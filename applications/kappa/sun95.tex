@@ -3977,7 +3977,7 @@ digits):
 
 \item \verb=%t+= :   Reset the {\att Style} attribute to its `normal' value.
 
-\item \verb=%-= :   Push the current graphics attribute values onto the top of 
+\item \verb=%-= :   Push the current graphics attribute values on to the top of 
            the stack (see \verb=%+=).
 
 \item \verb=%+= :   Pop attributes values of the top the stack (see \verb=%-=).  If
@@ -5773,9 +5773,9 @@ and another (the FRAME picture) to act as a frame for the DATA picture
 and the annotated axes. 
 
 Let's say you wanted to display an enlarged sub-section of the image in
-the top right corner of the X-window.  First, you need to decide on the
+the top-right corner of the X-window.  First, you need to decide on the
 bounds of the sub-section to be displayed.  Here, we use a graphics cursor to 
-indicate the bottom left and top right corners of a box enclosing the
+indicate the bottom left and top-right corners of a box enclosing the
 required area.  Click the left mouse button at the bottom left and top
 right corners of a box enclosing the required sub-section of the image:
 
@@ -5845,7 +5845,7 @@ screen or paper has a length of 1.0 (the scales on both axes are equal).
 
 \item [NDC] -- similar to BASEPIC but specifies positions in a
 normalised co-ordinate system in which the bottom left corner has
-co-ordinates (0,~0) and the top right corner has co-ordinates (1,~1).
+co-ordinates (0,~0) and the top-right corner has co-ordinates (1,~1).
 Thus, for a non-square device the scales on the two axes will be different.
 
 \item [CURPIC] -- similar to BASEPIC except that it covers only the
@@ -5880,7 +5880,7 @@ image section.  We have seen how \htmlref{PICDEF}{PICDEF} can be used
 to create a FRAME picture of a given size at a given position within
 the BASE picture, but there are also several other ways in which
 PICDEF can be used.  Here, we use PICDEF in `cursor' mode; the bottom
-left and top right corners of the new picture are specified by
+left and top-right corners of the new picture are specified by
 pointing and clicking with the mouse.\footnote{Note, by default, the
 FRAME picture created by PICDEF is \emph{not} constrained to be within
 the current picture, it can be anywhere within the BASE picture.} We
@@ -6008,7 +6008,7 @@ the graphics device before drawing the contours.  Instead, CONTOUR
 looks for an existing DATA picture contained within the current picture.
 If one is found, then CONTOUR attempts to align the contours using the 
 WCS information stored with the existing DATA picture.  In our case, the
-current picture is still the top right FRAME picture created by PICDEF,
+current picture is still the top-right FRAME picture created by PICDEF,
 and so the contours are aligned using the WCS information stored with the 
 DATA picture contained within this FRAME picture (\emph{i.e.} the magnified image 
 section).  CONTOUR tells us that this alignment occurred within the `SKY
@@ -6372,7 +6372,7 @@ shorter axis).  The bottom left corner of the graphics device is (0,~0).
 
 \item [NDC] --- Normalised Device Co-ordinates, which are similar to BASEPIC
 but specifies positions in a normalised co-ordinate system in which
-the bottom left corner has co-ordinates (0,~0) and the top right corner
+the bottom left corner has co-ordinates (0,~0) and the top-right corner
 has co-ordinates (1,~1). Thus, for a non-square device the scales on
 the two axes will be different.
 
@@ -6432,7 +6432,7 @@ again will often cure the problem.
 
 
 \subsection{\xlabel{se_psfiles}Working With PostScript Files\label{se:psfiles}}
-Having produced a pretty picture in an X-window, how do we get it onto a
+Having produced a pretty picture in an X-window, how do we get it on to a
 piece of paper? There are basically two ways.  The simplest way is to copy
 the pixel values from the X-window into a PostScript file, and then print
 the file on a suitable PostScript printer.  {\tt GIMP}, or {\tt xv} can be 
@@ -6651,7 +6651,7 @@ all of which span the entire graphics device.  GRAPHICS is an absolute
 co-ordinate system giving millimetres from the bottom left corner of the
 graphics device, and BASEPIC is a normalised co-ordinate system in which
 both axes have the same scale and the shorter dimension of the graphics
-device has length 1.0\footnote{NDC is like BASEPIC but the top right
+device has length 1.0\footnote{NDC is like BASEPIC but the top-right
 corner of the device has NDC co-ordinates (1,~1).}.  The BASEPIC Frame is 
 usually easier to work with
 since it does not depend on the size of the paper.  To determine the
@@ -6742,7 +6742,7 @@ positions as positions within the current co-ordinate Frame of the NDF
 {\tt m31}.  It also results in all the \htmlref{WCS}{apndf:wcs}~ information being copied from the
 NDF into the output positions list.
 
-We now create a Frame in the top right corner of the reduced `page' in
+We now create a Frame in the top-right corner of the reduced `page' in
 which a magnified image of the selected region will be displayed.  The
 picture occupies the remainder of the width left over by the main image
 (0.4 of the total width) and half the height.:
@@ -7168,7 +7168,7 @@ NDF, no matter how the NDF is created.
 \htmlref{AXIS}{apndf:axis}~ structures within the NDF.
 
 An AXIS structure is a one-dimensional array which maps pixel index along a
-given axis onto another related co-ordinate axis (\emph{e.g.} wavelength)
+given axis on to another related co-ordinate axis (\emph{e.g.} wavelength)
 -- the values on the other axes are assumed to be constant.  Each
 dimension in the NDF should have an associated AXIS structure.  Such
 structures can be created (for instance) using \htmlref{SETAXIS}{SETAXIS}.
@@ -7323,7 +7323,7 @@ any suitable system, but always stored internally in units of radians).
 electro-magnetic spectrum (various spectral systems and units are
 supported).
 \item [GRAPHICS] --- Reserved to represent positions on a graphics device 
-in units of millimetres, measured from the bottom left corner 
+in units of millimetres, measured from the bottom-left corner 
 of the device.
 \item [BASEPIC] --- Reserved to represent positions on a graphics device 
 in normalised units, in which the shorter axis of the graphics device has
@@ -9097,9 +9097,9 @@ the colour table using linear interpolation, whilst
 \htmlref{LUTRAMPS}{LUTRAMPS} loads the standard coloured ramps using
 the nearest neighbours in the lookup table.
 \htmlref{LUTREAD}{LUTREAD} reads the lookup table stored in the
-DATA\_ARRAY of the NDF called pastel and maps it onto the colour table
+DATA\_ARRAY of the NDF called pastel and maps it on to the colour table
 via linear interpolation.  In the fourth example the lookup table in
-NDF sawtooth is mapped onto the colour table via a linear
+NDF sawtooth is mapped on to the colour table via a linear
 nearest-neighbour method.  {\tt ex} tells \htmlref{LUTABLE}{LUTABLE} to
 read an external file.  In the final example
 \htmlref{LUTSAVE}{LUTSAVE} saves the current colour table into a
@@ -12004,7 +12004,7 @@ picture.}
 \menuitem{LUTWARM}{
  Loads the {\it warm} lookup table.}
 \menuitem{MAKESNR}{
- Create a signal-to-noise array from an NDF with Variance.}
+ Creates a signal-to-noise array from an NDF with Variance.}
 \menuitem{MAKESURFACE}{
  Creates a two-dimensional NDF from the coefficients of a polynomial surface.}
 \menuitem{MANIC}{
@@ -12453,7 +12453,7 @@ functions as follows.
 \classitem{LOGE}
  Takes the natural logarithm of each pixel of an NDF. 
 \classitem{MAKESNR}
- Create a signal-to-noise array from an NDF with Variance.
+ Creates a signal-to-noise array from an NDF with Variance.
 \classitem{MATHS}
  Evaluates mathematical expressions applied to NDF data structures.
 \classitem{MULT}
@@ -13058,7 +13058,7 @@ KAPPA: \htmlref{CADD}{CADD},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs} and \htmlref{VARIANCE}{apndf:variance} components of an NDF
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance} components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -14306,7 +14306,7 @@ KAPPA: \htmlref{CONVOLVE}{CONVOLVE},
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
          \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, 
-         \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the input NDF
+         \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the input NDF
          and propagates all \htmlref{extensions}{apndf:extensions}.  In addition, if the mean
          estimator is used, the \htmlref{VARIANCE}{apndf:variance}~ component is also processed.
          If the median estimator is used, then the output NDF will have
@@ -14393,7 +14393,7 @@ KAPPA: \htmlref{ADD}{ADD},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs} and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -14793,7 +14793,7 @@ KAPPA: \htmlref{VECPLOT}{VECPLOT};
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality}, \htmlref{VARIANCE}{apndf:variance},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the input NDF
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the input NDF
          and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -14875,7 +14875,7 @@ KAPPA: \htmlref{ADD}{ADD},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs} and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -15431,7 +15431,7 @@ KAPPA: \htmlref{PASTE}{PASTE},
          This routine correctly processes the DATA, \htmlref{QUALITY}{apndf:quality},
          \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, and \htmlref{HISTORY}{apndf:history}, components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.  Propagation is from
- the base NDF.  \htmlref{WCS}{apndf:wcs} and \htmlref{AXIS}{apndf:axis}~ information is lost.
+ the base NDF.  \htmlref{WCS}{apndf:wcs}, and \htmlref{AXIS}{apndf:axis}~ information is lost.
 
          \sstitem
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.
@@ -15576,7 +15576,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
 
          \sstitem
          The routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an NDF;
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF;
          and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -16079,7 +16079,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          should contain further comma-separated lists which will be
          read and interpreted in the same manner.  Attribute settings
          are applied in the order in which they occur within the list,
-         with later settings over-riding any earlier settings given for
+         with later settings overriding any earlier settings given for
          the same attribute.
 
          Each individual attribute setting should be of the form:
@@ -16551,7 +16551,7 @@ KAPPA: \htmlref{ADD}{ADD},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs} and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -16580,7 +16580,7 @@ KAPPA: \htmlref{ADD}{ADD},
       does not actually display the image, it just creates various output
       files which must be displayed using other tools (see below).
 
-      The data values in each of the input NDFs which are to be mapped onto
+      The data values in each of the input NDFs which are to be mapped on to
       zero intensity and full intensity can be given manually using
       parameters RLOW, RHIGH, GLOW, GHIGH, BLOW and BHIGH, but by default
       they are evaluated automatically.  This is done by finding specified
@@ -16828,7 +16828,7 @@ XV; PBMPLUS; NETPBM.
       \sstitemlist{
 
          \sstitem
-         The \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs} and \htmlref{AXIS}{apndf:axis}~ components, together with any extensions
+         The \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{AXIS}{apndf:axis}~ components, together with any extensions
          are propagated to the output NDF, from the first supplied input NDF.
 
          \sstitem
@@ -17019,7 +17019,7 @@ XV; PBMPLUS; NETPBM.
          values for the current Frame axis specified by parameter
          AXIS.  These two current Frame positions are transformed into
          pixel co-ordinates, and the projections of the vector joining
-         these two pixel positions onto the pixel axes are found.  The
+         these two pixel positions on to the pixel axes are found.  The
          pixel axis with the largest projection is selected as the
          collapse axis, and the two end points of the projection
          define the range of axis values to collapse.
@@ -17039,7 +17039,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{VARIANCE}{apndf:variance},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the input NDF and
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the input NDF and
          propagates all \htmlref{extensions}{apndf:extensions}.  QUALITY is not propagated.
 
          \sstitem
@@ -17094,7 +17094,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
 
             \sstitem
             {\tt "FIRST"} --- The compression boxes are placed so that the
-            first pixel in the input NDF (for instance, the bottom left
+            first pixel in the input NDF (for instance, the bottom-left
             pixel in a two-dimensional image) corresponds to the first pixel
             in a compression box.  This can result in the pixel origin being
             shifted by up to one compression box in the output image.  Thus,
@@ -17106,7 +17106,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
 
             \sstitem
             {\tt "LAST"} --- The compression boxes are placed so that the
-            last pixel in the input NDF (for instance, the top right
+            last pixel in the input NDF (for instance, the top-right
             pixel in a two-dimensional image) corresponds to the last pixel
             in a compression box.  See the {\tt "FIRST"} option above for further
             comments.
@@ -17296,7 +17296,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{VARIANCE}{apndf:variance},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the input NDF and
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the input NDF and
          propagates all \htmlref{extensions}{apndf:extensions}.  QUALITY is not processed since it is
  a series of flags, not numerical values.
 
@@ -17353,7 +17353,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
 
             \sstitem
             {\tt "FIRST"} --- The compression boxes are placed so that the
-            first pixel in the input NDF (for instance, the bottom left
+            first pixel in the input NDF (for instance, the bottom-left
             pixel in a two-dimensional image) corresponds to the first pixel
             in a compression box.  This can result in the pixel origin being
             shifted by up to one compression box in the output image.  Thus,
@@ -17365,7 +17365,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
 
             \sstitem
             {\tt "LAST"} --- The compression boxes are placed so that the
-            last pixel in the input NDF (for instance, the top right
+            last pixel in the input NDF (for instance, the top-right
             pixel in a two-dimensional image) corresponds to the last pixel
             in a compression box.  See the {\tt "FIRST"} option above for further
             comments.
@@ -17546,7 +17546,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{VARIANCE}{apndf:variance},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the input NDF and
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the input NDF and
          propagates all \htmlref{extensions}{apndf:extensions}.  QUALITY is not processed since it is
  a series of flags, not numerical values.
 
@@ -17673,7 +17673,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the
          input NDF and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -17777,7 +17777,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       }{
          The height below which the contours will be drawn with dashed
          lines (if possible).  A null value ({\tt{!}}) results in contours being
-         drawn with the styles specified by parameters PENS, PENROT and
+         drawn with the styles specified by parameters PENS, PENROT, and
          STYLE. {\tt [!]}
       }
       \sstsubsection{
@@ -17788,8 +17788,8 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       \sstsubsection{
          FAST = \_LOGICAL (Read)
       }{
-         If {\tt TRUE}, then a faster, but in certain cases less accurate, method
-         is used to draw the contours.  In fast mode, contours may be
+         If {\tt TRUE}, then a faster, but in certain cases less-accurate, 
+         method is used to draw the contours.  In fast mode, contours may be
          incorrectly placed on the display if the mapping between graphics
          co-ordinates and the current co-ordinate Frame of the supplied NDF
          has any discontinuities, or is strongly non-linear.  This may be
@@ -17830,13 +17830,13 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          KEYPOS() = \_REAL (Read)
       }{
          Two values giving the position of the key.  The first value gives
-         the gap between the right hand edge of the contour map and the left
-         hand edge of the key (0.0 for no gap, 1.0 for the largest gap).  The
-         second value gives the vertical position of the top of the key (1.0
+         the gap between the right-hand edge of the contour map and the
+         left-hand edge of the key (0.0 for no gap, 1.0 for the largest gap).
+         The second value gives the vertical position of the top of the key (1.0
          for the highest position, 0.0 for the lowest).  If the second value
          is not given, the top of the key is placed level with the top of the
          contour map.  Both values should be in the range 0.0 to 1.0.  If a
-         key is produced, then the right hand margin specified by parameter
+         key is produced, then the right-hand margin specified by parameter
          MARGIN is ignored. {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -17898,10 +17898,10 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          input NDF within the plot.  The label is drawn parallel to the
          first pixel axis.  Two values should be supplied for LABPOS.  The 
          first value specifies the distance in millimetres along the first
-         pixel axis from the centre of the bottom left pixel to the left 
+         pixel axis from the centre of the bottom-left pixel to the left 
          edge of the label.  The second value specifies the distance in 
          millimetres along the second pixel axis from the centre of the 
-         bottom left pixel to the baseline of the label.  If a null ({\tt{!}}) 
+         bottom-left pixel to the baseline of the label.  If a null ({\tt{!}}) 
          value is given, no label is produced.  The appearance of the label 
          can be set by using the STYLE parameter
          (for instance {\tt "Size(strings)=2"}). {\tt [}current value{\tt{]}}
@@ -18011,7 +18011,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          cycled through again, starting at the beginning.  Each string should
          be a comma-separated list of plotting attributes to be used when drawing
          the contour.  For instance, the string {\tt "width=10.0,colour=red,style=2"}
-         produces a thick, red, dashed contour.  Attributes which are
+         produces a thick, red, dashed contour.  Attributes that are
          unspecified in a string default to the values implied by parameter
          STYLE.  If a null value ({\tt{!}}) is given for PENS, then the pens
          implied by parameters PENROT, DASHED and STYLE are used. {\tt [!]}
@@ -18381,7 +18381,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the
          input NDF and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -18486,9 +18486,9 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
       This application creates a two-dimensional output \NDFref{NDF} containing
       artificial data of various forms (see parameter MODE).  The output
       NDF can, optionally, have a VARIANCE component describing the noise
-      in the Data array (see parameter VARIANCE), and additionally a
+      in the data array (see parameter VARIANCE), and additionally a
       randomly generated pattern of bad pixels (see parameter BADPIX).
-      Bad columns or rows of pixels can also be generated
+      Bad columns or rows of pixels can also be generated.
    }
    \sstusage{
       creframe out mode [lbound] [ubound]
@@ -18535,10 +18535,10 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
          \ssthitemlist{
 
             \sstitem
-            {\tt "FIX"} --- Fixed distance.
+            {\tt "FIX"} --- fixed distance, and
 
             \sstitem
-            {\tt "RSQ"} --- One over radius squared.
+            {\tt "RSQ"} --- one over radius squared.
 
          }
          {\tt ["FIX"]}
@@ -18677,7 +18677,7 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Title for the output NDF {\tt ["KAPPA - Creframe"]}
+         Title for the output NDF.  {\tt ["KAPPA - Creframe"]}
       }
       \sstsubsection{
          UBOUND( 2 ) = \_INTEGER (Read)
@@ -18785,7 +18785,7 @@ KAPPA: \htmlref{ADD}{ADD},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs} and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -19621,7 +19621,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          MODE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The method by which the maximum and minimum data values to be
-         displayed are chosen.  The options are:
+         displayed are chosen.  The options are as follows.
 
          \ssthitemlist{
 
@@ -19632,7 +19632,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
             Scale mode may be utilised later.
 
             \sstitem
-            {\tt "Flash"} --- The image is flashed onto the screen without any
+            {\tt "Flash"} --- The image is flashed on to the screen without any
             scaling at all.  This is the fastest option.
 
             \sstitem
@@ -19762,7 +19762,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          A value larger than 1.0 makes each data pixel wider.  If this
          results in the image being wider than the available space then
          the the image will be clipped to display fewer pixels.  See also
-         parameters YMAGN, CENTRE and FILL. [1.0]
+         parameters YMAGN, CENTRE, and FILL. [1.0]
       }
       \sstsubsection{
          YMAGN = \_REAL (Read)
@@ -19773,7 +19773,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          A value larger than 1.0 makes each data pixel taller.  If this
          results in the image being taller than the available space then
          the image will be clipped to display fewer pixels.  See also
-         parameters XMAGN, CENTRE and FILL.  If a null ({\tt{!}}) value is supplied,
+         parameters XMAGN, CENTRE, and FILL.  If a null ({\tt{!}}) value is supplied,
          the value used is the value supplied for XMAGN.  {\tt[!]}
       }
    }
@@ -19921,7 +19921,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{WCS}{apndf:wcs} and \htmlref{UNITS}{apndf:units}~ components of the input NDF.
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{WCS}{apndf:wcs}, and \htmlref{UNITS}{apndf:units}~ components of the input NDF.
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are
@@ -20013,7 +20013,7 @@ KAPPA: \htmlref{ADD}{ADD},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs} and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -20885,7 +20885,7 @@ KAPPA: \htmlref{FFCLEAN}{FFCLEAN},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an NDF data
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF data
          structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -21305,7 +21305,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an NDF
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -21537,7 +21537,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an NDF
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -23464,7 +23464,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          The text file containing the FITS headers.  Each record should
          be the standard 80-character `card image'.  If the file has
          been edited care is needed to ensure that none of the cards
-         are wrapped onto a second line.
+         are wrapped on to a second line.
       }
    }
    \sstexamples{
@@ -24064,7 +24064,7 @@ KAPPA: \htmlref{ROTATE}{ROTATE},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the
          input NDF and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -24557,7 +24557,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the
          input NDF and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -25086,7 +25086,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the
          input NDF and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -25739,7 +25739,7 @@ KAPPA: \htmlref{LAPLACE}{LAPLACE},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an NDF data structure and
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF data structure and
          propagates all \htmlref{extensions}{apndf:extensions}.  \htmlref{UNITS}{apndf:units}~ and \htmlref{VARIANCE}{apndf:variance}~ become undefined
          by the transformation, and so are not propagated.
 
@@ -26795,7 +26795,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
       This application creates a plot of array value against position for
       a one-dimensional \NDFref{NDF}.  The vertical axis of the plot represents array
       value, and the horizontal axis represents position.  These can be
-      mapped in various ways onto the graphics surface (\emph{e.g.} linearly, 
+      mapped in various ways on to the graphics surface (\emph{e.g.} linearly, 
       logarithmically); see parameters XMAP and YMAP.
 
       The plot may take several different forms such as a {\tt "join-the-dots"}
@@ -27053,7 +27053,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          MODE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          Specifies the way in which data values are represented.  MODE
-         can take the following values:
+         can take the following values.
 
          \ssthitemlist{
 
@@ -27092,7 +27092,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          SHAPE = LITERAL (Read)
       }{
          Specifies the way in which errors are represented.  SHAPE
-         can take the following values:
+         can take the following values.
 
          \ssthitemlist{
 
@@ -27195,7 +27195,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          XMAP = LITERAL (Read)
       }{
          Specifies how the quantity represented by the \textit{x} axis is mapped
-         onto the plot.  The options are:
+         on to the plot.  The options are as follows.
 
          \ssthitemlist{
 
@@ -27259,16 +27259,16 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          YMAP = LITERAL (Read)
       }{
          Specifies how the quantity represented by the \textit{y} axis is mapped
-         onto the screen.  The options are:
+         on to the screen.  The options are as follows.
 
          \ssthitemlist{
 
             \sstitem
-            {\tt "Linear"} --- The data values are mapped linearly onto the
+            {\tt "Linear"} --- The data values are mapped linearly on to the
             screen.
 
             \sstitem
-            {\tt "Log"} --- The data values are logged logarithmically onto the
+            {\tt "Log"} --- The data values are logged logarithmically on to the
             screen.  An error will be reported if the dynamic range of
             the axis is less than 100, or if the range specified by YTOP and
             YBOT encompasses the value zero.  For this reason, care should
@@ -27278,9 +27278,9 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
 
             \sstitem
             {\tt "ValueLog"} --- This is similar to {\tt "Log"} except that, instead
-            of mapping the data values logarithmically onto the screen,
+            of mapping the data values logarithmically on to the screen,
             this option maps the log (base 10) of the data values linearly
-            onto the screen.  If this option is selected, the values supplied
+            on to the screen.  If this option is selected, the values supplied
             for parameters YTOP and YBOT should be values for the logarithm of
             the data value, not the data value itself. 
          }
@@ -27350,7 +27350,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          This plots the data values in the entire one-dimensional NDF called
          prof, against the value described by the second axis in the current
          co-ordinate Frame of the NDF.  The values represented by both
-         axes are mapped logarithmically onto the screen.  The bottom of the
+         axes are mapped logarithmically on to the screen.  The bottom of the
          vertical axis corresponds to a data value of 10.0 and the top
          corresponds to a data value of 1000.0.
       }
@@ -27443,7 +27443,7 @@ KAPPA: \htmlref{PROFILE}{PROFILE},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{VARIANCE}{apndf:variance},
-         \htmlref{QUALITY}{apndf:quality}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{WCS}{apndf:wcs} and \htmlref{UNITS}{apndf:units}~ components of the NDF.
+         \htmlref{QUALITY}{apndf:quality}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{WCS}{apndf:wcs}, and \htmlref{UNITS}{apndf:units}~ components of the NDF.
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are
@@ -27733,13 +27733,13 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
 }{
    \sstdescription{
       This application reports positions contained in a catalogue.  The
-      catalogue should have the form of a positions list as produced (for
-      instance) by applications LISTMAKE and CURSOR.  By default all positions
+      catalogue should have the form of a positions list as produced, for
+      instance, by applications LISTMAKE and CURSOR.  By default all positions
       in the catalogue are reported, but a subset may be reported by
       specifying a range of \emph{position identifiers}~ (see parameters FIRST
       and LAST).
  
-      Positions may be reported in a range of \htmlref{co-ordinate Frames}{se:domains}~  dependent
+      Positions may be reported in a range of \htmlref{co-ordinate Frames}{se:domains}~ dependent
       on the information stored in the supplied positions list (see parameter
       FRAME).  The selected positions are written to an output parameter
       (parameter POSNS), and may also be written to an output positions
@@ -27753,7 +27753,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
       within the  co-ordinate Frame specified using parameter FRAME.  If this
       is not possible, alignment may occur in some other suitable Frame.  A
       message is displayed indicating the Frame in which alignment occurred.
-      If the supplied positions are aligned succesfully with a picture, then
+      If the supplied positions are aligned successfully with a picture, then
       the range of Frames in which the positions may be reported on the screen
       is extended to include all those associated with the picture.
    }
@@ -27780,8 +27780,8 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          The epoch at which the sky positions stored in the output
          catalogue were determined.  It will only be accessed if an epoch
          value is needed to qualify the co-ordinate Frame specified by
-         COLFRAME.  If required, it should be given as a decimal years
-         value, with or without decimal places ({\tt "1996.8"} for example).
+         COLFRAME.  If required, it should be given as a decimal-years
+         value, with or without decimal places ({\tt "1996.8"}, for example).
          Such values are interpreted as a Besselian epoch if less than
          1984.0 and as a Julian epoch otherwise.
       }
@@ -27830,7 +27830,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          A string determining the co-ordinate Frame in which positions are
          to be reported.  This application can report positions in
          any of the co-ordinate Frames stored with the positions list.  The
-         string supplied for FRAME can be one of the following:
+         string supplied for FRAME can be one of the following.
 
          \ssthitemlist{
 
@@ -27863,7 +27863,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          positions should be stright lines, or should be geodesic curves.
          In many co-ordinate Frames geodesic curves will be simple straight
          lines.  However, in others (such as the majority of celestial
-         co-ordinates Frames) geodesic curves will be more complex curves
+         co-ordinate Frames) geodesic curves will be more complex curves
          tracing the shortest path between two positions in a non-linear
          projection. {\tt [FALSE]}
       }
@@ -27880,8 +27880,9 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          text strings at the supplied positions.  This parameter is
          only accessed if parameter PLOT is set to {\tt "Text"}.  The supplied
          string should contain two characters; the first should be {\tt "B"},
-         {\tt "C"} or {\tt "T"}, meaning bottom, centre or top.  The second should be
-         {\tt "L"}, {\tt "C"} or {\tt "R"}, meaning left, centre or right.  The text is
+         {\tt "C"}, or {\tt "T"}, meaning bottom, centre, or top
+         respectively.  The second should be {\tt "L"}, {\tt "C"}, or 
+         {\tt "R"}, meaning left, centre, or right respectively.  The text is
          displayed so that the supplied position is at the specified
          point within the displayed text string. {\tt [CC]}
       }
@@ -27890,7 +27891,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
       }{
          If {\tt TRUE} the positions are labelled with the corresponding integer
          identifiers on the graphics device specified by parameter DEVICE.
-         The offset from each position to the centre of the corresponding
+         The offset of each position from the centre of the corresponding
          label is controlled using the \htmlattref{NumLabGap(1)}{NumLabGap(axis)}~
          and {\att NumLabGap(2)} plotting attributes, and the appearance of the 
          labels is controlled using attributes \htmlattref{Colour(NumLab)}{Colour(element)}, 
@@ -27902,9 +27903,8 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
       }{
          The identifier for the last position to be displayed.  Positions
          are only displayed which have identifiers in the range given by
-         parameters FIRST and LAST.  Parameters FIRST and LAST.  If a null ({\tt{!}})
-         value is supplied, the value used is the highest identifier value
-         in the positions list. {\tt [!]}
+         parameters FIRST and LAST.  If a null ({\tt{!}}) value is supplied, 
+         the value used is the highest identifier value in the positions list. {\tt [!]}
       }
       \sstsubsection{
          LOGFILE = FILENAME (Write)
@@ -27952,7 +27952,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          The type of graphics to be used to mark the positions on the
          graphics device specified by parameter DEVICE.  The appearance of
          these graphics (colour, size, \emph{etc.}) is controlled by the STYLE
-         parameter.  PLOT can take any of the following values:
+         parameter.  PLOT can take any of the following values.
 
          \ssthitemlist{
 
@@ -28000,7 +28000,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
             \sstitem
             {\tt "Blank"} --- The graphics device is opened and the picture specified
             by parameter NAME is found, but no actual graphics are drawn to mark
-            the positions.  This can be usefull if you just want to transform
+            the positions.  This can be useful if you just want to transform
             the supplied positions into one of the co-ordinate Frames associated
             with the picture, without drawing anything (see parameter FRAME).
 
@@ -28014,8 +28014,8 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          The unformatted co-ordinates of the positions selected by
          parameters FIRST and LAST, in the co-ordinate Frame selected by
          FRAME.  The axis values are stored as a one-dimensional vector.  All
-         the axis 1 values for the selected positions are stored first,
-         followed by the axis 2 values, \emph{etc}.  The number of positions in
+         the axis-1 values for the selected positions are stored first,
+         followed by the axis-2 values, \emph{etc}.  The number of positions in
          the vector is written to the output parameter NUMBER, and the
          number of axes per position is written to the output parameter
          DIM.  The axis values may not be in the same units as the
@@ -28026,7 +28026,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          QUIET = \_LOGICAL (Read)
       }{
          If {\tt TRUE} then the positions are not displayed on the screen while
-         The application is running.  Output parameters and files are still
+         the application is running.  Output parameters and files are still
          created.  If a null ({\tt{!}}) value is supplied, the value used is {\tt TRUE}
          if any graphics or labels are being plotted (see parameters PLOT
          and LABEL), and {\tt FALSE} otherwise. {\tt [!]}
@@ -28040,9 +28040,9 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          mark the second position, \emph{etc}.  If more positions are given than there
          are strings in the group, then the extra positions will be marked
          with an integer value indicating the index within the list of
-         supplied positions (note, these integers may be different to the
+         supplied positions. (Note, these integers may be different from the
          position identifiers in the supplied positions list; if you want to
-         see the position identifiers, use parameter LABEL).  If a null value
+         see the position identifiers, use parameter LABEL.)  If a null value
          ({\tt{!}}) is given for the parameter, then all positions will be marked
          with integer indices, starting at 1.
 
@@ -28124,7 +28124,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
       }{
          This extracts position 3 from the catalogue {\tt stars.fit} transforming
          it into FK5 equatorial RA/DEC co-ordinates (referenced to the
-         J2010 equinox) if possible.  The RA/DEC values (in radians) are
+         J2010 equinox), if possible.  The RA/DEC values (in radians) are
          written to the output parameter POSNS, but not to the screen.
       }
       \sstexamplesubsection{
@@ -29069,7 +29069,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the
          input NDF and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -29858,18 +29858,18 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
          \ssthitemlist{
 
             \sstitem
-            {\tt "GRAPHICS"} --- gives positions in millimetres from the bottom left
-            corner of the plotting surface.
+            {\tt "GRAPHICS"} --- gives positions in millimetres from the 
+            bottom-left corner of the plotting surface.
 
             \sstitem
             {\tt "BASEPIC"} --- gives positions in a normalised system in which the
-            bottom left corner of the plotting surface is (0,~0) and the
+            bottom-left corner of the plotting surface is (0,~0) and the
             shortest dimension of the plotting surface has length 1.0.  The
             scales on the two axes are equal.
 
             \sstitem
             {\tt "CURPIC"} --- gives positions in a normalised system in which the
-            bottom left corner of the current picture is (0,~0) and the
+            bottom-left corner of the current picture is (0,~0) and the
             shortest dimension of the current picture has length 1.0.  The
             scales on the two axes are equal.
 
@@ -30232,7 +30232,7 @@ KAPPA: \htmlref{DISPLAY}{DISPLAY},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs} and \htmlref{VARIANCE}{apndf:variance} components of an NDF
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance} components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -30396,7 +30396,8 @@ KAPPA: \htmlref{FITSURFACE}{FITSURFACE},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an NDF
+         \htmlref{VARIANCE}{apndf:variance},
+\htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.  However, neither
  QUALITY nor a SURFACEFIT extension is propagated when LIKE is not
          null.
@@ -30528,7 +30529,7 @@ KAPPA: \htmlref{FITSURFACE}{FITSURFACE},
          manic cube hyper [1,0,0,0,0,0,3] ubound=[2,4,2,2,1] accept
       }{
          This manic example projects the second dimension of an input
-         three-dimensional NDF onto the plane formed by its first and third
+         three-dimensional NDF on to the plane formed by its first and third
          dimensions by averaging, and grows the resulting plane
          up through five new dimensions with a variety of extents.
       }
@@ -30555,7 +30556,7 @@ KAPPA: \htmlref{COLLAPSE}{COLLAPSE},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{VARIANCE}{apndf:variance},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the input NDF and
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the input NDF and
          propagates all \htmlref{extensions}{apndf:extensions}.  QUALITY is also propagated if possible
  (\emph{i.e.} if no input axes are collapsed).
 
@@ -30950,7 +30951,7 @@ and numerous arithmetic tasks;
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the
          input NDFs.  HISTORY and \htmlref{extensions}{apndf:extensions}~ are propagated from both the
          primary NDF and template NDF.
 
@@ -31301,7 +31302,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title},
-         \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an NDF data structure and
+         \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF data structure and
          propagates all \htmlref{extensions}{apndf:extensions}.  \htmlref{VARIANCE}{apndf:variance}~ is not used to weight the
          median filter and is not propagated.
          \htmlref{QUALITY}{apndf:quality}~ is also lost.
@@ -31737,7 +31738,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an NDF
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -31937,13 +31938,13 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
       supplied NDF (see parameter COMP). Vertical error bars may be drawn if
       the NDF contains a VARIANCE component (see parameter ERRBAR).  The
       vertical axis of the plot represents array value (or the logarithm of
-      the array value - see parameter YLOG).  The horizontal axis represents
+      the array value---see parameter YLOG).  The horizontal axis represents
       position, and may be annotated using an axis selected from the Current
       Frame of the NDF (see parameter USEAXIS).
 
       Each curve may be labelled using its pixel index or a label specified
       by the user (see parameters LINLAB and LABELS).  The appearance of these
-      labels (size, colour, font, horizontal position, \emph{etc.}) can be
+      labels (size, colour, fount, horizontal position, \emph{etc.}) can be
       controlled using parameter STYLE.  A key may be produced to the left
       of the main plot listing the vertical offsets of the curves (see
       parameter KEY).  The appearance of the key may be controlled using
@@ -31958,7 +31959,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
       but parameter CLEAR can be used to prevent this, allowing several
       plots to be `stacked' together.  If a new plot is drawn over an
       existing plot, then the bounds of the new plot are set automatically
-      to the bounds of the existing plot (XLEFT, XRIGHT, YBOT and YTOP are
+      to the bounds of the existing plot (XLEFT, XRIGHT, YBOT, and YTOP are
       then ignored).
    }
    \sstusage{
@@ -31970,10 +31971,10 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          ABSAXS = \_INTEGER (Read)
       }{
          This selects whether to plot rows or columns within the NDF.
-         If ABSAXS is 1, each curve will represent the array values within
-         a single row of pixels within the NDF.  If it is 2, each curve will
-         represent the array values within a single column of pixels within
-         the NDF. {\tt [1]}
+	 If ABSAXS is {\tt 1}, each curve will represent the array
+	 values within a single row of pixels within the NDF.  If it
+	 is {\tt 2}, each curve will represent the array values within
+	 a single column of pixels within the NDF. {\tt [1]}
       }
       \sstsubsection{
          AXES = \_LOGICAL (Read)
@@ -31985,7 +31986,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          quantities used to annotated the horizontal and vertical axes
          respectively.  The width of the margins left for the annotation
          may be controlled using parameter MARGIN.  The appearance of the
-         axes (colours, fonts, \emph{etc.}) can be controlled using the parameter
+         axes (colours, founts, \emph{etc.}) can be controlled using the parameter
          STYLE. {\tt [!]}
       }
       \sstsubsection{
@@ -32025,7 +32026,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          FREQ = \_INTEGER (Read)
       }{
          The frequency at which error bars are to be plotted.  For
-         instance, a value of 2 would mean that alternate points have
+         instance, a value of {\tt 2} would mean that alternate points have
          error bars plotted.  This lets some plots be less cluttered.
          FREQ must lie in the range 1 to half of the number of points
          to be plotted.  FREQ is only accessed when parameter ERRBAR is
@@ -32037,20 +32038,21 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          {\tt TRUE} if a key giving the offset of each curve is to be produced.
          The appearance of this key can be controlled using parameter
          KEYSTYLE, and its position can be controlled using parameter
-         KEYPOS. {\tt [TRUE]}
+         KEYPOS.  {\tt [TRUE]}
       }
       \sstsubsection{
          KEYPOS() = \_REAL (Read)
       }{
-         Two values giving the position of the key.  The first value gives
-         the gap between the right hand edge of the contour map and the left
-         hand edge of the key (0.0 for no gap, 1.0 for the largest gap).  The
-         second value gives the vertical position of the top of the key (1.0
-         for the highest position, 0.0 for the lowest).  If the second value
-         is not given, the top of the key is placed level with the top of the
-         contour map.  Both values should be in the range 0.0 to 1.0.  If a
-         key is produced, then the right hand margin specified by parameter
-         MARGIN is ignored. {\tt [}current value{\tt{]}}
+         Two values giving the position of the key.  The first value
+	 gives the gap between the right-hand edge of the
+	 multiple-line plot and the left-hand edge of the key (0.0 for
+	 no gap, 1.0 for the largest gap).  The second value gives the
+	 vertical position of the top of the key (1.0 for the highest
+	 position, 0.0 for the lowest).  If the second value is not
+	 given, the top of the key is placed level with the top of the
+	 multiple-line plot.  Both values should be in the range 0.0 to 1.0.
+	 If a key is produced, then the right hand margin specified by
+	 parameter MARGIN is ignored.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          KEYSTYLE = \htmlref{GROUP}{se:groups} (Read)
@@ -32125,7 +32127,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
       }{
          Specifies the NDF pixel indices of the rows or columns to be
          displayed (see parameter ABSAXS).  A maximum of 100 lines may be
-         selected.  It can take any of the following values:
+         selected.  It can take any of the following values.
 
          \ssthitemlist{
 
@@ -32150,8 +32152,8 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
       \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
       }{
-         The widths of the margins to leave around the contour map for axis
-         annotation.  The widths should be given as fractions of the
+         The widths of the margins to leave around the multiple-line plot for 
+         axis annotation.  The widths should be given as fractions of the
          corresponding dimension of the current picture.  Four values may be
          given, in the order; bottom, right, top, left.  If fewer than four
          values are given, extra values are used equal to the first supplied
@@ -32173,7 +32175,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          MODE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          Specifies the way in which each curve is drawn.  MODE can take the
-         following values:
+         following values.
 
          \ssthitemlist{
 
@@ -32231,7 +32233,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          SIGMA = LITERAL (Read)
       }{
          If vertical error bars are produced (see parameter ERRBAR), then
-         SIGMA gives the number of standard deviations which the error
+         SIGMA gives the number of standard deviations that the error
          bars are to represent. {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -32275,7 +32277,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
       }{
          A group of attribute settings describing the plotting style to use
          when drawing the annotated axes, data curves, error bars, zero
-         markers and curve labels.
+         markers, and curve labels.
 
          A comma-separated list of strings should be given in which each
          string is either an attribute setting, or the name of a text file
@@ -32308,13 +32310,13 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          be used in place of {\att Markers}).  The appearance of the
          error bars is  controlled using {\att Colour(ErrBars)}, 
          {\att Width(ErrBars)}, \emph{etc.} (see parameter ERRBAR).  The appearance of 
-         the zero point markers is controlled using {\att Colour(ZeroMark)}, 
+         the zero-point markers is controlled using {\att Colour(ZeroMark)}, 
          {\att Size(ZeroMark}),  \emph{etc}.  The appearance of the curve labels is
          controlled using {\att Colour(Labels)}, {\att Size(Labels)}, \emph{etc}. 
          {\att LabPos(Left)} controls the horizontal position
          of the in-line curve label (see parameter LINLAB), and
          {\att LabPos(Right)} controls the horizontal position of the curve
-         label associated with the right hand zero point marker (see
+         label associated with the right-hand zero-point marker (see
          parameter ZMARK).  {\att LabPos} without any qualifier is equivalent to
          {\att LabPos(Left)}.  {\att LabPos} values are floating point, with 
          {\tt 0.0} meaning
@@ -32340,7 +32342,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
       \sstsubsection{
          XLEFT = LITERAL (Read)
       }{
-         The axis value to place at the left hand end of the horizontal
+         The axis value to place at the left-hand end of the horizontal
          axis.  If a null ({\tt{!}}) value is supplied, the value used is the first
          element in the data being displayed.  The value supplied may be
          greater than or less than the value supplied for XRIGHT.  A formatted
@@ -32350,9 +32352,9 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
       \sstsubsection{
          XRIGHT = LITERAL (Read)
       }{
-         The axis value to place at the right hand end of the horizontal
-         axis.  If a null ({\tt{!}}) value is supplied, the value used is the last
-         element in the data being displayed.  The value supplied may be
+         The axis value to place at the right-hand end of the horizontal
+         axis.  If a null ({\tt{!}}) value is supplied, the value used is the 
+         last element in the data being displayed.  The value supplied may be
          greater than or less than the value supplied for XLEFT.  A formatted
          value for the quantity specified by parameter USEAXIS should be
          supplied. {\tt [!]}
@@ -32389,7 +32391,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          If {\tt TRUE}, then a pair of short horizontal lines are drawn at the left
          and right edges of the main plot for each curve.  The vertical
          position of these lines corresponds to the zero point for the
-         corresponding curve.  The right hand marker is annotated with the
+         corresponding curve.  The right-hand marker is annotated with the
          curve label (see parameter LABELS).  The appearance of these
          markers can be controlled using the parameter STYLE. {\tt [TRUE]}
       }
@@ -32447,7 +32449,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
       }{
          Plot the currently selected rows of the two-dimensional NDF
          file, rcw3\_b1.  The base lines are set at 0.0 for the first row,
-         2.0E-4 for the second, 4.0E-4 for the third, 6.0E-4 for the fourth
+         2.0E-4 for the second, 4.0E-4 for the third, 6.0E-4 for the fourth,
          and 0.1 for the fifth.
       }
    }
@@ -32490,7 +32492,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT};
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{VARIANCE}{apndf:variance},
-         \htmlref{QUALITY}{apndf:quality}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{WCS}{apndf:wcs} and \htmlref{UNITS}{apndf:units}~ components of the NDF.
+         \htmlref{QUALITY}{apndf:quality}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{WCS}{apndf:wcs}, and \htmlref{UNITS}{apndf:units}~ components of the NDF.
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are
@@ -32563,10 +32565,11 @@ plot (9k).
       \sstsubsection{
          ILEVEL = \_INTEGER (Read)
       }{
-         The interactive level of the routine (only used if SINGLE={\tt TRUE}).  If
-         it is 1, nothing is reported on the screen.  If is is 2 or 3, the
-         statistics are reported.  If is is 3, the individual pixel values
-         are also reported.  It should lie between 1 and 3. {\tt [2]}
+         The interactive level of the routine (only used if SINGLE={\tt TRUE}).
+         If it is {\tt 1}, nothing is reported on the screen.  If is is 
+         {\tt 2} or {\tt 3}, the statistics are reported.  If is is {\tt 3}, 
+         the individual pixel values are also reported.  It should lie between 
+         1 and 3.  {\tt [2]}
       }
       \sstsubsection{
          IN = \htmlref{GROUP}{se:groups} (Read)
@@ -32574,13 +32577,13 @@ plot (9k).
          A group of input NDFs.  They may have different shapes, but
          must all have the same number of dimensions.  This should
          be given as a comma-separated list, in which each list element
-         can be:
+         can be one of the following.
 
          \ssthitemlist{
 
             \sstitem
-            an NDF name, optionally containing wild-cards and/or regular
-            expressions ({\tt "$*$"}, {\tt "?"}, {\tt "[a-z]"} \emph{etc.}).
+            An NDF name, optionally containing wild-cards and/or regular
+            expressions ({\tt "$*$"}, {\tt "?"}, {\tt "[a-z]"} \emph{etc.});
 
             \sstitem
             the name of a text file, preceded by an up-arrow character {\tt "$\wedge$"}.
@@ -32803,7 +32806,7 @@ KAPPA: \htmlref{ADD}{ADD},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs} and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -33025,7 +33028,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
    }
    \sstimplementationstatus{
       If present, an NDF's \htmlref{TITLE}{apndf:title}, \htmlref{LABEL}{apndf:label}, \htmlref{UNITS}{apndf:units}, DATA, \htmlref{VARIANCE}{apndf:variance},
-      \htmlref{QUALITY}{apndf:quality}, \htmlref{AXIS}{apndf:axis}~ \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components are copied by this routine,
+      \htmlref{QUALITY}{apndf:quality}, \htmlref{AXIS}{apndf:axis}~ \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components are copied by this routine,
       together with all \htmlref{extensions}{apndf:extensions}.  The output NDF's title may be
       modified, if required, by specifying a new value via the TITLE
       parameter.
@@ -33565,7 +33568,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an NDF
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -33624,8 +33627,8 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          {\tt TRUE} if labelled and annotated axes are to be drawn around the
          plot.  The width of the margins left for the annotation may be
          controlled using parameter MARGIN.  The appearance of the axes
-         (colours, fonts, \emph{etc.}) can be controlled using the parameter
-         STYLE. {\tt [TRUE]}
+         (colours, founts, \emph{etc.}) can be controlled using the parameter
+         STYLE.  {\tt [TRUE]}
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -33648,7 +33651,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          the value of PCRANGE.  Note, this parameter controls the range of
          data used in the fitting algorithm.  The range of data displayed
          in the plot can be specified separately using parameters XLEFT,
-         XRIGHT, YBOT and YTOP. {\tt [!]}
+         XRIGHT, YBOT, and YTOP. {\tt [!]}
       }
       \sstsubsection{
          DEVICE = \htmlref{DEVICE}{se:selgradev} (Read)
@@ -33728,19 +33731,19 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          which selects the data to use in the fitting algorithm.  The two
          values correspond to the percentage points in the histogram of
          IN2 at which the lower and upper cuts on data value are placed.
-         With the default value, the plots will omit those pixels which
-         lie in the lower and upper 2 percent intensity range of IN2.
+         With the default value, the plots will omit those pixels that
+         lie in the lower and upper two-percent intensity range of IN2.
          Note, this parameter controls the range of data used in the
          fitting algorithm.  The range of data displayed in the plot can
-         be specified separately using parameters XLEFT, XRIGHT, YBOT and
-         YTOP. {\tt [2,98]}
+         be specified separately using parameters XLEFT, XRIGHT, YBOT, and
+         YTOP.  {\tt [2,98]}
       }
       \sstsubsection{
          STYLE = LITERAL (Read)
       }{
          A group of attribute settings describing the plotting style to use
          when drawing the annotated axes, data values, error bars, and
-         best fitting line.
+         best-fitting line.
 
          A comma-separated list of strings should be given in which each
          string is either an attribute setting, or the name of a text file
@@ -33763,7 +33766,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          attributes.  Any unrecognised attributes are ignored (no error is
          reported).
 
-         The appearance of the best fitting straight line is controlled by
+         The appearance of the best-fitting straight line is controlled by
          the attributes \latexonly{\goodbreak} \htmlattref{Colour(Curves)}{Colour(element)}, 
          \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym {\att Line}
          may be used in place of {\att Curves}).  The appearance of markers is
@@ -33902,7 +33905,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 
          \sstitem
          The routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an NDF,
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF,
          and propagates all \htmlref{extensions}{apndf:extensions} to the output NDF.  All propagated
  components come from the NDF to be normalised.
 
@@ -34088,10 +34091,10 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          input NDF within the plot.  The label is drawn parallel to the
          first pixel axis.  Two values should be supplied for LABPOS.  The 
          first value specifies the distance in millimetres along the first
-         pixel axis from the centre of the bottom left pixel to the left 
+         pixel axis from the centre of the bottom-left pixel to the left 
          edge of the label.  The second value specifies the distance in 
          millimetres along the second pixel axis from the centre of the 
-         bottom left pixel to the baseline of the label.  If a null ({\tt{!}}) 
+         bottom-left pixel to the baseline of the label.  If a null ({\tt{!}}) 
          value is given, no label is produced.  The appearance of the label 
          can be set by using the STYLE parameter
          (for instance {\tt "Size(strings)=2"}). {\tt [}current value{\tt{]}}
@@ -34361,7 +34364,7 @@ KAPPA: \htmlref{PALENTRY}{PALENTRY},
          COLOUR() = LITERAL (Read)
       }{
          A colour to be added to the palette at the entry given by
-         parameter PALNUM.  It is either:
+         parameter PALNUM.  It is one of the following options.
 
            o  A \htmlref{named colour}{ap:colset} from the standard colour set, which may
            be abbreviated.  If the abbreviated name is ambiguous the
@@ -34719,7 +34722,7 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
       \sstsubsection{
          OUT = NDF (Write)
       }{
-         The NDF resulting from pasting of the input NDFs onto the base
+         The NDF resulting from pasting of the input NDFs on to the base
          NDF.  Its dimensions may be different from the base NDF.  See
          parameter CONFINE.
       }
@@ -34805,7 +34808,7 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}, components of an NDF
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}, components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.  Propagation is from
  the base NDF.
  
@@ -34908,7 +34911,7 @@ KAPPA: \htmlref{ROTATE}{ROTATE},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the
          input NDF and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -34979,7 +34982,7 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
       time a position is selected (usually by pressing a button on the mouse), 
       details of the topmost picture in the AGI database which encompasses that
       position are displayed, together with the cursor position (in
-      millimetres from the bottom left corner of the graphics device).
+      millimetres from the bottom -left corner of the graphics device).
       On exit the last picture selected becomes the current picture.
    }
    \sstusage{
@@ -36287,7 +36290,7 @@ KAPPA: \htmlref{PICDATA}{PICDATA},
          This converts the position (100.3,~$-$20.1), in pixel co-ordinates
          within the current picture of the current graphics device, to the
          GRAPHICS co-ordinates of that point (\emph{i.e.} millimetres from the
-         bottom left corner of the graphics device).
+         bottom-left corner of the graphics device).
       }
       \sstexamplesubsection{
          pictrans "10 10" framein=graphics frameout=basepic
@@ -36303,22 +36306,22 @@ KAPPA: \htmlref{PICDATA}{PICDATA},
 
             \sstitem
             BASEPIC co-ordinates locate a position within the entire graphics
-            device.  The bottom left corner of the device screen has BASEPIC
+            device.  The bottom-left corner of the device screen has BASEPIC
             co-ordinates of (0,~0).  The shorter dimension of the screen has
             length 1.0, and the other axis has a length greater than 1.0.
 
             \sstitem
             NDC co-ordinates are like BASEPIC co-ordinates except that
-            the top right corner of the screen has NDC co-ordinates 
+            the top-right corner of the screen has NDC co-ordinates 
             of (1,~1).  That is, both axes of the screen have unit length.
 
             \sstitem
             GRAPHICS co-ordinates also span the entire graphics device but
-            are measured in millimetres from the bottom left corner.
+            are measured in millimetres from the bottom-left corner.
 
             \sstitem
             CURPIC co-ordinates locate a point within the current picture.  The
-            bottom left corner of the current picture has CURPIC co-ordinates of
+            bottom-left corner of the current picture has CURPIC co-ordinates of
             (0,~0).  The shorter dimension of the current picture has length 1.0, and
             the other axis has a length greater than 1.0.
          }
@@ -36511,13 +36514,13 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
       }{
         Only used if a null ({\tt{!}}) value is supplied for parameter MASK.
         If accessed, the number of values supplied for this parameter should 
-        equal the number of pixel axes in the output NDF. A mask array
+        equal the number of pixel axes in the output NDF.  A mask array
         is then created which has bad values at every element except for
-        the element with indices given by IMASK, which is set the value
-        1.0. See parameter MASK for a description of the use of the mask
+        the element with indices given by IMASK, which is set to the value
+        {\tt 1.0}.  See parameter MASK for a description of the use of the mask
         array. If a null value is supplied for IMASK, then no mask
         is used, and every output pixel in an output block is set to the 
-        value of the corresponding input pixel. {\tt [!]}
+        value of the corresponding input pixel.  {\tt [!]}
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -36587,7 +36590,7 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}, components of an NDF
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}, components of an NDF
          data structure, and propagates all \htmlref{extensions}{apndf:extensions}. 
 
          \sstitem 
@@ -36666,7 +36669,7 @@ KAPPA: \htmlref{ADD}{ADD},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs} and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -36706,7 +36709,7 @@ KAPPA: \htmlref{ADD}{ADD},
          A string determining the \htmlref{co-ordinate Frame}{se:domains}~  in which positions are
          to be stored in the output catalogue associated with parameter
          OUTCAT.  The string supplied for CATFRAME can be one of the
-         following:
+         following options.
 
          \ssthitemlist{
 
@@ -36735,7 +36738,7 @@ KAPPA: \htmlref{ADD}{ADD},
          catalogue were determined.  It will only be accessed if an epoch
          value is needed to qualify the co-ordinate Frame specified by
          COLFRAME.  If required, it should be given as a decimal years
-         value, with or without decimal places ({\tt "1996.8"} for example).
+         value, with or without decimal places ({\tt "1996.8"}, for example).
          Such values are interpreted as a Besselian epoch if less than
          1984.0 and as a Julian epoch otherwise.
       }
@@ -36747,7 +36750,7 @@ KAPPA: \htmlref{ADD}{ADD},
          the required co-ordinate Frame).  The position should be supplied as
          a list of formatted axis values separated by spaces.  This parameter
          is only accessed if parameter MODE is set to {\tt "Curve"} and a null
-         ({\tt{!}}) value is given for INCAT.  If the last (top right) pixel in the
+         ({\tt{!}}) value is given for INCAT.  If the last (top-right) pixel in the
          NDF has valid co-ordinates in the current co-ordinate Frame of the
          NDF, then these co-ordinates will be used as the suggested default.
          Otherwise there will be no suggested default.
@@ -36790,8 +36793,8 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstsubsection{
          MODE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
-         The mode by which the sample positions are selected.  The options
-         are:
+         The mode by which the sample positions are selected.  The alternatives
+         are listed below.
 
          \ssthitemlist{
 
@@ -36860,7 +36863,7 @@ KAPPA: \htmlref{ADD}{ADD},
          Creates a one-dimensional NDF called prof, holding a profile of the
          data values in the input NDF my\_data along a profile starting at
          pixel co-ordinates [0.0,~0.0] and ending at pixel co-ordinates
-         [100.0,~100.0].  The profile consists of 40 samples spread evenly
+         [100.0,~100.0].  The profile consists of forty samples spread evenly
          (in the pixel co-ordinate Frame) between these two positions.
          This example assumes that the current co-ordinate Frame in the NDF
          my\_data represents pixel co-ordinates.  This can be ensured by
@@ -37550,7 +37553,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
 
             \sstitem
             A {\FITSref}~ file.  The Mapping used is the Mapping from the FITS
-            pixel co-ordinates in which the centre of the bottom left pixel
+            pixel co-ordinates in which the centre of the bottom-left pixel
             is at co-ordinates (1,1), to the co-ordinate system represented
             by the primary WCS headers, CRVAL, CRPIX, \emph{etc}.
 
@@ -37683,7 +37686,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          run-time default value is 2.0.  For the Gauss and SincGauss scheme, it
          specifies the full-width at half-maximum (FWHM) of the Gaussian
          envelope.  The minimum value is 0.1, and the run-time default is
-         1.0.  On astronomical NDFs and spectra, good results are often
+         1.0.  On astronomical images and spectra, good results are often
          obtained by approximately matching the FWHM of the envelope
          function, given by PARAMS(2), to the point-spread function of the
          input data. {\tt []}
@@ -37879,7 +37882,7 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       value being used).
 
       Both algorithms have the capability to introduce artificial
-      artifacts into the output image.  These have various causes
+      artefacts into the output image.  These have various causes
       described below.
  
       \sstitemlist{
@@ -37902,14 +37905,14 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          functions, and for this reason should be used with caution.  Again,
          wider spreading functions reduce the effect at the cost of
          degraded resolution.  Note, the resampling algorithm is not subject
-         to these artifacts.  For this reason, you may prefer to use the
+         to these artefacts.  For this reason, you may prefer to use the
          resampling algorithm with the CONSERVE parameter set to {\tt TRUE}.
          This causes the resampling algorithm to perform approximate flux
          conservation.
 
          \sstitem
          The approximation of the Mapping using a piece-wise linear
-         transformation (controlled by parameter TOL) can produce artifacts
+         transformation (controlled by parameter TOL) can produce artefacts
          at the joints between the panels of the approximation.  These can
          occur when using the rebinning algorithm, or when using the
          resampling algorithm with CONSERVE set to {\tt TRUE}.  They are caused by
@@ -38096,7 +38099,7 @@ KAPPA: \htmlref{CHAIN}{CHAIN},
          \sstitem
          This routine correctly processes the DATA, \htmlref{QUALITY}{apndf:quality},
          \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, and \htmlref{HISTORY}{apndf:history}, components of an NDF
-         data structure and propagates all \htmlref{extensions}{apndf:extensions}.  \htmlref{WCS}{apndf:wcs} and \htmlref{AXIS}{apndf:axis}~ 
+         data structure and propagates all \htmlref{extensions}{apndf:extensions}.  \htmlref{WCS}{apndf:wcs}, and \htmlref{AXIS}{apndf:axis}~ 
          information is lost.
 
          \sstitem
@@ -38207,7 +38210,7 @@ KAPPA: \htmlref{CADD}{CADD},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an NDF
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -38381,7 +38384,7 @@ KAPPA: \htmlref{FLIP}{FLIP},
 
          \sstitem
          For rotations that are multiples of 90-degrees, \htmlref{VARIANCE}{apndf:variance},
-         \htmlref{QUALITY}{apndf:quality}, \htmlref{AXIS}{apndf:axis}, \htmlref{HISTORY}{apndf:history}, \htmlref{LABEL}{apndf:label}~ \htmlref{WCS}{apndf:wcs} and \htmlref{UNITS}{apndf:units}~ components of the input
+         \htmlref{QUALITY}{apndf:quality}, \htmlref{AXIS}{apndf:axis}, \htmlref{HISTORY}{apndf:history}, \htmlref{LABEL}{apndf:label}~ \htmlref{WCS}{apndf:wcs}, and \htmlref{UNITS}{apndf:units}~ components of the input
          NDF are propagated to the output NDF.  The axis and WCS components
          are switched and flipped as appropriate.
 
@@ -38671,7 +38674,7 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
       supplied as null ({\tt{!}}) in which case the corresponding areas of the
       output NDF are filled with \htmlref{bad values}{se:masking}.  For 
       instance, supplying a null value for IN2 allows segments to be cut from 
-      IN1 and pasted onto a background of bad values.  Supplying a null value
+      IN1 and pasted on to a background of bad values.  Supplying a null value
       for IN1 allows `holes' to be cut out of IN2 and filled with bad values.
 
       Each polygonal segment is specified by giving the positions of its
@@ -39037,7 +39040,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          parameter QUALITY is not {\tt FALSE}.
 
          \sstitem
-         The \htmlref{UNITS}{apndf:units}, \htmlref{AXIS}{apndf:axis}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components are
+         The \htmlref{UNITS}{apndf:units}, \htmlref{AXIS}{apndf:axis}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components are
          propagated from the first supplied input NDF, together with all
          extensions.
 
@@ -40111,7 +40114,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an NDF
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -40318,7 +40321,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
       {\KAPPA}~ see  \hyperref{``Using Quality Names''}{Section }{}{se:qnames}.
 
       The user can select the pixels to be operated on in one of three
-      ways (see parameter SELECT):
+      ways (see parameter SELECT).
 
       \ssthitemlist{
 
@@ -40383,30 +40386,29 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
       }{
          This parameter specifies what function is to be performed on
          the `selected' pixels specified using parameters MASK, LIST or
-         ARDFILE.  It can take any of the values {\tt "HS"}, {\tt "HU"}, {\tt "NS"}, {\tt "NU"},
-         {\tt "HS$+$NU"} or {\tt "HU$+$NS"}
+         ARDFILE.  It can take any of the following values.
 
          \ssthitemlist{
 
             \sstitem
             {\tt "HS"} --- Ensure that the quality specified by QNAME is held by
                  all the selected pixels.  The quality of all other
-                 pixels is left un-changed.
+                 pixels is left unchanged.
 
             \sstitem
             {\tt "HU"} --- Ensure that the quality specified by QNAME is held by all
-                 the pixels which have not been selected.  The quality of
-                 the selected pixels is left un-changed.
+                 the pixels that have not been selected.  The quality of
+                 the selected pixels is left unchanged.
 
             \sstitem
             {\tt "NS"} --- Ensure that the quality specified by QNAME is not held by
                  any of the selected pixels.  The quality of all other
-                 pixels is left un-changed.
+                 pixels is left unchanged.
 
             \sstitem
             {\tt "NU"} --- Ensure that the quality specified by QNAME is not held by
-                 any of the pixels which have not been selected.  The
-                 quality of the selected pixels is left un-changed.
+                 any of the pixels that have not been selected.  The
+                 quality of the selected pixels is left unchanged.
 
             \sstitem
             {\tt "HS$+$NU"} --- Ensure that the quality specified by QNAME is held by
@@ -40415,7 +40417,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
 
             \sstitem
             {\tt "HU$+$NS"} --- Ensure that the quality specified by QNAME is held by
-                 all the pixels which have not been selected and not held
+                 all the pixels that have not been selected and not held
                  by any of the selected pixels.
          }
          {\tt ["HS"]}
@@ -40424,7 +40426,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
          LIST = LITERAL (Read)
       }{
          A group of pixels positions within the input NDF listing the
-         pixels which are to be `selected' (see parameter FUNCTION).
+         pixels that are to be `selected' (see parameter FUNCTION).
          Each position should be giving as a list of pixel indices
          (\emph{e.g.} $X1$, $Y1$, $X2$, $Y2$,\dots  for a two dimensional NDF).  LIST is
          only prompted for if parameter SELECT is given the value {\tt "LIST"}.
@@ -40434,8 +40436,8 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
       }{
          A mask NDF used to define the `selected' pixels within the
          input NDF (see parameter FUNCTION).  The mask should be aligned
-         pixel-for-pixel with the input NDF.  Pixels which are bad in
-         the mask NDF are `selected'.  The quality of any pixels which
+         pixel-for-pixel with the input NDF.  Pixels that are bad in
+         the mask NDF are `selected'.  The quality of any pixels that
          lie outside the bounds of the mask NDF are left unaltered.  This
          parameter is only prompted for if the parameter SELECT is given
          the value {\tt "MASK"}.
@@ -40457,8 +40459,8 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
          SELECT = LITERAL (Read)
       }{
          This parameter determines how the pixels are selected, and can
-         take the values {\tt "Mask"}, {\tt "List"} or {\tt "ARD"} (see parameters MASK, LIST
-         and ARD). {\tt ["Mask"]}
+         take the values {\tt "Mask"}, {\tt "List"} or {\tt "ARD"}
+         (see parameters MASK, LIST, and ARD). {\tt ["Mask"]}
       }
       \sstsubsection{
          XNAME = LITERAL (Read)
@@ -41266,7 +41268,7 @@ KAPPA: \htmlref{ERRCLIP}{ERRCLIP};
          shadow horse horse\_bas
       }{
          This enhances the NDF called horse by making it appear to be
-         illuminated from the top right, and stores the result in the
+         illuminated from the top-right, and stores the result in the
          NDF called horse\_bas.
       }
       \sstexamplesubsection{
@@ -41289,7 +41291,7 @@ KAPPA: \htmlref{LAPLACE}{LAPLACE},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an 
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an 
          NDF data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -42074,7 +42076,7 @@ KAPPA: \htmlref{ADD}{ADD},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs} and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -42202,7 +42204,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an NDF
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -42446,7 +42448,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the input NDF.
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the input NDF.
          There is no support for \htmlref{VARIANCE}{apndf:variance}~ processing.
 
          \sstitem
@@ -42615,7 +42617,7 @@ KAPPA: \htmlref{HISTEQ}{HISTEQ},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of an NDF
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -43023,7 +43025,7 @@ KAPPA: \htmlref{ADD}{ADD},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs} and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs}, and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -43099,7 +43101,7 @@ KAPPA: \htmlref{ADD}{ADD},
          Frame NDF1 - which may be changed using application \htmlref{WCSFRAME}{WCSFRAME}
          (see also parameter USEAXIS).  The width of the margins left for
          the annotation may be controlled using parameter MARGIN.  The
-         appearance of the axes (colours, fonts, \emph{etc.}) can be controlled
+         appearance of the axes (colours, founts, \emph{etc.}) can be controlled
          using the STYLE parameter. {\tt [TRUE]}
       }
       \sstsubsection{
@@ -43108,9 +43110,9 @@ KAPPA: \htmlref{ADD}{ADD},
          {\tt TRUE} if the graphics device is to be cleared before displaying
          the vector map.  If you want the vector map to be drawn over
          the top of an existing DATA picture, then set CLEAR to {\tt FALSE}.  The
-         contour map will then be drawn in alignment with the displayed
+         vector map will then be drawn in alignment with the displayed
          data.  If possible, alignment occurs within the current co-ordinate
-         Frame of the NDF.  If this is not possible, (for instance if
+         Frame of the NDF.  If this is not possible (for instance, if
          suitable \htmlref{WCS information}{se:wcsuse}~ was not stored with
          the existing DATA picture), then alignment is attempted in PIXEL
          co-ordinates.  If this is not possible, then alignment is
@@ -43159,7 +43161,7 @@ KAPPA: \htmlref{ADD}{ADD},
 
             \sstitem
              {\tt "Start"}  --- the vectors are drawn starting at the
-             corresponding pixel,
+             corresponding pixel, and
 
             \sstitem
              {\tt "End"} --- the vectors are drawn ending at the corresponding
@@ -43177,14 +43179,15 @@ KAPPA: \htmlref{ADD}{ADD},
          KEYPOS() = \_REAL (Read)
       }{
          Two values giving the position of the key.  The first value gives
-         the gap between the right hand edge of the contour map and the left
-         hand edge of the key ({\tt 0.0} for no gap, {\tt 1.0} for the largest
-         gap).  The second value gives the vertical position of the top of the key 
-         ({\tt 1.0} for the highest position, {\tt 0.0} for the lowest).  If the second value
-         is not given, the top of the key is placed level with the top of the
-         vector map.  Both values should be in the range 0.0 to 1.0.  If a
-         key is produced, then the right hand margin specified by parameter
-         MARGIN is ignored. {\tt [}current value{\tt{]}}
+         the gap between the right-hand edge of the vector map and the
+         left-hand edge of the key ({\tt 0.0} for no gap, {\tt 1.0} for the 
+         largest gap).  The second value gives the vertical position of the 
+         top of the key ({\tt 1.0} for the highest position, {\tt 0.0} for 
+         the lowest).  If the second value is not given, the top of the key 
+         is placed level with the top of the vector map.  Both values should 
+         be in the range 0.0 to 1.0.  If a key is produced, then the
+         right-hand margin specified by parameter MARGIN is ignored. 
+         {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          KEYSTYLE = \htmlref{GROUP}{se:groups} (Read)
@@ -43224,15 +43227,15 @@ KAPPA: \htmlref{ADD}{ADD},
          example vector is controlled using {\att Curve} attributes
          (\emph{e.g.} \htmlattref{Colour(Curves)}{Colour(element)}; the synonym {\att Vector} can be
          used in place of {\att Curves}).  The numerical scale value is
-         formatted as an axis 1 value (using attributes \htmlattref{Format(1)}{Format(axis)},
+         formatted as an axis-1 value (using attributes \htmlattref{Format(1)}{Format(axis)},
           \htmlattref{Digits(1)}{Digits/Digits(axis)}, \emph{etc}; the synonym {\att Scale} can be used in
          place of the value 1).  The length of the example vector is formatted
-         as an axis 2 value (using attribute {\att Format(2)}, \emph{etc}; the
+         as an axis-2 value (using attribute {\att Format(2)}, \emph{etc}; the
          synonym {\att Vector} can be used in place of the value 2).  The
          vertical space between lines in the key can be controlled using
          attribute \htmlattref{TextLabGap}{TextLabGap(axis)}.  A value of {\tt 1.0} is used if no
          value is set for this attribute, and produces default vertical
-         spacing. Values larger than 1.0 increase the vertical space, and
+         spacing.  Values larger than 1.0 increase the vertical space, and
          values less than 1.0 decrease the vertical space. {\tt [}current
          value{\tt{]}}
       }
@@ -43280,7 +43283,7 @@ KAPPA: \htmlref{ADD}{ADD},
          The number of pixels between adjacent displayed vectors (along
          both axes).  Increasing this value reduces the number of
          displayed vectors.  If a null ({\tt{!}}) value is supplied, the value
-         used gives about 30 vectors along the longest axis of the plot. {\tt [!]}
+         used gives about thirty vectors along the longest axis of the plot. {\tt [!]}
       }
       \sstsubsection{
          STYLE = \htmlref{GROUP}{se:groups} (Read)
@@ -44277,7 +44280,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       value being used).
 
       Both algorithms have the capability to introduce artificial
-      artifacts into the output image.  These have various causes
+      artefacts into the output image.  These have various causes
       described below.
  
       \sstitemlist{
@@ -44300,14 +44303,14 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          functions, and for this reason should be used with caution. Again,
          wider spreading functions reduce the effect at the cost of
          degraded resolution. Note, the resampling algorithm is not subject
-         to these artifacts. For this reason, you may prefer to use the
+         to these artefacts. For this reason, you may prefer to use the
          resampling algorithm with the CONSERVE parameter set to {\tt TRUE}.
          This causes the resampling algorithm to perform approximate flux
          conservation.
 
          \sstitem
          The approximation of the Mapping using a piece-wise linear
-         transformation (controlled by parameter ACC) can produce artifacts
+         transformation (controlled by parameter ACC) can produce artefacts
          at the joints between the panels of the approximation.  These can
          occur when using the rebinning algorithm, or when using the
          resampling algorithm with CONSERVE set to {\tt TRUE}.  They are 
@@ -44737,7 +44740,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          from $(I - 1.0)$ to \textit{I}.
 
          \sstitem
-         The pixel indices of the bottom left pixel in an NDF is called
+         The pixel indices of the bottom-left pixel in an NDF is called
          the \emph{pixel origin} of the NDF, and can take any value.  The pixel
          origin can be examined using application NDFTRACE and set using
          application \htmlref{SETORIGIN}{SETORIGIN}.  WCSCOPY takes account of the 
@@ -44940,7 +44943,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       found.  The output NDF is then normalised by dividing it by the
       weights array.  This normalisation of the output NDF takes account
       of any difference in the number of pixels contributing to each
-      output pixel, and also removes artifacts which may be produced by
+      output pixel, and also removes artefacts which may be produced by
       aliasing between the input and output pixel grids.
 
       If the input NDFs contain variances, then these are propagated to
@@ -44997,16 +45000,16 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       }{
          A group of input NDFs (of any dimensionality).  This should be
          given as a comma-separated list, in which each list element
-         can be:
+         can be one of the following options.
 
          \ssthitemlist{
 
             \sstitem
-            an NDF name, optionally containing wild-cards and/or regular
+            An NDF name, optionally containing wild-cards and/or regular
             expressions ({\tt "$*$"}, {\tt "?"}, {\tt "[a-z]"} \emph{etc.}).
 
             \sstitem
-            the name of a text file, preceded by an up-arrow character
+            The name of a text file, preceded by an up-arrow character
             {\tt "$\wedge$"}.  Each line in the text file should
             contain a comma-separated list of elements, each of which
             can in turn be an NDF name (with optional wild-cards,
@@ -45808,7 +45811,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the
          input NDF and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -45858,7 +45861,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          replaced.  This parameter is only accessed if parameter MODE is
          set to {\tt "File"}.  Each record in the file must be either a blank
          line, a comment (indicated by a {\tt "!"} or {\tt "\#"} in column 1), or a
-         definition of an area to be replaced, consisting of three of
+         definition of an area to be replaced, consisting of three or
          four space-separated fields.  If a range of columns is to be
          replaced, each of the first two fields should be a formatted
          value for the first axis of the current \htmlref{co-ordinate Frame}{se:domains}~  of the
@@ -45909,7 +45912,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       }{
          The type of area is to be replaced.  This parameter is only
          accessed if parameter MODE is set to {\tt "Cursor"} or {\tt "Interface"}.
-         The options are:
+         The options are as follows.
 
          \ssthitemlist{
 
@@ -46010,7 +46013,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          The type of graphics to be used to mark each cursor position.
          The appearance of these graphics (colour, size, \emph{etc.}) is
          controlled by the STYLE parameter.  PLOT can take any of the
-         following values:
+         following values.
 
          \ssthitemlist{
 
@@ -46104,7 +46107,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          ZAPTYPE = LITERAL (Read)
       }{
          The method used to choose the replacement pixel values.  It
-         should be one of:
+         should be one of the options below.
 
          \ssthitemlist{
 
@@ -46218,7 +46221,8 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the
+         \htmlref{VARIANCE}{apndf:variance},
+\htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref {HISTORY}{apndf:history}~ components of the
          input NDF and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
@@ -49982,7 +49986,7 @@ The following applications have been modified:
          co-ordinate Frame of the NDF.
          \item The output listing can now be produced in several formats
          (see the new parameter FORMAT).
-         \item The top right pixel value in the listing is now written to a
+         \item The top-right pixel value in the listing is now written to a
          new output parameter, VALUE.
       \end{itemize}
        
@@ -50007,7 +50011,7 @@ The following applications have been modified:
          graphics device.  CURSOR should be used for this purpose.  The sole 
          purpose of PICCUR is to allow a new current picture to be selected 
          using a cursor.  The position of the cursor is now reported in
-         millimetres from the bottom left corner of the screen, but the
+         millimetres from the bottom-left corner of the screen, but the
          cursor positions cannot be saved.
          \item The parameters COSYS, DOUBLE, LOGFILE and MODE have
          been removed.
@@ -50139,7 +50143,7 @@ See \hyperref{here}{Section }{}{se:styles}.
 Each picture in the graphics database now has a 
 \htmlref{co-ordinate Frame}{se:domains}~  with Domain ``NDC'' associated 
 with it.  This Frame covers the whole graphics
-device is (0,~0) at the bottom left corner and (1,~1) at the top right
+device is (0,~0) at the bottom-left corner and (1,~1) at the top-right
 corner.  The name ``NDC'' can now be used with applications such as 
 \htmlref{GDSTATE}{GDSTATE}.
 
@@ -50151,7 +50155,7 @@ qualified by any EPOCH and EQUINOX parameters in the catalogue.  If no
 such columns are found, a search is made for columns called ``X'' and
 ``Y''.  If found, they are assumed to hold positions in the GRID
 co-ordinate Frame.  GRID co-ordinates are like PIXEL co-ordinates except
-the centre of the bottom left pixel always has GRID co-ordinates ( 1.0,
+the centre of the bottom-left pixel always has GRID co-ordinates ( 1.0,
 1.0 ).  If a ``Z'' column also exists, the GRID co-ordinates are assumed
 to be three-dimensional.
 
@@ -50480,7 +50484,7 @@ The following applications have been modified:
    \item [\htmlref{LINPLOT}{LINPLOT}] \mbox{}
       \begin{itemize}
          \item New parameters XMAP and YMAP have been added to control
-               the mapping of each axis onto the screen.  These can, for
+               the mapping of each axis on to the screen.  These can, for
                instance, produce logarithmic axes.
          \item The YLOG parameter has been removed.  Using a value of
                {\tt "ValueLog"} for parameter YMAP will produce the same
@@ -50575,8 +50579,8 @@ The following new applications have been added:
        Forms a higher-resolution NDF by interleaving a set of NDFs of
        the same dimensionality.
    \item [\htmlref{MAKESNR}{MAKESNR}] \mbox{}
-       Creates a signal-to-noise array from an NDF with defined Variance
-       component, rejecting unusably small Variances.
+       Creates a signal-to-noise array from an NDF with defined VARIANCE
+       component, rejecting unusably small variances.
    \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}
        Fits independent trends to data lines that are parallel to an
        axis using polynomials up to order 15.  Regions containing
@@ -50621,6 +50625,7 @@ The following applications have been modified:
           COMP.
       \end{itemize}
 
+   \goodbreak
    \item [\htmlref{FITSEXIST}{FITSEXIST}] \mbox{}
       \begin{itemize}
          \item It is now a self-contained application.  It needs only read
@@ -50690,7 +50695,7 @@ The following applications have been modified:
 
          \item The default values for the TOL parameter for REGRID, and the
          ACC parameter for WCSALIGN, have been reduced to 0.05, in order to
-         reduce artifacts when transforming large images with flux
+         reduce artefacts when transforming large images with flux
          conservation.
       \end{itemize}
 
@@ -50974,7 +50979,7 @@ functions as follows.
 \classitem{LOGE}
  Takes the natural logarithm of each pixel of an NDF.
 \classitem{MAKESNR}
- Create a signal-to-noise array from an NDF with Variance.
+ Creates a signal-to-noise array from an NDF with Variance.
 \classitem{MATHS}
  Evaluates mathematical expressions applied to NDF data structures.
 \classitem{MULT}
