@@ -7,7 +7,8 @@
 *     KPS1_SUSEV
 
 *  Purpose:
-*     Evaluates a bi-cubic spline for all elements of a 2-d data array.
+*     Evaluates a bi-cubic spline for all elements of a two-dimensional
+*     data array.
 
 *  Language:
 *     Starlink Fortran 77
@@ -18,10 +19,10 @@
 *                      OUTARR, RMS, STATUS )
 
 *  Description:
-*     This routine fills a 2-d array by evaluating a supplied bi-cubic
-*     spline (in its a B-spline representation) at each pixel's
-*     position.  The rms difference between the fitted, interpolated
-*     pixels and the original pixels is also calculated.
+*     This routine fills a two-dimensional array by evaluating a 
+*     supplied bi-cubic spline (in its a B-spline representation) at 
+*     each pixel's position.  The rms difference between the fitted, 
+*     interpolated pixels and the original pixels is also calculated.
 
 *  Arguments:
 *     DIM1 = INTEGER (Given)
@@ -90,6 +91,8 @@
 *        Replaced remaining NAG so changed the d.p. types to real, and
 *        added IWORK argument.  Renamed from SPL2EV.  Converted to
 *        modern style.
+*     2006 April 12 (MJC):
+*        Remove unused variables.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,7 +110,6 @@
 *  Arguments Given:
       INTEGER DIM1, DIM2         ! Dimensions of the data arrays
       REAL INARR( DIM1, DIM2 )   ! Raw, unfitted data
-      INTEGER IDX, IDY           ! Size of a coarse-grid bin in pixels
       INTEGER NXKNOT             ! Total number of interior knots in x
       INTEGER NYKNOT             ! Total number of interior knots in y
       REAL XKNOT( NXKNOT + 8 )   ! Positions of the knots in x

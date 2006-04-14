@@ -4,7 +4,7 @@
 *     KPG1_LFTSV
 
 *  Purpose:
-*     Solve least squares equations for fitting a polynomial.
+*     Solve least-squares equations for fitting a polynomial.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,7 +13,7 @@
 *     CALL KPS1_LFTSV( ORDER, A, INITA, B, WRK1, WRK2, STATUS )
 
 *  Description
-*     This routine solves a system of linear equations in a least
+*     This routine solves a system of linear equations in a least-
 *     squares sense for the FITLINE application.
 
 *  Arguments:
@@ -22,25 +22,28 @@
 *     A( ORDER + 1, ORDER + 1 ) = DOUBLE PRECISION (Given and Returned)
 *        Matrix holding power X sums (A in Ax=B).
 *     INITA = LOGICAL (Given)
-*        If true then the A matrix should factored. If false it has
-*        already been factored on a previous call and can be reused
-*        to solve another B immediately. When reusing A you must also
+*        If .TRUE., then the A matrix should factored.  If .FALSE., it
+*        has already been factored on a previous call and can be reused
+*        to solve another B immediately.  When reusing A you must also
 *        return the same WRK2. 
 *     B( ORDER + 1 ) = DOUBLE PRECISION (Given and Returned)
-*        Y times power X sums (B in Ax=B). On exit contains the
+*        Y times power X sums (B in Ax=B).  On exit it contains the
 *        polynomial coefficients.
 *     WRK1( * ) = DOUBLE PRECISION (Given and Returned)
 *        Workspace of size (ORDER+1).
 *     WRK2( * ) = INTEGER (Given and Returned)
-*        Workspace of size (ORDER+1). Re-used when INITA is false.
+*        Workspace of size (ORDER+1).  Re-used when INITA is .FALSE.
 
 *  Authors:
 *     PWD: Peter W. Draper (JAC, Durham University)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     20-SEP-2005 (PWD):
 *        Original version.
+*     2006 April 12 (MJC):
+*        Remove unused variables.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -49,13 +52,13 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE             ! No implicit typing
+      IMPLICIT NONE              ! No implicit typing
 
 *  Global status:
       INTEGER STATUS
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'         ! Standard constants
+      INCLUDE 'SAE_PAR'          ! Standard constants
 
 *  Arguments Given:
       INTEGER ORDER
@@ -68,8 +71,6 @@
       INTEGER WRK2( ORDER + 1 )
 
 *  Local Variables:
-      DOUBLE PRECISION DELTA
-      INTEGER I, J, K           ! Do-loop increment variables
       INTEGER IND
       INTEGER ITASK
 

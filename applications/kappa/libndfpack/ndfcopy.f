@@ -172,6 +172,8 @@
 *        Check if the NDF identifier is for a base or section before
 *        using NDF_LOC to copy AXIS components. Re-write variable 
 *        comments to avoid multiline comments.
+*     2006 April 12 (MJC):
+*        Remove unused variables.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -203,14 +205,13 @@
       CHARACTER LOC2C*(DAT__SZLOC)! Loc. for a single o/p AXIS structure
       CHARACTER LOC3*(DAT__SZLOC) ! Locator to the input NDF
       CHARACTER LOC4*(DAT__SZLOC) ! Locator to input AXIS array
-      CHARACTER LOC4C*(DAT__SZLOC)! Loc. for a single i/p AXIS structure
+      CHARACTER LOC4C*(DAT__SZLOC)! Locator for a single i/p AXIS 
+                                 ! structure
       CHARACTER LOC5*(DAT__SZLOC)! Locator to AXIS component
-      CHARACTER LOC6*(DAT__SZLOC)! Locator to AXIS component
       CHARACTER NAME*(DAT__SZNAM)! Name of AXIS component
       CHARACTER TTL*80           ! Frame title
       CHARACTER TYPE*(DAT__SZTYP)! Numerical type of array component
       INTEGER CAXES( NDF__MXDIM )! Non-degenerate current Frame axes
-      INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
       INTEGER EL                 ! No. of elements in mapped array
       INTEGER I                  ! Loop index
       INTEGER IAXIS( NDF__MXDIM )! Current Frame axes to retain
@@ -220,7 +221,6 @@
       INTEGER IP2                ! Pointer to mapped output array
       INTEGER IPERM( NDF__MXDIM )! Output axis index for each input axis
       INTEGER IWCS               ! WCS FrameSet for output
-      INTEGER IWCS2              ! WCS FrameSet from input
       INTEGER LBND( NDF__MXDIM ) ! Template NDF lower bounds
       INTEGER LTTL               ! Length of title
       INTEGER MAP                ! Original base->current Mapping

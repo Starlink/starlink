@@ -55,6 +55,8 @@
 *  History:
 *     2005 October 13 (MJC):
 *        Original version.
+*     2006 April 12 (MJC):
+*        Remove unused variables.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -83,10 +85,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      LOGICAL BAD                ! True if an input value is out of
-                                 ! bounds
       LOGICAL FIRST              ! Extrapolate first element?
-      <LTYPE> FRAC               ! Fractional array index
       INTEGER I                  ! Loop counter
       DOUBLE PRECISION INCR      ! Increment between adjacent elements
       INTEGER J                  ! Loop counter

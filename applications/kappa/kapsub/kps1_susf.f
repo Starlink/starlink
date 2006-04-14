@@ -8,8 +8,8 @@
 *     KPS1_SUSF
 
 *  Purpose:
-*     Fits a bi-cubic spline surface by least squares to an input 2-d
-*     array.
+*     Fits a bi-cubic spline surface by least squares to an input
+*     two-dimensional array.
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,7 +21,7 @@
 *                     SCALE, STATUS )
 
 *  Description:
-*     This routine fits a bicubic spline surface for the given
+*     This routine fits a bi-cubic spline surface for the given
 *     vectors of values and weights at the given x-y co-ordinates, and
 *     returns the coefficients of the fit.
 
@@ -131,6 +131,8 @@
 *        passed different work arrays.  Renamed from SPL2D.
 *     1997 July 30 (MJC):
 *        Added LWS and NWS arguments.
+*     2006 April 12 (MJC):
+*        Remove unused variables.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -184,10 +186,8 @@
       REAL EYR( 2 )              ! Effective y limits
       INTEGER I                  ! Loop counter
       INTEGER IFAIL              ! PDA error status
-      INTEGER IRANK              ! Rank of the system
       REAL MAXV                  ! Maximum data value
       REAL MINV                  ! Minimum data value
-      INTEGER NADRES             ! Number of panels created by the knots
       REAL SIGMA                 ! Weighted sum of squares of residuals
 
 *.
