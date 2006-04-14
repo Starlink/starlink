@@ -51,7 +51,7 @@
 *        values are treated as numerical values (in the range 0 to
 *        255).  ["Data"]
 *     CUMUL = _LOGICAL (Read)
-*        Should a cumulative histogram be reported? [FALSE]
+*        Should a cumulative histogram be reported?  [FALSE]
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation on which to produce the plot.  If it
 *        is null (!), no plot will be made.  [Current graphics device]
@@ -77,7 +77,7 @@
 *     OUT = NDF (Read)
 *        Name of the NDF structure to save the histogram in its data
 *        array.  If null (!) is entered the histogram NDF is not
-*        created. [!]
+*        created.  [!]
 *     RANGE = LITERAL (Read)
 *        RANGE specifies the range of values for which the histogram is
 *        to be computed.  The supplied string should consist of up to
@@ -104,7 +104,7 @@
 *        the values default to "5,95".  Values must be in the range 0 to
 *        100.
 *
-*        - "Range" -- The minimum and maximum array values are used.  No 
+*        - "Range" -- The minimum and maximum array values are used.  No
 *        other sub-strings are needed by this option.  Null (!) is a
 *        synonym for the "Range" method.
 *
@@ -126,10 +126,10 @@
 *        specified on the command line.  In this case extreme values
 *        are only calculated where necessary for the chosen method.
 
-*        The method name can be abbreviated to a single character, and is
-*        case insensitive.  The initial value is "Range".  The suggested
-*        defaults are the current values, or ! if these do not exist. 
-*        [current value]
+*        The method name can be abbreviated to a single character, and
+*        is case insensitive.  The initial value is "Range".  The 
+*        suggested defaults are the current values, or ! if these do 
+*        not exist.  [current value]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
 *        use when drawing the annotated axes and data values.
@@ -157,7 +157,7 @@
 *
 *        The appearance of the histogram curve is controlled by the
 *        attributes Colour(Curves), Width(Curves), etc.  (The synonym
-*        Line may be used in place of Curves.)   [current value] 
+*        Line may be used in place of Curves.)  [current value] 
 *     TITLE = LITERAL (Read)
 *        Title for the histogram NDF.  ["KAPPA - Histogram"]
 *     XLEFT = _REAL (Read)
@@ -202,7 +202,7 @@
 *        Computes and reports the histogram for the z-vector at (x,y)
 *        element (3,4) of the data array in the 3-dimensional NDF called
 *        cube.  The histogram has 10 bins and spans a range three
-*        standard deviations either side of the mean of the data values. 
+*        standard deviations either side of the mean of the data values.
 *        The histogram is written to a one-dimensional NDF called
 *        c3_4_hist.
 *     histogram cube numbin=32 ! device=xwindows style="title=cube"
@@ -257,8 +257,8 @@
 *     12-JUL-1999 (TDCA):
 *        Converted graphics to AST/PGPLOT
 *     17-SEP-1999 (DSB):
-*        Tidied up. NDF calls changed to LPG to use auto-looping. Dynamic
-*        default parameters changed to use null default.
+*        Tidied up. NDF calls changed to LPG to use auto-looping. 
+*        Dynamicdefault parameters changed to use null default.
 *     26-OCT-1999 (DSB):
 *        Made MARGIN a fraction of the current picture, not the DATA
 *        picture.
@@ -268,13 +268,15 @@
 *        Moved the reporting the data range and obtaining the RANGE
 *        parameter to a subroutine.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     01-OCT-2004 (PWD):
 *        Moved CNF_PAR into declarations.
 *     15-APR-2005 (PWD):
 *        Parameterise use of backslash to improve portability.
 *     23-FEB-2006 (DSB):
 *        Added parameter CUMUL. 
+*     2006 April 12 (MJC):
+*        Remove unused variable and wrapped long lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -328,10 +330,10 @@
       INTEGER IAT                ! Position with TEXT
       INTEGER IERR               ! Position of first conversion error
       INTEGER IFIL               ! File descriptor for logfile
-      INTEGER IPLOT              ! AST pointer to plot to use for plotting
+      INTEGER IPLOT              ! AST pointer to Plot to use for 
+                                 ! plotting
       CHARACTER * ( 256 ) LABEL  ! Label of the histogram NDF
       INTEGER LENXL              ! Used length of XL
-      INTEGER LENYL              ! Used length of YL
       LOGICAL LOGFIL             ! Log file is required
       INTEGER MAXH               ! Maximum number in an histogram bin
       REAL MAXIM                 ! Maximum value of pixels in array
@@ -345,7 +347,8 @@
       INTEGER NC                 ! No. characters in text buffer
       INTEGER NMLEN              ! Used length of NDFNAM
       INTEGER NDFI               ! Identifier for input NDF
-      CHARACTER * ( 255 ) NDFNAM ! Base name of NDF (+ poss. an HDS path)
+      CHARACTER * ( 255 ) NDFNAM ! Base name of NDF (+ possibly an HDS 
+                                 ! path)
       INTEGER NDFO               ! NDF identifier of output histogram
       INTEGER NERR               ! Number of conversion errors
       INTEGER NINVAL             ! Number of invalid pixels in array
