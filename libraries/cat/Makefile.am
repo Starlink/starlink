@@ -127,4 +127,4 @@ check-local:
 EXTRA_DIST = $(PRIVATE_INCLUDES) CAT1_NUL.F
 
 dist_starnews_DATA = cat.news
-
+dist_pkgdata_DATA = LICENCE

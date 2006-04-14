@@ -1,5 +1,10 @@
 1 CAT_library
 
+  Version 8.1-2
+
+  o Now builds using autoconf
+  o Now released under the GPL
+
   Version 8.1 of the CAT subroutine library for manipulating astronomical
   catalogues and tables has recently been released.
 
@@ -15,6 +20,5 @@
   and minor enhancements.
 
   The CAT library is documented in SUN/181.
-
 
   A C Davenhall (acd@roe.ac.uk), 4 April 2001.

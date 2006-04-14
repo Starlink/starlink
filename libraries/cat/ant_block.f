@@ -1,21 +1,66 @@
-*+ANT_XBLOCK  Block data to set function/operator names/characteristics
       BLOCK DATA ANT_XBLOCK
+*+
+*  Name:
+*     ANT_XBLOCK
+
+*  Purpose:
+*     Block data to set function/operator names/characteristics
+
+*  Description:
+*     To add a new function:  
+*      (1) Edit ANTX1.INC to increase the value of MAXFUN
+*      (2) Add a statement below to define the values of FNAME, FPREC, FARGS
+*          and note the array index which is the same as the label used below.
+*      (3) Edit module ANT_XEVAL as follows:
+*          (a) add the new label to the computed GOTO at the top, 
+*          (b) add a labelled section to execute the function at the bottom.
+*      (4) Recompile all modified subroutines and those which access the 
+*          include file.
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1996, 2000 Central Laboratory of the 
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     CGP: Clive Page
+*     ACD: A C Davenhall (Edinburgh)
+
+*  History:
+*     1993-JUL-29 (CGP):
+*        Original Version
+*     1995-JAN-26 (ACD):
+*        Added GREAT.
+*     1996-AUG-15 (ACD):
+*        Added SCALE.
+*     2000-JUN-13 (ACD):
+*        Added PANGLE.
+*-
+
+*  Global variables:
       INCLUDE 'antx1.inc'
-*-Author  Clive Page  1993-JUL-29
-* Modified Clive Davenhall  1995-JAN-26  (Added GREAT).
-*    "     Clive Davenhall  1996-AUG-15  (  "   SCALE).
-*    "     Clive Davenhall  2000-JUN-13  (  "   PANGLE).
+
+*  Local Variables:
       INTEGER I
-*To add a new function:  
-*(1) Edit ANTX1.INC to increase the value of MAXFUN
-*(2) Add a statement below to define the values of FNAME, FPREC, FARGS
-*    and note the array index which is the same as the label used below.
-*(3) Edit module ANT_XEVAL as follows:
-*    (a) add the new label to the computed GOTO at the top, 
-*    (b) add a labelled section to execute the function at the bottom.
-*(4) Recompile all modified subroutines and those which access the 
-*    include file.
-*
+
+*.
+
 * FNAME is the function or operator, must be upper-case up to 6 chars long.
 * FPREC is the operator/function precedence, =30 for all functions.
 * FARGS: is a string of (N+1) chars for a function with N arguments, coded 

@@ -1,10 +1,44 @@
-**ant_s.for  String-handling routines  CGP 1993-JULY-27
-*
-*  Modification history:
-*    Modified the error reporting to use the ADAM libraries rather than
-*    Fortran WRITE statements.
-*                                                        ACD  1999-AUG-13
-*
+
+*+
+*  Name:
+*     ant_s
+
+*  Purpose:
+*     String handling routines
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council.
+*     Copyright (C) 1999 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     CGP: Clive Page
+*     ACD: A C Davenhall (Edinburgh)
+
+*  History:
+*     1993-JUL-27 (CGP):
+*        Original Version
+*     1999-AUG-13 (ACD):
+*        Modified the error reporting to use the ADAM libraries rather than
+*        Fortran WRITE statements.
+*-
+
 *+ANT_STOMJD  Converts string date/time to double precision MJD
       SUBROUTINE ANT_STOMJD(STRING, DMJD, STATUS)
       CHARACTER STRING*(*)
