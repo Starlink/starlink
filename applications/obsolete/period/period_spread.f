@@ -21,14 +21,14 @@ C PERIOD_SPREAD declarations.
 C------------------------------------------------------------------------------
 
       INTEGER M,IFAIL,J,N,IX,IHI,ILO 
-      DOUBLE PRECISION YY(N), NFAC(10)/1.0D0, 1.0D0, 2.0D0, 6.0D0,
-     :  24.0D0, 120.0D0, 720.0D0, 5040.0D0, 40320.0D0, 362880.0D0/
-      CHARACTER*1 BELL
+      DOUBLE PRECISION YY(N), NFAC(10)
       DOUBLE PRECISION FAC,NDEN,X,Y
-      DATA BELL/7/
  
+      DATA NFAC /1.0D0, 1.0D0, 2.0D0, 6.0D0,
+     :  24.0D0, 120.0D0, 720.0D0, 5040.0D0, 40320.0D0, 362880.0D0/
+
       IF ( M.GT.10 ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) 
      :           '** ERROR: Factorial table too small in PERIOD_SPREAD.'
          IFAIL = 1
