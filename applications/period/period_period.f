@@ -55,9 +55,8 @@ C-----------------------------------------------------------------------------
       LOGICAL YERRORARRAY(MXSLOT), DETRENDARRAY(MXSLOT)
       LOGICAL PERIOD_PARSE, LSELECT, LOG
       LOGICAL LPEAK, LOGWRITE, LSIG, LFAP1
-      CHARACTER*1 BELL, COMMAND*12, REPLY
+      CHARACTER*12 COMMAND, REPLY*1
       CHARACTER*72 INFILEARRAY(MXSLOT)
-      DATA BELL/7/
       DATA ISTEP/50/
       DATA LSIG, NPERMS/.FALSE., 0/
       DATA MINFREQ,MAXFREQ,FINTERVAL/0.0D0,0.0D0,0.0D0/
@@ -139,7 +138,7 @@ C CHISQ   * Least-squares sine-curve fitting.
 C**********-------------------------------------------------------------------
  
             IF ( .NOT.LSELECT ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: No slots selected.'
                GO TO 100
             ELSE
@@ -154,7 +153,7 @@ C-----------------------------------------------------------------------------
                NDATA = NPTSARRAY(SLOT)
 
                IF ( NDATA.EQ.0 ) THEN
-                  WRITE (*, *) BELL
+                  CALL PERIOD_WRITEBELL()
                   WRITE (*, *) '** ERROR: Slot empty =', SLOT
                   GO TO 100
                END IF
@@ -194,7 +193,7 @@ C-----------------------------------------------------------------------------
 
                      IF ( IFAIL.EQ.1 ) GO TO 294
                      IF ( FMIN.EQ.0.0D0 ) THEN
-                        WRITE (*, *) BELL
+                        CALL PERIOD_WRITEBELL()
                         WRITE (*, *) 
      :                       '** ERROR: No sine fit for zero frequency.'
                         GO TO 294
@@ -235,7 +234,8 @@ C-----------------------------------------------------------------------------
 
                   COUNTER = 0
                   LOOP = 1
-                  DO 250 FREQ = FMIN, FMAX, FINT
+                  FREQ = FMIN
+                  DO 250 WHILE ( FREQ .LE. FMAX )
 
                      CALL PERIOD_SETXYEDATA(%VAL(CNF_PVAL(YSLOT1)),
      :                                      NDATA, MXCOL,
@@ -264,7 +264,7 @@ C-----------------------------------------------------------------------------
      :                                  IFAIL)
 
                      IF ( IFAIL.EQ.1 ) THEN
-                        WRITE (*, *) BELL
+                        CALL PERIOD_WRITEBELL()
                         WRITE (*, *) '** ERROR: Sine fit unsuccessful.'
                         GO TO 292
                      END IF
@@ -299,6 +299,7 @@ C                    WK2(COUNTER) = F/(DFLOAT(NP)-3.0D0)
                      CALL PERIOD_PUT1D(RVAL1, COUNTER, 
      :                                 %VAL(CNF_PVAL(WK2PTR)),
      :                                 MAXPTS)
+                     FREQ = FREQ + FINT
  250              CONTINUE
  
 C-----------------------------------------------------------------------------
@@ -407,7 +408,7 @@ C FT      * Discrete Fourier power spectrum.
 C**********-------------------------------------------------------------------
  
             IF ( .NOT.LSELECT ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: No slots selected.'
                GO TO 100
             ELSE
@@ -422,7 +423,7 @@ C-----------------------------------------------------------------------------
                NDATA = NPTSARRAY(SLOT)
 
                IF ( NDATA.EQ.0 ) THEN
-                  WRITE (*, *) BELL
+                  CALL PERIOD_WRITEBELL()
                   WRITE (*, *) '** ERROR: Slot empty =', SLOT
                   GO TO 100
                END IF
@@ -599,7 +600,7 @@ C SCARGLE * Fast evaluation of the Lomb-Scargle statistic for each frequency.
 C**********-------------------------------------------------------------------
  
             IF ( .NOT.LSELECT ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: No slots selected.'
                GO TO 100
             ELSE
@@ -614,7 +615,7 @@ C-----------------------------------------------------------------------------
                NDATA = NPTSARRAY(SLOT)
 
                IF ( NDATA.EQ.0 ) THEN
-                  WRITE (*, *) BELL
+                  CALL PERIOD_WRITEBELL()
                   WRITE (*, *) '** ERROR: Slot empty =', SLOT
                   GO TO 100
                END IF
@@ -690,7 +691,7 @@ C------------------------------------------------------------------------------
      :                               ADEV, SDEV, VARI)
 
                   IF ( VARI.EQ.0.0D0 ) THEN
-                     WRITE (*, *) BELL
+                     CALL PERIOD_WRITEBELL()
                      WRITE (*, *)
      :                     '** ERROR: Zero variance in PERIOD_SCARGLE.'
                      GO TO 492
@@ -715,7 +716,7 @@ C------------------------------------------------------------------------------
      :                                OFAC, HIFAC, NFREQ)
 
                   IF ( IFAIL.EQ.1 ) THEN
-                     WRITE (*, *) BELL
+                     CALL PERIOD_WRITEBELL()
                      WRITE (*, *) 
      :                    '** ERROR: Lomb-Scargle statistic calculation'
      :                    // ' unsuccessful.'
@@ -829,7 +830,7 @@ C CLEAN   * CLEANed power spectrum.
 C**********-------------------------------------------------------------------
  
             IF ( .NOT.LSELECT ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: No slots selected.'
                GO TO 100
             ELSE
@@ -846,7 +847,7 @@ C**********-------------------------------------------------------------------
             WRITE (*, '(X,A,$)') 'Enter loop gain : '
             READ (*, *, ERR=520) GAIN
             IF ( (GAIN.LE.0.0D0) .OR. (GAIN.GE.2.0D0) ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Gain must lie between 0 and 2.'
                GO TO 100
             END IF
@@ -859,7 +860,7 @@ C-----------------------------------------------------------------------------
                NDATA = NPTSARRAY(SLOT)
 
                IF ( NDATA.EQ.0 ) THEN
-                  WRITE (*, *) BELL
+                  CALL PERIOD_WRITEBELL()
                   WRITE (*, *) '** ERROR: Slot empty =', SLOT
                   GO TO 100
                END IF
@@ -935,7 +936,7 @@ C-----------------------------------------------------------------------------
      :                        %VAL(CNF_PVAL(WK2PTR)), NOUT, SAMPLE)
 
                   IF ( NOUT.EQ.0 ) THEN
-                     WRITE (*, *) BELL
+                     CALL PERIOD_WRITEBELL()
                      WRITE (*, *)
      :                  '** ERROR: CLEAN calculation unsuccessful.'
                      NPTSARRAY(SLOTOUT) = NOUT
@@ -1052,7 +1053,7 @@ C STRING  * String-length method.
 C**********-------------------------------------------------------------------
  
             IF ( .NOT.LSELECT ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: No slots selected.'
                GO TO 100
             ELSE
@@ -1067,7 +1068,7 @@ C-----------------------------------------------------------------------------
                NDATA = NPTSARRAY(SLOT)
 
                IF ( NPTSARRAY(SLOT).EQ.0 ) THEN
-                  WRITE (*, *) BELL
+                  CALL PERIOD_WRITEBELL()
                   WRITE (*, *) '** ERROR: Slot empty =', SLOT
                   GO TO 100
                END IF
@@ -1106,7 +1107,7 @@ C-----------------------------------------------------------------------------
 
                      IF ( IFAIL.EQ.1 ) GO TO 694
                      IF ( FMIN.EQ.0.0D0 ) THEN
-                        WRITE (*, *) BELL
+                        CALL PERIOD_WRITEBELL()
                         WRITE (*, *) 
      :                  '** ERROR: No string-length for zero frequency.'
                         GO TO 694
@@ -1146,7 +1147,8 @@ C-----------------------------------------------------------------------------
 
                   COUNTER = 0
                   LOOP = 1
-                  DO 650 FREQ = FMIN, FMAX, FINT
+                  FREQ = FMIN
+                  DO 650 WHILE ( FREQ .LE. FMAX )
 
                      CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)), 
      :                                     NDATA, MXCOL,
@@ -1170,7 +1172,7 @@ C-----------------------------------------------------------------------------
      :                                  IFAIL)
 
                      IF ( IFAIL.EQ.1 ) THEN
-                        WRITE (*, *) BELL
+                        CALL PERIOD_WRITEBELL()
                         WRITE (*, *) '** ERROR: String-length' // 
      :                               ' calculation unsuccessful.'
                         GO TO 692
@@ -1203,6 +1205,7 @@ C                    WK2(COUNTER) = STRING
                      CALL PERIOD_PUT1D(STRING, COUNTER, 
      :                                 %VAL(CNF_PVAL(WK2PTR)),
      :                                 MAXPTS)
+                     FREQ = FREQ + FINT
  650              CONTINUE
  
 C-----------------------------------------------------------------------------
@@ -1306,7 +1309,7 @@ C PDM     * Phase dispersion minimization (PDM) method.
 C**********-------------------------------------------------------------------
  
             IF ( .NOT.LSELECT ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: No slots selected.'
                GO TO 100
             ELSE
@@ -1318,7 +1321,7 @@ C**********-------------------------------------------------------------------
             WRITE (*, '(X,A,$)') 'Enter number of bins : '
             READ (*, *, ERR=710) NBIN
             IF ( (NBIN.LT.2) ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Number of bins must be' //
      :                      ' greater than 2'
                GO TO 100
@@ -1328,7 +1331,7 @@ C**********-------------------------------------------------------------------
             WRITE (*, '(X,A,$)') 'Enter width of each bin : '
             READ (*, *, ERR=720) WBIN
             IF ( (WBIN.LE.0.0D0) .OR. (WBIN.GE.1.0D0) ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Width of bins must be' //
      :                      ' greater than 0 and less than 1'
                GO TO 100
@@ -1342,7 +1345,7 @@ C-----------------------------------------------------------------------------
                NDATA = NPTSARRAY(SLOT)
 
                IF ( NPTSARRAY(SLOT).EQ.0 ) THEN
-                  WRITE (*, *) BELL
+                  CALL PERIOD_WRITEBELL()
                   WRITE (*, *) '** ERROR: Slot empty =', SLOT
                   GO TO 100
                END IF
@@ -1382,7 +1385,7 @@ C-----------------------------------------------------------------------------
 
                      IF ( IFAIL.EQ.1 ) GO TO 794
                      IF ( FMIN.EQ.0.0D0 ) THEN
-                        WRITE (*, *) BELL
+                        CALL PERIOD_WRITEBELL()
                         WRITE (*, *)
      :                  '** ERROR: No PDM statistic for zero frequency.'
                         GO TO 794
@@ -1437,7 +1440,8 @@ C-----------------------------------------------------------------------------
 
                   TOLFACT = FINT*1.0D-4
 
-                  DO 750 FREQ = FMIN, FMAX+TOLFACT, FINT
+                  FREQ = FMIN
+                  DO 750 WHILE ( FREQ .LE. FMAX + TOLFACT )
 
                      CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)), 
      ;                                     NDATA, MXCOL,
@@ -1461,7 +1465,7 @@ C-----------------------------------------------------------------------------
      :                               PDM, MAXPTS, IFAIL)
 
                      IF ( IFAIL.EQ.1 ) THEN
-                        WRITE (*, *) BELL
+                        CALL PERIOD_WRITEBELL()
                         WRITE (*, *) '** ERROR: PDM statistic ' //
      :                         ' calculation unsuccessful.'
                         GO TO 792
@@ -1494,6 +1498,7 @@ C                    WK2(COUNTER) = PDM
                      CALL PERIOD_PUT1D(PDM, COUNTER, 
      :                                 %VAL(CNF_PVAL(WK2PTR)),
      :                                 MAXPTS)
+                     FREQ = FREQ + FINT
  750              CONTINUE
 
 C-----------------------------------------------------------------------------
@@ -1623,7 +1628,7 @@ C**********-------------------------------------------------------------------
             READ (*, *, ERR=810) FIRSTSLOT, LASTSLOT
             IF ( FIRSTSLOT.LE.0 .OR. LASTSLOT.LE.0 ) GO TO 100
             IF ( FIRSTSLOT.GT.MXSLOT .OR. LASTSLOT.GT.MXSLOT ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Maximum slot number =', MXSLOT
                GO TO 100
             END IF
@@ -1655,7 +1660,7 @@ C-----------------------------------------------------------------------------
                YSLOT1 = YPTR(SLOT)
 
             IF ( NDATA.EQ.0 ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Slot empty =', SLOT
                GO TO 100
             END IF
@@ -1675,15 +1680,15 @@ C           IF ( FMAX.LE.0.D0 ) FMAX = Y(NDATA, 1, SLOT)
                IF ( FMAX.EQ.RVAL2 ) LFAP1 = .TRUE.
             END IF
             IF ( FMAX.GT.RVAL2 ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Invalid frequency range.'
                GO TO 100
             ELSE IF ( FMIN.LT.RVAL1 ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Invalid frequency range.'
                GO TO 100
             ELSE IF ( FMIN.GE.FMAX ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Invalid frequency range.'
                GO TO 100
             END IF
@@ -1706,7 +1711,7 @@ C           IF ( FMAX.LE.0.D0 ) FMAX = Y(NDATA, 1, SLOT)
      :          ( INFILEARRAY(SLOT)(1:14).EQ.'PDM Statistic ' ) THEN
                   LPEAK = .FALSE.
                ELSE
-                  WRITE (*, *) BELL
+                  CALL PERIOD_WRITEBELL()
                   WRITE (*, *) '** ERROR: Input data is not' //
      :                           ' a periodogram.'
                   GO TO 100
@@ -1744,7 +1749,7 @@ C-----------------------------------------------------------------------------
                RVAL1 = PERIOD_GET2D(EL, 1, %VAL(CNF_PVAL(YSLOT1)),
      :                              NDATA, MXCOL)
                IF ( RVAL1.EQ.0.0D0 ) THEN
-                  WRITE (*, *) BELL
+                  CALL PERIOD_WRITEBELL()
                   WRITE (*, *) '** ERROR: Peak is at infinite' // 
      :                   ' period or frequency range too small.'
                   GO TO 100
@@ -1915,13 +1920,13 @@ C**********-------------------------------------------------------------------
      :                       'Enter number of permutations in sample : '
                   READ (*, *, ERR=910) NPERMS
                   IF ( NPERMS.LT.100 ) THEN
-                     WRITE (*, *) BELL
+                     CALL PERIOD_WRITEBELL()
                      WRITE (*, *) 
      :                 '** ERROR: Minimum number of permutations = 100.'
                      NPERMS = 0
                      GO TO 100
                   ELSE IF ( NPERMS.GT.1000 ) THEN
-                     WRITE (*, *) BELL
+                     CALL PERIOD_WRITEBELL()
                      WRITE (*, *) 
      :                        '** ERROR: Maximum number of permutations'
      :                        // ' = ', MAXPERMS

@@ -67,8 +67,6 @@ C-----------------------------------------------------------------------------
       DOUBLE COMPLEX PERIOD_DFOUR, CC, PERIOD_ALPHA
       DOUBLE COMPLEX D(0:MAXPTS-1), W(0:(2*MAXPTS)-1), R(0:MAXPTS-1)
       DOUBLE COMPLEX B(0:MAXPTS-1), C(0:MAXPTS-1),     S(0:MAXPTS-1)
-      CHARACTER*1 BELL
-      DATA BELL/7/
       DATA ISTEP/50/
 
  
@@ -120,7 +118,8 @@ C  short by FINT. This is a consequence of using non-integer Do Loop
 C  variables! (KPD)
       TOLFACT = FINT*1.0D-6
 
-      DO 30 FREQ = FMIN, FMAX+TOLFACT, FINT
+      FREQ = FMIN
+      DO 30 WHILE( FREQ .LE. FMAX+TOLFACT )
          WFREQ(I) = DCMPLX(FREQ,0.0D0)
          DFREQ(I) = DCMPLX(FREQ,0.0D0)
 
@@ -136,6 +135,7 @@ C  variables! (KPD)
             END IF
          END IF
          I = I + 1
+         FREQ = FREQ + FINT
   30  CONTINUE
       NDFREQ = I - 1
 
@@ -150,7 +150,8 @@ C-----------------------------------------------------------------------------
          WRITE (*, *) ' '
       END IF
 
-      DO 40 FREQ = FMAX + FINT, (2.0D0*FMAX)-FMIN+TOLFACT, FINT
+      FREQ = FMAX + FINT
+      DO 40 WHILE ( FREQ .LE. (2.0D0*FMAX)-FMIN+TOLFACT )
          WFREQ(I) = DCMPLX(FREQ,0.0D0)
 
          W(I) = PERIOD_DFOUR(NDATA, XDATA, ONES, FREQ)
@@ -164,7 +165,7 @@ C-----------------------------------------------------------------------------
             END IF
          END IF
          I = I + 1
-
+         FREQ = FREQ + FINT
   40  CONTINUE
       NWFREQ = I - 1
 
@@ -183,7 +184,7 @@ C-----------------------------------------------------------------------------
       HWIDTH = PERIOD_HWHM(NWFREQ, W)
 
       IF ( HWIDTH.LE.0.0D0 ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: Could not find half-width and'
          WRITE (*, *) '** ERROR: half-maximum in PERIOD_HWHM.'
          WRITE (*, *) 'HWIDTH = ', HWIDTH
