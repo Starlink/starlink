@@ -228,6 +228,8 @@
 *     2006 April 7 (MJC):
 *        Insert HDSNAME and HDSTYPE keywords for multi-NDF conversions.
 *        Document the multi-NDF rules.
+*     2006 April 13 (MJC):
+*        Remove unused variables.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -280,7 +282,6 @@
       PARAMETER ( PCOUNT = 0 )
 
 *  Local Variables:
-      LOGICAL ANYF               ! Bad values present in array?
       LOGICAL BAD                ! Bad values may be present in array?
       INTEGER BLANK              ! Data blank for integer arrays
       INTEGER BPIN               ! Input array's BITPIX
@@ -291,7 +292,6 @@
       DOUBLE PRECISION BSCALE    ! Block-integer scale factor
       CHARACTER * ( 200 ) BUFFER ! Buffer for error messages
       DOUBLE PRECISION BZERO     ! Block-integer offset
-      INTEGER CHDU               ! Current header and data unit
       CHARACTER * ( 48 ) COMENT  ! Comment from FITS-extension header
       DOUBLE PRECISION DELTA     ! Machine precision for scaling
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)

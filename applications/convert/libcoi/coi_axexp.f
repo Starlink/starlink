@@ -17,7 +17,7 @@
 *     headers to an OIF file.  The values for the headers are derived
 *     for the axis centres, labels and units in the supplied NDF.  It
 *     uses MWCS linear, equispec or multispec systems where the axis
-*     centres conform to the rules of these formats.  See the notes for
+*     centres conform to the rules of these formats.  See the Notes for
 *     more details.  The system used is returned.
 
 *  Arguments:
@@ -86,7 +86,9 @@
 *     1997 April-May  (MJC):
 *        Various fixes as learnt more about MWCS.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 April 13 (MJC):
+*        Remove unused variables.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -152,7 +154,6 @@
       INTEGER I                  ! Loop variable
       INTEGER IAXIS              ! Axis number
       REAL INCREM( NDF__MXDIM )  ! Incremental values for axis arrays
-      INTEGER ISTAT              ! IMFORT status
       INTEGER J                  ! Loop counter
       CHARACTER KEYWRD * ( SZKEY ) ! Accommodates keyword name
       LOGICAL LINEAR( NDF__MXDIM ) ! Axes are linear?
@@ -160,7 +161,6 @@
       INTEGER NCHAR              ! Length of a character string
       INTEGER NDIM               ! Number of dimensions
       INTEGER NELM               ! Number of elements
-      INTEGER NSPECN             ! specN length in characters
       REAL START( NDF__MXDIM )   ! Start values for an axis structures
       LOGICAL THERE              ! NDF has FITS extension?
       CHARACTER VALUE * ( SZVAL ) ! Accommodates keyword value

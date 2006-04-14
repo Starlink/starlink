@@ -127,12 +127,14 @@
 *     8-JAN-1999 (DSB):
 *        Added FMTCNV to argument list for COF_STYPE call.
 *     5-APR-2000 (AJC):
-*        Add CHECK argument to COF_SBND
+*        Add CHECK argument to COF_SBND.
 *     30-AUG-2000 (AJC):
-*        Correct description FITS_EXT_n not NDF_EXT_n
-*        Add separate FITS unit numbers in call to COF_WRTAB.
+*        Correct description FITS_EXT_n not NDF_EXT_n.  Add separate 
+*        FITS unit numbers in call to COF_WRTAB.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 April 13 (MJC):
+*        Remove unused variables.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -203,10 +205,7 @@
       LOGICAL HDUPRE             ! HDUCLASn keyword is present?
       INTEGER HDUTYP             ! HDU type (primary, IMAGE, ASCII or
                                  ! binary table)
-      INTEGER I                  ! Loop counter
-      INTEGER IEXT               ! Extension counter
       CHARACTER * ( NDF__SZTYP ) ITYPE ! NDF implementation data type
-      INTEGER LBND( NDF__MXDIM ) ! NDF lower bounds
       LOGICAL LOOP               ! Loop for another FITS extension?
       INTEGER NC                 ! Number of characters in component
       INTEGER NCF                ! Number of characters in filename

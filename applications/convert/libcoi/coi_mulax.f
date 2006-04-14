@@ -77,7 +77,9 @@
 *     1997 July 24 (MJC):
 *        Original version.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 April 13 (MJC):
+*        Remove unused variables.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -125,7 +127,6 @@
       INTEGER BUFLEN             ! Character length of the multi-line
                                  ! buffer for WATd_nnn headers
       REAL COEF( MXCOEF )        ! Polynomial coeeficients
-      CHARACTER * ( 1 ) CNDIM    ! The axis number
       INTEGER CPOS               ! CUrrent column position
       INTEGER CSTAT              ! CHR status
       DOUBLE PRECISION DCOEF( MXCOEF ) ! Polynomial coeeficients
@@ -137,11 +138,9 @@
       INTEGER DTYPE              ! Data linearity code
       INTEGER EL                 ! Dimension of the current axis
       INTEGER END( MAXWRD )      ! End column of each word
-      INTEGER ERR                ! IMFORT status
       INTEGER FTYPE              ! Non-linear-axis storage variant
       INTEGER I                  ! Loop counter
       CHARACTER * ( DAT__SZTYP ) ITYPE ! Data type of the axis centres
-      CHARACTER * ( 8 ) KEYWRD   ! FITS keyword
       CHARACTER * ( 70 ) LABEL   ! Axis label
       INTEGER NCL                ! Number of characters in label
       INTEGER NCU                ! Number of characters in units

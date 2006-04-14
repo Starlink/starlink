@@ -93,10 +93,12 @@
 *     1998 January 22 (MJC):
 *        Original version.
 *     18-FEB-1998 (DSB):
-*        Corrected constant "0" used as nullval argument to FTGCVx so that
-*        it has the required type (eg "0", "0.0" or "0.0D0" ).
+*        Corrected constant "0" used as nullval argument to FTGCVx so
+*        that it has the required type (eg "0", "0.0" or "0.0D0" ).
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 April 13 (MJC):
+*        Remove unused variables.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -174,8 +176,6 @@
       INTEGER NFIELD             ! Number of fields in table
       CHARACTER * ( DAT__SZLOC ) NLOC ! Locator to the dummy NDF
       INTEGER NORDER             ! Number of orders (rows) in table
-      INTEGER NREP               ! Number of bad error values replaced
-      INTEGER NREPHI             ! Dummy
       INTEGER ORDER              ! Order number
       INTEGER PLACE              ! Placeholder for new NDF
       INTEGER PNTR( 1 )          ! Pointer to a mapped column array
