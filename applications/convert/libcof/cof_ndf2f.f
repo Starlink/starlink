@@ -339,12 +339,12 @@
       CHARACTER * ( NDF__SZXNM ) XNAME ! Name of NDF extension
       CHARACTER * ( DAT__SZTYP ) XTYPE ! Name of NDF extension
 
+*  Save persistent variables.
+      SAVE FUNIT, NCF
+
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
-
-*  Save persistent variables.
-      SAVE FUNIT, NCF
 
 *.
 
