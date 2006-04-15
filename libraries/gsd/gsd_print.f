@@ -1,12 +1,42 @@
       PROGRAM GSD_PRINT
-*
-*    Program to PRINT a GSD file
-*
-*    Author : Jon Fairclough
-*             Horst Meyerdierks
-*    History : 11-Nov-1986 : Original.
-*              06-Dec-1994 : Ported to Unix, as tutorial.
-*
+*+
+*  Name:
+*     gsd_print
+
+*  Purpose:
+*     Program to PRINT a GSD file
+
+* Copyright:
+*    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
+*    All Rights Reserved. 
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*    Jon Fairclough
+*    Horst Meyerdierks
+
+*  History:
+*    11-Nov-1986 (JF):
+*        Original.
+*    06-Dec-1994 (HME):
+*        Ported to Unix, as tutorial.
+
+*  Notes:
 *    This programme is being ported as a test and tutorial for the new
 *    GSD library. There is a C version of this programme, which should
 *    be used instead.
@@ -44,10 +74,7 @@
 *    are declared exactly 16 characters long.
 *
 
-* Copyright:
-*    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
-*    All Rights Reserved. 
-
+*-
       IMPLICIT NONE
 *
       INCLUDE 'PRM_PAR'       ! Bad values

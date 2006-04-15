@@ -37,7 +37,7 @@ gsd2_testcp_LDADD = libgsd.la `cnf_link` -lm
 
 dist_starnews_DATA = gsd.news
 
-dist_pkgdata_DATA = GSD_CONDITIONS
+dist_pkgdata_DATA = LICENCE
 
 DISTCLEANFILES = stamp-h1
 
