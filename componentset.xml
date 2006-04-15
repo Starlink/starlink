@@ -1738,7 +1738,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="agi" support="S">
-  <version>2.1-1</version>
+  <version>2.1-2</version>
   <path>libraries/agi</path>
   <description>Applications Graphics Interface Library</description>
   <abstract><p>AGI and AGP interface.</p></abstract>
@@ -1770,7 +1770,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ard" support="S">
-  <version>2.0-5</version>
+  <version>2.0-6</version>
   <path>libraries/ard</path>
   <description>ASCII Region Definition</description>
   <abstract><p>The ARD (ASCII Region Definition) system provides a 
@@ -1875,7 +1875,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="cat" support="S">
-  <version>8.1</version>
+  <version>8.1-2</version>
   <path>libraries/cat</path>
   <description>CAT -- Catalogue and Table Manipulation Library</description>
   <abstract><p>
