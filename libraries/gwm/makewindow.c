@@ -22,21 +22,21 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
 			Window *win_id )
 /*
 *+
-*  Name :
+*  Name:
 *     GWM_Make_Window
 *
-*  Purpose :
+*  Purpose:
 *     Creates a GWM window and pixmap
 *
-*  Language :
+*  Language:
 *     C
 *
-*  Invocation :
+*  Invocation:
 *     status = GWM_MakeWindow( display, name title, ncols, inter,
 *                   border, fg, bg, olv, ovcol, size_x, size_y,
 *                   pos_x, pos_y, &win_id);
 *
-*  Description :
+*  Description:
 *      The following operations are carried out:
 *         Colour cells allocated - these are read/write if the server supports
 *         it, otherwise they are read only.
@@ -48,11 +48,11 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
 *     and the window id set to NULL.
 *     
 *
-*  Function return value :
+*  Function return value:
 *     status = int
 *        The error status
 *
-*  Arguments :
+*  Arguments:
 *     display = *Display (given)
 *        Display id
 *     name = char[] (given)
@@ -86,11 +86,31 @@ int GWM_MakeWindow ( Display *display, char name[], char *title, int ncols,
 *     win_id = Window (returned)
 *        Id of new window
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     DLT: David Terrett (Starlink RAL)
 *     {enter_new_authors_here}
 *
-*  History :
+*  History:
 *      4-MAR-1991 (DLT):
 *        Orignal version
 *      13-NOV_1991 (DLT):

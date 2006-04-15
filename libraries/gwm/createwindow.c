@@ -157,24 +157,24 @@ int GWM_CreateWindow( int argc, char *argv[], Display **display, char
 	name[])
 /*
 *+
-*  Name :
+*  Name:
 *     GWM_CreateWindow
 *
-*  Purpose :
+*  Purpose:
 *     Create a window     
 *
-*  Language :
+*  Language:
 *     C
 *
-*  Invocation :
+*  Invocation:
 *     status = GWM_CreateWindow( argc, argv, &display, &name);
 *
-*  Description :
+*  Description:
 *     A GWM window is created according to the specification in the
 *     argument list and the display id of the X connection and the name 
 *     of the window returned.
 *
-*  Arguments :
+*  Arguments:
 *     argc = int (given)
 *         Count of number of arguments
 *     argv = *char[] (given)
@@ -184,17 +184,37 @@ int GWM_CreateWindow( int argc, char *argv[], Display **display, char
 *     name = char[] (returned)
 *          window name
 *
-*  Algorithm :
+*  Algorithm:
 *     A connection to the X server is opened and -display added to the argument
 *     list. A "refresh" process is created and the argument list passed to it.
 *     A reply is read from the refresh process and if the window is created 
 *     sucessfully, a display id and window name are returned.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1991, 1992, 1994 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     DLT: David Terrett (Starlink RAL)
 *     {enter_new_authors_here}
 *
-*  History :
+*  History:
 *      7-MAR-1991 (DLT):
 *        Orignal version
 *      9-MAR-1992 (DLT):

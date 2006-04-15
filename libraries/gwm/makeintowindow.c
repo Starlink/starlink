@@ -16,20 +16,20 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
 			 int mincols, int fg, int bg, Boolean ovl, int ovcol) 
 /*
 *+
-*  Name :
+*  Name:
 *     GWM_MakeIntoWindow
 *
-*  Purpose :
+*  Purpose:
 *     Converts a window in to a GWM window
 *
-*  Language :
+*  Language:
 *     C
 *
-*  Invocation :
+*  Invocation:
 *     status = GWM_MakeIntoWindow( display, win_id, name, ncols, fg, bg,
 *                   olv, ovcol);
 *
-*  Description :
+*  Description:
 *      The following operations are carried out:
 *         Colour cells allocated - these are read/write if the server supports
 *         it, otherwise they are read only.
@@ -38,11 +38,11 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
 *     If any part of the operation fails, all resources allocated are released.
 *     
 *
-*  Function return value :
+*  Function return value:
 *     status = int
 *        The error status
 *
-*  Arguments :
+*  Arguments:
 *     display = *Display (given)
 *        Display id
 *     win_id = Window (given)
@@ -62,12 +62,33 @@ int GWM_MakeIntoWindow ( Display *display, Window win_id, char *name,
 *     ovcol = int (given)
 *        Overlay plane colour
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 1999, 2004 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     DLT: David Terrett (Starlink RAL)
 *     TIMJ: Tim Jenness (JAC)
 *     {enter_new_authors_here}
 *
-*  History :
+*  History:
 *      23-SEP-1992 (DLT):
 *        Orignal version
 *      05-MAR-1999 (DLT):

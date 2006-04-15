@@ -15,25 +15,25 @@ F77_SUBROUTINE(gwm_wseti) ( CHARACTER(option), INTEGER(value),
 
 /*
 *+
-*  Name :
+*  Name:
 *     GWM_WSETI
 *
-*  Purpose :
+*  Purpose:
 *     Set an integer window option
 *
-*  Language :
+*  Language:
 *     C
 *
-*  Invocation :
+*  Invocation:
 *     CALL GWM_WSETI( OPTION, VALUE, STATUS )
 *
-*  Description :
+*  Description:
 *     The window options are used to control the characteristics of
 *     the GWM window and to override the default values. These must
 *     be set before the window is created with GWM_CRWIN. The
 *     'COLOURS' option is an example of an integer option.
 *
-*  Arguments :
+*  Arguments:
 *     OPTION = CHARACTER * ( * ) (Given)
 *        The option name.
 *     VALUE = INTEGER (Given)
@@ -41,12 +41,32 @@ F77_SUBROUTINE(gwm_wseti) ( CHARACTER(option), INTEGER(value),
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1991, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink RAL)
 *     {enter_new_authors_here}
 *
-*  History :
+*  History:
 *     11-OCT-1991 (NE):
 *        Orignal version
 *      7-NOV-1991 (DLT):

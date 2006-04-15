@@ -38,19 +38,19 @@ int handler( int *sigargs, int *mechargs)
 int MAIN (int argc, char *argv[])
 /*
 *+
-*  Name :
+*  Name:
 *     xrefresh
 *
-*  Purpose :
+*  Purpose:
 *     Refresh an X window in response to expose events.
 *
-*  Language :
+*  Language:
 *     C
 *
-*  Invocation :
+*  Invocation:
 *     status = GWM_
 *
-*  Description :
+*  Description:
 *     On VMS the normal C command line conventions cannot be used directly
 *     because the program is maybe run as a subprocess without a CLI present
 *     so the main program on other systems has to be a function that is called
@@ -61,14 +61,34 @@ int MAIN (int argc, char *argv[])
 *     to the standard error channel. This provides the parent process
 *     with enough information to connect to the window.
 *     
-*  Arguments :
+*  Arguments:
 *     See xmake
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1991, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     DLT: David Terrett (Starlink RAL)
 *     {enter_new_authors_here}
 *
-*  History :
+*  History:
 *      13-MAR-1991 (DLT):
 *        Orignal version
 *      21-AUG-1991 (DLT):

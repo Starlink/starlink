@@ -14,22 +14,22 @@
 int GWM_GetPixmap( Display *display, Window win_id, Pixmap *pix_id)
 /*
 *+
-*  Name :
+*  Name:
 *     GWM_GetPixmap
 *
-*  Purpose :
+*  Purpose:
 *     Get pixmap id
 *     
-*  Language :
+*  Language:
 *     C
 *
-*  Invocation :
+*  Invocation:
 *     status = GWM_GetPixmap( display, win_id, &pix_id);
 *
-*  Description :
+*  Description:
 *     The value of the GWM_pixmap property is fetched from the window.
 *
-*  Arguments :
+*  Arguments:
 *     display = *Display (given)
 *        Display id
 *     win_di = Window (given)
@@ -37,11 +37,31 @@ int GWM_GetPixmap( Display *display, Window win_id, Pixmap *pix_id)
 *     pix_id = Pixmap (returned)
 *        Pixmap id
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     DLT: David Terrett (Starlink RAL)
 *     {enter_new_authors_here}
 *
-*  History :
+*  History:
 *      9-JUL-1991 (DLT):
 *        Orignal version
 *     {enter_changes_here}

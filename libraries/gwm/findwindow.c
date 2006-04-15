@@ -21,23 +21,23 @@ int GWM_FindWindow( Display *display, char name[], Window *win_id)
 {
 /*
 *+
-*  Name :
+*  Name:
 *     GWM_FindWindow
 *
-*  Purpose :
+*  Purpose:
 *     Find a window
 *     
-*  Language :
+*  Language:
 *     C
 *
-*  Invocation :
+*  Invocation:
 *     status = GWM_FindWindow( display, name, &win);
 *
-*  Description :
+*  Description:
 *     The X server is seached for a GWM window with the specified name
 *     and the id of the window returned.
 *
-*  Arguments :
+*  Arguments:
 *     display = *Display (given)
 *        Display id
 *     name = char[] (given)
@@ -45,17 +45,37 @@ int GWM_FindWindow( Display *display, char name[], Window *win_id)
 *     win = Window (returned)
 *        Window id
 *
-*  Algorithm :
+*  Algorithm:
 *     The root window of the display is searched for a property with 
 *     the name GWM_<name>. The value of this property is taken to be 
 *     the window id and the window itself is checked for a property 
 *     called GWM_name whose value matches the window name.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1991, 1994 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     DLT: David Terrett (Starlink RAL)
 *     {enter_new_authors_here}
 *
-*  History :
+*  History:
 *      7-MAR-1991 (DLT):
 *        Orignal version
 *      8-MAR-1994 (DLT):

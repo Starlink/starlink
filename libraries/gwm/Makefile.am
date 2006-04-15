@@ -57,7 +57,7 @@ gwm_test_SOURCES = gwm_test.f
 gwm_test_LDADD = libgwm.la $(X_LIBS) $(X_PRE_LIBS) -lX11 `ems_link` `cnf_link`
 
 dist_starnews_DATA = gwm.news
-
+dist_pkgdata_DATA = LICENCE
 
 EXTRA_DIST = gwm_err.msg
 

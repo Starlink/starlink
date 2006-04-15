@@ -12,22 +12,22 @@ int GWM_SetColour( Display *display, Window win_id, unsigned long entry,
 	unsigned long r, unsigned long g, unsigned long b)
 /*
 *+
-*  Name :
+*  Name:
 *     GWM_SetColour
 *
-*  Purpose :
+*  Purpose:
 *     Set colour
 *
-*  Language :
+*  Language:
 *     C
 *
-*  Invocation :
+*  Invocation:
 *     status = GWM_SetColour( display, win_id, entry, r, g, b);
 *
-*  Description :
+*  Description:
 *    The specified colour table entry is set to the requested colour.
 *
-*  Arguments :
+*  Arguments:
 *     display = *Display (Given)
 *        Display id
 *     win_id = Window (Given)
@@ -41,11 +41,32 @@ int GWM_SetColour( Display *display, Window win_id, unsigned long entry,
 *     b = unsigned long (given)
 *        New blue value
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     DLT: David Terrett (Starlink RAL)
 *     {enter_new_authors_here}
 *
-*  History :
+*  History:
 *      9-JUL-1991 (DLT):
 *        Orignal version
 *     21-APR-1995 (DLT):

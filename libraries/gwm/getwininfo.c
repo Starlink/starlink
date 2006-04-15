@@ -14,31 +14,31 @@
 int GWM_GetWinInfo( Display *display, Window win_id, struct wininfo **info)
 /*
 *+
-*  Name :
+*  Name:
 *     GWM_GetWinInfo
 *
-*  Purpose :
+*  Purpose:
 *     Returns a structure containing information about the specified
 *     window.
 *
-*  Language :
+*  Language:
 *     C
 *
-*  Invocation :
+*  Invocation:
 *     status = GWM_GetWinInfo( display, win_id, &info);
 *
-*  Description :
+*  Description:
 *     A wininfo structure is allocated and filled with the specification of
 *     the specified window. This structure is used by GWM_ProcessEvent
 *     in order to minimize the amount of work that has to be done in 
 *     response to events.
 *     
 *
-*  Function return value :
+*  Function return value:
 *     status = int
 *        The error status
 *
-*  Arguments :
+*  Arguments:
 *     display = *Display (given)
 *        Display id
 *     win_id = Window (given)
@@ -46,11 +46,31 @@ int GWM_GetWinInfo( Display *display, Window win_id, struct wininfo **info)
 *     info = *struct wininfo
 *        Window information structure
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1991, 1994 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     DLT: David Terrett (Starlink RAL)
 *     {enter_new_authors_here}
 *
-*  History :
+*  History:
 *      2-OCT-1991 (DLT):
 *        Original version
 *      2-MAR-1994 (DLT):
