@@ -1,6 +1,13 @@
 1 GRAPHPAR
                                                           Expires:
+Version_1.1-6
+
+ o Now released under the GPL
+ o Autoconf build system
+
+Vesion_1.1-5
 
 This is a maintenance release of the graphics ADAM parameter system interface
 which increases the size of the buffer used to store device names in order
 to accommodate an explict file name.
+

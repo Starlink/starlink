@@ -11,3 +11,4 @@ identifiers.
 instance) may now be included with file specifications used as
 indirection elements (e.g. "^$DATA_DIR/myfiles").
 
+ - Now released under the GPL

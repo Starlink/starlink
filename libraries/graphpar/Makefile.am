@@ -5,4 +5,5 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 SUBDIRS = gkspar pgppar sgspar
 
 dist_starnews_DATA = graphpar.news
+dist_pkgdata_DATA = LICENCE
 

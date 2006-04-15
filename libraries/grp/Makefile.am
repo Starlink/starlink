@@ -63,5 +63,6 @@ ADAM_F_ROUTINES = grp_group.f grp_list.f grp1_gtfil.f
 BLOCKDATA = grp1_init.f
 
 dist_starnews_DATA = grp.news
+dist_pkgdata_DATA = LICENCE
 
 EXTRA_DIST = GRP_CONST GRP_COM grp_test.dat

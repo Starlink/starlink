@@ -1,13 +1,47 @@
       SUBROUTINE PGP_TEST(STATUS)
-C-----------------------------------------------------------------------
-C Demonstration program for PGPLOT: draw a histogram.
-C-----------------------------------------------------------------------
+*+
+*  Name:
+*     pgp_test
+
+*  Purpose:
+*     Demonstration program for PGPLOT: draw a histogram.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Notes:
+*     PGRAND and PGRNRM are taken from the PGPLOT demo programs
+*     and are copyright (C) 1995 California Institute of Technology.
+
+*  Authors:
+*     {enter_new_authors_here}
+
+*-
 
       INCLUDE 'SAE_PAR'
 
       INTEGER  I, ISEED, PGBEG, STATUS, LUN
       REAL     DATA(1000), X(620), Y(620)
       REAL     PGRNRM
+*.
+
 C
 C Call PGP_ASSOC to initiate PGPLOT and open the output device; PGP_ASSOC
 C will prompt the user to supply the device name and type.
