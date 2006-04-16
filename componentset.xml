@@ -2113,7 +2113,7 @@ No longer under active control.
 </component>
 
 <component id="graphpar" support="S">
-  <version>1.1-5</version>
+  <version>1.1-6</version>
   <path>libraries/graphpar</path>
   <description>ADAM Graphics Programming</description>
   <abstract><p>
