@@ -1,3 +1,9 @@
+MAG Version 2.0-2
+
+o Released under the GPL
+
+o Now builds using the GNU auto tools.
+
 MAG Version 2.0-1 is released.
 
 This version adds a shared library for Linux

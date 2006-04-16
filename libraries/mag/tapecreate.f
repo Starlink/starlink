@@ -1,42 +1,105 @@
-*+ TAPECREATE - Create a Mag. Tape dataset
       SUBROUTINE TAPECREATE( STATUS )
-*    Description :
+*+
+*  Name:
+*     TAPECREATE
+
+*  Purpose:
+*     Create a Mag. Tape dataset.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL TAPECREATE( [p]... )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Create the Mag. Tape dataset specified by the %TAPE parameter.
-*    Parameters :
+
+*  ADAM Parameters:
 *     DRIVE     =MAG_TAPE(READ)
-*                Name of the tape dataset to be created.
+*        Name of the tape dataset to be created.
 *     DEVICE    =_CHAR(READ)
-*                device name of tape drive
+*        device name of tape drive
 *     DEVDATASET=UNIV(WRITE)
-*                name of device dataset
-*    Method :
+*        name of device dataset
+
+*  Algorithm:
 *     Get the location of the dataset, name of the tape drive and
 *     name of tape drive as known to the HOST system.
 *     Use MAG1_CRTDS to create data structure.
-*    Authors :
-*     Sid Wright. (UCL::SLW)
-*    History :
-*     22-Apr-1982:  Device dataset modifications.  (UCL::SLW)
-*     16-Jul-1983:  Starlink-ised version.  (UCL::SLW)
-*     23-Aug-1984:  Name changed from crtape. (RAL::AJC)
-*      5-Sep-1984:  Added parameters to prolog. (RAL::AJC)
-*     28-FEB-1990:  Create container file if it doesn't exist (RAL::AJC)
-*     03-MAR-1993:  Change the call to MAG$_CRTDS to one to MAG1_CRTDS
-*    Type Definitions :
+
+*  Copyright:
+*     Copyright (C) 1982, 1983, 1984, 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     SLW: Sid Wright. (UCL)
+*     AJC: Alan Chipperfield (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     22-APR-1982 (SLW):
+*         Device dataset modifications.
+*     16-JUL-1983 (SLW):
+*         Starlink-ised version.
+*     23-AUG-1984 (AJC):
+*         Name changed from crtape.
+*      5-SEP-1984 (AJC):
+*         Added parameters to prolog.
+*     28-FEB-1990 (AJC):
+*         Create container file if it doesn't exist
+*     03-MAR-1993 (AJC):
+*         Change the call to MAG$_CRTDS to one to MAG1_CRTDS
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'         ! DAT HDS constants
       INCLUDE 'PAR_ERR'			! Par Errors
       INCLUDE 'MAG_SYS'			! Mag Constants
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    Local variables :
+
+*  Local Variables:
       CHARACTER*(DAT__SZLOC) ELOC	! Locator to dataset storage
       CHARACTER*(DAT__SZNAM) TAPE	! Tape dataset name
       CHARACTER*(MAG__SZNAM) DEVICE	! Tape drive id.
-*-
-    
+
+*.
+
+
 *    Allowed to execute ?
       IF (STATUS .NE. SAI__OK) RETURN
 
@@ -45,7 +108,7 @@
 *
       CALL DAT_EXIST ( 'DEVDATASET', 'UPDATE', ELOC, STATUS )
 
-      IF ( ( STATUS .EQ. PAR__NULL ) .OR. ( STATUS .EQ. PAR__ABORT ) ) 
+      IF ( ( STATUS .EQ. PAR__NULL ) .OR. ( STATUS .EQ. PAR__ABORT ) )
      :  THEN
 
          RETURN

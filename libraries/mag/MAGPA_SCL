@@ -1,7 +1,36 @@
-*    Description :
+*+
+*  Name:
+*     MAGPA_SCL
+
+*  Purpose:
+*     MAGPA common block.
+
+*  Description:
 *     This file contains the MAGPA Common Block.   This Common Block
 *     provides the relationship between Starlink Program Parameters
 *     and MAG Tape Descriptors.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {enter_authors_here}
+
+*-
+
 *    Global variables :
       logical Pfree(MAG__MXPAR)		! whether slot used
       integer Pdesc(MAG__MXPAR)		! Tape descriptor for parameter
@@ -18,4 +47,4 @@
       save /mag_pa_1/
       common /mag_pa_2/ Ptname, Pdloc, Pacmod
       save /mag_pa_2/
-*-
+*.

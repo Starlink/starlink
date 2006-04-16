@@ -1,6 +1,12 @@
       SUBROUTINE MAGTEST(STATUS)
-*
-*    Description:
+*+
+*  Name:
+*     magtest
+
+*  Purpose:
+*     ADAM test of MAG and MIO
+
+*  Description:
 *     A test of the MAG and MIO packages.
 *     The program allocates and mounts the tape drive defined
 *     by %TAPE, then repeats it to check on the `already done'
@@ -13,10 +19,12 @@
 *     the second file.
 *     The tape is then rewound and the second records of each 
 *     file are read and the first 10 bytes printed.
-*    Parameters
-*     TAPE     =TAPEDRIVE(WRITE)
-*               name of the tape drive to be used
-*    Method:
+
+*  ADAM Parameters
+*     TAPE = TAPEDRIVE(WRITE)
+*       name of the tape drive to be used
+
+*  Method:
 *     The program uses the following MAG_ routines:
 *     MAG_ALOC
 *     MAG_MOUNT
@@ -29,10 +37,35 @@
 *     MAG_DISM
 *     MAG_ANNUL
 *     MAG_DEAL
-*    Author:
-*     A.Chipperfield  (RLVAD::AJC)
-*    History:
-*     05.06.1986: Original.   (RLVAD::AJC)
+
+*  Copyright:
+*     Copyright (C) 1986 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     AJC: Alan Chipperfield
+
+*  History:
+*     05-JUN-1986 (AJC):
+*        Original.
+
+*-
 *    Global constants:
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -50,7 +83,7 @@
       INTEGER IFILE           !File number
       INTEGER NWRIT           !Number of bytes actually in record
       BYTE OBUFF(65536)       !Output buffer
-
+*.
       PRINT *,'STARTED'
 *    Allocate and mount
       CALL MAG_ALOC('TAPE', STATUS)

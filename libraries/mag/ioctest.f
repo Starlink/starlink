@@ -1,13 +1,42 @@
       PROGRAM IOCTEST
-C
-C   Simple exerciser for the Fortran-callable version of the 
-C   ioc_ routines.
-C
-C   No attempt has been made to make this a Starlink or ADAAM Program.
-C
-C   KFH RAL 17/1/92
-C
+*+
+*  Name:
+*     ioctest
 
+*  Purpose:
+*     Simple exerciser for the Fortran-callable version of the  ioc_ routines.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     KFH: K F Hartley (RAL)
+
+*  History:
+*     17-JAN-1992 (KFH):
+*        Original version
+
+*  Notes:
+*     No attempt has been made to make this a Starlink or ADAAM Program.
+
+*-
       IMPLICIT NONE
 
 

@@ -75,6 +75,7 @@ magtest_SOURCES = magtest.f
 magtest_LDADD = `$(srcdir)/mag_link_adam` `prm_link`
 
 dist_starnews_DATA = mag.news
+dist_pkgdata_DATA = LICENCE
 
 EXTRA_DIST = mag_err.msg mio_err.msg
 
