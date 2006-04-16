@@ -154,6 +154,7 @@ img_test_SOURCES = img_test.f libimg_adam.la
 img_test_LDADD = $(LDADD) `$(srcdir)/img_link_adam`
 
 dist_starnews_DATA = img.news
+dist_pkgdata_DATA = LICENCE
 
 CLEANFILES = img_test img_test.ifc
 

@@ -12,6 +12,36 @@
 *     workspace. The output image contains the difference between the
 *     input image and a slightly shifted version.
 
+*  Copyright:
+*     Copyright (C) 1998, 2004 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     PWD: Peter Draper (Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+
+*  History:
+*     03-JUN-1998 (PWD):
+*         Original Version
+*     16-AUG-2004 (TIMJ):
+*         Use CNF_PVAL
+
 *  Notes:
 *     This can be done without the requirement for workspace (with a
 *     little extra effort), but then it wouldn't be an example of how

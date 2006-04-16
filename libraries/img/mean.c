@@ -14,6 +14,33 @@
  *     This is a demonstration routine for IMG. It accesses an existing
  *     image and calculates the mean value which it then writes to the
  *     terminal.
+
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+ *  Authors:
+ *     PWD: Peter Draper (Starlink)
+
+ *  History:
+ *     03-JUN-1998 (PWD):
+ *         Original Version
  
  *-
  */
