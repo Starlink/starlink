@@ -1,14 +1,15 @@
 /*
-*  Name :
+*+
+*  Name:
 *     KWM.C
 *
-*  Purpose :
+*  Purpose:
 *     Integer & char multivalued keyword file management
 *
-*  Description :
+*  Description:
 *     Integer & char multivalued keyword file management
 *
-*  Contents :
+*  Contents:
 *     kwi_xtr
 *        Keywords integer multi-value extraction
 *     kwi_upd
@@ -20,11 +21,31 @@
 *     kwm_upd
 *        Keywords update of memory file
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1991 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -96,20 +117,21 @@ static struct
 void kwi_xtr ( char filkeyw[], char keywid[], int* nitem, int ikeyw[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     kwi_xtr
 *
-*  Purpose :
+*  Purpose:
 *     Keywords integer multi-value extraction
 *
-*  Invocation :
+*  Invocation:
 *     kwi_xtr( filkeyw , keywid , nitem, ikeyw )
 *
-*  Description :
+*  Description:
 *     Keywords integer multi-value extraction
 *     Error flag : *nitem = 0 as output
 *
-*  Arguments :
+*  Arguments:
 *     filkeyw = char[]
 *        Keywords file name
 *     keywid = char[]
@@ -119,11 +141,11 @@ void kwi_xtr ( char filkeyw[], char keywid[], int* nitem, int ikeyw[] )
 *     ikeyw = int[]
 *        Integer values array
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     23-MAY-1991 (NE):
@@ -207,20 +229,21 @@ return;
 void kwi_upd ( char filkeyw[], char keywid[], int* nitem, int ikeyw[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     kwi_upd
 *
-*  Purpose :
+*  Purpose:
 *     Keywords integer multi-value update
 *
-*  Invocation :
+*  Invocation:
 *     kwi_upd( filkeyw , keywid , nitem, ikeyw )
 *
-*  Description :
+*  Description:
 *     Keywords integer multi-value update
 *     Error flag : *nitem = 0 as output
 *
-*  Arguments :
+*  Arguments:
 *     filkeyw = char[]
 *        Keywords file name
 *     keywid = char[]
@@ -230,11 +253,11 @@ void kwi_upd ( char filkeyw[], char keywid[], int* nitem, int ikeyw[] )
 *     ikeyw = int[]
 *        Integer values array
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     23-MAY-1991 (NE):
@@ -309,20 +332,21 @@ return;
 void kws_xtr ( char* filkeyw, char* keywid, int* nitem, char* skeyw[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     kws_xtr
 *
-*  Purpose :
+*  Purpose:
 *     Keywords string multi-value extraction
 *
-*  Invocation :
+*  Invocation:
 *     kws_xtr( filkeyw , keywid , nitem , skeyw )
 *
-*  Description :
+*  Description:
 *     Keywords string multi-value extraction
 *     Error flag : *nitem = 0 as output
 *
-*  Arguments :
+*  Arguments:
 *     filkeyw = char[]
 *        Keywords file name
 *     keywid = char[]
@@ -332,11 +356,11 @@ void kws_xtr ( char* filkeyw, char* keywid, int* nitem, char* skeyw[] )
 *     skeyw = char[]
 *        String array
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     23-MAY-1991 (NE):
@@ -418,20 +442,21 @@ return;
 void kwm_xtr ( char filkeyw[], char keywid[], int* nitem, int ikeyw[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     kwm_xtr
 *
-*  Purpose :
+*  Purpose:
 *     Keywords extraction from memory file
 *
-*  Invocation :
+*  Invocation:
 *     kwm_xtr( filkeyw , keywid , nitem, ikeyw )
 *
-*  Description :
+*  Description:
 *     Keywords extraction from memory file
 *     Error flag : *nitem = 0 as output
 *
-*  Arguments :
+*  Arguments:
 *     filkeyw = char[]
 *        Keywords file name
 *     keywid = char[]
@@ -441,10 +466,10 @@ void kwm_xtr ( char filkeyw[], char keywid[], int* nitem, int ikeyw[] )
 *     ikeyw = int[]
 *        Integer values array
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 */
@@ -662,20 +687,21 @@ return;
 void kwm_upd ( char filkeyw[], char keywid[], int* nitem, int ikeyw[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     kwm_upd
 *
-*  Purpose :
+*  Purpose:
 *     Keywords update of memory file
 *
-*  Invocation :
+*  Invocation:
 *     kwm_upd( filkeyw , keywid , nitem, ikeyw )
 *
-*  Description :
+*  Description:
 *     Keywords update of memory file
 *     Error flag : *nitem = 0 as output
 *
-*  Arguments :
+*  Arguments:
 *     filkeyw = char[]
 *        Keywords file name
 *     keywid = char[]
@@ -685,10 +711,10 @@ void kwm_upd ( char filkeyw[], char keywid[], int* nitem, int ikeyw[] )
 *     ikeyw = int[]
 *        Integer values array
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 */

@@ -1,14 +1,15 @@
 /*
-*  Name :
+*+
+*  Name:
 *     VDM.C
 *
-*  Purpose :
+*  Purpose:
 *     Virtual Display Management
 *
-*  Description :
+*  Description:
 *     Virtual Display Management
 *
-*  Contents :
+*  Contents:
 *     VDM_CRE
 *        Creates a new display window for subsequent operations
 *     VDM_DEL
@@ -24,17 +25,39 @@
 *     getkwfile
 *        Provides keywords file name for Virtual Device Manager
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1991, 1992, 1994 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     23-MAY-1991 (NE):
 *        Added stdlib.h for malloc, ctype for toupper
 *     26-MAR-1992 (NE):
 *        Added idi_err.h
+
+*-
 */
 
 /* System definitions */
@@ -64,6 +87,7 @@ int VDM_CRE ( char device[], int xoff, int yoff, int xdim, int ydim,
               char wtype, char display[] )
 
 /*
+*+
 *  Name :
 *     VDM_CRE
 *
@@ -228,6 +252,7 @@ return (status);
 int VDM_DEL ( char display[] )
 
 /*
+*+
 *  Name :
 *     VDM_DEL
 *
@@ -355,6 +380,7 @@ return (status);
 int VDM_INQ ( char display[], int* xoff, int* yoff, int* xdim, int* ydim )
 
 /*
+*+
 *  Name :
 *     VDM_INQ
 *
@@ -438,6 +464,7 @@ int VDM_MOD ( char display[], int vis, int dxoff, int dyoff, int dxdim,
               int dydim )
 
 /*
+*+
 *  Name :
 *     VDM_MOD
 *
@@ -511,6 +538,7 @@ return (status);
 int VDM_SAV ( char display[], char bmfile[] )
 
 /*
+*+
 *  Name :
 *     VDM_SAV
 *
@@ -581,6 +609,7 @@ return (status);
 void filwndcr ( char filwindow[], int* status )
 
 /*
+*+
 *  Name :
 *     filwndcr
 *
@@ -674,6 +703,7 @@ fclose(fwnd);
 void getkwfile ( char filwnd[] )
 
 /*
+*+
 *  Name :
 *     getkwfile
 *

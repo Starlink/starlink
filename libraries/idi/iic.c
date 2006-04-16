@@ -1,17 +1,18 @@
 /*
-*  Name :
+*+
+*  Name:
 *     IIC.C
 *
-*  Purpose :
+*  Purpose:
 *     Cursor Routines
 *
-*  Description :
+*  Description:
 *     Cursor Routines
 *     All cursor coords are relative to the associated memory
 *     (or to the device in case of memory = -1)
 *     (0,0 = bottom left)
 *
-*  Contents :
+*  Contents:
 *     IICINC_C
 *        Initialize Cursor;
 *     IICSCV_C
@@ -21,10 +22,30 @@
 *     IICWCP_C
 *        Write Cursor Position;
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1991, 1992, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -49,19 +70,20 @@ int IICINC_C ( int display, int memid, int curn, int cursh, int curcol,
                int xcur, int ycur )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IICINC_C
 *
-*  Purpose :
+*  Purpose:
 *     Initialize cursor
 *
-*  Invocation :
+*  Invocation:
 *     status = IICINC_C( display, memid, curn, cursh, curcol, xcur, ycur )
 *
-*  Description :
+*  Description:
 *     Initialize cursor
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -77,11 +99,11 @@ int IICINC_C ( int display, int memid, int curn, int cursh, int curcol,
 *     ycur = int
 *        Y cursor position
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     27-MAY-1992 (NE):
@@ -170,19 +192,20 @@ return(iicerr);
 int IICSCV_C ( int display, int curn, int vis )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IICSCV_C
 *
-*  Purpose :
+*  Purpose:
 *     Set cursor visibility
 *
-*  Invocation :
+*  Invocation:
 *     status = IICSCV_C( display, curn, vis )
 *
-*  Description :
+*  Description:
 *     Set cursor visibility
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     curn = int
@@ -190,11 +213,11 @@ int IICSCV_C ( int display, int curn, int vis )
 *     vis = int
 *        visibility [1 / 0]
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -294,19 +317,20 @@ int IICRCP_C ( int display, int inmemid, int curn, int* xcur, int* ycur,
                int* outmemid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IICRCP_C
 *
-*  Purpose :
+*  Purpose:
 *     Read cursor position
 *
-*  Invocation :
+*  Invocation:
 *     status = IICRCP_C( display, inmemid, curn, xcur, ycur, outmemid )
 *
-*  Description :
+*  Description:
 *     Read cursor position
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     inmemid = int
@@ -320,12 +344,12 @@ int IICRCP_C ( int display, int inmemid, int curn, int* xcur, int* ycur,
 *     outmemid = int
 *        Output memory identifier
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -462,19 +486,20 @@ return(iicerr);
 int IICWCP_C ( int display, int memid, int curn, int xcur, int ycur )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IICWCP_C
 *
-*  Purpose :
+*  Purpose:
 *     Write cursor position
 *
-*  Invocation :
+*  Invocation:
 *     status = IICWCP_C( display, memid, curn, xcur, ycur )
 *
-*  Description :
+*  Description:
 *     Write cursor position
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -486,11 +511,11 @@ int IICWCP_C ( int display, int memid, int curn, int xcur, int ycur )
 *     ycur = int
 *        Y cursor position
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):

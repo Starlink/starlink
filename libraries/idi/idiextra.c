@@ -1,15 +1,16 @@
 /*
-*  Name :
+*+
+*  Name:
 *     IDIEXTRA.C
 *
-*  Purpose :
+*  Purpose:
 *     Pixmap Routines
 *
-*  Description :
+*  Description:
 *     These routines manipulate an X-windows pixmap that is used
 *     to store the contents of the display memory.
 *
-*  Contents :
+*  Contents:
 *     attach_pixmap
 *        Attach to the GWM pixmap
 *     create_pixmap
@@ -51,10 +52,31 @@
 *     update_keys
 *        Update key descriptions from X
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1991, 1992, 1993, 1994 Science & Engineering Research Council.
+*     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *      8-MAY-1991 (NE):
@@ -117,31 +139,32 @@ typedef struct bm_window BM_WINDOW;
 void attach_pixmap ( int display, int memid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     attach_pixmap
 *
-*  Purpose :
+*  Purpose:
 *     Attach to the GWM pixmap
 *
-*  Invocation :
+*  Invocation:
 *     attach_pixmap ( display, memid );
 *
-*  Description :
+*  Description:
 *     Attach to the pixmap in the current GWM window
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
 *        Memory identifier
 *
-*  Algorithm :
+*  Algorithm:
 *     Attach to the pixmap in the current GWM window
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     23-AUG-1991 (NE):
 *        Orignal version
 *     27-NOV-1991 (NE):
@@ -189,19 +212,20 @@ return;
 void create_pixmap ( int display, int memid, int confn )
 
 /*
-*  Name :
+*+
+*  Name:
 *     create_pixmap
 *
-*  Purpose :
+*  Purpose:
 *     Create pixmap
 *
-*  Invocation :
+*  Invocation:
 *     create_pixmap ( display, memid, confn );
 *
-*  Description :
+*  Description:
 *     Create pixmap for the display or memory for use by interactive scroll
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -209,13 +233,13 @@ void create_pixmap ( int display, int memid, int confn )
 *     confn = int
 *        Configuration number
 *
-*  Algorithm :
+*  Algorithm:
 *     Create pixmap for the display or memory for use by interactive scroll
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *      8-MAY-1991 (NE):
@@ -331,19 +355,20 @@ void clear_pixmap ( int display, int memid, int bck,
                     unsigned long plane_mask )
 
 /*
-*  Name :
+*+
+*  Name:
 *     clear_pixmap
 *
-*  Purpose :
+*  Purpose:
 *     Clear_pixmap
 *
-*  Invocation :
+*  Invocation:
 *     clear_pixmap ( display, memid, bck, plane_mask );
 *
-*  Description :
+*  Description:
 *     Clear the pixmap
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -353,13 +378,13 @@ void clear_pixmap ( int display, int memid, int bck,
 *     plane_mask = unsigned long
 *        Plane mask
 *
-*  Algorithm :
+*  Algorithm:
 *     Clear the pixmap
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *      8-MAY-1991 (NE):
@@ -427,19 +452,20 @@ return;
 void free_pixmap ( int display, int confid, int memid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     free_pixmap
 *
-*  Purpose :
+*  Purpose:
 *     Free pixmap
 *
-*  Invocation :
+*  Invocation:
 *     free_pixmap ( display, confid, memid );
 *
-*  Description :
+*  Description:
 *     Release the resources of the pixmap
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     confid = int
@@ -447,14 +473,14 @@ void free_pixmap ( int display, int confid, int memid )
 *     memid = int
 *        Memory identifier
 *
-*  Algorithm :
+*  Algorithm:
 *     Release the resources of the pixmap
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *      8-MAY-1991 (NE):
@@ -499,19 +525,20 @@ void int_mem_scroll ( int display, int nint, short ev_type, short ev_data,
                       short pos[], int ew, int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     int_mem_scroll
 *
-*  Purpose :
+*  Purpose:
 *     Interactive memory scroll
 *
-*  Invocation :
+*  Invocation:
 *     int_mem_scroll( display, nint, ev_type, ev_data, pos, ew, err );
 *
-*  Description :
+*  Description:
 *     Interactive memory scroll
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -527,7 +554,7 @@ void int_mem_scroll ( int display, int nint, short ev_type, short ev_data,
 *     err = int
 *        Pointer to status
 *
-*  Algorithm :
+*  Algorithm:
 *     The scrolling is achieved by first copying as much of the pixmap
 *     that is still visible into its new position and then filling in the
 *     exposed areas with data from the internal memory. The exposed area
@@ -540,10 +567,10 @@ void int_mem_scroll ( int display, int nint, short ev_type, short ev_data,
 *     full width of the window, 1's represent the remaining area and .'s
 *     represent the part of the old pixmap copied to the new position.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Original version
 *     18-DEC-1992 (NE):
@@ -816,19 +843,20 @@ void int_dis_scroll ( int display, int nint, short ev_type, short ev_data,
                       short pos[], int ew, int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     int_dis_scroll
 *
-*  Purpose :
+*  Purpose:
 *     Interactive display scroll
 *
-*  Invocation :
+*  Invocation:
 *     int_dis_scroll( display, nint, ev_type, ev_data, pos, ew, err );
 *
-*  Description :
+*  Description:
 *     Interactive display scroll
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -844,7 +872,7 @@ void int_dis_scroll ( int display, int nint, short ev_type, short ev_data,
 *     err = int
 *        Pointer to status
 *
-*  Algorithm :
+*  Algorithm:
 *     The scrolling is achieved by first copying as much of the pixmap
 *     that is still visible into its new position and then filling in the
 *     exposed areas with data from the internal memory. The exposed area
@@ -857,10 +885,10 @@ void int_dis_scroll ( int display, int nint, short ev_type, short ev_data,
 *     full width of the window, 1's represent the remaining area and .'s
 *     represent the part of the old pixmap copied to the new position.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *      7-MAR-1991 (NE):
 *        Original version
 *     18-DEC-1992 (NE):
@@ -1271,32 +1299,33 @@ return;
 void imagrefr_p ( int display, int memid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     imagrefr_p
 *
-*  Purpose :
+*  Purpose:
 *     Refresh image into pixmap
 *
-*  Invocation :
+*  Invocation:
 *     imagrefr_p ( display, memid );
 *
-*  Description :
+*  Description:
 *     Draw images into the pixmap.
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
 *        Memory identifier
 *
-*  Algorithm :
+*  Algorithm:
 *     Create an image from the data.
 *     Draw that image into the pixmap.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *     24-APR-1991 (NE):
@@ -1413,19 +1442,20 @@ void imagrefr_z_p ( int display, int memid, int zoom, float x0, float y0,
                     float ys1 )
 
 /*
-*  Name :
+*+
+*  Name:
 *     imagrefr_z_p
 *
-*  Purpose :
+*  Purpose:
 *     Refresh zoomed image into pixmap ( zoom > 1 )
 *
-*  Invocation :
+*  Invocation:
 *     imagrefr_z_p( display, memid, zoom, x0, y0, xs0, ys0, x1, y1, xs1, ys1 )
 *
-*  Description :
+*  Description:
 *     Resample images and draw into the pixmap.
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -1449,14 +1479,14 @@ void imagrefr_z_p ( int display, int memid, int zoom, float x0, float y0,
 *     ys1 = float
 *        Sub-image display bitmap dimensions       (target)
 *
-*  Algorithm :
+*  Algorithm:
 *     Create an image from the data.
 *     Draw that image into the pixmap.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *     24-APR-1991 (NE):
@@ -1625,19 +1655,20 @@ void imagrefr_uz_p ( int display, int memid, int zoom, float x0, float y0,
                      float ys1 )
 
 /*
-*  Name :
+*+
+*  Name:
 *     imagrefr_uz_p
 *
-*  Purpose :
+*  Purpose:
 *     Refresh zoomed image into pixmap ( zoom < 0 )
 *
-*  Invocation :
+*  Invocation:
 *     imagrefr_uz_p( display, memid, zoom, x0, y0, xs0, ys0, x1, y1, xs1, ys1 )
 *
-*  Description :
+*  Description:
 *     Resample images and draw into the pixmap.
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -1661,14 +1692,14 @@ void imagrefr_uz_p ( int display, int memid, int zoom, float x0, float y0,
 *     ys1 = float
 *        Sub-image display bitmap dimensions       (target)
 *
-*  Algorithm :
+*  Algorithm:
 *     Create an image from the data.
 *     Draw that image into the pixmap.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *     24-APR-1991 (NE):
@@ -1818,19 +1849,20 @@ return;
 void polyrefr_p ( int display, int confn, int memid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     polyrefr_p
 *
-*  Purpose :
+*  Purpose:
 *     Refresh polylines into pixmap
 *
-*  Invocation :
+*  Invocation:
 *     polyrefr_p ( display, confn, memid );
 *
-*  Description :
+*  Description:
 *     Draw polylines into the pixmap.
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     confn = int
@@ -1838,13 +1870,13 @@ void polyrefr_p ( int display, int confn, int memid )
 *     memid = int
 *        Memory identifier
 *
-*  Algorithm :
+*  Algorithm:
 *     Draw each polyline in turn into the pixmap.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *     12-JUL-1991 (NE):
@@ -1908,19 +1940,20 @@ return;
 void textrefr_p ( int display, int confn, int memid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     textrefr_p
 *
-*  Purpose :
+*  Purpose:
 *     Refresh text into pixmap 
 *
-*  Invocation :
+*  Invocation:
 *     textrefr_p ( display, confn, memid );
 *
-*  Description :
+*  Description:
 *     Draw text into the pixmap.
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     confn = int
@@ -1928,13 +1961,13 @@ void textrefr_p ( int display, int confn, int memid )
 *     memid = int
 *        Memory identifier
 *
-*  Algorithm :
+*  Algorithm:
 *     Draw each text string in turn into the pixmap.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *     27-JUN-1991 (NE):
@@ -1999,19 +2032,20 @@ void polyline_p ( int display, int memid, int col, int style, int xs[],
                   int ys[], int np, int inwin )
 
 /*
-*  Name :
+*+
+*  Name:
 *     polyline_p
 *
-*  Purpose :
+*  Purpose:
 *     Polyline on memory pixmap
 *
-*  Invocation :
+*  Invocation:
 *     polyline_p ( display, memid, col, style, xs, ys, np, inwin );
 *
-*  Description :
+*  Description:
 *     Draw polyline into the pixmap.
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -2029,13 +2063,13 @@ void polyline_p ( int display, int memid, int col, int style, int xs[],
 *     inwin = int
 *        Draw polyline into window
 *
-*  Algorithm :
+*  Algorithm:
 *     Draw polyline into the pixmap.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *      8-MAY-1991 (NE):
@@ -2249,19 +2283,20 @@ void text_p ( int display, int memid, int x0, int y0, int path, int orient,
               int col, int size, char txt[], int inwin )
 
 /*
-*  Name :
+*+
+*  Name:
 *     text_p
 *
-*  Purpose :
+*  Purpose:
 *     Text on memory pixmap
 *
-*  Invocation :
+*  Invocation:
 *     text_p ( display, memid, x0, y0, path, orient, col, size, txt, inwin );
 *
-*  Description :
+*  Description:
 *     Draw text into the pixmap.
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -2283,13 +2318,13 @@ void text_p ( int display, int memid, int x0, int y0, int path, int orient,
 *     inwin = int
 *        Draw text into window
 *
-*  Algorithm :
+*  Algorithm:
 *     Draw text into the pixmap.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *      3-MAY-1991 (NE):
@@ -2472,29 +2507,30 @@ return;
 void refr_p ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     refr_p
 *
-*  Purpose :
+*  Purpose:
 *     Refresh the pixmap into the display
 *
-*  Invocation :
+*  Invocation:
 *     refr_p ( display );
 *
-*  Description :
+*  Description:
 *     Refresh the pixmap into the display
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Algorithm :
+*  Algorithm:
 *     Refresh the pixmap into the display
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *      8-MAY-1991 (NE):
@@ -2569,21 +2605,22 @@ void snap_pix ( int display, int colmode, int npixel, int xoff, int yoff,
                 int nlines, int dd, int depth, int packf, int data[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     snap_pix
 *
-*  Purpose :
+*  Purpose:
 *     Get snapshot from pixmap
 *
-*  Invocation :
+*  Invocation:
 *     snap_pix( display, colmode, npixel, xoff, yoff, nlines, dd, depth,
 *               packf, data )
 *
-*  Description :
+*  Description:
 *     Get snapshot from pixmap. This implementation assumes the display
 *     pseudocolour, and therefore ignores the colour mode argument.
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     colmode = int
@@ -2605,14 +2642,14 @@ void snap_pix ( int display, int colmode, int npixel, int xoff, int yoff,
 *     data = int
 *        Image data
 *
-*  Algorithm :
+*  Algorithm:
 *     Get snapshot from pixmap
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlik, RAL)
 *
-*  History :
+*  History:
 *     18-MAR-1991 (NE):
 *        Orignal version
 *      8-MAY-1991 (NE):
@@ -2865,20 +2902,21 @@ void pack ( unsigned char *inp, unsigned char *outp, int pfact, int width,
             int height )
 
 /*
-*  Name :
+*+
+*  Name:
 *     pack
 *
-*  Purpose :
+*  Purpose:
 *     Pack the input bytes into the output bytes.
 *
-*  Invocation :
+*  Invocation:
 *     pack( inp, outp, pfact, width, height )
 *
-*  Description :
+*  Description:
 *     Pack the input bytes into the output bytes, with a data
 *     compression given by the packing factor.
 *
-*  Arguments :
+*  Arguments:
 *     inp = char
 *        Pointer to input data
 *     outp = char
@@ -2890,7 +2928,7 @@ void pack ( unsigned char *inp, unsigned char *outp, int pfact, int width,
 *     height = int
 *        Number of pixels in y-direction
 *
-*  Algorithm :
+*  Algorithm:
 *     Pack the data, given as one pixel per byte, into pfact
 *     pixels per byte. The packing is done by shifting pixels
 *     to the left until the output byte is full. This algorithm
@@ -2898,10 +2936,10 @@ void pack ( unsigned char *inp, unsigned char *outp, int pfact, int width,
 *     range of the packing factor, e.g. data packed into 4 bits
 *     must have no data values bigger than 15.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     25-APR-1991 (NE):
 *        Orignal version
 *     29-AUG-1991 (NE):
@@ -2958,30 +2996,31 @@ return;
 void update_memory ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     update_memory
 *
-*  Purpose :
+*  Purpose:
 *     Update memory description from pixmap dimensions
 *
-*  Invocation :
+*  Invocation:
 *     update_memory ( display );
 *
-*  Description :
+*  Description:
 *     Update memory description from pixmap
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Algorithm :
+*  Algorithm:
 *     Update memory description from pixmap
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     29-AUG-1991 (NE):
 *        Original version
 *     21-OCT-1991 (NE):
@@ -3223,37 +3262,38 @@ return;
 void update_current_pixmap ( int display, int memid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     update_current_pixmap
 *
-*  Purpose :
+*  Purpose:
 *     Update the current memory identifiers in the display structure
 *
-*  Invocation :
+*  Invocation:
 *     update_current_pixmap ( display );
 *
-*  Description :
+*  Description:
 *     Update the current memory identifiers in the display structure.
 *     The given memory identifier indicates one of the memories currently
 *     displayed in the window. This routine searches the memory structures
 *     to see if any other memory is associated with the currently displayed
 *     pixmap.
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
 *        Memory identifier
 *
-*  Algorithm :
+*  Algorithm:
 *     Search the memory structures to see if any other memory is associated
 *     with the currently displayed pixmap. If it is then use the plane mask
 *     to decide which is the base plane and which is the overlay plane.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     16-APR-1992 (NE):
 *        Original version
 */
@@ -3306,19 +3346,20 @@ int define_memory ( int display, int xdim, int ydim, int mdepth, int mtype,
                     int* memid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     define_memory
 *
-*  Purpose :
+*  Purpose:
 *     Dynamic memory definition
 *
-*  Invocation :
+*  Invocation:
 *     status = define_memory( display, xdim, ydim, mdepth, mtype, memid )
 *
-*  Description :
+*  Description:
 *     Dynamic memory definition
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     xdim = int
@@ -3332,10 +3373,10 @@ int define_memory ( int display, int xdim, int ydim, int mdepth, int mtype,
 *     memid = int
 *        Memory identifier
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     16-APR-1992 (NE):
 *        Orignal version taken from IIDAMY_C
 */
@@ -3472,34 +3513,35 @@ return(iiderr);
 void update_keys ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     update_keys
 *
-*  Purpose :
+*  Purpose:
 *     Update key descriptions from X
 *
-*  Invocation :
+*  Invocation:
 *     update_keys ( display );
 *
-*  Description :
+*  Description:
 *     The keys that are described by key symbols (e.g. XK_Left) in the
 *     description file are updated so that the key codes are obtained from
 *     the display.
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Algorithm :
+*  Algorithm:
 *     To prevent kws_xtr opening the description file multiple times
 *     the key symbols for the locator movements and evaluator are
 *     hardwired into this routine using the appropriate X symbols
 *     (e.g. XK_Left, XK_Right).
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *      7-JAN-1993 (NE):
 *        Original version
 */

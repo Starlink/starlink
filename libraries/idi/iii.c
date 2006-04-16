@@ -1,14 +1,15 @@
 /*
-*  Name :
+*+
+*  Name:
 *     III.C
 *
-*  Purpose :
+*  Purpose:
 *     Interaction Routines
 *
-*  Description :
+*  Description:
 *     Interaction Routines
 *
-*  Contents :
+*  Contents:
 *     IIIENI_C
 *        Enable Interaction;
 *     IIISTI_C
@@ -28,11 +29,31 @@
 *     IIIGLD_C
 *        Get Locator Displacement;
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1991, 1992, 1994 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -63,20 +84,21 @@ int IIIENI_C ( int display, int intype, int intid, int objtype, int objid,
                int oper, int trigger )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIIENI_C
 *
-*  Purpose :
+*  Purpose:
 *     Enable interaction
 *
-*  Invocation :
+*  Invocation:
 *     status = IIIENI_C( display, intype, intid, objtype, objid, oper,
 *                        trigger )
 *
-*  Description :
+*  Description:
 *     Enable interaction
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     intype = int
@@ -92,11 +114,11 @@ int IIIENI_C ( int display, int intype, int intid, int objtype, int objid,
 *     trigger = int
 *        Exit trigger
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     25-JUL-1991 (NE):
@@ -241,27 +263,28 @@ return(iiierr);
 int IIISTI_C ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIISTI_C
 *
-*  Purpose :
+*  Purpose:
 *     Stop interaction
 *
-*  Invocation :
+*  Invocation:
 *     status = IIISTI_C( display )
 *
-*  Description :
+*  Description:
 *     Stop interaction
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -304,30 +327,31 @@ return(iiierr);
 int IIIEIW_C ( int display, int trgstatus[MAX_TRG] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIIEIW_C
 *
-*  Purpose :
+*  Purpose:
 *     Execute interaction & wait
 *
-*  Invocation :
+*  Invocation:
 *     status = IIIEIW_C( display, trgstatus )
 *
-*  Description :
+*  Description:
 *     Execute interaction & wait
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     trgstatus = int[]
 *        Output trigger status
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -640,19 +664,20 @@ return(iiierr);
 int IIIGIE_C ( int display, int evlid, int* evlival )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIIGIE_C
 *
-*  Purpose :
+*  Purpose:
 *     Get integer evaluator
 *
-*  Invocation :
+*  Invocation:
 *     status = IIIGIE_C( display, evlid, evlival )
 *
-*  Description :
+*  Description:
 *     Get integer evaluator
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     evlid = int
@@ -660,10 +685,10 @@ int IIIGIE_C ( int display, int evlid, int* evlival )
 *     evlival = int
 *        Evaluator integer value
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -714,19 +739,20 @@ return(iiierr);
 int IIIGRE_C ( int display, int evlid, float* evlrval )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIIGRE_C
 *
-*  Purpose :
+*  Purpose:
 *     Get real evaluator
 *
-*  Invocation :
+*  Invocation:
 *     status = IIIGRE_C( display, evlid, evlrval )
 *
-*  Description :
+*  Description:
 *     Get real evaluator
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     evlid = int
@@ -734,10 +760,10 @@ int IIIGRE_C ( int display, int evlid, float* evlrval )
 *     evlrval = int
 *        Evaluator real value
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -789,19 +815,20 @@ return(iiierr);
 int IIIGSE_C ( int display, int evlid, char evlsval[], int* svallen )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIIGSE_C
 *
-*  Purpose :
+*  Purpose:
 *     Get string evaluator
 *
-*  Invocation :
+*  Invocation:
 *     status = IIIGSE_C( display, evlid, evlsval, svallen )
 *
-*  Description :
+*  Description:
 *     Get string evaluator
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     evlid = int
@@ -811,10 +838,10 @@ int IIIGSE_C ( int display, int evlid, char evlsval[], int* svallen )
 *     svallen = int
 *        Returned string length
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -867,19 +894,20 @@ return(iiierr);
 int IIIGLE_C ( int display, int evlid, int* evllval )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIIGLE_C
 *
-*  Purpose :
+*  Purpose:
 *     Get string evaluator
 *
-*  Invocation :
+*  Invocation:
 *     status = IIIGLE_C( display, evlid, evllval )
 *
-*  Description :
+*  Description:
 *     Get string evaluator
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     evlid = int
@@ -887,10 +915,10 @@ int IIIGLE_C ( int display, int evlid, int* evllval )
 *     evllval = int
 *        Evaluator logical value
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -943,19 +971,20 @@ int IIIQID_C ( int display, int intype, int intn, char intdscr[],
                int* dscrlen )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIIQID_C
 *
-*  Purpose :
+*  Purpose:
 *     Query Interactor Description
 *
-*  Invocation :
+*  Invocation:
 *     status = IIIQID_C( display, intype, intn, intdscr, dscrlen )
 *
-*  Description :
+*  Description:
 *     Query Interactor Description
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     intype = int
@@ -967,11 +996,11 @@ int IIIQID_C ( int display, int intype, int intn, char intdscr[],
 *     dscrlen = int
 *        Description length
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *     23-MAY-1991 (NE):
@@ -1088,19 +1117,20 @@ return(iiierr);
 int IIIGLD_C ( int display, int locn, int* xdis, int* ydis )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIIGLD_C
 *
-*  Purpose :
+*  Purpose:
 *     Get Locator Displacement
 *
-*  Invocation :
+*  Invocation:
 *     status = IIIGLD_C( display, locn, xdis, ydis )
 *
-*  Description :
+*  Description:
 *     Get Locator Displacement
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     locn = int
@@ -1110,10 +1140,10 @@ int IIIGLD_C ( int display, int locn, int* xdis, int* ydis )
 *     ydis = int
 *        Y displacement
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */

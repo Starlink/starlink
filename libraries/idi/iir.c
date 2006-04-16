@@ -1,17 +1,18 @@
 /*
-*  Name :
+*+
+*  Name:
 *     IIR.C
 *
-*  Purpose :
+*  Purpose:
 *     Region of Interest Routines
 *
-*  Description :
+*  Description:
 *     Region of Interest Routines
 *     All roi coords are relative to the associated memory
 *     (or to the device in case of memory = -1)
 *     (0,0 = bottom left)
 *
-*  Contents :
+*  Contents:
 *     IIRINR_C
 *        Initialize Region of Interest;
 *     IIRSRV_C
@@ -21,11 +22,31 @@
 *     IIRWRI_C
 *        Write Region of Interest Position;
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1990, 1991, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     16-JUL-1991 (NE):
@@ -52,20 +73,21 @@ int IIRINR_C ( int display, int memid, int roicol, int roixmin, int roiymin,
                int roixmax, int roiymax, int *roiid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIRINR_C
 *
-*  Purpose :
+*  Purpose:
 *     Initialize region of interest
 *
-*  Invocation :
+*  Invocation:
 *     status = IIRINR_C ( display, memid, roicol, roixmin, roiymin, roixmax,
 *                         roiymax, roiid )
 *
-*  Description :
+*  Description:
 *     Initialize region of interest
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -83,11 +105,11 @@ int IIRINR_C ( int display, int memid, int roicol, int roixmin, int roiymin,
 *     roiid = int
 *        Region of interest identifier
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     26-NOV-1991 (NE):
@@ -193,19 +215,20 @@ return(iirerr);
 int IIRSRV_C ( int display, int roiid, int vis )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIRSRV_C ( display, roiid, vis )
 *
-*  Purpose :
+*  Purpose:
 *     Set region of interest visibility
 *
-*  Invocation :
+*  Invocation:
 *     status = IIRSRV_C ( display, roiid, vis )
 *
-*  Description :
+*  Description:
 *     Set region of interest visibility
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     roiid = int
@@ -213,11 +236,11 @@ int IIRSRV_C ( int display, int roiid, int vis )
 *     vis = int
 *        Visibility [1 / 0]
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -288,20 +311,21 @@ int IIRRRI_C ( int display, int inmemid, int roiid, int* roixmin,
                int* roiymin,int*  roixmax, int* roiymax, int* outmemid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIRRRI_C
 *
-*  Purpose :
+*  Purpose:
 *     Read region of interest position
 *
-*  Invocation :
+*  Invocation:
 *     status = IIRRRI_C( display, inmemid, roiid, roixmin, roiymin, roixmax,
 *                        roiymax, outmemid )
 *
-*  Description :
+*  Description:
 *     Read region of interest position
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     inmemid = int
@@ -319,12 +343,12 @@ int IIRRRI_C ( int display, int inmemid, int roiid, int* roixmin,
 *     outmemid = int
 *        Output memory identifier
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     RS:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *      2-FEB-1990 (RS):
@@ -428,20 +452,21 @@ int IIRWRI_C ( int display, int memid, int roiid, int roixmin, int roiymin,
                int roixmax, int roiymax )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIRWRI_C
 *
-*  Purpose :
+*  Purpose:
 *     Write region of interest position
 *
-*  Invocation :
+*  Invocation:
 *     status = IIRWRI_C( display, memid, roiid, roixmin, roiymin, roixmax,
 *                        roiymax )
 *
-*  Description :
+*  Description:
 *     Write region of interest position
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -457,11 +482,11 @@ int IIRWRI_C ( int display, int memid, int roiid, int roixmin, int roiymin,
 *     roiymax = int
 *        Y coordinate of opposite corner
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *      2-AUG-1991 (NE):

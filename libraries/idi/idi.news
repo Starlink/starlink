@@ -7,6 +7,8 @@
    of the error codes. The VMS fortran code is no longer shipped as
    part of the package.
 
+   Released under the GPL.
+
  IDI v1.4-4 is now available.
 
  An error in the link script idi_link_adam which caused libidi.{a,so} and

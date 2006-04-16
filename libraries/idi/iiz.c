@@ -1,14 +1,15 @@
 /*
-*  Name :
+*+
+*  Name:
 *     IIZ.C
 *
-*  Purpose :
+*  Purpose:
 *     Environment Service Routines
 *
-*  Description :
+*  Description:
 *     Environment Service Routines
 *
-*  Contents :
+*  Contents:
 *     IIZWSC_C
 *        Write Memory Scroll;
 *     IIZWZM_C
@@ -20,10 +21,30 @@
 *     IIZRZP_C
 *        Read  Display Zoom and Pan;
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1990, 1991, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -47,19 +68,20 @@
 int IIZWSC_C ( int display, int memlist[], int nmem, int xscr, int yscr )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIZWSC_C
 *
-*  Purpose :
+*  Purpose:
 *     Write memory scroll
 *
-*  Invocation :
+*  Invocation:
 *     status = IIZWSC_C( display, memlist, nmem, xscr, yscr )
 *
-*  Description :
+*  Description:
 *     Write memory scroll
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memlist = int
@@ -71,11 +93,11 @@ int IIZWSC_C ( int display, int memlist[], int nmem, int xscr, int yscr )
 *     yscr = int
 *        Y scroll
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     RS:
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *      1-FEB-1990 (RS):
@@ -137,19 +159,20 @@ return(iizerr);
 int IIZWZM_C ( int display, int memlist[] , int nmem, int zoomf )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIZWZM_C
 *
-*  Purpose :
+*  Purpose:
 *     Write memory zoom
 *
-*  Invocation :
+*  Invocation:
 *     status = IIZWZM_C( display, memlist, nmem, zoomf )
 *
-*  Description :
+*  Description:
 *     Write memory zoom
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memlist = int
@@ -159,12 +182,12 @@ int IIZWZM_C ( int display, int memlist[] , int nmem, int zoomf )
 *     zoomf = int
 *        Zoom factor
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     RS:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *      2-FEB-1990 (RS):
@@ -314,19 +337,20 @@ return(iizerr);
 int IIZRSZ_C ( int display, int memid, int* xscr, int* yscr, int* zoom )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIZRSZ_C
 *
-*  Purpose :
+*  Purpose:
 *     Read memory scroll and zoom
 *
-*  Invocation :
+*  Invocation:
 *     status = IIZRSZ_C( display, memid, xscr, yscr, zoom )
 *
-*  Description :
+*  Description:
 *     Read memory scroll and zoom
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -338,11 +362,11 @@ int IIZRSZ_C ( int display, int memid, int* xscr, int* yscr, int* zoom )
 *     zoom = int
 *        Zoom factor
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     28-NOV-1991 (NE):
@@ -402,19 +426,20 @@ return(iizerr);
 int IIZWZP_C ( int display, int xscr, int yscr, int zoomf )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIZWZP_C
 *
-*  Purpose :
+*  Purpose:
 *     Write display zoom and pan
 *
-*  Invocation :
+*  Invocation:
 *     status = IIZWZP_C( display, xscr, yscr, zoomf )
 *
-*  Description :
+*  Description:
 *     Write display zoom and pan
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     xscr = int
@@ -424,11 +449,11 @@ int IIZWZP_C ( int display, int xscr, int yscr, int zoomf )
 *     zoomf = int
 *        Zoom factor
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -475,19 +500,20 @@ return(iizerr);
 int IIZRZP_C ( int display, int* xscr, int* yscr, int* zoom )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIZRZP_C
 *
-*  Purpose :
+*  Purpose:
 *     Read display zoom and pan
 *
-*  Invocation :
+*  Invocation:
 *     status = IIZRZP_C( display, xscr, yscr, zoom )
 *
-*  Description :
+*  Description:
 *     Read display zoom and pan
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     xscr = int
@@ -497,10 +523,10 @@ int IIZRZP_C ( int display, int* xscr, int* yscr, int* zoom )
 *     zoomf = int
 *        Zoom factor
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */

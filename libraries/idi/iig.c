@@ -1,23 +1,44 @@
 /*
-*  Name :
+*+
+*  Name:
 *     IIG.C
 *
-*  Purpose :
+*  Purpose:
 *     Graphics Routines
 *
-*  Description :
+*  Description:
 *     Graphics Routines
 *
-*  Contents :
+*  Contents:
 *     IIGPLY_C
 *        Polyline;
 *     IIGTXT_C
 *        Plot Text;
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1991, 1992, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -41,19 +62,20 @@ int IIGPLY_C ( int display, int memid, int x[], int y[], int np, int color,
                int style )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIGPLY_C
 *
-*  Purpose :
+*  Purpose:
 *     Polyline
 *
-*  Invocation :
+*  Invocation:
 *     status = IIGPLY_C( display, memid, x, y, np, color, style )
 *
-*  Description :
+*  Description:
 *     Polyline
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -69,11 +91,11 @@ int IIGPLY_C ( int display, int memid, int x[], int y[], int np, int color,
 *     style = int
 *        Line style
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -171,20 +193,21 @@ int IIGTXT_C ( int display, int memid, char txt[], int x0, int y0, int path,
                int orient, int color, int txtsize )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIGTXT_C
 *
-*  Purpose :
+*  Purpose:
 *     Plot text
 *
-*  Invocation :
+*  Invocation:
 *     status = IIGTXT_C ( display, memid, txt, x0, y0, path, orient,
 *                         color, txtsize )
 *
-*  Description :
+*  Description:
 *     Plot text
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -204,11 +227,11 @@ int IIGTXT_C ( int display, int memid, char txt[], int x0, int y0, int path,
 *     txtsize = int
 *        Text size
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):

@@ -1,25 +1,48 @@
       PROGRAM GNSRUN
 *+
-*   Program:
-*
-*      GNSRUN
-*
-*   Description:
-*
-*      Exercises the Graphics Workstation Name System as a
-*      demonstration for a user and to test the installation of the GNS
-*      system.
-*
-*
-*   Usage:
-*
-*      RUN GNSRUN
-*
-*+
-*   D L Terrett   17-MAY-1989 
-*   Nick Eaton    23-JUL-1990  Removed calls to GNS_MSG
-*   M J Bly       14-OCT1007   Added initial STATUS.
+*  Name:
+*     GNSRUN
 
+*  Description:
+*     Exercises the Graphics Workstation Name System as a
+*     demonstration for a user and to test the installation of the GNS
+*     system.
+
+*  Copyright:
+*     Copyright (C) 1989, 1990 Science & Engineering Research Council.
+*     Copyright (C) 1997 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     DLT: D. L. Terrett (Starlink)
+*     NE: Nick Eaton (Durham University)
+*     MJB: Martin Bly (Starlink)
+
+*  History:
+*     17-MAY-1989 (DLT):
+*        Original Version.
+*     23-JUL-1990 (NE):
+*        Removed calls to GNS_MSG.
+*     14-OCT-1997 (MJB):
+*        Added initial STATUS.
+
+*-
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'GNS_ERR'

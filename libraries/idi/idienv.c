@@ -1,14 +1,15 @@
 /*
-*  Name :
+*+
+*  Name:
 *     IDIENV.C
 *
-*  Purpose :
+*  Purpose:
 *     Environment Service Routines
 *
-*  Description :
+*  Description:
 *     Environment Service Routines
 *
-*  Contents :
+*  Contents:
 *     getdev
 *        Get device name;
 *     getdctfile
@@ -16,11 +17,32 @@
 *     getdatfile
 *        Get name of DCT -> DAT file;
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1991, 1992, 1993 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     23-MAY-1991 (NE):
@@ -52,24 +74,25 @@
 char *getdev ()
 
 /*
-*  Name :
+*+
+*  Name:
 *     getdev
 *
-*  Purpose :
+*  Purpose:
 *     Get device name
 *
-*  Invocation :
+*  Invocation:
 *     getdev()
 *
-*  Description :
+*  Description:
 *     Get default device name
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -101,28 +124,29 @@ return (ididev);
 void getdctfile ( char fildct[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     getdctfile
 *
-*  Purpose :
+*  Purpose:
 *     Get DCT file name
 *
-*  Invocation :
+*  Invocation:
 *     getdctfile( fildct )
 *
-*  Description :
+*  Description:
 *     Build Device Configuration Table file name
 *
-*  Arguments :
+*  Arguments:
 *     fildct = char[]
 *        File name
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -162,28 +186,29 @@ return;
 void getdatfile ( char fildat[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     getdatfile
 *
-*  Purpose :
+*  Purpose:
 *     Get DAT file Name
 *
-*  Invocation :
+*  Invocation:
 *     getdatfile( fildat )
 *
-*  Description :
+*  Description:
 *     Build compiled version of Device Configuration Table file name
 *
-*  Arguments :
+*  Arguments:
 *     fildct = char[]
 *        File name
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -223,28 +248,29 @@ return;
 void getfile ( char *file, char *name )
 
 /*
-*  Name :
+*+
+*  Name:
 *     getfile
 *
-*  Purpose :
+*  Purpose:
 *     Get file name
 *
-*  Invocation :
+*  Invocation:
 *     getfile( file, name )
 *
-*  Description :
+*  Description:
 *     Build file name
 *
-*  Arguments :
+*  Arguments:
 *     file = char*
 *        File to find
 *     name = char[]
 *        Full file name
 *
-*  Authors :
+*  Authors:
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     27-JUL-1995 (DLT):
 */
 

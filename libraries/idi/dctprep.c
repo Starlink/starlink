@@ -1,14 +1,40 @@
-/* ----------------------------------------------------------------- */
-/* ---------  DCT_PREP --------------------------------------------- */
-/* ----------------------------------------------------------------- */
+/*
+*+
+*  Name:
+*     dctprep
 
-/* --------- DCT file management [ to be read by IIDOPN ] ---------- */
+*  Purpose:
+*     DCT file management (to be read by IIDOPN)
 
-/**********************************************************************
-* V 1.1    871201                                                     *
-* Author : P. Santin - Trieste Astronomical Observatory               *
-**********************************************************************/
+*  Copyright:
+*     Copyright (C) 1987 Science & Engineering Research Council.
+*     All Rights Reserved.
 
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     P. Santin (Trieste Astronomical Observatory)
+
+*  History:
+*     01-DEC-1987 (PS):
+*        Original Version
+
+*-
+*/
 
 /* Input  File DEVICE.DCT                                            */
 /* Output File DEVICE.DAT                                            */
@@ -24,7 +50,7 @@
 # include    "idi_err.h"
 # include    "idifuncs.h"
 
-int main()
+int main( void )
 
 {
 char    ic[2] , dev[5] , fildat[256] , fildct[256];
@@ -585,15 +611,3 @@ exit(dcterr);
 }
 
 /***********************************************************************/
-
-
-
-
-
-
-
-
-
-
-
-

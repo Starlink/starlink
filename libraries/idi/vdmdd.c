@@ -1,14 +1,15 @@
 /*
-*  Name :
+*+
+*  Name:
 *     VDMDD.C
 *
-*  Purpose :
+*  Purpose:
 *     Virtual Display Management
 *
-*  Description :
+*  Description:
 *     Virtual Display Management
 *
-*  Contents :
+*  Contents:
 *     vdm_cr_a
 *        Device dependent A display window creation
 *     vdm_cr_g
@@ -24,13 +25,33 @@
 *     vdm_sav_x
 *        Device dependent display window save as a bitmap
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1991, 1992, 1993, 1994 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     RS: R.Smareglia
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     26-OCT-1988 (PASIAN,SANTIN):
@@ -81,19 +102,20 @@ void vdm_cr_a ( char device[], int xoff, int yoff, int xdim, int ydim,
                 char wind[], int* status )
 
 /*
-*  Name :
+*+
+*  Name:
 *     vdm_cr_a
 *
-*  Purpose :
+*  Purpose:
 *     Device dependent A display window creation
 *
-*  Invocation :
+*  Invocation:
 *     vdm_cr_a( device, xoff, yoff, xdim, ydim, wind, status )
 *
-*  Description :
+*  Description:
 *     Device dependent A display window creation called by : vdm_cre
 *
-*  Arguments :
+*  Arguments:
 *     device = char[]
 *        Device type
 *     xoff = int
@@ -109,10 +131,10 @@ void vdm_cr_a ( char device[], int xoff, int yoff, int xdim, int ydim,
 *     status = int
 *        Status code
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -128,19 +150,20 @@ void vdm_cr_g ( char device[], int xoff, int yoff, int xdim, int ydim,
                 char wind[], int* status )
 
 /*
-*  Name :
+*+
+*  Name:
 *     vdm_cr_g
 *
-*  Purpose :
+*  Purpose:
 *     Device dependent G display window creation
 *
-*  Invocation :
+*  Invocation:
 *     vdm_cr_g( device, xoff, yoff, xdim, ydim, wind, status )
 *
-*  Description :
+*  Description:
 *     Device dependent G display window creation called by : vdm_cre
 *
-*  Arguments :
+*  Arguments:
 *     device = char[]
 *        Device type
 *     xoff = int
@@ -156,11 +179,11 @@ void vdm_cr_g ( char device[], int xoff, int yoff, int xdim, int ydim,
 *     status = int
 *        Status code
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -176,19 +199,20 @@ void vdm_cr_i ( char device[], int xoff, int yoff, int xdim, int ydim,
                 char wind[], int* status )
 
 /*
-*  Name :
+*+
+*  Name:
 *     vdm_cr_i
 *
-*  Purpose :
+*  Purpose:
 *     Device dependent I display window creation
 *
-*  Invocation :
+*  Invocation:
 *     vdm_cr_i( device, xoff, yoff, xdim, ydim, wind, status )
 *
-*  Description :
+*  Description:
 *     Device dependent I display window creation called by : vdm_cre
 *
-*  Arguments :
+*  Arguments:
 *     device = char[]
 *        Device type
 *     xoff = int
@@ -204,13 +228,13 @@ void vdm_cr_i ( char device[], int xoff, int yoff, int xdim, int ydim,
 *     status = int
 *        Status code
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink RAL)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -474,19 +498,20 @@ return;
 void vdm_del_x ( char device[], char wind[], int* status )
 
 /*
-*  Name :
+*+
+*  Name:
 *     vdm_del_x
 *
-*  Purpose :
+*  Purpose:
 *     Device dependent display window deletion
 *
-*  Invocation :
+*  Invocation:
 *     vdm_del_x( device, wind, status )
 *
-*  Description :
+*  Description:
 *     Device dependent display window deletion A/G/I called by : vdm_del
 *
-*  Arguments :
+*  Arguments:
 *     device = char[]
 *        Device type
 *     wind = char[]
@@ -494,11 +519,11 @@ void vdm_del_x ( char device[], char wind[], int* status )
 *     status = int
 *        Status code
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -554,20 +579,21 @@ void vdm_inq_x ( char device[], char wind[], int* xoff, int* yoff, int* xdim,
                  int* ydim, int* status )
 
 /*
-*  Name :
+*+
+*  Name:
 *     vdm_inq_x
 *
-*  Purpose :
+*  Purpose:
 *     Device dependent inquire display window characteristics
 *
-*  Invocation :
+*  Invocation:
 *     vdm_inq_x( device, wind, xoff, yoff, xdim, ydim, status )
 *
-*  Description :
+*  Description:
 *     Device dependent inquire display window characteristics A / G / I
 *     called by : vdm_inq
 *
-*  Arguments :
+*  Arguments:
 *     device = char[]
 *        Device type
 *     wind = char[]
@@ -583,11 +609,11 @@ void vdm_inq_x ( char device[], char wind[], int* xoff, int* yoff, int* xdim,
 *     status = int
 *        Status code
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -685,20 +711,21 @@ void vdm_mod_x ( char device[], char wind[], int vis, int dxoff, int dyoff,
                  int dxdim, int dydim, int* status )
 
 /*
-*  Name :
+*+
+*  Name:
 *     vdm_mod_x
 *
-*  Purpose :
+*  Purpose:
 *     Device dependent display window characteristics modification
 *
-*  Invocation :
+*  Invocation:
 *     vdm_mod_x( device, wind, vis, dxoff, dyoff, dxdim, dydim, status )
 *
-*  Description :
+*  Description:
 *     Device dependent display window characteristics modification A / G / I
 *     called by : vdm_mod
 *
-*  Arguments :
+*  Arguments:
 *     device = char[]
 *        Device type
 *     wind = char[]
@@ -716,11 +743,11 @@ void vdm_mod_x ( char device[], char wind[], int vis, int dxoff, int dyoff,
 *     status = int
 *        Status code
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -812,20 +839,21 @@ return;
 void vdm_sav_x ( char device[], char wind[], char bmfile[], int* status )
 
 /*
-*  Name :
+*+
+*  Name:
 *     vdm_sav_x
 *
-*  Purpose :
+*  Purpose:
 *     Device dependent display window save as a bitmap
 *
-*  Invocation :
+*  Invocation:
 *     vdm_sav_x ( device, wind, bmfile, status )
 *
-*  Description :
+*  Description:
 *     Device dependent display window save as a bitmap G / I
 *     called by : vdm_sav
 *
-*  Arguments :
+*  Arguments:
 *     device = char[]
 *        Device type
 *     wind = char[]
@@ -835,11 +863,11 @@ void vdm_sav_x ( char device[], char wind[], char bmfile[], int* status )
 *     status = int
 *        Status code
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):

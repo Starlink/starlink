@@ -1,14 +1,15 @@
 /*
-*  Name :
+*+
+*  Name:
 *     IIL.C
 *
-*  Purpose :
+*  Purpose:
 *     LUT Routines
 *
-*  Description :
+*  Description:
 *     LUT Routines
 *
-*  Contents :
+*  Contents:
 *     IILWIT_C
 *        Write Intensity Transformation Table;
 *     IILRIT_C
@@ -20,10 +21,30 @@
 *     IILSBV_C
 *        Set Bar Visibility;
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1991, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -48,19 +69,20 @@ int IILWIT_C ( int display, int memid, int ittn, int ittstart, int ittlen,
                float ittdata[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IILWIT_C
 *
-*  Purpose :
+*  Purpose:
 *     Write intensity transformation table
 *
-*  Invocation :
+*  Invocation:
 *     status = IILWIT_C( display, memid, ittn, ittstart, ittlen, ittdata )
 *
-*  Description :
+*  Description:
 *     Write intensity transformation table
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -74,11 +96,11 @@ int IILWIT_C ( int display, int memid, int ittn, int ittstart, int ittlen,
 *     ittdata = float[]
 *        ITT data
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -151,19 +173,20 @@ int IILRIT_C ( int display, int memid, int ittn, int ittstart, int ittlen,
                float ittdata[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IILRIT_C
 *
-*  Purpose :
+*  Purpose:
 *     Read intensity transformation table
 *
-*  Invocation :
+*  Invocation:
 *     status = IILRIT_C( display, memid, ittn, ittstart, ittlen, ittdata )
 *
-*  Description :
+*  Description:
 *     Read intensity transformation table
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -177,10 +200,10 @@ int IILRIT_C ( int display, int memid, int ittn, int ittstart, int ittlen,
 *     ittdata = float[]
 *        ITT data
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -246,19 +269,20 @@ int IILWLT_C ( int display, int lutn, int lutstart, int lutlen,
                float lutdata[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IILWLT_C
 *
-*  Purpose :
+*  Purpose:
 *     Write video look-up table
 *
-*  Invocation :
+*  Invocation:
 *     status = IILWLT_C( display, lutn, lutstart, lutlen, lutdata )
 *
-*  Description :
+*  Description:
 *     Write video look-up table
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     lutn = int
@@ -270,11 +294,11 @@ int IILWLT_C ( int display, int lutn, int lutstart, int lutlen,
 *     lutdata = float[]
 *        Look-up data
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     15-JAN-1993 (NE):
@@ -347,19 +371,20 @@ int IILRLT_C ( int display, int lutn, int lutstart, int lutlen,
                float lutdata[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IILRLT_C
 *
-*  Purpose :
+*  Purpose:
 *     Read video look-up table
 *
-*  Invocation :
+*  Invocation:
 *     status = IILRLT_C( display, lutn, lutstart, lutlen, lutdata )
 *
-*  Description :
+*  Description:
 *     Read video look-up table
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     lutn = int
@@ -371,10 +396,10 @@ int IILRLT_C ( int display, int lutn, int lutstart, int lutlen,
 *     lutdata = float[]
 *        Look-up data
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -445,19 +470,20 @@ return(iilerr);
 int IILSBV_C ( int display, int memid, int vis )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IILSBV_C
 *
-*  Purpose :
+*  Purpose:
 *     Set bar visibility
 *
-*  Invocation :
+*  Invocation:
 *     status = IILSBV_C( display, memid, vis )
 *
-*  Description :
+*  Description:
 *     Set bar visibility
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -465,11 +491,11 @@ int IILSBV_C ( int display, int memid, int vis )
 *     vis = int
 *        Bar visibility [0/1]
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):

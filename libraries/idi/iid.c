@@ -1,14 +1,15 @@
 /*
-*  Name :
+*+
+*  Name:
 *     IID.C
 *
-*  Purpose :
+*  Purpose:
 *     Device Routines
 *
-*  Description :
+*  Description:
 *     Device Routines
 *
-*  Contents :
+*  Contents:
 *     IIDOPN_C
 *        Open Display;
 *     IIDCLO_C
@@ -46,12 +47,33 @@
 *     IIDSSS_C
 *        Set Split Screen;
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1991, 1992, 1993, 1994 Science & Engineering Research Council.
+*     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     23-MAY-1991 (NE):
@@ -92,30 +114,31 @@ static  int   arg[ARGSIZE];
 int IIDOPN_C ( char display[], int* displayid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDOPN_C
 *
-*  Purpose :
+*  Purpose:
 *     Opens a new display for subsequent operations
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDOPN_C( display, displayid )
 *
-*  Description :
+*  Description:
 *     Opens a new display for subsequent operations
 *
-*  Arguments :
+*  Arguments:
 *     display = char[]
 *        Device type  <device>[.<window>]
 *     displayid = int
 *        Display identifier
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -892,28 +915,29 @@ return(iiderr);
 int IIDCLO_C ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDCLO_C
 *
-*  Purpose :
+*  Purpose:
 *     Closes an opened display
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDCLO_C ( display )
 *
-*  Description :
+*  Description:
 *     Closes an opened display
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -1070,27 +1094,28 @@ return(iiderr);
 int IIDRST_C ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDRST_C
 *
-*  Purpose :
+*  Purpose:
 *     Resets an opened display
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDRST_C( display )
 *
-*  Description :
+*  Description:
 *     Resets an opened display
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -1290,20 +1315,21 @@ int IIDQDV_C ( int display, int* nconf, int* xdev, int* ydev, int* depthdev,
                int* maxlutn, int* maxittn, int* maxcurn )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDQDV_C
 *
-*  Purpose :
+*  Purpose:
 *     Inquire device characteristics
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDQDV_C( display, nconf, xdev, ydev, depthdev, maxlutn,
 *                        maxittn, maxcurn )
 *
-*  Description :
+*  Description:
 *     Inquire device characteristics
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nconf = int
@@ -1321,10 +1347,10 @@ int IIDQDV_C ( int display, int* nconf, int* xdev, int* ydev, int* depthdev,
 *     maxcurn = int
 *        Maximum number of cursors
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -1404,19 +1430,20 @@ return(iiderr);
 int IIDQCI_C ( int display, int devcap, int size, int capdata[], int* ncap )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDQCI_C
 *
-*  Purpose :
+*  Purpose:
 *     Inquire device capabilities integer
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDQCI_C( display, devcap, size, capdata, ncap )
 *
-*  Description :
+*  Description:
 *     Inquire device capabilities integer
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     devcap = int
@@ -1428,11 +1455,11 @@ int IIDQCI_C ( int display, int devcap, int size, int capdata[], int* ncap )
 *     ncap = int
 *        Device capabilities number
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -2000,19 +2027,20 @@ return(iiderr);
 int IIDQCR_C ( int display, int devcap, int size, float capdata[], int* ncap )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDQCR_C
 *
-*  Purpose :
+*  Purpose:
 *     Inquire device capabilities real
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDQCR_C( display, devcap, size, capdata, ncap )
 *
-*  Description :
+*  Description:
 *     Inquire device capabilities real
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     devcap = int
@@ -2024,11 +2052,11 @@ int IIDQCR_C ( int display, int devcap, int size, float capdata[], int* ncap )
 *     ncap = int
 *        Device capabilities number
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *      7-AUG-1992 (NE):
@@ -2096,20 +2124,21 @@ int IIDQDC_C ( int display, int confn, int memtyp, int maxmem, int* confmode,
                int ittlen[], int*  nmem )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDQDC_C
 *
-*  Purpose :
+*  Purpose:
 *     Inquire defined configuration
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDQDC_C( display, confn, memtyp, maxmem, confmode,
 *                        mlist, mxsize, mysize, mdepth, ittlen, nmem )
 *
-*  Description :
+*  Description:
 *     Inquire defined configuration
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     confn = int
@@ -2133,11 +2162,11 @@ int IIDQDC_C ( int display, int confn, int memtyp, int maxmem, int* confmode,
 *     nmem = int
 *        No. of memories in configuration
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     30-APR-1992 (NE):
@@ -2251,29 +2280,30 @@ return(iiderr);
 int IIDSEL_C ( int display, int confn )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDSEL_C
 *
-*  Purpose :
+*  Purpose:
 *     Selects a defined configuration
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDSEL_C( display, confn )
 *
-*  Description :
+*  Description:
 *     Selects a defined configuration
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     confn = int
 *        Configuration number
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     22-MAY-1992 (NE):
@@ -2336,27 +2366,28 @@ return(iiderr);
 int IIDENC_C ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDENC_C
 *
-*  Purpose :
+*  Purpose:
 *     Enable dynamic memory configuration
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDENC_C( display )
 *
-*  Description :
+*  Description:
 *     Enable dynamic memory configuration
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     23-MAY-1991 (NE):
@@ -2465,28 +2496,29 @@ return(iiderr);
 int IIDSTC_C ( int display, int* confid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDSTC_C
 *
-*  Purpose :
+*  Purpose:
 *     Stop dynamic memory configuration
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDSTC_C( display, confid )
 *
-*  Description :
+*  Description:
 *     Stop dynamic memory configuration
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     confid = int
 *        Configuration number
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -2526,19 +2558,20 @@ int IIDAMY_C ( int display, int xdim, int ydim, int mdepth, int mtype,
                int* memid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDAMY_C
 *
-*  Purpose :
+*  Purpose:
 *     Dynamic memory definition
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDAMY_C( display, xdim, ydim, mdepth, mtype, memid )
 *
-*  Description :
+*  Description:
 *     Dynamic memory definition
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     xdim = int
@@ -2552,11 +2585,11 @@ int IIDAMY_C ( int display, int xdim, int ydim, int mdepth, int mtype,
 *     memid = int
 *        Memory identifier
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -2609,30 +2642,31 @@ return(iiderr);
 int IIDRLC_C ( int display, int confid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDRLC_C
 *
-*  Purpose :
+*  Purpose:
 *     Release dynamic configuration
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDRLC_C( display, confid )
 *
-*  Description :
+*  Description:
 *     Release dynamic configuration
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     confid = int
 *        Configuration number
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     27-MAY-1992 (NE):
@@ -2710,26 +2744,27 @@ return(iiderr);
 int IIDUPD_C ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDUPD_C
 *
-*  Purpose :
+*  Purpose:
 *     Update an opened display
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDUPD_C( display )
 *
-*  Description :
+*  Description:
 *     Update an opened display
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -2760,19 +2795,20 @@ return(iiderr);
 void IIDERR_C ( int errn, char errtxt[], int* txtlen )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDERR_C
 *
-*  Purpose :
+*  Purpose:
 *     Get error
 *
-*  Invocation :
+*  Invocation:
 *     IIDERR_C( errn, errtxt, txtlen )
 *
-*  Description :
+*  Description:
 *     Get error
 *
-*  Arguments :
+*  Arguments:
 *     errn = int
 *        Error number
 *     errtxt = char[]
@@ -2780,13 +2816,13 @@ void IIDERR_C ( int errn, char errtxt[], int* txtlen )
 *     txtlen = int
 *        Error text length
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *     TIMJ: Tim Jenness (JAC)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -2830,28 +2866,29 @@ void IIDERR_C ( int errn, char errtxt[], int* txtlen )
 int IIDIAG_C ( int display, int outf )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDIAG_C
 *
-*  Purpose :
+*  Purpose:
 *     Diagnostic output
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDIAG_C( display, outf )
 *
-*  Description :
+*  Description:
 *     Diagnostic output
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     outf = int
 *        Output flag
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -2884,19 +2921,20 @@ int IIDSDP_C ( int display, int memlist[], int nmem, int lutflag[],
                int ittflag[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDSDP_C
 *
-*  Purpose :
+*  Purpose:
 *     Select display path
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDSDP_C( display, memlist, nmem, lutflag, ittflag )
 *
-*  Description :
+*  Description:
 *     Select display path
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memlist = int[]
@@ -2908,10 +2946,10 @@ int IIDSDP_C ( int display, int memlist[], int nmem, int lutflag[],
 *     ittflag = int[]
 *        ITT flags
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -2939,20 +2977,21 @@ int IIDSNP_C ( int display, int colmode, int npixel, int xoff, int yoff,
                int depth, int packf, int data[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDSNP_C
 *
-*  Purpose :
+*  Purpose:
 *     Create snapshot
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDSNP_C ( display, colmode, npixel, xoff, yoff, depth,
 *                         packf, data )
 *
-*  Description :
+*  Description:
 *     Create snapshot
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     colmode = int
@@ -2970,10 +3009,10 @@ int IIDSNP_C ( int display, int colmode, int npixel, int xoff, int yoff,
 *     data = int[]
 *        Image data
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *     14-MAY-1991 (NE):
@@ -3055,19 +3094,20 @@ int IIDSSS_C ( int display, int memid[], int xoff[], int yoff[], int splitf,
                int splitx, int splity )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIDSSS_C( display, memid, xoff, yoff, splitf, splitx, splity )
 *
-*  Purpose :
+*  Purpose:
 *     Set split screen
 *
-*  Invocation :
+*  Invocation:
 *     status = IIDSSS_C( display, memid, xoff, yoff, splitf, splitx, splity )
 *
-*  Description :
+*  Description:
 *     Set split screen
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int[]
@@ -3083,10 +3123,10 @@ int IIDSSS_C ( int display, int memid[], int xoff[], int yoff[], int splitf,
 *     splitf = int
 *        Y split location
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */

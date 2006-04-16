@@ -64,6 +64,26 @@
 *     Verify the display identifier and call the device specific
 *     routines
 *
+*  Copyright:
+*     Copyright (C) 1988, 1989, 1990, 1991, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     NE: Nick Eaton (Durham University)
 *
@@ -5968,16 +5988,16 @@
       SUBROUTINE IDI_CLRFG ( IFLAG )
 
 *+
-*  Name :
+*  Name:
 *     IDI_CLRFG
 *
-*  Purpose :
+*  Purpose:
 *     Set clear flag
 *
-*  Invocation :
+*  Invocation:
 *     CALL IDI_CLRFG( IFLAG )
 *
-*  Description :
+*  Description:
 *     This routine sets the clear flag. The clear flag controls the
 *     source of the device context. If the flag = 0 ( the default )
 *     then the context is obtained from teh workstation state file.
@@ -5985,17 +6005,17 @@
 *     This value also suppresses the writing out of the context at
 *     closedown.
 *
-*  Arguments :
+*  Arguments:
 *     IFLAG = INTEGER (Given)
 *        Clear flag
 *
-*  Algorithm :
+*  Algorithm:
 *     Store the value in a common block.
 *
-*  Authors :
+*  Authors:
 *     NE : Nick Eaton  (Durham University)
 *
-*  History :
+*  History:
 *     November 1989 (NE):
 *        Original version
 *     February 1992 (NE):

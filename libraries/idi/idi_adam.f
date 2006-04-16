@@ -62,16 +62,16 @@
       SUBROUTINE IDI_ANNUL ( DISPID, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     IDI_ANNUL
 *
-*  Purpose :
+*  Purpose:
 *     Annul the given display identifier
 *
-*  Invocation :
+*  Invocation:
 *     CALL IDI_ANNUL( DISPID, STATUS )
 *
-*  Description :
+*  Description:
 *     Annul the given display identifer. The device is closed.
 *
 *  Arguments
@@ -80,17 +80,37 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Do not check the inherited status.
 *     Verify the display identifier.
 *     Clear the corresponding entries in the common blocks
 *     and decrement the reference counter.
 *     Close the device.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1989, 1990, 1991, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton  (Durham University)
 *
-*  History :
+*  History:
 *     June 1989 (NE):
 *        Original version
 *     April 1990 (NE):
@@ -174,22 +194,22 @@
       SUBROUTINE IDI_ASSOC ( PNAME, ACMODE, DISPID, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     IDI_ASSOC
 *
-*  Purpose :
+*  Purpose:
 *     Open IDI in the ADAM environment
 *
-*  Invocation :
+*  Invocation:
 *     CALL IDI_ASSOC( PNAME, ACMODE, DISPID, STATUS )
 *
-*  Description :
+*  Description:
 *     Associate an IDI device with a parameter in the ADAM environment
 *     and return a display identifer for that device. If the access
 *     mode is 'WRITE' the device is reset, otherwise the device is
 *     opened without being reset.
 *
-*  Arguments :
+*  Arguments:
 *     PNAME = CHARACTER*(*) (Given)
 *        Name of parameter used for accessing device name
 *     ACMODE = CHARACTER*(*) (Given)
@@ -199,7 +219,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     If the reference counter is zero initialise the common blocks.
 *     If this parameter has been used before then return the identifier.
@@ -209,10 +229,10 @@
 *     If the access mode is 'WRITE' reset the device.
 *     Store the parameter information in the common block.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     June 1989 (NE):
 *        Original version
 *     April 1990 (NE):
@@ -386,36 +406,36 @@
 
       SUBROUTINE IDI_CANCL ( PNAME, STATUS )
 *+
-*  Name :
+*  Name:
 *     IDI_CANCL
 *
-*  Purpose :
+*  Purpose:
 *     Cancel the ADAM device parameter
 *
-*  Invocation :
+*  Invocation:
 *     CALL IDI_CANCL( PNAME, STATUS )
 *
-*  Description :
+*  Description:
 *     Cancel the association of an ADAM parameter with an IDI device.
 *     Any devices associated with the parameter are closed.
 *
-*  Arguments :
+*  Arguments:
 *     PNAME = CHARACTER*(*) (Given)
 *        Parameter name
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Do not check the inherited status.
 *     Close any device associated with this parameter.
 *     Clear the parameter common blocks
 *     and decrement the reference counter.
 *     Cancel the parameter.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     June 1989 (NE):
 *        Original version
 *     April 1990 (NE):

@@ -1,14 +1,15 @@
 /*
-*  Name :
+*+
+*  Name:
 *     IIM.C
 *
-*  Purpose :
+*  Purpose:
 *     Memory Routines
 *
-*  Description :
+*  Description:
 *     Memory Routines
 *
-*  Contents :
+*  Contents:
 *     IIMSTW_C
 *        Set Transfer Window;
 *     IIMWMY_C
@@ -26,10 +27,30 @@
 *     IIMEBM_C
 *        External Bitmap;
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1990, 1991, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -57,20 +78,21 @@ int IIMSTW_C ( int display, int memid, int loaddir, int xwdim, int ywdim,
                int depth, int xwoff, int ywoff )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIMSTW_C
 *
-*  Purpose :
+*  Purpose:
 *     Set image memory transfer window
 *
-*  Invocation :
+*  Invocation:
 *     status = IIMSTW_C( display, memid, loaddir, xwdim, ywdim, depth,
 *                        xwoff, ywoff )
 *
-*  Description :
+*  Description:
 *     Set image memory transfer window
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -88,11 +110,11 @@ int IIMSTW_C ( int display, int memid, int loaddir, int xwdim, int ywdim,
 *     ywoff = int
 *        Y memory offset
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     27-MAY-1992 (NE):
@@ -168,19 +190,20 @@ int IIMWMY_C ( int display, int memid, int data[], int npixel, int depth,
                int packf, int x0, int y0 )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIMWMY_C
 *
-*  Purpose :
+*  Purpose:
 *     Writes image memory
 *
-*  Invocation :
+*  Invocation:
 *     status = IIMWMY_C ( display, memid, data, npixel, depth, packf, x0, y0 )
 *
-*  Description :
+*  Description:
 *     Writes image memory
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -198,11 +221,11 @@ int IIMWMY_C ( int display, int memid, int data[], int npixel, int depth,
 *     y0 = int
 *        Y data origin
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -303,20 +326,21 @@ int IIMRMY_C ( int display, int memid, int npixel, int x0, int y0, int depth,
                int packf, int ittf, int data[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIMRMY_C
 *
-*  Purpose :
+*  Purpose:
 *     Read image memory
 *
-*  Invocation :
+*  Invocation:
 *     status = IIMRMY_C( display, memid, npixel, x0, y0, depth, packf,
 *                        ittf, data )
 *
-*  Description :
+*  Description:
 *     Read image memory
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -336,10 +360,10 @@ int IIMRMY_C ( int display, int memid, int npixel, int x0, int y0, int depth,
 *     data = int[]
 *        Image or graphic data, single array -npixel- long
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     25-NOV-1991 (NE):
@@ -413,19 +437,20 @@ return(iimerr);
 int IIMSMV_C ( int display, int memlist[], int nmem, int vis )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIMSMV_C
 *
-*  Purpose :
+*  Purpose:
 *     Set memory visibility
 *
-*  Invocation :
+*  Invocation:
 *     status = IIMSMV_C( display, memlist, nmem, vis )
 *
-*  Description :
+*  Description:
 *     Set memory visibility
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memlist = int
@@ -435,11 +460,11 @@ int IIMSMV_C ( int display, int memlist[], int nmem, int vis )
 *     vis = int
 *        Visibility (1/0)
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -768,19 +793,20 @@ return(iimerr);
 int IIMCMY_C ( int display, int memlist[], int nmem, int bck )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIMCMY_C
 *
-*  Purpose :
+*  Purpose:
 *     Clear memory
 *
-*  Invocation :
+*  Invocation:
 *     status = IIMCMY_C( display, memlist, nmem, bck )
 *
-*  Description :
+*  Description:
 *     Clear memory
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memlist = int
@@ -790,12 +816,12 @@ int IIMCMY_C ( int display, int memlist[], int nmem, int bck )
 *     bck = int
 *        Background value
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     RS:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     19-MAR-1990 (RS):
@@ -864,19 +890,20 @@ return(iimerr);
 int IIMSLT_C ( int display, int memid, int lutn, int ittn )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIMSLT_C
 *
-*  Purpose :
+*  Purpose:
 *     Select video lookup table
 *
-*  Invocation :
+*  Invocation:
 *     status = IIMSLT_C( display, memid, lutn, ittn )
 *
-*  Description :
+*  Description:
 *     Select video lookup table
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -886,11 +913,11 @@ int IIMSLT_C ( int display, int memid, int lutn, int ittn )
 *     ittn = int
 *        ITT number
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     24-APR-1991 (NE):
@@ -996,19 +1023,20 @@ return(iimerr);
 int IIMBLM_C ( int display, int memlst[], int nmem, float period[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIMBLM_C
 *
-*  Purpose :
+*  Purpose:
 *     Blink memories
 *
-*  Invocation :
+*  Invocation:
 *     status = IIMBLM_C( display, memlst, nmem, period )
 *
-*  Description :
+*  Description:
 *     Blink memories
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memlist = int[]
@@ -1018,10 +1046,10 @@ int IIMBLM_C ( int display, int memlst[], int nmem, float period[] )
 *     period = float[]
 *        Blink periods
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -1048,19 +1076,20 @@ return(iimerr);
 int IIMEBM_C ( int display, char bmdscr[], char bmtype, int* xdim, int* ydim )
 
 /*
-*  Name :
+*+
+*  Name:
 *     IIMEBM_C
 *
-*  Purpose :
+*  Purpose:
 *     Define external bitmap
 *
-*  Invocation :
+*  Invocation:
 *     status = IIMEBM_C( display, bmdscr, bmtype, xdim, ydim )
 *
-*  Description :
+*  Description:
 *     Define external bitmap
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     bmdscr = char[]
@@ -1072,10 +1101,10 @@ int IIMEBM_C ( int display, char bmdscr[], char bmtype, int* xdim, int* ydim )
 *     ydim = int
 *        memory Y size
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */

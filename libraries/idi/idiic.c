@@ -1,4 +1,5 @@
 /*
+*+
 *  Name :
 *     IDIIC.C
 *
@@ -46,19 +47,19 @@ F77_SUBROUTINE(ixwopn) ( CHARACTER(devnam), INTEGER(lendisp),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWOPN
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to open a display
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWOPN( devnam, lendisp, displayid, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to open a display
 *
-*  Arguments :
+*  Arguments:
 *     devnam = char
 *        Device name
 *     lendisp = int
@@ -68,15 +69,36 @@ F77_SUBROUTINE(ixwopn) ( CHARACTER(devnam), INTEGER(lendisp),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Convert the FORTRAN string into a C string.
 *     Call the C routine.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1991, 1992, 1994 Science & Engineering Research Council.
+*     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -113,31 +135,31 @@ F77_SUBROUTINE(ixwclo) ( INTEGER(display), INTEGER(idierr) )
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWCLO
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to close a display 
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWCLO( display, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to close a display 
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -161,31 +183,31 @@ F77_SUBROUTINE(ixwrst) ( INTEGER(display), INTEGER(idierr) )
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWRST
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to reset a display
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWRST( display, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to reset a display
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -209,31 +231,31 @@ F77_SUBROUTINE(ixwupd) ( INTEGER(display), INTEGER(idierr) )
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWUPD
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to update (refresh) display
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWUPD( display, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to update (refresh) display
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -258,19 +280,19 @@ F77_SUBROUTINE(ixwerr) ( INTEGER(errn), CHARACTER(errtxt),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWERR
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to get error text 
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWERR( errn, errtxt, txtlen )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to get error text 
 *
-*  Arguments :
+*  Arguments:
 *     errn = int
 *        Error number
 *     errtxt = char
@@ -278,14 +300,14 @@ F77_SUBROUTINE(ixwerr) ( INTEGER(errn), CHARACTER(errtxt),
 *     txtlen = int
 *        Error text length
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *     Convert the C string into a FORTRAN string.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -320,20 +342,20 @@ F77_SUBROUTINE(ixwqdv) ( INTEGER(display), INTEGER(nconf), INTEGER(xdev),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWQDV
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to query display characteristics
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWQDV( display, nconf, xdev, ydev, depthdev, maxlutn,
 *                  maxittn, maxcurn, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to query display characteristics
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nconf = int
@@ -353,13 +375,13 @@ F77_SUBROUTINE(ixwqdv) ( INTEGER(display), INTEGER(nconf), INTEGER(xdev),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -393,19 +415,19 @@ F77_SUBROUTINE(ixwqci) ( INTEGER(display), INTEGER(cap),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWQCI
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to query capability (integer values)
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWQCI( display, cap, size, capdata, ncap, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to query capability (integer values)
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     cap = int
@@ -419,13 +441,13 @@ F77_SUBROUTINE(ixwqci) ( INTEGER(display), INTEGER(cap),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -455,19 +477,19 @@ F77_SUBROUTINE(ixwqcr) ( INTEGER(display), INTEGER(cap),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWQCR
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to query capability (real values)
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWQCR( display, cap, size, capdata, ncap, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to query capability (real values)
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Ddisplay identifier
 *     cap = int
@@ -481,13 +503,13 @@ F77_SUBROUTINE(ixwqcr) ( INTEGER(display), INTEGER(cap),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -520,20 +542,20 @@ F77_SUBROUTINE(ixwqdc) ( INTEGER(display), INTEGER(confn),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWQDC
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to query device characteristics
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWQDC ( display, confn, memtype, maxmem, confmode, memlist,
 *                   memxsize, memysize, memdepth, ittdepth, nmem, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to query device characteristics
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     confn = int
@@ -559,13 +581,13 @@ F77_SUBROUTINE(ixwqdc) ( INTEGER(display), INTEGER(confn),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -601,19 +623,19 @@ F77_SUBROUTINE(ixwsel) ( INTEGER(display), INTEGER(confn),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWSEL
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to select configuration
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWSEL( display, confn, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to select configuration
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     confn = int
@@ -621,13 +643,13 @@ F77_SUBROUTINE(ixwsel) ( INTEGER(display), INTEGER(confn),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -654,19 +676,19 @@ F77_SUBROUTINE(ixwsmv) ( INTEGER(display), INTEGER(memlist),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWSMV
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to set memory visibility
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWSMV( display, memlist, nmem, vis, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to set memory visibility
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memlist = int
@@ -678,13 +700,13 @@ F77_SUBROUTINE(ixwsmv) ( INTEGER(display), INTEGER(memlist),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -713,19 +735,19 @@ F77_SUBROUTINE(ixwwsc) ( INTEGER(display), INTEGER(memlist),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWWSC
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to write memory scroll
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWWSC( display, memlist, nmem, xscr, yscr, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to write memory scroll
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memlist = int
@@ -739,13 +761,13 @@ F77_SUBROUTINE(ixwwsc) ( INTEGER(display), INTEGER(memlist),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -775,19 +797,19 @@ F77_SUBROUTINE(ixwwzm) ( INTEGER(display), INTEGER(memlist),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWWZM
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to write memory zoom
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWWZM ( display, memlist, nmem, zoom, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to write memory zoom
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memlist = int
@@ -799,13 +821,13 @@ F77_SUBROUTINE(ixwwzm) ( INTEGER(display), INTEGER(memlist),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -834,19 +856,19 @@ F77_SUBROUTINE(ixwrsz) ( INTEGER(display), INTEGER(memid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWRSZ
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to read scroll and zoom
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWRSZ ( display, memid, xscr, yscr, zoom, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to read scroll and zoom
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -860,13 +882,13 @@ F77_SUBROUTINE(ixwrsz) ( INTEGER(display), INTEGER(memid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -896,19 +918,19 @@ F77_SUBROUTINE(ixwslt) ( INTEGER(display), INTEGER(memid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWSLT
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to select look-up table
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWSLT( display, memid, lutn, ittn, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to select look-up table
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -920,13 +942,13 @@ F77_SUBROUTINE(ixwslt) ( INTEGER(display), INTEGER(memid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -956,19 +978,19 @@ F77_SUBROUTINE(ixwsdp) ( INTEGER(display), INTEGER(memlist),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWSDP
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to select display path
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWSDP( display, memlist, nmem, lutf, ittf, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to select display path
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memlist = int
@@ -982,13 +1004,13 @@ F77_SUBROUTINE(ixwsdp) ( INTEGER(display), INTEGER(memlist),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -1019,19 +1041,19 @@ F77_SUBROUTINE(ixwwmy) ( INTEGER(display), INTEGER(memid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWWMY
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to write memory
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWWMY( display, memid, data, npixel, depth, packf, x0, y0, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to write memory
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -1051,13 +1073,13 @@ F77_SUBROUTINE(ixwwmy) ( INTEGER(display), INTEGER(memid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -1090,19 +1112,19 @@ F77_SUBROUTINE(ixwcmy) ( INTEGER(display), INTEGER(memlist),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWCMY
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to clear memory
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWCMY( display, memlist, nmem, bck, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to clear memory
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memlist = int
@@ -1114,13 +1136,13 @@ F77_SUBROUTINE(ixwcmy) ( INTEGER(display), INTEGER(memlist),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -1151,20 +1173,20 @@ F77_SUBROUTINE(ixwrmy) ( INTEGER(display), INTEGER(memid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWRMY
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to read memory
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWRMY ( display, memid, npixel, x0, y0, depth, packf,
 *                   ittf, data, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to write memory
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -1186,13 +1208,13 @@ F77_SUBROUTINE(ixwrmy) ( INTEGER(display), INTEGER(memid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -1229,20 +1251,20 @@ F77_SUBROUTINE(ixwstw) ( INTEGER(display), INTEGER(memid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWSTW
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to select transfer window 
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWSTW ( display, memid, loaddir, xwdim, ywdim, depth,
 *                   xwoff, ywoff, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to select transfer window 
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -1262,13 +1284,13 @@ F77_SUBROUTINE(ixwstw) ( INTEGER(display), INTEGER(memid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -1303,19 +1325,19 @@ F77_SUBROUTINE(ixwply) ( INTEGER(display), INTEGER(memid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWPLY
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to plot polyline
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWPLY( display, memid, x, y, np, color, style, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to plot polyline
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -1333,13 +1355,13 @@ F77_SUBROUTINE(ixwply) ( INTEGER(display), INTEGER(memid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -1374,20 +1396,20 @@ F77_SUBROUTINE(ixwtxt) ( INTEGER(display), INTEGER(memid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWTXT
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to plot text 
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWTXT ( display, memid, txt, lentxt, x0, y0, path, orient,
 *                   color, txtsize, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to plot text 
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -1411,15 +1433,15 @@ F77_SUBROUTINE(ixwtxt) ( INTEGER(display), INTEGER(memid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Convert the FORTRAN string into a C string.
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -1467,19 +1489,19 @@ F77_SUBROUTINE(ixwwit) ( INTEGER(display), INTEGER(memid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWWIT
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to write intensity transformation table
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWWIT( display, memid, ittn, ittstart, ittlen, ittdata, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to write intensity transformation table
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -1495,13 +1517,13 @@ F77_SUBROUTINE(ixwwit) ( INTEGER(display), INTEGER(memid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -1533,19 +1555,19 @@ F77_SUBROUTINE(ixwrit) ( INTEGER(display), INTEGER(memid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWRIT
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to read intensity transformation table
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWRIT( display, memid, ittn, ittstart, ittlen, ittdata, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to read intensity transformation table
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -1561,13 +1583,13 @@ F77_SUBROUTINE(ixwrit) ( INTEGER(display), INTEGER(memid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -1600,19 +1622,19 @@ F77_SUBROUTINE(ixwwlt) ( INTEGER(display), INTEGER(lutn),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWWLT
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to write look-up table
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWWLT( display, lutn, lutstart, lutlen, lutdata, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to write look-up table
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     lutn = int
@@ -1626,14 +1648,14 @@ F77_SUBROUTINE(ixwwlt) ( INTEGER(display), INTEGER(lutn),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Copy input array to local array.
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -1684,19 +1706,19 @@ F77_SUBROUTINE(ixwrlt) ( INTEGER(display), INTEGER(lutn),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWRLT
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to read look-up table
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWRLT( display, lutn, lutstart, lutlen, lutdata, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to read look-up table
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     lutn = int
@@ -1710,14 +1732,14 @@ F77_SUBROUTINE(ixwrlt) ( INTEGER(display), INTEGER(lutn),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *     Copy local array to output array.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -1768,19 +1790,19 @@ F77_SUBROUTINE(ixwwzp) ( INTEGER(display), INTEGER(xscr),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWWZP
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to write display zoom and pan
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWWZP( display, xscr, yscr, zoom, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to write display zoom and pan
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     xscr = int
@@ -1792,13 +1814,13 @@ F77_SUBROUTINE(ixwwzp) ( INTEGER(display), INTEGER(xscr),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -1827,19 +1849,19 @@ F77_SUBROUTINE(ixwrzp) ( INTEGER(display), INTEGER(xscr),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWRZP
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to read display zoom and pan
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWRZP( display, xscr, yscr, zoom, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to read display zoom and pan
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     xscr = int
@@ -1851,13 +1873,13 @@ F77_SUBROUTINE(ixwrzp) ( INTEGER(display), INTEGER(xscr),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -1887,19 +1909,19 @@ F77_SUBROUTINE(ixwinc) ( INTEGER(display), INTEGER(memid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWINC
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to initialize cursors
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWINC( display, memid, curn, cursh, curcol, xcur, ycur, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to initialize cursors
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -1917,13 +1939,13 @@ F77_SUBROUTINE(ixwinc) ( INTEGER(display), INTEGER(memid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -1954,19 +1976,19 @@ F77_SUBROUTINE(ixwscv) ( INTEGER(display), INTEGER(curn),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWSCV
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to set cursor visibility
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWSCV( display, curn, vis, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to set cursor visibility
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     curn = int
@@ -1976,13 +1998,13 @@ F77_SUBROUTINE(ixwscv) ( INTEGER(display), INTEGER(curn),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2010,19 +2032,19 @@ F77_SUBROUTINE(ixwrcp) ( INTEGER(display), INTEGER(inmemid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWRCP
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to read cursor position
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWRCP( display, inmemid, curn, xcur, ycur, outmemid, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to read cursor position
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     inmemid = int
@@ -2038,13 +2060,13 @@ F77_SUBROUTINE(ixwrcp) ( INTEGER(display), INTEGER(inmemid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2075,19 +2097,19 @@ F77_SUBROUTINE(ixwwcp) ( INTEGER(display), INTEGER(memid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWWCP
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to write cursor position
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWWCP( display, memid, curn, xcur, ycur, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to write cursor position
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -2101,13 +2123,13 @@ F77_SUBROUTINE(ixwwcp) ( INTEGER(display), INTEGER(memid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2139,20 +2161,20 @@ F77_SUBROUTINE(ixwinr) ( INTEGER(display), INTEGER(memid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWINR
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to initialize region of interest
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWINR( display, memid, roicol, roixmin, roiymin, roixmax,
 *                  roiymax, roiid, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to initialize region of interest
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -2172,13 +2194,13 @@ F77_SUBROUTINE(ixwinr) ( INTEGER(display), INTEGER(memid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2214,20 +2236,20 @@ F77_SUBROUTINE(ixwrri) ( INTEGER(display), INTEGER(inmemid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWRRI
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to read ROI position
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWRRI( display, inmemid, roiid, roixmin, roiymin, roixmax,
 *                  roiymax, outmemid, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to read ROI position
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     inmemid = int
@@ -2247,13 +2269,13 @@ F77_SUBROUTINE(ixwrri) ( INTEGER(display), INTEGER(inmemid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2288,20 +2310,20 @@ F77_SUBROUTINE(ixwwri) ( INTEGER(display), INTEGER(memid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWWRI
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to write ROI position
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWWRI ( display, memid, roiid, roixmin, roiymin, roixmax,
 *                  roiymax, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to write ROI position
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -2319,13 +2341,13 @@ F77_SUBROUTINE(ixwwri) ( INTEGER(display), INTEGER(memid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2357,19 +2379,19 @@ F77_SUBROUTINE(ixwsrv) ( INTEGER(display), INTEGER(roiid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWSRV
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to set visibility of region of interest
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWSRV( display, roiid, vis, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to set visibility of region of interest
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     roiid = int
@@ -2379,13 +2401,13 @@ F77_SUBROUTINE(ixwsrv) ( INTEGER(display), INTEGER(roiid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2414,20 +2436,20 @@ F77_SUBROUTINE(ixweni) ( INTEGER(display), INTEGER(intype),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWENI
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to enable interaction
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWENI( display, intype, intid, objtype, objid, oper,
 *                  trigger, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to enable interaction
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     intype = int
@@ -2445,13 +2467,13 @@ F77_SUBROUTINE(ixweni) ( INTEGER(display), INTEGER(intype),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2483,19 +2505,19 @@ F77_SUBROUTINE(ixweiw) ( INTEGER(display), INTEGER(trgstatus),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWEIW
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to execute interaction and wait
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWEIW( display, trgstatus, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to execute interaction and wait
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     trigstatus = int
@@ -2503,13 +2525,13 @@ F77_SUBROUTINE(ixweiw) ( INTEGER(display), INTEGER(trgstatus),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2534,31 +2556,31 @@ F77_SUBROUTINE(ixwsti) ( INTEGER(display), INTEGER(idierr) )
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWSTI
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to stop interactions
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWSTI( display, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to stop interactions
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2585,19 +2607,19 @@ F77_SUBROUTINE(ixwqid) ( INTEGER(display), INTEGER(intyp),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWQID
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to query interactor description
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWQID( display, intyp, intid, intdscr, lendscr, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to query interactor description
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     intyp = int
@@ -2611,14 +2633,14 @@ F77_SUBROUTINE(ixwqid) ( INTEGER(display), INTEGER(intyp),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2662,19 +2684,19 @@ F77_SUBROUTINE(ixwgld) ( INTEGER(display), INTEGER(locn),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWGLD
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to get locator displacement
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWGLD( display, locn, xdsp, ydsp, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to get locator displacement
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     locn = int
@@ -2686,13 +2708,13 @@ F77_SUBROUTINE(ixwgld) ( INTEGER(display), INTEGER(locn),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2720,19 +2742,19 @@ F77_SUBROUTINE(ixwgie) ( INTEGER(display), INTEGER(evlid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWGIE
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to get integer evaluator
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWGIE( display, evlid, evlival, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to get integer evaluator
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     evlid = int
@@ -2742,13 +2764,13 @@ F77_SUBROUTINE(ixwgie) ( INTEGER(display), INTEGER(evlid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2775,19 +2797,19 @@ F77_SUBROUTINE(ixwgre) ( INTEGER(display), INTEGER(evlid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWGRE
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to get real evaluator
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWGRE( display, evlid, evlrval, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to get real evaluator
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     evlid = int
@@ -2797,13 +2819,13 @@ F77_SUBROUTINE(ixwgre) ( INTEGER(display), INTEGER(evlid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2830,19 +2852,19 @@ F77_SUBROUTINE(ixwgle) ( INTEGER(display), INTEGER(evlid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWGLE
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to get logical evaluator
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWGLE( display, evlid, evllval, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to get logical evaluator
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     evlid = int
@@ -2852,13 +2874,13 @@ F77_SUBROUTINE(ixwgle) ( INTEGER(display), INTEGER(evlid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2886,19 +2908,19 @@ F77_SUBROUTINE(ixwgse) ( INTEGER(display), INTEGER(evlid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWGSE
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to get string evaluator
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWGSE( display, evlid, evlsval, svallen, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to get string evaluator
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     evlid = int
@@ -2910,13 +2932,13 @@ F77_SUBROUTINE(ixwgse) ( INTEGER(display), INTEGER(evlid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -2946,20 +2968,20 @@ F77_SUBROUTINE(ixwsnp) ( INTEGER(display), INTEGER(colmode),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWSNP
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to create snapshot
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWSNP( display, colmode, npixel, x0, y0, depth, packf,
 *                  data, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to create snapshot
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     colmode = int
@@ -2979,13 +3001,13 @@ F77_SUBROUTINE(ixwsnp) ( INTEGER(display), INTEGER(colmode),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -3019,19 +3041,19 @@ F77_SUBROUTINE(ixwblm) ( INTEGER(display), INTEGER(memlist),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWBLM
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to blink memories
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWBLM( display, memlist, nmem, period, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to blink memories
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memlist = int
@@ -3043,13 +3065,13 @@ F77_SUBROUTINE(ixwblm) ( INTEGER(display), INTEGER(memlist),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -3079,20 +3101,20 @@ F77_SUBROUTINE(ixwsss) ( INTEGER(display), INTEGER(memlist),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWSSS
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to define split screen
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWSSS( display, memlist, xoff, yoff, splitf, xsplit,
 *                  ysplit, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to define split screen
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memlist = int
@@ -3110,13 +3132,13 @@ F77_SUBROUTINE(ixwsss) ( INTEGER(display), INTEGER(memlist),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -3148,19 +3170,19 @@ F77_SUBROUTINE(ixwsbv) ( INTEGER(display), INTEGER(memid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWSBV
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to set intensity bar visibility
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWSBV( display, memid, vis, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to set intensity bar visibility
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -3170,13 +3192,13 @@ F77_SUBROUTINE(ixwsbv) ( INTEGER(display), INTEGER(memid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -3203,19 +3225,19 @@ F77_SUBROUTINE(ixwiag) ( INTEGER(display), INTEGER(outid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWIAG
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to define diagnostic output
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWIAG( display, outid, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to define diagnostic output
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     outid = int
@@ -3223,13 +3245,13 @@ F77_SUBROUTINE(ixwiag) ( INTEGER(display), INTEGER(outid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -3254,31 +3276,31 @@ F77_SUBROUTINE(ixwenc) ( INTEGER(display), INTEGER(idierr) )
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWENC
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to enable dynamic memory configuration
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWENC( display, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to enable dynamic memory configuration
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -3305,19 +3327,19 @@ F77_SUBROUTINE(ixwamy) ( INTEGER(display), INTEGER(xdim),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWAMY
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to allocate memory
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWAMY( display, xdim, ydim, mdepth, mtype, memid, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to allocate memory
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     xdim = int
@@ -3333,13 +3355,13 @@ F77_SUBROUTINE(ixwamy) ( INTEGER(display), INTEGER(xdim),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -3369,19 +3391,19 @@ F77_SUBROUTINE(ixwstc) ( INTEGER(display), INTEGER(confid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWSTC
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to stop dynamic memory configuration
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWSTC( display, confid, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to stop dynamic memory configuration
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     confid = int
@@ -3389,13 +3411,13 @@ F77_SUBROUTINE(ixwstc) ( INTEGER(display), INTEGER(confid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -3421,19 +3443,19 @@ F77_SUBROUTINE(ixwrlc) ( INTEGER(display), INTEGER(confid),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWRLC
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to release dynamic configuration
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWRLC( display, confid, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to release dynamic configuration
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     confid = int
@@ -3441,13 +3463,13 @@ F77_SUBROUTINE(ixwrlc) ( INTEGER(display), INTEGER(confid),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -3474,19 +3496,19 @@ F77_SUBROUTINE(ixwgep) ( CHARACTER(parnam), INTEGER(lbuf),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWGEP
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to get escape parameter
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWGEP( parnam, lbuf, buff, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to get escape parameter
 *
-*  Arguments :
+*  Arguments:
 *     parnam = char
 *        Parameter name
 *     lbuf = int
@@ -3496,13 +3518,13 @@ F77_SUBROUTINE(ixwgep) ( CHARACTER(parnam), INTEGER(lbuf),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -3539,19 +3561,19 @@ F77_SUBROUTINE(ixwpep) ( CHARACTER(parnam), INTEGER(lbuf),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWPEP
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to put escape parameter
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWPEP( parnam, lbuf, buff, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to put escape parameter
 *
-*  Arguments :
+*  Arguments:
 *     parnam = char
 *        Parameter name
 *     lbuf = int
@@ -3561,13 +3583,13 @@ F77_SUBROUTINE(ixwpep) ( CHARACTER(parnam), INTEGER(lbuf),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
@@ -3597,19 +3619,19 @@ F77_SUBROUTINE(ixwebm) ( INTEGER(display), CHARACTER(bmdscr),
 
 /*
 *+
-*  Name :
+*  Name:
 *     IXWEBM
 *
-*  Purpose :
+*  Purpose:
 *     F77 to C interface used to define external bitmap 
 *
-*  Invocation :
+*  Invocation:
 *     CALL IXWEBM( display, bmdscr, lendscr, bmtype, xdim, ydim, idierr )
 *
-*  Description :
+*  Description:
 *     F77 to C interface used to define external bitmap 
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     bmdscr = char
@@ -3625,13 +3647,13 @@ F77_SUBROUTINE(ixwebm) ( INTEGER(display), CHARACTER(bmdscr),
 *     idierr = int
 *        Status
 *
-*  Algorithm :
+*  Algorithm:
 *     Call the C routine.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     23-MAY-1991 (NE):

@@ -1,14 +1,15 @@
 /*
-*  Name :
+*+
+*  Name:
 *     IDIOTHER.C
 *
-*  Purpose :
+*  Purpose:
 *     Miscellaneous routines
 *
-*  Description :
+*  Description:
 *     Miscellaneous routines
 *
-*  Contents :
+*  Contents:
 *     roi_rectangle
 *        Draw a rectangular ROI with active corner;
 *     roi_refresh
@@ -34,10 +35,31 @@
 *     hard_cursor
 *        Hardware cursor
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1991, 1992, 1993 Science & Engineering Research Council.
+*     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *     23-MAY-1991 (NE):
@@ -82,19 +104,20 @@ void roi_rectangle ( int display, int corner, int x0, int y0, int x1, int y1,
                    int roicol )
 
 /*
-*  Name :
+*+
+*  Name:
 *     roi_rectangle
 *
-*  Purpose :
+*  Purpose:
 *     Draw a region of interest rectangle
 *
-*  Invocation :
+*  Invocation:
 *     roi_rectangle ( display, corner, x0, y0, x1, y1, roicol )
 *
-*  Description :
+*  Description:
 *     Draw a region of interest rectangle
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     corner = int
@@ -110,13 +133,13 @@ void roi_rectangle ( int display, int corner, int x0, int y0, int x1, int y1,
 *     roicol = int
 *        Region of interest colour
 *
-*  Algorithm :
+*  Algorithm:
 *     Draw a region of interest rectangle
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 *     29-APR-1991 (NE):
@@ -281,29 +304,30 @@ return;
 void roi_refresh ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     roi_refresh
 *
-*  Purpose :
+*  Purpose:
 *     Refresh the region of interests
 *
-*  Invocation :
+*  Invocation:
 *     roi_refresh ( display )
 *
-*  Description :
+*  Description:
 *     Refresh the region of interests
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Algorithm :
+*  Algorithm:
 *     Refresh the region of interests
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 */
@@ -346,19 +370,20 @@ void roi_switch ( int display, int nint, short ev_type, short ev_data,
                   int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     roi_switch
 *
-*  Purpose :
+*  Purpose:
 *     Switch the active corner of the region of interest
 *
-*  Invocation :
+*  Invocation:
 *     roi_switch ( display, nint, ev_type, ev_data, err )
 *
-*  Description :
+*  Description:
 *     Refresh the region of interests
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -370,13 +395,13 @@ void roi_switch ( int display, int nint, short ev_type, short ev_data,
 *     err = int
 *        Pointer to status
 *
-*  Algorithm :
+*  Algorithm:
 *     Switch the active corner of the region of interest
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     21-FEB-1991 (NE):
 *        Orignal version
 */
@@ -486,19 +511,20 @@ void lut_loc_rotate ( int display, int nint, short ev_type, short ev_data,
                       short pos[], int ew, int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     lut_loc_rotate
 *
-*  Purpose :
+*  Purpose:
 *     Rotate the LUT using the x-motion of the locator
 *
-*  Invocation :
+*  Invocation:
 *     lut_loc_rotate( display, nint, ev_type, ev_data, pos, ew, err )
 *
-*  Description :
+*  Description:
 *     Rotate the LUT using the x-motion of the locator
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -514,13 +540,13 @@ void lut_loc_rotate ( int display, int nint, short ev_type, short ev_data,
 *     err = int
 *        Pointer to status
 *
-*  Algorithm :
+*  Algorithm:
 *     Rotate the LUT using the x-motion of the locator
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *      5-MAR-1991 (NE):
 *        Orignal version
 *     23-MAY-1991 (NE):
@@ -647,19 +673,20 @@ return;
 void dis_zoom ( int display, int nint, short ev_type, short ev_data, int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     dis_zoom
 *
-*  Purpose :
+*  Purpose:
 *     Interactive zoom of display
 *
-*  Invocation :
+*  Invocation:
 *     dis_zoom( display, nint, ev_type, ev_data, err )
 *
-*  Description :
+*  Description:
 *     Interactive zoom of display
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -671,13 +698,13 @@ void dis_zoom ( int display, int nint, short ev_type, short ev_data, int* err )
 *     err = int
 *        Pointer to status
 *
-*  Algorithm :
+*  Algorithm:
 *     Interactive zoom of display
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *      8-MAR-1991 (NE):
 *        Orignal version
 */
@@ -726,19 +753,20 @@ void dis_unzoom ( int display, int nint, short ev_type, short ev_data,
                   int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     dis_unzoom
 *
-*  Purpose :
+*  Purpose:
 *     Interactive unzoom of display
 *
-*  Invocation :
+*  Invocation:
 *     dis_unzoom( display, nint, ev_type, ev_data, err )
 *
-*  Description :
+*  Description:
 *     Interactive unzoom of display
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -750,13 +778,13 @@ void dis_unzoom ( int display, int nint, short ev_type, short ev_data,
 *     err = int
 *        Pointer to status
 *
-*  Algorithm :
+*  Algorithm:
 *     Interactive unzoom of display
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *      8-MAR-1991 (NE):
 *        Orignal version
 */
@@ -807,19 +835,20 @@ void dis_clzoom ( int display, int nint, short ev_type, short ev_data,
                   int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     dis_clzoom
 *
-*  Purpose :
+*  Purpose:
 *     Interactive clear zoom of display
 *
-*  Invocation :
+*  Invocation:
 *     dis_clzoom( display, nint, ev_type, ev_data, err )
 *
-*  Description :
+*  Description:
 *     Interactive clear zoom of display
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -831,13 +860,13 @@ void dis_clzoom ( int display, int nint, short ev_type, short ev_data,
 *     err = int
 *        Pointer to status
 *
-*  Algorithm :
+*  Algorithm:
 *     Interactive clear zoom of display
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *      8-MAR-1991 (NE):
 *        Orignal version
 */
@@ -885,35 +914,36 @@ return;
 void remove_pending( int display, short ev_type )
 
 /*
-*  Name :
+*+
+*  Name:
 *     remove_pending
 *
-*  Purpose :
+*  Purpose:
 *     Remove multiple events of the same type from the event queue
 *
-*  Invocation :
+*  Invocation:
 *     remove_pending( display, ev_type )
 *
-*  Description :
+*  Description:
 *     Remove multiple events of the same type from the event queue.
 *     Events of the given type are removed from the front of the queue
 *     until an event of a different type is met.
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     ev_type = short
 *        Type of event to remove
 *
-*  Algorithm :
+*  Algorithm:
 *     Remove multiple events of the same type from the event queue.
 *     Events of the given type are removed from the front of the queue
 *     until an event of a different type is met.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     19-MAR-1992 (NE):
 *        Orignal version
 */
@@ -959,20 +989,21 @@ return;
 int is_motion_pending( int display, int x_pos, int y_pos )
 
 /*
-*  Name :
+*+
+*  Name:
 *     is_motion_pending
 *
-*  Purpose :
+*  Purpose:
 *     Inquire if next event is a motion event
 *
-*  Invocation :
+*  Invocation:
 *     is_motion_pending( display, x_pos, y_pos )
 *
-*  Description :
+*  Description:
 *     If the next event is a motion event and it the position does not
 *     exceed the maximum allowable then return true otherwise return false.
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     x_pos = int
@@ -980,15 +1011,15 @@ int is_motion_pending( int display, int x_pos, int y_pos )
 *     y_pos = int
 *        Current locator position
 *
-*  Algorithm :
+*  Algorithm:
 *     If there is a pending event on the queue then peek at it. 
 *     If the next event is a motion event and it the position does not
 *     exceed the maximum allowable then return true otherwise return false.
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     24-SEP-1992 (NE):
 *        Orignal version
 *     17-FEB-1993 (NE):
@@ -1031,19 +1062,20 @@ void mem_screen_conv ( int display, int memid, int xmem, int ymem, int* xscr,
                        int* yscr )
 
 /*
-*  Name :
+*+
+*  Name:
 *     mem_screen_conv
 *
-*  Purpose :
+*  Purpose:
 *     Memory to screen coordinate conversion
 *
-*  Invocation :
+*  Invocation:
 *     mem_screen_conv( display, memid, xmem, ymem, xscr, yscr )
 *
-*  Description :
+*  Description:
 *     Memory to screen coordinate conversion
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     memid = int
 *     xmem = int
@@ -1051,10 +1083,10 @@ void mem_screen_conv ( int display, int memid, int xmem, int ymem, int* xscr,
 *     xscr = int
 *     yscr = int
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     30-SEP-1992 (NE):
 *        Orignal version
 */
@@ -1100,19 +1132,20 @@ void screen_mem_conv ( int display, int memid, int xscr, int yscr, int* xmem,
                        int* ymem )
 
 /*
-*  Name :
+*+
+*  Name:
 *     screen_mem_conv
 *
-*  Purpose :
+*  Purpose:
 *     Screen to memory coordinate conversion
 *
-*  Invocation :
+*  Invocation:
 *     screen_mem_conv( display, memid, xscr, yscr, xmem, ymem )
 *
-*  Description :
+*  Description:
 *     Screen to memory coordinate conversion
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     memid = int
 *     xscr = int
@@ -1120,10 +1153,10 @@ void screen_mem_conv ( int display, int memid, int xscr, int yscr, int* xmem,
 *     xmem = int
 *     ymem = int
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     30-SEP-1992 (NE):
 *        Orignal version
 */
@@ -1169,19 +1202,20 @@ void hard_cursor ( int display, int func, int xin, int yin, int* xout,
                    int* yout )
 
 /*
-*  Name :
+*+
+*  Name:
 *     hard_cursor
 *
-*  Purpose :
+*  Purpose:
 *     Hardware cursor
 *
-*  Invocation :
+*  Invocation:
 *     hard_cursor( display, func, xin, yin, xout, yout )
 *
-*  Description :
+*  Description:
 *     Hardware cursor
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     func = int
 *     xin = int
@@ -1189,11 +1223,11 @@ void hard_cursor ( int display, int func, int xin, int yin, int* xout,
 *     xout = int
 *     yout = int
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1992 (NE):
 *        Orignal version
 *     17-FEB-1993 (NE):

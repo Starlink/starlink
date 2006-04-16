@@ -1,14 +1,15 @@
 /*
-*  Name :
+*+
+*  Name:
 *     IDILOCAL.C
 *
-*  Purpose :
+*  Purpose:
 *     Device Dependent Routines
 *
-*  Description :
+*  Description:
 *     Device Dependent Routines
 *
-*  Contents :
+*  Contents:
 *     local_init
 *        Device Dependent Init;
 *     disp_init
@@ -68,13 +69,34 @@
 *     ColormapOfWindow
 *        Return Colormap associated with a window
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1991, 1992, 1993, 1994 Science & Engineering Research Council.
+*     Copyright (C) 1999 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -139,29 +161,30 @@ typedef struct bm_origin BM_ORIGIN;
 void local_init ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     local_init
 *
-*  Purpose :
+*  Purpose:
 *     Device Dependent Init
 *
-*  Invocation :
+*  Invocation:
 *     local_init( display )
 *
-*  Description :
+*  Description:
 *     Device Dependent Init
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -196,19 +219,20 @@ void disp_init ( int display, char wind[], int xdisp, int xwind, int* depth,
                  int* lutlen, int* idierr )
 
 /*
-*  Name :
+*+
+*  Name:
 *     disp_init
 *
-*  Purpose :
+*  Purpose:
 *     Local Display Init
 *
-*  Invocation :
+*  Invocation:
 *     disp_init( display, wind, xdisp, xwind, idierr )
 *
-*  Description :
+*  Description:
 *     Local Display Init
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     wind = char[]
 *     xdisp = int
@@ -217,13 +241,13 @@ void disp_init ( int display, char wind[], int xdisp, int xwind, int* depth,
 *     lutlen = int
 *     idierr = int
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -324,27 +348,28 @@ return;
 void acq_disp ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     acq_disp
 *
-*  Purpose :
+*  Purpose:
 *     Acquire Display
 *
-*  Invocation :
+*  Invocation:
 *     acq_disp( display )
 *
-*  Description :
+*  Description:
 *     Acquire Display
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 */
@@ -358,27 +383,28 @@ return;
 void rel_disp ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     rel_disp
 *
-*  Purpose :
+*  Purpose:
 *     Release Display
 *
-*  Invocation :
+*  Invocation:
 *     rel_disp( display )
 *
-*  Description :
+*  Description:
 *     Release Display
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 */
@@ -392,28 +418,29 @@ return;
 void acq_lut ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     acq_lut
 *
-*  Purpose :
+*  Purpose:
 *     Acquire Color Cells
 *
-*  Invocation :
+*  Invocation:
 *     acq_lut( display )
 *
-*  Description :
+*  Description:
 *     Acquire Color Cells
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     23-APR-1991 (NE):
@@ -498,26 +525,27 @@ return;
 int icol ( double lutval )
 
 /*
-*  Name :
+*+
+*  Name:
 *     icol
 *
-*  Purpose :
+*  Purpose:
 *     Code Color
 *
-*  Invocation :
+*  Invocation:
 *     icol( lutval )
 *
-*  Description :
+*  Description:
 *     Code Color
 *
-*  Arguments :
+*  Arguments:
 *     lutval = float
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 */
@@ -531,26 +559,27 @@ return ( (int)(65535. * lutval) );
 float icol1 ( int color )
 
 /*
-*  Name :
+*+
+*  Name:
 *     icol1
 *
-*  Purpose :
+*  Purpose:
 *     Decode Color
 *
-*  Invocation :
+*  Invocation:
 *     icol1( color )
 *
-*  Description :
+*  Description:
 *     Decode Color
 *
-*  Arguments :
+*  Arguments:
 *     color = int
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 */
@@ -569,28 +598,29 @@ return (col / 65535.);
 void cl_display ( int display, int bck )
 
 /*
-*  Name :
+*+
+*  Name:
 *     cl_display
 *
-*  Purpose :
+*  Purpose:
 *     Clear Display
 *
-*  Invocation :
+*  Invocation:
 *     cl_display( display, bck )
 *
-*  Description :
+*  Description:
 *     Clear Display
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     bck = int
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     28-AUG-1991 (NE):
@@ -626,27 +656,28 @@ return;
 void wr_lut ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     wr_lut
 *
-*  Purpose :
+*  Purpose:
 *     Write XWindows LUT
 *
-*  Invocation :
+*  Invocation:
 *     wr_lut( display )
 *
-*  Description :
+*  Description:
 *     Load screen look up table
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     14-MAY-1992 (NE):
@@ -683,25 +714,26 @@ return;
 void wr_lut_gwm ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     wr_lut_gwm
 *
-*  Purpose :
+*  Purpose:
 *     Write XWindows LUT
 *
-*  Invocation :
+*  Invocation:
 *     wr_lut_gwm( display )
 *
-*  Description :
+*  Description:
 *     Inform GWM of a change to the screen look up table
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *
-*  Authors :
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     28-AUG-1991 (NE):
 *        Orignal version
 *     14-MAY-1992 (NE):
@@ -735,28 +767,29 @@ return;
 void get_slicol ( int* r, int* g, int* b )
 
 /*
-*  Name :
+*+
+*  Name:
 *     get_slicol
 *
-*  Purpose :
+*  Purpose:
 *     Get default color for LUT slice
 *
-*  Invocation :
+*  Invocation:
 *     get_slicol( r, g, b )
 *
-*  Description :
+*  Description:
 *     Get default color for LUT slice
 *
-*  Arguments :
+*  Arguments:
 *     r = int
 *     g = int
 *     b = int
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 */
@@ -777,28 +810,29 @@ return;
 void smv ( int display, int memid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     smv
 *
-*  Purpose :
+*  Purpose:
 *     Set memory visibility : zoom = 1
 *
-*  Invocation :
+*  Invocation:
 *     smv( display, memid )
 *
-*  Description :
+*  Description:
 *     Set memory visibility : zoom = 1
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     memid = int
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -873,19 +907,20 @@ void smv_z ( int display, int memid, int zoom, int x0, int y0, int xs0,
              int ys0, int x1, int y1, int xs1, int ys1 )
 
 /*
-*  Name :
+*+
+*  Name:
 *     smv_z
 *
-*  Purpose :
+*  Purpose:
 *     Set memory visibility : zoom > 1
 *
-*  Invocation :
+*  Invocation:
 *     smv_z( display, memid, zoom, x0, y0, xs0, ys0, x1, y1, xs1, ys1 )
 *
-*  Description :
+*  Description:
 *     Set memory visibility : zoom > 1
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -907,12 +942,12 @@ void smv_z ( int display, int memid, int zoom, int x0, int y0, int xs0,
 *     ys1 = int
 *        Sub-image display bitmap dimensions (target)
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -1015,19 +1050,20 @@ void smv_uz ( int display, int memid, int zoom, int x0, int y0, int xs0,
               int ys0, int x1, int y1, int xs1, int ys1 )
 
 /*
-*  Name :
+*+
+*  Name:
 *     smv_uz
 *
-*  Purpose :
+*  Purpose:
 *     Set memory visibility : zoom < 0
 *
-*  Invocation :
+*  Invocation:
 *     smv_uz ( display, memid, zoom, x0, y0, xs0, ys0, x1, y1, xs1, ys1 )
 *
-*  Description :
+*  Description:
 *     Set memory visibility : zoom < 0
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     memid = int
@@ -1049,12 +1085,12 @@ void smv_uz ( int display, int memid, int zoom, int x0, int y0, int xs0,
 *     ys1 = int
 *        Sub-image display bitmap dimensions (target)
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -1145,29 +1181,30 @@ return;
 void int_enable ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     int_enable
 *
-*  Purpose :
+*  Purpose:
 *     Interaction enable
 *
-*  Invocation :
+*  Invocation:
 *     int_enable( display )
 *
-*  Description :
+*  Description:
 *     Interaction enable
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -1332,29 +1369,30 @@ return;
 void int_disable ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     int_disable
 *
-*  Purpose :
+*  Purpose:
 *     Interaction disable
 *
-*  Invocation :
+*  Invocation:
 *     int_disable( display )
 *
-*  Description :
+*  Description:
 *     Interaction disable
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -1412,29 +1450,30 @@ return;
 void exit_trg_enable ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     exit_trg_enable
 *
-*  Purpose :
+*  Purpose:
 *     Exit trigger enable
 *
-*  Invocation :
+*  Invocation:
 *     exit_trg_enable( display )
 *
-*  Description :
+*  Description:
 *     Exit trigger enable
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -1499,27 +1538,28 @@ return;
 void exit_trg_disable ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     exit_trg_disable
 *
-*  Purpose :
+*  Purpose:
 *     Exit trigger disable
 *
-*  Invocation :
+*  Invocation:
 *     exit_trg_disable( display )
 *
-*  Description :
+*  Description:
 *     Exit trigger disable
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 */
@@ -1542,19 +1582,20 @@ void wait_int ( int display, int* ew, short* type, short* data,
                 short position[2] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     wait_int
 *
-*  Purpose :
+*  Purpose:
 *     Wait for interaction
 *
-*  Invocation :
+*  Invocation:
 *     wait_int( display, ew, type, data, position )
 *
-*  Description :
+*  Description:
 *     Synchronous interaction routine
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     ew  = int
@@ -1566,13 +1607,13 @@ void wait_int ( int display, int* ew, short* type, short* data,
 *     position = short[]
 *        Cursor position
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -1646,19 +1687,20 @@ void test_loc ( int display, int zf, short ev_type, short ev_data,
                 short pos[2], int interactor_id, int loc_id, int* f0 )
 
 /*
-*  Name :
+*+
+*  Name:
 *     test_loc
 *
-*  Purpose :
+*  Purpose:
 *     Test locator status
 *
-*  Invocation :
+*  Invocation:
 *     test_loc( display, zf, ev_type, ev_data, pos, interactor_id, loc_id, f0 )
 *
-*  Description :
+*  Description:
 *     Update locator status after interaction
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     zf = int
@@ -1676,12 +1718,12 @@ void test_loc ( int display, int zf, short ev_type, short ev_data,
 *     f0 = int
 *        Interaction flag
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -1781,19 +1823,20 @@ void test_evl ( int display, short ev_type, short ev_data, int interactor_id,
                 int evl_id, int* f0 )
 
 /*
-*  Name :
+*+
+*  Name:
 *     test_evl
 *
-*  Purpose :
+*  Purpose:
 *     Test evaluator status
 *
-*  Invocation :
+*  Invocation:
 *     test_evl( display, ev_type, ev_data, interactor_id, evl_id, f0 )
 *
-*  Description :
+*  Description:
 *     Update evaluator status after interaction
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     ev_type = short
@@ -1807,12 +1850,12 @@ void test_evl ( int display, short ev_type, short ev_data, int interactor_id,
 *     f0 = int
 *        Interaction flag
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -1926,19 +1969,20 @@ void test_trg ( short ev_type, short ev_data, int interactor_id, int trg_id,
                 int* f0 )
 
 /*
-*  Name :
+*+
+*  Name:
 *     test_trg
 *
-*  Purpose :
+*  Purpose:
 *     Test trigger status
 *
-*  Invocation :
+*  Invocation:
 *     test_trg( ev_type, ev_data, interactor_id, trg_id, f0 )
 *
-*  Description :
+*  Description:
 *     Update trigger status after interaction
 *
-*  Arguments :
+*  Arguments:
 *     ev_type = short
 *        Interaction type (mouse , keyboard ...
 *     ev_data = short
@@ -1950,12 +1994,12 @@ void test_trg ( short ev_type, short ev_data, int interactor_id, int trg_id,
 *     f0 = int
 *        Interaction flag
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -2012,30 +2056,31 @@ return;
 void idi__bar ( int display, int memid, int vis, int* idierr )
 
 /*
-*  Name :
+*+
+*  Name:
 *     idi__bar
 *
-*  Purpose :
+*  Purpose:
 *     Intensity bar
 *
-*  Invocation :
+*  Invocation:
 *     idi__bar( display, memid, vis, idierr )
 *
-*  Description :
+*  Description:
 *     Intensity bar
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     memid = int
 *     vis = int
 *     idierr = int
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -2145,30 +2190,31 @@ return;
 void cross_hair ( int display, int xcur, int ycur, int curcol )
 
 /*
-*  Name :
+*+
+*  Name:
 *     cross_hair
 *
-*  Purpose :
+*  Purpose:
 *     Cross-hair cursor
 *
-*  Invocation :
+*  Invocation:
 *     cross_hair( display, xcur, ycur, curcol )
 *
-*  Description :
+*  Description:
 *     Cross-hair cursor
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     xcur = int
 *     ycur = int
 *     curcol = int
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     24-APR-1991 (NE):
@@ -2280,30 +2326,31 @@ return;
 void cross ( int display, int xcur, int ycur, int curcol )
 
 /*
-*  Name :
+*+
+*  Name:
 *     cross
 *
-*  Purpose :
+*  Purpose:
 *     Cross cursor
 *
-*  Invocation :
+*  Invocation:
 *     cross( display, xcur, ycur, curcol )
 *
-*  Description :
+*  Description:
 *     Cross cursor
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     xcur = int
 *     ycur = int
 *     curcol = int
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     24-APR-1991 (NE):
@@ -2422,19 +2469,20 @@ return;
 void rectangle ( int display, int x0, int y0, int x1, int y1, int roicol )
 
 /*
-*  Name :
+*+
+*  Name:
 *     rectangle
 *
-*  Purpose :
+*  Purpose:
 *     Rectangular ROI
 *
-*  Invocation :
+*  Invocation:
 *     rectangle( display, x0, y0, x1, y1, roicol )
 *
-*  Description :
+*  Description:
 *     Rectangular ROI
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     x0 = int
 *     y0 = int
@@ -2442,12 +2490,12 @@ void rectangle ( int display, int x0, int y0, int x1, int y1, int roicol )
 *     y1 = int
 *     roicol = int
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     24-APR-1991 (NE):
@@ -2515,19 +2563,20 @@ void polyline_d ( int display, int memid, int col, int style, int xs[],
                   int ys[], int np )
 
 /*
-*  Name :
+*+
+*  Name:
 *     polyline_d
 *
-*  Purpose :
+*  Purpose:
 *     Polyline on display bitmap
 *
-*  Invocation :
+*  Invocation:
 *     polyline_d( display, memid, col, style, xs, ys, np )
 *
-*  Description :
+*  Description:
 *     Polyline on display bitmap
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     memid = int
 *     col = int
@@ -2536,12 +2585,12 @@ void polyline_d ( int display, int memid, int col, int style, int xs[],
 *     xs = int[]
 *     ys = int[]
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -2655,19 +2704,20 @@ void text_d ( int display, int x0, int y0, int path, int orient, int col,
               int size, char txt[], int* idierr )
 
 /*
-*  Name :
+*+
+*  Name:
 *     text_d( display, x0, y0, path, orient, col, size, txt, idierr )
 *
-*  Purpose :
+*  Purpose:
 *     Text on display bitmap
 *
-*  Invocation :
+*  Invocation:
 *     text_d( display, x0, y0, path, orient, col, size, txt, idierr )
 *
-*  Description :
+*  Description:
 *     Text on display bitmap
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     x0 = int
 *     y0 = int
@@ -2678,12 +2728,12 @@ void text_d ( int display, int x0, int y0, int path, int orient, int col,
 *     txt = char[]
 *     idierr = int
 *
-*  Authors :
+*  Authors:
 *     PASIAN: F. Pasian (Trieste Astronomical Observatory)
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (PASIAN,SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -2750,25 +2800,26 @@ return;
 Colormap ColormapOfWindow (display)
 
 /*
-*  Name :
+*+
+*  Name:
 *     colormap ColormapOfWindow (int display)
 *     
-*  Purpose :
+*  Purpose:
 *     Return the colormap associated with a window
 *
-*  Invocation :
+*  Invocation:
 *     cmap = ColormapOfWindow ( display);
 *
-*  Description :
+*  Description:
 *     
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *
-*  Authors :
+*  Authors:
 *     David Terrett (DLT)
 *
-*  History :
+*  History:
 *     02-MAR-1994 (DLT):
 *        Orignal version
 */
@@ -2796,25 +2847,26 @@ return winatt.colormap;
 Visual *VisualOfWindow (display)
 
 /*
-*  Name :
+*+
+*  Name:
 *     visual VisualOfWindow (int display)
 *     
-*  Purpose :
+*  Purpose:
 *     Return the visual associated with a window
 *
-*  Invocation :
+*  Invocation:
 *     visual = VisualOfWindow ( display);
 *
-*  Description :
+*  Description:
 *     
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *
-*  Authors :
+*  Authors:
 *     David Terrett (DLT)
 *
-*  History :
+*  History:
 *     21-APR-1999 (DLT):
 *        Orignal version
 */

@@ -1,14 +1,15 @@
 /*
-*  Name :
+*+
+*  Name:
 *     IDIUTIL.C
 *
-*  Purpose :
+*  Purpose:
 *     Internal Service Routines
 *
-*  Description :
+*  Description:
 *     Internal Service Routines
 *
-*  Contents :
+*  Contents:
 *     idi__min
 *        Minimum;
 *     idi__max
@@ -78,11 +79,31 @@
 *     text_dl
 *        Text : Display List Management;
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1990, 1991, 1992, 1994 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -136,26 +157,27 @@ typedef struct bm_origin BM_ORIGIN;
 int idi__min ( int ival[4], int n )
 
 /*
-*  Name :
+*+
+*  Name:
 *     idi__min
 *
-*  Purpose :
+*  Purpose:
 *     Min
 *
-*  Invocation :
+*  Invocation:
 *     idi__min( ival, n )
 *
-*  Description :
+*  Description:
 *     Min
 *
-*  Arguments :
+*  Arguments:
 *     ival = int[4]
 *     n = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -179,26 +201,27 @@ return (minval);
 int idi__max ( int ival[4], int n )
 
 /*
-*  Name :
+*+
+*  Name:
 *     idi__max
 *
-*  Purpose :
+*  Purpose:
 *     Max
 *
-*  Invocation :
+*  Invocation:
 *     idi__max( ival, n )
 *
-*  Description :
+*  Description:
 *     Max
 *
-*  Arguments :
+*  Arguments:
 *     ival = int[4]
 *     n = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -220,27 +243,28 @@ return (maxval);
 void refr ( int display, int* iierr )
 
 /*
-*  Name :
+*+
+*  Name:
 *     refr
 *
-*  Purpose :
+*  Purpose:
 *     Refresh
 *
-*  Invocation :
+*  Invocation:
 *     refr( display, iierr )
 *
-*  Description :
+*  Description:
 *     General refresh of image memories
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     iierr = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -335,26 +359,27 @@ return;
 void grefr ( int display, int* iierr )
 
 /*
-*  Name :
+*+
+*  Name:
 *     grefr
 *
-*  Purpose :
+*  Purpose:
 *     Cursors & Roi Refresh
 *
-*  Invocation :
+*  Invocation:
 *     grefr( display, iierr )
 *
-*  Description :
+*  Description:
 *     General refresh of cursors and ROIs
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     iierr = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -419,27 +444,28 @@ return;
 void polyrefr ( int display, int confn, int memid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     polyrefr
 *
-*  Purpose :
+*  Purpose:
 *     Graphics refresh from display list
 *
-*  Invocation :
+*  Invocation:
 *     polyrefr( display, confn, memid )
 *
-*  Description :
+*  Description:
 *     Graphics refresh from display list
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     confn = int
 *     memid = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -488,28 +514,29 @@ return;
 void txtrefr ( int display, int confn, int memid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     txtrefr
 *
-*  Purpose :
+*  Purpose:
 *     Text refresh from display list
 *
-*  Invocation :
+*  Invocation:
 *     txtrefr( display, confn, memid )
 *
-*  Description :
+*  Description:
 *     Text refresh from display list
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     confn = int
 *     memid = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -559,19 +586,20 @@ void mem_dis_conv ( int display, int memid, int xmem, int ymem, int* xdis,
                     int* ydis )
 
 /*
-*  Name :
+*+
+*  Name:
 *     mem_dis_conv
 *
-*  Purpose :
+*  Purpose:
 *     Memory to display coordinate conversion
 *
-*  Invocation :
+*  Invocation:
 *     mem_dis_conv( display, memid, xmem, ymem, xdis, ydis )
 *
-*  Description :
+*  Description:
 *     Memory to display coordinate conversion
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     memid = int
 *     xmem = int
@@ -579,12 +607,12 @@ void mem_dis_conv ( int display, int memid, int xmem, int ymem, int* xdis,
 *     xdis = int
 *     ydis = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     RS:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *      1-FEB_1990 (RS):
@@ -627,19 +655,20 @@ void dis_mem_conv ( int display, int memid, int xdis, int ydis, int* xmem,
                     int* ymem )
 
 /*
-*  Name :
+*+
+*  Name:
 *     dis_mem_conv
 *
-*  Purpose :
+*  Purpose:
 *     Display to memory coordinate conversion
 *
-*  Invocation :
+*  Invocation:
 *     dis_mem_conv( display, memid, xdis, ydis, xmem, ymem )
 *
-*  Description :
+*  Description:
 *     Display to memory coordinate conversion
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     memid = int
 *     xdis = int
@@ -647,12 +676,12 @@ void dis_mem_conv ( int display, int memid, int xdis, int ydis, int* xmem,
 *     xmem = int
 *     ymem = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     RS:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *      1-FEB_1990 (RS):
@@ -693,29 +722,30 @@ return;
 void cl_bitmap ( int display, int confn, int memid, int bck )
 
 /*
-*  Name :
+*+
+*  Name:
 *     cl_bitmap
 *
-*  Purpose :
+*  Purpose:
 *     Clear Main Memory Bitmap
 *
-*  Invocation :
+*  Invocation:
 *     cl_bitmap( display, confn, memid, bck )
 *
-*  Description :
+*  Description:
 *     Clear Main Memory Bitmap
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     confn = int
 *     memid = int
 *     bck = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     11-NOV-1992 (NE):
@@ -753,27 +783,28 @@ return;
 void cl_dl ( int display, int confn, int memid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     cl_dl
 *
-*  Purpose :
+*  Purpose:
 *     Clear Display List
 *
-*  Invocation :
+*  Invocation:
 *     cl_dl( display, confn, memid )
 *
-*  Description :
+*  Description:
 *     Clear Display List
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     confn = int
 *     memid = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -798,29 +829,30 @@ return;
 void mmbm_all ( int display, int confn, int memid, int* iierr )
 
 /*
-*  Name :
+*+
+*  Name:
 *     mmbm_all
 *
-*  Purpose :
+*  Purpose:
 *     Main memory bitmap allocate
 *
-*  Invocation :
+*  Invocation:
 *     mmbm_all( display, confn, memid, iierr )
 *
-*  Description :
+*  Description:
 *     Main memory bitmap allocate
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     confn = int
 *     memid = int
 *     iierr = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     23-MAY-1991 (NE):
@@ -863,27 +895,28 @@ return;
 void mmbm_deall ( int display, int confn, int memid )
 
 /*
-*  Name :
+*+
+*  Name:
 *     mmbm_deall
 *
-*  Purpose :
+*  Purpose:
 *     Main memory bitmap deallocate
 *
-*  Invocation :
+*  Invocation:
 *     mmbm_deall( display, confn, memid )
 *
-*  Description :
+*  Description:
 *     Main memory bitmap deallocate
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     confn = int
 *     memid = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -912,19 +945,20 @@ void wr_mem ( int display, int memid, int x0, int y0, int packf, int iy,
               int dd, int depth, int npixel, int data[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     wr_mem
 *
-*  Purpose :
+*  Purpose:
 *     Write main memory bitmap
 *
-*  Invocation :
+*  Invocation:
 *     wr_mem( display, memid, x0, y0, packf, iy, dd, depth, npixel, data )
 *
-*  Description :
+*  Description:
 *     Write main memory bitmap
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     memid = int
 *     x0 = int
@@ -936,12 +970,12 @@ void wr_mem ( int display, int memid, int x0, int y0, int packf, int iy,
 *     npixel = int
 *     data = int[]
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -1021,19 +1055,20 @@ void rd_mem ( int display, int memid, int x0, int y0, int packf, int npixel,
               int iy, int dd, int depth, int ittf, int data[] )
 
 /*
-*  Name :
+*+
+*  Name:
 *     rd_mem
 *
-*  Purpose :
+*  Purpose:
 *     Read main memory bitmap
 *
-*  Invocation :
+*  Invocation:
 *     rd_mem( display, memid, x0, y0, packf, npixel, iy, dd, depth, ittf, data )
 *
-*  Description :
+*  Description:
 *     Read main memory bitmap
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     memid = int
 *     x0 = int
@@ -1046,11 +1081,11 @@ void rd_mem ( int display, int memid, int x0, int y0, int packf, int npixel,
 *     ittf = int
 *     data = int[]
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     19-OCT-1991 (NE):
@@ -1147,19 +1182,20 @@ return;
 void ebwmy ( int display, int confn, int memid, int x0, int y0, int* iierr )
 
 /*
-*  Name :
+*+
+*  Name:
 *     ebwmy
 *
-*  Purpose :
+*  Purpose:
 *     External bitmap write memory
 *
-*  Invocation :
+*  Invocation:
 *     ebwmy( display, confn, memid, x0, y0, iierr )
 *
-*  Description :
+*  Description:
 *     Write image memory from external bitmap
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     confn = int
 *     memid = int
@@ -1167,11 +1203,11 @@ void ebwmy ( int display, int confn, int memid, int x0, int y0, int* iierr )
 *     y0 = int
 *     iierr = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -1272,16 +1308,17 @@ void eb_openi ( int display, char bmdscr[], int* xsize, int* ysize,
                 int* packf, int* ebdepth, int* idierr )
 
 /*
-*  Name :
+*+
+*  Name:
 *     eb_openi
 *
-*  Purpose :
+*  Purpose:
 *     External Bitmap Open (Read)
 *
-*  Invocation :
+*  Invocation:
 *     eb_openi( display, bmdscr, xsize, ysize, packf, ebdepth, idierr )
 *
-*  Description :
+*  Description:
 *     ad interim format of external bitmap file
 *     eb_label           : 80 char
 *     eb_date            : 6 char
@@ -1291,7 +1328,7 @@ void eb_openi ( int display, char bmdscr[], int* xsize, int* ysize,
 *     data               : Xsize*Ysize/packf int
 *     lut                : 3 * (2**depth) int
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     bmdscr = char[]
 *     xsize = int
@@ -1300,11 +1337,11 @@ void eb_openi ( int display, char bmdscr[], int* xsize, int* ysize,
 *     ebdepth = int
 *     idierr = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     23-MAY-1991 (NE):
@@ -1345,25 +1382,26 @@ return;
 void loc_zero ( int display )
 
 /*
-*  Name :
+*+
+*  Name:
 *     loc_zero
 *
-*  Purpose :
+*  Purpose:
 *     Locator positions zero
 *
-*  Invocation :
+*  Invocation:
 *     loc_zero( display )
 *
-*  Description :
+*  Description:
 *     Locator positions zero
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -1396,20 +1434,21 @@ void test_user ( int display, int nint, short ev_type, short ev_data,
                  short pos[], int ew, int* user_flag, int* trg_flag )
 
 /*
-*  Name :
+*+
+*  Name:
 *     test_user
 *
-*  Purpose :
+*  Purpose:
 *     Test user
 *
-*  Invocation :
+*  Invocation:
 *     test_user( display, nint, ev_type, ev_data, pos, ew,
 *                user_flag, trg_flag )
 *
-*  Description :
+*  Description:
 *     Check USER enabled interaction
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     nint = int
 *     ev_type = short
@@ -1419,10 +1458,10 @@ void test_user ( int display, int nint, short ev_type, short ev_data,
 *     user_flag = int
 *     trg_flag = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -1471,19 +1510,20 @@ void sync_loc ( int display, int nint, short ev_type, short ev_data,
                 short pos[], int* loc_flag )
 
 /*
-*  Name :
+*+
+*  Name:
 *     sync_loc
 *
-*  Purpose :
+*  Purpose:
 *     Sync loc
 *
-*  Invocation :
+*  Invocation:
 *     sync_loc( display, nint, ev_type, ev_data, pos, loc_flag )
 *
-*  Description :
+*  Description:
 *     Test LOCATOR interaction
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     nint = int
 *     ev_type = short
@@ -1491,10 +1531,10 @@ void sync_loc ( int display, int nint, short ev_type, short ev_data,
 *     pos = short[]
 *     loc_flag = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -1525,29 +1565,30 @@ void sync_evl ( int display, int nint, short ev_type, short ev_data,
                 int* evl_flag )
 
 /*
-*  Name :
+*+
+*  Name:
 *     sync_evl
 *
-*  Purpose :
+*  Purpose:
 *     Sync evl
 *
-*  Invocation :
+*  Invocation:
 *     sync_evl( display, nint, ev_type, ev_data, evl_flag )
 *
-*  Description :
+*  Description:
 *     Test EVALUATOR interaction
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     nint = int
 *     ev_type = short
 *     ev_data = short
 *     evl_flag = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -1576,30 +1617,31 @@ void sync_trg ( int display, int nint, short ev_type, short ev_data,
                 int* trg_flag )
 
 /*
-*  Name :
+*+
+*  Name:
 *     sync_trg
 *
-*  Purpose :
+*  Purpose:
 *     Sync trigger
 *
-*  Invocation :
+*  Invocation:
 *     sync_trg( display, nint, ev_type, ev_data, trg_flag )
 *
-*  Description :
+*  Description:
 *     Test TRIGGER interaction
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     nint = int
 *     ev_type = short
 *     ev_data = short
 *     trg_flag = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     30-JUL-1991 (NE):
@@ -1651,27 +1693,28 @@ return;
 void get_loc ( int loc0, int* interactor_id, int* loc_id )
 
 /*
-*  Name :
+*+
+*  Name:
 *     get_loc
 *
-*  Purpose :
+*  Purpose:
 *     Get locator id
 *
-*  Invocation :
+*  Invocation:
 *     get_loc( loc0, interactor_id, loc_id )
 *
-*  Description :
+*  Description:
 *     From absolute locator id get relative (to interactor device) id
 *
-*  Arguments :
+*  Arguments:
 *     loc0 = int
 *     interactor_id = int
 *     loc_id = short
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -1701,27 +1744,28 @@ return;
 void get_evl ( int evl0, int* interactor_id, int* evl_id )
 
 /*
-*  Name :
+*+
+*  Name:
 *     get_evl
 *
-*  Purpose :
+*  Purpose:
 *     Get evaluator id
 *
-*  Invocation :
+*  Invocation:
 *     get_evl( evl0, interactor_id, evl_id )
 *
-*  Description :
+*  Description:
 *     From absolute evaluator id get relative (to interactor device) id
 *
-*  Arguments :
+*  Arguments:
 *     evl0 = int
 *     interactor_id = int
 *     evl_id = short
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -1751,27 +1795,28 @@ return;
 void get_trg ( int trg0, int* interactor_id, int* trg_id )
 
 /*
-*  Name :
+*+
+*  Name:
 *     get_trg
 *
-*  Purpose :
+*  Purpose:
 *     Get trigger id
 *
-*  Invocation :
+*  Invocation:
 *     get_trg( trg0, interactor_id, trg_id )
 *
-*  Description :
+*  Description:
 *     From absolute trigger id get relative (to interactor device) id
 *
-*  Arguments :
+*  Arguments:
 *     trg0 = int
 *     interactor_id = int
 *     trg_id = short
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -1802,19 +1847,20 @@ void cursor_move ( int display, int nint, short ev_type, short ev_data,
                    short pos[], int ew, int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     cursor_move
 *
-*  Purpose :
+*  Purpose:
 *     Cursor move
 *
-*  Invocation :
+*  Invocation:
 *     cursor_move( display, nint, ev_type, ev_data, pos, ew, err )
 *
-*  Description :
+*  Description:
 *     Cursor move
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -1830,10 +1876,10 @@ void cursor_move ( int display, int nint, short ev_type, short ev_data,
 *     err = int
 *        Status
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -1916,19 +1962,20 @@ void roi_move ( int display, int nint, short ev_type, short ev_data,
                 short pos[], int ew, int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     roi_move
 *
-*  Purpose :
+*  Purpose:
 *     Roi move
 *
-*  Invocation :
+*  Invocation:
 *     roi_move( display, nint, ev_type, ev_data, pos, ew, err )
 *
-*  Description :
+*  Description:
 *     Roi move
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -1944,11 +1991,11 @@ void roi_move ( int display, int nint, short ev_type, short ev_data,
 *     err = int
 *        Status
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -2051,19 +2098,20 @@ void roi_modify ( int display, int nint, short ev_type, short ev_data,
                   short pos[], int ew, int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     roi_modify
 *
-*  Purpose :
+*  Purpose:
 *     Roi modify
 *
-*  Invocation :
+*  Invocation:
 *     roi_modify( display, nint, ev_type, ev_data, pos, ew, err )
 *
-*  Description :
+*  Description:
 *     Roi modify
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -2079,11 +2127,11 @@ void roi_modify ( int display, int nint, short ev_type, short ev_data,
 *     err = int
 *        Status
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     21-FEB-1991 (NE):
@@ -2339,19 +2387,20 @@ void lut_rotate ( int display, int nint, short ev_type, short ev_data,
                   int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     lut_rotate
 *
-*  Purpose :
+*  Purpose:
 *     Lut rotate
 *
-*  Invocation :
+*  Invocation:
 *     lut_rotate( display, nint, ev_type, ev_data, err )
 *
-*  Description :
+*  Description:
 *     Lut rotate
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -2363,11 +2412,11 @@ void lut_rotate ( int display, int nint, short ev_type, short ev_data,
 *     err = int
 *        Status
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     23-MAY-1991 (NE):
@@ -2458,19 +2507,20 @@ void lut_slice ( int display, int nint, short ev_type, short ev_data,
                  int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     lut_slice
 *
-*  Purpose :
+*  Purpose:
 *     Lut slice
 *
-*  Invocation :
+*  Invocation:
 *     lut_slice( display, nint, ev_type, ev_data, err )
 *
-*  Description :
+*  Description:
 *     Lut slice
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -2482,11 +2532,11 @@ void lut_slice ( int display, int nint, short ev_type, short ev_data,
 *     err = int
 *        Status
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     23-MAY-1991 (NE):
@@ -2558,19 +2608,20 @@ void mem_scroll ( int display, int nint, short ev_type, short ev_data,
                   short pos[], int ew, int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     mem_scroll
 *
-*  Purpose :
+*  Purpose:
 *     Memory scroll
 *
-*  Invocation :
+*  Invocation:
 *     mem_scroll( display, nint, ev_type, ev_data, pos, ew, err )
 *
-*  Description :
+*  Description:
 *     Memory scroll
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -2586,10 +2637,10 @@ void mem_scroll ( int display, int nint, short ev_type, short ev_data,
 *     err = int
 *        Status
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 */
@@ -2660,19 +2711,20 @@ return;
 void mem_zoom ( int display, int nint, short ev_type, short ev_data, int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     mem_zoom
 *
-*  Purpose :
+*  Purpose:
 *     Memory zoom
 *
-*  Invocation :
+*  Invocation:
 *     mem_zoom( display, nint, ev_type, ev_data, err )
 *
-*  Description :
+*  Description:
 *     Interactive zoom execution, connected to a trigger
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -2684,11 +2736,11 @@ void mem_zoom ( int display, int nint, short ev_type, short ev_data, int* err )
 *     err = int
 *        Status
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     30-APR-1991 (NE):
@@ -2739,19 +2791,20 @@ void mem_unzoom ( int display, int nint, short ev_type, short ev_data,
                   int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     mem_unzoom
 *
-*  Purpose :
+*  Purpose:
 *     Memory unzoom
 *
-*  Invocation :
+*  Invocation:
 *     mem_unzoom( display, nint, ev_type, ev_data, err )
 *
-*  Description :
+*  Description:
 *     Interactive unzoom execution, connected to a trigger
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -2763,11 +2816,11 @@ void mem_unzoom ( int display, int nint, short ev_type, short ev_data,
 *     err = int
 *        Status
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     30-APR-1991 (NE):
@@ -2820,19 +2873,20 @@ void mem_clzoom ( int display, int nint, short ev_type, short ev_data,
                   int* err )
 
 /*
-*  Name :
+*+
+*  Name:
 *     mem_clzoom
 *
-*  Purpose :
+*  Purpose:
 *     Memory clzoom
 *
-*  Invocation :
+*  Invocation:
 *     mem_clzoom( display, nint, ev_type, ev_data, err )
 *
-*  Description :
+*  Description:
 *     Interactive clear zoom execution, connected to a trigger
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *        Display identifier
 *     nint = int
@@ -2844,11 +2898,11 @@ void mem_clzoom ( int display, int nint, short ev_type, short ev_data,
 *     err = int
 *        Status
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     30-APR-1991 (NE):
@@ -2899,19 +2953,20 @@ void polyline_dl ( int display, int memid, int color, int style, int xs[],
                    int ys[], int np )
 
 /*
-*  Name :
+*+
+*  Name:
 *     polyline_dl
 *
-*  Purpose :
+*  Purpose:
 *     Polyline : display list management
 *
-*  Invocation :
+*  Invocation:
 *     polyline_dl( display, memid, color, style, xs, ys, np )
 *
-*  Description :
+*  Description:
 *     Polyline : display list management
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     memid = int
 *     color = int
@@ -2920,11 +2975,11 @@ void polyline_dl ( int display, int memid, int color, int style, int xs[],
 *     ys = int[]
 *     np = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     23-MAY-1991 (NE):
@@ -2986,19 +3041,20 @@ void text_dl ( int display, int memid, char text[], int x0, int y0, int path,
                int orient, int color, int size )
 
 /*
-*  Name :
+*+
+*  Name:
 *     text_dl
 *
-*  Purpose :
+*  Purpose:
 *     Text : display list management
 *
-*  Invocation :
+*  Invocation:
 *     text_dl( display, memid, text, x0, y0, path, orient, color, size )
 *
-*  Description :
+*  Description:
 *     Text : display list management
 *
-*  Arguments :
+*  Arguments:
 *     display = int
 *     memid = int
 *     text = char[]
@@ -3009,11 +3065,11 @@ void text_dl ( int display, int memid, char text[], int x0, int y0, int path,
 *     color = int
 *     size = int
 *
-*  Authors :
+*  Authors:
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     26-OCT-1988 (SANTIN):
 *        Orignal version
 *     23-MAY-1991 (NE):

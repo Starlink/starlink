@@ -71,6 +71,7 @@ idi_test_LDADD = libidi_adam.la `ndf_link_adam` `gwm_link_adam` \
 `gns_link_adam` `cnf_link_adam` $(X_LIBS) $(X_EXTRA_LIBS) $(X_PRE_LIBS) -lX11
 
 dist_starnews_DATA = idi.news
+dist_pkgdata_DATA = LICENCE
 
 EXTRA_DIST = xworks.dct
 
