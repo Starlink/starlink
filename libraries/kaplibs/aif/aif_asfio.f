@@ -13,13 +13,13 @@
 *  Invocation:
 *     CALL AIF_ASFIO( PNFILE, ACMODE, FORM, RECSZ, FD, OPEN, STATUS )
 
-*  Description :
+*  Description:
 *     This routine opens a sequential file via FIO_ASSOC.  Up to four
 *     attempts may be made to open the file.  If a null response is
 *     supplied the file is not opened, and the flag returned indicates
 *     this fact.
 
-*  Arguments :
+*  Arguments:
 *     PNFILE = CHARACTER*(*)
 *         Parameter name by which file is to be opened
 *     ACMODE = CHARACTER*(*)
@@ -40,7 +40,7 @@
 *     STATUS = INTEGER( READ, WRITE )
 *         Global status value
 
-*  Method :
+*  Method:
 *     Check for error on entry - return if not o.k.
 *     Initialise looping flag
 *     Do while no error obtaining the name and opening the output file
@@ -69,13 +69,33 @@
 *     Endif
 *     Return
 
-*  Bugs :
+*  Bugs:
 *     None known.
 
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1989, 1990 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
 
-*  History :
+*  History:
 *     1989 Jul 25: Original (RL.STAR::CUR).
 *     1990 Feb 20: Renamed from AIF_OPFIO (RAL::CUR).
 *-
