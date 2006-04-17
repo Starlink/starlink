@@ -52,7 +52,8 @@ ADAM_GRAPHIC_F_ROUTINES = $(KPG_GRAPHIC_ADAM_NONGEN)
 GEN_F_ROUTINES = $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
 	$(KPG_DIR_GEN:.gdir=.f) $(KPG_NXD_GEN:.gnxd=.f) \
 	$(KPG_BDIRW_GEN:.gbdirw=.f) $(KPG_NXB_GEN:.gnxb=.f) \
-	$(KPG_XC_GEN:.gxc=.f) $(KPG_XL_GEN:.gxl=.f)
+	$(KPG_XC_GEN:.gxc=.f) $(KPG_XL_GEN:.gxl=.f) \
+	$(KPG_BIRW_GEN:.gbirw=.f)
 
 GRAPHIC_GEN_F_ROUTINES = $(KPG_GRAPHIC_DR_GEN:.gdr=.f)
 
@@ -87,6 +88,9 @@ KPG_XC_GEN = kpg1_retv.gxc
 # All except unsigned types
 KPG_BDIRW_GEN = kpg1_iscl.gbdirw kpg1_flas.gbdirw
 
+# All except unsigned types and double
+KPG_BIRW_GEN = chval.gbirw
+
 # Double and REAL
 KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr \
 kpg1_stds.gdr kpg1_stfl.gdr kpg1_ssaz.gdr kpg1_ainb.gdr \
@@ -116,10 +120,6 @@ bad2dr.f \
 bad2dub.f \
 bad2duw.f \
 bad2dw.f \
-chvalb.f \
-chvali.f \
-chvalr.f \
-chvalw.f \
 copad.f \
 copai.f \
 copar.f \
@@ -496,6 +496,9 @@ kpg1_pltln.f
 	$(FGENERIC) $(<)
 
 .gbdirw.f:
+	$(FGENERIC) $(<)
+
+.gbirw.f:
 	$(FGENERIC) $(<)
 
 AM_FCFLAGS = -I../ira
