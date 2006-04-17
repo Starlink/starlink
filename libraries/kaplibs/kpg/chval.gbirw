@@ -1,31 +1,30 @@
-      SUBROUTINE CHVALR( DIM, INARR, OLDVAL, NEWVAL, OUTARR, STATUS )
-*
-*    Description :
-*
+      SUBROUTINE CHVAL<T>( DIM, INARR, OLDVAL, NEWVAL, OUTARR, STATUS )
+*+
+*  Name:
+*     CHVAL<T>
+
+*  Description:
 *     This routine replaces a specified pixel with an input
 *     value and returns the old value of the pixel.
 *
-*    Invocation :
-*
-*     CALL CHVALR( DIM, INARR, OLDVAL, NEWVAL, OUTARR, STATUS )
-*
-*    Arguments :
-*
+*  Invocation:
+*     CALL CHVAL<T>( DIM, INARR, OLDVAL, NEWVAL, OUTARR, STATUS )
+
+*  Arguments:
 *     DIM = INTEGER( READ )
 *         The dimension of the input array
-*     INARR( DIM ) = REAL( READ )
+*     INARR( DIM ) = <TYPE> ( READ )
 *         The input data array
-*     OLDVAL = REAL( READ )
+*     OLDVAL = <TYPE> ( READ )
 *         Value to be replaced
-*     NEWVAL = REAL( READ )
+*     NEWVAL = <TYPE> ( READ )
 *         New value to be substituted for the %OLDVAL.
-*     OUTARR( DIM ) = REAL( READ )
+*     OUTARR( DIM ) = <TYPE> ( READ )
 *         The output data array containing the modified pixel values
 *     STATUS  =  INTEGER( READ )
 *         Global status value
-*
-*    Method :
-*
+
+*  Method:
 *     If global status is ok. then
 *     For all pixels
 *        If pixel value is the value to be removed then
@@ -34,55 +33,50 @@
 *     Endfor
 *     End
 *
-*    Bugs :
-*
+*  Bugs:
 *     None are known at this time.
-*
-*    Authors :
-*
+
+*  Authors:
 *     Malcolm J. Currie STARLINK (RAL::CUR)
-*
-*    History :
-*
-*     1988 Oct 26 : Original (RAL::CUR).
-*     1990 Nov 24 : Used double precision for processing large
-*                   integer values (RAL::CUR).
-*
-*    Type Definitions :
- 
+
+*  History:
+*     26-OCT-1988 (MJC):
+*         Original.
+*     24-NOV-1990 (MJC):
+*         Used double precision for processing large integer values.
+*     17-APR-2006 (TIMJ):
+*         Make generic
+
+*-
+
+*  Type Definitions:
       IMPLICIT  NONE           ! No default typing allowed
  
-*    Global constants :
- 
+*  Global constants:
       INCLUDE  'SAE_PAR'       ! Global SSE definitions
       INCLUDE  'PRM_PAR'       ! Machine-precision constant
  
-*    Import :
- 
+*  Import:
       INTEGER
      :  DIM
  
-      REAL
+      <TYPE>
      :  INARR( DIM ),
      :  NEWVAL,
      :  OLDVAL
  
-*    Export :
- 
-      REAL
+*  Export:
+      <TYPE>
      :  OUTARR( DIM )
  
-*    Status :
- 
+*  Status:
       INTEGER  STATUS
  
-*    External references :
- 
+*  External references:
       DOUBLE PRECISION
-     :  VAL_RTOD             ! Data-conversion external function
+     :  VAL_<T>TOD             ! Data-conversion external function
  
-*    Local variables :
- 
+*  Local variables:
       INTEGER
      :  I                      ! Loop counter
  
@@ -92,8 +86,8 @@
                                ! for them to be regarded as identical
      :  FPOLD                  ! Floating-point value to be replaced
  
-*-
- 
+*.
+
 *    Error check on entry - return if not ok.
  
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -103,13 +97,13 @@
 *    the value to be replaced.  The machine precision defines the
 *    minimum detectable difference.
  
-      FPOLD = 0.5 * VAL_RTOD( .FALSE., OLDVAL, STATUS )
+      FPOLD = 0.5 * VAL_<T>TOD( .FALSE., OLDVAL, STATUS )
       DIFF = ABS( FPOLD * VAL__EPSD )
       DO  I = 1, DIM, 1
  
 *       The halving is done to prevent overflows.
  
-         IF ( ABS( ( VAL_RTOD( .FALSE., INARR( I ), STATUS ) * 0.5 )
+         IF ( ABS( ( VAL_<T>TOD( .FALSE., INARR( I ), STATUS ) * 0.5 )
      :        - FPOLD ) .LE. DIFF ) THEN
  
 *          A match has been found so replace the value in the output

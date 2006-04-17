@@ -87,7 +87,8 @@ kpg1_stds.f
 kpg1_stfl.f
 kpg1_thrs.f
 kpg1_trig.f
- *.lo
+chval.f
+*.lo
 *.la
 Makefile
 Makefile.in
