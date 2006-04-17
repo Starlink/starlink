@@ -1,7 +1,47 @@
-/* A C/ADAM version of the MERS test program
- * to test the installation of the C interface and ADAM link scripts
- * Note that <> is used to ensure that the installed include files are used
- */
+/*
+*+
+*  Name:
+*     err_test
+
+*  Purpose:
+*     A C/ADAM version of the MERS test program
+
+*  Description:
+*     To test the installation of the C interface and ADAM link scripts
+
+*  Copyright:
+*     Copyright (C) 2003 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     NXG: Norman Gray (Starlink)
+*     {enter_authors_here}
+
+*  History:
+*     15-DEC-2003 (NXG):
+*         Autoconf.
+
+*  Notes:
+*     Note that <> is used to ensure that the installed include files are used
+
+*-
+*/
 #include <sae_par.h>
 #include <mers.h>
 err_test(int *status) {
