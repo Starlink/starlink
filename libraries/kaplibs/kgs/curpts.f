@@ -1,79 +1,35 @@
-*+  CURPTS - define points in an image via the cursor
-
       SUBROUTINE CURPTS( NPTS, EXACT, MAXCHO, MARK, ERASE, CROSHT,
      :                   CONECT, DSTNCT, XLOW, XHIGH, YLOW, YHIGH,
      :                   XCUR, YCUR, NOBT, X, Y, STATUS )
-*
-*    Description :
-*
-*     This subroutine enables use of the cursor of the current graphics 
+*+
+*  Name:
+*     CURPTS
+
+*  Purpose:
+*     define points in an image via the cursor.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL CURPTS( NPTS, EXACT, MAXCHO, MARK, ERASE, CROSHT, CONECT,
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     This subroutine enables use of the cursor of the current graphics
 *     device to select a defined number of points whose co-ordinates are
 *     returned.  Only positions between defined limits are accepted.
 *     Optionally a cross may be drawn at each point, and each point may
 *     be forced to be distinct.  Also lines may be drawn connecting
 *     successive points.
-*
-*    Invocation :
-*
-*      CALL CURPTS( NPTS, EXACT, MAXCHO, MARK, ERASE, CROSHT, CONECT,
-*    :              DSTNCT, XLOW, XHIGH, YLOW, YHIGH, XCUR, YCUR, NOBT,
-*    :              X, Y, STATUS )
-*
-*    Arguments :
-*
-*     NPTS = INTEGER( READ )
-*         Number of points to be determined with the cursor.
-*     EXACT = LOGICAL( READ )
-*         True if exactly %NPTS are required.  This just changes the
-*           commentary.  It is ignored when only one point is required.
-*     MAXCHO = INTEGER( READ )
-*         Maximum choice number for the choice to be a valid selection.
-*           A choice with a higher value than this cause this routine to
-*           end.
-*     MARK = LOGICAL( READ )
-*         True if each point selected is marked with a cross.
-*     ERASE = LOGICAL( READ )
-*         True if each marked point is erased upon completion.  It is
-*           ignored unless %MARK is true.  This may not work on some
-*           devices.
-*     CROSHT = REAL( READ )
-*         Height of the marking cross.
-*     CONECT = LOGICAL( READ )
-*         True if successive points are connected by straight lines.
-*     DSTNCT = LOGICAL( READ )
-*         True if each point selected is to be distinct.
-*     XLOW = REAL( READ )
-*         Lower x co-ordinate that defines the region in which all
-*           points selected by the cursor must lie.
-*     XHIGH = REAL( READ )
-*         Upper x co-ordinate that defines the region in which all
-*           points selected by the cursor must lie.
-*     YLOW = REAL( READ )
-*         Lower y co-ordinate that defines the region in which all
-*           points selected by the cursor must lie.
-*     YHIGH = REAL( READ )
-*         Upper y co-ordinate that defines the region in which all
-*           points selected by the cursor must lie.
-*     XCUR = REAL( READ )
-*         X co-ordinate of the position where the cursor will first
-*           appear. This is usually the last location of the cursor
-*           or the centre of the picture.
-*     YCUR = REAL( READ )
-*         Y co-ordinate of the position where the cursor will first
-*           appear
-*     NOBT = INTEGER( WRITE )
-*         Number of points obtained with the cursor. This is usually
-*           the same as %NPTS, but should be tested in case there
-*           has been an error or a premature exit.
-*     X( NPTS ) = REAL( WRITE )
-*         The x co-ordinates of the points measured by the cursor.
-*     Y( NPTS ) = REAL( WRITE )
-*         The y co-ordinates of the points measured by the cursor.
-*     STATUS  = INTEGER( READ, WRITE )
-*         Global status value
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     Inform the user what is expected depending on the number of
 *       points, whether or not an exact number required, whether or not
@@ -85,7 +41,7 @@
 *           Replace it with the background colour
 *        Endif
 *     Endif
-*     Repeat until the required number of positions have been chosen or 
+*     Repeat until the required number of positions have been chosen or
 *       an exit button has been depressed or there is an error
 *        Repeat until a valid position has been chosen or an exit button
 *             has been pressed or there is an error
@@ -121,41 +77,65 @@
 *        Restore input pen number
 *     Endif
 *     End
-*
-*    Authors :
-*
+
+*  Copyright:
+*     Copyright (C) 1989, 1990, 1991, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     Malcolm Currie   STARLINK (RAL::CUR)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     1989 Nov 10: Original (RAL::CUR).
 *     1990 Feb 1 : Added optional lines between points, accidently
-*                  omitted in the original (RAL::CUR).
+*        omitted in the original (RAL::CUR).
 *     1990 May 2 : Added EXACT and ERASE arguments and functionality
-*                  (RAL::CUR).
+*        (RAL::CUR).
 *     1991 Mar 13: Used aspect source flags set to individual to erase
-*                  crosses, rather than set polyline representation
-*                  (RAL::CUR).
+*        crosses, rather than set polyline representation
+*        (RAL::CUR).
 *     1993 Nov 10: Made erasure dependent on the ERASE argument.
-*                  (RAL::CUR).
+*        (RAL::CUR).
 *     1993 Dec  6: Fixed bug that could give an incorrection rejection
-*                  of distinct points when x or y positions were the
-*                  the same. (RAL::CUR).
-*
-*    Type Definitions :
+*        of distinct points when x or y positions were the
+*        the same. (RAL::CUR).
+*     {enter_further_changes_here}
 
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global Constants :
 
+*  Global Constants:
       INCLUDE 'SAE_PAR'         ! SSE definitions
 
-*    Status :
 
+*  Status:
       INTEGER STATUS
 
-*    Import :
 
+*  Arguments Given:
       INTEGER
      :  NPTS,                   ! Number of points to be obtained
      :  MAXCHO                  ! Maximum choice number to accept a
@@ -179,8 +159,8 @@
      :  XHIGH, YHIGH            ! Upper bound of the region for
                                 ! valid cursor positions
 
-*    Export :
 
+*  Arguments Returned:
       INTEGER
      :  NOBT                    ! Number of points obtained
 
@@ -188,8 +168,8 @@
      :  X( NPTS ),              ! x co-ordinates of chosen points
      :  Y( NPTS )               ! y co-ordinates of chosen points
 
-*    Local Variables :
 
+*  Local Variables:
       INTEGER
      :  COLI,                   ! Polyline colour index
      :  GSTAT,                  ! GKS status
@@ -223,7 +203,9 @@
      :  DYNAMC                  ! Polyline colour representation is
                                 ! dynamic
 
-*-
+
+*.
+
 *    Check status on entry - return if not o.k.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -277,7 +259,7 @@
             CALL SGS_ICURW( WKID )
             CALL DYNCLR( WKID, DYNAMC, STATUS )
 
-*          Display surface will clear at the end of an application 
+*          Display surface will clear at the end of an application
 *          unless it is dynamic.
 
             IF ( DYNAMC .AND. STATUS .EQ. SAI__OK ) THEN

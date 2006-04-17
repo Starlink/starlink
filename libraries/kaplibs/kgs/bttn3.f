@@ -1,10 +1,25 @@
-*+  BTTN3 - Displays trackerball box menu on an image display for
-*           trackerballs with at least two choices
-
       SUBROUTINE BTTN3( LB1, LB2, LBE, LTX, LTY, USECUR, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     BTTN3
+
+*  Purpose:
+*     Displays trackerball box menu on an image display for.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL BTTN3( LB1, LB2, LBE, LTY, LTX, USECUR, STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     This subroutine draws three boxes at the bottom of the image-
 *     display screen in which the function of the first two buttons and
 *     the escape button of the trackerball box are written.  If the
@@ -15,36 +30,8 @@
 *     and right), the message beside it indicating the effect moving the
 *     trackerball in x has.  If either label is set to '*' then the
 *     message and the corresponding arrow will not be plotted.
-*
-*    Invocation :
-*
-*     CALL BTTN3( LB1, LB2, LBE, LTY, LTX, USECUR, STATUS )
-*
-*    Arguments :
-*
-*     LB1 = CHAR*(*)( READ )
-*           This is the label indicating what effect pressing
-*           the first (or leftmost) button has.
-*     LB2 = CHAR*(*)( READ )
-*           This is the label indicating what effect pressing
-*           the second (or second-from-left) button has.
-*     LBE = CHAR*(*)( READ )
-*           This is the label indicating what effect pressing
-*           the escape (or rightmost) button has.
-*     LTX = CHAR*(*)( READ )
-*           This is the label indicating what effect moving
-*           the trackerball in the x direction has.
-*     LTY = CHAR*(*)( READ )
-*           This is the label indicating what effect moving
-*           the trackerball in the y direction has.
-*     USECUR = LOGICAL( READ )
-*           This is a flag which is set only if the trackerball
-*           is to be used.
-*     STATUS = INTEGER( READ )
-*           This is the status value on entering this routine.
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     Save the input graphics parameters
 *     Clear the current workstation
@@ -66,28 +53,52 @@
 *     Reset the graphics attributes to their entry values
 *     If there was a graphics error, report context
 *     End
-*
-*    Authors :
-*
+
+*  Copyright:
+*     Copyright (C) 1987, 1988, 1990 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     1987 Sep 3  : Original based on Ken Hartley's modified KFH_BTTN4
-*                   (BTTN4) (RL.STAR::CUR).
+*        (BTTN4) (RL.STAR::CUR).
 *     1988 Jun 23 : Added GKS status check (RL.STAR::CUR).
 *     1990 Jan 9  : Corrected SGS status (RL.STAR::CUR).
-*
-*    Type Definitions :
+*     {enter_further_changes_here}
 
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global Constants :
 
+*  Global Constants:
       INCLUDE 'SAE_PAR'
 
-*    Import :
 
+*  Arguments Given:
       CHARACTER*(*)
      :    LB1,
      :    LBE,
@@ -97,12 +108,12 @@
 
       LOGICAL USECUR
 
-*    Status :
 
+*  Status:
       INTEGER STATUS
 
-*    Local Constants :
 
+*  Local Constants:
       INTEGER
      :    BLUE,                 ! Number of blue pen
      :    GREEN,                ! Number of green pen
@@ -142,10 +153,9 @@
       PARAMETER( XARRR = 0.5833 )
       PARAMETER( RADCIR = 0.55 * ARROWL )
       PARAMETER( BOXHT = 0.1 )
-      
 
-*    Local variables :
 
+*  Local Variables:
 *        Stored input set up data:
 
       INTEGER
@@ -174,7 +184,9 @@
      :    DELTX,                ! Space in x between boxes
      :    ENDAR,                ! End of an arrow
      :    YOFF                  ! Y offset of box
-*-
+
+*.
+
 
 *    If the status value is bad, then return to the calling program.
 
@@ -207,7 +219,7 @@
      :     STATUS )
 
          GOTO 999
-      END IF         
+      END IF
 
       IF ( USECUR ) THEN
          YOFF = YOFFS
@@ -380,7 +392,7 @@
      :     'BTTN3: Error while resetting the zone of the graphics '/
      :     /'device.', STATUS )
 
-      END IF         
+      END IF
 
 *    Reset the character height.
 

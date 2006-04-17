@@ -1,30 +1,30 @@
-*+  DYNCLR - Has the specified graphics workstation a dynamic colour 
-*            representation?
-
       SUBROUTINE DYNCLR( WKID, DYNAMC, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     DYNCLR
+
+*  Purpose:
+*     Has the specified graphics workstation a dynamic colour.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL DYNCLR( WKID, DYNAMC, STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     For the current GKS workstation determine whether or not the
 *     colour representation is dynamic.  GKS must be in state WSOP or
 *     WSAC.
-*
-*    Invocation :
-*
-*     CALL DYNCLR( WKID, DYNAMC, STATUS )
-*
-*    Arguments:
-*
-*     WKID   = INTEGER( READ )
-*         GKS workstation identifier
-*     DYNAMC  = LOGICAL( WRITE )
-*         If true the colour representation is changeable for the
-*           current GKS workstation
-*     STATUS  = INTEGER( READ, WRITE )
-*         Global status value
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     Inquire the workstation type
 *     Inquire whether GKS has reported an error
@@ -37,39 +37,63 @@
 *        Report context and exit
 *     Endif
 *     End
-*
-*    Authors :
-*
-*     Malcolm J. Currie  Starlink (RAL::CUR)
-*
-*    History :
-*
-*     1989 Apr 13: Original (RAL::CUR).
-*
-*    Type Definitions :
 
+*  Copyright:
+*     Copyright (C) 1989 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     Malcolm J. Currie  Starlink (RAL::CUR)
+*     {enter_new_authors_here}
+
+*  History:
+*     1989 Apr 13: Original (RAL::CUR).
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE            ! no implicit typing allowed
 
-*    Global constants :
 
+*  Global Constants:
       INCLUDE  'SAE_PAR'       ! global SSE definitions
 
-*    Import :
 
+*  Arguments Given:
       INTEGER
      :    WKID
 
-*    Export :
 
+*  Arguments Returned:
       LOGICAL
      :    DYNAMC
 
-*    Status :
 
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
 
+*  Local Variables:
       INTEGER
      :    COLREP,              ! colour representation changeable?
      :    CONID,               ! connection identifier
@@ -82,7 +106,9 @@
      :    WKTR,                ! dummy for GQDWKA
      :    WTYPE                ! workstation type
 
-*-
+
+*.
+
 *    check status on entry - return if not o.k.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
