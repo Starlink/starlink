@@ -62,6 +62,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,6 +76,8 @@
 *        Allowed axes to be insignificant by passing a negative NDIM,
 *        calling KPG1_SDIMP instead of KPG1_SGDIM, and setting the scale
 *        and offset.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -89,6 +92,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Arguments Given:
       INTEGER
@@ -174,8 +178,9 @@
 
 *  Find the range of the axis co-ordinates and whether or not the axis
 *  is linear.
-            CALL KPG1_AXLI<T>( AEL, %VAL( AXPNTR( 1 ) ), DALBND( I ),
-     :                         DAUBND( I ), AXLIN( I ), STATUS )
+            CALL KPG1_AXLI<T>( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                         DALBND( I ), DAUBND( I ), AXLIN( I ),
+     :                         STATUS )
 
 *  Let the application complete without an error if the world
 *  co-ordinates are non-linear, but issue a warning.
@@ -215,8 +220,8 @@
 *  the data-co-ordinate value of the single axis position, obtained by
 *  the bounds-finding routine.
          ELSE
-            CALL KPG1_AXBN<T>( AEL, %VAL( AXPNTR( 1 ) ), DALBND( I ),
-     :                         DAUBND( I ), STATUS )
+            CALL KPG1_AXBN<T>( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                         DALBND( I ), DAUBND( I ), STATUS )
             SCALE( I ) = 0<CONST>
             OFFSET( I ) = DALBND( I )
             IDENTY = .FALSE.
