@@ -188,13 +188,21 @@ dau_free_flq( void ) {
 
   /* Free all the chunks */
   for (i = 0; i < npntrs; i++) {
-     _invoke(rec_deall_mem( DAT_K_CLUSTER * sizeof( struct LCP ),
- 			   (void **)&malloced[i] ));
+    if (malloced[i] != NULL) {
+      _invoke(rec_deall_mem( DAT_K_CLUSTER * sizeof( struct LCP ),
+			     (void **)&malloced[i] ));
+    }
   }
-  
+  /* No longer have an pointers */
+  npntrs = 0;
+
   /* and the container */
   _invoke(rec_deall_mem( totpntrs * sizeof(struct LCP*),
 			 (void **)&malloced));
+
+  /* Reset values in case we are called twice */
+  totpntrs = 0;
+
   return hds_gl_status;
 }
 
