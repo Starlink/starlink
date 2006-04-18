@@ -9,6 +9,7 @@ FILE *fd;   /*  A pointer to the FILE structure identifying the open file */
 F77_INTEGER_FUNCTION(fopen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
                        TRAIL(access) ){
 /*
+ *+
  *  Name:
  *    fopen
  
@@ -29,7 +30,35 @@ F77_INTEGER_FUNCTION(fopen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
  *    ISTAT = INTEGER (Returned)
  *       Status: 0 = failure, 1 = success
 
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Engineering Research Council.
+*     All Rights Reserved.
 
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+ *  Authors:
+ *    DSB: David S. Berry (Starlink)
+ *    TIMJ: Tim Jenness (JAC, Hawaii)
+
+ *  History:
+ *    16-APR-2006 (TIMJ):
+ *        Add prolog.
+
+ *-
  */   
       GENPTR_CHARACTER(name)
       GENPTR_CHARACTER(access)
@@ -96,6 +125,7 @@ F77_INTEGER_FUNCTION(fopen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
 
 F77_INTEGER_FUNCTION(fclose)( void  ){
 /*
+ *+
  *  Name:
  *    fclose
  
@@ -109,7 +139,7 @@ F77_INTEGER_FUNCTION(fclose)( void  ){
  *    ISTAT = INTEGER (Returned)
  *       Status: 0 = failure, 1 = success
 
-
+ *-
  */   
 
       if( fclose( fd ) ){
@@ -124,6 +154,7 @@ F77_INTEGER_FUNCTION(fclose)( void  ){
 
 F77_INTEGER_FUNCTION(fwriter)( REAL(data), INTEGER(n) ){
 /*
+ *+
  *  Name:
  *    fwriter
  
@@ -144,6 +175,7 @@ F77_INTEGER_FUNCTION(fwriter)( REAL(data), INTEGER(n) ){
  *    ISTAT = INTEGER (Returned)
  *        Status: 0 = failure, 1 = success
 
+ *-
  */   
       GENPTR_REAL(data)
       GENPTR_INTEGER(n)
@@ -162,6 +194,7 @@ F77_INTEGER_FUNCTION(fwriter)( REAL(data), INTEGER(n) ){
 
 F77_INTEGER_FUNCTION(fwrited)( DOUBLE(data), INTEGER(n) ){
 /*
+ *+
  *  Name:
  *    fwrited
  
@@ -182,6 +215,7 @@ F77_INTEGER_FUNCTION(fwrited)( DOUBLE(data), INTEGER(n) ){
  *    ISTAT = INTEGER (Returned)
  *        Status: 0 = failure, 1 = success
 
+ *-
  */   
       GENPTR_DOUBLE(data)
       GENPTR_INTEGER(n)
@@ -200,6 +234,7 @@ F77_INTEGER_FUNCTION(fwrited)( DOUBLE(data), INTEGER(n) ){
 
 F77_INTEGER_FUNCTION(fwritei)( INTEGER(data), INTEGER(n) ){
 /*
+ *+
  *  Name:
  *    fwritei
  
@@ -220,6 +255,7 @@ F77_INTEGER_FUNCTION(fwritei)( INTEGER(data), INTEGER(n) ){
  *    ISTAT = INTEGER (Returned)
  *        Status: 0 = failure, 1 = success
 
+ *-
  */   
       GENPTR_INTEGER(data)
       GENPTR_INTEGER(n)
@@ -236,6 +272,7 @@ F77_INTEGER_FUNCTION(fwritei)( INTEGER(data), INTEGER(n) ){
 
 F77_INTEGER_FUNCTION(fwritec)( CHARACTER(data) TRAIL(data) ){
 /*
+ *+
  *  Name:
  *    fwritec
  
@@ -257,6 +294,7 @@ F77_INTEGER_FUNCTION(fwritec)( CHARACTER(data) TRAIL(data) ){
  *    ISTAT = INTEGER (Returned)
  *        Status: 0 = failure, 1 = success
 
+ *-
  */   
       GENPTR_CHARACTER(data)
 

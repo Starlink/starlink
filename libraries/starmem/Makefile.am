@@ -30,6 +30,7 @@ check_PROGRAMS = memtest
 memtest_SOURCES = memtest.c
 memtest_LDADD = libstarmem.la
 
+dist_pkgdata_DATA = LICENCE
 
 # Need to modify some files during make
 edit = sed \
