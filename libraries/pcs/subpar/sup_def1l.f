@@ -17,8 +17,8 @@
 *  Description:
 *     Set default values for a vector primitive object associated with
 *     a Parameter.
-*     If there are six or less values they are stored in COMMON. The COMMON 
-*     area used corresponds with the type of value supplied. If the type and 
+*     If there are six or less values they are stored in COMMON. The COMMON
+*     area used corresponds with the type of value supplied. If the type and
 *     number enables previously allocated dynamic default storage to be re-
 *     used, that is done, otherwise new storage is allocated.
 *     If there are more than six values, or there is no more storage space
@@ -27,7 +27,7 @@
 *     to be called by the corresponding SUBPAR_DEF0 routine.
 *
 *     PARDYN(1,-) is set = 0 by SUBPAR activation (PARSECON_NEWPAR or
-*     SUBPAR_LDIFC0/1), to the supplied dynamic default type by this routine 
+*     SUBPAR_LDIFC0/1), to the supplied dynamic default type by this routine
 *     (or 20+type by SUBPAR_DEFN) and is negated if the dynamic default is
 *     cancelled (by SUBPAR_UNSET) - the same allocated space can then be re-
 *     used within the same task invocation.
@@ -49,6 +49,26 @@
 *        Array containing the default values .
 *     STATUS=INTEGER
  
+*  Copyright:
+*     Copyright (C) 1984, 1986, 1990, 1992, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)

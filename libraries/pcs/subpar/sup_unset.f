@@ -18,12 +18,12 @@
 *     Which values are to be unset is decided by the value of KEYS,
 *     which may be a list of zero or more keywords, separated by commas
 *     or spaces. The keywords may be:
-*          DEFAULT to cancel the dynamic default (set by SUBPAR_DEFnx 
+*          DEFAULT to cancel the dynamic default (set by SUBPAR_DEFnx
 *              or DAT_DEF),
 *          MINIMUM to cancel the minimum value (set by SUBPAR_MIN) or
 *          MAXIMUM to cancel the maximum value (set by SUBPAR_MAX).
 *     The keywords may be abbreviated to their minimum unambiguous form.
-*     The case of KEYS is unimportant. If it is blank, none of the values 
+*     The case of KEYS is unimportant. If it is blank, none of the values
 *     will be unset.
 *     The routine will operate regardless of the given STATUS value and will
 *     not report or set STATUS if the specified values have not been set or
@@ -41,6 +41,26 @@
 *        The global status.
 *        The routine is executed regardless of the import value of STATUS.
 *
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
@@ -127,7 +147,7 @@
 *           and if this is the first match, note the index
                IF ( NMATCH .EQ. 0 ) THEN
                   NMATCH = I
-*           Otherwise set NMATCH to negative of first match to indicate 
+*           Otherwise set NMATCH to negative of first match to indicate
 *           ambiguity
                ELSE IF ( NMATCH .GT. 0 ) THEN
                   NMATCH = -NMATCH

@@ -14,16 +14,16 @@
 
 *  Description:
 *     The routine does any required expansion of logical names in the LIBRARY
-*     specification. 
+*     specification.
 *
 *     The LIBRARY name must be in a form acceptable to to platform on which
 *     the program is runnung except that, in the interests of allowing common
-*     code, LIBRARY may take the form $ENV/name or ENV:name, where ENV is a 
-*     logical-name/environment-variable. Either the ENV component or the name 
+*     code, LIBRARY may take the form $ENV/name or ENV:name, where ENV is a
+*     logical-name/environment-variable. Either the ENV component or the name
 *     component may be omitted.
 *
 *     Environment variables in the VMS form (ENV:) will be forced to upper
-*     case for translation and any 'name' component to lower case; the Unix 
+*     case for translation and any 'name' component to lower case; the Unix
 *     form will be translated as given.
 *
 *     The routine will do nothing if STATUS is given as not SAI__OK.
@@ -49,6 +49,26 @@
 *        The used length of EXNAME
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)

@@ -1,4 +1,5 @@
 /*
+*+
 *  Name:
 *     SUBPAR_TRMSZ
 
@@ -28,6 +29,27 @@
 *     SUBPAR_TRMSZ = INTEGER
 *        Returns 1 on success; 0 on failure.
 
+*  Copyright:
+*     Copyright (C) 1992, 1993 Science & Engineering Research Council.
+*     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     KFH: K F Hartley (INFOMATICS)
 *     AJC: A J Chipperfield (STARLINK)
@@ -48,7 +70,8 @@
 *  Bugs:
 *     {note_any_bugs_here}
 
-*- */
+*-
+*/
 #include <termios.h>
 #ifndef TIOCGWINSZ
 #include <sys/ioctl.h>
@@ -67,7 +90,7 @@ F77_INTEGER_FUNCTION(subpar_trmsz)(INTEGER(width),INTEGER(height))
 	struct winsize s;
 
 /* this 1 is the file descriptor eqivalent of 'SYS$OUTPUT' on VMS.
-*/	
+*/
 	if (ioctl (STDOUT_FILENO, TIOCGWINSZ, (char *) &s) < 0)
 		return 0;
 	*height = s.ws_row;

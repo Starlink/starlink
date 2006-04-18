@@ -36,6 +36,27 @@
 *     -  If this fails and the parameter type indicates a name, get
 *     the name from the parameter table.
 
+*  Copyright:
+*     Copyright (C) 1982, 1983, 1984, 1988, 1989, 1990, 1991 Science & Engineering Research Council.
+*     Copyright (C) 2002 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     JRG: Jack Giddings (UCL)
 *     SLW: Sid Wright (UCL)
@@ -116,8 +137,8 @@
 *  Mark a new error reporting context.
       CALL EMS_MARK
 
-*  Get a locator associated with the parameter PARAM, if it has one, 
-*  and return the HDS name. 
+*  Get a locator associated with the parameter PARAM, if it has one,
+*  and return the HDS name.
       CALL SUBPAR_STATE( NAMECODE, STATE, STATUS )
 
 *  Check the returned status.
@@ -156,7 +177,7 @@
 *           Annul the error context.
                CALL EMS_ANNUL( STATUS )
 
-*           There is no valid locator, so see if there is a 
+*           There is no valid locator, so see if there is a
 *           name associated.
                CALL SUBPAR_PARTYPE( NAMECODE, TYPE, STATUS )
 
@@ -164,7 +185,7 @@
                IF ( STATUS .EQ. SAI__OK ) THEN
                   IF ( TYPE .GE. 20 ) THEN
 
-*                 It must be a name other than an HDS object, 
+*                 It must be a name other than an HDS object,
 *                 so get the PARVALS entry.
                      CALL SUBPAR_FETCHC( NAMECODE, REFSTR, STATUS )
 

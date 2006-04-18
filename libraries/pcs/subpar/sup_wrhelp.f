@@ -17,7 +17,7 @@
 *  Description:
 *     The routine does any required expansion of logical names in the LIBRARY
 *     specification. If the resultant name has no filetype extension or the
-*     extension .hlb or .shl, the routine checks for the existence of a file 
+*     extension .hlb or .shl, the routine checks for the existence of a file
 *     with that name and extension .shl. If it is found, SUBPAR_PWHLP is called
 *     to use the portable help system; otherwise SUBPAR_VWHLP is called.
 *     On VMS this will use the VMS help system using the library name supplied;
@@ -28,15 +28,15 @@
 *
 *     LIBRARY name expansion is handled by SUBPAR_HLPEX which, in the interests
 *     of allowing the same interface file to work for VMS or Unix, permits
-*     LIBRARY to take the form $ENV/name or ENV:name,  where ENV is a 
+*     LIBRARY to take the form $ENV/name or ENV:name,  where ENV is a
 *     logical-name/environment-variable and name is a simple filename. Either
 *     the environment variable or name part may be used alone.
 *
 *     Environment variables in the VMS form (ENV:) will be forced to upper
-*     case for translation, and any associated 'name' to lower case; the 
+*     case for translation, and any associated 'name' to lower case; the
 *     Unix form ($ENV) will be translated as given.
-*     On VMS this makes no difference but on Unix means that the filename of 
-*     the library spec must be lower case with extension .shl. The specification in the 
+*     On VMS this makes no difference but on Unix means that the filename of
+*     the library spec must be lower case with extension .shl. The specification in the
 *     interface file may be either case and the extension may be omitted.
 *
 *     The routine will do nothing if STATUS is given as not SAI__OK. If STATUS
@@ -64,6 +64,26 @@
 *        Non-zero if help library search is required
 *     STATUS = INTEGER (Given)
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
@@ -165,7 +185,7 @@
             CALL EMS_REP( 'SUP_WRHELP2',
      :      'SUBPAR: Help library ^LIB - not found', STATUS )
 
-*     Otherwise use SUBPAR_VWHLP - 
+*     Otherwise use SUBPAR_VWHLP -
 *     It should check the file exists first
 *     For Unix this is an error condition - it means that something other
 *     than .shl, .hlb or no extension is specified in the interface file.

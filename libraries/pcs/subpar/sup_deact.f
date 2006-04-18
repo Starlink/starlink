@@ -35,11 +35,32 @@
 *     Reset the MIN, MAX and Dynamic default values in all cases and re-use
 *     the space. Annul the EXTLOC locator
 *
-*     To update GLOBAL associations, if the application terminated 
+*     To update GLOBAL associations, if the application terminated
 *     successfully, copy the values of any parameters in the ACTIVE state
 *     into the global area if they have a global association.
 *     The global HDS structure is only opened if necessary, and is
 *     closed again subsequently.
+
+*  Copyright:
+*     Copyright (C) 1984, 1985, 1987, 1988, 1989, 1990, 1991, 1992, 1993 Science & Engineering Research Council.
+*     Copyright (C) 1996, 1997, 2000 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     BDK: B D Kelly (ROE)
@@ -70,12 +91,12 @@
 *        done in SUBPAR_PUTNAME consistent with non-names
 *     24-JUL-1989 (AJC):
 *        DAT_ERASE existing global component whatever its
-*        type now DAT_ERASE is recursive 
+*        type now DAT_ERASE is recursive
 *     14-AUG-1989 (AJC):
 *        Use DAT_COPY to save global associations if private
-*        storage already exists 
+*        storage already exists
 *     09-JUL-1990 (AJC):
-*        Un-define dynamic defaults 
+*        Un-define dynamic defaults
 *     07-JUN-1991 (AJC):
 *        Improve comments
 *        Correct use of local status
@@ -119,7 +140,7 @@
 *        Assume all active non-internal parameters have locator set in
 *          PAR tables.
 *     11-AUG-2000 (AJC):
-*        Correct action for object names (type GE 20). (Shouldn't assume 
+*        Correct action for object names (type GE 20). (Shouldn't assume
 *        locator in PAR tables was the correct thing to copy to GLOBAL.)
 *     {enter_further_changes_here}
 
@@ -259,7 +280,7 @@
                      IF ( PARTYPE(J) .GE. 20 ) THEN
 *                     The stored 'value' is actually the name of a data
 *                     structure
-*                     If not already found, find locator to component in 
+*                     If not already found, find locator to component in
 *                     parameter file.
                         IF ( .NOT. ACTGOT ) THEN
                            IF (MONOLITH ) THEN
@@ -278,7 +299,7 @@
      :                         STATUS )
                            ENDIF
                         ENDIF
-*                     Get locator to parameter store 
+*                     Get locator to parameter store
                         CALL DAT_FIND ( ACTLOC, PARNAMES(J), LOC,
      :                    STATUS )
                         IF ( STATUS .EQ. SAI__OK ) THEN
@@ -295,7 +316,7 @@
                         ENDIF
 
                      ELSE IF ( PARTYPE(J) .GE. 10 ) THEN
-*                     Get locator to parameter store 
+*                     Get locator to parameter store
                         CALL SUBPAR_GETLOC( J, VALID, LOC, STATUS )
                         IF ( STATUS .EQ. SAI__OK ) THEN
                            IF ( VALID ) THEN
@@ -376,7 +397,7 @@
                CALL SUBPAR_CANCL ( J, ISTAT )
                PARSTATE(J) = SUBPAR__GROUND
 
-*         otherwise just ensure that associated HDS files are freed for 
+*         otherwise just ensure that associated HDS files are freed for
 *         use by others.
             ELSE IF ( PARTYPE(J) .GE. 20 ) THEN
                CALL SUBPAR_GETFLOC ( J, VALID, FILOC, ISTAT )

@@ -39,6 +39,26 @@
 *     INTERNAL parameters optimise the time taken to access scalar
 *     parameters.
 
+*  Copyright:
+*     Copyright (C) 1984, 1987, 1988, 1991, 1992, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)
@@ -56,7 +76,7 @@
 *        change PAR__ICACM to SUBPAR__
 *        and EMS error reports
 *     27-SEP-1991 (AJC):
-*        Prefix messages with 'SUBPAR:' 
+*        Prefix messages with 'SUBPAR:'
 *     19-JUN-1992 (AJC):
 *        Correct error message
 *     26-FEB-1993 (AJC):

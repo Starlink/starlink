@@ -22,7 +22,7 @@
 *
 *     If the preset value was a character string, it is re-defined as a name.
 *
-*     The name is 'checked' by SUBPAR_CHECKNAME but in fact this allows 
+*     The name is 'checked' by SUBPAR_CHECKNAME but in fact this allows
 *     anything as a name and strips leading '@' or quotes from the name
 *     obtained.
 
@@ -44,6 +44,27 @@
 
 *  Implementation Deficiencies:
 *     The setting of PARERRMESS should be improved.
+
+*  Copyright:
+*     Copyright (C) 1984, 1985, 1987, 1988, 1990, 1991, 1992, 1993, 1994 Science & Engineering Research Council.
+*     Copyright (C) 1996, 1998 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     BDK: B D Kelly (ROE)
@@ -79,7 +100,7 @@
 *        let RESET ignore 'current' on vpath also
 *     11-SEP-1990 (AJC):
 *        Handle vpath overridden inside the loop.
-*        Allow 5 re-prompts on bad values. 
+*        Allow 5 re-prompts on bad values.
 *     18-JUL-1991 (AJC):
 *        Use EMS not LIB$GETMSG
 *     05-AUG-1991 (AJC):
@@ -123,7 +144,7 @@
 *      5-SEP-1996 (AJC):
 *        Allow string as default
 *      5-FEB-1998 (AJC):
-*        Set given value of STRUCTURE in SUBPAR_CHECKNAME call: 
+*        Set given value of STRUCTURE in SUBPAR_CHECKNAME call:
 *        TRUE existing value is already a name (preserves quotes
 *        during unquoting process); FALSE otherwise
 

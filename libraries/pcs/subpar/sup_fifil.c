@@ -1,10 +1,11 @@
 /*
+*+
 *  Name:
 *     SUBPAR_FIFIL
 
 *  Purpose:
-*     To search along a given path for a NON-DIRECTORY file with a given 
-*     name and one of a possible choice of extensions and the specified 
+*     To search along a given path for a NON-DIRECTORY file with a given
+*     name and one of a possible choice of extensions and the specified
 *     access permission: 'r' read, 'w' write and 'x' execute.
 *     This is the Unix version - written in C and expected to be called
 *     from Fortran.
@@ -20,7 +21,7 @@
 *     in the given access mode, a file with the given NAME and each of
 *     the given extensions in turn. If the access is successful, the file
 *     is checked to see if it is a directory. If it is a directory, it is
-*     ignored, otherwise its full name and an index to indicate which 
+*     ignored, otherwise its full name and an index to indicate which
 *     extension was successful, are returned.
 
 *  Arguments:
@@ -45,6 +46,28 @@
 *        The global status.
 
 *  [optional_subroutine_items]...
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council.
+*     Copyright (C) 2002 Central Laboratory of the Research Councils.
+*     Copyright (C) 2005, 2006 Particle Physics & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -67,7 +90,8 @@
 *  Bugs:
 *     {note_any_bugs_here}
 
-*- */
+*-
+*/
       
 /* Include Statements: */
 #include "sae_par.h"

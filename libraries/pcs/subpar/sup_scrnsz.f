@@ -1,37 +1,65 @@
       SUBROUTINE SUBPAR_SCRNSZ (SCREEN_WIDTH, SCREEN_HEIGHT, STATUS)
+*+
+*  Name:
+*     SUBPAR_SCRNSZ
 
-*    Description :
+*  Purpose:
+*     Determine terminal width and height.
+
+*  Description:
 *     This is the Unix version
 *     It interrogates the system to find the width and height
 *     of the screen on which it is running.
 
-*    Invocation :
+*  Invocation:
 *     CALL SUBPAR_SCRNSZ (SCREEN_WIDTH, SCREEN_HEIGHT, STATUS)
 
-*    Parameters :
+*  Arguments:
 *     SCREEN_WIDTH   =INTEGER       (returned)
 *            width of the screen - defaults to 80 characters
 *     SCREEN_HEIGHT  =INTEGER       (returned)
 *            height of the screen - defaults to 0 lines,
 *            ie no paging (eg if running in batch)
 
-*    Method :
+*  Algorithm:
 *     Call the C function SUP_TRMSZ.
 *     If this is unsuccessful, set the default which will result in no
 *     paging.
 
-*    Deficiencies :
-*     <description of any deficiencies>
-
-*    Bugs :
+*  Bugs:
 *     <description of any "bugs" which have not been fixed>
 
-*    Authors :
-*     A. J. Chipperfield  (RLVAD::AJC)
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*    History :
-*     17.06.92:  Original
-*    endhistory
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     AJC: A. J. Chipperfield (Starlink)
+
+*  History:
+*     17-JUN-1992 (AJC):
+*        Original
+
+*  Notes:
+*     See also ONE_SCRNSZ
+
+*-
 
 *    Type Definitions :
       IMPLICIT NONE

@@ -21,7 +21,7 @@
 *     TSKNAME=CHARACTER*(*)  (Returned)
 *       The task name. In the case of Unix this may be the name of a link
 *       to the task.
-*     STATUS=INTEGER 
+*     STATUS=INTEGER
 *       Global status
 *  Algorithm:
 *     Set terminal as target for prompts.
@@ -33,6 +33,27 @@
 *  Implementation Deficiencies:
 *     The handling of locking is expected to be done by HDS at a future
 *     release so could be removed from here
+
+*  Copyright:
+*     Copyright (C) 1985, 1986, 1987, 1989, 1991, 1992, 1993 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1996 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     BDK: B D Kelly (ROE)
@@ -52,7 +73,7 @@
 *        on bad format IFC, give up
 *     01-AUG-1989 (AJC):
 *        Call SUBPAR_FINDIF to find the interface module according
-*        to new rules using search path. 
+*        to new rules using search path.
 *     13-JUN-1991 (AJC):
 *        Call TERMFACE at beginning
 *     14-JUN-1991 (AJC):
@@ -66,7 +87,7 @@
 *        messages from HDS_OPEN.
 *        Remove call to EXC_LEVEL
 *     27-SEP-1991 (AJC):
-*        Prefix messages with 'SUBPAR:' 
+*        Prefix messages with 'SUBPAR:'
 *     15-OCT-1991 (AJC):
 *        Correctly note error in _RDIF
 *     18-NOV-1991 (AJC):

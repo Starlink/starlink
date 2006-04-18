@@ -38,6 +38,27 @@
 
 *  Algorithm:
 
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
@@ -87,7 +108,7 @@
 
 *  If the parameter type is .GE. 20, a name has been supplied - return the
 *  name, preceded by @. This is a change from existing behaviour in the
-*  case where an HDS object is supplied as a primitive parameter value. 
+*  case where an HDS object is supplied as a primitive parameter value.
 *  Currently the value in the object would be returned.
       IF ( PARTYPE( NAMECODE ) .GE. 20 ) THEN
          STRING = '@'
@@ -107,7 +128,7 @@
 *  It's not a name, MIN or MAX; Get the parameter value - this will search
 *  VPATH etc. except that:
 *  1. Dynamic defaults will not be set.
-*  2. The GET context does not allow prompting - if it is required to do so, 
+*  2. The GET context does not allow prompting - if it is required to do so,
 *     error PAR__NOUSR is returned and errors reported.
          ELSE
 *
@@ -119,7 +140,7 @@
             CALL SUBPAR_GET0C( NAMECODE, STRING, STATUS )
 *     Not INTERNAL get locator in the normal way but this will try to open
 *     it as a primitive HDS object.
-*     This may say it can't open the file 
+*     This may say it can't open the file
          ELSE
             IF ( PARWRITE(NAMECODE) ) THEN
                CALL SUBPAR_ASSOC ( NAMECODE, 'UPDATE', LOC, STATUS )
@@ -133,7 +154,7 @@
 *        If the ASSOC failed, presumably it was because a name was given
 *        which didn't deliver as a primitive HDS object. If type allows,
 *        try to get it just as a name.
-*        Errors will have been reported and the parameter will have been 
+*        Errors will have been reported and the parameter will have been
 *        cancelled so annul errors and set parameter back to ground state.
                IF ( PARTYPE(NAMECODE) .EQ. SUBPAR__NOTYPE ) THEN
                   CALL EMS_ANNUL( STATUS )

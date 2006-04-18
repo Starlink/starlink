@@ -41,7 +41,7 @@
 *     The given keyword is assumed to be in upper case and the PARKEY
 *     array in SUBPAR common is searched for a match.
 *     If LOGICAL is true, only keywords of LOGICAL parameters are checked
-*     If SPECIAL is true the special keywords ACCEPT, PROMPT and RESET are 
+*     If SPECIAL is true the special keywords ACCEPT, PROMPT and RESET are
 *     also included in the search (these are checked first).
 *     Note that the keyword for a parameter will have been
 *     defaulted to the parameter name if a keyword has not been
@@ -54,6 +54,27 @@
 *     be more explicit. The given reply is converted to upper case and put
 *     through the complete check again. If an un-ambiguous keyword is not
 *     obtained after five attempts, SUBPAR__NOPAR is returned.
+
+*  Copyright:
+*     Copyright (C) 1984, 1987, 1991, 1992, 1993, 1994 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1996, 2001 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     BDK: B D Kelly (ROE)
@@ -147,8 +168,8 @@
       INNAME = KEYWORD
       PROMPT = 0
 
-*   For the given keyword and any supplied as  a result of 
-*   prompting from this routine, keep trying until error or un-ambiguous 
+*   For the given keyword and any supplied as  a result of
+*   prompting from this routine, keep trying until error or un-ambiguous
 *   keyword is found
       DO WHILE ( (.NOT. FOUND ) .AND. ( STATUS .EQ. SAI__OK ) )
 
@@ -290,7 +311,7 @@
      :          STATUS )
                NAMECODE = 0
 *        If this keyword was obtained by prompting, force another prompt to
-*        give the user another chance. 
+*        give the user another chance.
                IF ( PROMPT .GT. 0 ) MATCHES = 2
 
             END IF
@@ -310,7 +331,7 @@
  
                   CALL PSX_GETENV( 'ADAM_NOPROMPT', ABBRV, STATUS )
                   IF ( STATUS .EQ. SAI__OK ) THEN
-*              If ADAM_NOPROMPT is set abort 
+*              If ADAM_NOPROMPT is set abort
                      STATUS = SUBPAR__NOPAR
                      CALL EMS_REP ( 'SUP_FINDKEY4', 'SUBPAR: ' //
      :               'Prompting for unambiguous value prohibited',
