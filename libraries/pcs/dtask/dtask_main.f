@@ -76,6 +76,9 @@
                                  ! environment variable will be inherited
 *.
 
+*  Initialise Memory Routines
+      CALL STARMEM_INIT()
+
 *  Initialise error system
       CALL ERR_START
 

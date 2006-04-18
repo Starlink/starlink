@@ -476,6 +476,7 @@ linkcmd="$LIBTOOL --mode=link @FC@ @FCFLAGS@ $extra_mode_args @STAR_LDFLAGS@ \
         $linkextraflags \
         @libdir@/dtask_main.o \
         dtask_applic.lo \
+	@libdir@/starMemInit.o \
         $ARGS \
         -lhdspar_adam \
         -lpar_adam \
