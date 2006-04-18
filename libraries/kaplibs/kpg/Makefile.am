@@ -104,7 +104,7 @@ kpg1_hcon.gdr kpg1_prow.gdr kpg1_gaus.gdr kpg1_chev.gdr kpg1_mthe.gdr \
 kpg1_dwso.gdr kpg1_fftf.gdr
 
 KPG_DIR_GEN = kpg1_mul.gdir kpg1_sqsu.gdir kpg1_prsa.gdir \
-kpg1_chel.gdir kpg1_figr.gdir
+kpg1_chel.gdir kpg1_figr.gdir copa.gdir
 
 KPG_GRAPHIC_DR_GEN = kpg1_litr.gdr kpg1_lltr.gdr
 
@@ -120,9 +120,6 @@ bad2dr.f \
 bad2dub.f \
 bad2duw.f \
 bad2dw.f \
-copad.f \
-copai.f \
-copar.f \
 copy1d.f \
 copy2d.f \
 copy3d.f \
