@@ -69,4 +69,5 @@ EXTRA_DIST = $(PRIVATE_INCLUDES) demo.hlp
 
 CLEANFILES = testhelp demo.shl testhelp.ifc
 
+dist_pkgdata_DATA = LICENCE
 
