@@ -66,6 +66,6 @@ par_test_LDADD = libpar_adam.la `err_link_adam` `subpar_link_adam` `chr_link_ada
 CLEANFILES = par_test par_test.ifc
 
 EXTRA_DIST = par_err.msg
-
+dist_pkgdata_DATAT = LICENCE
 
 DISTCLEANFILES = fac_190_err PAR_ERR par_err.h

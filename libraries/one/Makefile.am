@@ -30,6 +30,6 @@ EXTRA_DIST = one_err.msg
 
 CLEANFILES = fac_1522_err one_err.h ONE_ERR
 
-dist_pkgdata_DATA = ONE_CONDITIONS
+dist_pkgdata_DATA = LICENCE
 
  
