@@ -2,6 +2,7 @@
                                                           Expires: **.**.**
 v0.5-3:
      Use starMem library for malloc/free
+     Release under the GPL
 
 v0.5-2:
      Added PSX_RENAME

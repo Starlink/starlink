@@ -32,6 +32,7 @@ ref_test_SOURCES = ref_test.f
 ref_test_LDADD = libref.la `hds_link` `ems_link`
 
 dist_starnews_DATA = ref.news
+dist_pkgdata_DATA = LICENCE
 
 EXTRA_DIST = ref_err.msg
 

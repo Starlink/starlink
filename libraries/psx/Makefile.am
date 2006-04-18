@@ -111,6 +111,7 @@ test_chdir_LDADD = libpsx.la `ems_link` `cnf_link`
 
 
 dist_starnews_DATA = psx.news
+dist_pkgdata_DATAT = LICENCE
 
 EXTRA_DIST = psx_err.msg
 
