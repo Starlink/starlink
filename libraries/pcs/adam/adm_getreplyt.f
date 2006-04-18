@@ -1,59 +1,87 @@
-*+  ADAM_GETREPLYT - wait for incoming message from specified path & messid
-      SUBROUTINE ADAM_GETREPLYT ( TIME, PATH, MESSID, CONTEXT, NAME, 
+      SUBROUTINE ADAM_GETREPLYT ( TIME, PATH, MESSID, CONTEXT, NAME,
      :  VALUE, STATUS )
-*    Description :
-*     Waits for a message from a particular path and with a particular 
-*     ID to arrive at this task, and returns with the message and 
+*+
+*  Name:
+*     ADAM_GETREPLYT
+
+*  Purpose:
+*     wait for incoming message from specified path & messid.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL ADAM_GETREPLYT ( TIME, PATH, MESSID, CONTEXT, NAME,
+*    :                      VALUE, STATUS)
+
+*  Description:
+*     Waits for a message from a particular path and with a particular
+*     ID to arrive at this task, and returns with the message and
 *     associated parameters provided the timeout period has not expired.
-*    Invocation :
-*     CALL ADAM_GETREPLYT ( TIME, PATH, MESSID, CONTEXT, NAME, 
-*    :  VALUE, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     TIME=INTEGER (given)
-*           timeout time in 1ms increments
+*        timeout time in 1ms increments
 *     PATH=INTEGER (given)
-*           required path of the received message
+*        required path of the received message
 *     MESSID=INTEGER (given)
-*           required message number of received message
+*        required message number of received message
 *     CONTEXT=INTEGER (returned)
-*           parameterised 'get, set, obey, cancel'
+*        parameterised 'get, set, obey, cancel'
 *     NAME=CHARACTER*(*) (returned)
-*           name of function or parameter
+*        name of function or parameter
 *     VALUE=CHARACTER*(*) (returned)
-*           received value 
+*        received value
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Call MESSYS_GETREPLY and interpret the data structure returned.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*     Charlie Richardson (REVA::DCR) 25-Feb-85
-*    History :
-*     date:  changes (institution::username)
-*     26-FEB-1985  First insertion (REVA::ADAM)
-*     06.06.1986:  return values even if bad status from MESSYS 
-*                  (REVAD::BDK)
-*     12.11.1992:  use SAI__OK not ADAM__OK (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+
+*  Authors:
+*     Charlie Richardson (REVA::DCR)
+*     Dennis Kelly (ROE)
+*     Alan Chipperfield (RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-FEB-1985 (DCR):
+*        Original.
+*     26-FEB-1985 (ADAM):
+*        First insertion
+*     06-JUN-1986 (BDK):
+*        Return values even if bad status from MESSYS
+*     12-NOV-1992 (AJC):
+*        Use SAI__OK not ADAM__OK
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER TIME        ! timeout time in 1ms increments
       INTEGER PATH        !  required path of the received message
       INTEGER MESSID      !  required message number of received message
-*    Export :
+
+*  Arguments Returned:
       INTEGER CONTEXT     !  parameterised 'get, set, obey, cancel'
       CHARACTER NAME*(*)  !  name of function or parameter
-      CHARACTER VALUE*(*) !  received value 
-*    Status :
-      INTEGER STATUS 
+      CHARACTER VALUE*(*) !  received value
+
+*  Status:
+      INTEGER STATUS
 *    Data structures for ADAM:
       INCLUDE 'MESSYS_DD'
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) THEN
          RETURN
