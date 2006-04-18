@@ -33,6 +33,14 @@
 *
 *     If either FrameSet contains a second Frame with the same Domain as
 *     the alignment Frame then a warning is issued.
+*
+*     If the above attempt to align the Frames directly using astConvert
+*     fails, then a further attempt is made if oneof the two Frames is a
+*     SpecFrame or SkyFrame, and the other Frame is a CmpFrame. In this
+*     case, the CmpFrame is searched for a Frame that can be aligned with
+*     the SkyFrame or SpecFrame. If this is succesful, the other axes i
+*     the CmpFrame are fed bad values by the Mapping which connects the
+*     two Frames.
 
 *  Arguments:
 *     IWCS1 = INTEGER (Given)
@@ -96,6 +104,9 @@
 *        Do not issue warning about multiple PIXEL Domains if alignment
 *        is performed in the PIXEL Domain (there is usally an extra PIXEL
 *        Frame in the Plot because KPG1_GDGET adds one).
+*     3-APR-2006 (DSB):
+*        Attempt to align SkyFrames or SpecFrames with a CmpFrame by searching 
+*        through the CmpFrame for a Matching Frame.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -119,6 +130,9 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER KPG1_CNVRT
 
 *  Local Variables:
       CHARACTER DOM*80           ! Domain of Current Frame in FrameSet
@@ -197,7 +211,7 @@
 *  returned describing the relationship between the Current Frames in 
 *  IWCS2 and IWCS1, and the Base Frames are changed to indicate 
 *  the Frames in which alignment occurred.
-      TEMP = AST_CONVERT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS ) 
+      TEMP = KPG1_CNVRT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS ) 
 
 *  Issue a fatal error if alignment was not possible in any Domain.
       IF( TEMP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
@@ -239,7 +253,7 @@
       CALL AST_SETI( IWCS2, 'CURRENT', IMAT2, STATUS )
 
 *  Now call AST_CONVERT again.
-      TEMP = AST_CONVERT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS ) 
+      TEMP = KPG1_CNVRT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS ) 
 
 *  Issue a fatal error if alignment was not possible. This shouldn't happen.
       IF( TEMP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
