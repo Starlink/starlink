@@ -1118,6 +1118,7 @@
             END IF
          ELSE
             HDRPRS = .FALSE.
+            NONDF = 1
          END IF             
 
 *  Obtain the values for the parameters.
@@ -1325,7 +1326,7 @@
 *  called later uses it for an adjustable-array size.  So we pass a
 *  standard but dummy name.  We also use a dummy BITPIX if the special 
 *  value 0 is used, as it will not be changed to an actual BITPIX since
-*  we are not procesing a data array for the header NDF.
+*  we are not processing a data array for the header NDF.
 
 *  Convert the NDF to the FITS file.
                CALL COF_NDF2F( NDF, FILNAM, 1, 'HEADER', -32,
