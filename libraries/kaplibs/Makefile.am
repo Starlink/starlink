@@ -24,5 +24,5 @@ dist_starnews_DATA = kaplibs.news
 
 CLEANFILES = kaplibs_test.ifc
 
-dist_pkgdata_DATA = KAPLIBS_CONDITIONS
+dist_pkgdata_DATA = LICENCE
 

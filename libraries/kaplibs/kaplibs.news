@@ -17,6 +17,7 @@ Version 2.8
    - The HLP helper routines are no longer part of kaplibs. Use SHL
      library instead.
    - kpg1_scrsz no longer present. Please use one_scrsz instead.
+   - now released under the GPL
 
 Version 2.7. includes the following changes:
 
