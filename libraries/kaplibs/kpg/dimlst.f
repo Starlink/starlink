@@ -1,34 +1,37 @@
-*+ DIMLST - Writes the dimensions of an array in a shorthand form
-
       SUBROUTINE DIMLST( NDIMS, DIMS, NCHDIM, DIMSTR, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     DIMLST
+
+*  Purpose:
+*     Writes the dimensions of an array in a shorthand form.
+
+*  Language:
+*     Starlink
+
+*  Invocation:
+*     CALL DIMLST( NDIMS, DIMS, NCHDIM, DIMSTR, STATUS )
+
+*  Description:
 *     Returns a character variable containing the dimensions of
 *     an array separated by commas and bounded by parentheses,
 *     unless there is only one dimension when no parentheses and
 *     comma are included. This enables the calling routine to require
 *     only one message call.
-*
-*    Invocation :
-*
-*     CALL DIMLST( NDIMS, DIMS, NCHDIM, DIMSTR, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     NDIMS  =  INTEGER( READ )
-*         Number of dimensions of array
+*        Number of dimensions of array
 *     DIMS ( NDIMS )  =  INTEGER( READ )
-*         Dimensions of the array
+*        Dimensions of the array
 *     NCHDIM  =  INTEGER( WRITE )
-*         Number of characters in DIMSTR less trailing blanks
+*        Number of characters in DIMSTR less trailing blanks
 *     DIMSTR  =  CHARACTER*(*)( WRITE )
-*         Character string of dimension list enclosed in parentheses
+*        Character string of dimension list enclosed in parentheses
 *     STATUS  = INTEGER( READ, WRITE )
-*         Global status value
-*
-*    Method :
-*
+*        Global status value
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     Initialise character counter and output string to blanks
 *     If only one dimension then
@@ -45,52 +48,77 @@
 *        Endfor
 *     Endif
 *     Return
-*
-*    Authors :
-*
+
+*  Copyright:
+*     Copyright (C) 1986, 1989 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     1986 Aug 8  : Original (RL.STAR::CUR).
 *     1989 Mar 19 : Used CHR_APPND for in-situ concatenation
-*                   (RL.STAR::CUR).
-*
-*
-*    Type Definitions :
+*        (RL.STAR::CUR).
+*     {enter_further_changes_here}
 
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE              ! no default typing allowed
 
-*    Global constants :
 
+*  Global Constants:
       INCLUDE 'SAE_PAR'          ! global SSE parameters
 
-*    Status :
 
+*  Status:
       INTEGER STATUS
 
-*    Import :
 
+*  Arguments Given:
       INTEGER
      :    NDIMS,
      :    DIMS( NDIMS )
 
-*    Export :
 
+*  Arguments Returned:
       INTEGER NCHDIM
 
       CHARACTER*(*) DIMSTR
 
-*    Local variables :
 
-      INTEGER 
+*  Local Variables:
+      INTEGER
      :    NCHAR,         ! Number of characters in a (decimal) dimension
      :    I              ! Loop counter
 
       CHARACTER*7
      :    CI             ! A dimension in characters
 
-*-
+
+*.
+
 *    check status on entry - return if not o.k.
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999

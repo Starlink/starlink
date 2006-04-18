@@ -1,34 +1,37 @@
-*+  EXPARR - take the exponential of an array, pixel by pixel
-
       SUBROUTINE EXPARR ( INARR, DIMS, BASE, OUTARR, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     EXPARR
+
+*  Purpose:
+*     take the exponential of an array, pixel by pixel.
+
+*  Language:
+*     Starlink
+
+*  Invocation:
+*     CALL EXPARR( INARR, DIMS, BASE, OUTARR, STATUS )
+
+*  Description:
 *     This routine fills the output array pixels with the results
-*     of taking the exponential of the pixels of the input array 
+*     of taking the exponential of the pixels of the input array
 *     to the base specified, i.e. New value = Base ** Old value.
 *     If the result is bigger than the maximum-allowed Vax real,
 *     then a bad pixel value is used.
-*
-*    Invocation :
-*
-*     CALL EXPARR( INARR, DIMS, BASE, OUTARR, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     INARR( DIMS )  =  REAL( READ )
-*         Array containing input image data
+*        Array containing input image data
 *     DIMS  =  INTEGER( READ )
-*         Dimension of input and output arrays
+*        Dimension of input and output arrays
 *     BASE  =  REAL( READ )
-*         Base of exponential to be used - must be a positive number
+*        Base of exponential to be used - must be a positive number
 *     OUTARR( DIMS )  =  REAL( WRITE )
-*         Array containing results of processing input data
+*        Array containing results of processing input data
 *     STATUS  =  INTEGER( READ )
-*         Global status value
-*
-*    Method :
-*
+*        Global status value
+
+*  Algorithm:
 *     Check for error on entry - if not o.k. return immediately
 *     If input base is less than one then
 *        Large negative pixels will cause us to overflow - work out
@@ -67,37 +70,58 @@
 *        Endfor
 *     Endif
 *     Return
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
+
+*  Copyright:
+*     Copyright (C) 1986 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     Mark McCaughrean UoE ( REVA::MJM )
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     02-07-1986 :  First implementation (REVA::MJM)
 *     1986 Aug 12:  Renamed from EXPARR2D, generalised to any array,
-*                   completed prologue and nearly conformed to 
-*                   Starlink standards (RL.STAR::CUR).
+*        completed prologue and nearly conformed to
+*        Starlink standards (RL.STAR::CUR).
 *     1986 Sep 2 :  Renamed parameters -> arguments section in prologue,
-*                   corrected bad-pixel handling and tidied 
-*                   (RL.CUR::STAR).
-*
-*    Type definitions :
+*        corrected bad-pixel handling and tidied
+*        (RL.CUR::STAR).
+*     {enter_further_changes_here}
 
+*  Bugs:
+*     None known.
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT  NONE              ! no implicit typing allowed
 
-*    Global constants :
 
+*  Global Constants:
       INCLUDE  'SAE_PAR'          ! SSE global definitions
       INCLUDE 'PRM_PAR'           ! PRIMDAT public constants
 
-*    Import :
 
+*  Arguments Given:
       INTEGER
      :    DIMS
 
@@ -105,20 +129,20 @@
      :    INARR( DIMS ),
      :    BASE
 
-*    Export :
 
+*  Arguments Returned:
       REAL
      :    OUTARR( DIMS )
 
-*    Status :
 
+*  Status:
       INTEGER  STATUS
 
-*    Local variables :
 
+*  Local Variables:
       INTEGER
-     :    J                       ! counter variables 
-   
+     :    J                       ! counter variables
+
       REAL
      :    MAXVAL,                 ! maximum valid pixel value allowed
                                   ! for exponentiation
@@ -129,7 +153,9 @@
                                   ! pixels, as opposed to large
                                   ! negative ones
 
-*-
+
+*.
+
 *    check status on entry - return if not o.k.
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -190,7 +216,7 @@
 
             IF ( INARR( J ) .GE. MAXVAL ) THEN
 
-*             too large a pixel value - stick the 'bad pixel' value 
+*             too large a pixel value - stick the 'bad pixel' value
 *             into the output pixel
 
                OUTARR( J )  =  VAL__BADR
@@ -228,7 +254,7 @@
 
             IF ( INARR( J ) .LE. MINVAL ) THEN
 
-*             too negative a pixel value - stick the 'bad pixel' value 
+*             too negative a pixel value - stick the 'bad pixel' value
 *             into the output pixel
 
                OUTARR( J )  =  VAL__BADR

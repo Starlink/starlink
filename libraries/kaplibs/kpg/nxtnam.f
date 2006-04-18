@@ -1,29 +1,32 @@
-*+  NXTNAM - increments Fnnnn type filename by one
-
       SUBROUTINE NXTNAM ( CURNAM, NEXTNM, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     NXTNAM
+
+*  Purpose:
+*     increments Fnnnn type filename by one.
+
+*  Language:
+*     Starlink
+
+*  Invocation:
+*     CALL NXTNAM( CURNAM, NEXTNM, STATUS )
+
+*  Description:
 *     This routine takes the input string CURNAM which should end with
 *     an IRCAM type filename Fnnnn (where nnnn is four integers), and
 *     returns the string NEXTNM containing the next filename in
 *     numerical sequence, i.e. it adds one to the integer nnnn.
-*
-*    Invocation :
-*
-*     CALL NXTNAM( CURNAM, NEXTNM, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     CURNAM  =  CHAR*(*)
-*         Current filename of IRCAM type ending in Fnnnn
+*        Current filename of IRCAM type ending in Fnnnn
 *     NEXTNM  =  CHAR*(*)
-*         Next filename in numerical sequence
+*        Next filename in numerical sequence
 *     STATUS  =  INTEGER( READ,WRITE )
-*         Global status value
-*
-*    Method :
-*
+*        Global status value
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     Get length of current filename ignoring trailing blanks
 *     Cut off last four characters of current filename assuming them to
@@ -39,53 +42,74 @@
 *     Splice required leading 0's onto new string
 *     Form next filename from current one with new number spliced on end
 *     Return
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
+
+*  Copyright:
+*     Copyright (C) 1986 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     Mark McCaughrean UoE ( REVA::MJM )
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
-*     02-06-1986 : First implementation (REVA::MJM)
-*     1986 Aug 12: Renamed from NEXT_NAME, and nearly conformed to 
-*                  Starlink standards (RL.STAR::CUR).
-*     1986 Sep 2 : Renamed parameter section arguments and tidied
-*                  (RL.STAR::CUR).
-*
-*    Type definitions :
+*     {enter_new_authors_here}
 
+*  History:
+*     02-06-1986 : First implementation (REVA::MJM)
+*     1986 Aug 12: Renamed from NEXT_NAME, and nearly conformed to
+*        Starlink standards (RL.STAR::CUR).
+*     1986 Sep 2 : Renamed parameter section arguments and tidied
+*        (RL.STAR::CUR).
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     None known.
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT  NONE              ! no default typing allowed
 
-*    Global constants :
 
+*  Global Constants:
       INCLUDE  'SAE_PAR'          ! SSE global definitions
 
-*    Import :
 
+*  Arguments Given:
       CHARACTER*(*)
      :    CURNAM
 
-*    Export :
 
+*  Arguments Returned:
       CHARACTER*(*)
      :    NEXTNM
 
-*    Status :
 
+*  Status:
       INTEGER  STATUS
 
-*    External references :
 
+*  External References:
       INTEGER
      :    CHR_LEN             ! string length omitting trailing blanks
 
-*    Local variables :
 
+*  Local Variables:
       INTEGER
      :    OLDNUM,             ! number corresponding to current filename
      :    NEWNUM,             !    "         "        " next        "
@@ -97,7 +121,9 @@
      :    OLDSTR,             ! four digits at end of current filename
      :    NEWSTR              !   "     "    "  "   " next        "
 
-*-
+
+*.
+
 *    check status on entry - return if not o.k.
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -107,7 +133,7 @@
 
       I  =  CHR_LEN( CURNAM )
 
-*    assume that the current filename ends with four integers, cut them 
+*    assume that the current filename ends with four integers, cut them
 *    off and put them into a new string
 
       OLDSTR  =  CURNAM( I-3 : I )
@@ -152,7 +178,7 @@
          NEWSTR  =  '00'//DUMMY( 1 : 2 )
 
       ELSE IF ( NCHAR .EQ. 3 ) THEN
- 
+
 *       output number lies between 100 and 999 - append one 0
 
          NEWSTR  =  '0'//DUMMY( 1 : 3 )
@@ -164,7 +190,7 @@
 *    now form the returned next filename
 
       NEXTNM  =  CURNAM( 1 : I-4 )//NEWSTR
-            
+
  999  CONTINUE
 
 *    return and end

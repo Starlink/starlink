@@ -1,11 +1,19 @@
-*+ ICMMM - Iteratively finds the mean, median and mode using the
-*          Chauvenet criterion
-
       SUBROUTINE ICMMM ( ARRAY, DIM, SMEAN, SMED, SMODE, SIGMA, SKEW,
      :                   NSAM, NINVAL, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     ICMMM
+
+*  Purpose:
+*     Iteratively finds the mean, median and mode using the.
+
+*  Language:
+*     Starlink
+
+*  Invocation:
+*     CALL ICMMM ( ARRAY, DIM, SMEAN, SMED, SMODE, SIGMA, SKEW, NSAM,
+
+*  Description:
 *     This finds the mean, median and mode (mmm) of a sample of data
 *     taken from a background region of an astronomical plate. It should
 *     not be used as a general mmm routine as there are special features
@@ -14,79 +22,93 @@
 *     trapped. The data need not be sorted as a NAG sorting routine
 *     (M01CAE, single precision) is called internally. The routine also
 *     returns the standard deviation and the skew of the sample.
-*
-*     The magic-value method is used for bad pixels.
-*
-*    Invocation :
-*
-*     CALL ICMMM ( ARRAY, DIM, SMEAN, SMED, SMODE, SIGMA, SKEW, NSAM,
-*    :             NINVAL, STATUS )
-*
-*    Arguments :
-*
-*     ARRAY( DIM ) = REAL( READ )
-*         Vector of data samples.
-*     DIM = INTEGER( READ )
-*         The number of data in the sample.
-*     SMEAN = REAL( WRITE )
-*         The mean of the sample.
-*     SMED = REAL( WRITE )
-*         The median of the sample.
-*     SMODE = REAL( WRITE )
-*         The mode of the sample.
-*     SIGMA = REAL( WRITE )
-*         The standard deviation of the sample.
-*     SKEW = REAL( WRITE )
-*         The skewness of the sample.
-*     NSAM = INTEGER( WRITE )
-*         The population of the sample after the iterative procedure.
-*     NINVAL = INTEGER( WRITE )
-*         The number of bad pixels in the sample.
-*     STATUS  =  INTEGER( READ, WRITE )
-*         Global status value.
-*
-*    Method :
-*
-*     Check for error on entry - return if not o.k.
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
-*     Malcolm J. Currie  STARLINK ( RAL::CUR )
-*
-*    History :
-*
-*     1990 Jan 24: First ADAM implementation, based upon the similar
-*                  routine in DAOPHOT, modified by Nick Eaton; now
-*                  has bad-pixel handling (RAL::CUR).
-*     1990 Jun 3 : Improved handling of variance for the general case
-*                  (RAL::CUR).
-*     1992 Jun 3 : Replaced NAG routine by KAPPA sorting routine.
-*                  Although the latter is slower it is available on
-*                  Unix (RAL::CUR).
-*
-*    Type definitions :
 
+*     The magic-value method is used for bad pixels.
+
+*  Arguments:
+*     ARRAY( DIM ) = REAL( READ )
+*        Vector of data samples.
+*     DIM = INTEGER( READ )
+*        The number of data in the sample.
+*     SMEAN = REAL( WRITE )
+*        The mean of the sample.
+*     SMED = REAL( WRITE )
+*        The median of the sample.
+*     SMODE = REAL( WRITE )
+*        The mode of the sample.
+*     SIGMA = REAL( WRITE )
+*        The standard deviation of the sample.
+*     SKEW = REAL( WRITE )
+*        The skewness of the sample.
+*     NSAM = INTEGER( WRITE )
+*        The population of the sample after the iterative procedure.
+*     NINVAL = INTEGER( WRITE )
+*        The number of bad pixels in the sample.
+*     STATUS  =  INTEGER( READ, WRITE )
+*        Global status value.
+
+*  Algorithm:
+*     Check for error on entry - return if not o.k.
+
+*  Copyright:
+*     Copyright (C) 1990, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     Malcolm J. Currie  STARLINK ( RAL::CUR )
+*     {enter_new_authors_here}
+
+*  History:
+*     1990 Jan 24: First ADAM implementation, based upon the similar
+*        routine in DAOPHOT, modified by Nick Eaton; now
+*        has bad-pixel handling (RAL::CUR).
+*     1990 Jun 3 : Improved handling of variance for the general case
+*        (RAL::CUR).
+*     1992 Jun 3 : Replaced NAG routine by KAPPA sorting routine.
+*        Although the latter is slower it is available on
+*        Unix (RAL::CUR).
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     None known.
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE            ! No assumed typing allowed
 
-*    Global constants :
 
+*  Global Constants:
       INCLUDE  'SAE_PAR'       ! SSE global definitions
       INCLUDE  'PRM_PAR'       ! Magic-value definitions
 
-*    Import :
 
+*  Arguments Given:
       INTEGER
      :    DIM
 
       REAL
      :    ARRAY( DIM )
 
-*    Export :
 
+*  Arguments Returned:
       REAL
      :  SIGMA,                 ! Sample standard deviation
      :  SKEW,                  ! Sample skewness
@@ -98,12 +120,12 @@
      :   NSAM                  ! Number of data elements after removal
                                ! of bad pixels
 
-*    Status :
 
+*  Status:
       INTEGER  STATUS
 
-*    Local constants :
 
+*  Local Constants:
       INTEGER
      :  MAXITR,                ! Maximum nuber of iterations
      :  MIND                   ! Minimum number of data points in the
@@ -111,8 +133,8 @@
       PARAMETER( MAXITR = 20 )
       PARAMETER( MIND = 5 )
 
-*    Local variables :
 
+*  Local Variables:
       LOGICAL                  ! If true:
      :   BPLOOP,               ! Continue search for bad pixels
      :   MOVE,                 ! There are more elements to move in or
@@ -147,13 +169,15 @@
      :   SAM,                  ! Number of data elements after removal
                                ! of bad pixels before iteration
      :   SMID,                 ! First guess median
-     :   STAT( 4 ),            ! Previous loop's statistics, when 
+     :   STAT( 4 ),            ! Previous loop's statistics, when
                                ! oscillating about a solution
      :   SUM,                  ! Sum of data values
      :   SUM2,                 ! Sum of squared data values
      :   VARNCE                ! Variance
 
-*-
+
+*.
+
 *    Check status on entry - return if not o.k..
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -174,7 +198,7 @@
 
 *    Look for and count bad pixels. Note we cannot assume the value
 *    of bad pixels is large negative, but we do assume that its absolute
-*    value large so the bad pixels will be at one end or other of the 
+*    value large so the bad pixels will be at one end or other of the
 *    sorted data.
 
       IF ( ARRAY( DIM ) .EQ. VAL__BADR ) THEN
@@ -265,7 +289,7 @@
 
       SMED = 0.5 * ( ARRAY( ( SMIN + SMAX + 1 ) / 2 ) +
      :       ARRAY( ( SMIN + SMAX ) / 2 + 1 ) )
-    
+
       SMEAN = SUM / SAM
       VARNCE = 1. / ( SAM - 1. ) * ( SUM2 - SAM * SMEAN * SMEAN )
       IF ( VARNCE .GT. 0.0 ) THEN
@@ -328,7 +352,7 @@
 
 *       Recompute the mean and sigma by adding and/or subtracting
 *       data values at both ends of the interval of acceptable values.
-*       Elements are added or subtracted depending on whether the limit 
+*       Elements are added or subtracted depending on whether the limit
 *       is moving towards or away from the mode.
 
          REDO = .FALSE.
@@ -356,7 +380,7 @@
             ELSE
 
 *             Subtract the next higher data value below the lower
-*             threshold from the summations, or add the next lower data 
+*             threshold from the summations, or add the next lower data
 *             value above the threshold, depending on the direction the
 *             partition is being moved.
 
@@ -391,7 +415,7 @@
             ELSE
 
 *             Subtract the next higher data value above the upper
-*             threshold from the summations, or add the next upper data 
+*             threshold from the summations, or add the next upper data
 *             value below the threshold, depending on the direction the
 *             partition is being moved.
 
@@ -425,7 +449,7 @@
          SMEAN = SMEAN + SMID
 
 *       Obtain the median. To first approximation the median is the
-*       value of the sky in the middle pixel of the sorted data (if the 
+*       value of the sky in the middle pixel of the sorted data (if the
 *       total number is odd) or the mean of the central two pixels (if
 *       the total number of pixels is even).
 *

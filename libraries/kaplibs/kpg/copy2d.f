@@ -1,34 +1,37 @@
-*+  COPY2D - copy one 2-D array into another
-
       SUBROUTINE COPY2D( DIM1, DIM2, ARRIN, ARROUT, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     COPY2D
+
+*  Purpose:
+*     copy one 2-D array into another.
+
+*  Language:
+*     Starlink
+
+*  Invocation:
+*     CALL COPY2D( DIM1, DIM2, ARRIN, ARROUT, STATUS )
+
+*  Description:
 *     The input 2-D array, ARRIN, of dimension DIM1, DIM2, is copied
 *     into the output 2-D array, ARROUT, of the same dimensions.
 *     An immediate return will occur if STATUS has an error value on
 *     entry.
-*
-*    Invocation :
-*
-*     CALL COPY2D( DIM1, DIM2, ARRIN, ARROUT, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     DIM1 = INTEGER( READ )
-*         The first dimension of the 2-d arrays.
+*        The first dimension of the 2-d arrays.
 *     DIM2 = INTEGER( READ )
-*         The second dimension of the 2-d arrays.
+*        The second dimension of the 2-d arrays.
 *     ARRIN( DIM1, DIM2 ) = REAL( READ )
-*         Array to be copied.
+*        Array to be copied.
 *     ARROUT( DIM1, DIM2 ) = REAL( WRITE )
-*         Will be returned containing a copy of the input array.
+*        Will be returned containing a copy of the input array.
 *     STATUS = INTEGER( READ )
-*         This is the global status, if this variable has an error
-*           value on entry then an immediate return will occur.
-*
-*    Method :
-*
+*        This is the global status, if this variable has an error
+*          value on entry then an immediate return will occur.
+
+*  Algorithm:
 *     If no error on entry then
 *        For all lines of the input and output arrays
 *           For all the points in a line
@@ -37,54 +40,80 @@
 *           Endfor
 *        Endfor
 *     Endif
-*
-*    Authors :
-*
+
+*  Copyright:
+*     Copyright (C) 1983, 1984, 1986, 1989 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     Dave Baines (ROE::ASOC5)
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     01/12/1983 : Original version                     (ROE::ASOC5)
 *     17/02/1984 : Documentation brought up to standard (ROE::ASOC5)
 *     1986 Sep 12: Renamed parameters section to arguments and tidied
-*                  (RL.STAR::CUR)
+*        (RL.STAR::CUR)
 *     1989 Aug  7: Passed array dimensions as separate variables
-*                  (RL.STAR::CUR).
-*
-*    Type Definitions :
+*        (RL.STAR::CUR).
+*     {enter_further_changes_here}
 
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
 
+*  Global Constants:
       INCLUDE 'SAE_PAR'
 
-*    Import :
 
+*  Arguments Given:
       INTEGER
      :  DIM1, DIM2
 
       REAL
      :  ARRIN( DIM1, DIM2 )
 
-*    Export :
 
+*  Arguments Returned:
       REAL
      :  ARROUT( DIM1, DIM2 )
 
-*    Status :
 
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
 
+*  Local Variables:
       INTEGER
      :  X,                     ! Index to input/output array elements,
                                ! 1st dimension
      :  Y                      ! Index to input/output array elements,
                                ! 2nd dimension
-*-
+
+*.
+
 
 *    check for error on entry
 

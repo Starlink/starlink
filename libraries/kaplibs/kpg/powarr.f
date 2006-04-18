@@ -1,9 +1,18 @@
-*+  POWARR - raise an array, pixel by pixel, to a given power
-
       SUBROUTINE POWARR ( INARR, DIMS, POWER, OUTARR, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     POWARR
+
+*  Purpose:
+*     raise an array, pixel by pixel, to a given power.
+
+*  Language:
+*     Starlink
+
+*  Invocation:
+*     CALL POWARR( INARR, DIMS, POWER, OUTARR, STATUS )
+
+*  Description:
 *     This routine fills the output array pixels with the results
 *     of raising the pixels of the input array to the power
 *     specified, i.e. New value = Old value ** Power.
@@ -13,26 +22,20 @@
 *     check is not necessary on some machines, e.g. Vax.)
 *     Negative input values are also converted to a bad pixel value
 *     in the output.
-*
-*    Invocation :
-*
-*     CALL POWARR( INARR, DIMS, POWER, OUTARR, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     INARR( DIMS )  =  REAL( READ )
-*         Array containing input image data
+*        Array containing input image data
 *     DIMS  =  INTEGER( READ )
-*         Dimension of input and output arrays
+*        Dimension of input and output arrays
 *     POWER  =  REAL( READ )
-*         Power to be used
+*        Power to be used
 *     OUTARR( DIMS )  =  REAL( WRITE )
-*         Array containing results of raising input data to the given power
+*        Array containing results of raising input data to the given power
 *     STATUS  =  INTEGER( READ, WRITE )
-*         Global status value
-*
-*    Method :
-*
+*        Global status value
+
+*  Algorithm:
 *     Check for error on entry - if not o.k. return immediately
 *     If input power is less than negative unity then
 *        Very small pixel values may cause us to overflow - work out
@@ -81,42 +84,63 @@
 *        Endfor
 *     Endif
 *     Return
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
+
+*  Copyright:
+*     Copyright (C) 1986, 1988 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     Mark McCaughrean UoE ( REVA::MJM )
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     03-07-1986 :  First implementation (REVA::MJM)
 *     1986 Aug 12:  Renamed from POWARR2D, generalised to any array,
-*                   completed prologue and nearly conformed to 
-*                   Starlink standards (RL.STAR::CUR).
+*        completed prologue and nearly conformed to
+*        Starlink standards (RL.STAR::CUR).
 *     1986 Sep 2 :  Renamed parameters -> arguments section in prologue,
-*                   corrected bad-pixel handling and tidied 
-*                   (RL.CUR::STAR).
+*        corrected bad-pixel handling and tidied
+*        (RL.CUR::STAR).
 *     1986 Oct 27:  Extended the protection to prevent underflows and
-*                   overflows when the power lies between -1 and 1
-*                   (RL.CUR::STAR).
+*        overflows when the power lies between -1 and 1
+*        (RL.CUR::STAR).
 *     1988 May 24:  Allow for raising negative numbers to even powers
-*                   (RL.CUR::STAR).
-*
-*    Type definitions :
+*        (RL.CUR::STAR).
+*     {enter_further_changes_here}
 
+*  Bugs:
+*     None known.
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT  NONE          ! no implicit typing allowed
 
-*    Global constants :
 
+*  Global Constants:
       INCLUDE  'SAE_PAR'      ! SSE global definitions
       INCLUDE 'PRM_PAR'       ! PRIMDAT public constants
 
-*    Import :
 
+*  Arguments Given:
       INTEGER
      :    DIMS
 
@@ -124,22 +148,22 @@
      :    INARR( DIMS ),
      :    POWER
 
-*    Export :
 
+*  Arguments Returned:
       REAL
      :    OUTARR( DIMS )
 
-*    Status :
 
+*  Status:
       INTEGER  STATUS
 
-*    Local variables :
 
+*  Local Variables:
       INTEGER
      :    J                   ! counter variable
-   
+
       REAL
-     :    MAXVAL,             ! maximum valid pixel value allowed 
+     :    MAXVAL,             ! maximum valid pixel value allowed
      :    MINVAL,             ! minimum   "     "     "      "
      :    X                   ! work variable
 
@@ -147,7 +171,9 @@
      :    LRGCHK              ! we are in danger from large pixel values
                               ! as opposed to small ones
 
-*-
+
+*.
+
 *    check status on entry - return if not o.k.
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -159,7 +185,7 @@
 
       IF ( POWER .LT. -1.0 ) THEN
 
-*       when the power is negative, the danger pixel values are small 
+*       when the power is negative, the danger pixel values are small
 *       positive ones - work out the limit
 
          MINVAL  =  EXP( X / POWER )
@@ -191,7 +217,7 @@
 
       ELSE
 
-*       any pixel value is o.k. 
+*       any pixel value is o.k.
 
          MAXVAL  =  VAL__MAXR
          MINVAL  =  VAL__MINR

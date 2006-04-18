@@ -1,6 +1,6 @@
       SUBROUTINE KPG1_MKLUT( IX, IY, NPNT, NVAR, FRM, TABLE, MAP, 
      :                       STATUS )
- *+
+*+
 *  Name:
 *     KPG1_MKLUT
 

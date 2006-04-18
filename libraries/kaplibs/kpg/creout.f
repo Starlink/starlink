@@ -1,9 +1,18 @@
-*+  CREOUT - creates and returns a locator to an IMAGE type structure
-
       SUBROUTINE CREOUT( PARNAM, TLENAM, NDIM, DIMS, LOCAT, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     CREOUT
+
+*  Purpose:
+*     creates and returns a locator to an IMAGE type structure.
+
+*  Language:
+*     Starlink
+
+*  Invocation:
+*     CALL CREOUT( PARNAM, LABNAM, NDIM, DIMS, LOCAT, STATUS )
+
+*  Description:
 *     An IMAGE-type data structure, associated with the parameter name
 *     in PARNAM, is created. A locator for this structure is returned
 *     in LOCAT. A TITLE component, associated with the parameter name in
@@ -14,35 +23,29 @@
 *     and is of type _REAL.
 *     An immediate return will occur if STATUS has an error value on
 *     entry.
-*
-*    Invocation :
-*
-*     CALL CREOUT( PARNAM, LABNAM, NDIM, DIMS, LOCAT, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     PARNAM = CHAR*(*)( READ )
-*           Parameter name associated with the IMAGE type structure to
-*           be created.
+*        Parameter name associated with the IMAGE type structure to
+*        be created.
 *     TLENAM = CHAR*(*)( READ )
-*           Parameter name associated with the TITLE component created
-*           in the new IMAGE-type structure.
+*        Parameter name associated with the TITLE component created
+*        in the new IMAGE-type structure.
 *     NDIM   = INTEGER( READ )
-*           Dimensionality of the DATA_ARRAY component of the new
-*           IMAGE-type structure.
+*        Dimensionality of the DATA_ARRAY component of the new
+*        IMAGE-type structure.
 *     DIMS( NDIM ) = INTEGER( READ )
-*           Dimensions of the DATA_ARRAY component of the new IMAGE-type
-*           structure.
+*        Dimensions of the DATA_ARRAY component of the new IMAGE-type
+*        structure.
 *     LOCAT  = CHAR*(*)( WRITE )
-*           Locator to the new IMAGE-type structure.
+*        Locator to the new IMAGE-type structure.
 *     STATUS = INTEGER( UPDATE )
-*           This is the global status, if this variable has an error
-*           value on entry then an immediate return will occur. If an
-*           error occurs during the execution of this routine STATUS
-*           will be returned containing the appropriate error value.
-*
-*    Method :
-*
+*        This is the global status, if this variable has an error
+*        value on entry then an immediate return will occur. If an
+*        error occurs during the execution of this routine STATUS
+*        will be returned containing the appropriate error value.
+
+*  Algorithm:
 *     If no error on entry then
 *        Create a new IMAGE-type data structure associated with the
 *          parameter name PARNAM.
@@ -59,30 +62,54 @@
 *           Endif
 *        Endif
 *     Endif
-*
-*    Authors :
-*
+
+*  Copyright:
+*     Copyright (C) 1983, 1986 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     Dave Baines (ROE::ASOC5)
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     01/12/1983 : Original version                       (ROE::ASOC5)
 *     20/02/1983 : Handles null response to TITLE request (ROE::ASOC5)
 *     1986 Sep 12: Renamed parameters section to arguments and tidied
-*                  (RL.STAR::CUR)
-*
-*    Type Definitions :
+*        (RL.STAR::CUR)
+*     {enter_further_changes_here}
 
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
 
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PAR_ERR'
 
-*    Import :
 
+*  Arguments Given:
       CHARACTER*(*)
      :  PARNAM,
      :  TLENAM
@@ -91,19 +118,22 @@
      :  NDIM,
      :  DIMS( NDIM )
 
-*    Export :
 
-      CHARACTER*(*)  
+*  Arguments Returned:
+      CHARACTER*(*)
      :  LOCAT
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
 
+*  Local Variables:
       CHARACTER*72
      :  TITLE   ! label written to new structure as TITLE component
-*-
+
+*.
+
 
 *    check for error on entry
 
@@ -154,7 +184,7 @@
             IF( STATUS .NE. SAI__OK ) THEN
                CALL DAT_ANNUL( LOCAT, STATUS )
             ENDIF
-         ENDIF               
+         ENDIF
       ENDIF
 
       END

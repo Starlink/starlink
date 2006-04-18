@@ -1,35 +1,37 @@
-*+  NORMAL - takes a value and returns a normally distributed noisy
-*            version
-
       SUBROUTINE NORMAL ( INVAL, SIGMA, SEED, OUTVAL, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     NORMAL
+
+*  Purpose:
+*     takes a value and returns a normally distributed noisy.
+
+*  Language:
+*     Starlink
+
+*  Invocation:
+*     CALL NORMAL( INVAL, SIGMA, SEED, OUTVAL, STATUS )
+
+*  Description:
 *     This routine takes as input a number and returns a number
 *     which is the input number plus or minus a random amount
 *     of normally distributed noise. Uses a Box-Mueller algorithm
 *     to generate a fairly good normal distribution.
-*
-*    Invocation :
-*
-*     CALL NORMAL( INVAL, SIGMA, SEED, OUTVAL, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     INVAL  =  REAL( READ )
-*         Input value to which noise is to be added
+*        Input value to which noise is to be added
 *     SIGMA  =  REAL ( READ )
-*         Standard deviation of  normal distribution
+*        Standard deviation of  normal distribution
 *     SEED  =  REAL ( READ, WRITE )
-*         Seed for random number generator.
+*        Seed for random number generator.
 *     OUTVAL  =  REAL ( WRITE )
-*         Output value which has random noise added
+*        Output value which has random noise added
 *     STATUS = INTEGER ( READ )
-*         Global status value
-*
-*    Method :
-*
-*     If error on entry 
+*        Global status value
+
+*  Algorithm:
+*     If error on entry
 *        OUTVAL = INVAL
 *     Else
 *        Initialise finished flag to false
@@ -44,58 +46,79 @@
 *        Enddo
 *     Endif
 *     Return
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
+
+*  Copyright:
+*     Copyright (C) 1986, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     Mark McCaughrean UoE ( REVA::MJM )
 *     Malcolm Currie RAL ( UK.AC.RL.STAR::CUR )
-*
-*    History :
-*
-*     14-02-1986 : First implementation (REVA::MJM)  
-*     1986 Aug 12: Completed prologue and nearly conformed to 
-*                  Starlink standards (RL.STAR::CUR).
-*     1986 Sep 2 : Renamed parameter section arguments and tidied
-*                  (RL.STAR::CUR).
-*     1992 Mar 17: Used portable random-number generation (RAL::CUR).
-*
-*    Type definitions :
+*     {enter_new_authors_here}
 
+*  History:
+*     14-02-1986 : First implementation (REVA::MJM)
+*     1986 Aug 12: Completed prologue and nearly conformed to
+*        Starlink standards (RL.STAR::CUR).
+*     1986 Sep 2 : Renamed parameter section arguments and tidied
+*        (RL.STAR::CUR).
+*     1992 Mar 17: Used portable random-number generation (RAL::CUR).
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     None known.
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT  NONE            ! no implicit typing allowed
 
-*    Global constants :
 
+*  Global Constants:
       INCLUDE  'SAE_PAR'        ! SSE global definitions
 
-*    Import :
 
+*  Arguments Given:
       REAL
      :     INVAL,
      :     SIGMA
 
-*    Import-Export :
 
+*  Arguments Given and Returned:
       REAL
      :     SEED
 
-*    Export :
 
+*  Arguments Returned:
       REAL
      :     OUTVAL
 
-*    Status :
 
+*  Status:
       INTEGER  STATUS
 
 *    External References:
       REAL SLA_RANDOM           ! Random-number generator
 
-*    Local variables :
 
+*  Local Variables:
       REAL
      :     RA, RB, RR, R        ! random numbers used by algorithm
 
@@ -103,7 +126,9 @@
      :     FINSHD               ! flag variable used to check that a
                                 ! valid random number has been generated
 
-*-
+
+*.
+
 *    check status on entry - return if not o.k.
 
       IF ( STATUS .NE. SAI__OK ) THEN
