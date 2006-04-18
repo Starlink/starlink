@@ -1,22 +1,44 @@
 #include <config.h>
 
-************************************************************************
-*                               BEGIN                                  *
-*                                                                      *
-*                Definitions of NUM_ REAL functions                    *
-*                ----------------------------------                    *
-*                                                                      *
-*                               BEGIN                                  *
-************************************************************************
-*
-*    Authors :
+*+
+*  Name:
+*     NUM_DEF_R
+
+*  Purpose:
+*     Definitions of NUM_ REAL functions
+
+*  Copyright:
+*     Copyright (C) 1988 Science & Engineering Research Council.
+*     Copyright (C) 2003 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     R.F. Warren-Smith (DUVAD::RFWS)
-*
-*    History :
-*     16-AUG-1988:  Original version (DUVAD::RFWS)
-*     12-MAR-2003:  autoconfed (Norman Gray, Starlink)
-*    endhistory
-*
+*     Norman Gray (Starlink)
+
+*  History:
+*     16-AUG-1988 (RFWS):
+*         Original version
+*     12-MAR-2003 (NXG):
+*         autoconfed
+
+*  Notes:
 *    The definitions below use SIND and friends as well as SIN, if these
 *    are available as intrinsics (they take and return arguments in
 *    degrees instead of radians).  Whether these are available or not is
@@ -24,7 +46,8 @@
 *    and if it is, assumes that the others are, too.  It configures this
 *    file by defining macro HAVE_INTRINSIC_SIND in config.h.  This file
 *    must be run through a Fortran preprocessor before use.
- 
+
+*-
  
 *******************************************
 *   Arithmetic between two REAL numbers   *

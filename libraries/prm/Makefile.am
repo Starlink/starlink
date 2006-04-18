@@ -208,6 +208,7 @@ EXTRA_DIST = $(PLATFORM_SOURCE) $(PLATFORM_INCLUDES:=.F) \
         prm_err.msg
 
 dist_starnews_DATA = prm.news
+dist_pkgdata_DATA = LICENCE
 
 CLEANFILES = PRM_ERR
 

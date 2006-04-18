@@ -11,6 +11,8 @@
 
     Switch to a new build system using GNU autoconf
 
+    Released under the GPL
+
  v1.3-1
     Provides an implementation of floating point error handling for alpha_OSF1.
 

@@ -1,29 +1,51 @@
 #include <config.h>
-************************************************************************
-*				BEGIN				       *
-*                                                                      *
-*      NUM_ common block definitions for numerical error trapping      *
-*      ----------------------------------------------------------      *
-*                                                                      *
-*				BEGIN                                  *
-************************************************************************
-*
-*    Version:
-*     sun4_Solaris.
-*
-*    Authors :
+
+*+
+*  Name:
+*     NUM_CMN
+
+*  Purpose:
+*     NUM_ common block definitions for numerical error trapping
+
+*  Copyright:
+*     Copyright (C) 1988 Science & Engineering Research Council.
+*     Copyright (C) 1997, 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     R.F. Warren-Smith (DUVAD::RFWS)
 *     BLY: M.J. Bly  (Starlink, RAL)
 *     NXG: Norman Gray (Starlink, Glasgow)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
-*
-*    History :
-*     16-AUG-1988:  Original version (DUVAD::RFWS)
-*     22-JAN-1997:  System specific versions for Unix (BLY)
-*     21-MAR-2004:  Autoconf (NXG) 
-*     15-AUG-2005:  Should not mark a COMMON as VOLATILE
-*    endhistory
-*
+
+*  History:
+*     16-AUG-1988 (RFWS):
+*         Original version
+*     22-JAN-1997 (BLY):
+*         System specific versions for Unix (BLY)
+*     21-MAR-2004 (NXG):
+*         Autoconf (NXG) 
+*     15-AUG-2005 (TIMJ):
+*         Should not mark a COMMON as VOLATILE
+
+*-
 
 *   Exception status variable to indicate a numerical error has been
 *   detected. 
