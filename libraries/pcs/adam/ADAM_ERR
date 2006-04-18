@@ -1,17 +1,66 @@
-*+  ADAMERRS - general error and status codes for the ADAM system
-*    Description:
+*+
+*  Name:
+*     ADAM_ERR
+
+*  Purpose:
+*     general error and status codes for the ADAM system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL ADAMERRS( [p]... )
+
+*  Description:
 *     Global parameter definitions used generally through the ADAM system.
-*    Authors:
-*     John Cooke (REVS::JAC) 21Mar84
-*    History:
-*     30Apr84 (REVS:JAC) context error added
-*     18Jun84 (REVA:ADAM) change status names (John Cooke)
-*     21Jun84 (REVA::ADAM) remove ss errs (used by messys) (John Cooke)
-*     27Aug86 (REVA::ADAM) remove ILLCONTEXT status to dtaskmsg (John Cooke)
-*    endhistory
+
+*  Copyright:
+*     Copyright (C) 1984, 1986 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     JAC: John Cooke (REVS::JAC)
+*     {enter_new_authors_here}
+
+*  History:
+*     21-MAR-1984 (JAC):
+*        Original version
+*     30-Apr-1984 (JAC):
+*        context error added
+*     18-Jun-1984 (JAC):
+*        change status names
+*     21-Jun-1984 (JAC):
+*        remove ss errs (used by messys)
+*     27-Aug-1986 (JAC):
+*        remove ILLCONTEXT status to dtaskmsg
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *    Global constants:
 
       INTEGER ADAM__OK
       PARAMETER ( ADAM__OK = 0 )   !  normal subroutine return status
 
-*-
+
+*.
+
