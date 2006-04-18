@@ -2461,7 +2461,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="mers" support="U">
-  <version>1.8</version>
+  <version>1.8-1</version>
   <path>libraries/mers</path>
   <description>Message and Error Reporting Systems</description>
   <abstract><p>This package contains two Fortran subroutine libraries,
