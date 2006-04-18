@@ -59,16 +59,13 @@ BUILT_SOURCES = $(noinst_MESSAGES) $(include_MESSAGES)
 
 # Tests
 
-TESTS = psx_test test_alloc test_cuserid test_getenv test_getpid \
+TESTS = test_alloc test_cuserid test_getenv test_getpid \
 	test_getuid test_putenv test_rand test_term test_time test_uname \
 	test_remove test_access test_getcwd test_chdir
 
-check_PROGRAMS = psx_test test_alloc test_cuserid test_getenv test_getpid \
+check_PROGRAMS = test_alloc test_cuserid test_getenv test_getpid \
 	test_getuid test_putenv test_rand test_term test_time test_uname \
 	test_remove test_access test_getcwd test_chdir
-
-psx_test_SOURCES = psx_test.f
-psx_test_LDADD = libpsx.la `ems_link` `cnf_link`
 
 test_alloc_SOURCES = test_alloc.f
 test_alloc_LDADD = libpsx.la `ems_link` `cnf_link`
