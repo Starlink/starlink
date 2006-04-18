@@ -49,3 +49,4 @@ trn_test_SOURCES = trn_test.f
 trn_test_LDADD = libtrn.la `hds_link` `err_link` `chr_link` `prm_link`
 
 dist_starnews_DATA = trn.news
+dist_pkgdata_DATA = LICENCE

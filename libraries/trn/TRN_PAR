@@ -1,22 +1,44 @@
-************************************************************************
-*                             BEGIN                                    *
-*                                                                      *
-*         Public constant definitions for the TRANSFORM facility       *
-*         ------------------------------------------------------       *
-*                                                                      *
-*                             BEGIN                                    *
-************************************************************************
-*
-*    Authors :
-*     R.F. Warren-Smith
-*
-*    History :
-*     6-MAY-1988:  Original version (DUVAD::RFWS)
-*     9-MAY-1988:  Added TRN__SZPRC constant (DUVAD::RFWS)
-*     17-AUG-1988:  Added TRN__NOID constant (DUVAD::RFWS)
-*     6-DEC-1988:  Version 0.9 (DUVAD::RFWS)
-*    endhistory
-*
+*+
+*  Name:
+*     TRN_PAR
+
+*  Purpose:
+*     Public constant definitions for the TRANSFORM facility
+
+*  Copyright:
+*     Copyright (C) 1988 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (Durham)
+
+*  History:
+*     06-MAY-1988 (RFWS):
+*         Original version
+*     09-MAY-1988 (RFWS):
+*         Added TRN__SZPRC constant.
+*     17-AUG-1988 (RFWS):
+*         Added TRN__NOID constant
+*     06-DEC-1988 (RFWS):
+*         Version 0.9
+
+*-
 
 
 
