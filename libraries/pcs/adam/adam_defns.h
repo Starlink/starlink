@@ -31,7 +31,7 @@
 *     02111-1307, USA
 
 *  Authors:
-*     IRJ:
+*     IRJ: I. R. Jenkins (Starlink)
 *     SKR:
 *     AJC: Alan Chipperfield (Starlink)
 
