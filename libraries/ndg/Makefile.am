@@ -54,7 +54,7 @@ test1_SOURCES = ndg_test.f
 test1_LDADD = libndg.la `$(srcdir)/ndg_link`
 
 dist_starnews_DATA = ndg.news
-
+dist_pkgdata_DATA = LICENCE
 CLEANFILES = TOM.sdf DICK.sdf HARRY.sdf 
 
 
