@@ -79,6 +79,9 @@
 *        Create a new temporary NDF (without mapping any array
 *        components) rather than taking a copy of the supplied NDF, since
 *        the supplied NDF may be very large.
+*     18-MAR-2006 (DSB):
+*        Use the AXIS Frame from the supplied NDF instead of from the
+*        temporary NDF when reading WCS from a FITS extension.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,13 +125,18 @@
       CHARACTER XLOC*(DAT__SZLOC) ! Locator to IRAS90 extension
       CHARACTER XNAME*(DAT__SZNAM) ! Name of extension containing IRA structure
       INTEGER ADDED              ! No. of elements added to the group
+      INTEGER AXFRM              ! AXIS Frame in supplied NDF
+      INTEGER AXMAP              ! Mapping from GRID to AXIS in supplied NDF
       INTEGER I                  ! Axis count
+      INTEGER IAX                ! Index of AXIS Frame
+      INTEGER ICURR              ! Index of original current Frame
       INTEGER IDA                ! IRA identifier for IRAS90 astrometry info
       INTEGER IGRP               ! GRP identifier for a group
       INTEGER INDFC              ! Identifier for NDF to get new WCS component
       INTEGER IPIX               ! Index of PIXEL Frame in IWCS
       INTEGER IRAFRM             ! AST Frame describing IRA sky co-ords
       INTEGER IRAMAP             ! AST Mapping from IRA "image" to sky co-ords
+      INTEGER IWCS2              ! Default FrameSet from supplied NDF
       INTEGER LBND( NDF__MXDIM ) ! Lower pixel bounds
       INTEGER NCARD              ! No. of header cards in the FITS extension
       INTEGER NDIM               ! Number of pixel axes
@@ -395,8 +403,55 @@
 
                END IF
 
-*  If a temporary copy of the NDF was used, delete it.
-               IF( .NOT. WRACC ) CALL NDF_DELET( INDFC, STATUS )
+*  If a temporary copy of the NDF was used, delete it. We also may need
+*  to copy the AXIS Frame from the original NDFs default FrameSet since it
+*  will have been truncated in size by using a temporary NDF that is
+*  smaller than the supplied NDF.
+               IF( .NOT. WRACC ) THEN
+                  CALL NDF_DELET( INDFC, STATUS )
+
+*  If the supplied NDF has a defined AXIS structure, we need to replace
+*  the AXIS Frame in the FrameSet obtained from the temporary NDF with the 
+*  AXIS Frame obtained from the supplied NDF. This is because the two
+*  NDFs will have different sizes and so the AXIS Frames will differ (e.g. 
+*  if they use LutMaps, the LutMap will have an inappropriate number of 
+*  entries).
+                  CALL NDF_STATE( INDF, 'AXIS', THERE, STATUS )
+                  IF( THERE ) THEN
+
+*  Get the default FrameSet from the supplied NDF, and get the Mapping
+*  from GRID to AXIS, and the AXIS Frame (the AXIS Frame will be the
+*  current Frame since there is no WCS FrameSet in the supplied NDF).
+                     CALL NDF_GTWCS( INDF, IWCS2, STATUS )
+                     AXMAP = AST_GETMAPPING( IWCS2, AST__BASE, 
+     :                                       AST__CURRENT, STATUS )
+                     AXFRM = AST_GETFRAME( IWCS2, AST__CURRENT, STATUS )
+
+*  Get the index of the AXIS Frame in the FrameSet read from the
+*  temporary NDF
+                     CALL KPG1_ASFFR( IWCS, 'AXIS', IAX, STATUS )
+
+*  Remove the AXIS Frame, first noting the index of the current Frame.
+                     ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
+                     CALL AST_REMOVEFRAME( IWCS, IAX, STATUS )
+
+*  Add in the AXIS Frame obtained from the supplied NDF. It becomes the
+*  current Frame.
+                     CALL AST_ADDFRAME( IWCS, AST__BASE, AXMAP, AXFRM,
+     :                                  STATUS )
+
+*  Re-instate the original current Frame.
+                     IF( ICURR .LT. IAX ) THEN
+                        CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
+
+                     ELSE IF( ICURR .GT. IAX ) THEN
+                        CALL AST_SETI( IWCS, 'CURRENT', ICURR - 1, 
+     :                                 STATUS )
+                     END IF
+
+                  END IF
+
+               END IF
 
             END IF
 
