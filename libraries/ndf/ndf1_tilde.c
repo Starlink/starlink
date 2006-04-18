@@ -20,75 +20,93 @@
 
    char *ndf1_tilde( const char *file, F77_INTEGER_TYPE *status )
    {
-/*+									    */
-/* Name:								    */
-/*    ndf1_tilde							    */
+/*
+*+
+* Name:
+*    ndf1_tilde
 
-/* Purpose:								    */
-/*    Expand leading tildes at the start of POSIX file names.		    */
+* Purpose:
+*    Expand leading tildes at the start of POSIX file names.
 
-/* Language:								    */
-/*    ANSI C								    */
+* Language:
+*    ANSI C
 
-/* Invocation:								    */
-/*    ndf1_tilde( file, status )					    */
+* Invocation:
+*    ndf1_tilde( file, status )
 
-/* Description:								    */
-/*    The routine expands tildes at the start of POSIX file path names,	    */
-/*    subsituting them with the name of the user's initial working	    */
-/*    directory.							    */
+* Description:
+*    The routine expands tildes at the start of POSIX file path names,
+*    subsituting them with the name of the user's initial working
+*    directory.
 
-/* Parameters:								    */
-/*    const char *file							    */
-/*	 Pointer to a null-terminated string containing the initial file    */
-/*	 path name.							    */
-/*    F77_INTEGER_TYPE *status						    */
-/*	 Pointer to the inherited global status.			    */
+* Parameters:
+*    const char *file
+*	 Pointer to a null-terminated string containing the initial file
+*	 path name.
+*    F77_INTEGER_TYPE *status
+*	 Pointer to the inherited global status.
 
-/* Returned Value:							    */
-/*    char *ndf1_tilde							    */
-/*	 Pointer to a null-terminated string (allocated using malloc)	    */
-/*	 containing the expanded file path name. The allocated space should */
-/*	 be deallocated by the caller (using free) when no longer required. */
+* Returned Value:
+*    char *ndf1_tilde
+*	 Pointer to a null-terminated string (allocated using malloc)
+*	 containing the expanded file path name. The allocated space should
+*	 be deallocated by the caller (using free) when no longer required.
 
-/* Notes:								    */
-/*    -  If the file path name begins with ~/ then the ~ is replaced with   */
-/*    the name of the current user's initial working directory. If it	    */
-/*    begins with ~user/ then the ~user is replaced with the name of the    */
-/*    specified user's initial working directory. In either case, the	    */
-/*    initial working directory string is obtained from the user database.  */
-/*    The "/" terminating the first path name field may also be a null	    */
-/*    (i.e. this may be the only field).				    */
-/*    -  A NULL pointer is returned if this routine is invoked with *status */
-/*    set, or if it should fail for any reason.				    */
+* Notes:
+*    -  If the file path name begins with ~/ then the ~ is replaced with
+*    the name of the current user's initial working directory. If it
+*    begins with ~user/ then the ~user is replaced with the name of the
+*    specified user's initial working directory. In either case, the
+*    initial working directory string is obtained from the user database.
+*    The "/" terminating the first path name field may also be a null
+*    (i.e. this may be the only field).
+*    -  A NULL pointer is returned if this routine is invoked with *status
+*    set, or if it should fail for any reason.
 
-/* Copyright:								    */
-/*    Copyright (C) 1993 Science & Engineering Research Council		    */
+* Copyright:
+*    Copyright (C) 1993 Science & Engineering Research Council
 
-/* Authors:								    */
-/*    RFWS: R.F. Warren-Smith (STARLINK, RAL)				    */
-/*    {@enter_new_authors_here@}					    */
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
-/* History:								    */
-/*    4-OCT-1993 (RFWS):						    */
-/*       Original version.						    */
-/*    {@enter_changes_here@}						    */
+* Authors:
+*    RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*    {@enter_new_authors_here@}
 
-/* Bugs:								    */
-/*    {@note_any_bugs_here@}						    */
+* History:
+*    4-OCT-1993 (RFWS):
+*       Original version.
+*    {@enter_changes_here@}
 
-/*-									    */
+* Bugs:
+*    {@note_any_bugs_here@}
 
-/* Local Variables:							    */
-      char *result = NULL;	 /* Pointer to result string		    */
-      char *user;		 /* Pointer to user name string		    */
-      const char *dir;		 /* Pointer to initial working directory    */
-      int dyn = 0;		 /* user string dynamically allocated?	    */
-      int i;			 /* Number of initial characters to discard */
-      size_t size;		 /* Allocated size of result string	    */
-      struct passwd *pw;	 /* Pointer to user's passwd structure	    */
+*-
+*/
 
-/*.									    */
+/* Local Variables:							    
+      char *result = NULL;	 /* Pointer to result string		    
+      char *user;		 /* Pointer to user name string		    
+      const char *dir;		 /* Pointer to initial working directory    
+      int dyn = 0;		 /* user string dynamically allocated?	    
+      int i;			 /* Number of initial characters to discard 
+      size_t size;		 /* Allocated size of result string	    
+      struct passwd *pw;	 /* Pointer to user's passwd structure	    
+
+/*.									    
 
 /* Check the inherited global status.					    */
       if ( *status != SAI__OK ) return result;

@@ -8,6 +8,10 @@ V1.6-1
    existing C programmes that use these routines will need to be modified
    (but use of DAT__ROOT should be replaced with a NULL pointer).
 
+   The ".sdf" file extension can now be included when opening a file.
+
+   Now released under the GPL.
+
 V1.5-10
    SUN/33 has been updated to include additional information about calling
    NDF from a C main function when working within the new Starlink Build

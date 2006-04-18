@@ -52,6 +52,40 @@ void ndfInit( int argc, char *const argv[], int *status ) {
 *     status
 *        Pointer to the global status.
 
+*  Copyright:
+*     Copyright (C) 1998, 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     RFWS: R. F. Warren-Smith (RAL, Starlink)
+*     PWD: Peter Draper (Durham, Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+
+*  History:
+*     30-SEP-1998 (RFWS):
+*         Original version.
+*     14-MAR-2004 (TIMJ):
+*         Import and autoconf.
+*     26-JAN-2005 (PWD):
+*         Portability fixes.
+
 *  Notes:
 *     - The actual arguments supplied for "argv" and "argc" should
 *     normally be the standard arguments supplied to the C "main"
@@ -64,7 +98,7 @@ void ndfInit( int argc, char *const argv[], int *status ) {
 *     - If these arguments are not available, then an "argc" value of
 *     zero should be given (whereupon the "argv" value will be
 *     ignored).
-*     - Additional initialisations of the Fortran Runtime may be 
+*     - Additional initialisations of the Fortran Runtime may be
 *     required for this to work correctly. The STAR_INITIALISE_FORTRAN
 *     macro of the Starlink Build System or the cnfInitRTL function
 *     will do this work, otherwise you need to arrange this for yourself.

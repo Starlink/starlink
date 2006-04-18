@@ -152,5 +152,6 @@ ndf_ctest_LDADD = libndf.la `$(srcdir)/ndf_link` `cnfrtl_link`  @FCLIBS@
 ndf_ftest_LDADD = libndf.la `$(srcdir)/ndf_link`
 
 dist_starnews_DATA = ndf.news
+dist_pkgdata_DATA = LICENCE
 
 EXTRA_DIST = $(PRIVATE_INCLUDES) 

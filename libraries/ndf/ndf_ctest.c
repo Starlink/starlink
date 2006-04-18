@@ -15,37 +15,55 @@ void FC_MAIN () {}
 #endif
 
 int main( int argc, char *argv[] ) {
-/*+                                                                         */
-/* Name:                                                                    */
-/*    ndf_test (C version)                                                  */
+/*                                                                         
+*+
+* Name:
+*    ndf_test (C version)
 
-/* Purpose:                                                                 */
-/*    Test the installation of NDF from C.                                  */
+* Purpose:
+*    Test the installation of NDF from C.
 
-/* Language:                                                                */
-/*    ANSI C                                                                */
+* Language:
+*    ANSI C
 
-/* Description:                                                             */
-/*    This program should be run after building and installing NDF in       */
-/*    order to test for correct installation of the C interface. Note that  */
-/*    this is not an exhaustive test of NDF, but only of its installation.  */
+* Description:
+*    This program should be run after building and installing NDF in
+*    order to test for correct installation of the C interface. Note that
+*    this is not an exhaustive test of NDF, but only of its installation.
 
-/* Authors:                                                                 */
-/*    RFWS: R.F. Warren-Smith (STARLINK, RAL)                               */
-/*    <{enter_new_authors_here}>                                            */
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
-/* Copyright:                                                               */
-/*    Copyright (C) 1998 Central Laboratory of the Research Councils        */
+* Authors:
+*    RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*    <{enter_new_authors_here}>
 
-/* History:                                                                 */
-/*    30-SEP-1998 (RFWS):                                                   */
-/*       Original version, derived from the equivalent Fortran program.     */
-/*    <{enter_further_changes_here}>                                        */
+* Copyright:
+*    Copyright (C) 1998 Central Laboratory of the Research Councils
 
-/* Bugs:                                                                    */
-/*    <{note_any_bugs_here}>                                                */
+* History:
+*    30-SEP-1998 (RFWS):
+*       Original version, derived from the equivalent Fortran program.
+*    <{enter_further_changes_here}>
 
-/*-                                                                         */
+* Bugs:
+*    <{note_any_bugs_here}>
+
+*-
+*/
       
 /* Status:                                                                  */
    int status;

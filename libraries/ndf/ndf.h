@@ -1,42 +1,60 @@
 #if !defined( _NDF_INCLUDED )	/* Protect against multiple inclusion	    */
 #define _NDF_INCLUDED 1
-/*+									    */
-/* Name:								    */
-/*    ndf.h								    */
+/*									    
+*+
+* Name:
+*    ndf.h
 
-/* Purpose:								    */
-/*    Public C definitions for the NDF library.                  	    */
+* Purpose:
+*    Public C definitions for the NDF library.
 
-/* Language:								    */
-/*    ANSI C								    */
+* Language:
+*    ANSI C
 
-/* Type of Module:							    */
-/*    Package public include file.					    */
+* Type of Module:
+*    Package public include file.
 
-/* Description:								    */
-/*    This file contains definitions which are used by the NDF system and   */
-/*    which may also be needed by software which calls routines from this   */
-/*    system.								    */
+* Description:
+*    This file contains definitions which are used by the NDF system and
+*    which may also be needed by software which calls routines from this
+*    system.
 
-/* Copyright:								    */
-/*    Copyright (C) 1998 Central Laboratory of the Research Councils        */
+* Copyright:
+*    Copyright (C) 1998 Central Laboratory of the Research Councils
 
-/* Authors:								    */
-/*    RFWS: R.F. Warren-Smith (STARLINK)				    */
-/*    <{enter_new_authors_here}>					    */
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
-/* History:								    */
-/*    8-OCT-1993 (RFWS:							    */
-/*       Original version.						    */
-/*    30-JAN-1995 (RFWS):                                                   */
-/*       Moved error code definitions out into separate file ndf_err.h.     */
-/*    30-SEP-1998 (RFWS)                                                    */
-/*       Added public C interface.                                          */
-/*    18-NOV-2005 (TIMJ):                                                   */
-/*       Use HDSLoc* rather than char [DAT__SZLOC]                          */
-/*    <{enter_further_changes_here}>					    */
+* Authors:
+*    RFWS: R.F. Warren-Smith (STARLINK)
+*    <{enter_new_authors_here}>
 
-/*-									    */
+* History:
+*    8-OCT-1993 (RFWS:
+*       Original version.
+*    30-JAN-1995 (RFWS):
+*       Moved error code definitions out into separate file ndf_err.h.
+*    30-SEP-1998 (RFWS)
+*       Added public C interface.
+*    18-NOV-2005 (TIMJ):
+*       Use HDSLoc* rather than char [DAT__SZLOC]
+*    <{enter_further_changes_here}>
+
+*-
+*/
 
 /* External interfaces.                                                     */
 /* ====================                                                     */
