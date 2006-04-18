@@ -1,66 +1,90 @@
-*+  SUBPAR_ENQUOTE - Enclose a given string in quotes
       SUBROUTINE SUBPAR_ENQUOTE ( STRING, QUOSTR, QUOLEN, STATUS )
-*    Description :
+*+
+*  Name:
+*     SUBPAR_ENQUOTE
+
+*  Purpose:
+*     Enclose a given string in quotes.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL SUBPAR_ENQUOTE ( STRING, QUOSTR, QUOLEN, STATUS )
+
+*  Description:
 *     Puts the given string into ADAM syntax - i.e. it is enclosed
-*     in single quotes and any single or double quotes within the string are 
+*     in single quotes and any single or double quotes within the string are
 *     doubled up.
 *     NOTE that the whole of the declared length of STRING is enclosed in
 *     quotes
-*    Invocation :
-*     CALL SUBPAR_ENQUOTE ( STRING, QUOSTR, QUOLEN, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     STRING=CHARACTER*(*) (given)
-*           The string to be quoted
+*        The string to be quoted
 *     QUOSTR=CHARACTER*(*) (returned)
-*           The quoted string
+*        The quoted string
 *     QUOLEN=INTEGER (returned)
-*           The used length of QUOSTR
+*        The used length of QUOSTR
 *     STATUS=INTEGER (returned)
-*    Method :
+
+*  Algorithm:
 *     The given string is searched for ' or " and copied to the output
 *     string surrounded by ' '. Any ' or " found is doubled up.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*     AJC: A.J.Chipperfield (Starlink)
-*    History :
-*     27-NOV-1996 (AJC):
-*        Original
-*      9-JUL-1997 (AJC):
-*        Add QUOLEN to invocation comment
-*    endhistory
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'SUBPAR_ERR'      
 
-*    Import :
+*  Authors:
+*     AJC: A.J.Chipperfield (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     27-NOV-1996 (AJC):
+*          Original
+*      9-JUL-1997 (AJC):
+*          Add QUOLEN to invocation comment
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'SUBPAR_ERR'
+
+
+*  Arguments Given:
       CHARACTER*(*) STRING      ! The string to be quoted
 
-*    Export :
+
+*  Arguments Returned:
       CHARACTER*(*) QUOSTR      ! The quoted string
       INTEGER QUOLEN            ! Used length of QUOSTR
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+
+*  Local Variables:
       INTEGER MAXEXP    ! Maximum possible expansion
       INTEGER I         ! Pointer within STRING
       INTEGER J         ! Pointer within QUOSTR
       INTEGER PTR       ! Relative pointer to quote in STRING
       INTEGER PTR1      ! Relative pointer to ' in STRING
       INTEGER PTR2      ! Relative pointer to " in STRING
-*-
+
+*.
+
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   First determine if quoting is possible
       MAXEXP = LEN( QUOSTR ) - LEN( STRING ) -2
       IF ( MAXEXP .GT. 0 ) THEN
-         
+
          I = 1
          J = 2
          QUOSTR(1:1) = ''''
