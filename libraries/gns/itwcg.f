@@ -13,7 +13,7 @@
 *  Description:
 *     The specified characteristic is returned as a character string,
 *     blank filled or truncated as necessary. If the characteristic does
-*     not exist then a blank string is returned. 
+*     not exist then a blank string is returned.
 *
 *     Any characteristic with a keyword value (see appendix A) can be
 *     inquired with this routine.
@@ -31,10 +31,30 @@
 *  Notes:
 *     This performs the same function as GNS_IWCG except that the device
 *     is specified by its GKS type and therefore the characteristics can
-*     be queried before the device is opened by GKS. 
+*     be queried before the device is opened by GKS.
 
 *  Side Effects:
 *     The GNS database may be opened.
+
+*  Copyright:
+*     Copyright (C) 1990, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     NE: Nick Eaton (Durham University)

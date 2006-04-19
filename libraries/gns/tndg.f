@@ -41,6 +41,27 @@
 *     from the common block arrays. This, however, assumes that the
 *     connection id. hasn't been hijacked in some way in between calls.
 
+*  Copyright:
+*     Copyright (C) 1990, 1991, 1992 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DLT: D.L. Terrett (STARLINK)
 *     NE: Nick Eaton (Durham University)
@@ -229,7 +250,7 @@
       
    40    CONTINUE
 
-*   Make sure that the common block contains data for this type 
+*   Make sure that the common block contains data for this type
          CALL GNS_1RDWST(IWKTYP, STATUS)
          IF (STATUS.NE.0) GO TO 9000
 
@@ -241,7 +262,7 @@
 *        select a suitable connection id (ie. one that isn't in use or
 *        has a file connected to it).
 *     else
-*        If 
+*        If
 *           the device is a terminal and the connection id is zero
 *        then
 *           use connection id 5.
@@ -306,7 +327,7 @@
                IF (OPEN) GO TO 50
 
 *        On an interactive workstation the next logical unit is used as
-*        well so we must check it too. 
+*        well so we must check it too.
                IF ( ICAT.EQ.GOUTIN ) THEN
                   INQUIRE ( UNIT = ICON, OPENED = OPEN)
                   IF (OPEN) GO TO 50
@@ -325,7 +346,7 @@
                CDENAG( NUMCOG ) = CDEV(:LDEV)
             ENDIF
 
-*        It's ok to use this id      
+*        It's ok to use this id
             ICONID = ICON
 
 *        Construct the appropriate environment string
