@@ -1,88 +1,112 @@
-*+  PARSECON_ACTLIST - Insert value into constraint list for actions
       SUBROUTINE PARSECON_ACTLIST ( ENTRY, STATUS )
-*    Description :
-*     Adds a value into the constraint-list for the most recent 
-*     entry on the list of required parameters for actions.
-*    Invocation :
+*+
+*  Name:
+*     PARSECON_ACTLIST
+
+*  Purpose:
+*     Insert value into constraint list for actions.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
 *     CALL PARSECON_ACTLIST ( ENTRY, STATUS )
-*    Parameters :
+
+*  Description:
+*     Adds a value into the constraint-list for the most recent
+*     entry on the list of required parameters for actions.
+
+*  Arguments:
 *     ENTRY=CHARACTER*(*) (given)
-*           data value
+*        data value
 *     STATUS=INTEGER
-*    Method :
-*     This routine adds a value into the constraint-list for the most 
+
+*  Algorithm:
+*     This routine adds a value into the constraint-list for the most
 *     recent entry on the list of required parameters for actions.
-*     The common variable NEEDPTR has been previously set to point to 
-*     the relevant entry, and this entry is a pointer to the relevant 
-*     parameter. The type of this parameter is extracted from storage, 
-*     and compared with the type deduced from the syntax of the value 
-*     string in ENTRY. Any valid type conversions are performed, and the 
+*     The common variable NEEDPTR has been previously set to point to
+*     the relevant entry, and this entry is a pointer to the relevant
+*     parameter. The type of this parameter is extracted from storage,
+*     and compared with the type deduced from the syntax of the value
+*     string in ENTRY. Any valid type conversions are performed, and the
 *     value is stored.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     14.09.1984:  Original (REVAD::BDK)
 *     16.02.1988:  force character values to uppercase (REVAD::BDK)
 *     15.10.1990:  Signal error on real or double to integer conversion
-*                  Use CHR for conversion. (RLVAD::AJC)
+*        Use CHR for conversion. (RLVAD::AJC)
 *     24.02.1992:  Report errors (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PARSECON_ERR'
       INCLUDE 'PARSECON_PAR'
       INCLUDE 'SUBPAR_PAR'
 
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) ENTRY                        ! data value
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
 
-*    Local variables :
-      INTEGER TEMPTR                           ! pointer to the 
-                                               ! parameter being 
+
+*  Local Variables:
+      INTEGER TEMPTR                           ! pointer to the
+                                               ! parameter being
                                                ! constrained
 
-      INTEGER DECTYPE                          ! code for type of 
-                                               ! declared program 
+      INTEGER DECTYPE                          ! code for type of
+                                               ! declared program
                                                ! parameter
 
       INTEGER CLASS                            ! code for type of ENTRY
                                                ! deduced from its syntax
 
       CHARACTER*132 VALUE_CHAR                 ! decoded ENTRY string
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*   Look-up the pointer to the parameter most recently added to the 
+*   Look-up the pointer to the parameter most recently added to the
 *   needs list.
-      TEMPTR = NEEDPAR(NEEDPTR) 
+      TEMPTR = NEEDPAR(NEEDPTR)
 
-*   Get the type declared for the parameter indicated by the last entry 
+*   Get the type declared for the parameter indicated by the last entry
 *   on the needs list.
       DECTYPE = PARTYPE ( TEMPTR )
 
-*   determine what type information can be deduced from the syntax of 
-*   the entry to be added, and do any syntax-dependent string 
+*   determine what type information can be deduced from the syntax of
+*   the entry to be added, and do any syntax-dependent string
 *   processing. - eg remove single quotes from character constant.
       CALL PARSECON_DECVAL ( ENTRY, VALUE_CHAR, CLASS, STATUS )
 
-*   Check for acceptable type conversions between the given entry value 
+*   Check for acceptable type conversions between the given entry value
 *   and the declared type of the associated parameter.
       IF ( CLASS .EQ. PARSE__STRUC ) THEN
 
@@ -94,8 +118,8 @@
 
       ELSE IF ( CLASS .EQ. PARSE__CHAR ) THEN
 
-*      String constant. VALUE_CHAR will contain the string with the 
-*      delimiting single quotes removed, and double (ie escaped) quotes 
+*      String constant. VALUE_CHAR will contain the string with the
+*      delimiting single quotes removed, and double (ie escaped) quotes
 *      contracted.
          IF ( DECTYPE .EQ. SUBPAR__CHAR ) THEN
 
@@ -104,7 +128,7 @@
                CHARPTR = CHARPTR + 1
                CALL CHR_UCASE( VALUE_CHAR )
                CHARLIST(CHARPTR) = VALUE_CHAR
-               IF ( NEEDLIMS(1,NEEDPTR) .EQ. 0 ) 
+               IF ( NEEDLIMS(1,NEEDPTR) .EQ. 0 )
      :           NEEDLIMS(1,NEEDPTR) = CHARPTR
                NEEDLIMS(2,NEEDPTR) = CHARPTR
 
@@ -123,7 +147,7 @@
             CALL EMS_REP ( 'PCN_ACTLIST3',
      :      'PARSECON: String as constraint for numeric parameter',
      :       STATUS )
-            
+
          ENDIF
 
       ELSE IF ( CLASS .EQ. PARSE__NUMBER ) THEN
@@ -136,7 +160,7 @@
 
                REALPTR = REALPTR + 1
                CALL CHR_CTOR( ENTRY, REALLIST(REALPTR), STATUS )
-               IF ( NEEDLIMS(1,NEEDPTR) .EQ. 0 ) 
+               IF ( NEEDLIMS(1,NEEDPTR) .EQ. 0 )
      :           NEEDLIMS(1,NEEDPTR) = REALPTR
                NEEDLIMS(2,NEEDPTR) = REALPTR
 
@@ -155,7 +179,7 @@
 
                DOUBLEPTR = DOUBLEPTR + 1
                CALL CHR_CTOD( ENTRY, DOUBLELIST(DOUBLEPTR), STATUS )
-               IF ( NEEDLIMS(1,NEEDPTR) .EQ. 0 ) 
+               IF ( NEEDLIMS(1,NEEDPTR) .EQ. 0 )
      :           NEEDLIMS(1,NEEDPTR) = DOUBLEPTR
                NEEDLIMS(2,NEEDPTR) = DOUBLEPTR
 
@@ -174,7 +198,7 @@
 
                INTPTR = INTPTR + 1
                CALL CHR_CTOI( ENTRY, INTLIST(INTPTR), STATUS )
-               IF ( NEEDLIMS(1,NEEDPTR) .EQ. 0 ) 
+               IF ( NEEDLIMS(1,NEEDPTR) .EQ. 0 )
      :           NEEDLIMS(1,NEEDPTR) = INTPTR
                NEEDLIMS(2,NEEDPTR) = INTPTR
 

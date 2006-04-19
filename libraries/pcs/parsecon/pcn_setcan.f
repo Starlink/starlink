@@ -1,44 +1,67 @@
-*+  PARSECON_SETCAN - Set CANCEL flag
       SUBROUTINE PARSECON_SETCAN ( FLAG, STATUS )
-*    Description :
-*     Sets the flag indicating whether CANCEL is valid for the current 
-*     action
-*    Invocation :
+*+
+*  Name:
+*     PARSECON_SETCAN
+
+*  Purpose:
+*     Set CANCEL flag.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
 *     CALL PARSECON_SETCAN ( FLAG, STATUS )
-*    Parameters :
+
+*  Description:
+*     Sets the flag indicating whether CANCEL is valid for the current
+*     action
+
+*  Arguments:
 *     FLAG=LOGICAL (given)
-*           .TRUE. => CANCEL is valid for the current action.
+*        .TRUE. => CANCEL is valid for the current action.
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Set the value into the common-block variable.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     02.10.1984:  Original (REVAD::BDK)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
-*    Import :
+
+*  Arguments Given:
       LOGICAL FLAG                 ! value to be set
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
 
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

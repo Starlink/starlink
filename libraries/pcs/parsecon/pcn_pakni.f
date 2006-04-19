@@ -1,30 +1,33 @@
       SUBROUTINE PARSECON_PAKNI( LU, N, ARRAY, START, END, STATUS )
+
+
+
+
+
+
+
+
+
+
+
+
 *+
 *  Name:
-*     PARSECON_PAKNI
- 
+*     {routine_name}
+
 *  Purpose:
-*     To encode elements of the compiled form of an interface file for
-*     a 2-D INTEGER array to reduce the file size.
- 
+*     {routine_purpose}
+
 *  Language:
-*     Starlink Fortran 77
- 
+*     VAX Fortran
+
 *  Invocation:
 *     CALL PARSECON_PAKNI( LU, N, ARRAY, START, END, STATUS )
- 
+
 *  Description:
-*     The routine encodes the N elements of the given array for each of
-*     values of the second dimension starting at the STARTth element
-*     and ending at the ENDth element into two parallel arrays. One
-*     gives a value and the other the number of consecutive occurrences
-*     of the value.
-*     The two arrays are then written to the .IFC file.
- 
-*  Deficiencies:
-*     The routine will only handle with certainty, values of N less
-*     than 4.
- 
+*     To encode elements of the compiled form of an interface file for
+*     a 2-D INTEGER array to reduce the file size.
+
 *  Arguments:
 *     LU = INTEGER (Given)
 *        The logical unit number to write to
@@ -38,40 +41,76 @@
 *        The last value of the second dimension to be encoded
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
+*  Implementation Deficiencies:
+*     The routine will only handle with certainty, values of N less
+*     than 4.
+
+*  Name:
+*     PARSECON_PAKNI
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Copyright:
+*     Copyright (C) 1991, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
- 
+*     {enter_new_authors_here}
+
 *  History:
 *     3-JUL-1991 (AJC):
 *        Original version.
 *     24-MAR-1993 (AJC):
 *        Add DAT_PAR for SUBPAR_CMN
 *     {enter_changes_here}
- 
+*     {enter_further_changes_here}
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+*     {note_new_bugs_here}
+
 *-
- 
+
+*.
+
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'
- 
+
 *  Arguments Given:
       INTEGER LU
       INTEGER N
       INTEGER ARRAY( N, * )
       INTEGER START
       INTEGER END
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'       ! Needed for SUBPAR__MAXPAR
 
@@ -83,22 +122,22 @@
       INTEGER BPT                ! Pointer to next entry in buffers
       INTEGER I                  ! Loop counter
       INTEGER J                  ! Loop counter
- 
+
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Initialise counters
       BPT = 1
       NV = 0
       LASTV = ARRAY( 1, START )
- 
+
 *  Loop through ARRAY from START to END
       DO 20, I = START, END
- 
+
          DO 10, J = 1, N
- 
+
             IF( ARRAY( J, I ) .NE. LASTV ) THEN
 *           End of consecutive equal values
                VBUFF( BPT ) = LASTV
@@ -106,22 +145,22 @@
                BPT = BPT + 1
                LASTV = ARRAY( J, I )
                NV = 1
- 
+
             ELSE
 *           Count consecutive values
                NV = NV + 1
- 
+
             ENDIF
- 
+
 10       CONTINUE
- 
+
 20    CONTINUE
- 
+
 *  End of ARRAY
 *  Save the last value and write the record
       VBUFF( BPT ) = LASTV
       NBUFF( BPT ) = NV
- 
+
       WRITE ( LU ) BPT, (NBUFF(I),I=1,BPT), (VBUFF(I),I=1,BPT)
- 
+
       END

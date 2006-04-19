@@ -1,58 +1,83 @@
-*+  PARSECON_SETACC - Sets-up parameter access mode
       SUBROUTINE PARSECON_SETACC ( ENTRY, STATUS )
-*    Description :
-*     Interprets the provided keyword as READ WRITE or UPDATE regardless
-*     of case and puts a logical value into the store indicating read or 
-*     write access for the most recently declared program parameter.
-*    Invocation :
+*+
+*  Name:
+*     PARSECON_SETACC
+
+*  Purpose:
+*     Sets-up parameter access mode.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
 *     CALL PARSECON_SETACC ( ENTRY, STATUS )
-*    Parameters :
+
+*  Description:
+*     Interprets the provided keyword as READ WRITE or UPDATE regardless
+*     of case and puts a logical value into the store indicating read or
+*     write access for the most recently declared program parameter.
+
+*  Arguments:
 *     ENTRY=CHARACTER*(*) (given)
-*           access type
+*        access type
 *     STATUS=INTEGER
-*    Method :
-*     Superfluous quotes are removed from the given string, and the 
+
+*  Algorithm:
+*     Superfluous quotes are removed from the given string, and the
 *     result is interpreted and stored.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     19.09.1984:  Original (REVAD::BDK)
 *     16.10.1990:  Force all string to upper case
-*                  Use CHR for upper case conversion
-*                  don't assume READ if not WRITE or UPDATE (RLVAD::AJC)
+*        Use CHR for upper case conversion
+*        don't assume READ if not WRITE or UPDATE (RLVAD::AJC)
 *     25.02.1992:  Report errors (RLVAD::AJC)
 *     27.02.1992:  Assume ENTRY is ucase unless a quoted string (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PARSECON_ERR'
 
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) ENTRY             ! the keyword string
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
 
-*    Local constants :
+
+*  Local Constants:
       CHARACTER*(*) QUOTE
       PARAMETER ( QUOTE = '''' )
 
-*    Local variables :
+
+*  Local Variables:
       CHARACTER*6 VALUE
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -77,7 +102,7 @@
          CALL EMS_REP ( 'PCN_SETACC1',
      :   'PARSECON: "ACCESS" value must be '//
      :   '''READ'', ''WRITE'' or ''UPDATE''', STATUS )
-     
+
       ENDIF
 
       END

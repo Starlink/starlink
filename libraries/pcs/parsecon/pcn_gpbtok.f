@@ -1,47 +1,75 @@
-*+  PARSECON_GPBTOK - Get next token from interface file
       SUBROUTINE PARSECON_GPBTOK ( LU, TOKEN, TOKLEN, LINENUM, STATUS )
-*    Description :
-*   Get next token from connection file on given logical unit.
-*    Invocation :
-*     CALL PARSECON_GPBTOK ( LU; TOKEN, TOKLEN, LINENUM, STATUS )
-*    Parameters :
-*     LU=INTEGER (given)
-*           FORTRAN unit number of interface file.
-*     TOKEN=CHARACTER*(*) (returned)
-*           next token from interface file.
-*     TOKLEN=INTEGER (returned)
-*           number of characters in the token.
-*     LINENUM=INTEGER (returned)
-*           number of line currently being read
-*     STATUS=INTEGER
-*    Method :
-*      Get next token from connection file on given logical unit. This
-*      routine calls PARSECON_GETTOK and the only extra task it performs is
-*      to discard 'new-record' conditions and count them, allowing 
-*      track to be kept of the number of the line in the input file 
-*      which has been reached, which is useful for reporting syntax 
-*      errors.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*     W.F.Lupton (RGO)
-*    History :
-*     18.09.1984:  VAX version (REVAD::BDK)
-*     16.10.1990:  Move SAVE instruction for standard (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*+
+*  Name:
+*     PARSECON_GPBTOK
+
+*  Purpose:
+*     Get next token from interface file.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL PARSECON_GPBTOK( [p]... )
+
+*  Description:
+*     {routine_description}
+
+*  Get Next Token From Connection File On Given Logical Unit.:
+*     Invocation :
+*      CALL PARSECON_GPBTOK ( LU; TOKEN, TOKLEN, LINENUM, STATUS )
+*     Parameters :
+*      LU=INTEGER (given)
+*            FORTRAN unit number of interface file.
+*      TOKEN=CHARACTER*(*) (returned)
+*            next token from interface file.
+*      TOKLEN=INTEGER (returned)
+*            number of characters in the token.
+*      LINENUM=INTEGER (returned)
+*            number of line currently being read
+*      STATUS=INTEGER
+*     Method :
+*       Get next token from connection file on given logical unit. This
+*       routine calls PARSECON_GETTOK and the only extra task it performs is
+*       to discard 'new-record' conditions and count them, allowing
+*       track to be kept of the number of the line in the input file
+*       which has been reached, which is useful for reporting syntax
+*       errors.
+*     Deficiencies :
+
+*     Bugs :
+
+*     Authors :
+*      W.F.Lupton (RGO)
+*     History :
+*      18.09.1984:  VAX version (REVAD::BDK)
+*      16.10.1990:  Move SAVE instruction for standard (RLVAD::AJC)
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
 
-*    Import :
-      INTEGER LU                    ! unit number for read from 
+
+*  Arguments Given:
+      INTEGER LU                    ! unit number for read from
                                     ! interface file
 
-*    Export :
+
+*  Arguments Returned:
       CHARACTER*(*) TOKEN           ! token (see gettok for further info)
 
       INTEGER TOKLEN                ! length of token
@@ -49,18 +77,22 @@
 
       INTEGER LINENUM               ! number of line being read
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+
+*  Local Variables:
       INTEGER LINE                  ! internal copy of LINENUM
       SAVE LINE
 
-*    Local Data :
+
+*  Local Data:
       DATA LINE / 0 /
 
 
-*-
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

@@ -1,29 +1,40 @@
-*+  PARSECON_NEWPAR - Create new parameter-list entry
       SUBROUTINE PARSECON_NEWPAR ( NAME, STATUS )
-*    Description :
-*     Adds a new name to the parameter-list.
-*    Invocation :
+*+
+*  Name:
+*     PARSECON_NEWPAR
+
+*  Purpose:
+*     Create new parameter-list entry.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
 *     CALL PARSECON_NEWPAR ( NAME, STATUS )
-*    Parameters :
+
+*  Description:
+*     Adds a new name to the parameter-list.
+
+*  Arguments:
 *     NAME=CHARACTER*(*) (given)
-*           parameter-name to be added to list
+*        parameter-name to be added to list
 *     STATUS=INTEGER
-*    Method :
-*     The parameter-list is searched to ensure that the name hasn't been 
-*     declared as a parameter already. Then the pointer to the parameter-list 
-*     is incremented, and the name is copied into the new location, 
-*     along with the length of the name. The parameter is then marked 
+
+*  Algorithm:
+*     The parameter-list is searched to ensure that the name hasn't been
+*     declared as a parameter already. Then the pointer to the parameter-list
+*     is incremented, and the name is copied into the new location,
+*     along with the length of the name. The parameter is then marked
 *     for write access, and its prompt-string and keyword blanked.
 *     It is also marked as not a LITERAL parameter.
 *     Save the name in the common block for possible error reporting
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     13.09.1984:  Original (REVAD::BDK)
 *     23.08.1985:  handle monoliths (REVAD::BDK)
 *     11.11.1985:  set the element of PARLIT to .FALSE. (REVAD::BDK)
@@ -34,46 +45,61 @@
 *     09.08.1990:  initialise PARTYPE to NOTYPE (RLVAD::AJC)
 *     16.08.1990:  save name for possible error reporting (RLVAD::AJC)
 *     16.10.1990:  define QUOTE portably
-*                  use CHR not VAX specifics (RLVAD::AJC)
+*        use CHR not VAX specifics (RLVAD::AJC)
 *     24.02.1991:  Report errors (RLVAD::AJC)
 *     26.02.1992:  Assume NAME already ucase unless quoted string (RLVAD::AJC)
 *     19.08.1992:  Initialize PARDYN(1,-) AND PARDYN(3,-) (RLVAD::AJC)
 *     19.11.1992:  Initialize PARMIN/MAX (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PARSECON_ERR'
       INCLUDE 'SUBPAR_PAR'
 
-*    Import :
-      CHARACTER*(*) NAME             ! name of action to be 
+
+*  Arguments Given:
+      CHARACTER*(*) NAME             ! name of action to be
                                      ! added to list.
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    External references :
+
+*  External References:
       INTEGER CHR_LEN
       EXTERNAL CHR_LEN
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
       INCLUDE 'PARSECON3_CMN'
 
-*    Local constants :
+
+*  Local Constants:
       CHARACTER QUOTE
       PARAMETER ( QUOTE = '''' )
 
-*    Local variables :
+
+*  Local Variables:
       INTEGER NAMCOD
       CHARACTER*30 STRING            ! processed name
       INTEGER NAMLEN                 ! length of name
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -158,7 +184,7 @@
                PARMAX(1,PARPTR) = 0
                PARMAX(2,PARPTR) = -1
 *
-*            Update pointer to end of parameter store for 
+*            Update pointer to end of parameter store for
 *            current program.
 *
                IF ( MONOLITH ) THEN

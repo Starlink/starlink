@@ -1,32 +1,37 @@
       SUBROUTINE PARSECON_UPKC( LU, ARRAY, START, END, STATUS )
+
+
+
+
+
+
+
+
+
+
+
 *+
 *  Name:
-*     PARSECON_UPKC
+*     {routine_name}
 
 *  Purpose:
-*     To decode elements of the new-style (packed) compiled form of an 
-*     interface file for a 1-D CHARACTER array.
+*     {routine_purpose}
 
 *  Language:
-*     Starlink Fortran 77
+*     VAX Fortran
 
 *  Invocation:
 *     CALL PARSECON_UPKC( LU, ARRAY, START, END, STATUS )
 
 *  Description:
-*     The routine reads a record from a new-style .IFC and decodes it
-*     into the elements of the given array starting at the STARTth
-*     element and ending at the ENDth element. The record will have
-*     been packed using the PARSECON_PACKC routine such that an array
-*     NBUFF gives the used length of the corresponding element of the
-*     character array.
-*     The remainder of each element of ARRAY must then be space-filled.
+*     To decode elements of the new-style (packed) compiled form of an
+*     interface file for a 1-D CHARACTER array.
 
 *  Arguments:
 *     LU = INTEGER (Given)
 *        The logical unit number to read from
 *     ARRAY(*) = <TYPE> (Given)
-*        The array of values 
+*        The array of values
 *     START = INTEGER (Given)
 *        The first element to be inserted
 *     END = INTEGER (Given)
@@ -34,24 +39,56 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Name:
+*     PARSECON_UPKC
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Copyright:
+*     Copyright (C) 1991, 1992, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
+*     {enter_new_authors_here}
 *     {enter_new_authors_here}
 
 *  History:
 *     3-JUL-1991 (AJC):
 *        Original version.
-*    21-JAN-1992 (AJC):
-*        Remove unused declarations
-*     24-MAR-1993 (AJC):
-*        Add DAT_PAR for SUBPAR_CMN
-*     {enter_changes_here}
+*     21-JAN-1992 (AJC):
+*           Remove unused declarations
+*        24-MAR-1993 (AJC):
+*           Add DAT_PAR for SUBPAR_CMN
+*        {enter_changes_here}
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
+*     {note_new_bugs_here}
 
 *-
-      
+
+*.
+
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

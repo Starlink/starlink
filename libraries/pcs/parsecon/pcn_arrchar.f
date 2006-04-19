@@ -1,126 +1,149 @@
-*+  PARSECON_ARRCHAR - Split character string into a set of values
-      SUBROUTINE PARSECON_ARRCHAR ( STRING, MXVALS, COUNT, CARRAY, 
+      SUBROUTINE PARSECON_ARRCHAR ( STRING, MXVALS, COUNT, CARRAY,
      :  CLENS, STATUS )
-*    Description :
-*     Split a character string up into a set of values. Values are 
+*+
+*  Name:
+*     PARSECON_ARRCHAR
+
+*  Purpose:
+*     Split character string into a set of values.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL PARSECON_ARRCHAR ( STRING, MXVALS, COUNT, CARRAY,
+*    :   CLENS, STATUS )
+
+*  Description:
+*     Split a character string up into a set of values. Values are
 *     separated by spaces or commas not inside quoted strings.
-*    Invocation :
-*     CALL PARSECON_ARRCHAR ( STRING, MXVALS, COUNT, CARRAY, 
-*    :  CLENS, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     STRING=CHARACTER*(*) (given)
-*           string to be parsed
+*        string to be parsed
 *     MXVALS=INTEGER (given)
-*           maximum possible number of values
+*        maximum possible number of values
 *     COUNT=INTEGER (returned)
-*           number of values found
+*        number of values found
 *     CARRAY(MXVALS)=CHARACTER*(*) (returned)
-*           array of 'values' - ie substrings
+*        array of 'values' - ie substrings
 *     CLENS(MXVALS)=INTEGER (returned)
-*           array of lengths of substrings
+*        array of lengths of substrings
 *     INTEGER STATUS
-*    Method :
+
+*  Algorithm:
 *     For the purposes of this routine, a token is a sequence of characters
 *     which are either all alphanumeric (with .+-()_[]"<>/~ being honorary
 *     alphanumerics) or are all non-alphanumeric (ie are anything other
-*     than alphanumeric and "white"). For the purposes of this routine, a 
-*     white character is a space, tab, newline or comma. 
-*
-*     Tokens are thus terminated by either a character of the opposite class 
+*     than alphanumeric and "white"). For the purposes of this routine, a
+*     white character is a space, tab, newline or comma.
+
+*     Tokens are thus terminated by either a character of the opposite class
 *     or by a "white" character. No characters need separate tokens.
-*     Apart from their role as delimiters, white characters are never 
+*     Apart from their role as delimiters, white characters are never
 *     significant.
-*
+
 *     Two exceptions to this rule are -
-*
-*      1) A token may consist of a set of characters enclosed in single 
-*         quotes. The first quote must be the first character of the token 
-*         and the token is terminated by the next isolated (ie.not '') quote 
+
+*      1) A token may consist of a set of characters enclosed in single
+*         quotes. The first quote must be the first character of the token
+*         and the token is terminated by the next isolated (ie.not '') quote
 *         or end of buffer (whichever comes first).
 *         Note that double quotes within a quoted token are not collapsed.
-*
+
 *      2) Terminators occurring within brackets within an alphanumeric
 *         token will be ignored ( as in STRUCTURE(1,2).NUMBER ).
-*
-*     Hexadecimal constants are recognised and converted to decimal 
+
+*     Hexadecimal constants are recognised and converted to decimal
 *     strings.
-*
+
 *     All characters on a line that follow a token starting with # token are
 *     ignored, AS IS THE # .
-*
-*     The tokens within STRING are recognised, and transferred to 
+
+*     The tokens within STRING are recognised, and transferred to
 *     CARRAY, one token per array element.
-*     Brackets identified as being part of a list of array elements are 
-*     returned as individual tokens. To achieve this it is necessary to 
-*     keep track of the nesting of brackets, and to switch between '(' 
-*     and ')' being handled as special characters and being handled as 
-*     alphanumeric. The full array list of whatever dimensionality has 
+*     Brackets identified as being part of a list of array elements are
+*     returned as individual tokens. To achieve this it is necessary to
+*     keep track of the nesting of brackets, and to switch between '('
+*     and ')' being handled as special characters and being handled as
+*     alphanumeric. The full array list of whatever dimensionality has
 *     to be contained within the one text line.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (RGO)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     18.09.1984:  VAX version (REVAD::BDK)
 *     27.09.1984:  ARRCHAR variant of GETTOK (REVAD::BDK)
-*     21.11.1984:  Make # sign recognised if it is just the first 
-*                  character of a token - ie. it need not be followed by 
-*                  a delimiter. (REVAD::BDK)
+*     21.11.1984:  Make # sign recognised if it is just the first
+*        character of a token - ie. it need not be followed by
+*        a delimiter. (REVAD::BDK)
 *     27.02.1985:  handle brackets in array list (REVAD::BDK)
 *     07.05.1987:  stop ! being a comment character (REVAD::BDK)
-*     07.05.1987:  ignore delimiters inside brackets embedded within a 
-*                  token - eg JUNK(3,4) (REVAD::BDK)
+*     07.05.1987:  ignore delimiters inside brackets embedded within a
+*        token - eg JUNK(3,4) (REVAD::BDK)
 *     21.10.1987:  accept ? and @ as alphanumeric (REVAD::BDK)
-*     28.11.1990:  correct test for termination of brackets within 
-*                  token and don't terminate token at termination of
-*                  brackets.
-*                  Improve comments (RLVAD::AJC)
-*     28.11.1990:  rename from STRING_ARRCHAR 
-*                  use CHR_SKCHR (RLVAD::AJC)
+*     28.11.1990:  correct test for termination of brackets within
+*        token and don't terminate token at termination of
+*        brackets.
+*        Improve comments (RLVAD::AJC)
+*     28.11.1990:  rename from STRING_ARRCHAR
+*        use CHR_SKCHR (RLVAD::AJC)
 *     01,10,1991:  revised spec for CHR_SKCHR (RLVAD::AJC)
 *     10.10.1991:  correct Z in list of letters (RLVAD::AJC)
 *     04.11.1991:  fix for CHR_FIWS bug if length = 1 (RLVAD::AJC)
 *     20.11.1991:  stop ' being honorary alphanumeric (RLVAD::AJC)
 *     24.02.1992:  report errors
-*                  make ~ and / honorary aplhanumeric
-*                  (for Unix names) (RLVAD::AJC)
+*        make ~ and / honorary aplhanumeric
+*        (for Unix names) (RLVAD::AJC)
 *     26.02.1992:  Don't convert to upper case (RLVAD::AJC)
-*      5.08.1996:  Insert closing quote if missing (AJC)
-*    endhistory
-*    Type Definitions :
+*     05.08.1996:  Insert closing quote if missing (AJC)
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PARSECON_ERR'
       INCLUDE 'CHR_ERR'
 
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) STRING           ! string to be parsed
       INTEGER MXVALS                 ! maximum possible number of values
 
-*    Export :
+
+*  Arguments Returned:
       INTEGER COUNT                  ! number of values found
 
       CHARACTER*(*) CARRAY(MXVALS)   ! array of 'values' - ie substrings
 
       INTEGER CLENS(MXVALS)          ! array of lengths of substrings
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    External references :
+
+*  External References:
       INTEGER CHR_LEN
       EXTERNAL CHR_LEN
 
-*    Local Constants :
+
+*  Local Constants:
       CHARACTER*(*) QUOTE
       PARAMETER ( QUOTE = '''' )
 
 
-*    Local variables :
+*  Local Variables:
       INTEGER LBRACK             ! count of bracket nesting
 
       INTEGER TOKLEN             ! no of chars in token,
@@ -136,25 +159,25 @@
 
       INTEGER J                  ! temporary pointer to input string
 
-      LOGICAL FINISHED           ! loop controller for copying string 
+      LOGICAL FINISHED           ! loop controller for copying string
                                  ! constants
 
-      LOGICAL HEX                           ! .TRUE. => syntax of token 
+      LOGICAL HEX                           ! .TRUE. => syntax of token
                                             ! is like HEX constant
 
-      INTEGER ITEMP                         ! temporary store for 
+      INTEGER ITEMP                         ! temporary store for
                                             ! integer converted from HEX
-      
+
       INTEGER LENGTH                        ! length of STRING
 
-      INTEGER PT2                           ! temporary pointer into 
-                                            ! BUFFER      
+      INTEGER PT2                           ! temporary pointer into
+                                            ! BUFFER
 
-      INTEGER START                         ! pointer into tokens of 
+      INTEGER START                         ! pointer into tokens of
                                             ! type JUNK(3,4)
 
-      INTEGER TBRACK                        ! counter of bracket nesting 
-                                            ! within token of type 
+      INTEGER TBRACK                        ! counter of bracket nesting
+                                            ! within token of type
                                             ! JUNK(3,4)
       INTEGER LALN                          ! used length of ALN
 
@@ -177,10 +200,13 @@
       PARAMETER (LALN2=76)
 
       CHARACTER*(*) OTHER
-      PARAMETER ( OTHER = '!#%&*=\\^`{|}' )     
+      PARAMETER ( OTHER = '!#%&*=\\^`{|}' )
 
-*    Local data :
-*-
+
+*  Local Data:
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -220,7 +246,7 @@
             IF ( STRING(PTR:PTR) .NE. '(' ) THEN
 
                TOKLEN = 1
-               CALL CHR_SKCHR( ALN(1:LALN), STRING(PTR:LENGTH), 
+               CALL CHR_SKCHR( ALN(1:LALN), STRING(PTR:LENGTH),
      :          .TRUE., TOKLEN )
                TOKLEN = TOKLEN - 1
 
@@ -236,7 +262,7 @@
                IF ( START .GT. 0 ) THEN
                   TBRACK = 1
                   START = START + PTR - 1
-                  DO WHILE ( ( TBRACK .GT. 0 ) .AND. 
+                  DO WHILE ( ( TBRACK .GT. 0 ) .AND.
      :              ( START .LT. LENGTH ) )
                      DOWHILE ( START .LT. PTR + TOKLEN - 1 )
                         START = START + 1
@@ -248,7 +274,7 @@
                      ENDDO
 
 *                 Now if level is GT 0, the token ended with brackets open
-*                 set START and TOKLEN to end of next token and continue 
+*                 set START and TOKLEN to end of next token and continue
 *                 counting levels
                      IF ( TBRACK .GT. 0 ) THEN
 *                    Brackets open.
@@ -259,10 +285,10 @@
                         START = START + PT2
 *                    then find end of next token
                         CALL CHR_SKCHR
-     :                    ( ALN(1:LALN), STRING(START:LENGTH), 
+     :                    ( ALN(1:LALN), STRING(START:LENGTH),
      :                      .TRUE., TOKLEN )
                         TOKLEN = TOKLEN - 1
-                        
+
                      ENDIF
 
 *                    Now continue counting levels
@@ -317,26 +343,26 @@
                TOKLEN = J - PTR + 1
             ENDIF
 
-         ELSE IF ( STRING(PTR:PTR) .EQ. ')' ) THEN 
-* 
-*         right bracket within a string 
-*         reduce the nesting count, and if zero switch '(' and ')' back 
-*         to being ALPHANUM 
-*         return the ')' as a token. 
-* 
-             IF ( LBRACK .EQ. 1 ) THEN 
-                LBRACK = 0 
-                ALN = ALN1 
+         ELSE IF ( STRING(PTR:PTR) .EQ. ')' ) THEN
+*
+*         right bracket within a string
+*         reduce the nesting count, and if zero switch '(' and ')' back
+*         to being ALPHANUM
+*         return the ')' as a token.
+*
+             IF ( LBRACK .EQ. 1 ) THEN
+                LBRACK = 0
+                ALN = ALN1
                 LALN = LALN1
-                TOKLEN = 1 
+                TOKLEN = 1
              ELSE IF ( LBRACK .GT. 1 ) THEN
-                LBRACK = LBRACK - 1 
-                TOKLEN = 1 
-             ELSE 
-                LBRACK = 0 
-                ALN = ALN1 
+                LBRACK = LBRACK - 1
+                TOKLEN = 1
+             ELSE
+                LBRACK = 0
+                ALN = ALN1
                 LALN = LALN1
-                TOKLEN = 1 
+                TOKLEN = 1
                 STATUS = PARSE__IVSYN
                 CALL EMS_REP ( 'PCN_ARRCHAR1',
      :          'PARSECON: Unmatched '')''', STATUS )
@@ -352,7 +378,7 @@
 
          ELSE
 *
-*         something else 
+*         something else
 *
 
             TOKLEN = 1
@@ -370,7 +396,7 @@
 *        Convert HEX to integer
             ISTAT = SAI__OK
             CALL CHR_HTOI( STRING(PTR+1:PTR+TOKLEN-3),
-     :                         ITEMP, ISTAT )            
+     :                         ITEMP, ISTAT )
             IF( ISTAT .EQ. SAI__OK ) THEN
 *           Convert INTEGER to CHARACTER
                CALL CHR_ITOC( ITEMP, CARRAY(COUNT), HLEN )
@@ -403,7 +429,7 @@
 *      now set ptr ready for next token (skip any WHITE space)
 *      If token implies a comment, ignore rest of STRING.
 *
-         IF ( ( CARRAY(COUNT)(1:1) .EQ. '#' ) .OR. 
+         IF ( ( CARRAY(COUNT)(1:1) .EQ. '#' ) .OR.
      :     ( PTR .GT. LENGTH ) ) THEN
             PTR = LENGTH + 1
          ELSE
@@ -430,10 +456,10 @@
 
       ENDDO
 *
-*   Check for the splitting being terminated by a comment or by running 
+*   Check for the splitting being terminated by a comment or by running
 *   out of array elements.
 *
-      IF ( CARRAY(COUNT)(1:1) .EQ. '#' ) 
+      IF ( CARRAY(COUNT)(1:1) .EQ. '#' )
      :  COUNT = COUNT - 1
 
       IF ( PTR .LT. LENGTH ) THEN

@@ -1,23 +1,32 @@
       SUBROUTINE PARSECON_RESET( STATE, STATUS )
+
+
+
+
+
+
+
+
+
+
+
+
 *+
 *  Name:
-*     PARSECON_RESET
+*     {routine_name}
 
 *  Purpose:
-*     To reset the parsing STATE to one suitable for recovery
-*     after an error.
+*     {routine_purpose}
 
 *  Language:
-*     Starlink Fortran 77
+*     VAX Fortran
 
 *  Invocation:
 *     CALL PARSECON_RESET( STATE, STATUS )
 
 *  Description:
-*     Regardless of the status on entry,
-*     the routine sets a recovery state depending upon the state
-*     in which the error was detected.
-*     If the system is in an unknown state, set STATE to FINISHED.
+*     To reset the parsing STATE to one suitable for recovery
+*     after an error.
 
 *  Arguments:
 *     STATE = INTEGER (Given and Returned)
@@ -26,25 +35,57 @@
 *     STATUS = INTEGER (Given)
 *        The global status.
 
+*  Implementation Deficiencies:
+*     Actually STATUS is not used but it is included as an argument
+*     because it could be helpful in deciding what state to return
+*     to and a more complicated routine could want to set it.
+
+*  Name:
+*     PARSECON_RESET
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Copyright:
+*     Copyright (C) 1990 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
+*     {enter_new_authors_here}
 *     {enter_new_authors_here}
 
 *  History:
 *     25-SEP-1990 (AJC):
 *        Original version.
 *     {enter_changes_here}
-
-*  Deficiencies:
-*     Actually STATUS is not used but it is included as an argument
-*     because it could be helpful in deciding what state to return 
-*     to and a more complicated routine could want to set it.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
+*     {note_new_bugs_here}
 
 *-
-      
+
+*.
+
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -61,7 +102,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER STATES( PARSE__NUMSTATE )  ! Table of recovery states 
+      INTEGER STATES( PARSE__NUMSTATE )  ! Table of recovery states
 
 *  Local Data:
       DATA STATES ( START    )/ START /,

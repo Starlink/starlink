@@ -1,43 +1,68 @@
-*+  PARSECON_PTRINIT - Initialise pointers etc. before parsing IFL
       SUBROUTINE PARSECON_PTRINIT ( STATUS )
-*    Description :
-*     Initialises pointers to the various storage lists 
-*     and various names before the parsing of an interface file begins.
-*    Invocation :
+*+
+*  Name:
+*     PARSECON_PTRINIT
+
+*  Purpose:
+*     Initialise pointers etc. before parsing IFL.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
 *     CALL PARSECON_PTRINIT ( STATUS )
-*    Parameters :
+
+*  Description:
+*     Initialises pointers to the various storage lists
+*     and various names before the parsing of an interface file begins.
+
+*  Arguments:
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Set the various pointers to zero.
-*    Deficiencies :
-*     Strictly, all the pointer arrays should be zeroed - eg PARDEF, 
+
+*  Implementation Deficiencies:
+*     Strictly, all the pointer arrays should be zeroed - eg PARDEF,
 *     PARDYN, PARASSOC, NEEDOB, NEEDCAN.....
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     02.10.1984:  Original (REVAD::BDK)
 *     27.02.1985:  initialize PROGNAME and EXEPATH (REVAD::BDK)
 *     23.08.1985:  initialize MONOLITH (REVAD::BDK)
 *     16.08.1990:  initialize ACNAME and PRNAME for error reports (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
       INCLUDE 'PARSECON3_CMN'
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

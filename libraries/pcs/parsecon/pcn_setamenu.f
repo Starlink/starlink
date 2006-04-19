@@ -1,54 +1,79 @@
-*+  PARSECON_SETAMENU - Sets-up action menu name
       SUBROUTINE PARSECON_SETAMENU ( ENTRY, STATUS )
-*    Description :
-*     Loads the provided name into the menu store for the most 
-*     recently declared program action.
-*    Invocation :
+*+
+*  Name:
+*     PARSECON_SETAMENU
+
+*  Purpose:
+*     Sets-up action menu name.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
 *     CALL PARSECON_SETAMENU ( ENTRY, STATUS )
-*    Parameters :
+
+*  Description:
+*     Loads the provided name into the menu store for the most
+*     recently declared program action.
+
+*  Arguments:
 *     ENTRY=CHARACTER*(*) (given)
-*           action menu name 
+*        action menu name
 *     STATUS=INTEGER
-*    Method :
-*     Superfluous quotes are removed from the given string, and the 
+
+*  Algorithm:
+*     Superfluous quotes are removed from the given string, and the
 *     result is put into the array holding menu names.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     13.05.1986:  Original (REVAD::BDK)
 *     16.10.1990:  Convert all strings to upper case
-*                  Use CHR for conversion  (RLVAD::AJC)
+*        Use CHR for conversion  (RLVAD::AJC)
 *     27.02.1992:  Assume ENTRY is ucase unless quoted string (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) ENTRY             ! the action menu name
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
 
-*    External references :
+
+*  External References:
 *     None
 
-*    Local Constants :
+
+*  Local Constants:
       CHARACTER*(*) QUOTE
       PARAMETER ( QUOTE = '''' )
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

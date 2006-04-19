@@ -1,62 +1,97 @@
       SUBROUTINE PARSECON_ERFL( STATUS )
+
+
+
+
+
+
+
+
+
+
+
+
+
 *+
 *  Name:
-*     PARSECON_EROUT
+*     {routine_name}
 
 *  Purpose:
-*     To flush out any error messages for PARSECON
+*     {routine_purpose}
 
 *  Language:
-*     Starlink Fortran 77
+*     VAX Fortran
 
 *  Invocation:
 *     CALL PARSECON_ERFL( STATUS )
 
 *  Description:
-*     The routine checks if there are any error messages stacked at the
-*     current context level and outputs them using PRINT if there are.
-*     It does this regardless of the given STATUS value and returns
-*     STATUS = SAI__OK.
-*
-*     This routine is provided because it is required that error
-*     messages reported when parsing the interface file are output as
-*     the errors are detected so that the message table does not fill
-*     up and messages are output before the task continues.
-*     It can safely use PRINT because there will be no return path at
-*     this stage.
-
-*  Deficiencies:
-*     1.The format has to be changed to just ( A ) for the Unix version
-*     2.One could consider also writing to the error output channel.
+*     To flush out any error messages for PARSECON
 
 *  Arguments:
 *     STATUS = INTEGER (Returned)
 *        The global status.
 
+*  Implementation Deficiencies:
+*     1.The format has to be changed to just ( A ) for the Unix version
+*     2.One could consider also writing to the error output channel.
+
+*  Name:
+*     PARSECON_EROUT
+
+*  Language:
+*     Starlink Fortran 77
+
 *  External Routines Used:
 *     EMS_ELOAD
 *     PARSECON_WRITE
 
+*  Copyright:
+*     Copyright (C) 1991, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
+*     {enter_new_authors_here}
 *     {enter_new_authors_here}
 
 *  History:
 *     13-JUN-1991 (AJC):
-*        Original version.
-*      1-OCT-1991 (AJC)
-*        Prefix messages with "!! " etc.
+*          Original version.
+*        1-OCT-1991 (AJC)
+*          Prefix messages with "!! " etc.
 *     21-JAN-1992 (AJC):
-*        Remove ref to ISTAT
-*      6-MAR-1992 (AJC):
-*        Use WRITE with FORMAT
+*          Remove ref to ISTAT
+*        6-MAR-1992 (AJC):
+*          Use WRITE with FORMAT
 *     {enter_changes_here}
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
+*     {note_new_bugs_here}
 
 *-
-      
+
+*.
+
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 

@@ -1,53 +1,77 @@
-*+  PARSECON_SETPMENU - Sets-up parameter menu name
       SUBROUTINE PARSECON_SETPMENU ( ENTRY, STATUS )
-*    Description :
-*     Loads the provided name into the menu store for the most 
-*     recently declared program parameter.
-*    Invocation :
+*+
+*  Name:
+*     PARSECON_SETPMENU
+
+*  Purpose:
+*     Sets-up parameter menu name.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
 *     CALL PARSECON_SETPMENU ( ENTRY, STATUS )
-*    Parameters :
+
+*  Description:
+*     Loads the provided name into the menu store for the most
+*     recently declared program parameter.
+
+*  Arguments:
 *     ENTRY=CHARACTER*(*) (given)
-*           parameter menu name 
+*        parameter menu name
 *     STATUS=INTEGER
-*    Method :
-*     Superfluous quotes are removed from the given string, and the 
+
+*  Algorithm:
+*     Superfluous quotes are removed from the given string, and the
 *     result is put into the array holding menu names.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     13.05.1986:  Original (REVAD::BDK)
 *     16.10.1990:  Define QUOTE portably
-*                  Force all names to upper case
-*                  Use CHR for conversion (RLVAD::AJC)
+*        Force all names to upper case
+*        Use CHR for conversion (RLVAD::AJC)
 *     27.02.1992:  Assume ENTRY is ucase unless quoted string (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) ENTRY             ! the parameter menu name
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
 
-*    Local Constants :
+
+*  Local Constants:
       CHARACTER*(*) QUOTE
       PARAMETER ( QUOTE = '''' )
 
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

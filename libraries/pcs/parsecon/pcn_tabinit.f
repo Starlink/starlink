@@ -1,58 +1,80 @@
-*+  PARSECON_TABINIT - Initialise parsing state-tables
       SUBROUTINE PARSECON_TABINIT ( STATUS )
-*    Description :
+*+
+*  Name:
+*     PARSECON_TABINIT
+
+*  Purpose:
+*     Initialise parsing state-tables.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL PARSECON_TABINIT ( STATUS )
+
+*  Description:
 *     Initialise the symbol state table which describes the syntax of the
 *     interface file.
-*    Invocation :
-*     CALL PARSECON_TABINIT ( STATUS )
-*    Parameters :
+
+*  Arguments:
 *     STATUS=INTEGER
-*    Method :
-*     The two tables storing the state-transitions are initialised so 
+
+*  Algorithm:
+*     The two tables storing the state-transitions are initialised so
 *     that all their entries correspond to error conditions. Then a series
 *     of calls to PARSECON_TABSET is made, each one setting up one legal
 *     situation. To determine whether a token is legal in a given context,
 *     and what action to take, use PARSECON_TABENT.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (RGO)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     21.09.1984:  VAX version (REVAD::BDK)
 *     23.08.1985:  handle monoliths (REVAD::BDK)
 *     13.05.1986:  handle menus (REVAD::BDK)
-*     05.05.1987:  allow monolith, action and parameter names to be 
-*                  reserved words (REVAD::BDK)
+*     05.05.1987:  allow monolith, action and parameter names to be
+*        reserved words (REVAD::BDK)
 *     05.05.1987:  add PPATH (REVAD::BDK)
 *     26.05.1987:  add ACTEND action (REVAD::BDK)
-*     10.11.1987:  allow parameter or action name to be a constant 
-*                  (REVAD::BDK)
+*     10.11.1987:  allow parameter or action name to be a constant
+*        (REVAD::BDK)
 *     15.05.1990:  Add helpkey (RLVAD::AJC)
 *     04.07.1990:  Add helplib in monolith or interface (RLVAD::AJC)
 *     16.08.1990:  Allow name for ASSOCIATION
-*                  Allow anything as TYPE or PTYPE
-*                  ALLOW ANYTHING FOR PROMPT
-*                  Allow PROMPT and DEFAULT on VPATH
-*                  Allow DEFAULT on PPATH 
-*                  Allow name or reserved word for HELPKEY (RLVAD::AJC)
+*        Allow anything as TYPE or PTYPE
+*        ALLOW ANYTHING FOR PROMPT
+*        Allow PROMPT and DEFAULT on VPATH
+*        Allow DEFAULT on PPATH
+*        Allow name or reserved word for HELPKEY (RLVAD::AJC)
 *     17.10.1990:  Remove unused INCLUDE PARSECON_PAR (RLVAD::AJC)
 *     12.11.1991:  Allow missing ENDINTERFACE (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PARSECON_PAR'
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'PARSECON_CMN'
 
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -62,7 +84,7 @@
       CALL PARSECON_TABSTART ( STATUS )
 *
 *   Now load the valid states.
-*   First, at the start INTERFACE, MONOLITH, ENDMONOLITH 
+*   First, at the start INTERFACE, MONOLITH, ENDMONOLITH
 *   or HELPLIB is expected
 *
       CALL PARSECON_TABSET ( START, IFACE, NONE, FACESTART )
@@ -189,7 +211,7 @@
       CALL PARSECON_TABSET ( MHLPLB, COORDS, SETHLIB, START )
       CALL PARSECON_TABSET ( MHLPLB, PPATH, SETHLIB, START )
 *
-*   Are within interface definition. Expect ACTION, PARAMETER, 
+*   Are within interface definition. Expect ACTION, PARAMETER,
 *   ENDINTERFACE, PROGRAM, EPATH, HELPLIB or MESSAGE.
 *
       CALL PARSECON_TABSET ( FACEGOT, EFACE, FACEND, FINISHED )
@@ -374,7 +396,7 @@
       CALL PARSECON_TABSET ( PARSTART, COORDS, NEWPAR, PARGOT )
       CALL PARSECON_TABSET ( PARSTART, PPATH, NEWPAR, PARGOT )
 *
-*   Within a parameter definition. Expect ENDPARAMETER or a parameter 
+*   Within a parameter definition. Expect ENDPARAMETER or a parameter
 *   description.
 *
       CALL PARSECON_TABSET ( PARGOT, EPARAM, PAREND, FACEGOT )
@@ -395,7 +417,7 @@
       CALL PARSECON_TABSET ( PARGOT, COORDS, NEWPCOORDS, PARCOORDS )
       CALL PARSECON_TABSET ( PARGOT, PPATH, NONE, PARPP )
 *
-*   Within a parameter range definition. Expect a constant, ENDPARAMETER 
+*   Within a parameter range definition. Expect a constant, ENDPARAMETER
 *   or a further parameter description.
 *
       CALL PARSECON_TABSET ( PARANGE, EPARAM, PAREND, FACEGOT )
@@ -414,7 +436,7 @@
       CALL PARSECON_TABSET ( PARANGE, COORDS, NEWPCOORDS, PARCOORDS )
       CALL PARSECON_TABSET ( PARANGE, PPATH, NONE, PARPP )
 *
-*   Within a parameter IN definition. Expect a constant, ENDPARAMETER 
+*   Within a parameter IN definition. Expect a constant, ENDPARAMETER
 *   or a further parameter description.
 *
       CALL PARSECON_TABSET ( PARIN, EPARAM, PAREND, FACEGOT )
@@ -454,7 +476,7 @@
       CALL PARSECON_TABSET ( PARDEF, COORDS, NEWPCOORDS, PARCOORDS )
       CALL PARSECON_TABSET ( PARDEF, PPATH, NONE, PARPP )
 *
-*   Within parameter MENUCOORDS definition. Expect a constant, 
+*   Within parameter MENUCOORDS definition. Expect a constant,
 *   ENDPARAMETER or a further parameter description.
 *
       CALL PARSECON_TABSET ( PARCOORDS, EPARAM, PAREND, FACEGOT )
@@ -513,7 +535,7 @@
       CALL PARSECON_TABSET ( ACTSTART, COORDS, NEWACT, ACTGOT )
       CALL PARSECON_TABSET ( ACTSTART, PPATH, NEWACT, ACTGOT )
 *
-*   Within an ACTION definition. Expect OBEY, CANCEL, action description 
+*   Within an ACTION definition. Expect OBEY, CANCEL, action description
 *   or ENDACTION.
 *
       CALL PARSECON_TABSET ( ACTGOT, ENDACT, ACTEND, FACEGOT )
@@ -524,7 +546,7 @@
       CALL PARSECON_TABSET ( ACTGOT, MENU, NONE, ACTMENU )
       CALL PARSECON_TABSET ( ACTGOT, COORDS, NEWACOORDS, ACTCOORDS )
 *
-*   Within an action MENUCOORDS definition. Expect a constant, OBEY, 
+*   Within an action MENUCOORDS definition. Expect a constant, OBEY,
 *   CANCEL, action description or ENDACTION.
 *
       CALL PARSECON_TABSET ( ACTCOORDS, ENDACT, NONE, FACEGOT )
@@ -584,7 +606,7 @@
       CALL PARSECON_TABSET ( ONEEDST, COORDS, OREQ, ONEED )
       CALL PARSECON_TABSET ( ONEEDST, PPATH, OREQ, ONEED )
 *
-*   Within OBEY NEEDS definition. Expect RANGE or IN (introducing a 
+*   Within OBEY NEEDS definition. Expect RANGE or IN (introducing a
 *   list) or start of a new NEEDS defintion, or ENDOBEY.
 *
       CALL PARSECON_TABSET ( ONEED, ENDOBEY, NONE, ACTGOT )
@@ -631,7 +653,7 @@
       CALL PARSECON_TABSET ( CNEEDST, COORDS, CREQ, CNEED )
       CALL PARSECON_TABSET ( CNEEDST, PPATH, CREQ, CNEED )
 *
-*   Within CANCEL NEEDS definition. Expect RANGE or IN (introducing a 
+*   Within CANCEL NEEDS definition. Expect RANGE or IN (introducing a
 *   list) or start of a new NEEDS defintion, or ENDOBEY.
 *
       CALL PARSECON_TABSET ( CNEED, ENDCANC, NONE, ACTGOT )
@@ -639,28 +661,28 @@
       CALL PARSECON_TABSET ( CNEED, IN, DISCVALS, CANCIN )
       CALL PARSECON_TABSET ( CNEED, NEEDS, NONE, CNEEDST )
 *
-*   Within range definition for OBEY NEEDS. Expect a constant, the start 
+*   Within range definition for OBEY NEEDS. Expect a constant, the start
 *   of a new NEEDS definition or ENDOBEY.
 *
       CALL PARSECON_TABSET ( ORANGE, ENDOBEY, NONE, ACTGOT )
       CALL PARSECON_TABSET ( ORANGE, NEEDS, NONE, ONEEDST )
       CALL PARSECON_TABSET ( ORANGE, CONST, ACTLIST, ORANGE )
 *
-*   Within range definition for CANCEL NEEDS. Expect a constant, the start 
+*   Within range definition for CANCEL NEEDS. Expect a constant, the start
 *   of a new NEEDS definition or ENDCANCEL.
 *
       CALL PARSECON_TABSET ( CRANGE, ENDCANC, NONE, ACTGOT )
       CALL PARSECON_TABSET ( CRANGE, NEEDS, NONE, CNEEDST )
       CALL PARSECON_TABSET ( CRANGE, CONST, ACTLIST, CRANGE )
 *
-*   Within IN definition for OBEY NEEDS. Expect a constant, the start 
+*   Within IN definition for OBEY NEEDS. Expect a constant, the start
 *   of a new NEEDS definition or ENDOBEY.
 *
       CALL PARSECON_TABSET ( OBIN, ENDOBEY, NONE, ACTGOT )
       CALL PARSECON_TABSET ( OBIN, NEEDS, NONE, ONEEDST )
       CALL PARSECON_TABSET ( OBIN, CONST, ACTLIST, OBIN )
 *
-*   Within IN definition for CANCEL NEEDS. Expect a constant, the start 
+*   Within IN definition for CANCEL NEEDS. Expect a constant, the start
 *   of a new NEEDS definition or ENDCANCEL.
 *
       CALL PARSECON_TABSET ( CANCIN, ENDCANC, NONE, ACTGOT )

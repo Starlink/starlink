@@ -1,71 +1,97 @@
-*+  PARSECON_SETASS - Sets-up an association for a parameter
       SUBROUTINE PARSECON_SETASS ( ENTRY, STATUS )
-*    Description :
-*     Interprets whether the association is to be read, write, or 
-*     update, and loads the corresponding indicator into the store for 
-*     the most recently declared program parameter, along with the name 
-*     of the global association.
-*    Invocation :
+*+
+*  Name:
+*     PARSECON_SETASS
+
+*  Purpose:
+*     Sets-up an association for a parameter.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
 *     CALL PARSECON_SETASS ( ENTRY, STATUS )
-*    Parameters :
+
+*  Description:
+*     Interprets whether the association is to be read, write, or
+*     update, and loads the corresponding indicator into the store for
+*     the most recently declared program parameter, along with the name
+*     of the global association.
+
+*  Arguments:
 *     ENTRY=CHARACTER*(*) (given)
-*           string specifying a global association
+*        string specifying a global association
 *     STATUS=INTEGER
-*    Method :
-*     Superfluous quotes are removed from the given string, and the 
-*     result is tested for access-type and an indicator stored. The name 
-*     of the associated global is is concatenated with the logical name 
-*     for the subdirectory containing the global container file, and put 
-*     into general string storage. A pointer to it is stored with the 
+
+*  Algorithm:
+*     Superfluous quotes are removed from the given string, and the
+*     result is tested for access-type and an indicator stored. The name
+*     of the associated global is is concatenated with the logical name
+*     for the subdirectory containing the global container file, and put
+*     into general string storage. A pointer to it is stored with the
 *     parameter.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     19.09.1984:  Original (REVAD::BDK)
 *     13.05.1985:  force string to uppercase (REVAD::BDK)
 *     16.10.1990:  use CHR for upper case converson
-*                  define QUOTE as character constant (RLVAD::AJC)
+*        define QUOTE as character constant (RLVAD::AJC)
 *     25.02.1992:  Report errors (RLVAD::AJC)
 *     27.02.1992:  Assume entry is ucase unless quoted string (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
 *     01.02.2004:  Checked into CVS repository cvs.starlink.ac.uk.  For any
-*                  further changes, see the repository.
-*    endhistory
-*    Type Definitions :
+*        further changes, see the repository.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PARSECON_ERR'
 
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) ENTRY             ! the keyword string
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    External references :
+
+*  External References:
       INTEGER STRING_INANYL
       EXTERNAL STRING_INANYL
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
 
-*    Local Constants :
+
+*  Local Constants:
       CHARACTER*(*) QUOTE
       PARAMETER ( QUOTE = '''' )
 
-*    Local variables :
+
+*  Local Variables:
       CHARACTER*132 VALUE
       INTEGER NAMESTART
 
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -99,8 +125,8 @@
      :       STATUS )
          ENDIF
 
-*   Store the name prefixed by the logical name for the directory 
-*   containing the global structure, and put a pointer to it into the 
+*   Store the name prefixed by the logical name for the directory
+*   containing the global structure, and put a pointer to it into the
 *   parameters' list.
          IF ( STATUS .EQ. SAI__OK ) THEN
 

@@ -1,46 +1,69 @@
-*+  PARSECON_ACTEND - on ENDACTION check for ACTKEY clashes
       SUBROUTINE PARSECON_ACTEND ( STATUS )
-*    Description :
+*+
+*  Name:
+*     PARSECON_ACTEND
+
+*  Purpose:
+*     on ENDACTION check for ACTKEY clashes.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL PARSECON_ACTEND ( STATUS )
+
+*  Description:
 *     Check the list of action keywords for a clash
 *     and remove the action name from the error report common block.
-*    Invocation :
-*     CALL PARSECON_ACTEND ( STATUS )
-*    Parameters :
+
+*  Arguments:
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     The list of action keywords is searched sequentially
 *     and set ACNAME to blank.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     26.05.1987:  Original (REVAD::BDK)
 *     16.08.1990:  Reset ACNAME for error reports (RLVAD::AJC)
 *     24.02.1992:  Report errors (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PARSECON_ERR'
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
       INCLUDE 'PARSECON3_CMN'
 
-*    Local variables :
+
+*  Local Variables:
       INTEGER NAMECODE                  ! counter for searching
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

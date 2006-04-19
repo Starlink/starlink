@@ -1,25 +1,31 @@
       SUBROUTINE PARSECON_PACKC( LU, ARRAY, START, END, STATUS )
+
+
+
+
+
+
+
+
+
+
+
 *+
 *  Name:
-*     PARSECON_PACKC
+*     {routine_name}
 
 *  Purpose:
-*     To encode CHARACTER elements of the compiled form of an interface
-*     file to reduce the file size.
+*     {routine_purpose}
 
 *  Language:
-*     Starlink Fortran 77
+*     VAX Fortran
 
 *  Invocation:
 *     CALL PARSECON_PACKC( LU, ARRAY, START, END, STATUS )
 
 *  Description:
-*     The used length of each element of the given CHARACTER array 
-*     starting at the STARTth element and ending at the ENDth element
-*     is entered into the corresponding element of the NBUFF array.
-*     The length array and the used part of the CHARACTER array are
-*     then written to the .IFC file. In the case of empty strings, a
-*     single character is written.
+*     To encode CHARACTER elements of the compiled form of an interface
+*     file to reduce the file size.
 
 *  Arguments:
 *     LU = INTEGER (Given)
@@ -33,8 +39,35 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Name:
+*     PARSECON_PACKC
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Copyright:
+*     Copyright (C) 1991, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
+*     {enter_new_authors_here}
 *     {enter_new_authors_here}
 
 *  History:
@@ -43,12 +76,17 @@
 *     24-MAR-1993 (AJC):
 *        Add DAT_PAR for SUBPAR_CMN
 *     {enter_changes_here}
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
+*     {note_new_bugs_here}
 
 *-
-      
+
+*.
+
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -91,7 +129,7 @@
 10    CONTINUE
 
 *  End of required part of array - write the record
-      WRITE ( LU ) (NBUFF(I),I=START,END), 
+      WRITE ( LU ) (NBUFF(I),I=START,END),
      :             (ARRAY(I)(1:NBUFF(I)),I=START,END)
-      
+
       END

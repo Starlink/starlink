@@ -1,84 +1,112 @@
-*+  PARSECON_SETDEF - Insert default parameter value
       SUBROUTINE PARSECON_SETDEF ( ENTRY, STATUS )
-*    Description :
-*     Enters a static default value for the most recently declared program 
-*     parameter
-*    Invocation :
+*+
+*  Name:
+*     PARSECON_SETDEF
+
+*  Purpose:
+*     Insert default parameter value.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
 *     CALL PARSECON_SETDEF ( ENTRY, STATUS )
-*    Parameters :
+
+*  Description:
+*     Enters a static default value for the most recently declared program
+*     parameter
+
+*  Arguments:
 *     ENTRY=CHARACTER*(*) (given)
-*           data value
+*        data value
 *     STATUS=INTEGER
-*    Method :
-*     This routine adds a value into the space for static defaults 
-*     associated with a program parameter. The common variable PARPTR 
-*     has been previously set to point to the relevant parameter. The 
-*     type of this parameter is extracted from storage, and compared 
-*     with the type deduced from the syntax of the value string in ENTRY. 
+
+*  Algorithm:
+*     This routine adds a value into the space for static defaults
+*     associated with a program parameter. The common variable PARPTR
+*     has been previously set to point to the relevant parameter. The
+*     type of this parameter is extracted from storage, and compared
+*     with the type deduced from the syntax of the value string in ENTRY.
 *     Any valid type conversions are performed, and the value is stored
-*     in the storage lists. The pointers to the parameter's default 
+*     in the storage lists. The pointers to the parameter's default
 *     values are set up.
-*    Deficiencies :
-*     Only handles scalars and 1-D arrays. In the case of array 
-*     elements, these arrive one at a time and are added to the current 
-*     list. The SSE syntax of a 1-D array is (value,value...). The 
-*     brackets are delivered to this routine, so in due course it should 
+
+*  Implementation Deficiencies:
+*     Only handles scalars and 1-D arrays. In the case of array
+*     elements, these arrive one at a time and are added to the current
+*     list. The SSE syntax of a 1-D array is (value,value...). The
+*     brackets are delivered to this routine, so in due course it should
 *     be possible to generalise it to handle the n-D syntax, which is
 *     (((value,..),(value,..)...),((value,..)..),..).
 *     For the time being the incoming brackets are simply ignored.
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     20.09.1984:  Original (REVAD::BDK)
 *     27.02.1985:  ignore '(' and ')' (REVAD::BDK)
 *     06.05.1987:  handle NULL default (REVAD::BDK)
 *     16.10.1990:  remove unused declarations (RLVAD::AJC)
-*     25.02.1991:  Report errors 
-*                  Mark and release error context - annul on '(', ')'
-*                  and '!' (RLVAD::AJC)
+*     25.02.1991:  Report errors
+*        Mark and release error context - annul on '(', ')'
+*        and '!' (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
 *     01.02.2004:  Checked in to CVS repository cvs.starlink.ac.uk.  See there
-*                  for all future changes (norman@astro.gla.ac.uk)
-*    endhistory
-*    Type Definitions :
+*        for all future changes (norman@astro.gla.ac.uk)
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PARSECON_ERR'
       INCLUDE 'SUBPAR_PAR'
 
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) ENTRY
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    External references :
+
+*  External References:
 *     None
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
 
-*    Local variables :
-      INTEGER DECTYPE                          ! code for type of 
-                                               ! declared program 
+
+*  Local Variables:
+      INTEGER DECTYPE                          ! code for type of
+                                               ! declared program
                                                ! parameter
 
-      LOGICAL STRUCTURE                        ! .TRUE. => name of a 
+      LOGICAL STRUCTURE                        ! .TRUE. => name of a
                                                ! data structure
 
-      REAL VALUE_REAL                          ! temporary storage for 
+      REAL VALUE_REAL                          ! temporary storage for
       INTEGER VALUE_INTEGER                    ! the value
       DOUBLE PRECISION VALUE_DOUBLE
       LOGICAL VALUE_LOGICAL
       CHARACTER*132 VALUE_CHAR
 
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -88,22 +116,22 @@
 *   Get the type declared for the current parameter
       DECTYPE = PARTYPE(PARPTR)
 
-*   determine what type information can be deduced from the syntax of 
-*   the entry to be added, and do any syntax-dependent string 
+*   determine what type information can be deduced from the syntax of
+*   the entry to be added, and do any syntax-dependent string
 *   processing. - eg remove single quotes from character constant.
 *   Convert the string to the required data type.
-      CALL PARSECON_CONVERT ( ENTRY, DECTYPE, VALUE_REAL, VALUE_CHAR, 
+      CALL PARSECON_CONVERT ( ENTRY, DECTYPE, VALUE_REAL, VALUE_CHAR,
      :  VALUE_DOUBLE, VALUE_INTEGER, VALUE_LOGICAL, STRUCTURE, STATUS )
 
-*   Check for acceptable type conversions between the given entry value 
+*   Check for acceptable type conversions between the given entry value
 *   and the declared type of the associated action.
-*   CONVERT will have generated an error in the case of the ENTRY being 
+*   CONVERT will have generated an error in the case of the ENTRY being
 *   a bracket.
       IF ( STATUS .EQ. SAI__OK ) THEN
 
          IF ( STRUCTURE ) THEN
 
-*         Modify the type to indicate storage in an HDS structure, and copy 
+*         Modify the type to indicate storage in an HDS structure, and copy
 *         the structure-name into character list storage.
             IF ( CHARPTR .LT. SUBPAR__MAXLIMS ) THEN
                CHARPTR = CHARPTR + 1
@@ -121,8 +149,8 @@
 
          ELSE IF ( DECTYPE .EQ. SUBPAR__CHAR ) THEN
 
-*         String constant. VALUE_CHAR will contain the string with the 
-*         delimiting single quotes removed, and double (ie escaped) quotes 
+*         String constant. VALUE_CHAR will contain the string with the
+*         delimiting single quotes removed, and double (ie escaped) quotes
 *         contracted.
             IF ( CHARPTR .LT. SUBPAR__MAXLIMS ) THEN
                CHARPTR = CHARPTR + 1

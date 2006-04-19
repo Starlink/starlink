@@ -1,32 +1,43 @@
-*+  PARSECON_READIFL - Read, interpret and store interface file
       SUBROUTINE PARSECON_READIFL ( LUCON, NUMERR, STATUS )
-*    Description :
-*     Read interface file from logical unit LUCON and store it in 
+*+
+*  Name:
+*     PARSECON_READIFL
+
+*  Purpose:
+*     Read, interpret and store interface file.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL PARSECON_READIFL ( LUCON, NUMERR, STATUS )
+
+*  Description:
+*     Read interface file from logical unit LUCON and store it in
 *     internal form.
-*    Invocation :
-*     CALL PARSECON_READIFL ( LUCON, NUMERR; STATUS )
-*    Parameters :
+
+*  Arguments:
 *     LUCON=INTEGER (given)
-*           logical unit number of interface file
+*        logical unit number of interface file
 *     NUMERR=INTEGER (returned)
-*           number of errors detected
+*        number of errors detected
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     A new error reporting context is set up
-*     The interface file is read, its contents being returned one token 
-*     at a time. The type of the token is determined and coded as an 
-*     integer. The current parse-state is also represented by an 
-*     integer. The combination of token-type and parse-state is used to 
-*     access a look-up table which gives a code for the action to be 
+*     The interface file is read, its contents being returned one token
+*     at a time. The type of the token is determined and coded as an
+*     integer. The current parse-state is also represented by an
+*     integer. The combination of token-type and parse-state is used to
+*     access a look-up table which gives a code for the action to be
 *     taken and for the new parse state.
 *     The error reporting context is released
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (RGO)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     11.09.1984:  VAX version (REVAD::BDK)
 *     23.08.1985:  handle monoliths (REVAD::BDK)
 *     13.05.1986:  handle menus (REVAD::BDK)
@@ -36,67 +47,81 @@
 *     15.05.1990:  add HELPKEY (RLVAD::AJC)
 *     04.07.1990:  add HELPLIB (RLVAD::AJC)
 *     16.08.1990:  add new actions for end of action/interface
-*                  and parameter (RLVAD::AJC)
+*        and parameter (RLVAD::AJC)
 *     19.09.1990:  re-organize
-*                  handling status set on readerr in GPBTOK
-*                  correct error message when TOKLEN -ve (RLVAD::AJC)
+*        handling status set on readerr in GPBTOK
+*        correct error message when TOKLEN -ve (RLVAD::AJC)
 *     17.10.1990:  correct argument mismatch NEWACCORDS (RLVAD::AJC)
 *     20.01.1992:  Use renamed COORDS routines (RLVAD::AJC)
-*     19.02.1991:  special action on non-contiguous positions 
-*                  add action on INTERFACE 
-*                  Set error context (RLVAD::AJC)
+*     19.02.1991:  special action on non-contiguous positions
+*        add action on INTERFACE
+*        Set error context (RLVAD::AJC)
 *     26.02.1991:  Retain unaltered token, _ARRCHAR and _TOKTYPE
-*                  altered  (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*        altered  (RLVAD::AJC)
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PARSECON_ERR'
 
-*    Import :
-      INTEGER LUCON                  ! logical unit number connected to 
+
+*  Arguments Given:
+      INTEGER LUCON                  ! logical unit number connected to
                                      ! interface file
 
-*    Export :
+
+*  Arguments Returned:
       INTEGER NUMERR                 ! number of errors detected
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'PARSECON_CMN'
       INCLUDE 'PARSECON2_CMN'
 
-*    Local variables :
+
+*  Local Variables:
       INTEGER STATE                  ! current parse-state
 
       CHARACTER*132 TOKEN            ! token from the interface file
 
-      INTEGER TOKLEN                 ! number of significant characters 
+      INTEGER TOKLEN                 ! number of significant characters
                                      ! in TOKEN
 
       CHARACTER*132 WORD             ! un-capitalised TOKEN
 
       INTEGER TOKTYP                 ! type of the TOKEN
 
-      INTEGER LINENUM                ! number of current line being read 
+      INTEGER LINENUM                ! number of current line being read
                                      ! from interface file
 
       INTEGER ACTCODE                ! code for the action to be taken
 
       INTEGER NEWSTATE               ! new parse-state
 
-      LOGICAL ERRFLAG                ! .TRUE. => in error state. Do not 
+      LOGICAL ERRFLAG                ! .TRUE. => in error state. Do not
                                      ! bother outputting error messages.
                                      ! When the parser 'picks-up' again,
                                      ! this gets reset to .FALSE.
 
-      LOGICAL MONFLAG                ! .TRUE. => parsing a monolith, try 
+      LOGICAL MONFLAG                ! .TRUE. => parsing a monolith, try
                                      ! for more INTERFACE declarations.
 
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -151,8 +176,8 @@
 
          ELSE IF ( ACTCODE .EQ. NEWPAR ) THEN
 *         The token is the name of a new parameter.
-*         Create a new entry on the parameter list, and set it to 
-*         WRITE access. This may be overwritten if there is 
+*         Create a new entry on the parameter list, and set it to
+*         WRITE access. This may be overwritten if there is
 *         subsequently an ACCESS restriction on the parameter.
              CALL PARSECON_NEWPAR ( TOKEN(:TOKLEN), STATUS )
 
@@ -161,19 +186,19 @@
              CALL PARSECON_PAREND ( STATUS )
 
          ELSE IF ( ACTCODE .EQ. MESTEXT ) THEN
-*         The current parameter is a MESSAGE. The current token contains 
-*         the message text. Mark the parameter for READ access, set 
+*         The current parameter is a MESSAGE. The current token contains
+*         the message text. Mark the parameter for READ access, set
 *         VPATH to INTERNAL, set the type to character, and put
 *         the text string as the static default.
             CALL PARSECON_MESTEXT ( TOKEN(:TOKLEN), STATUS )
 
          ELSE IF ( ACTCODE .EQ. NEWOB ) THEN
-*         Mark OBEY as valid for the action currently being 
+*         Mark OBEY as valid for the action currently being
 *         defined
             CALL PARSECON_SETOB ( .TRUE., STATUS )
 
          ELSE IF ( ACTCODE .EQ. NEWCAN ) THEN
-*         Mark CANCEL as valid for the action currently being 
+*         Mark CANCEL as valid for the action currently being
 *         defined
             CALL PARSECON_SETCAN ( .TRUE., STATUS )
 
@@ -204,12 +229,12 @@
             CALL PARSECON_SETRES ( .FALSE., STATUS )
 
          ELSE IF ( ACTCODE .EQ. DISCVALS ) THEN
-*         list restriction on parameter value required by current 
+*         list restriction on parameter value required by current
 *         action
             CALL PARSECON_ACTRES ( .FALSE., STATUS )
 
          ELSE IF ( ACTCODE .EQ. CONTVALS ) THEN
-*         range restriction on parameter value required by current 
+*         range restriction on parameter value required by current
 *         action
             CALL PARSECON_ACTRES ( .TRUE., STATUS )
 
@@ -218,7 +243,7 @@
             CALL PARSECON_PARLIST ( TOKEN(:TOKLEN), STATUS )
 
          ELSE IF ( ACTCODE .EQ. ACTLIST ) THEN
-*         add new entry to parameter constraint list required by 
+*         add new entry to parameter constraint list required by
 *         an action
             CALL PARSECON_ACTLIST ( TOKEN(:TOKLEN), STATUS )
 
@@ -251,7 +276,7 @@
             CALL PARSECON_SETPTY ( TOKEN(:TOKLEN), STATUS )
 
          ELSE IF ( ACTCODE .EQ. SETASS ) THEN
-*         store the name of the structure to be associated with the 
+*         store the name of the structure to be associated with the
 *         parameter
             CALL PARSECON_SETASS ( TOKEN(:TOKLEN), STATUS )
 
@@ -339,7 +364,7 @@
          ENDIF
 
 *      Now take stock of what has happened
-*      First look for the non-contiguous positions error or missing 
+*      First look for the non-contiguous positions error or missing
 *      ENDINTERFACE. This is so that the RESET action can be skipped
          IF ( ( STATUS .EQ. PARSE__NCPOS ) .OR.
      :        ( STATUS .EQ. PARSE__MISEND ) ) THEN

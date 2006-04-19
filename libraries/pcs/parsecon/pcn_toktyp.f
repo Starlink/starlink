@@ -1,23 +1,35 @@
-*+  PARSECON_TOKTYP - Determine type of a token from an interface file
       SUBROUTINE PARSECON_TOKTYP ( TOKEN, UTOKN, TOKTYP, STATUS )
-*    Description :
+*+
+*  Name:
+*     PARSECON_TOKTYP
+
+*  Purpose:
+*     Determine type of a token from an interface file.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL PARSECON_TOKTYP ( TOKEN, UTOKN, TOKTYP, STATUS )
+
+*  Description:
 *     Determine the type of a token, for use in parsing an interface
 *     file phrase.
-*    Invocation :
-*     CALL PARSECON_TOKTYP ( TOKEN; UTOKN, TOKTYP, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     TOKEN=CHARACTER*(*) (given)
-*           token, guaranteed to have no trailing spaces.
-*           All alpha chars except in char constants are in upper case
+*        token, guaranteed to have no trailing spaces.
+*        All alpha chars except in char constants are in upper case
 *     UTOKN=CHARACTER*(*) (returned)
-*           the token converted to upper case except in the case of
-*           quoted strings, when a copy of the given token is returned
+*        the token converted to upper case except in the case of
+*        quoted strings, when a copy of the given token is returned
 *     TOKTYP=INTEGER (returned)
-*           token type.
+*        token type.
 *     STATUS=INTEGER
-*    Method :
-*     The token-type may be one of a set of reserved words, or a 
-*     character or numeric constant, or a name. Anything not fitting 
+
+*  Algorithm:
+*     The token-type may be one of a set of reserved words, or a
+*     character or numeric constant, or a name. Anything not fitting
 *     into one of these categories is classified as OTHER.
 *     The token is checked for the following conditions in turn
 *     and TOKTYP set accordingly to one of a set of symbolic constants
@@ -31,13 +43,12 @@
 *      4. The token can be interpreted (by an internal READ) as a
 *         number (TOKTYP set to CONST)
 *      5. Anything else (TOKTYP set to NAME)
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (RGO)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     21.09.1984:  VAX version (REVAD::BDK)
 *     08.10.1984:  Optimised character checking (REVAD::BDK)
 *     23.08.1985:  add MONOLITH, ENDMONOLITH (REVAD::BDK)
@@ -47,49 +58,63 @@
 *     15.05.1990:  add HELPKEY (RLVAD::AJC)
 *     04.07.1990:  add HELPLIB (RLVAD::AJC)
 *     16.10.1990:  tidy unused declarations
-*                  change internal READ to CHR_CTOD (RLVAD::AJC)
-*                  improve comments (RLVAD::AJC)
+*        change internal READ to CHR_CTOD (RLVAD::AJC)
+*        improve comments (RLVAD::AJC)
 *     26.02.1992:  expect uncapitalised token - return capitalised version
-*                  except for quoted string (RLVAD::AJC)
+*        except for quoted string (RLVAD::AJC)
 *     11.09.1992:  Trap D and E else they may be typed as numbers (RLVAD::AJC)
 *     11.12.1992:  Trap anything starting with a letter as NAME - this
-*                  cures problem on Sun (RLVAD::AJC)
-*    endhistory
+*        cures problem on Sun (RLVAD::AJC)
+*     {enter_further_changes_here}
 
-*    Type Definitions :
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
 
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) TOKEN             ! token, guaranteed to have no
                                       ! trailing spaces.
 
-*    Export :
+
+*  Arguments Returned:
       CHARACTER*(*) UTOKN             ! The given token converted to upper
                                       ! case except for character constants
 
       INTEGER TOKTYP                  ! token type.
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'PARSECON_CMN'
 
-*    External references :
+
+*  External References:
       LOGICAL CHR_ISALF
       EXTERNAL CHR_ISALF
 
-*    Local Constants :
+
+*  Local Constants:
       CHARACTER*(*) QUOTE
       PARAMETER ( QUOTE = '''' )
 
       INTEGER RESNUM
       PARAMETER ( RESNUM = 35 )
 
-*    Local variables :
+
+*  Local Variables:
       INTEGER RESMAP(RESNUM)
       INTEGER RESMIN(RESNUM)
       INTEGER TOKLEN
@@ -98,13 +123,14 @@
       DOUBLE PRECISION D
       CHARACTER*12 RESERVED(RESNUM)
 
-*    Local data :
-      DATA RESERVED / 'INTERFACE', 'ENDINTERFACE', 'PARAMETER', 
-     :  'ENDPARAMETER', 'ACTION', 'ENDACTION', 'OBEY', 'ENDOBEY', 
-     :  'CANCEL', 'ENDCANCEL', 'RANGE', 'IN', 'DEFAULT', 'TYPE', 
-     :  'NEEDS', 'KEYWORD', 'POSITION', 'ACCESS', 'VPATH', 'HELP', 
-     :  'PTYPE', 'ASSOCIATION', 'PROGRAM', 'EPATH', 'MESSAGE', 'TEXT', 
-     :  'ENDMESSAGE', 'PROMPT', 'MONOLITH', 'ENDMONOLITH', 'MENU', 
+
+*  Local Data:
+      DATA RESERVED / 'INTERFACE', 'ENDINTERFACE', 'PARAMETER',
+     :  'ENDPARAMETER', 'ACTION', 'ENDACTION', 'OBEY', 'ENDOBEY',
+     :  'CANCEL', 'ENDCANCEL', 'RANGE', 'IN', 'DEFAULT', 'TYPE',
+     :  'NEEDS', 'KEYWORD', 'POSITION', 'ACCESS', 'VPATH', 'HELP',
+     :  'PTYPE', 'ASSOCIATION', 'PROGRAM', 'EPATH', 'MESSAGE', 'TEXT',
+     :  'ENDMESSAGE', 'PROMPT', 'MONOLITH', 'ENDMONOLITH', 'MENU',
      :  'MENUCOORDS', 'PPATH', 'HELPKEY', 'HELPLIB' /
 
       DATA RESMAP / IFACE, EFACE, PARAM, EPARAM, ACTION,
@@ -112,13 +138,15 @@
      :  RANGE, IN, DEFAULT, TYPE, NEEDS,
      :  KEYWORD, POSITION,
      :  ACCESS, VPATH, HELP, PTYPE, ASSOC,
-     :  PROGRAM, EPATH, MESSAGE, TEXT, EMESS, PROMPT, MONOL, EMONOL, 
+     :  PROGRAM, EPATH, MESSAGE, TEXT, EMESS, PROMPT, MONOL, EMONOL,
      :  MENU, COORDS, PPATH, HELPKEY, HELPLIB /
 
-      DATA RESMIN / 9, 12, 9, 12, 6, 9, 4, 7, 6, 9, 5, 2, 7, 4, 5, 7, 8, 
+      DATA RESMIN / 9, 12, 9, 12, 6, 9, 4, 7, 6, 9, 5, 2, 7, 4, 5, 7, 8,
      :  6, 5, 4, 5, 11, 7, 5, 7, 4, 10, 6, 8, 11, 4, 10, 5, 7, 7 /
 
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

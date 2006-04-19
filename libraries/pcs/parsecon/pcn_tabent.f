@@ -1,59 +1,78 @@
-*+  PARSECON_TABENT - Look-up parsing state-table
-      SUBROUTINE PARSECON_TABENT ( STATE, TOKTYPE, ACTCODE, 
+      SUBROUTINE PARSECON_TABENT ( STATE, TOKTYPE, ACTCODE,
      :  NEWSTATE, STATUS )
-*    Description :
+*+
+*  Name:
+*     PARSECON_TABENT
+
+*  Purpose:
+*     Look-up parsing state-table.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL PARSECON_TABENT ( STATE, TOKTYPE, ACTCODE,
+*    :   NEWSTATE, STATUS )
+
+*  Description:
 *     Look-up parsing state-table
-*    Invocation :
-*     CALL PARSECON_TABENT ( STATE, TOKTYPE; ACTCODE, 
-*    :  NEWSTATE )
-*    Parameters :
+
+*  Arguments:
 *     STATE=INTEGER (given)
-*           current parsing state
+*        current parsing state
 *     TOKTYPE=INTEGER (given)
-*           type of current token
+*        type of current token
 *     ACTCODE=INTEGER (returned)
-*           action code 
+*        action code
 *     NEWSTATE=INTEGER (returned)
-*           new parsing state
+*        new parsing state
 *     STATUS=INTEGER
-*    Method :
-*   Look up (action code, new state) for (state, token type).
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*     W.F.Lupton (RGO)
-*    History :
-*     18.09.1984:  VAX version (REVAD::BDK)
-*    endhistory
-*    Type Definitions :
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
 
-*    Import :
+
+*  Arguments Given:
       INTEGER STATE           ! current parsing state
 
       INTEGER TOKTYPE         ! type of current token
 
-*    Export :
+
+*  Arguments Returned:
       INTEGER ACTCODE         ! action code (0 = none)
 
       INTEGER NEWSTATE        ! new parsing state
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'PARSECON_CMN'
 
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
-*   Look-up the two values corresponding to the given combination of 
+*   Look-up the two values corresponding to the given combination of
 *   parse-state and token-type. An invalid combination will result in
 *          ACTCODE = ERROR
 *          NEWSTATE = FACEGOT

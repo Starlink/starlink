@@ -1,64 +1,91 @@
-*+  PARSECON_DUMPIFC - Write compiled interface file
       SUBROUTINE PARSECON_DUMPIFC ( LUCON, STATUS )
-*    Description :
-*     The compiled version of the interface file is written to disk.
-*    Invocation :
+*+
+*  Name:
+*     PARSECON_DUMPIFC
+
+*  Purpose:
+*     Write compiled interface file.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
 *     CALL PARSECON_DUMPIFC ( LUCON, STATUS )
-*    Parameters :
+
+*  Description:
+*     The compiled version of the interface file is written to disk.
+
+*  Arguments:
 *     LUCON=INTEGER (given)
-*           unit number for FORTRAN write
+*        unit number for FORTRAN write
 *     STATUS=INTEGER
-*    Method :
-*     The first two records contain the program name and the .EXE 
+
+*  Algorithm:
+*     The first two records contain the program name and the .EXE
 *     search-path.
-*     The third record in the file contains the pointers indicating how 
-*     many values were stored in each array. This record is written 
+*     The third record in the file contains the pointers indicating how
+*     many values were stored in each array. This record is written
 *     using the BYTE array equivalenced to the pointers.
-*    Deficiencies :
-*     The parameter full help specifiers are written on the end of the 
+
+*  Implementation Deficiencies:
+*     The parameter full help specifiers are written on the end of the
 *     file so that the reader can just fail on that read if an old-style
 *     .ifc is presented. Thus the need to re-compile all interface files
 *     is avoided.
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     09.10.1984:  Original (REVAD::BDK)
 *     27.02.1985:  output PROGNAME and EXEPATH (REVAD::BDK)
 *     23.08.1985:  include PROGADD (REVAD::BDK)
 *     11.11.1985:  output PARLIT (REVAD::BDK)
-*     13.05.1986:  output PARMENU, PARCOORDS, ACTHELP, ACTKEY, ACTMENU, 
-*                  ACTCOORDS (REVAD::BDK)
+*     13.05.1986:  output PARMENU, PARCOORDS, ACTHELP, ACTKEY, ACTMENU,
+*        ACTCOORDS (REVAD::BDK)
 *     05.05.1987:  output PARPPATH (REVAD::BDK)
 *     04.07.1990:  add PARHKEY (RLVAD::AJC)
 *     04.07.1991:  produce run-length encoded version of .IFC to decrease
-*                  size of file (RLVAD::AJC)
+*        size of file (RLVAD::AJC)
 *     02.10.1991:  expand out PTRIFL for portability (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
 *     28.06.1995:  Use PACKL for PARWRITE, not PACKI (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
-*    Import :
+
+*  Arguments Given:
       INTEGER LUCON                ! FORTRAN unit for output
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
 
-*    Local variables :
+
+*  Local Variables:
       INTEGER I
       INTEGER J
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -67,18 +94,18 @@
 *
       WRITE ( LUCON ) PROGNAME
 *
-*   Write search path 
+*   Write search path
 *   This is not used for its original purpose and has been hijacked
 *   to flag a new-style .IFC
 *   If last character is '1' run length encoded .IFC
-      EXEPATH(132:132) = '1'            
+      EXEPATH(132:132) = '1'
       WRITE ( LUCON ) EXEPATH
 *
-*   Write the set of pointers indicating how many values were stored by 
+*   Write the set of pointers indicating how many values were stored by
 *   the interface parser in the arrays.
 *
       WRITE ( LUCON ) PARPTR, ACTPTR, NEEDPTR,
-     :      INTPTR, REALPTR, DOUBLEPTR, CHARPTR, LOGPTR, 
+     :      INTPTR, REALPTR, DOUBLEPTR, CHARPTR, LOGPTR,
      :      FACENAME, PROGNAME, EXEPATH, MONOLITH
 
 *

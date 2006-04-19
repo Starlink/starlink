@@ -1,55 +1,75 @@
-*+  PARSECON_INTERP - Obsolete routine only needed for transfer vector
-      SUBROUTINE PARSECON_INTERP ( STRING, TYPE, RVAL, CVAL, 
+      SUBROUTINE PARSECON_INTERP ( STRING, TYPE, RVAL, CVAL,
      :  LVAL, STATUS )
-*    Description :
-*     Given a character string, the syntax of the string is checked, 
-*     and if possible it is converted to the corresponding primitive 
-*     data type and the value returned in the corresponding variable. 
-*    Invocation :
-*     CALL PARSECON_INTERP ( STRING, TYPE, RVAL, CVAL, 
-*    :  LVAL, STATUS )
-*    Parameters :
+*+
+*  Name:
+*     PARSECON_INTERP
+
+*  Purpose:
+*     Obsolete routine only needed for transfer vector.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL PARSECON_INTERP ( STRING, TYPE, RVAL, CVAL,
+*    :   LVAL, STATUS )
+
+*  Description:
+*     Given a character string, the syntax of the string is checked,
+*     and if possible it is converted to the corresponding primitive
+*     data type and the value returned in the corresponding variable.
+
+*  Arguments:
 *     STRING=CHARACTER*(*) (given)
-*           character string to be converted
+*        character string to be converted
 *     TYPE=INTEGER (returned)
-*           type identified, one of
-*                SUBPAR__REAL
-*                SUBPAR__CHAR
-*                SUBPAR__LOGICAL
+*        type identified, one of
+*             SUBPAR__REAL
+*             SUBPAR__CHAR
+*             SUBPAR__LOGICAL
 *     RVAL=REAL (returned)
-*           variable to hold converted value
+*        variable to hold converted value
 *     CVAL=CHARACTER*(*) (returned)
-*           variable to hold converted value
+*        variable to hold converted value
 *     LVAL=LOGICAL (returned)
-*           variable to hold converted value
+*        variable to hold converted value
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     The type is deduced from the syntax of the given string.
 *     Any valid type conversions are performed, and the value is stored
 *     in the corresponding variable.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     27.05.1985:  Original (REVAD::BDK)
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
 !      INCLUDE 'PARSECON_ERR'
 !      INCLUDE 'PARSECON_PAR'
 !      INCLUDE 'SUBPAR_PAR'
 !      INCLUDE '($SSDEF)'
 
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) STRING
 
-*    Export :
+
+*  Arguments Returned:
       INTEGER TYPE                             ! code for type of STRING
                                                ! deduced from its syntax
 
@@ -59,25 +79,30 @@
 
       LOGICAL LVAL                             ! value if logical
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    External references :
+
+*  External References:
 !      INTEGER LIB$CVT_DX_DX
 !      EXTERNAL LIB$CVT_DX_DX
-      
-*    Local variables :
-!      INTEGER ISTAT                            ! status return from 
+
+
+*  Local Variables:
+!      INTEGER ISTAT                            ! status return from
                                                ! type-conversion utility
 
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 !
 !
 !*
-!*   Determine what type information can be deduced from the syntax of 
-!*   STRING, and do any syntax-dependent string processing. - eg remove 
+!*   Determine what type information can be deduced from the syntax of
+!*   STRING, and do any syntax-dependent string processing. - eg remove
 !*   single quotes from character constant.
 !*
 !      CALL PARSECON_DECVAL ( STRING, CVAL, TYPE, STATUS )
@@ -90,7 +115,7 @@
 !
 !      ELSE IF ( TYPE .EQ. PARSE__NUMBER ) THEN
 !
-!         ISTAT = LIB$CVT_DX_DX ( %DESCR(CVAL), 
+!         ISTAT = LIB$CVT_DX_DX ( %DESCR(CVAL),
 !     :     %DESCR(RVAL) )
 !
 !         IF ( ISTAT .NE. SS$_NORMAL ) THEN

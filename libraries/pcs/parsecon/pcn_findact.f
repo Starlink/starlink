@@ -1,56 +1,79 @@
-*+  PARSECON_FINDACT - Search action-list for named action.
       SUBROUTINE PARSECON_FINDACT ( NAME, NAMECODE, STATUS )
-*    Description :
-*     Search the list of actions for the given name, and if it is found, 
+*+
+*  Name:
+*     PARSECON_FINDACT
+
+*  Purpose:
+*     Search action-list for named action.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL PARSECON_FINDACT ( NAME, NAMECODE, STATUS )
+
+*  Description:
+*     Search the list of actions for the given name, and if it is found,
 *     return its index.
-*    Invocation :
-*     CALL PARSECON_FINDACT ( NAME; NAMECODE, STATUS )
-*    Parameters :
-*     parameter[(dimensions)]=type(access)
-*           <description of parameter>
+
+*  Arguments:
 *     NAME=CHARACTER*(*) (given)
-*           name of requested action
+*        name of requested action
 *     NAMECODE=INTEGER (returned)
-*           index number of action, if found.
+*        index number of action, if found.
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     The list of action names is searched sequentially
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     02.10.1984:  Original (REVAD::BDK)
 *     24.02.1991:  Report errors (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PARSECON_ERR'
 
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) NAME                 ! name to be found
 
-*    Export :
+
+*  Arguments Returned:
       INTEGER NAMECODE                   ! index of NAME if found
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
 
-*    Local variables :
+
+*  Local Variables:
       LOGICAL FOUND
 
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

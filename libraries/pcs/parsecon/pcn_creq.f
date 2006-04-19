@@ -1,54 +1,78 @@
-*+  PARSECON_CREQ - Set-up new entry on required value list for CANCEL
       SUBROUTINE PARSECON_CREQ ( ENTRY, STATUS )
-*    Description :
-*     Sets up an entry on the required value list of an CANCEL action. The 
-*     entry must be already declared on the list of program parameters.
-*    Invocation :
+*+
+*  Name:
+*     PARSECON_CREQ
+
+*  Purpose:
+*     Set-up new entry on required value list for CANCEL.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
 *     CALL PARSECON_CREQ ( ENTRY, STATUS )
-*    Parameters :
+
+*  Description:
+*     Sets up an entry on the required value list of an CANCEL action. The
+*     entry must be already declared on the list of program parameters.
+
+*  Arguments:
 *     ENTRY=CHARACTER*(*) (given)
-*           the name of the 'required' parameter
+*        the name of the 'required' parameter
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Check that ENTRY has been declared as a program parameter.
-*     Then check it isn't in the NEEDS list currently being generated. 
+*     Then check it isn't in the NEEDS list currently being generated.
 *     Finally add it to the NEEDS list.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     14.09.1984:  Original (REVAD::BDK)
-*     24.02.1991:  Report errors 
-*                  and rely on _FINDPAR to report NOPAR (RLVAD::AJC)
+*     24.02.1991:  Report errors
+*        and rely on _FINDPAR to report NOPAR (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PARSECON_ERR'
 
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) ENTRY
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
 
-*    Local variables :
-      INTEGER NAMCOD                         ! pointer to parameter to 
+
+*  Local Variables:
+      INTEGER NAMCOD                         ! pointer to parameter to
                                              ! be added to list.
 
       INTEGER J
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -63,12 +87,12 @@
 
          IF ( STATUS .EQ. SAI__OK ) THEN
 *
-*         name there, so search for it on required value list 
+*         name there, so search for it on required value list
 *         - error if found
 *
             IF ( NEEDCAN(1,ACTPTR) .NE. 0 ) THEN
 *
-*            A list of required parameters has already been started for 
+*            A list of required parameters has already been started for
 *            this CANCEL action, so search the list.
 *
                DO J = NEEDCAN(1,ACTPTR), NEEDCAN(2,ACTPTR)

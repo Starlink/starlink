@@ -1,56 +1,81 @@
-*+  PARSECON_FINDPAR - Search parameter-list for named parameter
       SUBROUTINE PARSECON_FINDPAR ( NAME, NAMECODE, STATUS )
-*    Description :
-*     Search the list of parameters for the given name, and if it is found, 
+*+
+*  Name:
+*     PARSECON_FINDPAR
+
+*  Purpose:
+*     Search parameter-list for named parameter.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL PARSECON_FINDPAR ( NAME, NAMECODE, STATUS )
+
+*  Description:
+*     Search the list of parameters for the given name, and if it is found,
 *     return its index.
-*    Invocation :
-*     CALL PARSECON_FINDPAR ( NAME; NAMECODE, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     NAME=CHARACTER*(*) (given)
-*           name of requested parameter
+*        name of requested parameter
 *     NAMECODE=INTEGER (returned)
-*           index number of parameter, if found.
+*        index number of parameter, if found.
 *     STATUS=INTEGER
-*    Method :
-*     The list of parameter names for the current program is searched 
+
+*  Algorithm:
+*     The list of parameter names for the current program is searched
 *     sequentially
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     02.10.1984:  Original (REVAD::BDK)
 *     23.08.1985:  start search from PROGADD(1,PROGNUM) (REVAD::BDK)
 *     24.02.1991:  Report errors (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PARSECON_ERR'
 
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) NAME                 ! name to be found
 
-*    Export :
+
+*  Arguments Returned:
       INTEGER NAMECODE                   ! index of NAME if found
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
 
-*    Local variables :
+
+*  Local Variables:
       LOGICAL FOUND
 
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

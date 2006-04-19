@@ -1,58 +1,80 @@
-*+  PARSECON_PARLIST - Insert value into parameter constraint list
       SUBROUTINE PARSECON_PARLIST ( ENTRY, STATUS )
-*    Description :
-*     Adds a value into the constraint-list for the most recently 
-*     declared program parameter
-*    Invocation :
+*+
+*  Name:
+*     PARSECON_PARLIST
+
+*  Purpose:
+*     Insert value into parameter constraint list.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
 *     CALL PARSECON_PARLIST ( ENTRY, STATUS )
-*    Parameters :
+
+*  Description:
+*     Adds a value into the constraint-list for the most recently
+*     declared program parameter
+
+*  Arguments:
 *     ENTRY=CHARACTER*(*) (given)
-*           data value
+*        data value
 *     STATUS=INTEGER
-*    Method :
-*     This routine adds a value into the constraint-list for the most recently 
-*     declared program parameter. The common variable PARPTR has been 
-*     previously set to point to the relevant parameter. The type of this 
-*     parameter is extracted from storage, and compared with the type deduced 
-*     from the syntax of the value string in ENTRY. Any valid type 
+
+*  Algorithm:
+*     This routine adds a value into the constraint-list for the most recently
+*     declared program parameter. The common variable PARPTR has been
+*     previously set to point to the relevant parameter. The type of this
+*     parameter is extracted from storage, and compared with the type deduced
+*     from the syntax of the value string in ENTRY. Any valid type
 *     conversions are performed, and the value is stored.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
 *     A J Chipperfield (STARLINK)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     14.09.1984:  Original (REVAD::BDK)
 *     16.02.1988:  force character values to uppercase (REVAD::BDK)
 *     16.10.1990:  Signal error on real or double to integer conversion
-*                  Use CHR for conversion (RLVAD::AJC)
+*        Use CHR for conversion (RLVAD::AJC)
 *     25.02.1991:  Report errors (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PARSECON_ERR'
       INCLUDE 'PARSECON_PAR'
       INCLUDE 'SUBPAR_PAR'
 
-*    Import :
+
+*  Arguments Given:
       CHARACTER*(*) ENTRY
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'SUBPAR_CMN'
 
-*    Local variables :
-      INTEGER DECTYPE                          ! code for type of 
-                                               ! declared program 
+
+*  Local Variables:
+      INTEGER DECTYPE                          ! code for type of
+                                               ! declared program
                                                ! parameter
 
       INTEGER CLASS                            ! code for type of ENTRY
@@ -60,19 +82,21 @@
 
       CHARACTER*132 VALUE_CHAR                 ! decoded ENTRY string
 
-*-
+
+*.
+
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Get the type declared for the current parameter
       DECTYPE = PARTYPE(PARPTR)
 
-*   determine what type information can be deduced from the syntax of 
-*   the entry to be added, and do any syntax-dependent string 
+*   determine what type information can be deduced from the syntax of
+*   the entry to be added, and do any syntax-dependent string
 *   processing. - eg remove single quotes from character constant.
       CALL PARSECON_DECVAL ( ENTRY, VALUE_CHAR, CLASS, STATUS )
 
-*   Check for acceptable type conversions between the given entry value 
+*   Check for acceptable type conversions between the given entry value
 *   and the declared type of the associated action.
       IF ( CLASS .EQ. PARSE__STRUC ) THEN
 
@@ -84,8 +108,8 @@
 
       ELSE IF ( CLASS .EQ. PARSE__CHAR ) THEN
 
-*      String constant. VALUE_CHAR will contain the string with the 
-*      delimiting single quotes removed, and double (ie escaped) quotes 
+*      String constant. VALUE_CHAR will contain the string with the
+*      delimiting single quotes removed, and double (ie escaped) quotes
 *      contracted.
          IF ( DECTYPE .EQ. SUBPAR__CHAR ) THEN
 
@@ -94,7 +118,7 @@
                CHARPTR = CHARPTR + 1
                CALL CHR_UCASE( VALUE_CHAR )
                CHARLIST(CHARPTR) = VALUE_CHAR
-               IF ( PARLIMS(1,PARPTR) .EQ. 0 ) 
+               IF ( PARLIMS(1,PARPTR) .EQ. 0 )
      :           PARLIMS(1,PARPTR) = CHARPTR
                PARLIMS(2,PARPTR) = CHARPTR
 
@@ -126,7 +150,7 @@
 
                REALPTR = REALPTR + 1
                CALL CHR_CTOR( ENTRY, REALLIST(REALPTR), STATUS )
-               IF ( PARLIMS(1,PARPTR) .EQ. 0 ) 
+               IF ( PARLIMS(1,PARPTR) .EQ. 0 )
      :           PARLIMS(1,PARPTR) = REALPTR
                PARLIMS(2,PARPTR) = REALPTR
 
@@ -145,7 +169,7 @@
 
                DOUBLEPTR = DOUBLEPTR + 1
                CALL CHR_CTOD( ENTRY, DOUBLELIST(DOUBLEPTR), STATUS )
-               IF ( PARLIMS(1,PARPTR) .EQ. 0 ) 
+               IF ( PARLIMS(1,PARPTR) .EQ. 0 )
      :           PARLIMS(1,PARPTR) = DOUBLEPTR
                PARLIMS(2,PARPTR) = DOUBLEPTR
 
@@ -164,7 +188,7 @@
 
                INTPTR = INTPTR + 1
                CALL CHR_CTOI( ENTRY, INTLIST(INTPTR), STATUS )
-               IF ( PARLIMS(1,PARPTR) .EQ. 0 ) 
+               IF ( PARLIMS(1,PARPTR) .EQ. 0 )
      :           PARLIMS(1,PARPTR) = INTPTR
                PARLIMS(2,PARPTR) = INTPTR
 
