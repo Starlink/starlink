@@ -58,6 +58,8 @@ f     The Interval class does not define any new routines beyond those
 *  History:
 *     29-OCT-2004 (DSB):
 *        Original version.
+*     19-APR-2006 (DSB):
+*        Negate the cached equivalent Box if the Interval has been negated.
 *class--
 */
 
@@ -564,6 +566,9 @@ static AstBox *Cache( AstInterval *this ){
          bfrm = astAnnul( bfrm );
          map = astAnnul( map );
          bbox = astAnnul( bbox );
+
+/* If the supplied Interval has been negated, negate the equivalent Box. */
+         if( astGetNegated( this ) ) astNegate( this->box );
       }
 
 /* Store the axis limits in the Interval structure. */
