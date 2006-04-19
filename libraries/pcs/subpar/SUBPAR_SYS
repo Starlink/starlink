@@ -1,19 +1,48 @@
-*+  SUBPAR_SYS - SUBPAR system parameters
-*
+*+
+*  Name:
+*     SUBPAR_SYS
+
+*  Purpose:
+*     SUBPAR system parameters
+
+*  Notes:
 *       NOTE NOTE NOTE: although this file is installed in a public
 *       place, this is done only to coordinate Starlink library
 *       builds, and you should not regard it as user-visible.  That
 *       is, user programs should _not_, and should not need to,
 *       include this file.
-*
-*    Authors :
+
+*  Copyright:
+*     Copyright (C) 1993, 1994 Science & Engineering Research Council.
+*     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     AJC: A J Chipperfield (STARLINK)
-*    History :
-*     20-AUG-1993 (AJC): 
-*       Original version separated from SUBPAR_CMN 
+*     NXG: Norman Gray (Starlink)
+
+*  History:
+*     20-AUG-1993 (AJC):
+*       Original version separated from SUBPAR_CMN
 *     21-DEC-1994 (AJC):
 *       Add SUBPAR__STRLEN
-*     01-FEB-2004 (Norman Gray, Starlink/Glasgow)
+*     01-FEB-2004 (NXG):
 *       Checked into CVS repository cvs.starlink.ac.uk.  See there for any
 *       further changes.
 *-

@@ -1,127 +1,132 @@
-*+  SUBPAR_CMN - Internal storage for parameter system
-*
-*
-*   This consists, firstly, of two character*15 arrays, one holding the 
-*   names of program parameters (PARNAMES) and one the names of d-task 
-*   actions (ACTNAMES). Each has a parallel integer array holding the 
-*   lengths of the names (PARLEN and ACTLEN).
-*   The remaining storage associated with parameters and actions 
-*   diverges in the two cases.
-*   The names of individual programs in a MONOLITH are stored in 
-*   ACTNAMES.
+*+
+*  Name:
+*     SUBPAR_CMN
+
+*  Purpose:
+*     Internal storage for parameter system
+
+*  Description:
+*     This consists, firstly, of two character*15 arrays, one holding the
+*     names of program parameters (PARNAMES) and one the names of d-task
+*     actions (ACTNAMES). Each has a parallel integer array holding the
+*     lengths of the names (PARLEN and ACTLEN).
+*     The remaining storage associated with parameters and actions
+*     diverges in the two cases.
+*     The names of individual programs in a MONOLITH are stored in
+*     ACTNAMES.
 *
 *   PARAMETERS
 *
-*   Parallel to PARNAMES and PARLEN is :
-*     (1) an integer array PARSTATE containing codes for the current 
+*   Parallel to PARNAMES and PARLEN is:
+*     (1) an integer array PARSTATE containing codes for the current
 *     state of each parameter, GROUND, ACTIVE, CANCEL, NULL, EOL.
 *     (2) an integer array containing codes for the types of the
-*     parameters PARTYPE. The values in this indicate the data type 
+*     parameters PARTYPE. The values in this indicate the data type
 *     of the parameter, and whether the value itself is stored internally
-*     (which is usually the case for scalars), or in an external temporary 
+*     (which is usually the case for scalars), or in an external temporary
 *     HDS structure (arrays) or in a permanent HDS structure.
-*     (3) a CHARACTER*(SUBPAR__SZLEN) array PARVALS which holds the values of 
-*     character strings OR the name of the HDS structure containing the 
-*     parameter value. There are also INTEGER, REAL, DOUBLE PRECISION and 
+*     (3) a CHARACTER*(SUBPAR__SZLEN) array PARVALS which holds the values of
+*     character strings OR the name of the HDS structure containing the
+*     parameter value. There are also INTEGER, REAL, DOUBLE PRECISION and
 *     LOGICAL arrays for values.
-*     (4) a character*80 array PARPROM which holds prompt strings for 
+*     (4) a character*80 array PARPROM which holds prompt strings for
 *     the parameters.
-*     (5) a logical array PARWRITE which has .TRUE. values for those 
+*     (5) a logical array PARWRITE which has .TRUE. values for those
 *     parameters which can be written, .FALSE. for readonly.
-*     (6) an integer array (PARLIMS) with three elements for each parameter, 
+*     (6) an integer array (PARLIMS) with three elements for each parameter,
 *     giving the data type of the constraints on the parameter and
-*     pointing to the first and last elements of the array of relevant 
+*     pointing to the first and last elements of the array of relevant
 *     type which holds the constraint values.
-*     (7) a logical array (PARCONT). .TRUE. implies that the constraint 
-*     list for this parameter is a pair of values giving a range (ie 
-*     continuous), otherwise the constraint list is a set of possible 
+*     (7) a logical array (PARCONT). .TRUE. implies that the constraint
+*     list for this parameter is a pair of values giving a range (ie
+*     continuous), otherwise the constraint list is a set of possible
 *     values.
-*     (8) a character*DAT__SZLOC array PARLOC with two values for each 
-*     parameter storing HDS locators to the container file and the component 
+*     (8) a character*DAT__SZLOC array PARLOC with two values for each
+*     parameter storing HDS locators to the container file and the component
 *     containing the value of the parameter (if relevant).
-*     (9) a logical array PARVALID containing .TRUE. for parameters with 
+*     (9) a logical array PARVALID containing .TRUE. for parameters with
 *     active locators in PARLOC.
-*     (10) an integer array PARDEF with three elements for each parameter, 
+*     (10) an integer array PARDEF with three elements for each parameter,
 *     storing the data type of the static defaults for the parameter and
 *     pointing to a list of static default values.
-*     (11) an integer array PARDYN with three values for each parameter, 
+*     (11) an integer array PARDYN with three values for each parameter,
 *     storing the data type of the dynamic defaults for the parameter and
 *     pointing to a list of dynamic default values. (PARDYN(1,-) .EQ. 0) is
-*     used to flag that there is no dynamic default space allocated for this 
+*     used to flag that there is no dynamic default space allocated for this
 *     parameter. If space has been allocated, (PARDYN(3,-) .EQ. type) indicates
-*     that dynamic defaults are set in the typeLIST array. 
-*     (PARDYN(3,-) .EQ. -type) indicates that space is allocated in the 
+*     that dynamic defaults are set in the typeLIST array.
+*     (PARDYN(3,-) .EQ. -type) indicates that space is allocated in the
 *     typeLIST array but no dynamic default has been set.
-*     (12) an integer array PARASSOC with two values for each parameter, 
-*     containing pointers to CHARLIST for the names of HDS structures 
+*     (12) an integer array PARASSOC with two values for each parameter,
+*     containing pointers to CHARLIST for the names of HDS structures
 *     associated with the parameter, and a code for the access mode.
 *     (13) a byte array PARVPATH with five elements for each parameter,
 *     storing the search paths for obtaining values.
-*     (14) a character*15 array PARKEY containing the keyword for each 
+*     (14) a character*15 array PARKEY containing the keyword for each
 *     parameter, which is used when prompting.
-*     (15) a character*132 array PARHELP containing the one-line help 
+*     (15) a character*132 array PARHELP containing the one-line help
 *     text for each parameter.
-*     (16) a character*15 array PARPTY containing the PTYPE for physical 
+*     (16) a character*15 array PARPTY containing the PTYPE for physical
 *     devices.
-*     (17) an integer array PARRPATH with two values for each parameter, 
-*     containing pointers to CHARLIST for the names of HDS structures 
+*     (17) an integer array PARRPATH with two values for each parameter,
+*     containing pointers to CHARLIST for the names of HDS structures
 *     which are the upper-levels associated with a physical device.
-*     (18) an integer array PARPOS. This is not strictly parallel to 
-*     PARNAMES. It contains indices to the parameters following their 
-*     defined command-line order. Eg. Suppose PARNAMES(3) is a parameter 
+*     (18) an integer array PARPOS. This is not strictly parallel to
+*     PARNAMES. It contains indices to the parameters following their
+*     defined command-line order. Eg. Suppose PARNAMES(3) is a parameter
 *     declared to have POSITION 5, then PARPOS(5) = 3.
-*     (19) A logical array PARLIT. If an element of this is .TRUE. then 
-*     when a value is given to the corresponding parameter, it is 
-*     interpreted as a literal string NOT an HDS name, even if not 
+*     (19) A logical array PARLIT. If an element of this is .TRUE. then
+*     when a value is given to the corresponding parameter, it is
+*     interpreted as a literal string NOT an HDS name, even if not
 *     surrounded by quotes.
-*     (20) A 2-D integer array PARCOORDS giving the (ROW,COL) position 
+*     (20) A 2-D integer array PARCOORDS giving the (ROW,COL) position
 *     of the parameter in a menu display.
-*     (21) a character array PARMENU giving the name of the menu on 
+*     (21) a character array PARMENU giving the name of the menu on
 *     which the parameter is to appear.
 *     (22) a byte array PARPPATH with five elements for each parameter,
 *     storing the search paths for obtaining prompt values.
 *     (23) a character*(132) array PARHKEY containing the parameter's
 *     `helpkey' specifier (which may be a combination of helplib and
 *     helpkey specifiers).
-*     (24) A 2-D integer array PARMIN giving the index into the approprate 
+*     (24) A 2-D integer array PARMIN giving the index into the approprate
 *     typeLIST array for the parameter's minimum value, and the type (or
 *     -1 if no minimum value is set.
-*     (24) A 2-D integer array PARMAX giving the index into the approprate 
+*     (24) A 2-D integer array PARMAX giving the index into the approprate
 *     typeLIST array for the parameter's maximum value, and the type (or
 *     -1 if no maximum value is set.
 *   ACTIONS
 *
-*   Parallel to ACTNAMES and ACTLEN is :
-*     (1) a logical array (MAYOB) indicating whether OBEY is valid for 
+*   Parallel to ACTNAMES and ACTLEN is:
+*     (1) a logical array (MAYOB) indicating whether OBEY is valid for
 *     the action.
-*     (2) a logical array (MAYCAN) indicating whether CANCEL is valid 
+*     (2) a logical array (MAYCAN) indicating whether CANCEL is valid
 *     for the action.
-*     (3) an integer array (NEEDOB) with two elements for each action, 
-*     pointing to the first and last elements in a list of required 
+*     (3) an integer array (NEEDOB) with two elements for each action,
+*     pointing to the first and last elements in a list of required
 *     parameters for OBEYing the action.
 *     (4) an integer array (NEEDCAN) with two elements for each action,
-*     pointing to the first and last elements in a list of required 
+*     pointing to the first and last elements in a list of required
 *     parameters for cancelling the action.
-*     (5) a character array (ACTHELP) giving the help line for the 
+*     (5) a character array (ACTHELP) giving the help line for the
 *     action.
 *     (6) a character array (ACTKEY) giving the keyword for the action.
-*     (7) a character array (ACTMENU) giving the name of the menu on 
+*     (7) a character array (ACTMENU) giving the name of the menu on
 *     which the action is to appear.
-*     (8) a 2-D integer array (ACTCOORDS) giving the coordinates on 
+*     (8) a 2-D integer array (ACTCOORDS) giving the coordinates on
 *     which the action is to appear on the menu.
 *
 *   ACTION NEEDS
 *
-*   An integer array (NEEDPAR) contains a list of pointers to the 
+*   An integer array (NEEDPAR) contains a list of pointers to the
 *   parameter list. NEEDPAR is pointed at by NEEDOB and NEEDCAN, thereby
-*   specifying the list of parameters required to have values by each 
+*   specifying the list of parameters required to have values by each
 *   action.
-*   Parallel to NEEDPAR is :
-*     (1) an integer array (NEEDLIMS) with two elements for each NEEDPAR 
-*     entry, pointing to the start and end of the constraint list for 
+*   Parallel to NEEDPAR is:
+*     (1) an integer array (NEEDLIMS) with two elements for each NEEDPAR
+*     entry, pointing to the start and end of the constraint list for
 *     the entry.
-*     (2) a logical array (NEEDCONT) with .TRUE. values corresponding to 
-*     elements of NEEDLIMS pointing to a range constraint, .FALSE. if 
+*     (2) a logical array (NEEDCONT) with .TRUE. values corresponding to
+*     elements of NEEDLIMS pointing to a range constraint, .FALSE. if
 *     NEEDLIMS is pointing to a list of possible values.
 *
 *   CONSTRAINTS
@@ -133,9 +138,9 @@
 *     character (*SUBPAR__STRLEN) - CHARLIST
 *     logical          - LOGLIST
 *   These are pointed at by
-*     (1) PARLIMS, indicating general constraints on the value of a 
+*     (1) PARLIMS, indicating general constraints on the value of a
 *     scalar parameter.
-*     (2) NEEDLIMS, indicating constraints on the value of a parameter 
+*     (2) NEEDLIMS, indicating constraints on the value of a parameter
 *     specifically associated with some action.
 *   Note that constraints only apply to scalar parameter values.
 *
@@ -145,62 +150,106 @@
 *     (3) associated HDS structures, pointed at by PARVPATH.
 *
 *   MONOLITHS
-*     The names of the individual programs in a monolith are entered in 
-*     ACTNAMES. Parallel to ACTNAMES is an integer array PROGADD with 
-*     two elements for each program, containing pointers to PARNAMES 
+*     The names of the individual programs in a monolith are entered in
+*     ACTNAMES. Parallel to ACTNAMES is an integer array PROGADD with
+*     two elements for each program, containing pointers to PARNAMES
 *     indicating where the parameters for this program are to be found.
 *
 *   GENERAL STORED INFORMATION
-*     In addition to the above complex data structure, the common blocks 
+*     In addition to the above complex data structure, the common blocks
 *     also store the following pieces of information:
 *       The name of the interface module or monolith
 *       A flag, .TRUE. => monolith
 *       The program name
 *       The search path for the .EXE file
 *       A flag, .TRUE. => automatic checking for NEEDS lists
-*     For A-tasks, the two following pieces of run-time information are 
-*     held :
+*     For A-tasks, the two following pieces of run-time information are
+*     held:
 *       The path back to the task which ordered this task to RUN
 *       The message number of the RUN message.
 *       A flag indicating that prompts should go direct to the terminal
-*    Authors :
-*     B.D.Kelly (REVAD::BDK)
-*    History :
-*     13.09.1984:  Original (REVAD::BDK)
-*     21.11.1984:  add RUNPATH (REVAD::BDK)
-*     27.02.1085:  add PROGNAME and EXEPATH (REVAD::BDK)
-*     16.04.1985:  add RUNID (REVAD::BDK)
-*     23.08.1985:  handle monoliths - PROGADD, MONOLITH, EXTTOP, PROGNUM
-*                      (REVAD::BDK)
-*     05.09.1985:  store HDS locator to dynamic defaults (REVAD::BDK)
-*     11.11.1985:  add PARLIT and RUNFACE (REVAD::BDK)
-*     25.11.1985:  increase MAXPAR to 500 from 150 (REVAD::BDK)
-*     06.03.1986:  add CHECKNEEDS flag (REVAD::BDK)
-*     13.05.1986:  handle menus. Add PARCOORDS, PARMENU, ACTHELP, 
-*                  ACTKEY, ACTMENU, ACTCOORDS (REVAD::BDK)
-*     05.05.1987:  handle prompt search path. Add PARPPATH (REVAD::BDK)
-*     05.05.1987:  add extra states RESET, ACCPR, RESACC, PROMPT, 
-*                  RESPROM (REVAD::BDK)
-*     05.05.1987:  increase SUBPAR__MAXPAR and SUBPAR__MAXACT 
-*                  (REVAD::BDK)
-*     05.05.1987:  make RUNFACE an integer (REVAD::BDK)
-*     30.07.1987:  move constants for parameter states to SUBPAR.PAR 
-*                  (REVAD::BDK)
-*     30.04.1990:  Increase SUBPAR__MAXLIMS 300->350  (RLVAD::AJC)
-*     15.05.1990:  Add parameter helpkey  (RLVAD::AJC)
-*     03.07.1990:  Increase SUBPAR__MAXLIMS 350->500
-*                  Add SUBPARTERM help paging control  (RLVAD::AJC)
-*     15.10.1990:  Avoid mixing CHAR and numeric and
-*                  remove equivalence PTRIFL to pointers etc.  (RLVAD::AJC)
-*     14.07.1992:  Add PARMIN/PARMAX arrays (RLVAD::AJC)
-*     31.07.1992:  Add SUBPARPSV block to save pointers after interface file 
-*                  load so can restore to them at DEACT.
-*                  Better comments on PARDYN. (RLVAD::AJC)
-*      1.03.1993:  Use DAT__SZLOC, not 15, for portability (RLVAD::AJC)
-*     20.08.1993:  Remove system parameters to SUBPAR_SYS 
-*                  and include SUBPAR_SYS (RLVAD::AJC)
-*      3.09.1993:  Correctly SAVE SUBPARPSV (not PSAV) (RLVAD::AJC)
-*    endhistory
+
+*  Copyright:
+*     Copyright (C) 1085, 1984, 1985, 1986, 1987, 1990, 1992, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     BDK: B.D.Kelly (REVAD::BDK)
+*     AJC: Alan Chipperfield (Starlink)
+
+*  History:
+*     13-SEP-1984 (BDK):
+*        Original
+*     21-NOV-1984 (BDK):
+*        add RUNPATH
+*     27-FEB-1085 (BDK):
+*        add PROGNAME and EXEPATH
+*     16-APR-1985 (BDK):
+*        add RUNID
+*     23-AUG-1985 (BDK):
+*        handle monoliths - PROGADD, MONOLITH, EXTTOP, PROGNUM
+*     05-SEP-1985 (BDK):
+*        store HDS locator to dynamic defaults
+*     11-NOV-1985 (BDK):
+*        add PARLIT and RUNFACE
+*     25-NOV-1985 (BDK):
+*        increase MAXPAR to 500 from 150
+*     06-MAR-1986 (BDK):
+*        add CHECKNEEDS flag
+*     13-MAY-1986 (BDK):
+*        handle menus.
+*        Add PARCOORDS, PARMENU, ACTHELP, ACTKEY, ACTMENU, ACTCOORDS
+*     05-MAY-1987 (BDK):
+*        handle prompt search path. Add PARPPATH
+*     05-MAY-1987 (BDK):
+*        add extra states RESET, ACCPR, RESACC, PROMPT,
+*        RESPROM
+*     05-MAY-1987 (BDK):
+*        increase SUBPAR__MAXPAR and SUBPAR__MAXACT
+*     05-MAY-1987 (BDK):
+*        make RUNFACE an integer
+*     30-JUL-1987 (BDK):
+*        move constants for parameter states to SUBPAR.PAR
+*     30-APR-1990 (AJC):
+*        Increase SUBPAR__MAXLIMS 300->350
+*     15-MAY-1990 (AJC):
+*        Add parameter helpkey
+*     03-JUL-1990 (AJC):
+*        Increase SUBPAR__MAXLIMS 350->500
+*        Add SUBPARTERM help paging control
+*     15-OCT-1990 (AJC):
+*        Avoid mixing CHAR and numeric and
+*        remove equivalence PTRIFL to pointers etc.
+*     14-JUL-1992 (AJC):
+*        Add PARMIN/PARMAX arrays
+*     31-JUL-1992 (AJC):
+*        Add SUBPARPSV block to save pointers after interface file
+*        load so can restore to them at DEACT.
+*        Better comments on PARDYN.
+*      1-MAR-1993 (AJC):
+*        Use DAT__SZLOC, not 15, for portability
+*     20-AUG-1993 (AJC):
+*        Remove system parameters to SUBPAR_SYS
+*        and include SUBPAR_SYS
+*      3-SEP-1993 (AJC):
+*        Correctly SAVE SUBPARPSV (not PSAV)
+
 *-
 
 *
@@ -334,8 +383,8 @@
      :  PARMENU, PARHKEY
 
 *
-*   Common blocks holding data which is generated when the application is 
-*   running. This block does not need to be read from disk on program 
+*   Common blocks holding data which is generated when the application is
+*   running. This block does not need to be read from disk on program
 *   start-up.
 *
       COMMON / SUBPARDAT / PARSTATE, PARINT, PARREAL, 
@@ -380,7 +429,7 @@
 
 
 *
-*   Needs list - ie specification of parameters required by specific 
+*   Needs list - ie specification of parameters required by specific
 *   OBEY/CANCEL actions.
 *
       INTEGER NEEDPAR(SUBPAR__MAXNEEDS)     ! pointers to required 
@@ -396,12 +445,12 @@
 
 *
 *   Data lists. There is a list for each data type.
-*   The lists may contain a pair of values specifying a range, 
+*   The lists may contain a pair of values specifying a range,
 *   or a set of possible valid values, or static and dynamic defaults,
 *   or the names of associated HDS objects.
 *   The interpretation of the contents of the list is determined by
 *     parameter type +
-*     PARLIMS,PARCONT or NEEDLIMS,NEEDCONT or PARDEF or PARDYN or 
+*     PARLIMS,PARCONT or NEEDLIMS,NEEDCONT or PARDEF or PARDYN or
 *     PARVPATH.
 *
       INTEGER INTLIST(SUBPAR__MAXLIMS)
@@ -415,12 +464,12 @@
 
 
 *
-*   There is a set of pointers to the last elements of the various 
-*   lists. These pointers are set and manipulated during the parsing of 
-*   the interface file, but remain constant thereafter, except when 
+*   There is a set of pointers to the last elements of the various
+*   lists. These pointers are set and manipulated during the parsing of
+*   the interface file, but remain constant thereafter, except when
 *   storing dynamic defaults.
-*   Also stored with these are the interface name, program name and 
-*   EPATH string (search path for directory containing the .EXE), as 
+*   Also stored with these are the interface name, program name and
+*   EPATH string (search path for directory containing the .EXE), as
 *   well as the flag for whether this is a monolith.
 *   The equivalence is to enable the block to be written to or read from
 *   a disk-file.
@@ -469,9 +518,9 @@
 
       COMMON / SUBPARPSV / INTPSV, REALPSV, DOUBLEPSV, CHARPSV, LOGPSV
 *
-*   The common blocks also hold four locators to HDS structures which are 
-*   given values at progam activation. These are the locators to the 
-*   container files for global data, and for the external (ie not 
+*   The common blocks also hold four locators to HDS structures which are
+*   given values at progam activation. These are the locators to the
+*   container files for global data, and for the external (ie not
 *   common-block) storage of parameter values.
 *
       CHARACTER*(DAT__SZLOC) GLOBLOC    ! locator to global data storage
@@ -490,17 +539,17 @@
 
 
 *
-*   The path back to the task which ordered an ADAM A-task to RUN, and 
+*   The path back to the task which ordered an ADAM A-task to RUN, and
 *   the associated message id.
-*   These are used if it is necessary to prompt for a parameter. They 
-*   are set-up before the application routine is called, and are used by 
+*   These are used if it is necessary to prompt for a parameter. They
+*   are set-up before the application routine is called, and are used by
 *   SUBPAR_REQUEST.
 *   RUNFACE can have values
 *     SUBPAR__TASK => this is a stand-alone task.
-*     SUBPAR__TERM => connected directly to the terminal. In this case, 
-*                     output and prompting goes directly to the terminal 
+*     SUBPAR__TERM => connected directly to the terminal. In this case,
+*                     output and prompting goes directly to the terminal
 *                     rather than to another task.
-*     SUBPAR__UTASK => this is a UTASK. Call the UTASK library for 
+*     SUBPAR__UTASK => this is a UTASK. Call the UTASK library for
 *                      terminal output. Prompting should never occur.
 *
       INTEGER RUNPATH
@@ -520,7 +569,7 @@
       COMMON / MONPOINTER / PROGNUM
 
 *
-*   Flag for controlling whether the task fixed part checks items on a 
+*   Flag for controlling whether the task fixed part checks items on a
 *   NEEDS list.
 *
       LOGICAL CHECKNEEDS         ! .TRUE. => NEEDS list checked before 
