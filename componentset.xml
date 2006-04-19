@@ -2556,7 +2556,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="ndg" support="S">
-  <version>5.2-2</version>
+  <version>5.2-3</version>
   <path>libraries/ndg</path>
   <description>NDG - Routines for Accessing Groups of NDFs</description>
   <abstract><p>NDG provides facilities for handling groups of NDFs.
