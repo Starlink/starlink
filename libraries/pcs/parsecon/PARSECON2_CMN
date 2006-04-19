@@ -1,3 +1,21 @@
+*+
+*  Name:
+*     PARSECON2_CMN
+
+*  Purpose:
+*     Help library common block
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Authors:
+*     {enter_authors_here}
+
+*  History:
+*     {enter_history_here}
+
+*-
 
 *   Help library specifier
       CHARACTER*132 HLBSTR      ! the current helplib string

@@ -1,3 +1,22 @@
+*+
+*  Name:
+*     PARSECON3_CMN
+
+*  Purpose:
+*     <purpose>
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Authors:
+*     {enter_authors_here}
+
+*  History:
+*     {enter_history_here}
+
+*-
+
 *   Input buffer for record read from interface file
 *   Held in common so that error reports can quote it.
 

@@ -1,5 +1,22 @@
-*   Holds the highest specified position number for a task in common so 
-*   it can be checked at the end.
+*+
+*  Name:
+*     PARSECON4_CMN
+
+*  Purpose:
+*     Holds the highest specified position number for a task in common so 
+*     it can be checked at the end.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Authors:
+*     {enter_authors_here}
+
+*  History:
+*     {enter_history_here}
+
+*-
 
       INTEGER HIPOS
 

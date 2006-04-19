@@ -1,9 +1,21 @@
-*+  PARSECON_PAR - Parameters during parsing of interface module 
-*
-*   types deduced from the syntax of a character string being parsed
-*
-*   27.02.1985:  PARSE__NONE added (REVAD::BDK)
-*
+*+
+*  Name:
+*     PARSECON_PAR
+
+*  Purpose:
+*     Parameters during parsing of interface module 
+
+*  Description:
+*     types deduced from the syntax of a character string being parsed
+
+*  Authors:
+*     BDK: Dennis Kelly (ROE)
+
+*  History:
+*     27-FEB-1985 (BDK):
+*        PARSE__NONE added
+
+*-
       INTEGER PARSE__NONE                ! no recognised type
       INTEGER PARSE__CHAR                ! character string
       INTEGER PARSE__NUMBER              ! integer or real number

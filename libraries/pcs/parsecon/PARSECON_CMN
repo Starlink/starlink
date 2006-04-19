@@ -1,16 +1,36 @@
-*+  PARSECON_CMN - Common blocks for parsing interface file
-*   History :
-*    23.08.1985:  add features for MONOLITHS (REVAD::BDK)
-*    13.05.1986:  add features for menus (REVAD::BDK)
-*    05.05.1987:  add prompt search path (REVAD::BDK)
-*    26.05.1987:  add ACTEND (REVAD::BDK)
-*    15.05.1990:  add PARHKEY (RLVAD::AJC)
-*    03.07.1990:  add HELPLIB states, token, action and common (RLVAD::AJC)
-*    04.07.1990:  put buffer in common for better error reports (RLVAD::AJC)
-*    16.08.1990:  add actions PAREND and FACEND for error system (RLVAD::AJC)
-*    25.02.1992:  add action STFACE to check missing endinterface (RLVAD::AJC)
+*+
+*  Name:
+*     PARSECON_CMN
+
+*  Purpose:
+*    Common blocks for parsing interface file
+
+*  Authors:
+*    BDK: Dennis Kelly (ROE)
+*    AJC: Alan Chipperfield (Starlink)
+
+*  History:
+*    23-AUG-1985 (BDK):
+*       add features for MONOLITHS
+*    13-MAY-1986 (BDK):
+*       add features for menus
+*    05-MAY-1987 (BDK):
+*       add prompt search path
+*    26-MAY-1987 (BDK):
+*       add ACTEND
+*    15-MAY-1990 (AJC):
+*       add PARHKEY
+*    03-JUL-1990 (AJC):
+*       add HELPLIB states, token, action and common
+*    04-JUL-1990 (AJC):
+*       put buffer in common for better error reports
+*    16-AUG-1990 (AJC):
+*       add actions PAREND and FACEND for error system
+*    25-FEB-1992 (AJC):
+*       add action STFACE to check missing endinterface
+
 *-
-*
+
 *
 *   Parse state-table. The combination of parse-state and new token 
 *   input is used to look-up the conditions controlling the new 
