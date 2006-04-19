@@ -1,20 +1,42 @@
-*+  TASK_CMN - common blocks for TASK library
-*
-*    Authors :
+*+
+*  Name:
+*     TASK_CMN
+
+*  Purpose:
+*     common blocks for TASK library.
+
+*  Language:
+*     VAX Fortran
+
+*  Description:
+*     {routine_description}
+
+*  Authors:
 *     W.F.Lupton (AAOEPP::WFL)
-*    History :
+*     Dennis Kelly (ROE)
+*     Alan Chipperfield (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
 *     29.04.1989:  original (AAOEPP::WFL)
 *     30.04.1989:  distinguish between input and output VALUEs (AAOEPP::WFL)
 *     23.04.1991:  merge into a single INCLUDE file (REVAD::BDK)
-*     06.05.1991:  store CURACTNAME, use PAR__SZNAM, have 
-*                  separate common block for characters (REVAD::BDK)
+*     06.05.1991:  store CURACTNAME, use PAR__SZNAM, have
+*        separate common block for characters (REVAD::BDK)
 *     13.05.1991:  store INTRUPT_FLAG (REVAD::BDK)
 *     24.05.1991:  remove CURMESVALUE (REVAD::BDK)
 *     12.06.1991:  only store one value string, CURACTVALUE (REVAD::BDK)
 *     22.08.1991:  store application requests (REVAD::BDK)
 *     24.08.1993:  use subpar not par includes (RLVAD::AJC)
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
+
+*.
+
 
 *
 *    TASK_CURCOM - current d-task action common block
@@ -22,31 +44,31 @@
 *     behalf the current call to ACT has been made.
 *
       INTEGER CURACTPTR                    ! action pointer for current
-                                           ! action 
+                                           ! action
       INTEGER CURMESPATH                   ! message path resulting in
-                                           ! current entry 
+                                           ! current entry
       INTEGER CURMESMESSID                 ! message id resulting in
-                                           ! current entry 
+                                           ! current entry
       INTEGER CURMESCONTEXT                ! context in message
-                                           ! resulting in entry 
+                                           ! resulting in entry
 
       INTEGER CURMESSTATUS                 ! status in message resulting
-                                           ! in entry 
+                                           ! in entry
       INTEGER CURACTCONTEXT                ! context for current action
       INTEGER CURACTNAMECODE               ! name code for current
-                                           ! action 
+                                           ! action
       INTEGER CURACTSEQ                    ! sequence number for current
-                                           ! action 
+                                           ! action
 
       INTEGER CURACTDELAY                  ! delay before next entry
       INTEGER CURACTREQUEST                ! request for rescheduling
 
-      CHARACTER*(SUBPAR__NAMELEN) CURACTNAME    ! current action name 
+      CHARACTER*(SUBPAR__NAMELEN) CURACTNAME    ! current action name
       CHARACTER*(SUBPAR__NAMELEN) CURMESNAME    ! action name in message
-                                           ! resulting in entry 
+                                           ! resulting in entry
 
       CHARACTER*(MSG_VAL_LEN) CURACTVALUE  ! value string for current
-                                           ! action 
+                                           ! action
 
       COMMON / TASK_CURCOM / CURACTPTR, CURMESPATH, CURMESMESSID,
      :  CURMESCONTEXT, CURMESSTATUS, CURACTCONTEXT, CURACTNAMECODE,

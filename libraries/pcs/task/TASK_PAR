@@ -1,8 +1,31 @@
-*+  TASK_PAR - global constants for TASK library
-*
-*   History :
-*    23.04.1991: original (REVAD::BDK)
+*+
+*  Name:
+*     TASK_PAR
+
+*  Purpose:
+*     global constants for TASK library.
+
+*  Language:
+*     VAX Fortran
+
+*  Description:
+*     {routine_description}
+
+*  Authors:
+*     BDK: Dennis Kelly (ROE)
+*     {original_author_entry}
+
+*  History:
+*     23.04.1991: original (REVAD::BDK)
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-      INTEGER TASK__MAXSUB             ! maximum number of active 
+*.
+
+
+      INTEGER TASK__MAXSUB             ! maximum number of active
       PARAMETER ( TASK__MAXSUB = 100 ) ! subsidiary actions
