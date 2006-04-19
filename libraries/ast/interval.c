@@ -569,6 +569,9 @@ static AstBox *Cache( AstInterval *this ){
 
 /* If the supplied Interval has been negated, negate the equivalent Box. */
          if( astGetNegated( this ) ) astNegate( this->box );
+
+/* If the supplied Interval is closed, ensure the equivalent Box is closed. */
+         astSetClosed( this->box, astGetClosed( this ) );
       }
 
 /* Store the axis limits in the Interval structure. */
