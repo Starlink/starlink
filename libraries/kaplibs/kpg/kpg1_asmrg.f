@@ -104,9 +104,6 @@
 *        Do not issue warning about multiple PIXEL Domains if alignment
 *        is performed in the PIXEL Domain (there is usally an extra PIXEL
 *        Frame in the Plot because KPG1_GDGET adds one).
-*     3-APR-2006 (DSB):
-*        Attempt to align SkyFrames or SpecFrames with a CmpFrame by searching 
-*        through the CmpFrame for a Matching Frame.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -130,9 +127,6 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
-
-*  External References:
-      INTEGER KPG1_CNVRT
 
 *  Local Variables:
       CHARACTER DOM*80           ! Domain of Current Frame in FrameSet
@@ -211,7 +205,7 @@
 *  returned describing the relationship between the Current Frames in 
 *  IWCS2 and IWCS1, and the Base Frames are changed to indicate 
 *  the Frames in which alignment occurred.
-      TEMP = KPG1_CNVRT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS ) 
+      TEMP = AST_CONVERT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS ) 
 
 *  Issue a fatal error if alignment was not possible in any Domain.
       IF( TEMP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
@@ -253,7 +247,7 @@
       CALL AST_SETI( IWCS2, 'CURRENT', IMAT2, STATUS )
 
 *  Now call AST_CONVERT again.
-      TEMP = KPG1_CNVRT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS ) 
+      TEMP = AST_CONVERT( IWCS1, IWCS2, DOMLST( : IAT ), STATUS ) 
 
 *  Issue a fatal error if alignment was not possible. This shouldn't happen.
       IF( TEMP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
