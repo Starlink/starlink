@@ -2435,6 +2435,62 @@ iraf! {
       }
 
 
+      action astinterval {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter frame {
+            position 1
+            type NDF
+            prompt {The Frame in which the Interval is defined}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter lbnd {
+            position 2
+            type LITERAL
+            prompt {Lower axis bounds}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter ubnd {
+            position 3
+            type LITERAL
+            prompt {Upper axis bounds}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter unc {
+            position 4
+            type LITERAL
+            prompt {The uncertainty Region}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter options {
+            position 5
+            type LITERAL
+            prompt {Options for the Interval}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 6
+            type LITERAL
+            prompt {Name of file in which to store the Interval}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+
 
    }
 

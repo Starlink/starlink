@@ -23,11 +23,11 @@
 *        An identifier for the group
 *     NEL = INTEGER (Given)
 *        The size of the array.
-*     DATA( NEL ) = DOUBLE PRECISION (Returned)
-*        The array in which to store the values.
 *     ISTART = INTEGER (Given) 
 *        The index of the array element to receive the first value read
 *        from the group.
+*     DATA( NEL ) = DOUBLE PRECISION (Returned)
+*        The array in which to store the values.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 

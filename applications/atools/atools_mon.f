@@ -213,6 +213,9 @@
       ELSE IF ( NAME .EQ. 'ASTELLIPSE' ) THEN
          CALL ASTELLIPSE( STATUS )
  
+      ELSE IF ( NAME .EQ. 'ASTINTERVAL' ) THEN
+         CALL ASTINTERVAL( STATUS )
+ 
 
 *  If the action name is not recognised, then report an error.
       ELSE

@@ -11,6 +11,7 @@
 
   Changes in V1.9
 
+  - New command astinterval. Creates an Interval.
   - New command astselectormap. Creates a SelectorMap.
   - New command astswitchmap. Creates a SwitchMap.
 

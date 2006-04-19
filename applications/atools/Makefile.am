@@ -22,7 +22,7 @@ atools_mon_TASKS = astcopy astaddframe astclear astget astset asttest \
  astinvert astspecframe astsetrefpos astgetrefpos astformat asttran1 asttran2 \
  astmathmap astsetactunit astgetactunit astpolymap astswitchmap asttranmap \
  astdsbframe astfluxframe astsfluxframe astpolygon astellipse astmapsplit \
- astselectormap
+ astselectormap astinterval
 
 FSRC = \
  atl1_gtgrp.f atl1_rdgrp.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f \
@@ -92,7 +92,7 @@ astframeset.ifc astgetactunit.ifc astgetframe.ifc astget.ifc \
 astgetmapping.ifc astgetrefpos.ifc astinvert.ifc astlutmap.ifc \
 astmapbox.ifc astmathmap.ifc astmatrixmap.ifc astpcdmap.ifc \
 astpermaxes.ifc astpermmap.ifc astpickaxes.ifc astpolygon.ifc \
-astpolymap.ifc astremapframe.ifc astremoveframe.ifc \
+astinterval.ifc astpolymap.ifc astremapframe.ifc astremoveframe.ifc \
 astsetactunit.ifc astset.ifc astsetrefpos.ifc astsfluxframe.ifc \
 astshiftmap.ifc astsimplify.ifc astskyframe.ifc astspecframe.ifc \
 asttest.ifc asttran1.ifc asttran2.ifc astswitchmap.ifc asttranmap.ifc asttrann.ifc \
@@ -106,7 +106,7 @@ astframeset.ifl astgetactunit.ifl astgetframe.ifl astget.ifl \
 astgetmapping.ifl astgetrefpos.ifl astinvert.ifl astlutmap.ifl \
 astmapbox.ifl astmathmap.ifl astmatrixmap.ifl astpcdmap.ifl \
 astpermaxes.ifl astpermmap.ifl astpickaxes.ifl astpolygon.ifl \
-astpolymap.ifl astremapframe.ifl astremoveframe.ifl \
+astinterval.ifl astpolymap.ifl astremapframe.ifl astremoveframe.ifl \
 astsetactunit.ifl astset.ifl astsetrefpos.ifl astsfluxframe.ifl \
 astshiftmap.ifl astsimplify.ifl astskyframe.ifl astspecframe.ifl \
 asttest.ifl asttran1.ifl asttran2.ifl astswitchmap.ifl asttranmap.ifl asttrann.ifl \
