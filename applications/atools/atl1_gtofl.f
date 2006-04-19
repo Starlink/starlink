@@ -15,7 +15,8 @@
 *  Description:
 *     This routine read a vector of floating point values from a group,
 *     reporting an error if any of the text strings in the group are not
-*     valid numerical values.
+*     valid numerical values (except that anything containing the string
+*     "bad" - case insensitive - is accepted and represented by AST__BAD).
 
 *  Arguments:
 *     IGRP = INTEGER (Given)
@@ -39,6 +40,8 @@
 *        Original version.
 *     1-FEB-2005 (DSB):
 *        Added argument ISTART.
+*     19-APR-2006 (DSB):
+*        Allow bad values to be read.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -52,6 +55,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
       INTEGER IGRP
@@ -80,30 +84,36 @@
 
 *  Get this element.
          CALL GRP_GET( IGRP, I, 1, TEXT, STATUS ) 
-
-*  Attempt to convert it to a double.
          IF( STATUS .EQ. SAI__OK ) THEN 
-            CALL CHR_CTOD( TEXT, DATA( I + ISTART - 1 ), STATUS ) 
-            IF( STATUS .NE. SAI__OK ) THEN
 
-               CALL ERR_BEGIN( STATUS )               
-               CALL GRP_INFOC( IGRP, I, 'NAME', FILE, STATUS ) 
-               CALL ERR_END( STATUS )               
+*  If the string contains the word "bad" use a bad value.
+            CALL CHR_UCASE( TEXT )
+            IF( INDEX( 'BAD', TEXT ) .NE. -1 ) THEN
+               DATA( I + ISTART - 1 ) = AST__BAD
 
-               CALL MSG_SETC( 'C', TEXT )
-               IF( FILE .EQ. ' ' ) THEN 
-                  CALL ERR_REP( 'ATL1_GTOFL_ERR1', 'Error reading '//
-     :                          'string ''^C''.', STATUS )
-               ELSE
-                  CALL MSG_SETC( 'F', FILE )
-                  CALL ERR_REP( 'ATL1_GTOFL_ERR2', 'Error reading '//
-     :                          'string ''^C'' in file ^F.', STATUS )
+*  Otherwise, attempt to convert it to a double.
+            ELSE
+               CALL CHR_CTOD( TEXT, DATA( I + ISTART - 1 ), STATUS ) 
+               IF( STATUS .NE. SAI__OK ) THEN
+	       
+                  CALL ERR_BEGIN( STATUS )               
+                  CALL GRP_INFOC( IGRP, I, 'NAME', FILE, STATUS ) 
+                  CALL ERR_END( STATUS )               
+	       
+                  CALL MSG_SETC( 'C', TEXT )
+                  IF( FILE .EQ. ' ' ) THEN 
+                     CALL ERR_REP( 'ATL1_GTOFL_ERR1', 'Error reading '//
+     :                             'string ''^C''.', STATUS )
+                  ELSE
+                     CALL MSG_SETC( 'F', FILE )
+                     CALL ERR_REP( 'ATL1_GTOFL_ERR2', 'Error reading '//
+     :                             'string ''^C'' in file ^F.', STATUS )
+                  END IF
+	       
+                  GO TO 999
+	       
                END IF
-
-               GO TO 999
-
             END IF
-
          ELSE
             GO TO 999
          END IF
