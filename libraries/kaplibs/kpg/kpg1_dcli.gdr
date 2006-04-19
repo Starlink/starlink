@@ -78,6 +78,8 @@
 *        and offset.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL.
+*     2006 April 19 (MJC):
+*        Remove ATYPE and use HTYPE token instead.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -127,9 +129,6 @@
      :  SGDIM( NDF__MXDIM ),   ! Significant dimensions of the NDF
      :  UBND( NDF__MXDIM )     ! Upper bounds of the NDF
 
-      CHARACTER
-     :  ATYPE * ( NDF__SZTYP ) ! Processing type of the axis centres
-
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
@@ -159,17 +158,11 @@
       LINEAR = .TRUE.
       IDENTY = .TRUE.
 
-      IF ( '<T>' .EQ. 'D' ) THEN
-         ATYPE = '_DOUBLE'
-      ELSE
-         ATYPE = '_REAL'
-      END IF
-
 *  Loop for each axis dimension.
       DO  I = 1, ABS( NDIM )
 
 *  Map the axis centres for the dimension.
-         CALL NDF_AMAP( NDF, 'Centre', SGDIM( I ), ATYPE, 'READ',
+         CALL NDF_AMAP( NDF, 'Centre', SGDIM( I ), <HTYPE>, 'READ',
      :                  AXPNTR, AEL, STATUS )
 
 *  Only evaluate the transformation when there are more than one element
