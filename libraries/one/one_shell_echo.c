@@ -30,6 +30,7 @@
 *        -  ONE__LENGTHERR - Bad parameter length
 *        -  ONE__PIPEERR  - Pipe error
 *        -  ONE__MALLOCERR - Malloc error
+*        -  ONE__EXECERROR - error in fork/exec
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Engineering Research Council.
@@ -53,6 +54,7 @@
 
 *  Authors:
 *      DSB: David Berry (JAC, UCLan)
+*      TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *      7-MAR-2006 (DSB)
@@ -60,7 +62,10 @@
 *      14-MAR-2006 (DSB)
 *         Strip any trailing newline characters from the string before
 *         exporting it as a Fortran string.
-*.
+*      19-APR-2006 (TIMJ):
+*         reap child process to prevent zombies. Close parent file descriptor.
+*         use starmem.
+
 *-
  */
 
@@ -110,6 +115,7 @@
 #include "f77.h"
 #include "one_err.h"
 #include "sae_par.h"
+#include "star/mem.h"
 
 F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName), 
                                 INTEGER(Status) 
@@ -129,9 +135,8 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
    int Fdptr[2];         /* Array of two integer file descriptors */
    int Ichar;            /* Index into FileName for next character */
    int NameLength;       /* Number of bytes in FileName - FileName_length */
-   int Nchars;           /* Maximum number of chars that can be copied */
    int NullFd;           /* File descriptor for the null device */
-   int STATUS;           /* Local fork STATUS */
+   pid_t STATUS = 0;     /* Local fork STATUS/pid */
    int SpecLength;       /* Number of bytes in FileSpec - FileSpec_length */
 
 /* Start off by checking for good status  */
@@ -151,14 +156,14 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
 
 /* If succesful, allocate enough room for the eventual echo command string */
    } else {
-      Command = (char *) malloc( SpecLength + 20 );
+      Command = (char *) starMalloc( SpecLength + 20 );
 
 /* Fdptr[0] can now be used as the reading end of the pipe, and Fdptr[1] as 
    the writing end.  Having that, we now fork off a new process to do the 
    'echo' command that we will use to give us the filename we want. */
       STATUS = fork();
       if( STATUS < 0 ) {
-         *Status = ONE__PIPEERR;
+         *Status = ONE__EXECERROR;
 	 emsRep( "one_shell_echo", "Unable to fork", Status );
 
 /* This is the child process in which we will exec `echo'.  Copy t
@@ -202,7 +207,7 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
    command. We don't need the output fd for the pipe, so we close that. */
       } else {
          (void) close( Fdptr[1] );
-	 free( Command );
+	 starFree( Command );
       }
    }
 
@@ -233,5 +238,23 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
       FileName[ Ichar ] = '\0';
       cnfExprt( FileName, FileName, NameLength );
    }
+
+/* Close the parent pipe */
+   close( Fdptr[0] );
+
+/* Harvest the child to prevent zombies */
+   if (STATUS != 0) {
+     int process_status;
+     waitpid( STATUS, &process_status, 0 );
+     if (! WIFEXITED(process_status)) {
+       /* non-normal exit */
+       if (*Status != SAI__OK) {
+	 *Status = ONE__PIPEERR;
+	 emsRep( "ONE_SHELL_ECHO","ONE_SHELL_ECHO: Error from child",
+		 Status);
+       }
+     }
+   }
+
 }
 
