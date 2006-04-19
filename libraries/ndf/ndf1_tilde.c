@@ -97,16 +97,16 @@
 *-
 */
 
-/* Local Variables:							    
-      char *result = NULL;	 /* Pointer to result string		    
-      char *user;		 /* Pointer to user name string		    
-      const char *dir;		 /* Pointer to initial working directory    
-      int dyn = 0;		 /* user string dynamically allocated?	    
-      int i;			 /* Number of initial characters to discard 
-      size_t size;		 /* Allocated size of result string	    
-      struct passwd *pw;	 /* Pointer to user's passwd structure	    
+/* Local Variables:							    */
+     char *result = NULL;	 /* Pointer to result string		    */
+     char *user;		 /* Pointer to user name string		    */
+     const char *dir;		 /* Pointer to initial working directory    */
+     int dyn = 0;		 /* user string dynamically allocated?	    */
+     int i;			 /* Number of initial characters to discard */
+     size_t size;		 /* Allocated size of result string	    */
+     struct passwd *pw;	         /* Pointer to user's passwd structure	    */
 
-/*.									    
+/*.									    */
 
 /* Check the inherited global status.					    */
       if ( *status != SAI__OK ) return result;
