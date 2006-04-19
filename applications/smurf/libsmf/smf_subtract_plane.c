@@ -33,11 +33,24 @@
 *     gradient in the sky emission is calculated and subtracted. The
 *     third method offers a full 2-D plane-fitting procedure to allow
 *     for azimuthal variations as well.
+*
+*     The 1-D fit requires a transformation to the AzEl coordinate
+*     system. Initially this was done using astTran2 to transform all
+*     the pixels in the subarray. The current method only transforms
+*     two points in the subarray and then calculates the angle between
+*     the long axis of the subarray and the zenith. A simple geometric
+*     transformation is made to the Y pixel values to yield a set of
+*     effective elevations which are used in the 1-D fit. The gradient
+*     is calculated using the GSL multifit method and subtracted from
+*     the data values. For subsequent frames (timeslices), the change
+*     in the header variable tcs_az_angle (the angle between focal
+*     plane UP and zenith NORTH) is used to calculate the new long
+*     axis-zenith angle.
 
-*  Notes:
-*     At the moment there is a lot of duplicated code between this
-*     routine and smf_correct_extinction as they both work in the AzEl
-*     coordinate system
+*  Notes: 
+*     There is a lot of duplicated code between this routine and
+*     smf_correct_extinction as they both work in the AzEl coordinate
+*     system
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -52,6 +65,10 @@
 *        Use GSL multifit for both 1-D and 2-D calculations
 *     2006-04-07 (AGG):
 *        Refactor code to omit AST calls where possible
+*     2006-04-12 (AGG):
+*        Speedup 1-D fit by calculating the angle between the long
+*        axis of the subarray and the zenith, and incrementing it for
+*        subsequent timesteps
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -140,10 +157,19 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
   gsl_multifit_linear_workspace *work; /* Workspace */
   size_t ncoeff = 2;       /* Number of coefficients to fit for; default straight line */
 
-  size_t needast = 0; /* Flag to specify if astrometry is needed for fit */
-  size_t fitmean = 0;
-  size_t fitslope = 0;
-  size_t fitplane = 0;
+  size_t needast = 0;      /* Flag to specify if astrometry is needed for fit */
+  size_t fitmean = 0;      /* Flag to specify if the fit type is mean */
+  size_t fitslope = 0;     /* Flag to specify if the fit is a 1-D elev slope */
+  size_t fitplane = 0;     /* Flag to specify if the fit is a 2-D plane */
+
+  double *x0 = NULL;       /* Pixel coordinates of x points in subarray */
+  double *y0 = NULL;       /* Pixel coordinates of y points in subarray */
+  double *ynew = NULL;     /* Transformed y coordinates */
+  double a[2];             /* Coordinates for point A */
+  double b[2];             /* Coordinates for point B */
+  double c[2];             /* Coordinates for point C (zenith) */
+  double alpha = 0;        /* Angle ABC (radians) */
+  double dalpha;           /* Change in focal plane angle (radians) */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -198,8 +224,13 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
   xin = smf_malloc( npts, sizeof(double), 0, status );
   yin = smf_malloc( npts, sizeof(double), 0, status );
   if ( needast ) {
-    xout = smf_malloc( npts, sizeof(double), 0, status );
-    yout = smf_malloc( npts, sizeof(double), 0, status );
+    /*    xout = smf_malloc( npts, sizeof(double), 0, status );
+	  yout = smf_malloc( npts, sizeof(double), 0, status );*/
+    xout = smf_malloc( 2, sizeof(double), 0, status );
+    yout = smf_malloc( 2, sizeof(double), 0, status );
+    x0 = smf_malloc( 2, sizeof(double), 0, status );
+    y0 = smf_malloc( 2, sizeof(double), 0, status );
+    ynew = smf_malloc( npts, sizeof(double), 0, status );
   }
   indices = smf_malloc( npts, sizeof(size_t), 0, status );
 
@@ -243,7 +274,29 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 	}
       }
       /* Transfrom from pixels to AZEL */
-      astTran2(wcs, npts, xin, yin, 1, xout, yout );
+      /*      astTran2(wcs, npts, xin, yin, 1, xout, yout );*/
+      if (k == 0) {
+	x0[0] = xin[0];
+	x0[1] = xin[1];
+	y0[0] = yin[0];
+	y0[1] = yin[1];
+
+	astTran2(wcs, 2, x0, y0, 1, xout, yout );
+	a[0] = xout[0];
+	a[1] = yout[0];
+	b[0] = xout[1];
+	b[1] = yout[1];
+	c[0] = xout[1];
+	c[1] = M_PI_2;
+	alpha = astAngle( wcs, a, b, c);
+
+	/*	printf("alpha = %g\n",alpha);*/
+      }
+      dalpha = hdr->sc2head->tcs_az_ang - alpha;
+      alpha += dalpha;
+      for (i=0; i< npts; i++) {
+	ynew[i] = yin[i] * cos( alpha );
+      }
     }
 
     /* Offset into 3d data array */
@@ -275,7 +328,8 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 	index = indices[i] + base;
 	gsl_matrix_set( azel, i, 0, 1.0 );
 	if ( fitslope ) {
-	  gsl_matrix_set( azel, i, 1, yout[indices[i]] );
+	  /*	  gsl_matrix_set( azel, i, 1, yout[indices[i]] );*/
+	  gsl_matrix_set( azel, i, 1, ynew[indices[i]] );
 	} else  if ( fitplane ) {
 	  gsl_matrix_set( azel, i, 1, yin[indices[i]] );
 	  gsl_matrix_set( azel, i, 2, xin[indices[i]] );
@@ -317,7 +371,8 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 
 	/* Calculate sky value as a function of position */
 	if (fitslope) {
-	  sky = sky0 + dskyel * yout[indices[i]] + dskyaz * xout[indices[i]];
+	  /*	  sky = sky0 + dskyel * yout[indices[i]] + dskyaz * xout[indices[i]];*/
+	  sky = sky0 + dskyel * ynew[indices[i]];
 	} else {
 	  sky = sky0 + dskyel * yin[indices[i]] + dskyaz * xin[indices[i]];
 	}
@@ -331,7 +386,7 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
       if ( *status == SAI__OK) {
 	astSetC( wcs, "SYSTEM", origsystem );
 	/* Check AST status */
-	if (!astOK) {
+    	if (!astOK) {
 	  if (*status == SAI__OK) {
 	    *status = SAI__ERROR;
 	    errRep( FUNC_NAME, "Error from AST", status);
@@ -348,6 +403,9 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
   if ( needast ) {
     smf_free(xout,status);
     smf_free(yout,status);
+    smf_free(x0,status);
+    smf_free(y0,status);
+    smf_free(ynew,status);
   }
   smf_free(indices,status);
 
