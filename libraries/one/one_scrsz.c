@@ -31,6 +31,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998, 2000 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Councl.
 *     All Rights Reserved.
 
 *  Licence:
@@ -52,6 +53,7 @@
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
 *     RTP: R T Platon (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     10-FEB-1998 (AJC):
@@ -60,14 +62,17 @@
 *        Changed names to add to Odds & Ends Library
 *     12-SEP-2000 (RTP)
 *        Set default values 80 x 0, taken from Fortran version
+*     19-APR-2006 (TIMJ):
+*        Fix compiler warning (ioctl.h should always be included)
+*        to prototype ioctl()
 
 *-
 */
 
 #include <termios.h>
-#ifndef TIOCGWINSZ
+
 #include <sys/ioctl.h>
-#endif
+
 #include <unistd.h>
 #include "f77.h"
 #include "ems.h"
