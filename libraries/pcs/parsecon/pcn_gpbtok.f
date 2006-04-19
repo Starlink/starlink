@@ -16,9 +16,9 @@
 *     {routine_description}
 
 *  Get Next Token From Connection File On Given Logical Unit.:
-*     Invocation :
+*     Invocation:
 *      CALL PARSECON_GPBTOK ( LU; TOKEN, TOKLEN, LINENUM, STATUS )
-*     Parameters :
+*     Parameters:
 *      LU=INTEGER (given)
 *            FORTRAN unit number of interface file.
 *      TOKEN=CHARACTER*(*) (returned)
@@ -28,20 +28,40 @@
 *      LINENUM=INTEGER (returned)
 *            number of line currently being read
 *      STATUS=INTEGER
-*     Method :
+*     Method:
 *       Get next token from connection file on given logical unit. This
 *       routine calls PARSECON_GETTOK and the only extra task it performs is
 *       to discard 'new-record' conditions and count them, allowing
 *       track to be kept of the number of the line in the input file
 *       which has been reached, which is useful for reporting syntax
 *       errors.
-*     Deficiencies :
+*     Deficiencies:
 
-*     Bugs :
+*     Bugs:
 
-*     Authors :
+*  Copyright:
+*     Copyright (C) 1984, 1990 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*     Authors:
 *      W.F.Lupton (RGO)
-*     History :
+*     History:
 *      18.09.1984:  VAX version (REVAD::BDK)
 *      16.10.1990:  Move SAVE instruction for standard (RLVAD::AJC)
 
