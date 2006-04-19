@@ -98,6 +98,8 @@ int *status             /* global status (given and returned) */
      1Mar2006  : Check for (subnum==-1) before checking inherited status (dsb)
      2Mar2006  : const constant arrays (timj)
      12Apr2006 : added jig_az_x/y, remove extra_frames from interface (ec)
+     18Apr2006 : Use a ShiftMap to apply jig_az_x/y (dsb)
+     19Apr2006 : Only use shiftmap if non-zero jig_az_x/y (ec)
 */
 
 {
@@ -112,8 +114,9 @@ int *status             /* global status (given and returned) */
    AstZoomMap *zoommap;
    AstShiftMap *zshiftmap;
 
-   double az_eff;                  /* effective az including jiggle offset */
-   double el_eff;                  /* effective el including jiggle offset */
+   double shifts[ 2 ];
+   AstShiftMap *jigglemap;
+
 
    double a;                       /* subarray angle */
    const double rotangle[8] =
@@ -366,19 +369,31 @@ int *status             /* global status (given and returned) */
       astExempt( frameset_cache[ subnum ] );
    }
 
-/* Calculate the effective az/el of the tangent point including the small
-   offsets of the SMU jiggle pattern - currently using a quick KLUDGE! */
-   az_eff = az + az_jig_x/cos(el); /* lousy approx. at high elevations */
-   el_eff = el + az_jig_y;
 
 /* Create a Mapping from these Cartesian Nasmyth coords (in rads) to spherical 
    AzEl coords (in rads). */
-   azelmap = sc2ast_maketanmap( az_eff, el_eff, azel_cache, status );
+   azelmap = sc2ast_maketanmap( az, el, azel_cache, status );
 
-/* Combine this with the cached Mapping (from GRID coords for the subarray to
-   Cartesian Nasmyth coords in rads), to get the total Mapping from GRID 
-   coords to spherical AzEl in rads. */
-   mapping = (AstMapping *) astCmpMap( map_cache[ subnum ], azelmap, 1, "" );
+/* Calculate final mapping with SMU position correction only if needed */
+   if( (!az_jig_x) && (!az_jig_y) ) {
+
+     /* Combine these with the cached Mapping (from GRID coords for subarray 
+	to Cartesian Nasmyth coords in rads), to get total Mapping from GRID 
+	coords to spherical AzEl in rads. */
+     mapping = (AstMapping *) astCmpMap( map_cache[ subnum ], azelmap, 1, "" );
+
+   } else {
+
+     /* Create a ShiftMap which moves the origin of projection plane (X,Y)
+	coords to take account of the small offsets of SMU jiggle pattern. */
+     shifts[ 0 ] = az_jig_x;
+     shifts[ 1 ] = az_jig_y;
+     jigglemap = astShiftMap( 2, shifts, "" );
+
+     mapping = (AstMapping *) astCmpMap( map_cache[ subnum ], 
+                                         astCmpMap( jigglemap, azelmap, 1, 
+						    "" ), 1, "" );
+   }
 
 /* If not already created, create a SkyFrame describing (Az,El). Hard-wire 
    the geodetic longitude and latitude of JCMT into this Frame. Note, the 
