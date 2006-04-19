@@ -28,7 +28,7 @@ f     AST_SELECTORMAP
 *     position of the Region within the list of Regions supplied when the 
 *     SelectorMap was created, starting at 1 for the first Region). If an
 *     input position is not contained within any Region, a value of zero is 
-*     returned by teh forward transformation.
+*     returned by the forward transformation.
 *
 *     If a compound Mapping contains a SelectorMap in series with its own
 *     inverse, the combination of the two adjacent SelectorMaps will be 
@@ -690,6 +690,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    double **tptr;
    double *p2;             
    double *pout;
+   int closed;
    int inside;
    int icoord;
    int ipoint;
@@ -740,6 +741,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Temporarily Negate the Region. */
             astNegate( reg );
+            closed = astGetClosed( reg );
+            astSetClosed( reg, !closed );
  
 /* Transform the remaining input positions. Good input positions which
    are within the Region will be bad in the output. */
@@ -771,6 +774,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
             }
 
 /* Negate the Region to get it back to its original state. */
+            astSetClosed( reg, closed );
             astNegate( reg );
 
 /* Swap the input and output PointSets. */
