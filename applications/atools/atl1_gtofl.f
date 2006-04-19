@@ -88,7 +88,7 @@
 
 *  If the string contains the word "bad" use a bad value.
             CALL CHR_UCASE( TEXT )
-            IF( INDEX( 'BAD', TEXT ) .NE. -1 ) THEN
+            IF( INDEX( TEXT, 'BAD' ) .NE. 0 ) THEN
                DATA( I + ISTART - 1 ) = AST__BAD
 
 *  Otherwise, attempt to convert it to a double.
