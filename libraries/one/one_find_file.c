@@ -55,6 +55,7 @@
 *        -  ONE__NOFILES - No more files found
 *        -  ONE__LENGTHERR - Bad parameter length
 *        -  ONE__PIPEERR  - Pipe error
+*        -  ONE__EXECERROR - Error in fork/exec
 *        -  ONE__MALLOCERR - Malloc error
 *
 *  Returned Value:
@@ -65,7 +66,7 @@
 *  Copyright:
 *     Copyright (C) 1992, 1993 Science & Engineering Research Council.
 *     Copyright (C) 1995, 2000, 2004 Central Laboratory of the Research Councils.
-*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2005, 2006 Particle Physics & Engineering Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -189,10 +190,12 @@
 *         Made the Command string dynamic (was 256, which is too
 *         small for the current NDF_FORMATS_IN). Increased length
 *         of returned line to 512, in line with NDG practice.
-*      19-SEP-2005 (TJ):
+*      19-SEP-2005 (TIMJ):
 *         Removed unused defines for isspace and memcpy.
 *         Use cnfExprt rather than hand-rolled padding of strings
-*.
+*      19-APR-2006 (TIMJ):
+*         Use starmem
+
 *-
  */
 
@@ -269,6 +272,7 @@ typedef struct ContextStruct {
 #include "f77.h"
 #include "one_err.h"
 #include "sae_par.h"
+#include "star/mem.h"
 
 F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
                         CHARACTER(FileName), POINTER(Context), INTEGER(Status)
@@ -352,7 +356,7 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
          } else {
 
             /* Allocate enough room for the eventual ls command string */
-            Command = (char *) malloc( SpecLength + 10 );
+            Command = (char *) starMalloc( SpecLength + 10 );
 
             /*  Fdptr[0] can now be used as the reading end of the pipe,
              *  and Fdptr[1] as the writing end.  Having that, we now
@@ -364,7 +368,7 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
             if (STATUS < 0) {
 
                 /* error: unable to fork */
-                *Status = ONE__PIPEERR;
+                *Status = ONE__EXECERROR;
 		emsRep("one_find_file","Unable to fork", Status);
 
             } else if (STATUS == 0) {
@@ -438,7 +442,7 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
 
                (void) close (Fdptr[1]);
 	       *Context = cnfFptr( ContextPtr );
-	       free( Command );
+	       starFree( Command );
             }
          }
       }
