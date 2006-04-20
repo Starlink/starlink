@@ -83,7 +83,7 @@
 *        exit handler NBS_MLIST_EXITHANDLER to remove mapped global sections
 *        on image exit.
 *     17-May-95 - (DJA):
-*        Data space segments forced to sizeof(double) alignment. Ensures 
+*        Data space segments forced to sizeof(double) alignment. Ensures
 *        mapped data segments returned to C/Fortran are correctly aligned
 *        for numeric data types in those languages.
 *     12-Sep-95 - (DJA):
@@ -2182,7 +2182,7 @@ void NBS_MLIST_EXITHANDLER ()
 *     list of mapped sections. If the error NBS__IMPOSSIBLE is returned,
 *     a programming error is indicated as the logic in the routines using
 *     the NBS_MLIST_ functions should ensure that NBS_MLIST_FIND is called
-*     first. The first time this routine is called, the exit handler to 
+*     first. The first time this routine is called, the exit handler to
 *     remove unmapped global section is installed.
 
 *  Arguments:
@@ -2471,7 +2471,7 @@ void NBS_MLIST_UNMAP ( char *addr, int *status )
 *     -  If a negative time interval is given, the routine returns immediately.
 *     -  The resolution of the timer on the Sun is 10ms.
 *     -  The resolution of the timer on the DECstation is 3.906ms.
-*     -  All actual sleep times will be in units of the timer resolution and 
+*     -  All actual sleep times will be in units of the timer resolution and
 *        will be rounded up. E.g. a request to sleep for 15ms on a Sun will
 *        result in an actual sleep time of 20ms.
 
@@ -2490,6 +2490,22 @@ void NBS_MLIST_UNMAP ( char *addr, int *status )
 *     VMS RTL:
 *        LIB$WAIT            Wait a specified number of milliseconds.
 
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 
@@ -2497,7 +2513,7 @@ void NBS_MLIST_UNMAP ( char *addr, int *status )
 *     18-Jun-92 - (PMA):
 *        Original version.
 *     05-May-93 - (DJA):
-*        Renamed to NBS_SLEEPMS. LIB$WAIT call used to provide VMS 
+*        Renamed to NBS_SLEEPMS. LIB$WAIT call used to provide VMS
 *        functionality.
 *     {enter_changes_here}
 
