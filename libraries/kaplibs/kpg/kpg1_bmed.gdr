@@ -1,7 +1,7 @@
       SUBROUTINE KPG1_BMED<T>( BAD, SAMBAD, VAR, NX, NY, IN, HX, HY,
      :                        NLIM, OUT, BADOUT, WORK1, WORK2, STATUS )
 *+
-*  Name:
+* Name:
 *     KPG1_BMEDx
 
 *  Purpose:
@@ -80,20 +80,20 @@
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -317,9 +317,9 @@
                   ILO = MAX( 1, I - HX )
                   IHI = MIN( NX, I + HX )
 
-*  If both bounds are the same as last time, then the current output value
-*  will be identical to the previous output value. Save time by copying it
-*  rather than re-calculating it.
+*  If both bounds are the same as last time, then the current output
+*  value will be identical to the previous output value.  Save time by
+*  copying it rather than re-calculating it.
                   IF( ILO .EQ. ILOL .AND. IHI .EQ. IHIL ) THEN
                      OUT( I, J ) = OUT( I - 1, J )
 

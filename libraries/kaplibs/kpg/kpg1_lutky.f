@@ -17,9 +17,9 @@
 
 *  Description:
 *     The key consists of a ramp of colour covering the specified range
-*     of colour indices, with annotated axes. Axis 1 is always the data 
-*     value axis (whether it is drawn vertically or horizontally). The 
-*     whole plot (including annotation) is scaled to fit inside the 
+*     of colour indices, with annotated axes.  Axis 1 is always the 
+*     data-value axis (whether it is drawn vertically or horizontally). 
+*     The whole plot (including annotation) is scaled to fit inside the 
 *     picture specified by IPIC.
 
 *  Arguments:
@@ -27,13 +27,14 @@
 *        An AGI identifier for a picture in which the key is to be
 *        produced.
 *     PARAM = CHARACTER * ( * ) (Given)
-*        The name of the style parameter to use (eg STYLE, KEYSTYLE, etc).
+*        The name of the style parameter to use (e.g. STYLE, KEYSTYLE, 
+*        etc.).
 *     HIGH = REAL (Given)
-*        The X axis value (i.e. pixel value or pen number) corresponding to 
-*        the colour index UP. 
+*        The X axis value (i.e. pixel value or pen number) corresponding
+*        to the colour index UP. 
 *     LOW = REAL (Given)
-*        The X axis value (i.e. pixel value or pen number) corresponding to 
-*        the colour index LP. 
+*        The X axis value (i.e. pixel value or pen number) corresponding
+*        to the colour index LP. 
 *     LABEL = CHARACTER * ( * ) (Given)
 *        The default label to put against the data values.
 *     APP = CHARACTER * ( * ) (Given)
@@ -45,21 +46,24 @@
 *     F = REAL (Given)
 *        An amount by which to extend the margins left for annotation,
 *        expressed as a factor of the height or width of the plotting 
-*        area. For instance, a value of 0.1 could be given to fit the 
-*        annotation "comfortably" into the Plot. A value of 0.0 will 
+*        area.  For instance, a value of 0.1 could be given to fit the 
+*        annotation "comfortably" into the Plot.  A value of 0.0 will 
 *        result in the annotation being hard up against the edge of the 
 *        plot.
 *     GAP1 = REAL (Given)
-*        A gap, in millimetres, to place between the bottom or right edge
-*        of the supplied picture, and the nearest edge of the colour ramp.
+*        A gap, in millimetres, to place between the bottom or right 
+*        edge of the supplied picture, and the nearest edge of the 
+*        colour ramp.
 *     GAP2 = REAL (Given)
 *        A gap, in millimetres, to place between the top or left edge
-*        of the supplied picture, and the nearest edge of the colour ramp.
+*        of the supplied picture, and the nearest edge of the colour 
+*        ramp.
 *     JUST = CHARACTER*2 (Given)
-*        Indicates the justification of the new plot within the specified
-*        area.  'BL', 'BC', 'BR', 'CL', 'CC', 'CR', 'TL', 'TC' or 'TR',
-*        where B is Bottom, C is Centre, T is Top, L is Left and R is
-*        Right. Must be upper case. Unrecognised values are treated as "C".
+*        Indicates the justification of the new plot within the 
+*        specified area.  'BL', 'BC', 'BR', 'CL', 'CC', 'CR', 'TL', 
+*        'TC', or 'TR', where B is Bottom, C is Centre, T is Top, L is 
+*        Left and R is Right.  Must be uppercase.  Unrecognised values 
+*        are treated as "C".
 *     NEL = INTEGER (Given)
 *        The size of the vector COLDAT. If this is zero, COLDAT is not
 *        accessed, and requested for keys in the form of a histogram 
@@ -68,29 +72,29 @@
 *     COLDAT( NEL ) = INTEGER (Given)
 *        A vector of colour indices, one for each displayed data pixel.
 *        Only accessed if NEL is greater than zero and the STYLE
-*        parameter indicates that the key is to drawn in the form of a 
-*        histogram
+*        parameter indicates that the key is to drawn in the form of a
+*        histogram.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 1999 Central Laboratory of the Research Councils.
  
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -145,8 +149,8 @@
       INTEGER CHR_LEN
 
 *  Local Constants:
-      REAL ASPNOM                ! Nominal aspect ratio for the colour ramp
-      PARAMETER ( ASPNOM = 12.0 )
+      REAL ASPNOM                ! Nominal aspect ratio for the colour 
+      PARAMETER ( ASPNOM = 12.0 ) ! ramp
 
       INTEGER RAMP               ! Symbolic constant for RAMP key form
       PARAMETER ( RAMP = 0 )
@@ -179,7 +183,8 @@
       INTEGER FRM4               ! Pointer to an AST Frame
       INTEGER FRM5               ! Pointer to an AST Frame
       INTEGER IPENY              ! Index of the PEN-Y Frame within IPLOT
-      INTEGER IPHIST             ! Pointer to histogram of colour indices
+      INTEGER IPHIST             ! Pointer to histogram of colour 
+                                 ! indices
       INTEGER IPICB              ! AGI id for BASE picture
       INTEGER IPLOT              ! Pointer to an AST Plot
       INTEGER IPRGB              ! Pointer to work array
@@ -195,9 +200,11 @@
       INTEGER MAP3D              ! Pointer to an AST Mapping
       INTEGER MAP4               ! Pointer to an AST Mapping
       INTEGER MAP5               ! Pointer to an AST Mapping
-      INTEGER MAXPOP             ! Largest count in colour index histogram
+      INTEGER MAXPOP             ! Largest count in colour index 
+                                 ! histogram
       INTEGER MAXPOS             ! Value of largest count in histogram
-      INTEGER MINPOP             ! Smallest count in colour index histogram
+      INTEGER MINPOP             ! Smallest count in colour index 
+                                 ! histogram
       INTEGER MINPOS             ! Value of smallest count in histogram
       INTEGER NINVAL             ! Number of bad colour indices
       INTEGER NPEN               ! No. of pens in LUT
@@ -206,7 +213,8 @@
       INTEGER PMAP               ! Pointer to an AST Mapping
       LOGICAL LOGPOP             ! Is count axis to be logarithmic?
       LOGICAL OK                 ! Could small Plot be made?
-      LOGICAL PENNUM             ! Display pen numbers instead of data value?
+      LOGICAL PENNUM             ! Display pen numbers instead of data 
+                                 ! value?
       LOGICAL UPDATA             ! Use vertical edges for data axis?
       REAL ASPRAT                ! Aspect ratio for colour ramp
       REAL LBND( 2 )             ! Lower PEN-Y bounds
@@ -217,33 +225,33 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-
 *  Begin an AGI context.
       CALL AGI_BEGIN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Re-create the PGPLOT viewport for the specified picture, and obtain an 
-*  AST pointer to the Plot associated with the picture. World co-ordinates
-*  in the viewport will be millimetres from the bottom left of the
-*  view surface.
+*  Re-create the PGPLOT viewport for the specified picture, and obtain 
+*  an AST pointer to the Plot associated with the picture.  World 
+*  co-ordinates in the viewport will be millimetres from the bottom left
+*  of the view surface.
       CALL KPG1_GDGET( IPIC, AST__NULL, .FALSE., IPLOT, STATUS )
 
 *  Get the dimensions of the viewport.
       CALL PGQWIN( X1, X2, Y1, Y2 )
 
-*  Create a new Frame describing the displayed key. This will be the 
-*  "annotation" Frame. Axis 1 is data value or pen number, and axis 2 is
-*  either count (for histogram keys), intensity (for graph keys), or
+*  Create a new Frame describing the displayed key.  This will be the 
+*  "annotation" Frame.  Axis 1 is data value or pen number, and axis 2
+*  is either count (for histogram keys), intensity (for graph keys), or
 *  offset (for ramp keys).
       FRM5 = AST_FRAME( 2, ' ', STATUS )
 
-*  Temporarily add this Frame into the Plot using a UnitMapping to connect 
-*  it the GRAPHICS (Base) Frame in the Plot. The new Frame becomes the current 
-*  Frame. This is done so that there is a Frame which can be used to store
-*  the attribute settings supplied through the STYLE parameter. This Frame 
-*  will be removed later and re-added using apropriate Mappings.
+*  Temporarily add this Frame into the Plot using a UnitMapping to 
+*  connect it the GRAPHICS (Base) Frame in the Plot.  The new Frame 
+*  becomes the current Frame.  This is done so that there is a Frame 
+*  which can be used to store the attribute settings supplied through 
+*  the STYLE parameter.  This Frame will be removed later and re-added 
+*  using apropriate Mappings.
       CALL AST_ADDFRAME( IPLOT, AST__BASE, AST_UNITMAP( 2, ' ', 
      :                                                  STATUS ), 
      :                   FRM5, STATUS ) 
@@ -252,10 +260,10 @@
       CALL AST_SETC( IPLOT, 'LABEL(1)', LABEL, STATUS )
       CALL AST_SETC( IPLOT, 'SYMBOL(1)', 'VALUE', STATUS )
 
-*  Set up the default edge for labelling. If the viewport is short and 
-*  wide, axis 1 of the annotation Frame (the data value axis) is displayed 
-*  horizontally by default. It is displayed vertically by default if the 
-*  viewport is tall and thin. 
+*  Set up the default edge for labelling.  If the viewport is short and 
+*  wide, axis 1 of the annotation Frame (the data value axis) is 
+*  displayed horizontally by default.  It is displayed vertically by 
+*  default if the  viewport is tall and thin. 
       IF( ABS( Y1 - Y2 ) .GT. ABS( X2 - X1 ) ) THEN
          EDGE1 = 'LEFT'
          EDGE2 = 'BOTTOM'
@@ -274,8 +282,8 @@
 *  By default, the histogram count axis (if used) is linear.
       CALL AST_SETL( IPLOT, 'DIRECTION(2)', .FALSE., STATUS )
 
-*  Allow the synonym FORM to be used in place of the AST asttribute DOMAIN.
-*  during the following call to KPG1_ASSET.
+*  Allow the synonym FORM to be used in place of the AST attribute
+*  DOMAIN during the following call to KPG1_ASSET.
       CALL KPG1_ASPSY( 'FORM', 'DOMAIN', STATUS )
       CALL KPG1_ASPSY( 'PENNUMS', 'DIRECTION(1)', STATUS )
       CALL KPG1_ASPSY( 'LOGPOP', 'DIRECTION(2)', STATUS )
@@ -341,8 +349,8 @@
       LBND( 1 ) = REAL( LP ) - 0.5
       UBND( 1 ) = REAL( UP ) + 0.5
 
-*  If a histogram key is being produced, form a histogram of the supplied
-*  colour indices.
+*  If a histogram key is being produced, form a histogram of the 
+*  supplied colour indices.
       IF( FORM .EQ. HIST ) THEN
 
 *  Allocate memory for the histogram.
@@ -357,8 +365,8 @@
      :                    NINVAL, MAXPOP,
      :                    MINPOP, MAXPOS, MINPOS, STATUS )
 
-*  Store the axis 2 (count or log(count)) bounds of the key. Also store the 
-*  label for the cross axis.
+*  Store the axis-2 (count or log(count)) bounds of the key.  Also store
+*  the label for the cross axis.
          LBND( 2 ) = 0.0
          IF( LOGPOP ) THEN 
             UBND( 2 ) = 1.1*LOG10( REAL( MAXPOP ) )
@@ -398,8 +406,8 @@
 *  If the key is to be displayed so that the left or right edge is 
 *  annotated with data value/pen number, then we need to create a 
 *  Frame which is an axis swapped version of the GRAPHICS Frame. It
-*  is given Domain "GRSWAP". First get the indices of the GRAPHICS Frame
-*  axis in the order required in the new Frame.
+*  is given Domain "GRSWAP".  First get the indices of the GRAPHICS
+*  Frame axis in the order required in the new Frame.
       IF( EDGE1 .EQ. 'LEFT' .OR. EDGE1 .EQ. 'RIGHT' ) THEN
          UPDATA = .TRUE.
          PERM( 1 ) = 2
@@ -426,9 +434,9 @@
 
       END IF
 
-*  Create the new Frame, and get a Mapping (MAP1) form the GRAPHICS Frame
-*  to the new Frame.
-      FRM1 = AST_PICKAXES( AST_GETFRAME( IPLOT, AST__BASE, STATUS ), 2, 
+*  Create the new Frame, and get a Mapping (MAP1) form the GRAPHICS
+*  Frame to the new Frame.
+      FRM1 = AST_PICKAXES( AST_GETFRAME( IPLOT, AST__BASE, STATUS ), 2,
      :                     PERM, MAP1, STATUS ) 
 
 *  Set the attributes for the new Frame.
@@ -442,7 +450,7 @@
  
 *  Add the new Frame into the Plot, connecting it to the Base (GRAPHICS)
 *  Frame using the Mapping returned by AST_PICKAXES.
-      CALL AST_ADDFRAME( IPLOT, AST__BASE, AST_SIMPLIFY( MAP1, STATUS ), 
+      CALL AST_ADDFRAME( IPLOT, AST__BASE, AST_SIMPLIFY( MAP1, STATUS ),
      :                   FRM1, STATUS )
 
 *  The next Frame to add has axes corresponding to pen number and
@@ -485,11 +493,12 @@
 *  Note the index of the PEN-Y Frame.
       IPENY = AST_GETI( IPLOT, 'CURRENT', STATUS )
 
-*  The next Frame has 6 axes; X axis value (pen number or pixel value),
-*  Y axis value (offset, count or intensity), R intensity, G intensity, 
-*  B intensity, pen number.
+*  The next Frame has six axes; X-axis value (pen number or pixel
+*  value), Y-axis value (offset, count or intensity), R intensity, 
+*  G intensity, B intensity, and pen number.
 
-*  Create a 1d UnitMap or WinMap from Pen number to X axis value.
+*  Create a one-dimensional UnitMap or WinMap from Pen number to X-axis
+*  value.
       IF( PENNUM ) THEN
          MAP3A = AST_UNITMAP( 1, ' ', STATUS )
       ELSE
@@ -506,9 +515,9 @@
 *  Compound them in parallel.
       CMAP1 = AST_CMPMAP( MAP3A, MAP3B, .FALSE., ' ', STATUS )
 
-*  Create a Mapping from pen number to RGB intensities (1 input, 3
+*  Create a Mapping from pen number to RGB intensities (one input, three
 *  outputs).
-      CALL PSX_CALLOC( 3*NPEN, '_DOUBLE', IPWORK, STATUS )
+      CALL PSX_CALLOC( 3 * NPEN, '_DOUBLE', IPWORK, STATUS )
       CALL KPG1_LUTK4( LP, UP, %VAL( CNF_PVAL( IPWORK ) ), 
      :                 MAP3C, STATUS )
       CALL PSX_FREE( IPWORK, STATUS )
@@ -522,16 +531,16 @@
 *  Add it to the parallel compound Mapping.
       CMAP3 = AST_CMPMAP( CMAP2, MAP3D, .FALSE., ' ', STATUS )
 
-*  Create a 2 input, 4 output, PermMap to feed the 4 inputs of the above 
-*  parallel CmpMap.
+*  Create a two-input, four-output PermMap to feed the four inputs of 
+*  the above parallel CmpMap.
       PERM( 1 ) = 1
       PERM( 2 ) = 2
       PERM( 3 ) = 1
       PERM( 4 ) = 1
       PMAP = AST_PERMMAP( 2, PERM, 4, PERM, 0.0D0, ' ', STATUS )
 
-*  Combine this PermMap in series with the above parallel CmpMap. This
-*  is the final Mapping with 2 inputs and 6 outputs.
+*  Combine this PermMap in series with the above parallel CmpMap.  This
+*  is the final Mapping with two inputs and six outputs.
       MAP3 = AST_CMPMAP( PMAP, CMAP3, .TRUE., ' ', STATUS )
 
 *  Create a 6D Frame to use,
@@ -572,9 +581,9 @@
       CALL AST_ADDFRAME( IPLOT, AST__CURRENT, 
      :                   AST_SIMPLIFY( MAP4, STATUS ), FRM4, STATUS )
       
-*  The final Frame has 2 axes; X axis value (pen number or pixel value),
-*  and Y axis value (count,initensity or offset). Pick these axes from the 
-*  LUT Frame to create the new Frame. 
+*  The final Frame has two axes; X-axis value (pen number or pixel 
+*  value), and Y-axis value (count, intensity or offset).  Pick these 
+*  axes from the LUT Frame to create the new Frame. 
       PERM( 1 ) = 1
       PERM( 2 ) = 2
       FRM5 = AST_PICKAXES( FRM3, 2, PERM, MAP5, STATUS ) 
@@ -582,22 +591,23 @@
 *  Set the Domain in the new Frame.
       CALL AST_SETC( FRM5, 'DOMAIN', 'LUTKEY', STATUS )
 
-*  Add the new Frame to the Plot, feeding it from the IPENY Frame. We use
-*  the CMAP1 Mapping in preference to the MAP5 mapping. This is because
-*  MAP5 will have 6 inputs and 2 outputs and so will not have an inverse.
-*  On the other hand, CMAP1 has 2 inputs and 2 outputs and will have an
-*  inverse (the AST routine which draws the coordinate grid requires the
+*  Add the new Frame to the Plot, feeding it from the IPENY Frame.  We 
+*  use the CMAP1 Mapping in preference to the MAP5 mapping.  This is 
+*  because MAP5 will have six inputs and two outputs and so will not 
+*  have an inverse.  On the other hand, CMAP1 has two inputs and two
+*  outputs and will have an inverse (the AST routine which draws the 
+*  co-ordinate grid requires the
 *  mapping to be invertable).
       CALL AST_ADDFRAME( IPLOT, IPENY, 
      :                   AST_SIMPLIFY( CMAP1, STATUS ), FRM5, STATUS )
       
 *  If we used the current Plot (IPLOT) to create the key, the key itself
 *  (ramp, histogram or graph) would occupy the current PGPLOT viewport,
-*  and any axis annotation would fall outside the current viewport. We want
-*  all components of the key, icluding annotation, to be within the
-*  current viewport. To achieve this, we "shrink" the Plot. First, get the
-*  desired aspect ratio for the new plot. Zero means "make it as big as
-*  possible".
+*  and any axis annotation would fall outside the current viewport.  We 
+*  want all components of the key, including annotation, to be within 
+*  the current viewport.  To achieve this, we "shrink" the Plot.  First, 
+*  get the desired aspect ratio for the new plot.  Zero means "make it 
+*  as big as possible".
       IF( FORM .EQ. RAMP ) THEN
          IF( UPDATA ) THEN
             ASPRAT = ASPNOM
@@ -608,8 +618,8 @@
          ASPRAT = 0
       END IF
 
-*  Replace the current Plot with a new Plot covering a smaller area so that 
-*  there is room for the annotation within the current viewport.
+*  Replace the current Plot with a new Plot covering a smaller area so 
+*  that there is room for the annotation within the current viewport.
       CALL KPG1_ASSHR( ASPRAT, F, X1, X2, Y1, Y2, JUST, IPLOT, OK, 
      :                 STATUS )
 
@@ -628,8 +638,8 @@
       CALL AST_SETL( IPLOT, 'NUMLAB(2)', (FORM .NE. RAMP), STATUS )
       CALL AST_SETL( IPLOT, 'TEXTLAB(2)', (FORM .NE. RAMP), STATUS )
 
-*  Re-establish the attributes of the new Plot so that it is like the old
-*  Plot.
+*  Re-establish the attributes of the new Plot so that it is like the
+*  old Plot.
       CALL KPG1_ASSET( APP, PARAM, IPLOT, STATUS )
 
 *  Set the edges to label.
@@ -660,11 +670,12 @@
          CALL PSX_FREE( IPX, STATUS )
          CALL PSX_FREE( IPRGB, STATUS )
 
-*  For Histogram and Ramp keys, the data is displayed as a pixmap (image).
+*  For Histogram and Ramp keys, the data are displayed as a pixmap 
+*  (image).
       ELSE
 
-*  Find the number of pixels to use in the colour index array in the direction
-*  of the "other" axis. 
+*  Find the number of pixels to use in the colour-index array in the 
+*  direction of the "other" axis. 
          IF( FORM .EQ. HIST ) THEN
 
 *  Find the bounds of the PGPLOT viewport in device pixels.
@@ -677,7 +688,8 @@
                NZ = NINT( Y2 - Y1 ) + 1
             END IF
 
-*  For ramp keys, just us an array 1 pixel wide, set to the colour index.
+*  For ramp keys, just us an array one-pixel wide, set to the colour 
+*  index.
          ELSE IF( FORM .EQ. RAMP ) THEN
             NZ = 1
    
@@ -692,7 +704,7 @@
 *  Fill the colour table array.
             CALL KPG1_LUTK2( FORM, 2, 1, NZ, LP, UP, 
      :                       %VAL( CNF_PVAL( IPHIST ) ),
-     :                       MAXPOP, LOGPOP, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                       MAXPOP, LOGPOP, %VAL( CNF_PVAL( IPWORK ) ),
      :                       STATUS )
 
 *  Display it.
@@ -705,7 +717,7 @@
 *  Fill the colour table array.
             CALL KPG1_LUTK2( FORM, 1, LP, UP, 1, NZ, 
      :                       %VAL( CNF_PVAL( IPHIST ) ),
-     :                       MAXPOP, LOGPOP, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                       MAXPOP, LOGPOP, %VAL( CNF_PVAL( IPWORK ) ),
      :                       STATUS )
 
 *  Display it.

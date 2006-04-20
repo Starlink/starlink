@@ -4,7 +4,8 @@
 *     KPG1_BOR2x
 
 *  Purpose:
-*     Places a border of constant values at the edges of a 2-d array.
+*     Places a border of constant values at the edges of a
+*     two-dimensional array.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,9 +15,9 @@
 
 *  Description:
 *     This routine assigns a constant value to the edge pixels of a
-*     2-d array.  The width of the edge is adjustable along each
-*     axis, but it is the same for the leading and trailing edges along
-*     a given dimension.  If the border is wider than the array
+*     two-dimensional array.  The width of the edge is adjustable along 
+*     each axis, but it is the same for the leading and trailing edges 
+*     along a given dimension.  If the border is wider than the array
 *     a SAI__ERROR status is returned.
 
 *  Arguments:
@@ -38,7 +39,7 @@
 
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
 *     array and value to be substituted that are supplied to the routine
 *     must have the data type specified.
 
@@ -51,20 +52,20 @@
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -99,17 +100,14 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER
-     :  I, J                     ! Loop counters
+      INTEGER I, J               ! Loop counters
 
 *.
 
-*    Check the inherited global status.
-
+* Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Validate border widths.
-
+* Validate border widths.
       IF ( BORWID( 1 ) .GE. DIM1 .OR. BORWID( 2 ) .GE. DIM2 ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'BOR1', BORWID( 1 ) )
@@ -122,16 +120,14 @@
          GOTO 999
       END IF
 
-*    Fill the lower border.
-
+* Fill the lower border.
       DO J = 1, BORWID( 2 )
          DO I = 1, DIM1
             ARRAY( I, J ) = VALUE
          END DO
       END DO
 
-*    Fill the left and right borders.
-
+* Fill the left and right borders.
       DO J = BORWID( 2 ) + 1, DIM2 - BORWID( 2 )
          DO I = 1, BORWID( 1 )
             ARRAY( I, J ) = VALUE
@@ -141,8 +137,7 @@
          END DO
       END DO
 
-*    Fill the upper border.
-
+* Fill the upper border.
       DO J = DIM2 - BORWID( 2 ) + 1, DIM2
          DO I = 1, DIM1
             ARRAY( I, J ) = VALUE

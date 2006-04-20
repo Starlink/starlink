@@ -3,17 +3,17 @@
 *+
 *  Name:
 *     KPG1_PASTx
-
+ 
 *  Purpose:
 *     Pastes an array onto another.
-
+ 
 *  Language:
 *     Starlink Fortran 77
-
+ 
 *  Invocation:
 *     CALL KPG1_PASTx( TRANSP, BAD, OFFSET, IDIMS, ELI,
 *                      INARR, ODIMS, ELO, BASE, STATUS )
-
+ 
 *  Description:
 *     This routine `pastes' an array onto another array.  Values of
 *     the underlying array are replaced by values in the pasted
@@ -21,7 +21,7 @@
 *     in other words the original base array appears through the bad
 *     values.  Origin information is used to situate the paste
 *     operation.
-
+ 
 *  Arguments:
 *     TRANSP = LOGICAL (Given)
 *        Whether bad pixels are transparent or not.  If true, bad pixels
@@ -50,7 +50,7 @@
 *        The base array onto which the input array will be pasted.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-
+ 
 *  Notes:
 *     -  This routine works in n-D, where n is 1 to 7.  Even if the
 *     array has actually less dimensions there is negligible loss of
@@ -59,49 +59,49 @@
 *     the routine name by D, R, I, W, UW, B or UB as appropriate. The
 *     base and paste arrays supplied to the routine must have the data
 *     type specified.
-
+ 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
+*     
+*     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+*     PURPOSE.  See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
-
+ 
 *  History:
 *     1991 November 15 (MJC):
 *        Original version.
 *     {enter_changes_here}
-
+ 
 *  Bugs:
 *     {note_any_bugs_here}
-
+ 
 *-
-      
+ 
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
-
+ 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INCLUDE 'NDF_PAR'          ! NDF public constants
-
+ 
 *  Arguments Given:
       INTEGER
      :  OFFSET( NDF__MXDIM ),
@@ -109,21 +109,21 @@
      :  IDIMS( NDF__MXDIM ),
      :  ELO,
      :  ODIMS( NDF__MXDIM )
-
+ 
       LOGICAL
      :  TRANSP,
      :  BAD
-
+ 
       <TYPE>
      :  INARR( ELI )
-
+ 
 *  Arguments Given and Returned:
       <TYPE>
      :  BASE( ELO )
-
+ 
 *  Status:
       INTEGER STATUS             ! Global status
-
+ 
 *  Local Variables:
       INTEGER
      :  B,                       ! Pixel index of the modified array
@@ -132,41 +132,41 @@
      :  J,                       ! Loop counter
      :  P,                       ! Pixel index of the pasted array
      :  STRID( NDF__MXDIM )      ! Dimension strides for paste region
-
+ 
 *.
-
+ 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
+ 
 *  Initialise the stride of dimension number 1 for the base array. (The
 *  stride for a dimension is the amount by which the vectorised array
 *  index increases when the n-dimensional array index for that
 *  dimension increases by 1.)
       STRID( 1 ) = 1
-
+ 
 *  Calculate the stride for each remaining dimension.
       DO  J = 2, NDF__MXDIM
          STRID( J ) = STRID( J - 1 ) * ODIMS( J - 1 )
       END DO
-
+ 
 *  Find the origin within the base array where the input array is going
 *  to be pasted.
       B = 1
       DO J = 1, NDF__MXDIM
          B = B + STRID( J ) * OFFSET( J )
       END DO
-
+ 
 *  Initialise the pixel index of the pasted array.
       P = 1
-
+ 
 *  Copy the data from the input array to the base array.  As the
 *  values are copied increment the index of the base array accordingly.
 *  There are two processing paths: whether or not bad-pixel testing is
 *  required.
-
+ 
 *  Paste the data values with transparent bad values.
 *  ==================================================
-
+ 
 *  Bad-value testing is only true when both bad pixels may be present
 *  and bad pixels are transparent, i.e. not pasted.
       IF ( BAD .AND. TRANSP ) THEN
@@ -177,19 +177,19 @@
                      DO I3 = 1, IDIMS( 3 )
                         DO I2 = 1, IDIMS( 2 )
                            DO I1 = 1, IDIMS( 1 )
-
+ 
 *  Copy the value if it is not bad.
                               IF ( INARR( P ) .NE. VAL__BAD<T> ) THEN
                                  BASE( B ) = INARR( P )
                               END IF
-
+ 
 *  Move to the next pixel by shifting the pixel indices along by one.
 *  (For the input array the stride of the first dimension is 1 and the
 *  zeroth is 0---see pattern below).
                               B = B + 1
                               P = P + 1
                            END DO
-
+ 
 *  Move to the next input pixel to be pasted, skipping a stride, less
 *  the number already read from the lower stride each time a dimension's
 *  pixel index is incremented.
@@ -205,11 +205,11 @@
             END DO
             B = B + STRID( 7 ) - STRID( 6 ) * IDIMS( 6 )
          END DO
-
+ 
 *  Paste the data values regardless of value.
 *  ==========================================
       ELSE
-
+ 
          DO I7 = 1, IDIMS( 7 )
             DO I6 = 1, IDIMS( 6 )
                DO I5 = 1, IDIMS( 5 )
@@ -217,17 +217,17 @@
                      DO I3 = 1, IDIMS( 3 )
                         DO I2 = 1, IDIMS( 2 )
                            DO I1 = 1, IDIMS( 1 )
-
+ 
 *  Paste the input array to the base array.
                               BASE( B ) = INARR( P )
-
+ 
 *  Move to the next pixel by shifting the pixel indices along by one.
 *  (For the input array the stride of the first dimension is 1 and the
 *  zeroth is 0---see pattern below).
                               B = B + 1
                               P = P + 1
                            END DO
-
+ 
 *  Move to the next input pixel to be pasted, skipping a stride, less
 *  the number already read from the lower stride each time a dimension's
 *  pixel index is incremented.
@@ -244,5 +244,5 @@
             B = B + STRID( 7 ) - STRID( 6 ) * IDIMS( 6 )
          END DO
       END IF
-
+ 
       END

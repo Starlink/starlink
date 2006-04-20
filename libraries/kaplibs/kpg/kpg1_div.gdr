@@ -15,13 +15,13 @@
 
 *  Description:
 *     The routine divides one vectorised array by another, with
-*     optional variance information. Bad value checking is also
+*     optional variance information.  Bad value checking is also
 *     performed if required.
 
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        Whether it is necessary to check for bad values in the input
-*        arrays. The routine will execute more rapidly if this checking
+*        arrays.  The routine will execute more rapidly if this checking
 *        can be omitted.
 *     VAR = LOGICAL (Given)
 *        Whether associated variance information is to be processed.
@@ -30,17 +30,17 @@
 *     A( EL ) = ? (Given)
 *        First array of data, to be divided by the second array.
 *     VA( EL ) = ? (Given)
-*        Variance values associated with the array A. Not used if VAR
+*        Variance values associated with the array A.  Not used if VAR
 *        is set to .FALSE..
 *     B( EL ) = ? (Given)
 *        Second array of data, to be divided into the first array.
 *     VB( EL ) = ? (Given)
-*        Variance values associated with the array B. Not used if VAR
+*        Variance values associated with the array B.  Not used if VAR
 *        is set to .FALSE..
 *     C( EL ) = ? (Returned)
 *        Result of dividing array A by array B.
 *     VC( EL ) = ? (Returned)
-*        Variance values associated with the array C. Not used if VAR
+*        Variance values associated with the array C.  Not used if VAR
 *        is set to .FALSE..
 *     NBAD = INTEGER (Returned)
 *        Number of VAL__BADx values in the returned results array (C).
@@ -61,20 +61,20 @@
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
@@ -152,8 +152,8 @@
 *  Store the resulting data value.
                   C( I ) = A( I ) / B( I )
 
-*  If the denominator is zero, store a bad output value and increment the
-*  number of errors.
+*  If the denominator is zero, store a bad output value and increment 
+*  the number of errors.
                ELSE 
                   C( I ) = VAL__BAD<T>
                   NBAD = NBAD + 1
@@ -209,7 +209,7 @@
 *  Store the resulting data value.
                   C( I ) = A( I ) / B( I )
 
-*  If either value is bad or the denominator is zero, store a bad output 
+*  If either value is bad or the denominator is zero, store a bad output
 *  value and increment the number of errors.
                ELSE 
                   C( I ) = VAL__BAD<T>

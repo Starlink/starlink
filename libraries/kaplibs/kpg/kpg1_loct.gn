@@ -6,7 +6,8 @@
 *     KPG1_LOCTx
 
 *  Purpose:
-*     Locates the centroid of a blob image feature in an n-D array.
+*     Locates the centroid of a blob image feature in an n-dimensional
+*     array.
 
 *  Language:
 *     Starlink Fortran 77
@@ -18,12 +19,12 @@
 
 *  Description:
 *     This routine locates the centroid of a blob feature within
-*     a defined search area in an n-D array about suggested starting
-*     co-ordinates, and returns the final centroid position.  A blob
-*     is a series of connected pixels above or below the value of the
-*     surrounding background.
+*     a defined search area in an n-dimensional array about suggested
+*     starting co-ordinates, and returns the final centroid position.
+*     A blob is a series of connected pixels above or below the value
+*     of the surrounding background.
 
-*     The routine forms marginal profiles within a search square. A
+*     The routine forms marginal profiles within a search square.  A
 *     separate background estimate is subtracted from each sample in 
 *     each of the profiles, in order to ensure that he profiles have
 *     a roughly flat background.  The background estimate used for each 
@@ -122,20 +123,20 @@
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -486,7 +487,7 @@
 *  estimate for any profile samples which have only one contibution.
 *  Find the first sample with any data.
             FST = 1
-            DO WHILE ( NAV( FST, I ) .EQ. 0 .AND. FST .LT. NSAMPL( I ) ) 
+            DO WHILE ( NAV( FST, I ) .EQ. 0 .AND. FST .LT. NSAMPL( I ) )
                FST = FST + 1
             END DO
 
@@ -549,7 +550,8 @@
                      IF ( STACK( 1 ) .NE. VAL__MAXR ) THEN
                         AV( L, I ) = AV( L, I ) - STACK( 1 )
 
-*  If the background could not be defined, use the straight line estimate.
+*  If the background could not be defined, use the straight-line 
+*  estimate.
                      ELSE
                         AV( L, I ) = AV( L, I ) - SLOPE * REAL( L ) - 
      :                               OFFSET
@@ -682,7 +684,7 @@
 *  Test the shift.
 *  ===============
 *          
-*  Compute the shift of the current position from the starting position. 
+*  Compute the shift of the current position from the starting position.
 *  Protect against no shift.
             SHIFT = .FALSE.
             DO  I = 1, NDIM

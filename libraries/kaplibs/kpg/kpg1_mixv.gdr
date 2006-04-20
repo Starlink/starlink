@@ -33,7 +33,7 @@
 *        supplied for the parameter.
 *     MAXVAL = INTEGER (Given)
 *        The maximum number of values required.  A PAR__ERROR status is
-*        returned when the number of values requested is less than one.
+*        returned when the number of values requested is fewer than one.
 *     VMIN = <TYPE> (Given)
 *        The value immediately above a range wherein the obtained
 *        numeric values cannot lie.  Thus if VMAX is greater than VMIN,
@@ -96,24 +96,25 @@
 *        values.  This is not achieved through the MIN/MAX system.
  
 *  Copyright:
-*     Copyright (C) 1999, 2000 Central Laboratory of the Research Councils.
+*     Copyright (C) 1999, 2000 Central Laboratory of the Research 
+*                   Councils.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -165,14 +166,15 @@
       LOGICAL EXCLUD           ! The numeric range is an exclusion zone?
       LOGICAL NOTOK            ! No acceptable value obtained?
       LOGICAL NUMERC           ! Supplied value is numeric?
-      <LTYPE> VAL              ! A value obtained if the input is numeric
+      <LTYPE> VAL              ! A value obtained if the input is 
+                               ! numeric
 *.
  
 *  Check the inherited status.
-      IF( STATUS .NE. SAI__OK ) RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
  
 *  Ensure the number of values needed is positive.
-      IF( MAXVAL .LT. 1 ) THEN
+      IF ( MAXVAL .LT. 1 ) THEN
  
 *  Too few values requested.
          STATUS = PAR__ERROR
@@ -202,21 +204,21 @@
  
 *  Repeat until an acceptable value is obtained or an error occurs.
   140 CONTINUE
-         IF( ALLOK .OR. ( STATUS .NE. SAI__OK ) ) GO TO 200
+         IF ( ALLOK .OR. ( STATUS .NE. SAI__OK ) ) GO TO 200
  
-*  Get up to MAXVAL values from the parameter system. If too many values 
-*  are supplied, report an error, flush the error, cancel the parameter 
-*  and loop.
+*  Get up to MAXVAL values from the parameter system.  If too many 
+*  values are supplied, report an error, flush the error, cancel the 
+*  parameter, and loop.
          ACTVAL = MAXVAL + 1
-         IF( IGRP. NE. GRP__NOID ) CALL GRP_DELET( IGRP, STATUS )
+         IF ( IGRP. NE. GRP__NOID ) CALL GRP_DELET( IGRP, STATUS )
          DO WHILE( ACTVAL .GT. MAXVAL .AND. STATUS .EQ. SAI__OK )
 
-            IF( IGRP .NE. GRP__NOID ) THEN
+            IF ( IGRP .NE. GRP__NOID ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'P', PARAM )
                CALL MSG_SETI( 'A', ACTVAL )
 
-               IF( MAXVAL .GT. 1 ) THEN
+               IF ( MAXVAL .GT. 1 ) THEN
                   CALL MSG_SETI( 'M', MAXVAL )
                   CALL ERR_REP( 'KPG1_MIXVx_ERR1', 'Too many values '//
      :                          '(^A) supplied for parameter %^P. '//
@@ -237,13 +239,13 @@
          END DO
 
 *  Check for an error.
-         IF( STATUS .EQ. SAI__OK ) THEN
+         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Extract the group contents into the supplied array.
             CALL GRP_GET( IGRP, 1, ACTVAL, VALUES, STATUS ) 
  
 *  Check if we have acceptable values.
-*  =====================================
+*  ===================================
  
 *  Assume that all values are now acceptable until shown otherwise.
             ALLOK = .TRUE.
@@ -258,7 +260,7 @@
 *  dynamic default to the numeric data type.  If it fails the bad
 *  status must be annulled, and there is still no suggested default.
                CALL CHR_CTO<T>( VALUES( J ), VAL, STATUS )
-               IF( STATUS .NE. SAI__OK ) THEN
+               IF ( STATUS .NE. SAI__OK ) THEN
                   CALL ERR_ANNUL( STATUS )
                   NUMERC = .FALSE.
  
@@ -269,7 +271,7 @@
 *  The value is numeric.  Determine whether or not it satisifies the
 *  range constraint.
                   NUMERC = .TRUE.
-                  IF( EXCLUD ) THEN
+                  IF ( EXCLUD ) THEN
                      NOTOK = ( VAL .LT. VMIN ) .AND. ( VAL .GT. VMAX )
                   ELSE
                      NOTOK = ( VAL .LT. VMIN ) .OR. ( VAL .GT. VMAX )
@@ -281,7 +283,7 @@
                CALL ERR_RLSE
  
 *  Test if we already have the required value.
-               IF( NOTOK ) THEN
+               IF ( NOTOK ) THEN
  
 *  Permit one mistyped character in the value.
                   CALL PAR1_MENU( VALUES( J ), OPTS, ',', 1, OPTION,
@@ -289,18 +291,18 @@
  
 *  The value is not within the constraints, so make error reports
 *  including full information using tokens.
-                  IF( STATUS .NE. SAI__OK ) THEN
+                  IF ( STATUS .NE. SAI__OK ) THEN
  
 *  Record that at least one value is not valid.
                      ALLOK = .FALSE.
  
 *  Give details of the range limits for a numeric value.
-                     IF( NUMERC ) THEN
+                     IF ( NUMERC ) THEN
                         CALL MSG_SETC( 'PARAM', PARAM )
                         CALL MSG_SETC( 'VALUE', VALUES( J ) )
                         CALL MSG_SET<T>( 'MIN', VMIN )
                         CALL MSG_SET<T>( 'MAX', VMAX )
-                        IF( EXCLUD ) THEN
+                        IF ( EXCLUD ) THEN
                            CALL MSG_SETC( 'XCLD', 'outside' )
                         ELSE
                            CALL MSG_SETC( 'XCLD', 'in' )
@@ -333,11 +335,11 @@
                      NOTOK = J .LT. ACTVAL
  
 *  Warn the user that the nearest match was used.
-                     IF( PENALT .NE. 0 ) THEN
+                     IF ( PENALT .NE. 0 ) THEN
                         CALL MSG_SETC( 'VAL', VALUES( J ) )
                         CALL MSG_SETI( 'I', J )
                         CALL MSG_SETC( 'PARAM', PARAM )
-                        CALL MSG_OUTIF( MSG__NORM, 'KPG1_MIXVx_MISMAT',
+                        CALL MSG_OUTIF ( MSG__NORM, 'KPG1_MIXVx_MISMAT',
      :                    'Selected the nearest match "^VAL" for '/
      :                    /'value number ^I of parameter ^PARAM.',
      :                    STATUS )
@@ -356,7 +358,7 @@
   200 CONTINUE
  
 *  Delete the group.
-      IF( IGRP .NE. GRP__NOID ) CALL GRP_DELET( IGRP, STATUS )
+      IF ( IGRP .NE. GRP__NOID ) CALL GRP_DELET( IGRP, STATUS )
 
 *  Release the new error context.
       CALL ERR_RLSE

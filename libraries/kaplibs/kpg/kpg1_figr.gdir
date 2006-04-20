@@ -14,7 +14,7 @@
 *     CALL KPG1_FIGRx( NDIMS, DIMS, EL, ARRAY, STATUS )
 
 *  Description:
-*     This routine sets each pixel in an n-dimensional array to its grid
+*     This routine sets each pixel in an N-dimensional array to its grid
 *     co-ordinate.
 
 *  Arguments:
@@ -23,9 +23,9 @@
 *     DIMS( NDIM ) = INTEGER (Given)
 *        Array of dimension sizes for each array dimension.
 *     EL = INTEGER (Given)
-*        First dimension of the array of grid co-ordinates.  It must be at
-*        least the total number of elements, i.e. the product of the DIMS
-*        dimensions.
+*        First dimension of the array of grid co-ordinates.  It must be
+*        at least the total number of elements, i.e. the product of the 
+*        DIMS dimensions.
 *     ARRAY( EL, NDIM ) = ? (Returned)
 *        The array containing the grid co-ordinates of each element
 *        given by the supplied dimensions.  The values are stored such
@@ -44,24 +44,25 @@
 *     that's what AST_TRANN uses.
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics & Engineering Research
+*                   Council.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)

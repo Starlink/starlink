@@ -15,11 +15,11 @@
 *                      UPPER, STATUS )
 
 *  Description:
-*     This routine derives a data range applicable to the supplied array.
-*     It is intended to be used to specify the data limits for histogram
-*     plots and scaling data for image display.  There is a variety of
-*     methods available to derive the limits, of which a subset of
-*     appropriate methods can be defined by argument METHOD.
+*     This routine derives a data range applicable to the supplied
+*     array.  It is intended to be used to specify the data limits for
+*     histogram plots and scaling data for image display.  There is a
+*     variety of methods available to derive the limits, of which a 
+*     subset of appropriate methods can be defined by argument METHOD.
 
 *     The method is selected by the user through the literal parameter
 *     specified by PARAM.  The supplied string should consist of up to
@@ -33,7 +33,7 @@
 *        lowest and highest supplied data values, extended to give a
 *        margin of 2.5% of the total data range at each end.
 *
-*        - "Extended,10,5" -- Like "Extended", except the margins at the 
+*        - "Extended,10,5" -- Like "Extended", except the margins at the
 *        two ends are specified as a pair of numerical value in the
 *        second and third elements of the array.  These values are 
 *        percentages of the total data range.  So, "Extended,10,5"
@@ -48,8 +48,8 @@
 *        standard deviations.  This is retained for historical reasons.
 *
 *        - "Limit" --  Allows user to supply explicit lower and upper
-*        limiting values.  For example, "Limit,10,20" would set the lower
-*        limit to 10 and its upper limit to 20.  For compatibility
+*        limiting values.  For example, "Limit,10,20" would set the
+*        lower limit to 10 and its upper limit to 20.  For compatibility
 *        reasons and for ease of use, this routine permits the omission
 *        of the method.  Thus "10,20" is equivalent to the previous
 *        example.  The upper limit may be numerically smaller than the
@@ -115,20 +115,20 @@
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (JAC)
@@ -167,62 +167,67 @@
       INTEGER STATUS
 
 *  External References:
-      EXTERNAL CHR_INSET       ! String is member of a set?
+      EXTERNAL CHR_INSET         ! String is member of a set?
       LOGICAL CHR_INSET
 
 *  Local Constants:
-      INTEGER NUMBIN           ! Number of bins in histogram
+      INTEGER NUMBIN             ! Number of bins in histogram
       PARAMETER( NUMBIN = 2048 ) ! should be enough
 
-      INTEGER NOMETH           ! Number of methods for defining limits
+      INTEGER NOMETH             ! Number of methods for defining limits
       PARAMETER( NOMETH = 6 )
 
-      INTEGER NPRCTL           ! Maximum number of percentiles
+      INTEGER NPRCTL             ! Maximum number of percentiles
       PARAMETER( NPRCTL = 2 )
 
 *  Local Variables:
-      <LTYPE> MAXV             ! Minimum value in the array
-      <LTYPE> MINV             ! Maximum value in the array
-      CHARACTER BUFFER*80      ! Buffer for formatting output
-      CHARACTER PVALS( 3 )*20  ! Parameter values
-      CHARACTER VAMETH*60      ! Comma-separated list of valid selected methods
-      DOUBLE PRECISION DMAX    ! Maximum value
-      DOUBLE PRECISION DMAXC   ! Maximum value after clipping (not used)
-      DOUBLE PRECISION DMIN    ! Minimum value
-      DOUBLE PRECISION DMINC   ! Minimum value after clipping (not used)
-      DOUBLE PRECISION DRMAX   ! Maximum possible value
-      DOUBLE PRECISION DRMIN   ! Minimum possible value
-      DOUBLE PRECISION MEAN    ! Mean of array
-      DOUBLE PRECISION MEANC   ! Clipped mean of array
+      <LTYPE> MAXV               ! Minimum value in the array
+      <LTYPE> MINV               ! Maximum value in the array
+      CHARACTER BUFFER*( 80 )    ! Buffer for formatting output
+      CHARACTER PVALS( 3 )*( 20 ) ! Parameter values
+      CHARACTER VAMETH*( 60 )    ! Comma-separated list of valid 
+                                 ! selected methods
+      DOUBLE PRECISION DMAX      ! Maximum value
+      DOUBLE PRECISION DMAXC     ! Max. value after clipping (not used)
+      DOUBLE PRECISION DMIN      ! Minimum value
+      DOUBLE PRECISION DMINC     ! Min. value after clipping (not used)
+      DOUBLE PRECISION DRMAX     ! Maximum possible value
+      DOUBLE PRECISION DRMIN     ! Minimum possible value
+      DOUBLE PRECISION MEAN      ! Mean of array
+      DOUBLE PRECISION MEANC     ! Clipped mean of array
       DOUBLE PRECISION PERVAL( NPRCTL ) ! Values at the percentiles
-      DOUBLE PRECISION RANGE   ! Range of data values
-      DOUBLE PRECISION STDEV   ! Standard deviation of array
-      DOUBLE PRECISION STDEVC  ! Clipped standard deviation (not used)
-      DOUBLE PRECISION SUM     ! Sum of array
-      DOUBLE PRECISION SUMC    ! Clipped sum of array (not used)
-      DOUBLE PRECISION V1      ! First supplied numerical parameter value
-      DOUBLE PRECISION V2      ! Second supplied numerical parameter value
-      INTEGER ACTIVE           ! The %PARAM parameter state
-      INTEGER I                ! Loop counter
-      INTEGER IMAX             ! Index of maximum value (not used)
-      INTEGER IMAXC            ! Index of maximum value after clipping (not used)
-      INTEGER IMIN             ! Index of minimum value (not used)
-      INTEGER IMINC            ! Clipped index, minimum value (not used)
-      INTEGER INE              ! Index to first numerical element
-      INTEGER MAXPOS           ! Position of the maximum (not used)
-      INTEGER MINPOS           ! Position of the minimum (not used)
-      INTEGER NC               ! Number of characters in message
-      INTEGER NCVM             ! Number of characters of valid methods
-      INTEGER NGOOD            ! Number of good values (not used)
-      INTEGER NGOODC           ! Clipped number of good values (not used)
-      INTEGER NINVAL           ! Number of bad values in the input array
-      INTEGER NVAL             ! Number of parameter values supplied
-      LOGICAL FNDRNG           ! Find the data range?
-      LOGICAL INRANG           ! Supplied data values are in range?
-      LOGICAL ISMETH           ! Does method list include at least one valid method name?
-      REAL CLFRAC( NPRCTL )    ! Clipped percentiles
-      REAL DUMMY               ! Used to swap percentiles
-      REAL PERCNT( NPRCTL )    ! Percentiles
+      DOUBLE PRECISION RANGE     ! Range of data values
+      DOUBLE PRECISION STDEV     ! Standard deviation of array
+      DOUBLE PRECISION STDEVC    ! Clipped standard deviation (not used)
+      DOUBLE PRECISION SUM       ! Sum of array
+      DOUBLE PRECISION SUMC      ! Clipped sum of array (not used)
+      DOUBLE PRECISION V1        ! First supplied numerical parameter
+                                 ! value
+      DOUBLE PRECISION V2        ! Second supplied numerical parameter 
+                                 ! value
+      INTEGER ACTIVE             ! The %PARAM parameter state
+      INTEGER I                  ! Loop counter
+      INTEGER IMAX               ! Index of maximum value (not used)
+      INTEGER IMAXC              ! Index of maximum value after 
+                                 ! clipping (not used)
+      INTEGER IMIN               ! Index of minimum value (not used)
+      INTEGER IMINC              ! Clipped index, min. value (not used)
+      INTEGER INE                ! Index to first numerical element
+      INTEGER MAXPOS             ! Position of the maximum (not used)
+      INTEGER MINPOS             ! Position of the minimum (not used)
+      INTEGER NC                 ! Number of characters in message
+      INTEGER NCVM               ! Number of characters of valid methods
+      INTEGER NGOOD              ! Number of good values (not used)
+      INTEGER NGOODC             ! Clipped no. of good values (not used)
+      INTEGER NINVAL             ! No. of bad values in the input array
+      INTEGER NVAL               ! Number of parameter values supplied
+      LOGICAL FNDRNG             ! Find the data range?
+      LOGICAL INRANG             ! Supplied data values are in range?
+      LOGICAL ISMETH             ! Does method list include at least one
+                                 ! valid method name?
+      REAL CLFRAC( NPRCTL )      ! Clipped percentiles
+      REAL DUMMY                 ! Used to swap percentiles
+      REAL PERCNT( NPRCTL )      ! Percentiles
 
 *  Local Data:
       CHARACTER * ( 12 ) OPTION( NOMETH ) ! Allowed methods
@@ -230,8 +235,8 @@
      :              'Range', 'Sigmas' /
 
 *  Internal References:
-      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
-      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
 
 *.
 

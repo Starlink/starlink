@@ -6,7 +6,7 @@
 *     KPG1_GAUSx
 
 *  Purpose:
-*     Smooth a 2-dimensional array using a symmetrical Gaussian PSF.
+*     Smooths a two-dimensional array using a symmetrical Gaussian PSF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -17,7 +17,7 @@
 
 *  Description:
 *     The routine smooths the array A using a symmetrical Gaussian
-*     point spread function and returns the result in the array B.
+*     point-spread function and returns the result in the array B.
 
 *  Arguments:
 *     SIGMA = REAL (Given)
@@ -25,12 +25,12 @@
 *     IBOX = INTEGER (Given)
 *        Half-size, in pixels, of the box over which the Gaussian
 *        smoothing profile will be applied (the actual box used has an
-*        edge which is 2*IBOX+1 pixels long). This defines the region
+*        edge which is 2*IBOX+1 pixels long).  This defines the region
 *        within which the point spread function is non-zero.
 *     SAMBAD = LOGICAL (Given)
 *        If a .TRUE. value is given, then any "bad" pixels in the input
 *        array A will be propagated to the output array B (output
-*        values will be calculated for all other output pixels). If a
+*        values will be calculated for all other output pixels).  If a
 *        .FALSE. value is given, then the WLIM argument is used to
 *        determine which output pixels will be bad (if any). This
 *        argument is not relevant if BAD is .FALSE..
@@ -43,16 +43,16 @@
 *        and should be less than or equal to 1.0. This argument is not
 *        used if SAMBAD is .TRUE. or if BAD is .FALSE..
 *     NX = INTEGER (Given)
-*        First dimension of the 2-d array A.
+*        First dimension of the two-dimensional array A.
 *     NY = INTEGER (Given)
-*        Second dimension of the 2-d array A.
+*        Second dimension of the two-dimensional array A.
 *     BAD = LOGICAL (Given)
-*        Whether it is necessary to check for bad pixels in the input
-*        array A.
+*        Whether or not it is necessary to check for bad pixels in the 
+*        input array A.
 *     VAR = LOGICAL (Given)
 *        If a .FALSE. value is given for this argument, then smoothing
 *        will be performed as if the array supplied (A) is an array of
-*        data and the PSF will be used directly as specified. If a
+*        data and the PSF will be used directly as specified.  If a
 *        .TRUE. value is given, then smoothing will be applied as if
 *        the array is an array of variance values associated with an
 *        array of data; in this case, the effective PSF will be reduced
@@ -75,29 +75,30 @@
 
 *  Notes:
 *     There are routines for processing double precision and real data.
-*     Replace "x" in the routine name by D or R as appropriate. The
+*     Replace "x" in the routine name by D or R as appropriate.  The
 *     data types of the WLIM, A, B, WEIGHT, AMAR, and WMAR arguments
 *     must match the routine used.
 
 *  Copyright:
-*     Copyright (C) 1981, 1983, 1984, 1986, 1988, 1989, 1990 Science & Engineering Research Council.
+*     Copyright (C) 1981, 1983, 1984, 1986, 1988, 1989, 1990 Science & 
+*                   Engineering Research Council.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     BDK: B.D.Kelly (ROE)
@@ -114,7 +115,7 @@
 *     17-FEB-1984 (DB):
 *        Documentation brought up to standard.
 *     11-SEP-1986 (MJC):
-*        Renamed routine name from RAPGAU. Renamed parameters section
+*        Renamed routine name from RAPGAU.  Renamed parameters section
 *        to arguments, removed unused argument, RBUF - formerly 6th,
 *        added invalid-pixel handling, which necessitated two
 *        additional arguments (WLIMIT - 3rd and WMAR - 9th) and tidied.
@@ -124,9 +125,9 @@
 *        Passed array dimensions as separate variables.
 *     14-SEP-1990 (RFWS):
 *        Complete re-write, removing the rolling buffer (unnecessary)
-*        and converting to generic code. Added the SAMBAD, BAD and
+*        and converting to generic code.  Added the SAMBAD, BAD and
 *        BADOUT arguments and changed to process from one array to
-*        another, rather than updating the input array. Most variables
+*        another, rather than updating the input array.  Most variables
 *        re-named.  Prologue layout upgraded.
 *     24-SEP-1990 (RFWS):
 *        Added the VAR argument to enable the routine to smooth arrays

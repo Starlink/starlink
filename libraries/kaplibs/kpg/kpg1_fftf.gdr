@@ -14,10 +14,11 @@
 
 *  Description:
 *     The Fourier transform of the input (purely real) image is taken 
-*     and returned in OUT.  The returned FT is stored in Hermitian format,
-*     in which the real and imaginary parts of the FT are combined into
-*     a single array. The FT can be inverted using KPG1_FFTB<T>, and two
-*     Hermitian FTs can be multipled together using routine KPG1_HMLT<T>.
+*     and returned in OUT.  The returned FT is stored in Hermitian 
+*     format, in which the real and imaginary parts of the FT are 
+*     combined into a single array.  The FT can be inverted using 
+*     KPG1_FFTB<T>, and two Hermitian FTs can be multipled together 
+*     using routine KPG1_HMLT<T>.
 
 *  Arguments:
 *     M = INTEGER (Given)
@@ -36,26 +37,34 @@
 *    STATUS = INTEGER (Given and Returned)
 *       The global status.
 
+*  Notes:
+*     -  There is a routine for the data types real or double precision:
+*     replace "x" in the routine name by R or D respectively, as
+*     appropriate.  The input and output data arrays plus a work space 
+*     must have the data type specified.
+
 *  Copyright:
-*     Copyright (C) 1995, 2003, 2004 Central Laboratory of the Research Councils.
-*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     Copyright (C) 1995, 2003, 2004 Central Laboratory of the Research 
+*                   Councils.
+*     Copyright (C) 2005 Particle Physics & Engineering Research
+*                   Council.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -73,21 +82,24 @@
 *     1995 September 7 (MJC):
 *        Used PDA_ prefix for FFTPACK routines.
 *     13-DEC-2003 (DSB):
-*        Use KPG1_<T>2NAG in stead of PDA_<T>2NAG. KPG1_<T>2NAG uses workspace
-*        to achieve greater speed.
+*        Use KPG1_<T>2NAG in stead of PDA_<T>2NAG.  KPG1_<T>2NAG uses 
+*        workspace to achieve greater speed.
 *     2004 September 1 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     2005 September 17 (TIMJ):
 *        Generic-ify.
+*     2006 April 20 (MJC):
+*        Added Notes and removed RETURN.
 *     {enter_further_changes_here}
 
 *  Implementation Status:
 *     Some of the generated code looks a bit odd because the names of
-*     the PDA subroutines do not match the standard type naming conventions
-*     required by GENERIC. Explicit IF statements are included but since
-*     these compare constants (after generic is run) the compiler will
-*     optimize the checks out of the final runtime. The real fix is to
-*     fix the names of the PDA routines (and associated KPG routine).
+*     the PDA subroutines do not match the standard type naming 
+*     conventions required by GENERIC.  Explicit IF statements are 
+*     included but since these compare constants (after generic is run) 
+*     the compiler will optimize the checks out of the final runtime.
+*     The real fix is to fix the names of the PDA routines (and 
+*     associated KPG routine).
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -129,7 +141,7 @@
          CALL ERR_REP( 'KPG1_FFTF<T>',
      :        'Routine only supports _REAL or _DOUBLE not <HTYPE>',
      :        STATUS )
-         RETURN
+         GOTO 999
       END IF
 
 *  Allocate work space for use in KPG1_R2NAG. Abort if failure.
@@ -191,11 +203,11 @@
          IF ( '<TYPE>' .EQ. 'REAL' ) THEN
             CALL PDA_RFFTF( N, WORK( IW + 1 ), WORK )
             CALL KPG1_R2NAG( N, WORK( IW + 1 ),
-     :           %VAL( CNF_PVAL( IPW ) ) )
+     :                       %VAL( CNF_PVAL( IPW ) ) )
          ELSE
             CALL PDA_DRFFTF( N, WORK( IW + 1 ), WORK )
             CALL KPG1_DR2NAG( N, WORK( IW + 1 ),
-     :           %VAL( CNF_PVAL( IPW ) ) )
+     :                        %VAL( CNF_PVAL( IPW ) ) )
          END IF
 
 *  Copy the transformed column back to the output array.
@@ -205,7 +217,9 @@
 
       END DO
 
-*  Free work space 
+*  Free the work space.
       CALL PSX_FREE( IPW, STATUS )
+
+  999 CONTINUE
 
       END

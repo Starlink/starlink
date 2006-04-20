@@ -17,23 +17,23 @@
 *                      YMIN, YMAX, COEFF, VARIAN, WORK, STATUS )
 
 *  Description:
-*     This routine writes information describing a 2-dimensional
+*     This routine writes information describing a two-dimensional
 *     polynomial surface to a standard Starlink POLYNOMIAL structure,
 *     as defined in SGP/38.  An empty POLYNOMIAL structure should
 *     already have been created.  All floating point components within
 *     the structure are written as DOUBLE PRECISION.
 *
-*     It is assumed the calling program has a 1-dimensional array of
+*     It is assumed the calling programme has a one-dimensional array of
 *     coefficients, where COEFF( (IX-1)*NYPAR + IY ) contains the
 *     coefficient for the (IX,IY)th term (with NYPAR being the total
-*     number of Y terms).  Such a 1-dimensional array is used by the
+*     number of Y terms).  Such a one-dimensional array is used by the
 *     NAG routines and defined in the NAG manual (see Chapter E02 on
 *     "Curve and Surface fitting").
 *
-*     This routine will convert the coefficient array to 2-dimensional,
-*     flip it around and store it in the POLYNOMIAL structure so that
-*     DATA_ARRAY(IX,IY) contains the coefficient for the (IX,IY)th term
-*     (see SGP/38).
+*     This routine will convert the coefficient array to 
+*     two-dimensional, flip it around and store it in the POLYNOMIAL 
+*     structure so that DATA_ARRAY(IX,IY) contains the coefficient for 
+*     the (IX,IY)th term (see SGP/38).
 *
 *     The routine will also load the TMIN and TMAX arrays with XMIN,
 *     XMAX, YMIN and YMAX.  Note that these are compulsory when
@@ -76,7 +76,7 @@
 *        used by NAG routines.
 *     WORK( NXPAR, NYPAR ) = DOUBLE PRECISION (Returned)
 *        Work array used to flip the polynomial coefficients.  On exit
-*        it will contain the 2-dimensional array of coefficients
+*        it will contain the two-dimensional array of coefficients
 *        written to the POLYNOMIAL structure.
 *     STATUS =  INTEGER (Given and Returned)
 *        Global status value.
@@ -86,24 +86,25 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
-*     Copyright (C) 1995, 1997 Central Laboratory of the Research Councils.
+*     Copyright (C) 1995, 1997 Central Laboratory of the Research
+*                   Councils.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     SMB: Steven M Beard (ROE)
@@ -164,8 +165,8 @@
       INTEGER CHR_LEN            ! Character length determining function
 
 *  Local constants:
-      INTEGER MAXDIM             ! Only 2-dimensional polynomials can be
-                                 ! handled
+      INTEGER MAXDIM             ! Only two-dimensional polynomials can
+                                 ! be handled
       PARAMETER ( MAXDIM = 2 )
 
 *  Local variables:

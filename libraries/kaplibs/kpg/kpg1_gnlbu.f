@@ -15,8 +15,8 @@
 *  Description:
 *     This routine obtains an axis annotation from the parameter system.
 *     The suggested default has the form "label (units)" when the NDF
-*     has both a label and units, or "label" if there is a label but not 
-*     units.  When neither component is present the default is the
+*     has both a label and units, or "label" if there is a label but 
+*     not units.  When neither component is present the default is the
 *     component name follwed by " values".  The units are squared for
 *     the variance component.  If a bad status, other than abort, is
 *     returned by the parameter system when getting the value, the
@@ -44,20 +44,20 @@
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -81,57 +81,47 @@
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
 
 *  Arguments Given:
-      INTEGER
-     :  NDF
+      INTEGER NDF
 
-      CHARACTER * ( * )
-     :  PNLAB,
-     :  COMP
+      CHARACTER*( * ) PNLAB
+      CHARACTER*( * ) COMP
 
 *  Arguments Returned:
-      CHARACTER * ( * )
-     :  AXSLAB
+      CHARACTER*( * ) AXSLAB
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * 128            ! Limitation by parameter system
-     :  AXSDEF                   ! Default annotation
+      CHARACTER*( 128 ) AXSDEF   ! Limitation by parameter system
+                                 ! Default annotation
 
 *.
 
 *  Check the inherited global status.
-
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Start a new error context.
-
+*  Start a new error context.
       CALL ERR_MARK
 
-*    Find the label and units of the NDF so that they can form
-*    the default axis label, otherwise take the component name appended
-*    with " values"
-
+*  Find the label and units of the NDF so that they can form
+*  the default axis label, otherwise take the component name appended
+*  with " values"
       CALL KPG1_DANOT( NDF, COMP, AXSDEF, STATUS )
 
-*    Set the suggested default for the parameter.
-
+*  Set the suggested default for the parameter.
       CALL PAR_DEF0C( PNLAB, AXSDEF, STATUS )
 
-*    Obtain the annotation from the parameter.
-
+*  Obtain the annotation from the parameter.
       CALL PAR_GET0C( PNLAB, AXSLAB, STATUS )
 
-*    Look for the null condition.
-
+*  Look for the null condition.
       IF ( STATUS .NE. SAI__OK .AND. STATUS .NE. PAR__ABORT ) THEN
          CALL ERR_ANNUL( STATUS )
          AXSLAB = AXSDEF
       END IF
 
-*    Release the new error context.
-
+*  Release the new error context.
       CALL ERR_RLSE
 
       END

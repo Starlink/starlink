@@ -20,8 +20,8 @@
 *     named colour is not present the index of the colour nearest to
 *     the requested colour is returned.  A city-block metric is used.
 *
-*     A close colour is only accepted if the close colour is not equal to
-*     the background colour. This avoids pens becoming invisible.
+*     A close colour is only accepted if the close colour is not equal
+*     to the background colour.  This avoids pens becoming invisible.
 
 *  Arguments:
 *     COLOUR = CHARACTER * ( * ) (Given)
@@ -40,24 +40,25 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
-*     Copyright (C) 1998, 1999 Central Laboratory of the Research Councils.
+*     Copyright (C) 1998, 1999 Central Laboratory of the Research 
+*                   Councils.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -68,7 +69,7 @@
 *     1991 July 19 (MJC):
 *        Original version.
 *     27-FEB-1998 (DSB):
-*        Changed for use with PGPLOT instead of GKS. Re-formatted to
+*        Changed for use with PGPLOT instead of GKS.  Re-formatted to
 *        modern style.
 *     9-JUN-1999 (DSB):
 *        Avoid accepting close colours which are equal to the background
@@ -100,8 +101,8 @@
       INTEGER NPRICL             ! Number of primary colours
       PARAMETER ( NPRICL = 3 )
 
-      REAL COPREC                ! Colour precision for colours to be identical
-      PARAMETER ( COPREC = 0.001 )
+      REAL COPREC                ! Colour precision for colours to be
+      PARAMETER ( COPREC = 0.001 ) ! identical
 
 *  Local Variables:
       INTEGER CI1                ! Lowest available colour index
@@ -132,16 +133,16 @@
       CALL PGQCOL( CI1, CI2 )
 
 *  For Xoverlay devices, the above call returns CI1=0 implying that 
-*  the background can be written to. This is technically correct because
-*  writing to the background causes any foreground graphics to be "rubbed
-*  out".  However, the pen representation for the background gives
-*  rgb=0,0,0 (i.e. it thinks the background is a black pen). This is not
-*  correct, therefore do not allow pen 0 to be used if CI1 is zero and
-*  CI2 = 1. 
+*  the background can be written to.  This is technically correct 
+*  because writing to the background causes any foreground graphics to 
+*  be "rubbed out".  However, the pen representation for the background 
+*  gives rgb=0,0,0 (i.e. it thinks the background is a black pen).  This
+*  is not correct, therefore do not allow pen 0 to be used if CI1 is 
+*  zero and CI2 = 1. 
       IF( CI1 .EQ. 0 .AND. CI2 .EQ. 1 ) THEN
          COLIND = 1
 
-*  Otherwise,
+*  Otherwise...
       ELSE
 
 *  Note the highest colour index in the palete.
@@ -182,8 +183,8 @@
      :                ABS( B0 - PALETT( 3, I ) ) .LE. 0.5 )
 
 *  Accept this colour if it matches the requested colour exactly, or if
-*  it is close to the requested colour and is not close to the background
-*  colour.
+*  it is close to the requested colour and is not close to the 
+*  background colour.
             IF ( METRIC .EQ. 0 .OR.
      :           METRIC .LT. 3 * COPREC .AND. .NOT. BACKG ) THEN
 

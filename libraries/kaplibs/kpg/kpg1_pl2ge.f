@@ -7,7 +7,7 @@
 *     KPG1_PL2GE
 
 *  Purpose:
-*     Reads 2-dimensional polynomial information from a POLYNOMIAL
+*     Reads two-dimensional polynomial information from a POLYNOMIAL
 *     structure.
 
 *  Language:
@@ -19,22 +19,22 @@
 *                      STATUS )
 
 *  Description:
-*     This routine reads information describing a 2-dimensional
+*     This routine reads information describing a two-dimensional
 *     polynomial surface from a standard Starlink POLYNOMIAL structure,
 *     as defined in SGP/38.  All floating-point information within the
 *     structure is returned as DOUBLE PRECISION.
 *
-*     It is assumed the calling program needs a 1-dimensional array of
-*     coefficients, where COEFF( (IX-1)*NYPAR + IY ) contains the
+*     It is assumed the calling programme needs a one-dimensional array
+*     of coefficients, where COEFF( (IX-1)*NYPAR + IY ) contains the
 *     coefficient for the (IX,IY)th term (with NYPAR being the total
-*     number of Y terms).  Such a 1-dimensional array is used by the
+*     number of Y terms).  Such a one-dimensional array is used by the
 *     NAG routines and defined in the NAG manual (see Chapter E02 on
 *     "Curve and Surface fitting").
 *
-*     This routine will convert read the 2-dimensional coefficient
+*     This routine will convert read the two-dimensional coefficient
 *     array from the POLYNOMIAL structure (in the format described in
 *     SGP/38) and load a flipped version of this into the required
-*     1-dimensional array.  If there is a variance array present, the
+*     one-dimensional array.  If there is a variance array present, the
 *     VARPRE flag is set .TRUE., and the variances returned in VARIAN.
 *
 *     The routine will also read the TMIN and TMAX arrays from the
@@ -59,14 +59,15 @@
 *        item should be at least CHARACTER*9.
 *     NXPAR = INTEGER (Returned)
 *        Number of x parameters (= order of polynomial in x direction +
-*        1)
+*        1).
 *     NYPAR = INTEGER (Returned)
-*        Number of y parameters (= order of polynomial in Y direction + 1)
+*        Number of y parameters (= order of polynomial in Y direction +
+*        1).
 *     LIMITS = LOGICAL (Returned)
 *        When VARNT='SIMPLE' this logical flag indicates whether any
 *        TMIN and TMAX limits have been read from the polynomial
-*        structure and returned in the next 4 arguments (in which case
-*        LIMITS will be .TRUE.).
+*        structure and returned in the next four arguments (in which 
+*        case LIMITS will be .TRUE.).
 *     XMIN = DOUBLE PRECISION (Returned)
 *        Minimum value along x axis for which polynomial is valid.
 *     XMAX = DOUBLE PRECISION (Returned)
@@ -86,8 +87,8 @@
 *        by NAG routines.  The values are only assigned when VARPRE is
 *        .TRUE..
 *     WORK( MXPAR, MXPAR ) = DOUBLE PRECISION (Returned)
-*        Work array containing the 2-dimensional array of coefficients as read from the
-*        POLYNOMIAL structure.
+*        Work array containing the two-dimensional array of 
+*        coefficients as read from the POLYNOMIAL structure.
 *     STATUS =  INTEGER (Given and Returned)
 *        Global status value.
 
@@ -96,24 +97,25 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
-*     Copyright (C) 1995, 1997 Central Laboratory of the Research Councils.
+*     Copyright (C) 1995, 1997 Central Laboratory of the Research
+*                   Councils.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     SMB: Steven M Beard (ROE)
@@ -173,14 +175,15 @@
       INTEGER STATUS
 
 *  Local constants:
-      INTEGER MAXDIM             ! Only 2-dimensional polynomials can
+      INTEGER MAXDIM             ! Only two-dimensional polynomials can
                                  ! be handled
       PARAMETER ( MAXDIM = 2 )
 
 *  Local variables:
       INTEGER DIM( MAXDIM )      ! Actual dimensions of coefficients
                                  ! array
-      INTEGER DIMX( MAXDIM )     ! Declared dimensions of coefficients array.
+      INTEGER DIMX( MAXDIM )     ! Declared dimensions of coefficients 
+                                 ! array
       INTEGER IX                 ! Loop counter
       INTEGER IY                 ! Loop counter
       CHARACTER * ( DAT__SZNAM ) NAME ! Name of HDS component
@@ -218,7 +221,7 @@
          CALL CMP_GETND( LOC, 'DATA_ARRAY', MAXDIM, DIMX, WORK, DIM,
      :                   STATUS )
 
-*  Flip the work array to restore the original 1-dimensional
+*  Flip the work array to restore the original one-dimensional
 *  coefficients array.
          DO IY = 1, NYPAR
             DO IX = 1, NXPAR
@@ -230,7 +233,7 @@
          CALL CMP_GETND( LOC, 'VARIANCE', MAXDIM, DIMX, WORK, DIM,
      :                   STATUS )
 
-*  Flip the work array to restore the original 1-dimensional
+*  Flip the work array to restore the original one-dimensional
 *  coefficients' variances array.
          DO IY = 1, NYPAR
             DO IX = 1, NXPAR

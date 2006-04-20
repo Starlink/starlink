@@ -21,7 +21,7 @@
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        Whether it is necessary to check for bad values in the input
-*        arrays. The routine will execute more rapidly if this checking
+*        arrays.  The routine will execute more rapidly if this checking
 *        can be omitted.
 *     VAR = LOGICAL (Given)
 *        Whether associated variance information is to be processed.
@@ -30,20 +30,20 @@
 *     A( EL ) = ? (Given)
 *        First array of data to be multiplied.
 *     VA( EL ) = ? (Given)
-*        Variance values associated with the array A. Not used if VAR
+*        Variance values associated with the array A.  Not used if VAR
 *        is set to .FALSE..
 *     B( EL ) = ? (Given)
 *        Second array of data to be multipled.
 *     VB( EL ) = ? (Given)
-*        Variance values associated with the array B. Not used if VAR
+*        Variance values associated with the array B.  Not used if VAR
 *        is set to .FALSE..
 *     C( EL ) = ? (Returned)
 *        Result of multiplying arrays A and B.
 *     VC( EL ) = ? (Returned)
-*        Variance values associated with the array C. Not used if VAR
+*        Variance values associated with the array C.  Not used if VAR
 *        is set to .FALSE..
 *     NERR = INTEGER (Returned)
-*        Number of numerical errors which occurred during the
+*        Number of numerical errors that occurred during the
 *        calculations.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -51,33 +51,34 @@
 *  Notes:
 *     -  There is a routine for each of the data types integer, real
 *     and double precision: replace "x" in the routine name by I, R or
-*     D as appropriate. The arrays passed to this routine should all
+*     D as appropriate.  The arrays passed to this routine should all
 *     have the specified data type.
-*     -  This routine will handle numerical overflow. If overflow
+*     -  This routine will handle numerical overflow.  If overflow
 *     occurs, then affected output array elements will be set to the
 *     "bad" value. A count of the numerical errors which occur is
 *     returned via the NERR argument.
  
 *  Copyright:
 *     Copyright (C) 1990, 1991 Science & Engineering Research Council.
-*     Copyright (C) 1996, 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 1996, 2004 Central Laboratory of the Research
+*                   Councils.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
@@ -94,7 +95,7 @@
 *        Replaced LIB$ESTABLISH and LIB$REVERT calls.
 *     2004 Oct 1 (TIMJ):
 *        Recreate Generic version from constituent parts.
-*        NUM_ERROR can no longer be accessed directly
+*        NUM_ERROR can no longer be accessed directly.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -144,8 +145,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
  
-*  No variance component to process:
+*  No variance component to process
 *  ================================
+
 *  Simply multiply the two data arrays.
       IF ( .NOT. VAR ) THEN
          CALL ERR_MARK
@@ -155,8 +157,9 @@
          CALL ERR_ANNUL( STATUS )
          CALL ERR_RLSE
  
-*  Variance component present:
+*  Variance component present
 *  ==========================
+
 *  Establish a numerical error handler and initialise the numerical
 *  error status and error count.
       ELSE
@@ -164,7 +167,7 @@
          CALL NUM_CLEARERR()
          NERR = 0
  
-*  No bad values present:
+*  No bad values present
 *  =====================
          IF ( .NOT. BAD ) THEN
  
@@ -186,14 +189,14 @@
                   NERR = NERR + 1
                   CALL NUM_CLEARERR()
                END IF
-1           CONTINUE
+    1       CONTINUE
  
-*  Bad values present:
+*  Bad values present
 *  ==================
          ELSE
             DO 2 I = 1, EL
  
-*  See if either input data value is bad. If so, then set bad output
+*  See if either input data value is bad.  If so, then set bad output
 *  values.
                IF ( ( A( I ) .EQ. VAL__BAD<T> ) .OR.
      :              ( B( I ) .EQ. VAL__BAD<T> ) ) THEN
@@ -209,7 +212,7 @@
                      CALL NUM_CLEARERR()
                   END IF
  
-*  See if either input variance value is bad. If so, then set a bad
+*  See if either input variance value is bad.  If so, then set a bad
 *  output variance value.
                   IF ( ( VA( I ) .EQ. VAL__BAD<T> ) .OR.
      :                 ( VB( I ) .EQ. VAL__BAD<T> ) ) THEN
@@ -226,7 +229,7 @@
                      END IF
                   END IF
                END IF
-2           CONTINUE
+    2       CONTINUE
          END IF
  
 *  Remove the numerical error handler.

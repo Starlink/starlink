@@ -32,20 +32,20 @@
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -111,13 +111,14 @@
 *  Obtain the process id as an integer.
          CALL PSX_GETPID( PID, STATUS )
 
-*  Generate the seed as an odd number. The process id is included because
-*  the ticks are in seconds. On modern machines the applicatiom may be
-*  called several times each second, and so the same seed would be used
-*  if it depended on NTICKS alone. Including the PID causes different 
-*  seeds to be used each time because the PIDs will be different. If the
-*  application is run repeatedly in the same process (eg ICL), then the
-*  seed will be set in the above (DONE=.TRUE.) block.
+*  Generate the seed as an odd number.  The process id is included 
+*  because the ticks are in seconds.  On modern machines the 
+*  application may be called several times each second, and so the same 
+*  seed would be used if it depended on NTICKS alone.  Including the PID
+*  causes different seeds to be used each time because the PIDs will be 
+*  different.  If the application is run repeatedly in the same process
+*  (e.g. ICL), then the seed will be set in the above (DONE=.TRUE.) 
+*  block.
          SEED = REAL( ( MOD( NTICKS, NORM ) + 100*PID )* 2 + 1 )
 
 *  Indicate the seed has been set.

@@ -80,20 +80,20 @@
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     SMB: Steven M Beard (ROE)
@@ -146,8 +146,8 @@
       INTEGER STATUS             ! Global status
 
 *  Local constants:
-      DOUBLE PRECISION WTOLER    ! Tolerance to prevent extremely large weights
-      PARAMETER ( WTOLER = 1.0D-7 ) ! Maximum weight 10 million
+      DOUBLE PRECISION WTOLER    ! Tolerance to prevent extremely large
+      PARAMETER ( WTOLER = 1.0D-7 ) ! weights: maximum weight 10 million
 
 *  Local variables:
       INTEGER I                  ! Loop counter
@@ -156,8 +156,8 @@
       DOUBLE PRECISION WMAX      ! Maximum weight found
 
 *  Internal References:
-      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
-      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
 
 *.
 
@@ -168,7 +168,7 @@
 *  are none, used the faster algorithm without any checks.
       IF ( BAD ) THEN
 
-*  Bad pixels present - rigorous algorithm.
+*  Bad pixels present---rigorous algorithm.
 
 *  Initialise the number of good pixels and the maximum weight, and
 *  scan through each pixel in the array in turn.
@@ -183,7 +183,7 @@
                IF ( ARRAY( IX, IY ) .NE. VAL__BAD<T> ) THEN
 
 *  Increment the number of good pixels and load up the x, y, and z
-*  arrays. (Note that the input arrays are <COMM> but the output
+*  arrays.  (Note that the input arrays are <COMM> but the output
 *  arrays are DOUBLE PRECISION, so a conversion is needed).
                   NGOOD = NGOOD + 1
                   X( NGOOD ) = XAXIS( IX )
@@ -221,7 +221,7 @@
 
 *  If variances have been used, and the maximum weight is greater than
 *  the tolerance (to avoid a divide by zero), normalise all the weights
-*  to the range 0.0-1.0.
+*  to the range 0.0--1.0.
          IF ( VARWTS .AND. ( WMAX .GT. WTOLER ) ) THEN
             DO I = 1, NGOOD
                W( I ) = W( I ) / WMAX
@@ -229,7 +229,7 @@
          END IF
       ELSE
 
-*  No bad pixels present - fast alogorithm.
+*  No bad pixels present---fast algorithm.
 
 *  Initialise the number of good pixels and the maximum weight, and
 *  scan through each pixel in the array in turn.

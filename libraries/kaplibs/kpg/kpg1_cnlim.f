@@ -60,25 +60,26 @@
 *        them.
 
 *  Copyright:
-*     Copyright (C) 1980, 1988, 1990 Science & Engineering Research Council.
+*     Copyright (C) 1980, 1988, 1990 Science & Engineering Research
+*                   Council.
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *      DP: Dave Pearce (STARLINK)
@@ -103,58 +104,44 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT  NONE           ! no default typing allowed
-
+      IMPLICIT  NONE             ! no default typing allowed
 
 *  Global Constants:
-      INCLUDE  'SAE_PAR'       ! SSE global definitions
-      INCLUDE  'PRM_PAR'       ! Maximum-constant definitions
-
+      INCLUDE  'SAE_PAR'         ! SSE global definitions
+      INCLUDE  'PRM_PAR'         ! Maximum-constant definitions
 
 *  Arguments Given:
-      CHARACTER*(*)
-     :  NOS
-
+      CHARACTER*( * ) NOS
 
 *  Arguments Returned:
-      INTEGER
-     :  FIRST,
-     :  LAST
-
+      INTEGER FIRST
+      INTEGER LAST
 
 *  Status:
-      INTEGER
-     :  STATUS
+      INTEGER STATUS             ! Global status
 
 
 *  External References:
-      INTEGER
-     :  CHR_INDEX,             ! Index of substring in string
-     :  CHR_LEN                ! Used length of a string
+      INTEGER CHR_INDEX          ! Index of substring in string
+      INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
-      INTEGER
-     :  DUMMY,                 ! Dummy position for swapping
-     :  NSEP,                  ! Character position of separator
-     :  WILD                   ! Character position of wildcard
-
+      INTEGER DUMMY              ! Dummy position for swapping
+      INTEGER NSEP               ! Character position of separator
+      INTEGER WILD               ! Character position of wildcard
 
 *.
 
-*    Check for an error on entry.
-
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Find character position of number separator ('-').
-
+*  Find character position of number separator ('-').
       NSEP = CHR_INDEX( NOS, '-' )
 
-*    Is there a wildcard?
-
+*  Is there a wildcard?
       WILD = CHR_INDEX( NOS, '*' )
 
-*    Check if the delimiter is the first or last character.
-
+*  Check if the delimiter is the first or last character.
       IF ( NSEP .EQ. 1 ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'ERR_KPG1_CNLIM_INPINV',
@@ -167,83 +154,67 @@
 
       ELSE
 
-*       If there is no separator, then only one number specified unless
-*       there is a wildcard.
-
+*  If there is no separator, then only one number specified unless
+*  there is a wildcard.
          IF ( NSEP .EQ. 0 ) THEN
             IF ( WILD .EQ. 0 ) THEN
 
-*             Convert the number.  Upper and lower limits are
-*             identical.
-
+*  Convert the number.  Upper and lower limits are identical.
                CALL CHR_CTOI( NOS, FIRST, STATUS )
                IF ( STATUS .EQ. SAI__OK ) LAST = FIRST
             ELSE
 
-*             All numbers are required.
-
+*  All numbers are required.
                FIRST = VAL__MINI
                LAST = VAL__MAXI
             END IF
 
-*       The specification has a delimiter.
-
+*  The specification has a delimiter.
          ELSE
 
-*          Does it have a wildcard before the delimiter?
-
+*  Does it have a wildcard before the delimiter?
             IF ( WILD .GE. 1 .AND. WILD .LE. NSEP - 1 ) THEN
 
-*             Start from the smallest non-bad integer
-
+*  Start from the smallest non-bad integer
                FIRST = VAL__MINI
 
-*             Extract the last number.
-
+*  Extract the last number.
                CALL CHR_CTOI( NOS( NSEP+1: ), LAST, STATUS )
       
-*          Does it have a wildcard after the delimiter?
-
+*  Does it have a wildcard after the delimiter?
             ELSE IF ( WILD .GE. NSEP + 1 ) THEN
               
-*             Extract the first number.
-
+*  Extract the first number.
                CALL CHR_CTOI( NOS( :NSEP-1 ), FIRST, STATUS )
 
-*             Go to the end.
-
+*  Go to the end.
                LAST = VAL__MAXI
             ELSE
 
-*             Just a simple a-b format.  So extract the first and
-*             last numbers.
-
+*  Just a simple a-b format.  So extract the first and last numbers.
                CALL CHR_CTOI( NOS( :NSEP-1 ), FIRST, STATUS )
                CALL CHR_CTOI( NOS( NSEP+1: ), LAST, STATUS )
 
-*             If misordered, swap the values around.
-
+*  If misordered, swap the values around.
                IF ( FIRST .GT. LAST ) THEN
                   DUMMY = FIRST
                   FIRST = LAST
                   LAST = DUMMY
                END IF
 
-*          End of check for wildcard and a delimiter.
-
+*  End of check for wildcard and a delimiter.
             END IF
 
-*       End of no-separator check.
-
+*  End of no-separator check.
          END IF
 
       END IF
 
 *  Report a context message if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) THEN
+      IF ( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'NOS', NOS )
-         CALL ERR_REP( 'KPG1_CNLIM_ERR', 'Cannot interpret range of '//
-     :                 'integers ''^NOS''.', STATUS )
+         CALL ERR_REP( 'KPG1_CNLIM_ERR', 'Cannot interpret range of '/
+     :                 /'integers ''^NOS''.', STATUS )
       END IF
 
       END

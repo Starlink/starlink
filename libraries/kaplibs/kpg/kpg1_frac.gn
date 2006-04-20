@@ -83,25 +83,27 @@
 *     bin number.
 
 *  Copyright:
-*     Copyright (C) 2000, 2001, 2002 Central Laboratory of the Research Councils.
-*     Copyright (C) 2005, 2006 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2000, 2001, 2002 Central Laboratory of the Research
+*                   Councils.
+*     Copyright (C) 2005, 2006 Particle Physics & Engineering Research
+*                   Council.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (JAC)
@@ -134,8 +136,8 @@
 *        thus curing a potential divide-by-zero error if maximum were
 *        -1 times the minimum.
 *     21-NOV-2000 (DSB):
-*        Added in corrections from MT to avoid numeric overflows in the case 
-*        of signed integral data types with a large dynamic range.
+*        Added in corrections from MT to avoid numeric overflows in the
+*        case of signed integral data types with a large dynamic range.
 *     28-NOV-2000 (DSB):
 *        More fixes from MT related to typing of MINV and MAXV.
 *     18-JUL-2001 (DSB):
@@ -150,7 +152,8 @@
 *     2002 August 12 (MJC)
 *        Corrections and improvements to the previous enhancement.
 *     2005 November 28 (BEC)
-*        Fix bug possibly related to G95 and upcasting of BYTE to INTEGER.
+*        Fix bug possibly related to G95 and upcasting of BYTE to 
+*        INTEGER.
 *     2005 December 7 (PWD):
 *        Change use of MIN to NUM_MIN<T> so that MIN(BYTE,BYTE) works.
 *     2006 February 24 (MJC):
