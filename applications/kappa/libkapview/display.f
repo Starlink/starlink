@@ -557,6 +557,10 @@
 *        Use KPG1_ASTTL to get the title.
 *     2006 April 12 (MJC):
 *        Remove unused variables.
+*     20-APR-2006 (DSB):
+*        If annotated axes are not being drawn, remove the requirement 
+*        for the WCS->PIXEL transformation to be defined. Shorten 
+*        variable comments so that each fits entirely on one line.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -601,109 +605,87 @@
 *  Local Variables:
       CHARACTER COMP*8           ! Component to be displayed
       CHARACTER FORM*( NDF__SZFRM ) ! Form of the output data array
-      CHARACTER LABEL*255        ! Label for key
-      CHARACTER MCOMP*8          ! Component to be mapped
-      CHARACTER NDFNAM*255       ! Full NDF specification 
-      CHARACTER OTYPE*( NDF__SZTYP ) ! Processing type of the output
-                                 ! image
-      DOUBLE PRECISION BOX( 4 )  ! Bounds of image in pixel co-ordinates
-      DOUBLE PRECISION CC( 2 )   ! Current Frame co-ords at image centre
-      DOUBLE PRECISION DHI       ! Upper displayed data value limit
-      DOUBLE PRECISION DLO       ! Lower displayed data value limit
-      DOUBLE PRECISION GC( 2 )   ! GRID co-ords at image centre
-      INTEGER BPCI               ! Bad-pixel colour index
-      INTEGER DIMS( NDIM )       ! Dimensions of input array
-      INTEGER EL                 ! Number of elements in the mapped 
-                                 ! array
-      INTEGER I                  ! General variable
-      INTEGER IPICK              ! AGI identifier for KEY picture
-      INTEGER IERR               ! Position of first conversion error
-      INTEGER INDF1              ! NDF identifier for input NDF
-      INTEGER INDF2              ! NDF identifier for displayed NDF
-                                 ! section
-      INTEGER INDF3              ! NDF identifier for output NDF
-      INTEGER INDF4              ! NDF identifier for NDF containing LUT
-      INTEGER IPCOL              ! Pointer to colour index array
-      INTEGER IPIC0              ! AGI id. for original current picture
-      INTEGER IPICD              ! AGI id. for DATA picture
-      INTEGER IPICF              ! AGI id. for new FRAME picture
-      INTEGER IPLOT              ! Pointer to AST Plot for DATA picture
-      INTEGER IPWORK             ! Pointer to work array for key
-      INTEGER IWCS               ! Pointer to WCS FrameSet from the NDF
-      INTEGER LBND( NDF__MXDIM ) ! Lower pixel-index bounds of the image
-      INTEGER LDIMS( NDIM )      ! Dimensions of LUT arrays
-      INTEGER LEL                ! Number of elements in i/p and o/p
-                                 ! LUT arrays
-      INTEGER LP                 ! Lowest pen with which to display
-                                 ! image
-      INTEGER LPNTR( 1 )         ! Pointer to input colour table
-      INTEGER NC                 ! Number of characters in NDFNAM
-      INTEGER NDIMS              ! Total number of NDF dimensions
-      INTEGER NERR               ! Number of conversion errors
-      INTEGER NFRM               ! Frame index increment between IWCS
-                                 ! and IPLOT
-      INTEGER NMARG              ! Number of margin values given
-      INTEGER NX                 ! First dimension of colour-index array
-      INTEGER NY                 ! Second dimension, colour-index array
-      INTEGER OPNTR( 1 )         ! Pointer to output array data
-      INTEGER SDIM( NDIM )       ! The significant NDF axes
-      INTEGER SLBND( NDIM )      ! Significant lower bounds of the image
-      INTEGER STATE              ! State of a parameter
-      INTEGER SUBND( NDIM )      ! Significant upper bounds of the image
-      INTEGER UBND( NDF__MXDIM ) ! Upper pixel-index bounds of the image
-      INTEGER UP                 ! Highest pen with which to display 
-                                 ! image
-      INTEGER WDIM( NDIM )       ! Dimensions in pixels of PGPLOT window
-      INTEGER WILBND( NDIM )     ! Lower pixel-index bounds of NDF 
-                                 ! section
-      INTEGER WIUBND( NDIM )     ! Upper pixel-index bounds of NDF 
-                                 ! section
-      LOGICAL ALIGN              ! DATA picture aligned with a previous
-                                 ! picture?
-      LOGICAL AXES               ! Annotated axes are to be drawn?
-      LOGICAL BAD                ! Bad pixels are present in the image?
-      LOGICAL BORDER             ! Border to be drawn?
-      LOGICAL DEVCAN             ! Cancel DEVICE parameter?
-      LOGICAL KEY                ! Produce a colour ramp as a key?
-      LOGICAL NN                 ! Map the LUT via nearest-neighbour
-                                 ! method?
-      LOGICAL SCALE              ! Does the input array need to be 
-                                 ! scaled?
-      REAL ASP0                  ! Aspect ratio of the available space
-      REAL ASPD                  ! Aspect ratio of the data array
-      REAL ASPECT                ! Aspect ratio of the DATA picture
-      REAL DEFMAR                ! Default MARGIN value
-      REAL GLBND( NDIM )         ! Low grid co-ord bounds of PGPLOT 
-                                 ! window
-      REAL GUBND( NDIM )         ! High grid co-ord bounds of PGPLOT
-                                 ! window
-      REAL KEYPOS                ! Horizontal position of key
-      REAL KWID                  ! Width to reserve for the KEY (if any)
-      REAL MARGIN( 4 )           ! Width of margins round DATA picture
-      REAL OPLBND( NDIM )        ! Low pixel co-ord bounds of NDF 
-                                 ! overlap
-      REAL OPUBND( NDIM )        ! High pixel co-ord bounds of NDF 
-                                 ! overlap
-      REAL PCLBND( NDIM )        ! Low pixel co-ord bounds of PGPLOT
-                                 ! window
-      REAL PCUBND( NDIM )        ! High pixel co-ord bounds of PGPLOT
-                                 ! window
-      REAL WPLBND( NDIM )        ! Low pixel co-ord bounds of NDF 
-                                 ! section
-      REAL WPUBND( NDIM )        ! High pixel co-ord bounds of NDF
-                                 ! section
-      REAL X1, X2, Y1, Y2        ! Bounds of current picture viewport in
-                                 ! millimetres
-      REAL XMAGN                 ! X magnification
-      REAL XTENT                 ! Extent in X of the PGPLOT window in 
-                                 ! NDF pixels
-      REAL XVMAG                 ! X magnification factor for viewport
-      REAL XWMAG                 ! X magnification factor for window
-      REAL YMAGN                 ! Y magnification
-      REAL YTENT                 ! Extent in Y of the PGPLOT window in 
-                                 ! NDF pixels
-      REAL YVMAG                 ! Y magnification factor for viewport
-      REAL YWMAG                 ! Y magnification factor for window
+      CHARACTER LABEL*255      ! Label for key
+      CHARACTER MCOMP*8        ! Component to be mapped
+      CHARACTER NDFNAM*255     ! Full NDF specification 
+      CHARACTER OTYPE*( NDF__SZTYP )! Processing type of output image
+      DOUBLE PRECISION BOX( 4 )! Bounds of image in pixel co-ordinates
+      DOUBLE PRECISION CC( NDF__MXDIM ) ! CurFrm coords at image centre
+      DOUBLE PRECISION DHI     ! Upper displayed data value limit
+      DOUBLE PRECISION DLO     ! Lower displayed data value limit
+      DOUBLE PRECISION GC( 2 ) ! GRID co-ords at image centre
+      INTEGER BPCI             ! Bad-pixel colour index
+      INTEGER DIMS( NDIM )     ! Dimensions of input array
+      INTEGER EL               ! Number of elements in the mapped array
+      INTEGER I                ! General variable
+      INTEGER IERR             ! Position of first conversion error
+      INTEGER INDF1            ! NDF id for input NDF
+      INTEGER INDF2            ! NDF id for displayed NDF section
+      INTEGER INDF3            ! NDF id for output NDF
+      INTEGER INDF4            ! NDF id for NDF containing LUT
+      INTEGER IPCOL            ! Pointer to colour index array
+      INTEGER IPIC0            ! AGI id. for original current picture
+      INTEGER IPICD            ! AGI id. for DATA picture
+      INTEGER IPICF            ! AGI id. for new FRAME picture
+      INTEGER IPICK            ! AGI identifier for KEY picture
+      INTEGER IPLOT            ! Pointer to AST Plot for DATA picture
+      INTEGER IPWORK           ! Pointer to work array for key
+      INTEGER IWCS             ! Pointer to WCS FrameSet from the NDF
+      INTEGER LBND( NDF__MXDIM )! Lower pixel-index bounds of the image
+      INTEGER LDIMS( NDIM )    ! Dimensions of LUT arrays
+      INTEGER LEL              ! No. of elements in i/p and o/p LUTs
+      INTEGER LP               ! Lowest pen with which to display image
+      INTEGER LPNTR( 1 )       ! Pointer to input colour table
+      INTEGER NC               ! Number of characters in NDFNAM
+      INTEGER NCUR             ! No. of current Frame axes
+      INTEGER NDIMS            ! Total number of NDF dimensions
+      INTEGER NERR             ! Number of conversion errors
+      INTEGER NFRM             ! Frm index change between IWCS and IPLOT
+      INTEGER NMARG            ! No. of margin values given
+      INTEGER NX               ! First dimension of colour index array
+      INTEGER NY               ! Second dimension of colour index array
+      INTEGER OPNTR( 1 )       ! Pointer to output array data
+      INTEGER SDIM( NDIM )     ! The significant NDF axes
+      INTEGER SLBND( NDIM )    ! Significant lower bounds of the image
+      INTEGER STATE            ! State of a parameter
+      INTEGER SUBND( NDIM )    ! Significant upper bounds of the image
+      INTEGER UBND( NDF__MXDIM )! Upper pixel-index bounds of the image
+      INTEGER UP               ! Highest pen with which to display image
+      INTEGER WDIM( NDIM )     ! Dimensions in pixels of PGPLOT window
+      INTEGER WILBND( NDIM )   ! Lower pixel-index bounds of NDF section
+      INTEGER WIUBND( NDIM )   ! Upper pixel-index bounds of NDF section
+      LOGICAL ALIGN            ! DATA pic aligned with a previous pic?
+      LOGICAL AXES             ! Annotated axes are to be drawn?
+      LOGICAL BAD              ! Bad pixels are present in the image?
+      LOGICAL BORDER           ! Border to be drawn?
+      LOGICAL DEVCAN           ! Cancel DEVICE parameter?
+      LOGICAL KEY              ! Produce a colour ramp as a key?
+      LOGICAL NN               ! Map the LUT via nearest-neighbour?
+      LOGICAL SCALE            ! Does the input array need to be scaled?
+      REAL ASP0                ! Aspect ratio of the available space
+      REAL ASPD                ! Aspect ratio of the data array
+      REAL ASPECT              ! Aspect ratio of the DATA picture
+      REAL DEFMAR              ! Default MARGIN value
+      REAL GLBND( NDIM )       ! Low grid co-ord bounds of PGPLOT window
+      REAL GUBND( NDIM )       ! Hi grid co-ord bounds of PGPLOT window
+      REAL KEYPOS              ! Horizontal position of key
+      REAL KWID                ! Width to reserve for the KEY (if any)
+      REAL MARGIN( 4 )         ! Width of margins round DATA picture
+      REAL OPLBND( NDIM )      ! Low pixel co-ord bounds of NDF overlap
+      REAL OPUBND( NDIM )      ! High pixel co-ord bounds of NDF overlap
+      REAL PCLBND( NDIM )      ! Lo pixel co-ord bounds of PGPLOT window
+      REAL PCUBND( NDIM )      ! Hi pixel co-ord bounds of PGPLOT window
+      REAL WPLBND( NDIM )      ! Low pixel co-ord bounds of NDF section
+      REAL WPUBND( NDIM )      ! High pixel co-ord bounds of NDFsection
+      REAL X1, X2, Y1, Y2      ! Bounds of current pic viewport in mm
+      REAL XMAGN               ! X magnification
+      REAL XTENT               ! X extent of PGPLOT window in NDF pixels
+      REAL XVMAG               ! X magnification factor for viewport
+      REAL XWMAG               ! X magnification factor for window
+      REAL YMAGN               ! y magnification
+      REAL YTENT               ! Y extent of PGPLOT window in NDF pixels
+      REAL YVMAG               ! Y magnification factor for viewport
+      REAL YWMAG               ! Y magnification factor for window
 
 *.
 
@@ -728,13 +710,20 @@
 *  'Variance' in place of 'Error'.
       CALL KPG1_ARCOG( 'COMP', INDF1, MCOMP, COMP, STATUS )
 
+*  See if annotated axes are required. 
+      CALL PAR_GET0L( 'AXES', AXES, STATUS )
+
 *  Get an AST pointer to a FrameSet describing the co-ordinate Frames
-*  present in the NDF's WCS component.  Modify it to ensure that the 
-*  Base, PIXEL and Current frames all have two dimensions.  The NDF must
-*  have no more than two significant dimensions (i.e. axes spanning more
-*  than one pixel).  A single significant axis is allowed.
-      CALL KPG1_ASGET( INDF1, NDIM, .FALSE., .TRUE., .TRUE., SDIM, 
+*  present in the NDF's WCS component.  If axes are being drawn, modify 
+*  it to ensure that the Base, PIXEL and Current frames all have two 
+*  dimensions.  The NDF must have no more than two significant pixel axes 
+*  (i.e. pixel axes spanning more than one pixel).  A single significant 
+*  pixel axis is allowed.
+      CALL KPG1_ASGET( INDF1, NDIM, .FALSE., AXES, AXES, SDIM, 
      :                 SLBND, SUBND, IWCS, STATUS )
+
+*  Store the number of current Frame axes.
+      NCUR = AST_GETI( IWCS, 'NAXES', STATUS )
 
 *  Store the size of each significant dimension.
       DIMS( 1 ) = SUBND( 1 ) - SLBND( 1 ) + 1
@@ -747,9 +736,6 @@
 
 *  Determine the width of the margins to leave around the DATA picture.
 *  ====================================================================
-
-*  See if annotated axes are required. 
-      CALL PAR_GET0L( 'AXES', AXES, STATUS )
 
 *  See if a border is also required.
       CALL PAR_GET0L( 'BORDER', BORDER, STATUS )
@@ -948,36 +934,47 @@
       GC( 2 ) = ( 1.0D0 + DBLE( DIMS( 2 ) ) ) / 2.0D0
 
 *  Convert these into the Current Frame of the NDF. 
-      CALL AST_TRAN2( IWCS, 1, GC( 1 ), GC( 2 ), .TRUE., CC( 1 ), 
-     :                CC( 2 ), STATUS )
+      CALL AST_TRANN( IWCS, 1, 2, 1, GC, .TRUE., NCUR, 1, CC, 
+     :                STATUS )
+
+* See if a value for CENTRE was supplied on the command line.
+      CALL LPG_STATE( 'CENTRE', STATE, STATUS )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Try to convert these back to grid.  The current Frame is not suitable
 *  for specifying a centre position if any of the returned values are
 *  bad.
       CALL AST_TRAN2( IWCS, 1, CC( 1 ), CC( 2 ), .FALSE., GC( 1 ), 
      :                GC( 2 ), STATUS )
-      IF( GC( 1 ) .EQ. AST__BAD .OR. GC( 2 ) .EQ. AST__BAD ) THEN
-         IF( STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'DISPLAY_ERR4B', 'The Mapping from the '//
+
+      IF( STATUS .NE. SAI__OK .OR. 
+     :    GC( 1 ) .EQ. AST__BAD .OR. GC( 2 ) .EQ. AST__BAD ) THEN
+
+         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+
+         IF( STATE .EQ. PAR__ACTIVE ) THEN
+            CALL MSG_OUT( 'DISPLAY_NOG1', 'The Mapping from the '//
      :                    'current WCS co-ordinate Frame to pixel '//
      :                    'co-ordinates is undefined at the image '//
      :                    'centre.', STATUS )
-            CALL ERR_REP( 'DISPLAY_ERR4C',  'Try displaying a section'//
-     :                    ' of the image, or changing the current '//
-     :                    'Frame to PIXEL using the KAPPA wcsframe '//
-     :                    'command.', STATUS )
+	    
+            CALL MSG_OUT( 'DISPLAY_NOG2', 'The CENTRE parameter will '//
+     :                    'be ignored and the centre of the image '//
+     :                    'will be displayed at the centre of the '//
+     :                    'display.', STATUS )
          END IF
-         GO TO 999
-      END IF
+
+         GC( 1 ) = ( 1.0D0 + DBLE( DIMS( 1 ) ) ) / 2.0D0
+         GC( 2 ) = ( 1.0D0 + DBLE( DIMS( 2 ) ) ) / 2.0D0
 
 *  If the centre pixel of the supplied NDF has no defined position then 
 *  we only access the CENTRE parameter if a value was supplied on the
 *  command line.  Otherwise, just use the centre of the GRID frame as 
 *  the centre for the displayed image.
-      CALL LPG_STATE( 'CENTRE', STATE, STATUS )
-      IF( ( CC( 1 ) .NE. AST__BAD .AND. CC( 2 ) .NE. AST__BAD ) .OR.
-     :    STATE .EQ. PAR__ACTIVE ) THEN
+      ELSE IF( ( CC( 1 ) .NE. AST__BAD .AND. CC( 2 ) .NE. AST__BAD ) 
+     :         .OR. STATE .EQ. PAR__ACTIVE ) THEN
 
 *  Obtain the Current Frame co-ordinates (returned in CC) to put at the 
 *  centre of the picture using parameter CENTRE.  Use the Current Frame 
