@@ -87,7 +87,7 @@ f     The SwitchMap class does not define any new routines beyond those
 *     which are applicable to all Mappings.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 1997-2006 Council for the Central Laboratory of the Research Councils
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -1196,6 +1196,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
          if( popmap[ iroute ] > maxpop ) maxpop = popmap[ iroute ];
          totpop += popmap[ iroute ];
       }
+      if( maxpop == 0 ) maxpop = 1;
 
 /* If some of the points are not transformed by any route Mapping.
    Initialise the whole output array to hold AST__BAD at every point. */
