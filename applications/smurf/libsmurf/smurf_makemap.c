@@ -34,6 +34,7 @@
 *     Tim Jenness (JAC, Hawaii)
 *     Andy Gibb (UBC)
 *     Edward Chapin (UBC)
+*     David Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,6 +60,8 @@
 *        - fits header written to output using ndfputwcs
 *     2006-03-23 (AGG):
 *        Update to take account of new API for rebinmap
+*     2006-03-23 (DSB):
+*        Guard against null pointer when reporting error.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -182,11 +185,15 @@ void smurf_makemap( int *status ) {
       msgOutif(MSG__VERB, " ", 
 	       "SMF_REBINMAP: Processing ^THISFILE/^NUMFILES ^FILE",
 	       status);
-    } else {
+
+    } else if( data && data->file ){
       file = data->file;
       pname =  file->name;
       msgSetc("FILE", pname);
       errRep( "smf_rebinmap", "Couldn't open input file ^FILE", status );
+
+    } else {
+      errRep( "smf_rebinmap", "Couldn't open input file", status );
     }
 
     /* Check that the data dimensions are 3 (for time ordered data) */
