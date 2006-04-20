@@ -348,6 +348,7 @@
 /* we use it in preference to a synchronous call), that seems to depend on   */
 /* the operating system. To be sure of writing we must call fsync() when the */
 /* file is closed.                                                           */
+/*	    printf("Unmapping %ld bytes from address %p (actually %p)\n", len, addr, *pntr );*/
             if ( ( msync( addr, len, MS_ASYNC ) != 0 ) ||
                  ( munmap( addr, len ) != 0 ) )
 	    {

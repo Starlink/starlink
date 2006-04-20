@@ -37,7 +37,7 @@
 
 *  Copyright:
 *     Copyright (C) 1984, 1985, 1986, 1989, 1991, 1993 Science & Engineering Research Council.
-*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:

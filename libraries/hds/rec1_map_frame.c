@@ -582,10 +582,11 @@ file ^FILE - ^MESSAGE",
                   emsSyser( "MESSAGE", errno );
                   dat1emsSetBigi( "FIRST", offs + 1 );
                   dat1emsSetBigi( "LAST", offs + length );
+		  dat1emsSetBigi( "NB", length );
                   emsSetnc( "ACCESS", &mode, 1 );
                   rec1_fmsg( "FILE", slot );
                   emsRep( "REC1_MAP_FRAME_6",
-                             "Error mapping bytes ^FIRST:^LAST for "
+                             "Error mapping bytes ^FIRST:^LAST (^NB bytes) for "
                              "\'^ACCESS\' access in file ^FILE - ^MESSAGE",
                              &hds_gl_status );
                   break;
@@ -649,7 +650,18 @@ file ^FILE - ^MESSAGE",
                   }
                }
             }
+
+	    /* indicate success */
+	    /*	    if (hds_gl_status == DAT__OK) {
+	      printf("Mapping %llu bytes in file %d at offset %llu to pointer %p (actually %p)\n",
+		     (uint64_t)len, fd, (uint64_t)off, *pntr, start );
+	    } else {
+	      printf("Failed to map %llu bytes to file %d with offset %llu\n",
+		     (uint64_t)len, fd, (uint64_t)off );
+		     }*/
 	 }
+
+	 
 
 /* If an error occurred during file mapping, then return a null pointer	    */
 /* value.								    */

@@ -7,7 +7,7 @@
  *    A simple test of the C EMS installation 
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:

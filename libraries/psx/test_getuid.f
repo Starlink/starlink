@@ -7,7 +7,7 @@
 *     Test subroutines PSX_GETUID, PSX_GETGID, PSX_GETEUID and PSX_GETEGID.
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:

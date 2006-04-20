@@ -24,7 +24,7 @@
 *  Copyright:
 *     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
-*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:

@@ -51,7 +51,7 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
-*     Copyright (C) 2006 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or

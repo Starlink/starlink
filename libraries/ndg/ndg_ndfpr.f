@@ -49,7 +49,7 @@
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
-*     Copyright (C) 2006 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:

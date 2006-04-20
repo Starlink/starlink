@@ -10,7 +10,7 @@
 *     This include file includes all MERS related include files.
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:

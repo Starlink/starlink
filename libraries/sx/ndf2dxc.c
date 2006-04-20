@@ -31,7 +31,7 @@ F77_INTEGER_FUNCTION(fopen)( CHARACTER(name), CHARACTER(access) TRAIL(name)
  *       Status: 0 = failure, 1 = success
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:

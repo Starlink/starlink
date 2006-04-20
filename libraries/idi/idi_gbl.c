@@ -7,7 +7,7 @@
 *     IDI Global variable definitions
 
 *  Copyright:
-*     Copyright (C) 2004 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2004 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
