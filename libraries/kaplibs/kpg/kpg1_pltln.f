@@ -118,7 +118,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998, 1999, 2001 Central Laboratory of the Research Councils.
-*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:

@@ -67,7 +67,7 @@ F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
 *     following it, and the entire next line will be appended to the value.
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:

@@ -40,7 +40,7 @@ F77_SUBROUTINE(kpg1_kygrp)( INTEGER(KEYMAP), INTEGER(IGRP), INTEGER(STATUS) ) {
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:

@@ -52,7 +52,7 @@
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1996, 1999 Central Laboratory of the Research 
 *                   Councils.
-*     Copyright (C) 2006 Particle Physics & Engineering Research
+*     Copyright (C) 2006 Particle Physics & Astronomy Research
 *                   Council.
 *     All Rights Reserved.
 

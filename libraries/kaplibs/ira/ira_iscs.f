@@ -80,7 +80,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
-*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:

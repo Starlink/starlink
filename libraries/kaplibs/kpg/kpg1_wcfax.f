@@ -35,7 +35,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics & Engineering Research
+*     Copyright (C) 2006 Particle Physics & Astronomy Research
 *                   Council.
 *     All Rights Reserved.
 

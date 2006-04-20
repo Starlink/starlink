@@ -52,7 +52,7 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 *     KPG1_KYGRP Fortran routine and kpg1Kygrp C function.
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:

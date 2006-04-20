@@ -71,7 +71,7 @@ void kpg1Kymp1( Grp *igrp, AstKeyMap **keymap, int *status ){
 *     following it, and the entire next line will be appended to the value.
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:

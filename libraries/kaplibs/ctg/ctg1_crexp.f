@@ -48,7 +48,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999, 2004 Central Laboratory of the Research Councils.
-*     Copyright (C) 2005, 2006 Particle Physics & Engineering Research Council.
+*     Copyright (C) 2005, 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
