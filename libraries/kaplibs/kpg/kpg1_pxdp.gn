@@ -32,19 +32,19 @@
 *     USEMSK = LOGICAL (Given)
 *        Should the mask array supplied by argument MASK be used?
 *     MASK( * ) = REAL (Given)
-*        Only accessed if USEMSK is .TRUE. The MASK array corresponds to
-*        a single expansion block in the output array, and so should have
-*        a size equal to the product of the values supplied in the EXPAND 
-*        argument. If USEMSK is .true., the value stored for each output 
-*        pixel equals the product of the input pixel which is being
-*        duplicated, and the corresponding mask pixel (that is, the mask
-*        pixel which is at the same position as the output position is
-*        within its current block of output pixels). If USEMSK is .FALSE.
-*        each output pixel value is simply equal to the input pixel value
-*        which is being duplicated. This is equivalent to using a mask
-*        which is filled with the value 1.0. The suplied mask array may
-*        contain VAL__BADR values in which case the corresponding output
-*        pixel will be set to VAL__BAD<T>.
+*        Only accessed if USEMSK is .TRUE.  The MASK array corresponds 
+*        to a single expansion block in the output array, and so should 
+*        have a size equal to the product of the values supplied in the 
+*        EXPAND argument.  If USEMSK is .TRUE., the value stored for 
+*        each output pixel equals the product of the input pixel which 
+*        is being duplicated, and the corresponding mask pixel (that is,
+*        the mask pixel that is at the same position as the output 
+*        position is within its current block of output pixels).  If 
+*        USEMSK is .FALSE. each output pixel value is simply equal to 
+*        the input pixel value that is being duplicated.  This is 
+*        equivalent to using a mask that is filled with the value 1.0. 
+*        The supplied mask array may contain VAL__BADR values in which 
+*        case the corresponding output pixel will be set to VAL__BAD<T>.
 *     ODIMS( NDF__MXDIM ) = INTEGER (Given)
 *        The dimensions of the expanded array.  Unused dimensions up to
 *        NDF__MXDIM should be set to one.
@@ -64,25 +64,27 @@
 
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
-*     Copyright (C) 1995, 2004 Central Laboratory of the Research Councils.
-*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     Copyright (C) 1995, 2004 Central Laboratory of the Research
+*                   Councils.
+*     Copyright (C) 2005, 2006 Particle Physics & Engineering Research 
+*                   Council.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -99,6 +101,8 @@
 *     13-AUG-2005 (TIMJ):
 *        Use NUM_<T>TOD to convert VAL__ constant to DOUBLE.
 *        Some compilers have trouble casting BOZ notation.
+*     2006 April 20 (MJC):
+*        Wrap long code lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -158,9 +162,9 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise the stride of dimension number 1 for the input array. (The
-*  stride for a dimension is the amount by which the vectorised array
-*  index increases when the n-dimensional array index for that
+*  Initialise the stride of dimension number 1 for the input array.  
+*  (The stride for a dimension is the amount by which the vectorised 
+*  array index increases when the n-dimensional array index for that
 *  dimension increases by 1.)
       STRID( 1 ) = 1
 
@@ -193,14 +197,15 @@
             IP = ( I7 - 1 ) / EXPAND( 7 ) 
  
 *  Find the number of output pixels by which the current output pixel
-*  exceeds the boundary of the previous expansion block on this axis (the
-*  remainder in the above integer division). This is the index into the mask 
-*  array on the 7th axis. Then multiply by the mask stride and add 1 in
-*  order to get the index of the first mask element within MASK
-*  corresponding to this value on the 7th mask axis. 
+*  exceeds the boundary of the previous expansion block on this axis 
+*  (the remainder in the above integer division).  This is the index 
+*  into the mask array on the 7th axis.  Then multiply by the mask 
+*  stride and add 1 in order to get the index of the first mask element 
+*  within MASK corresponding to this value on the 7th mask axis. 
             IM( 7 ) = ( I7 - 1 - IP * EXPAND( 7 ) ) * MSTRID( 7 ) + 1
 
-*  Find the index of the first input pixel on the corresponding input axis.
+*  Find the index of the first input pixel on the corresponding input
+*  axis.
             IN( 7 ) = IP * STRID( 7 ) + 1
 
 *  Do the same for the remaining axes.
@@ -218,7 +223,7 @@
    
                   DO I4 = 1, ODIMS( 4 )
                      IP = ( I4 - 1 ) / EXPAND( 4 ) 
-                     IM( 4 ) = ( I4 - 1 - IP*EXPAND( 4 ) ) * MSTRID( 4 ) 
+                     IM( 4 ) = ( I4 - 1 - IP*EXPAND( 4 ) ) * MSTRID( 4 )
      :                         + IM( 5 )
                      IN( 4 ) = IP * STRID( 4 ) + IN( 5 )
    
@@ -240,9 +245,9 @@
      :                                  + IM( 2 )
                               IN( 1 ) = IP + IN( 2 )
 
-*  Multiply the input value by the mask value and copy the product to the 
-*  output array. Check that the product fits within the range of the data
-*  type.
+*  Multiply the input value by the mask value and copy the product to 
+*  the output array.  Check that the product fits within the range of
+*  the data type.
                               MV = MASK( IM( 1 ) )
                               IV = INARR( IN( 1 ) )
                               IF( MV .NE. VAL__BADR .AND.
@@ -282,22 +287,24 @@
                IN( 6 ) = ( I6 - 1 ) / EXPAND( 6 ) * STRID( 6 ) + IN( 7 )
    
                DO I5 = 1, ODIMS( 5 )
-                  IN( 5 ) = ( I5 - 1 ) / EXPAND( 5 ) * STRID( 5 ) + IN( 6 )
+                  IN( 5 ) = ( I5 - 1 ) / EXPAND( 5 ) * STRID( 5 ) +
+     :                      IN( 6 )
    
                   DO I4 = 1, ODIMS( 4 )
                      IN( 4 ) = ( I4 - 1 ) / EXPAND( 4 ) * STRID( 4 ) +
      :                         IN( 5 )
    
                      DO I3 = 1, ODIMS( 3 )
-                        IN( 3 ) = ( I3 - 1 ) / EXPAND( 3 ) * STRID( 3 ) +
-     :                            IN( 4 )
+                        IN( 3 ) = ( I3 - 1 ) / EXPAND( 3 ) * 
+     :                            STRID( 3 ) + IN( 4 )
    
                         DO I2 = 1, ODIMS( 2 )
-                           IN( 2 ) = ( I2 - 1 ) / EXPAND( 2 ) * STRID( 2 )
-     :                               + IN( 3 )
+                           IN( 2 ) = ( I2 - 1 ) / EXPAND( 2 ) * 
+     :                               STRID( 2 ) + IN( 3 )
    
                            DO I1 = 1, ODIMS( 1 )
-                              IN( 1 ) = ( I1 - 1 ) / EXPAND( 1 ) + IN( 2 )
+                              IN( 1 ) = ( I1 - 1 ) / EXPAND( 1 ) + 
+     :                                  IN( 2 )
                               OUTARR( IO ) = INARR( IN( 1 ) )
                               IO = IO + 1
    
