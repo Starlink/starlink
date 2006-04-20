@@ -1647,7 +1647,7 @@ iraf! {
             type LITERAL
             prompt {IARC output file}
             ppath CURRENT
-            vpath CURRENT
+            vpath DEFAULT
             default !
             helpkey *
           }
