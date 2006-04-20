@@ -60,6 +60,8 @@ f     The PolyMap class does not define any new routines beyond those
 *        FitsChans. 
 *     20-MAY-2005 (DSB):
 *        Correct the indexing of keywords produced in the Dump function.
+*     20-APR-2006 (DSB):
+*        Guard against undefined transformations in Copy.
 *class--
 */
 
@@ -870,36 +872,38 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Copy the number of coefficients associated with each output of the forward 
    transformation. */
-   out->ncoeff_f = (int *) astStore( NULL, (void *) in->ncoeff_f,
-                                     sizeof( int )*(size_t) nout ); 
+   if( in->ncoeff_f ) {
+      out->ncoeff_f = (int *) astStore( NULL, (void *) in->ncoeff_f,
+                                        sizeof( int )*(size_t) nout ); 
 
 /* Copy the maximum power of each input axis value used by the forward 
    transformation. */
-   out->mxpow_f = (int *) astStore( NULL, (void *) in->mxpow_f,
-                                    sizeof( int )*(size_t) nin ); 
+      out->mxpow_f = (int *) astStore( NULL, (void *) in->mxpow_f,
+                                       sizeof( int )*(size_t) nin ); 
 
 /* Copy the coefficient values used by the forward transformation. */
-   if( in->coeff_f ) {
-      out->coeff_f = astMalloc( sizeof( double * )*(size_t) nout );
-      if( astOK ) {
-         for( i = 0; i < nout; i++ ) {
-            out->coeff_f[ i ] = (double *) astStore( NULL, (void *) in->coeff_f[ i ],
-                                                  sizeof( double )*(size_t) in->ncoeff_f[ i ] ); 
+      if( in->coeff_f ) {
+         out->coeff_f = astMalloc( sizeof( double * )*(size_t) nout );
+         if( astOK ) {
+            for( i = 0; i < nout; i++ ) {
+               out->coeff_f[ i ] = (double *) astStore( NULL, (void *) in->coeff_f[ i ],
+                                                     sizeof( double )*(size_t) in->ncoeff_f[ i ] ); 
+            }
          }
       }
-   }
 
 /* Copy the input axis powers associated with each coefficient of the forward 
    transformation. */
-   if( in->power_f ) {
-      out->power_f = astMalloc( sizeof( int ** )*(size_t) nout );
-      if( astOK ) {
-         for( i = 0; i < nout; i++ ) {
-            out->power_f[ i ] = astMalloc( sizeof( int * )*(size_t) in->ncoeff_f[ i ] );
-            if( astOK ) {
-               for( j = 0; j < in->ncoeff_f[ i ]; j++ ) {
-                  out->power_f[ i ][ j ] = (int *) astStore( NULL, (void *) in->power_f[ i ][ j ],
-                                                             sizeof( int )*(size_t) nin );
+      if( in->power_f ) {
+         out->power_f = astMalloc( sizeof( int ** )*(size_t) nout );
+         if( astOK ) {
+            for( i = 0; i < nout; i++ ) {
+               out->power_f[ i ] = astMalloc( sizeof( int * )*(size_t) in->ncoeff_f[ i ] );
+               if( astOK ) {
+                  for( j = 0; j < in->ncoeff_f[ i ]; j++ ) {
+                     out->power_f[ i ][ j ] = (int *) astStore( NULL, (void *) in->power_f[ i ][ j ],
+                                                                sizeof( int )*(size_t) nin );
+                  }
                }
             }
          }
@@ -907,31 +911,33 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    }
 
 /* Do the same for the inverse transformation. */
-   out->ncoeff_i = (int *) astStore( NULL, (void *) in->ncoeff_i,
-                                     sizeof( int )*(size_t) nin ); 
-
-   out->mxpow_i = (int *) astStore( NULL, (void *) in->mxpow_i,
-                                    sizeof( int )*(size_t) nout ); 
-
-   if( in->coeff_i ) {
-      out->coeff_i = astMalloc( sizeof( double * )*(size_t) nin );
-      if( astOK ) {
-         for( i = 0; i < nin; i++ ) {
-            out->coeff_i[ i ] = (double *) astStore( NULL, (void *) in->coeff_i[ i ],
-                                                  sizeof( double )*(size_t) in->ncoeff_i[ i ] ); 
+   if( in->ncoeff_i ) {
+      out->ncoeff_i = (int *) astStore( NULL, (void *) in->ncoeff_i,
+                                        sizeof( int )*(size_t) nin ); 
+   
+      out->mxpow_i = (int *) astStore( NULL, (void *) in->mxpow_i,
+                                       sizeof( int )*(size_t) nout ); 
+   
+      if( in->coeff_i ) {
+         out->coeff_i = astMalloc( sizeof( double * )*(size_t) nin );
+         if( astOK ) {
+            for( i = 0; i < nin; i++ ) {
+               out->coeff_i[ i ] = (double *) astStore( NULL, (void *) in->coeff_i[ i ],
+                                                     sizeof( double )*(size_t) in->ncoeff_i[ i ] ); 
+            }
          }
       }
-   }
-
-   if( in->power_i ) {
-      out->power_i = astMalloc( sizeof( int ** )*(size_t) nin );
-      if( astOK ) {
-         for( i = 0; i < nin; i++ ) {
-            out->power_i[ i ] = astMalloc( sizeof( int * )*(size_t) in->ncoeff_i[ i ] );
-            if( astOK ) {
-               for( j = 0; j < in->ncoeff_i[ i ]; j++ ) {
-                  out->power_i[ i ][ j ] = (int *) astStore( NULL, (void *) in->power_i[ i ][ j ],
-                                                             sizeof( int )*(size_t) nout );
+   
+      if( in->power_i ) {
+         out->power_i = astMalloc( sizeof( int ** )*(size_t) nin );
+         if( astOK ) {
+            for( i = 0; i < nin; i++ ) {
+               out->power_i[ i ] = astMalloc( sizeof( int * )*(size_t) in->ncoeff_i[ i ] );
+               if( astOK ) {
+                  for( j = 0; j < in->ncoeff_i[ i ]; j++ ) {
+                     out->power_i[ i ][ j ] = (int *) astStore( NULL, (void *) in->power_i[ i ][ j ],
+                                                                sizeof( int )*(size_t) nout );
+                  }
                }
             }
          }
