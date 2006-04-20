@@ -4,7 +4,7 @@
 *     KPG1_NOISx
 
 *  Purpose:
-*     Adds random Normal noise to a 1-d array.
+*     Adds random Normal noise to a one-dimensional array.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,9 +13,9 @@
 *     CALL KPG1_NOISx( BAD, EL, VARNCE, ARRAY, STATUS )
 
 *  Description:
-*     This routine takes a 1-d array and adds noise randomly to each
-*     element in the array.  The random number at each element is drawn
-*     from a Normal distribution whose spread is given by the
+*     This routine takes a one-dimensional array and adds noise randomly
+*     to each element in the array.  The random number at each element
+*     is drawn from a Normal distribution whose spread is given by the
 *     corresponding variance array at that element.
 
 *  Arguments:
