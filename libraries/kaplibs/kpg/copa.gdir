@@ -4,7 +4,7 @@
 *     COPA<T>
 
 *  Purpose:
-*     Copy 1D array.
+*     Copy a one-dimensional array.
 
 *  Language:
 *     VAX Fortran
@@ -26,38 +26,33 @@
 *        The global status.
 
 *  Description:
-*     The input 1-D array, ARRIN, of dimension DIM, is copied into the
-*     output 1-D array, ARROUT, of the same dimension.
-*     An immediate return will occur if STATUS has an error value on
-*     entry.
-
-*  Algorithm:
-*     If no error on entry then
-*        For all points in the input array
-*           Output array point is set to value of input array point.
-*        Endfor
-*     Endif
+*     The input one-dimensional array, ARRIN, of dimension DIM, is 
+*     copied into the output one-dimensional array, ARROUT, of the same 
+*     dimension.  An immediate return will occur if STATUS has an error
+*     value on entry.
 
 *  Copyright:
-*     Copyright (C) 1983, 1984, 1986 Science & Engineering Research Council.
-*     Copyright (C) 2006 Particle Physics & Engineering Research Council.
+*     Copyright (C) 1983, 1984, 1986 Science & Engineering Research
+*                   Council.
+*     Copyright (C) 2006 Particle Physics & Engineering Research
+*                   Council.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     ASOC5: Dave Baines (ROE)
@@ -67,15 +62,17 @@
 
 *  History:
 *     02-DEC-1983 (ASOC5):
-*         Original version
+*        Original version
 *     17-FEB-1984 (ASOC5):
-*         Documentation brought up to standard
+*        Documentation brought up to standard
 *     12-SEP-1986 (MJC):
-*         Renamed parameters section to arguments and tidied
+*        Renamed parameters section to arguments and tidied.
 *     23-NOV-1986 (MJC):
-*         Made generic.
+*        Made generic.
 *     17-APR-2006 (TIMJ):
-*         Made generic (again!)
+*        Made generic (again!)
+*     2006 April 20 (MJC):
+*        Modern style and Copytoofarright. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -84,24 +81,20 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            ! No default typing
+      IMPLICIT NONE              ! No default typing
 
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'        ! Standard ADAM definitions
+      INCLUDE 'SAE_PAR'          ! Standard ADAM definitions
 
 
 *  Arguments Given:
-      INTEGER
-     :  DIM
+      INTEGER DIM
 
-      <TYPE>
-     :  ARRIN( DIM )
-
+      <TYPE> ARRIN( DIM )
 
 *  Arguments Returned:
-      <TYPE>
-     :  ARROUT( DIM )
+      <TYPE> ARROUT( DIM )
 
 
 *  Status:
@@ -109,22 +102,18 @@
 
 
 *  Local Variables:
-      INTEGER
-     :  X                      ! Index to input/output array elements
+      INTEGER X                  ! Index to input/output array elements
 
 *.
 
 
-*    check for error on entry
-
+*  Check the inherited global status.
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*       for all points in input/output arrays
-
+*  For all points in input/output arrays
          DO  X = 1, DIM
 
-*          output array point is set to value of input array point
-
+*  Output array point is set to value of input array point.
             ARROUT( X ) = ARRIN( X )
          END DO
       END IF
