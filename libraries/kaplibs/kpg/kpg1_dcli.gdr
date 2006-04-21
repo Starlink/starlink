@@ -162,7 +162,7 @@
       DO  I = 1, ABS( NDIM )
 
 *  Map the axis centres for the dimension.
-         CALL NDF_AMAP( NDF, 'Centre', SGDIM( I ), <HTYPE>, 'READ',
+         CALL NDF_AMAP( NDF, 'Centre', SGDIM( I ), '<HTYPE>', 'READ',
      :                  AXPNTR, AEL, STATUS )
 
 *  Only evaluate the transformation when there are more than one element
