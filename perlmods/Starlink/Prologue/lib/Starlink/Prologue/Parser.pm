@@ -1,4 +1,4 @@
-package Starlink::Prolgue;
+package Starlink::Prologue::Parser;
 
 =head1 NAME
 
@@ -130,6 +130,7 @@ sub push_line {
 
     # create a object
     my $w = $fclass->new();
+    $self->_worker( $w );
     return $w->push_line( $line );
   }
 

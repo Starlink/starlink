@@ -31,8 +31,6 @@ use Starlink::Prologue;
 
 =head1 METHODS
 
-=head1 METHODS
-
 =head2 Constructor
 
 =over 4
@@ -111,6 +109,40 @@ sub content {
   return $self->{CONTENT};
 }
 
+=item B<flush_section>
+
+Migrate the current section information into the C<Starlink::Prologue>
+object.
+
+  $parser->flush_section();
+
+=cut
+
+sub flush_section {
+  my $self = shift;
+  my $section = $self->section;
+  return unless defined $section;
+
+  my @content = @{$self->{CONTENT}};
+
+  # remove any blank lines from the end of the content
+  my $pos = $#content;
+  if ($pos > -1) {
+    while ($content[$pos] =~ /^\s*$/) {
+      $pos--;
+    }
+    @content = @content[0..$pos];
+  }
+  # store the content
+  my $prl = $self->prologue;
+  $prl->content( $section, @content);
+
+  # reset internal state
+  $self->section( undef );
+  @{ $self->content } = ();
+
+}
+
 =back
 
 =head2 General
@@ -136,6 +168,7 @@ sub push_line {
   if (defined $prl) {
     # currently active prologue
     my $cchar = $prl->comment_char;
+    my $r = quotemeta( $cchar );
 
     # now need to parse the line. We have the following cases:
     # - end of prologue (*-)
@@ -153,10 +186,12 @@ sub push_line {
     # C comment end usually indicates end of prologue in modern
     #   implementation
 
-    if ( $line =~ /^\s*$cchar\-/  #  *-
+
+    if ( $line =~ /^\s*[$r]\-/  #  *-
 	 || $line =~ /\*\/$/      #  */
-	 || ($line !~ /\s*$cchar/ && $line =~ /\w/)  # real code
+	 || ($line !~ /\s*[$r]/ && $line =~ /\w/)  # real code
        ) {
+      print "End of prologue detected\n";
       # end of prologue so flush the current section
       $self->flush_section();
 
@@ -169,9 +204,13 @@ sub push_line {
       # return the newly minted version
       return $prl;
 
-    } elsif ( $line =~ /^\s*$cchar\s+(.*)$/ ) {
-      # prologue content (or *-)
-
+    } elsif ( $line =~ /^\s*[$r]\s+(.*):\s*$/ ) {
+      # section
+      $self->flush_section();
+      $self->section($1);
+    } elsif ( $line =~ /^\s*[$r]\s+(.*)\s*$/ ) {
+      # prologue content (or *- but that is dealt with above)
+      push(@{$self->content()}, $1);
     }
 
 
@@ -179,14 +218,16 @@ sub push_line {
     # looking for one to start
     my ($cchar, $title) = $self->prolog_start( $line );
     if (defined $cchar) {
+      chomp($line);
+      print "Starting prologue with comment char $cchar ($line)\n";
       # a new prologue is starting
       $prl = new Starlink::Prologue();
       $self->prologue( $prl );
-      $prl->comment_char( $char );
+      $prl->comment_char( $cchar );
 
       # are we in a section already?
       if (defined $title) {
-	$self->section( $section );
+	$self->section( $title );
 	@{$self->content} = ();
       }
 

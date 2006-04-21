@@ -1,4 +1,4 @@
-package Starlink::Prolgue;
+package Starlink::Prologue;
 
 =head1 NAME
 
@@ -56,9 +56,9 @@ sub METHOD {
     $self->content( $key, @_ );
   }
   if (wantarray) {
-    return ( $key, [$self->_content( $key ) ] );
+    return ( $key, [$self->content( $key ) ] );
   } else {
-    return [$self->_content( $key )];
+    return [$self->content( $key )];
   }
 }
 };
@@ -214,7 +214,11 @@ For standard sections, use the accessors directly.
 sub content {
   my $self = shift;
   my $tag = shift;
+  Carp::confess("Supplied tag is not defined!") unless defined $tag;
+
+  # copy in content and remove newlines
   my @content = @_;
+
 
   # Normalise the tag into standard form
   $tag =~ s/^\s+//;
@@ -268,6 +272,7 @@ sub misc_sections {
 
   my @misc;
   for my $p (@present) {
+    next unless $p; # blank keys are a bug
     push(@misc, $p) unless exists $standard{$p};
   }
   return @misc;
@@ -300,13 +305,16 @@ sub stringify {
   $code .= $cchar ."+\n";
 
   for my $h (@STANDARD_HEADERS, $self->misc_sections) {
-    my $meth = lc($h);
-    my ($title, $content) = $self->$meth();
 
-    $code .= $cchar . "  $title:\n";
-    for my $l (@$content) {
-      $code .= $cchar . "     " . $l ."\n";
+    my @content = $self->content( $h );
+
+    if (@content) {
+      $code .= $cchar . "  $h:\n";
+      for my $l (@content) {
+	$code .= $cchar . "     " . $l ."\n" if $l;
+      }
     }
+    $code .= "\n";
   }
 
   # end the prologue

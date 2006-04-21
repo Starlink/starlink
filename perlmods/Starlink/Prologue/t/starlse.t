@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 require_ok("Starlink::Prologue");
 require_ok("Starlink::Prologue::Parser");
@@ -9,7 +9,8 @@ require_ok("Starlink::Prologue::Parser");
 my $parser = new Starlink::Prologue::Parser();
 isa_ok( $parser, "Starlink::Prologue::Parser");
 
-while (my $line = <DATA>) {
+while (defined (my $line = <DATA>)) {
+  print "looping\n";
   my $status = $parser->push_line( $line );
 
   if (ref($status)) {
