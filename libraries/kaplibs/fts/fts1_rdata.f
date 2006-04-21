@@ -81,24 +81,25 @@
 *     End
 
 *  Copyright:
-*     Copyright (C) 1987, 1988, 1989, 1990, 1991, 1992 Science & Engineering Research Council.
+*     Copyright (C) 1987, 1988, 1989, 1990, 1991, 1992 Science &
+*                   Engineering Research Council.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     PMA: Peter Allan  (Manchester University)
@@ -127,6 +128,8 @@
 *        Added REVERS argument so that IEEE data are not reversed.
 *     1992 December (RDS):
 *        Added extra argument to FTS1_DREAD calls.
+*     2006 April 21 (MJC):
+*        Modern-style variable declarations and commenting.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -135,74 +138,55 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT  NONE           ! no default typing allowed
+      IMPLICIT  NONE             ! no default typing allowed
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'        ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER
-     :  BLKSIZ,                ! The maximum allowed blocksize on
-                               ! the FITS file
-     :  BPV,                   ! Number of bytes per value
-     :  MD,                    ! Medium descriptor
-     :  SIZE                   ! Number of elements in the data array
-
-      LOGICAL
-     :  REVERS                 ! Reverse the bytes in an array element
-
-      CHARACTER * ( * )
-     :  MEDIUM                 ! Data medium
+      CHARACTER * ( * ) MEDIUM
+      INTEGER MD    
+      INTEGER SIZE
+      INTEGER BPV
+      LOGICAL REVERS
+      INTEGER BLKSIZ
 
 *  Arguments Given and Returned:
-      INTEGER
-     :  ACTSIZ,                ! The actual blocksizes on the FITS tape
-                               ! or disk
-     :  OFFSET,                ! The number of bytes of the input
-                               ! block that must be skipped. Equal to
-                               ! ACTSIZ means read a new block.
-     :  RDISP                  ! The displacement within the current
-                               ! FITS record
-
-      BYTE
-     :  BUFFER( BLKSIZ ),      ! The input tape or disk buffer
-     :  RECORD( 2880 )         ! Current FITS record
+      INTEGER ACTSIZ
+      BYTE BUFFER( BLKSIZ )
+      INTEGER OFFSET
+      BYTE RECORD( 2880 )
+      INTEGER RDISP
 
 *  Arguments Returned:
-      BYTE
-     :  DARRAY( SIZE * BPV )   ! Data array
+      BYTE DARRAY( SIZE * BPV )
 
 *  Status:
-      INTEGER STATUS
+      INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER RECLEN           ! FITS record length
+      INTEGER RECLEN             ! FITS record length
       PARAMETER ( RECLEN = 2880 )
 
 *  Local Variables:
-      INTEGER
-     :  ACTNBT,                ! Number of bytes in input buffer
-                               ! actually transferred to the data array
-     :  DISP,                  ! Displacement pointer
-     :  I,                     ! Loop counter
-     :  J,                     ! Loop counter
-     :  NBT,                   ! Number of bytes left in the current
-                               ! record yet to be transferred to the
-                               ! data array
-     :  NBYTES                 ! Number of bytes in data array
-
-      LOGICAL                  ! True if:
-     :  TAPE                   ! The medium is a standard tape
+      INTEGER ACTNBT             ! Number of bytes in input buffer
+                                 ! actually transferred to data array
+      INTEGER DISP               ! Displacement pointer
+      INTEGER I                  ! Loop counter
+      INTEGER J                  ! Loop counter
+      INTEGER NBT                ! Number of bytes left in the current
+                                 ! record yet to be transferred to the
+                                 ! data array
+      INTEGER NBYTES             ! Number of bytes in data array
+      LOGICAL TAPE               ! Medium is a standard tape?
 
 *.
 
 
-*    Check for error on entry.
-
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Make sure the medium is permitted.
-
+*  Make sure the medium is permitted.
       IF ( MEDIUM .NE. 'TAPE' .AND. MEDIUM .NE. 'DISK' ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'MEDIUM', MEDIUM )
@@ -212,66 +196,54 @@
          GOTO 999
       END IF
 
-*    Calculate the number of bytes in the data.
-
+*  Calculate the number of bytes in the data.
       NBYTES = BPV * SIZE
 
-*    Use a logical for efficiency to determine which calls to make to
-*    read in the FITS file.
-
+*  Use a logical for efficiency to determine which calls to make to
+*  read in the FITS file.
       TAPE = MEDIUM .EQ. 'TAPE'
 
-*    Initialise the displacement pointer.
-
+*  Initialise the displacement pointer.
       DISP = 0
 
-*    Read the blocks of data.
-*    ========================
-
+*  Read the blocks of data.
+*  ========================
       DO WHILE ( DISP .LT. NBYTES )
 
-*       Are there data already read in the last block of
-*       header cards, waiting to be transferred to the array?
-
+*  Are there data already read in the last block of header cards, 
+*  waiting to be transferred to the array?
          IF ( RDISP .EQ. RECLEN ) THEN
 
-*          No the buffer has been exhausted.
+*  No the buffer has been exhausted.
 
-*          Read the tape.
-
+*  Read the tape.
             IF ( TAPE ) THEN
                CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ, BUFFER, OFFSET,
      :                          RECORD, STATUS )
 
-*          Read the disk file.
-
+*  Read the disk file.
             ELSE
                CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE., BUFFER, 
      :                          OFFSET, RECORD, STATUS )
             END IF
 
-*          Error reading the FITS file.  Report context and abort.
-
+*  Error reading the FITS file.  Report context and abort.
             IF ( STATUS .NE. SAI__OK ) GOTO 980
 
-*          Start of a new record so reset the record displacement.
-
+*  Start of a new record so reset the record displacement.
             RDISP = 0
          END IF
 
-*       Determine the number of bytes remaining in the current record.
-
+*  Determine the number of bytes remaining in the current record.
          NBT = RECLEN - RDISP
 
-*       Now the actual number to be transferred.
-
+*  Now the actual number to be transferred.
          ACTNBT = MIN( NBT, NBYTES - DISP )
 
-*       ** VAX specific **
-*       Copy the data from the record to the data array, swapping bytes
-*       wwhere requested since a Vax stores bytes in the reverse order
-*       to what is in the FITS file.
-
+*  ** VAX specific **
+*  Copy the data from the record to the data array, swapping bytes
+*  where requested since a Vax stores bytes in the reverse order
+*  to what is in the FITS file.
          IF ( REVERS ) THEN
             DO I = 1, ACTNBT, BPV
                DO J = 1, BPV
@@ -286,10 +258,9 @@
          END IF
          DISP = DISP + ACTNBT
 
-*       Compute the offset in the current record for any further data,
-*       both within the primary data array and in any FITS groups.  If
-*       this is equal to RECLEN further data will be in a new record.
-
+*  Compute the offset in the current record for any further data,
+*  both within the primary data array and in any FITS groups.  If
+*  this is equal to RECLEN further data will be in a new record.
          RDISP = RDISP + ACTNBT
       END DO
 
