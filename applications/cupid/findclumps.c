@@ -379,7 +379,9 @@ void findclumps() {
 *     being correct. [2*RMS]
 *     - ClumpFind.FwhmBeam: The FWHM of the instrument beam, in pixels. The 
 *     clump widths written to the output catalogue are reduced (in
-*     quadrature) by this amount. [2.0]
+*     quadrature) by this amount. If a direct comparison with other 
+*     implementations of the ClumpFind algorithm is required, a value of zero
+*     should be used. [2.0]
 *     - ClumpFind.Level<n>: The n'th data value at which to contour the
 *     data array (where <n> is an integer). Values should be given for 
 *     "Level1", "Level2", "Level3", etc. Any number of contours can be 
@@ -402,7 +404,8 @@ void findclumps() {
 *     as real clumps. The default value is based on the supplied values
 *     for the other parameters that specify the minimum peak height, the
 *     background level and the instrumental beam widths, limited to be at
-*     least 16 pixels. []
+*     least 16 pixels. If a direct comparison with other implementations
+*     of the ClumpFind algorithm is required, a value of 5 should be used. []
 *     - ClumpFind.Naxis: Controls the way in which contiguous areas of
 *     pixels are located when contouring the data. When a pixel is found
 *     to be at or above a contour level, the adjacent pixels are also checked.
@@ -431,7 +434,9 @@ void findclumps() {
 *     "DeltaT". [2*RMS]
 *     - ClumpFind.VeloRes: The velocity resolution of the instrument, in
 *     channels. The velocity width of each clump written to the output 
-*     catalogue is reduced (in quadrature) by this amount. [2.0]
+*     catalogue is reduced (in quadrature) by this amount. If a direct 
+*     comparison with other implementations of the ClumpFind algorithm is 
+*     required, a value of zero should be used. [2.0]
 
 *  Reinhold Configuration Parameters:
 *     The Reinhold algorithm uses the following configuration parameters. 
