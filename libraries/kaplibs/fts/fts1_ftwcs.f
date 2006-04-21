@@ -17,36 +17,37 @@
 
 *  Description:
 *     This constructs an AST FrameSet from the supplied FITS headers 
-*     and adds it into the existing WCS information in the supplied NDF. 
+*     and adds it into the existing WCS information in the supplied NDF.
 *     It can also create AXIS structures (see below).
 *
-*     The information needed to create the FrameSet can be stored several
-*     times in a single FITS header, using different keywords each time. Each
-*     of these descriptions is known as an "encoding" and AST supports several
-*     different encoding schemes (i.e. FITS-WCS, FITS-IRAF, DSS, NATIVE, etc).
-*     If the supplied FITS header contains more than one encoding then we
-*     need to choose which one to use. This decision is important because
-*     is is possible for encodings to be inconsistent (i.e. software may
-*     modify one encoding without making equivalent modifications to the
-*     other encodings). The simplest way to make this decision is to hand
+*     The information needed to create the FrameSet can be stored
+*     several times in a single FITS header, using different keywords 
+*     each time. Each of these descriptions is known as an "encoding" 
+*     and AST supports several different encoding schemes (e.g.
+*     FITS-WCS, FITS-IRAF, DSS, NATIVE).  If the supplied FITS header 
+*     contains more than one encoding then we need to choose which one 
+*     to use. This decision is important because is is possible for 
+*     encodings to be inconsistent (i.e. software may modify one 
+*     encoding without making equivalent modifications to the other 
+*     encodings). The simplest way to make this decision is to hand
 *     responsibility for it over to the user. In this case, the user
-*     supplies a list of preferred encodings, and the first of these encodings
-*     which exists in the FITS header gets used. If the user does not
-*     know which encoding to use, then we can make an intelligent guess by
-*     comparing the encodings to see which ones are consistent and which
-*     ones are not. 
+*     supplies a list of preferred encodings, and the first of these 
+*     encodings that exists in the FITS header gets used. If the user 
+*     does not know which encoding to use, then we can make an 
+*     intelligent guess by comparing the encodings to see which ones are
+*     consistent and which ones are not. 
 *
 *     In addition to the WCS component, this routine also creates AXIS 
-*     Centre, Label and Units components in the NDF, but only if they do 
+*     Centre, Label and Units components in the NDF, but only if they do
 *     not already exist, and if the FrameSet read from the FITS header 
-*     contains an AXIS Frame. NDF2FITS does not write out the AXIS Frame 
-*     if it is equivalent to pixel coordinates, and so no AXIS structures 
-*     will be created by this routine in this case. Also, if the AXIS Frame 
-*     represents linear axis coordinates, then there will already be AXIS 
-*     structures in the NDF (created earlier within FITSIN), and so again 
-*     no AXIS  structures will be created by this routine. Thus, this routine 
-*     will only create AXIS structures in the cases where the axis coordinates 
-*     are non-linear.
+*     contains an AXIS Frame. NDF2FITS does not write out the AXIS Frame
+*     if it is equivalent to pixel co-ordinates, and so no AXIS 
+*     structures will be created by this routine in this case. Also, if
+*     the AXIS Frame represents linear axis co-ordinates, then there
+*     will already be AXIS structures in the NDF (created earlier within
+*     FITSIN), and so again no AXIS  structures will be created by this
+*     routine. Thus, this routine will only create AXIS structures in
+*     the cases where the axis co-ordinates are non-linear.
 
 *  Arguments:
 *     NCARD = INTEGER (Given)
@@ -65,14 +66,15 @@
 *     NENCOD = INTEGER (Given)
 *        The number of encodings supplied in ENCODS.
 *     ENCODS( NENCOD ) = CHARACTER * ( * ) (Given)
-*        The user's preferred AST encodings. If NENCOD is zero, then this
-*        is ignored, and an intelligent guess is made as to which encoding
-*        to use (see FTS1_WCSIM).
+*        The user's preferred AST encodings. If NENCOD is zero, then 
+*        this is ignored, and an intelligent guess is made as to which
+*        encoding to use (see FTS1_WCSIM).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1998, 1999 Central Laboratory of the Research Councils.
+*     Copyright (C) 1998, 1999 Central Laboratory of the Research
+*                   Councils.
 *     All Rights Reserved.
 
 *  Licence:
@@ -101,11 +103,12 @@
 *     14-SEP-1998 (DSB):
 *        Changed to report the first 3 bad header cards.
 *     9-DEC-1998 (DSB):
-*        Included FITS-IRAF encoding. Do not flush errors reported within
-*        this routine. The caller now has responsibility for this.
+*        Included FITS-IRAF encoding. Do not flush errors reported
+*        within this routine. The caller now has responsibility for
+*        this.
 *     16-DEC-1999 (DSB):
-*        Added call to FTS1_ASTWN to report warning messages stored in the
-*        FitsChan by AST.
+*        Added call to FTS1_ASTWN to report warning messages stored in
+*        the FitsChan by AST.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -132,8 +135,8 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER MXBADH             ! Max. no. of bad header card indices to save
-      PARAMETER (MXBADH = 3)    
+      INTEGER MXBADH             ! Maximum no. of bad header card 
+      PARAMETER (MXBADH = 3)     ! indices to save
 
 *  Local Variables:
       INTEGER BADH( MXBADH )     ! Indices of bad header cards
@@ -162,8 +165,8 @@
       DO IHEAD = SCARD, NCARD
 
 *  Add this header into the FitsChan. If an error occurs, annul the
-*  error, increment the number of bad headers, and continue to process any
-*  remaining headers.
+*  error, increment the number of bad headers, and continue to process 
+*  any remaining headers.
          CALL AST_PUTFITS( FC, HEADER( IHEAD ), 1, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )

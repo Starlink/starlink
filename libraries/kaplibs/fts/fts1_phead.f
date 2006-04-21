@@ -158,25 +158,27 @@
 *     End
 
 *  Copyright:
-*     Copyright (C) 1987, 1988, 1989, 1990, 1992 Science & Engineering Research Council.
-*     Copyright (C) 1996, 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 1987, 1988, 1989, 1990, 1992 Science & Engineering
+*                   Research Council.
+*     Copyright (C) 1996, 2004 Central Laboratory of the Research 
+*                   Councils.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     PMA: Peter Allan  (Manchester University)
@@ -268,14 +270,14 @@
       INTEGER OFFSET             ! The number of bytes of the last data
                                  ! block that contains header
                                  ! information
-                                 ! Equal to ACTSIZ means the current block
-                                 ! is wholly header.
+                                 ! Equal to ACTSIZ means the current 
+                                 ! block is wholly header
       LOGICAL CURREC             ! Use the current FITS record
                                  ! immediately?
 
 *  Arguments Returned:
       INTEGER HSTART( MAXHDR )   ! Start card in each header section
-      INTEGER HDNUM( MAXHDR )    ! Number of cards in each header section
+      INTEGER HDNUM( MAXHDR )    ! No. of cards in each header section
       LOGICAL EXTEND             ! File contains extensions?
       INTEGER NHEADS             ! Number of header sections found in
                                  ! the sub-file
@@ -285,7 +287,7 @@
 
 *  Local Constants:
       INTEGER NOCARD             ! Number of cards in a FITS record
-      PARAMETER ( NOCARD = 36 )! 2880 / 80 characters
+      PARAMETER ( NOCARD = 36 )  ! 2880 / 80 characters
 
 *  Local Variables:
       INTEGER CARD               ! Number of card image in current block

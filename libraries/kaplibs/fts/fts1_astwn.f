@@ -99,14 +99,15 @@
       MESS = ' '
       IAT = 0
 
-*  Rewind the FitsChan so that the following search starts with the first
-*  card.
+*  Rewind the FitsChan so that the following search starts with the
+*  first card.
       CALL AST_CLEAR( FC, 'Card', STATUS )
 
 *  Search the FItsChan for cards containing messages issued by AST.
       DO WHILE( AST_FINDFITS( FC, 'ASTWARN', HEADER, .TRUE., STATUS ) )
 
-*  Extract the keyword value from the header card (minus delimiting quotes).
+*  Extract the keyword value from the header card (minus delimiting 
+*  quotes).
          VALUE = ' '
          START = INDEX( HEADER, '''' ) 
          IF( START .NE. 0 ) THEN
@@ -122,14 +123,14 @@
          CALL CHR_LDBLK( VALUE )
          HLEN = CHR_LEN( VALUE )
 
-*  If the value is not blank, append it to the total message, followed by
-*  a single space. Indicate we have a message to send.
+*  If the value is not blank, append it to the total message, followed
+*  by a single space. Indicate we have a message to send.
          IF( HLEN .GT. 0 ) THEN
             CALL CHR_APPND( VALUE( : HLEN ), MESS, IAT )
             IAT = IAT + 1
             REPORT = .TRUE.
 
-*  Otherwise, display the current total message. Prepend the name of the 
+*  Otherwise, display the current total message. Prepend the name of the
 *  NDF to the first non-blank warning.
          ELSE
             CALL MSG_SETC( 'T', MESS )

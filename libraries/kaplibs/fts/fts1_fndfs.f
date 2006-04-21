@@ -25,8 +25,8 @@
 *        The global status.
 
 *  Notes:
-*     -  The FitsChan is not rewound before reading. The first read starts at 
-*     the current Card in the FitsChan.
+*     -  The FitsChan is not rewound before reading. The first read 
+*     starts at the current Card in the FitsChan.
 *     -  No value is set for the FitsChan Encoding attribute.
 *     -  OBJ is returned equal to AST__NULL if no FrameSet can be read
 *     from the supplied FitsChan, or if an error occurs.

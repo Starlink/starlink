@@ -17,7 +17,7 @@
 *  Description:
 *     This routine searches for the mandatory FITS header keywords
 *     stored in a buffer, and their values are returned, if they
-*     are present. Should an item be missing or have an unsupported
+*     are present.  Should an item be missing or have an unsupported
 *     value an error is reported, a bad status is set and the routine
 *     exits. This version supports mandatory descriptors that are not
 *     in the correct order.
@@ -94,25 +94,26 @@
 *     End
 
 *  Copyright:
-*     Copyright (C) 1988, 1989, 1990, 1991 Science & Engineering Research Council.
+*     Copyright (C) 1988, 1989, 1990, 1991 Science & Engineering
+*                   Research Council.
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)

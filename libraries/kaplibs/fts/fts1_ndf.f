@@ -22,8 +22,8 @@
 *                    FMTOUT, IEEE, BADPIX, BLANK, BSCALE, BZERO, DARRAY,
 *                    NONSDA, GCOUNT, PCOUNT, MXPARM, PTYPE, PSCALE,
 *                    PZERO, FILROO, LOGHDR, FD, CFN, SUBFIL, GEXTND,
-*                    NCARD, HEADER, SCARD, NENCOD, ENCODS, BLKSIZ, ACTSIZ, 
-*                    OFFSET, CURREC, NEXT, PARAMS, STATUS )
+*                    NCARD, HEADER, SCARD, NENCOD, ENCODS, BLKSIZ, 
+*                    ACTSIZ, OFFSET, CURREC, NEXT, PARAMS, STATUS )
 
 *  Description:
 *
@@ -32,23 +32,23 @@
 *     and name an NDF; copy the FITS data to the NDF's data array,
 *     performing a data conversion if requested and flagging blank data
 *     with the standard bad-pixel values; generate the other
-*     components: title, units, WCS, axis structure and the FITS extension.
-*     For group-format FITS data, a series of NDFs are created, one per
-*     group, each with a generated filename.  A null NDF may be given
-*     and this routine will exit, but permit the calling routine to
-*     continue to the next FITS file.
+*     components: title, units, WCS, axis structure and the FITS 
+*     extension.  For group-format FITS data, a series of NDFs are 
+*     created, one per group, each with a generated filename.  A null 
+*     NDF may be given and this routine will exit, but permit the 
+*     calling routine to continue to the next FITS file.
 
 *  Arguments:
 *     HEADER( * ) = CHARACTER * 80 (Given)
 *        The FITS headers in 80-character records.
 *     BFPNTR = INTEGER (Given)
-*        Pointer to BUFFER( BLKSIZ ) = CHARACTER * 1 (Given and Returned)
-*        The buffer containing the block of data. This is only read
-*        when %OFFSET does not equal %ACTSIZ, i.e. there are some
-*        non-header data within it.
+*        Pointer to BUFFER( BLKSIZ ) = CHARACTER * ( 1 ) (Given and 
+*        Returned).  The buffer containing the block of data.  This is 
+*        only read when %OFFSET does not equal %ACTSIZ, i.e. there are 
+*        some non-header data within it.
 *     RCPNTR = INTEGER (Given)
-*        Pointer to RECORD( 36 ) = CHARACTER * ( 80 ) (Given and Returned)
-*        The buffer to hold the current FITS record.
+*        Pointer to RECORD( 36 ) = CHARACTER * ( 80 ) (Given and 
+*        Returned).  The buffer to hold the current FITS record.
 *     AUTO = LOGICAL (Given)
 *        If true the processing should be done in automatic mode, where
 *        the user is not prompted for file names, since these are
@@ -154,10 +154,10 @@
 *     NENCOD = INTEGER (Given)
 *        The number of AST encodings supplied in ENCODS.
 *     ENCODS( NENCOD ) = CHARACTER * ( * ) (Given)
-*        The user's preferred AST encodings. If NENCOD is zero, then this
-*        is ignored, and an intelligent guess is made as to which encoding
-*        to use. The encoding determines which FITS headers are used to
-*        create the NDF WCS component.
+*        The user's preferred AST encodings.  If NENCOD is zero, then 
+*        this is ignored, and an intelligent guess is made as to which
+*        encoding to use.  The encoding determines which FITS headers 
+*        are used to create the NDF WCS component.
 *     BLKSIZ = INTEGER (Given)
 *        The maximum blocksize and dimension of the tape/disk buffer.
 *     ACTSIZ = INTEGER (Given and Returned)
@@ -182,25 +182,27 @@
 *  Algorithm:
 
 *  Copyright:
-*     Copyright (C) 1990, 1991, 1992, 1993 Science & Engineering Research Council.
-*     Copyright (C) 1998, 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 1990, 1991, 1992, 1993 Science & Engineering
+*                   Research Council.
+*     Copyright (C) 1998, 2004 Central Laboratory of the Research
+*                   Councils.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or
+*     This programme is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
+*     PURPOSE.  See the GNU General Public License for more details.
 *     
 *     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -233,9 +235,10 @@
 *     9-JUN-1998 (DSB):
 *        Added support for NDF WCS component.
 *     8-OCT-1998 (DSB):
-*        KPG1_CHVAx changed to FTS1_CHVAx so that they can be in libfits.a.
+*        KPG1_CHVAx changed to FTS1_CHVAx so that they can be in 
+*         libfits.a.
 *     2004 September 1 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
