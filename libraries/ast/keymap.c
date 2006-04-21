@@ -60,7 +60,8 @@ f     - AST_MAPSIZE: Get the number of entries in a KeyMap
 f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 1997-2006 Council for the Central Laboratory of the
+*     Research Councils
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or

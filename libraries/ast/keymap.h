@@ -27,7 +27,8 @@
 *     The KeyMap class inherits from the Object class.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 1997-2006 Council for the Central Laboratory of the
+*     Research Councils
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or

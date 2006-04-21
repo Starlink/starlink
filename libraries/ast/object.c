@@ -74,7 +74,8 @@ f     - AST_TUNE: Set or get an AST tuning parameter
 f     - AST_VERSION: Return the verson of the AST library being used.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 1997-2006 Council for the Central Laboratory of the
+*     Research Councils
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or

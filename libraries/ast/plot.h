@@ -549,7 +549,8 @@ f     - Strings: Text strings drawn using AST_TEXT
 *        provided for external calls to the AST library.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 1997-2006 Council for the Central Laboratory of the
+*     Research Councils
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or

@@ -130,7 +130,8 @@ c     - astPutCards: Stores a set of FITS header card in a FitsChan
 f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 1997-2006 Council for the Central Laboratory of the
+*     Research Councils
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or

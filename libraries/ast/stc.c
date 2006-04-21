@@ -44,7 +44,8 @@ c     - astGetStcNCoord: Returns the number of AstroCoords elements in an Stc
 f     - AST_GETSTCNCOORD: Returns the number of AstroCoords elements in an Stc
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 1997-2006 Council for the Central Laboratory of the
+*     Research Councils
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
