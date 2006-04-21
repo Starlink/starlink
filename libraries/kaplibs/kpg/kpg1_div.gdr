@@ -107,9 +107,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
 
-*  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Define NUM_ERROR status flag
-
 *  Arguments Given:
       LOGICAL BAD
       LOGICAL VAR
