@@ -44,12 +44,12 @@ C       Autoconf symbols
       IMPLICIT NONE
       CHARACTER COM*(*)
       INTEGER ISTATUS
-#if HAVE_INTINSIC_SH
+#if HAVE_INTRINSIC_SH
       INTEGER SH
 #elif HAVE_INTRINSIC_SYSTEM
       INTEGER SYSTEM
 #else
-# error "Unable to run system commands"
+  error "Unable to run system commands"
 #endif
 
 *     Execute the system command
