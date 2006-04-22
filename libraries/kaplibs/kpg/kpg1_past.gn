@@ -5,7 +5,7 @@
 *     KPG1_PASTx
  
 *  Purpose:
-*     Pastes an array onto another.
+*     Pastes an array on to another.
  
 *  Language:
 *     Starlink Fortran 77
@@ -15,7 +15,7 @@
 *                      INARR, ODIMS, ELO, BASE, STATUS )
  
 *  Description:
-*     This routine `pastes' an array onto another array.  Values of
+*     This routine `pastes' an array on to another array.  Values of
 *     the underlying array are replaced by values in the pasted
 *     array, except that bad values may also be made transparent,
 *     in other words the original base array appears through the bad
@@ -40,14 +40,14 @@
 *     ELI = INTEGER (Given)
 *        The number of elements in the array to be pasted.
 *     INARR( ELI ) = ? (Given)
-*        The array that will be pasted onto the base array.
+*        The array that will be pasted on to the base array.
 *     ODIMS( NDF__MXDIM ) = INTEGER (Given)
 *        The dimensions of the base array.  Unused dimensions up to
 *        NDF__MXDIM should be set to one.
 *     ELO = INTEGER (Given)
 *        The number of elements in the base array.
 *     BASE( ELO ) = ? (Given and Returned)
-*        The base array onto which the input array will be pasted.
+*        The base array on to which the input array will be pasted.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
  
