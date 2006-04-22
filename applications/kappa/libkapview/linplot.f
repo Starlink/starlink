@@ -1312,12 +1312,14 @@
 
       END IF
 
+*  Create a Plot.
+*  ==============
+*
 *  If the above code did not produce a Plot which can be used to draw
 *  the new data plot, we create one now by creating a new DATA picture
 *  within the current picture, making it as large as possible.  The
 *  bounds of this picture are specified by the user, with the bounds of
 *  the supplied data being used as the default picture bounds.
-*  ====================================================================
 
       IF( .NOT. NEWPIC .AND. STATUS .EQ. SAI__OK ) THEN 
 
@@ -1345,7 +1347,7 @@
      :                                       STATUS ),
      :                       STATUS )
 
-*  Find the limits of the axis 1 data value in the "what we want"
+*  Find the limits of the axis-1 data value in the "what we want"
 *  Frame, including any required error bars.  This returns the central 
 *  and extreme X-axis values for each error bar in the "what we want"
 *  Frame.
