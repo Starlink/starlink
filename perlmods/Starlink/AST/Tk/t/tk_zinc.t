@@ -10,7 +10,13 @@ require_ok("Starlink::AST::Tk");
 BEGIN {
 
  use Tk;
- use Tk::Zinc;
+
+ eval "use Tk::Zinc";
+ if ($@) {
+   plan skip_all => "Tk::Zinc module not installed";
+   exit;
+ }
+
  eval "use Tk::Button;";
  if ( $@ ) {
    plan skip_all => "Tk modules not installed";

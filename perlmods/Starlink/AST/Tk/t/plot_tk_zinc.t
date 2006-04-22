@@ -17,8 +17,18 @@ print "# zoom = $zoom, xfactor = $factor[0], yfactor = $factor[1]\n";
 
 BEGIN {
 
- use Tk;
- use Tk::Zinc;
+ eval "use Tk";
+ if ($@) {
+   plan skip_all => "Tk module not installed";
+   exit;
+ }
+
+ eval "use Tk::Zinc";
+ if ($@) {
+   plan skip_all => "Tk::Zinc module not installed";
+   exit;
+ }
+
  eval "use Tk::Button";
  if ( $@ ) {
    plan skip_all => "Tk modules not installed";
