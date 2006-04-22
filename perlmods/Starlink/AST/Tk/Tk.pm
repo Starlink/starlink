@@ -25,9 +25,10 @@ The following helper methods are also provided,
 
 =head1 DESCRIPTION
 
-This file implements the low level graphics functions required by the rest
-of AST, by calling suitable Tk::Canvas functions. In all the routines $w
-is a reference to the Tk::Canvas object on which we're plotting.
+This file implements the low level graphics functions required by the
+rest of AST, by calling suitable Tk::Canvas or Tk::Zinc functions. In
+all the routines $w is a reference to the Tk::Canvas or Tk::Zinc
+object on which we're plotting.
 
 =head1 NOTES
 
@@ -50,6 +51,7 @@ use Tk;
 use Tk::Font;
 use Starlink::AST;
 use Carp;
+use Data::Dumper;
 
 '$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
@@ -59,6 +61,11 @@ use constant EXT_ATTR => 9;
 # reference height for characters as a fraction of the 
 # full height/width of the display
 use constant DEFAULT_CHAR_HEIGHT => 1 / 40;
+
+# Tk::Zinc drawing objects need a group number. Not sure if we need to
+# get complicated with groups, so, for now, use the root group, which
+# is 1.
+use constant TK_ZINC_GROUP => 1;
 
 # Static look up tables mapping AST index to Tk equivalent
 # Note that the "black" and "white" entries are really default
@@ -82,14 +89,26 @@ my @COLOURS = qw( black
 		  grey
 	       );
 
-# Line styles are
+# Line style specification depends on whether the canvas is a
+# Tk::Canvas widget or a Tk::Zinc widget.
+my %LINE_STYLES = (
+# Line styles for Tk::Canvas are
 #    solid, long dashes, dash-dot-dash-dot, dotted and dash-dot-dot-dot.
-my @LINE_STYLES = (undef,
-		   undef,  # default is solid
-		   '-',
-		   '-.',
-		   '..',
-		   '-...',
+		   'Tk::Canvas' => [undef,
+				    undef,  # default is solid
+				    '-',
+				    '-.',
+				    '..',
+				    '-...'],
+# Line styles for Tk::Zinc are simple (solid), dashed, mixed
+#  (dash-dot-dash-dot), and dotted. Tk::Zinc does not support
+#  dash-dot-dot-dot, so just use mixed for that case.
+		   'Tk::Zinc' => [undef,
+				  undef,  # default is solid
+				  'dashed',
+				  'mixed',
+				  'dotted',
+				  'mixed']
 		  );
 
 # Look up from AST attribute number to Attribute hash key
@@ -180,9 +199,12 @@ sub _GLine {
 
      # line style
      my $lindex = $external->[EXT_ATTR]->{LINE}->{STYLE};
-     my $lstyle;
-     $lstyle = $LINE_STYLES[ $lindex ] if defined $lindex;
-     $opts{'-dash'} = $lstyle if defined $lstyle;
+     # For now, put a -lindex key in the %opts hash, if $lindex is
+     # defined. The _create_line function will translate the -lindex
+     # value into the correct option as required by Tk::Canvas or
+     # Tk::Zinc, depending on which type of widget we are working
+     # with.
+     $opts{'-lindex'} = $lindex if defined $lindex;
 
      # a line width is in units of 1/200 in according to the PGPLOT
      # standard
@@ -192,7 +214,7 @@ sub _GLine {
      $opts{'-width'} = $width if defined $width;
 
      # and draw the line
-     my $t = $canvas->createLine( @points, %opts );
+     my $t = _create_line( $canvas, $external, \@points, %opts );
      $canvas->addtag( 'ASTGLine', 'withtag', $t);
 
    }
@@ -307,7 +329,7 @@ sub _GMark {
 	 my $y1 = $y - $dist;
 	 my $y2 = $y + $dist;
 
-	 $item = $canvas->createRectangle( $x1, $y1, $x2, $y2, %opts );
+	 $item = _create_rectangle( $canvas, $external, $x1, $y1, $x2, $y2, %opts );
 
        } elsif ($prim eq 'circle') {
 
@@ -316,8 +338,7 @@ sub _GMark {
 	 my $x2 = $x + $dist;
 	 my $y1 = $y - $dist;
 	 my $y2 = $y + $dist;
-
-	 $item = $canvas->createOval( $x1, $y1, $x2, $y2, %opts );
+	 $item = _create_oval( $canvas, $external, $x1, $y1, $x2, $y2, %opts );
 
 
        } elsif ($prim eq 'cross') {
@@ -329,9 +350,11 @@ sub _GMark {
 	 my $y1 = $y - $dist;
 	 my $y2 = $y + $dist;
 
-	 $item = $canvas->createLine( $x, $y1, $x, $y2, %opts );
+	 $item = _create_line( $canvas, $external, [$x, $y1, $x, $y2], %opts );
+
 	 $canvas->addtag( 'ASTGMark', 'withtag', $item);
-	 $item = $canvas->createLine( $x1, $y, $x2, $y, %opts );
+
+	 $item = _create_line( $canvas, $external, [$x1, $y, $x1, $y], %opts );
 
 
 
@@ -406,15 +429,6 @@ sub _GText {
      # and reconstruct it
      $just = $ya. $xa;
 
-     # Try to fudge the most common rotation
-     if ($upx == 1 && $upy == 0 ) {
-       # massage to attempt vertical text
-       $text = join("\n", split(//, $text));
-     } elsif ($upx == -1 && $upy == 0 ) {
-       # massage to attempt vertical text
-       $text = join("\n", reverse split(//, $text));
-     }
-
      # option handling
      my %opts;
      %opts = _attr_to_colour( $canvas, $external->[EXT_ATTR], 'TEXT');
@@ -436,11 +450,12 @@ sub _GText {
 
      # size in pixels is specified as negative number
      $font->configure( '-size' => (-1 * $charh ) );
+     # Add the font to the %opts hash
+     $opts{'-font'} = $font;
 
      # draw text
-     my $item = $canvas->createText( $x, $y, -text => $text, %opts,
-				     -font => $font,
-				   );
+     my $item = _create_text( $canvas, $external, $text, $x, $y, $upx, $upy, %opts );
+
      $canvas->addtag( 'ASTGText', 'withtag', $item);
 
      # if we have a scalar ref
@@ -561,7 +576,11 @@ sub _GTxExt {
   my @bbox = $canvas->bbox( 'ASTGTxExt_TEMP' );
 
   # delete the text
-  $canvas->delete( 'ASTGTxExt_TEMP' );
+  if ($external->[EXT_ATTR]->{ISA_CANVAS}) {
+    $canvas->delete( 'ASTGTxExt_TEMP' );
+  } elsif ($external->[EXT_ATTR]->{ISA_ZINC}) {
+    $canvas->remove( 'ASTGTxExt_TEMP' );
+  }
 
   # to convert these coordinates back to the correct units
   # we need the width and height of the canvas
@@ -850,6 +869,170 @@ sub _char_height {
   return ($dch * $scale);
 }
 
+# Create a line composed of segments from (x1,y1) to (x2,y2) to ... to
+# (xn,yn) with options in %opt. The points variable is a reference to
+# an array with the end points of the line segments, i.e. (x1, y1, x2,
+# y2, ..., xn, yn). Returns the id of the line.
+
+sub _create_line {
+
+  my ($canvas, $external, $points, %opts) = @_;
+
+  my $item;  # id of the item created
+
+  # If the canvas is a Tk::Canvas widget, use the createLine
+  # method. Tk::Zinc widgets require a little more work.
+  if ($external->[EXT_ATTR]->{ISA_CANVAS}) {
+    # Translate the linestyle index into the proper string for the
+    # Tk::Canvas -dash option.
+    if (exists $opts{-lindex}) {
+      my $lstyle = $LINE_STYLES{'Tk::Canvas'}->[ $opts{-lindex} ];
+      $opts{'-dash'} = $lstyle if defined $lstyle;
+      delete $opts{-lindex};
+    }
+    $item = $canvas->createLine( @$points,  %opts );
+  } elsif ($external->[EXT_ATTR]->{ISA_ZINC}) {
+    # Translate the linestyle index into the proper string for the
+    # Tk::Zinc -linestyle option.
+    if (exists $opts{-lindex}) {
+      my $lstyle = $LINE_STYLES{'Tk::Zinc'}->[ $opts{-lindex} ];
+      $opts{'-linestyle'} = $lstyle if defined $lstyle;
+      delete $opts{-lindex};
+    }
+    # Tk::Zinc uses the linecolor option, rather than the fill
+    # option used by Tk::Canvas.
+    if (exists $opts{'-fill'}) {
+      $opts{'-linecolor'} = $opts{'-fill'};
+      delete $opts{'-fill'};
+    }
+    # Tk::Zinc uses the linewidth option, rather than the width option
+    # used by Tk::Canvas. Also, Tk::Zinc requires the linewidth to be
+    # in pixels rather than inches, so we use fpixels to convert.
+    if (exists $opts{'-width'}) {
+      $opts{'-linewidth'} = $canvas->fpixels($opts{'-width'});
+      delete $opts{'-width'};
+    }
+    # Add the curve to the canvas
+    $item = $canvas->add( 'curve', TK_ZINC_GROUP, $points, %opts );
+  }
+  return $item;
+}
+
+# Create a rectangle with corners at (x1,y1) and (x2,y2) with options in
+# %opt. Returns the id of the rectangle.
+
+sub _create_rectangle {
+
+  my ($canvas, $external, $x1, $y1, $x2, $y2, %opts) = @_;
+
+  my $item;  # id of the item created
+
+  # If the canvas is a Tk::Canvas widget, use the createRectangle
+  # method. Tk::Zinc widgets require a little more work.
+  if ($external->[EXT_ATTR]->{ISA_CANVAS}) {
+    $item = $canvas->createRectangle( $x1, $y1, $x2, $y2, %opts );
+  } elsif ($external->[EXT_ATTR]->{ISA_ZINC}) {
+    # Tk::Zinc uses the linecolor option, rather than the outline
+    # option used by Tk::Canvas.
+    if (exists $opts{'-outline'}) {
+      $opts{'-linecolor'} = $opts{'-outline'};
+      delete $opts{'-outline'};
+    }
+    # Tk::Zinc uses the fillcolor and filled (boolean) options, rather
+    # than the fill (string) option used by Tk::Canvas.
+    if (exists $opts{'-fill'}) {
+      $opts{'-fillcolor'} = $opts{'-fill'};
+      $opts{'-filled'} = 1;
+      delete $opts{-fill};
+    }
+    # Add the rectangle to the canvas
+    $item = $canvas->add( 'rectangle', TK_ZINC_GROUP, [$x1, $y1, $x2, $y2], %opts );
+  }
+  return $item;
+}
+
+# Create an oval inside the rectangle with corners at (x1,y1) and
+# (x2,y2) with options in %opt. Returns the id of the oval.
+
+sub _create_oval {
+
+  my ($canvas, $external, $x1, $y1, $x2, $y2, %opts) = @_;
+
+  my $item;  # id of the item created
+
+  # If the canvas is a Tk::Canvas widget, use the createRectangle
+  # method. Tk::Zinc widgets require a little more work.
+  if ($external->[EXT_ATTR]->{ISA_CANVAS}) {
+    $item = $canvas->createOval( $x1, $y1, $x2, $y2, %opts );
+  } elsif ($external->[EXT_ATTR]->{ISA_ZINC}) {
+    # Tk::Zinc uses the linecolor option, rather than the outline
+    # option used by Tk::Canvas.
+    if (exists $opts{'-outline'}) {
+      $opts{'-linecolor'} = $opts{'-outline'};
+      delete $opts{'-outline'};
+    }
+    # Tk::Zinc uses the fillcolor and filled (boolean) options, rather
+    # than the fill (string) option used by Tk::Canvas.
+    if (exists $opts{'-fill'}) {
+      $opts{'-fillcolor'} = $opts{'-fill'};
+      $opts{'-filled'} = 1;
+      delete $opts{-fill};
+    }
+    # Add the oval to the canvas
+    $item = $canvas->add( 'arc', TK_ZINC_GROUP, [$x1, $y1, $x2, $y2], %opts );
+  }
+  return $item;
+}
+
+# Create text at position (x, y) with options in %opt. Up-direction of
+# the text specified by (upx, upy) vector. Returns the id of the text.
+
+sub _create_text {
+
+  my ($canvas, $external, $text, $x, $y, $upx, $upy, %opts) = @_;
+
+  my $item;  # id of the item created
+
+  # For Tk::Canvas widgets, which don't support rotated text, try to
+  # fudge the most common rotation. For Tk::Zinc widgets, text can be
+  # at any angle, so we compute the angle from the specified up
+  # vector. To be consistent with what Tk::Zinc wants, we are
+  # measuring the angle as positve clockwise from the positive y-axis,
+  # which AST considers to point upward on the screen.
+  my $rotAngle;
+  if ($external->[EXT_ATTR]->{ISA_CANVAS}) {
+    if ($upx == 1 && $upy == 0 ) {
+      # massage to attempt vertical text
+      $text = join("\n", split(//, $text));
+    } elsif ($upx == -1 && $upy == 0 ) {
+      # massage to attempt vertical text
+      $text = join("\n", reverse split(//, $text));
+    }
+  } elsif ($external->[EXT_ATTR]->{ISA_ZINC}) {
+    $rotAngle = atan2($upx, $upy);
+  }
+
+  # If the canvas is a Tk::Canvas widget, use the createText
+  # method. Tk::Zinc widgets require a little more work.
+  if ($external->[EXT_ATTR]->{ISA_CANVAS}) {
+    $item = $canvas->createText( $x, $y, -text => $text, %opts);
+  } elsif ($external->[EXT_ATTR]->{ISA_ZINC}) {
+    # Tk::Zinc uses the color option, rather than the fill option used
+    # by Tk::Canvas.
+    if (exists $opts{'-fill'}) {
+      $opts{'-color'} = $opts{'-fill'};
+      delete $opts{'-fill'};
+    }
+    # Add the text to the canvas
+    $item = $canvas->add( 'text', TK_ZINC_GROUP, -position => [$x, $y],
+			  -text => $text, %opts
+			   );
+    # Rotate the text
+    $canvas->rotate( $item, $rotAngle);
+  }
+  return $item;
+}
+
 # Routine to initialise the attributes. This includes the creation
 # of Font objects that match the desired PGPLOT types
 
@@ -891,6 +1074,15 @@ sub _init_canvas_attrs {
 
   $attr->{FONTS} = \@fonts;
 
+  # The canvas widget is allowed to be either a Tk::Canvas or a
+  # Tk::Zinc widget. The ISA_CANVAS attribute is set to true if the
+  # canvas is a Tk::Canvas widget. The ISA_ZINC attribute is set to
+  # true if the canvas is a Tk::Zinc widget. There are slight
+  # differences in the Tk::Canvas and Tk::Zinc methods, so we use the
+  # ISA_CANVAS and ISA_ZINC attributes in the _create_line and related
+  # methods to make sure we are calling the correct widget methods.
+  $attr->{ISA_CANVAS} = UNIVERSAL::isa($canvas, 'Tk::Canvas');
+  $attr->{ISA_ZINC} = UNIVERSAL::isa($canvas, 'Tk::Zinc');
 }
 
 =back
