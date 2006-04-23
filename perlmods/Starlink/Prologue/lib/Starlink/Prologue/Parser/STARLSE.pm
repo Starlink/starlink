@@ -211,7 +211,7 @@ sub push_line {
       # Include leading spaces since we want to retain indenting
       # strip off the first 5 spaces (standard formatting)
       my $content = $1;
-      $content =~ s/^\s\s\s\s\s//;
+      $content =~ s/^\s{2,5}//;
       push(@{$self->content()}, $content);
     } else {
       # if nothing matches we have a blank line
