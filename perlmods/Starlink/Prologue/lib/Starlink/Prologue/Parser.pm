@@ -136,6 +136,38 @@ sub push_line {
 
 }
 
+=item B<flush>
+
+Indicate that no more content is arriving for the current
+parser. This should be called after a set of C<push_line>
+calls when no more lines are expected.
+
+ $prl = $parser->flush();
+
+Returns undef if a prologue was not in progress, else returns
+the current prologue (in as complete a state as was available).
+
+The internal state is reset after this is called, any new lines
+added to C<push_line> will be treated as a new prologue.
+
+=cut
+
+sub flush {
+  my $self = shift;
+
+  my $worker = $self->_worker;
+  if (!defined $worker) {
+    # no active worker so either no prologue or it was 
+    # already complete.
+    return;
+  } else {
+    my $prl = $worker->flush;
+    $self->_worker( undef );
+    return $prl;
+  }
+
+}
+
 
 =back
 

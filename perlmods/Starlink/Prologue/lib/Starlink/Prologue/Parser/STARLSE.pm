@@ -147,8 +147,6 @@ sub flush_section {
 
 =head2 General
 
-=head2 General
-
 =over 4
 
 =item B<push_line>
@@ -186,7 +184,7 @@ sub push_line {
     # C comment end usually indicates end of prologue in modern
     #   implementation
 
-
+    chomp($line);
     if ( $line =~ /^\s*[$r]\-/  #  *-
 	 || $line =~ /\*\/$/      #  */
 	 || ($line !~ /\s*[$r]/ && $line =~ /\w/)  # real code
@@ -204,19 +202,33 @@ sub push_line {
       # return the newly minted version
       return $prl;
 
-    } elsif ( $line =~ /^\s*[$r]\s+(.*):\s*$/ ) {
+    } elsif ( $line =~ /^\s*[$r]\s+([A-Za-z\s]*)\s*:\s*$/ ) {
       # section
       $self->flush_section();
       $self->section($1);
-    } elsif ( $line =~ /^\s*[$r]\s+(.*)\s*$/ ) {
+    } elsif ( $line =~ /^\s*[$r](\s+.*)\s*$/ ) {
       # prologue content (or *- but that is dealt with above)
-      push(@{$self->content()}, $1);
+      # Include leading spaces since we want to retain indenting
+      # strip off the first 5 spaces (standard formatting)
+      my $content = $1;
+      $content =~ s/^\s\s\s\s\s//;
+      push(@{$self->content()}, $content);
+    } else {
+      # if nothing matches we have a blank line
+      # we should store it in case it is within a section
+      my $content = $line;
+      $content =~ s/^\s+//;
+      $content =~ s/\s+$//;
+      $content = '' if $content =~ /^$r$/;
+      push(@{$self->content()}, $content);
+
     }
+
 
 
   } else {
     # looking for one to start
-    my ($cchar, $title) = $self->prolog_start( $line );
+    my ($cchar, $title, $startc) = $self->prolog_start( $line );
     if (defined $cchar) {
       chomp($line);
       print "Starting prologue with comment char $cchar ($line)\n";
@@ -224,6 +236,7 @@ sub push_line {
       $prl = new Starlink::Prologue();
       $self->prologue( $prl );
       $prl->comment_char( $cchar );
+      $prl->start_c_comment( $startc );
 
       # are we in a section already?
       if (defined $title) {
@@ -243,6 +256,38 @@ sub push_line {
 
 }
 
+=item B<flush>
+
+Flush the current prologue and return it. Resets the object.
+
+  $prologue = $parser->flush();
+
+Returns undef if no active prologue.
+
+This should be called when no more lines are to be parsed to
+make sure that unterminated prologues are returned.
+
+=cut
+
+sub flush {
+  my $self = shift;
+  my $prl = $self->prologue;
+  return () unless defined $prl;
+
+  # flush internal content to prologue
+  $self->flush_section();
+
+  # reset internal content
+  $self->prologue(undef);
+
+  # return the prologue as-is
+  return $prl;
+}
+
+=head2 Class Methods
+
+=over 4
+
 =item B<prolog_start>
 
 Returns true if the line supplied could be interpreted as a
@@ -251,23 +296,36 @@ start of a prolog. Otherwise returns false.
  $is_start = $p->prolog_start( $line );
 
 In list context returns the comment character and optional section
-heading (in case we are starting with a "Name".
+heading (in case we are starting with a "Name") and flag indicating
+whether a C comment started at the same time.
 
- ($cchar, $title) = $p->prolog_start( $line );
+ ($cchar, $title, $startc) = $p->prolog_start( $line );
 
 =cut
 
 sub prolog_start {
   my $self = shift;
   my $line = shift;
-  if ($line =~ /^\s*([\*\#])\+\s*$/               #  *+
-     || $line =~ /^\s*\/([\*\#])\+\s*$/           #  /*+
-     ||  $line =~ /^\s*([\*\#])\s+(Name)\s*:\s*$/ #  * Name:
-     ) {
-    my $cchar = $1;
-    my $title = $2;
+  my $cchar;
+  my $title;
+  my $startc;
+  if ($line =~ /^\s*([\*\#])\+\s*$/) {
+     # Normal prologue start :  *+ or #+
+     $cchar = $1;
+  } elsif ($line =~ /^\s*\/\*\+\s*$/        #  /*+
+           || $line =~ /^\s*\/\*\s*\*\+\s*$/ ) {  #  /* *+
+     # C comment
+     $cchar = ($1 || "*");
+     $startc = 1;
+  } elsif ( $line =~ /^\s*([\*\#])\s+(Name)\s*:\s*$/ ) {
+     # Name: (implicit start)
+     $cchar = $1;
+     $title = $2;
+  }
+
+  if (defined $cchar) {
     if (wantarray) {
-      return ($cchar, $title);
+      return ($cchar, $title, $startc);
     } else {
       return 1;
     }

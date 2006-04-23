@@ -296,6 +296,9 @@ sub stringify {
   my $self = shift;
   my $cchar = $self->comment_char;
 
+  use Data::Dumper;
+  print Dumper($self);
+
   my $code = '';
 
   # Do we need to open a C-style comment first?
@@ -311,14 +314,15 @@ sub stringify {
     if (@content) {
       $code .= $cchar . "  $h:\n";
       for my $l (@content) {
-	$code .= $cchar . "     " . $l ."\n" if $l;
+	$code .= $cchar . "     " . $l ."\n" if defined $l;
       }
+      # blank line between each section
+      $code .= "\n";
     }
-    $code .= "\n";
   }
 
   # end the prologue
-  $code .= "\n$cchar" . "-\n";
+  $code .= "$cchar" . "-\n";
 
   # close the comment block if required
   $code .= "*/\n" if $self->end_c_comment;
