@@ -1686,7 +1686,7 @@ f     AST_SWITCHMAP
 c     #include "switchmap.h"
 c     AstSwitchMap *astSwitchMap( AstMapping *fsmap, AstMapping *ismap,
 c                                 int nroute, AstMapping *routemaps[],
-*                                 const char *options, ... )
+c                                 const char *options, ... )
 f     RESULT = AST_SWITCHMAP( FSMAP, ISMAP, NROUTE, ROUTEMAPS, OPTIONS, 
 f                             STATUS )
 

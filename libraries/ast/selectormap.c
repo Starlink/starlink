@@ -1130,7 +1130,7 @@ f     AST_SELECTORMAP
 *  Synopsis:
 c     #include "selectormap.h"
 c     AstSelectorMap *astSelectorMap( int nreg, AstRegion *regs[],
-*                                     const char *options, ... )
+c                                     const char *options, ... )
 f     RESULT = AST_SELECTORMAP( NREG, REGS, OPTIONS, STATUS )
 
 *  Class Membership:
@@ -1171,7 +1171,7 @@ f     AST_SIMPLIFY.
 c     nreg
 f     NREG = INTEGER (Given)
 *        The number of supplied Regions.
-*     regs
+c     regs
 f     REGS( NREG ) = INTEGER (Given)
 *        An array of pointers to the Regions. All the supplied Regions must 
 *        relate to the same coordinate Frame. The number of axes in this
