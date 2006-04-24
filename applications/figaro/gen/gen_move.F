@@ -22,7 +22,7 @@ C     31st Oct 1982  Original Author in VAX MACRO: Keith Shortridge, CIT
 C     5th  Feb 1988  (CKL/CIT) Converted to Convex
 C     20th Mar 1991  (SNS/CIT) Minor changes to compile silently on Suns
 C     27th Aug 1992  (HME/UoE) No preprocessor. Sun accepts %LOC.
-C
+C     24th Apr 2006  (TIMJ/JAC) Check for NULL pointers
 C
       IMPLICIT NONE
 C
@@ -42,19 +42,33 @@ C
 #else
       Do not have LOC or %LOC
 #endif
+
+C
+C     Sanity check to prevent SEGV
+C
+      IF ( DST .EQ. 0) THEN
+         PRINT *,'PANIC! NULL pointer given to GEN_MOVE for DST'
+         STOP
+      END IF
+
+      IF ( SRC .EQ. 0) THEN
+         PRINT *,'PANIC! NULL pointer given to GEN_MOVE for SRC'
+         STOP
+      END IF
+
 C
 C     The easy case is when dst <= src
 C
       IF (DST.LE.SRC) THEN
-          DO 10 I=1,BYTES
+          DO I=1,BYTES
              TO(I)=FROM(I)
-10        CONTINUE
+          END DO
       ELSE
 C
 C         The hard case is when dst > src
 C
-          DO 20 I=BYTES,1,-1
+          DO I=BYTES,1,-1
              TO(I)=FROM(I)
-20        CONTINUE
+          END DO
       ENDIF
       END
