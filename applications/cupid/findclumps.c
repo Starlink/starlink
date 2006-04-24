@@ -394,10 +394,11 @@ void findclumps() {
 *     initially found at the lowest contour level are ignored. That is, clumps 
 *     must have peaks which exceed the second lowest contour level to be 
 *     included in the returned catalogue. []
-*     - GaussClumps.MaxBad: The maximum number of pixels in a clump that
-*     are allowed to be adjacent to a bad pixel. If the number fo clump
+*     - ClumpFind.MaxBad: The maximum number of pixels in a clump that
+*     are allowed to be adjacent to a bad pixel. If the number of clump
 *     pixels adjacent to a bad pixel exceeds this value, the clump is 
-*     excluded. [4]
+*     excluded. If a direct comparison with other implementations of the 
+*     ClumpFind algorithm is required, a value of zero should be used. [4]
 *     - ClumpFind.MinPix: The lowest number of pixel which a clump can
 *     contain. If a candidate clump has fewer than this number of pixels, 
 *     it will be ignored. This prevents noise spikes from being interpreted 
