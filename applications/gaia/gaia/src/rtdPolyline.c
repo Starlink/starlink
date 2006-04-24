@@ -425,7 +425,8 @@ static int LineCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         numCoords = 2*linePtr->numPoints;
         if (linePtr->firstArrowPtr != NULL) {
             coordPtr = linePtr->firstArrowPtr;
-        } else {
+        } 
+        else {
             coordPtr = linePtr->coordPtr;
         }
         for (i = 0; i < numCoords; i++, coordPtr++) {
@@ -438,17 +439,22 @@ static int LineCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 	    subobj = Tcl_NewDoubleObj(*coordPtr);
 	    Tcl_ListObjAppendElement(interp, obj, subobj);
         }
-    } else if (objc < 4) {
+        Tcl_SetObjResult(interp, obj);
+        return TCL_OK;
+    } 
+    else if (objc < 4) {
         Tcl_AppendResult(interp,
                 "too few coordinates for line: must have at least 4",
                 (char *) NULL);
         return TCL_ERROR;
-    } else if (objc & 1) {
+    } 
+    else if (objc & 1) {
         Tcl_AppendResult(interp,
                 "odd number of coordinates specified for line",
                 (char *) NULL);
         return TCL_ERROR;
-    } else {
+    } 
+    else {
 	numPoints = objc/2;
 	if (linePtr->numPoints != numPoints) {
 	    coordPtr = (double *) ckalloc((unsigned)
@@ -533,7 +539,8 @@ ConfigureLine(Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 
     if (linePtr->fg == NULL) {
         newGC = arrowGC = None;
-    } else {
+    } 
+    else {
         gcValues.foreground = linePtr->fg->pixel;
         gcValues.join_style = linePtr->joinStyle;
         if (linePtr->width < 0) {
@@ -569,7 +576,8 @@ ConfigureLine(Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 
     if (linePtr->splineSteps < 1) {
         linePtr->splineSteps = 1;
-    } else if (linePtr->splineSteps > 100) {
+    } 
+    else if (linePtr->splineSteps > 100) {
         linePtr->splineSteps = 100;
     }
 
@@ -805,13 +813,15 @@ RtdLineDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 
     if ((linePtr->smooth) && (linePtr->numPoints > 2)) {
         numPoints = 1 + linePtr->numPoints*linePtr->splineSteps;
-    } else {
+    } 
+    else {
         numPoints = linePtr->numPoints;
     }
 
     if (numPoints <= MAX_STATIC_POINTS) {
         pointPtr = staticPoints;
-    } else {
+    } 
+    else {
         pointPtr = (XPoint *) ckalloc((unsigned) (numPoints * sizeof(XPoint)));
     }
 
@@ -839,7 +849,8 @@ RtdLineDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 
         XDrawLines( display, drawable, linePtr->gc, pointPtr, numPoints,
                     CoordModeOrigin );
-    } else {
+    } 
+    else {
         int count = 0;
         pPtr = pointPtr;
         coordPtr = linePtr->coordPtr;
@@ -938,14 +949,16 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
         numPoints = 1 + linePtr->numPoints*linePtr->splineSteps;
         if (numPoints <= MAX_STATIC_POINTS) {
             linePoints = staticSpace;
-        } else {
+        } 
+        else {
             linePoints = (double *) ckalloc((unsigned)
                     (2*numPoints*sizeof(double)));
         }
         numPoints = TkMakeBezierCurve(canvas, linePtr->coordPtr,
                 linePtr->numPoints, linePtr->splineSteps, (XPoint *) NULL,
                 linePoints);
-    } else {
+    } 
+    else {
         numPoints = linePtr->numPoints;
         linePoints = linePtr->coordPtr;
     }
@@ -974,7 +987,8 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
             if (dist <= 0.0) {
                 bestDist = 0.0;
                 goto done;
-            } else if (dist < bestDist) {
+            } 
+            else if (dist < bestDist) {
                 bestDist = dist;
             }
         }
@@ -988,12 +1002,14 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
         if (count == numPoints) {
             TkGetButtPoints(coordPtr+2, coordPtr, (double) linePtr->width,
                     linePtr->capStyle == CapProjecting, poly, poly+2);
-        } else if ((linePtr->joinStyle == JoinMiter) && !changedMiterToBevel) {
+        } 
+        else if ((linePtr->joinStyle == JoinMiter) && !changedMiterToBevel) {
             poly[0] = poly[6];
             poly[1] = poly[7];
             poly[2] = poly[4];
             poly[3] = poly[5];
-        } else {
+        } 
+        else {
             TkGetButtPoints(coordPtr+2, coordPtr, (double) linePtr->width, 0,
                     poly, poly+2);
 
@@ -1011,7 +1027,8 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
                 if (dist <= 0.0) {
                     bestDist = 0.0;
                     goto done;
-                } else if (dist < bestDist) {
+                } 
+                else if (dist < bestDist) {
                     bestDist = dist;
                 }
                 changedMiterToBevel = 0;
@@ -1020,14 +1037,16 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
         if (count == 2) {
             TkGetButtPoints(coordPtr, coordPtr+2, (double) linePtr->width,
                     linePtr->capStyle == CapProjecting, poly+4, poly+6);
-        } else if (linePtr->joinStyle == JoinMiter) {
+        } 
+        else if (linePtr->joinStyle == JoinMiter) {
             if (TkGetMiterPoints(coordPtr, coordPtr+2, coordPtr+4,
                     (double) linePtr->width, poly+4, poly+6) == 0) {
                 changedMiterToBevel = 1;
                 TkGetButtPoints(coordPtr, coordPtr+2, (double) linePtr->width,
                         0, poly+4, poly+6);
             }
-        } else {
+        } 
+        else {
             TkGetButtPoints(coordPtr, coordPtr+2, (double) linePtr->width, 0,
                     poly+4, poly+6);
         }
@@ -1037,7 +1056,8 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
         if (dist <= 0.0) {
             bestDist = 0.0;
             goto done;
-        } else if (dist < bestDist) {
+        } 
+        else if (dist < bestDist) {
             bestDist = dist;
         }
     }
@@ -1053,7 +1073,8 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
         if (dist <= 0.0) {
             bestDist = 0.0;
             goto done;
-        } else if (dist < bestDist) {
+        } 
+        else if (dist < bestDist) {
             bestDist = dist;
         }
     }
@@ -1069,7 +1090,8 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
             if (dist <= 0.0) {
                 bestDist = 0.0;
                 goto done;
-            } else if (dist < bestDist) {
+            } 
+            else if (dist < bestDist) {
                 bestDist = dist;
             }
         }
@@ -1079,7 +1101,8 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
             if (dist <= 0.0) {
                 bestDist = 0.0;
                 goto done;
-            } else if (dist < bestDist) {
+            } 
+            else if (dist < bestDist) {
                 bestDist = dist;
             }
         }
@@ -1128,14 +1151,16 @@ LineToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *rectPtr )
         numPoints = 1 + linePtr->numPoints*linePtr->splineSteps;
         if (numPoints <= MAX_STATIC_POINTS) {
             linePoints = staticSpace;
-        } else {
+        } 
+        else {
             linePoints = (double *) ckalloc((unsigned)
                     (2*numPoints*sizeof(double)));
         }
         numPoints = TkMakeBezierCurve(canvas, linePtr->coordPtr,
                 linePtr->numPoints, linePtr->splineSteps, (XPoint *) NULL,
                 linePoints);
-    } else {
+    } 
+    else {
         numPoints = linePtr->numPoints;
         linePoints = linePtr->coordPtr;
     }
@@ -1441,7 +1466,8 @@ ConfigureArrows( Tk_Canvas canvas, PolyLineItem *linePtr )
         length = hypot(dx, dy);
         if (length == 0) {
             sinTheta = cosTheta = 0.0;
-        } else {
+        } 
+        else {
             sinTheta = dy/length;
             cosTheta = dx/length;
         }
@@ -1487,7 +1513,8 @@ ConfigureArrows( Tk_Canvas canvas, PolyLineItem *linePtr )
         length = hypot(dx, dy);
         if (length == 0) {
             sinTheta = cosTheta = 0.0;
-        } else {
+        } 
+        else {
             sinTheta = dy/length;
             cosTheta = dx/length;
         }
@@ -1550,11 +1577,13 @@ RtdLineToPostscript( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 
     if ((!linePtr->smooth) || (linePtr->numPoints <= 2)) {
         Tk_CanvasPsPath(interp, canvas, linePtr->coordPtr, linePtr->numPoints);
-    } else {
+    } 
+    else {
         if (linePtr->fillStipple == None) {
             TkMakeBezierPostscript(interp, canvas, linePtr->coordPtr,
                     linePtr->numPoints);
-        } else {
+        } 
+        else {
             /*
              * Special hack: Postscript printers don't appear to be able
              * to turn a path drawn with "curveto"s into a clipping path
@@ -1593,14 +1622,16 @@ RtdLineToPostscript( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     style = "0 setlinecap\n";
     if (linePtr->capStyle == CapRound) {
         style = "1 setlinecap\n";
-    } else if (linePtr->capStyle == CapProjecting) {
+    } 
+    else if (linePtr->capStyle == CapProjecting) {
         style = "2 setlinecap\n";
     }
     Tcl_AppendResult(interp, style, (char *) NULL);
     style = "0 setlinejoin\n";
     if (linePtr->joinStyle == JoinRound) {
         style = "1 setlinejoin\n";
-    } else if (linePtr->joinStyle == JoinBevel) {
+    } 
+    else if (linePtr->joinStyle == JoinBevel) {
         style = "2 setlinejoin\n";
     }
     Tcl_AppendResult(interp, style, (char *) NULL);
@@ -1613,7 +1644,8 @@ RtdLineToPostscript( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                 != TCL_OK) {
             return TCL_ERROR;
         }
-    } else {
+    } 
+    else {
         Tcl_AppendResult(interp, "stroke\n", (char *) NULL);
     }
 
@@ -1681,7 +1713,8 @@ ArrowheadPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
                 != TCL_OK) {
             return TCL_ERROR;
         }
-    } else {
+    } 
+    else {
         Tcl_AppendResult(interp, "fill\n", (char *) NULL);
     }
     return TCL_OK;
