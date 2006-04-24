@@ -66,6 +66,7 @@
 *     AJC: A.J. Chipperfield (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     RTP: R.T. Platon (STARLINK)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -78,6 +79,11 @@
 *        Use *iposn not iposn internally 
 *     21-SEP-2001 (AJC):
 *        Correct calculation of allow
+*     24-APR-2006 (PWD):
+*        Correct strncpy to use allow, not allow + 1. Reserve 4 characters
+*        for ellipsis ('...', plus '\0', strcpy includes trailing NULL ).
+*        Calculate length of string to include trailing NULL (should
+*        be copied if any later strlens are to succeed).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -101,8 +107,8 @@ void ems1Putc( const char *cvalue, const int maxlen, char *string, int *iposn,
    /*  Initialise the returned status. */
    *status = SAI__OK;
 
-/*  Get the size of target string. */
-   size1 = strlen( cvalue );
+/*  Get the size of target string, including trailing NULL. */
+   size1 = strlen( cvalue ) + 1;
 
 /*  Check that the pointer is within string. */
    if ( *iposn < maxlen ) {
@@ -111,13 +117,13 @@ void ems1Putc( const char *cvalue, const int maxlen, char *string, int *iposn,
       allow = MIN( size1, maxlen - *iposn - 1 );
 
 /*     Copy the string. */
-      strncpy( &string[*iposn+1] , cvalue, allow+1 );
+      strncpy( &string[*iposn+1] , cvalue, allow );
 
 /*     Check if an ellipsis is required. */
       if ( allow < size1 ) {
 
 /*        Append an ellipsis. */
-         idx = MAX( 0, maxlen - 3 );
+         idx = MAX( 0, maxlen - 4 );
          strcpy( &string[idx], "..." );
          *status = SAI__WARN;
       }
@@ -128,7 +134,7 @@ void ems1Putc( const char *cvalue, const int maxlen, char *string, int *iposn,
    } else {
 /*     The pointer is beyond the declared length of the string, so 
  *     append an ellipsis. */
-      idx = MAX( 0, maxlen - 3 );
+      idx = MAX( 0, maxlen - 4 );
       strcpy( &string[idx], "..." );
       *status = SAI__WARN;
 
