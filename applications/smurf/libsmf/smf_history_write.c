@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_history_check( const smfData * data, const char * appl,
+*     smf_history_write( const smfData * data, const char * appl,
 *                        const char * text, int * status );
 
 *  Arguments:
@@ -101,7 +101,7 @@
 
 void smf_history_write( const smfData* data, const char * appl, 
 			const char * text, int *status) {
-  smfFile *file = NULL; /* data->file */
+  smfFile *file = NULL;  /* data->file */
   char *linarr[1];       /* Pointer to char * text */
 
   /* Check entry status */
@@ -121,7 +121,7 @@ void smf_history_write( const smfData* data, const char * appl,
   if ( file == NULL ) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME,
-	    "Supplied smfData is not associated with a file. Unable to query history", status );
+	    "Supplied smfData is not associated with a file. Unable to write history", status );
     return;
   }
 
@@ -141,7 +141,7 @@ void smf_history_write( const smfData* data, const char * appl,
     return;
   }
 
-  /* Write the information */
+  /* Write the information to the file */
   linarr[0] = (char *)text; /* fix warning when const passed to linarr */
   ndfHput("NORMAL", appl, 0, 1, linarr, 1, 1, 1, file->ndfid, status );
 
