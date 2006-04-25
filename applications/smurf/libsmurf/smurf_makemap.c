@@ -62,6 +62,8 @@
 *        Update to take account of new API for rebinmap
 *     2006-03-23 (DSB):
 *        Guard against null pointer when reporting error.
+*     2006-04-21 (AGG):
+*        Now calls sky removal and extinction correction routines.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,12 +119,14 @@
 #include "sc2da/sc2store.h"
 #include "sc2da/sc2ast.h"
 
+#define FUNC_NAME "smurf_makemap"
+#define TASK_NAME "MAKEMAP"
+
 void smurf_makemap( int *status ) {
 
   /* Local Variables */
   void *data_index[1];       /* Array of pointers to mapped arrays in ndf */
   smfData *data=NULL;           /* pointer to  SCUBA2 data struct */
-  smfFile *file=NULL;           /* SCUBA2 data file information */
   int flag;                  /* Flag */
   dim_t i;                      /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
@@ -132,7 +136,6 @@ void smurf_makemap( int *status ) {
   int ondf;                  /* output NDF identifier */
   AstFrameSet *outframeset=NULL; /* Frameset containing sky->output mapping */
   float pixsize=3;           /* Size of an output map pixel in arcsec */
-  char *pname=NULL;             /* Name of currently opened data file */
   int size;                  /* Number of files in input group */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance=NULL;       /* Pointer to the variance map */
@@ -157,6 +160,9 @@ void smurf_makemap( int *status ) {
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
   smf_mapbounds( igrp, size, "icrs", 0, 0, 1, pixsize, lbnd_out, ubnd_out, 
 		 &outframeset, status );
+  if (*status != SAI__OK) {
+    errRep(FUNC_NAME, "Unable to determine map bounds", status);
+  }
 
   /* Create the output NDF for the image and map arrays */
   ndfCreat( "OUT", "_DOUBLE", 2, lbnd_out, ubnd_out, &ondf, status );
@@ -174,36 +180,22 @@ void smurf_makemap( int *status ) {
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Regrid data", status);
   for(i=1; i<=size; i++ ) {
     /* Read data from the ith input file in the group */      
-    smf_open_file( igrp, i, "READ", 1, &data, status );
+    smf_open_and_flatfield( igrp, NULL, i, &data, status );
 
-    if( *status == SAI__OK ) {
-      file = data->file;
-      pname =  file->name;
-      msgSetc("FILE", pname);
-      msgSeti("THISFILE", i);
-      msgSeti("NUMFILES", size);
-      msgOutif(MSG__VERB, " ", 
-	       "SMF_REBINMAP: Processing ^THISFILE/^NUMFILES ^FILE",
-	       status);
+    /* Remove sky - assume MEAN is good enough for now */
+    smf_subtract_plane(data, "MEAN", status);
 
-    } else if( data && data->file ){
-      file = data->file;
-      pname =  file->name;
-      msgSetc("FILE", pname);
-      errRep( "smf_rebinmap", "Couldn't open input file ^FILE", status );
-
-    } else {
-      errRep( "smf_rebinmap", "Couldn't open input file", status );
-    }
+    /* Use raw WVM data to make the extinction correction */
+    smf_correct_extinction(data, "WVMR", 0, 0, status);
 
     /* Check that the data dimensions are 3 (for time ordered data) */
     if( *status == SAI__OK ) {
       if( data->ndims != 3 ) {
-	msgSetc("FILE", pname);
+	msgSeti("I",i);
 	msgSeti("THEDIMS", data->ndims);
 	*status = SAI__ERROR;
-	errRep("smf_rebinmap", 
-	       "^FILE data has ^THEDIMS dimensions, should be 3.", 
+	errRep(FUNC_NAME, 
+	       "File ^I data has ^THEDIMS dimensions, should be 3.", 
 	       status);
       }
     }
@@ -211,11 +203,11 @@ void smurf_makemap( int *status ) {
     /* Check that the input data type is double precision */
     if( *status == SAI__OK ) 
       if( data->dtype != SMF__DOUBLE) {
-	msgSetc("FILE", pname);
+	msgSeti("I",i);
 	msgSetc("DTYPE", smf_dtype_string( data, status ));
 	*status = SAI__ERROR;
-	errRep("smurf_makemap", 
-	       "^FILE has ^DTYPE data type, should be DOUBLE.",
+	errRep(FUNC_NAME, 
+	       "File ^I has ^DTYPE data type, should be DOUBLE.",
 	       status);
       }
 
@@ -230,7 +222,8 @@ void smurf_makemap( int *status ) {
     }
     /* Break out of loop over data files if bad status */
     if (*status != SAI__OK) {
-      errRep("smurf_makemap", "Rebinning step failed", status);
+      errRep(FUNC_NAME, "Rebinning step failed", status);
+      break;
     }
   }
 
