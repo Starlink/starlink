@@ -50,6 +50,7 @@
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 *     David Berry (JAC, UCLan)
+*     Andy Gibb (UBC)
 *     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
@@ -67,11 +68,11 @@
 *        series headers.
 *     2006-02-08 (AGG):
 *        Add needwcs flag to API.
-*     2006-02-11 (AGG):
+*     2006-02-11 (DSB):
 *        Add "extra_frames" parameter to sc2ast_createwcs calls.
 *     2006-03-23 (AGG):
 *        Store current frame in smfData
-*     2006-04-12 (AC):
+*     2006-04-12 (EC):
 *        Added jig_az_x/y to createwcs call
 *     {enter_further_changes_here}
 
