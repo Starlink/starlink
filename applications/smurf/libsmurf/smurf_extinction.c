@@ -74,11 +74,13 @@
 *        Filter now a string
 *     2006-02-07 (AGG):
 *        Can now use the WVMRAW method for getting tau
+*     2006-04-21 (AGG):
+*        Add call to smf_subtract_plane for sky removal
 *     {enter_further_changes_here}
 
 *  Notes:
-*     At the moment no check is made on whether the extinction
-*     correction has already been applied.
+*     At the moment there is no way of exploiting the range of options
+*     for sky removal so only a simple mean is removed if necessary.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -187,12 +189,13 @@ void smurf_extinction( int * status ) {
       /* Tell the user which file it was... */
       /* Would be user-friendly to trap 1st etc... */
       msgSeti("I",i);
-      errRep(TASK_NAME, "Unable to flatfield data from the ^I th file", status);
+      errRep(TASK_NAME, "Unable to flatfield data from file ^I", status);
     }
 
     /* What next if status is bad? */
 
-    /* Remove polynomials */
+    /* Remove sky */
+    smf_subtract_plane( odata, "MEAN", status);
 
     /* Tell user if polynomials have already been removed */
 
