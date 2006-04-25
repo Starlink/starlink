@@ -10,7 +10,7 @@ smf_open_file.c smf_close_file.c \
 smf_dtype_check.c smf_dtype_string.c smf_dtype_size.c smf_dtype_check_fatal.c \
 smf_dtype_fromstring.c \
 smf_fits_getI.c smf_fits_getD.c smf_fits_getF.c smf_fits_getS.c \
-smf_history_check.c smf_history_write.c \
+smf_history_check.c smf_history_write.c smf_history_read.c smf_history_add.c\
 smf_tslice_ast.c smf_tslice.c \
 smf_open_and_flatfield.c \
 smf_flatfield.c smf_check_flat.c smf_flatten.c \

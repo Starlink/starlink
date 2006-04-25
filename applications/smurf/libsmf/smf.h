@@ -81,6 +81,10 @@
 *          rather than smfDA
 *        - Add smf_check_smfData, smf_check_smfDA, smf_check_smfFile and
 *          smf_check_smfHead
+*     2006-04-21 (AGG):
+*        - Change API for smf_check_smfData, smf_deepcopy_smfData
+*        - Add history to smf_construct_smfData
+*        - Add smf_history_add, smf_history_read
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -121,7 +125,8 @@ double smf_calc_wvm( const smfHead *hdr, int *status );
 
 void smf_check_flat ( const smfData *data, int *status );
 
-void smf_check_smfData ( const smfData *idata, smfData *odata, int *status );
+void smf_check_smfData ( const smfData *idata, smfData *odata, const int flags, 
+			 int *status );
 
 void smf_check_smfDA ( const smfData *idata, smfData *odata, int *status );
 
@@ -133,7 +138,8 @@ void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
 
 void smf_close_file( smfData **, int *status);
 
-void smf_correct_extinction( smfData *data, const char *method, const int quick, double tau, int *status);
+void smf_correct_extinction( smfData *data, const char *method, 
+			     const int quick, double tau, int *status);
 
 smfData* smf_create_smfData( int flags, int * status );
 
@@ -147,7 +153,8 @@ smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
 		       smfDA * da, smf_dtype dtype, void * pntr[3], 
 		       const dim_t dims[], int ndims,
-		       int virtual, int ncoeff, double *poly, int * status );
+		       int virtual, int ncoeff, double *poly, 
+		       AstKeyMap *history, int * status );
 smfDA *
 smf_construct_smfDA( smfDA * tofill, double * flatcal,
 		     double * flatpar, const char * flatname, int nflat,
@@ -165,7 +172,8 @@ smf_construct_smfHead( smfHead * tofill,
 
 smfHead * smf_deepcopy_smfHead ( const smfHead *old, int * status);
 
-smfData * smf_deepcopy_smfData ( const smfData *old, const int rawconvert, int * status);
+smfData * smf_deepcopy_smfData ( const smfData *old, const int rawconvert, 
+				 const int flags, int * status);
 
 smfDA * smf_deepcopy_smfDA ( const smfData *old, int * status);
 
@@ -184,24 +192,31 @@ size_t smf_dtype_size( const smfData* data, int * status );
 smf_dtype
 smf_dtype_fromstring( const char * dtype, int * status );
 
-/*void smf_extcorr( smfData *data, double tau, int *status);*/
-
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status);
 
 /* Do not return the result since we want the interface to remain the same when a
    string is required. If we return a string we have to know who should free it */
-void smf_fits_getI( const smfHead * hdr, const char * cardname, int * result, int * status );
-void smf_fits_getD( const smfHead * hdr, const char * cardname, double * result, int * status );
-void smf_fits_getF( const smfHead * hdr, const char * cardname, float * result, int * status );
-void smf_fits_getS( const smfHead * hdr, const char * cardname, char result[70], size_t len, int * status );
+void smf_fits_getI( const smfHead * hdr, const char * cardname, int * result, 
+		    int * status );
+void smf_fits_getD( const smfHead * hdr, const char * cardname, double * result, 
+		    int * status );
+void smf_fits_getF( const smfHead * hdr, const char * cardname, float * result, 
+		    int * status );
+void smf_fits_getS( const smfHead * hdr, const char * cardname, char result[70], 
+		    size_t len, int * status );
 
-void smf_flatfield ( const smfData *idata, smfData **odata, int *status );
+void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, int *status );
 
 void smf_flatten ( smfData *data, int *status );
 
 void smf_free( void * pntr, int * status );
 
 int smf_history_check( const smfData* data, const char * appl, int *status);
+
+void smf_history_read( smfData* data, int *status);
+
+void smf_history_add( smfData* data, const char * appl, 
+			const char * text, int *status);
 
 void smf_history_write( const smfData* data, const char * appl, 
 			const char * text, int *status);
