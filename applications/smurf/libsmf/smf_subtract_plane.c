@@ -69,6 +69,8 @@
 *        Speedup 1-D fit by calculating the angle between the long
 *        axis of the subarray and the zenith, and incrementing it for
 *        subsequent timesteps
+*     2006-04-21 (AGG):
+*        Add history check, and update history if routine successful
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -173,6 +175,13 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 
   /* Check status */
   if (*status != SAI__OK) return;
+
+  if ( smf_history_check( data, FUNC_NAME, status) ) {
+    msgSetc("F", FUNC_NAME);
+    msgOutif( MSG__VERB, FUNC_NAME, 
+	      "^F has already been run on these data, returning to caller", status);
+    return;
+  }
 
   /* Set some flags depending on desired FIT type */
   if ( strncmp( fittype, "MEAN", 4 ) == 0 ) {
@@ -396,6 +405,15 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
     }
 
   } /* End of loop over timeslice frame */
+
+  /* Write history entry */
+  if ( *status == SAI__OK ) {
+    smf_history_add( data, FUNC_NAME, 
+		       "Plane sky subtraction successful", status);
+  } else {
+    errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
+	   status);
+  }
 
   CLEANUP:
   smf_free(xin,status);

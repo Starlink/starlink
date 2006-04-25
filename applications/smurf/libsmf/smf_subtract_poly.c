@@ -36,6 +36,8 @@
 *  History:
 *     2006-02-17 (AGG):
 *        Initial test version
+*     2006-04-21 (AGG):
+*        Add history check, and update history if routine successful
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -99,7 +101,7 @@ void smf_subtract_poly(smfData *data, int *status) {
   /* Check status */
   if (*status != SAI__OK) return;
 
-  /*  if ( smf_history_check( *data, FUNC_NAME, status) ) return;*/
+  if ( smf_history_check( data, FUNC_NAME, status) ) return;
 
   /* Retrieve polynomial data */
   ncoeff = data->ncoeff;
@@ -127,7 +129,6 @@ void smf_subtract_poly(smfData *data, int *status) {
       /* Construct the polynomial for this bolometer */
       baseline = 0.0;
       for (k=0; k<ncoeff; k++) {
-	/*	printf("poly = %g\n",poly[i+ nbol*k]);*/
 	baseline += poly[i + nbol*k] * (double)pow(j, k);
       }
       outdata[i + nbol*j] -= baseline;
@@ -137,6 +138,13 @@ void smf_subtract_poly(smfData *data, int *status) {
   /* Store polynomial-subtracted data */
   (data->pntr)[0] = outdata;
 
-  /*smf_history_write( data, FUNC_NAME, "Lots of nonsense", status);*/
+  /* Write history entry */
+  if ( *status == SAI__OK ) {
+    smf_history_add( data, FUNC_NAME, 
+		       "Polynomial sky subtraction successful", status);
+  } else {
+    errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
+	   status);
+  }
 
 }
