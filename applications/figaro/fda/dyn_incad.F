@@ -1,3 +1,6 @@
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
       SUBROUTINE DYN_INCAD( BASEAD, TYPE, INCR, ADDRES, ISNEW, STATUS )
 *+
 *  Name:
@@ -139,9 +142,15 @@
 *  Local Variables:
       INTEGER I                  ! Loop index
       CHARACTER * ( 7 ) TYPEUC   ! Given type in upper case
+#if SIZEOF_VOIDP == 8
       INTEGER * 8 NEWAD          ! New address, full type.
       INTEGER * 8 OFFSET         ! Offset in bytes
-
+#elif SIZEOF_VOIDP == 4
+      INTEGER * 4 NEWAD          ! New address, full type.
+      INTEGER * 4 OFFSET         ! Offset in bytes
+#else
+      Non-standard pointer size! (SIZEOF_VOIDP)
+#endif
 *.
 
 *  Check the inherited global status.

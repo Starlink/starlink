@@ -15,7 +15,7 @@ PRIVATE_INCLUDES = DSA_COMMON DSA_STRUCTURE DSA_TYPES
 BLOCK_DATA_FILES = dsa_block.f
 
 F_ROUTINES = \
-dyn_incad.f dyn_increm.f dsa_open.f dsa_close.f \
+dyn_increm.f dsa_open.f dsa_close.f \
 dsa_dump_cmn.f dsa_input.f dsa_nm_in.f dsa_inputu.f dsa_nm_inu.f \
 dsa_output.f dsa_nm_out.f  dsa_smpl_out.f  dsa_close_sr.f dsa_unmap.f \
 dsa_gt_ac_nm.f dsa_use_fl.f dsa_use_ql.f dsa_ql_fl_ok.f \
@@ -42,4 +42,4 @@ dta_rdvarx.f dta_wrvarx.f dta_loc.f dta_annul.f dta1_there.f \
 dta1_split.f dta1_decdim.f dsa2_acre.f dsa2_afillf.f dsa2_ifillf.f \
 dsa2_ifilld.f dsa2_pixin.f
 
-FPP_ROUTINES = dyn_element.F
+FPP_ROUTINES = dyn_element.F dyn_incad.F
