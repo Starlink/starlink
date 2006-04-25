@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="mag" support="U">
-  <version>1.1-4</version>
+  <version>2.0-2</version>
   <path>libraries/mag</path>
   <description>Fortran access to magentic tape devices</description>
   <abstract><p>
