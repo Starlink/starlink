@@ -71,7 +71,7 @@ KPG_NXD_GEN = kpg1_cmul.gnxd
 
 # All numeric types
 KPG_N_GEN = bad2d.gn kpg1_bl1d.gn kpg1_bor2.gn \
-kpg1_cadd.gn kpg1_chva.gn kpg1_cmpk.gn kpg1_cpnt.gn \
+kpg1_cadd.gn kpg1_chva.gn kpg1_cmpk.gn \
 kpg1_csub.gn kpg1_elnm.gn kpg1_expo.gn kpg1_fill.gn \
 kpg1_flip.gn kpg1_frac.gn kpg1_gauf.gn kpg1_ghst.gn \
 kpg1_hsta.gn kpg1_hstq.gn kpg1_loct.gn kpg1_loga.gn \
@@ -101,9 +101,9 @@ kpg1_axlv.gdr kpg1_axvl.gdr kpg1_bloc.gdr kpg1_bmed.gdr \
 kpg1_chax.gdr kpg1_chep.gdr kpg1_chev.gdr kpg1_cmav.gdr \
 kpg1_che2.gdr kpg1_cmad.gdr kpg1_cmvd.gdr kpg1_cmvv.gdr \
 kpg1_d2w2.gdr kpg1_dcli.gdr kpg1_div.gdr  kpg1_dwso.gdr \
-kpg1_ffr.gdr  kpg1_fftf.gdr kpg1_flco.gdr kpg1_gaus.gdr \
+kpg1_ffr.gdr  kpg1_fftf.gdr kpg1_gaus.gdr \
 kpg1_hcon.gdr kpg1_hmlt.gdr kpg1_hsds.gdr kpg1_hsfl.gdr \
-kpg1_hstf.gdr kpg1_inco.gdr kpg1_litn.gdr kpg1_ludc.gdr \
+kpg1_hstf.gdr kpg1_litn.gdr kpg1_ludc.gdr \
 kpg1_mdet.gdr kpg1_mono.gdr kpg1_mthe.gdr kpg1_pow.gdr \
 kpg1_prow.gdr kpg1_psfs.gdr kpg1_qntl.gdr kpg1_rfco.gdr \
 kpg1_ssaz.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_tral.gdr \
@@ -301,9 +301,9 @@ kpg1_wgndf.f \
 kpg1_wrlst.f \
 kpg1_wrls2.f
 
-KPG_ADAM_DR_GEN = kpg1_mixv.gdr
+KPG_ADAM_DR_GEN = kpg1_mixv.gdr kpg1_inco.gdr kpg1_flco.gdr 
 
-KPG_ADAM_N_GEN = kpg1_dara.gn
+KPG_ADAM_N_GEN = kpg1_dara.gn kpg1_cpnt.gn 
 
 # Graphic routines
 KPG_GRAPHIC_NONGEN = \
