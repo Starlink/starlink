@@ -83,7 +83,6 @@ void smf_check_smfDA( const smfData *idata, smfData *odata, int * status ) {
 
   smfDA *ida = NULL;       /* Input smfDA */
   smfDA *oda = NULL;       /* Output smfDA */
-  char flatname[SC2STORE_FLATLEN]; /* name of flatfield algorithm */
   double *flatcal;         /* pointer to flatfield calibration */
   double *flatpar;         /* pointer to flatfield parameters */
   int nbol;                /* Number of bolometers/pixels */
