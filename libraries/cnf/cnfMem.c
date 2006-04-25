@@ -625,15 +625,17 @@ F77_POINTER_FUNCTION(cnf_preg)( void ** locptr, LOGICAL(isnew) ) {
 
 *  Arguments:
 *     LOCPTR = INTEGER*X (Given)
-*        The output from %LOC
+*        The output from %LOC. If called using an INTEGER the
+*        size of INTEGER must match the size of integer returned
+*        from %LOC.
 *     ISNEW = LOGICAL (Returned)
 *        TRUE if the pointer was registered successfully.
 *        FALSE if the pointer was already registered. The result is
 *        undefined if the function itself returned 0.
 
 *  Returned Value:
-*     CNF_PREG
-*        The pointer squeezed into an INTEGER. Will contain zero
+*     CNF_PREG = INTEGER
+*        The pointer squeezed into an INTEGER*4. Will contain zero
 *        if the pointer could not be registered.
 
 *  Notes:
@@ -646,10 +648,16 @@ F77_POINTER_FUNCTION(cnf_preg)( void ** locptr, LOGICAL(isnew) ) {
 *       be responsible for unregistering the pointer.
 *     - The pointer should be unregistered using CNF_UNREGP
 *       when it is no longer required.
-*-
+*     - If the routine is to be called using an INTEGER argument
+*       make sure that the size of the INTEGER matches the size
+*       returned by %LOC (ie a C pointer). Using an INTEGER*8
+*       on a 32-bit system may lead to failures on big endian
+*       systems (such as PowerPC).
 
 *  Implementation Notes:
 *     - This routine is designed to be called from Fortran.
+
+*-
 */
 
 /* Local Variables: */
