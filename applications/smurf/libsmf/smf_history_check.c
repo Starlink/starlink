@@ -39,11 +39,14 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-01-24 (TIMJ):
 *        Initial version.
+*     2006-04-20 (AGG):
+*        Use history AstKeyMap instead of file history
 
 *  Notes:
 *     - Applications names are compared case sensitively. Uppercase
@@ -55,8 +58,9 @@
 *     - See also smf_history_write
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council and the University of British Columbia.  All Rights
+*     Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -97,7 +101,6 @@
 
 int smf_history_check( const smfData* data, const char * appl, int *status) {
   size_t applen;       /* Length of supplied appl string */
-  smfFile *file = NULL; /* data->file */
   int i = 0;           /* Loop counter */
   int nrec = 0;        /* Number of history records */
   char refappl[NDF__SZAPP+1]; /* Name of application from header record */
@@ -115,39 +118,13 @@ int smf_history_check( const smfData* data, const char * appl, int *status) {
     return retval;
   }
 
-  /* Check that we have a file */
-  file = data->file;
-  if ( file == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "Supplied smfData is not associated with a file. Unable to query history", status );
-    return retval;
-  }
+  applen = strlen( appl );
 
-  /* Special case sc2store file */
-  if (file->isSc2store) {
-    return 1;
-  }
+  nrec = astMapSize( data->history );
 
-  /* Check that we have an NDF */
-  if (file->ndfid == NDF__NOID) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "Supplied smfData is associated wit ha file but it isn't an NDF",
-	    status );
-    return 0;
-  }
-
-  /* Found out how many history records we have */
-  ndfHnrec( file->ndfid, &nrec, status );
-
-  if ( *status == SAI__OK ) {
-
-    /* history records start at 1 */
-    applen = strlen( appl );
-    for (i = 1; i <= nrec; i++ ) {
-      ndfHinfo(file->ndfid, "APPLICATION", i, refappl, NDF__SZAPP, status);
-      if (strncmp( refappl, appl, applen ) == 0 ) {
+  if ( nrec != 0 ) {
+    for ( i=0; i<nrec; i++ ) {
+      if ( strncmp( astMapKey( data->history, i ), appl, applen ) == 0 ) {
 	retval = 1;
 	break;
       }
