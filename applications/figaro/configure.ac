@@ -51,6 +51,10 @@ AC_FC_HAVE_OLD_TYPELESS_BOZ()
 AC_FC_HAVE_TYPELESS_BOZ()
 AC_FC_HAVE_BOZ
 
+dnl    We need to know how big the C pointer type is
+dnl    so that we can use CNF_PREG
+AC_CHECK_SIZEOF(void*)
+
 dnl    Dependences on Starlink packages
 STAR_DECLARE_DEPENDENCIES([build], [pda agi grp ndf fio idi shl sla], [link])
 
