@@ -56,10 +56,14 @@ Also see C<Starlink::Prologue::Parser::Base>.
 
 =item B<push_line>
 
-Add a new line of content to the parser. Returns the line
-itself if the line is not part of a prologue. Returns undef if the
-line was part of a prologue and returns a C<Starlink::Prologue>
-object if the line ends a prologue.
+Add a new line of content to the parser. Since some prologues are only
+terminated when the first line of code is discovered, it is sometimes
+necessary to return both a line of code and the relevant
+C<Starlink::Prologue> prologue object. The C<push_line> method returns
+the line itself if the line is not part of a prologue, and/or a
+prologue object if the prologue is terminated by this line.
+
+  ($line, $prologue) = $parser->push_line;
 
 =cut
 
@@ -105,7 +109,7 @@ sub push_line {
       $self->prologue( undef );
 
       # return the newly minted version
-      return $prl;
+      return (undef, $prl);
 
     } elsif ( $line =~ /^\s*[$r]\s+([A-Za-z\s]*)\s*:\s*$/ ) {
       # section
@@ -150,11 +154,11 @@ sub push_line {
       }
 
       # inside a prolog so return nothing
-      return undef;
+      return ();
 
     } else {
       # not interested
-      return $line;
+      return ($line, undef);
     }
 
   }

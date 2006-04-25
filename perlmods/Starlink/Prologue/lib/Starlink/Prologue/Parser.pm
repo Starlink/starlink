@@ -72,10 +72,23 @@ sub new {
 
 =item B<push_line>
 
-Add a new line of content to the parser. Returns the line
-itself if the line is not part of a prologue. Returns undef if the
-line was part of a prologue and returns a C<Starlink::Prologue>
-object if the line ends a prologue.
+Add a new line of content to the parser. In scalar context returns the
+line itself if the line is not part of a prologue, returns undef if
+the line was part of a prologue and returns a C<Starlink::Prologue>
+object if the line completes a prologue. This usage is adequate if only
+the prologue is being extracted, as opposed to rewriting the prologue.
+
+  $result = $parser->prologue;
+
+Since some prologues are only terminated when the first line of code is
+discovered, it is sometimes necessary to return both a line of code and the
+relevant prologue. If the prologue is being rewritten and code lines are
+not being discarded, the C<push_line> method should be called in list context
+where both a line and prologue can be returned simultaneously. Either the line
+or prologue or both can be undef depending on context.
+
+  ($line, $prologue) = $parser->push_line;
+
 
 =cut
 
@@ -92,17 +105,28 @@ sub push_line {
 
   if (defined $worker) {
     # currently in a prologue
-    my $status = $worker->push_line($line);
+    my @status = $worker->push_line($line);
 
     # we should only be getting undef or a prologue object
     # unless we are at the top of an old style prolog.
-    if (defined $status) {
-      if (ref($status) ) {
+    if (defined $status[1]) {
+      if (ref($status[1]) ) {
 	# finished this prologue
 	$self->_worker( undef );
       }
     }
-    return $status;
+    if ( wantarray() ) {
+    return @status;
+    } else {
+      if (defined $status[1]) {
+        # prologue takes priority in scalar context
+        return $status[1];
+      } else {
+        # return line or undef
+        return $status[0];
+      }
+    }
+
 
   } else {
     # not in a prologue, so this might be a start
