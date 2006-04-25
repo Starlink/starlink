@@ -3,14 +3,9 @@
 use strict;
 use Test::More;
 
-require_ok("Starlink::AST");
-require_ok("Starlink::AST::Tk");
-
-
 BEGIN {
 
- use Tk;
- eval "use Tk::Button;";
+ eval "use Tk; use Tk::Button;";
  if ( $@ ) {
    plan skip_all => "Tk modules not installed";
    exit;
@@ -18,6 +13,9 @@ BEGIN {
    plan tests => 16;
  }
 };
+
+require_ok("Starlink::AST");
+require_ok("Starlink::AST::Tk");
 
 # create Tk test harness
 my $c = create_window();

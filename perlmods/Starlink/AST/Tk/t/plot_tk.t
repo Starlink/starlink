@@ -4,21 +4,9 @@ use strict;
 use Test::More;
 use Data::Dumper;
 
-require_ok("Starlink::AST");
-require_ok("Starlink::AST::Tk");
-
-use File::Spec;
-
-my $zoom = 1;
-my @factor;
-$factor[0] = 1.7;
-$factor[1] = 1.7;
-print "# zoom = $zoom, xfactor = $factor[0], yfactor = $factor[1]\n";
-
 BEGIN {
 
- use Tk;
- eval "use Tk::Button";
+ eval "use Tk; use Tk::Button";
  if ( $@ ) {
    plan skip_all => "Tk modules not installed";
    exit;
@@ -39,6 +27,17 @@ BEGIN {
  plan tests => 5;    
  
 };
+
+require_ok("Starlink::AST");
+require_ok("Starlink::AST::Tk");
+
+use File::Spec;
+
+my $zoom = 1;
+my @factor;
+$factor[0] = 1.7;
+$factor[1] = 1.7;
+print "# zoom = $zoom, xfactor = $factor[0], yfactor = $factor[1]\n";
 
 Starlink::AST::Begin();
    

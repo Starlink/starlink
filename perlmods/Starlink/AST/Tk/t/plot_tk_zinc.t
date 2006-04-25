@@ -3,17 +3,7 @@
 use strict;
 use Test::More;
 use Data::Dumper;
-
-require_ok("Starlink::AST");
-require_ok("Starlink::AST::Tk");
-
 use File::Spec;
-
-my $zoom = 1;
-my @factor;
-$factor[0] = 1.7;
-$factor[1] = 1.7;
-print "# zoom = $zoom, xfactor = $factor[0], yfactor = $factor[1]\n";
 
 BEGIN {
 
@@ -50,6 +40,15 @@ BEGIN {
  plan tests => 5;    
  
 };
+
+require_ok("Starlink::AST");
+require_ok("Starlink::AST::Tk");
+
+my $zoom = 1;
+my @factor;
+$factor[0] = 1.7;
+$factor[1] = 1.7;
+print "# zoom = $zoom, xfactor = $factor[0], yfactor = $factor[1]\n";
 
 Starlink::AST::Begin();
    
