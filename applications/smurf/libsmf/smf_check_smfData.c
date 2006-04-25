@@ -35,6 +35,10 @@
 *  History:
 *     2006-04-03 (AGG):
 *        Initial version.
+*     2006-04-21 (AGG):
+*        - Add flags to determine whether smfFile, DA and Head elements
+*          should be checked
+*        - Add check for presence of history element
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -79,7 +83,7 @@
 
 #define FUNC_NAME "smf_check_smfData"
 
-void smf_check_smfData( const smfData *idata, smfData *odata, int * status ) {
+void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, int * status ) {
 
   smfDA *da = NULL;       /* New smfDA */
   smfFile *file = NULL;   /* New smfFile */
@@ -94,6 +98,7 @@ void smf_check_smfData( const smfData *idata, smfData *odata, int * status ) {
   double *outdata = NULL; /* Pointer to output DATA */
   void *pntr[3];          /* Data, variance and quality arrays */
   int *tstream;           /* Pointer to raw time series data */
+  AstKeyMap *history;
 
   if (*status != SAI__OK) return;
 
@@ -201,7 +206,6 @@ void smf_check_smfData( const smfData *idata, smfData *odata, int * status ) {
     }
   }
 
-
   /* Check scanfit polynomial coefficients */
   /* Is there an easy way of checking consistency? */
   if ( !(odata->ncoeff) ) {
@@ -218,40 +222,51 @@ void smf_check_smfData( const smfData *idata, smfData *odata, int * status ) {
     }
   }
 
-  /* Check Head */
-  if ( odata->hdr == NULL ) {
-    hdr = smf_deepcopy_smfHead( idata->hdr, status);
-    if ( *status == SAI__OK ) {
-      odata->hdr = hdr;
-    } else {
-      errRep(FUNC_NAME, "Unable to allocate memory for new smfHead", status);
-    }
-  } else {
-    smf_check_smfHead( idata, odata, status );
+  /* Check for history, copy from input if present */
+  if ( odata->history == NULL && idata->history != NULL ) {
+    history = astCopy( idata->history );
+    odata->history = history;
   }
 
-  /* Check File */
-  if ( odata->file == NULL ) {
-    file = smf_deepcopy_smfFile( idata->file, status);
-    if ( *status == SAI__OK ) {
-      odata->file = file;
+  /* Check smfHead if desired */
+  if (! (flags & SMF__NOCREATE_HEAD) ) {
+    if ( odata->hdr == NULL ) {
+      hdr = smf_deepcopy_smfHead( idata->hdr, status);
+      if ( *status == SAI__OK ) {
+	odata->hdr = hdr;
+      } else {
+	errRep(FUNC_NAME, "Unable to allocate memory for new smfHead", status);
+      }
     } else {
-      errRep(FUNC_NAME, "Unable to allocate memory for new smfFile", status);
+      smf_check_smfHead( idata, odata, status );
     }
-  } else {
-    smf_check_smfFile( idata, odata, status );
+  }
+  /* Check File if desired */
+  if (! (flags & SMF__NOCREATE_FILE) ) {
+    if ( odata->file == NULL ) {
+      file = smf_deepcopy_smfFile( idata->file, status);
+      if ( *status == SAI__OK ) {
+	odata->file = file;
+      } else {
+	errRep(FUNC_NAME, "Unable to allocate memory for new smfFile", status);
+      }
+    } else {
+      smf_check_smfFile( idata, odata, status );
+    }
   }
 
-  /* Check DA */
-  if ( odata->da == NULL && idata->da != NULL ) {
-    da = smf_deepcopy_smfDA( idata, status );
-    if ( *status == SAI__OK ) {
-      odata->da = da;
+  /* Check DA if desired */
+  if (! (flags & SMF__NOCREATE_DA) ) {
+    if ( odata->da == NULL && idata->da != NULL ) {
+      da = smf_deepcopy_smfDA( idata, status );
+      if ( *status == SAI__OK ) {
+	odata->da = da;
+      } else {
+	errRep(FUNC_NAME, "Unable to allocate memory for new smfDA", status);
+      }
     } else {
-      errRep(FUNC_NAME, "Unable to allocate memory for new smfDA", status);
+      smf_check_smfDA( idata, odata, status );
     }
-  } else {
-    smf_check_smfDA( idata, odata, status );
   }
 
   /* Refcount & virtual */
