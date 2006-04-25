@@ -28,6 +28,7 @@ use warnings;
 use Carp;
 
 use Starlink::Prologue;
+use base qw/ Starlink::Prologue::Parser::Base /;
 
 =head1 METHODS
 
@@ -39,113 +40,17 @@ use Starlink::Prologue;
 
 Create a new STARLSE parser
 
-  $p = new Starlink::Prologue::Parser::STARLSE;
-
-=cut
-
-sub new {
-  my $proto = shift;
-  my $class = ref($proto) || $proto;
-
-  my $p = bless {
-		 PROLOGUE => undef,
-		 SECTION => undef,
-		 CONTENT => [],
-		}, $class;
-
-  return $p;
-}
-
+  $p = new Starlink::Prologue::Parser::STARLSE();
 
 =back
 
 =head2 Accessors
 
-=over 4
-
-=item B<prologue>
-
-Prologue that is currently being populated. It will be deleted when the
-current prolog completes.
-
-=cut
-
-=item B<prologue>
-
-=cut
-
-sub prologue {
-  my $self = shift;
-  if (@_) {
-    $self->{PROLOGUE} = shift;
-  }
-  return $self->{PROLOGUE};
-}
-
-=item B<section>
-
-Title of currently active section.
-
-=cut
-
-sub section {
-  my $self = shift;
-  if (@_) {
-    $self->{SECTION} = shift;
-  }
-  return $self->{SECTION};
-}
-
-=item B<content>
-
-Contents of currently active section.
-
- @{$self->content} = ();
-
-=cut
-
-sub content {
-  my $self = shift;
-  return $self->{CONTENT};
-}
-
-=item B<flush_section>
-
-Migrate the current section information into the C<Starlink::Prologue>
-object.
-
-  $parser->flush_section();
-
-=cut
-
-sub flush_section {
-  my $self = shift;
-  my $section = $self->section;
-  return unless defined $section;
-
-  my @content = @{$self->{CONTENT}};
-
-  # remove any blank lines from the end of the content
-  my $pos = $#content;
-  if ($pos > -1) {
-    while ($content[$pos] =~ /^\s*$/) {
-      $pos--;
-    }
-    @content = @content[0..$pos];
-  }
-  # store the content
-  my $prl = $self->prologue;
-  $prl->content( $section, @content);
-
-  # reset internal state
-  $self->section( undef );
-  @{ $self->content } = ();
-
-}
-
-=back
+For a list of generic accessors see C<Starlink::Prologue::Parser::Base>.
 
 =head2 General
+
+Also see C<Starlink::Prologue::Parser::Base>.
 
 =over 4
 
@@ -256,34 +161,6 @@ sub push_line {
 
 }
 
-=item B<flush>
-
-Flush the current prologue and return it. Resets the object.
-
-  $prologue = $parser->flush();
-
-Returns undef if no active prologue.
-
-This should be called when no more lines are to be parsed to
-make sure that unterminated prologues are returned.
-
-=cut
-
-sub flush {
-  my $self = shift;
-  my $prl = $self->prologue;
-  return () unless defined $prl;
-
-  # flush internal content to prologue
-  $self->flush_section();
-
-  # reset internal content
-  $self->prologue(undef);
-
-  # return the prologue as-is
-  return $prl;
-}
-
 =head2 Class Methods
 
 =over 4
@@ -335,9 +212,13 @@ sub prolog_start {
 
 =back
 
+=head1 NOTES
+
+This class is a subclass of C<Starlink::Prologue::Parser::Base>
+
 =head1 SEE ALSO
 
-C<Starlink::Prologue::Parser>
+C<Starlink::Prologue::Parser::Base>
 
 =head1 AUTHOR
 
