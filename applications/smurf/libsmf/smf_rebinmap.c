@@ -105,12 +105,10 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outframeset
   AstMapping *bolo2sky=NULL;    /* Mapping bolo->celestial coordinates */
   AstCmpMap *bolo2map=NULL;     /* Combined mapping bolo->map coordinates */
   double  *boldata;             /* Pointer to bolometer data */
-  smfFile *file=NULL;           /* SCUBA2 data file information */
   smfHead *hdr=NULL;            /* Pointer to data header this time slice */
   dim_t j;                      /* Loop counter */
   int lbnd_in[2];               /* Lower pixel bounds for input maps */
   int nbol = 0;                 /* # of bolometers in the sub-array */
-  char *pname=NULL;             /* Name of currently opened data file */
   int rebinflags;               /* Control the rebinning procedure */
   struct sc2head *sc2hdr=NULL;  /* Pointer to sc2head for this time slice */
   AstMapping *sky2map=NULL;     /* Mapping celestial->map coordinates */

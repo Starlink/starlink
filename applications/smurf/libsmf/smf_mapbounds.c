@@ -115,7 +115,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   smfData *data=NULL;          /* pointer to  SCUBA2 data struct */
   smfFile *file=NULL;          /* SCUBA2 data file information */
   AstFitsChan *fitschan=NULL;  /* Fits channels to construct WCS header */
-  char fitshd[8][81];          /* Strings for each fits channel */
   smfHead *hdr=NULL;           /* Pointer to data header this time slice */
   dim_t i;                     /* Loop counter */
   dim_t j;                     /* Loop counter */
@@ -124,7 +123,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   struct sc2head *sc2hdr=NULL; /* Pointer to sc2head for this time slice */
   AstMapping *sky2map=NULL;    /* Mapping celestial->map coordinates */
   int startboundcheck=1;       /* Flag for first check of map dimensions */
-  char wcssystem[81];          /* String containing system attribute */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */ 
   double x_map[4];             /* Projected X-coordinates of corner bolos */ 
   double y_array_corners[4];   /* Y-Indices for corner pixels in array */ 
@@ -281,6 +279,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   astSetC( *outframeset, "SYSTEM", system );
   
   /* Change the pixel bounds to be consistent with the new CRPIX */
+
   ubnd_out[0] -= lbnd_out[0];
   lbnd_out[0] = 0;
 
