@@ -104,6 +104,9 @@
 #include "libsmf/smf_err.h"
 #include "sc2da/sc2store.h"
 
+#define FUNC_NAME "smurf_flatfield"
+#define TASK_NAME "FLATFIELD"
+
 void smurf_flatfield( int *status ) {
 
   smfData *ffdata = NULL;   /* Pointer to output data struct */
@@ -127,24 +130,22 @@ void smurf_flatfield( int *status ) {
 
     /* Call flatfield routine */
     smf_open_and_flatfield(igrp, ogrp, i, &ffdata, status);
-    /*    smf_open_and_flatfield(igrp, NULL, i, &ffdata, status );*/
 
     /* Check status to see if data are already flatfielded */
     if (*status == SMF__FLATN) {
       errAnnul( status );
-      msgOutif(MSG__VERB, "smurf_flatfield",
-	     "smurf_flatfield: Data are already flatfielded", status);
+      msgOutif(MSG__VERB, FUNC_NAME,
+	     "Data are already flatfielded", status);
     } else if ( *status == SAI__OK) {
-      msgOutif(MSG__VERB," ","Flat field applied", status);
-      /* Write history entry */
+      msgOutif(MSG__VERB, FUNC_NAME, "Flat field applied", status);
     } else {
       /* Tell the user which file it was... */
       /* Would be user-friendly to trap 1st etc... */
       errFlush( status );
       msgSeti("I",i);
       msgSeti("N",size);
-      errRep("smurf_flatfield",
-	     "Unable to flatfield data from the ^I th of ^N files", status);
+      errRep(FUNC_NAME,
+	     "Unable to flatfield data from file ^I of ^N", status);
     }
     /* Free resources for output data */
     smf_close_file( &ffdata, status );
