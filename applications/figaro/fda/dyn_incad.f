@@ -48,7 +48,9 @@
 *        the result will be set equal to BASEAD.
 *     INCR = INTEGER (Given)
 *        The number of elements of the dynamically allocated array by
-*        which the current element number is to be incremented.
+*        which the current element number is to be incremented. If INCR
+*        is zero, the input pointer will be returned and ISNEW will be
+*        set to FALSE.
 *     ADDRES = INTEGER (Returned)
 *        The new memory address.
 *     ISNEW = INTEGER (Returned)
@@ -68,9 +70,31 @@
 *     then a replacement for this routine will be required (in which
 *     case a C implementation may be required).
 
+*  Copyright:
+*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+
 *  Authors:
 *     PWD: Peter W. Draper (STARLINK, Durham University)
 *     MJC: Malcolm J. Currie (Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,6 +106,9 @@
 *        correct a few typos.  Added STATUS argument.
 *     09-JUN-2005 (PWD):
 *        Few tidyups.
+*     24-APR-2006 (TIMJ):
+*        Check return value from CNF_PREG. Add short circuit test
+*        if INCR is 0
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -120,9 +147,28 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Short circuit
+      IF (INCR .EQ. 0) THEN
+         ADDRES = BASEAD
+         ISNEW = .FALSE.
+         RETURN
+      END IF
+
+*  Actually need to increment
       TYPEUC = TYPE
       CALL CHR_UCASE( TYPEUC )
       NEWAD = CNF_PVAL( BASEAD )
+      IF (NEWAD .EQ. 0) THEN
+         IF (STATUS .NE. SAI__OK) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP('DYN_INCAD_PVAL',
+     :           'Variable given to DYN_INCAD is not '/
+     :           /'registered with CNF',
+     :           STATUS)
+            GO TO 3
+         END IF
+      END IF
+
       OFFSET = 0
       DO 1 I = 1, MAX_TYPES
          IF ( TYPEUC .EQ. TYPE_NAMES( I ) ) THEN
@@ -144,6 +190,19 @@
  2    CONTINUE
 
 *  Register this address with CNF.
-      ADDRES = CNF_PREG( NEWAD, ISNEW )
+      IF (STATUS .EQ. SAI__OK) THEN
+         ADDRES = CNF_PREG( NEWAD, ISNEW )
+         IF (ADDRES .EQ. 0) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'DYN_INC_PADREG',
+     :           'DYN_INCAD: Unable to register offset pointer '/
+     :           /'with CNF.',
+     :           STATUS)
+
+         END IF
+      END IF
+
+*  Jump here on error
+ 3    CONTINUE
 
       END
