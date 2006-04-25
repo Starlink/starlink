@@ -66,6 +66,8 @@
 *        CSOTAU method
 *     2006-02-17 (AGG):
 *        Store and monitor all three WVM temperatures
+*     2006-04-21 (AGG):
+*        Check and update history if routine successful
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -154,6 +156,8 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
 
   /* Check status */
   if (*status != SAI__OK) return;
+
+  if ( smf_history_check( data, FUNC_NAME, status) ) return;
 
   /* Do we have 2-D image data? */
   if (data->ndims == 2) {
@@ -315,6 +319,15 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
 	}
       }
     }
+  }
+
+  /* Add history entry */
+  if ( *status == SAI__OK ) {
+    smf_history_add( data, FUNC_NAME, 
+		       "Extinction correction successful", status);
+  } else {
+    errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
+	   status);
   }
 
  CLEANUP:
