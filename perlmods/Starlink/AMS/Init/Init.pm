@@ -88,7 +88,8 @@ sub new {
 
   # Could be done with a scalar object
   my $task = {};  # Anon hash
-  $task->{Running} = 0;
+  $task->{Running}  = 0;
+  $task->{Messages} = undef;
 
   # Bless this ams into class
   bless($task, $class);
@@ -167,24 +168,30 @@ else they are ignored.
 
 Default is to print all messages.
 
+If messages() has not been previously set, calling it will return
+undef. When messages() is in this state it will act as if it were set
+to the default of printing all messages.
+
 =cut
 
 
 sub messages {
   my $self = shift;
-  if (@_) { 
+  if (@_) {
     my $arg = shift;
     # also need to set the flag in the Core module
     # This is the inverse to Messages since
     # true means I want messages.
     if ($arg) {
       $Starlink::AMS::Core::msg_hide = 0;
+      $self->{Messages} = $arg;
     } else {
       $Starlink::AMS::Core::msg_hide = 1;
+      $self->{Messages} = 0;
     }
 
   }
-  return ( ! $Starlink::AMS::Core::msg_hide );
+  return $self->{Messages};
 }
 
 =item errors
