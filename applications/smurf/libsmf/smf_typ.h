@@ -47,6 +47,8 @@
 *        Add ncoeff and poly for scanfit polynomial coefficients
 *     2006-03-23 (AGG):
 *        Add nframes and curframe to smfHead
+*     2006-04-21 (AGG):
+*        Add history to smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -85,6 +87,7 @@
 #include "star/grp.h"
 #include "smurf_typ.h"
 #define SMF_PATH_MAX GRP__SZNAM
+#define SMF_NAME_MAX GRP__SZNAM
 
 /* Different data types supported by SMURF */
 
@@ -152,6 +155,7 @@ typedef struct smfData {
   int virtual;             /* Flag for extracted timeslices */
   double *poly;            /* Polynomial scan fits */
   int ncoeff;              /* Number of coefficients in polynomial */
+  AstKeyMap *history;      /* History entries */
 } smfData;
 
 #endif /* SMF_TYP_DEFINED */
