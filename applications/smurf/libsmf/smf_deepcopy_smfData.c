@@ -49,6 +49,11 @@
 *     2006-03-28 (AGG):
 *        Change API to allow copying of raw integer data to a double
 *        output array
+*     2006-04-21 (AGG):
+*        - Update API to accept a flags to determine whether the smfFile,
+           smfDA and smfHead elements should be copied
+*        - Make use of these SMF__NOCREATE_* flags
+*        - Copy history element only if present
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -93,25 +98,27 @@
 #define FUNC_NAME "smf_deepcopy_smfData"
 
 smfData *
-smf_deepcopy_smfData( const smfData *old, const int rawconvert, int * status ) {
+smf_deepcopy_smfData( const smfData *old, const int rawconvert, 
+		      const int flags, int * status ) {
 
-  smfDA *da = NULL;       /* New smfDA */
-  dim_t dims[NDF__MXDIM]; /* Dimensions of each axis of data array */
-  smf_dtype dtype;        /* Data type */
-  smfFile *file = NULL;   /* New smfFile */
-  smfHead *hdr = NULL;    /* New smfHead */
-  size_t i;                  /* Loop counter */
-  size_t j;                  /* Loop counter */
-  size_t nbytes;          /* number of bytes in data type */
-  dim_t ncoeff = 0;       /* Number of coefficients */
-  int ndims;              /* Number of dimensions in data array */
-  smfData *new = NULL;    /* New smfData */
-  int npts;               /* Number of data points */
+  smfDA *da = NULL;           /* New smfDA */
+  dim_t dims[NDF__MXDIM];     /* Dimensions of each axis of data array */
+  smf_dtype dtype;            /* Data type */
+  smfFile *file = NULL;       /* New smfFile */
+  smfHead *hdr = NULL;        /* New smfHead */
+  size_t i;                   /* Loop counter */
+  size_t j;                   /* Loop counter */
+  size_t nbytes;              /* Number of bytes in data type */
+  dim_t ncoeff = 0;           /* Number of coefficients */
+  int ndims;                  /* Number of dimensions in data array */
+  smfData *new = NULL;        /* New smfData */
+  int npts;                   /* Number of data points */
   double *outdata;            /* Pointer to output DATA */
-  void *pntr[3];          /* Data, variance and quality arrays */
-  double *poly = NULL;    /* Polynomial coefficients */
+  void *pntr[3];              /* Data, variance and quality arrays */
+  double *poly = NULL;        /* Polynomial coefficients */
   int *tstream;               /* Pointer to raw time series data */
-  int virtual;            /* Is it a virtual smfData? */
+  int virtual;                /* Is it a virtual smfData? */
+  AstKeyMap *history = NULL;  /* Pointer to history */
 
   if (*status != SAI__OK) return NULL;
 
@@ -126,6 +133,13 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert, int * status ) {
   npts = dims[0]*dims[1];
   if (ndims == 3 ) {
     npts *= dims[2];
+  }
+
+  /* Copy all history components provided one exists */
+  if ( old->history != NULL ) {
+    history = astCopy( old->history );
+  } else {
+    msgOutif(MSG__VERB, FUNC_NAME, "No history to copy. Continuing, but this may cause problems later", status);
   }
 
   /* DATA and VARIANCE */
@@ -165,12 +179,19 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert, int * status ) {
   poly = smf_malloc( npts, sizeof(double), 0, status);
   memcpy( poly, old->poly, npts*sizeof(double));
 
-  /* Create the new smfHead */
-  hdr = smf_deepcopy_smfHead( old->hdr, status );
+  /* Copy smfHead if desired */
+  if (! (flags & SMF__NOCREATE_HEAD) )
+    hdr = smf_deepcopy_smfHead( old->hdr, status );
+  /* Copy smfFile if desired */
+  if (! (flags & SMF__NOCREATE_FILE) )
+    file = smf_deepcopy_smfFile( old->file, status );
+  /* Copy smfDA if desired */
+  if (! (flags & SMF__NOCREATE_DA) )
+    da = smf_deepcopy_smfDA( old, status );
 
   /* Construct the new smfData */
   new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, dims, ndims, 
-			       virtual, ncoeff, poly, status);
+			       virtual, ncoeff, poly, history, status);
 
   return new;
 }
