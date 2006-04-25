@@ -25,6 +25,7 @@
 *  Authors:
 *     HME: Horst Meyerdierks (UoE, Starlink)
 *     ACD: Clive Davenhall (UoE, Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,6 +57,8 @@
 *        Add FITSET application.
 *     30-OCT-2001 (ACD):
 *        Add IMPOS application.
+*     24-APR-2006 (TIMJ):
+*        Force inclusion of DSA block data
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -69,6 +72,9 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_PAR'          ! Standard PAR constants
+
+*  External Block Data:
+      EXTERNAL DSA_BLOCK
 
 *  Arguments Given and Returned:
 

@@ -29,6 +29,7 @@
 *     HME: Horst Meyerdierks (UoE, Starlink)
 *     ACC: Anne Charles (RAL, Starlink)
 *     MJC: Malcolm J. Currie (RAL, Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -64,6 +65,8 @@
 *        Change GROW to GROWS because of name clash with FIGARO.
 *     2004 July 16 (MJC):
 *        GOODVAR removed as it was transferred to Figaro in 2001 July.
+*     24-APR-2006 (TIMJ):
+*        Force inclusion of block data
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -77,6 +80,10 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_PAR'          ! Standard PAR constants
+
+*  External Block Data:
+      EXTERNAL SPD_FBLK
+      EXTERNAL SPD_PBLK
 
 *  Status:
       INTEGER STATUS             ! Global status

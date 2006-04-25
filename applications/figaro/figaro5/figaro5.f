@@ -30,6 +30,7 @@
 *     TNW: Tim Wilkins (Durham)
 *     BLY: M.J.Bly (Starlink, RAL)
 *     TDCA: Tim Ash (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,8 +61,9 @@
 *        Included old IFBLOCK as inline code.
 *     22-JUN-1999 (TCDA):
 *        Renamed as FIGARO5 for incorporation into FIGARO.
+*     24-APR-2006 (TIMJ):
+*        Force inclusion of DSA block data
 *     {enter_further_changes_here}
-*
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -74,6 +76,9 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_PAR'          ! Parameter system constants
+
+*  External Block Data:
+      EXTERNAL DSA_BLOCK
 
 *  Arguments Given and Returned:
 

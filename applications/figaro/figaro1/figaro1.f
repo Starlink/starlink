@@ -27,6 +27,7 @@
 *     MJCL: Martin Clayton (Starlink, UCL)
 *     MBT:  Mark Taylor (Starlink, IoA)
 *     ACD:  Clive Davenhall (Starlink, Edinburgh)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -64,6 +65,8 @@
 *        Add IALOG application.
 *     9-NOV-1998 (MBT, ACD)
 *        Add SCLEAN.
+*     24-APR-2006 (TIMJ):
+*        Force inclusion of DSA block data
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -77,6 +80,9 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_PAR'          ! Standard PAR constants
+
+*  External Block Data:
+      EXTERNAL DSA_BLOCK
 
 *  Arguments Given and Returned:
 
