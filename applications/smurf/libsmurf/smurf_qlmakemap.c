@@ -42,7 +42,9 @@
 *     2006-03-23 (AGG):
 *        Use new and updated routines to estimate map bounds, rebin
 *        map. Also carry out flatfield, sky removal and extinction
-*        correction
+*        correction.
+*     2006-04-21 (AGG):
+*        Now use quicker MEAN sky subtraction rather than polynomials
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -98,6 +100,8 @@
 #include "sc2da/sc2store.h"
 #include "sc2da/sc2ast.h"
 
+#define TASK_NAME "smurf_qlmakemap"
+
 void smurf_qlmakemap( int *status ) {
 
   /* Local Variables */
@@ -116,9 +120,7 @@ void smurf_qlmakemap( int *status ) {
   void *weights=NULL;        /* Pointer to the weights map */
 
   smfData *data=NULL;          /* pointer to  SCUBA2 data struct */
-  smfFile *file=NULL;          /* SCUBA2 data file information */
   dim_t i;                     /* Loop counter */
-  char *pname=NULL;            /* Name of currently opened data file */
 
   double tau;
 
@@ -138,7 +140,8 @@ void smurf_qlmakemap( int *status ) {
   }
 
   /* Calculate the map bounds */
-  msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Determine map bounds", status);
+  msgOutif(MSG__VERB, TASK_NAME, 
+	   "SMURF_QLMAKEMAP: Determine approx map bounds", status);
   smf_mapbounds_approx( igrp, size, "icrs", 0, 0, 1, pixsize, lbnd_out, ubnd_out, 
 			&outframeset, status );
 
@@ -156,12 +159,13 @@ void smurf_qlmakemap( int *status ) {
 			1, status );
 
   /* Regrid the data */
-  msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Regrid data", status);
+  msgOutif(MSG__VERB, TASK_NAME, "SMURF_QLMAKEMAP: Regrid data", status);
   for(i=1; i<=size; i++ ) {
     /* Read data from the ith input file in the group */
     smf_open_and_flatfield( igrp, NULL, i, &data, status );
 
-    smf_subtract_poly( data, status );
+    /*smf_subtract_poly( data, status );*/
+    smf_subtract_plane( data, "MEAN", status );
     smf_fits_getD( data->hdr, "MEANWVM", &tau, status);
     smf_correct_extinction( data, "CSOTAU", 1, tau, status);
 
@@ -171,7 +175,7 @@ void smurf_qlmakemap( int *status ) {
 
       /* Break out of loop over data files if bad status */
       if (*status != SAI__OK) {
-	errRep("smurf_makemap", "Rebinning step failed", status);
+	errRep(TASK_NAME, "Rebinning step failed", status);
       }
     }
     if( data != NULL ) {
@@ -196,5 +200,5 @@ void smurf_qlmakemap( int *status ) {
   
   ndfEnd( status );
   
-  msgOutif(MSG__VERB," ","Map written.", status);
+  msgOutif(MSG__VERB, TASK_NAME, "Map written.", status);
 }
