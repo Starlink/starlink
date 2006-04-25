@@ -79,6 +79,8 @@
 *        Initial version
 *     2006-03-23 (AGG):
 *        Add scanfit polynomial variables
+*     2006-04-21 (AGG):
+*        Add history AstKeyMap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -126,7 +128,8 @@ smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
 		       smfDA * da, smf_dtype dtype, void * pntr[3], 
 		       const dim_t dims[], int ndims,
-		       int virtual, int ncoeff, double *poly, int * status ) {
+		       int virtual, int ncoeff, double *poly, 
+		       AstKeyMap *history, int * status ) {
 
   /* need to make sure that any memory we malloc will be freed on error 
      so make sure we NULL all pointers first. */
@@ -188,6 +191,7 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
       }
       data->ncoeff = ncoeff;
       data->poly = poly;
+      data->history = history;
     }
   }
 
