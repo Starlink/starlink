@@ -106,7 +106,6 @@ void smurf_remsky( int * status ) {
   Grp *ogrp = NULL;          /* Output group */
   int outsize;               /* Total number of NDF names in the output group */
   int size;                  /* Number of files in input group */
-  int remsky = 0;
 
   char method[LEN__METHOD];  /* String for sky subtraction method */
   char fittype[LEN__METHOD]; /* String for PLANE method fit type */
@@ -142,37 +141,22 @@ void smurf_remsky( int * status ) {
       errRep(TASK_NAME, "Unable to flatfield data from the ^I th file", status);
     }
 
-    /* Check if REMSKY has already been run */
-    /*    remsky = smf_history_check( odata, TASK_NAME, status );*/
-    if ( remsky ) {
-      if ( *status == SAI__OK) {
-	msgOut(TASK_NAME, TASK_NAME " has already been run, skipping to next file", status);
+    if ( *status == SAI__OK ) {
+      if ( strncmp( method, "POLY", 4 ) == 0 ) {
+	/* Bolometer-based sky removal */
+	smf_subtract_poly( odata, status );
+	/* Check status */
+      } else if ( strncmp( method, "PLAN", 4 ) == 0 ) {
+	/* Timeslice-based sky removal */
+	parChoic( "FIT", "SLOPE", "Mean, Slope, Plane", 
+		  1, fittype, LEN__METHOD, status);
+	smf_subtract_plane( odata, fittype, status );
       } else {
 	*status = SAI__ERROR;
-	errRep("", "Error in checking history. Possible programming error", status);
-      }
-    } else {
-
-      if ( *status == SAI__OK ) {
-	if ( strncmp( method, "POLY", 4 ) == 0 ) {
-	  /* Bolometer-based sky removal */
-	  smf_subtract_poly( odata, status );
-	  /* Update history */
-	  /*	  smf_history_write( odata, TASK_NAME, "Blether....", status );*/
-	  /* Check status */
-	} else if ( strncmp( method, "PLAN", 4 ) == 0 ) {
-	  /* Timeslice-based sky removal */
-	  parChoic( "FIT", "SLOPE", "Mean, Slope, Plane", 
-		    1, fittype, LEN__METHOD, status);
-	  smf_subtract_plane( odata, fittype, status );
-	} else {
-	  *status = SAI__ERROR;
-	  msgSetc("M", method);
-	  errRep("", "Unsupported method, ^M. Possible programming error.", status);
-	}
+	msgSetc("M", method);
+	errRep("", "Unsupported method, ^M. Possible programming error.", status);
       }
     }
-
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
