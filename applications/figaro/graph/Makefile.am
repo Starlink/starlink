@@ -11,7 +11,7 @@ libgraph_la_SOURCES = \
 
 PRIVATE_INCLUDES = \
 gr_fotor_gca gr_inc2
-         
+
 F_ROUTINES = \
 arrow.f clgrap.f colrain.f disp_window2.f drawpoly.f get_grey.f \
 gr_annul.f gr_circ.f gr_clab.f gr_conv.f gr_curin.f gr_ebar.f gr_fotor.f \
