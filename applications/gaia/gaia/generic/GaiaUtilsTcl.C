@@ -94,7 +94,7 @@ static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
     }
     fullwcs = (AstFrameSet *) adr;
 
-    /* Get the axes */
+    /* Get the axes, these are AST ones.*/
     if ( Tcl_GetIntFromObj( interp, objv[2], &axis1 ) != TCL_OK ) {
         return TCL_ERROR;
     }

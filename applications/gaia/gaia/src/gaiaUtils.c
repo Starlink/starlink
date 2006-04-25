@@ -368,8 +368,8 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
         zero[i] = 0.0;
         inperm[i] = -1;
     }
-    inperm[axis1] = 1;
-    inperm[axis2] = 2;
+    inperm[axis1-1] = 1;
+    inperm[axis2-1] = 2;
     map = (AstMapping *) astPermMap( nbase, inperm, 2, outperm, zero, "" );
 
     /* Now add this frame to the FrameSet and make it the base one. Also
@@ -411,9 +411,16 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
     }
 
     if ( n != 2 ) {
-        *error_mess = strdup( "Failed to pick out world coordinates" );
-        astEnd;
-        return TCL_ERROR;
+        /* The axes are not independent, so more than two have moved. 
+         * In this case we just assume grid-WCS axes correspondence. */
+        for ( i = 0; i < MAXDIM; i++ ) {
+            out1[i][0] = out2[i][0];
+        }
+        out1[axis1-1][0] = 0.0;
+        out1[axis2-1][0] = 0.0;
+        out2[axis1-1][0] = 1.0;
+        out2[axis2-1][0] = 1.0;
+        n = 2;
     }
 
     /* Choose the selected axes from the currentframe. */
@@ -425,7 +432,7 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
             inperm[i] = n;
         }
         else {
-            if ( out1[i][0] != AST__BAD ) { // Single valued coordinate
+            if ( out1[i][0] != AST__BAD ) {        // Single valued coordinate
                 zero[abs(izero) - 1] = out1[i][0];
             }
             else {
