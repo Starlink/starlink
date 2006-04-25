@@ -78,6 +78,8 @@
 *        Store the number of frames (timeslices) in the smfData struct
 *     2006-03-24 (TIMJ):
 *        Fix bug where allsc2heads wasn't being set
+*     2006-04-21 (AGG):
+*        Add history read
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -427,8 +429,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
       sc2store_free( status );
 
     }
-    /* Store info in smfData struct */  
-
+    /* Store info in smfData struct */
     if (*status == SAI__OK) {
       (*data)->dtype = itype;
       strncpy(file->name, pname, SMF_PATH_MAX);
@@ -450,5 +451,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
       }
     }
   }
+  /* Read and store history */
+  smf_history_read( *data, status );
+
 }
 
