@@ -9,7 +9,8 @@
 /* If a Fortran main is defined, provide a dummy entry point to
    satisfy potential linker problems */
 #if HAVE_FC_MAIN
-void FC_MAIN () {}
+void FC_MAIN (void);
+void FC_MAIN (void) {}
 #endif
 
 
