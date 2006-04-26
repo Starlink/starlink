@@ -30,24 +30,55 @@ use strict;
 use warnings;
 use Carp;
 
+# Standard headers in the standard order
 my @STANDARD_HEADERS = (qw/
 			   Name
 			   Purpose
 			   Language
+			   /,
+			"Type Of Module",
+			qw/
 			   Invocation
 			   Description
 			   Arguments
+			   Algorithm
+			   /,
+			"Implementation Deficiencies",
+			qw/
+			   Notes
 			   Copyright
 			   Licence
 			   Authors
 			   History
-			   Notes
 			   Bugs
 			   /);
+
+# Lists any defaults for the standard headers that are used if no content
+# is available
+my %DEFAULTS = (
+		Bugs => '{note_any_bugs_here}',
+		History => '{enter_changes_here}',
+		Authors => '{original_author_entry}',
+		Language => '{routine_language}',
+	       );
+
+# Aliases that can be used in place of primary key
+my %ALIASES = (
+	       Authors => 'Author',
+	      );
+
+# Lists any terminators of sections (if not-terminated)
+my %TERMINATORS = (
+		   Bugs => '{note_new_bugs_here}',
+		   History => '{enter_further_changes_here}',
+		   Authors => '{enter_new_authors_here}',
+		  );
+
 
 # create accessors
 for my $h (@STANDARD_HEADERS) {
   my $method = lc($h);
+  $method =~ s/\s+/_/g;
   my $code = q{
 sub METHOD {
   my $self = shift;
@@ -101,6 +132,7 @@ sub new {
 		   COMMENT_CHAR => '*',
                    START_C_COMMENT => 0,
                    END_C_COMMENT => 0,
+		   PROLOGUE_TYPE => undef,
 		  }, $class;
 
   return $prl;
@@ -160,6 +192,27 @@ sub end_c_comment {
   return $self->{END_C_COMMENT};
 }
 
+=item B<prologue_type>
+
+Type of prologue that was parsed to construct this object. Can be undef if the
+object was constructed manually.
+
+  $type = $prl->prologue_type;
+
+A standard Starlink prologue would be "STARLSE". Other types are possible,
+see C<Starlink::Prologue::Parser>. This method can be used to decide whether
+the prologue for a source file should be modernised.
+
+=cut
+
+sub prologue_type {
+  my $self = shift;
+  if (@_) {
+    $self->{PROLOGUE_TYPE} = shift;
+  }
+  return $self->{PROLOGUE_TYPE};
+}
+
 =back
 
 =head2 Section Accessors
@@ -180,18 +233,20 @@ Return section title and reference to array of content.
 
 The following methods are available by default:
 
-   Name
-   Purpose
-   Language
-   Invocation
-   Description
-   Arguments
-   Copyright
-   Licence
-   Authors
-   History
-   Notes
-   Bugs
+   name
+   purpose
+   language
+   invocation
+   description
+   arguments
+   copyright
+   licence
+   authors
+   history
+   notes
+   bugs
+   implementation_deficiencies
+   type_of_module
 
 =over 4
 
@@ -207,7 +262,9 @@ Returns a list containing all the content.
 
   @lines = $prl->content( "Description" );
 
-For standard sections, use the accessors directly.
+For standard sections, the accessors can be used directly.
+
+Aliases are not resolved automatically.
 
 =cut
 
@@ -256,6 +313,39 @@ sub sections {
   return sort keys %{$self->{CONTENT}};
 }
 
+=item B<has_section>
+
+Returns the section name if the section name exists. Can be used to
+translate aliases.
+
+  $section = $prl->has_section( "Authors" );
+
+may return "Author" if that section is defined.
+
+=cut
+
+sub has_section {
+  my $self = shift;
+  my $key = shift;
+  my $alias;
+  $alias = $ALIASES{$key} if exists $ALIASES{$key};
+
+  my %keys = map { $_, undef } $self->sections;
+
+  my $hasprim = (exists $keys{$key});
+  my $hasalias = (defined $alias && exists $keys{$alias});
+
+  if ($hasprim && $hasalias) {
+    warn "Both section ($key) and alias ($alias) exist\n";
+    return $key;
+  } elsif ($hasprim) {
+    return $key;
+  } elsif ($hasalias) {
+    return $alias;
+  }
+  return ();
+}
+
 =item B<misc_sections>
 
 Return all the section headings (in alphabetical order) not present in the
@@ -268,7 +358,7 @@ standard list but present in the prologue.
 sub misc_sections {
   my $self = shift;
   my @present = $self->sections;
-  my %standard = map { $_, undef } @STANDARD_HEADERS;
+  my %standard = map { $_, undef } @STANDARD_HEADERS, values %ALIASES;
 
   my @misc;
   for my $p (@present) {
@@ -307,12 +397,35 @@ sub stringify {
   # Open the prologue, using the proper comment character
   $code .= $cchar ."+\n";
 
+  # Go through each of the standard headers in order and then
+  # finish with the unknown sections
   for my $h (@STANDARD_HEADERS, $self->misc_sections) {
 
-    my @content = $self->content( $h );
+    my $section = $self->has_section( $h );
 
+    # get the content for this section
+    my @content;
+    @content = $self->content( $section ) if defined $section;
+
+    # if no content we may have a default
+    if (!@content) {
+      if (exists $DEFAULTS{$h}) {
+	$section = $h;
+	@content = ( $DEFAULTS{$h} );
+      }
+    }
+
+    # process content
     if (@content) {
-      $code .= $cchar . "  $h:\n";
+      $code .= $cchar . "  $section:\n";
+
+      # do we have to terminate content?
+      if (exists $TERMINATORS{$h} &&
+	  $content[$#content] !~ /^\s*\{[\w_]+\}\s*$/) {
+	push(@content, $TERMINATORS{$h} );
+      }
+
+      # write out the content
       for my $l (@content) {
 	$code .= $cchar . "     " . $l ."\n" if defined $l;
       }
