@@ -767,6 +767,7 @@ itcl::class gaia::Gaia {
       itk_component add $name {
          GaiaApPhotom $w_.\#auto 1 \
             -canvasdraw [$image_ component draw] \
+            -image $image_ \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
@@ -780,6 +781,7 @@ itcl::class gaia::Gaia {
       itk_component add $name {
          GaiaApPhotom $w_.\#auto 0 \
             -canvasdraw [$image_ component draw] \
+            -image $image_ \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
@@ -793,6 +795,7 @@ itcl::class gaia::Gaia {
       itk_component add $name {
          GaiaOptPhotom $w_.\#auto 1 \
             -canvasdraw [$image_ component draw] \
+            -image $image_ \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
@@ -806,6 +809,7 @@ itcl::class gaia::Gaia {
       itk_component add $name {
          GaiaOptPhotom $w_.\#auto 0 \
             -canvasdraw [$image_ component draw] \
+            -image $image_ \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
@@ -819,6 +823,7 @@ itcl::class gaia::Gaia {
       itk_component add $name {
          GaiaArd $w_.\#auto \
             -canvasdraw [$image_ component draw] \
+            -image $image_ \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
             -gaia $w_ \
@@ -1132,7 +1137,7 @@ itcl::class gaia::Gaia {
    #  Create the startup options toolbox.
    public method make_opencube_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaNDFCube $w_.\#auto \
+         GaiaCube $w_.\#auto \
             -gaia $w_ \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
@@ -1171,7 +1176,7 @@ itcl::class gaia::Gaia {
             make_toolbox opencube 0 1
             set msg {}
             set result [catch {$itk_component(opencube) configure \
-                                  -ndfcube $itk_option(-file)} msg]
+                                  -cube $itk_option(-file)} msg]
             if { $result != 0 } {
                $itk_component(opencube) close
                if { $msg != {} } {
@@ -1182,7 +1187,7 @@ itcl::class gaia::Gaia {
       } else {
          #  Make sure toolbox is withdrawn.
          if { [info exists itk_component(opencube)] } {
-            $itk_component(opencube) close 0
+            $itk_component(opencube) close
          }
       }
    }
