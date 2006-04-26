@@ -60,6 +60,8 @@
 #        2000x4000 break with this arrangement).
 #     23-JUL-2001 (PWD):
 #        Added UKIRT quick look facility changes.
+#     16-APR-2006 (PWD):
+#        Added save_if_volatile for cube slice interop.
 #     {enter_changes_here}
 
 #-
@@ -517,6 +519,31 @@ itcl::class gaia::GaiaImageCtrl {
        } else {
 	   $image_ update
        }
+   }
+
+   #  If the backing image data is volatile (that is has been changed
+   #  dynamically, like when cube slicing), then save the image to disk file
+   #  and replace the current copy. Finally reopen the copy to make the file up
+   #  to date. ONLY use this on temporary images as no checks are made and the
+   #  original file will be overwritten. Will also only work for simple images,
+   #  like NDFs with no path.
+   public method save_if_volatile {} {
+      if { [$image_ volatile] } {
+
+         #  Create a temporary file name, .sdf shouldn't matter.
+         set tmpname "GaiaImageCtrlTmp[incr count_].sdf"
+
+         #  Write current image to disk
+         if { [catch { $image_ dump $tmpname FITS } msg] == 0 } {
+
+            #  Move new image into place and reopen.
+            ::file rename -force $tmpname [$image_ cget -file]
+            puts stderr "rename $tmpname to [$image_ cget -file]"
+            reopen
+         } else {
+            error_dialog "Failed to save volatile image: $msg"
+         }
+      }
    }
 
    #  Save the current image to a file chosen from a file name dialog
@@ -1072,4 +1099,7 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  Name of fileselection dialog window. Shared between all instances.
    common fileselect_ .imagectrlfs
+
+   #  Counter for temporary file names.
+   common count_ 0
 }
