@@ -86,7 +86,10 @@ Title of currently active section.
 sub section {
   my $self = shift;
   if (@_) {
-    $self->{SECTION} = shift;
+    my $s = shift;
+    $s =~ s/\s+$//; # trim
+    $s =~ s/^\s+//;
+    $self->{SECTION} = $s;
   }
   return $self->{SECTION};
 }
