@@ -63,13 +63,16 @@ C<Starlink::Prologue> prologue object. The C<push_line> method returns
 the line itself if the line is not part of a prologue, and/or a
 prologue object if the prologue is terminated by this line.
 
-  ($line, $prologue) = $parser->push_line;
+  ($line, $prologue) = $parser->push_line( $input );
+
+The returned line will not have a new line.
 
 =cut
 
 sub push_line {
   my $self = shift;
   my $line = shift;
+  chomp($line);
 
   my $prl = $self->prologue;
   if (defined $prl) {
@@ -93,7 +96,6 @@ sub push_line {
     # C comment end usually indicates end of prologue in modern
     #   implementation
 
-    chomp($line);
     if ( $line =~ /^\s*$r\-/  #  *-
 	 || $line =~ /\*\/$/      #  */
 	 || ($line !~ /\s*$r/ && $line =~ /\w/)  # real code
@@ -141,8 +143,7 @@ sub push_line {
     # looking for one to start
     my ($cchar, $title, $startc) = $self->prolog_start( $line );
     if (defined $cchar) {
-      chomp($line);
-      print "Starting prologue with comment char '$cchar' ($line)\n";
+      # print "Starting prologue with comment char '$cchar' ($line)\n";
       # a new prologue is starting
       $prl = new Starlink::Prologue();
       $self->prologue( $prl );
