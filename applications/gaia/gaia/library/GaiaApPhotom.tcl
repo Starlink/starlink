@@ -54,25 +54,30 @@
 #     The following configuration options are mandatory when
 #     creating an object instance.
 #
-#        -canvasdraw -canvas -rtdimage
+#        -canvasdraw -image -canvas -rtdimage
 
 #  Configuration options:
 #
-#        -canvasdraw canvas_draw_name
+#        -canvasdraw
 #
 #     Sets the name of the StarCanvasDraw object used to control the
 #     graphics content.
 #
-#        -canvas canvas_name
+#        -canvas
 #
 #     Sets the name of the canvas used to display the image and graphics.
 #
-#        -rtdimage rtd_image_name
+#        -image
 #
 #     Sets the name of the GaiaImageCtrl object used to display the
 #     image.
 #
-#        -annulus boolean
+#        -rtdimage
+#
+#     Sets the name of the rtdimage object used to display the
+#     image.
+#
+#        -annulus (boolean)
 #
 #     Controls if the sky regions are determined from annuli about the
 #     apertures.
@@ -81,7 +86,7 @@
 #
 #     Controls the shape of the apertures when drawn.
 #
-#        -linewidth integer
+#        -linewidth (integer)
 #
 #     Sets the width of any lines drawn.
 #
@@ -158,6 +163,8 @@
 #        Added changes so that user can disable exit confirmation.
 #     02-MAY-2003 (PWD):
 #        Added automatic measurement of apertures.
+#     26-APR-2006 (PWD):
+#        Added -image to handle volatile cube data.
 #     {enter_further_changes_here}
 #-
 
@@ -498,7 +505,7 @@ itcl::class gaia::GaiaApPhotom {
          catch {$autophotom_ delete_sometime}
          set autophotom_ {}
       }
-      if { $namer_ != {} } { 
+      if { $namer_ != {} } {
          catch {delete object $namer_}
       }
    }
@@ -606,9 +613,13 @@ itcl::class gaia::GaiaApPhotom {
 
             #  If args are given then set the command to be run when
             #  the application returns.
-            if { $args != "" } { 
+            if { $args != "" } {
                set complete_cmd_ "$args"
             }
+
+            #  Make sure that the disk image is up to date. Only relevant for
+            #  volatile images (from cubes).
+            $itk_option(-image) save_if_volatile
 
             #  And run the command.
             blt::busy hold $w_
@@ -623,7 +634,7 @@ itcl::class gaia::GaiaApPhotom {
                skymag=$skymag_ \
                usemags=$ok \
                $more"
-            
+
          } else {
             error_dialog "No image is displayed"
          }
@@ -682,7 +693,7 @@ itcl::class gaia::GaiaApPhotom {
          measure_objects
       }
    }
-   
+
    #  Toggle the define sky button to reflect the current state.
    private method toggle_sky_button_ {} {
       if { $skymethod_($this) } {
@@ -698,7 +709,7 @@ itcl::class gaia::GaiaApPhotom {
       if { [file exists GaiaPhotomOut.Dat] } {
          $object_list_ read_file GaiaPhotomOut.Dat 1
       }
-      if { $complete_cmd_ != {} } { 
+      if { $complete_cmd_ != {} } {
          eval $complete_cmd_
          set complete_cmd_ {}
       }
@@ -813,6 +824,9 @@ itcl::class gaia::GaiaApPhotom {
       }
    }
 
+   #  Name of GaiaImageCtrl widget.
+   itk_option define -image image Image {}
+
    #  Name of canvas.
    itk_option define -canvas canvas Canvas {} {
       if { $object_list_ != {} } {
@@ -918,7 +932,7 @@ itcl::class gaia::GaiaApPhotom {
 
    #  Name of image control object.
    protected variable namer_ {}
-   
+
    #  Whether apertures are automatically measured when created, or not.
    protected variable auto_measure_ 0
 

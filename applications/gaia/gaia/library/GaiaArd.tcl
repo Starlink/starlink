@@ -35,31 +35,34 @@
 
 #  Configuration options:
 #
-#        -canvasdraw canvas_draw_name
+#        -canvasdraw
 #
 #     Sets the name of the StarCanvasDraw object used to control the
 #     graphics content.
 #
-#        -canvas canvas_name
+#        -image
+#
+#     Sets the name of the GaiaImageCtrl object used.
+#
+#        -canvas
 #
 #     Sets the name of the canvas used to display the image and graphics.
 #
-#        -rtdimage rtd_image_name
+#        -rtdimage
 #
-#     Sets the name of the GaiaImageCtrl object used to display the
-#     image.
+#     Sets the name of the rtdimage object used to display the image.
 #
-#        -gaia gaiawidget
+#        -gaia
 #
 #     Name of Gaia widget that parents this widget (used for
 #     clone creation).
 #
-#         -replace boolean
+#         -replace (boolean)
 #
 #     Controls whether new images are displayed in a new window
 #     or the existing window.
 #
-#         -number integer
+#         -number (integer)
 #
 #     Identifying number for toolbox (shown in () in window title).
 #     This should be the clone number of the invoking Gaia widget.
@@ -147,7 +150,8 @@
 #     10-JUN-1997 (PWD):
 #        Finished prologue.
 #     24-Mar-1998 (ALLAN)
-#        Changed "rect" to "rectangle", to reslove conflict with rtd bitmap name.
+#        Changed "rect" to "rectangle", to resolve conflict with rtd bitmap
+#        name. 
 #     24-APR-1998 (ALLAN)
 #        Pass command line arguments to "clone" rather than use "after 500".
 #     12-NOV-1998 (PWD):
@@ -157,6 +161,8 @@
 #     28-JUN-1999 (PWD):
 #        Added ability to save log window to text file. Renamed to
 #        GaiaArd. Added short_help.
+#     26-APR-2006 (PWD):
+#        Added -image option to support volatile cube slices.
 #     {enter_further_changes_here}
 #-
 
@@ -500,6 +506,10 @@ itcl::class gaia::GaiaArd {
 	       set complete_cmd_ $args
 	    }
 
+            #  Make sure that the disk image is up to date. Only relevant for
+            #  volatile images (from cubes).
+            $itk_option(-image) save_if_volatile
+
             #  And ARDSTAT on the image and file.
             blt::busy hold $w_
             update idletasks
@@ -528,7 +538,7 @@ itcl::class gaia::GaiaArd {
       $itk_component(statsresults) see end
 
       #  If necessary do the completion command.
-      if { $complete_cmd_ != {} } { 
+      if { $complete_cmd_ != {} } {
 	 eval $complete_cmd_
 	 set complete_cmd_ {}
       }
@@ -550,7 +560,7 @@ itcl::class gaia::GaiaArd {
       }
    }
 
-   #  Blank out regions and display in a new clone. "args" if given, 
+   #  Blank out regions and display in a new clone. "args" if given,
    #  is a command to execute when task really finishes.
    public method blank {mode args} {
 
@@ -586,6 +596,10 @@ itcl::class gaia::GaiaArd {
 	    if { $args != "" } {
 	       set complete_cmd_ $args
 	    }
+
+            #  Make sure that the disk image is up to date. Only relevant for
+            #  volatile images (from cubes).
+            $itk_option(-image) save_if_volatile
 
             #  And run ARDMASK on the image and file.
             blt::busy hold $w_
@@ -646,6 +660,10 @@ itcl::class gaia::GaiaArd {
               incr count_
               set tmpimage_ "GaiaArdImg${count_}"
 
+              #  Make sure that the disk image is up to date. Only relevant for
+              #  volatile images (from cubes).
+              $itk_option(-image) save_if_volatile
+
               #  And run ARDMASK on the image and file.
               blt::busy hold $w_
               $ardmask_ runwiths "in=$image ardfile=$tmpfile_ out=$tmpimage_"
@@ -684,6 +702,10 @@ itcl::class gaia::GaiaArd {
          incr count_
          set tmpimage_ "GaiaArdImg${count_}"
 
+         #  Make sure that the disk image is up to date. Only relevant for
+         #  volatile images (from cubes).
+         $itk_option(-image) save_if_volatile
+
          #  And run autocrop on the image and file.
          blt::busy hold $w_
          $autocrop_ runwiths "in=$image out=$tmpimage_"
@@ -719,7 +741,7 @@ itcl::class gaia::GaiaArd {
       }
 
       #  If given do the completed command.
-      if { $complete_cmd_ != {} } { 
+      if { $complete_cmd_ != {} } {
 	 eval $complete_cmd_
 	 set complete_cmd_ {}
       }
@@ -736,6 +758,9 @@ itcl::class gaia::GaiaArd {
 
    #  Name of a StarCanvasDraw widget to use to control objects.
    itk_option define -canvasdraw canvasdraw CanvasDraw {} {}
+
+   #  Name of GaiaImageCtrl object.
+   itk_option define -image image Image {} {}
 
    #  Name of canvas.
    itk_option define -canvas canvas Canvas {} {}

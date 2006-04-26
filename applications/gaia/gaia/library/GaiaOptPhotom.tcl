@@ -53,23 +53,26 @@
 #     The following configuration options are mandatory when
 #     creating an object instance.
 #
-#        -canvasdraw -canvas -rtdimage
+#        -canvasdraw -image -canvas -rtdimage
 
 #  Configuration options:
 #
-#        -canvasdraw canvas_draw_name
+#        -canvasdraw
 #
 #     Sets the name of the StarCanvasDraw object used to control the
 #     graphics content.
 #
-#        -canvas canvas_name
+#        -image
+#
+#     Sets the name of the GaiaImageCtrl used.
+#
+#        -canvas
 #
 #     Sets the name of the canvas used to display the image and graphics.
 #
-#        -rtdimage rtd_image_name
+#        -rtdimage
 #
-#     Sets the name of the GaiaImageCtrl object used to display the
-#     image.
+#     Sets the name of the rtdimage object used to display the image.
 #
 #        -annulus boolean
 #
@@ -135,6 +138,8 @@
 #        Added changes so that user can disable exit confirmation.
 #     02-MAY-2003 (PWD):
 #        Added option to make measurements immediately.
+#     26-APR-2006 (PWD):
+#        Added -image option to support volatile cube slices.
 #     {enter_further_changes_here}
 #-
 
@@ -649,7 +654,11 @@ itcl::class gaia::GaiaOptPhotom {
                } else {
                   set more ""
                }
-               
+
+               #  Make sure that the disk image is up to date. Only relevant
+               #  for volatile images (from cubes).
+               $itk_option(-image) save_if_volatile
+
                #  And run the command.
                if { $usemags_ } {
                   set ok "true"
@@ -920,6 +929,9 @@ itcl::class gaia::GaiaOptPhotom {
       }
    }
 
+   #  Name of GaiaImageCtrl
+   itk_option define -image image Image {}
+
    #  Name of canvas.
    itk_option define -canvas canvas Canvas {} {
       if { $object_list_ != {} } {
@@ -928,7 +940,7 @@ itcl::class gaia::GaiaOptPhotom {
       }
    }
 
-   #  Name of starrtdimage widget.
+   #  Name of rtdimage widget.
    itk_option define -rtdimage rtdimage RtdImage {} {
       if { $object_list_ != {} } {
          $object_list_ configure -rtdimage $itk_option(-rtdimage)
