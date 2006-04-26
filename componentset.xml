@@ -562,7 +562,7 @@ variety of formats.
 </component>
 
 <component id="figaro" support="S">
-  <version>5.6-2</version>
+  <version>5.6-4</version>
   <path>applications/figaro</path>
   <description>FIGARO general data-reduction system</description>
   <abstract><p>
