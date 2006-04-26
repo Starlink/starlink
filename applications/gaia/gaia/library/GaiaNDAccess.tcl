@@ -6,7 +6,7 @@
 #     [incr Tcl] class
 
 #  Purpose:
-#     Handles multidimensional dataset access in GAIA. 
+#     Handles multidimensional dataset access in GAIA.
 
 #  Description:
 #     This class is designed to handle the access and description of datasets
@@ -14,7 +14,7 @@
 #     supporting access to NDF and FITS data, relying on the ndf:: and
 #     fits:: (to be written) Tcl commands. Sections of the data can be
 #     directly extracted from cubes for passing into GAIA/Skycat for display
-#     as images and spectra. 
+#     as images and spectra.
 
 #  Invocations:
 #
@@ -85,7 +85,7 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Parse specification to determine data type and get an access name.
    protected method parse_name_ {} {
-      
+
       #  Release previous dataset, if any.
       close
 
@@ -95,20 +95,20 @@ itcl::class gaia::GaiaNDAccess {
          set cnfmap_ 1
       } else {
          set type_ "fits"
-         set cnfmap_ 0
+         set cnfmap_ 1 ;# No harm. Needed for mapped memory inserted into NDF.
       }
-      
+
       #  Open the dataset.
       open_
    }
-   
+
    #  Open the dataset. Wraps two methods, one for NDFs and one for FITS files.
    #  These should be light-weight accesses that just get meta-data at this
    #  stage.
    protected method open_ {} {
       set handle_ [${type_}::open [$namer_ ndfname 0]]
    }
-   
+
    #  Close the dataset, if open.
    public method close {} {
       if { $handle_ != {} } {
@@ -118,6 +118,15 @@ itcl::class gaia::GaiaNDAccess {
          set cnfmap_ 0
          set dims_ {}
       }
+   }
+
+   #  Acquire an already opened NDF by name and "handle" (NDF identifier).
+   public method acquire {name handle} {
+      set handle_ $handle
+      $namer_ configure -imagename $name
+      set dataset $name
+      set type_ "ndf"
+      set cnfmap_ 1
    }
 
    #  Get the dimensions of the full data. Returns a list of integers.
@@ -146,12 +155,15 @@ itcl::class gaia::GaiaNDAccess {
       return [${type_}::getcoord $handle_ $axis $indices $formatted $trail]
    }
 
-   #  Map in the dataset "data component". Returns the address, number of
-   #  elements and the data type (these are in the HDS format). The mapping
-   #  uses mmap, if possible and requested and the given access mode, 
-   #  one of "READ", "UPDATE" or "WRITE". Clearly this must match what access
-   #  the file supports.
+   #  Map in the dataset "data component". Returns a structure that can be
+   #  queried using the getinfo method. The mapping uses mmap, if possible and
+   #  currently the default and the given access mode,  one of "READ",
+   #  "UPDATE" or "WRITE". Clearly this must match what access the file
+   #  supports.
    public method map { {access "READ"} } {
+      if { $addr_ != 0 } {
+         unmap
+      }
       set addr_ [${type_}::map $handle_ $usemmap $access]
       return $addr_
    }
@@ -164,7 +176,7 @@ itcl::class gaia::GaiaNDAccess {
       }
    }
 
-   #  Return the value of a "character component" of the dataset. These may be 
+   #  Return the value of a "character component" of the dataset. These may be
    #  the units of the data and a label describing the units, nothing else is
    #  supported. So valid values for "what" are "units" and "label".
    public method getc {what} {
@@ -181,8 +193,8 @@ itcl::class gaia::GaiaNDAccess {
       return [gaiautils::getaxiswcs $wcs $axis $shift]
    }
 
-   #  Return the address of a spectral line of data. This will only 
-   #  work for cubes and requires that the complete data are mapped first. 
+   #  Return the address of a spectral line of data. This will only
+   #  work for cubes and requires that the complete data are mapped first.
    #  The axis is the spectral axis along which the line will be extracted
    #  (1,2,3). The alow and ahigh values define a range along the axis to
    #  extract (-1 for end points). The p1 and p2 positions, are grid
@@ -191,26 +203,25 @@ itcl::class gaia::GaiaNDAccess {
    #  trailing redundant axes (that axes of size 1, the first three must be
    #  significant).
    public method getspectrum {axis alow ahigh p1 p2 trunc} {
-      if { $addr_ != {} } {
-         set dims_ [getdims $trunc]
-         lassign [eval "array::getspectrum $addr_ $dims_ $axis $alow $ahigh \
+      if { $addr_ != 0 } {
+         set dims [getdims $trunc]
+         lassign [eval "array::getspectrum $addr_ $dims $axis $alow $ahigh \
                                            $p1 $p2 $cnfmap_"] adr
          return $adr
       }
    }
 
-   #  Return the address of an image plane. This will only work for cubes 
-   #  and requires that the complete data are mapped first. The axis is the
-   #  spectral axis along which the image will be extracted (1,2,3), the 
-   #  index value selects the plane along that axis.
-   #  The trunc argument provides for the removal of any trailing redundant
-   #  axes (that axes of size 1, the first three must be significant).
+   #  Access the data of an image plane. This will only work for cubes and
+   #  requires that the complete data are mapped first. The axis is the
+   #  spectral axis along which the image will be extracted (1,2,3), the index
+   #  value selects the plane along that axis.  The trunc argument provides for
+   #  the removal of any trailing redundant axes (that axes of size 1, the
+   #  first three must be significant). The address of an array info structure
+   #  is returned (query using getinfo).
    public method getimage {axis index trunc} {
-      if { $addr_ != {} } {
-         set dims_ [getdims $trunc]
-         lassign [eval "array::getimage $addr_ $dims_ $axis \
-                                        $index $cnfmap_"] adr
-         return $adr
+      if { $addr_ != 0 } {
+         set dims [getdims $trunc]
+         return [eval "array::getimage $addr_ $dims $axis $index $cnfmap_"]
       }
    }
 
@@ -226,6 +237,40 @@ itcl::class gaia::GaiaNDAccess {
       return [array::getinfo $adr]
    }
 
+   #  Create an NDF that represents the bare bones of an image extracted from
+   #  the attached dataset. The bare bones are an NDF of the correct
+   #  dimensions, with an appropriated WCS. No data components are copied.
+   #  Returns a new instance of this class wrapping the new NDF.
+   public method createimage {name axis} {
+      if { $addr_ == 0 } {
+         error "Must map in cube data before creating an image"
+      }
+      set dims [getdims 1]
+      lassign [getinfo $addr_] adr nel hdstype
+
+      set fullwcs [${type_}::getwcs $handle_]
+      if { $axis == 1 } {
+         set axis1 2
+         set axis2 3
+      } elseif { $axis == 2 } {
+         set axis1 1
+         set axis2 3
+      } else {
+         set axis1 1
+         set axis2 2
+      }
+      set dim1 [lindex $dims [expr $axis1-1]]
+      set dim2 [lindex $dims [expr $axis2-1]]
+      set imagewcs [gaiautils::get2dwcs $fullwcs $axis1 $axis2 $dim1 $dim2]
+
+      set newhandle [ndf::create $name $dim1 $dim2 $hdstype $imagewcs]
+
+      #  Create a new instance to manage the new NDF.
+      set accessor [uplevel \#0 GaiaNDAccess \#auto]
+      $accessor acquire $name $newhandle
+
+      return $accessor
+   }
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -260,10 +305,10 @@ itcl::class gaia::GaiaNDAccess {
    #  The memory address of the dataset data component.
    protected variable addr_ 0
 
-   #  Whether mapped data should be registered with CNF (required for some
-   #  NDF actions).
+   #  Whether mapped data should be registered with CNF, currently this
+   #  is always true.
    protected variable cnfmap_ 0
-   
+
    #  Common variables: (shared by all instances)
    #  -----------------
 

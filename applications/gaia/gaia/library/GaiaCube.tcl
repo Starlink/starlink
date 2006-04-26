@@ -1,22 +1,22 @@
 #+
 #  Name:
-#     GaiaNDFCube
+#     GaiaCube
 
 #  Type of Module:
 #     [incr Tk] class
 
 #  Purpose:
-#     Control the display of an NDF cube as a series of images in GAIA.
+#     Control the display of a cube as a series of images in GAIA.
 
 #  Description:
-#     This class opens a 3D NDF and then displays image shaped sections of it
-#     in an associated window.
+#     This class opens a 3D data cube and then displays image shaped sections
+#     of it in an associated window.
 
 #  Invocations:
 #
-#        GaiaNDFCube object_name [configuration options]
+#        GaiaCube object_name [configuration options]
 #
-#     This creates an instance of a GaiaNDFCube object. The return is
+#     This creates an instance of a GaiaCube object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -50,9 +50,9 @@
 
 #.
 
-itk::usual GaiaNDFCube {}
+itk::usual GaiaCube {}
 
-itcl::class gaia::GaiaNDFCube {
+itcl::class gaia::GaiaCube {
 
    #  Inheritances:
    #  -------------
@@ -77,7 +77,7 @@ itcl::class gaia::GaiaNDFCube {
 
       #  Set window properties.
       wm protocol $w_ WM_DELETE_WINDOW [code $this close]
-      wm title $w_ "Display image sections of NDF cube ($itk_option(-number))"
+      wm title $w_ "Display image sections of a cube ($itk_option(-number))"
 
       #  Add short help window
       make_short_help
@@ -97,7 +97,7 @@ itcl::class gaia::GaiaNDFCube {
       set Options [add_menubutton "Options" left]
       configure_menubutton Options -underline 0
 
-      #  If file mapping is not available, then set value off.
+      #  If HDS file mapping is not available, then set value off.
       set canmmap 1
       if { [hds::gtune MAP] != "1" } {
          configure -usemmap 0
@@ -132,22 +132,22 @@ itcl::class gaia::GaiaNDFCube {
             otherwise fixed by last click (faster)}
 
       #  Add window help.
-      add_help_button ndfcube "On Window..."
+      add_help_button cube "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 
-      #  Name of input NDF.
-      itk_component add ndfcube {
-         LabelFileChooser $w_.ndfcube \
+      #  Name of input dataset.
+      itk_component add cube {
+         LabelFileChooser $w_.cube \
             -labelwidth $lwidth \
-            -text "Input NDF cube:" \
-            -textvariable [scope itk_option(-ndfcube)] \
-            -command [code $this set_chosen_ndf_] \
+            -text "Input cube:" \
+            -textvariable [scope itk_option(-cube)] \
+            -command [code $this set_chosen_cube_] \
             -filter_types $itk_option(-filter_types)
       }
-      pack $itk_component(ndfcube) -side top -fill x -ipadx 1m -ipady 2m
-      add_short_help $itk_component(ndfcube) \
-         {Name of the input NDF, must be a cube}
+      pack $itk_component(cube) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(cube) \
+         {Name of the input data file, must be a cube}
 
       #  Control for selecting the axis we move along.
       itk_component add axis {
@@ -186,13 +186,6 @@ itcl::class gaia::GaiaNDFCube {
       pack $itk_component(index) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(index) \
          {Index of the image plane to display (along current axis)}
-
-      #  Button release on scale part of widget updates the image to a proper
-      #  section. Return in entry part does same.
-      $itk_component(index) bindscale <ButtonRelease-1> \
-         [code $this display_current_section_]
-      $itk_component(index) bindentry <Return> \
-         [code $this display_current_section_]
 
       #  Index coordinate.
       itk_component add indexlabel {
@@ -376,7 +369,7 @@ itcl::class gaia::GaiaNDFCube {
 
       itk_component add stop {
          button $itk_component(animation).stop -text Stop \
-            -command [code $this stop_ 1]
+            -command [code $this stop_]
       }
       pack $itk_component(stop) -side right -expand 1 -pady 3 -padx 3
       add_short_help $itk_component(stop) {Stop animation}
@@ -494,15 +487,19 @@ itcl::class gaia::GaiaNDFCube {
    #  -----------
    destructor  {
 
-      #  Close and release NDF. Don't release the slice memory, that should be
-      #  done safely by now, otherwise best left hanging.
-      if { $accessor_ != {} } {
-         $accessor_ close
-         set accessor_ {}
+      #  Close and release the cube.
+      if { $cubeaccessor_ != {} } {
+         $cubeaccessor_ close
+         set cubeaccessor_ {}
+      }
+
+      #  Delete the NDF image slice.
+      if { $section_name_ != {} } {
+         catch {::file delete $section_name_} msg
       }
 
       #  Stop animation.
-      stop_ 0
+      stop_
 
       #  Release collapser task.
       if { $collapser_ != {} } {
@@ -527,8 +524,8 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Close window. If image is being replaced set dispsection false to 
    #  avoid the section being loaded.
-   public method close { {dispsection 1} } {
-      stop_ $dispsection
+   public method close {} {
+      stop_
       wm withdraw $w_
       if { [info exists spectrum_] } {
          if { $spectrum_ != {} && [winfo exists $spectrum_] } {
@@ -542,12 +539,12 @@ itcl::class gaia::GaiaNDFCube {
       }
    }
 
-   #  Open the chosen NDF.
-   protected method set_chosen_ndf_ { args } {
-      set namer [GaiaImageName \#auto -imagename $itk_option(-ndfcube)]
+   #  Open the chosen file as a cube.
+   protected method set_chosen_cube_ { args } {
+      set namer [GaiaImageName \#auto -imagename $itk_option(-cube)]
       if { [$namer exists] } {
-         if { $accessor_ == {} } {
-            set accessor_ [uplevel \#0 GaiaNDAccess \#auto]
+         if { $cubeaccessor_ == {} } {
+            set cubeaccessor_ [uplevel \#0 GaiaNDAccess \#auto]
          }
 
          #  Is this an NDF cube?
@@ -559,8 +556,8 @@ itcl::class gaia::GaiaNDFCube {
 
          $namer absolute
          set ndfname_ [$namer ndfname 0]
-         $accessor_ configure -dataset "$ndfname_"
-         set bounds_ [$accessor_ getbounds]
+         $cubeaccessor_ configure -dataset "$ndfname_"
+         set bounds_ [$cubeaccessor_ getbounds]
          set ndims [expr [llength $bounds_]/2]
 
          #  Allow fourth dimension, as long as it is redundant.
@@ -579,15 +576,20 @@ itcl::class gaia::GaiaNDFCube {
                "Not a cube, must have 3 significant dimensions (has $ndims)"
             return
          }
+
+         #  Map in all data, this makes it immediately available within
+         #  application
+         load_cube_ 1
+
+         #  Retain the object value for creating new ones.
+         set object_ [$itk_option(-rtdimage) object]
+
+         #  Set axis and display the plane for first time.
          set axis_ 2
          set_step_axis_ 3
 
          #  Display spectra on mouse click.
          add_bindings_
-
-         #  Map in all data, this makes it immediately available within
-         #  application
-         load_cube_ 1
       }
    }
 
@@ -598,19 +600,24 @@ itcl::class gaia::GaiaNDFCube {
    #  readout. Otherwise mmap is used, which may give an initially slow
    #  spectral readout for large cubes.
    protected method load_cube_ { force } {
-      if { $accessor_ == {} } {
+      if { $cubeaccessor_ == {} } {
          return
       }
-      if { [$accessor_ cget -usemmap] != $itk_option(-usemmap) || $force } {
+      if { [$cubeaccessor_ cget -usemmap] != $itk_option(-usemmap) || $force } {
          busy {
-            $accessor_ unmap
-            $accessor_ configure -usemmap $itk_option(-usemmap)
-            lassign [$accessor_ map] adr
+            $cubeaccessor_ unmap
+            $cubeaccessor_ configure -usemmap $itk_option(-usemmap)
+            set adr [$cubeaccessor_ map "READ"]
          }
       }
    }
 
-   #  Set the axis we step along.
+   #  Set the axis we step along. A side-effect of this is to create the dummy
+   #  NDF that will be actually manipulated in the main display window. A 
+   #  dummy NDF is used for FITS and NDF files as this is the simplest way
+   #  to make sure that the toolboxes can also access the data in an efficient
+   #  manner. When a toolbox access this file if will need to save the NDF
+   #  first to make sure that the data values are up to date.
    protected method set_step_axis_ {value} {
       if { $value != $axis_ && $bounds_ != {} } {
          set axis_ $value
@@ -646,8 +653,8 @@ itcl::class gaia::GaiaNDFCube {
       }
    }
 
-   #  Set the plane to display and display it. When regen is true a new slice
-   #  is displayed, otherwise just the image data is updated.
+   #  Set the plane to display and display it. When regen is true a new
+   #  image NDF is displayed, otherwise just the NDF image data is updated.
    protected method set_display_plane_ { newvalue {regen 0} } {
 
       if { $newvalue != $plane_ && $ndfname_ != {} } {
@@ -659,12 +666,42 @@ itcl::class gaia::GaiaNDFCube {
             set plane_ $newvalue
          }
 
-         if { $regen || ![info exists spectrum_] } {
-            #  Display a section from the NDF (forced in non-devel mode).
+         #  Non-devel display of slice, use simple NDF sections.
+         if { ![info exists spectrum_] } {
             display_current_section_
-
          } else {
-            #  Just extract this plane from the cube and update the image.
+            if { $regen } {
+
+               #  Set name of the image displayed image section.
+               set oldname $section_name_
+               set section_name_ "GaiaCubeSection[incr count_].sdf"
+
+               #  And create the dummy image NDF. Will have axis removed from
+               #  the WCS and be the size and type of cube in other axes.
+               set imageaccessor [$cubeaccessor_ createimage \
+                                      $section_name_ $axis_]
+
+               #  Map in the data component to initialise it. Use BAD
+               #  to avoid NDF bad flag from being set false.
+               $imageaccessor map "WRITE/BAD"
+
+               #  Close before it can be displayed by the rtdimage.
+               $imageaccessor close
+
+               #  Display this for the first time.
+               display_ $section_name_ 0
+
+               #  Now delete old image slice (waited until released).
+               if { $oldname != {} } {
+                  catch {::file delete $oldname} msg
+                  if { $msg != {} } {
+                     puts stderr "WARNING: Failed to delete old image section: $msg"
+                  }
+               }
+
+            }
+
+            #  Now copy this plane from the cube and update the image.
             #  Correct plane to grid indices.
             if { $axis_ == 1 } {
                set zo [lindex $bounds_ 0]
@@ -674,16 +711,31 @@ itcl::class gaia::GaiaNDFCube {
                set zo [lindex $bounds_ 4]
             }
             set zp [expr round($plane_+1-$zo)]
-            lassign [$accessor_ getimage $axis_ $zp 1] adr
-            lassign [$accessor_ getinfo $adr] realadr nel type
+
+            #  Access the image data for this plane and replace 
+            #  the displayed copy.
+            lassign [$cubeaccessor_ getimage $axis_ $zp 1] adr
+            lassign [$cubeaccessor_ getinfo $adr] realadr nel type
             $itk_option(-rtdimage) updateimagedata $realadr
+
+            #  If regenerating bring autocuts etc. into sync.
+            if { $regen } {
+               $itk_option(-rtdimage) autocut -percent 98
+            }
+
+            #  Set the object description of this slice to include the
+            #  cube slice.
+            $itk_option(-rtdimage) object "[slice_display_name_] ($object_)"
+            $rtdctrl_info_ updateValues
 
             # Release memory from last time and save pointer.
             if { $last_slice_adr_ != 0 } {
-               $accessor_ release $last_slice_adr_
+               $cubeaccessor_ release $last_slice_adr_
             }
             set last_slice_adr_ $adr
+
          }
+
          set coord [get_coord_ $plane_ 1 0]
          $itk_component(indexlabel) configure -value $coord
 
@@ -703,13 +755,22 @@ itcl::class gaia::GaiaNDFCube {
       }
    }
 
-   #  Display the current NDF section and release the memory slice.
-   protected method display_current_section_ {} {
-      
-      # Don't do this anything but NDFs, sectioning is slow... 
-      # XXX need something similar for FITS cubes.
-      if { ! $isndf_ } return
+   #  Create a description of the slice. Note use short name so should
+   #  probably not be used to access any NDF sections.
+   protected method slice_display_name_ {} {
+      if { $axis_ == 1 } {
+         set section "($plane_,,$close_section_"
+      } elseif { $axis_ == 2 } {
+         set section "(,$plane_,$close_section_"
+      } else {
+         set section "(,,${plane_}${close_section_}"
+      }
+      return ${itk_option(-cube)}${section}
+   }
 
+   #  Display the current NDF section and release the memory slice. 
+   #  OLD method, do be removed.
+   protected method display_current_section_ {} {
       if { $axis_ == 1 } {
          set section "($plane_,,$close_section_"
       } elseif { $axis_ == 2 } {
@@ -718,14 +779,9 @@ itcl::class gaia::GaiaNDFCube {
          set section "(,,${plane_}${close_section_}"
       }
       display_ ${ndfname_}$section
-
-      if { $last_slice_adr_ != 0 } {
-         $accessor_ release $last_slice_adr_
-         set last_slice_adr_ 0
-      }
    }
 
-   #  Display an NDF.
+   #  Display an image.
    protected method display_ {name {istemp 0} } {
       $itk_option(-gaia) configure -check_for_cubes 0
       $itk_option(-gaia) open $name
@@ -758,7 +814,7 @@ itcl::class gaia::GaiaNDFCube {
       }
       set coord {}
       catch {
-         set coord [$accessor_ getcoord $axis_ $section $formatted $trail]
+         set coord [$cubeaccessor_ getcoord $axis_ $section $formatted $trail]
       }
       return $coord
    }
@@ -773,15 +829,14 @@ itcl::class gaia::GaiaNDFCube {
             set upper_bound_ $temp
          }
          set step_ $itk_option(-step)
-         set_display_plane_ $lower_bound_
+         set_display_plane_ $lower_bound_ 0
          increment_
       }
    }
    protected variable initial_seconds_ 0
 
-   #  Stop the animation. If dispsection is true display the current NDF
-   #  section and release slice memory.
-   protected method stop_ { {dispsection 0} } {
+   #  Stop the animation. 
+   protected method stop_ {} {
 
       if { $afterId_ != {} } {
          after cancel $afterId_
@@ -790,9 +845,6 @@ itcl::class gaia::GaiaNDFCube {
             #  DEBUG.
             puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
          }
-      }
-      if { $dispsection } {
-         display_current_section_
       }
    }
 
@@ -813,7 +865,7 @@ itcl::class gaia::GaiaNDFCube {
    #  Increment the displayed section by one.
    protected method increment_ {} {
       if { $plane_ >= $lower_bound_ && $plane_ < $upper_bound_ } {
-         set_display_plane_ [expr ${plane_}+$step_]
+         set_display_plane_ [expr ${plane_}+$step_] 0
          if { $plane_ == $lower_bound_ } {
             #  At lower edge, running backwards, need to let it step below.
             set plane_ [expr ${plane_}+$step_]
@@ -825,7 +877,7 @@ itcl::class gaia::GaiaNDFCube {
          #  Check that we have a range, otherwise this will call increment_
          #  causing an eval depth exception.
          if { $lower_bound_ == $upper_bound_ } {
-            stop_ 1
+            stop_
          } else {
             #  Force temporary halt as visual clue that end has arrived.
             update idletasks
@@ -848,7 +900,7 @@ itcl::class gaia::GaiaNDFCube {
                }
                increment_
             } else {
-               stop_ 1
+               stop_
             }
          }
       }
@@ -891,7 +943,7 @@ itcl::class gaia::GaiaNDFCube {
       }
 
       #  Create a temporary file name.
-      set tmpimage_ "GaiaNDFCube${count_}"
+      set tmpimage_ "GaiaCube${count_}"
       incr count_
 
       blt::busy hold $w_
@@ -1054,7 +1106,7 @@ itcl::class gaia::GaiaNDFCube {
             #  all time.
             if { $itk_option(-autoscale) || $action == "localstart" } {
                busy {
-                  $spectrum_ display $accessor_ $axis_ $alow $ahigh \
+                  $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh \
                      $ix $iy 1 $ccx $ccy
                }
 
@@ -1066,7 +1118,7 @@ itcl::class gaia::GaiaNDFCube {
                }
             } else {
                busy {
-                  $spectrum_ display $accessor_ $axis_ $alow $ahigh \
+                  $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh \
                      $ix $iy 0
                }
             }
@@ -1103,13 +1155,15 @@ itcl::class gaia::GaiaNDFCube {
    #  ----------------------
 
    #  Name of the input text file.
-   itk_option define -ndfcube ndfcube Ndfcube {} {
-      set_chosen_ndf_
+   itk_option define -cube cube Cube {} {
+      set_chosen_cube_
    }
 
    #  Name of the Gaia instance we're controlling.
    itk_option define -gaia gaia Gaia {} {
       set check_for_cubes_ [$itk_option(-gaia) cget -check_for_cubes]
+      set rtdctrl [$itk_option(-gaia) get_image]
+      set rtdctrl_info_ [$rtdctrl component info]
    }
 
    #  The canvas. Used for displaying spectra.
@@ -1139,13 +1193,13 @@ itcl::class gaia::GaiaNDFCube {
    #  Protected variables: (available to instance)
    #  --------------------
 
-   #  Data access object.
-   protected variable accessor_ {}
+   #  Data access object for the cube.
+   protected variable cubeaccessor_ {}
 
-   #  The bounds of the NDF, 3 pairs of upper and lower values.
+   #  The bounds of the cube, 3 pairs of upper and lower values.
    protected variable bounds_ {}
 
-   #  The name of the NDF.
+   #  The name of the dataset, as an NDF specification (handle HDU and slices).
    protected variable ndfname_ {}
 
    #  Is this an NDF.
@@ -1206,12 +1260,22 @@ itcl::class gaia::GaiaNDFCube {
    #  The position marker that corresponds to the spectrum.
    protected variable position_mark_ {}
 
+   #  The name for the dummy NDF, with updatable image section.
+   protected variable section_name_ ""
+
    #  Memory used for last slice. Free this when not needed.
    protected variable last_slice_adr_ 0
 
    #  The terminator characters for closing a section. May specify 
    #  a final redundant axis.
    protected variable close_section_ ")"
+
+   #  The object value set in the cube (used in slice object).
+   protected variable object_ {}
+
+   #  GaiaImagePanel object used in the main window. Forced to update to
+   #  reveal the slice information.
+   protected variable rtdctrl_info_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
