@@ -94,9 +94,9 @@ sub push_line {
     #   implementation
 
     chomp($line);
-    if ( $line =~ /^\s*[$r]\-/  #  *-
+    if ( $line =~ /^\s*$r\-/  #  *-
 	 || $line =~ /\*\/$/      #  */
-	 || ($line !~ /\s*[$r]/ && $line =~ /\w/)  # real code
+	 || ($line !~ /\s*$r/ && $line =~ /\w/)  # real code
        ) {
       print "End of prologue detected\n";
       # end of prologue so flush the current section
@@ -110,16 +110,16 @@ sub push_line {
 
       # must return the line itself if it was real code
       my $retval;
-      $retval = $line if ($line !~ /\s*[$r]/ && $line =~ /\w/);
+      $retval = $line if ($line !~ /\s*$r/ && $line =~ /\w/);
 
       # return the newly minted version
       return ($retval, $prl);
 
-    } elsif ( $line =~ /^\s*[$r]\s+([A-Za-z\s]*)\s*:\s*$/ ) {
+    } elsif ( $line =~ /^\s*$r\s+([A-Za-z\s]*)\s*:\s*$/ ) {
       # section
       $self->flush_section();
       $self->section($1);
-    } elsif ( $line =~ /^\s*[$r](\s+.*)\s*$/ ) {
+    } elsif ( $line =~ /^\s*$r(\s+.*)\s*$/ ) {
       # prologue content (or *- but that is dealt with above)
       # Include leading spaces since we want to retain indenting
       # strip off the first 5 spaces (standard formatting)
@@ -137,17 +137,16 @@ sub push_line {
 
     }
 
-
-
   } else {
     # looking for one to start
     my ($cchar, $title, $startc) = $self->prolog_start( $line );
     if (defined $cchar) {
       chomp($line);
-      print "Starting prologue with comment char $cchar ($line)\n";
+      print "Starting prologue with comment char '$cchar' ($line)\n";
       # a new prologue is starting
       $prl = new Starlink::Prologue();
       $self->prologue( $prl );
+      $self->_set_prologue_type();
       $prl->comment_char( $cchar );
       $prl->start_c_comment( $startc );
 
