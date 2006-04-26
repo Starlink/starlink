@@ -46,6 +46,8 @@
 *        Use switch to select malloc
 *     25-FEB-2006 (TIMJ):
 *        Force initialisation first time through.
+*     26-APR-2006 (TIMJ):
+*        Check for libgc *and* gc.h
 
 *  Notes:
 *     - The Garbage Collector malloc is only available if starMemInit() has
@@ -97,7 +99,7 @@ void * starCalloc( size_t nmemb, size_t size ) {
     break;
 
   case STARMEM__GC:
-#if HAVE_LIBGC
+#if HAVE_LIBGC && HAVE_GC_H
     /* Call normal malloc since we know the GC initialises memory */
     tmp = GC_MALLOC( nmemb * size );
 #else

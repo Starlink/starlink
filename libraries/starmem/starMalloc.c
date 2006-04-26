@@ -46,6 +46,8 @@
 *        Use switch to select malloc
 *     25-FEB-2006 (TIMJ):
 *        Force initialisation first time through.
+*     26-APR-2006 (TIMJ):
+*        Check for libgc *and* gc.h
 
 *  Notes:
 *     - The Garbage Collector malloc is only available if starMemInit() has
@@ -102,7 +104,7 @@ void * starMalloc( size_t size ) {
     break;
 
   case STARMEM__GC:
-#if HAVE_LIBGC
+#if HAVE_LIBGC && HAVE_GC_H
     if ( size < THRESHOLD ) {
       tmp = GC_MALLOC( size );
     } else {

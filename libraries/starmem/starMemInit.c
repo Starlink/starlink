@@ -41,6 +41,8 @@ void starMemInitFort( void );
 *  History:
 *     09-FEB-2006 (TIMJ):
 *        Original version.
+*     26-APR-2006 (TIMJ):
+*        Check for libgc *and* gc.h
 
 *  Notes:
 *     - Call this from your main program. It is not part of the shared
@@ -89,7 +91,7 @@ starMemInitFort() {
   /* return immediately if we have been initialised already */
   if ( starMemIsInitialised() ) return;
 
-#if HAVE_LIBGC
+#if HAVE_LIBGC && HAVE_GC_H
   GC_INIT();
   starMemInitPrivate( 1 );
 #else

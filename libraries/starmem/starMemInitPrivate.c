@@ -49,6 +49,8 @@
 *        Add DL
 *     25-FEB-2006 (TIMJ):
 *        Add STARMEM_PRINT_INFO
+*     26-APR-2006 (TIMJ):
+*        Check for libgc *and* gc.h
 
 *  Notes:
 *     - This function is private and should only be called from the
@@ -142,7 +144,7 @@ starMemInitPrivate( int gc_initialised ) {
 
   } else if (strncmp(starenv, "GC", 2) == 0 ) {
     /* Garbage Collector mandatory */
-#if HAVE_LIBGC    
+#if HAVE_LIBGC && HAVE_GC_H
     if (gc_initialised) {
       STARMEM_MALLOC = STARMEM__GC;
     } else {

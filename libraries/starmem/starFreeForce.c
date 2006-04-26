@@ -36,6 +36,8 @@
 *  History:
 *     09-FEB-2006 (TIMJ):
 *        Original version.
+*     26-APR-2006 (TIMJ):
+*        Check for libgc *and* gc.h
 
 *  Notes:
 *     - An attempt will be made to free this memory regardless of
@@ -85,7 +87,7 @@ void starFreeForce( void * ptr ) {
     break;
 
   case STARMEM__GC:
-#if HAVE_LIBGC
+#if HAVE_LIBGC && HAVE_GC_H
     GC_FREE( ptr );
 #else
     starMemFatalGC;
