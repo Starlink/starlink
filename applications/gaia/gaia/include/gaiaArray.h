@@ -53,9 +53,9 @@ extern "C" {
     void gaiaArrayToDouble( ARRAYinfo *info, double badValue, double *outPtr );
 
     /* Get a simple image section from a cube */
-    void gaiaArrayImageFromCube( ARRAYinfo *info, int dims[3], int axis, 
-                                 int index, int cnfmalloc, void **outPtr, 
-                                 int *nel );
+    void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
+                                 int index, ARRAYinfo **imageinfo, 
+                                 int cnfmalloc );
         
     /* Get a spectrum (line of data) from a cube */
     void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis, 
