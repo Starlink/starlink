@@ -108,8 +108,12 @@ sub push_line {
       # undefine the internal copy
       $self->prologue( undef );
 
+      # must return the line itself if it was real code
+      my $retval;
+      $retval = $line if ($line !~ /\s*[$r]/ && $line =~ /\w/);
+
       # return the newly minted version
-      return (undef, $prl);
+      return ($retval, $prl);
 
     } elsif ( $line =~ /^\s*[$r]\s+([A-Za-z\s]*)\s*:\s*$/ ) {
       # section
