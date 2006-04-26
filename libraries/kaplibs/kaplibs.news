@@ -12,14 +12,15 @@ Version 2.8
      symbols
    - Can now be built as a shared library
    - Added kpg1_astcmn to provide access to KPG_AST private common block
-   - The link script now accepts a -notk option so that no Tk dependencies
-     will be included in the link
    - The HLP helper routines are no longer part of kaplibs. Use SHL
      library instead.
    - kpg1_scrsz no longer present. Please use one_scrsz instead.
    - now released under the GPL
    - kpgGtfts and kpgPtfts can now be used to read and write
      AST FitsChan objects from/to an NDF
+   - kaplibs no longer links against Tk (the one Tk routine has been
+     removed from kaplibs)
+   - kaplibs now has a public C interface (but not for all routines)
 
 Version 2.7. includes the following changes:
 
