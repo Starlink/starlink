@@ -10,8 +10,9 @@
 #include "ndf_err.h"
 #include "dat_err.h"
 #include "kpg_err.h"
+#include "kaplibs.h"
 
-const int SZFITSCARD = 80; /* Size of a FITS header card */
+#define SZFITSCARD 80      /* Size of a FITS header card */
 #define FITSSTR "80"       /* string representation of size of FITS */
 
 /*
@@ -100,7 +101,7 @@ int kpgGtfts( int indf, AstFitsChan ** fchan, int * status ) {
   HDSLoc *fitsloc = NULL;     /* FITS HDS Locator in extension */
   hdsdim fitsdim[DAT__MXDIM]; /* Dimensionality of FITS extension */
   void   *fpntr = NULL;       /* Pointer to the mapped FITS header */
-  int    i;                   /* Loop counter */
+  unsigned int    i;          /* Loop counter */
   size_t ncards;              /* Number of header cards in extension */
   size_t nchars;              /* Number of characters in extension */
   int    ndim;                /* Number of dimensions in FITS array */
@@ -153,7 +154,7 @@ int kpgGtfts( int indf, AstFitsChan ** fchan, int * status ) {
   datSize( fitsloc, &ncards, status );
 
   if ( *status == SAI__OK ) {
-    if ( ncards != fitsdim[0] ) {
+    if ( ncards != (size_t)fitsdim[0] ) {
       *status = DAT__DIMIN;
       msgSeti( "DM", (int)fitsdim[0] );
       msgSeti( "SZ", (int)ncards );
