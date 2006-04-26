@@ -18,6 +18,8 @@ Version 2.8
      library instead.
    - kpg1_scrsz no longer present. Please use one_scrsz instead.
    - now released under the GPL
+   - kpgGtfts and kpgPtfts can now be used to read and write
+     AST FitsChan objects from/to an NDF
 
 Version 2.7. includes the following changes:
 
