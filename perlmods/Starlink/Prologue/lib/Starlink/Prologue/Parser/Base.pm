@@ -87,8 +87,10 @@ sub section {
   my $self = shift;
   if (@_) {
     my $s = shift;
-    $s =~ s/\s+$//; # trim
-    $s =~ s/^\s+//;
+    if (defined $s) {
+      $s =~ s/\s+$//; # trim
+      $s =~ s/^\s+//;
+    }
     $self->{SECTION} = $s;
   }
   return $self->{SECTION};
@@ -123,17 +125,31 @@ sub flush_section {
 
   my @content = @{$self->{CONTENT}};
 
+  # remove blank lines from the front
+  my $nonblank;
+  for my $pos (0..$#content) {
+    # loop until we 
+    if (defined $content[$pos] && $content[$pos] =~ /\S/) {
+      $nonblank = $pos;
+      last;
+    }
+  }
+  if (defined $nonblank) {
+    @content = @content[$nonblank..$#content];
+  }
+
+
   # remove any blank lines from the end of the content
   my $pos = $#content;
   if ($pos > -1) {
-    while ($content[$pos] =~ /^\s*$/) {
+    while ($pos >=0 && $content[$pos] =~ /^\s*$/) {
       $pos--;
     }
     @content = @content[0..$pos];
   }
-  # store the content
+  # store the content if we had content
   my $prl = $self->prologue;
-  $prl->content( $section, @content);
+  $prl->content( $section, @content) if @content;
 
   # reset internal state
   $self->section( undef );
@@ -191,6 +207,32 @@ sub flush {
   # return the prologue as-is
   return $prl;
 }
+
+=begin __INTERNAL__
+
+=head2 Internal Methods
+
+=over 4
+
+=item B<_set_prologue_type>
+
+=cut
+
+sub _set_prologue_type {
+  my $self = shift;
+  my $prl = $self->prologue;
+  return unless defined $prl;
+
+  # get the class name and chop off everything before the last ::
+  my $class = ref($self);
+  $class =~ s/.*:://;
+  $prl->prologue_type( $class )
+}
+
+
+=back
+
+=end __INTERNAL__
 
 =head2 Class Methods
 
