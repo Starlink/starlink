@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {999.1}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {6th February 2006}
+\newcommand{\stardocdate}      {26th April 2006}
 \newcommand{\stardoctitle}     {CUPID}
 \newcommand{\stardoconeline}   {A Clump Identification and Analysis Package}
-\newcommand{\stardocversion}   {Version 0.0-1}
+\newcommand{\stardocversion}   {Version 0.0-12}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {CUPID is a package of the identification
 and analysis of clumps of emission within 2- and 3- dimensional 
@@ -658,7 +658,65 @@ which are implemented within CUPID.
 To be written.
 
 \subsection{\xlabel{clumpfind}ClumpFind}
-To be written.
+This algorithm was developed by Jonathan Williams and had been described
+fully in \htmladdnormallink{Williams, de Geus \& Blitz 1994, ApJ, 428, 693}
+{http://adsabs.harvard.edu/cgi-bin/nph-bib_query?1994ApJ%2E%2E%2E428%2E%2E693W&db_key=AST}.
+
+Briefly, it contours the data array at many different levels, starting at
+a value close to the peak value in the array and working down to a
+specified minimum contour level. At each contour level, all contiguous
+areas of pixels that are above the contour level are found and considered
+in turn. If such a set of pixels includes no pixels that have already
+been assigned to a clump (\emph{i.e.} have already been identified at a
+higher contour level), then the set is marked as a new clump. If the set
+includes some pixels that have already been assigned to a clump, then, if
+all such pixels belong to the same clump, that clump is extended to
+include all the pixels in the set. If the set includes pixels that have
+already been assigned to two or more clumps, then the new pixels in the
+set are shared out between the two or more existing clumps. This sharing
+is done by assigning each new pixel to the closest clump. Note, this is
+based on the distance to the nearest pixel already assigned to the clump,
+not the distance to the central or peak pixel in the clump. The above
+paper refers to this as a ``friends-of-friends'' algorithm.
+
+This process continues down to the lowest specified contour level, except
+that new clumps found at the lowest contour level are ignored. However,
+clumps found at higher contour levels are followed down to the lowest
+specified contour level.
+
+\subsubsection{Comparing CUPID ClumpFind with other Implementations}
+The CUPID implementation of this algorithm is completely independent of
+the Williams implementation (which is written in IDL and available from
+Williams own web page at \htmladdnormallink{http://www.ifa.hawaii.edu/~jpw/}
+{http://www.ifa.hawaii.edu/~jpw/}). In particularly, several extra
+configuration parameters have been added by CUPID to provide more
+detailed control of the algorithm. If you want to do a direct comparison
+between the CUPID implementation and the Williams implementation, then
+you should set these extra parameters to the following values:
+
+\begin{itemize}
+\item ClumpFind.FwhmBeam = 0
+\item ClumpFind.MaxBad = 100000  (or some other very large number)
+\item ClumpFind.MinPix = 5
+\item ClumpFind.VeloRes = 0
+\end{itemize}
+
+You should also note that the pixel co-ordinate system used by the two
+implementations differ, and consequently the positions reported for the
+clump peaks will also differ. The IDL implementation of ClumpFind uses a
+pixel coordinate system in which the first pixel (\emph{i.e} the bottom
+left pixel of a 2D image displayed ``normally'') is centred at (0,0).
+This differs from both the FITS and NDF definition of pixel co-ordinates.
+In FITS, the centre of the first pixel in the array has a value of 1.0 on
+every pixel axis. In NDF, the centre of the first pixel has a value of
+$LBND(I) - 0.5$ on axis $I$, where $LBND(I)$ is an attribute of the NDF
+known as the ``pixel origin''. For an NDF which has been derived from a
+FITS file and which has been subjected to no geometric transformations,
+the pixel origin will be 1.0 on every pixel axis, resulting in the centre
+of the first pixel having a value of 0.5 on every pixel axis.
+
+
+
 
 \subsection{\xlabel{reinhold}Reinhold}
 This algorithm was developed by Kim Reinhold whilst working at the Joint

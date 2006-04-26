@@ -398,7 +398,7 @@ void findclumps() {
 *     are allowed to be adjacent to a bad pixel. If the number of clump
 *     pixels adjacent to a bad pixel exceeds this value, the clump is 
 *     excluded. If a direct comparison with other implementations of the 
-*     ClumpFind algorithm is required, a value of zero should be used. [4]
+*     ClumpFind algorithm is required, a very large value should be used. [4]
 *     - ClumpFind.MinPix: The lowest number of pixel which a clump can
 *     contain. If a candidate clump has fewer than this number of pixels, 
 *     it will be ignored. This prevents noise spikes from being interpreted 
