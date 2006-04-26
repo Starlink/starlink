@@ -63,13 +63,16 @@ C<Starlink::Prologue> prologue object. The C<push_line> method returns
 the line itself if the line is not part of a prologue, and/or a
 prologue object if the prologue is terminated by this line.
 
-  ($line, $prologue) = $parser->push_line;
+  ($line, $prologue) = $parser->push_line( $input );
+
+The returned line will not have a newline.
 
 =cut
 
 sub push_line {
   my $self = shift;
   my $line = shift;
+  chomp($line);
 
   my $prl = $self->prologue;
   if (defined $prl) {
@@ -98,7 +101,6 @@ sub push_line {
     # blank lines are treated as content unless they are
     #   before a section.
 
-    chomp($line);
     if ( $line =~ /^\s*[$r]\s+Type Definitions\s*:$/i
 	 || $line =~ /^\s*[$r]\s+Global constants\s*:$/i
 	 || $line =~ /^\s*[$r]\s+Import\s*:$/i
@@ -106,7 +108,7 @@ sub push_line {
 	 || $line =~ /^\s*[$r]\s+Status\s*:$/i
 	 || $line =~ /^\s*[$r]\-\s*$/  #   *- but usually too late
        ) {
-      print "End of prologue detected\n";
+      # print "End of prologue detected\n";
       # end of prologue so flush the current section
       $self->flush_section();
 
@@ -127,6 +129,9 @@ sub push_line {
       $self->flush_section();
       $self->section( "Type Of Module" );
       push(@{$self->content()}, $1 );
+
+      # this line should be returned
+      return ($line, undef);
 
     } elsif ( $line =~ /^\s*[$r]\s+([A-Za-z\s]*)\s*:\s*$/ ) {
       # section start
@@ -168,13 +173,15 @@ sub push_line {
       push(@{$self->content()}, $content);
 
     }
+    # indicate that we are in a prologue but not complete
+    return (undef, undef );
 
   } else {
+
     # looking for one to start
     my ($cchar, $title, $purpose) = $self->prolog_start( $line );
     if (defined $cchar) {
-      chomp($line);
-      print "Starting prologue with comment char $cchar ($line)\n";
+
       # a new prologue is starting
       $prl = new Starlink::Prologue();
       $self->prologue( $prl );
@@ -199,9 +206,8 @@ sub push_line {
       # not interested
       return ($line, undef);
     }
-
   }
-
+  return ();
 }
 
 =head2 Class Methods

@@ -88,14 +88,16 @@ not being discarded, the C<push_line> method should be called in list context
 where both a line and prologue can be returned simultaneously. Either the line
 or prologue or both can be undef depending on context.
 
-  ($line, $prologue) = $parser->push_line;
+  ($line, $prologue) = $parser->push_line( $input );
 
+The returned line will not have a newline character.
 
 =cut
 
 sub push_line {
   my $self = shift;
   my $line = shift;
+  chomp($line);
 
   # if we are in a prologue then we simply pass this to the worker
   # if we are not in a prologue and this is the start of one, we need
@@ -117,7 +119,7 @@ sub push_line {
       }
     }
     if ( wantarray() ) {
-    return @status;
+      return @status;
     } else {
       if (defined $status[1]) {
         # prologue takes priority in scalar context
@@ -147,6 +149,9 @@ sub push_line {
       my $w = $match->new();
       $self->_worker( $w );
       return $w->push_line( $line );
+    } else {
+      # not a prolog start
+      return ($line, undef);
     }
   }
 
