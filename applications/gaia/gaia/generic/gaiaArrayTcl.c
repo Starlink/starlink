@@ -198,29 +198,28 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
 static int gaiaArrayImage( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] )
 {
-    ARRAYinfo *arrayInfo;
+    ARRAYinfo *cubeArrayInfo = NULL;
+    ARRAYinfo *imageArrayInfo = NULL;
     int axis;
     int cnfMalloc;
     int dims[3];
     int index;
-    int nel;
-    long adr;
-    void *outPtr;
+    long cubeadr;
 
     /* Check arguments */
     if ( objc != 8 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "address "
-                          "dim1 dim2 dim3 axis index cnf_register" );
+        Tcl_WrongNumArgs( interp, 1, objv, "cube_address dim1 dim2 dim3 "
+                          "axis index cnf_register" );
         return TCL_ERROR;
     }
 
     /* Get cube memory address */
-    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+    if ( Tcl_GetLongFromObj( interp, objv[1], &cubeadr ) != TCL_OK ) {
         Tcl_AppendResult( interp, ": failed to read data pointer",
                           (char *) NULL );
         return TCL_ERROR;
     }
-    arrayInfo = (ARRAYinfo *)adr;
+    cubeArrayInfo = (ARRAYinfo *)cubeadr;
 
     /* Cube dimensions */
     if ( ( Tcl_GetIntFromObj( interp, objv[2], &dims[0] ) != TCL_OK ) ||
@@ -251,7 +250,7 @@ static int gaiaArrayImage( ClientData clientData, Tcl_Interp *interp,
     /* Correct to array indices */
     index--;
 
-    /* CNF registered memory */
+    /* CNF registered memory. */
     if ( Tcl_GetBooleanFromObj( interp, objv[7], &cnfMalloc ) != TCL_OK ) {
         Tcl_AppendResult( interp, ": failed to read spectral axis",
                           (char *) NULL );
@@ -259,14 +258,11 @@ static int gaiaArrayImage( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Extraction */
-    gaiaArrayImageFromCube( arrayInfo, dims, axis, index, cnfMalloc, 
-                            &outPtr, &nel );
+    gaiaArrayImageFromCube( cubeArrayInfo, dims, axis, index, 
+                            &imageArrayInfo, cnfMalloc );
 
-    /* Export results as an ARRAYinfo struct */
-    arrayInfo = gaiaArrayCreateInfo( outPtr, arrayInfo->type, nel, 
-                                     arrayInfo->isfits, arrayInfo->haveblank, 
-                                     arrayInfo->blank );
-    Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) arrayInfo ) );
+    /* Export result */
+    Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) imageArrayInfo ) );
     return TCL_OK;
 }
 

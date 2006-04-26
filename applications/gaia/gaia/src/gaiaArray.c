@@ -271,14 +271,17 @@ void gaiaArrayToDouble( ARRAYinfo *info, double badValue, double *outPtr )
  *
  *  Purpose:
  *     Given an array of 3 significant dimensions, in a supported data type,
- *     extract a 2D image section and return the data in that section in a
- *     simple array. The dataType should be one of the enumerations HDS_
- *     defined in gaiaArray.h (these correspond to the HDS data types). No
- *     changes to the underlying data representation are made (no byte
- *     swapping or bad value transformations).
+ *     extract a 2D image section and return the data in that section
+ *     in an ARRAYinfo structure. The dataType should be one of the
+ *     enumerations HDS_xxxx defined in gaiaArray.h (these correspond to the
+ *     HDS data types). No changes to the underlying data representation are
+ *     made (no byte swapping or bad value transformations).
+ *
+ *     If an existing ARRAYinfo structure is given to contain the extracted
+ *     image it should be the correct size.
  *
  *  Arguments:
- *     info
+ *     cubeinfo
  *         Pointer to the cube ARRAYinfo structure.
  *     dims[3]
  *         The dimensions of the cube.
@@ -287,23 +290,30 @@ void gaiaArrayToDouble( ARRAYinfo *info, double badValue, double *outPtr )
  *         fastest.
  *     index
  *         The index of the plane that will be extracted (along axis "axis").
+ *     imageinfo
+ *         a pointer to a pointer of either an existing ARRAYinfo structure
+ *         or NULL. If NULL the necessary memory will be allocated using
+ *         malloc or cnfMalloc as determined by the final argument. Freeing it
+ *         is the responsibility of the caller. If non-NULL then the data
+ *         of this structure will be overwritten.
  *     cnfmalloc
  *         Whether to use cnfMalloc to allocate the image data. Otherwise
  *         malloc will be used.
- *     outPtr
- *         a pointer to a pointer that will point at the extracted image on
- *         exit. This memory is allocated using malloc or cnfMalloc as
- *         determined by the final argument. Freeing it is the responsibility
- *         of the caller.
- *     nel
- *         number of elements extracted (number of type elements in outPtr).
  */
-void gaiaArrayImageFromCube( ARRAYinfo *info, int dims[3], int axis,
-                             int index, int cnfmalloc, void **outPtr,
-                             int *nel )
+void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
+                             int index, ARRAYinfo **imageinfo, int cnfmalloc )
 {
-    void *inPtr = info->ptr;
-    int type = info->type;
+    void *inPtr = cubeinfo->ptr;
+    int type = cubeinfo->type;
+    void *outPtr;
+    size_t nel;
+
+    if ( *imageinfo != NULL ) {
+        outPtr = (*imageinfo)->ptr;
+    }
+    else {
+        outPtr = NULL;
+    }
 
     if ( axis == 2 ) {
 
@@ -312,14 +322,16 @@ void gaiaArrayImageFromCube( ARRAYinfo *info, int dims[3], int axis,
         size_t length;
         size_t offset;
 
-        *nel = (size_t) dims[0] * (size_t) dims[1];
-        length = (*nel) * gaiaArraySizeOf( type );
+        nel = (size_t) dims[0] * (size_t) dims[1];
+        length = nel * gaiaArraySizeOf( type );
 
-        if ( cnfmalloc == 1 ) {
-            *outPtr = cnfMalloc( length );
-        }
-        else {
-            *outPtr = malloc( length );
+        if ( outPtr == NULL ) {
+            if ( cnfmalloc == 1 ) {
+                outPtr = cnfMalloc( length );
+            }
+            else {
+                outPtr = malloc( length );
+            }
         }
 
         /* Get the offset into cube of first pixel (in bytes). */
@@ -327,7 +339,7 @@ void gaiaArrayImageFromCube( ARRAYinfo *info, int dims[3], int axis,
         ptr = ((char *) inPtr) + offset;
 
         /* And copy the memory */
-        memcpy( *outPtr, ptr, length );
+        memcpy( outPtr, ptr, length );
     }
     else {
 
@@ -355,15 +367,17 @@ void gaiaArrayImageFromCube( ARRAYinfo *info, int dims[3], int axis,
             axis2 = 2;
         }
 
-        /* Allocate the memory */
-        *nel = (size_t) dims[axis1] * (size_t) dims[axis2];
-        length = (*nel) * gaiaArraySizeOf( type );;
+        nel = (size_t) dims[axis1] * (size_t) dims[axis2];
+        length = nel * gaiaArraySizeOf( type );;
 
-        if ( cnfmalloc == 1 ) {
-            *outPtr = cnfMalloc( length );
-        }
-        else {
-            *outPtr = malloc( length );
+        /* Allocate the memory, if needed. */
+        if ( outPtr == NULL ) {
+            if ( cnfmalloc == 1 ) {
+                outPtr = cnfMalloc( length );
+            }
+            else {
+                outPtr = malloc( length );
+            }
         }
 
         /* Get the strides for stepping around dimensions */
@@ -374,7 +388,7 @@ void gaiaArrayImageFromCube( ARRAYinfo *info, int dims[3], int axis,
 #define EXTRACT_AND_COPY(type)                    \
 {                                                 \
     type *fromPtr = (type *) inPtr;               \
-    type *toPtr = (type *) *outPtr;               \
+    type *toPtr = (type *) outPtr;                \
     k = 0;                                        \
     for ( i = 0; i < dims[axis2]; i++ ) {         \
         indices[axis2] = i;                       \
@@ -420,6 +434,17 @@ void gaiaArrayImageFromCube( ARRAYinfo *info, int dims[3], int axis,
         }
     }
 #undef EXTRACT_AND_COPY
+
+    /* Create the ARRAYinfo structure, if needed */
+    if ( *imageinfo == NULL ) {
+        *imageinfo = gaiaArrayCreateInfo( outPtr, cubeinfo->type, nel, 
+                                          0, 0, 0 );
+    }
+
+    /* Normalise the data to remove byte-swapping and unrecognised 
+     * BAD values */
+    gaiaArrayDataNormalise( outPtr, type, nel, cubeinfo->isfits, 
+                            cubeinfo->haveblank, cubeinfo->blank );
 }
 
 /**

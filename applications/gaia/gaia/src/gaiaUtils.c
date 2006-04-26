@@ -114,9 +114,13 @@ int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset,
 {
    AstFrame *tmpframe;
    AstMapping *joined;
+   double zero[1];
+   int i;
    int iaxes[1];
+   int inperm[MAXDIM];
    int nin;
    int nout;
+   int outperm[1];
 
    astBegin;
 
@@ -143,7 +147,19 @@ int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset,
    if ( nin != 1 ) {
        astInvert( *iwcs );
        joined = NULL;
-       tmpframe = astPickAxes( *iwcs, 1, iaxes, &joined );
+       tmpframe = astPickAxes( *iwcs, 1, iaxes, NULL );
+
+       /* Create a mapping for this permutation that doesn't have <bad>
+        * values as the result. */
+       zero[0] = 0.0;
+       for ( i = 0; i < nin; i++ ) {
+           inperm[i] = -1;
+       }
+       inperm[ iaxes[0] - 1 ] = 1;
+       outperm[0] = iaxes[0];
+       joined = (AstMapping *) astPermMap( nin, inperm, 1, outperm, zero, "" );
+
+       /* Add in the new frame */
        astAddFrame( *iwcs, AST__CURRENT, joined, tmpframe );
        astInvert( *iwcs );
 
@@ -161,8 +177,18 @@ int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset,
    /* Select an axis in the current frame and tack this onto the
     * end. Same procedure as above, just no inversion. */
    if ( nout != 1 ) {
-       joined = NULL;
-       tmpframe = astPickAxes( *iwcs, 1, iaxes, &joined );
+       tmpframe = astPickAxes( *iwcs, 1, iaxes, NULL );
+
+       /* Create a mapping for this permutation that doesn't have <bad>
+        * values as the result. */
+       zero[0] = 0.0;
+       for ( i = 0; i < nout; i++ ) {
+           inperm[i] = -1;
+       }
+       inperm[ iaxes[0] - 1 ] = 1;
+       outperm[0] = iaxes[0];
+       joined = (AstMapping *)astPermMap( nout, inperm, 1, outperm, zero, "" );
+
        astAddFrame( *iwcs, AST__CURRENT, joined, tmpframe );
    }
 
