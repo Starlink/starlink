@@ -129,7 +129,7 @@ void ems1Putc( const char *cvalue, const int maxlen, char *string, int *iposn,
       }
 
 /*     Update the pointer value. */
-         *iposn = *iposn + allow;
+         *iposn = *iposn + allow - 1;
 
    } else {
 /*     The pointer is beyond the declared length of the string, so 
