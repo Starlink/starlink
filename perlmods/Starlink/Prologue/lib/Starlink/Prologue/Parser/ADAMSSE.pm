@@ -2,7 +2,7 @@ package Starlink::Prologue::Parser::ADAMSSE;
 
 =head1 NAME
 
-Starlink::Prologue::Parser::ADAMSSE - Standard Starlink prologue parser
+Starlink::Prologue::Parser::ADAMSSE - Old ADAM/SSE prologue parser
 
 =head1 SYNOPSIS
 
@@ -90,13 +90,13 @@ sub push_line {
     # interests Starlink::Prologue does not include variable
     # definitions.
 
-    # Real code can not be a terminator s
-    
-    #
+    # Real code can not be a terminator since the ADAM/SSE
+    # style has the SUBROUTINE call embedded in it. We should
+    # fill in "Type of Module" by using the SUBROUTINE vs FUNCTION
+    # vs BLOCK DATA.
+
     # blank lines are treated as content unless they are
     #   before a section.
-    # programmatic content in a modern prologue indicates
-    #   that the prologue finished prematurely.
 
     chomp($line);
     if ( $line =~ /^\s*[$r]\s+Type Definitions\s*:$/i
@@ -120,6 +120,14 @@ sub push_line {
       # return the newly minted version
       return ($retval, $prl);
 
+    } elsif ( $line =~ /^\s{6}(SUBROUTINE)\b/i
+	      || $line =~ /^\s{6}(\w+ FUNCTION)\b/i
+	      || $line =~ /^\s{6}(BLOCK DATA)\b/i) {
+      # This is the Type of Module
+      $self->flush_section();
+      $self->section( "Type Of Module" );
+      push(@{$self->content()}, $1 );
+
     } elsif ( $line =~ /^\s*[$r]\s+([A-Za-z\s]*)\s*:\s*$/ ) {
       # section start
       $self->flush_section();
@@ -130,6 +138,10 @@ sub push_line {
       # need to rename some sections
       if ($section =~ /^Parameters$/i) {
 	$section = 'Arguments';
+      } elsif ($section =~ /^Method$/i) {
+	$section = 'Algorithm';
+      } elsif ($section =~ /^Implementation$/i) {
+	$section = 'Implementation Deficiencies';
       }
       $self->section( $section );
     } elsif ( $line =~ /^\s*[$r](\s+.*)\s*$/ ) {
@@ -166,6 +178,7 @@ sub push_line {
       # a new prologue is starting
       $prl = new Starlink::Prologue();
       $self->prologue( $prl );
+      $self->_set_prologue_type();
       $prl->comment_char( $cchar );
       $prl->start_c_comment( 0 );
 
