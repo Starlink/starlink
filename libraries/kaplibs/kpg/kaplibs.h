@@ -51,6 +51,8 @@
 *        GRP interface now uses struct
 *     7-MAR-2006 (DSB):
 *        Added KPG1_RGNDF and KPG1_WGNDF.
+*     25-APR-2006 (TIMJ):
+*        Add kpgPtfts
 
 *-
 */
@@ -90,5 +92,6 @@ void irqAddqn( IRQLocs *, const char *, int, const char *, int * );
 void irqSetqm( IRQLocs *, int, const char *, int, float *, int *, int * );
 
 int kpgGtfts( int, AstFitsChan ** fchan, int * status );
+int kpgPtfts( int, const AstFitsChan * fchan, int * status );
 
 #endif
