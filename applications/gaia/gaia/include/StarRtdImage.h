@@ -49,6 +49,8 @@
 //       Added astalwaysmergeCmd.
 //    14-DEC-2005 (PWD):
 //       Added isCompoundCmd.
+//    26-APR-2006 (PWD):
+//       Added updateImageCmd and volatility marking.
 //
 //-
 
@@ -120,14 +122,9 @@ class StarRtdImage : public Skycat
    ~StarRtdImage();
 
    //  Entry point from tcl to create a image.
-    static int CreateImage( Tcl_Interp*, char *name, int argc,
-#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
-                            Tcl_Obj *CONST objv[],
-#else
-                            char **argv,
-#endif
-                            Tk_ImageType*, Tk_ImageMaster, ClientData* );
-
+   static int CreateImage( Tcl_Interp *interp, char *name, int argc,
+                           Tcl_Obj *CONST objv[], Tk_ImageType *typePtr,
+                           Tk_ImageMaster master, ClientData *clientDataPtr );
 
    //  Replace the image data.
    int updateImageDataCmd( int argc, char *argv[] );
@@ -274,6 +271,9 @@ class StarRtdImage : public Skycat
    //  Fullname command.
    int fullNameCmd( int argc, char *argv[] );
 
+   //  Object command.
+   int objectCmd( int argc, char *argv[] );
+
    //  "isfits" command.
    int isfitsCmd( int argc, char *argv[] );
 
@@ -306,6 +306,10 @@ class StarRtdImage : public Skycat
 
    //  Configure the bias images.
    int biasimageCmd( int argc, char *argv[] );
+
+   // Command to get or set the volatility status. Note this happens
+   // automatically when updateImageDataCmd is called.
+   int volatileCmd( int argc, char *argv[] );
 
  protected:
 
@@ -454,6 +458,9 @@ class StarRtdImage : public Skycat
    int ql_x1;
    int ql_y1;
    int ql_rowcut;
+
+   // Flag indicating if image data has been updated externally.
+   int volatile_;
 
  private:
 

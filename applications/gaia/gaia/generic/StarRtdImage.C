@@ -175,6 +175,8 @@
 //        via the ndf:: commands. See gaiaNDFTcl.
 //     30-MAR-2006 (PWD):
 //        Added updateImageDataCmd.
+//     26-APR-2006 (PWD):
+//        Added objectCmd and volatileCmd.
 //-
 
 #include <config.h>   /* Skycat util */
@@ -298,9 +300,11 @@ public:
     { "readonly",        &StarRtdImage::readonlyCmd,        0, 1 },
     { "remote",          &StarRtdImage::remoteCmd,          0, 1 },
     { "remotetcl",       &StarRtdImage::remoteTclCmd,       1, 1 },
+    { "object",          &StarRtdImage::objectCmd,          0, 1 },
     { "slice",           &StarRtdImage::sliceCmd,          11, 11},
     { "updateimagedata", &StarRtdImage::updateImageDataCmd, 1, 1 },
     { "usingxshm",       &StarRtdImage::usingxshmCmd,       0, 0 },
+    { "volatile",        &StarRtdImage::volatileCmd,        0, 1 },
     { "xyprofile",       &StarRtdImage::xyProfileCmd,      14, 14}
 };
 
@@ -450,6 +454,9 @@ StarRtdImage::StarRtdImage(Tcl_Interp* interp, const char* instname,
 
     // Initialise all the Channel slots.
     for ( int i=0; i < MAX_CHANNELS; i++ ) channels_[i] = NULL;
+
+    // The image data is fixed at first.
+    volatile_ = 0;
 }
 
 
@@ -624,6 +631,9 @@ ImageData *StarRtdImage::makeImage( ImageIO imio )
         imio.wcs( wcs );  // this sets the WCS object to use for this image
     }
 
+    // The image data is fixed at first.
+    volatile_ = 0;
+
     return ImageData::makeImage( name(), imio, biasimage_->biasInfo(), verbose() );
 }
 
@@ -743,8 +753,36 @@ int StarRtdImage::updateImageDataCmd( int argc, char *argv[] )
     size_t size = image_->data().length();
     Mem data = Mem( (void *)adr, size, 0 );
 
+    //  Record that the data associated with this image is now volatile (that
+    //  is doesn't match the underlying data in any associated file).
+    volatile_ = 1;
+
+    //  And update data.
     return updateImageNewData( data );
 }
+
+//+
+//   StarRtdImage::volatileCmd
+//
+//   Purpose:
+//      Return or set the volatility status. The behaviour depends on the
+//      number of arguments, none to get the current value, 1 to set it to the
+//      given value. Note this value will be reset when a new image is loaded.
+//-
+int StarRtdImage::volatileCmd( int argc, char *argv[] )
+{
+    if ( ! image_ ) { 
+        return TCL_OK;
+    }
+    if ( argc == 0 ) {
+        return set_result( volatile_ );
+    }
+    if ( Tcl_GetBoolean( interp_, argv[0], &volatile_ ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
 
 //+
 //   StarRtdImage::dumpCmd
@@ -4844,12 +4882,12 @@ int StarRtdImage::percentCmd( int argc, char *argv[] )
         }
     }
 
-    //  Get the hisogram of data values.
+    //  Get the histogram of data values.
     int numValues = 2048;
     double xyvalues[2048*2];
     image_->getDist( numValues, xyvalues );
 
-    //  Find out how many pixel we actually counted (may be significant
+    //  Find out how many pixels we actually counted (may be significant
     //  numbers of blanks)
     int npixels = 0;
     int i;
@@ -5382,6 +5420,26 @@ int StarRtdImage::fileExists( const char *filename )
         }
     }
     return 0;
+}
+
+//+
+//   StarRtdImage::objectCmd
+//
+//   Purpose:
+//      Return or set the OBJECT value used. The behaviour depends on the
+//      number of arguments, none to get the value, 1 to set it to the given
+//      value. Note this value will be reset when a new image is loaded.
+//-
+int StarRtdImage::objectCmd( int argc, char *argv[] )
+{
+    if ( ! image_ ) { 
+        return TCL_OK;
+    }
+    if ( argc == 0 ) {
+        return set_result( image_->object() );
+    }
+    image_->object( argv[0] );
+    return TCL_OK;
 }
 
 //+
