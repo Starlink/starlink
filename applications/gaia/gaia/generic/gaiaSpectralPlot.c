@@ -684,11 +684,19 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         fprintf( stderr, "xmin etc: %f,%f,%f,%f\n", spPtr->xmin, spPtr->ymin,
                  spPtr->xmax, spPtr->ymax );
 #endif
+
         astTran2( spPtr->framesets[1], 2, xin, yin, 0, xout, yout );
         basebox[0] = xout[0];
         basebox[1] = yout[0];
         basebox[2] = xout[1];
         basebox[3] = yout[1];
+
+        /* If the transformation fails, take a stab at some useful values. */
+        if ( basebox[0] == AST__BAD ) basebox[0] = spPtr->xmax;
+        if ( basebox[1] == AST__BAD ) basebox[1] = spPtr->ymin;
+        if ( basebox[2] == AST__BAD ) basebox[2] = spPtr->xmin;
+        if ( basebox[3] == AST__BAD ) basebox[3] = spPtr->ymax;
+        if ( ! astOK ) astClearStatus;
 
 #if DEBUG
         fprintf( stderr, "basebox: %f,%f,%f,%f\n", basebox[0], basebox[1],
@@ -709,6 +717,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
             astGrid( spPtr->plot );          /* Draw grid */
             astTk_Tag( NULL );               /* Stop tagging */
         }
+        if ( ! astOK ) astClearStatus;
     }
 
     /* Finally the spectrum, for speed we use direct control of a
