@@ -31,6 +31,7 @@ use Carp;
 
 use Starlink::Prologue;
 use Starlink::Prologue::Parser::STARLSE;
+use Starlink::Prologue::Parser::ADAMSSE;
 
 =head1 METHODS
 
@@ -129,33 +130,24 @@ sub push_line {
 
 
   } else {
-    # not in a prologue, so this might be a start
-    my $class;
-    if (Starlink::Prologue::Parser::STARLSE->prolog_start( $line ) ) {
-      # looks like a standard header
-      $class = "STARLSE";
-    } elsif ( $line =~ /^\s*\/\*\+\s+\*\\$/ ) {
-      # looks like a C file with protective commenting
-      $class = "CSTARLSE";
-    } elsif ($line =~ /^\*\+\s+[\w_]+\s+\-\s+\w+/) {
-      # ADAM/SSE prolog
-      $class = "ADAMSSE";
-    } else {
-      # line looks normal so return it
-      return $line;
+    # not in a prologue, so this might be a start of prologue
+    my @classes = qw/ STARLSE ADAMSSE /;
+    my $match;
+    for my $c (@classes) {
+      # try each class in turn
+      my $try = "Starlink::Prologue::Parser::$c";
+      if ($try->prolog_start($line)) {
+	$match = $try;
+	last;
+      }
     }
 
-    # load the class
-    my $fclass = "Starlink::Prologue::Parser::$class";
-    eval "require $fclass;";
-    if ($@) {
-      croak "Prologue looked to be of type $class but could not load: $@\n";
+    if (defined $match) {
+      # create a object
+      my $w = $match->new();
+      $self->_worker( $w );
+      return $w->push_line( $line );
     }
-
-    # create a object
-    my $w = $fclass->new();
-    $self->_worker( $w );
-    return $w->push_line( $line );
   }
 
 }
