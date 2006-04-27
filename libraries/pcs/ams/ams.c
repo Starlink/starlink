@@ -250,7 +250,6 @@ int *status                          /* global status (given and
    *status = SAI__OK;
 }
 
-/*= AMS_ADDREST */
 
 static void ams_addrest
 (
@@ -262,17 +261,36 @@ int *status                        /* global status (given and returned) */
 )
 
 
-/*  Method :
-      This task has sent an "init" message to another task requesting a
-      connecting path to be set up. A positive reply has been received.
-      Check the reply is valid and complete the data structure for the
-      path.
+/*
+*+
+*  Name:
+*     AMS_ADDREST
 
-     Authors :
-     History :
-      Created: irj 15/6/92
-      Tidied : irj, skr 17/6/92
-      12Apr 1994: make function static (BDK)
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     This task has sent an "init" message to another task requesting a
+*     connecting path to be set up. A positive reply has been received.
+*     Check the reply is valid and complete the data structure for the
+*     path.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     17-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1805,7 +1823,6 @@ int *status       /* global status (given and returned) */
    ams_nalookup ( name, path, &netind, task, mach, &remote, status );
 }
 
-/*= AMS_PATH - get a communications path to another task */
 
 void ams_path
 (
@@ -1814,43 +1831,65 @@ int *path,              /* pointer to the path (returned) */
 int *status             /* global status (given and returned) */
 )
 
-/*   Method :
-      Open a path to the task whose name is 'other_task_name' and return
-      the path index in 'path'.
+/*
+*+
+*  Name:
+*     AMS_PATH
 
-      Using nalookup() we obtain the machinename, taskname and netindex
-      of a remote task (remote = 1) or obtain the local task name (remote
-      = 0) We then obtain a freepath and depending on whether the task is
-      local or remote:
+*  Purpose:
+*     Get a communications path to another task 
 
-       local:
-                   fill in t_paths[p] with the othertasks command_q (by
-		   calling msp_get_task_queue() and set
-		   t_paths[].machine_num to NULL_M and
-		   t_paths[].path_state to PART_P (nearly opened)
+*  Language:
+*     Starlink C
 
-       remote: 
-                using messys_call_out() (that also exchanges a
-		C_REM_CALL_OUT message with the remote server) we obtain
-		the remote machine's machine number (an index into
-		machine_names[], a table of known remote host names).
-		Then set t_paths[].other_com_q to messys_netqueue[netind]
-		(which is the command queue for the remote server for
-		that machine set_up when the system is first required to
-		messys_call_out() that remote host),
-		t_paths[].machine_num to the remote host's machine number
-		and t_paths[].path_state to PART_P (nearly opened)
+*  Algorithm:
+*     Open a path to the task whose name is 'other_task_name' and return
+*     the path index in 'path'.
+*     
+*     Using nalookup() we obtain the machinename, taskname and netindex
+*     of a remote task (remote = 1) or obtain the local task name (remote
+*     = 0) We then obtain a freepath and depending on whether the task is
+*     local or remote:
+*     
+*      local:
+*                  fill in t_paths[p] with the othertasks command_q (by
+*     calling msp_get_task_queue() and set
+*     t_paths[].machine_num to NULL_M and
+*     t_paths[].path_state to PART_P (nearly opened)
+*     
+*      remote: 
+*               using messys_call_out() (that also exchanges a
+*     C_REM_CALL_OUT message with the remote server) we obtain
+*     the remote machine's machine number (an index into
+*     machine_names[], a table of known remote host names).
+*     Then set t_paths[].other_com_q to messys_netqueue[netind]
+*     (which is the command queue for the remote server for
+*     that machine set_up when the system is first required to
+*     messys_call_out() that remote host),
+*     t_paths[].machine_num to the remote host's machine number
+*     and t_paths[].path_state to PART_P (nearly opened)
+*     
+*     We then obtain a temporary transaction acknowledge queue using
+*     ams_getfreetrans() and then send, using ams_sendinit(), a MESSYS_INIT
+*     message and using messys_getreply() obtain the reply.  If this
+*     short transaction fails to complete we free the path and any
+*     associated transactions using messys_remove(), otherwise we return
+*     with 'path' set to the path (index) established.
 
-      We then obtain a temporary transaction acknowledge queue using
-      ams_getfreetrans() and then send, using ams_sendinit(), a MESSYS_INIT
-      message and using messys_getreply() obtain the reply.  If this
-      short transaction fails to complete we free the path and any
-      associated transactions using messys_remove(), otherwise we return
-      with 'path' set to the path (index) established.
-     Authors :
-     History :
-      Created: irj 15/6/92
-      Tidied : irj, skr 18/6/92
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 
@@ -2070,7 +2109,6 @@ int *status                        /* global status (given and returned) */
    *status = SAI__OK;
 }
 
-/*= AMS_RADDREST */
 
 static void ams_raddrest
 (
@@ -2081,16 +2119,36 @@ sendq_type replyq,                /* queue for sending rejections (given) */
 int *status                       /* global status (given and returned) */
 )
 
-/*   Method :
-      This task has sent an "init" message to a task on another machine
-      requesting a connecting path to be set up. A positive reply has
-      been received. Check the reply is valid and complete the data
-      structure for the path.
-     Authors :
-     History :
-      Created: irj 15/6/92
-      Tidied : irj, skr 16/6/92
-      12Apr 1994: make function static (BDK)
+/*
+*+
+*  Name:
+*     AMS_RADDREST
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     This task has sent an "init" message to a task on another machine
+*     requesting a connecting path to be set up. A positive reply has
+*     been received. Check the reply is valid and complete the data
+*     structure for the path.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     16-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
