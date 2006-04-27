@@ -18463,6 +18463,10 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       (parameter OUT) which is a copy of IN, except that any pixel which
       is set bad in the DATA array of REF, is also set bad in the DATA
       and \htmlref{VARIANCE}{apndf:variance}~ (if available) arrays in OUT.
+
+      By setting the INVERT parameter TRUE, the opposite effect can be
+      produced (i.e. any pixel which is not set bad in the DATA array of 
+      REF, is set bad in OUT and the others are left unchanged).
    }
    \sstusage{
       copybad in ref out [title]
@@ -18472,6 +18476,14 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          IN = NDF (Read)
       }{
          NDF containing the data to be copied to OUT.
+      }
+      \sstsubsection{
+         INVERT = _LOGICAL (Read)
+      }{
+         If TRUE, then the bad and good pixels within the reference NDF
+         specified by parameter REF are inverted before being used (that
+         is, good pixels are treated as bad and bad pixels are treated as 
+         good).  {\tt [FALSE]}
       }
       \sstsubsection{
          REF = NDF (Read)
@@ -50671,6 +50683,14 @@ The following applications have been modified:
           axes to be drawn if and only if the graphics device is cleared 
           before the contours are plotted, as controlled by the parameter
           CLEAR.
+      \end{itemize}
+
+
+   \item [\htmlref{COPYBAD}{COPYBAD}] \mbox{}
+      \begin{itemize}
+         \item COPYBAD now has an extra parameter called INVERT which, if set
+               TRUE, causes output pixels to be set bad if the corresponding 
+               pixels in the reference NDF are good.
       \end{itemize}
 
    \item [\htmlref{CURSOR}{CURSOR}] \mbox{}

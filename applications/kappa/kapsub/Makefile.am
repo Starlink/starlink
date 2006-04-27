@@ -16,8 +16,7 @@ kps1_cenbt.f kps1_cenhd.f kps1_censg.f kps1_censh.f kps1_cff2d.f \
 kps1_cff2r.f kps1_clipa.f kps1_clipg.f kps1_clnsr.f kps1_clpa0.f \
 kps1_clpal.f kps1_cntdr.f kps1_cntgd.f kps1_cntky.f \
 kps1_cntpn.f kps1_cntsc.f kps1_cntst.f kps1_cnvfp.f kps1_cnvlv.f \
-kps1_cnvrp.f kps1_cpbb.f kps1_cpbd.f kps1_cpbi.f kps1_cpbr.f \
-kps1_cpbub.f kps1_cpbuw.f kps1_cpbw.f kps1_cremg.f kps1_crets.f \
+kps1_cnvrp.f kps1_cremg.f kps1_crets.f \
 kps1_curfm.f kps1_curdv.f kps1_discl.f kps1_dnrth.f kps1_dtpcl.f \
 kps1_elgau.f kps1_elmap.f kps1_elpr1.f kps1_elpr2.f kps1_elpr3.f \
 kps1_elpr4.f kps1_elpr5.f kps1_errcl.f kps1_fainb.f kps1_faind.f \
@@ -88,7 +87,8 @@ GEN_F_ROUTINES = $(KPG_N_GEN:.gen=.f) $(KPG_DR_GEN:.gdr=.f) \
 ## Generic
 
 KPG_N_GEN = kps1_apad.gen kps1_ardm.gen kps1_lapl.gen kps1_prmx.gen \
-            kps1_rs1.gen kps1_spar.gen kps1_stpa.gen kps1_thgt.gen 
+            kps1_rs1.gen kps1_spar.gen kps1_stpa.gen kps1_thgt.gen \
+            kps1_cpb.gen
 
 KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr kps1_subi.gdr \
              kps1_cnse.gdr

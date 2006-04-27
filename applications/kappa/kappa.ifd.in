@@ -8794,6 +8794,16 @@ package kappa {
             helpkey *
           }
 
+         parameter invert {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Should good reference pixels be set bad?}
+            default FALSE
+            helpkey *
+          }
+
          parameter ref {
             position 2
             type NDF

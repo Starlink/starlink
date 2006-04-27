@@ -21,6 +21,10 @@
 *     (parameter OUT) which is a copy of IN, except that any pixel which
 *     is set bad in the DATA array of REF, is also set bad in the DATA 
 *     and VARIANCE (if available) arrays in OUT.
+*
+*     By setting the INVERT parameter TRUE, the opposite effect can be
+*     produced (i.e. any pixel which is not set bad in the DATA array of 
+*     REF, is set bad in OUT and the others are left unchanged).
 
 *  Usage:
 *     copybad in ref out title
@@ -28,6 +32,11 @@
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *        NDF containing the data to be copied to OUT.
+*     INVERT = _LOGICAL (Read)
+*        If TRUE, then the bad and good pixels within the reference NDF
+*        specified by parameter REF are inverted before being used (that
+*        is, good pixels are treated as bad and bad pixels are treated as 
+*        good). [FALSE]
 *     REF = NDF (Read)
 *        NDF containing the bad pixels to be copied to OUT.
 *     OUT = NDF (Write)
@@ -96,6 +105,8 @@
 *        - Set BAD-PIXEL flag in output NDF.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     27-APR-2006 (DSB):
+*        Added parameter INVERT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -126,6 +137,7 @@
       INTEGER P_REF                     ! Pointer to REF's data array
       INTEGER REF                       ! Identifier for REF (input)
       LOGICAL VAR                       ! Varience array present in IN ?
+      LOGICAL INVERT                    ! Invert the good/bad status?
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -163,39 +175,42 @@
       IF( VAR ) CALL NDF_MAP( OUT, 'Variance', TY_IN, 'WRITE', P_OUTV, 
      :                        NEL, STATUS )
 
+*  See if the operation is to be inverted.
+      CALL PAR_GET0L( 'INVERT', INVERT, STATUS )
+
 *  Select the appropriate routine to copy the bad pixels.
       IF ( TY_IN .EQ. '_INTEGER' ) THEN
-         CALL KPS1_CPBI( NEL, VAR, %VAL( CNF_PVAL( P_REF ) ), 
+         CALL KPS1_CPBI( NEL, INVERT, VAR, %VAL( CNF_PVAL( P_REF ) ), 
      :                   %VAL( CNF_PVAL( P_OUT ) ),
      :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF ( TY_IN .EQ. '_REAL' ) THEN
-         CALL KPS1_CPBR( NEL, VAR, %VAL( CNF_PVAL( P_REF ) ), 
+         CALL KPS1_CPBR( NEL, INVERT, VAR, %VAL( CNF_PVAL( P_REF ) ), 
      :                   %VAL( CNF_PVAL( P_OUT ) ),
      :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF ( TY_IN .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_CPBD( NEL, VAR, %VAL( CNF_PVAL( P_REF ) ), 
+         CALL KPS1_CPBD( NEL, INVERT, VAR, %VAL( CNF_PVAL( P_REF ) ), 
      :                   %VAL( CNF_PVAL( P_OUT ) ),
      :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF ( TY_IN .EQ. '_BYTE' ) THEN
-         CALL KPS1_CPBB( NEL, VAR, %VAL( CNF_PVAL( P_REF ) ), 
+         CALL KPS1_CPBB( NEL, INVERT, VAR, %VAL( CNF_PVAL( P_REF ) ), 
      :                   %VAL( CNF_PVAL( P_OUT ) ),
      :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF ( TY_IN .EQ. '_UBYTE' ) THEN
-         CALL KPS1_CPBUB( NEL, VAR, %VAL( CNF_PVAL( P_REF ) ), 
+         CALL KPS1_CPBUB( NEL, INVERT, VAR, %VAL( CNF_PVAL( P_REF ) ), 
      :                    %VAL( CNF_PVAL( P_OUT ) ),
      :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF ( TY_IN .EQ. '_WORD' ) THEN
-         CALL KPS1_CPBW( NEL, VAR, %VAL( CNF_PVAL( P_REF ) ), 
+         CALL KPS1_CPBW( NEL, INVERT, VAR, %VAL( CNF_PVAL( P_REF ) ), 
      :                   %VAL( CNF_PVAL( P_OUT ) ),
      :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF ( TY_IN .EQ. '_UWORD' ) THEN
-         CALL KPS1_CPBUW( NEL, VAR, %VAL( CNF_PVAL( P_REF ) ), 
+         CALL KPS1_CPBUW( NEL, INVERT, VAR, %VAL( CNF_PVAL( P_REF ) ), 
      :                    %VAL( CNF_PVAL( P_OUT ) ),
      :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 

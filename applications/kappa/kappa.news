@@ -73,6 +73,10 @@
    o  LOOK parameter FORMAT has an extra option "cglist". This is like 
    "clist" except that bad values are not included in the list.
 
+   o  COPYBAD now has an extra parameter called INVERT which, if set
+   TRUE, causes output pixels to be set bad if the corresponding pixel in
+   the reference NDF are good.
+
 Changes introduced in version 1.4-2
 
    o  The NDFTRACE application now displays the bounds of the NDF within 

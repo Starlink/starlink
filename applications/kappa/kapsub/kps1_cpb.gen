@@ -1,8 +1,8 @@
-      SUBROUTINE KPS1_CPBUB( NEL, VAR, DATREF, DATOUT, VAROUT, NBAD,
-     :                       STATUS )
+      SUBROUTINE KPS1_CPB<T>( NEL, INVERT, VAR, DATREF, DATOUT, 
+     :                        VAROUT, NBAD, STATUS )
 *+
 *  Name:
-*     KPS1_CPBUB
+*     KPS1_CPB<T>
 
 *  Purpose:
 *     Copies bad pixels from DATREF to DATOUT
@@ -11,27 +11,30 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CPBUB( NEL, VAR, DATREF, DATOUT, VAROUT, NBAD, STATUS )
+*     CALL KPS1_CPB<T>( NEL, INVERT, VAR, DATREF, DATOUT, VAROUT, NBAD, 
+*                       STATUS )
 
 *  Description:
-*     This routine is called by copybad, and is passed two unsigned byte
-*     arrays, DATOUT and DATREF, which contain the data 
-*     values of two NDF files. If any element in DATREF is equal to
-*     VAL__BADUB, and the corresponding element in DATOUT is not
-*     equal to VAL__BADUB, then the corresponding element in DATOUT 
-*     is set to VAL__BADUB. If a variance array is present in NDF OUT,
-*     then the corresponding variance element is also set to VAL__BADUB.
+*     This routine is called by copybad, and is passed two arrays, DATOUT 
+*     and DATREF, which contain the data values of two NDF files. If any 
+*     element in DATREF is equal to VAL__BAD<T> (or, if INVERT is .TRUE., 
+*     is not equal to VAL__BAD<T>), and the corresponding element in DATOUT 
+*     is not equal to VAL__BAD<T>, then the corresponding element in DATOUT 
+*     is set to VAL__BAD<T>. If a variance array is present in NDF OUT,
+*     then the corresponding variance element is also set to VAL__BAD<T>.
 
 *  Arguments:
 *     NEL = INTEGER (Given)
 *         Number of elements in either of the arrays.
+*     INVERT = LOGICAL (Given)
+*         Should the good/bad status of each pixelin DATREF be inverted?
 *     VAR = LOGICAL (Given)
 *         Is a variance array present in NDF OUT ?
-*     DATREF( NEL ) = BYTE (Given)
+*     DATREF( NEL ) = <TYPE> (Given)
 *         Array containing the data values of NDF REF.
-*     DATOUT( NEL ) = BYTE (Given and Returned)
+*     DATOUT( NEL ) = <TYPE> (Given and Returned)
 *         Array containing the data values of NDF OUT.
-*     VAROUT( NEL ) = BYTE (Given and Returned)
+*     VAROUT( NEL ) = <TYPE> (Given and Returned)
 *         Array containing the variance values of NDF OUT.
 *     NBAD = Integer (Returned)
 *         Number of bad pixels in the output NDF.
@@ -59,6 +62,8 @@
 *        - Remove check which prevented pixels which were already bad in
 *          the input NDF being included in the count of bad pixels.
 *        - Include the required check on the inherited status value.
+*     27-ARP-2006 (DSB):
+*        Made generic and added INVERT argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -75,12 +80,13 @@
 
 *  Arguments Given:
       INTEGER NEL                 ! No of elements
+      LOGICAL INVERT              ! Variance array present in OUT ?
       LOGICAL VAR                 ! Variance array present in OUT ?
-      BYTE DATREF( NEL )          ! Pixel values from REF
+      <LTYPE> DATREF( NEL )       ! Pixel values from REF
 
 *  Arguments Given and Returned:
-      BYTE DATOUT( NEL )          ! Pixel values from OUT
-      BYTE VAROUT( NEL )          ! Variance values from OUT
+      <LTYPE> DATOUT( NEL )       ! Pixel values from OUT
+      <LTYPE> VAROUT( NEL )       ! Variance values from OUT
 
 *  Arguments Returned:
       INTEGER NBAD                ! Number of bad pixels copied
@@ -90,6 +96,7 @@
 
 *  Internal Variables:
       INTEGER COUNT               ! Loop counter  
+
 *.
 
 *  Check inherited status.
@@ -98,21 +105,46 @@
 *  Initialise the number of bad values copied.
       NBAD=0
 
+*  First do normal (not inverted) case.
+      IF( .NOT. INVERT ) THEN
+
 *  Loop round each element of the arrays.
-      DO COUNT = 1, NEL
+         DO COUNT = 1, NEL
 
 *  If the reference NDF has a bad data value, ensure that the output DATA
 *  and VARIANCE arrays are both bad.
-         IF( DATREF( COUNT ) .EQ. VAL__BADUB ) THEN
+            IF( DATREF( COUNT ) .EQ. VAL__BAD<T> ) THEN
+ 
+               DATOUT( COUNT ) = VAL__BAD<T>
+               IF( VAR ) VAROUT( COUNT ) = VAL__BAD<T>
 
-            DATOUT( COUNT ) = VAL__BADUB
-            IF( VAR ) VAROUT( COUNT ) = VAL__BADUB
-
-         END IF
+            END IF
 
 *  Increment the number of bad pixels in the output NDF.
-         IF( DATOUT( COUNT ) .EQ. VAL__BADUB ) NBAD = NBAD + 1
+            IF( DATOUT( COUNT ) .EQ. VAL__BAD<T> ) NBAD = NBAD + 1
 
-      END DO
+         END DO
+
+*  Now do inverted case.
+      ELSE
+
+*  Loop round each element of the arrays.
+         DO COUNT = 1, NEL
+
+*  If the reference NDF has a bad data value, ensure that the output DATA
+*  and VARIANCE arrays are both bad.
+            IF( DATREF( COUNT ) .NE. VAL__BAD<T> ) THEN
+ 
+               DATOUT( COUNT ) = VAL__BAD<T>
+               IF( VAR ) VAROUT( COUNT ) = VAL__BAD<T>
+
+            END IF
+
+*  Increment the number of bad pixels in the output NDF.
+            IF( DATOUT( COUNT ) .EQ. VAL__BAD<T> ) NBAD = NBAD + 1
+
+         END DO
+
+      END IF
 
       END 
