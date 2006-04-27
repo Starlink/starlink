@@ -117,7 +117,7 @@ sub push_line {
       # return the newly minted version
       return ($retval, $prl);
 
-    } elsif ( $line =~ /^\s*$r\s+([A-Z][A-Za-z\s]*)\s*:\s*$/ ) {
+    } elsif ( $line =~ /^\s*$r\s+([A-Z][A-Za-z\s_]*)\s*:\s*$/ ) {
       # section start (must start with upper case).
       $self->flush_section();
 
@@ -194,10 +194,14 @@ sub push_line {
                               d => 'DOUBLE',
                               l => 'LOGICAL');
              if (!exists $types{$type}) {
-               croak "Bad type in argument list: $content\n";
+               warn "Possible Bad type in argument list: $content\n";
+                # Assume a continuation of a previous line description
+                $content =~ s/^\s+//;
+                push(@{$self->content()}, "    ". $content);
+             } else {
+                 push(@{$self->content()}, "$var = $types{$type} ($section)",
+                                                        "    ". ucfirst($desc) );
              }
-            push(@{$self->content()}, "$var = $types{$type} ($section)",
-                                                 "    ". ucfirst($desc) );
             return ();
       }
 
