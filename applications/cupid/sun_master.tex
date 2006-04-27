@@ -684,19 +684,23 @@ clumps found at higher contour levels are followed down to the lowest
 specified contour level.
 
 \subsubsection{Comparing CUPID ClumpFind with other Implementations}
-The CUPID implementation of this algorithm is completely independent of
-the Williams implementation (which is written in IDL and available from
+The CUPID implementation of ClumpFind is a completely independent
+and total re-write, based on the description of the algorithm in the 1994 
+Williams, de Geus \& Blitz paper. Consequently, it differs slightly from 
+other implementations such as the IDL implementation available from
 Williams own web page at \htmladdnormallink{http://www.ifa.hawaii.edu/~jpw/}
 {http://www.ifa.hawaii.edu/~jpw/}). In particularly, several extra
 configuration parameters have been added by CUPID to provide more
 detailed control of the algorithm. If you want to do a direct comparison
-between the CUPID implementation and the Williams implementation, then
-you should set these extra parameters to the following values:
+between the CUPID implementation of the ClumpFind algorithm and another
+implementation, then you should set these extra parameters to the
+following values:
 
 \begin{itemize}
 \item ClumpFind.FwhmBeam = 0
 \item ClumpFind.MaxBad = 100000  (or some other very large number)
-\item ClumpFind.MinPix = 5
+\item ClumpFind.MinPix = 5 (although this value seems to differ depending
+on which particular implementation of ClumpFInd you want to compare with)
 \item ClumpFind.VeloRes = 0
 \end{itemize}
 
@@ -714,7 +718,21 @@ FITS file and which has been subjected to no geometric transformations,
 the pixel origin will be 1.0 on every pixel axis, resulting in the centre
 of the first pixel having a value of 0.5 on every pixel axis.
 
+Another point to note is that some implementations of ClumpFind do not
+conform exactly to the description in the published paper. Specifically:
 
+\begin{enumerate}
+
+\item the way in which areas containing merged clumps are divided up between
+individual clumps can differ slightly
+
+\item the restriction that all peaks must extend at least as far as the 
+second contour level is sometimes omitted
+
+\item the restriction on the minimum number of pixels contained within a 
+clump is sometimes varied in value
+
+\end{enumerate}
 
 
 \subsection{\xlabel{reinhold}Reinhold}
