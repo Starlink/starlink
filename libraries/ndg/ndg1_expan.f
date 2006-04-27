@@ -128,6 +128,8 @@
 *        ONE_FIND_FILE.
 *     7-MAR-2006 (DSB):
 *        Turn off interpretation of shell metacharacters within HDS_FIND.
+*     27-APR-2006 (DSB):
+*        Do not escape spaces within NDF section strings.
 *     {enter_further_changes_here}
 
 *-
@@ -206,6 +208,7 @@
       INTEGER IGRPT              ! Group holding file type fields
       INTEGER J                  ! Loop count
       INTEGER L                  ! Index of last non-blank character
+      INTEGER LEND               ! Index of last character before section
       INTEGER NC                 ! No. of characters in string
       INTEGER NMATCH             ! No. of matching file types
       INTEGER RPOS               ! Offset position in REST() for .sdf
@@ -293,11 +296,15 @@
 
 *  Otherwise, we escape any embedded spaces in the template so that the 
 *  shell script used by one_find_file will interpret the spaces as part
-*  of the file path.
+*  of the file path. We do not escape spaces within the NDF section
+*  identifier (if any) since this would confuse the NDF library. So we
+*  stop checking for spaces when the first "(" character is encountered.
       ELSE
          TMPLT2 = ' '
          J = 1
-         DO I = F, L
+         LEND = INDEX( TEMPLT, '(' ) - 1
+         IF( LEND .EQ. -1 ) LEND = L
+         DO I = F, LEND
             IF( TEMPLT( I : I ) .EQ. ' ' ) THEN
                TMPLT2( J : J ) = ESC
                J = J + 1
