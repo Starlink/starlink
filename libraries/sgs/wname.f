@@ -14,7 +14,7 @@
 *      ACTROU     routine  action routine
 *      INTARG     i        argument passed to action routine
 *
-*   Returned
+*   Returned:
 *      JSTAT      i        status = 0 if success
 *
 *   Externals:

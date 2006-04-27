@@ -13,7 +13,7 @@
 *      COMMNT    c      description
 *      LU        i      Fortran I/O unit for output
 *
-*   Returned
+*   Returned:
 *      JSTAT     i      status:  0 = OK
 *
 *   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991

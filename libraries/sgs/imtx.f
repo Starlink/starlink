@@ -1,14 +1,16 @@
       SUBROUTINE sgs_IMTX(HM,IF,IPR,HT,AR,XU,YU,SP,TXJ)
 *+
-*     OBSOLETE ROUTINE - RETAINED FOR GKS 6.2 VERSION COMPATABILITY
-*
 *     - - - - - - -
 *        I M T X
 *     - - - - - - -
 *
 *   Inquire marker & text parameters
 *
-*   Returned
+*   Remarks:
+*
+*     OBSOLETE ROUTINE - RETAINED FOR GKS 6.2 VERSION COMPATABILITY
+*
+*   Returned:
 *        HM      r      Marker height (=width)
 *        IF      i      Text font number
 *        IPR     i      Text precision
@@ -18,7 +20,7 @@
 *        SP      r      Text spacing
 *        TXJ     c      Text justification code
 *
-*   Read from COMMON
+*   Read from COMMON:
 *        HMK, IFONT, IPREC, HTX, ARTX, XUPTX, YUPTX, STX, CTXJ
 *
 *   P.T.Wallace, D.L.Terrett  Starlink  Jan 1987

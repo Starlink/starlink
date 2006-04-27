@@ -16,7 +16,7 @@
 *   Given:
 *      WKSTN      c      workstation name
 *
-*   Returned
+*   Returned:
 *      IZONID     i      zone identifier
 *      JSTAT      i      status: 0=OK
 *
