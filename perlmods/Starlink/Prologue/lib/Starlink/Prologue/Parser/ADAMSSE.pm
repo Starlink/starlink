@@ -105,6 +105,7 @@ sub push_line {
 	 || $line =~ /^\s*[$r]\s+Global constants\s*:$/i
 	 || $line =~ /^\s*[$r]\s+Import\s*:$/i
 	 || $line =~ /^\s*[$r]\s+Export\s*:$/i
+	 || $line =~ /^\s*[$r]\s+Import\-Export\s*:$/i
 	 || $line =~ /^\s*[$r]\s+Status\s*:$/i
 	 || $line =~ /^\s*[$r]\-\s*$/  #   *- but usually too late
        ) {
@@ -133,6 +134,10 @@ sub push_line {
       # this line should be returned
       return ($line, undef);
 
+    } elsif ( $line =~ /^\s*:/ && $self->section eq 'Type Of Module') {
+      # Continuation of the SUBROUTINE definition
+      return ($line, undef);
+
     } elsif ( $line =~ /^\s*[$r]\s+([A-Za-z\s]*)\s*:\s*$/ ) {
       # section start
       $self->flush_section();
@@ -145,7 +150,7 @@ sub push_line {
 	$section = 'Arguments';
       } elsif ($section =~ /^Method$/i) {
 	$section = 'Algorithm';
-      } elsif ($section =~ /^Implementation$/i) {
+      } elsif ($section =~ /^Deficiencies$/i) {
 	$section = 'Implementation Deficiencies';
       }
       $self->section( $section );
@@ -160,9 +165,10 @@ sub push_line {
       if ($self->section() eq 'History' &&
 	  $content =~ /^\s*endhistory\s*$/i) {
 	$self->flush_section();
+      } else {
+	push(@{$self->content()}, $content);
       }
 
-      push(@{$self->content()}, $content);
     } else {
       # if nothing matches we have a blank line
       # we should store it in case it is within a section
@@ -210,6 +216,119 @@ sub push_line {
   return ();
 }
 
+=item B<tidy_content>
+
+Subclass variant of tidy_content() routine. Whilst the base class is used
+to trim blank lines from the start and end of the section, this version
+also attempts to reformat History sections.
+
+ $parser->tidy_content;
+
+Also, the <description of any XXX> sections are removed.
+
+=cut
+
+sub tidy_content {
+  my $self = shift;
+  $self->SUPER::tidy_content();
+
+  my $section = $self->section();
+  my @content = $self->content;
+
+  # see if we are History
+  if ($section eq 'History') {
+    my @out;
+    for my $hline (@content) {
+      # Looking for 
+      #   DD-MMM-YYYY message (user)
+      #   DD.MM.YYYY: message (user)
+      my $line = $hline;
+      chomp($line);
+      $line =~ s/^\s+//;
+      $line =~ s/\s+$//;
+
+      # special casea
+      if ($line eq 'date:  changes (institution::username)' ||
+	  $line eq 'endhistory') {
+	next;
+      }
+
+
+      my ($date,@rest) = split (/\s+/,$line);
+
+      # if date matches we continue on
+      if ($date =~ /^(\d{1,2})[\-\.\/](\w\w\w|\d{1,2})[\-\.\/](\d{2,4}):?$/
+	  || $date =~ /^(\d{1,2})(\w\w\w)(\d{2,4}):?$/ ) {
+	#  DD-APR-YYYY  19Jun84
+	#  DD-APR-YY
+	#  DD.APR.YYYY etc
+	#  DD-MM-YY
+	my $day = $1;
+	my $month = uc($2);
+	my $year = $3;
+	$day =~ s/^0+//; # leading zeroes
+	$month =~ s/^0+//; # trim leading zeroes
+
+	# turn month into string
+	my @months = qw/ JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC /;
+	if ($month =~ /\d/) {
+	  if ($month > 0 && $month <= 12) {
+	    $month = $months[$month-1];
+	  } else {
+	    # abort
+	    push(@out, $hline);
+	    next;
+	  }
+	}
+
+	# correct 2 digit years
+	if ($year < 100) {
+	  if ($year > 50) {
+	    $year += 1900;
+	  } else {
+	    $year += 2000;
+	  }
+	}
+
+	# format the date
+	my $date = sprintf("%02d-%s-%4d", $day, $month, $year);
+
+	# user name
+	if ($rest[-1] =~ /^\(/) {
+
+	  # looks good
+	  my $author = pop(@rest);
+	  push(@out, "$date $author:");
+	  push(@out, "   ".ucfirst(join(" ",@rest)));
+
+	} else {
+
+	  # no dice, just rewrite date for now
+	  
+	  push(@out, "$date: ".join(" ",@rest));
+	}
+
+      } else {
+	# just return it without further processing
+	#print "NO DATE: $hline\n";
+	push(@out, $hline);
+      }
+    }
+
+    # store modified history
+    @{$self->content} = @out;
+  } elsif ( $section eq 'Bugs' || $section eq 'Algorithm' ||
+	  $section =~ /Deficiencies/ ) {
+    if (@content && $content[-1] =~ /^<description.*>$/) {
+      pop(@content);
+      @{$self->content} = @content;
+    }
+  }
+
+}
+
+=back
+
 =head2 Class Methods
 
 =over 4
@@ -239,7 +358,7 @@ sub prolog_start {
      # Normal prologue start :  *+ title - purpose
      $cchar = $1;
      $title = $2;
-     $purpose = $3;
+     $purpose = ucfirst($3);
   }
 
   # title is mandatory
