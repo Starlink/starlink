@@ -65,6 +65,7 @@ my %DEFAULTS = (
 # Aliases that can be used in place of primary key
 my %ALIASES = (
 	       Authors => 'Author',
+	       Licence => 'License',
 	      );
 
 # Lists any terminators of sections (if not-terminated)
@@ -99,7 +100,6 @@ sub METHOD {
   $code =~ s/KEY/$h/g;
 
   # Create the method
-  print "Method $method\n";
   eval $code;
   croak "Error creating accessor method: $@\n Code: $code\n" if $@;
 }
@@ -300,6 +300,37 @@ sub content {
   }
 }
 
+=item B<years>
+
+Parse the history information and extract all the relevant years.
+
+ @years = $prl->years();
+
+=cut
+
+sub years {
+  my $self = shift;
+  my @history = $self->history;
+
+  # Extract history information
+  my %history;
+  for my $line (@history) {
+    if ($line =~ /(\d\d\d\d)/) {  # yyyy
+      $history{$1}++;
+    } elsif ( $line =~ /\d+[\/\.]\d+[\/\.](\d\d)/ ) { # dd.mm.yy dd/mm/yy
+      my $yr = $1;
+      if ($yr > 50) {
+	$yr += 1900;
+      } else {
+	$yr += 2000;
+      }
+      $history{$yr}++;
+    }
+  }
+
+  return (sort keys %history);
+}
+
 =item B<sections>
 
 Returns all the section headings present in the prologue in alphabetical order.
@@ -386,8 +417,8 @@ sub stringify {
   my $self = shift;
   my $cchar = $self->comment_char;
 
-  use Data::Dumper;
-  print Dumper($self);
+#  use Data::Dumper;
+#  print Dumper($self);
 
   my $code = '';
 
