@@ -53,16 +53,6 @@ Create a new ADAM/SSE parser
 
 For a list of generic accessors see C<Starlink::Prologue::Parser::Base>.
 
-=over 4
-
-=item B<>
-
-=cut
-
-sub xxx {
-
-}
-
 =head2 General
 
 Also see C<Starlink::Prologue::Parser::Base>.
@@ -116,6 +106,13 @@ sub push_line {
       # we must return the line unless it was the *-
       my $retval;
       $retval = $line unless $line =~ /^\s*$r[\+\-]\s*$/;
+
+      # For SGS we must combine Given: and Returned: into Arguments:
+      my @given = $prl->content( "Given" );
+      my @returned = $prl->content( "Returned" );
+      $prl->content("Arguments", @given, @returned);
+      $prl->del_section( "Given" );
+      $prl->del_section( "Returned" );
 
       # return the newly minted version
       return ($retval, $prl);
@@ -186,6 +183,21 @@ sub push_line {
 	push(@{$self->content},$hist, "   Modified.");
 	$self->flush_section();
 	return();
+      } elsif (defined $section && ($section eq 'Returned' || $section eq 'Given')) {
+	my ($var, $type, $desc) = split(/\s+/, $content, 3);
+              print "GOT: $var - $type - $desc\n";
+	my %types = (
+                               c => 'CHAR',
+                               i => 'INTEGER',
+                               r => 'REAL',
+                              d => 'DOUBLE',
+                              l => 'LOGICAL');
+             if (!exists $types{$type}) {
+               croak "Bad type in argument list: $content\n";
+             }
+            push(@{$self->content()}, "$var = $types{$type} ($section)",
+                                                 "    ". ucfirst($desc) );
+            return ();
       }
 
       # store the content if we have some left
