@@ -1,6 +1,7 @@
 /*****************************************************************************
- *
- * F A M S . C
+ *+
+ * Name:
+ *    fams.c
  *
  * Function:
  *    A Fortran callable interface to the ADAM message system AMS.
@@ -35,13 +36,13 @@
  *              ams_resmsg
  *              ams_send
  *
- * Deficiencies:
+ * Implementation Deficiencies:
  *    1. Returned message values are not blank filled so the returned
  *       length must be used.
  *    2. MSG_NAME_LEN etc are defined the same value in C as in Fortran
  *       but C has to include the null terminator. Therefore a size -1
  *       length is imposed on the Fortran string used length.
- *****************************************************************************
+ *-
  */
 #  include "cnf.h"
 #  include "f77.h"

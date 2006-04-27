@@ -1,7 +1,14 @@
-/* amsmaster
- * A test of ams - run in conjunction with amsslave
- *   % amsslave &
- *   % amsmaster
+/*
+ *+
+ *  Name:
+ *     amsmaster
+ * 
+ *  Purpose:
+ *     A test of ams - run in conjunction with amsslave
+ *
+ *  Description:
+ *     % amsslave &
+ *     % amsmaster
  *
  * History:
  *   xx-xxx-1994 (BDK):
@@ -9,6 +16,7 @@
  *    7-JUL-1994 (AJC):
  *      Tidy header files (some now renamed).
  *
+ *-
 */
 #include <stdio.h>
 #include <sys/types.h>

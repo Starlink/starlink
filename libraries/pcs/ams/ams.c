@@ -6,6 +6,9 @@
 *  Purpose:
 *     Adam Message System
 
+*  Language:
+*     Starlink C
+
 *  Authors:
 *     IRJ: Ian Jenkins (RAL)
 *     BDK: Dennis Kelly (ROE)
@@ -13,6 +16,7 @@
 *     AJC: Alan Chipperfield (STARLINK)
 *     DLT: David Terrett (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
 *  History:
 *     15-JUN-1992 (IRJ):
@@ -26,7 +30,7 @@
 *     17-MAR-1994 (BDK):
 *        Changed to ams
 *     07-JUL-1994 (AJC):
-*        Rename some include files:
+*        Rename Some Include Files:
 *          adamdefns.h -> adam_defns.h
 *          mesdefns.h -> messys_len.h
 *     16-AUG-1994 (BKM):
@@ -41,6 +45,11 @@
 *        Fix compiler warnings due to lack of include files
 *     29-DEC-2005 (TIMJ):
 *        Tidy up config ATEXIT logic
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -164,7 +173,6 @@ static char MSG_EMPTYVAL[MSG_VAL_LEN] = "";
 
 
 
-/*=  AMS_ACCEPT - accept a request to open a path */
 
 static void ams_accept
 (
@@ -176,17 +184,40 @@ int *status                          /* global status (given and
                                         returned) */
 )
 
-/*   Method :
-      An "init" message has been received from another task requesting a
-      connecting path to be set up. Allocate a data structure to the path
-      and return an acceptance message.
-     Authors :
+/*
+*+
+*  Name:
+*     AMS_ACCEPT
 
-     History :
-      15Jun 1992: Created: irj 
-      18Jun 1992: Tidied : irj, skr 
-      12Apr 1994: make function static (BDK)
-      27Jun 1994: use msp_mkcomq to get command queue of other task (BDK)
+*  Purpose:
+*     Accept a request to open a path 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     An "init" message has been received from another task requesting a
+*     connecting path to be set up. Allocate a data structure to the path
+*     and return an acceptance message.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     12-APR-1994 (BDK):
+*        Make function static
+*     27-JUN-1994 (BDK):
+*        Use msp_mkcomq to get command queue of other task
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -220,7 +251,6 @@ int *status                          /* global status (given and
 }
 
 
-/*=  AMS_ADDREST */
 
 static void ams_addrest
 (
@@ -228,7 +258,25 @@ struct a_loc_ack_in * loc_ack_in,  /* received ack_in structure (given) */
 int path,                          /* path of init transaction (given) */
 int messid,                        /* messid of init transaction (given) */
 sendq_type reply_q,                /* queue for sending rejection (given)
-                                      */
+/*
+*+
+*  Name:
+*     AMS_ADDREST
+
+*  Language:
+*     Starlink C
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
 int *status                        /* global status (given and returned) */
 )
 
@@ -264,7 +312,6 @@ int *status                        /* global status (given and returned) */
    }
 }
 
-/*=  AMS_ANALYSENAME */
 
 static void ams_analysename
 (
@@ -276,25 +323,43 @@ int *remote,      /* flag for whether task is remote (returned) */
 int *status       /* global status (given and returned) */
 )
 
-/*   Method :
-      Given, by the application code a taskname 'name' of the form
-      xxxxxbbyyyyyyyy or yyyyyyyy where yyyyy is the actual taskname,
-      xxxxxx is a remote host's name and bb is the separator for that
-      host. This function given the form yyyyyy (it detects this form by
-      the absence of a known separator bb (all known host separators are
-      held in messys_netsep[0..MESSYS__MAXNET-1])) sets task to a
-      trailing space trimmed yyyyyy, machine to "", remote to 0 and
-      netind to MESSSY_MAXNET. If given the other form xxxxxbbyyyyyy
-      (detected by bb existing in messys_netsep[], the function sets
-      'task' to the trailing space trimmed version of yyyyyy, 'mach' to
-      xxxxxbb, 'remote' to 1 and 'netind' to the index position in
-      messys_netsep[] of bb. If the taskname is longer than MESSYS__TNAME
-      or the machine name given is longer than MESSYS_MNAME, this
-      function returns MESSYS__TOOLONG in *status, otherwise returns
-      SAI__OK.
-     Authors :
-     History :
-      12Apr 1994: make function static (BDK)
+/*
+*+
+*  Name:
+*     AMS_ANALYSENAME
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Given, by the application code a taskname 'name' of the form
+*     xxxxxbbyyyyyyyy or yyyyyyyy where yyyyy is the actual taskname,
+*     xxxxxx is a remote host's name and bb is the separator for that
+*     host. This function given the form yyyyyy (it detects this form by
+*     the absence of a known separator bb (all known host separators are
+*     held in messys_netsep[0..MESSYS__MAXNET-1])) sets task to a
+*     trailing space trimmed yyyyyy, machine to "", remote to 0 and
+*     netind to MESSSY_MAXNET. If given the other form xxxxxbbyyyyyy
+*     (detected by bb existing in messys_netsep[], the function sets
+*     'task' to the trailing space trimmed version of yyyyyy, 'mach' to
+*     xxxxxbb, 'remote' to 1 and 'netind' to the index position in
+*     messys_netsep[] of bb. If the taskname is longer than MESSYS__TNAME
+*     or the machine name given is longer than MESSYS_MNAME, this
+*     function returns MESSYS__TOOLONG in *status, otherwise returns
+*     SAI__OK.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 {
    char *machend;         /* pointer to end of machine name */
@@ -368,24 +433,42 @@ int *status       /* global status (given and returned) */
    }
 }
 
-/*+  AMS_ASTINT - send an ASTINT message from a signal handler */
 
 void ams_astint
 (
 int *status         /* global status (given and returned) */
 )
 
-/*   Method :
-      Send obey message to astint_q as ast interrupt has occurred.
-     Authors :
-     History :
+/*
+*+
+*  Name:
+*     AMS_ASTINT
+
+*  Purpose:
+*     Send an ASTINT message from a signal handler 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Send obey message to astint_q as ast interrupt has occurred.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
    ams_sendobey ( sigast_q, MSG_EMPTYNAME, 1, MSG_EMPTYVAL, status );
 }
 
-/*+  AMS_ASTMSG - send an ASTMSG from a signal handler */
 
 void ams_astmsg
 (
@@ -395,18 +478,37 @@ char *value,      /* message to be passed to main-line code (given) */
 int *status       /* global status (given and returned) */
 )
 
-/*   Method :
-      Send a soft ast interrupt message 'value' qualified by 'name' to
-      astint_q.
-     Authors :
-     History :
+/*
+*+
+*  Name:
+*     AMS_ASTMSG
+
+*  Purpose:
+*     Send an ASTMSG from a signal handler 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Send a soft ast interrupt message 'value' qualified by 'name' to
+*     astint_q.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
    ams_sendobey ( sigast_q, name, length, value, status );
 }
 
-/*=  AMS_CALL_OUT */ 
 
 static void ams_call_out 
 ( 
@@ -417,18 +519,38 @@ int *machnum,      /* number allocated to machine in MESSYS common blocks
 int *status        /* global status (given and returned) */
 )
 
-/*   Method : 
-      Return a machine number corresponding the node name embedded in the
-      given machine name which has been extracted from a given taskname.
+/*
+*+
+*  Name:
+*     AMS_CALL_OUT
 
-      This may involve initiating a network connection with a remote
-      machine
-     Authors : 
-     History : 
-      Created: irj 15/6/92
-      Tidied : irj, skr 17/6/92
-      add extint_q to list waited on (BDK)
-      12Apr 1994: make function static (BDK)
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Return a machine number corresponding the node name embedded in the
+*     given machine name which has been extracted from a given taskname.
+*     
+*     This may involve initiating a network connection with a remote
+*     machine
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     17-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     add extint_q to list waited on (BDK)
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 {
    struct a_mess_out mess_out;   /* message sent */
@@ -527,7 +649,6 @@ int *status        /* global status (given and returned) */
    }
 }
 
-/*=  AMS_ENDTRANS */
 
 static void ams_endtrans
 ( 
@@ -547,19 +668,40 @@ char *message_value,               /* message value (returned) */
 int *status                        /* global status (given and returned) */
 )
 
-/*   Method :
-      The system has received a local gsoc_end message, the last message
-      in the transaction 'loc_msg_in->this_task_t_trans_num' (set into
-      *messid) on path t_trans[*messid].t_path_num (set into *path.).
-      Using ams_unpacklocmsg() this routine returns the contents of the
-      last message to the caller and uses ams_freetrans() to close and
-      free the relevent transaction.
-     Authors :
-     History :
-      15Jun 1992: Created: irj 
-      18Jun 1992: Tidied : irj, skr 
-      11Apr 1994: return message components as separate arguments (BDK)
-      12Apr 1994: make function static (BDK)
+/*
+*+
+*  Name:
+*     AMS_ENDTRANS
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     The system has received a local gsoc_end message, the last message
+*     in the transaction 'loc_msg_in->this_task_t_trans_num' (set into
+*     *messid) on path t_trans[*messid].t_path_num (set into *path.).
+*     Using ams_unpacklocmsg() this routine returns the contents of the
+*     last message to the caller and uses ams_freetrans() to close and
+*     free the relevent transaction.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     11-APR-1994 (BDK):
+*        Return message components as separate arguments
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -578,7 +720,6 @@ int *status                        /* global status (given and returned) */
 }
 
 
-/*=  AMS_EXIT1 - SunOS on_exit handler */
 
 #if USE_ON_EXIT
 static void ams_exit1
@@ -591,24 +732,68 @@ static void ams_exit1
 }
 #endif
 
-/*=  AMS_EXIT - ams exit handler */
 
 void ams_exit 
 ( 
 void
 )
-/*   Method :
-      Send a DE_INIT message to each open path.
-     Authors :
-     History :
-      Created: irj 15/6/92
-      Tidied : irj, skr 18/6/92
-      12Apr 1994: make function static (BDK)
-      1June 1994: fix arguments to sendgsocend (BDK)
-      01Dec 1994: Don't send DE_INIT on each transaction - just on each open
-                  path (BKM)
-      05Dec 1994: Make routine global BUT should NOT be called directly except
-                  by error handling code!
+/*
+*+
+*  Name:
+*     AMS_EXIT1
+
+*  Purpose:
+*     SunOS on_exit handler 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Send a DE_INIT message to each open path.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     12-APR-1994 (BDK):
+*        Make function static
+*     01-JUN-1994 (BDK):
+*        Fix arguments to sendgsocend
+*     01-DEC-1994: Don't send DE_INIT on each transaction - just on each open
+*                 path (BKM)
+*     05-DEC-1994: Make routine global BUT should NOT be called directly except
+*                 by error handling code!
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+/*
+*+
+*  Name:
+*     AMS_EXIT
+
+*  Purpose:
+*     Ams exit handler 
+
+*  Language:
+*     Starlink C
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -629,37 +814,73 @@ void
 }
 
 
-/*+  AMS_EXTINT - send an EXTINT message from a signal handler */
 
 void ams_extint
 (
 int *status         /* global status (given and returned) */
 )
 
-/*   Method :
-      Send obey message to extint_q as ext interrupt has occured.
-     Authors :
-     History :
+/*
+*+
+*  Name:
+*     AMS_EXTINT
+
+*  Purpose:
+*     Send an EXTINT message from a signal handler 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Send obey message to extint_q as ext interrupt has occured.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 {
    ams_sendobey ( sigext_q, MSG_EMPTYNAME, 1, MSG_EMPTYVAL, status );
 }
 
           
-/*=  AMS_FREEPATH */ 
 
 static void ams_freepath
 (
 int j              /* path number (given) */
 )
 
-/*   Method :
-      Free the path whose index into pathfree[] and t_paths[] is j.
-      Free all transactions associated with the path, then close msp 
-      communications on this path, then null the path entry.
-     Authors :
-     History :
-      12Apr 1994: make function static (BDK)
+/*
+*+
+*  Name:
+*     AMS_FREEPATH
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Free the path whose index into pathfree[] and t_paths[] is j.
+*     Free all transactions associated with the path, then close msp 
+*     communications on this path, then null the path entry.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 {
    int jj;               /* loop counter */
@@ -695,7 +916,6 @@ int j              /* path number (given) */
     }
 }
 
-/*=  AMS_FREETRANS */
 
 static void ams_freetrans
 (
@@ -703,27 +923,45 @@ int messid,       /* identifier of transaction to be freed (given) */
 int *status       /* global status (given and received) */
 )
 
-/*   Method :
-      This frees an active transaction entry in t_trans[]. The first
-      thing it does, subject to the transaction index being legal (ie
-      lies between 0 and MESSYS__MXTRANS-1 (inclusive), is to check to
-      see if the transaction had an acknowledge queue and if so delete it
-      using msp_delete_queue(). It then clears the transaction structure
-      using the appropriate NULLs (see messys_par.h) and then sets
-      transfree[] to true.
+/*
+*+
+*  Name:
+*     AMS_FREETRANS
 
-      A transaction entry records the path associated with the
-      transaction (t_path_num, an index into t_paths[] that records other
-      information about that path), this task's acknowledge queue for
-      this transaction (this_task_ack_q), the others task's acknowledge
-      queue for this transaction (other_task_ack_q) and the other task's
-      transaction index into its own t_trans[] (other_transnum).
-      transfree[j] records the active use of a transaction entry in
-      t_trans[j] when set false otherwise indicates that the
-      corresponding t_trans[] entry is unused and free for (re)use.
-     Authors :
-     History :
-      12Apr 1994: make function static (BDK)
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     This frees an active transaction entry in t_trans[]. The first
+*     thing it does, subject to the transaction index being legal (ie
+*     lies between 0 and MESSYS__MXTRANS-1 (inclusive), is to check to
+*     see if the transaction had an acknowledge queue and if so delete it
+*     using msp_delete_queue(). It then clears the transaction structure
+*     using the appropriate NULLs (see messys_par.h) and then sets
+*     transfree[] to true.
+*     
+*     A transaction entry records the path associated with the
+*     transaction (t_path_num, an index into t_paths[] that records other
+*     information about that path), this task's acknowledge queue for
+*     this transaction (this_task_ack_q), the others task's acknowledge
+*     queue for this transaction (other_task_ack_q) and the other task's
+*     transaction index into its own t_trans[] (other_transnum).
+*     transfree[j] records the active use of a transaction entry in
+*     t_trans[j] when set false otherwise indicates that the
+*     corresponding t_trans[] entry is unused and free for (re)use.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -743,7 +981,6 @@ int *status       /* global status (given and received) */
     }
 }
 
-/*=  AMS_GETFREEPATH */
 
 static void ams_getfreepath
 (
@@ -751,17 +988,35 @@ int *path,         /* path number (returned) */
 int *status        /* global status (given and returned) */
 )
 
-/*   Method :
-      Searches pathfree[] for a free path, setting *path to index and
-      pathfree[*path] to false if one found or *status to
-      MESSYS_COMFULL.
-     Authors :
-     History :
-      12Apr 1994: make function static (BDK)
-      21Jun 1994: don't use path number zero - there is software outside
-                  the message system which assumes that it can check for
-                  a valid path number on the basis that it has to be
-                  greater than zero (BDK)
+/*
+*+
+*  Name:
+*     AMS_GETFREEPATH
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Searches pathfree[] for a free path, setting *path to index and
+*     pathfree[*path] to false if one found or *status to
+*     MESSYS_COMFULL.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     12-APR-1994 (BDK):
+*        Make function static
+*     21-JUN-1994: don't use path number zero - there is software outside
+*                 the message system which assumes that it can check for
+*                 a valid path number on the basis that it has to be
+*                 greater than zero (BDK)
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 {
    int wpath;
@@ -785,7 +1040,6 @@ int *status        /* global status (given and returned) */
    }
 }
 
-/*=  AMS_GETFREETRANS */
 
 static void ams_getfreetrans
 (
@@ -797,29 +1051,47 @@ int *messid,       /* identifier for the transaction (returned) */
 int *status        /* global status (given and returned) */
 )
 
-/*   Method :
-      Searches transfree[] for a free transaction slot and if it finds
-      one sets
+/*
+*+
+*  Name:
+*     AMS_GETFREETRANS
 
-        *messid to its index,
-        *status to SAI__OK,
-        transfree[index] to false,
-        t_trans[index].t_path_num to path,
-        t_trans[index].this_task_ack_q to a new queue  (if getq == 1) or
-                                    NULL_Q (if getq == 0)
-        t_trans[index].other_task_ack_q to otaq
-        t_trans[index].other_transnum to ottn
+*  Language:
+*     Starlink C
 
-      otherwise sets
+*  Algorithm:
+*     Searches transfree[] for a free transaction slot and if it finds
+*     one sets
+*     
+*       *messid to its index,
+*       *status to SAI__OK,
+*       transfree[index] to false,
+*       t_trans[index].t_path_num to path,
+*       t_trans[index].this_task_ack_q to a new queue  (if getq == 1) or
+*                                   NULL_Q (if getq == 0)
+*       t_trans[index].other_task_ack_q to otaq
+*       t_trans[index].other_transnum to ottn
+*     
+*     otherwise sets
+*     
+*      *messid to MESSYS__NULL_T and
+*      *status to MESSYS_COMFULL.
+*     
+*     Creation of the reply queue is made optional as an optimisation for
+*     the cases where no reply queue is going to be involved.
 
-       *messid to MESSYS__NULL_T and
-       *status to MESSYS_COMFULL.
+*  Authors:
+*     {original_author_entry}
 
-      Creation of the reply queue is made optional as an optimisation for
-      the cases where no reply queue is going to be involved.
-     Authors :
-     History :
-      12Apr 1994: make function static (BDK)
+*  History:
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -859,7 +1131,6 @@ int *status        /* global status (given and returned) */
    }
 }
 
-/*=  AMS_GETMACHNUM - return the index to the named machine */
 
 static void ams_getmachnum
 (
@@ -869,23 +1140,44 @@ int *added,             /* flag for if new entry added (returned) */
 int *status             /* global status (given and returned) */
 )
 
-/*   Method :
-      The system maintains an array of known remote machines that this
-      process is in communication with.  When this task makes a path
-      connection with a remote task (named, say, xxxxx::yyyyyy) then the
-      "xxxx::" part is stored in a free entry in machine_names[] and the
-      t_paths[].machine_num part of the relevant t_path[]'s entry records
-      the index into machine_names[]
+/*
+*+
+*  Name:
+*     AMS_GETMACHNUM
 
-      This function tries to find an existing entry in machine_names[]
-      for the machine 'machinename' but failing this tries to create a
-      new entry.  If either of these succeed it sets *machinenumber to
-      the relevant machine_names[] index, otherwise it returns a bad status.
-      If it does add a new entry then *added is set to 1 otherwise added 
-      will be 0 on return
-     Authors :
-     History :
-      12Apr 1994: make function static (BDK)
+*  Purpose:
+*     Return the index to the named machine 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     The system maintains an array of known remote machines that this
+*     process is in communication with.  When this task makes a path
+*     connection with a remote task (named, say, xxxxx::yyyyyy) then the
+*     "xxxx::" part is stored in a free entry in machine_names[] and the
+*     t_paths[].machine_num part of the relevant t_path[]'s entry records
+*     the index into machine_names[]
+*     
+*     This function tries to find an existing entry in machine_names[]
+*     for the machine 'machinename' but failing this tries to create a
+*     new entry.  If either of these succeed it sets *machinenumber to
+*     the relevant machine_names[] index, otherwise it returns a bad status.
+*     If it does add a new entry then *added is set to 1 otherwise added 
+*     will be 0 on return
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -925,7 +1217,6 @@ int *status             /* global status (given and returned) */
    }
 }
 
-/*+  AMS_GETREPLY - receive a message on a specified path, messid */
 
 void ams_getreply
 (
@@ -942,43 +1233,67 @@ char *message_value,      /* message value (returned) */
 int *status               /* global status (given and returned) */
 )
 
-/*   Method :
-      The application has sent a message on path 'path' as part of
-      transaction 'messid' and wishes to obtain the reply. The function
-      first checks the transaction is legally identified and that there
-      exists an acknowledge queue for that transaction (using
-      AMS_checktransactive()) It then, if 'timeout' is not
-      MESSYS_INFINITE, sets the timer clock going so that we get a
-      timeout if there is no response within timeout milliseconds. It
-      then, using msp_receive_message() determines input on either the
-      external interrupt queue, the transaction acknowlege queue or the
-      timeout queue.
+/*
+*+
+*  Name:
+*     AMS_GETREPLY
 
-      If the message received is of type C_LOC_MSG_IN, the origin is
-      determined as either an external interrupt, a timeout interrupt OR a
-      normal message setting *status to MESSYS_EXTINT, MESSYS_TIMEOUT or
-      SAI__OK appropriately. messys_translate() is used to unpack the
-      message.
+*  Purpose:
+*     Receive a message on a specified path, messid 
 
-      If the message is                                      use
+*  Language:
+*     Starlink C
 
-       message from remote source    (C_REM_MSG_IN)        messys_rtranslate()
-       end transaction message       (C_LOC_GSOC_END_IN)   messys_endtrans()
-       remote end transaction        (C_REM_GSOC_END_IN)   messys_rendtrans()
-       local deinitialise path       (C_LOC_DEINIT_IN)     messys_remove()
-       remote deinitialise path      (C_REM_DEINIT_IN)     messys_remove()
-       local initialise acknowldge   (C_LOC_ACK_IN)        messys_addrest()
-       remote initialise acknowledge (C_REM_ACK_IN)        messys_raddrest()
-       other                         we set *status to MESSYS_MSGFUNC
+*  Algorithm:
+*     The application has sent a message on path 'path' as part of
+*     transaction 'messid' and wishes to obtain the reply. The function
+*     first checks the transaction is legally identified and that there
+*     exists an acknowledge queue for that transaction (using
+*     AMS_checktransactive()) It then, if 'timeout' is not
+*     MESSYS_INFINITE, sets the timer clock going so that we get a
+*     timeout if there is no response within timeout milliseconds. It
+*     then, using msp_receive_message() determines input on either the
+*     external interrupt queue, the transaction acknowlege queue or the
+*     timeout queue.
+*     
+*     If the message received is of type C_LOC_MSG_IN, the origin is
+*     determined as either an external interrupt, a timeout interrupt OR a
+*     normal message setting *status to MESSYS_EXTINT, MESSYS_TIMEOUT or
+*     SAI__OK appropriately. messys_translate() is used to unpack the
+*     message.
+*     
+*     If the message is                                      use
+*     
+*      message from remote source    (C_REM_MSG_IN)        messys_rtranslate()
+*      end transaction message       (C_LOC_GSOC_END_IN)   messys_endtrans()
+*      remote end transaction        (C_REM_GSOC_END_IN)   messys_rendtrans()
+*      local deinitialise path       (C_LOC_DEINIT_IN)     messys_remove()
+*      remote deinitialise path      (C_REM_DEINIT_IN)     messys_remove()
+*      local initialise acknowldge   (C_LOC_ACK_IN)        messys_addrest()
+*      remote initialise acknowledge (C_REM_ACK_IN)        messys_raddrest()
+*      other                         we set *status to MESSYS_MSGFUNC
+*     
+*     If the timer is still running, then we use messys_cantim() to turn
+*     it off.
 
-      If the timer is still running, then we use messys_cantim() to turn
-      it off.
-     Authors :
-     History :
-      15Jun 1992: Created: irj 
-      16Jun 1992: Tidied : irj, skr 
-      17Mar 1994: use the reply_q returned from msp (BDK)
-      11Apr 1994: return message components as separate arguments (BDK)
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     16-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     17-MAR-1994 (BDK):
+*        Use the reply_q returned from msp
+*     11-APR-1994 (BDK):
+*        Return message components as separate arguments
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 
@@ -1081,21 +1396,41 @@ int *status               /* global status (given and returned) */
    }
 }
 
-/*+  AMS_INIT - initialise ams */
 
 void ams_init
 (
 char *own_name,      /* name of this task (given) */
 int *status
 )
-/*   Method :
-      Call ams_initeh
+/*
+*+
+*  Name:
+*     AMS_INIT
+
+*  Purpose:
+*     Initialise ams 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Call ams_initeh
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 {
    ams_initeh( own_name, 1, status);
 }
 
-/*+  AMS_INITEH - initialise ams */
 
 void ams_initeh
 (
@@ -1104,17 +1439,40 @@ int eh,              /* register exit handler */
 int *status
 )
 
-/*   Method :
-      Initialise the internal data structures. 
+/*
+*+
+*  Name:
+*     AMS_INITEH
 
-      Register with msp, obtain the command queue for incoming messages,
-      then create the queues used for this task sending messages to
-      itself. Finally set up the signal handler.
-     Authors :
-     History :
-      Created: irj 15/6/92
-      Tidied: irj, skr 16/6/92
-      Commented: skr 7/7/92
+*  Purpose:
+*     Initialise ams 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Initialise the internal data structures. 
+*     
+*     Register with msp, obtain the command queue for incoming messages,
+*     then create the queues used for this task sending messages to
+*     itself. Finally set up the signal handler.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     16-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     07-JUL-1992 (SKR):
+*        Commented
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 {
    int nlen;                  /* length of task name */
@@ -1185,7 +1543,6 @@ int *status
    }
 }
 
-/*+  AMS_KICK - send a message to this task's kick queue */
 void ams_kick 
 (
 char *name,       /* name of the action to be rescheduled (given) */
@@ -1193,11 +1550,31 @@ int length,       /* number of significant bytes in value (given) */
 char *value,      /* message to be passed to application code (given) */
 int *status       /* global status (given and returned) */
 )
-/*   Method :
-      Send a soft kick interrupt message 'value' qualified by 'name' to
-      kick_q.
-     Authors :
-     History :
+/*
+*+
+*  Name:
+*     AMS_KICK
+
+*  Purpose:
+*     Send a message to this task's kick queue 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Send a soft kick interrupt message 'value' qualified by 'name' to
+*     kick_q.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1205,7 +1582,6 @@ int *status       /* global status (given and returned) */
 }
 
 
-/*=  AMS_NALOOKUP */
 
 static void ams_nalookup 
 ( 
@@ -1218,35 +1594,53 @@ int *remote,       /* flag for whether task is across network (returned) */
 int *status        /* global status (given and returned) */
 )
 
-/*   Method :
+/*
+*+
+*  Name:
+*     AMS_NALOOKUP
 
-      Given name as xxxx::yyyy task will be set to yyyyyy and mach to
-      xxxx:: and remote to 1.  Given yyyyyy, task will be set to yyyyyy
-      mach to "" and remote to zero.
+*  Language:
+*     Starlink C
 
-      We start by checking if the name given is prefixed with a known
-      machine name (ie of the form xxxxx::yyyyy).  We check this by
-      scanning all the known machinename/taskname separators (held in
-      messys_netsep[0..netint-1]) and if a separator is found we select
-      out the machinename part (xxxxx) and the taskname (yyyyyyy).
+*  Algorithm:
+*     Given name as xxxx::yyyy task will be set to yyyyyy and mach to
+*     xxxx:: and remote to 1.  Given yyyyyy, task will be set to yyyyyy
+*     mach to "" and remote to zero.
+*     
+*     We start by checking if the name given is prefixed with a known
+*     machine name (ie of the form xxxxx::yyyyy).  We check this by
+*     scanning all the known machinename/taskname separators (held in
+*     messys_netsep[0..netint-1]) and if a separator is found we select
+*     out the machinename part (xxxxx) and the taskname (yyyyyyy).
+*     
+*     If one is not found we scan the t_paths array checking for a match
+*     in the given name and the "other_taskname" member of each t_paths[]
+*     entry. If one is found and the task is local ( machine_num member
+*     of t_paths[] is MESSYS_NULL_M) path is set and we return with
+*     status set to SAI__OK, otherwise we return with status set to
+*     MESSYS_NOTFOUND.
+*     
+*     If a separator is found we scan the t_paths[] array looking for an
+*     entry where the 'other_taskname' member and the 'machine_num' entry
+*     is positive and when used to index machine_names[] also gives match
+*     with xxxxx (ie task yyyyyy running on machine xxxxx has path
+*     existing to it).  If we find such a match we return the path indexs
+*     in 'path', otherwise we return MESSYS_NOTFOUND.
 
-      If one is not found we scan the t_paths array checking for a match
-      in the given name and the "other_taskname" member of each t_paths[]
-      entry. If one is found and the task is local ( machine_num member
-      of t_paths[] is MESSYS_NULL_M) path is set and we return with
-      status set to SAI__OK, otherwise we return with status set to
-      MESSYS_NOTFOUND.
+*  Authors:
+*     {original_author_entry}
 
-      If a separator is found we scan the t_paths[] array looking for an
-      entry where the 'other_taskname' member and the 'machine_num' entry
-      is positive and when used to index machine_names[] also gives match
-      with xxxxx (ie task yyyyyy running on machine xxxxx has path
-      existing to it).  If we find such a match we return the path indexs
-      in 'path', otherwise we return MESSYS_NOTFOUND.
-     Authors :
-     History :
-      12Apr 1994: make function static (BDK)
-      03Jun 1994: return ok status is path already open (BDK)
+*  History:
+*     12-APR-1994 (BDK):
+*        Make function static
+*     03-JUN-1994 (BDK):
+*        Return ok status is path already open
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1281,7 +1675,6 @@ int *status        /* global status (given and returned) */
    }
 }
 
-/*=  AMS_NEWTRANS */
 
 static void ams_newtrans
 (
@@ -1303,26 +1696,45 @@ char *message_value,               /* message value (returned) */
 int *status                        /* global status (given and returned) */
 )
 
-/*   Method :
+/*
+*+
+*  Name:
+*     AMS_NEWTRANS
 
-      System has just received a gsoc_start transaction message.  This
-      function tries to establish a transaction end at this end using
-      ams_getfreetrans() filling in the t_trans[] entry with data from
-      the gsoc message. The only tricky bit here is if the gsoc_flag of
-      the message just received is set to OBEY, then we must establish a
-      transaction acknowledge queue this end (ams_getfreetrans() does
-      this conditional on its second parameter) If we fail to establish a
-      transaction end we send a C_LOC_GSOC_END_OUT message to the other
-      task's transaction acknowledge queue using ams_sendgsocend(). If we
-      succeed in establishing a transaction end we unpack the message for
-      the caller (using ams_unpacklocgsoc()).
+*  Language:
+*     Starlink C
 
-     Authors :
-     History :
-      Created: irj 15/6/92
-      Tidied : irj, skr 18/6/92
-      11Apr 1994: return message components as separate arguments (BDK)
-      12Apr 1994: make function static (BDK)
+*  Algorithm:
+*     System has just received a gsoc_start transaction message.  This
+*     function tries to establish a transaction end at this end using
+*     ams_getfreetrans() filling in the t_trans[] entry with data from
+*     the gsoc message. The only tricky bit here is if the gsoc_flag of
+*     the message just received is set to OBEY, then we must establish a
+*     transaction acknowledge queue this end (ams_getfreetrans() does
+*     this conditional on its second parameter) If we fail to establish a
+*     transaction end we send a C_LOC_GSOC_END_OUT message to the other
+*     task's transaction acknowledge queue using ams_sendgsocend(). If we
+*     succeed in establishing a transaction end we unpack the message for
+*     the caller (using ams_unpacklocgsoc()).
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     11-APR-1994 (BDK):
+*        Return message components as separate arguments
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1361,7 +1773,6 @@ int *status                        /* global status (given and returned) */
    }
 }
 
-/*=  AMS_NLOOKUP */
 
 static void ams_nlookup
 (
@@ -1370,15 +1781,34 @@ int *path,        /* path number for communication to task (returned) */
 int *status       /* global status (given and returned) */
 )
 
-/*   Method :
-      Check to see if a path already exists to the task 'name' and if so
-      set path to reflect this.
+/*
+*+
+*  Name:
+*     AMS_NLOOKUP
 
-     Authors :
-     History :
-      Created: irj 15/6/92
-      Tidied : irj, skr 17/6/92
-      12Apr 1994: make function static (BDK)
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Check to see if a path already exists to the task 'name' and if so
+*     set path to reflect this.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     17-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1389,12 +1819,32 @@ int *status       /* global status (given and returned) */
    ams_nalookup ( name, path, &netind, task, mach, &remote, status );
 }
 
-/*+  AMS_PATH - get a communications path to another task */
 
 void ams_path
 (
 char *other_task_name,  /* name of task to which path is required (given)
-                           */
+/*
+*+
+*  Name:
+*     AMS_PATH
+
+*  Purpose:
+*     Get a communications path to another task 
+
+*  Language:
+*     Starlink C
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
 int *path,              /* pointer to the path (returned) */
 int *status             /* global status (given and returned) */
 )
@@ -1504,7 +1954,6 @@ int *status             /* global status (given and returned) */
    }
 }
 
-/*+  AMS_PLOOKUP - look up a taskname given a path to it */
 
 void ams_plookup 
 ( 
@@ -1513,23 +1962,45 @@ char *name,           /* the task name (returned) */
 int *status           /* global status (given and returned) */
 )
 
-/*   Method :
-      PATHINDEX -> TASKNAME
+/*
+*+
+*  Name:
+*     AMS_PLOOKUP
 
-      Given a path 'path', we check that the path is legal and then use
-      it to index t_paths[] to ascertain whether the path is linked to a
-      remote task or a local task (by checking t_paths[path].machine_num
-      which will be MESSYS__NULL_M if local).
+*  Purpose:
+*     Look up a taskname given a path to it 
 
-      If the path is connected to a local task, we copy that task's name
-      into 'name' using t_paths[path].other_taskname. If the task is
-      remote we form xxxxx::yyyyyy in 'name', obtaining xxxxxx:: from
-      machine_names[t_paths[path].machine_num] and yyyyyy from
-      t_paths[path].other_taskname.
-     Authors :
-     History :
-      Created: irj 15/6/92
-      Tidied : irj, skr 18/6/92
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     PATHINDEX -> TASKNAME
+*     
+*     Given a path 'path', we check that the path is legal and then use
+*     it to index t_paths[] to ascertain whether the path is linked to a
+*     remote task or a local task (by checking t_paths[path].machine_num
+*     which will be MESSYS__NULL_M if local).
+*     
+*     If the path is connected to a local task, we copy that task's name
+*     into 'name' using t_paths[path].other_taskname. If the task is
+*     remote we form xxxxx::yyyyyy in 'name', obtaining xxxxxx:: from
+*     machine_names[t_paths[path].machine_num] and yyyyyy from
+*     t_paths[path].other_taskname.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1561,7 +2032,6 @@ int *status           /* global status (given and returned) */
 }
 
 
-/*=  AMS_RACCEPT */
 
 static void ams_raccept
 (
@@ -1570,19 +2040,40 @@ sendq_type ackq,                   /* acknowledgement queue (given) */
 int *status                        /* global status (given and returned) */
 )
 
-/*   Method :
-      An "init" message has been received from a task on another machine 
-      requesting a connecting path to be set up. Allocate a data structure 
-      to the path and return an acceptance message.
-     Authors :
-       IRJ: Ian R Jenkins (RAL)
-       BDK: B.D.Kelly (ROE)
-       AJC: A.J.Chipperfield (STARLINK)
-     History :
-      Created: irj 15/6/92
-      Tidied : irj, skr 18/6/92
-      12Apr 1994: make function static (BDK)
-       8Feb 1996: remove diagnostic printfs (AJC)
+/*
+*+
+*  Name:
+*     AMS_RACCEPT
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     An "init" message has been received from a task on another machine 
+*     requesting a connecting path to be set up. Allocate a data structure 
+*     to the path and return an acceptance message.
+
+*  Authors:
+*      IRJ: Ian R Jenkins (RAL)
+*      BDK: B.D.Kelly (ROE)
+*      AJC: A.J.Chipperfield (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     12-APR-1994 (BDK):
+*        Make function static
+*     08-FEB-1996 (AJC):
+*        Remove diagnostic printfs
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1614,7 +2105,6 @@ int *status                        /* global status (given and returned) */
    *status = SAI__OK;
 }
 
-/*=  AMS_RADDREST */
 
 static void ams_raddrest
 (
@@ -1622,7 +2112,25 @@ struct a_rem_ack_in *rem_ack_in,  /* received ack_in structure (given) */
 int path,                         /* path of init transaction (given) */
 int messid,                       /* messid of init transaction (given) */
 sendq_type replyq,                /* queue for sending rejections (given)
-                                     */
+/*
+*+
+*  Name:
+*     AMS_RADDREST
+
+*  Language:
+*     Starlink C
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
 int *status                       /* global status (given and returned) */
 )
 
@@ -1656,7 +2164,6 @@ int *status                       /* global status (given and returned) */
    }
 }
 
-/*+  AMS_RECEIVE - receive any incoming message */
 
 void ams_receive 
 ( 
@@ -1673,20 +2180,44 @@ int *messid,              /* message number of incoming message (returned) */
 int *status               /* global status (given and returned) */
 )
 
-/*   Method :
-     Authors :
-      IRJ: I.R.Jenkins (RAL)
-      BDK: B.D. Kelly (ROE)
-      BKM: B.K. McIlwrath (STARLINK)
-      AJC: A.J.Chipperfield (STARLINK)
-     History :
-      15Jun 1992: Created: irj 
-      18Jun 1992: Tidied: irj, skr 
-      17Mar 1994: use the reply_q returned from msp (BDK)
-      11Apr 1994: return message components as separate arguments (BDK)
-      18Aug 1994: correct confusion between status and message_status
-      01Dec 1994: correct 'numq' when transaction queues have gone away (BKM)
-       8Feb 1996: remove diagnostic printfs (AJC)
+/*
+*+
+*  Name:
+*     AMS_RECEIVE
+
+*  Purpose:
+*     Receive any incoming message 
+
+*  Language:
+*     Starlink C
+
+*  Authors:
+*     IRJ: I.R.Jenkins (RAL)
+*     BDK: B.D. Kelly (ROE)
+*     BKM: B.K. McIlwrath (STARLINK)
+*     AJC: A.J.Chipperfield (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     17-MAR-1994 (BDK):
+*        Use the reply_q returned from msp
+*     11-APR-1994 (BDK):
+*        Return message components as separate arguments
+*     18-AUG-1994: correct confusion between status and message_status
+*     01-DEC-1994 (BKM):
+*        Correct 'numq' when transaction queues have gone away
+*     08-FEB-1996 (AJC):
+*        Remove diagnostic printfs
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1849,7 +2380,6 @@ int *status               /* global status (given and returned) */
    }
 }
 
-/*=  AMS_REJECT */
 
 static void ams_reject
 (
@@ -1858,16 +2388,36 @@ sendq_type reply_q,                /* queue for sending reply (given) */
 int *status                        /* global status (given and returned) */
 )
 
-/*   Method :
-      The system has received an unexpected local acknowledgement to an
-      init message. It therefore sends a de_init to the source, whose
-      acknowledge queue is in the replyq part of the received
-      acknowledgement. We use ams_senddeinit() to actually send the message.
-     Authors :
-     History :
-      Created: irj 15/6/92
-      Tidied : irj, skr 18/6/92
-      12Apr 1994: make function static (BDK)
+/*
+*+
+*  Name:
+*     AMS_REJECT
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     The system has received an unexpected local acknowledgement to an
+*     init message. It therefore sends a de_init to the source, whose
+*     acknowledge queue is in the replyq part of the received
+*     acknowledgement. We use ams_senddeinit() to actually send the message.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1878,26 +2428,45 @@ int *status                        /* global status (given and returned) */
    *status = SAI__OK;
 }
 
-/*=  AMS_REMOVE */
 
 static void ams_remove
 (
 int pathnum              /* path number (given) */
 )
 
-/*   Method :
-      This routine removes the path 'pathnum' from the perceived list of
-      active paths (pathfree[] == false).  By using ams_freepath() to do this
-      it checks to see if any currently active transactions use this path
-      (t_trans[].t_path_num == pathnum) and if so, frees the acknowledge
-      queue associated with that transaction using
-      msp_delete_queue(t_trans[].this_task_ack_q) and then frees the
-      transaction entry t_trans[].
-     Authors :
-     History :
-      Created: irj 15/6/92
-      Tidied : irj, skr 18/6/92
-      12Apr 1994: make function static (BDK)
+/*
+*+
+*  Name:
+*     AMS_REMOVE
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     This routine removes the path 'pathnum' from the perceived list of
+*     active paths (pathfree[] == false).  By using ams_freepath() to do this
+*     it checks to see if any currently active transactions use this path
+*     (t_trans[].t_path_num == pathnum) and if so, frees the acknowledge
+*     queue associated with that transaction using
+*     msp_delete_queue(t_trans[].this_task_ack_q) and then frees the
+*     transaction entry t_trans[].
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 {
    int istat;               /* local status */
@@ -1910,7 +2479,6 @@ int pathnum              /* path number (given) */
    }
 }
 
-/*=  AMS_RENDTRANS */
 
 static void ams_rendtrans
 (
@@ -1930,19 +2498,40 @@ char *message_value,              /* message value (returned) */
 int *status                       /* global status (given and returned) */
 )
 
-/*   Method :
-      The system has received a remote gsoc_end message, the last message
-      in the transaction 'rem_msg_in->local_task_t_trans_num' (set into
-      *messid) on path t_trans[*messid].t_path_num (set into *path.).
-      Using ams_unpackremmsg() this routine returns the contents of the
-      last message to the caller and uses ams_freetrans() to close and
-      free the relevant transaction.
-     Authors :
-     History :
-      15Jun 1992: Created: irj 
-      18Jun 1992: Tidied : irj, skr 
-      11Apr 1994: return message components as separate arguments (BDK)
-      12Apr 1994: make function static (BDK)
+/*
+*+
+*  Name:
+*     AMS_RENDTRANS
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     The system has received a remote gsoc_end message, the last message
+*     in the transaction 'rem_msg_in->local_task_t_trans_num' (set into
+*     *messid) on path t_trans[*messid].t_path_num (set into *path.).
+*     Using ams_unpackremmsg() this routine returns the contents of the
+*     last message to the caller and uses ams_freetrans() to close and
+*     free the relevant transaction.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     11-APR-1994 (BDK):
+*        Return message components as separate arguments
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1956,7 +2545,6 @@ int *status                       /* global status (given and returned) */
    ams_freetrans ( *messid, status );
 }
 
-/*+  AMS_REPLY - send a message on a given path, messid */
 
 void ams_reply
 (
@@ -1972,41 +2560,63 @@ char *message_value,    /* message value (given) */
 int *status             /* global status (given and returned) */
 )
 
-/*   Method :
+/*
+*+
+*  Name:
+*     AMS_REPLY
 
-      As part of transaction 'messid' on path 'path', the user wishes to
-      send the message AS A REPLY to a previously received message from
-      the other end of the path. The user can ONLY reply with a de_init
-      message (something has gone wrong) or with a transaction end
-      message (GSOC_END) or with a normal message.
+*  Purpose:
+*     Send a message on a given path, messid 
 
-      We first check that the path is open (AMS_checkpathopen()) and that the
-      transaction is in use (AMS_checktrans()).  If both these are OK we
-      check the 'function' part of the external form and check exactly
-      what is being sent:
+*  Language:
+*     Starlink C
 
-        MESSYS_DE_INIT
+*  Algorithm:
+*     As part of transaction 'messid' on path 'path', the user wishes to
+*     send the message AS A REPLY to a previously received message from
+*     the other end of the path. The user can ONLY reply with a de_init
+*     message (something has gone wrong) or with a transaction end
+*     message (GSOC_END) or with a normal message.
+*     
+*     We first check that the path is open (AMS_checkpathopen()) and that the
+*     transaction is in use (AMS_checktrans()).  If both these are OK we
+*     check the 'function' part of the external form and check exactly
 
-               then we use ams_senddeinit() and if this fails then
-	       messsy_remove() to remove the path and free any
-	       transactions using the path.
+*  Authors:
+*     {original_author_entry}
 
-       MESSYS__MESSAGE 
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     27-APR-1993 (AJC):
+*        Use AMS_checktrans not AMS_checktransactive
+*     {enter_further_changes_here}
 
-               then we use ams_sendmessage() to send the message.  It is
-	       inside ams_sendmessage() that an end of transaction
-	       message is detected through an examination of the message
-	       status (and, by the way, the transaction end at this end
-	       is then freed using ams_freetrans())
+*  Bugs:
+*     {note_any_bugs_here}
 
-       other
+*  What Is Being Sent:
+*       MESSYS_DE_INIT
+*     
+*              then we use ams_senddeinit() and if this fails then
+*       messsy_remove() to remove the path and free any
+*       transactions using the path.
+*     
+*      MESSYS__MESSAGE 
+*     
+*              then we use ams_sendmessage() to send the message.  It is
+*       inside ams_sendmessage() that an end of transaction
+*       message is detected through an examination of the message
+*       status (and, by the way, the transaction end at this end
+*       is then freed using ams_freetrans())
+*     
+*      other
+*     
+*              the system returns MESSYS__MSGFUNC
 
-               the system returns MESSYS__MSGFUNC
-     Authors :
-     History :
-      Created: irj 15/6/92
-      Tidied : irj, skr 18/6/92
-      Use AMS_checktrans not AMS_checktransactive : ajc 27/4/93
+*-
 */
 
 {
@@ -2040,7 +2650,6 @@ int *status             /* global status (given and returned) */
    }
 }
 
-/*+  AMS_RESMSG - send a message to this task's  reschedule queue */
 
 void ams_resmsg
 (
@@ -2049,18 +2658,37 @@ char *value,       /* message to be passed to main-line code (given) */
 int *status        /* global status (given and returned) */
 )
 
-/*   Method :
-      Send a soft reschedule interrupt message 'value' qualified by
-      'name' to resched_q.
-     Authors :
-     History :
+/*
+*+
+*  Name:
+*     AMS_RESMSG
+
+*  Purpose:
+*     Send a message to this task's  reschedule queue 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Send a soft reschedule interrupt message 'value' qualified by
+*     'name' to resched_q.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
    ams_sendobey ( sigresch_q, MSG_EMPTYNAME, length, value, status );
 }
 
-/*=  AMS_RNEWTRANS */
 
 static void ams_rnewtrans
 (
@@ -2082,29 +2710,48 @@ char *message_value,               /* message value (returned) */
 int *status                        /* global status (given and returned) */
 )
 
-/*   Method :
+/*
+*+
+*  Name:
+*     AMS_RNEWTRANS
 
-      System has just received a gsoc_start transaction message from a
-      remote source.  This function tries to establish a transaction end
-      at this end using ams_getfreetrans() filling in the t_trans[] entry
-      with data from the gsoc message.  The only tricky bit here is if
-      the gsoc_flag of the message just received is set to OBEY, then we
-      must establish a transaction acknowledge queue this end
-      (ams_getfreetrans() does this conditional on its second parameter).
+*  Language:
+*     Starlink C
 
-      If we fail to establish a transaction end we send a
-      C_REM_GSOC_END_OUT message using ams_sendgsocend() to the local
-      nettask's acknowledge queue.
+*  Algorithm:
+*     System has just received a gsoc_start transaction message from a
+*     remote source.  This function tries to establish a transaction end
+*     at this end using ams_getfreetrans() filling in the t_trans[] entry
+*     with data from the gsoc message.  The only tricky bit here is if
+*     the gsoc_flag of the message just received is set to OBEY, then we
+*     must establish a transaction acknowledge queue this end
+*     (ams_getfreetrans() does this conditional on its second parameter).
+*     
+*     If we fail to establish a transaction end we send a
+*     C_REM_GSOC_END_OUT message using ams_sendgsocend() to the local
+*     nettask's acknowledge queue.
+*     
+*     If we succeed in establishing a transaction end we unpack the
+*     message for the caller (using) ams_unpackremgsoc()).
 
-      If we succeed in establishing a transaction end we unpack the
-      message for the caller (using) ams_unpackremgsoc()).
+*  Authors:
+*     {original_author_entry}
 
-     Authors :
-     History :
-      15Jun 1992: Created: irj 
-      18Jun 1992: Tidied : irj, skr 
-      11Apr 1994: return message components as separate arguments (BDK)
-      12Apr 1994: make function static (BDK)
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     11-APR-1994 (BDK):
+*        Return message components as separate arguments
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2139,7 +2786,6 @@ int *status                        /* global status (given and returned) */
    }
 }
 
-/*=  AMS_RREJECT */
 
 static void ams_rreject 
 ( 
@@ -2148,15 +2794,35 @@ sendq_type reply_q,                /* queue for sending rejection (given) */
 int *status                        /* global status (given and returned) */
 )
 
-/*   Method :
-      The system has received an unexpected remote acknowledgement to an
-      init message. It therefore sends a de_init to the source using
-      ams_senddeinit() message.
-     Authors :
-     History :
-      Created: irj 15/6/92
-      Tidied : irj, skr 18/6/92
-      12Apr 1994: make function static (BDK)
+/*
+*+
+*  Name:
+*     AMS_RREJECT
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     The system has received an unexpected remote acknowledgement to an
+*     init message. It therefore sends a de_init to the source using
+*     ams_senddeinit() message.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2167,7 +2833,6 @@ int *status                        /* global status (given and returned) */
    *status = SAI__OK;
 }
 
-/*=  AMS_RTRANSLATE */
 
 static void ams_rtranslate
 (
@@ -2188,26 +2853,47 @@ char *message_value,              /* message value (returned) */
 int *status                       /* global status (given and returned) */
 )
 
-/*   Method :
-      The system has received a remote message as part of the transaction
-      'rem_msg_in->local_task_t_trans_num' (set into *messid) on path
-      t_trans[*messid].t_path_num (set into *path).
+/*
+*+
+*  Name:
+*     AMS_RTRANSLATE
 
-      This routine updates the transaction entry for this end (in
-      particular adding the other task's acknowledge queue and
-      transaction end index if the existing transaction end this end is
-      missing this information) and then uses ams_unpackremmsg() to
-      unpack the message contents. If the path associated with the
-      transaction has been closed or changed this routine sets *status to
-      MESSYS_BADPATH but still unpacks the message.  If the transaction
-      referred to in the message is invalid then *status will reflect
-      this but the message will still be unpacked.
-     Authors :
-     History :
-      15Jun 1992: Created: irj 
-      18Jun 1992: Tidied : irj, skr 
-      11Apr 1994: return message components as separate arguments (BDK)
-      12Apr 1994: make function static (BDK)
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     The system has received a remote message as part of the transaction
+*     'rem_msg_in->local_task_t_trans_num' (set into *messid) on path
+*     t_trans[*messid].t_path_num (set into *path).
+*     
+*     This routine updates the transaction entry for this end (in
+*     particular adding the other task's acknowledge queue and
+*     transaction end index if the existing transaction end this end is
+*     missing this information) and then uses ams_unpackremmsg() to
+*     unpack the message contents. If the path associated with the
+*     transaction has been closed or changed this routine sets *status to
+*     MESSYS_BADPATH but still unpacks the message.  If the transaction
+*     referred to in the message is invalid then *status will reflect
+*     this but the message will still be unpacked.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     11-APR-1994 (BDK):
+*        Return message components as separate arguments
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2245,7 +2931,6 @@ int *status                       /* global status (given and returned) */
      message_length, message_value, status );
 }
 
-/*+  AMS_SEND - send a message on a given path */
 
 void ams_send
 (
@@ -2260,29 +2945,52 @@ int *messid,            /* message number issued by this task (returned) */
 int *status             /* global status (given and returned) */
 )
 
-/*   Method :
-      This function is used by the application code to send a message
-      to another task on path 'path'.
+/*
+*+
+*  Name:
+*     AMS_SEND
 
-      The expectation is that this is one of a DEINIT message, an INIT
-      message or the first message of a NEW transaction whose transaction
-      number is to be set into '*messid'.
+*  Purpose:
+*     Send a message on a given path 
 
-      When used for the first message of a transaction, a free
-      transaction is obtained using ams_getfreetrans() and the MESSYS_MESSAGE
-      is sent to the other task's command queue.
+*  Language:
+*     Starlink C
 
-      When used to send an INIT message a free temporary transaction is
-      obtained using ams_getfreetrans() and the MESSYS_INIT (using
-      ams_sendinit()) is sent to the other task's command queue.
+*  Algorithm:
+*     This function is used by the application code to send a message
+*     to another task on path 'path'.
+*     
+*     The expectation is that this is one of a DEINIT message, an INIT
+*     message or the first message of a NEW transaction whose transaction
+*     number is to be set into '*messid'.
+*     
+*     When used for the first message of a transaction, a free
+*     transaction is obtained using ams_getfreetrans() and the MESSYS_MESSAGE
+*     is sent to the other task's command queue.
+*     
+*     When used to send an INIT message a free temporary transaction is
+*     obtained using ams_getfreetrans() and the MESSYS_INIT (using
+*     ams_sendinit()) is sent to the other task's command queue.
+*     
+*     When used to send a DEINIT, ams_senddeinit() is used to send the
+*     MESSYS_DE_INIT message to the other task's command queue.
 
-      When used to send a DEINIT, ams_senddeinit() is used to send the
-      MESSYS_DE_INIT message to the other task's command queue.
-     Authors :
-     History :
-      15Jun 1992: Created: irj 
-      16Jun 1992: Tidied : irj, skr 
-      11Apr 1994: pass message components as separate arguments (BDK)
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     16-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     11-APR-1994 (BDK):
+*        Pass message components as separate arguments
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2328,7 +3036,6 @@ int *status             /* global status (given and returned) */
 }
 
 
-/*=  AMS_SENDDEINIT */
 
 static void ams_senddeinit
 (
@@ -2339,24 +3046,42 @@ int otherpathno,       /* path number in other task (given) */
 int *status            /* global status (given and returned) */
 )
 
-/*   Method :
-      System wishes to send a de_init message to queue targetq.
-      The format of such a message is
+/*
+*+
+*  Name:
+*     AMS_SENDDEINIT
 
-      [C_LOC_DEINIT_OUT,othertaskscommandq,othertaskspathnamber]
+*  Language:
+*     Starlink C
 
-      or
+*  Algorithm:
+*     System wishes to send a de_init message to queue targetq.
+*     The format of such a message is
+*     
+*     [C_LOC_DEINIT_OUT,othertaskscommandq,othertaskspathnamber]
+*     
+*     or
+*     
+*     [C_REM_DEINIT_OUT,othertaskscommandq,othertaskspathnamber]
+*     
+*     depending on local (local = 1) or remote (local = 0) target.
+*     
+*     This routine sends such a message using msp_send_message() returning
+*     the status from this. If 'path' is not set to MESSYS__NULL_P, then
+*     ams_freepath(path) is called to release the path.
 
-      [C_REM_DEINIT_OUT,othertaskscommandq,othertaskspathnamber]
+*  Authors:
+*     {original_author_entry}
 
-      depending on local (local = 1) or remote (local = 0) target.
+*  History:
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
 
-      This routine sends such a message using msp_send_message() returning
-      the status from this. If 'path' is not set to MESSYS__NULL_P, then
-      ams_freepath(path) is called to release the path.
-     Authors :
-     History :
-      12Apr 1994: make function static (BDK)
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2385,7 +3110,6 @@ int *status            /* global status (given and returned) */
 }
 
 
-/*=  AMS_SENDGSOCEND */
 
 static void ams_sendgsocend
 (
@@ -2401,39 +3125,57 @@ char *gvalue,           /* message value field (given) */
 int *status             /* global status (given and returned) */
 )
 
-/*   Method :
-      System wishes to send a gsocend message to queue targetq.
-      The format of such a message is (local)
+/*
+*+
+*  Name:
+*     AMS_SENDGSOCEND
 
-      [C_LOC_GSOC_END_OUT
-      the othertask's transaction number, from ottn
-      thistask's transaction number,      from tttn
-      the message's gsoc flag,            from gflag
-      the message's name qualifier,       from gname
-      the message's length,               from glen
-      the message's status,               from gstatus
-      the message's value                 from gval
-      ]
+*  Language:
+*     Starlink C
 
-      or (!local)
+*  Algorithm:
+*     System wishes to send a gsocend message to queue targetq.
+*     The format of such a message is (local)
+*     
+*     [C_LOC_GSOC_END_OUT
+*     the othertask's transaction number, from ottn
+*     thistask's transaction number,      from tttn
+*     the message's gsoc flag,            from gflag
+*     the message's name qualifier,       from gname
+*     the message's length,               from glen
+*     the message's status,               from gstatus
+*     the message's value                 from gval
+*     ]
+*     
+*     or (!local)
+*     
+*     [C_REM_GSOC_END_OUT
+*     local nettask's transaction number,              from ottn
+*     thistask's (local_task) transaction number,      from tttn
+*     the message's gsoc flag,                         from gflag
+*     the message's name qualifier,                    from gname
+*     the message's length,                            from glen
+*     the message's status,                            from gstatus
+*     the message's value                              from gval
+*     
+*     If this task's transaction number, 'tttn' is not null, that is we
+*     have just sent an end of transaction message as part of an active
+*     transaction (as distinct from a failed attempt to establish a
+*     transaction end (see newtrans() and rnewtrans())) we use
+*     ams_freetrans() to release the transaction recorded in t_trans[].
 
-      [C_REM_GSOC_END_OUT
-      local nettask's transaction number,              from ottn
-      thistask's (local_task) transaction number,      from tttn
-      the message's gsoc flag,                         from gflag
-      the message's name qualifier,                    from gname
-      the message's length,                            from glen
-      the message's status,                            from gstatus
-      the message's value                              from gval
+*  Authors:
+*     {original_author_entry}
 
-      If this task's transaction number, 'tttn' is not null, that is we
-      have just sent an end of transaction message as part of an active
-      transaction (as distinct from a failed attempt to establish a
-      transaction end (see newtrans() and rnewtrans())) we use
-      ams_freetrans() to release the transaction recorded in t_trans[].
-     Authors :
-     History :
-      12Apr 1994: make function static (BDK)
+*  History:
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2477,7 +3219,6 @@ int *status             /* global status (given and returned) */
    }
 }
 
-/*=  AMS_SENDGSOCSTART */
 
 static void ams_sendgsocstart
 (
@@ -2491,48 +3232,66 @@ char *message_value,    /* message value (given) */
 int *status             /* global status (given and returned) */
 )
 
-/*   Method :
+/*
+*+
+*  Name:
+*     AMS_SENDGSOCSTART
 
-      The caller wishes to send the first message on path 'path' in
-      messys internal format as the start of a new transaction 'messid'
-      using the command queue of the other task associated with this path
-      (held in t_paths[path].other_com_q) We need to send a local/remote
-      gsoc_start message:- Depending on whether the target is remote or
-      local (decerned by looking at t_paths[path].machine_num which will
-      be MESSYS__NULL_M in the case of a local task) this code sends
+*  Language:
+*     Starlink C
 
-      (local)
+*  Algorithm:
+*     The caller wishes to send the first message on path 'path' in
+*     messys internal format as the start of a new transaction 'messid'
+*     using the command queue of the other task associated with this path
+*     (held in t_paths[path].other_com_q) We need to send a local/remote
+*     gsoc_start message:- Depending on whether the target is remote or
+*     local (decerned by looking at t_paths[path].machine_num which will
+*     be MESSYS__NULL_M in the case of a local task) this code sends
+*     
+*     (local)
+*     
+*     [C_LOC_GSOC_START_OUT,
+*     the othertask's command queue,  from t_paths[path].other_com_q
+*     the othertask's pathnumber,     from t_paths[path].other_pathnum
+*     thistask's transaction number,  from messid
+*     thistask's acknowledge queue,   from t_trans[messid].this_task_ack_q
+*     the message's gsoc flag,        from message_context
+*     the message's name qualifier,   from message_name
+*     the message's length,           from message_length
+*     the message's value             from message_value
+*     ]
+*     
+*     or (remote)
+*     
+*     [C_REM_GSOC_START_OUT,
+*     local_nettask's command queue,    from t_paths[path].other_com_q
+*     local nettask's path number,      from t_paths[path].other_pathnum
+*     thistask's (local_task) transaction number,
+*                                       from messid
+*     thistask's acknowledge queue(local_task_init_ack_q),
+*                                       from t_trans[messid].this_task_ack_q
+*     thistask's (local_task)name,      from the global taskname
+*     the message's gsoc flag,          from message_context
+*     the message's name qualifier,     from message_name
+*     the message's length,             from message_length
+*     the message's value               from message_value
+*     ]
 
-      [C_LOC_GSOC_START_OUT,
-      the othertask's command queue,  from t_paths[path].other_com_q
-      the othertask's pathnumber,     from t_paths[path].other_pathnum
-      thistask's transaction number,  from messid
-      thistask's acknowledge queue,   from t_trans[messid].this_task_ack_q
-      the message's gsoc flag,        from message_context
-      the message's name qualifier,   from message_name
-      the message's length,           from message_length
-      the message's value             from message_value
-      ]
+*  Authors:
+*     {original_author_entry}
 
-      or (remote)
+*  History:
+*     11-APR-1994 (BDK):
+*        Pass message components as separate arguments
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
 
-      [C_REM_GSOC_START_OUT,
-      local_nettask's command queue,    from t_paths[path].other_com_q
-      local nettask's path number,      from t_paths[path].other_pathnum
-      thistask's (local_task) transaction number,
-                                        from messid
-      thistask's acknowledge queue(local_task_init_ack_q),
-                                        from t_trans[messid].this_task_ack_q
-      thistask's (local_task)name,      from the global taskname
-      the message's gsoc flag,          from message_context
-      the message's name qualifier,     from message_name
-      the message's length,             from message_length
-      the message's value               from message_value
-]
-     Authors :
-     History :
-      11Apr 1994: pass message components as separate arguments (BDK)
-      12Apr 1994: make function static (BDK)
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2580,7 +3339,6 @@ int *status             /* global status (given and returned) */
    }
 }
 
-/*=  AMS_SENDINIT */
 
 static void ams_sendinit 
 ( 
@@ -2589,43 +3347,61 @@ int messid,         /* temporary transaction (given) */
 int *status         /* global status (given and returned) */
 )
 
-/*   Method :
-      The caller wishes to send an init message for path 'path'
-      as part of the temporary transaction 'messid'.
-      Depending on whether the target is remote or local
-      (decerned by looking at t_paths[path].machine_num which
-      will be MESSYS__NULL_M in the case of a local task)
-      this code sends (local)
+/*
+*+
+*  Name:
+*     AMS_SENDINIT
 
-      [C_LOC_INIT_OUT,
-      the othertask's command queue,      from t_paths[path].other_com_q
-      thistask's name,                    from the global taskname
-      the othertask's name,               from t_paths[path].other_taskname
-      thistask's pathnumber,              from path
-      thistask's init acknowledge queue,  from t_trans[messid].this_task_ack_q
-      thistask's command queue,           from the global command_q
-      ]
+*  Language:
+*     Starlink C
 
-      or (remote)
+*  Algorithm:
+*     The caller wishes to send an init message for path 'path'
+*     as part of the temporary transaction 'messid'.
+*     Depending on whether the target is remote or local
+*     (decerned by looking at t_paths[path].machine_num which
+*     will be MESSYS__NULL_M in the case of a local task)
+*     this code sends (local)
+*     
+*     [C_LOC_INIT_OUT,
+*     the othertask's command queue,      from t_paths[path].other_com_q
+*     thistask's name,                    from the global taskname
+*     the othertask's name,               from t_paths[path].other_taskname
+*     thistask's pathnumber,              from path
+*     thistask's init acknowledge queue,  from t_trans[messid].this_task_ack_q
+*     thistask's command queue,           from the global command_q
+*     ]
+*     
+*     or (remote)
+*     
+*     [C_REM_INIT_OUT,
+*     local_nettask_command_q,     from t_paths[path].other_com_q
+*     thistask's (local_task)name, from the global taskname
+*     remote_taskname,             from t_paths[path].other_taskname
+*     remote_machine_name,         from machine_names[t_paths[path].machine_num]
+*     thistask's pathnumber(local_task_t_path_num),      from path
+*     thistask's init acknowledge queue(local_task_init_ack_q),
+*                                  from t_trans[messid].this_task_ack_q
+*     thistask's command queue(local_task_com_q),
+*                                  from the global command_q
+*     ]
+*     
+*     to the t_paths[path].other_com_q (the other task's command queue)
+*     using msp_send_message(). If the send fails, then ams_remove() is
+*     used to remove the path connection to the other task.
 
-      [C_REM_INIT_OUT,
-      local_nettask_command_q,     from t_paths[path].other_com_q
-      thistask's (local_task)name, from the global taskname
-      remote_taskname,             from t_paths[path].other_taskname
-      remote_machine_name,         from machine_names[t_paths[path].machine_num]
-      thistask's pathnumber(local_task_t_path_num),      from path
-      thistask's init acknowledge queue(local_task_init_ack_q),
-                                   from t_trans[messid].this_task_ack_q
-      thistask's command queue(local_task_com_q),
-                                   from the global command_q
-      ]
+*  Authors:
+*     {original_author_entry}
 
-      to the t_paths[path].other_com_q (the other task's command queue)
-      using msp_send_message(). If the send fails, then ams_remove() is
-      used to remove the path connection to the other task.
-     Authors :
-     History :
-      12Apr 1994: make function static (BDK)
+*  History:
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2663,7 +3439,6 @@ int *status         /* global status (given and returned) */
    }
 }
 
-/*=  AMS_SENDINITACK */
 
 static void ams_sendinitack 
 ( 
@@ -2674,34 +3449,52 @@ int thispathno,       /* this task's path number (given) */
 int *status           /* global status (give and returned) */
 )
 
-/*   Method :
-      The system has successfully set up a path end 'thispathno' in
-      reponse to a INIT path request and now wishes to send a INIT path
-      acknowlege message to the acknowledge queue of the requester
-      ('ackq') whose path end index was 'otherpathno'. We, depending on
-      'local', send
+/*
+*+
+*  Name:
+*     AMS_SENDINITACK
 
-       local (local == 1)
+*  Language:
+*     Starlink C
 
-      [C_LOC_ACK_OUT,
-      the othertasks path end index                  from otherpathno
-      this tasks recently established path end index from thispathno
-      ]
+*  Algorithm:
+*     The system has successfully set up a path end 'thispathno' in
+*     reponse to a INIT path request and now wishes to send a INIT path
+*     acknowlege message to the acknowledge queue of the requester
+*     ('ackq') whose path end index was 'otherpathno'. We, depending on
+*     'local', send
+*     
+*      local (local == 1)
+*     
+*     [C_LOC_ACK_OUT,
+*     the othertasks path end index                  from otherpathno
+*     this tasks recently established path end index from thispathno
+*     ]
+*     
+*     or remote (local == 0)
+*     
+*     [C_REM_ACK_OUT,
+*     the local nettasks path end index              from otherpathno
+*     this tasks recently established path end index from thispathno
+*     ]
+*     
+*     using msp_send_message() with target queue 'ackq'.  If the send
+*     failed we use ams_freepath() to release the path end in the
+*     knowledge that the othertask will timeout waiting for the ack and
+*     free its path end as well.
 
-      or remote (local == 0)
+*  Authors:
+*     {original_author_entry}
 
-      [C_REM_ACK_OUT,
-      the local nettasks path end index              from otherpathno
-      this tasks recently established path end index from thispathno
-      ]
+*  History:
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
 
-      using msp_send_message() with target queue 'ackq'.  If the send
-      failed we use ams_freepath() to release the path end in the
-      knowledge that the othertask will timeout waiting for the ack and
-      free its path end as well.
-     Authors :
-     History :
-      12Apr 1994: make function static (BDK)
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2734,7 +3527,6 @@ int *status           /* global status (give and returned) */
    }
 }
 
-/*=  AMS_SENDMESSAGE */
 
 static void ams_sendmessage
 (
@@ -2748,66 +3540,83 @@ char *message_value,     /* message value (given) */
 int *status              /* global status (given and returned) */
 )
 
-/*   Method :
+/*
+*+
+*  Name:
+*     AMS_SENDMESSAGE
 
-      The caller wishes to send the message on path 'path' in messys
-      internal format as part of transaction 'messid' using the
-      othertask's transaction acknowledge queue associated with this
-      transaction on this path.
+*  Language:
+*     Starlink C
 
-      We need to send either a local/remote MSG_OUT message OR depending
-      on the message status being MESSYS__PARAMREQ or MESSYS__PARAMREP or
-      MESSYS__INFORM or MESSYS__SYNC or MESSYS__SYNCREP or
-      MESSYS__TRIGGER or DTASK__ACTSTART a local/remote GSOC_END message
-      using ams_sendgsocend().
+*  Algorithm:
+*     The caller wishes to send the message on path 'path' in messys
+*     internal format as part of transaction 'messid' using the
+*     othertask's transaction acknowledge queue associated with this
+*     transaction on this path.
+*     
+*     We need to send either a local/remote MSG_OUT message OR depending
+*     on the message status being MESSYS__PARAMREQ or MESSYS__PARAMREP or
+*     MESSYS__INFORM or MESSYS__SYNC or MESSYS__SYNCREP or
+*     MESSYS__TRIGGER or DTASK__ACTSTART a local/remote GSOC_END message
+*     using ams_sendgsocend().
+*     
+*     Depending on whether the target is remote or local (discerned by
+*     looking at t_paths[path].machine_num which will be MESSYS__NULL_M
+*     in the case of a local task) this code sends
+*     
+*     (local)
+*     
+*     [C_LOC_MSG_OUT (depending on status member of source),
+*     the othertask's acknowledge queue,  from t_trans[messid].other_task_ack_q
+*     thistask's acknowldege queue,       from t_trans[messid].this_task_ack_q
+*     the othertask's transaction number, from t_trans[messid].other_transnum
+*     thistask's transaction number,      from messid
+*     the message's gsoc flag,            from message_context
+*     the message's name qualifier,       from message_name
+*     the message's length,               from message_length
+*     the message's status,               from message_status
+*     the message's value                 from message_value
+*     ]
+*     
+*     or (remote)
+*     
+*     [C_REM_MSG_OUT (depending on status member of source),
+*     local_nettask's acknowledge queue,   from t_trans[messid].other_task_ack_q
+*     local nettask's transaction number,  from t_trans[messid].other_transnum
+*     thistask's acknowledge queue(local_task__ack_q),
+*                                          from t_trans[messid].this_task_ack_q
+*     thistask's (local_task) transaction number,
+*                                          from messid
+*     the message's gsoc flag,             from message_context
+*     the message's name qualifier,        from message_name
+*     the message's length,                from message_length
+*     the message's status,                from message_status
+*     the message's value                  from message_value
+*     ]
+*     
+*     to the target queue targetq using msp_send_message(). 
+*     
+*     Note : If the code ends up sending a GSOC_END message using
+*     ams_sendgsocend() then within ams_sendgsocend() ams_freetrans() is
+*     used to free the transaction entry in transfree[] and t_trans[] as
+*     the transaction just completed. If the send fails, then
+*     ams_remove() is used to remove the path connection to the other
+*     task, otherwise we return SAI__OK.
 
-      Depending on whether the target is remote or local (discerned by
-      looking at t_paths[path].machine_num which will be MESSYS__NULL_M
-      in the case of a local task) this code sends
+*  Authors:
+*     {original_author_entry}
 
-      (local)
+*  History:
+*     11-APR-1994 (BDK):
+*        Pass message components as separate arguments
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
 
-      [C_LOC_MSG_OUT (depending on status member of source),
-      the othertask's acknowledge queue,  from t_trans[messid].other_task_ack_q
-      thistask's acknowldege queue,       from t_trans[messid].this_task_ack_q
-      the othertask's transaction number, from t_trans[messid].other_transnum
-      thistask's transaction number,      from messid
-      the message's gsoc flag,            from message_context
-      the message's name qualifier,       from message_name
-      the message's length,               from message_length
-      the message's status,               from message_status
-      the message's value                 from message_value
-      ]
+*  Bugs:
+*     {note_any_bugs_here}
 
-      or (remote)
-
-      [C_REM_MSG_OUT (depending on status member of source),
-      local_nettask's acknowledge queue,   from t_trans[messid].other_task_ack_q
-      local nettask's transaction number,  from t_trans[messid].other_transnum
-      thistask's acknowledge queue(local_task__ack_q),
-                                           from t_trans[messid].this_task_ack_q
-      thistask's (local_task) transaction number,
-                                           from messid
-      the message's gsoc flag,             from message_context
-      the message's name qualifier,        from message_name
-      the message's length,                from message_length
-      the message's status,                from message_status
-      the message's value                  from message_value
-      ]
-
-      to the target queue targetq using msp_send_message(). 
-
-      Note : If the code ends up sending a GSOC_END message using
-      ams_sendgsocend() then within ams_sendgsocend() ams_freetrans() is
-      used to free the transaction entry in transfree[] and t_trans[] as
-      the transaction just completed. If the send fails, then
-      ams_remove() is used to remove the path connection to the other
-      task, otherwise we return SAI__OK.
-
-     Authors :
-     History :
-      11Apr 1994: pass message components as separate arguments (BDK)
-      12Apr 1994: make function static (BDK)
+*-
 */
 
 
@@ -2875,7 +3684,6 @@ int *status              /* global status (given and returned) */
    }
 }
 
-/*=  AMS_SENDOBEY */
 
 static void ams_sendobey
 (
@@ -2886,21 +3694,39 @@ char *value,           /* message to be passed to main-line code (given) */
 int *status            /* global status (given and returned) */
 )
 
-/*   Method :
-      When an the application wishes to send a soft interrupt (ast/kick
-      etc) the messys layer sends itself a message on a queue particular
-      to the hardware source of the interrupt. This routine sends
+/*
+*+
+*  Name:
+*     AMS_SENDOBEY
 
-      [C_LOC_MSG_OUT,nullt,nullt,OBEY,name,length,SAI__OK,value]
+*  Language:
+*     Starlink C
 
-      to queue targetq using msp_send_message() using command_q as a
-      reply queue. The given length specifies the length of the 'value'
-      part of the message. The name argument (whose length must be
-      MSG_NAME_LEN or less) qualifies the message being sent in 'value'
-      See messys_struct.h for layout of messys messages.
-     Authors :
-     History :
-      12Apr 1994: make function static (BDK)
+*  Algorithm:
+*     When an the application wishes to send a soft interrupt (ast/kick
+*     etc) the messys layer sends itself a message on a queue particular
+*     to the hardware source of the interrupt. This routine sends
+*     
+*     [C_LOC_MSG_OUT,nullt,nullt,OBEY,name,length,SAI__OK,value]
+*     
+*     to queue targetq using msp_send_message() using command_q as a
+*     reply queue. The given length specifies the length of the 'value'
+*     part of the message. The name argument (whose length must be
+*     MSG_NAME_LEN or less) qualifies the message being sent in 'value'
+*     See messys_struct.h for layout of messys messages.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2926,18 +3752,35 @@ int *status            /* global status (given and returned) */
 }
 
 
-/*=  AMS_SETTIMEOUT */
 
 static void ams_settimeout
 (
 int time,        /* timeout in milliseconds (given) */
 int *status      /* global status (given and returned) */
 )
-/*   Method :
-      Sets up a timeout event to occur in 'time' millseconds
-     Authors :
-     History :
-      12Apr 1994: make function static (BDK)
+/*
+*+
+*  Name:
+*     AMS_SETTIMEOUT
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Sets up a timeout event to occur in 'time' millseconds
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 {
    atimer_settimr ( time, MESSYS__TIMEOUTID, ams_timeout, status );
@@ -2945,22 +3788,43 @@ int *status      /* global status (given and returned) */
 
 
 
-/*=  AMS_TIMEOUT - cause AMS_RECEIVE or GETREPLY to timeout */
 
 static void ams_timeout
 (
 int parm                          /* the timeout parameter (given) */
 )
 
-/*   Method :
-      This routine is assumed to be called from the timer's signal handler.
-      It writes an empty message onto this task's timeout queue, thereby
-      causing AMS_RECEIVE or AMS_GETREPLY to detect the condition.
-     Authors :
-      B.D.Kelly (ROE)
-     History :
-      10 Mar 1994: original (BDK)
-      12Apr 1994: make function static (BDK)
+/*
+*+
+*  Name:
+*     AMS_TIMEOUT
+
+*  Purpose:
+*     Cause AMS_RECEIVE or GETREPLY to timeout 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     This routine is assumed to be called from the timer's signal handler.
+*     It writes an empty message onto this task's timeout queue, thereby
+*     causing AMS_RECEIVE or AMS_GETREPLY to detect the condition.
+
+*  Authors:
+*     B.D.Kelly (ROE)
+*     {enter_new_authors_here}
+
+*  History:
+*     10-MAR-1994 (BDK):
+*        Original
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 {
    struct a_mess_out mess_out;    /* the message sent */
@@ -2991,7 +3855,6 @@ int parm                          /* the timeout parameter (given) */
 }
 
 
-/*=  AMS_TRANSLATE */
 
 static void ams_translate
 ( 
@@ -3012,27 +3875,49 @@ char *message_value,              /* message value (returned) */
 int *status                       /* global status (given and returned) */
 )
 
-/*   Method :
-      The system has received a local message as part of the transaction
-      'loc_msg_in->this_task_t_trans_num' (set into *messid) on path
-      t_trans[*messid].t_path_num (set into *path).
+/*
+*+
+*  Name:
+*     AMS_TRANSLATE
 
-      This routine updates the transaction entry for this end (in
-      particular adding the other task's acknowledge queue and
-      transaction end index if the existing transaction end this end is
-      missing this information) and then uses ams_unpacklocmsg() to
-      unpack the message.
+*  Language:
+*     Starlink C
 
-      If the path associated with the transaction has been closed or
-      changed this routine sets *status to MESSYS__BADPATH but still
-      unpacks the message.
-     Authors :
-     History :
-      15Jun 1992: Created: irj 
-      18Jun 1992: Tidied : irj, skr 
-      11Apr 1994: return message components as separate arguments (BDK)
-      12Apr 1994: make function static (BDK)
-      17Aug 1994: Use local status on call to ams_unpacklocmsg (BKM)
+*  Algorithm:
+*     The system has received a local message as part of the transaction
+*     'loc_msg_in->this_task_t_trans_num' (set into *messid) on path
+*     t_trans[*messid].t_path_num (set into *path).
+*     
+*     This routine updates the transaction entry for this end (in
+*     particular adding the other task's acknowledge queue and
+*     transaction end index if the existing transaction end this end is
+*     missing this information) and then uses ams_unpacklocmsg() to
+*     unpack the message.
+*     
+*     If the path associated with the transaction has been closed or
+*     changed this routine sets *status to MESSYS__BADPATH but still
+*     unpacks the message.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     18-JUN-1992 (IRJ,SKR):
+*        Tidied
+*     11-APR-1994 (BDK):
+*        Return message components as separate arguments
+*     12-APR-1994 (BDK):
+*        Make function static
+*     17-AUG-1994 (BKM):
+*        Use local status on call to ams_unpacklocmsg
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -3070,7 +3955,6 @@ int *status                       /* global status (given and returned) */
      message_length, message_value, &istat );
 }
 
-/*=  AMS_UNPACKLOCGSOC */
 
 static void ams_unpacklocgsoc
 (
@@ -3085,14 +3969,33 @@ char *message_value,                   /* message value (returned) */
 int *status                            /* global status (given and returned) */
 )       
 
-/*   Method :
-      Unpack a local gsoc start message.
-     Authors :
-     History :
-      11Apr 1994: return values as separate arguments, trap for
-                  overfilling buffers (BDK)
-      12Apr 1994: make function static (BDK)
-      23Jun 1994: fix one-off in trapping message_length (BDK)
+/*
+*+
+*  Name:
+*     AMS_UNPACKLOCGSOC
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Unpack a local gsoc start message.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     11-APR-1994: return values as separate arguments, trap for
+*                 overfilling buffers (BDK)
+*     12-APR-1994 (BDK):
+*        Make function static
+*     23-JUN-1994 (BDK):
+*        Fix one-off in trapping message_length
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 {
    int nlen;        /* length of name */
@@ -3124,7 +4027,6 @@ int *status                            /* global status (given and returned) */
 }
 
 
-/*=  AMS_UNPACKLOCMSG */
 
 static void ams_unpacklocmsg
 (
@@ -3139,14 +4041,33 @@ char *message_value,                   /* message value (returned) */
 int *status                            /* global status (given and returned) */
 )
 
-/*   Method :
-      Unpack a local message.
-     Authors :
-     History :
-      11Apr 1994: return values as separate arguments, trap for
-                  overfilling buffers (BDK)
-      12Apr 1994: make function static (BDK)
-      23Jun 1994: fix one-off in trapping message_length (BDK)
+/*
+*+
+*  Name:
+*     AMS_UNPACKLOCMSG
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Unpack a local message.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     11-APR-1994: return values as separate arguments, trap for
+*                 overfilling buffers (BDK)
+*     12-APR-1994 (BDK):
+*        Make function static
+*     23-JUN-1994 (BDK):
+*        Fix one-off in trapping message_length
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 {
    int nlen;        /* length of name */
@@ -3177,7 +4098,6 @@ int *status                            /* global status (given and returned) */
    }
 }
 
-/*=  AMS_UNPACKREMGSOC */
 
 static void ams_unpackremgsoc
 (
@@ -3192,14 +4112,33 @@ char *message_value,                   /* message value (returned) */
 int *status                            /* global status (given and returned) */
 )
 
-/*   Method :
-      Unpack a remote gsoc start message.
-     Authors :
-     History :
-      11Apr 1994: return values as separate arguments, trap for
-                  overfilling buffers (BDK)
-      12Apr 1994: make function static (BDK)
-      23Jun 1994: fix one-off in trapping message_length (BDK)
+/*
+*+
+*  Name:
+*     AMS_UNPACKREMGSOC
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Unpack a remote gsoc start message.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     11-APR-1994: return values as separate arguments, trap for
+*                 overfilling buffers (BDK)
+*     12-APR-1994 (BDK):
+*        Make function static
+*     23-JUN-1994 (BDK):
+*        Fix one-off in trapping message_length
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -3233,7 +4172,6 @@ int *status                            /* global status (given and returned) */
    }
 }
 
-/*=  AMS_UNPACKREMMSG */
 
 static void ams_unpackremmsg
 (
@@ -3248,13 +4186,31 @@ char *message_value,                   /* message value (returned) */
 int *status                            /* global status (given and returned) */
 )
 
-/*   Method :
-      Unpack a remote message.
-     Authors :
-     History :
-      11Apr 1994: return values as separate arguments, trap for
-                  overfilling buffers (BDK)
-      12Apr 1994: make function static (BDK)
+/*
+*+
+*  Name:
+*     AMS_UNPACKREMMSG
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Unpack a remote message.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     11-APR-1994: return values as separate arguments, trap for
+*                 overfilling buffers (BDK)
+*     12-APR-1994 (BDK):
+*        Make function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -3289,4 +4245,3 @@ int *status                            /* global status (given and returned) */
       *status = MESSYS__BUFOV;
    }
 }
-

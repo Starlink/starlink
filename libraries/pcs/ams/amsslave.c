@@ -1,14 +1,21 @@
-/* amsslave
- * A test of ams - run in conjunction with amsmaster
- *   % amsslave &
- *   % amsmaster
+/*
+ *+
+ *  Name:
+ *     amsslave
  *
- * History:
- *   xx-xxx-1994 (BDK):
- *      Original
- *    7-JUL-1994 (AJC):
- *      Tidy header files (some now renamed).
+ *  Purpose:
+ *     A test of ams - run in conjunction with amsmaster
  *
+ *  Description:
+ *     % amsslave &
+ *     % amsmaster
+ *
+ *  History:
+ *     xx-xxx-1994 (BDK):
+ *        Original
+ *     7-JUL-1994 (AJC):
+ *        Tidy header files (some now renamed).
+ *-
 */
 #include <stdio.h>
 #include <time.h>
