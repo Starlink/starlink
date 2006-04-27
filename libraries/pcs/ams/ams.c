@@ -250,41 +250,24 @@ int *status                          /* global status (given and
    *status = SAI__OK;
 }
 
-
+/*= AMS_ADDREST */
 
 static void ams_addrest
 (
 struct a_loc_ack_in * loc_ack_in,  /* received ack_in structure (given) */
 int path,                          /* path of init transaction (given) */
 int messid,                        /* messid of init transaction (given) */
-sendq_type reply_q,                /* queue for sending rejection (given)
-/*
-*+
-*  Name:
-*     AMS_ADDREST
-
-*  Language:
-*     Starlink C
-
-*  Authors:
-*     {original_author_entry}
-
-*  History:
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
-
-*-
-*/
+sendq_type reply_q,                /* queue for sending rejection (given) */
 int *status                        /* global status (given and returned) */
 )
 
-/*   Method :
+
+/*  Method :
       This task has sent an "init" message to another task requesting a
       connecting path to be set up. A positive reply has been received.
       Check the reply is valid and complete the data structure for the
       path.
+
      Authors :
      History :
       Created: irj 15/6/92
@@ -722,21 +705,7 @@ int *status                        /* global status (given and returned) */
 
 
 #if USE_ON_EXIT
-static void ams_exit1
-( 
- int iarg,		/* exit() value  - not used */
- void * arg,            /* Argument to on_exit - not used */
-)
-{
-    ams_exit();
-}
-#endif
 
-
-void ams_exit 
-( 
-void
-)
 /*
 *+
 *  Name:
@@ -773,6 +742,23 @@ void
 *     {note_any_bugs_here}
 
 *-
+*/
+
+static void ams_exit1
+( 
+ int iarg,		/* exit() value  - not used */
+ void * arg,            /* Argument to on_exit - not used */
+)
+{
+    ams_exit();
+}
+#endif
+
+void ams_exit 
+( 
+void
+)
+
 /*
 *+
 *  Name:
@@ -1819,32 +1805,11 @@ int *status       /* global status (given and returned) */
    ams_nalookup ( name, path, &netind, task, mach, &remote, status );
 }
 
+/*= AMS_PATH - get a communications path to another task */
 
 void ams_path
 (
-char *other_task_name,  /* name of task to which path is required (given)
-/*
-*+
-*  Name:
-*     AMS_PATH
-
-*  Purpose:
-*     Get a communications path to another task 
-
-*  Language:
-*     Starlink C
-
-*  Authors:
-*     {original_author_entry}
-
-*  History:
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
-
-*-
-*/
+char *other_task_name,  /* name of task to which path is required (given) */
 int *path,              /* pointer to the path (returned) */
 int *status             /* global status (given and returned) */
 )
@@ -2105,32 +2070,14 @@ int *status                        /* global status (given and returned) */
    *status = SAI__OK;
 }
 
+/*= AMS_RADDREST */
 
 static void ams_raddrest
 (
 struct a_rem_ack_in *rem_ack_in,  /* received ack_in structure (given) */
 int path,                         /* path of init transaction (given) */
 int messid,                       /* messid of init transaction (given) */
-sendq_type replyq,                /* queue for sending rejections (given)
-/*
-*+
-*  Name:
-*     AMS_RADDREST
-
-*  Language:
-*     Starlink C
-
-*  Authors:
-*     {original_author_entry}
-
-*  History:
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
-
-*-
-*/
+sendq_type replyq,                /* queue for sending rejections (given) */
 int *status                       /* global status (given and returned) */
 )
 
