@@ -450,6 +450,31 @@ itcl::class gaia::GaiaArd {
       destroy $w_
    }
 
+   #  Make sure backing store image is update if displayed data is volatile
+   #  (usual case for slices from cubes). Also need to restore graphics, if
+   #  image is reopened.
+   protected method save_if_volatile {} {
+      if { [$itk_option(-rtdimage) volatile] } {
+
+         #  Save description so we can restore it.
+         set tmpfile [make_tmpname_]
+         $Toolbox_ save_description $tmpfile
+
+         #  Update image.
+         $itk_option(-image) save_if_volatile
+
+         #  Restore description.
+         $Toolbox_ read_description $tmpfile
+      }
+   }
+
+   #  Determine a name for a new temporary file.
+   protected method make_tmpname_ {} {
+      incr count_
+      set tempfiles_($count_) "GaiaArdIn${count_}.Dat"
+      return $tempfiles_($count_)
+   }
+
    #  Save ARD description to a file.
    public method save_file {{filename ""}} {
       if { $filename == "" } {
@@ -477,13 +502,11 @@ itcl::class gaia::GaiaArd {
       }
 
       #  First save the current description to a file
-      incr count_
-      set tempfiles_($count_) "GaiaArdIn${count_}.Dat"
-      set tmpfile_ $tempfiles_($count_)
+      set tmpfile [make_tmpname_]
       if { $mode == "all" } {
-         set ok [$Toolbox_ save_description $tmpfile_]
+         set ok [$Toolbox_ save_description $tmpfile]
       } else {
-         set ok [$Toolbox_ save_selected_description $tmpfile_]
+         set ok [$Toolbox_ save_selected_description $tmpfile]
       }
       if { $ok } {
          #  Now startup the Ardstat application.
@@ -506,15 +529,14 @@ itcl::class gaia::GaiaArd {
 	       set complete_cmd_ $args
 	    }
 
-            #  Make sure that the disk image is up to date. Only relevant for
-            #  volatile images (from cubes).
-            $itk_option(-image) save_if_volatile
+            #  Make sure that the disk image is up to date.
+            save_if_volatile
 
             #  And ARDSTAT on the image and file.
             blt::busy hold $w_
             update idletasks
             $ardstat_ runwiths \
-               "in=$image simple=f full=t oneline=t region=^${tmpfile_}"
+               "in=$image simple=f full=t oneline=t region=^${tmpfile}"
 
          } else {
             error_dialog "No image is displayed"
@@ -564,14 +586,12 @@ itcl::class gaia::GaiaArd {
    #  is a command to execute when task really finishes.
    public method blank {mode args} {
 
-      #  First save the current description to a file
-      incr count_
-      set tempfiles_($count_) "GaiaArdIn${count_}.Dat"
-      set tmpfile_ $tempfiles_($count_)
+      #  First save the current description to a file.
+      set tmpfile [make_tmpname_]
       if { $mode == "all" } {
-         set ok [$Toolbox_ save_description $tmpfile_]
+         set ok [$Toolbox_ save_description $tmpfile]
       } else {
-         set ok [$Toolbox_ save_selected_description $tmpfile_]
+         set ok [$Toolbox_ save_selected_description $tmpfile]
       }
       if { $ok } {
 
@@ -597,13 +617,12 @@ itcl::class gaia::GaiaArd {
 	       set complete_cmd_ $args
 	    }
 
-            #  Make sure that the disk image is up to date. Only relevant for
-            #  volatile images (from cubes).
-            $itk_option(-image) save_if_volatile
+            #  Make sure that the disk image is up to date.
+            save_if_volatile
 
             #  And run ARDMASK on the image and file.
             blt::busy hold $w_
-            $ardmask_ runwiths "in=$image ardfile=$tmpfile_ out=$tmpimage_"
+            $ardmask_ runwiths "in=$image ardfile=$tmpfile out=$tmpimage_"
          } else {
             error_dialog "No image is displayed"
          }
@@ -621,22 +640,20 @@ itcl::class gaia::GaiaArd {
    #  Extract regions and display in a new clone.
    public method extract {mode} {
 
-      #  First save the current description to a file
-      incr count_
-      set tempfiles_($count_) "GaiaArdIn${count_}.Dat"
-      set tmpfile_ $tempfiles_($count_)
+      #  First save the current description to a file.
+      set tmpfile [make_tmpname_]
       if { $mode == "all" } {
-         set ok [$Toolbox_ save_description $tmpfile_]
+         set ok [$Toolbox_ save_description $tmpfile]
       } else {
-         set ok [$Toolbox_ save_selected_description $tmpfile_]
+         set ok [$Toolbox_ save_selected_description $tmpfile]
       }
       if { $ok } {
 
          #  Need to invert the sense of the ARD region for extraction.
-	   set f [::open $tmpfile_ r]
+	   set f [::open $tmpfile r]
 	   set contents [::read $f]
 	   ::close $f
-	   set f [::open $tmpfile_ w]
+	   set f [::open $tmpfile w]
 	   puts -nonewline $f {.NOT.(}
            puts -nonewline $f $contents
            puts $f {)}
@@ -660,13 +677,12 @@ itcl::class gaia::GaiaArd {
               incr count_
               set tmpimage_ "GaiaArdImg${count_}"
 
-              #  Make sure that the disk image is up to date. Only relevant for
-              #  volatile images (from cubes).
-              $itk_option(-image) save_if_volatile
+              #  Make sure that the disk image is up to date.
+              save_if_volatile
 
               #  And run ARDMASK on the image and file.
               blt::busy hold $w_
-              $ardmask_ runwiths "in=$image ardfile=$tmpfile_ out=$tmpimage_"
+              $ardmask_ runwiths "in=$image ardfile=$tmpfile out=$tmpimage_"
 	   } else {
               error_dialog "No image is displayed"
 	   }
@@ -702,9 +718,8 @@ itcl::class gaia::GaiaArd {
          incr count_
          set tmpimage_ "GaiaArdImg${count_}"
 
-         #  Make sure that the disk image is up to date. Only relevant for
-         #  volatile images (from cubes).
-         $itk_option(-image) save_if_volatile
+         #  Make sure that the disk image is up to date.
+         save_if_volatile
 
          #  And run autocrop on the image and file.
          blt::busy hold $w_
