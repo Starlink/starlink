@@ -1,13 +1,35 @@
-*+  DTASK_SYS - internal constants for DTASK library
-*    Authors:
+*+
+*  Name:
+*     DTASK_SYS
+
+*  Purpose:
+*     Internal constants for DTASK library
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     FORTRAN INCLUDE
+
+*  Authors:
 *     Dennis Kelly (REVAD::BDK)
 *     Alan Chipperfield (RLVAD::AJC)
-*    History :
-*     25.04.1991:  original (REVAD::BDK)
-*     03.05.1991:  increase MAXACT to match SUBPAR limit (REVAD::BDK)
-*     13.05.1991:  update comments (REVAD::BDK)
-*     13.10.1992:  add DTASK__SYSNORM (RLVAD::AJC)
-*    endhistory
+*     {enter_new_authors_here}
+
+*  History:
+*     25-APR-1991 (REVAD::BDK):
+*        Original
+*     03-MAY-1991 (REVAD::BDK):
+*        Increase MAXACT to match SUBPAR limit
+*     13-MAY-1991 (REVAD::BDK):
+*        Update comments
+*     13-OCT-1992 (RLVAD::AJC):
+*        Add DTASK__SYSNORM
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
       INTEGER DTASK__MAXACT                   ! maximum number of

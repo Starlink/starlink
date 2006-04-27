@@ -1,25 +1,54 @@
-*+  DTASK_CMN - DTASK library common blocks
-*    Authors :
+*+
+*  Name:
+*     DTASK_CMN
+
+*  Purpose:
+*     DTASK library common blocks
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     COMMON BLOCK
+
+*  Authors:
 *     John Cooke (REVS::JAC) 17May84
-*    History :
-*     19Jun84:  added 'actcount' (REVA::ADAM) (John Cooke)
-*     19Jun84:  changed ASTCOM to hold two identifiers (REVA::ADAM)
+*     {enter_new_authors_here}
+
+*  History:
+*     19-JUN-1984: added 'actcount' (REVA::ADAM) (John Cooke)
+*     19-JUN-1984 (REVA::ADAM):
+*        Changed ASTCOM to hold two identifiers
 *               (John Cooke) 
-*     23.06.1985:  added ASTNAME  (REVAD::BDK)
-*     14.11.1989: Change value MAXACTTOT from 2**30  (RLVAD::AJC)
-*     25.04.1991: merged separate INCLUDE files, removed PARAMETERs 
+*     23-JUN-1985 (REVAD::BDK):
+*        Added ASTNAME
+*     14-NOV-1989 (RLVAD::AJC):
+*        Change value MAXACTTOT from 2**30
+*     25-APR-1991: merged separate INCLUDE files, removed PARAMETERs
 *                 (REVAD::BDK)
-*     30.04.1991: remove ASTNAME and REQASTPAR, use PAR__SZNAM instead of 
+*     30-APR-1991: remove ASTNAME and REQASTPAR, use PAR__SZNAM instead of
 *                 NAMELEN (REVAD::BDK)
-*     01.05.1991: remove ACTTOT (REVAD::BDK)
-*     03.05.1991: add ACTTIM (REVAD::BDK)
-*     09.05.1991: add ACTKEY (REVAD::BDK)
-*     09.05.1991: use SAVE statement (REVAD::BDK)
-*     13.05.1991: remove AST common block (REVAD::BDK)
-*     04.05.1991:  Rename ACTSTATE to ACTSTATUS (ROE::BMC)
-*     11.06.1991: add ACTCODE (REVAD::BDK)
-*     23.08.1993: Use SUBPAR__NAMELEN not PAR__SZNAM (RLVAD::AJC)
-*    endhistory
+*     01-MAY-1991 (REVAD::BDK):
+*        Remove ACTTOT
+*     03-MAY-1991 (REVAD::BDK):
+*        Add ACTTIM
+*     09-MAY-1991 (REVAD::BDK):
+*        Add ACTKEY
+*     09-MAY-1991 (REVAD::BDK):
+*        Use SAVE statement
+*     13-MAY-1991 (REVAD::BDK):
+*        Remove AST common block
+*     04-MAY-1991 (ROE::BMC):
+*        Rename ACTSTATE to ACTSTATUS
+*     11-JUN-1991 (REVAD::BDK):
+*        Add ACTCODE
+*     23-AUG-1993 (RLVAD::AJC):
+*        Use SUBPAR__NAMELEN not PAR__SZNAM
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
 *

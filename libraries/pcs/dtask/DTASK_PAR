@@ -1,16 +1,38 @@
-*+  DTASK_PAR - general parameter definitions dtasks
-*    Description:
+*+
+*  Name:
+*     DTASK_PAR
+
+*  Purpose:
+*     General parameter definitions dtasks
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     FORTRAN INCLUDE
+
+*  Description:
 *     Global parameter definitions for use by dtasks
-*    Authors:
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History:
-*     12.02.1987:  'applications' parameters copied from MESDEFNS 
+*     {enter_new_authors_here}
+
+*  History:
+*     12-FEB-1987: 'applications' parameters copied from MESDEFNS
 *                  (REVAD::BDK)
-*     07.03.1988:  add MESSAGE (REVAD::BDK)
-*     30.04.1991:  remove MESSAGE (use MESSYS__MESSAGE instead 
+*     07-MAR-1988 (REVAD::BDK):
+*        Add MESSAGE
+*     30-APR-1991: remove MESSAGE (use MESSYS__MESSAGE instead
 *                  (REVAD::BDK)
-*    endhistory
-*    Global constants:
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
 
       INTEGER INFINITE  !  infinite timeout for ADAM_ calls
       PARAMETER ( INFINITE = -1 )
@@ -23,4 +45,4 @@
       INTEGER EF_APP03    !  event flag for applications
       PARAMETER ( EF_APP03 = 23 )
 
-*-
+*.
