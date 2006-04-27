@@ -192,6 +192,7 @@ sub push_line {
                  }
               
 	my %types = (
+                               routine => 'SUBROUTINE',
                                c => 'CHAR',
                                'c*(*)' => 'CHAR',
                                'c*2' => 'CHAR*2',
