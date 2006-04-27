@@ -100,13 +100,64 @@ sub section {
 
 Contents of currently active section.
 
- @{$self->content} = ();
+ @{$parser->content} = ();
+ @lines = $parser->content;
+
+Returns the lines in list context, the reference to the internal
+array in scalar context.
 
 =cut
 
 sub content {
   my $self = shift;
-  return $self->{CONTENT};
+  if (wantarray) {
+    return @{$self->{CONTENT}};
+  } else {
+    return $self->{CONTENT};
+  }
+}
+
+=item B<tidy_content>
+
+Tidy the content for the current section. The base class trims off blank
+lines from the start and end of the section.
+
+ $parser->tidy_content();
+
+Called from flush_section() and can be sub-classed.
+
+=cut
+
+sub tidy_content {
+  my $self = shift;
+
+  # local copy for editing
+  my @content = $self->content;
+
+  # remove blank lines from the front
+  my $nonblank;
+  for my $pos (0..$#content) {
+    # loop until we 
+    if (defined $content[$pos] && $content[$pos] =~ /\S/) {
+      $nonblank = $pos;
+      last;
+    }
+  }
+  if (defined $nonblank) {
+    @content = @content[$nonblank..$#content];
+  }
+
+  # remove any blank lines from the end of the content
+  my $pos = $#content;
+  if ($pos > -1) {
+    while ($pos >=0 && $content[$pos] =~ /^\s*$/) {
+      $pos--;
+    }
+    @content = @content[0..$pos];
+  }
+
+  # Store it back
+  @{$self->content()} = @content;
 }
 
 =item B<flush_section>
@@ -123,32 +174,12 @@ sub flush_section {
   my $section = $self->section;
   return unless defined $section;
 
-  my @content = @{$self->{CONTENT}};
+  # tidy the content before storing
+  $self->tidy_content();
 
-  # remove blank lines from the front
-  my $nonblank;
-  for my $pos (0..$#content) {
-    # loop until we 
-    if (defined $content[$pos] && $content[$pos] =~ /\S/) {
-      $nonblank = $pos;
-      last;
-    }
-  }
-  if (defined $nonblank) {
-    @content = @content[$nonblank..$#content];
-  }
-
-
-  # remove any blank lines from the end of the content
-  my $pos = $#content;
-  if ($pos > -1) {
-    while ($pos >=0 && $content[$pos] =~ /^\s*$/) {
-      $pos--;
-    }
-    @content = @content[0..$pos];
-  }
   # store the content if we had content
   my $prl = $self->prologue;
+  my @content = $self->content();
   $prl->content( $section, @content) if @content;
 
   # reset internal state
