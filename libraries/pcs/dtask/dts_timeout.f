@@ -1,55 +1,79 @@
-*+  DTASK_TIMEOUT - interpret a message from a timer
       SUBROUTINE DTASK_TIMEOUT ( DTASK_APPLIC, VALUE, STATUS ) 
-*    Description :
+*+
+*  Name:
+*     DTASK_TIMEOUT
+
+*  Purpose:
+*     Interpret a message from a timer
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL DTASK_TIMEOUT ( DTASK_APPLIC, VALUE, STATUS )
+
+*  Description:
 *     Interpret a message from a timer. If necessary, activate the 
 *     application.
-*    Invocation :
-*     CALL DTASK_TIMEOUT ( DTASK_APPLIC, VALUE, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     DTASK_APPLIC=EXTERNAL (given)
 *           application calling routine
 *     VALUE=CHARACTER*(*) (returned)
 *           command-line parameter string
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Unpack the details of the timeout from the VALUE string. If the 
 *     timeout matches a currently active action, restart the OBEY.
-*    Deficiencies :
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     11.06.1991: developed from Adam v1 DTASK_INPUT (REVAD::BDK)
-*     13.10.1992:  add INCLUDE 'PAR_PAR' (RLVAD::AJC)
-*     23.08.1993:  Replace PAR_PAR with SUBPAR_SYS  (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     11-JUN-1991 (REVAD::BDK):
+*        Developed from Adam v1 DTASK_INPUT
+*     13-OCT-1992 (RLVAD::AJC):
+*        Add INCLUDE 'PAR_PAR'
+*     23-AUG-1993 (RLVAD::AJC):
+*        Replace PAR_PAR with SUBPAR_SYS
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'DTASK_SYS'
       INCLUDE 'MESSYS_ERR'
 
-*    Import :
+*  Arguments Given:
       EXTERNAL DTASK_APPLIC  ! application calling routine
       CHARACTER*(*) VALUE    ! command-line parameter string
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+*  Global Variables:
       INCLUDE 'DTASK_CMN'
 
-*    Local variables :
+*  Local Variables:
       INTEGER ACTPTR               ! action pointer
       INTEGER COUNT                ! requested action count number
       CHARACTER*4 RESVAL           ! copy of timer message VALUE
       INTEGER ASTVAL               ! for unpacking RESVAL
 
       EQUIVALENCE ( RESVAL, ASTVAL )
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN 
 *

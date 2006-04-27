@@ -1,15 +1,30 @@
-*+  DTASK_SETDUMP - Dummy for Unix: enable generation of stack dump on command
       SUBROUTINE DTASK_SETDUMP ( STATUS )
-*    Description :
+*+
+*  Name:
+*     DTASK_SETDUMP
+
+*  Purpose:
+*     Dummy for Unix: enable generation of stack dump on command
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL DTASK_SETDUMP ( STATUS )
+
+*  Description:
 *     Enable or re-enable facility for generating a stack dump of a 
 *     task.
-*    Invocation :
-*     CALL DTASK_SETDUMP ( STATUS )
-*    Parameters :
+
+*  Arguments:
 *     parameter[(dimensions)]=type(access)
 *           <description of parameter>
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     The first call of this routine will be from mainline code. In this 
 *     case, create a mailbox with a name based on the process name, and 
 *     start a QIO to it declaring a completion AST handler. The AST 
@@ -18,24 +33,30 @@
 *     QIO.
 *     Subsequent calls to this routine will be from the AST handler. In 
 *     this case, restart the QIO.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     13.08.1986:  Original (REVAD::BDK)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     13-AUG-1986 (REVAD::BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
-*-
+*  Local Variables:
+*.
 
 
       IF ( STATUS .NE. SAI__OK ) RETURN

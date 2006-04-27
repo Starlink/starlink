@@ -1,57 +1,81 @@
-*+  DTASK_SRCHKEY - search action list for given action keyword
       SUBROUTINE DTASK_SRCHKEY ( NAME, ACTPTR, STATUS )
-*    Description :
+*+
+*  Name:
+*     DTASK_SRCHKEY
+
+*  Purpose:
+*     Search action list for given action keyword
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL DTASK_SRCHKEY ( NAME, ACTPTR, STATUS )
+
+*  Description:
 *     Searches action list for the ACTIVE with the given keyword. If found,
 *     returns pointer and sets status DTASK__ACTACTIVE. If not found or 
 *     action not active returns ACTPTR=0 and status DTASK__NOTFOUND.
 *     returns error status. 
-*    Invocation :
-*     CALL DTASK_SRCHKEY ( NAME, ACTPTR, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     NAME=CHARACTER*(*) (given)
 *           action name
 *     ACTPTR=INTEGER (returned)
 *           pointer to this entry in the action list
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Do a sequential search through the names in the common block.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     John Cooke (REVS::JAC) 22May84
-*    History :
-*     07.06.1991: copied from DTASK_SRCHLST (REVAD::BDK)
-*     27.06.1991: correct spellings in comments (RLVAD::AJC)
-*     13.10.1992:  add INCLUDE 'PAR_PAR' (RLVAD::AJC)
-*     23.08.1993:  Replace PAR_PAR with SUBPAR_SYS  (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     07-JUN-1991 (REVAD::BDK):
+*        Copied from DTASK_SRCHLST
+*     27-JUN-1991 (RLVAD::AJC):
+*        Correct spellings in comments
+*     13-OCT-1992 (RLVAD::AJC):
+*        Add INCLUDE 'PAR_PAR'
+*     23-AUG-1993 (RLVAD::AJC):
+*        Replace PAR_PAR with SUBPAR_SYS
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'DTASK_SYS'
       INCLUDE 'DTASK_ERR'
 
-*    Import :
+*  Arguments Given:
       CHARACTER NAME*(*)  !   action keyword
 
-*    Export :
+*  Arguments Returned:
       INTEGER ACTPTR   !  pointer to this entry in the action list
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+*  Global Variables:
       INCLUDE 'DTASK_CMN'
 
-*    Local variables :
+*  Local Variables:
       INTEGER N
       LOGICAL FOUND
       LOGICAL DONE
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

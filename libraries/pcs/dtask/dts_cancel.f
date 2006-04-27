@@ -1,13 +1,27 @@
-*+  DTASK_CANCEL - cancel an action if active
       SUBROUTINE DTASK_CANCEL ( DTASK_APPLIC, PATH, MESSID, ACTPTR,
      :  VALUE, STATUS )
-*    Description :
+*+
+*  Name:
+*     DTASK_CANCEL
+
+*  Purpose:
+*     Cancel an action if active
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL DTASK_CANCEL ( DTASK_APPLIC, PATH, MESSID, ACTPTR,
+*     :  VALUE, STATUS )
+
+*  Description:
 *     Tell the application that a request has been received to cancel an 
 *     action which is currently waiting to be rescheduled.
-*    Invocation :
-*     CALL DTASK_CANCEL ( DTASK_APPLIC, PATH, MESSID, ACTPTR,
-*    :  VALUE, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     DTASK_APPLIC=EXTERNAL (given)
 *           address of action routine
 *     PATH=INTEGER (given)
@@ -19,7 +33,8 @@
 *     VALUE=CHARACTER*(*) (given and returned)
 *           command line parameter string
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Check the named action is in progress.
 *     Give the command-line parameter string to the parameter system.
 *     Call DTASK_APPLIC to inform the application code what has 
@@ -31,67 +46,102 @@
 *     the CANCEL. 
 *     Send an acknowledgement to the task which issued the obey if the 
 *     action has ended.
-*    Deficiencies :
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors 
-*     John Cooke (REVS::JAC) 22May84
-*    History :
-*     22-MAY-1984  first insertion ( stub ) (REVA::ADAM])
-*     25-MAY-1984  now implemented (REVA::ADAM])
-*     25-MAY-1984  %val on actptr in cantim (REVA::ADAM])
-*     25-MAY-1984  remove %val on actptr ! (REVA::ADAM])
-*     25-MAY-1984  replace %val again for tests (REVA::ADAM])
-*     20-JUN-1984  changed error symbol names (REVA::ADAM)
-*     25-JUN-1984  added AST interrupts (REVA::ADAM)
-*     02-OCT-1984  handle command-line parameters (REVAD::BDK)
-*     16-NOV-1984  new version for parameter system (REVA::ADAM)
-*     16-NOV-1984  handle CANCONSTR status (REVA::ADAM)
-*     24-NOV-1984  use DTASK_ACKNOW (BDK) (REVA::ADAM)
-*     16.04.1985:  send two acknowledgements if needed (REVAD::BDK)
-*     21.06.1985:  return name of parameter violating constraints 
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     22-MAY-1984 (REVA::ADAM]):
+*        First insertion ( stub )
+*     25-MAY-1984 (REVA::ADAM]):
+*        Now implemented
+*     25-MAY-1984 (REVA::ADAM]):
+*        %val on actptr in cantim
+*     25-MAY-1984 (REVA::ADAM]):
+*        Remove %val on actptr !
+*     25-MAY-1984 (REVA::ADAM]):
+*        Replace %val again for tests
+*     20-JUN-1984 (REVA::ADAM):
+*        Changed error symbol names
+*     25-JUN-1984 (REVA::ADAM):
+*        Added AST interrupts
+*     02-OCT-1984 (REVAD::BDK):
+*        Handle command-line parameters
+*     16-NOV-1984 (REVA::ADAM):
+*        New version for parameter system
+*     16-NOV-1984 (REVA::ADAM):
+*        Handle CANCONSTR status
+*     24-NOV-1984 (REVA::ADAM):
+*        Use DTASK_ACKNOW (BDK)
+*     16-APR-1985 (REVAD::BDK):
+*        Send two acknowledgements if needed
+*     21-JUN-1985: return name of parameter violating constraints
 *                      (REVAD::BDK)
-*     21.03.1986:  remove special handling of reschedules and ASTs
+*     21-MAR-1986: remove special handling of reschedules and ASTs
 *                  and pass SEQ to ACT (REVAD::BDK)
-*     25.03.1986:  don't send 2nd acknowledgement if action not active
+*     25-MAR-1986: don't send 2nd acknowledgement if action not active
 *                      (REVAD::BDK)
-*     22.01.1987:  New command line parser added (AAOEPP::JAB)
-*     26.05.1987:  use action keyword (REVAD::BDK)
-*     30.04.1989:  call DTASK_APPLIC rather than ACT and surround with
+*     22-JAN-1987 (AAOEPP::JAB):
+*        New command line parser added
+*     26-MAY-1987 (REVAD::BDK):
+*        Use action keyword
+*     30-APR-1989: call DTASK_APPLIC rather than ACT and surround with
 *                  TASK_PUT_CURRINFO and TASK_GET_CURRINFO calls (AAOEPP::WFL)
-*     30.04.1989:  call TASK_CLEAR_MESSINFO on action completion (AAOEPP::WFL)
-*     01.05.1989:  check for ACT__MESSAGE status returned (AAOEPP::WFL)
-*     01.03.1990:  call DTASK_APPLIC all arguments required by ACT (and more);
+*     30-APR-1989 (AAOEPP::WFL):
+*        Call TASK_CLEAR_MESSINFO on action completion
+*     01-MAY-1989 (AAOEPP::WFL):
+*        Check for ACT__MESSAGE status returned
+*     01-MAR-1990: call DTASK_APPLIC all arguments required by ACT (and more);
 *                  improve status checking, correct comments (AAOEPP::WFL)
-*     09.04.1991:  always send two acknowledgements if the action was 
+*     09-APR-1991: always send two acknowledgements if the action was
 *                  actually cancelled, two ensure that both transactions 
 *                  are closed-down (REVAD::BDK)
-*     25.04.1991:  revise INCLUDE files (REVAD::BDK)
-*     30.04.1991:  revise INCLUDE files, reduce sizes of arguments to 
+*     25-APR-1991 (REVAD::BDK):
+*        Revise INCLUDE files
+*     30-APR-1991: revise INCLUDE files, reduce sizes of arguments to
 *                  SUBPAR_CHECKACT (REVAD::BDK)
-*     02.05.1991:  fit the TJF mod DTASK_ACT_SCHED (REVAD::BDK)
-*     03.05.1991:  cancel timer if necessary (REVAD::BDK)
-*     09.05.1991:  VALUE is given and returned, change order of 
+*     02-MAY-1991 (REVAD::BDK):
+*        Fit the TJF mod DTASK_ACT_SCHED
+*     03-MAY-1991 (REVAD::BDK):
+*        Cancel timer if necessary
+*     09-MAY-1991: VALUE is given and returned, change order of
 *                  arguments (REVAD::BDK)
-*     14.05.1991:  Remove action parameter constraint checking (ROE::BMC)
-*     27.05.1991:  user ERR_REP and DTASK_COMSHUT (REVAD::BDK)
-*     07.06.1991:  change arguments to DTASK_APPLIC, add extra error 
+*     14-MAY-1991 (ROE::BMC):
+*        Remove action parameter constraint checking
+*     27-MAY-1991 (REVAD::BDK):
+*        User ERR_REP and DTASK_COMSHUT
+*     07-JUN-1991: change arguments to DTASK_APPLIC, add extra error
 *                  reporting and change comments (REVAD::BDK)
-*     11.06.1991:  change call arguments, assume the parameter system 
+*     11-JUN-1991: change call arguments, assume the parameter system
 *                  has been set-up already (REVAD::BDK)
-*     23.07.1991:  get action keyword from COMMON (REVAD::BDK)
-*     22.08.1991:  add REQUEST argument to DTASK_APPLIC (REVAD::BDK)
-*     25.11.1991:  use ADAM_ACKNOW (REVAD::BDK)
-*     13.10.1992:  add INCLUDE 'PAR_PAR' 
+*     23-JUL-1991 (REVAD::BDK):
+*        Get action keyword from COMMON
+*     22-AUG-1991 (REVAD::BDK):
+*        Add REQUEST argument to DTASK_APPLIC
+*     25-NOV-1991 (REVAD::BDK):
+*        Use ADAM_ACKNOW
+*     13-OCT-1992: add INCLUDE 'PAR_PAR'
 *                  Get ^STATUS via DTASK_ESETK (RLVAD::AJC)
-*     27.07.1993:  Remove unused ACTLEN (RLVAD::AJC)
-*     23.08.1993:  Replace PAR_PAR with SUBPAR_SYS  (RLVAD::AJC)
+*     27-JUL-1993 (RLVAD::AJC):
+*        Remove unused ACTLEN
+*     23-AUG-1993 (RLVAD::AJC):
+*        Replace PAR_PAR with SUBPAR_SYS
 *                  Replace PAR__SZNAM with SUBPAR__NAMELEN  (RLVAD::AJC)
-*     11.06.2001:  Call AMS_REPLY (FAMS) directly (AJC):
-*    endhistory
-*    Type Definitions :
+*     11-JUN-2001 (AJC)::
+*        Call AMS_REPLY (FAMS) directly
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     <description of any "bugs" which have not been fixed>
+*     Authors 
+*     John Cooke (REVS::JAC) 22May84
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'ADAM_DEFNS'
@@ -100,22 +150,22 @@
       INCLUDE 'MESSYS_PAR'
       INCLUDE 'ACT_ERR'
 
-*    Import :
+*  Arguments Given:
       EXTERNAL DTASK_APPLIC  ! address of action routine
       INTEGER PATH           ! message path needed for reply
       INTEGER MESSID         ! transaction number
       INTEGER ACTPTR         ! action pointer
 
-*    Import-export :
+*  Arguments Given and Returned:
       CHARACTER*(*) VALUE    ! command line parameter string
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+*  Global Variables:
       INCLUDE 'DTASK_CMN'
 
-*    Local variables :
+*  Local Variables:
       INTEGER SEQ                     ! sequence number for stage of
                                       ! action 
       INTEGER SCHEDTIME               ! requested reschedule time in 
@@ -132,7 +182,7 @@
                                       ! reschedule
       INTEGER REQUEST                 ! status signalling reschedule 
                                       ! type requested
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

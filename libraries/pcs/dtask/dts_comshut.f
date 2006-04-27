@@ -1,13 +1,27 @@
-*+  DTASK_COMSHUT - shut-down communications for a transaction
       SUBROUTINE DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, CONTEXT, 
      :  AKEY, VALUE, STATUS )
-*    Description :
+*+
+*  Name:
+*     DTASK_COMSHUT
+
+*  Purpose:
+*     Shut-down communications for a transaction
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, CONTEXT, 
+*     :  AKEY, VALUE, STATUS )
+
+*  Description:
 *     Shut-down communications for a transaction, including sending the
 *     final acknowledgement. Operate even on bad entry status.
-*    Invocation :
-*     CALL DTASK_COMSHUT ( PATH, MESSID, MESSTATUS, CONTEXT, 
-*    :  AKEY, VALUE, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     PATH=INTEGER (given)
 *           message path needed for reply
 *     MESSID=INTEGER given)
@@ -22,33 +36,44 @@
 *           string to be returned in completion message
 *     STATUS=INTEGER (returned)
 *           status is returned OK if at all possible.
-*    Method :
-*     Flush the ERR and MSG systems. Send the final acknowledgment.
-*    Deficiencies :
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*     B.D.Kelly (REVAD::BDK)
-*    History :
-*     13.05.1991:  original (REVAD::BDK)
-*     28.05.1991:  use ERR_CLEAR (REVAD::BDK)
-*     07.06.1991:  change comments (REVAD::BDK)
-*     11.06.1991:  report failure in shutdown (REVAD::BDK)
-*     25.11.1991:  use ADAM_ACKNOW (REVAD::BDK)
-*     14.10.1992:  get ^STATUS via DTASK_ESETK (RLVAD::AJC)
-*     11.06.2001:  call AMS_REPLY/PLOOKUP (FAMS) directly
-*                  ADAM_PRCNAM now DTASK_PRCNAM (AJC)
-*                  
-*    endhistory
 
-*    Type Definitions :
+*  Algorithm:
+*     Flush the ERR and MSG systems. Send the final acknowledgment.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     13-MAY-1991 (REVAD::BDK):
+*        Original
+*     28-MAY-1991 (REVAD::BDK):
+*        Use ERR_CLEAR
+*     07-JUN-1991 (REVAD::BDK):
+*        Change comments
+*     11-JUN-1991 (REVAD::BDK):
+*        Report failure in shutdown
+*     25-NOV-1991 (REVAD::BDK):
+*        Use ADAM_ACKNOW
+*     14-OCT-1992 (RLVAD::AJC):
+*        Get ^STATUS via DTASK_ESETK
+*     11-JUN-2001: call AMS_REPLY/PLOOKUP (FAMS) directly
+*                  ADAM_PRCNAM now DTASK_PRCNAM (AJC)
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'MESSYS_PAR'
 
-*    Import :
+*  Arguments Given:
       INTEGER PATH               ! message path needed for reply
       INTEGER MESSID             ! transaction number needed for reply 
       INTEGER MESSTATUS          ! status to be returned in completion
@@ -58,10 +83,10 @@
       CHARACTER*(*) AKEY         ! keyword of action required
       CHARACTER*(*) VALUE        ! command line parameter string
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
       INTEGER MESLEN                     ! length of value
       CHARACTER*(MESSYS__TNAME) MYNAME   ! name of this task
       INTEGER NLENGTH                    ! actual length of MYNAME
@@ -69,7 +94,7 @@
                                          ! failed to close 
                                          ! communications
       INTEGER ISTAT                      ! local status
-*-
+*.
 
 
 *

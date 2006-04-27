@@ -1,12 +1,26 @@
-*+  DTASK_OBEY - handle action for "obey" request 
       SUBROUTINE DTASK_OBEY ( DTASK_APPLIC, ACTPTR, VALUE, STATUS )
-*    Description :
+*+
+*  Name:
+*     DTASK_OBEY
+
+*  Purpose:
+*     Handle action for "obey" request 
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL DTASK_OBEY ( DTASK_APPLIC, ACTPTR, VALUE, STATUS )
+
+*  Description:
 *     Carry out an OBEY, whether first-time in or as a result of a 
 *     reschedule. After the application has returned, set-up any 
 *     reschedule it may have requested.
-*    Invocation :
-*     CALL DTASK_OBEY ( DTASK_APPLIC, ACTPTR, VALUE, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     DTASK_APPLIC=EXTERNAL (given)
 *           address of action routine
 *     ACTPTR=INTEGER (given)
@@ -14,89 +28,133 @@
 *     VALUE=CHARACTER*(*) (given and returned)
 *           command line parameter string
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Call DTASK_APPLIC, check the returned status and set up any 
 *     requested rescheduling. If the action has completed send the final
 *     acknowledgment. 
-*    Deficiencies :
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     John Cooke (REVA::JAC) 17May84
-*    History :
-*     date:  changes (institution::username)
-*     22-MAY-1984  first insertion (REVA::ADAM])
-*     22-MAY-1984  remove entry from action list once complete (REVA::ADAM])
-*     22-MAY-1984  test debug (REVA::ADAM])
-*     22-MAY-1984  ditto (REVA::ADAM])
-*     22-MAY-1984  repair call to addlst (REVA::ADAM])
-*     22-MAY-1984  remove debug (REVA::ADAM])
-*     22-MAY-1984  increment actseq on "wait" or "stage" (REVA::ADAM])
-*     24-MAY-1984  added msg_context - was missing (REVA::ADAM])
-*     24-MAY-1984  handle rejected actions by not calling act (REVA::ADAM])
-*     20-JUN-1984  changed error symbol names (REVA::ADAM)
-*     20-JUN-1984  removed references to obstat (REVA::ADAM)
-*     25-JUN-1984  added AST interrupt (REVA::ADAM)
-*     25-JUN-1984  added seq increment for astint (REVA::ADAM)
-*     17-AUG-1984  add "inform" return status (REVA::ADAM)
-*     26-OCT-1984  add CHECKACT (REVAD::BDK)
-*     14-NOV-1984  made 'SEQ' an import/export parameter (REVA::ADAM)
-*     14-NOV-1984  allow seq to return as 0 (for first return!) (REVA::ADAM)
-*     16-NOV-1984  new version with parameter system (REVA::ADAM)
-*     16-NOV-1984  handle ACTCONSTR status (REVA::ADAM)
-*     16-NOV-1984  handle constraint status correctly! (REVA::ADAM)
-*     16-NOV-1984  try again! (REVA::ADAM)
-*     24-NOV-1984  use DTASK_ACKNOW (REVAD::BDK)
-*     24-NOV-1984  handle SUBPAR_FINDACT status correctly (BDK) (REVA::ADAM)
-*     23.06.1985:  report name of parameter violating constraints 
+*     {enter_new_authors_here}
+
+*  History:
+*     22-MAY-1984 (REVA::ADAM]):
+*        First insertion
+*     22-MAY-1984 (REVA::ADAM]):
+*        Remove entry from action list once complete
+*     22-MAY-1984 (REVA::ADAM]):
+*        Test debug
+*     22-MAY-1984 (REVA::ADAM]):
+*        Ditto
+*     22-MAY-1984 (REVA::ADAM]):
+*        Repair call to addlst
+*     22-MAY-1984 (REVA::ADAM]):
+*        Remove debug
+*     22-MAY-1984 (REVA::ADAM]):
+*        Increment actseq on "wait" or "stage"
+*     24-MAY-1984 (REVA::ADAM]):
+*        Added msg_context - was missing
+*     24-MAY-1984 (REVA::ADAM]):
+*        Handle rejected actions by not calling act
+*     20-JUN-1984 (REVA::ADAM):
+*        Changed error symbol names
+*     20-JUN-1984 (REVA::ADAM):
+*        Removed references to obstat
+*     25-JUN-1984 (REVA::ADAM):
+*        Added AST interrupt
+*     25-JUN-1984 (REVA::ADAM):
+*        Added seq increment for astint
+*     17-AUG-1984 (REVA::ADAM):
+*        Add "inform" return status
+*     26-OCT-1984 (REVAD::BDK):
+*        Add CHECKACT
+*     14-NOV-1984 (REVA::ADAM):
+*        Made 'SEQ' an import/export parameter
+*     14-NOV-1984 (REVA::ADAM):
+*        Allow seq to return as 0 (for first return!)
+*     16-NOV-1984 (REVA::ADAM):
+*        New version with parameter system
+*     16-NOV-1984 (REVA::ADAM):
+*        Handle ACTCONSTR status
+*     16-NOV-1984 (REVA::ADAM):
+*        Handle constraint status correctly!
+*     16-NOV-1984 (REVA::ADAM):
+*        Try again!
+*     24-NOV-1984 (REVAD::BDK):
+*        Use DTASK_ACKNOW
+*     24-NOV-1984 (REVA::ADAM):
+*        Handle SUBPAR_FINDACT status correctly (BDK)
+*     23-JUN-1985: report name of parameter violating constraints
 *                      (REVAD::BDK)
-*     09.10.1985:  trap OK and NORMAL status returns from ACT (REVAD::BDK)
-*     25.03.1986:  trap ACTCANCEL return from ACT, clarify handling of 
+*     09-OCT-1985 (REVAD::BDK):
+*        Trap OK and NORMAL status returns from ACT
+*     25-MAR-1986: trap ACTCANCEL return from ACT, clarify handling of
 *                  error conditions after CHECKACT (REVAD::BDK)
-*      9.01.1987:  new command line parser added (AAOEPP::JAB)
-*     26.05.1987:  use action keyword (REVAD::BDK)
-*     30.04.1989:  call DTASK_APPLIC rather than ACT and surround with
+*     09-JAN-1987 (AAOEPP::JAB):
+*        New command line parser added
+*     26-MAY-1987 (REVAD::BDK):
+*        Use action keyword
+*     30-APR-1989: call DTASK_APPLIC rather than ACT and surround with
 *                  TASK_PUT_CURRINFO and TASK_GET_CURRINFO calls (AAOEPP::WFL)
-*     30.04.1989:  call TASK_CLEAR_MESSINFO at start and end of action to
+*     30-APR-1989: call TASK_CLEAR_MESSINFO at start and end of action to
 *                  clear records of active subsidiary actions (AAOEPP::WFL)
-*     01.05.1989:  handle ACT__MESSAGE status; support timeout on ACT__ASTINT
+*     01-MAY-1989: handle ACT__MESSAGE status; support timeout on ACT__ASTINT
 *                  ACT__MESSAGE (AAOEPP::WFL)
-*     14.11.1989:  remove include 'mesdefns'
+*     14-NOV-1989: remove include 'mesdefns'
 *                  re-compile with MAXACTTOT = 32767 not 2**30
 *                  (revised DTCOMMON) (RLVAD::AJC)
-*     01.03.1990:  call DTASK_APPLIC all arguments required by ACT (and more);
+*     01-MAR-1990: call DTASK_APPLIC all arguments required by ACT (and more);
 *                  improve status checking, correct comments (AAOEPP::WFL)
-*     02.03.1990:  restore include 'mesdefns' (defines INFINITE) (AAOEPP::WFL)
-*     09.04.1991:  used passed-in PATH and MESSID for rescheduled 
+*     02-MAR-1990 (AAOEPP::WFL):
+*        Restore include 'mesdefns' (defines INFINITE)
+*     09-APR-1991: used passed-in PATH and MESSID for rescheduled
 *                  actions (REVAD::BDK)
-*     25.04.1991:  revise INCLUDE files (REVAD::BDK)
-*     30.04.1991:  revise INCLUDE files, reduce sizes of arguments to 
+*     25-APR-1991 (REVAD::BDK):
+*        Revise INCLUDE files
+*     30-APR-1991: revise INCLUDE files, reduce sizes of arguments to
 *                  SUBPAR_CHECKACT (REVAD::BDK)
-*     01.05.1991:  remove ACTTOT, fit the TJF mod DTASK_ACT_SCHED 
+*     01-MAY-1991: remove ACTTOT, fit the TJF mod DTASK_ACT_SCHED
 *                  (REVAD::BDK)
-*     03.05.1991:  cancel timers on reschedules (REVAD::BDK)
-*     09.05.1991:  change order of arguments to this routine. Pass AKEY 
+*     03-MAY-1991 (REVAD::BDK):
+*        Cancel timers on reschedules
+*     09-MAY-1991: change order of arguments to this routine. Pass AKEY
 *                  to ADDLST, improve error trapping (REVAD::BDK)
-*     10.05.1991:  close ERR and MSG whenever the transaction closes 
+*     10-MAY-1991: close ERR and MSG whenever the transaction closes
 *                  don't bother trapping -ve values of SEQ (REVAD::BDK)
-*     13.05.1991:  use ACTSHUT and COMSHUT (REVAD::BDK)
-*     14.05.1991:  Remove action parameter constraint checking (ROE::BMC)
-*     28.05.1991:  remove lib$cvt_dx_dx (REVAD::BDK)
-*     28.05.1991:  Remove reference to NOWAIT and PARNAME (ROE::BMC)
-*     07.06.1991:  change arguments to DTASK_APPLIC (REVAD::BDK)
-*     10.06.1991:  sizeable rewrite, change subroutine arguments 
+*     13-MAY-1991 (REVAD::BDK):
+*        Use ACTSHUT and COMSHUT
+*     14-MAY-1991 (ROE::BMC):
+*        Remove action parameter constraint checking
+*     28-MAY-1991 (REVAD::BDK):
+*        Remove lib$cvt_dx_dx
+*     28-MAY-1991 (ROE::BMC):
+*        Remove reference to NOWAIT and PARNAME
+*     07-JUN-1991 (REVAD::BDK):
+*        Change arguments to DTASK_APPLIC
+*     10-JUN-1991: sizeable rewrite, change subroutine arguments
 *                  (REVAD::BDK)
-*     05.07.1991:  copy action keyword from COMMON (REVAD::BDK)
-*     22.08.1991:  add REQUEST argument to DTASK_APPLIC (REVAD::BDK)
-*     13.10.1992:  add INCLUDE 'PAR_PAR'
+*     05-JUL-1991 (REVAD::BDK):
+*        Copy action keyword from COMMON
+*     22-AUG-1991 (REVAD::BDK):
+*        Add REQUEST argument to DTASK_APPLIC
+*     13-OCT-1992: add INCLUDE 'PAR_PAR'
 *                  use DTASK__SYSNORM instead of SS$_NORMAL (RLVAD::AJC)
-*     27.07.1993:  remove unused VALID and ACTLEN (RLVAD::AJC)
-*     23.08.1993:  Replace PAR_PAR with SUBPAR_SYS  (RLVAD::AJC)
+*     27-JUL-1993 (RLVAD::AJC):
+*        Remove unused VALID and ACTLEN
+*     23-AUG-1993 (RLVAD::AJC):
+*        Replace PAR_PAR with SUBPAR_SYS
 *                  Replace PAR__SZNAM with SUBPAR__NAMELEN  (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'ADAM_DEFNS'
@@ -104,19 +162,19 @@
       INCLUDE 'DTASK_ERR'
       INCLUDE 'ACT_ERR'
 
-*    Import :
+*  Arguments Given:
       EXTERNAL DTASK_APPLIC      ! address of action routine
       INTEGER ACTPTR             ! index for looking-up the action
                                  ! details 
       CHARACTER*(*) VALUE        ! command line parameter string
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+*  Global Variables:
       INCLUDE 'DTASK_CMN'
 
-*    Local variables :
+*  Local Variables:
       INTEGER SCHEDTIME              ! time in milliseconds for
                                      ! rescheduled action 
       INTEGER SEQ                    ! sequence number for stage of
@@ -132,7 +190,7 @@
                                      ! the application
       INTEGER REQUEST                ! copy of request code returned 
                                      ! from the application
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

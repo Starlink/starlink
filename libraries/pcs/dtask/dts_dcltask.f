@@ -1,79 +1,114 @@
-*+  DTASK_DCLTASK - ADAM top subroutine for running tasks from DCL
       SUBROUTINE DTASK_DCLTASK ( DEVINIT, DTASK_APPLIC, STATUS )
-*    Description :
+*+
+*  Name:
+*     DTASK_DCLTASK
+
+*  Purpose:
+*     ADAM top subroutine for running tasks from DCL
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Description:
 *     ADAM tasks use this as their main subroutine when run directly at
 *     a terminal using the DCL RUN command. They can also be declared as
 *     DCL foreign commands, in which case the command-line parameters 
 *     are picked-up.
-*    Parameters :
+
+*  Arguments:
 *     DEVINIT=EXTERNAL (given)
 *           application initialisation routine
 *     DTASK_APPLIC=EXTERNAL (given)
 *           application calling routine
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Initialize the parameter system, and inform it that the task is 
 *     running at the terminal. Get the command-line and pass it to the 
 *     command-line parser. Finally, call the application code.
 *     The application routines are passed as EXTERNAL to allow the DTASK 
 *     library to be in a shareable image.
-*    Deficiencies :
-*
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     11.11.1985:  Original (REVAD::BDK)
-*     25.03.1986:  change severity before signalling error (REVAD::BDK)
-*     27.08.1986:  make this a subroutine rather than the main program 
+*     {enter_new_authors_here}
+
+*  History:
+*     11-NOV-1985 (REVAD::BDK):
+*        Original
+*     25-MAR-1986 (REVAD::BDK):
+*        Change severity before signalling error
+*     27-AUG-1986: make this a subroutine rather than the main program
 *                  (REVAD::BDK)
-*     17.06.1987:  pass the action name 'RUN' in a variable (REVAD::BDK)
-*     30.04.1989:  receive and pass on EXTERNAL DTASK_APPLIC (AAOEPP::WFL)
-*     01.05.1989:  only output significant part of value string (AAOEPP::WFL)
-*     01.05.1989:  use ERR_OUT more and LIB$SIGNAL less; don't change severity
+*     17-JUN-1987 (REVAD::BDK):
+*        Pass the action name 'RUN' in a variable
+*     30-APR-1989 (AAOEPP::WFL):
+*        Receive and pass on EXTERNAL DTASK_APPLIC
+*     01-MAY-1989 (AAOEPP::WFL):
+*        Only output significant part of value string
+*     01-MAY-1989: use ERR_OUT more and LIB$SIGNAL less; don't change severity
 *                  of status (AAOEPP::WFL)
-*     02.05.1989:  receive and call EXTERNAL DEVINIT (AAOEPP::WFL)
-*     25.04.1991:  revise INCLUDE files (REVAD::BDK)
-*     30.04.1991:  revise INCLUDE files and improve error checking
+*     02-MAY-1989 (AAOEPP::WFL):
+*        Receive and call EXTERNAL DEVINIT
+*     25-APR-1991 (REVAD::BDK):
+*        Revise INCLUDE files
+*     30-APR-1991: revise INCLUDE files and improve error checking
 *                  (REVAD::BDK) 
-*     23.05.1991:  ensure STATUS is bad before calling ERR (REVAD::BDK)
-*     27.05.1991:  user ERR_REP (REVAD::BDK)
-*     04.05.1991:  Modify comments (ROE::BMC)
-*     04.05.1991:  Modify calls to ERR_REP to be more meaningful (ROE::BMC)
-*     04.05.1991:  Set status OK if action has completed (ROE::BMC)
-*     07.06.1991:  change comments (REVAD::BDK)
-*     14.10.1992:  Get command line via DTASK_GTCMD 
+*     23-MAY-1991 (REVAD::BDK):
+*        Ensure STATUS is bad before calling ERR
+*     27-MAY-1991 (REVAD::BDK):
+*        User ERR_REP
+*     04-MAY-1991 (ROE::BMC):
+*        Modify comments
+*     04-MAY-1991 (ROE::BMC):
+*        Modify calls to ERR_REP to be more meaningful
+*     04-MAY-1991 (ROE::BMC):
+*        Set status OK if action has completed
+*     07-JUN-1991 (REVAD::BDK):
+*        Change comments
+*     14-OCT-1992: Get command line via DTASK_GTCMD
 *                  Get ^STATUS via DTASK_ESETK
 *                  INCLUDE PAR_PAR (RLVAD::AJC)
-*      2.11.1992:  Get task name returned from SUBPAR_ACTDCL (RLVAD::AJC)
-*      8.03.1993:  Use MESSYS__VAL_LEN not MSG_VAL_LEN (RLVAD::AJC)
-*     23.08.1993:  Replace PAR_PAR with SUBPAR_SYS  (RLVAD::AJC)
+*     02-NOV-1992 (RLVAD::AJC):
+*        Get task name returned from SUBPAR_ACTDCL
+*     08-MAR-1993 (RLVAD::AJC):
+*        Use MESSYS__VAL_LEN not MSG_VAL_LEN
+*     23-AUG-1993 (RLVAD::AJC):
+*        Replace PAR_PAR with SUBPAR_SYS
 *                  Replace PAR__SZNAM with SUBPAR__NAMELEN  (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'DTASK_ERR'
       INCLUDE 'MESSYS_PAR'
 
-*    Import :
+*  Arguments Given:
       EXTERNAL DEVINIT         ! application initialisation routine
       EXTERNAL DTASK_APPLIC    ! application calling routine
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
       CHARACTER VALUE*(MESSYS__VAL_LEN)   ! command-line parameter string
       CHARACTER*(SUBPAR__NAMELEN) NAME     ! action name. This is declared as 
                                       ! a variable to allow the symbolic 
                                       ! debugger to change the action 
                                       ! name
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

@@ -1,52 +1,82 @@
-*+  DTASK_ASTHDLR - AST handler for timed reschedules
       SUBROUTINE DTASK_ASTHDLR ( ASTPARM )
-*    Description :
-*     Signals that a timer has completed indicating that an action is 
-*     due for rescheduling.
-*    Invocation :
+*+
+*  Name:
+*     DTASK_ASTHDLR
+
+*  Purpose:
+*     AST handler for timed reschedules
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
 *     Invoked by timer completion
 *     interrupts.
-*    Parameters :
+
+*  Description:
+*     Signals that a timer has completed indicating that an action is 
+*     due for rescheduling.
+
+*  Arguments:
 *     ASTPARM=INTEGER (given)
 *           packed action number plus action counter passed by value
-*    Method :
+
+*  Algorithm:
 *     Interpret the AST parameter. This has been passed by VALUE, which 
 *     is necessary to ensure it is unique to this timer event. The 
 *     parameter contains two two-byte integers.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     John Cooke (REVS::JAC) 22May84
-*    History :
-*     date:  changes (institution::username)
-*     22-MAY-1984  first insertion (REVA::ADAM])
-*     25-MAY-1984  astparm access mode to %loc (REVA::ADAM])
-*     20-JUN-1984  two 16-bit parameters; new error system (REVA::ADAM)
-*     20-JUN-1984  added save of ast parm itself for reference (REVA::ADAM)
-*     21-JUN-1984  added interrupt flag (REVA::ADAM)
-*     25.04.1991:  rearrange INCLUDE files and add comments (REVAD::BDK)
-*     30.04.1991:  revise INCLUDE files, remove REQASTPAR (REVAD::BDK)
-*     13.05.1991:  dont disable ASTs, use MESSYS_RESMSG (REVAD::BDK)
-*     07.06.1991:  change comments (REVAD::BDK)
-*     28.06.1994:  Version for Unix Version 2 timer system (RAL::AJC)
-*     11.06.2001:  Call AMS (FAMS) directly (AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     22-MAY-1984 (REVA::ADAM]):
+*        First insertion
+*     25-MAY-1984 (REVA::ADAM]):
+*        Astparm access mode to %loc
+*     20-JUN-1984 (REVA::ADAM):
+*        Two 16-bit parameters; new error system
+*     20-JUN-1984 (REVA::ADAM):
+*        Added save of ast parm itself for reference
+*     21-JUN-1984 (REVA::ADAM):
+*        Added interrupt flag
+*     25-APR-1991 (REVAD::BDK):
+*        Rearrange INCLUDE files and add comments
+*     30-APR-1991 (REVAD::BDK):
+*        Revise INCLUDE files, remove REQASTPAR
+*     13-MAY-1991 (REVAD::BDK):
+*        Dont disable ASTs, use MESSYS_RESMSG
+*     07-JUN-1991 (REVAD::BDK):
+*        Change comments
+*     28-JUN-1994 (RAL::AJC):
+*        Version for Unix Version 2 timer system
+*     11-JUN-2001 (AJC):
+*        Call AMS (FAMS) directly
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+*  Arguments Given:
       INTEGER ASTPARM           ! the VMS AST parameter passed by value
-*    Local variables :
+*  Local Variables:
       INTEGER ASTVAL            ! value of ASTPARM
       CHARACTER*4 VALUE         ! message sent to application
       INTEGER LENGTH            ! length of message sent
       INTEGER STATUS            ! local status
 *    Data structures for ADAM:
       EQUIVALENCE ( ASTVAL, VALUE )
-*-
+*.
 
 *
 *   Copy the timer identifier from the AST parameter.

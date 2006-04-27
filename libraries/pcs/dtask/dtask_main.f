@@ -35,18 +35,18 @@
 *  History:
 *     8-JUL-1991 (AJC):
 *        Original version.
-*    17-MAY-1993 (AJC):
+*     17-MAY-1993 (AJC):
 *        Modify for ICL or shell running
-*    23-AUG-1993 (AJC):
+*     23-AUG-1993 (AJC):
 *        Change name of environment variable to ICL_TASK_NAME
-*    16-FEB-1994 (AJC):
+*     16-FEB-1994 (AJC):
 *        Tune HDS_SHELL
-*    02-DEC-1994 (BKM):
+*     02-DEC-1994 (BKM):
 *       Add DTS_SETSIG
-*    24-SEP-1996 (AJC):
+*     24-SEP-1996 (AJC):
 *       Change HDS shell value from 2 (tcsh) to 1 (csh) as HDS doesn't
 *       fall through to lower numbers if shell unavailable
-*    14-SEP-1998 (AJC):
+*     14-SEP-1998 (AJC):
 *       Indicate succes or failure on exit (subject to ADAM_EXIT set).
 *     {enter_changes_here}
 
@@ -140,35 +140,57 @@
 
       END
 
-*+  DEVINIT - Dummy initialisation routine for ADAM tasks.
       SUBROUTINE DEVINIT ( STATUS )
-*    Description :
+*+
+*  Name:
+*     DEVINIT
+
+*  Purpose:
+*     Dummy initialisation routine for ADAM tasks.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Description:
 *     This is a dummy initialisation routine for ADAM tasks. It will be
 *     used if the programmer does not supply one.
-*    Parameters :
+
+*  Arguments:
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Return.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (AAOEPP::WFL)
-*    History :
-*     30.04.1989:  Original (AAOEPP::WFL)
-*     09.04.1991:  call SUBPAR_SETCHECK (REVAD::BDK)
-*     25.04.1991:  check status on entry (REVAD::BDK)
-*     14.05.1991:  Remove NEEDS list checking control (ROE::BMC)
-*    endhistory
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-*    Status :
-      INTEGER STATUS
+*     {enter_new_authors_here}
+
+*  History:
+*     30-APR-1989 (AAOEPP::WFL):
+*        Original
+*     09-APR-1991 (REVAD::BDK):
+*        Call SUBPAR_SETCHECK
+*     25-APR-1991 (REVAD::BDK):
+*        Check status on entry
+*     14-MAY-1991 (ROE::BMC):
+*        Remove NEEDS list checking control
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
+
+*  Type Definitions:
+      IMPLICIT NONE
+*  Global Constants:
+      INCLUDE 'SAE_PAR'
+*  Status:
+      INTEGER STATUS
+*.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       END
-

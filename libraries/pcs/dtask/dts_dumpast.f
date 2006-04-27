@@ -1,39 +1,62 @@
-*+  DTASK_DUMPAST - Dummy for Unix: AST routine for generating a task stack dump
       SUBROUTINE DTASK_DUMPAST ( ASTPARM )
-*    Description :
+*+
+*  Name:
+*     DTASK_DUMPAST
+
+*  Purpose:
+*     Dummy for Unix: AST routine for generating a task stack dump
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     An AST routine, invoked by VMS.
+
+*  Description:
 *     Generate a stack dump of a task, then reenable the dumping 
 *     facility.
-*    Invocation :
-*     An AST routine, invoked by VMS.
-*    Parameters :
+
+*  Arguments:
 *     ASTPARM=INTEGER (given)
 *           the AST parameter. Unused.
-*    Method :
+
+*  Algorithm:
 *     Call LIB$SIGNAL to generate a stack dump. Then call DTASK_SETDUMP 
 *     to reenable the AST.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     13.08.1986:  Original (REVAD::BDK)
-*     27.08.1986:  use DTASK__DUMP in the signal (REVAD::BDK)
-*     25.04.1991:  revise INCLUDE files (REVAD::BDK)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     13-AUG-1986 (REVAD::BDK):
+*        Original
+*     27-AUG-1986 (REVAD::BDK):
+*        Use DTASK__DUMP in the signal
+*     25-APR-1991 (REVAD::BDK):
+*        Revise INCLUDE files
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DTASK_ERR'
 
-*    Import :
+*  Arguments Given:
       INTEGER ASTPARM     ! the AST parameter.
 
-*    Local variables :
+*  Local Variables:
       INTEGER STATUS
-*-
+*.
 
 !      CALL LIB$SIGNAL ( %VAL(DTASK__DUMP) )
 

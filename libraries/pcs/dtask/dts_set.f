@@ -1,11 +1,25 @@
-*+  DTASK_SET - routine handling task set
       SUBROUTINE DTASK_SET ( PATH, NAME, VALUE, MESSID, STATUS )
-*    Description :
+*+
+*  Name:
+*     DTASK_SET
+
+*  Purpose:
+*     Routine handling task set
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL DTASK_SET ( PATH, NAME, VALUE, MESSID, STATUS )
+
+*  Description:
 *     Sets the named task parameter to the given value. 
 *     Sends acknowledgment to initiating task.
-*    Invocation :
-*     CALL DTASK_SET ( PATH, NAME, VALUE, MESSID, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     PATH=INTEGER (given)
 *           path to initiating task
 *     NAME=CHARACTER*(*) (given)
@@ -16,60 +30,83 @@
 *     MESSID=INTEGER (given)
 *           message identifier
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Calls the ADAM parameter system primitives, so that the user is 
 *     not prompted for an HDS structure to put the parameter value in.
-*    Deficiencies :
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     John Cooke (REVS::JAC) 01May84
-*    History :
-*     date:  changes (institution::username)
-*     8-MAY-1984  first insertion (REVAD::JAC)
-*     11-MAY-1984  test of autodoc (REVAD::JAC)
-*     19-JUN-1984  changed from "put"; added acknowledgment (REVA::ADAM)
-*     19-JUN-1984  repaired msg_value to msg_val ! (REVA::ADAM)
-*     02-NOV-1984  use full parameter system (REVAD::BDK)
-*     16-NOV-1984  new version with parameter system (REVA::ADAM)
-*     11-JUN-1987:  handle monoliths (REVAD::BDK)
-*     15-JAN-1991:  check if task is monolith (RLVAD::AJC)
-*     25.04.1991:  revise INCLUDE files (REVAD::BDK)
-*     30.04.1991:  revise INCLUDE files (REVAD::BDK)
-*     09.05.1991:  clear-out ERR and MSG systems (REVAD::BDK)
-*     13.05.1991:  use COMSHUT (REVAD::BDK)
-*     04.06.1991:  Remove reference to DDMSG (ROE::BMC)
-*     04.06.1991:  Correct call to SUBPAR_FINDPAR to use NAMECODE when
+*     {enter_new_authors_here}
+
+*  History:
+*     08-MAY-1984 (REVAD::JAC):
+*        First insertion
+*     11-MAY-1984 (REVAD::JAC):
+*        Test of autodoc
+*     19-JUN-1984 (REVA::ADAM):
+*        Changed from "put"; added acknowledgment
+*     19-JUN-1984 (REVA::ADAM):
+*        Repaired msg_value to msg_val !
+*     02-NOV-1984 (REVAD::BDK):
+*        Use full parameter system
+*     16-NOV-1984 (REVA::ADAM):
+*        New version with parameter system
+*     11-JUN-1987 (REVAD::BDK):
+*        Handle monoliths
+*     15-JAN-1991 (RLVAD::AJC):
+*        Check if task is monolith
+*     25-APR-1991 (REVAD::BDK):
+*        Revise INCLUDE files
+*     30-APR-1991 (REVAD::BDK):
+*        Revise INCLUDE files
+*     09-MAY-1991 (REVAD::BDK):
+*        Clear-out ERR and MSG systems
+*     13-MAY-1991 (REVAD::BDK):
+*        Use COMSHUT
+*     04-JUN-1991 (ROE::BMC):
+*        Remove reference to DDMSG
+*     04-JUN-1991: Correct call to SUBPAR_FINDPAR to use NAMECODE when
 *                  generating an error (ROE::BMC)
-*     07.06.1991:  insist COLPOS>1 for a monolith (REVAD::BDK)
-*     08.03.1993:  remove include MESSYS_PAR (RLVAD::AJC)
-*     24.05.1995:  Report on no action for monolith (RLVAD::AJC)
-*     04.08.1995:  Allow non-monoliths to have action:name form (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     07-JUN-1991 (REVAD::BDK):
+*        Insist COLPOS>1 for a monolith
+*     08-MAR-1993 (RLVAD::AJC):
+*        Remove include MESSYS_PAR
+*     24-MAY-1995 (RLVAD::AJC):
+*        Report on no action for monolith
+*     04-AUG-1995 (RLVAD::AJC):
+*        Allow non-monoliths to have action:name form
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DTASK_ERR'
       INCLUDE 'ADAM_DEFNS'
 
-*    Import :
+*  Arguments Given:
       INTEGER PATH         !  path to initiating task
       CHARACTER NAME*(*)   !  name of parameter to be set
       CHARACTER VALUE*(*)  !  value it is to be set to
       INTEGER MESSID       !  message identifier
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
       INTEGER NAMECODE     ! code number of parameter
       INTEGER COLPOS       ! position of ':' in NAME
       INTEGER ACODE        ! action pointer (returned by FINDACT
                            ! but not used)
       LOGICAL MONO         ! if the task is a monolith
       INTEGER MESSTATUS    ! status returned to initiating task
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 *

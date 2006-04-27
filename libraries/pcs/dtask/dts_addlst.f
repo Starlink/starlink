@@ -1,15 +1,29 @@
-*+  DTASK_ADDLST - add item to task action list
       SUBROUTINE DTASK_ADDLST ( ANAME, AKEY, PATH, MESSID, SEQ, ACODE,      
      :  ACTPTR, STATUS ) 
-*    Description :
+*+
+*  Name:
+*     DTASK_ADDLST
+
+*  Purpose:
+*     Add item to task action list
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL DTASK_ADDLST ( ANAME, AKEY, PATH, MESSID, SEQ, ACTPTR,
+*     :  ACODE, STATUS ) 
+
+*  Description:
 *     Adds item to the list of current actions. If an entry
 *     for the action already exists but is not active, it is re-used.
 *     If an entry does not exist, one is created. If an entry already
 *     exists and is active, an error status is returned.
-*    Invocation :
-*     CALL DTASK_ADDLST ( ANAME, AKEY, PATH, MESSID, SEQ, ACTPTR,
-*    :  ACODE, STATUS ) 
-*    Parameters :
+
+*  Arguments:
 *     ANAME=CHARACTER*(*) (given)
 *           action name
 *     AKEY=CHARACTER*(*) (given)
@@ -24,63 +38,83 @@
 *           action code in the parameter system
 *     ACTPTR=INTEGER (returned)
 *           pointer to this entry in the action list
-*    
+*     
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Search through the common-block arrays. When the slot has been 
 *     found (or allocated) for the action, store the details and 
 *     increment the action counter.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     John Cooke (REVS::JAC) 22May84
-*    History :
-*     22-MAY-1984  first insertion (REVA::ADAM])
-*     22-MAY-1984  repair to lookup (REVA::ADAM])
-*     22-MAY-1984  test debug (REVA::ADAM])
-*     22-MAY-1984  remove debug (REVA::ADAM])
-*     19-JUN-1984  change status names (REVA::ADAM)
-*     20-JUN-1984  added actcount (REVA::ADAM)
-*     25.04.1991:  revise INCLUDE files (REVAD::BDK)
-*     30.04.1991:  revise INCLUDE files, remove ACTVALUE (REVAD::BDK)
-*     01.05.1991:  remove the COUNT and VALUE import arguments
+*     {enter_new_authors_here}
+
+*  History:
+*     22-MAY-1984 (REVA::ADAM]):
+*        First insertion
+*     22-MAY-1984 (REVA::ADAM]):
+*        Repair to lookup
+*     22-MAY-1984 (REVA::ADAM]):
+*        Test debug
+*     22-MAY-1984 (REVA::ADAM]):
+*        Remove debug
+*     19-JUN-1984 (REVA::ADAM):
+*        Change status names
+*     20-JUN-1984 (REVA::ADAM):
+*        Added actcount
+*     25-APR-1991 (REVAD::BDK):
+*        Revise INCLUDE files
+*     30-APR-1991 (REVAD::BDK):
+*        Revise INCLUDE files, remove ACTVALUE
+*     01-MAY-1991: remove the COUNT and VALUE import arguments
 *                  (REVAD::BDK) 
-*     03.05.1991:  only set ACTCOUNT for new action, initialise ACTTIM 
+*     03-MAY-1991: only set ACTCOUNT for new action, initialise ACTTIM
 *                  (REVAD::BDK)
-*     09.05.1991:  pass-in and store the action keyword (REVAD::BDK)
-*     04.05.1991:  Rename ACTSTATUS to ACTSTATE (ROE::BMC)
-*     07.06.1991:  cange comments (REVAD::BDK)
-*     28.02.1992:  Add ACODE argument to set ACTCODE. (AAO::TJF)
-*     13.10.1992:  add INCLUDE 'PAR_PAR' (RLVAD::AJC)
-*     23.08.1993:  Replace PAR_PAR with SUBPAR_SYS  (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     09-MAY-1991 (REVAD::BDK):
+*        Pass-in and store the action keyword
+*     04-MAY-1991 (ROE::BMC):
+*        Rename ACTSTATUS to ACTSTATE
+*     07-JUN-1991 (REVAD::BDK):
+*        Cange comments
+*     28-FEB-1992 (AAO::TJF):
+*        Add ACODE argument to set ACTCODE.
+*     13-OCT-1992 (RLVAD::AJC):
+*        Add INCLUDE 'PAR_PAR'
+*     23-AUG-1993 (RLVAD::AJC):
+*        Replace PAR_PAR with SUBPAR_SYS
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'DTASK_SYS'
       INCLUDE 'DTASK_ERR'
-*    Import :
+*  Arguments Given:
       CHARACTER*(*) ANAME ! action name
       CHARACTER*(*) AKEY  ! action keyword
       INTEGER PATH        ! path pointer
       INTEGER MESSID      ! message id for action setup
       INTEGER SEQ         ! current sequence status of action
       INTEGER ACODE       ! action code in the parameter system
-*    Export :
+*  Arguments Returned:
       INTEGER ACTPTR   !  pointer to this entry in the action list
-*    Status :
+*  Status:
       INTEGER STATUS
-*    Global variables :
+*  Global Variables:
       INCLUDE 'DTASK_CMN'
-*    Local variables :
+*  Local Variables:
       INTEGER N
       LOGICAL FOUND
       LOGICAL DONE
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 *

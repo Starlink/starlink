@@ -1,12 +1,26 @@
-*+  DTASK_ACTSHUT - shut-down an action
       SUBROUTINE DTASK_ACTSHUT ( PATH, MESSID, MESSTATUS, CONTEXT, 
      :  ACTPTR, ANAME, AKEY, VALUE, STATUS )
-*    Description :
-*     Shut-down an action, including sending the final acknowledgement.
-*    Invocation :
+*+
+*  Name:
+*     DTASK_ACTSHUT
+
+*  Purpose:
+*     Shut-down an action
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
 *     CALL DTASK_ACTSHUT ( PATH, MESSID, MESSTATUS, CONTEXT, 
-*    :  ACTPTR, ANAME, AKEY, VALUE, STATUS )
-*    Parameters :
+*     :  ACTPTR, ANAME, AKEY, VALUE, STATUS )
+
+*  Description:
+*     Shut-down an action, including sending the final acknowledgement.
+
+*  Arguments:
 *     PATH=INTEGER (given)
 *           message path needed for reply
 *     MESSID=INTEGER given)
@@ -24,26 +38,36 @@
 *     VALUE=CHARACTER*(*) (given and returned)
 *           string to be returned in completion message
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Tell the TASK library to forget about this action. Tell the DTASK 
 *     library the action is no longer active. Flush the ERR and MSG 
 *     systems. Send the final acknowledgment.
-*    Deficiencies :
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     13.05.1991:  original (REVAD::BDK)
-*     27.05.1991:  use ERR_CLEAR (REVAD::BDK)
-*     11.06.1991:  use DTASK_COMSHUT (REVAD::BDK)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     13-MAY-1991 (REVAD::BDK):
+*        Original
+*     27-MAY-1991 (REVAD::BDK):
+*        Use ERR_CLEAR
+*     11-JUN-1991 (REVAD::BDK):
+*        Use DTASK_COMSHUT
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
 
-*    Import :
+*  Arguments Given:
       INTEGER PATH               ! message path needed for reply
       INTEGER MESSID             ! transaction number needed for reply 
       INTEGER MESSTATUS          ! status to be returned in completion
@@ -55,10 +79,10 @@
       CHARACTER*(*) AKEY         ! keyword of action required
       CHARACTER*(*) VALUE        ! command line parameter string
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

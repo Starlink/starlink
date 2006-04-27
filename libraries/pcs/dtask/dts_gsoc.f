@@ -1,13 +1,27 @@
-*+  DTASK_GSOC - interpret a GET/SET/OBEY/CANCEL/CONTROL message
       SUBROUTINE DTASK_GSOC ( DTASK_APPLIC, PATH, MESSID, CONTEXT, NAME,
      :  VALUE, STATUS ) 
-*    Description :
+*+
+*  Name:
+*     DTASK_GSOC
+
+*  Purpose:
+*     Interpret a GET/SET/OBEY/CANCEL/CONTROL message
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL DTASK_GSOC ( DTASK_APPLIC, PATH, MESSID, CONTEXT, NAME,
+*     :  VALUE, STATUS ) 
+
+*  Description:
 *     Interpret a message requesting GET, SET, OBEY, CANCEL or CONTROL. If 
 *     necessary, activate the application.
-*    Invocation :
-*     CALL DTASK_GSOC ( DTASK_APPLIC, PATH, MESSID, CONTEXT, NAME,
-*    :  VALUE, STATUS ) 
-*    Parameters :
+
+*  Arguments:
 *     DTASK_APPLIC=EXTERNAL (given)
 *           application calling routine
 *     PATH=INTEGER (given)
@@ -21,35 +35,51 @@
 *     VALUE=CHARACTER*(*) (given)
 *           command-line parameter string
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     A GET, SET or CONTROL is passed to the routine which handles it. For
 *     OBEY and CANCEL check whether this is a valid request before calling 
 *     the corresponding routine.
-*    Deficiencies :
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     John Cooke (REVS::JAC) 22May84
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     22-MAY-1984  first insertion (REVA::ADAM])
-*     10.06.1991:  DTASK_GSOC developed from various earlier routines 
+*     {enter_new_authors_here}
+
+*  History:
+*     22-MAY-1984 (REVA::ADAM]):
+*        First insertion
+*     10-JUN-1991: DTASK_GSOC developed from various earlier routines
 *                  (REVAD::BDK)
-*     27.06.1991:  call DTASK_SRCHKEY - name was wrong (REVAD::BDK)
-*     25.11.1991:  use ADAM_ACKNOW (REVAD::BDK)
-*     28.02.1992:  Add ACODE argument to DTASK_ADDLST (AAO::TJF)
-*     07.04.1992:  Add CONTROL context and CONTROL DEFAULT action (RLVAD::BKM)
-*     15.07.1992:  Correct handling of unknown context messages
-*     15.07.1992:  Try to recover from GSOC errors
-*     13.10.1992:  Add INCLUDE 'PAR_PAR' (RLVAD::AJC)
-*     23.04.1993:  Remove unused variable declarations (RLVAD::AJC)
-*     23.08.1993:  Replace PAR_PAR with SUBPAR_SYS  (RLVAD::AJC)
+*     27-JUN-1991 (REVAD::BDK):
+*        Call DTASK_SRCHKEY - name was wrong
+*     25-NOV-1991 (REVAD::BDK):
+*        Use ADAM_ACKNOW
+*     28-FEB-1992 (AAO::TJF):
+*        Add ACODE argument to DTASK_ADDLST
+*     07-APR-1992 (RLVAD::BKM):
+*        Add CONTROL context and CONTROL DEFAULT action
+*     15-JUL-1992: Correct handling of unknown context messages
+*     15-JUL-1992: Try to recover from GSOC errors
+*     13-OCT-1992 (RLVAD::AJC):
+*        Add INCLUDE 'PAR_PAR'
+*     23-APR-1993 (RLVAD::AJC):
+*        Remove unused variable declarations
+*     23-AUG-1993 (RLVAD::AJC):
+*        Replace PAR_PAR with SUBPAR_SYS
 *                  Replace PAR__SZNAM with SUBPAR__NAMELEN  (RLVAD::AJC)
-*     11.06.2001:  Call AMS_REPLY (FAMS) directly (AJC)
-*    endhistory
-*    Type Definitions :
+*     11-JUN-2001 (AJC):
+*        Call AMS_REPLY (FAMS) directly
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'ADAM_DEFNS'
@@ -57,7 +87,7 @@
       INCLUDE 'DTASK_ERR'
       INCLUDE 'MESSYS_PAR'
       INCLUDE 'MESSYS_ERR'
-*    Import :
+*  Arguments Given:
       EXTERNAL DTASK_APPLIC        ! application calling routine
       INTEGER PATH                 ! path for message received
       INTEGER MESSID               ! transaction number for message
@@ -65,11 +95,11 @@
       INTEGER CONTEXT              ! context of message received
       CHARACTER*(*) NAME           ! name field in received message
       CHARACTER*(*) VALUE          ! command-line parameter string
-*    Status :
+*  Status:
       INTEGER STATUS
-*    Global variables :
+*  Global Variables:
       INCLUDE 'DTASK_CMN'
-*    Local variables :
+*  Local Variables:
       INTEGER ACTPTR               ! action pointer
       CHARACTER*(SUBPAR__NAMELEN) ANAME ! action name
       INTEGER ACTLEN               ! length of action name
@@ -79,7 +109,7 @@
       INTEGER SEQ                  ! sequence number for action
       INTEGER ACODE                ! number for the action in the 
                                    ! parameter system
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN 
 *

@@ -1,14 +1,28 @@
-*+  DTASK_SUBSID - check for a message from a subsidiary task
       SUBROUTINE DTASK_SUBSID ( DTASK_APPLIC, PATH, MESSID, CONTEXT,
      :  AKEY, MSGSTATUS, VALUE, STATUS ) 
-*    Description :
+*+
+*  Name:
+*     DTASK_SUBSID
+
+*  Purpose:
+*     Check for a message from a subsidiary task
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL DTASK_SUBSID ( DTASK_APPLIC, PATH, MESSID, CONTEXT,
+*     :  AKEY, MSGSTATUS, VALUE, STATUS ) 
+
+*  Description:
 *     Check whether the message has come from a subsidiary task. If it 
 *     has, check what sort of message it is and either forward it or 
 *     reactivate this application.
-*    Invocation :
-*     CALL DTASK_SUBSID ( DTASK_APPLIC, PATH, MESSID, CONTEXT,
-*    :  AKEY, MSGSTATUS, VALUE, STATUS ) 
-*    Parameters :
+
+*  Arguments:
 *     DTASK_APPLIC=EXTERNAL (given)
 *           application calling routine
 *     PATH=INTEGER (given)
@@ -24,35 +38,41 @@
 *     VALUE=CHARACTER*(*) (given and returned)
 *           received VALUE string
 *     STATUS=INTEGER
-*    Method :
-*     <description of how the subroutine works>
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     11.06.1991: original (REVAD:BDK)
-*     18.10.1991: always call ERR_REP with bad status (RLVAD::AJC)
-*     25.11.1991: use ADAM_ACKNOW for forwarding replies to SYNCs 
+*     {enter_new_authors_here}
+
+*  History:
+*     11-JUN-1991 (REVAD:BDK):
+*        Original
+*     18-OCT-1991 (RLVAD::AJC):
+*        Always call ERR_REP with bad status
+*     25-NOV-1991: use ADAM_ACKNOW for forwarding replies to SYNCs
 *                 (REVAD::BDK)
-*     13.10.1992:  add INCLUDE 'PAR_PAR'
+*     13-OCT-1992: add INCLUDE 'PAR_PAR'
 *                  Get ^STATUS via DTASK_ESETK (RLVAD::AJC)
-*     23.08.1993:  Replace PAR_PAR with SUBPAR_SYS  (RLVAD::AJC)
-*     11.06.2001:  Call AMS (FAMS) _REPLY and _PLOOKUP directly
+*     23-AUG-1993 (RLVAD::AJC):
+*        Replace PAR_PAR with SUBPAR_SYS
+*     11-JUN-2001: Call AMS (FAMS) _REPLY and _PLOOKUP directly
 *                  ADAM_PRCNAM now DTASK_PRCNAM (AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'DTASK_SYS'
       INCLUDE 'MESSYS_PAR'
       INCLUDE 'MESSYS_ERR'
 
-*    Import :
+*  Arguments Given:
       EXTERNAL DTASK_APPLIC   ! application calling routine
       INTEGER PATH            ! path for received message
       INTEGER MESSID          ! identifier for transaction
@@ -60,16 +80,16 @@
       CHARACTER*(*) AKEY      ! action keyword
       INTEGER MSGSTATUS       ! status in received message
 
-*    Import-Export :
+*  Arguments Given and Returned:
       CHARACTER*(*) VALUE     ! received VALUE string
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+*  Global Variables:
       INCLUDE 'DTASK_CMN'
 
-*    Local variables :
+*  Local Variables:
       INTEGER ACTPTR                    ! action pointer
       CHARACTER*(MESSYS__TNAME) MYNAME  ! name of this task
       INTEGER NLENGTH                   ! actual length of MYNAME
@@ -78,7 +98,7 @@
       INTEGER MESLEN                    ! length of VALUE
       INTEGER ISTAT                     ! local status
       LOGICAL TRANSPARENT               ! TRUE => message to be forwarded
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

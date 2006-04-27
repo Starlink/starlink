@@ -1,13 +1,26 @@
-*+  DTASK_DTASK - Top subroutine for tasks run as separate processes
       SUBROUTINE DTASK_DTASK ( DEVINIT, DTASK_APPLIC, STATUS )
-*    Description :
+*+
+*  Name:
+*     DTASK_DTASK
+
+*  Purpose:
+*     Top subroutine for tasks run as separate processes
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Description:
 *     Initialise for this mode of operation, then wait for incoming 
 *     messages. When one is received, identify the CONTEXT (GET, SET, 
 *     OBEY, CANCEL or CONTROL) and pass the message information to the 
 *     corresponding routine.
 *     If at all possible, recover from any error conditions and revert 
 *     to waiting for more messages.
-*    Method :
+
+*  Algorithm:
 *     Find the name of the process running the program, and use the name
 *     while initialising into the ADAM message and parameter systems.
 *     Then loop receiving instructions and acting on them.
@@ -15,77 +28,110 @@
 *     "transaction", identified by MESSID. The transaction and its 
 *     associated communications are closed-down when this task returns 
 *     the final message for the GET/SET/OBEY/CANCEL/CONTROL.
-*    Deficiencies :
-*
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     John Cooke (REVS::JAC) 01May84
 *     BDK: B.D.Kelly (ROE)
 *     WFL: W.F.Lupton (AAO)
 *     AJC: A.J.Chipperfield (Starlink, RAL)
 *     BKM: B.K.McIlwrath (Starlink, RAL)
-*
-*    History :
-*     08May84:  added initial/final acknowledgment for OBEY
-*     17May84:  dtask rescheduling started
-*     19Jun84:  general rewrite started
-*     26Oct84:  add full parameter system (REVAD::BDK)
-*     04Dec84:  report error on exit (REVAD::BDK)
-*     11Dec84:  report G/S/O/C errors without exiting (REVAD::BDK)
-*     11Dec84:  use DTASK_ACKNOW (REVAD::BDK)
-*     20.06.1985:  report bad status on message received without exiting
+*     {enter_new_authors_here}
+
+*  History:
+*     08-MAY-1984: added initial/final acknowledgment for OBEY
+*     17-MAY-1984: dtask rescheduling started
+*     19-JUN-1984: general rewrite started
+*     26-OCT-1984 (REVAD::BDK):
+*        Add full parameter system
+*     04-DEC-1984 (REVAD::BDK):
+*        Report error on exit
+*     11-DEC-1984 (REVAD::BDK):
+*        Report G/S/O/C errors without exiting
+*     11-DEC-1984 (REVAD::BDK):
+*        Use DTASK_ACKNOW
+*     20-JUN-1985: report bad status on message received without exiting
 *                       (REVAD::BDK)
-*     25.03.1986: change severity before signalling errors (REVAD::BDK)
-*     22.08.1986: report failure in ACKNOW without exiting (REVAD::BDK)
-*     27.08.1986: make into subroutine instead of main program 
+*     25-MAR-1986 (REVAD::BDK):
+*        Change severity before signalling errors
+*     22-AUG-1986 (REVAD::BDK):
+*        Report failure in ACKNOW without exiting
+*     27-AUG-1986: make into subroutine instead of main program
 *                 (REVAD::BDK)
-*     27.08.1986:  moved illcontext from adam__ to dtask__ (REVA::ADAM)
-*     27.08.1986:  forgot to include dterrs! (REVA::ADAM)
-*     30.04.1989:  enable and disable reporting (AAOEPP::WFL)
-*     30.04.1989:  receive and pass down EXTERNAL DTASK_APPLIC (AAOEPP::WFL)
-*     01.05.1989:  use ERR_OUT rather than LIB$SIGNAL and TYPE (AAOEPP::WFL)
-*     01.05.1989:  don't change severity of failure status (AAOEPP::WFL)
-*     02.05.1989:  receive and call EXTERNAL DEVINIT (AAOEPP::WFL)
-*     01.03.1990:  initialise VALUE, remove DONE, remove MSG_START and
+*     27-AUG-1986 (REVA::ADAM):
+*        Moved illcontext from adam__ to dtask__
+*     27-AUG-1986 (REVA::ADAM):
+*        Forgot to include dterrs!
+*     30-APR-1989 (AAOEPP::WFL):
+*        Enable and disable reporting
+*     30-APR-1989 (AAOEPP::WFL):
+*        Receive and pass down EXTERNAL DTASK_APPLIC
+*     01-MAY-1989 (AAOEPP::WFL):
+*        Use ERR_OUT rather than LIB$SIGNAL and TYPE
+*     01-MAY-1989 (AAOEPP::WFL):
+*        Don't change severity of failure status
+*     02-MAY-1989 (AAOEPP::WFL):
+*        Receive and call EXTERNAL DEVINIT
+*     01-MAR-1990: initialise VALUE, remove DONE, remove MSG_START and
 *                  ERR_START calls and localise area where MSG and ERR
 *                  routines can work, correct comments (AAOEPP::WFL)
-*     25.04.1991:  revise INCLUDE files (REVAD::BDK)
-*     30.04.1991:  use MESSYS__TNAME (REVAD::BDK)
-*     09.05.1991:  tidy error reporting (REVAD::BDK)
-*     09.05.1991:  change order of arguments to OBEY and CANCEL (REVAD::BDK) 
-*     27.05.1991:  use ERR_REP, don't call ERR_ and MSG_STOP (REVAD::BDK)
-*     04.06.1991:  Remove redundant variables (ROE::BMC)
-*     04.06.1991:  Update/correct comments (ROE::BMC)
-*     04.06.1991:  Use MYNAME length obtained instead of MSG_SETC (ROE::BMC)
-*     04.06.1991:  Call ERR_CLEAR before DTASK_ACKNOW as the latter will
+*     25-APR-1991 (REVAD::BDK):
+*        Revise INCLUDE files
+*     30-APR-1991 (REVAD::BDK):
+*        Use MESSYS__TNAME
+*     09-MAY-1991 (REVAD::BDK):
+*        Tidy error reporting
+*     09-MAY-1991 (REVAD::BDK):
+*        Change order of arguments to OBEY and CANCEL
+*     27-MAY-1991 (REVAD::BDK):
+*        Use ERR_REP, don't call ERR_ and MSG_STOP
+*     04-JUN-1991 (ROE::BMC):
+*        Remove redundant variables
+*     04-JUN-1991 (ROE::BMC):
+*        Update/correct comments
+*     04-JUN-1991 (ROE::BMC):
+*        Use MYNAME length obtained instead of MSG_SETC
+*     04-JUN-1991: Call ERR_CLEAR before DTASK_ACKNOW as the latter will
 *                  terminate communications on this MESSID (ROE::BMC)
-*     04.06.1991:  Use DTASK_COMSHUT (ROE::BMC)
-*     07.06.1991:  move error reporting at end of task inside the DO 
+*     04-JUN-1991 (ROE::BMC):
+*        Use DTASK_COMSHUT
+*     07-JUN-1991: move error reporting at end of task inside the DO
 *                  loop. Change comments, change AKEY to NAME
 *                  (REVAD::BDK) 
-*     10.06.1991:  rewrite message receiving and handling section 
+*     10-JUN-1991: rewrite message receiving and handling section
 *                  (REVAD::BDK)
-*     07.04.1992:  Add CONTROL context to prologue and comments (RLVAD::BKM)
-*     15.07.1992:  correct and split end messages (RLVAD::AJC)
-*     14.10.1992:  Mods for portability
+*     07-APR-1992 (RLVAD::BKM):
+*        Add CONTROL context to prologue and comments
+*     15-JUL-1992 (RLVAD::AJC):
+*        Correct and split end messages
+*     14-OCT-1992: Mods for portability
 *                  Get ^STATUS via DTASK_ESETK
 *                  INCLUDE PAR_PAR (RLVAD::AJC)
-*     16.11.1992:  Remove unused declarations ISTAT and BADNAME (RLVAD::AJC)
-*      8.03.1993:  Use MESSYS__VAL_LEN - remove include DDMSG (RLVAD::AJC)
-*     23.08.1993:  Replace PAR_PAR with SUBPAR_SYS  (RLVAD::AJC)
+*     16-NOV-1992 (RLVAD::AJC):
+*        Remove unused declarations ISTAT and BADNAME
+*     08-MAR-1993 (RLVAD::AJC):
+*        Use MESSYS__VAL_LEN - remove include DDMSG
+*     23-AUG-1993 (RLVAD::AJC):
+*        Replace PAR_PAR with SUBPAR_SYS
 *                  Replace PAR__SZNAM with SUBPAR__NAMELEN  (RLVAD::AJC)
-*     22.09.1993:  Prevent attempts to use MESSYS after MSP errors (RLVAD::BKM)
-*     25.09.1995:  Increase size of NAME to allow ACTNAME:PARNAME (RLVAD:AJC)
-*     31.07.1995:    Add TEMPORARY call to DTASK_DECBUG to correct a compiler bug
+*     22-SEP-1993 (RLVAD::BKM):
+*        Prevent attempts to use MESSYS after MSP errors
+*     25-SEP-1995 (RLVAD:AJC):
+*        Increase size of NAME to allow ACTNAME:PARNAME
+*     31-JUL-1995: Add TEMPORARY call to DTASK_DECBUG to correct a compiler bug
 *                  on Alpha/OSF Fortran. (BKM)
-*     11.06.2001:  Call AMS_RECEIVE (FAMS) directly
+*     11-JUN-2001: Call AMS_RECEIVE (FAMS) directly
 *                  ADAM_PRCNAM now DTASK_PRCNAM (AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'MESSYS_PAR'
@@ -93,14 +139,14 @@
       INCLUDE 'ADAM_DEFNS'
       INCLUDE 'DTASK_ERR'
 
-*    Import :
+*  Arguments Given:
       EXTERNAL DEVINIT        ! application initialisation routine
       EXTERNAL DTASK_APPLIC   ! application calling routine
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
       INTEGER MSGSTATUS                 ! status of received message
       INTEGER CONTEXT                   ! GET, SET, OBEY, CANCEL or CONTROL
       INTEGER MSGLEN                    ! Length of message value
@@ -113,7 +159,7 @@
       INTEGER MESSID                    ! identifier for transaction
       CHARACTER*(MESSYS__TNAME) MYNAME  ! name of this task
       INTEGER NLENGTH                   ! actual length of MYNAME
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 *

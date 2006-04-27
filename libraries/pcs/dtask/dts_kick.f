@@ -1,11 +1,25 @@
-*+  DTASK_KICK - interpret a message from this application 
       SUBROUTINE  DTASK_KICK ( DTASK_APPLIC, ANAME, VALUE, STATUS ) 
-*    Description :
+*+
+*  Name:
+*     DTASK_KICK
+
+*  Purpose:
+*     Interpret a message from this application 
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL DTASK_KICK ( DTASK_APPLIC, ANAME, VALUE, STATUS ) 
+
+*  Description:
 *     Interpret a message received from this application. If necessary, 
 *     activate the application.
-*    Invocation :
-*     CALL DTASK_KICK ( DTASK_APPLIC, ANAME, VALUE, STATUS ) 
-*    Parameters :
+
+*  Arguments:
 *     DTASK_APPLIC=EXTERNAL (given)
 *           application calling routine
 *     ANAME=CHARACTER*(*) (given)
@@ -13,39 +27,48 @@
 *     VALUE=CHARACTER*(*) (given)
 *           command-line parameter string
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Check the named action is active. If it is, reactivate the OBEY.
-*    Deficiencies :
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     11.06.1991: original, derived from Adam v1 DTASK_INPUT 
+*     {enter_new_authors_here}
+
+*  History:
+*     11-JUN-1991: original, derived from Adam v1 DTASK_INPUT
 *                 (REVAD::BDK)
-*     13.10.1992:  add INCLUDE 'PAR_PAR' (RLVAD::AJC)
-*     23.08.1993:  Replace PAR_PAR with SUBPAR_SYS  (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     13-OCT-1992 (RLVAD::AJC):
+*        Add INCLUDE 'PAR_PAR'
+*     23-AUG-1993 (RLVAD::AJC):
+*        Replace PAR_PAR with SUBPAR_SYS
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'DTASK_SYS'
       INCLUDE 'DTASK_ERR'
       INCLUDE 'MESSYS_ERR'
 
-*    Import :
+*  Arguments Given:
       EXTERNAL DTASK_APPLIC  ! application calling routine
       CHARACTER*(*) ANAME    ! action name in message received
       CHARACTER*(*) VALUE    ! command-line parameter string
-*    Status :
+*  Status:
       INTEGER STATUS
-*    Global variables :
+*  Global Variables:
       INCLUDE 'DTASK_CMN'
-*    Local variables :
+*  Local Variables:
       INTEGER ACTPTR               ! action pointer
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN 
 *
