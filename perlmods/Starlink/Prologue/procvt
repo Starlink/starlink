@@ -18,6 +18,8 @@ If files are supplied as arguments, each file is processed in turn
 and if the prologue is not in STARLSE form the file will be modified
 to use a modern prologue.
 
+=over 4
+
 =item B<-version>
 
 Report the version number.
@@ -65,20 +67,33 @@ if (@ARGV) {
   # files on command line
   for my $file (@ARGV) {
     open(my $fh, "<$file") || die "Error opening file $file for read: $!\n";
-    my ($types, $rewrite) = _convert_header( join("", <$fh>) );
-    my $converted;
-    for my $t (@$types) {
-      if ($t ne 'STARLSE') {
-	$converted = 1;
-	last;
+    my ($types, $rewrite) = _convert_header( join("", <$fh>), $file );
+    close($fh) || die "Error closing input file $file: $!\n";
+
+    if (@$types) {
+      my $converted;
+      for my $t (@$types) {
+	if ($t ne 'STARLSE') {
+	  $converted = 1;
+	  last;
+	}
       }
-    }
-    if ($converted) {
-      my %types = map { $_, undef } @$types;
-      print STDERR "Prologue in file $file contains ", join(",",keys %types),
-	" prologues. Converting...\n";
+      if ($converted) {
+	my %types = map { $_, undef } @$types;
+	print STDERR "Prologue in file $file contains ", join(", ",keys %types),
+	  " prologues. Converting...\n";
+
+	# open the input file for write
+	open( my $fh, ">", $file) || 
+	  die "Error opening file $file for writing modified prologue: $!";
+	print $fh $rewrite;
+	close( $fh ) || die "Error closing output file $file: $!\n";
+
+      } else {
+	print STDERR "Prologue in file $file does not need to be converted\n";
+      }
     } else {
-      print STDERR "Prologue in file $file does not need to be converted\n";
+      print STDERR "No prologue located in file $file\n";
     }
   }
 } else {
@@ -117,12 +132,15 @@ sub _convert_header {
     # run in rewrite rather than extraction mode
     my ($printme, $prologue) = $parser->push_line( $line );
 
-    # if we have a line and a prologue we need to print the
-    # prologue first
-    if (defined $printme && defined $prologue) {
+    # if we have a prologue it needs to be printed. It may 
+    # come with a line of text that should also be printed after
+    # the prologue
+    if (defined $prologue) {
+
       # fix up language if not defined
       if (!@{$prologue->language}) {
 	if (!defined $file) {
+	  print "DID NOT HAVE FILE\n";
 	  # assume that old prologue is always Fortran!
 	  my @type = @{$prologue->type_of_module};
 	  if (@type && $prologue->prologue_type eq 'ADAMSSE' &&
@@ -130,6 +148,7 @@ sub _convert_header {
 	    $prologue->language("Starlink Fortran 77");
 	  }
 	} elsif ($file =~ /\./) {
+	  # File has a suffix
 	  my @parts = split /\./,$file;
 	  
 	  my $lang;
@@ -151,20 +170,29 @@ sub _convert_header {
 
 	} else {
 	  # now things are getting hard so assume Starlink conventions
-	  if ($file =~ /_PAR$/
-	      || $file =~ /_ERR$/
-	      || $file =~ /_CMN/i
-	     ) {
+	  if ($file =~ /_(ERR|SYS|CMN|PAR)$/i ) {
 	    $prologue->language( "Starlink Fortran 77" );
 	  }
 	}
       }
 
+      # fix up type of module
+      my @type_of_module = @{$prologue->type_of_module};
+      if (!@type_of_module) {
+	if ($file =~ /_CMN$/i) {
+	  $prologue->type_of_module( "COMMON BLOCK" );
+	} elsif ($file =~ /_(ERR|PAR|SYS)$/i ) {
+	  $prologue->type_of_module( "FORTRAN INCLUDE" );
+	}
+      }
+      # stringify the prologue
       $rewrite .= $prologue->stringify;
       $type = $prologue->prologue_type;
       push(@types, $type);
-      $printme = _rewrite_line( $type, $printme );
-      $rewrite .= "\n".$printme ."\n";
+      if (defined $printme) {
+	$printme = _rewrite_line( $type, $printme );
+	$rewrite .= "\n".$printme ."\n";
+      }
     } elsif (defined $printme) {
       # if we just have a line we need to print it out
       $printme = _rewrite_line( $type, $printme );
@@ -198,14 +226,20 @@ sub _rewrite_line {
     return "*  Type Definitions:";
   } elsif ($line =~ /^\s*\*\s+Global Constants\s*:$/i) {
     return "*  Global Constants:";
+  } elsif ($line =~ /^\s*\*\s+Local Constants\s*:$/i) {
+    return "*  Local Constants:";
   } elsif ($line =~ /^\s*\*\s+Local Variables\s*:$/i) {
     return "*  Local Variables:";
+  } elsif ($line =~ /^\s*\*\s+Global Variables\s*:$/i) {
+    return "*  Global Variables:";
   } elsif ($line =~ /^\s*\*\s+Status\s*:$/i) {
     return "*  Status:";
   } elsif ($line =~ /^\s*\*\s+Import\s*:$/i) {
     return "*  Arguments Given:";
   } elsif ($line =~ /^\s*\*\s+Export\s*:$/i) {
     return "*  Arguments Returned:";
+  } elsif ($line =~ /^\s*\*\s+Import-Export\s*:$/i) {
+    return "*  Arguments Given and Returned:";
   }
   return $line;
 }
