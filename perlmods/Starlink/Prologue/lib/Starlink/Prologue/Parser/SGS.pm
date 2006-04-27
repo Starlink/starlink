@@ -185,9 +185,10 @@ sub push_line {
 	return();
       } elsif (defined $section && ($section eq 'Returned' || $section eq 'Given')) {
 	my ($var, $type, $desc) = split(/\s+/, $content, 3);
-              print "GOT: $var - $type - $desc\n";
 	my %types = (
                                c => 'CHAR',
+                               'c*(*)' => 'CHAR',
+                               'c*2' => 'CHAR*2',
                                i => 'INTEGER',
                                r => 'REAL',
                               d => 'DOUBLE',
