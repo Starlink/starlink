@@ -84,6 +84,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'ELF_PAR'               ! ELLFOU constants
+      INCLUDE 'CNF_PAR'
 
 *  Status:
       INTEGER STATUS                  ! Global status
@@ -124,8 +125,9 @@
  5    CONTINUE
 
 *   Use bi-linear interpolation.
-      CALL ELF1_INTER0(ELEMS,%VAL(ARRP(1)),NUMPOI,XR,YR,PRANGE,USED,
-     :                    VA,STATUS)
+      CALL ELF1_INTER0(ELEMS,%VAL(CNF_PVAL(ARRP(1))),
+     :                 NUMPOI,XR,YR,PRANGE,USED,
+     :                 VA,STATUS)
 
 *   Calculate the mean pixel value around the ellipse and also the
 *   number of points for which a value was interpolated successfully.
@@ -293,6 +295,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'ELP_PAR'               ! ELLPRO constants
+      INCLUDE 'CNF_PAR'
 
 *  Status:
       INTEGER STATUS                  ! Global status
@@ -363,13 +366,15 @@
 *      Call the first interpolation system. Employs
 *      pixels around that required. Full grid must be present
 *      to suceed.
-         CALL ELP1_INTER(ELEMS,%VAL(ARRP(1)),NUMPOI,XR,YR,PRANGE,USED,
+         CALL ELP1_INTER(ELEMS,%VAL(CNF_PVAL(ARRP(1))),
+     :                   NUMPOI,XR,YR,PRANGE,USED,
      :                    VA,STATUS)
 
       ELSE
                    
 *        Use bi-linear interpolation.
-         CALL ELP1_INTER0(ELEMS,%VAL(ARRP(1)),NUMPOI,XR,YR,PRANGE,USED,
+         CALL ELP1_INTER0(ELEMS,%VAL(CNF_PVAL(ARRP(1))),
+     :                    NUMPOI,XR,YR,PRANGE,USED,
      :                    VA,STATUS)
 
       END IF
@@ -460,7 +465,7 @@
                WSSIZE = NUMPOI
                IF (STATUS .NE. SAI__OK) GOTO 9999
             ENDIF
-            STAT = ESP1_MEDIAN(VA,USED,NUMPOI,%VAL(WS),STATUS)
+            STAT = ESP1_MEDIAN(VA,USED,NUMPOI,%VAL(CNF_PVAL(WS)),STATUS)
             
 *         Use the sum of the absolute differences as the `residual'.
 *         I've no detailed justification for this, but it `matches' the

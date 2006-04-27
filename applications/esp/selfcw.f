@@ -132,6 +132,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'SEL_PAR'               ! SELFC constants
+      INCLUDE 'CNF_PAR'
                      
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -322,8 +323,10 @@
       YMAX=PRANGE(2)
 
 *   Create an self-correlation image.
-         CALL SEL1_SELFCW(MULT,ELEMS,%VAL(POINT1(1)),RADIUS,MODE,
-     :              XMAX,YMAX,USEALL,HIEST,STATUS,%VAL(POINT2(1)))  
+         CALL SEL1_SELFCW(MULT,ELEMS,%VAL(CNF_PVAL(POINT1(1))),
+     :              RADIUS,MODE,
+     :              XMAX,YMAX,USEALL,HIEST,STATUS,
+     :              %VAL(CNF_PVAL(POINT2(1))))
          IF (STATUS.NE.SAI__OK) GOTO 9999
      
  9999 CONTINUE

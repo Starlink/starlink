@@ -70,7 +70,7 @@
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
       INCLUDE 'PAR_ERR'		      ! PAR constants
-
+      INCLUDE 'CNF_PAR'
          
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -314,7 +314,8 @@
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Transfer values from the mapped NDF to the allocated memory.
-         CALL ELF1_TRANS(ELEMS,%VAL(POINT0(1)),%VAL(POINT1(1)),STATUS)
+         CALL ELF1_TRANS(ELEMS,%VAL(CNF_PVAL(POINT0(1))),
+     :                   %VAL(CNF_PVAL(POINT1(1))),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Un-map the source NDF. Helps to reduce the resources being used.
@@ -336,7 +337,7 @@
          
 *      Look for a better (though crude) estimate of the galaxy core position.
          IF (AUTOL) CALL ELF1_AUTOL(ELEMS,PRANGE,BACK,
-     :                   %VAL(POINT1(1)),XCO,YCO,STATUS)
+     :                   %VAL(CNF_PVAL(POINT1(1))),XCO,YCO,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Call the routine that profiles the galaxy and sets up the values
@@ -539,6 +540,7 @@
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
       INCLUDE 'PAR_ERR'               ! PAR constants
+      INCLUDE 'CNF_PAR'
 
 
 *  Status:     
@@ -840,7 +842,8 @@ C      END IF
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Transfer values from the mapped NDF to the allocated memory.
-         CALL ELP1_TRANS(ELEMS,%VAL(POINT0(1)),%VAL(POINT1(1)),STATUS)
+         CALL ELP1_TRANS(ELEMS,%VAL(CNF_PVAL(POINT0(1))),
+     :                   %VAL(CNF_PVAL(POINT1(1))),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Un-map the source NDF. Helps to reduce the resources being used.
@@ -862,7 +865,7 @@ C      END IF
 
 *      Look for a better (though crude) estimate of the galaxy core position.
          IF (AUTOL) CALL ELP1_AUTOL(BACK,ELEMS,PRANGE,
-     :                   %VAL(POINT1(1)),XCO,YCO,STATUS)
+     :                   %VAL(CNF_PVAL(POINT1(1))),XCO,YCO,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Call the routine that profiles the galaxy and sets up the values
@@ -1055,6 +1058,7 @@ C      END IF
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
       INCLUDE 'PAR_ERR'		      ! defines PAR__NULL
       include 'GAU_PAR'
+      INCLUDE 'CNF_PAR'
          
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -1327,8 +1331,9 @@ C      END IF
       IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *   Transfer values from the mapped NDF to the allocated memory.
-      CALL GAU1_TRANS(NSOUR,BACK,SIGMA,NSIGMA,ELEMS,%VAL(POINT(1)),
-     :               %VAL(POINT(2)),XCO,YCO,RLIM,PRANGE,
+      CALL GAU1_TRANS(NSOUR,BACK,SIGMA,NSIGMA,ELEMS,
+     :               %VAL(CNF_PVAL(POINT(1))),
+     :               %VAL(CNF_PVAL(POINT(2))),XCO,YCO,RLIM,PRANGE,
      :               UPIX,GUESS,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998
 
@@ -1346,8 +1351,10 @@ C      END IF
 
 *   Store locations of the pixels being used. Will help speed things up
 *   later.
-      CALL GAU1_TRAN2(ELEMS,%VAL(POINT(2)),UPIX,PRANGE(1),
-     :                %VAL(POINT(4)),%VAL(POINT(5)),%VAL(POINT(6)),
+      CALL GAU1_TRAN2(ELEMS,%VAL(CNF_PVAL(POINT(2))),UPIX,PRANGE(1),
+     :                %VAL(CNF_PVAL(POINT(4))),
+     :                %VAL(CNF_PVAL(POINT(5))),
+     :                %VAL(CNF_PVAL(POINT(6))),
      :                STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998
 
@@ -1392,7 +1399,7 @@ C      END IF
 *      peak values to try. 
          call gau1_guess(nsour,angcon,angoff,psize,sigma,
      :        nsigma,back,xco,yco,rlim,
-     :        elems,%val(point(2)),prange,guess,
+     :        elems,%val(cnf_pval(point(2))),prange,guess,
      :        hint,status)
          if (status.ne.sai__ok) goto 9998
 
@@ -1457,15 +1464,16 @@ C      END IF
 *      Look for a better (though crude) estimate of the source core position.
          CALL PAR_GET0L('AUTOL',AUTOL,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
-         IF (AUTOL) CALL GAU1_AUTOL(NSOUR,ELEMS,PRANGE,%VAL(POINT(2)),
-     :        XCO,YCO,STATUS)
+         IF (AUTOL) CALL GAU1_AUTOL(NSOUR,ELEMS,PRANGE,
+     :                              %VAL(CNF_PVAL(POINT(2))),
+     :                              XCO,YCO,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
      
 *      Get an estimate for the first position angles, sigmas and
 *      peak values to try. 
          CALL GAU1_GUESS(NSOUR,ANGCON,ANGOFF,PSIZE,SIGMA,
      :        NSIGMA,BACK,XCO,YCO,RLIM,
-     :        ELEMS,%VAL(POINT(2)),PRANGE,GUESS,
+     :        ELEMS,%VAL(CNF_PVAL(POINT(2))),PRANGE,GUESS,
      :        HINT,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
@@ -1490,7 +1498,8 @@ C      END IF
 *   [ orig comment: Copy the errors generated to an output image. ]
 *   No - it copies the working image to the result image.  No errors
 *   are calculated anywhere... [NG]
-      CALL GAU1_OUTIM(ELEMS,%VAL(POINT(3)),%VAL(MODEL),STATUS)
+      CALL GAU1_OUTIM(ELEMS,%VAL(CNF_PVAL(POINT(3))),
+     :                %VAL(CNF_PVAL(MODEL)),STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998
       
 *   Output a text file containing results if required.
@@ -1603,6 +1612,7 @@ C      END IF
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'SEC_PAR'               ! SECTOR constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants   
+      INCLUDE 'CNF_PAR'
 
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -1839,7 +1849,8 @@ C      END IF
          IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *      Transfer values from the mapped NDF to the allocated memory.
-         CALL SEC1_TRANS(ELEMS,%VAL(POINT0(1)),%VAL(POINT1(1)),STATUS)
+         CALL SEC1_TRANS(ELEMS,%VAL(CNF_PVAL(POINT0(1))),
+     :                   %VAL(CNF_PVAL(POINT1(1))),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *      Un-map the source NDF. Helps to reduce the resources being used.
@@ -1860,13 +1871,14 @@ C      END IF
          
 *      Look for a better (though crude) estimate of the galaxy core position.
          CALL SEC1_AUTOL(AUTOL,ELEMS,PRANGE,OCOUNT,FLAG,
-     :                   %VAL(POINT1(1)),XCO,YCO,STATUS)
+     :                   %VAL(CNF_PVAL(POINT1(1))),XCO,YCO,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *      Call the routine that fills the arrays with the summation of all
 *      the data points within the required slice.
          CALL SEC1_PIE(1,BACK,ELEMS,XCO,YCO,PRANGE,POSANG,ANGWID,NVP,
-     :                 NUMBER,SUMMAT,RLIM,%VAL(POINT1(1)),STATUS)
+     :                 NUMBER,SUMMAT,RLIM,%VAL(CNF_PVAL(POINT1(1))),
+     :                 STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
          LEN2=RLIM
 
@@ -1881,7 +1893,8 @@ C      END IF
 
 *         Perform the count summation for the opposite side of the object.
             CALL SEC1_PIE(0,BACK,ELEMS,XCO,YCO,PRANGE,TEMP,ANGWID,NVP,
-     :                    NUMBER,SUMMAT,RLIM,%VAL(POINT1(1)),STATUS)
+     :                    NUMBER,SUMMAT,RLIM,%VAL(CNF_PVAL(POINT1(1))),
+     :                    STATUS)
             IF (STATUS.NE.SAI__OK) GOTO 9999
 
          END IF

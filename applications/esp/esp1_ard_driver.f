@@ -48,6 +48,7 @@
       INCLUDE 'PRM_PAR'                 ! Primdat constants
       INCLUDE 'NDF_PAR'                 ! NDF constants
       INCLUDE 'PAR_ERR'			! Constants for the PAR system
+      INCLUDE 'CNF_PAR'
       
 *   Arguments Given:
       INTEGER ELEMS                     ! Number of pixels in the image
@@ -108,7 +109,8 @@
          ARDINP=.TRUE.
          CALL ERR_MARK
          CALL ARD_WORK(IGRP,NDIM,LBND,UBND,TRCOEF,.FALSE.,
-     :                 INDEX,%VAL(POINT4(1)),LBNDI,UBNDI,LBNDE,
+     :                 INDEX,%VAL(CNF_PVAL(POINT4(1))),
+     :                 LBNDI,UBNDI,LBNDE,
      :                 UBNDE,STATUS)
          IF (STATUS.NE.SAI__OK) THEN
 
@@ -126,8 +128,8 @@
          IF (ARDINP) THEN
           
 *         Set the required pixels to bad.
-            CALL ESP1_ARD_DRIVE2(ELEMS,%VAL(POINT1(1)),
-     :                          %VAL(POINT4(1)),STATUS)
+            CALL ESP1_ARD_DRIVE2(ELEMS,%VAL(CNF_PVAL(POINT1(1))),
+     :                          %VAL(CNF_PVAL(POINT4(1))),STATUS)
 
 *          Close down the group used to hold the pixel mask.
             CALL GRP_DELET(IGRP,STATUS)

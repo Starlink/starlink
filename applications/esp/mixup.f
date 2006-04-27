@@ -62,6 +62,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
+      INCLUDE 'CNF_PAR'
                      
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -171,7 +172,8 @@
 
 *   Mixup the image pixels.
          CALL MIX1_MIXER(XMAX,YMAX,ELEMS,
-     :                   %VAL(POINT1(1)),%VAL(POINT2(1)),STATUS)  
+     :                   %VAL(CNF_PVAL(POINT1(1))),
+     :                   %VAL(CNF_PVAL(POINT2(1))),STATUS)  
          IF (STATUS.NE.SAI__OK) GOTO 9999
 
  9999 CONTINUE

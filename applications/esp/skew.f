@@ -154,6 +154,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'SKE_PAR'               ! SKEW constants
+      INCLUDE 'CNF_PAR'
                      
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -347,15 +348,19 @@
       IF (MODET) THEN
 
 *      Global mode version.
-         CALL SKE1_GLOBAL(MULT,ELEMS,%VAL(POINT1(1)),RADIUS,MODE,
-     :              XMAX,YMAX,USEALL,HIEST,STATUS,%VAL(POINT2(1)))  
+         CALL SKE1_GLOBAL(MULT,ELEMS,%VAL(CNF_PVAL(POINT1(1))),
+     :               RADIUS,MODE,
+     :               XMAX,YMAX,USEALL,HIEST,STATUS,
+     :               %VAL(CNF_PVAL(POINT2(1))))  
          IF (STATUS.NE.SAI__OK) GOTO 9999
      
       ELSE
 
 *      Local mode version.
-         CALL SKE1_LOCAL(MULT,ELEMS,%VAL(POINT1(1)),RADIUS,
-     :                   XMAX,YMAX,STATUS,%VAL(POINT2(1)))  
+         CALL SKE1_LOCAL(MULT,ELEMS,%VAL(CNF_PVAL(POINT1(1))),
+     :                   RADIUS,
+     :                   XMAX,YMAX,STATUS,
+     :                   %VAL(CNF_PVAL(POINT2(1))))
          IF (STATUS.NE.SAI__OK) GOTO 9999
 
       END IF 

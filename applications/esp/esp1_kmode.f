@@ -71,6 +71,7 @@
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
       INCLUDE 'PAR_ERR'		      ! PAR constants
+      INCLUDE 'CNF_PAR'
          
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -267,7 +268,8 @@
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Transfer values from the mapped NDF to the allocated memory.
-         CALL ELF1_TRANS(ELEMS,%VAL(POINT0(1)),%VAL(POINT1(1)),STATUS)
+         CALL ELF1_TRANS(ELEMS,%VAL(CNF_PVAL(POINT0(1))),
+     :                   %VAL(CNF_PVAL(POINT1(1))),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Un-map the source NDF. Helps to reduce the resources being used.
@@ -289,7 +291,7 @@
 
 *      Look for a better (though crude) estimate of the galaxy core position.
          IF (AUTOL) CALL ELF1_AUTOL(ELEMS,PRANGE,BACK,
-     :                   %VAL(POINT1(1)),XCO,YCO,STATUS)
+     :                   %VAL(CNF_PVAL(POINT1(1))),XCO,YCO,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Call the routine that profiles the galaxy and sets up the values
@@ -458,6 +460,7 @@
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
       INCLUDE 'PAR_ERR'               ! PAR constants
+      INCLUDE 'CNF_PAR'
          
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -703,7 +706,8 @@
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Transfer values from the mapped NDF to the allocated memory.
-         CALL ELP1_TRANS(ELEMS,%VAL(POINT0(1)),%VAL(POINT1(1)),STATUS)
+         CALL ELP1_TRANS(ELEMS,%VAL(CNF_PVAL(POINT0(1))),
+     :                   %VAL(CNF_PVAL(POINT1(1))),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Un-map the source NDF. Helps to reduce the resources being used.
@@ -725,7 +729,7 @@
 
 *      Look for a better (though crude) estimate of the galaxy core position.
          IF (AUTOL) CALL ELP1_AUTOL(BACK,ELEMS,PRANGE,
-     :                   %VAL(POINT1(1)),XCO,YCO,STATUS)
+     :                   %VAL(CNF_PVAL(POINT1(1))),XCO,YCO,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Call the routine that profiles the galaxy and sets up the values
@@ -899,6 +903,7 @@
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'SEC_PAR'               ! SECTOR constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constant
+      INCLUDE 'CNF_PAR'
    
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -1075,7 +1080,8 @@
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Transfer values from the mapped NDF to the allocated memory.
-         CALL SEC1_TRANS(ELEMS,%VAL(POINT0(1)),%VAL(POINT1(1)),STATUS)
+         CALL SEC1_TRANS(ELEMS,%VAL(CNF_PVAL(POINT0(1))),
+     :                   %VAL(CNF_PVAL(POINT1(1))),STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Un-map the source NDF. Helps to reduce the resourcse being used.
@@ -1096,13 +1102,14 @@
  
 *      Look for a better (though crude) estimate of the galaxy core position.
          CALL SEC1_AUTOL(AUTOL,ELEMS,PRANGE,OCOUNT,FLAG,
-     :                   %VAL(POINT1(1)),XCO,YCO,STATUS)
+     :                   %VAL(CNF_PVAL(POINT1(1))),XCO,YCO,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Call the routine that fills the arrays with the summation of all
 *      the data points within the required slice.
          CALL SEC1_PIE(1,BACK,ELEMS,XCO,YCO,PRANGE,POSANG,ANGWID,NVP,
-     :                 NUMBER,SUMMAT,RLIM,%VAL(POINT1(1)),STATUS)
+     :                 NUMBER,SUMMAT,RLIM,%VAL(CNF_PVAL(POINT1(1))),
+     :                 STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
          LEN2=RLIM
 
@@ -1116,7 +1123,8 @@
 
 *         Perform the count summation for the opposite side of the object.
             CALL SEC1_PIE(0,BACK,ELEMS,XCO,YCO,PRANGE,TEMP,ANGWID,NVP,
-     :                    NUMBER,SUMMAT,RLIM,%VAL(POINT1(1)),STATUS)
+     :                    NUMBER,SUMMAT,RLIM,%VAL(CNF_PVAL(POINT1(1))),
+     :                    STATUS)
             IF (STATUS.NE.SAI__OK) GOTO 9998
 
          END IF

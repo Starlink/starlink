@@ -752,6 +752,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'ELP_PAR'               ! ELLPRO constants
+      INCLUDE 'CNF_PAR'
 
 *  Status:
       INTEGER STATUS                  ! Global status
@@ -880,7 +881,8 @@
 *   ellipticity values to try. retain the initial value of radius
 *   for later use.
       CALL ELP1_GUESS(DMODE,ANGCON,SIGMA,BACK,X,Y,ELEMS,
-     :                %VAL(ARRP(1)),PRANGE,POSANG,RADIUS,ELLIP,STATUS)
+     :                %VAL(CNF_PVAL(ARRP(1))),
+     :                PRANGE,POSANG,RADIUS,ELLIP,STATUS)
       EGUESS=ELLIP
       PGUESS=POSANG
      

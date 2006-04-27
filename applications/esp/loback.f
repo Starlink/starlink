@@ -150,6 +150,7 @@
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'LOB_PAR'               ! LOBACK system variables
+      INCLUDE 'CNF_PAR'
                      
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -344,9 +345,10 @@
  1          CONTINUE     
             SDEV(1)=0.0
             SDEV(2)=0.0
-            CALL LOB1_FILL(ELEMS,%VAL(POINT0(1)),PRANGE,LBND,UBND,
+            CALL LOB1_FILL(ELEMS,%VAL(CNF_PVAL(POINT0(1))),
+     :                     PRANGE,LBND,UBND,
      :                     XC(I),YC(I),NUMP,WIDTH,NUMPS,
-     :                     %VAL(POINT1(1)),STATUS)
+     :                     %VAL(CNF_PVAL(POINT1(1))),STATUS)
 
 *         Call the modified version of HISTPEAK/HSUB. If it returns with
 *         status set this is unset so that other data points can be
@@ -818,6 +820,7 @@
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'LOB_PAR'               ! LOBACK system variables
+      INCLUDE 'CNF_PAR'
                      
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -883,7 +886,7 @@
 
 *   Call routine to find the highest, lowest and mean
 *   value of those in the data array.
-      CALL LOB1_HILOA(ELEMS,%VAL(POINT1(1)),
+      CALL LOB1_HILOA(ELEMS,%VAL(CNF_PVAL(POINT1(1))),
      :                UNUPIX,HIGH,MEAN,LOW,NUMBER,STATUS)               
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
@@ -914,16 +917,17 @@
 
 *   Call routine to find moments of deviation from the mean for
 *   the NDF data array.
-      CALL LOB1_MOMDE(ELEMS,NUMBER,%VAL(POINT1(1)),
+      CALL LOB1_MOMDE(ELEMS,NUMBER,%VAL(CNF_PVAL(POINT1(1))),
      :                MEAN,ADEV,VARI,SDEV,STATUS) 
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Call routine to find the median and mode of the values in
 *   the NDF array data.
-      CALL LOB1_MEDMO(ELEMS,%VAL(POINT1(1)),POINT2,POINT3,BARSIZ,
-     :                BINWID,LOW,ADEV,SFACT,
-     :                NUMBER,SDEV,%VAL(POINT2(1)),
-     :                %VAL(POINT3(1)),MEDIAN,PEAKV,SFACTA,MODE,STATUS)
+      CALL LOB1_MEDMO(ELEMS,%VAL(CNF_PVAL(POINT1(1))),POINT2,POINT3,
+     :                BARSIZ,BINWID,LOW,ADEV,SFACT,
+     :                NUMBER,SDEV,%VAL(CNF_PVAL(POINT2(1))),
+     :                %VAL(CNF_PVAL(POINT3(1))),
+     :                MEDIAN,PEAKV,SFACTA,MODE,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999  
                                            
 *   Return to the calling routine..

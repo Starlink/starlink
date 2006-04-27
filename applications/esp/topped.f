@@ -98,6 +98,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'TOP_PAR'               ! TOPPED constants
+      INCLUDE 'CNF_PAR'
                      
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -255,8 +256,10 @@
 
 *   Carry out the operation to set the pixels immediately surrounding 
 *   bright pixels to bad.
-      CALL TOP1_REMOV(ELEMS,%VAL(POINT1(1)),NOISE,BACK,SIGMA,NSIGMA,
-     :                RADIUS,XMAX,YMAX,%VAL(POINT2(1)),STATUS)  
+      CALL TOP1_REMOV(ELEMS,%VAL(CNF_PVAL(POINT1(1))),NOISE,BACK,SIGMA,
+     :                NSIGMA,
+     :                RADIUS,XMAX,YMAX,
+     :                %VAL(CNF_PVAL(POINT2(1))),STATUS)  
       IF (STATUS.NE.SAI__OK) GOTO 9999
      
  9999 CONTINUE

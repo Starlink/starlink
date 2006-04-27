@@ -185,6 +185,7 @@
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'HIS_PAR'               ! HISTPEAK system variables
       INCLUDE 'PAR_ERR'               ! Parameter system error constants
+      INCLUDE 'CNF_PAR'
                      
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -375,7 +376,8 @@
 *   Set up the image array to reflect which pixels are to
 *   be used when the image is processed.
       CALL HIS1_SELAR(POINT1,PRANGE,USE,LBND,UBND,
-     :                %VAL(POINT0(1)),ELEMS,%VAL(POINT1(1)),STATUS)
+     :                %VAL(CNF_PVAL(POINT0(1))),ELEMS,
+     :                %VAL(CNF_PVAL(POINT1(1))),STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Display the heading for the results display.
@@ -391,7 +393,7 @@
 
 *   Call routine to find the highest, lowest and mean
 *   value of those in the data array.
-      CALL HIS1_HILOA(ELEMS,%VAL(POINT1(1)),
+      CALL HIS1_HILOA(ELEMS,%VAL(CNF_PVAL(POINT1(1))),
      :                UNUPIX,HIGH,MEAN,LOW,NUMBER,STATUS)               
       IF (STATUS.NE.SAI__OK) GOTO 9999
     
@@ -422,16 +424,18 @@
 
 *   Call routine to find moments of deviation from the mean for
 *   the NDF data array.
-      CALL HIS1_MOMDE(ELEMS,NUMBER,%VAL(POINT1(1)),
+      CALL HIS1_MOMDE(ELEMS,NUMBER,%VAL(CNF_PVAL(POINT1(1))),
      :                MEAN,ADEV,VARI,SDEV,SKEW,KURT,STATUS) 
       IF (STATUS.NE.SAI__OK) GOTO 9999      
 
 *   Call routine to find the median and mode of the values in
 *   the smoothed NDF array data.
-      CALL HIS1_MEDMO(ELEMS,%VAL(POINT1(1)),POINT2,POINT3,BARSIZ,
+      CALL HIS1_MEDMO(ELEMS,%VAL(CNF_PVAL(POINT1(1))),
+     :                POINT2,POINT3,BARSIZ,
      :                BINWID,LOW,ADEV,SFACT,SEEHIS,
-     :                NUMBER,SDEV,%VAL(POINT2),
-     :                %VAL(POINT3),MEDIAN,PEAKV,SFACTA,MODE,STATUS)
+     :                NUMBER,SDEV,%VAL(CNF_PVAL(POINT2)),
+     :                %VAL(CNF_PVAL(POINT3)),MEDIAN,PEAKV,
+     :                SFACTA,MODE,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999  
 
 *   Display the results.

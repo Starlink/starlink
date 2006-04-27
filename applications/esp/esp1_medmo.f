@@ -98,6 +98,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'HIS_PAR'               ! HISTPEAK system constants
+      INCLUDE 'CNF_PAR'
 
 *  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the image
@@ -461,7 +462,7 @@
 
 *   Take chords through the histogram peak and get values for 
 *   histogram chord 
-      CALL HIS1_CHORD(HIVAL,LOVAL,MODEC,%VAL(POINT3),LOW,ADEV,
+      CALL HIS1_CHORD(HIVAL,LOVAL,MODEC,%VAL(CNF_PVAL(POINT3)),LOW,ADEV,
      :                BARSIZ,BINWID,NUMDAT,HEIG,X1,Y1,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
            
@@ -475,15 +476,17 @@
 
 *   Set up the data for matrix inversion to provide 
 *   an interpolated value for the mode.
-      CALL HIS1_PARA(ADEV,%VAL(POINT3),BARSIZ,LOW,BINWID,
+      CALL HIS1_PARA(ADEV,%VAL(CNF_PVAL(POINT3)),BARSIZ,LOW,BINWID,
      :               MODE,SDEV,PEAKV,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Display histogram if user has opted for graphics.      
       IF (SEEHIS) THEN
-         CALL HIS1_GRAPH(ADEV,%VAL(POINT2),PEAKV(1),LOW,MODE,MEDIAN,
-     :                  SDEV,%VAL(POINT3),BARSIZ,HEIG,X1,Y1,NUMDAT,
-     :                  BINWID,STATUS)
+         CALL HIS1_GRAPH(ADEV,%VAL(CNF_PVAL(POINT2)),
+     :                   PEAKV(1),LOW,MODE,MEDIAN,
+     :                   SDEV,%VAL(CNF_PVAL(POINT3)),
+     :                   BARSIZ,HEIG,X1,Y1,NUMDAT,
+     :                   BINWID,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
       END IF
 
@@ -590,6 +593,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'HSB_PAR'               ! HSUB system constants
+      INCLUDE 'CNF_PAR'
 
 *  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the image
@@ -959,7 +963,8 @@
 
 *   Take chords through the histogram peak and get values for 
 *   histogram chord 
-      CALL HSB1_CHORD(HIVAL,LOVAL,MODEC,%VAL(POINT3(1)),LOW,ADEV,
+      CALL HSB1_CHORD(HIVAL,LOVAL,MODEC,%VAL(CNF_PVAL(POINT3(1))),
+     :                LOW,ADEV,
      :                BARSIZ,BINWID,STATUS,NUMDAT,HEIG,X1,Y1)
       IF (STATUS.NE.SAI__OK) GOTO 9999
            
@@ -977,7 +982,7 @@
 
 *   Set up the data for matrix inversion to provide 
 *   an interpolated value for the mode.
-      CALL HSB1_PARA(ADEV,%VAL(POINT3(1)),BARSIZ,LOW,BINWID,
+      CALL HSB1_PARA(ADEV,%VAL(CNF_PVAL(POINT3(1))),BARSIZ,LOW,BINWID,
      :               MODE,SDEV,PEAKV,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
@@ -1082,6 +1087,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'LOB_PAR'               ! LOBACK system constants
+      INCLUDE 'CNF_PAR'
 
 *  Arguments Given:
       INTEGER ELEMS                   ! Number of pixels in the image
@@ -1442,7 +1448,8 @@
 
 *   Take chords through the histogram peak and get values for 
 *   histogram chord 
-      CALL LOB1_CHORD(HIVAL,LOVAL,MODEC,%VAL(POINT3(1)),LOW,ADEV,
+      CALL LOB1_CHORD(HIVAL,LOVAL,MODEC,%VAL(CNF_PVAL(POINT3(1))),
+     :                LOW,ADEV,
      :                BARSIZ,BINWID,NUMDAT,HEIG,X1,Y1,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
            
@@ -1456,7 +1463,7 @@
 
 *   Set up the data for matrix inversion to provide 
 *   an interpolated value for the mode.
-      CALL LOB1_PARA(ADEV,%VAL(POINT3(1)),BARSIZ,LOW,BINWID,
+      CALL LOB1_PARA(ADEV,%VAL(CNF_PVAL(POINT3(1))),BARSIZ,LOW,BINWID,
      :               MODE,SDEV,PEAKV,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 

@@ -67,6 +67,7 @@
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
       INCLUDE 'PAR_ERR'		      ! PAR constants
+      INCLUDE 'CNF_PAR'
          
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -287,7 +288,8 @@
       IF (STATUS.NE.SAI__OK) GOTO 9998
      
 *   Transfer values from the mapped NDF to the allocated memory.
-      CALL ELF1_TRANS(ELEMS,%VAL(POINT0(1)),%VAL(POINT1(1)),STATUS)
+      CALL ELF1_TRANS(ELEMS,%VAL(CNF_PVAL(POINT0(1))),
+     :                %VAL(CNF_PVAL(POINT1(1))),STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998
       
 *   Un-map the source NDF. Helps to reduce the resources being used.
@@ -335,7 +337,8 @@
 
 *      Look for a better (though crude) estimate of the galaxy core position.
          IF (AUTOL) CALL ELF1_AUTOL(ELEMS,PRANGE,BACK,
-     :                              %VAL(POINT1(1)),XCO,YCO,STATUS)
+     :                              %VAL(CNF_PVAL(POINT1(1))),
+     :                              XCO,YCO,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Call the routine that profiles the galaxy and sets up the values
@@ -486,6 +489,7 @@
       INCLUDE 'ELP_PAR'               ! ELLPRO constants
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
+      INCLUDE 'CNF_PAR'
          
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -756,7 +760,8 @@
       IF (STATUS.NE.SAI__OK) GOTO 9998
      
 *   Transfer values from the mapped NDF to the allocated memory.
-      CALL ELP1_TRANS(ELEMS,%VAL(POINT0(1)),%VAL(POINT1(1)),STATUS)
+      CALL ELP1_TRANS(ELEMS,%VAL(CNF_PVAL(POINT0(1))),
+     :                %VAL(CNF_PVAL(POINT1(1))),STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998
       
 *   Un-map the source NDF. Helps to reduce the resources being used.
@@ -805,7 +810,8 @@
 
 *      Look for a better (though crude) estimate of the galaxy core position.
          IF (AUTOL) CALL ELP1_AUTOL(BACK,ELEMS,PRANGE,
-     :                              %VAL(POINT1(1)),XCO,YCO,STATUS)
+     :                              %VAL(CNF_PVAL(POINT1(1))),
+     :                              XCO,YCO,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *      Call the routine that profiles the galaxy and sets up the values
@@ -948,6 +954,7 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
       include 'PAR_ERR'
       include 'GAU_PAR'
+      INCLUDE 'CNF_PAR'
          
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -1180,9 +1187,10 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *   Transfer values from the mapped NDF to the allocated memory.
-      CALL GAU1_TRANS(NSOUR,BACK,SIGMA,NSIGMA,ELEMS,%VAL(POINT(1)),
-     :               %VAL(POINT(2)),XCO,YCO,RLIM,PRANGE,
-     :               UPIX,GUESS,STATUS)
+      CALL GAU1_TRANS(NSOUR,BACK,SIGMA,NSIGMA,ELEMS,
+     :                %VAL(CNF_PVAL(POINT(1))),
+     :                %VAL(CNF_PVAL(POINT(2))),XCO,YCO,RLIM,PRANGE,
+     :                UPIX,GUESS,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *   Allocate more dynamic memory on which to map the addresses of good pixels.
@@ -1199,8 +1207,10 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
 
 *   Store locations of the pixels being used. Will help speed things up
 *   later.
-      CALL GAU1_TRAN2(ELEMS,%VAL(POINT(2)),UPIX,PRANGE(1),
-     :                %VAL(POINT(4)),%VAL(POINT(5)),%VAL(POINT(6)),
+      CALL GAU1_TRAN2(ELEMS,%VAL(CNF_PVAL(POINT(2))),UPIX,PRANGE(1),
+     :                %VAL(CNF_PVAL(POINT(4))),
+     :                %VAL(CNF_PVAL(POINT(5))),
+     :                %VAL(CNF_PVAL(POINT(6))),
      :                STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998
 
@@ -1220,7 +1230,7 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
 *      peak values to try. 
          call gau1_guess(nsour,angcon,angoff,psize,sigma,
      :        nsigma,back,xco,yco,rlim,
-     :        elems,%val(point(2)),prange,guess,
+     :        elems,%val(cnf_pval(point(2))),prange,guess,
      :        hint,status)
          if (status.ne.sai__ok) goto 9998
 
@@ -1286,15 +1296,16 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
 *      position.
          CALL PAR_GET0L('AUTOL',AUTOL,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999
-         IF (AUTOL) CALL GAU1_AUTOL(NSOUR,ELEMS,PRANGE,%VAL(POINT(2)),
-     :        XCO,YCO,STATUS)
+         IF (AUTOL) CALL GAU1_AUTOL(NSOUR,ELEMS,PRANGE,
+     :                              %VAL(CNF_PVAL(POINT(2))),
+     :                              XCO,YCO,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
          
 *      Get an estimate for the first position angles, sigmas and
 *      peak values to try. 
          CALL GAU1_GUESS(NSOUR,ANGCON,ANGOFF,PSIZE,SIGMA,NSIGMA,BACK,
      :        XCO,YCO,RLIM,
-     :        ELEMS,%VAL(POINT(2)),PRANGE,GUESS,
+     :        ELEMS,%VAL(CNF_PVAL(POINT(2))),PRANGE,GUESS,
      :        HINT,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
 
@@ -1317,7 +1328,8 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
       endif
 
 *   Store the output image.
-      CALL GAU1_OUTIM(ELEMS,%VAL(POINT(3)),%VAL(MODEL),STATUS)
+      CALL GAU1_OUTIM(ELEMS,%VAL(CNF_PVAL(POINT(3))),
+     :                %VAL(CNF_PVAL(MODEL)),STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998
       
 *   Output a text file containing results.

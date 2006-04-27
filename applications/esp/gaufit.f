@@ -414,6 +414,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data
       include 'GAU_PAR'
+      INCLUDE 'CNF_PAR'
 
 *  Status:
       INTEGER STATUS                  ! Global status
@@ -474,8 +475,11 @@
 
 *   Build the residuals image.
       CALL GAU1_BUILD(NSOUR,BACK,PRANGE,RLIM,PASS,ELEMS,UPIX,
-     :                %VAL(POINT(2)),%VAL(POINT(3)),%VAL(POINT(4)),
-     :                %VAL(POINT(5)),%VAL(POINT(6)),
+     :                %VAL(CNF_PVAL(POINT(2))),
+     :                %VAL(CNF_PVAL(POINT(3))),
+     :                %VAL(CNF_PVAL(POINT(4))),
+     :                %VAL(CNF_PVAL(POINT(5))),
+     :                %VAL(CNF_PVAL(POINT(6))),
      :                RESID,STATUS)
 
 *   Tell the user what the initial residual was.
@@ -509,9 +513,12 @@
 *               Build the residuals image.
                   CALL GAU1_BUILD(NSOUR,BACK,PRANGE,RLIM,PASS,
      :                            ELEMS,UPIX,
-     :                            %VAL(POINT(2)),%VAL(POINT(3)),
-     :                            %VAL(POINT(4)),%VAL(POINT(5)),
-     :                            %VAL(POINT(6)),RESID,STATUS)
+     :                            %VAL(CNF_PVAL(POINT(2))),
+     :                            %VAL(CNF_PVAL(POINT(3))),
+     :                            %VAL(CNF_PVAL(POINT(4))),
+     :                            %VAL(CNF_PVAL(POINT(5))),
+     :                            %VAL(CNF_PVAL(POINT(6))),
+     :                            RESID,STATUS)
                
 *               Test for better residuals.                
                   IF(RESID.LT.BEST)THEN
@@ -537,9 +544,12 @@
 *               Build the main image.
                   CALL GAU1_BUILD(NSOUR,BACK,PRANGE,RLIM,PASS,ELEMS,
      :                            UPIX,
-     :                            %VAL(POINT(2)),%VAL(POINT(3)),
-     :                            %VAL(POINT(4)),%VAL(POINT(5)),
-     :                            %VAL(POINT(6)),RESID,STATUS)
+     :                            %VAL(CNF_PVAL(POINT(2))),
+     :                            %VAL(CNF_PVAL(POINT(3))),
+     :                            %VAL(CNF_PVAL(POINT(4))),
+     :                            %VAL(CNF_PVAL(POINT(5))),
+     :                            %VAL(CNF_PVAL(POINT(6))),
+     :                            RESID,STATUS)
             
 *               Test for better residuals.                
                   IF(RESID.LT.BEST)THEN
@@ -565,9 +575,12 @@
 *               Build the main image.
                   CALL GAU1_BUILD(NSOUR,BACK,PRANGE,RLIM,PASS,
      :                            ELEMS,UPIX,
-     :                            %VAL(POINT(2)),%VAL(POINT(3)),
-     :                            %VAL(POINT(4)),%VAL(POINT(5)),
-     :                            %VAL(POINT(6)),RESID,STATUS)
+     :                            %VAL(CNF_PVAL(POINT(2))),
+     :                            %VAL(CNF_PVAL(POINT(3))),
+     :                            %VAL(CNF_PVAL(POINT(4))),
+     :                            %VAL(CNF_PVAL(POINT(5))),
+     :                            %VAL(CNF_PVAL(POINT(6))),
+     :                            RESID,STATUS)
 
 *               Test for better residuals.                
                   IF(RESID.LT.BEST)THEN
@@ -595,8 +608,11 @@
 
 *            Build the main image.
                CALL GAU1_BUILD(NSOUR,BACK,PRANGE,RLIM,PASS,ELEMS,UPIX,
-     :                   %VAL(POINT(2)),%VAL(POINT(3)),%VAL(POINT(4)),
-     :                   %VAL(POINT(5)),%VAL(POINT(6)),
+     :                   %VAL(CNF_PVAL(POINT(2))),
+     :                   %VAL(CNF_PVAL(POINT(3))),
+     :                   %VAL(CNF_PVAL(POINT(4))),
+     :                   %VAL(CNF_PVAL(POINT(5))),
+     :                   %VAL(CNF_PVAL(POINT(6))),
      :                   RESID,STATUS)
 
 *            Test for better residuals.                 
@@ -622,9 +638,12 @@
 
 *            Build the main image.
                CALL GAU1_BUILD(NSOUR,BACK,PRANGE,RLIM,PASS,ELEMS,UPIX,
-     :                         %VAL(POINT(2)),%VAL(POINT(3)),
-     :                         %VAL(POINT(4)),%VAL(POINT(5)),
-     :                         %VAL(POINT(6)),RESID,STATUS)
+     :                         %VAL(CNF_PVAL(POINT(2))),
+     :                         %VAL(CNF_PVAL(POINT(3))),
+     :                         %VAL(CNF_PVAL(POINT(4))),
+     :                         %VAL(CNF_PVAL(POINT(5))),
+     :                         %VAL(CNF_PVAL(POINT(6))),
+     ;                         RESID,STATUS)
 
 *            Test for better residuals.                
                IF(RESID.LT.BEST)THEN
@@ -649,9 +668,12 @@
 
 *            Build the main image.
                CALL GAU1_BUILD(NSOUR,BACK,PRANGE,RLIM,PASS,ELEMS,UPIX,
-     :                         %VAL(POINT(2)),%VAL(POINT(3)),
-     :                         %VAL(POINT(4)),%VAL(POINT(5)),
-     :                         %VAL(POINT(6)),RESID,STATUS)
+     :                         %VAL(CNF_PVAL(POINT(2))),
+     :                         %VAL(CNF_PVAL(POINT(3))),
+     :                         %VAL(CNF_PVAL(POINT(4))),
+     :                         %VAL(CNF_PVAL(POINT(5))),
+     :                         %VAL(CNF_PVAL(POINT(6))),
+     :                         RESID,STATUS)
 
 *            Test for better residuals.                
                IF(RESID.LT.BEST)THEN
@@ -693,15 +715,18 @@
 
 *      Model of the whole image.       
          CALL GAU1_BUILD2(NSOUR,BACK,PRANGE,PASS,ELEMS,
-     :                   %VAL(POINT(3)),STATUS)
+     :                   %VAL(CNF_PVAL(POINT(3))),STATUS)
       
 
       ELSE
 
 *      The image residuals near the sources.
          CALL GAU1_BUILD(NSOUR,BACK,PRANGE,RLIM,PASS,ELEMS,UPIX,
-     :                   %VAL(POINT(2)),%VAL(POINT(3)),%VAL(POINT(4)),
-     :                   %VAL(POINT(5)),%VAL(POINT(6)),
+     :                   %VAL(CNF_PVAL(POINT(2))),
+     :                   %VAL(CNF_PVAL(POINT(3))),
+     :                   %VAL(CNF_PVAL(POINT(4))),
+     :                   %VAL(CNF_PVAL(POINT(5))),
+     :                   %VAL(CNF_PVAL(POINT(6))),
      :                   RESID,STATUS)
       
       END IF

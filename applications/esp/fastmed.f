@@ -78,6 +78,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
+      INCLUDE 'CNF_PAR'
                      
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -220,8 +221,8 @@
       CALL MSG_BLANK(STATUS)
 
 *   Carry out the operation to median filter the image.
-      CALL FAS1_FILT(ELEMS,%VAL(POINT1(1)),RADIUS,XMAX,YMAX,
-     :               BACK,SIGMA,%VAL(POINT2(1)),STATUS)  
+      CALL FAS1_FILT(ELEMS,%VAL(CNF_PVAL(POINT1(1))),RADIUS,XMAX,YMAX,
+     :               BACK,SIGMA,%VAL(CNF_PVAL(POINT2(1))),STATUS)  
       IF (STATUS.NE.SAI__OK) GOTO 9999
      
  9999 CONTINUE

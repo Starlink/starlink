@@ -65,7 +65,7 @@
       SUBROUTINE GAU2_PRO(NSOUR, MODTYP, ANGCON, ANGOFF, PSIZE,
      :     NITER, RLIM, BACK, SIGMA, ELEMS, UPIX, POINT, PRANGE,
      :     GUESS, GUESSERRS, calcerrs, STATUS)
-*+              
+*+
 *  Name:
 *     GAU2_PRO
 *
@@ -104,7 +104,7 @@
 *     ANGCON = LOGICAL (Given)
 *        Angle rotation convention. Defines if clockwise or
 *        anticlockwise is considered positive. TRUE=Clockwise.  NOT YET USED!
-*     ANGOFF = REAL (Given) 
+*     ANGOFF = REAL (Given)
 *        Angular offset for position angles generated. Units degrees.
 *       NOT YET USED!
 *     PSIZE = REAL (Given)
@@ -112,7 +112,7 @@
 *     NITER = INTEGER (Given)
 *        Number of iterations.  Negative means use default 150.
 *     RLIM(gau2maxfits) = REAL (Given)
-*        The maximum distance from the origin at which profiling 
+*        The maximum distance from the origin at which profiling
 *        takes place.
 *     BACK = REAL (Given, and possibly returned)
 *        The background count for the image.  If negative, this is to be
@@ -160,6 +160,7 @@
 *  Global Constants:
       include 'SAE_PAR'         ! Standard SAE constants
       include 'GAU_PAR'         ! gau2 parameters
+      include 'CNF_PAR'
 
 *   Status:
       INTEGER STATUS            ! Global status
@@ -178,17 +179,17 @@
       REAL BACK                 ! Background count value
       REAL RLIM(gau2maxfits)    ! Maximum source radius used
       REAL SIGMA                ! Std deviation of BACK
-      
+
 *  Arguments Given and Returned:
       REAL GUESS(gau2maxfits,7) ! Current estimates of the parameters
       REAL GUESSERRS(gau2maxfits,7) ! sd of parameter estimates
       logical calcerrs          ! calculate errors?
 
 *   local variables
-      
+
 *   allocated image array
       integer img
-      
+
 *   Arguments passed to NSG
       integer l			! number of non-linear params=nsour or nsour+1
       integer p			! no. n.l. parameters = 5*l
@@ -237,7 +238,7 @@ c$$$      endif
 *   will be incremented in gau2_prep if the background is to be fitted
 *   for as well.
       l = nsour
-      
+
 *   Sanity-check the parameters.  Are these all the checks we need?
       if (nsour .lt. 1 .or. upix .lt. 1 .or. upix .lt. p+1) then
          status = sai__error
@@ -249,35 +250,36 @@ c$$$      endif
      :        ', p=^P', status)
          goto 999
       endif
-      
+
 
 *   There are a total of ELEMS pixels in the image, UPIX of which are
 *   unmasked/good.  Denote the 6 arrays point(1..6) by p1,...,p6.  The
 *   pixel values are in real p2(1..elems), with the good pixels at p2(p4(i)),
 *   i=1..upix, and (x,y)=(p5(i),p6(i)), i=1..upix.  p4, p5, p6 all
 *   integer(1..upix).
-      
-      call gau2_prep (%val(point(2)), %val(point(4)), elems, upix,
-     :     back, niter, calcerrs, modtyp, 
+
+      call gau2_prep (%val(cnf_pval(point(2))),
+     :     %val(cnf_pval(point(4))), elems, upix,
+     :     back, niter, calcerrs, modtyp,
      :     guess, img, in, iv, v, x, xinit, c,
-     :     l, p, liv, lv, gau2par, 
+     :     l, p, liv, lv, gau2par,
      :     status)
-      
+
 *   Now allocate the space for the A and DA
 *   matrices, and initialise the values required by drnsg.
 *   The example in gau2_dnsg does some initialisation by a dummy call to
 *   gau2_drnsg, but I don't need to do this here, as the extra arrays I
 *   need I will allocate separately.
-      
+
       if (status .ne. sai__ok) goto 999
 
-*   Correspondence with rnsg documentation is 
+*   Correspondence with rnsg documentation is
 *      nda = p                   ! no. columns of DA = ncols. of INC
 *      la = n                    ! row-dim of A and DA
 *      l1 = l                    ! =l because no (l+1)-th column
       call psx_calloc (upix*l, '_DOUBLE', a,  status)
       call psx_calloc (upix*p, '_DOUBLE', da, status)
-      
+
       if (status .ne. sai__ok) then
          gau2par(gau2status) = gau2memory
          status = sai__error
@@ -306,38 +308,50 @@ c$$$      endif
 
 
 *   Off we go (wheeee!)
-      call gau2_donsg (%val(a), %val(da), %val(xinit), 
-     :     %val(in), %val(iv), %val(v), %val(img), 
-     :     %val(point(5)), %val(point(6)),
-     :     driftscale, liv, lv, upix, l, p, 
-     :     %val(x), %val(c), gau2par, status)
-      
+      call gau2_donsg (%val(cnf_pval(a)), %val(cnf_pval(da)),
+     :     %val(cnf_pval(xinit)),
+     :     %val(cnf_pval(in)), %val(cnf_pval(iv)),
+     :     %val(cnf_pval(v)), %val(cnf_pval(img)),
+     :     %val(cnf_pval(point(5))), %val(cnf_pval(point(6))),
+     :     driftscale, liv, lv, upix, l, p,
+     :     %val(cnf_pval(x)), %val(cnf_pval(c)), gau2par, status)
+
 *   Calculate the errors in the X vector.  We no longer need xinit, so
-*   rename that to xerrs and pass it to gau2_xerrs 
+*   rename that to xerrs and pass it to gau2_xerrs
       if (calcerrs) then
          xerrs = xinit
-         call gau2_xerrs (%val(iv), %val(v), p, liv, lv, upix, 
-     :        %val(xerrs), sigma, gau2par, status)
+         call gau2_xerrs (%val(cnf_pval(iv)), %val(cnf_pval(v)),
+     :        p, liv, lv, upix,
+     :        %val(cnf_pval(xerrs)), sigma, gau2par, status)
       endif
-      
-      call gau2_rep (upix, %val(iv), %val(v), %val(x), %val(c), 
-     :     %val(xerrs), calcerrs, liv, lv, p, l, gau2par, status)
-      
+
+      call gau2_rep (upix, %val(cnf_pval(iv)), %val(cnf_pval(v)),
+     :     %val(cnf_pval(x)), %val(cnf_pval(c)),
+     :     %val(cnf_pval(xerrs)), calcerrs, liv, lv, p, l, gau2par,
+     :     status)
+
       if (modtyp .eq. gau2regdiag) then
-         call gau2_getrd (%val(iv), liv, %val(v), lv, 
-     :        %val(point(4)), upix, elems, %val(point(3)),
+         call gau2_getrd (%val(cnf_pval(iv)), liv,
+     :        %val(cnf_pval(v)), lv,
+     :        %val(cnf_pval(point(4))), upix, elems,
+     :        %val(cnf_pval(point(3))),
      :        status)
       else
 *      Create the output image
-         call gau2_outim (modtyp, %val(point(2)), %val(point(4)),
-     :        %val(point(5)), %val(point(6)), %val(x), %val(c), 
-     :        elems, upix, p, l, gau2par, %val(a), %val(point(3)),
+         call gau2_outim (modtyp, %val(cnf_pval(point(2))),
+     :        %val(cnf_pval(point(4))),
+     :        %val(cnf_pval(point(5))),
+     :        %val(cnf_pval(point(6))),
+     :        %val(cnf_pval(x)), %val(cnf_pval(c)),
+     :        elems, upix, p, l, gau2par, %val(cnf_pval(a)), 
+     :        %val(cnf_pval(point(3))),
      :        status)
       endif
-      
+
       call gau2_uinit (guess, guesserrs, calcerrs,
-     :     %val(x), %val(xerrs), %val(c), p, l, back, status)
-      
+     :     %val(cnf_pval(x)), %val(cnf_pval(xerrs)), 
+     :     %val(cnf_pval(c)), p, l, back, status)
+
       call gau2_uprep (img, in, iv, v, x, xinit, c, gau2par, status)
 
  998  call psx_free (a,  status)

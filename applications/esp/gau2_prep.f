@@ -84,6 +84,7 @@
       include 'GAU_PAR'
       include 'PSX_ERR'
       include 'SAE_PAR'
+      include 'CNF_PAR'
 
 *   arguments
       integer elems, n, l, p, liv, lv
@@ -145,7 +146,9 @@
       if (status .eq. sai__ok) then
 *      call a subroutine to initialise workimg and inc
          call gau2_inita (n, p, l, bkgd, sourceimg, mask, elems, 
-     :        guess, %val(xinit), %val(workimg), %val(inc))
+     :        guess, %val(cnf_pval(xinit)), 
+     :        %val(cnf_pval(workimg)), 
+     :        %val(cnf_pval(inc)))
       endif
 
       close (10)
@@ -156,7 +159,8 @@
       
 *   We've allocated the v and iv arrays, now initialise them
       call gau2_initv (liv, lv, niter, calcerrs,
-     :     modtyp, %val(iv), %val(v), gau2par, status)
+     :     modtyp, %val(cnf_pval(iv)), %val(cnf_pval(v)), 
+     :     gau2par, status)
 
       end
 

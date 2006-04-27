@@ -638,6 +638,7 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'ELF_PAR'               ! ELLFOU constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
+      INCLUDE 'CNF_PAR'
 
 *  Status:
       INTEGER STATUS                  ! Global status
@@ -785,7 +786,7 @@
       END IF
       
 *   Find the highest and lowest pixel values in the required area.
-      CALL ELF1_HILOW(ELEMS,%VAL(ARRP(1)),PRANGE,XCO,YCO,
+      CALL ELF1_HILOW(ELEMS,%VAL(CNF_PVAL(ARRP(1))),PRANGE,XCO,YCO,
      :                RLIM,VMIN,VMAX,STATUS)
      
 *   Adjust the minimum value so that it is not below the background.
@@ -819,7 +820,7 @@
          HIGH=MEAN+BOUNDS
          
 *      Provide an estimate for the radius to be examined.
-         CALL ELF1_LEVEL(MEAN,XO,YO,ELEMS,%VAL(ARRP(1)),
+         CALL ELF1_LEVEL(MEAN,XO,YO,ELEMS,%VAL(CNF_PVAL(ARRP(1))),
      :                   PRANGE,SEARCH,STATUS)
 
 *      Modify the range suggested to allow for big errors.
@@ -828,7 +829,8 @@
          IF ((SEARCH.LT.0.0).OR.(SEARCH.GT.RLIM)) SEARCH=RLIM
         
 *      Find points within required brightness range
-         CALL ELF1_FIND(ELEMS,%VAL(ARRP(1)),PRANGE,XO,YO,SEARCH,
+         CALL ELF1_FIND(ELEMS,%VAL(CNF_PVAL(ARRP(1))),
+     :                  PRANGE,XO,YO,SEARCH,
      :                  LOW,HIGH,COUNTR,XE,YE,PCV,STATUS)
      
 *      Continue only if more than four were found.

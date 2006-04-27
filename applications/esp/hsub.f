@@ -448,6 +448,7 @@
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'PRM_PAR'               ! PRIMDAT primitive data constants
       INCLUDE 'HSB_PAR'               ! HSUB system variables
+      INCLUDE 'CNF_PAR'
                      
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -539,7 +540,7 @@
          
 *   Call routine to find the highest, lowest and mean
 *   value of those in the data array.
-      CALL HSB1_HILOA(ELEMS,%VAL(POINT1(1)),
+      CALL HSB1_HILOA(ELEMS,%VAL(CNF_PVAL(POINT1(1))),
      :                STATUS,UNUPIX,HIGH,MEAN,LOW,NUMBER)               
       IF (STATUS.NE.SAI__OK) GOTO 9999
             
@@ -568,16 +569,18 @@
 
 *   Call routine to find moments of deviation from the mean for
 *   the NDF data array.
-      CALL HSB1_MOMDE(ELEMS,NUMBER,%VAL(POINT1(1)),
+      CALL HSB1_MOMDE(ELEMS,NUMBER,%VAL(CNF_PVAL(POINT1(1))),
      :                MEAN,STATUS,ADEV,VARI,SDEV,SKEW,KURT) 
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Call routine to find the median and mode of the values in
 *   the NDF array data.
-      CALL HSB1_MEDMO(TYPE,ELEMS,%VAL(POINT1(1)),POINT2,POINT3,BARSIZ,
+      CALL HSB1_MEDMO(TYPE,ELEMS,%VAL(CNF_PVAL(POINT1(1))),
+     :                POINT2,POINT3,BARSIZ,
      :                BINWID,LOW,ADEV,SFACT,
-     :                NUMBER,STATUS,SDEV,%VAL(POINT2(1)),
-     :                %VAL(POINT3(1)),MEDIAN,PEAKV,SFACTA,MODE)
+     :                NUMBER,STATUS,SDEV,%VAL(CNF_PVAL(POINT2(1))),
+     :                %VAL(CNF_PVAL(POINT3(1))),
+     :                MEDIAN,PEAKV,SFACTA,MODE)
       IF (STATUS.NE.SAI__OK) GOTO 9999  
                                            
 *   Return to the calling routine..
