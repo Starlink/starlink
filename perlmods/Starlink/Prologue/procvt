@@ -1,0 +1,240 @@
+#!perl
+
+=head1 NAME
+
+procvt - Convert an old prologue to modern STARLSE style
+
+=head1 SYNOPSIS
+
+  procvt *.f
+  cat test.f | procvt > new.f
+
+=head1 OPTIONS
+
+If source code is piped directly into the command, the prologue
+is parsed and the modified source code is sent to standard out.
+
+If files are supplied as arguments, each file is processed in turn
+and if the prologue is not in STARLSE form the file will be modified
+to use a modern prologue.
+
+=item B<-version>
+
+Report the version number.
+
+=item B<-help>
+
+Display the help information.
+
+=item B<-man>
+
+Display the full manual page.
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+use Pod::Usage;
+use Getopt::Long;
+
+use Starlink::Prologue;
+use Starlink::Prologue::Parser;
+
+# Options
+my ($help, $man, $version);
+my $status = GetOptions("help" => \$help,
+                        "man" => \$man,
+                        "version" => \$version,
+                       );
+
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+if ($version) {
+  my $id = '$Id$ ';
+  print "procvt - modernise a Starlink prologue\n";
+  print " CVS revision: $id\n";
+  exit;
+}
+
+# do we have standard input or file arguments?
+
+if (@ARGV) {
+  # files on command line
+  for my $file (@ARGV) {
+    open(my $fh, "<$file") || die "Error opening file $file for read: $!\n";
+    my ($types, $rewrite) = _convert_header( join("", <$fh>) );
+    my $converted;
+    for my $t (@$types) {
+      if ($t ne 'STARLSE') {
+	$converted = 1;
+	last;
+      }
+    }
+    if ($converted) {
+      my %types = map { $_, undef } @$types;
+      print STDERR "Prologue in file $file contains ", join(",",keys %types),
+	" prologues. Converting...\n";
+    } else {
+      print STDERR "Prologue in file $file does not need to be converted\n";
+    }
+  }
+} else {
+  # try reading from pipe
+  my @lines = <>;
+  if (@lines) {
+    my ($types, $rewrite) = _convert_header( join("", @lines) );
+    print $rewrite;
+  } else {
+    print "Please supply files to modify or source code via stdin\n";
+  }
+}
+
+exit;
+
+# Given a string containing the source code, rewrite the header
+# and return the result as a string. Second argument is the filename
+# that can be used to determine Language (can be undef).
+# Returns:
+#  - reference to array of strings indicating which types the
+#    prologues were (allowing the caller to skip if the prologue
+#    has not been converted)
+#  - modified source code as a single string
+
+sub _convert_header {
+  my $input = shift;
+  my $file = shift;
+
+  my $parser = new Starlink::Prologue::Parser;
+  my @types; # all processed types
+  my $type; # Type of most recent prologue
+  my $rewrite = ''; # rewritten source
+
+  for my $line (split/\n/,$input) {
+
+    # run in rewrite rather than extraction mode
+    my ($printme, $prologue) = $parser->push_line( $line );
+
+    # if we have a line and a prologue we need to print the
+    # prologue first
+    if (defined $printme && defined $prologue) {
+      # fix up language if not defined
+      if (!@{$prologue->language}) {
+	if (!defined $file) {
+	  # assume that old prologue is always Fortran!
+	  my @type = @{$prologue->type_of_module};
+	  if (@type && $prologue->prologue_type eq 'ADAMSSE' &&
+	      $type[0] =~ /(SUBROUTINE|BLOCK DATA|PROGRAM)/) {
+	    $prologue->language("Starlink Fortran 77");
+	  }
+	} elsif ($file =~ /\./) {
+	  my @parts = split /\./,$file;
+	  
+	  my $lang;
+	  my $suffix = $parts[-1];
+	  if ($suffix =~ /^(for|f)$/i) {
+	    $lang = "Starlink Fortran 77" ;
+	  } elsif ($suffix =~ /^(pl|pm)$/) {
+	    $lang = "Perl";
+	  } elsif ($suffix eq 'c') {
+	    $lang = "Starlink C";
+	  } elsif ($suffix eq 'C' || $suffix eq 'cc') {
+	    $lang = "Starlink C++";
+	  } elsif ($suffix eq 'sh' ) {
+	    $lang = "Bourne shell";
+	  } elsif ($suffix eq 'csh' ) {
+	    $lang = "C-shell";
+	  }
+	  $prologue->language( $lang ) if defined $lang;
+
+	} else {
+	  # now things are getting hard so assume Starlink conventions
+	  if ($file =~ /_PAR$/
+	      || $file =~ /_ERR$/
+	      || $file =~ /_CMN/i
+	     ) {
+	    $prologue->language( "Starlink Fortran 77" );
+	  }
+	}
+      }
+
+      $rewrite .= $prologue->stringify;
+      $type = $prologue->prologue_type;
+      push(@types, $type);
+      $printme = _rewrite_line( $type, $printme );
+      $rewrite .= "\n".$printme ."\n";
+    } elsif (defined $printme) {
+      # if we just have a line we need to print it out
+      $printme = _rewrite_line( $type, $printme );
+      $rewrite .= $printme ."\n";
+    } else {
+      # nothing to do so the line is part of a prologue
+    }
+
+  }
+
+  # if we still have a pending prologue (should not)
+  # flush it
+  my $prologue = $parser->flush();
+  if (defined $prologue) {
+    $rewrite .= $prologue->stringify;
+  }
+
+  return (\@types, $rewrite);
+}
+
+# in ADAMSSE prologues we should tweak some of the variable
+# sections
+
+sub _rewrite_line {
+  my ($type, $line) = @_;
+  return $line unless (defined $type && $type eq 'ADAMSSE');
+
+  if ($line =~ /^\s*\*\-\s*$/) {
+    return "*.";
+  } elsif ($line =~ /^\s*\*\s+Type Definitions\s*:$/i) {
+    return "*  Type Definitions:";
+  } elsif ($line =~ /^\s*\*\s+Global Constants\s*:$/i) {
+    return "*  Global Constants:";
+  } elsif ($line =~ /^\s*\*\s+Local Variables\s*:$/i) {
+    return "*  Local Variables:";
+  } elsif ($line =~ /^\s*\*\s+Status\s*:$/i) {
+    return "*  Status:";
+  } elsif ($line =~ /^\s*\*\s+Import\s*:$/i) {
+    return "*  Arguments Given:";
+  } elsif ($line =~ /^\s*\*\s+Export\s*:$/i) {
+    return "*  Arguments Returned:";
+  }
+  return $line;
+}
+
+
+=head1 SEE ALSO
+
+SST application.
+
+=head1 AUTHOR
+
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
+
+Copyright 2006 Particle Physics and Astronomy Research Council.
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+=cut
+
+1;
