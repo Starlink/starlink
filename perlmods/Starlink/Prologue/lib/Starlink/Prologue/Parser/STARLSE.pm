@@ -100,7 +100,7 @@ sub push_line {
 	 || $line =~ /\*\/$/      #  */
 	 || ($line !~ /\s*$r/ && $line =~ /\w/)  # real code
        ) {
-      print "End of prologue detected\n";
+      # print "End of prologue detected\n";
       # end of prologue so flush the current section
       $self->flush_section();
 
@@ -138,6 +138,8 @@ sub push_line {
       push(@{$self->content()}, $content);
 
     }
+    # indicate that we are in a prologue but not complete
+    return ();
 
   } else {
     # looking for one to start
