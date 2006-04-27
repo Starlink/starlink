@@ -185,6 +185,12 @@ sub push_line {
 	return();
       } elsif (defined $section && ($section eq 'Returned' || $section eq 'Given')) {
 	my ($var, $type, $desc) = split(/\s+/, $content, 3);
+                 my $arr = '';
+                 if ($type =~ /^\w\(\)$/) {
+                    $arr = '()';
+                    $type =~ s/\(\)//;
+                 }
+              
 	my %types = (
                                c => 'CHAR',
                                'c*(*)' => 'CHAR',
@@ -199,7 +205,7 @@ sub push_line {
                 $content =~ s/^\s+//;
                 push(@{$self->content()}, "    ". $content);
              } else {
-                 push(@{$self->content()}, "$var = $types{$type} ($section)",
+                 push(@{$self->content()}, "$var$arr = $types{$type} ($section)",
                                                         "    ". ucfirst($desc) );
              }
             return ();
