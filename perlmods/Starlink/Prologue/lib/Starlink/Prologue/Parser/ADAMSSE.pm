@@ -253,6 +253,11 @@ sub tidy_content {
 	next;
       }
 
+      # special case a modern history in an old prologue
+      if ($line =~ /^\d{1,2}\-\w\w\w\-\d{2,4}\s+\(\w+\):?$/) {
+	push(@out, $hline);
+	next;
+      }
 
       my ($date,@rest) = split (/\s+/,$line);
 
