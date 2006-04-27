@@ -9,7 +9,7 @@
 *   Given:
 *      AR      r      text aspect ratio (W/H)
 *
-*   Written to COMMON
+*   Written to COMMON:
 *      ARTX    r      text aspect ratio
 *
 *   Externals:

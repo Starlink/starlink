@@ -14,7 +14,7 @@
 *   Given:
 *      MARKL      i      marker type
 *
-*   Read from COMMON
+*   Read from COMMON:
 *      NPOLY      i      length of current polyline
 *      XPOLY      i()    current polyline (X)
 *      YPOLY      i()       "       "     (Y)

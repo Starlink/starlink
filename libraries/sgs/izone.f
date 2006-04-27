@@ -15,7 +15,7 @@
 *      XM      r     x size in metres
 *      YM      r     y   "   "   "
 *
-*   Read from COMMON
+*   Read from COMMON:
 *      IZTW    i()   Zone table - SGS workstation ID
 *      ISZID   i     Current zone ID
 *      IWTID   i()   Workstation table - GKS workstation ID
@@ -24,10 +24,10 @@
 *      XRES    r()   Workstation description table - X resolution
 *      YRES    r()        "           "        "   - Y      "
 *
-*   Externals
+*   Externals:
 *      GQWKT, sgs_1ERR
 *
-*   Errors
+*   Errors:
 *      Error returned by GKS inquiry
 *
 *   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
