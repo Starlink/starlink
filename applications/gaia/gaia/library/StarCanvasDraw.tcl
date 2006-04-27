@@ -86,7 +86,7 @@ itcl::class gaia::StarCanvasDraw {
 
    method init {} {
       CanvasDraw::init
-       
+
       # Set some options in the base class.
       # (Since we have reimplemented rotation in C, we don't need the inherited Tcl version.)
       configure -withrotate 0
@@ -160,6 +160,11 @@ itcl::class gaia::StarCanvasDraw {
    #  the new object when its creation is completed.
 
    method set_drawing_mode {type {create_cmd ""}} {
+      #  XXX need this as interaction with cube bindings is weird (out of
+      #  order, see <B1-Motion> first!). 
+      if { ! [info exists obj_id_] } {
+         set obj_id_ {}
+      }
       CanvasDraw::set_drawing_mode $type $create_cmd
       switch -exact $drawing_mode_ {
          ellipse -
@@ -176,7 +181,7 @@ itcl::class gaia::StarCanvasDraw {
                [code eval $this create_done $canvasX_ $canvasY_]
          }
          circle {
-            bind $canvas_ <1> \
+            bind $canvas_ <ButtonPress-1> \
                [code eval $this create_object $canvasX_ $canvasY_]
             bind $canvas_ <ButtonRelease-1> \
                [code eval $this check_done $canvasX_ $canvasY_ update_circle]
@@ -264,7 +269,7 @@ itcl::class gaia::StarCanvasDraw {
          return
       }
       set draw $itk_option(-show_selection_grips)
-      if { [info exists types_($id)] } { 
+      if { [info exists types_($id)] } {
          switch $types_($id) {
             circle {
                if { $draw } { draw_circle_selection_grips $id }
@@ -295,10 +300,10 @@ itcl::class gaia::StarCanvasDraw {
             default {
                CanvasDraw::select_object $id $any
             }
-         } 
+         }
       } else {
          #  We have no knowledge of this object so just pass on
-         #  responsibility. 
+         #  responsibility.
          CanvasDraw::select_object $id $any
       }
 
@@ -545,7 +550,7 @@ itcl::class gaia::StarCanvasDraw {
    #  Adjust the selection handles for the given circle.
 
    method adjust_circle_selection {id} {
-      lassign [$canvas_ coords $id] x y 
+      lassign [$canvas_ coords $id] x y
       set smaj [$canvas_ itemcget $id -semimajor]
       set x [expr $x+$smaj]
       set w [expr $itk_option(-gripwidth)/2]
@@ -647,7 +652,7 @@ itcl::class gaia::StarCanvasDraw {
 
    method resize_arc {id x y side} {
       set resizing_ 1
-      
+
       lassign [$canvas_ coords $id] x0 y0 x1 y1
 
       set centx [expr ($x0+$x1)/2]
@@ -748,6 +753,7 @@ itcl::class gaia::StarCanvasDraw {
    #  types_ array to access obj_id_).
 
    method create_object {x y} {
+
       mark $x $y
       set obj_coords_ "$x $y"
       set obj_id_ [create_$drawing_mode_ $x $y]
@@ -759,9 +765,9 @@ itcl::class gaia::StarCanvasDraw {
       set resizing_ 1
    }
 
-   #  Override add_object_bindings to deal with the case when a canvas 
+   #  Override add_object_bindings to deal with the case when a canvas
    #  item is created directly (in which case we do not know the id).
-   method add_object_bindings {id {target_id ""} } { 
+   method add_object_bindings {id {target_id ""} } {
       CanvasDraw::add_object_bindings $id $target_id
       if { ! [info exists types_($id)] } {
 
@@ -769,9 +775,9 @@ itcl::class gaia::StarCanvasDraw {
          $canvas_ addtag objects withtag $id
          $canvas_ addtag $w_.objects withtag $id
          set types_($id) $drawing_mode_
-         if { [$canvas_ type $id] == "rtd_ellipse" } { 
+         if { [$canvas_ type $id] == "rtd_ellipse" } {
             set types_($id) ellipse
-         } elseif { [$canvas_ type $id] == "rtd_rotbox" } { 
+         } elseif { [$canvas_ type $id] == "rtd_rotbox" } {
             set types_($id) rotbox
          }
       }
@@ -837,7 +843,7 @@ itcl::class gaia::StarCanvasDraw {
       $canvas_ itemconfigure $obj_id_ -start [expr $newang-($oa/2)]
    }
 
-   # Return arc coordinates corresponding to id, as a list, or {} if 
+   # Return arc coordinates corresponding to id, as a list, or {} if
    # no such coordinates.
    # Return value is a list, of [x y r pa oa].  (x,y,r) are the position of
    # the centre of the circle of which this is a arc, and its
@@ -925,7 +931,7 @@ itcl::class gaia::StarCanvasDraw {
    #  Update circle.
 
    method update_circle {x y} {
-      lassign [$canvas_ coords $obj_id_] x0 y0 
+      lassign [$canvas_ coords $obj_id_] x0 y0
       set dx [expr ($x0-$x)]
       set dy [expr ($y0-$y)]
       set smaj [expr sqrt($dx*$dx+$dy*$dy)]
@@ -1164,7 +1170,7 @@ itcl::class gaia::StarCanvasDraw {
    method clip {x y} {
    }
 
-   #  Redefine select only the given object to update the pointpoly 
+   #  Redefine select only the given object to update the pointpoly
    #  when required (trap for only moving mouse stopped this at v2.0.7).
    method select_only_object {id x y} {
       CanvasDraw::select_only_object $id $x $y

@@ -995,17 +995,17 @@ itcl::class gaia::GaiaCube {
    #  These are single-click and drag-click.
    protected method add_spectral_bindings_ {} {
 
-      $itk_option(-canvas) bind all <B1-Motion> \
-         [code $this display_spectrum_ localdrag %x %y]
-
       $itk_option(-canvas) bind all <1> \
          [code $this display_spectrum_ localstart %x %y]
+
+      $itk_option(-canvas) bind all <B1-Motion> \
+         [code $this display_spectrum_ localdrag %x %y]
    }
 
    #  Remove bindings from main canvas for spectral plot.
    protected method remove_spectral_bindings_ {} {
-      $itk_option(-canvas) bind all <B1-Motion> {}
       $itk_option(-canvas) bind all <1> {}
+      $itk_option(-canvas) bind all <B1-Motion> {}
    }
 
    #  Display a spectrum in the plot. Action can be "splat", "localstart" or
