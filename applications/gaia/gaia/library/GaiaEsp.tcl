@@ -434,6 +434,9 @@ itcl::class gaia::GaiaEsp {
                 # Clear the log window
                 $itk_component(status) clear 0 end
 
+                # Make sure image is updated, if volatile (cube slices).
+                $itk_option(-image) save_if_volatile
+
                 # RUN ESP!!!
                 $star_app_ runwiths $invoke_args
             }
@@ -1262,6 +1265,9 @@ itcl::class gaia::GaiaEsp {
 
         # Clear the log window
         $itk_component(status) clear 0 end
+
+        # Make sure image is updated, if volatile (cube slices).
+        $itk_option(-image) save_if_volatile
 
         # Run HSUB
         $hsub_star_app_ runwiths $invoke_args

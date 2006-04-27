@@ -80,6 +80,8 @@
 #        to be common for scope to work in widgets.
 #     26-SEP-2003 (PWD):
 #        Added changes to support AUTOASTROM detections.
+#     27-APR-2006 (PWD):
+#        Added support for volatile images.
 #     {enter_further_changes_here}
 
 #-
@@ -2243,6 +2245,10 @@ itcl::class gaia::GaiaSextractor {
                set diskdetect ""
             }
 
+            #  The image may be volatile (a slice from a cube) so make sure
+            #  the disk file is upto date.
+            $itk_option(-image) save_if_volatile
+
 	    #  Set the command to run when measurements are available.
 	    if { $args != "" } {
 	       set complete_cmd_ $args
@@ -2755,7 +2761,7 @@ itcl::class gaia::GaiaSextractor {
    #  Name of rtdimage widget.
    itk_option define -rtdimage rtdimage RtdImage {} {}
 
-   #  Name of RtdImageCtrl widget or a derived class.
+   #  Name of the GaiaImageCtrl widget.
    itk_option define -image image Image {} {}
 
    #  Name of Astrocat subclass to use to create new catalog widgets.

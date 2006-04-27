@@ -1041,6 +1041,7 @@ itcl::class gaia::Gaia {
          GaiaEsp $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
+            -image $image_ \
             -rtdimage [$image_ get_image]\
             -transient $itk_option(-transient_tools) \
             -number $clone_ \

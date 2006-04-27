@@ -812,6 +812,10 @@ itcl::class gaia::GaiaAutoAstrom {
             puts "  $args $image"
          }
 
+         #  If the image is volatile (part of a cube), then we need to 
+         #  save the image to disk.
+         $itk_option(-image) save_if_volatile
+
          #  Run program, monitoring output...
          catch {eval $autoastrom_ runwith $args \$image} msg
 
