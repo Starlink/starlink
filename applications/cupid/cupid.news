@@ -7,6 +7,14 @@
  data arrays.
 
 
+Changes introduced at V0.0-13:
+
+ - Additional text in SUN255.
+
+ - The FINDCLUMPS command has a new comfiguration parameter
+   ClumpFind.AllowEdge that can be set to a non-zero value in order to
+   retain clumps that touch an edge of the data array.
+
 Changes introduced at V0.0-12:
 
  - The MAKESNR command has been moved from CUPID to KAPPA.

@@ -368,6 +368,10 @@ void findclumps() {
 *     Values for these parameters can be specified using the CONFIG parameter. 
 *     Default values are shown in square brackets:
 *
+*     - ClumpFind.AllowEdge: If set to a zero value, then clumps are
+*     rejected if they touch any edge of the data array. If non-zero, then
+*     such clumps are retained. Note, other implementations of ClumpFind
+*     often include such clumps but flag them in some way. [0]
 *     - ClumpFind.DeltaT: The gap between the contour levels. Only accessed 
 *     if no value is supplied for "Level1", in which case the contour levels 
 *     are linearly spaced, starting at a lowest level given by "Tlow" and 

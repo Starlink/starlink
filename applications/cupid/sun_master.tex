@@ -622,6 +622,11 @@ provides the following facilities:
 \item creation of cut-out images containing the emission from individual clumps.
 \end{itemize}
 
+\begin{center}
+\emph{Note, it is currently assumed that any background extended emission has
+been removed from the data before using CUPID.}
+\end{center}
+
 CUPID processes data in \emph{NDF} format. This is the standard data
 format used by most Starlink software, and is described fully in
 \xref{SUN/33}{sun33}{}. However, other astronomical data formats may also
@@ -638,6 +643,7 @@ packages such as KAPPA and CCDPACK. The following sections in
 general information about these issues:
 
 \begin{itemize}
+\item ``\xref{Bad pixel values}{sun95}{se_masking}''
 \item ``\xref{Parameters}{sun95}{se_param}''
 \item ``\xref{Graphics Devices and Files}{sun95}{se_graphdev}''
 \item ``\xref{Plotting Styles and Attributes}{sun95}{se_style}''
@@ -649,17 +655,105 @@ general information about these issues:
 \item ``\xref{Procedures}{sun95}{se_procedures}''
 \end{itemize}
 
+\subsection{\xlabel{availablecommands}Available Commands}
+Currently, the following commands are available within CUPID:
+\begin{description}
+
+\item[\htmlref{CUPIDHELP}{CUPIDHELP}] - gives on-line help for all CUPID
+commands.
+
+\item[\htmlref{EXTRACTCLUMPS}{EXTRACTCLUMPS}] - calculates parameters for
+the clumps within a 1, 2 or 3D data array, given a mask array that identifies 
+the pixels within each clump.
+ 
+\item[\htmlref{FINDCLUMPS}{FINDCLUMPS}] - finds clumps within a 1, 2 or 3D 
+array and produces a mask identifying the pixels included in each clump.
+Also produces a catalogue of clump parameters. Various clump
+identification algorithms are supported such as ClumpFind, GaussClumps,
+\emph{etc}.
+
+\item[\htmlref{MAKECLUMPS}{MAKECLUMPS}] - creates a 1, 2 or 3D array
+containing a collection of random Gaussian clumps, with added noise.
+
+\end{description}
 
 \section{Clump Identification Algorithms}
 This section lists and describes the clump identification algorithms
-which are implemented within CUPID.
+which are implemented within the CUPID \htmlref{FINDCLUMPS}{FINDCLUMPS}
+command.
 
 \subsection{\xlabel{gaussclumps}GaussClumps}
-To be written.
+
+This is based on the algorithm described by \emph{Stutski \& Gusten}
+(1990, ApJ 356, 513). This algorithm proceeds by fitting a Gaussian
+profile to the brightest peak in the data. It then subtracts the fit from
+the data and iterates, fitting a new ellipse to the brightest peak in the
+residuals. This continues until a series of consecutive fits are made
+that have peak values below a given multiple of the noise level. Each
+fitted ellipse is taken to be a single clump and is added to the output
+catalogue. In this algorithm, clumps may overlap. Any input variance
+component is used to scale the weight associated with each pixel value
+when performing the Gaussian fit. The most significant configuration
+parameters for this algorithm are: GaussClumps.FwhmBeam and
+GaussClumps.VeloRes which determine the minimum clump size, and
+GaussClumps.Thresh which (together with the ADAM parameter RMS) determine
+the termination criterion.
+
+Note, this implementation of the GaussClumps algorithm is a completely
+independent re-write, and includes some differences from other
+GaussClumps implementations. Specifically, these include:
+
+\begin{itemize}
+
+\item The Gaussian fitting is based on the SUMSL module (algorithm 611)
+from the TOMS library available from 
+\htmladdnormallink{http://www.netlib.org/}{http://www.netlib.org/}.
+
+\item Any available variance information is used to weight the pixels
+when doing the Gaussian fit. This is in addition to the Gaussian
+weighting function implied by configuration parameters GaussClumps.Wwidth
+and GaussClumps.Wmin.
+
+\item The termination criteria are different. FINDCLUMPS stops finding 
+further clumps if any one of the following criteria is met:
+
+\begin{enumerate}
+
+\item The number of clumps already found equals the value of
+configuration parameter GaussClumps.MaxClumps
+
+\item The number of consecutive fitted peaks with peak value below the 
+value of configuration parameter GaussClumps.Thresh reaches the value of
+configuration parameter GaussClumps.NPad (the final group of NPad clumps
+are not included in the returned list of usable clumps).
+
+\item The number of failed attempts to fit consecutive clumps reaches
+the value of configuration parameter GaussClumps.MaxSkip.
+
+\end{enumerate}
+
+\item A clump will be ignored if its fitted peak value is a long way above or
+below the peak value of the previously fitted clump. The definition of
+``a long way'' is more than GaussClumps.NSigma times the standard
+deviation of the previous GaussClumps.NPeak fitted peaks. This
+restriction is only imposed once GaussClumps.NPeak peaks have been fitted.
+
+\item In certain situations the chi-squared value that is minimised when
+fitting a Gaussian clump to a peak in the data array may be dominated by
+pixels that are largely unaffected by changes in the parameters of the
+Gaussian clumps\footnote{This can happen for instance when neighbouring
+peaks are present within the area of pixels used to fit a central peak.}.
+This can result in a very poor fit to the clump. To avoid this at attempt
+is made to identify such pixels and to lower the weight associated with
+them.
+
+\end{itemize}
+
+
 
 \subsection{\xlabel{clumpfind}ClumpFind}
 This algorithm was developed by Jonathan Williams and had been described
-fully in \emph{Williams, de Geus \& Blitz 1994, ApJ, 428, 693}.
+fully in \emph{Williams, de Geus \& Blitz} (1994, ApJ 428, 693).
 
 Briefly, it contours the data array at many different levels, starting at
 a value close to the peak value in the array and working down to a
@@ -700,7 +794,7 @@ following values:
 \item ClumpFind.FwhmBeam = 0
 \item ClumpFind.MaxBad = 100000  (or some other very large number)
 \item ClumpFind.MinPix = 5 (although this value seems to differ depending
-on which particular implementation of ClumpFInd you want to compare with)
+on which particular implementation of ClumpFind you want to compare with)
 \item ClumpFind.VeloRes = 0
 \end{itemize}
 
@@ -988,6 +1082,254 @@ merged together.
 The results of this merging process are the final clump allocations for
 every data pixel, from which the catalogue of clump parameters is
 produced.
+
+\section{Examining the Results}
+
+
+The pixel values in the output NDF created by \htmlref{FINDCLUMPS}{FINDCLUMPS} 
+and \htmlref{EXTRACTCLUMPS}{EXTRACTCLUMPS} are integer values that
+indicate which clump each pixel belongs to (that is, all pixels that are
+contain within a single clump will all have the same integer value in the
+output NDF). Pixels that are not contained within any clump have bad
+values. 
+
+
+\subsection{2D Data}
+For 2D data the simplest way to examine the results is just
+to display the output NDF using the KAPPA \xref{DISPLAY}{sun95}{DISPLAY} 
+command. For instance:
+
+\small
+\begin{verbatim}
+     % display clumps mode=scale badcol=red accept
+\end{verbatim}
+\normalsize
+
+will display the file \verb+clumps.sdf+ so that black corresponds to the
+lowest clump index and white to the largest, with bad pixels (\emph{i.e.}
+pixels not in any clump) coloured red.
+
+If you want to see the actual data values instead of the clump index
+values, then you can use KAPPA \xref{COPYBAD}{sun95}{COPYBAD} to produce a
+copy of the original data with all non-clump pixels set bad:
+
+\small
+\begin{verbatim}
+     % copybad data ref=clumps out=data2
+     % display data2 mode=perc badcol=red accept
+\end{verbatim}
+\normalsize
+
+This will copy the file \verb+data.sdf+ into the file \verb+data2.sdf+,
+setting pixels bad in \verb+data2.sdf+ if the corresponding pixels
+are bad in  \verb+clumps.sdf+.
+
+Alternatively, you may be interested in the background (non-clump)
+pixels. To get an NDF containing just the background pixels, do:
+
+\small
+\begin{verbatim}
+     % copybad data ref=clumps out=data2 invert
+     % display data2 mode=perc badcol=red accept
+\end{verbatim}
+\normalsize
+
+The output NDF contains an extension structure holding information
+about each identified clump. For each clump, the extension contains a 
+minimal cut-out from the input data array that contains just those pixels
+belonging to the clump\footnote{Any pixels within the bounds of the
+rectangular region covered by the cut-out that are \emph{not} contained
+within the clump are set bad.}. So to display an image of (say) clump 12,
+do:
+
+\small
+\begin{verbatim}
+     % display "clumps.more.cupid.clumps(12)" mode=perc badcol=red accept
+\end{verbatim}
+\normalsize
+
+To draw an outline of a clump on top of a previously displayed image of
+the entire data array, do:
+
+\small
+\begin{verbatim}
+     % display data mode=perc accept
+     % contour noclear mode=good labpos=\! "clumps.more.cupid.clumps(12)"
+\end{verbatim}
+\normalsize
+
+
+\subsection{3D Data}
+
+Visualising clumps in 3D is much harder. Options include:
+
+\begin{enumerate}
+
+\item Examining specified 2D slices from the 3D data. For instance to
+display the intersection of the tenth pixel plane with clump number 12, do:
+
+\small
+\begin{verbatim}
+     % display "clumps.more.cupid.clumps(12)(,,10)" mode=perc badcol=red accept
+\end{verbatim}
+\normalsize
+
+\item Use the 3D facilities of \xref{GAIA}{sun214}{} \latexonly{(SUN/214)},
+accessed through the \verb+Open cube+ entry in the \verb+File+ menu.
+
+\item Use a complete 3D visualisation such as OpenDX (see 
+\htmladdnormallink{http://www.opendx.org/}{http://www.opendx.org/}). The
+facilities of the Starlink DX extension package (known as ``SX'' 
+\xref{SX}{sun203}{} \latexonly{(SUN/203)}) may be useful as it provides
+a means of converting NDF data files to the DX native format, and also
+provides some demonstration DX ``networks'' that can be used to do simple
+visualisations of a 3D data cube.
+
+
+
+\end{enumerate}
+
+
+\subsection{Using the output Catalogue}
+By default, the output catalogue created by FINDCLUMPS and EXTRACTCLUMPS
+will be a standard FITS binary table, with the following columns:
+
+\begin{description}
+\item[PeakX]: The X co-ordinate at the centre of the pixel with the
+highest data value in the clump.
+\item[PeakY]: The Y co-ordinate at the centre of the pixel with the
+highest data value in the clump.
+\item[PeakZ]: The Z co-ordinate at the centre of the pixel with the
+highest data value in the clump.
+\item[CenX]: The X co-ordinate of the clump centroid.
+\item[CenY]: The Y co-ordinate of the clump centroid.
+\item[CenZ]: The Z co-ordinate of the clump centroid.
+\item[SizeX]: The size of the clump along the X axis, in pixels.
+\item[SizeY]: The size of the clump along the Y axis, in pixels.
+\item[SizeZ]: The size of the clump along the Z axis, in pixels.
+\item[Sum]: The total data sum in the clump.
+\item[Peak]: The peak value in the clump.
+\item[Area]: The total number of pixels falling within the clump.
+\end{description}
+
+The $(X,Y,Z)$ co-ordinates are specified with the NDF's PIXEL co-ordinate
+system. The centroid position is the weighted mean of the X, Y and Z values
+at the centre of all the pixels in the clump, with the pixel values being
+used as the weights.
+
+\begin{myquote}
+\begin{eqnarray*}
+  CenX & = & \frac{\sum_{k}X_{k}.D_{k}}{\sum_{k}D_{k}} \\
+  CenY & = & \frac{\sum_{k}Y_{k}.D_{k}}{\sum_{k}D_{k}} \\
+  CenZ & = & \frac{\sum_{k}Z_{k}.D_{k}}{\sum_{k}D_{k}}
+\end{eqnarray*}
+\end{myquote}
+
+The clump sizes are the standard deviation of the X, Y and Z values about the 
+centroid position, weighted by the pixel values, then corrected to remove the 
+effect of the instrumental smoothing specified by the FwhmBeam and VeloRes
+configuration parameters:
+
+\begin{myquote}
+\begin{eqnarray*}
+  SizeX & = & \sqrt{\frac{\sum_{k}D_{k}.(X_{k}-CenX)^{2}}{\sum_{k}D_{k}} - b_{x}^{2} } \\
+  SizeY & = & \sqrt{\frac{\sum_{k}D_{k}.(Y_{k}-CenY)^{2}}{\sum_{k}D_{k}} - b_{y}^{2} } \\
+  SizeZ & = & \sqrt{\frac{\sum_{k}D_{k}.(Z_{k}-CenZ)^{2}}{\sum_{k}D_{k}} - b_{z}^{2} }
+\end{eqnarray*}
+\end{myquote}
+
+where $b_{x}$, $b_{y}$ and $b_{z}$ are the beam widths implied by
+configuration parameters FwhmBeam and VeloRes. Clumps are excluded from
+the returned list if the clump size before correction is smaller than the
+specified beam width.
+
+The peak value in the clump is also corrected to take account of the
+smoothing produced by the instrumental beam. Such smoothing will result in
+the observed peak value being less than the real peak value, by an amount
+that increases as the clump area gets smaller. The correction factor
+assumes that the clumps has a Gaussian profile:
+
+\begin{myquote}
+\begin{eqnarray*}
+  Peak & = & D_{max}.sqrt{ (SizeX'.SizeY'.SizeZ')/(SizeX.SizeY.SizeZ)  } 
+\end{eqnarray*}
+\end{myquote}
+
+where the primed sizes refer to the clump sizes before the correction for
+the instrumental beam width.
+
+The recommended way to explore and examine the output catalogue is to use
+the Starlink catalogue browser, TOPCAT (see 
+\htmladdnormallink{http://www.starlink.ac.uk/topcat/}
+{http://www.starlink.ac.uk/topcat/}). 
+
+\section{Taking Account of Varying Noise Levels}
+
+All the clump finding algorithms implemented by the \htmlref{FINDCLUMPS}{FINDCLUMPS} 
+command assumes that the noise level is constant across the supplied data
+array, and equal to the the value of the RMS parameter. This is true even
+if the supplied NDF contains a VARIANCE component\footnote{Although any
+available VARIANCE component will be used to determine the default value
+for the RMS parameter. The GaussClumps algorithm will also use any
+available variance values to weight the data when fitting individual
+Gaussians.}.
+
+However, in many cases the real noise level may vary across the data
+array. This may result in real clumps being missed in low noise areas and
+spurious noise spikes being interpreted as real clumps in high noise
+areas. To avoid this some way of taking account of the varying noise
+level is needed. Since the assumption of constant noise level is more or
+less intrinsic to most of the clump finding algorithms, this is best done
+by first converting the data array into an array containing the
+signal-to-noise (SNR) ratio, and then running FINDCLUMPS on this SNR array
+rather than the original data array. This will determine the spatial
+extent of each clump, but the output catalogue will contain clump
+parameters in terms of SNR values rather than the original data values.
+Therefore, the \htmlref{EXTRACTCLUMPS}{EXTRACTCLUMPS} command should then
+be used to transfer the clumps outlines found within the SNR array into
+the original data array and extract the corresponding clump parameters.
+
+So the procedure is:
+\begin{enumerate}
+
+\item If you have a single NDF containing both DATA and VARIANCE
+components, use the \xref{MAKESNR}{sun95}{MAKESNR} command (part of the 
+KAPPA package - see \xref{SUN/95}{sun95}{}) to convert the original data 
+array into an SNR array. MAKESNR divides the DATA component of the NDF by 
+the square root of the VARIANCE component, checking for anomalously small 
+variance values in order to avoid very large spurious SNR values appearing 
+in the output. Any such pixels are assigned a ``bad'' value in the output 
+SNR array and are excluded from all later calculations.
+
+If you have separate data and noise arrays, then a suitable SNR array can
+be produced using the KAPPA \xref{MATHS}{sun95}{MATHS} command.
+
+The noise level in the SNR array will, by definition, be constant and
+equal to 1.0.
+
+\item If you wish to apply any smoothing to the array, it should be done now. 
+That is, it is usually better to smooth the SNR array rather than the data
+array. This is because smoothing the data array can spread anomalous
+variance values out around the neighbouring pixels, making the anomalous
+values harder to identify. Such smoothing will not introduce variations
+in the noise level (assuming the degree of smoothing is constant across
+the image), but will change the constant noise level from its initial
+value of 1.0.
+
+\item Use FINDCLUMPS to identify the clumps within the SNR array. The
+output catalogue will contain clump parameters in terms of SNR value and
+so will probably not be what you want. However, the output mask NDF will
+identify the pixels contained in each SNR clump and these will usually 
+correspond to the pixels within each data clump.
+
+\item Use EXTRACTCLUMPS to create a catalogue of clump parameters in
+terms of the original data value. EXTRACTCLUMPS reads in the mask produced
+by FINDCLUMPS and identifies the corresponding pixels in the original
+data array, producing the required data clump parameters.
+
+\end{enumerate}
+
+
 
 \newpage
 \appendix

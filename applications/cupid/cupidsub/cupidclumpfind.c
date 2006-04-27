@@ -99,6 +99,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    double mind;         /* Minimum value in data array */
    float fd;            /* Data value */   
    int *ipa;            /* Pointer to pixel assignment array */
+   int allow_edge;      /* Are clumps allowed to touch an edge of the data array? */
    int dims[3];         /* Pointer to array of array dimensions */
    int el;              /* Number of elements in array */
    int i;               /* Loop count */
@@ -150,6 +151,9 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       beamcorr[ 2 ] = beamcorr[ 0 ];
       beamcorr[ velax ]= cupidConfigD( cfconfig, "VELORES", 2.0 );
    }
+
+/* See if clumps are allowed to touch an edge of the data array. */
+   allow_edge = cupidConfigI( cfconfig, "ALLOWEDGE", 0 );
 
 /* Get the value which defines whether two pixels are neighbours or not.
    The default value is equalto the number of axes in the data array. */
@@ -272,7 +276,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                nminpix++;
                clumps[ ii ] = cupidCFFreePS( ps, NULL, 0 );
 
-            } else if( ps->edge ){
+            } else if( ps->edge && !allow_edge ){
                nedge++; 
                clumps[ ii ] = cupidCFFreePS( ps, NULL, 0 );
 
