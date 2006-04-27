@@ -1,30 +1,38 @@
-/*+  DTASK_SETSIG - C Version - Set up default Unix signal handlers
-      SUBROUTINE DTASK_SETSIG
-*    Description :
+/*
+*+
+*  Name:
+*     DTASK_SETSIG
+
+*  Purpose:
+*     C Version - Set up default Unix signal handlers
+
+*  Language:
+*     C
+
+*  Invocation:
+*     DTASK_SETSIG is called during dtask initialisation.
+*     The routine DTASK_SIGHDLR is called by Unix when a signal occurs
+
+*  Description:
 *     Called during DTASK initialisation to alter the defaults for likely
 *     Unix Signals (from the terminal, programming or system faults) to
 *     cause the process to terminate via the exit() system service. This allows
 *     any library "exit handlers" declared via atexit() ( or the non-standard
 *     on_exit() on SunOS) to be called.
-*    Language:
-*     C
-*    Invocation :
-*     DTASK_SETSIG is called during dtask initialisation.
-*     The routine DTASK_SIGHDLR is called by Unix when a signal occurs
-*    Parameters :
+
+*  Arguments:
 *     Boolean argument IFLAG.
 *        Set to .TRUE.  if this task has been started from ICL
 *        Set to .FALSE. if this task has been started from the shell
-*    Method :
+
+*  Algorithm:
 *     Uses standard Unix C system service routines
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     BKM: B.K. McIlwrath (STARLINK, RAL)
-*    History :
-*     date:  changes (institution::username)
+*     {enter_new_authors_here}
+
+*  History:
 *     02-DEC-1994 (BKM):
 *        Original version.
 *     14-JUL-1995 (BKM):
@@ -44,7 +52,12 @@
 *     11-JAN-2001 (BKM):
 *        Revise to defeat new C compiler extreme fussiness on Compaq Tru64 V5.0
 *        (C version 6.1-019) and tested again on all systems.
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 #include <signal.h>
 #include <stdio.h>

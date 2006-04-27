@@ -1,30 +1,43 @@
-/*+  DTASK_CHDLR - C Version AST handler for timed reschedules
-      SUBROUTINE DTASK_CHDLR ( ID )
-*    Description :
-*     Is called by the C ATIMER system and  in turn calls the Fortran
-*     DTASK_ASTHDLR routine.
-*    Language:
+/*
+*+
+*  Name:
+*     DTASK_CHDLR
+
+*  Purpose:
+*     C Version AST handler for timed reschedules
+
+*  Language:
 *     C
-*    Invocation :
+
+*  Invocation:
 *     Invoked by timer completion
 *     interrupts.
-*    Parameters :
+
+*  Description:
+*     Is called by the C ATIMER system and  in turn calls the Fortran
+*     DTASK_ASTHDLR routine.
+
+*  Arguments:
 *     ASTPARM=INTEGER (given)
 *           The timer id
-*    Method :
+
+*  Algorithm:
 *     Call the Fortran handler with its argument a  pointer to the
 *     argument of this routine.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     AJC: A.J.Chipperfield (STARLINK, RAL)
-*    History :
-*     date:  changes (institution::username)
+*     {enter_new_authors_here}
+
+*  History:
 *     28-JUN-1994 (AJC):
 *        Original version.
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 #include "f77.h"
 
