@@ -276,17 +276,8 @@ sub content {
   # copy in content and remove newlines
   my @content = @_;
 
-
   # Normalise the tag into standard form
-  $tag =~ s/^\s+//;
-  $tag =~ s/\s+$//;
-  my @parts = split(/\s+/, $tag);
-  for  (@parts) {
-    $_ = lc($_);
-    $_ = ucfirst($_); 
-  }
-  $tag = join(" ", @parts );
-
+  $tag = $self->_normalise_section_name( $tag );
   croak "Must supply an argument to content()" unless defined $tag;
 
   if (@content) {
@@ -342,6 +333,20 @@ Returns all the section headings present in the prologue in alphabetical order.
 sub sections {
   my $self = shift;
   return sort keys %{$self->{CONTENT}};
+}
+
+=item B<del_section>
+
+Delete the named section (if it exists).
+
+=cut
+
+sub del_section {
+  my $self = shift;
+  my $tag = shift;
+  $tag = $self->_normalise_section_name( $tag );
+  delete $self->{CONTENT}->{$tag};
+  return;
 }
 
 =item B<has_section>
@@ -482,6 +487,28 @@ sub stringify {
 
 =over 4
 
+=item B<_normalise_section_name>
+
+Internal routine to normalise a section name to a standard form for storing
+internally.
+
+  $norm = $prl->_normalise_section_name();
+
+=cut
+
+sub _normalise_section_name {
+  my $self = shift;
+  my $tag = shift;
+  $tag =~ s/^\s+//;
+  $tag =~ s/\s+$//;
+  my @parts = split(/\s+/, $tag);
+  for  (@parts) {
+    $_ = lc($_);
+    $_ = ucfirst($_); 
+  }
+  $tag = join(" ", @parts );
+  return $tag;
+}
 
 =back
 
