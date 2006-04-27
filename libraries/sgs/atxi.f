@@ -11,7 +11,7 @@
 *
 *   Given:
 *      I      i      Integer to be formatted
-*      NFI    i      Format indicator:
+*      NFI    i      Format indicator:-
 *                       either  number of leading spaces (NFI.GE.0)
 *                           or  minus the field width (NFI.LT.0)
 *  Externals:

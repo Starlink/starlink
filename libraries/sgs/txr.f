@@ -12,7 +12,7 @@
 *      X         r      position of text string (x)
 *      Y         r          "    "   "      "   (y)
 *      R         r      real number to be formatted
-*      NFI       i      format indicator:
+*      NFI       i      format indicator:-
 *                       either  number of leading spaces (NFI.GE.0)
 *                           or  minus the field width (NFI.LT.0)
 *      NDP       i      number of decimal places
@@ -20,6 +20,7 @@
 *                          If NDP.EQ.0, the decimal point appears
 *                          If NDP.GT.0, NDP digits appear after the point
 *
+*   Remarks:
 *   The field width is limited in size - see sgs_ATXR coding.
 *
 *   Externals:

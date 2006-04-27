@@ -12,10 +12,11 @@
 *      X        r      position of text string (x)
 *      Y        r         "     "    "     "   (y)
 *      I        i      integer to be formatted
-*      NFI      i      format indicator:
+*      NFI      i      format indicator:-
 *                       either  number of leading spaces (NFI.GE.0)
 *                           or  minus the field width (NFI.LT.0)
 *
+*   Remarks:
 *   The field width is limited to 20 characters.
 *
 *   Externals:
