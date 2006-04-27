@@ -298,14 +298,24 @@
 *  shell script used by one_find_file will interpret the spaces as part
 *  of the file path. We do not escape spaces within the NDF section
 *  identifier (if any) since this would confuse the NDF library. So we
-*  stop checking for spaces when the first "(" character is encountered.
+*  stop checking for spaces when the first "(" or "." character is 
+*  encountered.
       ELSE
+         J = INDEX( TEMPLT, '.' ) - 1
+         LEND = INDEX( TEMPLT, '(' ) - 1
+         IF( J .NE. -1 ) THEN
+            IF( LEND .NE. -1 ) THEN
+               LEND = MIN( LEND, J )
+            ELSE
+               LEND = J
+            END IF
+         END IF
+         IF( LEND .EQ. -1 ) LEND = L + 1
+
          TMPLT2 = ' '
          J = 1
-         LEND = INDEX( TEMPLT, '(' ) - 1
-         IF( LEND .EQ. -1 ) LEND = L
-         DO I = F, LEND
-            IF( TEMPLT( I : I ) .EQ. ' ' ) THEN
+         DO I = F, L
+            IF( TEMPLT( I : I ) .EQ. ' ' .AND. I .LT. LEND ) THEN
                TMPLT2( J : J ) = ESC
                J = J + 1
             END IF
