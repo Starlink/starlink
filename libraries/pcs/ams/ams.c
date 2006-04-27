@@ -1,27 +1,47 @@
-/*  AMS - Adam Message System
-    Authors:
-       IRJ: Ian Jenkins (RAL)
-       BDK: Dennis Kelly (ROE)
-       BKM: Brian McIlwrath (STARLINK)
-       AJC: Alan Chipperfield (STARLINK)
-       DLT: David Terrett (STARLINK)
-       TIMJ: Tim Jenness (JAC, Hawaii)
-    History :
-      Created: irj 15/6/92
-      Tidied : irj, skr 16/6/92
-      Tidied and reformatted: bkm 15-16/6/93
-      Further reformatted and ANSI-C only: bkm 09/93
-      Further reformatted and ANSI-C only: bkm 09/93
-      Changed to ams: bdk 17Mar 1994
-      Rename some include files: AJC 7/7/94
-         adamdefns.h -> adam_defns.h
-         mesdefns.h -> messys_len.h
-      Bring up to date with BDK version (and comments): BKM 16/8/94
-      Dimension transfree MESSYS__MXTRANS not MXPATH: AJC 15/11/94
-      Remove diagnostic printfs in ams_raccept and ams_receive: AJC 8/2/96
-      Enable initialization without exit handler: DLT 14/9/99
-      Fix compiler warnings due to lack of include files: TIMJ 3/9/04
-      Tidy up config ATEXIT logic: TIMJ 29/12/05
+/*
+*+
+*  Name:
+*     AMS
+
+*  Purpose:
+*     Adam Message System
+
+*  Authors:
+*     IRJ: Ian Jenkins (RAL)
+*     BDK: Dennis Kelly (ROE)
+*     BKM: Brian McIlwrath (STARLINK)
+*     AJC: Alan Chipperfield (STARLINK)
+*     DLT: David Terrett (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+
+*  History:
+*     15-JUN-1992 (IRJ):
+*        Created
+*     16-JUN-1992 (IRJ/SKR):
+*        Tidied
+*     16-JUN-1993 (BKM):
+*        Tidied and reformatted
+*     01-SEP-1993 (BKM):
+*        Further reformatted and ANSI-C only
+*     17-MAR-1994 (BDK):
+*        Changed to ams
+*     07-JUL-1994 (AJC):
+*        Rename some include files:
+*          adamdefns.h -> adam_defns.h
+*          mesdefns.h -> messys_len.h
+*     16-AUG-1994 (BKM):
+*        Bring up to date with BDK version (and comments)
+*     15-NOV-1994 (AJC):
+*        Dimension transfree MESSYS__MXTRANS not MXPATH
+*     08-FEB-1996 (AJC):
+*        Remove diagnostic printfs in ams_raccept and ams_receive
+*     14-SEP-1999 (DLT):
+*        Enable initialization without exit handler
+*     03-SEP-2004 (TIMJ):
+*        Fix compiler warnings due to lack of include files
+*     29-DEC-2005 (TIMJ):
+*        Tidy up config ATEXIT logic
+*-
 */
 
 #if HAVE_CONFIG_H
@@ -162,7 +182,7 @@ int *status                          /* global status (given and
       and return an acceptance message.
      Authors :
 
-     History
+     History :
       15Jun 1992: Created: irj 
       18Jun 1992: Tidied : irj, skr 
       12Apr 1994: make function static (BDK)
