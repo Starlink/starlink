@@ -1,5 +1,8 @@
 *+  DTASK_SYS - internal constants for DTASK library
-*    History
+*    Authors:
+*     Dennis Kelly (REVAD::BDK)
+*     Alan Chipperfield (RLVAD::AJC)
+*    History :
 *     25.04.1991:  original (REVAD::BDK)
 *     03.05.1991:  increase MAXACT to match SUBPAR limit (REVAD::BDK)
 *     13.05.1991:  update comments (REVAD::BDK)
