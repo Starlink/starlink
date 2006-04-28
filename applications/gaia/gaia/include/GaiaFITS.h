@@ -30,5 +30,6 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
 int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, char *value,
                   int value_length );
 int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, int *value );
+int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, double *value );
 
 #endif

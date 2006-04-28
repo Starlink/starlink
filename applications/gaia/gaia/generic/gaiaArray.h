@@ -16,6 +16,8 @@ enum { HDS_UNKNOWN = -1,
  * array, such as its memory address, number of elements, data type and
  * some information about FITS derived data. FITS derived data may not be in
  * the native byte ordering and may have a bad value that will differ from HDS.
+ * It can also require the application of a scale and zero point to get the
+ * actual data values.
  */
 struct ARRAYinfo {
     void *ptr;           /* Pointer to array data */
@@ -24,6 +26,9 @@ struct ARRAYinfo {
     int isfits;          /* If FITS data */
     int haveblank;       /* Have a FITS blank value */
     int blank;           /* The FITS blank value, if applicable */
+    double bscale;       /* FITS BSCALE value, used for integer types */
+    double bzero;        /* FITS BZERO value, used for integer types */
+    int cnfmalloc;       /* Was pointer to array data malloc by CNF */
 };
 typedef struct ARRAYinfo ARRAYinfo;
 
@@ -34,7 +39,8 @@ extern "C" {
 
     /* Create and initialise an ARRAYinfo structure */
     ARRAYinfo *gaiaArrayCreateInfo( void *ptr, int type, long el, int isfits,
-                                    int haveblank, int blank );
+                                    int haveblank, int blank, double bscale,
+                                    double bzero, int cnfmalloc );
     
     /* Free an ARRAYinfo structure. */
     void gaiaArrayFreeInfo( ARRAYinfo *info );
@@ -48,6 +54,14 @@ extern "C" {
     /* Convert local type into HDS type string */
     char const *gaiaArrayTypeToHDS( int type );
 
+    /* Return the type that will be used to return an image or spectrum as an
+     * HDS string */
+    char const *gaiaArrayFullTypeToHDS( int intype, double bscale, 
+                                        double bzero );
+
+    /* Return the type that will be used to return an image or spectrum */
+    int gaiaArrayScaledType( int intype, double bscale, double bzero );
+
     /* Convert an array of typed data into simple double precision
        representation. */
     void gaiaArrayToDouble( ARRAYinfo *info, double badValue, double *outPtr );
@@ -60,7 +74,8 @@ extern "C" {
     /* Get a spectrum (line of data) from a cube */
     void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis, 
                                     int arange[2], int index1, int index2, 
-                                    int cnfmalloc, void **outPtr, int *nel );
+                                    int cnfmalloc, void **outPtr, int *nel,
+                                    int *outtype );
 
     /* Get strides for indexing an ND array */ 
     void gaiaArrayGetStrides( int ndims, int dims[], int strides[] );
