@@ -538,7 +538,6 @@ itcl::class gaia::GaiaImageCtrl {
 
             #  Move new image into place and reopen.
             ::file rename -force $tmpname [$image_ cget -file]
-            puts stderr "rename $tmpname to [$image_ cget -file]"
 
             #  Record cut levels, reopen and restore cuts.
             lassign [$image_ cut] low high
