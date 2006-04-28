@@ -18465,8 +18465,8 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       and \htmlref{VARIANCE}{apndf:variance}~ (if available) arrays in OUT.
 
       By setting the INVERT parameter TRUE, the opposite effect can be
-      produced (i.e. any pixel which is not set bad in the DATA array of 
-      REF, is set bad in OUT and the others are left unchanged).
+      produced (\emph{i.e.} any pixel that is not set bad in the DATA array 
+      of REF, is set bad in OUT and the others are left unchanged).
    }
    \sstusage{
       copybad in ref out [title]
@@ -18478,7 +18478,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          NDF containing the data to be copied to OUT.
       }
       \sstsubsection{
-         INVERT = _LOGICAL (Read)
+         INVERT = \_LOGICAL (Read)
       }{
          If TRUE, then the bad and good pixels within the reference NDF
          specified by parameter REF are inverted before being used (that
