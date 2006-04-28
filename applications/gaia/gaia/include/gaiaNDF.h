@@ -38,7 +38,7 @@ extern "C" {
                    const char *type, char **error_message );
 
    /*  Create a very simple NDF. */
-   int gaiaCreateNDF( const char *filename, int width, int height, 
+   int gaiaCreateNDF( const char *filename, int ndim, int lbnd[], int ubnd[],
                       const char *type, AstFrameSet *wcs, int *indf, 
                       char **error_mess );
 
