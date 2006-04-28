@@ -1,14 +1,38 @@
-*+  MESSYS_PAR - MESSYS constants
-*
-*    Authors :
+*+
+*  Name:
+*     MESSYS_PAR
+
+*  Purpose:
+*     MESSYS constants
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     FORTRAN INCLUDE
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     13.04.1988: original (REVAD::BDK)
-*     09.05.1988: add MSPNAMLEN and extra comments (REVAD::BDK)
-*     23.07.1991: Add MESSYS_QT (ROE::BMC)
-*     25.02.1992: Increase MESSYS_MXTRANS and MXPATH from 16  (RLVAD::AJC)
-*     21.01.1993: Add MESSYS__NETNAME  (RLVAD::AJC)
-*      8.03.1993: Add MESSYS__VAL_LEN  (RLVAD::AJC)
+*     {enter_new_authors_here}
+
+*  History:
+*     13-APR-1988 (REVAD::BDK):
+*        Original
+*     09-MAY-1988 (REVAD::BDK):
+*        Add MSPNAMLEN and extra comments
+*     23-JUL-1991 (ROE::BMC):
+*        Add MESSYS_QT
+*     25-FEB-1992 (RLVAD::AJC):
+*        Increase MESSYS_MXTRANS and MXPATH from 16
+*     21-JAN-1993 (RLVAD::AJC):
+*        Add MESSYS__NETNAME
+*     08-MAR-1993 (RLVAD::AJC):
+*        Add MESSYS__VAL_LEN
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
 *

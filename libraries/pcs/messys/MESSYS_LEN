@@ -1,19 +1,38 @@
-*+   MESSYS_LEN - constants for message structure
-*    Authors :
-*     John Cooke (REVS::JAC) 22Mar84
-*    History :
-*     03May84:  msg_len increased to 136 to allow 80-byte value fields
-*               (was 60 before) (REVS::JAC)
-*     14Nov84:  msg_len increased to 256 to allow 200-byte value fields
-*               (was 80 before) (REVS::JAC)
-*     04.03.1988:  declare MSG_NAME_LEN (REVAD::BDK)
-*     01.05.1990:  msg_len increased to 500 to allow 444-byte value field
-*                  512 limit on total message imposed by MSP
-*     17.06.1994:  unix version (BDK)
-*     17.07.1994:  Rename from MESSYS_DD (AJC)
-*    endhistory
+*+
+*  Name:
+*     MESSYS_LEN
 
-*    Global constants :
+*  Purpose:
+*     Constants for message structure
+
+*  Language:
+*     {routine_language}
+
+*  Authors:
+*     John Cooke (REVS::JAC) 22Mar84
+*     {enter_new_authors_here}
+
+*  History:
+*     03-MAY-1984: msg_len increased to 136 to allow 80-byte value fields
+*               (was 60 before) (REVS::JAC)
+*     14-NOV-1984: msg_len increased to 256 to allow 200-byte value fields
+*               (was 80 before) (REVS::JAC)
+*     04-MAR-1988 (REVAD::BDK):
+*        Declare MSG_NAME_LEN
+*     01-MAY-1990: msg_len increased to 500 to allow 444-byte value field
+*                  512 limit on total message imposed by MSP
+*     17-JUN-1994 (BDK):
+*        Unix version
+*     17-JUL-1994 (AJC):
+*        Rename from MESSYS_DD
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
       INTEGER MSG_LEN   !  length of message in bytes (from DDPATH)
       PARAMETER ( MSG_LEN = 500 )   !  must be divisible by 4
 *       !!! N.B. if this is changed MESDEFNS must be changed also
@@ -24,4 +43,4 @@
       INTEGER MSG_NAME_LEN
       PARAMETER ( MSG_NAME_LEN = 32 )
 
-*-
+*.

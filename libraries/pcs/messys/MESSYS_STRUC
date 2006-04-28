@@ -1,17 +1,34 @@
-*+   MESSYS_STRUC - definition for message structure
-*    Authors :
-*     John Cooke (REVS::JAC) 22Mar84
-*    History :
-*     03May84:  msg_len increased to 136 to allow 80-byte value fields
-*               (was 60 before) (REVS::JAC)
-*     14Nov84:  msg_len increased to 256 to allow 200-byte value fields
-*               (was 80 before) (REVS::JAC)
-*     04.03.1988:  declare MSG_NAME_LEN (REVAD::BDK)
-*     01.05.1990:  msg_len increased to 500 to allow 444-byte value field
-*                  512 limit on total message imposed by MSP
-*     17.06.1994:  unix version (BDK)
-*    endhistory
+*+
+*  Name:
+*     MESSYS_STRUC
 
+*  Purpose:
+*     Definition for message structure
+
+*  Language:
+*     {routine_language}
+
+*  Authors:
+*     John Cooke (REVS::JAC) 22Mar84
+*     {enter_new_authors_here}
+
+*  History:
+*     03-MAY-1984: msg_len increased to 136 to allow 80-byte value fields
+*               (was 60 before) (REVS::JAC)
+*     14-NOV-1984: msg_len increased to 256 to allow 200-byte value fields
+*               (was 80 before) (REVS::JAC)
+*     04-MAR-1988 (REVAD::BDK):
+*        Declare MSG_NAME_LEN
+*     01-MAY-1990: msg_len increased to 500 to allow 444-byte value field
+*                  512 limit on total message imposed by MSP
+*     17-JUN-1994 (BDK):
+*        Unix version
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 *    data structure for external form of message :
 
       INTEGER MSG_(MSG_LEN / 4)
@@ -42,4 +59,4 @@
       EQUIVALENCE ( MSG_(6), MSG_NAME )
       EQUIVALENCE ( MSG_(14), MSG_LENGTH )
       EQUIVALENCE ( MSG_(15), MSG_VAL )  !  start depends on name length
-*-
+*.

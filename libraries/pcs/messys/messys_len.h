@@ -1,8 +1,30 @@
-/*  MESSYS_LEN.H - Data definitions for message structure
-    History :
-     11Apr 1994: remove definition of EXT_ macros (BDK)
-     13Apr 1994: remove structure definitions (BDK)
-      7Jul 1994: renamed from MESSYS_DD (AJC)
+/*
+*+
+*  Name:
+*     MESSYS_LEN
+
+*  Purpose:
+*     .H - Data definitions for message structure 
+
+*  Language:
+*     {routine_language}
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     11-APR-1994 (BDK):
+*        Remove definition of EXT_ macros
+*     13-APR-1994 (BDK):
+*        Remove structure definitions
+*     07-JUL-1994 (AJC):
+*        Renamed from MESSYS_DD
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 #ifndef INT_BYTE_SIZE

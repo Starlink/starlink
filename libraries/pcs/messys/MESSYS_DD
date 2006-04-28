@@ -1,12 +1,32 @@
-*+  MESSYS_DD (formerly DDMSG) - 
-*   FORTRAN include file for message system constants
-*
-*    This file is required to provide compatibility.
-*    The most important constant defined by it is MSG_VAL_LEN, which is 
-*    used in many applications as well as by ceratin adam system routines.
-*    MSG_VAL_LEN may now be defined by INCLUDING MESSYS_LEN alone.
-*
+*+
+*  Name:
+*     MESSYS_DD
+
+*  Purpose:
+*     FORTRAN include file for message system constants
+
+*  Language:
+*     {routine_language}
+
+*  Description:
+*     This file is required to provide compatibility.
+*     The most important constant defined by it is MSG_VAL_LEN, which is 
+*     used in many applications as well as by ceratin adam system routines.
+*     MSG_VAL_LEN may now be defined by INCLUDING MESSYS_LEN alone.
+
+*  Notes:
+*     Formerly DDMSG
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
       INCLUDE 'MESSYS_LEN'    ! Message length definitions.
       INCLUDE 'MESSYS_STRUC'  ! message structure definition required 
                               ! for calling the MESSYS library.
-

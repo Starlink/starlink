@@ -1,13 +1,15 @@
-/******************************************************************************
- *
- * 	M E S S Y S . P A R . H
- *
- * Include file for messys layer - messys constants
- *
- * History:
- *   15-NOV-1994 (AJC):
- *      Increased MESSYS__MXPATH and __MXTRANS from 16 to 32
- ******************************************************************************
+/*
+ *+
+ *  Name:
+ *    messys_par.h
+
+ *  Purpose:
+ *    Include file for messys layer - messys constants
+
+ *  History:
+ *    15-NOV-1994 (AJC):
+ *       Increased MESSYS__MXPATH and __MXTRANS from 16 to 32
+ *-
  */
 #ifndef MESSYS__TNAME
 
