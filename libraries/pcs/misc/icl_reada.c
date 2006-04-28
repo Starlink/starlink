@@ -1,48 +1,63 @@
 /******************************************************************************
- *
- * 	I C L _ R E A D A . C
- *
- * History :
- *	Created	as icl_io.c : skr 26/6/92
- *	subsequent development: bkm
- *      Modified to ICL_READA: ajc (1998)
- *       Changes from ICL_IO version:
- *         Removed message handing
- *         Removed screen mode
- *         Remember current inputline in recall system
- *         Add filename completion and list options
- *         Use tcsh edit keys.
- *         Default action on CNTL/Z (suspend) and CNTL/C(abort)
- *      Modified: ajc 2/6/98
- *         Recover if task suspended when not expecting input.
- *         Restore initial tty state on return from ICL_READA
- *         Handle environment variables in filename completion
- *      Modified: bkm 5/8/98
- *         Correct logic to cope with case when stdin is NOT a tty
- *      Modified bkm 28/10/98
- *         Don't echo the artifical newline used to pick up typeahead
- *      Modified ajc 16/2/99
- *         Correctly cyclicly decrement inbuf_rpos to forget type-ahead
- *         forced \n.
- *      Modified ajc  5/3/99
- *         Allow lines up to 256 characters and correct editing for long
- *         lines. Works with xterm and dumb terms and various between.
- *      Modified timj 28/3/05
- *         Tweak ncurses discovery.
- *         Fix compiler warnings
- *      Modified pwd 6/9/05
- *         Add extra 0's to tparm calls. These are part of the official
- *         prototype.
- *      Modified timj 29/12/05
- *         Use DAT__FLEXT rather than hard coded ".sdf"
- *
- * This is the routine used by ADAM tasks to read input in response to
- * parameter prompts when running from the shell.
- *
- * Terminal input is placed in a buffer to allow for command recall and various
- * key processing options which emulate the behaviour on VMS.
- *
- ******************************************************************************
+*+
+*  Name:
+*     icl_reada
+
+*  Purpose:
+*     Read input in response to parameter prompts
+
+*  Language:
+*     Starlink C
+
+*  Description:
+*     This is the routine used by ADAM tasks to read input in response to
+*     parameter prompts when running from the shell.
+*     
+*     Terminal input is placed in a buffer to allow for command recall and various
+*     key processing options which emulate the behaviour on VMS.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     	Created	as icl_io.c : skr 26/6/92
+*     	subsequent development: bkm
+*      Modified to ICL_READA: ajc (1998)
+*       Changes from ICL_IO version:
+*         Removed message handing
+*         Removed screen mode
+*         Remember current inputline in recall system
+*         Add filename completion and list options
+*         Use tcsh edit keys.
+*         Default action on CNTL/Z (suspend) and CNTL/C(abort)
+*      Modified: ajc 2/6/98
+*         Recover if task suspended when not expecting input.
+*         Restore initial tty state on return from ICL_READA
+*         Handle environment variables in filename completion
+*      Modified: bkm 5/8/98
+*         Correct logic to cope with case when stdin is NOT a tty
+*      Modified bkm 28/10/98
+*         Don't echo the artifical newline used to pick up typeahead
+*      Modified ajc 16/2/99
+*         Correctly cyclicly decrement inbuf_rpos to forget type-ahead
+*         forced \n.
+*      Modified ajc  5/3/99
+*         Allow lines up to 256 characters and correct editing for long
+*         lines. Works with xterm and dumb terms and various between.
+*      Modified timj 28/3/05
+*         Tweak ncurses discovery.
+*         Fix compiler warnings
+*      Modified pwd 6/9/05
+*         Add extra 0's to tparm calls. These are part of the official
+*         prototype.
+*      Modified timj 29/12/05
+*         Use DAT__FLEXT rather than hard coded ".sdf"
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
  */
 /* System includes */
 

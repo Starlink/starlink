@@ -1,28 +1,43 @@
-/*+  PUTENV -  Set environment variable
-     INTEGER FUNCTION PUTENV
-*    Description :
+/*
+*+
+*  Name:
+*     PUTENV
+
+*  Purpose:
+*     Set environment variable
+
+*  Language:
+*     C
+
+*  Invocation:
+*     I = PUTENV(VAR=VAL)
+
+*  Description:
 *     Provides a FORTRAN interface to the C library function putenv() to
 *     set an environment variable.
-*    Language:
-*     C
-*    Invocation :
-*     I = PUTENV(VAR=VAL)
-*    Parameters :
+
+*  Arguments:
 *     VAR=VAL (CHARACTER*(*))  variable_name=Value
-*    Return value:
-*     Zero if C level putenv() was successful. Else errno of the failure.
-*    Method :
+
+*  Algorithm:
 *     Uses standard Unix C system service routines
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     AJC: A.J.Chipperfield (STARLINK, RAL)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     12-AUG-1997 (AJC):
 *        Original version.
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Return Value:
+*     Zero if C level putenv() was successful. Else errno of the failure.
+
+*-
 */
 #include "f77.h"
 #include <string.h>
