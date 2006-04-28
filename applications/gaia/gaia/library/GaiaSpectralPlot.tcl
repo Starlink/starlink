@@ -250,7 +250,6 @@ itcl::class gaia::GaiaSpectralPlot {
       if { $itk_option(-open_cmd) != {} } {
          eval $itk_option(-open_cmd)
       }
-      after idle [code $this fitxy]
    }
 
    #  Reset so that a new spectrum will be created.
@@ -288,7 +287,7 @@ itcl::class gaia::GaiaSpectralPlot {
    #  spectrum fits. Otherwise the existing plot bounds are used.
    #  The alow and ahigh arguments are the range along the axis to extract
    #  and p1 and p2 the positions of the spectrum along the remaining two axes.
-   public method display {accessor axis alow ahigh p1 p2 autoscale 
+   public method display {accessor axis alow ahigh p1 p2 autoscale
                           {x {}} {y {}}} {
 
       #  Get the spectral data from the accessor.
@@ -307,10 +306,11 @@ itcl::class gaia::GaiaSpectralPlot {
          #  Clicking on the plot deselects other graphics.
          $itk_component(canvas) bind $spectrum_ <1> \
             +[code $itk_component(draw) deselect_objects]
-         
+
          #  Make a reference line.
          make_ref_line_
          set_to_ref_coord_
+         fitxy
       }
 
       #  Create the secondary plot, put this at the given x and y.
@@ -385,17 +385,19 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Make the spectral_plot item scale to fit the full size of the canvas.
    public method fitxy { args } {
-      $itk_component(canvas) scale $spectrum_ -1 -1 -1 -1
+      if { $spectrum_ != {} } {
+         $itk_component(canvas) scale $spectrum_ -1 -1 -1 -1
 
-      # Resize the reference line.
-      if { $ref_line_ != {} } {
-         $itk_component(canvas) delete $ref_line_
-         make_ref_line_
-         set_to_ref_coord_
+         # Resize the reference line.
+         if { $ref_line_ != {} } {
+            $itk_component(canvas) delete $ref_line_
+            make_ref_line_
+            set_to_ref_coord_
+         }
+
+         # Fudge immediate update.
+         $itk_component(canvas) itemconfigure $spectrum_ -showaxes 1
       }
-
-      # Fudge immediate update.
-      $itk_component(canvas) itemconfigure $spectrum_ -showaxes 1
    }
 
    #  Set the anchor point for the spectrum.
