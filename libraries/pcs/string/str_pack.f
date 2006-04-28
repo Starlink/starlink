@@ -1,18 +1,29 @@
-*+  STRING_PACK - pack an array of strings into a smaller array
       SUBROUTINE STRING_PACK ( NUMPACK, SIZE, INARRAY, OUTARRAY, 
      :     STATUS )
-*    Description :
+*+
+*  Name:
+*     STRING_PACK
+
+*  Purpose:
+*     Pack an array of strings into a smaller array
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL STRING_PACK ( NUMPACK, SIZE, INARRAY, OUTARRAY, 
+*     :     STATUS )
+
+*  Description:
 *     Pack an array of strings into a smaller array of bigger strings.
 *     The NUMPACK elements of the output array each consist of SIZE 
 *     elements of the input array separated by commas and surrounded by 
 *     brackets.
-*    Deficiencies :
-*     The use of CHR_FIWS assumes that there are no significant leading
-*     commas in the input elements.
-*    Invocation :
-*     CALL STRING_PACK ( NUMPACK, SIZE, INARRAY, OUTARRAY, 
-*    :     STATUS )
-*    Parameters :
+
+*  Arguments:
 *     NUMPACK=INTEGER (given)
 *           number of output strings
 *     SIZE=INTEGER (given)
@@ -22,34 +33,47 @@
 *     OUTARRAY(*)=CHARACTER*(*) (returned)
 *           array of output strings
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     For each output string, concatenate the SIZE input strings
 *     separating them by commas and removing trailing spaces.
 *     Each output string is surrounded by a pair of brackets.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Implementation Deficiencies:
+*     The use of CHR_FIWS assumes that there are no significant leading
+*     commas in the input elements.
+
+*  Authors:
 *     B.D.Kelly
-*    History :
-*     08.05.1987:  Original  (REVAD::BDK)
-*     08.06.1987:  use square brackets (REVAD::BDK)
-*     19.07.1991:  rewrite using CHR not VMS specifics (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     08-MAY-1987 (REVAD::BDK):
+*        Original
+*     08-JUN-1987 (REVAD::BDK):
+*        Use square brackets
+*     19-JUL-1991 (RLVAD::AJC):
+*        Rewrite using CHR not VMS specifics
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'CHR_ERR'
-*    Local constants :
+*  Local Constants:
       CHARACTER LBRACK
       PARAMETER ( LBRACK = '[' )
 
       CHARACTER RBRACK
       PARAMETER ( RBRACK = ']' )
 
-*    Import :
+*  Arguments Given:
       INTEGER NUMPACK            ! number of output strings
 
       INTEGER SIZE               ! number of input strings per output 
@@ -57,16 +81,16 @@
 
       CHARACTER*(*) INARRAY(*)   ! array of input strings
 
-*    Export :
+*  Arguments Returned:
       CHARACTER*(*) OUTARRAY(*)  ! array of output strings
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
 *    External references :
       INTEGER CHR_LEN            ! used length of string
 
-*    Local variables :
+*  Local Variables:
       INTEGER I             ! counter for packing output array
 
       INTEGER J             ! counter for output array
@@ -78,7 +102,7 @@
       INTEGER LENGTH        ! trimmed length of strings
 
       INTEGER START         ! start position of strings
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 *  For each element of the output array
@@ -136,4 +160,3 @@
       ENDDO
 
       END
-

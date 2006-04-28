@@ -1,6 +1,21 @@
-*+  TASK_GET_REASON - get reason for current reschedule
       SUBROUTINE TASK_GET_REASON ( REASON, STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_GET_REASON
+
+*  Purpose:
+*     Get reason for current reschedule
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_GET_REASON ( REASON, STATUS )
+
+*  Description:
 *     Return an integer whose value signifies the reason for the current 
 *     reschedule. Their possible values are:
 *       MESSYS__EXTINT
@@ -8,42 +23,50 @@
 *       MESSYS__ASTINT
 *       MESSYS__TRIGGER
 *       any status from the completion of a subsidiary action
-*    Invocation :
-*     CALL TASK_GET_REASON ( REASON, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     REASON=INTEGER (returned)
 *           value indicating reason for reschedule
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Return CURMESSTATUS from the common block
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     06.05.1991: original (REVAD::BDK)
-*      4.10.1992:  add PAR_PAR for porting (RLVAD::AJC)
-*     24.08.1993:  Use SUBPAR_SYS not PAR_PAR (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     06-MAY-1991 (REVAD::BDK):
+*        Original
+*     04-OCT-1992 (RLVAD::AJC):
+*        Add PAR_PAR for porting
+*     24-AUG-1993 (RLVAD::AJC):
+*        Use SUBPAR_SYS not PAR_PAR
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'TASK_PAR'
       INCLUDE 'MESSYS_LEN'
 
-*    Export :
+*  Arguments Returned:
       INTEGER REASON   ! value indicating reason for reschedule
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+*  Global Variables:
       INCLUDE 'TASK_CMN'
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

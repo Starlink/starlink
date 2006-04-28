@@ -1,12 +1,26 @@
-*+  TASK_SPLIT - split an argument list into an array of strings
       SUBROUTINE TASK_SPLIT ( VALUE, MAXVALS, NVALS, STRINGS, STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_SPLIT
+
+*  Purpose:
+*     Split an argument list into an array of strings
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_SPLIT ( VALUE, MAXVALS, NVALS, STRINGS, STATUS )
+
+*  Description:
 *     Given an argument list consisting of space-separated arguments,
 *     split it into an array of strings. Account for arrays by not regarding
 *     spaces within [] brackets as being separators.
-*    Invocation :
-*     CALL TASK_SPLIT ( VALUE, MAXVALS, NVALS, STRINGS, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     VALUE=CHARACTER*(*) (given)
 *           the argument list
 *     MAXVALS=INTEGER (given)
@@ -16,40 +30,47 @@
 *     STRINGS=CHARACTER*(*) (returned)
 *           the array of strings
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Replace [] with () and use STRING_ARRCHAR to split the string into
 *     space-separated sub-strings (it regards the parentheses as tokens in
 *     their own right in these circumstances). Re-concatenate as necessary
 *     to preserve array specifications.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (AAOEPP::WFL)
-*    History :
-*     01.05.1989:  Original (AAOEPP::WFL)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     01-MAY-1989 (AAOEPP::WFL):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'TASK_ERR'
 
-*    Import :
+*  Arguments Given:
       CHARACTER*(*) VALUE              ! argument list
 
       INTEGER MAXVALS                  ! max num of strings that can be returned
 
-*    Export :
+*  Arguments Returned:
       INTEGER NVALS                    ! actual num of strings in the arg list
 
       CHARACTER*(*) STRINGS(1:*)       ! array of strings
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
       INTEGER I                        ! loop counter
 
       CHARACTER*200 COPY               ! copy of VALUE with [] -> ()
@@ -66,7 +87,7 @@
 
       INTEGER LEVEL                    ! parenthesis level
 
-*-
+*.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       COPY = VALUE

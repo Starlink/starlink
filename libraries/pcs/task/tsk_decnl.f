@@ -1,16 +1,30 @@
-*+  TASK_DECNL - decode a character string as an array
       SUBROUTINE TASK_DECNL ( STRING, NMAXDIMS, MAXDIMS, NDIMS, DIMS,
      :                          LVALS, STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_DECNL
+
+*  Purpose:
+*     Decode a character string as an array
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_DECNL ( STRING, NMAXDIMS, MAXDIMS, NDIMS, DIMS,
+*                         LVALS, STATUS )
+
+*  Description:
 *     Convert the given character string, which is assumed to have
 *     the ADAM syntax for an array, that is the whole is surrounded by
 *     [] and the elements of the array are separated, into a 1-D array.
 *     Future versions could support returning multi-dimensional arrays.
 *     There is a routine for each type C, D, I, L, R.
-*    Invocation :
-*     CALL TASK_DECNL ( STRING, NMAXDIMS, MAXDIMS, NDIMS, DIMS,
-*                         LVALS, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     STRING=CHARACTER*(*) (given)
 *           the given character string
 *     NMAXDIMS=INTEGER (given)
@@ -25,28 +39,36 @@
 *     LVALS(1:*)=LOGICAL (returned)
 *           the decoded array, treated as a vector
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Call the ADAM string splitting routine to split the string into a
 *     1-D array of strings. Then convert each of these strings into an
 *     element of the returned array using the appropriate TASK_DEC0 routine.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (AAOEPP::WFL)
-*    History :
-*     29.04.1989:  original (AAOEPP::WFL)
-*      5.10.1992:  use TASK_DEC0 routine for portability.
+*     {enter_new_authors_here}
+
+*  History:
+*     29-APR-1989 (AAOEPP::WFL):
+*        Original
+*     05-OCT-1992: use TASK_DEC0 routine for portability.
 *                  use only used length of CARRAY element. (RLVAD::AJC)
-*     24.08.1993:  remove istat - not used (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     24-AUG-1993 (RLVAD::AJC):
+*        Remove istat - not used
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
  
-*    Import :
+*  Arguments Given:
       CHARACTER*(*) STRING ! the given character string
  
       INTEGER NMAXDIMS     ! the maximum number of dimensions that can be
@@ -55,14 +77,14 @@
       INTEGER MAXDIMS(NMAXDIMS) ! the maximum array indices in the various
                            ! dimensions that can be returned
  
-*    Export :
+*  Arguments Returned:
       INTEGER NDIMS        ! number of dimensions in the decoded array
  
       INTEGER DIMS(1:*)    ! sizes of dimensions of the given array
  
       LOGICAL LVALS(1:*)  ! the decoded array, treated as a vector
  
-*    Status :
+*  Status:
       INTEGER STATUS
  
 *    External references :
@@ -71,14 +93,14 @@
       INTEGER STRING_INANYR
       EXTERNAL STRING_INANYR
  
-*    Local variables :
+*  Local Variables:
       CHARACTER*(40) CARRAY(20)  ! store for original type conversions
       INTEGER CLENGTHS(20)       ! lengths of original converted strings
       INTEGER START              ! start position in string
       INTEGER END                ! end position in string
       INTEGER COUNT              ! number of items for conversion
       INTEGER J                  ! loop counter
-*-
+*.
  
       IF ( STATUS .NE. SAI__OK ) RETURN
 *

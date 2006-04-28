@@ -1,14 +1,28 @@
-*+  STRING_BUILDARR - Build an array of strings into a string
       SUBROUTINE STRING_BUILDARR ( NDIMS, DIMS, CARRAY, OUTSTRING, 
      :  STATUS )
-*    Description :
+*+
+*  Name:
+*     STRING_BUILDARR
+
+*  Purpose:
+*     Build an array of strings into a string
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL STRING_BUILDARR ( NDIMS, DIMS, CARRAY, OUTSTRING, 
+*     :  STATUS )
+
+*  Description:
 *     Given an N-dimensional array of strings, build them into a single 
 *     string with dimensions and values separated by brackets and 
 *     commas.
-*    Invocation :
-*     CALL STRING_BUILDARR ( NDIMS, DIMS, CARRAY, OUTSTRING, 
-*    :  STATUS )
-*    Parameters :
+
+*  Arguments:
 *     NDIMS=INTEGER (given)
 *           number of dimensions in CARRAY
 *     DIMS(NDIMS)=INTEGER (given)
@@ -18,38 +32,43 @@
 *     OUTSTRING=CHARACTER*(*) (returned)
 *           generated string
 *     STATUS=INTEGER
-*    Method :
-*     <description of how the subroutine works>
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     08.05.1987:  Original (REVAD::BDK)
-*     31.10.1997:  Increase size (80->250) and number (50->100)
+*     {enter_new_authors_here}
+
+*  History:
+*     08-MAY-1987 (REVAD::BDK):
+*        Original
+*     31-OCT-1997 (50->100):
+*        Increase size (80->250) and number
 *                  of array elements (STARLINK::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
 
-*    Import :
+*  Arguments Given:
       INTEGER NDIMS             ! number of dimensions in CARRAY
 
       INTEGER DIMS(NDIMS)       ! dimensions of CARRAY
 
       CHARACTER*(*) CARRAY(*)   ! array containing the values
 
-*    Export :
+*  Arguments Returned:
       CHARACTER*(*) OUTSTRING   ! generated string
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
       CHARACTER*250 INARRAY(100)  ! work array
 
       CHARACTER*250 OUTARRAY(100) ! work array
@@ -61,7 +80,7 @@
       INTEGER K                 ! dimension currently being packed
 
       INTEGER NUMPACK           ! number of packages being generated
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

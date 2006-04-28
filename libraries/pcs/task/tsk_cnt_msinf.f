@@ -1,11 +1,25 @@
-*+  TASK_COUNT_MESSINFO - count entries in list of active subsid actions
       SUBROUTINE TASK_COUNT_MESSINFO ( ACTPTR, COUNT, STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_COUNT_MESSINFO
+
+*  Purpose:
+*     Count entries in list of active subsid actions
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_COUNT_MESSINFO ( ACTPTR, COUNT, STATUS )
+
+*  Description:
 *     Counts entries in the list of active actions in subsidiary tasks
 *     corresponding to a given initiating action.
-*    Invocation :
-*     CALL TASK_COUNT_MESSINFO ( ACTPTR, COUNT, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     ACTPTR=INTEGER (given)
 *           The action pointer for the action that initiated the actions in
 *           the subsidiary task.
@@ -13,45 +27,56 @@
 *           The number of actions initiated by this action that are still
 *           active.
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Count list entries associated with this action.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (AAOEPP::WFL)
-*    History :
-*     01.05.1989:  original (AAOEPP::WFL)
-*     23.04.1991:  rearrange INCLUDE files (REVAD::BDK)
-*     06.05.1991:  remove ADAMDEFNS (REVAD::BDK)
-*      4.10.1992:  add PAR_PAR for porting (RLVAD::AJC)
-*     24.08.1993:  Use SUBPAR_SYS not PAR_PAR (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     01-MAY-1989 (AAOEPP::WFL):
+*        Original
+*     23-APR-1991 (REVAD::BDK):
+*        Rearrange INCLUDE files
+*     06-MAY-1991 (REVAD::BDK):
+*        Remove ADAMDEFNS
+*     04-OCT-1992 (RLVAD::AJC):
+*        Add PAR_PAR for porting
+*     24-AUG-1993 (RLVAD::AJC):
+*        Use SUBPAR_SYS not PAR_PAR
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'MESSYS_LEN'
       INCLUDE 'TASK_PAR'
 
-*    Import :
+*  Arguments Given:
       INTEGER ACTPTR      ! the action pointer for the initiating action
 
-*    Export :
+*  Arguments Returned:
       INTEGER COUNT       ! the number of active actions initiated by this one
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+*  Global Variables:
       INCLUDE 'TASK_CMN'
 
-*    Local variables :
+*  Local Variables:
       INTEGER I           ! counter
       LOGICAL DONE        ! whether have finished searching the list
-*-
+*.
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *    Cycle through the list counting matching entries until hit end of list or

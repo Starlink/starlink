@@ -1,11 +1,25 @@
-*+  TASK_ASKPARAM - ask user for parameter value
       SUBROUTINE TASK_ASKPARAM ( PATH, VALUE, MESSID, STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_ASKPARAM
+
+*  Purpose:
+*     Ask user for parameter value
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_ASKPARAM ( PATH, VALUE, MESSID, STATUS )
+
+*  Description:
 *     Given parameter info in "value", ask user (by prompting) for
 *     a value for the parameter.
-*    Invocation :
-*     CALL TASK_ASKPARAM ( PATH, VALUE, MESSID, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     PATH=INTEGER (Given)
 *           path to requesting task
 *     VALUE=CHARACTER*(*) (Given)
@@ -13,7 +27,8 @@
 *     MESSID=INTEGER (Given)
 *           ID for reply message
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     The value string contains substrings separated by nulls. The 
 *     substrings are the parameter name, its prompt string, its default 
 *     value, its help information, and an error message if an 
@@ -21,34 +36,46 @@
 *     is used by ASKPARAM to prompt the user. 
 *     The value obtained is then sent to the task which requested the 
 *     parameter.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     John Cooke (REVA::ADAM) 7Nov84
-*    History :
-*     07.11.1984: Original version (REVAD::JAC)
-*     29.03.1985: UFACE version (REVAD::BDK)
-*     18.10.1985: version for cli running as a task (REVAD::BDK)
-*     23.07.1987: make PARHELP 132 long (REVAD::BDK)
-*     05.11.1987: version for TASK (REVAD::BDK)
-*     05.12.1990: call SUBPAR_SPLITVAL to split revised message
+*     {enter_new_authors_here}
+
+*  History:
+*     07-NOV-1984 (REVAD::JAC):
+*        Original version
+*     29-MAR-1985 (REVAD::BDK):
+*        UFACE version
+*     18-OCT-1985 (REVAD::BDK):
+*        Version for cli running as a task
+*     23-JUL-1987 (REVAD::BDK):
+*        Make PARHELP 132 long
+*     05-NOV-1987 (REVAD::BDK):
+*        Version for TASK
+*     05-DEC-1990: call SUBPAR_SPLITVAL to split revised message
 *                 value structure (RLVAD::AJC)
-*     06.05.1991: revise include files (REVAD::BDK)
-*     25.11.1991: use ADAM_ACKNOW (REVAD::BDK)
-*      4.10.1992: add PAR_PAR for porting
+*     06-MAY-1991 (REVAD::BDK):
+*        Revise include files
+*     25-NOV-1991 (REVAD::BDK):
+*        Use ADAM_ACKNOW
+*     04-OCT-1992: add PAR_PAR for porting
 *                 replace STR$TRIM with CHR_LEN (RLVAD::AJC)
-*     24.08.1993:  Use SUBPAR_SYS not PAR_PAR,
+*     24-AUG-1993: Use SUBPAR_SYS not PAR_PAR,
 *                  SUBPAR__NAMELEN not PAR__SZNAM
 *                  and SUBPAR_PARERR not PAR_ERR (RLVAD::AJC)
-*     11.06.2001: Use AMS (FAMS) _REPLY not ADAM_ACKNOW
+*     11-JUN-2001: Use AMS (FAMS) _REPLY not ADAM_ACKNOW
 *                 Use AMS (FAMS) _PLOOKUP not MESSYS_PLOOKUP
 *                 Change MSG_VAL_LEN to MESSYS__VAL_LEN (AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'SUBPAR_PARERR'
@@ -56,25 +83,25 @@
       INCLUDE 'MESSYS_ERR'
       INCLUDE 'MESSYS_LEN'
 
-*    Import :
+*  Arguments Given:
       INTEGER PATH                 ! path to requesting task
       CHARACTER VALUE*(*)          ! message value string
       INTEGER MESSID               ! ID for reply message
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
 *    External Routines :
       INTEGER CHR_LEN              ! used length of string
       EXTERNAL CHR_LEN
 
-*    Local constants :
+*  Local Constants:
       INTEGER NOCONTEXT
       PARAMETER ( NOCONTEXT = 0 )
       CHARACTER NONAME
       PARAMETER ( NONAME = ' ' )
 
-*    Local variables :
+*  Local Variables:
       CHARACTER*(MESSYS__TNAME) TASKNAME ! name of task which requested
                                          ! value 
       INTEGER TNAMELEN                   ! length of TASKNAME
@@ -95,7 +122,7 @@
       INTEGER ERRLEN                     ! length of error message
       CHARACTER*(MESSYS__VAL_LEN) INVAL  ! value from user
       INTEGER MESSTATUS                  ! forwarded message status
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 *

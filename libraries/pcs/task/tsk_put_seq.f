@@ -1,45 +1,70 @@
-*+  TASK_PUT_SEQ - set current action sequence counter
       SUBROUTINE TASK_PUT_SEQ ( SEQ, STATUS )
-*    Description :
-*     Sets the current action sequence counter.
-*    Invocation :
+*+
+*  Name:
+*     TASK_PUT_SEQ
+
+*  Purpose:
+*     Set current action sequence counter
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
 *     CALL TASK_PUT_SEQ ( SEQ, STATUS )
-*    Parameters :
+
+*  Description:
+*     Sets the current action sequence counter.
+
+*  Arguments:
 *     SEQ=INTEGER (given)
 *           The current action sequence counter
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Copy information to COMMON.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (AAOEPP::WFL)
-*    History :
-*     01.03.1990:  original (AAOEPP::WFL)
-*     23.04.1991:  rearrange INCLUDE files (REVAD::BDK)
-*     06.05.1991:  remove ADAMDEFNS (REVAD::BDK)
-*      4.10.1992:  add PAR_PAR for porting (RLVAD::AJC)
-*     24.08.1993:  Use SUBPAR_SYS not PAR_PAR (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     01-MAR-1990 (AAOEPP::WFL):
+*        Original
+*     23-APR-1991 (REVAD::BDK):
+*        Rearrange INCLUDE files
+*     06-MAY-1991 (REVAD::BDK):
+*        Remove ADAMDEFNS
+*     04-OCT-1992 (RLVAD::AJC):
+*        Add PAR_PAR for porting
+*     24-AUG-1993 (RLVAD::AJC):
+*        Use SUBPAR_SYS not PAR_PAR
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'MESSYS_LEN'
       INCLUDE 'TASK_PAR'
 
-*    Import :
+*  Arguments Given:
       INTEGER SEQ     ! the current action sequence counter
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+*  Global Variables:
       INCLUDE 'TASK_CMN'
-*-
+*.
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *    Simply copy the sequence counter to COMMON.

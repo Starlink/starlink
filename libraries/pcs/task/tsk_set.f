@@ -1,10 +1,24 @@
-*+  TASK_SET - set a parameter value in a task
       SUBROUTINE TASK_SET (TASK_NAME, NAME, INVAL, STATUS )
-*    Description :
-*     Set the value of a parameter in a task.
-*    Invocation :
+*+
+*  Name:
+*     TASK_SET
+
+*  Purpose:
+*     Set a parameter value in a task
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
 *     CALL TASK_SET (TASK_NAME, NAME, INVAL, STATUS )
-*    Parameters :
+
+*  Description:
+*     Set the value of a parameter in a task.
+
+*  Arguments:
 *     TASK_NAME=CHARACTER*(*) (given)
 *           the name of the task
 *     NAME=CHARACTER*(*) (given)
@@ -12,43 +26,54 @@
 *     INVAL=CHARACTER*(*) (returned)
 *           the parameter value
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Get a path to the named task and send it a message.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     05.11.1987:  original (REVAD::BDK)
-*     08.08.1991:  do message forwarding (REVAD::BDK)
-*      4.10.1992:  add PAR_PAR for porting (RLVAD::AJC)
-*     24.08.1993:  Use SUBPAR_SYS not PAR_PAR (RLVAD::AJC)
-*     11.06.2001:  replace ADAM calls with AMS (AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     05-NOV-1987 (REVAD::BDK):
+*        Original
+*     08-AUG-1991 (REVAD::BDK):
+*        Do message forwarding
+*     04-OCT-1992 (RLVAD::AJC):
+*        Add PAR_PAR for porting
+*     24-AUG-1993 (RLVAD::AJC):
+*        Use SUBPAR_SYS not PAR_PAR
+*     11-JUN-2001 (AJC):
+*        Replace ADAM calls with AMS
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADAM_DEFNS'
       INCLUDE 'MESSYS_PAR'
-*    Import :
+*  Arguments Given:
       CHARACTER*(*) TASK_NAME   ! the name of the task
 
       CHARACTER*(*) NAME        ! the name of the parameter
 
       CHARACTER*(*) INVAL       ! the supplied parameter value
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
       INTEGER PATH            ! path to task
       INTEGER MESSID          ! message identifier
       INTEGER MESLEN          ! length of INVAL
       CHARACTER*(MESSYS__VAL_LEN) OUTVAL ! value string sent
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

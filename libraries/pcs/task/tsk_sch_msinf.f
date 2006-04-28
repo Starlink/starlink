@@ -1,13 +1,27 @@
-*+  TASK_SEARCH_MESSINFO - search for entry from list of active subsid actions
       SUBROUTINE TASK_SEARCH_MESSINFO ( PATH, MESSID, ACTPTR, STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_SEARCH_MESSINFO
+
+*  Purpose:
+*     Search for entry from list of active subsid actions
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_SEARCH_MESSINFO ( PATH, MESSID, ACTPTR, STATUS )
+
+*  Description:
 *     Searches for an entry corresponding to a specified path and message id in
 *     the list of active subsidiary actions. If the entry is found, the action
 *     pointer is returned. Otherwise, an action pointer of zero is returned
 *     (but not a bad status).
-*    Invocation :
-*     CALL TASK_SEARCH_MESSINFO ( PATH, MESSID, ACTPTR, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     PATH=INTEGER (given)
 *           The path identifying the subsidiary task
 *     MESSID=INTEGER (given)
@@ -17,48 +31,59 @@
 *           the subsidiary task. Zero if the path and message are not found
 *           in the list
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Search list for entry with matching path and message id.
 *     If found, return action pointer.
 *     If not found, return action pointer of zero.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (AAOEPP::WFL)
-*    History :
-*     29.04.1989:  original (AAOEPP::WFL)
-*     23.04.1991:  rearrange INCLUDE files (REVAD::BDK)
-*     06.05.1991:  remove ADAMDEFNS (REVAD::BDK)
-*      4.10.1992:  add PAR_PAR for porting (RLVAD::AJC)
-*     24.08.1993:  Use SUBPAR_SYS not PAR_PAR (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     29-APR-1989 (AAOEPP::WFL):
+*        Original
+*     23-APR-1991 (REVAD::BDK):
+*        Rearrange INCLUDE files
+*     06-MAY-1991 (REVAD::BDK):
+*        Remove ADAMDEFNS
+*     04-OCT-1992 (RLVAD::AJC):
+*        Add PAR_PAR for porting
+*     24-AUG-1993 (RLVAD::AJC):
+*        Use SUBPAR_SYS not PAR_PAR
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'MESSYS_LEN'
       INCLUDE 'TASK_PAR'
 
-*    Import :
+*  Arguments Given:
       INTEGER PATH        ! the path identifying the subsidiary task
       INTEGER MESSID      ! the message id'ing the action in the subsidiary task
 
-*    Export :
+*  Arguments Returned:
       INTEGER ACTPTR      ! the action pointer for the initiating action
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+*  Global Variables:
       INCLUDE 'TASK_CMN'
 
-*    Local variables :
+*  Local Variables:
       INTEGER I           ! counter
       LOGICAL DONE        ! whether have searchd entry to the list
-*-
+*.
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *    Cycle through the list until find matching entry or find a zero action

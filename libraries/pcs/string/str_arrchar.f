@@ -1,13 +1,27 @@
-*+  STRING_ARRCHAR - Split character string into a set of values
       SUBROUTINE STRING_ARRCHAR ( STRING, MXVALS, COUNT, CARRAY, 
      :  CLENS, STATUS )
-*    Description :
+*+
+*  Name:
+*     STRING_ARRCHAR
+
+*  Purpose:
+*     Split character string into a set of values
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL STRING_ARRCHAR ( STRING, MXVALS, COUNT, CARRAY, 
+*     :  CLENS, STATUS )
+
+*  Description:
 *     Split a character string up into a set of values. Values are 
 *     separated by spaces or commas not inside quoted strings.
-*    Invocation :
-*     CALL STRING_ARRCHAR ( STRING, MXVALS, COUNT, CARRAY, 
-*    :  CLENS, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     STRING=CHARACTER*(*) (given)
 *           string to be parsed
 *     MXVALS=INTEGER (given)
@@ -19,35 +33,36 @@
 *     CLENS(MXVALS)=INTEGER (returned)
 *           array of lengths of substrings
 *     INTEGER STATUS
-*    Method :
+
+*  Algorithm:
 *     For the purposes of this routine, a token is a sequence of characters
 *     which are either all alphanumeric (with .+-()_[]"<>/~ being honorary
 *     alphanumerics) or are all non-alphanumeric (ie are anything other
 *     than alphanumeric and "white"). For the purposes of this routine, a 
 *     white character is a space, tab, newline or comma. 
-*
+*     
 *     Tokens are thus terminated by either a character of the opposite class 
 *     or by a "white" character. No characters need separate tokens.
 *     Apart from their role as delimiters, white characters are never 
 *     significant.
-*
+*     
 *     Two exceptions to this rule are -
-*
+*     
 *      1) A token may consist of a set of characters enclosed in single 
 *         quotes. The first quote must be the first character of the token 
 *         and the token is terminated by the next isolated (ie.not '') quote 
 *         or end of buffer (whichever comes first).
 *         Note that double quotes within a quoted token are not collapsed.
-*
+*     
 *      2) Terminators occurring within brackets within an alphanumeric
 *         token will be ignored ( as in STRUCTURE(1,2).NUMBER ).
-*
+*     
 *     Hexadecimal constants are recognised and converted to decimal 
 *     strings.
-*
+*     
 *     All characters on a line that follow a token starting with # token are
 *     ignored, AS IS THE # .
-*
+*     
 *     The tokens within STRING are recognised, and transferred to 
 *     CARRAY, one token per array element.
 *     Brackets identified as being part of a list of array elements are 
@@ -56,71 +71,85 @@
 *     and ')' being handled as special characters and being handled as 
 *     alphanumeric. The full array list of whatever dimensionality has 
 *     to be contained within the one text line.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (RGO)
-*    History :
-*     18.09.1984:  VAX version (REVAD::BDK)
-*     27.09.1984:  ARRCHAR variant of GETTOK (REVAD::BDK)
-*     21.11.1984:  Make # sign recognised if it is just the first 
+*     {enter_new_authors_here}
+
+*  History:
+*     18-SEP-1984 (REVAD::BDK):
+*        VAX version
+*     27-SEP-1984 (REVAD::BDK):
+*        ARRCHAR variant of GETTOK
+*     21-NOV-1984: Make # sign recognised if it is just the first
 *                  character of a token - ie. it need not be followed by 
 *                  a delimiter. (REVAD::BDK)
-*     27.02.1985:  handle brackets in array list (REVAD::BDK)
-*     07.05.1987:  stop ! being a comment character (REVAD::BDK)
-*     07.05.1987:  ignore delimiters inside brackets embedded within a 
+*     27-FEB-1985 (REVAD::BDK):
+*        Handle brackets in array list
+*     07-MAY-1987 (REVAD::BDK):
+*        Stop ! being a comment character
+*     07-MAY-1987: ignore delimiters inside brackets embedded within a
 *                  token - eg JUNK(3,4) (REVAD::BDK)
-*     21.10.1987:  accept ? and @ as alphanumeric (REVAD::BDK)
-*     28.11.1990:  correct test for termination of brackets within 
+*     21-OCT-1987 (REVAD::BDK):
+*        Accept ? and @ as alphanumeric
+*     28-NOV-1990: correct test for termination of brackets within
 *                  token and don't terminate token at termination of
 *                  brackets.
 *                  Improve comments (RLVAD::AJC)
-*     28.11.1990:  rename from STRING_ARRCHAR 
+*     28-NOV-1990: rename from STRING_ARRCHAR
 *                  use CHR_SKCHR (RLVAD::AJC)
 *     01,10,1991:  revised spec for CHR_SKCHR (RLVAD::AJC)
-*     10.10.1991:  correct Z in list of letters (RLVAD::AJC)
-*     04.11.1991:  fix for CHR_FIWS bug if length = 1 (RLVAD::AJC)
-*     20.11.1991:  stop ' being honorary alphanumeric (RLVAD::AJC)
-*     24.02.1992:  report errors
+*     10-OCT-1991 (RLVAD::AJC):
+*        Correct Z in list of letters
+*     04-NOV-1991 (RLVAD::AJC):
+*        Fix for CHR_FIWS bug if length = 1
+*     20-NOV-1991 (RLVAD::AJC):
+*        Stop ' being honorary alphanumeric
+*     24-FEB-1992: report errors
 *                  make ~ and / honorary aplhanumeric
 *                  (for Unix names) (RLVAD::AJC)
-*     26.02.1992:  Don't convert to upper case (RLVAD::AJC)
-*     12.11.1992:  Convert back from PARSECON__ARRCHAR 
+*     26-FEB-1992 (RLVAD::AJC):
+*        Don't convert to upper case
+*     12-NOV-1992: Convert back from PARSECON__ARRCHAR
 *                  mods since 20.11.91 (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'CHR_ERR'
 
-*    Import :
+*  Arguments Given:
       CHARACTER*(*) STRING           ! string to be parsed
       INTEGER MXVALS                 ! maximum possible number of values
 
-*    Export :
+*  Arguments Returned:
       INTEGER COUNT                  ! number of values found
 
       CHARACTER*(*) CARRAY(MXVALS)   ! array of 'values' - ie substrings
 
       INTEGER CLENS(MXVALS)          ! array of lengths of substrings
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
 *    External references :
       INTEGER CHR_LEN
       EXTERNAL CHR_LEN
 
-*    Local Constants :
+*  Local Constants:
       CHARACTER*(*) QUOTE
       PARAMETER ( QUOTE = '''' )
 
 
-*    Local variables :
+*  Local Variables:
       INTEGER LBRACK             ! count of bracket nesting
 
       INTEGER TOKLEN             ! no of chars in token,
@@ -180,7 +209,7 @@
       PARAMETER ( OTHER = '!#%&*=\\^`{|}' )     
 
 *    Local data :
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -434,4 +463,3 @@
       ENDIF
 
       END
-

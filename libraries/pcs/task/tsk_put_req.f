@@ -1,45 +1,68 @@
-*+  TASK_PUT_REQUEST - set REQUEST for action be the fixed-part
       SUBROUTINE TASK_PUT_REQUEST ( REQUEST, STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_PUT_REQUEST
+
+*  Purpose:
+*     Set REQUEST for action be the fixed-part
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_PUT_REQUEST ( REQUEST, STATUS )
+
+*  Description:
 *     Sets the REQUEST for interpretation by the fixed-part.
 *     This simply involves copying to COMMON.
-*    Invocation :
-*     CALL TASK_PUT_REQUEST ( REQUEST, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     REQUEST=INTEGER (given)
 *           The REQUEST from the application for action by the 
 *           fixed-part.
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Copy information to COMMON.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     22.08.1991:  original (REVAD::BDK)
-*      9.10.1992:  Add PAR_PAR (RLVAD::AJC)
-*     24.08.1993:  Use SUBPAR_SYS not PAR_PAR (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     22-AUG-1991 (REVAD::BDK):
+*        Original
+*     09-OCT-1992 (RLVAD::AJC):
+*        Add PAR_PAR
+*     24-AUG-1993 (RLVAD::AJC):
+*        Use SUBPAR_SYS not PAR_PAR
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'MESSYS_LEN'
       INCLUDE 'TASK_PAR'
 
-*    Import :
+*  Arguments Given:
       INTEGER REQUEST   ! the REQUEST for the fixed-part
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+*  Global Variables:
       INCLUDE 'TASK_CMN'
-*-
+*.
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *    Simply copy the REQUEST to COMMON.

@@ -1,46 +1,71 @@
-*+  TASK_TSTINTFLG - test interrupt flag
       SUBROUTINE TASK_TSTINTFLG ( RESULT, STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_TSTINTFLG
+
+*  Purpose:
+*     Test interrupt flag
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_TSTINTFLG ( RESULT, STATUS )
+
+*  Description:
 *     Tests the flag which is set (in the AST routine) by interrupts.
 *     The flag is cleared if it was set.
 *     This can be polled by code which is executing under the fixed part
 *     of the system to check for interrupts and act accordingly.
-*    Invocation :
-*     CALL TASK_TSTINTFLG ( RESULT, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     RESULT = LOGICAL(EXPORT)
 *           status of interrupt flag on calling
-*    Method :
+
+*  Algorithm:
 *     Uses flag in AST common block.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     John Cooke (REVA::ADAM) 21June84
-*    History :
-*     date:  changes (institution::username)
-*     21-JUN-1984  first insertion (REVA::ADAM)
-*     25.04.1991:  revise INCLUDE files (REVAD::BDK)
-*     30.04.1991:  revise INCLUDE files (REVAD::BDK)
-*     13.05.1991:  move to TASK library (REVAD::BDK)
-*      4.10.1992:  add PAR_PAR for porting (RLVAD::AJC)
-*     24.08.1993:  Use SUBPAR_SYS not PAR_PAR (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     21-JUN-1984 (REVA::ADAM):
+*        First insertion
+*     25-APR-1991 (REVAD::BDK):
+*        Revise INCLUDE files
+*     30-APR-1991 (REVAD::BDK):
+*        Revise INCLUDE files
+*     13-MAY-1991 (REVAD::BDK):
+*        Move to TASK library
+*     04-OCT-1992 (RLVAD::AJC):
+*        Add PAR_PAR for porting
+*     24-AUG-1993 (RLVAD::AJC):
+*        Use SUBPAR_SYS not PAR_PAR
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'TASK_PAR'
       INCLUDE 'MESSYS_LEN'
-*    Export :
+*  Arguments Returned:
       LOGICAL RESULT
-*    Status :
+*  Status:
       INTEGER STATUS
-*    Global variables :
+*  Global Variables:
       INCLUDE 'TASK_CMN'
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

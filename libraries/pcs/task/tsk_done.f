@@ -1,6 +1,21 @@
-*+  TASK_DONE - wait for final acknowledgement from task
       SUBROUTINE TASK_DONE ( TIMEOUT, PATH, MESSID, OUTVAL, STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_DONE
+
+*  Purpose:
+*     Wait for final acknowledgement from task
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_DONE ( TIMEOUT, PATH, MESSID, OUTVAL, STATUS )
+
+*  Description:
 *     Wait for a final acknowledgement from a task executing a 
 *     GET/SET/OBEY/CANCEL.
 *     The routine will return when the required message arrives, or if 
@@ -9,9 +24,8 @@
 *     the action are automatically forwarded to the user interface. 
 *     Parameter values sent by the user interface are forwarded to the 
 *     task.
-*    Invocation :
-*     CALL TASK_DONE ( TIMEOUT, PATH, MESSID, OUTVAL, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     TIMEOUT=INTEGER (given)
 *           timeout in millisecs. -1 gives infinite timeout.
 *     PATH=INTEGER (given)
@@ -21,30 +35,44 @@
 *     OUTVAL=CHARACTER*(*) (returned)
 *           The value string from the task 
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Get replies from the task, handling parameter requests until the 
 *     final completion message is received.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     05.11.1987:  Original (REVAD::BDK)
-*     16.11.1987:  use SUBPAR_WRITE to forward messages (REVAD::BDK)
-*     18.04.1989:  return VALUE on success (REVAD::BDK)
-*     06.05.1991:  revise INCLUDE files (REVAD::BDK)
-*     08.08.1991:  handle GSOC, not just OBEY (REVAD::BDK)
-*     25.11.1991:  use ADAM_ACKNOW for SYNC replies (REVAD::BDK)
-*      4.10.1992:  add PAR_PAR for porting (RLVAD::AJC)
-*     24.08.1993:  Use SUBPAR_SYS not PAR_PAR 
+*     {enter_new_authors_here}
+
+*  History:
+*     05-NOV-1987 (REVAD::BDK):
+*        Original
+*     16-NOV-1987 (REVAD::BDK):
+*        Use SUBPAR_WRITE to forward messages
+*     18-APR-1989 (REVAD::BDK):
+*        Return VALUE on success
+*     06-MAY-1991 (REVAD::BDK):
+*        Revise INCLUDE files
+*     08-AUG-1991 (REVAD::BDK):
+*        Handle GSOC, not just OBEY
+*     25-NOV-1991 (REVAD::BDK):
+*        Use ADAM_ACKNOW for SYNC replies
+*     04-OCT-1992 (RLVAD::AJC):
+*        Add PAR_PAR for porting
+*     24-AUG-1993: Use SUBPAR_SYS not PAR_PAR
 *                  SUBPAR__NAMELEN not PAR__SZNAM (RLVAD::AJC)
-*     11.06.2001:  call AMS (FAMS) directly (AJC)
-*    endhistory
-*    Type Definitions :
+*     11-JUN-2001 (AJC):
+*        Call AMS (FAMS) directly
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'MESSYS_PAR'
@@ -52,7 +80,7 @@
       INCLUDE 'DTASK_ERR'
       INCLUDE 'MESSYS_LEN'
 
-*    Import :
+*  Arguments Given:
       INTEGER TIMEOUT           ! timeout in millisecs. 
                                 ! -1 gives infinite timeout.
 
@@ -60,20 +88,20 @@
 
       INTEGER MESSID            ! messid for the action.
 
-*    Export :
+*  Arguments Returned:
       CHARACTER*(*) OUTVAL      ! The value string from the task 
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
       INTEGER MSGSTATUS              ! message status returned from task
       INTEGER MESLEN                 ! length of INTVAL
       CHARACTER*(MESSYS__VAL_LEN) INTVAL ! message returned from task
       INTEGER CONTEXT                ! context returned from task
       LOGICAL FINISHED               ! loop controller
       CHARACTER*(SUBPAR__NAMELEN) REPLACT ! action name returned by GETREPLY
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

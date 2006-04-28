@@ -1,59 +1,84 @@
-*+  TASK_REMOVE_MESSINFO - remove entry from list of active subsidiary actions
       SUBROUTINE TASK_REMOVE_MESSINFO ( PATH, MESSID, STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_REMOVE_MESSINFO
+
+*  Purpose:
+*     Remove entry from list of active subsidiary actions
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_REMOVE_MESSINFO ( PATH, MESSID, STATUS )
+
+*  Description:
 *     Removes an entry from the list of active subsidiary actions. This simply
 *     involves searching the list for an entry with a matching path and message
 *     id and, if found, removing it. Entries are not checked for ownership
 *     by the current action.
-*    Invocation :
-*     CALL TASK_REMOVE_MESSINFO ( PATH, MESSID, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     PATH=INTEGER (given)
 *           The path identifying the subsidiary task
 *     MESSID=INTEGER (given)
 *           The message id identifying the action in the subsidiary task
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Search list for entry with matching path and message id.
 *     Set action pointer to -1 (unused).
 *     If this was last used entry, set topmost -1's to 0 (end of list).
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (AAOEPP::WFL)
-*    History :
-*     29.04.1989:  original (AAOEPP::WFL)
-*     23.04.1991:  rearrange INCLUDE files (REVAD::BDK)
-*     23.04.1991:  set MESACTPTR(I)=0 if the entry is at the end of the 
+*     {enter_new_authors_here}
+
+*  History:
+*     29-APR-1989 (AAOEPP::WFL):
+*        Original
+*     23-APR-1991 (REVAD::BDK):
+*        Rearrange INCLUDE files
+*     23-APR-1991: set MESACTPTR(I)=0 if the entry is at the end of the
 *                  storage arrays (REVAD::BDK)
-*     06.05.1991:  remove ADAMDEFNS (REVAD::BDK)
-*      4.10.1992:  add PAR_PAR for porting (RLVAD::AJC)
-*     24.08.1993:  Use SUBPAR_SYS not PAR_PAR (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     06-MAY-1991 (REVAD::BDK):
+*        Remove ADAMDEFNS
+*     04-OCT-1992 (RLVAD::AJC):
+*        Add PAR_PAR for porting
+*     24-AUG-1993 (RLVAD::AJC):
+*        Use SUBPAR_SYS not PAR_PAR
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'MESSYS_LEN'
       INCLUDE 'TASK_PAR'
 
-*    Import :
+*  Arguments Given:
       INTEGER PATH        ! the path identifying the subsidiary task
       INTEGER MESSID      ! the message id'ing the action in the subsidiary task
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+*  Global Variables:
       INCLUDE 'TASK_CMN'
 
-*    Local variables :
+*  Local Variables:
       INTEGER I           ! counter
       LOGICAL DONE        ! whether have removed entry to the list
-*-
+*.
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *    Cycle through the list until find matching entry or find a zero action

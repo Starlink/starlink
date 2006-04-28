@@ -1,57 +1,71 @@
-*+  TASK_DEC0C - decode a character string as a value
       SUBROUTINE TASK_DEC0C ( STRING, CVAL, STATUS )
- 
-*    Description :
+*+
+*  Name:
+*     TASK_DEC0C
+
+*  Purpose:
+*     Decode a character string as a value
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_DEC0C ( STRING, CVAL, STATUS )
+
+*  Description:
 *     Copy a given character string into another string, checking for
 *     truncation but ignoring trailing spaces
- 
-*    Invocation :
-*     CALL TASK_DEC0C ( STRING, CVAL, STATUS )
- 
-*    Parameters :
+
+*  Arguments:
 *     STRING=CHARACTER*(*) (given)
 *           the string to be decoded
 *     CVAL=CHARACTER*(*) (returned)
 *           the returned value
 *     STATUS=INTEGER
- 
-*    Method :
+
+*  Algorithm:
 *     Use CHR_COPY which checks for truncation/
- 
-*    Deficiencies :
-*     <description of any deficiencies>
- 
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
- 
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (AAOEPP::WFL)
 *     A J Chpperifeld (RLVAD::AJC)
- 
-*    History :
-*     29.04.1989:  original (AAOEPP::WFL)
-*      4.10.1992:  use CHR for portability (RLVAD::AJC)
- 
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     29-APR-1989 (AAOEPP::WFL):
+*        Original
+*     04-OCT-1992 (RLVAD::AJC):
+*        Use CHR for portability
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
  
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'TASK_ERR'
  
-*    Import :
+*  Arguments Given:
       CHARACTER*(*) STRING  ! the character string to be decoded
  
-*    Export :
+*  Arguments Returned:
       CHARACTER*(*) CVAL         ! the returned value
  
-*    Status :
+*  Status:
       INTEGER STATUS
  
-*    Local variables :
+*  Local Variables:
       INTEGER ISTAT         ! local (CHR) status
  
-*-
+*.
  
       IF ( STATUS .NE. SAI__OK ) RETURN
  

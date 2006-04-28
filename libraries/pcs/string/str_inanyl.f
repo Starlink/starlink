@@ -1,41 +1,59 @@
-*+  STRING_INANYL
       INTEGER FUNCTION STRING_INANYL ( STRING, CHOICE )
-*    Description :
+*+
+*  Name:
+*     STRING_INANYL
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     INTEGER FUNCTION
+
+*  Invocation:
+*     POSITION = STRING_INANYL ( STRING, CHOICE )
+
+*  Description:
 *     Finds the position of the first character in STRING which fails to 
 *     match any of the characters in CHOICE.
-*    Invocation :
-*     POSITION = STRING_INANYL ( STRING, CHOICE )
-*    Result :
+
+*  Algorithm:
+*     Each character of STRING is compared with the characters in CHOICE 
+*     until no match is found, or STRING is exhausted.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     31-MAR-1984 (REVAD::BDK):
+*        Original version
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Result:
 *     POSITION = INTEGER
 *           The value returned is the position in STRING at which the 
 *           first character mis-match occurs.
 *           If no mis-match found, then POSITION is set to zero.
-*    Method :
-*     Each character of STRING is compared with the characters in CHOICE 
-*     until no match is found, or STRING is exhausted.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*     B.D.Kelly (REVAD::BDK)
-*    History :
-*     31.03.1984: original version (REVAD::BDK)
-*    endhistory
-*    Type Definitions :
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Import :
+*  Arguments Given:
       CHARACTER*(*) STRING,          ! character string to be searched
      :              CHOICE           ! set of matching characters
 *    External references :
 *     <declarations for external function references>
-*    Local variables :
+*  Local Variables:
       INTEGER NUMSTRING,             ! number of characters in STRING
      :        NUMCHOICE,             ! number of characters in CHOICE
      :        POSITION,              ! current position in STRING
      :        MATCH                  ! position in CHOICE
       LOGICAL FOUND                  ! controller for search loop
-*-
+*.
 
       NUMSTRING = LEN ( STRING )
       NUMCHOICE = LEN ( CHOICE )
@@ -59,4 +77,3 @@
       ENDIF
 
       END
-

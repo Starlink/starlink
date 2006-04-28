@@ -1,13 +1,27 @@
-*+  TASK_CNCAT - concatenate an array of strings into an argument list
       SUBROUTINE TASK_CNCAT ( NVALS, STRINGS, VALUE, STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_CNCAT
+
+*  Purpose:
+*     Concatenate an array of strings into an argument list
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_CNCAT ( NVALS, STRINGS, VALUE, STATUS )
+
+*  Description:
 *     Given an array of strings, concatenate them with separating single
 *     spaces, having removed leading and trailing spaces. This generates
 *     an argument list suitable for passing through the ADAM message 
 *     system.
-*    Invocation :
-*     CALL TASK_CNCAT ( NVALS, STRINGS, VALUE, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     NVALS=INTEGER (given)
 *           number of strings in the array
 *     STRINGS=CHARACTER*(*) (given)
@@ -15,43 +29,52 @@
 *     VALUE=CHARACTER*(*) (returned)
 *           the concatenated string
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     For each of the NVALS elements of STRINGS, use LIB$SKPC to skip 
 *     leading spaces and STR$TRIM to remove trailing spaces, then append 
 *     the result onto VALUE with a single trailing space.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     13.06.1985:  Original (REVAD::BDK)
-*     01.03.1990:  fix one-off error in FIRSTSPACE and initialise VALUE 
+*     {enter_new_authors_here}
+
+*  History:
+*     13-JUN-1985 (REVAD::BDK):
+*        Original
+*     01-MAR-1990: fix one-off error in FIRSTSPACE and initialise VALUE
 *                  to spaces (REVAD::BDK)
-*      4.10.1992:  use CHR_FANDL not STR$SKPC and STR$TRIM (RLVAD::AJC)
-*     24.08.1993:  remove istat - not used (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     04-OCT-1992 (RLVAD::AJC):
+*        Use CHR_FANDL not STR$SKPC and STR$TRIM
+*     24-AUG-1993 (RLVAD::AJC):
+*        Remove istat - not used
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'TASK_ERR'
 
-*    Import :
+*  Arguments Given:
       INTEGER NVALS                    ! the number of strings
 
       CHARACTER*(*) STRINGS(*)         ! the array of strings
 
-*    Export :
+*  Arguments Returned:
       CHARACTER*(*) VALUE              ! the concatenated line
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
 *    External references :
 
-*    Local variables :
+*  Local Variables:
       INTEGER FIRSTSPACE               ! first free space in VALUE
 
       INTEGER MAXLEN                   ! LEN(VALUE)
@@ -61,7 +84,7 @@
       INTEGER START                    ! position of start of a string
 
       INTEGER ENDSTR                   ! position of end of a string
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 

@@ -1,13 +1,27 @@
-*+  TASK_VAL1R - encode a vector as a character string
       SUBROUTINE TASK_VAL1R ( NVALS, RVALS, STRING, STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_VAL1R
+
+*  Purpose:
+*     Encode a vector as a character string
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_VAL1R ( NVALS, RVALS, STRING, STATUS )
+
+*  Description:
 *     Convert the given 1-D array into characters and concatenate the
 *     result into a string with the ADAM syntax, that is the elements of
 *     the array are separated and the whole is surrounded by [].
 *     There is a routine for each type C, D, I, L, R.
-*    Invocation :
-*     CALL TASK_VAL1R ( NVALS, RVALS, STRING, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     NVALS=INTEGER (given)
 *           number of values in the 1-D array
 *     RVALS(NVALS)=REAL (given)
@@ -15,34 +29,42 @@
 *     STRING=CHARACTER*(*) (returned)
 *           the returned character string
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Call TASK_ENC1R
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     06.11.1987:  original (REVAD::BDK)
-*     29.04.1989:  make it generic (same as TASK_ENC1R) (AAOEPP::WFL)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     06-NOV-1987 (REVAD::BDK):
+*        Original
+*     29-APR-1989 (AAOEPP::WFL):
+*        Make it generic (same as TASK_ENC1R)
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
  
-*    Import :
+*  Arguments Given:
       INTEGER NVALS         ! number of values in the 1-D array
  
       REAL RVALS(NVALS) ! the array to be encoded
  
-*    Export :
+*  Arguments Returned:
       CHARACTER*(*) STRING  ! the returned character string
  
-*    Status :
+*  Status:
       INTEGER STATUS
-*-
+*.
  
       IF ( STATUS .NE. SAI__OK ) RETURN
  

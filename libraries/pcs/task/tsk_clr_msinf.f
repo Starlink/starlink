@@ -1,6 +1,21 @@
-*+  TASK_CLEAR_MESSINFO - clear list of active subsidiary actions for an action
       SUBROUTINE TASK_CLEAR_MESSINFO ( ACTPTR, STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_CLEAR_MESSINFO
+
+*  Purpose:
+*     Clear list of active subsidiary actions for an action
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_CLEAR_MESSINFO ( ACTPTR, STATUS )
+
+*  Description:
 *     Marks all entries in the list of active subsidiary actions for an action 
 *     as being unused. Entries are added to the list when user code calls
 *     TASK_ADD_MESSINFO to indicate that it has initiated an action in a
@@ -8,61 +23,72 @@
 *     fixed d-task routines determine that such an action has completed. It
 *     is assumed that this routine is only called when the list is expected
 *     to be empty and warning messages are output if any entries are found.
-*    Invocation :
-*     CALL TASK_CLEAR_MESSINFO ( ACTPTR, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     ACTPTR=INTEGER (given)
 *           The pointer by which entries in the list are associated with
 *           actions (normally the same as the action pointer that is used
 *           in the DTASK_ routines but it doesn't have to be).
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Search list for entries with matching action pointers.
 *     If found, warn and set action pointer to -1 (unused).
 *     If this was last used entry, set topmost -1's to 0 (end of list).
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (AAOEPP::WFL)
 *     B.D.Kelly (REVAD::BDK)
 *     A.J.Chipperfield (STARLINK)
-*    History :
-*     29.04.1989:  original (AAOEPP::WFL)
-*     23.04.1991:  rearrange INCLUDE files and set error status before 
+*     {enter_new_authors_here}
+
+*  History:
+*     29-APR-1989 (AAOEPP::WFL):
+*        Original
+*     23-APR-1991: rearrange INCLUDE files and set error status before
 *                  calling ERR routines (REVAD::BDK)
-*     06.05.1991:  remove ADAMDEFNS (REVAD::BDK)
-*      4.10.1992:  add PAR_PAR for porting (RLVAD::AJC)
-*     11.11.1992:  Use ERR_REP and ERR_FLUSH not ERR_OUT (RLVAD::AJC)
-*     24.08.1993:  Use SUBPAR_SYS not PAR_PAR (RLVAD::AJC)
-*     15.06.2001:  Use AMS (FAMS) _PLOOKUP not MESSYS_PLOOKUP (AJC)
-*    endhistory
-*    Type Definitions :
+*     06-MAY-1991 (REVAD::BDK):
+*        Remove ADAMDEFNS
+*     04-OCT-1992 (RLVAD::AJC):
+*        Add PAR_PAR for porting
+*     11-NOV-1992 (RLVAD::AJC):
+*        Use ERR_REP and ERR_FLUSH not ERR_OUT
+*     24-AUG-1993 (RLVAD::AJC):
+*        Use SUBPAR_SYS not PAR_PAR
+*     15-JUN-2001 (AJC):
+*        Use AMS (FAMS) _PLOOKUP not MESSYS_PLOOKUP
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'MESSYS_PAR'
       INCLUDE 'MESSYS_LEN'
       INCLUDE 'TASK_PAR'
 
-*    Import :
+*  Arguments Given:
       INTEGER ACTPTR                  ! action pointer for which entries
                                       ! are to be cleared 
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+*  Global Variables:
       INCLUDE 'TASK_CMN'
 
-*    Local variables :
+*  Local Variables:
       INTEGER I                       ! counter
       LOGICAL DONE                    ! whether have finished going
                                       ! through the list 
       CHARACTER*(MESSYS__TNAME) TASK  ! task name used in error messages
-*-
+*.
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *    Cycle through the list until exhaust it or find a zero action pointer

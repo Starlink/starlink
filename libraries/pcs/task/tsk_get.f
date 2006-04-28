@@ -1,10 +1,24 @@
-*+  TASK_GET - get a parameter value from a task
       SUBROUTINE TASK_GET (TASK_NAME, NAME, OUTVAL, STATUS )
-*    Description :
-*     Get the value of a parameter from a task as a character string.
-*    Invocation :
+*+
+*  Name:
+*     TASK_GET
+
+*  Purpose:
+*     Get a parameter value from a task
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
 *     CALL TASK_GET (TASK_NAME, NAME, OUTVAL, STATUS )
-*    Parameters :
+
+*  Description:
+*     Get the value of a parameter from a task as a character string.
+
+*  Arguments:
 *     TASK_NAME=CHARACTER*(*) (given)
 *           the name of the task
 *     NAME=CHARACTER*(*) (given)
@@ -12,42 +26,51 @@
 *     OUTVAL=CHARACTER*(*) (returned)
 *           the returned parameter value
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Get a path to the named task and send it a message.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     05.11.1987:  original (REVAD::BDK)
-*     08.08.1991:  do message forwarding (REVAD::BDK)
-*     11.06.2001:  replace ADAM calls with AMS (AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     05-NOV-1987 (REVAD::BDK):
+*        Original
+*     08-AUG-1991 (REVAD::BDK):
+*        Do message forwarding
+*     11-JUN-2001 (AJC):
+*        Replace ADAM calls with AMS
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADAM_DEFNS'
       INCLUDE 'MESSYS_PAR'
-*    Import :
+*  Arguments Given:
       CHARACTER*(*) TASK_NAME   ! the name of the task
 
       CHARACTER*(*) NAME        ! the name of the parameter
 
-*    Export :
+*  Arguments Returned:
       CHARACTER*(*) OUTVAL      ! the returned parameter value
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
       INTEGER PATH            ! path to task
       INTEGER MESSID          ! message identifier
       INTEGER MESLEN          ! length of INVAL
       CHARACTER*1 INVAL       ! value string sent
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -60,4 +83,3 @@
 
 
       END
-

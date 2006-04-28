@@ -1,14 +1,28 @@
-*+  TASK_DEC1L - decode a character string as a vector
       SUBROUTINE TASK_DEC1L ( STRING, MAXVALS, NVALS, LVALS,
      :                          STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_DEC1L
+
+*  Purpose:
+*     Decode a character string as a vector
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_DEC1L ( STRING, MAXVALS, NVALS, LVALS, STATUS )
+
+*  Description:
 *     Convert the given character string, which is assumed to have
 *     the ADAM syntax for an array, that is the whole is surrounded by
 *     [] and the elements of the array are separated, into a 1-D array.
 *     There is a routine for each type C, D, I, L, R.
-*    Invocation :
-*     CALL TASK_DEC1L ( STRING, MAXVALS, NVALS, LVALS, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     STRING=CHARACTER*(*) (given)
 *           the given character string
 *     MAXVALS=CHARACTER*(*) (given)
@@ -18,39 +32,46 @@
 *     LVALS(NVALS)=LOGICAL (returned)
 *           the returned 1-D array
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Call TASK_DECNL
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (AAOEPP::WFL)
-*    History :
-*     29.04.1989:  original (AAOEPP::WFL)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     29-APR-1989 (AAOEPP::WFL):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
  
-*    Import :
+*  Arguments Given:
       CHARACTER*(*) STRING  ! the given character string
  
       INTEGER MAXVALS       ! the maximum number of values in 1-D array
  
-*    Export :
+*  Arguments Returned:
       INTEGER NVALS         ! the number of values in the 1-D array
  
       LOGICAL LVALS(1:*)   ! the returned 1-D array
  
-*    Status :
+*  Status:
       INTEGER STATUS
  
-*    Local variables :
+*  Local Variables:
       INTEGER NMAXDIMS      ! max no of dimensions to return
       INTEGER NDIMS         ! no of dimensions in encoded string
-*-
+*.
  
       IF ( STATUS .NE. SAI__OK ) RETURN
  

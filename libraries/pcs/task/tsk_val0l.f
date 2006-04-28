@@ -1,43 +1,65 @@
-*+  TASK_VAL0L - encode a value as a character string
       SUBROUTINE TASK_VAL0L ( LVAL, STRING, STATUS )
-*    Description :
+*+
+*  Name:
+*     TASK_VAL0L
+
+*  Purpose:
+*     Encode a value as a character string
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_VAL0L ( LVAL, STRING, STATUS )
+
+*  Description:
 *     Convert the given value of type LOGICAL into a character
 *     string and return it in STRING.
 *     A routine exists for each type C, D, L, I, R.
-*    Invocation :
-*     CALL TASK_VAL0L ( LVAL, STRING, STATUS )
-*    Parameters :
+
+*  Arguments:
 *     LVAL=LOGICAL (given)
 *           the value to be encoded
 *     STRING=CHARACTER*(*) (returned)
 *           the returned character string
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Call TASK_ENC0L
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     06.11.1987:  original (REVAD::BDK)
-*     29.04.1989:  make it generic (same as TASK_ENC0L) (AAOEPP::WFL)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     06-NOV-1987 (REVAD::BDK):
+*        Original
+*     29-APR-1989 (AAOEPP::WFL):
+*        Make it generic (same as TASK_ENC0L)
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
  
-*    Import :
+*  Arguments Given:
       LOGICAL LVAL         ! the value to be encoded
  
-*    Export :
+*  Arguments Returned:
       CHARACTER*(*) STRING  ! the returned character string
  
-*    Status :
+*  Status:
       INTEGER STATUS
-*-
+*.
  
       IF ( STATUS .NE. SAI__OK ) RETURN
  

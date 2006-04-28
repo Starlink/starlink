@@ -1,12 +1,26 @@
-*+  TASK_OBEY - send an OBEY to a task
       SUBROUTINE TASK_OBEY ( TASK_NAME, NAME, INVAL, OUTVAL, PATH, 
      :  MESSID, STATUS )
-*    Description :
-*     Send an OBEY command and command-line parameter string to a task.
-*    Invocation :
+*+
+*  Name:
+*     TASK_OBEY
+
+*  Purpose:
+*     Send an OBEY to a task
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
 *     CALL TASK_OBEY ( TASK_NAME, NAME, INVAL, OUTVAL, PATH, 
-*    :  MESSID, STATUS )
-*    Parameters :
+*     :  MESSID, STATUS )
+
+*  Description:
+*     Send an OBEY command and command-line parameter string to a task.
+
+*  Arguments:
 *     TASK_NAME=CHARACTER*(*) (given)
 *           the name of the task
 *     NAME=CHARACTER*(*) (given)
@@ -20,44 +34,54 @@
 *     MESSID=INTEGER (returned)
 *           the message identifier for the OBEY
 *     STATUS=INTEGER
-*    Method :
+
+*  Algorithm:
 *     Get a path to the named task and send it a message.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     B.D.Kelly (REVAD::BDK)
-*    History :
-*     05.11.1987:  original (REVAD::BDK)
-*     06.05.1991:  remove DDMSG (REVAD::BDK)
-*     08.08.1991:  do message forwarding (REVAD::BDK)
-*     11.06.2001:  replace ADAM calls with AMS (AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     05-NOV-1987 (REVAD::BDK):
+*        Original
+*     06-MAY-1991 (REVAD::BDK):
+*        Remove DDMSG
+*     08-AUG-1991 (REVAD::BDK):
+*        Do message forwarding
+*     11-JUN-2001 (AJC):
+*        Replace ADAM calls with AMS
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADAM_DEFNS'
       INCLUDE 'MESSYS_PAR'
-*    Import :
+*  Arguments Given:
       CHARACTER*(*) TASK_NAME   ! the name of the task
 
       CHARACTER*(*) NAME        ! the name of the parameter
 
       CHARACTER*(*) INVAL       ! the command-line parameter values
 
-*    Export :
+*  Arguments Returned:
       CHARACTER*(*) OUTVAL      ! the string returned from the task
 
       INTEGER PATH              ! the path to the task
       INTEGER MESLEN            ! length of INVAL
       INTEGER MESSID            ! the message identifier for the OBEY
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*-
+*.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -70,4 +94,3 @@
 
 
       END
-

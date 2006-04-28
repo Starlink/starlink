@@ -1,14 +1,28 @@
-*+  TASK_GET_MESSINFO - get details of current action in subsidiary task
       SUBROUTINE TASK_GET_MESSINFO ( PATH, CONTEXT, NAME, VALUE, MESSID,
      :  EVENT, STATUS ) 
-*    Description :
+*+
+*  Name:
+*     TASK_GET_MESSINFO
+
+*  Purpose:
+*     Get details of current action in subsidiary task
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL TASK_GET_MESSINFO ( PATH, CONTEXT, NAME, VALUE, MESSID, EVENT,
+*     STATUS)
+
+*  Description:
 *     Gets details of the action in a subsidiary task that has given rise to
 *     this ACT entry. This simply involves copying information from COMMON
 *     variables.
-*    Invocation :
-*     CALL TASK_GET_MESSINFO ( PATH, CONTEXT, NAME, VALUE, MESSID, EVENT,
-*     STATUS)
-*    Parameters :
+
+*  Arguments:
 *     PATH=INTEGER (returned)
 *           The path identifying the subsidiary task
 *     CONTEXT=INTEGER (returned)
@@ -23,34 +37,49 @@
 *           The subsidiary action message status
 *     STATUS=INTEGER
 *           Normal inherited status
-*    Method :
+
+*  Algorithm:
 *     Copy information from COMMON.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     W.F.Lupton (AAOEPP::WFL)
-*    History :
-*     29.04.1989:  original (AAOEPP::WFL)
-*     02.05.1989:  alter interface to be more consistent (AAOEPP::WFL)
-*     23.04.1991:  rearrange INCLUDE files (REVAD::BDK)
-*     06.05.1991:  remove ADAMDEFNS (REVAD::BDK)
-*     24.05.1991:  use CURRACTVALIN for VALUE (REVAD::BDK)
-*     12.06.1991:  use CURACTVALUE for VALUE (REVAD::BDK)
-*     17.09.1991:  separate EVENT and STATUS (RLVAD::AJC)
-*      4.10.1992:  add PAR_PAR for porting (RLVAD::AJC)
-*     24.08.1993:  Use SUBPAR_SYS not PAR_PAR (RLVAD::AJC)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     29-APR-1989 (AAOEPP::WFL):
+*        Original
+*     02-MAY-1989 (AAOEPP::WFL):
+*        Alter interface to be more consistent
+*     23-APR-1991 (REVAD::BDK):
+*        Rearrange INCLUDE files
+*     06-MAY-1991 (REVAD::BDK):
+*        Remove ADAMDEFNS
+*     24-MAY-1991 (REVAD::BDK):
+*        Use CURRACTVALIN for VALUE
+*     12-JUN-1991 (REVAD::BDK):
+*        Use CURACTVALUE for VALUE
+*     17-SEP-1991 (RLVAD::AJC):
+*        Separate EVENT and STATUS
+*     04-OCT-1992 (RLVAD::AJC):
+*        Add PAR_PAR for porting
+*     24-AUG-1993 (RLVAD::AJC):
+*        Use SUBPAR_SYS not PAR_PAR
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'SUBPAR_SYS'
       INCLUDE 'MESSYS_LEN'
       INCLUDE 'TASK_PAR'
 
-*    Export :
+*  Arguments Returned:
       INTEGER PATH          ! the path identifying the subsidiary task
       INTEGER CONTEXT       ! the subsidiary action context (OBEY or CANCEL)
       CHARACTER*(*) NAME    ! the subsidiary action name
@@ -58,12 +87,12 @@
       INTEGER MESSID        ! the message id id'ing the subsidiary action
       INTEGER EVENT         ! the subsidiary action message status
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+*  Global Variables:
       INCLUDE 'TASK_CMN'
-*-
+*.
       IF ( STATUS .NE. SAI__OK ) RETURN
 *
 *    Simply copy the values from COMMON.
