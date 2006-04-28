@@ -11,15 +11,21 @@
 dist_bin_SCRIPTS = $(SCRIPTS_GAIA) $(GAIA_LIB_FILES) $(GAIA_IFC_FILES)
 
 ##  None distributed versions (binaries).
-bin_SCRIPTS = $(SKYCAT_FILES) $(GAIA_BIN_FILES)
+bin_SCRIPTS = $(SKYCAT_BIN_FILES) $(GAIA_BIN_FILES)
 
 ##  GAIA top-level scripts.
 SCRIPTS_GAIA = gaia.csh gaiadisp.csh tabbedgaia.csh .gaFilters
 
+
 ## Things we need to create from the various sub-components.
 
-## Binaries used for real time display.
-SKYCAT_FILES = rtdServer$(EXEEXT) rtdClient$(EXEEXT) rtdCubeDisplay$(EXEEXT)
+## Binaries used for real time display and bits of Skycat that are installed
+## for instrument control systems.
+SKYCAT_INC_FILES = rtdConfig.h rtdImageEvent.h
+SKYCAT_LIB_FILES =  librtdImgEvt.a
+SKYCAT_BIN_FILES = rtdServer$(EXEEXT) rtdClient$(EXEEXT) \
+  rtdCubeDisplay$(EXEEXT)
+SKYCAT_FILES = $(SKYCAT_INC_FILES) $(SKYCAT_LIB_FILES) $(SKYCAT_BIN_FILES)
 
 SKYCAT_TEST_FILES = built/lib/skycatConfig.sh
 
@@ -154,4 +160,15 @@ install-exec-local:
 	   echo $(LN_S) gaiaMon $$t; \
 	   $(LN_S) gaiaMon $$t; \
 	   $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(bindir)/$$t" || : ;\
+	done
+
+##  Install realtime parts of Skycat that have not been done yet.
+install-data-local:
+	for t in $(SKYCAT_LIB_FILES); do \
+	   $(INSTALL_DATA) $(srcdir)/$$t $(DESTDIR)$(libdir)/$$t; \
+	   $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(libdir)/$$t" || : ; \
+	done
+	for t in $(SKYCAT_INC_FILES); do \
+	   $(INSTALL_DATA) $(srcdir)/$$t $(DESTDIR)$(includedir)/$$t; \
+	   $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(includedir)/$$t" || : ; \
 	done
