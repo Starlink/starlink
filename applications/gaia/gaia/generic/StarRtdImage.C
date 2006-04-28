@@ -1278,9 +1278,20 @@ int StarRtdImage::originCmd( int argc, char *argv[] )
     char *out_name;
     char *value;
     char name[10];
+    char *base;
+
+    // If any ELBOUND cards are defined we use them, otherwise LBOUND (of
+    // which there should only ever be two).
+    if( image_->image().get( "ELBOUND1" ) != NULL ) {
+        base = "ELBOUND";
+    }
+    else {
+        base = "LBOUND";
+    }
+
     for ( int i = 0; i < argc; i++ ) {
         out_name = argv[i];
-        sprintf( name, "ELBOUND%d", i + 1 );
+        sprintf( name, "%s%d", base, i + 1 );
         value = image_->image().get( name );
         if ( ! value ) {
             value = "1";
