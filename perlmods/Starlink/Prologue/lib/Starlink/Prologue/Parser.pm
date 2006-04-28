@@ -73,6 +73,75 @@ sub new {
 
 =over 4
 
+=item B<parse_lines>
+
+Parse a source file as a collection of code lines and return an array
+of lines with the prologues replaced by C<Starlink::Prologue> objects.
+
+ @result = $parser->parse_lines( @source);
+
+Standard source lines will be returned unchanged.
+If there are no prologues, the number of input lines will match the
+number of lines returned. The lines will not include newline characters.
+
+=cut
+
+sub parse_lines {
+  my $self = shift;
+  my @input = @_;
+
+  my @output;
+  for my $line (@input) {
+    # push each line to the 
+    my ($printme, $prologue) = $self->push_line( $line );
+
+    # if we have a prologue it needs to be printed. It may 
+    # come with a line of text that should also be printed after
+    # the prologue
+    if (defined $prologue) {
+
+      # store the prologue
+      push(@output, $prologue);
+
+      # we got a line at the same time as the termination.
+      # Add a blank line between it and the prologue.
+      if (defined $printme) {
+	push( @output, "", $printme);
+      }
+    } elsif (defined $printme) {
+      # if we just have a line we just store it
+      push( @output, $printme );
+    } else {
+      # nothing to do so the line is part of a prologue
+    }
+
+  }
+
+  # if we still have a pending prologue (should not)
+  # flush it
+  my $prologue = $self->flush();
+  if (defined $prologue) {
+    push(@output, $prologue );
+  }
+
+  # Done
+  return @output;
+}
+
+=item B<extract_prologues>
+
+Given an array of source lines, extract all the prologues and return
+them:
+
+ @prologues = $parser->extract_prologues( @source );
+
+=cut
+
+sub extract_prologues {
+  my $self = shift;
+  return grep { ref($_) } $self->parse_lines( @_ );
+}
+
 =item B<push_line>
 
 Add a new line of content to the parser. In scalar context returns the

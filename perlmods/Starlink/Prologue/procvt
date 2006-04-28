@@ -101,9 +101,11 @@ if (@ARGV) {
   my @lines = <>;
   if (@lines) {
     my ($types, $rewrite) = _convert_header( join("", @lines) );
+    my %types = map { $_, undef } @$types;
+    print STDERR "Supplied prologue contains ", join(", ", keys %types), " prologues. Converting...\n";
     print $rewrite;
   } else {
-    print "Please supply files to modify or source code via stdin\n";
+    print STDERR "Please supply files to modify or source code via stdin\n";
   }
 }
 
@@ -122,30 +124,29 @@ sub _convert_header {
   my $input = shift;
   my $file = shift;
 
+  # Create a parser and parse all the source code
   my $parser = new Starlink::Prologue::Parser;
+  my @parsed = $parser->parse_lines( split /\n/, $input );
+
+  # process the lines and update unknown fields
+
   my @types; # all processed types
   my $type; # Type of most recent prologue
   my $rewrite = ''; # rewritten source
 
-  for my $line (split/\n/,$input) {
+  for my $entry (@parsed) {
 
-    # run in rewrite rather than extraction mode
-    my ($printme, $prologue) = $parser->push_line( $line );
-
-    # if we have a prologue it needs to be printed. It may 
-    # come with a line of text that should also be printed after
-    # the prologue
-    if (defined $prologue) {
+    # if we have a prologue it needs to be stringified
+    if (ref $entry) {
 
       # fix up language if not defined
-      if (!@{$prologue->language}) {
+      if (!@{$entry->language}) {
 	if (!defined $file) {
-	  print "DID NOT HAVE FILE\n";
 	  # assume that old prologue is always Fortran!
-	  my @type = @{$prologue->type_of_module};
-	  if (@type && $prologue->prologue_type eq 'ADAMSSE' &&
+	  my @type = @{$entry->type_of_module};
+	  if (@type && $entry->prologue_type eq 'ADAMSSE' &&
 	      $type[0] =~ /(SUBROUTINE|BLOCK DATA|PROGRAM)/) {
-	    $prologue->language("Starlink Fortran 77");
+	    $entry->language("Starlink Fortran 77");
 	  }
 	} elsif ($file =~ /\./) {
 	  # File has a suffix
@@ -166,50 +167,37 @@ sub _convert_header {
 	  } elsif ($suffix eq 'csh' ) {
 	    $lang = "C-shell";
 	  }
-	  $prologue->language( $lang ) if defined $lang;
+	  $entry->language( $lang ) if defined $lang;
 
 	} else {
 	  # now things are getting hard so assume Starlink conventions
 	  if ($file =~ /_(ERR|SYS|CMN|PAR)$/i ) {
-	    $prologue->language( "Starlink Fortran 77" );
+	    $entry->language( "Starlink Fortran 77" );
 	  }
 	}
       }
 
       # fix up type of module
-      my @type_of_module = @{$prologue->type_of_module};
+      my @type_of_module = @{$entry->type_of_module};
       if (!@type_of_module) {
 	if (defined $file) {
 	  if ($file =~ /_CMN$/i) {
-	    $prologue->type_of_module( "COMMON BLOCK" );
+	    $entry->type_of_module( "COMMON BLOCK" );
 	  } elsif ($file =~ /_(ERR|PAR|SYS)$/i ) {
-	    $prologue->type_of_module( "FORTRAN INCLUDE" );
+	    $entry->type_of_module( "FORTRAN INCLUDE" );
 	  }
 	}
       }
       # stringify the prologue
-      $rewrite .= $prologue->stringify;
-      $type = $prologue->prologue_type;
+      $rewrite .= $entry->stringify;
+      $type = $entry->prologue_type;
       push(@types, $type);
-      if (defined $printme) {
-	$printme = _rewrite_line( $type, $printme );
-	$rewrite .= "\n".$printme ."\n";
-      }
-    } elsif (defined $printme) {
-      # if we just have a line we need to print it out
-      $printme = _rewrite_line( $type, $printme );
-      $rewrite .= $printme ."\n";
+
     } else {
-      # nothing to do so the line is part of a prologue
+      # if we just have a line we need to print it out
+      $rewrite .= _rewrite_line( $type, $entry ) ."\n";
     }
 
-  }
-
-  # if we still have a pending prologue (should not)
-  # flush it
-  my $prologue = $parser->flush();
-  if (defined $prologue) {
-    $rewrite .= $prologue->stringify;
   }
 
   return (\@types, $rewrite);
