@@ -162,7 +162,7 @@ sub push_line {
       $content =~ s/^\s{2,5}//;
 
       # special case endhistory
-      if ($self->section() eq 'History' &&
+      if (defined $self->section && $self->section() eq 'History' &&
 	  $content =~ /^\s*endhistory\s*$/i) {
 	$self->flush_section();
       } else {
@@ -200,7 +200,7 @@ sub push_line {
 	$prl->name( $title );
       }
 
-      if (defined $purpose) {
+      if (defined $purpose && $purpose =~ /\w/) {
 	$prl->purpose( $purpose );
       }
 
@@ -260,16 +260,15 @@ sub tidy_content {
       }
 
       my ($date,@rest) = split (/\s+/,$line);
-
       # if date matches we continue on
-      if ($date =~ /^(\d{1,2})[\-\.\/](\w\w\w|\d{1,2})[\-\.\/](\d{2,4}):?$/
-	  || $date =~ /^(\d{1,2})(\w\w\w)(\d{2,4}):?$/ ) {
+      if ($date =~ /^(\d{1,2})[\-\.\/](\w{3,}|\d{1,2})[\-\.\/](\d{2,4}):?$/
+	  || $date =~ /^(\d{1,2})\s?(\w{3,})\s?(\d{2,4}):?$/ ) {
 	#  DD-APR-YYYY  19Jun84
 	#  DD-APR-YY
 	#  DD.APR.YYYY etc
 	#  DD-MM-YY
 	my $day = $1;
-	my $month = uc($2);
+	my $month = substr(uc($2),0,3);
 	my $year = $3;
 	$day =~ s/^0+//; # leading zeroes
 	$month =~ s/^0+//; # trim leading zeroes
@@ -359,7 +358,7 @@ sub prolog_start {
   my $cchar;
   my $title;
   my $purpose;
-  if ($line =~ /^\s*([\*\#])\+\s*([\w_\d]+)\s*-\s*(.*)\s*$/) {
+  if ($line =~ /^\s*([\*\#])\+\s*([\w_\d]+)\s*-?\s*(.*)\s*$/) {
      # Normal prologue start :  *+ title - purpose
      $cchar = $1;
      $title = $2;
