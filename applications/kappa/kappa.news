@@ -2,7 +2,7 @@
 
    A new release of KAPPA (v1.5) has been made.  The main changes are:
 
-   o  A new application called MAKESNR has been added. This command
+   o  A new application called MAKESNR has been added.  This command
    creates a signal-to-noise array from an NDF with defined VARIANCE
    component, rejecting unusably small variances.
 
@@ -31,7 +31,7 @@
    read access to an NDF, unlike the former version that was an alias
    to FITSMOD.  It should be faster too.
 
-   o A new parameter called CUMUL has been added to HISTOGRAM. Setting 
+   o  A new parameter called CUMUL has been added to HISTOGRAM.  Setting
    CUMUL to TRUE will result in a cumulative histogram being produced.
 
    o  The WCSALIGN and REGRID applications now have options for using a
@@ -70,11 +70,11 @@
    heights called "Scale".  This sets a specified number of contour 
    levels to be equally spaced between two pixel values that you supply.
 
-   o  LOOK parameter FORMAT has an extra option "cglist". This is like 
+   o  LOOK parameter FORMAT has an extra option "cglist".  This is like 
    "clist" except that bad values are not included in the list.
 
    o  COPYBAD now has an extra parameter called INVERT which, if set
-   TRUE, causes output pixels to be set bad if the corresponding pixel in
+   TRUE, causes output pixels to be set bad if the corresponding pixels in
    the reference NDF are good.
 
 Changes introduced in version 1.4-2
