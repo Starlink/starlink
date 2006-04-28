@@ -1,96 +1,101 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html>
 <head>
-<title>Displaying images</title>
+    <title>Displaying images</title>
 </head>
-
+  
 <body>
-<a name="xref_display"></a>
-<h2 align="center"><font color=red>Displaying images</font></h2>
-<p>If you want to display an image, after starting GAIA, then pull down
-the menu marked "File" and select the "Open..." option. This creates a
-file browser in which you should locate your image file, or just type
-in the name in the Selection box. The various data formats that can be
-read should be shown here (NDF format and FITS are always available).
-<p align=center><img src="display.gif">
-<p>
-Various preset file filters are available for all the known data
-formats (one of the FITS filters is chosen in the example image). Note
-these are just filters, not image type selectors. The type of an image
-is always indicated by its file extension.
+    <a name="xref_display"></a>
+    <h2 align="center"><font color=red>Displaying images</font></h2>
+    <p>If you want to display an image, after starting GAIA, then pull down
+      the menu marked "File" and select the "Open..." option. This creates a
+      file browser in which you should locate your image file, or just type
+      in the name in the Selection box. The various data formats that can be
+      read should be shown here (NDF format and FITS are always available).
+    <p align=center><img src="display.gif">
+    <p>
+      Various preset file filters are available for all the known data
+      formats (one of the FITS filters is chosen in the example image). Note
+      these are just filters, not image type selectors. The type of an image
+      is always indicated by its file extension.
     </p>
     <p>
-You can also specify one image to display when starting GAIA:
+      You can also specify one image to display when starting GAIA:
     <pre>
    % gaia my_image &
     </pre>
-And display images into a GAIA that is already running:
+    And display images into a GAIA that is already running:
     <pre>
    % gaiadisp my_image
     </pre>
-(actually this command will also start GAIA if it fails to
-connect to an existing instance).</p>
-
+    (actually this command will also start GAIA if it fails to
+    connect to an existing instance).</p>
+    
     <h3>Displaying more than one image at the same time</h3>
-To do this you need to create a completely new main window (but which
-is still part of this program) by selecting the "New Window" option of
-the "File" menu. A second image can then be displayed by selecting the
-"Open..." option of the "File" menu of the new window. You can have as
-many of these "cloned" windows as you want.
     <p>
-One use for cloned windows is as preparation for blink comparing
-images. Before blinking is allowed each image must be displayed in a
-clone.
+      To do this you need to create a completely new main window (but which
+      is still part of this program) by selecting the "New Window" option of
+      the "File" menu. A second image can then be displayed by selecting the
+      "Open..." option of the "File" menu of the new window. You can have as
+      many of these "cloned" windows as you want.
     </p>
     <p>
-To display a series of images from the command-line you can just do:
+      One use for cloned windows is as preparation for blink comparing
+      images. Before blinking is allowed each image must be displayed in a
+      clone.
+    </p>
+    <p>
+      To display a series of images from the command-line you can just do:
     <pre>
    % gaiadisp image1 image2 image3 image4 ...
     </pre>
-Or to display into a clone (numbered 2):
+    Or to display into a clone (numbered 2):
     <pre>
    % gaiadisp my_image 2
     </pre>
   </p>
     <p>
-Popup windows (like analysis and catalogue windows) tend to be
-associated with the clone that created them. When this is true the
-window title will have the "clone" number written into its title bar
-in parenthesis, e.g. a window with title "Image regions (1)" would be
-associated with the main window, "Image regions (2)" with the first
-clone created etc.).
-
+      Popup windows (like analysis and catalogue windows) tend to be
+      associated with the clone that created them. When this is true the
+      window title will have the "clone" number written into its title bar
+      in parenthesis, e.g. a window with title "Image regions (1)" would be
+      associated with the main window, "Image regions (2)" with the first
+      clone created etc.).
+      
     <h3>Make best use of my display area</h3>
-You can resize the main window by dragging its edges, just like any
-other window. The penalty is that redraws will get slower and the
-program will require more memory.
-<p>
-If the shape of the main image display area is a problem (you'd like
-it to be more square), then the panel with the readouts and zoom/pan
-images can be temporarily removed, just open the "View" menu and
-select the "Hide control panel" option.
-</p>
-For the ultimate in control you can also remove any of the pan, zoom
-or color ramp windows permanently:
-<pre> 
+    <p>
+      You can resize the main window by dragging its edges, just like any
+      other window. The penalty is that redraws will get slower and the
+      program will require more memory.
+    </p>
+    <p>
+      If the shape of the main image display area is a problem (you'd like
+      it to be more square), then the panel with the readouts and zoom/pan
+      images can be temporarily removed, just open the "View" menu and
+      select the "Hide control panel" option.
+    </p>
+    For the ultimate in control you can also remove any of the pan, zoom
+    or color ramp windows permanently:
+    <pre> 
   % gaia -with_zoom_window 0
   % gaia -with_pan_window 0 
   % gaia -with_colorramp 0
-</pre>
-or get rid of them all with:
-<pre>
+    </pre>
+    or get rid of them all with:
+    <pre>
   % gaia -with_zoom_window 0 -with_pan_window 0 -with_colorramp 0
-</pre>
-Finally you can put the control panel in a window of its own:
-<pre>
+    </pre>
+    Finally you can put the control panel in a window of its own:
+    <pre>
   % gaia -float_panel 1 
-</pre>
-This option is designed for very restricted size monitors.
-</p>
- 
-<h3>Displaying data cubes</h3>
+    </pre>
+    This option is designed for very restricted size monitors.
+  </p>
+    
+    <h3>Displaying spectra and image planes from cubes</h3>
     If your data are really three dimensional cubes then you can still display
-    them. There are two basic ways that this will be done. The default method
+    image planes from them and also plot spectra from the hidden dimension. 
+    There are two basic ways that this will be done. The default method
     is to provide a toolbox that allows you to step through the image planes
     of the cube (you can also go to this directly using the "Open cube.." item
     in the File menu), or you can display the cube as a stretched out series of
@@ -98,7 +103,7 @@ This option is designed for very restricted size monitors.
     this latter behaviour you will need to start GAIA with the
     <tt>-check_for_cubes</tt> option set to <tt>0</tt>, and have a NDF
     format cube. See the tool
-    <a href="ndfcube.html">help</a> for more.
-
+    <a href="cube.html">help</a> for more.
+    
   </body>
 </html>
