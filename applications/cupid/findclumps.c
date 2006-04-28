@@ -215,7 +215,7 @@ void findclumps() {
 *     This application will create an NDF extension called "CUPID" in the 
 *     output NDF and will add the following components to it:
 * 
-*     - FINDCLUMPS: This a an array of CLUMP structures, one for each clump
+*     - CLUMPS: This a an array of CLUMP structures, one for each clump
 *     identified by the selected algorithm. Each such structure contains 
 *     the same clump parameters that are written to the catalogue via
 *     parameter OUTCAT. It also contains a component called MODEL which
@@ -645,9 +645,9 @@ void findclumps() {
          *status = SAI__ERROR;
          ndfMsg( "NDF", indf );
          msgSeti( "NSIG", nsig );
-         errRep( "FINDCLUMPS_ERR2", "\"^NDF\" has ^NSIG significant "
+         errRep( "FINDCLUMPS_ERR1", "\"^NDF\" has ^NSIG significant "
                  "pixel axes", status );
-         errRep( "FINDCLUMPS_ERR4", "This application requires 1, 2 or 3 "
+         errRep( "FINDCLUMPS_ERR2", "This application requires 1, 2 or 3 "
                  "significant pixel axes", status );
       }
       goto L999;
@@ -756,7 +756,7 @@ void findclumps() {
 
       } else {
          *status = SAI__ERROR;
-         errRep( "FINDCLUMPS_ERR1", "The supplied data contains insufficient "
+         errRep( "FINDCLUMPS_ERR3", "The supplied data contains insufficient "
                  "good Variance values to continue.", status );
       }         
 
@@ -771,7 +771,7 @@ void findclumps() {
    parGet0d( "RMS", &rms, status );
 
 /* Determine which algorithm to use. */
-   parChoic( "METHOD", "GAUSSFINDCLUMPS", "GAUSSFINDCLUMPS,CLUMPFIND,REINHOLD,"
+   parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND,REINHOLD,"
              "FELLWALKER", 1, method, 15,  status );
 
 /* Abort if an error has occurred. */
@@ -807,7 +807,7 @@ void findclumps() {
    if( grp ) grpDelet( &grp, status );      
 
 /* Switch for each method */
-   if( !strcmp( method, "GAUSSFINDCLUMPS" ) ) {
+   if( !strcmp( method, "GAUSSCLUMPS" ) ) {
       ndfs = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms, 
                                 keymap, velax, ilevel, beamcorr ); 
 
@@ -824,8 +824,9 @@ void findclumps() {
                               keymap, velax, ilevel, beamcorr ); 
       
    } else if( *status == SAI__OK ) {
+      *status = SAI__ERROR;
       msgSetc( "METH", method );
-      errRep( "FINDCLUMPS_ERR1", "Requested Method ^METH has not yet been "
+      errRep( "FINDCLUMPS_ERR4", "Requested Method ^METH has not yet been "
               "implemented.", status );
    }
 
@@ -836,7 +837,7 @@ void findclumps() {
       ipo = NULL;
       ndfProp( indf, "AXIS,WCS,NOEXTENSION(CUPID)", "OUT", &indf2, 
                status );
-      if( !strcmp( method, "GAUSSFINDCLUMPS" ) ) {
+      if( !strcmp( method, "GAUSSCLUMPS" ) ) {
          ndfMap( indf2, "DATA", itype, "WRITE", &ipo, &el, status );
          ndfSbad( 1, indf2, "DATA", status );
 
@@ -961,8 +962,8 @@ L999:
 /* If an error has occurred, issue another error report identifying the 
    program which has failed (i.e. this one). */
    if( *status != SAI__OK ) {
-      errRep( "FINDCLUMPS_ERR", "FINDCLUMPS: Failed to identify clumps of emission "
-              "within a 1, 2 or 3-D NDF.", status );
+      errRep( "FINDCLUMPS_ERR5", "FINDCLUMPS: Failed to identify clumps of "
+              "emission within a 1, 2 or 3-D NDF.", status );
    }
 
 }
