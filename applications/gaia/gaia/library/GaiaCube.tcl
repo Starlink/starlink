@@ -557,7 +557,7 @@ itcl::class gaia::GaiaCube {
          $namer absolute
          set ndfname_ [$namer ndfname 0]
          $cubeaccessor_ configure -dataset "$ndfname_"
-         set bounds_ [$cubeaccessor_ getbounds]
+         set bounds_ [$cubeaccessor_ getbounds 0]
          set ndims [expr [llength $bounds_]/2]
 
          #  Allow fourth dimension, as long as it is redundant.

@@ -434,19 +434,16 @@ int gaiaMapComponent( int ndfid, void **data, const char* component,
  *     Create a new simple NDF.
  *
  *  Description:
- *     Create a new NDF with the given type (HDS format), width and height. 
+ *     Create a new NDF with the given type (HDS format) and bounds. 
  *     Add the given WCS (NULL for none). The components can be accessed using
  *     gaiaMapComponent.
  */
-int gaiaCreateNDF( const char *filename, int width, int height, 
+int gaiaCreateNDF( const char *filename, int ndim, int lbnd[], int ubnd[], 
                    const char *type, AstFrameSet *wcs, 
                    int *indf, char **error_mess )
 {
-    int lbnd[2];
-    int ndim;
     int place;
     int status = SAI__OK;
-    int ubnd[2];
 
     emsMark();
 
@@ -454,11 +451,6 @@ int gaiaCreateNDF( const char *filename, int width, int height,
     ndfOpen( NULL, filename, "WRITE", "NEW", indf, &place, &status );
 
     /* Create the NDF */
-    ndim = 2;
-    lbnd[0] = 1;
-    ubnd[0] = width;
-    lbnd[1] = 1;
-    ubnd[1] = height;
     ndfNew( type, ndim, lbnd, ubnd, &place, indf, &status );
 
     /* Insert the WCS */

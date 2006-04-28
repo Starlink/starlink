@@ -10,9 +10,9 @@
 
 #  Description:
 #     This class is designed to handle the access and description of datasets
-#     that don't have 2 dimensions. Superficially it is datatype independent,
-#     supporting access to NDF and FITS data, relying on the ndf:: and
-#     fits:: (to be written) Tcl commands. Sections of the data can be
+#     that don't necessarily have 2 dimensions. Superficially it is datatype
+#     independent, supporting access to NDF and FITS data, relying on the
+#     ndf::, fits:: and array:: Tcl commands. Sections of the data can be
 #     directly extracted from cubes for passing into GAIA/Skycat for display
 #     as images and spectra.
 
@@ -117,6 +117,7 @@ itcl::class gaia::GaiaNDAccess {
          set addr_ 0
          set cnfmap_ 0
          set dims_ {}
+         set bounds_ {}
       }
    }
 
@@ -130,7 +131,7 @@ itcl::class gaia::GaiaNDAccess {
    }
 
    #  Get the dimensions of the full data. Returns a list of integers.
-   #  if trunc is true then any trailing redundant axes are trimmed.
+   #  If trunc is true then any trailing redundant axes are trimmed.
    public method getdims {trunc} {
       if { $dims_ == {} } {
          set dims_ [${type_}::getdims $handle_ $trunc]
@@ -140,9 +141,13 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Get the pixel ranges/bounds of the full data. Returns pairs of
    #  integers, one for each dimension. For FITS files the lower bound will
-   #  always be 1.
-   public method getbounds {} {
-      return [${type_}::getbounds $handle_]
+   #  always be 1. If trunc is true then any trailing redundant axes are
+   #  trimmed. 
+   public method getbounds {trunc} {
+      if { $bounds_ == {} } {
+         set bounds_ [${type_}::getbounds $handle_ $trunc]
+      }
+      return $bounds_
    }
 
    #  Return the coordinate of a position along a given axis.
@@ -157,7 +162,7 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Map in the dataset "data component". Returns a structure that can be
    #  queried using the getinfo method. The mapping uses mmap, if possible and
-   #  currently the default and the given access mode,  one of "READ",
+   #  currently the default, and the given access mode,  one of "READ",
    #  "UPDATE" or "WRITE". Clearly this must match what access the file
    #  supports.
    public method map { {access "READ"} } {
@@ -168,7 +173,7 @@ itcl::class gaia::GaiaNDAccess {
       return $addr_
    }
 
-   #  Unmap in the dataset "data component", if mapped.
+   #  Unmap the dataset "data component", if mapped.
    public method unmap {} {
       if { $addr_ != 0 } {
          ${type_}::unmap $handle_ $addr_
@@ -241,20 +246,19 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Create an NDF that represents the bare bones of an image extracted from
    #  the attached dataset. The bare bones are an NDF of the correct
-   #  dimensions, with an appropriated WCS. No data components are copied.
-   #  Returns a new instance of this class wrapping the new NDF.
+   #  dimensions and bounds, with an appropriate WCS. No data components are
+   #  copied. Returns a new instance of this class wrapping the new NDF.
    public method createimage {name axis} {
       if { $addr_ == 0 } {
          error "Must map in cube data before creating an image"
       }
-      set dims [getdims 1]
 
       #  Get the underlying info. Note the cube type may not be the image type
       #  (because of scaling of variants) so we must check what getimage will
       #  return.
       lassign [getinfo $addr_] adr nel hdstype fulltype
 
-      set fullwcs [${type_}::getwcs $handle_]
+      #  Select the image axes, these are not axis.
       if { $axis == 1 } {
          set axis1 2
          set axis2 3
@@ -265,11 +269,24 @@ itcl::class gaia::GaiaNDAccess {
          set axis1 1
          set axis2 2
       }
+
+      #  Get a 2D WCS for our chosen axes.
+      set fullwcs [${type_}::getwcs $handle_]
+      set dims [getdims 1]
       set dim1 [lindex $dims [expr $axis1-1]]
       set dim2 [lindex $dims [expr $axis2-1]]
       set imagewcs [gaiautils::get2dwcs $fullwcs $axis1 $axis2 $dim1 $dim2]
+      
+      #  Get the bounds for our chosen axes.
+      set bounds [getbounds 1]
+      set lbnd1 [lindex $bounds_ [expr (${axis1}-1)*2]]
+      set ubnd1 [lindex $bounds_ [expr (${axis1}-1)*2+1]]
+      set lbnd2 [lindex $bounds_ [expr (${axis2}-1)*2]]
+      set ubnd2 [lindex $bounds_ [expr (${axis2}-1)*2+1]]
 
-      set newhandle [ndf::create $name $dim1 $dim2 $fulltype $imagewcs]
+      #  And create the NDF.
+      set newhandle \
+         [ndf::create $name $lbnd1 $ubnd1 $lbnd2 $ubnd2 $fulltype $imagewcs]
 
       #  Create a new instance to manage the new NDF.
       set accessor [uplevel \#0 GaiaNDAccess \#auto]
@@ -305,6 +322,9 @@ itcl::class gaia::GaiaNDAccess {
 
    #  The dimensionality of the data (list).
    protected variable dims_ {}
+
+   #  The bounds of the data (list).
+   protected variable bounds_ {}
 
    #  The handle to the opened dataset. NDF or FITS identifier.
    protected variable handle_ {}
