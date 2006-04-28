@@ -1,20 +1,47 @@
-/*   MSP - message system protocol
-     History :
-      28Aug 1991: hack version using sockets  (JAC) 
-      07Mar 1994: revised version (BDK)
-      14Mar 1994: changed to use STREAM sockets (BDK)
-      08Jul 1994: default ADAM_USER to ~/adam (AJC)
-      15Sep 1995: create ADAM_USER directory if necessary (AJC)
-      12Feb 1996: FRIG TO ALLOW ICL TO WORK WITH TASKS LINKED
-                  WITH PREVIOUS VERSION AMS_SYS.H see *FRIG*
-                  where overlong messages may be received (AJC)
-      14Sep 1999: Remove (with #if 0) declaration of exit handler.
-                  It must now be done at a higher level. (DLT)
-      2 Jul 2004: Now use mkfifo if available. Fix bug in mknod call (TIMJ)
-      26Jul 2004: Use plain file instead of FIFO when mknod and mkfifo
-                  not available  (PWD)
-      29Dec 2005: Fix compiler warnings (TIMJ)
-                  Remove code that sets exit handler (TIMJ)
+
+/*
+*+
+*  Name:
+*     MSP
+
+*  Purpose:
+*     Message system protocol 
+
+*  Language:
+*     Starlink C
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     28-AUG-1991 (JAC):
+*        Hack version using sockets
+*     07-MAR-1994 (BDK):
+*        Revised version
+*     14-MAR-1994 (BDK):
+*        Changed to use STREAM sockets
+*     08-JUL-1994 (AJC):
+*        Default ADAM_USER to ~/adam
+*     15-SEP-1995 (AJC):
+*        Create ADAM_USER directory if necessary
+*     12-FEB-1996: FRIG TO ALLOW ICL TO WORK WITH TASKS LINKED
+*                 WITH PREVIOUS VERSION AMS_SYS.H see *FRIG*
+*                 where overlong messages may be received (AJC)
+*     14-SEP-1999: Remove (with #if 0) declaration of exit handler.
+*                 It must now be done at a higher level. (DLT)
+*     02-JUL-2004 (TIMJ):
+*        Now use mkfifo if available. Fix bug in mknod call
+*     26-JUL-2004: Use plain file instead of FIFO when mknod and mkfifo
+*                 not available  (PWD)
+*     29-DEC-2005 (TIMJ):
+*        Fix compiler warnings
+*                 Remove code that sets exit handler (TIMJ)
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 #if HAVE_CONFIG_H
@@ -132,10 +159,6 @@ static char my_name[32];                    /* name of this task */
 *     dir = *char (Given)
 *        String containing the directory name
 
-*  Returned value:
-*     0 on success
-*     non-zero on failure
-
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
@@ -145,9 +168,12 @@ static char my_name[32];                    /* name of this task */
 *        Original version.
 *     {enter_changes_here}
 
-
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  Returned Value:
+*     0 on success
+*     non-zero on failure
 
 *-
 */      
@@ -237,13 +263,9 @@ struct stat statb;
 *  Arguments:
 *     admusr = *char (Given)
 *        Pointer to string where the definition of the ADAM_USER directory
-*
+*     
 *     aulen = int (Given)
 *        The maximum length for the admusr string.
-
-*  Return Value:
-*     returns 0 if successful
-*             MSP__ADMUS if failure
 
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
@@ -254,9 +276,12 @@ struct stat statb;
 *        Original version.
 *     {enter_changes_here}
 
-
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  Return Value:
+*     returns 0 if successful
+*             MSP__ADMUS if failure
 
 *-
 */
@@ -313,47 +338,49 @@ struct stat statb;
 }
 
 /*
- *+
- *  Name:
- *     msp1_mkrvous
+*+
+*  Name:
+*     msp1_mkrvous
 
- *  Purpose:
- *     To create a rendezvous file using a plain file.
+*  Purpose:
+*     To create a rendezvous file using a plain file.
 
- *  Language:
- *     C
+*  Language:
+*     C
 
- *  Invocation:
- *     int msp1_mkrvous( char *fname )
+*  Invocation:
+*     int msp1_mkrvous( char *fname )
 
- *  Description:
- *     Creates the given file which should be the name of a rendezvous
- *     file that advertizes the relationship between a task and the 
- *     port number that should be used to communicate with it. Normally
- *     a rendezvous file is created as a FIFO using mknod or mkfifo, but
- *     a plain file will also do. The file is created and its permissions 
- *     are set as if a FIFO (for consistency, no other reason I know).
- *     If succesful 0 is returned, otherwise a -1 is returned.
+*  Description:
+*     Creates the given file which should be the name of a rendezvous
+*     file that advertizes the relationship between a task and the 
+*     port number that should be used to communicate with it. Normally
+*     a rendezvous file is created as a FIFO using mknod or mkfifo, but
+*     a plain file will also do. The file is created and its permissions 
+*     are set as if a FIFO (for consistency, no other reason I know).
+*     If succesful 0 is returned, otherwise a -1 is returned.
 
- *  Arguments:
- *     fname = *char (Given)
- *        String containing the full file name.
+*  Arguments:
+*     fname = *char (Given)
+*        String containing the full file name.
 
- *  Returned value:
- *     0 on success
- *     -1 on failure
+*  Authors:
+*     PWD: Peter W. Draper (Starlink, Durham University)
+*     {enter_new_authors_here}
 
+*  History:
+*     29-JUL-2004 (PWD):
+*        Original version. Maybe this could replace all rendezvous creation.
+*     {enter_changes_here}
 
- *  Authors:
- *     PWD: Peter W. Draper (Starlink, Durham University)
- *     {enter_new_authors_here}
+*  Bugs:
+*     {note_any_bugs_here}
 
- *  History:
- *     29-JUL-2004 (PWD):
- *        Original version. Maybe this could replace all rendezvous creation.
- *     {enter_changes_here}
+*  Returned Value:
+*     0 on success
+*     -1 on failure
 
- *-
+*-
  */
 int msp1_mkrvous( const char *fname )
 {
@@ -373,21 +400,42 @@ int msp1_mkrvous( const char *fname )
 
 
 
-/*=  MSP_ACCEPT - accept an incoming connection request */
 
 static void msp_accept
 (
 int *status          /* global status (given and returned) */
 )
 
-/*   Method :
-      Find an unused sockets slot the use the accept() call to bind it to
-      a connection to the other task.
-     Authors :
-      B.D.Kelly
-     History :
-      15Mar 1994: original (BDK)
-      12Apr 1994: make the function static (BDK)
+/*
+*+
+*  Name:
+*     MSP_ACCEPT
+
+*  Purpose:
+*     Accept an incoming connection request 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Find an unused sockets slot the use the accept() call to bind it to
+*     a connection to the other task.
+
+*  Authors:
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     15-MAR-1994 (BDK):
+*        Original
+*     12-APR-1994 (BDK):
+*        Make the function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -437,7 +485,6 @@ int *status          /* global status (given and returned) */
 }
 
 
-/*=  MSP_CHECKSOCK - check a socket number is in use */
 
 void msp_checksock 
 (
@@ -445,12 +492,33 @@ int sock,            /* a socket number (given) */
 int *status          /* global status (given and returned) */
 )
 
-/*   Method :
-      Check the socket number is on the active list.
-     Authors :
-      B.D.Kelly
-     History :
-      13May 1994: original (BDK)
+/*
+*+
+*  Name:
+*     MSP_CHECKSOCK
+
+*  Purpose:
+*     Check a socket number is in use 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Check the socket number is on the active list.
+
+*  Authors:
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     13-MAY-1994 (BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -481,7 +549,6 @@ int *status          /* global status (given and returned) */
 
 
 
-/*+  MSP_CLOSE_TASK_QUEUE - close communications with another task */
 
 void msp_close_task_queue
 (
@@ -489,17 +556,38 @@ sendq_type qid,      /* a send queue to the other task */
 int *status          /* global status (given and returned) */
 )
 
-/*   Method :
-      Close the communications socket and remove the socket from the msp
-      list.
+/*
+*+
+*  Name:
+*     MSP_CLOSE_TASK_QUEUE
 
-      This routine should only be called once per other task, otherwise
-      there is the possiblity of wrongly closing a socket which has been
-      reused.
-     Authors :
-      B.D.Kelly
-     History :
-      29Mar 1994: original (BDK)
+*  Purpose:
+*     Close communications with another task 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Close the communications socket and remove the socket from the msp
+*     list.
+*     
+*     This routine should only be called once per other task, otherwise
+*     there is the possiblity of wrongly closing a socket which has been
+*     reused.
+
+*  Authors:
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     29-MAR-1994 (BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -519,7 +607,6 @@ int *status          /* global status (given and returned) */
 }
 
 
-/*+  MSP_CREATE_LOCALQ - create a queue for local messages */
 
 void msp_create_localq
 (
@@ -528,16 +615,39 @@ receiveq_type *qid,  /* created receive queue (returned) */
 int *status          /* global status (given and returned) */
 )
 
-/*   Method :
-      socketpair() creates a pair of unix domain sockets corresponding to
-      both ends of a connection. Keep one of these for receiving messages
-      and return the other as part of a sendq.
-     Authors :
-      B.D.Kelly
-     History :
-      28Aug 1991: original prototype (JAC) 
-      07Mar 1994: revised version (BDK)
-      14Mar 1994: changed to use STREAM sockets (BDK)
+/*
+*+
+*  Name:
+*     MSP_CREATE_LOCALQ
+
+*  Purpose:
+*     Create a queue for local messages 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     socketpair() creates a pair of unix domain sockets corresponding to
+*     both ends of a connection. Keep one of these for receiving messages
+*     and return the other as part of a sendq.
+
+*  Authors:
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     28-AUG-1991 (JAC):
+*        Original prototype
+*     07-MAR-1994 (BDK):
+*        Revised version
+*     14-MAR-1994 (BDK):
+*        Changed to use STREAM sockets
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -628,7 +738,6 @@ int *status          /* global status (given and returned) */
 }
 
 
-/*+  MSP_CREATE_RECEIVEQ - create a queue for receiving messages */
 
 void msp_create_receiveq
 (
@@ -636,14 +745,37 @@ receiveq_type *qid,  /* created queue identifier (returned) */
 int *status          /* global status (given and returned) */
 )
 
-/*   Method :
-      Search for an unused queue and allocate it, returning its identifier.
-     Authors :
-      B.D.Kelly
-     History :
-      28Aug 1991: original prototype (JAC) 
-      07Mar 1994: revised version (BDK)
-      14Mar 1994: changed to use STREAM sockets (BDK)
+/*
+*+
+*  Name:
+*     MSP_CREATE_RECEIVEQ
+
+*  Purpose:
+*     Create a queue for receiving messages 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Search for an unused queue and allocate it, returning its identifier.
+
+*  Authors:
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     28-AUG-1991 (JAC):
+*        Original prototype
+*     07-MAR-1994 (BDK):
+*        Revised version
+*     14-MAR-1994 (BDK):
+*        Changed to use STREAM sockets
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -678,7 +810,6 @@ int *status          /* global status (given and returned) */
 }
 
 
-/*+  MSP_DELETE_QUEUE - delete a queue */
 
 void msp_delete_queue
 (
@@ -686,16 +817,39 @@ receiveq_type qid,  /* identifier of queue to be deleted (given) */
 int *status         /* global status (given and returned) */
 )
 
-/*   Method :
-      If the queue has any messages on it discard them, then mark the
-      queue as free.
-     Authors :
-      J.A.Cooke
-      B.D.Kelly
-     History :
-      28Aug 1991: original prototype (JAC) 
-      07Mar 1994: revised version (BDK)
-      14Mar 1994: changed to use STREAM sockets (BDK)
+/*
+*+
+*  Name:
+*     MSP_DELETE_QUEUE
+
+*  Purpose:
+*     Delete a queue 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     If the queue has any messages on it discard them, then mark the
+*     queue as free.
+
+*  Authors:
+*     J.A.Cooke
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     28-AUG-1991 (JAC):
+*        Original prototype
+*     07-MAR-1994 (BDK):
+*        Revised version
+*     14-MAR-1994 (BDK):
+*        Changed to use STREAM sockets
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -737,7 +891,6 @@ int *status         /* global status (given and returned) */
 
 
 
-/*+  MSP_ENTER_TASK - register this task with MSP */
 
 void msp_enter_task
 (
@@ -746,22 +899,45 @@ receiveq_type *commandq, /* command queue for this task (returned) */
 int *status              /* global status (given and returned) */
 )
 
-/*   Method :
-      Initialise global arrays, then search for an unused internet
-      sockets port number. The socket bound to this port number is added
-      to the list of sockets to be watched for messages.
+/*
+*+
+*  Name:
+*     MSP_ENTER_TASK
 
-      The task advertises its port number to other tasks by creating a
-      file in the $ADAM_USER directory with a filename constructed from
-      this task name and the port number. If environment variable ADAM_USER
-      is not defined, directory adam in the user's home directory is used.
-     Authors :
-      J.A.Cooke
-      B.D.Kelly
-     History :
-      28Aug 1991: original prototype (JAC) 
-      07Mar 1994: revised version (BDK)
-      14Mar 1994: changed to use STREAM sockets (BDK)
+*  Purpose:
+*     Register this task with MSP 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Initialise global arrays, then search for an unused internet
+*     sockets port number. The socket bound to this port number is added
+*     to the list of sockets to be watched for messages.
+*     
+*     The task advertises its port number to other tasks by creating a
+*     file in the $ADAM_USER directory with a filename constructed from
+*     this task name and the port number. If environment variable ADAM_USER
+*     is not defined, directory adam in the user's home directory is used.
+
+*  Authors:
+*     J.A.Cooke
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     28-AUG-1991 (JAC):
+*        Original prototype
+*     07-MAR-1994 (BDK):
+*        Revised version
+*     14-MAR-1994 (BDK):
+*        Changed to use STREAM sockets
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -895,20 +1071,40 @@ int *status              /* global status (given and returned) */
 }
 
 
-/*+  MSP_EXIT - exit handler */
 
 void msp_exit
 ( 
 void
 )
 
-/*   Method :
-      Remove all the known queues and associated files.
-     Authors :
-      B.D.Kelly
-     History :
-      08Mar 1994: original (BDK)
-      05Dec 1994: Make global - intended for error processing only
+/*
+*+
+*  Name:
+*     MSP_EXIT
+
+*  Purpose:
+*     Exit handler 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Remove all the known queues and associated files.
+
+*  Authors:
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     08-MAR-1994 (BDK):
+*        Original
+*     05-DEC-1994: Make global - intended for error processing only
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -927,7 +1123,6 @@ void
    }
 }
 
-/*=  MSP_GET_TASKPORT - get task identifier */
 
 static void msp_get_taskport
 (
@@ -937,16 +1132,39 @@ int *taskport,        /* port number of task (returned) */
 int *status           /* global status (given and returned) */
 )
 
-/*   Method :
-      Search the rendezvous directory for a file with the right name. The
-      part of the filename following "_" is the port number.
-     Authors :
-      J.A.Cooke
-      B.D.Kelly
-     History :
-      28Aug 1991: original prototype (JAC) 
-      07Mar 1994: revised version (BDK)
-      12Apr 1994: make the function static (BDK)
+/*
+*+
+*  Name:
+*     MSP_GET_TASKPORT
+
+*  Purpose:
+*     Get task identifier 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Search the rendezvous directory for a file with the right name. The
+*     part of the filename following "_" is the port number.
+
+*  Authors:
+*     J.A.Cooke
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     28-AUG-1991 (JAC):
+*        Original prototype
+*     07-MAR-1994 (BDK):
+*        Revised version
+*     12-APR-1994 (BDK):
+*        Make the function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -989,7 +1207,6 @@ int *status           /* global status (given and returned) */
 
 
 
-/*+  MSP_GET_TASK_QUEUE - get the command queue of a named task */
 
 void msp_get_task_queue
 (
@@ -998,16 +1215,39 @@ sendq_type *qid,    /* task command queue (returned) */
 int *status         /* global status (given and returned) */
 )
 
-/*   Method :
-      Get the internet port number of the named task and connect to it.
-      Add the connected socket to the list to be watched for messages.
-     Authors :
-      J.A.Cooke
-      B.D.Kelly
-     History :
-      28Aug 1991: original prototype (JAC) 
-      07Mar 1994: revised version (BDK)
-      14Mar 1994: changed to use STREAM sockets (BDK)
+/*
+*+
+*  Name:
+*     MSP_GET_TASK_QUEUE
+
+*  Purpose:
+*     Get the command queue of a named task 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Get the internet port number of the named task and connect to it.
+*     Add the connected socket to the list to be watched for messages.
+
+*  Authors:
+*     J.A.Cooke
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     28-AUG-1991 (JAC):
+*        Original prototype
+*     07-MAR-1994 (BDK):
+*        Revised version
+*     14-MAR-1994 (BDK):
+*        Changed to use STREAM sockets
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1099,7 +1339,6 @@ int *status         /* global status (given and returned) */
 }
 
 
-/*=  MSP_INPUT - get a message from any of the input sockets */
 
 static void msp_input
 (
@@ -1107,19 +1346,45 @@ int waitflag,         /* wait flag (given) */
 int *status           /* global status (given and returned) */
 )
 
-/*   Method :
-      Look for input available on any of the input sockets. If input is
-      available, read a message and put it onto the relevant message queue.
-     Authors :
-      J.A.Cooke
-      B.D.Kelly
-     History :
-      28Aug 1991: original prototype (JAC) 
-      07Mar 1994: revised version (BDK)
-      14Mar 1994: changed to use STREAM sockets (BDK)
-      29Mar 1994: use the msg_stack stack (BDK)
-      30Mar 1994: use msp_select() (BDK)
-      12Apr 1994: make the function static (BDK)
+/*
+*+
+*  Name:
+*     MSP_INPUT
+
+*  Purpose:
+*     Get a message from any of the input sockets 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Look for input available on any of the input sockets. If input is
+*     available, read a message and put it onto the relevant message queue.
+
+*  Authors:
+*     J.A.Cooke
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     28-AUG-1991 (JAC):
+*        Original prototype
+*     07-MAR-1994 (BDK):
+*        Revised version
+*     14-MAR-1994 (BDK):
+*        Changed to use STREAM sockets
+*     29-MAR-1994 (BDK):
+*        Use the msg_stack stack
+*     30-MAR-1994 (BDK):
+*        Use msp_select()
+*     12-APR-1994 (BDK):
+*        Make the function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1239,7 +1504,6 @@ int *status           /* global status (given and returned) */
 }
 
 
-/*+  MSP_MKCOMQ - return a task's command q given any send q */
 
 void msp_mkcomq
 (
@@ -1248,13 +1512,34 @@ sendq_type *commandq, /* command queue for the task (returned) */
 int *status           /* global status (given and returned) */
 )
 
-/*   Method :
-      If the given reply queue is valid, generate the corresponding
-      command queue.
-     Authors :
-      B.D.Kelly
-     History :
-      13May 1994: original (BDK)
+/*
+*+
+*  Name:
+*     MSP_MKCOMQ
+
+*  Purpose:
+*     Return a task's command q given any send q 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     If the given reply queue is valid, generate the corresponding
+*     command queue.
+
+*  Authors:
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     13-MAY-1994 (BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1272,7 +1557,6 @@ int *status           /* global status (given and returned) */
 }
 
 
-/*+  MSP_MKNUMQ - return a numbered send q given any send q */
 
 void msp_mknumq
 (
@@ -1282,13 +1566,34 @@ sendq_type *numq,     /* reply queue for given number (returned) */
 int *status           /* global status (given and returned) */
 )
 
-/*   Method :
-      The the given reply queue is valid, generate the reply queue
-      corresponding to the given number.
-     Authors :
-      B.D.Kelly
-     History :
-      13May 1994: original (BDK)
+/*
+*+
+*  Name:
+*     MSP_MKNUMQ
+
+*  Purpose:
+*     Return a numbered send q given any send q 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     The the given reply queue is valid, generate the reply queue
+*     corresponding to the given number.
+
+*  Authors:
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     13-MAY-1994 (BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1306,7 +1611,6 @@ int *status           /* global status (given and returned) */
 }
 
 
-/*+  MSP_RECEIVE_MESSAGE - receive a message on one of a list of queues */
 
 void msp_receive_message
 (
@@ -1321,20 +1625,44 @@ sendq_type *replyq,   /* reply queue for message (returned) */
 int *status           /* global status (given and returned) */
 )
 
-/*   Method :
-      Search the members of the internal array of queues corresponding to
-      the given queue identifiers. If a message is found, return it. If
-      no message is found, input a message and then recheck the array of
-      queues. This is performed just once if the wait_flag is zero,
-      otherwise it is repeated until a message is found.
-     Authors :
-      J.A.Cooke
-      B.D.Kelly
-     History :
-      28Aug 1991: original prototype (JAC) 
-      07Mar 1994: revised version (BDK)
-      14Mar 1994: changed to use STREAM sockets (BDK)
-      29Mar 1994: use the msg_stack stack (BDK)
+/*
+*+
+*  Name:
+*     MSP_RECEIVE_MESSAGE
+
+*  Purpose:
+*     Receive a message on one of a list of queues 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Search the members of the internal array of queues corresponding to
+*     the given queue identifiers. If a message is found, return it. If
+*     no message is found, input a message and then recheck the array of
+*     queues. This is performed just once if the wait_flag is zero,
+*     otherwise it is repeated until a message is found.
+
+*  Authors:
+*     J.A.Cooke
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     28-AUG-1991 (JAC):
+*        Original prototype
+*     07-MAR-1994 (BDK):
+*        Revised version
+*     14-MAR-1994 (BDK):
+*        Changed to use STREAM sockets
+*     29-MAR-1994 (BDK):
+*        Use the msg_stack stack
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1436,7 +1764,6 @@ int *status           /* global status (given and returned) */
 }
 
 
-/*=  MSP_SELECT - look for a message on any of the input sockets */
 
 static void msp_select
 (
@@ -1446,15 +1773,37 @@ int *q_number,        /* no. of first queue with data (returned) */
 int *status           /* global status (given and returned) */
 )
 
-/*   Method :
-      Generate an "fd_set" bit array from the list of active sockets and
-      wait on them all using select(). If the select() returns because of
-      a signal, restart it.
-     Authors :
-      B.D.Kelly
-     History :
-      30Mar 1994: original (BDK)
-      12Apr 1994: make the function static (BDK)
+/*
+*+
+*  Name:
+*     MSP_SELECT
+
+*  Purpose:
+*     Look for a message on any of the input sockets 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Generate an "fd_set" bit array from the list of active sockets and
+*     wait on them all using select(). If the select() returns because of
+*     a signal, restart it.
+
+*  Authors:
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     30-MAR-1994 (BDK):
+*        Original
+*     12-APR-1994 (BDK):
+*        Make the function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1552,7 +1901,6 @@ int *status           /* global status (given and returned) */
 }
 
 
-/*+  MSP_SEND_MESSAGE - send a message on a queue */
 
 void msp_send_message
 (
@@ -1564,15 +1912,38 @@ receiveq_type replyq,  /* reply queue to be associated with the message
 int *status            /* global status (given and returned) */
 )
 
-/*   Method :
-      Construct the message into a data structure and send it.
-     Authors :
-      J.A.Cooke
-      B.D.Kelly
-     History :
-      28Aug 1991: original prototype (JAC) 
-      07Mar 1994: revised version (BDK)
-      14Mar 1994: changed to use STREAM sockets (BDK)
+/*
+*+
+*  Name:
+*     MSP_SEND_MESSAGE
+
+*  Purpose:
+*     Send a message on a queue 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Construct the message into a data structure and send it.
+
+*  Authors:
+*     J.A.Cooke
+*     B.D.Kelly
+*     {enter_new_authors_here}
+
+*  History:
+*     28-AUG-1991 (JAC):
+*        Original prototype
+*     07-MAR-1994 (BDK):
+*        Revised version
+*     14-MAR-1994 (BDK):
+*        Changed to use STREAM sockets
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1606,5 +1977,3 @@ int *status            /* global status (given and returned) */
       *status = MSP__SENDLEN;
    }
 }
-
-

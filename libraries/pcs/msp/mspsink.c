@@ -1,15 +1,35 @@
-/* mspsink
- * A test of msp - run in conjunction with mspsink
- *   % mspsink &
- *   % mspsource
- * mspsource sends 1000 messages to the task registered as "sink"
- * which on termination prints a message.
- *
- * History:
- *   xx-xxx-1994 (BDK):
- *      Original
- *    8-JUL-1994 (AJC):
- *      Add prologue and add message number to final message
+/*
+*+
+*  Name:
+*     mspsink
+
+*  Purpose:
+*     A test of msp
+
+*  Language:
+*     Starlink C
+
+*  Description:
+*     A test of msp - run in conjunction with mspsink
+*      % mspsink &
+*      % mspsource
+*     mspsource sends 1000 messages to the task registered as "sink"
+*     which on termination prints a message.
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     xx-xxx-1994 (BDK):
+*      Original
+*     8-JUL-1994 (AJC):
+*      Add prologue and add message number to final message
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 #include <string.h>
 #include <stdio.h>

@@ -1,10 +1,31 @@
-/*   MSP_PAR.H - constants and declarations for msp
-    Authors :
-     B.D.Kelly (ROE)
-    History :
-     15Mar 1994: original (BDK)
-     22Mar 1994: add definition of null send and receive queues (BDK)
-     25Mar 1994: add MSP__MXMSGSZ (BDK)
+/*
+*+
+*  Name:
+*     MSP_PAR
+
+*  Purpose:
+*     .H - constants and declarations for msp 
+
+*  Language:
+*     {routine_language}
+
+*  Authors:
+*     B.D.Kelly (ROE)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-MAR-1994 (BDK):
+*        Original
+*     22-MAR-1994 (BDK):
+*        Add definition of null send and receive queues
+*     25-MAR-1994 (BDK):
+*        Add MSP__MXMSGSZ
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 /*   Maximum message size */

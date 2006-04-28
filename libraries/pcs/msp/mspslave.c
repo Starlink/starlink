@@ -1,14 +1,33 @@
-/* mspslave
- * A test of msp - run in conjunction with mspmaster
- *   % mspslave &
- *   % mspmaster
- *
- * History:
- *   xx-xxx-1994 (BDK):
- *      Original
- *    8-JUL-1994 (AJC):
- *      Add prologue and tidy header files
- *
+/*
+*+
+*  Name:
+*     mspslave
+
+*  Purpose:
+*     A test of msp
+
+*  Language:
+*     Starlink C
+
+*  Description:
+*      A test of msp - run in conjunction with mspmaster
+*        % mspslave &
+*        % mspmaster
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     xx-xxx-1994 (BDK):
+*      Original
+*     8-JUL-1994 (AJC):
+*      Add prologue and tidy header files
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 #include <string.h>
 #include <stdio.h>
