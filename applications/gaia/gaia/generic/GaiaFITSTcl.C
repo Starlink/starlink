@@ -227,6 +227,8 @@ static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
 {
     ARRAYinfo *arrayInfo;
     FITSinfo *info;
+    double bscale;
+    double bzero;
     int blank;
     int haveblank;
     int type;
@@ -281,8 +283,21 @@ static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
             blank = 0;
         }
 
+        /* Similarly for BSCALE and BZERO */
+        bscale = 1.0;
+        bzero = 0.0;
+        if ( type < HDS_REAL ) {
+            if ( GaiaFITSHGet( info->handle, "BSCALE", &bscale ) != TCL_OK ) {
+                bscale = 1.0;
+            }
+            if ( GaiaFITSHGet( info->handle, "BZERO", &bzero ) != TCL_OK ) {
+                bzero = 0.0;
+            }
+        }
+
         /* Construct result */
-        arrayInfo = gaiaArrayCreateInfo( ptr, type, el, 1, haveblank, blank );
+        arrayInfo = gaiaArrayCreateInfo( ptr, type, el, 1, haveblank, blank,
+                                         bscale, bzero, 0 );
         Tcl_SetObjResult( interp, Tcl_NewLongObj( (long)arrayInfo ) );
         return TCL_OK;
     }
