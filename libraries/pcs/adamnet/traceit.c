@@ -19,7 +19,6 @@
 
 
 
-/*+  c_tcr_trim - trim trailing characters  */
 
 void c_tcr_trim 
 ( 
@@ -31,19 +30,40 @@ int * pos,         /* position of first non-matching character - if no
 int * status       /* inherited status (updateable) */
 )
 
-/*   Method :
-      Search sequentially through STRING for the last mismatch.
-      The function returns the effective length of the string.
+/*
+*+
+*  Name:
+*     c_tcr_trim
 
-     Authors :
-      B.D.Kelly      (REVAD::BDK)
-      Len Lawrence   (roe::lcl)
+*  Purpose:
+*     Trim trailing characters  
 
-     History :
-      28 Feb 1992:  Conversion to C.                   (roe::lcl)
-      19 Mar 1992:  changed while loop to for loop     (roe::lcl)
-      20 Mar 1992:  reverse search introduced          (roe::lcl)
--*/
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Search sequentially through STRING for the last mismatch.
+*     The function returns the effective length of the string.
+
+*  Authors:
+*     B.D.Kelly      (REVAD::BDK)
+*     Len Lawrence   (roe::lcl)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-FEB-1992 (roe::lcl):
+*        Conversion to C.
+*     19-MAR-1992 (roe::lcl):
+*        Changed while loop to for loop
+*     20-MAR-1992 (roe::lcl):
+*        Reverse search introduced
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
 
 {
    long j ;                 /* position index within string   */

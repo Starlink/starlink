@@ -1,12 +1,26 @@
-*+  name - LEX_SET
       SUBROUTINE LEX_SET(NSTATE,TABLE,STATE,C1,C2,NEWSTATE,ACTION,
      :       BACK,COPY,WRITE,STACK,CH,STATUS)
-*    Description :
-*     Set one or more entries in the state table for the LEX parser
-*    Invocation :
+*+
+*  Name:
+*     name
+
+*  Purpose:
+*     LEX_SET
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
 *     CALL LEX_SET(NSTATE,TABLE,STATE,C1,C2,NEWSTATE,ACTION,
 *            BACK,COPY,WRITE,STACK,CH)
-*    Parameters :
+
+*  Description:
+*     Set one or more entries in the state table for the LEX parser
+
+*  Arguments:
 *     NSTATE = INTEGER (given)
 *           The number of states in the state table
 *     TABLE(4,0:127,NSTATE) = BYTE (given)
@@ -39,25 +53,30 @@
 *           The character to be written to the token string if
 *           WRITE is specified
 *     STATUS = INTEGER 
-*    Method :
+
+*  Algorithm:
 *     The specified entry is written into the state table for
 *     the state and range of characters specified by STATE
 *     and C1 - C2.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     Jeremy Bailey  (AAOEPP::JAB) 8 Jan 1987
-*    History :
-*     date:  changes (institution::username)
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'LEX_ERR'
-*    Import :
+*  Arguments Given:
       INTEGER NSTATE
       BYTE TABLE(4,0:127,NSTATE)
       INTEGER STATE
@@ -66,11 +85,11 @@
       INTEGER ACTION
       LOGICAL BACK,COPY,WRITE,STACK
       CHARACTER*1 CH
-*    Status :
+*  Status:
       INTEGER STATUS
-*    Local variables :
+*  Local Variables:
       INTEGER I,I1,I2,IC
-*-
+*.
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF (STATE .GT. NSTATE .OR. STATE .LT. 1) THEN
@@ -103,5 +122,3 @@
          ENDIF
       ENDIF
       END
-
-

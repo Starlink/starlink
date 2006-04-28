@@ -72,27 +72,50 @@ static unsigned int sigisset=0;
 
 
 
-/*=  ANT_ACCEPT - accept a network connection request */
 
 void ant_accept 
 ( 
 int *status    /* global status (given and returned) */
 )
 
-/*   Method :
-      A connection request has been received.
-      Store the new channel and unit numbers in COMMON arrays indexed by
-      MACHNUM. 
-      Start the read on the new channel.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      20.02.1987:  original (REVAD::BDK)
-      23.03.1988:  revise variable names (REVAD::BDK)
-      27.04.1988:  fix interpretation of RXBUF (REVAD::BDK)
-      19.05.1988:  improve status checking (REVAD::BDK)
-      18.04.1994:  TCP/IP version (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_ACCEPT
+
+*  Purpose:
+*     Accept a network connection request 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     A connection request has been received.
+*     Store the new channel and unit numbers in COMMON arrays indexed by
+*     MACHNUM. 
+*     Start the read on the new channel.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     20-FEB-1987 (REVAD::BDK):
+*        Original
+*     23-MAR-1988 (REVAD::BDK):
+*        Revise variable names
+*     27-APR-1988 (REVAD::BDK):
+*        Fix interpretation of RXBUF
+*     19-MAY-1988 (REVAD::BDK):
+*        Improve status checking
+*     18-APR-1994 (REVAD::BDK):
+*        TCP/IP version
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -166,26 +189,47 @@ int *status    /* global status (given and returned) */
 }
 
 
-/*=  ANT_ACCEPT_NETACK - accept a netack message */
 
 void ant_accept_netack 
 ( 
 int *status                         /* global status (give and returned) */
 )
 
-/*   Method :
-      Complete the relevant N_PATH entry from information in the 
-      received message.
-      Forward an acknowledgement message to the local task.
-      On error, return a DEINIT message across the network and annul the 
-      N_PATH entry.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      30.03.1988:  original (REVAD::BDK)
-      20.05.1988:  check path is in range (REVAD::BDK)
-      20.04.1994:  constant message size (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_ACCEPT_NETACK
+
+*  Purpose:
+*     Accept a netack message 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Complete the relevant N_PATH entry from information in the 
+*     received message.
+*     Forward an acknowledgement message to the local task.
+*     On error, return a DEINIT message across the network and annul the 
+*     N_PATH entry.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-MAR-1988 (REVAD::BDK):
+*        Original
+*     20-MAY-1988 (REVAD::BDK):
+*        Check path is in range
+*     20-APR-1994 (REVAD::BDK):
+*        Constant message size
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -266,31 +310,51 @@ int *status                         /* global status (give and returned) */
 }
 
 
-/*=  ANT_ACCEPT_NETDEINIT - accept a netdeinit message */
 
 void ant_accept_netdeinit 
 ( 
 int *status                            /* global status (give and returned) */
 )
 
-/*   Method :
-      Find the relevant N_PATH entry from information in the 
-      received message.
-      Forward a deinit message to the local task.
-      Search for any transactions associated with the N_PATH entry. Send 
-      deinit messages to their associated queues and annul the 
-      transaction entries.
-      Annul the N_PATH entry.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      30.03.1988:  original (REVAD::BDK)
-      08.06.1988:  use local status (REVAD::BDK)
-      31.05.1990:  handle case where deinit is the reply to init 
-                   (REVAD::BDK)
-      11.01.1996:  only send DEINIT on path, not separate transactions
-                   (BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_ACCEPT_NETDEINIT
+
+*  Purpose:
+*     Accept a netdeinit message 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Find the relevant N_PATH entry from information in the 
+*     received message.
+*     Forward a deinit message to the local task.
+*     Search for any transactions associated with the N_PATH entry. Send 
+*     deinit messages to their associated queues and annul the 
+*     transaction entries.
+*     Annul the N_PATH entry.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-MAR-1988 (REVAD::BDK):
+*        Original
+*     08-JUN-1988 (REVAD::BDK):
+*        Use local status
+*     31-MAY-1990: handle case where deinit is the reply to init
+*                  (REVAD::BDK)
+*     11-JAN-1996: only send DEINIT on path, not separate transactions
+*                  (BDK)
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -397,7 +461,6 @@ int *status                            /* global status (give and returned) */
 }
 
 
-/*=  ANT_ACCEPT_NETINIT - accept a netinit message */
 
 void ant_accept_netinit 
 ( 
@@ -406,21 +469,45 @@ int machnum,                         /* index to other machine details
 int *status                          /* global status (give and returned) */
 )
 
-/*   Method :
-      Search the common blocks for an unused N_PATH entry.
-      Put partial information into it from the received message.
-      Open communications with the target task on this machine.
-      On error, return a DEINIT message across the network and annul the 
-      new N_PATH entry.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      30.03.1988:  original (REVAD::BDK)
-      28.04.1988: hardwire MSP prefix for local task (frig) (REVAD::BDK)
-      20.05.1988: use ANT_MSPNAME (REVAD::BDK)
-      31.05.1990: always return ok status (REVAD::BDK)
-      20.04.1994:  constant message size (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_ACCEPT_NETINIT
+
+*  Purpose:
+*     Accept a netinit message 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Search the common blocks for an unused N_PATH entry.
+*     Put partial information into it from the received message.
+*     Open communications with the target task on this machine.
+*     On error, return a DEINIT message across the network and annul the 
+*     new N_PATH entry.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-MAR-1988 (REVAD::BDK):
+*        Original
+*     28-APR-1988 (REVAD::BDK):
+*        Hardwire MSP prefix for local task (frig)
+*     20-MAY-1988 (REVAD::BDK):
+*        Use ANT_MSPNAME
+*     31-MAY-1990 (REVAD::BDK):
+*        Always return ok status
+*     20-APR-1994 (REVAD::BDK):
+*        Constant message size
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -510,7 +597,6 @@ int *status                          /* global status (give and returned) */
 }
 
 
-/*=  ANT_CALL_OUT - handle request to make network call */
 
 void ant_call_out 
 ( 
@@ -519,17 +605,38 @@ sendq_type reply_q,                 /* task reply queue (given) */
 int *status                         /* global status (give and returned) */
 )
 
-/*   Method :
-      Get the name of the target machine from the given message. Check 
-      the ANT common blocks to see if a link to it exists. If not, open 
-      a network connection to it. Return an acknowledgement to the 
-      requesting task.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      06.04.1988:  original (REVAD::BDK)
-      20.05.1988:  change order of if-then-else (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_CALL_OUT
+
+*  Purpose:
+*     Handle request to make network call 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Get the name of the target machine from the given message. Check 
+*     the ANT common blocks to see if a link to it exists. If not, open 
+*     a network connection to it. Return an acknowledgement to the 
+*     requesting task.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     06-APR-1988 (REVAD::BDK):
+*        Original
+*     20-MAY-1988 (REVAD::BDK):
+*        Change order of if-then-else
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -604,7 +711,6 @@ int *status                         /* global status (give and returned) */
 }
 
 
-/*=  ANT_COMMQ - handle messages received on the command queue */
 
 void ant_commq 
 ( 
@@ -613,17 +719,39 @@ sendq_type reply_q,        /* reply queue for the message (given) */
 int *status                /* global status (given and returned) */
 )
 
-/*   Method :
-      The given message will have been sent by an ADAM task on this 
-      machine. The message will be one of the MESSYS REM_ data structures. 
-      Inspect its TYPE flag to see what action is requested.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      25.03.1988:  original (REVAD::BDK)
-      18.04.1988:  add call to ANT_OBEY (REVAD::BDK)
-      20.05.1988:  remove GSOC_ACK type (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_COMMQ
+
+*  Purpose:
+*     Handle messages received on the command queue 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     The given message will have been sent by an ADAM task on this 
+*     machine. The message will be one of the MESSYS REM_ data structures. 
+*     Inspect its TYPE flag to see what action is requested.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-MAR-1988 (REVAD::BDK):
+*        Original
+*     18-APR-1988 (REVAD::BDK):
+*        Add call to ANT_OBEY
+*     20-MAY-1988 (REVAD::BDK):
+*        Remove GSOC_ACK type
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -673,7 +801,6 @@ int *status                /* global status (given and returned) */
 }
 
 
-/*=  ANT_CONNECT - Connect to an adamnet on another machine */
 
 void ant_connect 
 ( 
@@ -683,15 +810,35 @@ int *channel,              /* i/o channel for communications,
 int *status                /* global status (give and returned) */
 )
 
-/*   Method :
-      Create a channel for communications to another machine.
-      Bind the channel to a socket, make the call, enable SIGIO on the
-      socket.
-     Authors :
-      B.D.Kelly (REVAD::BDK) 
-     History :
-      15.04.1994:  original (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_CONNECT
+
+*  Purpose:
+*     Connect to an adamnet on another machine 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Create a channel for communications to another machine.
+*     Bind the channel to a socket, make the call, enable SIGIO on the
+*     socket.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK) 
+*     {enter_new_authors_here}
+
+*  History:
+*     15-APR-1994 (REVAD::BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -726,7 +873,6 @@ int *status                /* global status (give and returned) */
 }
 
 
-/*=  ANT_DISCON - disconnect a network call */
 
 void ant_discon 
 ( 
@@ -735,19 +881,44 @@ int machnum,       /* machine number associated with the call to
 int *status        /* global status (give and returned) */
 )
 
-/*   Method :
-      Search for all active paths and transactions dependent on the
-      machine number and close them all down.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      29.03.1988:  original (REVAD::BDK)
-      29.04.1988:  declare UNITNUM I*2 (REVAD::BDK)
-      30.05.1988:  remove GSOC_ACK structures (REVAD::BDK)
-      30.05.1988:  handle partly installed paths (REVAD::BDK)
-      08.06.1988:  use local status (REVAD::BDK)
-      18.04.1994:  TCP/IP version (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_DISCON
+
+*  Purpose:
+*     Disconnect a network call 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Search for all active paths and transactions dependent on the
+*     machine number and close them all down.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     29-MAR-1988 (REVAD::BDK):
+*        Original
+*     29-APR-1988 (REVAD::BDK):
+*        Declare UNITNUM I*2
+*     30-MAY-1988 (REVAD::BDK):
+*        Remove GSOC_ACK structures
+*     30-MAY-1988 (REVAD::BDK):
+*        Handle partly installed paths
+*     08-JUN-1988 (REVAD::BDK):
+*        Use local status
+*     18-APR-1994 (REVAD::BDK):
+*        TCP/IP version
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 
@@ -847,7 +1018,6 @@ int *status        /* global status (give and returned) */
 }
 
 
-/*=  ANT_EXIT - the ADAMNET exit handler */
 
 void ant_exit 
 ( 
@@ -855,19 +1025,39 @@ void ant_exit
 void
 )
 
-/*   Method :
-      Search the lists of PATHs and TRANSACTIONs and send deinit 
-      messages to all the relevant queues. It is not necessary to send 
-      messages to the remote machine because the network itself should 
-      report the exit of this process to ADAMNET on the other machine.
-      Close the listen socket.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      15.02.1990:  original (REVAD::BDK)
-      11.01.1996: Don't send DE_INIT on each transaction - just on each open
-                  path (BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_EXIT
+
+*  Purpose:
+*     The ADAMNET exit handler 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Search the lists of PATHs and TRANSACTIONs and send deinit 
+*     messages to all the relevant queues. It is not necessary to send 
+*     messages to the remote machine because the network itself should 
+*     report the exit of this process to ADAMNET on the other machine.
+*     Close the listen socket.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-FEB-1990 (REVAD::BDK):
+*        Original
+*     11-JAN-1996: Don't send DE_INIT on each transaction - just on each open
+*                 path (BDK)
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -901,28 +1091,48 @@ void
 }
 
 
-/*=  ANT_FORWARD_ACK_IN - forward a network message to the target task */
 
 void ant_forward_ack_in 
 ( 
 int *status                      /* global status (given and returned) */
 )
 
-/*   Method :
-      Given a NET_MSG_IN, forward it to the target task and make 
-      the necessary entries in the common blocks. In the event of 
-      failure, do what tidying is possible.
-      Check the indicated path and transaction number are valid.
-      Complete the N_TRANS entry if necessary.
-      Send the message to the target task on this machine.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      31.03.1988:  original (REVAD::BDK)
-      20.05.1988:  stop use of GSOC_ACK structures (REVAD::BDK)
-      09.06.1988:  remove unused variables, calculate LENGTH 
-                   (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_FORWARD_ACK_IN
+
+*  Purpose:
+*     Forward a network message to the target task 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Given a NET_MSG_IN, forward it to the target task and make 
+*     the necessary entries in the common blocks. In the event of 
+*     failure, do what tidying is possible.
+*     Check the indicated path and transaction number are valid.
+*     Complete the N_TRANS entry if necessary.
+*     Send the message to the target task on this machine.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     31-MAR-1988 (REVAD::BDK):
+*        Original
+*     20-MAY-1988 (REVAD::BDK):
+*        Stop use of GSOC_ACK structures
+*     09-JUN-1988: remove unused variables, calculate LENGTH
+*                  (REVAD::BDK)
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1017,27 +1227,47 @@ int *status                      /* global status (given and returned) */
 }
 
 
-/*=  ANT_FORWARD_END_IN - forward a net END_IN message */
 
 void ant_forward_end_in 
 ( 
 int *status                       /* global status (give and returned) */
 )
 
-/*   Method :
-      Given a NET_GSOC_END_IN, forward it to the target task and make 
-      the necessary entries in the common blocks. 
-      Check the indicated path and transaction number are valid.
-      Send the GSOC_END to the target task on this machine.
-      Remove the transaction.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      04.04.1988:  original (REVAD::BDK)
-      20.05.1988:  stop using GSOC_ACK structures (REVAD::BDK)
-      09.06.1988:  remove unused variables, calculate LENGTH 
-                   (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_FORWARD_END_IN
+
+*  Purpose:
+*     Forward a net END_IN message 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Given a NET_GSOC_END_IN, forward it to the target task and make 
+*     the necessary entries in the common blocks. 
+*     Check the indicated path and transaction number are valid.
+*     Send the GSOC_END to the target task on this machine.
+*     Remove the transaction.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     04-APR-1988 (REVAD::BDK):
+*        Original
+*     20-MAY-1988 (REVAD::BDK):
+*        Stop using GSOC_ACK structures
+*     09-JUN-1988: remove unused variables, calculate LENGTH
+*                  (REVAD::BDK)
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1132,33 +1362,55 @@ int *status                       /* global status (give and returned) */
 }
 
 
-/*=  ANT_FORWARD_START_IN - forward a net GSOC start message */
 
 void ant_forward_start_in 
 ( 
 int *status                         /* global status (give and returned) */
 )
 
-/*   Method :
-      Given a NET_GSOC_START, forward it to the target task and make the 
-      necessary entries in the common blocks. In the event of failure, 
-      return a GSOC_END message across the network.
-      Check the indicated path is valid
-      Search the common blocks for an unused N_TRANS entry.
-      Put partial information into it from the received message.
-      Send the GSOC_START to the target task on this machine.
-      On error, return a GSOC_END message across the network if 
-      relevant.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      31.03.1988:  original (REVAD::BDK)
-      30.05.1988:  remove GSOC_ACK structures (REVAD::BDK)
-      09.06.1988:  check PATH in range, calculate LENGTH (REVAD::BDK)
-      04.07.1991:  for failure, set NET_OUT_TYPE to C_NET_GSOC_END_OUT 
-                   (REVAD::BDK)
-      20.04.1994:  constant message size (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_FORWARD_START_IN
+
+*  Purpose:
+*     Forward a net GSOC start message 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Given a NET_GSOC_START, forward it to the target task and make the 
+*     necessary entries in the common blocks. In the event of failure, 
+*     return a GSOC_END message across the network.
+*     Check the indicated path is valid
+*     Search the common blocks for an unused N_TRANS entry.
+*     Put partial information into it from the received message.
+*     Send the GSOC_START to the target task on this machine.
+*     On error, return a GSOC_END message across the network if 
+*     relevant.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     31-MAR-1988 (REVAD::BDK):
+*        Original
+*     30-MAY-1988 (REVAD::BDK):
+*        Remove GSOC_ACK structures
+*     09-JUN-1988 (REVAD::BDK):
+*        Check PATH in range, calculate LENGTH
+*     04-JUL-1991: for failure, set NET_OUT_TYPE to C_NET_GSOC_END_OUT
+*                  (REVAD::BDK)
+*     20-APR-1994 (REVAD::BDK):
+*        Constant message size
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1302,25 +1554,47 @@ int *status                         /* global status (give and returned) */
 }
 
 
-/*+  ANT_INIT - initialise the ANT library */
 
 void ant_init 
 ( 
 int *status                         /* global status (give and returned) */
 )
 
-/*   Method :
-      Find the name of this machine and store it.
-      Initialise the global arrays. Get the local IP address.
-      Set up the i/o signal handler.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      07.04.1988:  Original (REVAD::BDK)
-      20.05.1988:  check for SS$_NORMAL (REVAD::BDK)
-      18.04.1994:  TCP/IP version (REVAD::BDK)
-      15.04.1996:  use sigaction() to handle SIGIO (BDK)
-    endhistory
+/*
+*+
+*  Name:
+*     ANT_INIT
+
+*  Purpose:
+*     Initialise the ANT library 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Find the name of this machine and store it.
+*     Initialise the global arrays. Get the local IP address.
+*     Set up the i/o signal handler.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-APR-1988 (REVAD::BDK):
+*        Original
+*     20-MAY-1988 (REVAD::BDK):
+*        Check for SS$_NORMAL
+*     18-APR-1994 (REVAD::BDK):
+*        TCP/IP version
+*     15-APR-1996 (BDK):
+*        Use sigaction() to handle SIGIO
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1455,22 +1729,41 @@ int *status                         /* global status (give and returned) */
 
 
 
-/*=  ANT_LISTEN - start an asynchronous connection acceptance */
 
 void ant_listen 
 ( 
 int *status                         /* global status (give and returned) */
 )
 
-/*   Method :
-      Create a socket for listening for incoming connection requests on
-      the adamnet well-known port. Set the socket to deliver SIGIO if a
-      request arrives.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      14.04.1994:  original (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_LISTEN
+
+*  Purpose:
+*     Start an asynchronous connection acceptance 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Create a socket for listening for incoming connection requests on
+*     the adamnet well-known port. Set the socket to deliver SIGIO if a
+*     request arrives.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-APR-1994 (REVAD::BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1568,7 +1861,6 @@ int *status                         /* global status (give and returned) */
    }
 }
 
-/*=  ANT_NETMSG - handle messages received across the network */
 
 void ant_netmsg 
 ( 
@@ -1576,17 +1868,39 @@ int machnum,         /* index to the received message (given) */
 int *status          /* global status (give and returned) */
 )
 
-/*   Method :
-      Read the message.
-      Identify message type and pass the relevant structure component to 
-      the corresponding routine.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      29.03.1988:  original (REVAD::BDK)
-      20.05.1988:  remove GSOC_ACK structures (REVAD::BDK)
-      18.04.1994:  TCP/IP version (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_NETMSG
+
+*  Purpose:
+*     Handle messages received across the network 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Read the message.
+*     Identify message type and pass the relevant structure component to 
+*     the corresponding routine.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     29-MAR-1988 (REVAD::BDK):
+*        Original
+*     20-MAY-1988 (REVAD::BDK):
+*        Remove GSOC_ACK structures
+*     18-APR-1994 (REVAD::BDK):
+*        TCP/IP version
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1649,21 +1963,40 @@ int *status          /* global status (give and returned) */
 }
 
 
-/*=  ANT_NETWORK - handle messages received across the network */
 
 void ant_network
 ( 
 int *status          /* global status (give and returned) */
 )
 
-/*   Method :
-      Search for any messages present on the existing network sockets and
-      process them.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      25.04.1994:  original (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_NETWORK
+
+*  Purpose:
+*     Handle messages received across the network 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Search for any messages present on the existing network sockets and
+*     process them.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-APR-1994 (REVAD::BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1733,7 +2066,6 @@ int *status          /* global status (give and returned) */
 
 
 
-/*=  ANT_OBEY - obey a command to dump diagnostics */
 
 void ant_obey 
 ( 
@@ -1742,15 +2074,35 @@ struct a_loc_gsoc_start_out loc_gsoc_start_out, /* the incoming message
 int *status                         /* global status (give and returned) */
 )
 
-/*   Method :
-      A message has been received requesting ADAMNET to output 
-      diagnostics.
-      Write the contents of the ADAMNET common blocks to a text file.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      18.04.1988:  original (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_OBEY
+
+*  Purpose:
+*     Obey a command to dump diagnostics 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     A message has been received requesting ADAMNET to output 
+*     diagnostics.
+*     Write the contents of the ADAMNET common blocks to a text file.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-APR-1988 (REVAD::BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1822,7 +2174,6 @@ int *status                         /* global status (give and returned) */
 }
 
 
-/*=  ANT_OPENNET - Initiate communication with a task across a network */
 
 void ant_opennet 
 ( 
@@ -1832,24 +2183,50 @@ sendq_type accept_q,        /* queue for sending acknowledgement to task
 int *status                 /* global status (give and returned) */
 )
 
-/*   Method :
-      Initiate the call.
-      If the connection request was successful return an 
-      ACK_INIT message to the ADAM task on this machine which requested 
-      the path. Start a read on the newly-opened network channel.
-      If the connection request was rejected, return a rejection message 
-      to the task which requested the path.
-     Authors :
-      B.D.Kelly (REVAD::BDK) 
-     History :
-      25.03.1988:  original (REVAD::BDK)
-      07.04.1988:  set-up N_MACH(I).LOCAL_UNIT (REVAD::BDK)
-      25.04.1988:  assume '::' is in MACHINE_NAME (REVAD::BDK)
-      26.04.1988:  use MESSYS__NETNAME (REVAD::BDK)
-      20.05.1988:  improve error trapping (REVAD::BDK)
-      09.06.1988:  set MACH_STATE to ANT__THIS_START (REVAD::BDK)
-      15.04.1994:  TCP/IP version (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_OPENNET
+
+*  Purpose:
+*     Initiate communication with a task across a network 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Initiate the call.
+*     If the connection request was successful return an 
+*     ACK_INIT message to the ADAM task on this machine which requested 
+*     the path. Start a read on the newly-opened network channel.
+*     If the connection request was rejected, return a rejection message 
+*     to the task which requested the path.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK) 
+*     {enter_new_authors_here}
+
+*  History:
+*     25-MAR-1988 (REVAD::BDK):
+*        Original
+*     07-APR-1988 (REVAD::BDK):
+*        Set-up N_MACH(I).LOCAL_UNIT
+*     25-APR-1988 (REVAD::BDK):
+*        Assume '::' is in MACHINE_NAME
+*     26-APR-1988 (REVAD::BDK):
+*        Use MESSYS__NETNAME
+*     20-MAY-1988 (REVAD::BDK):
+*        Improve error trapping
+*     09-JUN-1988 (REVAD::BDK):
+*        Set MACH_STATE to ANT__THIS_START
+*     15-APR-1994 (REVAD::BDK):
+*        TCP/IP version
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -1930,7 +2307,6 @@ int *status                 /* global status (give and returned) */
 }
 
 
-/*=  ANT_RETARGET - retarget a signal to the ant handling routine */
 
 static void ant_retarget
 (
@@ -1939,15 +2315,36 @@ struct sigaction oact    /* action structure with flag initialised
                             (given) */
 )
 
-/*  Method :
-     If ant has not already been set to handle this particular signal,
-     inquire the function handler for the signal and store it in the list
-     of ant signal handlers. Declare ant_exhdlr as the new handler for
-     the signal.
-    Authors :
-     Brian McIlwrath (Starlink)
-    History :
-     15.01.1996: taken from the DTASK signal handler (BDK)
+/*
+*+
+*  Name:
+*     ANT_RETARGET
+
+*  Purpose:
+*     Retarget a signal to the ant handling routine 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     If ant has not already been set to handle this particular signal,
+*     inquire the function handler for the signal and store it in the list
+*     of ant signal handlers. Declare ant_exhdlr as the new handler for
+*     the signal.
+
+*  Authors:
+*     Brian McIlwrath (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-JAN-1996 (BDK):
+*        Taken from the DTASK signal handler
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2007,7 +2404,6 @@ struct sigaction oact    /* action structure with flag initialised
 } 
 
 
-/*=  ANT_SEND_ACK_OUT - send a net ACK_OUT message */
 
 void ant_send_ack_out 
 ( 
@@ -2016,22 +2412,44 @@ sendq_type reply_q,               /* task reply queue (given) */
 int *status                       /* global status (give and returned) */
 )
 
-/*   Method :
-      Given a REM_MSG_OUT, send it to the other machine and make 
-      the necessary entries in the global structures. In the event of 
-      failure, do what tidying is possible.
-      Check the indicated path and transaction number are valid.
-      Complete the N_TRANS entry if necessary.
-      Send the message to the other machine.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      06.04.1988:  original (REVAD::BDK)
-      20.05.1988:  remove GSOC_ACK structures (REVAD::BDK)
-      09.06.1988:  check TRANS_NUM in range, calculate LENGTH 
-                   (REVAD::BDK)
-      20.04.1994:  constant message size (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_SEND_ACK_OUT
+
+*  Purpose:
+*     Send a net ACK_OUT message 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Given a REM_MSG_OUT, send it to the other machine and make 
+*     the necessary entries in the global structures. In the event of 
+*     failure, do what tidying is possible.
+*     Check the indicated path and transaction number are valid.
+*     Complete the N_TRANS entry if necessary.
+*     Send the message to the other machine.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     06-APR-1988 (REVAD::BDK):
+*        Original
+*     20-MAY-1988 (REVAD::BDK):
+*        Remove GSOC_ACK structures
+*     09-JUN-1988: check TRANS_NUM in range, calculate LENGTH
+*                  (REVAD::BDK)
+*     20-APR-1994 (REVAD::BDK):
+*        Constant message size
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2136,7 +2554,6 @@ int *status                       /* global status (give and returned) */
 }
 
 
-/*=  ANT_SEND_END_OUT - send a net END_OUT message */
 
 void ant_send_end_out 
 ( 
@@ -2145,22 +2562,44 @@ struct a_rem_msg_out rem_msg_out,  /* the received message, this is a MSG
 int *status                         /* global status (give and returned) */
 )
 
-/*   Method :
-      Given a REM_GSOC_END_OUT, send it to the other machine and make 
-      the necessary entries in the common blocks. In the event of 
-      failure, do what tidying is possible.
-      Check the indicated path and transaction number are valid.
-      Send the GSOC_END to the other machine.
-      Remove the transaction entry.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      07.04.1988:  original (REVAD::BDK)
-      20.05.1988:  remove GSOC_ACK structures (REVAD::BDK)
-      09.06.1988:  check TRANS_NUM in range, calculate LENGTH 
-                   (REVAD::BDK)
-      20.04.1994:  constant message size (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_SEND_END_OUT
+
+*  Purpose:
+*     Send a net END_OUT message 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Given a REM_GSOC_END_OUT, send it to the other machine and make 
+*     the necessary entries in the common blocks. In the event of 
+*     failure, do what tidying is possible.
+*     Check the indicated path and transaction number are valid.
+*     Send the GSOC_END to the other machine.
+*     Remove the transaction entry.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-APR-1988 (REVAD::BDK):
+*        Original
+*     20-MAY-1988 (REVAD::BDK):
+*        Remove GSOC_ACK structures
+*     09-JUN-1988: check TRANS_NUM in range, calculate LENGTH
+*                  (REVAD::BDK)
+*     20-APR-1994 (REVAD::BDK):
+*        Constant message size
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2245,7 +2684,6 @@ int *status                         /* global status (give and returned) */
 }
 
 
-/*=  ANT_SEND_NETACK - send a netack message */
 
 void ant_send_netack 
 ( 
@@ -2254,21 +2692,43 @@ sendq_type reply_q,                 /* task reply queue (given) */
 int *status                        /* global status (give and returned) */
 )
 
-/*   Method :
-      Given a REM_ACK, send a NETACK it to the other machine and 
-      make the necessary entries in the common blocks. In the event of 
-      failure, return a DEINIT to the local task.
-      Complete the relevant N_PATH entry from information in the 
-      received message.
-      Forward an acknowledgement message to the other machine.
-      On error, return a DEINIT message to the local task.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      30.03.1988:  original (REVAD::BDK)
-      20.05.1988:  check PATH is in range (REVAD::BDK)
-      20.04.1994:  constant message size (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_SEND_NETACK
+
+*  Purpose:
+*     Send a netack message 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Given a REM_ACK, send a NETACK it to the other machine and 
+*     make the necessary entries in the common blocks. In the event of 
+*     failure, return a DEINIT to the local task.
+*     Complete the relevant N_PATH entry from information in the 
+*     received message.
+*     Forward an acknowledgement message to the other machine.
+*     On error, return a DEINIT message to the local task.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-MAR-1988 (REVAD::BDK):
+*        Original
+*     20-MAY-1988 (REVAD::BDK):
+*        Check PATH is in range
+*     20-APR-1994 (REVAD::BDK):
+*        Constant message size
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2342,7 +2802,6 @@ int *status                        /* global status (give and returned) */
 }
 
 
-/*=  ANT_SEND_NETDEINIT - send a NETDEINIT message */
 
 void ant_send_netdeinit 
 ( 
@@ -2350,21 +2809,43 @@ struct a_rem_deinit_out rem_deinit_out,  /* the received message (given) */
 int *status                         /* global status (give and returned) */
 )
 
-/*   Method :
-      Given a REM_DEINIT, send a NETDEINIT to the other machine and 
-      annul the necessary entries in the common blocks. 
-      Look-up the relevant N_PATH entry from information in the 
-      received message.
-      Send a deinit message to the other machine.
-      Close msp communications with the local task.
-      Remove the N_PATH entry.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      30.03.1988:  original (REVAD::BDK)
-      09.06.1988:  remove the transaction entries (REVAD::BDK)
-      20.04.1994:  constant message size (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_SEND_NETDEINIT
+
+*  Purpose:
+*     Send a NETDEINIT message 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Given a REM_DEINIT, send a NETDEINIT to the other machine and 
+*     annul the necessary entries in the common blocks. 
+*     Look-up the relevant N_PATH entry from information in the 
+*     received message.
+*     Send a deinit message to the other machine.
+*     Close msp communications with the local task.
+*     Remove the N_PATH entry.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-MAR-1988 (REVAD::BDK):
+*        Original
+*     09-JUN-1988 (REVAD::BDK):
+*        Remove the transaction entries
+*     20-APR-1994 (REVAD::BDK):
+*        Constant message size
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2444,7 +2925,6 @@ int *status                         /* global status (give and returned) */
 }
 
 
-/*=  ANT_SEND_NETINIT - send a netinit message */
 
 void ant_send_netinit 
 ( 
@@ -2453,23 +2933,46 @@ sendq_type reply_q,                 /* task reply queue (given) */
 int *status                         /* global status (give and returned) */
 )
 
-/*   Method :
-      Given a NETINIT, send it to the target machine and make the 
-      necessary entries in the common blocks. In the event of failure, 
-      return a DEINIT message to the local task.
-      Search the common blocks for an unused N_PATH entry.
-      Put partial information into it from the received message.
-      Send the init message across the network.
-      On error, return a DEINIT to the local task and annul the 
-      new N_PATH entry.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      06.04.1988:  original (REVAD::BDK)
-      20.05.1988:  trap error on qiow (REVAD::BDK)
-      09.06.1988:  ensure MACH_STATE is ok (REVAD::BDK)
-      20.04.1994:  constant message size (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_SEND_NETINIT
+
+*  Purpose:
+*     Send a netinit message 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Given a NETINIT, send it to the target machine and make the 
+*     necessary entries in the common blocks. In the event of failure, 
+*     return a DEINIT message to the local task.
+*     Search the common blocks for an unused N_PATH entry.
+*     Put partial information into it from the received message.
+*     Send the init message across the network.
+*     On error, return a DEINIT to the local task and annul the 
+*     new N_PATH entry.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     06-APR-1988 (REVAD::BDK):
+*        Original
+*     20-MAY-1988 (REVAD::BDK):
+*        Trap error on qiow
+*     09-JUN-1988 (REVAD::BDK):
+*        Ensure MACH_STATE is ok
+*     20-APR-1994 (REVAD::BDK):
+*        Constant message size
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2582,7 +3085,6 @@ int *status                         /* global status (give and returned) */
 }
 
 
-/*=  ANT_SEND_START_OUT - send a net GSOC start message */
 
 void ant_send_start_out 
 ( 
@@ -2592,20 +3094,45 @@ sendq_type reply_q,                 /* task reply queue (given) */
 int *status                         /* global status (give and returned) */
 )
 
-/*    Method :
-      Given a REM_GSOC_START, record the new transaction and send it to 
-      the target machine. In the event of failure, return a GSOC_END to 
-      the local task.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      06.04.1988:  original (REVAD::BDK)
-      29.04.1988:  check qio status (REVAD::BDK)
-      29.04.1988:  set value of MACHNUM (REVAD::BDK)
-      30.05.1988:  remove GSOC_ACK structures (REVAD::BDK)
-      09.06.1988:  check PATH is in range (REVAD::BDK)
-      20.04.1994:  constant message size (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_SEND_START_OUT
+
+*  Purpose:
+*     Send a net GSOC start message 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Given a REM_GSOC_START, record the new transaction and send it to 
+*     the target machine. In the event of failure, return a GSOC_END to 
+*     the local task.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     06-APR-1988 (REVAD::BDK):
+*        Original
+*     29-APR-1988 (REVAD::BDK):
+*        Check qio status
+*     29-APR-1988 (REVAD::BDK):
+*        Set value of MACHNUM
+*     30-MAY-1988 (REVAD::BDK):
+*        Remove GSOC_ACK structures
+*     09-JUN-1988 (REVAD::BDK):
+*        Check PATH is in range
+*     20-APR-1994 (REVAD::BDK):
+*        Constant message size
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2720,19 +3247,36 @@ int *status                         /* global status (give and returned) */
 
 
 
-/*+  ANT_SERVE - forward network messages */
 
 void ant_serve 
 ( 
 int *status          /* global status (given and returned) */
 )
 
-/*   Method :
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      26.04.1994:  original (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_SERVE
+
+*  Purpose:
+*     Forward network messages 
+
+*  Language:
+*     Starlink C
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     26-APR-1994 (REVAD::BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2808,34 +3352,52 @@ int *status          /* global status (given and returned) */
 }
 
 
-/*= ANT_SETSIG - set up signal handlers */
 
 static void ant_setsig
 ( 
 void 
 )
 
-/*  Method :
-     Called during process initialisation to alter the defaults for likely
-     Unix Signals (from the terminal, programming or system faults) to
-     cause the process to terminate via the exit() system service. This allows
-     any library "exit handlers" declared via atexit() to be called.
-     The routine ant_exhdlr is called by Unix when a signal occurs
-     Uses standard Unix C system service routines
-     Note: all signal handlers can be overridden by the user elsewhere in 
-     the process and we should document any side effects of doing this.
-    Authors :
-     BKM: B.K. McIlwrath (STARLINK, RAL)
-    History :
-     02-DEC-1994 (BKM):
-        Original version.
-     14-JUL-1995 (BKM):
-        Totally revised logic (exit handler idea from RFWS)
-     12-Jan-1996 (BDK):
-        adapted from DTASK library for ANT
-     11-Apr-1996 (AB, from BDK):
-        Modified SIGALRM handling, added SIGVTALRM and lots of others
-    endhistory
+/*
+*+
+*  Name:
+*     ANT_SETSIG
+
+*  Purpose:
+*     Set up signal handlers 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Called during process initialisation to alter the defaults for likely
+*     Unix Signals (from the terminal, programming or system faults) to
+*     cause the process to terminate via the exit() system service. This allows
+*     any library "exit handlers" declared via atexit() to be called.
+*     The routine ant_exhdlr is called by Unix when a signal occurs
+*     Uses standard Unix C system service routines
+*     Note: all signal handlers can be overridden by the user elsewhere in 
+*     the process and we should document any side effects of doing this.
+
+*  Authors:
+*     BKM: B.K. McIlwrath (STARLINK, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     02-DEC-1994 (BKM):
+*       Original version.
+*     14-JUL-1995 (BKM):
+*       Totally revised logic (exit handler idea from RFWS)
+*     12-Jan-1996 (BDK):
+*       adapted from DTASK library for ANT
+*     11-APR-1996: (AB, from BDK):
+*       Modified SIGALRM handling, added SIGVTALRM and lots of others
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -2963,7 +3525,6 @@ void
 }
 
 
-/*= ANT_EXHDLR - ADAM task signal handler for all process signals */
 
 void ant_exhdlr
 (
@@ -3057,7 +3618,6 @@ void *dummy
 
 
 
-/*=  ANT_SIGHDLR - signal handler network messages */
 
 void ant_sighdlr
 ( 
@@ -3066,20 +3626,64 @@ siginfo_t *infop,          /* info pointer (given) */
 void *ucp                  /* context pointer (given) */
 )
 
-/*   Method :
-      This routine is declared as the signal handler for SIGIO events.
-      All created network sockets are set to deliver signals whenever
-      they move from the state of having no input data.
-      Write an MSP message to the NETWORKS_Q so that the main-line code
-      is aware of the presence of socket action.
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      23.03.1988:  original (REVAD::BDK)
-      20.05.1988:  signal bad status from READMBX (REVAD::BDK)
-      18.04.1994:  TCP/IP version (REVAD::BDK)
-      15.04.1996:  change to using sigaction() in main-line (BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_EXHDLR
+
+*  Purpose:
+*     ADAM task signal handler for all process signals 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     This routine is declared as the signal handler for SIGIO events.
+*     All created network sockets are set to deliver signals whenever
+*     they move from the state of having no input data.
+*     Write an MSP message to the NETWORKS_Q so that the main-line code
+*     is aware of the presence of socket action.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     23-MAR-1988 (REVAD::BDK):
+*        Original
+*     20-MAY-1988 (REVAD::BDK):
+*        Signal bad status from READMBX
+*     18-APR-1994 (REVAD::BDK):
+*        TCP/IP version
+*     15-APR-1996 (BDK):
+*        Change to using sigaction() in main-line
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+/*
+*+
+*  Name:
+*     ANT_SIGHDLR
+
+*  Purpose:
+*     Signal handler network messages 
+
+*  Language:
+*     Starlink C
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -3100,7 +3704,6 @@ void *ucp                  /* context pointer (given) */
 
 
 
-/*=  ANT_VERIFY - verify an incoming connection */
 
 void ant_verify 
 ( 
@@ -3110,13 +3713,33 @@ char *machine_name,  /* name of other machine (returned) */
 int *status          /* global status (give and returned) */
 )
 
-/*   Method :
-      Inquire the details of the peer machine
-     Authors :
-      B.D.Kelly (REVAD::BDK) 
-     History :
-      15.04.1994:  original (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_VERIFY
+
+*  Purpose:
+*     Verify an incoming connection 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Inquire the details of the peer machine
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK) 
+*     {enter_new_authors_here}
+
+*  History:
+*     15-APR-1994 (REVAD::BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -3151,4 +3774,3 @@ int *status          /* global status (give and returned) */
    }   
 
 }
-

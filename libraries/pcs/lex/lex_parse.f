@@ -1,12 +1,26 @@
-*+  name - LEX_PARSE
       SUBROUTINE LEX_PARSE(INIT,STRING,NSTATE,TABLE,ACTION,TOKEN,
      :      TLEN,POSN,STATUS)
-*    Description :
-*     LEX parser - main routine
-*    Invocation :
+*+
+*  Name:
+*     name
+
+*  Purpose:
+*     LEX_PARSE
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
 *     CALL LEX_PARSE(INIT,STRING,NSTATE,TABLE,ACTION,TOKEN,
-*    :      TLEN,POSN,STATUS)
-*    Parameters :
+*     :      TLEN,POSN,STATUS)
+
+*  Description:
+*     LEX parser - main routine
+
+*  Arguments:
 *     INIT = LOGICAL (given)
 *           If TRUE a parse of a new string is initiated, otherwise
 *           a continuation of a current parse
@@ -25,7 +39,8 @@
 *     POSN = INTEGER (returned)
 *           Current position in parse
 *     STATUS = INTEGER
-*    Method :
+
+*  Algorithm:
 *     On the initital call (INIT = TRUE) the character position is
 *     set to 1, and the state is set to 1. Then for each character
 *     the entry in the state table is found corresponding to the
@@ -37,44 +52,50 @@
 *     (unless BACK is specified). It also returns to the caller in the 
 *     event of an invalid character for the state, or on reaching the
 *     end of the string.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     Jeremy Bailey (AAOEPP::JAB)
 *     Alan Chipperfield (RLVAD::AJC)
 *     Tim Jenness (JACH::TIMJ)
-*    History :
-*     date:  changes (institution::username)
-*     23.09.1991: Report errors correctly (RLVAD::AJC)
-*      6.03.1996: Correctly save OSTATE not STATE (RLVAD::AJC)
-*     28.03.2003: Initialise TOKEN on Linux to prevent uninitialised
+*     {enter_new_authors_here}
+
+*  History:
+*     23-SEP-1991 (RLVAD::AJC):
+*        Report errors correctly
+*     06-MAR-1996 (RLVAD::AJC):
+*        Correctly save OSTATE not STATE
+*     28-MAR-2003: Initialise TOKEN on Linux to prevent uninitialised
 *                 warnings from memory checkers (JACH::TIMJ)
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'LEX_ERR'
-*    Import :
+*  Arguments Given:
       LOGICAL INIT
       CHARACTER*(*) STRING
       INTEGER NSTATE
       BYTE TABLE(4,0:127,NSTATE)
-*    Export :
+*  Arguments Returned:
       INTEGER ACTION
       CHARACTER*(*) TOKEN
       INTEGER TLEN
       INTEGER POSN
-*    Status :
+*  Status:
       INTEGER STATUS
 *    External references :
 *     <declarations for external function references>
-*    Local Constants :
+*  Local Constants:
       INTEGER STACKSIZE
       PARAMETER (STACKSIZE = 20)     ! Size of state stack
-*    Local variables :
+*  Local Variables:
       INTEGER STATE, OSTATE          ! Current state, old state
       INTEGER NC                     ! Current character position
       INTEGER NL                     ! Length of string
@@ -86,7 +107,7 @@
       LOGICAL FINISHED               ! completion flag
 
       SAVE OSTATE,NL,NC,STACK,SP
-*-
+*.
 
       IF (STATUS .EQ. SAI__OK) THEN
           IF (INIT) THEN
@@ -214,4 +235,3 @@
 	  POSN = NC-1
        ENDIF
        END
-

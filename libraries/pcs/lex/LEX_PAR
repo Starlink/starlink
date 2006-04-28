@@ -1,7 +1,29 @@
-*+ LEX_PAR - Constants used by the ADAM LEX system
-*
-*   Values defining actions types
-*
+*+
+*  Name:
+*     LEX_PAR
+
+*  Purpose:
+*     Constants used by the ADAM LEX system
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     FORTRAN INCLUDE
+
+*  Description:
+*     Values defining actions types
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
       INTEGER LEX__NAME        ! HDS, device name or file name
       INTEGER LEX__STRING      ! String
       INTEGER LEX__INTEGER     ! Integer

@@ -1,3 +1,26 @@
+/*
+*+
+*  Name:
+*     antmaster
+
+*  Purpose:
+*     Test adamnet
+
+*  Language:
+*     Starlink C
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+
 #include <stdio.h>
 #include <time.h>
 #include <sys/types.h>

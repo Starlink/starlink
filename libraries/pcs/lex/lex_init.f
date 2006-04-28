@@ -1,41 +1,57 @@
-*+  name - LEX_INIT
-*    Description :
       SUBROUTINE LEX_INIT(NSTATE,TABLE)
+*+
+*  Name:
+*     name
+
+*  Purpose:
+*     LEX_INIT
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
 *     Initialize a state table for the LEX parser
-*    Invocation :
+
+*  Invocation:
 *     CALL LEX_INIT(NSTATE,TABLE)
-*    Parameters :
+
+*  Arguments:
 *     NSTATE = INTEGER (given)
 *           The number of states in the state table
 *     TABLE(4,0:127,NSTATE) = BYTE (returned)
 *           The state table
-*    Method :
+
+*  Algorithm:
 *     The state table is filled with entries which cause the
 *     parser to signal an error. Valid state transitions will
 *     be subsequently overwritten by calls to the LEX_SET
 *     routine.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     Jeremy Bailey (AAOEPP::JAB) 8 Jan 1987
-*    History :
-*     date:  changes (institution::username)
-*     
-*    endhistory
-*    Type Definitions :
+*     {enter_new_authors_here}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
 *     <any INCLUDE files containing global constant definitions>
-*    Import :
+*  Arguments Given:
       INTEGER NSTATE
-*    Export :
+*  Arguments Returned:
       BYTE TABLE(4,0:127,NSTATE)
-*    Local variables :
+*  Local Variables:
       INTEGER I,C
-*-
+*.
 
       DO I=1,NSTATE
          DO C=0,127
@@ -47,4 +63,3 @@
       ENDDO
 
       END
-

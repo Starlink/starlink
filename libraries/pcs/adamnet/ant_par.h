@@ -1,11 +1,33 @@
-/*   ANT_PAR - constants for ANT library
+/*
+*+
+*  Name:
+*     ANT_PAR
 
-     History :
-      23.03.1988:  original (REVAD::BDK)
-      19.05.1988:  add NETDEV, MBXNAM (REVAD::BDK)
-      18.04.1994:  add PORTNUM (REVAD::BDK)
-      26.04.1994:  C-unix version (REVAD::BDK)
-     endhistory
+*  Purpose:
+*     Constants for ANT library 
+
+*  Language:
+*     {routine_language}
+
+*  Authors:
+*      BDK: Dennis Kelly (ROE)
+*     {enter_new_authors_here}
+
+*  History:
+*     23-MAR-1988 (REVAD::BDK):
+*        Original
+*     19-MAY-1988 (REVAD::BDK):
+*        Add NETDEV, MBXNAM
+*     18-APR-1994 (REVAD::BDK):
+*        Add PORTNUM
+*     26-APR-1994 (REVAD::BDK):
+*        C-unix version
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 #define ANT__MAXLINK 16    /* maximum number of network links */

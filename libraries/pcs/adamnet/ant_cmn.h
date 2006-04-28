@@ -1,17 +1,39 @@
-/*  ANT_CMN - global variables for ANT library
+/*
+*+
+*  Name:
+*     ANT_CMN
 
-     Authors :
-      B.D.Kelly (REVAD::BDK)
-     History :
-      24.02.1988:  original (REVAD::BDK)
-      25.03.1988:  add LOCAL_TASK_ACCEPT_Q (REVAD::BDK)
-      25.03.1988:  add COMMAND_Q (REVAD::BDK)
-      07.04.1988:  insert common blocks for structures and add 
-                   THIS_MACHINE (REVAD::BDK)
-      07.04.1988:  rationalise N_MACH structure (REVAD::BDK)
-      18.04.1994:  TCP/IP version (REVAD::BDK)
-      26.04.1994:  C-unix version (REVAD::BDK)
-     endhistory
+*  Purpose:
+*     Global variables for ANT library 
+
+*  Language:
+*     {routine_language}
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     24-FEB-1988 (REVAD::BDK):
+*        Original
+*     25-MAR-1988 (REVAD::BDK):
+*        Add LOCAL_TASK_ACCEPT_Q
+*     25-MAR-1988 (REVAD::BDK):
+*        Add COMMAND_Q
+*     07-APR-1988: insert common blocks for structures and add
+*                  THIS_MACHINE (REVAD::BDK)
+*     07-APR-1988 (REVAD::BDK):
+*        Rationalise N_MACH structure
+*     18-APR-1994 (REVAD::BDK):
+*        TCP/IP version
+*     26-APR-1994 (REVAD::BDK):
+*        C-unix version
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 struct a_ntrans {       /* holds details of a net transaction */

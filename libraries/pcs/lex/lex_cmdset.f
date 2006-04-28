@@ -1,43 +1,71 @@
-*+  name - LEX_CMDSET
       SUBROUTINE LEX_CMDSET
-*    Description :
-*     Initialize the LEX parser for ADAM command line parsing
-*    Invocation :
+*+
+*  Name:
+*     name
+
+*  Purpose:
+*     LEX_CMDSET
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Invocation:
 *     CALL LEX_CMDSET
-*    Method :
+
+*  Description:
+*     Initialize the LEX parser for ADAM command line parsing
+
+*  Algorithm:
 *     Make entries in the parser state table to correspond to
 *     the ADAM command line syntax
-*    Deficiencies :
+
+*  Implementation Deficiencies:
 *     There should be a distinction between NUMBER states entered
 *     from PAR and those entered from KEYPAR so that we know
 *     whether to switch back to KAMBIG or AMBIG if the number
 *     doesn't complete. For the moment, switch to AMBIG as it
 *     always has done.
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
+
+*  Authors:
 *     Jeremy Bailey  (AAOEPP::JAB)  Jan 8 1987
-*    History :
-*     date:  changes (institution::username)
-*     28/1/87   Don't stack state in KEYPAR   (AAOEPP::JAB)
-*     5/4/87    Allow commas within brackets in AMBIG  (AAOEPP::JAB)
-*     2/7/87    Allow non alphabetic characters in literals
+*     {enter_new_authors_here}
+
+*  History:
+*     28-JAN-1987 (AAOEPP::JAB):
+*        Don't stack state in KEYPAR
+*     05-APR-1987 (AAOEPP::JAB):
+*        Allow commas within brackets in AMBIG
+*     02-JUL-1987: Allow non alphabetic characters in literals
 *                     after keywords  (AAOEPP::JAB)
-*     9/8/89    Allow any legal literal as an array element
+*     09-AUG-1989: Allow any legal literal as an array element
 *               Also use symbolic names for actions
 *               and status  (RLVAD::AJC)
-*     25/10/89  Treat tabs (C9) as spaces  (RLVAD::AJC)
-*     13/03/90  Make ch 33-127 in KEYPAR the same
+*     25-OCT-1989 (RLVAD::AJC):
+*        Treat tabs (C9) as spaces
+*     13-MAR-1990: Make ch 33-127 in KEYPAR the same
 *               corrects bug where non-alpha stacked  (RLVAD::AJC)
-*     20/07/90  Allow number to AMBIG state after E or D (RLVAD::AJC)
-*     17/07/91  Remove unused decalaration of STRING and TOKEN (RLVAD::AJC)
-*     05/05/93  Don't change exponent letter e,d,D to E (RLVAD::AJC)
-*     24/12/02  Add ARRAMBIG state so ] is not special in normal AMBIG (AJC)
-*    endhistory
-*    Type Definitions :
+*     20-JUL-1990 (RLVAD::AJC):
+*        Allow number to AMBIG state after E or D
+*     17-JUL-1991 (RLVAD::AJC):
+*        Remove unused decalaration of STRING and TOKEN
+*     05-MAY-1993 (RLVAD::AJC):
+*        Don't change exponent letter e,d,D to E
+*     24-DEC-2002 (AJC):
+*        Add ARRAMBIG state so ] is not special in normal AMBIG
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'LEX_PAR'
 
@@ -46,7 +74,7 @@
       BYTE TABLE(4,0:127,25)
       COMMON /LEX_COM/ TABLE
 
-*    Local Constants :
+*  Local Constants:
 
 *  Parser states
 
@@ -83,12 +111,12 @@
       PARAMETER(T=.TRUE.)
       PARAMETER(F=.FALSE.)
 
-*    Local variables :
+*  Local Variables:
 
       CHARACTER*1 C0,C9,C13,C32,C33,C34,C126,C127
       INTEGER S
 
-*-
+*.
 
       C0 = CHAR(0)
       C9 = CHAR(9)

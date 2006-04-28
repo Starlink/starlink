@@ -1,13 +1,37 @@
-/*   ANT_SYS -  system constants for ANT library */
 
-/*   History :
-      22.03.1988:  original (REVAD::BDK)
-      25.03.1988: revise CALL and ACCEPT names (REVAD::BDK)
-      31.03.1988: add GSOC_END IN and OUT (REVAD::BDK)
-      28.04.1988: fix CALL, INIT, ACCEPT _IN_LEN (REVAD::BDK)
-      19.05.1988: remove GSOC_ACK add MAXMSG_LEN (REVAD::BDK)
-      26.04.1994: C-unix version (REVAD::BDK)
-     endhistory
+/*
+*+
+*  Name:
+*     ANT_SYS
+
+*  Purpose:
+*     System constants for ANT library 
+
+*  Language:
+*     {routine_language}
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     22-MAR-1988 (REVAD::BDK):
+*        Original
+*     25-MAR-1988 (REVAD::BDK):
+*        Revise CALL and ACCEPT names
+*     31-MAR-1988 (REVAD::BDK):
+*        Add GSOC_END IN and OUT
+*     28-APR-1988 (REVAD::BDK):
+*        Fix CALL, INIT, ACCEPT _IN_LEN
+*     19-MAY-1988 (REVAD::BDK):
+*        Remove GSOC_ACK add MAXMSG_LEN
+*     26-APR-1994 (REVAD::BDK):
+*        C-unix version
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 
