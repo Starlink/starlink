@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Cube handling toolbox</title>
+  </head>
+
+  <body>
+    <h2 align=center><font color=red>Cube handling toolbox</font></h2>
+    <p>
+      Using this toolbox you can interactively display successive images from
+      the planes of a cube and "spectra" for each pixel position from the
+      remaining dimension. The aim is to be as efficient as possible, at these
+      two jobs, and very good speed is available on machines whose physical
+      memory is greater than the size of the cube.
+    </p>
+    <p>
+      To view an image plane from the cube, just select the file containing
+      the cube and then use the axis control to choose an axis to step along
+      (normally this will be the dispersion/spectral axis) now either type in
+      the index of the image that you want to view along that axis and press
+      return or drag the slider to move through slices.
+    </p>
+    <p>
+      To display a spectrum just click, using mouse button 1, on a position on
+      the image. To see a continously updating spectrum, click and drag around
+      the image.
+    </p>
+    <p>
+      This simple behaviour can be enhanced using the extra controls in the
+      lower panes. Using these you can automatically step through a range of
+      indices (with three options for continuous looping), or you can create a
+      new image that is produced by collapsing a range of planes.
+    </p>
+    <p>
+      Once an image is displayed you are free to analyse it using the usual
+      tools, such as the photometric or image region toolboxes.
+    </p>
+    <p>
+      The indices are what are normally known as NDF pixel indices. For FITS
+      cubes this will be just the grid index (starting from 1 to the length of
+      the chosen axis), for NDFs this will include the origin. If available
+      the actual world coordinates being used will be displayed, together with
+      a description of their meaning and units.
+    <p>
+    <h3>Data formats and efficiency</h3>
+    <p>
+      The toolbox should handle both NDF and FITS data cubes with more-or-less
+      equal efficiency (NDF's may be slightly more efficient for some
+      formats). Other formats will be converted into NDFs on the fly. For
+      large datasets that isn't optimal, so you should convert the data
+      yourself to NDF first. The CONVERT package has many applications for
+      performing these conversions. If you want to use any tools that operate
+      on the full cube data, rather than a plane (so that's any operations ran
+      from this window, rather than any of the usual image analysis
+      toolboxes), then having your data in NDF format is definitely preferred,
+      as that will also involve a conversion to NDF anyway.
+    </p>
+
+    <p>
+      When using some image analysis tools the currently displayed plane will
+      be replaced with an actual NDF (for speed the image plane is displayed
+      using a skeletal NDF with dynamically updated data, so cannot be
+      directly processed by any external processes). After analysis you are
+      free to continue moving through slices. A side-effect of this quest for
+      speed is that the data processed by the analysis tools will not be a
+      full NDF, that is it currently does not contain any addition components,
+      such as variance or quality. If this is important you will need to
+      extract the plane from the cube using the KAPPA task NDFCOPY, with a
+      suitable NDF section (this is shown as part of the slice name in the
+      main window) and open that normally in GAIA.
+   </p>
+
+    <h3>Analysing spectra</h3>
+    <p>
+      The simplest way to view a spectrum, for analysis, is to double click on
+      the image currently displayed (this can be a slice or a collapsed
+      image). Then providing you have the Starlink SPLAT program installed on
+      your machine the data from the third dimension will be displayed as a
+      line plot, where you can measure line strengths, compare to other
+      spectra (from the VO), etc.
+    </p>
+  </body>
+</html>
