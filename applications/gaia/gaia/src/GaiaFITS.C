@@ -69,7 +69,7 @@ int GaiaFITSClose( StarFitsIO *fitsio )
  * Parse a FITS specification into a filename and a HDU number. "name" should
  * be at least as long as spec.
  */
-int GaiaFITSParseName( const char *spec, char *name, int name_length, 
+int GaiaFITSParseName( const char *spec, char *name, int name_length,
                        int *hdu )
 {
     // Copy input to output.
@@ -114,7 +114,7 @@ void GaiaFITSUnmap( Mem *dataPtr )
  * the array dimensions. The dims array should have MAX_DIM elements. The
  * number of dimensions returned is ndims.
  */
-int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs, 
+int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
                    int dims[], int *ndims )
 {
     astBegin;
@@ -172,22 +172,34 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
     return TCL_OK;
 }
 
-/** 
+/**
  * Get the value of a FITS keyword. Returns the empty string if not found.
  */
-int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, char *value, 
+int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, char *value,
                   int value_length )
 {
     fitsio->get( keyword, value, value_length );
     return TCL_OK;
 }
 
-/** 
+/**
  * Get the integer value of a FITS keyword. Returns TCL_ERROR if not found.
  */
 int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, int *value )
 {
-    if ( fitsio->get( keyword, *value ) ) {
+    if ( fitsio->get( keyword, *value ) == 0 ) {
+        return TCL_OK;
+    }
+    return TCL_ERROR;
+}
+
+/**
+ * Get the double precision value of a FITS keyword. Returns TCL_ERROR if not
+ * found.
+ */
+int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, double *value )
+{
+    if ( fitsio->get( keyword, *value ) == 0 ) {
         return TCL_OK;
     }
     return TCL_ERROR;
