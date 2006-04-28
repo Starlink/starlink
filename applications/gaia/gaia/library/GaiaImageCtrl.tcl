@@ -539,7 +539,12 @@ itcl::class gaia::GaiaImageCtrl {
             #  Move new image into place and reopen.
             ::file rename -force $tmpname [$image_ cget -file]
             puts stderr "rename $tmpname to [$image_ cget -file]"
+
+            #  Record cut levels, reopen and restore cuts.
+            lassign [$image_ cut] low high
             reopen
+            $image_ cut $low $high
+            $itk_component(info) updateValues
          } else {
             error_dialog "Failed to save volatile image: $msg"
          }
@@ -708,7 +713,7 @@ itcl::class gaia::GaiaImageCtrl {
 
    # Check if the given filename is in the history catalog, and if so,
    # apply the cut levels and color settings for the file. Overriden
-   # so that we can apply a default cut by usingh GaiaSearch instead of
+   # so that we can apply a default cut by using GaiaSearch instead of
    # SkySearch.
    public method apply_history {filename} {
       gaia::GaiaSearch::apply_history $this $filename $itk_option(-default_cut)
