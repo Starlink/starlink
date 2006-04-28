@@ -1,3 +1,26 @@
+/*
+*+
+*  Name:
+*     atimer_test
+
+*  Purpose:
+*     Test atimer
+
+*  Language:
+*     Starlink C
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/    
+
 #include <stdio.h>
 #include <string.h>
 #include <time.h>

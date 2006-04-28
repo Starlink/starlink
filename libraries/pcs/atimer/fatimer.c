@@ -1,4 +1,5 @@
 /*
+*+
 *  Name:
 *     FATIMER
 
@@ -35,7 +36,8 @@
 *     18-SEP-1995 (AJC):
 *        Correct declaration of handler argument in settimr.
 *     {enter_changes_here}
-*- */
+*-
+*/
       
 /* Include Statements: */
 #include "sae_par.h"
@@ -43,6 +45,7 @@
 #include "atimer.h"
 
 /*
+*+
 *  Name:
 *     FATIMER_CANTIM( ID, STATUS )
 
@@ -79,7 +82,8 @@
 *  Bugs:
 *     {note_any_bugs_here}
 
-*- */
+*-
+*/
 
 /* Function Definition: */
 F77_SUBROUTINE(fatimer_cantim)( INTEGER(id), INTEGER(status) )
@@ -94,6 +98,7 @@ F77_SUBROUTINE(fatimer_cantim)( INTEGER(id), INTEGER(status) )
 }
 
 /*
+*+
 *  Name:
 *     FATIMER_SETTIMR( DELAY, ID, HANDLER, STATUS )
 
@@ -122,7 +127,6 @@ F77_SUBROUTINE(fatimer_cantim)( INTEGER(id), INTEGER(status) )
 *     STATUS = INTEGER (Given and returned)
 *        The global status.
 
-*  [optional_subroutine_items]...
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
 *     {enter_new_authors_here}
@@ -135,7 +139,8 @@ F77_SUBROUTINE(fatimer_cantim)( INTEGER(id), INTEGER(status) )
 *  Bugs:
 *     {note_any_bugs_here}
 
-*- */
+*-
+*/
       
 /* Function Definition: */
 F77_SUBROUTINE(fatimer_settimr)( INTEGER(delay), INTEGER(id), 

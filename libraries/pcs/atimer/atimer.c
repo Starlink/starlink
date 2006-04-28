@@ -25,7 +25,6 @@ static struct timer_q *timer_queue = NULL;   /* Queue list-head */
 
 
 
-/*+  ATIMER_CANTIM - remove an event from the timer queue */
 
 void atimer_cantim
 (
@@ -33,14 +32,36 @@ int timerid,    /* timeout identifier (given) */
 int *status     /* global status (given and returned) */
 )
 
-/*   Method :
-      Given a timer-id number cancel the appropriate queued event.
-     Authors :
-      Brian McIlwrath (RAL)
-      B.D.Kelly (ROE)
-     History :
-      09 July 1993: original (bkm)
-      10 Mar 1994: atimer version (BDK)
+/*
+*+
+*  Name:
+*     ATIMER_CANTIM
+
+*  Purpose:
+*     Remove an event from the timer queue 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Given a timer-id number cancel the appropriate queued event.
+
+*  Authors:
+*     Brian McIlwrath (RAL)
+*     B.D.Kelly (ROE)
+*     {enter_new_authors_here}
+
+*  History:
+*     09-JUL-1993 (bkm):
+*        Original
+*     10-MAR-1994 (BDK):
+*        Atimer version
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -134,23 +155,44 @@ int *status     /* global status (given and returned) */
    }
 }
 
-/*=  ATIMER_HANDLER - signal handler for timer system */
 
 static void atimer_handler
 (
 int signo                   /* signal number (given) */
 )
 
-/*   Method :
-      This is called as a result of SIGALRM.
-      Remove the entry from the front of the timer queue and invoke the
-      associated function. If there are still entries on the queue, restart 
-      the timer.
-     Authors :
-      B.D.Kelly (ROE)
-     History :
-      10 Mar 1994: original (BDK)
-      12 Apr 1994: make the function static (BDK)
+/*
+*+
+*  Name:
+*     ATIMER_HANDLER
+
+*  Purpose:
+*     Signal handler for timer system 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     This is called as a result of SIGALRM.
+*     Remove the entry from the front of the timer queue and invoke the
+*     associated function. If there are still entries on the queue, restart 
+*     the timer.
+
+*  Authors:
+*     B.D.Kelly (ROE)
+*     {enter_new_authors_here}
+
+*  History:
+*     10-MAR-1994 (BDK):
+*        Original
+*     12-APR-1994 (BDK):
+*        Make the function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 {
 
@@ -190,7 +232,6 @@ int signo                   /* signal number (given) */
 }
 
 
-/*=  ATIMER_INSERT - insert an entry in the event list */
 
 static void atimer_insert 
 (
@@ -198,23 +239,46 @@ struct timer_q *new_entry,  /* pointer to item to be added (given) */
 int *status                 /* global status (given and returned) */
 )
 
-/*   Method :
-      Add a time value to the timer queue.
-      The interval timer queue is implemented as an ordered in increasing 
-      time order linked list of (struct timer_q *) entries with a list_head 
-      pointed to by 'timer_queue'. Each entry is constructed to contain the 
-      time interval (in setitimer format) required from completion of the
-      previous entry.
-      Note - The macros timercmp, timerisset and timerclear are included from
-      <sys/time.h.>. The macro timer_sub is defined in "atimer_par.h"
-     Authors :
-      Brian McIlwrath (RAL)
-      B.D.Kelly (ROE)
-     History :   
-      07Jul 1993: original (BKM)
-      11Mar 1994: atimer version (BDK)
-      12 Apr 1994: make the function static (BDK)
-       5 Feb 1998: rename timersub to timer_sub as Linux has timersub
+/*
+*+
+*  Name:
+*     ATIMER_INSERT
+
+*  Purpose:
+*     Insert an entry in the event list 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*     Add a time value to the timer queue.
+*     The interval timer queue is implemented as an ordered in increasing 
+*     time order linked list of (struct timer_q *) entries with a list_head 
+*     pointed to by 'timer_queue'. Each entry is constructed to contain the 
+*     time interval (in setitimer format) required from completion of the
+*     previous entry.
+*     Note - The macros timercmp, timerisset and timerclear are included from
+*     <sys/time.h.>. The macro timer_sub is defined in "atimer_par.h"
+
+*  Authors:
+*     Brian McIlwrath (RAL)
+*     B.D.Kelly (ROE)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-JUL-1993 (BKM):
+*        Original
+*     11-MAR-1994 (BDK):
+*        Atimer version
+*     12-APR-1994 (BDK):
+*        Make the function static
+*     05-FEB-1998: rename timersub to timer_sub as Linux has timersub
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -272,7 +336,6 @@ int *status                 /* global status (given and returned) */
 }
 
 
-/*+  ATIMER_SETTIMR - add an event to the timer queue */
 
 void atimer_settimr
 (
@@ -282,13 +345,33 @@ void (*func)(),        /* address of associated routine (given) */
 int *status            /* global status (given and returned) */
 )
 
-/*   Method :
-     Authors :
-      Brian McIlwrath (RAL)
-      B.D.Kelly (ROE)
-     History :   
-      30 June 1993: original (bkm)
-      10 Mar 1994: atimer version (BDK)
+/*
+*+
+*  Name:
+*     ATIMER_SETTIMR
+
+*  Purpose:
+*     Add an event to the timer queue 
+
+*  Language:
+*     Starlink C
+
+*  Authors:
+*     Brian McIlwrath (RAL)
+*     B.D.Kelly (ROE)
+*     {enter_new_authors_here}
+
+*  History:
+*     30-JUN-1993 (bkm):
+*        Original
+*     10-MAR-1994 (BDK):
+*        Atimer version
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
