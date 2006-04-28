@@ -25,7 +25,6 @@ struct hostent *gethostbyname ( const char *name );
 struct hostent *gethostbyaddr ( const char *addr, int len, int type );
 */
 
-/*+  SOCK_ACCEPT - accept a network call */
 
 void sock_accept
 (
@@ -34,13 +33,33 @@ int *new_socket,       /* Socket for new connection (returned) */
 int *status            /* global status (given and returned) */
 )
 
-/*   Method:
-       Perform repeated accepts of a call to allow for signal interrupts.
+/*
+*+
+*  Name:
+*     SOCK_ACCEPT
 
-     Authors:
-      B.D.Kelly (REVAD::BDK)
-     History:
-      06.05.1994: original (REVAD::BDK)
+*  Purpose:
+*     Accept a network call 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*      Perform repeated accepts of a call to allow for signal interrupts.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     06-MAY-1994 (REVAD::BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -71,7 +90,6 @@ int *status            /* global status (given and returned) */
    }
 }
 
-/*+  SOCK_CONNECT - Make a connection */
 
 void sock_connect
 (
@@ -80,13 +98,33 @@ struct sockaddr *connect_addr,  /* socket info */
 int *status                     /* global status (given and returned) */
 )
 
-/*   Method:
-       Perform repeated connection attempts to allow for signal interrupts.
+/*
+*+
+*  Name:
+*     SOCK_CONNECT
 
-     Authors:
-      B.D.Kelly (REVAD::BDK)
-     History:
-      06.05.1994: original (REVAD::BDK)
+*  Purpose:
+*     Make a connection 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*      Perform repeated connection attempts to allow for signal interrupts.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     06-MAY-1994 (REVAD::BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -115,7 +153,6 @@ int *status                     /* global status (given and returned) */
 }
 
 
-/*+  SOCK_GHBA - get host detail by address */
 
 void sock_ghba
 (
@@ -124,13 +161,33 @@ struct hostent *peeraddr,  /* structure for peer entry (returned) */
 int *status                /* global status (given and returned) */
 )
 
-/*   Method:
-       Perform repeated gethostbyaddr to allow for signal interrupts.
+/*
+*+
+*  Name:
+*     SOCK_GHBA
 
-     Authors:
-      B.D.Kelly (REVAD::BDK)
-     History:
-      06.05.1994: original (REVAD::BDK)
+*  Purpose:
+*     Get host detail by address 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*      Perform repeated gethostbyaddr to allow for signal interrupts.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     06-MAY-1994 (REVAD::BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -187,7 +244,6 @@ int *status                /* global status (given and returned) */
 }
 
 
-/*+  SOCK_GHBN - get host details by name */
 
 void sock_ghbn
 (
@@ -197,13 +253,33 @@ struct hostent *retentptr,  /* network data structure for other
 int *status                 /* global status (given and returned) */
 )
 
-/*   Method:
-       Perform repeated gethostbyname to allow for signal interrupts.
+/*
+*+
+*  Name:
+*     SOCK_GHBN
 
-     Authors:
-      B.D.Kelly (REVAD::BDK)
-     History:
-      06.05.1994: original (REVAD::BDK)
+*  Purpose:
+*     Get host details by name 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*      Perform repeated gethostbyname to allow for signal interrupts.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     06-MAY-1994 (REVAD::BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -259,7 +335,6 @@ int *status                 /* global status (given and returned) */
 }
 
 
-/*+  SOCK_GPN - get peer details */
 
 void sock_gpn
 (
@@ -269,13 +344,33 @@ struct sockaddr_in *peer, /* structure for peer details (returned) */
 int *status            /* global status (given and returned) */
 )
 
-/*   Method:
-       Perform repeated getpeername to allow for signal interrupts.
+/*
+*+
+*  Name:
+*     SOCK_GPN
 
-     Authors:
-      B.D.Kelly (REVAD::BDK)
-     History:
-      06.05.1994: original (REVAD::BDK)
+*  Purpose:
+*     Get peer details 
+
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*      Perform repeated getpeername to allow for signal interrupts.
+
+*  Authors:
+*     B.D.Kelly (REVAD::BDK)
+*     {enter_new_authors_here}
+
+*  History:
+*     06-MAY-1994 (REVAD::BDK):
+*        Original
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -307,7 +402,6 @@ int *status            /* global status (given and returned) */
 }
 
 
-/*+  SOCK_READ - Read a complete message from a socket */
 
 void sock_read
 (
@@ -317,18 +411,39 @@ char *buffer,          /* Buffer to receive the data (returned) */
 int *status            /* global status (given and returned) */
 )
 
-/*   Method:
-       Perform repeated reads on a socket in order to completely input a
-       block of data of a specified size
+/*
+*+
+*  Name:
+*     SOCK_READ
 
-     Authors:
-       Bernard V. McNally (bmc@roe.ac.uk)
+*  Purpose:
+*     Read a complete message from a socket 
 
-     History:
-      1993-03-08 : Original version (bmc@roe.ac.uk)
-      09.06.1993: adapted from GATEWAY for tranchan (REVAD::BDK)
-      16Mar 1994: adapted for msp (BDK)
-      12Apr 1994: make the function static (BDK)
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*      Perform repeated reads on a socket in order to completely input a
+*      block of data of a specified size
+
+*  Authors:
+*      Bernard V. McNally (bmc@roe.ac.uk)
+*     {enter_new_authors_here}
+
+*  History:
+*     1993-03-08 : Original version (bmc@roe.ac.uk)
+*     09-JUN-1993 (REVAD::BDK):
+*        Adapted from GATEWAY for tranchan
+*     16-MAR-1994 (BDK):
+*        Adapted for msp
+*     12-APR-1994 (BDK):
+*        Make the function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
@@ -371,7 +486,6 @@ int *status            /* global status (given and returned) */
 }
 
 
-/*+  SOCK_WRITE - Write a complete message to a socket */
 
 void sock_write
 (
@@ -381,18 +495,39 @@ char *buffer,         /* Buffer containing the data (returned) */
 int *status           /* global status (given and returned) */
 )
 
-/*   Method:
-       Perform repeated writes on a socket in order to completely output
-       a block of data of a specified size
+/*
+*+
+*  Name:
+*     SOCK_WRITE
 
-     Authors:
-       Bernard V. McNally (bmc@roe.ac.uk)
+*  Purpose:
+*     Write a complete message to a socket 
 
-     History:
-      1993-03-08 : Original version (bmc@roe.ac.uk)
-      09.06.1993: adapted from GATEWAY for tranchan (REVAD::BDK)
-      16Mar 1994: adapted for msp (BDK)
-      12Apr 1994: make the function static (BDK)
+*  Language:
+*     Starlink C
+
+*  Algorithm:
+*      Perform repeated writes on a socket in order to completely output
+*      a block of data of a specified size
+
+*  Authors:
+*      Bernard V. McNally (bmc@roe.ac.uk)
+*     {enter_new_authors_here}
+
+*  History:
+*     1993-03-08 : Original version (bmc@roe.ac.uk)
+*     09-JUN-1993 (REVAD::BDK):
+*        Adapted from GATEWAY for tranchan
+*     16-MAR-1994 (BDK):
+*        Adapted for msp
+*     12-APR-1994 (BDK):
+*        Make the function static
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 {
