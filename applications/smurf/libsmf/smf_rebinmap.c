@@ -13,14 +13,17 @@
 *     C function
 
 *  Invocation:
-*     smf_rebinmap( Grp *igrp, int size, AstFrameSet *outframeset,
+*     smf_rebinmap( smfData *data, int index, int size, 
+*                    AstFrameSet *outframeset,
 *                   int *lbnd_out, int *ubnd_out, 
 *                   double *map, double *variance, double *weights,
 *         	    int *status );
 
 *  Arguments:
-*     igrp = Grp* (Given)
-*        Group of timestream NDF data files
+*     data = smfData* (Given)
+*        Pointer to smfData struct
+*     index = int (Given)
+*        Index of element in igrp
 *     size = int (Given)
 *        Number of elements in igrp
 *     outframeset = AstFrameSet* (Given)
