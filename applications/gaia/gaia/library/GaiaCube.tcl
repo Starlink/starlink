@@ -64,12 +64,6 @@ itcl::class gaia::GaiaCube {
    #  ------------
    constructor {args} {
 
-      #  Enable devel code.
-      global env
-      if { [info exists env(GAIA_DEVEL)] } {
-         set spectrum_ {}
-      }
-
       #  Evaluate any options [incr Tk].
       eval itk_initialize $args
 
@@ -508,14 +502,12 @@ itcl::class gaia::GaiaCube {
       }
 
       #  Close spectrum plot.
-      if { [info exists spectrum_] } {
-         if { $spectrum_ != {} && [winfo exists $spectrum_] } {
-            $spectrum_ close
-            remove_spectral_bindings_
-         }
-         if { $position_mark_ != {} } {
-            $itk_option(-canvas) delete $position_mark_
-         }
+      if { $spectrum_ != {} && [winfo exists $spectrum_] } {
+         $spectrum_ close
+         remove_spectral_bindings_
+      }
+      if { $position_mark_ != {} } {
+         $itk_option(-canvas) delete $position_mark_
       }
    }
 
@@ -527,16 +519,14 @@ itcl::class gaia::GaiaCube {
    public method close {} {
       stop_
       wm withdraw $w_
-      if { [info exists spectrum_] } {
-         if { $spectrum_ != {} && [winfo exists $spectrum_] } {
-            $spectrum_ close
-            remove_spectral_bindings_
-         }
-         if { $position_mark_ != {} } {
-            $itk_option(-canvas) delete $position_mark_
-         }
-         set position_mark_ {}
+      if { $spectrum_ != {} && [winfo exists $spectrum_] } {
+         $spectrum_ close
+         remove_spectral_bindings_
       }
+      if { $position_mark_ != {} } {
+         $itk_option(-canvas) delete $position_mark_
+      }
+      set position_mark_ {}
    }
 
    #  Open the chosen file as a cube.
@@ -657,100 +647,97 @@ itcl::class gaia::GaiaCube {
    #  image NDF is displayed, otherwise just the NDF image data is updated.
    protected method set_display_plane_ { newvalue {regen 0} } {
 
-      if { $newvalue != $plane_ && $ndfname_ != {} } {
-         if { $newvalue >= $plane_max_ } {
-            set plane_ $plane_max_
-         } elseif { $newvalue <= $plane_min_ } {
-            set plane_ $plane_min_
-         } else {
-            set plane_ $newvalue
+      #  Do nothing, if the plane remains the same.
+      if { $newvalue == $plane_ || $ndfname_ == {} } {
+         return
+      }
+
+      if { $newvalue >= $plane_max_ } {
+         set plane_ $plane_max_
+      } elseif { $newvalue <= $plane_min_ } {
+         set plane_ $plane_min_
+      } else {
+         set plane_ $newvalue
+      }
+
+      #  If regenerating create the dummy NDF.
+      if { $regen } {
+         
+         #  Set name of the image displayed image section.
+         set oldname $section_name_
+         set section_name_ "GaiaCubeSection[incr count_].sdf"
+
+         #  And create the dummy image NDF. Will have axis removed from
+         #  the WCS and be the size and type of cube in other axes.
+         set imageaccessor [$cubeaccessor_ createimage $section_name_ $axis_]
+            
+         #  Map in the data component to initialise it. Use BAD
+         #  to avoid NDF bad flag from being set false.
+         $imageaccessor map "WRITE/BAD"
+         
+         #  Close before it can be displayed by the rtdimage.
+         $imageaccessor close
+         
+         #  Display this for the first time.
+         display_ $section_name_ 0
+         
+         #  Now delete old image slice (waited until released).
+         if { $oldname != {} } {
+            catch {::file delete $oldname} msg
+            if { $msg != {} } {
+               puts stderr \
+                  "WARNING: Failed to delete old image section: $msg"
+            }
          }
-
-         #  Non-devel display of slice, use simple NDF sections.
-         if { ![info exists spectrum_] } {
-            display_current_section_
-         } else {
-            if { $regen } {
-
-               #  Set name of the image displayed image section.
-               set oldname $section_name_
-               set section_name_ "GaiaCubeSection[incr count_].sdf"
-
-               #  And create the dummy image NDF. Will have axis removed from
-               #  the WCS and be the size and type of cube in other axes.
-               set imageaccessor [$cubeaccessor_ createimage \
-                                      $section_name_ $axis_]
-
-               #  Map in the data component to initialise it. Use BAD
-               #  to avoid NDF bad flag from being set false.
-               $imageaccessor map "WRITE/BAD"
-
-               #  Close before it can be displayed by the rtdimage.
-               $imageaccessor close
-
-               #  Display this for the first time.
-               display_ $section_name_ 0
-
-               #  Now delete old image slice (waited until released).
-               if { $oldname != {} } {
-                  catch {::file delete $oldname} msg
-                  if { $msg != {} } {
-                     puts stderr "WARNING: Failed to delete old image section: $msg"
-                  }
-               }
-
-            }
-
-            #  Now copy this plane from the cube and update the image.
-            #  Correct plane to grid indices.
-            if { $axis_ == 1 } {
-               set zo [lindex $bounds_ 0]
-            } elseif { $axis_ == 2 } {
-               set zo [lindex $bounds_ 2]
-            } else {
-               set zo [lindex $bounds_ 4]
-            }
-            set zp [expr round($plane_+1-$zo)]
-
-            #  Access the image data for this plane and replace 
-            #  the displayed copy.
-            lassign [$cubeaccessor_ getimage $axis_ $zp 1] adr
-            lassign [$cubeaccessor_ getinfo $adr] realadr nel type
-            $itk_option(-rtdimage) updateimagedata $realadr
-
-            #  If regenerating bring autocuts etc. into sync.
-            if { $regen } {
-               $itk_option(-rtdimage) autocut -percent 98
-            }
-
-            #  Set the object description of this slice to include the
-            #  cube slice.
-            $itk_option(-rtdimage) object "[slice_display_name_] ($object_)"
-            $rtdctrl_info_ updateValues
-
-            # Release memory from last time and save pointer.
-            if { $last_slice_adr_ != 0 } {
-               $cubeaccessor_ release $last_slice_adr_
-            }
-            set last_slice_adr_ $adr
-
-         }
-
-         set coord [get_coord_ $plane_ 1 0]
-         $itk_component(indexlabel) configure -value $coord
-
-         #  Make sure position show in slide matches this (note feedback is
-         #  avoided as $newvalue == $plane_).
-         $itk_component(index) configure -value $plane_
-
-         #  Move spectral reference position.
-         if { [info exists spectrum_] } {
-            if { $spectrum_ != {} } {
-               set coord [get_coord_ $plane_ 0 0]
-               if { $coord != {} } {
-                  $spectrum_ set_ref_coord $coord
-               }
-            }
+         
+      }
+      
+      #  Now copy this plane from the cube and update the image.
+      #  Correct plane to grid indices.
+      if { $axis_ == 1 } {
+         set zo [lindex $bounds_ 0]
+      } elseif { $axis_ == 2 } {
+         set zo [lindex $bounds_ 2]
+      } else {
+         set zo [lindex $bounds_ 4]
+      }
+      set zp [expr round($plane_+1-$zo)]
+      
+      #  Access the image data for this plane and replace 
+      #  the displayed copy.
+      lassign [$cubeaccessor_ getimage $axis_ $zp 1] adr
+      lassign [$cubeaccessor_ getinfo $adr] realadr nel type
+      $itk_option(-rtdimage) updateimagedata $realadr
+      
+      #  If regenerating bring autocuts etc. into sync.
+      if { $regen } {
+         $itk_option(-rtdimage) autocut -percent 98
+      }
+      
+      #  Set the object description of this slice to include the
+      #  cube slice.
+      $itk_option(-rtdimage) object "[slice_display_name_] ($object_)"
+      $rtdctrl_info_ updateValues
+      
+      # Release memory from last time and save pointer.
+      if { $last_slice_adr_ != 0 } {
+         $cubeaccessor_ release $last_slice_adr_
+      }
+      set last_slice_adr_ $adr
+      
+      #  Update the displayed coordinate.
+      set coord [get_coord_ $plane_ 1 0]
+      $itk_component(indexlabel) configure -value $coord
+      
+      #  Make sure position show in slide matches this (note feedback is
+      #  avoided as $newvalue != $plane_).
+      $itk_component(index) configure -value $plane_
+      
+      #  Move spectral reference position.
+      if { $spectrum_ != {} } {
+         set coord [get_coord_ $plane_ 0 0]
+         if { $coord != {} } {
+            $spectrum_ set_ref_coord $coord
          }
       }
    }
@@ -766,19 +753,6 @@ itcl::class gaia::GaiaCube {
          set section "(,,${plane_}${close_section_}"
       }
       return ${itk_option(-cube)}${section}
-   }
-
-   #  Display the current NDF section and release the memory slice. 
-   #  OLD method, do be removed.
-   protected method display_current_section_ {} {
-      if { $axis_ == 1 } {
-         set section "($plane_,,$close_section_"
-      } elseif { $axis_ == 2 } {
-         set section "(,$plane_,$close_section_"
-      } else {
-         set section "(,,${plane_}${close_section_}"
-      }
-      display_ ${ndfname_}$section
    }
 
    #  Display an image.
@@ -837,14 +811,11 @@ itcl::class gaia::GaiaCube {
 
    #  Stop the animation. 
    protected method stop_ {} {
-
       if { $afterId_ != {} } {
          after cancel $afterId_
          set afterId_ {}
-         if { [info exists spectrum_] } {
-            #  DEBUG.
-            puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
-         }
+         # DEBUG
+         puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
       }
    }
 
@@ -1058,73 +1029,71 @@ itcl::class gaia::GaiaCube {
       } else {
          #  Display in the spectrum_plot. Note show short help in this window
          #  to save real estate.
-         if { [info exists spectrum_] } {
-            if { $spectrum_ == {} } {
-               set spectrum_ [GaiaSpectralPlot $w_.specplot \
-                                 -number $itk_option(-number) \
-                                 -shorthelpwin [scope $short_help_win_]]
-
-               #  Make this a transient of main window, not this one.
-               wm transient $spectrum_ $itk_option(-gaia)
-
-               #  Display in main window as well.
-               $spectrum_ configure -canvas $itk_option(-canvas)
-
-               #  Create the marker for the image position.
+         if { $spectrum_ == {} } {
+            set spectrum_ [GaiaSpectralPlot $w_.specplot \
+                              -number $itk_option(-number) \
+                              -shorthelpwin [scope $short_help_win_]]
+            
+            #  Make this a transient of main window, not this one.
+            wm transient $spectrum_ $itk_option(-gaia)
+            
+            #  Display in main window as well.
+            $spectrum_ configure -canvas $itk_option(-canvas)
+            
+            #  Create the marker for the image position.
+            create_position_marker_ $ccx $ccy
+         } else {
+            #  Re-display if withdrawn.
+            if { [wm state $spectrum_] == "withdrawn" } {
+               $spectrum_ open
+            }
+            
+            #  Re-create the marker for the image position.
+            if { $position_mark_ == {} } {
                create_position_marker_ $ccx $ccy
-            } else {
-               #  Re-display if withdrawn.
-               if { [wm state $spectrum_] == "withdrawn" } {
-                  $spectrum_ open
-               }
-
-               #  Re-create the marker for the image position.
-               if { $position_mark_ == {} } {
-                  create_position_marker_ $ccx $ccy
-               }
             }
-
-            #  Correct collapse bounds to grid indices.
-            if { $axis_ == 1 } {
-               set zo [lindex $bounds_ 0]
-            } elseif { $axis_ == 2 } {
-               set zo [lindex $bounds_ 2]
-            } else {
-               set zo [lindex $bounds_ 4]
+         }
+         
+         #  Correct collapse bounds to grid indices.
+         if { $axis_ == 1 } {
+            set zo [lindex $bounds_ 0]
+         } elseif { $axis_ == 2 } {
+            set zo [lindex $bounds_ 2]
+         } else {
+            set zo [lindex $bounds_ 4]
+         }
+         set alow [expr round($lower_collapse_bound_+1-$zo)]
+         set ahigh [expr round($upper_collapse_bound_+1-$zo)]
+         
+         #  Make sure ix and iy are integers (zoomed images).
+         set ix [expr round($iix)]
+         set iy [expr round($iiy)]
+         
+         #  Move position marker on the image.
+         $itk_option(-canvas) coords $position_mark_ $ccx $ccy
+         
+         #  Also autoscale when single click, so that we are not fixed for
+         #  all time.
+         if { $itk_option(-autoscale) || $action == "localstart" } {
+            busy {
+               $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh \
+                  $ix $iy 1 $ccx $ccy
             }
-            set alow [expr round($lower_collapse_bound_+1-$zo)]
-            set ahigh [expr round($upper_collapse_bound_+1-$zo)]
-
-            #  Make sure ix and iy are integers (zoomed images).
-            set ix [expr round($iix)]
-            set iy [expr round($iiy)]
-
-            #  Move position marker on the image.
-            $itk_option(-canvas) coords $position_mark_ $ccx $ccy
-
-            #  Also autoscale when single click, so that we are not fixed for
-            #  all time.
-            if { $itk_option(-autoscale) || $action == "localstart" } {
-               busy {
-                  $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh \
-                     $ix $iy 1 $ccx $ccy
-               }
-
-               #  Set first-time reference position.
-               set coord [get_coord_ $plane_ 0 0]
-               if { $coord != {} } {
-                  update; # Force redraw to get underlying plot right.
-                  $spectrum_ set_ref_coord $coord
-               }
-            } else {
-               busy {
-                  $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh \
-                     $ix $iy 0
-               }
+            
+            #  Set first-time reference position.
+            set coord [get_coord_ $plane_ 0 0]
+            if { $coord != {} } {
+               update; # Force redraw to get underlying plot right.
+               $spectrum_ set_ref_coord $coord
+            }
+         } else {
+            busy {
+               $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh \
+                  $ix $iy 0
             }
          }
       }
-
+      
       #  XXX Checker code for region spectra.
       #       if { $ardspectra_ == {} } {
       #          global gaia_dir
@@ -1253,9 +1222,8 @@ itcl::class gaia::GaiaCube {
    #  Check for cubes setting of GAIA.
    protected variable check_for_cubes_ 1
 
-   #  The spectrum plot item, XXX variable not initialised unless in
-   #  development mode.
-   protected variable spectrum_
+   #  The spectrum plot item.
+   protected variable spectrum_ {}
 
    #  The position marker that corresponds to the spectrum.
    protected variable position_mark_ {}
