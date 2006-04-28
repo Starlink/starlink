@@ -175,7 +175,7 @@ Starlink applications, and a number of other common data formats.
 </component>
 
 <component id="cupid" support="S">
-  <version>0.0-12</version>
+  <version>0.0-13</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
@@ -451,7 +451,7 @@ proposal, or before or during an observing run.
 </component>
 
 <component id="esp" support="S">
-  <version>0.11</version>
+  <version>0.11-1</version>
   <path>applications/esp</path>
   <description>Extended Surface Photometry</description>
   <abstract><p>ESP (Extended Surface Photometry) is a package of
