@@ -179,10 +179,12 @@ sub _convert_header {
       # fix up type of module
       my @type_of_module = @{$prologue->type_of_module};
       if (!@type_of_module) {
-	if ($file =~ /_CMN$/i) {
-	  $prologue->type_of_module( "COMMON BLOCK" );
-	} elsif ($file =~ /_(ERR|PAR|SYS)$/i ) {
-	  $prologue->type_of_module( "FORTRAN INCLUDE" );
+	if (defined $file) {
+	  if ($file =~ /_CMN$/i) {
+	    $prologue->type_of_module( "COMMON BLOCK" );
+	  } elsif ($file =~ /_(ERR|PAR|SYS)$/i ) {
+	    $prologue->type_of_module( "FORTRAN INCLUDE" );
+	  }
 	}
       }
       # stringify the prologue
