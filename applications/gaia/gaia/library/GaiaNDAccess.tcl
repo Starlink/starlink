@@ -232,7 +232,9 @@ itcl::class gaia::GaiaNDAccess {
    }
 
    #  Return the underlying information about an accessor array. This
-   #  is the real memory address, number of elements and HDS data type.
+   #  is the real memory address, number of elements, HDS data type of 
+   #  the cube data and the HDS data type of any extracted data (will
+   #  differ for FITS scaled data).
    public method getinfo {adr} {
       return [array::getinfo $adr]
    }
@@ -246,7 +248,11 @@ itcl::class gaia::GaiaNDAccess {
          error "Must map in cube data before creating an image"
       }
       set dims [getdims 1]
-      lassign [getinfo $addr_] adr nel hdstype
+
+      #  Get the underlying info. Note the cube type may not be the image type
+      #  (because of scaling of variants) so we must check what getimage will
+      #  return.
+      lassign [getinfo $addr_] adr nel hdstype fulltype
 
       set fullwcs [${type_}::getwcs $handle_]
       if { $axis == 1 } {
@@ -263,7 +269,7 @@ itcl::class gaia::GaiaNDAccess {
       set dim2 [lindex $dims [expr $axis2-1]]
       set imagewcs [gaiautils::get2dwcs $fullwcs $axis1 $axis2 $dim1 $dim2]
 
-      set newhandle [ndf::create $name $dim1 $dim2 $hdstype $imagewcs]
+      set newhandle [ndf::create $name $dim1 $dim2 $fulltype $imagewcs]
 
       #  Create a new instance to manage the new NDF.
       set accessor [uplevel \#0 GaiaNDAccess \#auto]
@@ -271,6 +277,7 @@ itcl::class gaia::GaiaNDAccess {
 
       return $accessor
    }
+
    #  Configuration options: (public variables)
    #  ----------------------
 

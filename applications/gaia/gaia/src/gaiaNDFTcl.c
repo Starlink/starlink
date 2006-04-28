@@ -294,7 +294,7 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
                 /* Construct result */
                 if ( result == TCL_OK ) {
                     arrayInfo = gaiaArrayCreateInfo( dataPtr, type, el, 
-                                                     0, 0, 0 );
+                                                     0, 0, 0, 1.0, 0.0, 0 );
                     Tcl_SetObjResult( interp,Tcl_NewLongObj((long)arrayInfo));
                 }
                 else {

@@ -73,7 +73,7 @@ int Array_Init( Tcl_Interp *interp )
  *   8&9)   grid indices of the other two dimensions (increasing order), these
  *          define the "position" of the line
  *   10)    a boolean indicating whether the extracted data should be
- *          registered with CNF so that it can be released by CNF 
+ *          registered with CNF so that it can be released by CNF
  *          (NDF's will require this).
  *
  * The result is the memory address of an ARRAYinfo struct.
@@ -89,6 +89,7 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
     int index1;
     int index2;
     int nel = 0;
+    int outtype;
     long adr;
     void *outPtr;
 
@@ -171,10 +172,12 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
 
     /* Extraction */
     gaiaArraySpectrumFromCube( arrayInfo, dims, axis, arange,
-                               index1, index2, cnfMalloc, &outPtr, &nel );
+                               index1, index2, cnfMalloc, &outPtr, &nel,
+                               &outtype );
 
     /* Export results as an ARRAYinfo struct */
-    arrayInfo = gaiaArrayCreateInfo( outPtr, arrayInfo->type, nel, 0, 0, 0 );
+    arrayInfo = gaiaArrayCreateInfo( outPtr, outtype, nel, 0, 0, 0, 1.0, 0.0,
+                                     cnfMalloc );
     Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) arrayInfo ) );
 
     return TCL_OK;
@@ -258,7 +261,7 @@ static int gaiaArrayImage( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Extraction */
-    gaiaArrayImageFromCube( cubeArrayInfo, dims, axis, index, 
+    gaiaArrayImageFromCube( cubeArrayInfo, dims, axis, index,
                             &imageArrayInfo, cnfMalloc );
 
     /* Export result */
@@ -304,17 +307,19 @@ static int gaiaArrayRelease( ClientData clientData, Tcl_Interp *interp,
 
 /**
  * Return basic information about an ARRAYinfo. These are:
- * 
+ *
  *   address of memory
- *   HDS type 
+ *   basic HDS type
  *   number of elements
+ *   full HDS type (used when scaling a variant).
  */
 static int gaiaArrayInfo( ClientData clientData, Tcl_Interp *interp,
                           int objc, Tcl_Obj *CONST objv[] )
 {
     ARRAYinfo *info;
     Tcl_Obj *resultObj;
-    Tcl_Obj *type;
+    Tcl_Obj *basictype;
+    Tcl_Obj *fulltype;
     long adr;
 
     /* Check arguments */
@@ -332,11 +337,18 @@ static int gaiaArrayInfo( ClientData clientData, Tcl_Interp *interp,
     info = (ARRAYinfo *) adr;
 
     resultObj = Tcl_GetObjResult( interp );
+
     Tcl_ListObjAppendElement( interp, resultObj,
                               Tcl_NewLongObj( (long) info->ptr ) );
     Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewIntObj( info->el ) );
-    type = Tcl_NewStringObj( gaiaArrayTypeToHDS( info->type ), -1 );
-    Tcl_ListObjAppendElement(interp, resultObj, type );
-                             
+
+    basictype = Tcl_NewStringObj( gaiaArrayTypeToHDS( info->type ), -1 );
+    Tcl_ListObjAppendElement(interp, resultObj, basictype );
+
+    fulltype = Tcl_NewStringObj( gaiaArrayFullTypeToHDS( info->type,
+                                                         info->bscale, 
+                                                         info->bzero ), -1 );
+    Tcl_ListObjAppendElement(interp, resultObj, fulltype );
+
     return TCL_OK;
 }

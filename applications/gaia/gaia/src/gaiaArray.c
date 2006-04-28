@@ -50,8 +50,10 @@ static char *hdstypes[] = {
 };
 
 /* Local prototypes */
-static void gaiaArrayDataNormalise( void *inPtr, int type, int nel, 
-                                    int isfits, int haveblank, int inBlank );
+static void gaiaArrayDataNormalise( void *inPtr, int intype, int nel,
+                                    int isfits, int haveblank, int inBlank,
+                                    double bscale, double bzero, int cnfmalloc,
+                                    void **outPtr, int *outtype );
 
 /**
  * Create an ARRAYinfo structure for a data array. If blank isn't set for your
@@ -59,7 +61,8 @@ static void gaiaArrayDataNormalise( void *inPtr, int type, int nel,
  * point values, so you should set haveblank 1 for those.
  */
 ARRAYinfo *gaiaArrayCreateInfo( void *ptr, int type, long el, int isfits,
-                                int haveblank, int blank )
+                                int haveblank, int blank, double bscale,
+                                double bzero, int cnfmalloc )
 {
     ARRAYinfo *info = (ARRAYinfo *) malloc( sizeof( ARRAYinfo ) );
     info->ptr = ptr;
@@ -68,6 +71,9 @@ ARRAYinfo *gaiaArrayCreateInfo( void *ptr, int type, long el, int isfits,
     info->isfits = isfits;
     info->haveblank = haveblank;
     info->blank = blank;
+    info->bscale = bscale;
+    info->bzero = bzero;
+    info->cnfmalloc = cnfmalloc;
 
     return info;
 }
@@ -174,6 +180,41 @@ char const *gaiaArrayTypeToHDS( int type )
 }
 
 /**
+ * Convert a local enum type into an HDS string type that represents the 
+ * type that would be used to return an image or spectrum (different for
+ * scaled integer FITS data).
+ */
+char const *gaiaArrayFullTypeToHDS( int intype, double bscale, double bzero )
+{
+    int type = gaiaArrayScaledType( intype, bscale, bzero );
+    if ( type >= 0 && type < 7 ) {
+        return hdstypes[type];
+    }
+    return "_UBYTE";
+}
+
+/**
+ * Convert a local enum type into a type that represents the type that would
+ * be used to return an image or spectrum (different for scaled integer FITS
+ * data).
+ */
+int gaiaArrayScaledType( int intype, double bscale, double bzero )
+{
+    int outtype = intype;
+    int scaled = ( intype < HDS_REAL && ( bscale != 1.0 || bzero != 0.0 ) );
+
+    if ( scaled ) {
+        if ( intype == HDS_INTEGER ) {
+            outtype = HDS_DOUBLE;
+        }
+        else {
+            outtype = HDS_REAL;
+        }
+    }
+    return outtype;
+}
+
+/**
  *  Return the sizeof() of a known type.
  */
 static size_t gaiaArraySizeOf( int type )
@@ -274,11 +315,9 @@ void gaiaArrayToDouble( ARRAYinfo *info, double badValue, double *outPtr )
  *     extract a 2D image section and return the data in that section
  *     in an ARRAYinfo structure. The dataType should be one of the
  *     enumerations HDS_xxxx defined in gaiaArray.h (these correspond to the
- *     HDS data types). No changes to the underlying data representation are
- *     made (no byte swapping or bad value transformations).
- *
- *     If an existing ARRAYinfo structure is given to contain the extracted
- *     image it should be the correct size.
+ *     HDS data types). The underlying data will be changed if byte-swapping
+ *     if needed and amy be converted into a floating point type, if the
+ *     data are FITS and have non-trivial bscale and bzero values.
  *
  *  Arguments:
  *     cubeinfo
@@ -291,11 +330,10 @@ void gaiaArrayToDouble( ARRAYinfo *info, double badValue, double *outPtr )
  *     index
  *         The index of the plane that will be extracted (along axis "axis").
  *     imageinfo
- *         a pointer to a pointer of either an existing ARRAYinfo structure
- *         or NULL. If NULL the necessary memory will be allocated using
- *         malloc or cnfMalloc as determined by the final argument. Freeing it
- *         is the responsibility of the caller. If non-NULL then the data
- *         of this structure will be overwritten.
+ *         a pointer to a pointer to be assigned to a new ARRAYinfo structure.
+ *         The necessary memory will be allocated using malloc or cnfMalloc as
+ *         determined by the final argument. Freeing it is the responsibility
+ *         of the caller.
  *     cnfmalloc
  *         Whether to use cnfMalloc to allocate the image data. Otherwise
  *         malloc will be used.
@@ -303,21 +341,16 @@ void gaiaArrayToDouble( ARRAYinfo *info, double badValue, double *outPtr )
 void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
                              int index, ARRAYinfo **imageinfo, int cnfmalloc )
 {
-    void *inPtr = cubeinfo->ptr;
+    int normtype;
     int type = cubeinfo->type;
-    void *outPtr;
     size_t nel;
-
-    if ( *imageinfo != NULL ) {
-        outPtr = (*imageinfo)->ptr;
-    }
-    else {
-        outPtr = NULL;
-    }
+    void *inPtr = cubeinfo->ptr;
+    void *normPtr;
+    void *outPtr;
 
     if ( axis == 2 ) {
 
-        /* If we're losing the last dimension, then this is just a memcpy. */
+        /* If we're losing the last dimension, then this is just a memcpy */
         char *ptr;
         size_t length;
         size_t offset;
@@ -325,13 +358,11 @@ void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
         nel = (size_t) dims[0] * (size_t) dims[1];
         length = nel * gaiaArraySizeOf( type );
 
-        if ( outPtr == NULL ) {
-            if ( cnfmalloc == 1 ) {
-                outPtr = cnfMalloc( length );
-            }
-            else {
-                outPtr = malloc( length );
-            }
+        if ( cnfmalloc == 1 ) {
+            outPtr = cnfMalloc( length );
+        }
+        else {
+            outPtr = malloc( length );
         }
 
         /* Get the offset into cube of first pixel (in bytes). */
@@ -370,14 +401,12 @@ void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
         nel = (size_t) dims[axis1] * (size_t) dims[axis2];
         length = nel * gaiaArraySizeOf( type );;
 
-        /* Allocate the memory, if needed. */
-        if ( outPtr == NULL ) {
-            if ( cnfmalloc == 1 ) {
-                outPtr = cnfMalloc( length );
-            }
-            else {
-                outPtr = malloc( length );
-            }
+        /* Allocate the memory */
+        if ( cnfmalloc == 1 ) {
+            outPtr = cnfMalloc( length );
+        }
+        else {
+            outPtr = malloc( length );
         }
 
         /* Get the strides for stepping around dimensions */
@@ -435,16 +464,18 @@ void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
     }
 #undef EXTRACT_AND_COPY
 
-    /* Create the ARRAYinfo structure, if needed */
-    if ( *imageinfo == NULL ) {
-        *imageinfo = gaiaArrayCreateInfo( outPtr, cubeinfo->type, nel, 
-                                          0, 0, 0 );
-    }
 
-    /* Normalise the data to remove byte-swapping and unrecognised 
-     * BAD values */
-    gaiaArrayDataNormalise( outPtr, type, nel, cubeinfo->isfits, 
-                            cubeinfo->haveblank, cubeinfo->blank );
+    /* Normalise the data to remove byte-swapping and unrecognised
+     * BAD values, and convert from a scaled variant */
+    gaiaArrayDataNormalise( outPtr, type, nel, cubeinfo->isfits,
+                            cubeinfo->haveblank, cubeinfo->blank,
+                            cubeinfo->bscale, cubeinfo->bzero,
+                            cnfmalloc, &normPtr, &normtype );
+
+    /* Create the ARRAYinfo structure, note not FITS and BSCALE and BZERO are
+     * no longer used. */
+    *imageinfo = gaiaArrayCreateInfo( normPtr, normtype, nel,
+                                      0, 0, 0, 1.0, 0.0, cnfmalloc );
 }
 
 /**
@@ -482,6 +513,9 @@ void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
  *         responsibility of the caller, or you can call gaiaArrayFree.
  *     nel
  *         the number of elements extracted
+ *     outtype 
+ *         the type of the returned data, may be different for scaled FITS
+ *         integer types.
  *
  *  Notes:
  *     If the spectrum isn't within the array bounds then an empty spectrum
@@ -489,14 +523,16 @@ void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
  */
 void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
                                 int arange[2], int index1, int index2,
-                                int cnfmalloc, void **outPtr, int *nel )
+                                int cnfmalloc, void **outPtr, int *nel,
+                                int *outtype )
 {
     int lower;
     int outside = 0;
     int upper;
     size_t length;
     void *inPtr = info->ptr;
-    int type = info->type;
+    int intype = info->type;
+    void *normPtr;
 
     /* Allocate memory for spectrum. Only need "arange" spanning values when
      * that is set. */
@@ -510,7 +546,7 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
         upper = MIN( dims[axis], MAX( arange[1], arange[0] ) ) + 1;
         *nel = upper - lower;
     }
-    length = (*nel) * gaiaArraySizeOf( type );
+    length = (*nel) * gaiaArraySizeOf( intype );
     if ( cnfmalloc == 1 ) {
         *outPtr = cnfMalloc( length );
     }
@@ -561,7 +597,7 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
         offset += lower;
 
         /* Set the address of first pixel, remember to include sizeof(type). */
-        ptr = ((char *) inPtr) + ( offset * gaiaArraySizeOf( type ) );
+        ptr = ((char *) inPtr) + ( offset * gaiaArraySizeOf( intype ) );
 
         /* And copy the memory */
         memcpy( *outPtr, ptr, length );
@@ -605,7 +641,7 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
         toPtr[k] = fromPtr[offset];                 \
     }                                               \
 }
-        switch ( type )
+        switch ( intype )
         {
             case HDS_DOUBLE:
                 EXTRACT_AND_COPY(double)
@@ -632,10 +668,12 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
     }
 #undef EXTRACT_AND_COPY
 
-    /* Normalise the data to remove byte-swapping and unrecognised 
-     * BAD values */
-    gaiaArrayDataNormalise( *outPtr, type, *nel, info->isfits, 
-                            info->haveblank, info->blank );
+    /* Normalise the data to remove byte-swapping and unrecognised
+     * BAD values transform scaled FITS integer data. */
+    gaiaArrayDataNormalise( *outPtr, intype, *nel, info->isfits,
+                            info->haveblank, info->blank, info->bscale,
+                            info->bzero, cnfmalloc, &normPtr, outtype );
+    *outPtr = normPtr;
 }
 
 /**
@@ -666,7 +704,7 @@ void gaiaArrayGetStrides( int ndims, int dims[], int strides[] )
 }
 
 /**
- * Free data previously allocated by these routines and associated with an 
+ * Free data previously allocated by these routines and associated with an
  * ARRAYinfo structure.
  */
 void gaiaArrayFree( ARRAYinfo *info, int cnfMalloc )
@@ -689,30 +727,28 @@ void gaiaArrayFree( ARRAYinfo *info, int cnfMalloc )
  *  Normalise an array if this machine does not have native FITS ordering and
  *  the data is in FITS format. Also transform FITS bad values into HDS ones.
  */
-void gaiaArrayNormalise( ARRAYinfo *info )
-{
-    gaiaArrayDataNormalise( info->ptr, info->type, info->el, 
-                            info->isfits, info->haveblank, info->blank );
-}
- 
-/**
- *  Normalise an array if this machine does not have native FITS ordering and
- *  the data is in FITS format. Also transform FITS bad values into HDS ones.
- */
-static void gaiaArrayDataNormalise( void *inPtr, int type, int nel, 
-                                    int isfits, int haveblank, int inBlank )
+static void gaiaArrayDataNormalise( void *inPtr, int intype, int nel,
+                                    int isfits, int haveblank, int inBlank,
+                                    double bscale, double bzero, int cnfmalloc,
+                                    void **outPtr, int *outtype )
 {
     int i;
-    
-    /*  Only applies to FITS data */
-    if ( ! isfits ) return;
+    int scaled;
+    long length;
 
+    /*  Only applies to FITS data */
+    if ( ! isfits ) {
+        *outPtr = inPtr;
+        *outtype = intype;
+        return;
+    }
     /* Byte swap first, note we do this using macros that require integers,
-     * so cannot merge with bad checking. */
+     * so cannot merge with bad checking. Also any scaling must happen with
+     * bad checking. */
 #if BIGENDIAN
     /* Nothing to do */
 #else
-    switch ( type )
+    switch ( intype )
     {
         case HDS_DOUBLE: {
             double *ptr = (double *)inPtr;
@@ -758,10 +794,26 @@ static void gaiaArrayDataNormalise( void *inPtr, int type, int nel,
     }
 #endif
 
-    if ( isfits ) return;
+    /* If the data is to be scaled to a floating type, then allocate the
+     * necessary memory. */
+    *outtype = gaiaArrayScaledType( intype, bscale, bzero );
+    scaled = ( intype != (*outtype) );
+    if ( scaled ) {
+        length = nel * gaiaArraySizeOf( *outtype );
 
-    /* BAD value transformation. */
-    switch ( type )
+        if ( cnfmalloc == 1 ) {
+            *outPtr = cnfMalloc( length );
+        }
+        else {
+            *outPtr = malloc( length );
+        }
+    }
+    else {
+        *outPtr = inPtr;
+    }
+
+    /* BAD value transformation and variant scaling for integer types */
+    switch ( intype )
     {
         case HDS_DOUBLE: {
             double *ptr = (double *)inPtr;
@@ -792,6 +844,18 @@ static void gaiaArrayDataNormalise( void *inPtr, int type, int nel,
                     }
                 }
             }
+            if ( scaled ) {
+                int *ip = (int *)inPtr;
+                double *op = (double *)*outPtr;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( op[i] != VAL__BADI ) {
+                        op[i] = ip[i] * bscale + bzero;
+                    }
+                    else {
+                        op[i] = VAL__BADD;
+                    }
+                }
+            }
         }
         break;
 
@@ -802,6 +866,20 @@ static void gaiaArrayDataNormalise( void *inPtr, int type, int nel,
                 for ( i = 0; i < nel; i++ ) {
                     if ( ptr[i] == blank ) {
                         ptr[i] = VAL__BADW;
+                    }
+                }
+            }
+            if ( scaled ) {
+                short *ip = (short *)inPtr;
+                float *op = (float *)*outPtr;
+                float zero = (float) bzero;
+                float scale = (float) bscale;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ip[i] != VAL__BADW ) {
+                        op[i] = ip[i] * scale + zero;
+                    }
+                    else {
+                        op[i] = VAL__BADR;
                     }
                 }
             }
@@ -818,6 +896,20 @@ static void gaiaArrayDataNormalise( void *inPtr, int type, int nel,
                     }
                 }
             }
+            if ( scaled ) {
+                unsigned short *ip = (unsigned short *)inPtr;
+                float *op = (float *)*outPtr;
+                float zero = (float) bzero;
+                float scale = (float) bscale;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ip[i] != VAL__BADUW ) {
+                        op[i] = ip[i] * scale + zero;
+                    }
+                    else {
+                        op[i] = VAL__BADR;
+                    }
+                }
+            }
         }
         break;
 
@@ -828,6 +920,20 @@ static void gaiaArrayDataNormalise( void *inPtr, int type, int nel,
                 for ( i = 0; i < nel; i++ ) {
                     if ( ptr[i] == blank ) {
                         ptr[i] = VAL__BADB;
+                    }
+                }
+            }
+            if ( scaled ) {
+                char *ip = (char *)inPtr;
+                float *op = (float *)*outPtr;
+                float zero = (float) bzero;
+                float scale = (float) bscale;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ip[i] != VAL__BADB ) {
+                        op[i] = ip[i] * scale + zero;
+                    }
+                    else {
+                        op[i] = VAL__BADR;
                     }
                 }
             }
@@ -844,7 +950,31 @@ static void gaiaArrayDataNormalise( void *inPtr, int type, int nel,
                     }
                 }
             }
+            if ( scaled ) {
+                unsigned char *ip = (unsigned char *)inPtr;
+                float *op = (float *)*outPtr;
+                float zero = (float) bzero;
+                float scale = (float) bscale;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ip[i] != VAL__BADUB ) {
+                        op[i] = ip[i] * scale + zero;
+                    }
+                    else {
+                        op[i] = VAL__BADR;
+                    }
+                }
+            }
         }
         break;
+    }
+
+    /* Free the memory if we produced a scaled version */
+    if ( scaled ) {
+        if ( cnfmalloc ) {
+            cnfFree( inPtr );
+        }
+        else {
+            free( inPtr );
+        }
     }
 }
