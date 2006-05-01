@@ -301,11 +301,11 @@ Parse the history information and extract all the relevant years.
 
 sub years {
   my $self = shift;
-  my @history = $self->history;
+  my ($text, $histlines) = $self->history;
 
   # Extract history information
   my %history;
-  for my $line (@history) {
+  for my $line (@$histlines) {
     if ($line =~ /(\d\d\d\d)/) {  # yyyy
       $history{$1}++;
     } elsif ( $line =~ /\d+[\/\.]\d+[\/\.](\d\d)/ ) { # dd.mm.yy dd/mm/yy
