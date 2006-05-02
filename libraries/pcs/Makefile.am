@@ -41,4 +41,4 @@ libsubpar_adam_la_LIBADD = \
 	parsecon/libparsecon_convenience.la
 
 dist_starnews_DATA = pcs.news
-
+dist_pkgdata_DATA = LICENCE
