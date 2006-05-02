@@ -20,6 +20,15 @@ to use a modern prologue.
 
 =over 4
 
+=item B<-parsers>
+
+Overrides the list of parsers that will be used to attempt to parse
+the supplied prologue. Multiple C<--parsers> options can be supplied.
+
+  --parsers SGS --parsers STARLSE
+
+A corresponding C<Starlink::Prologue::Parser::> class must exist.
+
 =item B<-version>
 
 Report the version number.
@@ -45,10 +54,11 @@ use Starlink::Prologue;
 use Starlink::Prologue::Parser;
 
 # Options
-my ($help, $man, $version);
+my ($help, $man, $version, @parsers);
 my $status = GetOptions("help" => \$help,
                         "man" => \$man,
                         "version" => \$version,
+                        "parsers=s" => \@parsers,
                        );
 
 pod2usage(1) if $help;
@@ -67,7 +77,7 @@ if (@ARGV) {
   # files on command line
   for my $file (@ARGV) {
     open(my $fh, "<$file") || die "Error opening file $file for read: $!\n";
-    my ($types, $rewrite) = _convert_header( join("", <$fh>), $file );
+    my ($types, $rewrite) = _convert_header( join("", <$fh>), $file, \@parsers );
     close($fh) || die "Error closing input file $file: $!\n";
 
     if (@$types) {
@@ -100,7 +110,7 @@ if (@ARGV) {
   # try reading from pipe
   my @lines = <>;
   if (@lines) {
-    my ($types, $rewrite) = _convert_header( join("", @lines) );
+    my ($types, $rewrite) = _convert_header( join("", @lines), undef, \@parsers );
     my %types = map { $_, undef } @$types;
     print STDERR "Supplied prologue contains ", join(", ", keys %types), " prologues. Converting...\n";
     print $rewrite;
@@ -114,6 +124,7 @@ exit;
 # Given a string containing the source code, rewrite the header
 # and return the result as a string. Second argument is the filename
 # that can be used to determine Language (can be undef).
+# Third argument overrides default parsers.
 # Returns:
 #  - reference to array of strings indicating which types the
 #    prologues were (allowing the caller to skip if the prologue
@@ -123,9 +134,17 @@ exit;
 sub _convert_header {
   my $input = shift;
   my $file = shift;
+  my $parsers = shift;
 
-  # Create a parser and parse all the source code
+  # Create a parser
   my $parser = new Starlink::Prologue::Parser;
+
+  # see if we have override parsers
+  if (defined $parsers && @$parsers) {
+    $parser->parsers( @$parsers );
+  }
+
+  # Parse the source code
   my @parsed = $parser->parse_lines( split /\n/, $input );
 
   # process the lines and update unknown fields

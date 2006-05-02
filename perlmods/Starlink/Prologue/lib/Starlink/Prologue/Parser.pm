@@ -36,6 +36,8 @@ use Starlink::Prologue::Parser::ADAMSSEC;
 use Starlink::Prologue::Parser::SGS;
 use Starlink::Prologue::Parser::GNS;
 
+my @DEFAULT_PARSERS = qw/ STARLSE ADAMSSE ADAMSSEC GNS /;
+
 =head1 METHODS
 
 =head2 Constructor
@@ -56,6 +58,7 @@ sub new {
 
   my $p = bless {
 		 WORKER => undef,
+                 PARSERS => [],
 		}, $class;
 
   return $p;
@@ -67,6 +70,37 @@ sub new {
 =head2 Accessors
 
 =over 4
+
+=item B<parsers>
+
+List of parsers that will be tested, in the order in which they will
+be tried.
+
+  @types = $parser->parsers;
+  $parser->parsers( @types );
+  $parser->parsers( undef );
+
+Returns default order if the order has not been set. Default order can
+be restored by using "undef".
+
+=cut
+
+sub parsers {
+  my $self = shift;
+  if (@_) {
+    my @in = @_;
+    if (!defined $in[0]) {
+      # reset
+      @in = ();
+    }
+    @{$self->{PARSERS}} = @_;
+  }
+  if (@{$self->{PARSERS}}) {
+    return @{$self->{PARSERS}};
+  } else {
+    return @DEFAULT_PARSERS;
+  }
+}
 
 =back
 
@@ -205,10 +239,10 @@ sub push_line {
 
   } else {
     # not in a prologue, so this might be a start of prologue
-    my @classes = qw/ STARLSE ADAMSSE ADAMSSEC GNS /;
     my $match;
-    for my $c (@classes) {
+    for my $c ($self->parsers) {
       # try each class in turn
+      print "Trying $c\n";
       my $try = "Starlink::Prologue::Parser::$c";
       if ($try->prolog_start($line)) {
 	$match = $try;
