@@ -1,6 +1,6 @@
 /*
 *
-*  Module name:
+*  Name:
 *     NBSLOW.C
 
 *  Purpose:
@@ -16,22 +16,19 @@
 *     This module is split into several sections of routines, all of which are
 *     called by the high-level NBS routines in module NBS.C.
 
-*  Version date:
-*     02-Feb-90
-
 *  History:
-*     03-Feb-86 - (WFL):
+*     03-Feb-1986 (WFL):
 *        Original version.
-*     17-Jul-87 - (WFL):
+*     17-Jul-1987 (WFL):
 *        Change names of INCLUDEd files and change NULL to NIL.
-*     20-Jul-87 - (WFL):
+*     20-Jul-1987 (WFL):
 *        Add maximum length arguments to string import and export routines,
 *        plus, on import, use a user-supplied buffer. Also capitalise and
 *        ignore spaces and non-printing characters.
 *	 Remove NBS_COPY (to replace with _CHMOVE macro).
 *	 Use default extension of .NBD for definition files.
 *	 Ignore trailing blanks on global section names.
-*     21-Jul-87 - (WFL):
+*     21-Jul-1987 (WFL):
 *        Remove NBS_PRIVATE_ITEM.
 *	 Excise all mention of OTHER_SELF.
 *	 Remove the NBS_*_FIELDS routines.
@@ -39,33 +36,33 @@
 *	 add offsets and do before recursive calls. If NO, subtract
 *	 offsets and do after recursive calls. Also split the IFS_OFFSET
 *	 arg into I_OFFSET and FBS_OFFSET.
-*     06-Nov-87 - (WFL):
+*     06-Nov-1987 (WFL):
 *        Portable VMS / UNIX version. Use unix / vms / strdescr
 *	 macros as appropriate.
-*     10-Feb-88 - (WFL):
+*     10-Feb-1988 (WFL):
 *        Sort out string descriptors to VMS system services
-*     11-Feb-88 - (WFL):
+*     11-Feb-1988 (WFL):
 *        Use macros for routine names and use NBS_ prefix when
 *	 strdescr is defined, NBC_ when it is not. Also use #module to
 *	 set module name explicitly. Change strdescr to c_string.
-*     25-Mar-88 - (WFL):
+*     25-Mar-1988 (WFL):
 *        Move file header definition to NBS_TYP.H.
 *        Extra FILE_SIZE argument to NBS_WRITE_FILE and NBS_OPEN_FILE.
 *	 New NBS_OPEN_WRITE and NBS_UPDATE_FILE routines.
-*     30-Mar-88 - (WFL):
+*     30-Mar-1988 (WFL):
 *        Only use #module under VMS; under UNIX use first
 *	 character plus last ones for shared memory name.
-*     10-Apr-89 - (WFL):
+*     10-Apr-1989 (WFL):
 *        Use EXTERN rather than STATIC so that NBS and NBC
 *	 routines can be used intermingled (but not values alterable
 *	 using NBS_TUNE, since these are initialised)
-*     02-Feb-90 - (WFL):
+*     02-Feb-1990 (WFL):
 *        Add NBS_UNMAP_SECTION
-*     06-Feb-90 - (WFL):
+*     06-Feb-1990 (WFL):
 *        Account for PARENT and DATA being in unions
-*     07-Feb-90 - (WFL):
+*     07-Feb-1990 (WFL):
 *        Similarly SHAPE
-*     05-Feb-93 - (DJA):
+*     05-Feb-1993 (DJA):
 *        Added NBS_MLIST_ADD, _FIND and _UNMAP to handle restrictions
 *        on mapping UNIX memory sections.
 *        FORTRAN/C interface made portable using F77/CNF. NBS_STRIMP &
@@ -78,25 +75,26 @@
 *        #module moved to nbs_module.h due as ULTRIX compiler neither supports
 *        this, nor ignores the directive.
 *        Error reporting added using EMS package.
-*     05-May-93 - (DJA):
+*     05-May-1993 (DJA):
 *        Added NBS_SLEEPMS to provide UNIX portable milli-second timing. Added
 *        exit handler NBS_MLIST_EXITHANDLER to remove mapped global sections
 *        on image exit.
-*     17-May-95 - (DJA):
+*     17-May-1995 (DJA):
 *        Data space segments forced to sizeof(double) alignment. Ensures
 *        mapped data segments returned to C/Fortran are correctly aligned
 *        for numeric data types in those languages.
-*     12-Sep-95 - (DJA):
+*     12-Sep-1995 (DJA):
 *        Added NBS_MAKE_KEY.
-*     27-Apr-99 - (BKM):
+*     27-Apr-1999 (BKM):
 *        Add include of <string.h> and omit unnecessary declarations.
-*     28-Jun-04 (AA):
+*     28-Jun-2004 (AA):
 *        Changed ifdef logic for Mac OSX support.
-*     12-Sep-04 (TIMJ):
+*     12-Sep-2004 (TIMJ):
 *        Minimize compiler warnings. Use config.h
-*     2-Sep-05 (TIMJ):
+*     2-Sep-2005 (TIMJ):
 *        Move protoypes out of functions (gcc 4 objects)
 *     {enter_changes_here}
+*-
 */
 
 #if HAVE_CONFIG_H
@@ -192,9 +190,8 @@ static mapping_id nbs_gl_mlist = NIL; /* Mapping list */
 *  Prior Requirements:
 *     None
 
-
 *  History:
-*     12-Sep-95 - (DJA):
+*     12-Sep-1995 (DJA):
 *        Original version.
 *     {enter_changes_here}
 
@@ -220,7 +217,7 @@ key_t NBS_MAKE_KEY(char *name)
 
 /*
 *
-*  Section name:
+*  Section Name:
 *     NBS_ALLOCATE
 
 *  Purpose:
@@ -238,7 +235,7 @@ key_t NBS_MAKE_KEY(char *name)
 *     base address.
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
 *     {enter_changes_here}
 *
@@ -294,7 +291,7 @@ extern char *nbs_ga_alloc_data; /* Next "free byte" for data  */
 *        MALLOC         Allocate dynamic memory
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
 *     {enter_changes_here}
 
@@ -366,9 +363,9 @@ char *NBS_INIT_ALLOC (int nbytes,char *data)
 *     None
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     17-May-95 - (DJA):
+*     17-May-1995 (DJA):
 *        Ensure data address is sizeof(double) aligned
 *     {enter_changes_here}
 
@@ -436,9 +433,9 @@ char *NBS_ALLOC (int nbytes)
 *     None
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     17-May-95 - (DJA):
+*     17-May-1995 (DJA):
 *        Ensure data address is sizeof(double) aligned
 *     {enter_changes_here}
 
@@ -492,7 +489,7 @@ char *NBS_DATA_ALLOC (int nbytes)
 *     None
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
 *     {enter_changes_here}
 
@@ -511,10 +508,13 @@ char *NBS_DEINIT_ALLOC ()
 
 /*
 *
-*  Section name:
+*  Section Name:
 *     NBS_FILE
 
 *  Purpose:
+*     Read and write Noticeboards to files.
+
+*  Description:
       The standard C RTL routines FOPEN, FWRITE and FREAD are used. The notice-
       board definition file has a default extension of .NBD and is written
       using two calls to FWRITE. The first writes a header that contains the
@@ -539,9 +539,12 @@ char *NBS_DEINIT_ALLOC ()
 *     ANSI C
 
 *  History:
-*     25-Mar-88 - (WFL):
+*     25-Mar-1988 (WFL):
 *        Original version.
 *     {enter_changes_here}
+
+*  Notes:
+*     See NBS_WRITE_FILE, NBS_OPEN_FILE
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -603,9 +606,9 @@ char *NBS_DEINIT_ALLOC ()
 *        NBS_STRIMP	Import a string, converting to upper-case
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 - (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated string handling. Added error reporting.
 *
 *     {enter_changes_here}
@@ -739,9 +742,9 @@ NBS_WRITE_FILE (
 *       NBS_STRIMP   Import a string, converting to upper-case
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 - (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated string handling. Added error reporting.
 *
 *     {enter_changes_here}
@@ -854,9 +857,9 @@ NBS_OPEN_FILE ( RW_CHARACTER(name),
 *        FREAD	    Read from a file
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 - (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting.
 *     {enter_changes_here}
 
@@ -924,7 +927,7 @@ NBS_READ_FILE ( FILE *chan,
 *        FCLOSE	    Close a file
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
 *     {enter_changes_here}
 
@@ -981,9 +984,9 @@ NBS_CLOSE_FILE ( RW_POINTER(chan) )
 *        FOPEN	    Open a file
 
 *  History:
-*     25-Mar-88 - (WFL):
+*     25-Mar-1988 (WFL):
 *        Original version.
-*     22-Mar-93 - (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting.
 *     {enter_changes_here}
 
@@ -1058,9 +1061,9 @@ NBS_OPEN_WRITE (char *save_name, FILE **chan, int *status)
 *        FWRITE	    Write to a file
 
 *  History:
-*     28-Mar-88 - (WFL):
+*     28-Mar-1988 (WFL):
 *        Original version.
-*     22-Mar-93 - (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting.
 *     {enter_changes_here}
 
@@ -1105,8 +1108,8 @@ NBS_UPDATE_FILE (FILE *chan,char *section,int section_size,int *status)
 }
 
 /*
-*+
-*  Name:
+*
+*  Section Name:
 *     NBS_MAP
 
 *  Purpose:
@@ -1122,7 +1125,7 @@ NBS_UPDATE_FILE (FILE *chan,char *section,int section_size,int *status)
 *     There are three routines in this section. One creates a global section of
 *     a given size and returns its starting address. One maps an existing
 *     global section. The last one unmaps an existing global section.
-*-
+*
 */
 
 /*
@@ -1177,9 +1180,9 @@ NBS_UPDATE_FILE (FILE *chan,char *section,int section_size,int *status)
 *                      sections mapped by this process
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 - (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting and string handling.
 *     {enter_changes_here}
 
@@ -1357,9 +1360,9 @@ char *NBS_CREATE_SECTION ( RW_CHARACTER(name), int section_size,
 *        NBS_MLIST_FIND Locate a section in the section list
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 - (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting and string handling.
 *     {enter_changes_here}
 
@@ -1530,9 +1533,9 @@ char *NBS_MAP_SECTION ( RW_CHARACTER(name), W_INTEGER(status) TRAIL(name) )
 *        NBS_MLIST_UNMAP   Unmap a section in the section list
 
 *  History:
-*     02-Feb-90 - (WFL):
+*     02-Feb-1990 (WFL):
 *        Original version.
-*     22-Mar-93 - (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting and string handling.
 *     {enter_changes_here}
 *-
@@ -1592,7 +1595,7 @@ NBS_MLIST_UNMAP ((char *) start,status);
 
 /*
 *
-*  Section name:
+*  Section Name:
 *     NBS_RELOCATE
 
 *  Purpose:
@@ -1620,7 +1623,7 @@ NBS_MLIST_UNMAP ((char *) start,status);
 *     ion.
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
 *     {enter_changes_here}
 *
@@ -1685,7 +1688,7 @@ NBS_MLIST_UNMAP ((char *) start,status);
 *                              lower-level items
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
 *     {enter_changes_here}
 *-
@@ -1765,7 +1768,7 @@ NBS_RELOCATE_POINTERS (item_id id,int i_offset,int fbs_offset,
 *        NBS_RELOCATE_ADDRESS  Relocate a single address
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
 *     {enter_changes_here}
 *-
@@ -1834,9 +1837,9 @@ NBS_RELOCATE_ITEM (item_id id,int i_offset,int fbs_offset,int d_offset,int add)
 *     None
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 - (DJA):
+*     22-Mar-1993 (DJA):
 *        Removed check for negative address as both ULTRIX and SunOS can
 *        generate such legal addresses.
 *     {enter_changes_here}
@@ -1929,9 +1932,9 @@ char *NBS_RELOCATE_ADDRESS (char *address,int offset,int add)
 *        STRLEN        Length of C string
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 - (DJA):
+*     22-Mar-1993 (DJA):
 *        Recoded using F77 and CNF packages.
 *     {enter_changes_here}
 *-
@@ -2019,9 +2022,9 @@ char *F77_EXTERNAL_NAME(nbs_strimp) ( char *out, RW_CHARACTER(in),
 *        CNF_EXPN      Export C string to FORTRAN string
 
 *  History:
-*     23-Jul-87 - (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 - (DJA):
+*     22-Mar-1993 (DJA):
 *        Recoded using F77 and CNF packages.
 *     {enter_changes_here}
 *-
@@ -2136,7 +2139,7 @@ void F77_EXTERNAL_NAME(nbs_strexp)( RW_CHARACTER(out),
 *        NBS_MLIST_UNMAP   Unmap a global section from process address space
 
 *  History:
-*     30-Apr-93 - (DJA):
+*     30-Apr-1993 (DJA):
 *        Original version.
 *     {enter_changes_here}
 *-
@@ -2208,7 +2211,7 @@ void NBS_MLIST_EXITHANDLER ()
 *        MALLOC        Allocate dynamic memory
 
 *  History:
-*     05-Feb-93 - (DJA):
+*     05-Feb-1993 (DJA):
 *        Original version.
 *     {enter_changes_here}
 *-
@@ -2310,7 +2313,7 @@ else
 *        MALLOC        Allocate dynamic memory
 
 *  History:
-*     05-Feb-93 - (DJA):
+*     05-Feb-1993 (DJA):
 *        Original version.
 *     {enter_changes_here}
 *-
@@ -2387,7 +2390,7 @@ return addr;
 *        FREE          Release dynamic memory
 
 *  History:
-*     05-Feb-93 - (DJA):
+*     05-Feb-1993 (DJA):
 *        Original version.
 *     {enter_changes_here}
 *-
@@ -2510,9 +2513,9 @@ void NBS_MLIST_UNMAP ( char *addr, int *status )
 *     PMA: Peter Allan (Starlink, RAL)
 
 *  History:
-*     18-Jun-92 - (PMA):
+*     18-Jun-1992 (PMA):
 *        Original version.
-*     05-May-93 - (DJA):
+*     05-May-1993 (DJA):
 *        Renamed to NBS_SLEEPMS. LIB$WAIT call used to provide VMS
 *        functionality.
 *     {enter_changes_here}

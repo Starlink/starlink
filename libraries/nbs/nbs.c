@@ -1,5 +1,6 @@
 /*
-*  Module name:
+*+
+*  Name:
 *     NBS
 
 *  Purpose:
@@ -124,6 +125,7 @@
 
 *  Authors:
 *     WFL: William Lupton (AAO)
+*     JAB: Jeremy Bailey (AAO)
 *     DJA: David J. Allan (ROSAT)
 *     BKM: Brian McIIwrath (Starlink)
 *     AA: Alasdair Allan (Starlink)
@@ -131,27 +133,24 @@
 *     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
-*  Version Date:
-*     02-Jul-90 - (WFL)
-
 *  History:
-*     03-Feb-86 - (WFL):
+*     03-Feb-1986 (WFL):
 *        Original version
-*     05-Jul-86 - (JAB):
+*     05-Jul-1986 (JAB):
 *        Speed up search loop in NBS_FIND_ITEM: NBS_STRIMP call
 *        removed from loop, NBS_RELOCATE_ADDRESS calls removed and
 *        relocation coded directly.
-*     13-Apr-87 - (WFL):
+*     13-Apr-1987 (WFL):
 *        Correct bug whereby MAXNAME-char names are not found
 *	 in NBS_FIND_ITEM since they are not null-terminated.
 *	 Prevent NBS_END_DEFINITION from copying more than
 *	 MAXNAME characters from NAME.
-*     17-Jul-87 - (WFL):
+*     17-Jul-1987 (WFL):
 *        Change names of INCLUDEd files to be NBS_xxx.H.
 *	 Check for zero IDs on entry and replace NULL with NIL.
 *	 Remove ENVID from NBS_GET_NAME.
 *	 New NBS_GET_PARENT, NBS_GET_MODIFIED and NBS_INC_MODIFIED routines.
-*     20-Jul-87 - (WFL):
+*     20-Jul-1987 (WFL):
 *        In NBS_GET_SHAPE, regard MAXDIMS as modified argument
 *	 and return as maximum number of dimensions.
 *	 Alter interface to NBS_STR* routines.
@@ -159,7 +158,7 @@
 *	 Replace NBS_COPY with _CHMOVE macro.
 *	 New status NBS__TOOMANYBYTES in NBS_PUT_VALUE, plus
 *	 use NBS__TOOMANYDIMS in NBS_PUT_SHAPE.
-*     21-Jul-87 - (WFL):
+*     21-Jul-1987 (WFL):
 *        Add new NBS_PUT_SIZE routine.
 *	 Add definition size, section size and version to the
 *	 board info that is part of the global section - check version
@@ -177,23 +176,23 @@
 *	 them whether to add or subtract the offset. Split IFS_OFFSET
 *	 argument into I_OFFSET for items and FBS_OFFSET for fixed,
 *	 board and shape information.
-*     22-Jul-87 - (WFL):
+*     22-Jul-1987 (WFL):
 *        Remove board_info BASE; set up BOARD pointers at
 *   	 definition time and don't take local copies of board_info.
-*     31-Jul-87 - (WFL):
+*     31-Jul-1987 (WFL):
 *        Extend header comments.
 *	 Insert missing braces after IF_OK... macro calls.
-*     06-Nov-87 - (WFL):
+*     06-Nov-1987 (WFL):
 *        Portable VMS / UNIX version. Use vms / unix / strdescr
 *	 macros as necessary.
-*     11-Feb-88 - (WFL):
+*     11-Feb-1988 (WFL):
 *        Use macros for routine names and use NBS_ prefix when
 *	 strdescr is defined, NBC_ when it is not. Also use #module to
 *	 set module name explicitly. Change strdescr to c_string.
 *	 Change NBS_ADD_INTERLOCKED to ADD_INTERLOCKED.
 *	 Change SAVE to character OPTION in NBS_END_DEFINITION.
 *	 Add OFFSET arguments to NBS_PUT_VALUE and NBS_GET_VALUE.
-*     16-Feb-88 - (WFL):
+*     16-Feb-1988 (WFL):
 *        Add TIMEOUT_COUNT, WORLD_WRITE, INCREMENT_MODIFY and
 *	 CHECK_MODIFY static variables and NBS_TUNE routine to alter them
 *	 Add handling of FIXED_INFO CHILDREN component.
@@ -204,68 +203,68 @@
 *	 noticeboard.
 *	 Make NBS_FIND_ITEM use a binary search (since the
 *	 names are known to be linked in alphabetical order).
-*     17-Feb-88 - (WFL):
+*     17-Feb-1988 (WFL):
 *        Receive definitions of MAXALLOC, ITEM_BASE and DATA_BASE
 *	 from NBS_MAC.H and allow tune of MAXALLOC (now called
 *	 MAX_DEFN_SIZE).
-*     03-Mar-88 - (WFL):
+*     03-Mar-1988 (WFL):
 *        Improve binary search.
 *	 Update comments ready for use in documentation.
-*     25-Mar-88 - (WFL):
+*     25-Mar-1988 (WFL):
 *        Simple-minded implementation of saving data to
 *	 disc, restoring from disc etc. Involves new NBS_RESTORE_NOTICE-
 *	 BOARD and NBS_SAVE_NOTICEBOARD routines.
 *	 Alter NBS_GET_INFO to take name of required item (so
 *	 that the interface need not continually change).
-*     28-Mar-88 - (WFL):
+*     28-Mar-1988 (WFL):
 *        Rationalise initialisation of BOARD_INFO components.
-*     30-Mar-88 - (WFL):
+*     30-Mar-1988 (WFL):
 *        Only use #module on VMS; allow NBS_TUNE to use same
 *	 arguments for new and old values; make NBS_END_DEFINITION
 *	 clear DEFINING even if it fails (once re-location is done);
 *	 re-order NBS_INC_MODIFIED and NBS_PUT_SIZE.
-*     08-Apr-88 - (WFL):
+*     08-Apr-1988 (WFL):
 *        (Again) update comments ready for use in documentation.
-*     20-May-88 - (WFL):
+*     20-May-1988 (WFL):
 *        Use NBS_INTIMP to import input integers (allows them
 *	 to be passed by value for the C interfaces).
-*     10-Apr-89 - (WFL):
+*     10-Apr-1989 (WFL):
 *        Use EXTERN rather than STATIC so that NBS and NBC
 *	 routines can be used intermingled (but not values alterable
 *	 using NBS_TUNE, since these are initialised)
-*     01-Feb-90 - (WFL):
+*     01-Feb-1990 (WFL):
 *        Add TIMEOUT_INTERVAL to list of tuneable parameters;
 *	 add NBS_TUNE_NOTICEBOARD and set extra board info parameters
 *	 on noticeboard creation; use noticeboard-specific parameters
 *	 on get and put; maintain ACCESSED count; allow use of same
 *	 variable for ENV(S)ID and (S)ID; on find noticeboard, wait
 *	 for it to be valid; delay between tries on get
-*     02-Feb-90 - (WFL):
+*     02-Feb-1990 (WFL):
 *        Add NBS_LOSE_NOTICEBOARD and NBS_LOSE_ITEM; if notice-
 *	 board existed when being created, adopt current process as
 *	 owner; on NBS_FIND_NOTICEBOARD and if owner, unmap section
 *	 mapped on create
-*     06-Feb-90 - (WFL):
+*     06-Feb-1990 (WFL):
 *        Account for PARENT, DATA and ACCESSED being in unions;
 *	 maintain TRIGGER and MODIFIED in ITEM_DESCR; use
 *	 _ADD_INTERLOCKED macro (uses _ADAWI); add new NBS_PUT_TRIGGER,
 *	 NBS_GET_MODIFIED_POINTER and NBS_GET_UPDATED routines; be
 *	 careful to unmap if mapping routine fails after having mapped;
 *	 add use of ORIGINAL_UNMAPPED
-*     07-Feb-90 - (WFL):
+*     07-Feb-1990 (WFL):
 *        Account for SHAPE and GLOBAL_BASE being in unions;
 *	 update modified count for NBS_PUT_SIZE; explicitly set NIL
 *	 top-level PARENT in relocated copy of definition
-*     09-Feb-90 - (WFL):
+*     09-Feb-1990 (WFL):
 *        Upgrade comments; GET_MODIFIED_POINTER to work for
 *	 structures too; always increment noticeboard modified count;
 *	 use ADD_INTERLOCKED for noticeboard modified count increment;
 *	 use OR of NBS_TUNE flags and NBS_TUNE_NOTICEBOARD flags for
 *	 upwards compatibility; correct test for NBS__DATASAVED
-*     15-Feb-90 - (WFL):
+*     15-Feb-1990 (WFL):
 *        Revert to regarding TIMEOUT_COUNT and TIMEOUT_DELAY
 *	 as per-process values
-*     25-Mar-93 - (DJA):
+*     25-Mar-1993 (DJA):
 *        Error reporting by EMS. All high level routines report errors
 *        as well as setting STATUS bad.
 *        #module moved to nbs_module.h to cope with failure of ULTRIX
@@ -274,26 +273,26 @@
 *        New routines NBS_GET_CVALUE, NBS_PUT_CVALUE and NBS_GET_CINFO
 *        to handle put and fetch of character values portably.
 *        Prologue formats changed to SST forms.
-*      5-May-93 - (DJA):
+*      5-May-1993 (DJA):
 *        New routine NBS_SLEEPMS provides millisecond timing. Replaced
 *        _wait macro in NBS_MAC.H. Exit handler to remove remaining mapped
 *        sections on UNIX.
-*     24-Nov-94 - (DJA):
+*     24-Nov-1994 (DJA):
 *        Correct Fortran version of NBS_GET_CVALUE call.
-*     27-Apr-99 - (BKM):
+*     27-Apr-1999 (BKM):
 *        Omit unnecessary malloc and free declarations.
-*     28-Jun-04 - (AA):
+*     28-Jun-2004 (AA):
 *        Fixed ifdef logic for building under Mac OSX
-*     12-Sep-04 - (TIMJ):
+*     12-Sep-2004 (TIMJ):
 *        Minimize compiler warnings. Use new style ems calling convention.
-*     04-Jul-05 - (PWD):
+*     04-Jul-2005 (PWD):
 *        Comment out void arglist function prototypes. GCC4 doesn't allow those.
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
-*
+*-
 */
 
 #if HAVE_CONFIG_H
@@ -612,9 +611,9 @@ static int check_modify = YES; /* Whether to check MODIFIED on GET */
 *                           limiting number of characters
 
 *  History:
-*     01-Feb-90 (WFL):
+*     01-Feb-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
 *     {enter_changes_here}
 *-
@@ -753,9 +752,9 @@ int NBS_TUNE ( RW_CHARACTER(name), R_INTEGER(value), W_INTEGER(oldvalue),
 *                           limiting number of characters
 
 *  History:
-*     01-Feb-90 (WFL):
+*     01-Feb-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
 *     {enter_changes_here}
 *-
@@ -888,9 +887,9 @@ int NBS_TUNE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(name), R_INTEGER(value),
 *        STRNCPY            Copy one string to another up to a specified limit
 
 *  History:
-*     22-Jul-90 (WFL):
+*     22-Jul-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
 *     {enter_changes_here}
 *-
@@ -1081,9 +1080,9 @@ int NBS_BEGIN_DEFINITION ( item_id *sid, W_INTEGER(status) )
 *        STRNCPY            Copy one string to another up to a specified limit
 
 *  History:
-*     22-Jul-90 (WFL):
+*     22-Jul-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
 *     {enter_changes_here}
 *-
@@ -1273,9 +1272,9 @@ int NBS_DEFINE_STRUCTURE ( R_INTEGER(envsid), RW_CHARACTER(name),
 *        STRNCPY            Copy one string to another up to a specified limit
 
 *  History:
-*     22-Jul-90 (WFL):
+*     22-Jul-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
 *     {enter_changes_here}
 *-
@@ -1459,9 +1458,9 @@ int NBS_DEFINE_PRIMITIVE ( R_INTEGER(envsid), RW_CHARACTER(name),
 *     None.
 
 *  History:
-*     22-Jul-90 (WFL):
+*     22-Jul-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting.
 *     {enter_changes_here}
 *-
@@ -1608,9 +1607,9 @@ int NBS_DEFINE_SHAPE ( R_INTEGER(sid), R_INTEGER(ndims),
 *                               limit
 
 *  History:
-*     09-Feb-90 (WFL):
+*     09-Feb-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
 *     {enter_changes_here}
 *-
@@ -1794,9 +1793,9 @@ int NBS_END_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(option),
 *        GETPID                 Get process ID
 
 *  History:
-*     09-Feb-90 (WFL):
+*     09-Feb-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
 *     {enter_changes_here}
 *-
@@ -1951,9 +1950,9 @@ int NBS_RESTORE_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(save_name),
 *        GETPID                 Get process ID
 
 *  History:
-*     25-Mar-88 (WFL):
+*     25-Mar-1988 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
 *     {enter_changes_here}
 *-
@@ -2089,9 +2088,9 @@ int NBS_RESTORE_NOTICEBOARD ( RW_CHARACTER(name), RW_CHARACTER(save_name),
 *                               for write access
 
 *  History:
-*     25-Mar-88 (WFL):
+*     25-Mar-1988 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
 *     {enter_changes_here}
 *-
@@ -2247,11 +2246,11 @@ int NBS_SAVE_NOTICEBOARD ( R_INTEGER(id), W_INTEGER(status) )
 *        MALLOC                 Allocate dynamic memory
 
 *  History:
-*     06-Feb-90 (WFL):
+*     06-Feb-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
-*      8-Mar-94 (DJA):
+*      8-Mar-1994 (DJA):
 *        Updated handling of external pointers using EXPORT_POINTER.
 *     {enter_changes_here}
 *-
@@ -2457,11 +2456,11 @@ int NBS_FIND_NOTICEBOARD ( RW_CHARACTER(name), item_id *id,
 *                               specified limit
 
 *  History:
-*     22-Jul-87 (WFL):
+*     22-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
-*      8-Mar-94 (DJA):
+*      8-Mar-1994 (DJA):
 *        Updated handling of external pointers using EXPORT_POINTER.
 *     {enter_changes_here}
 *-
@@ -2595,11 +2594,11 @@ int NBS_FIND_ITEM ( R_INTEGER(envid), RW_CHARACTER(name), item_id *id,
 *     None.
 
 *  History:
-*     23-Jul-87 (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
-*      8-Mar-94 (DJA):
+*      8-Mar-1994 (DJA):
 *        Updated handling of external pointers using EXPORT_POINTER.
 *     {enter_changes_here}
 *-
@@ -2752,9 +2751,9 @@ int NBS_FIND_NTH_ITEM ( R_INTEGER(envid), R_INTEGER(posn),
 *        FREE               Free dynamic memory
 
 *  History:
-*     02-Feb-90 (WFL):
+*     02-Feb-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
 *     {enter_changes_here}
 *-
@@ -2875,9 +2874,9 @@ int NBS_LOSE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(option),
 *        NBS_STRIMP         Import a string, converting to upper-case
 
 *  History:
-*     02-Feb-90 (WFL):
+*     02-Feb-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
 *     {enter_changes_here}
 *-
@@ -3077,9 +3076,9 @@ int NBS_LOSE_ITEM ( R_INTEGER(id), RW_CHARACTER(option),
 *     None.
 
 *  History:
-*     16-Feb-88 (WFL):
+*     16-Feb-1988 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -3221,7 +3220,7 @@ int NBS_PUT_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(nbytes),
 *        NBS_PUT_VALUE        Write a byte array to an item
 
 *  History:
-*     05-Mar-93 (DJA):
+*     05-Mar-1993 (DJA):
 *        Original version.
 *     {enter_changes_here}
 *-
@@ -3299,9 +3298,9 @@ return (*status);
 *     None.
 
 *  History:
-*     16-Feb-88 (WFL):
+*     16-Feb-1988 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -3435,9 +3434,9 @@ int NBS_PUT_SHAPE ( R_INTEGER(id), R_INTEGER(ndims), RW_INTEGER_ARRAY(dims),
 *     None.
 
 *  History:
-*     23-Jul-88 (WFL):
+*     23-Jul-1988 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -3559,9 +3558,9 @@ int NBS_PUT_SIZE ( R_INTEGER(id), R_INTEGER(nbytes), W_INTEGER(status) )
 *     None.
 
 *  History:
-*     23-Jul-87 (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -3667,9 +3666,9 @@ int NBS_INC_MODIFIED ( R_INTEGER(id), W_INTEGER(status) )
 *     None.
 
 *  History:
-*     06-Feb-90 (WFL):
+*     06-Feb-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -3821,9 +3820,9 @@ int NBS_PUT_TRIGGER ( R_INTEGER(id), int (*trigger)(), W_INTEGER(status) )
 *     None.
 
 *  History:
-*     23-Jul-87 (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -3972,7 +3971,7 @@ int NBS_GET_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(maxbytes),
 *        NBS_GET_VALUE      Read byte array from primitive item.
 
 *  History:
-*     05-Mar-93 (WFL):
+*     05-Mar-1993 (WFL):
 *        Original version.
 *     {enter_changes_here}
 *-
@@ -4066,9 +4065,9 @@ IF_OK {
 *     None.
 
 *  History:
-*     23-Jul-87 (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -4202,9 +4201,9 @@ int NBS_GET_SHAPE ( R_INTEGER(id), W_INTEGER(maxdims), RW_INTEGER_ARRAY(dims),
 *     None.
 
 *  History:
-*     09-Feb-90 (WFL):
+*     09-Feb-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -4302,9 +4301,9 @@ int NBS_GET_MODIFIED ( R_INTEGER(id), W_INTEGER(modified), W_INTEGER(status) )
 *     None.
 
 *  History:
-*     09-Feb-90 (WFL):
+*     09-Feb-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -4394,9 +4393,9 @@ int NBS_GET_MODIFIED_POINTER ( R_INTEGER(id), data_id *pointer,
 *     None.
 
 *  History:
-*     09-Feb-90 (WFL):
+*     09-Feb-1990 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -4483,9 +4482,9 @@ int NBS_GET_UPDATED ( R_INTEGER(id), W_INTEGER(updated), W_INTEGER(status) )
 *     None.
 
 *  History:
-*     23-Jul-87 (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -4565,9 +4564,9 @@ int NBS_GET_POINTER ( R_INTEGER(id), data_id *pointer, W_INTEGER(status) )
 *        NBS_STREXP	Export a string
 
 *  History:
-*     23-Jul-87 (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -4644,9 +4643,9 @@ int NBS_GET_NAME ( R_INTEGER(id), RW_CHARACTER(name),
 *        NBS_STREXP	Export a string
 
 *  History:
-*     23-Jul-87 (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -4726,9 +4725,9 @@ int NBS_GET_TYPE ( R_INTEGER(id), RW_CHARACTER(type),
 *     None
 
 *  History:
-*     23-Jul-87 (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -4813,9 +4812,9 @@ int NBS_GET_SIZE ( R_INTEGER(id), W_INTEGER(maxbytes),
 *     None
 
 *  History:
-*     23-Jul-87 (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -4894,9 +4893,9 @@ int NBS_GET_PRIMITIVE ( R_INTEGER(id), W_INTEGER(primitive), W_INTEGER(status) )
 *     None
 
 *  History:
-*     23-Jul-87 (WFL):
+*     23-Jul-1987 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -4975,9 +4974,9 @@ int NBS_GET_PARENT ( R_INTEGER(id), item_id *envid, W_INTEGER(status) )
 *     None
 
 *  History:
-*     16-Feb-88 (WFL):
+*     16-Feb-1988 (WFL):
 *        Original version.
-*     22-Mar-93 (DJA):
+*     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
 *-
@@ -5078,9 +5077,9 @@ int NBS_GET_CHILDREN ( R_INTEGER(id), W_INTEGER(children), W_INTEGER(status) )
 *        NBS_STRIMP       Import a string, converting to upper-case.
 
 *  History:
-*     07-Feb-90 (WFL):
+*     07-Feb-1990 (WFL):
 *        Original version.
-*     31-Mar-93 (DJA):
+*     31-Mar-1993 (DJA):
 *        Added error reporting and updated string handling. SAVE_NAME 
 *        option removed to NBS_GET_CINFO.
 *     {enter_changes_here}
@@ -5208,7 +5207,7 @@ int NBS_GET_INFO ( R_INTEGER(id), RW_CHARACTER(name), W_INTEGER(value),
 *        NBS_STRIMP       Import a string, converting to upper-case.
 
 *  History:
-*     31-Mar-93 (DJA):
+*     31-Mar-1993 (DJA):
 *        Original version.
 *     {enter_changes_here}
 *-
