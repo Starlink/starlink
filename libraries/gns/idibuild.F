@@ -1,28 +1,32 @@
 #include <config.h>
       PROGRAM IDIBLD
 *+
-*   Program:
-*
-*      IDIBLD
+*   Name:
+*     IDIBLD
 *
 *   Description:
+*     Builds the binary GNS workstation description file for IDI
+*     workstations from a text description.
 *
-*      Builds the binary GNS workstation description file for IDI
-*      workstations from a text description.
+*  Type of Module:
+*     PROGRAM
+
+*   Invocation:
+*     IDIBUILD
 *
-*
-*   Usage:
-*
-*      RUN IDIBUILD
-*
-*+
 *   Side Effects:
-*    
-*      Creates a new description file called GNS_GKSDEVICES.DAT in the
-*      current default directory.
-*    
-*   Nick Eaton    21-MAY-1989
-*   Tim Jenness   15-APR-2004 (Use autoconf for RECL units)
+*     Creates a new description file called GNS_GKSDEVICES.DAT in the
+*     current default directory.
+
+*   Authors:
+*     NE: Nick Eaton (Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+
+*   History:
+*     21-MAY-1989 (NE):
+*        Original.
+*     15-APR-2004 (TIMJ):
+*        Use autoconf for RECL units
 *-
       IMPLICIT NONE
 
@@ -110,37 +114,41 @@
 
       INTEGER FUNCTION GETNEX(SKIPS,UPCAS)
 *+
-*   Routine:
+*   Name:
+*     GETNEX
 *
-*      GETNEX
-*
-*   Function:
-*
-*      Gets the next character from the input file
-*
+*   Type of module:
+*     SUBROUTINE
+
+*   Purpose:
+*     Gets the next character from the input file
+
 *   Description:
-*
-*      Gets the next character after interpereting escape characters
-*      (the ^). Spaces are skipped and characters converted to upper case
-*      if requested. End of record is treated as a space.
+*     Gets the next character after interpereting escape characters
+*     (the ^). Spaces are skipped and characters converted to upper case
+*     if requested. End of record is treated as a space.
 *
 *   Arguments:
-*
-*      Given:
+*     SKIPS = LOGICAL (Given)
+*         Skip spaces
+*     UPCAS = LOGICAL (Given)
+*         Fold to upper case
+
+*   Returned Value:
+*     GETNEX = INTEGER
+*         Integer representation of character or -1 if
+*         the end of file is encountered
 *       
-*         SKIPS (LOGICAL)
-*                        Skip spaces
-*         UPCAS (LOGICAL)
-*                        Fold to upper case
-*       
-*      Returned:
-*       
-*         function return value   (INTEGER)
-*                        Integer representation of character or -1 if
-*                        the end of file is encountered
-*       
-*+
-*   D L Terrett   19-APR-1989 
+*  Authors:
+*     DLT: D L Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     19-APR-1989 (DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*-
 
       IMPLICIT NONE
       LOGICAL SKIPS,UPCAS
@@ -213,24 +221,32 @@
        
       SUBROUTINE GETWST(IREC,RREC)
 *+
-*   Routine:
-*
-*      GETWST
-*
-*   Function:
-*
-*      Get the data for the next workstation from the data file
-*
-*   Description:
-*
-*      {routine_description}
-*
-*   Arguments:
-*
-*      {arguments_or_none}
-*+
-*   Nick Eaton    21-MAY-1989
+*  Name:
+*     GETWST
 
+*   Purpose:
+*     Get the data for the next workstation from the data file
+*
+*  Authors:
+*     NE: Nick Eaton (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     21-MAY-1989 (DLT):
+*        Original.
+*     {enter_further_changes_here}
+
+*  Notes:
+*     The text description file consists entirely of statements of the
+*     form <keyword>=<value>.  Spaces, tabs and end of records are ignored
+*     and all characters converted to upper case except when evaluating
+*     character values as described below.  The recognized keywords and
+*     their data types are as follows:
+*
+*           WORKSTATION       character
+*           AGITYPE           integer
+
+*-
       IMPLICIT NONE
       INCLUDE 'GNS_PAR'
       
@@ -238,16 +254,7 @@
       PARAMETER (BUFSIZ=75)
       INTEGER IREC(BUFSIZ)
       REAL RREC(BUFSIZ)
-*
-*   The text description file consists entirely of statements of the
-*   form <keyword>=<value>.  Spaces, tabs and end of records are ignored
-*   and all characters converted to upper case except when evaluating
-*   character values as described below.  The recognized keywords and
-*   their data types are as follows:
-*
-*           WORKSTATION       character
-*           AGITYPE           integer
-*
+
       INTEGER NKEYWR
       PARAMETER (NKEYWR = 2)
       CHARACTER*(GNS__SZKEY) KEYWRD(NKEYWR)
@@ -471,28 +478,22 @@
 
       SUBROUTINE WRTWST(IWKSTN,IREC,RREC,NITEM)
 *+
-*   Routine:
+*  Name:
+*     WRTWST
 *
-*      WRTWST
+*   Purpose:
+*     Write a workstation description record to the binary file
 *
-*   Function:
-*
-*      Write a workstaion description record to the binary file
-*
-*   Description:
-*
-*      {routine_description}
-*
-*   Arguments:
-*
-*      {arguments_or_none}
-*+
-*   Nick Eaton    21-MAY-1989
+*  Authors:
+*     NE: Nick Eaton (Starlink)
+*     {enter_new_authors_here}
 
-      IMPLICIT NONE
-      INTEGER IWKSTN, IREC(*), NITEM
-      REAL RREC(*)
-*
+*  History:
+*     21-MAY-1989 (NE):
+*        Original.
+*     {enter_further_changes_here}
+
+*  Notes:
 *   The binary description file is an unformatted direct access Fortran
 *   file with fixed length records (dictated by the Fortran standard).
 *
@@ -517,6 +518,12 @@
 *   The first record in the file contains a file structure version
 *   number in the first item and optionally other data that depends on
 *   the version (eg. constants to use in the hashing).
+
+*-
+
+      IMPLICIT NONE
+      INTEGER IWKSTN, IREC(*), NITEM
+      REAL RREC(*)
 
 *   Record size of binary file (in numeric storage units)
 

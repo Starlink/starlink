@@ -1,40 +1,65 @@
 #include <config.h>
       SUBROUTINE gns_1INITI (STATUS)
-*++
-*   gns_1INITI   Prepares the IDI name database for access
-*
-*   Description:
-*      If the names database has already been loaded then the routine
-*      exits immediately with a success status. Otherwise the database
-*      file is opened, read into common, and closed.
-*
-*   Input arguments:
-*      STATUS  i                 Inherited status
-*
-*   Output arguments:
-*      STATUS  i                 Status
-*
-*   Implicit inputs:
-*      The contents of the IDI names database file
-*
-*   Implicit outputs:
-*      none
-*
-*++
-*   Libraries Used:
-*
-*      EMS
-*
-*   D L Terrett  18-JUL-1989 
-*   Nick Eaton   17-MAY-1990  Added sequence number
-*   Nick Eaton   11-JUN-1990  Access IDIDEVICES file
-*   Nick Eaton    9-JUL-1990  Added error reporting
-*   D L Terrett  16-JAN-1991  Move file names to include file + use GNS
-*                             routine to get node name + fix LUN logic
-*   Nick Eaton    2-DEC-1991  Allow blank fields for the node name
-*   D L Terrett  25-JUL-1995  Search for data files
-*   Tim Jenness  15-APR-2004  Use autoconf for RECL
-*   P W Draper   29-JUL-2004  Increase file and device names to 256 chars
+*+
+*  Name:
+*     gns_1INITI
+
+*  Purpose:
+*     Prepares the IDI name database for access
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     If the names database has already been loaded then the routine
+*     exits immediately with a success status. Otherwise the database
+*     file is opened, read into common, and closed.
+
+*  Arguments:
+*     STATUS = INTEGER (Given & Returned)
+*         Status
+
+*  Authors:
+*     DLT: D L Terrett (Starlink)
+*     NE: Nick Eaton (Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: P W Draper (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-JUL-1989 (DLT):
+*        Modified.
+*     17-MAY-1990 (NE):
+*        Added sequence number.
+*     11-JUN-1990 (NE):
+*        Access IDIDEVICES file.
+*     9-JUL-1990 (NE):
+*        Added error reporting.
+*     16-JAN-1991 (DLT):
+*        Move file names to include file + use GNS routine to get node name + fix LUN logic.
+*     2-DEC-1991 (NE):
+*        Allow blank fields for the node name.
+*     25-JUL-1995 (DLT):
+*        Search for data files.
+*     15-APR-2004 (TIMJ):
+*        Use autoconf for RECL.
+*     29-JUL-2004 (PWD):
+*        Increase file and device names to 256 chars.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Implicit Inputs:
+*     The contents of the IDI names database file
+
+*  Implicit Outputs:
+*     none
+
+*  Libraries Used:
+*     EMS
+
+*-
 
       IMPLICIT NONE
       INCLUDE 'GNS_PAR'
@@ -246,4 +271,3 @@
      :              'GNS database file has invalid format', STATUS )
   999 CONTINUE
       END       
-
