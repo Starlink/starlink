@@ -386,6 +386,15 @@ void findclumps() {
 *     quadrature) by this amount. If a direct comparison with other 
 *     implementations of the ClumpFind algorithm is required, a value of zero
 *     should be used. [2.0]
+*     - ClumpFind.IDLAlg: If a non-zero value is supplied, then FINDCLUMPS 
+*     emulates the ClumpFind algorithm as implemented by the IDL package
+*     available from Jonathan Williams WWW site on 28th April 2006. The
+*     default value of zero causes FINDCLUMPS to use the algorithm
+*     described in the Williams et al ApJ paper of 1994. These two
+*     algorithms differ in the way that pixels within merged clumps are
+*     allocated to individual clumps. Also the ApJ algorithm rejects clumps 
+*     that do not not extend above the second contour level, whereas the IDL 
+*     algorithm accepts such clumps. [0]
 *     - ClumpFind.Level<n>: The n'th data value at which to contour the
 *     data array (where <n> is an integer). Values should be given for 
 *     "Level1", "Level2", "Level3", etc. Any number of contours can be 
@@ -410,7 +419,8 @@ void findclumps() {
 *     for the other parameters that specify the minimum peak height, the
 *     background level and the instrumental beam widths, limited to be at
 *     least 16 pixels. If a direct comparison with other implementations
-*     of the ClumpFind algorithm is required, a value of 5 should be used. []
+*     of the ClumpFind algorithm is required, a value of 5 should be used
+*     (for 3D data) or 20 (for 2D data). []
 *     - ClumpFind.Naxis: Controls the way in which contiguous areas of
 *     pixels are located when contouring the data. When a pixel is found
 *     to be at or above a contour level, the adjacent pixels are also checked.

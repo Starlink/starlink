@@ -103,6 +103,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int dims[3];         /* Pointer to array of array dimensions */
    int el;              /* Number of elements in array */
    int i;               /* Loop count */
+   int idl;             /* Emulate the IDL clumpfind algorithm? */
    int ii;              /* Significant clump index */
    int ilev;            /* Contour index */
    int index;           /* Next PixelSet index to use */
@@ -161,6 +162,10 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the RMS noise level to use. */
    rms = cupidConfigD( cfconfig, "RMS", rms );
+
+/* See if the IDL implementation of ClumpFind should be emulated rather than 
+   the algorithm described in the original Williams et al ApJ paper. */
+   idl = cupidConfigI( cfconfig, "IDLALG", 0 );
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array, and the skip in 1D vector index needed to
@@ -245,8 +250,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    will find no pixels. */
          if( clevel <= maxrem ) {
             clumps = cupidCFScan( type, ipd, ipa, el, ndim, dims, skip, 
-                                  clumps, clevel, &index, naxis, ilevel,
-                                  ilev < nlevels - 1, slbnd, &maxrem );
+                                  clumps, idl, clevel, &index, naxis, ilevel,
+                                  idl || ilev < nlevels - 1, slbnd, &maxrem );
 
          } else if( ilevel > 2 ) {
             msgOut( "", "   No pixels found at this contour level.", status );
@@ -257,8 +262,12 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       if( ilevel > 1 ) msgBlank( status );
 
 /* Get the minimum number of pixels allowed in a clump.*/
-      minpix = cupidDefMinPix( ndim, beamcorr, levels[ nlevels - 1 ],
-                                               levels[ nlevels - 2 ] );
+      if( nlevels > 1 ) {
+         minpix = cupidDefMinPix( ndim, beamcorr, levels[ nlevels - 1 ],
+                                                  levels[ nlevels - 2 ] );
+      } else {
+         minpix = 5;
+      }
       minpix = cupidConfigI( cfconfig, "MINPIX", minpix );
 
 /* Loop round each clump */

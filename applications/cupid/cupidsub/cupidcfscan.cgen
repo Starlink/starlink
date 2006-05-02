@@ -5,7 +5,7 @@
 
 CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel, 
                                             int ndim, int dims[3], int skip[3],
-                                            CupidPixelSet **clumps, 
+                                            CupidPixelSet **clumps, int idl,
                                             double clevel, int *index,
                                             int naxis, int ilevel, int newok,
                                             int *slbnd, double *maxpd ){
@@ -19,7 +19,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *  Synopsis:
 *     CupidPixelSet **cupidCFScan<X>( CGEN_TYPE *ipd, int *ipa, int nel, 
 *                                     int ndim, int dims[3], int skip[3], 
-*                                     CupidPixelSet **clumps, 
+*                                     CupidPixelSet **clumps, int idl,
 *                                     double clevel, int *index, int naxis,
 *                                     int ilevel, int newok, int *slbnd, 
 *                                     double *maxpd )
@@ -67,6 +67,10 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *        stored within the PixelSet structure (this makes it easy and
 *        fast to get a pointer to a PixelSet with a particular index value).
 *        Elements of the array which are not used should hold NULL.
+*     idl
+*        If non-zero, the IDL implementation of ClumpFind will be
+*        emulated rather than the algorithm described in the original 
+*        Williams et al ApJ paper.
 *     clevel
 *        The data value at which to scan the supplied data array.
 *     index
@@ -146,7 +150,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    int i;                /* Loop count */
    int ii;               /* Loop count */
    int il1;              /* Lowest index of adjoining PixelSets at this level */
-   int il2;              /* Index of adjoining PixelSets at higher level */
+   int il2;              /* Index of closest adjoining PixelSet at higher level */
    int ix;               /* GRID index on 1st axis */
    int iy;               /* GRID index on 2nd axis */
    int iz;               /* GRID index on 3rd axis */
@@ -255,6 +259,15 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
                         }
                      }
 
+/* If we are using the IDL ClumpFind algorithm (rather than the algorithm
+   published in ApJ), and if the pixel adjoins a clump defined at a higher 
+   contour level, then note that the clump containing the new pixel adjoins 
+   this higher level clump. */
+                     if( idl && il2 != CUPID__CFNULL ) {
+                        ps->nebs = astGrow( ps->nebs, ps->nneb + 1, sizeof( int ) );
+                        if( astOK ) ps->nebs[ ps->nneb++ ] = il2;
+                     }
+
 /* If the current pixel data value is good but is lower than the current
    contour level (and has so not been assigned to a clump), note the
    largest such data value. This will tell us if we can skip some of the
@@ -278,6 +291,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
       if( ps ) {
          total_pop += ps->pop;
 
+
+
 /* Tell the user about the new PixelSet. */
          if( ilevel > 3 ) {
             msgSeti( "I", ps->index );
@@ -285,12 +300,22 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
             msgOut( "", "   New PixelSet: index ^I population ^P", status );
          }
 
-/* Attempt to erode the new PixelSet by transferring pixels from the PixelSet
+/* If we are using the "friends-of-friends" algorithm (as described in
+   the 1994 ApJ Williams et al paper) to carve up merged contours, then we
+   attempt to erode the new PixelSet by transferring pixels from the PixelSet
    into adjoining PixelSets defined at a higher contour level. The loop 
    continues until all pixels that adjoin another PixelSet have been 
    transferred out of the new PixelSet.*/
-         while( 1 ) {
-            if( !cupidCFErode( ps, ipa, ndim, dims, skip, naxis, ret ) ) break;
+         if( !idl ) {
+            while( 1 ) {
+               if( !cupidCFErode( ps, ipa, ndim, dims, skip, naxis, ret ) ) break;
+            }
+
+/* Otherwise, we use the simpler algorithm implemented in later IDL
+   versions of ClumpFind. This assigns each pixel in the PixelSet to the
+   adjoining clump that has the closest peak pixel. */
+         } else {
+            cupidCFIdl( ps, ipa, ndim, dims, skip, naxis, ret );
          }
 
 /* If the PixelSet is now empty, free the resources used by the PixelSet.

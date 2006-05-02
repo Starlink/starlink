@@ -78,9 +78,9 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel){
 
 
 /* Put all scalar fields back to their initial values in prepreation for
-   the PixelSet pointer being re-issued by cupidMakePS. Dynamic memory
-   referenced by the PixelSet is not freed, so that it can be reused
-   later. */
+   the PixelSet pointer being re-issued by cupidMakePS. */
+   ps->nebs = astFree( ps->nebs );
+   ps->nneb = 0;
    ps->pop = 0;
    ps->edge = 0;
    ps->vpeak = -DBL_MAX;

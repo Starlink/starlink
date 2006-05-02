@@ -75,6 +75,8 @@ typedef struct CupidPixelSet {
    int peak[ 3 ];      /* Peak pixel GRID coords */
    int pop;            /* Number of pixels assigned to the pixel set */
    int edge;           /* Does the PixelSet touch an edge of the data array? */
+   int *nebs;          /* List of indices of neighbouring clumps */
+   int nneb;           /* Length of "nebs" list */
 } CupidPixelSet;
 
 
@@ -173,6 +175,7 @@ float cupidRanVal( int, float[2] );
 int *cupidRCA( int *, int *, int, int[ 3 ], int[ 3 ], double, int, int, int, int );
 int *cupidRCA2( int *, int *, int, int[ 3 ], int[ 3 ] );
 int cupidCFErode( CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet ** );
+void cupidCFIdl( CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet ** );
 int cupidCFXtend( CupidPixelSet *, CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet ** );
 int cupidConfigI( AstKeyMap *, const char *, int );
 int cupidRFillClumps( int *, int *, int, int, int[ 3 ], int[ 3 ], int );

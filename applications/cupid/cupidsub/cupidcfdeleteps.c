@@ -38,7 +38,11 @@ CupidPixelSet *cupidCFDeletePS( CupidPixelSet *ps ){
 *     {note_any_bugs_here}
 */      
 
-/* Free the meory holding the PixelSet itself, and return a NULL pointer. */
+/* Free the memory used to hold the list of the indices of neighbouring
+   clumps. */   
+   ps->nebs = astFree( ps->nebs );
+
+/* Free the memory holding the PixelSet itself, and return a NULL pointer. */
    return astFree( ps );
 
 }

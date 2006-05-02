@@ -61,6 +61,8 @@ CupidPixelSet *cupidCFMakePS( int index ){
          ret->edge = 0;
          ret->vpeak = -DBL_MAX;
          ret->index = index;
+         ret->nebs = NULL;
+         ret->nneb = 0;
       }
 
 /* Otherwise, return a pointer to the PixelSet at the end of the cache
@@ -69,6 +71,8 @@ CupidPixelSet *cupidCFMakePS( int index ){
       ret = cupid_ps_cache[ --cupid_ps_cache_size ];
       cupid_ps_cache[ cupid_ps_cache_size ] = NULL;
       ret->index = index;
+      ret->nebs = NULL;
+      ret->nneb = 0;
    }
 
 /* Return the PixelSet pointer. */

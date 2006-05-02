@@ -793,9 +793,9 @@ following values:
 \begin{itemize}
 \item ClumpFind.FwhmBeam = 0
 \item ClumpFind.MaxBad = 100000  (or some other very large number)
-\item ClumpFind.MinPix = 5 (although this value seems to differ depending
-on which particular implementation of ClumpFind you want to compare with)
+\item ClumpFind.MinPix = 5 (for 3D data - use 20 for 2D data)
 \item ClumpFind.VeloRes = 0
+\item ClumpFind.IDLAlg = 1
 \end{itemize}
 
 You should also note that the pixel co-ordinate system used by the two
@@ -812,8 +812,8 @@ FITS file and which has been subjected to no geometric transformations,
 the pixel origin will be 1.0 on every pixel axis, resulting in the centre
 of the first pixel having a value of 0.5 on every pixel axis.
 
-Another point to note is that some implementations of ClumpFind do not
-conform exactly to the description in the published paper. Specifically:
+Some implementations of ClumpFind do not conform exactly to the description 
+in the published paper. Specifically:
 
 \begin{enumerate}
 
@@ -827,6 +827,13 @@ second contour level is sometimes omitted
 clump is sometimes varied in value
 
 \end{enumerate}
+
+CUPID provides an option to use either the published algorithm, or the
+algorithm implemented by the IDL package available from Jonathan Williams
+WWW site (as available at 28th April 2006). Setting the configuration
+parameter ClumpFind.IDLAlg to a non-zero value will cause the IDL
+implementation to be used. The default value of zero causes the published
+algorithm to be used.
 
 
 \subsection{\xlabel{reinhold}Reinhold}
@@ -1247,7 +1254,9 @@ The peak value in the clump is also corrected to take account of the
 smoothing produced by the instrumental beam. Such smoothing will result in
 the observed peak value being less than the real peak value, by an amount
 that increases as the clump area gets smaller. The correction factor
-assumes that the clumps has a Gaussian profile:
+assumes that the clumps has a Gaussian profile and is determined by the
+requirement that the total data sum within the corrected clump equals
+the total data sum within the uncorrected clump:
 
 \begin{myquote}
 \begin{eqnarray*}

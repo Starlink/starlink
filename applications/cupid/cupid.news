@@ -7,6 +7,15 @@
  data arrays.
 
 
+Changes introduced at V0.0-14:
+
+ - Added a new configuration parameter (ClumpFind.IDLAlg) that can be
+   used to force FINDCLUMPS to emulate the IDL implementation of the
+   ClumpFind algorithm, rather than the algorithm as described in the
+   Williams et al ApJ paper.
+
+ - Fixed bug that caused GAUSSCLUMPS method not to be recognised.
+
 Changes introduced at V0.0-13:
 
  - Additional text in SUN255.

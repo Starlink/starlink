@@ -17,7 +17,8 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *     cupidCFErode
 
 *  Purpose:
-*     Transfer all the pixels in one PixelSet into another.
+*     Transfer all the pixels in one PixelSet into another, using the
+*     algorithm of the Williams et al ClumpFind ApJ paper.
 
 *  Synopsis:
 *     int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
@@ -25,7 +26,11 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 
 *  Description:
 *     This function transfer all the pixels in PixelSet "ps" which are
-*     adjacent to another PixelSet into the neighbouring PixelSet. 
+*     adjacent to another PixelSet into the neighbouring PixelSet. The
+*     Williams et al ApJ ClumpFInd paper describes such pixels as
+*     "friends" of the neighbouring PixelSet, and the "friends-of-friends" 
+*     algorithm described in that paper is implemented by repeated calls 
+*     to this function.
 
 *  Parameters:
 *     ps
