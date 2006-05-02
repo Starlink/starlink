@@ -12,6 +12,12 @@
 *  Invocation:
 *     CALL DAT_CREAT ( PARAM, TYPE, NDIMS, DIMS, STATUS )
 
+*  Description:
+*     An HDS data object is created, as specified by the character
+*     string associated with the parameter, and the given type and 
+*     dimensionality. If the object is a component of a structure,
+*     the structure must already exist.
+
 *  Arguments:
 *     PARAM=CHARACTER*(*) (given)
 *           Name of program parameter
@@ -25,15 +31,30 @@
 *     STATUS=INTEGER (given and returned)
 *        Global status
 
-*  Description:
-*     An HDS data object is created, as specified by the character
-*     string associated with the parameter, and the given type and 
-*     dimensionality. If the object is a component of a structure,
-*     the structure must already exist.
-
 *  Algorithm:
 *     The internal identifying number for the parameter is obtained, and
 *     SUBPAR_CREAT called.
+
+*  Copyright:
+*     Copyright (C) 1984 Science & Engineering Research Council.
+*     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     BDK: B D Kelly (ROE)

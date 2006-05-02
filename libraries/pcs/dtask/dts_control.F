@@ -1,5 +1,4 @@
 #include <config.h>
-*+  DTASK_CONTROL - Unix version : process a CONTROL context message
       SUBROUTINE DTASK_CONTROL( PATH, ACTION, VALUE, MESSID, STATUS )
 *+
 *  Name:
@@ -15,7 +14,6 @@
 *     CALL DTASK_CONTROL( PATH, ACTION, VALUE, MESSID, STATUS )
 
 *  Description:
-*      
 *     Check that ACTION is recognised. At present this can only
 *     be 'DEFAULT' to get or set the task current working directory
 *        'SETENV' to set the value of an environment variable for the task
@@ -36,7 +34,7 @@
 *         by VALUE - all parameter states will be reset to the GROUND state.
 *         If no action is specified, it is done for all actions in the task/
 *         monolith.
-*
+
 *  Arguments:
 *     PATH = INTEGER (Given)
 *        The path identifier to the controlling task
@@ -51,6 +49,27 @@
 
 *  Implementation Deficiencies:
 *     Unix specific version
+
+*  Copyright:
+*     Copyright (C) 1991-1993 Science & Engineering Research Council.
+*     Copyright (C) 1995-1997, 2000 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)

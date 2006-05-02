@@ -34,6 +34,27 @@
 *     Otherwise get ARG 0, find the end of any path information and take the
 *     the remainder as the name.
 
+*  Copyright:
+*     Copyright (C) 1992-1993 Science & Engineering Research Council.
+*     Copyright (C) 2001 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
 *     BKM: B K McIlwrath (STARLINK)
@@ -41,19 +62,19 @@
 
 *  History:
 *     13-NOV-1992 (AJC)::
-*        
+*
 *      Original Version - dummy
 *     23-FEB-1993 (AJC)::
-*        
+*
 *      Version to use exe name
 *     26-APR-1993 (AJC)::
-*        
+*
 *      Add the translation of ICL_PARENT_PID to the name where appropriate
 *     02-AUG-1993 (BKM)::
-*        
+*
 *      Replace ICL_PARENT_PID by ICL_TASK_NAME
 *     15-JUN-2001 (AJC)::
-*        
+*
 *      Changed name from ADAM_PRCNAM
 *     {enter_further_changes_here}
 
