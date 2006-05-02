@@ -119,6 +119,10 @@ sub push_line {
       $section =~ s/\s+$//;
       if ($section eq 'Remarks') {
 	$section = "Notes";
+      } elsif ($section eq 'Inputs') {
+	$section = 'Input Arguments';
+      } elsif ($section eq 'Outputs') {
+	$section = 'Output Arguments';
       }
       $self->section( $section );
 
