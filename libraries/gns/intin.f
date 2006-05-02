@@ -1,64 +1,84 @@
       SUBROUTINE gns_1INTIN (STRING, NSTRT, IRESLT, JFLAG)
 *+
-*
-*     - - - - - -
-*      I N T I N   (Internal routine)
-*     - - - - - -
-*
-*   Convert free-format input into integer
-*
-*   Given
-*      STRING      c       String containing field to be decoded
-*      NSTRT       i       Pointer to 1st character of field in string
-*
-*   Returned
-*      NSTRT       i       Advanced to next field
-*      IRESLT      i       Result
-*      JFLAG       i       -1 = -OK, 0 = +OK, 1 = null field, 2 = error
-*
-*   Externals
-*      gns_1IDCHI
-*
-*   Notes
+*  Name:
+*     INTIN
+
+*  Purpose:
+*     Convert free-format input into integer
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     Internal routine
+
+*  Arguments:
+*     STRING = CHAR (Given)
+*         String containing field to be decoded
+*     NSTRT = INTEGER (Given)
+*         Pointer to 1st character of field in string
+*     NSTRT = INTEGER (Returned)
+*         Advanced to next field
+*     IRESLT = INTEGER (Returned)
+*         Result
+*     JFLAG = INTEGER (Returned)
+*         -1 = -OK, 0 = +OK, 1 = null field, 2 = error
+
+*  Notes:
 *     1     The basic format is #^ where # means + or -, and ^
-*           means a string of decimals.
+*     means a string of decimals.
 *
 *     2     Spaces:
-*             Leading spaces are ignored.
-*             Spaces between # and ^ are ignored.
-*             Trailing spaces are ignored;  the first signifies
-*             end of decoding and subsequent ones are skipped.
+*     Leading spaces are ignored.
+*     Spaces between # and ^ are ignored.
+*     Trailing spaces are ignored;  the first signifies
+*     end of decoding and subsequent ones are skipped.
 *
 *     3     # is optional.  The default is +.
-*           If # is present, ^ must be as well.
+*     If # is present, ^ must be as well.
 *
 *     4     A null field is one that does not begin with
-*           +,-, or 0-9, or consists entirely of spaces.
-*           If the field is null, JFLAG is set to 1 and
-*           IRESLT is left untouched.
+*     +,-, or 0-9, or consists entirely of spaces.
+*     If the field is null, JFLAG is set to 1 and
+*     IRESLT is left untouched.
 *
 *     5     NSTRT = 1 for the first character in the string.
 *
 *     6     On return from INTIN, NSTRT is set ready for the next
-*           decode - following trailing blanks and (if used) the
-*           separator. If a separator other than a comma or an underscore
-*           is being used, NSTRT must be incremented before the next
-*           call to INTIN.
+*     decode - following trailing blanks and (if used) the
+*     separator. If a separator other than a comma or an underscore
+*     is being used, NSTRT must be incremented before the next
+*     call to INTIN.
 *
 *     7     Errors (JFLAG=2) occur when:
-*             a)  The field has # but no ^.
-*             b)  ^ is greater than 2**31-1.
+*     a)  The field has # but no ^.
+*     b)  ^ is greater than 2**31-1.
 *
 *     8     When an error has been detected, NSTRT is left
-*           pointing to the character which caused the error.
+*     pointing to the character which caused the error.
 *
 *     9     End of field may occur in either of two ways:
-*             a)  As dictated by the string length.
-*             b)  Detected during the decode.
-*                 (b overrides a.)
-*
-*   P.T.Wallace, D.L.Terrett   Starlink  Jan 1987
-*+
+*     a)  As dictated by the string length.
+*     b)  Detected during the decode.
+*     (b overrides a.)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     01-JAN-1987 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     gns_1IDCHI
+
+*-
       IMPLICIT NONE
 
       CHARACTER*(*) STRING

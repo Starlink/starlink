@@ -1,34 +1,56 @@
       SUBROUTINE gns_1IDCHI (STRING, NPTR, LENSTR, NVEC, DIGIT)
 *+
+*  Name:
+*     IDCHI
+
+*  Purpose:
+*     Identify next character in string for INTIN
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     Internal routine
+
+*  Arguments:
+*     STRING = CHAR (Given)
+*         String
+*     NPTR = INTEGER (Given)
+*         Pointer to character to be identified
+*     LENSTR = INTEGER (Given)
+*         String length
+*     NPTR = INTEGER (Returned)
+*         Incremented unless end of field
+*     NVEC = INTEGER (Returned)
+*         Vector for identified character
+*     DIGIT = DOUBLE (Returned)
+*         Double precision digit if 0-9
+
+*  Notes:
+*     NVEC takes the following values:-
 *
-*     - - - - - - 
-*      I D C H I   (Internal routine)
-*     - - - - - -
-*
-*   Identify next character in string for INTIN
-*
-*   Given
-*      STRING      c       string
-*      NPTR        i       pointer to character to be identified
-*      LENSTR      i       string length
-*
-*   Returned
-*      NPTR        i       incremented unless end of field
-*      NVEC        i       vector for identified character
-*      DIGIT       d       double precision digit if 0-9
-*
-*     NVEC takes the following values:
-*
-*      1     0-9
-*      2     space 
-*      3     +
-*      4     -
-*      5     , or _
-*      6     else
-*      7     outside string
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   Jan 1987
-*+
+*     1     0-9
+*     2     space
+*     3     +
+*     4     -
+*     5     , or _
+*     6     else
+*     7     outside string
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     01-JAN-1987 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
       IMPLICIT NONE
 
       CHARACTER*(*) STRING
