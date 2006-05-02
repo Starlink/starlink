@@ -969,7 +969,7 @@ itcl::class gaia::GaiaCube {
 
          #  Button-1 does a lot already so use double click.
          $itk_option(-canvas) bind all <Double-Button-1> \
-            [code $this display_spectrum_ splat %x %y]
+            [code $this send_to_splat_ %x %y]
       } else {
          $itk_option(-canvas) bind all <Double-Button-1> {}
       }
@@ -993,9 +993,9 @@ itcl::class gaia::GaiaCube {
       $itk_option(-canvas) bind all <B1-Motion> {}
    }
 
-   #  Display a spectrum in the plot. Action can be "splat", "localstart" or
-   #  "localdrag", for display in SPLAT, start a spectral display (sets the
-   #  initial scale of a drag), or update during a drag.
+   #  Display a spectrum in the local plot. Action can be "localstart" or
+   # "localdrag", to start a spectral display (sets the initial scale of a
+   # drag), or update during a drag.
    protected method display_spectrum_ {action cx cy} {
 
       #  Convert click coordinates from canvas coords to grid coords.
@@ -1003,123 +1003,116 @@ itcl::class gaia::GaiaCube {
       set ccy [$itk_option(-canvas) canvasy $cy]
       $itk_option(-rtdimage) convert coords $ccx $ccy canvas iix iiy image
 
-      if { $action == "splat" } {
-
-         #  Use origins to get pixel indices.
-         if { $axis_ == 1 } {
-            set xo [lindex $bounds_ 2]
-            set yo [lindex $bounds_ 4]
-         } elseif { $axis_ == 2 } {
-            set xo [lindex $bounds_ 0]
-            set yo [lindex $bounds_ 4]
-         } else {
-            set xo [lindex $bounds_ 0]
-            set yo [lindex $bounds_ 2]
-         }
-
-         #  Correct to pixel indices.
-         set ix [expr round($iix-1+$xo)]
-         set iy [expr round($iiy-1+$yo)]
-
-         #  Create the right section. Use collapse coords as bounds on the
-         #  spectral axis.
-         set range "$lower_collapse_bound_:$upper_collapse_bound_"
-         if { $axis_ == 1 } {
-            set section "($range,$ix,${iy}${close_section_}"
-         } elseif { $axis_ == 2 } {
-            set section "($ix,$range,${iy}${close_section_})"
-         } else {
-            set section "($ix,$iy,${range}${close_section_}"
-         }
-
-         #  Send the section to SPLAT.
-         if { $splat_disp_ == {} } {
-            set splat_disp_ [GaiaForeignExec \#auto \
-                                -application $splat_dir_/splatdisp \
-                                -show_output 0]
-         }
-         $splat_disp_ runwith "${ndfname_}${section}" 0
+      if { $spectrum_ == {} } {
+         #  Need to create a spectrum plot. Note show short help in this
+         #  window to save real estate.
+         set spectrum_ [GaiaSpectralPlot $w_.specplot \
+                           -number $itk_option(-number) \
+                           -shorthelpwin [scope $short_help_win_]]
+         
+         #  Make this a transient of main window, not this one.
+         wm transient $spectrum_ $itk_option(-gaia)
+         
+         #  Display in main window as well.
+         $spectrum_ configure -canvas $itk_option(-canvas)
+         
+         #  Create the marker for the image position.
+         create_position_marker_ $ccx $ccy
 
       } else {
-         #  Display in the spectrum_plot. Note show short help in this window
-         #  to save real estate.
-         if { $spectrum_ == {} } {
-            set spectrum_ [GaiaSpectralPlot $w_.specplot \
-                              -number $itk_option(-number) \
-                              -shorthelpwin [scope $short_help_win_]]
-            
-            #  Make this a transient of main window, not this one.
-            wm transient $spectrum_ $itk_option(-gaia)
-            
-            #  Display in main window as well.
-            $spectrum_ configure -canvas $itk_option(-canvas)
-            
-            #  Create the marker for the image position.
+
+         #  Already have a plot, re-display if withdrawn.
+         if { [wm state $spectrum_] == "withdrawn" } {
+            $spectrum_ open
+         }
+         
+         #  Re-create the marker for the image position.
+         if { $position_mark_ == {} } {
             create_position_marker_ $ccx $ccy
-         } else {
-            #  Re-display if withdrawn.
-            if { [wm state $spectrum_] == "withdrawn" } {
-               $spectrum_ open
-            }
-            
-            #  Re-create the marker for the image position.
-            if { $position_mark_ == {} } {
-               create_position_marker_ $ccx $ccy
-            }
-         }
-         
-         #  Correct collapse bounds to grid indices.
-         if { $axis_ == 1 } {
-            set zo [lindex $bounds_ 0]
-         } elseif { $axis_ == 2 } {
-            set zo [lindex $bounds_ 2]
-         } else {
-            set zo [lindex $bounds_ 4]
-         }
-         set alow [expr round($lower_collapse_bound_+1-$zo)]
-         set ahigh [expr round($upper_collapse_bound_+1-$zo)]
-         
-         #  Make sure ix and iy are integers (zoomed images).
-         set ix [expr round($iix)]
-         set iy [expr round($iiy)]
-         
-         #  Move position marker on the image.
-         $itk_option(-canvas) coords $position_mark_ $ccx $ccy
-         
-         #  Also autoscale when single click, so that we are not fixed for
-         #  all time.
-         if { $itk_option(-autoscale) || $action == "localstart" } {
-            busy {
-               $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh \
-                  $ix $iy 1 $ccx $ccy
-            }
-            
-            #  Set first-time reference position.
-            set coord [get_coord_ $plane_ 0 0]
-            if { $coord != {} } {
-               $spectrum_ set_ref_coord $coord
-            }
-         } else {
-            busy {
-               $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh \
-                  $ix $iy 0
-            }
          }
       }
       
-      #  XXX Checker code for region spectra.
-      #       if { $ardspectra_ == {} } {
-      #          global gaia_dir
-      #          set ardspectra_ [GaiaApp \#auto -application $gaia_dir/ardspectra]
-      #       }
-      #       set arddesc "CIRCLE($ix,$iy,20)"
-      #       echo "$ardspectra_  runwiths in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
-      #       $ardspectra_  runwiths "in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
-      #       catch {
-      #          echo "$splat_disp_ runwith GaiaArdSpectrum"
-      #          $splat_disp_ runwith "GaiaArdSpectrum"
-      #       } msg
-      #       puts "msg = $msg"
+      #  Correct collapse bounds to grid indices.
+      if { $axis_ == 1 } {
+         set zo [lindex $bounds_ 0]
+      } elseif { $axis_ == 2 } {
+         set zo [lindex $bounds_ 2]
+      } else {
+         set zo [lindex $bounds_ 4]
+      }
+      set alow [expr round($lower_collapse_bound_+1-$zo)]
+      set ahigh [expr round($upper_collapse_bound_+1-$zo)]
+      
+      #  Make sure ix and iy are integers (zoomed images).
+      set ix [expr round($iix)]
+      set iy [expr round($iiy)]
+      
+      #  Move position marker on the image.
+      $itk_option(-canvas) coords $position_mark_ $ccx $ccy
+      
+      #  Also autoscale when single click, so that we are not fixed for
+      #  all time.
+      if { $itk_option(-autoscale) || $action == "localstart" } {
+         busy {
+            $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh \
+               $ix $iy 1 $ccx $ccy
+         }
+         
+         #  Set first-time reference position.
+         set coord [get_coord_ $plane_ 0 0]
+         if { $coord != {} } {
+            $spectrum_ set_ref_coord $coord
+         }
+      } else {
+         busy {
+            $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh \
+               $ix $iy 0
+         }
+      }
+   }
+
+   #  Send a spectrum to SPLAT. 
+   protected method send_to_splat_ {cx cy} {
+
+      #  Convert click coordinates from canvas coords to grid coords.
+      set ccx [$itk_option(-canvas) canvasx $cx]
+      set ccy [$itk_option(-canvas) canvasy $cy]
+      $itk_option(-rtdimage) convert coords $ccx $ccy canvas iix iiy image
+
+      #  Use origins to get pixel indices.
+      if { $axis_ == 1 } {
+         set xo [lindex $bounds_ 2]
+         set yo [lindex $bounds_ 4]
+      } elseif { $axis_ == 2 } {
+         set xo [lindex $bounds_ 0]
+         set yo [lindex $bounds_ 4]
+      } else {
+         set xo [lindex $bounds_ 0]
+         set yo [lindex $bounds_ 2]
+      }
+      
+      #  Correct to pixel indices.
+      set ix [expr round($iix-1+$xo)]
+      set iy [expr round($iiy-1+$yo)]
+      
+      #  Create the right section. Use collapse coords as bounds on the
+      #  spectral axis.
+      set range "$lower_collapse_bound_:$upper_collapse_bound_"
+      if { $axis_ == 1 } {
+         set section "($range,$ix,${iy}${close_section_}"
+      } elseif { $axis_ == 2 } {
+         set section "($ix,$range,${iy}${close_section_})"
+      } else {
+         set section "($ix,$iy,${range}${close_section_}"
+      }
+      
+      #  Send the section to SPLAT.
+      if { $splat_disp_ == {} } {
+         set splat_disp_ [GaiaForeignExec \#auto \
+                             -application $splat_dir_/splatdisp \
+                             -show_output 0]
+      }
+      $splat_disp_ runwith "${ndfname_}${section}" 0
    }
 
    #  Create the spectral position marker.
@@ -1139,6 +1132,18 @@ itcl::class gaia::GaiaCube {
       $itk_option(-canvas) bind $position_mark_  <B1-Motion> \
          [code $this display_spectrum_ localdrag %x %y]
    }
+
+   #  XXX Devel code for region spectra (was in display_spectrum_).
+   #  if { $ardspectra_ == {} } {
+   #     global gaia_dir
+   #     set ardspectra_ [GaiaApp \#auto -application $gaia_dir/ardspectra]
+   #  }
+   #  set arddesc "CIRCLE($ix,$iy,20)"
+   #  $ardspectra_  runwiths "in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
+   #  catch {
+   #     $splat_disp_ runwith "GaiaArdSpectrum"
+   #  } msg
+
 
    #  Configuration options: (public variables)
    #  ----------------------
