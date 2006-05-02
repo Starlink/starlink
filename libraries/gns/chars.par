@@ -1,5 +1,9 @@
 *+
-*   Symbolic names for the values of the enumerated type characteristics
+*  Name:
+*     char.par
+
+*  Purpose:
+*     Symbolic names for the values of the enumerated type characteristics
 *-
 
 *   CLASS

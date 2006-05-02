@@ -1,6 +1,10 @@
 *+
-*   Public constants for the GNS package
-*+
+*  Name:
+*     GNS_PAR
+
+*  Purpose:
+*     Public constants for the GNS package
+*-
 
 *   Workstation names
       INTEGER GNS__SZNAM
