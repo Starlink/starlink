@@ -1,20 +1,38 @@
       SUBROUTINE gns_1HOSTN( NAME, LNAME, STATUS)
-*++
-*   gns_1HOSTN  returns the name of the system
-*
-*   Description:
-*       Gets the system name; eg the DECnet node name or IP host name
-*       
-*   Input arguments:
-*      STATUS  i                 Inherited status
-*
-*   Output arguments:
-*      NAME    c                 The system name
-*      LNAME   i                 The length of the name
-*      STATUS  i                 Status
-*
-*   D L Terrett 06-JUN-1991
-*++
+*+
+*  Name:
+*     gns_1HOSTN
+
+*  Purpose:
+*     returns the name of the system
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     Gets the system name; eg the DECnet node name or IP host name
+
+*  Arguments:
+*     NAME = CHAR (Returned)
+*         The system name
+*     LNAME = INTEGER (Returned)
+*         The length of the name
+*     STATUS = INTEGER (Given & Returned)
+*         Status
+
+*  Authors:
+*     DLT: D L Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     06-JUN-1991 (DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
       IMPLICIT NONE
 
       CHARACTER*(*) NAME

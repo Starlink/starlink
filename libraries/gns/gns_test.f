@@ -1,15 +1,12 @@
       PROGRAM GNS_TEST
 *+
-*   Program:
+*  Name:
+*     GNSRUN
 *
-*      GNSRUN
-*
-*   Description:
-*
-*      Exercises the Graphics Workstation Name System test the installation
-*
-*
-*+
+*  Purpose:
+*     Exercises the Graphics Workstation Name System test the installation
+
+*-
 
       IMPLICIT NONE
 

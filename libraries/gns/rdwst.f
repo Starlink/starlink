@@ -1,46 +1,44 @@
       SUBROUTINE GNS_1RDWST(ITYPE, STATUS)
 *+
-*   Routine:
+*  Name:
+*     GNS_1RDWST
+
+*  Purpose:
+*     Ensure that the GNS comon block is filled in with the data for
+*     the specified workstation type.
 *
-*      GNS_1RDWST
-*
-*   Function:
-*
-*      Ensure that the GNS comon block is filled in with the data for
-*      the specified workstation type.
-*
-*   Call:
-*
-*      CALL GNS_1RDWST(ITYPE, STATUS)
+*  Invocation:
+*     CALL GNS_1RDWST(ITYPE, STATUS)
 *
 *   Description:
-*
-*      The workstation type of the current contents of the common block
-*      are compared with the requested type and the common block filled
-*      by reading from the description file if necessary.
+*     The workstation type of the current contents of the common block
+*     are compared with the requested type and the common block filled
+*     by reading from the description file if necessary.
 *
 *   Arguments:
-*
-*      Given:
-*       
-*         ITYPE   (INTEGER)
-*                        GKS workstation type
-*       
-*      Modified:
-*       
-*         STATUS  (INTEGER)
-*                        Inherited status
-*       
-*+
-*   Libraries Used:
-*
-*      EMS
-*
-*   D L Terrett   11-MAY-1989 
-*   Nick Eaton     2-APR-1990  Added OPEN keyword
-*   Nick Eaton    18-MAY-1990  Added AGI types
-*   Nick Eaton     9-JUL-1990  Added error reporting
+*     ITYPE =INTEGER (Given)
+*        GKS workstation type
+*     STATUS  (INTEGER (Given & Returned)
+*        Inherited status
 
+*   Libraries Used:
+*     EMS
+*
+*   Authors:
+*     DLT: D L Terrett (Starlink)
+*     NE: Nick Eaton (Starlink)
+
+*  History:
+*     11-MAY-1989 (DLT):
+*        Original.
+*      2-APR-1990 (NE):
+*        Added OPEN keyword
+*     18-MAY-1990 (NE):
+*        Added AGI types
+*      9-JUL-1990 (NE):
+*        Added error reporting
+
+*-
       IMPLICIT NONE
       INTEGER ITYPE, STATUS
 

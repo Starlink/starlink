@@ -1,19 +1,35 @@
       PROGRAM GNSRUN
 *+
-*   Program:
-*
-*      GNSRUN
-*
-*   Description:
-*
-*      Exercises the Graphics Workstation Name System as a
-*      demonstration for a user and to test the installation of the GNS
-*      system.
-*
-*+
-*   D L Terrett   17-MAY-1989 
-*   Nick Eaton    23-JUL-1990  Removed calls to GNS_MSG
+*  Name:
+*     GNSRUN
 
+*  Purpose:
+*     Test GNS
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     Exercises the Graphics Workstation Name System as a
+*     demonstration for a user and to test the installation of the GNS
+*     system.
+
+*  Authors:
+*     DLT: D L Terrett (Starlink)
+*     NE: Nick Eaton (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     17-MAY-1989 (DLT):
+*        Modified.
+*     23-JUL-1990 (NE):
+*        Removed calls to GNS_MSG.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
       IMPLICIT NONE
       INCLUDE 'GNS_ERR'
       INCLUDE 'GNS_PAR'

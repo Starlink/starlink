@@ -1,31 +1,50 @@
       SUBROUTINE gns_1FNDF (PACK,FILE,NAME)
-*++
-*   gns_1FNDF   Locates a GNS data file.
+*+
+*  Name:
+*     gns_1FNDF
+
+*  Purpose:
+*     Locates a GNS data file.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     The GNS data file for the specified package is located by checking
+*     for the existence of the following files:
 *
-*   Description:
-*      The GNS data file for the specified package is located by checking
-*      for the existence of the following files:
-*
-*         ${GNS_<PACK><FILE>} (eg. translation of the environment variable
-*                               GNS_GKSNAMES).
-*         ${GNS_DIR}/gns_<pack><file>
-*         ${PATH}/etc/gns_<pack>_<file>
-*
-*   Input arguments:
-*      PACK      c(*)   Package name (eg GKS or IDI)
-*      FILE      c(*)   File to be found (eg NAMES or DEVICES)
-*
-*   Output arguments:
-*      NAME      c*(*)  Full file name
-*
-*   Implicit inputs:
-*      none
-*
-*   Implicit outputs:
-*      none
-*
-*   D L Terrett   25-JUN-1995 
-*++
+*        ${GNS_<PACK><FILE>} (eg. translation of the environment variable
+*                             GNS_GKSNAMES).
+*        ${GNS_DIR}/gns_<pack><file>
+*        ${PATH}/etc/gns_<pack>_<file>
+
+*  Arguments:
+*     PACK = CHAR (Given)
+*         Package name (eg GKS or IDI)
+*     FILE = CHAR (Given)
+*         File to be found (eg NAMES or DEVICES)
+*     NAME = CHAR (Returned)
+*         Full file name
+
+*  Authors:
+*     DLT: D L Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-JUN-1995 (DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Implicit Inputs:
+*     none
+
+*  Implicit Outputs:
+*     none
+
+*-
       IMPLICIT NONE
 
       INCLUDE 'SAE_PAR'

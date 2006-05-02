@@ -1,38 +1,32 @@
       SUBROUTINE GNS_MSG(STATUS, LEN, MSG)
 *+
-*   Routine:
+*  Name:
+*     GNS_MSG
 *
-*      GNS_MSG
+*  Purpose:
+*     Translates a GNS error code to a message
 *
-*   Function:
+*  Invocation:
+*     CALL GNS_MSG(STATUS, LEN, MSG)
 *
-*      Translates a GNS error code to a message
+*  Description:
+*     The given status code is converted to a text message
 *
-*   Call:
-*
-*      CALL GNS_MSG(STATUS, LEN, MSG)
-*
-*   Description:
-*
-*      The given status code is converted to a text message
-*
-*   Arguments:
-*
-*      Given:
-*       
-*         STATUS  (INTEGER)
-*                        GNS error status code
-*       
-*      Returned:
-*       
-*         LEN  (INTEGER)
-*                        Length of message text (can be zero)
-*         MSG  (CHARACTER)
-*                        Text of message
-*       
-*+
-*   D L Terrett   17-MAY-1989 
+*  Arguments:
+*     STATUS = INTEGER (Given)
+*         GNS error status code
+*     LEN = INTEGER (Returned)
+*         Length of message text (can be zero)
+*     MSG = CHARACTER
+*         Text of message
+* 
+*  Authors:
+*     DLT: D L Terrett (Starlink)
 
+*  History:
+*     17-MAY-1989 (DLT):
+*        Modified.
+*-
       IMPLICIT NONE
       INTEGER STATUS, LEN
       CHARACTER*(*) MSG

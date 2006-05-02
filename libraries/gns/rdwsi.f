@@ -1,43 +1,36 @@
       SUBROUTINE GNS_1RDWSI(WKTYPE, STATUS)
 *+
-*   Routine:
+*  Name:
+*     GNS_1RDWSI
 *
-*      GNS_1RDWSI
+*  Purpose:
+*     Ensure that the GNS comon block is filled in with the data for
+*     the specified workstation type.
 *
-*   Function:
-*
-*      Ensure that the GNS comon block is filled in with the data for
-*      the specified workstation type.
-*
-*   Call:
-*
-*      CALL GNS_1RDWSI(WKTYPE, STATUS)
+*  Invocation:
+*     CALL GNS_1RDWSI(WKTYPE, STATUS)
 *
 *   Description:
-*
-*      The workstation type of the current contents of the common block
-*      are compared with the requested type and the common block filled
-*      by reading from the description file if necessary.
+*     The workstation type of the current contents of the common block
+*     are compared with the requested type and the common block filled
+*     by reading from the description file if necessary.
 *
 *   Arguments:
-*
-*      Given:
-*
-*         WKTYPE  (CHARACTER*(GNS__SZTYP))
-*                        IDI workstation type
-*
-*      Modified:
-*
-*         STATUS  (INTEGER)
-*                        Inherited status
-*
-*+
-*   Libraries Used:
-*
-*      EMS
-*
-*   Nick Eaton    11-JUN-1990
+*     WKTYPE = CHARACTER*(GNS__SZTYP) (Given)
+*        IDI workstation type
+*     STATUS = INTEGER (Given & Returned)
+*        Inherited status
 
+*   Libraries Used:
+*     EMS
+
+*  Authors:
+*     NE: Nick Eaton (Starlink)
+
+*  History:
+*     11-JUN-1990 (NE):
+*        Modified.
+*-
       IMPLICIT NONE
       CHARACTER*(*) WKTYPE
       INTEGER STATUS

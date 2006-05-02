@@ -1,24 +1,43 @@
       SUBROUTINE GNS_1LOGTR ( LNAME, EQNAM, LENEQ, STATUS )
 
-*++
-*   GNS_1LOGTR - Perform one logical translation of the given name
-*
-*   Description :
-*     This routine translates the given environment variable into an 
+*+
+*  Name:
+*     GNS_1LOGTR
+
+*  Purpose:
+*     Perform one logical translation of the given name
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     This routine translates the given environment variable into an
 *     equivalence name.
 *     If the translation fails then a zero length string is returned.
-*
-*   Input arguments:
-*     LNAME   c*(*)   Name to translate
-*
-*   Output arguments:
-*     EQNAM   c*(*)   Equivalence name
-*     LENEQ   i       Length of name
-*     STATUS  i       Inherited status
-*
-*+
-*     D L Terrett  15 Jan 1991
 
+*  Arguments:
+*     LNAME = CHAR (Given)
+*         Name to translate
+*     EQNAM = CHAR (Returned)
+*         Equivalence name
+*     LENEQ = INTEGER (Returned)
+*         Length of name
+*     STATUS = INTEGER (Given & Returned)
+*         Inherited status
+
+*  Authors:
+*     DLT: D L Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-Jan-1991 (DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
       IMPLICIT NONE
 
       CHARACTER *(*) LNAME
@@ -46,4 +65,3 @@
       ENDIF
 
       END
-
