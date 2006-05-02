@@ -8,6 +8,13 @@ lib_LTLIBRARIES = libstarmem.la
 
 libstarmem_la_SOURCES = $(PRIVATE_C_FILES) $(PUBLIC_C_FILES)
 
+# Make all library code position independent. This is handy for creating
+# shareable libraries from the static ones (Java JNI libraries).
+if !NOPIC
+libstarmem_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+endif
+
+
 # We need to install starMemInit.c as a starMemInit.o for Fortran interface
 starMemInit.o: starMemInit.c mem.h
 install-exec-local: starMemInit.o
