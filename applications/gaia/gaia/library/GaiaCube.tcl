@@ -125,6 +125,15 @@ itcl::class gaia::GaiaCube {
          {Continuously change data limits,
             otherwise fixed by last click (faster)}
 
+      #  Enable send to SPLAT.
+      $Options add checkbutton -label "Enable SPLAT" \
+         -command [code $this set_splat_bindings_] \
+         -variable [scope itk_option(-use_splat)] \
+         -onvalue 1 \
+         -offvalue 0
+      add_menu_short_help $Options {Enable SPLAT}  \
+         {Enabled sending spectra to SPLAT (double click)}
+
       #  Add window help.
       add_help_button cube "On Window..."
       add_short_help $itk_component(menubar).help \
@@ -944,29 +953,37 @@ itcl::class gaia::GaiaCube {
    #  the associated spectra.
    protected method add_bindings_ {} {
 
-      #  SPLAT bindings. XXX move this into GaiaSpectralPlot. For now
-      #  this option is quiet when not enabled.
-      global env
-      if { [info exists env(SPLAT_DIR)]} {
-         set splat_dir_ $env(SPLAT_DIR)
-
-         #  Button-1 does a lot already so use double click.
-         $itk_option(-canvas) bind all <Double-Button-1> \
-            [code $this display_spectrum_ splat %x %y]
-      }
+      #  Bindings for sending to SPLAT (or not).
+      set_splat_bindings_
 
       #  Bindings for GaiaSpectralPlot instance.
       add_spectral_bindings_
    }
 
-   #  Add bindings to main canvas for spectral plot.
-   #  These are single-click and drag-click.
+   #  Add or disable SPLAT binding. XXX move this into GaiaSpectralPlot as a
+   #  more obvious control.
+   protected method set_splat_bindings_ {} {
+      global env
+      if { [info exists env(SPLAT_DIR)] && $itk_option(-use_splat)} {
+         set splat_dir_ $env(SPLAT_DIR)
+
+         #  Button-1 does a lot already so use double click.
+         $itk_option(-canvas) bind all <Double-Button-1> \
+            [code $this display_spectrum_ splat %x %y]
+      } else {
+         $itk_option(-canvas) bind all <Double-Button-1> {}
+      }
+   }
+
+
+   #  Add bindings to rtdimage in the main canvas for spectral plot.
+   #  These are single-click and drag-click on the image and cross.
    protected method add_spectral_bindings_ {} {
 
-      $itk_option(-canvas) bind all <1> \
+      $itk_option(-canvas) bind $itk_option(-rtdimage) <1> \
          [code $this display_spectrum_ localstart %x %y]
-
-      $itk_option(-canvas) bind all <B1-Motion> \
+      
+      $itk_option(-canvas) bind $itk_option(-rtdimage)  <B1-Motion> \
          [code $this display_spectrum_ localdrag %x %y]
    }
 
@@ -1080,7 +1097,6 @@ itcl::class gaia::GaiaCube {
             #  Set first-time reference position.
             set coord [get_coord_ $plane_ 0 0]
             if { $coord != {} } {
-               update; # Force redraw to get underlying plot right.
                $spectrum_ set_ref_coord $coord
             }
          } else {
@@ -1115,6 +1131,13 @@ itcl::class gaia::GaiaCube {
       set position_mark_ [$itk_option(-canvas) create rtd_mark \
                              $cx $cy -type cross -scale 1 \
                              -fixscale 1 -size 7 -outline red]
+
+      #  Bindings to move and select this.
+      $itk_option(-canvas) bind $position_mark_ <1> \
+         [code $this display_spectrum_ localstart %x %y]
+      
+      $itk_option(-canvas) bind $position_mark_  <B1-Motion> \
+         [code $this display_spectrum_ localdrag %x %y]
    }
 
    #  Configuration options: (public variables)
@@ -1155,6 +1178,9 @@ itcl::class gaia::GaiaCube {
    #  Whether to use file mapping (quick startup), or direct io (fast
    #  spectral display).
    itk_option define -usemmap usemmap UseMmap 1
+
+   #  Whether to enable or disabled the SPLAT mouse bindings.
+   itk_option define -use_splat use_splat Use_Splat 0
 
    #  Protected variables: (available to instance)
    #  --------------------
