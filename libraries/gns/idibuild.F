@@ -1,32 +1,62 @@
 #include <config.h>
       PROGRAM IDIBLD
 *+
-*   Name:
+*  Name:
 *     IDIBLD
-*
-*   Description:
-*     Builds the binary GNS workstation description file for IDI
-*     workstations from a text description.
-*
-*  Type of Module:
+
+*  Language:
+*     {routine_language}
+
+*  Type Of Module:
 *     PROGRAM
 
-*   Invocation:
+*  Invocation:
 *     IDIBUILD
-*
-*   Side Effects:
-*     Creates a new description file called GNS_GKSDEVICES.DAT in the
-*     current default directory.
 
-*   Authors:
+*  Description:
+*     Builds the binary GNS workstation description file for IDI
+*     workstations from a text description.
+
+*  Copyright:
+*     Copyright (C) 1989 Science & Engineering Research Council.
+*     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Starlink)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
-*   History:
+*  History:
 *     21-MAY-1989 (NE):
 *        Original.
 *     15-APR-2004 (TIMJ):
 *        Use autoconf for RECL units
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Side Effects:
+*     Creates a new description file called GNS_GKSDEVICES.DAT in the
+*     current default directory.
+
 *-
       IMPLICIT NONE
 
@@ -114,31 +144,54 @@
 
       INTEGER FUNCTION GETNEX(SKIPS,UPCAS)
 *+
-*   Name:
+*  Name:
 *     GETNEX
-*
-*   Type of module:
-*     SUBROUTINE
 
-*   Purpose:
+*  Purpose:
 *     Gets the next character from the input file
 
-*   Description:
+*  Language:
+*     {routine_language}
+
+*  Type Of Module:
+*     SUBROUTINE
+
+*  Description:
 *     Gets the next character after interpereting escape characters
 *     (the ^). Spaces are skipped and characters converted to upper case
 *     if requested. End of record is treated as a space.
-*
-*   Arguments:
+
+*  Arguments:
 *     SKIPS = LOGICAL (Given)
 *         Skip spaces
 *     UPCAS = LOGICAL (Given)
 *         Fold to upper case
 
-*   Returned Value:
+*  Returned Value:
 *     GETNEX = INTEGER
 *         Integer representation of character or -1 if
 *         the end of file is encountered
-*       
+
+*  Copyright:
+*     Copyright (C) 1989 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DLT: D L Terrett (Starlink)
 *     {enter_new_authors_here}
@@ -147,6 +200,9 @@
 *     19-APR-1989 (DLT):
 *        Modified.
 *     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 
@@ -224,17 +280,11 @@
 *  Name:
 *     GETWST
 
-*   Purpose:
+*  Purpose:
 *     Get the data for the next workstation from the data file
-*
-*  Authors:
-*     NE: Nick Eaton (Starlink)
-*     {enter_new_authors_here}
 
-*  History:
-*     21-MAY-1989 (DLT):
-*        Original.
-*     {enter_further_changes_here}
+*  Language:
+*     {routine_language}
 
 *  Notes:
 *     The text description file consists entirely of statements of the
@@ -245,6 +295,38 @@
 *
 *           WORKSTATION       character
 *           AGITYPE           integer
+
+*  Copyright:
+*     Copyright (C) 1989 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     NE: Nick Eaton (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     21-MAY-1989 (DLT):
+*        Original.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
       IMPLICIT NONE
@@ -480,10 +562,59 @@
 *+
 *  Name:
 *     WRTWST
-*
-*   Purpose:
+
+*  Purpose:
 *     Write a workstation description record to the binary file
+
+*  Language:
+*     {routine_language}
+
+*  Notes:
+*     The binary description file is an unformatted direct access Fortran
+*     file with fixed length records (dictated by the Fortran standard).
 *
+*     Each workstation description consists of the workstation type
+*     (a counted string) followed by a mixture of integers, reals,
+*     enumerated types (stored as integers) and "counted strings".
+*     A counted string is an integer character count followed by the
+*     characters stored as integers.  The order and meaning of the items
+*     is fixed; only the lengths of the counted strings varies between
+*     workstations.  Missing numeric items are represented my magic
+*     values that varies from item to item and missing string are
+*     represented by a count of zero.
+*
+*     Each workstation starts on the record boundary but may extend over
+*     more than one record in which case the first item on the
+*     continuation records is a magic value that can be distingushed from
+*     a workstation type.
+*
+*     The record number at which a particular workstation starts is
+*     calulated from the type using a tbd. hashing algorithm.
+*
+*     The first record in the file contains a file structure version
+*     number in the first item and optionally other data that depends on
+*     the version (eg. constants to use in the hashing).
+
+*  Copyright:
+*     Copyright (C) 1989 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     NE: Nick Eaton (Starlink)
 *     {enter_new_authors_here}
@@ -493,31 +624,8 @@
 *        Original.
 *     {enter_further_changes_here}
 
-*  Notes:
-*   The binary description file is an unformatted direct access Fortran
-*   file with fixed length records (dictated by the Fortran standard).
-*
-*   Each workstation description consists of the workstation type
-*   (a counted string) followed by a mixture of integers, reals,
-*   enumerated types (stored as integers) and "counted strings".
-*   A counted string is an integer character count followed by the
-*   characters stored as integers.  The order and meaning of the items
-*   is fixed; only the lengths of the counted strings varies between
-*   workstations.  Missing numeric items are represented my magic
-*   values that varies from item to item and missing string are
-*   represented by a count of zero.
-*
-*   Each workstation starts on the record boundary but may extend over
-*   more than one record in which case the first item on the
-*   continuation records is a magic value that can be distingushed from
-*   a workstation type.
-*
-*   The record number at which a particular workstation starts is
-*   calulated from the type using a tbd. hashing algorithm.
-*
-*   The first record in the file contains a file structure version
-*   number in the first item and optionally other data that depends on
-*   the version (eg. constants to use in the hashing).
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 
