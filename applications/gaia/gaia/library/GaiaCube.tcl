@@ -980,7 +980,6 @@ itcl::class gaia::GaiaCube {
    #  "localdrag", for display in SPLAT, start a spectral display (sets the
    #  initial scale of a drag), or update during a drag.
    protected method display_spectrum_ {action cx cy} {
-      puts "display_spectrum_ action = $action ($cx,$cy)"
 
       #  Convert click coordinates from canvas coords to grid coords.
       set ccx [$itk_option(-canvas) canvasx $cx]
