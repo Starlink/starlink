@@ -91,7 +91,8 @@ sub push_line {
     # - blank line (*   )
     # - terminator (*++) if we are too late
 
-    if ( $line =~ /^\s*$r\+\+\s*$/ #   *++ 
+    if ( $line =~ /^\s*$r\+\+\s*$/  || #   *++ 
+	 $line =~ /^\s*$r\+\s*$/       #   *+
        ) {
       # print "End of prologue detected\n";
       # end of prologue so flush the current section
@@ -122,12 +123,14 @@ sub push_line {
       $self->section( $section );
 
     } elsif (defined $self->section() && $self->section eq 'Name'
-	     && $line =~ /\w/) {
+	     && $line =~ /\s*$r\s+(.*)$/) {
       # first non-blank line is 
       #   NAME Purpose
-      $line =~ s/^\s+//;
-      $line =~ s/\s+$//;
-      my ($name, @purpose) = split /\s+/, $line;
+      my $title = $1;
+      $title =~ s/^\s+//;
+      $title =~ s/\s+$//;
+
+      my ($name, @purpose) = split /\s+/, $title;
       push(@{$self->content}, $name);
       $self->flush_section;
       $self->section( "Purpose" );
@@ -146,26 +149,39 @@ sub push_line {
       my $section = $self->section;
 
       # Look for an Author. Indicated by -1991 date
-      if ($line =~ /^\s*$r\s+(.*)\s+(\d{1,2}\-\w\w\w-\d\d\d\d)\s*$/) {
+      if ($line =~ /^\s*$r\s+(.*)\s+(\d{1,2}\-\w\w\w\-\d\d\d\d)/) {
 
 	my $author = $1;
 	my $date = $2;
+	$author =~ s/\s+$//;
 
-	# assume all authors on one line
-	$self->flush_section();
-	$self->section( "Authors" );
-	push(@{$self->content}, $author);
-	$self->flush_section();
+	my $comment;
+	if ($line =~ /\-\d\d\d\d\s+(.*)$/) {
+	  $comment = $1;
+	  $comment =~ s/\s+$//;
+	  $comment =~ s/^\s+//;
+	}
 
-	# history
+	# initials
 	my @names = split /\s+/,$author;
 	my $initials;
 	for my $n (@names) {
 	  $initials .= substr($n,0,1);
 	}
+
+	# Assume it is possible that there can be another line
+	# so retrieve earlier information
+	$self->flush_section();
+	$self->section( "Authors" );
+	push(@{$self->content}, $prl->content( "Authors" ), $initials . ": ". $author . " (Starlink)");
+	$self->flush_section();
+
+	# history
 	my $hist = $date . " ($initials):";
 	$self->section("History");
-	push(@{$self->content},$hist, "   Modified.");
+	push(@{$self->content},
+	     $prl->content("History"),
+	     $hist, "   ". ($comment ? $comment : "Modified") .".");
 	$self->flush_section();
 	return();
       } elsif (defined $section && ($section =~ /^Input/ || $section =~ /Output/)) {
@@ -184,14 +200,15 @@ sub push_line {
 	  croak "Error parsing Input/Output section: $section\n";
 	}
 	my %types = (
-                               routine => 'SUBROUTINE',
-                               c => 'CHAR',
-                               'c*(*)' => 'CHAR',
-                               'c*2' => 'CHAR*2',
-                               i => 'INTEGER',
-                               r => 'REAL',
-                              d => 'DOUBLE',
-                              l => 'LOGICAL');
+		     routine => 'SUBROUTINE',
+		     c => 'CHAR',
+		     'c*(*)' => 'CHAR',
+		     'c(*)' => 'CHAR',
+		     'c*2' => 'CHAR*2',
+		     i => 'INTEGER',
+		     r => 'REAL',
+		     d => 'DOUBLE',
+		     l => 'LOGICAL');
              if (!exists $types{$type}) {
                warn "Possible Bad type in argument list: $content\n";
                 # Assume a continuation of a previous line description
@@ -243,6 +260,29 @@ sub push_line {
   return ();
 }
 
+=item B<tidy_content>
+
+Remove duplicate content from Authors.
+
+=cut
+
+sub tidy_content {
+  my $self = shift;
+  my $section = $self->section;
+  return unless defined $section;
+  if ($section eq 'Authors' ) {
+    my @content = $self->content;
+    my @out;
+    my %uniq;
+    for my $e (@content) {
+      if (!exists $uniq{$e}) {
+	$uniq{$e} = $e;
+	push(@out, $e);
+      }
+    }
+    @{$self->content} = @out;
+  }
+}
 
 =back
 
