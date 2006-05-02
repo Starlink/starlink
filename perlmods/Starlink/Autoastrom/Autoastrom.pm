@@ -875,6 +875,26 @@ sub obsdata {
   return $self->{OBSDATA};
 }
 
+=item B<rawcatalogue>
+
+Retrieve the catalogue of detected objects before astrometry
+correction.
+
+  $raw = $auto->rawcatalogue;
+
+This method returns an C<Astro::Catalog> object.
+
+=cut
+
+sub rawcatalogue {
+  my $self = shift;
+  if( @_ ) {
+    my $raw = shift;
+    $self->{RAWCATALOGUE} = $raw;
+  }
+  return $self->{RAWCATALOGUE};
+}
+
 =item B<resultcatalogue>
 
 Retrieve the catalogue of detected objects with the updated WCS.
@@ -1319,6 +1339,7 @@ sub solve {
                              quality => 0, );
     $self->printstd( sprintf( "--I Extracted %d objects from NDF.\n", $ndfcat->sizeof ) )
       if $self->starlink_output;
+    $self->rawcatalogue( $ndfcat );
   }
 
 # We cannot do automated astrometry corrections if we have fewer
