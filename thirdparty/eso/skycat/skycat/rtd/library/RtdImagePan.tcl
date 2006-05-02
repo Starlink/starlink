@@ -13,6 +13,10 @@
 # Peter W. Draper 15 Feb 01  Changed notify_cmd method to deal with
 #                            very narrow images (spectra).
 # pbiereic        14/12/04   Fixed: Panning while image events are received
+# Peter W. Draper 02 Apr 05  Slight correction to logic of above. Make sure
+#                            panning changes are always seen for new images 
+#                            and images with orientation changes (pan with 
+#                            changed=1)
 
 itk::usual RtdImagePan {}
 
@@ -157,9 +161,11 @@ itcl::class rtd::RtdImagePan {
     # of the target image
     # x1 y1 x2 y2 give the visible portion of the image
     # if "changed" is 1, there is a new image with pos. different dimensions.
+    # PWD: if changed is true always do this, includes cases when orientation
+    # is changed (want to see the compass update).
 
     protected method pan {x1 y1 x2 y2 changed} {
-        if { [info exists coords_] } {
+       if { [info exists coords_] && ! $changed } {
             if { $x1 == $coords_(pan_x1) && $y1 == $coords_(pan_y1) && \
                  $x2 == $coords_(pan_x2) && $y2 == $coords_(pan_y2) && \
                  $panImageWidth_ > 1 } {
