@@ -6,6 +6,7 @@ package kappa {
 
       action mem2d {
          alias {mem2(d)}
+
          helplib {$KAPPA_HELP}
 
          parameter analyse {
@@ -1439,6 +1440,7 @@ package kappa {
       }
 
       action qualtobad {
+         alias {qualt(obad)}
 
          helplib {$KAPPA_HELP}
 
@@ -1483,6 +1485,7 @@ package kappa {
       }
 
       action remqual {
+         alias {remq(ual)}
 
          helplib {$KAPPA_HELP}
 
@@ -1956,7 +1959,8 @@ package kappa {
       }
 
       action setqual {
-         alias {setqu(al)}
+         alias {setq(ual)}
+
          helplib {$KAPPA_HELP}
 
          parameter ardfile {
@@ -2058,6 +2062,8 @@ package kappa {
       }
 
       action setsky {
+         alias {sets(ky)}
+
          helplib {$KAPPA_HELP}
          parameter coords {
             position 3
@@ -2359,6 +2365,7 @@ package kappa {
       }
 
       action showqual {
+         alias {showq(ual)}
 
          helplib {$KAPPA_HELP}
 
@@ -2385,6 +2392,7 @@ package kappa {
       }
 
       action wcsadd {
+         alias {wcsad(d)}
 
          helplib {$KAPPA_HELP}
 
@@ -2586,6 +2594,7 @@ package kappa {
       }
 
       action wcsattrib {
+         alias {wcsat(trib)}
 
          helplib {$KAPPA_HELP}
 
@@ -2654,6 +2663,7 @@ package kappa {
       }
 
       action wcscopy {
+         alias {wcsc(opy)}
 
          helplib {$KAPPA_HELP}
 
@@ -2713,6 +2723,7 @@ package kappa {
       }
 
       action wcsframe {
+         alias {wcsf(rame)}
 
          helplib {$KAPPA_HELP}
 
@@ -2747,6 +2758,7 @@ package kappa {
       }
 
       action wcsremove {
+         alias {wcsr(emove)}
 
          helplib {$KAPPA_HELP}
 
@@ -2773,6 +2785,7 @@ package kappa {
       }
 
       action wcsshow {
+         alias {wcss(how)}
 
          helplib {$KAPPA_HELP}
 
@@ -2852,6 +2865,7 @@ package kappa {
       }
 
       action chain {
+         alias {chai(n)}
 
          helplib {$KAPPA_HELP}
 
@@ -3549,8 +3563,7 @@ package kappa {
       }
 
       action colcomp {
-
-         alias {colcomp}
+         alias {colc(omp)}
 
          helplib {$KAPPA_HELP}
 
@@ -3690,7 +3703,7 @@ package kappa {
 
 
       action contour {
-         alias {contou(r)}
+         alias {cont(our)}
 
          helplib {$KAPPA_HELP}
 
@@ -3952,6 +3965,7 @@ package kappa {
       }
 
       action cursor {
+         alias {curs(or)}
 
          helplib {$KAPPA_HELP}
 
@@ -4205,6 +4219,7 @@ package kappa {
          alias {drawn(orth)}
 
          helplib {$KAPPA_HELP}
+
          parameter arrow {
             type _REAL
             vpath CURRENT DEFAULT
@@ -5345,6 +5360,8 @@ package kappa {
       }
 
       action lutedit {
+         alias {lute(dit)}
+
          helplib {$KAPPA_HELP}
 
          parameter device {
@@ -5380,7 +5397,10 @@ package kappa {
       }
 
       action lutsave {
+         alias {lutsa(ve)}
+
          helplib {$KAPPA_HELP}
+
          parameter device {
             position 2
             ptype DEVICE
@@ -5426,7 +5446,10 @@ package kappa {
       }
 
       action lutview {
+         alias {lutv(iew)}
+
          helplib {$KAPPA_HELP}
+
          parameter comp {
             type LITERAL
             vpath DEFAULT
@@ -6901,7 +6924,10 @@ package kappa {
       }
 
       action aperadd {
+         alias {aper(add)}
+
          helplib {$KAPPA_HELP}
+
          parameter ardfile {
             type FILENAME
             access READ
@@ -7123,7 +7149,10 @@ package kappa {
       }
 
       action ardmask {
+         alias {ardm(ask)}
+
          helplib {$KAPPA_HELP}
+
          parameter ardfile {
             position 2
             type FILENAME
@@ -8249,6 +8278,108 @@ package kappa {
 
       }
 
+      action chanmap {
+         alias {chan(map)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter axis {
+            position 3
+            type LITERAL
+            prompt {The axis to be collapsed}
+            ppath DYNAMIC
+            helpkey *
+          }
+         parameter estimator {
+            position 8
+            type LITERAL
+            vpath DEFAULT
+            prompt {Method for estimating collapsed pixel values}
+            ppath CURRENT DEFAULT
+            default Mean
+            helpkey *
+          }
+         parameter high {
+            position 7
+            type LITERAL
+            vpath DEFAULT
+            prompt {Axis value at end of channel range}
+            ppath DYNAMIC
+            default !
+            helpkey *
+          }
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            prompt {Input NDF}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+         parameter low {
+            position 6
+            type LITERAL
+            vpath DEFAULT
+            prompt {Axis value at start of channel range}
+            ppath DYNAMIC
+            default !
+            helpkey *
+          }
+         parameter nchan {
+            size *
+            position 4
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Total number of channels}
+            helpkey *
+          }
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            prompt {Output NDF}
+            association ->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+         parameter shape {
+            position 5
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Number of channels along x axis of the output NDF}
+            helpkey *
+          }
+         parameter title {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Output title}
+            ppath DYNAMIC
+            default !
+            helpkey *
+          }
+          parameter useaxis {
+            type LITERAL
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            default !
+            prompt {The WCS axes to retain in the output}
+            helpkey *
+          }
+         parameter wlim {
+            position 9
+            type _REAL
+            vpath DEFAULT
+            prompt {Weight limit for good output pixels}
+            ppath CURRENT DEFAULT
+            default 0.3
+            helpkey *
+          }
+      }
+
       action chpix {
          alias {chpi(x)}
 
@@ -8370,7 +8501,10 @@ package kappa {
       }
 
       action collapse {
+         alias {coll(apse)}
+         
          helplib {$KAPPA_HELP}
+
          parameter axis {
             position 3
             type LITERAL
@@ -8433,6 +8567,7 @@ package kappa {
             helpkey *
           }
          parameter wlim {
+            position 7
             type _REAL
             vpath DEFAULT
             prompt {Weight limit for good output pixels}
@@ -8837,6 +8972,7 @@ package kappa {
 
       action creframe {
          alias {cref(rame)}
+
          helplib {$KAPPA_HELP}
 
          parameter background {
@@ -10372,7 +10508,7 @@ package kappa {
       }
 
       action interleave {
-         alias {int(erleave)}
+         alias {inte(rleave)}
 
          helplib {$KAPPA_HELP}
 
@@ -10485,7 +10621,10 @@ iraf! {
 }
 
       action laplace {
+         alias {lapl(ace)}
+
          helplib {$KAPPA_HELP}
+
          parameter in {
             position 1
             type NDF
@@ -11085,6 +11224,7 @@ iraf! {
       }
 
       action makesnr {
+         alias {makesn(r)}
 
          helplib {$CUPID_HELP}
 
@@ -12921,7 +13061,10 @@ iraf! {
       }
 
       action outset {
+         alias {outs(et)}
+
          helplib {$KAPPA_HELP}
+
          parameter centre {
             position 3
             type LITERAL
@@ -13329,7 +13472,10 @@ iraf! {
       }
 
       action permaxes {
+         alias {perm(axes)}
+
          helplib {$KAPPA_HELP}
+
          parameter in {
             position 1
             type NDF
@@ -13434,7 +13580,9 @@ iraf! {
       }
 
       action pow {
+
          helplib {$KAPPA_HELP}
+
          parameter in {
             position 1
             type NDF
@@ -15421,7 +15569,9 @@ iraf! {
       }
 
       action trig {
+
          helplib {$KAPPA_HELP}
+
          parameter in {
             position 1
             type NDF
@@ -15753,6 +15903,7 @@ iraf! {
       }
 
       action listmake {
+         alias {listma(ke)}
 
          helplib {$KAPPA_HELP}
 
@@ -15872,6 +16023,7 @@ iraf! {
       }
 
       action listshow {
+         alias {listsh(ow)}
 
          helplib {$KAPPA_HELP}
 
@@ -16096,6 +16248,7 @@ iraf! {
       }
 
       action profile {
+         alias {prof(ile)}
 
          helplib {$KAPPA_HELP}
 
@@ -16200,6 +16353,7 @@ iraf! {
       }
 
       action wcsmosaic {
+         alias {wcsm(osaic)}
 
          helplib {$KAPPA_HELP}
 
@@ -16318,6 +16472,7 @@ iraf! {
       }
 
       action wcsalign {
+         alias {wcsal(ign)}
 
          helplib {$KAPPA_HELP}
 
@@ -16456,6 +16611,7 @@ iraf! {
       }
 
       action wcstran {
+         alias {wcst(ran)}
 
          helplib {$KAPPA_HELP}
 
@@ -16730,6 +16886,7 @@ iraf! {
 
    command outline {
       task contour {
+         alias {outl(ine)}
          taskinherit axes
          taskinherit device
          taskinherit margin
@@ -16806,99 +16963,99 @@ iraf! {
    }
 
    command transformer {
-      obsolete { The transformer command has been retired to the KAPRH package - see SUN239. Use "regrid" instead. }
+      obsolete { The transformer command has been retired to the KAPRH package---see SUN/239.  Use "regrid" instead. }
    } 
 
    command traninvert {
-      obsolete { The traninvert command has been retired to the KAPRH package - see SUN239. }
+      obsolete { The traninvert command has been retired to the KAPRH package---see SUN/239. }
    } 
 
    command tranjoin {
-      obsolete { The tranjoin command has been retired to the KAPRH package - see SUN239. }
+      obsolete { The tranjoin command has been retired to the KAPRH package---see SUN/239. }
    } 
 
    command tranmake {
-      obsolete { The tranmake command has been retired to the KAPRH package - see SUN239. }
+      obsolete { The tranmake command has been retired to the KAPRH package---see SUN/239. }
    } 
 
    command trantrace {
-      obsolete { The trantrace command has been retired to the KAPRH package - see SUN239. }
+      obsolete { The trantrace command has been retired to the KAPRH package---see SUN/239. }
    } 
 
    command idset {
-      obsolete { The idset command has been retired to the KAPRH package - see SUN239. Use "gdset" instead. }
+      obsolete { The idset command has been retired to the KAPRH package---see SUN/239. Use "gdset" instead. }
    } 
 
    command idclear {
-      obsolete { The idclear command has been retired to the KAPRH package - see SUN239. Use "gdclear" instead. }
+      obsolete { The idclear command has been retired to the KAPRH package---see SUN/239.  Use "gdclear" instead. }
    } 
 
    command idstate {
-      obsolete { The idstate command has been retired to the KAPRH package - see SUN239. Use "gdstate" instead. }
+      obsolete { The idstate command has been retired to the KAPRH package---see SUN/239.  Use "gdstate" instead. }
    } 
 
    command ovset {
-      obsolete { The ovset command has been retired to the KAPRH package - see SUN239. }
+      obsolete { The ovset command has been retired to the KAPRH package---see SUN/239. }
    } 
 
    command ovclear {
-      obsolete { The ovclear command has been retired to the KAPRH package - see SUN239. }
+      obsolete { The ovclear command has been retired to the KAPRH package---see SUN/239. }
    } 
 
    command idinvisible {
-      obsolete { The idinvisible command has been moved to the KAPRH package - see SUN239. }
+      obsolete { The idinvisible command has been moved to the KAPRH package---see SUN/239. }
    } 
 
    command idpazo {
-      obsolete { The idpazo command has been moved to the KAPRH package - see SUN239. }
+      obsolete { The idpazo command has been moved to the KAPRH package---see SUN/239. }
    } 
 
    command lutflip {
-      obsolete { The lutflip command has been moved to the KAPRH package - see SUN239. }
+      obsolete { The lutflip command has been moved to the KAPRH package---see SUN/239. }
    } 
 
    command luthilite {
-      obsolete { The luthilite has been moved to the KAPRH package - see SUN239. }
+      obsolete { The luthilite has been moved to the KAPRH package---see SUN/239. }
    } 
 
    command lutrot {
-      obsolete { The lutrot command has been moved to the KAPRH package - see SUN239. }
+      obsolete { The lutrot command has been moved to the KAPRH package---see SUN/239. }
    } 
 
    command luttweak {
-      obsolete { The luttweak command has been moved to the KAPRH package - see SUN239. }
+      obsolete { The luttweak command has been moved to the KAPRH package---see SUN/239. }
    } 
 
    command contover {
-      obsolete { The contover command has been retired. Use "contour clear=no" instead or use the contover command in the KAPRH package - see SUN239. }
+      obsolete { The contover command has been retired.  Use "contour clear=no" instead or use the contover command in the KAPRH package---see SUN/239. }
    } 
 
    command greyplot {
-      obsolete { The greyplot command has been retired. Use "display key=y" instead or use the greyplot command in the KAPRH package - see SUN239. }
+      obsolete { The greyplot command has been retired.  Use "display key=y" instead or use the greyplot command in the KAPRH package---see SUN/239. }
    } 
 
    command inspect {
-      obsolete { The inspect command has been retired. Use Gaia instead or use the inspect command in the KAPRH package - see SUN239. }
+      obsolete { The inspect command has been retired.  Use GAIA instead or use the inspect command in the KAPRH package---see SUN/239. }
    } 
 
    command mosaic {
-      obsolete { The mosaic command has been retired. Use ccdpack:makemos or use the mosaic command in the KAPRH package - see SUN239. }
+      obsolete { The mosaic command has been retired.  Use ccdpack:makemos or use the mosaic command in the KAPRH package---see SUN/239. }
    } 
 
    command quilt {
-      obsolete { The quilt command has been retired. Use ccdpack:makemos or use the quilt command in the KAPRH package - see SUN239. }
+      obsolete { The quilt command has been retired.  Use ccdpack:makemos or use the quilt command in the KAPRH package---see SUN/239. }
    } 
 
    command snapshot {
-      obsolete { The snapshot command has been retired. Use a utility such as gimp or xv or use the snapshot command in the KAPRH package - see SUN239. }
+      obsolete { The snapshot command has been retired.  Use a utility such as gimp or xv or use the snapshot command in the KAPRH package---see SUN/239. }
    } 
 
    command turbocont {
-      obsolete { The turbocont command has been retired. Use "contour" instead or use the turbocont command in the KAPRH package - see SUN239. }
+      obsolete { The turbocont command has been retired.  Use "contour" instead or use the turbocont command in the KAPRH package---see SUN/239. }
    } 
 
    command crelut {
-      obsolete { The crelut command has been retired. Use "lutedit" instead or use the crelut command in the KAPRH package - see SUN239. }
+      obsolete { The crelut command has been retired.  Use "lutedit" instead or use the crelut command in the KAPRH package---see SUN/239. }
    } 
 
    icl {defhelp kappa $KAPPA_HELP 0}
