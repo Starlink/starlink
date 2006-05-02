@@ -815,7 +815,7 @@ itcl::class gaia::GaiaCube {
          after cancel $afterId_
          set afterId_ {}
          # DEBUG
-         puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
+         # puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
       }
    }
 
@@ -948,7 +948,6 @@ itcl::class gaia::GaiaCube {
       #  this option is quiet when not enabled.
       global env
       if { [info exists env(SPLAT_DIR)]} {
-         puts "SPLAT_DIR defined and bound to double click"
          set splat_dir_ $env(SPLAT_DIR)
 
          #  Button-1 does a lot already so use double click.
@@ -1023,7 +1022,6 @@ itcl::class gaia::GaiaCube {
                                 -application $splat_dir_/splatdisp \
                                 -show_output 0]
          }
-         puts "$splat_disp_ runwith ${ndfname_}${section} 0"
          $splat_disp_ runwith "${ndfname_}${section}" 0
 
       } else {
