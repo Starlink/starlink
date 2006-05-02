@@ -1,30 +1,49 @@
       SUBROUTINE gns_1TRIM (IN,OUT,L)
-*++
-*   gns_1TRIM   Trims leading and trailing blanks from a string.
-*
-*   Description:
-*      Leading and trailing blanks are removed from the input string and
-*      the length of the resulting string returned. If the input string
-*      is all blanks the length is set to zero.
-*
-*   Input arguments:
-*      IN      c(*)     Input string
-*
-*   Output arguments:
-*      OUT     c*(*)    Output string
-*      L       i        Length of output string
-*
-*   Implicit inputs:
-*      none
-*
-*   Implicit outputs:
-*      none
-*
-*   External references:
-*      none
-*
-*   D L Terrett   3-JUN-1988 
-*++
+*+
+*  Name:
+*     gns_1TRIM
+
+*  Purpose:
+*     Trims leading and trailing blanks from a string.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     Leading and trailing blanks are removed from the input string and
+*     the length of the resulting string returned. If the input string
+*     is all blanks the length is set to zero.
+
+*  Arguments:
+*     IN = CHAR (Given)
+*         Input string
+*     OUT = CHAR (Returned)
+*         Output string
+*     L = INTEGER (Returned)
+*         Length of output string
+
+*  Authors:
+*     DLT: D L Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     3-JUN-1988 (DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External References:
+*     none
+
+*  Implicit Inputs:
+*     none
+
+*  Implicit Outputs:
+*     none
+
+*-
       IMPLICIT NONE
 
       CHARACTER*(*) IN, OUT
