@@ -58,8 +58,11 @@
 *     2006-03-29 (AGG):
 *        Check ffdata on return from astRealloc
 *     2006-04-21 (AGG):
-*        - update subroutine calls due to changed APIS
+*        - update subroutine calls due to changed APIs
 *        - set SMF_NOCREATE_FILE flag for NULL ffdata
+*     2006-05-02 (AGG):
+*        Set SMF_NOCREATE_FILE & SMF__NOCREATE_DA flags for
+*        NULL ffdata when input data are flatfielded
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -198,6 +201,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
     /* What if ffdata is NULL? */
     msgOutif(MSG__VERB, FUNC_NAME, "Data FF: Copying to output file ", status);
     if ( *ffdata == NULL ) {
+      flags = SMF__NOCREATE_FILE | SMF__NOCREATE_DA;
       *ffdata = smf_deepcopy_smfData( data, 0, flags, status );
     } else {
       /*      printf("using memcpy\n");*/
