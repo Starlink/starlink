@@ -57,5 +57,5 @@ sla_test_SOURCES = sla_test.f
 sla_test_LDADD = libsla.la
 
 dist_starnews_DATA = sla.news
-
+dist_pkgdata_DATA = SLA_CONDITIONS
 DISTCLEANFILES = gresid.F random.F wait.f
