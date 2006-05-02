@@ -30,7 +30,7 @@
 *     17-MAR-1994 (BDK):
 *        Changed to ams
 *     07-JUL-1994 (AJC):
-*        Rename Some Include Files:
+*        Rename Some Include Files:-
 *          adamdefns.h -> adam_defns.h
 *          mesdefns.h -> messys_len.h
 *     16-AUG-1994 (BKM):
