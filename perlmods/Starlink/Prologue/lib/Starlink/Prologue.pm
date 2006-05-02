@@ -463,7 +463,15 @@ sub stringify {
 
       # write out the content
       for my $l (@content) {
-	$code .= $cchar . "     " . $l ."\n" if defined $l;
+	if (defined $l) {
+	  if ($l =~ /\w/) {
+	    # not just a blank line
+	    $code .= $cchar . "     " . $l ."\n";
+	  } else {
+	    # blank line
+	    $code .= $cchar . "\n";
+	  }
+	}
       }
       # blank line between each section
       $code .= "\n";
