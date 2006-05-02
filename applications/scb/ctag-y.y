@@ -99,6 +99,10 @@
 typedef char * STRING;
 #define YYSTYPE STRING
 #include "tag.h"
+#include <stdio.h>
+#include <stdlib.h>
+char *canchor( char *attrib, char *fname, int f77flag );
+void handle_error();
 
 %}
 
