@@ -152,6 +152,19 @@ sub push_line {
 	  $self->section( "Purpose" );
 	}
 	return ();
+      } elsif ($section eq 'Name' && $content =~ /\w/) {
+         #    F U N C (internal routine)
+         if ($content =~ /^\s*([\w\s_\d]+)\s\((.*)\)\s*$/) {
+           # some comment at the end
+           $content = $1;
+           my $comment = $2;
+           $comment =~ s/^\s+//;
+           $comment =~ s/\s+$//;
+           $prl->type_of_module( $comment );
+         }
+         # remove spaces from function name
+         $content =~ s/\s+//g;
+
       } elsif ($line =~ /Wallace|Terrett/) {
 	# assume all authors on one line
 	$self->flush_section();
