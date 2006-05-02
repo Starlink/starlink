@@ -34,6 +34,7 @@ use Starlink::Prologue::Parser::STARLSE;
 use Starlink::Prologue::Parser::ADAMSSE;
 use Starlink::Prologue::Parser::ADAMSSEC;
 use Starlink::Prologue::Parser::SGS;
+use Starlink::Prologue::Parser::GNS;
 
 =head1 METHODS
 
@@ -204,7 +205,7 @@ sub push_line {
 
   } else {
     # not in a prologue, so this might be a start of prologue
-    my @classes = qw/ STARLSE ADAMSSE ADAMSSEC /;
+    my @classes = qw/ STARLSE ADAMSSE ADAMSSEC GNS /;
     my $match;
     for my $c (@classes) {
       # try each class in turn
