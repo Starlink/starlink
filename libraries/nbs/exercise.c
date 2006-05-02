@@ -1,17 +1,30 @@
 /******************************************************************************/
-/* EXERCISE.C                                                                 */
-/******************************************************************************/
+/*
+ *+
+ *  Name:
+ *     exercise.c
 
-/*  Exercise ALL NBS routines and cause ALL error status to be returned       */
-/*  (except ones that indicate system failure or resource exhaustion).        */
+ *  Purpose:
+ *     Exercise ALL NBS routines and cause ALL error status to be returned
+ *     (except ones that indicate system failure or resource exhaustion).
 
-/*  William Lupton, 28-Mar-88                                                 */
+ *  Authors:
+ *     WFL: William Lupton (RGO)
+ *     DJA: D.J. Allan (Jet-X, University of Birmingham)
 
-/*  07-Feb-90 - WFL - Update for V2.3                                         */
-/*  31-Mar-93 - DJA - Update for V2.4. New routines, and test of duff file    */
-/*                    names removed for UNIX version.                         */
-/*   4-Nov-93 - DJA - Update for V2.4.1. Variable length argument stuff */
-/*                    done properly */
+ *  History:
+ *  28-MAR-1988 (WFL):
+ *  07-Feb-1990 (WFL):
+ *     Update for V2.3
+ *  31-Mar-1993 (DJA):
+ *     Update for V2.4. New routines, and test of duff file
+ *     names removed for UNIX version.
+ *   4-Nov-1993 (DJA):
+ *     Update for V2.4.1. Variable length argument stuff
+ *     done properly.
+ *-
+ */
+
 /* Include files */
 
 #include <time.h>

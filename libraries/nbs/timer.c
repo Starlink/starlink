@@ -1,12 +1,22 @@
 /*
- *  T I M E R . C
+ *+
+ *  Name:
+ *     timer.c
  *
- *  UNIX implementations of the routines timer_start and cpu_used
+ *  Purpose:
+ *     UNIX implementations of the routines timer_start and cpu_used
  *
- *  Major modifications by William Lupton from Keith Shortridge version.
- *
- *  31-Mar-88 - WFL - Make portable between VMS and UNIX and return all
- *		elapsed times as integer microseconds.
+ *  Authors:
+ *     KS: Keith Shortridge (AAO)
+ *     WFL: William Lupton (RGO)
+ 
+ *  History:
+ *     XX-XXX-198X (KS):
+ *        Original.
+ *     31-Mar-88 (WFL):
+ *        Make portable between VMS and UNIX and return all
+ *        elapsed times as integer microseconds.
+ *-
  */
 
 #if HAVE_CONFIG_H

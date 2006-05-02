@@ -1,7 +1,17 @@
-/* WORDS.C								    */
-/*									    */
-/* Create a tree-structured noticeboard that records different words found  */
-/* in a file. Then allow enquiry of the existence of specific words.	    */
+/*
+ *+ 
+ *  Name:
+ *     words.c
+
+ *  Purpose:
+ *     Create a tree-structured noticeboard that records different words found
+ *     in a file. Then allow enquiry of the existence of specific words.
+
+ *  Authors:
+ *     WFL: William Lupton (RGO)
+
+ *-
+ */
 
 /* Include files							    */
 

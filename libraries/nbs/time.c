@@ -1,6 +1,19 @@
-/*+	Noticeboard system timing tests.	*/
+/*
+ *+
+ *  Name:
+ *    time.c
+ *
+ *  Purpose:
+ *    Noticeboard system timing tests.
 
-/*	Converted from Fortran to portable C, 31-Mar-88, William Lupton. */
+ *  Authors:
+ *    WFL: William Lupton (RGO)
+
+ *  History:
+ *    31-MAR-1988 (WFL):
+ *       Rewrite in portable C from Fortran.
+ *-
+*/
 
 #if HAVE_CONFIG_H
 # include <config.h>
