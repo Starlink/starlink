@@ -511,8 +511,11 @@ sub _normalise_section_name {
   $tag =~ s/\s+$//;
   my @parts = split(/\s+/, $tag);
   for  (@parts) {
-    $_ = lc($_);
-    $_ = ucfirst($_); 
+    # leave unchanged if all upper case
+    if ( $_ !~ /^[A-Z_]$/) {
+      $_ = lc($_);
+      $_ = ucfirst($_);
+    } 
   }
   $tag = join(" ", @parts );
   return $tag;
