@@ -41,6 +41,9 @@ my @STANDARD_HEADERS = (qw/
 			   Invocation
 			   Description
 			   Arguments
+                           /,
+                          "Returned Value",
+                         qw/
 			   Algorithm
 			   /,
 			"Implementation Deficiencies",
