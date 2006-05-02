@@ -1,28 +1,35 @@
 #include <config.h>
       PROGRAM GKSBLD
 *+
-*   Program:
-*
+*   Name:
 *      GKSBLD
 *
 *   Description:
-*
 *      Builds the binary GNS workstation description file for GKS
 *      workstations from a text description.
 *
-*
-*   Usage:
-*
-*      RUN GKSBUILD
-*
-*+
+*   Type of module:
+*      Program
+
+*   Invocation:
+*      gksbuild
+
 *   Side Effects:
-*    
 *      Creates a new description file called GNS_GKSDEVICES.DAT in the
 *      current default directory.
 *    
-*   D L Terrett    4-APR-1989
-*   Tim Jenness   15-APR-2004 (Use autoconf for RECL units)
+*  Authors:
+*     DLT: D L Terrett (Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     19-APR-1989 (DLT):
+*        Modified.
+*     15-APR-2004 (TIMJ):
+*        Use autoconf for RECL units
+*     {enter_further_changes_here}
+
 *-
       IMPLICIT NONE
 
@@ -111,37 +118,38 @@
 
       INTEGER FUNCTION GETNEX(SKIPS,UPCAS)
 *+
-*   Routine:
-*
+*   Name:
 *      GETNEX
 *
-*   Function:
-*
+*   Purpose:
 *      Gets the next character from the input file
 *
 *   Description:
-*
 *      Gets the next character after interpereting escape characters
 *      (the ^). Spaces are skipped and characters converted to upper case
 *      if requested. End of record is treated as a space.
 *
 *   Arguments:
-*
-*      Given:
+*     SKIPS = LOGICAL (Given)
+*        Skip spaces
+*     UPCAS = LOGICAL (Given)
+*        Fold to upper case
 *       
-*         SKIPS (LOGICAL)
-*                        Skip spaces
-*         UPCAS (LOGICAL)
-*                        Fold to upper case
+*   Returned Value:
+*     GETNEX = INTEGER
+*         Integer representation of character or -1 if
+*         the end of file is encountered
 *       
-*      Returned:
-*       
-*         function return value   (INTEGER)
-*                        Integer representation of character or -1 if
-*                        the end of file is encountered
-*       
-*+
-*   D L Terrett   19-APR-1989 
+*  Authors:
+*     DLT: D L Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     19-APR-1989 (DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*-
 
       IMPLICIT NONE
       LOGICAL SKIPS,UPCAS
@@ -216,40 +224,34 @@
        
       SUBROUTINE GETWST(IREC,RREC)
 *+
-*   Routine:
-*
-*      GETWST
-*
-*   Function:
-*
-*      Get the data for the next workstation from the data file
-*
-*   Description:
-*
-*      {routine_description}
-*
-*   Arguments:
-*
-*      {arguments_or_none}
-*+
-*   D L Terrett    3-MAY-1989 
-*   Nick Eaton     2-APR-1990  Added OPEN keyword
-*   Nick Eaton    18-MAY-1990  Added AGI types
-*   Nick Eaton     3-JUN-1992  Added WINDOW_OVERLAY
+*  Name:
+*     GETWST
 
-      IMPLICIT NONE
-      INCLUDE 'GNS_PAR'
-      
-      INTEGER BUFSIZ
-      PARAMETER (BUFSIZ=165)
-      INTEGER IREC(BUFSIZ)
-      REAL RREC(BUFSIZ)
+*   Purpose:
+*     Get the data for the next workstation from the data file
 *
-*   The text description file consists entirely of statements of the
-*   form <keyword>=<value>.  Spaces, tabs and end of records are ignored
-*   and all characters converted to upper case except when evaluating
-*   character values as described below.  The recognized keywords and
-*   their data types are as follows:
+*  Authors:
+*     DLT: D L Terrett (Starlink)
+*     NE: Nick Eaton (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     3-MAY-1989 (DLT):
+*        Modified.
+*     2-APR-1990 (NE):
+*        Added OPEN keyword
+*     18-MAY-1990 (NE):
+*        Added AGI types
+*     03-JUN-1992 (NE):
+*        Added WINDOW_OVERLAY.
+*     {enter_further_changes_here}
+
+* Notes:
+*     The text description file consists entirely of statements of the
+*     form <keyword>=<value>.  Spaces, tabs and end of records are ignored
+*     and all characters converted to upper case except when evaluating
+*     character values as described below.  The recognized keywords and
+*     their data types are as follows:
 *
 *           WORKSTATION       integer
 *           CLASS             enumerated
@@ -261,6 +263,16 @@
 *           OPEN              enumerated
 *           AGITYPE           integer
 *
+
+*-
+      IMPLICIT NONE
+      INCLUDE 'GNS_PAR'
+      
+      INTEGER BUFSIZ
+      PARAMETER (BUFSIZ=165)
+      INTEGER IREC(BUFSIZ)
+      REAL RREC(BUFSIZ)
+
       INTEGER NKEYWR
       PARAMETER (NKEYWR = 9)
       CHARACTER*(GNS__SZKEY) KEYWRD(NKEYWR)
@@ -508,28 +520,22 @@
 
       SUBROUTINE WRTWST(IWKSTN,IREC,RREC,NITEM)
 *+
-*   Routine:
+*  Name:
+*     WRTWST
 *
-*      WRTWST
+*   Purpose:
+*     Write a workstation description record to the binary file
 *
-*   Function:
-*
-*      Write a workstaion description record to the binary file
-*
-*   Description:
-*
-*      {routine_description}
-*
-*   Arguments:
-*
-*      {arguments_or_none}
-*+
-*   D L Terrett    3-MAY-1989 
+*  Authors:
+*     DLT: D L Terrett (Starlink)
+*     {enter_new_authors_here}
 
-      IMPLICIT NONE
-      INTEGER IWKSTN, IREC(*), NITEM
-      REAL RREC(*)
-*
+*  History:
+*     3-MAY-1989 (DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Notes:
 *   The binary description file is an unformatted direct access Fortran
 *   file with fixed length records (dictated by the Fortran standard).
 *
@@ -555,6 +561,12 @@
 *   The first record in the file contains a file structure version
 *   number in the first item and optionally other data that depends on
 *   the version (eg. constants to use in the hashing).
+
+*-
+
+      IMPLICIT NONE
+      INTEGER IWKSTN, IREC(*), NITEM
+      REAL RREC(*)
 
 *   Record size of binary file (in numeric storage units)
 
