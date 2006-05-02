@@ -79,24 +79,30 @@ my %COPYTEXT = (
 if (@ARGV) {
   # files on command line
   for my $file (@ARGV) {
+    next unless -f $file;
     open(my $fh, "<$file") || die "Error opening file $file for read: $!\n";
-    my ($nmodified, $rewrite) = _process( $file, <$fh> );
+    my ($nmodified, $types, $rewrite) = _process( $file, <$fh> );
     close($fh) || die "Error closing input file $file: $!\n";
 
     # was a prologue modified?
     if ($nmodified) {
-      # open the input file for write
-      open( my $fh, ">", $file) || 
-	die "Error opening file $file for writing modified prologue: $!";
-      print $fh $rewrite;
-      close( $fh ) || die "Error closing output file $file: $!\n";
+      if (scalar keys %$types == 1 && exists $types->{STARLSE}) {
+	# Standard prologue
+	# open the input file for write
+	open( my $fh, ">", $file) || 
+	  die "Error opening file $file for writing modified prologue: $!";
+	print $fh $rewrite;
+	close( $fh ) || die "Error closing output file $file: $!\n";
+      } else {
+	print STDERR "Prologue non-standard in $file, not modifying\n";
+      }
     }
   }
 } else {
   # try reading from pipe
   my @lines = <>;
   if (@lines) {
-    my ($nmodified, $rewrite) = _process( undef, @lines );
+    my ($nmodified, $types, $rewrite) = _process( undef, @lines );
     print $rewrite;
   }
 }
@@ -135,6 +141,12 @@ sub _process {
 	# Get the years from the history
 	my @years = $line->years;
 
+	if (!@years) {
+	  my @date = gmtime(time);
+	  push(@years, ($date[5]+1900));
+	  print STDERR "WARNING: No year for copyright in $file. Assigning current year ($years[0]).\n";
+	}
+
 	if (@years) {
 	  # pick default assignment of copyright
 	  my @clrc;
@@ -158,7 +170,10 @@ sub _process {
 	  if ($ctext) {
 	    $ctext .= " All Rights Reserved.";
 
-	    # now word wrap to 66 characters
+	    # now word wrap to 66 characters (compress multiple spaces)
+	    $ctext =~ s/^\s+//;
+	    $ctext =~ s/\s+$//;
+	    $ctext =~ s/\s+/ /g;
 	    local $Text::Wrap::columns = 66;
 	    $ctext = wrap('','',$ctext);
 
@@ -169,7 +184,9 @@ sub _process {
 	  }
 	}
 	if (!$mod) {
-	  print STDERR "Unable to set copyright in file $file\n";
+	  my ($section, $name) = $line->name(); 
+	  $name = $name->[0];
+	  print STDERR "Unable to set copyright in file $file ($name)\n";
 	}
       }
 
@@ -191,10 +208,10 @@ sub _process {
 
   # information to user
   # was a prologue modified?
+  my %types = map { $_, undef } @types;
   if ($nmod) {
     # inform the user the type of prologues located
-    my %types = map { $_, undef } @types;
-    print STDERR "Prologue in file $file contains ", join(", ",keys %types),
+    print STDERR "Prologue in file $file contains ", join(", ",sort keys %types),
       " prologues (modified $nmod of ".@types." ).\n";
   } else {
     if (@types != 0) {
@@ -205,7 +222,7 @@ sub _process {
   }
 
   # finished
-  return ($nmod, $output);
+  return ($nmod, \%types, $output);
 }
 
 sub _write_copyright {
@@ -246,9 +263,6 @@ sub _write_copyright {
   } else {
     push(@compressed, $start);
   }
-
-  use Data::Dumper;
-  print Dumper(\@years,\@compressed);
 
   return "Copyright (C) ". join(", ",@compressed). " $copytext.";
 }
