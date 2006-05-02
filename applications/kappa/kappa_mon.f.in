@@ -65,14 +65,16 @@
 *     29-SEP-2005 (DSB):
 *        Added warnings about unannulled GRP identifiers.
 *     26-JAN-2006 (TIMJ):
-*        Add warnings about locator leaks
+*        Add warnings about locator leaks.
 *     27-JAN-2006 (TIMJ):
 *        Need to exclude GLOBAL from leak check.
 *     31-JAN-2006 (TIMJ):
 *        Use ERR_MARK/RLSE and annul status if HDS_INFOI fails for any
 *        reason.
 *     23-MAR-2006 (TIMJ):
-*        Enable AST Memory Cache
+*        Enable AST Memory Cache.
+*     2006 April 13 (MJC):
+*        Added CHANMAP.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,7 +99,7 @@
       INTEGER CHR_LEN             ! Length of string
 
 *  Local Variables:
-      CHARACTER FILTER*(60)       ! HDS_INFOI filter string
+      CHARACTER FILTER*( 60 )     ! HDS_INFOI filter string
       CHARACTER NAME * ( 15 )     ! Task name from the command
       INTEGER IPOSN               ! Position in string
       INTEGER LSTAT               ! Local status
@@ -217,6 +219,11 @@
 *  Finds the centroids of star-like features in an NDF.
          ELSE IF ( NAME .EQ. 'CENTROID' ) THEN
             CALL CENTROID ( STATUS )
+
+*  Creates a channel map from a cube NDF by compressing along a
+*  nominated axis.
+         ELSE IF ( NAME .EQ. 'CHANMAP' ) THEN
+            CALL CHANMAP ( STATUS )
 
 *  Replaces the values of selected pixels in an NDF.
          ELSE IF ( NAME .EQ. 'CHPIX' ) THEN
