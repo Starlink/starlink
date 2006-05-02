@@ -40,29 +40,29 @@
 *     alphanumerics) or are all non-alphanumeric (ie are anything other
 *     than alphanumeric and "white"). For the purposes of this routine, a 
 *     white character is a space, tab, newline or comma. 
-*     
+*
 *     Tokens are thus terminated by either a character of the opposite class 
 *     or by a "white" character. No characters need separate tokens.
 *     Apart from their role as delimiters, white characters are never 
 *     significant.
-*     
+*
 *     Two exceptions to this rule are -
-*     
+*
 *      1) A token may consist of a set of characters enclosed in single 
 *         quotes. The first quote must be the first character of the token 
 *         and the token is terminated by the next isolated (ie.not '') quote 
 *         or end of buffer (whichever comes first).
 *         Note that double quotes within a quoted token are not collapsed.
-*     
+*
 *      2) Terminators occurring within brackets within an alphanumeric
 *         token will be ignored ( as in STRUCTURE(1,2).NUMBER ).
-*     
+*
 *     Hexadecimal constants are recognised and converted to decimal 
 *     strings.
-*     
+*
 *     All characters on a line that follow a token starting with # token are
 *     ignored, AS IS THE # .
-*     
+*
 *     The tokens within STRING are recognised, and transferred to 
 *     CARRAY, one token per array element.
 *     Brackets identified as being part of a list of array elements are 
@@ -71,6 +71,26 @@
 *     and ')' being handled as special characters and being handled as 
 *     alphanumeric. The full array list of whatever dimensionality has 
 *     to be contained within the one text line.
+
+*  Copyright:
+*     Copyright (C) 1984-1985, 1987, 1990-1992 Science & Engineering
+*     Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     W.F.Lupton (RGO)
