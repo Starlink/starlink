@@ -944,17 +944,15 @@ itcl::class gaia::GaiaCube {
    #  the associated spectra.
    protected method add_bindings_ {} {
 
-      #  SPLAT bindings. May move this into GaiaSpectralPlot.
+      #  SPLAT bindings. XXX move this into GaiaSpectralPlot. For now
+      #  this option is quiet when not enabled.
       global env
-      if {! [info exists env(SPLAT_DIR)]} {
-         puts stderr "Information: No SPLAT_DIR variable available. \
-                      Cannot display spectra remotely"
-      } else {
+      if { [info exists env(SPLAT_DIR)]} {
+         puts "SPLAT_DIR defined and bound to double click"
          set splat_dir_ $env(SPLAT_DIR)
 
-         #  Button-1 does a lot already so use double click. May clash with
-         #  image regions toolbox....
-         $itk_option(-canvas) bind $itk_option(-rtdimage) <Double-Button-1> \
+         #  Button-1 does a lot already so use double click.
+         $itk_option(-canvas) bind all <Double-Button-1> \
             [code $this display_spectrum_ splat %x %y]
       }
 
@@ -983,6 +981,7 @@ itcl::class gaia::GaiaCube {
    #  "localdrag", for display in SPLAT, start a spectral display (sets the
    #  initial scale of a drag), or update during a drag.
    protected method display_spectrum_ {action cx cy} {
+      puts "display_spectrum_ action = $action ($cx,$cy)"
 
       #  Convert click coordinates from canvas coords to grid coords.
       set ccx [$itk_option(-canvas) canvasx $cx]
@@ -1024,6 +1023,7 @@ itcl::class gaia::GaiaCube {
                                 -application $splat_dir_/splatdisp \
                                 -show_output 0]
          }
+         puts "$splat_disp_ runwith ${ndfname_}${section} 0"
          $splat_disp_ runwith "${ndfname_}${section}" 0
 
       } else {
