@@ -1,46 +1,62 @@
-/*+			N B S _ M A C . H
+/*
+ *+
+ *  Name:
+ *     nbs_mac.h
 
- *  Module name:
-      NBS_MAC.H
-
- *  Function:
-      Macros for the noticeboard system.
+ *  Purpose:
+ *     Macros for the noticeboard system.
 
  *  Description:
-      This module contains definitions of constants that are not directly
-      required by the type definitions, plus a few utility macros.
+ *     This module contains definitions of constants that are not directly
+ *     required by the type definitions, plus a few utility macros.
 
  *  Language:
-      C
+ *     C
 
- *  Support: William Lupton, AAO
-
- *  Version date: 07-Feb-90
- *-
+ *  Authors:
+ *     WFL: William Lupton (AAO)
+ *     DJA: D.J. Allan (Jet-X, University of Birmingham)
+ *     AA: Alasdair Allan (Starlink)
 
  *  History:
-      03-Feb-86 - WFL - Original version
-      17-Jul-87 - WFL - Change VERSION to 2 to correspond to change in the
- 		definition of ITEM_DESCRIPTOR.
-      20-Jul-87 - WFL - Add _CHMOVE macro.
-      21-Jul-87 - WFL - Remove definition of VERSION.
-      06-Nov-87 - WFL - Portable VMS / UNIX version. On VMS, use OTS$MOVE3,
-		but on UNIX use MEMCPY. Also, define HUGE.
-      12-Feb-88 - WFL - Version of _CHMOVE that does 1, 2, 4 and 8 byte moves
-		directly.
-      17-Feb-88 - WFL - Move MAXALLOC, ITEM_BASE and DATA_BASE to NBS.C, since
-		they are only used there.
-      25-Jan-89 - WFL - Add extra parentheses to _CHMOVE to ensure that any
-		expressions in the arguments are evaluated first
-      01-Feb-90 - WFL - Add definition of NBS_WAIT
-      07-Feb-90 - WFL - Add definition of _ADD_INTERLOCKED using _ADAWI; modify
-		_CHMOVE to use _MOVC3
-      07-Feb-93 - DJA - Added argument processing macros 
-      05-May-93 - DJA - Removed _wait macro. Replaced by NBS_SLEEPMS.
-      08-Mar-94 - DJA - Added EXPORT_POINTER macro to export pointers to
-                        C and Fortran portably.
-      08-Feb-95 - DJA - Changed NBS__OK to SAI__OK 
-      27-Jun-04 - AA - Changed ifdef logic for building under Mac OSX
+ *     03-Feb-1986 (WFL):
+ *        Original version
+ *     17-Jul-1987 (WFL): 
+ *        Change VERSION to 2 to correspond to change in the
+ * 	  definition of ITEM_DESCRIPTOR.
+ *     20-Jul-1987 (WFL):
+ *        Add _CHMOVE macro.
+ *     21-Jul-1987 (WFL):
+ *        Remove definition of VERSION.
+ *     06-Nov-1987 (WFL):
+ *        Portable VMS / UNIX version. On VMS, use OTS$MOVE3,
+ *	  but on UNIX use MEMCPY. Also, define HUGE.
+ *     12-Feb-1988 (WFL):
+ *        Version of _CHMOVE that does 1, 2, 4 and 8 byte moves
+ *	  directly.
+ *     17-Feb-1988 (WFL):
+ *        Move MAXALLOC, ITEM_BASE and DATA_BASE to NBS.C, since
+ *	  they are only used there.
+ *     25-Jan-1989 (WFL):
+ *        Add extra parentheses to _CHMOVE to ensure that any
+ *	  expressions in the arguments are evaluated first
+ *     01-Feb-1990 (WFL):
+ *        Add definition of NBS_WAIT
+ *     07-Feb-1990 (WFL):
+ *        Add definition of _ADD_INTERLOCKED using _ADAWI; modify
+ *	  _CHMOVE to use _MOVC3
+ *     07-Feb-1993 (DJA):
+ *        Added argument processing macros 
+ *     05-May-1993 (DJA):
+ *        Removed _wait macro. Replaced by NBS_SLEEPMS.
+ *     08-Mar-1994 (DJA):
+ *        Added EXPORT_POINTER macro to export pointers to
+ *        C and Fortran portably.
+ *     08-Feb-1995 (DJA):
+ *        Changed NBS__OK to SAI__OK 
+ *     27-Jun-2004 (AA):
+ *        Changed ifdef logic for building under Mac OSX
+ *-
  */
 
 /* Constant definitions	*/

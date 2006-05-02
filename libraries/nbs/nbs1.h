@@ -38,7 +38,7 @@
 
  *  Authors:
  *    WFL: William Lupton
- *    TIMJ: Tim Jenness
+ *    TIMJ: Tim Jenness (JAC, Hawaii)
 
  *  History:
  *    2-SEP-2005 (TIMJ):
