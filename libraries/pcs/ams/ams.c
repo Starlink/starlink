@@ -9,6 +9,28 @@
 *  Language:
 *     Starlink C
 
+*  Copyright:
+*     Copyright (C) 1992-1994 Science & Engineering Research Council.
+*     Copyright (C) 1996, 1999, 2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2005 Particle Physics & Astronomy
+*     Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     IRJ: Ian Jenkins (RAL)
 *     BDK: Dennis Kelly (ROE)
@@ -200,6 +222,26 @@ int *status                          /* global status (given and
 *     connecting path to be set up. Allocate a data structure to the path
 *     and return an acceptance message.
 
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -275,6 +317,26 @@ int *status                        /* global status (given and returned) */
 *     Check the reply is valid and complete the data structure for the
 *     path.
 
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -348,6 +410,26 @@ int *status       /* global status (given and returned) */
 *     or the machine name given is longer than MESSYS_MNAME, this
 *     function returns MESSYS__TOOLONG in *status, otherwise returns
 *     SAI__OK.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -454,6 +536,22 @@ int *status         /* global status (given and returned) */
 *  Algorithm:
 *     Send obey message to astint_q as ast interrupt has occurred.
 
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -494,6 +592,22 @@ int *status       /* global status (given and returned) */
 *     Send a soft ast interrupt message 'value' qualified by 'name' to
 *     astint_q.
 
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -531,9 +645,29 @@ int *status        /* global status (given and returned) */
 *  Algorithm:
 *     Return a machine number corresponding the node name embedded in the
 *     given machine name which has been extracted from a given taskname.
-*     
+*
 *     This may involve initiating a network connection with a remote
 *     machine
+
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -685,6 +819,26 @@ int *status                        /* global status (given and returned) */
 *     last message to the caller and uses ams_freetrans() to close and
 *     free the relevent transaction.
 
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -738,6 +892,26 @@ int *status                        /* global status (given and returned) */
 *  Algorithm:
 *     Send a DE_INIT message to each open path.
 
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -787,6 +961,22 @@ void
 
 *  Language:
 *     Starlink C
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -838,6 +1028,22 @@ int *status         /* global status (given and returned) */
 *  Algorithm:
 *     Send obey message to extint_q as ext interrupt has occured.
 
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -872,6 +1078,26 @@ int j              /* path number (given) */
 *     Free the path whose index into pathfree[] and t_paths[] is j.
 *     Free all transactions associated with the path, then close msp 
 *     communications on this path, then null the path entry.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -943,7 +1169,7 @@ int *status       /* global status (given and received) */
 *     using msp_delete_queue(). It then clears the transaction structure
 *     using the appropriate NULLs (see messys_par.h) and then sets
 *     transfree[] to true.
-*     
+*
 *     A transaction entry records the path associated with the
 *     transaction (t_path_num, an index into t_paths[] that records other
 *     information about that path), this task's acknowledge queue for
@@ -953,6 +1179,26 @@ int *status       /* global status (given and received) */
 *     transfree[j] records the active use of a transaction entry in
 *     t_trans[j] when set false otherwise indicates that the
 *     corresponding t_trans[] entry is unused and free for (re)use.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -1004,6 +1250,26 @@ int *status        /* global status (given and returned) */
 *     Searches pathfree[] for a free path, setting *path to index and
 *     pathfree[*path] to false if one found or *status to
 *     MESSYS_COMFULL.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -1066,7 +1332,7 @@ int *status        /* global status (given and returned) */
 *  Algorithm:
 *     Searches transfree[] for a free transaction slot and if it finds
 *     one sets
-*     
+*
 *       *messid to its index,
 *       *status to SAI__OK,
 *       transfree[index] to false,
@@ -1075,14 +1341,34 @@ int *status        /* global status (given and returned) */
 *                                   NULL_Q (if getq == 0)
 *       t_trans[index].other_task_ack_q to otaq
 *       t_trans[index].other_transnum to ottn
-*     
+*
 *     otherwise sets
-*     
+*
 *      *messid to MESSYS__NULL_T and
 *      *status to MESSYS_COMFULL.
-*     
+*
 *     Creation of the reply queue is made optional as an optimisation for
 *     the cases where no reply queue is going to be involved.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -1162,13 +1448,33 @@ int *status             /* global status (given and returned) */
 *     "xxxx::" part is stored in a free entry in machine_names[] and the
 *     t_paths[].machine_num part of the relevant t_path[]'s entry records
 *     the index into machine_names[]
-*     
+*
 *     This function tries to find an existing entry in machine_names[]
 *     for the machine 'machinename' but failing this tries to create a
 *     new entry.  If either of these succeed it sets *machinenumber to
 *     the relevant machine_names[] index, otherwise it returns a bad status.
 *     If it does add a new entry then *added is set to 1 otherwise added 
 *     will be 0 on return
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -1259,15 +1565,15 @@ int *status               /* global status (given and returned) */
 *     then, using msp_receive_message() determines input on either the
 *     external interrupt queue, the transaction acknowlege queue or the
 *     timeout queue.
-*     
+*
 *     If the message received is of type C_LOC_MSG_IN, the origin is
 *     determined as either an external interrupt, a timeout interrupt OR a
 *     normal message setting *status to MESSYS_EXTINT, MESSYS_TIMEOUT or
 *     SAI__OK appropriately. messys_translate() is used to unpack the
 *     message.
-*     
+*
 *     If the message is                                      use
-*     
+*
 *      message from remote source    (C_REM_MSG_IN)        messys_rtranslate()
 *      end transaction message       (C_LOC_GSOC_END_IN)   messys_endtrans()
 *      remote end transaction        (C_REM_GSOC_END_IN)   messys_rendtrans()
@@ -1276,9 +1582,29 @@ int *status               /* global status (given and returned) */
 *      local initialise acknowldge   (C_LOC_ACK_IN)        messys_addrest()
 *      remote initialise acknowledge (C_REM_ACK_IN)        messys_raddrest()
 *      other                         we set *status to MESSYS_MSGFUNC
-*     
+*
 *     If the timer is still running, then we use messys_cantim() to turn
 *     it off.
+
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -1420,6 +1746,22 @@ int *status
 *  Algorithm:
 *     Call ams_initeh
 
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -1456,10 +1798,30 @@ int *status
 
 *  Algorithm:
 *     Initialise the internal data structures. 
-*     
+*
 *     Register with msp, obtain the command queue for incoming messages,
 *     then create the queues used for this task sending messages to
 *     itself. Finally set up the signal handler.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -1569,6 +1931,22 @@ int *status       /* global status (given and returned) */
 *     Send a soft kick interrupt message 'value' qualified by 'name' to
 *     kick_q.
 
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -1610,26 +1988,46 @@ int *status        /* global status (given and returned) */
 *     Given name as xxxx::yyyy task will be set to yyyyyy and mach to
 *     xxxx:: and remote to 1.  Given yyyyyy, task will be set to yyyyyy
 *     mach to "" and remote to zero.
-*     
+*
 *     We start by checking if the name given is prefixed with a known
 *     machine name (ie of the form xxxxx::yyyyy).  We check this by
 *     scanning all the known machinename/taskname separators (held in
 *     messys_netsep[0..netint-1]) and if a separator is found we select
 *     out the machinename part (xxxxx) and the taskname (yyyyyyy).
-*     
+*
 *     If one is not found we scan the t_paths array checking for a match
 *     in the given name and the "other_taskname" member of each t_paths[]
 *     entry. If one is found and the task is local ( machine_num member
 *     of t_paths[] is MESSYS_NULL_M) path is set and we return with
 *     status set to SAI__OK, otherwise we return with status set to
 *     MESSYS_NOTFOUND.
-*     
+*
 *     If a separator is found we scan the t_paths[] array looking for an
 *     entry where the 'other_taskname' member and the 'machine_num' entry
 *     is positive and when used to index machine_names[] also gives match
 *     with xxxxx (ie task yyyyyy running on machine xxxxx has path
 *     existing to it).  If we find such a match we return the path indexs
 *     in 'path', otherwise we return MESSYS_NOTFOUND.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -1721,6 +2119,26 @@ int *status                        /* global status (given and returned) */
 *     succeed in establishing a transaction end we unpack the message for
 *     the caller (using ams_unpacklocgsoc()).
 
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -1797,6 +2215,26 @@ int *status       /* global status (given and returned) */
 *     Check to see if a path already exists to the task 'name' and if so
 *     set path to reflect this.
 
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -1845,18 +2283,18 @@ int *status             /* global status (given and returned) */
 *  Algorithm:
 *     Open a path to the task whose name is 'other_task_name' and return
 *     the path index in 'path'.
-*     
+*
 *     Using nalookup() we obtain the machinename, taskname and netindex
 *     of a remote task (remote = 1) or obtain the local task name (remote
 *     = 0) We then obtain a freepath and depending on whether the task is
 *     local or remote:
-*     
+*
 *      local:
 *                  fill in t_paths[p] with the othertasks command_q (by
 *     calling msp_get_task_queue() and set
 *     t_paths[].machine_num to NULL_M and
 *     t_paths[].path_state to PART_P (nearly opened)
-*     
+*
 *      remote: 
 *               using messys_call_out() (that also exchanges a
 *     C_REM_CALL_OUT message with the remote server) we obtain
@@ -1868,13 +2306,33 @@ int *status             /* global status (given and returned) */
 *     messys_call_out() that remote host),
 *     t_paths[].machine_num to the remote host's machine number
 *     and t_paths[].path_state to PART_P (nearly opened)
-*     
+*
 *     We then obtain a temporary transaction acknowledge queue using
 *     ams_getfreetrans() and then send, using ams_sendinit(), a MESSYS_INIT
 *     message and using messys_getreply() obtain the reply.  If this
 *     short transaction fails to complete we free the path and any
 *     associated transactions using messys_remove(), otherwise we return
 *     with 'path' set to the path (index) established.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -1979,17 +2437,37 @@ int *status           /* global status (given and returned) */
 
 *  Algorithm:
 *     PATHINDEX -> TASKNAME
-*     
+*
 *     Given a path 'path', we check that the path is legal and then use
 *     it to index t_paths[] to ascertain whether the path is linked to a
 *     remote task or a local task (by checking t_paths[path].machine_num
 *     which will be MESSYS__NULL_M if local).
-*     
+*
 *     If the path is connected to a local task, we copy that task's name
 *     into 'name' using t_paths[path].other_taskname. If the task is
 *     remote we form xxxxx::yyyyyy in 'name', obtaining xxxxxx:: from
 *     machine_names[t_paths[path].machine_num] and yyyyyy from
 *     t_paths[path].other_taskname.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -2056,6 +2534,27 @@ int *status                        /* global status (given and returned) */
 *     An "init" message has been received from a task on another machine 
 *     requesting a connecting path to be set up. Allocate a data structure 
 *     to the path and return an acceptance message.
+
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
+*     Copyright (C) 1996 Central Laboratory of the Research Councils. 
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *      IRJ: Ian R Jenkins (RAL)
@@ -2133,6 +2632,26 @@ int *status                       /* global status (given and returned) */
 *     been received. Check the reply is valid and complete the data
 *     structure for the path.
 
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -2195,6 +2714,27 @@ int *status               /* global status (given and returned) */
 
 *  Language:
 *     Starlink C
+
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
+*     Copyright (C) 1996 Central Laboratory of the Research Councils. 
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     IRJ: I.R.Jenkins (RAL)
@@ -2407,6 +2947,26 @@ int *status                        /* global status (given and returned) */
 *     acknowledge queue is in the replyq part of the received
 *     acknowledgement. We use ams_senddeinit() to actually send the message.
 
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -2455,6 +3015,26 @@ int pathnum              /* path number (given) */
 *     queue associated with that transaction using
 *     msp_delete_queue(t_trans[].this_task_ack_q) and then frees the
 *     transaction entry t_trans[].
+
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -2519,6 +3099,26 @@ int *status                       /* global status (given and returned) */
 *     last message to the caller and uses ams_freetrans() to close and
 *     free the relevant transaction.
 
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -2582,10 +3182,30 @@ int *status             /* global status (given and returned) */
 *     the other end of the path. The user can ONLY reply with a de_init
 *     message (something has gone wrong) or with a transaction end
 *     message (GSOC_END) or with a normal message.
-*     
+*
 *     We first check that the path is open (AMS_checkpathopen()) and that the
 *     transaction is in use (AMS_checktrans()).  If both these are OK we
 *     check the 'function' part of the external form and check exactly
+
+*  Copyright:
+*     Copyright (C) 1992-1993 Science & Engineering Research Council.  
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -2604,21 +3224,21 @@ int *status             /* global status (given and returned) */
 
 *  What Is Being Sent:
 *       MESSYS_DE_INIT
-*     
+*
 *              then we use ams_senddeinit() and if this fails then
 *       messsy_remove() to remove the path and free any
 *       transactions using the path.
-*     
+*
 *      MESSYS__MESSAGE 
-*     
+*
 *              then we use ams_sendmessage() to send the message.  It is
 *       inside ams_sendmessage() that an end of transaction
 *       message is detected through an examination of the message
 *       status (and, by the way, the transaction end at this end
 *       is then freed using ams_freetrans())
-*     
+*
 *      other
-*     
+*
 *              the system returns MESSYS__MSGFUNC
 
 *-
@@ -2678,6 +3298,22 @@ int *status        /* global status (given and returned) */
 *     Send a soft reschedule interrupt message 'value' qualified by
 *     'name' to resched_q.
 
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -2731,13 +3367,33 @@ int *status                        /* global status (given and returned) */
 *     the gsoc_flag of the message just received is set to OBEY, then we
 *     must establish a transaction acknowledge queue this end
 *     (ams_getfreetrans() does this conditional on its second parameter).
-*     
+*
 *     If we fail to establish a transaction end we send a
 *     C_REM_GSOC_END_OUT message using ams_sendgsocend() to the local
 *     nettask's acknowledge queue.
-*     
+*
 *     If we succeed in establishing a transaction end we unpack the
 *     message for the caller (using) ams_unpackremgsoc()).
+
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -2812,6 +3468,26 @@ int *status                        /* global status (given and returned) */
 *     init message. It therefore sends a de_init to the source using
 *     ams_senddeinit() message.
 
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -2870,7 +3546,7 @@ int *status                       /* global status (given and returned) */
 *     The system has received a remote message as part of the transaction
 *     'rem_msg_in->local_task_t_trans_num' (set into *messid) on path
 *     t_trans[*messid].t_path_num (set into *path).
-*     
+*
 *     This routine updates the transaction entry for this end (in
 *     particular adding the other task's acknowledge queue and
 *     transaction end index if the existing transaction end this end is
@@ -2880,6 +3556,26 @@ int *status                       /* global status (given and returned) */
 *     MESSYS_BADPATH but still unpacks the message.  If the transaction
 *     referred to in the message is invalid then *status will reflect
 *     this but the message will still be unpacked.
+
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -2964,21 +3660,41 @@ int *status             /* global status (given and returned) */
 *  Algorithm:
 *     This function is used by the application code to send a message
 *     to another task on path 'path'.
-*     
+*
 *     The expectation is that this is one of a DEINIT message, an INIT
 *     message or the first message of a NEW transaction whose transaction
 *     number is to be set into '*messid'.
-*     
+*
 *     When used for the first message of a transaction, a free
 *     transaction is obtained using ams_getfreetrans() and the MESSYS_MESSAGE
 *     is sent to the other task's command queue.
-*     
+*
 *     When used to send an INIT message a free temporary transaction is
 *     obtained using ams_getfreetrans() and the MESSYS_INIT (using
 *     ams_sendinit()) is sent to the other task's command queue.
-*     
+*
 *     When used to send a DEINIT, ams_senddeinit() is used to send the
 *     MESSYS_DE_INIT message to the other task's command queue.
+
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -3062,18 +3778,38 @@ int *status            /* global status (given and returned) */
 *  Algorithm:
 *     System wishes to send a de_init message to queue targetq.
 *     The format of such a message is
-*     
+*
 *     [C_LOC_DEINIT_OUT,othertaskscommandq,othertaskspathnamber]
-*     
+*
 *     or
-*     
+*
 *     [C_REM_DEINIT_OUT,othertaskscommandq,othertaskspathnamber]
-*     
+*
 *     depending on local (local = 1) or remote (local = 0) target.
-*     
+*
 *     This routine sends such a message using msp_send_message() returning
 *     the status from this. If 'path' is not set to MESSYS__NULL_P, then
 *     ams_freepath(path) is called to release the path.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -3141,7 +3877,7 @@ int *status             /* global status (given and returned) */
 *  Algorithm:
 *     System wishes to send a gsocend message to queue targetq.
 *     The format of such a message is (local)
-*     
+*
 *     [C_LOC_GSOC_END_OUT
 *     the othertask's transaction number, from ottn
 *     thistask's transaction number,      from tttn
@@ -3150,10 +3886,10 @@ int *status             /* global status (given and returned) */
 *     the message's length,               from glen
 *     the message's status,               from gstatus
 *     the message's value                 from gval
-*     ]
-*     
+*
+*
 *     or (!local)
-*     
+*
 *     [C_REM_GSOC_END_OUT
 *     local nettask's transaction number,              from ottn
 *     thistask's (local_task) transaction number,      from tttn
@@ -3162,12 +3898,32 @@ int *status             /* global status (given and returned) */
 *     the message's length,                            from glen
 *     the message's status,                            from gstatus
 *     the message's value                              from gval
-*     
+*
 *     If this task's transaction number, 'tttn' is not null, that is we
 *     have just sent an end of transaction message as part of an active
 *     transaction (as distinct from a failed attempt to establish a
 *     transaction end (see newtrans() and rnewtrans())) we use
 *     ams_freetrans() to release the transaction recorded in t_trans[].
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -3253,9 +4009,9 @@ int *status             /* global status (given and returned) */
 *     gsoc_start message:- Depending on whether the target is remote or
 *     local (decerned by looking at t_paths[path].machine_num which will
 *     be MESSYS__NULL_M in the case of a local task) this code sends
-*     
+*
 *     (local)
-*     
+*
 *     [C_LOC_GSOC_START_OUT,
 *     the othertask's command queue,  from t_paths[path].other_com_q
 *     the othertask's pathnumber,     from t_paths[path].other_pathnum
@@ -3265,10 +4021,10 @@ int *status             /* global status (given and returned) */
 *     the message's name qualifier,   from message_name
 *     the message's length,           from message_length
 *     the message's value             from message_value
-*     ]
-*     
+*
+*
 *     or (remote)
-*     
+*
 *     [C_REM_GSOC_START_OUT,
 *     local_nettask's command queue,    from t_paths[path].other_com_q
 *     local nettask's path number,      from t_paths[path].other_pathnum
@@ -3281,7 +4037,27 @@ int *status             /* global status (given and returned) */
 *     the message's name qualifier,     from message_name
 *     the message's length,             from message_length
 *     the message's value               from message_value
-*     ]
+*
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -3367,7 +4143,7 @@ int *status         /* global status (given and returned) */
 *     (decerned by looking at t_paths[path].machine_num which
 *     will be MESSYS__NULL_M in the case of a local task)
 *     this code sends (local)
-*     
+*
 *     [C_LOC_INIT_OUT,
 *     the othertask's command queue,      from t_paths[path].other_com_q
 *     thistask's name,                    from the global taskname
@@ -3375,10 +4151,10 @@ int *status         /* global status (given and returned) */
 *     thistask's pathnumber,              from path
 *     thistask's init acknowledge queue,  from t_trans[messid].this_task_ack_q
 *     thistask's command queue,           from the global command_q
-*     ]
-*     
+*
+*
 *     or (remote)
-*     
+*
 *     [C_REM_INIT_OUT,
 *     local_nettask_command_q,     from t_paths[path].other_com_q
 *     thistask's (local_task)name, from the global taskname
@@ -3389,11 +4165,31 @@ int *status         /* global status (given and returned) */
 *                                  from t_trans[messid].this_task_ack_q
 *     thistask's command queue(local_task_com_q),
 *                                  from the global command_q
-*     ]
-*     
+*
+*
 *     to the t_paths[path].other_com_q (the other task's command queue)
 *     using msp_send_message(). If the send fails, then ams_remove() is
 *     used to remove the path connection to the other task.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -3468,25 +4264,45 @@ int *status           /* global status (give and returned) */
 *     acknowlege message to the acknowledge queue of the requester
 *     ('ackq') whose path end index was 'otherpathno'. We, depending on
 *     'local', send
-*     
+*
 *      local (local == 1)
-*     
+*
 *     [C_LOC_ACK_OUT,
 *     the othertasks path end index                  from otherpathno
 *     this tasks recently established path end index from thispathno
-*     ]
-*     
+*
+*
 *     or remote (local == 0)
-*     
+*
 *     [C_REM_ACK_OUT,
 *     the local nettasks path end index              from otherpathno
 *     this tasks recently established path end index from thispathno
-*     ]
-*     
+*
+*
 *     using msp_send_message() with target queue 'ackq'.  If the send
 *     failed we use ams_freepath() to release the path end in the
 *     knowledge that the othertask will timeout waiting for the ack and
 *     free its path end as well.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -3558,19 +4374,19 @@ int *status              /* global status (given and returned) */
 *     internal format as part of transaction 'messid' using the
 *     othertask's transaction acknowledge queue associated with this
 *     transaction on this path.
-*     
+*
 *     We need to send either a local/remote MSG_OUT message OR depending
 *     on the message status being MESSYS__PARAMREQ or MESSYS__PARAMREP or
 *     MESSYS__INFORM or MESSYS__SYNC or MESSYS__SYNCREP or
 *     MESSYS__TRIGGER or DTASK__ACTSTART a local/remote GSOC_END message
 *     using ams_sendgsocend().
-*     
+*
 *     Depending on whether the target is remote or local (discerned by
 *     looking at t_paths[path].machine_num which will be MESSYS__NULL_M
 *     in the case of a local task) this code sends
-*     
+*
 *     (local)
-*     
+*
 *     [C_LOC_MSG_OUT (depending on status member of source),
 *     the othertask's acknowledge queue,  from t_trans[messid].other_task_ack_q
 *     thistask's acknowldege queue,       from t_trans[messid].this_task_ack_q
@@ -3581,10 +4397,10 @@ int *status              /* global status (given and returned) */
 *     the message's length,               from message_length
 *     the message's status,               from message_status
 *     the message's value                 from message_value
-*     ]
-*     
+*
+*
 *     or (remote)
-*     
+*
 *     [C_REM_MSG_OUT (depending on status member of source),
 *     local_nettask's acknowledge queue,   from t_trans[messid].other_task_ack_q
 *     local nettask's transaction number,  from t_trans[messid].other_transnum
@@ -3597,16 +4413,36 @@ int *status              /* global status (given and returned) */
 *     the message's length,                from message_length
 *     the message's status,                from message_status
 *     the message's value                  from message_value
-*     ]
-*     
+*
+*
 *     to the target queue targetq using msp_send_message(). 
-*     
+*
 *     Note : If the code ends up sending a GSOC_END message using
 *     ams_sendgsocend() then within ams_sendgsocend() ams_freetrans() is
 *     used to free the transaction entry in transfree[] and t_trans[] as
 *     the transaction just completed. If the send fails, then
 *     ams_remove() is used to remove the path connection to the other
 *     task, otherwise we return SAI__OK.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -3711,14 +4547,34 @@ int *status            /* global status (given and returned) */
 *     When an the application wishes to send a soft interrupt (ast/kick
 *     etc) the messys layer sends itself a message on a queue particular
 *     to the hardware source of the interrupt. This routine sends
-*     
+*
 *     [C_LOC_MSG_OUT,nullt,nullt,OBEY,name,length,SAI__OK,value]
-*     
+*
 *     to queue targetq using msp_send_message() using command_q as a
 *     reply queue. The given length specifies the length of the 'value'
 *     part of the message. The name argument (whose length must be
 *     MSG_NAME_LEN or less) qualifies the message being sent in 'value'
 *     See messys_struct.h for layout of messys messages.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -3774,6 +4630,26 @@ int *status      /* global status (given and returned) */
 *  Algorithm:
 *     Sets up a timeout event to occur in 'time' millseconds
 
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -3814,6 +4690,26 @@ int parm                          /* the timeout parameter (given) */
 *     This routine is assumed to be called from the timer's signal handler.
 *     It writes an empty message onto this task's timeout queue, thereby
 *     causing AMS_RECEIVE or AMS_GETREPLY to detect the condition.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     B.D.Kelly (ROE)
@@ -3892,16 +4788,36 @@ int *status                       /* global status (given and returned) */
 *     The system has received a local message as part of the transaction
 *     'loc_msg_in->this_task_t_trans_num' (set into *messid) on path
 *     t_trans[*messid].t_path_num (set into *path).
-*     
+*
 *     This routine updates the transaction entry for this end (in
 *     particular adding the other task's acknowledge queue and
 *     transaction end index if the existing transaction end this end is
 *     missing this information) and then uses ams_unpacklocmsg() to
 *     unpack the message.
-*     
+*
 *     If the path associated with the transaction has been closed or
 *     changed this routine sets *status to MESSYS__BADPATH but still
 *     unpacks the message.
+
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council. 
+*      All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -3985,6 +4901,26 @@ int *status                            /* global status (given and returned) */
 *  Algorithm:
 *     Unpack a local gsoc start message.
 
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -4057,6 +4993,26 @@ int *status                            /* global status (given and returned) */
 *  Algorithm:
 *     Unpack a local message.
 
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     {original_author_entry}
 
@@ -4127,6 +5083,26 @@ int *status                            /* global status (given and returned) */
 
 *  Algorithm:
 *     Unpack a remote gsoc start message.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
@@ -4201,6 +5177,26 @@ int *status                            /* global status (given and returned) */
 
 *  Algorithm:
 *     Unpack a remote message.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.   All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     {original_author_entry}
