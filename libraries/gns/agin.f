@@ -1,30 +1,50 @@
       SUBROUTINE gns_1AGIN (M,N,LOG,L)
-*++
-*   gns_1AGIN   Construct a AGI_n_m name string
-*
-*   Description:
-*      A string of the form AGI_n_m is constructed and it and its length
-*      returned
-*
-*   Input arguments:
-*      N    i     Workstation type
-*      M    i     Sequence number
-*
-*   Output arguments:
-*      LOG  c*(*) The resulting name
-*      L    i     the length of the name
-*
-*   Implicit inputs:
-*      none
-*
-*   Implicit outputs:
-*      none
-*
-*   External references:
-*      none
-*
-*   Nick Eaton   2-DEC-1991
-*++
+*+
+*  Name:
+*     gns_1AGIN
+
+*  Purpose:
+*     Construct a AGI_n_m name string
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     A string of the form AGI_n_m is constructed and it and its length
+*     returned
+
+*  Arguments:
+*     N = INTEGER (Given)
+*         Workstation type
+*     M = INTEGER (Given)
+*         Sequence number
+*     LOG = CHAR (Returned)
+*         The resulting name
+*     L = INTEGER (Returned)
+*         The length of the name
+
+*  Authors:
+*     NE: Nick Eaton (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     2-DEC-1991 (NE):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External References:
+*     none
+
+*  Implicit Inputs:
+*     none
+
+*  Implicit Outputs:
+*     none
+
+*-
       IMPLICIT NONE
 
       INTEGER M, N, L
