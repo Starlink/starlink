@@ -1,37 +1,65 @@
-/*+ LN.C
+/*+
+ *  Name:
+ *     nbtrace
  *
- *  List noticeboard contents. A single argument is expected - the name of the
- *  noticeboard definition file. For primitive items, the current
- *  dimensionality and the first few values are listed.
+ *  Purpose:
+ *     List noticeboard contents
  *
- *  William Lupton, RGO, 9th February 1986
+ *  Description:
+ *     List noticeboard contents. A single argument is expected - the name of the
+ *     noticeboard definition file. For primitive items, the current
+ *     dimensionality and the first few values are listed.
  *
- *  03-Apr-87 - WFL - Allow noticeboard name, not just definition file name
- *            - WFL - Where TYPE looks like an HDS primitive type, output
- *              value in more helpful format
- *            - WFL - Allow file-name of up to 80 characters
- *            - WFL - Correct bugs to do with calculating significant lengths
- *              and outputting tab characters
- *  07-Apr-87 - WFL - Don't throw away trailing spaces on _CHAR items
- *  17-Jul-87 - WFL - Translate final status
- *  22-Jul-87 - WFL - Output modified flag value as well
- *  06-Nov-87 - WFL - Portable VMS / UNIX version. Assume that  
- *              the C binding is used for passing character strings.
- *  11-Feb-88 - WFL - Allow TYPE's that look like stamdard C types to be
- *		output in more helpful format as well
- *  11-Feb-88 - WFL - Use NBC_ form routines (because use C strings)
- *  12-Feb-88 - WFL - New interface to GET_VALUE and PUT_VALUE
- *  16-Feb-88 - WFL - Use new GET_CHILDREN and GET_INFO routines
- *  25-Mar-88 - WFL - Use new interface to GET_INFO
- *  20-May-88 - WFL - Use new interfaces for input scalars
- *  12-May-89 - WFL - Don't display trailing spaces
- *  22-May-89 - WFL - Give Hex translation for integer types; be intelligent
- *		about realising that an INT of size 1 is really a BYTE etc
- *  10-Nov-89 - WFL - Support A.B.C syntax to determine dive-in point
- *  13-Nov-89 - WFL - Support VMS-style wild cards in names
- *  05-Feb-90 - WFL - Support _VARYING type
- *  09-Feb-90 - WFL - Try to find the noticeboard first. Only restore the
-		definition from file if it didn't already exist.
+ *  Authors:
+ *     WFL: William Lupton (RGO)
+ *
+ *  History:
+ *     09-FEB-1986 (WFL):
+ *        Original.
+ *     03-Apr-87 (WFL):
+ *        - Allow noticeboard name, not just definition file name.
+ *        - Where TYPE looks like an HDS primitive type, output
+ *          value in more helpful format.
+ *        - Allow file-name of up to 80 characters.
+ *        - Correct bugs to do with calculating significant lengths
+ *          and outputting tab characters.
+ *     07-Apr-87 (WFL):
+ *        Don't throw away trailing spaces on _CHAR items
+ *     17-Jul-87 (WFL):
+ *        Translate final status
+ *     22-Jul-87 (WFL):
+ *        Output modified flag value as well
+ *     06-Nov-87 (WFL):
+ *        Portable VMS / UNIX version. Assume that  
+ *        the C binding is used for passing character strings.
+ *     11-Feb-88 (WFL):
+ *        Allow TYPE's that look like stamdard C types to be
+ *	  output in more helpful format as well
+ *     11-Feb-88 (WFL):
+ *        Use NBC_ form routines (because use C strings)
+ *     12-Feb-88 (WFL):
+ *        New interface to GET_VALUE and PUT_VALUE
+ *     16-Feb-88 (WFL):
+ *        Use new GET_CHILDREN and GET_INFO routines
+ *     25-Mar-88 (WFL):
+ *        Use new interface to GET_INFO
+ *     20-May-88 (WFL):
+ *        Use new interfaces for input scalars
+ *     12-May-89 (WFL):
+ *        Don't display trailing spaces
+ *     22-May-89 (WFL):
+ *        Give Hex translation for integer types; be intelligent
+ *	  about realising that an INT of size 1 is really a BYTE etc
+ *     10-Nov-89 (WFL):
+ *        Support A.B.C syntax to determine dive-in point
+ *     13-Nov-89 (WFL):
+ *        Support VMS-style wild cards in names
+ *     05-Feb-90 (WFL):
+ *        Support _VARYING type
+ *     09-Feb-90 (WFL):
+ *        Try to find the noticeboard first. Only restore the
+ *        definition from file if it didn't already exist.
+ *-
  */
 
 /*
