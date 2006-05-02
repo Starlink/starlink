@@ -242,7 +242,6 @@ sub push_line {
     my $match;
     for my $c ($self->parsers) {
       # try each class in turn
-      print "Trying $c\n";
       my $try = "Starlink::Prologue::Parser::$c";
       if ($try->prolog_start($line)) {
 	$match = $try;
