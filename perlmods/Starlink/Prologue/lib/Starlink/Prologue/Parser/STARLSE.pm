@@ -117,7 +117,7 @@ sub push_line {
       # return the newly minted version
       return ($retval, $prl);
 
-    } elsif ( $line =~ /^\s*$r\s+([A-Za-z\s]*)\s*:\s*$/ ) {
+    } elsif ( $line =~ /^\s*$r\s+([A-Z][A-Za-z\s]*)\s*:\s*$/ ) {
       # section
       $self->flush_section();
       $self->section($1);
