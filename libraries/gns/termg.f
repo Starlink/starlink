@@ -1,31 +1,27 @@
       SUBROUTINE gns_1TERMG(STATUS)
 *+
-*   Routine:
+*  Name:
+*     gns_1TERMG
 *
-*      gns_1TERMG
+*  Purpose:
+*     Close the GNS system for the GKS package
 *
-*   Function:
+*  Invocation:
+*     CALL GNS_1TERMG(STATUS)
 *
-*      Close the GNS system for the GKS package
+*  Description:
+*     The GKS devices data file is closed
 *
-*   Call:
-*
-*      CALL GNS_1TERMG(STATUS)
-*
-*   Description:
-*
-*      The GKS devices data file is closed
-*
-*   Arguments:
-*
-*      Modified:
-*       
-*         STATUS  (INTEGER)
-*                        Inherited status
-*       
-*+
-*   D L Terrett   16-MAY-1989 
+*  Arguments:
+*     STATUS = INTEGER (Given & Returned)
 
+*  Authors:
+*     DLT: D L Terrett (Starlink)
+
+*  History:
+*     16-MAY-1989 (DLT):
+*        Original.
+*-
       IMPLICIT NONE
 
       INCLUDE 'GNS_PAR'
