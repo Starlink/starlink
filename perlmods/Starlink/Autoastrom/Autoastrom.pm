@@ -165,6 +165,14 @@ and returned.
 For a list of available SkyCat catalogue names, see
 http://archive.eso.org/skycat/
 
+This method supports multiple SkyCat names separated by commas:
+
+  $auto->catalogue( 'usno@eso,2mass@ukirt' );
+
+If more than one SkyCat name has been supplied, the first will be
+tried. If that fails or returns zero objects, then the second will be
+returned, and so on until the list of names has been exhausted.
+
 =cut
 
 sub catalogue {
@@ -1389,24 +1397,53 @@ sub solve {
     $racen =~ s/^\s+//;
     $deccen =~ s/^\s+//;
 
-    $self->printstd( sprintf( "--I Obtaining catalogue from %s.\n",
-                              $self->catalogue ) )
-      if $self->starlink_output;
+    my $skycatstring = $self->catalogue;
+    my @skycatnames = split /,/, $skycatstring;
 
-    my $query = new Astro::Catalog::Query::SkyCat( catalog => $self->catalogue,
-                                                   RA => "$racen",
-                                                   Dec => "$deccen",
-                                                   Radius => $radius,
-                                                 );
-    if( defined( $self->skycatconfig ) ) {
-      $query->cfg_file( $self->skycatconfig );
+    foreach my $skycatname ( @skycatnames ) {
+
+      $self->printstd( sprintf( "--I Obtaining catalogue from %s.\n",
+                                $skycatname ) )
+        if $self->starlink_output;
+
+      my $query;
+      eval {
+        $query = new Astro::Catalog::Query::SkyCat( catalog => $skycatname,
+                                                    RA => "$racen",
+                                                    Dec => "$deccen",
+                                                    Radius => $radius,
+                                                  );
+      };
+      if( $@ ) {
+        $self->printerr( "Error setting up SkyCat query: $@" )
+          if $self->starlink_output;
+        next;
+      }
+
+      if( defined( $self->skycatconfig ) ) {
+        $query->cfg_file( $self->skycatconfig );
+      }
+      eval {
+        $querycat = $query->querydb();
+      };
+
+      if( $@ ) {
+print "trapping error\n";
+        $self->printerr( "Error retrieving catalogue from $skycatname: $@" )
+          if $self->starlink_output;
+        next;
+      }
+
+      $self->printstd( sprintf( "--I Obtained catalogue, %d entries, from %s.\n",
+                                $querycat->sizeof,
+                                $skycatname ) )
+        if $self->starlink_output;
+
+      last if $querycat->sizeof != 0;
+
+      $self->printerr( "Retrieved zero objects from $skycatname. Trying next catalogue.\n" );
+
     }
-    $querycat = $query->querydb();
-
-    $self->printstd( sprintf( "--I Obtained catalogue, %d entries, from %s.\n",
-                              $querycat->sizeof,
-                              $self->catalogue ) )
-      if $self->starlink_output;
   }
 
   # Again, croak if we have fewer than 2 objects.
