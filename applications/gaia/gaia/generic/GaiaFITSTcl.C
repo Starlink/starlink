@@ -562,7 +562,12 @@ static int GaiaFITSTclCoord( ClientData clientData, Tcl_Interp *interp,
                         result = TCL_ERROR;
                         break;
                     }
+                    /* These are "pixel indices", so we need to convert to
+                     * FITS grid values. */ 
+                    coords[i] += 0.5;
                 }
+                
+
 
                 /* Whether to format value. */
                 format = 1;
