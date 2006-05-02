@@ -17,6 +17,12 @@ the command-line, or by using X properties.
 <ul>
       <li><b>Use a floating panel (-float_panel)</b><br>
         Create the control panel area in a detached window.</li>
+
+      <li><b>Panel orientation (-panel_orient)</b><br >
+        Set the orientation for the properties panel. If vertical
+        if will appear on the left (makes the display area more square on wide
+        display, moves the panel from under the spectral plot).
+      </li>
       
       <li><b>Display a zoom window (-with_zoom_window)</b><br>
         Display, or not, the zoom window in the control panel.</li>
@@ -62,6 +68,20 @@ the command-line, or by using X properties.
         behaviour is unwanted and the chooser should remain inactive.
       </li>
 
+      <li><b>Always merge MEF headers (-always_merge)</b><br>
+        When looking for a WCS in a FITS extension some of the details may be
+        only present in the primary data units headers (dates and systems
+        usually). When this is true you will want to merge the primary and
+        extension headers. An option as this can cause unanticipated problems.
+      </li>
+
+      <li><b>Check for cubes (-check_for_cubes)</b><br>
+        When a data file is opened, from the the command-line, open dialog or
+        Go history menu, check if it contains a cube and if so open it using
+        the cube toolbox. It's more efficient to open such a file directly
+        from the cube toolbox, so this is an option.
+      </li>
+
       <li><b>Minimum zoom (-min_zoom)</b><br>
         The lowest zoom factor to be offered in the <tt>Scale:</tt>
         menu. Negative values are lower factors.
@@ -73,6 +93,18 @@ the command-line, or by using X properties.
         of the display if the difference between the minimum zoom and
         this value is too large.
         </li>
+
+      <li><b>Zoom factor (-zoom_factor)</b><br>
+        The zoom factor used in the zoom window. 
+        </li>
+
+      <li><b>Default cut (-default_cut)</b><br>
+        The default percentile cut used when opening an image. Note that this
+        only apply to images (files) that have not already been opened. Images
+        that have already been opened use the value stored in the history.
+        To clear the history remove the file <tt>$HOME/.skycat/history or</tt>
+        use the <tt>"Data Servers"->"History..."</tt> window.
+      </li>
 
       <li><b>Default colormap (-default_cmap)</b><br>
         The colormap to be used by default. Note that this isn't as

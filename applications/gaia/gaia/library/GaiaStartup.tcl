@@ -179,25 +179,26 @@ itcl::class gaia::GaiaStartup {
 
    #  Set defaults for widget states.
    protected method set_defaults_ {} {
-      set values_($this,extended_precision) 0
-      set values_($this,show_hdu_chooser) 1
-      set values_($this,float_panel) 0
-      set values_($this,panel_orient) horizontal
-      set values_($this,with_zoom_window) 1
-      set values_($this,with_pan_window) 1
-      set values_($this,with_colorramp) 1
-      set values_($this,focus_follows_mouse) 1
-      set values_($this,scrollbars) 1
-      set values_($this,transient_tools) 0
-      set values_($this,quiet_exit) 1
-      set values_($this,min_scale) -10
-      set values_($this,max_scale) 20
-      set values_($this,zoom_factor) 4
-      set values_($this,default_cut) 100.0
-      set values_($this,default_cmap) real
-      set values_($this,default_itt) ramp
-      set values_($this,linear_cartesian) 1
       set values_($this,always_merge) 0
+      set values_($this,check_for_cubes) 1
+      set values_($this,default_cmap) real
+      set values_($this,default_cut) 100.0
+      set values_($this,default_itt) ramp
+      set values_($this,extended_precision) 0
+      set values_($this,float_panel) 0
+      set values_($this,focus_follows_mouse) 1
+      set values_($this,linear_cartesian) 1
+      set values_($this,max_scale) 20
+      set values_($this,min_scale) -10
+      set values_($this,panel_orient) horizontal
+      set values_($this,quiet_exit) 1
+      set values_($this,scrollbars) 1
+      set values_($this,show_hdu_chooser) 1
+      set values_($this,transient_tools) 0
+      set values_($this,with_colorramp) 1
+      set values_($this,with_pan_window) 1
+      set values_($this,with_zoom_window) 1
+      set values_($this,zoom_factor) 4
    }
 
    #  Update the properties object to the local values and cause a
@@ -208,7 +209,7 @@ itcl::class gaia::GaiaStartup {
                    with_colorramp focus_follows_mouse scrollbars \
                    transient_tools quiet_exit min_scale max_scale \
                    zoom_factor default_cut default_cmap default_itt \
-                   linear_cartesian always_merge" {
+                   linear_cartesian always_merge check_for_cubes" {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
       $props_ save_properties
@@ -234,6 +235,8 @@ itcl::class gaia::GaiaStartup {
             $values_($this,transient_tools)
          $itk_option(-gaia) configure -quiet_exit \
             $values_($this,quiet_exit)
+         $itk_option(-gaia) configure -check_for_cubes \
+            $values_($this,check_for_cubes)
       }
    }
 
@@ -404,6 +407,18 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(alwaysmerge) \
          {Always merge primary into extension headers for full WCS}
       pack $itk_component(alwaysmerge) -side top -fill x
+
+      #  Check for cubes.
+      itk_component add checkforcubes {
+         StarLabelCheck $w_.checkforcubes \
+            -text "Check for cubes:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope values_($this,check_for_cubes)]
+      }
+      add_short_help $itk_component(checkforcubes) \
+         {Check any opened files for cubes, if found open in cube toolbox}
+      pack $itk_component(checkforcubes) -side top -fill x
 
       #  Minimum zoom scale.
       itk_component add minscale {

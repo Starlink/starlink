@@ -31,35 +31,36 @@
       files has been fixed.
 
     - The object detection toolbox has been updated to work with SExtractor
-      version 2.4.3. This include Petrosian magnitudes and some windowed
+      version 2.4.3. This includes Petrosian magnitudes and some windowed
       parameters.
 
-    - The Second U.S. Naval Observatory CCD Astrograph Catalog (UCAC2) has
+    - The Second U.S. Naval Observatory CCD Astrograph Catalogue (UCAC2) has
       been added to the default list. Existing users will be prompted to
       remove the file $HOME/.skycat/skycat.cfg and re-start GAIA to make this
       available.
 
+    - The 2MASS catalogue query now includes a minimum radius. This change
+      will be included with the UCAC2 update.
+
     - The GAIAIMAGEPICK_DIR environment variable now selects default directory
-      for Pick Image toolbox log file.
+      for Pick-Image toolbox log file.
 
     - The image slice now has a option to display the Y axis using a log scale.
 
-    - The 2MASS catalogue query now includes a minimum radius. Remove any
-      existing $HOME/.skycat/skycat.cfg files to benefit from this change.
-
-    - The NDF cube slice display toolbox now has options for continuously
+    - The cube slice display toolbox now has options for continuously
       looping (including "rock-and-roll").
 
   Finally in this release GAIA has undergone major changes in the way that it
   is built and distributed (it is now available in the Starlink CVS repository
-  and uses the unified build procedures). One consequence of this is that GAIA
-  no longer distributes any files for IRAF support.
+  and uses the unified build procedures). During this change IRAF support
+  has been dropped (although the IRAF support files are still available in the
+  CVS repository).
 
-  GAIA is no longer supported by the Starlink project, which has been
-  terminated. Most of this new work has been carried out for the JAC Hawaii.
-  If you want work on GAIA to continue then support it by contacting any
-  current members of the PPARC Astronomy or Science committees and making
-  your views known.
+  Long-term users should note that GAIA is no longer supported by the Starlink
+  project, which has been terminated. Most of this new work has been carried
+  out for the JAC Hawaii. If you want work on GAIA to continue then support it
+  by contacting any current members of the PPARC Astronomy or Science
+  committees and making your views known.
 
   If you have any comments or problems with GAIA then join the Starlink
   support group, where I usually respond, when time permits.

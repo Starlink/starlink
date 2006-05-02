@@ -16,11 +16,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.18}
+\newcommand{\stardocnumber}    {214.19}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {10th October 2005}
+\newcommand{\stardocdate}      {28th April 2006}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and Image Analysis Tool}
-\newcommand{\stardocversion}   {2.9.4}
+\newcommand{\stardocversion}   {3.0-0}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
@@ -282,26 +282,29 @@ the ability to query on-line (WWW) catalogues.}
 
 \section{Introduction\xlabel{introduction}\label{introduction}}
 
-GAIA is an image display tool but with the additional capability of being
-extendable to integrate other programs.  At present extensions are provided
-that cover the astronomically interesting areas of aperture \& optimal
-photometry, automatic source detection, surface photometry, contouring,
-arbitrary region analysis, celestial coordinate readout, calibration and
-modification, grid overlays, blink comparison, image defect patching, 
-polarization vector plotting and the ability to connect to resources
-available in on-line (WWW) catalogues and archives.
+GAIA is an highly interactive image display tool but with the additional
+capability of being extendable to integrate other programs.  At present
+extensions are provided that cover the astronomically interesting areas of
+aperture \& optimal photometry, automatic source detection, surface
+photometry, contouring, arbitrary region analysis, celestial coordinate
+readout, calibration and modification, grid overlays, blink comparison, image
+defect patching, polarization vector plotting and the ability to connect to
+resources available in on-line (WWW) catalogues and archives.
+
+GAIA also features tools for interactively displaying image planes from data
+cubes and plotting spectra from the hidden dimension.
 
 GAIA is a derivative of the
 \htmladdnormallinkfoot{SkyCat}{http://archive.eso.org/skycat/} image
 display and catalogue browsing tool, developed as part of the
 \htmladdnormallinkfoot{VLT}{http://www.eso.org/vlt/} project at
-\htmladdnormallinkfoot{ESO}{http://www.eso.org/}. SkyCat and GAIA are 
+\htmladdnormallinkfoot{ESO}{http://www.eso.org/}. Both SkyCat and GAIA are
 free software under the terms of the GNU copyright.
 
 \section{\xlabel{getting_started}Getting Started}
 
 The following two sections describe the absolute basics of how to
-startup GAIA and how to display images using it. 
+startup GAIA and how to display images using it.
 
 If you need help beyond this, and are new to GAIA, then you should probably
 read the `The GAIA CookBook' (\xref{SC/17}{sc17}{}). In addition to the usual
@@ -319,15 +322,18 @@ one-line description of the window element under the cursor (an
 approximation of balloon help).
 
 If you need help beyond what is available in these resources (or have
-any suggestions for improvements), then send an email message to:
+any suggestions for improvements), then join the Starlink user support
+mailing lists at
 \begin{quote}
-\htmladdnormallink{\mytt{gaia@star.rl.ac.uk}}{mailto:gaia@star.rl.ac.uk}.
+\htmladdnormallink{\mytt{http://www.starlink.ac.uk}}{http://www.starlink.ac.uk}.
 \end{quote}
-The GAIA home page (which should have a current list of known bugs,
-work arounds and other useful information) is at:
+The GAIA home page is at:
 \begin{quote}
 \htmladdnormallink{\mytt{http://www.starlink.rl.ac.uk/gaia/}}{http://www.starlink.rl.ac.uk/gaia/}.
 \end{quote}
+which may be updated from time-to-time. GAIA was mainly produced by the now
+closed Starlink project, funded by the Particle Physics and Astronomy Research
+Council (see links on the front page).
 
 \subsection{\xlabel{using_gaia_from_the_cshell}Using GAIA from the C-shell}
 
@@ -425,13 +431,14 @@ GAIA provides the following normal ``image display tool'' features:
   values and simple statistics of a region about the cursor can be
   displayed.
 
-\item Display of image planes from data cubes. Using this you can step
-  along an axis and display the image formed by the other two axes. 
+\item Display of image planes and spectra from data cubes. Using this you can
+  step along an axis and display the image formed by the other two axes.
   You can also combine a range of image planes or do the stepping
-  using a timed animation. The displayed images created by this tool can be 
-  analysed just like any other image, but the data format should be 
-  NDF for efficiency. Finally a spectrum from the hidden dimension of
-  the cube can be displayed in the Starlink SPLAT program.
+  using a timed animation. The displayed images created by this tool can be
+  analysed in the image-analysis toolboxes. Finally a spectrum from the
+  hidden dimension of the cube can be displayed and updated interactively and
+  even sent to the Starlink SPLAT-VO program for analysis and additional
+  inspection.
 \end{itemize}
 
 \subsection{\xlabel{image_analysis_capabilities}Image analysis capabilities}
@@ -525,11 +532,11 @@ astronomical work with images:
   determine the distance and offsets between any two points on
   your image (in arc minutes).
 
-\item Real time profiling. Two separate toolboxes allow you to either 
+\item Real time profiling. Two separate toolboxes allow you to either
   move a line around on the image and see the image data values
   displayed as a profile change (this profile can also be saved as a
   spectrum), or do the same with a rectangle, in which case the mean
-  profiles along the X and Y directions are shown. 
+  profiles along the X and Y directions are shown.
 
 \item Object parameterization. This allows you to select a single
   object on the image. Details such as its full width half
@@ -694,7 +701,7 @@ local catalogue (which you can then edit into your tab files).
 To find out more about the TST format and how to configure plot
 symbols you should consult the ESO document
 \htmladdnormallinkfoot{`Astronomical Catalog Library'}
-{http://star-www.dur.ac.uk/\~{}pdraper/gaia/docs/cat.ps.gz} and 
+{http://star-www.dur.ac.uk/\~{}pdraper/gaia/docs/cat.ps.gz} and
 `Writing Catalogue and Image Servers for GAIA and CURSA '
 (\xref{SSN/75}{ssn75}{}).
 
@@ -728,12 +735,14 @@ FITS files are a special case in that GAIA will read these natively
 routines (such as those used in the photometry toolbox) will still
 need to be able to convert these files into NDFs, using the on-the-fly
 facility, so if you define your own conversion facilities make sure
-that you include a FITS converter.
+that you include a FITS converter (note these doesn't apply to FITS
+data cubes, GAIA handles converting these into NDFs for the various toolboxes
+directly).
 
 To display any of these images in GAIA just type the full disk-file
 name on the command-line (either when you start GAIA or by using the
 \mytt{gaiadisp} command), or similarly select the disk-file in the
-open file window. 
+open file window.
 
 To display a FITS file extension image, either open the disk file and
 choose the extension from the \mytt{HDU} selector window that appears,
@@ -761,7 +770,7 @@ used:
 \end{verbatim}
 \end{quote}
 This can also be applied to FITS files and other foreign formats, but
-note that this means that FITS files will now be accessed as foreign, 
+note that this means that FITS files will now be accessed as foreign,
 \textit{i.e.} the FITS files will really be NDFs:
 \begin{quote}
 \begin{verbatim}
@@ -782,6 +791,7 @@ are best set using the \mytt{Startup options...} window located in the
 \hline
  -always\_merge      &  Merge primary and extension headers \\
  -catalog            &  Open windows for the given catalogs on startup \\
+ -check\_for\_cubes  &  Check input files to see if they are cubes (default 1) \\ 
  -component          &  NDF component to display on startup \\
  -component          &  The NDF component (data, variance or quality) \\
  -default\_cmap      &  Change the default colour map \\
@@ -874,38 +884,66 @@ to read about ``SkyCat plugins''.
 
 \section{Recent \xlabel{changes}Changes}
 
-\section{This release 2.9}
+\section{This release 3.0-0}
 
-There have been several minor changes in this release of GAIA.
+The most significant change in this release are many updates to the cube
+toolbox. This is now much faster at image slicing and handles FITS cubes as
+well as NDF cubes. It also features an all new, built-in, interactive
+spectral readout display.
 
-The minor changes are:
-\begin{itemize}
+As part of these cube handling updates, all the image analysis toolboxes now
+also work on cube slices. Spectral analysis features are provided by SPLAT-VO,
+which works outside of GAIA.
 
-\item GAIA can now display in-line compressed images (such as RICE from WFCAM).
-      These are converted into temporary files on the fly and can be used with
-      all other tasks within GAIA.
+Other major changes in this release are that the version of Skycat has been
+updated (after a long pause of five years) to 2.4.7, along with an update to
+using Tcl/Tk 8.4.11.
 
-\item When you display slices from cubes, it is now possible to get a spectral
-      display by double-clicking on a display pixel. This sends the spectrum 
-      to the Starlink SPLAT program.
+Highlights of the change to Skycat 2.4.7 include a new feature for the display
+of MEFs, and groups of NDFs, as a single image.
 
-\item The ESP toolbox now reports the mean count along the isophote and plots
+There are also many minor changes in this release of GAIA:
+
+    - GAIA can now display in-line compressed images (such as RICE from WFCAM).
+      These are converted into temporary files on the fly and can be
+      used with all other tasks within GAIA.
+
+    - The ESP toolbox now reports the mean count along the isophote and plots
       intensity profiles.
 
-\item A rarely seen problem with foreign-file conversion deleting the input
+    - A rarely seen problem with foreign-file conversion deleting the input
       files has been fixed.
 
-\item The object detection toolbox has been updated to work with SExtractor
+    - The object detection toolbox has been updated to work with SExtractor
       version 2.4.3. This include Petrosian magnitudes and some windowed
       parameters.
 
-\end{itemize}
+    - The Second U.S. Naval Observatory CCD Astrograph Catalog (UCAC2) has
+      been added to the default list. Existing users will be prompted to
+      remove the file $HOME/.skycat/skycat.cfg and re-start GAIA to make this
+      available.
 
-Internally GAIA has undergone major changes in the way that it is built and
-distributed. One immediate consequence of this is that GAIA no longer
-distributes any files for IRAF support. 
+    - The GAIAIMAGEPICK_DIR environment variable now selects default directory
+      for Pick Image toolbox log file.
 
-AUTOASTROM does not exist, so that is also missing...
+    - The image slice now has a option to display the Y axis using a log scale.
+
+    - The 2MASS catalogue query now includes a minimum radius. Remove any
+      existing $HOME/.skycat/skycat.cfg files to benefit from this change.
+
+    - The NDF cube slice display toolbox now has options for continuously
+      looping (including "rock-and-roll").
+
+Finally in this release GAIA has undergone major changes in the way that it is
+built and distributed (it is now available in the Starlink CVS repository and
+uses the unified build procedures). One consequence of this is that GAIA no
+longer distributes any files for IRAF support.
+
+GAIA is no longer supported by the Starlink project, which has been
+terminated. Most of this new work has been carried out for the JAC Hawaii.  If
+you want work on GAIA to continue then support it by contacting any current
+members of the PPARC Astronomy or Science committees and making your views
+known.
 
 \subsection{Release 2.8}
 
@@ -918,12 +956,12 @@ data format should be NDF for good efficiency.
 
 Other changes in this release:
 \begin{itemize}
- \item GAIA has been relinked against AST to fix a problem when the 
+ \item GAIA has been relinked against AST to fix a problem when the
        presence of multiple possible astrometries in FITS headers
        causes the image scale to be incorrectly estimated.
 
  \item Printing the `whole image' now works when repeated without exiting
-       GAIA. 
+       GAIA.
 
  \item Incompatibilities in the WCS components of NDFs are now ignored (older
        versions of AST cannot read newer encodings).
@@ -931,21 +969,21 @@ Other changes in this release:
  \item A problem with coordinate readout coupling when using more than one
        interactive slice or XY profile is being used.
 
- \item A error reading the CRPIX values in the blink/compare toolbox has been 
+ \item A error reading the CRPIX values in the blink/compare toolbox has been
        fixed.
 \end{itemize}
 
-\subsection{Release - 2.7} 
+\subsection{Release - 2.7}
 This was a major release of GAIA incorporating two new automated astrometry
 toolboxes, a major re-write of the blink comparison toolbox and many
 changes and fixes.
 
-GAIA now offers two new toolboxes based on the Starlink 
+GAIA now offers two new toolboxes based on the Starlink
 AUTOASTROM \xref{SUN/242}{sun242} program. These make it possible to provide a
 minimum of positional information (image centre and scale) and then fit an
 astrometric solution. They also make it possible, for the first time, to fit
-optical distortions. The new toolboxes are available at: 
-\begin{verbatim} 
+optical distortions. The new toolboxes are available at:
+\begin{verbatim}
      Image-Analysis->Astrometry Calibration->Automatic position matching
 \end{verbatim}
 One is for simple use and the other for advanced use.
@@ -990,24 +1028,24 @@ Other changes in this release
      \item Long thin or tall images (2 pixels or more) now display a readout of
        positions.
 
-     \item The \mytt{\$GAIA\_DIR/pix2wcs} and 
+     \item The \mytt{\$GAIA\_DIR/pix2wcs} and
         \mytt{\$GAIA\_DIR/wcs2pix} scripts should be
-       working again. 
+       working again.
 
      \item The \mytt{\$GAIA\_DIR/displaycat} command now creates fully
-       functional 
+       functional
        catalogue windows (previous these did not include any GAIA specific
-       changes). 
- 
+       changes).
+
      \item The \mytt{-catalog} command-line option now accepts a list of
-       catalogues to 
+       catalogues to
        display immediately.
 
      \item The polarimetry toolbox now correctly processes selection expressions
        when column names are short forms of other names (i.e. when \mytt{P}
        and \mytt{PI},
        \mytt{DP} and \mytt{DPI} etc. are used). Previously an attempt to
-       interpret \mytt{\$PI} as 
+       interpret \mytt{\$PI} as
         \mytt{\$P} would be made and subsequently fail.
 
      \item Making name queries using the RedHat 9 build of GAIA failed
@@ -1019,27 +1057,27 @@ Other changes in this release
        projections are simple linear mappings (this remains the default),
        ignoring the possibility of spherical rotations. Refer to the CarLin
        attribute of the AST (\xref{SUN/211}{sun211}) library for more about
-       this change. 
+       this change.
 
      \item Various changes to grid overlays have been implemented.
        This now supports AST 3.2 super-script and sub-script, font and colour
        changes within a string. Fonts drawn on the overlay grid can now be
        scaled with image. Better matching of postscript font size to displayed
-       size has also been implemented. A long term memory leak has been cured 
-       (only seen when drawing overlays). 
+       size has also been implemented. A long term memory leak has been cured
+       (only seen when drawing overlays).
 
      \item A new configuration option \mytt{always\_merge} controls if the
-       primary header 
+       primary header
        of any FITS files are merged with those of extension being viewed to
        create a full set of headers for creating a world coordinate system. By
        default this merging no longer occurs when the primary HDU contains a
-       non dummy image. 
+       non dummy image.
 
      \item Region statistics now also include values for the NDF variance
        component.
 
 \end{itemize}
- 
+
 \subsection{Release - 2.8}
 
 A major release of GAIA incorporating a new NDF cube handling facility.  GAIA
@@ -1059,17 +1097,17 @@ The following minor issues have also been fixed.
     \item The astrometry tables now offer a button to project X,Y to RA,DEC
       to complement the reset projection of RA,DEC to X,Y.
 
-    \item Incompatibilities in the WCS are now ignored (older versions of 
+    \item Incompatibilities in the WCS are now ignored (older versions of
       AST cannot read newer encodings). This will naturally only effect
       GAIA in future versions.
 
     \item XY profiles now display a local value when a row or column contains
-      no valid values (previous this displayed zero, which occasionally 
-      made the graphs scale to silly values). 
+      no valid values (previous this displayed zero, which occasionally
+      made the graphs scale to silly values).
 
     \item Contouring toolbox bug fixed. If you entered an incorrect NDF name for
       the second image, the error was never recovered and GAIA had to be
-      restarted. 
+      restarted.
 
     \item Fixed problem with coordinate readout coupling when more than one
       interactive slice or XY profile is being used.
@@ -1091,7 +1129,13 @@ They also make use of many other extensions and scripts developed by
 the Tcl community.
 Thanks are also due to the many people who helped test out GAIA and
 iron out minor and major problems (in particular Tim Jenness, Tim
-Gledhill and Nigel Metcalfe).
+Gledhill and Nigel Metcalfe) and all the users who have reported bugs
+and sent support since the early releases.
+
+GAIA was created within the, now closed, Starlink project with funding from
+the Particle Physics and Astronomy Research Council. More recent developments
+(GAIA 3) have been supported by the Joint Astronomy Centre, Hawaii, again with
+funding from the Particle Physics and Astronomy Research Council.
 
 % ? End of main text
 \end{document}

@@ -140,7 +140,7 @@ Options:
  -catalog  "<c1> <c2> .." - open windows for the given catalogs on startup.
  -colorramp_height <n>    - height of colorramp window (default: 12).
  -component <component>   - NDF component to display (one of: data, variance)
- -check_for_cubes <bool>  - reopen cubes using the cube toolbox (default: 1)
+ -check_for_cubes <bool>  - Check input files to see if they are cubes (default: 1) \\ 
  -debug <bool>            - debug flag: run bg processes in fg.
  -default_cmap <cmap>     - default colormap.
  -default_itt <itt>       - default intensity transfer table.
