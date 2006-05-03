@@ -18,6 +18,7 @@ kps1_prmx.f
 kps1_rs1.f
 kps1_spar.f
 kps1_slae.f
+kps1_subi.f
 kps1_stpa.f
 kps1_thgt.f
 *.loT
