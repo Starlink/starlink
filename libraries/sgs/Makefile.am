@@ -57,4 +57,4 @@ sgsx2_SOURCES = sgsx2.f
 sgsx2_LDADD = libsgs.la `gns_link` `gks_link` `ems_link` `chr_link`
 
 dist_starnews_DATA = sgs.news
-
+dist_pkgdata_DATA = LICENCE

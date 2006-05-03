@@ -33,6 +33,42 @@
 *         Inherited status (if option selected)
 *         Status (0=OK) (if non-inherited)
 
+*  Notes:
+*     Position code;  the first two characters determine the position of
+*     the new zone within the current zone as follows:
+*
+*     1st character = B (bottom), C (centre) or T (top).
+*     2nd character = L (left),   C (centre) or R (right).
+*
+*     The new zone can be positioned in one corner of the current zone
+*     by specifiying 'BL', 'BR', 'TL' or 'TR'.  The new zone can be
+*     positioned centrally against one edge via 'BC', 'CR', 'TC' or 'CL'.
+*     'CC' causes the new zone to be concentric with the current one.
+*
+*     The new zone has a window whose world coordinate extent is (0,0) to
+*     (X,Y), where X/Y is the true aspect ratio of the viewport and the
+*     smaller of X or Y is unity.
+
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     PTW: P. T. Wallace (Starlink)
 *     DLT: D. L. Terrett (Starlink)
@@ -56,22 +92,6 @@
 *     ISZID      i      current zone ID
 *     IZTW       i()    zone table - SGS workstation ID
 *     ZVT        r()    zone table - viewport
-*
-*  Notes:
-*     Position code;  the first two characters determine the position of
-*     the new zone within the current zone as follows:
-*
-*     1st character = B (bottom), C (centre) or T (top).
-*     2nd character = L (left),   C (centre) or R (right).
-*
-*     The new zone can be positioned in one corner of the current zone
-*     by specifiying 'BL', 'BR', 'TL' or 'TR'.  The new zone can be
-*     positioned centrally against one edge via 'BC', 'CR', 'TC' or 'CL'.
-*     'CC' causes the new zone to be concentric with the current one.
-*
-*     The new zone has a window whose world coordinate extent is (0,0) to
-*     (X,Y), where X/Y is the true aspect ratio of the viewport and the
-*     smaller of X or Y is unity.
 
 *-
 

@@ -13,6 +13,31 @@
 *     N = INTEGER (Returned)
 *         The choice
 
+*  Notes:
+*     This routine assumes that if a workstation has a choice device
+*     2 then this is a keyboard and that the choice numbers are the
+*     ASCII code minus hex 31.
+
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     PTW: P. T. Wallace (Starlink)
 *     DLT: D. L. Terrett (Starlink)
@@ -29,15 +54,11 @@
 *  Constants From GKS_PAR:
 *     GREQU      i        mode - request
 *     GNONE      i        break
+*     {note_new_bugs_here}
 
 *  Externals:
 *     sgs_INCHO, sgs_1ICHMO, sgs_1GETCH, sgs_OPOLY, sgs_OTEXT,
 *     GSCHM, GRQCH
-
-*  Notes:
-*     This routine assumes that if a workstation has a choice device
-*     2 then this is a keyboard and that the choice numbers are the
-*     ASCII code minus hex 31.
 
 *  Read From Common:
 *     ISZID      i        current zone ID

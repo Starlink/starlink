@@ -1,3 +1,10 @@
+SGS V1.1-2
+
+ o Released under the GPL
+ o Builds using Gnu autotools
+
+SGS V1.1
+
 This release of SGS updates the documentation (SUN/85) by removing 
 references to VMS and a hypertext version created.
 
