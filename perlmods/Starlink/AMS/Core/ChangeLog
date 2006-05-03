@@ -1,3 +1,7 @@
+2006-05-02  Tim Jenness  <timj@apele.jach.hawaii.edu>
+
+	* Core.pm (adamtask_sendw): Remove string eval for local send.
+
 2005-02-24  Tim Jenness  <tjenness@cpan.org>
 
 	* Core.pm (adamtask_init): Explicit error message for the failure

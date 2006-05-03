@@ -437,7 +437,7 @@ sub adamtask {
 #
 #  Sends a command to be executed by the relay process and returns the
 #  result. The command is made up of a perl command plus arguments
-#
+#  and will be evaluated in the relay process.
 
 sub adamtask_send {
 
@@ -462,23 +462,25 @@ sub adamtask_send {
 #
 #  - Send a command and then block until the command is complete
 #     This does not use the relay directly from here.
+#   - Arguments are those expected for adam_send:
+#      task name, command string, Command Context, parameter values
 
 sub adamtask_sendw {
 
+  my $task = shift;
   my $command = shift;
+  my $context = shift;
+  my $args = shift;
 
   my ($reply, @reply, $response, $status);
 
   # First I need to send the command
-  # Since we are evalling an adam_send we should receive the
+  # Since we are calling adam_send we should receive the
   # path and messid to the remote task.
   # This allows us to await the return from a specific task and not
   # get confused by other messages
 
-  # The assumption is that the command to be evaluated is always a
-  # adam_send.
-
-  my (@returns) = eval "$command";
+  my (@returns) = eval { adam_send($task, $command, $context, $args); };
 
   # We had an error sending the command
   if ($@ ne "" || $returns[2] != &Starlink::ADAM::SAI__OK) {
@@ -486,7 +488,7 @@ sub adamtask_sendw {
     # Note that I should return a status here.
     # If we are doing a GET I have to return two values
     my $get = 0;
-    $get = 1 if ($command =~ /,\"GET\",|,\"CONTROL\",/);
+    $get = 1 if ($context =~ /GET|CONTROL/);
 
     # Set bad status
     my $badstatus = &Starlink::ADAM::SAI__ERROR;
@@ -601,7 +603,7 @@ sub adamtask_set {
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
   my $status = 
-    adamtask_sendw("adam_send(\"$task\",\"$param\",\"SET\",\"$val\")");
+    adamtask_sendw($task,$param,"SET",$val);
 
 }
 
@@ -638,7 +640,7 @@ sub adamtask_get {
   # Reset ADAM_STATUS
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
-  my ($status, $result) = adamtask_sendw("adam_send(\"$task\",\"$param\",\"GET\",\"\")");
+  my ($status, $result) = adamtask_sendw($task,$param,"GET","");
 
   if (wantarray) {
     return ($result, $status);
@@ -756,7 +758,7 @@ sub adamtask_control {
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
   my ($status, $result) = 
-    adamtask_sendw("adam_send(\"$task\",\"$command\",\"CONTROL\",\"$params\")");
+    adamtask_sendw($task,$command,"CONTROL",$params);
 
 #  return $result if $command eq 'default';
   return ($result, $status);
@@ -777,7 +779,7 @@ sub adamtask_cancel {
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
   my $status =
-    adamtask_sendw("adam_send(\"$task\",\"$command\",\"CANCEL\",\"$params\")");
+    adamtask_sendw($task,$command,"CANCEL",$params);
 
   return $status;
 }
@@ -821,7 +823,7 @@ sub adamtask_obeyw {
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
   # First I need to send the OBEY to sendw
-  my $status = adamtask_sendw("adam_send(\"$task\",\"$command\",\"OBEY\",\"$params\")");
+  my $status = adamtask_sendw($task,$command,"OBEY",$params);
 
   return $status;
 
