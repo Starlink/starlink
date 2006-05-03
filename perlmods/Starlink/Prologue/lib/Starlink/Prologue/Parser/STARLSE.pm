@@ -117,15 +117,18 @@ sub push_line {
       # return the newly minted version
       return ($retval, $prl);
 
-    } elsif ( $line =~ /^\s*$r\s+([A-Z][A-Za-z\s]*)\s*:\s*$/ ) {
-      # section
+    } elsif ( $line =~ /^\s*$r\s{1,4}([A-Z][A-Za-z\s]*)\s*:\s*$/ ) {
+      # section - but only allow up to 4 spaces between comment
+      # char and title. This prevents History entries being included.
       $self->flush_section();
       $self->section($1);
     } elsif ( $line =~ /^\s*$r(\s+.*)\s*$/ ) {
       # prologue content (or *- but that is dealt with above)
       # Include leading spaces since we want to retain indenting
       # strip off the first 5 spaces (standard formatting)
+      # Replace tabs with 8 characters
       my $content = $1;
+      $content =~ s/\t/        /;
       $content =~ s/^\s{2,5}//;
       push(@{$self->content()}, $content);
     } else {
