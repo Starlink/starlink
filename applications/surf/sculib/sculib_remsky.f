@@ -53,13 +53,16 @@
  
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1995-1999, 2004, 2006 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.9  2006/05/03 22:05:43  timj
+*     protect against all data being bad. Minor other fixes for bad data
+*
 *     Revision 1.8  2004/09/01 00:52:23  timj
 *     use CNF_PVAL
 *
@@ -178,6 +181,9 @@
 *     Loop over all data
       DO I = 1, N_POS
 
+*     Initialisations
+         SKYVAR = VAL__BADR
+
 *     Loop over sky bolometers
          N_GOOD = 0
          DO SKY = 1, N_SKYBOLS
@@ -196,7 +202,7 @@
      :        GOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV, QSORT,
      :        STATUS)
 
-*     If there were no good points returned then finishe
+*     If there were no good points returned then finish
 
          IF (GOOD .GT. 0) THEN
 
@@ -211,17 +217,17 @@
                SKYVAR = ERRMEAN * ERRMEAN
 
                CALL MSG_SETI('POS', I)
-               CALL MSG_SETR('BG', SNGL(BACKGROUND))
+               CALL MSG_SETD('BG', BACKGROUND)
                CALL MSG_SETR('ERR', ERRMEAN)
                CALL MSG_SETI('GOOD', GOOD)
                
                CALL MSG_OUTIF(MSG__VERB, ' ',
      :              '^POS: MEAN = ^BG +- ^ERR (^GOOD points)', STATUS)
             ELSE
-               BACKGROUND = SNGL(MEDIAN)
+               BACKGROUND = MEDIAN
                
                CALL MSG_SETI('POS', I)
-               CALL MSG_SETR('BG', SNGL(BACKGROUND))
+               CALL MSG_SETD('BG', BACKGROUND)
                
                CALL MSG_OUTIF(MSG__VERB, ' ',
      :              '^POS: MEDIAN = ^BG', STATUS)
@@ -266,30 +272,45 @@
       QS_PTR = 0
       QS_PTR_END = 0
 
-      CALL SCULIB_MALLOC(NLOOPS * VAL__NBUB, DQ_PTR, DQ_PTR_END,
-     :     STATUS)
-      IF (STATUS .EQ. SAI__OK) THEN
-         BTEMP = 0
-         CALL SCULIB_CFILLB(NLOOPS, BTEMP, %VAL(CNF_PVAL(DQ_PTR)))
+*     See if we had any data at all in the file
+      STDEV = VAL__BADD
+      MEAN_LEVEL = VAL__BADD
+      SUM = VAL__BADD
+      SUMSQ = VAL__BADD
+      IF (NLOOPS .GT. 0) THEN
+
+         CALL SCULIB_MALLOC(NLOOPS * VAL__NBUB, DQ_PTR, DQ_PTR_END,
+     :        STATUS)
+         IF (STATUS .EQ. SAI__OK) THEN
+            BTEMP = 0
+            CALL SCULIB_CFILLB(NLOOPS, BTEMP, %VAL(CNF_PVAL(DQ_PTR)))
+         END IF
+         CALL SCULIB_MALLOC(NLOOPS * VAL__NBR, QS_PTR, QS_PTR_END,
+     :        STATUS)
+         LCLIP = -1.0
+
+         CALL SCULIB_STATR(NLOOPS, LCLIP, %VAL(CNF_PVAL(SKY_PTR)), 
+     :        %VAL(CNF_PVAL(DQ_PTR)),
+     :        BADBIT, GOOD, MEAN_LEVEL, MEDIAN, SUM, SUMSQ, STDEV, 
+     :        %VAL(CNF_PVAL(QS_PTR)), STATUS)
+
+
+*     Free the memory for statistics
+         CALL SCULIB_FREE('DUMMY_SQUAL', DQ_PTR, DQ_PTR_END, STATUS)
+         CALL SCULIB_FREE('SKY_SORTED', QS_PTR, QS_PTR_END, STATUS)
+
       END IF
-      CALL SCULIB_MALLOC(NLOOPS * VAL__NBR, QS_PTR, QS_PTR_END,
-     :     STATUS)
-      LCLIP = -1.0
 
-      CALL SCULIB_STATR(NLOOPS, LCLIP, %VAL(CNF_PVAL(SKY_PTR)), 
-     :                  %VAL(CNF_PVAL(DQ_PTR)),
-     :     BADBIT, GOOD, MEAN_LEVEL, MEDIAN, SUM, SUMSQ, STDEV, 
-     :     %VAL(CNF_PVAL(QS_PTR)), STATUS)
-
-
-*     Free the memory
+*     Free main array
       CALL SCULIB_FREE('SKY_ARRAY', SKY_PTR, SKY_PTR_END, STATUS)
-      CALL SCULIB_FREE('DUMMY_SQUAL', DQ_PTR, DQ_PTR_END, STATUS)
-      CALL SCULIB_FREE('SKY_SORTED', QS_PTR, QS_PTR_END, STATUS)
 
 *     Print out the sky noise value
       CALL MSG_SETI('NGOOD', GOOD)
-      CALL MSG_SETR('NOISE',SNGL(STDEV))
+      IF (STDEV .NE. VAL__BADD) THEN
+         CALL MSG_SETR('NOISE',SNGL(STDEV))
+      ELSE
+         CALL MSG_SETC('NOISE', 'BAD')
+      END IF
       CALL MSG_OUTIF(MSG__NORM, ' ','Sky noise: ^NOISE (^NGOOD points)',
      :     STATUS)
 
