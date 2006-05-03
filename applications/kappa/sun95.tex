@@ -11833,6 +11833,8 @@ picture.}
  Divides an NDF by a scalar.}
 \menuitem{CENTROID}{
  Finds the centroids of star-like features in an NDF.}
+\menuitem{CHANMAP}{
+ Creates a channel map from a cube NDF by compressing slices along a nominated axis}
 \menuitem{CHPIX}{
  Replaces the values of selected pixels in an NDF.}
 \menuitem{CHAIN}{
@@ -12488,6 +12490,8 @@ functions as follows.
 \label{cl:compexp}
 \item {\large\bf Compression and expansion}
 \begin{description}
+\classitem{CHANMAP}
+ Creates a channel map from a cube NDF by compressing slices along a nominated axis
 \classitem{COLLAPSE}
  Reduces the number of axes in an NDF by collapsing it along a nominated axis.
 \classitem{COMPADD}
@@ -12500,14 +12504,15 @@ functions as follows.
  Forms a higher-resolution NDF by interleaving a set of NDFs.
 \classitem{PIXDUPE}
  Expands an NDF by pixel duplication.
-\classitem{SQORST}
- Squashes or stretches an NDF.
 \classitem{REGRID}
  Uses an arbitrary mapping to regrid an NDF.
+\classitem{SQORST}
+ Squashes or stretches an NDF.
 \classitem{WCSALIGN}
  Aligns a group of NDFs using \htmlref{WCS}{apndf:wcs}~ information.
 \end{description}
 \vspace*{0.7ex}
+\goodbreak
 %
 \item {\large\bf Configuration change}
 \begin{description}
@@ -15429,9 +15434,12 @@ KAPPA: \htmlref{PASTE}{PASTE},
 
          \sstitem
          This routine correctly processes the DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, and \htmlref{HISTORY}{apndf:history}, components of an NDF
-         data structure and propagates all \htmlref{extensions}{apndf:extensions}.  Propagation is from
- the base NDF.  \htmlref{WCS}{apndf:wcs}, and \htmlref{AXIS}{apndf:axis}~ information is lost.
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, 
+         \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, and 
+         \htmlref{HISTORY}{apndf:history}, components of an NDF data structure and 
+         propagates all \htmlref{extensions}{apndf:extensions}.  Propagation is from 
+         the base NDF.  \htmlref{WCS}{apndf:wcs}, and \htmlref{AXIS}{apndf:axis}~ information 
+         is lost.
 
          \sstitem
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.
@@ -15439,6 +15447,327 @@ KAPPA: \htmlref{PASTE}{PASTE},
          \sstitem
          Any number of NDF dimensions is supported.
 
+      }
+   }
+}
+
+\sstroutine{
+   CHANMAP
+}{
+   Creates a channel map from a cube NDF by compressing slices along
+   a nominated axis
+}{
+   \sstdescription{
+      This application creates a two-dimensional channel-map image from
+      a three-dimensional NDF.  It collapses along a nominated pixel
+      axis in a series of slices.  The collapsed slices are tiled with
+      no margins to form the output image.  This grid of channel maps
+      is filled from left to right, and bottom to top.  A specified
+      range of axis values can be used instead of the whole axis (see
+      parameters LOW and HIGH).  The number of channels and their
+      arrangement into an image is controlled through parameters
+      NCHAN and SHAPE.
+
+      For each output pixel, all corresponding input pixel values
+      between the channel bounds of the the nominated axis to be
+      collapsed are combined together using one of a selection of
+      estimators, including a mean, mode, or median, to produce the
+      output pixel value.
+   }
+   \sstusage{
+      chanmap in out axis nchan shape [low] [high] [estimator] [wlim]
+   }
+   \sstparameters{
+      \sstsubsection{
+         AXIS = LITERAL (Read)
+      }{
+         The axis along which to collapse the NDF.  This can be
+         specified by its integer index within the current Frame of the
+         input NDF (in the range 1 to the number of axes in the current
+         Frame), or by its symbol string.  A list of acceptable values
+         is displayed if an illegal value is supplied.  If the axes of
+         the current Frame are not parallel to the NDF pixel axes, then
+         the pixel axis which is most nearly parallel to the specified
+         current Frame axis will be used.
+      }
+      \sstsubsection{
+         ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
+      }{
+         The method to use for estimating the output pixel values.  It
+         can be one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "Mean"} -- Mean value
+
+            \sstitem
+            {\tt "WMean"}  -- Weighted mean in wich each data value is weighted
+                        by the reciprocal of the associated variance.  
+
+            \sstitem
+            {\tt "Mode"}   -- Modal value
+
+            \sstitem
+            {\tt "Median"} -- Median value.  Note that this is extremely memory
+                        and CPU intensive for large datasets; use with 
+                        care!  If strange things happen, use {\tt "Mean"}.
+
+            \sstitem
+            {\tt "Absdev"} -- Mean absolute deviation from the unweighted mean.
+
+            \sstitem
+            {\tt "Comax"}  -- Co-ordinate of the maximum value.
+
+            \sstitem
+            {\tt "Comin"}  -- Co-ordinate of the minimum value.
+
+            \sstitem
+            {\tt "Integ"}  -- Integrated value, being the sum of the products 
+                        of the value and pixel width in world
+                        co-ordinates.
+
+            \sstitem
+            {\tt "Iwc"}    -- Intensity-weighted co-ordinate, being the sum of 
+                        each value times its co-ordinate, all divided by
+                        the integrated value (see the {\tt "Integ"} option).
+
+            \sstitem
+            {\tt "Iwd"}    -- Intensity-weighted dispersion of the
+                        co-ordinate, normalised like {\tt "Iwc"} by the 
+                        integrated value.
+
+            \sstitem
+            {\tt "Max"}    -- Maximum value.
+
+            \sstitem
+            {\tt "Min"}    -- Minimum value.
+
+            \sstitem
+            {\tt "Rms"}    -- Root-mean-square value.
+
+            \sstitem
+            {\tt "Sigma"}  -- Standard deviation about the unweighted mean.
+
+            \sstitem
+            {\tt "Sum"}    -- The total value.
+         }
+         {\tt ["Mean"]}
+      }
+      \sstsubsection{
+         HIGH = LITERAL (Read)
+      }{
+         Together with parameter LOW, this parameter defines the range
+         of values for the axis specified by parameter AXIS to be
+         divided into channels.  For example, if AXIS is 3 and the
+         current Frame of the input NDF has axes RA/DEC/Wavelength, then
+         a wavelength value should be supplied.  If, on the other hand,
+         the current Frame in the NDF was the PIXEL Frame, then a pixel
+         co-ordinate value would be required for the third axis (note,
+         the pixel with index I covers a range of pixel co-ordinates
+         from ($I-1$) to $I$).
+
+         Note, HIGH and LOW should not be equal.  If a null value ({\tt{!}}) is
+         supplied for either HIGH or LOW, the entire range of the axis
+         fragmented into channels.  {\tt [!]}
+      }
+      \sstsubsection{
+         IN  = NDF (Read)
+      }{
+         The input NDF.  This must have three dimensions.
+      }
+      \sstsubsection{
+         LOW = LITERAL (Read)
+      }{
+         Together with parameter HIGH this parameter defines the range
+         of values for the axis specified by parameter AXIS to be
+         divided into channels.  For example, if AXIS is 3 and the
+         current Frame of the input NDF has axes RA/DEC/Frequency, then
+         a frequency value should be supplied.  If, on the other hand,
+         the current Frame in the NDF was the PIXEL Frame, then a pixel
+         co-ordinate value would be required for the third axis (note,
+         the pixel with index I covers a range of pixel co-ordinates
+         from ($I-1$) to $I$).
+
+         Note, HIGH and LOW should not be equal.  If a null value (!) is
+         supplied for either HIGH or LOW, the entire range of the axis
+         fragmented into channels.  {\tt [!]}
+      }
+      \sstsubsection{
+         NCHAN = \_INTEGER (Read)
+      }{
+         The number of channels to appear in the channel map.  It must
+         be a positive integer up to the lesser of 100 or one third of
+         the number of pixels along the collapsed axis.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output NDF.
+      }
+      \sstsubsection{
+         SHAPE = \_INTEGER (Read)
+      }{
+         The number of channels along the $x$ axis of the output NDF.  The
+         number along the $y$ axis will be (NCHAN-1)/SHAPE.  A null value
+         ({\tt{!}}) asks the application to select a shape.  It will generate
+         one that gives the most square output NDF possible.
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Title for the output NDF structure.  A null value ({\tt{!}})
+         propagates the title from the input NDF to the output NDF.  {\tt [!]}
+      }
+      \sstsubsection{
+         USEAXIS = GROUP (Read)
+      }{
+         USEAXIS is only accessed if the current co-ordinate Frame of
+         the input NDF has more than three axes.  A group of three
+         strings should be supplied specifying the three axes which are
+         to be retained in a collapsed slab.  Each axis can be
+         specified either by its integer index within the current Frame
+         (in the range 1 to the number of axes in the current Frame), or
+          by its symbol string.  A list of acceptable values is
+         displayed if an illegal value is supplied.  If a null ({\tt{!}}) value
+         is supplied, the axes with the same indices as the three used
+         pixel axes within the NDF are used.   {\tt [!]}
+      }
+      \sstsubsection{
+         WLIM = \_REAL (Read)
+      }{
+         If the input NDF contains bad pixels, then this parameter
+         may be used to determine the number of good pixels which must
+         be present within the range of collapsed input pixels before a
+         valid output pixel is generated.  It can be used, for example,
+         to prevent output pixels from being generated in regions where
+         there are relatively few good pixels to contribute to the
+         collapsed result.
+
+         WLIM specifies the minimum fraction of good pixels which must
+         be present in order to generate a good output pixel.  If this
+         specified minimum fraction of good input pixels is not present,
+         then a bad output pixel will result, otherwise an good output
+         value will be calculated.  The value of this parameter should
+         lie between 0.0 and 1.0 (the actual number used will be rounded
+         up if necessary to correspond to at least one pixel).  [0.3]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         chanmap cube chan4 lambda 4 2 4500 4550
+      }{
+         The current Frame in the input three-dimensional NDF called
+         cube has axes with labels {\tt "RA"}, {\tt "DEC"} and 
+         {\tt "Lambda"}, with the lambda axis being parallel to the 
+         third pixel axis.  The above command extracts four slabs of 
+         the input cube between wavelengths 4500 and 4550 {\AA}ngstroms, 
+         and collapses each slab, into a single two-dimensional array 
+         with RA and DEC axes forming a channel image.  Each channel 
+         image is pasted into a 2$\times$2 grid within the output NDF 
+         called chan4.  Each pixel in the output NDF is the mean of the
+         corresponding input pixels with wavelengths in 12.5-{\AA}ngstrom 
+         bins.
+      }
+      \sstexamplesubsection{
+         chanmap in=cube out=chan4 axis=3 low=4500 high=4550 nchan=4 shape=2
+      }{
+         The same as above except the axis to collapse along is
+         specified by index (3) rather than label (lambda), and it uses
+         keywords rather than positional parameters.
+      }
+      \sstexamplesubsection{
+         chanmap cube chan4 3 4 2 9.0 45.0
+      }{
+         This is the same as the above examples, except that the current
+         Frame in the input NDF has been set to the PIXEL Frame (using
+         \htmlref{WCSFRAME}{WCSFRAME}), and so the high and low axis values 
+         are specified in pixel co-ordinates instead of {\AA}ngstroms, and 
+         each channel covers nine pixels.  Note the difference between 
+         floating-point pixel co-ordinates, and integer pixel indices (for 
+         instance the pixel with index 10 extends from pixel co-ordinate 
+         9.0 to pixel co-ordinate 10.0).
+      }
+      \sstexamplesubsection{
+         chanmap in=zcube out=vel7 axis=1 low=-30 high=40 nchan=7 shape=! estimator=max
+      }{
+         This command assumes that the zcube NDF has a current
+         co-ordinate system where the first axis is radial velocity
+         (perhaps selected using WCSFRAME and \htmlref{WCSATTRIB}{WCSATTRIB}), 
+         and the the second and third axes are {\tt "RA"}, and {\tt "DEC"}. 
+         It extracts seven velocity slabs of the input cube between $-30$ and
+         $+$40~km/s, and collapses each slab, into a single two-dimensional 
+         array with RA and DEC axes forming a channel image.  Each channel
+         image is pasted into a default grid (likely 4$\times$2) within the
+         output NDF called vel7.  Each pixel in the output NDF is the
+         maximum of the corresponding input pixels with velocities in
+         10-km/s bins.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The collapse is always performed along one of the pixel axes,
+         even if the current Frame in the input NDF is not the PIXEL Frame.
+         Special care should be taken if the current Frame axes are not
+         parallel to the pixel axes.  The algorithm used to choose the
+         pixel axis and the range of values to collapse along this pixel
+         axis proceeds as follows.
+
+      
+         The current Frame co-ordinates of the central pixel in the
+	 input NDF are determined (or some other point if the
+	 co-ordinates of the central pixel are undefined).  Two
+	 current Frame positions are then generated by substituting in
+	 turn into this central position each of the HIGH and LOW
+	 values for the current Frame axis specified by parameter
+	 AXIS.  These two current Frame positions are transformed into
+	 pixel co-ordinates, and the projections of the vector joining
+	 these two pixel positions on to the pixel axes are found.
+	 The pixel axis with the largest projection is selected as the
+	 collapse axis, and the two end points of the projection
+	 define the range of axis values to collapse.
+
+         \sstitem
+         The WCS of the output NDF retains the three-dimensional
+         co-ordinate system of the input cube for every tile, except that
+         each tile has a single representative mean co-ordinate for the
+         collapsed axis.
+
+         \sstitem
+         The slices may have slightly different pixel depths depending 
+         where the boundaries of the channels lie in pixel co-ordinates.
+         Excise care interpreting estimators like {\tt "Sum"} or ensure 
+         equal numbers of pixels in each channel.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+     KAPPA: \htmlref{COLLAPSE}{COLLAPSE},
+     \htmlref{CLINPLOT}{CLINPLOT}.
+   }
+   \newpage
+   \sstimplementationstatus{
+      \ssthitemlist{
+
+         \sstitem
+         This routine correctly processes the DATA, \htmlref{VARIANCE}{apndf:variance},
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, 
+         \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the input NDF; and
+         propagates all \htmlref{extensions}{apndf:extensions}.  \htmlref{AXIS}{apndf:axis} and 
+         \htmlref{QUALITY}{apndf:quality} are not propagated.
+
+         \sstitem
+         Processing of \htmlref{bad pixels}{se:masking} and automatic 
+         \htmlref{quality masking}{se:qualitymask} are supported.
+
+         \sstitem
+         All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.
+
+         \sstitem
+         The origin of the output NDF is at (1,1).
       }
    }
 }
@@ -16890,7 +17219,7 @@ XV; PBMPLUS; NETPBM.
          The method to use for estimating the output pixel values.  It
          can be one of the following options.  The first four are
          more for general collapsing, and the remainder are for cube
-        analysis.
+         analysis.
 
          \ssthitemlist{
 
@@ -16963,7 +17292,7 @@ XV; PBMPLUS; NETPBM.
          parameter gives the range of axis values to be compressed.  Note,
          HIGH and LOW should not be equal since.  If a null value ({\tt{!}}) is
          supplied for either HIGH or LOW, the entire range of the axis
-         is collapsed. {\tt [!]}
+         is collapsed.  {\tt [!]}
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -17020,13 +17349,13 @@ XV; PBMPLUS; NETPBM.
          collapse cube slab lambda 4500 4550
       }{
          The current Frame in the input three-dimensional NDF called cube has
-         axes with labels {\tt "RA"}, {\tt "DEC"} and {\tt "Lambda"}, with the lambda axis
-         being parallel to the third pixel axis.  The above command
+         axes with labels {\tt "RA"}, {\tt "DEC"} and {\tt "Lambda"}, with the 
+         lambda axis being parallel to the third pixel axis.  The above command
          extracts a slab of the input cube between wavelengths 4500 and
-         4550 Angstroms, and collapses this slab into a single
+         4550 {\AA}ngstroms, and collapses this slab into a single
          two-dimensional output NDF called slab with RA and DEC axes.  Each
          pixel in the output NDF is the mean of the corresponding input
-         pixels with wavelengths between 4500 and 4550 Angstroms.
+         pixels with wavelengths between 4500 and 4550 {\AA}ngstroms.
       }
       \sstexamplesubsection{
          collapse cube slab 3 4500 4550
@@ -17040,7 +17369,7 @@ XV; PBMPLUS; NETPBM.
          This is the same as the above examples, except that the current
          Frame in the input NDF has been set to the PIXEL Frame (using
          \htmlref{WCSFRAME}{WCSFRAME}), and so the high and low axis values are 
-         specified in pixel co-ordinates instead of Angstroms.  Note the difference
+         specified in pixel co-ordinates instead of {\AA}ngstroms.  Note the difference
          between floating-point pixel co-ordinates, and integer pixel
          indices (for instance the pixel with index 10 extends from pixel
          co-ordinate 9.0 to pixel co-ordinate 10.0).
@@ -17094,9 +17423,12 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
       \sstitemlist{
 
          \sstitem
-         This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{VARIANCE}{apndf:variance},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of the input NDF and
-         propagates all \htmlref{extensions}{apndf:extensions}.  QUALITY is not propagated.
+         This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, 
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, 
+         \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and 
+         \htmlref{HISTORY}{apndf:history}~ components of the input NDF; and
+         propagates all \htmlref{extensions}{apndf:extensions}.  \htmlref{QUALITY}{apndf:quality} 
+         is not propagated.
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are
@@ -31930,8 +32262,8 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       }{
          This example fits cubic polynomials to the spectral axis of
          a data cube. The fits only use the data lying within the
-         ranges 1000 to 2000 and 3000 to 4000 Angstroms (assuming
-         the spectral axis is calibrated in Angstroms and that is the
+         ranges 1000 to 2000 and 3000 to 4000 {\AA}ngstroms (assuming
+         the spectral axis is calibrated in {\AA}ngstroms and that is the
          current co-ordinate system).  The fit is evaluated and
          written to the data cube called detrend.
       }
@@ -43822,7 +44154,7 @@ plot (7k).
          attrs="'system=wave,unit=Angstrom'"
       }{
          This example assumes the NDF called speca has an Axis
-         structure describing wavelength in Angstroms.  It adds a
+         structure describing wavelength in {\AA}ngstroms.  It adds a
          corresponding \xref{SpecFrame}{sun210}{SpecFrame}~ into the
          WCS component of the NDF.  The SpecFrame is connected to the
          Frame describing the NDF Axis structure using a unit Mapping.
@@ -50636,6 +50968,12 @@ which can be specified via a STYLE parameter:
 The following new applications have been added:
 
 \begin{description}
+   \item [\htmlref{CHANMAP}{CHANMAP}] \mbox{}
+       Creates a two-dimensional channel map from a three-dimensional
+       NDF by collapsing along a nominated pixel axis in each of
+       a series of slices.  The collapsed slices are tiled with
+       no margins to form the output channel map.  A wide selection of
+       statistics is available for the collapsing.
    \item [\htmlref{CLINPLOT}{CLINPLOT}] \mbox{}
        Draws a spatial grid of line plots for an axis of a cube NDF.
        This is particularly relevant to inspection of spectral-line
@@ -51089,6 +51427,8 @@ functions as follows.
 %
 \item {\large\bf Compression and expansion}
 \begin{description}
+\classitem{CHANMAP}
+ Creates a channel map from a cube NDF by compressing slices along a nominated axis
 \classitem{COLLAPSE}
  Reduces the number of axes in an NDF by collapsing it along a nominated axis.
 \classitem{COMPADD}
@@ -51101,14 +51441,15 @@ functions as follows.
  Forms a higher-resolution NDF by interleaving a set of NDFs.
 \classitem{PIXDUPE}
  Expands an NDF by pixel duplication.
+\classitem{REGRID}
+ Uses an arbitrary mapping to regrid an NDF.
 \classitem{SQORST}
  Squashes or stretches an NDF.
-\classitem{REGRID}
- Applies a geometrical transformation to an NDF.
 \classitem{WCSALIGN}
- Aligns a group of NDFs using \htmlref{WCS}{apndf:wcs} information.
+ Aligns a group of NDFs using \htmlref{WCS}{apndf:wcs}~ information.
 \end{description}
 \vspace*{0.7ex}
+\goodbreak
 %
 \item {\large\bf Configuration change}
 \begin{description}

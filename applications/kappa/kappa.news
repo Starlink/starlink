@@ -22,6 +22,12 @@
    co-ordinate ranges, making this a useful tool for fitting the 
    continua of independent spectra stored in data cubes.
 
+   o  A new application CHANMAP creates a two-dimensional channel map 
+   from a three-dimensional NDF by collapsing along a nominated pixel 
+   axis in each of a series of slices.  The collapsed slices are tiled 
+   with no margins to form the output channel map.  A wide selection of
+   statistics is available for the collapsing.
+
    o  A new application CLINPLOT draws a spatial grid of line plots for 
    an axis of a cube NDF.  This is highly relevant to inspection of 
    spectral-line data cubes.  In addition to the normal spectral axes
