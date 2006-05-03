@@ -210,7 +210,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Assign every data pixel to a clump and stores the clumps index in the
    corresponding pixel in "ipa". */
    maxid = cupidFWMain( type, ipd, el, ndim, dims, skip, rms, fwconfig,
-                        ipa );
+                        ipa, ilevel );
 
 /* Abort if no clumps found. */
    if( maxid < 0 ) {
@@ -316,7 +316,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }
 
 /* Loop round counting the clumps which are too small or too low. Put the
-   indices of usableclumps into another array. */
+   indices of usable clumps into another array. */
       nsmall = 0;
       nlow = 0;
       ngood = 0;

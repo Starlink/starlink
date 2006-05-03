@@ -163,7 +163,7 @@ CupidPixelSet *cupidCFDeletePS( CupidPixelSet * );
 CupidPixelSet *cupidCFFreePS( CupidPixelSet *, int *, int );
 CupidPixelSet *cupidCFMakePS( int );
 HDSLoc *cupidClumpFind( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, double[3] );
-HDSLoc *cupidFellWalker( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, double[3]  );
+HDSLoc *cupidFellWalker( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, double[3] );
 HDSLoc *cupidGaussClumps( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, double[3] );
 HDSLoc *cupidReinhold( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, double[3]  );
 double *cupidCFLevels( AstKeyMap *, double, double, double, int * );

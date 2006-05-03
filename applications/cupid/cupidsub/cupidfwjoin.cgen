@@ -7,7 +7,7 @@
 void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
                                  int dims[ 3 ], int skip[ 3 ], double rms, 
                                  AstKeyMap *config, int *ipa, double *peakvals,
-                                 int *npeak ){
+                                 int *npeak, int ilevel ){
 /*
 *  Name:
 *     cupidFWJoin<X>
@@ -19,7 +19,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *     void cupidFWJoin<X>( CGEN_TYPE *array, int nel, int ndim,
 *                          int dims[ 3 ], int skip[ 3 ], double rms, 
 *                          AstKeyMap *config, int *ipa, double *peakvals,
-*                          int *npeak )
+*                          int *npeak, int ilevel )
 
 *  Description:
 *     This function identifies groups of adjoining clumps which have no
@@ -80,6 +80,8 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *        The address of an integer holding the highest clump index value
 *        in "ipa". On exit, the supplied value will be reduced if any of 
 *        the clumps were merged.
+*     ilevel
+*        Amount of information to display.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidFWJoin macro 
@@ -153,32 +155,32 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 /* We scan the "ipa" array "ndim" times, once along each pixel axis. */
    for( scanax = 0; scanax < ndim; scanax++ ) {
 
+/* Store the skip in 1D vector index between adjacent samples along the scan 
+   line, and the number of samples along the scan line. */
+      iiskip = skip[ scanax ];
+      iidim = dims[ scanax ];
+
 /* Consider every pixel in the data cube as a candidate for the start of
    a scan line. */
       iv0 = 0;
-      for( iz = 0; iz < dims[ 2 ]; iz++ ) {
+      for( iz = 1; iz <= dims[ 2 ]; iz++ ) {
          x[ 2 ] = iz;
 
-         for( iy = 0; iy < dims[ 1 ]; iy++ ) {
+         for( iy = 1; iy <= dims[ 1 ]; iy++ ) {
             x[ 1 ] = iy;
 
-            for( ix = 0; ix < dims[ 0 ]; ix++, iv0++ ) {
+            for( ix = 1; ix <= dims[ 0 ]; ix++, iv0++ ) {
                x[ 0 ] = ix;
 
-/* Scan lines start at pixels which have a value of zero on the axis
+/* Scan lines start at pixels which have a value of one on the axis
    currently being scanned. */
-               if( x[ scanax ] == 0 ) {
-
-/* Store the skip in 1D vector index between adjacent samples along the scan 
-   line, and the number of samples along the scan line. */
-                  iiskip = skip[ scanax ];
-                  iidim = dims[ scanax ];
+               if( x[ scanax ] == 1 ) {
 
 /* Initialise the index of the clump to which the current sample in the
    scan line is assigned. */
                   oldclump = -1;
 
-/* Initialise the 1D vector index of ht ecurrent sample. */
+/* Initialise the 1D vector index of the current sample. */
                   iv = iv0;
 
 /* Loop round every sample in the scan line. */
@@ -273,10 +275,22 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
                kpeak = ( table2[ jpeak ] = ++new_npeak );
             }
             table2[ ipeak ] = kpeak;
+
          }
    
 /* If necesaary, translate all the values in "ipa" using the above table. */
          if( new_npeak < *npeak ) {
+
+            if( ilevel > 2 ) {
+               for( ipeak = 0; ipeak <= *npeak; ipeak++ ) {
+                  if( ipeak != table2[ ipeak ] ) {
+                     msgSeti( "P0", ipeak );
+                     msgSeti( "P1", table2[ ipeak ] );
+                     msgOut( "", "Moving clump ^P0 into clump ^P1", status );
+                  }
+               }
+            }
+
             pa = ipa;
             for( iv = 0; iv < nel; iv++, pa++ ) {
                if( *pa != -1 ) *pa = table2[ *pa ];

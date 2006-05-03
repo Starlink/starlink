@@ -12,6 +12,8 @@ Changes introduced at V0.0-15:
  - Fixed bug in the emulation of the IDL implementation of the
    ClumpFind algorithm.
 
+ - Fixed bugs in FellWalker that couldproduce erroneous clump assignments.
+
 Changes introduced at V0.0-14:
 
  - Added a new configuration parameter (ClumpFind.IDLAlg) that can be
