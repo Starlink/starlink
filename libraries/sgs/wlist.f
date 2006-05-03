@@ -1,19 +1,35 @@
       SUBROUTINE sgs_WLIST (LU)
 *+
-*   - - - - - -
-*    W L I S T
-*   - - - - - -
-*
-*   List all the SGS workstation names.
-*
-*   Given:
-*      LU       i      Fortran I/O stream number to which the
-*                      list will be output
-*
-*   Externals:
-*      sgs_WNAME, sgs_1WLST, gns_START
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     WLIST
+
+*  Purpose:
+*     List all the SGS workstation names.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     LU = INTEGER (Given)
+*         Fortran I/O stream number to which the
+*         list will be output
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_WNAME, sgs_1WLST, gns_START
+
 *-
 
       IMPLICIT NONE

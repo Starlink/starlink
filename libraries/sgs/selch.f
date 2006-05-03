@@ -1,18 +1,34 @@
       SUBROUTINE sgs_SELCH (NCHDEV)
 *+
-*   - - - - - -
-*    S E L C H
-*   - - - - - -
-*
-*   Set the current SGS choice device.
-*
-*   Given:
-*      NCHDEV      i      SGS choice device
-*
-*   Written to COMMON:
-*      NCHODV      i      current SGS choice device
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     SELCH
+
+*  Purpose:
+*     Set the current SGS choice device.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     NCHDEV = INTEGER (Given)
+*         SGS choice device
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Written To Common:
+*     NCHODV      i      current SGS choice device
+
 *-
 
       IMPLICIT NONE

@@ -1,18 +1,37 @@
       SUBROUTINE sgs_1CLWK (IWKID)
 *+
-*   - - - - -
-*    C L W K     (Internal routine)
-*   - - - - -
-*
-*   De-activate (if active) and close a workstation.
-*
-*   Given:
-*      IWKID    i        GKS Workstation ID
-*
-*   Externals:
-*      GQWKS, GDAWK, GCLWK
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     CLWK
+
+*  Purpose:
+*     De-activate (if active) and close a workstation.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     Internal routine
+
+*  Arguments:
+*     IWKID = INTEGER (Given)
+*         GKS Workstation ID
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     GQWKS, GDAWK, GCLWK
+
 *-
 
       IMPLICIT NONE

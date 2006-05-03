@@ -1,21 +1,37 @@
       SUBROUTINE sgs_SHTX (H)
 *+
-*   - - - - -
-*    S H T X
-*   - - - - -
-*
-*   Specify text height.
-*
-*   Given:
-*      H         r      text height (sign ignored)
-*
-*   Written to COMMON:
-*      HTX       r      current txt height
-*
-*   Externals:
-*      sgs_OTEXT, sgs_1SETTX
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     SHTX
+
+*  Purpose:
+*     Specify text height.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     H = REAL (Given)
+*         Text height (sign ignored)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_OTEXT, sgs_1SETTX
+
+*  Written To Common:
+*     HTX       r      current txt height
+
 *-
 
       IMPLICIT NONE

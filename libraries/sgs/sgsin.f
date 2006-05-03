@@ -1,60 +1,79 @@
       SUBROUTINE sgs_1SGSIN (JSTAT)
 *+
-*   - - - - - -
-*    S G S I N     (internal routine)
-*   - - - - - -
-*
-*   Initialise SGS.
-*
-*   Set common block variables to suitable initial states.
-*
-*   Given:
-*      JSTAT     i      inherited status (if option selected)
-*
-*   Returned:
-*      JSTAT     i      status: 0=OK
-*
-*   Written to COMMON:
-*      IWTID     i()    workstation table - workstation ID
-*      IWTTY     i()    workstation table - type
-*      IWTCO     i()    workstation table - connection ID
-*      IWTCA     i()    workstation table - category
-*      IZTW      i()    zone table - workstation ID
-*      ZTV       r()     "     "   - viewport
-*      ZTW       r()     "     "   - window
-*      IPEN      i      current pen
-*      NPOLY     i      length of current polyline
-*      NTEXT     i        "    "     "    text string
-*      HMK       r      current marker height (obsolete)
-*      IFONT     i         "    font
-*      IPREC     i         "    text precision
-*      HTX       r         "      "  height
-*      ARTX      r         "      "  aspect ratio
-*      XUPTX     r         "      "  up vector (x)
-*      YUPTX     r         "      "   "   "    (y)
-*      STX       r         "      "  spacing
-*      CTXJ      c*2       "      "  justification
-*      NCHODV    i         "    choice device
-*      LCHOST    i      number of valid choice keys
-*      ISZID     i      current zone ID
-*      XRES      r()    WDT - x resolution
-*      YRES      r()    WDT - y resolution
-*      IBLKCL    i()    WDT - block clear mechanism
-*      ISPOOL    i()    WDT - workstation spooled
-*      NCLORQ    i      no clear open requested
-*
-*   Constants from SGSCOM:
-*      MXWK      i      maximum number of workstations allowed
-*      MXZ       i         "      "    "      zones       "
-*   Constants from GKS_PAR:
-*      GBUNDL    i      aspect source flag - bundled
-*      GINDIV    i        "       "     "  - individual
-*      GSTRKP    i      text precision - stroke
-*
-*   Externals:
-*      sgs_1HSTAT, sgs_1GKERR, sgs_1ERR, GSELNT, GQASF
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     SGSIN
+
+*  Purpose:
+*     Initialise SGS.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     internal routine
+
+*  Description:
+*     Set common block variables to suitable initial states.
+
+*  Arguments:
+*     JSTAT = INTEGER (Given & Returned)
+*         Inherited status (if option selected)
+*         Status: 0=OK (if non-inherited)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GBUNDL    i      aspect source flag - bundled
+*     GINDIV    i        "       "     "  - individual
+*     GSTRKP    i      text precision - stroke
+
+*  Constants From Sgscom:
+*     MXWK      i      maximum number of workstations allowed
+*     MXZ       i         "      "    "      zones       "
+
+*  Externals:
+*     sgs_1HSTAT, sgs_1GKERR, sgs_1ERR, GSELNT, GQASF
+
+*  Written To Common:
+*     IWTID     i()    workstation table - workstation ID
+*     IWTTY     i()    workstation table - type
+*     IWTCO     i()    workstation table - connection ID
+*     IWTCA     i()    workstation table - category
+*     IZTW      i()    zone table - workstation ID
+*     ZTV       r()     "     "   - viewport
+*     ZTW       r()     "     "   - window
+*     IPEN      i      current pen
+*     NPOLY     i      length of current polyline
+*     NTEXT     i        "    "     "    text string
+*     HMK       r      current marker height (obsolete)
+*     IFONT     i         "    font
+*     IPREC     i         "    text precision
+*     HTX       r         "      "  height
+*     ARTX      r         "      "  aspect ratio
+*     XUPTX     r         "      "  up vector (x)
+*     YUPTX     r         "      "   "   "    (y)
+*     STX       r         "      "  spacing
+*     CTXJ      c*2       "      "  justification
+*     NCHODV    i         "    choice device
+*     LCHOST    i      number of valid choice keys
+*     ISZID     i      current zone ID
+*     XRES      r()    WDT - x resolution
+*     YRES      r()    WDT - y resolution
+*     IBLKCL    i()    WDT - block clear mechanism
+*     ISPOOL    i()    WDT - workstation spooled
+*     NCLORQ    i      no clear open requested
+
 *-
 
       IMPLICIT NONE

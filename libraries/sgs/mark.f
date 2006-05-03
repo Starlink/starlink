@@ -1,23 +1,42 @@
       SUBROUTINE sgs_MARK (X,Y, MTYPE)
 *+
-*   - - - - -
-*    M A R K
-*   - - - - -
-*
-*   Draw a marker.
-*
-*   The marker type is set to MARKL.  The marker type ASF is assumed to
-*   be set to GINDIV.
-*
-*   Given:
-*      X       r     x coordinate of marker
-*      Y       r     y      "     "    "
-*      MARKL   i     marker type
-*
-*   Externals:
-*      GSMK, GPM
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     MARK
+
+*  Purpose:
+*     Draw a marker.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     The marker type is set to MARKL.  The marker type ASF is assumed to
+*     be set to GINDIV.
+
+*  Arguments:
+*     X = REAL (Given)
+*         X coordinate of marker
+*     Y = REAL (Given)
+*         Y      "     "    "
+*     MARKL = INTEGER (Given)
+*         Marker type
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     GSMK, GPM
+
 *-
 
       IMPLICIT NONE

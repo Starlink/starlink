@@ -1,18 +1,34 @@
       SUBROUTINE sgs_ATXL (STRING)
 *+
-*   - - - - -
-*    A T X L
-*   - - - - -
-*
-*   Append left justified string onto text buffer.
-*
-*   Given:
-*      STRING   c*(*)   character string
-*
-*   Externals:
-*      sgs_ATEXT
-*
-*  P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     ATXL
+
+*  Purpose:
+*     Append left justified string onto text buffer.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     STRING = CHAR (Given)
+*         Character string
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_ATEXT
+
 *-
 
       IMPLICIT NONE

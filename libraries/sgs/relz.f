@@ -1,27 +1,44 @@
       SUBROUTINE sgs_RELZ (IZONID)
 *+
-*   - - - - -
-*    R E L Z
-*   - - - - -
-*
-*   Release a zone that is no longer required.
-*
-*   Neither a base zone nor the current zone can be released.
-*
-*   Given:
-*      IZONID       i      zone identifier
-*
-*   Read from COMMON:
-*      ISZID        i      current zone ID
-*      IZTW         i()    zone table - workstation ID
-*
-*   Written to COMMON:
-*      IZTW         i()    zone table - workstation ID
-*
-*   Constants from SGSCOM:
-*      MXZ          i      maximum number of zones allowed
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     RELZ
+
+*  Purpose:
+*     Release a zone that is no longer required.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     Neither a base zone nor the current zone can be released.
+
+*  Arguments:
+*     IZONID = INTEGER (Given)
+*         Zone identifier
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From Sgscom:
+*     MXZ          i      maximum number of zones allowed
+
+*  Read From Common:
+*     ISZID        i      current zone ID
+*     IZTW         i()    zone table - workstation ID
+
+*  Written To Common:
+*     IZTW         i()    zone table - workstation ID
+
 *-
 
       IMPLICIT NONE

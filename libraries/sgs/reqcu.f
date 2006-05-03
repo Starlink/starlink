@@ -1,41 +1,60 @@
       SUBROUTINE sgs_REQCU (X,Y, N)
 *+
-*   - - - - - -
-*    R E Q C U
-*   - - - - - -
-*
-*   Obtain cursor position and choice number.
-*
-*   This routine uses an escape function specific to the RAL GKS.
-*
-*   Returned:
-*      X       r      cursor position (x)
-*      Y       r         "      "     (y)
-*      N       i      choice. Zero if no choice, -1 if X & Y are not
-*                     valid
-*
-*   Read from COMMON:
-*      ISZID   i      current zone ID
-*      IZTW    i()    zone table - SGS workstation ID
-*      IWTID   i()    workstation table - GKS workstation ID
-*      NCHODV  i      current choice device
-*      CHOIST  c      valid choice keys
-*      LCHOST  i      number of valid choice keys
-*      NPOLY   i      length of current polyline
-*      NTEXT   i      length of current text string
-*
-*   Constants from GKS_PAR:
-*      GREQU   i      mode - request
-*      GOK     i      input status - OK
-*
-*   Errors:
-*      Error returned by GKS inquiry
-*
-*   Externals:
-*      sgs_ICUAV, sgs_1ILCMO, sgs_SETCU, sgs_1UPCAS, sgs_OPOLY,
-*      sgs_OTEXT, sgs_1ERR, GSLCM, GRQLC, GQCNTN, GQNT
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     REQCU
+
+*  Purpose:
+*     Obtain cursor position and choice number.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     This routine uses an escape function specific to the RAL GKS.
+
+*  Arguments:
+*     X = REAL (Returned)
+*         Cursor position (x)
+*     Y = REAL (Returned)
+*         "      "     (y)
+*     N = INTEGER (Returned)
+*         Choice. Zero if no choice, -1 if X & Y are not
+*         valid
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GREQU   i      mode - request
+*     GOK     i      input status - OK
+
+*  Errors:
+*     Error returned by GKS inquiry
+
+*  Externals:
+*     sgs_ICUAV, sgs_1ILCMO, sgs_SETCU, sgs_1UPCAS, sgs_OPOLY,
+*     sgs_OTEXT, sgs_1ERR, GSLCM, GRQLC, GQCNTN, GQNT
+
+*  Read From Common:
+*     ISZID   i      current zone ID
+*     IZTW    i()    zone table - SGS workstation ID
+*     IWTID   i()    workstation table - GKS workstation ID
+*     NCHODV  i      current choice device
+*     CHOIST  c      valid choice keys
+*     LCHOST  i      number of valid choice keys
+*     NPOLY   i      length of current polyline
+*     NTEXT   i      length of current text string
+
 *-
 
       IMPLICIT NONE

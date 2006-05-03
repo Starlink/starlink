@@ -1,32 +1,57 @@
       SUBROUTINE sgs_1BNORM (X1,X2, Y1,Y2, X1N,X2N, Y1N,Y2N, JSTAT)
 *+
-*   - - - - - -
-*    B N O R M    (internal routine)
-*   - - - - - -
-*
-*   Order bounds for normal orientation and check for non-zero area.
-*
-*   Given:
-*      X1       r      lower bound in x
-*      Y1       r        "     "    " y
-*      X2       r      upper   "    " x
-*      Y2       r        "     "    " y
-*      JSTAT    i      inherited status (if option selected)
-*
-*   Returned:
-*      X1N      r      normalized lower bound in x
-*      Y1N      r           "       "     "    " y
-*      X2N      r           "     Upper   "    " x
-*      Y2N      r           "       "     "    " y
-*      JSTAT    i      status (0=OK)
-*
-*   Errors:
-*      Zero extent
-*
-*   Externals:
-*      sgs_1HSTAT, sgs_1ERR
-*
-*  P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     BNORM
+
+*  Purpose:
+*     Order bounds for normal orientation and check for non-zero area.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     internal routine
+
+*  Arguments:
+*     X1 = REAL (Given)
+*         Lower bound in x
+*     Y1 = REAL (Given)
+*         "     "    " y
+*     X2 = REAL (Given)
+*         Upper   "    " x
+*     Y2 = REAL (Given)
+*         "     "    " y
+*     X1N = REAL (Returned)
+*         Normalized lower bound in x
+*     Y1N = REAL (Returned)
+*         "       "     "    " y
+*     X2N = REAL (Returned)
+*         "     Upper   "    " x
+*     Y2N = REAL (Returned)
+*         "       "     "    " y
+*     JSTAT = INTEGER (Given & Returned)
+*         Inherited status (if option selected)
+*         Status (0=OK) (if non-inherited)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Errors:
+*     Zero extent
+
+*  Externals:
+*     sgs_1HSTAT, sgs_1ERR
+
 *-
 
       IMPLICIT NONE

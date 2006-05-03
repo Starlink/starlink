@@ -1,24 +1,40 @@
       SUBROUTINE sgs_DEFCH (CHOSTR)
 *+
-*   - - - - - -
-*    D E F C H
-*   - - - - - -
-*
-*   Define the valid keys for choice input from the command terminal.
-*   Convert the specified characters to upper case and store them in
-*   COMMON.
-*
-*   Given:
-*      CHOSTR      c*(*)    character string containing valid keys
-*
-*   Written to COMMON:
-*      CHOIST      c        current valid choice characters
-*      LCHOST      i        number of valid choice characters
-*
-*   Externals:
-*      sgs_1UPCAS
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     DEFCH
+
+*  Purpose:
+*     Define the valid keys for choice input from the command terminal.
+*     Convert the specified characters to upper case and store them in
+*     COMMON.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     CHOSTR = CHAR (Given)
+*         Character string containing valid keys
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_1UPCAS
+
+*  Written To Common:
+*     CHOIST      c        current valid choice characters
+*     LCHOST      i        number of valid choice characters
+
 *-
 
       IMPLICIT NONE

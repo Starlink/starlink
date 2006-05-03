@@ -1,21 +1,39 @@
       SUBROUTINE sgs_1UPCAS (IN, OUT)
 *+
-*   - - - - - -
-*    U P C A S     (Internal routine)
-*   - - - - - -
-*
-*   Convert character string to uppercase.
-*
-*   Given:
-*      IN       c      string to be converted
-*
-*   Returned:
-*      OUT      c      converted string
-*
-*   Externals:
-*      chr_UCASE
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     UPCAS
+
+*  Purpose:
+*     Convert character string to uppercase.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     Internal routine
+
+*  Arguments:
+*     IN = CHAR (Given)
+*         String to be converted
+*     OUT = CHAR (Returned)
+*         Converted string
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     chr_UCASE
+
 *-
 
       IMPLICIT NONE

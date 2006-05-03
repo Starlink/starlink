@@ -1,56 +1,73 @@
       SUBROUTINE sgs_SELZ (IZONID, JSTAT)
 *+
-*   - - - - -
-*    S E L Z
-*   - - - - -
+*  Name:
+*     SELZ
+
+*  Purpose:
+*     Select a new zone.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     1) If the current and new zones are on different workstations,
+*     the current workstation is deactivated and the new one is
+*     activated instead.
 *
-*   Select a new zone.
-*
-*   1) If the current and new zones are on different workstations,
-*      the current workstation is deactivated and the new one is
-*      activated instead.
-*
-*   2) The window/viewport for the new zone is set.
-*
-*   Given:
-*      IZONID        i        zone identifier
-*      JSTAT         i        inherited status (if option selected)
-*
-*   Returned:
-*      JSTAT         i        status: 0=OK
-*
-*   Read from COMMON:
-*      ISZID         i        current zone ID
-*      IZTW          i()      zone table - workstation ID
-*      ZTW           r()        "    "   - window
-*      ZTV           r()        "    "   - viewport
-*      IWTID         i()      workstation table - workstation ID
-*      IWTCA         i()      workstation table - category
-*      IPEN          i        current SGS pen
-*
-*   Written to COMMON:
-*      ISZID         i        current zone ID
-*
-*   Constants from SGSCOM:
-*      MXZ           i        maximum number of zones allowed
-*   Constants from GKS_PAR:
-*      GMI           i        workstation category - metafile input
-*      GINPUT        i             "         "     - input
-*      GWISS         i             "         "     - workstation-
-*                                                    independent
-*                                                    segment Storage
-*      GAVTIV        i        workstation state - active
-*      GHIGHR        i        transformation priority - higher
-*
-*   Externals:
-*      sgs_1HSTAT, sgs_1ERR, sgs_FLUSH, sgs_1SETTX, sgs_SPEN,
-*      sgs_1GKERR, GQWKS, GDAWK, GACWK, GSELNT, GSVPIP, GSWN, GSVP
-*
-*   Errors:
-*      INVALID ZONE ID
-*      SPECIFIED ZONE DOES NOT EXIST
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*     2) The window/viewport for the new zone is set.
+
+*  Arguments:
+*     IZONID = INTEGER (Given)
+*         Zone identifier
+*     JSTAT = INTEGER (Given & Returned)
+*         Inherited status (if option selected)
+*         Status: 0=OK (if non-inherited)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GMI           i        workstation category - metafile input
+*     GINPUT        i             "         "     - input
+*     GWISS         i             "         "     - workstation-
+*     independent
+*     segment Storage
+*     GAVTIV        i        workstation state - active
+*     GHIGHR        i        transformation priority - higher
+
+*  Constants From Sgscom:
+*     MXZ           i        maximum number of zones allowed
+
+*  Errors:
+*     INVALID ZONE ID
+*     SPECIFIED ZONE DOES NOT EXIST
+
+*  Externals:
+*     sgs_1HSTAT, sgs_1ERR, sgs_FLUSH, sgs_1SETTX, sgs_SPEN,
+*     sgs_1GKERR, GQWKS, GDAWK, GACWK, GSELNT, GSVPIP, GSWN, GSVP
+
+*  Read From Common:
+*     ISZID         i        current zone ID
+*     IZTW          i()      zone table - workstation ID
+*     ZTW           r()        "    "   - window
+*     ZTV           r()        "    "   - viewport
+*     IWTID         i()      workstation table - workstation ID
+*     IWTCA         i()      workstation table - category
+*     IPEN          i        current SGS pen
+
+*  Written To Common:
+*     ISZID         i        current zone ID
+
 *-
 
       IMPLICIT NONE

@@ -1,18 +1,34 @@
       SUBROUTINE sgs_ICURZ (IZONID)
 *+
-*   - - - - - -
-*    I C U R Z
-*   - - - - - -
-*
-*   Return zone identifier for current zone.
-*
-*   Returned:
-*      IZONID     i     zone identifier
-*
-*   Read from COMMON:
-*      ISZID      i     current zone ID
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     ICURZ
+
+*  Purpose:
+*     Return zone identifier for current zone.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     IZONID = INTEGER (Returned)
+*         Zone identifier
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Read From Common:
+*     ISZID      i     current zone ID
+
 *-
 
       IMPLICIT NONE

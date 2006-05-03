@@ -1,25 +1,45 @@
       SUBROUTINE sgs_1GKSTM (JSTAT)
 *+
-*   - - - - - -
-*    G K S T M      (Internal routine)
-*   - - - - - -
-*
-*   Terminate GKS.
-*
-*   Deactivate and close all workstations, close GKS.
-*
-*   Returned:
-*      JSTAT     i    status: 0=OK
-*
-*   Externals:
-*      GQOPS, GCLSG, GQOPWK, GCLKS, sgs_1CLWK, sgs_1GKERR
-*
-*   Constants from GKS_PAR:
-*      GCLKS     i    operating state - closed
-*      GSGOP     i        "       "   - segment open
-*      GGKOP     i        "       "   - at least one workstation open
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     GKSTM
+
+*  Purpose:
+*     Terminate GKS.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     Internal routine
+
+*  Description:
+*     Deactivate and close all workstations, close GKS.
+
+*  Arguments:
+*     JSTAT = INTEGER (Returned)
+*         Status: 0=OK
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GCLKS     i    operating state - closed
+*     GSGOP     i        "       "   - segment open
+*     GGKOP     i        "       "   - at least one workstation open
+
+*  Externals:
+*     GQOPS, GCLSG, GQOPWK, GCLKS, sgs_1CLWK, sgs_1GKERR
+
 *-
 
       IMPLICIT NONE

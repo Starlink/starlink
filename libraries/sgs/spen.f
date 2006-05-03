@@ -1,39 +1,55 @@
       SUBROUTINE sgs_SPEN (NPEN)
 *+
-*   - - - - -
-*    S P E N
-*   - - - - -
-*
-*   Select a pen for line marker and text plotting.
-*
-*   Given:
-*      NPEN       i     pen number (1,2,3...)
-*
-*   Read from COMMON:
-*      IZTW       i()   zone table - workstation
-*      IWTID      i()   workstation table - workstation ID
-*      IWTCA      i()        "        "   - category
-*      ISZID      i     current zone ID
-*      NPOLY      i     length of current polyline
-*      NTEXT      i     length of current text string
-*
-*   Written to COMMON:
-*      IPEN       i     current SGS pen
-*
-*   Constants from GKS_PAR:
-*      GOUTPT     i     workstation category - output
-*      COUTIN     i          "          "    - input/output
-*
-*   Externals:
-*      sgs_1ERR, sgs_OTEXT, sgs_OPOLY, GQPLR, GSTXCI, GSPMCI, GSPLI
-*
-*   The following ASF flag settings are assumed:
-*
-*                     Polyline colour index:   GBUNDL
-*                     Polymarker colour index: GINDIV
-*                     Text colour index:       GINDIV
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     SPEN
+
+*  Purpose:
+*     Select a pen for line marker and text plotting.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     NPEN = INTEGER (Given)
+*         Pen number (1,2,3...)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GOUTPT     i     workstation category - output
+*     COUTIN     i          "          "    - input/output
+
+*  Externals:
+*     sgs_1ERR, sgs_OTEXT, sgs_OPOLY, GQPLR, GSTXCI, GSPMCI, GSPLI
+
+*  Read From Common:
+*     IZTW       i()   zone table - workstation
+*     IWTID      i()   workstation table - workstation ID
+*     IWTCA      i()        "        "   - category
+*     ISZID      i     current zone ID
+*     NPOLY      i     length of current polyline
+*     NTEXT      i     length of current text string
+
+*  Notes:
+*     The following ASF flag settings are assumed:
+*           Polyline colour index:   GBUNDL
+*           Polymarker colour index: GINDIV
+*           Text colour index:       GINDIV
+
+*  Written To Common:
+*     IPEN       i     current SGS pen
+
 *-
 
       IMPLICIT NONE

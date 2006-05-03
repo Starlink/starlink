@@ -1,25 +1,42 @@
       SUBROUTINE sgs_ATEXT (STRING)
 *+
-*   - - - - - -
-*    A T E X T
-*   - - - - - -
+*  Name:
+*     ATEXT
+
+*  Purpose:
+*     Append a field onto the text buffer.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     If the resulting string is longer than the text buffer, characters
+*     will be lost from the end.
+
+*  Arguments:
+*     STRING = CHAR (Given)
+*         String to be appended
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Read From Common:
+*     NTEXT    i       Length of current string
+*     CTEXT    c()     Text string buffer
 *
-*   Append a field onto the text buffer.
-*
-*   If the resulting string is longer than the text buffer, characters
-*   will be lost from the end.
-*
-*   Given:
-*      STRING   c*(*)   String to be appended
-*
-*   Read from COMMON:
-*      NTEXT    i       Length of current string
-*      CTEXT    c()     Text string buffer
-*
-*   Constants (from SGSCOM):
-*      LTEXT    i       Size of text string buffer
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Constants (from SGSCOM):
+*     LTEXT    i       Size of text string buffer
+
 *-
 
       IMPLICIT NONE

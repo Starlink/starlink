@@ -1,36 +1,57 @@
       SUBROUTINE sgs_ITXB (X,Y, N, DX,DY)
 *+
-*   - - - - -
-*    I T X B
-*   - - - - -
+*  Name:
+*     ITXB
+
+*  Purpose:
+*     Inquire status of text string buffer.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     If the current horizontal text justification is "LEFT" and a new
+*     text string is begun whose coordinates are X+DX,Y+DY, the new string
+*     will append to the old.
 *
-*   Inquire status of text string buffer.
-*
-*   If the current horizontal text justification is "LEFT" and a new
-*   text string is begun whose coordinates are X+DX,Y+DY, the new string
-*   will append to the old.
-*
-*   If no text string is present, X,Y,DX,DY are not returned.
-*
-*   Returned:
-*        X        r      string coordinate (x)
-*        Y        r        "        "      (y)
-*        N        i      string length
-*        DX       r      displacement to end of string (x)
-*        DY       r           "       "   "   "   "    (y)
-*
-*   Read from COMMON:
-*        NTEXT    i      length of current string
-*        XTEXT    r      coordinate of current string (x)
-*        YTEXT    r           "      "    "       "   (y)
-*        IZTW     i()    zone table - SGS workstation ID
-*        ISZID    i      current zone ID
-*        ITWID    i()    workstation table - GKS workstation ID
-*
-*   Externals:
-*      GQTXX
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*     If no text string is present, X,Y,DX,DY are not returned.
+
+*  Arguments:
+*     X = REAL (Returned)
+*         String coordinate (x)
+*     Y = REAL (Returned)
+*         "        "      (y)
+*     N = INTEGER (Returned)
+*         String length
+*     DX = REAL (Returned)
+*         Displacement to end of string (x)
+*     DY = REAL (Returned)
+*         "       "   "   "   "    (y)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     GQTXX
+
+*  Read From Common:
+*     NTEXT    i      length of current string
+*     XTEXT    r      coordinate of current string (x)
+*     YTEXT    r           "      "    "       "   (y)
+*     IZTW     i()    zone table - SGS workstation ID
+*     ISZID    i      current zone ID
+*     ITWID    i()    workstation table - GKS workstation ID
+
 *-
 
       IMPLICIT NONE

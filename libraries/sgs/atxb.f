@@ -1,20 +1,37 @@
       SUBROUTINE sgs_ATXB (STRING, NSPACE)
 *+
-*   - - - - -
-*    A T X B
-*   - - - - -
-*
-*   Append a field onto the text buffer leaving a specified number
-*   of spaces before the non-blank region of the field.
-*
-*   Given:
-*      STRING   c*(*)   String to be appended
-*      NSPACE   i       Number of spaces to leave
-*
-*   Externals:
-*      sgs_ATEXT
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     ATXB
+
+*  Purpose:
+*     Append a field onto the text buffer leaving a specified number
+*     of spaces before the non-blank region of the field.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     STRING = CHAR (Given)
+*         String to be appended
+*     NSPACE = INTEGER (Given)
+*         Number of spaces to leave
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_ATEXT
+
 *-
 
       IMPLICIT NONE

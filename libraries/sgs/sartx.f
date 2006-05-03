@@ -1,21 +1,37 @@
       SUBROUTINE sgs_SARTX (AR)
 *+
-*  - - - - - -
-*   S A R T X
-*   - - - - - -
-*
-*   Specify text aspect ratio.
-*
-*   Given:
-*      AR      r      text aspect ratio (W/H)
-*
-*   Written to COMMON:
-*      ARTX    r      text aspect ratio
-*
-*   Externals:
-*      sgs_OTEXT, sgs_1SETTX
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     SARTX
+
+*  Purpose:
+*     Specify text aspect ratio.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     AR = REAL (Given)
+*         Text aspect ratio (W/H)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_OTEXT, sgs_1SETTX
+
+*  Written To Common:
+*     ARTX    r      text aspect ratio
+
 *-
 
       IMPLICIT NONE

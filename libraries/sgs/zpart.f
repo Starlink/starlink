@@ -1,28 +1,45 @@
       SUBROUTINE sgs_ZPART (NX,NY, IZONID, JSTAT)
 *+
-*   - - - - - -
-*    Z P A R T
-*   - - - - - -
-*
-*   Partition the current zone into NX by NY segments.  The current
-*   zone is unchanged.
-*
-*   Given:
-*      NX        i       number of zones in horizontal direction
-*      NY        i       number of zones in vertical direction
-*      JSTAT     i       inherited status (if option selected)
-*
-*   Returned:
-*      IZONID    i()     array of zone identifiers for new zones
-*      JSTAT     i       status (0=OK)
-*
-*   Externals:
-*      sgs_1HSTAT, sgs_ICURZ, sgs_IZONE, sgs_ZONE, sgs_SELZ, sgs_RELZ
-*
-*   Errors:
-*      Too many zones
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     ZPART
+
+*  Purpose:
+*     Partition the current zone into NX by NY segments.  The current
+*     zone is unchanged.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     NX = INTEGER (Given)
+*         Number of zones in horizontal direction
+*     NY = INTEGER (Given)
+*         Number of zones in vertical direction
+*     IZONID() = INTEGER (Returned)
+*         Array of zone identifiers for new zones
+*     JSTAT = INTEGER (Given & Returned)
+*         Inherited status (if option selected)
+*         Status (0=OK) (if non inherited)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Errors:
+*     Too many zones
+
+*  Externals:
+*     sgs_1HSTAT, sgs_ICURZ, sgs_IZONE, sgs_ZONE, sgs_SELZ, sgs_RELZ
+
 *-
 
       IMPLICIT NONE

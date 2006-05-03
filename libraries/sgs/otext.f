@@ -1,28 +1,42 @@
       SUBROUTINE sgs_OTEXT
 *+
-*   - - - - - -
-*    O T E X T
-*   - - - - - -
-*
-*
-*   Output completed text string.
-*
-*   Read from COMMON:
-*      NTEXT      i       length of current string
-*      XTEXT      r       position of current string (x)
-*      YTEXT      r          "     "     "       "   (y)
-*      CTEXT      c       current text string
-*
-*   Written to COMMON:
-*      NTEXT      i       length of current string
-*
-*   Constants from SGSCOM:
-*      LTEXT      i       length of text buffer
-*
-*   Externals:
-*      GTX
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     OTEXT
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     Output completed text string.
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From Sgscom:
+*     LTEXT      i       length of text buffer
+
+*  Externals:
+*     GTX
+
+*  Read From Common:
+*     NTEXT      i       length of current string
+*     XTEXT      r       position of current string (x)
+*     YTEXT      r          "     "     "       "   (y)
+*     CTEXT      c       current text string
+
+*  Written To Common:
+*     NTEXT      i       length of current string
+
 *-
 
       IMPLICIT NONE

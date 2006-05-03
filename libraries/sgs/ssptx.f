@@ -1,21 +1,37 @@
       SUBROUTINE sgs_SSPTX (SP)
 *+
-*   - - - - - -
-*    S S P T X
-*   - - - - - -
-*
-*   Specify text spacing.
-*
-*   Given:
-*      SP       r     spacing factor
-*
-*   Written to COMMON:
-*      STX      r     current character spacing
-*
-*   Externals:
-*      sgs_OTEXT, sgs_1SETTX
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     SSPTX
+
+*  Purpose:
+*     Specify text spacing.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     SP = REAL (Given)
+*         Spacing factor
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_OTEXT, sgs_1SETTX
+
+*  Written To Common:
+*     STX      r     current character spacing
+
 *-
 
       IMPLICIT NONE

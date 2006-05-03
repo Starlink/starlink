@@ -1,32 +1,46 @@
       SUBROUTINE sgs_ISTAT (MODE, JSTAT)
 *+
-*   - - - - - -
-*    I S T A T
-*   - - - - - -
-*
-*   Initialise SGS status mode.
-*
-*
-*   Given:
-*      MODE      i     status mode:
-*                                  0  = non-inherited
-*                                  >0 = inherited
-*                                  <0 = set to default (non-inherited) if not
-*                                       already set
-*
-*      JSTAT     i     status (in inherited status mode)
-*
-*   Returned:
-*      JSTAT     i     zero (in non-inherited status mode)
-*
-*   In inherited status mode SGS routines with a status argument only
-*   execute if the status is set to zero on entry; in non-inherited
-*   mode the status is ignored and the routines always execute.
-*
-*   Written to COMMON:
-*      JSOPT     i     status mode
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   13 January 1992
+*  Name:
+*     ISTAT
+
+*  Purpose:
+*     Initialise SGS status mode.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     MODE = INTEGER (Given)
+*         Status Mode:
+*            0  = non-inherited
+*            >0 = inherited
+*            <0 = set to default (non-inherited) if not
+*                 already set
+*     JSTAT = INTEGER (Given & Returned)
+*         Status in inherited status mode.
+*         Returns zero in non-inherited status mode.
+
+*  Description:
+*     In inherited status mode SGS routines with a status argument only
+*     execute if the status is set to zero on entry; in non-inherited
+*     mode the status is ignored and the routines always execute.
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     13-JAN-1992 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Written To Common:
+*     JSOPT     i     status mode
+
 *-
 
       IMPLICIT NONE

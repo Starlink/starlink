@@ -1,26 +1,43 @@
       SUBROUTINE sgs_WNAME (ACTROU, INTARG, JSTAT)
 *+
-*   - - - - - -
-*    W N A M E
-*   - - - - - -
-*
-*   Call the action routine once for every workstation name found,
-*   passing to it the workstation name and its associated description.
-*
-*   GKS is opened with unit 6 as the error channel if not already open.
-*   (See sgs_OPEN for a discussion of the choice of error channel.)
-*
-*   Given:
-*      ACTROU     routine  action routine
-*      INTARG     i        argument passed to action routine
-*
-*   Returned:
-*      JSTAT      i        status = 0 if success
-*
-*   Externals:
-*        gns_GWNG, GQOPS, GOPKS
-*        
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     WNAME
+
+*  Purpose:
+*     Call the action routine once for every workstation name found,
+*     passing to it the workstation name and its associated description.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     GKS is opened with unit 6 as the error channel if not already open.
+*     (See sgs_OPEN for a discussion of the choice of error channel.)
+
+*  Arguments:
+*     ACTROU = SUBROUTINE (Given)
+*         Action routine
+*     INTARG = INTEGER (Given)
+*         Argument passed to action routine
+*     JSTAT = INTEGER (Returned)
+*         Status = 0 if success
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     gns_GWNG, GQOPS, GOPKS
+
 *-
 
       IMPLICIT NONE

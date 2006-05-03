@@ -1,22 +1,41 @@
       SUBROUTINE sgs_TX (X,Y, STRING)
 *+
-*   - - -
-*    T X
-*   - - -
-*
-*   Begin a new text string with a string.
-*
-*   (In practice, this means simply "plot a string")
-*
-*   Given:
-*        X         r       position of string (x)
-*        Y         r           "     "    "   (y)
-*        STRING    c       string which is to begin the new text string
-*
-*   Externals:
-*      sgs_BTEXT, sgs_ATEXT
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     TX
+
+*  Purpose:
+*     Begin a new text string with a string.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     (In practice, this means simply "plot a string")
+
+*  Arguments:
+*     X = REAL (Given)
+*         Position of string (x)
+*     Y = REAL (Given)
+*         "     "    "   (y)
+*     STRING = CHAR (Given)
+*         String which is to begin the new text string
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_BTEXT, sgs_ATEXT
+
 *-
 
       IMPLICIT NONE

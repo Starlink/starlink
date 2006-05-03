@@ -1,37 +1,54 @@
       SUBROUTINE sgs_REQCH (N)
 *+
-*   - - - - - -
-*    R E Q C H
-*   - - - - - -
-*
-*   Return choice selected by user.
-*
-*   Returned:
-*      N          i        the choice
-*
-*   Read from COMMON:
-*      ISZID      i        current zone ID
-*      IZTW       i()      zone table - SGS workstation ID
-*      IWTID      i()      workstation table - GKS workstation ID
-*      NCHODV     i        current choice device
-*      CHOIST     c        valid choice keys
-*      LCHOST     i        number of valid choice keys
-*      NPOLY      i        length of current polyline
-*      NTEXT      i        length of current text string
-*
-*   Constants from GKS_PAR:
-*      GREQU      i        mode - request
-*      GNONE      i        break
-*
-*   Externals:
-*      sgs_INCHO, sgs_1ICHMO, sgs_1GETCH, sgs_OPOLY, sgs_OTEXT,
-*      GSCHM, GRQCH
-*
-*   This routine assumes that if a workstation has a choice device
-*   2 then this is a keyboard and that the choice numbers are the
-*   ASCII code minus hex 31.
-*      
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     REQCH
+
+*  Purpose:
+*     Return choice selected by user.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     N = INTEGER (Returned)
+*         The choice
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GREQU      i        mode - request
+*     GNONE      i        break
+
+*  Externals:
+*     sgs_INCHO, sgs_1ICHMO, sgs_1GETCH, sgs_OPOLY, sgs_OTEXT,
+*     GSCHM, GRQCH
+
+*  Notes:
+*     This routine assumes that if a workstation has a choice device
+*     2 then this is a keyboard and that the choice numbers are the
+*     ASCII code minus hex 31.
+
+*  Read From Common:
+*     ISZID      i        current zone ID
+*     IZTW       i()      zone table - SGS workstation ID
+*     IWTID      i()      workstation table - GKS workstation ID
+*     NCHODV     i        current choice device
+*     CHOIST     c        valid choice keys
+*     LCHOST     i        number of valid choice keys
+*     NPOLY      i        length of current polyline
+*     NTEXT      i        length of current text string
+
 *-
 
       IMPLICIT NONE

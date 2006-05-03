@@ -1,25 +1,42 @@
       SUBROUTINE sgs_1HSTAT (JSTAT)
 *+
-*
-*   - - - - - -
-*    H S T A T      (internal routine)
-*   - - - - - -
-*
-*   Handle incoming status.
-*
-*   If SGS not in 'inherited status' mode, set JSTAT to zero;
-*   otherwise do nothing.
-*
-*   Given:
-*      JSTAT     i      incoming status
-*
-*   Returned:
-*      JSTAT     i      status
-*
-*   Read from COMMON:
-*      JSOPT     i      status handling mode
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     HSTAT
+
+*  Purpose:
+*     Handle incoming status.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     internal routine
+
+*  Description:
+*     If SGS not in 'inherited status' mode, set JSTAT to zero;
+*     otherwise do nothing.
+
+*  Arguments:
+*     JSTAT = INTEGER (Given & Returned)
+*         Incoming status (if enabled)
+*         Status (if non-inherited)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Read From Common:
+*     JSOPT     i      status handling mode
+
 *-
 
       IMPLICIT NONE

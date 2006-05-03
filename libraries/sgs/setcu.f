@@ -1,19 +1,36 @@
       SUBROUTINE sgs_SETCU (X,Y)
 *+
-*   - - - - - -
-*    S E T C U
-*   - - - - - -
-*
-*   Set cursor position.
-*
-*   Given:
-*      X        r      x cursor position in world coordinates
-*      Y        r      y   "        "     "   "        "
-*
-*   Externals:
-*      sgs_ICUAV, sgs_IZONE, sgs_ICURW, sgs_1ERR, GQLCS, GINLC
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     SETCU
+
+*  Purpose:
+*     Set cursor position.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     X = REAL (Given)
+*         X cursor position in world coordinates
+*     Y = REAL (Given)
+*         Y   "        "     "   "        "
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_ICUAV, sgs_IZONE, sgs_ICURW, sgs_1ERR, GQLCS, GINLC
+
 *-
 
       IMPLICIT NONE

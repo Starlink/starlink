@@ -1,31 +1,48 @@
       SUBROUTINE sgs_SAMCU (X,Y)
 *+
-*   - - - - - -
-*    S A M C U
-*   - - - - - -
-*
-*   Sample cursor position.
-*
-*   Returned:
-*       X        r     cursor position in world coordinates (x)
-*       Y        r       "       "      "   "        "      (y)
-*
-*   Read from COMMON:
-*       ISZID    i     current zone ID
-*       IZTW     i()   zone table - workstation ID
-*       NPOLY    i     length of current polyline
-*       NTEXT    i     length of current text string
-*
-*   Constants from GKS_PAR:
-*       GSAMPL   i     mode - sample
-*
-*   Errors:
-*       Errror returned by GKS inquiry
-*
-*   Externals:
-*      sgs_SETCU, sgs_OPOLY, sgs_OTEXT, sgs_1ERR, GSMLC, GQNTN, GQNT
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     SAMCU
+
+*  Purpose:
+*     Sample cursor position.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     X = REAL (Returned)
+*         Cursor position in world coordinates (x)
+*     Y = REAL (Returned)
+*         "       "      "   "        "      (y)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GSAMPL   i     mode - sample
+
+*  Errors:
+*     Errror returned by GKS inquiry
+
+*  Externals:
+*     sgs_SETCU, sgs_OPOLY, sgs_OTEXT, sgs_1ERR, GSMLC, GQNTN, GQNT
+
+*  Read From Common:
+*     ISZID    i     current zone ID
+*     IZTW     i()   zone table - workstation ID
+*     NPOLY    i     length of current polyline
+*     NTEXT    i     length of current text string
+
 *-
 
       IMPLICIT NONE

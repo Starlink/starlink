@@ -1,70 +1,87 @@
       SUBROUTINE sgs_OPNWK (WKSTN, IZONID, JSTAT)
 *+
-*     - - - - - -
-*      O P N W K
-*     - - - - - -
+*  Name:
+*     OPNWK
+
+*  Purpose:
+*     Open a workstation and set text representations (unless the
+*     workstation is already open).  Create a base zone and select it.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     The base zone fills the display surface, with a window that
+*     extends from (0,0) to (x,y), where the x/y is the true aspect
+*     ratio of the display surface and the smaller of x or y is
+*     unity.
 *
-*   Open a workstation and set text representations (unless the
-*   workstation is already open).  Create a base zone and select it.
-*
-*   The base zone fills the display surface, with a window that
-*   extends from (0,0) to (x,y), where the x/y is the true aspect
-*   ratio of the display surface and the smaller of x or y is
-*   unity.
-*
-*   This routine contains a workaround for a bug in the RAL GKS.
-*
-*   Given:
-*      WKSTN      c      workstation name (a character string)
-*      JSTAT      i      inherited status (if option selected)
-*
-*   Returned:
-*      IZONID     i      zone identifier
-*      JSTAT      i      status: 0=OK
-*
-*   Read from COMMON:
-*      IWTID      i()    workstation table - GKS workstation ID
-*      IWTTY      i()    workstation table - type
-*      IWTCO      i()    workstation table - connection ID
-*      IWTCA      i()    workstation table - category
-*      IZTW       i()    zone table - SGS workstation ID
-*      NSCLOP     l()    WDT - no screen clear supported
-*      IFONT      i      current font
-*      IPREC      i          "    text precision
-*      NCLORQ     l      no clear open requested
-*
-*   Written to COMMON:
-*      NCLORQ     l       no clear open requested
-*      WSNRCL     l       workstation not really clear
-*
-*   Constants from SGSCOM:
-*      MXWK       i      maximum number of workstations allowed
-*      MXZ        i      maximum number of zones allowed
-*
-*   Constants from GKS_PAR:
-*      GOUTPT     i      workstation category - Output
-*      GINPUT     i           "          "    - Input
-*      GINOUT     i           "          "    - Input/output
-*      GMETRE     i      device units - Metres
-*      GBNIG      i      deferral state - Before next interaction globally
-*      GSUPPD     i      regeneration mode - suppressed
-*      GYES       I      Yes
-*
-*   Externals:
-*      sgs_1HSTAT, sgs_FLUSH, sgs_WIDEN, sgs_1ERR, sgs_1GKERR,
-*      sgs_1NORM, sgs_1WDTRD, sgs_1GETZ, sgs_1NEWZ, sgs_1SETTX,
-*      GQWKCA, GQWKC, GOPWK, GQDSP, GSWKVP, GSWKVP,
-*      GSWKWN, GSDS, GSTXFP, GQWKM, GPREC, GESC
-*
-*   Errors:
-*      Bad workstation name
-*      Bad workstation type
-*      Too many workstations
-*      Too many zones
-*      Workstation could not be opened
-*      Error returned by GKS inquiry
-*
-*    P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*     This routine contains a workaround for a bug in the RAL GKS.
+
+*  Arguments:
+*     WKSTN = CHAR (Given)
+*         Workstation name (a character string)
+*     IZONID = INTEGER (Returned)
+*         Zone identifier
+*     JSTAT = INTEGER (Given & Returned)
+*         Inherited status (if option selected)
+*         Status: 0=OK (if non-inherited)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GOUTPT     i      workstation category - Output
+*     GINPUT     i           "          "    - Input
+*     GINOUT     i           "          "    - Input/output
+*     GMETRE     i      device units - Metres
+*     GBNIG      i      deferral state - Before next interaction globally
+*     GSUPPD     i      regeneration mode - suppressed
+*     GYES       I      Yes
+
+*  Constants From Sgscom:
+*     MXWK       i      maximum number of workstations allowed
+*     MXZ        i      maximum number of zones allowed
+
+*  Errors:
+*     Bad workstation name
+*     Bad workstation type
+*     Too many workstations
+*     Too many zones
+*     Workstation could not be opened
+*     Error returned by GKS inquiry
+
+*  Externals:
+*     sgs_1HSTAT, sgs_FLUSH, sgs_WIDEN, sgs_1ERR, sgs_1GKERR,
+*     sgs_1NORM, sgs_1WDTRD, sgs_1GETZ, sgs_1NEWZ, sgs_1SETTX,
+*     GQWKCA, GQWKC, GOPWK, GQDSP, GSWKVP, GSWKVP,
+*     GSWKWN, GSDS, GSTXFP, GQWKM, GPREC, GESC
+
+*  Read From Common:
+*     IWTID      i()    workstation table - GKS workstation ID
+*     IWTTY      i()    workstation table - type
+*     IWTCO      i()    workstation table - connection ID
+*     IWTCA      i()    workstation table - category
+*     IZTW       i()    zone table - SGS workstation ID
+*     NSCLOP     l()    WDT - no screen clear supported
+*     IFONT      i      current font
+*     IPREC      i          "    text precision
+*     NCLORQ     l      no clear open requested
+
+*  Written To Common:
+*     NCLORQ     l       no clear open requested
+*     WSNRCL     l       workstation not really clear
+
 *-
 
       IMPLICIT NONE

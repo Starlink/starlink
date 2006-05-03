@@ -1,25 +1,45 @@
       SUBROUTINE sgs_ARC (XCENT,YCENT, RADIUS, START,FINISH)
 *+
-*   - - - -
-*    A R C
-*   - - - -
-*
-*   Plot an arc of a circle.
-*
-*   This routine forms a polyline approximation which, in cases where
-*   the arc passes close to a clipping boundary, may suffer clipping at
-*   a vertex.
-*
-*   Given:
-*      XCENT,YCENT   r   centre (world coordinates)
-*      RADIUS        r   radius (world coordinates)
-*      START         r   start angle (radians)
-*      FINISH        r   finish angle (radians)
-*
-*   Externals:
-*      sgs_IDUN, sgs_BPOLY, sgs_APOLY
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     ARC
+
+*  Purpose:
+*     Plot an arc of a circle.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     This routine forms a polyline approximation which, in cases where
+*     the arc passes close to a clipping boundary, may suffer clipping at
+*     a vertex.
+
+*  Arguments:
+*     XCENT,YCENT = REAL (Given)
+*         Centre (world coordinates)
+*     RADIUS = REAL (Given)
+*         Radius (world coordinates)
+*     START = REAL (Given)
+*         Start angle (radians)
+*     FINISH = REAL (Given)
+*         Finish angle (radians)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_IDUN, sgs_BPOLY, sgs_APOLY
+
 *-
 
       IMPLICIT NONE

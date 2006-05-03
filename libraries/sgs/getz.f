@@ -1,33 +1,52 @@
       SUBROUTINE sgs_1GETZ (IWKID, IZONID)
 *+
-*   - - - - -
-*    G E T Z        (Internal routine)
-*   - - - - -
+*  Name:
+*     GETZ
+
+*  Purpose:
+*     Allocate a zone table entry.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     Internal routine
+
+*  Description:
+*     A negative IWKID is specified when the base zone for a workstation
+*     is being created.
 *
-*   Allocate a zone table entry.
-*
-*   A negative IWKID is specified when the base zone for a workstation
-*   is being created.
-*
-*   IZONID = 0 indicates either that the workstation ID is illegal
-*   (i.e. zero) or that all zone table entries are in use.
-*
-*   Given:
-*      IWKID     i     workstation ID or its complement
-*
-*   Returned:
-*      IZONID    i     zone ID  (0=failure)
-*
-*   Read from COMMON:
-*      IZTW      i()   zone table - workstation ID
-*
-*   Written to COMMON:
-*      IZTW      i()   zone table - workstation ID
-*
-*   Constants from SGSCOM:
-*      MXZ       i     maximum number of zones allowed
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*     IZONID = 0 indicates either that the workstation ID is illegal
+*     (i.e. zero) or that all zone table entries are in use.
+
+*  Arguments:
+*     IWKID = INTEGER (Given)
+*         Workstation ID or its complement
+*     IZONID = INTEGER (Returned)
+*         Zone ID  (0=failure)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From Sgscom:
+*     MXZ       i     maximum number of zones allowed
+
+*  Read From Common:
+*     IZTW      i()   zone table - workstation ID
+
+*  Written To Common:
+*     IZTW      i()   zone table - workstation ID
+
 *-
 
       IMPLICIT NONE

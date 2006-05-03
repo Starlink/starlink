@@ -1,38 +1,56 @@
       SUBROUTINE sgs_1GKERR (RNAME, JSTAT)
 *+
-*   - - - - -
-*    G K E R R       (Internal routine)
-*   - - - - -
+*  Name:
+*     GKERR
+
+*  Purpose:
+*     Test for GKS error.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     Internal routine
+
+*  Description:
+*     If the status is bad on entry, it is returned unchanged.  If
+*     not, and if there has been a GKS error since this routine
+*     was last called, an error value is returned and an error
+*     reported.
 *
-*   Test for GKS error.
+*     This routine will only detect a GKS error if it is the last
+*     error reported and the GKS error has not been flushed - i.e. only
+*     GKS errors that occured after the error stack was marked can be
+*     detected.
 *
-*   If the status is bad on entry, it is returned unchanged.  If
-*   not, and if there has been a GKS error since this routine
-*   was last called, an error value is returned and an error
-*   reported.
-*
-*   This routine will only detect a GKS error if it is the last
-*   error reported and the GKS error has not been flushed - i.e. only
-*   GKS errors that occured after the error stack was marked can be
-*   detected.
-*
-*   It will only work if the Starlink GKS error handler which reports
-*   errors via EMS is present.
-*
-*   Given:
-*      RNAME     c      name of calling routine
-*      JSTAT     i      status
-*
-*   Returned:
-*      JSTAT     i      status
-*
-*   Externals:
-*       sgs_1ERR, ems_STAT
-*
-*   Errors:
-*      GKS error
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*     It will only work if the Starlink GKS error handler which reports
+*     errors via EMS is present.
+
+*  Arguments:
+*     RNAME = CHAR (Given)
+*         Name of calling routine
+*     JSTAT = INTEGER (Given & Returned)
+*         Status
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Errors:
+*     GKS error
+
+*  Externals:
+*     sgs_1ERR, ems_STAT
+
 *-
 
       IMPLICIT NONE

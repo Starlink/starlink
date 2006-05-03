@@ -1,23 +1,40 @@
       SUBROUTINE sgs_SUPTX (XU,YU)
 *+
-*   - - - - - -
-*    S U P T X
-*   - - - - - -
-*
-*   Specify text orientation vector.
-*
-*   Given:
-*      XU        r      x 'up' vector (magnitude immaterial)
-*      YU        r      y  "     "        "          "
-*
-*   Written to COMMON:
-*      XUPTX     r      current up vector (x)
-*      YUPTX     r        "     "    "    (y)
-*
-*   Externals:
-*      sgs_OTEXT, sgs_1SETTX
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     SUPTX
+
+*  Purpose:
+*     Specify text orientation vector.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     XU = REAL (Given)
+*         X 'up' vector (magnitude immaterial)
+*     YU = REAL (Given)
+*         Y  "     "        "          "
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_OTEXT, sgs_1SETTX
+
+*  Written To Common:
+*     XUPTX     r      current up vector (x)
+*     YUPTX     r        "     "    "    (y)
+
 *-
 
       IMPLICIT NONE

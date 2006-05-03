@@ -1,37 +1,56 @@
       SUBROUTINE sgs_SW (X1, X2, Y1, Y2, JSTAT)
 *+
-*   - - -
-*    S W
-*   - - -
-*
-*   Set window for current zone.
-*
-*   The smaller of X1 and X2, and of Y1 and Y2, are the coordinates of
-*   the bottom left-hand corner of the resulting window.  Both extents
-*   must be greater than zero.
-*
-*   Given:
-*      X1        r       window limit x
-*      X2        r          "     "   x
-*      Y1        r          "     "   y
-*      Y2        r          "     "   y
-*      JSTAT     i       inherited status (if option selected)
-*
-*   Returned:
-*      JSTAT     i       status (0=OK)
-*
-*   Read from COMMON:
-*      ISZID     i       current zone id
-*      NPOLY     i       length of current polyline
-*      NTEXT     i       length of current text
-*
-*   Written to COMMON:
-*      ZTW       r()     zone table - window
-*
-*   Externals:
-*      sgs_1HSTAT, sgs_1BNORM, sgs_1GKERR, sgs_OPOLY, sgs_OTEXT, GSWN
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     SW
+
+*  Purpose:
+*     Set window for current zone.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     The smaller of X1 and X2, and of Y1 and Y2, are the coordinates of
+*     the bottom left-hand corner of the resulting window.  Both extents
+*     must be greater than zero.
+
+*  Arguments:
+*     X1 = REAL (Given)
+*         Window limit x
+*     X2 = REAL (Given)
+*         "     "   x
+*     Y1 = REAL (Given)
+*         "     "   y
+*     Y2 = REAL (Given)
+*         "     "   y
+*     JSTAT = INTEGER (Given & Returned)
+*         Inherited status (if option selected)
+*         Status (0=OK) (if not inherited)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_1HSTAT, sgs_1BNORM, sgs_1GKERR, sgs_OPOLY, sgs_OTEXT, GSWN
+
+*  Read From Common:
+*     ISZID     i       current zone id
+*     NPOLY     i       length of current polyline
+*     NTEXT     i       length of current text
+
+*  Written To Common:
+*     ZTW       r()     zone table - window
+
 *-
 
       IMPLICIT NONE

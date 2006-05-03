@@ -1,25 +1,42 @@
       SUBROUTINE sgs_WIDEN (CIDENT,WS,CONID,JSTAT)
 *+
-*   - - - - - -
-*    W I D E N
-*   - - - - - -
-*
-*   Convert a character string workstation description to an integer
-*   workstation sequence number and connection identifier by calling
-*   the GNS library.
-*
-*   Given:
-*      CIDENT     c      the character workstation identifier
-*
-*   Returned:
-*      WS         i      workstation sequence number (if JSTAT=0)
-*      CONID      i      connection ID (if JSTAT=0)
-*      JSTAT      i      status  = 0 if success
-*
-*   Externals:
-*      gns_TNG
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     WIDEN
+
+*  Purpose:
+*     Convert a character string workstation description to an integer
+*     workstation sequence number and connection identifier by calling
+*     the GNS library.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     CIDENT = CHAR (Given)
+*         The character workstation identifier
+*     WS = INTEGER (Returned)
+*         Workstation sequence number (if JSTAT=0)
+*     CONID = INTEGER (Returned)
+*         Connection ID (if JSTAT=0)
+*     JSTAT = INTEGER (Returned)
+*         Status  = 0 if success
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     gns_TNG
+
 *-
 
       IMPLICIT NONE

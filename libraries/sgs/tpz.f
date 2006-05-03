@@ -1,37 +1,57 @@
       SUBROUTINE sgs_TPZ (IZIN, XIN,YIN, IZOUT, XOUT,YOUT, JSTAT)
 *+
-*   - - - -
-*    T P Z
-*   - - - -
-*
-*   Convert position in one zone to position in another.
-*
-*   Given:
-*      IZIN        i      zone of input position
-*      XIN         r      x position in zone IZIN
-*      YIN         r      y    "     "    "   "
-*      IZOUT       i      zone of output position
-*
-*   Returned:
-*      XOUT        r      x position in zone IZOUT
-*      YOUT        r      y    "     "    "   "
-*      JSTAT       i      status (0=OK)
-*
-*   Read from COMMON:
-*      IZTW        i()    zone Table - workstation ID
-*      ZTV         r()      "    "   - viewport
-*      ZTW         r()      "    "   - window
-*
-*   Constants from SGSCOM:
-*      MXZ         i      Maximum number of zones allowed
-*
-*   Externals:
-*      sgs_1ERR, sgs_1HSTAT
-*
-*   Errors:
-*      Invalid zone ID
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     TPZ
+
+*  Purpose:
+*     Convert position in one zone to position in another.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     IZIN = INTEGER (Given)
+*         Zone of input position
+*     XIN = REAL (Given)
+*         X position in zone IZIN
+*     YIN = REAL (Given)
+*         Y    "     "    "   "
+*     IZOUT = INTEGER (Given)
+*         Zone of output position
+*     XOUT = REAL (Returned)
+*         X position in zone IZOUT
+*     YOUT = REAL (Returned)
+*         Y    "     "    "   "
+*     JSTAT = INTEGER (Returned)
+*         Status (0=OK)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From Sgscom:
+*     MXZ         i      Maximum number of zones allowed
+
+*  Errors:
+*     Invalid zone ID
+
+*  Externals:
+*     sgs_1ERR, sgs_1HSTAT
+
+*  Read From Common:
+*     IZTW        i()    zone Table - workstation ID
+*     ZTV         r()      "    "   - viewport
+*     ZTW         r()      "    "   - window
+
 *-
 
       IMPLICIT NONE

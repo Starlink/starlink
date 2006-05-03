@@ -1,31 +1,48 @@
       SUBROUTINE sgs_STXJ (TXJ)
 *+
-*   - - - - -
-*    S T X J
-*   - - - - -
-*
-*   Set text justification.
-*
-*   Given:
-*      TXJ       c*2      text justification code
-*
-*      The text justification code is a string whose first two
-*      characters specify the vertical and horizontal alignments
-*      respectively.  The first can be B(ottom), C(entre) or T(op); the
-*      second can be L(eft), C(entre) or R(ight); other characters cause
-*      no change.  The alignment refers to where in the character string
-*      the nominated X,Y lies; thus a code of 'BL' would place the
-*      nominated X,Y at the bottom left of the string.  The terms 'TOP',
-*      'LEFT' etc refer to the character string as seen in its normal
-*      orientation, rather than as actually displayed.
-*
-*   Written to COMMON:
-*      CTXJ      c*2      current text justification
-*
-*   Externals:
-*      sgs_OTEXT, sgs_1UPCAS, sgs_1SETTX
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     STXJ
+
+*  Purpose:
+*     Set text justification.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     TXJ = CHAR*2 (Given)
+*         Text justification code
+
+*  Description:
+*     The text justification code is a string whose first two
+*     characters specify the vertical and horizontal alignments
+*     respectively.  The first can be B(ottom), C(entre) or T(op); the
+*     second can be L(eft), C(entre) or R(ight); other characters cause
+*     no change.  The alignment refers to where in the character string
+*     the nominated X,Y lies; thus a code of 'BL' would place the
+*     nominated X,Y at the bottom left of the string.  The terms 'TOP',
+*     'LEFT' etc refer to the character string as seen in its normal
+*     orientation, rather than as actually displayed.
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_OTEXT, sgs_1UPCAS, sgs_1SETTX
+
+*  Written To Common:
+*     CTXJ      c*2      current text justification
+
 *-
 
       IMPLICIT NONE

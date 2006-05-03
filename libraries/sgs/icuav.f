@@ -1,31 +1,46 @@
       SUBROUTINE sgs_ICUAV (AVAIL)
 *+
-*   - - - - - -
-*    I C U A V
-*   - - - - - -
-*
-*   Inquire availability of cursor on current SGS device.
-*
-*   Returned:
-*      AVAIL       l      true if cursor input available
-*
-*   Read from COMMON:
-*      IZTW        i()    zone table - SGS workstation ID
-*      ISZID       i      current zone ID
-*      IWTTY       i()    workstation table - workstation type
-*      IWTCA       i()    workstation table - category
-*
-*   Constants from GKS_PAR:
-*      GINPUT      i      workstation category - input
-*      GOUTIN      i           "         "     - input/output
-*
-*   Externals:
-*      GQLI, sgs_1ERR
-*
-*   Errors:
-*      Error returned by GKS inquiry
-*
-*  P.T.Wallace, D.L.Terrett   Starlink   7 September
+*  Name:
+*     ICUAV
+
+*  Purpose:
+*     Inquire availability of cursor on current SGS device.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     AVAIL = LOGICAL (Returned)
+*         True if cursor input available
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GINPUT      i      workstation category - input
+*     GOUTIN      i           "         "     - input/output
+
+*  Errors:
+*     Error returned by GKS inquiry
+
+*  Externals:
+*     GQLI, sgs_1ERR
+
+*  Read From Common:
+*     IZTW        i()    zone table - SGS workstation ID
+*     ISZID       i      current zone ID
+*     IWTTY       i()    workstation table - workstation type
+*     IWTCA       i()    workstation table - category
+
 *-
 
       IMPLICIT NONE

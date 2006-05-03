@@ -1,41 +1,60 @@
       SUBROUTINE sgs_CLRBL (X1, X2, Y1, Y2)
 *+
-*   - - - - - -
-*    C L R B L
-*   - - - - - -
-*
-*   Clear a rectangle with sides parallel to the x and y axes if the
-*   workstation can clear a selected area of the display surface.
-*   Nothing is done if the display surface is already empty.
-*
-*   Given:
-*      X1       r      x coordinate of bottom left corner
-*      Y1       r      y      "      "    "     "     "
-*      X2       r      x      "      "   top  right   "
-*      Y2       r      y      "      "    "     "
-*
-*   Read from COMMON:
-*      IZTW     i()    zone table - SGS workstation ID
-*      ISZID    i      current zone ID
-*      IWTID    i()    workstation table - GKS workstation ID
-*      IBLKCL   i()    workstation descrition table - block clear mechanism
-*      NPOLY    i      length of current polyline
-*      NTEXT    i      length of current text string
-*      WSNRCL   l()    workstation not really clear
-*
-*   Constants from GKS_PAR:
-*      GNEMPT   i      display surface not empty
-*      GSOLID   i      fill area interior style solid
-*
-*   Externals:
-*      GQWKDU, GQASF, GSASF, GQFAIS, GQFACI, GSFAIS, GSFACI, GFA, GQLN,
-*      GQLN, GQLWSC, GQPLCI, GSLN, GSLWSC, GSPLCI, sgs_1ERR, sgs_BOX,
-*      sgs_OPOLY, sgs_OTEXT
-*
-*   Errors:
-*      Error returned by GKS inquiry
-*
-*  P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     CLRBL
+
+*  Purpose:
+*     Clear a rectangle with sides parallel to the x and y axes if the
+*     workstation can clear a selected area of the display surface.
+*     Nothing is done if the display surface is already empty.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     X1 = REAL (Given)
+*         X coordinate of bottom left corner
+*     Y1 = REAL (Given)
+*         Y      "      "    "     "     "
+*     X2 = REAL (Given)
+*         X      "      "   top  right   "
+*     Y2 = REAL (Given)
+*         Y      "      "    "     "
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GNEMPT   i      display surface not empty
+*     GSOLID   i      fill area interior style solid
+
+*  Errors:
+*     Error returned by GKS inquiry
+
+*  Externals:
+*     GQWKDU, GQASF, GSASF, GQFAIS, GQFACI, GSFAIS, GSFACI, GFA, GQLN,
+*     GQLN, GQLWSC, GQPLCI, GSLN, GSLWSC, GSPLCI, sgs_1ERR, sgs_BOX,
+*     sgs_OPOLY, sgs_OTEXT
+
+*  Read From Common:
+*     IZTW     i()    zone table - SGS workstation ID
+*     ISZID    i      current zone ID
+*     IWTID    i()    workstation table - GKS workstation ID
+*     IBLKCL   i()    workstation descrition table - block clear mechanism
+*     NPOLY    i      length of current polyline
+*     NTEXT    i      length of current text string
+*     WSNRCL   l()    workstation not really clear
+
 *-
 
       IMPLICIT NONE

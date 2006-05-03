@@ -1,7 +1,26 @@
       PROGRAM SGS_TEST
 *+
-*   Program to exercise all SGS routines
-*+
+*  Name:
+*     SGS_TEST
+
+*  Purpose:
+*     Program to exercise all SGS routines.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
       CHARACTER*40 WS
       INTEGER IZS(4)
       DATA MSGLU/6/
@@ -84,8 +103,27 @@
 
       SUBROUTINE REF(MSGLU)
 *+
-*   plots reference picture
-*+
+*  Name:
+*     REF
+
+*  Purpose:
+*     Plots reference picture.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
       CHARACTER*2 TXJ
       INTEGER IZS(4)
       REAL XSTART(2:5),YSTART(2:5)

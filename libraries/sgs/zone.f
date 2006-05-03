@@ -1,38 +1,55 @@
       SUBROUTINE sgs_ZONE (X1, X2, Y1, Y2, IZONID, JSTAT)
 *+
-*   - - - - -
-*    Z O N E
-*   - - - - -
-*
-*   Create and select a zone of the specified extent.
-*
-*   The new zone has a window whose world coordinate extent is (0,0) to
-*   (X,Y), where X/Y is the true aspect ratio of the viewport and the
-*   smaller of X or Y is unity.
-*
-*   Given:
-*      X1,X2,Y1,Y2   r      bounds of new zone in current zone's
-*                                                      world coordinates
-*      JSTAT         i      inherited status (if option selected)
-*
-*   Returned:
-*      IZONID        i      zone identifier for new zone
-*      JSTAT         i      status (0=OK)
-*
-*   Read from COMMON:
-*      ISZID         i      current zone ID
-*      ZTW           i()    zone table - window
-*      ZTV           i()     "     "   - viewport
-*      IZTW          i()     "     "   - workstation ID
-*
-*   Externals:
-*      sgs_1HSTAT, sgs_1BNORM, sgs_1ERR, sgs_1GETZ, sgs_1NEWZ
-*
-*   Errors:
-*      New zone not inside current
-*      Too many zones
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     ZONE
+
+*  Purpose:
+*     Create and select a zone of the specified extent.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     The new zone has a window whose world coordinate extent is (0,0) to
+*     (X,Y), where X/Y is the true aspect ratio of the viewport and the
+*     smaller of X or Y is unity.
+
+*  Arguments:
+*     X1,X2,Y1,Y2 = REAL (Given)
+*         Bounds of new zone in current zone's
+*         world coordinates
+*     IZONID = INTEGER (Returned)
+*         Zone identifier for new zone
+*     JSTAT = INTEGER (Given & Returned)
+*         Inherited status (if option selected)
+*         Status (0=OK) (if not inherited)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Errors:
+*     New zone not inside current
+*     Too many zones
+
+*  Externals:
+*     sgs_1HSTAT, sgs_1BNORM, sgs_1ERR, sgs_1GETZ, sgs_1NEWZ
+
+*  Read From Common:
+*     ISZID         i      current zone ID
+*     ZTW           i()    zone table - window
+*     ZTV           i()     "     "   - viewport
+*     IZTW          i()     "     "   - workstation ID
+
 *-
 
       IMPLICIT NONE

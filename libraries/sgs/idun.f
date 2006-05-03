@@ -1,40 +1,59 @@
       SUBROUTINE sgs_IDUN (XW,YW)
 *+
-*   - - - - -
-*    I D U N
-*   - - - - -
-*
-*   Estimate plotting resolution of current zone.
-*
-*   For metafiles and segment storage, zero XW & YW are returned.
-*
-*   Returned:
-*      XW        r      size of x resolution elements in world coordinates
-*      YW        r        "   " y     "          "    "    "       "
-*
-*      XW and YW are returned as zero if either the workstation has not
-*      got a display surface or an error occurs.
-*
-*   Read from COMMON:
-*      IZTW      i()    zone table - SGS workstation ID
-*      ISZID     i      current zone ID
-*      IWTTY     i()    workstation table - workstation type
-*      IWTCA     i()    workstation table - category
-*      IWTID     i()    workstation table - GKS workstation ID
-*
-*   Constants from GKS_PAR:
-*      GWISS     i      workstation category - workstation-independent
-*                                              segment store
-*      GMO       i           "          "    - metafile output
-*      GMI       i           "          "    - metafile input
-*
-*   Externals:
-*       GQDSP, GQWKT, GQNT, sgs_1ERR
-*
-*   Errors:
-*      Error returned by GKS inquiry
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     IDUN
+
+*  Purpose:
+*     Estimate plotting resolution of current zone.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     For metafiles and segment storage, zero XW & YW are returned.
+
+*  Arguments:
+*     XW = REAL (Returned)
+*         Size of x resolution elements in world coordinates
+*     YW = REAL (Returned)
+*         "   " y     "          "    "    "       "
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Notes:
+*     XW and YW are returned as zero if either the workstation has not
+*     got a display surface or an error occurs.
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GWISS     i      workstation category - workstation-independent
+*     segment store
+*     GMO       i           "          "    - metafile output
+*     GMI       i           "          "    - metafile input
+
+*  Errors:
+*     Error returned by GKS inquiry
+
+*  Externals:
+*     GQDSP, GQWKT, GQNT, sgs_1ERR
+
+*  Read From Common:
+*     IZTW      i()    zone table - SGS workstation ID
+*     ISZID     i      current zone ID
+*     IWTTY     i()    workstation table - workstation type
+*     IWTCA     i()    workstation table - category
+*     IWTID     i()    workstation table - GKS workstation ID
+
 *-
 
       IMPLICIT NONE

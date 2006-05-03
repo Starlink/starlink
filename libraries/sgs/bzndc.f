@@ -1,63 +1,83 @@
       SUBROUTINE sgs_BZNDC (X1,X2,Y1,Y2, POS, JSTAT)
 *+
-*   - - - - - -
-*    B Z N D C
-*   - - - - - -
-*
-*   Modify the size and position on the display surface of a base zone.
-*
-*   The following conditions must be satisfied:-
-*         (i)   The current zone is a base zone
-*         (ii)  There are no other zones on the workstation
-*         (iii) The display suface is empty
-*
-*   This routine contains a workaround for a bug in the RAL GKS.
-*
-*   Given:
-*      X1      r     new NDC x coordinate of bottom left corner of zone
-*      Y1      r      "   "  y     "       "   "     "     "    "   "
-*      X2      r      "   "  x     "       "  top  right   "    "   "
-*      Y2      r      "   "  y     "       "   "     "     "    "   "
-*      POS     c*2   position of zone on display surface: the two
-*                    characters determine the position of the zone
-*                    within the display surface as follows:-
-*
-*                  1st character = B (bottom), C (centre), or T (top).
-*                  2nd character = L (left),   C (centre), or R (right).
-*
-*     JSTAT    i     status (if in inherited status mode)
-*
-*   Returned:
-*     JSTAT    i     status (0=OK)
-*
-*   Read from COMMON:
-*     IZTW     i()   zone table - SGS workstation ID
-*     ISZID    i     current zone ID
-*     IWTID    i()   workstation table - GKS workstation ID
-*     IWTTY    i()        "        "   - workstation type
-*
-*   Written to COMMON:
-*     ZTW      r()   zone table - window
-*     ZTV      r()   zone table - viewport
-*
-*   Constants from SGSCOM:
-*     MXZ      i     maximum number of zones allowed = size of zone table
-*   Constants from GKS_PAR:
+*  Name:
+*     BZNDC
+
+*  Purpose:
+*     Modify the size and position on the display surface of a base zone.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     The following conditions must be satisfied:-
+*       (i)   The current zone is a base zone
+*       (ii)  There are no other zones on the workstation
+*       (iii) The display suface is empty
+
+*  Arguments:
+*     X1 = REAL (Given)
+*         New NDC x coordinate of bottom left corner of zone
+*     Y1 = REAL (Given)
+*         "   "  y     "       "   "     "     "    "   "
+*     X2 = REAL (Given)
+*         "   "  x     "       "  top  right   "    "   "
+*     Y2 = REAL (Given)
+*         "   "  y     "       "   "     "     "    "   "
+*     POS = CHAR*2 (Given)
+*         Position of zone on display surface: the two
+*         characters determine the position of the zone
+*         within the display surface as follows:-
+*         1st character = B (bottom), C (centre), or T (top).
+*         2nd character = L (left),   C (centre), or R (right).
+*     JSTAT = INTEGER (Given & Returned)
+*         Status (if in inherited status mode)
+*         Status (0=OK) (if non-inherited)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Notes:
+*     This routine contains a workaround for a bug in the RAL GKS.
+
+*  Constants From GKS_PAR:
 *     GEMPTY   i     display surface is empty
 *     GOTHU    i     device units are "other"
-*
-*   Externals:
-*     sgs_1HSTAT, sgs_1ERR, sgs_1GKERR, sgs_1NORM, sgs_1UPCAS, sgs_SELZ,
-*     GQWKDU, GSWKWN, GQDSP, GSWKVP
-*
-*   Errors:
+
+*  Constants From sgscom:
+*     MXZ      i     maximum number of zones allowed = size of zone table
+
+*  Errors:
 *     Current zone is not a base zone
 *     Scale factor invalid
 *     Other zones exist on workstation
 *     Display surface is not empty
 *     Other zones exist on workstation
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+
+*  Externals:
+*     sgs_1HSTAT, sgs_1ERR, sgs_1GKERR, sgs_1NORM, sgs_1UPCAS, sgs_SELZ,
+*     GQWKDU, GSWKWN, GQDSP, GSWKVP
+
+*  Read From Common:
+*     IZTW     i()   zone table - SGS workstation ID
+*     ISZID    i     current zone ID
+*     IWTID    i()   workstation table - GKS workstation ID
+*     IWTTY    i()        "        "   - workstation type
+
+*  Written To Common:
+*     ZTW      r()   zone table - window
+*     ZTV      r()   zone table - viewport
+
 *-
 
       IMPLICIT NONE

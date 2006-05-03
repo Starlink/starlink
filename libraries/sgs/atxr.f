@@ -1,27 +1,46 @@
       SUBROUTINE sgs_ATXR (R, NFI, NDP)
 *+
-*   - - - - -
-*    A T X R
-*   - - - - -
-*
-*   Format a real number and append to the text buffer.
-*
-*   The field width is limited in size - see coding.
-*
-*   Given:
-*      R      r     real number to be formatted
-*      NFI    i     format indicator:
-*                     either  number of leading spaces (NFI.GE.0)
-*                         or  minus the field width (NFI.LT.0)
-*      NDP    i     number of decimal places
-*                     if NDP.LT.0, only the integer part appears
-*                     if NDP.EQ.0, the decimal point appears
-*                     if NDP.GT.0, NDP digits appear after the point
-*
-*   Externals:
-*      sgs_ATXB, sgs_ATEXT
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     ATXR
+
+*  Purpose:
+*     Format a real number and append to the text buffer.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     The field width is limited in size - see coding.
+
+*  Arguments:
+*     R = REAL (Given)
+*         Real number to be formatted
+*     NFI = INTEGER (Given)
+*         I Format Indicator:
+*            either  number of leading spaces (NFI.GE.0)
+*            or  minus the field width (NFI.LT.0)
+*     NDP = INTEGER (Given)
+*         Number of decimal places
+*           if NDP.LT.0, only the integer part appears
+*           if NDP.EQ.0, the decimal point appears
+*           if NDP.GT.0, NDP digits appear after the point
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_ATXB, sgs_ATEXT
+
 *-
 
       IMPLICIT NONE

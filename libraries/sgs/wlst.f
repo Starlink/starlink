@@ -1,22 +1,42 @@
       SUBROUTINE sgs_1WLST (NAME, COMMNT, LU, JSTAT)
 *+
-*   - - - - -
-*    W L S T       (Internal routine)
-*   - - - - -
-*
-*   Internal routine which lists one SGS workstation name for the
-*   sgs_WLIST routine.  It is called by the sgs_WNAME routine once per
-*   workstation name.
-*
-*   Given:
-*      NAME      c      SGS workstation name
-*      COMMNT    c      description
-*      LU        i      Fortran I/O unit for output
-*
-*   Returned:
-*      JSTAT     i      status:  0 = OK
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     WLST
+
+*  Purpose:
+*     Internal routine which lists one SGS workstation name for the
+*     sgs_WLIST routine.  It is called by the sgs_WNAME routine once per
+*     workstation name.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     Internal routine
+
+*  Arguments:
+*     NAME = CHAR (Given)
+*         SGS workstation name
+*     COMMNT = CHAR (Given)
+*         Description
+*     LU = INTEGER (Given)
+*         Fortran I/O unit for output
+*     JSTAT = INTEGER (Returned)
+*         Status:  0 = OK
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
       IMPLICIT NONE

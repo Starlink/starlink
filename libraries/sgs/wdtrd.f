@@ -1,32 +1,51 @@
       SUBROUTINE sgs_1WDTRD (IWKID, JSTAT)
 *+
-*   - - - - - -
-*    W D T R D    (Internal routine)
-*   - - - - - -
-*
-*   Read WDT entry into common block.
-*
-*   Given:
-*      IWKID       i        SGS Workstation ID
-*      JSTAT       i        inherited status (if mode selected)
-*
-*   Returned:
-*      JSTAT       i        status 0=OK
-*
-*   Read from COMMON:
-*      IWTID       i()      GKS workstation ID
-*      
-*   Written to COMMON:
-*      XRES        r()      WDT - x resolution
-*      YRES        r()      WDT - y resolution
-*      IBLKCL      i()      WDT - block clear mechanism
-*      ISPOOL      i()      WDT - workstation spooled
-*      NSCLOP      l()      WDT - workstation supports no screen clear
-*                                                                   open
-*   Externals:
-*      sgs_1HSTAT, sgs_1ERR, gns_IWSG, gns_IWCG
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     WDTRD
+
+*  Purpose:
+*     Read WDT entry into common block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     Internal routine
+
+*  Arguments:
+*     IWKID = INTEGER (Given)
+*         SGS Workstation ID
+*     JSTAT = INTEGER (Given & Returned)
+*         Inherited status (if mode selected)
+*         Status 0=OK (if not inherited)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_1HSTAT, sgs_1ERR, gns_IWSG, gns_IWCG
+
+*  Read From Common:
+*     IWTID       i()      GKS workstation ID
+
+*  Written To Common:
+*     XRES        r()      WDT - x resolution
+*     YRES        r()      WDT - y resolution
+*     IBLKCL      i()      WDT - block clear mechanism
+*     ISPOOL      i()      WDT - workstation spooled
+*     NSCLOP      l()      WDT - workstation supports no screen clear
+*     open
+
 *-
 
       IMPLICIT NONE

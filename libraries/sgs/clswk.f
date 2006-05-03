@@ -1,50 +1,65 @@
       SUBROUTINE sgs_CLSWK (IZONID, JSTAT)
 *+
-*   - - - - - -
-*    C L S W K
-*   - - - - - -
+*  Name:
+*     CLSWK
+
+*  Purpose:
+*     Close a workstation.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     If there are no other base zones on the workstation: delete the zone
+*     and all other zones on the workstation; de-activate and close the
+*     workstation. Otherwise just delete the base zone.  If the current
+*     zone has been deleted the current zone ID is set to zero.
 *
-*   Close a workstation.
-*
-*   If there are no other base zones on the workstation: delete the zone
-*   and all other zones on the workstation; de-activate and close the
-*   workstation. Otherwise just delete the base zone.  If the current
-*   zone has been deleted the current zone ID is set to zero.
-*
-*   The specified zone must be a base zone.
-*
-*   Given:
-*      IZONID    i       zone identifier
-*      JSTAT     i       inherited status (if option selected)
-*
-*   Returned:
-*      JSTAT     i       status: 0=OK
-*
-*   Read from COMMON:
-*      IZTW      i()     zone table - workstation ID
-*      NTEXT     i       length of current polyline
-*      OTEXT     i       length of current text string
-*      IWTID     i()     workstation table - GKS workstation ID
-*
-*   Written to COMMON:
-*      IWTID     i()     workstation table - GKS workstation ID
-*      IWTTY     i()     workstation table - Type
-*      IWTCO     i()     workstation table - Connection ID
-*      IWTCA     i()     workstation table - Category
-*
-*
-*   Constants from SGSCOM:
-*      MXZ       i       maximum number of zones allowed
-*
-*   Externals:
-*      sgs_1HSTAT, sgs_1ERR, sgs_1CLWK, sgs_OTEXT, sgs_OPOLY
-*
-*   Errors:
-*      Invalid zone ID
-*      Specified zone does not exist
-*      Specified zone is not a base zone
-*                                       
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*     The specified zone must be a base zone.
+
+*  Arguments:
+*     IZONID = INTEGER (Given)
+*         Zone identifier
+*     JSTAT = INTEGER (Given & Returned)
+*         Inherited status (if option selected)
+*         Status: 0=OK
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From Sgscom:
+*     MXZ       i       maximum number of zones allowed
+
+*  Errors:
+*     Invalid zone ID
+*     Specified zone does not exist
+*     Specified zone is not a base zone
+
+*  Externals:
+*     sgs_1HSTAT, sgs_1ERR, sgs_1CLWK, sgs_OTEXT, sgs_OPOLY
+
+*  Read From Common:
+*     IZTW      i()     zone table - workstation ID
+*     NTEXT     i       length of current polyline
+*     OTEXT     i       length of current text string
+*     IWTID     i()     workstation table - GKS workstation ID
+
+*  Written To Common:
+*     IWTID     i()     workstation table - GKS workstation ID
+*     IWTTY     i()     workstation table - Type
+*     IWTCO     i()     workstation table - Connection ID
+*     IWTCA     i()     workstation table - Category
+
 *-
 
       IMPLICIT NONE

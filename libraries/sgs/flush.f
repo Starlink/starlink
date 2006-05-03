@@ -1,23 +1,38 @@
       SUBROUTINE sgs_FLUSH
 *+
-*   - - - - - -
-*    F L U S H
-*   - - - - - -
-*
-*   Flush any pending output on all active workstations.
-*
-*   Externals:
-*      sgs_OTEXT, sgs_OPOLY, sgs_1ERR, GQOPS, GQACWK, GUWK
-*
-*   Constants from GKS_PAR:
-*      GWSAC      i       at least one workstation active
-*      GSGOP      i       segment open
-*      GPOSTP     i       regeneration postponed
-*
-*   Errors:
-*      Error returned by GKS inquiry
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     FLUSH
+
+*  Purpose:
+*     Flush any pending output on all active workstations.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GWSAC      i       at least one workstation active
+*     GSGOP      i       segment open
+*     GPOSTP     i       regeneration postponed
+
+*  Errors:
+*     Error returned by GKS inquiry
+
+*  Externals:
+*     sgs_OTEXT, sgs_OPOLY, sgs_1ERR, GQOPS, GQACWK, GUWK
+
 *-
 
       IMPLICIT NONE

@@ -1,23 +1,42 @@
       SUBROUTINE sgs_ATXI (I, NFI)
 *+
-*   - - - - -
-*    A T X I
-*   - - - - -
-*
-*   Format an integer number and append to the text buffer.
-*
-*   The field width is limited to 20 characters by the size of the
-*   local string variable STRING.
-*
-*   Given:
-*      I      i      Integer to be formatted
-*      NFI    i      Format indicator:-
-*                       either  number of leading spaces (NFI.GE.0)
-*                           or  minus the field width (NFI.LT.0)
+*  Name:
+*     ATXI
+
+*  Purpose:
+*     Format an integer number and append to the text buffer.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     The field width is limited to 20 characters by the size of the
+*     local string variable STRING.
+
+*  Arguments:
+*     I = INTEGER (Given)
+*         Integer to be formatted
+*     NFI = INTEGER (Given)
+*         Format indicator:-
+*           either  number of leading spaces (NFI.GE.0)
+*           or  minus the field width (NFI.LT.0)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *  Externals:
 *     sgs_ATXB, sgs_ATEXT
-*
-*  P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+
 *-
 
       IMPLICIT NONE

@@ -1,26 +1,47 @@
       SUBROUTINE sgs_1NEWZ (IZONID, X1,X2, Y1,Y2)
 *+
-*   - - - - -
-*    N E W Z     (Internal routine)
-*   - - - - -
-*
-*   Finish setting up a new zone.
-*
-*   The viewport and a default window are stored in the zone table entry
-*   for the given zone ID, and the new zone is selected.
-*
-*   Given:
-*      IZONID        i     zone identifier for new zone
-*      X1,X2,Y1,Y2   r     zone viewport bounds (NDC)
-*
-*   Written to COMMON:
-*      ZTV           r()   zone table - viewport
-*      ZTW           r()   zone table - window
-*
-*   Externals:
-*      sgs_SELZ, sgs_1NORM
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     NEWZ
+
+*  Purpose:
+*     Finish setting up a new zone.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     Internal routine
+
+*  Description:
+*     The viewport and a default window are stored in the zone table entry
+*     for the given zone ID, and the new zone is selected.
+
+*  Arguments:
+*     IZONID = INTEGER (Given)
+*         Zone identifier for new zone
+*     X1,X2,Y1,Y2 = REAL (Given)
+*         Zone viewport bounds (NDC)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_SELZ, sgs_1NORM
+
+*  Written To Common:
+*     ZTV           r()   zone table - viewport
+*     ZTW           r()   zone table - window
+
 *-
 
       IMPLICIT NONE

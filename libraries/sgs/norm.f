@@ -1,21 +1,40 @@
       SUBROUTINE sgs_1NORM (X,Y, XN,YN)
 *+
-*   - - - - -
-*    N O R M     (Internal routine)
-*   - - - - -
-*
-*   Normalize a pair of numbers which specify the extent of a rectangle.
-*
-*   The routine returns a pair of numbers with the same quotient but
-*   neither of which is greater than unity.
-*
-*   Given:
-*        X,Y       r     number pair to be normalised
-*
-*   Returned:
-*        XN,YN     r     normalised number pair
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     NORM
+
+*  Purpose:
+*     Normalize a pair of numbers which specify the extent of a rectangle.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     Internal routine
+
+*  Description:
+*     The routine returns a pair of numbers with the same quotient but
+*     neither of which is greater than unity.
+
+*  Arguments:
+*     X,Y = REAL (Given)
+*         Number pair to be normalised
+*     XN,YN = REAL (Returned)
+*         Normalised number pair
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
       IMPLICIT NONE

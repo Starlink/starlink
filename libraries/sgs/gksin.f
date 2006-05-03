@@ -1,27 +1,46 @@
       SUBROUTINE sgs_1GKSIN (LUN, JSTAT)
 *+
-*   - - - - - -
-*    G K S I N     (Internal routine)
-*   - - - - - -
-*
-*   Initialise GKS.
-*
-*   If GKS is already open, it is left open.
-*
-*   Given:
-*      LUN      i      logical unit for error messages
-*      JSTAT    i      inherited status (if option selected)
-*
-*   Returned:
-*      JSTAT    i      status: 0=OK
-*
-*   Constants from GKS_PAR:
-*      GGKCL    i      operating state - closed
-*
-*    Externals:
-*      sgs_1HSTAT, sgs_1GKERR, GQOPS, GOPKS
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     GKSIN
+
+*  Purpose:
+*     Initialise GKS.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     Internal routine
+
+*  Description:
+*     If GKS is already open, it is left open.
+
+*  Arguments:
+*     LUN = INTEGER (Given)
+*         Logical unit for error messages
+*     JSTAT = INTEGER (Given & Returned)
+*         Inherited status (if option selected)
+*         Status: 0=OK
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GGKCL    i      operating state - closed
+
+*  Externals:
+*     sgs_1HSTAT, sgs_1GKERR, GQOPS, GOPKS
+
 *-
 
       IMPLICIT NONE

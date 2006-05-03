@@ -1,36 +1,57 @@
       SUBROUTINE sgs_IZONE (X1,X2, Y1,Y2, XM,YM)
 *+
-*   - - - - - -
-*    I Z O N E
-*   - - - - - -
-*
-*   Inquire world coordinate bounds and device coordinate size of the
-*   current zone.
-*
-*   Returned:
-*      X1      r     x coordinate of lower left corner
-*      Y1      r     y      "     "    "    "     "
-*      X2      r     x      "     "  upper right  "
-*      Y2      r     y      "     "    "     "    "
-*      XM      r     x size in metres
-*      YM      r     y   "   "   "
-*
-*   Read from COMMON:
-*      IZTW    i()   Zone table - SGS workstation ID
-*      ISZID   i     Current zone ID
-*      IWTID   i()   Workstation table - GKS workstation ID
-*      ZTW     i()   Zone table - window
-*      ZTV     i()   Zone table - viewport
-*      XRES    r()   Workstation description table - X resolution
-*      YRES    r()        "           "        "   - Y      "
-*
-*   Externals:
-*      GQWKT, sgs_1ERR
-*
-*   Errors:
-*      Error returned by GKS inquiry
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     IZONE
+
+*  Purpose:
+*     Inquire world coordinate bounds and device coordinate size of the
+*     current zone.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     X1 = REAL (Returned)
+*         X coordinate of lower left corner
+*     Y1 = REAL (Returned)
+*         Y      "     "    "    "     "
+*     X2 = REAL (Returned)
+*         X      "     "  upper right  "
+*     Y2 = REAL (Returned)
+*         Y      "     "    "     "    "
+*     XM = REAL (Returned)
+*         X size in metres
+*     YM = REAL (Returned)
+*         Y   "   "   "
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Errors:
+*     Error returned by GKS inquiry
+
+*  Externals:
+*     GQWKT, sgs_1ERR
+
+*  Read From Common:
+*     IZTW    i()   Zone table - SGS workstation ID
+*     ISZID   i     Current zone ID
+*     IWTID   i()   Workstation table - GKS workstation ID
+*     ZTW     i()   Zone table - window
+*     ZTV     i()   Zone table - viewport
+*     XRES    r()   Workstation description table - X resolution
+*     YRES    r()        "           "        "   - Y      "
+
 *-
 
       IMPLICIT NONE

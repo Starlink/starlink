@@ -1,18 +1,34 @@
       SUBROUTINE sgs_IPEN (NPEN)
 *+
-*   - - - - -
-*    I P E N
-*   - - - - -
-*
-*   Inquire current SGS pen number.
-*
-*   Returned:
-*      NPEN     i    SGS pen number
-*
-*   Read from COMMON:
-*      IPEN     i    SGS pen number
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     IPEN
+
+*  Purpose:
+*     Inquire current SGS pen number.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     NPEN = INTEGER (Returned)
+*         SGS pen number
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Read From Common:
+*     IPEN     i    SGS pen number
+
 *-
 
       IMPLICIT NONE

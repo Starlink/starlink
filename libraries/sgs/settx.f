@@ -1,31 +1,49 @@
       SUBROUTINE sgs_1SETTX
 *+
-*   - - - - - -
-*    S E T T X     (Internal routine)
-*   - - - - - -
-*
-*   Set text size spacing & justification from SGS parameters.
-*
-*   Read from COMMON:
-*      HTX       r      text height
-*      XUPTX     r      character up vector (x)
-*      YUPTX     r         "      "    "    (y)
-*      STX       r      character spacing
-*      CTXJ      c*2    text justification
-*      ARTX      r      character aspect ratio
-*
-*   Constants from GKS_PAR:
-*      GAHALF    i      vertical text alignment - Halfline
-*      GACAP     i         "      "       "     - Capline
-*      GABASE    i         "      "       "     - Baseline
-*      GACENT    i      horizontal text alignment - Centre
-*      GALEFT    i          "        "      "     - Left
-*      GARITE    i          "        "      "     - Right
-*
-*   Externals:
-*      GSCHH, GSCHUP, GSCHSP, GSTXAL, GSCHXP
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     SETTX
+
+*  Purpose:
+*     Set text size spacing & justification from SGS parameters.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type Of Module:
+*     Internal routine
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GAHALF    i      vertical text alignment - Halfline
+*     GACAP     i         "      "       "     - Capline
+*     GABASE    i         "      "       "     - Baseline
+*     GACENT    i      horizontal text alignment - Centre
+*     GALEFT    i          "        "      "     - Left
+*     GARITE    i          "        "      "     - Right
+
+*  Externals:
+*     GSCHH, GSCHUP, GSCHSP, GSTXAL, GSCHXP
+
+*  Read From Common:
+*     HTX       r      text height
+*     XUPTX     r      character up vector (x)
+*     YUPTX     r         "      "    "    (y)
+*     STX       r      character spacing
+*     CTXJ      c*2    text justification
+*     ARTX      r      character aspect ratio
+
 *-
 
       IMPLICIT NONE

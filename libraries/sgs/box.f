@@ -1,22 +1,41 @@
       SUBROUTINE sgs_BOX (X1,X2, Y1,Y2)
 *+
-*   - - - -
-*    B O X
-*   - - - -
-*
-*   Draw a rectangle with sides parallel to the x and y axes with the
-*   current SGS pen.
-*
-*   Given:
-*      X1    r    x coordinate of bottom left corner
-*      Y1    r    y      "      "    "     "    "
-*      X2    r    x      "      "  top right    "
-*      Y2    r    y      "      "   "    "      "
-*
-*   Externals:
-*      sgs_APOLY, sgs_BPOLY
-*
-*  P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     BOX
+
+*  Purpose:
+*     Draw a rectangle with sides parallel to the x and y axes with the
+*     current SGS pen.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     X1 = REAL (Given)
+*         X coordinate of bottom left corner
+*     Y1 = REAL (Given)
+*         Y      "      "    "     "    "
+*     X2 = REAL (Given)
+*         X      "      "  top right    "
+*     Y2 = REAL (Given)
+*         Y      "      "   "    "      "
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_APOLY, sgs_BPOLY
+
 *-
 
       IMPLICIT NONE

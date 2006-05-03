@@ -1,33 +1,48 @@
       SUBROUTINE sgs_CLRZ
 *+
-*   - - - - -
-*    C L R Z
-*   - - - - -
-*
-*   Clear current zone, even if this means clearing the whole screen.
-*
-*   Read from COMMON:
-*      IZTW     i()     zone table - SGS workstation ID
-*      IWTID    i()     workstation table - GKS workstation ID
-*      ISZID    i       current zone ID
-*      IBLKCL   i()     workstation descrition table - block clear mechanism
-*      ZTW      r()     zone table - window
-*      NTEXT    i       text counter
-*      NPOLY    i       polyline counter
-*      WSNRCL   l()     workstation not really clear
-*
-*   Written to COMMON:
-*      WSNRCL   l()     workstation not really clear
-*
-*   Constants from GKS_PAR:
-*      GCONDI   i       clear workstation conditionally
-*      GPOSTP   i       regeneration postponed
-*      GALWAY   i       clear workstation always
-*
-*   Externals:
-*      sgs_CLRBL, sgs_OPOLY, sgs_OTEXT, GCLRWK, GUWK
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     CLRZ
+
+*  Purpose:
+*     Clear current zone, even if this means clearing the whole screen.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GCONDI   i       clear workstation conditionally
+*     GPOSTP   i       regeneration postponed
+*     GALWAY   i       clear workstation always
+
+*  Externals:
+*     sgs_CLRBL, sgs_OPOLY, sgs_OTEXT, GCLRWK, GUWK
+
+*  Read From Common:
+*     IZTW     i()     zone table - SGS workstation ID
+*     IWTID    i()     workstation table - GKS workstation ID
+*     ISZID    i       current zone ID
+*     IBLKCL   i()     workstation descrition table - block clear mechanism
+*     ZTW      r()     zone table - window
+*     NTEXT    i       text counter
+*     NPOLY    i       polyline counter
+*     WSNRCL   l()     workstation not really clear
+
+*  Written To Common:
+*     WSNRCL   l()     workstation not really clear
+
 *-
 
       IMPLICIT NONE

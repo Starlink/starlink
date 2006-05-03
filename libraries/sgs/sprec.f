@@ -1,24 +1,40 @@
       SUBROUTINE sgs_SPREC (NPR)
 *+
-*   - - - - - -
-*    S P R E C
-*   - - - - - -
-*
-*   Select text precision.
-*
-*   Given:
-*      NPR       i      text precision
-*
-*   Read from COMMON:
-*      IFONT     i      current font
-*
-*   Written to COMMON:
-*      IPREC     i      current text precision
-*
-*   Externals:
-*      sgs_OTEXT, GSTXFP
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     SPREC
+
+*  Purpose:
+*     Select text precision.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     NPR = INTEGER (Given)
+*         Text precision
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_OTEXT, GSTXFP
+
+*  Read From Common:
+*     IFONT     i      current font
+
+*  Written To Common:
+*     IPREC     i      current text precision
+
 *-
 
       IMPLICIT NONE

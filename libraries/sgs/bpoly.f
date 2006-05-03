@@ -1,28 +1,44 @@
       SUBROUTINE sgs_BPOLY (X,Y)
 *+
-*
-*   - - - - - -
-*    B P O L Y
-*   - - - - - -
-*
-*   Begin a new polyline.
-*
-*   Given:
-*      X         r      x coordinate of first point
-*      Y         r      y      "      "   "     "
-*
-*   Read from COMMON:
-*      NPOLY     i      length of current polyline
-*
-*   Written to COMMON:
-*      XPOLY     r()    current polyline buffer (X)
-*      YPOLY     r()    current polyline buffer (Y)
-*      NPOLY     i      length of current polyline
-*
-*   Externals:
-*      sgs_OPOLY
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*  Name:
+*     BPOLY
+
+*  Purpose:
+*     Begin a new polyline.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     X = REAL (Given)
+*         X coordinate of first point
+*     Y = REAL (Given)
+*         Y      "      "   "     "
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_OPOLY
+
+*  Read From Common:
+*     NPOLY     i      length of current polyline
+
+*  Written To Common:
+*     XPOLY     r()    current polyline buffer (X)
+*     YPOLY     r()    current polyline buffer (Y)
+*     NPOLY     i      length of current polyline
+
 *-
 
       IMPLICIT NONE

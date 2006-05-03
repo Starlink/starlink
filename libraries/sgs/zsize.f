@@ -1,46 +1,65 @@
       SUBROUTINE sgs_ZSIZE (XM,YM, POS, IZONID, JSTAT)
 *+
-*   - - - - - -
-*    Z S I Z E
-*   - - - - - -
+*  Name:
+*     ZSIZE
+
+*  Purpose:
+*     Create and select a zone of the specified size.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     The new zone has a window whose world coordinate extent is (0,0) to
+*     (X,Y), where X/Y is the true aspect ratio of the viewport and the
+*     smaller of X or Y is unity.
+
+*  Arguments:
+*     XM,YM = REAL (Given)
+*         Zone size in X and Y (metres)
+*     POS = CHAR (Given)
+*         Position code (see below)
+*     IZONID = INTEGER (Returned)
+*         Zone identifier for new zone
+*     JSTAT = INTEGER (Given & Returned)
+*         Inherited status (if option selected)
+*         Status (0=OK) (if non-inherited)
+
+*  Notes:
+*     Position code;  the first two characters determine the position of
+*     the new zone within the current zone as follows:
 *
-*   Create and select a zone of the specified size.
+*     1st character = L (left),   C (centre) or R (right).
+*     2nd character = B (bottom), C (centre) or T (top).
 *
-*   The new zone has a window whose world coordinate extent is (0,0) to
-*   (X,Y), where X/Y is the true aspect ratio of the viewport and the
-*   smaller of X or Y is unity.
-*
-*   Given:
-*      XM,YM        r      zone size in X and Y (metres)
-*      POS          c      position code (see below)
-*      JSTAT        i      inherited status (if option selected)
-*
-*   Returned:
-*      IZONID       i      zone identifier for new zone
-*      JSTAT        i      status (0=OK)
-*
-*   Position code;  the first two characters determine the position of
-*   the new zone within the current zone as follows:
-*
-*        1st character = L (left),   C (centre) or R (right).
-*        2nd character = B (bottom), C (centre) or T (top).
-*
-*   The new zone can be positioned in one corner of the current zone
-*   by specifiying 'BL', 'BR', 'TL' or 'TR'.  The new zone can be
-*   positioned centrally against one edge via 'BC', 'CR', 'TC' or 'CL'.
-*   'CC' causes the new zone to be concentric with the current one.
-*
-*   Read from COMMON:
-*      ISZID        i      current zone ID
-*      ZTV          i()    zone table - viewport
-*
-*   Externals:
-*      sgs_IZONE, sgs_1ERR, sgs_1HSTAT, sgs_1PNZ
-*
-*   Errors:
-*      Requested zone bigger than current
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   14 September 1991
+*     The new zone can be positioned in one corner of the current zone
+*     by specifiying 'BL', 'BR', 'TL' or 'TR'.  The new zone can be
+*     positioned centrally against one edge via 'BC', 'CR', 'TC' or 'CL'.
+*     'CC' causes the new zone to be concentric with the current one.
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Errors:
+*     Requested zone bigger than current
+
+*  Externals:
+*     sgs_IZONE, sgs_1ERR, sgs_1HSTAT, sgs_1PNZ
+
+*  Read From Common:
+*     ISZID        i      current zone ID
+*     ZTV          i()    zone table - viewport
+
 *-
 
       IMPLICIT NONE

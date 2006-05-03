@@ -1,35 +1,53 @@
       SUBROUTINE sgs_APOLY (X,Y)
 *+
-*  - - - - - -
-*   A P O L Y
-*  - - - - - -
-*
-*  Append new point to current polyline.
-*
-*  If the polyline buffer is full, call OPOLY to flush the polyline to
-*  GKS and start a new polyline beginning at the last point of the old
-*  one.  Copy the new point into the buffer and increment the number of
-*  points.
-*
-*  Given:
-*     X      r     x coordinate of new point
-*     Y      r     y     "      "   "    "
-*
-*  Read from COMMON:
+*  Name:
+*     APOLY
+
+*  Purpose:
+*     Append new point to current polyline.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     If the polyline buffer is full, call OPOLY to flush the polyline to
+*     GKS and start a new polyline beginning at the last point of the old
+*     one.  Copy the new point into the buffer and increment the number of
+*     points.
+
+*  Arguments:
+*     X = REAL (Given)
+*         X coordinate of new point
+*     Y = REAL (Given)
+*         Y     "      "   "    "
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_OPOLY
+
+*  Read From Common:
 *     NPOLY  i     Length of current polyline
-*
-*  Written to COMMON:
+
+*  Written To Common:
 *     XPOLY  r()   Polyline buffer (X)
 *     XPOLY  r()   Polyline buffer (Y)
 *     NPOLY  i     Length of current polyline
 *
 *  Constants (from SGSCOM):
 *     LPOLY  i     Maximum number of points in polyline
-*
-*  Externals:
-*     sgs_OPOLY
-*
-*  P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+
 *-
 
       IMPLICIT NONE

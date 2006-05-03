@@ -1,24 +1,40 @@
       SUBROUTINE sgs_INIT (LUN, JSTAT)
 *+
-*   - - - - -
-*    I N I T
-*   - - - - -
-*
-*   Open SGS.
-*
-*   Open GKS (unless already open), Set default values in the SGS
-*   common block.
-*
-*   Given:
-*      LUN      i     logical unit for error messages
-*
-*   Returned:
-*      JSTAT    i     status: 0=OK
-*
-*   Externals:
-*      sgs_ISTAT, sgs_1GKSIN, sgs_1SGSIN
-*
-*   P.T.Wallace, D.L.Terrett   Starlink   13 January 1992
+*  Name:
+*     INIT
+
+*  Purpose:
+*     Open SGS.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     Open GKS (unless already open), Set default values in the SGS
+*     common block.
+
+*  Arguments:
+*     LUN = INTEGER (Given)
+*         Logical unit for error messages
+*     JSTAT = INTEGER (Returned)
+*         Status: 0=OK
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     13-JAN-1992 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
+*     sgs_ISTAT, sgs_1GKSIN, sgs_1SGSIN
+
 *-
 
       IMPLICIT NONE

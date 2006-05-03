@@ -1,43 +1,60 @@
       SUBROUTINE sgs_INCHO (NCHOIC, N)
 *+
-*   - - - - - -
-*    I N C H O
-*   - - - - - -
-*
-*   Inquire number of choices on choice device on current SGS
-*   workstation.
-*
-*   If the specified choice device does not exist N is set to zero.
-*     
-*   Given:
-*      NCHOIC     i      SGS choice device
-*
-*   Returned:
-*      N          i      number of choices
-*
-*   Read from COMMON:
-*      IZTW       i()    zone table - SGS workstation ID
-*      ISZID      i      current zone ID
-*      IWTTY      i()    workstation table - workstation type
-*      IWTCA      i()    workstation table - category
-*
-*   Constants from SGSCOM:
-*      MAXCHO     i      maximum number of keyboard choices
-*
-*   Constants from GKS_PAR:
-*      GINPUT      i      workstation category - input
-*      GOUTIN      i           "         "     - input/output
-*
-*   Externals:
-*      GQLI, GQCHD, sgs_1ERR
-*
-*   Errors:
-*      Error returned by GKS inquiry
-*
-*   This routine assumes that if a workstation has a choice device 2
-*   then this is a keyboard.
-*      
-*   P.T.Wallace, D.L.Terrett   Starlink   7 September 1991
+*  Name:
+*     INCHO
+
+*  Purpose:
+*     Inquire number of choices on choice device on current SGS
+*     workstation.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     If the specified choice device does not exist N is set to zero.
+
+*  Arguments:
+*     NCHOIC = INTEGER (Given)
+*         SGS choice device
+*     N = INTEGER (Returned)
+*         Number of choices
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     DLT: D. L. Terrett (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07-SEP-1991 (PTW/DLT):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Constants From GKS_PAR:
+*     GINPUT      i      workstation category - input
+*     GOUTIN      i           "         "     - input/output
+
+*  Constants From Sgscom:
+*     MAXCHO     i      maximum number of keyboard choices
+
+*  Errors:
+*     Error returned by GKS inquiry
+
+*  Notes:
+*     This routine assumes that if a workstation has a choice device 2
+*     then this is a keyboard.
+
+*  Externals:
+*     GQLI, GQCHD, sgs_1ERR
+
+*  Read From Common:
+*     IZTW       i()    zone table - SGS workstation ID
+*     ISZID      i      current zone ID
+*     IWTTY      i()    workstation table - workstation type
+*     IWTCA      i()    workstation table - category
+
 *-
 
       IMPLICIT NONE
