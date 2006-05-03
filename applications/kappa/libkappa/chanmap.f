@@ -21,14 +21,14 @@
 *        The global status.
 
 *  Description:
-*     This application creates a channel-map two-dimensional image from
+*     This application creates a two-dimensional channel-map image from
 *     a three-dimensional NDF.  It collapses along a nominated pixel
-*     axis in a series of slices.  The collapsed slices are tiled with
-*     no margins to form the output image.  This grid of channel maps
-*     is filled from left to right, and bottom to top.  A specified 
-*     range of axis values can be used instead of the whole axis (see
-*     parameters LOW and HIGH).  The number of channels and their 
-*     arrangement into an image is controlled through parameters 
+*     axis in each of a series of slices.  The collapsed slices are 
+*     tiled with no margins to form the output image.  This grid of 
+*     channel maps is filled from left to right, and bottom to top.  A 
+*     specified range of axis values can be used instead of the whole
+*     axis (see parameters LOW and HIGH).  The number of channels and
+*     their arrangement into an image is controlled through parameters 
 *     NCHAN and SHAPE.
 *
 *     For each output pixel, all corresponding input pixel values 
@@ -52,9 +52,7 @@
 *        current Frame axis will be used.
 *     ESTIMATOR = LITERAL (Read)
 *        The method to use for estimating the output pixel values.  It
-*        can be one of the following options.  The first four are
-*        more for general collapsing, and the remainder are for cube
-*        analysis.
+*        can be one of the following options. 
 *          "Mean"   -- Mean value
 *          "WMean"  -- Weighted mean in wich each data value is weighted
 *                      by the reciprocal of the associated variance.  
@@ -62,7 +60,6 @@
 *          "Median" -- Median value.  Note that this is extremely memory
 *                      and CPU intensive for large datasets; use with 
 *                      care!  If strange things happen, use "Mean".
-*
 *          "Absdev" -- Mean absolute deviation from the unweighted mean.
 *          "Comax"  -- Co-ordinate of the maximum value.
 *          "Comin"  -- Co-ordinate of the minimum value.
@@ -111,7 +108,7 @@
 *        Note, HIGH and LOW should not be equal.  If a null value (!) is
 *        supplied for either HIGH or LOW, the entire range of the axis 
 *        fragmented into channels.  [!]
-*     NCHAN = INTEGER (Given)
+*     NCHAN = _INTEGER (Read)
 *        The number of channels to appear in the channel map.  It must 
 *        be a positive integer up to the lesser of 100 or one third of
 *        the number of pixels along the collapsed axis.
@@ -216,6 +213,10 @@
 *     co-ordinate system of the input cube for every tile, except that
 *     each tile has a single representative mean co-ordinate for the
 *     collapsed axis.
+*     -  The slices may have slightly different pixel depths depending 
+*     where the boundaries of the channels lie in pixel co-ordinates.
+*     Excise care interpreting estimators like "Sum" or ensure equal
+*     numbers of pixels in each channel.
 
 *  Related Applications:
 *     KAPPA: COLLAPSE, CLINPLOT.
