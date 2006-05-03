@@ -383,7 +383,7 @@ sub adamtask {
 
      # If I use this method for starting the tasks they 
      # kill themselves when I shutdown.
-#    print "Starting $image...";
+#    print "Starting $image...\n";
     my $pid = new Proc::Simple;
     $pid->kill_on_destroy(1);
     my $status = $pid->start("$image");
