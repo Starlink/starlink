@@ -291,8 +291,6 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
       if( ps ) {
          total_pop += ps->pop;
 
-
-
 /* Tell the user about the new PixelSet. */
          if( ilevel > 3 ) {
             msgSeti( "I", ps->index );

@@ -171,7 +171,7 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
                   d2 += d*d;
 
 /* If this is less than the previous minimum, remember it. */
-                  if( d2 < d2min ) {
+                  if( d2 <= d2min ) {
                      d2min = d2;
                      iclumpmin = iclump;
                   }

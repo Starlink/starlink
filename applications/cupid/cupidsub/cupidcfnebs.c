@@ -115,7 +115,7 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 
 *  Description:
 *     This function returns information about which, if any, PixelSets 
-*     adjoing a given pixel.
+*     adjoin a given pixel.
 
 *  Parameters:
 *     ipa

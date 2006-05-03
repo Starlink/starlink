@@ -230,6 +230,7 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
    supplied diagnostic information. */
    if( extra ) {
       xloc = NULL;  
+      dloc = NULL;  
       ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
       nex = astMapSize( extra );
       for( i = 0; i < nex; i++ ) {

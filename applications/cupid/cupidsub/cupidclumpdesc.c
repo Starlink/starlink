@@ -128,7 +128,7 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
    if( !ret ) {
 
 /* Determine the number of parameters needed to describe the clump. */
-      *ncpar = ndim*3 + 3;
+      *ncpar = ndim*3 + 3; 
 
 /* Allocate memory for this number of parameters. */
       ret = astMalloc( sizeof( double )*( *ncpar ) );

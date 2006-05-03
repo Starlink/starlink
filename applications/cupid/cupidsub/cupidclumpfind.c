@@ -4,6 +4,7 @@
 #include "ast.h"
 #include "star/hds.h"
 #include "prm_par.h"
+#include <stdio.h>
 
 HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                         double *ipv, double rms, AstKeyMap *config, int velax,

@@ -124,5 +124,19 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
       ps2->peak[ 1 ] = ps1->peak[ 1 ];
       ps2->peak[ 2 ] = ps1->peak[ 2 ];
    }
+
+/* Add an list of neigbours contained in the source PixelSet into the
+   list of neighbours in the destination pixelet. */
+   if( ps1->nneb > 0 ) {
+      ps2->nebs = astGrow( ps2->nebs, ps1->nneb + ps2->nneb, sizeof( int ) );
+      if( astOK ) {
+         memcpy( ps2->nebs + ps2->nneb,
+                 ps1->nebs, ps1->nneb*sizeof( int ) );
+         ps2->nneb += ps1->nneb;
+      }
+      ps1->nebs = astFree( ps1->nebs );
+      ps1->nneb = 0;
+   }
+
 }
 
