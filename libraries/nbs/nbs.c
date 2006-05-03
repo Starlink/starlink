@@ -123,6 +123,28 @@
 *     of an access violation if true garbage ID's are passed. This is unlikely
 *     to happen, because of the use of the modified status convention.
 
+*  Copyright:
+*     Copyright (C) 1986-1990, 1993-1994 Science & Engineering Research
+*     Council. Copyright (C) 1999, 2004 Central Laboratory of the
+*     Research Councils. Copyright (C) 2005 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     WFL: William Lupton (AAO)
 *     JAB: Jeremy Bailey (AAO)
@@ -142,128 +164,128 @@
 *        relocation coded directly.
 *     13-Apr-1987 (WFL):
 *        Correct bug whereby MAXNAME-char names are not found
-*	 in NBS_FIND_ITEM since they are not null-terminated.
-*	 Prevent NBS_END_DEFINITION from copying more than
-*	 MAXNAME characters from NAME.
+*         in NBS_FIND_ITEM since they are not null-terminated.
+*         Prevent NBS_END_DEFINITION from copying more than
+*         MAXNAME characters from NAME.
 *     17-Jul-1987 (WFL):
 *        Change names of INCLUDEd files to be NBS_xxx.H.
-*	 Check for zero IDs on entry and replace NULL with NIL.
-*	 Remove ENVID from NBS_GET_NAME.
-*	 New NBS_GET_PARENT, NBS_GET_MODIFIED and NBS_INC_MODIFIED routines.
+*         Check for zero IDs on entry and replace NULL with NIL.
+*         Remove ENVID from NBS_GET_NAME.
+*         New NBS_GET_PARENT, NBS_GET_MODIFIED and NBS_INC_MODIFIED routines.
 *     20-Jul-1987 (WFL):
 *        In NBS_GET_SHAPE, regard MAXDIMS as modified argument
-*	 and return as maximum number of dimensions.
-*	 Alter interface to NBS_STR* routines.
-*	 Use ODD function for testing incoming LOGICALs.
-*	 Replace NBS_COPY with _CHMOVE macro.
-*	 New status NBS__TOOMANYBYTES in NBS_PUT_VALUE, plus
-*	 use NBS__TOOMANYDIMS in NBS_PUT_SHAPE.
+*         and return as maximum number of dimensions.
+*         Alter interface to NBS_STR* routines.
+*         Use ODD function for testing incoming LOGICALs.
+*         Replace NBS_COPY with _CHMOVE macro.
+*         New status NBS__TOOMANYBYTES in NBS_PUT_VALUE, plus
+*         use NBS__TOOMANYDIMS in NBS_PUT_SHAPE.
 *     21-Jul-1987 (WFL):
 *        Add new NBS_PUT_SIZE routine.
-*	 Add definition size, section size and version to the
-*	 board info that is part of the global section - check version
-*	 in NBS_FIND_NOTICEBOARD
-*	 In NBS_FIND_NOTICEBOARD, make a relocated copy of the
-*	 entire noticeboard definition and thus dispense with the
-*	 relocating in NBS_FIND_ITEM and NBS_FIND_NTH_ITEM.
-*	 Correct apparent bug in NBS_FIND_NOTICEBOARD where
-*	 mapper's PID was copied to overwrite creator's PID.
-*	 Bring inline the three NBS_*_FIELDS routines and modify
-*	 so that items are added in alphabetical order.
-*	 Ensure that all routines that return ID's return NIL
-*	 ones if they fail.
-*	 Add logical argument to relocate routines telling
-*	 them whether to add or subtract the offset. Split IFS_OFFSET
-*	 argument into I_OFFSET for items and FBS_OFFSET for fixed,
-*	 board and shape information.
+*         Add definition size, section size and version to the
+*         board info that is part of the global section - check version
+*         in NBS_FIND_NOTICEBOARD
+*         In NBS_FIND_NOTICEBOARD, make a relocated copy of the
+*         entire noticeboard definition and thus dispense with the
+*         relocating in NBS_FIND_ITEM and NBS_FIND_NTH_ITEM.
+*         Correct apparent bug in NBS_FIND_NOTICEBOARD where
+*         mapper's PID was copied to overwrite creator's PID.
+*         Bring inline the three NBS_*_FIELDS routines and modify
+*         so that items are added in alphabetical order.
+*         Ensure that all routines that return ID's return NIL
+*         ones if they fail.
+*         Add logical argument to relocate routines telling
+*         them whether to add or subtract the offset. Split IFS_OFFSET
+*         argument into I_OFFSET for items and FBS_OFFSET for fixed,
+*         board and shape information.
 *     22-Jul-1987 (WFL):
 *        Remove board_info BASE; set up BOARD pointers at
-*   	 definition time and don't take local copies of board_info.
+*            definition time and don't take local copies of board_info.
 *     31-Jul-1987 (WFL):
 *        Extend header comments.
-*	 Insert missing braces after IF_OK... macro calls.
+*         Insert missing braces after IF_OK... macro calls.
 *     06-Nov-1987 (WFL):
 *        Portable VMS / UNIX version. Use vms / unix / strdescr
-*	 macros as necessary.
+*         macros as necessary.
 *     11-Feb-1988 (WFL):
 *        Use macros for routine names and use NBS_ prefix when
-*	 strdescr is defined, NBC_ when it is not. Also use #module to
-*	 set module name explicitly. Change strdescr to c_string.
-*	 Change NBS_ADD_INTERLOCKED to ADD_INTERLOCKED.
-*	 Change SAVE to character OPTION in NBS_END_DEFINITION.
-*	 Add OFFSET arguments to NBS_PUT_VALUE and NBS_GET_VALUE.
+*         strdescr is defined, NBC_ when it is not. Also use #module to
+*         set module name explicitly. Change strdescr to c_string.
+*         Change NBS_ADD_INTERLOCKED to ADD_INTERLOCKED.
+*         Change SAVE to character OPTION in NBS_END_DEFINITION.
+*         Add OFFSET arguments to NBS_PUT_VALUE and NBS_GET_VALUE.
 *     16-Feb-1988 (WFL):
 *        Add TIMEOUT_COUNT, WORLD_WRITE, INCREMENT_MODIFY and
-*	 CHECK_MODIFY static variables and NBS_TUNE routine to alter them
-*	 Add handling of FIXED_INFO CHILDREN component.
-*	 Add handling of BOARD_INFO MODIFIED component and return
-*	 it with NBS_GET_MODIFIED for non-primitive items.
-*	 Add NBS_GET_CHILDREN to return number of children and
-*	 NBS_GET_INFO to return miscellaneous information about a
-*	 noticeboard.
-*	 Make NBS_FIND_ITEM use a binary search (since the
-*	 names are known to be linked in alphabetical order).
+*         CHECK_MODIFY static variables and NBS_TUNE routine to alter them
+*         Add handling of FIXED_INFO CHILDREN component.
+*         Add handling of BOARD_INFO MODIFIED component and return
+*         it with NBS_GET_MODIFIED for non-primitive items.
+*         Add NBS_GET_CHILDREN to return number of children and
+*         NBS_GET_INFO to return miscellaneous information about a
+*         noticeboard.
+*         Make NBS_FIND_ITEM use a binary search (since the
+*         names are known to be linked in alphabetical order).
 *     17-Feb-1988 (WFL):
 *        Receive definitions of MAXALLOC, ITEM_BASE and DATA_BASE
-*	 from NBS_MAC.H and allow tune of MAXALLOC (now called
-*	 MAX_DEFN_SIZE).
+*         from NBS_MAC.H and allow tune of MAXALLOC (now called
+*         MAX_DEFN_SIZE).
 *     03-Mar-1988 (WFL):
 *        Improve binary search.
-*	 Update comments ready for use in documentation.
+*         Update comments ready for use in documentation.
 *     25-Mar-1988 (WFL):
 *        Simple-minded implementation of saving data to
-*	 disc, restoring from disc etc. Involves new NBS_RESTORE_NOTICE-
-*	 BOARD and NBS_SAVE_NOTICEBOARD routines.
-*	 Alter NBS_GET_INFO to take name of required item (so
-*	 that the interface need not continually change).
+*         disc, restoring from disc etc. Involves new NBS_RESTORE_NOTICE-
+*         BOARD and NBS_SAVE_NOTICEBOARD routines.
+*         Alter NBS_GET_INFO to take name of required item (so
+*         that the interface need not continually change).
 *     28-Mar-1988 (WFL):
 *        Rationalise initialisation of BOARD_INFO components.
 *     30-Mar-1988 (WFL):
 *        Only use #module on VMS; allow NBS_TUNE to use same
-*	 arguments for new and old values; make NBS_END_DEFINITION
-*	 clear DEFINING even if it fails (once re-location is done);
-*	 re-order NBS_INC_MODIFIED and NBS_PUT_SIZE.
+*         arguments for new and old values; make NBS_END_DEFINITION
+*         clear DEFINING even if it fails (once re-location is done);
+*         re-order NBS_INC_MODIFIED and NBS_PUT_SIZE.
 *     08-Apr-1988 (WFL):
 *        (Again) update comments ready for use in documentation.
 *     20-May-1988 (WFL):
 *        Use NBS_INTIMP to import input integers (allows them
-*	 to be passed by value for the C interfaces).
+*         to be passed by value for the C interfaces).
 *     10-Apr-1989 (WFL):
 *        Use EXTERN rather than STATIC so that NBS and NBC
-*	 routines can be used intermingled (but not values alterable
-*	 using NBS_TUNE, since these are initialised)
+*         routines can be used intermingled (but not values alterable
+*         using NBS_TUNE, since these are initialised)
 *     01-Feb-1990 (WFL):
 *        Add TIMEOUT_INTERVAL to list of tuneable parameters;
-*	 add NBS_TUNE_NOTICEBOARD and set extra board info parameters
-*	 on noticeboard creation; use noticeboard-specific parameters
-*	 on get and put; maintain ACCESSED count; allow use of same
-*	 variable for ENV(S)ID and (S)ID; on find noticeboard, wait
-*	 for it to be valid; delay between tries on get
+*         add NBS_TUNE_NOTICEBOARD and set extra board info parameters
+*         on noticeboard creation; use noticeboard-specific parameters
+*         on get and put; maintain ACCESSED count; allow use of same
+*         variable for ENV(S)ID and (S)ID; on find noticeboard, wait
+*         for it to be valid; delay between tries on get
 *     02-Feb-1990 (WFL):
 *        Add NBS_LOSE_NOTICEBOARD and NBS_LOSE_ITEM; if notice-
-*	 board existed when being created, adopt current process as
-*	 owner; on NBS_FIND_NOTICEBOARD and if owner, unmap section
-*	 mapped on create
+*         board existed when being created, adopt current process as
+*         owner; on NBS_FIND_NOTICEBOARD and if owner, unmap section
+*         mapped on create
 *     06-Feb-1990 (WFL):
 *        Account for PARENT, DATA and ACCESSED being in unions;
-*	 maintain TRIGGER and MODIFIED in ITEM_DESCR; use
-*	 _ADD_INTERLOCKED macro (uses _ADAWI); add new NBS_PUT_TRIGGER,
-*	 NBS_GET_MODIFIED_POINTER and NBS_GET_UPDATED routines; be
-*	 careful to unmap if mapping routine fails after having mapped;
-*	 add use of ORIGINAL_UNMAPPED
+*         maintain TRIGGER and MODIFIED in ITEM_DESCR; use
+*         _ADD_INTERLOCKED macro (uses _ADAWI); add new NBS_PUT_TRIGGER,
+*         NBS_GET_MODIFIED_POINTER and NBS_GET_UPDATED routines; be
+*         careful to unmap if mapping routine fails after having mapped;
+*         add use of ORIGINAL_UNMAPPED
 *     07-Feb-1990 (WFL):
 *        Account for SHAPE and GLOBAL_BASE being in unions;
-*	 update modified count for NBS_PUT_SIZE; explicitly set NIL
-*	 top-level PARENT in relocated copy of definition
+*         update modified count for NBS_PUT_SIZE; explicitly set NIL
+*         top-level PARENT in relocated copy of definition
 *     09-Feb-1990 (WFL):
 *        Upgrade comments; GET_MODIFIED_POINTER to work for
-*	 structures too; always increment noticeboard modified count;
-*	 use ADD_INTERLOCKED for noticeboard modified count increment;
-*	 use OR of NBS_TUNE flags and NBS_TUNE_NOTICEBOARD flags for
-*	 upwards compatibility; correct test for NBS__DATASAVED
+*         structures too; always increment noticeboard modified count;
+*         use ADD_INTERLOCKED for noticeboard modified count increment;
+*         use OR of NBS_TUNE flags and NBS_TUNE_NOTICEBOARD flags for
+*         upwards compatibility; correct test for NBS__DATASAVED
 *     15-Feb-1990 (WFL):
 *        Revert to regarding TIMEOUT_COUNT and TIMEOUT_DELAY
-*	 as per-process values
+*         as per-process values
 *     25-Mar-1993 (DJA):
 *        Error reporting by EMS. All high level routines report errors
 *        as well as setting STATUS bad.
@@ -598,10 +620,40 @@ static int check_modify = YES; /* Whether to check MODIFIED on GET */
 *        The old value of the parameter.
 *     STATUS = INTEGER (Given and returned)
 *        The global status.
-*        	NBS__BADOPTION	=> Illegal parameter name
+*                NBS__BADOPTION	=> Illegal parameter name
 
-*  Prior Requirements:
-*     None.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     01-Feb-1990 (WFL):
+*        Original version.
+*     22-Mar-1993 (DJA):
+*        Updated FORTRAN string handling. Added error reporting.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     NBS:
@@ -610,12 +662,9 @@ static int check_modify = YES; /* Whether to check MODIFIED on GET */
 *        STRNCMP            Compare one string with another up to a specified
 *                           limiting number of characters
 
-*  History:
-*     01-Feb-1990 (WFL):
-*        Original version.
-*     22-Mar-1993 (DJA):
-*        Updated FORTRAN string handling. Added error reporting.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     None.
+
 *-
 */
 int NBS_TUNE ( RW_CHARACTER(name), R_INTEGER(value), W_INTEGER(oldvalue),
@@ -738,11 +787,41 @@ int NBS_TUNE ( RW_CHARACTER(name), R_INTEGER(value), W_INTEGER(oldvalue),
 *        The old value of the parameter.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*        	NBS__NILID	=> NIL ID
-*		NBS__BADOPTION	=> Illegal parameter name
+*                NBS__NILID	=> NIL ID
+*        	NBS__BADOPTION	=> Illegal parameter name
 
-*  Prior Requirements:
-*     None.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     01-Feb-1990 (WFL):
+*        Original version.
+*     22-Mar-1993 (DJA):
+*        Updated FORTRAN string handling. Added error reporting.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     NBS:
@@ -751,12 +830,9 @@ int NBS_TUNE ( RW_CHARACTER(name), R_INTEGER(value), W_INTEGER(oldvalue),
 *        STRNCMP            Compare one string with another up to a specified
 *                           limiting number of characters
 
-*  History:
-*     01-Feb-1990 (WFL):
-*        Original version.
-*     22-Mar-1993 (DJA):
-*        Updated FORTRAN string handling. Added error reporting.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     None.
+
 *-
 */
 int NBS_TUNE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(name), R_INTEGER(value),
@@ -872,12 +948,42 @@ int NBS_TUNE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(name), R_INTEGER(value),
 *        be used in subsequent calls to the NBS_DEFINE_* routines.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__DEFINING   => Already defining a noticeboard
-*		NBS__INITALLOCFAILED => Storage allocation failed
-*		NBS__NOMOREROOM => Storage area is full up
+*        	NBS__DEFINING   => Already defining a noticeboard
+*        	NBS__INITALLOCFAILED => Storage allocation failed
+*        	NBS__NOMOREROOM => Storage area is full up
 
-*  Prior Requirements:
-*     None.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     22-Jul-1990 (WFL):
+*        Original version.
+*     22-Mar-1993 (DJA):
+*        Updated FORTRAN string handling. Added error reporting.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     NBS:
@@ -886,12 +992,9 @@ int NBS_TUNE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(name), R_INTEGER(value),
 *     C RTL:
 *        STRNCPY            Copy one string to another up to a specified limit
 
-*  History:
-*     22-Jul-1990 (WFL):
-*        Original version.
-*     22-Mar-1993 (DJA):
-*        Updated FORTRAN string handling. Added error reporting.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     None.
+
 *-
 */
 int NBS_BEGIN_DEFINITION ( item_id *sid, W_INTEGER(status) )
@@ -1062,13 +1165,43 @@ int NBS_BEGIN_DEFINITION ( item_id *sid, W_INTEGER(status) )
 *        subsequent calls to the NBS_DEFINE_* routines.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NOTDEFINING => Not currently defining a noticeboard
-*		NBS__NILSID	    => NIL static ID
-*		NBS__PRIMITIVE  => Prospective parent is primitive
-*		NBS__NOMOREROOM => Storage area is full up
+*        	NBS__NOTDEFINING => Not currently defining a noticeboard
+*        	NBS__NILSID	    => NIL static ID
+*        	NBS__PRIMITIVE  => Prospective parent is primitive
+*        	NBS__NOMOREROOM => Storage area is full up
 
-*  Prior Requirements:
-*     NBS_BEGIN_DEFINITION must have been called.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     22-Jul-1990 (WFL):
+*        Original version.
+*     22-Mar-1993 (DJA):
+*        Updated FORTRAN string handling. Added error reporting.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     NBS:
@@ -1079,12 +1212,9 @@ int NBS_BEGIN_DEFINITION ( item_id *sid, W_INTEGER(status) )
 *                           limiting number of characters
 *        STRNCPY            Copy one string to another up to a specified limit
 
-*  History:
-*     22-Jul-1990 (WFL):
-*        Original version.
-*     22-Mar-1993 (DJA):
-*        Updated FORTRAN string handling. Added error reporting.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     NBS_BEGIN_DEFINITION must have been called.
+
 *-
 */
 int NBS_DEFINE_STRUCTURE ( R_INTEGER(envsid), RW_CHARACTER(name), 
@@ -1223,7 +1353,7 @@ int NBS_DEFINE_STRUCTURE ( R_INTEGER(envsid), RW_CHARACTER(name),
 
 *  Invocation:
 *     (Int) = NBS_DEFINE_PRIMITIVE (ENVSID,NAME,TYPE,MAXDIMS,MAXBYTES,
-*							   SID,STATUS)
+*        						   SID,STATUS)
 
 *  Description:
 *     Check that we are currently in the middle of defining a noticeboard. \\
@@ -1254,13 +1384,43 @@ int NBS_DEFINE_STRUCTURE ( R_INTEGER(envsid), RW_CHARACTER(name),
 *        is permitted though).
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NOTDEFINING => Not currently defining a noticeboard
-*		NBS__NILSID	    => NIL static ID
-*		NBS__PRIMITIVE  => Prospective parent is primitive
-*		NBS__NOMOREROOM => Storage area is full up
+*        	NBS__NOTDEFINING => Not currently defining a noticeboard
+*        	NBS__NILSID	    => NIL static ID
+*        	NBS__PRIMITIVE  => Prospective parent is primitive
+*        	NBS__NOMOREROOM => Storage area is full up
 
-*  Prior Requirements:
-*     NBS_BEGIN_DEFINITION must have been called.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     22-Jul-1990 (WFL):
+*        Original version.
+*     22-Mar-1993 (DJA):
+*        Updated FORTRAN string handling. Added error reporting.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     NBS:
@@ -1271,12 +1431,9 @@ int NBS_DEFINE_STRUCTURE ( R_INTEGER(envsid), RW_CHARACTER(name),
 *                           limiting number of characters
 *        STRNCPY            Copy one string to another up to a specified limit
 
-*  History:
-*     22-Jul-1990 (WFL):
-*        Original version.
-*     22-Mar-1993 (DJA):
-*        Updated FORTRAN string handling. Added error reporting.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     NBS_BEGIN_DEFINITION must have been called.
+
 *-
 */
 int NBS_DEFINE_PRIMITIVE ( R_INTEGER(envsid), RW_CHARACTER(name),
@@ -1446,16 +1603,33 @@ int NBS_DEFINE_PRIMITIVE ( R_INTEGER(envsid), RW_CHARACTER(name),
 *        Dimensions.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NOTDEFINING => Not currently defining a noticeboard
-*		NBS__NILSID	    => NIL static ID
-*		NBS__PRIMITIVE  => Prospective parent is primitive
-*		NBS__TOOMANYDIMS => Too many dimensions
+*        	NBS__NOTDEFINING => Not currently defining a noticeboard
+*        	NBS__NILSID	    => NIL static ID
+*        	NBS__PRIMITIVE  => Prospective parent is primitive
+*        	NBS__TOOMANYDIMS => Too many dimensions
 
-*  Prior Requirements:
-*     NBS_BEGIN_DEFINITION must have been called.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     22-Jul-1990 (WFL):
@@ -1463,6 +1637,16 @@ int NBS_DEFINE_PRIMITIVE ( R_INTEGER(envsid), RW_CHARACTER(name),
 *     22-Mar-1993 (DJA):
 *        Added error reporting.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None.
+
+*  Prior Requirements:
+*     NBS_BEGIN_DEFINITION must have been called.
+
 *-
 */
 int NBS_DEFINE_SHAPE ( R_INTEGER(sid), R_INTEGER(ndims),
@@ -1571,26 +1755,56 @@ int NBS_DEFINE_SHAPE ( R_INTEGER(sid), R_INTEGER(ndims),
 *        recommended because new options may be supported in the future. Case 
 *        is not significant. Possible values are:
 *
-*	    DEFINITION_SAVE => Save the definition to a file that
-*			does not contain space allocated for the data.
+*            DEFINITION_SAVE => Save the definition to a file that
+*        		does not contain space allocated for the data.
 *           NOTICEBOARD_SAVE => Save the definition to a file that
-*			does contains space allocated for the data.
-*	    CREATE_NOTICEBOARD => Create the noticeboard immediately
-*			without associating it with a file. This is assumed
-*			if an illegal value of OPTION is given.
+*        		does contains space allocated for the data.
+*            CREATE_NOTICEBOARD => Create the noticeboard immediately
+*        		without associating it with a file. This is assumed
+*        		if an illegal value of OPTION is given.
 *
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NOTDEFINING => Not currently defining a noticeboard
-*		NBS__CANTOPEN   => Can't create the definition file
-*		NBS__CANTWRITE  => Can't write the definition file
-*		NBS__SECTIONEXISTED => Noticeboard of this name already
-*				    existed
+*        	NBS__NOTDEFINING => Not currently defining a noticeboard
+*        	NBS__CANTOPEN   => Can't create the definition file
+*        	NBS__CANTWRITE  => Can't write the definition file
+*        	NBS__SECTIONEXISTED => Noticeboard of this name already
+*        			    existed
 *
-*     		SS$_*	    => System service codes from SYS$CRMPSC
+*             	SS$_*	    => System service codes from SYS$CRMPSC
 
-*  Prior Requirements:
-*     NBS_BEGIN_DEFINITION must have been called.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     09-Feb-1990 (WFL):
+*        Original version.
+*     22-Mar-1993 (DJA):
+*        Updated FORTRAN string handling. Added error reporting.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     NBS:
@@ -1606,12 +1820,9 @@ int NBS_DEFINE_SHAPE ( R_INTEGER(sid), R_INTEGER(ndims),
 *        STRNCPY                Copy one string to another up to a specified 
 *                               limit
 
-*  History:
-*     09-Feb-1990 (WFL):
-*        Original version.
-*     22-Mar-1993 (DJA):
-*        Updated FORTRAN string handling. Added error reporting.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     NBS_BEGIN_DEFINITION must have been called.
+
 *-
 */
 int NBS_END_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(option),
@@ -1767,19 +1978,49 @@ int NBS_END_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(option),
 *        default file type of .NBD)
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*	    NBS__CANTOPEN   => Can't open the definition file
-*	    NBS__DATASAVED  => Noticeboard data was saved to the
-*			       definition file --- cannot restore only defn
-*	    NBS__CANTREAD   => Can't read the definition file
-*	    NBS__BADVERSION => Wrong version in definition file
-*	    NBS__SECTIONEXISTED => Noticeboard of this name already
-*				    existed
+*            NBS__CANTOPEN   => Can't open the definition file
+*            NBS__DATASAVED  => Noticeboard data was saved to the
+*        		       definition file --- cannot restore only defn
+*            NBS__CANTREAD   => Can't read the definition file
+*            NBS__BADVERSION => Wrong version in definition file
+*            NBS__SECTIONEXISTED => Noticeboard of this name already
+*        			    existed
 *
-*     	    SS$_*	    => System service codes from SYS$CRMPSC /
-*			       SYS$DELTVA (VMS only)
+*                 SS$_*	    => System service codes from SYS$CRMPSC /
+*        		       SYS$DELTVA (VMS only)
 
-*  Prior Requirements:
-*     None.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     09-Feb-1990 (WFL):
+*        Original version.
+*     22-Mar-1993 (DJA):
+*        Updated FORTRAN string handling. Added error reporting.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     NBS:
@@ -1792,12 +2033,9 @@ int NBS_END_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(option),
 *     C RTL:
 *        GETPID                 Get process ID
 
-*  History:
-*     09-Feb-1990 (WFL):
-*        Original version.
-*     22-Mar-1993 (DJA):
-*        Updated FORTRAN string handling. Added error reporting.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     None.
+
 *-
 */
 int NBS_RESTORE_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(save_name),
@@ -1922,19 +2160,49 @@ int NBS_RESTORE_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(save_name),
 *        default file type of .NBD)
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*	    NBS__CANTOPEN   => Can't open the definition file
-*	    NBS__CANTREAD   => Can't read the definition file
-*	    NBS__BADVERSION => Wrong version in definition file
-*	    NBS__SECTIONEXISTED => Noticeboard of this name already
-*			       existed
-*	    NBS__DATANOTSAVED => Noticeboard data not saved to the
-*			       definition file, so not restored
+*            NBS__CANTOPEN   => Can't open the definition file
+*            NBS__CANTREAD   => Can't read the definition file
+*            NBS__BADVERSION => Wrong version in definition file
+*            NBS__SECTIONEXISTED => Noticeboard of this name already
+*        		       existed
+*            NBS__DATANOTSAVED => Noticeboard data not saved to the
+*        		       definition file, so not restored
 *
-*     	    SS$_*	    => System service codes from SYS$CRMPSC /
-*			       SYS$DELTVA (VMS only)
+*                 SS$_*	    => System service codes from SYS$CRMPSC /
+*        		       SYS$DELTVA (VMS only)
 
-*  Prior Requirements:
-*     None.
+*  Copyright:
+*     Copyright (C) 1988, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     25-Mar-1988 (WFL):
+*        Original version.
+*     22-Mar-1993 (DJA):
+*        Updated FORTRAN string handling. Added error reporting.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     NBS:
@@ -1945,16 +2213,13 @@ int NBS_RESTORE_DEFINITION ( RW_CHARACTER(name), RW_CHARACTER(save_name),
 *        NBS_RELOCATE_ADDRESS   Relocate an individual address
 *        NBS_STRIMP             Import a string, converting to upper-case
 *        NBS_CREATE_SECTION     Create a noticeboard
-*        NBS_UNMAP_SECTION	Unmap an existing noticeboard
+*        NBS_UNMAP_SECTION        Unmap an existing noticeboard
 *     C RTL:
 *        GETPID                 Get process ID
 
-*  History:
-*     25-Mar-1988 (WFL):
-*        Original version.
-*     22-Mar-1993 (DJA):
-*        Updated FORTRAN string handling. Added error reporting.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     None.
+
 *-
 */
 int NBS_RESTORE_NOTICEBOARD ( RW_CHARACTER(name), RW_CHARACTER(save_name),
@@ -2067,25 +2332,39 @@ int NBS_RESTORE_NOTICEBOARD ( RW_CHARACTER(name), RW_CHARACTER(save_name),
 *  Arguments:
 *     ID = INTEGER (Given)
 *        Identifier of noticeboard or of any item in
-*	 the noticeboard whose data is to be saved.
+*         the noticeboard whose data is to be saved.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*	    NBS__NILID	    => NIL ID
-*	    NBS__CANTOPEN   => Can't open the definition file
-*	    NBS__NOTOWNER   => Caller does not own the noticeboard
-*	    NBS__DATANOTRESTORED => Noticeboard data was not restored
-*			       from the definition file (so can't save it)
-*	    NBS__CANTOPEN   => Can't open the definition file
-*	    NBS__CANTWRITE  => Can't write the definition file
+*            NBS__NILID	    => NIL ID
+*            NBS__CANTOPEN   => Can't open the definition file
+*            NBS__NOTOWNER   => Caller does not own the noticeboard
+*            NBS__DATANOTRESTORED => Noticeboard data was not restored
+*        		       from the definition file (so can't save it)
+*            NBS__CANTOPEN   => Can't open the definition file
+*            NBS__CANTWRITE  => Can't write the definition file
 
-*  Prior Requirements:
-*     None.
+*  Copyright:
+*     Copyright (C) 1988, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     NBS:
-*        NBS_UPDATE_FILE        Write data to a noticeboard definition file
-*        NBS_OPEN_WRITE         Open a noticeboard definition file
-*                               for write access
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     25-Mar-1988 (WFL):
@@ -2093,6 +2372,19 @@ int NBS_RESTORE_NOTICEBOARD ( RW_CHARACTER(name), RW_CHARACTER(save_name),
 *     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     NBS:
+*        NBS_UPDATE_FILE        Write data to a noticeboard definition file
+*        NBS_OPEN_WRITE         Open a noticeboard definition file
+*                               for write access
+
+*  Prior Requirements:
+*     None.
+
 *-
 */
 int NBS_SAVE_NOTICEBOARD ( R_INTEGER(id), W_INTEGER(status) )
@@ -2225,25 +2517,36 @@ int NBS_SAVE_NOTICEBOARD ( R_INTEGER(id), W_INTEGER(status) )
 *        Identifier of the top-level of the noticeboard.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__SECTIONNOTFOUND => No section called NAME existed
-*		NBS__TIMEOUT    => Timeout awaiting valid noticeboard
-*		NBS__NOMOREROOM => Failed to allocate private memory area
-*		NBS__BADVERSION => Wrong version in noticeboard
-*               
-*     		SS$_*	    	=> System service codes from SYS$CRMPSC /
-*				   SYS$DELTVA
+*        	NBS__SECTIONNOTFOUND => No section called NAME existed
+*        	NBS__TIMEOUT    => Timeout awaiting valid noticeboard
+*        	NBS__NOMOREROOM => Failed to allocate private memory area
+*        	NBS__BADVERSION => Wrong version in noticeboard
+*
+*             	SS$_*	    	=> System service codes from SYS$CRMPSC /
+*        			   SYS$DELTVA
 
-*  Prior Requirements:
-*     None.
+*  Copyright:
+*     Copyright (C) 1990, 1993-1994 Science & Engineering Research
+*     Council. All Rights Reserved.
 
-*  External Routines Used:
-*     NBS:
-*        NBS_MAP_SECTION	Map an existing noticeboard
-*        NBS_RELOCATE_ITEM	Relocate addresses in item descriptor
-*        NBS_UNMAP_SECTION	Unmap an existing noticeboard
-*     C RTL:
-*        GETPID                 Get process ID
-*        MALLOC                 Allocate dynamic memory
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     06-Feb-1990 (WFL):
@@ -2253,6 +2556,22 @@ int NBS_SAVE_NOTICEBOARD ( R_INTEGER(id), W_INTEGER(status) )
 *      8-Mar-1994 (DJA):
 *        Updated handling of external pointers using EXPORT_POINTER.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     NBS:
+*        NBS_MAP_SECTION        Map an existing noticeboard
+*        NBS_RELOCATE_ITEM        Relocate addresses in item descriptor
+*        NBS_UNMAP_SECTION        Unmap an existing noticeboard
+*     C RTL:
+*        GETPID                 Get process ID
+*        MALLOC                 Allocate dynamic memory
+
+*  Prior Requirements:
+*     None.
+
 *-
 */
 int NBS_FIND_NOTICEBOARD ( RW_CHARACTER(name), item_id *id,
@@ -2441,19 +2760,32 @@ int NBS_FIND_NOTICEBOARD ( RW_CHARACTER(name), item_id *id,
 *        Identifier of the found item (zero if not found).
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*		NBS__PRIMITIVE	  => Parent is primitive
-*		NBS__ITEMNOTFOUND => No item of this name exists
+*        	NBS__NILID	  => NIL ID
+*        	NBS__PRIMITIVE	  => Parent is primitive
+*        	NBS__ITEMNOTFOUND => No item of this name exists
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1987, 1993-1994 Science & Engineering Research
+*     Council. All Rights Reserved.
 
-*  External Routines Used:
-*     NBS:
-*        NBS_STRIMP 		Import a string, converting to upper-case
-*     C RTL:
-*        STRNCMP		Compare one string with another up to 
-*                               specified limit
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     22-Jul-1987 (WFL):
@@ -2463,6 +2795,20 @@ int NBS_FIND_NOTICEBOARD ( RW_CHARACTER(name), item_id *id,
 *      8-Mar-1994 (DJA):
 *        Updated handling of external pointers using EXPORT_POINTER.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     NBS:
+*        NBS_STRIMP         	Import a string, converting to upper-case
+*     C RTL:
+*        STRNCMP        	Compare one string with another up to 
+*                               specified limit
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_FIND_ITEM ( R_INTEGER(envid), RW_CHARACTER(name), item_id *id,
@@ -2583,15 +2929,32 @@ int NBS_FIND_ITEM ( R_INTEGER(envid), RW_CHARACTER(name), item_id *id,
 *        Identifier of the found item (zero if not found).
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*		NBS__PRIMITIVE	  => Parent is primitive
-*		NBS__ITEMNOTFOUND => No item of this name exists
+*        	NBS__NILID	  => NIL ID
+*        	NBS__PRIMITIVE	  => Parent is primitive
+*        	NBS__ITEMNOTFOUND => No item of this name exists
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1987, 1993-1994 Science & Engineering Research
+*     Council. All Rights Reserved.
 
-*  External Routines Used:
-*     None.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -2601,6 +2964,16 @@ int NBS_FIND_ITEM ( R_INTEGER(envid), RW_CHARACTER(name), item_id *id,
 *      8-Mar-1994 (DJA):
 *        Updated handling of external pointers using EXPORT_POINTER.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None.
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_FIND_NTH_ITEM ( R_INTEGER(envid), R_INTEGER(posn),
@@ -2727,21 +3100,51 @@ int NBS_FIND_NTH_ITEM ( R_INTEGER(envid), R_INTEGER(posn),
 *        may be supported in the future. Case is not significant. Possible 
 *        values are{:}
 *
-*	    FORCE => Unmap the noticeboard regardless of whether there
-*		     identifiers derived from this one.
+*            FORCE => Unmap the noticeboard regardless of whether there
+*        	     identifiers derived from this one.
 *           CHECK => Check that no identifiers are derived from this
-*	             one (assumed if invalid option is given).
+*                     one (assumed if invalid option is given).
 *
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*		NBS__NOTTOPLEVEL  => ID is not a top-level identifier
-*		NBS__HASIDS	  => Noticeboard has identifiers derived
-*				     from it
-*		SS$_*	          => System service codes from SYS$DELTVA
+*        	NBS__NILID	  => NIL ID
+*        	NBS__NOTTOPLEVEL  => ID is not a top-level identifier
+*        	NBS__HASIDS	  => Noticeboard has identifiers derived
+*        			     from it
+*        	SS$_*	          => System service codes from SYS$DELTVA
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     02-Feb-1990 (WFL):
+*        Original version.
+*     22-Mar-1993 (DJA):
+*        Updated FORTRAN string handling. Added error reporting.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     NBS:
@@ -2750,12 +3153,9 @@ int NBS_FIND_NTH_ITEM ( R_INTEGER(envid), R_INTEGER(posn),
 *     C RTL:
 *        FREE               Free dynamic memory
 
-*  History:
-*     02-Feb-1990 (WFL):
-*        Original version.
-*     22-Mar-1993 (DJA):
-*        Updated FORTRAN string handling. Added error reporting.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_LOSE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(option),
@@ -2851,27 +3251,43 @@ int NBS_LOSE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(option),
 *        may be supported in the future. Case is not significant. Possible 
 *        values are{:}
 *
-*	    FORCE => Unmap the item regardless of whether there
-*	             identifiers derived from this one.
+*            FORCE => Unmap the item regardless of whether there
+*                     identifiers derived from this one.
 *           CHECK => Check that no identifiers are derived from this
-*		     one (assumed if invalid option is given).
+*        	     one (assumed if invalid option is given).
 *
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*		NBS__NOTTOPLEVEL  => ID is not a top-level identifier
-*		NBS__NEVERFOUND   => Item was never found (or more items
-*				     have been lost than were found)
-*		NBS__HASIDS	  => Noticeboard has identifiers derived
-*				     from it
-*		SS$_*	          => System service codes from SYS$DELTVA
+*        	NBS__NILID	  => NIL ID
+*        	NBS__NOTTOPLEVEL  => ID is not a top-level identifier
+*        	NBS__NEVERFOUND   => Item was never found (or more items
+*        			     have been lost than were found)
+*        	NBS__HASIDS	  => Noticeboard has identifiers derived
+*        			     from it
+*        	SS$_*	          => System service codes from SYS$DELTVA
 
-*  Prior Requirements:
-*     NBS_FIND_ITEM must have been called.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     NBS:
-*        NBS_STRIMP         Import a string, converting to upper-case
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     02-Feb-1990 (WFL):
@@ -2879,6 +3295,17 @@ int NBS_LOSE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(option),
 *     22-Mar-1993 (DJA):
 *        Updated FORTRAN string handling. Added error reporting.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     NBS:
+*        NBS_STRIMP         Import a string, converting to upper-case
+
+*  Prior Requirements:
+*     NBS_FIND_ITEM must have been called.
+
 *-
 */
 int NBS_LOSE_ITEM ( R_INTEGER(id), RW_CHARACTER(option),
@@ -3057,11 +3484,11 @@ int NBS_LOSE_ITEM ( R_INTEGER(id), RW_CHARACTER(option),
 *        Bytes to be put.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*		NBS__NOTPRIMITIVE => Item is not primitive
-*		NBS__NOTOWNER 	  => Caller does not own the noticeboard
-*		NBS__BADOFFSET	  => Negative offset specified
-*		NBS__TOOMANYBYTES => Not room to put all the data
+*        	NBS__NILID	  => NIL ID
+*        	NBS__NOTPRIMITIVE => Item is not primitive
+*        	NBS__NOTOWNER 	  => Caller does not own the noticeboard
+*        	NBS__BADOFFSET	  => Negative offset specified
+*        	NBS__TOOMANYBYTES => Not room to put all the data
 
 *  Notes:
 *     In versions prior to {V2.4.0} this routine could be used to write
@@ -3069,11 +3496,28 @@ int NBS_LOSE_ITEM ( R_INTEGER(id), RW_CHARACTER(option),
 *     the character data. A new routine, NBS_PUT_CVALUE, has been provided
 *     to remove the need for %REF and make the method portable.
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1988, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     16-Feb-1988 (WFL):
@@ -3081,6 +3525,16 @@ int NBS_LOSE_ITEM ( R_INTEGER(id), RW_CHARACTER(option),
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None.
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_PUT_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(nbytes),
@@ -3203,26 +3657,53 @@ int NBS_PUT_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(nbytes),
 *        The string to be put.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*		NBS__NOTPRIMITIVE => Item is not primitive
-*		NBS__NOTOWNER 	  => Caller does not own the noticeboard
-*		NBS__BADOFFSET	  => Negative offset specified
-*		NBS__TOOMANYBYTES => Not room to put all the data
+*        	NBS__NILID	  => NIL ID
+*        	NBS__NOTPRIMITIVE => Item is not primitive
+*        	NBS__NOTOWNER 	  => Caller does not own the noticeboard
+*        	NBS__BADOFFSET	  => Negative offset specified
+*        	NBS__TOOMANYBYTES => Not room to put all the data
 
 *  Notes:
 *     Replaces NBS_PUT_VALUE when writing character strings to noticeboards.
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council. All
+*     Rights Reserved.
 
-*  External Routines Used:
-*     NBS:
-*        NBS_PUT_VALUE        Write a byte array to an item
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     05-Mar-1993 (DJA):
 *        Original version.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     NBS:
+*        NBS_PUT_VALUE        Write a byte array to an item
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_PUT_CVALUE ( R_INTEGER(id), R_INTEGER(offset), RW_CHARACTER(string),
@@ -3286,16 +3767,33 @@ return (*status);
 *        Dimensions to be put.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*		NBS__NOTPRIMITIVE => Item is not primitive
-*		NBS__NOTOWNER 	  => Caller does not own the noticeboard
-*		NBS__TOOMANYDIMS  => NDIMS is greater than item max dims
+*        	NBS__NILID	  => NIL ID
+*        	NBS__NOTPRIMITIVE => Item is not primitive
+*        	NBS__NOTOWNER 	  => Caller does not own the noticeboard
+*        	NBS__TOOMANYDIMS  => NDIMS is greater than item max dims
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1988, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     16-Feb-1988 (WFL):
@@ -3303,6 +3801,16 @@ return (*status);
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None.
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_PUT_SHAPE ( R_INTEGER(id), R_INTEGER(ndims), RW_INTEGER_ARRAY(dims),
@@ -3422,16 +3930,33 @@ int NBS_PUT_SHAPE ( R_INTEGER(id), R_INTEGER(ndims), RW_INTEGER_ARRAY(dims),
 *        new item size in bytes.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*		NBS__NOTPRIMITIVE => Item is not primitive
-*		NBS__NOTOWNER 	  => Caller does not own the noticeboard
-*		NBS__TOOMANYBYTES => NBYTES is greater than item size
+*        	NBS__NILID	  => NIL ID
+*        	NBS__NOTPRIMITIVE => Item is not primitive
+*        	NBS__NOTOWNER 	  => Caller does not own the noticeboard
+*        	NBS__TOOMANYBYTES => NBYTES is greater than item size
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1988, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1988 (WFL):
@@ -3439,6 +3964,16 @@ int NBS_PUT_SHAPE ( R_INTEGER(id), R_INTEGER(ndims), RW_INTEGER_ARRAY(dims),
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None.
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_PUT_SIZE ( R_INTEGER(id), R_INTEGER(nbytes), W_INTEGER(status) )
@@ -3548,14 +4083,31 @@ int NBS_PUT_SIZE ( R_INTEGER(id), R_INTEGER(nbytes), W_INTEGER(status) )
 *        Identifier of the item whose modified count is be incremented.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*		NBS__NOTOWNER 	  => Caller does not own the noticeboard
+*        	NBS__NILID	  => NIL ID
+*        	NBS__NOTOWNER 	  => Caller does not own the noticeboard
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -3563,6 +4115,16 @@ int NBS_PUT_SIZE ( R_INTEGER(id), R_INTEGER(nbytes), W_INTEGER(status) )
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None.
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_INC_MODIFIED ( R_INTEGER(id), W_INTEGER(status) )
@@ -3656,14 +4218,31 @@ int NBS_INC_MODIFIED ( R_INTEGER(id), W_INTEGER(status) )
 *        from FORTRAN) to disable the facility).
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*		NBS__NOTOWNER 	  => Caller does not own the noticeboard
+*        	NBS__NILID	  => NIL ID
+*        	NBS__NOTOWNER 	  => Caller does not own the noticeboard
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     06-Feb-1990 (WFL):
@@ -3671,6 +4250,16 @@ int NBS_INC_MODIFIED ( R_INTEGER(id), W_INTEGER(status) )
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None.
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_PUT_TRIGGER ( R_INTEGER(id), int (*trigger)(), W_INTEGER(status) )
@@ -3722,6 +4311,7 @@ int NBS_PUT_TRIGGER ( R_INTEGER(id), int (*trigger)(), W_INTEGER(status) )
 }
 
 /*
+*+
 *  Name:
 *     NBS_GET
 
@@ -3751,6 +4341,37 @@ int NBS_PUT_TRIGGER ( R_INTEGER(id), int (*trigger)(), W_INTEGER(status) )
 *
 *     3. TIMEOUT_INTERVAL is 100 by default and is the delay in milliseconds
 *        between tries.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 /*
@@ -3808,16 +4429,33 @@ int NBS_PUT_TRIGGER ( R_INTEGER(id), int (*trigger)(), W_INTEGER(status) )
 *        will be copied into the user's buffer.  
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*	 	NBS__NOTPRIMITIVE => Item is not primitive
-*		NBS__BADOFFSET	  => Negative offset specified
-*		NBS__TIMEOUT	  => Timeout awaiting valid data
+*        	NBS__NILID	  => NIL ID
+*         	NBS__NOTPRIMITIVE => Item is not primitive
+*        	NBS__BADOFFSET	  => Negative offset specified
+*        	NBS__TIMEOUT	  => Timeout awaiting valid data
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -3825,6 +4463,16 @@ int NBS_PUT_TRIGGER ( R_INTEGER(id), int (*trigger)(), W_INTEGER(status) )
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None.
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_GET_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(maxbytes),
@@ -3949,10 +4597,10 @@ int NBS_GET_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(maxbytes),
 *        will be copied into the user's buffer.  
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*	 	NBS__NOTPRIMITIVE => Item is not primitive
-*		NBS__BADOFFSET	  => Negative offset specified
-*		NBS__TIMEOUT	  => Timeout awaiting valid data
+*        	NBS__NILID	  => NIL ID
+*         	NBS__NOTPRIMITIVE => Item is not primitive
+*        	NBS__BADOFFSET	  => Negative offset specified
+*        	NBS__TIMEOUT	  => Timeout awaiting valid data
 
 *  Notes:
 *     No C version of this routine is supplied because C strings are
@@ -3963,17 +4611,44 @@ int NBS_GET_VALUE ( R_INTEGER(id), R_INTEGER(offset), R_INTEGER(maxbytes),
 *     of NBS_GET_VALUE in this case, the user must at least state the
 *     destination length explicitly.
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council. All
+*     Rights Reserved.
 
-*  External Routines Used:
-*     NBS:
-*        NBS_GET_VALUE      Read byte array from primitive item.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     05-Mar-1993 (WFL):
 *        Original version.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     NBS:
+*        NBS_GET_VALUE      Read byte array from primitive item.
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 #ifndef c_string
@@ -4054,15 +4729,32 @@ IF_OK {
 *        will be copied into the user's buffer.  
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*	 	NBS__NOTPRIMITIVE => Item is not primitive
-*		NBS__TIMEOUT	  => Timeout awaiting valid data
+*        	NBS__NILID	  => NIL ID
+*         	NBS__NOTPRIMITIVE => Item is not primitive
+*        	NBS__TIMEOUT	  => Timeout awaiting valid data
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -4070,6 +4762,16 @@ IF_OK {
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None.
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_GET_SHAPE ( R_INTEGER(id), W_INTEGER(maxdims), RW_INTEGER_ARRAY(dims),
@@ -4192,13 +4894,30 @@ int NBS_GET_SHAPE ( R_INTEGER(id), W_INTEGER(maxdims), RW_INTEGER_ARRAY(dims),
 *        The current value of the noticeboard or item's modified count.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
+*        	NBS__NILID	  => NIL ID
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     09-Feb-1990 (WFL):
@@ -4206,6 +4925,16 @@ int NBS_GET_SHAPE ( R_INTEGER(id), W_INTEGER(maxdims), RW_INTEGER_ARRAY(dims),
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None.
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_GET_MODIFIED ( R_INTEGER(id), W_INTEGER(modified), W_INTEGER(status) )
@@ -4292,13 +5021,30 @@ int NBS_GET_MODIFIED ( R_INTEGER(id), W_INTEGER(modified), W_INTEGER(status) )
 *        The address of the item's modified count.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
+*        	NBS__NILID	  => NIL ID
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     09-Feb-1990 (WFL):
@@ -4306,6 +5052,16 @@ int NBS_GET_MODIFIED ( R_INTEGER(id), W_INTEGER(modified), W_INTEGER(status) )
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None.
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_GET_MODIFIED_POINTER ( R_INTEGER(id), data_id *pointer, 
@@ -4384,13 +5140,30 @@ int NBS_GET_MODIFIED_POINTER ( R_INTEGER(id), data_id *pointer,
 *         Whether updated (1) or not (0).
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
+*        	NBS__NILID	  => NIL ID
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     09-Feb-1990 (WFL):
@@ -4398,6 +5171,16 @@ int NBS_GET_MODIFIED_POINTER ( R_INTEGER(id), data_id *pointer,
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None.
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_GET_UPDATED ( R_INTEGER(id), W_INTEGER(updated), W_INTEGER(status) )
@@ -4472,14 +5255,31 @@ int NBS_GET_UPDATED ( R_INTEGER(id), W_INTEGER(updated), W_INTEGER(status) )
 *        The address of the first byte of this item's noticeboard data.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*		NBS__NOTPRIMITIVE => Item is not primitive
+*        	NBS__NILID	  => NIL ID
+*        	NBS__NOTPRIMITIVE => Item is not primitive
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -4487,6 +5287,16 @@ int NBS_GET_UPDATED ( R_INTEGER(id), W_INTEGER(updated), W_INTEGER(status) )
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None.
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_GET_POINTER ( R_INTEGER(id), data_id *pointer, W_INTEGER(status) )
@@ -4536,7 +5346,7 @@ int NBS_GET_POINTER ( R_INTEGER(id), data_id *pointer, W_INTEGER(status) )
 
 *  Purpose:
 *     Get the name of an item associated with the specified identifier
- 
+
 *  Language:
 *     ANSI C
 
@@ -4554,14 +5364,30 @@ int NBS_GET_POINTER ( R_INTEGER(id), data_id *pointer, W_INTEGER(status) )
 *        The item's name.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
+*        	NBS__NILID	  => NIL ID
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     NBS:
-*        NBS_STREXP	Export a string
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -4569,6 +5395,17 @@ int NBS_GET_POINTER ( R_INTEGER(id), data_id *pointer, W_INTEGER(status) )
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     NBS:
+*        NBS_STREXP        Export a string
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_GET_NAME ( R_INTEGER(id), RW_CHARACTER(name), 
@@ -4615,7 +5452,7 @@ int NBS_GET_NAME ( R_INTEGER(id), RW_CHARACTER(name),
 
 *  Purpose:
 *     Get the type of an item associated with the specified identifier
- 
+
 *  Language:
 *     ANSI C
 
@@ -4633,14 +5470,30 @@ int NBS_GET_NAME ( R_INTEGER(id), RW_CHARACTER(name),
 *        The item's type.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
+*        	NBS__NILID	  => NIL ID
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     NBS:
-*        NBS_STREXP	Export a string
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -4648,6 +5501,17 @@ int NBS_GET_NAME ( R_INTEGER(id), RW_CHARACTER(name),
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     NBS:
+*        NBS_STREXP        Export a string
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_GET_TYPE ( R_INTEGER(id), RW_CHARACTER(type),
@@ -4695,7 +5559,7 @@ int NBS_GET_TYPE ( R_INTEGER(id), RW_CHARACTER(type),
 *  Purpose:
 *     Get the maximum and actual sizes of a primitive item
 *     associated with the specified identifier
- 
+
 *  Language:
 *     ANSI C
 
@@ -4715,14 +5579,31 @@ int NBS_GET_TYPE ( R_INTEGER(id), RW_CHARACTER(type),
 *        Actual size in bytes.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
+*        	NBS__NILID	  => NIL ID
 *               NBS__NOPRIMITIVE  => Item is not primitive
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -4730,6 +5611,16 @@ int NBS_GET_TYPE ( R_INTEGER(id), RW_CHARACTER(type),
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_GET_SIZE ( R_INTEGER(id), W_INTEGER(maxbytes),
@@ -4784,7 +5675,7 @@ int NBS_GET_SIZE ( R_INTEGER(id), W_INTEGER(maxbytes),
 
 *  Purpose:
 *     Determine whether or not an item is primitive
- 
+
 *  Language:
 *     ANSI C
 
@@ -4803,13 +5694,30 @@ int NBS_GET_SIZE ( R_INTEGER(id), W_INTEGER(maxbytes),
 *        Whether primitive (1) or structured (0).
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
+*        	NBS__NILID	  => NIL ID
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -4817,6 +5725,16 @@ int NBS_GET_SIZE ( R_INTEGER(id), W_INTEGER(maxbytes),
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_GET_PRIMITIVE ( R_INTEGER(id), W_INTEGER(primitive), W_INTEGER(status) )
@@ -4862,7 +5780,7 @@ int NBS_GET_PRIMITIVE ( R_INTEGER(id), W_INTEGER(primitive), W_INTEGER(status) )
 
 *  Purpose:
 *     Get the identifier of an item's parent structure
- 
+
 *  Language:
 *     ANSI C
 
@@ -4884,13 +5802,30 @@ int NBS_GET_PRIMITIVE ( R_INTEGER(id), W_INTEGER(primitive), W_INTEGER(status) )
 *        a NIL ID will be returned.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
+*        	NBS__NILID	  => NIL ID
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -4898,6 +5833,16 @@ int NBS_GET_PRIMITIVE ( R_INTEGER(id), W_INTEGER(primitive), W_INTEGER(status) )
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_GET_PARENT ( R_INTEGER(id), item_id *envid, W_INTEGER(status) )
@@ -4946,7 +5891,7 @@ int NBS_GET_PARENT ( R_INTEGER(id), item_id *envid, W_INTEGER(status) )
 
 *  Purpose:
 *     Get the number of children of a structured item
- 
+
 *  Language:
 *     ANSI C
 
@@ -4964,14 +5909,31 @@ int NBS_GET_PARENT ( R_INTEGER(id), item_id *envid, W_INTEGER(status) )
 *        Number of children.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*		NBS__PRIMITIVE	  => Parent is primitive
+*        	NBS__NILID	  => NIL ID
+*        	NBS__PRIMITIVE	  => Parent is primitive
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1988, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     16-Feb-1988 (WFL):
@@ -4979,6 +5941,16 @@ int NBS_GET_PARENT ( R_INTEGER(id), item_id *envid, W_INTEGER(status) )
 *     22-Mar-1993 (DJA):
 *        Added error reporting. 
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_GET_CHILDREN ( R_INTEGER(id), W_INTEGER(children), W_INTEGER(status) )
@@ -5030,7 +6002,7 @@ int NBS_GET_CHILDREN ( R_INTEGER(id), W_INTEGER(children), W_INTEGER(status) )
 
 *  Purpose:
 *     Get general non-character information on a given noticeboard
- 
+
 *  Language:
 *     ANSI C
 
@@ -5045,14 +6017,14 @@ int NBS_GET_CHILDREN ( R_INTEGER(id), W_INTEGER(children), W_INTEGER(status) )
 *     a common noticeboard area but GLOBAL_BASE is an address within the
 *     address space of the caller. Unless otherwise stated, all are integers.
 *
-*     CHAN		=> Channel to open noticeboard file (zero if not open)
-*     DEFN_SIZE		=> Size of definition part of noticeboard
-*     FILE_SIZE		=> Size of noticeboard definition file
-*     GLOBAL_BASE	=> Address of noticeboard start
-*     MODIFIED		=> Total number of times values have been modified
-*     PID		=> PID of owner of this noticeboard
-*     SECTION_SIZE	=> Total size of noticeboard including data
-*     VERSION		=> Software version creating file / noticeboard
+*     CHAN        	=> Channel to open noticeboard file (zero if not open)
+*     DEFN_SIZE        	=> Size of definition part of noticeboard
+*     FILE_SIZE        	=> Size of noticeboard definition file
+*     GLOBAL_BASE        => Address of noticeboard start
+*     MODIFIED        	=> Total number of times values have been modified
+*     PID        	=> PID of owner of this noticeboard
+*     SECTION_SIZE        => Total size of noticeboard including data
+*     VERSION        	=> Software version creating file / noticeboard
 
 *  Arguments:
 *     ID = INTEGER (Given)
@@ -5066,15 +6038,31 @@ int NBS_GET_CHILDREN ( R_INTEGER(id), W_INTEGER(children), W_INTEGER(status) )
 *        coerced to pointer to real.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*	        NBS__BADOPTION	  => Illegal item name
+*        	NBS__NILID	  => NIL ID
+*                NBS__BADOPTION	  => Illegal item name
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     NBS:
-*        NBS_STRIMP       Import a string, converting to upper-case.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     07-Feb-1990 (WFL):
@@ -5083,6 +6071,17 @@ int NBS_GET_CHILDREN ( R_INTEGER(id), W_INTEGER(children), W_INTEGER(status) )
 *        Added error reporting and updated string handling. SAVE_NAME 
 *        option removed to NBS_GET_CINFO.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     NBS:
+*        NBS_STRIMP       Import a string, converting to upper-case.
+
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_GET_INFO ( R_INTEGER(id), RW_CHARACTER(name), W_INTEGER(value),
@@ -5169,7 +6168,7 @@ int NBS_GET_INFO ( R_INTEGER(id), RW_CHARACTER(name), W_INTEGER(value),
 
 *  Purpose:
 *     Get general character information on a given noticeboard
- 
+
 *  Language:
 *     ANSI C
 
@@ -5182,7 +6181,7 @@ int NBS_GET_INFO ( R_INTEGER(id), RW_CHARACTER(name), W_INTEGER(value),
 *
 *     There is currently only one character item which can be returned.
 *
-*     SAVE_NAME		=> Name of noticeboard file (character)
+*     SAVE_NAME        	=> Name of noticeboard file (character)
 
 *  Arguments:
 *     ID = INTEGER (Given)
@@ -5195,21 +6194,48 @@ int NBS_GET_INFO ( R_INTEGER(id), RW_CHARACTER(name), W_INTEGER(value),
 *        The item's value.
 *     STATUS = INTEGER (Given and returned)
 *        The global status. Possible return values are,
-*		NBS__NILID	  => NIL ID
-*	        NBS__BADOPTION	  => Illegal item name
+*        	NBS__NILID	  => NIL ID
+*                NBS__BADOPTION	  => Illegal item name
 
-*  Prior Requirements:
-*     NBS_FIND_NOTICEBOARD must have been called.
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     31-Mar-1993 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     NBS:
 *        NBS_STREXP       Export a string.
 *        NBS_STRIMP       Import a string, converting to upper-case.
 
-*  History:
-*     31-Mar-1993 (DJA):
-*        Original version.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     NBS_FIND_NOTICEBOARD must have been called.
+
 *-
 */
 int NBS_GET_CINFO ( R_INTEGER(id), RW_CHARACTER(name), RW_CHARACTER(value),

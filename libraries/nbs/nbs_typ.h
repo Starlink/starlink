@@ -1,158 +1,184 @@
 /*
- *+
- *  Name:
- *     nbs_typ.h
+*+
+*  Name:
+*     nbs_typ.h
 
- *  Purpose:
- *     Type definitions for noticeboard system.
+*  Purpose:
+*     Type definitions for noticeboard system.
 
- *  Description:
- *     The same types are used both internally and in noticeboard definition
- *     files. There is a complication with pointers since they are invalidated
- *     when data is moved to a different virtual address. Thus all pointers are
- *     relocated relative to a small positive integer when noticeboard
- *     definitions are saved to disc or copied to a global section. All
- *     processes accessing a given noticeboard take a private copy of all the
- *     pointers and relocate them so that they are valid pointers for that
- *     process. This allows direct access to noticeboard data using C
- *     structures.
- *
- *     Apart from the above, the structure of a noticeboard definition is
- *     identical in private memory, in a global section and on disc. The basic
- *     data structure is the "item descriptor". This consists entirely of
- *     pointers and is the only structure that contains pointers (thus only item
- *     descriptors need relocating). It has the following structure.
- *     
- *	    Pointer to parent item descriptor 
- *	    Pointer to eldest child item descriptor
- *	    Pointer to next sibling item descriptor
- *	    Pointer to fixed information
- *	    Pointer to general noticeboard information
- *	    Pointer to shape information
- *	    Pointer to associated data
- *          Number of lower-level items accessed via this item
- *     
- *     The first pointers are to other item descriptors. It can be seen that an
- *     item gains access to its children by first going to its eldest child and
- *     then searching through its eldest child's siblings. This is simple but can
- *     be inefficient when there are many children (and results in very heavily
- *     nested recursive calls when relocating pointers).
- *
- *     The other pointers are data structures, none of which contain any
- *     pointers. Because of this there is no need to take private copies of
- *     these structures and the always reside in the global section (any that
- *     can change must be in the global section anyway). The fixed information
- *     has the following structure.
- *
- *	    Item name (up to 16 bytes, null-terminated if shorter)
- *	    Item type (up to 16 bytes, null-terminated if shorter)
- *	    Whether or not the item is primitive
- *	    Max dimensionality of item
- *	    Current dimensionality of item
- *	    Max size of item in bytes
- *	    Current size of item in bytes
- *	    Modified count (incremented before and after each modification)
- *
- *     There is only one copy of the general noticeboard information per
- *     noticeboard. It has the following structure.
- *
- *	    Software version creating file / noticeboard
- *          Size of noticeboard definition file (0 if no file)
- *     	    Size of definition part of noticeboard
- *	    Total size of noticeboard including data
- *	    PID of owner (first mapper) of this noticeboard
- *          Number of times noticeboard data has been modified
- *
- *          Timeout count on find and get
- *          Timeout interval on find and get
- *          Whether everybody can write noticeboard
- *          Whether to increment modify count on put
- *          Whether to check modify count on get
- *    
- *          Channel number on which noticeboard definition file is open
- *          Address of start of noticeboard
- *          Name of file from which noticeboard was restored
- *
- *     (The last three items are only used when updating noticeboard data to
- *     disc and are only meaningful to the noticeboard owner.)
- *
- *     The shape information is simply an array of integers.
- *
- *     The associated data is simply an array of bytes.
- *
- *     The only assumption that is made about the relative placement of these
- *     structures within a noticeboard definition is that the item descriptor
- *     for the top-level item starts at offset zero. The data always starts
- *     at the byte following the last byte of the definition.
- *     
- *     (In fact it would be a good idea if the item descriptors were allocated
- *     in a separate contiguous part of memory. If this were done then mapping
- *     processes would need to take a copy only of the item descriptors,
- *     rather than of the entire definition. This is not possible at present
- *     because the item descriptors are all mixed in with the fixed information,
- *     the noticeboard information and the shape information.)
-                                                             
- *  Language:
- *     C
+*  Language:
+*     C
 
- *  Authors:
- *     WFL: William Lupton (AAO)
+*  Description:
+*     The same types are used both internally and in noticeboard definition
+*     files. There is a complication with pointers since they are invalidated
+*     when data is moved to a different virtual address. Thus all pointers are
+*     relocated relative to a small positive integer when noticeboard
+*     definitions are saved to disc or copied to a global section. All
+*     processes accessing a given noticeboard take a private copy of all the
+*     pointers and relocate them so that they are valid pointers for that
+*     process. This allows direct access to noticeboard data using C
+*     structures.
+*
+*     Apart from the above, the structure of a noticeboard definition is
+*     identical in private memory, in a global section and on disc. The basic
+*     data structure is the "item descriptor". This consists entirely of
+*     pointers and is the only structure that contains pointers (thus only item
+*     descriptors need relocating). It has the following structure.
+*
+*            Pointer to parent item descriptor 
+*            Pointer to eldest child item descriptor
+*            Pointer to next sibling item descriptor
+*            Pointer to fixed information
+*            Pointer to general noticeboard information
+*            Pointer to shape information
+*            Pointer to associated data
+*          Number of lower-level items accessed via this item
+*
+*     The first pointers are to other item descriptors. It can be seen that an
+*     item gains access to its children by first going to its eldest child and
+*     then searching through its eldest child's siblings. This is simple but can
+*     be inefficient when there are many children (and results in very heavily
+*     nested recursive calls when relocating pointers).
+*
+*     The other pointers are data structures, none of which contain any
+*     pointers. Because of this there is no need to take private copies of
+*     these structures and the always reside in the global section (any that
+*     can change must be in the global section anyway). The fixed information
+*     has the following structure.
+*
+*            Item name (up to 16 bytes, null-terminated if shorter)
+*            Item type (up to 16 bytes, null-terminated if shorter)
+*            Whether or not the item is primitive
+*            Max dimensionality of item
+*            Current dimensionality of item
+*            Max size of item in bytes
+*            Current size of item in bytes
+*            Modified count (incremented before and after each modification)
+*
+*     There is only one copy of the general noticeboard information per
+*     noticeboard. It has the following structure.
+*
+*            Software version creating file / noticeboard
+*          Size of noticeboard definition file (0 if no file)
+*                 Size of definition part of noticeboard
+*            Total size of noticeboard including data
+*            PID of owner (first mapper) of this noticeboard
+*          Number of times noticeboard data has been modified
+*
+*          Timeout count on find and get
+*          Timeout interval on find and get
+*          Whether everybody can write noticeboard
+*          Whether to increment modify count on put
+*          Whether to check modify count on get
+*
+*          Channel number on which noticeboard definition file is open
+*          Address of start of noticeboard
+*          Name of file from which noticeboard was restored
+*
+*     (The last three items are only used when updating noticeboard data to
+*     disc and are only meaningful to the noticeboard owner.)
+*
+*     The shape information is simply an array of integers.
+*
+*     The associated data is simply an array of bytes.
+*
+*     The only assumption that is made about the relative placement of these
+*     structures within a noticeboard definition is that the item descriptor
+*     for the top-level item starts at offset zero. The data always starts
+*     at the byte following the last byte of the definition.
+*
+*     (In fact it would be a good idea if the item descriptors were allocated
+*     in a separate contiguous part of memory. If this were done then mapping
+*     processes would need to take a copy only of the item descriptors,
+*     rather than of the entire definition. This is not possible at present
+*     because the item descriptors are all mixed in with the fixed information,
+*     the noticeboard information and the shape information.)
 
- *  History:
- *     03-Feb-86 (WFL):
- *        Original version
- *     17-Jul-87 (WFL): 
- *        Ensure that MODIFIED is word-aligned with respect to
- *   	  the rest of the structure. Also ensure that all structures
- *	  are an integral number of words in length.
- *     21-Jul-87 (WFL):
- *        o Add DEFN_SIZE, SECTION_SIZE and VERSION to BOARD_INFO.
- *	  o Excise all mention of OTHER_SELF.
- *	  o Token effort at saving space - make MAXDIMS and ACTDIMS
- *	    into SHORT integers.
- *	  o Move definition of VERSION to here.
- *     22-Jul-87 (WFL):
- *        Remove BASE from BOARD_INFO.
- *     06-Nov-87 (WFL):
- *        Portable VMS / UNIX version. Use strdescr macro to
- *   	  decide whether to use VMS string descriptors or C strings.
- *     11-Feb-88 (WFL):
- *        Don't alter strdescr macro definition and use the
- *	  c_string macro instead.
- *     16-Feb-88 (WFL):
- *        Add CHILDREN to FIXED_INFO, add MODIFIED to BOARD_INFO,
- *	  and increment VERSION.
- *     25-Mar-88 (WFL):
- *        o Add FILE_SIZE, SAVE_NAME and CHAN to BOARD_INFO and
- *	    increment VERSION. Move file header definition from NBSLOW.
- *	  o Add RESERVE fields to all data structures to minimise
- *	    necessity for incrementing VERSION on all changes (and increment
- *	    VERSION).
- *     20-May-88 (WFL): 
- *        Add INT_ID type (type used for input integers - int
- *	  for c_string, int* otherwise).
- *     01-Feb-90 (WFL):
- *        Add ACCESSED to ITEM_INFO, and TIMEOUT_COUNT,
- *	  TIMEOUT_INTERVAL, WORLD_WRITE, INCREMENT_MODIFY and
- *	  CHECK_MODIFY to BOARD_INFO; no need to alter VERSION
- *     06-Feb-90 (WFL):
- *        Use variant for ITEM_INFO PARENT/VALID and for
- *	  DATA/ACCESSED; add ITEM_INFO TRIGGER and MODIFIED; add
- *	  ORIGINAL_UNMAPPED
- *     07-Feb-90 (WFL):
- *        Add variant ITEM_INFO GLOBAL_BASE/SHAPE, with
- *	  GLOBAL_BASE used only for top-level items
- *     15-Feb-90 (WFL): 
- *        Remove TIMEOUT_COUNT and TIMEOUT_DELAY from BOARD_INFO
- *     19-Nov-93 (DJA):
- *        string_id removed in favour of F77 usage.
- *     24-Nov-94 (DJA):
- *        Allocated item sizes rounded up to long boundaries
- *     11-Sep-95 (DJA):
- *        Fixed bug in _ALIGN_ITEM macro
- *     12-Sep-04 (TIMJ):
- *        VERSION now NBSVERSION.
- *-
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     WFL: William Lupton (AAO)
+*     {enter_new_authors_here}
+
+*  History:
+*     03-Feb-86 (WFL):
+*        Original version
+*     17-Jul-87 (WFL): 
+*        Ensure that MODIFIED is word-aligned with respect to
+*             the rest of the structure. Also ensure that all structures
+*          are an integral number of words in length.
+*     21-Jul-87 (WFL):
+*        o Add DEFN_SIZE, SECTION_SIZE and VERSION to BOARD_INFO.
+*          o Excise all mention of OTHER_SELF.
+*          o Token effort at saving space - make MAXDIMS and ACTDIMS
+*            into SHORT integers.
+*          o Move definition of VERSION to here.
+*     22-Jul-87 (WFL):
+*        Remove BASE from BOARD_INFO.
+*     06-Nov-87 (WFL):
+*        Portable VMS / UNIX version. Use strdescr macro to
+*             decide whether to use VMS string descriptors or C strings.
+*     11-Feb-88 (WFL):
+*        Don't alter strdescr macro definition and use the
+*          c_string macro instead.
+*     16-Feb-88 (WFL):
+*        Add CHILDREN to FIXED_INFO, add MODIFIED to BOARD_INFO,
+*          and increment VERSION.
+*     25-Mar-88 (WFL):
+*        o Add FILE_SIZE, SAVE_NAME and CHAN to BOARD_INFO and
+*            increment VERSION. Move file header definition from NBSLOW.
+*          o Add RESERVE fields to all data structures to minimise
+*            necessity for incrementing VERSION on all changes (and increment
+*            VERSION).
+*     20-May-88 (WFL): 
+*        Add INT_ID type (type used for input integers - int
+*          for c_string, int* otherwise).
+*     01-Feb-90 (WFL):
+*        Add ACCESSED to ITEM_INFO, and TIMEOUT_COUNT,
+*          TIMEOUT_INTERVAL, WORLD_WRITE, INCREMENT_MODIFY and
+*          CHECK_MODIFY to BOARD_INFO; no need to alter VERSION
+*     06-Feb-90 (WFL):
+*        Use variant for ITEM_INFO PARENT/VALID and for
+*          DATA/ACCESSED; add ITEM_INFO TRIGGER and MODIFIED; add
+*          ORIGINAL_UNMAPPED
+*     07-Feb-90 (WFL):
+*        Add variant ITEM_INFO GLOBAL_BASE/SHAPE, with
+*          GLOBAL_BASE used only for top-level items
+*     15-Feb-90 (WFL): 
+*        Remove TIMEOUT_COUNT and TIMEOUT_DELAY from BOARD_INFO
+*     19-Nov-93 (DJA):
+*        string_id removed in favour of F77 usage.
+*     24-Nov-94 (DJA):
+*        Allocated item sizes rounded up to long boundaries
+*     11-Sep-95 (DJA):
+*        Fixed bug in _ALIGN_ITEM macro
+*     12-Sep-04 (TIMJ):
+*        VERSION now NBSVERSION.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
  */
 
 /* Constant definitions	*/

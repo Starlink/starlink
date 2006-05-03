@@ -1,28 +1,57 @@
 /******************************************************************************/
 /*
- *+
- *  Name:
- *     exercise.c
+*+
+*  Name:
+*     exercise.c
 
- *  Purpose:
- *     Exercise ALL NBS routines and cause ALL error status to be returned
- *     (except ones that indicate system failure or resource exhaustion).
+*  Purpose:
+*     Exercise ALL NBS routines and cause ALL error status to be returned
+*     (except ones that indicate system failure or resource exhaustion).
 
- *  Authors:
- *     WFL: William Lupton (RGO)
- *     DJA: D.J. Allan (Jet-X, University of Birmingham)
+*  Language:
+*     {routine_language}
 
- *  History:
- *  28-MAR-1988 (WFL):
- *  07-Feb-1990 (WFL):
- *     Update for V2.3
- *  31-Mar-1993 (DJA):
- *     Update for V2.4. New routines, and test of duff file
- *     names removed for UNIX version.
- *   4-Nov-1993 (DJA):
- *     Update for V2.4.1. Variable length argument stuff
- *     done properly.
- *-
+*  Copyright:
+*     Copyright (C) 1988, 1990, 1993 Science & Engineering Research
+*     Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     WFL: William Lupton (RGO)
+*     DJA: D.J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-MAR-1988 (WFL):
+*     07-Feb-1990 (WFL):
+*     Update for V2.3
+*     31-Mar-1993 (DJA):
+*     Update for V2.4. New routines, and test of duff file
+*     names removed for UNIX version.
+*     4-Nov-1993 (DJA):
+*     Update for V2.4.1. Variable length argument stuff
+*     done properly.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
  */
 
 /* Include files */

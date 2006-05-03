@@ -1,65 +1,95 @@
-/*+
- *  Name:
- *     nbtrace
- *
- *  Purpose:
- *     List noticeboard contents
- *
- *  Description:
- *     List noticeboard contents. A single argument is expected - the name of
- *     the noticeboard definition file. For primitive items, the current
- *     dimensionality and the first few values are listed.
- *
- *  Authors:
- *     WFL: William Lupton (RGO)
- *
- *  History:
- *     09-FEB-1986 (WFL):
- *        Original.
- *     03-Apr-1987 (WFL):
- *        - Allow noticeboard name, not just definition file name.
- *        - Where TYPE looks like an HDS primitive type, output
- *          value in more helpful format.
- *        - Allow file-name of up to 80 characters.
- *        - Correct bugs to do with calculating significant lengths
- *          and outputting tab characters.
- *     07-Apr-1987 (WFL):
- *        Don't throw away trailing spaces on _CHAR items
- *     17-Jul-1987 (WFL):
- *        Translate final status
- *     22-Jul-1987 (WFL):
- *        Output modified flag value as well
- *     06-Nov-1987 (WFL):
- *        Portable VMS / UNIX version. Assume that  
- *        the C binding is used for passing character strings.
- *     11-Feb-1988 (WFL):
- *        Allow TYPE's that look like stamdard C types to be
- *	  output in more helpful format as well
- *     11-Feb-1988 (WFL):
- *        Use NBC_ form routines (because use C strings)
- *     12-Feb-1988 (WFL):
- *        New interface to GET_VALUE and PUT_VALUE
- *     16-Feb-1988 (WFL):
- *        Use new GET_CHILDREN and GET_INFO routines
- *     25-Mar-1988 (WFL):
- *        Use new interface to GET_INFO
- *     20-May-1988 (WFL):
- *        Use new interfaces for input scalars
- *     12-May-1989 (WFL):
- *        Don't display trailing spaces
- *     22-May-1989 (WFL):
- *        Give Hex translation for integer types; be intelligent
- *	  about realising that an INT of size 1 is really a BYTE etc
- *     10-Nov-1989 (WFL):
- *        Support A.B.C syntax to determine dive-in point
- *     13-Nov-1989 (WFL):
- *        Support VMS-style wild cards in names
- *     05-Feb-1990 (WFL):
- *        Support _VARYING type
- *     09-Feb-1990 (WFL):
- *        Try to find the noticeboard first. Only restore the
- *        definition from file if it didn't already exist.
- *-
+/*
+*+
+*  Name:
+*     nbtrace
+
+*  Purpose:
+*     List noticeboard contents
+
+*  Language:
+*     {routine_language}
+
+*  Description:
+*     List noticeboard contents. A single argument is expected - the name of
+*     the noticeboard definition file. For primitive items, the current
+*     dimensionality and the first few values are listed.
+
+*  Copyright:
+*     Copyright (C) 1986-1990 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     WFL: William Lupton (RGO)
+*     {enter_new_authors_here}
+
+*  History:
+*     09-FEB-1986 (WFL):
+*        Original.
+*     03-Apr-1987 (WFL):
+*        - Allow noticeboard name, not just definition file name.
+*        - Where TYPE looks like an HDS primitive type, output
+*          value in more helpful format.
+*        - Allow file-name of up to 80 characters.
+*        - Correct bugs to do with calculating significant lengths
+*          and outputting tab characters.
+*     07-Apr-1987 (WFL):
+*        Don't throw away trailing spaces on _CHAR items
+*     17-Jul-1987 (WFL):
+*        Translate final status
+*     22-Jul-1987 (WFL):
+*        Output modified flag value as well
+*     06-Nov-1987 (WFL):
+*        Portable VMS / UNIX version. Assume that  
+*        the C binding is used for passing character strings.
+*     11-Feb-1988 (WFL):
+*        Allow TYPE's that look like stamdard C types to be
+*          output in more helpful format as well
+*     11-Feb-1988 (WFL):
+*        Use NBC_ form routines (because use C strings)
+*     12-Feb-1988 (WFL):
+*        New interface to GET_VALUE and PUT_VALUE
+*     16-Feb-1988 (WFL):
+*        Use new GET_CHILDREN and GET_INFO routines
+*     25-Mar-1988 (WFL):
+*        Use new interface to GET_INFO
+*     20-May-1988 (WFL):
+*        Use new interfaces for input scalars
+*     12-May-1989 (WFL):
+*        Don't display trailing spaces
+*     22-May-1989 (WFL):
+*        Give Hex translation for integer types; be intelligent
+*          about realising that an INT of size 1 is really a BYTE etc
+*     10-Nov-1989 (WFL):
+*        Support A.B.C syntax to determine dive-in point
+*     13-Nov-1989 (WFL):
+*        Support VMS-style wild cards in names
+*     05-Feb-1990 (WFL):
+*        Support _VARYING type
+*     09-Feb-1990 (WFL):
+*        Try to find the noticeboard first. Only restore the
+*        definition from file if it didn't already exist.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
  */
 
 /*

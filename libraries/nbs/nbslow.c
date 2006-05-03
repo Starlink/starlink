@@ -1,5 +1,6 @@
 /*
 *
+*+
 *  Name:
 *     NBSLOW.C
 
@@ -16,6 +17,31 @@
 *     This module is split into several sections of routines, all of which are
 *     called by the high-level NBS routines in module NBS.C.
 
+*  Copyright:
+*     Copyright (C) 1986-1990, 1993 Science & Engineering Research
+*     Council. Copyright (C) 1995, 1999, 2004 Central Laboratory of the
+*     Research Councils. Copyright (C) 2005 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
 *  History:
 *     03-Feb-1986 (WFL):
 *        Original version.
@@ -25,37 +51,37 @@
 *        Add maximum length arguments to string import and export routines,
 *        plus, on import, use a user-supplied buffer. Also capitalise and
 *        ignore spaces and non-printing characters.
-*	 Remove NBS_COPY (to replace with _CHMOVE macro).
-*	 Use default extension of .NBD for definition files.
-*	 Ignore trailing blanks on global section names.
+*         Remove NBS_COPY (to replace with _CHMOVE macro).
+*         Use default extension of .NBD for definition files.
+*         Ignore trailing blanks on global section names.
 *     21-Jul-1987 (WFL):
 *        Remove NBS_PRIVATE_ITEM.
-*	 Excise all mention of OTHER_SELF.
-*	 Remove the NBS_*_FIELDS routines.
-*	 Add extra logical arg to relocation routines. If YES,
-*	 add offsets and do before recursive calls. If NO, subtract
-*	 offsets and do after recursive calls. Also split the IFS_OFFSET
-*	 arg into I_OFFSET and FBS_OFFSET.
+*         Excise all mention of OTHER_SELF.
+*         Remove the NBS_*_FIELDS routines.
+*         Add extra logical arg to relocation routines. If YES,
+*         add offsets and do before recursive calls. If NO, subtract
+*         offsets and do after recursive calls. Also split the IFS_OFFSET
+*         arg into I_OFFSET and FBS_OFFSET.
 *     06-Nov-1987 (WFL):
 *        Portable VMS / UNIX version. Use unix / vms / strdescr
-*	 macros as appropriate.
+*         macros as appropriate.
 *     10-Feb-1988 (WFL):
 *        Sort out string descriptors to VMS system services
 *     11-Feb-1988 (WFL):
 *        Use macros for routine names and use NBS_ prefix when
-*	 strdescr is defined, NBC_ when it is not. Also use #module to
-*	 set module name explicitly. Change strdescr to c_string.
+*         strdescr is defined, NBC_ when it is not. Also use #module to
+*         set module name explicitly. Change strdescr to c_string.
 *     25-Mar-1988 (WFL):
 *        Move file header definition to NBS_TYP.H.
 *        Extra FILE_SIZE argument to NBS_WRITE_FILE and NBS_OPEN_FILE.
-*	 New NBS_OPEN_WRITE and NBS_UPDATE_FILE routines.
+*         New NBS_OPEN_WRITE and NBS_UPDATE_FILE routines.
 *     30-Mar-1988 (WFL):
 *        Only use #module under VMS; under UNIX use first
-*	 character plus last ones for shared memory name.
+*         character plus last ones for shared memory name.
 *     10-Apr-1989 (WFL):
 *        Use EXTERN rather than STATIC so that NBS and NBC
-*	 routines can be used intermingled (but not values alterable
-*	 using NBS_TUNE, since these are initialised)
+*         routines can be used intermingled (but not values alterable
+*         using NBS_TUNE, since these are initialised)
 *     02-Feb-1990 (WFL):
 *        Add NBS_UNMAP_SECTION
 *     06-Feb-1990 (WFL):
@@ -94,6 +120,10 @@
 *     2-Sep-2005 (TIMJ):
 *        Move protoypes out of functions (gcc 4 objects)
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -183,12 +213,32 @@ static mapping_id nbs_gl_mlist = NIL; /* Mapping list */
 *     char * NAME (Given)
 *        Address of null terminated section name
 
-*  Returned value:
+*  Returned Value:
 *     key_t NBS_MAKE_KEY
 *        Integer memory key
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     12-Sep-1995 (DJA):
@@ -197,6 +247,10 @@ static mapping_id nbs_gl_mlist = NIL; /* Mapping list */
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 key_t NBS_MAKE_KEY(char *name)
@@ -279,16 +333,32 @@ extern char *nbs_ga_alloc_data; /* Next "free byte" for data  */
 *     char * DATA (Given)
 *        Address to use as base for allocating data memory.
 
-*  Returned value:
+*  Returned Value:
 *     char *NBS_INIT_ALLOC
 *        Pointer to first character of allocated memory area.
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1987 Science & Engineering Research Council. All
+*     Rights Reserved.
 
-*  External Routines Used:
-*     C RTL:
-*        MALLOC         Allocate dynamic memory
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -297,6 +367,14 @@ extern char *nbs_ga_alloc_data; /* Next "free byte" for data  */
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  External Routines Used:
+*     C RTL:
+*        MALLOC         Allocate dynamic memory
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 char *NBS_INIT_ALLOC (int nbytes,char *data)
@@ -352,15 +430,33 @@ char *NBS_INIT_ALLOC (int nbytes,char *data)
 *     int NBYTES (Given)
 *        Number of bytes of contiguous memory to allocate.
 
-*  Returned value:
+*  Returned Value:
 *     char *NBS_ALLOC
 *        Pointer to first character of allocated memory area.
 
-*  Prior Requirements:
-*     NBS_INIT_ALLOC must have been called.
+*  Copyright:
+*     Copyright (C) 1987 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -371,6 +467,13 @@ char *NBS_INIT_ALLOC (int nbytes,char *data)
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None
+
+*  Prior Requirements:
+*     NBS_INIT_ALLOC must have been called.
+
 *-
 */
 char *NBS_ALLOC (int nbytes)
@@ -422,15 +525,33 @@ char *NBS_ALLOC (int nbytes)
 *     int NBYTES (Given)
 *        Number of bytes of contiguous memory to allocate.
 
-*  Returned value:
+*  Returned Value:
 *     char *NBS_DATA_ALLOC
 *        Pointer to first character of allocated memory area.
 
-*  Prior Requirements:
-*     NBS_INIT_ALLOC must have been called.
+*  Copyright:
+*     Copyright (C) 1987 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -441,6 +562,13 @@ char *NBS_ALLOC (int nbytes)
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None
+
+*  Prior Requirements:
+*     NBS_INIT_ALLOC must have been called.
+
 *-
 */
 char *NBS_DATA_ALLOC (int nbytes)
@@ -476,17 +604,32 @@ char *NBS_DATA_ALLOC (int nbytes)
 *  Arguments:
 *     None
 
-*  Returned value:
+*  Returned Value:
 *     char *NBS_ALLOC
 *        (Char *) The value returned by FREE.
 
-*  Prior Requirements:
-*     NBS_INIT_ALLOC must have been called.
+*  Copyright:
+*     Copyright (C) 1987 Science & Engineering Research Council. All
+*     Rights Reserved.
 
-*  External Routines Used:
-*     C RTL:
-*        FREE          Release dynamic memory
-*     None
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -495,6 +638,15 @@ char *NBS_DATA_ALLOC (int nbytes)
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  External Routines Used:
+*     C RTL:
+*        FREE          Release dynamic memory
+*     None
+
+*  Prior Requirements:
+*     NBS_INIT_ALLOC must have been called.
+
 *-
 */
 char *NBS_DEINIT_ALLOC ()
@@ -565,7 +717,7 @@ char *NBS_DEINIT_ALLOC ()
 
 *  Invocation:
 *     (Void) = NBS_WRITE_FILE (NAME,DATA,FILE_SIZE,DEFN_SIZE,
-*						   SECTION_SIZE,STATUS)
+*        					   SECTION_SIZE,STATUS)
 
 *  Description:
 *     Create the file with a default file extension of .NBD
@@ -587,23 +739,34 @@ char *NBS_DEINIT_ALLOC ()
 *         Total size of global section.
 *     int *STATUS (Given and returned)
 *         The global status. Possible codes are,
-*		NBS__CANTOPEN	=> Can't open the file
-*		NBS__CANTWRITE	=> Can't write the file
+*        	NBS__CANTOPEN	=> Can't open the file
+*        	NBS__CANTWRITE	=> Can't write the file
 
-*  Returned value:
+*  Returned Value:
 *     (void)
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     C RTL:
-*        FCLOSE	    	Close a file
-*        FOPEN	    	Open a file
-*        FWRITE	    	Write to a file
-*        TIME	    	Get the current time
-*     NBS:
-*        NBS_STRIMP	Import a string, converting to upper-case
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -615,6 +778,19 @@ char *NBS_DEINIT_ALLOC ()
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  External Routines Used:
+*     C RTL:
+*        FCLOSE            	Close a file
+*        FOPEN            	Open a file
+*        FWRITE            	Write to a file
+*        TIME            	Get the current time
+*     NBS:
+*        NBS_STRIMP        Import a string, converting to upper-case
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 void
@@ -724,22 +900,35 @@ NBS_WRITE_FILE (
 *         Total size of global section.
 *     int *STATUS (Given and returned)
 *         The global status. Possible codes are,
-*		NBS__CANTOPEN	=> Can't open the file
-*		NBS__CANTREAD	=> Can't read the file
-*		NBS__BADVERSION	=> File written with wrong s/w version
+*        	NBS__CANTOPEN	=> Can't open the file
+*        	NBS__CANTREAD	=> Can't read the file
+*        	NBS__BADVERSION	=> File written with wrong s/w version
 
-*  Returned value:
+*  Returned Value:
 *     (void)
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     C RTL:
-*        FOPEN	     Open a file
-*        FREAD	     Read from a file
-*     NBS:
-*       NBS_STRIMP   Import a string, converting to upper-case
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -751,6 +940,17 @@ NBS_WRITE_FILE (
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  External Routines Used:
+*     C RTL:
+*        FOPEN             Open a file
+*        FREAD             Read from a file
+*     NBS:
+*       NBS_STRIMP   Import a string, converting to upper-case
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 void
@@ -844,17 +1044,33 @@ NBS_OPEN_FILE ( RW_CHARACTER(name),
 *         Size of definition part of noticeboard.
 *     int *STATUS (Given and returned)
 *         The global status. Possible codes are,
-*		NBS__CANTOPEN	=> Can't open the file
+*        	NBS__CANTOPEN	=> Can't open the file
 
-*  Returned value:
+*  Returned Value:
 *     (void)
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     C RTL:
-*        FREAD	    Read from a file
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -865,6 +1081,14 @@ NBS_OPEN_FILE ( RW_CHARACTER(name),
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  External Routines Used:
+*     C RTL:
+*        FREAD            Read from a file
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 void
@@ -916,15 +1140,31 @@ NBS_READ_FILE ( FILE *chan,
 *     FILE **CHAN (Given)
 *        Channel on which file has been opened.
 
-*  Returned value:
+*  Returned Value:
 *     (void)
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1987 Science & Engineering Research Council. All
+*     Rights Reserved.
 
-*  External Routines Used:
-*     C RTL:
-*        FCLOSE	    Close a file
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -933,6 +1173,14 @@ NBS_READ_FILE ( FILE *chan,
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  External Routines Used:
+*     C RTL:
+*        FCLOSE            Close a file
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 void
@@ -971,17 +1219,33 @@ NBS_CLOSE_FILE ( RW_POINTER(chan) )
 *        Channel on which file has been opened for write access.
 *     int *STATUS (Given and returned)
 *         The global status. Possible codes are,
-*		NBS__CANTOPEN	=> Can't open the file
+*        	NBS__CANTOPEN	=> Can't open the file
 
-*  Returned value:
+*  Returned Value:
 *     (void)
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1988, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     C RTL:
-*        FOPEN	    Open a file
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     25-Mar-1988 (WFL):
@@ -992,6 +1256,14 @@ NBS_CLOSE_FILE ( RW_POINTER(chan) )
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  External Routines Used:
+*     C RTL:
+*        FOPEN            Open a file
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 void
@@ -1047,18 +1319,33 @@ NBS_OPEN_WRITE (char *save_name, FILE **chan, int *status)
 *        "length of header" into the file.
 *     int *STATUS (Given and returned)
 *         The global status. Possible codes are,
-*		NBS__CANTWRITE	=> Can't write the file
+*        	NBS__CANTWRITE	=> Can't write the file
 
-*  Returned value:
+*  Returned Value:
 *     (void)
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1988, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     C RTL:
-*        FSEEK      Position to a given offset within a file
-*        FWRITE	    Write to a file
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     28-Mar-1988 (WFL):
@@ -1069,6 +1356,15 @@ NBS_OPEN_WRITE (char *save_name, FILE **chan, int *status)
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  External Routines Used:
+*     C RTL:
+*        FSEEK      Position to a given offset within a file
+*        FWRITE            Write to a file
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 void
@@ -1156,15 +1452,45 @@ NBS_UPDATE_FILE (FILE *chan,char *section,int section_size,int *status)
 *        Total size of global section.
 *     int *STATUS (Given and returned)
 *         The global status. Possible codes are,
-*		NBS__SECTIONEXISTED => Section of this name existed
-*		System service status from SYS$CRMPSC
+*        	NBS__SECTIONEXISTED => Section of this name existed
+*        	System service status from SYS$CRMPSC
 
-*  Returned value:
+*  Returned Value:
 *     (Char *) NBS_CREATE_SECTION
 *        Pointer to first byte of global section.
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     23-Jul-1987 (WFL):
+*        Original version.
+*     22-Mar-1993 (DJA):
+*        Added error reporting and string handling.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     VMS RTL:
@@ -1179,15 +1505,9 @@ NBS_UPDATE_FILE (FILE *chan,char *section,int section_size,int *status)
 *        NBS_MLIST_ADD Add a mapped section to the list of
 *                      sections mapped by this process
 
-*  History:
-*     23-Jul-1987 (WFL):
-*        Original version.
-*     22-Mar-1993 (DJA):
-*        Added error reporting and string handling.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     None
 
-*  Bugs:
-*     {note_any_bugs_here}
 *-
 */
 char *NBS_CREATE_SECTION ( RW_CHARACTER(name), int section_size,
@@ -1336,15 +1656,45 @@ char *NBS_CREATE_SECTION ( RW_CHARACTER(name), int section_size,
 *        and non-printing characters and converts to upper case) before use.
 *     int *STATUS (Given and returned)
 *         The global status. Possible codes are,
-*		NBS__SECTIONNOTFOUND => Section of this name not found
-*		System service status from SYS$MGBLSC
+*        	NBS__SECTIONNOTFOUND => Section of this name not found
+*        	System service status from SYS$MGBLSC
 
-*  Returned value:
+*  Returned Value:
 *     (Char *) NBS_MAP_SECTION
 *        Pointer to first byte of global section.
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     23-Jul-1987 (WFL):
+*        Original version.
+*     22-Mar-1993 (DJA):
+*        Added error reporting and string handling.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     VMS RTL:
@@ -1359,15 +1709,9 @@ char *NBS_CREATE_SECTION ( RW_CHARACTER(name), int section_size,
 *        NBS_MLIST_ADD  Add a mapped section to the section list
 *        NBS_MLIST_FIND Locate a section in the section list
 
-*  History:
-*     23-Jul-1987 (WFL):
-*        Original version.
-*     22-Mar-1993 (DJA):
-*        Added error reporting and string handling.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     None
 
-*  Bugs:
-*     {note_any_bugs_here}
 *-
 */
 char *NBS_MAP_SECTION ( RW_CHARACTER(name), W_INTEGER(status) TRAIL(name) )
@@ -1518,19 +1862,33 @@ char *NBS_MAP_SECTION ( RW_CHARACTER(name), W_INTEGER(status) TRAIL(name) )
 *         Total size of global section.
 *     int *STATUS (Given and returned)
 *         The global status. Possible codes are,
-*		System service status from SYS$DELTVA
+*        	System service status from SYS$DELTVA
 
-*  Returned value:
+*  Returned Value:
 *     (void)
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     VMS RTL:
-*        SYS$DELTVA        Map a global section
-*     NBS:
-*        NBS_MLIST_UNMAP   Unmap a section in the section list
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     02-Feb-1990 (WFL):
@@ -1538,6 +1896,19 @@ char *NBS_MAP_SECTION ( RW_CHARACTER(name), W_INTEGER(status) TRAIL(name) )
 *     22-Mar-1993 (DJA):
 *        Added error reporting and string handling.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     VMS RTL:
+*        SYS$DELTVA        Map a global section
+*     NBS:
+*        NBS_MLIST_UNMAP   Unmap a section in the section list
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 void
@@ -1675,11 +2046,39 @@ NBS_MLIST_UNMAP ((char *) start,status);
 *        Whether add the offsets at the beginning (1) or subtract them
 *        at the end (0).
 
-*  Returned value:
+*  Returned Value:
 *     (void)
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1987 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     23-Jul-1987 (WFL):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     NBS:
@@ -1687,10 +2086,9 @@ NBS_MLIST_UNMAP ((char *) start,status);
 *        NBS_RELOCATE_POINTERS Relocate pointers for an item and all
 *                              lower-level items
 
-*  History:
-*     23-Jul-1987 (WFL):
-*        Original version.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     None
+
 *-
 */
 void
@@ -1757,20 +2155,47 @@ NBS_RELOCATE_POINTERS (item_id id,int i_offset,int fbs_offset,
 *        Whether add the offsets at the beginning (1) or subtract them
 *        at the end (0).
 
-*  Returned value:
+*  Returned Value:
 *     (void)
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1987 Science & Engineering Research Council. All
+*     Rights Reserved.
 
-*  External Routines Used:
-*     NBS:
-*        NBS_RELOCATE_ADDRESS  Relocate a single address
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
 *        Original version.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     NBS:
+*        NBS_RELOCATE_ADDRESS  Relocate a single address
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 void
@@ -1826,15 +2251,32 @@ NBS_RELOCATE_ITEM (item_id id,int i_offset,int fbs_offset,int d_offset,int add)
 *     int ADD (Given)
 *        Whether add the offsets (1) or subtract them (0).
 
-*  Returned value:
+*  Returned Value:
 *     (Char *) NBS_RELOCATE_ADDRESS
 *        The relocated address.
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     None
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -1843,6 +2285,16 @@ NBS_RELOCATE_ITEM (item_id id,int i_offset,int fbs_offset,int d_offset,int add)
 *        Removed check for negative address as both ULTRIX and SunOS can
 *        generate such legal addresses.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     None
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 char *NBS_RELOCATE_ADDRESS (char *address,int offset,int add)
@@ -1917,12 +2369,42 @@ char *NBS_RELOCATE_ADDRESS (char *address,int offset,int add)
 *     int MAXCHAR (Given)
 *        Maximum number of characters to copy to the output string.
 
-*  Returned value:
+*  Returned Value:
 *     (Char *) NBS_STRIMP
 *        Pointer to the first character in the output string.
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     23-Jul-1987 (WFL):
+*        Original version.
+*     22-Mar-1993 (DJA):
+*        Recoded using F77 and CNF packages.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     C RTL:
@@ -1931,12 +2413,9 @@ char *NBS_RELOCATE_ADDRESS (char *address,int offset,int add)
 *        TOUPPER       Convert a character to upper-case.
 *        STRLEN        Length of C string
 
-*  History:
-*     23-Jul-1987 (WFL):
-*        Original version.
-*     22-Mar-1993 (DJA):
-*        Recoded using F77 and CNF packages.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     None
+
 *-
 */
 #ifdef c_string
@@ -2011,15 +2490,31 @@ char *F77_EXTERNAL_NAME(nbs_strimp) ( char *out, RW_CHARACTER(in),
 *     int MAXCHAR (Given)
 *        Maximum number of characters to copy from the input string.
 
-*  Returned value:
+*  Returned Value:
 *     (Void)
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1987, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
 
-*  External Routines Used:
-*     CNF:
-*        CNF_EXPN      Export C string to FORTRAN string
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     23-Jul-1987 (WFL):
@@ -2027,6 +2522,17 @@ char *F77_EXTERNAL_NAME(nbs_strimp) ( char *out, RW_CHARACTER(in),
 *     22-Mar-1993 (DJA):
 *        Recoded using F77 and CNF packages.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     CNF:
+*        CNF_EXPN      Export C string to FORTRAN string
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 #ifdef c_string
@@ -2128,20 +2634,47 @@ void F77_EXTERNAL_NAME(nbs_strexp)( RW_CHARACTER(out),
 *     space and all such sections in order that they can be removed from
 *     the system without further actionn by the user.
 
-*  Returned value:
+*  Returned Value:
 *     (Void)
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council. All
+*     Rights Reserved.
 
-*  External Routines Used:
-*     NBS:
-*        NBS_MLIST_UNMAP   Unmap a global section from process address space
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     30-Apr-1993 (DJA):
 *        Original version.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     NBS:
+*        NBS_MLIST_UNMAP   Unmap a global section from process address space
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 void NBS_MLIST_EXITHANDLER ()
@@ -2200,20 +2733,47 @@ void NBS_MLIST_EXITHANDLER ()
 *           NBS__IMPOSSIBLE => Section already mapped, indicates failure
 *           of logic elsewhere in NBS
 
-*  Returned value:
+*  Returned Value:
 *     (Void)
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council. All
+*     Rights Reserved.
 
-*  External Routines Used:
-*     C RTL:
-*        MALLOC        Allocate dynamic memory
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     05-Feb-1993 (DJA):
 *        Original version.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     C RTL:
+*        MALLOC        Allocate dynamic memory
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 void NBS_MLIST_ADD ( int creator, int memid, char *addr, int *status )
@@ -2301,21 +2861,48 @@ else
 *     int *STATUS (Given and returned)
 *        Global status. Possible codes are,
 
-*  Returned value:
+*  Returned Value:
 *     (char * ) = NBS_MLIST_FIND
 *        Start address of mapped global section
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council. All
+*     Rights Reserved.
 
-*  External Routines Used:
-*     C RTL:
-*        MALLOC        Allocate dynamic memory
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
 
 *  History:
 *     05-Feb-1993 (DJA):
 *        Original version.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  External Routines Used:
+*     C RTL:
+*        MALLOC        Allocate dynamic memory
+
+*  Prior Requirements:
+*     None
+
 *-
 */
 char * NBS_MLIST_FIND ( int memid, int *status )
@@ -2376,11 +2963,39 @@ return addr;
 *     int *STATUS (Given and returned)
 *        Global status. Possible codes are,
 
-*  Returned value:
+*  Returned Value:
 *     (Void)
 
-*  Prior Requirements:
-*     None
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     05-Feb-1993 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *  External Routines Used:
 *     UNIX RTL:
@@ -2389,10 +3004,9 @@ return addr;
 *     C RTL:
 *        FREE          Release dynamic memory
 
-*  History:
-*     05-Feb-1993 (DJA):
-*        Original version.
-*     {enter_changes_here}
+*  Prior Requirements:
+*     None
+
 *-
 */
 void NBS_MLIST_UNMAP ( char *addr, int *status )
@@ -2470,6 +3084,9 @@ void NBS_MLIST_UNMAP ( char *addr, int *status )
 *     msecs = int (Given)
 *        The number of milliseconds to sleep for.
 
+*  Returned Value:
+*     (Void)
+
 *  Notes:
 *     -  If a negative time interval is given, the routine returns immediately.
 *     -  The resolution of the timer on the Sun is 10ms.
@@ -2481,29 +3098,17 @@ void NBS_MLIST_UNMAP ( char *addr, int *status )
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council
 
-*  Returned value:
-*     (Void)
-
-*  Prior Requirements:
-*     None
-
-*  External Routines Used:
-*     UNIX RTL:
-*        SELECT              Connect to file descriptors, with timeout.
-*     VMS RTL:
-*        LIB$WAIT            Wait a specified number of milliseconds.
-
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -2511,6 +3116,7 @@ void NBS_MLIST_UNMAP ( char *addr, int *status )
 
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
 
 *  History:
 *     18-Jun-1992 (PMA):
@@ -2522,6 +3128,15 @@ void NBS_MLIST_UNMAP ( char *addr, int *status )
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  External Routines Used:
+*     UNIX RTL:
+*        SELECT              Connect to file descriptors, with timeout.
+*     VMS RTL:
+*        LIB$WAIT            Wait a specified number of milliseconds.
+
+*  Prior Requirements:
+*     None
 
 *-
 */

@@ -2,37 +2,66 @@
 #include "nbs_typ.h"
 
 /*
- *+
- *  Name:
- *     nbs_gbl.c
+*+
+*  Name:
+*     nbs_gbl.c
 
- *  Purpose:
- *     Define global variables
+*  Purpose:
+*     Define global variables
 
- *  Authors:
- *     WFL: William Lupton (RGO)
- *     AA: Alasdair Allan (Starlink)
- *     TIMJ: Tim Jenness (JAC, Hawaii)
- *     NXG: Norman Gray (Starlink)
+*  Language:
+*     ANSI C
 
- *  History:
- *     XX-XX-19XX (WFL):
- *        Original.
- *     28-JUN-2004 (AA/TIMJ/NXG):
- *        Symbols were undefined under Mac OSX and GCC 3.3, defining the pointer
- *        to NULL fixed this (int's set to zero just in case). Looks to be from the
- *        ISO-9899:1999 standard (section 6.9.2) (commonly refered to as C99) which 
- *        declares that:
- *   
- *        "A declaration of an identifier for an object that has file scope 
- *        without an initializer, and without a storage-class specified for with 
- *        the storage-class specifier static, constitutes a tentative definition. 
- *        If a translation unit contains one or more tentative definitions for an
- *        identifier, and the translation unit contains no external definitions for
- *        that identifier, then the behaviour is exactly as if the translation unit
- *        contains a file scope declaration of that identifier, with the composite
- *        type as of the end of the translation unit, with an initializer equal to 0."
- *-
+*  Copyright:
+*     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     WFL: William Lupton (RGO)
+*     AA: Alasdair Allan (Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     NXG: Norman Gray (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     XX-XX-19XX (WFL):
+*        Original.
+*     28-JUN-2004 (AA/TIMJ/NXG):
+*        Symbols were undefined under Mac OSX and GCC 3.3, defining the pointer
+*        to NULL fixed this (int's set to zero just in case). Looks to be from the
+*        ISO-9899:1999 standard (section 6.9.2) (commonly refered to as C99) which 
+*        declares that:
+*
+*        "A declaration of an identifier for an object that has file scope 
+*        without an initializer, and without a storage-class specified for with 
+*        the storage-class specifier static, constitutes a tentative definition. 
+*        If a translation unit contains one or more tentative definitions for an
+*        identifier, and the translation unit contains no external definitions for
+*        that identifier, then the behaviour is exactly as if the translation unit
+*        contains a file scope declaration of that identifier, with the composite
+*        type as of the end of the translation unit, with an initializer equal to 0."
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */   
 
 /* External definitions   */

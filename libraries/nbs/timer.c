@@ -1,22 +1,52 @@
 /*
- *+
- *  Name:
- *     timer.c
- *
- *  Purpose:
- *     UNIX implementations of the routines timer_start and cpu_used
- *
- *  Authors:
- *     KS: Keith Shortridge (AAO)
- *     WFL: William Lupton (RGO)
- 
- *  History:
- *     XX-XXX-198X (KS):
- *        Original.
- *     31-Mar-88 (WFL):
- *        Make portable between VMS and UNIX and return all
- *        elapsed times as integer microseconds.
- *-
+*+
+*  Name:
+*     timer.c
+
+*  Purpose:
+*     UNIX implementations of the routines timer_start and cpu_used
+
+*  Language:
+*     {routine_language}
+
+*  Copyright:
+*     Copyright (C) 1988 Science & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     KS: Keith Shortridge (AAO)
+*     WFL: William Lupton (RGO)
+*     {enter_new_authors_here}
+
+*  History:
+*     XX-XXX-198X (KS):
+*        Original.
+*     31-Mar-1988 (WFL):
+*        Make portable between VMS and UNIX and return all
+*        elapsed times as integer microseconds.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
  */
 
 #if HAVE_CONFIG_H
