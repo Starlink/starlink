@@ -27,4 +27,5 @@ starconf.status.local
 stamp-h1
 make.log
 .deps
-
+kapmon.hlp.1
+kapmon.hlp.2
