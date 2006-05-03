@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {214.19}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {28th April 2006}
+\newcommand{\stardocdate}      {3rd May 2006}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and Image Analysis Tool}
 \newcommand{\stardocversion}   {3.0-0}
 \newcommand{\stardocmanual}    {User's Manual}
@@ -331,9 +331,10 @@ The GAIA home page is at:
 \begin{quote}
 \htmladdnormallink{\mytt{http://www.starlink.rl.ac.uk/gaia/}}{http://www.starlink.rl.ac.uk/gaia/}.
 \end{quote}
-which may be updated from time-to-time. GAIA was mainly produced by the now
-closed Starlink project, funded by the Particle Physics and Astronomy Research
-Council (see links on the front page).
+which may be updated from time-to-time. GAIA was created by the now
+closed Starlink UK project, funded by the Particle Physics and Astronomy Research
+Council (see links on the front page) ans has been more recently support by
+the Joint Astronomy Centre Hawaii (another PPARC funded organisation).
 
 \subsection{\xlabel{using_gaia_from_the_cshell}Using GAIA from the C-shell}
 
@@ -888,8 +889,8 @@ to read about ``SkyCat plugins''.
 
 The most significant change in this release are many updates to the cube
 toolbox. This is now much faster at image slicing and handles FITS cubes as
-well as NDF cubes. It also features an all new, built-in, interactive
-spectral readout display.
+well as NDF cubes. It also features an all new, built-in, interactive spectral
+readout display.
 
 As part of these cube handling updates, all the image analysis toolboxes now
 also work on cube slices. Spectral analysis features are provided by SPLAT-VO,
@@ -903,47 +904,50 @@ Highlights of the change to Skycat 2.4.7 include a new feature for the display
 of MEFs, and groups of NDFs, as a single image.
 
 There are also many minor changes in this release of GAIA:
+\begin{itemize}
+    \item GAIA can now display in-line compressed images (such as RICE from
+     WFCAM). These are converted into temporary files on the fly and can be
+     used with all other tasks within GAIA.
 
-    - GAIA can now display in-line compressed images (such as RICE from WFCAM).
-      These are converted into temporary files on the fly and can be
-      used with all other tasks within GAIA.
+    \item The ESP toolbox now reports the mean count along the isophote and
+     plots intensity profiles.
 
-    - The ESP toolbox now reports the mean count along the isophote and plots
-      intensity profiles.
+    \item A rarely seen problem with foreign-file conversion deleting the
+     input files has been fixed.
 
-    - A rarely seen problem with foreign-file conversion deleting the input
-      files has been fixed.
+    \item The object detection toolbox has been updated to work with
+     SExtractor version 2.4.3. This includes Petrosian magnitudes and some
+     windowed parameters.
 
-    - The object detection toolbox has been updated to work with SExtractor
-      version 2.4.3. This include Petrosian magnitudes and some windowed
-      parameters.
+    \item The Second U.S. Naval Observatory CCD Astrograph Catalogue (UCAC2)
+    has been added to the default list. Existing users will be prompted to
+    remove the file \mytt{\$HOME/.skycat/skycat.cfg} and re-start GAIA to make
+    this available.
 
-    - The Second U.S. Naval Observatory CCD Astrograph Catalog (UCAC2) has
-      been added to the default list. Existing users will be prompted to
-      remove the file $HOME/.skycat/skycat.cfg and re-start GAIA to make this
-      available.
+    \item The 2MASS catalogue query now includes a minimum radius. This change
+     will be included with the UCAC2 update.
 
-    - The GAIAIMAGEPICK_DIR environment variable now selects default directory
-      for Pick Image toolbox log file.
+    \item The \mytt{GAIAIMAGEPICK\_DIR} environment variable now selects
+     default directory for Pick-Image toolbox log file.
 
-    - The image slice now has a option to display the Y axis using a log scale.
+    \item The image slice now has a option to display the Y axis using a log
+     scale. 
 
-    - The 2MASS catalogue query now includes a minimum radius. Remove any
-      existing $HOME/.skycat/skycat.cfg files to benefit from this change.
-
-    - The NDF cube slice display toolbox now has options for continuously
-      looping (including "rock-and-roll").
+    \item The cube slice display toolbox now has options for continuously
+     looping (including "rock-and-roll").
+\end{itemize}
 
 Finally in this release GAIA has undergone major changes in the way that it is
 built and distributed (it is now available in the Starlink CVS repository and
-uses the unified build procedures). One consequence of this is that GAIA no
-longer distributes any files for IRAF support.
+uses the unified build procedures). During this change IRAF support has been
+dropped (although the IRAF support files are still available in the CVS
+repository).
 
-GAIA is no longer supported by the Starlink project, which has been
-terminated. Most of this new work has been carried out for the JAC Hawaii.  If
-you want work on GAIA to continue then support it by contacting any current
-members of the PPARC Astronomy or Science committees and making your views
-known.
+Long-term users should note that GAIA is no longer supported by the Starlink
+project, which has been terminated. Most of this new work has been carried out
+for the JAC Hawaii. If you want work on GAIA to continue then support it by
+contacting any current members of the PPARC Astronomy or Science committees
+and making your views known.
 
 \subsection{Release 2.8}
 

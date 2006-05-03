@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Spectral plot window</title>
+  </head>
+
+  <body>
+    <h2 align=center><font color=red>Spectral plot window</font></h2>
+    <p>
+      This window displays a line plot (a spectrum) made from the pixel values
+      along the hidden dimension of a cube. You have usually created it by
+      opening a cube and then clicking on a pixel from the displayed image
+      slice. It can be updated by clicking on another pixel (each click
+      auto-scales the display values) or continuously updated by clicking and
+      then dragging over the image, while holding the mouse button down.
+    <p>
+      To get the data range updated continuously (which will be much slower)
+      you can selection the <tt>Autoscale</tt> item in the cube toolbox
+      <tt>Options</tt> menu. If you want to zoom on a region you can currently
+      only do this using the collapse limits in the cube toolbox. Set these to
+      the pixel ranges required, click on the image and only spectral values
+      from that range will be displayed (both these arrangements may change in
+      the next release).
+    </p>
+    <p>
+      When looking at a spectrum the position of the current slice in the cube
+      is shown by a vertical line (red by default). This will updated as you
+      move through the cube slice-by-slice (the position of the spectrum on
+      the image is shown by a cross).
+    <p>
+    <p>
+      You are free to close this window at any time as it will be reopened (if
+      you click on the image) if the cube toolbox is active. It can also (like
+      all GAIA windows) be resized.
+    </p>
+
+    <h3>Taking a hardcopy</h3>
+    <p>
+      To either print a copy of the spectrum or save a copy to disk you can
+      use the <tt>File</tt> <tt>Print</tt> option. Using the various options
+      in the <tt>Options</tt> and <tt>Graphics</tt> menu you can change the
+      various colours and fonts in use and add temporary annotations.
+    </p>
+    
+    <h3>Why doesn't the log option work?</h3>
+    <p>
+      For either axis to be drawn using log spacing the limits cannot include
+      the value zero. When this is detected the axes are drawn using a linear
+      spacing.
+    </p>
+  </body>
+</html>

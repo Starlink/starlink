@@ -9,7 +9,7 @@
     <p>
       Using this toolbox you can interactively display successive images from
       the planes of a cube and "spectra" for each pixel position from the
-      remaining dimension. The aim is to be as efficient as possible, at these
+      remaining dimension. The aim is to be as efficient as possible at these
       two jobs, and very good speed is available on machines whose physical
       memory is greater than the size of the cube.
     </p>
@@ -29,7 +29,9 @@
       This simple behaviour can be enhanced using the extra controls in the
       lower panes. Using these you can automatically step through a range of
       indices (with three options for continuous looping), or you can create a
-      new image that is produced by collapsing a range of planes.
+      white light image that is produced by collapsing a range of planes
+      (there are options to control the collapse in various ways, such as
+      mean, mode, median, and integrated value, see the KAPPA COLLAPSE help).
     </p>
     <p>
       Once an image is displayed you are free to analyse it using the usual
@@ -46,16 +48,28 @@
     <p>
       The toolbox should handle both NDF and FITS data cubes with more-or-less
       equal efficiency (NDF's may be slightly more efficient for some
-      formats). Other formats will be converted into NDFs on the fly. For
-      large datasets that isn't optimal, so you should convert the data
-      yourself to NDF first. The CONVERT package has many applications for
+      integer data types). Other formats will be converted into NDFs on the
+      fly. For large datasets that isn't optimal, so you should convert the
+      data yourself to NDF first. The CONVERT package has many applications for
       performing these conversions. If you want to use any tools that operate
       on the full cube data, rather than a plane (so that's any operations ran
       from this window, rather than any of the usual image analysis
       toolboxes), then having your data in NDF format is definitely preferred,
       as that will also involve a conversion to NDF anyway.
     </p>
-
+    <p>
+      Normally the cube file is memory mapped to access the data. Usually this
+      gives a good compromise between startup speed and access speed. However,
+      for very large cubes (2Gb and up) the access speed can suffer as the
+      data is only read incrementally on demand. This is particularly
+      noticable when plotting spectra (which are usually accessed sparsely
+      being in the third dimension), typically this manifests itself as a very
+      slow response, which suddenly becomes much faster after clicking on the
+      cube many times. To avoid this behaviour you can choose to read the cube
+      into core memory (but make sure you have sufficient first), in one
+      chunk. To do this select the <tt>Memory map cube data</tt> option in the
+      <tt>Options</tt> menu (and wait a while).
+    </p>
     <p>
       When using some image analysis tools the currently displayed plane will
       be replaced with an actual NDF (for speed the image plane is displayed
@@ -68,16 +82,18 @@
       extract the plane from the cube using the KAPPA task NDFCOPY, with a
       suitable NDF section (this is shown as part of the slice name in the
       main window) and open that normally in GAIA.
-   </p>
+    </p>
 
     <h3>Analysing spectra</h3>
     <p>
-      The simplest way to view a spectrum, for analysis, is to double click on
-      the image currently displayed (this can be a slice or a collapsed
-      image). Then providing you have the Starlink SPLAT program installed on
-      your machine the data from the third dimension will be displayed as a
-      line plot, where you can measure line strengths, compare to other
-      spectra (from the VO), etc.
+      The spectral display tool is just that and offers no analysis
+      features. If you want to perform a measurement on a spectrum (or say
+      compare it with one from the VO) then you can either extract it (using
+      some command-line tool like KAPPA NDFCOPY), or send it to the Starlink
+      SPLAT-VO program (best to only do this when displaying NDFs). If you
+      want to do this enable SPLAT by selecting the <tt>Enable SPLAT</tt> item
+      in the <tt>Options</tt> menu. Once you've done that you can send a
+      spectrum to SPLAT by double clicking on the relevant image pixel.
     </p>
   </body>
 </html>
