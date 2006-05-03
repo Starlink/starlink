@@ -105,8 +105,8 @@ help/picgrid.hlp help/piclast.hlp help/picxy.hlp
 #  Define the tasks for each monolith.
 
 KAPPA_TASKS = div pow add aperadd ardgen ardmask block cadd calc      \
-calpol cdiv centroid chpix cmult collapse compadd compave compick     \
-convolve copybad creframe csub errclip expon ffclean fillbad          \
+calpol cdiv centroid chanmap chpix cmult collapse compadd compave     \
+compick convolve copybad creframe csub errclip expon ffclean fillbad  \
 fitsurface flip fourier gausmooth glitch globals histat histeq        \
 histogram interleave laplace kstest logar look lucy manic makesurface \
 maths median mstats mult noglobals nomagic normalize numb outset parget \
@@ -257,13 +257,14 @@ nomagic.ifc normalize.ifc numb.ifc outset.ifc \
 parget.ifc paste.ifc permaxes.ifc pixdupe.ifc \
 psf.ifc regrid.ifc rift.ifc add.ifc aperadd.ifc \
 ardgen.ifc ardmask.ifc block.ifc cadd.ifc calc.ifc \
-calpol.ifc cdiv.ifc centroid.ifc chpix.ifc cmult.ifc \
-collapse.ifc compadd.ifc compave.ifc compick.ifc \
+calpol.ifc cdiv.ifc centroid.ifc chanmap.ifc chpix.ifc \
+cmult.ifc collapse.ifc compadd.ifc compave.ifc compick.ifc \
 convolve.ifc copybad.ifc creframe.ifc csub.ifc div.ifc \
 pow.ifc ndfpack_mon.ifc kapview_mon.ifc kappa_mon.ifc
 
 
-BUILT_IFL_FILES = kappa_mon.ifl chpix.ifl cmult.ifl collapse.ifl \
+BUILT_IFL_FILES = kappa_mon.ifl chanmap.ifl \
+chpix.ifl cmult.ifl collapse.ifl \
 compadd.ifl compave.ifl compick.ifl convolve.ifl \
 copybad.ifl creframe.ifl csub.ifl div.ifl errclip.ifl \
 expon.ifl ffclean.ifl fillbad.ifl fitsurface.ifl \
