@@ -221,21 +221,35 @@ Updating the source set
 -----------------------
 
 The `make world' command will not _re_build the tree after you do a
-CVS update, possibly unexpectedly.  For an explanation of why this is
-so and what to do about it, see the `General FAQs' in SSN/78,
-described below.
+CVS update, possibly unexpectedly.  For a detailed explanation of why this is
+so, see the `General FAQs' in SSN/78, described below.
 
 
-SSN/78 and FAQs
----------------
+Further information
+-------------------
 
-See Starlink document SSN/78 for more details on building Starlink
-classic applications.  The source for this document is in the
-repository at docs/ssn/078, and a built version should be available on
-the Starlink web pages.  A version is also currently (May 2005)
-available at <http://www.astro.gla.ac.uk/users/norman/star/ssn78/>.
-This document contains some FAQs: some of these will likely be of
-interest to thise building the system from a checkout, though others
+The Starlink document SUN/248 gives further advice about building
+Starlink classic applications, including some platform-specific
+notes.  A version is currently (May 2006) available at
+<http://www.astro.gla.ac.uk/users/norman/star/sun248/>, but may
+migrate to the Starlink site in future.  The source is in the
+repository at docs/sun/248.
+
+You should also consult the project web pages at
+<http://www.starlink.ac.uk>, and consider subscribing to the Starlink
+development mailing list: see <http://www.jiscmail.ac.uk/archives/starlink.html>.
+
+Starlink document SSN/78 gives much more detailed information on the
+process of building Starlink classic applications, but this document
+is primarily concerned with documenting the build system itself, and
+describing how to add new components to the build-system repository.
+The source for this document is in the repository at docs/ssn/078, and
+a built version should be available on the Starlink web pages.  A
+version is also currently (May 2006) available at
+<http://www.astro.gla.ac.uk/users/norman/star/ssn78/>.
+
+This document contains some FAQs: a few of these will likely be of
+interest to thise building the system from a checkout, though most
 address quite specific details of how to configure software to work
 within the Starlink source tree.
 
