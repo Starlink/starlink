@@ -1415,8 +1415,8 @@ sub solve {
                                                   );
       };
       if( $@ ) {
-        $self->printerr( "Error setting up SkyCat query: $@" )
-          if $self->starlink_output;
+        $self->printerr( "Error setting up SkyCat query: $@" );
+        $self->printerr( "Trying next catalogue in list.\n" );
         next;
       }
 
@@ -1428,9 +1428,8 @@ sub solve {
       };
 
       if( $@ ) {
-print "trapping error\n";
-        $self->printerr( "Error retrieving catalogue from $skycatname: $@" )
-          if $self->starlink_output;
+        $self->printerr( "Error retrieving catalogue from $skycatname: $@" );
+        $self->printerr( "Trying next catalogue in list.\n" );
         next;
       }
 
@@ -1442,11 +1441,16 @@ print "trapping error\n";
       last if $querycat->sizeof != 0;
 
       $self->printerr( "Retrieved zero objects from $skycatname. Trying next catalogue.\n" );
+      $self->printerr( "Trying next catalogue in list.\n" );
 
     }
   }
 
   # Again, croak if we have fewer than 2 objects.
+  if( ! defined( $querycat ) ) {
+    croak "Retrieved query catalogue is undefined. Likely cause is "
+          . "query failed";
+  }
   if( $querycat->sizeof < 2 ) {
     croak "Only retrieved " . $querycat->sizeof . " objects from "
           . $self->catalogue . ". Cannot perform automated astrometry "
