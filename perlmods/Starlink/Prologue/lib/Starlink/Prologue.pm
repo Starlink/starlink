@@ -78,7 +78,6 @@ my %TERMINATORS = (
 		   Authors => '{enter_new_authors_here}',
 		  );
 
-
 # create accessors
 for my $h (@STANDARD_HEADERS) {
   my $method = lc($h);
@@ -489,6 +488,70 @@ sub stringify {
 
   return $code;
 }
+
+=item B<guess_defaults>
+
+Try to fill in some default values by using hint information.
+
+  $prl->guess_defaults( File => $file );
+
+Recognized hints are:
+
+  File => The filename
+
+=cut
+
+sub guess_defaults {
+  my $self = shift;
+  my %hints = @_;
+
+  # fix up language if not defined
+  if (defined $hints{File} && !@{$self->language}) {
+    my $file = $hints{File};
+    if ($file =~ /\./) {
+      # File has a suffix
+      my @parts = split /\./,$file;
+
+      my $lang;
+      my $suffix = $parts[-1];
+      if ($suffix =~ /^(for|f)$/i) {
+	$lang = "Starlink Fortran 77" ;
+      } elsif ($suffix =~ /^(pl|pm)$/) {
+	$lang = "Perl";
+      } elsif ($suffix =~ /^(t)$/) {
+	$lang = "Perl Test";
+      } elsif ($suffix eq 'c') {
+	$lang = "Starlink C";
+      } elsif ($suffix eq 'C' || $suffix eq 'cc') {
+	$lang = "Starlink C++";
+      } elsif ($suffix eq 'sh' ) {
+	$lang = "Bourne shell";
+      } elsif ($suffix eq 'csh' ) {
+	$lang = "C-shell";
+      }
+      $self->language( $lang ) if defined $lang;
+
+    } else {
+      # now things are getting hard so assume Starlink conventions
+      if ($file =~ /_(ERR|SYS|CMN|PAR)$/i ) {
+	$self->language( "Starlink Fortran 77" );
+      }
+    }
+  }
+
+  # fix up type of module
+  my @type_of_module = @{$self->type_of_module};
+  if (!@type_of_module && defined $hints{File}) {
+    my $file = $hints{File};
+    if ($file =~ /_CMN$/i) {
+      $self->type_of_module( "COMMON BLOCK" );
+    } elsif ($file =~ /_(ERR|PAR|SYS)$/i ) {
+      $self->type_of_module( "FORTRAN INCLUDE" );
+    }
+  }
+  return;
+}
+
 
 =back
 

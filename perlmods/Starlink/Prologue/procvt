@@ -158,55 +158,9 @@ sub _convert_header {
     # if we have a prologue it needs to be stringified
     if (ref $entry) {
 
-      # fix up language if not defined
-      if (!@{$entry->language}) {
-	if (!defined $file) {
-	  # assume that old prologue is always Fortran!
-	  my @type = @{$entry->type_of_module};
-	  if (@type && $entry->prologue_type eq 'ADAMSSE' &&
-	      $type[0] =~ /(SUBROUTINE|BLOCK DATA|PROGRAM)/) {
-	    $entry->language("Starlink Fortran 77");
-	  }
-	} elsif ($file =~ /\./) {
-	  # File has a suffix
-	  my @parts = split /\./,$file;
-	  
-	  my $lang;
-	  my $suffix = $parts[-1];
-	  if ($suffix =~ /^(for|f)$/i) {
-	    $lang = "Starlink Fortran 77" ;
-	  } elsif ($suffix =~ /^(pl|pm)$/) {
-	    $lang = "Perl";
-	  } elsif ($suffix eq 'c') {
-	    $lang = "Starlink C";
-	  } elsif ($suffix eq 'C' || $suffix eq 'cc') {
-	    $lang = "Starlink C++";
-	  } elsif ($suffix eq 'sh' ) {
-	    $lang = "Bourne shell";
-	  } elsif ($suffix eq 'csh' ) {
-	    $lang = "C-shell";
-	  }
-	  $entry->language( $lang ) if defined $lang;
+      # Guess suitable defaults
+      $entry->guess_defaults( File => $file );
 
-	} else {
-	  # now things are getting hard so assume Starlink conventions
-	  if ($file =~ /_(ERR|SYS|CMN|PAR)$/i ) {
-	    $entry->language( "Starlink Fortran 77" );
-	  }
-	}
-      }
-
-      # fix up type of module
-      my @type_of_module = @{$entry->type_of_module};
-      if (!@type_of_module) {
-	if (defined $file) {
-	  if ($file =~ /_CMN$/i) {
-	    $entry->type_of_module( "COMMON BLOCK" );
-	  } elsif ($file =~ /_(ERR|PAR|SYS)$/i ) {
-	    $entry->type_of_module( "FORTRAN INCLUDE" );
-	  }
-	}
-      }
       # stringify the prologue
       $rewrite .= $entry->stringify;
       $type = $entry->prologue_type;
