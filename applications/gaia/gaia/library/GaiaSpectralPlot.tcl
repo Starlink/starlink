@@ -122,15 +122,15 @@ itcl::class gaia::GaiaSpectralPlot {
 
       #  Whether to show the secondary plot or not. Also requires an
       #  extra canvas.
-      set show_plot2_ 0
-      $Options add checkbutton \
-         -label {Show thumbnail plot} \
-         -variable [scope show_plot2_] \
-         -onvalue 1 \
-         -offvalue 0 \
-         -command [code $this toggle_show_plot2_]
-      add_menu_short_help $Options {Show thumbnail plot}  \
-         {Show a thumbnail copy of plot in main window}
+      #set show_plot2_ 0
+      #$Options add checkbutton \
+      #   -label {Show thumbnail plot} \
+      #   -variable [scope show_plot2_] \
+      #   -onvalue 1 \
+      #   -offvalue 0 \
+      #   -command [code $this toggle_show_plot2_]
+      #add_menu_short_help $Options {Show thumbnail plot}  \
+      #   {Show a thumbnail copy of plot in main window}
 
       #  Choose a colour for the spectral line.
       $Options add cascade -label "Line color" \
@@ -259,10 +259,10 @@ itcl::class gaia::GaiaSpectralPlot {
       }
       set spectrum_ {}
 
-      if { $itk_option(-canvas) != {} && $spectrum2_ != {} } {
-         $itk_option(-canvas) delete $spectrum2_
-      }
-      set spectrum2_ {}
+      #if { $itk_option(-canvas) != {} && $spectrum2_ != {} } {
+      #   $itk_option(-canvas) delete $spectrum2_
+      #}
+      #set spectrum2_ {}
 
       if { [info exists itk_component(canvas)] && $ref_line_ != {} } {
          $itk_component(canvas) delete $ref_line_
@@ -314,24 +314,24 @@ itcl::class gaia::GaiaSpectralPlot {
       }
 
       #  Create the secondary plot, put this at the given x and y.
-      if { $itk_option(-canvas) != {} && $spectrum2_ == {} && $show_plot2_ } {
-         set autoscale 1
-         set spectrum2_ [$itk_option(-canvas) create spectral_plot \
-                            pointer $adr \
-                            -x $x -y $y -width 200 -height 200 \
-                            -linecolour $linecolour_ -linewidth 1 \
-                            -showaxes 0 -tags $itk_option(-ast_tag) \
-                            -fixedscale 1]
-      }
+      #if { $itk_option(-canvas) != {} && $spectrum2_ == {} && $show_plot2_ } {
+      #   set autoscale 1
+      #   set spectrum2_ [$itk_option(-canvas) create spectral_plot \
+      #                      pointer $adr \
+      #                      -x $x -y $y -width 200 -height 200 \
+      #                      -linecolour $linecolour_ -linewidth 1 \
+      #                      -showaxes 0 -tags $itk_option(-ast_tag) \
+      #                      -fixedscale 1]
+      #}
 
       #  When autoscaling (or just created one of the plots), set the frameset
       #  and the NDF data units.
       if { $autoscale } {
          set frameset [$accessor getaxiswcs $axis [expr $alow -1]]
          $itk_component(canvas) itemconfigure $spectrum_ -frameset $frameset
-         if { $spectrum2_ != {} } {
-            $itk_option(-canvas) itemconfigure $spectrum2_ -frameset $frameset
-         }
+         #if { $spectrum2_ != {} } {
+         #   $itk_option(-canvas) itemconfigure $spectrum2_ -frameset $frameset
+         #}
          $itk_component(canvas) itemconfigure $spectrum_ \
             -dataunits [$accessor getc units] \
             -datalabel [$accessor getc label]
@@ -339,16 +339,16 @@ itcl::class gaia::GaiaSpectralPlot {
 
       #  Pass in the data.
       $itk_component(canvas) coords $spectrum_ pointer $adr
-      if { $spectrum2_ != {} } {
-         $itk_option(-canvas) coords $spectrum2_ pointer $adr
-
-         #  Translate the secondary plot.
-         if { $x != {} && $y != {} } {
-            set dx [expr $x - [$itk_option(-canvas) itemcget $spectrum2_ -x]]
-            set dy [expr $y - [$itk_option(-canvas) itemcget $spectrum2_ -y]]
-            $itk_option(-canvas) move $spectrum2_ $dx $dy
-         }
-      }
+      #if { $spectrum2_ != {} } {
+      #   $itk_option(-canvas) coords $spectrum2_ pointer $adr
+      #
+      #   #  Translate the secondary plot.
+      #   if { $x != {} && $y != {} } {
+      #      set dx [expr $x - [$itk_option(-canvas) itemcget $spectrum2_ -x]]
+      #      set dy [expr $y - [$itk_option(-canvas) itemcget $spectrum2_ -y]]
+      #      $itk_option(-canvas) move $spectrum2_ $dx $dy
+      #   }
+      #}
 
       #  Finished with the spectral data.
       $accessor release $adr
@@ -420,15 +420,15 @@ itcl::class gaia::GaiaSpectralPlot {
    }
 
    #  Handle a change in the show_plot2_ variable.
-   protected method toggle_show_plot2_ {} {
-      if { ! $show_plot2_ && $spectrum2_ != {} } {
-         #  Make spectrum disappear.
-         if { $itk_option(-canvas) != {} } {
-            $itk_option(-canvas) delete $spectrum2_
-         }
-         set spectrum2_ {}
-      }
-   }
+   #protected method toggle_show_plot2_ {} {
+   #   if { ! $show_plot2_ && $spectrum2_ != {} } {
+   #      #  Make spectrum disappear.
+   #      if { $itk_option(-canvas) != {} } {
+   #         $itk_option(-canvas) delete $spectrum2_
+   #      }
+   #      set spectrum2_ {}
+   #   }
+   #}
 
    #  Apply the current grid options.
    public method apply_gridoptions {} {
@@ -540,10 +540,10 @@ itcl::class gaia::GaiaSpectralPlot {
    protected variable spectrum_ {}
 
    #  Whether to show the secondary plot.
-   protected variable show_plot2_ 0
+   #protected variable show_plot2_ 0
 
    #  The secondary spectral_plot item.
-   protected variable spectrum2_ {}
+   #protected variable spectrum2_ {}
 
    #  The reference coordinate, canvas coords.
    protected variable xref_ 0
