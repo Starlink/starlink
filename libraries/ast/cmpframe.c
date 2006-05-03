@@ -145,6 +145,9 @@ f     The CmpFrame class does not define any new routines beyond those
 *        Modify Match so that an attempt is made to align the target with
 *        each of the two component Frames if the target cannot be matched
 *        with the CmpFrame as a whole.
+*     3-MAY-2006 (DSB):
+*        Fix bug in Match that could cause segvio when matching a target
+*        against the second component of a CmpFrame.
 *class--
 */
 
@@ -4051,7 +4054,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
                }
    
                for( ; axis < result_naxes; axis++ ) {
-                  (*template_axes)[ axis ] = operm[ nax1 + ftemplate_axes[ axis ] ];
+                  (*template_axes)[ axis ] = operm[ nax1 + ftemplate_axes[ axis - nax1 ] ];
                }
    
 /* Change the target axes list so that they describe the axes in the
