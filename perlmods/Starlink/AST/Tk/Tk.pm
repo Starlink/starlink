@@ -813,14 +813,23 @@ sub _attr_to_colour {
   my ($canvas, $external, $PRIM) = @_;
 
   my %opts;
+
+  # depends on Tk::Zinc vs Canvas
+  # -fill will be translated by the _create routines.
+  my $bgkey;
+  if ($external->{ISA_CANVAS}) {
+    $bgkey = "-background";
+  } elsif ($external->{ISA_ZINC}) {
+    $bgkey = "-backcolor";
+  }
   my $ci = $external->{$PRIM}->{COLOUR};
   if (defined $ci && $ci >= 0 && $ci <= $#COLOURS) {
     # background color
     if ($ci == 0) {
-      $opts{'-fill'} = $canvas->cget('-background');
+      $opts{'-fill'} = $canvas->cget($bgkey);
     } elsif ($ci == 1) {
       # foreground color
-      my $bg = $canvas->cget('-background');
+      my $bg = $canvas->cget($bgkey);
       my $fg = $COLOURS[$ci];
 
       if ($bg eq $fg) {
