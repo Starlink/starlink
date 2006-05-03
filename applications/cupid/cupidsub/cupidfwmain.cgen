@@ -553,14 +553,6 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
       msgOut( "", "  100 % done", status );
    }
 
-   if( ilevel > 3 ) {
-      int slbnd[3];
-      slbnd[ 0 ] = 1;
-      slbnd[ 1 ] = 1;
-      slbnd[ 2 ] = 1;
-      cupidDumpI( work, ndim, dims, slbnd );
-   }
-
 /* Smooth the boundaries between the clumps. This cellular automata replaces 
    each output pixels by the most commonly occuring value within a 3x3x3 
    cube of input pixels centred on the output pixel. Repeat this process
@@ -580,26 +572,10 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    "ipa" array. */
    if( m1 != ipa ) memcpy( ipa, work, sizeof( int )*nel );
 
-   if( ilevel > 3 ) {
-      int slbnd[3];
-      slbnd[ 0 ] = 1;
-      slbnd[ 1 ] = 1;
-      slbnd[ 2 ] = 1;
-      cupidDumpI( ipa, ndim, dims, slbnd );
-   }
-
 /* Amalgamate adjoining clumps if there is no significant dip between the
    clumps. */
    CGEN_FUNCTION(cupidFWJoin)( array, nel, ndim, dims, skip, rms, config, 
                                ipa, peak_values, &ret, ilevel );
-
-   if( ilevel > 3 ) {
-      int slbnd[3];
-      slbnd[ 0 ] = 1;
-      slbnd[ 1 ] = 1;
-      slbnd[ 2 ] = 1;
-      cupidDumpI( ipa, ndim, dims, slbnd );
-   }
 
 /* Free resources. */
    peak_values = astFree( peak_values );
