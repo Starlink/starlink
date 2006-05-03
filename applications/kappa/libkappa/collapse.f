@@ -22,10 +22,9 @@
 
 *  Description:
 *     This application collapses a nominated pixel axis of an 
-*     N-dimensional NDF, producing an output NDF with one fewer
-*     pixels axes than the input NDF.  A specified range of axis values 
-*     can be used instead of the whole axis (see parameters LOW and
-*     HIGH).
+*     N-dimensional NDF, producing an output NDF with one fewer pixel
+*     axes than the input NDF.  A specified range of axis values can
+*     be used instead of the whole axis (see parameters LOW and HIGH).
 *
 *     For each output pixel, all corresponding input pixel values 
 *     between the specified bounds of the the nominated axis to be
@@ -150,7 +149,7 @@
 *        Frame in the input NDF has been set to the PIXEL Frame (using
 *        WCSFRAME), and so the high and low axis values are specified in
 *        pixel co-ordinates instead of Angstroms.  Note the difference 
-*        between floating point pixel co-ordinates, and integer pixel 
+*        between floating-point pixel co-ordinates, and integer pixel 
 *        indices (for instance the pixel with index 10 extends from 
 *        pixel co-ordinate 9.0 to pixel co-ordinate 10.0).
 *     collapse cube slab 3 low=99.0 high=100.0
@@ -186,7 +185,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, VARIANCE,
-*     LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF
+*     LABEL, TITLE, UNITS, WCS, and HISTORY components of the input NDF
 *     and propagates all extensions.  QUALITY is not propagated.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -292,10 +291,10 @@
 
 *  Local Variables:
       CHARACTER AUNITS*( 30 )    ! Units of co-ordinates 
-      CHARACTER ATTRIB* ( 10 )   ! AST attribute name
+      CHARACTER ATTRIB*( 10 )    ! AST attribute name
       CHARACTER COMP * ( 13 )    ! List of components to process
       CHARACTER DTYPE*( NDF__SZFTP ) ! Numeric type for output arrays
-      CHARACTER ESTIM*6          ! Method to use to estimate collapsed
+      CHARACTER ESTIM*( 6 )      ! Method to use to estimate collapsed
                                  ! values
       CHARACTER ITYPE*( NDF__SZTYP ) ! Numeric type for processing
       CHARACTER LOC1*(DAT__SZLOC)! Locator to the whole NDF
@@ -306,7 +305,7 @@
       CHARACTER LOC5*(DAT__SZLOC)! Locator to cell of the old AXIS array
       CHARACTER LOC6*(DAT__SZLOC)! Locator to component of the old cell
       CHARACTER NAME*(DAT__SZNAM)! The component name
-      CHARACTER TTLC*255         ! Title of original current Frame
+      CHARACTER TTLC*( 255 )     ! Title of original current Frame
       CHARACTER UNITS*( 60 )     ! Units of data 
       INTEGER AEL                ! Number of collapse axis elements
       DOUBLE PRECISION AXHIGH    ! High bound of collapse axis in
@@ -347,7 +346,7 @@
       INTEGER IERR               ! Position of first numerical error
       INTEGER INDF1              ! Input NDF identifier
       INTEGER INDF2              ! Output NDF identifier
-      INTEGER INDFS              ! Input NDF-seciton identifier
+      INTEGER INDFS              ! Input NDF-section identifier
       INTEGER IPAXCO             ! Pointers to mapped d.p. axis array
       INTEGER IPCO               ! Pointers to mapped co-ordinate array
       INTEGER IPIN( 2 )          ! Pointers to mapped input arrays
@@ -367,7 +366,7 @@
       INTEGER JLO                ! Low pixel index for collapse axis
       INTEGER LBND( NDF__MXDIM ) ! Lower pixel index bounds of the input
                                  ! NDF
-      INTEGER LBNDO( NDF__MXDIM )! Lower pixel index bounds of the
+      INTEGER LBNDO( NDF__MXDIM ) ! Lower pixel index bounds of the
                                  ! output NDF
       INTEGER LBNDS( NDF__MXDIM ) ! Lower pixel index bounds of the
                                  ! section of the input NDF
@@ -381,8 +380,8 @@
                                  ! array
       INTEGER NERR               ! Number of numerical errors
       INTEGER NC                 ! Used length of string
-      INTEGER NDIM               ! No. of pixel axes in input NDF
-      INTEGER NDIMO              ! No. of pixel axes in output NDF
+      INTEGER NDIM               ! Number of pixel axes in input NDF
+      INTEGER NDIMO              ! Number of pixel axes in output NDF
       INTEGER NVAL               ! Number of values obtained (1)
       INTEGER OBL                ! Identifier for output-NDF block
       INTEGER OBLSIZ( NDF__MXDIM ) ! Output-NDF sizes for processing 
@@ -439,9 +438,9 @@
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INDF1 )
          CALL MSG_SETC( 'T', TTLC )
-         CALL ERR_REP( 'COLLAPSE_ERR1', 'The transformation from the '//
-     :                 'current co-ordinate Frame of ''^NDF'' '//
-     :                 '(^T) to pixel co-ordinates is not defined.', 
+         CALL ERR_REP( 'COLLAPSE_ERR1', 'The transformation from the '/
+     :                 /'current co-ordinate Frame of ''^NDF'' '/
+     :                 /'(^T) to pixel co-ordinates is not defined.', 
      :                 STATUS )
 
       ELSE IF( .NOT. AST_GETL( MAP, 'TRANFORWARD', STATUS ) .AND.
@@ -550,9 +549,9 @@
 
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'COLLAPSE_ERR3', 'The WCS information is '//
-     :                    'too complex (cannot find two valid pixel '//
-     :                    'positions).', STATUS )
+            CALL ERR_REP( 'COLLAPSE_ERR3', 'The WCS information is '/
+     :                    /'too complex (cannot find two valid pixel '/
+     :                    /'positions).', STATUS )
             GO TO 999
          END IF
 
@@ -564,9 +563,9 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'I', IAXIS )   
-            CALL ERR_REP( 'COLLAPSE_ERR3B', 'The specified WCS axis '//
-     :                    '(axis ^I) has a constant value over the '//
-     :                    'whole NDF and so cannot be collapsed.',
+            CALL ERR_REP( 'COLLAPSE_ERR3B', 'The specified WCS axis '/
+     :                    /'(axis ^I) has a constant value over the '/
+     :                    /'whole NDF and so cannot be collapsed.',
      :                    STATUS )
          END IF
          GO TO 999
@@ -612,8 +611,8 @@
       CALL MSG_SETI( 'I', JAXIS )
       CALL MSG_SETI( 'L', JLO )
       CALL MSG_SETI( 'H', JHI )
-      CALL MSG_OUT( 'COLLAPSE_MSG1', '   Collapsing pixel axis ^I '//
-     :             'from pixel ^L to pixel ^H inclusive...', STATUS )
+      CALL MSG_OUT( 'COLLAPSE_MSG1', '   Collapsing pixel axis ^I '/
+     :              /'from pixel ^L to pixel ^H inclusive...', STATUS )
       CALL MSG_BLANK( ' ', STATUS )
       AEL = JHI - JLO + 1
 
@@ -869,12 +868,12 @@
 *  full span of a dimension that becomes the block size along that
 *  axis.  Partial fills take the remaining maximum size and subsequent
 *  dimensions' block sizes are unity.
-      IBLSIZ( IAXIS ) = AEL
+      IBLSIZ( JAXIS ) = AEL
       MAXSIZ = MAX( 1, MAXPIX / AEL )
       LOOP = .TRUE.
       J = 0
       DO I = 1, NDIM
-         IF ( I .NE. IAXIS ) THEN
+         IF ( I .NE. JAXIS ) THEN
             IF ( LOOP ) THEN
                D = UBND( I ) - LBND( I ) + 1
                IF ( MAXSIZ .GE. D ) THEN
