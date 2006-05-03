@@ -7,7 +7,10 @@
 #  Purpose:
 #     Generate linker (ld) arguments for linking against ADAM NBS.
 
-#  Type of Module:
+#  Language:
+#     {routine_language}
+
+#  Type Of Module:
 #     Shell script.
 
 #  Description:
@@ -16,16 +19,24 @@
 #     compiler (or ld) command. The arguments generated are written to
 #     the standard output.
 
-#  Invocation:
-#     The script may be invoked as part of a command such as:
-#
-#        alink program.f -L/star/lib `nbs_link_adam`
-#
-#     although the ADAM "alink" command will normally link against NBS
-#     anyway.
-
 #  Copyright:
 #     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     DJA: D.J. Allan (Jet-X, University of Birmingham)
@@ -41,6 +52,12 @@
 
 #  Bugs:
 #     {note_any_bugs_here}
+
+#  The Script May Be Invoked As Part Of A Command Such As:
+#        alink program.f -L/star/lib `nbs_link_adam`
+#
+#     although the ADAM "alink" command will normally link against NBS
+#     anyway.
 
 #-
 
