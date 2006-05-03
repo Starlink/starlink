@@ -11226,7 +11226,7 @@ iraf! {
       action makesnr {
          alias {makesn(r)}
 
-         helplib {$CUPID_HELP}
+         helplib {$KAPPA_HELP}
 
          parameter in {
             position 1
