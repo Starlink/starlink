@@ -72,6 +72,10 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN            ! Length of a string less trailing
+                                 ! blanks
+                                       
 *  Local Variables:
       CHARACTER CARD1*80         ! FITS header card from 1st FitsChan
       CHARACTER CARD2*80         ! FITS header card from 2nd FitsChan
@@ -82,14 +86,10 @@
       INTEGER COM2               ! Index of start of comment in CARD2
       INTEGER FC1                ! AST identifier first FitsChan
       INTEGER FC2                ! AST identifier second FitsChan
-      INTEGER IENCOD             ! Index of the current encoding
       INTEGER ISTAT              ! CHR status value
       INTEGER NMLEN              ! Length of the keyword
       INTEGER NOBJ1              ! No. of objects written to 1st FitsChan
       INTEGER NOBJ2              ! No. of objects written to 2nd FitsChan
-      INTEGER OBJ                ! AST identifier for Object read from FC2
-
-      integer chr_len
 
 *.
 
