@@ -476,7 +476,6 @@
      :  WHDIM( 1 )             ! Size of the structure to store the 
                                ! header cards
       INTEGER
-     :  ISTAT,                 ! Status variable for file finding 
      :  LP,                    ! Loop variable
      :  ADDED,                 ! Number of items added to a group
      :  ENCGRP                 ! Group identifier of ENCODINGS
