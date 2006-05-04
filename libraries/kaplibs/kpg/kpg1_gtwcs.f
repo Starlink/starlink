@@ -82,6 +82,8 @@
 *     18-MAR-2006 (DSB):
 *        Use the AXIS Frame from the supplied NDF instead of from the
 *        temporary NDF when reading WCS from a FITS extension.
+*     4-MAY-2006 (DSB):
+*        Guard against NULL IWCS values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -417,7 +419,7 @@
 *  if they use LutMaps, the LutMap will have an inappropriate number of 
 *  entries).
                   CALL NDF_STATE( INDF, 'AXIS', THERE, STATUS )
-                  IF( THERE ) THEN
+                  IF( THERE .AND. IWCS .NE. AST__NULL ) THEN
 
 *  Get the default FrameSet from the supplied NDF, and get the Mapping
 *  from GRID to AXIS, and the AXIS Frame (the AXIS Frame will be the
