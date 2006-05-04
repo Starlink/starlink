@@ -81,7 +81,6 @@
       INTEGER NCARD              ! Total number of header cards
       INTEGER NCARD1             ! Number of header cards in NDF1
       INTEGER NCARD2             ! Number of header cards in NDF2
-      INTEGER NDIM               ! Number of dimensions
       CHARACTER * ( DAT__SZLOC ) TFALOC ! Locator to temporary airlock
                                  ! copy from first NDF
       LOGICAL VALID              ! NDF identifier is valid?

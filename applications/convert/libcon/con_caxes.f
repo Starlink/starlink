@@ -44,7 +44,7 @@
 *        Re-written to derived the AXIS values from the WCS component of
 *        the NDF cube.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *-
@@ -73,7 +73,6 @@
       PARAMETER ( D2R = 0.01745329252 )
 
 *  Local Variables:
-      CHARACTER AX*10     ! Buffer for axis specifier
       CHARACTER LA(3)*8   ! Label attribute names
       CHARACTER TEXT*80   ! Buffer for label text
       DOUBLE PRECISION BPOS( 3 ) ! A Base Frame positions
