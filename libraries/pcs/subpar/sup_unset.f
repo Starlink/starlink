@@ -43,6 +43,7 @@
 *
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -63,11 +64,14 @@
 
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-JUN-1993 (AJC):
 *        Original version.
+*     03-MAY-2006 (TIMJ):
+*        Initialise KEYDO.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -112,6 +116,7 @@
 
 *  Local Data:
       DATA KEYWORDS/'MINIMUM','MAXIMUM','DEFAULT'/
+      DATA KEYDO / NKEYS * .FALSE. /
 *.
 
 *  Start new error environment
