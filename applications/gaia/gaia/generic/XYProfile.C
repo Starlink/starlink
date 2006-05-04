@@ -48,6 +48,7 @@
  *        Added double precision support.
  *     {enter_changes_here}
  *-
+ */
 
 #include <climits>
 #include <cstring>
