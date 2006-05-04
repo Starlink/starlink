@@ -84,7 +84,6 @@
       INTEGER MAP5               ! 1-D PIXEL to 1-D AXIS mapping
       INTEGER NC                 ! No. of characters in text
       INTEGER OUTPRM( NDF__MXDIM ) ! Indices of corresponding axes
-      LOGICAL THERE              ! Is an AXIS coordinate system defined?
 
 *.
 
