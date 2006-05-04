@@ -329,7 +329,8 @@
 *  Copyright:
 *     Copyright (C) 1991, 1992, 1998-2001 Central Laboratory of 
 *         the Research Councils
-*     Copyright (C) 2004-2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2004-2006 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -375,6 +376,9 @@
 *        Use CNF_PVAL
 *     27-DEC-2005 (TIMJ):
 *        Use KPG1_NDFNAM
+*     03-MAY-2006 (TIMJ):
+*        Protect some sections if status is bad. Prevents SEGV.
+*        Initialise some variables.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -476,6 +480,15 @@
       GOTNAM = .FALSE.
       OUTCO = .FALSE.
       LOGPOS = .FALSE.
+      FILE = .FALSE.
+      NPOS = 0
+      MARK = ' '
+
+*  Initialise pointers for valgrind
+      IPW1 = 0
+      IPW2 = 0
+      IPOUT = 0
+      IPID = 0
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
@@ -776,7 +789,7 @@
 *  Obtain the search region sizes, duplicating the value if only a single 
 *  value is given. Each size must be a positive odd number.
       CALL PAR_GDRVI( 'SEARCH', NDIMS, 1, 51, SEARCH, NVAL, STATUS )
-      IF( NVAL .LT. NDIMS ) THEN
+      IF( STATUS .EQ. SAI__OK .AND. NVAL .LT. NDIMS ) THEN
          DO  I = NVAL + 1, NDIMS
             SEARCH( I ) = SEARCH( 1 )
          END DO
@@ -810,7 +823,7 @@
       CALL PAR_GDRVR( 'MAXSHIFT', NDIMS, 0.0, 26.0, MXSHFT, NVAL,
      :                STATUS )
 
-      IF( NVAL .LT. NDIMS ) THEN
+      IF( STATUS .EQ. SAI__OK .AND. NVAL .LT. NDIMS ) THEN
          DO  I = NVAL + 1, NDIMS
             MXSHFT( I ) = MXSHFT( 1 )
          END DO
