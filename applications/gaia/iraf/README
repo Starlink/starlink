@@ -1,0 +1,16 @@
+These are the support files for running GAIA from IRAF cl.
+
+They are no longer supported, but that doesn't mean they will
+no longer work. The positions of these files was:
+
+ % ls -R /star/iraf/gaia/
+ /star/iraf/gaia/:
+ doc      gaiacut.cl         gaiadisp.cl  gaia.hd   gaiapercent.cl  root.hd
+  gaia.cl  gaiadispandcut.cl  _gaia.hd     gaia.men  helpdb.mip
+
+ /star/iraf/gaia/doc:
+ gaiacut.hlp  gaiadispandcut.hlp  gaiadisp.hlp  gaia.hlp  gaiapercent.hlp
+
+Getting the cl scripts to work is probably straight-forward.
+
+Peter W. Draper 4-MAY-2006.
