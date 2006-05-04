@@ -116,9 +116,9 @@
 *        The output NDF.
 *     SHAPE = _INTEGER (Read)
 *        The number of channels along the x axis of the output NDF.  The
-*        number along the y axis will be (NCHAN-1)/SHAPE.  A null value 
-*        (!) asks the application to select a shape.  It will generate
-*        one that gives the most square output NDF possible.
+*        number along the y axis will be 1+(NCHAN-1)/SHAPE.  A null 
+*        value (!) asks the application to select a shape.  It will
+*        generate one that gives the most square output NDF possible.
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
 *        propagates the title from the input NDF to the output NDF.  [!]
@@ -705,6 +705,8 @@
 
 *  The aspect ratio is 1.0 and the tiles abut.
          CALL KPS1_CHSHA( NOCHAN, CHDIMS, 1.0, 0.0, SHAPE, STATUS )
+      ELSE
+         SHAPE( 2 ) = ( NOCHAN - 1 ) / SHAPE( 1 ) + 1
       END IF
 
 *  Propagate the input to the output NDF and define latter's bounds.
@@ -850,11 +852,15 @@
 *  a two-dimensional to three-dimensional Mapping, with a constant
 *  along the third axis, being a representative collapsed-axis
 *  PIXEL co-ordinate (indicated by the negative axis).
-      DO I = 1, NDIMO
-         IPERM( I ) = I
-         OPERM( I ) = AXES( I )
+      J = 0
+      DO I = 1, NDIM
+         IF ( I .NE. JAXIS ) THEN
+            J = J + 1
+            IPERM( J ) = J
+            OPERM( I ) = J
+         END IF
       END DO
-      OPERM( NDIM ) = -1
+      OPERM( JAXIS ) = -1
 
 *  Make a temporary NDF to store a single channel's image.
       CALL NDF_TEMP( PLACE, STATUS )
