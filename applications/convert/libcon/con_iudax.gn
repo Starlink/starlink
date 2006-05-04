@@ -73,7 +73,6 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( 1 ) BUFFER   ! Buffer for skipping over records
       INTEGER FIOSTA             ! Fortran I/O status
       INTEGER I                  ! Loop counter for file records
       INTEGER J                  ! Loop counter for values per record
