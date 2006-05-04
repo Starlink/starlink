@@ -37,6 +37,7 @@
  
 *  Copyright:
 *     Copyright (C) 1984, 1988, 1990, 1992 Science & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -59,6 +60,7 @@
 *     BDK: B D Kelly (REVAD::BDK)
 *     AJC: A J Chipperfield (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
  
 *  History:
@@ -73,6 +75,8 @@
 *     1992 November 13 (MJC):
 *        Commented the code, and renamed the NAMECODE identifier.
 *        Re-tidied the prologue.
+*     03-MAY-2006 (TIMJ):
+*        Initialise the return value.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -99,7 +103,10 @@
       INTEGER NAMCOD             ! Code number for the parameter
  
 *.
- 
+
+*  Make sure that we return an initialised value
+      VALUE = .FALSE.
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
  

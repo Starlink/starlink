@@ -36,7 +36,9 @@
 *     returned only if all the components have defined values).
 
 *  Copyright:
-*     Copyright (C) 1997 Rutherford Appleton Laboratory
+*     Copyright (C) 1989-1990, 993, 1997 Rutherford Appleton Laboratory
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -56,6 +58,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,6 +78,8 @@
 *        Installed support for the HISTORY component.
 *     30-JUN-1997 (RFWS):
 *        Installed support for the WCS component.
+*     03-MAY-2006 (TIMJ):
+*        Initialise the return value.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -133,6 +138,9 @@
       INTEGER NEXTN              ! Number of NDF extensions present
 
 *.
+
+*  Make sure that we return an initialised value
+      STATE = .FALSE.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
