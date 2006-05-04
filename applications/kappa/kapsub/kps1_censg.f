@@ -141,8 +141,10 @@
 *     4-DEC-2001 (DSB):
 *        Retain error messages if only a single position is being
 *        centroided.
-*     2004 September 3 (TIMJ):
+*     03-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     03-MAY-2006 (TIMJ):
+*        Initialse INPOS to AST__BAD.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -247,6 +249,8 @@
       REAL X2, Y2                ! Co-ords. of the lower-left of picture
       REAL XIN, YIN              ! Co-ords. of the centre of picture
 *.
+*  Initialisations
+      DATA INPOS / NDF__MXDIM * AST__BAD /
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
