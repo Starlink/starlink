@@ -595,7 +595,6 @@
       INTEGER NCOMP              ! Number of top-level components
       INTEGER NDF                ! NDF identifier
       INTEGER NDFHDR             ! NDF identifier for .HEADER
-      CHARACTER * ( DAT__SZLOC ) NDFLOC ! Locator to an NDF
       INTEGER NDFTMP             ! NDF identifier for temporary NDF
       INTEGER NGROUP             ! Group identifier of list of NDFs in
                                  ! container file
