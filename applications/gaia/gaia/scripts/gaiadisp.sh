@@ -4,17 +4,17 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #+
 #   Name:
 #      gaiadisp
-#
+
 #   Purpose:
 #      Display images in a GAIA tool.
-#
+
 #   Usage:
 #         gaiadisp image
 #      or
 #         gaiadisp image clone_number
 #      or
 #         gaiadisp image1 image2 image3 ...
-#
+
 #   Description:
 #      This command displays images in GAIA. It has two basic modes
 #      display a single image into a specified "clone", or display
@@ -22,12 +22,34 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #
 #      Clones are specified by an integer number less than 1000.
 #      The special number -1 indicates that a number should be generated.
-#
+
 #   Notes:
-#
+
 #   Authors:
 #      Peter W. Draper (PWD):
+
+#  Copyright:
+#     Copyright (C) 1996-2005 Central Laboratory of the Research Councils.
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+
 #   History:
 #      25-NOV-1996 (PWD):
 #         Original version.
