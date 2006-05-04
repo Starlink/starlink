@@ -84,7 +84,6 @@
       CHARACTER * ( 80 ) HISTRY  ! FITS header card
       CHARACTER * ( NDF__SZHST ) HOST ! Host machine
       INTEGER IREC               ! Loop counter for history records
-      INTEGER ISTAT              ! IMFORT status
       CHARACTER * ( NDF__SZHUM ) MODE ! Update mode
       INTEGER NC                 ! Number of characters in update-mode
                                  ! format

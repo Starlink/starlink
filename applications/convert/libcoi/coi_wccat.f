@@ -82,7 +82,6 @@
       CHARACTER * ( 80 ) CARD    ! IRAF header card
       CHARACTER * ( 1 ) CD       ! d in WATd_nnn 
       CHARACTER * ( 4 ) CN       ! 1000 plus line number nnn
-      INTEGER ERR                ! IMFORT error status
       INTEGER KEYNO              ! Keyword counter
       CHARACTER * ( 8 ) KEYWRD   ! Header keyword
       INTEGER LINE               ! Line counter
