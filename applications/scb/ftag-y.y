@@ -89,6 +89,19 @@
 typedef char * STRING;
 #define YYSTYPE STRING
 #include "tag.h"
+#include <stdio.h>
+#include <stdlib.h>
+char *refname( char *name );
+char *fanchor( char *attrib, char *name );
+char *fanchor_inc( char *attrib, char *name );
+int isreserved( char *name );
+int inlist( char *name, ELEMENT *list );
+void array_declare( char *name );
+char *function_call( char *name );
+void module_start();
+void tagwrap();
+void handle_error();
+
 
 %}
 
@@ -817,7 +830,7 @@ token_brac
    }
 
 
-   void tagwrap() { 
+   void tagwrap() {
 /*
 *+
 *  Name:
