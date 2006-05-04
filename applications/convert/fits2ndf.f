@@ -918,8 +918,6 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      CHARACTER * ( 2 ) CHR_NTH  ! Ordinal abbreviation
-
       LOGICAL ONE_FIND_FILE      ! Find file from wildcarded list
 
       EXTERNAL ONE_FIND_FILE
@@ -952,15 +950,12 @@
       LOGICAL FOUND              ! Found a wildcarded file?
       CHARACTER * ( 255 ) IFSPEC ! Individual File specification
       INTEGER IPOSN              ! String index
-      LOGICAL GOOD               ! All group values are valid?
-      INTEGER I                  ! Loop counter
       INTEGER IFILE              ! Loop counter for each input NDF
       CHARACTER * ( FIO__SZFNM ) INFILE ! Input-file name
       INTEGER IGRP1              ! Group identifier of input file list
       INTEGER IGRP2              ! Group identifier of input files
       INTEGER IGRP3              ! Group identifier of input purged FITS
                                  ! files
-      INTEGER ISTAT              ! Find-file status
       INTEGER IWILD              ! Counter of the wild-carded files
       LOGICAL LEAVE              ! The FITS-file testing is finished?
       LOGICAL LOGHDR             ! There is an open logfile?
@@ -968,7 +963,6 @@
       INTEGER NDF                ! NDF identifier
       CHARACTER * ( 255 ) NDFNAM ! Name of NDF
       INTEGER NENCOD             ! No. of of WCS encodings supplied
-      INTEGER NFC                ! Number of FMTCNV values
       INTEGER NGLIST             ! No. of items in input list
       INTEGER NGROUP             ! Group identifier of default list of
                                  ! NDF files

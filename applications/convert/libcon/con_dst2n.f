@@ -261,7 +261,6 @@
       CHARACTER COMENT * ( 50 )  ! FITS item comment
       LOGICAL   COMPRE           ! True if a FITS item has an comment
       INTEGER   CW               ! Length of the output width component
-      DOUBLE PRECISION DARRAY(100) ! Used to read in DP type data items
       INTEGER   DIMS(7)          ! Dimensions of output data
       DOUBLE PRECISION DWIDTH    ! Scalar width
       INTEGER   DSTAT            ! DTA_ routine returned status
@@ -291,7 +290,6 @@
       INTEGER   LENAME           ! Length of name
       CHARACTER LEVEL1 * ( 80 )  ! Full name of environment at 1st level
       CHARACTER LEVEL2 * ( 80 )  ! Full name of environment at 2nd level
-      INTEGER   MINLEN           ! Minimum length of input FITS string
       LOGICAL   MORE             ! Determine necessity for .MORE
       LOGICAL   MOREFG           ! Determine necessity for .MORE.FIGARO
       LOGICAL   MORFGO           ! Determine necessity for
@@ -307,9 +305,6 @@
       CHARACTER NAMOUT * ( 132 ) ! Name in output structure
       INTEGER   NAXIS            ! Axis number
       INTEGER   NBYTES           ! No. of BYTES
-      INTEGER   NC               ! Number of characters
-      INTEGER   NCC              ! Column from where the comment
-                                 ! appears in the FITS card image
       INTEGER   NCPC             ! Number of characters in path comp.
       INTEGER   NDATA            ! No. of data values
       CHARACTER NDFNAM * ( 15 )  ! Name of the NDF structure
@@ -317,7 +312,6 @@
       INTEGER   NDIM             ! No of dimensions
       LOGICAL   NEEDAX           ! True if axis data present
       INTEGER   NERR             ! Count of numerical errors 
-      INTEGER   NF               ! Length of string
       INTEGER   NFITS            ! No. of FITS items
       INTEGER   NMSTAT           ! Status from 1st-level call to
                                  ! DTA_NMVAR

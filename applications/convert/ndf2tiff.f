@@ -181,7 +181,6 @@
 
       LOGICAL                  ! True if:
      :  FNDRNG,                ! Find the data range for scaling
-     :  INVERT,                ! The array is to inverted for display
      :  POSTIV                 ! The scaling of the array is to be
                                ! positive
       REAL
@@ -201,8 +200,6 @@
 
       CHARACTER*72
      :  COMP * 8,              ! Component to be displayed
-     :  FORM * ( NDF__SZFRM ), ! Form of the output data array
-     :  FOUNT * 4,             ! Fount type
      :  ITYPE * ( NDF__SZTYP ),! Processing type of the image
      :  MODE,                  ! Manner in which the array is to be
                                ! scaled
@@ -222,20 +219,12 @@
 
       INTEGER
      :  I, NC,                 ! General variables
-     :  IERR,                  ! Position of first conversion error
-     :  IIMHI,                 ! Upper limit used for scaling the array
-     :  IIMLO,                 ! Lower   "     "   "     "     "    "
-     :  IMAXV,                 ! Minimum value in the array
-     :  IMINV,                 ! Maximum value in the array
      :  MAXPOS,                ! Position of the maximum (not used)
      :  MINPOS                 ! Position of the minimum (not used)
 
       INTEGER
      :  NDF,                   ! Identifier for input NDF
-     :  NDFC,                  ! Identifier for input section
-     :  NDFO,                  ! Identifier for output NDF
      :  NDIMS,                 ! Total number of NDF dimensions
-     :  NERR,                  ! Number of conversion errors
      :  NINVAL,                ! Number of bad values in the input array
      :  NUMBIN,                ! Number of bins in histogram
      :  OPNTR                  ! Pointer to output array data
