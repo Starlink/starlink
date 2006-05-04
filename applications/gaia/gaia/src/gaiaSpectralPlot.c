@@ -1,23 +1,40 @@
 /*+
  *  Name:
  *     gaiaSpectralPlot
- *
+
  *  Purpose:
  *     Defines a Tk canvas item "spectral_plot" that displays a spectrum in a
  *     2D axes plot.
- *
+
  *  Description:
  *     This item displays an array of data values as a polyline in
  *     a plot. The two axes are determined using an AST spectral coordinate
  *     system (wavelength, frequency, velocity etc.) and an optional set of
  *     data units.
+
+ *  Copyright:
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
+
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
  *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
  *
- * Copyright (c) 2006 Particle Physics and Astronomy Research Council
- *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
+
  *  Authors:
  *     PWD: P.W. Draper (JAC, Durham University).
- *
+
  *  Changes:
  *     14-FEB-2006: (PWD)
  *        Original version.
@@ -366,13 +383,13 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  *
  *   This procedure is invoked to process the "coords" widget command.
  *   This reads an list of doubles that are the spectral coordinates,
- *   or accepts a pointer to an ARRAYinfo structure of already available 
- *   values in one of the HDS types (_BYTE, _UBYTE, _WORD, _UWORD, 
+ *   or accepts a pointer to an ARRAYinfo structure of already available
+ *   values in one of the HDS types (_BYTE, _UBYTE, _WORD, _UWORD,
  *   _INTEGER, _REAL _DOUBLE). In the latter case you should use the format:
  *
  *      <canvas> coords <item> \
  *         "pointer" memory_address_of_ARRAYinfo
- * 
+ *
  *   A special feature (should be moved into some generic interface) is to
  *   convert an X coordinate into a canvas coordinate, using the plot. This
  *   uses the format:
@@ -506,7 +523,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         /* Check if data has no range, in that case just add +/- 1, so we can
          * plot something. During interactive updates that's better than
          * throwing an error. */
-        if ( spPtr->ymin == spPtr->ymax ) { 
+        if ( spPtr->ymin == spPtr->ymax ) {
             /* No range */
             spPtr->ymin -= 1.0;
             spPtr->ymax += 1.0;
@@ -1163,7 +1180,7 @@ static void GeneratePlotFrameSet( SPItem *spPtr )
     /* Check if coordinates have no range, in that case just add +/- 1, so we
      * can plot something. During interactive updates that's better than
      * throwing an error. */
-    if ( spPtr->xmin == spPtr->xmax ) { 
+    if ( spPtr->xmin == spPtr->xmax ) {
         /* No range */
         spPtr->xmin -= 1.0;
         spPtr->xmax += 1.0;

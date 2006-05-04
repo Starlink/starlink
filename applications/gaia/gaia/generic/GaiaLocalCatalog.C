@@ -1,56 +1,75 @@
-//+
-//   Name:
-//      GaiaLocalCatalog
+/*+
+ *  Name:
+ *     GaiaLocalCatalog
 
-//  Purpose:
-//     Defines a class for controlling access to a non-tab table
-//     (i.e. CAT and plain ASCII) catalogues.
+ *  Purpose:
+ *     Defines a class for controlling access to a non-tab table
+ *     (i.e. CAT and plain ASCII) catalogues.
 
-//  Description:
-//     This class defines a series of methods that control the
-//     conversion of a "foreign" catalogue into a tab-table stored in
-//     a temporary file.
-//
-//     The actual conversion is performed by an external [incr Tcl]
-//     class GaiaConvertTable, which is provided so that addition
-//     filters etc. can be added without extending the abilities of
-//     this class.
+ *  Description:
+ *     This class defines a series of methods that control the
+ *     conversion of a "foreign" catalogue into a tab-table stored in
+ *     a temporary file.
+ *
+ *     The actual conversion is performed by an external [incr Tcl]
+ *     class GaiaConvertTable, which is provided so that addition
+ *     filters etc. can be added without extending the abilities of
+ *     this class.
 
-//  Language:
-//     C++
+ *  Language:
+ *     C++
 
-//  Copyright:
-//     Copyright (C) 2000 Central Laboratory of the Research Councils
+ *  Copyright:
+ *     Copyright (C) 1996-2005 Central Laboratory of the Research Councils
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
 
-//  Inherits:
-//     LocalCatalog
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
 
-//  Bugs:
-//     Not really a bug in this class, but in the way that it and
-//     LocalCatalog are used. After the initial creation of this
-//     object queries are done in forked processes. So if the
-//     catalogue changes this fact is noted in the forked process and
-//     a conversion is performed, however, no information about this
-//     change is available after the forked process dies. So the
-//     timestamp is not updated and any mapped data are lost.  This is
-//     relatively harmless, but has an efficiency burden as after the
-//     first modification the catalogue is reconverted on occasions
-//     when it isn't really necessary. The simple solution is to avoid
-//     forking processes that use local catalogues (in fact this is
-//     what happens in GAIA).
+ *  Inherits:
+ *     LocalCatalog
 
-//  Authors:
-//     Peter W. Draper (PWD):
-//     {enter_new_authors_here}
+ *  Bugs:
+ *     Not really a bug in this class, but in the way that it and
+ *     LocalCatalog are used. After the initial creation of this
+ *     object queries are done in forked processes. So if the
+ *     catalogue changes this fact is noted in the forked process and
+ *     a conversion is performed, however, no information about this
+ *     change is available after the forked process dies. So the
+ *     timestamp is not updated and any mapped data are lost.  This is
+ *     relatively harmless, but has an efficiency burden as after the
+ *     first modification the catalogue is reconverted on occasions
+ *     when it isn't really necessary. The simple solution is to avoid
+ *     forking processes that use local catalogues (in fact this is
+ *     what happens in GAIA).
 
-//  History:
-//     28-JUN-1996 (PWD):
-//        Original version, based on LocalCatalog.
-//     28-JAN-2000 (PWD):
-//        Changed to handle FITS extensions.
-//     {enter_changes_here}
+ *  Authors:
+ *     Peter W. Draper (PWD):
+ *     {enter_new_authors_here}
 
-//-
+ *  History:
+ *     28-JUN-1996 (PWD):
+ *        Original version, based on LocalCatalog.
+ *     28-JAN-2000 (PWD):
+ *        Changed to handle FITS extensions.
+ *     {enter_changes_here}
+
+ *-
+ */
 
 #include <cstdio>
 #include <cstdlib>

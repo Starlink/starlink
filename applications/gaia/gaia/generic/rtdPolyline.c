@@ -5,9 +5,11 @@
  *
  * Copyright (c) 1991-1994 The Regents of the University of California.
  * Copyright (c) 1994-1995 Sun Microsystems, Inc.
+ * Copyright (c) 1999-2005 Central Laboratory of the Research Councils
+ * Copyright (c) 2006 Particle Physics and Astronomy Research Council
  *
- * See the file "license.terms" for information on usage and redistribution
- * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+ * See the Tcl distribution file "license.terms" for information on usage and
+ * redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
  * Modified:
  *    Peter W. Draper 07 May 1999: Was tkCanvLine in Tk8.0. Modified

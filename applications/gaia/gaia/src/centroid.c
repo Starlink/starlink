@@ -1,10 +1,10 @@
 /*
  *  Name:
  *     centroidCmd
- *
+ 
  *  Purpose:
  *     Interface from RTD to CENTROID routine.
- *
+ 
  *  Description:
  *     This routine is designed to be called from RTD, the Real Time
  *     Display tool, as a foreign method. It accepts an info structure
@@ -29,12 +29,12 @@
  *      -maxshift the maximum shift in position.
  *      -toler the tolerence in centroid for convergence.
  *      -maxit the maximum number of iterations used in centroid estimation.
- *
+ 
  *  Notes:
  *     -  The -coords parameter should be paired doubles, these are
  *        read until the end of the string or until a new argument
  *        string is started.
- *
+ 
  *  Arguments:
  *     StarImageInfo = struct * (Given)
  *        Pointer to an ImageInfo structure.
@@ -43,13 +43,32 @@
  *     errStr = char ** (Returned)
  *        Pointer to pointer to a string that contains an error
  *        message if appropriate. Only set if return is 0.
- *
+ 
  *  Copyright:
  *     Copyright (C) 1998 Central Laboratory of the Research Councils
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
+ 
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
+
  *
  *  Authors:
  *     PWD: Peter W. Draper (STARLINK - Durham University)
- *
+ 
  *  History:
  *     12-DEC-1997 (PWD):
  *        Original version.

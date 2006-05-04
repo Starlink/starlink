@@ -1,27 +1,46 @@
-//+
-//  Name:
-//     GaiaRtdRemote
-//
-//  Language:
-//     C++
-//
-//  Purpose:
-//     Defines the members of the GaiaRtdRemote class.
-//
-//  Authors:
-//     P.W. Draper (PWD)
-//
-//  Copyright:
-//     Copyright (C) 2000 Central Laboratory of the Research Councils
-//
-//  History:
-//     01-FEB-2000 (PWD):
-//        Original version.
-//     26-MAY-2000 (PWD):
-//        Added maintenance of addition rtd-remote file. This allows
-//        multiple GAIA instances to co-exist using the same home
-//        directory (and the remote control interface).
-//-
+/*+
+ *  Name:
+ *     GaiaRtdRemote
+ 
+ *  Language:
+ *     C++
+ 
+ *  Purpose:
+ *     Defines the members of the GaiaRtdRemote class.
+ 
+ *  Authors:
+ *     P.W. Draper (PWD)
+ 
+ *  Copyright:
+ *     Copyright (C) 2000 Central Laboratory of the Research Councils
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
+
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
+ 
+ *  History:
+ *     01-FEB-2000 (PWD):
+ *        Original version.
+ *     26-MAY-2000 (PWD):
+ *        Added maintenance of addition rtd-remote file. This allows
+ *        multiple GAIA instances to co-exist using the same home
+ *        directory (and the remote control interface).
+ *-
+ */
 
 //  Include files.
 #include <unistd.h>

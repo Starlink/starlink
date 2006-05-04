@@ -8,10 +8,8 @@
  * Copyright (c) 1997-1998 Central Laboratory of the Research Councils
  *
  *
- * See the file "license.terms" for information on usage and redistribution
- * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
- *
- * SCCS: @(#) tkCanvLine.c 1.44 96/12/02 10:54:33
+ * See the Tcl distribution file "license.terms" for information on usage and
+ * redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
  * Modified:
  *

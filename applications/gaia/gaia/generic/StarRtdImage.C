@@ -1,184 +1,202 @@
-//+
-//  Name:
-//     StarRtdImage
-//
-//  Language:
-//     C++
-//
-//  Purpose:
-//     Defines the members of the StarRtdImage class.
-//
-//  Authors:
-//     P.W. Draper (PWD)
-//     Allan Brighton, ESO (ALLAN)
-//
-//  Copyright:
-//     Copyright (C) 1997-2004 Central Laboratory of the Research Councils
-//
-//  History:
-//     15-FEB-1996 (PWD):
-//        Original version.
-//     4-APR-1996 (PWD):
-//        Added pix2screen command to convert image coordinates to
-//        screen coordinates.
-//     30-NOV-1996 (PWD):
-//        Added origin command and usingxshm.
-//     17-JAN-1996 (PWD):
-//        Changed loadImage command to clear image when file is "".
-//        Previously this deleted the image too (leaving none).
-//     19-AUG-1997 (PWD):
-//        Added plotgrid method.
-//     28-AUG-1997 (PWD):
-//        Converted to work with RTD 2.18.3. The shared memory copies
-//        of the headers and data no longer seem to be available.
-//     16-SEP-1997 (PWD):
-//        Added checks to deal with image/NDF slices.
-//     06-OCT-1997 (PWD):
-//        Modified to create FitsIO and NDFIO objects directly. This
-//        decouples the FitsIO classes and NDFIO classes from
-//        ImageData (and ImageIO) which allows us to subclass ImageIO
-//        and use the ImageData ABC without modifying the code.
-//        The loadImage member function becomes loadFile (which is now
-//        virtual) and we control configureImage completely at this
-//        level (this is needed to parse the options, plus the
-//        ast_tag item that we need). The RtdImage constructor is
-//        also changed, as we need to set the image name, the widget
-//        options and avoid some pitfalls with the RtdImage
-//        constructor calling loadFile (via the initImage member).
-//     17-OCT-1997 (PWD):
-//        Started changes to support the modification of Astrometry
-//        information in the WCS.
-//     16-Mar-1998 (ALLAN):
-//        Make use of new Skycat/Rtd features supporting subclassing,
-//        New constructor args to support subclassing,
-//        Changed image type from "starrtdimage" to "rtdimage",
-//        Added GAIA_CONFIG macro for Tk config options,
-//        Renamed OPTION() macro to GAIA_OPTION (Tk config options),
-//
-//        Renamed WCS to StarWCS, which is now a subclass of WCSRep,
-//        for compatibility with Rtd/Skycat, and added the method
-//        "getStarWCSPtr(image)" to access the StarWCS class ptr inside
-//        the WCS (reference counted) class.
-//
-//        Added getStarImage() method, to avoid duplicate code to read an
-//        image file and setup the right WCS subclass.
-//
-//        Added class StarFitsIO to replace GAIA version of FitsIO and
-//        remain compatible with the Skycat version.
-//     22-APR-1998 (PWD):
-//        Now subclasses Skycat rather than RtdImage. Changed
-//        draw_ellipse method to use rtd_ellipse.
-//     27-APR-1998 (ALLAN):
-//        Modified isNDFtype() and getStarImage() to check for all FITS
-//        suffixes (anything including "fit", such as fits.gz, fits.Z,
-//        cfits, gzfits, etc.).
-//     23-JUN-1998 (PWD):
-//        Added command for retrieving a file from a web server.
-//     16-JUL-1998 (PWD):
-//        Added slice command. This extends spectrum to also return
-//        the X and Y coordinates used as positions along the line.
-//        Added command to control the colour of blank pixels.
-//     04-NOV-1998 (PWD):
-//        Added override for get_compass member. This allows the
-//        images that have a WCS component to not use it when scaling
-//        and orienting the plotting symbols. This is much faster, and
-//        OK when dealing with detections for images that are
-//        displayed (i.e. the SExtractor toolbox). Also added -plotwcs
-//        configuration option to control this.
-//     13-NOV-1998 (PWD):
-//        Added rotbox to plotting symbols.
-//     13-JAN-1999 (PWD):
-//        Merged Allan Brighton's GAIA plugins changes (see history above).
-//     06-APR-1999 (PWD):
-//        Added contour command. Lots of restructuring of gridplot
-//        command.
-//     14-JUN-1999 (PWD):
-//        Added "hdu" command to stop use of this facility. There is a
-//        fundermental problem with memory mapped FITS files that
-//        stops the use of these commands (basically the disk file is
-//        not available to add/read HDUs). When time permits this
-//        problem should be worked around.
-//     12-JUL-1999 (PWD):
-//        Added changes to sliceCmd to replace blank pixels by the
-//        mean along the slice. Added percentiles command.
-//     14-JUL-1999 (PWD):
-//        Added gbandCmd to display image pixels and non-RA/Dec
-//        coordinates, otherwise this is exactly the same as
-//        RtdImage::mbandCmd.
-//     15-JUL-1999 (PWD):
-//        Changed sliceCmd to not flip the line ends when passing
-//        through horizonal and vertical.
-//     25-AUG-1999 (PWD):
-//        Added changes to support NDFs stored within container files.
-//     15-OCT-1999 (PWD):
-//        Added changes to astsystem to select a pixel coordinate system.
-//     17-NOV-1999 (PWD):
-//        Changed dumpCmd to attempt to write a native encoding of the
-//        WCS, if the default encoding isn't Native (this happens -
-//        sometimes - when the channel contains a known WCS that is
-//        illegal?).
-//     12-JAN-2000 (PWD):
-//        Returned to hdu command. Now enabled for FITS images and
-//        NDFs. NDFs do not support the full range of commands as no
-//        catalogue access is available. The fully qualified names of
-//        the displayed image is now returned via the "fullname"
-//        command, which should be used in preference to the "-file"
-//        option, which may just name the container file.
-//     01-FEB-2000 (PWD):
-//        Override RTD "remote" command so that we use GaiaRtdRemote
-//        instead of RtdImageRemote class. This cleans up the control
-//        of the ~/.rtd-remote file (which can become invalid when
-//        main windows are closed).
-//     16-MAR-2000 (PWD):
-//        Override "remotetcl" command. This adds error status return
-//        if command fails.
-//     27-MAR-2000 (PWD):
-//        Added globalstats command. Performs same job as statistics
-//        command except on a list of X,Y positions.
-//     08-MAY-2000 (PWD):
-//        Modified astsystem command to transform between current
-//        frame and new celestial coordinates. Also added asttran2
-//        command to transform coordinates between such frames.
-//     23-MAY-2000 (PWD):
-//        Added astwarnings command. These return the content of any
-//        ASTWARN cards produced when the WCS is set up.
-//     10-JUL-2000 (PWD):
-//        Added XY profile command.
-//     04-APR-2001 (PWD):
-//        Added astaddcolour command.
-//     15-MAY-2001 (PWD):
-//        Changed method for estimating contour region.
-//     08-AUG-2001 (PWD):
-//        Fixed problem with native objects being written at start of
-//        FITS headers (actually turned out to be an AST bug).
-//     27-JAN-2003 (PWD):
-//        Added facilities to support the display of coordinates at
-//        milli-arcsecond resolution.
-//     12-SEP-2003 (PWD):
-//        Added the slalib command. Currently only offers the ability
-//        to get a list of known observatories. A proper
-//        implementation would see this command refactored to a
-//        standalone Tcl command and more SLALIB facilities offered,
-//        but time presses.
-//     19-DEC-2003 (PWD):
-//        Added astcarlin command. Controls the CarLin attribute
-//        used when reading a FITS channel.
-//     16-FEB-2004 (PWD):
-//        Added astalwaysmerge command. Controls whether primary headers are
-//        merged with extension before looking for a WCS.
-//     28-OCT-2004 (PWD):
-//        Added direct NDF access commands. These are used to access cubes.
-//     14-DEC-2005 (PWD):
-//        Various update for Skycat 2.7.4.
-//     21-MAR-2006 (PWD): 
-//        Removed direct NDF access commands. These are now available
-//        via the ndf:: commands. See gaiaNDFTcl.
-//     30-MAR-2006 (PWD):
-//        Added updateImageDataCmd.
-//     26-APR-2006 (PWD):
-//        Added objectCmd and volatileCmd.
-//-
+/*+
+ *  Name:
+ *     StarRtdImage
+ 
+ *  Language:
+ *     C++
+ 
+ *  Purpose:
+ *     Defines the members of the StarRtdImage class.
+ 
+ *  Authors:
+ *     P.W. Draper (PWD)
+ *     Allan Brighton, ESO (ALLAN)
+ 
+ *  Copyright:
+ *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
 
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
+ 
+ *  History:
+ *     15-FEB-1996 (PWD):
+ *        Original version.
+ *     4-APR-1996 (PWD):
+ *        Added pix2screen command to convert image coordinates to
+ *        screen coordinates.
+ *     30-NOV-1996 (PWD):
+ *        Added origin command and usingxshm.
+ *     17-JAN-1996 (PWD):
+ *        Changed loadImage command to clear image when file is "".
+ *        Previously this deleted the image too (leaving none).
+ *     19-AUG-1997 (PWD):
+ *        Added plotgrid method.
+ *     28-AUG-1997 (PWD):
+ *        Converted to work with RTD 2.18.3. The shared memory copies
+ *        of the headers and data no longer seem to be available.
+ *     16-SEP-1997 (PWD):
+ *        Added checks to deal with image/NDF slices.
+ *     06-OCT-1997 (PWD):
+ *        Modified to create FitsIO and NDFIO objects directly. This
+ *        decouples the FitsIO classes and NDFIO classes from
+ *        ImageData (and ImageIO) which allows us to subclass ImageIO
+ *        and use the ImageData ABC without modifying the code.
+ *        The loadImage member function becomes loadFile (which is now
+ *        virtual) and we control configureImage completely at this
+ *        level (this is needed to parse the options, plus the
+ *        ast_tag item that we need). The RtdImage constructor is
+ *        also changed, as we need to set the image name, the widget
+ *        options and avoid some pitfalls with the RtdImage
+ *        constructor calling loadFile (via the initImage member).
+ *     17-OCT-1997 (PWD):
+ *        Started changes to support the modification of Astrometry
+ *        information in the WCS.
+ *     16-Mar-1998 (ALLAN):
+ *        Make use of new Skycat/Rtd features supporting subclassing,
+ *        New constructor args to support subclassing,
+ *        Changed image type from "starrtdimage" to "rtdimage",
+ *        Added GAIA_CONFIG macro for Tk config options,
+ *        Renamed OPTION() macro to GAIA_OPTION (Tk config options),
+ *
+ *        Renamed WCS to StarWCS, which is now a subclass of WCSRep,
+ *        for compatibility with Rtd/Skycat, and added the method
+ *        "getStarWCSPtr(image)" to access the StarWCS class ptr inside
+ *        the WCS (reference counted) class.
+ *
+ *        Added getStarImage() method, to avoid duplicate code to read an
+ *        image file and setup the right WCS subclass.
+ *
+ *        Added class StarFitsIO to replace GAIA version of FitsIO and
+ *        remain compatible with the Skycat version.
+ *     22-APR-1998 (PWD):
+ *        Now subclasses Skycat rather than RtdImage. Changed
+ *        draw_ellipse method to use rtd_ellipse.
+ *     27-APR-1998 (ALLAN):
+ *        Modified isNDFtype() and getStarImage() to check for all FITS
+ *        suffixes (anything including "fit", such as fits.gz, fits.Z,
+ *        cfits, gzfits, etc.).
+ *     23-JUN-1998 (PWD):
+ *        Added command for retrieving a file from a web server.
+ *     16-JUL-1998 (PWD):
+ *        Added slice command. This extends spectrum to also return
+ *        the X and Y coordinates used as positions along the line.
+ *        Added command to control the colour of blank pixels.
+ *     04-NOV-1998 (PWD):
+ *        Added override for get_compass member. This allows the
+ *        images that have a WCS component to not use it when scaling
+ *        and orienting the plotting symbols. This is much faster, and
+ *        OK when dealing with detections for images that are
+ *        displayed (i.e. the SExtractor toolbox). Also added -plotwcs
+ *        configuration option to control this.
+ *     13-NOV-1998 (PWD):
+ *        Added rotbox to plotting symbols.
+ *     13-JAN-1999 (PWD):
+ *        Merged Allan Brighton's GAIA plugins changes (see history above).
+ *     06-APR-1999 (PWD):
+ *        Added contour command. Lots of restructuring of gridplot
+ *        command.
+ *     14-JUN-1999 (PWD):
+ *        Added "hdu" command to stop use of this facility. There is a
+ *        fundermental problem with memory mapped FITS files that
+ *        stops the use of these commands (basically the disk file is
+ *        not available to add/read HDUs). When time permits this
+ *        problem should be worked around.
+ *     12-JUL-1999 (PWD):
+ *        Added changes to sliceCmd to replace blank pixels by the
+ *        mean along the slice. Added percentiles command.
+ *     14-JUL-1999 (PWD):
+ *        Added gbandCmd to display image pixels and non-RA/Dec
+ *        coordinates, otherwise this is exactly the same as
+ *        RtdImage::mbandCmd.
+ *     15-JUL-1999 (PWD):
+ *        Changed sliceCmd to not flip the line ends when passing
+ *        through horizonal and vertical.
+ *     25-AUG-1999 (PWD):
+ *        Added changes to support NDFs stored within container files.
+ *     15-OCT-1999 (PWD):
+ *        Added changes to astsystem to select a pixel coordinate system.
+ *     17-NOV-1999 (PWD):
+ *        Changed dumpCmd to attempt to write a native encoding of the
+ *        WCS, if the default encoding isn't Native (this happens -
+ *        sometimes - when the channel contains a known WCS that is
+ *        illegal?).
+ *     12-JAN-2000 (PWD):
+ *        Returned to hdu command. Now enabled for FITS images and
+ *        NDFs. NDFs do not support the full range of commands as no
+ *        catalogue access is available. The fully qualified names of
+ *        the displayed image is now returned via the "fullname"
+ *        command, which should be used in preference to the "-file"
+ *        option, which may just name the container file.
+ *     01-FEB-2000 (PWD):
+ *        Override RTD "remote" command so that we use GaiaRtdRemote
+ *        instead of RtdImageRemote class. This cleans up the control
+ *        of the ~/.rtd-remote file (which can become invalid when
+ *        main windows are closed).
+ *     16-MAR-2000 (PWD):
+ *        Override "remotetcl" command. This adds error status return
+ *        if command fails.
+ *     27-MAR-2000 (PWD):
+ *        Added globalstats command. Performs same job as statistics
+ *        command except on a list of X,Y positions.
+ *     08-MAY-2000 (PWD):
+ *        Modified astsystem command to transform between current
+ *        frame and new celestial coordinates. Also added asttran2
+ *        command to transform coordinates between such frames.
+ *     23-MAY-2000 (PWD):
+ *        Added astwarnings command. These return the content of any
+ *        ASTWARN cards produced when the WCS is set up.
+ *     10-JUL-2000 (PWD):
+ *        Added XY profile command.
+ *     04-APR-2001 (PWD):
+ *        Added astaddcolour command.
+ *     15-MAY-2001 (PWD):
+ *        Changed method for estimating contour region.
+ *     08-AUG-2001 (PWD):
+ *        Fixed problem with native objects being written at start of
+ *        FITS headers (actually turned out to be an AST bug).
+ *     27-JAN-2003 (PWD):
+ *        Added facilities to support the display of coordinates at
+ *        milli-arcsecond resolution.
+ *     12-SEP-2003 (PWD):
+ *        Added the slalib command. Currently only offers the ability
+ *        to get a list of known observatories. A proper
+ *        implementation would see this command refactored to a
+ *        standalone Tcl command and more SLALIB facilities offered,
+ *        but time presses.
+ *     19-DEC-2003 (PWD):
+ *        Added astcarlin command. Controls the CarLin attribute
+ *        used when reading a FITS channel.
+ *     16-FEB-2004 (PWD):
+ *        Added astalwaysmerge command. Controls whether primary headers are
+ *        merged with extension before looking for a WCS.
+ *     28-OCT-2004 (PWD):
+ *        Added direct NDF access commands. These are used to access cubes.
+ *     14-DEC-2005 (PWD):
+ *        Various update for Skycat 2.7.4.
+ *     21-MAR-2006 (PWD): 
+ *        Removed direct NDF access commands. These are now available
+ *        via the ndf:: commands. See gaiaNDFTcl.
+ *     30-MAR-2006 (PWD):
+ *        Added updateImageDataCmd.
+ *     26-APR-2006 (PWD):
+ *        Added objectCmd and volatileCmd.
+ *-
+ */
 #include <config.h>   /* Skycat util */
 
 #include <cctype>

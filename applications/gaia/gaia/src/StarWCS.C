@@ -1,70 +1,89 @@
-//+
-//  Name:
-//     StarWCS
-//
-//  Language:
-//     C++
-//
-//  Purpose:
-//     Defines the members of the StarWCS class
-//
-//  Authors:
-//     P.W. Draper (PWD)
-//     Allan Brighton, ESO (ALLAN)
-//
-//  Copyright:
-//     Copyright (C) 1997-1999 Central Laboratory of the Research Councils
-//
-//  History:
-//     23-JUL-1997 (PWD):
-//        Original version. Created to replace WCS with a layer
-//        based on AST.
-//     17-OCT-1997 (PWD):
-//        Added changes to allow situation when axis 1 isn't the
-//        RA axis (previews from CADC HST archive sometimes have
-//        these reversed!).
-//     9-JAN-1998 (PWD):
-//        Removed checks for pix2wcs and wcs2pix out of bounds. It
-//        can be useful for these to succeed at times (i.e. when
-//        fitting new WCS systems that are initially inaccurate).
-//    16-MAR-1998 (ALLAN)
-//        Renamed local class WCSRep to StarWCS and removed local class WCS,
-//        to be compatible with the main Rtd/Skycat release.
-//        Now we define a subclass of the original rtd WCSRep that defines the
-//        new behavior and uses the Starlink routines.
-//    17-MAR-1998 (ALLAN)
-//        Added pix2wcsDist, for compat with base class
-//    22-APR-98 (ALLAN)
-//        Fixed xSecPix() and ySecPix() methods, added setSecPix() to note
-//        the values for later access.
-//     8-MAR-1998 (PWD):
-//        Moved astNorm calls to be before any corrections for RA/Dec
-//        reversal.
-//    24-JUN-1998 (PWD):
-//        Increased digits of display to 8 (from a default of 7). This
-//        is inline with vanilla RTD.
-//    13-JAN-1999 (PWD):
-//        Merged in Allan's changes (see history above).
-//    19-NOV-1999 (PWD):
-//        Added test for sky coordinates and members to query this.
-//    15-SEP-2000 (PWD):
-//        Fixed ::set member so that it works as advertised.
-//     7-DEC-2000 (PWD):
-//        Added methods to return a list of domains and to set an AST
-//        attribute.
-//    22-JAN-2003 (PWD)
-//        Added methods to support extra precision in output. When
-//        enabled this is supposed to show milli-arcsec resolution.
-//    10-JUN-2003 (PWD):
-//        Reworked make2D for case when there are more than 2
-//        dimensions. Should work better with NDF sections which have
-//        insignificant dimensions (in the base frame).
-//    16-NOV-2005 (PWD):
-//        Added deltset from 2.7.4.
-//    19-DEC-2005 (PWD):
-//        Implemented projection and xRefPix and yRefPix. These are now
-//        used in Skycat.
-//-
+/*+
+ *  Name:
+ *     StarWCS
+ 
+ *  Language:
+ *     C++
+ 
+ *  Purpose:
+ *     Defines the members of the StarWCS class
+ 
+ *  Authors:
+ *     P.W. Draper (PWD)
+ *     Allan Brighton, ESO (ALLAN)
+ 
+ *  Copyright:
+ *     Copyright (C) 1997-1999 Central Laboratory of the Research Councils
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
+
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
+ 
+ *  History:
+ *     23-JUL-1997 (PWD):
+ *        Original version. Created to replace WCS with a layer
+ *        based on AST.
+ *     17-OCT-1997 (PWD):
+ *        Added changes to allow situation when axis 1 isn't the
+ *        RA axis (previews from CADC HST archive sometimes have
+ *        these reversed!).
+ *     9-JAN-1998 (PWD):
+ *        Removed checks for pix2wcs and wcs2pix out of bounds. It
+ *        can be useful for these to succeed at times (i.e. when
+ *        fitting new WCS systems that are initially inaccurate).
+ *    16-MAR-1998 (ALLAN)
+ *        Renamed local class WCSRep to StarWCS and removed local class WCS,
+ *        to be compatible with the main Rtd/Skycat release.
+ *        Now we define a subclass of the original rtd WCSRep that defines the
+ *        new behavior and uses the Starlink routines.
+ *    17-MAR-1998 (ALLAN)
+ *        Added pix2wcsDist, for compat with base class
+ *    22-APR-98 (ALLAN)
+ *        Fixed xSecPix() and ySecPix() methods, added setSecPix() to note
+ *        the values for later access.
+ *     8-MAR-1998 (PWD):
+ *        Moved astNorm calls to be before any corrections for RA/Dec
+ *        reversal.
+ *    24-JUN-1998 (PWD):
+ *        Increased digits of display to 8 (from a default of 7). This
+ *        is inline with vanilla RTD.
+ *    13-JAN-1999 (PWD):
+ *        Merged in Allan's changes (see history above).
+ *    19-NOV-1999 (PWD):
+ *        Added test for sky coordinates and members to query this.
+ *    15-SEP-2000 (PWD):
+ *        Fixed ::set member so that it works as advertised.
+ *     7-DEC-2000 (PWD):
+ *        Added methods to return a list of domains and to set an AST
+ *        attribute.
+ *    22-JAN-2003 (PWD)
+ *        Added methods to support extra precision in output. When
+ *        enabled this is supposed to show milli-arcsec resolution.
+ *    10-JUN-2003 (PWD):
+ *        Reworked make2D for case when there are more than 2
+ *        dimensions. Should work better with NDF sections which have
+ *        insignificant dimensions (in the base frame).
+ *    16-NOV-2005 (PWD):
+ *        Added deltset from 2.7.4.
+ *    19-DEC-2005 (PWD):
+ *        Implemented projection and xRefPix and yRefPix. These are now
+ *        used in Skycat.
+ *-
+ */
 
 #include <cstring>
 #include <cstdlib>
@@ -75,7 +94,7 @@
 #include "error.h"
 #include "StarWCS.h"
 
-//  Trig conversion factors.
+                                    //  Trig conversion factors.
 static const double pi_ = 3.14159265358979323846;
 static const double r2d_ = 180.0/pi_;
 static const double d2r_ = pi_/180.0;
@@ -1619,5 +1638,3 @@ char *StarWCS::getDomains()
     }
     return namelist;
 }
-
-

@@ -1,13 +1,13 @@
 /**
  *  Name:
  *     GaiaSkySearch
- *
+
  *  Language:
  *     C++
- *
+
  *  Purpose:
  *     Defines the members of the GaiaSkySearch class.
- *
+
  *  Description:
  *     This class extends the SkySearch class (and thereby
  *     TclAstroCat) to use an external filter scheme to convert
@@ -19,13 +19,31 @@
  *     A special override of the plot_objects function is added to
  *     sort out problems with catalogues that have both WCS and X-Y
  *     coordinates.
- *
+
  *  Authors:
  *     P.W. Draper (PWD)
- *
+
  *  Copyright:
  *     Copyright (C) 1998-2000 Central Laboratory of the Research Councils
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
+
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
  *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
+
  *  History:
  *     25-SEP-1998 (PWD):
  *        Original version.
@@ -36,6 +54,7 @@
  *        ignored (all files in /tmp not saved).
  *     {enter_new_authors_here}
  *
+ *-
  */
 
 #include <config.h>  //  From skycat util
@@ -85,7 +104,7 @@ int GaiaSkySearch::call(const char* name, int len, int argc, char* argv[])
         high = sizeof(subcmds_)/sizeof(*subcmds_) - 1,
         mid,
         cond;
-    
+
     while (low <= high) {
         mid = (low + high) / 2;
         if ((cond = strcmp(name, subcmds_[mid].name)) < 0)
@@ -99,7 +118,7 @@ int GaiaSkySearch::call(const char* name, int len, int argc, char* argv[])
             return (this->*t.fptr)(argc, argv);
         }
     }
-    
+
     //  Not found, so extend search to parent class.
     return SkySearch::call(name, len, argc, argv);
 }
@@ -130,7 +149,7 @@ int GaiaSkySearch::astroCatCmd( ClientData, Tcl_Interp *interp,
                           argv[0], " instanceName\"", NULL );
         return TCL_ERROR;
     }
-    
+
     GaiaSkySearch *cmd = new GaiaSkySearch( interp, argv[0], argv[1] );
     return cmd->status();
 }
@@ -173,16 +192,16 @@ int GaiaSkySearch::openCmd(int argc, char* argv[])
     if ( cat_ ) {
         delete cat_;
     }
-    
+
     //  Get the entry for this catalogue type.
     CatalogInfoEntry *e = CatalogInfo::lookup( argv[0] );
     if ( !e ) {
         return TCL_ERROR;
     }
-    
+
     //  Now open the catalog, using the appropriate type.
     if ( strcmp( e->servType(), "local" ) == 0 ) {
-        
+
         //  Local catalogues are either tab tables or a format
         //  recognised by GaiaLocalCatalog.
         if ( GaiaLocalCatalog::is_foreign( argv[0] ) ) {
@@ -193,22 +212,22 @@ int GaiaSkySearch::openCmd(int argc, char* argv[])
     } else {
         cat_ = new AstroCatalog( e );   //  Class for remote catalogues.
     }
-    
+
     if ( !cat_ || cat_->status() != 0 ) {
         if ( cat_->status() != 0 ) delete cat_;
         cat_ = NULL;
         return error( "Failed to open catalog:", argv[0] );
     }
-    
+
     //  Set up feedback, if requested.
     if ( feedback_ ) {
         cat_->feedback( feedback_ );
     }
-    
+
     //  Reset origins.
     xOrigin_ = 0.0;
     yOrigin_ = 0.0;
-    
+
     return TCL_OK;
 }
 
@@ -237,12 +256,12 @@ int GaiaSkySearch::entryCmd( int argc, char* argv[] )
     if ( !dir ) {
         return TCL_ERROR;
     }
-    
+
     //  Trap "get" command and modify url so that it appears the same as
     //  longname for foreign catalogues.
     if ( strcmp( argv[0], "get" ) == 0 ) {
         if ( argc == 1 ) {
-            
+
             //  Get entry from current catalog.
             if ( !cat_ ) {
                 return error( "no catalog is open" );
@@ -250,21 +269,21 @@ int GaiaSkySearch::entryCmd( int argc, char* argv[] )
             e = cat_->entry();
         } else {
             if ( argc > 2 ) {
-                
+
                 //  Use given catalog directory.
                 dir = CatalogInfo::lookup( argv[2] );
                 if ( !dir ) {
                     return TCL_ERROR;
                 }
             }
-            
+
             //  Get entry from named catalog.
             e = CatalogInfo::lookup( dir, argv[1] );
             if ( !e ) {
                 return error( "can't find catalog entry for: ", argv[1] );
             }
         }
-        
+
         //  Reset the url to be longname and pass on to TclAstroCat command.
         url = strdup( e->url() );
         if ( strcmp( e->servType(), "local" ) == 0 ) {
@@ -272,7 +291,7 @@ int GaiaSkySearch::entryCmd( int argc, char* argv[] )
         }
     }
     int ret = TclAstroCat::entryCmd( argc, argv );
-    
+
     //  Restore dynamic url, if needed.
     if ( url != NULL ) {
         e->url( url );
@@ -313,13 +332,13 @@ int GaiaSkySearch::saveCmd( int argc, char* argv[] )
         if (Tcl_GetBoolean(interp_, argv[1], &iflag) != TCL_OK)
             return TCL_ERROR;
     }
-    
+
     //  Check if destination catalogue is a known foreign type.
     char *filename = NULL;
     int ret = TCL_OK;
     AstroCatalog *tmp = NULL;
     if ( GaiaLocalCatalog::is_foreign( argv[0] ) ) {
-        
+
         //  If appending then the temporary file should already exist, so
         //  save the contents first. To do this we need to convert the
         //  file, if it hasn't been converted already.
@@ -334,25 +353,25 @@ int GaiaSkySearch::saveCmd( int argc, char* argv[] )
             struct stat buf;
             if ( stat( e->url(), &buf ) != 0 ||
                  strcmp( e->url(), e->longName() ) == 0) {
-                
+
                 //  Temporary file for this file doesn't exist, so we need to
                 //  create it.
                 tmp = new GaiaLocalCatalog( e, interp_ );
             }
             argv[0] = (char *) e->url();
-            
+
         } else {
-            
+
             //  Create a temporary name to store the results.
             argv[0] = tempnam( (char *) NULL, "gaia" );
         }
         argv[0] = strdup( argv[0] );
     }
-    
+
     //  Now do the real save.
     ret = TclAstroCat::saveCmd( argc, argv );
     if ( filename != NULL && ret == TCL_OK ) {
-        
+
         //  Result stored in temporary file. Need to convert to
         //  appropriate foreign format. Create a pseudo CatalogInfoEntry
         //  so we can use a proper object to control the conversion.
@@ -385,7 +404,7 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
     int len = 0;
     int i;
     int j;
-    
+
     //  Split the list into a list of rows.
     if ( Tcl_SplitList( interp_, argv[0], &mainArgc, &mainArgv ) != TCL_OK ) {
         return error( "not a list" );
@@ -397,7 +416,7 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
             }
             return error( "not a sub list" );
         } else {
-            
+
             //  Allocate memory for columns sizes.
             if ( ncolumn == 0  ) {
                 sizes = new int[rowArgc];
@@ -406,7 +425,7 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
                     sizes[j] = 0;
                 }
             }
-            
+
             //  Check list if same length as before.
             if ( rowArgc != ncolumn ) {
                 if ( mainArgc > 0 ) {
@@ -417,7 +436,7 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
                 }
                 return error( "lists are different lengths" );
             }
-            
+
             //  Compare lengths of these strings with previous ones.
             for ( j = 0; j < ncolumn; j++ ) {
                 len = strlen( rowArgv[j] );
@@ -425,14 +444,14 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
                     sizes[j] = len;
                 }
             }
-            
+
             //  Free the memory.
             if ( rowArgc > 0 ) {
                 Tcl_Free( (char *) rowArgv );
             }
         }
     }
-    
+
     //  Now construct the list to return.
     if ( ncolumn > 0 ) {
         ostringstream os;
@@ -465,7 +484,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
     char** symb = NULL;
     int nexpr = 0;
     char** exprList = NULL;
-    
+
     //  This loop executes only once and is used for error
     //  handling/cleanup via "break".
     int once = 1;
@@ -486,12 +505,12 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
         if ( status != TCL_OK ) {
             break;
         }
-        
+
 	//  Parse symbol info, a variable length list of
 	//  {shape color ratio angle label cond}
 	if ((status = Tcl_SplitList(interp_, (char*)symbol, &nsymb, &symb)) != TCL_OK)
 	    break;
-        
+
 	//  Default values
 	char* shape = "";
 	char* fg = "white"; // if no color is specified, use 2: b&w
@@ -503,7 +522,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 	if ((status = parse_symbol(r, nsymb, symb, shape, fg, bg, ratio,
 				   angle, label, cond)) != TCL_OK)
 	    break;
-        
+
 	// parse the size expr list: {size units}
 	if ((status = Tcl_SplitList(interp_, (char*)expr, &nexpr, &exprList)) != TCL_OK)
 	    break;
@@ -515,7 +534,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 	char* units = "image";
 	if (nexpr > 1 && strlen(exprList[1]))
 	    units = exprList[1];
-        
+
 	// for each row in the catalog, eval the expressions and plot the symbols
 	int nrows = r.numRows();
 	int id_col = r.id_col();
@@ -532,7 +551,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 		x = pos.x();
 		y = pos.y();
 		strcpy(xy_units, "image");
-                
+
                 //  Subtract the origins.
                 x -= xOrigin_;
                 y -= yOrigin_;
@@ -552,7 +571,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 		break;
 	}
     }
-    
+
     // free memory allocated for split Tcl lists and return the status
     if (colNames)
 	free(colNames);
@@ -562,7 +581,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 	free(symb);
     if (exprList)
 	free(exprList);
-    
+
     return status;
 }
 
@@ -572,7 +591,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
  *  plotted.  These are the NDF origin values and are used to
  *  transform between image coordinate and pixel coordinates.
  *
- *  Arguments are none, in which case the current origins are returned 
+ *  Arguments are none, in which case the current origins are returned
  *  as the result, or two doubles, which are added to any image
  *  coordinates before plotting (note if any 0.5 corrections are
  *  required then you must add these here, the origin supplied are
@@ -581,7 +600,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 int GaiaSkySearch::originCmd( int argc, char *argv[] )
 {
     if ( argc < 2 ) {
-        
+
         // Return the current origin.
         Tcl_ResetResult( interp_ );
         char buf[80];
@@ -620,7 +639,7 @@ int GaiaSkySearch::originCmd( int argc, char *argv[] )
  * no $directory is given, is the top level list read from the default
  * config file at startup.
  *
- * This method overrides the TclAstroCat version to make sure that our 
+ * This method overrides the TclAstroCat version to make sure that our
  * temporary files are not excluded from the configuration file.
  */
 int GaiaSkySearch::infoCmd(int argc, char* argv[])
@@ -642,11 +661,11 @@ int GaiaSkySearch::infoCmd(int argc, char* argv[])
     else {
         e = CatalogInfo::root();
     }
-        
-    if (!e || !e->link()) 
+
+    if (!e || !e->link())
         return error("can't find catalog info");
     e = e->link();  // get pointer to first catalog in directory
-    
+
     // get the serv_type
     Tcl_ResetResult(interp_);
     int n = strlen(argv[0]);

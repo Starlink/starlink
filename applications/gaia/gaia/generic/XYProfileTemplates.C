@@ -1,30 +1,49 @@
-//+
-//  Define members of XYProfile.C that are data type dependent.
-//
-//  The data type used by these overloaded members is controlled by
-//  the macro "DATA_TYPE". Define this and #include this file as many
-//  times as required for the data types that you want to support.
-//
-//-
+/**
+ *  Define members of XYProfile.C that are data type dependent.
+ *
+ *  The data type used by these overloaded members is controlled by
+ *  the macro "DATA_TYPE". Define this and #include this file as many
+ *  times as required for the data types that you want to support.
 
-//
-//   Extract the X and Y profiles from a sub region of image data.
-//   Native format image data version.
-//
-//   Arguments:
-//      image = pointer to the image data.
-//      nx, ny = size of image data.
-//      bscale, bzero = image data scale and zero point (FITS only).
-//      x0, y0, x1, y1 = array indices of region to process.
-//      xCoords = list of image coordinates of valid columns.
-//      xVector = pairs of values recording the index and mean value
-//                of each valid column (index starts from 0 == x0).
-//      yCoords = list of image coordinates of valid rows.
-//      yVector = pairs of values recording the index and mean value
-//                of each valid row (index starts from 0 == y0).
-//      numValues[2] = number of valid columns and rows.
+ *  Copyright:
+ *     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
+ 
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
+ */
 
-//
+/*
+ *   Extract the X and Y profiles from a sub region of image data.
+ *   Native format image data version.
+ *
+ *   Arguments:
+ *      image = pointer to the image data.
+ *      nx, ny = size of image data.
+ *      bscale, bzero = image data scale and zero point (FITS only).
+ *      x0, y0, x1, y1 = array indices of region to process.
+ *      xCoords = list of image coordinates of valid columns.
+ *      xVector = pairs of values recording the index and mean value
+ *                of each valid column (index starts from 0 == x0).
+ *      yCoords = list of image coordinates of valid rows.
+ *      yVector = pairs of values recording the index and mean value
+ *                of each valid row (index starts from 0 == y0).
+ *      numValues[2] = number of valid columns and rows.
+ */
 void XYProfile::extractNativeImage( const DATA_TYPE *image, const int nx,
                                     const int ny, const double bscale,
                                     const double bzero, const int x0,
@@ -127,13 +146,13 @@ void XYProfile::extractNativeImage( const DATA_TYPE *image, const int nx,
     delete[] ycount;
 }
 
-//
-//   Extract the X and Y profiles from a sub region of image data.
-//   Byte swapped image data version.
-//
-//   Arguments:
-//      as above.
-//
+/*
+ *   Extract the X and Y profiles from a sub region of image data.
+ *   Byte swapped image data version.
+ *
+ *   Arguments:
+ *      as above.
+ */
 void XYProfile::extractSwapImage( const DATA_TYPE *image, const int nx,
                                   const int ny, const double bscale,
                                   const double bzero, const int x0,

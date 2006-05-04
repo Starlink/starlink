@@ -1,69 +1,88 @@
-//+
-//   Name:
-//      NDFIO.C
+/*+
+ *  Name:
+ *     NDFIO.C
 
-//  Purpose:
-//     Defines the NDF class member functions for reading and
-//     writing NDFs.
+ *  Purpose:
+ *    Defines the NDF class member functions for reading and
+ *    writing NDFs.
 
-//  Language:
-//     C++
+ *  Language:
+ *    C++
 
-//
-//  Notes:
-//     May want to create an NDFIO::initialize member if supporting NDF
-//     reading and writing from shared memory.
-//
+ *
+ *  Notes:
+ *    May want to create an NDFIO::initialize member if supporting NDF
+ *    reading and writing from shared memory.
+ *
 
-//  Copyright:
-//     Copyright (C) 1997-2005 Central Laboratory of the Research Councils
+ *  Copyright:
+ *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
 
-//  Authors:
-//     Peter W. Draper (PWD):
-//     Allan Brighton, ESO (ALLAN):
-//     {enter_new_authors_here}
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
 
-//  History:
-//     28-JUN-1996 (PWD):
-//        Started again for version 2.3.
-//     22-NOV-1996 (PWD):
-//        Converted to accept memory header (rather than use a fixed
-//        size local array).
-//     16-JAN-1997 (PWD):
-//        Changed to create the memory copy of the image data before
-//        copying. This is intended to reduce the overall footprint of
-//        the application in memory when the NDF data is released. The
-//        data is now also copied by chunking so that the total amount of
-//        memory required is now smaller for very large images.
-//     16-Mar-1998 (ALLAN)
-//        Updated for Skycat/Gaia plugin (get() methods)
-//        Removed static put_keyword, blankImage methods (not used)
-//        Changed constructor to initialize WCS object.
-//     29-OCT-1999 (PWD):
-//        Now use hgeti to access unsigned short value. The hgeti2
-//        routine is changed to truncate values into the range of
-//        signed word.
-//     12-JAN-2000 (PWD):
-//        Added changes to support NDF "HDUs". This is just a way of
-//        accessing NDF data components and NDFs within container
-//        files and is provided to match the FITS HDU concept.
-//     07-FEB-2000 (PWD):
-//        Added changes to get back writable data components when
-//        needed (for image patching).
-//     10-APR-2000 (PWD):
-//        Changed to use bitpix=8 explicitly when accessing quality
-//        component. Note still assumes variance is same data type as
-//        main array.
-//     05-SEP-2004 (PWD):
-//        Modify so that all memory is allocated by HDS or CNF so that we can
-//        safely pass this into Fortran, even on 64 bit machines.
-//     22-NOV-2005 (PWD):
-//        Switch to new byte swapping in Skycat 2.7.4.
-//     14-DEC-2005 (PWD):
-//        Implemented copy.
-//     {enter_changes_here}
+ *  Authors:
+ *     Peter W. Draper (PWD):
+ *     Allan Brighton, ESO (ALLAN):
+ *     {enter_new_authors_here}
 
-//-
+ *  History:
+ *     28-JUN-1996 (PWD):
+ *        Started again for version 2.3.
+ *     22-NOV-1996 (PWD):
+ *        Converted to accept memory header (rather than use a fixed
+ *        size local array).
+ *     16-JAN-1997 (PWD):
+ *        Changed to create the memory copy of the image data before
+ *        copying. This is intended to reduce the overall footprint of
+ *        the application in memory when the NDF data is released. The
+ *        data is now also copied by chunking so that the total amount of
+ *        memory required is now smaller for very large images.
+ *     16-Mar-1998 (ALLAN)
+ *        Updated for Skycat/Gaia plugin (get() methods)
+ *        Removed static put_keyword, blankImage methods (not used)
+ *        Changed constructor to initialize WCS object.
+ *     29-OCT-1999 (PWD):
+ *        Now use hgeti to access unsigned short value. The hgeti2
+ *        routine is changed to truncate values into the range of
+ *        signed word.
+ *     12-JAN-2000 (PWD):
+ *        Added changes to support NDF "HDUs". This is just a way of
+ *        accessing NDF data components and NDFs within container
+ *        files and is provided to match the FITS HDU concept.
+ *     07-FEB-2000 (PWD):
+ *        Added changes to get back writable data components when
+ *        needed (for image patching).
+ *     10-APR-2000 (PWD):
+ *        Changed to use bitpix=8 explicitly when accessing quality
+ *        component. Note still assumes variance is same data type as
+ *        main array.
+ *     05-SEP-2004 (PWD):
+ *        Modify so that all memory is allocated by HDS or CNF so that we can
+ *        safely pass this into Fortran, even on 64 bit machines.
+ *     22-NOV-2005 (PWD):
+ *        Switch to new byte swapping in Skycat 2.7.4.
+ *     14-DEC-2005 (PWD):
+ *        Implemented copy.
+ *     {enter_changes_here}
+
+ *-
+ */
 
 #include <define.h>  //  From skycat util
 

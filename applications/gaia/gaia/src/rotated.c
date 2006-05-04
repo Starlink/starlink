@@ -1,7 +1,7 @@
 /* ********************************************************************** */
 
 /* xvertext 5.0, Copyright (c) 1993 Alan Richardson (mppa3@uk.ac.sussex.syma)
- *               Copyright (c) 1997-1998 Central Laboratory of the Research Councils
+ * Copyright (c) 1997-1998 Central Laboratory of the Research Councils
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided

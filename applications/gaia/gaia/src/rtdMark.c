@@ -5,8 +5,8 @@
  * Copyright (c) 2006      Particle Physics and Astronomy Reseach Council
  *
  *
- * See the file "license.terms" for information on usage and redistribution
- * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+ * See the Tcl distribution file "license.terms" for information on usage and
+ * redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 
 /*+

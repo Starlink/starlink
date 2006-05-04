@@ -1,25 +1,47 @@
-//+
-//  Define members of RegionStats.C that are data type dependent.
-//
-//  The data type used by these overloaded members is controlled by
-//  the macro "DATA_TYPE". Define this and #include this file as many
-//  times as required for the data types that you want to support.
-//
-//
-//  This code is really Min Tan's "ImageTemplates::Statistic_box"
-//  extracted from RTD.
-//-
+/*+
+ *  Define members of RegionStats.C that are data type dependent.
+ *
+ *  The data type used by these overloaded members is controlled by
+ *  the macro "DATA_TYPE". Define this and #include this file as many
+ *  times as required for the data types that you want to support.
+ *
+ *
+ *  This code is really Min Tan's "ImageTemplates::Statistic_box"
+ *  extracted from RTD.
 
-//
-//   Calculate stats for a sub region of image data.
-//   Native format image data version.
-//
-//   Arguments:
-//      image = pointer to the image data.
-//      nx, ny = size of image data.
-//      bscale, bzero = image data scale and zero point (FITS only).
-//      x0, y0, x1, y1 = array indices of region to process.
-//
+ *  Copyright:
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
+ 
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
+ *-
+ */
+
+/*
+ *   Calculate stats for a sub region of image data.
+ *   Native format image data version.
+ *
+ *   Arguments:
+ *      image = pointer to the image data.
+ *      nx, ny = size of image data.
+ *      bscale, bzero = image data scale and zero point (FITS only).
+ *      x0, y0, x1, y1 = array indices of region to process.
+ *
+ */
 void RegionStats::calcNative( const DATA_TYPE *image, const int nx,
                               const int ny, const double bscale,
                               const double bzero, const int x0,

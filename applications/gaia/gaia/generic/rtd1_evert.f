@@ -15,6 +15,23 @@ C
 C   Inputs:  DX     DBLE     Position in vector
 C   Outputs: IX     I*2     Offset to start
 C            SVECT  DBLE(*)  Weights
+
+C  Licence:
+C     This program is free software; you can redistribute it and/or
+C     modify it under the terms of the GNU General Public License as
+C     published by the Free Software Foundation; either version 2 of the
+C     License, or (at your option) any later version.
+C
+C     This program is distributed in the hope that it will be
+C     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+C     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+C     GNU General Public License for more details.
+C
+C     You should have received a copy of the GNU General Public License
+C     along with this program; if not, write to the Free Software
+C     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+C     02111-1307, USA
+
 C----------------------------------------------------------------------
       INTEGER*2 IX
       DOUBLE PRECISION SVECT(1), DX

@@ -1,104 +1,123 @@
-//+
-//  Name:
-//     Contour.C
+/*+
+ *  Name:
+ *     Contour.C
 
-//  Language:
-//     C++
+ *  Language:
+ *     C++
 
-//  Purpose:
-//     Define a class for contouring an image, possibly over another
-//     image.
+ *  Purpose:
+ *     Define a class for contouring an image, possibly over another
+ *     image.
 
-//  Description:
-//     This class controls the drawing of contours lines. The contours
-//     are generated using image data which is given as a ImageIO
-//     object. The positions where the contours are actually plotted
-//     are decided by using coordinates described by an AstPlot. The
-//     AstPlot should be set up so that the current frame is the GRID
-//     coordinates of the image (i.e. the pixel indices) and the base
-//     frame is in the coordinate system of the graphics device. Using
-//     this scheme the AstPlot may transform from GRID coordinates to
-//     Graphics coordinate via a system based on another image.
-//
-//     The properties of each contour (i.e. colour, line thickness
-//     etc.) are defined as a list of AST attributes. This list should
-//     either consist of one set, which will be applied to all
-//     contours, or a set for each contour
-//
-//     The "careful_" member variable indicates that contours should
-//     be drawn using geodesics, rather than plain straight-lines.
-//     Drawing straight-lines is faster, but could be confused when
-//     using difficult astrometries.
-//
-//     See the descriptions with the member functions (here and in the
-//     associated class definition file) for how to use this class.
+ *  Description:
+ *     This class controls the drawing of contours lines. The contours
+ *     are generated using image data which is given as a ImageIO
+ *     object. The positions where the contours are actually plotted
+ *     are decided by using coordinates described by an AstPlot. The
+ *     AstPlot should be set up so that the current frame is the GRID
+ *     coordinates of the image (i.e. the pixel indices) and the base
+ *     frame is in the coordinate system of the graphics device. Using
+ *     this scheme the AstPlot may transform from GRID coordinates to
+ *     Graphics coordinate via a system based on another image.
+ *
+ *     The properties of each contour (i.e. colour, line thickness
+ *     etc.) are defined as a list of AST attributes. This list should
+ *     either consist of one set, which will be applied to all
+ *     contours, or a set for each contour
+ *
+ *     The "careful_" member variable indicates that contours should
+ *     be drawn using geodesics, rather than plain straight-lines.
+ *     Drawing straight-lines is faster, but could be confused when
+ *     using difficult astrometries.
+ *
+ *     See the descriptions with the member functions (here and in the
+ *     associated class definition file) for how to use this class.
 
-//  Algorithm:
-//     The following notes describe the current algorithm used to
-//     locate the contours (taken from KPS1_CNTF). Note we use this
-//     algorithm as it draws the contours in sensible polylines,
-//     rather than many line segments, this should suit a Tk canvas.
-//
-//     The routine makes a separate pass through the image for each
-//     contour to be plotted.  The image is divided into "cells"
-//     (groups of four adjacent pixels) and each is examined in turn.
-//     Cells contining "bad" pixels are ignored, but for all others
-//     the minimum and maximum cell data values are found.  If the
-//     contour level currently being plotted lies between these two
-//     values, then a contour crosses the cell in question, otherwise
-//     the cell is skipped over on this pass.
-//
-//     Having identified a cell containing a contour, the contour
-//     following algorithm is triggered.  Each cell side (a "side" is
-//     one of the lines joining pixel centres) is examined to
-//     determine if the contour passes through it and, if so, at what
-//     position.  If the contour only passes through two cell sides,
-//     then the cell is "simple" and is only crossed by a single
-//     contour line.  In this case, the contour entry and exit points
-//     are put into a list of positions (to be plotted), the cell is
-//     flagged as "done" and the algorithm moves on to the cell
-//     adjacent to the contour exit position, where the process is
-//     repeated - thereby "following" the contour.
-//
-//     Contour following continues until the next cell is off the edge
-//     of the image, has already been "done" on this pass, contains a
-//     "bad" pixel or is "confused" (i.e. is crossed by more than one
-//     contour line).  In "confused" cells, all four cell sides are
-//     crossed by contours, and the algorithm pairs the points to form
-//     two line segents to plot which do not cross and which produce
-//     the shortest total length of contour line within the cell.
-//     Contour- following also terminates if the buffer containing the
-//     list of points to plot becomes full.
-//
-//     When contour following terminates, all pending output is
-//     plotted with the appropriate pen (there are two separate lines
-//     to plot if the final cell was confused).  The scan through the
-//     data (looking for cells which are crossed by the current
-//     contour) then resumes at the cell following the one which
-//     initiated the last episode of contour-following.  Cells which
-//     are already flagged as "done" do not subsequently trigger
-//     further contour-following on this pass.
+ *  Algorithm:
+ *     The following notes describe the current algorithm used to
+ *     locate the contours (taken from KPS1_CNTF). Note we use this
+ *     algorithm as it draws the contours in sensible polylines,
+ *     rather than many line segments, this should suit a Tk canvas.
+ *
+ *     The routine makes a separate pass through the image for each
+ *     contour to be plotted.  The image is divided into "cells"
+ *     (groups of four adjacent pixels) and each is examined in turn.
+ *     Cells contining "bad" pixels are ignored, but for all others
+ *     the minimum and maximum cell data values are found.  If the
+ *     contour level currently being plotted lies between these two
+ *     values, then a contour crosses the cell in question, otherwise
+ *     the cell is skipped over on this pass.
+ *
+ *     Having identified a cell containing a contour, the contour
+ *     following algorithm is triggered.  Each cell side (a "side" is
+ *     one of the lines joining pixel centres) is examined to
+ *     determine if the contour passes through it and, if so, at what
+ *     position.  If the contour only passes through two cell sides,
+ *     then the cell is "simple" and is only crossed by a single
+ *     contour line.  In this case, the contour entry and exit points
+ *     are put into a list of positions (to be plotted), the cell is
+ *     flagged as "done" and the algorithm moves on to the cell
+ *     adjacent to the contour exit position, where the process is
+ *     repeated - thereby "following" the contour.
+ *
+ *     Contour following continues until the next cell is off the edge
+ *     of the image, has already been "done" on this pass, contains a
+ *     "bad" pixel or is "confused" (i.e. is crossed by more than one
+ *     contour line).  In "confused" cells, all four cell sides are
+ *     crossed by contours, and the algorithm pairs the points to form
+ *     two line segents to plot which do not cross and which produce
+ *     the shortest total length of contour line within the cell.
+ *     Contour- following also terminates if the buffer containing the
+ *     list of points to plot becomes full.
+ *
+ *     When contour following terminates, all pending output is
+ *     plotted with the appropriate pen (there are two separate lines
+ *     to plot if the final cell was confused).  The scan through the
+ *     data (looking for cells which are crossed by the current
+ *     contour) then resumes at the cell following the one which
+ *     initiated the last episode of contour-following.  Cells which
+ *     are already flagged as "done" do not subsequently trigger
+ *     further contour-following on this pass.
 
-//  Implementation Deficiencies:
-//     The contours are not smooth and the scanning algorithm can be made
-//     many times faster by not examining all pixels at all heights.
+ *  Implementation Deficiencies:
+ *     The contours are not smooth and the scanning algorithm can be made
+ *     many times faster by not examining all pixels at all heights.
 
-//
-//  Authors:
-//     P.W. Draper (PWD)
-//
-//  Copyright:
-//     Copyright (C) 1999 Central Laboratory of the Research Councils
-//
-//  History:
-//     23-MAY-1999 (PWD):
-//        Original version. The contouring algorithm is based on
-//        Rodney Warren-Smith's used in the KPS1_CNTF. See the
-//        drawContour member for how this works.
-//     06-JUL-1999 (PWD):
-//        Added BSCALE and BZERO corrections to contour level.
-//     {enter_changes_here}
-//-
+ *
+ *  Authors:
+ *     P.W. Draper (PWD)
+ *
+ *  Copyright:
+ *     Copyright (C) 1999-2005 Central Laboratory of the Research Councils
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
+
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
+ *
+ *  History:
+ *     23-MAY-1999 (PWD):
+ *        Original version. The contouring algorithm is based on
+ *        Rodney Warren-Smith's used in the KPS1_CNTF. See the
+ *        drawContour member for how this works.
+ *     06-JUL-1999 (PWD):
+ *        Added BSCALE and BZERO corrections to contour level.
+ *     {enter_changes_here}
+ *-
+ */
 
 #include <climits>
 #include <cstring>

@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 1991-1994 The Regents of the University of California.
- * Copyright (c) 1994-1995 Sun Microsystems, Inc.
- * Copyright (c) 1997-2005 Central Laboratory of the Research Councils
- * Copyright (c) 2006      Particle Physics and Astronomy Research Council
+ * Copyright (C) 1994-1995 Sun Microsystems, Inc.
+ * Copyright (C) 1997-2005 Central Laboratory of the Research Councils
+ * Copyright (C) 2006      Particle Physics and Astronomy Research Council
  *
- * See the file "license.terms" for information on usage and redistribution
- * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+ * See the Tcl distribution file "license.terms" for information on usage and
+ * redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 
 /*+
