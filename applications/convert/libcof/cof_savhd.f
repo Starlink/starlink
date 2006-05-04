@@ -80,12 +80,6 @@
 *  Arguments Given:
       INTEGER FUNIT
       
-*  Arguments Given and Returned:
-      
-*  Arguments Returned:
-      INTEGER BLOCSZ
-      INTEGER EXTN
-      
 *  Status:
       INTEGER STATUS            ! Global status
 
