@@ -241,10 +241,10 @@
 *  If the NDF has a WCS component do not propagate the AXIS information.
       CALL NDF_STATE( NDF, 'WCS', GOTWCS, STATUS )
 
-*  If the FITS extension contains usable WCS information and the contents
-*  of the FITS extension are being propagated to the output FITS file,
-*  do not propagate the AXIS information.
-      IF( PROPEX .AND. COF_ISWCS( NDF, STATUS ) ) GOTWCS = .TRUE.
+*  If the FITS extension contains usable WCS information and the 
+*  contents of the FITS extension are being propagated to the output 
+*  FITS file, do not propagate the AXIS information.
+      IF ( PROPEX .AND. COF_ISWCS( NDF, STATUS ) ) GOTWCS = .TRUE.
 
 *  For any axis structure present, the routine checks to see if each
 *  axis data array is linear.  If it is, the start value and incremental
