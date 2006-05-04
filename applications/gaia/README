@@ -17,7 +17,8 @@ more astronomically useful ones such as aperture & optimal photometry,
 contouring, source detection, surface photometry, arbitrary region
 analysis, celestial coordinate readout, calibration and modification,
 grid overlays, blink comparison, defect patching and the ability to
-query on-line (WWW) catalogue for catalogues and images.
+query on-line (WWW) catalogue for catalogues and images. It can also
+display image slices from cubes and plot spectra from the third dimension.
 
 To get started look at the main document SUN/214 (Starlink User Note
 214), which should be part of the release. Try the command:
@@ -28,24 +29,21 @@ Or alternatively look for the "sun214.htx" directory and load the
 "sun214.html" file into a HTML browser. GAIA has an on-line help
 system which should be consulted next.
 
-If you have any comments, bug reports etc. about GAIA then email
-"GAIA support" at:
+If you have any comments, bug reports etc. about GAIA then join the
+Starlink support mailing list, directions to that can be found at:
 
-   gaia@star.rl.ac.uk
+   http://www.starlink.ac.uk
 
-Releases of GAIA should be found at the "Starlink Software Store":
+and ask for help. The most recent versions of GAIA are available on the 
+Starlink CVS repository:
 
-   http://www.starlink.ac.uk/store/store.html
-
-or can be obtained on a Starlink CDROM release, also available from
-the Starlink web site. Source code for GAIA should be also available
-at that site, or contact GAIA support.
+   http://dev.starlink.ac.uk
 
 Note that GAIA and SkyCat are free software under the terms of the GNU
 General Public License. See the files GAIA_CONDITIONS and COPYING for
 further details.
 
-Peter W. Draper (p.w.draper@durham.ac.uk) 6th May 2003.
+Peter W. Draper (p.w.draper@durham.ac.uk) 4th May 2006.
 
 (1) http://www.starlink.ac.uk/
 (2) http://www.starlink.ac.uk/gaia/

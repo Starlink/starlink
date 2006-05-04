@@ -1,6 +1,5 @@
-                   Starlink Software Licencing for GAIA
-                   ====================================
-
+                   Software Licensing for GAIA
+                   ===========================
 
 PREAMBLE
 
@@ -10,18 +9,18 @@ be used.
 
 APPLICABILITY
 
-All the material in this distribution of GAIA, except the code found
-in the "gaia_tcl.tar" and "gaia_skycat.tar" files, is covered by these
-terms and conditions. The code in these two tar files contains their
-own terms and conditions.
+All the material in this distribution of GAIA, except the code found in the
+skycat and gaia/tkhtml directories, is covered by these terms and
+conditions. The code in these two directories contain their own terms and
+conditions (also GNU).
 
 NOTICE TO USER:
 
 BY USING THE SOFTWARE YOU ACCEPT THE FOLLOWING TERMS AND CONDITIONS
 WHICH APPLY TO ITS USE.
 
-1. The Software is owned by the Council for the Central Laboratory of the
-Research Councils ("CCLRC").
+1. Where indicated the Software is owned by the Council for the Central
+Laboratory of the Research Councils ("CCLRC").
 
 2. This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
