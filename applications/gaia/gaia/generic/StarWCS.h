@@ -2,37 +2,59 @@
 #ifndef _StarWCS_h_
 #define _StarWCS_h_
 
-//
-//+
-// Name:
-//    StarWCS
-//
-// Purpose:
-//    Include file that defines the StarWCS class.
-//
-// Authors:
-//    P.W. Draper (PWD)
-//    Allan Brighton, ESO (ALLAN)
-//
-// History:
-//    24-JUL-1997 (PWD):
-//       Original version based on WCS for RTD.
-//    16-MAR-1998 (ALLAN)
-//       Renamed the local WCSRep class to StarWCS and removed local WCS class,
-//       to be compatible with the main Rtd/Skycat release.
-//       The original WCSRep class has been renamed to SAOWCS (based on the
-//       saoimage wcslib) and WCSRep is now an abstract base class.
-//       Here we define a subclass of WCSRep that defines the new behavior
-//       and uses the Starlink routines, rather then the sao version, as is
-//       used by skycat.
-//    22-APR-1998 (ALLAN)
-//       Fixed xSecPix() and ySecPix(), added setSecPix() method
-//       (needed for plotting some symbols based on world coordinates).
-//    22-JAN-2003 (PWD):
-//       Added milli-arcsec resolution option.
-//    19-DEC-2003 (PWD):
-//       Added CarLin static member and control method.
-//-
+
+/*+
+ *  Name:
+ *     StarWCS
+ 
+ *  Purpose:
+ *     Include file that defines the StarWCS class.
+ 
+ *  Authors:
+ *     P.W. Draper (PWD)
+ *     Allan Brighton, ESO (ALLAN)
+
+ *  Copyright:
+ *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils.
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
+ 
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
+ 
+ *  History:
+ *     24-JUL-1997 (PWD):
+ *        Original version based on WCS for RTD.
+ *     16-MAR-1998 (ALLAN)
+ *        Renamed the local WCSRep class to StarWCS and removed local WCS class,
+ *        to be compatible with the main Rtd/Skycat release.
+ *        The original WCSRep class has been renamed to SAOWCS (based on the
+ *        saoimage wcslib) and WCSRep is now an abstract base class.
+ *        Here we define a subclass of WCSRep that defines the new behavior
+ *        and uses the Starlink routines, rather then the sao version, as is
+ *        used by skycat.
+ *     22-APR-1998 (ALLAN)
+ *        Fixed xSecPix() and ySecPix(), added setSecPix() method
+ *        (needed for plotting some symbols based on world coordinates).
+ *     22-JAN-2003 (PWD):
+ *        Added milli-arcsec resolution option.
+ *     19-DEC-2003 (PWD):
+ *        Added CarLin static member and control method.
+ *-
+ */
 
 extern "C" {
 #include "ast.h"

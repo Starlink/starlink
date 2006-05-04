@@ -4,26 +4,44 @@
 
 /*
  *+
- * Name:
- *    StarRtdForeignCmds
+ *  Name:
+ *     StarRtdForeignCmds
 
- * Purpose:
- *    Include file that defines the structure that describes any
- *    "foreign" commands that require direct access to the displayed
- *    image.
+ *  Purpose:
+ *     Include file that defines the structure that describes any
+ *     "foreign" commands that require direct access to the displayed
+ *     image.
 
- * Notes:
- *    This file is designed to be included in C and C++ code.
+ *  Notes:
+ *     This file is designed to be included in C and C++ code.
 
  *  Copyright:
- *    Copyright (C) 1998 Central Laboratory of the Research Councils
+ *     Copyright (C) 1996-2005 Central Laboratory of the Research Councils.
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
 
- * Authors:
- *    P.W. Draper (PWD)
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
 
- * History:
- *    13-JUN-1996 (PWD):
- *       Original version.
+ *  Authors:
+ *     P.W. Draper (PWD)
+
+ *  History:
+ *     13-JUN-1996 (PWD):
+ *        Original version.
 
  *-
  */

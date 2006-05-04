@@ -1,44 +1,65 @@
 #ifndef _GaiaSkySearch_h_
 #define _GaiaSkySearch_h_
-//+
-//   Name:
-//      GaiaSkySearch
 
-//  Purpose:
-//     Defines the GaiaSkySearch class.
+/*+
+ *   Name:
+ *      GaiaSkySearch
 
-//  Language:
-//     C++
+ *  Purpose:
+ *     Defines the GaiaSkySearch class.
 
-//  Description:
-//     This module defines the members of the GaiaSkySearch
-//     class. This class implements methods for accessing CAT
-//     catalogues as if they were tab tables.
+ *  Language:
+ *     C++
 
-//  Copyright:
-//    Copyright (C) 1998-2000 Central Laboratory of the Research Councils
+ *  Description:
+ *     This module defines the members of the GaiaSkySearch
+ *     class. This class implements methods for accessing CAT
+ *     catalogues as if they were tab tables.
 
-//  History:
-//     23-SEP-1998 (PWD):
-//        Original version.
-//     21-AUG-2000 (PWD):
-//        Added originCmd, xOrigin_ and yOrigin_ members.
-//     {enter_changes_here}
+ *  Copyright:
+ *     Copyright (C) 1998-2005 Central Laboratory of the Research Councils.
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
+ 
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
 
-//-
+ *  History:
+ *     23-SEP-1998 (PWD):
+ *        Original version.
+ *     21-AUG-2000 (PWD):
+ *        Added originCmd, xOrigin_ and yOrigin_ members.
+ *     {enter_changes_here}
+
+ *-
+ */
 
 #include "SkySearch.h"
 
-class GaiaSkySearch : public SkySearch {
+class GaiaSkySearch : public SkySearch 
+{
 
-protected:
+ protected:
 
     //  Origins to be added to plot image coordinates.
     double xOrigin_;
     double yOrigin_;
-
-public:
-
+    
+ public:
+    
     //  Constructor.
     GaiaSkySearch( Tcl_Interp *interp, const char *cmdname, 
                    const char *instname);
@@ -70,4 +91,3 @@ public:
 };
 
 #endif // _GaiaSkySearch_h_
-

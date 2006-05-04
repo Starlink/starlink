@@ -1,40 +1,58 @@
 #if !defined( GRF_INCLUDED ) /* Include this file only once */
 #define GRF_INCLUDED
 /*
-*+
-*  Name:
-*     grf.h
-
-*  Type:
-*     C include file.
-
-*  Purpose:
-*     Define the interface to the grf module
-
-*  Invocation:
-*     #include "grf.h"
-
-*  Description:
-*     This include file defines the interface to the grf module and
-*     provides the type definitions, function prototypes and macros, etc.
-*     needed to use this module.
-
-*  Inheritance:
-*     The grf module is not a class and does not inherit.
-
-*  Copyright:
-*     Copyright (C) 2004 Central Laboratory of the Research Councils
-
-*  Authors:
-*     DSB: David S. Berry (Starlink)
-
-*  History:
-*     27-JUN-1996 (DSB):
-*        Original version.
-*     25-OCT-1996 (DSB):
-*        Primatives macros defined, extra parameter added to astGAttr.
-*-
-*/
+ *+
+ *  Name:
+ *     grf.h
+ 
+ *  Type:
+ *     C include file.
+ 
+ *  Purpose:
+ *     Define the interface to the grf module
+ 
+ *  Invocation:
+ *     #include "grf.h"
+ 
+ *  Description:
+ *     This include file defines the interface to the grf module and
+ *     provides the type definitions, function prototypes and macros, etc.
+ *     needed to use this module.
+ 
+ *  Inheritance:
+ *     The grf module is not a class and does not inherit.
+ 
+ *  Copyright:
+ *     Copyright (C) 1996-2005 Central Laboratory of the Research Councils.
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
+ 
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
+ 
+ *  Authors:
+ *     DSB: David S. Berry (Starlink)
+ 
+ *  History:
+ *     27-JUN-1996 (DSB):
+ *        Original version.
+ *     25-OCT-1996 (DSB):
+ *        Primatives macros defined, extra parameter added to astGAttr.
+ *-
+ */
 
 /* Constant Values. */
 /* ================ */

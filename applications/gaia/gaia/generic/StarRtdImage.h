@@ -2,57 +2,74 @@
 #ifndef _StarRtdImage_
 #define _StarRtdImage_
 
-//
-//+
-// Name:
-//    StarRtdImage
-//
-// Purpose:
-//    Include file that defines the class that extends Skycat to add
-//    features required by the Starlink implementation.
-//
-// Authors:
-//    P.W. Draper (PWD)
-//
-// Copyright:
-//    Copyright (C) 1997-2001 Central Laboratory of the Research Councils
-//
-// History:
-//    15-FEB-1996 (PWD):
-//       Original version.
-//    12-JUN-1996 (PWD):
-//       Added foreign command.
-//    04-SEP-1997 (PWD):
-//       Added plotgrid method.
-//    08-OCT-1997 (PWD):
-//       loadImage now called loadFile and becomes virtual.
-//    16-Mar-1998 (Allan Brighton, ESO):
-//       Use class Skycat as the base class instead of Rtd.
-//       Make use of new Skycat/Rtd features supporting subclassing,
-//       new constructor args, GAIA_CONFIG macro,
-//       Added getStarImage(), getStarWCSPtr()
-//    22-APR-1998 (PWD):
-//       Now subclasses Skycat rather than RtdImage.
-//    13-JAN-1999 (PWD):
-//       Merged in changes from Allan Brighton's GAIA plugin (see
-//       history above).
-//    14-MAR-1999 (PWD):
-//       Added contour command and related changes.
-//    04-APR-2001 (PWD):
-//       Added the astaddcolourCmd member.
-//    16-JUL-2001 (PWD):
-//       Added UKIRT quick look code. Also needed processMotionEvent.
-//       The quick look is off by default.
-//    22-JAN-2003 (PWD):
-//       Added astmilliCmd to switch on milli-arcsec resolution.
-//    16-FEB-2004 (PWD):
-//       Added astalwaysmergeCmd.
-//    14-DEC-2005 (PWD):
-//       Added isCompoundCmd.
-//    26-APR-2006 (PWD):
-//       Added updateImageCmd and volatility marking.
-//
-//-
+/*+
+ *  Name:
+ *     StarRtdImage
+ 
+ *  Purpose:
+ *     Include file that defines the class that extends Skycat to add
+ *     features required by the Starlink implementation.
+ 
+ *  Authors:
+ *     P.W. Draper (PWD)
+ 
+ *  Copyright:
+ *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils.
+ *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     All Rights Reserved.
+
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
+ 
+ *  History:
+ *     15-FEB-1996 (PWD):
+ *        Original version.
+ *     12-JUN-1996 (PWD):
+ *        Added foreign command.
+ *     04-SEP-1997 (PWD):
+ *        Added plotgrid method.
+ *     08-OCT-1997 (PWD):
+ *        loadImage now called loadFile and becomes virtual.
+ *     16-Mar-1998 (Allan Brighton, ESO):
+ *        Use class Skycat as the base class instead of Rtd.
+ *        Make use of new Skycat/Rtd features supporting subclassing,
+ *        new constructor args, GAIA_CONFIG macro,
+ *        Added getStarImage(), getStarWCSPtr()
+ *     22-APR-1998 (PWD):
+ *        Now subclasses Skycat rather than RtdImage.
+ *     13-JAN-1999 (PWD):
+ *        Merged in changes from Allan Brighton's GAIA plugin (see
+ *        history above).
+ *     14-MAR-1999 (PWD):
+ *        Added contour command and related changes.
+ *     04-APR-2001 (PWD):
+ *        Added the astaddcolourCmd member.
+ *     16-JUL-2001 (PWD):
+ *        Added UKIRT quick look code. Also needed processMotionEvent.
+ *        The quick look is off by default.
+ *     22-JAN-2003 (PWD):
+ *        Added astmilliCmd to switch on milli-arcsec resolution.
+ *     16-FEB-2004 (PWD):
+ *        Added astalwaysmergeCmd.
+ *     14-DEC-2005 (PWD):
+ *        Added isCompoundCmd.
+ *     26-APR-2006 (PWD):
+ *        Added updateImageCmd and volatility marking.
+ *-
+ */
 
 #include "Skycat.h"
 #include "StarWCS.h"

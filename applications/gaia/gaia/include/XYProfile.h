@@ -2,22 +2,23 @@
 #ifndef _XYProfile_h_
 #define _XYProfile_h_
 
-//
-//+
-// Name:
-//    XYProfile
-//
-// Purpose:
-//    Include file that defines the XYProfile class.
-//
-// Authors:
-//    P.W. Draper (PWD)
-//
-// History:
-//    10-JUL-2000 (PWD):
-//       Original version.
-//    {enter_changes_here}
-//-
+
+/*+
+ * Name:
+ *    XYProfile
+
+ * Purpose:
+ *    Include file that defines the XYProfile class.
+
+ * Authors:
+ *    P.W. Draper (PWD)
+
+ * History:
+ *    10-JUL-2000 (PWD):
+ *       Original version.
+ *    {enter_changes_here}
+ *-
+ */
 
 //  Include files:
 #include <sys/types.h>
@@ -48,7 +49,7 @@ public:
   virtual ~XYProfile();
 
   //  Extract and return XYProfiles.
-  void extractProfiles( double *xCoords, double *xVector, 
+  void extractProfiles( double *xCoords, double *xVector,
                         double *yCoords, double *yVector, int numValues[2] );
 
   //  Set the region of the image to be profiled.
@@ -95,35 +96,35 @@ public:
   inline char swapArrayVal( const char *arrayPtr, const int& span,
                             const int &ix, const int& iy )
      {
-        return arrayPtr[iy*span + ix]; 
+        return arrayPtr[iy*span + ix];
      }
 
   inline unsigned char swapArrayVal( const unsigned char *arrayPtr,
-                                     const int& span, const int &ix, 
+                                     const int& span, const int &ix,
                                      const int& iy )
      {
-        return arrayPtr[iy*span + ix]; 
+        return arrayPtr[iy*span + ix];
      }
 
   inline short swapArrayVal( const short *arrayPtr, const int& span,
                              const int &ix, const int& iy )
      {
-        return (short)ntohs((unsigned short)arrayPtr[iy*span + ix]); 
+        return (short)ntohs((unsigned short)arrayPtr[iy*span + ix]);
      }
 
-  inline unsigned short swapArrayVal( const unsigned short *arrayPtr, 
-                                      const int& span, const int &ix, 
+  inline unsigned short swapArrayVal( const unsigned short *arrayPtr,
+                                      const int& span, const int &ix,
                                       const int& iy )
      {
-        return ntohs(arrayPtr[iy*span + ix]); 
+        return ntohs(arrayPtr[iy*span + ix]);
      }
 
-  inline FITS_LONG swapArrayVal( const FITS_LONG *arrayPtr, 
+  inline FITS_LONG swapArrayVal( const FITS_LONG *arrayPtr,
                                  const int& span,
                                  const int &ix,
                                  const int& iy )
      {
-        return ntohl(arrayPtr[iy*span + ix]); 
+        return ntohl(arrayPtr[iy*span + ix]);
      }
 
   inline float swapArrayVal( const float *arrayPtr, const int& span,
