@@ -2,7 +2,7 @@
 
  FITS2NDF has a new TYPE group parameter to set the data type of 
  the NDF, overriding the value propagated from the FITS BITPIX, or
- BSCALE asnd BZERO precision when FMTCNV is TRUE.
+ BSCALE and BZERO precision when FMTCNV is TRUE.
 
  NDF2FITS now supports multi-NDFs HDS container files through the
  new CONTAINER and MERGE parameters.
@@ -11,7 +11,10 @@
 
  FITSGZ is a new on-the-fly conversion format for GZIP-compressed FITS
  files.  The recognised extensions are fits.gz, fit.gz, and fts.gz.
- 
+
+ FITS2NDF supports the new AAO Instruments (AAOMEGA and FMOS) that use 
+ the 2dF data structures.
+  
 1 CONVERT_Version_1.5-5
 
  Added FITS-AIPS++ and FITS-CLASS encodings to FITS2NDF and NDF2FITS.
@@ -21,7 +24,7 @@
  just the output NDF.
 
  SPECX2NDF now creates NDF files using the new double-sideband 
- specframe.  See the AST documentation for more details on 
+ SpecFrame.  See the AST documentation for more details on 
  double-sideband spectra. 
 
 1 CONVERT_Version_1.5-4
