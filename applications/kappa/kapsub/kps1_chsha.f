@@ -80,7 +80,7 @@
       REAL BEST                  ! Best efficiency
       REAL EFFIC                 ! Efficiency of the configuration
       REAL CASP                  ! Aspect ratio of current configuration
-      REAL GM                    ! Geometric mean of the no. of tiles
+      INTEGER GM                 ! Geometric mean of the no. of tiles
       INTEGER I                  ! Loop counter
       INTEGER IP                 ! Maximum additional no. of tiles in x
       INTEGER LX                 ! Lowest number of tiles in x
