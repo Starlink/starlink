@@ -21,7 +21,7 @@ Changes introduced at V0.0-15:
  - Fixed bug in the emulation of the IDL implementation of the
    ClumpFind algorithm.
 
- - Fixed bugs in FellWalker that couldproduce erroneous clump assignments.
+ - Fixed bugs in FellWalker that could produce erroneous clump assignments.
 
 
 Changes introduced at V0.0-14:
@@ -37,7 +37,7 @@ Changes introduced at V0.0-13:
 
  - Additional text in SUN255.
 
- - The FINDCLUMPS command has a new comfiguration parameter
+ - The FINDCLUMPS command has a new configuration parameter
    ClumpFind.AllowEdge that can be set to a non-zero value in order to
    retain clumps that touch an edge of the data array.
 
