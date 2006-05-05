@@ -1948,10 +1948,10 @@ window gives you access to this."
 itcl::body ::cat::AstroCat::new_catalog {name {id ""}
    {classname AstroCat} {debug 0} {tcs_flag 0} {type "catalog"}
    {w ""} {dirPath ""}} {
-   if {[check_local_catalog $name $id $classname $debug $tcs_flag $type $w] != 0} {
+   if {[check_local_catalog $name $id $classname $debug $tcs_flag $type $w $dirPath] != 0} {
       return
    }
-   set i "$name,$id"
+   set i "$name,$id,$dirPath"
    if {[info exists instances_($i)] && [winfo exists $instances_($i)]} {
       utilRaiseWindow $instances_($i)
       if {"[$instances_($i).cat servtype]" == "local"} {
@@ -1959,6 +1959,12 @@ itcl::body ::cat::AstroCat::new_catalog {name {id ""}
       }
       return
    }
+
+   #if {[catch {$astrocat_ open $name $dirPath} msg]} {
+   #  error_dialog $msg
+   #  return
+   #}
+
    if {[winfo exists $w]} {
       set instname $w.ac[incr n_instances_]
    } else {
@@ -1970,6 +1976,7 @@ itcl::body ::cat::AstroCat::new_catalog {name {id ""}
 	  -debug $debug \
 	  -catalog $name \
 	  -catalogtype $type \
+          -catalogdir $dirPath \
 	  -tcs $tcs_flag \
 	  -transient 0 \
 	  -center 0]

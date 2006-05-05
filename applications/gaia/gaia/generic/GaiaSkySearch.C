@@ -195,7 +195,7 @@ int GaiaSkySearch::openCmd(int argc, char* argv[])
     }
 
     CatalogInfoEntry *e = NULL;
-    if ( argc == 2 ) {
+    if ( argc == 2 && ( strlen(argv[1]) != 0 ) ) {
         
         // Open given catalog in given directory path.
 	e = lookupCatalogDirectoryEntry( argv[1] );
@@ -204,7 +204,7 @@ int GaiaSkySearch::openCmd(int argc, char* argv[])
         }
 	e = CatalogInfo::lookup( e, argv[0] );
 	if ( !e ) {
-	    return fmt_error( "catalog entry for '%s' not found under '%s': ",
+	    return fmt_error( "catalog entry for '%s' not found under '%s' ",
                               argv[0], argv[1]);
         }
     }
