@@ -40,11 +40,14 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-01-24 (TIMJ):
 *        Initial version.
+*     2006-05-05 (AGG):
+*        Add called to ndfHend to allow multiple distinct history writes
 
 *  Notes:
 *     - SMURF subroutines should choose history "application" names
@@ -59,8 +62,8 @@
 *       same file that you just called smf_history_write on.
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council
+*     and University of British Coulmbia. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -144,5 +147,6 @@ void smf_history_write( const smfData* data, const char * appl,
   /* Write the information to the file */
   linarr[0] = (char *)text; /* fix warning when const passed to linarr */
   ndfHput("NORMAL", appl, 0, 1, linarr, 1, 1, 1, file->ndfid, status );
+  ndfHend( status ); /* Needed to write a separate line for each call of ndfHput */
 
 }
