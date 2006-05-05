@@ -66,5 +66,6 @@ void smurf_flatfield( int * );
 void smurf_makemap( int * );
 void smurf_qlmakemap( int * );
 void smurf_remsky( int * );
+void smurf_scanfit( int * );
 
 #endif /* SMURF_LIB_DEFINED */
