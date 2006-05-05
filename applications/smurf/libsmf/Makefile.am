@@ -14,7 +14,7 @@ smf_history_check.c smf_history_write.c smf_history_read.c smf_history_add.c\
 smf_tslice_ast.c smf_tslice.c \
 smf_open_and_flatfield.c \
 smf_flatfield.c smf_check_flat.c smf_flatten.c \
-smf_clone_data.c \
+smf_clone_data.c smf_scanfit.c \
 smf_create_smfData.c smf_create_smfFile.c smf_create_smfHead.c \
 smf_create_smfDA.c \
 smf_construct_smfFile.c smf_construct_smfHead.c smf_construct_smfDA.c \

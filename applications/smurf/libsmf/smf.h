@@ -252,4 +252,6 @@ void smf_rebinmap( smfData *data, int index, int size, AstFrameSet *outframeset,
                    int *lbnd_out, int *ubnd_out, double *map, double *variance,
 		   double *weights, int *status );
 
+void smf_scanfit( smfData *data, int order, int *status );
+
 #endif /* SMF_DEFINED */
