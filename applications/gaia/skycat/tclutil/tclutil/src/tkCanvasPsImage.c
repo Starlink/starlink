@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: tkCanvasPsImage.c,v 1.2 2005/02/02 01:43:02 brighton Exp $" 
+ * "@(#) $Id: tkCanvasPsImage.c,v 1.2 2005/02/02 01:43:02 brighton Exp $"
  *
  * TkCanvasPsImage.C -  Implement Tk postscript output for images
  *
@@ -18,23 +18,94 @@
  * you will have to redo it, based on the latest Tk sources and/or Tk
  * canvasps patch.
  *
+ * PWD (again): Redone for tk8.4 as the default printing (at least there is
+ * some now) includes the empty padding once more. Using a new image
+ * postscript proc will not work as their isn't enough information passed in
+ * to determine the canvas viewport.
+ *
  * To enable this extension, call TkCanvasPsImage_Init().
  *
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  19/06/98  Created
+ * Peter W. Draper 05/05/06  Added support for tk8.4 as zoomed images
+ *                           generate massive postscript files full of
+ *                           padding around the rtdimage.
  */
 static char* rcsId="@(#) $Id: tkCanvasPsImage.c,v 1.2 2005/02/02 01:43:02 brighton Exp $";
 
-
 #include <stdio.h>
-/*
-#include "tkInt.h"
-#include "tkPort.h"
-*/
 #include "tkCanvas.h"
 
-/* Allan: 5/01: This file is not compatible with tk8.3 */
+/* Local prototypes */
+static int ImageToPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
+                              Tk_Item *itemPtr, int prepass );
+
+ 
+/*
+ * --------------------------------------------------------------
+ *
+ * TkCanvasPsImage_Init --
+ *
+ * 	This procedure is called to initialize the canvas image
+ *  	postscript extension by setting a field in the canvas
+ *      image type control struct, causing our postscript routine
+ *      to be called for canvas images.
+ *
+ * Results:
+ * 	None.
+ *
+ * Side effects:
+ * 	None.
+ *
+ * --------------------------------------------------------------
+ */
+
+void
+TkCanvasPsImage_Init()
+{
+#if TCL_MAJOR_VERSION <= 8 && TCL_MINOR_VERSION <= 2
+    extern Tk_ItemType tkImageType;
+    tkImageType.postscriptProc = ImageToPostscript;
+#endif
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 4
+    extern Tk_ItemType tkImageType;
+    tkImageType.postscriptProc = ImageToPostscript;
+#endif
+}
+
+/*
+ * XXX - allan: same as Tk_CanvasWindowCoords, but with no clipping
+ */
+void
+Tk_CanvasWindowCoordsNoClip(canvas, x, y, screenXPtr, screenYPtr)
+    Tk_Canvas canvas;			/* Token for the canvas. */
+    double x, y;			/* Coordinates in canvas space. */
+    int *screenXPtr, *screenYPtr;	/* Screen coordinates are stored
+					 * here. */
+{
+    TkCanvas *canvasPtr = (TkCanvas *) canvas;
+    double tmp;
+
+    tmp = x - canvasPtr->xOrigin;
+    if (tmp > 0) {
+	tmp += 0.5;
+    } else {
+	tmp -= 0.5;
+    }
+    *screenXPtr = tmp;
+
+    tmp = y  - canvasPtr->yOrigin;
+    if (tmp > 0) {
+	tmp += 0.5;
+    } else {
+	tmp -= 0.5;
+    }
+    *screenYPtr = tmp;
+}
+
+
+/* Allan: 5/01: This part of the file is not compatible with tk8.3 */
 #if TCL_MAJOR_VERSION <= 8 && TCL_MINOR_VERSION <= 2
 
 /*
@@ -121,13 +192,13 @@ typedef struct ImageItem  {
  * TkImageGetColor --
  *
  *	This procedure converts a pixel value to three floating
- *      point numbers, representing the amount of red, green, and 
+ *      point numbers, representing the amount of red, green, and
  *      blue in that pixel on the screen.  It makes use of colormap
  *      data passed as an argument, and should work for all Visual
  *      types.
  *
  * Results:
- *	Returns red, green, and blue color values in the range 
+ *	Returns red, green, and blue color values in the range
  *      0 to 1.  There are no error returns.
  *
  * Side effects:
@@ -135,7 +206,7 @@ typedef struct ImageItem  {
  *
  *--------------------------------------------------------------
  */
- 
+
 static void
 TkImageGetColor(cdata, pixel, red, green, blue)
      TkColormapData *cdata;              /* Colormap data */
@@ -163,8 +234,8 @@ TkImageGetColor(cdata, pixel, red, green, blue)
  * TkCanvasPsImage --
  *
  *	This procedure is called to output the contents of an
- *	image in Postscript, using a format appropriate for the 
- *      current color mode (i.e. one bit per pixel in monochrome, 
+ *	image in Postscript, using a format appropriate for the
+ *      current color mode (i.e. one bit per pixel in monochrome,
  *      one byte per pixel in gray, and three bytes per pixel in
  *      color).
  *
@@ -179,7 +250,7 @@ TkImageGetColor(cdata, pixel, red, green, blue)
  *
  *--------------------------------------------------------------
  */
- 
+
 int
 TkCanvasPsImage(interp, canvas, ximage, cdata, width, height)
     Tcl_Interp *interp;         /* Interpreter for returning Postscript code
@@ -196,13 +267,13 @@ TkCanvasPsImage(interp, canvas, ximage, cdata, width, height)
     double red, green, blue;
     int bytesPerLine=0, maxWidth=0;
     int level = psInfoPtr->colorLevel;
- 
+
     /*
-     * Figure out which color level to use (possibly lower than the 
+     * Figure out which color level to use (possibly lower than the
      * one specified by the user).  For example, if the user specifies
-     * color with monochrome screen, use gray or monochrome mode instead. 
+     * color with monochrome screen, use gray or monochrome mode instead.
      */
- 
+
     if (!cdata->color && level == 2) {
         level = 1;
     }
@@ -210,20 +281,20 @@ TkCanvasPsImage(interp, canvas, ximage, cdata, width, height)
     if (!cdata->color && cdata->ncolors == 2) {
         level = 0;
     }
- 
+
     /*
      * Check that at least one row of the image can be represented
-     * with a string less than 64 KB long (this is a limit in the 
+     * with a string less than 64 KB long (this is a limit in the
      * Postscript interpreter).
      */
-     
+
     switch (level)
     {
         case 0: bytesPerLine = (width + 7) / 8;  maxWidth = 240000;  break;
         case 1: bytesPerLine = width;  maxWidth = 60000;  break;
         case 2: bytesPerLine = 3 * width;  maxWidth = 20000;  break;
     }
- 
+
     if (bytesPerLine > 60000) {
         Tcl_ResetResult(interp);
         sprintf(buffer,
@@ -233,9 +304,9 @@ TkCanvasPsImage(interp, canvas, ximage, cdata, width, height)
         Tcl_AppendResult(interp, buffer, (char *) NULL);
         return TCL_ERROR;
     }
- 
+
     maxRows = 60000 / bytesPerLine;
- 
+
     for (band = height-1; band >= 0; band -= maxRows) {
         int rows = (band >= maxRows) ? maxRows : band + 1;
         int lineLen = 0;
@@ -292,7 +363,7 @@ TkCanvasPsImage(interp, canvas, ximage, cdata, width, height)
                 }
                 case 1: {
                     /*
-                     * Generate data in gray mode--in this case, take a 
+                     * Generate data in gray mode--in this case, take a
                      * weighted sum of the red, green, and blue values.
                      */
                     for (x = 0; x < width; x ++) {
@@ -381,11 +452,11 @@ ImageToPostscript(interp, canvas, itemPtr, prepass)
     ImageItem *imgPtr = (ImageItem *)itemPtr;
     Tk_Window canvasWin = Tk_CanvasTkwin(canvas);
     TkCanvas *canvasPtr = (TkCanvas *) canvas;
-   
+
     TkColormapData cdata;
-  
+
     char buffer[256];
-    
+
      int i, result, ncolors;
      double x, y;
      int width, height, depth;
@@ -394,11 +465,11 @@ ImageToPostscript(interp, canvas, itemPtr, prepass)
      XImage *ximage;
      Visual *visual;
      int screenX1, screenY1, screenX2, screenY2;
- 
+
      if (prepass) {
          return TCL_OK;
      }
-     
+
      /*  Determine region of image that needs to be drawn. Only the
          part visible on the display screen is done. */
      Tk_SizeOfImage(imgPtr->image, &width, &height);
@@ -421,28 +492,28 @@ ImageToPostscript(interp, canvas, itemPtr, prepass)
      cmap = Tk_Colormap(canvasWin);
      depth = Tk_Depth(canvasWin);
      visual = Tk_Visual(canvasWin);
- 
+
      /*
       * Create a Pixmap, tell the image to redraw itself there, and then
-      * generate an XImage from the Pixmap.  We can then read pixel 
+      * generate an XImage from the Pixmap.  We can then read pixel
       * values out of the XImage.
       */
      pmap = Tk_GetPixmap(Tk_Display(canvasWin), Tk_WindowId(canvasWin),
                              width, height, depth);
      Tk_RedrawImage(imgPtr->image, screenX1, screenY1, width, height,
-                    pmap, 0, 0); 
+                    pmap, 0, 0);
      ximage = XGetImage(Tk_Display(canvasWin), pmap, 0, 0, width, height,
                         AllPlanes, ZPixmap);
      Tk_FreePixmap(Tk_Display(canvasWin),pmap);
-     
+
      /*
       * Compute the coordinates of the lower-left corner of the image,
       * taking into account the anchor position for the image.
       */
- 
+
      x = imgPtr->x;
      y = Tk_CanvasPsY(canvas, imgPtr->y);
-     
+
      switch (imgPtr->anchor) {
  	case TK_ANCHOR_NW:			y -= height;		break;
  	case TK_ANCHOR_N:	x -= width/2.0; y -= height;		break;
@@ -454,17 +525,17 @@ ImageToPostscript(interp, canvas, itemPtr, prepass)
  	case TK_ANCHOR_W:			y -= height/2.0;	break;
  	case TK_ANCHOR_CENTER:	x -= width/2.0; y -= height/2.0;	break;
      }
- 
+
      /*
       * Obtain information about the colormap, ie the mapping between
       * pixel values and RGB values.  The code below should work
       * for all Visual types.
       */
- 
+
      ncolors = visual->map_entries;
      cdata.colors = (XColor *) ckalloc(sizeof(XColor) * ncolors);
      cdata.ncolors = ncolors;
- 
+
      if (visual->class == DirectColor || visual->class == TrueColor)
      {
          cdata.separated = 1;
@@ -494,84 +565,178 @@ ImageToPostscript(interp, canvas, itemPtr, prepass)
      if (visual->class == StaticGray || visual->class == GrayScale)
          cdata.color = 0; else
              cdata.color = 1;
- 
+
      XQueryColors(Tk_Display(canvasWin), cmap, cdata.colors, ncolors);
- 
+
      /*
       * Finally, we have the pixel values and the colormap.  Call a
-      * function that actually generates the postsript for the image. 
+      * function that actually generates the postsript for the image.
       */
- 
+
      sprintf(buffer, "%.15g %.15g translate\n", x, y);
      Tcl_AppendResult(interp, buffer, (char *) NULL);
      result = TkCanvasPsImage(interp, canvas, ximage, &cdata, width, height);
- 
+
      XDestroyImage(ximage);
      ckfree((char *) cdata.colors);
      return result;
 }
 #endif /* tcl version check */
 
- 
+
+/**
+ * -----------------------
+ * Start of tk8.4 support, not tested for 8.3.
+ * -----------------------
+ *
+ * Note we do it this way, rather than by defining an image postscript proc,
+ * as we do not have the necessary handles to canvases etc. passed to a
+ * postscript proc.
+ */
+
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 4
+
 /*
- * --------------------------------------------------------------
+ * The structure below defines the record for each image item (lifted from
+ * tkCanvImg.c).
+ */
+
+typedef struct ImageItem  {
+    Tk_Item header;		/* Generic stuff that's the same for all
+				 * types.  MUST BE FIRST IN STRUCTURE. */
+    Tk_Canvas canvas;		/* Canvas containing the image. */
+    double x, y;		/* Coordinates of positioning point for
+				 * image. */
+    Tk_Anchor anchor;		/* Where to anchor image relative to
+				 * (x,y). */
+    char *imageString;		/* String describing -image option (malloc-ed).
+				 * NULL means no image right now. */
+    char *activeImageString;	/* String describing -activeimage option.
+				 * NULL means no image right now. */
+    char *disabledImageString;	/* String describing -disabledimage option.
+				 * NULL means no image right now. */
+    Tk_Image image;		/* Image to display in window, or NULL if
+				 * no image at present. */
+    Tk_Image activeImage;	/* Image to display in window, or NULL if
+				 * no image at present. */
+    Tk_Image disabledImage;	/* Image to display in window, or NULL if
+				 * no image at present. */
+} ImageItem;
+
+/*
+ *--------------------------------------------------------------
  *
- * TkCanvasPsImage_Init --
+ * ImageToPostscript --
  *
- * 	This procedure is called to initialize the canvas image
- *  	postscript extension by setting a field in the canvas
- *      image type control struct, causing our postscript routine
- *      to be called for canvas images.
+ *	This procedure is called to generate Postscript for
+ *	image items.
  *
  * Results:
- * 	None. 
+ *	The return value is a standard Tcl result.  If an error
+ *	occurs in generating Postscript then an error message is
+ *	left in interp->result, replacing whatever used to be there.
+ *	If no error occurs, then Postscript for the item is appended
+ *	to the result.
  *
  * Side effects:
- * 	None.
+ *	None.
  *
- * --------------------------------------------------------------
+ *--------------------------------------------------------------
  */
- 
-void
-TkCanvasPsImage_Init()
-{
-#if TCL_MAJOR_VERSION <= 8 && TCL_MINOR_VERSION <= 2
-    extern Tk_ItemType tkImageType;
-    tkImageType.postscriptProc = ImageToPostscript;
-#endif
-}
 
-
-/*
- * XXX - allan: same as Tk_CanvasWindowCoords, but with no clipping
- */
-void
-Tk_CanvasWindowCoordsNoClip(canvas, x, y, screenXPtr, screenYPtr)
-    Tk_Canvas canvas;			/* Token for the canvas. */
-    double x, y;			/* Coordinates in canvas space. */
-    int *screenXPtr, *screenYPtr;	/* Screen coordinates are stored
+static int
+ImageToPostscript(interp, canvas, itemPtr, prepass)
+    Tcl_Interp *interp;			/* Leave Postscript or error message
 					 * here. */
+    Tk_Canvas canvas;			/* Information about overall canvas. */
+    Tk_Item *itemPtr;			/* Item for which Postscript is
+					 * wanted. */
+    int prepass;			/* 1 means this is a prepass to
+					 * collect font information;  0 means
+					 * final Postscript is being created.*/
 {
+    ImageItem *imgPtr = (ImageItem *)itemPtr;
+    Tk_Window canvasWin = Tk_CanvasTkwin(canvas);
+
+    char buffer[256];
+    double x, y;
+    int width, height;
+    Tk_Image image;
+    Tk_State state = itemPtr->state;
+    int screenX1, screenY1, screenX2, screenY2;
     TkCanvas *canvasPtr = (TkCanvas *) canvas;
-    double tmp;
 
-    tmp = x - canvasPtr->xOrigin;
-    if (tmp > 0) {
-	tmp += 0.5;
-    } else {
-	tmp -= 0.5;
-    }
-    *screenXPtr = tmp;
+    fprintf( stderr, "Yup that's me printing\n" );
 
-    tmp = y  - canvasPtr->yOrigin;
-    if (tmp > 0) {
-	tmp += 0.5;
-    } else {
-	tmp -= 0.5;
+    if (state == TK_STATE_NULL) {
+	state = ((TkCanvas *)canvas)->canvas_state;
     }
-    *screenYPtr = tmp;
+
+    image = imgPtr->image;
+    if (((TkCanvas *)canvas)->currentItemPtr == itemPtr) {
+	if (imgPtr->activeImage != NULL) {
+	    image = imgPtr->activeImage;
+	}
+    } else if (state == TK_STATE_DISABLED) {
+	if (imgPtr->disabledImage != NULL) {
+	    image = imgPtr->disabledImage;
+	}
+    }
+    if (image == NULL) {
+	/*
+	 * Image item without actual image specified.
+	 */
+	return TCL_OK;
+    }
+
+    Tk_SizeOfImage(image, &width, &height);
+
+
+    /*  Determine region of image that needs to be drawn. For rtdimages only
+     *  the part visible on the display screen is done. */
+    screenX1 = canvasPtr->xOrigin + canvasPtr->inset;
+    screenY1 = canvasPtr->yOrigin + canvasPtr->inset;
+    screenX2 = canvasPtr->xOrigin + Tk_Width(canvasWin) - canvasPtr->inset;
+    screenY2 = canvasPtr->yOrigin + Tk_Height(canvasWin) - canvasPtr->inset;
+    if ( width > screenX2 - screenX1 ) {
+        width = screenX2 - screenX1;
+    } else {
+        screenX1 = 0;
+    }
+    if ( height > screenY2 - screenY1 ) {
+        height = screenY2 - screenY1;
+    } else {
+        screenY1 = 0;
+    }
+
+    /*
+     * Compute the coordinates of the lower-left corner of the image,
+     * taking into account the anchor position for the image.
+     */
+
+    x = imgPtr->x;
+    y = Tk_CanvasPsY(canvas, imgPtr->y);
+
+    switch (imgPtr->anchor) {
+	case TK_ANCHOR_NW:			y -= height;		break;
+	case TK_ANCHOR_N:	x -= width/2.0; y -= height;		break;
+	case TK_ANCHOR_NE:	x -= width;	y -= height;		break;
+	case TK_ANCHOR_E:	x -= width;	y -= height/2.0;	break;
+	case TK_ANCHOR_SE:	x -= width;				break;
+	case TK_ANCHOR_S:	x -= width/2.0;				break;
+	case TK_ANCHOR_SW:						break;
+	case TK_ANCHOR_W:			y -= height/2.0;	break;
+	case TK_ANCHOR_CENTER:	x -= width/2.0; y -= height/2.0;	break;
+    }
+
+    if (!prepass) {
+	sprintf(buffer, "%.15g %.15g", x, y);
+	Tcl_AppendResult(interp, buffer, " translate\n", (char *) NULL);
+    }
+
+    return Tk_PostscriptImage(image, interp, canvasWin,
+                              ((TkCanvas *) canvas)->psInfo, 
+                              0, 0, width, height, prepass);
 }
 
-
-
-
+#endif
