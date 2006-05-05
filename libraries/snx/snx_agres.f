@@ -1,33 +1,47 @@
       SUBROUTINE snx_AGRES (HEAP)
+*+
+*  Name:
+*     AGRES
 
-*+
-*
-*  - - - - - -
-*   A G R E S
-*  - - - - - -
-*
-*  Restore the current state of the NCAR AUTOGRAPH system.
-*
-*  All of AUTOGRAPH's important variables are restored from
-*  an array, supplied by the caller, which has previously
-*  been set using the routine snx_AGSAV.
-*
-*  Given:
-*     HEAP    r()     array containing the saved variables
-*
-*  For the current size requirement for HEAP, see the
-*  snx_AGSAV routine.
-*
-*  Called:  SET
-*
-*  (The native NCAR routines AGSAVE and AGRSTR perform save
-*  and restore via a file;  they can therefore be used to
-*  maintain AUTOGRAPH context from one program execution to
-*  another.)
-*
-*  P T Wallace   Starlink   April 1986
-*
-*+
+*  Purpose:
+*     Restore the current state of the NCAR AUTOGRAPH system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     All of AUTOGRAPH's important variables are restored from
+*     an array, supplied by the caller, which has previously
+*     been set using the routine snx_AGSAV.
+
+*  Arguments:
+*     HEAP() = REAL (Given)
+*         Array containing the saved variables
+*         For the current size requirement for HEAP, see the
+*         snx_AGSAV routine.
+
+*  Externals:
+*     SET
+
+*  Notes:
+*     (The native NCAR routines AGSAVE and AGRSTR perform save
+*     and restore via a file;  they can therefore be used to
+*     maintain AUTOGRAPH context from one program execution to
+*     another.)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     01-APR-1986 (PTW):
+*        Original.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 
       IMPLICIT NONE
 

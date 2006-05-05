@@ -1,34 +1,47 @@
-
       SUBROUTINE snx_AGSAV (HEAP)
+*+
+*  Name:
+*     AGSAV
 
-*+
-*
-*  - - - - - -
-*   A G S A V
-*  - - - - - -
-*
-*  Save the current state of the NCAR AUTOGRAPH system.
-*
-*  All of AUTOGRAPH's important variables are stored in
-*  an array supplied by the caller, to be restored later
-*  in the same program by the snx_AGRES routine.
-*
-*  Returned:
-*     HEAP    r()     array containing the saved variables
-*
-*  HEAP must be at least 2606 elements long.  This number
-*  may change if the COMMON layouts etc in NCAR are altered.
-*
-*  Called:  AGINIT, GETSET, PLOTIT
-*
-*  (The native NCAR routines AGSAVE and AGRSTR perform save
-*  and restore via a file;  they can therefore be used to
-*  maintain AUTOGRAPH context from one program execution to
-*  another.)
-*
-*  P T Wallace   Starlink   April 1986
-*
-*+
+*  Purpose:
+*     Save the current state of the NCAR AUTOGRAPH system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     All of AUTOGRAPH's important variables are stored in
+*     an array supplied by the caller, to be restored later
+*     in the same program by the snx_AGRES routine.
+
+*  Arguments:
+*     HEAP() = REAL (Returned)
+*         Array containing the saved variables
+*         HEAP must be at least 2606 elements long.  This number
+*         may change if the COMMON layouts etc in NCAR are altered.
+
+*  Externals:
+*     AGINIT, GETSET, PLOTIT
+
+*  Notes:
+*     (The native NCAR routines AGSAVE and AGRSTR perform save
+*     and restore via a file;  they can therefore be used to
+*     maintain AUTOGRAPH context from one program execution to
+*      another.)
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     01-APR-1986 (PTW):
+*        Original.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 
       IMPLICIT NONE
 

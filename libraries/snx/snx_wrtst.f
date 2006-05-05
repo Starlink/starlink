@@ -1,24 +1,43 @@
       SUBROUTINE snx_WRTST (XG, YG, STRING, HG, IOR, ICTR)
 
 *+
-*
-*  - - - - - -
-*   W R T S T
-*  - - - - - -
-*
-*  Write a character string at a given position in grid coordinates
-*
-*  Given:
-*     XG,YG    r      grid coordinates
-*     STRING   c*(*)  string to be plotted
-*     HG       r      nominal character height in grid Y units
-*     IOR      i      orientation (deg anticlockwise from horizontal)
-*     ICTR     i      justification (see below)
-*
-*  Called:  snx_AGGUX, snx_AGGUY, AGPWRT, KUPY, PLOTIT
-*
-*  ICTR argument:
-*
+*  Name:
+*     WRTST
+
+*  Purpose:
+*     Write a character string at a given position in grid coordinates
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     XG,YG = REAL (Given)
+*         Grid coordinates
+*     STRING = CHAR (Given)
+*         String to be plotted
+*     HG = REAL (Given)
+*         Nominal character height in grid Y units
+*     IOR = INTEGER (Given)
+*         Orientation (deg anticlockwise from horizontal)
+*     ICTR = INTEGER (Given)
+*         Justification (see below)
+
+*  Externals:
+*     snx_AGGUX, snx_AGGUY, AGPWRT, KUPY, PLOTIT
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     09-JUN-1987 (PTW):
+*        Original.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  ICTR Argument:
 *     ICTR is passed directly to the AGPWRT routine.  The default
 *     version of AGPWRT supports three ICTR options:  with ICTR=0,
 *     the string is centred on the given position; with ICTR=-1 the
@@ -34,12 +53,10 @@
 *         ICTR = +1   right justified, monospaced
 *         ICTR = +2   right justified, proportionally spaced
 *
-*      The proportionally spaced options also support PWRITX control
-*      sequences for Greek letters, special characters etc.
-*
-*  P T Wallace   Starlink   9 June 1987
-*
-*+
+*     The proportionally spaced options also support PWRITX control
+*     sequences for Greek letters, special characters etc.
+
+*-
 
       IMPLICIT NONE
 

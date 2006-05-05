@@ -1,37 +1,49 @@
       SUBROUTINE snx_AGCS
+*+
+*  Name:
+*     AGCS
 
-*+
-*
-*  - - - - -
-*   A G C S
-*  - - - - -
-*
-*  Set the world coordinate extent of the current SGS
-*  zone to match the grid coordinate extent of the NCAR
-*  AUTOGRAPH graph window.
-*
-*  The result will only be useful if the current SGS zone
-*  and the AUTOGRAPH graph window occupy the same region
-*  of the display surface.  This will be the case if the
-*  snx_AGWV routine has been called following the creation
-*  of the current zone.  Assuming this requirement is met,
-*  calling this routine will adjust the world coordinate
-*  bounds of the current zone such that the region
-*  (0.0,1.0,0.0,1.0) coincides with the AUTOGRAPH grid
-*  window.
-*
-*  Called:  sgs_SW
-*
-*  From COMMON:
+*  Purpose:
+*     Set the world coordinate extent of the current SGS
+*     zone to match the grid coordinate extent of the NCAR
+*     AUTOGRAPH graph window.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     The result will only be useful if the current SGS zone
+*     and the AUTOGRAPH graph window occupy the same region
+*     of the display surface.  This will be the case if the
+*     snx_AGWV routine has been called following the creation
+*     of the current zone.  Assuming this requirement is met,
+*     calling this routine will adjust the world coordinate
+*     bounds of the current zone such that the region
+*     (0.0,1.0,0.0,1.0) coincides with the AUTOGRAPH grid
+*     window.
+
+*  Externals:
+*     sgs_SW
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     BKM: Brian McIlwrath (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     01-APR-1986 (PTW):
+*        Original.
+*     28-05-1996 (BKM):
+*        Initialise local status value J before calling SGS routines.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  From Common:
 *     XRGD,XLGD,YTGD,YBGD from /AGCONP/
-*
-* Author:
-*  P T Wallace   Starlink   April 1986
-*
-* Modifications:
-*  B K McIlwrah  Starlink   May 28 1996
-*    Initialise local status value J before calling SGS routines.
-*+
+
+*-
 
       IMPLICIT NONE
 

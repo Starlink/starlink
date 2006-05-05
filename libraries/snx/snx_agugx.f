@@ -1,27 +1,47 @@
-
       REAL FUNCTION snx_AGUGX (UX)
-
 *+
-*
-*  - - - - - -
-*   A G U G X
-*  - - - - - -
-*
-*  Convert user X-coordinate UX into grid X-coordinate.
-*
-*  Grid coordinates run (0.0,0.0)-(1.0,1.0) within
-*  the grid window;  user coordinates are as originally
-*  supplied to be plotted.
-*
-*  From COMMON:
+*  Name:
+*     AGUGX
+
+*  Purpose:
+*     Convert user X-coordinate UX into grid X-coordinate.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     UX = REAL (Given)
+*        User X-coordinate
+
+*  Returned Value:
+*     SNX_AGUGX = REAL
+*        Grid X-coordinate.
+
+*  Description:
+*     Grid coordinates run (0.0,0.0)-(1.0,1.0) within
+*     the grid window;  user coordinates are as originally
+*     supplied to be plotted.
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     PCTR: P C T Rees (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     01-APR-1986 (PTW):
+*        Original.
+*     01-APR-1992 (PCTR):
+*        Added trap to avoid logarithms of zero or negative numbers.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  From Common:
 *     LL from /IUTLCM/
 *     XLUW,XRUW from /AGCONP/
-*
-*  P T Wallace   Starlink   April 1986
-*  P C T Rees    Starlink   April 1992
-*     Added trap to avoid logarithms of zero or negative numbers.
-*
-*+
+
+*-
 
       REAL UX
 

@@ -1,43 +1,55 @@
-
       SUBROUTINE snx_TO (SORN)
-
 *+
+*  Name:
+*     TO
+
+*  Purpose:
+*     Switch from NCAR plotting to SGS or vice versa
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     SORN = CHAR (Given)
+*         New plotting interface
+
+*  Notes:
+*     The first character of SORN specifies which form of plotting
+*     is about to start:
 *
-*  - - -
-*   T O
-*  - - -
+*       SORN(1:1) = 'S' or 's' means we have been plotting with
+*                              NCAR and wish now to use SGS
 *
-*  Switch from NCAR plotting to SGS or vice versa
+*       SORN(1:1) = 'N' or 'n' means we have been using SGS and
+*                              wish now to revert to NCAR
 *
-*  Given:
-*     SORN    c*(*)    new plotting interface
+*     At the time this routine is first called, SGS must have been
+*     opened and NCAR plotting must have occurred, so that the call
+*     is to switch to SGS.  Subsequent calls must alternate
+*     strictly between NCAR and SGS.  If this sequence is violated,
+*     a message is output to the NCAR error reporting I/O unit.
 *
-*  The first character of SORN specifies which form of plotting
-*  is about to start:
-*
-*     SORN(1:1) = 'S' or 's' means we have been plotting with
-*                            NCAR and wish now to use SGS
-*
-*     SORN(1:1) = 'N' or 'n' means we have been using SGS and
-*                            wish now to revert to NCAR
-*
-*  At the time this routine is first called, SGS must have been
-*  opened and NCAR plotting must have occurred, so that the call
-*  is to switch to SGS.  Subsequent calls must alternate
-*  strictly between NCAR and SGS.  If this sequence is violated,
-*  a message is output to the NCAR error reporting I/O unit.
-*
-*  An illegal SORN value is reported via a message to the
-*  NCAR error reporting I/O unit.
-*
-*  Called:
+*     An illegal SORN value is reported via a message to the
+*     NCAR error reporting I/O unit.
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     29-JUN-1988 (PTW):
+*        Original.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  Externals:
 *     NCAR/SPPS - I1MACH, PLOTIT
 *     SGS - sgs_FLUSH, sgs_ICURZ, sgs_SELZ
 *     GKS - GQCNTN, GQNT, GSVP, GSWN, GSELNT
-*
-*  P T Wallace   Starlink   29 June 1988
-*
-*+
+
+*-
 
       IMPLICIT NONE
 

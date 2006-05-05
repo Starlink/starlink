@@ -2,36 +2,51 @@
      :                   IPXM, CHRE, MCIE, NCIE)
 
 *+
-*
-*  - - - - - - -
-*   A G C H N L
-*  - - - - - - -
-*
-*  Inserts leading zeros into NCAR numeric axis labels
-*
-*  Given:
-*     IAXS    i      axis number
-*     VILS    r      value to be represented by the label
-*     CHRM    c*(*)  mantissa string
-*     MCIM    i      maximum length of mantissa string
-*     NCIM    i      actual length of mantissa string
-*     IPXM    i      pointer to "times" symbol if any
-*     CHRE    c*(*)  exponent string
-*     MCIE    i      maximum length of exponent string
-*     NCIE    i      actual length of exponent string
-*
-*  Returned:
-*     CHRM    c*(*)  mantissa string
-*     NCIM    i      actual length of mantissa string
-*     IPXM    i      pointer to "times" symbol if any
-*     CHRE    c*(*)  exponent string
-*     NCIE    i      actual length of exponent string
-*
-*  For detailed explanations see AUTOGRAPH write-up, section 3.26.
-*
-*  P T Wallace   Starlink   October 1986
-*
-*+
+*  Name:
+*     AGCHNL
+
+*  Purpose:
+*     Inserts leading zeros into NCAR numeric axis labels
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     IAXS = INTEGER (Given)
+*         Axis number
+*     VILS = REAL (Given)
+*         Value to be represented by the label
+*     CHRM = CHAR (Given & Returned)
+*         Mantissa string
+*     MCIM = INTEGER (Given)
+*         Maximum length of mantissa string
+*     NCIM = INTEGER (Given & Returned)
+*         Actual length of mantissa string
+*     IPXM = INTEGER (Given & Returned)
+*         Pointer to "times" symbol if any
+*     CHRE = CHAR (Given & Returned)
+*         Exponent string
+*     MCIE = INTEGER (Given)
+*         Maximum length of exponent string
+*     NCIE = INTEGER (Given & Returned)
+*         Actual length of exponent string
+
+*  Notes:
+*     For detailed explanations see AUTOGRAPH write-up, section 3.26.
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     01-OCT-1986 (PTW):
+*        Original.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 
       IMPLICIT NONE
 

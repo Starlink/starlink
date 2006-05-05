@@ -2,27 +2,48 @@
       REAL FUNCTION snx_AGUGY (UY)
 
 *+
-*
-*  - - - - - -
-*   A G U G Y
-*  - - - - - -
-*
-*  Convert user Y-coordinate UY into grid Y-coordinate.
-*
-*  Grid coordinates run (0.0,0.0)-(1.0,1.0) within
-*  the grid window;  user coordinates are as originally
-*  supplied to be plotted.
-*
-*  From COMMON:
+*  Name:
+*     AGUGY
+
+*  Purpose:
+*     Convert user Y-coordinate UY into grid Y-coordinate.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     UY = REAL (Given)
+*         User Y-coordinate
+
+*  Returned Value:
+*     SNX_AGUGY = REAL
+*         Grid Y-coordinate.
+
+*  Description:
+*     Grid coordinates run (0.0,0.0)-(1.0,1.0) within
+*     the grid window;  user coordinates are as originally
+*     supplied to be plotted.
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     PCTR: P C T Rees (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     01-APR-1986 (PTW):
+*        Original.
+*     01-APR-1992 (PCTR):
+*        Added trap to avoid logarithms of zero or negative numbers.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*  From Common:
 *     LL from /IUTLCM/
 *     YBUW,YTUW from /AGCONP/
-*
-*
-*  P T Wallace   Starlink   April 1986
-*  P C T Rees    Starlink   April 1992
-*     Added trap to avoid logarithms of zero or negative numbers.
-*
-*+
+
+*-
 
       REAL UY
 

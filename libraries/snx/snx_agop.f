@@ -1,22 +1,35 @@
       SUBROUTINE snx_AGOP
 
 *+
-*
-*  - - - - -
-*   A G O P
-*  - - - - -
-*
-*  Open NCAR AUTOGRAPH plotting via SGS/GKS
-*
-*  Called:  I1MACH, sgs_OPEN, snx_AGUVW, AGPRWT, AGCHNL
-*
-*  P T Wallace   Starlink   April 1986 (original)
-*
-*  M J Bly       Starlink   March 1995 (modification)
-*     Adden null calls to AGPWRT, AGCHNL to force linking with SNX versions.
-*
-*
-*+
+*  Name:
+*     AGOP
+
+*  Purpose:
+*     Open NCAR AUTOGRAPH plotting via SGS/GKS
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Externals:
+*     I1MACH, sgs_OPEN, snx_AGUVW, AGPRWT, AGCHNL
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     BLY: M J Bly (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     01-APR-1986 (PTW):
+*        Original.
+*     01-MAR-1995 (BLY):
+*        Adden null calls to AGPWRT, AGCHNL to force linking with
+*        SNX versions.  
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 
       IMPLICIT NONE
 

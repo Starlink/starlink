@@ -1,23 +1,35 @@
-
       SUBROUTINE snx_CHSET (I)
+*+
+*  Name:
+*     CHSET
 
-*+
-*
-*  - - - - - -
-*   C H S E T
-*  - - - - - -
-*
-*  Select character set
-*
-*  Given:
-*     I      i      character set: 1='duplex', 2='complex'
-*
-*  This routine sets the variable MODE in the NCAR labelled
-*  COMMON block /PUSER/.
-*
-*  P T Wallace   Starlink   April 1986
-*
-*+
+*  Purpose:
+*     Select character set
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     I = INTEGER (Given)
+*         Character set: 1='duplex', 2='complex'
+
+*  Description:
+*     This routine sets the variable MODE in the NCAR labelled
+*     COMMON block /PUSER/.
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     01-APR-1986 (PTW):
+*        Original.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 
       IMPLICIT NONE
 

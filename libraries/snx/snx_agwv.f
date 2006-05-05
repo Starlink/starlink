@@ -1,20 +1,31 @@
-
       SUBROUTINE snx_AGWV
+*+
+*  Name:
+*     AGWV
 
-*+
-*
-*  - - - - -
-*   A G W V
-*  - - - - -
-*
-*  Set up NCAR AUTOGRAPH graph window to match the
-*  current GKS viewport.
-*
-*  Called:  GQCNTN, GQNT, AGSETP
-*
-*  P T Wallace   Starlink   April 1986
-*
-*+
+*  Purpose:
+*     Set up NCAR AUTOGRAPH graph window to match the
+*     current GKS viewport.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Externals:
+*     GQCNTN, GQNT, AGSETP
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     01-APR-1986 (PTW):
+*        Original.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 
       IMPLICIT NONE
 

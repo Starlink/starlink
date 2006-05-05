@@ -1,37 +1,49 @@
       SUBROUTINE snx_CURS (X,Y,N)
 
 *+
+*  Name:
+*     CURS
+
+*  Purpose:
+*     Read a cursor position
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Arguments:
+*     X,Y = REAL (Given & Returned)
+*         Where cursor is to be preset to if possible
+*         and where cursor was when choice was made
+*         X,Y are USER coordinates (i.e. data coordinates)
+*     N = INTEGER (Returned)
+*         Choice selected
+
+*  Externals:
+*     PLOTIT, sgs_FLUSH, sgs_SETCU, sgs_REQCU,
+*     snx_TO, snx_AGCS, snx_AGUGX, snx_AGUGY, snx_AGGUX, snx_AGGUY
+
+*  Description:
+*     This routine may only be called after NCAR AUTOGRAPH has been
+*     used to plot a graph, thus having specified the mapping between
+*     the coordinate systems involved.
 *
-*  - - - - -
-*   C U R S
-*  - - - - -
-*
-*  Read a cursor position
-*
-*  Given:
-*     X,Y    r     where cursor is to be preset to if possible
-*
-*  Returned:
-*     X,Y    r     where cursor was when choice was made
-*     N      i     choice selected
-*
-*  X,Y are USER coordinates (i.e. data coordinates)
-*
-*  Called: PLOTIT,
-*          sgs_FLUSH, sgs_SETCU, sgs_REQCU,
-*          snx_TO, snx_AGCS, snx_AGUGX, snx_AGUGY, snx_AGGUX, snx_AGGUY
-*
-*  This routine may only be called after NCAR AUTOGRAPH has been
-*  used to plot a graph, thus having specified the mapping between
-*  the coordinate systems involved.
-*
-*  Variations of choice device, cursor visibility, echo type, etc
-*  may be made by direct SGS/GKS calls prior to calling this
-*  routine.
-*
-*  P T Wallace   Starlink   May 1987
-*
-*+
+*     Variations of choice device, cursor visibility, echo type, etc
+*     may be made by direct SGS/GKS calls prior to calling this
+*     routine.
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     01-MAY-1987 (PTW):
+*        Original.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 
       IMPLICIT NONE
 

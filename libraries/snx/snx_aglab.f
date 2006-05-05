@@ -2,33 +2,50 @@
       SUBROUTINE snx_AGLAB (LNAME, TEXT)
 
 *+
+*  Name:
+*     AGLAB
+
+*  Purpose:
+*     In NCAR AUTOGRAPH, set up one of the predefined
+*     informational labels.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     See section 2.30 et seq in the AUTOGRAPH manual.
+
+*  Arguments:
+*     LNAME = CHAR (Given)
+*         Label name - R,L,B, or T.
+*     TEXT = CHAR (Given)
+*         Text of label
+
+*  Notes:
+*     Line numbers 100 for 'T' and 'L', and -100 for 'B' and 'R'
+*     are used.
 *
-*  - - - - - -
-*   A G L A B
-*  - - - - - -
+*     Trailing blanks in TEXT are ignored to achieve centring.
 *
-*  In NCAR AUTOGRAPH, set up one of the predefined
-*  informational labels.
-*
-*  See section 2.30 et seq in the AUTOGRAPH manual.
-*
-*  Given:
-*     LNAME     c      label name - R,L,B, or T.
-*     TEXT      c      text of label
-*
-*  Line numbers 100 for 'T' and 'L', and -100 for 'B' and 'R'
-*  are used.
-*
-*  Trailing blanks in TEXT are ignored to achieve centring.
-*
-*  If an illegal LNAME is given, the top label is set
-*  to '*** AGLAB LABEL ERROR ***'
-*
-*  Called:  AGGETI, AGSETC, AGSETI
-*
-*  P T Wallace   Starlink   24 June 1987
-*
-*+
+*     If an illegal LNAME is given, the top label is set
+*     to '*** AGLAB LABEL ERROR ***'
+
+*  Externals:
+*     AGGETI, AGSETC, AGSETI
+
+*  Authors:
+*     PTW: P. T. Wallace (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     24-JUN-1987 (PTW):
+*        Modified.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 
       IMPLICIT NONE
 
