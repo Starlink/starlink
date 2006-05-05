@@ -84,7 +84,6 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
    double vlast;      /* Previous data value */
    double vlim;       /* Data value marking start of a rise in data value */
    int *pp;           /* Pointer to next vector index value */
-   int hminpix;       /* Min. No. of pixels required on each side of peak */
    int hslok;         /* Significant slope found on upper slope? */
    int i;             /* Index within "dlow" */
    int ilo;           /* Index within "dlow" of lower edge */
@@ -94,16 +93,13 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
    int maxpos;        /* Index within "dlow" of maximum data value */
    int minpos;        /* Index within "dlow" of minimum data value */
    int up_ok;         /* Was "iup" found before the end of the line? */
- 
+
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
 /* Initialise the change in data value which is considered to be
    significant. */
    deltav = GRADSTEP*flatslope;
-
-/* Note half the minimum peak width. */
-   hminpix = minpix/2;
 
 /* Enter a loop in which we look for a new peak in the 1D data line. */
    while( 1 ) {
@@ -282,7 +278,7 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 
 /* Flag the relevant mask pixels as edge pixels, if they span sufficient
    pixels, and do not cross an edge of the data. */
-      if( iup - maxpos > hminpix && maxpos - ilo > hminpix && 
+      if( iup != maxpos && ilo != maxpos && iup - ilo >= minpix &&
           up_ok && lo_ok ) {
          mask[ dpos[ ilo ] ] = CUPID__KEDGE;
          mask[ dpos[ iup ] ] = CUPID__KEDGE;
@@ -292,9 +288,9 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
    increment the mask value by CUPID__KPEAK. */
          if( hslok && lslok && mask[ dpos[ maxpos ] ] != CUPID__KEDGE &&
              maxval >= thresh ) {
-
             mask[ dpos[ maxpos ] ] += CUPID__KPEAK;
-         }
+
+         } 
       }
 
 /* Indicate that the intervening pixels have been allocated to a peak. */

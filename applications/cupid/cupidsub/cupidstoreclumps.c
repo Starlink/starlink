@@ -264,8 +264,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
       msgBlank( status );
    }
 
-/* Resize the array pf clump structures */
-   if( aloc && iclump < nndf ) datAlter( aloc, 1, &iclump, status );
+/* Resize the array of clump structures */
+   if( aloc && iclump < nndf && iclump ) datAlter( aloc, 1, &iclump, status );
 
 /* See if an output catalogue is to be created. If not, annull the null
    parameter error. */
@@ -365,8 +365,10 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
       }
    
 /* Create the output catalogue */
-      kpg1Wrlst( param, nndf, iclump, ncpar, tab, AST__BASE, iwcs,
-                 ttl, 1, NULL, 1, status );
+      if( iclump > 0 ) {
+         kpg1Wrlst( param, nndf, iclump, ncpar, tab, AST__BASE, iwcs,
+                    ttl, 1, NULL, 1, status );
+      }
    
 /* End the AST context. */
       astEnd;

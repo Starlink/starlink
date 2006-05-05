@@ -213,6 +213,7 @@ void makeclumps() {
    int indf2;                    /* Identifier for output NDF without noise */
    int indf;                     /* Identifier for output NDF with noise */
    int lbnd[ 3 ];                /* Lower pixel bounds */
+   int nc;                       /* Number of clumps created */
    int nclump;                   /* Number of clumps to create */
    int ndim;                     /* Number of pixel axes */
    int nel;                      /* Number of elements in array */
@@ -331,7 +332,26 @@ void makeclumps() {
 /* Loop round creating clumps. */
    obj = NULL;
    maxpeak = 1.0;
-   for( i = 0; i < nclump && *status == SAI__OK; i++ ) {
+   nc = 0;
+   i = 0;
+   while( nc < nclump && *status == SAI__OK) {
+      if( i++ == 100*nclump ) {
+         if( nc == 0 ) {
+            *status = SAI__ERROR;
+            errRep( "", "Cannot create any clumps - they all touch an "
+                    "edge of the output array", status );
+
+         } else if( nc == 1 ) {
+            msgOut( "", "Can only create one clump - all others touch an "
+                    "edge of the output array.", status );
+
+         } else {
+            msgSeti( "N", nc );
+            msgOut( "", "Can only create ^N clumps - all others touch an "
+                    "edge of the output array.", status );
+         }
+         break;
+      }
 
 /* Determine the parameter values to use for the clump. */
       par[ 0 ] = cupidRanVal( normal, peak );
@@ -361,6 +381,9 @@ void makeclumps() {
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];
 
+/* See how many clumps we now have (no NDF will have been created for
+   this clump if it touches an edge of eh output array). */
+      if( obj ) datSize( obj, (size_t *) &nc, status );
    }
 
 /* Create the output data array by summing the contents of the NDFs
