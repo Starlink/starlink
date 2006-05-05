@@ -666,8 +666,6 @@ ImageToPostscript(interp, canvas, itemPtr, prepass)
     int screenX1, screenY1, screenX2, screenY2;
     TkCanvas *canvasPtr = (TkCanvas *) canvas;
 
-    fprintf( stderr, "Yup that's me printing\n" );
-
     if (state == TK_STATE_NULL) {
 	state = ((TkCanvas *)canvas)->canvas_state;
     }
