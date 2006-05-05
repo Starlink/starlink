@@ -11,7 +11,8 @@
 
 #  Description:
 #     This class creates a window that contains displays that show the
-#     current coordinate in all the known domains.
+#     current coordinate in all the known domains. Domains that have more
+#     than two axes can also be handled.
 
 #  Invocations:
 #
@@ -66,6 +67,8 @@
 #  History:
 #     12-DEC-2001 (PWD):
 #        Original version.
+#     04-MAY-2006 (PWD):
+#        Converted to display domains that have more than 2 axes.
 #     {enter_further_changes_here}
 
 #-
@@ -182,48 +185,42 @@ itcl::class gaia::GaiaAstDisplayDomains {
       #  Clear any existing controls.
       if { [info exists domains_] }  {
          set i 0
-         foreach domain "$domains_" {
+         foreach {domain dims} "$domains_" {
             incr i
-            catch {
-               destroy $itk_component(frame$i)
-               destroy $itk_component(x$i)
-               destroy $itk_component(y$i)
-               destroy $itk_component(label$i)
+            catch {destroy $itk_component(label$i)}
+            for {set j 1} {$j <= $dims} {incr j} {
+               catch {destroy $itk_component(value$i$j)}
             }
          }
          unset domains_
       }
 
-      #  Locate all the domains.
-      set domains_ [$itk_option(-rtdimage) astdomains]
+      #  Locate all the domains and their dimensionalities.
+      set domains_ [$itk_option(-rtdimage) astdomains 1]
       set i 0
       set lwidth 15
-      catch {
-         set lwidth [expr 3+[string length $domains_]/[llength $domains_]]
+      foreach {domain dims} "$domains_" {
+         set lwidth [expr max([string length $domain],$lwidth)]
       }
-      foreach domain "$domains_" {
+
+      set w $itk_component(readoutarea)
+      blt::table $w
+      foreach {domain dims} "$domains_" {
          incr i
-         itk_component add frame$i {
-            frame $itk_component(readoutarea).frame$i
-         }
-         set dframe $itk_component(frame$i)
 
          itk_component add label$i {
-            label $dframe.label -text "$domain:" -width $lwidth -anchor e
+            label $w.label$i -text "$domain:" -width $lwidth -anchor e
          }
+         blt::table $w $itk_component(label$i) $i,0 -fill x
 
-         set xvalues_($i) 0.0
-         itk_component add x$i {
-            entry $dframe.x -text "X value" -textvariable [scope xvalues_($i)]
+         for {set j 1} {$j <= $dims} {incr j} {
+            set values_($i,$j) 0.0
+            itk_component add value$i$j {
+               entry $w.value$i$j -text "Value $j" \
+                  -textvariable [scope values_($i,$j)]
+            }
+            blt::table $w $itk_component(value$i$j) $i,$j -fill x
          }
-         set yvalues_($i) 0.0
-         itk_component add y$i {
-            entry $dframe.y -text "Y value" -textvariable [scope yvalues_($i)]
-         }
-         pack $dframe -side top -fill both -expand 1 -pady 3 -padx 3
-         pack $itk_component(label$i) -side left -fill none
-         pack $itk_component(x$i) -side left -fill x
-         pack $itk_component(y$i) -side left -fill x
       }
       start_trace_
    }
@@ -240,7 +237,7 @@ itcl::class gaia::GaiaAstDisplayDomains {
 
       # For each domain, switch the image to it and then transform the
       # X and Y coordinates, update the readout. Trap problem domains
-      # (3D etc.) and pass on to later ones.
+      # (bad coordinates etc.) and pass on to later ones.
       set i 0
       foreach domain $domains_ {
          catch {
@@ -248,9 +245,12 @@ itcl::class gaia::GaiaAstDisplayDomains {
             $itk_option(-rtdimage) astset current $i
             set oldx [set ::${var}(X)]
             set oldy [set ::${var}(Y)]
-            lassign [$itk_option(-rtdimage) astpix2cur $oldx $oldy] newx newy
-            set xvalues_($i) $newx
-            set yvalues_($i) $newy
+            set xylist [$itk_option(-rtdimage) astpix2cur $oldx $oldy]
+            set j 0
+            foreach value "$xylist" {
+               incr j
+               set values_($i,$j) $value
+            }
          }
       }
 
@@ -301,8 +301,7 @@ itcl::class gaia::GaiaAstDisplayDomains {
 
    #  Domains that are available.
    protected variable domains_ {}
-   protected variable xvalues_
-   protected variable yvalues_
+   protected variable values_
 
    #  Whether trace is active.
    protected variable trace_active_ 0

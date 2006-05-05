@@ -1,17 +1,17 @@
 /*+
  *  Name:
  *     StarWCS
- 
+
  *  Language:
  *     C++
- 
+
  *  Purpose:
  *     Defines the members of the StarWCS class
- 
+
  *  Authors:
  *     P.W. Draper (PWD)
  *     Allan Brighton, ESO (ALLAN)
- 
+
  *  Copyright:
  *     Copyright (C) 1997-1999 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -32,7 +32,7 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  History:
  *     23-JUL-1997 (PWD):
  *        Original version. Created to replace WCS with a layer
@@ -1570,7 +1570,7 @@ void StarWCS::constructWarning( const char *encoding, int failed,
     }
     if ( nwarns > 0 || encoding || failed ) {
         std::string istring = os.str();  /* Keep reference in scope so memory
-                                          * is not freed immediately as in 
+                                          * is not freed immediately as in
                                           * os.str().c_str(). */
         const char *str = istring.c_str();
 
@@ -1596,9 +1596,11 @@ const char *StarWCS::getWarning()
 
 //
 //  Get a list of the domains available in the frameset. The returned
-//  string should be freed by the caller.
+//  string should be freed by the caller. If dimens is true then pairs of
+//  values are returned that include the number of dimensions that the domains
+//  have.
 //
-char *StarWCS::getDomains()
+char *StarWCS::getDomains( int dimens )
 {
     if ( ! wcs_ ) {
         return NULL;
@@ -1613,22 +1615,40 @@ char *StarWCS::getDomains()
     char *namelist = (char *) malloc( (size_t) chunk );
     namelist[0] = '\0';
     int length = chunk;
+    char dval[6];
+    char sdomain[chunk];
+    char *domain;
 
     int nframe = astGetI( wcs_, "nframe" );
+    int newlength;
     for ( int i = 1; i <= nframe; i++ ) {
         astSetI( wcs_, "Current", i );
-        char *domain = (char *) astGetC( wcs_, "Domain" );
-        int newlength = (int) strlen( domain );
+        domain = (char *) astGetC( wcs_, "Domain" );
+
+        newlength = (int) strlen( domain );
         if ( newlength == 0 ) { // No domain name, so make one up.
-            domain = (char *) malloc( (size_t) chunk );
+            domain = sdomain;
             sprintf( domain, "Domain%d", i );
         }
+
+        if ( dimens ) {
+            newlength += 6;
+            sprintf( dval, "%d", astGetI( wcs_, "Naxes" ) );
+        }
+
         if ( insert + newlength > length ) {
-            length += chunk;
+            length += max( chunk, newlength + 1 );
             namelist = (char *) realloc( namelist, length );
         }
+
         strcat( namelist, " " );
         strcat( namelist, domain );
+        insert += newlength + 1;
+        if ( dimens ) {
+            strcat( namelist, " " );
+            strcat( namelist, dval );
+            insert += 6;
+        }
     }
 
     //  Restore original current frame and return list of names.
@@ -1637,4 +1657,39 @@ char *StarWCS::getDomains()
         astClearStatus;
     }
     return namelist;
+}
+
+//
+//  Convert the given x,y image coordinates to world coordinates of any
+//  dimensionality. The wcs array must be greater or equal to the expected
+//  dimensionality which is returned as ndim (usually MAXDIM).
+///
+int StarWCS::pix2wcs( double x, double y, double wcs[], int &ndim ) const
+{
+    if ( !isWcs() ) {
+        return error( "image does not support world coordinates" );
+    }
+
+    // Dimensionality of the current domain.
+    ndim = astGetI( wcs_, "Naxes" );
+
+    // Transform the position.
+    double in[2][1];
+    double out[MAXDIM][1];
+    in[0][0] = x;
+    in[1][0] = y;
+    
+    WCSAstTranN( wcs_, 1, 2, 1, in, 1, ndim, 1, out );
+    for ( int i = 0; i < ndim; i++ ) {
+        wcs[i] = out[i][0];
+    }
+
+    // Normalise this (for RA and Dec).
+    astNorm( wcs_, wcs );
+
+    if ( ! astOK ) {
+        astClearStatus;
+        return error( "can't convert world coordinates: out of range" );
+    }
+    return 0;
 }

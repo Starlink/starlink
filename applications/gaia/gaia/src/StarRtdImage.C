@@ -281,7 +281,7 @@ public:
     { "astcreate",       &StarRtdImage::astcreateCmd,       0, 0 },
     { "astcur2pix",      &StarRtdImage::astcur2pixCmd,      2, 3 },
     { "astdelete",       &StarRtdImage::astdeleteCmd,       1, 1 },
-    { "astdomains",      &StarRtdImage::astdomainsCmd,      0, 0 },
+    { "astdomains",      &StarRtdImage::astdomainsCmd,      0, 1 },
     { "astfix",          &StarRtdImage::astfixCmd,          0, 0 },
     { "astfontresize",   &StarRtdImage::astfontresizeCmd,   1, 1 },
     { "astget",          &StarRtdImage::astgetCmd,          1, 1 },
@@ -2771,19 +2771,20 @@ int StarRtdImage::astpix2wcsCmd( int argc, char *argv[] )
 //  StarRtdImage::astpix2curCmd
 //
 //  Purpose:
-//     Given an image X and Y position return them as formatted
-//     coordinates in the current frame.
+//     Given an image X and Y position return a lis of coordinates that they
+//     transform into in the current frame.
 //
 //  Input:
 //     X and Y position
 //
 //  Result:
-//     Formatted position transformed into the current frame.
+//     Formatted positions transformed into the current frame (may be more
+//     than 2 values).
 //
 //  Notes:
 //     This provides some of the functionality of the convert command,
 //     but avoids any issues to do with equinoxes, celestial
-//     coordinates systems (FK5/FK4 etc.) and epochs.
+//     coordinates systems (FK5/FK4 etc.) and epochs and dimensionalities.
 //-
 int StarRtdImage::astpix2curCmd( int argc, char *argv[] )
 {
@@ -2799,22 +2800,20 @@ int StarRtdImage::astpix2curCmd( int argc, char *argv[] )
         return TCL_ERROR;
     }
 
-    //  Convert to current coordinates. Note we get result as
-    //  degrees. Convert back to radians...
-    double ra;
-    double dec;
-    if ( image_->wcs().pix2wcs( x, y, ra, dec ) == 0 ) {
-        ra /= r2d_;
-        dec /= r2d_;
+    //  Convert to current coordinates.
+    double wcs[7];
+    int dims;
+    StarWCS* wcsp = getStarWCSPtr();
+    if ( wcsp->pix2wcs( x, y, wcs, dims ) == 0 ) {
 
         //  Format the values according to the current frame.
-        StarWCS* wcsp = getStarWCSPtr();
-        AstFrameSet *wcs = wcsp->astWCSClone();
-        const char *ra_buf = astFormat( wcs, 1, ra );
-        const char *dec_buf = astFormat( wcs, 2, dec );
-        set_result( ra_buf );
-        append_element( dec_buf );
-        astAnnul( wcs );
+        AstFrameSet *iwcs = wcsp->astWCSClone();
+        char *value;
+        reset_result();
+        for ( int i = 0; i < dims; i++ ) {
+            append_element( astFormat( iwcs, i+1, wcs[i] ) );
+        }
+        astAnnul( iwcs );
         return TCL_OK;
     }
     else {
@@ -6220,10 +6219,12 @@ int StarRtdImage::swapNeeded( ImageIO imio )
 //
 //   Purpose:
 //      Return a list of all the domain names in the current AST
-//      frameset.
+//      frameset. If an argument is also given then the dimensionality of the
+//      domain is also returned.
 //
 //   Result:
-//      A tcl list of the names.
+//      A tcl list of the names, paired with the dimensionality when
+//      requested.
 //-
 int StarRtdImage::astdomainsCmd( int argc, char *argv[] )
 {
@@ -6238,7 +6239,7 @@ int StarRtdImage::astdomainsCmd( int argc, char *argv[] )
         return TCL_ERROR;
     }
 
-    char *result = wcsp->getDomains();
+    char *result = wcsp->getDomains( argc == 1 );
     set_result( result );
     free( result );
     return TCL_OK;

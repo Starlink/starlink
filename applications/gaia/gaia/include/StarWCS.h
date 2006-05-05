@@ -168,6 +168,9 @@ public:
   //  Return the world coords (in degrees, as 2 doubles) for the ximage coords
   int pix2wcs(double x, double y, double& ra, double& dec) const;
 
+  //  Return the full world coords, can be more than 2 if needed.
+  int pix2wcs( double x, double y, double wcs[], int &ndim ) const;
+
   //  Get the image coordinates for the given world coords
   int wcs2pix(double ra, double dec, double &x, double &y) const;
 
@@ -264,7 +267,7 @@ public:
   const char *getWarning();
 
   //  Get a list of the domains available in the frameset.
-  char *getDomains();
+  char *getDomains( int dimens );
   
   //  Set an AST attribute.
   int astSetAttrib( const char *what, const char *value );
