@@ -1,58 +1,67 @@
-
       SUBROUTINE AGPWRT (XPOS,YPOS,CHRS,NCHS,ISIZ,IORI,ICEN)
 *+
+*  Name:
+*     AGPWRT
+
+*  Purpose:
+*     SNX version of NCAR routine of the same name.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     This routine is a substitute for the NCAR routine of the
+*     same name but allowing the PWRITX character drawing routine
+*     to be used instead of the usual PWRIT, giving access to
+*     special fonts etc.
 *
-*  - - - - - - -
-*   A G P W R T
-*  - - - - - - -
+*     The character string accepted by the PWRITX routine includes
+*     control codes to switch font etc.  This implementation of
+*     AGPWRT accepts and passes PWRITX codes and also inserts the
+*     appropriate codes where lowercase and certain other characters
+*     are supplied.  Some special characters not directly available
+*     from PWRITX are produced by means of control sequences selected
+*     through additional codes which are peculiar to this
+*     implementation of AGPWRT.
 *
-*  This routine is a substitute for the NCAR routine of the
-*  same name but allowing the PWRITX character drawing routine
-*  to be used instead of the usual PWRIT, giving access to
-*  special fonts etc.
+*     Other special values of the ICEN parameter are used to select
+*     plotting via either the PWRITX routine or the PWRIT routine.
+*     This feature allows an application to plot using GKS character
+*     drawing facilities on some occasions while using PWRITX on other
+*     occasions.  The PWRITX option gives high quality characters from
+*     a rich set, but slowly;  the GKS option, on the other hand,
+*     provides access to other GKS fonts and allows the use of lower
+*     text precision on graphics devices where this will reduce the
+*     plotting time.
 *
-*  The character string accepted by the PWRITX routine includes
-*  control codes to switch font etc.  This implementation of
-*  AGPWRT accepts and passes PWRITX codes and also inserts the
-*  appropriate codes where lowercase and certain other characters
-*  are supplied.  Some special characters not directly available
-*  from PWRITX are produced by means of control sequences selected
-*  through additional codes which are peculiar to this
-*  implementation of AGPWRT.
+*     The NCAR utilities use values of the justification argument ICEN
+*     argument of +/-1 where left or right justification is required,
+*     and in these cases the string is plotted artificially monospaced to
+*     avoid irregular axis labelling, subject to the restriction that
+*     the string must not contain PWRITX function codes (though lowercase
+*     and common punctuation symbols are acceptable).  To enable left
+*     and right justified strings to be proportionally spaced and to
+*     contain PWRITX function codes, this implementation of AGPWRT also
+*     supports the non-NCAR values ICEN = +/-2.  There is no provision
+*     for centred monospaced strings.
 *
-*  Other special values of the ICEN parameter are used to select
-*  plotting via either the PWRITX routine or the PWRIT routine.
-*  This feature allows an application to plot using GKS character
-*  drawing facilities on some occasions while using PWRITX on other
-*  occasions.  The PWRITX option gives high quality characters from
-*  a rich set, but slowly;  the GKS option, on the other hand,
-*  provides access to other GKS fonts and allows the use of lower
-*  text precision on graphics devices where this will reduce the
-*  plotting time.
-*
-*  The NCAR utilities use values of the justification argument ICEN
-*  argument of +/-1 where left or right justification is required,
-*  and in these cases the string is plotted artificially monospaced to
-*  avoid irregular axis labelling, subject to the restriction that
-*  the string must not contain PWRITX function codes (though lowercase
-*  and common punctuation symbols are acceptable).  To enable left
-*  and right justified strings to be proportionally spaced and to
-*  contain PWRITX function codes, this implementation of AGPWRT also
-*  supports the non-NCAR values ICEN = +/-2.  There is no provision
-*  for centred monospaced strings.
-*
-*  Given:
-*     XPOS,YPOS    r,r    string position in SPPS user coordinates
-*     CHRS,NCHS    c,i    string and length, inclusive of codes etc
-*     ISIZ         i      character size
-*     IORI         i      orientation
-*     ICEN         i      justification, or PWRIT/PWRITX selection
-*
-*  Where the special values of ICEN are used to select plotting
-*  via either PWRIT or PWRITX, the other arguments are ignored.
+*  Arguments:
+*     XPOS,YPOS = REAL (Given)
+*         String position in SPPS user coordinates
+*     CHRS = CHAR (Given)
+*         String, inclusive of codes etc.
+*     NCHS = INTEGER (Given)
+*         Length of CHRS.
+*     ISIZ = INTEGER (Given)
+*         Character size
+*     IORI = INTEGER (Given)
+*         Orientation
+*     ICEN = INTEGER (Given)
+*         Justification, or PWRIT/PWRITX selection.
+*         Where the special values of ICEN are used to select plotting
+*         via either PWRIT or PWRITX, the other arguments are ignored.
 *
 *  Plotter units:
-*
 *     Displacements and character sizes are specified in "plotter
 *     units".  (n.b.  Do not confuse plotter units with device
 *     coordinates.  Plotter units are not related to true device
@@ -62,7 +71,6 @@
 *     changed by means of the SPPS routine SETI.
 *
 *  PWRITX fonts:
-*
 *     Twelve fonts are provided, each containing 47 symbols and indexed
 *     by the standard Fortran characters (A-Z 0-9 +-*/()$=,. and space).
 *     A given font is specified by three letters which in broad terms
@@ -71,7 +79,6 @@
 *     required.
 *
 *  ISIZ argument:
-*
 *     ISIZ specifies an overall magnification factor for all
 *     the characters drawn.
 *
@@ -105,17 +112,15 @@
 *                    3        24/21
 *                   >3       ISIZ/21
 *
-*  Thus, for ISIZ>3, Principal characters will be drawn nominally
-*  ISIZ plotter units high, and ISIZ can simply be thought of
-*  as the nominal character height in plotter units.
-*
+*     Thus, for ISIZ>3, Principal characters will be drawn nominally
+*     ISIZ plotter units high, and ISIZ can simply be thought of
+*     as the nominal character height in plotter units.
+
 *  IORI argument:
-*
 *     IORI is the string orientation in degrees anticlockwise
 *     from the normal left-to-right.
-*
+
 *  ICEN argument (normal use to specify positioning):
-*
 *          ICEN                   meaning
 *
 *           -2            (XPOS,YPOS) is the centre of the left
@@ -141,9 +146,8 @@
 *           +2            (XPOS,YPOS) is the centre of the right
 *                         edge of the last character.  The string
 *                         is proportionally spaced.
-*
+
 *  ICEN argument (special use to select string drawing routine):
-*
 *          ICEN                   meaning
 *
 *           -100          Selects PWRIT routine, which gives access
@@ -158,21 +162,18 @@
 *       3) This inelegant use of the ICEN argument is a consequence
 *          of having to work within the standard AGPWRT call, which
 *          is made directly by the AUTOGRAPH utilities.
-*
+
 *  Characters available without using function codes:
-*
 *     1)  All uppercase and lowercase Roman characters, and most common
 *         punctuation symbols are available by including them literally
 *         in the string CHRS.
-*
 *     2)  Two consecutive apostrophes causes a single apostrophe to be
 *         drawn - for example "Murphy''s Law".
 *
 *     Both of these are features of this implementation of AGPWRT and
 *     are not available when directly calling PWRITX.
-*
+
 *  Function codes:
-*
 *     Function codes are sequences of characters, enclosed within
 *     apostrophes, which may (except when ICEN=+/-1) be included in the
 *     character string CHRS to change font, case, etc. within the plotted
@@ -319,15 +320,42 @@
 *
 *        nnn       Numeric character: character number nnn (octal) will
 *                  be drawn.
+
+*  Externals:
+*     AGGETI, AGSETI, SETER, PWRITX, PWRIT, GTNUM,
+*     KUPX, KUPY, CPUX, CPUY,
 *
-*  Called:  AGGETI, AGSETI, SETER, PWRITX, PWRIT, GTNUM,
-*           KUPX, KUPY, CPUX, CPUY,
+*  Notes:
+*     This routine uses characters outside the ANSI Fortran 77 character
+*     set.
+
+*  Authors:
+*     PTW: Pat Wallace (Starlink)
+
+*  History:
+*     03-SEP-1990 (PTW):
+*        Modified.
+
+*  Copyright:
+*     Copyright (C) 1990 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
 *
-*  This routine uses characters outside the ANSI Fortran 77 character
-*  set.
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
 *
-*  P T Wallace   Starlink   3 September 1990
-*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *-
 
       IMPLICIT NONE
