@@ -191,12 +191,30 @@ int GaiaSkySearch::openCmd(int argc, char* argv[])
 {
     if ( cat_ ) {
         delete cat_;
+        cat_ = NULL;
     }
 
-    //  Get the entry for this catalogue type.
-    CatalogInfoEntry *e = CatalogInfo::lookup( argv[0] );
-    if ( !e ) {
-        return TCL_ERROR;
+    CatalogInfoEntry *e = NULL;
+    if ( argc == 2 ) {
+        
+        // Open given catalog in given directory path.
+	e = lookupCatalogDirectoryEntry( argv[1] );
+	if ( !e ) {
+	    return TCL_ERROR;
+        }
+	e = CatalogInfo::lookup( e, argv[0] );
+	if ( !e ) {
+	    return fmt_error( "catalog entry for '%s' not found under '%s': ",
+                              argv[0], argv[1]);
+        }
+    }
+    else {
+
+        //  Get the entry for this catalogue type.
+        e = CatalogInfo::lookup( argv[0] );
+        if ( !e ) {
+            return TCL_ERROR;
+        }
     }
 
     //  Now open the catalog, using the appropriate type.
@@ -271,7 +289,7 @@ int GaiaSkySearch::entryCmd( int argc, char* argv[] )
             if ( argc > 2 ) {
 
                 //  Use given catalog directory.
-                dir = CatalogInfo::lookup( argv[2] );
+                dir = lookupCatalogDirectoryEntry( argv[2] );
                 if ( !dir ) {
                     return TCL_ERROR;
                 }
@@ -648,11 +666,9 @@ int GaiaSkySearch::infoCmd(int argc, char* argv[])
 
     CatalogInfoEntry* e;
     if (argc == 2) {
-        e = CatalogInfo::lookup(argv[1]);
+        e = lookupCatalogDirectoryEntry(argv[1]);
         if (!e)
             return TCL_ERROR;
-        if (strcmp(e->servType(), "directory") != 0)
-            return error("expected a catalog directory entry");
         if (! e->link()) {
             if (CatalogInfo::load(e) != 0)  // follow catalog dir link
                 return TCL_ERROR;
