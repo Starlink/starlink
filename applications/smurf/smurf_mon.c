@@ -170,6 +170,8 @@ void smurf_mon( int * status ) {
     smurf_qlmakemap( status );
   } else if (strcmp( taskname, "REMSKY" ) == 0 ) {
     smurf_remsky( status );
+  } else if (strcmp( taskname, "SCANFIT" ) == 0 ) {
+    smurf_scanfit( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );
