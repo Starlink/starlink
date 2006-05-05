@@ -12,6 +12,9 @@ Changes introduced at V0.0-16:
  - Fixed bug in MAKECLUMPS that could prevent the requested number of
    clumps from being created.
 
+ - Minor change to Reinhold algorithm to try to improve performance with
+   3D data.
+
 
 Changes introduced at V0.0-15:
 
