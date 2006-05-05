@@ -20,14 +20,31 @@
 *         For the current size requirement for HEAP, see the
 *         snx_AGSAV routine.
 
-*  Externals:
-*     SET
-
 *  Notes:
 *     (The native NCAR routines AGSAVE and AGRSTR perform save
 *     and restore via a file;  they can therefore be used to
 *     maintain AUTOGRAPH context from one program execution to
 *     another.)
+
+*  Copyright:
+*     Copyright (C) 1986 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PTW: P. T. Wallace (Starlink)
@@ -40,6 +57,9 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  Externals:
+*     SET
 
 *-
 

@@ -10,18 +10,6 @@
 *  Language:
 *     Starlink Fortran 77
 
-*  Arguments:
-*     X,Y = REAL (Given & Returned)
-*         Where cursor is to be preset to if possible
-*         and where cursor was when choice was made
-*         X,Y are USER coordinates (i.e. data coordinates)
-*     N = INTEGER (Returned)
-*         Choice selected
-
-*  Externals:
-*     PLOTIT, sgs_FLUSH, sgs_SETCU, sgs_REQCU,
-*     snx_TO, snx_AGCS, snx_AGUGX, snx_AGUGY, snx_AGGUX, snx_AGGUY
-
 *  Description:
 *     This routine may only be called after NCAR AUTOGRAPH has been
 *     used to plot a graph, thus having specified the mapping between
@@ -30,6 +18,34 @@
 *     Variations of choice device, cursor visibility, echo type, etc
 *     may be made by direct SGS/GKS calls prior to calling this
 *     routine.
+
+*  Arguments:
+*     X,Y = REAL (Given & Returned)
+*         Where cursor is to be preset to if possible
+*         and where cursor was when choice was made
+*         X,Y are USER coordinates (i.e. data coordinates)
+*     N = INTEGER (Returned)
+*         Choice selected
+
+*  Copyright:
+*     Copyright (C) 1987 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PTW: P. T. Wallace (Starlink)
@@ -42,6 +58,10 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*  Externals:
+*     PLOTIT, sgs_FLUSH, sgs_SETCU, sgs_REQCU,
+*     snx_TO, snx_AGCS, snx_AGUGX, snx_AGUGY, snx_AGGUX, snx_AGGUY
 
 *-
 

@@ -30,5 +30,5 @@ snx_test_LDADD = libsnx.la `sgs_link` `ncar_link`
 EXTRA_DIST = snx_test.con snx_test.dat 
 
 dist_starnews_DATA = snx.news
-
+dist_pkgdata_DATA = LICENCE
 
