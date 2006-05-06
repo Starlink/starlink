@@ -31,12 +31,11 @@ C
 C
 C     Parameters 
 C   
-      INTEGER I,N,TYP
+      INTEGER N,TYP
       REAL X(N),Y(N),XVST,XVEN,LOW,HIGH,LOWR,HIGHR
 C
 C     Local variables
 C
-      REAL YVAL1,YVAL2
       INTEGER THICK,THIN
       PARAMETER (THICK=2,THIN=1)
 

@@ -20,11 +20,6 @@ C                      help, thus disuse PAR_Q*. Disuse GKD_CLEAR_ALPHA.
 C+
       IMPLICIT NONE
 C
-C     Local variables
-C
-      CHARACTER CHARS
-      INTEGER STATUS
-C
 C     Clear screen 
 C
       CALL PGADVANCE

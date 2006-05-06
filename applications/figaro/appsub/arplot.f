@@ -49,7 +49,6 @@ C     PGPOINT       (  "   ) Mark a single point.
 C     PGBOX         (  "   ) Draw axes for plot.
 C     PGBIN         (  "   ) Plot data as a histogram.
 C     PGLABEL       (  "   ) Label plot.
-C     GEN_EPOLYD    (GEN_ package) Evaluate a polynomial
 C
 C                                    KS / CIT 14th June 1983
 C     Modified:
@@ -76,13 +75,12 @@ C
 C     Functions
 C
       INTEGER ICH_LEN
-      DOUBLE PRECISION GEN_EPOLYD
       CHARACTER*16 ICH_CF
 C
 C     Local variables
 C
       LOGICAL WAVED
-      INTEGER I,INVOKE,IX,NEXT
+      INTEGER I,IX,NEXT
       REAL HIGH,LOW,XV,XVMAX,XVMIN,YOFF,YP
       CHARACTER CHARS*16
 C

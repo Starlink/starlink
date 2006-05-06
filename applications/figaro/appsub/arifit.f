@@ -47,7 +47,7 @@ C
 C
 C     Local variables
 C
-      INTEGER I,NORDER,STATUS
+      INTEGER I,NORDER
       REAL ERR
       CHARACTER CHARS*64
 C

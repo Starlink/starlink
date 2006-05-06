@@ -34,7 +34,6 @@ C                  output, 0 otherwise.
 C
 C     Subroutines / functions used -
 C
-C     ICH_LEN      (ICH_ package) Position of last non-blank char in string
 C     PAR_WRUSER   (PAR_   "    ) Send message to user
 C
 C                                              KS / CIT 14th June 1984
@@ -62,13 +61,9 @@ C
       REAL CHANS(NLMAX),WAVES(NLMAX),WEIGHTS(NLMAX),FSIGMA
       CHARACTER*(*) ARFILE, FILE
 C
-C     Functions
-C
-      INTEGER ICH_LEN
-C
 C     Local variables
 C
-      INTEGER IBRACK, IDOT, NFILE
+      INTEGER NFILE
       INTEGER STATUS, OSTAT, LSTAT
       CHARACTER AUTO*4, FILENAME*64, BUFFER*75
 C

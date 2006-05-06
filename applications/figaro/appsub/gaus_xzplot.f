@@ -75,7 +75,7 @@ C
 C
 C     Functions
 C
-      INTEGER ICH_LEN,PGBEGIN
+      INTEGER PGBEGIN
 C
 C     Colour for axes
 C
@@ -95,8 +95,6 @@ C     Local variables
 C
       INTEGER I,J,CKEY,SYM,IGNORE
       REAL RFAC,XP(4096),ZP(4096),YVAL1,YVAL2
-      CHARACTER CHARS*64,TYPE*16
-      LOGICAL APPEND
 C
 C     Is this a 'hard' plot?
 C

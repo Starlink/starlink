@@ -46,7 +46,7 @@ C     Local variables
 C
       INTEGER I,J,NP,IFAIL,IFAIL2,KPLUS1,NDEG
       DOUBLE PRECISION X(4096),Y(4096),W(4096),R(4096),A3(3*4096+3*8),
-     :P,XX,EPS,DUMMY
+     :P,EPS,DUMMY
 C
 C     Form the arrays of points which are to be polynomial fitted
 C     based on non-zero values of ICONO. Set weights to 1.0

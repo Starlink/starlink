@@ -44,7 +44,7 @@ C
 C
 C     Local variables
 C
-      INTEGER IXEN,IXST,KX,STATUS
+      INTEGER IXEN,IXST,KX
       REAL LOW,HIGH,Y
       CHARACTER CH
 C
