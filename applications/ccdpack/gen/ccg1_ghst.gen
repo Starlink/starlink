@@ -3,21 +3,21 @@
 *+
 *  Name:
 *     CCG1_GHST<T>
- 
+
 *  Purpose:
 *     Calculates the histogram of an array of data.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL CCG1_GHST<T>( BAD, DIM, ARRAY, NUMBIN, VALMAX, VALMIN, HIST,
 *    :                   STATUS )
- 
+
 *  Description:
 *     This routine calculates the truncated histogram of an array of
 *     data between defined limits and in a defined number of bins.
- 
+
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        If .TRUE., bad pixels will be processed.  This should not be
@@ -38,18 +38,39 @@
 *        Array containing the histogram.
 *     STATUS = INTEGER (Given and Returned)
 *        Global status value.
- 
+
 *  Algorithm:
 *     - Compute the scale factor
 *     - For all array elements, check whether the value is within the
 *     range of the histogram, and if it is compute its bin number. Check
 *     for bad pixels if requested.
- 
+
+*  Copyright:
+*     Copyright (C) 1990-1991 Science & Engineering Research Council.
+*     Copyright (C) 1996, 2000 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     19-JUL-1990 (MJC):
 *        Original version.
@@ -64,10 +85,10 @@
 *     4-JUL-2000 (MBT):
 *        Adapted for CCDPACK.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_new_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

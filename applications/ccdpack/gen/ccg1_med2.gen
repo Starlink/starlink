@@ -23,14 +23,6 @@
 *     output variances are estimated from the VARS values and are
 *     returned in RESVAR.
 
-*  Notes:
-*     - this routine performs its work in double precision, but the
-*     output is returned in single precision, therefore it should only
-*     be used with data whose outputs are in the range of single
-*     precision values. It accepts the data in any of the non-complex
-*     formats as supported by PRIMDAT, the variances must be given in
-*     double precision.
-
 *  Arguments:
 *     STACK( NPIX, NLINES ) = <COMM> (Given)
 *        The array of lines which are to be combined into a single line.
@@ -52,6 +44,35 @@
 *        to the output line.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Notes:
+*     - this routine performs its work in double precision, but the
+*     output is returned in single precision, therefore it should only
+*     be used with data whose outputs are in the range of single
+*     precision values. It accepts the data in any of the non-complex
+*     formats as supported by PRIMDAT, the variances must be given in
+*     double precision.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)

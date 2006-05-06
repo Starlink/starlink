@@ -2,21 +2,21 @@
 *+
 *  Name:
 *     KPG1_CADDx
- 
+
 *  Purpose:
 *     Add a constant to each element of a vectorised array.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPG1_CADDx( BAD, EL, A, CONST, B, NERR, STATUS )
- 
+
 *  Description:
 *     The routine adds a constant to each element of a vectorised array
 *     to produce a new array. Bad value checking is performed if
 *     required.
- 
+
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        Whether to check for bad values in the input array.
@@ -33,7 +33,7 @@
 *        array.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
 *     the routine name by D, R, I, W, UW, B or UB as appropriate. The
@@ -44,14 +44,35 @@
 *     data type of the arrays without overflow, then all elements of
 *     the output array will be assigned this bad value and NERR will
 *     return the value of EL.
- 
+
+*  Copyright:
+*     Copyright (C) 1990 Science & Engineering Research Council.
+*     Copyright (C) 1996, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     17-APR-1990 (RFWS):
 *        Original version.
@@ -63,10 +84,10 @@
 *     04-OCT-2004: BRADC):
 *        No longer use NUM_ERROR
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:
