@@ -49,7 +49,6 @@
 *     appropriate.  The matrix and the SECOND workspace should have
 *     this data type as well.
 
-*  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}

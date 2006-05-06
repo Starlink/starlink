@@ -47,7 +47,6 @@
 *     input and output vectors supplied to the routine must have the
 *     data type specified.
 
-*  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}

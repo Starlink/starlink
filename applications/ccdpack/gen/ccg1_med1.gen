@@ -22,7 +22,7 @@
 *     are returned in the array RESULT. The output variances are
 *     estimated from the VARS values and are returned in RESVAR.
 
-*  Notes
+*  Notes:
 *     - this routine performs its work in double precision, but the
 *     output is returned in single precision, therefore it should only
 *     be used with data whose outputs are in the range of single

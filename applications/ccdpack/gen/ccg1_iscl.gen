@@ -11,7 +11,7 @@
 *  Language:
 *     Starlink Fortran 77
 
-*  Invocation
+*  Invocation:
 *     CALL CCG1_ISCL<T>( IDIM1, IDIM2, INARR, LOWER, UPPER,
 *                        LOWLIM, UPPLIM, BADVAL, ODIM1, ODIM2,
 *                        OFF1, OFF2, OUTARR, STATUS )

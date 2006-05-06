@@ -56,7 +56,6 @@
 *     input co-ordinate lie outside the range of co-ordinates of
 *     the axis.  Processing will continue through the list.
 
-*  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}

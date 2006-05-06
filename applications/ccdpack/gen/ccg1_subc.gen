@@ -17,7 +17,7 @@
 *     The routine subtracts the constants CONST from the corresponding
 *     lines of data values in STACK.
 
-*  Notes
+*  Notes:
 *     - uses kappa internal routine KPG1_CSUB<T>
 
 *  Arguments:

@@ -10,7 +10,7 @@
 *  Language:
 *     Starlink Fortran 77
  
-*  Invocation
+*  Invocation:
 *     CALL CCG1_GHST<T>( BAD, DIM, ARRAY, NUMBIN, VALMAX, VALMIN, HIST,
 *    :                   STATUS )
  
