@@ -1,14 +1,18 @@
-\documentstyle[11pt]{article} 
+\documentclass[twoside,11pt]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {7.4}
-\newcommand{\stardocauthors}   {S M Beard \\ P M Allan}
-\newcommand{\stardocdate}      {31 March 1993}
-\newcommand{\stardoctitle}     {GENERIC --- A Utility for Compiling Generic
-				\\[2ex] Fortran Subroutines}
+\newcommand{\stardocsource}    {sun7.5}
+\newcommand{\stardocnumber}    {7.5}
+\newcommand{\stardocauthors}   {S M Beard \\ P M Allan\\ Malcolm J. Currie\\ Peter W. Draper}
+\newcommand{\stardocdate}      {2006 May 5}
+\newcommand{\stardoctitle}     {GENERIC --- A Utility for Preprocessing Generic
+				\\ Fortran and C Subroutines}
+\newcommand{\stardocversion}   {1.2}
+\newcommand{\stardocmanual}    {User's Guide}
+
 %------------------------------------------------------------------------------
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
@@ -23,45 +27,255 @@
 \setlength{\parskip}{\medskipamount}
 \setlength{\unitlength}{1mm}
 
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+
+% -----------------------------------------------------------------------------
+% ? Document-specific \newcommand or \newenvironment commands.
+
+% Shorthands for hypertext links.
+% -------------------------------
+\newcommand{\ASTERIX}{{\footnotesize ASTERIX}\normalsize}
+\newcommand{\ASTERIXref}{\xref{\ASTERIX}{sun98}{}}
+\newcommand{\GENERIC}{{\footnotesize GENERIC}\normalsize}
+\newcommand{\HDS}{{\footnotesize HDS}\normalsize}
+\newcommand{\HDSref}{\xref{\HDS}{sun92}{}~}
+\newcommand{\PRIMDAT}{{\footnotesize PRIMDAT}\normalsize}
+\newcommand{\PRIMDATref}{\xref{\PRIMDAT}{sun39}{}~}
+
 %------------------------------------------------------------------------------
 % Add any \newcommand or \newenvironment commands here
+
+% conditional text
+\newcommand{\latexelsehtml}[2]{#1}
+\begin{htmlonly}
+  \renewcommand{\latexelsehtml}[2]{#2}
+\end{htmlonly}
+
 %------------------------------------------------------------------------------
 
+% ? End of document specific commands
+%------------------------------------------------------------------------------
+
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
 \begin{document}
 \thispagestyle{empty}
-SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-RUTHERFORD APPLETON LABORATORY\\
-{\large\bf Starlink Project\\}
-{\large\bf \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
 
-%------------------------------------------------------------------------------
-%  Add this part if you want a table of contents
-  \setlength{\parskip}{0mm}
-  \tableofcontents
-  \setlength{\parskip}{\medskipamount}
-  \markright{\stardocname}
-%------------------------------------------------------------------------------
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
 
-\newpage
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+%  \htmladdimg{sun95_cover.gif}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+\GENERIC\ is tool for Fortran 77 and C developers to create type-specific
+code from a generic source that includes tokens for type-dependent
+elements.  This saves effort supporting multiple versions of the 
+source code.
+
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+ \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markboth{\stardocname}{\stardocname}
+%  \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+% \newpage
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+% The main text begins here.
+% -----------------------------------------------------------------------------
+
 \section{Introduction}
 
-GENERIC is a utility which preprocesses a generic Fortran subroutine into
-its different types and concatenates these routines into a file.
-The file can then be compiled with the Fortran compiler to produce an
-object module.
+\GENERIC\ is a utility which preprocesses a generic Fortran or C 
+subroutine into its different types and concatenates these routines 
+into a file.  The file can then be compiled with the appropriate
+compiler to produce an object module.
 
-\section{GENERIC Subroutines - an Example}
+\section{GENERIC Fortran Subroutines---an Example}
 
 A generic subroutine is one which has an argument (or arguments)
 which may be one of a number of different Fortran data types.
@@ -79,106 +293,107 @@ The following subroutines would need to be written:
 \end{verbatim}
 
 The integer routine might contain the following code (in a file
-called {\tt zeroi.f} on Unix; ZEROI.FOR on VMS):
+called {\tt zeroi.f}):
 
 \begin{verbatim}
-            SUBROUTINE ZEROI( N, ARRAY )
-      *+
-      *  Name:
-      *     ZEROI
-      *  Purpose:
-      *     Zero all the elements of an INTEGER array
-      *  Invocation :
-      *     CALL ZEROI( N, ARRAY )
-      *  Description :
-      *     This sets all the elements of an INTEGER array to zero
-      *  Arguments:
-      *     N = INTEGER( Given )
-      *        Dimension of array
-      *     ARRAY( N ) = INTEGER( Given and Returned )
-      *        The array to be zeroed
-      *                   "
-      *     (the rest of the standard prologue)
-      *                   "
-      *  Type Definitions:
-            IMPLICIT NONE
-      *  Arguments Given:
-            INTEGER N
-      *  Arguments Given and Returned:
-            INTEGER ARRAY( N )
-      *  Local Variables:
-            INTEGER I                   ! Array index
-      *-
+          SUBROUTINE ZEROI( N, ARRAY )
+    *+
+    *  Name:
+    *     ZEROI
+    *  Purpose:
+    *     Zero all the elements of an4 INTEGER array
+    *  Invocation :
+    *     CALL ZEROI( N, ARRAY )
+    *  Description :
+    *     This sets all the elements of an INTEGER array to zero
+    *  Arguments:
+    *     N = INTEGER( Given )
+    *        Dimension of array
+    *     ARRAY( N ) = INTEGER( Given and Returned )
+    *        The array to be zeroed
+    *                   "
+    *     (the rest of the standard prologue)
+    *                   "
+    *  Type Definitions:
+          IMPLICIT NONE
+    *  Arguments Given:
+          INTEGER N
+    *  Arguments Given and Returned:
+          INTEGER ARRAY( N )
+    *  Local Variables:
+          INTEGER I                   ! Array index
+    *-
       
-            DO I = 1, N      
-               ARRAY( I ) = 0
-            END DO
-            END
+          DO I = 1, N      
+             ARRAY( I ) = 0
+          END DO
+          END
 \end{verbatim}
 
 The REAL and DOUBLE PRECISION versions of the routine would have to be
 written in a similar way, and this obviously involves a lot of 
 duplication of effort.
 The situation gets even worse if other versions of the routine
-(such as BYTE, INTEGER*2 etc...) are needed.
+(such as BYTE, INTEGER*2) are needed.
 Also, it is very difficult and tedious to keep all the versions
 in step if they have to be edited individually when the routines
 are changed.
 
-The GENERIC utility is a labour saving device which enables all the
+The \GENERIC\ utility is a labour-saving device which enables all the
 various types of routines to be constructed automatically from
 one master routine.
 If any changes become necessary, only this one master routine needs
 to be edited.
 
-To use the GENERIC utility, the routine listed above is replaced by
-the following (in a file called {\tt zero.gen} on Unix; ZERO.GEN on VMS):
+To use the \GENERIC\ utility, the routine listed above is replaced by
+the following (in a file called {\tt zero.gen}):
 
 \begin{verbatim}
-            SUBROUTINE ZERO<T>( N, ARRAY )
-      *+
-      *  Name:
-      *     ZERO<T>
-      *  Purpose:
-      *     Zero all the elements of a <COMM> array
-      *  Invocation :
-      *     CALL ZERO<T>( N, ARRAY )
-      *  Description :
-      *     This sets all the elements of a <COMM> array to zero
-      *  Argument:
-      *     N = INTEGER( Given )
-      *        Dimension of array
-      *     ARRAY( N ) = <TYPE>( Given and Returned )
-      *        The array to be zeroed
-      *                   "
-      *     (the rest of the standard prologue)
-      *                   "
-      *  Type Definitions:
-            IMPLICIT NONE
-      *  Arguments Given:
-            INTEGER N
-      *  Arguments Given and Returned:
-            <TYPE> ARRAY( N )
-      *  Local Variables:
-            INTEGER I                  ! Array index
-      *-
+          SUBROUTINE ZERO<T>( N, ARRAY )
+    *+
+    *  Name:
+    *     ZERO<T>
+    *  Purpose:
+    *     Zero all the elements of a <COMM> array
+    *  Invocation :
+    *     CALL ZERO<T>( N, ARRAY )
+    *  Description :
+    *     This sets all the elements of a <COMM> array to zero
+    *  Argument:
+    *     N = INTEGER( Given )
+    *        Dimension of array
+    *     ARRAY( N ) = <TYPE>( Given and Returned )
+    *        The array to be zeroed
+    *                   "
+    *     (the rest of the standard prologue)
+    *                   "
+    *  Type Definitions:
+          IMPLICIT NONE
+    *  Arguments Given:
+          INTEGER N
+    *  Arguments Given and Returned:
+          <TYPE> ARRAY( N )
+    *  Local Variables:
+          INTEGER I                  ! Array index
+    *-
       
-            DO I = 1, N
-               ARRAY( I ) = 0<CONST>
-            END DO
-            END
+          DO I = 1, N
+             ARRAY( I ) = 0<CONST>
+          END DO
+          END
 \end{verbatim}
 
 This is a ``generic routine.''
 Other examples of generic routines include the DAT\_ routines in
-the Hierarchical Data System (SUN/92) and the PAR\_ routines of
-the ADAM parameter system (SUN/94).
+the \xref{Hierarchical Data System}{sun92}{} (SUN/92) and the 
+\xref{PAR\_ routines}{sun114}{} of the \xref{ADAM parameter 
+system}{ssn29}{} (SSN/29).
 
-The items in angle brackets, $<>$ , are ``tokens'' which the generic
-utility replaces when it converts the routine into one of a given
-type.
+The items in angle brackets, $<>$ , are ``tokens'' which the 
+\GENERIC\ utility replaces when it converts the routine into one 
+of a given type.
 In the above example, the tokens would be replaced
-as follows :-
+as follows.
 
 \begin{verbatim}
        Token       Double precision    Integer       Real
@@ -190,29 +405,105 @@ as follows :-
        <CONST>     .0D0                (blank)       .0E0
 \end{verbatim}
 
-The types are generated by issuing the following command from DCL on a VMS
-system :-
-
-\begin{quote}{\tt
-\$ GENERIC ZERO.GEN/TYPES=(D,I,R)
-}
-\end{quote}
-
-or this command on a Unix system :-
+The types are generated by issuing the following command.
 
 \begin{quote}{\tt
 \% generic -t dir zero.gen
 }
 \end{quote}
 
-More details on the use of the GENERIC utility, and a full list of 
+More details on the use of the \GENERIC\ utility, and a full list of 
 tokens and types, are given in the rest of this document.
+
+\section{Creating generic C code}
+
+To use \GENERIC\ for C routines follow the recipe described below.
+
+First create your generic code routines in an include file with extension
+{\tt .cgen}.  There are three macros defined for use when defining
+generic functions.
+
+\begin{itemize}
+\item CGEN\_FUNCTION
+\item CGEN\_TYPE
+\item CGEN\_BAD
+\end{itemize}
+
+You need to use {\tt CGEN\_FUNCTION} as part of the normal function
+declaration so that generic forms of the function name can be
+used.  Each routine in a generic file should start:
+
+\begin{verbatim}
+    return_type CGEN_FUNCTION(function_name) ( arg decs )
+\end{verbatim}
+
+So a routine called {\tt kpg1\_bad} that returned an int and accepted a
+{\tt CGEN\_CTYPE} pointer, called {\tt value}, would be defined as:
+
+\begin{verbatim}
+    int CGEN_FUNCTION(kpg1_bad) (CGEN_CTYPE *value) {
+        if ( value[0] == CGEN_BAD ) {
+           return 1;
+        }
+        return 0;
+    }
+\end{verbatim}
+
+with the trivial job of testing the first element of an array
+against the BAD value contant.
+
+The value of {\tt CGEN\_TYPE} will be set to the C type, that is
+double, float, int, short int, unsigned short int, char
+and unsigned char, as appropriate.
+
+The value of {\tt CGEN\_BAD} will be set to one of the \PRIMDAT\ constants
+{\tt VAL\_\_BADD}, {\tt VAL\_\_BADR} \emph{etc.} as appropriate.\\
+
+Second create a C file that includes the generic code, once for each of
+the data types you want (this file can also contain related
+non-generic code).  To do this define the macro {\tt CGEN\_CODE\_TYPE} 
+to be one of the values:
+
+\begin{verbatim}
+    CGEN_DOUBLE_TYPE, CGEN_FLOAT_TYPE, CGEN_INT_TYPE,
+    CGEN_WORD_TYPE, CGEN_UWORD_TYPE, CGEN_BYTE_TYPE
+    CGEN_UBYTE_TYPE
+\end{verbatim}
+
+to select the data type required.  Then include the file
+{\tt cgeneric\_defs.h} followed by your generic include file,
+(called {\tt mygenerics.cgen} in the following example):
+
+\begin{verbatim}
+    #include <prm_par.h>
+    #include <cgeneric.h>
+
+    #define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE
+    #include "cgeneric_defs.h"
+    #include "mygenerics.cgen"
+    #undef CGEN_CODE_TYPE
+
+    #define CGEN_CODE_TYPE CGEN_INT_TYPE
+    #include "cgeneric_defs.h"
+    #include "mygenerics.cgen"
+    #undef CGEN_CODE_TYPE
+\end{verbatim}
+
+that generates code for double and int routines.\\
+
+
+Third, use the {\bf generic} command.  The function names will
+have the character codes {\tt D}, {\tt F}, {\tt I}, {\tt W}, {\tt UW}, 
+{\tt B}, and {\tt UB} appended to their declared names.  So
+for our example {\tt kpg1\_bad}, we have the two functions
+{\tt kpg1\_badD} and {\tt kpg1\_badI}.
+
 
 \section{Features of the GENERIC Utility}
 
 \subsection{The KERNEL Tokens}
 
-The following tokens are recognised by the GENERIC utility :-
+The following tokens are recognised by the \GENERIC\ utility:
 
 \newlength{\numlen}
 \settowidth{\numlen}{000000000000}
@@ -221,41 +512,46 @@ The following tokens are recognised by the GENERIC utility :-
 \begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
 \addtolength{\leftmargin}{\labelsep}}
 
-\item[\verb+<T>+] To be replaced by a single character representation
+\item[{\tt $<$T$>$}] To be replaced by a single character representation
 of the specified type.
 
-\item[\verb+<TYPE>+] To be replaced by the string used to declare variables
+\item[{\tt $<$TYPE$>$}] To be replaced by the string used to declare variables
 of the specified type when they are passed as arguments to
 the subroutine.
 
-\item[\verb+<LTYPE>+] To be replaced by the string used to declare variables
+\item[{\tt $<$LTYPE$>$}] To be replaced by the string used to declare variables
 of the specified type when they are defined as local variables
 in the subroutine.
 
-\item[\verb+<CONST>+] To be replaced by the string appended to numeric constants
-of the specified type.
+\item[{\tt $<$CONST$>$}] To be replaced by the string appended to numeric 
+constants of the specified type.
 
-\item[\verb+<HTYPE>+] To be replaced by the HDS name for the specified type.
+\item[{\tt $<$HTYPE$>$}] To be replaced by the \HDSref\ name for the specified 
+type.
 
-\item[\verb+<COMM>+] To be replaced by a comment describing the specified type
+\item[{\tt $<$COMM$>$}] To be replaced by a comment describing the specified type
 in plain English.
 
 \end{list}
 
-A full table of the translation of these tokens
-for each variable type is given in
-Appendix 1 at the end of this document. 
+A full table of the translation of these tokens for each variable type
+is given in 
+\latexelsehtml{Appendix~\ref{ap_a}}{the
+\htmlref{token translations}{ap_a}}
+at the end of this document. 
 
 \subsection{The ASTERIX Tokens}
 
 As well as the kernel tokens, there are an additional set of
-tokens which will be translated if the ASTERIX option is specified
-with the GENERIC command (see below).
+tokens which will be translated if the {\tt -a} option is specified
+with the \GENERIC\ command (see below).
 
-These tokens are available to allow GENERIC to process existing
-ASTERIX software (SUN/98) which uses them.
+These tokens are available to allow \GENERIC\ to process existing
+\ASTERIXref\ software (SUN/98) which uses them.
 They are {\em not}\ recommended for use by new software.
-A list of the ASTERIX tokens is given in Appendix 1.
+A list of the \ASTERIX\ tokens is given in 
+\latexelsehtml{Appendix~\ref{ap_a}}{the
+\htmlref{token translations}{ap_a}}.
 
 \subsection{The Local CHARACTER Size}
 
@@ -268,274 +564,100 @@ for all types except CHARACTER.
 In the CHARACTER type, a variable passed as an argument is declared
 CHARACTER*(*), but a local variable is declared CHARACTER*\verb+<CHASIZ>+.
 \verb+<CHASIZ>+ is replaced by the ``local character size.''
-If not told otherwise, GENERIC will replace \verb+<CHASIZ>+ by 200,
+If not told otherwise, \GENERIC\ will replace \verb+<CHASIZ>+ by 200,
 making local character variables CHARACTER*200.
 
 It is possible to override this default character size
-if it is unsuitable.
-This can be done using the GENSETDEF command, or by specifying
-a /CHASIZ qualifier to the GENERIC command on a VMS system (see below).
-On a Unix system, you can define the environment variable GENERIC\_CHASIZ or
-you can use the {\bf -c} flag on the {\bf generic} command.
+if it is unsuitable.  You can define the environment4 variable 
+GENERIC\_CHASIZ or you can use the {\tt -c} flag on the 
+{\bf generic} command.
 
-\subsection{The Maximum Record Length}
+\subsection{The Fortran Maximum Record Length}
  
-The GENERIC utility assumes it is dealing with Fortran 77
+The \GENERIC\ utility assumes it is dealing with Fortran 77
 source code which cannot go beyond column 72.
 If the substitution of a token results in a line becoming longer
 than 72 characters, it will be broken automatically at column 72
 and continued on the next line, using a ``:'' continuation character
 in column 6 of the next line.
 
-The VMS version of GENERIC will issue a warning message if it has to do this.
-Getting this message is not serious, but it warns that, should the
-routine in question fail, the line numbers referred to in a traceback
-will not correspond to line numbers in the original generic routine.
-
 It is recommended that source lines in generic routines be kept
 well below 72 characters in length to prevent this from happening.
 
 {\bf NOTE:}~{\it Comment lines (~{\rm i.e.} those beginning `C', `c', `D', `d' 
-or `*') which are longer than 72 characters are unaltered by GENERIC.
-So are lines of code with an in-line comment (~{\rm i.e.} those containing
+or `*') which are longer than 72 characters are unaltered by \GENERIC.
+So are lines of code with an in-line comment (~\emph{i.e.} those containing
 a ``!'' character).}
 
-This algorithm is not perfect and it is possible to fool it with end of line
-comments on long lines or exclamation marks in character strings. However, this
-seems not to have proven a problem in practice.
+This algorithm is not perfect and it is possible to fool it with end
+of line comments on long lines or exclamation marks in character
+strings.  However, this seems not to have proven a problem in practice.
 
-\section{Using the GENERIC Utility on VMS}
+\section{Using the GENERIC Utility}
 
-\subsection{The GENERIC Command}
-
-The GENERIC utility is executed by typing the following command:
+The \GENERIC\ utility is executed by typing the following command:
 
 \begin{quote}{\tt
-\$ GENERIC  <file-spec>[/qualifier[/qualifier...]]
-}
-\end{quote}
-
-\verb+<file-spec>+ is the name of the file containing the generic routine.
-The default type for such a file is ``{\tt .GEN}.''
-The various routines generated are written to a file of type ``{\tt .FOR}'',
-which is then compiled into an object module of type ``{\tt .OBJ}.''
-The {\tt .FOR} file is then deleted (though this may be prevented by using
-the /NOCOMPILE qualifier, below).
-
-Optional qualifiers may be appended to the file-spec.
-These can be classified into two types :-
-
-\paragraph{Compiler qualifiers :}
-Any qualifier for the Fortran compiler may be given
-(e.g. /LIST, /DEBUG, /D\_LINES etc...). (See the VMS Fortran manual,
-or type HELP FORTRAN for more details on these).
-
-\paragraph{Generic qualifiers :}
-In addition, there are certain qualifiers which the
-GENERIC utility itself will recognise. These are:
-
-\begin{description}
-\item[\mbox{}]\mbox{}
-\begin{description}
-\item[/TYPES=(type-list)]
-This specifies the types required. The types should be separated
-by commas and enclosed in parentheses (e.g. /TYPES=(C,D,I,L,R) )
-The following types are possible :-
-\begin{center}
-\begin{tabular}{ll}
-	B  &- Byte \\
-	UB &- Unsigned byte \\
-	C  &- Character \\
-	D  &- Double precision \\
-	I  &- Integer \\
-	L  &- Logical \\
-	R  &- Real \\
-	W  &- Word \\
-	UW &- Unsigned word \\
-\end{tabular}
-\end{center}
-There are also some key words which can be used in the /TYPES qualifier for 
-convenience. These are :-
-\begin{verbatim}
-	/TYPES=ALL		! Generate all types
-	/TYPES=NUMERIC		! Generate all numeric types
-\end{verbatim}
-If the /TYPES qualifier is not specified, then the list of types which
-is currently defined as the default (using GENSETDEF) will be generated.
-If a default list of types has not been specified then all types will be
-generated. 
-
-\item[/CHASIZ=local-character-size]
-This specifies the local character size required.
-This is the size (in bytes) of any CHARACTER variables which are
-declared as local variables (with the \verb+<LTYPE>+ token) in a GENERIC
-routine. 
-
-If the /CHASIZ qualifier is not specified, then the local
-character size which has been defined as the default (using GENSETDEF)
-will be used.
-If a default size has not been specified, then 200 will be used
-(resulting in CHARACTER*200).
-
-\item[/ASTERIX]
-If specified, this qualifier causes GENERIC
-to replace the ASTERIX tokens (listed in Appendix 1),
-as well as the usual (KERNEL) tokens.
-Using this qualifier will slow down the execution of GENERIC,
-because it will need to search for more tokens.
-
-\item[/NOCOMPILE]
-If present, this qualifier specifies that the resultant
-Fortran source file should be kept, and not compiled and deleted.
-
-\end{description}
-\end{description}
-
-\subsection{The GENSETDEF Command}
-
-The command GENSETDEF can be used to set up default parameter values
-for GENERIC to use subsequently.
-The format of this command is as follows :-
-
-\begin{quote}{\tt
-\$ GENSETDEF  <default-types>  <default-local-character-size>
-}
-\end{quote}
-
-If any parameter is not given it will be prompted for,
-and it is usually easier to let GENSETDEF prompt for what it needs.
-
-\verb+<default-types>+ is a string of types, in the same format as given to the
-/TYPES qualifier (but without the parentheses), which GENERIC is to use
-subsequently whenever a /TYPES qualifier is not specified. 
-
-\verb+<default-local-character-size>+ is a default local character size
-to be used subsequently whenever the /CHASIZ qualifier is not
-specified.
-(This will override the 200 initially used as the default.)
-
-All the defaults set up by GENSETDEF will remain for the login
-session, but will disappear on logout.
-
-\subsection{Using GENERIC\_PROG Directly}
-
-The GENERIC utility {\tt GENERIC\_DIR:GENERIC.COM} uses a program called \\
-{\tt GENERIC\_DIR:GENERIC\_PROG.EXE} to produce the Fortran code file.
-For special purposes, this program may be executed on its own.
-(The tables in Appendix 1 were generated using {\tt GENERIC\_PROG}).
-It is executed as a DCL foreign command as follows :-
-
-\begin{verbatim}
-      $ GENERIC_PROG :== $GENERIC_DIR:GENERIC_PROG
-      $ GENERIC_PROG <input> <output> <types>[/qualifier] <chasiz>
-\end{verbatim}
-
-\verb+<input>+ specifies the name of the input file.
-	
-\verb+<output>+ specifies the name of the output file.
-
-\verb+<types>+ specifies the types to be generated (in the same form
-as used in the /TYPES qualifier for GENERIC (but without the 
-parentheses).
-The /ASTERIX qualifier only may be appended to the types string.
-
-\verb+<chasiz>+ specifies the local character size to be used.
-
-If any of the first three parameters are not specified,
-then the GENERIC\_PROG program will prompt for them.
-
-\subsection{Using the GENERIC Utility from LIBMAINT}
-
-LIBMAINT is a procedure for maintaining modules within a text/object
-library pair, and is described in SUN/99.
-The GENERIC utility is designed to integrate easily with LIBMAINT,
-and it is treated by LIBMAINT just like another compiler.
-Generic modules are recognised by having type ``{\tt .GEN}''
-appended to their names.
-Note that specifying ``{\tt .GEN}'' after a module name is compulsory
-in this case in order to tell LIBMAINT that the module is
-generic.
-
-The types which GENERIC is to generate can be defined by using /TYPES
-as a compiler qualifier in LIBMAINT (see SUN/99), or by using GENSETDEF.
-Using GENERIC with LIBMAINT is best illustrated by some examples.
-Suppose the library ABCLIB contains generic modules, such as
-ABC\_GET0.GEN, ABC\_GET1.GEN, ABC\_PUT0.GEN, ABC\_PUT1.GEN etc...
-
-\begin{enumerate}
-
-\item To insert a new generic module, producing C,D,I,L \& R types
-(note the double slash ``//'' and the compulsory ``{\tt .GEN}'') :-
-
-\begin{quote}{\tt
-\$ LIBMAINT ABCLIB \\
-\$ INSERT ABC\_GET0.GEN//TYPES=(C,D,I,L,R)
-}
-\end{quote}
-
-
-\item To recompile all the modules, generating C,D,I,L \& R types for
-the generic ones :-
-
-\begin{quote}{\tt
-\$ LIBMAINT \\
-\$ GENSETDEF "C,D,I,L,R" 200 \\
-\$ OLBCRE ABCLIB
-}
-\end{quote}
-
-\end{enumerate}
-The OBJLIST command in LIBMAINT can be used to verify which types
-have been generated.
-
-\section{Using the GENERIC Utility on Unix}
-
-The GENERIC utility is executed by typing the following command:
-
-\begin{quote}{\tt
-\% generic [-t <types>] [-c <chasiz>] [-s] [-sc <char>] [-a] file1 [file2...]
-}
+\% generic [-t <types>] [-a] [-c <chasiz>] [-s] [-sc <char>] [-u] [-x] \\
+           file1 [file2...]}
 \end{quote}
 
 Arguments in square brackets are optional and items in angle brackets are
-descriptive terms for the actual string that would be given. The simplest form
-of the {\tt generic} command is:
+descriptive terms for the actual string that would be given.  The simplest form
+of the {\bf generic} command is:
 
 \begin{quote}{\tt
 \% generic prog.gen
 }
 \end{quote}
 
-which will produce a file called {\tt prog.f} containing routines for all of
-the supported data types. Note that the Unix version of generic does {\em not}
-compile the Fortran files. All generic input files must have a suffix of
-{\tt .gen}. You can specify multiple input files explicitly or with wild cards.
-All output files have a suffix of {\tt .f}.
+which will produce a file called {\tt prog.f} containing routines for
+all of the supported data types.  Likewise for C
 
-The generic command accepts the following flags:
+\begin{quote}{\tt
+\% generic prog.cgen
+}
+\end{quote}
+will create a file {\tt prog.c}.
+
+A softlink called {\bf fgeneric} is also provided to avoid a clash 
+with the IRAF generic preprocessor.
+
+All generic input Fortran files must have a suffix of {\tt .gen}, or 
+{\tt .g\verb+<types>+} where \verb+<types>+ is a list of data types 
+(see option {\tt -t} below for a list).  The latter was introduced to
+simplify building using GNU tools, and is the recommended naming
+convention.  For C files the file extension should be {\tt .cgen}.
+
+You can specify multiple input files explicitly or with wild cards.
+All output Fortran files have a suffix of {\tt .f}, and output C files
+have suffix {\tt .c}.
+
+The {\bf generic} command accepts the following command-line options.
 
 \begin{description}
-\item[-t] This must be followed by a list of the data type to be processed. The
-list should be separated from the {\tt -t} by a space, and should consist of
-one or more of the letters a, b, B, c, d, i, l, n, r, w or W. The letters have
-the following meanings:
+
+\item[-t] This must be followed by a list of the data types to be
+processed. The list should be separated from the {\tt -t} by a space,
+and should consist of one or more of the letters {\tt a, b, B, c, d, i, l,
+n, r, w or W}.  The letters have the following meanings:
 \begin{center}
 \begin{tabular}{ll}
-a & all data types \\
-b & BYTE \\
-B & unsigned BYTE \\
-c & CHARACTER \\
-d & DOUBLE PRECISION \\
-i & INTEGER \\
-l & LOGICAL \\
-n & all numeric types (i.e. everything except CHARACTER and LOGICAL)\\
-r & REAL \\
-w & WORD (i.e. INTEGER*2) \\
-W & unsigned WORD \\
+{\tt a} & all data types \\
+{\tt b} & BYTE \\
+{\tt B} & unsigned BYTE \\
+{\tt c} & CHARACTER \\
+{\tt d} & DOUBLE PRECISION \\
+{\tt i} & INTEGER \\
+{\tt l} & LOGICAL \\
+{\tt n} & all numeric types (\emph{i.e.} everything except CHARACTER and LOGICAL)\\
+{\tt r} & REAL \\
+{\tt w} & WORD (\emph{i.e.} INTEGER*2) \\
+{\tt W} & unsigned WORD \\
 \end{tabular}
 \end{center}
 
-For example, to generate routines for all of the standard FORTRAN numeric data
+For example, to generate routines for all of the standard Fortran numeric data
 types, type the command:
 
 \begin{quote}{\tt
@@ -546,22 +668,26 @@ types, type the command:
 (Using {\tt n} instead of {\tt dir} would generate byte and word versions as
 well.)
 
-\item[-c] This should be followed by a space and then an integer giving the
-value of the local character size required. The default value is 200.
+\item[-c] This should be followed by a space and then an integer
+giving the value of the local character size required.  The default
+value is 200. This value can be specified by the environment variable
+{\tt GENERIC\_CHASIZ}.  If {\tt GENERIC\_CHASIZ} is defined and the
+{\tt -c} argument is present, the {\tt -c} argument takes precedence.
 
-\item[-s] Generate the output in separate files for each data type with the
-single character type specifier appended to the base name of the file. The
-default is to generate one output file for each input file. For example, if the
-input file is {\tt sub1.gen} and the {\tt -t} flag is set to {\tt dir}, then
-specifying the {\tt -s} flag will cause output files called {\tt sub1d.f}, {\tt
-sub1i.f} and {\tt sub1r.f} to be generated. This option is provided as it is
-usual on Unix systems to have all Fortran routines in separate source files.
+\item[-s] Generate the output in separate files for each data type
+with the single character type specifier appended to the base name of
+the file.  The default is to generate one output file for each input
+file.  For example, if the input file is {\tt sub1.gen} and the {\tt
+-t} flag is set to {\tt dir}, then specifying the {\tt -s} flag will
+cause output files called {\tt sub1d.f}, {\tt sub1i.f} and {\tt
+sub1r.f} to be generated.  This option is provided as it is usual on
+Unix systems to have all Fortran routines in separate source files.
 
-\item[-sc] This flag allows the user to specify one or more characters that
-will be used to separate the base file name from the appended character when
-generating separate output files for each data type. The {\tt -sc} should be
-followed by a space and then the character(s) to be used as the separator. For
-example, the command:
+\item[-sc] This flag allows the user to specify one or more characters
+that will be used to separate the base file name from the appended
+character when generating separate output files for each data type.
+The {\tt -sc} should be followed by a space and then the character(s)
+to be used as the separator.  For example, the command:
 
 \begin{quote}{\tt
 \% generic -t dir -sc \_ func2.gen
@@ -569,17 +695,30 @@ example, the command:
 \end{quote}
 
 will generate files called {\tt func2\_d.f}, {\tt func2\_i.f} and {\tt
-func2\_r.f}. If the {\tt -sc} flag is given, then the {\tt -s} flag can be
+func2\_r.f}.  If the {\tt -sc} flag is given, then the {\tt -s} flag can be
 omitted.
 
-\item[-a] This will cause the ASTERIX tokens to be interpreted as well as the
-standard ones. Its use is deprecated.
+\item[-a] This will cause the \ASTERIX\ tokens to be interpreted as well as the
+standard ones.  Its use is deprecated.
+
+\item[-u]  The B and W types substitute {\tt ub} and {\tt uw} tokens 
+respectively in the code and in generated filenames.  This is for 
+compability with the original VMS version when most generic routines were
+developed.  However, note that the {\tt -t} values of BW should still be 
+used to obtain unsigned byte and unsigned-word instantiations.
+
+\item[-x]  Removes the last {\tt x} from the file name before generating the
+names of the output files.  This is provided for compatability
+with early generic files in the VMS era files that had a final {\tt x} in the
+name to indicate where the token would be replaced in the
+instantiated files.  In modern usage the trailing {\tt x} is absent, and
+this option is not required.
 
 \end{description}
 
 It is possible to specify the list of data types to be processed and the local
 character size by setting environment variables {\tt GENERIC\_TYPES} and {\tt
-GENERIC\_CHASIZ}, e.g.
+GENERIC\_CHASIZ}, \emph{e.g.}
 
 \begin{quote}{\tt
 \% setenv GENERIC\_TYPES cdilr \\
@@ -587,23 +726,24 @@ GENERIC\_CHASIZ}, e.g.
 }
 \end{quote}
 
-{\bf N.B.} {\em The Unix version of generic does {\bf NOT} compile the
-resulting FORTRAN output files. This must be done separately.}
-
-
-\section{Data Type Conversions -- the DCV Routines}
+\section{Data Type Conversions---the DCV Routines}
 
 \subsection{Introduction}
 
-Occasionally, it may be necessary to convert data passed into
-a generic routine in a generic variable into another type.
-A general set of conversion functions is provided to make this
-possible.
+Occasionally, it may be necessary to convert data passed into a
+generic routine in a generic variable into another data type. A
+general set of conversion functions was originally provided within 
+\GENERIC\ to make this possible.  However, \emph{new code requiring such
+conversions should invoke the \PRIMDATref\ library of functions}.
+\PRIMDAT\ also provides many other instrinsic functions that are
+amenable to inclusion in generic code.  This section remains
+only to interpret legacy code that still calls DCV routines.
+
 A naming convention is used so that the function
 DCV\_\verb+<T1>TO<T2>+ converts data type \verb+<T1>+ into \verb+<T2>+.
 
 The functions which can be are defined using Fortran statement 
-functions in a file which may be included in a program by;
+functions in a file which may be included in a program by
 
 \begin{quote}{\tt
 INCLUDE 'DCV\_FUN'
@@ -613,19 +753,12 @@ INCLUDE 'DCV\_FUN'
 which should come after any data type definitions, but before
 any DATA initialisation or executable code.
 In the standard prologue of SGP/16, it should go in the
-``Internal references'' section.
+``Internal References'' section.
 
-Conversions which cannot be defined as statement functions are provided as
-external functions in an object library ({\tt GENERIC\_DIR:DCV.OLB on VMS;
-/star/lib/dcv.a on Unix}). Programs
-requiring these functions should be linked:
-
-\begin{quote}{\tt
-\$ LINK program,GENERIC\_DIR:DCV/LIB
-}
-\end{quote}
-
-on VMS, or compiled with
+Conversions which cannot be defined as statement functions are
+provided as external functions in an object library ({\tt
+/star/lib/dcv.a} on a Starlink system).  Programs requiring these
+functions should be compiled
 
 \begin{quote}{\tt
 \% f77 prog.f -L/star/lib `dcv\_link`
@@ -634,14 +767,14 @@ on VMS, or compiled with
 
 on Unix.
 
-The types of these functions can be declared in a program by including;
+The types of these functions can be declared in a program by including
 
 \begin{quote}{\tt
 INCLUDE 'DCV\_EXT'
 }
 \end{quote}
 
-(in the ``External references'' section of the standard prologue).
+(in the ``External References'' section of the standard prologue).
 
 {\bf NOTE:}~{\it Statement functions are considerably faster than external 
 functions, so programs which use the common conversions defined in `DCV\_FUN'
@@ -651,152 +784,152 @@ Only numeric conversions are supported at present, and
 there are no DCV\_ functions for conversions involving CHARACTER and
 LOGICAL data types.
 A full list of the functions, the conversion performed, and their
-location and restrictions, is given in Appendix 2.
+location and restrictions, is given in 
+\latexelsehtml{Appendix~\ref{ap_b}}{the
+\htmlref{conversion functions}{ap_b}}.
 
 \subsection{An Example of Data Type Conversion}
 
 As an example, a generic subroutine for finding the mean of the data
 contained in an array, where the array is of varying type but the mean is
-always REAL, might look like the following :- 
+always REAL, might look like the following routine.
 
 \begin{verbatim}
-            SUBROUTINE MEAN<T>( N, ARRAY, MEAN )
-      *+
-      *  Name:
-      *     MEAN<T>
-      *  Purpose:
-      *     Calculate the mean value contained in a <COMM> array.
-      *  Invocation :
-      *     CALL MEAN<T>( N, ARRAY, MEAN )
-      *  Description :
-      *     This calculates the mean value of then data contained in the given
-      *     <COMM> array, and returns the value in the REAL variable MEAN.
-      *  Arguments:
-      *     N = INTEGER( Given )
-      *        The dimension of the array.
-      *     ARRAY( N ) = <TYPE>( Given )
-      *        The array containing the data to be averaged.
-      *     MEAN = REAL( Returned )
-      *        The mean of the values contained in the array.
-      *                   "
-      *     (the rest of the standard prologue)
-      *                   "
-      *  Type Definitions:
-            IMPLICIT NONE
-      *  Arguments Given:
-            INTEGER N
-            <TYPE> ARRAY( N )
-      *  Arguments Returned:
-            REAL MEAN
-      *  External References:
-            INCLUDE 'DCV_EXT'          ! Data conversion external functions
-      *  Local Variables:
-            INTEGER I                  ! Array index
-            <LTYPE> SUM                ! Sum of the data in the array
-      *  Internal References:
-            INCLUDE 'DCV_FUN'          ! Data conversion statement functions
-      *-
+          SUBROUTINE MEAN<T>( N, ARRAY, MEAN )
+    *+
+    *  Name:
+    *     MEAN<T>
+    *  Purpose:
+    *     Calculate the mean value contained in a <COMM> array.
+    *  Invocation :
+    *     CALL MEAN<T>( N, ARRAY, MEAN )
+    *  Description :
+    *     This calculates the mean value of then data contained in the given
+    *     <COMM> array, and returns the value in the REAL variable MEAN.
+    *  Arguments:
+    *     N = INTEGER( Given )
+    *        The dimension of the array.
+    *     ARRAY( N ) = <TYPE>( Given )
+    *        The array containing the data to be averaged.
+    *     MEAN = REAL( Returned )
+    *        The mean of the values contained in the array.
+    *                   "
+    *     (the rest of the standard prologue)
+    *                   "
+    *  Type Definitions:
+          IMPLICIT NONE
+    *  Arguments Given:
+          INTEGER N
+          <TYPE> ARRAY( N )
+    *  Arguments Returned:
+          REAL MEAN
+    *  External References:
+          INCLUDE 'DCV_EXT'          ! Data conversion external functions
+    *  Local Variables:
+          INTEGER I                  ! Array index
+          <LTYPE> SUM                ! Sum of the data in the array
+    *  Internal References:
+          INCLUDE 'DCV_FUN'          ! Data conversion statement functions
+    *-
       
-      *  Initialise the sum to zero
-            SUM = 0<CONST>
+    *  Initialise the sum to zero.
+          SUM = 0<CONST>
       
-      *  Accumulate the sum of the contents of the array
-            DO I = 1, N
-              SUM = SUM + ARRAY( N )
-            END DO
+    *  Accumulate the sum of the contents of the array.
+          DO I = 1, N
+            SUM = SUM + ARRAY( N )
+          END DO
       
-      *  Divide by the dimension of the array to obtain the mean, using
-      *  DCV_<T>TOR to convert from <COMM> into REAL.
-            MEAN = DCV_<T>TOR( SUM ) / REAL( N )
+    *  Divide by the dimension of the array to obtain the mean, using
+    *  DCV_<T>TOR to convert from <COMM> into REAL.
+          MEAN = DCV_<T>TOR( SUM ) / REAL( N )
 
-            END
+          END
 \end{verbatim}
 
 In the above example, for the INTEGER version of the routine for
-instance, the DCV\_ITOR(~SUM~) statement will be converted to
-REAL(~SUM~) by the statement function in `DCV\_FUN'. 
+instance, the {\tt DCV\_ITOR(~SUM~)} statement will be converted to
+{\tt REAL(~SUM~)} by the statement function in {\tt DCV\_FUN}. 
 
 \subsection{Range Checking}
 
 The DCV\_\verb+<T1>+TO\verb+<T2>+ functions will not check the range of the 
 values given to them, and overflow errors are possible from some conversions
-(e.g. INTEGER to BYTE).
+(\emph{e.g.} INTEGER to BYTE).
 It is recommended that an application check the range of any value
 given to a DCV function, to ensure it is within the allowed range.
 Global parameters of the form DCV\_\_\verb+<T>+MIN and DCV\_\_\verb+<T>+MAX 
 are available for this purpose, which give the allowed range for type
-\verb+<T>+ ({\it e.g.} -128 to +127 for a BYTE).
-These by may included in a program using;
+\verb+<T>+ (\emph{e.g.} $-128$ to $+127$ for a BYTE).
+These by may included in a program using the following line.
 
 \begin{quote}{\tt
 INCLUDE 'DCV\_PAR'
 }
 \end{quote}
 
-(in the ``Global parameters'' section of the standard prologue).
+(in the ``Global Parameters'' section of the standard prologue).
 
-An example of the use of these parameters (for instance
-converting an INTEGER to another type could be) :-
+Here is an example of the use of these parameters (for instance
+converting an INTEGER to another type).
 
 \begin{verbatim}
-      *             "
-      *     (standard prologue)
-      *             "
-      *  Global parameters:
-            INCLUDE 'DCV_PAR'          ! DCV global parameters giving allowed ranges
-      *             "
-      *  External References:
-            INCLUDE 'DCV_EXT'          ! DCV external function definitions
-      *             "
-      *  Local Variables:
-            INTEGER IVAL               ! Integer value to be converted
-            <TYPE> VAL                 ! Destination variable of type <COMM>
+    *             "
+    *     (standard prologue)
+    *             "
+    *  Global Parameters:
+          INCLUDE 'DCV_PAR'          ! DCV global parameters giving allowed 
+                                     ! ranges
+    *             "
+    *  External References:
+          INCLUDE 'DCV_EXT'          ! DCV external function definitions
+    *             "
+    *  Local Variables:
+          INTEGER IVAL               ! Integer value to be converted
+          <TYPE> VAL                 ! Destination variable of type <COMM>
                     "
-      *  Internal References:
-            INCLUDE 'DCV_FUN'          ! DCV in-line statement functions
-      *-
-                    "
-                    "
-            IF ( ( IVAL .GE. DCV__<T>MIN ) .AND.
-           :     ( IVAL .LE. DCV__<T>MAX ) ) THEN
+    *  Internal References:
+          INCLUDE 'DCV_FUN'          ! DCV in-line statement functions
+    *-
+                  "
+                  "
+          IF ( ( IVAL .GE. DCV__<T>MIN ) .AND.
+         :     ( IVAL .LE. DCV__<T>MAX ) ) THEN
 
-      *  Value within range. The conversion is allowed.
-               VAL = DCV_ITO<T>( IVAL )
+    *  Value within range. The conversion is allowed.
+             VAL = DCV_ITO<T>( IVAL )
 
-            ELSE
+          ELSE
       
-      *  Error. Value out of range ...
-               <take appropriate action>
-            END IF
-                    "
-                    "
+    *  Error. Value out of range ...
+             <take appropriate action>
+          END IF
+                  "
+                  "
 \end{verbatim}
       
 Note that ranges are only provided for numeric data types.
 
-An alternative (and easier) way of preventing numerical overflow from causing
-problems is to use the PRIMDAT routines instead of the DCV ones. The PRIMDAT
-routines will not crash your program if an overflow occurs. See SUN/39 for
-details.
+An alternative (and easier) way of preventing numerical overflow from
+causing problems is to use the \PRIMDAT\ routines instead of the
+DCV ones.  The \PRIMDAT\ routines will not crash your program if an
+overflow occurs.  See \xref{SUN/39}{sun39}{} for details.
 
+\appendix
 \newpage
-\begin{center}
-{\Large\bf APPENDIX 1}
-
-{\large\bf A FULL TABLE OF TOKEN TRANSLATIONS}
-\end{center}
+\section{\xlabel{ap_a}A Full Table of Token Translations\label{ap_a}}
 
 This appendix gives the translations of all the tokens
-made by GENERIC for each of the data types.
+made by \GENERIC\ for each of the data types.
 If a translation is illegal, the result will be ``?''
-(and GENERIC will give a warning message).
+(and \GENERIC\ will give a warning message).
 
 To produce the BYTE version of a program, the following substitutions
-are made :-
+are made.
 %bytekernal
 \begin{tabbing}
 xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
-\>{\bf Kernel} tokens (translated by default) :- \\
+\>{\bf Kernel} tokens (translated by default): \\
 \\
 \>TOKEN  \>SUBSTITUTE  \>\>COMMENT \\
 \\
@@ -804,10 +937,10 @@ xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
 \>$<$TYPE$>$    \>\>{\tt "BYTE"}    \>{\em Argument type definition} \\
 \>$<$LTYPE$>$   \>\>{\tt "BYTE"}    \>{\em Local type definition} \\
 \>$<$CONST$>$   \>\>{\tt " "}       \>{\em String to be appended to constant} \\
-\>$<$HTYPE$>$   \>\>{\tt "\_BYTE"}  \>{\em HDS type} \\
+\>$<$HTYPE$>$   \>\>{\tt "\_BYTE"}  \>{\em \HDSref\ type} \\
 \>$<$COMM$>$    \>\>{\tt "BYTE"}    \>{\em Comment describing type} \\
 \\
-\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :- \\
+\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified): \\
 %byteasterix
 \\
 \>TOKEN  \>SUBSTITUTE  \>\>COMMENT \\
@@ -821,14 +954,14 @@ xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
 \>$<$REV$>$     \>\>{\tt " "} \>{\em REAL to BYTE conversion} \\
 \>$<$RVBRAK$>$  \>\>{\tt " "} \>{\em Brackets for REAL to BYTE conversion} \\
 \>$<$IREV$>$    \>\>{\tt " "} \>{\em INTEGER to BYTE conversion} \\
-\>$<$IRVBRAK$>$ \>\>{\tt " "} \>{\em Brackets for INTEGER to BYTE conversion} \\                          
+\>$<$IRVBRAK$>$ \>\>{\tt " "} \>{\em Brackets for INTEGER to BYTE conversion} \\
 \end{tabbing}
 To produce the UNSIGNED BYTE version of a program, the following
-substitutions are made :-
+substitutions are made.
 %usbytekernal
 \begin{tabbing}
 xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
-\>{\bf Kernel} tokens (translated by default) :- \\
+\>{\bf Kernel} tokens (translated by default): \\
 \\ 
 \>TOKEN     \>SUBSTITUTE     \>\>COMMENT \\
 \\
@@ -836,10 +969,10 @@ xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
 \>$<$TYPE$>$    \>\>{\tt "BYTE"}   \>{\em Argument type definition} \\
 \>$<$LTYPE$>$   \>\>{\tt "BYTE"}   \>{\em Local type definition} \\
 \>$<$CONST$>$   \>\>{\tt " "}      \>{\em String to be appended to constant}\\
-\>$<$HTYPE$>$   \>\>{\tt "\_UBYTE"}  \>{\em HDS type} \\
+\>$<$HTYPE$>$   \>\>{\tt "\_UBYTE"}  \>{\em \HDS\ type} \\
 \>$<$COMM$>$    \>\>{\tt "UNSIGNED BYTE"} \>{\em Comment describing type} \\
 \\
-\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :-\\
+\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified):\\
 %usbyteasterix
 xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
 \\ 
@@ -864,11 +997,11 @@ conversion}\\
 \\
 \end{tabbing}
 To produce the CHARACTER version of a program, the following
-substitutions are made :-
+substitutions are made.
 %cHarkernal
 \begin{tabbing}
 xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
-\>{\bf Kernel} tokens (translated by default) :-\\
+\>{\bf Kernel} tokens (translated by default):\\
 \\
 \>TOKEN      \>SUBSTITUTE     \>\> COMMENT \\
 \\
@@ -877,10 +1010,10 @@ xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
 \>$<$LTYPE$>$ \>{\tt "CHARACTER*$<$CHASIZ$>$"} \>\>{\em Local type definition (CHASIZ = 200 by default)} \\
 \>$<$CONST$>$ \>{\tt "?"}            \>\>{\em String to be appended to 
 constant} \\
-\>$<$HTYPE$>$ \>{\tt "\_CHAR"}       \>\>{\em HDS type} \\
+\>$<$HTYPE$>$ \>{\tt "\_CHAR"}       \>\>{\em \HDS\ type} \\
 \>$<$COMM$>$  \>{\tt "CHARACTER"}    \>\>{\em Comment describing type} \\
 \\
-\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :- \\
+\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified): \\
 %charasterix
 \\
 \>TOKEN      \>SUBSTITUTE     \>\> COMMENT \\
@@ -900,11 +1033,11 @@ conversion}\\
 conversion} \\
 \end{tabbing}
 To produce the DOUBLE PRECISION version of a program, the following
-substitutions are made :-
+substitutions are made.
 %dpkernal
 \begin{tabbing}
 xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
-\>{\bf Kernel} tokens (translated by default) :-\\
+\>{\bf Kernel} tokens (translated by default):\\
 \\
 \>TOKEN     \>SUBSTITUTE  \>\>COMMENT \\
 \\
@@ -913,13 +1046,13 @@ xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
 \>$<$LTYPE$>$ \>{\tt "DOUBLE PRECISION"}\>\>{\em Local type definition}\\
 \>$<$CONST$>$ \>{\tt ".0D0"}            \>\>{\em String to be appended to 
 constant} \\
-\>$<$HTYPE$>$ \>{\tt "\_DOUBLE"}        \>\>{\em HDS type}\\
+\>$<$HTYPE$>$ \>{\tt "\_DOUBLE"}        \>\>{\em \HDS\ type}\\
 \>$<$COMM$>$  \>{\tt "DOUBLE PRECISION"}\>\>{\em Comment describing type}\\
 \end{tabbing}
-\newpage                 
+%\newpage                 
 \begin{tabbing}
 xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
-\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :-\\
+\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified):\\
 %dpasterix
 \\
 \>TOKEN  \>SUBSTITUTE  \>\>COMMENT \\
@@ -943,11 +1076,11 @@ conversion}\\
 PRECISION conversion}\\
 \end{tabbing}
 To produce the INTEGER version of a program, the following substitutions
-are made :-
+are made.
 %intkernal
 \begin{tabbing}
 xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
-\>{\bf Kernel} tokens (translated by default) :-\\
+\>{\bf Kernel} tokens (translated by default):\\
 \\
 \>TOKEN  \>SUBSTITUTE   \>\>COMMENT\\
 \\
@@ -955,10 +1088,10 @@ xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
 \>$<$TYPE$>$  \>\>{\tt "INTEGER"}   \>{\em Argument type definition}\\
 \>$<$LTYPE$>$ \>\>{\tt "INTEGER"}   \>{\em Local type definition}\\
 \>$<$CONST$>$ \>\>{\tt " "}         \>{\em String to be appended to constant}\\
-\>$<$HTYPE$>$ \>\>{\tt "\_INTEGER"} \>{\em HDS type}\\
+\>$<$HTYPE$>$ \>\>{\tt "\_INTEGER"} \>{\em \HDS\ type}\\
 \>$<$COMM$>$  \>\>{\tt "INTEGER"}   \>{\em Comment describing type}\\
 \\                                 
-\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :-\\
+\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified).\\
 %intasterix
 \\
 \>TOKEN  \>SUBSTITUTE   \>\>COMMENT\\
@@ -980,11 +1113,11 @@ conversion}\\
 conversion}\\
 \end{tabbing}
 To produce the LOGICAL version of a program, the following substitutions
-are made :-
+are made.
 %logkernal
 \begin{tabbing}
 xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
-\>{\bf Kernel} tokens (translated by default) :-\\
+\>{\bf Kernel} tokens (translated by default):\\
 \\
 \>TOKEN      \>SUBSTITUTE      \>\>COMMENT \\
 \\
@@ -993,10 +1126,10 @@ xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
 \>$<$LTYPE$>$    \>\>{\tt "LOGICAL"}   \>{\em Local type definition}\\
 \>$<$CONST$>$    \>\>{\tt " "}         \>{\em String to be appended to 
 constant}\\
-\>$<$HTYPE$>$    \>\>{\tt "\_LOGICAL"} \>{\em HDS type}\\
+\>$<$HTYPE$>$    \>\>{\tt "\_LOGICAL"} \>{\em \HDS\ type}\\
 \>$<$COMM$>$     \>\>{\tt "LOGICAL"}   \>{\em Comment describing type}\\ 
 \\                                            
-\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :-\\
+\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified).\\
 %logasterix
 \\
 \>TOKEN      \>SUBSTITUTE      \>\>COMMENT\\
@@ -1015,11 +1148,11 @@ conversion}\\
 conversion}\\
 \end{tabbing}
 To produce the REAL version of a program, the following substitutions
-are made :-
+are made.
 %realkernal
 \begin{tabbing}
 xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
-\>{\bf Kernel} tokens (translated by default) :-\\
+\>{\bf Kernel} tokens (translated by default):\\
 \\
 \>TOKEN      \>SUBSTITUTE      \>\>COMMENT\\
 \\
@@ -1027,10 +1160,10 @@ xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
 \>$<$TYPE$>$  \>\>{\tt "REAL"}  \>{\em Argument type definition}\\
 \>$<$LTYPE$>$ \>\>{\tt "REAL"}  \>{\em Local type definition}\\
 \>$<$CONST$>$ \>\>{\tt ".0E0"}  \>{\em String to be appended to constant}\\
-\>$<$HTYPE$>$ \>\>{\tt "\_REAL"} \>{\em HDS type}\\
+\>$<$HTYPE$>$ \>\>{\tt "\_REAL"} \>{\em \HDS\ type}\\
 \>$<$COMM$>$  \>\>{\tt "REAL"}  \>{\em Comment describing type}\\
 \\
-\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :-\\
+\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified).\\
 %realasterix
 \\
 \>TOKEN      \>SUBSTITUTE      \>\>COMMENT\\
@@ -1047,11 +1180,11 @@ xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
 \>$<$IRVBRAK$>$  \>\>{\tt ")"} \>{\em Brackets for INTEGER to REAL conversion}\\
 \end{tabbing}           
 To produce the WORD version of a program, the following substitutions
-are made :-
+are made.
 %wordkernal
 \begin{tabbing}
 xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
-\>{\bf Kernel} tokens (translated by default) :-\\
+\>{\bf Kernel} tokens (translated by default):\\
 \\
 \>TOKEN      \>SUBSTITUTE     \>\>COMMENT\\
 \\
@@ -1059,10 +1192,10 @@ xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
 \>$<$TYPE$>$  \>\>{\tt "INTEGER*2"} \>{\em Argument type definition}\\
 \>$<$LTYPE$>$ \>\>{\tt "INTEGER*2"} \>{\em Local type definition}\\
 \>$<$CONST$>$ \>\>{\tt " "}         \>{\em String to be appended to constant}\\
-\>$<$HTYPE$>$ \>\>{\tt "\_WORD"}    \>{\em HDS type}\\
+\>$<$HTYPE$>$ \>\>{\tt "\_WORD"}    \>{\em \HDS\ type}\\
 \>$<$COMM$>$  \>\>{\tt "WORD"}      \>{\em Comment describing type}\\
 \\                                         
-\>ASTERIX tokens (translated when /ASTERIX is specified) :-\\
+\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified).\\
 %wordasterix
 \\
 \>TOKEN      \>SUBSTITUTE      \>\>COMMENT\\
@@ -1079,11 +1212,11 @@ xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
 \>$<$IRVBRAK$>$  \>\>{\tt " "} \>{\em Brackets for INTEGER to WORD conversion}\\
 \end{tabbing}                             
 To produce the UNSIGNED WORD version of a program, the following
-substitutions are made :-
+substitutions are made.
 %uswordkernal
 \begin{tabbing}
 xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
-\>{\bf Kernel} tokens (translated by default) :-\\
+\>{\bf Kernel} tokens (translated by default):\\
 \\
 \>TOKEN      \>SUBSTITUTE     \>\>COMMENT\\
 \\
@@ -1091,10 +1224,10 @@ xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
 \>$<$TYPE$>$  \>\>{\tt "INTEGER*2"}     \>{\em Argument type definition}\\
 \>$<$LTYPE$>$ \>\>{\tt "INTEGER*2"}     \>{\em Local type definition}\\
 \>$<$CONST$>$ \>\>{\tt " "}         \>{\em String to be appended to constant}\\
-\>$<$HTYPE$>$ \>\>{\tt "\_UWORD"}       \>{\em HDS type}\\
+\>$<$HTYPE$>$ \>\>{\tt "\_UWORD"}       \>{\em \HDS\ type}\\
 \>$<$COMM$>$  \>\>{\tt "UNSIGNED WORD"} \>{\em Comment describing type}\\
 \\              
-\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :-\\
+\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified).\\
 %uswordasterix
 xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
 \\
@@ -1118,19 +1251,16 @@ conversion}\\
  conversion}\\
 \end{tabbing}                             
 \newpage
-\begin{center}
-{\Large\bf APPENDIX 2}
 
-{\large\bf A FULL LIST OF CONVERSION FUNCTIONS}
-\end{center}
+\section{\xlabel{ap_b}A Full List of Conversion Functions\label{ap_b}}
 
 This appendix gives the conversion functions which are available using
 the DCV utility, and describes which ones are statement functions and
-which ones are external. 
+which ones are external.
 
 The following conversions are defined as in-line statement functions in 
 `DCV\_FUN'. (They are either trivial, or are mentioned in the Fortran
-manual as legal conversions) :-
+manual as legal conversions).
 
 \begin{tabbing}
 xxxx\=xxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\=xxx\kill 
