@@ -585,6 +585,12 @@ sub guess_defaults {
 	$lang = "Bourne shell";
       } elsif ($suffix eq 'csh' ) {
 	$lang = "C-shell";
+      } elsif ($suffix eq 'tcl' ) {
+	$lang = "TCL";
+      } elsif ($suffix eq 'py' ) {
+	$lang = "Python";
+      } elsif ($suffix eq 'icl') {
+	$lang = "ICL";
       }
       $self->language( $lang ) if defined $lang;
 
@@ -592,6 +598,10 @@ sub guess_defaults {
       # now things are getting hard so assume Starlink conventions
       if ($file =~ /_(ERR|SYS|CMN|PAR)$/i ) {
 	$self->language( "Starlink Fortran 77" );
+      } elsif ($file =~ /_link(_adam)?$/) {
+	$self->language( "Bourne Shell" );
+      } elsif ($file =~ /^Makefile/) {
+	$self->language( "Makefile" );
       }
     }
   }
