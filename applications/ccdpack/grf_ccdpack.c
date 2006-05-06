@@ -1,9 +1,13 @@
 /*
+*+
 *  Name:
 *     grf_ccdpack.c
 
 *  Purpose:
 *     Implement the grf module for CCDPACK.
+
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This file implements the low level graphics functions required
@@ -17,10 +21,27 @@
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
 
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry (Starlink)
 *     RFWS: R.F. Warren-Smith (Starlink)
 *     MBT: Mark Taylor (Starlink)
+*     {enter_new_authors_here}
 
 *  History:
 *     27-JUN-1996 (DSB):
@@ -47,6 +68,12 @@
 *     10-JAN-2001 (MBT):
 *        Renamed to grf_ccdpack.c and modified text background colour
 *        handling.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 /* Macros */
@@ -137,20 +164,52 @@ int astGFlush( void ){
 *  Purpose:
 *     Flush all pending graphics to the output device.
 
-*  Synopsis:
-*     #include "grf.h"
-*     int astGFlush( void )
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This function ensures that the display device is up-to-date,
 *     by flushing any pending graphics to the output device.
 
-*  Parameters:
-*     None.
-
 *  Returned Value:
 *     A value of 0 is returned if an error occurs, and 1 is returned
 *     otherwise.
+
+*  Parameters:
+*     None.
+
+*  Synopsis:
+*     #include "grf.h"
+*     int astGFlush( void )
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 */
@@ -168,12 +227,19 @@ int astGLine( int n, const float *x, const float *y ){
 *  Purpose:
 *     Draw a polyline (i.e. a set of connected lines).
 
-*  Synopsis:
-*     #include "grf.h"
-*     int astGLine( int n, const float *x, const float *y )
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This function displays lines joining the given positions.
+
+*  Returned Value:
+*     A value of 0 is returned if an error occurs, and 1 is returned
+*     otherwise.
+
+*  Notes:
+*     -  Nothing is done if "n" is less than 2, or if a NULL pointer is
+*     given for either "x" or "y".
 
 *  Parameters:
 *     n
@@ -183,13 +249,38 @@ int astGLine( int n, const float *x, const float *y ){
 *     y 
 *        A pointer to an array holding the "n" y values.
 
-*  Returned Value:
-*     A value of 0 is returned if an error occurs, and 1 is returned
-*     otherwise.
+*  Synopsis:
+*     #include "grf.h"
+*     int astGLine( int n, const float *x, const float *y )
 
-*  Notes:
-*     -  Nothing is done if "n" is less than 2, or if a NULL pointer is
-*     given for either "x" or "y".
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 */
@@ -207,12 +298,19 @@ int astGMark( int n, const float *x, const float *y, int type ){
 *  Purpose:
 *     Draw a set of markers.
 
-*  Synopsis:
-*     #include "grf.h"
-*     int astGMark( int n, const float *x, const float *y, int type )
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This function displays markers at the given positions.
+
+*  Returned Value:
+*     A value of 0 is returned if an error occurs, and 1 is returned
+*     otherwise.
+
+*  Notes:
+*     -  Nothing is done if "n" is less than 1, or if a NULL pointer is
+*     given for either "x" or "y".
 
 *  Parameters:
 *     n
@@ -225,13 +323,38 @@ int astGMark( int n, const float *x, const float *y, int type ){
 *        An integer which can be used to indicate the type of marker symbol
 *        required.
 
-*  Returned Value:
-*     A value of 0 is returned if an error occurs, and 1 is returned
-*     otherwise.
+*  Synopsis:
+*     #include "grf.h"
+*     int astGMark( int n, const float *x, const float *y, int type )
 
-*  Notes:
-*     -  Nothing is done if "n" is less than 1, or if a NULL pointer is
-*     given for either "x" or "y".
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 */
@@ -250,14 +373,22 @@ int astGText( const char *text, float x, float y, const char *just,
 *  Purpose:
 *     Draw a character string.
 
-*  Synopsis:
-*     #include "grf.h"
-*     int astGText( const char *text, float x, float y, const char *just,
-*                   float upx, float upy )
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This function displays a character string at a given position
 *     using a specified justification and up-vector.
+
+*  Returned Value:
+*     A value of 0 is returned if an error occurs, and 1 is returned
+*     otherwise.
+
+*  Notes:
+*     -  Any graphics within the rotated box enclosing the text are erased.
+*     -  A NULL value for "just" causes a value of "CC" to be used.
+*     -  Both "upx" and "upy" being zero causes an error.
+*     -  Any unrecognised character in "just" causes an error.
 
 *  Parameters:
 *     text 
@@ -289,15 +420,40 @@ int astGText( const char *text, float x, float y, const char *just,
 *        to ensure that positive values always refer to displacements from 
 *        bottom to top on the screen.
 
-*  Returned Value:
-*     A value of 0 is returned if an error occurs, and 1 is returned
-*     otherwise.
+*  Synopsis:
+*     #include "grf.h"
+*     int astGText( const char *text, float x, float y, const char *just,
+*                   float upx, float upy )
 
-*  Notes:
-*     -  Any graphics within the rotated box enclosing the text are erased.
-*     -  A NULL value for "just" causes a value of "CC" to be used.
-*     -  Both "upx" and "upy" being zero causes an error.
-*     -  Any unrecognised character in "just" causes an error.
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -413,9 +569,8 @@ int astGAxScale( float *alpha, float *beta ){
 *  Purpose:
 *     Get the axis scales.
 
-*  Synopsis:
-*     #include "grf.h"
-*     int astGAxScale( float *alpha, float *beta )
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This function returns two values (one for each axis) which scale
@@ -426,6 +581,10 @@ int astGAxScale( float *alpha, float *beta ){
 *        2 - X values increase from left to right.
 *        3 - Y values increase from bottom to top.
 
+*  Returned Value:
+*     A value of 0 is returned if an error occurs, and 1 is returned
+*     otherwise.
+
 *  Parameters:
 *     alpha
 *        A pointer to the location at which to return the scale for the
@@ -434,9 +593,38 @@ int astGAxScale( float *alpha, float *beta ){
 *        A pointer to the location at which to return the scale for the
 *        Y axis (i.e. Ynorm = beta*Yworld).
 
-*  Returned Value:
-*     A value of 0 is returned if an error occurs, and 1 is returned
-*     otherwise.
+*  Synopsis:
+*     #include "grf.h"
+*     int astGAxScale( float *alpha, float *beta )
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 */
@@ -474,16 +662,26 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 *  Purpose:
 *     Get the extent of a character string.
 
-*  Synopsis:
-*     #include "grf.h"
-*     int astGTxExt( const char *text, float x, float y, const char *just,
-*                   float upx, float upy, float *xb, float *yb )
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This function returns the corners of a box which would enclose the 
 *     supplied character string if it were displayed using astGText.
 *
 *     The returned box INCLUDES any leading or trailing spaces.
+
+*  Returned Value:
+*     A value of 0 is returned if an error occurs, and 1 is returned
+*     otherwise.
+
+*  Notes:
+*     -  The order of the corners is anti-clockwise (in world coordinates)
+*        starting at the bottom left.
+*     -  A NULL value for "just" causes a value of "CC" to be used.
+*     -  Both "upx" and "upy" being zero causes an error.
+*     -  Any unrecognised character in "just" causes an error.
+*     -  Zero is returned for all bounds of the box if an error occurs.
 
 *  Parameters:
 *     text 
@@ -521,17 +719,39 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 *        An array of 4 elements in which to return the y coordinate of
 *        each corner of the bounding box.
 
-*  Returned Value:
-*     A value of 0 is returned if an error occurs, and 1 is returned
-*     otherwise.
+*  Synopsis:
+*     #include "grf.h"
+*     int astGTxExt( const char *text, float x, float y, const char *just,
+*                   float upx, float upy, float *xb, float *yb )
 
-*  Notes:
-*     -  The order of the corners is anti-clockwise (in world coordinates)
-*        starting at the bottom left.
-*     -  A NULL value for "just" causes a value of "CC" to be used.
-*     -  Both "upx" and "upy" being zero causes an error.
-*     -  Any unrecognised character in "just" causes an error.
-*     -  Zero is returned for all bounds of the box if an error occurs.
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 */
@@ -732,13 +952,16 @@ int astGQch( float *chv, float *chh ){
 *  Purpose:
 *     Return the character height in world coordinates.
 
-*  Synopsis:
-*     #include "grf.h"
-*     int astGQch( float *chv, float *chh )
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This function returns the heights of characters drawn vertically and
 *     horizontally in world coordinates.
+
+*  Returned Value:
+*     A value of 0 is returned if an error occurs, and 1 is returned
+*     otherwise.
 
 *  Parameters:
 *     chv
@@ -750,9 +973,38 @@ int astGQch( float *chv, float *chh ){
 *        characters drawn vertically. This will be an increment in the Y
 *        axis.
 
-*  Returned Value:
-*     A value of 0 is returned if an error occurs, and 1 is returned
-*     otherwise.
+*  Synopsis:
+*     #include "grf.h"
+*     int astGQch( float *chv, float *chh )
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 */
@@ -806,14 +1058,17 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
 *  Purpose:
 *     Enquire or set a graphics attribute value.
 
-*  Synopsis:
-*     #include "grf.h"
-*     int int astGAttr( int attr, double value, double *old_value, int prim )
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This function returns the current value of a specified graphics
 *     attribute, and optionally establishes a new value. The supplied
 *     value is converted to an integer value if necessary before use.
+
+*  Returned Value:
+*     A value of 0 is returned if an error occurs, and 1 is returned
+*     otherwise.
 
 *  Parameters:
 *     attr
@@ -838,11 +1093,38 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
 *           GRF__MARK
 *           GRF__TEXT
 
-*  Returned Value:
-*     A value of 0 is returned if an error occurs, and 1 is returned
-*     otherwise.
+*  Synopsis:
+*     #include "grf.h"
+*     int int astGAttr( int attr, double value, double *old_value, int prim )
 
-*  Notes:
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 */

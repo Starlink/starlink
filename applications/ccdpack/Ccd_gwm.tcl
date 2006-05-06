@@ -2,11 +2,14 @@
 #  Name:
 #     Ccd::gwm
 
-#  Type of Module:
-#     [incr Tcl] class
-
 #  Purpose:
 #     Defines a scrollable, resizable gwm based widget.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tcl] class
 
 #  Description:
 #     This routine defines a widget class based around the gwm canvas
@@ -17,26 +20,7 @@
 #     reconfiguration event) or if the configuration cantrolling the
 #     canvas size are changed.
 
-#  Invocations:
-#
-#        Ccd::gwm window [-option value]...
-#
-#     This command create an instance of a "scrollable gwm widget" and
-#     returns a command "window" for manipulating it via the methods and
-#     configuration options described below. Configuration options may
-#     be appended to the command.
-#
-#        window configure -configuration_options value
-#
-#     Applies any of the configuration options (after the widget
-#     instance has been created).
-#
-#        window method arguments
-#
-#     Performs the given method on this widget.
-
-#  Configuration options:
-#
+#  Configuration Options:
 #        -gwmname name
 #
 #     Defines the GWM widget name (as recognised by GNS). Defaults to 
@@ -58,11 +42,11 @@
 #      the size of the canvas.
 #
 #        -width width
-#    
+#
 #      Define the viewable width of the canvas (the bit you see).
 #
 #        -height height
-#    
+#
 #      Define the viewable height of the canvas.
 #
 #        -tags tag
@@ -81,17 +65,37 @@
 #
 #      Minimum number of colours that are required. KAPPA lutcol 
 #      requires 34 so this is the default value.
-#      
+
+#  Inheritance:
+#     This class inherits "Ccd::base" and its methods and configuration
+#     options, which are not directly occluded by those specified here.
+
+#  Invocations:
+#        Ccd::gwm window [-option value]...
+#
+#     This command create an instance of a "scrollable gwm widget" and
+#     returns a command "window" for manipulating it via the methods and
+#     configuration options described below. Configuration options may
+#     be appended to the command.
+#
+#        window configure -configuration_options value
+#
+#     Applies any of the configuration options (after the widget
+#     instance has been created).
+#
+#        window method arguments
+#
+#     Performs the given method on this widget.
 
 #  Methods:
 #     constructor [-option value]...
 #        This method is invoked automatically by the class command and
-#	 creates the "class " widget with a default configuration,
-#	 except when overridden by command line options.
+#         creates the "class " widget with a default configuration,
+#         except when overridden by command line options.
 #     configure [-option value]...
 #        Activates the configuration options. If no configuration value
-#	 is given then the current value of any known option is returned
-#	 in a form similar (but not identical to) the Tk widget command.
+#         is given then the current value of any known option is returned
+#         in a form similar (but not identical to) the Tk widget command.
 #     method do args
 #        This method provides access to the canvas. The args are those
 #        you would use in a command to control the canvas.
@@ -107,9 +111,26 @@
 #        not be used outside of the class definitions.
 #        description
 
-#  Inheritance:
-#     This class inherits "Ccd::base" and its methods and configuration
-#     options, which are not directly occluded by those specified here.
+#  Copyright:
+#     Copyright (C) 1995, 2000 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -118,12 +139,15 @@
 
 #  History:
 #     26-SEP-1995 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     12-MAY-2000 (MBT):
 #        Upgraded to Tcl8.
 #     27-JAN-2006 (PDRAPER):
 #        Updated to itcl::class syntax.
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

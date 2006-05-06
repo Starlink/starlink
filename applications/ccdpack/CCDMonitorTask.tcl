@@ -3,11 +3,14 @@
 #  Name:
 #     CCDMonitorTask
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     Monitors the progress (output) of a task.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
 
 #  Description:
 #     This routine monitors the text returned from a task running in
@@ -42,6 +45,26 @@
 #        should be cleared. The element ($task,progress) is set to the
 #        percentage of the task completed, if watch is true.
 
+#  Copyright:
+#     Copyright (C) 1995, 2000-2001 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
 #     MBT: Mark Taylor (STARLINK)
@@ -49,7 +72,7 @@
 
 #  History:
 #     15-MAR-1995 (PDRAPER):
-#     	 Added header.
+#        Added header.
 #     2-AUG-1995 (PDRAPER):
 #        Converted for use with the tcl ADAM extensions (instead of BLT).
 #     21-AUG-1995 (PDRAPER):
@@ -64,6 +87,9 @@
 #        to stdout, which is helpful if a bit messy.  Also removed an
 #        error reporting bug I introduced in the last change.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

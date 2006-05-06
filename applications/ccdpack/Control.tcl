@@ -3,11 +3,14 @@
 #  Name:
 #     Control
 
-#  Type of Module:
-#     [incr Tk] Mega-Widget
-
 #  Purpose:
 #     Base class for viewer controls.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tk] Mega-Widget
 
 #  Description:
 #     This class provides a base from which specific controls can inherit.  
@@ -17,11 +20,7 @@
 #     additional windows for user interaction if a button-sized area
 #     is not big enough for it.
 
-#  Public Methods:
-#
-
 #  Public Procedures:
-#
 #     max num ...
 #        Gives the maximum of all the (numeric) arguments supplied.
 #        Just here because it's useful.
@@ -29,10 +28,8 @@
 #     mim num ...
 #        Gives the minimum of all the (numeric) arguments supplied.
 #        Just here because it's useful.
-#
 
 #  Public Variables (Configuration Options):
-#
 #     balloonstr
 #        A short which will pop up in a balloon if the cursor stays over
 #        the widget for longer than a short space of time.
@@ -74,9 +71,38 @@
 #        Mega-Widget.  You'd think there was some clean way round
 #        this using Itk's complicated option handling facilities, but
 #        it doesn't seem to work properly.
-#        
+#
 #     value
 #        The value of the widget.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

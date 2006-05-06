@@ -3,11 +3,14 @@
 #  Name:
 #     CCDRestoreDirectoryMenu
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     Restores directories which have been visited to menu.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
 
 #  Description:
 #     This procedure creates commands in a menu (which is part of a
@@ -18,24 +21,44 @@
 #  Arguments:
 #     menubar = window (read)
 #        The name of (CCDPACK) menubar which is to have the commands
-#	 added to one of its menus.
+#        added to one of its menus.
 #     menu = string (read)
 #        The name of the menubar menu which is to have the commands
-#	 added.
+#        added.
 #     entry = window (read)
 #        The name of a labelled entry widget to receive the name of the
-#	 directory when the menu command is invoked.
+#        directory when the menu command is invoked.
 #     choicebar = window (read)
 #        The name of the choice bar which contains the button as a named
-#	 option.
+#        option.
 #     button = window (read)
-#	 The name of a button in a choice bar which when invoked
-#	 will perform the actual change of directory.
+#        The name of a button in a choice bar which when invoked
+#        will perform the actual change of directory.
 
-#  Global variables:
+#  Global Variables:
 #     CCDmenudirs$menu() = array (write)
 #        The list of directories previously associated with the menu.
-#	 These are indexed by the directory names.
+#        These are indexed by the directory names.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council. All
+#     Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -43,8 +66,11 @@
 
 #  History:
 #     20-APR-1994 (PDRAPER):
-#     	 {changes}
+#        {changes}
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

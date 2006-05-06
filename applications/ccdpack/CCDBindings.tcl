@@ -5,8 +5,14 @@
 #  Purpose:
 #     Defines bindings for widget events.
 
+#  Language:
+#     TCL
+
 #  Type of Module:
 #     Tcl/Tk script.
+
+#  Invocation:
+#     source CCDBindings.tcl
 
 #  Description:
 #     This file contains widget event bindings and associated
@@ -16,8 +22,26 @@
 #     code. This file (together with the Tk default bindings) defines
 #     the "feel" of applications.
 
-#  Invocation:
-#     source CCDBindings.tcl
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper ({affiliation})
@@ -25,7 +49,7 @@
 
 #  History:
 #     14-MAR-1994 (PDRAPER):
-#     	 Original version based on Xadam bindings by Dave Terrett
+#        Original version based on Xadam bindings by Dave Terrett
 #        (STARLINK) and Tk bindings by John Ousterhout.
 #     22-MAR-1995 (PDRAPER):
 #        Added bindings for global context help.
@@ -34,8 +58,11 @@
 #        enhanced Motif compatibility. No repeat bindings now allowed
 #        in this file, hence considerably simplified.
 #     {enter_changes_here}
-
+#
 #     {bugs}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

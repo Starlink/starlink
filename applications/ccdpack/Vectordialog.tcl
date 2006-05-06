@@ -3,25 +3,36 @@
 #  Name:
 #     Vectordialog
 
-#  Type of module:
-#     [incr Tk] Mega-Widget
-
 #  Purpose:
 #     Get a vector of values by user dialog.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tk] Mega-Widget
 
 #  Description:
 #     This class currently posts a dialog box consisting of a number of
 #     scale widgets.  The ranges of these can be controlled individually.
 
+#  Configuration Options:
+#     The following options take a list which must have num elements.
+#     Each one is taken in turn to apply to the corresponding control.
+#        -from list
+#           Start of scale.
+#        -label list
+#           Label used for scale.
+#        -to list
+#           End of scale.
+
 #  Constructor:
-#
 #     vectordialog number ?-option value ...?
 #        The obligatory constructor argument num gives the number of 
 #        values in the vector, which is the same as the number of scale 
 #        widgets which will appear in the dialog box.
 
 #  Public Methods:
-#
 #     activate
 #        The widget begins its life inactive.  When the activate method
 #        is called, the window will display itself.  If the -modality
@@ -34,16 +45,35 @@
 #     setvec list
 #        Set the value of the vector.  List must number elements.
 
-#  Configuration options:
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
-#     The following options take a list which must have num elements.
-#     Each one is taken in turn to apply to the corresponding control.
-#        -from list
-#           Start of scale.
-#        -label list
-#           Label used for scale.
-#        -to list
-#           End of scale.
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 #  Inheritance.

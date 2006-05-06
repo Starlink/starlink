@@ -20,7 +20,7 @@
 #     GLOBAL_PARNAME must be one of the parameters as used by CCDSETUP.
 #     These are:
 #        ADC
-#	 BOUNDS
+#        BOUNDS
 #        DEFERRED
 #        DIRECTION
 #        EXTENT
@@ -43,23 +43,44 @@
 #
 #     Lines may be continued using the character "-" at the end of the
 #     line, comments may be present. These use the characters "#" and
-#     "!".
+#
 
 #  Arguments:
 #     file = string (read)
 #        The name of the text file containing the commands used to set
-#	 the global associations.
+#        the global associations.
 
 #  Returned Value:
 #     No value is returned (see Global parameters).
 
-#  Global parameters:
+#  Global Parameters:
 #     CCDglobalpars = array (write)
 #        The resultant global parameters are set using the elements
-#	 CCDglobalpars(GLOBAL_PARNAME). If a value already exists this is
-#	 overwritten. Global parameters with no value are not set.
+#        CCDglobalpars(GLOBAL_PARNAME). If a value already exists this is
+#        overwritten. Global parameters with no value are not set.
 #     CCDsetindices = list of integers (write)
 #        The NDF Set Index values that we know about.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 2001 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -68,12 +89,15 @@
 
 #  History:
 #     22-FEB-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     4-MAR-1994 (PDRAPER):
-#     	 Now named CCDReadRestoreFile.
+#        Now named CCDReadRestoreFile.
 #     26-JUN-2001 (MBT):
 #        Upgraded for Sets.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

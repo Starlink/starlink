@@ -2,11 +2,14 @@
 #  Name:
 #     Ccd::table
 
-#  Type of Module:
-#     [incr Tcl] class
-
 #  Purpose:
 #     Defines a table widget with editable cells.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tcl] class
 
 #  Description:
 #     This file describes the class of table widget that allows the
@@ -21,26 +24,17 @@
 #     portion of table can be smaller than the actual extent allowing
 #     a much larger table to be used.
 
-#  Invocations:
+#  Notes:
+#     Efficiency: changing the number of rows and columns using the
+#     "insert" methods can be quite slow (this is because of a
+#     "update" that is necessary to get the new size of the canvas to
+#     define the scrollable region) it is much better to set the size
+#     of the table as a configuration option (with -rows and
+#     -columns), before inserting new entries.
 #
-#        Ccd::table window [-option value]...
-#
-#     This command creates an instance of a "table" and returns a
-#     command "window" for manipulating it via the methods and
-#     configuration options described below. Configuration options may
-#     be appended to the command.
-#
-#        window configure -configuration_options value
-#
-#     Applies any of the configuration options (after the widget
-#     instance has been created).
-#
-#        window method arguments
-#
-#     Performs the given method on this widget.
+#     This probably isn't the best implementation for very large tables.
 
-#  Configuration options:
-#
+#  Configuration Options:
 #        -rows number
 #
 #     Sets the numer of rows to be displayed. This value is changed if
@@ -86,6 +80,27 @@
 #     ones for moving the selection etc.). This doesn't actually 
 #     guarantee that an entry has changed, but indicates it might 
 #     have.
+
+#  Inheritance:
+#     This class inherits "Ccd::base" and its methods and configuration
+#     options, which are not directly occluded by those specified here.
+
+#  Invocations:
+#        Ccd::table window [-option value]...
+#
+#     This command creates an instance of a "table" and returns a
+#     command "window" for manipulating it via the methods and
+#     configuration options described below. Configuration options may
+#     be appended to the command.
+#
+#        window configure -configuration_options value
+#
+#     Applies any of the configuration options (after the widget
+#     instance has been created).
+#
+#        window method arguments
+#
+#     Performs the given method on this widget.
 
 #  Methods:
 #     constructor [-option value]...
@@ -176,7 +191,7 @@
 #        Sets the document and label for the help associated with 
 #        this widget as a whole.
 #
-#  Internal methods (should not be used outside of this class defintion).
+#     Internal methods (should not be used outside of this class defintion).
 #     Control of region of canvas to scroll
 #        _scrollregion {bounds}
 #     Support for selection control.
@@ -196,19 +211,26 @@
 #     in size.)
 #        _reconfigure {newwidth}
 
-#  Notes:
-#     Efficiency: changing the number of rows and columns using the
-#     "insert" methods can be quite slow (this is because of a
-#     "update" that is necessary to get the new size of the canvas to
-#     define the scrollable region) it is much better to set the size
-#     of the table as a configuration option (with -rows and
-#     -columns), before inserting new entries.
-#
-#    This probably isn't the best implementation for very large tables.
+#  Copyright:
+#     Copyright (C) 1995, 2000 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
 
-#  Inheritance:
-#     This class inherits "Ccd::base" and its methods and configuration
-#     options, which are not directly occluded by those specified here.
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -223,6 +245,9 @@
 #     27-JAN-2006 (PDRAPER):
 #        Updated to itcl::class syntax.
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

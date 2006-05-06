@@ -28,11 +28,11 @@
 #  Returned Value:
 #     No value is returned.
 
-#  Global parameters:
+#  Global Parameters:
 #     CCDglobalpars = array (write)
 #        The global parameters selected by the user are return in this
-#	 array which is indexed by the name of the CCDPACK global
-#	 parameters (i.e. CCDglobalpars(ADC) is the ADC factor).
+#        array which is indexed by the name of the CCDPACK global
+#        parameters (i.e. CCDglobalpars(ADC) is the ADC factor).
 #     CCDgloprefix = string (read and write)
 #        Keeps track of the Set Index to which the currently displayed
 #        entry panel refers.  If Sets are in use it will be the current 
@@ -43,6 +43,28 @@
 #     CCDsetindices = list of integers (read and write)
 #        The NDF Set Index values that we know about.
 
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 2000-2001 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
 #     MBT: Mark Taylor (STARLINK)
@@ -50,7 +72,7 @@
 
 #  History:
 #     22-FEB-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     21-APR-1994 (PDRAPER):
 #        Changed to use mega-widgets.
 #     22-MAR-1995 (PDRAPER):
@@ -71,6 +93,9 @@
 #     1-JAN-2006 (PDRAPER):
 #        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

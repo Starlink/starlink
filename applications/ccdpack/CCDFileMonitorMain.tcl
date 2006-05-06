@@ -5,8 +5,14 @@
 #  Purpose:
 #     Main routine for filemonitor X interface.
 
+#  Language:
+#     TCL
+
 #  Type of Module:
 #     Tcl/Tk script.
+
+#  Invocation:
+#     wish CCDFileMonitorMain file
 
 #  Description:
 #     This is the top-level routine for the X reduction interface for
@@ -14,13 +20,31 @@
 #     performs global initialisations of bindings, colours, script
 #     auto path etc.
 
-#  Invocation:
-#     wish CCDFileMonitorMain file
-
 #  Notes:
 #     This interface requires that the extensions [incr Tcl], BLT and
 #     TclADAM are available (built into the wish executable that 
 #     invokes this file).  
+
+#  Copyright:
+#     Copyright (C) 1995, 2000, 2003 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -37,6 +61,9 @@
 #     01-FEB-2006 (PDRAPER):
 #        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

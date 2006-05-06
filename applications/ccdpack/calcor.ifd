@@ -2,12 +2,33 @@
 #+
 #  Name:
 #     calcor.ifd
-      
-#  Type of Module:
-#     IFD parameter interface file.
 
 #  Language:
 #     Tcl.
+
+#  Type of Module:
+#     IFD parameter interface file.
+
+#  Copyright:
+#     Copyright (C) 1991, 1994 Science & Engineering Research Council.
+#     Copyright (C) 1999, 2001 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -16,16 +37,19 @@
 
 #  History:
 #     30-MAY-1991 (PDRAPER):
-#     	 Original Version
+#              Original Version
 #     4-JUL-1991 (PDRAPER):
-#     	 Added associations and helpkey info.
+#              Added associations and helpkey info.
 #     2-FEB-1994 (PDRAPER):
-#     	 Added KEEPIN parameter (USEEXT and TYPE already present)
+#              Added KEEPIN parameter (USEEXT and TYPE already present)
 #     6-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
 #     14-FEB-2001 (MBT):
 #        Upgraded for use with Sets.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

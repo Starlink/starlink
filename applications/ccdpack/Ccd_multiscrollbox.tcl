@@ -2,11 +2,14 @@
 #  Name:
 #     Ccd::multiscrollbox
 
-#  Type of Module:
-#     [incr Tcl] class
-
 #  Purpose:
 #     Defines a class of many scrollboxes.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tcl] class
 
 #  Description:
 #     This class description defines methods and configurations for
@@ -16,26 +19,7 @@
 #     individually. It also allows re-stacking in the vertical and
 #     horizontal directions.
 
-#  Invocations:
-#
-#        Ccd::multiscrollbox window [-option value]...
-#
-#     This command create an instance of a multiscrollbox and returns a
-#     command "window" for manipulating it via the methods and
-#     configuration options described below. Configuration options may
-#     be appended to the command.
-#
-#        window configure -configuration_options value
-#
-#     Applies any of the configuration options (after the widget
-#     instance has been created).
-#
-#        window method arguments
-#
-#     Performs the given method on this widget.
-
-#  Configuration options:
-#
+#  Configuration Options:
 #        -scrollbarplaces "place1 place2"
 #
 #     This option configures the placing of the scrollbars. These may
@@ -70,27 +54,48 @@
 #     If true then the boxes are resized in an attempt to display all
 #     the text. Default is true.
 
+#  Inheritance:
+#     This class inherits Ccd::scrollbox and its methods and configuration
+#     options, which are not directly occluded by those specified here.
+
+#  Invocations:
+#        Ccd::multiscrollbox window [-option value]...
+#
+#     This command create an instance of a multiscrollbox and returns a
+#     command "window" for manipulating it via the methods and
+#     configuration options described below. Configuration options may
+#     be appended to the command.
+#
+#        window configure -configuration_options value
+#
+#     Applies any of the configuration options (after the widget
+#     instance has been created).
+#
+#        window method arguments
+#
+#     Performs the given method on this widget.
+
 #  Methods:
 #     constructor [-option value]...
 #        This method is invoked automatically by the class command and
-#	 creates the multiscrollbox widget with a default configuration,
-#	 except when overridden by command line options.
+#        creates the multiscrollbox widget with a default configuration,
+#        except when overridden by command line options.
 #     destructor
 #        Destroys the multiscrollbox, invoked by the "delete" method.
 #     configure [-option value]...
 #        Activates the configuration options. If no configuration value
-#	 is given then the current value of any known option is returned
-#	 in a form similar (but not identical to) the Tk widget command.
+#        is given then the current value of any known option is returned
+#        in a form similar (but not identical to) the Tk widget command.
 #     insert listno index text
-#	 Insert a text string into a scrollboxes at position index.
-#	 "index" can be 0 or end which inserts at the beginning	and at
-#	 the end. If "listno" is "all" then the text is inserted into
-#	 all the listboxes.
+#        Insert a text string into a scrollboxes at position index.
+#        "index" can be 0 or end which inserts at the beginning	and at
+#        the end. If "listno" is "all" then the text is inserted into
+#        all the listboxes.
 #     clear listno first [last]
 #        Clears a range of items from the a scrollbox. If listno is
-#	 "all" then all scrollboxes are cleared. If first is "all"
-#	 then all lines are deleted. If only first is given then this
-#	 clears a single line. "last" may be set as end.
+#        "all" then all scrollboxes are cleared. If first is "all"
+#        then all lines are deleted. If only first is given then this
+#        clears a single line. "last" may be set as end.
 #     get listno index
 #        Gets the item with the given indices from the scrollbox with
 #        number listno . If "listno" is "all" then the items with
@@ -98,51 +103,68 @@
 #        all the items from a scrollbox are returned.
 #     size listno
 #        Returns the size of the listbox "listno". If listno is "all"
-#	 then all the listbox sizes are returned.
+#        then all the listbox sizes are returned.
 #     bind listno args
 #        Binds the event and procedure in args to the given list. This
-#	 uses the "bind list" method of the scrollbox. "listno" may be
-#	 "all" in which case the binding is applied to all the listboxes
-#	 in the scrollboxes.
+#        uses the "bind list" method of the scrollbox. "listno" may be
+#        "all" in which case the binding is applied to all the listboxes
+#        in the scrollboxes.
 #     wconfig listno option widget value
 #        Invokes the Ccd::base wconfig method for the named widget.
-#	 "listno" may be "all" in which case all widgets of that name
-#	 in the scrollboxes are configured. Widget is the name of the
-#	 basic widget (one of list, scrolltop, scrollright, scrollleft,
-#	 scrollbottom for the constituents of the scrollbox, see
-#	 Ccd::scrollbox).
+#        "listno" may be "all" in which case all widgets of that name
+#        in the scrollboxes are configured. Widget is the name of the
+#        basic widget (one of list, scrolltop, scrollright, scrollleft,
+#        scrollbottom for the constituents of the scrollbox, see
+#        Ccd::scrollbox).
 #     number
 #        Returns the current number of scrollboxes being used.
 #     select listno args
-#	 Sets the selection in the given listbox. The args are the an
-#	 option valid for a listbox and its qualifiers. If listno is
-#	 "all" then all listboxes are selected (requires exportselect
-#	 to be false - 0).
+#        Sets the selection in the given listbox. The args are the an
+#        option valid for a listbox and its qualifiers. If listno is
+#        "all" then all listboxes are selected (requires exportselect
+#        to be false - 0).
 #     scrollbarnames place
 #        Returns the names of the constituent scrollbars (of the
-#	 scrollboxes) which are at the given places. This function
-#	 should only be used by sub-classes and allows the
-#	 re-configuration (of configuration change commands for instance)
-#	 of non-trivial options.
+#        scrollboxes) which are at the given places. This function
+#        should only be used by sub-classes and allows the
+#        re-configuration (of configuration change commands for instance)
+#        of non-trivial options.
 #     listnames
-#	Returns the names of the constituent listboxes. This function
-#	should only be used by sub-classes and allows the
-#	re-configuration (of the x and y scrollcommands for instance)
-#	of non-trivial options.
+#        Returns the names of the constituent listboxes. This function
+#        should only be used by sub-classes and allows the
+#        re-configuration (of the x and y scrollcommands for instance)
+#        of non-trivial options.
 #     scrollbarplaces listno places
-#       Allows the re-configuration of the scrollbars of any scrollbox
-#	or all if listno is "all". (Not to be confused with the
-#	configuration option, which configures all scrollboxes)
+#        Allows the re-configuration of the scrollbars of any scrollbox
+#        or all if listno is "all". (Not to be confused with the
+#        configuration option, which configures all scrollboxes)
 #     curselection listno
 #        Returns a list of the indices of any items selected in listbox
-#	 with the given listno.
+#        with the given listno.
 #     label listno text
 #        Set the label of the listbox listno to text.
 
-#  Inheritance:
-#     This class inherits Ccd::scrollbox and its methods and configuration
-#     options, which are not directly occluded by those specified here.
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 2000-2001 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
 
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -151,12 +173,12 @@
 
 #  History:
 #     19-MAR-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     24-MAR-1994 (PDRAPER):
-#     	 Final methods.
+#        Final methods.
 #     5-MAY-1994 (PDRAPER):
-#     	 Removed complex commands from publics into internal methods so
-#	 that classes can inherit their capabilities.
+#        Removed complex commands from publics into internal methods so
+#        that classes can inherit their capabilities.
 #     4-MAY-1995 (PDRAPER):
 #        Started move to Tk4. Commented out ::rename in destructor, no
 #        longer needed.
@@ -167,6 +189,9 @@
 #     27-JAN-2006 (PDRAPER):
 #        Updated for itcl::class syntax.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

@@ -7,6 +7,9 @@
 #     Saves an import table described in two listboxes managed by the
 #     CCDCreateImportTable interface. 
 
+#  Language:
+#     TCL
+
 #  Type of Module:
 #     Tcl/Tk procedure
 
@@ -23,16 +26,36 @@
 #        The name of a file to contain the saved import information.
 #     fitsbox = window (read)
 #        The name of a listbox which contains type and keyword names
-#	 of FITS items to be extracted from the FITS block.
+#        of FITS items to be extracted from the FITS block.
 #     extenbox = window (read)
 #        The name of a listbox which contains the names of the
-#	 destination extension items and the expressions of FITS
-#	 keywords which result in a value.
+#        destination extension items and the expressions of FITS
+#        keywords which result in a value.
 
 #  Returned Value:
 #     CCDSaveImportTable = boolean
 #        If a file is written successfully then this returns true (1)
-#	 otherwise false (0)
+#        otherwise false (0)
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council. All
+#     Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -40,8 +63,11 @@
 
 #  History:
 #     7-MAR-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

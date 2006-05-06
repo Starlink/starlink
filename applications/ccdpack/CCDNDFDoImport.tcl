@@ -24,35 +24,35 @@
 #        If present this should be a command to run if the NDF import
 #        runs successfully (such as enabling commands for the next section).
 
-#  Global variables:
+#  Global Variables:
 #     CCDhaveframe = array (read)
 #        This is a boolean array which has flags indicating which of the
-#	 available frame types are to be imported into the system. The
-#	 indices of this array are:
-#	    (targets)
-#	    (flatfields)
-#	    (biases)
-#	    (darks)
-#	    (flashes)
-#	    (master_biases)
-#	    (master_flats)
-#	    (master_darks)
-#	    (master_flashes)
+#        available frame types are to be imported into the system. The
+#        indices of this array are:
+#            (targets)
+#            (flatfields)
+#            (biases)
+#            (darks)
+#            (flashes)
+#            (master_biases)
+#            (master_flats)
+#            (master_darks)
+#            (master_flashes)
 #     CCDsame = array (read)
 #        This array indicates the answer to the questions about
 #        the presence of different filters, and whether or not the darks
-#	 and flashes have different exposure times. The indices are:
-#           (filter)
-#	    (darks)
-#	    (flashes)
-#	 The values are either 1 (true) or 0 (false).
+#        and flashes have different exposure times. The indices are:
+#            (filter)
+#            (darks)
+#            (flashes)
+#        The values are either 1 (true) or 0 (false).
 #     CCDfilternames = string (read)
 #        The names of any known filters. These are separated by
-#	 whitespace or commas.
+#        whitespace or commas.
 #     CCDndfs = array (write)
 #        The names of the NDFs. This array is indexed by the frame types
-#	 ("targets", "flatfields", "biases", "darks" and "flashes" ) and
-#	 also by the filter type if used (this is the second index).
+#        ("targets", "flatfields", "biases", "darks" and "flashes" ) and
+#        also by the filter type if used (this is the second index).
 #     CCDfactors = array (read)
 #        Any previous exposure factors (dark and flash times). These
 #        are indexed by frame type, filter (if any) and darks or
@@ -77,6 +77,28 @@
 #        Name of scrollbox/table with master dark frame.
 #     Masterflash = variable (write)
 #        Name of scrollbox/table with master pre-flash frame.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 2000 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)

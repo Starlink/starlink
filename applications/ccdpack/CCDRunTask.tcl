@@ -3,11 +3,14 @@
 #  Name:
 #     CCDRunApp
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     Runs an application.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
 
 #  Description:
 #     This routine runs an application of an ADAM task loaded using
@@ -54,8 +57,8 @@
 #        optional arguments must give the name of the window controlling
 #        the busy window.  A second optional argument may be given
 #        specifying the text to write in the busy window.
-
-#  Global variables (of note):
+#
+#     Global variables (of note):
 #     CCDdir = string (read)
 #        The CCDPACK binary directory.
 #     CCDseetasks = boolean (read)
@@ -89,6 +92,27 @@
 #     The wait bar mechanisms are CCDPACK specific and should be
 #     generalised for other use.
 
+#  Copyright:
+#     Copyright (C) 1995, 2000-2001 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
 #     MBT: Mark Taylor (STARLINK)
@@ -96,7 +120,7 @@
 
 #  History:
 #     14-MAR-1995 (PDRAPER):
-#     	 Tidied up and added header.
+#        Tidied up and added header.
 #     1-JUN-1995 (PDRAPER):
 #        Removed built-in keyboard traversal.
 #     20-JUL-1995 (PDRAPER):
@@ -122,6 +146,9 @@
 #     1-JAN-2006 (PDRAPER):
 #        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

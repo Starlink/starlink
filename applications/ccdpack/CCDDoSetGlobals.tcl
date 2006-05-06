@@ -26,9 +26,6 @@ proc CCDDoSetGlobals { Top type } {
 #        EXTENT, DIRECTION, BOUNDS, ADC, RNOISE, MASK, DEFERRED and
 #        SATURATION
 
-#  Return value:
-#     Returns 0 if MASK file is not located, 1 otherwise.
-
 #  Arguments:
 #     Top = window (read)
 #        Name of the top-level window that is running this
@@ -38,10 +35,34 @@ proc CCDDoSetGlobals { Top type } {
 #        One of "general" or "CCD". This defines which parameters will
 #        be checked by this call.
 
-#  Global variables:
+#  Global Variables:
 #      CCDglobalpars = array (read)
 #         The array of all the currently defined global
 #         parameters. The indices are ADC, MASK etc.
+
+#  Return Value:
+#     Returns 0 if MASK file is not located, 1 otherwise.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -60,7 +81,6 @@ proc CCDDoSetGlobals { Top type } {
 #        Recoded again. Now doesn't run any applications. The globals
 #        are now cleared when the GUI runs up.
 #     {enter_changes_here}
-
 
 #  Bugs:
 #     {note_any_bugs_here}

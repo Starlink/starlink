@@ -4,11 +4,14 @@ proc CCDTaskStart { app } {
 #  Name:
 #     CCDTaskStart
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     Starts the monolith associated with an application.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
 
 #  Description:
 #     This routine checks if the monolith associated with an
@@ -19,11 +22,7 @@ proc CCDTaskStart { app } {
 #        Name of the application that will be run. The associated
 #        monolith is loaded here.
 
-#  Return value:
-#     CCDTaskStart = boolean 
-#        Returns 1 if ok, 0 otherwise (failed to load monolith).
-
-#  Global variables:
+#  Global Variables:
 #     MONOLITH = array (read)
 #        This variable describes the known monoliths, the name of
 #        their executable, their status and the command name associated 
@@ -50,14 +49,41 @@ proc CCDTaskStart { app } {
 #
 #        Only the (name,monolith) element is used by this routine.
 
+#  Return Value:
+#     CCDTaskStart = boolean 
+#        Returns 1 if ok, 0 otherwise (failed to load monolith).
+
+#  Copyright:
+#     Copyright (C) 1995 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
 #     11-OCT-1995 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
    global TASK

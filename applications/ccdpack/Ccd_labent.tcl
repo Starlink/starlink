@@ -2,35 +2,20 @@
 #  Name:
 #     Ccd::labent
 
-#  Type of Module:
-#     [incr Tcl] class
-
 #  Purpose:
 #     Defines widget consisting of an label and an entry widget.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tcl] class
 
 #  Description:
 #     This routine defines a widget class which consist of a label
 #     widget and an entry widget. A labelled entry widget.
 
-#  Invocations:
-#
-#        Ccd::labent window 
-#
-#     Returns a command "window" which is available in the global scope.
-#     This may be optionally followed by any of the configuration
-#     options.
-#
-#        window configure -configuration_options value
-#
-#     Applies any of the configuration options (after the widget
-#     instance has been created).
-#
-#        window method arguments
-#
-#     Performs the given method on this widget.
-
-#  Configuration options:
-#
+#  Configuration Options:
 #        -text  "string"
 #
 #     Set the text string of the label widget. Defaults to "label".
@@ -57,35 +42,6 @@
 #     Sets the state of the entry widget. Disabled means that text
 #     cannot be entered.
 
-#  Methods:
-#     constructor
-#        Creates the widget command.
-#
-#        This method is invoked automatically when the class is asked to
-#	 create an object. It is also invoked by classes which inherit
-#	 from this class (this happens after the constructor method of
-#	 the inheriting class unless the constructor of this class is
-#	 invoked explicitly). 
-#     destructor
-#        Deletes the widget command via the "delete" method.
-#     configure
-#        Activates the configuration options. 
-#     get
-#        Returns the contents of the entry widget.
-#     clear args
-#        Clears the contents of the entry widget. The args are those
-#	 which the entry widget "delete" command expects. I.e. a first
-#	 and (optional) last index.
-#     insert args
-#        Inserts text into the entry widget. The args are those used by
-#	 the entry widget. I.e. an index and the text string.
-#     sethelp document label.
-#        Sets the context sensitive help information for all the 
-#        components of the meta-widget that exist. $document should be
-#        the name of a HTML document and $label the label (HTML
-#        anchor) within the document that identifies the part to be
-#        displayed. 
-
 #  Inheritance:
 #     This widget inherits methods and configuration options from the
 #     following superclasses.
@@ -95,6 +51,73 @@
 #     These should be consulted for the methods and options which they
 #     supply.
 
+#  Invocations:
+#        Ccd::labent window 
+#
+#     Returns a command "window" which is available in the global scope.
+#     This may be optionally followed by any of the configuration
+#     options.
+#
+#        window configure -configuration_options value
+#
+#     Applies any of the configuration options (after the widget
+#     instance has been created).
+#
+#        window method arguments
+#
+#     Performs the given method on this widget.
+
+#  Methods:
+#     constructor
+#        Creates the widget command.
+#
+#        This method is invoked automatically when the class is asked to
+#        create an object. It is also invoked by classes which inherit
+#        from this class (this happens after the constructor method of
+#        the inheriting class unless the constructor of this class is
+#        invoked explicitly). 
+#     destructor
+#        Deletes the widget command via the "delete" method.
+#     configure
+#        Activates the configuration options. 
+#     get
+#        Returns the contents of the entry widget.
+#     clear args
+#        Clears the contents of the entry widget. The args are those
+#        which the entry widget "delete" command expects. I.e. a first
+#        and (optional) last index.
+#     insert args
+#        Inserts text into the entry widget. The args are those used by
+#        the entry widget. I.e. an index and the text string.
+#     sethelp document label.
+#        Sets the context sensitive help information for all the 
+#        components of the meta-widget that exist. $document should be
+#        the name of a HTML document and $label the label (HTML
+#        anchor) within the document that identifies the part to be
+#        displayed. 
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 2000 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
 #     MBT: Mark Taylor (STARLINK)
@@ -102,7 +125,7 @@
 
 #  History:
 #     22-MAR-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     22-MAR-1995 (PDRAPER):
 #        Added sethelp method.
 #     4-MAY-1995 (PDRAPER):
@@ -115,6 +138,9 @@
 #     27-JAN-2006 (PDRAPER):
 #        Updated for itcl::class syntax.
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

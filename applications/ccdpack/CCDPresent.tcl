@@ -31,7 +31,7 @@
 #        If present this should be a command to run if the NDF import
 #        runs successfully (such as enabling commands for the next section).
 
-#  Global variables:
+#  Global Variables:
 #     CCDndfs = array (read)
 #        This array contains the names of all known NDFs. The indices of the
 #        array the either the names of the frame types (which are -
@@ -64,6 +64,27 @@
 #        Task control block. Use TASK(present,error) to check status
 #        of task on exit.
 
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 2001 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
 #     MBT: Mark Taylor (STARLINK)
@@ -77,6 +98,9 @@
 #     19-JUN-2001 (MBT):
 #        Added missing global declaration of TASK.
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

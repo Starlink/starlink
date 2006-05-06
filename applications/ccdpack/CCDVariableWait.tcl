@@ -3,11 +3,14 @@
 #  Name:
 #     CCDVariableWait
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     Waits for a global variable to be set.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
 
 #  Description:
 #     This procedure waits for the named global variable to be
@@ -21,7 +24,7 @@
 #  Arguments:
 #     variable = string (read)
 #        The name of a global variable which needs to be modified before
-#	 proceeding.
+#        proceeding.
 #     Top = window (read)
 #        The name of a top-level window which will probably modify the
 #        variable and which needs to have all events grabbed for it.
@@ -29,8 +32,29 @@
 #        The name of the window to receive focus, part of $Top (see also bit).
 #     bit = string (read)
 #        If focus window is a mega-widget the focus is set using a
-#	 "$focus focus $bit" command. If this is {} then the ordinary
-#	 focus command is used.
+#        "$focus focus $bit" command. If this is {} then the ordinary
+#        focus command is used.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 2000 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -39,12 +63,15 @@
 
 #  History:
 #     4-MAY-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     4-MAY-1995 (PDRAPER):
 #        Started move to Tk4.
 #     16-MAY-2000 (MBT):
 #        Upgraded to Tcl8.
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

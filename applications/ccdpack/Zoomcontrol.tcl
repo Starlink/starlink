@@ -3,18 +3,20 @@
 #  Name:
 #     Zoomcontrol
 
-#  Type of Module:
-#     [incr Tk] Mega-Widget
-
 #  Purpose:
 #     Control widget for selecting a zoom level.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tk] Mega-Widget
 
 #  Description:
 #     This control provides an interface from which the user can select
 #     a zoom level for image display.
 
 #  Public Methods:
-#
 #     zoominc factor inc
 #        This method is provided for doing arithmetic on zoomfactors;
 #        the factor argument is a possible contents of the "value" 
@@ -26,7 +28,6 @@
 #        public variable.  This method respects the max and min limits.
 
 #  Public Variables (Configuration Options):
-#
 #     max
 #        The maximum value that the value variable may take.
 #
@@ -39,6 +40,35 @@
 #
 #     Zoomcontrol also inherits all the public variables of the Control
 #     widget.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

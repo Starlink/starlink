@@ -2,11 +2,14 @@
 #  Name:
 #     CCDOptions
 
-#  Type of Module:
-#     Tcl/Tk commands
-
 #  Purpose:
 #     Sets the default look for a CCDPACK Tcl/Tk application.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk commands
 
 #  Invocation:
 #     source CCDOptions
@@ -25,6 +28,28 @@
 #     really be startupFile to allow .Xdefaults to override, but these
 #     generally look horrid.
 
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 2000 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
 #     MBT: Mark Taylor (STARLINK)
@@ -34,7 +59,7 @@
 #     11-MAR-1994 (PDRAPER):
 #        Original version. Colours based on Tix grey schemes by Ioi Kim Lam.
 #     9-MAY-1994 (PDRAPER):
-#     	 Added option to read application startup file ~/.ccdpack
+#        Added option to read application startup file ~/.ccdpack
 #     5-MAY-1995 (PDRAPER):
 #        Started to tune for Tk4. Default colours may be gray soon in
 #        which case this file will become mostly redundant.
@@ -51,6 +76,10 @@
 #        Finally removed all colour defaults. Standard set are no 
 #        longer bisque, so may as well use them.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 #  Global variables.

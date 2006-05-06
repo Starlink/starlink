@@ -2,12 +2,15 @@
 #  Name:
 #     Ccd::checkarray
 
-#  Type of Module:
-#     [incr Tcl] class
-
 #  Purpose:
 #     Declares a class for creating an array of checkbuttons with a
 #     label.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tcl] class
 
 #  Description:
 #     This class creates an instance of a checkarray. The checkarray
@@ -15,8 +18,23 @@
 #     which they are referred) and which have a single descriptive label
 #     associated with them.
 
-#  Invocations:
+#  Configuration Options:
+#        -stack horizontal|vertical
 #
+#     The order in which the checkbuttons are stacked. "vertical" is the
+#     default.
+#
+#        -label "string"
+#
+#     Specifies the label to apply to the checkarray as a whole. If
+#     stacking is vertical then this appears to the left of the array.
+#     If stacking is horizontal then it appears above the array.
+
+#  Inheritance:
+#     This class inherits Ccd::base and its methods and configuration
+#     options, which are not directly occluded by those specified here.
+
+#  Invocations:
 #        Ccd::checkarray window [-option value]...
 #
 #     This command create an instance of a checkarray and returns a
@@ -33,49 +51,36 @@
 #
 #     Performs the given method on this widget.
 
-#  Configuration options:
-#
-#        -stack horizontal|vertical
-#
-#     The order in which the checkbuttons are stacked. "vertical" is the
-#     default.
-#
-#        -label "string"
-#
-#     Specifies the label to apply to the checkarray as a whole. If
-#     stacking is vertical then this appears to the left of the array.
-#     If stacking is horizontal then it appears above the array.
-
 #  Methods:
 #     constructor [-option value]...
 #        This method is invoked automatically by the class command and
-#	 creates the "class " widget with a default configuration,
-#	 except when overridden by command line options.
+#        creates the "class " widget with a default configuration,
+#        except when overridden by command line options.
 #     destructor
 #        Destroys the "class" instance, invoked by the "delete" method.
 #     configure [-option value]...
 #        Activates the configuration options. If no configuration value
-#	 is given then the current value of any known option is returned
-#	 in a form similar (but not identical to) the Tk widget command.
+#        is given then the current value of any known option is returned
+#        in a form similar (but not identical to) the Tk widget command.
 #     invoke name
 #        Invokes the named checkbutton. The name is that used when creating
-#	 it.
+#        it.
 #     _repack
 #        Internal method for re-packing the checkbuttons.
 #     addcommand name command
 #        Adds a command to the named checkbutton.
 #     addvariable name variable args
 #        Adds a variable to the checkbutton. This is set to the value 0
-#	 or 1 if no on and off values are given, The on and off values
-#	 are the optional args argument.
+#        or 1 if no on and off values are given, The on and off values
+#        are the optional args argument.
 #     addbutton name args
-#	 Creates a checkbutton and packs it into the array.  "args" is
-#	 optional and may be any of the arguments as passed to the
-#	 "checkbutton" command (i.e. -variable variable -onvalue
-#	 onvalue -offvalue offvalue etc.).
+#        Creates a checkbutton and packs it into the array.  "args" is
+#        optional and may be any of the arguments as passed to the
+#        "checkbutton" command (i.e. -variable variable -onvalue
+#        onvalue -offvalue offvalue etc.).
 #     state name button_state
 #        Set the state of the named button. "button_state" should be one
-#	 of normal, active or disabled.
+#        of normal, active or disabled.
 #     toggle name
 #        Toggles the selection state of the named button.
 #     select name
@@ -90,9 +95,27 @@
 #        the document is associated with all sub-components of the
 #        widget at that time.
 
-#  Inheritance:
-#     This class inherits Ccd::base and its methods and configuration
-#     options, which are not directly occluded by those specified here.
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 2000 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -101,9 +124,9 @@
 
 #  History:
 #     23-APR-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     9-MAY-1994 (PDRAPER):
-#     	 Added state and toggle methods.
+#        Added state and toggle methods.
 #     24-MAY-1994 (PDRAPER):
 #        Added select and de-select methods.
 #     23-MAR-1995 (PDRAPER):
@@ -116,6 +139,9 @@
 #     27-JAN-2006 (PDRAPER):
 #        Updated to itcl::class syntax.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

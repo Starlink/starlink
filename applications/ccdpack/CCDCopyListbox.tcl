@@ -3,11 +3,14 @@
 #  Name:
 #     CCDCopyListbox
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     Copies a part of a listbox to another listbox.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
 
 #  Description:
 #     This routine copies either the current selection from one listbox
@@ -23,21 +26,42 @@
 #        The listbox which is to have values copied
 #     to = window (read)
 #        The listbox which is to have values entered. New values are
-#	 appended to the end of any current contents (this could be
-#	 cleared first by a {$to delete 0 end} before calling this
-#	 routine).
+#        appended to the end of any current contents (this could be
+#        cleared first by a {$to delete 0 end} before calling this
+#        routine).
 #      mode = string (read)
-#         The mode to use when determining the range of values to copy.
-#	  Either "select" if the current selection is to be copied, or
-#	  "range" if the args arguments have the lower and upper indices
-#	  of the range.
+#        The mode to use when determining the range of values to copy.
+#        Either "select" if the current selection is to be copied, or
+#        "range" if the args arguments have the lower and upper indices
+#        of the range.
 #      args = list (read)
-#         Up to four values. The first two are used when mode=range,
-#	  when they specify the lower and upper indices of the values to
-#	  copy. The last two are strings to prepend and append to the
-#	  names which are copied. If mode!=range then only two values
-#	  will be used in which case they are the prepend and append
-#	  strings.
+#        Up to four values. The first two are used when mode=range,
+#        when they specify the lower and upper indices of the values to
+#        copy. The last two are strings to prepend and append to the
+#        names which are copied. If mode!=range then only two values
+#        will be used in which case they are the prepend and append
+#        strings.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 2000 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -46,12 +70,15 @@
 
 #  History:
 #     9-MAR-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     15-MAR-1994 (PDRAPER):
-#     	 Added prepend and append capability.
+#        Added prepend and append capability.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

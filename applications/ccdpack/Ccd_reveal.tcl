@@ -2,12 +2,15 @@
 #  Name:
 #     Ccd::reveal
 
-#  Type of Module:
-#     [incr Tcl] class
-
-# Purpose:
+#  Purpose:
 #     Provides a class for hiding and revealing many sub-windows within
 #     one window.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tcl] class
 
 #  Description:
 #     This class provides a method for controlling the display of one
@@ -18,19 +21,19 @@
 #     window size considerations make it possible to view only one at
 #     a time.
 #
-#           +--------------------------------------------+
-#           |   +------+  +------+  +------+  +------+   |
+#
+#
 #           |   |View 1|  |View 2|  |View 3|  |View 4|   |
-#           |   +------+  +------+  +------+  +------+   |
-#           +--------------------------------------------+
-#           |                                            |
-#           |                                            |
-#           |                                            |
+#
+#
+#
+#
+#
 #           |                  V I E W  1                |
-#           |                                            |
-#           |                                            |
-#           |                                            |
-#           +--------------------------------------------+
+#
+#
+#
+#
 #
 #     So pressing button "View 2" would unpack the "VIEW 1" window and
 #     pack into its place "VIEW 2" etc.
@@ -42,26 +45,7 @@
 #     is contained here, so for a tidy exit they should be destroyed
 #     before this.
 
-#  Invocations:
-#
-#        Ccd::reveal window [-option value]...
-#
-#     This command creates an instance of a "Ccd::reveal" and returns a
-#     command "window" for manipulating it via the methods and
-#     configuration options described below. Configuration options may
-#     be appended to the command.
-#
-#        window configure -configuration_options value
-#
-#     Applies any of the configuration options (after the widget
-#     instance has been created).
-#
-#        window method arguments
-#
-#     Performs the given method on this widget.
-
-#  Configuration options:
-#
+#  Configuration Options:
 #        -placebar (top|bottom|left|right)
 #
 #     This option configures where to place the choice (button) bar
@@ -88,18 +72,39 @@
 #     name of this instance, so the windows to be controlled should be
 #     children of this. Reconfiguring in will apply to all windows.
 
+#  Inheritance:
+#     This class inherits "Ccd::base" and its methods and configuration
+#     options, which are not directly occluded by those specified here.
+
+#  Invocations:
+#        Ccd::reveal window [-option value]...
+#
+#     This command creates an instance of a "Ccd::reveal" and returns a
+#     command "window" for manipulating it via the methods and
+#     configuration options described below. Configuration options may
+#     be appended to the command.
+#
+#        window configure -configuration_options value
+#
+#     Applies any of the configuration options (after the widget
+#     instance has been created).
+#
+#        window method arguments
+#
+#     Performs the given method on this widget.
+
 #  Methods:
 #     constructor [-option value]...
 #        This method is invoked automatically by the class command and
-#	 creates the "Ccd::reveal" widget with a default configuration,
-#	 except when overridden by command line options.
+#         creates the "Ccd::reveal" widget with a default configuration,
+#         except when overridden by command line options.
 #     destructor
 #        Destroys the "Ccd::reveal" instance, invoked by the "delete"
 #        method.
 #     configure [-option value]...
 #        Activates the configuration options. If no configuration value
-#	 is given then the current value of any known option is returned
-#	 in a form similar (but not identical to) the Tk widget command.
+#         is given then the current value of any known option is returned
+#         in a form similar (but not identical to) the Tk widget command.
 #     addbutton text [window]
 #        This method adds a button to the choice bar and enters the
 #        text as its label. The window argument is optional and should
@@ -113,10 +118,26 @@
 #     seewindow window
 #        Reveals the named window (must be registered with a button).
 
+#  Copyright:
+#     Copyright (C) 1995, 2000 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
 
-#  Inheritance:
-#     This class inherits "Ccd::base" and its methods and configuration
-#     options, which are not directly occluded by those specified here.
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -125,12 +146,15 @@
 
 #  History:
 #     15-JUN-1995 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     15-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
 #     27-JAN-2006 (PDRAPER):
 #        Updated for itcl::class syntax.
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

@@ -7,6 +7,9 @@
 #  Purpose:
 #     Link a standalone binary with the CCDPACK libraries.
 
+#  Language:
+#     {routine_language}
+
 #  Type of Module:
 #     Shell script.
 
@@ -17,10 +20,31 @@
 #     '-pgp' or '-pgplot' is given, then Starlink or Native PGPLOT
 #     graphics will be linked in.
 
+#  Copyright:
+#     Copyright (C) 2001, 2004 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     PWD: Peter Draper (Starlink)
 #     MBT: Mark Taylor (Starlink)
 #     TIMJ: Tim Jenness (JAC, Hawaii)
+#     {enter_new_authors_here}
 
 #  History:
 #     11-JAN-2001 (MBT):
@@ -29,6 +53,11 @@
 #        flags for graphics system selection.
 #     29-AUG-2004 (TIMJ):
 #        Use one_link
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 #  Initialise link options - default is no graphics linking.

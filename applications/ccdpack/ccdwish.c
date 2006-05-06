@@ -6,8 +6,8 @@
 *  Purpose:
 *     Main routines for ccdwish shell.
 
-*  Usage:
-*     ccdwish [-pipes ifd ofd]
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This source file contains the main() routine for the ccdwish shell.
@@ -42,15 +42,45 @@
 *     This -pipes mode of running is only likely to be useful when the
 *     interpreter is running as an exec'd child process.
 
+*  Usage:
+*     ccdwish [-pipes ifd ofd]
+
+*  Copyright:
+*     Copyright (C) 2000 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
 *     PDRAPER: Peter W. Draper (STARLINK)
+*     {enter_new_authors_here}
 
 *  History:
 *     10-OCT-2000 (MBT):
 *        Initial version.
 *     1-FEB-2006 (PDRAPER):
 *        Removed the use of CCDPACK_DIR as home for Tcl/Tk/Itcl.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -115,6 +145,39 @@ extern F77_SUBROUTINE(ccd1_getarg)
 
 *  Purpose:
 *     Main routine for the CCDWISH shell.
+
+*  Language:
+*     Starlink C
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
       int ifd;                       /* File descriptor of downward pipe */
@@ -198,10 +261,13 @@ extern F77_SUBROUTINE(ccd1_getarg)
 *+
 *  Name:
 *     ccdPipestcl
-*
+
 *  Purpose:
 *     Set up a Tcl interpreter to read and write through pipes.
-*
+
+*  Language:
+*     Starlink C
+
 *  Description:
 *     This routine is designed to be run in a subprocess, and communication
 *     is done between it and the parent process using pipes.  It begins
@@ -223,7 +289,7 @@ extern F77_SUBROUTINE(ccd1_getarg)
 *     The routine then starts listening again.  The correct way to
 *     terminate this process is by sending a Tcl 'exit' command down
 *     the pipe.
-*
+
 *  Arguments:
 *     ifd = int
 *        The file descriptor for the input (downwards) pipe on which
@@ -231,6 +297,36 @@ extern F77_SUBROUTINE(ccd1_getarg)
 *     ofd = int
 *        The file descriptor for the output (upwards) pipe to which
 *        Tcl exit status and result strings are to be written.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -352,6 +448,9 @@ extern F77_SUBROUTINE(ccd1_getarg)
 *  Purpose:
 *     Set an environment variable.
 
+*  Language:
+*     Starlink C
+
 *  Description:
 *     This routine does the same as setenv(3) on some operating systems,
 *     but which is absent on Solaris.  It the value of an environment
@@ -367,9 +466,39 @@ extern F77_SUBROUTINE(ccd1_getarg)
 *        If the environment variable name already exists, then the value
 *        will only be overwritten if overwrite is non-zero.
 
-*  Return value:
+*  Return Value:
 *     Zero is returned on success, -1 if there was a failure in memory
 *     allocation.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -391,10 +520,13 @@ extern F77_SUBROUTINE(ccd1_getarg)
 *+
 *  Name:
 *     ccdEndinterp
-*
+
 *  Purpose:
 *     Asynchronous event handler for Tcl interpreter process.
-*
+
+*  Language:
+*     Starlink C
+
 *  Description:
 *     This routine should be registered as the asynchronous event
 *     handler for use with Tcl interpreters.  If it is invoked
@@ -404,15 +536,7 @@ extern F77_SUBROUTINE(ccd1_getarg)
 *     interpreter to shut down in an orderly fashion.
 *
 *     This routine should not be invoked directly by user code.
-*
-*  Note: 
-*     This doesn't seem to work at all.  Writing an exit instruction
-*     ought to cause clean up, but when executed here it doesn't seem
-*     to get rid of the adam message relay and its associated
-*     monoliths.  It does exit the process, but then the signal alone
-*     would do that anyway.  Leave this in place for the moment in
-*     case I can work out how to make it work.
-*
+
 *  Arguments:
 *     interp = Tcl_Interp *
 *        A pointer to the Tcl interpreter structure, if a Tcl command has
@@ -423,14 +547,52 @@ extern F77_SUBROUTINE(ccd1_getarg)
 *     code = int
 *        Return code of some command which has recently been executed,
 *        if a Tcl has just completed.
-*     
+
 *  Notes:
 *     As noted on the Tcl_Async man page, the interp and code arguments
 *     will not necessarily have anything useful in them (this will be
 *     the case if the hander is invoked while waiting for an X event,
 *     which is quite likely).  For this reason, the clientData argument
 *     is used to identify the interpreter to be shut down.
-*-    
+
+*  Note:
+*     This doesn't seem to work at all.  Writing an exit instruction
+*     ought to cause clean up, but when executed here it doesn't seem
+*     to get rid of the adam message relay and its associated
+*     monoliths.  It does exit the process, but then the signal alone
+*     would do that anyway.  Leave this in place for the moment in
+*     case I can work out how to make it work.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
 */
 
 /* Local Variables. */
@@ -456,10 +618,13 @@ extern F77_SUBROUTINE(ccd1_getarg)
 *+
 *  Name:
 *     ccdSigtcl
-*
+
 *  Purpose:
 *     Signal handler for Tcl interpreter process.
-*
+
+*  Language:
+*     Starlink C
+
 *  Description:
 *     This routine should be registered as the signal handler for
 *     signals which will cause the Tcl interpreter process to terminate.
@@ -467,10 +632,40 @@ extern F77_SUBROUTINE(ccd1_getarg)
 *     registered in the global variable ccd_async (which routine ought
 *     to effect a clean exit) will be called at a safe point in the
 *     near future.
-*
+
 *  Arguments:
 *     sig = int
 *        The number of the signal which has been caught.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
       int status[ 1 ] = { SAI__OK };

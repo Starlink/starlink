@@ -4,11 +4,14 @@
 #  Name:
 #     CCDRecordDirectoryinMenu
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     Creates a command in a menu to return to the current directory.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
 
 #  Description:
 #     This procedure creates a command in a menu (which is part of a
@@ -22,26 +25,46 @@
 #  Arguments:
 #     menubar = window (read)
 #        The name of (CCDPACK) menubar which is to have the command
-#	 added to one of its menus.
+#        added to one of its menus.
 #     menu = string (read)
 #        The name of the menubar menu which is to have the command
-#	 added.
+#        added.
 #     directory = string (read)
 #        The name of the directory which is to be entered.
 #     entry = window (read)
 #        The name of a labelled entry widget to recieve the name of the
-#	 directory when the menu command is invoked.
+#        directory when the menu command is invoked.
 #     choicebar = window (read)
 #        The name of the choice bar which contains the button as a named
-#	 option.
+#        option.
 #     button = window (read)
-#	 The name of a button in a choice bar which when invoked
-#	 will perform the actual change of directory.
+#        The name of a button in a choice bar which when invoked
+#        will perform the actual change of directory.
 
-#  Global variables:
+#  Global Variables:
 #     CCDmenudirs$menu() = array (write)
 #        The list of directories associated with the menu. This is
-#	 indexed by the directory name.
+#        indexed by the directory name.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council. All
+#     Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -49,10 +72,13 @@
 
 #  History:
 #     8-MAR-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     29-MAR-1994 (PDRAPER):
-#     	 Modified to use mega-widgets.
+#        Modified to use mega-widgets.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

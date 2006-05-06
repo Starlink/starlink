@@ -6,6 +6,9 @@
 #  Purpose:
 #     Gets a name for a new file.
 
+#  Language:
+#     TCL
+
 #  Type of Module:
 #     Tcl/Tk procedure.
 
@@ -22,12 +25,34 @@
 #     title = string (read)
 #        The title for top-level widget.
 
-#  Global variables:
+#  Global Variables:
 #     CCDimportfile = filename (write)
 #        The name of the new file.
 #     CCDimportavail = logical (write)
 #        If a name has been given then this is true, otherwise it if
-#	 false (0).
+#        false (0).
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 2000-2001 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -36,9 +61,9 @@
 
 #  History:
 #     7-MAR-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     21-APR-1994 (PDRAPER):
-#     	 Now uses mega-widgets.
+#        Now uses mega-widgets.
 #     1-JUN-1995 (PDRAPER):
 #        Removed built-in keyboard traversal.
 #     21-AUG-1995 (PDRAPER):
@@ -51,6 +76,9 @@
 #        Fixed entry widget width to 20 characters.
 #        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

@@ -3,11 +3,14 @@
 #  Name:
 #     CCDFITSImport
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     Controls the import of FITS information into NDFs.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
 
 #  Description:
 #     This routine controls the import of FITS information from the FITS
@@ -24,11 +27,33 @@
 #        If present this should be a command to run if the NDF import
 #        runs successfully (such as enabling commands for the next section).
 
-#  Global variables:
+#  Global Variables:
 #     CCDallndfs = list (read & write)
 #        The names of all the known NDFs.
 #     CCDimporttable = string (read & write)
 #        The name of the import control table.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 2000-2001 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -37,7 +62,7 @@
 
 #  History:
 #     23-APR-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     1-JUN-1995 (PDRAPER):
 #        Removed built-in keyboard traversal.
 #     18-AUG-1995 (PDRAPER):
@@ -50,6 +75,9 @@
 #        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #        Fixed problem with use of default file filter.
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

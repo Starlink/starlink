@@ -3,11 +3,14 @@
 #  Name:
 #     CCDShowHelp
 
-#  Type of Module:
-#     Tcl procedure.
-
 #  Purpose:
 #     Displays a help file in a WWW browser.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl procedure.
 
 #  Description:
 #     This routine controls the display of help pages in a HTML WWW
@@ -21,6 +24,25 @@
 #     filename = string (read)
 #        The URL of the help page to be displayed.
 
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     DLT: D L Terrett (Starlink, RAL)
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -29,7 +51,7 @@
 
 #  History:
 #     29-NOV-1993 (DLT):
-#     	 Original version.
+#        Original version.
 #     21-MAR-1995 (PDRAPER):
 #        Brought into CCDPACK from Xadam (was named gethelp).
 #     22-MAR-1995 (PDRAPER):
@@ -44,8 +66,8 @@
 #        Added firefox (another mozilla/netscape variant).
 #     {enter_further_changes_here}
 
-#  Copyright:
-#     Copyright (C) 1993 Science & Engineering Research Council
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

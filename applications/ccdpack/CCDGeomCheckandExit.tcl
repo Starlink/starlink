@@ -3,11 +3,14 @@ proc CCDGeomCheckandExit {} {
 #  Name:
 #     CCDGeomCheckandExit.
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     Checks the chosen CCD regions.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
 
 #  Description:
 #     This routine checks that the chosen CCD regions comply with the
@@ -23,10 +26,30 @@ proc CCDGeomCheckandExit {} {
 #  Arguments:
 #     none
 
-#  Return value:
+#  Return Value:
 #     CCDGeomCheckandExit
 #        Returns true if the regions are acceptable and false otherwise.
 #        Suitable message are displayed if non-compliance is found.
+
+#  Copyright:
+#     Copyright (C) 1995, 1997, 2001 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -35,12 +58,15 @@ proc CCDGeomCheckandExit {} {
 
 #  History:
 #     29-SEP-1995 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     16-APR-1997 (PDRAPER):
 #        Added traps for bias strip extents set to 0.
 #     4-JUL-2001 (MBT):
 #        Upgraded for use with Sets.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

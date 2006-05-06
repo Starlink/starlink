@@ -3,11 +3,32 @@
 #  Name:
 #     ccdhelp.ifd
 
-#  Type of module:
-#     IFD parameter interface file.
-
 #  Language:
 #     Tcl.
+
+#  Type of Module:
+#     IFD parameter interface file.
+
+#  Copyright:
+#     Copyright (C) 1986, 1992-1993 Science & Engineering Research
+#     Council. Copyright (C) 1999 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Author:
 #     MJC: Malcolm J. Currie (STARLINK)
@@ -17,14 +38,17 @@
 
 #  History:
 #     14-NOV-1986 (MJC):
-#	 Original version.
+#         Original version.
 #     19-AUG-1992 (MJC):
-#     	 Added prologue, and access to help library.
+#              Added prologue, and access to help library.
 #     5-JAN-1993 (PDRAPER):
 #        Rename CCDHELP.
 #     7-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

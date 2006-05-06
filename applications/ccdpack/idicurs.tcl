@@ -1,17 +1,17 @@
 #+
 #  Name:
 #     idicurs.tcl
-#
+
 #  Purpose:
 #     Script to do the work for the IDICURS application.
-#
+
 #  Language:
 #     Tcl.
-#
+
 #  Description:
 #     This script causes the user to be presented with an Ndf viewer 
 #     so that points on it may be indicated.
-#
+
 #  External Variables:
 #     CENTROID = boolean (Given and Returned)
 #        Indicates whether points are centroided when added.
@@ -52,15 +52,41 @@
 #     ZOOM = real (Given and Returned)
 #        The zoom factor for NDF display; may be limited by the value of
 #        MAXCANV.
+
+#  Copyright:
+#     Copyright (C) 2000-2001 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
-#
+#     {enter_new_authors_here}
+
 #  History:
 #     14-SEP-2000 (MBT):
 #        Original version.
 #     9-APR-2001 (MBT):
 #        Upgraded for use with Sets.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 #  Initialise screen.

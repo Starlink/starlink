@@ -4,11 +4,14 @@ proc CCDGeometry { Top {surekill 1} } {
 #  Name:
 #     CCDGeometry
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     Aid to determining the geometric properties of a CCD frame.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
 
 #  Description:
 #     This routine displays the given NDF in a GWM canvas item and
@@ -29,9 +32,30 @@ proc CCDGeometry { Top {surekill 1} } {
 #     surekill = boolean (read)
 #        Whether exit item will also kill . Defaults to true.
 
-#  Global variables:
+#  Global Variables:
 #     NDF = string (read and write)
 #        Name of the NDF to be displayed.
+
+#  Copyright:
+#     Copyright (C) 1995, 1997, 2000-2001 Central Laboratory of the
+#     Research Councils. Copyright (C) 2006 Particle Physics &
+#     Astronomy Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -40,7 +64,7 @@ proc CCDGeometry { Top {surekill 1} } {
 
 #  History:
 #     25-SEP-1995 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     15-APR-1997 (PDRAPER):
 #        Added CCDimagefilters to support foreign data formats.
 #     16-MAY-2000 (MBT):
@@ -50,6 +74,9 @@ proc CCDGeometry { Top {surekill 1} } {
 #     01-FEB-2006 (PDRAPER):
 #        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

@@ -2,19 +2,28 @@
 #  Name:
 #     Ccd::menubarhelp
 
-#  Type of Module:
-#     [incr Tcl] class
-
 #  Purpose:
 #     Defines the "class of menubar with Help".
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tcl] class
 
 #  Description:
 #     This class is an extension of Ccd::menubar that also performs the
 #     standard configuration of the Help system. It is NOT a general
 #     widget as it contains CCDPACK specific information.
 
+#  Configuration Options:
+#     See Ccd::menubar.
+
+#  Inheritance:
+#     This class inherits Ccd::menubar and its methods and configuration
+#     options, which are not directly occluded by those specified here.
+
 #  Invocations:
-#
 #        Ccd::menubarhelp window [-option value]...
 #
 #     This command create an instance of a menubar with help and returns a
@@ -31,20 +40,17 @@
 #
 #     Performs the given method on this widget.
 
-#  Configuration options:
-#     See Ccd::menubar.
-
 #  Methods:
 #     constructor [-option value]...
 #        This method is invoked automatically by the class command and
-#	 creates the "class " widget with a default configuration,
-#	 except when overridden by command line options.
+#         creates the "class " widget with a default configuration,
+#         except when overridden by command line options.
 #     destructor
 #        Destroys the "class" instance, invoked by the "delete" method.
 #     configure [-option value]...
 #        Activates the configuration options. If no configuration value
-#	 is given then the current value of any known option is returned
-#	 in a form similar (but not identical to) the Tk widget command.
+#         is given then the current value of any known option is returned
+#         in a form similar (but not identical to) the Tk widget command.
 #     sethelpitem item document label
 #        Sets the help file to associate with a help item. Item is the
 #        name of the help label. "document" the name of the document to
@@ -57,9 +63,26 @@
 #        Displays any help available for the Help menu item labelled
 #        "$name".
 
-#  Inheritance:
-#     This class inherits Ccd::menubar and its methods and configuration
-#     options, which are not directly occluded by those specified here.
+#  Copyright:
+#     Copyright (C) 1995, 2000 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -68,7 +91,7 @@
 
 #  History:
 #     21--MAR-1995 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     4-MAY-1995 (PDRAPER):
 #        Started move to Tk4. Commented out ::rename in destructor, no
 #        longer needed.
@@ -77,6 +100,9 @@
 #     27-JAN-2006 (PDRAPER):
 #        Updated to itcl::class syntax.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

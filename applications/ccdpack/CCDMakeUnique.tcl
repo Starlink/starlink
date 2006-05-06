@@ -3,11 +3,14 @@
 #  Name:
 #     CCDMakeUnique
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     Makes unique a column in a scrollbox, multitem & table contents.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
 
 #  Description:
 #     This routine reads in the contents of a scrollbox, multitem or
@@ -24,11 +27,31 @@
 #     key = integer (read)
 #        The number of the column to make unique.
 
-#  Global values:
+#  Global Values:
 #     CCDlaterunique
 #        If true or non-existent then later unique values (and more
 #        importantly their related columns) are kept. Otherwise the
 #        earlier unique values are kept.
+
+#  Copyright:
+#     Copyright (C) 1995 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -36,8 +59,11 @@
 
 #  History:
 #     22-AUG-1995 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

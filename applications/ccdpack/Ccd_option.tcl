@@ -2,11 +2,14 @@
 #  Name:
 #     Ccd::option
 
-#  Type of Module:
-#     [incr Tcl] class
-
 #  Purpose:
 #     Defines the class of option labelled entry widgets.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tcl] class
 
 #  Description:
 #     This class creates a labelled entry widget with an additional
@@ -17,8 +20,23 @@
 #     may be provided. Options can be either a symbolic name and
 #     associated value or just a value shown for both.
 
-#  Invocations:
+#  Configuration Options:
+#        -placelabel.
 #
+#     Shouldn't be used, always on the left.
+#
+#        -contrain boolean
+#
+#     Whether to make the value shown in the entry field always one
+#     of the options. This is achieved by binding <1> to show the
+#     popup in the entry (so it is impossible to type into this
+#     field).
+
+#  Inheritance:
+#     This class inherits Ccd::labent and its methods and configuration
+#     options, which are not directly occluded by those specified here.
+
+#  Invocations:
 #        Ccd::option window [-option value]...
 #
 #     This command create an instance of an option entry widget and
@@ -35,37 +53,42 @@
 #
 #     Performs the given method on this widget.
 
-#  Configuration options:
-#
-#        -placelabel.
-#
-#     Shouldn't be used, always on the left.
-#
-#        -contrain boolean
-#
-#     Whether to make the value shown in the entry field always one
-#     of the options. This is achieved by binding <1> to show the
-#     popup in the entry (so it is impossible to type into this
-#     field).
-
 #  Methods:
 #     destructor
 #        Destroys the "class" instance, invoked by the "delete" method.
 #     configure [-option value]...
 #        Activates the configuration options. If no configuration value
-#	 is given then the current value of any known option is returned
-#	 in a form similar (but not identical to) the Tk widget command.
+#         is given then the current value of any known option is returned
+#         in a form similar (but not identical to) the Tk widget command.
 #     addoption label [value]
 #        Adds a label to the menu. This creates a menu item with
-#	 this label and inserts this value into the entry widget
+#         this label and inserts this value into the entry widget
 #        if no value is given, otherwise value is used.
 #     postmenu x y
 #        Forces the posting of the menu at the given (absolute)
-#	 position.
+#         position.
 
-#  Inheritance:
-#     This class inherits Ccd::labent and its methods and configuration
-#     options, which are not directly occluded by those specified here.
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 1997, 2000 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -74,7 +97,7 @@
 
 #  History:
 #     29-MAR-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     4-MAY-1995 (PDRAPER):
 #        Started move to Tk4. Commented out ::rename in destructor, no
 #        longer needed.
@@ -94,6 +117,9 @@
 #     27-JAN-2006 (PDRAPER):
 #        Updated for itcl::class syntax.
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

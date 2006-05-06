@@ -3,11 +3,14 @@ class Ccdtop {
 #  Name:
 #     Ccdtop
 
-#  Type of module:
-#     [incr Tk] Mega-Widget
-
 #  Purpose:
 #     Provide a generic toplevel window for CCDPACK applications.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tk] Mega-Widget
 
 #  Description:
 #     This class provides a mega-widget to be used as a general-purpose
@@ -15,8 +18,7 @@ class Ccdtop {
 #     help text, a mechanism for watching its status, and a childsite 
 #     into which client widget can put their own content.
 
-#  Public methods:
-#
+#  Public Methods:
 #     addcontrol widget grpname
 #        Adds a control widget to the control panel.  The widget
 #        argument should be the pathname of a widget which has 
@@ -36,7 +38,7 @@ class Ccdtop {
 #        modify the packing.
 #           - grpname    -- Tag to identify the group
 #           - heading    -- Short text string to label the group
-# 
+#
 #     childsite
 #        Returns the path of a frame into which windows can be placed.
 #
@@ -87,8 +89,8 @@ class Ccdtop {
 #        the action has completed.
 #
 #     Ccdtop also inherits all the public methods of itk::Toplevel.
- 
-#  Public variables (configuration options):
+#
+#     Public variables (configuration options):
 #
 #     geometry = string
 #        This gives the geometry in the normal X11 format.
@@ -119,16 +121,15 @@ class Ccdtop {
 #        can be traced to watch for changes in status.
 #
 #     Ccdtop also inherits all the public variables of itk::Toplevel
- 
-#  Public procedures:
-#
+
+#  Public Procedures:
 #     bestvisual window visual ...
 #        Returns a visual (in the form {visualtype depth}) which represents
 #        the best choice among those indicated of the ones available in 
 #        the window specified.  There may be any number of visual arguments,
 #        of the form {visualtype mindepth}; the first which can be 
 #        satisfied is returned.
-#        
+#
 #     max num ...
 #        Gives the maximum of all the (numeric) arguments supplied.
 #        Just here because it's useful.
@@ -137,7 +138,34 @@ class Ccdtop {
 #        Gives the minimum of all the (numeric) arguments supplied.
 #        Just here because it's useful.
 
-#  Notes:
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

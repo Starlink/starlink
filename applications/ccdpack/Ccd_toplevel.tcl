@@ -2,11 +2,14 @@
 #  Name:
 #     Ccd::toplevel
 
-#  Type of Module:
-#     [incr Tcl] class
-
 #  Purpose:
 #     Defines the class of CCDPACK top-level widgets.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tcl] class
 
 #  Description:
 #     This class creates a top-level widget with the standard CCDPACK
@@ -20,26 +23,7 @@
 #     all toplevel widgets display a cursor, except possibly the current
 #     (i.e. $oldthis) object.
 
-#  Invocations:
-#
-#        Ccd::toplevel window [-option value]...
-#
-#     This command create an instance of a Ccd-toplevel object and
-#     returns a command "window" for manipulating it via the methods
-#     and configuration options described below. Configuration options
-#     may be appended to the command.
-#
-#        window configure -configuration_options value
-#
-#     Applies any of the configuration options (after the widget
-#     instance has been created).
-#
-#        window method arguments
-#
-#     Performs the given method on this widget.
-
-#  Configuration options:
-#
+#  Configuration Options:
 #        -CCDbitmap bitmap
 #
 #     This option configures the bitmap associated with the top-level
@@ -59,39 +43,78 @@
 #
 #     Height of window.
 
+#  Inheritance:
+#     This class inherits Ccd::base and its methods and configuration
+#     options, which are not directly occluded by those specified here.
+
+#  Invocations:
+#        Ccd::toplevel window [-option value]...
+#
+#     This command create an instance of a Ccd-toplevel object and
+#     returns a command "window" for manipulating it via the methods
+#     and configuration options described below. Configuration options
+#     may be appended to the command.
+#
+#        window configure -configuration_options value
+#
+#     Applies any of the configuration options (after the widget
+#     instance has been created).
+#
+#        window method arguments
+#
+#     Performs the given method on this widget.
+
 #  Methods:
 #     constructor [-option value]...
 #        This method is invoked automatically by the class command and
-#	 creates the "Ccd::toplevel" widget with a default configuration,
-#	 except when overridden by command line options.
+#         creates the "Ccd::toplevel" widget with a default configuration,
+#         except when overridden by command line options.
 #     destructor
 #        Destroys the "class" instance, invoked by the "delete" method.
 #     configure [-option value]...
 #        Activates the configuration options. If no configuration value
-#	 is given then the current value of any known option is returned
-#	 in a form similar (but not identical to) the Tk widget command.
+#         is given then the current value of any known option is returned
+#         in a form similar (but not identical to) the Tk widget command.
 #     busy option self
-#	 This operates using the blt::busy command. The possible options
-#	 being "hold" and "forget". If "hold" is used then all
-#	 top-level windows (created by this class) are put on hold,
-#	 but, only if they are not already busy. If the current window
-#	 is not to be made busy then self should be set false (0). When
-#	 an object is destroyed (via the delete method), then any
-#	 objects placed on hold by it are released using the "forget"
-#	 option, this can also be invoked explicitly. So using these
-#	 methods a series of top-level objects can be placed on hold in
-#	 any order and they will then be released in the same order
-#	 (any holds in effect before an invocation will not be affected
-#	 by later "holds" and "forget"s unless it is invoked from the
-#	 correct object -- the one that placed the hold).
+#         This operates using the blt::busy command. The possible options
+#         being "hold" and "forget". If "hold" is used then all
+#         top-level windows (created by this class) are put on hold,
+#         but, only if they are not already busy. If the current window
+#         is not to be made busy then self should be set false (0). When
+#         an object is destroyed (via the delete method), then any
+#         objects placed on hold by it are released using the "forget"
+#         option, this can also be invoked explicitly. So using these
+#         methods a series of top-level objects can be placed on hold in
+#         any order and they will then be released in the same order
+#         (any holds in effect before an invocation will not be affected
+#         by later "holds" and "forget"s unless it is invoked from the
+#         correct object -- the one that placed the hold).
 #     sethelp document label
 #        Sets the default help for all widgets within the scope of
 #        the top-level window. Document is a name like sun139 and
 #        label an xlabel within it (without the xref_ part).
 
-#  Inheritance:
-#     This class inherits Ccd::base and its methods and configuration
-#     options, which are not directly occluded by those specified here.
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 1997, 1999-2000 Central Laboratory of the
+#     Research Councils. Copyright (C) 2006 Particle Physics &
+#     Astronomy Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -100,7 +123,7 @@
 
 #  History:
 #     28-MAR-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     4-MAY-1995 (PDRAPER):
 #        Started move to Tk4. Commented out ::rename in destructor, no
 #        longer needed. Toplevels now resize by default.
@@ -119,6 +142,9 @@
 #     27-JAN-2006 (PWD):
 #        Updated for itcl::class syntax.
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

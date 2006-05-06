@@ -1,34 +1,60 @@
    proc CCDRemoveFromList { listbox args } {
 #+
-#   Name:
+#  Name:
 #      CCDRemoveFromList
 
-#   Purpose:
+#  Purpose:
 #      Deletes the current selection from a listbox.
 
-#   Parameters:
+#  Language:
+#     TCL
+
+#  Parameters:
 #      listbox = window (read)
 #        The name of the listbox which should be used. 
 #      args = string (read)
 #        If defined this specifies the command to use when deleting the
-#	 items from the listbox (which may be a scrollbox or variant in
-#	 which case "clear" should be used instead of "delete").
+#        items from the listbox (which may be a scrollbox or variant in
+#        which case "clear" should be used instead of "delete").
 
-#   Authors:
+#  Copyright:
+#     Copyright (C) 1993-1994 Science & Engineering Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
 #      PDRAPER: Peter Draper (Starlink - Durham University)
 #      {enter_new_authors}
 
-#   History:
+#  History:
 #      31-AUG-1993 (PDRAPER):
 #         Original version.
 #      2-MAR-1994 (PDRAPER):
-#      	  Modification of routine to delete NDFs from multiple lists.
+#         Modification of routine to delete NDFs from multiple lists.
 #      3-MAR-1994 (PDRAPER):
-#      	  Added check for listbox name.
+#         Added check for listbox name.
 #      8-MAR-1994 (PDRAPER):
 #         Now uses the selection in listbox, does not assume that 
 #         this is the X11 selection.
 #      {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

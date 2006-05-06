@@ -3,11 +3,14 @@ class Gwmview {
 #  Name:
 #     Gwmview
 
-#  Type of module:
-#     [incr Tk] Mega-Widget
-
 #  Purpose:
 #     Provide a window which can hold a GWM display.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tk] Mega-Widget
 
 #  Description:
 #     This class provides a mega-widget for holding a GWM canvas item
@@ -39,8 +42,19 @@ class Gwmview {
 #     are needed if the canvas needs to be addressed directly, for 
 #     instance to create canvas item bindings.
 
-#  Public methods:
+#  Notes:
+#     The canvas on which the GWM item is displayed can be accessed
+#     by using its widget name, which is held in the public variable
+#     canvas.  The following tag names are used to refer to items
+#     on the canvas:
+#        - gwmitem  -- The GWM item
 #
+#     The display method contains elements of a workaround for a bug in
+#     the PGPLOT driver for the GWM widget.  This is fixed in PGPLOT
+#     5.2.0-6, but not in the Spring 2000 release.  When the fixed version
+#     can be relied on to be there, this should be removed.
+
+#  Public Methods:
 #     activate
 #        Sets the status so that the widget is ready to be used.  This 
 #        method should be called after sufficient configuration has been
@@ -142,8 +156,8 @@ class Gwmview {
 #           - vy       -- Y coordinate in Gwmview viewer coordinates
 #
 #     Gwmview also inherits all the public methods of Ccdtop.
- 
-#  Public variables (configuration options):
+#
+#     Public variables (configuration options):
 #
 #     lutable = list
 #        This is a one or two element list giving the configuration of
@@ -167,21 +181,30 @@ class Gwmview {
 #        (differs from zoom by a factor of pixelsize).
 #
 #     Gwmview also inherits all the public variables of Ccdtop.
- 
-#  Notes:
-#     The canvas on which the GWM item is displayed can be accessed
-#     by using its widget name, which is held in the public variable
-#     canvas.  The following tag names are used to refer to items
-#     on the canvas:
-#        - gwmitem  -- The GWM item
-#        
-#     The display method contains elements of a workaround for a bug in
-#     the PGPLOT driver for the GWM widget.  This is fixed in PGPLOT
-#     5.2.0-6, but not in the Spring 2000 release.  When the fixed version
-#     can be relied on to be there, this should be removed.
+
+#  Copyright:
+#     Copyright (C) 2000-2001 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
 
 #  History:
 #     11-OCT-2000 (MBT):
@@ -189,6 +212,10 @@ class Gwmview {
 #     19-JUL-2001 (MBT):
 #        Removed all knowledge of points from this file - now handled
 #        at a higher level.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

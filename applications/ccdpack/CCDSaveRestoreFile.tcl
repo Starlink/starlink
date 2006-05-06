@@ -3,11 +3,14 @@
 #  Name:
 #     CCDSaveRestoreFile.tcl
 
-#  Type of Module:
-#     Tk/Tcl
-
 #  Purpose:
 #     Saves the current global parameter setup to the named file.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tk/Tcl
 
 #  Description:
 #     This routine opens the named file and writes the contents of the
@@ -19,16 +22,37 @@
 #  Arguments:
 #     filename = string (read)
 #        The name of the file which is to have the current global setup
-#	 written to it.
+#        written to it.
 
-#  Global parameters:
+#  Global Parameters:
 #      CCDglobalpars = array (read)
 #         The array of global parameter values.
 
 #  Return:
 #      CCDrestorefile = logical (write)
 #         If the write is successful then the return is set to 1
-#	  otherwise it is 0.
+#          otherwise it is 0.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 2001 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -37,10 +61,13 @@
 
 #  History:
 #     22-FEB-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     4-JUL-2001 (MBT):
 #        Prevented it from saving ZEROED.  What is ZEROED?
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

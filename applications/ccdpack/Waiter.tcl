@@ -2,14 +2,11 @@
 #+
 #  Name:
 #     Waiter
- 
-#  Type of Module:
-#     [incr Tk] Mega-Widget.
- 
+
 #  Purpose:
 #     Provide a window to display indicating the user has to wait.
- 
-#  Description.
+#
+#     Description.
 #     This class provides a mega-widget which will be posted indicating
 #     to the user that something is going on and he/she will have to
 #     wait.  The window can contain a text message, and is centred over
@@ -20,10 +17,15 @@
 #
 #     This widget has no methods other than the constructor and destructor.
 
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tk] Mega-Widget.
+
 #  Public Methods:
 
 #  Public Variables (Configuration Options):
-#
 #     animate = boolean
 #        If the value of this option is non-zero, a little animation will
 #        appear to indeicate that work is being done for as long as the
@@ -40,13 +42,38 @@
 #     text = string
 #        Text to appear in the message box.
 
+#  Copyright:
+#     Copyright (C) 2000 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     MBT: Mark Taylor (Starlink)
+#     {enter_new_authors_here}
 
 #  History:
 #     2-NOV-2000 (MBT):
 #        Original version.
- 
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 #  Inheritance.

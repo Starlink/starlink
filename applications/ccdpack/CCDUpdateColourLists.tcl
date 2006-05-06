@@ -19,7 +19,7 @@ proc CCDUpdateColourLists { element scrollbox filter } {
 #  Arguments:
 #     element = string (read)
 #        The name of the element of the global array CCDndfs which will
-#	 contain the (Tcl) list of NDF names returned from the user.
+#        contain the (Tcl) list of NDF names returned from the user.
 #        This is also indexed by the filter type.
 #     scrollbox = window (read)
 #        The name of the scrollbox (which may be a multitem) which
@@ -27,10 +27,10 @@ proc CCDUpdateColourLists { element scrollbox filter } {
 #     filter = string (read)
 #        Name of the current filter.
 
-#  Global variables:
+#  Global Variables:
 #      CCDndfs = array (write)
 #         An array of lists of NDF names. The NDFs selected by this
-#	  procedure are written to element CCDndfs($element,$filter).
+#         procedure are written to element CCDndfs($element,$filter).
 #      CCDfactors = array (write)
 #         If required this array will contain lists of exposure
 #         factors for dark counts or pre-flash. The indices are
@@ -39,6 +39,27 @@ proc CCDUpdateColourLists { element scrollbox filter } {
 #         This array's elements are (darks) and (flashes) if these are
 #         false then values for the dark and/or pre-flash time are
 #         assumed to be present.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)

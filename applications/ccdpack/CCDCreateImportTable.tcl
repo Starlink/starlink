@@ -3,14 +3,17 @@
 #  Name:
 #     CCDCreateImportTable.
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     Presents a form which contains widgets for creating or modifying
 #     a FITS import control table.
 
-#  Description
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
+
+#  Description:
 #     This window allows the creation and/or modification of a FITS
 #     import control table. An import control table is required to
 #     generate extension information for CCDPACK from FITS items in the
@@ -44,6 +47,13 @@
 #     is which case this will be used. The filename is returned in the
 #     CCDimportfile global variable. The existence of such a file is
 #     indicated by the value of the global boolean CCDimportexits.
+
+#  Arguments:
+#     Top = window (read)
+#        The name of the top-level object for this form.
+#     table = filename (read)
+#        The name of an import table to read into form. None read if
+#        this is {}.
 
 #  Table Format:
 #     The import control (translation) table is an ordinary text file
@@ -135,12 +145,27 @@
 #     placed anywhere and should start with the characters "#" or "!".
 #     Continuation onto a new line is indicated by use of "-".
 
-#  Arguments:
-#     Top = window (read)
-#        The name of the top-level object for this form.
-#     table = filename (read)
-#        The name of an import table to read into form. None read if
-#	 this is {}.
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995-1996, 2000-2001 Central Laboratory of the
+#     Research Councils. Copyright (C) 2006 Particle Physics &
+#     Astronomy Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -149,7 +174,7 @@
 
 #  History:
 #     30-MAR-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     11-MAY-1995 (PDRAPER):
 #        Updated to Tk4.0.
 #     19-MAY-1995 (PDRAPER):
@@ -168,6 +193,9 @@
 #        confusing/unused CCDndfimportfilter and switch to correct
 #        CCDimportfilter.
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

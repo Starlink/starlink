@@ -3,11 +3,14 @@
 #  Name:
 #     CCDDialog
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     Creates a dialog box.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
 
 #  Description:
 #     Creates a modal dialog box for issuing warnings. The resultant
@@ -25,6 +28,27 @@
 #        The name of a bitmap to display on the left. If blank this is
 #        not used.
 
+#  Copyright:
+#     Copyright (C) 1995, 1999-2001 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
 #     MBT: Mark Taylor (STARLINK)
@@ -32,7 +56,7 @@
 
 #  History:
 #     21-JUL-1995 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     23-AUG-1995 (PDRAPER):
 #        Added code to centre in parent top-level or screen.
 #     13-MAY-1999 (PDRAPER):
@@ -45,6 +69,9 @@
 #     01-FEB-2006 (PDRAPER):
 #        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

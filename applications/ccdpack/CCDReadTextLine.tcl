@@ -4,20 +4,23 @@
 #  Name:
 #     CCDReadTextLine.tcl
 
-#  Type of Module:
-#     Tk/Tcl
-
 #  Purpose:
 #     Reads a line of information from a text file.
 
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tk/Tcl
+
 #  Description:
-#   This procedure reads in a line of information from a file which has
-#   its contents in the usual CCDPACK text file format. This allows for
-#   comments (indicated by the characters "!" and "#") continuation
-#   lines (indicated by a "-" at the end of the line) and blank lines.
-#   Comments are skipped or removed, continued lines are joined and
-#   blank lines are skipped. The return is an extracted line of
-#   information ready for processing. This is in the original case.
+#     This procedure reads in a line of information from a file which has
+#     its contents in the usual CCDPACK text file format. This allows for
+#     comments (indicated by the characters "!" and "#") continuation
+#     lines (indicated by a "-" at the end of the line) and blank lines.
+#     Comments are skipped or removed, continued lines are joined and
+#     blank lines are skipped. The return is an extracted line of
+#     information ready for processing. This is in the original case.
 
 #  Arguments:
 #     fileid = string (read)
@@ -26,8 +29,28 @@
 #  Returned Value:
 #     CCDReadTextLine = string
 #        The extracted (joined, comment stripped etc.) line
-#	 read from the file. If an error occurs (such as no more lines
-#	 to read etc.) then a null value is returned.
+#        read from the file. If an error occurs (such as no more lines
+#        to read etc.) then a null value is returned.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council. All
+#     Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -35,13 +58,16 @@
 
 #  History:
 #     22-FEB-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     4-MAR-1994 (PDRAPER):
-#     	 Now named CCDReadTextLine
+#        Now named CCDReadTextLine
 #     3-MAY-1994 (PDRAPER):
-#     	 Doesn't convert to uppercase any more (case sensitive filenames
-#	 were being disrupted).
+#        Doesn't convert to uppercase any more (case sensitive filenames
+#        were being disrupted).
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

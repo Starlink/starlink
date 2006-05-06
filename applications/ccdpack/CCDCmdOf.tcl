@@ -3,11 +3,14 @@
 #  Name:
 #     CCDCmdOf
 
-#  Type of Module:
-#     Tcl/Tk commands
-
 #  Purpose:
 #     Finds the command name corresponding to a window.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk commands
 
 #  Description:
 #     Given a window pathname which may refer either to a genuine Tk widget
@@ -29,12 +32,37 @@
 #  Return Value:
 #     The pathname of the window corresponding to the command.
 
+#  Copyright:
+#     Copyright (C) 2000 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
 
 #  History:
 #     1-APR-2000 (MBT):
 #        Original version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
       regsub ^\.- $window . cmd

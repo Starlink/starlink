@@ -2,11 +2,14 @@
 #  Name:
 #     Ccd::choice
 
-#  Type of Module:
-#     [incr Tcl] class
-
 #  Purpose:
 #     Declares a class for creating a choice bar.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tcl] class
 
 #  Description:
 #     This class creates an instance of a choice bar. The choice bar
@@ -17,26 +20,7 @@
 #     above buttons that are stacked horizontally and to the left of
 #     buttons stacked vertically.
 
-#  Invocations:
-#
-#        Ccd::choice window [-option value]...
-#
-#     This command creates an instance of a choice bar and returns a
-#     command "window" for manipulating it via the methods and
-#     configuration options described below. Configuration options may
-#     be appended to the command.
-#
-#        window configure -configuration_options value
-#
-#     Applies any of the configuration options (after the widget
-#     instance has been created).
-#
-#        window method arguments
-#
-#     Performs the given method on this widget.
-
-#  Configuration options:
-#
+#  Configuration Options:
 #        -standard boolean
 #
 #     This options causes the choice bar to have the standard
@@ -66,6 +50,27 @@
 #
 #     Minimum width of all the buttons, this may increase to
 #     accomodate more text and all buttons will adopt the new size.
+
+#  Inheritance:
+#     This class inherits Ccd::base and its methods and configuration
+#     options, which are not directly occluded by those specified here.
+
+#  Invocations:
+#        Ccd::choice window [-option value]...
+#
+#     This command creates an instance of a choice bar and returns a
+#     command "window" for manipulating it via the methods and
+#     configuration options described below. Configuration options may
+#     be appended to the command.
+#
+#        window configure -configuration_options value
+#
+#     Applies any of the configuration options (after the widget
+#     instance has been created).
+#
+#        window method arguments
+#
+#     Performs the given method on this widget.
 
 #  Methods:
 #     constructor [-option value]...
@@ -101,10 +106,27 @@
 #        Sets the state of the button $name. If $name is "all" then all
 #        buttons are set to this state.
 
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 2000 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
 
-#  Inheritance:
-#     This class inherits Ccd::base and its methods and configuration
-#     options, which are not directly occluded by those specified here.
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -132,6 +154,9 @@
 #     27-JAN-2006 (PDRAPER):
 #        Updated to itcl::class syntax.
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
    itcl::class Ccd::choice {

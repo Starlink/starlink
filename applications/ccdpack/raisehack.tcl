@@ -5,6 +5,9 @@
 #  Purpose:
 #     Work around a window manager bug which makes the raise command slow.
 
+#  Language:
+#     TCL
+
 #  Invocation:
 #     source raisehack.tcl
 
@@ -19,13 +22,39 @@
 #     tries to raise a window if it is already partially obscured;
 #     this operation does not encounter the timeout.
 
+#  Copyright:
+#     Copyright (C) 2000 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
 #     EB: Eric Boudaillier (ProXad - France)
+#     {enter_new_authors_here}
 
 #  History:
 #     10-NOV-2000 (MBT):
 #        Original version, following EB's advice from comp.lang.tcl.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 #  Ensure that we have not executed this script before.

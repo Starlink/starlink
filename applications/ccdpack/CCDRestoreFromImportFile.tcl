@@ -3,12 +3,15 @@
 #  Name:
 #     CCDRestoreFromImportFile
 
-#  Type of Module:
-#     Tcl/Tk procedure
-
 #  Purpose:
 #     Reads the contents of an import table entering the contents into
 #     two tables widgets.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure
 
 #  Description:
 #     This routine reads in a standard CCDPACK import control table.
@@ -22,10 +25,31 @@
 #        The name of an existing import control table.
 #     fitstable = window (read)
 #        A table widget to contain the FITS item declarations (will be
-#	 emptied first).
+#        emptied first).
 #     extentable = window (read)
 #        A table widget to contain the extension item expression (will be
-#	 emptied first).
+#        emptied first).
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -33,12 +57,15 @@
 
 #  History:
 #     4-MAR-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     8-APR-1994 (PDRAPER):
-#     	 Now inserts into multitem listboxes.
+#        Now inserts into multitem listboxes.
 #     22-AUG-1995 (PDRAPER):
 #        Now inserts into table widgets.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 #.

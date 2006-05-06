@@ -2,21 +2,29 @@
 #+
 #  Name:
 #     Ndfalign
- 
-#  Type of Module:
-#     [incr Tk] Mega-Widget
- 
+
 #  Purpose:
 #     Provide a window in which a user can align two images.
- 
-#  Description.
+#
+#     Description.
 #     This class provides a mega-widget which will display two NDF
 #     Sets and allow the user to overlay them interactively, thus 
 #     specifying an offset between the two.  The offset chosen by
 #     the user can be retrieved by the caller.
 
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tk] Mega-Widget
+
+#  Notes:
+#     The display method contains elements of a workaround for a bug in
+#     the PGPLOT driver for the GWM widget.  This is fixed in PGPLOT
+#     5.2.0-6, but not in the Spring 2000 release.  When the fixed version
+#     can be relied on to be there, this should be removed.
+
 #  Public Methods:
-#
 #     activate
 #        Following a call to this method, the object gets put in the
 #        "active" status, and it will allow images to be aligned by the
@@ -85,7 +93,6 @@
 #     Ndfalign also inherits all the public methods of Gwmview.
 
 #  Public Variables (Configuration Options):
-#
 #     info = string
 #        Gives a string which will be displayed somewhere in the window
 #        near each displayed NDF Set.  The following substitutions will be 
@@ -121,14 +128,29 @@
 #
 #     Ndfalign also inherits all the public variables of Gwmview.
 
-#  Notes:
-#     The display method contains elements of a workaround for a bug in
-#     the PGPLOT driver for the GWM widget.  This is fixed in PGPLOT
-#     5.2.0-6, but not in the Spring 2000 release.  When the fixed version
-#     can be relied on to be there, this should be removed.
+#  Copyright:
+#     Copyright (C) 2000-2001 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
 
 #  History:
 #     10-NOV-2000 (MBT):
@@ -139,6 +161,10 @@
 #        Added centroidig, and moved position marking methods into 
 #        this widget from Gwmview (this widget gets two Markercontrol 
 #        widgets to do the work).
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

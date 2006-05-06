@@ -3,22 +3,23 @@
 #  Name:
 #     Helpcontrol
 
-#  Type of Module:
-#     [incr Tk] Mega-Widget
-
 #  Purpose:
 #     Viewer control which activates a help window.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tk] Mega-Widget
 
 #  Description:
 #     This class provides a simple control which pops up a text window
 #     when activated which displays some help text.
 
 #  Public Methods:
-#
 #     Helpcontrol inherits all the public methods of the Control widget.
 
 #  Public Variables (Configuration Options):
-#
 #     helptext
 #        Text to display to the user when the control is activated.
 #
@@ -30,6 +31,35 @@
 #
 #     Helpcontrol also inherits all the appropriate public variables
 #     of the Control widget.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

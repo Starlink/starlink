@@ -3,11 +3,14 @@
 #  Name:
 #     Ndfchoose
 
-#  Type of Module:
-#     [incr Tk] Mega-Widget
-
 #  Purpose:
 #     Provide a method of choosing images from a group.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tk] Mega-Widget
 
 #  Description:
 #     This class provides a GUI which allows a user to choose pairs of
@@ -16,7 +19,6 @@
 #     can call methods in order to find out which images have been chosen.
 
 #  Constructor:
-#
 #     ndfchoose pathname ndf ndf ?ndf ...? ?options?
 #        An NDF chooser object is constructed in the normal way; apart
 #        from any configuration options, all arguments are existing ndf
@@ -27,7 +29,6 @@
 #        index; the index of the first is 1, of the second is 2, etc.
 
 #  Public Methods:
-#
 #     getpair
 #        Returns an ordered list of two image indices, indicating the pair 
 #        of images which is currently selected by the user.  An invalid
@@ -65,7 +66,6 @@
 #           - index     -- Index of the image whose frame name is required
 
 #  Public Variables (Configuration Options):
-#
 #     choosepercentiles = boolean
 #        If true, the user will be able to manipulate the percentile 
 #        cutoff used for NDF display.
@@ -119,8 +119,29 @@
 #        being the width and height in pixels of the window in which 
 #        each previewed image is displayed.
 
+#  Copyright:
+#     Copyright (C) 2000-2001 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
 
 #  History:
 #     10-NOV-2000 (MBT):
@@ -142,6 +163,7 @@
 #        Fixed size of info windows (i.e. prevented geometry propagation)
 #        which prevents some resizing problems.  Also set a minimum
 #        resizable size for the window.
+#     {enter_further_changes_here}
 
 #  Bugs:
 #     The resizing of this widget is somewhat fragile; it will not cope
@@ -154,6 +176,8 @@
 #     does resizing by passing a cascade of WINCH events one for each
 #     point the mouse goes through during the user interactive window
 #     resize.  This leads to a core dump.
+#     {note_new_bugs_here}
+
 #-
 
 #  Inheritance.

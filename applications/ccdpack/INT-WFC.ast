@@ -1,13 +1,13 @@
 #+
 #  Name:
 #     INT-WFC.ast
-#
+
 #  Purpose:
 #     AST file for INT WFC mosaic camera.
-#
-#  Usage:
-#     astimp astfile=INT-WFC.ast in
-#
+
+#  Language:
+#     {routine_language}
+
 #  Description:
 #     This file is an AST file describing the relative positioning of
 #     CCDs in the Wide Field Camera instrument of the Isaac Newton 
@@ -47,12 +47,36 @@
 #     This transformation is thought to be correct to an accuracy of
 #     1 or 2 pixels, which is around half an arcsecond, over the whole 
 #     focal plane.
+
+#  Usage:
+#     astimp astfile=INT-WFC.ast in
+
+#  Copyright:
+#     Copyright (C) 2000 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
 #     PWD: Peter Draper (STARLINK)
 #     DG: David Gilbank (Durham University)
-#
+#     {enter_new_authors_here}
+
 #  History:
 #     10-FEB-2000 (PWD/DG):
 #        Initial registration of frames.
@@ -60,7 +84,11 @@
 #        Registration improved slightly and this file generated.
 #     3-JUL-2000:
 #        Prologue added.
-#
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
  USE FITSROT ROTSKYPA
  

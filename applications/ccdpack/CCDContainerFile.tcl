@@ -6,6 +6,9 @@
 #  Purpose:
 #     Returns the filename associated with an image.
 
+#  Language:
+#     TCL
+
 #  Description:
 #     This routine returns the filename in which an NDF structure lives.
 #     Often this will just be the name of the structure with '.sdf'
@@ -21,20 +24,45 @@
 #     ndfname = string (read)
 #        The name of an NDF structure.
 
-#  Return value:
-#     The name of the container file in which the NDF structure lives.
-
-#  Global variables:
+#  Global Variables:
 #     CCDndfcontainers = array (read)
 #        An array mapping every NDF structure so far encountered to its
 #        HDS container file.
 
+#  Return Value:
+#     The name of the container file in which the NDF structure lives.
+
+#  Copyright:
+#     Copyright (C) 2001 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
 
 #  History:
 #     15-JUN-2001 (MBT):
 #        Original version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

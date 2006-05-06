@@ -5,8 +5,14 @@
 #  Purpose:
 #     Main routine for CCD geometry X interface.
 
+#  Language:
+#     TCL
+
 #  Type of Module:
 #     Tcl/Tk script.
+
+#  Invocation:
+#     wish CCDGeometryMain
 
 #  Description:
 #     This is the top-level routine for the X reduction interface for
@@ -14,14 +20,32 @@
 #     performs global initialisations of bindings, colours, script
 #     auto path etc.
 
-#  Invocation:
-#     wish CCDGeometryMain
-
 #  Notes:
-
 #     This interface requires that the extensions [incr Tcl], BLT
 #     and TclADAM are available (built into the wish executable that invokes
 #     this file) as well as Tcl and Tk.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 2001, 2003 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -39,6 +63,9 @@
 #        Fixed problems with default file filters being shown as blank.
 #        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

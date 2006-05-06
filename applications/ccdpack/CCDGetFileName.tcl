@@ -4,11 +4,30 @@
 #  Name:
 #     CCDGetFileName
 
+#  Purpose:
+#     Gets the name of a file, allowing directory movement
+
+#  Language:
+#     TCL
+
 #  Type of Module:
 #     Tcl/Tk procedure
 
-#  Purpose:
-#     Gets the name of a file, allowing directory movement
+#  Global Parameters:
+#     CCDimportfile = filename (write)
+#        On exit this variable contains the name of the file
+#     CCDimportexists = filename (write)
+#        On exit this variable indicates whether the output
+#        file exists (or not).
+#     CCDimportfilter = list (read)
+#        The current file filter value(s). If more than one exists
+#        this procedure extends the interface to allow selection
+#        from the list. The list format is pairs of symbolic names
+#        and the associated filter types.
+#     CCDndfcontainers = array (write)
+#        An array giving the name of the HDS container file for each
+#        NDF which has been encountered (will only be affected if
+#        images is true).
 
 #  Method:
 #     This is a general get the name of a file routine. It displays
@@ -30,22 +49,27 @@
 #        which is encountered is passed to ndgexpand in order to 
 #        look inside it for NDF structures.
 
-#  Global parameters:
-#     CCDimportfile = filename (write)
-#        On exit this variable contains the name of the file
-#     CCDimportexists = filename (write)
-#        On exit this variable indicates whether the output
-#        file exists (or not).
-#     CCDimportfilter = list (read)
-#        The current file filter value(s). If more than one exists
-#        this procedure extends the interface to allow selection
-#        from the list. The list format is pairs of symbolic names
-#        and the associated filter types.
-#     CCDndfcontainers = array (write)
-#        An array giving the name of the HDS container file for each
-#        NDF which has been encountered (will only be affected if
-#        images is true).
+#  Copyright:
+#     Copyright (C) 1993-1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 1997, 2000-2001 Central Laboratory of the
+#     Research Councils. Copyright (C) 2006 Particle Physics &
+#     Astronomy Research Council. All Rights Reserved.
 
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (Starlink - Durham University)
@@ -56,10 +80,10 @@
 #     7-SEP-1993 (PDRAPER):
 #        Original version.
 #     2-MAR-1994 (PDRAPER):
-#     	 Now CCDGetFileName, much improved functionality. Global names
-#	 changed to CCDxxxxxxxx rule.
+#        Now CCDGetFileName, much improved functionality. Global names
+#        changed to CCDxxxxxxxx rule.
 #     29-MAR-1994 (PDRAPER):
-#     	 Now uses mega-widgets and has keyboard traversal.
+#        Now uses mega-widgets and has keyboard traversal.
 #     11-MAY-1995 (PDRAPER):
 #        Updated to Tk4.0.
 #     1-JUN-1995 (PDRAPER):
@@ -79,6 +103,9 @@
 #        Fixed problems handling the default file filter.
 #        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

@@ -2,38 +2,21 @@
 #  Name:
 #     Ccd::base
 
-#  Type of Module:
-#     [incr Tcl] class
-
 #  Purpose:
 #     Defines the base "superclass" for all compound widgets.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tcl] class
 
 #  Description:
 #     This routine defines a series of basic methods and configurations
 #     which apply to all compound widgets. It should consequently be
 #     inherited by all classes which construct compound widgets.
 
-#  Invocations:
-#
-#        Ccd::base name
-#
-#     This form of the command creates a frame widget. This form should
-#     not normally be used directly.
-#
-#        name configure -configuration_options value
-#
-#     Applies any of the configuration options (after the widget
-#     instance has been created).
-#
-#        name method arguments
-#
-#     Performs the given method on this object.  Note that 'name' is
-#     the name/command for this Ccd::base object, and not the pathname
-#     of the widget itself.  The pathname may be obtained by using the
-#     'pathname' method.
-
-#  Configuration options:
-#
+#  Configuration Options:
 #        -borderwidth width
 #
 #     All widgets are assumed to be based on a underlying frame (shell)
@@ -54,6 +37,28 @@
 #     and <SHIFT-TAB> default bindings. The default is
 #     {} which indicates the the built-in procedures tkFocusNext and
 #     tkPrevFocus should make their own minds up.
+
+#  Inheritance:
+#     This widget inherits no classes and is the base superclass for all
+#     compound widgets.
+
+#  Invocations:
+#        Ccd::base name
+#
+#     This form of the command creates a frame widget. This form should
+#     not normally be used directly.
+#
+#        name configure -configuration_options value
+#
+#     Applies any of the configuration options (after the widget
+#     instance has been created).
+#
+#        name method arguments
+#
+#     Performs the given method on this object.  Note that 'name' is
+#     the name/command for this Ccd::base object, and not the pathname
+#     of the widget itself.  The pathname may be obtained by using the
+#     'pathname' method.
 
 #  Methods:
 #     constructor [-option value]...
@@ -140,9 +145,27 @@
 #        information related to parts of a widget. In this case a
 #        showhelp method occluding this one should be provided.
 
-#  Inheritance:
-#     This widget inherits no classes and is the base superclass for all
-#     compound widgets.
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 2000 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -176,6 +199,9 @@
 #        Updated for itcl::class syntax. Removed configure, config, _report
 #        and cget methods.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

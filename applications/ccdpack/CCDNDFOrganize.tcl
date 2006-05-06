@@ -3,11 +3,14 @@ proc CCDNDFOrganize { Topwin args } {
 #  Name:
 #     CCDNDFOrganize
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     Organizes NDFs into colour and type related lists.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
 
 #  Description:
 #     This routine creates a top-level window with options to describe
@@ -32,39 +35,61 @@ proc CCDNDFOrganize { Topwin args } {
 #        If present this should be a command to run if the NDF import
 #        runs successfully (such as enabling commands for the next section).
 
-#  Global variables:
+#  Global Variables:
 #     CCDhaveframe = array (write)
 #        This is a boolean array which has flags indicating which of the
-#	 available frame types have been imported into the system. The
-#	 indices of this array are:
-#	    (targets)
-#	    (flatfields)
-#	    (biases)
-#	    (darks)
-#	    (flashes)
-#           (master_biases)
-#           (master_flashes)
-#           (master_darks)
-#           (master_flatfields)
+#        available frame types have been imported into the system. The
+#        indices of this array are:
+#            (targets)
+#            (flatfields)
+#            (biases)
+#            (darks)
+#            (flashes)
+#            (master_biases)
+#            (master_flashes)
+#            (master_darks)
+#            (master_flatfields)
 #     CCDsame = array (write)
 #        This array indicates the current answer to the questions about
-#	 the presence of different filters, and whether or not the darks
-#	 and flashes have different exposure times. The indices are:
-#           (filter)
-#	    (darks)
-#	    (flashes)
-#	 The values are either 1 (true) or 0 (false).
+#        the presence of different filters, and whether or not the darks
+#        and flashes have different exposure times. The indices are:
+#            (filter)
+#            (darks)
+#            (flashes)
+#        The values are either 1 (true) or 0 (false).
 #     CCDfilternames = string (write)
 #        The names of the known filters. These are separated by
-#	 whitespace. If none are given this is set to blank rather
+#         whitespace. If none are given this is set to blank rather
 #        than remaining unset.
 #     CCDndfs = array (write)
 #        The names of the NDFs. This array is indexed by the frame types
-#	 ("targets", "flatfields", "biases", "darks" and "flashes" ) and
-#	 also by the filter type if used (this is the second index).
+#         ("targets", "flatfields", "biases", "darks" and "flashes" ) and
+#         also by the filter type if used (this is the second index).
 #     CCDirflats = booleans (read and write)
 #        If targets are to be used as flats, if none of the correct colour
 #        are available.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 2000 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -73,7 +98,7 @@ proc CCDNDFOrganize { Topwin args } {
 
 #  History:
 #     3-MAY-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     24-MAY-1994 (PDRAPER):
 #        Removed control of NDF input from this form. Added required
 #        controls for exposure times in all frames.
@@ -89,6 +114,9 @@ proc CCDNDFOrganize { Topwin args } {
 #     1-JAN-2006 (PDRAPER):
 #        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

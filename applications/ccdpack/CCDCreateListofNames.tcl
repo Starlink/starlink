@@ -3,11 +3,14 @@
 #  Name:
 #     CCDCreateListofNames
 
-#  Type of Module:
-#     Tcl/Tk procedure.
-
 #  Purpose:
 #     To create a list of the names entered in a listbox.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     Tcl/Tk procedure.
 
 #  Description:
 #     This routine creates a Tcl list which contains all the entries in
@@ -18,18 +21,38 @@
 #  Arguments:
 #     frombox = window (read)
 #        The name of the listbox whose contents are to be copied into a
-#	 list.
+#        list.
 #     prefix = string (read)
 #        A string to prefix to the names extracted from the listbox
-#	 before entry into the list.
+#        before entry into the list.
 #     postfix = string (read)
 #        A string to be appended to the names extracted from the listbox
-#	 before entry into the list
+#        before entry into the list
 
-#  Return:
+#  Returned Value:
 #     CCDCreateListofNames = list (write)
 #        The list of names extracted from the listbox. Null if none are
-#	 found.
+#         found.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council. All
+#     Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -37,8 +60,11 @@
 
 #  History:
 #     9-MAR-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 #.

@@ -2,11 +2,14 @@
 #  Name:
 #     Ccd::menubar
 
-#  Type of Module:
-#     [incr Tcl] class
-
 #  Purpose:
 #     Defines the "class of menubar" used in CCDPACK.
+
+#  Language:
+#     TCL
+
+#  Type of Module:
+#     [incr Tcl] class
 
 #  Description:
 #     This class defines a menubar for the standard configuration
@@ -15,8 +18,32 @@
 #     with Tk so that is can be invoked using keyboard accelerators and
 #     the "Help" button is placed on the right.
 
-#  Invocations:
+#  Configuration Options:
+#        -borderwidth width
 #
+#     The borderwidth of the underlying frame widget (defaults to 2).
+#
+#         -background colour
+#
+#     Sets the background colour of frame widget. Defaults to ""
+#     which causes no change.
+#
+#        -relief  "raised|flat|groove|ridge|sunken"
+#
+#     Sets the relief of the border. Defaults to raised.
+#
+#        -standard boolean
+#
+#     Defines whether the menubar should be setup using the standard
+#     configuration or not. This defaults to true (1) and needs to be
+#     configured when the class instance (using "-standard 0") is
+#     created to be overridden.
+
+#  Inheritance:
+#     This class inherits Ccd::base and its methods and configuration
+#     options, which are not directly occluded by those specified here.
+
+#  Invocations:
 #        Ccd::menubar window [-option value]...
 #
 #     This command create an instance of a menubar and returns a
@@ -33,44 +60,22 @@
 #
 #     Performs the given method on this widget.
 
-#  Configuration options:
-#
-#        -borderwidth width
-#
-#     The borderwidth of the underlying frame widget (defaults to 2).
-#
-#	 -background colour
-#
-#     Sets the background colour of frame widget. Defaults to ""
-#     which causes no change.
-#
-#        -relief  "raised|flat|groove|ridge|sunken"
-#
-#     Sets the relief of the border. Defaults to raised.
-#
-#        -standard boolean
-#
-#     Defines whether the menubar should be setup using the standard
-#     configuration or not. This defaults to true (1) and needs to be
-#     configured when the class instance (using "-standard 0") is
-#     created to be overridden.
-
 #  Methods:
 #     constructor [-option value]...
 #        This method is invoked automatically by the class command and
-#	 creates the "class " widget with a default configuration,
-#	 except when overridden by command line options.
+#        creates the "class " widget with a default configuration,
+#        except when overridden by command line options.
 #     destructor
 #        Destroys the "class" instance, invoked by the "delete" method.
 #     configure [-option value]...
 #        Activates the configuration options. If no configuration value
-#	 is given then the current value of any known option is returned
-#	 in a form similar (but not identical to) the Tk widget command.
+#        is given then the current value of any known option is returned
+#        in a form similar (but not identical to) the Tk widget command.
 #     addbutton name underline
 #        Adds a menubutton to the menubar. The button is labelled with
-#	 the string "name". The character indicated by the "underline"
-#	 value (see the menubutton description) is underlined for use in
-#	 keyboard acceleration.
+#        the string "name". The character indicated by the "underline"
+#        value (see the menubutton description) is underlined for use in
+#        keyboard acceleration.
 #     addcheckbutton name label args
 #        Adds a checkbutton to the menu associated with menubutton "name".
 #        It is given the label "label". The extra arguments "args" are
@@ -78,17 +83,17 @@
 #        manpage.
 #     addcommand name label command
 #        Adds a command to the menu associated with menubutton "name".
-#	 The entry is given the label "label".
+#         The entry is given the label "label".
 #     addseparator name
 #        Appends a separator to the menu with menubutton "name".
 #     _repack
 #        Internal method for re-packing the menubuttons.
 #     enable name index
 #        Set the state of the command under button "name" with the given
-#	 index to enabled.
+#        index to enabled.
 #     disable name index
 #        Set the state of the command under button "name" with the given
-#	 index to disabled.
+#        index to disabled.
 #     invoke name index
 #        Invokes the command under button "name" with the given index.
 #     sethelp name document label.
@@ -98,9 +103,27 @@
 #        identifies the part to be displayed. If $name is "all" then
 #        the document is associated with the whole of the menubar.
 
-#  Inheritance:
-#     This class inherits Ccd::base and its methods and configuration
-#     options, which are not directly occluded by those specified here.
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995, 2000 Central Laboratory of the Research
+#     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+#     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -109,9 +132,9 @@
 
 #  History:
 #     28-MAR-1994 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     10-MAY-1994 (PDRAPER):
-#     	 Added method for enabling, disabling a command.
+#        Added method for enabling, disabling a command.
 #     14-MAR-1995 (PDRAPER):
 #        Added addcheckbutton method.
 #     4-MAY-1995 (PDRAPER):
@@ -124,6 +147,9 @@
 #     27-JAN-2006 (PDRAPER):
 #        Updated fot itcl::class syntax.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 
