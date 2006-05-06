@@ -11,7 +11,7 @@
 *  Language:
 *     Starlink Fortran 77
 
-*  Invocation
+*  Invocation:
 *     CALL KPG1_ISCLx( BAD, DIM1, DIM2, INARR, INVERT, LOWER, UPPER,
 *    :                 LOWLIM, UPPLIM, BADVAL, OUTARR, STATUS )
 
