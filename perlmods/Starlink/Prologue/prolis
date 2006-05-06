@@ -87,6 +87,10 @@ sub _extract {
   print STDERR "Extracted ".scalar(@prologues) . 
     " prologues from ". (defined $file ? "file $file" : "stdin")."\n";
   for my $prl (@prologues) {
+    # Guess missing items
+    $line->guess_defaults( File => $file );
+
+    # stringify
     print $prl->stringify;
   }
   return;

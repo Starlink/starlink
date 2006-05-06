@@ -190,6 +190,9 @@ sub _process {
 	}
       }
 
+      # Guess missing items
+      $line->guess_defaults( File => $file );
+
       # store type
       push(@types, $line->prologue_type);
 
