@@ -88,7 +88,7 @@ sub _extract {
     " prologues from ". (defined $file ? "file $file" : "stdin")."\n";
   for my $prl (@prologues) {
     # Guess missing items
-    $line->guess_defaults( File => $file );
+    $prl->guess_defaults( File => $file );
 
     # stringify
     print $prl->stringify;
