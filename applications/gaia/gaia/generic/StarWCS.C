@@ -1355,8 +1355,8 @@ int StarWCS::make2D()
                 sprintf( astime, "AsTime(%d)", i );
                 if ( astGetC( wcs_, astime ) ) {
                     naxes++;
-                    out1[i][0] = 1.0;
-                    out2[i][0] = 3.0;
+                    out1[i-1][0] = 1.0;
+                    out2[i-1][0] = 3.0;
                     if ( naxes == 2 ) {
                         break;
                     }
