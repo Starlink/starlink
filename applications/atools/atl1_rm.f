@@ -6,6 +6,9 @@
 *  Purpose:
 *     Remove a file.
 
+*  Language:
+*     Starlink Fortran 77
+
 *  Description:
 *     This subroutine calls the "PSX_REMOVE" RTL function to remove a
 *     specified file. No error occurs if the file cannot be removed for
@@ -16,6 +19,27 @@
 *        The path to the file.
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
+
+*  Copyright:
+*     Copyright (C) 1999 Central Laboratory of the Research Councils.
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

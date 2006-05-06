@@ -58,19 +58,19 @@
 *        An text file to receive the new Interval. 
 *     UNC = LITERAL (Read) 
 *        An optional text file containing an existing Region which
-*	 specifies the uncertainties associated with each point on the
-*	 boundary of the Interval being created. The uncertainty at any
-*	 point on the Interval is found by shifting the supplied
-*	 "uncertainty" Region so that it is centred at the point being
-*	 considered. The area covered by the shifted uncertainty Region
-*	 then represents the uncertainty in the position. The uncertainty
-*	 is assumed to be the same for all points.
+*        specifies the uncertainties associated with each point on the
+*        boundary of the Interval being created. The uncertainty at any
+*        point on the Interval is found by shifting the supplied
+*        "uncertainty" Region so that it is centred at the point being
+*        considered. The area covered by the shifted uncertainty Region
+*        then represents the uncertainty in the position. The uncertainty
+*        is assumed to be the same for all points.
 *
 *        If supplied, the uncertainty Region must be either a Box, a Circle
 *        or an Ellipse. Alternatively, a null value (!) may be supplied, in 
 *        which case a default uncertainty is used equivalent to a box 
 *        1.0E-6 of the size of the bounding box of the Interval being created.
-*        
+*
 *        The uncertainty Region has two uses: 1) when the astOverlap
 *        function compares two Regions for equality the uncertainty
 *        Region is used to determine the tolerance on the comparison, and 2)
@@ -78,6 +78,26 @@
 *        subsequently simplified (using astSimplify), the uncertainties are 
 *        used to determine if the transformed boundary can be accurately 
 *        represented by a specific shape of Region.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
