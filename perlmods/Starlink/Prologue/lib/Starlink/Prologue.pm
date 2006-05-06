@@ -40,7 +40,7 @@ my @STANDARD_HEADERS = (qw/
 			   Purpose
 			   Language
 			   /,
-			"Type Of Module",
+			"Type of Module",
 			qw/
 			   Invocation
 			   Description
@@ -263,6 +263,8 @@ The following methods are available by default:
    bugs
    implementation_deficiencies
    type_of_module
+   adam_parameters
+   usage
 
 =over 4
 
@@ -286,14 +288,14 @@ Aliases are not resolved automatically.
 
 sub content {
   my $self = shift;
-  my $tag = shift;
-  Carp::confess("Supplied tag is not defined!") unless defined $tag;
+  my $intag = shift;
+  Carp::confess("Supplied tag is not defined!") unless defined $intag;
 
   # copy in content and remove newlines
   my @content = @_;
 
   # Normalise the tag into standard form
-  $tag = $self->_normalise_section_name( $tag );
+  my $tag = $self->_normalise_section_name( $intag );
   croak "Must supply an argument to content()" unless defined $tag;
 
   if (@content) {
@@ -409,8 +411,14 @@ standard list but present in the prologue.
 
 sub misc_sections {
   my $self = shift;
+  # These names have all been normalised
   my @present = $self->sections;
-  my %standard = map { $_, undef } @STANDARD_HEADERS, values %ALIASES;
+
+  # Get a hash of all the standard sections
+  # use normalised names for consistency
+  my %standard = map {
+    $self->_normalise_section_name($_), undef
+  } @STANDARD_HEADERS, values %ALIASES;
 
   # remove the placeholder
   delete $standard{&MISCELLANEOUS};
@@ -465,7 +473,7 @@ sub stringify {
 
   # ADAM tasks put the Arguments in front of Description
   my @type_of_m = $self->content( "Type of Module" );
-  if ($type_of_m[0] =~ /ADAM/) {
+  if (@type_of_m && $type_of_m[0] =~ /ADAM/) {
     my $see_desc;
     my $see_args;
     my @new;
@@ -626,8 +634,14 @@ sub _normalise_section_name {
   $tag =~ s/\s+$//;
   my @parts = split(/\s+/, $tag);
   for  (@parts) {
-    # leave unchanged if all upper case
-    if ( $_ !~ /^[A-Z_]+$/) {
+    # we do not always upper case first letter
+    if ( $_ =~ /^[A-Z_]+$/ ) {
+      # leave unchanged if all upper case
+    } elsif ( $_ =~ /^of$/i ) {
+      # or if the word is "of" (Type of Module)
+      $_ = "of";
+    } else {
+      # lower case then upper case first
       $_ = lc($_);
       $_ = ucfirst($_);
     }
