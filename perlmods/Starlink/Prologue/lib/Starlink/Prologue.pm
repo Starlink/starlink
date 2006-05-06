@@ -30,6 +30,10 @@ use strict;
 use warnings;
 use Carp;
 
+# placeholder key to allow us to insert all the miscellaneous
+# keys into a set location rather than just the end.
+use constant MISCELLANEOUS => "__MISCELLANEOUS__PLACEHOLDER__";
+
 # Standard headers in the standard order
 my @STANDARD_HEADERS = (qw/
 			   Name
@@ -41,14 +45,23 @@ my @STANDARD_HEADERS = (qw/
 			   Invocation
 			   Description
 			   Arguments
+			   Usage
                            /,
-                          "Returned Value",
-                         qw/
+			"ADAM Parameters",
+			"Returned Value",
+			qw/
+			   Examples
 			   Algorithm
+			   References
 			   /,
+			"Related Applications",
+			"Implementation Status",
 			"Implementation Deficiencies",
 			qw/
 			   Notes
+			   /,
+			&MISCELLANEOUS,
+			qw/
 			   Copyright
 			   Licence
 			   Authors
@@ -80,6 +93,7 @@ my %TERMINATORS = (
 
 # create accessors
 for my $h (@STANDARD_HEADERS) {
+  next if $h eq &MISCELLANEOUS;
   my $method = lc($h);
   $method =~ s/\s+/_/g;
   my $code = q{
@@ -398,6 +412,9 @@ sub misc_sections {
   my @present = $self->sections;
   my %standard = map { $_, undef } @STANDARD_HEADERS, values %ALIASES;
 
+  # remove the placeholder
+  delete $standard{&MISCELLANEOUS};
+
   my @misc;
   for my $p (@present) {
     next unless $p; # blank keys are a bug
@@ -435,9 +452,41 @@ sub stringify {
   # Open the prologue, using the proper comment character
   $code .= $cchar ."+\n";
 
-  # Go through each of the standard headers in order and then
-  # finish with the unknown sections
-  for my $h (@STANDARD_HEADERS, $self->misc_sections) {
+  # Get the list of standard headers and insert the miscellaneous
+  # values into the correct place
+  my @sections;
+  for my $h (@STANDARD_HEADERS) {
+    if ($h ne &MISCELLANEOUS) {
+      push(@sections, $h);
+    } else {
+      push(@sections, $self->misc_sections);
+    }
+  }
+
+  # ADAM tasks put the Arguments in front of Description
+  my @type_of_m = $self->content( "Type of Module" );
+  if ($type_of_m[0] =~ /ADAM/) {
+    my $see_desc;
+    my $see_args;
+    my @new;
+    for my $h (@sections) {
+      # if this is description and we have not seen Arguments
+      # already, store Arguments
+      if ($h eq 'Description' && !$see_args) {
+	push(@new, "Arguments");
+	$see_desc = 1;
+      } elsif ($h eq 'Arguments') {
+	$see_args = 1;
+	# already have seen a Description field?
+	next if $see_desc;
+      }
+      push(@new, $h);
+    }
+    @sections = @new;
+  }
+
+  # Go through each of the headers in order
+  for my $h (@sections) {
 
     my $section = $self->has_section( $h );
 
@@ -578,10 +627,10 @@ sub _normalise_section_name {
   my @parts = split(/\s+/, $tag);
   for  (@parts) {
     # leave unchanged if all upper case
-    if ( $_ !~ /^[A-Z_]$/) {
+    if ( $_ !~ /^[A-Z_]+$/) {
       $_ = lc($_);
       $_ = ucfirst($_);
-    } 
+    }
   }
   $tag = join(" ", @parts );
   return $tag;
