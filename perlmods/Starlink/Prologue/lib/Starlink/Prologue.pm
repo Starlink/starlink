@@ -523,7 +523,7 @@ sub stringify {
       # write out the content
       for my $l (@content) {
 	if (defined $l) {
-	  if ($l =~ /\w/) {
+	  if ($l =~ /\S/) {
 	    # not just a blank line
 	    $code .= $cchar . "     " . $l ."\n";
 	  } else {
@@ -577,7 +577,7 @@ sub guess_defaults {
 	$lang = "Perl";
       } elsif ($suffix =~ /^(t)$/) {
 	$lang = "Perl Test";
-      } elsif ($suffix eq 'c') {
+      } elsif ($suffix eq 'c' || $suffix eq 'h') {
 	$lang = "Starlink C";
       } elsif ($suffix eq 'C' || $suffix eq 'cc') {
 	$lang = "Starlink C++";
