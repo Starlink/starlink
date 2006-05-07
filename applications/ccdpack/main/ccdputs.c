@@ -3,29 +3,20 @@
 *  Name:
 *     ccdputs
 
-*  Type of Module:
-*     C extension to Tcl.
+*  Purpose:
+*     Allows output from Tcl via the ADAM logging system.
 
 *  Language:
 *     ANSI C.
 
-*  Purpose:
-*     Allows output from Tcl via the ADAM logging system.
-
-*  Usage:
-*     ccdputs ?options? message
+*  Type of Module:
+*     C extension to Tcl.
 
 *  Description:
 *     The message supplied to this command is output via ADAM message
 *     system.  According to the flags it may be output to the ADAM
 *     message system direct using a MSG_OUT call, or via the CCDPACK 
 *     logging system using CCD1_MSG or CCD1_ERREP calls.
-
-*  Notes:
-*     This command works by writing commands up the pipe to the parent
-*     process, if ccdwish is running in pipes mode.  Therefore its
-*     implementation is closely tied to the interprocess communication
-*     code in the ccdwish binary.
 
 *  Arguments:
 *     options
@@ -41,7 +32,7 @@
 *           -name name
 *               If supplied, this gives the name of the message to be
 *               passed to the ADAM message system.
-* 
+*
 *        If neither the -log nor the -error flag is specified, the message
 *        will be passed directly to the ADAM message system using a
 *        MSG_OUT call.
@@ -49,15 +40,50 @@
 *        All message arguments will be concatenated and output as the 
 *        message.  The total length must not exceed MSG__SZMSG characters.
 
+*  Usage:
+*     ccdputs ?options? message
+
+*  Notes:
+*     This command works by writing commands up the pipe to the parent
+*     process, if ccdwish is running in pipes mode.  Therefore its
+*     implementation is closely tied to the interprocess communication
+*     code in the ccdwish binary.
+
+*  Copyright:
+*     Copyright (C) 2000 Central Laboratory of the Research Councils.
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
 *  History:
 *     21-SEP-2000 (MBT):
 *        Original version.
 *     11-APR-2005 (TIMJ):
 *        Fix compiler warnings
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 */

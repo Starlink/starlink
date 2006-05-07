@@ -3,16 +3,14 @@
 *  Name:
 *     ndfdrawpair
 
-*  Type of Module:
-*     C extension to Tcl.
-
 *  Purpose:
 *     Allow plotting of two NDFs on a GWM device.
 
-*  Usage:
-*     ndfdrawpair device xorigin yorigin xdev ydev zoom 
-*                 ndfsetA frameA xoffA yoffA lopercA hipercA
-*                 ndfsetB frameB xoffB yoffB lopercB hipercB
+*  Language:
+*     Starlink C
+
+*  Type of Module:
+*     C extension to Tcl.
 
 *  Description:
 *     The ndfdrawpair command causes two NDFs or NDF Sets to be 
@@ -85,6 +83,11 @@
 *        Percentile in the data of the second NDF to correspond to the 
 *        upper colour index for plotting (0 <= lopercB <= hipercB <= 100).
 
+*  Usage:
+*     ndfdrawpair device xorigin yorigin xdev ydev zoom 
+*                 ndfsetA frameA xoffA yoffA lopercA hipercA
+*                 ndfsetB frameB xoffB yoffB lopercB hipercB
+
 *  Return Value:
 *     The return value is a count of the pixels in the overlap region 
 *     which have contributions from both the NDFs.  Thus if a zero is
@@ -92,14 +95,39 @@
 *     this does not necessarily mean there is no overlap; there could
 *     be an overlap composed entirely of bad pixels).
 
+*  Copyright:
+*     Copyright (C) 2000-2001 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
+*     {enter_new_authors_here}
 
 *  History:
 *     5-SEP-2000 (MBT):
 *        Initial version.
 *     12-MAR-2001 (MBT):
 *        Upgraded for use with Sets.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 */

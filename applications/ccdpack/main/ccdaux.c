@@ -8,10 +8,13 @@
 *+
 *  Name:
 *     ccdMall
-*
+
 *  Purpose:
 *     C wrapper for fortran CCD1_MALL routine.
-*
+
+*  Language:
+*     Starlink C
+
 *  Arguments:
 *     type = char *
 *        HDS type of memory to allocate, as a null-terminated string.
@@ -19,7 +22,7 @@
 *        Number of elements of type type to allocate.
 *     status = int
 *        The global status.
-*
+
 *  Return Value:
 *     A pointer to a block of memory which will hold size elements of
 *     type type.  This pointer has been registered with the CCDPACK
@@ -28,6 +31,36 @@
 *     The pointer returned is a C pointer, and thus suitable for direct
 *     use by C code.  If it is to be used by Fortran code it must
 *     be processed with the function cnfFptr.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
       DECLARE_CHARACTER( ftype, DAT__SZTYP );

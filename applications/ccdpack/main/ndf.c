@@ -3,14 +3,14 @@
 *  Name:
 *     ndf
 
-*  Type of Module:
-*     C extension to Tcl8.
+*  Purpose:
+*     Provides new commands "ndf" and "ndfset" for use with Tcl.
 
 *  Language:
 *     ANSI C.
 
-*  Purpose:
-*     Provides new commands "ndf" and "ndfset" for use with Tcl.
+*  Type of Module:
+*     C extension to Tcl8.
 
 *  Description:
 *     This file provides an object to use within Tcl programs for
@@ -30,9 +30,9 @@
 *     to calling C code (e.g. other extensions to Tcl), such as 
 *     mapping the NDF and generating an array suitable for feeding
 *     to PGPLOT for plotting on a display device.
-
-*  The following prologue items document the behaviour of both ndf and
-*  ndfset objects.
+*
+*     The following prologue items document the behaviour of both ndf and
+*     ndfset objects.
 
 *  Usage:
 *     set ndfob [ndf ndfname]
@@ -52,8 +52,7 @@
 *        be used.  Returns the name of a new object command which can be
 *        used to manipulate the new ndfset object.
 
-*  Object commands:
-*
+*  Object Commands:
 *     ndfob-or-ndfsetob addframe baseframe coeffs ?newdomain?
 *        This adds a new frame to the WCS component of the NDF; note it
 *        does not write to the NDF on disk, it only affects the 
@@ -240,13 +239,30 @@
 *        each element of the list containing the coordinates in the 'to'
 *        frame of the corresponding pos argument.
 
-*  Bugs:
-*     In several cases, if a command exits with error status, it may
-*     have leaked some memory.  On the whole, such leaks should be
-*     pretty small.
+*  Copyright:
+*     Copyright (C) 2000-2001 Central Laboratory of the Research
+*     Councils. Copyright (C) 2005 Particle Physics & Astronomy
+*     Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
+*     {enter_new_authors_here}
 
 *  History:
 *     16-AUG-2000 (MBT):
@@ -255,6 +271,14 @@
 *        Upgraded for use with Sets.
 *     18-NOV-2005 (TIMJ):
 *        Use official HDS C interface
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     In several cases, if a command exits with error status, it may
+*     have leaked some memory.  On the whole, such leaks should be
+*     pretty small.
+*     {note_new_bugs_here}
+
 *-
 */
 

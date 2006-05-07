@@ -2,14 +2,17 @@
 *+
 *  Name:
 *     tcltalk.c
-*
-*  Purpose: 
+
+*  Purpose:
 *     Tcl utility routines for CCDPACK.
-*
+
+*  Language:
+*     Starlink C
+
 *  Description:
 *     This file contains routines which are used by C functions in CCDPACK
 *     which have to communicate with Tcl interpreters.
-*
+
 *  Notes:
 *     As currently implemented the Tcl interpreter is run in a separate
 *     process and communication is done using pipes.  Because of the 
@@ -29,15 +32,41 @@
 *     shut AMS down (for instance, if it is required to run more than
 *     one separate Tcl script) this means that we can't do it in the
 *     calling process.
+
+*  Copyright:
+*     Copyright (C) 2000 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
 *
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
-*
+*     {enter_new_authors_here}
+
 *  History:
 *     1-JUL-2000 (MBT):
 *        Original version.
 *     28-JUL-2000 (MBT):
 *        Recoded to run the Tcl interpreter in a separate process.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -72,10 +101,13 @@
 *+
 *  Name:
 *     ccdTclStart
-*
+
 *  Purpose:
 *     Start up a Tcl interpreter.
-*
+
+*  Language:
+*     Starlink C
+
 *  Description:
 *     This function returns a pointer to a ccdTcl_Interp structure, which
 *     is the value which should be passed as the 'interp' argument to
@@ -87,16 +119,46 @@
 *     by calling ccdTclDo or one of the other similar functions.  The 
 *     correct way to free the resources associated with this pointer 
 *     is using a call to the ccdTclStop routine.
-*
+
 *  Arguments:
 *     status = int *
 *        The global status.
-*
-*  Return value:
+
+*  Return Value:
 *     On successful execution, a pointer to a ccdTcl_Interp structure, 
 *     to be used for subsequent calls to related routines, is returned.
 *     If there is an error then the status argument is set, and NULL
 *     is returned.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -197,10 +259,13 @@
 *+
 *  Name:
 *     ccdTclEval
-*
+
 *  Purpose:
 *     Evaluate a Tcl command.
-*
+
+*  Language:
+*     Starlink C
+
 *  Description:
 *     This routine executes a command in the Tcl interpreter specified
 *     by the cinterp argument, and returns the interpreter's result 
@@ -216,7 +281,7 @@
 *     This function is declared static, and so not intended for use 
 *     by external code.  External routines should use ccdTclDo or one
 *     of the other ccdTcl* functions instead.
-*
+
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
@@ -226,11 +291,41 @@
 *        should be all right.
 *     status = int *
 *        The global status.
-*
+
 *  Return Value:
 *     A pointer to a static character string is returned, which contains
 *     the string result of the evaluation.  This will be overwritten by
 *     the next call to this routine.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -346,21 +441,54 @@
 *+
 *  Name:
 *     ccdTclStop
-*
+
 *  Purpose:
 *     Delete a Tcl interpreter.
-*
+
+*  Language:
+*     Starlink C
+
 *  Description:
 *     This routine should be called to shut down a Tcl interpreter which
 *     was started by ccdTclStart.  It ought not to be shut down in any
 *     other way.  This routine will attempt to execute even if the
 *     status is set.
-*
+
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
 *     status = int *
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -396,20 +524,24 @@
 
 
    void ccdTclDo( ccdTcl_Interp *cinterp, char *script, int *status ) {
-/*+
+/*
+*+
 *  Name:
 *     ccdTclDo
-*
+
 *  Purpose:
 *     Execute a Tcl command and discard the result.
-*
+
+*  Language:
+*     Starlink C
+
 *  Description:
 *     This function executes an arbitrary string of Tcl commands within
 *     the current interpreter and discards the result.  It is better
 *     to use this than ccdTclGetC cast to void if the result string 
 *     may be long, since attempting to pass a long result string up 
 *     the result pipe may result in a buffer overflow.
-*
+
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
@@ -417,6 +549,36 @@
 *        Any string of Tcl commands.
 *     status = int *
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -436,18 +598,22 @@
 
 
    void ccdTclRun( ccdTcl_Interp *cinterp, char *filename, int *status ) {
-/*+
+/*
+*+
 *  Name:
 *     ccdTclRun
-*
+
 *  Purpose:
 *     Execute a Tcl script file.
-*
+
+*  Language:
+*     Starlink C
+
 *  Description:
 *     This routine causes the script file named by the filename argument
 *     to be executed within the running Tcl interpreter.  It will look
 *     for the script in the CCDPACK_DIR directory.
-*
+
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
@@ -455,6 +621,36 @@
 *        Name of the Tcl script file to interpret.
 *     status = int *
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -484,14 +680,17 @@
 *+
 *  Name:
 *     ccdTclAppC
-*
+
 *  Purpose:
 *     Append an item to a Tcl list.
-*
+
+*  Language:
+*     Starlink C
+
 *  Description:
 *     This routine appends an item to a Tcl variable using the lappend 
 *     command.
-*
+
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
@@ -501,6 +700,36 @@
 *        The item to appeand to the variable contents.
 *     status = int *
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -521,10 +750,13 @@
 *+
 *  Name:
 *     ccdTclSetI
-*
+
 *  Purpose:
 *     Set the value of a Tcl variable to an integer.
-*
+
+*  Language:
+*     Starlink C
+
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
@@ -534,6 +766,36 @@
 *        The value to set the variable to.
 *     status = int *
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -554,10 +816,13 @@
 *+
 *  Name:
 *     ccdTclSetD
-*
+
 *  Purpose:
 *     Set the value of a Tcl variable to a double.
-*
+
+*  Language:
+*     Starlink C
+
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
@@ -567,6 +832,36 @@
 *        The value to set the variable to.
 *     status = int *
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -587,10 +882,13 @@
 *+
 *  Name:
 *     ccdTclSetC
-*
+
 *  Purpose:
 *     Set the value of a Tcl variable to a string.
-*
+
+*  Language:
+*     Starlink C
+
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
@@ -600,6 +898,36 @@
 *        Pointer to string to set the variable to.
 *     status = int *
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -620,10 +948,13 @@
 *+
 *  Name:
 *     ccdTclGetI
-*
+
 *  Purpose:
 *     Evaluate a Tcl expression as an integer value.
-*
+
+*  Language:
+*     Starlink C
+
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
@@ -633,6 +964,36 @@
 *        A pointer to the variable in which to store the result;
 *     status = int *
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -661,10 +1022,13 @@
 *+
 *  Name:
 *     ccdTclGetD
-*
+
 *  Purpose:
 *     Evaluate a Tcl expression as an double value.
-*
+
+*  Language:
+*     Starlink C
+
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
@@ -674,6 +1038,36 @@
 *        A pointer to the variable in which to store the result;
 *     status = int *
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 
@@ -702,17 +1096,20 @@
 *+
 *  Name:
 *     ccdTclGetC
-*
+
 *  Purpose:
 *     Evaluate a Tcl expression as a string value.
-*
+
+*  Language:
+*     Starlink C
+
 *  Description:
 *     This function executes an arbitrary string within the Tcl 
 *     interpreter and returns the result string.  Note it should NOT
 *     be used if the return string may be long (longer than BUFLENG)
 *     since this may cause the read buffer to overflow when the result
 *     is passed back up the pipe.
-*
+
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
@@ -720,11 +1117,41 @@
 *        A pointer to the text of a Tcl expression to evaluate.
 *     status = int *
 *        The global status.
-*
-*  Return value:
+
+*  Return Value:
 *     A pointer to the result of the expression.  If there was an error
 *     then status is set, and the return value will be set to an empty 
 *     string.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     {original_author_entry}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
 

@@ -3,23 +3,27 @@
 *  Name:
 *     ndgexpand
 
-*  Type of Module:
-*     C extension to Tcl.
+*  Purpose:
+*     Expands an NDG group expression to a list of names.
 
 *  Language:
 *     ANSI C.
 
-*  Purpose:
-*     Expands an NDG group expression to a list of names.
-
-*  Usage:
-*     ndgexpand ?-sup? group-expression
+*  Type of Module:
+*     C extension to Tcl.
 
 *  Description:
 *     An NDG group expression is expanded to give a list of the NDF 
 *     structures to which it refers.  Either the NDF name alone or
 *     the full list of NDG supplementary data can be returned 
 *     according to the absence or presence of the -sup flag.
+
+*  Arguments:
+*     group = string
+*        A group expression representing an NDG-type query.
+
+*  Usage:
+*     ndgexpand ?-sup? group-expression
 
 *  Flags:
 *     -sup
@@ -40,20 +44,41 @@
 *        Note that the final element of this list is the same as the 
 *        single value returned with no -sup flag.
 
-*  Arguments:
-*     group = string
-*        A group expression representing an NDG-type query.
-
 *  Return Value:
 *     A list of strings, one per (possible) NDF structure in the 
 *     NDG-expanded version of group.
 
+*  Copyright:
+*     Copyright (C) 2001 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
+*     {enter_new_authors_here}
 
 *  History:
 *     14-JUN-2001 (MBT):
 *        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 */
