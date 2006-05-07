@@ -21,7 +21,7 @@
 *     file (an aborting task will issue other messages to the batch log
 *     file or the currently interactive process).
 *     THIS VERSION USES FIO and PSX.
-
+*
 *     Notes:
 *     -  This version is designed for use on machines which do not
 *        support the ICL/ADAM logging system. It uses FIO and PSX
@@ -31,6 +31,26 @@
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status. This routine tries to run if status is BAD.
+
+*  Copyright:
+*     Copyright (C) 1991-1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)

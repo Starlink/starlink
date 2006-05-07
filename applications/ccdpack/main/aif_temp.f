@@ -30,15 +30,6 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Notes:
-*     -  A blank string will be returned for the LOC argument if this
-*     routine is called with STATUS set, although no further processing
-*     will occur. The same value will also be returned if the routine
-*     should fail for any reason.
-*     -  This routine is a work-around to avoid the problems associated
-*     with calling DAT_TEMP if the objects created must subsequently be
-*     erased.
-
 *  Algorithm:
 *     -  Initialise the LOC argument, before checking the inherited
 *     status.
@@ -49,6 +40,35 @@
 *     -  Create the object within the enclosing structure and obtain a
 *     locator to it.
 *     -  If an error occurred, then reset the LOC argument.
+
+*  Notes:
+*     -  A blank string will be returned for the LOC argument if this
+*     routine is called with STATUS set, although no further processing
+*     will occur. The same value will also be returned if the routine
+*     should fail for any reason.
+*     -  This routine is a work-around to avoid the problems associated
+*     with calling DAT_TEMP if the objects created must subsequently be
+*     erased.
+
+*  Copyright:
+*     Copyright (C) 1989, 1991 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)

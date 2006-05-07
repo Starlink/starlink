@@ -21,23 +21,23 @@
 *
 *       TYPE='MASTER_BIAS' ACCEPT=1 IGNORE=0
 *
-*    Then the NDF frame type must be equal to 'MASTER_BIAS'. If we have
+*     Then the NDF frame type must be equal to 'MASTER_BIAS'. If we have
 *
 *       TYPE='TARGET' ACCEPT=0 IGNORE=0
 *
-*    Then the NDF frame type must be equal to 'TARGET'. If we have
+*     Then the NDF frame type must be equal to 'TARGET'. If we have
 *
 *       TYPE='TARGET_PROCESSED' ACCEPT=0 IGNORE=0
 *
-*    Then the NDF frame type must be 'TARGET'. If we have
+*     Then the NDF frame type must be 'TARGET'. If we have
 *
 *       TYPE ='PROCESSED_FLATTENED' ACCEPT=2 IGNORE=1
 *
-*    The the NDF type must be 'XXXX_PROCESSED_FLATTENED' and the
-*    XXXX_ in the name will be ignored etc.
+*     The the NDF type must be 'XXXX_PROCESSED_FLATTENED' and the
+*     XXXX_ in the name will be ignored etc.
 *
-*    Failure to meet any of these requirements is not critical
-*    and a warning message is just issued.
+*     Failure to meet any of these requirements is not critical
+*     and a warning message is just issued.
 
 *  Arguments:
 *     ID = INTEGER (Given)
@@ -58,6 +58,26 @@
 *  Notes:
 *     -  Just because this subroutine doesn't issue a warning isn't a
 *     guarantee that everything is ok. This is just a courtesy function.
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)

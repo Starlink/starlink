@@ -16,35 +16,35 @@
 *                      IVALS, RVALS, DVALS, LVALS, STATUS )
 
 *  Description:
-*   This routine interprets the information passed to it as instructions
-*   about how to extract information from the FITS block of an NDF and
-*   consequently how to use the values associated to derive a value for
-*   named extension items in the NDF's CCDPACK extension. FITGRP and
-*   DESGRP should have been produced the CCD1_FTGRP routine, these
-*   contain the HDS types and names of the FITS-keywords to be used
-*   (FITGRP) and the destination name and type of the CCDPACK extension
-*   ITEM, together with a function which describes how to generate this
-*   information from the values of the FITS-items (DESGRP).
+*     This routine interprets the information passed to it as instructions
+*     about how to extract information from the FITS block of an NDF and
+*     consequently how to use the values associated to derive a value for
+*     named extension items in the NDF's CCDPACK extension. FITGRP and
+*     DESGRP should have been produced the CCD1_FTGRP routine, these
+*     contain the HDS types and names of the FITS-keywords to be used
+*     (FITGRP) and the destination name and type of the CCDPACK extension
+*     ITEM, together with a function which describes how to generate this
+*     information from the values of the FITS-items (DESGRP).
 *
-*   The destination group function may be of several types. Most simply
-*   it is a FITS-keyword in which case the value extracted from the
-*   FITS block will be used (possibly after a type transformation of
-*   some kind).  It can also be a TRANSFORM expression containing
-*   references to FITS-keywords. Items whose destination type are
-*   _LOGICAL must be translatable to a string which the routine CHR_CTOL
-*   can process and should only contain a single FITS-keyword. Finally
-*   if the destination item is of HDS type _CHAR then it is assumed to
-*   be an expression which maps the values of string extracted from the
-*   FITS block to strings which are valid in the CCDPACK extension,
-*   unless it is a single word in which case the value is used
-*   directly or unless it contains the string '//' in which case the
-*   values are concatenated together.
+*     The destination group function may be of several types. Most simply
+*     it is a FITS-keyword in which case the value extracted from the
+*     FITS block will be used (possibly after a type transformation of
+*     some kind).  It can also be a TRANSFORM expression containing
+*     references to FITS-keywords. Items whose destination type are
+*     _LOGICAL must be translatable to a string which the routine CHR_CTOL
+*     can process and should only contain a single FITS-keyword. Finally
+*     if the destination item is of HDS type _CHAR then it is assumed to
+*     be an expression which maps the values of string extracted from the
+*     FITS block to strings which are valid in the CCDPACK extension,
+*     unless it is a single word in which case the value is used
+*     directly or unless it contains the string '//' in which case the
+*     values are concatenated together.
 *
-*   The FITS items types need not be the same as the extension types as
-*   translations between the various types are preformed. This may
-*   occasionally result in an unwanted truncation, in this case all the
-*   FITS-keywords should be extracted as _CHAR these will then be used
-*   literally (i.e. as they appear).
+*     The FITS items types need not be the same as the extension types as
+*     translations between the various types are preformed. This may
+*     occasionally result in an unwanted truncation, in this case all the
+*     FITS-keywords should be extracted as _CHAR these will then be used
+*     literally (i.e. as they appear).
 
 *  Arguments:
 *     FITGRP( 2 ) = INTEGER (Given)
@@ -88,6 +88,27 @@
 *        of FITS items which will be extracted (size of FITGRP groups).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council.
+*     Copyright (C) 2000 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)

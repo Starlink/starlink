@@ -8,11 +8,14 @@
 *  Purpose:
 *     Determines the covariances of a non-linear fit.
 
+*  Language:
+*     Starlink Fortran 77
+
 *  Invocation:
 *     CALL CCD1_FCOV( M, N, FSUMSQ, X, COVAR, LCOV,
 *                     WRK1, WRK2, WRK3, WRK4, IFAIL )
 
-*   Description:
+*  Description:
 *     This routine calculates the covariance matrix of the estimated
 *     regression coefficients for a non-linear least squares problem.
 *     It uses the estimate of the jacobian of f(x) at the solution.
@@ -36,7 +39,7 @@
 *     CCD1_SZSLV after a call to DQEDS. CCD1_CALCJ is defined to use the
 *     common block information in CCD1_SZSLV to calculate the jacobian.
 
-*   Arguments:
+*  Arguments:
 *     M = INTEGER (Given)
 *        The number of residuals in used in fit (observations).
 *     N = INTEGER (Given)
@@ -64,6 +67,26 @@
 *        the calculation has failed. If greater than 1 then the matrix
 *        contains linear or near linear dependencies. A matrix has still
 *        been calculated and may still be a good solution.
+
+*  Copyright:
+*     Copyright (C) 1996 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)

@@ -14,13 +14,32 @@
 *  Invocation:
 *     CALL KPG1_ASFRM( PARAM, EPARAM, IWCS, WCDOM, DCDOM, PROMPT, STATUS )
 
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
 *  Description:
 *     This routine allows the user to specify a new Current Frame for a 
 *     FrameSet using an environment parameter.
+
+*  Arguments:
+*     PARAM = CHARACTER * ( * ) (Given)
+*        Name of parameter to use to get Frame description.
+*     EPARAM = CHARACTER * ( * ) (Given)
+*        Name of parameter to use to get Epoch value (if needed).
+*     IWCS = INTEGER (Given)
+*        An AST pointer to the FrameSet. 
+*     WCDOM = CHARACTER * ( * ) (Given)
+*        The Domain name to use if the user requests "WORLD" co-ordinates.
+*        No translation of WORLD takes place if a blank value is supplied.
+*     DCDOM = CHARACTER * ( * ) (Given)
+*        The Domain name to use if the user requests "DATA" co-ordinates.
+*        No translation of DATA takes place if a blank value is supplied.
+*     PROMPT = LOGICAL (Given)
+*        An error is always reported if the requested Frame is not
+*        available in the FrameSet. PROMPT controls what happens after
+*        the error has been reported. If .TRUE., then the error is
+*        flushed, the parameter is cancelled, and the user is re-prompted 
+*        for a new %PARAM value. Otherwise, the error is retained, and the 
+*        routine exits with STATUS set to SAI__ERROR.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
 *  ADAM Parameters:
 *     %PARAM = LITERAL (Read)
@@ -47,34 +66,31 @@
 *        ("1996.8" for example). Such values are interpreted as a Besselian 
 *        epoch if less than 1984.0 and as a Julian epoch otherwise. 
 
-*  Arguments:
-*     PARAM = CHARACTER * ( * ) (Given)
-*        Name of parameter to use to get Frame description.
-*     EPARAM = CHARACTER * ( * ) (Given)
-*        Name of parameter to use to get Epoch value (if needed).
-*     IWCS = INTEGER (Given)
-*        An AST pointer to the FrameSet. 
-*     WCDOM = CHARACTER * ( * ) (Given)
-*        The Domain name to use if the user requests "WORLD" co-ordinates.
-*        No translation of WORLD takes place if a blank value is supplied.
-*     DCDOM = CHARACTER * ( * ) (Given)
-*        The Domain name to use if the user requests "DATA" co-ordinates.
-*        No translation of DATA takes place if a blank value is supplied.
-*     PROMPT = LOGICAL (Given)
-*        An error is always reported if the requested Frame is not
-*        available in the FrameSet. PROMPT controls what happens after
-*        the error has been reported. If .TRUE., then the error is
-*        flushed, the parameter is cancelled, and the user is re-prompted 
-*        for a new %PARAM value. Otherwise, the error is retained, and the 
-*        routine exits with STATUS set to SAI__ERROR.
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
 *  Notes:
 *     -  This routine may add a new co-ordinate Frame into the FrameSet.
 *     -  If the FrameSet contains more than one Frame with the requested 
 *        Domain, then the last matching Frame in the FrameSet will be 
 *        used (i.e. the one with highest index).
+
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -87,6 +103,9 @@
 *        Ensure each Domain is only included once in the list of available
 *        Domains.
 *     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 *  Type Definitions:
