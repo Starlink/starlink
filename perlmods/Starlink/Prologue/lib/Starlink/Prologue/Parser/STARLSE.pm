@@ -126,7 +126,7 @@ sub push_line {
       # prologue content (or *- but that is dealt with above)
       # Include leading spaces since we want to retain indenting
       # strip off the first 5 spaces (standard formatting)
-      # Replace tabs with 8 characters
+      # Replace tabs with 8 characters (not clever)
       my $content = $1;
       $content =~ s/\t/        /;
       $content =~ s/^\s{2,5}//;
