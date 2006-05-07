@@ -6,8 +6,7 @@
 
 *  Purpose:
 *     To calculate the area under a line segment within a unit pixel
-*     at the origin. This is called from CCD1_BOX, in turn called
-*     from CCD1_DODIZ and hence from to DRIZZLE
+*     at the origin.
 
 *  Language:
 *     Starlink Fortran 77
@@ -16,8 +15,8 @@
 *     CALL CCD1_SGARE( X1, Y1, X2, Y2, STATUS )
 
 *  Description:
-
-*  Notes
+*     This is called from CCD1_BOX, in turn called
+*     from CCD1_DODIZ and hence from to DRIZZLE
 
 *  Arguments:
 *     X1 = DOUBLE PRECISION (Given)

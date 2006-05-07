@@ -17,7 +17,7 @@
 *     to copy the data pointed to by IPIN to the array pointed to by
 *     IPOUT.
 
-*  Notes
+*  Notes:
 *     - just uses R and D types for now.
 
 *  Arguments:

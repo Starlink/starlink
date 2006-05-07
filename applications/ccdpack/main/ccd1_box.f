@@ -14,10 +14,6 @@
 *  Invocation:
 *     CALL CCD1_BOX( XS, YS, XOUT, YOUT, OVER, STATUS )
 
-*  Description:
-
-*  Notes
-
 *  Arguments:
 *     XS = INTEGER (Given)
 *       X co-ordinate of affected ouptut pixel
