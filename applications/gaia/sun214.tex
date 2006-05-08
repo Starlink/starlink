@@ -707,13 +707,13 @@ symbols you should consult the ESO document
 (\xref{SSN/75}{ssn75}{}).
 
 \subsubsection{FITS tables} Much of the above also applies to FITS tables
-that GAIA will read, \textit{i.e.} FITS keywords with the names
-\mytt{X\_COL}, \mytt{Y\_COL} and \mytt{SYMBOL} will be interpreted
-correctly. Special parameter names that are longer than 8 characters
-(such as \mytt{search\_cols}, \mytt{sort\_order}, \mytt{show\_cols}
-and \mytt{copyright}) should be truncated. Long symbol expressions can
-span more than one card by using the names: \mytt{SYMBOL1} through
-\mytt{SYMBOL9}.
+that GAIA will read, \textit{i.e.} FITS keywords with the name
+\mytt{SYMBOL} will be interpreted correctly. Special parameter names that are
+longer than 8 characters (such as \mytt{search\_cols}, \mytt{sort\_order},
+\mytt{show\_cols} and \mytt{copyright}) should be truncated. Long symbol
+expressions can span more than one card by using the names: \mytt{SYMBOL1}
+through \mytt{SYMBOL9}. The columns used for world coordinates should have
+units of degrees or radians and have names like \mytt{RA} and \mytt{DEC}.
 
 \subsection{\xlabel{image_formats}Accessing images of differing formats}
 

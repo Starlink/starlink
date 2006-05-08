@@ -31,7 +31,8 @@
 *        .
 *
 *     The tab table returned by this routine may have the special
-*     parameters, x_col, y_col, id_col, ra_col and dec_col.
+*     parameters, x_col, y_col, id_col, ra_col and dec_col, set 
+*     depending on what heuristics apply (there's a lot of guess work).
 
 *  Arguments:
 *     CI = INTEGER (Given)
@@ -41,7 +42,7 @@
 *     IDCOL = INTEGER (Given)
 *        The position, within the catalogue, of the ID column. If this
 *        doesn't exist and the first column is a positional one
-*        (i.e. RA, DEC, X or Y)then a pseudo index will be generated.
+*        (i.e. RA, DEC, X or Y) then a pseudo index will be generated.
 *     XCOL = INTEGER (Given and Returned)
 *        The position, within the catalogue, of the X column. This will
 *        be guessed, if the value is set to -1.
@@ -293,15 +294,20 @@
 *  to be possible sky coordinates. WFCAM has Radians, so make case insensitive.
          CALL CHR_LCASE( UNITS )
          CALL CHR_LDBLK( UNITS )
-         IF ( UNITS( :7 ) .EQ. 'radians' ) THEN
+         IF ( UNITS( :7 ) .EQ. 'radians' .OR. 
+     :        UNITS( :6 ) .EQ. 'degree' ) THEN
 
-*  Not degrees.
-            AREDEG = .FALSE.
+*  Not degrees?
+            IF ( UNITS( :7 ) .EQ. 'radians' ) THEN 
+               AREDEG = .FALSE.
+            ELSE
+               AREDEG = .TRUE.
+            END IF
 
-*  Column with angle data. This is either an RA or DEC. If qualified by
-*  {HOURS} or the name is some variation of RA/Ra/r.a./Rightxxx, then
-*  assume RA, otherwise it is a DEC. Note we need both of these to have
-*  a valid match.
+*  Assuming this is a column with angle data. This is either an RA or
+*  DEC. If qualified by {HOURS} or the name is some variation of
+*  RA/Ra/r.a./Rightxxx, then assume RA, otherwise it is a DEC. Note we
+*  need both of these to have a valid match, but we don't check for that.
             IF ( UNITS( 8: ) .EQ. '{hours}' ) THEN
                IF ( RACOL .EQ. -1 ) RACOL = I - 1
             ELSE
@@ -310,14 +316,17 @@
                CALL CHR_LDBLK( LNAME )
                IF ( LNAME( :2 ) .EQ. 'ra' .OR.
      :              LNAME( :5 ) .EQ. 'right' .OR.
-     :              LNAME( :4 ) .EQ. 'r.a.' ) THEN
+     :              LNAME( :4 ) .EQ. 'r.a.' .OR.
+     :              LNAME( :7 ) .EQ. 'x_world' ) THEN
                   IF ( RACOL .EQ. -1 ) RACOL = I - 1
                ELSE
+
+*  Assume this is declination.
                   IF ( DECCOL .EQ. -1 ) DECCOL = I - 1
                END IF
             END IF
 
-*  Check for SExtractor specific names. Note SExtractor world
+*  Check for SExtractor specific names without units. SExtractor world
 *  coordinates are in degrees, and shouldn't be converted.
          ELSE IF ( NAME .EQ. 'X_WORLD' ) THEN
             IF ( RACOL .EQ. -1 ) RACOL = I - 1
@@ -334,7 +343,7 @@
          ELSE IF ( NAME .EQ. 'Y' ) THEN
             IF ( YCOL .EQ. -1 ) YCOL = I - 1
 
-*  Look for incoming IDCOL.
+*  Look for incoming IDCOL (as a column, seems odd?).
          ELSE IF ( NAME .EQ. 'ID_COL' ) THEN 
             IF ( IDCOL .EQ. -1 ) IDCOL = I - 1
          END IF
