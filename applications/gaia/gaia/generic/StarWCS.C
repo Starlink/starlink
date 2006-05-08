@@ -85,6 +85,8 @@
  *-
  */
 
+#include "define.h"    // From tclutil
+
 #include <cstring>
 #include <cstdlib>
 #include <cmath>
