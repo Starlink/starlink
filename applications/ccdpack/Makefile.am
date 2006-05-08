@@ -39,6 +39,7 @@ starhelp_DATA = ccdpack.shl
 include_MESSAGES = USER_ERR
 
 dist_starnews_DATA = ccdpack.news
+dist_pkgdata_DATA = LICENCE
 
 ccdpack_red_SOURCES = ccdpack_red.f
 ccdpack_reg_SOURCES = ccdpack_reg.f
