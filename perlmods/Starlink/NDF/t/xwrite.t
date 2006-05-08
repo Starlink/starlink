@@ -1,6 +1,6 @@
 #!perl -w
 
-use Test::More tests => 24;
+use Test::More tests => 27;
 use warnings;
 use strict;
 
@@ -34,11 +34,11 @@ is( $status, &NDF::SAI__OK, "check status");
 
 # Add an extension
 my @dim = ();
-ndf_xnew($indf, 'TEST', 'PERL_TEST', 0, \@dim, my $loc, $status);
+ndf_xnew($indf, 'TEST', 'PERL_TEST', 0, \@dim, my $loca, $status);
 is($status, &NDF::SAI__OK, "Check status");
 
 @dim = (1,2);
-ndf_xnew($indf, 'ARY_TEST', 'PERL_TEST_ARR', 2, \@dim, $loc, $status);
+ndf_xnew($indf, 'ARY_TEST', 'PERL_TEST_ARR', 2, \@dim, my $locb, $status);
 is($status, &NDF::SAI__OK, "Check status");
 
 # Add some data
@@ -75,6 +75,22 @@ ndf_xgt0l($indf, 'TEST', 'LOG', $lval, $status);
 is($status, &NDF::SAI__OK, "Check status");
 ndf_xgt0r($indf, 'TEST', 'REAL', $rval, $status);
 is($status, &NDF::SAI__OK, "Check status");
+
+# Try to create an NDF in the extension
+ndf_xstat( $indf, "TEST", my $there, $status );
+ok($there, "Extension is present");
+ndf_open( $loca, "MAPCOORD", "WRITE", "UNKNOWN", my $cndf, $place, $status);
+is($cndf, 0, "No NDF ID");
+isnt($place, 0, "Place holder");
+ 
+my @lbnd = (1);
+my @ubnd = (2);
+ndf_new( "_INTEGER", 1, @lbnd, @ubnd, $place, $cndf, $status );
+ndf_map( $cndf, "DATA", "_INTEGER", "WRITE", my $pntr, my $el, $status);
+ndf_annul( $cndf, $status );
+
+dat_annul( $loca, $status );
+dat_annul( $locb, $status );
 
 # delete the extensions
 ndf_xdel($indf, 'TEST', $status);
