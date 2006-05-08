@@ -2,16 +2,49 @@
 #+
 #  Name:
 #     tkast
-#
+
 #  Purpose:
 #     Browse an AST Object. 
-#
+
+#  Language:
+#     TCL
+
 #  Invocation:
 #     tkast <file>
-#
+
 #  Command Line Arguments:
 #     file - A text file containing descriptions of one or more AST Objects
 #            in the format used by a simple AST "Channel".
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 # Set up global constants.
@@ -36,16 +69,16 @@ proc MakeData {top} {
 #+
 #  Name:
 #     MakeData
-#
+
 #  Purpose:
 #     Create a Tcl description of an AST data item. The AST description of 
 #     the data item is obtained by reading records sequentially from the 
 #     supplied file (opened with descriptor $FD), starting at the current 
 #     file position.
-#     
+#
 #     The returned Tcl description of a data item consists of a list of 5 
 #     elements, in the following order:
-#     
+#
 #     0 - The name of the data item.
 #     1 - The type of the data item. This will be either:
 #           - The Object class name if the data item is an Object.
@@ -63,22 +96,55 @@ proc MakeData {top} {
 #         file. A value of 1 is stored if it was not commented out (i.e. if
 #         it is "required"), and a value of zero is stored if it was 
 #         commented out.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     top - Should be set to 1 by the calling procedure to indicate a 
 #           top-level entry. It will be set to zero when calling this 
 #           procedure recursively.
-#
+
 #  Returned Value:
 #     A 5 element list describing the data item read from the input file.
 #     If an error occurs while in a recursive entry to this procedure, then
 #     $ERROR is returned. If an eror occurs in a top-level entry, then an
 #     error message is reported and the applications is aborted.
-#
+
 #  Notes:
-#    -  "IsA" data items are stored with a blank name, and a value consisting 
-#    of a single string component holding the class name of the parent Object 
-#    just completed.
+#     -  "IsA" data items are stored with a blank name, and a value consisting 
+#     of a single string component holding the class name of the parent Object 
+#     just completed.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global FD
    global FILE
@@ -183,14 +249,47 @@ proc Save {object title} {
 #+
 #  Name:
 #     Save
-#
+
 #  Purpose:
 #     Write an object out to the text file with name ${title}.ast in 
 #     a format which can be read by a standard AST Channel.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     object - the Tcl list defining the object to be dumped.
 #     title - A string giving the name of the object.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global FD
    regsub -all {\.} $title "_" file
@@ -208,17 +307,50 @@ proc WriteObject {object indent top} {
 #+
 #  Name:
 #     WriteObject
-#
+
 #  Purpose:
 #     Write an object out to the text file opened on unit $FD, in 
 #     a format which can be read by a standard AST Channel.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     object - the Tcl list defining the object to be dumped.
 #     indext - A string of spaces giving the current indentation.
 #     top - Should be set to 1 by the calling procedure to indicate a 
 #           top-level entry. It will be set to zero when calling this 
 #           procedure recursively.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global FD
 

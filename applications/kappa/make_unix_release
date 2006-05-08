@@ -1,31 +1,56 @@
 #!/bin/tcsh
-# Name:
-#    make_unix_release
+#+
+#  Name:
+#     make_unix_release
+
+#  Purpose:
+#     Do unix specific bits required to make a release of kappa.
+
+#  Language:
+#      TCSH script
+
+#  Type of Module:
+#     Shell script
+
+#  Invocation:
+#     make_unix_release
+
+#  Description:
+#     This command creates a compressed tar file containing a release of the 
+#     kappa package. It is called from within the make_release script. 
+
+#  Copyright:
+#     Copyright (C) 1997 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
-# Purpose:
-#    Do unix specific bits required to make a release of kappa.
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
 #
-# Type of Module:
-#    Shell script
-#
-# Description:
-#    This command creates a compressed tar file containing a release of the 
-#    kappa package. It is called from within the make_release script. 
-#    
-# Invocation:
-#    make_unix_release
-#
-# Authors:
-#    DSB: David S. Berry (STARLINK)
-#    {enter_new_authors_here}
-#
-# History:
-#    4-DEC-1997 (DSB):
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     4-DEC-1997 (DSB):
 #       Original version, based on POLPACK equivalent.
-#    {enter_changes_here}
-#
-# Bugs:
-#    {note_any_bugs_here}
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 #  Ensure the sdt grp command is available.

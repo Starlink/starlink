@@ -4,14 +4,17 @@ exec @AWISH@ $0 ${1+"$@"}
 #+
 #  Name:
 #     stardemo.tcl
-#
+
 #  Purpose:
 #     The main stardemo tcl script.
-#
+
+#  Language:
+#     TCL
+
 #  Invocation:
 #     stardemo.tcl [demo] [-dir <demo_dir>] [-(no)paging] [-(no)loop]
 #                         [-(no)net] [-debug] [-log]
-#
+
 #  Command Line Arguments:
 #     demo: An optional name of a demonstration to be selected and run
 #     automatically. If no demo name is given on the command line, all 
@@ -21,7 +24,7 @@ exec @AWISH@ $0 ${1+"$@"}
 #
 #     -dir <demo_dir>: An optional argument giving the directory to be 
 #     searched for demo scripts. If not supplied, $KAPPA_DIR is used.
-#   
+#
 #     -paging: If specified, causes each step in the demo commentary to
 #     be displayed until a key or mouse button is pressed. If -nopage
 #     is specified, the page is displayed for a fixed time before
@@ -42,16 +45,38 @@ exec @AWISH@ $0 ${1+"$@"}
 #
 #     -log: If specified, all the atask commands are recorded in a file
 #     called stardemo.log in the current directory.
-#
+
 #  Copyright:
 #     Copyright (C) 1999 Central Laboratory of the Research Councils
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     DSB: David S. Berry (STARLINK)
-#
-#  History: 
+#     {enter_new_authors_here}
+
+#  History:
 #     22-OCT-1999 (DSB):
 #        Original version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 #rename proc tclproc

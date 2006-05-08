@@ -4,24 +4,24 @@ exec @AWISH@ $0 ${1+"$@"}
 #+
 #  Name:
 #     LutEdit.tcl
-#
+
 #  Purpose:
 #     The Tcl script which implements the bulk of the LUTEDIT command.
-#
-#  Type of module:
+
+#  Language:
+#     TCL
+
+#  Type of Module:
 #     Tk/Tcl script.
-#
+
 #  Description:
 #     This script displays an image using a specified lut and then allows
 #     the user to interactively edit the colour table in various ways.
 #     The modified colour table may be saved in an NDF which can later be
 #     used by LUTABLE, etc.
-#     
+#
 #     The LUTEDIT a-task should normally be used to execute this script.
-#
-#  Usage:
-#     lutedit.tcl lut image
-#
+
 #  Arguments:
 #     lut 
 #        The file containing the initial lookup table.  The supplied string
@@ -31,16 +31,42 @@ exec @AWISH@ $0 ${1+"$@"}
 #     image 
 #        The image to be displayed. If not supplied, $KAPPA_DIR/m31 is
 #        used.
+
+#  Usage:
+#     lutedit.tcl lut image
+
+#  Copyright:
+#     Copyright (C) 2001 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     DSB: David Berry (STARLINK)
 #     {enter_new_authors_here}
-#
+
 #  History:
 #     16-NOV-2001 (DSB):
-#	 Original version.
+#         Original version.
 #     {enter_further_changes_here}
-#
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 # Define procedures...
@@ -933,19 +959,52 @@ proc PalArea {} {
 #+
 #  Name:
 #     PalArea
-#
+
 #  Purpose:
 #     Create or destroy the frame displaying a palette of colours at the
 #     bottom of the main window.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     None.
-#
+
 #  Globals:
 #     FPAL (Read and Write)
 #        The name of the frame to contain help information.
 #     PALON (Read)
 #        Is help information to be displayed?
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global KAPPA_DIR
    global PALON
@@ -3169,17 +3228,20 @@ proc drawCurve {col} {
 proc B1MotionBind {x y} {
 #+
 #  Name:
-#    B1MotionBind
-#
+#     B1MotionBind
+
 #  Purpose:
-#    Process pointer motion over the editor with button 1 pressed.
-#
+#     Process pointer motion over the editor with button 1 pressed.
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    x
+#     x
 #       The screen X coord.
-#    y
+#     y
 #       The screen Y coord.
-#
+
 #  Globals:
 #     CAN2 (Read)
 #        The name of the canvas widget holding the editor.
@@ -3192,6 +3254,36 @@ proc B1MotionBind {x y} {
 #        The canvas X coordinate at which the button was pressed.
 #     ROOTY (Read)
 #        The canvas Y coordinate at which the button was pressed.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global CAN2
    global BACKCOL
@@ -3284,27 +3376,60 @@ proc B1MotionBind {x y} {
 proc CheckMsg {action val} {
 #+
 #  Name:
-#    CheckMsg
-#
+#     CheckMsg
+
 #  Purpose:
-#    Checks messages created by an ADAM action for error messages. If an
-#    error message is found, it is added to a global list of error messages.
-#
+#     Checks messages created by an ADAM action for error messages. If an
+#     error message is found, it is added to a global list of error messages.
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    action
+#     action
 #       The current action.
-#    val
+#     val
 #       The value of the ADAM error message.
-#
+
 #  Globals:
-#    ADAM_ERRORS (Read and Write)
+#     ADAM_ERRORS (Read and Write)
 #       The current list of ADAM error messages.
-#    ATASK_OUTPUT (Read and Write)
+#     ATASK_OUTPUT (Read and Write)
 #       Any non-error messages are appended to this list. Each
 #       message is stored as a new element in the list.
-#    LOGFILE_ID (Read)
+#     LOGFILE_ID (Read)
 #       The file id for any logfile to which all messages should be
 #       written.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global ADAM_ERRORS
    global ATASK_OUTPUT
@@ -3343,20 +3468,23 @@ proc CheckRF {task} {
 #+
 #  Name:
 #     CheckRF
-#
+
 #  Purpose:
 #     Check that the AMS rendevous file for a task still exists. If it
 #     does not (for some reason it seems to be occasionally deleted by
 #     the StarTcl system, turning the process into a zombie), then the 
 #     task is killed and re-loaded.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     The task to be checked (previously loaded using LoadTask).
-#
+
 #  Returned Value:
 #     Returns 1 if the rendevous file still exists, and zero if it 
 #     did not exist (in which case the task will have been re-loaded).
-#
+
 #  Globals:
 #     RENDEVOUS (Read)
 #        A 1-d array, indexed by task name, storing the path to the
@@ -3364,6 +3492,36 @@ proc CheckRF {task} {
 #     TASK_FILE
 #        A 1-d array, indexed by task name, storing the path to the
 #        task's executable binary file (as supplied to LoadTask).
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global RENDEVOUS
    global TASK_FILE
@@ -3384,21 +3542,53 @@ proc CheckRF {task} {
 proc Confirm {message} {
 #+
 #  Name:
-#    Confirm
-#
+#     Confirm
+
 #  Purpose:
-#    Get the user to confirm an operation. The supplied text is displayed
-#    and the user presses one of two buttons. An indication of which
-#    button was pressed is returned.
-#
+#     Get the user to confirm an operation. The supplied text is displayed
+#     and the user presses one of two buttons. An indication of which
+#     button was pressed is returned.
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    message
+#     message
 #       The message to display. 
-#
+
 #  Returned Value:
-#   Zero is returned if the operation should be cancelled, one is
-#   returned if it is ok to proceed.
+#     Zero is returned if the operation should be cancelled, one is
+#     returned if it is ok to proceed.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 # Display the dialog box and get the user's response.
@@ -3412,11 +3602,14 @@ proc dialog {w title text bitmap default args} {
 #+
 #  Name:
 #     dialog
-#
+
 #  Purpose:
 #     This procedure displays a dialog box, waits for a button in the dialog
 #     to be invoked, then returns the index of the selected button.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     w 
 #        Window to use for dialog top-level.
@@ -3428,10 +3621,40 @@ proc dialog {w title text bitmap default args} {
 #        Bitmap to display in dialog (empty string means none).
 #     default 
 #        Index of button that is to display the default ring
-#     	 (-1 means none).
+#              (-1 means none).
 #     args 
 #        One or more strings to display in buttons across the
-#	 bottom of the dialog box.
+#         bottom of the dialog box.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
     global tk_priv
     global TOP
@@ -3500,13 +3723,46 @@ proc Finish {} {
 #+
 #  Name:
 #     Finish
-#
+
 #  Purpose:
 #     Exit lutedit, warning the user if the colour table has not yet
 #     been saved.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     None
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 # If required, save the colour table.
@@ -3516,29 +3772,61 @@ proc Finish {} {
 proc GetParam {task param} {
 #+
 #  Name:
-#    GetParam
-#
+#     GetParam
+
 #  Purpose:
-#    Get a parameter value from an ADAM task.
-#
+#     Get a parameter value from an ADAM task.
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    task
+#     task
 #       The name of the task (eg "kapview").
-#    param
+#     param
 #       The name of the parameter in the form "action:param" 
 #       (eg "datapic:ncx1").
-#
+
 #  Returned Value:
-#    The parameter value.
-#
-#  Globals:
-#    PAR_VALUE (Write)
-#       The most recently acquired parameter value.
-#
+#     The parameter value.
+
 #  Notes:
-#    - This procedure does not return until the parameter value has been
-#    obtained.
+#     - This procedure does not return until the parameter value has been
+#     obtained.
+
+#  Globals:
+#     PAR_VALUE (Write)
+#       The most recently acquired parameter value.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global PAR_VALUE
    global PAR_GOT
@@ -3558,21 +3846,53 @@ proc GetParamED {task param} {
 #+
 #  Name:
 #     GetParamED
-#
+
 #  Purpose:
 #     Returns the value of an ATASK parameter substituing "E" exponents for 
 #     "D" exponents. Also removes single quotes. Also converts values with
 #     a 3 digit exponent to "BAD".
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     task
 #        The name of the task
 #     param
 #        The name of the parameter, in the form "<application>:<parameter>"
-#
+
 #  Returned Value:
 #     The parameter value.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    regsub -nocase -all D [GetParam $task $param] E res1
    regsub -nocase -all "'" $res1 "" res2
@@ -3587,13 +3907,16 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 #+
 #  Name:
 #     GetPars
-#
+
 #  Purpose:
 #     Obtain a set of values of various data types from the user.
 #     A dialog box is displayed, containing a set of labeled entry
 #     widgets, check buttons and radio buttons. Checks are made that 
 #     the supplied values are acceptable.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     vars
 #        A list of the names of the global variable which are to recieve
@@ -3629,17 +3952,47 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 #     dhelp
 #        The dynamic help string to display while the pointer is over the
 #        dialog box.
-#
+
 #  Returned Value:
 #     One if the "OK" button is pressed, and zero if the "Cancel" button
 #     is pressed.
-#
+
 #  Globals:
 #     B_FONT (Read)
 #        The default font used for buttons.
 #     INPUTS_BUTTON (Write)
 #        Used to communicate with the buttons in the dialog box. It holds
 #        the label of the most recently pressed button.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global tcl_precision
    global B_FONT
@@ -3886,14 +4239,47 @@ proc greyCurves {nent} {
 #+
 #  Name:
 #     greyCurves
-#
+
 #  Purpose:
 #     Set each of the three colour curves to a linear ramp from zero to
 #     one, and delete all control points.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     nent
 #        The number of entries to create it the colour table
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global NENT
    global CTRL
@@ -4037,15 +4423,48 @@ proc gwmDisplay {} {
 #+
 #  Name:
 #     gwmDisplay
-#
+
 #  Purpose:
 #     Re-display the image and histogram colour table key.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     None
 
 #  Returned Value:
 #     None
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global IMAGE
    global LUTEDIT_SCRATCH
@@ -4066,15 +4485,47 @@ proc gwmUpdate {force} {
 #+
 #  Name:
 #     gwmUpdate
-#
+
 #  Purpose:
 #     Save the current colour table into a temporary file, and
 #     re-initialize the gwm display using the saved LUT.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     force
 #        update the GWM items even if they may not need it.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global CAN
    global GWMNEW
@@ -4110,18 +4561,51 @@ proc gwmMake {} {
 #+
 #  Name:
 #     gwmMake
-#
+
 #  Purpose:
 #     Create a GWM canvas item which fills the existing canvas widget.
 #     If this fails (e.g. due to lack of colours), an error message 
 #     is returned and GWM is set to "". If succesful, a blank string is
 #     returned.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     None
-#
+
 #  Returned Value:
 #     An error message, or a blank string.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global CAN
    global CAN2
@@ -4252,14 +4736,17 @@ proc HelpArea {} {
 #+
 #  Name:
 #     HelpArea
-#
+
 #  Purpose:
 #     Create or destroy the frame displaying help information at the
 #     bottom of the main window.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     None.
-#
+
 #  Globals:
 #     FHELP (Read and Write)
 #        The name of the frame to contain help information.
@@ -4267,6 +4754,36 @@ proc HelpArea {} {
 #        Is help information to be displayed?
 #     HLP_FONT (Read)
 #        The font in which to display help information.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global FHELP
    global HAREA
@@ -4322,21 +4839,54 @@ proc Helper { blank } {
 #+
 #  Name:
 #     Helper
-#
+
 #  Purpose:
 #     Selects the text to display in the help area. 
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     blank
 #        If non-zero set the help blank. Otherwise, set the help
 #        according to the current widget/tag.
-#
+
 #  Globals:
 #     HELPS (Read)
 #        An array holding the help messages for all widgets and canvas tags, 
 #        indexed by widget name or canvas tag.
 #     HELP (Write)
 #        The text to be displayed in the help area.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
    global HELPS
@@ -4411,26 +4961,58 @@ proc Helper { blank } {
 proc LoadTask {task file} {
 #+
 #  Name:
-#    LoadTask
-#
+#     LoadTask
+
 #  Purpose:
-#    Load an ADAM task so that it can be used.
-#
+#     Load an ADAM task so that it can be used.
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    task
+#     task
 #      The name by which the task is to be known 
 #      (eg "kapview").
-#    file
+#     file
 #      The file containing the executable image 
 #      (eg "/star/bin/kappa/kapview_mon").
-#
+
 #  Notes:
-#    -  This procedure shuts down the whole application if the task 
-#    cannot be loaded.
-#
+#     -  This procedure shuts down the whole application if the task 
+#     cannot be loaded.
+
 #  Globals:
-#    ADAM_TASKS (Write)
+#     ADAM_TASKS (Write)
 #       A list of the names of the ADAM tasks started up by Polka.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
    global ADAM_TASKS
@@ -4483,11 +5065,14 @@ proc MakeDialog {w title grab} {
 #+
 #  Name:
 #     MakeDialog
-#
+
 #  Purpose:
 #     Create an empty dialog box. It should be destroyed using
 #     "destroy $w" when no longer needed.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     w
 #        The name of the toplevel window to create.
@@ -4495,13 +5080,43 @@ proc MakeDialog {w title grab} {
 #        The title to display above the toplevel window.
 #     grab
 #        Should the toplevel window grab all X events?
-#
+
 #  Returned Value:
 #     The path to a frame in which the dialog box components can be packed.
-#
+
 #  Globals:
 #     TOP (Read)
 #        The path to the main application window.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global TOP
 
@@ -4533,11 +5148,14 @@ proc MenuHelp {win label text} {
 #+
 #  Name:
 #     MenuHelp
-#
+
 #  Purpose:
 #     Establish the help text to display when the pointer is over
 #     a specified entry in a specified menu.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     win
 #        The name of the menu.
@@ -4545,11 +5163,41 @@ proc MenuHelp {win label text} {
 #        The textual label for the menu entry.
 #     text
 #        The help information to display.
-#
+
 #  Globals:
 #     MENUHELPS (Write)
 #        A 2d array indexed by widget path and entry label, holding
 #        the help text strings for all menu entries.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global MENUHELPS
 
@@ -4566,22 +5214,55 @@ proc MenuMotionBind {win y} {
 #+
 #  Name:
 #     MenuMotionBind
-#
+
 #  Purpose:
 #     Displays help as the pointer moves over a menu. It should be bound
 #     to motion over all menus.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     win
 #        The name of the window currently under the pointer.
 #     y
 #        The y coordinate of the pointer.
-#
+
 #  Globals:
 #     HELP (Write)
 #        The current help text to display.
 #     MENUHELPS (Read)
 #        The help text for each entry of each menu.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global HELP
    global MENUHELPS
@@ -4623,19 +5304,52 @@ proc MenuMotionBind {win y} {
 proc Message {message} {
 #+
 #  Name:
-#    Message
-#
+#     Message
+
 #  Purpose:
-#    Display a dialogue box displaying a message, and wait for the
-#    user to press the "OK" button.
-#
+#     Display a dialogue box displaying a message, and wait for the
+#     user to press the "OK" button.
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    message
+#     message
 #       The message to display. 
-#
+
 #  Globals:
-#    TOP (Read)
+#     TOP (Read)
 #        The path to the main application window.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global TOP
    global env
@@ -4657,17 +5371,49 @@ proc Message {message} {
 proc MotionBind {x y} {
 #+
 #  Name:
-#    MotionBind
-#
+#     MotionBind
+
 #  Purpose:
-#    Process pointer motion over the editor with no buttons pressed.
-#
+#     Process pointer motion over the editor with no buttons pressed.
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    x
+#     x
 #       The screen X coord.
-#    y
+#     y
 #       The screen Y coord.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 }
@@ -4675,29 +5421,62 @@ proc MotionBind {x y} {
 proc my_exit {args} {
 #+
 #  Name:
-#    my_exit
-#
+#     my_exit
+
 #  Purpose:
-#    Shutdown the tcl script, cleaning up in the process.
-#
+#     Shutdown the tcl script, cleaning up in the process.
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    args
+#     args
 #       The exit integer status value.
-#
+
+#  Notes:
+#     - This command replaces the built-in Tcl "exit" command, which should
+#     have been renamed as "tcl_exit".
+
 #  Globals:
-#    ADAM_TASKS (Read)
+#     ADAM_TASKS (Read)
 #       A list of the names of the ADAM tasks started up by LutEdit.
-#    ADAM_USER (Read)
+#     ADAM_USER (Read)
 #       The path to the temporary ADAM_USER directory used by LutEdit.
-#    OLD_ADAM_USER (Read)
+#     OLD_ADAM_USER (Read)
 #       The original value of the ADAM_USER environment variable, or a null
 #       string if ADAM_USER was not defined.
-#    LUTEDIT_SCRATCH (Read)
+#     LUTEDIT_SCRATCH (Read)
 #       The path to the directory used by LutEdit to store temporary NDFs.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
-#  Notes:
-#    - This command replaces the built-in Tcl "exit" command, which should
-#    have been renamed as "tcl_exit".
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global ADAM_TASKS
    global ADAM_USER
@@ -4749,12 +5528,45 @@ proc New {} {
 #+
 #  Name:
 #     New
-#
+
 #  Purpose:
 #     Close the current colour table and load a new greyscale colour table.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     none
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global LUTFILE
    global UP
@@ -4805,21 +5617,24 @@ proc New {} {
 proc Obey {task action params args} {
 #+
 #  Name:
-#    Obey
-#
+#     Obey
+
 #  Purpose:
-#    Executes an ADAM application. 
-#
+#     Executes an ADAM application. 
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    task
+#     task
 #       The name of the task containing the application (eg "kapview").
-#    action
+#     action
 #       The name of the application (eg "display").
-#    params
+#     params
 #       Any command line parameter assignments to pass to the 
 #       application. A blank string must be supplied if no 
 #       command line parameter assignments are needed.
-#    args
+#     args
 #       o  If the optional string "noreport" is supplied, then any error
 #       messages generated by the action are not displayed. 
 #       o  If the name of a currently defined global variable is supplied, 
@@ -4829,29 +5644,59 @@ proc Obey {task action params args} {
 #       o  The presence of any other non-blank value after "params" causes
 #       the whole TCL application to abort if the specified action
 #       does not complete succesfully.
-#
+
 #  Returned Value:
-#    If the application completes succesfully, then 1 is returned.
-#    Otherwise, 0 is returned.
-#
+#     If the application completes succesfully, then 1 is returned.
+#     Otherwise, 0 is returned.
+
+#  Notes:
+#     - The Task must already have been loaded using LoadTask.
+#     - Any error messages created by the action are displayed in a dialog
+#     box, unless the optional argument "args" has the value "noreport".
+#     - This procedure does not return until the application has finished.
+#     In the mean time, the display is "frozen" so that no further actions
+#     can be initiated.
+
 #  Globals:
-#    ACTION (Write)
+#     ACTION (Write)
 #      Name of current action in the form "task:action".
-#    ADAM_ERRORS (Write)
+#     ADAM_ERRORS (Write)
 #      The messages from the most recent ADAM application to fail.
-#    ATASK_OUTPUT (Write)
+#     ATASK_OUTPUT (Write)
 #       Any non-error messages generated by the action are appended to 
 #       this list. Each message is stored as a new element in the list.
-#    STATUS (Write)
+#     STATUS (Write)
 #      The status string returned by the action.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
-#  Notes:
-#    - The Task must already have been loaded using LoadTask.
-#    - Any error messages created by the action are displayed in a dialog
-#    box, unless the optional argument "args" has the value "noreport".
-#    - This procedure does not return until the application has finished.
-#    In the mean time, the display is "frozen" so that no further actions
-#    can be initiated.
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global ACTION
    global ADAM_ERRORS
@@ -4974,25 +5819,58 @@ proc Obey {task action params args} {
 proc Pop {stack args} {
 #+
 #  Name:
-#    Pop
-#
+#     Pop
+
 #  Purpose:
-#    Returns and removes the top value in the supplied FILO stack.
-#
+#     Returns and removes the top value in the supplied FILO stack.
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    stack
+#     stack
 #       The name (NOT the value) of a global list variable holding the stack. 
 #       On exit, the list holds one less element than on entry.
-#    args
+#     args
 #        An optional argument giving the number of levels to pop off the
 #        stack. It defaults to 1. If it is supplied as -1, then the 
 #        the first (bottom) entry is returned and the stack is emptied. If it
 #        is supplied as 0, then the top entry on the stack is returned, but 
 #        it is not removed from the stack.
-#
+
 #  Returned Value:
-#    The required stack element, or an empty string if the supplied stack 
-#    was empty.
+#     The required stack element, or an empty string if the supplied stack 
+#     was empty.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
    upvar #0 $stack stk
@@ -5021,24 +5899,57 @@ proc Pop {stack args} {
 proc Push {stack value} {
 #+
 #  Name:
-#    Push
-#
+#     Push
+
 #  Purpose:
-#    Enter a new value onto the top of the supplied FILO stack.
-#
+#     Enter a new value onto the top of the supplied FILO stack.
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    stack
+#     stack
 #       The name (NOT the value) of a global list variable holding the stack. 
 #       On exit, the list holds one more element than on entry.
-#    value
+#     value
 #       The value to be pushed onto stack.
-#
+
 #  Returned Value:
-#    The supplied value.
-#
+#     The supplied value.
+
 #  Notes:
-#    - The new entry is stored at index 0 in the list, and existing entries
-#    are moved up to make room for it.
+#     - The new entry is stored at index 0 in the list, and existing entries
+#     are moved up to make room for it.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    upvar #0 $stack stk
    set stk [linsert $stk 0 $value]
@@ -5048,32 +5959,65 @@ proc Push {stack value} {
 proc RealValue {name width value command args} {
 #+
 #  Name:
-#    RealValue
-#
+#     RealValue
+
 #  Purpose:
-#    Create a simple numerical value entry "widget". 
-#
+#     Create a simple numerical value entry "widget". 
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    name
+#     name
 #      The name of the "entry" to create (eg ".wm.maxval")
-#    width
+#     width
 #      The number of characters in the text entry widget.
-#    value
+#     value
 #      The name (NOT the value) of the global variable to receive the 
 #      numerical value. Note, this must be a *global* variable.
-#    command
+#     command
 #      A command to execute after a valid value has been assigned to the
 #      variable.
-#    args 
+#     args 
 #      Any further options to pass to the command which creates the
 #      "entry" widget (optional).
-#
+
 #  Returned Value:
-#    The name of the entry widget.
-#
+#     The name of the entry widget.
+
 #  Globals:
-#    OLD_VAL (Write)
+#     OLD_VAL (Write)
 #      The previous (valid) value displayed in the text entry widget.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global OLD_VAL
    global $value
@@ -5142,17 +6086,20 @@ proc RealValue {name width value command args} {
 proc ReleaseBind {x y} {
 #+
 #  Name:
-#    ReleaseBind
-#
+#     ReleaseBind
+
 #  Purpose:
-#    Process button-1 releases over the editor. 
-#
+#     Process button-1 releases over the editor. 
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    x
+#     x
 #       The screen X coord.
-#    y
+#     y
 #       The screen Y coord.
-#
+
 #  Globals:
 #     CAN2 (Read)
 #        The name of the canvas widget holding the editor.
@@ -5163,6 +6110,36 @@ proc ReleaseBind {x y} {
 #        The canvas X coordinate at which the button was pressed.
 #     ROOTY (Read)
 #        The canvas Y coordinate at which the button was pressed.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global CAN2
    global CFREEZE
@@ -5318,15 +6295,48 @@ proc Resize {} {
 #+
 #  Name:
 #     Resize
-#
+
 #  Purpose:
 #     Respond to an interactive re-size of the window.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     None
-#
+
 #  Returned Value:
 #     None
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global TKT
 
@@ -5350,15 +6360,48 @@ proc doResize {} {
 #+
 #  Name:
 #     doResize
-#
+
 #  Purpose:
 #     Replace the GWM canvas item with a new one with an appropriate new size.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     None
-#
+
 #  Returned Value:
 #     None
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global CAN
    global CAN2
@@ -5460,21 +6503,51 @@ proc Save {conf} {
 #+
 #  Name:
 #     Save
-#
+
 #  Purpose:
 #     Save the current colour table.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     conf
 #        If non-zero, then user must confirm that it is OK to replace
 #        an existing file. If zero, then existing files are replaced
 #        without needing confirmation.
-#
+
 #  Returned Value:
 #     One for success, zero for failure.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
-#  Globals:
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
 #
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global LUTFILE
    set ok 0
@@ -5493,18 +6566,48 @@ proc SaveAs {} {
 #+
 #  Name:
 #     SaveAs
-#
+
 #  Purpose:
 #     Save the current colour table to a new file.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     None.
-#
+
 #  Returned Value:
 #     One for success, zero for failure.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
-#  Globals:
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
 #
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global LUTFILE
    global UWIN
@@ -5534,19 +6637,51 @@ proc saveLUT {file conf} {
 #+
 #  Name:
 #     saveLUT
-#
+
 #  Purpose:
 #     Save the current colour table into a named file.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     file
 #        The name of the NDF to create.
 #     conf 
 #        If 1, then confirm that it is OK to replace an existing file.
-#
+
 #  Returned:
 #     One if the file was created, and zero otherwise.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global NENT
    global LUT
@@ -5613,30 +6748,62 @@ proc saveLUT {file conf} {
 proc SetHelp {widgets help args} {
 #+
 #  Name:
-#    SetHelp
-#
+#     SetHelp
+
 #  Purpose:
-#    Set the text to appear at the bottom of the screen when the pointer
-#    passes over a specified widgets, or over a canvas item with a
-#    specified tag.
-#
+#     Set the text to appear at the bottom of the screen when the pointer
+#     passes over a specified widgets, or over a canvas item with a
+#     specified tag.
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    widgets
+#     widgets
 #       A list of widget names (eg ".fr1.button"), or canvas tags.
-#    help
+#     help
 #       The text to display. 
-#    args
+#     args
 #       An optional htx cross-reference label to be associated with the
 #       widget.
-#
+
 #  Globals:
-#    HELP_LABELS (Write)
+#     HELP_LABELS (Write)
 #       A 1-D array index by widget name or canvas tag. Each element is an htx
 #       cross-reference label to be displayed if the widget is selected
 #       using "Help on pointer".
-#    HELPS (Write)
+#     HELPS (Write)
 #       An array holding the current help text for each widget or canvas tag.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global HELPS
    global HELP_LABELS
@@ -5662,18 +6829,50 @@ proc SetHelp {widgets help args} {
 proc SingleBind {x y shift} {
 #+
 #  Name:
-#    SingleBind
-#
+#     SingleBind
+
 #  Purpose:
-#    Process single clicks of button 1 over the editor.
-#
+#     Process single clicks of button 1 over the editor.
+
+#  Language:
+#     TCL
+
 #  Arguments:
-#    x
+#     x
 #       The screen X coord.
-#    y
+#     y
 #       The screen Y coord.
-#    shift
+#     shift
 #       Was the shift key pressed when the button was clicked?
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
    global CAN2
@@ -5847,16 +7046,48 @@ proc textLut {file} {
 #+
 #  Name:
 #     textLut
-#
+
 #  Purpose:
 #     Loads a new LUT from a text file. The data is placed in the global
 #     LUT arrays. Other globals are initialized, but the editor and GWM 
 #     items are not redrawn.
 
+#  Language:
+#     TCL
+
 #  Arguments:
 #     file
 #        The name of the text file containing the LUT.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global CTRL
    global CPEN
@@ -5940,20 +7171,23 @@ proc UniqueFile {} {
 #+
 #  Name:
 #     UniqueFile
-#
+
 #  Purpose:
 #     Returns a unique file name for which no file currently exists.
 #     These files are created in the LUTEDIT_SCRATCH directory
 #     created by LutEdit, and so do not need to be deleted when finished
 #     with as they will all be deleted when the temporary ADAM_USER
 #     directory is deleted when LutEdit exits.
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     None.
-#
+
 #  Returned Value:
 #     The file name.
-#
+
 #  Globals:
 #     LUTEDIT_SCRATCH (Read)
 #        The path to the LUTEDIT_SCRATCH directory.
@@ -5963,7 +7197,36 @@ proc UniqueFile {} {
 #        records the value of i used in the previous call to this
 #        function. The first value of i considered is one greater than
 #        that used last time.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global LUTEDIT_SCRATCH
    global IFILE
@@ -5983,13 +7246,16 @@ proc WaitFor {name args} {
 #+
 #  Name:
 #     WaitFor
-#
+
 #  Purpose:
 #     Pause the caller until a named global variable changes its value.
 #     Meanwhile, events are directed to a nominated "safe" window. This
 #     "freezes" the display so that further actions cannot be initiated by 
 #     the user
-#
+
+#  Language:
+#     TCL
+
 #  Arguments:
 #     name
 #        The name (NOT the value) of the global variable to be watched.
@@ -6000,21 +7266,51 @@ proc WaitFor {name args} {
 #        specified time, until the variable is changed. If the delay time
 #        is not supplied it defaults to 100 milliseconds. If the suppleid
 #        command returns a zero value, then the loop is aborted prematurely.
-#
+
 #  Returned Value:
 #     Zero if a supplied command returned a zero value or the
 #     CANCEL_OP variable was set to a non-zero value (in which
 #     case the delay is aborted prematurely), and one otherwise.
-#
+
+#  Notes:
+#     - This procedure should be used in place of tkwait, which should NOT
+#     be used.
+
 #  Globals:
 #     SAFE (Read)
 #        The path to a window which can receive notifivcation of all events
 #        while we are waiting. This should be a window which ignores all 
 #        events.
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
-#  Notes:
-#    - This procedure should be used in place of tkwait, which should NOT
-#    be used.
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     {original_author_entry}
+
+#  History:
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
    global CAN
    global SAFE

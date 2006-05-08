@@ -30,9 +30,6 @@
 #     -d
 #        The device name.  Defaults to xwindows.
 
-#  Prior Requirements:
-#     -  An image must already have been displayed.
-
 #  Notes:
 #     -  Depending on your current settings for DISPLAY, the colour table
 #     may change when each new section is displayed, as the scaling
@@ -40,6 +37,29 @@
 #     -  For ease of use, it's recommended that you set up an alias for
 #     this script, for example
 #        alias pazo 'source /home/bm/scripts/pazo.csh'
+
+#  Prior Requirements:
+#     -  An image must already have been displayed.
+
+#  Copyright:
+#     Copyright (C) 2001 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     DSB: David S. Berry (Starlink)
@@ -49,6 +69,9 @@
 #     14-MAR-2001 (DSB):
 #        Original version.
 #     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
 
 #-
 

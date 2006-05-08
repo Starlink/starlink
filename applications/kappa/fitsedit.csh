@@ -2,46 +2,70 @@
 #+
 #  Name:
 #     FITSEDIT
-#
+
 #  Purpose:
 #     Edits the FITS extension of an NDF.
-#
+
+#  Language:
+#     C-shell
+
 #  Type of Module:
 #     C-shell script
-#
-#  Usage:
-#     fitsedit ndf
-#
+
 #  Description:
 #     This procedure allows you to use your favourite editor to
 #     modify the FITS headers stored in an NDF's FITS extension.
 #     There is limited validation of the FITS headers after editing.
 #     A FITS extension is created if the NDF does not already have 
 #     one.
-#
+
+#  Usage:
+#     fitsedit ndf
+
 #  ADAM Parameters:
 #     NDF = NDF (Read)
 #        The name of the NDF whose FITS extension is to be edited.
-#
+
+#  Examples:
+#     fitsedit m51b
+#        This allows editing of the FITS headers in the NDF called m51b.
+
+#  Related Applications:
+#     KAPPA: FITSMOD, FITSEXP, FITSHEAD, FITSIMP, FITSLIST; Figaro: FITSKEYS.
+
 #  Notes:
 #     -  This uses the environmental variable, EDITOR, to select
 #     the editor.  If this variable is undefined vi is assumed.
 #     -  The script lists the headers to a temporary file; allows text 
 #     editing; and then replaces the former FITS extension with the
 #     modified version, performing some validation at this stage.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1996, 1998, 2000 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
-#  Examples:
-#     fitsedit m51b
-#        This allows editing of the FITS headers in the NDF called m51b.
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
 #
-#  Related Applications:
-#     KAPPA: FITSMOD, FITSEXP, FITSHEAD, FITSIMP, FITSLIST; Figaro: FITSKEYS.
-#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     Malcolm J. Currie (STARLINK)
 #     David S. Berry (DSB):
 #     {enter_new_authors_here}
-#
+
 #  History:
 #     1994 September 28 (MJC):
 #        Original version.
@@ -65,10 +89,10 @@
 #        of the sh built-in echo command which does not seem to recognize
 #        the -n option on Solaris.
 #     {enter_further_changes_here}
-#
+
 #  Bugs:
 #     {note_any_bugs_here}
-#
+
 #-
 #
 #   Ensure that processing to temporary file will work by deleting them.

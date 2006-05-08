@@ -2,22 +2,25 @@
 #+
 #  Name:
 #     FITSHEAD
-#
+
 #  Purpose:
 #     Lists the headers of FITS files.
-#
+
+#  Language:
+#     C-shell
+
 #  Type of Module:
 #     C-shell script
-#
-#  Usage:
-#     fitshead file [block] [start] [finish]
-#
+
 #  Description:
 #     This procedure lists to standard output the headers of the primary
 #     header and data unit, and any extensions present that are
 #     contained within a set of input FITS files, or a range of
 #     specified files on a tape.
-#
+
+#  Usage:
+#     fitshead file [block] [start] [finish]
+
 #  ADAM Parameters:
 #     FILE  = FILENAME (Read)
 #        A space-separated list of FITS files whose headers are to be
@@ -42,15 +45,7 @@
 #        to the value of start, otherwise you will be prompted for a new
 #        value.  Should the first argument not be a tape device, this
 #        argument will be treated as a file name. []
-#
-#  Notes:
-#     -  Prompting is directed to the standard error, so that the listings
-#     may be redirected to a file.
-#     -  If the blocking factor is unknown it is possible to obtain only
-#     a part of the headers and some of the FITS data.  Unless the FITS
-#     file is small, it is usually safe to set parameter BLOCK higher
-#     than its true value.
-#
+
 #  Examples:
 #     fitshead /dev/nrmt1
 #        This lists the FITS headers for all the files of the tape mounted
@@ -70,14 +65,43 @@
 #     fitshead ~/fits/*.fit ~/data/p?.fi* | lpr
 #        This prints the FITS headers in the files ~/fits/*.fit and
 #        ~/data/p?.fi*.
-#
+
 #  Related Applications:
 #     KAPPA: FITSEDIT, FITSEXP, FITSIMP, FITSLIST; Figaro: FITSKEYS.
+
+#  Notes:
+#     -  Prompting is directed to the standard error, so that the listings
+#     may be redirected to a file.
+#     -  If the blocking factor is unknown it is possible to obtain only
+#     a part of the headers and some of the FITS data.  Unless the FITS
+#     file is small, it is usually safe to set parameter BLOCK higher
+#     than its true value.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 2000, 2003 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
 #  Authors:
 #     Malcolm J. Currie (STARLINK)
 #     {enter_new_authors_here}
-#
+
 #  History:
 #     1994 November 4 (MJC):
 #        Original version.
@@ -90,10 +114,10 @@
 #        Revised the sed termination patterns.  No longer support
 #        illegally formatted END lines.
 #     {enter_further_changes_here}
-#
+
 #  Bugs:
 #     {note_any_bugs_here}
-#
+
 #-
 #
 #   Specify the text search limits, and that we want to print the text
