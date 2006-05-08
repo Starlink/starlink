@@ -62,6 +62,7 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax ){
 /* Initialise. */
    *imax = -1;
    ngood = 0;
+   maxval = 0;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return 1;

@@ -134,7 +134,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
-   if( !astMapGet0A( config, "CLUMPFIND", &cfconfig ) ) {     
+   if( !astMapGet0A( config, "CLUMPFIND", (AstObject *) &cfconfig ) ) {     
       cfconfig = astKeyMap( "" );
       astMapPut0A( config, "CLUMPFIND", cfconfig, "" );
    }

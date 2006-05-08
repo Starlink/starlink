@@ -7,6 +7,11 @@
  data arrays.
 
 
+Changes introduced at V0.0-17:
+
+ - Fixed various harmless compiler warnings.
+
+
 Changes introduced at V0.0-16:
 
  - Fixed bug in MAKECLUMPS that could prevent the requested number of

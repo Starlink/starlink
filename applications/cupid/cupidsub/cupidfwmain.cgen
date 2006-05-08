@@ -224,6 +224,9 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 /* Make a copy of the ipa array. */
    work = astStore( NULL, ipa, nel*sizeof(int) );
 
+/* Initialise the pointer to an array holding the peak value in every clump. */
+   peak_values = NULL;
+      
 /* Pre-allocate some memory for the route array which holds the 1D vector
    indices of the pixels traversed in the route from the initial pixel to
    the clump peak. */
@@ -243,9 +246,6 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
       nsy = ( ndim > 1 ) ? maxjump : 0;
       nsx = maxjump;
 
-/* Initialise the pointer to an array holding the peak value in every clump. */
-      peak_values = NULL;
-      
 /* Scan through the "work" array, looking for usable pixels which have not
    yet been assigned to a clump (i.e. have a value of zero in "work"). */
       pa = work;
@@ -333,7 +333,12 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                      ixoff = iix - 1;
                      iyoff = iiy - ylim/2;
                      izoff = iiz - zlim/2;
-                    
+
+                     nix = 0;
+                     niy = 0;
+                     niz = 0;
+                     nv = 0;
+
                      jvz = iv - skip0;
                      for( jz = 0; jz < zlim; jz++ ) {
                         jvy = jvz;

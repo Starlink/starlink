@@ -141,7 +141,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
-   if( !astMapGet0A( config, "REINHOLD", &rconfig ) ) {     
+   if( !astMapGet0A( config, "REINHOLD", (AstObject *) &rconfig ) ) {     
       rconfig = astKeyMap( "" );
       astMapPut0A( config, "REINHOLD", rconfig, "" );
    }
@@ -293,8 +293,10 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Loop round every pixel in the final pixel assignment array. */
       if( type == CUPID__DOUBLE ) {
          pd = (double *) ipd;
+         pf = NULL;
       } else {
          pf = (float *) ipd;
+         pd = NULL;
       }
       pa = m1;
       for( iz = 1; iz <= dims[ 2 ]; iz++ ){

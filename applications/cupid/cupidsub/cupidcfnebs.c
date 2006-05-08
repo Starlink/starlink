@@ -208,6 +208,7 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
    *n2 = 0;
    *il1 = INT_MAX;
    *il2 = CUPID__CFNULL;
+   d1 = VAL__BADD;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;

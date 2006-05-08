@@ -102,6 +102,8 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen ){
       wr = w;
       sum = 0.0;
       n = 0;
+      maxv = 0;
+      minv = 0;
       for( irow = 0; irow < nrow; irow++ ){
          *(wr++) = CGEN_BAD;
          pr++;

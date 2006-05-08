@@ -156,6 +156,10 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
 
+/* Initialise things to avoid compiler warnings. */
+   peakvals = NULL;
+   nrem = NULL;
+
 /* Say which method is being used. */
    if( ilevel > 0 ) {
       msgBlank( status );
@@ -165,7 +169,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
-   if( !astMapGet0A( config, "FELLWALKER", &fwconfig ) ) {     
+   if( !astMapGet0A( config, "FELLWALKER", (AstObject *) &fwconfig ) ) {     
       fwconfig = astKeyMap( "" );
       astMapPut0A( config, "FELLWALKER", fwconfig, "" );
    }
@@ -266,8 +270,10 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Loop round every pixel in the final pixel assignment array. */
       if( type == CUPID__DOUBLE ) {
          pd = (double *) ipd;
+         pf = NULL;
       } else {
          pf = (float *) ipd;
+         pd = NULL;
       }
       pa = ipa;
       for( iz = 1; iz <= dims[ 2 ]; iz++ ){

@@ -234,10 +234,17 @@ void extractclumps() {
          ndfMsg( "M", indf2 );
          errRep( "", "No clumps identified by mask NDF ^M", status );
       }
+
+/* Store the number of clumps */
+      nclump = idmax - idmin + 1;
+
+   } else {
+      nclump = 0;
+      idmax = -1;
+      idmin = 0;
    }
 
 /* Allocate memory to hold the pixel bounds of the clumps. */
-   nclump = idmax - idmin + 1;
    clbnd = astMalloc( sizeof( int )*nclump*3 );
    cubnd = astMalloc( sizeof( int )*nclump*3 );
 

@@ -900,7 +900,7 @@ void findclumps() {
 /* Store the configuration parameters relating to the used algorithm in the 
    CUPID extension. We put them into a new KeyMap so that the CUPID NDF
    extension gets names of the form "method.name" rather than just "name". */
-      if( astMapGet0A( keymap, method, &config ) ) {     
+      if( astMapGet0A( keymap, method, (AstObject *) &config ) ) {     
          config2 = astKeyMap( "" );
          astMapPut0A( config2, method, config, NULL );
          cupidStoreConfig( xloc, config2 );
@@ -925,7 +925,7 @@ void findclumps() {
 
 /* Get a KeyMap containing the parameters specific to the chosen
    algorithm. */
-      if( astMapGet0A( keymap, method, &aconfig ) ) {     
+      if( astMapGet0A( keymap, method, (AstObject *) &aconfig ) ) {     
 
 /* Create a GRP group containing a text form of the KeyMap. */
          grp = NULL;

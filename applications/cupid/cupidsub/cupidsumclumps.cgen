@@ -135,11 +135,12 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
    }
 
 /* If supplied, initialise the "out" array to hold zero or bad values. */
+   pi = NULL;
+   pd = NULL;
    if( out ) {
       if( alg == GAUSSCLUMPS ) {
          pd = (CGEN_TYPE *) out;
          for( i = 0; i < nel; i++ ) *(pd++) = 0.0;
-
       } else {
          pi = (int *) out;
          for( i = 0; i < nel; i++ ) *(pi++) = VAL__BADI;

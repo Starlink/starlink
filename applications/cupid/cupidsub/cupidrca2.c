@@ -144,6 +144,7 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ] ){
                }
    
                maxvotes = 0;
+               winner = 0;
                for( ip = 0; ip < np; ip++ ) {
                   if( votes[ ip ] > maxvotes ) {
                      maxvotes = votes[ ip ];

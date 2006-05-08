@@ -1,6 +1,7 @@
 #include "sae_par.h"
 #include "cupid.h"
 #include "ast.h"
+#include "mers.h"
 #include <string.h>
 #include <math.h>
 
@@ -142,6 +143,9 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 /* This first section identifies pairs of adjoining clumps between which
    there is no significant intervening dip. */
 /* ---------------------------------------------------------------------- */
+
+/* Initialise things to avoid compiler warnings. */
+   oldv = 0.0;
 
 /* Get the minimum dip between two adjoining peaks necessary for the two
    peaks to be considered distinct. */
