@@ -153,7 +153,7 @@
 *        as the input NDFs except to add a type use.
 *
 *           OUTLIST > *.cent
-*        
+*
 *        Or alternatively you can use an explicit list of names.
 *        These may use indirection elements as well as names separated
 *        by commas.
@@ -168,6 +168,38 @@
 *        centroiding process just stops after the permitted number of 
 *        iterations (MAXITER).
 *        [0.05]
+
+*  Examples:
+*     findcent in='*' outlist='*.cent'
+*        In this example all the NDFs in the current directory are
+*        processed. It is assumed that the NDFs are associated with
+*        positions lists of inaccurate positions (via the item
+*        CURRENT_LIST in the NDF CCDPACK extensions). These position
+*        lists are accessed and centroided with the appropriate NDFs.
+*        On exit the new lists are named *.cent and are associated with
+*        the NDFs (instead of the original "input" lists).
+*
+*     findcent ndfnames=false in='"ndf1,ndf2,ndf3"' 
+*              inlist='"ndf1.pos,ndf2.pos,ndf3.pos"' outlist='*.acc'
+*              namelist=new_position_lists
+*        In this example the position list names are not previously
+*        associated with the NDFs and must have their names given
+*        explicitly (and in the same order as the NDF names). The
+*        output lists are called the same names as the input NDFs except
+*        with the extension .acc. The names of the output lists are
+*        written into the file new_position_lists which can be used to
+*        pass these names onto another application using indirection
+*        (in which invoke the next application with ndfnames=false
+*        inlist=^new_position_lists).
+
+*  Implementation Status:
+*     - This routine correctly processes the DATA and QUALITY components
+*       of an NDF data structure. Bad pixels and all non-complex numeric
+*       data types can be handled.
+
+*  Implementation Deficiencies:
+*     - There is no support positions other than in pixel coordinates.
+*     - No use is made of variance information.
 
 *  Notes:
 *     - Position list formats. 
@@ -211,39 +243,7 @@
 *       are to be centroided. On exit this item will be updated to 
 *       reference the name of the centroided list of positions.
 
-*  Implementation Status:
-*     - This routine correctly processes the DATA and QUALITY components
-*       of an NDF data structure. Bad pixels and all non-complex numeric
-*       data types can be handled.
-
-*  Implementation Deficiencies:
-*     - There is no support positions other than in pixel coordinates.
-*     - No use is made of variance information.
-
-*  Examples:
-*     findcent in='*' outlist='*.cent'
-*        In this example all the NDFs in the current directory are
-*        processed. It is assumed that the NDFs are associated with
-*        positions lists of inaccurate positions (via the item
-*        CURRENT_LIST in the NDF CCDPACK extensions). These position
-*        lists are accessed and centroided with the appropriate NDFs.
-*        On exit the new lists are named *.cent and are associated with
-*        the NDFs (instead of the original "input" lists).
-*
-*     findcent ndfnames=false in='"ndf1,ndf2,ndf3"' 
-*              inlist='"ndf1.pos,ndf2.pos,ndf3.pos"' outlist='*.acc'
-*              namelist=new_position_lists
-*        In this example the position list names are not previously
-*        associated with the NDFs and must have their names given
-*        explicitly (and in the same order as the NDF names). The
-*        output lists are called the same names as the input NDFs except
-*        with the extension .acc. The names of the output lists are
-*        written into the file new_position_lists which can be used to
-*        pass these names onto another application using indirection
-*        (in which invoke the next application with ndfnames=false
-*        inlist=^new_position_lists).
-
-*  Behaviour of parameters:
+*  Behaviour of Parameters:
 *     All parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
 *     application. If the application has not been run then the
@@ -260,6 +260,27 @@
 *     values. These global values will always take precedence, except
 *     when an assignment is made on the command line.  Global values may
 *     be set and reset using the CCDSETUP and CCDCLEAR commands.
+
+*  Copyright:
+*     Copyright (C) 1992-1993 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1997, 1999-2001 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)

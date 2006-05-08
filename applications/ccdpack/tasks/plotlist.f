@@ -119,7 +119,7 @@
 *           - 6 -- magenta
 *           - 7 -- yellow
 *           - 8 -- orange
-* 
+*
 *        and so on up to pen 16 (or up to the number available on the
 *        current graphics device). After PLOTLIST has been run these
 *        colours can be superseded by using the KAPPA palette
@@ -132,6 +132,23 @@
 *        The thickness of the lines used to draw the markers. This may
 *        take any value in the range 1-21.
 *        [1]
+
+*  Examples:
+*     plotlist inlist='*'
+*        In this example all the NDFs in the current directory are
+*        accessed and their associated lists of positions are plotted
+*        onto the current display device.
+*
+*     plotlist ndfnames=false inlist=one_list.dat
+*        In this example the position list one_list.dat is opened and
+*        its position are plotted on the current display device.
+*
+*     plotlist in='aligned_*' mtype=-1 palnum=4 msize=1 thick=3
+*        In this example the NDFs aligned_* have their associated
+*        position lists accessed and the positions are plotted on the
+*        current display device. The pen colour used is blue. The
+*        text is drawn at a relative size of 1 (the normal default  is
+*        2.5) with a line thickness of 3.
 
 *  Notes:
 *     - Position list formats. 
@@ -168,24 +185,7 @@
 *       and assumed to contain the names of the lists whose positions 
 *       are to be plotted. 
 
-*  Examples:
-*     plotlist inlist='*'
-*        In this example all the NDFs in the current directory are
-*        accessed and their associated lists of positions are plotted
-*        onto the current display device.
-*
-*     plotlist ndfnames=false inlist=one_list.dat
-*        In this example the position list one_list.dat is opened and
-*        its position are plotted on the current display device.
-*
-*     plotlist in='aligned_*' mtype=-1 palnum=4 msize=1 thick=3
-*        In this example the NDFs aligned_* have their associated
-*        position lists accessed and the positions are plotted on the
-*        current display device. The pen colour used is blue. The
-*        text is drawn at a relative size of 1 (the normal default  is
-*        2.5) with a line thickness of 3.
-
-*  Behaviour of parameters:
+*  Behaviour of Parameters:
 *     All parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
 *     application. If the application has not been run then the
@@ -204,6 +204,27 @@
 *     The DEVICE parameter also has a global association. This is not
 *     controlled by the usual CCDPACK mechanisms, instead it works in
 *     co-operation with KAPPA (SUN/95) image display/control routines.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1998, 2000-2001 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)

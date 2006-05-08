@@ -557,6 +557,18 @@
 *        suppression algorithm (perhaps for data which contain few sky
 *        pixels).
 
+*  Implementation Status:
+*     - MAKEMOS supports "bad" pixel values and all non-complex data
+*       types, with arithmetic being performed using the appropriate
+*       floating point type. It can process NDFs with any number of
+*       dimensions. The DATA, TITLE and VARIANCE components of an NDF
+*       are directly supported, with the AXIS, HISTORY, LABEL
+*       and UNITS components and all extensions being propagated from
+*       the first input NDF supplied (note that AXIS values, if
+*       present, will normally be extrapolated as a result of
+*       propagation to the output mosaic, which will typically have a
+*       larger extent than any of the input NDFs).
+
 *  Algorithms Used:
 *     Some of the algorithms used by MAKEMOS require a little
 *     explanation.  The first of these is used to inter-compare
@@ -610,19 +622,7 @@
 *     demands on system resources such as memory. It does this by
 *     partitioning the mosaic into small regions for processing.
 
-*  Implementation Status:
-*     - MAKEMOS supports "bad" pixel values and all non-complex data
-*       types, with arithmetic being performed using the appropriate
-*       floating point type. It can process NDFs with any number of
-*       dimensions. The DATA, TITLE and VARIANCE components of an NDF
-*       are directly supported, with the AXIS, HISTORY, LABEL
-*       and UNITS components and all extensions being propagated from
-*       the first input NDF supplied (note that AXIS values, if
-*       present, will normally be extrapolated as a result of
-*       propagation to the output mosaic, which will typically have a
-*       larger extent than any of the input NDFs).
-
-*  Behaviour of parameters:
+*  Behaviour of Parameters:
 *     Most parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
 *     application. If the application has not been run then the
@@ -650,6 +650,22 @@
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council
 *     Copyright (C) 1998-1999 Central Laboratory of the Research Councils
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)

@@ -20,10 +20,10 @@
 *        The global status.
 
 *  Description:
-*    This routine applies a flat field correction to a series of images.
-*    If any of the input data have been flagged as saturated using a
-*    saturation value (instead of being marked as BAD) then the
-*    saturation values may be protected from modification.
+*     This routine applies a flat field correction to a series of images.
+*     If any of the input data have been flagged as saturated using a
+*     saturation value (instead of being marked as BAD) then the
+*     saturation values may be protected from modification.
 
 *  Usage:
 *     flatcor in out flat
@@ -169,6 +169,10 @@
 *        same name as the corresponding input images, but with the 
 *        characters "_flattened" appended to the filename.
 
+*  Implementation Status:
+*     - Supports processing of all non-complex numeric types.
+*       BAD pixels are processed as are all NDF components.
+
 *  Notes:
 *     - If any of the input data have had their saturation values set by
 *       applications not within CCDPACK, then this routine will require
@@ -179,7 +183,7 @@
 *       saturation values have been set within CCDPACK (by DEBIAS) 
 *       these will be processed correctly and may be different.
 
-*  Behaviour of parameters:
+*  Behaviour of Parameters:
 *     Most parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
 *     application. If the application has not been run then the
@@ -202,9 +206,26 @@
 *     CCDCLEAR commands, however, the FLAT parameter may only be set by
 *     a run of the application MAKEFLAT.
 
-*  Implementation Status:
-*     - Supports processing of all non-complex numeric types.
-*       BAD pixels are processed as are all NDF components.
+*  Copyright:
+*     Copyright (C) 1991-1992, 1994 Science & Engineering Research
+*     Council. Copyright (C) 1995-1997, 1999-2001 Central Laboratory of
+*     the Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)

@@ -210,7 +210,7 @@
 *        plane of the instrument, and may have been added to the WCS
 *        component using the ASTIMP application.  The name FINAL is
 *        used for the new domain added to the WCS component.
-*    
+*
 *     wcsreg "skyfr1,skyfr2,skyfr3,skyfr4" refpos=2 domains=!
 *        Here wcsreg is being used with a somewhat different intent.
 *        The images named are already fully aligned in their 
@@ -224,7 +224,7 @@
 *        since the SKY coordinates have units of radians, which 
 *        are much too large compared to pixels.
 
-*  Behaviour of parameters:
+*  Behaviour of Parameters:
 *     Most parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
 *     application. If the application has not been run then the
@@ -245,6 +245,22 @@
 *  Copyright:
 *     Copyright (C) 1999 Particle Physics & Astronomy Research Council
 
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
@@ -257,6 +273,9 @@
 *     16-FEB-2001 (MBT):
 *        Upgraded for use with Sets.
 *     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 

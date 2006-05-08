@@ -6,6 +6,19 @@
 *  Purpose:
 *     Generates a sequence of test frames.
 
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     ccdgenerate
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
 *  Description:
 *     This routine creates a sequence NDFs which mimic data taken
 *     during observations with a CCD device. The output consists of
@@ -15,15 +28,6 @@
 *
 *     Model objects are added to the data using a list of supplied
 *     positions and intensities.
-
-*  Language:
-*     Starlink Fortran 77
-
-*  Type of Module:
-*     ADAM A-task
-
-*  Invocation:
-*     ccdgenerate
 
 *  ADAM Parameters:
 *     ANGLES( * ) = _DOUBLE (Read)
@@ -120,12 +124,6 @@
 *        types, if you want the results in a foreign format.
 *        [".sdf"]
 
-*  Notes:
-*     -  The log file information is very restricted from this
-*     application, just enough to monitor progress is given.
-*
-*     - All output data is of type _REAL.
-
 *  Examples:
 *     ccdgenerate nseq=4 file=test.obj pixels=[128,128]
 *                 origins=[0,0,-1,0,-1,-1,0,-1] angles=[0,270,180,90]
@@ -145,9 +143,32 @@
 *        This will produce just one HDS container file "testset.sdf",
 *        into which will be written four NDF structures.
 
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
+*  Notes:
+*     -  The log file information is very restricted from this
+*     application, just enough to monitor progress is given.
+*
+*     - All output data is of type _REAL.
+
+*  Copyright:
+*     Copyright (C) 1992-1993 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1997, 1999, 2001 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)

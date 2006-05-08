@@ -347,6 +347,9 @@
 *        large display area.  During alignment, marked points on the
 *        left hand image will be shown as little pink circles.
 
+*  Implementation Status:
+*     - Supports Bad pixel values and all non-complex data types.
+
 *  Notes:
 *     - NDF extension items. 
 *
@@ -374,10 +377,7 @@
 *       In all cases, the coordinates in position lists are pixel
 *       coordinates.
 
-*  Implementation Status:
-*     - Supports Bad pixel values and all non-complex data types.
-
-*  Behaviour of parameters:
+*  Behaviour of Parameters:
 *     All parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
 *     application. If the application has not been run then the
@@ -401,6 +401,27 @@
 *     the graphical user interface.  If the program exits normally, 
 *     their values at the end of the run will be used as defaults 
 *     next time the program starts up.
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1997, 1999-2002 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -446,6 +467,7 @@
 *     windows may cause the program to crash when the chooser window is
 *     being resized.  In this case, the PREVX and PREVY parameters
 *     must be used to control the size of previewed images.
+*     {note_new_bugs_here}
 
 *-
       

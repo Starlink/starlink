@@ -405,7 +405,7 @@
 *        processing using CCDPACK's "automated" methods (in this case
 *        the input NDFs should contain all the information necessary to
 *        process them).
-*        
+*
 *        The parameters that this affects are:
 *           ADC
 *           BOUNDS
@@ -482,8 +482,8 @@
 *        debiassed. The names of the output NDFs are as those of the
 *        corresponding input NDFs, except that they are trailed by the
 *        "_debias" string.
-
-*  ASCII_region_definition files:
+*
+*  ASCII region definition files:
 *      DEBIAS allows regions which are to be defined as having poor
 *      quality (either by setting the appropriate pixels BAD or by
 *      setting part of the quality component) to be described within an
@@ -544,7 +544,7 @@
 *       only have integer values, and start at 1,1 not 0,0. To change
 *       from pixel coordinates add 0.5 and round to the nearest integer.
 
-*  Behaviour of parameters:
+*  Behaviour of Parameters:
 *     Most parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
 *     application. If the application has not been run then the
@@ -576,6 +576,27 @@
 *     are not used: ADC, BOUNDS, DEFERRED, DIRECTION, EXTENT, RNOISE,
 *     SATURATION and ZERO. Values are obtained from the input NDF
 *     extensions instead.
+
+*  Copyright:
+*     Copyright (C) 1991-1992, 1994 Science & Engineering Research
+*     Council. Copyright (C) 1995, 1997, 1999-2001 Central Laboratory
+*     of the Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)

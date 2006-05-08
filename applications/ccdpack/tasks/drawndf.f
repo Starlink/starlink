@@ -327,6 +327,13 @@
 *        each will be drawn upright in the middle of each one,
 *        without an opaque background.
 
+*  Implementation Status:
+*     DRAWNDF's communication with the AGI database is compatible with
+*     most of KAPPA's behaviour, but is slightly less capable; in 
+*     particular it will fail to align with pictures whose alignment
+*     has been stored using TRANSFORM structures instead of MORE.AST
+*     extensions.  This affects only older applications.
+
 *  Notes:
 *     -  Resampling schemes:
 *        When the IMAGE parameter is true and image pixels are plotted,
@@ -382,12 +389,25 @@
 *     be sought first from the input NDF extensions, and only got
 *     from its global or command-line value if it is not present there.
 
-*  Implementation Status:
-*     DRAWNDF's communication with the AGI database is compatible with
-*     most of KAPPA's behaviour, but is slightly less capable; in 
-*     particular it will fail to align with pictures whose alignment
-*     has been stored using TRANSFORM structures instead of MORE.AST
-*     extensions.  This affects only older applications.
+*  Copyright:
+*     Copyright (C) 2000-2001 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)

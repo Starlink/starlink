@@ -159,7 +159,7 @@
 *        the same name as the input NDFs except to add a type use.
 *
 *           OUTLIST > *.find
-*        
+*
 *        If no NDF names are given (NDFNAMES is FALSE) then if you want
 *        to change the extension of the files (from ".find" to ".off"
 *        in this case) use
@@ -177,7 +177,7 @@
 *        been chosen, an position list will still be written for 
 *        each input NDF, but for NDFs which were not matched the
 *        output list will be empty (will consist only of comment lines).
-*        
+*
 *        Incomplete matching would ideally indicate that one, or more, 
 *        of the input lists are from positions not coincident with the 
 *        others, in which case it is perfectly legimate to proceed. 
@@ -243,9 +243,55 @@
 *        This parameter is ignored if NDFNAMES is false.
 *        [TRUE]
 
+*  Examples:
+*     findoff inlist='*' error=1 outlist='*.off'
+*        In this example all the NDFs in the current directory are
+*        accessed and their associated position lists are used.  
+*        The NDFs are related by a simple offset (translation) in
+*        their Current coordinate system, although not necessarily
+*        their pixel coordinate system.  The matched position lists are 
+*        named *.off.  The method used is to try the FAST algorithm, 
+*        switching to SLOW if FAST fails. The completeness measure 
+*        is used when forming the spanning tree.  Matches with 
+*        completenesses less than 0.5 and or with less than three 
+*        positions, are rejected.
+*
+*     findoff fast nofailsafe
+*        In this example the only the FAST algorithm is used.
+*
+*     findoff usecomp=false
+*        In this example the completeness factor is derived but not used
+*        to weight the edges of the spanning tree.
+*
+*     findoff error=8 minsep=100
+*        In this example very fuzzy measurements (or small pixels) are 
+*        being used.  The intrinsic error in the measurements is around
+*        8 pixels and positions within a box 100 pixels of each other
+*        are rejected.
+*
+*     findoff inlist='data*' outlist='*.off' restrict=true
+*        This form would be used if the NDFs 'data*' are already
+*        approximately aligned in their Current coordinates. Setting the
+*        RESTRICT parameter then tells FINDOFF to consider only objects
+*        in the region which overlaps in the Current coordinates of 
+*        each pair of frames. This can save a lot of time if there
+*        are many objects and a small overlap, but will result in
+*        failure of the program if the NDFs are not translationally
+*        aligned reasonably well in the first place.
+*
+*     findoff inlist='data*' outlist='*.off' restrict minmatch=2
+*             maxdisp=20 minsep=30
+*        In this example the NDFs are sparsely populated, and a pair 
+*        will be considered to match if as few as two matching objects
+*        can be found.  The NDFs have been initially aligned in their
+*        Current coordinate systems to an accuracy of 20 or better.  As
+*        an additional safeguard, no objects within 30 units (in
+*        coordinates of the Current frame) of each other in the same NDF
+*        are used for matching.
+
 *  Notes:
 *     - Position list formats. 
-*       
+*
 *       CCDPACK supports data in two formats.
 *
 *       CCDPACK format - the first three columns are interpreted as the
@@ -286,7 +332,25 @@
 *       extension of the input NDFs. On exit this item will be updated
 *       to contain the name of the appropriate output lists.
 
-*  Notes on Algorithms:
+*  Behaviour of Parameters:
+*     Most parameters retain their current value as default. The
+*     "current" value is the value assigned on the last run of the
+*     application. If the application has not been run then the
+*     "intrinsic" defaults, as shown in the parameter help, apply.
+*
+*     Retaining parameter values has the advantage of allowing you to
+*     define the default behaviour of the application but does mean
+*     that additional care needs to be taken when re-using the
+*     application after a break of sometime. The intrinsic default
+*     behaviour of the application may be restored by using the RESET
+*     keyword on the command line.
+*
+*     Certain parameters (LOGTO, LOGFILE, NDFNAMES and USESET) have global
+*     values. These global values will always take precedence, except
+*     when an assignment is made on the command line.  Global values may
+*     be set and reset using the CCDSETUP and CCDCLEAR commands.
+
+*  Notes On Algorithms:
 *     The pattern-matching process uses two main algorithms, one which
 *     matches all the point pair-offsets between any two input lists, 
 *     looking for the matches with the most common positions, and one 
@@ -351,69 +415,26 @@
 *     method), resulting in labelled position lists which are output
 *     for use by REGISTER.
 
-*  Examples:
-*     findoff inlist='*' error=1 outlist='*.off'
-*        In this example all the NDFs in the current directory are
-*        accessed and their associated position lists are used.  
-*        The NDFs are related by a simple offset (translation) in
-*        their Current coordinate system, although not necessarily
-*        their pixel coordinate system.  The matched position lists are 
-*        named *.off.  The method used is to try the FAST algorithm, 
-*        switching to SLOW if FAST fails. The completeness measure 
-*        is used when forming the spanning tree.  Matches with 
-*        completenesses less than 0.5 and or with less than three 
-*        positions, are rejected.
-*
-*     findoff fast nofailsafe
-*        In this example the only the FAST algorithm is used.
-*
-*     findoff usecomp=false
-*        In this example the completeness factor is derived but not used
-*        to weight the edges of the spanning tree.
-*
-*     findoff error=8 minsep=100
-*        In this example very fuzzy measurements (or small pixels) are 
-*        being used.  The intrinsic error in the measurements is around
-*        8 pixels and positions within a box 100 pixels of each other
-*        are rejected.
-*
-*     findoff inlist='data*' outlist='*.off' restrict=true
-*        This form would be used if the NDFs 'data*' are already
-*        approximately aligned in their Current coordinates. Setting the
-*        RESTRICT parameter then tells FINDOFF to consider only objects
-*        in the region which overlaps in the Current coordinates of 
-*        each pair of frames. This can save a lot of time if there
-*        are many objects and a small overlap, but will result in
-*        failure of the program if the NDFs are not translationally
-*        aligned reasonably well in the first place.
-*
-*     findoff inlist='data*' outlist='*.off' restrict minmatch=2
-*             maxdisp=20 minsep=30
-*        In this example the NDFs are sparsely populated, and a pair 
-*        will be considered to match if as few as two matching objects
-*        can be found.  The NDFs have been initially aligned in their
-*        Current coordinate systems to an accuracy of 20 or better.  As
-*        an additional safeguard, no objects within 30 units (in
-*        coordinates of the Current frame) of each other in the same NDF
-*        are used for matching.
+*  Copyright:
+*     Copyright (C) 1992-1993 Science & Engineering Research Council.
+*     Copyright (C) 1995-2002 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
 
-*  Behaviour of parameters:
-*     Most parameters retain their current value as default. The
-*     "current" value is the value assigned on the last run of the
-*     application. If the application has not been run then the
-*     "intrinsic" defaults, as shown in the parameter help, apply.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
 *
-*     Retaining parameter values has the advantage of allowing you to
-*     define the default behaviour of the application but does mean
-*     that additional care needs to be taken when re-using the
-*     application after a break of sometime. The intrinsic default
-*     behaviour of the application may be restored by using the RESET
-*     keyword on the command line.
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
 *
-*     Certain parameters (LOGTO, LOGFILE, NDFNAMES and USESET) have global
-*     values. These global values will always take precedence, except
-*     when an assignment is made on the command line.  Global values may
-*     be set and reset using the CCDSETUP and CCDCLEAR commands.
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)

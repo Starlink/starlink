@@ -79,6 +79,47 @@
 *        create a translation table.
 *        ['import.tab']
 
+*  Examples:
+*     import in='*' table=$CCDPACK_DIR/WHTSKY.DAT
+*        This example shows all the images in the current directory being
+*        processed using the import control table $CCDPACK_DIR/WHTSKY.DAT.
+
+*  CCDPACK Extension Items:
+*     The CCDPACK extension of an image may contain the following items.
+*     The names and types of the extension items are those as used in
+*     import tables. More complete descriptions of the items can be
+*     found with the applications that use these values.  
+*
+*        Name            HDS data type    Description
+*
+*        ADC             _DOUBLE          The analogue to digital
+*                                         conversion factor.
+*        BOUNDS.END1     _INTEGER         The end row or column of the
+*                                         first bias strip region.
+*        BOUNDS.END2     _INTEGER         The end row or column of the
+*                                         second bias strip region.
+*        BOUNDS.START1   _INTEGER         The first row or column of the
+*                                         first bias strip region.
+*        BOUNDS.START2   _INTEGER         The first row or column of the
+*                                         second bias strip region.
+*        DEFERRED        _DOUBLE          The deferred charge.
+*        DIRECTION       _CHAR            The "readout" direction (X or Y).
+*        EXTENT.MAXX     _INTEGER         Maximum X coordinate of useful
+*                                         region.
+*        EXTENT.MAXY     _INTEGER         Maximum Y coordinate of useful
+*                                         region.
+*        EXTENT.MINX     _INTEGER         Minimum X coordinate of useful
+*                                         region.
+*        EXTENT.MINY     _INTEGER         Minimum Y coordinate of useful
+*                                         region.
+*        FILTER          _CHAR            Filter name.
+*        FTYPE           _CHAR            Frame type (TARGET, BIAS, FLAT,
+*                                         DARK or FLASH)
+*        RNOISE          _DOUBLE          Readout noise (ADUs)
+*        SATURATION      _DOUBLE          Pixel saturation count.
+*        TIMES.DARK      _DOUBLE          Dark count time.
+*        TIMES.FLASH     _DOUBLE          Pre-flash time.
+
 *  Table Format:
 *     The import control (translation) table is an ordinary text file
 *     which contains instructions on how to transfer FITS information
@@ -197,46 +238,26 @@
 *     placed anywhere and should start with the characters "#" or "!".
 *     Continuation onto a new line is indicated by use of "-".
 
-*  CCDPACK extension items:
-*     The CCDPACK extension of an image may contain the following items.
-*     The names and types of the extension items are those as used in
-*     import tables. More complete descriptions of the items can be
-*     found with the applications that use these values.  
-*
-*        Name            HDS data type    Description
-*
-*        ADC             _DOUBLE          The analogue to digital
-*                                         conversion factor.
-*        BOUNDS.END1     _INTEGER         The end row or column of the
-*                                         first bias strip region.
-*        BOUNDS.END2     _INTEGER         The end row or column of the
-*                                         second bias strip region.
-*        BOUNDS.START1   _INTEGER         The first row or column of the
-*                                         first bias strip region.
-*        BOUNDS.START2   _INTEGER         The first row or column of the
-*                                         second bias strip region.
-*        DEFERRED        _DOUBLE          The deferred charge.
-*        DIRECTION       _CHAR            The "readout" direction (X or Y).
-*        EXTENT.MAXX     _INTEGER         Maximum X coordinate of useful
-*                                         region.
-*        EXTENT.MAXY     _INTEGER         Maximum Y coordinate of useful
-*                                         region.
-*        EXTENT.MINX     _INTEGER         Minimum X coordinate of useful
-*                                         region.
-*        EXTENT.MINY     _INTEGER         Minimum Y coordinate of useful
-*                                         region.
-*        FILTER          _CHAR            Filter name.
-*        FTYPE           _CHAR            Frame type (TARGET, BIAS, FLAT,
-*                                         DARK or FLASH)
-*        RNOISE          _DOUBLE          Readout noise (ADUs)
-*        SATURATION      _DOUBLE          Pixel saturation count.
-*        TIMES.DARK      _DOUBLE          Dark count time.
-*        TIMES.FLASH     _DOUBLE          Pre-flash time.
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1997-1998, 2000 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
 
-*  Examples:
-*     import in='*' table=$CCDPACK_DIR/WHTSKY.DAT
-*        This example shows all the images in the current directory being
-*        processed using the import control table $CCDPACK_DIR/WHTSKY.DAT.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)

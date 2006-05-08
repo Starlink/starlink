@@ -236,7 +236,17 @@
 *       processing, assuming that the input data have a normal
 *       distribution.
 
-*  Behaviour of parameters:
+*  Notes:
+*     - The data input into this routine should have bias strip
+*       regions and any badly vignetted parts removed.
+*
+*     - The input images are normalised to have a mean of one
+*       before being combined. This makes sure that all input images
+*       contribute to the final result (even though, for instance,
+*       they were taken on a source of varying brightness, e.g. the
+*       twilight sky).
+
+*  Behaviour of Parameters:
 *     Most parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
 *     application. If the application has not been run then the
@@ -257,18 +267,24 @@
 *     assignment is made on the command line.  Global values may be set
 *     and reset using the CCDSETUP and CCDCLEAR commands.
 
-*  Notes:
-*     - The data input into this routine should have bias strip
-*       regions and any badly vignetted parts removed.
-*
-*     - The input images are normalised to have a mean of one
-*       before being combined. This makes sure that all input images
-*       contribute to the final result (even though, for instance,
-*       they were taken on a source of varying brightness, e.g. the
-*       twilight sky).
-
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)

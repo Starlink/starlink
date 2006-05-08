@@ -247,28 +247,6 @@
 *        parameter). By default, no zero-point corrections are applied.
 *        [FALSE]
 *     {enter_further_parameters_here}
-*
-*  Notes:
-*     The file containing scale and zero-point corrections (see the
-*     CORRECT parameter) must contain one line per frame having the
-*     following information
-*
-*              INDEX SCALE ZERO
-*
-*     Where the fields have the following meaning:
-*
-*        INDEX = the index number of the frame, this must be the
-*                same as its order number in the input list (see 
-*                the IN parameter)
-*        SCALE = the multiplicative scaling factor for the NDF
-*        ZERO  = the zero-point correction for the NDF
-*
-*     Comment lines may be added, but must be prefixed with a "#"
-*     character.
-
-*  Pitfalls:
-*     The format of the file containing scale and zero-point corrections
-*     must be correct or the A-task will abort operations.
 
 *  Examples:
 *     drizzle * out pixfrac=0.7
@@ -293,6 +271,24 @@
 *     -  All non-complex numeric data types are supported.
 *     -  Bad pixels are supported.
 *     -  The algorithm is restricted to handling 2D NDFs only.
+
+*  Notes:
+*     The file containing scale and zero-point corrections (see the
+*     CORRECT parameter) must contain one line per frame having the
+*     following information
+*
+*              INDEX SCALE ZERO
+*
+*     Where the fields have the following meaning:
+*
+*        INDEX = the index number of the frame, this must be the
+*                same as its order number in the input list (see 
+*                the IN parameter)
+*        SCALE = the multiplicative scaling factor for the NDF
+*        ZERO  = the zero-point correction for the NDF
+*
+*     Comment lines may be added, but must be prefixed with a "#"
+*     character.
 
 *  Algorithms Used:
 *     Taken from Fruchter et al., "A package for the reduction of dithered
@@ -351,10 +347,30 @@
 *      fill in the gaps caused by these zero-weight input pixels. Finally
 *      the linear weighting scheme is statistically optimum when inverse
 *      variance maps are used as weights."
- 
+
+*  Pitfalls:
+*     The format of the file containing scale and zero-point corrections
+*     must be correct or the A-task will abort operations.
+
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council
 *     Copyright (C) 1998-1999 Central Laboratory of the Research Councils
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     AA: Alasdair Allan (STARLINK, Keele University)

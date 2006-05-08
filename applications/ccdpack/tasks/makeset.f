@@ -218,7 +218,7 @@
 *        as the input file, so out="*-set" would create output
 *        files with the same name as the input files but with "-set"
 *        appended.
-*        
+*
 *        If MODE is not SPLIT then no new output files are created, so
 *        this parameter is ignored.
 *     SECTIONS( * ) = LITERAL (Read)
@@ -362,6 +362,19 @@
 *        directory, and written into a container file with the
 *        same name but '-s' appended.
 
+*  Notes:
+*     - When MODE=CONTAINER, membership of a Set is not strictly 
+*     determined by the identity of the HDS container file in which 
+*     it resides, but by the pathname supplied to the IN parameter
+*     which identifies that HDS container file.  Thus it is possible
+*     to create members of two Sets within a single container file
+*     in one invocation of MAKESET, but it's most unlikely that this
+*     will result unless you are deliberately invoking it in a 
+*     bizarre way.
+*
+*     - When a non-null ASTFILE parameter is supplied, this program
+*     duplicates much of the functionality of ASTIMP.
+
 *  Behaviour of Parameters:
 *     All parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
@@ -378,21 +391,24 @@
 *     when an assignment is made on the command line. Global values may
 *     be set and reset using the CCDSETUP and CCDCLEAR commands.
 
-*  Notes:
-*     - When MODE=CONTAINER, membership of a Set is not strictly 
-*     determined by the identity of the HDS container file in which 
-*     it resides, but by the pathname supplied to the IN parameter
-*     which identifies that HDS container file.  Thus it is possible
-*     to create members of two Sets within a single container file
-*     in one invocation of MAKESET, but it's most unlikely that this
-*     will result unless you are deliberately invoking it in a 
-*     bizarre way.
-*
-*     - When a non-null ASTFILE parameter is supplied, this program
-*     duplicates much of the functionality of ASTIMP.
-
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)

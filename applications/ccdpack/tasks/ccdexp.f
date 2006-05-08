@@ -44,6 +44,13 @@
 *        The text file containing the keyword translation table. The
 *        format of this file is described under "Table Format".
 
+*  Notes:
+*     Before an export occurs all existing CCDPACK items are removed
+*     from the headers. This may cause the occasional unexpected
+*     behaviour (if for instance you wanted to run this in sequence
+*     rather than just once for each export), but is generally the
+*     correct thing to do.
+
 *  Table Format:
 *     The keyword translation table should be held in a text file, with
 *     one extension component specified per line.  Each line should
@@ -68,12 +75,25 @@
 *     with an exclamation mark.  The remainder of the line will then be
 *     ignored.
 
-*  Notes:
-*     Before an export occurs all existing CCDPACK items are removed
-*     from the headers. This may cause the occasional unexpected
-*     behaviour (if for instance you wanted to run this in sequence
-*     rather than just once for each export), but is generally the
-*     correct thing to do.
+*  Copyright:
+*     Copyright (C) 1997 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter W. Draper (STARLINK, Durham University)

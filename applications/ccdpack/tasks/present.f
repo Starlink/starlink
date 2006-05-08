@@ -303,10 +303,10 @@
 *        MODIFY is TRUE then you will be given an opportunity to modify
 *        them, otherwise these values will be entered into the NDF
 *        CCDPACK extensions.
-
+*
 *        The input record format is five fields separated by commas. These 
 *        are:
-*        
+*
 *            - 1 NDF name
 *            - 2 Frame type
 *            - 3 Filter name
@@ -328,7 +328,7 @@
 *           BIAS1,bias,!,!,!
 *           BIAS2,bias,!,!,!
 *           BIAS3,bias,!,!,!
-* 
+*
 *        Then it would be invoked using parameters 
 *
 *           - SIMPLE MULTIENTRY IN=^XREDUCE.NDFS
@@ -435,6 +435,27 @@
 *     present masters simple=false masterflat="2dspectraff"
 *        In this example a master flatfield is imported to be used
 *        in an automated reduction of spectral data.
+
+*  Copyright:
+*     Copyright (C) 1992, 1994 Science & Engineering Research Council.
+*     Copyright (C) 1995, 2000 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)

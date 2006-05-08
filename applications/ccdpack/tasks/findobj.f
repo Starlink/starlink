@@ -195,6 +195,15 @@
 *        is then 3 times the standard deviation above the estimated
 *        background.
 
+*  Implementation Status:
+*     - This routine correctly processes the DATA and QUALITY components
+*       of an NDF data structure. Bad pixels and all non-complex numeric
+*       data types can be handled.
+
+*  Implementation Deficiencies:
+*     -  There is no support positions other than in pixel coordinates.
+*     -  No use is made of variance information.
+
 *  Notes:
 *     - Threshold estimation.
 *
@@ -255,7 +264,7 @@
 *       In all cases the coordinates in position lists are pixel 
 *       coordinates.
 
-*  Behaviour of parameters:
+*  Behaviour of Parameters:
 *     Most parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
 *     application. If the application has not been run then the
@@ -276,14 +285,26 @@
 *     assignment is made on the command line.  Global values may be set
 *     and reset using the CCDSETUP and CCDCLEAR commands.
 
-*  Implementation Status:
-*     - This routine correctly processes the DATA and QUALITY components
-*       of an NDF data structure. Bad pixels and all non-complex numeric
-*       data types can be handled.
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 1995-2000 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
 
-*  Implementation Deficiencies:
-*     -  There is no support positions other than in pixel coordinates.
-*     -  No use is made of variance information.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
