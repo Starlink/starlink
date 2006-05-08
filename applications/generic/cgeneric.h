@@ -21,9 +21,10 @@
 *          ".cgen". There are three macros defined for use when defining
 *          generic functions.
 *
-*          -- CGEN_FUNCTION
-*          -- CGEN_TYPE
 *          -- CGEN_BAD
+*          -- CGEN_FUNCTION
+*          -- CGEN_HDS_TYPE
+*          -- CGEN_TYPE
 *
 *          You need to use CGEN_FUNCTION as part of the normal function
 *          declaration so that generic forms of the function name can be
@@ -51,6 +52,10 @@
 *          The value of CGEN_BAD will be set to one of the PRM constants
 *          VAL__BADD, VAL__BADR etc. as appropriate.
 *
+*          The value of CGEN_HDS_TYPE will be set to the HDS type of the
+*          current type, one of "_DOUBLE", "_REAL", "_INTEGER", "_WORD"
+*          "_UWORD", "_BYTE" or "_UBYTE".
+*
 *        - Create a C file that includes the generic code, once for each of
 *          the data types you want (this file can also contain related
 *          non-generic code). To do this define the macro CGEN_CODE_TYPE to be
@@ -77,7 +82,8 @@
 *             #include "mygenerics.cgen"
 *             #undef CGEN_CODE_TYPE
 *
-*          Which generates code for double and int routines.
+*          Which generates code for double and int routines when 
+*          the C file is compiled.
 *
 *        - Use the generic routines. The function names will
 *          have the character codes "D", "F", "I", "W", "UW",
