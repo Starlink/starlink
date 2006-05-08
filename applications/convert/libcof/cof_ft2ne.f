@@ -18,7 +18,7 @@
 *     binary table written by NDF2FITS.  The extension can be a
 *     structure, sub-structure, structure-array element or a primitive
 *     component.  It uses the EXTNAME and EXTTYPE keywords to determine
-*     the extensions's path and data type.  EXTNAME also has the
+*     the extension's path and data type.  EXTNAME also has the
 *     element indices if the extension or sub-structure is an array;
 *     the dimensions of such a structure or a primitive array are taken
 *     from the EXTSHAPE keyword.  The routine creates the extension or
@@ -47,6 +47,9 @@
 *        structure array.
 *     1997 November 15 (MJC):
 *        Allow for extensions which are primitive arrays.
+*     2006 May 8 (MJC):
+*        Allow for the different component paths of on-the-fly 
+*        conversions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -82,6 +85,7 @@
 *  Local Variables:
       CHARACTER * ( 48 ) COMENT  ! FITS header comment
       INTEGER DIMS( DAT__MXDIM ) ! Dimensions of the structure
+      INTEGER ELEVEL             ! Top level of extensions
       INTEGER END( MAXWRD )      ! End columns of words (not used)
       CHARACTER * ( ( MAXWRD+1 ) * DAT__SZNAM ) EXPATH ! Extension path
       CHARACTER * ( DAT__SZTYP ) EXTYPE ! Extension data type
@@ -116,6 +120,16 @@
          GOTO 999
       END IF
 
+      CALL CHR_UCASE( EXPATH )
+      IF ( INDEX( EXPATH, 'MORE' ) .EQ. 0 ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'COF_FT2NE_EXTMORE',
+     :     'EXTNAME keyword value does not contain the NDF extension '/
+     :     /'component.  Unable to recreate the NDF extension.',
+     :     STATUS )
+         GOTO 999
+      END IF
+
 *  Obtain the EXTTYPE keyword.
       CALL COF_GKEYC( FUNIT, 'EXTTYPE', THERE, EXTYPE, COMENT, STATUS )
 
@@ -147,19 +161,24 @@
 *  Replace the dots in the path by spaces.
       CALL CHR_TRCHR( '.', ' ', EXPATH, STATUS )
 
-*  Break the path into words.
+*  Break the path into words.  Extension must be at least the second
+*  item because the first is the top-level NDF name.  The extensions 
+*  normally begin at level 3 in an NDF, but allow for on-the-fly
+*  conversion where the path is longer.
       CALL CHR_DCWRD( EXPATH, MAXWRD, NWORD, START, END, WORDS, STATUS )
+      DO LEVEL = 2, NWORD
+        IF ( WORDS( LEVEL ) .EQ. 'MORE' ) ELEVEL = LEVEL + 1
+      END DO
 
 *  Extract the extension's name, number of dimensions and their values,
 *  dimensions, and indices to a structure element.
-      CALL COF_EXDIM( FUNIT, WORDS( 3 ), DAT__MXDIM, NAME, NDIM, DIMS,
-     :                INDICE, STATUS )
+      CALL COF_EXDIM( FUNIT, WORDS( ELEVEL ), DAT__MXDIM, NAME, NDIM, 
+     :                DIMS, INDICE, STATUS )
 
-*  The extensions begin at level 3.
       CALL NDF_XSTAT( NDF, NAME, THERE, STATUS )
 
 *  Deal with a primitive extension.  This can only be written if there
-*  is no exisiting component of the same name.
+*  is no existing component of the same name.
       IF ( PRIMEX ) THEN
          IF ( .NOT. THERE ) THEN
 
@@ -195,8 +214,8 @@
       END IF
 
 *  Create sub-structures of the extension.
-      IF ( NWORD .GT. 3 ) THEN
-         DO LEVEL = 2, NWORD - 2
+      IF ( NWORD .GT. ELEVEL ) THEN
+         DO LEVEL = ELEVEL - 1, NWORD - 2
 
 *  Extract the structure's name, number of dimensions and their values,
 *  dimensions, and indices to a structure element.
