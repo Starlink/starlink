@@ -30,15 +30,15 @@
 #     fitsedit m51b
 #        This allows editing of the FITS headers in the NDF called m51b.
 
-#  Related Applications:
-#     KAPPA: FITSMOD, FITSEXP, FITSHEAD, FITSIMP, FITSLIST; Figaro: FITSKEYS.
-
 #  Notes:
 #     -  This uses the environmental variable, EDITOR, to select
 #     the editor.  If this variable is undefined vi is assumed.
 #     -  The script lists the headers to a temporary file; allows text 
 #     editing; and then replaces the former FITS extension with the
 #     modified version, performing some validation at this stage.
+
+#  Related Applications:
+#     KAPPA: FITSMOD, FITSEXP, FITSHEAD, FITSIMP, FITSLIST; Figaro: FITSKEYS.
 
 #  Copyright:
 #     Copyright (C) 1994 Science & Engineering Research Council.
@@ -89,12 +89,9 @@
 #        of the sh built-in echo command which does not seem to recognize
 #        the -n option on Solaris.
 #     {enter_further_changes_here}
-
-#  Bugs:
-#     {note_any_bugs_here}
-
-#-
 #
+#-
+
 #   Ensure that processing to temporary file will work by deleting them.
 #
 if (-e zzfitsedit.tmp~) rm zzfitsedit.tmp~

@@ -66,9 +66,6 @@
 #        This prints the FITS headers in the files ~/fits/*.fit and
 #        ~/data/p?.fi*.
 
-#  Related Applications:
-#     KAPPA: FITSEDIT, FITSEXP, FITSIMP, FITSLIST; Figaro: FITSKEYS.
-
 #  Notes:
 #     -  Prompting is directed to the standard error, so that the listings
 #     may be redirected to a file.
@@ -76,6 +73,9 @@
 #     a part of the headers and some of the FITS data.  Unless the FITS
 #     file is small, it is usually safe to set parameter BLOCK higher
 #     than its true value.
+
+#  Related Applications:
+#     KAPPA: FITSEDIT, FITSEXP, FITSIMP, FITSLIST; Figaro: FITSKEYS.
 
 #  Copyright:
 #     Copyright (C) 1994 Science & Engineering Research Council.
@@ -115,11 +115,8 @@
 #        illegally formatted END lines.
 #     {enter_further_changes_here}
 
-#  Bugs:
-#     {note_any_bugs_here}
-
 #-
-#
+
 #   Specify the text search limits, and that we want to print the text
 #   between these limits to standard output.  These look for lines
 #   starting "SIMPLE  =" and "END " for a primary header and data unit,
