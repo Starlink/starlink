@@ -1,10 +1,23 @@
-*+  MED3D - outputs the z axis median for all pixels in the x,y plane
-
       SUBROUTINE MED3D ( WKARR, WKDIM1, WKDIM2, WKDIM3, WTARR, GDDATA,
      :                   ZNUMBR, MEDNAR, GODNUM, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     MED3D
+
+*  Purpose:
+*     Outputs the z axis median for all pixels in the x,y plane
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL MED3D( WKARR, WKDIM1, WKDIM2, WKDIM3, WTARR, GDDATA, ZNUMBR,
+*     :            MEDNAR, GODNUM, STATUS )
+
+*  Description:
 *     This routine takes as input a 3-d array with dimensions x,y,z.
 *     Returned is a 2-d array, dimensions x,y, which holds the median
 *     value for each pixel in the x,y plane, determined along the z
@@ -12,14 +25,8 @@
 *     or may not have data in it, and this is indicated by the values
 *     found in an input logical array. The final number of x,y planes
 *     involved in deriving medians is also returned.
-*
-*    Invocation :
-*
-*     CALL MED3D( WKARR, WKDIM1, WKDIM2, WKDIM3, WTARR, GDDATA, ZNUMBR,
-*    :            MEDNAR, GODNUM, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     WKARR( WKDIM1, WKDIM2, WKDIM3 )  =  REAL( READ )
 *         3-d array containing data to be statistically analysed
 *     WKDIM1 = INTEGER( READ )
@@ -40,9 +47,8 @@
 *         Number of z slices finally used in statistics
 *     STATUS  =  INTEGER( UPDATE )
 *         Global status parameter
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     Work out how many of the used z planes contain valid data
 *     Set up variables for dummy array passed to stats subroutine
@@ -61,30 +67,32 @@
 *        Endfor
 *     Endfor
 *     Return
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
+
+*  Authors:
 *     Malcolm Currie STARLINK (RAL::CUR)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     1989 May 26: First implementation (RAL::CUR)
 *     1989 Aug  8: Passed array dimensions as separate variables
 *                  (RL.STAR::CUR).
-*
-*    Type definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     None known.
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT  NONE              ! no default typing allowed
 
-*    Global constants :
+*  Global Constants:
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :    WKDIM1, WKDIM2, WKDIM3,
@@ -97,7 +105,7 @@
       LOGICAL
      :    GDDATA( ZNUMBR )
 
-*    Export :
+*  Arguments Returned:
 
       INTEGER
      :    GODNUM
@@ -105,18 +113,18 @@
       REAL
      :    MEDNAR( WKDIM1, WKDIM2 )
 
-*    Status :
+*  Status:
 
       INTEGER  STATUS
 
-*    Local Constants :
+*  Local Constants:
 
       INTEGER
      :    MAXNUM                ! Maximum number of valid x,y planes
       PARAMETER( MAXNUM = 1000 )! allowed - same default as in calling
                                 ! routine
 
-*    Local variables :
+*  Local Variables:
 
       INTEGER
      :    WORK2( MAXNUM ),      ! Work array used by MEDWV
@@ -128,7 +136,7 @@
      :    WORK1( MAXNUM ),      ! Work array used by MEDWV
      :    MEDIAN                ! median
 
-*-
+*.
 *    Check status on entry - return if not o.k.
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999

@@ -1,11 +1,25 @@
-*+  LISTSB - lists a specified section of a 2-d array to a file for
-*            printing
-
       SUBROUTINE LISTSB ( ARRAY, DIM1, DIM2, XLOW, YLOW, XUPP, YUPP,
      :                    OPENF, FDI, FILNAM, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     LISTSB
+
+*  Purpose:
+*     Lists a specified section of a 2-d array to a file for
+*     printing
+
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL LISTSB( ARRAY, DIM1, DIM2, XLOW, YLOW, XUPP, YUPP, OPENF,
+*     :             FDI, FILNAM, STATUS )
+
+*  Description:
 *     This routine takes an input 2-d array and lists out a specified
 *     section of that image, as defined by the x-and-y lower-and-upper
 *     bounds to a Fortran file. The file must either be already opened
@@ -15,14 +29,8 @@
 *     characters.  The format chosen gives ten numbers across a full
 *     printout page (132 chars), and a new page is thrown at the right
 *     point.
-*
-*    Invocation :
-*
-*     CALL LISTSB( ARRAY, DIM1, DIM2, XLOW, YLOW, XUPP, YUPP, OPENF,
-*    :             FDI, FILNAM, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     ARRAY( DIM1, DIM2 )  =  REAL( READ )
 *         2-d array to be listed.
 *     DIM1 = INTEGER( READ )
@@ -49,9 +57,8 @@
 *           listing output.
 *     STATUS  =  INTEGER( READ, WRITE )
 *         Global status value
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     Open file for listing if required
 *     If an error occurred then abort
@@ -89,19 +96,15 @@
 *     Endfor
 *     Close file if opened in the routine
 *     End
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
+
+*  Authors:
 *     Mark McCaughrean UoE ( REVA::MJM )
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
-*     14-06-1986 : First implementation - partly from KFH (REVA::MJM)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-JUN-1986 (REVA::MJM):
+*        : First implementation - partly from KFH
 *     1986 Aug 14: Renamed from LISTSUB, completed prologue, removed
 *                  format statements and added IOSTAT to file open,
 *                  nearly conformed to Starlink programming standards
@@ -121,18 +124,25 @@
 *                  Fortran file, i.e. to make it more modular
 *                  (RAL::CUR).
 *     1992 Jan 26: Used functional FIO_ASSOC and FIO_CANCL. (RAL::MJC)
-*
-*    Type definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     None known.
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT  NONE           ! no default typing allowed
 
-*    Global constants :
+*  Global Constants:
 
       INCLUDE 'SAE_PAR'        ! SSE global definitions
       INCLUDE 'PAR_ERR'        ! Parameter-system error constants
       INCLUDE 'PRM_PAR'        ! PRIMDAT public constants
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :  DIM1, DIM2,
@@ -151,18 +161,18 @@
       CHARACTER*(*)
      :    FILNAM
 
-*    Status :
+*  Status:
 
       INTEGER  STATUS
 
-*    Local Constants :
+*  Local Constants:
 
       INTEGER
      :    NCHLIN               ! maximum number of characters in an
                                ! output record
       PARAMETER ( NCHLIN = 132 )
 
-*    Local variables :
+*  Local Variables:
 
       INTEGER
      :    FD,                  ! file description
@@ -188,7 +198,7 @@
       CHARACTER*5
      :    CSTRIP               ! string to hold current strip number
 
-*-
+*.
 *    check status on entry - return if not o.k.
 
       IF ( STATUS .NE. SAI__OK ) RETURN

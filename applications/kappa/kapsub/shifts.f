@@ -1,10 +1,23 @@
-*+  SHIFTS - sets up parameters for use by SHIFTX and SHIFTY
-
       SUBROUTINE SHIFTS( SIZE, SHIFT, AXIS, INTSH, WHOLE, NEGAT, FRACT,
      :  STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     SHIFTS
+
+*  Purpose:
+*     Sets up parameters for use by SHIFTX and SHIFTY
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL SHIFTS( SIZE, SHIFT, AXIS, INTSH, WHOLE, NEGAT, FRACT,
+*     :             STATUS )
+
+*  Description:
 *     The variables INTSH, WHOLE, NEGAT, and FRACT are set according to
 *     the value of SHIFT. A check is made that the integer pixel shift
 *     INTSH would not shift the input array completely outside the
@@ -12,14 +25,8 @@
 *     returned status is set to an error value.
 *     An immediate return will occur if STATUS has an error value on
 *     entry.
-*
-*    Invocation :
-*
-*     CALL SHIFTS( SIZE, SHIFT, AXIS, INTSH, WHOLE, NEGAT, FRACT,
-*    :             STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     SIZE = INTEGER( READ )
 *           Dimension of the input and output arrays under
 *           consideration.
@@ -44,9 +51,8 @@
 *           shift would move the whole of the input array outside of
 *           the output array then STATUS is set to SAI__ERROR and an
 *           error reported.
-*
-*    Method :
-*
+
+*  Algorithm:
 *     If no error on entry then
 *        Set logical variables to default to positive integer pixel
 *          shift
@@ -69,30 +75,37 @@
 *           Set status to error value and report error
 *        Endif
 *     Endif
-*
-*    Authors :
-*
+
+*  Authors:
 *     Dave Baines (ROE::ASOC5)
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
-*     18/08/1983 : Original version             (ROE::ASOC5)
-*     17/02/1984 : Rewritten to be more general (ROE::ASOC5)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-AUG-1983 (ROE::ASOC5):
+*        : Original version
+*     17-FEB-1984 (ROE::ASOC5):
+*        : Rewritten to be more general
 *     1986 Sep 9 : Renamed parameters section to arguments and tidied
 *                  (RL.STAR::CUR).
 *     1988 Jun 22 : Added identification to error reporting
 *                   (RL.STAR::CUR).
-*
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT NONE
 
-*    Global constants :
+*  Global Constants:
 
       INCLUDE 'SAE_PAR'
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :  SIZE
@@ -103,7 +116,7 @@
       CHARACTER*(*)
      :  AXIS
 
-*    Export :
+*  Arguments Returned:
 
       INTEGER
      :  INTSH
@@ -114,21 +127,21 @@
       REAL
      :  FRACT
 
-*    Status :
+*  Status:
 
       INTEGER STATUS
 
-*    Local Constants :
+*  Local Constants:
 
       REAL FRAMIN
       PARAMETER ( FRAMIN = 0.001 ) ! minimum fractional pixel shift
                                    ! allowed
 
-*    Local variables :
+*  Local Variables:
 
       REAL
      :  ABSSH ! absolute value of shift
-*-
+*.
 
 *    check for error on entry
 

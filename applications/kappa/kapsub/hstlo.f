@@ -1,10 +1,23 @@
-*+  HSTLO - Computes an histogram locus.
-
       SUBROUTINE HSTLO( HIST, NHIST, HMIN, HMAX, NULL, XLOG, YLOG,
      :                  YLOW, NPOINT, XLOC, YLOC, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     HSTLO
+
+*  Purpose:
+*     Computes an histogram locus.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*      CALL HSTLO( HIST, NHIST, HMIN, HMAX, NULL, XLOG, YLOG, NPOINT,
+*     :            XLOC, YLOC, STATUS )
+
+*  Description:
 *     This routine computes the locus of an histogram for later
 *     plotting.  Either or both of the ordinate or abscissa may be on
 *     a logarithmic scale.  Where a position becomes undefined, the
@@ -13,14 +26,8 @@
 *     abscissa is logarthmic and the lower limt is negative, rather than
 *     using the data values, the locus is decribed in terms of histogram
 *     bin numbers.
-*
-*    Invocation :
-*
-*      CALL HSTLO( HIST, NHIST, HMIN, HMAX, NULL, XLOG, YLOG, NPOINT,
-*    :            XLOC, YLOC, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     HIST( NHIST ) = INTEGER( READ )
 *         This array contains the histogram.
 *     NHIST = INTEGER( READ )
@@ -49,9 +56,8 @@
 *         Work array for the y locus of the histogram
 *     STATUS = INTEGER( READ, WRITE )
 *         This is the status value on entry to this subroutine.
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     If abscissa is logarithmic then
 *        If minimum value is zero or negative
@@ -80,24 +86,29 @@
 *          and for points that would duplicate a vertical line
 *     Endif
 *     End
-*
-*    Authors :
-*
+
+*  Authors:
 *     Malcolm J. Currie  STARLINK (RAL::CUR)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     1989 Apr 23: Original (RAL::CUR).
-*
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT NONE            ! no default typing allowed
 
-*    Global constants :
+*  Global Constants:
 
       INCLUDE 'SAE_PAR'        ! SSE global definitions
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :  NHIST,
@@ -112,17 +123,17 @@
      :  NULL,
      :  YLOW
 
-*    Export :
+*  Arguments Returned:
 
       REAL
      :  XLOC( NPOINT ),
      :  YLOC( NPOINT )
 
-*    Status :
+*  Status:
 
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
 
       INTEGER
      :  I,                     ! general variable
@@ -133,7 +144,7 @@
      :  BINSZ,                 ! size of the bins
      :  YNULL                  ! bin height for an empty bin in a
                                ! histogram with a log ordinate
-*-
+*.
 
 *    If the status is bad, then return immediately
 

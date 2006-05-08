@@ -1,20 +1,27 @@
-*+  CURRE - defines a region within the current zone
-
       SUBROUTINE CURRE( CURSOR, PNLOW, PNUPP, LBND, UBND, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     CURRE
+
+*  Purpose:
+*     Defines a region within the current zone
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*      CALL CURRE( CURSOR, PNLOW, PNUPP, LBND, UBND, STATUS )
+
+*  Description:
 *     This subroutine defines a 2-d region in the current zone. If a
 *     cursor is available and required, then it is used to define the
 *     rectangular area, otherwise, the co-ordinates of the region come
 *     from the environment.
-*
-*    Invocation :
-*
-*      CALL CURRE( CURSOR, PNLOW, PNUPP, LBND, UBND, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     CURSOR = LOGICAL ( READ )
 *         True if the cursor is required
 *     PNLOW = CHARACTER ( READ )
@@ -31,9 +38,8 @@
 *         %CURSOR is false).
 *     STATUS  = INTEGER( READ, WRITE )
 *         Global status value
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     Get bounds of the zone and the position of its centre
 *     If cursor mode then
@@ -84,13 +90,12 @@
 *        Tidy parameters
 *     Endif
 *     End
-*
-*    Authors :
-*
+
+*  Authors:
 *     Malcolm Currie   STARLINK (RAL::CUR)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     1989 Apr 30: Original based on INRE (RAL::CUR).
 *     1989 Oct 25: Removed some commentary for use with PRPCUR
 *                  (RAL::CUR).
@@ -98,34 +103,40 @@
 *                  (RAL::CUR).
 *     1992 Mar  3: Replaced AIF parameter-system calls by the extended
 *                  PAR library (RAL::CUR).
-*
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT NONE
 
-*    Global Constants :
+*  Global Constants:
 
       INCLUDE 'SAE_PAR'         ! SSE definitions
       INCLUDE 'PAR_ERR'         ! Parameter-system errors
 
-*    Status :
+*  Status:
 
       INTEGER STATUS
 
-*    Import :
+*  Arguments Given:
 
       LOGICAL CURSOR
 
       CHARACTER*(*)
      :  PNLOW, PNUPP
 
-*    Export :
+*  Arguments Returned:
 
       REAL
      :  LBND( 2 ),
      :  UBND( 2 )
 
-*    Local Variables :
+*  Local Variables:
 
       INTEGER
      :  BUTTN1,                 ! Number of button pressed on the
@@ -161,7 +172,7 @@
      :  AGAIN2, REPEAT          ! when a simulated REPEAT..UNTIL loop
                                 ! is to continue
 
-*-
+*.
 *    Check status on entry - return if not o.k.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -490,4 +501,3 @@
       END IF
 
       END
-

@@ -1,24 +1,31 @@
-*+  INRE - defines a sub-array or region within a 2-d array
-
       SUBROUTINE INRE( CURSOR, ZONEOV, ZONEO, XCEN, YCEN, LBND, DIMS,
      :                 XLOW, XHIGH, YLOW, YHIGH, PNLB, PNUB,
      :                 X1, X2, Y1, Y2, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     INRE
+
+*  Purpose:
+*     Defines a sub-array or region within a 2-d array
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*      CALL INRE( CURSOR, ZONEOV, ZONEO, XCEN, YCEN, LBND, DIMS,
+*     :           XLOW, XHIGH, YLOW, YHIGH, PNLB, PNUB,
+*     :           X1, X2, Y1, Y2, STATUS )
+
+*  Description:
 *     This subroutine defines a region of a 2-d array. If an image
 *     display is available, then the cursor is used to define the
 *     area, otherwise, the co-ordinates of the region come from the
 *     environment.
-*
-*    Invocation :
-*
-*      CALL INRE( CURSOR, ZONEOV, ZONEO, XCEN, YCEN, LBND, DIMS,
-*    :           XLOW, XHIGH, YLOW, YHIGH, PNLB, PNUB,
-*    :           X1, X2, Y1, Y2, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     CURSOR = LOGICAL ( READ )
 *         True if the cursor of the image is required
 *     ZONEOV = INTEGER ( READ )
@@ -68,9 +75,8 @@
 *           false)
 *     STATUS  = INTEGER( READ, WRITE )
 *         Global status value
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     If cursor mode then
 *        Select overlay frame zone and get bounds
@@ -131,13 +137,12 @@
 *        Tidy parameters
 *     Endif
 *     End
-*
-*    Authors :
-*
+
+*  Authors:
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     1988 Apr 9 : Original extracted from INSPECT (RL.STAR::CUR)
 *     1988 Jun 23: More error checking (RL.STAR::CUR).
 *     1988 Sep 12 : Gave subroutine CROSS extra argument (RL.STAR::CUR).
@@ -153,20 +158,26 @@
 *                   instead of 4 x and y parameters. (RAL::CUR).
 *     1992 Mar  3: Replaced AIF parameter-system calls by the extended
 *                  PAR library (RAL::CUR).
-*
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT NONE
 
-*    Global Constants :
+*  Global Constants:
 
       INCLUDE 'SAE_PAR'         ! SSE definitions
 
-*    Status :
+*  Status:
 
       INTEGER STATUS
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :  LBND( 2 ),
@@ -185,13 +196,13 @@
      :  PNLB,
      :  PNUB
 
-*    Import-Export :
+*  Arguments Given and Returned:
 
       INTEGER
      :  X1, Y1,
      :  X2, Y2
 
-*    Local Variables :
+*  Local Variables:
 
       INTEGER
      :  LIML( 2 ),              ! Pixel limits below which the slice
@@ -233,7 +244,7 @@
      :  AGAIN2, REPEAT          ! when a simulated REPEAT..UNTIL loop
                                 ! is to continue
 
-*-
+*.
 *    check status on entry - return if not o.k.
 
       IF ( STATUS .EQ. SAI__OK ) THEN

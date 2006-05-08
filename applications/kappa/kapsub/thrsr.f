@@ -1,21 +1,30 @@
       SUBROUTINE THRSR( INARR, DIMS, THRLO, THRHI, NEWLO, NEWHI,
      :                   OUTARR, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     THRSR
+
+*  Purpose:
+*     Threshold an array of data
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL THRSR( INARR, OUTARR, DIMS, THRLO, THRHI, NEWLO, NEWHI,
+*     :             STATUS )
+
+*  Description:
 *     Takes an array of data and sets all values above a defined upper
 *     threshold to a new defined value, and sets all those below a
 *     defined lower threshold to another defined value. In practice,
 *     all values outside the two thresholds may be set to zero, for
 *     example.
-*
-*    Invocation :
-*
-*     CALL THRSR( INARR, OUTARR, DIMS, THRLO, THRHI, NEWLO, NEWHI,
-*    :             STATUS )
-*
-*     Arguments :
-*
+
+*  Arguments:
 *     INARR( DIMS )  =  REAL( READ )
 *         Input data to be thresholded
 *     DIMS  =  INTEGER( READ )
@@ -32,9 +41,8 @@
 *         Output thresholded data
 *     STATUS  = INTEGER( READ )
 *         Global status parameter
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry
 *     If o.k.  then
 *        For all pixels of input array
@@ -50,43 +58,48 @@
 *        Endfor
 *     Endif
 *     Return
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
+
+*  Authors:
 *     B.D.Kelly (ROE::BDK)
 *     Mark McCaughrean UoE (REVA::MJM)
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
-*     29-01-1982 : First implementation (ROE::BDK)
-*     04-06-1985 : Revised to take status parameter, to take different
+*     {enter_new_authors_here}
+
+*  History:
+*     29-JAN-1982 (ROE::BDK):
+*        : First implementation
+*     04-JUN-1985: : Revised to take status parameter, to take different
 *                : new values for upper and lower thresholds, and
 *                : redocumented SSE / ADAM style (REVA::MJM)
 *                : (Also changed last section - seemed crazy)
-*     02-09-1985 : Renamed THRESHSUB (REVA::MJM)
-*     03-07-1986 : Revised implementation and documentation (REVA::MJM)
+*     02-SEP-1985 (REVA::MJM):
+*        : Renamed THRESHSUB
+*     03-JUL-1986 (REVA::MJM):
+*        : Revised implementation and documentation
 *     1986 Aug 18: Renamed from THRESHSUB, reordered arguments (2nd to
 *                  7th), generalised to any array; tidied and nearly
 *                  conformed to Starlink standards (RL.STAR::CUR).
 *     1986 Sep 5 : Renamed parameters section to arguments, applied
 *                  bad-pixel handling (RL.STAR::CUR).
 *     1986 Nov 12: Made a generic routine (RL.STAR::CUR).
-*
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     None known.
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
  
       IMPLICIT  NONE              ! no default typing allowed
  
-*    Global constants :
+*  Global Constants:
  
       INCLUDE  'SAE_PAR'          ! SSE global definitions
       INCLUDE 'PRM_PAR'           ! PRIMDAT public constants
  
-*    Import :
+*  Arguments Given:
  
       INTEGER
      :    DIMS
@@ -98,20 +111,20 @@
      :    NEWLO,
      :    NEWHI
  
-*    Export :
+*  Arguments Returned:
  
       REAL
      :    OUTARR( DIMS )
  
-*    Status :
+*  Status:
  
       INTEGER  STATUS
  
-*    Local variables :
+*  Local Variables:
  
       INTEGER  J                  ! counter
  
-*-
+*.
 *    check status on entry - return if not o.k.
  
       IF ( STATUS .EQ. SAI__OK ) THEN

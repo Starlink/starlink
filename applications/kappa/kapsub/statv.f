@@ -1,12 +1,27 @@
-*+  STATV - gives simple statistics of an array
-
       SUBROUTINE STATV ( ARRAY, DIM, NCLIP, CLIP, MAXMUM, MINMUM, TOTAL,
      :                   MEAN, STDDEV, NINVAL, MAXPOS, MINPOS, MAXMCL,
      :                   MINMCL, TOTLCL, MEANCL, STDVCL, NPIXCL, MXPSCL,
      :                   MNPSCL, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     STATV
+
+*  Purpose:
+*     Gives simple statistics of an array
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL STATV ( ARRAY, DIM, NCLIP, CLIP, MAXMUM, MINMUM, TOTAL, MEAN,
+*     :             STDDEV, NINVAL, MAXPOS, MINPOS, MAXMCL, MINMCL,
+*     :             TOTLCL, MEANCL, STDVCL, NPIXCL, MXPSCL, MNPSCL,
+*     :             STATUS )
+
+*  Description:
 *     This routine returns simples statistics of an array.  The
 *     statistics are the maximum and minimum values and their
 *     co-ordinates, the total value, the mean, the standard deviation
@@ -14,16 +29,8 @@
 *     clipping is optional.
 *
 *     The magic-value method is used for bad pixels.
-*
-*    Invocation :
-*
-*     CALL STATV ( ARRAY, DIM, NCLIP, CLIP, MAXMUM, MINMUM, TOTAL, MEAN,
-*    :             STDDEV, NINVAL, MAXPOS, MINPOS, MAXMCL, MINMCL,
-*    :             TOTLCL, MEANCL, STDVCL, NPIXCL, MXPSCL, MNPSCL,
-*    :             STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     ARRAY( DIM ) = REAL( READ )
 *         The input data array for which statistical parameters are
 *           required.
@@ -73,9 +80,8 @@
 *           after clipping.
 *     STATUS  =  INTEGER( READ )
 *         Global status value.
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     Looping around the requested array (including only valid
 *     pixels) just once, the maximum and minimum pixel values are
@@ -86,31 +92,33 @@
 *     All internal arithmetic is done in with double-precision reals
 *     for accuracy, although the input and output remain in single
 *     precision.
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
+
+*  Authors:
 *     Malcolm J. Currie  STARLINK ( RAL::CUR )
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     1990 Jan 16: Second implementation (RAL::CUR).
 *     1990 Mar  8: Added arguments for the position of maximum and
 *                  minimum pixels (RAL::CUR).
-*
-*    Type definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     None known.
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT  NONE              ! no implicit typing allowed
 
-*    Global constants :
+*  Global Constants:
 
       INCLUDE  'SAE_PAR'          ! SSE global definitions
       INCLUDE  'PRM_PAR'          ! Magic-value definitions
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :  DIM,
@@ -120,7 +128,7 @@
      :  ARRAY( DIM ),
      :  CLIP( * )
 
-*    Export :
+*  Arguments Returned:
 
       INTEGER
      :  NINVAL,
@@ -142,11 +150,11 @@
      :  MEANCL,
      :  STDVCL
 
-*    Status :
+*  Status:
 
       INTEGER  STATUS
 
-*    Local variables :
+*  Local Variables:
 
       DOUBLE PRECISION
      :  VALUE,                 ! Current array pixel value
@@ -174,7 +182,7 @@
      :  NOCL,                  ! Number of times to loop less one
      :  NVALPX                 ! Number of valid pixels in array
 
-*-
+*.
 *    Check status on entry - return if not o.k..
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999

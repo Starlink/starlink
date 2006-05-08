@@ -1,19 +1,26 @@
-*+  GETV2 - Returns the value of a specified point in a 2-d array.
-
       SUBROUTINE GETV2( INARR, DIM1, DIM2, X, Y, VALUE, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     GETV2
+
+*  Purpose:
+*     Returns the value of a specified point in a 2-d array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL GETV2( INARR, DIM1, DIM2, X, Y, VALUE, STATUS )
+
+*  Description:
 *     This routine accepts the co-ordinates of a point
 *     on an image and determines the value of the image
 *     at that point, which is returned to the calling routine.
-*
-*    Invocation :
-*
-*     CALL GETV2( INARR, DIM1, DIM2, X, Y, VALUE, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     INARR( DIMS1, DIMS2 ) = REAL( READ )
 *         The 2-dimensional array.
 *     DIM1 = INTEGER( READ )
@@ -30,9 +37,8 @@
 *         The value of the specified pixel.
 *     STATUS = INTEGER( READ, WRITE )
 *         The status value on entry to this subroutine.
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     If input element numbers are outside bounds of the array then
 *        Report the error and set bad status
@@ -41,26 +47,31 @@
 *          co-ordinates given.
 *     Endif
 *     End
-*
-*    Authors :
-*
+
+*  Authors:
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     1988 Sep  8 : Original (RL.STAR::CUR).
 *     1989 Jul 27 : Passed the array dimensions as two variables
 *                   (RL.STAR::CUR).
-*
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT NONE
 
-*    Global Constants :
+*  Global Constants:
 
       INCLUDE 'SAE_PAR'
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :  DIM1, DIM2,
@@ -69,16 +80,16 @@
       REAL
      :  INARR( DIM1, DIM2 )
 
-*    Export :
+*  Arguments Returned:
 
       REAL
      :  VALUE
 
-*    Status :
+*  Status:
 
       INTEGER STATUS
 
-*-
+*.
 
 *    If the status is bad, then return to the main program.
 

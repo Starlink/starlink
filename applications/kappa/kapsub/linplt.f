@@ -1,12 +1,26 @@
-*+  LINPLT - Draws a line plot, connecting a series x-y values, with
-*            labelled and annotated axes
-
       SUBROUTINE LINPLT( XDAT, YDAT, NELM, XLIMIT, YLIMIT, XLOW, YLOW,
      :                   XHIGH, YHIGH, TITLE, XLAB, YLAB, MINTIC,
      :                   MAJTIC, XLOG, YLOG, OUTTIC, THICK, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     LINPLT
+
+*  Purpose:
+*     Draws a line plot, connecting a series x-y values, with
+*     labelled and annotated axes
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL LINPLT( XDAT, YDAT, NELM, XLIMIT, YLIMIT, XLOW, YLOW, XHIGH,
+*     :             YHIGH, TITLE, XLAB, YLAB, MINTIC, MAJTIC, XLOG, YLOG,
+*     :             OUTTIC, THICK, STATUS )
+
+*  Description:
 *     This subroutine uses NCAR and SNX to draw annotated and labelled
 *     axes for a 'line plot' (a continuous line connecting a series of
 *     x and y values) within the current SGS zone.
@@ -22,7 +36,6 @@
 *       d) reduce the maximum number of major tick marks to prevent
 *          shrinkage; and
 *       e) increase the size of axis tick marks.
-*
 *     There are other options controlled by input arguments:
 *       f) control the extents of the x and y axes, rather than letting 
 *          NCAR decide;
@@ -32,15 +45,8 @@
 *
 *     Note before using the routine an SGS device must be opened, a call
 *     to SNX_AGWV made and an SGS zone selected or created.
-*
-*    Invocation :
-*
-*     CALL LINPLT( XDAT, YDAT, NELM, XLIMIT, YLIMIT, XLOW, YLOW, XHIGH,
-*    :             YHIGH, TITLE, XLAB, YLAB, MINTIC, MAJTIC, XLOG, YLOG,
-*    :             OUTTIC, THICK, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     XDAT( NELM ) = REAL( READ )
 *         The x data
 *     YDAT( NELM ) = REAL( READ )
@@ -89,9 +95,8 @@
 *     STATUS = INTEGER( UPDATE )
 *         This is the global status, if this variable has an error
 *           value on entry then an immediate return will occur.
-*
-*    Method :
-*
+
+*  Algorithm:
 *     If no error on entry then return
 *     Store input values of all AUTOGRAPH parameters to be changed.
 *     Reset AUTOGRAPH parameters as required
@@ -100,25 +105,30 @@
 *     Restore altered AUTOGRAPH parameters to their values on input to this
 *       routine
 *     Return
-*
-*    Authors :
-*
+
+*  Authors:
 *     Malcolm J. Currie  STARLINK ( RAL::CUR )
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     1988 Oct 25 : Original based on CNTAXS ( RAL::CUR )
 *     1991 Jun 21 : Allow for reversed axes. (RAL::CUR).
-*
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT NONE            ! no default typing allowed
 
-*    Global constants :
+*  Global Constants:
 
       INCLUDE 'SAE_PAR'        ! Global SSE definitions
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :  NELM
@@ -146,11 +156,11 @@
      :  XLOG,
      :  YLOG
 
-*    Status :
+*  Status:
 
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
 
       REAL
                                ! storage for input AUTOGRAPH parameter:
@@ -178,7 +188,7 @@
       INTEGER
      :  LINWDT                 ! NCAR default line width
 
-*-
+*.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Plot graph with AUTOGRAPH

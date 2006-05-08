@@ -1,19 +1,26 @@
-*+  HSTREP - Produces a summary of a histogram.
-
       SUBROUTINE HSTREP( HIST, HRMIN, HRMAX, NUMBIN, BINFAC, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     HSTREP
+
+*  Purpose:
+*     Produces a summary of a histogram.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL HSTREP( HIST, HRMIN, HRMAX, NUMBIN, BINFAC, STATUS )
+
+*  Description:
 *     This routine produces a summary of the histogram of
 *     an image or a sub-section of an image. The histogram
 *     is compressed to 16 bins and is displayed to the user.
-*
-*    Invocation :
-*
-*     CALL HSTREP( HIST, HRMIN, HRMAX, NUMBIN, BINFAC, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     HIST( NUMBIN ) = INTEGER( READ )
 *           The array holding the histogram.
 *     HRMIN = REAL( READ )
@@ -26,9 +33,8 @@
 *           The number of bins in the compressed histogram.
 *     STATUS = INTEGER( READ, WRITE )
 *           The status value on entry to this subroutine.
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     If there are insufficient bins for a compression to take place
 *       then
@@ -53,14 +59,16 @@
 *        End do
 *     Endif
 *     Return
-*
-*    Authors :
-*
+
+*  Type Definitions:
+*     IMPLICIT NONE
+
+*  Authors:
 *     S.Chan ( RGVAD::KFH )
 *     Malcolm Currie RAL ( UK.AC.RL.STAR::CUR )
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     10 September 1983: Original ( RGVAD::KFH )
 *     1986 Sep 20 : Renamed from KFH_HSTREP. Standardised to RAPI2D
 *                   style; renamed parameters section to arguments and
@@ -71,16 +79,18 @@
 *                   not doing the job), added error report; fixed range
 *                   bug and expanded the "Method :" section
 *                   (RL.STAR::CUR).
-*
-*    Type Definitions :      
+*     {enter_further_changes_here}
 
-      IMPLICIT NONE
+*  Bugs:
+*     {note_any_bugs_here}
 
-*    Global constants:
+*-
+
+*  Global Constants:
 
       INCLUDE 'SAE_PAR'
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :    BINFAC,
@@ -91,18 +101,18 @@
      :    HRMIN,
      :    HRMAX
 
-*    Status :
+*  Status:
 
       INTEGER STATUS
 
-*    Local constants :
+*  Local Constants:
 
       INTEGER
      :  BINMAX                  ! maximum number of compressed bins for 
                                 ! histogram summary
       PARAMETER ( BINMAX = 30 )
 
-*    Local variables :
+*  Local Variables:
 
       REAL
      :    BINSZ,                ! The size of the bins in the histogram
@@ -121,7 +131,7 @@
 
       CHARACTER*50 TEXT         ! summary of the histogram
 
-*-
+*.
 
 *    If the status is bad, then return
 
@@ -206,5 +216,3 @@
       END IF
 
       END
-
-

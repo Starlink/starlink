@@ -1,17 +1,24 @@
-*+  HSTDSP - Displays an histogram
-
       SUBROUTINE HSTDSP( HIST, HRMIN, HRMAX, NUMBIN, STATUS )
-*
-*    Description :
-*
-*     This routine reports an histogram to the user.
-*
-*    Invocation :
-*
+*+
+*  Name:
+*     HSTDSP
+
+*  Purpose:
+*     Displays an histogram
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
 *     CALL HSTDSP( HIST, HRMIN, HRMAX, NUMBIN, STATUS )
-*
-*    Arguments :
-*
+
+*  Description:
+*     This routine reports an histogram to the user.
+
+*  Arguments:
 *     HIST( NUMBIN ) = INTEGER( READ )
 *           The array holding the histogram.
 *     HRMIN = REAL( READ )
@@ -22,9 +29,8 @@
 *           The number of bins in the histogram.
 *     STATUS = INTEGER( READ, WRITE )
 *           The status value on entry to this subroutine.
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     If there are insufficient bins then
 *        Report error and set bad status
@@ -36,24 +42,28 @@
 *        End do
 *     Endif
 *     Return
-*
-*    Authors :
-*
+
+*  Type Definitions:
+*     IMPLICIT NONE
+
+*  Authors:
 *     Malcolm Currie RAL ( UK.AC.RL.STAR::CUR )
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     1988 Jul 7  : Original (RL.STAR::CUR).
-*
-*    Type Definitions :      
+*     {enter_further_changes_here}
 
-      IMPLICIT NONE
+*  Bugs:
+*     {note_any_bugs_here}
 
-*    Global constants:
+*-
+
+*  Global Constants:
 
       INCLUDE 'SAE_PAR'
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :    NUMBIN,
@@ -63,11 +73,11 @@
      :    HRMIN,
      :    HRMAX
 
-*    Status :
+*  Status:
 
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
 
       REAL
      :    NBINWD,               ! Width of the report bins
@@ -79,7 +89,7 @@
 
       CHARACTER*50 TEXT         ! summary of the histogram
 
-*-
+*.
 
 *    If the status is bad, then return
 

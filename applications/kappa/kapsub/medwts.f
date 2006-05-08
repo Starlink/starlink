@@ -1,32 +1,29 @@
-*+  MEDWTS - performs 2-D weighted median filtering on a 2-D array
-
       SUBROUTINE MEDWTS( DIFF, STEP, NUMSAM, MEDPOS, MEDTHR, SAMSIZ,
      :                   SAMINF, IDIM1, IDIM2, ARRIN, ODIM1, ODIM2,
      :                   SAMPLE, SAMWT, ARROUT, STATUS )
+*+
+*  Name:
+*     MEDWTS
 
-*
-*    Description :
-*
+*  Purpose:
+*     Performs 2-D weighted median filtering on a 2-D array
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*      CALL MEDWTS( DIFF, STEP, NUMSAM, MEDPOS, MEDTHR, SAMSIZ, SAMINF,
+*     :             IDIM1, IDIM2, ARRIN, ODIM1, ODIM2, SAMPLE, SAMWT,
+*     :             ARROUT, STATUS )
+
+*  Description:
 *     The input array, ARRIN, is filtered using a weighted median
 *     filter to give the output array, ARROUT. An input image point will
-*     only be replaced by the sample median if:
-*       a) the absolute value of the difference between the input image
-*          point and the sample median is greater than DIFF;
-*       b) at least three valid pixels were used to define it;
-*       c) and at least MEDTHR*MEDPOS weighting was used to define it.
-*     The extent of the filter is defined by STEP and the weighting
-*     values and offsets for the elements of the filter are given in
-*     SAMINF. An immediate return will occur if STATUS has an error
-*     value on entry.
-*
-*    Invocation :
-*
-*      CALL MEDWTS( DIFF, STEP, NUMSAM, MEDPOS, MEDTHR, SAMSIZ, SAMINF,
-*    :             IDIM1, IDIM2, ARRIN, ODIM1, ODIM2, SAMPLE, SAMWT,
-*    :             ARROUT, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     DIFF = REAL( READ )
 *         Determines whether replacement by the median will take
 *           place. Replacement will only take place if the absolute
@@ -67,9 +64,8 @@
 *     STATUS = INTEGER( READ )
 *         This is the global status, if this variable has an error
 *           value on entry then an immediate return will occur.
-*
-*    Method :
-*
+
+*  Algorithm:
 *     If no error on entry then
 *        For all lines of output image
 *           Calculate position of corresponding input image line
@@ -103,16 +99,27 @@
 *           Endfor
 *        Endfor
 *     Endif
-*
-*    Authors :
-*
+
+*  Only Be Replaced By The Sample Median If:
+*       a) the absolute value of the difference between the input image
+*          point and the sample median is greater than DIFF;
+*       b) at least three valid pixels were used to define it;
+*       c) and at least MEDTHR*MEDPOS weighting was used to define it.
+*     The extent of the filter is defined by STEP and the weighting
+*     values and offsets for the elements of the filter are given in
+*     SAMINF. An immediate return will occur if STATUS has an error
+*     value on entry.
+
+*  Authors:
 *     Dave Baines (ROE::ASOC5)
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
-*     24/10/1983 : Original version                     (ROE::ASOC5)
-*     17/02/1984 : Documentation brought up to standard (ROE::ASOC5)
+*     {enter_new_authors_here}
+
+*  History:
+*     24-OCT-1983 (ROE::ASOC5):
+*        : Original version
+*     17-FEB-1984 (ROE::ASOC5):
+*        : Documentation brought up to standard
 *     1986 Sep 11: Renamed parameters section to arguments, added
 *                  invalid-pixel handling, which necessitated an
 *                  additional argument (MEDTHR - 5th), reordered 
@@ -122,17 +129,23 @@
 *                  (RL.STAR::CUR).
 *     1992 Jul 20: Fixed bug indexing when median is not computed.
 *                  (RL.STAR::CUR).
-*
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT NONE
 
-*    Global constants :
+*  Global Constants:
 
       INCLUDE 'SAE_PAR'        ! SSE global constants
       INCLUDE 'PRM_PAR'        ! PRIMDAT public constants
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :  IDIM1, IDIM2,
@@ -148,7 +161,7 @@
      :  DIFF,
      :  MEDTHR
 
-*    Import-export :
+*  Arguments Given and Returned:
 
       INTEGER
      :  SAMWT( SAMSIZ )
@@ -156,16 +169,16 @@
       REAL
      :  SAMPLE( SAMSIZ )
 
-*    Export :
+*  Arguments Returned:
 
       REAL
      :  ARROUT( ODIM1, ODIM2 )
 
-*    Status :
+*  Status:
 
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
 
       INTEGER
      :  XPOS,                  ! X position of image element being
@@ -197,7 +210,7 @@
      :  CURVAL,                ! Current smallest value during sorting
      :  MEDIAN                 ! Value of median for testing agains
                                ! input image points
-*-
+*.
 
 *    check for error on entry
 

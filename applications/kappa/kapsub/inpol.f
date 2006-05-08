@@ -1,20 +1,27 @@
-*+  INPOL - Interpolates X, Y pairs of points.
-
       SUBROUTINE INPOL( LINDAT, MAXPTS, NPTS, DATA, DIM1, DIM2, LINE,
      :                  STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     INPOL
+
+*  Purpose:
+*     Interpolates X, Y pairs of points.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL INPOL( LINDAT, MAXPTS, NPTS, DATA, DIM1, DIM2, LINE, STATUS )
+
+*  Description:
 *     This routine interpolates the X, Y pairs of points generated
 *     by the LINSET subroutine. Each point is interpolated
 *     and stored in an array which can then be used for plotting.
-*
-*    Invocation :
-*
-*     CALL INPOL( LINDAT, MAXPTS, NPTS, DATA, DIM1, DIM2, LINE, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     LINDAT( MAXPTS, 2 ) = REAL( READ )
 *         This array contains the X, Y pairs of points to
 *           be interpolated.
@@ -33,9 +40,8 @@
 *           ready for plotting.
 *     STATUS = INTEGER( READ, WRITE )
 *         Status value on entering this subroutine.
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     For each point to be interpolated 
 *        The four surrounding points in the data or image array are
@@ -51,15 +57,14 @@
 *     If the slice includes invalid pixels then replace them by the
 *     minimum and valid value in the slice, to form an array which can
 *     then be used for plotting.
-*
-*    Authors :
-*
+
+*  Authors:
 *     C.D.Pike ( and others )
 *     S.Chan
 *     Malcolm Currie RAL ( UK.AC.RL.STAR::CUR )
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     23 February 1981
 *     26 September 1983
 *     1986 Sep 22: Renamed from KFH_INTERPOLATE. Standardised to RAPI2D
@@ -75,17 +80,23 @@
 *                  NINT in calculation of LINE (RL.STAR::CUR).
 *     1989 Aug  7: Passed array dimensions as separate variables
 *                  (RL.STAR::CUR).
-*
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT NONE
 
-*    Global Constants :
+*  Global Constants:
 
       INCLUDE 'SAE_PAR'          ! global SSE definitions
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :    DIM1, DIM2,
@@ -96,15 +107,15 @@
      :   DATA( DIM1, DIM2 ),
      :   LINDAT( MAXPTS, 2 )
 
-*     Export :
+*  Arguments Returned:
 
       REAL LINE( NPTS )
 
-*    Status :
+*  Status:
 
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
 
       INTEGER
      :    I,                    ! general variable
@@ -128,7 +139,7 @@
      :    WEIGHT,               ! Weight of a pixel for interpolation
      :    WTSUM                 ! Sum of weights
 
-*-
+*.
 *    If the status is bad,  then return to the calling program
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999

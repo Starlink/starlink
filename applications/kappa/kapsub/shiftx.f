@@ -1,14 +1,27 @@
-*+  SHIFTX - input array is shifted into the output array in the X
-*            direction
-
       SUBROUTINE SHIFTX( XNEG, XWHOLE, INTXS, FRACX, DIM1, DIM2, ARRIN,
      :                   ARROUT, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     SHIFTX
+
+*  Purpose:
+*     Input array is shifted into the output array in the X
+*     direction
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL SHIFTX( XNEG, XWHOLE, INTXS, FRACX, DIM1, DIM2, ARRIN,
+*     :             ARROUT, STATUS )
+
+*  Description:
 *     The output array, ARROUT, will contain the input array, ARRIN,
 *     shifted in the X direction. The following arguments determine
-*     how the shift is performed :
+*     how the shift is performed:
 *     XNEG   - if .true. then shift is a negative shift
 *     XWHOLE - if .true. then shift is through a whole number of pixels
 *     INTXS  - integer pixel shift. This will also be the number of
@@ -18,14 +31,9 @@
 *     entry.
 *
 *     Undefined pixels are given the magic value.
-*
-*    Invocation :
-*
-*     CALL SHIFTX( XNEG, XWHOLE, INTXS, FRACX, DIM1, DIM2, ARRIN,
-*    :             ARROUT, STATUS )
-*
-*    Arguments :
-*
+
+
+*  Arguments:
 *     XNEG = LOGICAL( READ )
 *           Will be .TRUE. if shift is in the negative direction.
 *     XWHOLE = LOGICAL( READ )
@@ -49,9 +57,8 @@
 *     STATUS = INTEGER( READ )
 *           This is the global status, if this variable has an error
 *           value on entry then an immediate return will occur.
-*
-*    Method :
-*
+
+*  Algorithm:
 *     If no error on entry then
 *        Set all elements of output array equal to bad value
 *        If shift is through whole number of pixels then
@@ -103,16 +110,17 @@
 *           Endif
 *        Endif
 *     Endif
-*
-*    Authors :
-*
+
+*  Authors:
 *     Dave Baines (ROE::ASOC5)
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
-*     18/08/1983 : Original version                     (ROE::ASOC5)
-*     19/02/1984 : Documentation brought up to standard (ROE::ASOC5)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-AUG-1983 (ROE::ASOC5):
+*        : Original version
+*     19-FEB-1984 (ROE::ASOC5):
+*        : Documentation brought up to standard
 *     1986 Sep 9 : Renamed parameters section to arguments and tidied
 *                  (RL.STAR::CUR).
 *     1986 Oct 27: Added bad-pixel handling (RL.STAR::CUR).
@@ -120,17 +128,23 @@
 *                  (RL.STAR::CUR).
 *     1992 Aug 15: Initialise output array with bad values rather than
 *                  zero (RL.STAR::CUR).
-*
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT NONE
 
-*    Global constants :
+*  Global Constants:
 
       INCLUDE  'SAE_PAR'      ! SSE global definitions
       INCLUDE 'PRM_PAR'       ! PRIMDAT public constants
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :  DIM1, DIM2,
@@ -144,16 +158,16 @@
      :  XNEG,
      :  XWHOLE
 
-*    Export :
+*  Arguments Returned:
 
       REAL
      :  ARROUT( DIM1, DIM2 )
 
-*    Status :
+*  Status:
 
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
 
       INTEGER
      :  X,          ! index to elements in output array, 1st dimension
@@ -163,7 +177,7 @@
 
       REAL
      :  FRACX1      ! 1.0 - fractional pixel shift
-*-
+*.
 
 *    check for error on entry
 

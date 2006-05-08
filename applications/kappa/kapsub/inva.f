@@ -1,24 +1,31 @@
-*+  INVA - reports the value of a pixel of a 2-d array
-
       SUBROUTINE INVA( CURSOR, ZONEOV, ZONEO, XCEN, YCEN, LBND, DIM1,
      :                 DIM2, ARRAY, XLOW, XHIGH, YLOW, YHIGH, PNV,
      :                 STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     INVA
+
+*  Purpose:
+*     Reports the value of a pixel of a 2-d array
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*      CALL INVA( CURSOR, ZONEOV, ZONEO, XCEN, YCEN, LBND, DIM1, DIM2,
+*     :           ARRAY, XLOW, XHIGH, YLOW, YHIGH, PNV, STATUS )
+
+*  Description:
 *     This subroutine reports the value of a pixel of a 2-d array. If an
 *     image display is available, then the cursor is used to define the
 *     point, otherwise, the co-ordinates of the pixel come from the
 *     environment.  In the former case repeated values may be obtained
 *     until the escape choice is selected.
-*
-*    Invocation :
-*
-*      CALL INVA( CURSOR, ZONEOV, ZONEO, XCEN, YCEN, LBND, DIM1, DIM2,
-*    :           ARRAY, XLOW, XHIGH, YLOW, YHIGH, PNV, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     CURSOR = LOGICAL ( READ )
 *         True if the cursor of the image is required
 *     ZONEOV = INTEGER ( READ )
@@ -57,9 +64,8 @@
 *         false.
 *     STATUS  = INTEGER( READ, WRITE )
 *         Global status value
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     If cursor mode then
 *        Select overlay frame zone and get bounds
@@ -89,13 +95,12 @@
 *     Tidy parameters
 *     Endif
 *     End
-*
-*    Authors :
-*
+
+*  Authors:
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     1988 Apr 9 : Original extracted from INSPECT (RL.STAR::CUR)
 *     1988 Jun 23: More error checking (RL.STAR::CUR).
 *     1989 Apr 19 : Converted to graphics database (new argument list -
@@ -110,22 +115,28 @@
 *                   x-y position (RAL::CUR).
 *     1992 Mar  3: Replaced AIF parameter-system calls by the extended
 *                  PAR library (RAL::CUR).
-*
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT NONE
 
-*    Global Constants :
+*  Global Constants:
 
       INCLUDE 'SAE_PAR'        ! Global SSE definitions
       INCLUDE 'PRM_PAR'        ! Magic-value definitions
       INCLUDE 'PAR_ERR'        ! Parameter-system error definitions
 
-*    Status :
+*  Status:
 
       INTEGER STATUS
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :  LBND( 2 ),
@@ -144,7 +155,7 @@
       CHARACTER*(*)
      :  PNV
 
-*    Local Variables :
+*  Local Variables:
 
       INTEGER
      :  VAPIX( 2 ),             ! x-y pixel indices
@@ -164,7 +175,7 @@
      :  REPEAT                  ! when a simulated REPEAT..UNTIL loop
                                 ! is to continue
 
-*-
+*.
 *    check status on entry - return if not o.k.
 
       IF ( STATUS .EQ. SAI__OK ) THEN

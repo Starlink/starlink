@@ -1,10 +1,23 @@
-*+  MEDWV - performs weighted median filtering on a vector
-
       SUBROUTINE MEDWV( DIM, ARRAY, NELM, MEDTHR, SAMSIZ, SAMINF,
      :                  SAMPLE, SAMWT, MEDIAN, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     MEDWV
+
+*  Purpose:
+*     Performs weighted median filtering on a vector
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*      CALL MEDWV( DIM, ARRAY, NELM, MEDTHR, SAMSIZ, SAMINF,
+*     :            SAMPLE, SAMWT, MEDIAN, STATUS )
+
+*  Description:
 *     The weighted median value of the input array is obtained. The
 *     median returned will be undefined if:
 *       a) less than three valid pixels were used to define it;
@@ -14,14 +27,8 @@
 *
 *     The weighted array is only partially sorted via Quicksort for
 *     efficiency.
-*
-*    Invocation :
-*
-*      CALL MEDWV( DIM, ARRAY, NELM, MEDTHR, SAMSIZ, SAMINF,
-*    :            SAMPLE, SAMWT, MEDIAN, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     DIM = INTEGER( READ )
 *         Dimension of input data array.
 *     ARRAY( DIM ) = REAL( READ )
@@ -45,9 +52,8 @@
 *     STATUS = INTEGER( READ )
 *         This is the global status, if this variable has an error
 *           value on entry then an immediate return will occur.
-*
-*    Method :
-*
+
+*  Algorithm:
 *     If no error on entry then
 *        For all points in input array
 *           Initialise running totals of weight and number in sample
@@ -69,25 +75,30 @@
 *             median position)
 *        Endif
 *     Endif
-*
-*    Authors :
-*
+
+*  Authors:
 *     Malcolm Currie  STARLINK (RAL::CUR)
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     1989 May 24: Original version (RAL::CUR).
-*
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT NONE
 
-*    Global constants :
+*  Global Constants:
 
       INCLUDE 'SAE_PAR'        ! Environment global definitions
       INCLUDE 'PRM_PAR'        ! PRIMDAT public constants
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :  DIM,
@@ -98,7 +109,7 @@
      :  ARRAY( DIM ),
      :  MEDTHR
 
-*    Import-export :
+*  Arguments Given and Returned:
 
       INTEGER
      :  SAMWT( SAMSIZ )
@@ -106,16 +117,16 @@
       REAL
      :  SAMPLE( SAMSIZ )
 
-*    Export :
+*  Arguments Returned:
 
       REAL
      :  MEDIAN
 
-*    Status :
+*  Status:
 
       INTEGER STATUS
 
-*    Local variables :
+*  Local Variables:
 
       INTEGER
      :  INDEX,                 ! Index to sample elements
@@ -140,7 +151,7 @@
       REAL
 
      :  CURVAL                 ! current smallest value during sorting
-*-
+*.
 
 *    Check for error on entry
 

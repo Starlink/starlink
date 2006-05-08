@@ -1,21 +1,28 @@
-*+  IMLST - Produces a listing of an image.
-
       SUBROUTINE IMLST( INARR, LBND, DIM1, DIM2, X1, Y1, X2, Y2, FNAME,
      :                  FACTOR, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     IMLST
+
+*  Purpose:
+*     Produces a listing of an image.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL IMLST( INARR, LBND, DIM1, DIM2, X1, Y1, X2, Y2, FNAME,
+*     :            FACTOR, STATUS )
+
+*  Description:
 *     This routine generates a formatted listing of a 1-D or a 2-D
 *     image. The resulting file may be typed or printed in the usual
 *     manner.
-*
-*    Invocation :
-*
-*     CALL IMLST( INARR, LBND, DIM1, DIM2, X1, Y1, X2, Y2, FNAME,
-*    :            FACTOR, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments:
 *     INARR( DIM1, DIM2 ) = REAL( READ )
 *           This array contains the image to be listed.
 *     LBND( 2 ) = INTEGER ( READ )
@@ -40,9 +47,8 @@
 *           The factor by which the pixel values are to be multiplied.
 *     STATUS = INTEGER( READ, WRITE )
 *           Value of the status on entering this subroutine.
-*
-*    Method :
-*
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     A new file is created with the supplied filename. The image is
 *     divided into vertical strips of 15 pixels wide, so that the first
@@ -50,16 +56,15 @@
 *     the range of the strip is taken and put into a buffer called LINE
 *     and written to the file. If a FACTOR is specified, then the data
 *     are multiplied by that figure before writing it to file.
-*
-*    Authors :
-*
+
+*  Authors:
 *     P.T.Wallace
 *     K.F.Hartley
 *     S.Chan
 *     Malcolm Currie RAL ( UK.AC.RL.STAR::CUR )
-*
-*    History :
-*
+*     {enter_new_authors_here}
+
+*  History:
 *     7 January 1982
 *     26 September 1983
 *     1986 Sep 22 : Renamed from KFH_NLIST. Standardised to RAPI2D
@@ -91,21 +96,27 @@
 *                   to use NDF (RAL::CUR).
 *     1993 Feb 9  : Used the improved FIO_ASSOC and the new FIO_ANNUL.
 *                   (RAL::CUR).
-*
-*    Type Definitions :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
 
       IMPLICIT  NONE           ! no default typing allowed
 
-*    Global constants :
+*  Global Constants:
 
       INCLUDE  'SAE_PAR'       ! SSE global definitions
       INCLUDE 'PRM_PAR'        ! PRIMDAT public constants
 
-*    Status :
+*  Status:
 
       INTEGER STATUS
 
-*    Import :
+*  Arguments Given:
 
       INTEGER
      :    LBND( 2 ),
@@ -119,7 +130,7 @@
 
       CHARACTER*(*) FNAME
 
-*    Local Constants :
+*  Local Constants:
 
       INTEGER  
      :    NCHLIN,              ! maximum number of characters in a
@@ -128,7 +139,7 @@
       PARAMETER ( NCHLIN = 128 )
       PARAMETER ( LNSPPA = 56 )
 
-*    Local variables :
+*  Local Variables:
 
       INTEGER
      :    AX, AY,              ! Array indices
@@ -150,7 +161,7 @@
 
       REAL Z                   ! holds the result of FACTOR pixel value
 
-*-
+*.
 *    If the status is bad on entry, then return to the calling program.
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
