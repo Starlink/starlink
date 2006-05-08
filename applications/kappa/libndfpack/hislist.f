@@ -54,8 +54,6 @@
 *  Implementation Deficiencies:
 *     There is no facility to list only certain history records, say by
 *     time or application name.
-*
-*     [optional_A_task_items]...
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.

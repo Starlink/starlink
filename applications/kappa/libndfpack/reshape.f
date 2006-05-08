@@ -74,8 +74,6 @@
 *     is lost.
 *     -  All non-complex numeric data types can be handled.
 *     -  Any number of NDF dimensions is supported.
-*
-*     [optional_A_task_items]...
 
 *  Copyright:
 *     Copyright (C) 1997-1998, 2004 Central Laboratory of the Research

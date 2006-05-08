@@ -75,8 +75,6 @@
 *  Implementation Deficiencies:
 *     There is no facility to erase history records before a given date
 *     or number.
-*
-*     [optional_A_task_items]...
 
 *  Notes:
 *     -  A HISTORY component is created if it does not exist within the

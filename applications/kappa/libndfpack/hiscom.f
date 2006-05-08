@@ -83,8 +83,6 @@
 
 *  Related Applications:
 *     KAPPA: HISLIST, HISSET, NDFTRACE.
-*
-*     [optional_A_task_items]...
 
 *  Notes:
 *     -  A HISTORY component is created if it does not exist within the
@@ -99,8 +97,6 @@
 *     -  The maximum line length in the file is 200 characters.
 *     -  Paragraphs should have fewer than 33 lines.  Longer ones will
 *     be divided.
-*
-*     [optional_A_task_items]...
 
 *  Copyright:
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
