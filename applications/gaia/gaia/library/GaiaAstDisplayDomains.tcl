@@ -239,7 +239,7 @@ itcl::class gaia::GaiaAstDisplayDomains {
       # X and Y coordinates, update the readout. Trap problem domains
       # (bad coordinates etc.) and pass on to later ones.
       set i 0
-      foreach domain $domains_ {
+      foreach {domain dims} $domains_ {
          catch {
             incr i
             $itk_option(-rtdimage) astset current $i
