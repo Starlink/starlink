@@ -7,7 +7,7 @@
 
 *  Purpose:
 *     Evaluates a bivariate Chebyshev polynomial series for all elements
-*     of a 2-dimensional data array, using x and y axis co-ordinates.
+*     of a two-dimensional data array, using x and y axis co-ordinates.
 
 *  Language:
 *     Starlink Fortran 77
@@ -42,10 +42,10 @@
 *     YMAX = DOUBLE PRECISION (Given)
 *        Lower end of the y range of the fit.
 *     NXPAR = INTEGER (Given)
-*        The number of parameters of the FIT in the x direction, i.e.
+*        The number of parameters of the fit in the x direction, i.e.
 *        the degree of the polynomial plus one.
 *     NYPAR = INTEGER (Given)
-*        The number of parameters of the FIT in the y direction, i.e.
+*        The number of parameters of the fit in the y direction, i.e.
 *        the degree of the polynomial plus one.
 *     MCHOEF = INTEGER (Given)
 *        The dimension of the array of Chebyshev coefficients.
@@ -68,14 +68,6 @@
 *     OUTARR argument supplied to the routine must have the data type
 *     specified.
 *     -  Uses the magic-value method for bad or undefined pixels.
-
-*  Algorithm:
-*     -  Scan through the bins a line at a time.
-*     -  If the Y co-ordinate is within the valid range then
-*           Evaluate the Chebyshev surface for the line of pixels.
-*        else
-*           Fill the line with bad values
-*        end if
 
 *  Copyright:
 *     Copyright (C) 1990, 1993 Science & Engineering Research Council.
@@ -125,9 +117,6 @@
 *     1997 May 10 (MJC):
 *        Renamed from KPS1_FSPAx.  Reordered code to improve efficiency.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 
