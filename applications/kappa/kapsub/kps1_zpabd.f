@@ -3,33 +3,33 @@
 *+
 *  Name:
 *     KPS1_ZPABx
- 
+
 *  Purpose:
 *     Creates a string to be output to an ASCII steering file from
 *     ZAPLIN.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_ZPABx( REGION, LINE, COLBND, LINBND, BUFFER, LEN,
 *                      STATUS )
- 
+
 *  Description:
 *     This routine is a server for ZAPLIN.  It reports the pixel indices
 *     of the bounds of the region to be be zapped.  It also validates
 *     the bounds for a line or column region by checking that they do
 *     not include the whole array.
- 
+*
 *     If a region has been zapped the format of the string is:
 *        lower_column lower_line upper_column upper_line
- 
+*
 *     If a line has been zapped the format of the string is:
 *        lower_line upper_line  L
- 
+*
 *     If a column has been zapped the format of the string is:
 *        lower_column upper_column  C
- 
+
 *  Arguments:
 *     REGION = LOGICAL (Given)
 *        If true the string contains lower and upper pixel indices of
@@ -56,27 +56,48 @@
 *        blanks.
 *     STATUS = INTEGER (Given)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for real and double-precision data types:
 *     replace "x" in the routine name by R or D respectively.  The
 *     bounds supplied to the routine must have the data type specified.
- 
-*  [optional_subroutine_items]...
+*
+
+
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1991 May 29 (MJC):
 *        Original version.
 *     1991 June 17 (MJC):
 *        Converted to generic.
 *     {enter_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

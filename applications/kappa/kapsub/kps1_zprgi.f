@@ -3,17 +3,17 @@
 *+
 *  Name:
 *     KPS1_ZPRGx
- 
+
 *  Purpose:
 *     Linearly interpolates over a region in a 2-d array.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_ZPRGx( DIM1, DIM2, LBND, UBND, NOISE, VAR, ARRAY,
 *                      STATUS )
- 
+
 *  Description:
 *     This routine bi-linearly interpolates across regions of a 2-d
 *     array an associated variance array.  If any of the lines or
@@ -24,7 +24,7 @@
 *     Normal-distribution noise may be added to the data using the
 *     variance for cosmetic effect.  Where the variance is bad no noise
 *     is added.
- 
+
 *  Arguments:
 *     DIM1 = INTEGER (Given)
 *        The first dimension of the 2-d array to be processed.
@@ -46,12 +46,7 @@
 *        Array containing data to be processed.
 *     STATUS = INTEGER (Given)
 *        Global status value.
- 
-*  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
-*     arrays supplied to the routine must have the data type specified.
- 
+
 *  Algorithm:
 *     The routine takes as input a data array and its dimensions,
 *     and also the start and finish lines and columns that are to be
@@ -69,22 +64,47 @@
 *     If the NOISE argument is set to true on entry, then
 *     pseudo-Poissonian noise is added to the interpolated data. After
 *     modification, the same array is returned.
- 
+
 *  Implementation Deficiencies:
 *     No bad-pixel flag to improve efficiency.
- 
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     arrays supplied to the routine must have the data type specified.
+
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm Currie  (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1991 May 28 (MJC):
 *        Original based on ZPLNSB in pre-0.8 KAPPA.
 *     {enter_changes_here}
- 
+
 *  Bugs:
 *     {note_new_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

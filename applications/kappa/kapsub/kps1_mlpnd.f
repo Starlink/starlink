@@ -27,50 +27,6 @@
 *     of the screen. The nominal data value for a given pixel is equal 
 *     to the actual pixel value plus the offset for the line.
 
-*  Environment Parameters:
-*     OFFSET() = _DOUBLE (Read)
-*        This parameter is used to obtain the vertical offsets for the data
-*        curve when parameter SPACE is given the value "Free". The number
-*        of values supplied should equal the number of curves being drawn.
-*        The supplied values are added on to the data values read from
-*        the NDF before displaying them.
-*     SPACE = LITERAL (Given)
-*        The value of this parameter specifies how the vertical offset for 
-*        each data curve is determined. It should be given one of
-*        the following values:
-*
-*        - "Average" -- The offsets are chosen automatically so that 
-*        the average data values of the curves are evenly spaced between 
-*        the upper and lower limits of the plotting area.  Any line-
-*        to-line striping is thus hidden and the amount of overlap of
-*        adjacent traces is minimised.
-*
-*        - "Constant" -- The offsets are chosen automatically so that 
-*        the zero points of the curves are evenly spaced between the upper 
-*        and lower limits of the plotting area.  The width of any line-
-*        to-line strip is constant, which could result in the curves
-*        becoming confused if the bias of a curve from its zero point is
-*        so large that it overlaps another curve.
-*
-*        - "Free" -- The offsets to use are obtained explicitly using 
-*        parameter OFFSET.
-*
-*        - "None" -- No vertical offsets are used. All curves are
-*        displayed with the same zero point.
-
-*        The input can be abbreviated to an unambiguous length and 
-*        is case insensitive. ["Average"]
-*     YBOT = _DOUBLE (Read)
-*        The data value to place at the bottom end of the vertical axis. 
-*        The dynamic default is the lowest data value to be displayed,
-*        after addition of the vertical offsets. The value supplied may be 
-*        greater than or less than the value supplied for YTOP.
-*     YTOP = _DOUBLE (Read)
-*        The data value to place at the top end of the vertical axis. 
-*        The dynamic default is the highest data value to be displayed,
-*        after addition of the vertical offsets. The value supplied may be 
-*        greater than or less than the value supplied for YBOT.
-
 *  Arguments:
 *     NX = INTEGER (Given)
 *        The number of grid elements along the first axis of the data 
@@ -130,6 +86,70 @@
 *        The nominal data value at the top of the screen.
 *     STATUS = INTEGER (Given and Returned)
 *        Global status value.
+
+*  Environment Parameters:
+*     OFFSET() = _DOUBLE (Read)
+*        This parameter is used to obtain the vertical offsets for the data
+*        curve when parameter SPACE is given the value "Free". The number
+*        of values supplied should equal the number of curves being drawn.
+*        The supplied values are added on to the data values read from
+*        the NDF before displaying them.
+*     SPACE = LITERAL (Given)
+*        The value of this parameter specifies how the vertical offset for 
+*        each data curve is determined. It should be given one of
+*        the following values:
+*
+*        - "Average" -- The offsets are chosen automatically so that 
+*        the average data values of the curves are evenly spaced between 
+*        the upper and lower limits of the plotting area.  Any line-
+*        to-line striping is thus hidden and the amount of overlap of
+*        adjacent traces is minimised.
+*
+*        - "Constant" -- The offsets are chosen automatically so that 
+*        the zero points of the curves are evenly spaced between the upper 
+*        and lower limits of the plotting area.  The width of any line-
+*        to-line strip is constant, which could result in the curves
+*        becoming confused if the bias of a curve from its zero point is
+*        so large that it overlaps another curve.
+*
+*        - "Free" -- The offsets to use are obtained explicitly using 
+*        parameter OFFSET.
+*
+*        - "None" -- No vertical offsets are used. All curves are
+*        displayed with the same zero point.
+*
+*        The input can be abbreviated to an unambiguous length and 
+*        is case insensitive. ["Average"]
+*     YBOT = _DOUBLE (Read)
+*        The data value to place at the bottom end of the vertical axis. 
+*        The dynamic default is the lowest data value to be displayed,
+*        after addition of the vertical offsets. The value supplied may be 
+*        greater than or less than the value supplied for YTOP.
+*     YTOP = _DOUBLE (Read)
+*        The data value to place at the top end of the vertical axis. 
+*        The dynamic default is the highest data value to be displayed,
+*        after addition of the vertical offsets. The value supplied may be 
+*        greater than or less than the value supplied for YBOT.
+
+*  Copyright:
+*     Copyright (C) 1998, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)

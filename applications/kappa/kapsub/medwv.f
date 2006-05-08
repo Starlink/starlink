@@ -18,7 +18,7 @@
 *    Invocation :
 *
 *      CALL MEDWV( DIM, ARRAY, NELM, MEDTHR, SAMSIZ, SAMINF,
-*     :            SAMPLE, SAMWT, MEDIAN, STATUS )
+*    :            SAMPLE, SAMWT, MEDIAN, STATUS )
 *
 *    Arguments :
 *

@@ -3,18 +3,18 @@
 *+
 *  Name:
 *     KPS1_SUSKx
- 
+
 *  Purpose:
 *     To place interior knots so as to maintain an even distribution
 *     of data points between the knot positions when fitting spline
 *     functions to data.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_SUSKx( NX, X, NXKNOT, XKNOT, STATUS )
- 
+
 *  Arguments:
 *     NX = INTEGER (Given)
 *        The number of data points.
@@ -26,24 +26,45 @@
 *        The x positions of the interior knots defined.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
+*  Algorithm:
+*     - Calculate the mean number of data points per knot interval.
+*     - Place the knots this number of data points apart, interpolating
+*       linearly between the data positions to obtain the knot
+*       positions.
+
 *  Notes:
 *     -  Uses the magic-value method for bad or undefined pixels.
 *     -  There is a routine for double precision or real data types:
 *     replace "x" in the routine name by D or R as appropriate.  The
 *     X and XKNOT arguments supplied to the routine must have the data
 *     type specified.
- 
-*  Algorithm:
-*     - Calculate the mean number of data points per knot interval.
-*     - Place the knots this number of data points apart, interpolating
-*       linearly between the data positions to obtain the knot
-*       positions.
- 
+
+*  Copyright:
+*     Copyright (C) 1990 Science & Engineering Research Council.
+*     Copyright (C) 1996 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1990 Jan 31 (MJC):
 *        Original version based on the EDRS code of the same name.
@@ -51,10 +72,10 @@
 *        Renamed from SETKNT.  Made generic.  Transposed X and NX
 *        arguments.  Modern style.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_new_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

@@ -4,19 +4,18 @@
 *+
 *  Name:
 *     KPS1_FAINx
- 
+
 *  Purpose:
 *     Scales an image to a range of standard deviations about the
 *     mean value of the image.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
-*  Invocation
- 
+
+*  Invocation:
 *     CALL KPS1_FAINx( BAD, DIM1, DIM2, INARR, SIGRNG, LOW, HIGH,
 *    :                 BADVAL, INVERT, OUTARR, LOWER, UPPER, STATUS )
- 
+
 *  Description:
 *     This routine scales a 2-d array such that the lower and upper
 *     limits are specified by two standard-deviation values about the
@@ -27,7 +26,7 @@
 *     correspond to lookup-table entries. Also, the scaled array may be
 *     inverted so that when it is displayed it will come out the right
 *     way around.
- 
+
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        If true bad pixels will be processed.  This should not be set
@@ -61,7 +60,14 @@
 *        The upper limit used for scaling the image.
 *     STATUS = INTEGER (Given)
 *        Value of the status on entry.
- 
+
+*  Algorithm:
+*     - Compute the mean and standard deviation of the array values.
+*     - Derive the scaling limits.
+*     - The scaled image is then produced with or without inversion,
+*       and with or without bad-pixel checking via a subroutine. Bad
+*       pixels are set to defined value.
+
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
 *     the routine name by B, D, I, R, or W as appropriate. The array
@@ -72,28 +78,41 @@
 *     to display the image inverts it.
 *     -  The statistical calculations are performed in double-precision
 *     arithmetic.
- 
-*  Algorithm:
-*     - Compute the mean and standard deviation of the array values.
-*     - Derive the scaling limits.
-*     - The scaled image is then produced with or without inversion,
-*       and with or without bad-pixel checking via a subroutine. Bad
-*       pixels are set to defined value.
- 
+
+*  Copyright:
+*     Copyright (C) 1990-1991 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1990 July 19 (MJC):
 *        Original version.
 *     1991 July 23 (MJC):
 *        Added BADVAL argument.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

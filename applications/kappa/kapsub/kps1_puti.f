@@ -3,22 +3,22 @@
 *+
 *  Name:
 *     KPS1_PUTx
- 
+
 *  Purpose:
 *     Report the first and last few values of an INTEGER object.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_PUTx( LOC, NDIM, DIMS, SIZE, NLINES, INDNTC, LOGEXM, FD,
 *    :                LINE, LENG, STATUS )
- 
+
 *  Description:
 *     A number of values are read from the object and coded into one
 *     or more text lines in a concise manner.  The information may
 *     be written to an open text file.
- 
+*
 *     The values are normally listed at the end of one line, but may
 *     start on a new line.  The maximum number of lines of data values
 *     may also be set.  For all but the smallest arrays where the values
@@ -29,9 +29,9 @@
 *     values. Note the number of elements shown depends on the number of
 *     characters that will fit on the line.  Bad values are indicated
 *     by an asterisk.
- 
+*
 *     This routine is not suitable for handling character objects.
- 
+
 *  Arguments:
 *     LOC = CHARACTER * ( DAT__SZLOC ) (Given)
 *        Locator to the object.
@@ -57,7 +57,7 @@
 *        blanks.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Algorithm:
 *     If status is bad then return
 *     Read a limited part of the data object slicing if an array
@@ -113,27 +113,47 @@
 *        Endif
 *     Endif
 *     End
- 
-*  Prior Requirements:
-*     -  The text file associated with descriptor FD must already be
-*     opened if LOGEXM is .TRUE..
- 
+
 *  Notes:
 *     -  There is a routine for each of the numeric data types: replace
 *     "x" in the routine name by B, D, I, R, UB, UW or W as appropriate.
- 
+
+*  Prior Requirements:
+*     -  The text file associated with descriptor FD must already be
+*     opened if LOGEXM is .TRUE..
+
+*  Copyright:
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1995 May 9 (MJC)
 *        Original version based upon HDSTRACE routine TRA_PUTX.
 *     {enter_any_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

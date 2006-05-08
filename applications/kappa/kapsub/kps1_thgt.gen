@@ -3,17 +3,17 @@
 *+
 *  Name:
 *     KPS1_THGT<T>
- 
+
 *  Purpose:
 *     Gets the threshold limits and replacement values for THRESH.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_THGT<T>( PNTHLO, PNTHHI, PNRLO, PNRHI, THRLO,
 *                      THRHI, NEWLO, NEWHI, BAD, STATUS )
- 
+
 *  Description:
 *     This is just a server routine for THRESH that obtains the
 *     threshold limits, and the values to replace those beyond the
@@ -25,7 +25,7 @@
 *     converted to that type for return to THRESH.  Given the number of
 *     operations involved and it's generic nature it is more
 *     cost-effective to code it in a subroutine.
- 
+
 *  Arguments:
 *     PNTHLO = CHARACTER * ( * ) (Given)
 *        The ADAM parameter name for the lower threshold.
@@ -51,17 +51,38 @@
 *        If true either of the replacement values is the bad flag.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
 *     the routine name by D, R, I, W, UW, B or UB as appropriate. The
 *     values returned from the routine must have the data type
 *     specified.
- 
+
+*  Copyright:
+*     Copyright (C) 1991, 1994 Science & Engineering Research Council.
+*     Copyright (C) 1995, 2000 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1991 November 6 (MJC):
 *        Original version.
@@ -74,10 +95,10 @@
 *        Reconstructed the generic version, and do not get a high
 *        replacement value if THRHI is less than or equal to THRLO.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

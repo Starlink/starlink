@@ -15,7 +15,7 @@
 *    Invocation :
 *
 *      CALL INVA( CURSOR, ZONEOV, ZONEO, XCEN, YCEN, LBND, DIM1, DIM2,
-*     :           ARRAY, XLOW, XHIGH, YLOW, YHIGH, PNV, STATUS )
+*    :           ARRAY, XLOW, XHIGH, YLOW, YHIGH, PNV, STATUS )
 *
 *    Arguments :
 *

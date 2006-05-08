@@ -17,14 +17,14 @@
 *                      DISTRB, BADPIX, FRACTN, BADCOL, BADROW, SCREEN, 
 *                      PARAM1, PARAM2, VARS, IMAGE, ERROR, WORK, STATUS )     
 
-*  Description :
+*  Description:
 *     This routine generates a specified number of 2-D Gaussian images
 *     with dimensions, intensities and so on as input. A pseudo-
 *     Poissonian noise distribution is added, and the option to
 *     simulate bad pixels and columns is included. The relevant Gaussian
 *     parameters may be output via the screen or into a file.
 
-*  Arguments :
+*  Arguments:
 *     IDIM1 = INTEGER (Given)
 *         First dimension of array to be created
 *     IDIM2 = INTEGER (Given)
@@ -70,11 +70,33 @@
 *     STATUS = INTEGER (Given and Returned)
 *         Global status value
 
+*  Copyright:
+*     Copyright (C) 1985-1990, 1992-1993 Science & Engineering Research
+*     Council. Copyright (C) 2001 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJM: Mark McCaughrean 
 *     MJC: Malcolm Currie (Starlink, RAL)
 *     AALLAN: Alasdair Allan (Starlink, University of Exeter)
 *     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
 
 *  History:
 *     14-OCT-1985 (MJM): 
@@ -120,9 +142,11 @@
 *     11-SEP-2001 (DSB):
 *        Changed layout of code comments, and variable declarations.
 *        Added args PARAM2 and WORK.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
+
 *-
 
 *  Type definitions:

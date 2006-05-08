@@ -26,7 +26,7 @@
 *            2      Pn
 *         |H|   +  ----
 *                   Pg
-*                   
+*
 *            *                                                   2 
 *     where H  is the complex conjugate of the FT of the PSF, |H|  is
 *     the square of the modulus of the FT of the PSF, Pn is the mean
@@ -39,7 +39,7 @@
 *     This routine uses Hermitian arrays to store both the real and
 *     imaginary parts of an FT in a single array.  See KPG1_HMLTR for
 *     more information about Hermitian arrays.
-      
+
 *  Arguments:
 *     EL = INTEGER (Given)
 *        Total number of elements in each internal file.
@@ -64,6 +64,26 @@
 *        Work space. 
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

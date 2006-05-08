@@ -3,22 +3,22 @@
 *+
 *  Name:
 *     KPS1_KS2Tx
- 
+
 *  Purpose:
 *     Returns the probability that two datasets are from the same
 *     sample.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_KS2Tx( N1, N2, DATA1, DATA2, D, PROB, SORT1, SORT2, STATUS )
- 
+
 *  Description:
 *     This routine computes the two-sided Kolmogorov-Smirnov statistic
 *     of two arrays and returns the probability that the two arrays are
 *     drawn from the same sample.
- 
+
 *  Arguments:
 *     N1 = INTEGER (Given)
 *        Number of elements in the first array.
@@ -39,29 +39,49 @@
 *        Sorted form of array DATA2.
 *     STATUS = INTEGER (Given & Returned)
 *        Global status value.
- 
+
+*  Algorithm:
+*     This routine first sorts both arrays and then compares cumulative
+*     distribution functions.  The largest separation between these
+*     functions is then used to calculate the Kolmogorov-Smirnov
+*     statistic.
+
+*  References:
+*     - Press et al, 1992, "Numerical Recipes in FORTRAN", 2nd edition
+*     (CUP).
+
 *  Notes:
 *     -  The input arrays must not contain any bad data.
 *     -  There is a routine for double-precision, and real data types:
 *     replace "x" in the routine name by D or R as appropriate.  The
 *     DATA1, DATA2, SORT1, SORT2 arrays and the maximum distance
 *     supplied to the routine must have the data type specified.
- 
-*  Algorithm:
-*     This routine first sorts both arrays and then compares cumulative
-*     distribution functions.  The largest separation between these
-*     functions is then used to calculate the Kolmogorov-Smirnov
-*     statistic.
- 
-*  References:
-*     - Press et al, 1992, "Numerical Recipes in FORTRAN", 2nd edition
-*     (CUP).
- 
+
+*  Copyright:
+*     Copyright (C) 1996-1997 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1996 October 22 (TIMJ):
 *       Original Starlink version
@@ -69,10 +89,10 @@
 *        Made generic and some tidying.  Reordered the N2 argument to
 *        adhere to the Starlink standard.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

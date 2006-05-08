@@ -1,23 +1,23 @@
       SUBROUTINE KPS1_AGNCV( X1, Y1, XW, YW, STATUS )
-*+ 
+*+
 *  Name:
 *     KPS1_AGNCV
- 
+
 *  Purpose:
 *     Displays text telling the user what the latest value is for the
 *     cursor position in ARDGEN.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_AGNCV( X1, Y1, XW, YW, STATUS )
- 
+
 *  Description:
 *     The routine displays the latest value for the cursor position.
 *     When an image is being displayed output is in the form of pixel
 *     co-ordinates.
- 
+
 *  Arguments:
 *     X1 = REAL (Given)
 *        X pixel co-ordinate of the left-hand edge of the image.
@@ -29,13 +29,34 @@
 *        Y pixel co-ordinate.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
+*  Copyright:
+*     Copyright (C) 1993-1994 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
-*    GJP: Grant Privett (STARLINK)
-*    DSB: David Berry (STARLINK)
-*    MJC: Malcolm J. Currie (STARLINK)
-*    {enter_new_authors_here}
- 
+*     GJP: Grant Privett (STARLINK)
+*     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
 *  History:
 *     15-Mar-1993 (GJP)
 *        Original version
@@ -51,8 +72,8 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
- 
-*- 
+
+*-
  
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing

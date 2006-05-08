@@ -2,13 +2,13 @@
      :                       SCS, NP, NPOS, P, PC, AA, BB, XX, YY,
      :                       STATUS )
 *+
-* Name:
-*    KPS1_SKYF2
+*  Name:
+*     KPS1_SKYF2
 
 *  Purpose:
 *     Form an initial guess at the IRA projection parameters which
 *     will describe the supplied co-ordinate data.
-     
+
 *  Language:
 *     Starlink Fortran 77
 
@@ -27,7 +27,7 @@
 *     arc-distance and bearing of the second supplied position from the
 *     first.  The celestial sphere is asummed not to have been tilted
 *     before projection.
-      
+
 *  Arguments:
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for a group holding the supplied co-ordinate
@@ -74,6 +74,26 @@
 *        The image Y values read from the group identified by IGRP.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

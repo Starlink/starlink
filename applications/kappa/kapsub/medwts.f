@@ -22,8 +22,8 @@
 *    Invocation :
 *
 *      CALL MEDWTS( DIFF, STEP, NUMSAM, MEDPOS, MEDTHR, SAMSIZ, SAMINF,
-*     :             IDIM1, IDIM2, ARRIN, ODIM1, ODIM2, SAMPLE, SAMWT,
-*     :             ARROUT, STATUS )
+*    :             IDIM1, IDIM2, ARRIN, ODIM1, ODIM2, SAMPLE, SAMWT,
+*    :             ARROUT, STATUS )
 *
 *    Arguments :
 *

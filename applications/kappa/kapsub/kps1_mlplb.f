@@ -28,22 +28,22 @@
 *        Colour(Zeromark): Colour for the zero-point markers.
 *        Width(Zeromark) : Line width for the zero-point markers.
 *        Style(Zeromark) : Line style for the zero-point markers.
-
+*
 *        Size(Labels)    : Relative text size for the curve labels.
 *        Colour(Labels)  : Colour for the curve labels.
 *        Width(Labels)   : Line width for the curve labels.
 *        Style(Labels)   : Line style for the curve labels.
 *        Font(Labels)    : Line style for the curve labels.
-
+*
 *        LabPos(Left)    : Horizontal position of the left-curve label. 
 *        LabPos(Right)   : Horizontal position of the right-curve 
 *                          label. 
-*        
+*
 *     Minimum abbreviation for "ZeroMark" Is "Zer".
 *     Minimum abbreviation for "Labels" Is "Lab".
 *     Minimum abbreviation for "Left" Is "L".
 *     Minimum abbreviation for "Right" Is "R".
-*     
+*
 *     "LabPos" without any qualifier refers to the Left label.  LabPos 
 *     values are floating point, with 0.0 meaning the left edge of the 
 *     plotting area, and 1.0 the right edge.
@@ -93,6 +93,27 @@
 *        A group holding the curve labels.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Copyright:
+*     Copyright (C) 1999 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)

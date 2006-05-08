@@ -1,7 +1,7 @@
       SUBROUTINE LSFUN1( M, N, XC, FVECC )
 *+
-* Name:
-*    LSFUN1
+*  Name:
+*     LSFUN1
 
 *  Purpose:
 *     Evaluates function values for NAG minimisation routine E04FDF
@@ -27,7 +27,7 @@
 *
 *     If an error occurs in this routine, an error is reported and the
 *     status value is returned in common variable ISTAT.
-      
+
 *  Arguments:
 *     M = INTEGER (Given)
 *        The number of residuals to be calculated.  M should be two
@@ -45,6 +45,27 @@
 *        common.
 *     FVECC( M ) = DOUBLE PRECISION (Returned)
 *        The residuals.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.
+*     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

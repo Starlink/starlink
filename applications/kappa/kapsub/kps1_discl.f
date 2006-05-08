@@ -30,52 +30,73 @@
 *     covered by the returned array of colour indices.
 
 *  Arguments:
-*    INDF = INTEGER (Given)
+*     INDF = INTEGER (Given)
 *       An NDF identifier for the section of the NDF which is to be
 *       displayed.
-*    SDIMS( 2 ) = INTEGER (Given)
+*     SDIMS( 2 ) = INTEGER (Given)
 *       The dimensions of the two pixel axes within the NDF which are being
 *       used.
-*    MCOMP = CHARACTER * ( * ) (Given)
+*     MCOMP = CHARACTER * ( * ) (Given)
 *       The NDF component to be used. This can include 'Error'.
-*    LP = INTEGER (Given)
+*     LP = INTEGER (Given)
 *       The lowest colour index to use.
-*    UP = INTEGER (Given)
+*     UP = INTEGER (Given)
 *       The highest colour index to use.
-*    BPCI = INTEGER (Given)
+*     BPCI = INTEGER (Given)
 *       The colour index to use for bad data.
-*    WPLBND( 2 ) = REAL (Given and Returned)
+*     WPLBND( 2 ) = REAL (Given and Returned)
 *       On entry, this holds the pixel co-ordinate lower bounds of the 
 *       supplied NDF. On exit they are modified to represent the bounds
 *       of the data spanned by the returned array of colour indices, 
 *       taking account of the any change in shape or size of the data 
 *       caused by any block averaging which may have been performed. 
-*    WPUBND( 2 ) = REAL (Given and Returned)
+*     WPUBND( 2 ) = REAL (Given and Returned)
 *       On entry, this holds the pixel co-ordinate upper bounds of the 
 *       supplied NDF. On exit they are modified to represent the bounds
 *       of the data spanned by the returned array of colour indices, 
 *       taking account of the any change in shape or size of the data 
 *       caused by any block averaging which may have been performed. 
-*    IP = INTEGER (Returned)
+*     IP = INTEGER (Returned)
 *       A pointer to a work array holding the colour index values. This
 *       should be freed using PSX_FREE when no longer needed. Returned
 *       equal to zero if an error occurs.
-*    NX = INTEGER (Returned)
+*     NX = INTEGER (Returned)
 *       The number of columns in the returned array of colour indices.
-*    NY = INTEGER (Returned)
+*     NY = INTEGER (Returned)
 *       The number of rows in the returned array of colour indices.
-*    DLO = DOUBLE PRECISION (Returned)
+*     DLO = DOUBLE PRECISION (Returned)
 *       Lower data limit used for scaling the array
-*    DHI = DOUBLE PRECISION (Returned)
+*     DHI = DOUBLE PRECISION (Returned)
 *       Upper data limit used for scaling the array
-*    STATUS = INTEGER (Given and Returned)
+*     STATUS = INTEGER (Given and Returned)
 *       The global status value.
 
 *  Notes:
-*    -  The following parameter names are hard-wired into this routine: 
-*    MODE, SIGMAS, LOW, HIGH, PERCENTILES, NUMBIN.
-*    -  The PGPLOT viewport on entry must correspond to the DATA picture
-*    in which the image is to be displayed. 
+*     -  The following parameter names are hard-wired into this routine: 
+*     MODE, SIGMAS, LOW, HIGH, PERCENTILES, NUMBIN.
+*     -  The PGPLOT viewport on entry must correspond to the DATA picture
+*     in which the image is to be displayed. 
+
+*  Copyright:
+*     Copyright (C) 1998-1999, 2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+*     Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -98,6 +119,9 @@
 *     2006 February 24 (MJC):
 *        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx calls.
 *     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
 

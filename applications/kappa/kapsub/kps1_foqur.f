@@ -2,18 +2,16 @@
 *+
 *  Name:
 *     KPS1_FOQUx
- 
+
 *  Purpose:
 *     Copies one 2-d array to another optionally swapping quadrants.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
-*  Invocation
+
+*  Invocation:
 *     CALL KPS1_FOQUx( MO, NO, IN, MI, NI, SWAP, OUT, STATUS )
- 
-*  Description:
- 
+
 *  Arguments:
 *     MI = INTEGER (Given)
 *        The number of pixels per line in the unpadded region.
@@ -32,7 +30,7 @@
 *        The output image.
 *     STATUS = INTEGER (Given)
 *        The global status.
- 
+
 *  Algorithm:
 *     - The images may have been padded out at high column and
 *       line numbers (see preprocessing subroutine), therefore the
@@ -44,18 +42,39 @@
 *       unpadded data, and `reverse' in which the swap is done about a
 *       position equal to the `forward' position reflected through the
 *       image centre.
- 
+
 *  Notes:
 *     -  There is a routine for real and double-precision floating-
 *     point data: replace "x" in the routine name by D or R as
 *     appropriate.  The arrays and fill value supplied to the routine
 *     must have the data type specified.
- 
+
+*  Copyright:
+*     Copyright (C) 1988, 1990, 1994 Science & Engineering Research
+*     Council. Copyright (C) 1995 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: D.S. Berry (STARLINK) 6/6/88
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1988 June 6 (DSB):
 *        Original version.
@@ -70,10 +89,10 @@
 *     1995 March 30 (MJC):
 *        Made generic from FTQUAD.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing

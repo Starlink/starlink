@@ -38,56 +38,76 @@
 *     specified BAD colour index stored in the output image array.
 
 *  Arguments:
-*    NLUT = INTEGER (Given)
+*     NLUT = INTEGER (Given)
 *       The number of colours which can be stored in the returned colour
 *       table.
-*    NDATA = INTEGER (Given)
+*     NDATA = INTEGER (Given)
 *       The number of supplied data points.
-*    RDATA( NDATA ) = REAL (Given)
+*     RDATA( NDATA ) = REAL (Given)
 *       The red data values.
-*    RHI = REAL (Given)
+*     RHI = REAL (Given)
 *       The red data value corresponding to full red intensity.
-*    RLO = REAL (Given)
+*     RLO = REAL (Given)
 *       The red data value corresponding to zero red intensity.
-*    GDATA( NDATA ) = REAL (Given)
+*     GDATA( NDATA ) = REAL (Given)
 *       The green data values.
-*    GHI = REAL (Given)
+*     GHI = REAL (Given)
 *       The green data value corresponding to full green intensity.
-*    GLO = REAL (Given)
+*     GLO = REAL (Given)
 *       The green data value corresponding to zero green intensity.
-*    BDATA( NDATA ) = REAL (Given)
+*     BDATA( NDATA ) = REAL (Given)
 *       The blue data values.
-*    BHI = REAL (Given)
+*     BHI = REAL (Given)
 *       The blue data value corresponding to full blue intensity.
-*    BLO = REAL (Given)
+*     BLO = REAL (Given)
 *       The blue data value corresponding to zero blue intensity.
-*    BAD = INTEGER (Given)
+*     BAD = INTEGER (Given)
 *       The colour index to store in LUT for each pixel which has one or
 *       more bad input intensities.
-*    RSVPN = INTEGER (Given)
+*     RSVPN = INTEGER (Given)
 *       The number of colours reserved for the pallette. The returned
 *       image will use a value of RSVPN to refer to the first entry
 *       in the returned colour table.
-*    NHIST = INTEGER (Given)
+*     NHIST = INTEGER (Given)
 *       The maximum number of cells which can be used in the 3D histogram.
-*    RHIST( NHIST ) = REAL (Returned)
+*     RHIST( NHIST ) = REAL (Returned)
 *       Work space which is used to hold red intensity (in the range 0.0
 *       to 1.0) at the centre of each 3D histogram cell.
-*    GHIST( NHIST ) = REAL (Returned)
+*     GHIST( NHIST ) = REAL (Returned)
 *       Work space which is used to hold green intensity (in the range 0.0
 *       to 1.0) at the centre of each 3D histogram cell.
-*    BHIST( NHIST ) = REAL (Returned)
+*     BHIST( NHIST ) = REAL (Returned)
 *       Work space which is used to hold blue intensity (in the range 0.0
 *       to 1.0) at the centre of each 3D histogram cell.
-*    PHIST( NHIST ) = INTEGER (Returned)
+*     PHIST( NHIST ) = INTEGER (Returned)
 *       Work space which is used to hold the population in each 3D 
 *       histogram cell.
-*    LUT( 3, NLUT ) = REAL (Returned)
+*     LUT( 3, NLUT ) = REAL (Returned)
 *       The returned colour table.
-*    CI( NDATA ) = INTEGER (Returned)
+*     CI( NDATA ) = INTEGER (Returned)
 *       The returned image of colour indices.
-*    STATUS = INTEGER (Given and Returned)
+*     STATUS = INTEGER (Given and Returned)
 *       The global status value.
+
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -96,6 +116,11 @@
 *  History:
 *     25-NOV-1998 (DSB):
 *        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
 *  Type Definitions:

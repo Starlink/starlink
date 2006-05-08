@@ -5,19 +5,19 @@
 *+
 *  Name:
 *     KPS1_CFF2x
- 
+
 *  Purpose:
 *     Rejects iteratively defects in a substantially smooth 2-d array.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_CFF2x( NX, NY, INARR, VAR, NVAR, INVAR, BOXSZ, NITER,
 *                      CLIP, LIMITS, ILEVEL, SAMBAD, NLIM, CINARR,
 *                      OUTARR, OUTVAR, NGOOD, SIGMA, ASUM, NSUM,
 *                      STATUS )
- 
+
 *  Description:
 *     This routine sets pixels in a 2-d array to be invalid if they
 *     deviate too far from 'local mean' and lie within a nominated range
@@ -31,7 +31,7 @@
 *     to the cleaned array.  Iterations stop an status is set to
 *     SAI__ERROR when the array is entirely composed of bad values or
 *     all pixels have been rejected.
- 
+
 *  Arguments:
 *     NX = INTEGER (Given)
 *        First dimension of the image to be cleaned.
@@ -96,19 +96,39 @@
 *        Work array for counting good pixels during smoothing the image.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for processing single- and double-precision
 *     arrays; replace "x" in the routine name by R or D as appropriate.
 *     The data type of the INARR, OUTARR, LIMITS, CINARR, INVAR,
 *     OUTVAR and ASUM arguments must match the routine used.
- 
+
+*  Copyright:
+*     Copyright (C) 1981, 1990-1992 Science & Engineering Research
+*     Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     RFWS: R. F. Warren-Smith (STARLINK)
 *     WG: Wei Gong (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1981 July (RFWS):
 *        Original INTERIM version.
@@ -123,10 +143,10 @@
 *        Fixed bug that caused the variance array to be accessed when it
 *        did not exist.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

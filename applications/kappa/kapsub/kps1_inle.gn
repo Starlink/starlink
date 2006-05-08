@@ -3,23 +3,23 @@
 *+
 *  Name:
 *     KPG1_INLEx
- 
+
 *  Purpose:
 *     Interleaves an array into another.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_INLEx( EXPAND, FIRST, IDIMS, ELI, INARR, ODIMS, ELO, 
 *                      BASE, STATUS )
- 
+
 *  Description:
 *     This routine interleaves an array onto another array.  Values of
 *     the underlying base array are replaced by values in the
 *     interleaved array.  Origin information is used to situate the
 *     interleaved array elements along each axis.
- 
+
 *  Arguments:
 *     EXPAND( NDF__MXDIM ) = INTEGER (Given)
 *        The interleave enlargement factors along each axis.  These 
@@ -50,7 +50,7 @@
 *        by the factors
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  This routine works in n-D, where n is 1 to 7.  Even if the
 *     array has actually less dimensions there is negligible loss of
@@ -60,19 +60,39 @@
 *     the routine name by D, R, I, W, UW, B or UB as appropriate. The
 *     base and  arrays supplied to the routine must have the data
 *     type specified.
- 
+
+*  Copyright:
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     2005 August 11 (MJC):
 *        Original version based upon KPG1_PASTx.
 *     {enter_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

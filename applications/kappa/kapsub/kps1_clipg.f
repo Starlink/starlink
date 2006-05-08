@@ -26,7 +26,7 @@
 *     one for each picture, the horizontal axis increasing faster.
 *     The comment for the DATA picture is supplied through argument
 *     COMENT.  An optional outline may be drawn (see argument OUTLIN).
-
+*
 *     If argument MAKFRM is TRUE, then a FRAME picture with a comment
 *     set to "REFERENCE" is created first.  It spans from just inside 
 *     the lower-left corner of the input picture and just beyond the
@@ -89,7 +89,27 @@
 *  Prior Requirements:
 *     -  The PGPLOT interface to the AGI library should be opened before
 *     calling this routine.  
- 
+
+*  Copyright:
+*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
+*     Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}

@@ -18,7 +18,7 @@
 *     A number of values are read from the object and coded into one
 *     or more text lines in a concise manner.  The information may
 *     be written to an open ASCII file.
-
+*
 *     The values are normally listed at the end of one line, but may
 *     start on a new line.  The maximum number of lines of data values
 *     may also be set.  For all but the smallest arrays where the values
@@ -113,6 +113,26 @@
 *  Prior Requirements:
 *     -  The ASCII file associated with descriptor FD must already be
 *     opened.
+
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)

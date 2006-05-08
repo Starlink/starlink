@@ -23,11 +23,11 @@
 *     the array to find a cell of four pixels containing a contour at
 *     that level, and then traces the contour until it closes or ends
 *     outside the image.
-
+*
 *     A log of contour heights actually plotted is made.  The pens
 *     which draw the contours may be cycled modulo 3 for each height
 *     used, and so assist in identification.
-
+*
 *     There is an option to compute the number of closed contours, and
 *     the total contour length at each level used.
 
@@ -106,7 +106,7 @@
 *     level currently being plotted lies between these two values, then
 *     a contour crosses the cell in question, otherwise the cell is
 *     skipped over on this pass.
-
+*
 *     Having identified a cell containing a contour, the contour
 *     following algorithm is triggered.  Each cell side (a "side" is
 *     one of the lines joining pixel centres) is examined to determine
@@ -118,7 +118,7 @@
 *     the algorithm moves on to the cell adjacent to the contour exit
 *     position, where the process is repeated - thereby "following" the
 *     contour.
-
+*
 *     Contour following continues until the next cell is off the
 *     edge of the image, has already been "done" on this pass, contains
 *     a "bad" pixel or is "confused" (i.e. is crossed by more than one
@@ -128,7 +128,7 @@
 *     shortest total length of contour line within the cell.  Contour-
 *     following also terminates if the buffer containing the list of
 *     points to plot becomes full.
-
+*
 *     When contour following terminates, all pending output is plotted
 *     with the appropriate pen (there are two separate lines to plot if
 *     the final cell was confused).  The scan through the data (looking
@@ -137,12 +137,34 @@
 *     contour-following.  Cells which are already flagged as "done" do
 *     not subsequently trigger further contour-following on this pass.
 
-*  Notes:
-*     -  Magic-value bad pixels are correctly processed.
-
 *  Implementation Deficiencies:
 *     The contours are not smooth and the scanning algorithm can be made
 *     many times faster by not examining all pixels at all heights.
+
+*  Notes:
+*     -  Magic-value bad pixels are correctly processed.
+
+*  Copyright:
+*     Copyright (C) 1000, 1983, 1988-1989 Science & Engineering
+*     Research Council. Copyright (C) 1997-1998, 2001 Central
+*     Laboratory of the Research Councils. Copyright (C) 2006 Particle
+*     Physics & Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     RFWS: Rodney Warren-Smith (STARLINK, Durham)

@@ -19,35 +19,55 @@
 *     the formatted RGB intensities at each point.
 
 *  Arguments:
-*    FD = INTEGER (Given)
+*     FD = INTEGER (Given)
 *       The FIO file descriptor for the output PPM file.
-*    NX = INTEGER (Given)
+*     NX = INTEGER (Given)
 *       The number of pixels in one row of the image.
-*    NY = INTEGER (Given)
+*     NY = INTEGER (Given)
 *       The number of rows in the image.
-*    RDATA( NX, NY ) = REAL (Given)
+*     RDATA( NX, NY ) = REAL (Given)
 *       The red data values.
-*    RHI = REAL (Given)
+*     RHI = REAL (Given)
 *       The red data value corresponding to full red intensity.
-*    RLO = REAL (Given)
+*     RLO = REAL (Given)
 *       The red data value corresponding to zero red intensity.
-*    GDATA( NX, NY ) = REAL (Given)
+*     GDATA( NX, NY ) = REAL (Given)
 *       The green data values.
-*    GHI = REAL (Given)
+*     GHI = REAL (Given)
 *       The green data value corresponding to full green intensity.
-*    GLO = REAL (Given)
+*     GLO = REAL (Given)
 *       The green data value corresponding to zero green intensity.
-*    BDATA( NX, NY ) = REAL (Given)
+*     BDATA( NX, NY ) = REAL (Given)
 *       The blue data values.
-*    BHI = REAL (Given)
+*     BHI = REAL (Given)
 *       The blue data value corresponding to full blue intensity.
-*    BLO = REAL (Given)
+*     BLO = REAL (Given)
 *       The blue data value corresponding to zero blue intensity.
-*    BAD( 3 ) = REAL (Given)
+*     BAD( 3 ) = REAL (Given)
 *       The RGB intensities in the range 0.0 to 1.0 to represent any
 *       pixel which has one or more bad input intensities.
-*    STATUS = INTEGER (Given and Returned)
+*     STATUS = INTEGER (Given and Returned)
 *       The global status value.
+
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -56,6 +76,11 @@
 *  History:
 *     25-NOV-1998 (DSB):
 *        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
 *  Type Definitions:

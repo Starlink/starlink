@@ -19,14 +19,14 @@
 *     an average interval between adjacent elements, which is applied
 *     to the first interior good value to derive the replacement value
 *     for the bad.
-
+*
 *     This is a server routine for SLIDE to allow for non-integer
 *     interpolation, where the resampling leaves bad values at the
 *     ends of axis centres.  It assumes that the array is monotonic and
 *     approximately linear.  This routine may be used for arbitrary
 *     one-dimensional arrays in addition to axes, provided these 
 *     criteria are met.
-*
+
 *  Arguments:
 *     LBND = INTEGER (Given)
 *        The lower bound of the axis array.
@@ -46,8 +46,29 @@
 *     specified.
 *     -  An error report is made and bad status returned should the
 *     axis array have too few elements for interpolation.
+*
 
-*  [optional_subroutine_items]...
+
+*  Copyright:
+*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
+*     Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}

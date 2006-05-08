@@ -4,24 +4,24 @@
 *+
 *  Name:
 *     KPS1_ROBLx
- 
+
 *  Purpose:
 *     Rotates input array into output array for ROTATE.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_ROBLx( NUMRA, LONG, SHORT, ROTSIZ, XLARGE, IDIM1, IDIM2,
-*     :                ARRIN, ODIM1, ODIM2, ARROUT, WORK, STATUS )
- 
+*    :                ARRIN, ODIM1, ODIM2, ARROUT, WORK, STATUS )
+
 *  Description:
 *     This routine rotates an array in 90-degree multiples by blocking
 *     (in the NDF sense) the array into square sections.  The input
 *     array, ARRIN, is rotated through NUMRA right angles in the
 *     clockwise direction as a number of ROTSIZ by ROTSIZ sections.
 *     The rotated array is put into ARROUT.
- 
+
 *  Arguments:
 *     NUMRA = INTEGER (Given)
 *        Number of right-angles through which the data will be rotated.
@@ -50,15 +50,7 @@
 *        Workspace to hold the subsection for rotation.
 *     STATUS = INTEGER( UPDATE )
 *        The global status.
-*
-*  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
-*     ARRIN, ARROUT, and WORK arguments of the routine must have the
-*     data type specified.
-*     - If an error occurs during the execution of this routine STATUS
-*     will be returned containing the appropriate error value.
- 
+
 *  Algorithm:
 *     If no error on entry then
 *        ENDL is the position of the start of the last rotation box
@@ -102,12 +94,41 @@
 *           Endif
 *        Endif
 *     Endif
- 
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     ARRIN, ARROUT, and WORK arguments of the routine must have the
+*     data type specified.
+*     - If an error occurs during the execution of this routine STATUS
+*     will be returned containing the appropriate error value.
+
+*  Copyright:
+*     Copyright (C) 1983-1984, 1986, 1989 Science & Engineering
+*     Research Council. Copyright (C) 1995 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DB: Dave Baines (ROE)
 *     MJC: Malcolm J. Currie (Starlink)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     27/07/1983 (DB):
 *        Original version.
@@ -121,10 +142,10 @@
 *        Made generic from ROTAS4.  Used an SST prologue and modern
 *        variable declarations.  Corrected grammatical errors.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

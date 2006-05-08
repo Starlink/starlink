@@ -3,24 +3,24 @@
 *+
 *  Name:
 *     KPS1_SUCLx
- 
+
 *  Purpose:
 *     Rejects deviant surface-fit residuals truncating the given
 *     list of unfitted values, weights and positions.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_SUCLx( EL, FIT, RMS, CLIP, X, Y, Z, W, NBIN, STATUS )
- 
+
 *  Description:
 *     Theis routine compares an array of fitted to corresponding raw
 *     values.  Elements that are more than a defined number of standard
 *     deviations away from the fit are removed from the raw data array.
 *     It also truncates the corresponding arrays of weights and
 *     positions.
- 
+
 *  Arguments:
 *     EL = INTEGER (Returned)
 *        The number of values in the list before the clipping operation.
@@ -46,23 +46,45 @@
 *        operation.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Algorithm:
 *     -  Loop for all points in the list
 *     -  If the residual lies within the clipping range, increment the
 *        count of bins copied and copy the value, weight and position.
- 
+
 *  Notes:
 *     -  There is a routine for double precision or real data types:
 *     replace "x" in the routine name by D or R as appropriate.  The
 *     FIT, X, Y, Z, and W arguments supplied to the routine must have
 *     the data type specified.
- 
-*  [optional_subroutine_items]...
+*
+
+
+*  Copyright:
+*     Copyright (C) 1990 Science & Engineering Research Council.
+*     Copyright (C) 1996 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1990 February 1 (MJC):
 *        Original version.
@@ -70,10 +92,10 @@
 *        Made generic and renamed from CLPXYL.  Used modern style.
 *        Added Description.  Swapped FIT and EL arguments.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_new_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

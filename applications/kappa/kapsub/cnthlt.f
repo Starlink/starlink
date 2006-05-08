@@ -27,12 +27,6 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Notes:
-*     -  The messages use ADAM parameters HEIGHT_LIST and HEIGHT_TITLE.
-
-*  Prior Requirements:
-*     -  The contour levels and the flags should be sorted into order.
-
 *  Algorithm:
 *     -  Find the first and last heights used, watching out for special
 *        cases like only one height supplied.
@@ -41,6 +35,32 @@
 *     -  Continue to append heights until more than 60 characters have
 *        been used, then report the line of heights, and start a new
 *        line in the buffer.
+
+*  Notes:
+*     -  The messages use ADAM parameters HEIGHT_LIST and HEIGHT_TITLE.
+
+*  Prior Requirements:
+*     -  The contour levels and the flags should be sorted into order.
+
+*  Copyright:
+*     Copyright (C) 1990 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)

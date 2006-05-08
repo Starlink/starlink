@@ -4,17 +4,17 @@
 *+
 *  Name:
 *     KPS1_TRDRx
- 
+
 *  Purpose:
 *     Reads co-ordinate and value data from an ASCII free-format file.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_TRDRx( FD, DIM1, DIM2, POSCOD, COUNT, CODATA, VADATA,
 *    :                 LBND, UBND, CMPLET, STATUS )
- 
+
 *  Description:
 *     This routine reads co-ordinate information and data value from
 *     an ASCII free-format file.  The file is like a relational
@@ -24,7 +24,7 @@
 *     for each record of the file, its columns stores the given
 *     positional data in the order x,y,z etc. The second stores the
 *     data value. If the end of file is not reached a flag is returned.
- 
+
 *  Arguments:
 *     FD = INTEGER (Given)
 *        Fortran file identifier.
@@ -63,7 +63,15 @@
 *        If true the ASCII file has been completely read.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
+*  Algorithm:
+*     -  Get the number of the furthest column to be read.
+*     -  While the buffer is not full and there is no error, read a file
+*        record into a buffer and extract the required columns, storing
+*        them in the output file, and computing the bounds of the array.
+*        Report the context of an error should one occur.
+*     -  If the file was completely read, set a flag to indicate this.
+
 *  Notes:
 *     -  This is a server subroutine for TRANDAT.  The code would be at
 *        the top level (i.e. TRANDAT) but for the requirement to
@@ -75,22 +83,35 @@
 *        from the current line in the file.  Hence this routine can be
 *        called repeatedly as the the output array is expanded to
 *        accommodate the input data.
- 
+
 *  Prior Requirements:
 *     -  The Fortran ASCII file must already be opened.
- 
-*  Algorithm:
-*     -  Get the number of the furthest column to be read.
-*     -  While the buffer is not full and there is no error, read a file
-*        record into a buffer and extract the required columns, storing
-*        them in the output file, and computing the bounds of the array.
-*        Report the context of an error should one occur.
-*     -  If the file was completely read, set a flag to indicate this.
- 
+
+*  Copyright:
+*     Copyright (C) 1990 Science & Engineering Research Council.
+*     Copyright (C) 1996 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1990 Apr 17 (MJC):
 *        Original version.
@@ -100,10 +121,10 @@
 *     1996 January 31 (MJC):
 *        Replaced NAG calls.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

@@ -3,21 +3,21 @@
 *+
 *  Name:
 *     KPS1_FOFOx
- 
+
 *  Purpose:
 *     Performs a forward FFT of a 2-d real array.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
-*  Invocation
+
+*  Invocation:
 *     CALL KPS1_FOFOx( M, N, UNTANG, DATA, WIM1, WIM2, WIM3, STATUS )
- 
+
 *  Description:
 *     This routine performs a forward FFT of a real image.  The output
 *     FFT is stored with the zero-frequency pixel at the centre of the
 *     array, in either Hermitian form, or real and imaginary forms.
- 
+
 *  Arguments:
 *     M = INTEGER (Given)
 *        The number of columns per line in the data array.
@@ -37,18 +37,39 @@
 *        Work space, and the real part of FFT if %UNTANG is .TRUE..
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for real and double-precision floating-
 *     point data: replace "x" in the routine name by D or R as
 *     appropriate.  The arrays supplied to the routine must have the
 *     data type specified.
- 
+
+*  Copyright:
+*     Copyright (C) 1988, 1990 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1988 Jun 6 (DSB):
 *        Original version.
@@ -63,10 +84,10 @@
 *     1995 March 30 (MJC):
 *        Made generic from FFTFOR.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing

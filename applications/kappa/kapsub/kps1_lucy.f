@@ -37,28 +37,7 @@
 *     smoothing it with the PSF and adding the background.  The
 *     chi-squared value for the new simulated data is found at this 
 *     point.
-      
-*  Internal Files:
-*     `Internal files' are used to hold data sets or images.  A `data
-*     set' holds values which relate to data space, i.e. values which
-*     are gridded like the observed data.  An `image' holds values in
-*     image space, i.e. values which are gridded like the reconstructed
-*     image.  A data set can be created from an image by convolving it
-*     with the PSF.  An image can be created from a data set by
-*     convolving it with the transposed PSF.  In the current version of
-*     this application, data sets and images are the same size.
-*
-*     Eight internal files are used as follows:
-*     
-*       1 - The current estimate of the reconstructed image.
-*       2 - Work space (image or data set).
-*       3 - The Fourier transform of the PSF.
-*       4 - The observed data.
-*       5 - A work array to hold bad-pixel masks. 
-*       6 - The background data. 
-*       7 - Work space (image or data set).
-*       8 - Data variances.
-      
+
 *  Arguments:
 *     N = INTEGER (Given)
 *        The number of elements in each internal file.
@@ -104,6 +83,47 @@
 *        Work space.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Internal Files:
+*     `Internal files' are used to hold data sets or images.  A `data
+*     set' holds values which relate to data space, i.e. values which
+*     are gridded like the observed data.  An `image' holds values in
+*     image space, i.e. values which are gridded like the reconstructed
+*     image.  A data set can be created from an image by convolving it
+*     with the PSF.  An image can be created from a data set by
+*     convolving it with the transposed PSF.  In the current version of
+*     this application, data sets and images are the same size.
+*
+*     Eight internal files are used as follows:
+*
+*       1 - The current estimate of the reconstructed image.
+*       2 - Work space (image or data set).
+*       3 - The Fourier transform of the PSF.
+*       4 - The observed data.
+*       5 - A work array to hold bad-pixel masks. 
+*       6 - The background data. 
+*       7 - Work space (image or data set).
+*       8 - Data variances.
+
+*  Copyright:
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

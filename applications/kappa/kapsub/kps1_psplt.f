@@ -21,16 +21,6 @@
 *     the minor or major axis.  The graph comprises the mean profile at
 *     each bin and the smooth fit to those data.
 
-*  Environment Parameters:
-*     The following environment parameter names are used by this
-*     routine:
-*
-*     PROFOUT = NDF (Write)
-*        The name of a 1-dimensional NDF to be created holding the profile 
-*        data. The DATA component holds the fitted profile values, and the
-*        VARIANCE component holds the square of the residuals. If a null (!) 
-*        value is supplied, no NDF is created.
-
 *  Arguments:
 *     NBIN = INTEGER (Given)
 *        The number of radial-profile data points.
@@ -77,6 +67,38 @@
 
 *  Notes:
 *     -  This is a server routine for PSF via KPS1_SPARx.
+
+*  Environment Parameters:
+*     The following environment parameter names are used by this
+*     routine:
+*
+*     PROFOUT = NDF (Write)
+*        The name of a 1-dimensional NDF to be created holding the profile 
+*        data. The DATA component holds the fitted profile values, and the
+*        VARIANCE component holds the square of the residuals. If a null (!) 
+*        value is supplied, no NDF is created.
+
+*  Copyright:
+*     Copyright (C) 1991-1993 Science & Engineering Research Council.
+*     Copyright (C) 1999-2001, 2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2005 Particle Physics & Astronomy
+*     Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Durham Univ.)

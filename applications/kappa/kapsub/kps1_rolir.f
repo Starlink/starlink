@@ -3,18 +3,18 @@
 *+
 *  Name:
 *     KPS1_ROLIx
- 
+
 *  Purpose:
 *     Rotates an image through an arbitrary angle using bilinear
 *     interpolation.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_ROLIx( IDIM1, IDIM2, INARR, VAR, INVAR, ANGLE, ODIM1,
 *                      ODIM2, OUTARR, OUTVAR, STATUS )
- 
+
 *  Description:
 *     This routine takes an input 2-dimensional array and rotates it
 *     clockwise by an arbitrary angle into the output array.  The
@@ -28,7 +28,7 @@
 *
 *     Variance information may be used to weight the pixels in the
 *     interpolation.
- 
+
 *  Arguments:
 *     IDIM1 = INTEGER (Given)
 *        The first dimension of the input 2-dimensional array.
@@ -54,13 +54,7 @@
 *        The rotated variance array if VAR is .TRUE..
 *     STATUS = INTEGER (Given and Returned)
 *        Global status parameter.
- 
-*  Notes:
-*     -  There is a routine for double-precision and single-precision
-*     floating-point data types: replace "x" in the routine name by D
-*     or R as appropriate.  The INARR, INVAR, OUTARR, and OUTVAR
-*     arguments must have the data type specified.
- 
+
 *  Algorithm:
 *     If status not o.k. - return
 *     Set up co-ordinates of the two array centres
@@ -95,12 +89,39 @@
 *        Endfor
 *     Endfor
 *     Return
- 
+
+*  Notes:
+*     -  There is a routine for double-precision and single-precision
+*     floating-point data types: replace "x" in the routine name by D
+*     or R as appropriate.  The INARR, INVAR, OUTARR, and OUTVAR
+*     arguments must have the data type specified.
+
+*  Copyright:
+*     Copyright (C) 1985-1986, 1988-1989 Science & Engineering Research
+*     Council. Copyright (C) 1995 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJM: Mark McCaughrean (UoE)
 *     MJC: Malcolm Currie (Starlink)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     14-11-1985 (MJM):
 *        First implementation for ROTATE.
@@ -119,10 +140,10 @@
 *        modern variable declarations.  Evaluate the transformation
 *        inline for greater efficiency.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

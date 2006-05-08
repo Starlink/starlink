@@ -5,24 +5,24 @@
 *+
 *  Name:
 *     KPS1_BAFIx
- 
+
 *  Purpose:
 *     Fills bad-pixel regions in a 2-dimensional image.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_BAFIx( NPIX, NLINES, INARR, VAR, INVAR, NITER, SIZE,
 *                      CNGMAX, CNGRMS, NBAD, OUTARR, OUTVAR, DSUM,
 *                      WTSUM, DLAST, WTLAST, STATUS )
- 
+
 *  Description:
 *     This routine replaces all the bad pixels in an image with a
 *     solution of Laplace's equation that matches the valid data in
 *     the image at the edges of the invalid regions.  This solution
 *     has zero gradient normal to any image edges which it meets.
- 
+
 *  Arguments:
 *     NPIX = INTEGER (Given)
 *        The number of pixels per line in the input data and variance
@@ -63,20 +63,7 @@
 *        Work array for the last set of weights.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
-*  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
-*     data and variance arrays supplied to this routine must have the
-*     data type specified.
-*     -  The state of the replacements (iteration, smoothing length,
-*     maximum change, rms change) is tabulated for verbose reporting.
- 
-*  Prior Requirements:
-*     -  The input variance array should be propagated from the input
-*     dataset.  This was done to reduce memory requirements, which are
-*     already large.
- 
+
 *  Algorithm:
 *     Iterate, replacing each bad pixel with a weighted mean of its
 *     valid neighbours in the same row and column.  The weights
@@ -87,7 +74,7 @@
 *     change in an iteration is at least a factor 4 less than the
 *     maximum absolute change obtained since the current scale length
 *     was first used.  Iterations stop after NITER have been performed.
- 
+*
 *     When there is variance processing the output variance is
 *     reassigned if either the input variance or data value was bad.
 *     Where the input value is good but its associated variance is bad,
@@ -97,12 +84,45 @@
 *
 *     See the Notes in FILLBAD for additional details and background to
 *     the algorithm.
- 
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     data and variance arrays supplied to this routine must have the
+*     data type specified.
+*     -  The state of the replacements (iteration, smoothing length,
+*     maximum change, rms change) is tabulated for verbose reporting.
+
+*  Prior Requirements:
+*     -  The input variance array should be propagated from the input
+*     dataset.  This was done to reduce memory requirements, which are
+*     already large.
+
+*  Copyright:
+*     Copyright (C) 1995, 1998 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1995 April 16 (MJC):
 *        Original version based on R.F. Warren-Smith's FILLIN.
@@ -110,10 +130,10 @@
 *        Added protection against division by zero if there are any
 *        zero variance values.
 *     {enter_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

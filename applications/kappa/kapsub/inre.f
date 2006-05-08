@@ -14,8 +14,8 @@
 *    Invocation :
 *
 *      CALL INRE( CURSOR, ZONEOV, ZONEO, XCEN, YCEN, LBND, DIMS,
-*     :           XLOW, XHIGH, YLOW, YHIGH, PNLB, PNUB,
-*     :           X1, X2, Y1, Y2, STATUS )
+*    :           XLOW, XHIGH, YLOW, YHIGH, PNLB, PNUB,
+*    :           X1, X2, Y1, Y2, STATUS )
 *
 *    Arguments :
 *

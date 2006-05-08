@@ -2,21 +2,21 @@
 *+
 *  Name:
 *     KPS1_SAXLK
- 
+
 *  Purpose:
 *     Copy an AXIS system from one NDF to another.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_SAXLK( INDF1, INDF2, STATUS )
- 
+
 *  Description:
 *     This routine copies the entire array of AXIS structures from INDF2
 *     to INDF1.  These axis arrays are extrapolated as necessary by the
 *     NDF library.
- 
+
 *  Arguments:
 *     INDF1 = INTEGER (Given)
 *        Identifier for the destination NDF.
@@ -24,13 +24,34 @@
 *        Identifier for the source NDF.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
+*  Copyright:
+*     Copyright (C) 2000, 2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+*     Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     16 MAY 2000 (DSB):
 *        Original version.
@@ -40,10 +61,10 @@
 *        Remove unused variables, including CNF_PVAL, and wrapped 
 *        long lines.
 *     {enter_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

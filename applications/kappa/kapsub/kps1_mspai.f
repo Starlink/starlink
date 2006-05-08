@@ -4,21 +4,19 @@
 *+
 *  Name:
 *     KPS1_MSPAx
- 
+
 *  Purpose:
 *     Evaluates a bivariate Chebyshev polynomial series for all elements
 *     of a 2-dimensional data array, using x and y axis co-ordinates.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *      CALL KPS1_MSPAx( DIM1, DIM2, XAXIS, XMIN, XMAX, YAXIS, YMIN,
 *                       YMAX, NXPAR, NYPAR, MCHOEF, CHCOEF, WORK,
 *                       OUTARR, STATUS )
- 
-*  Description:
- 
+
 *  Arguments:
 *     DIM1 = INTEGER (Given)
 *        The first dimension of the data array.
@@ -61,14 +59,7 @@
 *        The fitted array.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
-*  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
-*     OUTARR argument supplied to the routine must have the data type
-*     specified.
-*     -  Uses the magic-value method for bad or undefined pixels.
- 
+
 *  Algorithm:
 *     -  Scan through the bins a line at a time.
 *     -  If the Y co-ordinate is within the valid range then
@@ -76,12 +67,40 @@
 *        else
 *           Fill the line with bad values
 *        end if
- 
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     OUTARR argument supplied to the routine must have the data type
+*     specified.
+*     -  Uses the magic-value method for bad or undefined pixels.
+
+*  Copyright:
+*     Copyright (C) 1990, 1993 Science & Engineering Research Council.
+*     Copyright (C) 1995-1997 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     SMB: Steven M. Beard (ROE)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1990 Jan 30 (MJC):
 *        Original version as PLY2EV.
@@ -104,10 +123,10 @@
 *     1997 May 10 (MJC):
 *        Renamed from KPS1_FSPAx.  Reordered code to improve efficiency.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

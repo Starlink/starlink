@@ -3,24 +3,24 @@
 *+
 *  Name:
 *     KPS1_TRNVx
- 
+
 *  Purpose:
 *     Converts co-ordinate and value arrays of data into an n-d array.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
-*  Invocation
+
+*  Invocation:
 *     CALL KPS1_TRNVx( NDIMS, ODIMS, NPTS, CODATA, VADATA, PSCALE,
 *    :                 COMIN, OUTARR, STATUS )
- 
+
 *  Description:
 *     This routine transfers the supplied data values whose co-ordinates
 *     and values are known to a regularly-spaced n-d output array.  A
 *     scaling between pixel separations may be made.  The bin selected
 *     is calculated as follows:
 *        index = IFIX( ( CODATA - COMIN ) / PSCALE ) + 1
- 
+
 *  Arguments:
 *     NDIMS = INTEGER (Given)
 *        The number of dimensions of the output array, or in other
@@ -45,7 +45,7 @@
 *        Output array containing the input data, stored as a vector.
 *     STATUS = INTEGER (Given)
 *        Global status value.
- 
+
 *  Algorithm:
 *     -  Find the product of the number of elements within succeeding
 *     dimensions.
@@ -53,22 +53,42 @@
 *     -  For all points compute the pixel index (after the offset and
 *     scaling) for each dimension, and then convert to a pixel index in
 *     the output vector array. Set the value of the pixel.
- 
+
 *  Notes:
 *     -  This is a server subroutine for TRANDAT.  The code would be at
 *        the top level (i.e. TRANDAT) but for the requirement to
 *        transfer ASCII-file data into mapped work arrays.
 *     -  There is a routine for integer and floating-point data types:
 *        replace "x" in the routine name by I, D, or R as appropriate.
- 
+
 *  Prior Requirements:
 *     -  The output array should be initialised to zero or the magic
 *     value when created.
- 
+
+*  Copyright:
+*     Copyright (C) 1990-1991 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1990 Jun 18 (MJC):
 *        Original loosely based on the 2-d version of the
@@ -77,10 +97,10 @@
 *        Corrected the calculation of pixel index by removing a
 *        superfluous + 0.5 from the IFIX calculation.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_new_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

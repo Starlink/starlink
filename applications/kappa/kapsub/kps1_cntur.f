@@ -26,14 +26,14 @@
 *     to avoid unnecessary searching of all pixels at each contour
 *     level.  All line segments are drawn as straight lines without
 *     smoothing.
-
+*
 *     There is an option to draw to the plotting resolution, i.e.
 *     sub-pixel segments, otherwise it is only single pixel resolution.
 *     This slows down the contouring.  If speed is of the essence, then
 *     this option should not be used.  (Subroutine J06GBF in application
 *     CONTOUR has better sub-pixel plotting algorithms that smooth the
 *     contours giving rounded images.)
-
+*
 *     A log of contour heights actually plotted is made.   Contours may
 *     be annotated, the frequency with contour level may be defined.
 *     If no annotations are used then the SGS pens which draw the
@@ -176,6 +176,14 @@
 *     Endfor
 *     End
 
+*  Implementation Deficiencies:
+*     Does not handle contours that pass through the cell corners well.
+*     The sub-pixel resolution is only partially successful, and
+*     requires a smoothing technique.  The number of segments is not
+*     checked that it does not exceed the buffer size, because of
+*     efficiency reasons.  Needs to handle smoothing options for
+*     sub-pixel resolution.
+
 *  Notes:
 *     -  Magic-value bad pixels are correctly processed.
 *     -  Uses pen 2 for plotting.  5 also is used when there is a
@@ -189,13 +197,26 @@
 *     2.  When pen rotation is also requested pens 6 and 7 are dashed
 *     forms of pens 3 and 4.
 
-*  Implementation Deficiencies:
-*     Does not handle contours that pass through the cell corners well.
-*     The sub-pixel resolution is only partially successful, and
-*     requires a smoothing technique.  The number of segments is not
-*     checked that it does not exceed the buffer size, because of
-*     efficiency reasons.  Needs to handle smoothing options for
-*     sub-pixel resolution.
+*  Copyright:
+*     Copyright (C) 1988-1989, 1991 Science & Engineering Research
+*     Council. Copyright (C) 1997 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     R.F. Warren-Smith (STARLINK, University of Durham)
@@ -223,6 +244,7 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
+
 *-
 
 *  Type Definitions:

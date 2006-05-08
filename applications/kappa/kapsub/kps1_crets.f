@@ -50,13 +50,39 @@
 *     STATUS  =  INTEGER ( Given )
 *         Global status value
 
-*  Authors :
+*  Implementation Deficiencies:
+*     Poissonian noise is artificial. No checks are made that the ramps
+*     or random limits will not generate bad pixels. 
+
+*  Copyright:
+*     Copyright (C) 1985-1986, 1988-1989, 1992 Science & Engineering
+*     Research Council. Copyright (C) 2001 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     MJM: Mark McCaughrean 
 *     MJC: Malcolm Currie (Starlink, RAL)
 *     AALLAN: Alasdair Allan (Starlink, University of Exeter)
 *     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
 
-*  History :
+*  History:
 *     29-JUL-1985 (MJM):
 *        First implemenation as aid in debugging A-tasks
 *     25-OCT-1985 (MJM):
@@ -86,10 +112,7 @@
 *     11-SEP-2001 (DSB):
 *        Changed layout of code comments, and variable declarations.
 *        Re-wrote variances estimations.
-
-*  Deficiencies :
-*     Poissonian noise is artificial. No checks are made that the ramps
-*     or random limits will not generate bad pixels. 
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}

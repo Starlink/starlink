@@ -17,7 +17,7 @@
 *    Invocation :
 *
 *      CALL HSTLO( HIST, NHIST, HMIN, HMAX, NULL, XLOG, YLOG, NPOINT,
-*     :            XLOC, YLOC, STATUS )
+*    :            XLOC, YLOC, STATUS )
 *
 *    Arguments :
 *

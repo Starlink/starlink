@@ -4,18 +4,18 @@
 *+
 *  Name:
 *     KPS1_DSCL<T>
- 
+
 *  Purpose:
 *     Scales a 2-d array between user-defined limits into a cell array.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
-*  Invocation
+
+*  Invocation:
 *     CALL KPS1_DSCL<T>( BAD, DIM1, DIM2, INARR, INVERT, PARLOW, PARUPP,
 *    :                 LOWCI, HICI, BADCI, MINV, MAXV, POSTIV, OUTARR,
 *    :                 LOWER, UPPER, STATUS )
- 
+
 *  Description:
 *     The user is given the minimum and maximum values found in a 2-d
 *     array, and is then asked for the limits between which
@@ -26,7 +26,7 @@
 *     between are assigned values using linear interpolation between
 *     the limits. The array may (normal) or may not be inverted on
 *     display.
- 
+
 *  Arguments:
 *     BAD = LOGICAL (Given)
 *        If true bad pixels will be processed.  This should not be set
@@ -67,15 +67,7 @@
 *        The upper limit used for scaling the image.
 *     STATUS = INTEGER( READ, WRITE )
 *        Value of the status on entering this subroutine.
- 
-*  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by B, D, I, R or W as appropriate. The array and
-*     limits supplied to the routine must have the data type specified.
-*     -  The array is normally inverted so that the image will appear
-*     the correct way round when displayed as the GKS routine
-*     to display the image inverts it.
- 
+
 *  Algorithm:
 *     - Report the maximum and minimum values in the array.
 *     - Obtain the scaling limits, which must be different values.
@@ -83,12 +75,41 @@
 *     - The scaled image is then produced with or without inversion,
 *       and with or without bad-pixel checking via a subroutine. Bad
 *       values are set to the defined value.
- 
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by B, D, I, R or W as appropriate. The array and
+*     limits supplied to the routine must have the data type specified.
+*     -  The array is normally inverted so that the image will appear
+*     the correct way round when displayed as the GKS routine
+*     to display the image inverts it.
+
+*  Copyright:
+*     Copyright (C) 1990-1992 Science & Engineering Research Council.
+*     Copyright (C) 1999-2000 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1990 July 12 (MJC):
 *        Original version based on IMSCL.
@@ -105,10 +126,10 @@
 *       acceptable value (i.e. change .LT. to .LE.). This is because DSML
 *       can be zero  in the _DOUBLE version of this file.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

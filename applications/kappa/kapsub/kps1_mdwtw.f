@@ -6,18 +6,18 @@
 *+
 *  Name:
 *     KPS1_MDWTx
- 
+
 *  Purpose:
 *     Performs 2-dimensional weighted median filtering of an array.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *      CALL KPS1_MDWTx( DIFF, STEP, DAMP, NUMSAM, MEDPOS, MEDTHR,
 *                       SAMSIZ, SAMINF, IDIM1, IDIM2, ARRIN, ODIM1,
 *                       ODIM2, SAMPLE, SAMWT, ARROUT, CHANGE, STATUS )
- 
+
 *  Description:
 *     The input array, ARRIN, is filtered using a weighted median
 *     filter to give the output array, ARROUT.  An input image point
@@ -35,7 +35,7 @@
 *     value.  This may be used to prevent the output oscillating
 *     endlessly between two solutions if the filter is being used
 *     iteratively.
- 
+
 *  Arguments:
 *     DIFF = DOUBLE PRECISION (Given)
 *        Determines whether replacement by the median will take place.
@@ -85,13 +85,7 @@
 *        filtering has converged and the caller can stop iterating.
 *     STATUS = INTEGER (Given)
 *        Global status.
- 
-*  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
-*     ARRIN and ARROUT arguments to the routine must have the data
-*     type specified.
- 
+
 *  Algorithm:
 *     If no error on entry then
 *        initialise CHANGE to FALSE
@@ -133,13 +127,40 @@
 *           Endfor
 *        Endfor
 *     Endif
- 
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     ARRIN and ARROUT arguments to the routine must have the data
+*     type specified.
+
+*  Copyright:
+*     Copyright (C) 1983-1984, 1986, 1989, 1993 Science & Engineering
+*     Research Council. Copyright (C) 1995 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DB: Dave Baines (ROE)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     SMB: Steven Beard (ROE)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     24/10/1983 (DB):
 *        Original version.
@@ -160,10 +181,10 @@
 *     1995 July 27 (MJC):
 *        Made generic (from MEDWTS).  Used a modern prologue and style.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

@@ -2,17 +2,17 @@
 *+
 *  Name:
 *     KPS1_CLNSx
- 
+
 *  Purpose:
 *     To 'clean' a marginal star profile, removing neighbouring stars
 *     and blemishes.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_CLNSx( LBND, UBND, XCEN, X, STATUS )
- 
+
 *  Description:
 *     This routine cleans a marginal star profile by subtracting the
 *     lower quartile data point as a background estimate.  It works
@@ -20,7 +20,7 @@
 *     exceeding the maximum of the two previous data values.  This
 *     ensures that the data does not increase with increasing distance
 *     from the centre.
- 
+
 *  Arguments:
 *     LBND = INTEGER (Given)
 *        The lower bound of the data array.
@@ -33,17 +33,37 @@
 *        subtracted.
 *     STATUS = INTEGER (Given)
 *        The global status.
- 
+
 *  Notes:
 *     There is a routine for each numeric data type: replace "x" in the
 *     routine name by D, R, I, W, UW, B, UB as appropriate.  The array
 *     supplied to the routine must have the data type specified.
- 
+
+*  Copyright:
+*     Copyright (C) 1981, 1990 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Durham Univ.)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1981 (RFWS):
 *        Original version.
@@ -52,10 +72,10 @@
 *        commented the variables, added status, and converted the
 *        prologue.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

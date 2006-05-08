@@ -3,23 +3,23 @@
 *+
 *  Name:
 *     KPS1_RORAx
- 
+
 *  Purpose:
 *     Rotates a subsection of 2-dimnensional array by 90, 180 or 270
 *     degrees.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_RORAx( NUMRA, XSIZE, YSIZE, XEXT, YEXT, ARRAY, STATUS )
- 
+
 *  Description:
 *     The XEXT by YEXT section of the input 2-dimensional array ARRAY,
 *     of dimensions XSIZE, YSIZE, is rotated through NUMRA right angles
 *     in the clockwise direction.  ARRAY will hold the rotated data on
 *     exit from the routine.
- 
+
 *  Arguments:
 *     NUMRA = INTEGER (Given)
 *        Number of right-angles through which the data array will be
@@ -37,14 +37,7 @@
 *        returned containing the rotated data.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
-*  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
-*     ARRAY argument must have the data type specified.
-*     - If the number of right-angles for rotation is not 1, 2, or 3
-*     then STATUS will be set to SAI__ERROR and an error reported.
- 
+
 *  Algorithm:
 *     If no error on entry then
 *        If no. of right angles to rotate is 1 then
@@ -100,12 +93,40 @@
 *           Set status and report error
 *        Endif
 *     Endif
- 
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     ARRAY argument must have the data type specified.
+*     - If the number of right-angles for rotation is not 1, 2, or 3
+*     then STATUS will be set to SAI__ERROR and an error reported.
+
+*  Copyright:
+*     Copyright (C) 1983-1984, 1986, 1988-1989 Science & Engineering
+*     Research Council. Copyright (C) 1995 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DB: Dave Baines (ROE)
 *     MJC: Malcolm J. Currie (Starlink)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     27/07/1983 (DB):
 *        Original version.
@@ -122,10 +143,10 @@
 *        Made generic from ROTAS2.  Used an SST prologue and modern
 *        variable declarations.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

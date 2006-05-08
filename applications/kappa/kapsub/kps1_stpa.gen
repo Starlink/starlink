@@ -3,18 +3,18 @@
 *+
 *  Name:
 *     KPS1_STPA<T>
- 
+
 *  Purpose:
 *     Finds the mean axis ratio, seeing disk size and orientation
 *     of a set of elliptical star images.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_STPA<T>( DIM1, DIM2, ARRAY, LBND, NXY, ISIZE, POS,
 *    :                 SIG0, AXISR, THETA, NGOOD, SIG, STATUS )
- 
+
 *  Description:
 *     This routine finds the mean axis ratio, seeing disk size and
 *     orientation of a set of elliptical star images by fitting to 2-d
@@ -31,7 +31,7 @@
 *     estimates at each of the four directions for all the stars are
 *     combined modally to give four mean widths.  Using these the
 *     routine finds the parameters of a mean elliptical star image.
- 
+
 *  Arguments:
 *     DIM1 = INTEGER (Given)
 *        The number of pixels per line of the array.
@@ -69,19 +69,40 @@
 *        found, all its entries in %SIG are zero.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
 *     the routine name by D, R, I, W, UW, B, UB as appropriate.  The
 *     array supplied to the routine must have the data type specified.
 *     -  This is a server routine for PSF.
- 
+
+*  Copyright:
+*     Copyright (C) 1981, 1990-1992 Science & Engineering Research
+*     Council. Copyright (C) 1999-2000 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Durham Univ.)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1981 (RFWS):
 *        Original version.
@@ -101,10 +122,10 @@
 *        Report an error only if no stars at all can be used. Previously,
 *        an error was reported if any stars could not be used.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

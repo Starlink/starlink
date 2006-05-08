@@ -2,21 +2,21 @@
 *+
 *  Name:
 *     KPS1_FOHEx
- 
+
 *  Purpose:
 *     Produces a Hermitian FFT image from separate 2-d arrays holding
 *     real and imaginary parts of the FFT.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
-*  Invocation
+
+*  Invocation:
 *     CALL KPS1_FOHEx( M, N, R, I, H, MAXDEV, STATUS )
- 
+
 *  Description:
 *     The real and imaginary arrays are `tangled' to form an Hermitian
 *     matrix.
- 
+
 *  Arguments:
 *     M = INTEGER (Given)
 *        Number of pixels per line in each of the input arrays.
@@ -33,7 +33,7 @@
 *        component.
 *     STATUS = INTEGER (Given)
 *        The global status.
- 
+
 *  Algorithm:
 *     - The `untangling' process described in routine FFTFOR is
 *       reversed.
@@ -49,18 +49,39 @@
 *       invert the FFT.  The user is told what the maximum deviation is
 *       between any two estimates of the same pixel in the Hermitian
 *       FFT.
- 
+
 *  Notes:
 *     -  There is a routine for real and double-precision floating-
 *     point data: replace "x" in the routine name by D or R as
 *     appropriate.  The arrays and maximum difference supplied to
 *     the routine must have the data type specified.
- 
+
+*  Copyright:
+*     Copyright (C) 1988, 1990 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1988 Jun 6 (DSB):
 *        Original version.
@@ -76,10 +97,10 @@
 *     1995 March 30 (MJC):
 *        Made generic from HERMIT.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

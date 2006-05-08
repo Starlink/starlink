@@ -2,17 +2,17 @@
 *+
 *  Name:
 *     KPS1_TRNDx
- 
+
 *  Purpose:
 *     Reads a formatted ASCII file who records comprise data values
 *     and stores in an array.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPS1_TRNDx( FD, NELM, ARRAY, STATUS )
- 
+
 *  Description:
 *     This routine reads records from an ASCII file comprising data
 *     values that are to be read into an array, usually for storage in
@@ -20,7 +20,7 @@
 *     either whole lines or at the end of lines.  A comment is
 *     recognised by the ! or # which starts it.  The values in the
 *     record (less any comment) are converted to the required data type.
- 
+
 *  Arguments:
 *     FD = INTEGER (Given)
 *        Descriptor for the ASCII file containing records of numeric
@@ -31,28 +31,48 @@
 *        The array to be filled with values from the ASCII file.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for integer and floating-point data types:
 *        replace "x" in the routine name by I, D, or R as appropriate.
 *     -  A warning is reported if the shape does not use all the data
 *     points in the file.
- 
+
 *  Prior Requirements:
 *     - The file must have already been opened and should be rewound.
- 
+
+*  Copyright:
+*     Copyright (C) 1990 Science & Engineering Research Council. All
+*     Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1990 Jun 13 (MJC):
 *        Original version.
 *     {enter_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
  
 *  Type Definitions:

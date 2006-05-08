@@ -26,20 +26,6 @@
 *     to the GRID axis used as the abscissa  for the middle data line (i.e. 
 *     the line with index (NDISP + 1)/2 ).
 
-*  Environment Parameters:
-*     XLEFT = LITERAL (Read)
-*        The axis value to place at the left hand end of the horizontal
-*        axis. The dynamic default is the value for the first element in the 
-*        data being displayed. The value supplied may be greater than or 
-*        less than the value supplied for XRIGHT. A formatted value for the 
-*        quantity specified by parameter USEAXIS should be supplied. []
-*     XRIGHT = LITERAL (Read)
-*        The axis value to place at the right hand end of the horizontal
-*        axis. The dynamic default is the value for the last element in the 
-*        data being displayed. The value supplied may be greater than or 
-*        less than the value supplied for XLEFT. A formatted value for the 
-*        quantity specified by parameter USEAXIS should be supplied. []
-
 *  Arguments:
 *     ABSDIM = INTEGER (Given)
 *        The number of grid elements along the abscissa axis of the data 
@@ -81,6 +67,40 @@
 *        The annotated axis value at the right end of the horizontal axis.
 *     STATUS = INTEGER (Given and Returned)
 *        Global status value.
+
+*  Environment Parameters:
+*     XLEFT = LITERAL (Read)
+*        The axis value to place at the left hand end of the horizontal
+*        axis. The dynamic default is the value for the first element in the 
+*        data being displayed. The value supplied may be greater than or 
+*        less than the value supplied for XRIGHT. A formatted value for the 
+*        quantity specified by parameter USEAXIS should be supplied. []
+*     XRIGHT = LITERAL (Read)
+*        The axis value to place at the right hand end of the horizontal
+*        axis. The dynamic default is the value for the last element in the 
+*        data being displayed. The value supplied may be greater than or 
+*        less than the value supplied for XLEFT. A formatted value for the 
+*        quantity specified by parameter USEAXIS should be supplied. []
+
+*  Copyright:
+*     Copyright (C) 1998, 2000, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
