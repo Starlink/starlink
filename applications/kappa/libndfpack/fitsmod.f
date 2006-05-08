@@ -218,133 +218,36 @@
 *        The editing instructions are stored in the text file called
 *        fitstable.txt.
 
-*  Timing:
-*     Approximately proportional to the number of FITS keywords to be
-*     edited.  "Update" and "Write" edits require the most time.
+*  References:
+*     "A User's Guide for the Flexible Image Transport System (FITS)",
+*     NASA/Science Office of Science and Technology (1994).
 
-*  File Format:
-*     The file consists of a series of lines, one per editing
-*     instruction, although blank lines and lines beginning with a ! or
-*     # are treated as comments.  Note that the order does matter, as
-*     the edits are performed in the order given.
-*
-*     The format is summarised below:
-*
-*       command keyword{[occur]}{(keyword{[occur]})} {value {comment}}
-*
-*     where braces indicate optional values, and occur is the
-*     occurrence of the keyword.  In effect there are four fields
-*     delineated by spaces that define the edit operation, keyword,
-*     value and comment.
-*
-*     -  Field 1:
-*        This specifies the editing operation.  Allowed values are
-*        Delete, Exist, Move, Read, Write, and Update, and can be
-*        abbreviated to the initial letter.  Delete removes a named
-*        keyword.  Read causes the value of a named keyword to be
-*        displayed to standard output.  Exist reports TRUE to standard
-*        output if the named keyword exists in the header, and FALSE if
-*        the keyword is not present.  Move relocates a named keyword to
-*        be immediately before a second keyword.  When this positional
-*        keyword is not supplied, it defaults to the END card, and if
-*        the END card is absent, the new location is at the end of the
-*        headers.  Write creates a new card given a value and an
-*        optional comment.  Its location uses the same rules as for the
-*        Move command.  Update revises the value and/or the comment.
-*        If a secondary keyword is defined explicitly, the card may be
-*        relocated at the same time.  Update requires that the keyword
-*        exists.
+*  Related Applications:
+*     KAPPA: FITSEDIT, FITSEXIST, FITSEXP, FITSHEAD, FITSIMP, FITSLIST,
+*     FITSVAL, FITSWRITE.
 
-*     -  Field 2:
-*        This specifies the keyword to edit, and optionally the
-*        position of that keyword in the header after the edit (for
-*        Move, Write and Update edits).  The new position in the header
-*        is immediately before a positional keyword, whose name is
-*        given in parentheses concatenated to the edit keyword.  See
-*        "Field 1" for defaulting when the position parameter is not
-*        defined or is null.
-*
-*        Both the editing keyword and position keyword may be compound
-*        to handle hierarchical keywords.  In this case the form is
-*        keyword1.keyword2.keyword3 etc.  All keywords must be valid
-*        FITS keywords.  This means they must be no more than 8
-*        characters long, and the only permitted characters are
-*        uppercase alphabetic, numbers, hyphen, and underscore.
-*        Invalid keywords will be rejected.
-*
-*        Both the edit and position keyword may have an occurrence
-*        specified in brackets [].  This enables editing of a keyword
-*        that is not the first occurrence of that keyword, or locate a
-*        edited keyword not at the first occurrence of the positional
-*        keyword.  Note that it is not normal to have multiple
-*        occurrences of a keyword in a FITS header, unless it is blank,
-*        COMMENT or HISTORY.  Any text between the brackets other than
-*        a positive integer is interpreted as the first occurrence.
+*  Notes:
+*     -  Requests to move, assign values or comments, the following
+*     reserved keywords in the FITS extension are ignored: SIMPLE,
+*     BITPIX, NAXIS, NAXISn, EXTEND, PCOUNT, GCOUNT, XTENSION, BLOCKED,
+*     and END.
+*     -  When an error occurs during editing, warning messages are sent
+*     at the normal reporting level, and processing continues to the
+*     next editing command.
+*     -  The FITS fixed format is used for writing or updating
+*     headers, except for double-precision values requiring more space.
+*     The comment is delineated from the value by the string " / ".
+*     -  The comments in comment cards begin one space following the
+*     keyword or from column 10 whichever is greater.
+*     -  To be sure that the resultant FITS extension is what you
+*     desired, you should inspect it using the command FITSLIST before
+*     exporting the data.  If there is something wrong, you may find it
+*     convenient to use command FITSEDIT to make minor corrections.
 
-*        Use a null value ('' or "") if you want the card to be a
-*        comment with keyword other than COMMENT or HISTORY.  As blank
-*        keywords are used for hierarchical keywords, to write a
-*        comment in a blank keyword you must give a null edit keyword.
-*        These have no keyword appearing before the left parenthesis
-*        or bracket, such as (), [], [2], or (EPOCH).
-
-*     -  Field 3:
-*        This specifies the value to assign to the edited keyword in
-*        the Write and Update operations, or the name of the new
-*        keyword in the Rename modification.  If the keyword exists,
-*        the existing value or keyword is replaced, as appropriate.
-*        The data type used to store the value is inferred from the
-*        value itself.  See topic "Value Data Type".
-*
-*        For the Update and Write modifications there is a special
-*        value, $V, which means use the current value of the edited
-*        keyword, provided that keyword exists.  This makes it possible
-*        to modify a comment, leaving the value unaltered.  In addition
-*        $V(keyword) requests that the value of the keyword given
-*        between the parentheses be assigned to the keyword being
-*        edited.
-*
-*        The value field is ignored when the keyword is COMMENT,
-*        HISTORY or blank, and the modification is to Update or Write.
-
-*     -  Field 4:
-*        This specifies the comment to assign to the edited keyword for
-*        the Write and Update operations.  A leading "/" should not be
-*        supplied.
-
-*        There is a special value, $C, which means use the current
-*        comment of the edited keyword, provided that keyword exists.
-*        This makes it possible to modify a value, leaving the comment
-*        unaltered.  In addition $C(keyword) requests that the comment
-*        of the keyword given between the parentheses be assigned to
-*        the edited keyword.
-*
-*        To obtain leading spaces before some commentary, use a quote
-*        (') or double quote (") as the first character of the comment.
-*        There is no need to terminate the comment with a trailing and
-*        matching quotation character.  Also do not double quotes
-*        should one form part of the comment.
-
-*  Value Data Type:
-*     The data type of a value is determined as follows:
-*        -  For the text-file, values enclosed in quotes (') or doubled
-*        quotes (") are strings.  Note that numeric or logical string
-*        values must be quoted to prevent them being converted to a
-*        numeric or logical value in the FITS extension.
-*        -  For prompting the value is a string when parameter STRING
-*        is TRUE.
-*        -  Otherwise type conversions of the first word after the
-*        keywords are made to integer, double precision, and logical
-*        types in turn.  If a conversion is successful, that becomes the
-*        data type.  In the case of double precision, the type is set
-*        to real when the number of significant digits only warrants
-*        single precision.  If all the conversions failed the value
-*        is deemed to be a string.
-
-*  Examples of the File Format:
+*  Examples of The File Format:
 *     The best way to illustrate the options is by listing some example
 *     lines.
-*     
+*
 *         P AIRMASS
 *     This reports the value of keyword AIRMASS to standard output.
 *
@@ -404,31 +307,148 @@
 *     This moves the second occurrence of keyword OFFSET to just
 *     before the third COMMENT card.
 
-*  Notes:
-*     -  Requests to move, assign values or comments, the following
-*     reserved keywords in the FITS extension are ignored: SIMPLE,
-*     BITPIX, NAXIS, NAXISn, EXTEND, PCOUNT, GCOUNT, XTENSION, BLOCKED,
-*     and END.
-*     -  When an error occurs during editing, warning messages are sent
-*     at the normal reporting level, and processing continues to the
-*     next editing command.
-*     -  The FITS fixed format is used for writing or updating
-*     headers, except for double-precision values requiring more space.
-*     The comment is delineated from the value by the string " / ".
-*     -  The comments in comment cards begin one space following the
-*     keyword or from column 10 whichever is greater.
-*     -  To be sure that the resultant FITS extension is what you
-*     desired, you should inspect it using the command FITSLIST before
-*     exporting the data.  If there is something wrong, you may find it
-*     convenient to use command FITSEDIT to make minor corrections.
+*  File Format:
+*     The file consists of a series of lines, one per editing
+*     instruction, although blank lines and lines beginning with a ! or
+*     # are treated as comments.  Note that the order does matter, as
+*     the edits are performed in the order given.
+*
+*     The format is summarised below:
+*
+*       command keyword{[occur]}{(keyword{[occur]})} {value {comment}}
+*
+*     where braces indicate optional values, and occur is the
+*     occurrence of the keyword.  In effect there are four fields
+*     delineated by spaces that define the edit operation, keyword,
+*     value and comment.
+*
+*     -  Field 1:
+*        This specifies the editing operation.  Allowed values are
+*        Delete, Exist, Move, Read, Write, and Update, and can be
+*        abbreviated to the initial letter.  Delete removes a named
+*        keyword.  Read causes the value of a named keyword to be
+*        displayed to standard output.  Exist reports TRUE to standard
+*        output if the named keyword exists in the header, and FALSE if
+*        the keyword is not present.  Move relocates a named keyword to
+*        be immediately before a second keyword.  When this positional
+*        keyword is not supplied, it defaults to the END card, and if
+*        the END card is absent, the new location is at the end of the
+*        headers.  Write creates a new card given a value and an
+*        optional comment.  Its location uses the same rules as for the
+*        Move command.  Update revises the value and/or the comment.
+*        If a secondary keyword is defined explicitly, the card may be
+*        relocated at the same time.  Update requires that the keyword
+*        exists.
+*
+*     -  Field 2:
+*        This specifies the keyword to edit, and optionally the
+*        position of that keyword in the header after the edit (for
+*        Move, Write and Update edits).  The new position in the header
+*        is immediately before a positional keyword, whose name is
+*        given in parentheses concatenated to the edit keyword.  See
+*        "Field 1" for defaulting when the position parameter is not
+*        defined or is null.
+*
+*        Both the editing keyword and position keyword may be compound
+*        to handle hierarchical keywords.  In this case the form is
+*        keyword1.keyword2.keyword3 etc.  All keywords must be valid
+*        FITS keywords.  This means they must be no more than 8
+*        characters long, and the only permitted characters are
+*        uppercase alphabetic, numbers, hyphen, and underscore.
+*        Invalid keywords will be rejected.
+*
+*        Both the edit and position keyword may have an occurrence
+*        specified in brackets [].  This enables editing of a keyword
+*        that is not the first occurrence of that keyword, or locate a
+*        edited keyword not at the first occurrence of the positional
+*        keyword.  Note that it is not normal to have multiple
+*        occurrences of a keyword in a FITS header, unless it is blank,
+*        COMMENT or HISTORY.  Any text between the brackets other than
+*        a positive integer is interpreted as the first occurrence.
+*
+*        Use a null value ('' or "") if you want the card to be a
+*        comment with keyword other than COMMENT or HISTORY.  As blank
+*        keywords are used for hierarchical keywords, to write a
+*        comment in a blank keyword you must give a null edit keyword.
+*        These have no keyword appearing before the left parenthesis
+*        or bracket, such as (), [], [2], or (EPOCH).
+*
+*     -  Field 3:
+*        This specifies the value to assign to the edited keyword in
+*        the Write and Update operations, or the name of the new
+*        keyword in the Rename modification.  If the keyword exists,
+*        the existing value or keyword is replaced, as appropriate.
+*        The data type used to store the value is inferred from the
+*        value itself.  See topic "Value Data Type".
+*
+*        For the Update and Write modifications there is a special
+*        value, $V, which means use the current value of the edited
+*        keyword, provided that keyword exists.  This makes it possible
+*        to modify a comment, leaving the value unaltered.  In addition
+*        $V(keyword) requests that the value of the keyword given
+*        between the parentheses be assigned to the keyword being
+*        edited.
+*
+*        The value field is ignored when the keyword is COMMENT,
+*        HISTORY or blank, and the modification is to Update or Write.
+*
+*     -  Field 4:
+*        This specifies the comment to assign to the edited keyword for
+*        the Write and Update operations.  A leading "/" should not be
+*        supplied.
+*
+*        There is a special value, $C, which means use the current
+*        comment of the edited keyword, provided that keyword exists.
+*        This makes it possible to modify a value, leaving the comment
+*        unaltered.  In addition $C(keyword) requests that the comment
+*        of the keyword given between the parentheses be assigned to
+*        the edited keyword.
+*
+*        To obtain leading spaces before some commentary, use a quote
+*        (') or double quote (") as the first character of the comment.
+*        There is no need to terminate the comment with a trailing and
+*        matching quotation character.  Also do not double quotes
+*        should one form part of the comment.
 
-*  References:
-*     "A User's Guide for the Flexible Image Transport System (FITS)",
-*     NASA/Science Office of Science and Technology (1994).
+*  Timing:
+*     Approximately proportional to the number of FITS keywords to be
+*     edited.  "Update" and "Write" edits require the most time.
 
-*  Related Applications:
-*     KAPPA: FITSEDIT, FITSEXIST, FITSEXP, FITSHEAD, FITSIMP, FITSLIST,
-*     FITSVAL, FITSWRITE.
+*  Value Data Type:
+*     The data type of a value is determined as follows:
+*        -  For the text-file, values enclosed in quotes (') or doubled
+*        quotes (") are strings.  Note that numeric or logical string
+*        values must be quoted to prevent them being converted to a
+*        numeric or logical value in the FITS extension.
+*        -  For prompting the value is a string when parameter STRING
+*        is TRUE.
+*        -  Otherwise type conversions of the first word after the
+*        keywords are made to integer, double precision, and logical
+*        types in turn.  If a conversion is successful, that becomes the
+*        data type.  In the case of double precision, the type is set
+*        to real when the number of significant digits only warrants
+*        single precision.  If all the conversions failed the value
+*        is deemed to be a string.
+
+*  Copyright:
+*     Copyright (C) 1996, 1999-2000, 2004 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)

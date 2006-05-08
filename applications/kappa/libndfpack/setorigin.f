@@ -15,6 +15,10 @@
 *  Invocation:
 *     CALL SETORIGIN( STATUS )
 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
 *  Description:
 *     This application sets a new pixel origin value for an NDF data
 *     structure.  The NDF is accessed in update mode and the indices of
@@ -41,16 +45,6 @@
 *        A 1-dimensional array specifying the new pixel origin values,
 *        one for each NDF dimension.
 
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
-*  Notes:
-*     If the number of new pixel origin values is less than the number
-*     of NDF dimensions, then the pixel origin of the extra dimensions
-*     will remain unchanged.  If the number of values exceeds the number
-*     of NDF dimensions, then the excess values will be ignored.
-
 *  Examples:
 *     setorigin image_2d [1,1]
 *        Sets the indices of the first pixel in the 2-dimensional image
@@ -68,12 +62,39 @@
 *        Sets the pixel origin of the NDF called betapic to be equal to
 *        that of the NDF called alphapic.
 
+*  Related Applications:
+*     KAPPA: SETBOUND.
+
+*  Notes:
+*     If the number of new pixel origin values is less than the number
+*     of NDF dimensions, then the pixel origin of the extra dimensions
+*     will remain unchanged.  If the number of values exceeds the number
+*     of NDF dimensions, then the excess values will be ignored.
+
 *  Timing:
 *     Setting a new pixel origin is a quick operation whose timing does
 *     not depend on the size of the NDF.
 
-*  Related Applications:
-*     KAPPA: SETBOUND.
+*  Copyright:
+*     Copyright (C) 1990-1991 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)

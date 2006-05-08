@@ -42,6 +42,9 @@
 *        This places the FITS headers stored in the text file called
 *        headers.lis in the FITS extension of the NDF called hh73.
 
+*  Related Applications:
+*     KAPPA: FITSEDIT, FITSEXP, FITSLIST; CONVERT: NDF2FITS.
+
 *  Notes:
 *     - The validation process performs the following checks on each
 *     header `card':
@@ -67,10 +70,10 @@
 *       by a space; and
 *       j) comments begin at least two columns after the end of the
 *       comment delimiter.
-
+*
 *     - The validation issues warning messages at the normal reporting
 *     level for violations a), b), c), d), and i).
-
+*
 *     -  The validation can only go so far.  If any of your header lines
 *     are ambiguous, the resulting entry in the FITS extension may not
 *     be what you intended.  Therefore, you should inspect the
@@ -78,8 +81,26 @@
 *     exporting the data.  If there is something wrong, you may find it
 *     convenient to use command FITSEDIT to make minor corrections.
 
-*  Related Applications:
-*     KAPPA: FITSEDIT, FITSEXP, FITSLIST; CONVERT: NDF2FITS.
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.
+*     Copyright (C) 1996, 1998 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)

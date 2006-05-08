@@ -16,6 +16,10 @@
 *  Invocation:
 *     CALL SETAXIS( STATUS )
 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
 *  Description:
 *     This routine modifies the values of an axis array component or
 *     system within an NDF data structure.  There are a number of
@@ -25,7 +29,7 @@
 *     whole array using Fortran-like mathematical expressions, or values
 *     in a text file, or to pixel co-ordinates, or by copying from
 *     another NDF.
-*      
+*
 *     If an AXIS structure does not exist, a new one whose centres are
 *     pixel co-ordinates is created before any modification.
 
@@ -137,10 +141,6 @@
 *        value used is the current data type of the array component if 
 *        it exists, otherwise it is "_REAL". [!]
 
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
 *  Examples:
 *     setaxis ff mode=delete
 *        This erases the axis structure from the NDF called ff.
@@ -175,6 +175,12 @@
 *        This assigns the value 1.0E-05 to the axis width at index -16
 *        along the first axis of the NDF called cube.
 
+*  Related Applications:
+*     KAPPA: AXCONV, AXLABEL, AXUNITS; Figaro: LXSET, LYSET.
+
+*  Implementation Status:
+*     Processing is in single- or double-precision floating point.
+
 *  Notes:
 *     -  An end-of-file error results when MODE="File" and the file
 *     does not contain sufficient values to assign to the whole array.
@@ -206,11 +212,25 @@
 *          35.2 37.
 *         <EOF>
 
-*  Related Applications:
-*     KAPPA: AXCONV, AXLABEL, AXUNITS; Figaro: LXSET, LYSET.
+*  Copyright:
+*     Copyright (C) 1995, 2000-2001, 2004 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
 
-*  Implementation Status:
-*     Processing is in single- or double-precision floating point.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)

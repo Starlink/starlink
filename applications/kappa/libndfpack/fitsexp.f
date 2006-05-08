@@ -49,9 +49,43 @@
 *        are under the control of a keyword translation table held in
 *        the file fitstable.txt. 
 
-*  Timing:
-*     Approximately proportional to the number of FITS keywords to be
-*     translated.
+*  References:
+*     "A User's Guide for the Flexible Image Transport System (FITS)",
+*     NASA/Science Office of Science and Technology (1994).
+
+*  Related Applications:
+*     KAPPA: FITSEDIT, FITSHEAD, FITSLIST, FITSMOD; CONVERT: NDF2FITS.
+
+*  Implementation Status:
+*     -  The replacements are made in blocks of 32 to reduce the number
+*     of time-consuming shuffles of the FITS extension.  Thus it is
+*     possible to locate a new keyword before another keyword, provided
+*     the latter keyword appears in an earlier block, though reliance
+*     on this feature is discouraged; instead run the application
+*     twice.
+*     -  For each block the application inserts new cards or relocates
+*     old ones, marking each with different tokens, and then sorts the
+*     FITS extension into the requested order, removing the relocated
+*     cards.  It then inserts the new values.  If there are multiple
+*     occurrences of a keyword, this process can leave behind cards
+*     having the token value '{undefined}'.
+
+*  Notes:
+*     -  Requests to assign values to the following reserved keywords
+*     in the FITS extension are ignored: SIMPLE, BITPIX, NAXIS, NAXISn,
+*     EXTEND, PCOUNT, GCOUNT, XTENSION, BLOCKED, and END.
+*     -  Only scalar or one-element vector components may be
+*     transferred to the FITS extension.
+*     -  The data type of the component selects the type of the FITS
+*     value.
+*     -  If the destination keyword exists, the existing value and
+*     comment are replaced with the new values.
+*     -  If an error is found within a line, processing continues
+*     to the next line and the error reported.
+*     -  To be sure that the resultant FITS extension is what you
+*     desired, you should inspect it using the command fitslist before
+*     exporting the data.  If there is something wrong, you may find it
+*     convenient to use command FITSEDIT to make minor corrections.
 
 *  Table Format:
 *     The keyword translation table should be held in a text file, with
@@ -99,43 +133,30 @@
 *     with an exclamation mark.  The remainder of the line will then be
 *     ignored.
 
-*  Notes:
-*     -  Requests to assign values to the following reserved keywords
-*     in the FITS extension are ignored: SIMPLE, BITPIX, NAXIS, NAXISn,
-*     EXTEND, PCOUNT, GCOUNT, XTENSION, BLOCKED, and END.
-*     -  Only scalar or one-element vector components may be
-*     transferred to the FITS extension.
-*     -  The data type of the component selects the type of the FITS
-*     value.
-*     -  If the destination keyword exists, the existing value and
-*     comment are replaced with the new values.
-*     -  If an error is found within a line, processing continues
-*     to the next line and the error reported.
-*     -  To be sure that the resultant FITS extension is what you
-*     desired, you should inspect it using the command fitslist before
-*     exporting the data.  If there is something wrong, you may find it
-*     convenient to use command FITSEDIT to make minor corrections.
+*  Timing:
+*     Approximately proportional to the number of FITS keywords to be
+*     translated.
 
-*  Implementation Status:
-*     -  The replacements are made in blocks of 32 to reduce the number
-*     of time-consuming shuffles of the FITS extension.  Thus it is
-*     possible to locate a new keyword before another keyword, provided
-*     the latter keyword appears in an earlier block, though reliance
-*     on this feature is discouraged; instead run the application
-*     twice.
-*     -  For each block the application inserts new cards or relocates
-*     old ones, marking each with different tokens, and then sorts the
-*     FITS extension into the requested order, removing the relocated
-*     cards.  It then inserts the new values.  If there are multiple
-*     occurrences of a keyword, this process can leave behind cards
-*     having the token value '{undefined}'.
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.
+*     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
 
-*  References:
-*     "A User's Guide for the Flexible Image Transport System (FITS)",
-*     NASA/Science Office of Science and Technology (1994).
-
-*  Related Applications:
-*     KAPPA: FITSEDIT, FITSHEAD, FITSLIST, FITSMOD; CONVERT: NDF2FITS.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)

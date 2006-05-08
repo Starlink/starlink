@@ -188,15 +188,6 @@
 *        Whether or not there are axis width arrays present in the NDF.
 *        This is only written when FULLAXIS is TRUE and AXIS is TRUE.
 
-*  Notes:
-*     -  If the WCS component of the NDF is undefined, then an attempt 
-*     is made to find WCS information from two other sources: first, an 
-*     IRAS90 astrometry structure, and second, the FITS extension.  If 
-*     either of these sources yield usable WCS information, then it is
-*     displayed in the same way as the NDF WCS component.  Other KAPPA
-*     applications will use this WCS information as if it were stored in
-*     the WCS component.
-
 *  Examples:
 *     ndftrace mydata
 *        Displays information about the attributes of the NDF structure
@@ -210,6 +201,37 @@
 
 *  Related Applications:
 *     KAPPA: WCSFRAME; HDSTRACE
+
+*  Notes:
+*     -  If the WCS component of the NDF is undefined, then an attempt 
+*     is made to find WCS information from two other sources: first, an 
+*     IRAS90 astrometry structure, and second, the FITS extension.  If 
+*     either of these sources yield usable WCS information, then it is
+*     displayed in the same way as the NDF WCS component.  Other KAPPA
+*     applications will use this WCS information as if it were stored in
+*     the WCS component.
+
+*  Copyright:
+*     Copyright (C) 1990-1994 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1997, 1999-2000, 2003-2004 Central Laboratory
+*     of the Research Councils. Copyright (C) 2005-2006 Particle
+*     Physics & Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)

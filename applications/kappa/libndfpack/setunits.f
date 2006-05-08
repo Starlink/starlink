@@ -15,6 +15,10 @@
 *  Invocation:
 *     CALL SETUNITS( STATUS )
 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
 *  Description:
 *     This routine sets a new value for the UNITS component of an
 *     existing NDF data structure. The NDF is accessed in update mode
@@ -51,13 +55,6 @@
 *        display where the NDF's data values are shown.  The suggested
 *        default is the current value.
 
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
-*  Related Applications:
-*     KAPPA: AXUNITS, SETLABEL, SETTITLE.
-
 *  Examples:
 *     setunits ngc1342 "count/s"
 *        Sets the UNITS component of the NDF structure ngc1342 to have
@@ -78,6 +75,30 @@
 *        1.0E22.  However, if the original units component was (say) "K"
 *        (Kelvin) then an error would be reported since there is no
 *        direct conversion from Kelvin to MegaJansky.
+
+*  Related Applications:
+*     KAPPA: AXUNITS, SETLABEL, SETTITLE.
+
+*  Copyright:
+*     Copyright (C) 1990 Science & Engineering Research Council.
+*     Copyright (C) 1995, 2003-2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)

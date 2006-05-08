@@ -34,7 +34,7 @@
 *     specify a list of files, including wildcards.  A record of the
 *     FITS headers, and group parameters (for a group-format file) can
 *     be stored in a text file.
-
+*
 *     There is an option to run in automatic mode, where the names of
 *     output NDF data structures are generated automatically, and you
 *     can decide whether or not format conversion is to be applied to
@@ -61,7 +61,7 @@
 *        example, if the prefix was "XRAY" and the 25th file of the
 *        tape was being processed, the filename of the NDF would be
 *        XRAY25.
-
+*
 *        For table-format FITS objects in the automatic mode the
 *        application generates a filename beginning with a defined
 *        prefix followed by the number of the file on tape.  For
@@ -131,7 +131,7 @@
 *        in which case the value actually used is in the first in the
 *        list for which corresponding keywords can be found in the FITS
 *        header.
-*        
+*
 *        A FITS header may contain keywords from more than one of these
 *        encodings, in which case it is possible for the encodings to
 *        be inconsistent with each other.  This may happen for instance
@@ -299,7 +299,7 @@
 *     -  The application processes tapes blocked at other than an
 *     integer multiple of 2880 bytes up to a maximum of 63360, provided
 *     it is a multiple of the number of bytes per data value.
-
+*
 *     -  For simple or group format FITS:
 *        -  IEEE floating point is supported.
 *        -  If BUNIT is present its value will appear as the NDF's
@@ -330,6 +330,27 @@
 *     header cards only, then a dummy vector data array of dimension
 *     two is created to make the output a valid NDF.  This data array
 *     is undefined.
+
+*  Copyright:
+*     Copyright (C) 1987-1993 Science & Engineering Research Council.
+*     Copyright (C) 1995-1996, 1998, 2000, 2004 Central Laboratory of
+*     the Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)

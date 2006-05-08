@@ -102,6 +102,9 @@
 *        This chooses a co-ordinate Frame with domain WORLD if one exists, 
 *        or the PIXEL co-ordinate Frame otherwise.
 
+*  Related Applications:
+*     KAPPA: NDFTRACE, WCSREMOVE, WCSCOPY, WCSATTRIB
+
 *  Notes:
 *     -  The current co-ordinate Frame in the supplied NDF is not displayed 
 *     if a value is assigned to parameter FRAME on the command line.
@@ -110,8 +113,25 @@
 *     -  The NDFTRACE command can be used to examine the co-ordinate
 *     Frames in the WCS component of an NDF.
 
-*  Related Applications:
-*     KAPPA: NDFTRACE, WCSREMOVE, WCSCOPY, WCSATTRIB
+*  Copyright:
+*     Copyright (C) 1998-1999 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

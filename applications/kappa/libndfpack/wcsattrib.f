@@ -23,7 +23,7 @@
 *     This application can be used to manage the values of attributes 
 *     associated with the current co-ordinate Frame of an NDF (title, axis 
 *     labels, axis units, etc).
-
+*
 *     Each attribute has a name, a value, and a state. This application 
 *     accesses all attribute values as character strings, converting to 
 *     and from other data types as necessary. The attribute state is a 
@@ -151,6 +151,9 @@
 *        modified in order to precess them from the original (incorrect)
 *        equinox to J2000.
 
+*  Related Applications:
+*     KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD, AXLABEL, AXUNITS
+
 *  Notes:
 *     -  An error is reported if an attempt is made to set or clear the 
 *     Base Frame in the WCS component.
@@ -158,8 +161,25 @@
 *     the NDF library and an error will be reported if an attempt is made 
 *     to assign one of these values to any Frame.
 
-*  Related Applications:
-*     KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD, AXLABEL, AXUNITS
+*  Copyright:
+*     Copyright (C) 1998, 2001, 2003 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

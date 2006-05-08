@@ -107,32 +107,35 @@
 *        pixel origin has been reset by SQORST. The squashing factor for
 *        the first axis is then:
 *
-*        	FX = M/(I2 - I1 + 1)
+*                FX = M/(I2 - I1 + 1)
 *
 *        and the shift in the pixel origin is:
 *
-*        	SX = FX*( 1 - I1 )
+*                SX = FX*( 1 - I1 )
 *
 *        Likewise, if the bounds of the second axis in m51 are J1:J2,
 *        and SQORST parameter YDIM is set to N, then the squashing
 *        factor for the second axis is:
 *
-*        	FY = N/(J2 - J1 + 1)
+*                FY = N/(J2 - J1 + 1)
 *
 *        and the shift in the pixel origin is:
 *
-*        	SY = FY*( 1 - J1 )
+*                SY = FY*( 1 - J1 )
 *
 *        You would then use the following values for parameter TR when
 *        running WCSCOPY:
 *
-*        	TR = [SX, FX, 0.0, SY, 0.0, FY]
+*                TR = [SX, FX, 0.0, SY, 0.0, FY]
 *
 *        Note, the zero terms indicate that the axes are independent
 *        (i.e. there is no rotation of the image). The numerical values
 *        in the example are for an image with pixel-index bounds of
 *        52:251 on both axes which was squashed by SQORST to produce an
 *        image with 100 pixels on each axis.
+
+*  Related Applications:
+*     KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSADD, WCSATTRIB
 
 *  Notes:
 *     -  An error is reported if the transformation supplied using
@@ -147,8 +150,25 @@
 *     value is given for parameter TR, the supplied WCS component may
 *     still be modified if the two NDFs have different pixel origins. 
 
-*  Related Applications:
-*     KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSADD, WCSATTRIB
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

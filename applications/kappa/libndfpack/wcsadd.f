@@ -28,7 +28,7 @@
 *     Mapping for future use by other applications such as REGRID (see 
 *     parameter MAPOUT). A number of different types of Mapping can be 
 *     used (see parameter MAPTYPE).
-*     
+*
 *     When adding a new Frame to a WCS component, the Mapping is used
 *     to connect the new Frame to an existing one (called the "basis"
 *     Frame: see parameter FRAME). The specific type of Frame to add is
@@ -66,7 +66,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of an attribute appropriate to the
 *        type of Frame specified by parameter FRMTYPE (see SUN/210 for
 *        a complete description of all attributes), and <value> is the
@@ -150,7 +150,7 @@
 *        The type of Frame to add to the NDF. If a null (!) value is
 *        supplied, a copy of the basis Frame is used (as modified by 
 *        parameters ATTRS and DOMAIN). The allows values are:
-* 
+*
 *        - FRAME      -- A simple Cartesian Frame (the number of axes is
 *                        equal to the number of outputs from the
 *                        Mapping)
@@ -183,7 +183,7 @@
 *        The type of Mapping to be used to connect the new Frame to the
 *        basis Frame. It must be one of the following strings, each
 *        of which require some additional parameters as indicated:
-* 
+*
 *        - DIAGONAL   -- A linear mapping with no translation
 *                        of off-diagonal coefficients (see parameter
 *                        DIAG)
@@ -331,14 +331,35 @@
 *        the pixels of an NDF according to this transformation.
 *        No NDF is accessed.
 
+*  Related Applications:
+*     KAPPA: NDFTRACE, REGRID, WCSFRAME, WCSREMOVE, WCSATTRIB;
+*     CCDPACK: WCSEDIT.
+
 *  Notes:
 *     -  The new Frame has the same number of axes as the basis Frame.
 *     -  An error is reported if the transformation supplied using
 *     parameter TR is singular. 
 
-*  Related Applications:
-*     KAPPA: NDFTRACE, REGRID, WCSFRAME, WCSREMOVE, WCSATTRIB;
-*     CCDPACK: WCSEDIT.
+*  Copyright:
+*     Copyright (C) 1998-1999, 2001-2003 Central Laboratory of the
+*     Research Councils. Copyright (C) 2005-2006 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

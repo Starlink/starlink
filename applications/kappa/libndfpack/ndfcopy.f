@@ -126,6 +126,9 @@
 *        the original, setting the surrounding region to the bad-pixel
 *        value.
 
+*  Related Applications:
+*     KAPPA: SETBOUND; Figaro: ISUBSET.
+
 *  Implementation Status:
 *     If present, an NDF's TITLE, LABEL, UNITS, DATA, VARIANCE, QUALITY,
 *     AXIS WCS and HISTORY components are copied by this routine,
@@ -133,8 +136,27 @@
 *     modified, if required, by specifying a new value via the TITLE
 *     parameter.
 
-*  Related Applications:
-*     KAPPA: SETBOUND; Figaro: ISUBSET.
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1998, 2000, 2003-2004 Central Laboratory of
+*     the Research Councils. Copyright (C) 2005-2006 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)

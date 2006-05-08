@@ -69,6 +69,15 @@
 *        This sets the history-recording level to be quiet for the NDF
 *        called test42, so that only brief information is recorded.
 
+*  Related Applications:
+*     KAPPA: HISCOM, HISLIST, NDFTRACE.
+
+*  Implementation Deficiencies:
+*     There is no facility to erase history records before a given date
+*     or number.
+*
+*     [optional_A_task_items]...
+
 *  Notes:
 *     -  A HISTORY component is created if it does not exist within the
 *     NDF, except for MODE="Erase".
@@ -77,14 +86,27 @@
 *     changed.  Thus the history information will show where there may
 *     be gaps in the recording.
 
-*  Related Applications:
-*     KAPPA: HISCOM, HISLIST, NDFTRACE.
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council.
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
 
-*  Implementation Deficiencies:
-*     There is no facility to erase history records before a given date
-*     or number.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
-*  [optional_A_task_items]...
 *  Authors:
 *     RFWS: R.F.Warren-Smith (STARLINK, RAL)
 *     MJC: Malcolm J. Currie (STARLINK)
