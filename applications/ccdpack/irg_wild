@@ -7,11 +7,11 @@
 #  Purpose:
 #     Wildcards files into a list for use by NDF applications.
 
+#  Language:
+#     {routine_language}
+
 #  Type of Module:
 #     Bourne shell script
-
-#  Usage:
-#     irg_wild filename_pattern [filename_pattern] ...
 
 #  Description:
 #     This routine is designed to output a list of files that can be
@@ -24,13 +24,15 @@
 #     extensions) are sorted using the priority specified in the 
 #     NDF_FORMATS_IN environment variable.
 
+#  Usage:
+#     irg_wild filename_pattern [filename_pattern] ...
+
 #  Examples:
-#
 #     irg_wild "*"
 #        This list all the files in the current directory that 
 #        can be processed. Any duplicates are removed according
 #        to the priority defined the NDF_FORMATS_IN variable. 
-#        
+#
 #     irg_wild "*.fit" "*.imh"
 #        This example would output a list of all the files with 
 #        extensions ".fit" and ".imh".
@@ -50,6 +52,26 @@
 #     are located. Only the file with higher priority in the 
 #     NDF_FORMATS_IN string will be returned (even if this second
 #     name is "only" picked up from pattern).
+
+#  Copyright:
+#     Copyright (C) 1997-1998 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     RFWS: Rodney Warren-Smith (Starlink)
