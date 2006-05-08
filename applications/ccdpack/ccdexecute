@@ -1,33 +1,30 @@
 #!/bin/csh
 
 #+
-#   Name:
+#  Name:
 #      ccdexecute
-#
-#   Purpose:
+
+#  Purpose:
 #      Executes a CCDPACK command file in the background.
-#
-#   Language:
+
+#  Language:
 #      C shell
-#
-#   Type of Module:
+
+#  Type of Module:
 #      C shell script
-#
-#   Note:
-#      - C shell specific.
-#
-#   Usage:
-#      ccdexecute script_type user_script [logfile]
-#
-#   Description:
+
+#  Description:
 #      This command saves the current ADAM execution environment
 #      and then executes the given command procedure in the
 #      background. The output from executing the procedure is
 #      written to the file "logfile". The type of script file
 #      should be "CSH" or "ICL". "CSH" for a C-shell script and
 #      "ICL" for an ICL script.
-#
-#   ADAM Parameters:
+
+#  Usage:
+#      ccdexecute script_type user_script [logfile]
+
+#  ADAM Parameters:
 #      $1 = string (read)
 #         The type of command file to be executed, "CSH" or "ICL".
 #      $2 = filename (read)
@@ -36,18 +33,42 @@
 #      $3 = filename (write)
 #         The name of a file to contain any output from the execution
 #         of the command procedure.
-#
-#   Examples:
+
+#  Examples:
 #      ccdexecute ccdred ccdred.log
 #         In this example the CCDPACK commands written in the file
 #         ccdred are executed and any output is recorded in the
 #         file ccdred.log.
+
+#  Note:
+#      - C shell specific.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council.
+#     Copyright (C) 1995 Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
 #
-#   Authors:
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
 #      PDRAPER: Peter Draper (STARLINK)
 #      {enter_new_authors_here}
-#
-#   History:
+
+#  History:
 #      4-JAN-1994 (PDRAPER):
 #         Original Version.
 #      18-AUG-1995 (PDRAPER):
@@ -56,6 +77,10 @@
 #         unset ADAM_TASK_TYPE which might make future TCL tasks not
 #         reset the parameter system (probably not important for C-shell).
 #      {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 #  Test for at least two parameters - the user shell type and script name.

@@ -1,25 +1,19 @@
 #!/bin/csh
 #+
-#   Name:
+#  Name:
 #      CCDFORK
 
-#   Purpose:
+#  Purpose:
 #      Creates a script for executing CCDPACK commands in a background
 #      process.
 
-#   Language:
+#  Language:
 #      C shell
-   
-#   Type of Module:
+
+#  Type of Module:
 #      C shell script
 
-#   Note:
-#      - C shell specific.
-
-#   Usage:
-#      ccdfork input_script [output_script] [directory]
-
-#   Description:
+#  Description:
 #       This procedure performs any additional work that is required
 #       to safely execute a set of CCDPACK commands in a background job.
 #
@@ -31,7 +25,10 @@
 #       The output script should be executed as a nice priority
 #       background job (see the examples section).
 
-#   ADAM Parameters:
+#  Usage:
+#      ccdfork input_script [output_script] [directory]
+
+#  ADAM Parameters:
 #      $1 = filename (read)
 #         The name of the script file which contains the 
 #         CCDPACK commands which are to be run in the background. 
@@ -46,7 +43,7 @@
 #         of the current ADAM_USER parent is created. 
 #         [adam_unique_string]
 
-#   Examples:
+#  Examples:
 #      ccdfork ccdred
 #      nice ccdpack_fork &
 #         In this example ccdfork saves the current ADAM parameter
@@ -59,22 +56,49 @@
 #      nice batch1 &
 #         As above except that the output script is now called
 #         batch1.
-#      
+#
 #      ccdfork ccdred batch2 /scratch/user/batch2
 #         As above except the output script is now called batch2
 #         and the ADAM parameter files are written to the directory
 #         /scratch/user/batch2.
 
-#   Authors:
+#  Note:
+#      - C shell specific.
+
+#  Copyright:
+#     Copyright (C) 1992-1993 Science & Engineering Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
 #      PDRAPER: Peter Draper (STARLINK)
 #      {enter_new_authors_here}
 
-#   History:
+#  History:
 #      30-APR-1992 (PDRAPER):
 #         Original Version.
 #      12-AUG-1993 (PDRAPER):
 #         Changed to test for ccdpack definition.
 #      {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
 #-
 
 
