@@ -1318,23 +1318,25 @@ int StarWCS::make2D()
     // detect the correct axes.
     double in1[2][1];
     double out1[MAXDIM][1];
-    in1[0][0] = 0.0;
-    in1[1][0] = 0.0;
+    in1[0][0] = 1.0;
+    in1[1][0] = 1.0;
     for ( i = 0; i < MAXDIM; i++ ) out1[i][0] = 0.0;
     WCSAstTranN( wcs_, 1, 2, 1, in1, 1, nsky, 1, out1 );
 
     double in2[2][1];
     double out2[MAXDIM][1];
-    in2[0][0] = (double) nxpix_;
-    in2[1][0] = (double) nypix_;
+    in2[0][0] = (double) (nxpix_-1);
+    in2[1][0] = (double) (nypix_-1);
     for ( i = 0; i < MAXDIM; i++ ) out2[i][0] = 0.0;
     WCSAstTranN( wcs_, 1, 2, 1, in2, 1, nsky, 1, out2 );
 
     //  Check to see which dimensions have jiggled.
     int n = 0;
     for ( i = 0; i < nsky; i++ ) {
-        if ( fabs( out1[i][0] - out2[i][0] ) > DBL_EPSILON ) {
-            n++;
+        if ( out1[i][0] != AST__BAD &&  out2[i][0] != AST__BAD ) {
+            if ( fabs( out1[i][0] - out2[i][0] ) > DBL_EPSILON ) {
+                n++;
+            }
         }
     }
     if ( ! astOK ) astClearStatus;
