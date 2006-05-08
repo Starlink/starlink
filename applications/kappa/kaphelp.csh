@@ -12,9 +12,6 @@
 #  Type of Module:
 #     C-shell script
 
-#  Invocation:
-#     CALL KAPHELP( STATUS )
-
 #  Description:
 #     Displays help about KAPPA.  The help information has classified
 #     and alphabetical lists of commands, general information about
@@ -42,10 +39,6 @@
 #     See the Section "Navigating the Help Library" for details how to
 #     move around the help information, and to select the topics you
 #     want to view.
-
-#  Arguments:
-#     STATUS = INTEGER (Given and Returned)
-#        The global status.
 
 #  Usage:
 #     kaphelp [topic] [subtopic] [subsubtopic] [subsubsubtopic]
@@ -146,11 +139,8 @@
 
 #  History:
 #     31-OCT-2001 (DSB):
-#        Original c-shell version.
+#        Original C-shell version.
 #     {enter_further_changes_here}
-
-#  Bugs:
-#     {note_any_bugs_here}
 
 #-
 
