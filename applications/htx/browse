@@ -40,10 +40,11 @@
 #     HTX_BROWSER
 #        An optional command which will be used to invoke the WWW browser. This
 #        should contain a string corresponding to one of the supported WWW
-#        browsers (currently "netscape", "Mosaic", or "Safari") in order that
-#        the browser being used can be recognosed. If this variable is not
-#        defined, then "netscape" is used by default. If it is not recognised,
-#        then an error will result.
+#        browsers (currently firefox, mozilla, netscape, safari and Mosaic) in
+#        order that the browser being used can be recognised. If this variable
+#        is not defined, then each of the browsers will be checked, see
+#        findbrowser for the priority used. If it is not recognised, then an
+#        error will result.
 #     HTX_SCRIPT
 #        The name of the script originally invoked by the user. This is used
 #        in the generation of warning and error messages.
@@ -97,6 +98,8 @@
 #  Authors:
 #     RFWS: R.F. Warren-Smith (Starlink, RAL)
 #     SER: S.E. Rankin (Starlink, RAL)
+#     BEC: Brad Cavanagh (JAC, Hawaii)
+#     PWD: Peter W. Draper (JAC, Durham University)
 #     {enter_new_authors_here}
 
 #  History:
@@ -111,7 +114,7 @@
 #     6-JAN-1998 (RFWS):
 #        Re-define standard input to be ${HTX_TTY} for "xdisplay" if possible.
 #     29-OCT-2003 (SER)
-#        Added Mozilla. Fixed bug for Solaris when starting 
+#        Added Mozilla. Fixed bug for Solaris when starting
 #        netscape (redirection command for sh).
 #     17-MAY-2004 (SER)
 #        Added Netscape 7.1 code (same as Mozilla). Made some alterations
@@ -119,9 +122,12 @@
 #        urlgen and showme scripts.
 #     9-SEP-2004 (BEC)
 #        Added support for OS X by opening URLs and HTML files with "open".
-#     7-Jun-2005 (SER)
+#     7-JUN-2005 (SER)
 #        Added support for Firefox, just a copy of Mozilla setup. Will need
 #        testing.
+#     9-MAY-2006 (PWD):
+#        Changed to use find_browser script so that a list of preferred
+#        browsers can be used as the default.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -145,8 +151,11 @@
       tmpdir="${HTX_TMP:-${HOME}/.htxtmp}"
       if test ! -d "${tmpdir}"; then mkdir "${tmpdir}"; fi
 
-#  Select a WWW browser, providing "netscape" as a default.
-      case "${HTX_BROWSER:=netscape}" in
+#  Select a WWW browser, if HTX_BROWSER is not defined.
+      HTX_BROWSER="`$HTX_DIR/findbrowser`"
+
+#  Deal with each known browser.
+      case "${HTX_BROWSER}" in
 
 #
 #  Netscape.
@@ -899,7 +908,7 @@
 #  If the browser was not recognised, then abort with an error message.
       *)
          echo >&2 \
-         "${HTX_SCRIPT}: the ${HTX_BROWSER} WWW browser is not recognised"
+         "${HTX_SCRIPT}: ${HTX_BROWSER} WWW browser is not recognised"
          exit 1
       esac
 

@@ -1,0 +1,108 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     findbrowser
+
+#  Purpose:
+#     Find a suitable browser for HTX.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script returns the name of a supported browser on the PATH, 
+#     unless the environment variable HTX_BROWSER is already defined, 
+#     in which case it returns the value of that. The supported browsers
+#     are checked using a priority list, which may need to be updated 
+#     from time-to-time.
+
+#  Invocation:
+#        HTX_BROWSER=`findbrowser`
+
+#  Environment Variables Used:
+#     HTX_BROWSER
+#        An optional command which will be used to invoke the WWW browser.
+#        This should contain a string corresponding to one of the supported
+#        WWW browsers (firefox, mozilla, netscape, safari and mosaic).
+
+#  Notes: 
+#     Both the PATH and HTX_BROWSER variables may contain spaces in the
+#     path names. 
+#
+#     It returns an error message for wrapping in a context if it cannot find
+#     any browsers.
+#
+#     We avoid using 'which', which doesn't return a useful exit status on
+#     some platforms.  A possible alternative would be 'command -v' but
+#     that isn't POSIX (though we don't know of any platforms where it
+#     doesn't work). 
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+
+#  Authors:
+#     NXG: Norman Gray (Glasgow University)
+#     PWD: Peter W. Draper (JAC, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     17-OCT-1995 (NXG):
+#        Original version.
+#     5-JAN-1998 (PWD):
+#        Brought into HTX and converted to work with HTX_BROWSER.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  If HTX_BROWSER is set, just echo that back.
+    if test -n "$HTX_BROWSER"; then
+       echo "$HTX_BROWSER"
+       exit
+    fi
+
+#  Define the default set of browsers to look for, extend this as needed, also
+#  prune from time-to-time. Note this defines the preferred order.
+    browser_list="firefox mozilla netscape safari mosaic"
+    browser_list="$browser_list Mozilla Netscape Mosaic"
+
+#  Save IFS for use in the htx_cmd_inpath function.
+    origifs="$IFS"
+
+#  Define a local function. 
+#  ------------------------
+#  Given a command as argument see if it is in the path, return 1 if found, 0
+#  otherwise. 
+    htx_cmd_inpath () {
+       cmd=$1
+       fnd=0
+       IFS=:
+       for p in $PATH
+       do
+          IFS="$origifs"
+          if test -f "$p/$cmd"; then
+             fnd=1
+             break
+          fi
+       done
+       echo "$fnd"
+   }
+
+#  Test each browser in the list, stop at the first one we find.
+   cmd="failed to find a WWW browser, the default"
+   for b in $browser_list
+   do
+      if test `htx_cmd_inpath $b` -eq 1; then
+         cmd="$b"
+         break
+      fi
+   done
+
+#  Return the command.
+   echo "$cmd"
+   exit
+
+#  End of script.

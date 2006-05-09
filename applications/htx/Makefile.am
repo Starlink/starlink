@@ -8,9 +8,9 @@ PUBLIC_SCR = hlink findme showme
 #  List of private scripts, not usually seen by the user. These will be
 #  installed in the $(INSTALL_BIN_PKG) directory.
 
-PRIVATE_SCR =  allfind browse creindex depends docfind dockey gettitle \
-homepage htxpath moveddocs msgover multised newdocs newindex oldindex reffind \
-relink resolve settrap showhtml stdfile urlgen wrfiles
+PRIVATE_SCR =  allfind browse creindex depends docfind dockey findbrowser \
+gettitle homepage htxpath moveddocs msgover multised newdocs newindex \
+oldindex reffind relink resolve settrap showhtml stdfile urlgen wrfiles
 
 EXTRA_DIST = creindex.sed.in edhead.sed.in edtail.sed.in gethead.sed.in \
              gettitle.sed.in htxpath.in

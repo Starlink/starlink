@@ -1,15 +1,46 @@
    HTX - Utilities for Accessing Hypertext Documentation
    =====================================================
 
-   Updates 1.2-10 (SER) You can now use Netscape 7.1.
+   Version 1.3 (May 2006)
+   ----------------------
 
-   Updates 1.2-9 (SER) Fixed bug when starting Netscape 4.x on 
-                       some Solaris systems.
+   In this release the HTX system now uses a set of default browsers,
+   rather than just one (formerly netscape). The current list (in priority
+   order) is: 
 
-   Updates 1.2-7 (SER)
+      firefox mozilla netscape safari mosaic
+
+   HTX continues to honour the HTX_BROWSER environment variable, so if
+   you have that set you will see no changes in behaviour.
+
+
+   V1.2-10 (SER) 
+   -------------
+   You can now use Netscape 7.1.
+
+   V1.2-9 (SER) 
+   ------------
+
+   Fixed bug when starting Netscape 4.x on some Solaris systems.
+
+   V1.2-7 (SER)
+   ------------
 
    Added Mozilla browser which can be set with setenv HTX_BROWSER 
    mozilla. This was done for RedHat 9.0. 
+
+   V1.2-5 (January 2003)
+   ---------------------
+      Fixed broken behavior related to change in linux sort flags.
+
+
+   V1.2-6 (June 2003)
+   ---------------------
+      Stopped "Incorrectly built binary" warning for Netscape on RedHat 9.0.
+      Added Mozilla browser.
+
+   Version 1.2
+   -----------
 
    New Features
    ------------
@@ -48,13 +79,4 @@
 
       to jump straight to the relevant page using your WWW browser.
 
-   V1.2-5 (January 2003)
-   ---------------------
-      Fixed broken behavior related to change in linux sort flags.
-
-
-   V1.2-6 (June 2003)
-   ---------------------
-      Stopped "Incorrectly built binary" warning for Netscape on RedHat 9.0.
-      Added Mozilla browser.
 

@@ -5,13 +5,13 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocnumber}    {188.3}
-\newcommand{\stardocsource}    {sun188.3}
-\newcommand{\stardocauthors}   {R.F.~Warren-Smith}
-\newcommand{\stardocdate}      {6th January 1998}
+\newcommand{\stardocnumber}    {188.4}
+\newcommand{\stardocsource}    {sun188.4}
+\newcommand{\stardocauthors}   {R.F.~Warren-Smith \& P.W~Draper}
+\newcommand{\stardocdate}      {9th May 2006}
 \newcommand{\stardoctitle}     {HTX\\[1ex]
                                 Hypertext Cross-Reference Utilities}
-\newcommand{\stardocversion}   {Version 1.2}
+\newcommand{\stardocversion}   {Version 1.3}
 \newcommand{\stardocmanual}    {User's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -2585,37 +2585,25 @@ hypertext (\qt{.htx}) documents.
 \htmlref{HTX}{sect:HTX} commands that need to display
 \htmlref{documents}{sect:hypertextdocuments} do so using a WWW browser
 and will try to make use of one that you already have running, if
-possible. Otherwise a new one will be started. By default, the
-\netscaperef{\st{Netscape}} browser will be used and will be invoked
-using the command:
+possible. Otherwise a new one will be started. By default, one of the
+browsers in the list \st{firefox}, \st{mozilla}, \st{netscape}, \st{safari}
+and \st{mosaic} will be used (in that priority order).
 
-\begin{quote}
-\begin{verbatim}
-netscape
-\end{verbatim}
-\end{quote}
-
-You can change this command, or cause HTX to invoke the
-\mosaicref{\st{Mosaic}} browser instead if you prefer, by means of the
-HTX\_BROWSER environment variable. Thus, if you normally use the
-command \qt{Mosaic} to invoke your browser, you could put the
+You can change the browser that is used by means of the HTX\_BROWSER
+environment variable. Thus, if you normally use the command \qt{mozilla} to
+invoke your browser (and also have \qt{firefox} installed), you could put the
 following into your \hi{.login} file:
 
 \begin{quote}
 \begin{verbatim}
-setenv HTX_BROWSER Mosaic
+setenv HTX_BROWSER mozilla
 \end{verbatim}
 \end{quote}
 
 Note that this command should not be an alias (\st{e.g.}\ if you
 normally use the C~shell).
 
-Currently, HTX can work only with \st{Mosaic} and \st{Netscape} -- and
-it has to know which one you are using. To determine this, it searches
-for either of the strings \qt{mosaic} or \qt{netscape} in the value
-you give for the HTX\_BROWSER environment variable.\footnote{This
-search is case insensitive.} You should therefore ensure that the
-comand you use contains one of these strings.
+Currently, HTX can work only with the browsers listed above.
 
 \subsection{\xlabel{defining_your_X_display}Defining Your X~Display}
 
@@ -2649,10 +2637,7 @@ yourself will eliminate this delay.
 
 \htmlref{HTX}{sect:HTX} communicates with your \htmlref{WWW
 browser}{sect:usingwwwbrowsers} using a \st{remote control} mechanism
-which is different for each browser. At the time of writing, the
-method used by \mosaicref{\st{Mosaic}} is somewhat faster and more
-flexible, but the technology is still evolving and both \st{Mosaic}
-and \netscaperef{\st{Netscape}} have some limitations in this area.
+which is different for each browser. 
 
 In general, if you use only one machine at a time and never start up
 more than one copy of your browser, you are unlikely to have
@@ -2660,40 +2645,20 @@ problems. However, if you use multiple machines or multiple browsers,
 the following describes some of the browser-specific behaviour you may
 need to be aware of.
 
-\subsubsection{Mosaic Behaviour}
+\subsubsection{Netscape, Mozilla and Firefox Behaviour}
 
-\htmlref{HTX}{sect:HTX} determines whether you have an invocation of
-\mosaicref{\st{Mosaic}} running by looking for the \hi{.mosaicpid}
-file which it creates in your login directory and then checking that
-the browser process it describes still exists. This means that if you
-have more than one invocation of \st{Mosaic} running on the same
-machine, HTX will normally talk to the one you started most
-recently. If you run \st{Mosaic} on two machines that share the same
-\hi{.mosaicpid} file, the results can be unpredictable.
+\htmlref{HTX}{sect:HTX} communicates with these browsers using
+the remote control commands, which work by means of \st{X~resources}, in
+essence looking for an existing window on your X~display. If there is more
+than one of these, the first one will generally be used. If it cannot find
+such a window, HTX will start a new instance.
 
-If you open new windows from within \st{Mosaic}, HTX output will generally
-go to the most recently used one. This can sometimes make it difficult
-to use more than one window to view different documents, as HTX output
-tends to over-write whichever was used last. The best way of avoiding
-this problem is to start two separate copies of the browser.
-
-\subsubsection{Netscape Behaviour}
-
-\htmlref{HTX}{sect:HTX} communicates with \netscaperef{\st{Netscape}}
-by means of \st{X~resources}, in essence looking for a window on your
-X~display which was created by \st{Netscape}. If there is more than
-one of these, the first one will generally be used. If it cannot find
-such a window, HTX will start a new invocation of \st{Netscape} to
-create one.
-
-One problem with this arrangement is that HTX may detect an invocation
-of \st{Netscape} running on a different machine but displaying on the
-same X~display. In this case, attempts to communicate with it will
-succeed, but the browser may not necessarily be able to access the
-local files that HTX asks it to view (but
-see~\S\ref{sect:intermachinecommunication}). The best way around this
-problem is to ensure that the browser to be used by HTX is started
-first.
+One problem with this arrangement is that HTX may detect an instance running
+on a different machine but displaying on the same X~display. In this case,
+attempts to communicate with it will succeed, but the browser may not
+necessarily be able to access the local files that HTX asks it to view (but
+see~\S\ref{sect:intermachinecommunication}). The best way around this problem
+is to ensure that the browser to be used by HTX is started first.
 
 \subsection{\label{sect:intermachinecommunication}\xlabel{inter_machine_browser_communication}Inter-Machine Browser Communication}
 
@@ -2702,8 +2667,8 @@ that communication between different machines is possible via
 files. Such an arrangement provides an opportunity for
 \htmlref{HTX}{sect:HTX} to pass information to WWW browsers which are
 already running on other machines. With the
-\netscaperef{\st{Netscape}} browser, this can make working on multiple
-machines considerably easier by reducing the number of browser
+\netscaperef{\st{Netscape}} family of browsers, this can make working on
+multiple machines considerably easier by reducing the number of browser
 invocations you require. For it to work successfully, however, the
 files you are accessing must be known by identical names on all the
 machines involved.
@@ -2724,138 +2689,5 @@ suitable alternative directory to hold these temporary communication
 files. The directory you use should be accessible (for both reading
 and writing) and be known by identical names on all the machines which
 will use it.
-
-\newpage
-\section{\xlabel{changes_and_new_features}CHANGES AND NEW FEATURES}
-
-\subsection{Changes and New Features in V1.1}
-
-The following describes the most significant changes which occurred in
-\htmlref{HTX}{sect:HTX} between versions V1.0 and V1.1.
-
-\begin{enumerate}
-\item Two new commands have been added\begin{latexonly} (see
-\S\ref{sect:commanddescriptions} for a full
-description)\end{latexonly}:
-
-\begin{description}
-
-\item[\findmeref{\hi{findme}}]\mbox{}\\
-Performs \htmlref{keyword searching}{sect:searchingfordocuments} of
-local documents with hypertext display of the results using a
-\htmlref{WWW browser}{sect:usingwwwbrowsers}. This forms the main
-command-line user interface to an HTX hypertext documentation set. A
-variety of search options are available.
-
-\item[\showmeref{\hi{showme}}]\mbox{}\\ Allows viewing of specified
-parts of documents, as identified by a document name and (optional)
-\htmlref{cross-reference label}{sect:targetlabels}. The selected
-document is displayed using a WWW browser. This provides a useful
-command-line user interface for documents whose name or structure is
-known. It also provides a programming interface, for instance for
-implementing on-line \htmlref{hypertext help}{sect:hypertexthelp}
-systems in other software.
-
-\end{description}
-
-\item \htmlref{Index files}{sect:indexfiles} \begin{latexonly} (see
-\S\ref{sect:indexfiles}) \end{latexonly} created by the
-\htmlref{\hi{hlink}}{hlink} command are no longer stored in the
-\htmlref{document library}{sect:documentlibraries} using the file name
-\qt{document.index}. Instead, they are now stored \st{inside} the
-document in a file named:
-
-\begin{quote}
-\begin{verbatim}
-document.htx/htx.index
-\end{verbatim}
-\end{quote}
-
-This means that if a document is removed from a library, its index
-file is automatically removed as well. This avoids the need for other
-library maintenance software to know about HTX index files.
-
-The old \qt{docname.index} files are no longer used and may be
-removed. New index files will then be generated when \hi{hlink} is
-next run.
-
-\item The format of index files has been changed and additional
-information is now stored in them. This means that index file
-generation is a little slower, but the additional information allows
-subsequent document searches (\st{e.g.}\ using the \hi{findme}
-command) to run more rapidly.
-
-\item Additional information is now stored in the
-\htmlref{\qt{htx.log}}{sect:linkediting} file which acts as a
-date-stamp in each document library and records when it was last
-re-linked using \hi{hlink}\begin{latexonly} (see
-\S\ref{sect:linkediting})\end{latexonly}. This information allows
-\hi{hlink} to detect if documents have been added or removed from the
-documentation set, or moved to a different location, and will trigger
-a re-link of any documents that refer to them. This change removes the
-need to use the \hi{-r} option with \hi{hlink}.
-
-\item The default for the \htmlref{\hi{HTX\_PATH} search
-path}{sect:searchpath} used for locating documents is now evaluated
-from the \hi{INSTALL} and \hi{STARLINK} environment variables when the
-HTX software is installed, rather than at run time\begin{latexonly}
-(see \S\ref{sect:searchpath})\end{latexonly}.
-
-This means that by default HTX can now locate both its own and other
-Starlink documentation even if it is not installed in the standard
-place (\st{i.e.} under the \hi{/star} directory).
-
-\item The concept of \htmlref{\st{catalogue
-files}}{sect:cataloguefiles} \begin{latexonly} (see
-\S\ref{sect:cataloguefiles}) \end{latexonly} has been introduced to
-allow searches to be performed on the names and titles of documents
-that are not installed locally in hypertext format.
-
-\item Various improvements to efficiency have been implemented.
-
-\item This document (\xref{SUN/188}{sun188}{}) has been revised and updated.
-
-\end{enumerate}
-
-\subsection{\xlabel{list_of_most_recent_changes}Changes and New
-Features in V1.2}
-
-The following describes the most significant changes which have
-occurred in \htmlref{HTX}{sect:HTX} between versions V1.1 and V1.2
-(the current version).
-
-\begin{enumerate}
-\item The default WWW browser used by the \findmeref{\hi{findme}} and
-\showmeref{\hi{showme}} commands is now \netscaperef{\st{Netscape}},
-rather than \mosaicref{\st{Mosaic}}. See
-\S\ref{sect:specifyingabrowser} if you wish to continue using
-\st{Mosaic} as your browser.
-
-\item The \htmlref{\hi{HTX\_NOLINK}}{sect:suppressing} environment
-variable may now be used to suppress hypertext re-linking when it is not
-required\begin{latexonly} (see
-\S\ref{sect:suppressing})\end{latexonly}.
-
-\item HTX now creates a directory (\hi{\$HOME/.htxtmp} by default) to
-hold the temporary files used to communicate with WWW browsers.  This
-enhances the opportunities for communication with browsers running on
-other machines.  The environment variable
-\htmlref{\hi{HTX\_TMP}}{sect:intermachinecommunication} may be used to
-specify an alternative directory for these files if
-necessary\begin{latexonly} (see
-\S\ref{sect:intermachinecommunication})\end{latexonly}.
-
-\item The method used to pass local documents to the
-\netscaperef{\st{Netscape}} WWW browser has changed slightly. This is
-because the original mechanism no longer works correctly with recent
-versions of \st{Netscape}.
-
-\item A problem has been fixed which could prevent the Starlink
-\hi{xdisplay} utility from being used by HTX to set the DISPLAY
-environment variable on PC~Linux systems. This could prevent a WWW
-browser from being started unless DISPLAY was already set.
-
-\item This document (\xref{SUN/188}{sun188}{}) has been revised and updated.
-\end{enumerate}
 
 \end{document}
