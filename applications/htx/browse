@@ -36,7 +36,7 @@
 #        it is not set, an attempt will be made to run the Starlink "xdisplay"
 #        utility to define it, although this may slow down document display.
 #        If the DISPLAY variable cannot be set in this way, then an error will
-#        result.
+#        result. Not required on Apple OS X.
 #     HTX_BROWSER
 #        An optional command which will be used to invoke the WWW browser. This
 #        should contain a string corresponding to one of the supported WWW
@@ -44,7 +44,8 @@
 #        order that the browser being used can be recognised. If this variable
 #        is not defined, then each of the browsers will be checked, see
 #        findbrowser for the priority used. If it is not recognised, then an
-#        error will result.
+#        error will result. On Apple OS X the default browser will be used if
+#        HTX_BROWSER is not set.
 #     HTX_SCRIPT
 #        The name of the script originally invoked by the user. This is used
 #        in the generation of warning and error messages.
@@ -100,6 +101,7 @@
 #     SER: S.E. Rankin (Starlink, RAL)
 #     BEC: Brad Cavanagh (JAC, Hawaii)
 #     PWD: Peter W. Draper (JAC, Durham University)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -128,6 +130,10 @@
 #     9-MAY-2006 (PWD):
 #        Changed to use find_browser script so that a list of preferred
 #        browsers can be used as the default.
+#     9-MAY-2006 (TIMJ):
+#        OSX ignores all the clever stuff and calls the Apple "open"
+#        command directly. If HTX_BROWSER is not set the default browser
+#        is used.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -150,6 +156,73 @@
 #  ensure that it exists.
       tmpdir="${HTX_TMP:-${HOME}/.htxtmp}"
       if test ! -d "${tmpdir}"; then mkdir "${tmpdir}"; fi
+
+#  Mac OS X
+#  --------
+#  If this is an OSX system the "open" command will do all the heavy lifting
+#  for us and will let us use the system default browser.
+      opsys=`uname`
+      if test $opsys = "Darwin"; then
+
+#  Manage scratch file space.
+#  -------------------------
+#  If the document to be viewed is being supplied on standard input, then
+#  we must generate a name for a temporary file to store it.
+         if test "${HTX_WHERE}" = 'i'; then
+
+#  Use "ls" to list all the temporary file names so far used in reverse order
+#  of their creation time.
+            tempfiles="`ls -t ${tmpdir}/htx-browse-osx-${LOGNAME}-*.html \
+                        2>/dev/null`"
+
+#  Pass this list of file names through "sed" to extract the sequence number
+#  field, quitting once that corresponding to the most recently created file
+#  has been obtained.
+            n="`echo "${tempfiles}" \
+            | sed -n 's%^.*/htx-browse-osx-'"${LOGNAME}"'-\([1-9][0-9]*\)\.html$%\1%p
+                      t done
+                      b
+                      :done
+                      q'`"
+
+#  If no sequence number was found, then use 1. Otherwise increment it.
+            if test ! -n "${n}"; then n='1'; else n="`expr "${n}" + 1`"; fi
+
+#  Generate the temporary file name and replace the URL value with it. This
+#  name must be unique to the current machine, software, browser, user and
+#  temporary document sequence number.
+            url="${tmpdir}/htx-browse-osx-${LOGNAME}-${n}.html"
+
+#  Select the names of all but the most recent few temporary files and remove
+#  these older ones if necessary.
+            oldfiles="`echo "${tempfiles}" | tail +3`"
+            if test -n "${oldfiles}"; then rm -f ${oldfiles}; fi
+         fi
+
+#  Open the URL with OSX
+#  ------------------------
+#  Safari can open a file or URL with the "open" command, and does not need
+#  special checks to see if it is running or not.
+
+#  If necessary, read the document from standard input into its temporary file.
+#  Before doing so, set a trap to remove the file if this script is aborted.
+         if test "${HTX_WHERE}" = 'i'; then
+            settrap 'rm -f "${url}"'
+            cat >"${url}" || exit
+         fi
+
+#  Start a new browser, supplying the URL generated above. Cannot suppress
+#  warning messages on OS X.
+         echo "Sending document to ${HTX_BROWSER} WWW browser..."
+	
+         if test -z $HTX_BROWSER; then
+             open $url
+         else
+             open -a ${HTX_BROWSER} $url
+         fi
+#  OS X stops here. The job is done.
+	 exit
+      fi
 
 #  Select a WWW browser, if HTX_BROWSER is not defined.
       HTX_BROWSER="`$HTX_DIR/findbrowser`"
@@ -844,64 +917,6 @@
             if test "${HTX_WHERE}" = 'i'; then settrap; fi
          fi
          ;;
-
-#
-#  Safari.
-#  ======
-      *[Ss][Aa][Ff][Aa][Rr][Ii]*)
-
-#  Manage scratch file space.
-#  -------------------------
-#  If the document to be viewed is being supplied on standard input, then
-#  we must generate a name for a temporary file to store it.
-         if test "${HTX_WHERE}" = 'i'; then
-
-#  Use "ls" to list all the temporary file names so far used in reverse order
-#  of their creation time.
-            tempfiles="`ls -t ${tmpdir}/htx-browse-safari-${LOGNAME}-*.html \
-                        2>/dev/null`"
-
-#  Pass this list of file names through "sed" to extract the sequence number
-#  field, quitting once that corresponding to the most recently created file
-#  has been obtained.
-            n="`echo "${tempfiles}" \
-            | sed -n 's%^.*/htx-browse-safari-'"${LOGNAME}"'-\([1-9][0-9]*\)\.html$%\1%p
-                      t done
-                      b
-                      :done
-                      q'`"
-
-#  If no sequence number was found, then use 1. Otherwise increment it.
-            if test ! -n "${n}"; then n='1'; else n="`expr "${n}" + 1`"; fi
-
-#  Generate the temporary file name and replace the URL value with it. This
-#  name must be unique to the current machine, software, browser, user and
-#  temporary document sequence number.
-            url="${tmpdir}/htx-browse-safari-${LOGNAME}-${n}.html"
-
-#  Select the names of all but the most recent few temporary files and remove
-#  these older ones if necessary.
-            oldfiles="`echo "${tempfiles}" | tail +3`"
-            if test -n "${oldfiles}"; then rm -f ${oldfiles}; fi
-         fi
-
-#  Open the URL with Safari.
-#  ------------------------
-#  Safari can open a file or URL with the "open" command, and does not need
-#  special checks to see if it is running or not.
-
-#  If necessary, read the document from standard input into its temporary file.
-#  Before doing so, set a trap to remove the file if this script is aborted.
-         if test "${HTX_WHERE}" = 'i'; then
-            settrap 'rm -f "${url}"'
-            cat >"${url}" || exit
-         fi
-
-#  Start a new browser, supplying the URL generated above. Cannot suppress
-#  warning messages on OS X.
-         echo "Starting ${HTX_BROWSER} WWW browser..."
-         open -a ${HTX_BROWSER} "${url}" &
-      ;;
 
 #  Unknown browser.
 #  ===============
