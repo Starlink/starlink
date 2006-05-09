@@ -80,9 +80,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
  * Extract a WCS for a two axes from a full WCS. The result is
  * the address of an AST FrameSet.
  *
- * There are five arguments, the address of the AST FrameSet, the two axes to
- * extract and their lengths (in base units, usually the width and height of
- * the image).
+ * There are five required arguments, the address of the AST FrameSet, the two
+ * axes to extract and their lengths (in base units, usually the width and
+ * height of the image) and one optional coordinate to use as a replacement
+ * value for the removed axis (a const to the PermMap).
  */
 static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] )
@@ -92,16 +93,18 @@ static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
     char *error_mess;
     int axis1;
     int axis2;
+    int index;
     int length1;
     int length2;
     int result;
     long adr;
 
-    /* Check arguments, only allow five, the frameset, the two axes and some
-     * scale lengths along the axes (base units). */
-    if ( objc != 6 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, 
-                          "frameset axis1 axis2 length1 length2" );
+    /* Check arguments, only allow five or six, the frameset, the two axes and
+     * some scale lengths along the axes (base units), plus the replacement
+     * value. */
+    if ( objc != 6 && objc != 7 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset axis1 axis2 length1 "
+                          "length2 [axis3_coord]" );
         return TCL_ERROR;
     }
 
@@ -127,9 +130,17 @@ static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
 
+    /* And the replacement index */
+    index = 0;
+    if ( objc == 7 ) {
+        if ( Tcl_GetIntFromObj( interp, objv[6], &index ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+    }
+
     /* Extract 2D WCS */
     result = gaiaUtilsGt2DWcs( fullwcs, axis1, axis2, length1, length2,
-                               &newwcs, &error_mess );
+                               index, &newwcs, &error_mess );
 
     /* Export the new WCS as a long containing the address */
     if ( result == TCL_OK ) {
@@ -146,10 +157,10 @@ static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
  * Extract a WCS for a specific axis from a full WCS. The result is
  * the address of an AST FrameSet.
  *
- * There are three arguments, the address of the AST FrameSet, the axis to
- * extract and an optional offset.  The offset is for the GRID domain and is
- * used when a section of a WCS is required (0 when not needed, this is the
- * NDF origin).
+ * There are four arguments, the address of the AST FrameSet, the axis to
+ * extract, an offset and the coordinate of a value along the axis.  The
+ * offset is for the GRID domain and is used when a section of a WCS is
+ * required (set this to 0 when not needed, this is the NDF origin).
  */
 static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] )
@@ -162,10 +173,10 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
     int result;
     long adr;
 
-    /* Check arguments, only allow two or three, the frameset and an
-     * axis number plus offset */
-    if ( objc != 3 && objc != 4 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "frameset axis [offset]" );
+    /* Check arguments, only allow three, the frameset and an axis number, plus
+     * offset */ 
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset axis offset" );
         return TCL_ERROR;
     }
 
@@ -181,12 +192,10 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
     if ( Tcl_GetIntFromObj( interp, objv[2], &axis ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    if ( objc == 4 ) {
-        if ( Tcl_GetIntFromObj( interp, objv[3], &offset ) != TCL_OK ) {
-            return TCL_ERROR;
-        }
+    if ( Tcl_GetIntFromObj( interp, objv[3], &offset ) != TCL_OK ) {
+        return TCL_ERROR;
     }
-    result = gaiaUtilsGtAxisWcs(fullwcs, axis, offset, &axiswcs, &error_mess);
+    result= gaiaUtilsGtAxisWcs( fullwcs, axis, offset, &axiswcs, &error_mess );
 
     /* Export the new WCS as a long containing the address */
     if ( result == TCL_OK ) {

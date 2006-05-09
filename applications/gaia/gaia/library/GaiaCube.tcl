@@ -211,6 +211,11 @@ itcl::class gaia::GaiaCube {
       add_short_help $itk_component(index) \
          {Index of the image plane to display (along current axis)}
 
+      #  Button release on scale part of widget updates the WCS so that the
+      #  spectral coordinate is correct.
+      $itk_component(index) bindscale <ButtonRelease-1> [code $this update_wcs_]
+      $itk_component(index) bindentry <Return> [code $this update_wcs_]
+
       #  Index coordinate.
       itk_component add indexlabel {
          LabelValue $w_.indexlabel \
@@ -544,7 +549,7 @@ itcl::class gaia::GaiaCube {
    #  Methods:
    #  --------
 
-   #  Close window. If image is being replaced set dispsection false to 
+   #  Close window. If image is being replaced set dispsection false to
    #  avoid the section being loaded.
    public method close {} {
       stop_
@@ -565,13 +570,6 @@ itcl::class gaia::GaiaCube {
       if { [$namer exists] } {
          if { $cubeaccessor_ == {} } {
             set cubeaccessor_ [uplevel \#0 GaiaNDAccess \#auto]
-         }
-
-         #  Is this an NDF cube?
-         if { [$namer type] == ".sdf" } {
-            set isndf_ 1
-         } else {
-            set isndf_ 0
          }
 
          $namer absolute
@@ -633,7 +631,7 @@ itcl::class gaia::GaiaCube {
    }
 
    #  Set the axis we step along. A side-effect of this is to create the dummy
-   #  NDF that will be actually manipulated in the main display window. A 
+   #  NDF that will be actually manipulated in the main display window. A
    #  dummy NDF is used for FITS and NDF files as this is the simplest way
    #  to make sure that the toolboxes can also access the data in an efficient
    #  manner. When a toolbox access this file if will need to save the NDF
@@ -692,7 +690,7 @@ itcl::class gaia::GaiaCube {
 
       #  If regenerating create the dummy NDF.
       if { $regen } {
-         
+
          #  Set name of the image displayed image section.
          set oldname $section_name_
          set section_name_ "GaiaCubeSection[incr count_].sdf"
@@ -700,17 +698,17 @@ itcl::class gaia::GaiaCube {
          #  And create the dummy image NDF. Will have axis removed from
          #  the WCS and be the size and type of cube in other axes.
          set imageaccessor [$cubeaccessor_ createimage $section_name_ $axis_]
-            
+
          #  Map in the data component to initialise it. Use BAD
          #  to avoid NDF bad flag from being set false.
          $imageaccessor map "WRITE/BAD"
-         
+
          #  Close before it can be displayed by the rtdimage.
          $imageaccessor close
-         
+
          #  Display this for the first time.
          display_ $section_name_ 0
-         
+
          #  Now delete old image slice (waited until released).
          if { $oldname != {} } {
             catch {::file delete $oldname} msg
@@ -719,9 +717,9 @@ itcl::class gaia::GaiaCube {
                   "WARNING: Failed to delete old image section: $msg"
             }
          }
-         
+
       }
-      
+
       #  Now copy this plane from the cube and update the image.
       #  Correct plane to grid indices.
       if { $axis_ == 1 } {
@@ -732,43 +730,55 @@ itcl::class gaia::GaiaCube {
          set zo [lindex $bounds_ 4]
       }
       set zp [expr round($plane_+1-$zo)]
-      
-      #  Access the image data for this plane and replace 
+
+      #  Access the image data for this plane and replace
       #  the displayed copy.
       lassign [$cubeaccessor_ getimage $axis_ $zp 1] adr
       lassign [$cubeaccessor_ getinfo $adr] realadr nel type
       $itk_option(-rtdimage) updateimagedata $realadr
-      
+
       #  If regenerating bring autocuts etc. into sync.
       if { $regen } {
          $itk_option(-rtdimage) autocut -percent 98
       }
-      
+
       #  Set the object description of this slice to include the
       #  cube slice.
       $itk_option(-rtdimage) object "[slice_display_name_] ($object_)"
       $rtdctrl_info_ updateValues
-      
+
       # Release memory from last time and save pointer.
       if { $last_slice_adr_ != 0 } {
          $cubeaccessor_ release $last_slice_adr_
       }
       set last_slice_adr_ $adr
-      
+
       #  Update the displayed coordinate.
       set coord [get_coord_ $plane_ 1 0]
       $itk_component(indexlabel) configure -value $coord
-      
+
       #  Make sure position show in slide matches this (note feedback is
       #  avoided as $newvalue != $plane_).
       $itk_component(index) configure -value $plane_
-      
+
       #  Move spectral reference position.
       if { $spectrum_ != {} } {
          set coord [get_coord_ $plane_ 0 0]
          if { $coord != {} } {
             $spectrum_ set_ref_coord $coord
          }
+      }
+   }
+
+   #  Update the dummy NDF WCS so that it matches the current spectral
+   #  coordinates. This should be done only when necessary (end of animation,
+   #  slice slider drag etc.).
+   protected method update_wcs_ {} {
+      set index [axis_pixel2grid_ $plane_]
+      puts "update_wcs_ index = $index"
+      set frameset [$cubeaccessor_ getimagewcs $axis_ $index]
+      if { $frameset != 0 } {
+         $itk_option(-rtdimage) astreplace $frameset
       }
    }
 
@@ -839,13 +849,16 @@ itcl::class gaia::GaiaCube {
    }
    protected variable initial_seconds_ 0
 
-   #  Stop the animation. 
+   #  Stop the animation.
    protected method stop_ {} {
       if { $afterId_ != {} } {
          after cancel $afterId_
          set afterId_ {}
          # DEBUG
          # puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
+
+         #  Update the WCS so that the spectral axis coordinate is correct.
+         update_wcs_
       }
    }
 
@@ -1003,7 +1016,7 @@ itcl::class gaia::GaiaCube {
 
       $itk_option(-canvas) bind $itk_option(-rtdimage) <1> \
          [code $this display_spectrum_ localstart %x %y]
-      
+
       $itk_option(-canvas) bind $itk_option(-rtdimage)  <B1-Motion> \
          [code $this display_spectrum_ localdrag %x %y]
    }
@@ -1030,13 +1043,13 @@ itcl::class gaia::GaiaCube {
          set spectrum_ [GaiaSpectralPlot $w_.specplot \
                            -number $itk_option(-number) \
                            -shorthelpwin [scope $short_help_win_]]
-         
+
          #  Make this a transient of main window, not this one.
          wm transient $spectrum_ $itk_option(-gaia)
-         
+
          #  Display in main window as well.
          $spectrum_ configure -canvas $itk_option(-canvas)
-         
+
          #  Create the marker for the image position.
          create_position_marker_ $ccx $ccy
 
@@ -1046,31 +1059,24 @@ itcl::class gaia::GaiaCube {
          if { [wm state $spectrum_] == "withdrawn" } {
             $spectrum_ open
          }
-         
+
          #  Re-create the marker for the image position.
          if { $position_mark_ == {} } {
             create_position_marker_ $ccx $ccy
          }
       }
-      
+
       #  Correct collapse bounds to grid indices.
-      if { $axis_ == 1 } {
-         set zo [lindex $bounds_ 0]
-      } elseif { $axis_ == 2 } {
-         set zo [lindex $bounds_ 2]
-      } else {
-         set zo [lindex $bounds_ 4]
-      }
-      set alow [expr round($lower_collapse_bound_+1-$zo)]
-      set ahigh [expr round($upper_collapse_bound_+1-$zo)]
-      
+      set alow [axis_pixel2grid_ $lower_collapse_bound_]
+      set ahigh [axis_pixel2grid_ $upper_collapse_bound_]
+
       #  Make sure ix and iy are integers (zoomed images).
       set ix [expr round($iix)]
       set iy [expr round($iiy)]
-      
+
       #  Move position marker on the image.
       $itk_option(-canvas) coords $position_mark_ $ccx $ccy
-      
+
       #  Also autoscale when single click, so that we are not fixed for
       #  all time.
       if { $itk_option(-autoscale) || $action == "localstart" } {
@@ -1078,7 +1084,7 @@ itcl::class gaia::GaiaCube {
             $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh \
                $ix $iy 1 $ccx $ccy
          }
-         
+
          #  Set first-time reference position.
          set coord [get_coord_ $plane_ 0 0]
          if { $coord != {} } {
@@ -1092,15 +1098,8 @@ itcl::class gaia::GaiaCube {
       }
    }
 
-   #  Send a spectrum to SPLAT. 
-   protected method send_to_splat_ {cx cy} {
-
-      #  Convert click coordinates from canvas coords to grid coords.
-      set ccx [$itk_option(-canvas) canvasx $cx]
-      set ccy [$itk_option(-canvas) canvasy $cy]
-      $itk_option(-rtdimage) convert coords $ccx $ccy canvas iix iiy image
-
-      #  Use origins to get pixel indices.
+   #  Convert grid indices to pixel indices along image axes.
+   protected method image_grid2pixel_ {x y} {
       if { $axis_ == 1 } {
          set xo [lindex $bounds_ 2]
          set yo [lindex $bounds_ 4]
@@ -1111,11 +1110,67 @@ itcl::class gaia::GaiaCube {
          set xo [lindex $bounds_ 0]
          set yo [lindex $bounds_ 2]
       }
-      
+
       #  Correct to pixel indices.
-      set ix [expr round($iix-1+$xo)]
-      set iy [expr round($iiy-1+$yo)]
-      
+      set ix [expr round($x-1+$xo)]
+      set iy [expr round($y-1+$yo)]
+      return "$ix $iy"
+   }
+
+   #  Convert grid index to pixel index along the selected axis.
+   protected method axis_grid2pixel_ { value } {
+      if { $axis_ == 1 } {
+         set zo [lindex $bounds_ 0]
+      } elseif { $axis_ == 2 } {
+         set zo [lindex $bounds_ 2]
+      } else {
+         set zo [lindex $bounds_ 4]
+      }
+      return [expr round($value-1+$zo)]
+   }
+
+   #  Convert pixel indices to grid indices along image axes.
+   protected method image_pixel2grid_ {x y} {
+      if { $axis_ == 1 } {
+         set xo [lindex $bounds_ 2]
+         set yo [lindex $bounds_ 4]
+      } elseif { $axis_ == 2 } {
+         set xo [lindex $bounds_ 0]
+         set yo [lindex $bounds_ 4]
+      } else {
+         set xo [lindex $bounds_ 0]
+         set yo [lindex $bounds_ 2]
+      }
+
+      #  Correct to grid indices.
+      set ix [expr round($x+1-$xo)]
+      set iy [expr round($y+1-$yo)]
+      return "$ix $iy"
+   }
+
+   #  Convert pixel index to grid index along the selected axis.
+   protected method axis_pixel2grid_ { value } {
+      if { $axis_ == 1 } {
+         set zo [lindex $bounds_ 0]
+      } elseif { $axis_ == 2 } {
+         set zo [lindex $bounds_ 2]
+      } else {
+         set zo [lindex $bounds_ 4]
+      }
+      return [expr round($value+1-$zo)]
+   }
+
+   #  Send a spectrum to SPLAT.
+   protected method send_to_splat_ {cx cy} {
+
+      #  Convert click coordinates from canvas coords to grid coords.
+      set ccx [$itk_option(-canvas) canvasx $cx]
+      set ccy [$itk_option(-canvas) canvasy $cy]
+      $itk_option(-rtdimage) convert coords $ccx $ccy canvas iix iiy image
+
+      #  Correct to pixel indices.
+      lassign [image_grid2pixel_ $iix $iiy] ix iy
+
       #  Create the right section. Use collapse coords as bounds on the
       #  spectral axis.
       set range "$lower_collapse_bound_:$upper_collapse_bound_"
@@ -1126,7 +1181,7 @@ itcl::class gaia::GaiaCube {
       } else {
          set section "($ix,$iy,${range}${close_section_}"
       }
-      
+
       #  Send the section to SPLAT.
       if { $splat_disp_ == {} } {
          set splat_disp_ [GaiaForeignExec \#auto \
@@ -1149,7 +1204,7 @@ itcl::class gaia::GaiaCube {
       #  Bindings to move and select this.
       $itk_option(-canvas) bind $position_mark_ <1> \
          [code $this display_spectrum_ localstart %x %y]
-      
+
       $itk_option(-canvas) bind $position_mark_  <B1-Motion> \
          [code $this display_spectrum_ localdrag %x %y]
    }
@@ -1220,9 +1275,6 @@ itcl::class gaia::GaiaCube {
    #  The name of the dataset, as an NDF specification (handle HDU and slices).
    protected variable ndfname_ {}
 
-   #  Is this an NDF.
-   protected variable isndf_ 1
-
    #  The current plane along the current axis.
    protected variable plane_ 1
 
@@ -1283,7 +1335,7 @@ itcl::class gaia::GaiaCube {
    #  Memory used for last slice. Free this when not needed.
    protected variable last_slice_adr_ 0
 
-   #  The terminator characters for closing a section. May specify 
+   #  The terminator characters for closing a section. May specify
    #  a final redundant axis.
    protected variable close_section_ ")"
 

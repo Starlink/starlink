@@ -162,7 +162,7 @@ itcl::class gaia::GaiaNDAccess {
    #  Get the pixel ranges/bounds of the full data. Returns pairs of
    #  integers, one for each dimension. For FITS files the lower bound will
    #  always be 1. If trunc is true then any trailing redundant axes are
-   #  trimmed. 
+   #  trimmed.
    public method getbounds {trunc} {
       if { $bounds_ == {} } {
          set bounds_ [${type_}::getbounds $handle_ $trunc]
@@ -173,7 +173,7 @@ itcl::class gaia::GaiaNDAccess {
    #  Return the coordinate of a position along a given axis.
    #
    #  The arguments are the index of the axis, a list of all the pixel indices
-   #  needed to identify the coordinate, and an optional boolean arguments that
+   #  needed to identify the coordinate, and an optional boolean argument that
    #  determines whether to format the value (using astFormat) and if to add
    #  trailing label and units strings.
    public method getcoord {axis indices {formatted 1} {trail 0} } {
@@ -234,6 +234,7 @@ itcl::class gaia::GaiaNDAccess {
                                            $p1 $p2 $cnfmap_"] adr
          return $adr
       }
+      return 0
    }
 
    #  Access the data of an image plane. This will only work for cubes and
@@ -248,6 +249,7 @@ itcl::class gaia::GaiaNDAccess {
          set dims [getdims $trunc]
          return [eval "array::getimage $addr_ $dims $axis $index $cnfmap_"]
       }
+      return 0
    }
 
    #  Free data allocated by any of the get methods (spectra and image
@@ -257,7 +259,7 @@ itcl::class gaia::GaiaNDAccess {
    }
 
    #  Return the underlying information about an accessor array. This
-   #  is the real memory address, number of elements, HDS data type of 
+   #  is the real memory address, number of elements, HDS data type of
    #  the cube data and the HDS data type of any extracted data (will
    #  differ for FITS scaled data).
    public method getinfo {adr} {
@@ -295,8 +297,9 @@ itcl::class gaia::GaiaNDAccess {
       set dims [getdims 1]
       set dim1 [lindex $dims [expr $axis1-1]]
       set dim2 [lindex $dims [expr $axis2-1]]
-      set imagewcs [gaiautils::get2dwcs $fullwcs $axis1 $axis2 $dim1 $dim2]
-      
+      set dim3 [expr [lindex $dims [expr $axis-1]]/2]
+      set imagewcs [gaiautils::get2dwcs $fullwcs $axis1 $axis2 $dim1 $dim2 $dim3]
+
       #  Get the bounds for our chosen axes.
       set bounds [getbounds 1]
       set lbnd1 [lindex $bounds_ [expr (${axis1}-1)*2]]
@@ -313,6 +316,38 @@ itcl::class gaia::GaiaNDAccess {
       $accessor acquire $name $newhandle
 
       return $accessor
+   }
+
+   #  Create a WCS that represents the coordinates of an image extracted from
+   #  the attached dataset. The axis value is the axis that is not part of the
+   #  image and index is an index along this axis (its coordinates is used to
+   #  replace all coordinates along that axis when it is removed, so should
+   #  normally be the image plane index).
+   public method getimagewcs {axis index} {
+      if { $addr_ != 0 } {
+
+         #  Select the image axes, these are not axis.
+         if { $axis == 1 } {
+            set axis1 2
+            set axis2 3
+         } elseif { $axis == 2 } {
+            set axis1 1
+            set axis2 3
+         } else {
+            set axis1 1
+            set axis2 2
+         }
+
+         #  Get a 2D WCS for our chosen axes.
+         set fullwcs [${type_}::getwcs $handle_]
+         set dims [getdims 1]
+         set dim1 [lindex $dims [expr $axis1-1]]
+         set dim2 [lindex $dims [expr $axis2-1]]
+         set imagewcs \
+            [gaiautils::get2dwcs $fullwcs $axis1 $axis2 $dim1 $dim2 $index]
+         return $imagewcs
+      }
+      return 0
    }
 
    #  Configuration options: (public variables)

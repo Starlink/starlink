@@ -290,7 +290,7 @@ public:
     { "astpix2wcs",      &StarRtdImage::astpix2wcsCmd,      2, 4 },
     { "astread",         &StarRtdImage::astreadCmd,         1, 1 },
     { "astrefine",       &StarRtdImage::astrefineCmd,       4, 4 },
-    { "astreplace",      &StarRtdImage::astreplaceCmd,      0, 0 },
+    { "astreplace",      &StarRtdImage::astreplaceCmd,      0, 1 },
     { "astreset",        &StarRtdImage::astresetCmd,        1, 1 },
     { "astrestore",      &StarRtdImage::astrestoreCmd,      0, 1 },
     { "astset",          &StarRtdImage::astsetCmd,          2, 2 },
@@ -2053,34 +2053,45 @@ int StarRtdImage::astreadCmd( int argc, char *argv[] )
 //  StarRtdImage::astreplaceCmd
 //
 //  Purpose:
-//     Replaces the existing WCS AstFrameSet with a new version that
-//     has been created by other members in this class
-//     (i.e. astread or astrefine). A clone of the existing WCS system
-//     is retained so that the changes can be undone (at least until
-//     up to the next invocation of astread or astrefine) using
-//     astrestore.
+//     Replaces the existing WCS AstFrameSet with a new version. This can be
+//     by passing in a memory address (as a long) of a new FrameSet, or, (when
+//     no arguments are given) by using one that has been created by other
+//     members in this class (i.e. astread or astrefine, this will be
+//     currently pointed at by newset_). A clone of the existing WCS system is
+//     retained so that the changes can be undone (at least until up to the
+//     next invocation of astread or astrefine, or the next call to this
+//     function) using astrestore.
 //
-//     If not already taken a clone of what is reckoned to
-//     be the original WCS associated with the image is also
-//     made. This can be restored using the "astrestore original"
-//     command.
+//     If not already taken a clone of what is reckoned to be the original WCS
+//     associated with the image is also made. This can be restored using the
+//     "astrestore original" command.  
 //-
 int StarRtdImage::astreplaceCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::astreplaceCmd" << std::endl;
 #endif
-    if (!image_) {
-        return error("no image loaded");
+    if ( !image_ ) {
+        return error( "no image loaded" );
     }
-    if (!newset_) {
-        return error("no new WCS system is available");
+    if ( !newset_ && argc == 0 ) {
+        return error( "no new WCS system is available" );
     }
 
-    // get a pointer to the internal Starlink version of the WCS class
+    //  Get a pointer to the internal Starlink version of the WCS class.
     StarWCS* wcsp = getStarWCSPtr();
-    if (!wcsp)
+    if ( !wcsp ) {
         return TCL_ERROR;
+    }
+
+    //  If given access the memory address of the FrameSet.
+    if ( argc == 1 ) {
+        long adr;
+        if ( Tcl_ExprLong( interp_, argv[0], &adr ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        newset_ = (AstFrameSet *) adr;
+    }
 
     //  If the original WCS hasn't been cloned yet then take one to keep
     //  so that we can always get back to where we started. This will go
@@ -2103,7 +2114,8 @@ int StarRtdImage::astreplaceCmd( int argc, char *argv[] )
     //  Update any views to use this information.
     if ( updateViews( 2 ) != TCL_OK ) {
         return TCL_ERROR;
-    } else {
+    } 
+    else {
         return TCL_OK;
     }
 }
@@ -2808,7 +2820,6 @@ int StarRtdImage::astpix2curCmd( int argc, char *argv[] )
 
         //  Format the values according to the current frame.
         AstFrameSet *iwcs = wcsp->astWCSClone();
-        char *value;
         reset_result();
         for ( int i = 0; i < dims; i++ ) {
             append_element( astFormat( iwcs, i+1, wcs[i] ) );

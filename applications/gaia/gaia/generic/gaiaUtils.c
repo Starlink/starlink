@@ -336,10 +336,13 @@ int gaiaUtilsQueryCoord( AstFrameSet *frameset, int axis, double *coords,
  *
  * The arguments are the WCS and the two axis that are to be retained. The
  * axes correspond to the base frame, not the current frame. The length values
- * should be the "size" of the axes (image width and height for instance).
+ * should be the "size" of the axes (image width and height for instance), and
+ * index a position along the axis to be dropped (usually corresponds to the
+ * image plane index).
  */
 int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
-                      int length2, AstFrameSet **iwcs, char **error_mess )
+                      int length2, int index, AstFrameSet **iwcs,
+                      char **error_mess )
 {
     AstFrame *baseframe;
     AstFrame *currentframe;
@@ -408,13 +411,15 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
     newframe = (AstFrame *) astPickAxes( baseframe, 2, outperm, NULL );
 
     /* Create a mapping for this permutation that doesn't have <bad>
-     * values as the result. */
+     * values as the result. Set the constant for the axis we loose to the
+     * given index, this then transform to the current system correctly. */
     for ( i = 0; i < MAXDIM; i++ ) {
         zero[i] = 0.0;
         inperm[i] = -1;
     }
     inperm[axis1-1] = 1;
     inperm[axis2-1] = 2;
+    zero[0] = (double) index;
     map = (AstMapping *) astPermMap( nbase, inperm, 2, outperm, zero, "" );
 
     /* Now add this frame to the FrameSet and make it the base one. Also
@@ -456,7 +461,7 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
     }
 
     if ( n != 2 ) {
-        /* The axes are not independent, so more than two have moved. 
+        /* The axes are not independent, so more than two have moved.
          * In this case we just assume grid-WCS axes correspondence. */
         for ( i = 0; i < MAXDIM; i++ ) {
             out1[i][0] = out2[i][0];
