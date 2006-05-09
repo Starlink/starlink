@@ -29,6 +29,11 @@ the supplied prologue. Multiple C<--parsers> options can be supplied.
 
 A corresponding C<Starlink::Prologue::Parser::> class must exist.
 
+=item B<-incdefs>
+
+Include fields that only include default content. Default is to skip empty fields
+if they will only result in default content.
+
 =item B<-version>
 
 Report the version number.
@@ -54,8 +59,9 @@ use Starlink::Prologue;
 use Starlink::Prologue::Parser;
 
 # Options
-my ($help, $man, $version, @parsers);
+my ($help, $man, $version, @parsers, $incdefs);
 my $status = GetOptions("help" => \$help,
+                        "incdefs" => \$incdefs,
                         "man" => \$man,
                         "version" => \$version,
                         "parsers=s" => \@parsers,
@@ -77,7 +83,7 @@ if (@ARGV) {
   # files on command line
   for my $file (@ARGV) {
     open(my $fh, "<$file") || die "Error opening file $file for read: $!\n";
-    my ($types, $rewrite) = _convert_header( join("", <$fh>), $file, \@parsers );
+    my ($types, $rewrite) = _convert_header( join("", <$fh>), $file, $incdefs, \@parsers );
     close($fh) || die "Error closing input file $file: $!\n";
 
     if (@$types) {
@@ -110,7 +116,7 @@ if (@ARGV) {
   # try reading from pipe
   my @lines = <>;
   if (@lines) {
-    my ($types, $rewrite) = _convert_header( join("", @lines), undef, \@parsers );
+    my ($types, $rewrite) = _convert_header( join("", @lines), undef, $incdefs, \@parsers );
     my %types = map { $_, undef } @$types;
     print STDERR "Supplied prologue contains ", join(", ", keys %types), " prologues. Converting...\n";
     print $rewrite;
@@ -134,6 +140,7 @@ exit;
 sub _convert_header {
   my $input = shift;
   my $file = shift;
+  my $incdefs = shift;
   my $parsers = shift;
 
   # Create a parser
@@ -160,6 +167,9 @@ sub _convert_header {
 
       # Guess suitable defaults
       $entry->guess_defaults( File => $file );
+
+      # Write defaults?
+      $entry->write_defaults( $incdefs );
 
       # stringify the prologue
       $rewrite .= $entry->stringify;

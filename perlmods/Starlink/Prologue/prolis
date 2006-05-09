@@ -18,6 +18,11 @@ writes them all to standard output (translating if necessary).
 
 =over 4
 
+=item B<-incdefs>
+
+Include fields that only include default content. Default is to skip empty fields
+if they will only result in default content.
+
 =item B<-version>
 
 Report the version number.
@@ -43,8 +48,9 @@ use Starlink::Prologue;
 use Starlink::Prologue::Parser;
 
 # Options
-my ($help, $man, $version);
+my ($help, $man, $version, $incdefs);
 my $status = GetOptions("help" => \$help,
+                        "incdefs" => \$incdefs,
                         "man" => \$man,
                         "version" => \$version,
                        );
@@ -65,13 +71,13 @@ if (@ARGV) {
   # files on command line
   for my $file (@ARGV) {
     open(my $fh, "<$file") || die "Error opening file $file for read: $!\n";
-    _extract( $file, <$fh> );
+    _extract( $file, $incdefs, <$fh> );
   }
 } else {
   # try reading from pipe
   my @lines = <>;
   if (@lines) {
-    _extract( undef, @lines );
+    _extract( undef, $incdefs, @lines );
   }
 }
 
@@ -79,6 +85,7 @@ exit;
 
 sub _extract {
   my $file = shift;
+  my $incdefs = shift;
   my @lines = @_;
   my $parser = new Starlink::Prologue::Parser;
   my @prologues = $parser->extract_prologues( @lines );
@@ -89,6 +96,9 @@ sub _extract {
   for my $prl (@prologues) {
     # Guess missing items
     $prl->guess_defaults( File => $file );
+
+    # write default sections?
+    $prl->write_defaults( $incdefs );
 
     # stringify
     print $prl->stringify;
