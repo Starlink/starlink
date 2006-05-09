@@ -19,8 +19,8 @@ extern "C" {
 
     /* Extract a FrameSet for an image */
     int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, 
-                          int length1, int length2, AstFrameSet **iwcs, 
-                          char **error_mess );
+                          int length1, int length2, int index, 
+                          AstFrameSet **iwcs, char **error_mess );
 
 
     /* Query the coordinate of a base pixel along the equivalent world
