@@ -147,6 +147,7 @@ sub new {
                    START_C_COMMENT => 0,
                    END_C_COMMENT => 0,
 		   PROLOGUE_TYPE => undef,
+                   WRITE_DEFAULTS => 0,
 		  }, $class;
 
   return $prl;
@@ -225,6 +226,23 @@ sub prologue_type {
     $self->{PROLOGUE_TYPE} = shift;
   }
   return $self->{PROLOGUE_TYPE};
+}
+
+=item B<write_defaults>
+
+If true, default elements will be filled in for Bugs, Language, History etc,
+else, if empty, those elements will not be written out when the prologue is stringified.
+
+  $write = $prl->write_defaults();
+
+=cut
+
+sub write_defaults {
+  my $self = shift;
+  if (@_) {
+    $self->{WRITE_DEFAULTS} = shift;
+  }
+  return $self->{WRITE_DEFAULTS};
 }
 
 =back
@@ -511,6 +529,9 @@ sub stringify {
     @sections = @new;
   }
 
+  # are we allowed to write default sections?
+  my $wrdef = $self->write_defaults;
+
   # Go through each of the headers in order
   for my $h (@sections) {
 
@@ -521,7 +542,7 @@ sub stringify {
     @content = $self->content( $section ) if defined $section;
 
     # if no content we may have a default
-    if (!@content) {
+    if (!@content && $wrdef) {
       if (exists $DEFAULTS{$h}) {
 	$section = $h;
 	@content = ( $DEFAULTS{$h} );
@@ -583,7 +604,15 @@ sub guess_defaults {
   # fix up language if not defined
   if (defined $hints{File} && !@{$self->language}) {
     my $file = $hints{File};
+
+    # remove any .in suffix since they are conventionally
+    # autotools files that are processed to the file without
+    # the .in
+    $file =~ s/\.in$//;
+
+    # do we have a suffix?
     if ($file =~ /\./) {
+
       # File has a suffix
       my @parts = split /\./,$file;
 
@@ -607,6 +636,8 @@ sub guess_defaults {
 	$lang = "TCL";
       } elsif ($suffix eq 'py' ) {
 	$lang = "Python";
+      } elsif ($suffix eq 'awk') {
+	$lang = "AWK";
       } elsif ($suffix eq 'icl') {
 	$lang = "ICL";
       }
