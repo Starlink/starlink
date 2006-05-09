@@ -73,6 +73,8 @@
 *        requires "pixel" coords to have integer values at the centre
 *        of pixels, but Starlink pixel coords have integer value at 
 *        pixel corners.
+*     9-MAY-2006 (DSB):
+*        Correct number of axes in input NDF.
 *     {enter_further_changes_here}
 
 *-
@@ -151,7 +153,6 @@
       DO J = 1, NDIM
          LBND( J ) = VAL__MAXI
          UBND( J ) = VAL__MINI
-	 SHIFT( J ) = -0.5D0
       END DO
       USEVAR = .TRUE.
 
@@ -196,11 +197,20 @@
          
 *  Create a ShiftMap which shifts pixel coords by 0.5 of a pixel in order
 *  to put integer values at the centre of the pixel (as required by AST_REBINSEQ).
-	 SM = AST_SHIFTMAP( NDIM, SHIFT, ' ', STATUS )
+         NDIM1 = AST_GETI( MAPS( I ), 'Nin', STATUS )
+         DO J = 1, NDIM1
+   	    SHIFT( J ) = -0.5D0
+         END DO
+	 SM = AST_SHIFTMAP( NDIM1, SHIFT, ' ', STATUS )
 
 *  Combine this with the above Mapping.
 	 MAPS( I ) = AST_CMPMAP( SM, MAPS( I ), .TRUE., ' ', STATUS )
-	 CALL AST_INVERT( SM, STATUS )
+
+*  Do the inverse for the output pixel axes.
+         DO J = 1, NDIM
+   	    SHIFT( J ) = 0.5D0
+         END DO
+	 SM = AST_SHIFTMAP( NDIM, SHIFT, ' ', STATUS )
 	 MAPS( I ) = AST_CMPMAP( MAPS( I ), SM, .TRUE., ' ', STATUS )
 
 *  Simplify the total Mapping.	 
@@ -210,13 +220,13 @@
          CALL AST_EXPORT( MAPS( I ), STATUS )
 
 *  Get the pixel index bounds of this input NDF, and convert to double
-*  precision pixel coordinates which have inegral values at the centre of
+*  precision pixel coordinates which have integral values at the centre of
 *  each pixel. Note, this is different to the usual Starlink convention
 *  for pixel coordinates which has integral values at the edges of each
 *  pixel, but it is the convention required by AST_REBINSEQ.
          CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND1, UBND1, NDIM1, 
      :                   STATUS )
-         DO J = 1, NDIM
+         DO J = 1, NDIM1
             DLBND1( J ) = DBLE( LBND1( J ) ) - 0.5D0
             DUBND1( J ) = DBLE( UBND1( J ) ) + 0.5D0
          END DO
