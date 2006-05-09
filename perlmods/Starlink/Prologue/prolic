@@ -21,6 +21,16 @@ stdout, modifying if necessary.
 
 =over 4
 
+=item B<-incdefs>
+
+Include fields that only include default content. Default is to skip empty fields
+if they will only result in default content.
+
+=item B<-copyright>
+
+Override the default copyright text (usually Starlink derived CLRC, SERC or PPARC)
+with the supplied value. It should be quoted.
+
 =item B<-version>
 
 Report the version number.
@@ -47,10 +57,12 @@ use Starlink::Prologue;
 use Starlink::Prologue::Parser;
 
 # Options
-my ($help, $man, $version);
+my ($help, $man, $version, $incdefs, $copytext);
 my $status = GetOptions("help" => \$help,
+                        "incdefs" => \$incdefs,
                         "man" => \$man,
                         "version" => \$version,
+                        "copyright=s" => \$copytext,
                        );
 
 pod2usage(1) if $help;
@@ -74,6 +86,9 @@ my %COPYTEXT = (
 		PPARC => "Particle Physics & Astronomy Research Council",
 	       );
 
+# add user override if required
+$COPYTEXT{USER} = $copytext if defined $copytext;
+
 # do we have standard input or file arguments?
 
 if (@ARGV) {
@@ -81,7 +96,7 @@ if (@ARGV) {
   for my $file (@ARGV) {
     next unless -f $file;
     open(my $fh, "<$file") || die "Error opening file $file for read: $!\n";
-    my ($nmodified, $types, $rewrite) = _process( $file, <$fh> );
+    my ($nmodified, $types, $rewrite) = _process( $file, $incdefs, <$fh> );
     close($fh) || die "Error closing input file $file: $!\n";
 
     # was a prologue modified?
@@ -102,7 +117,7 @@ if (@ARGV) {
   # try reading from pipe
   my @lines = <>;
   if (@lines) {
-    my ($nmodified, $types, $rewrite) = _process( undef, @lines );
+    my ($nmodified, $types, $rewrite) = _process( undef, $incdefs, @lines );
     print $rewrite;
   }
 }
@@ -111,6 +126,7 @@ exit;
 
 sub _process {
   my $file = shift;
+  my $incdefs = shift;
   my @lines = @_;
   my $parser = new Starlink::Prologue::Parser;
   my @processed = $parser->parse_lines( @lines );
@@ -152,21 +168,29 @@ sub _process {
 	  my @clrc;
 	  my @pparc;
 	  my @serc;
-	  for my $yr (sort @years) {
-	    if ($yr < 1995) {
-	      push(@serc, $yr);
-	    } elsif ($yr >= 2005) {
-	      push(@pparc, $yr);
-	    } else {
-	      push(@clrc, $yr);
+          my @user;
+          if (exists $COPYTEXT{USER} && defined $COPYTEXT{USER}) {
+             # user is overriding copyright text
+             @user = @years;
+          } else {
+             # assume starlink copyrights
+             for my $yr (sort @years) {
+	      if ($yr < 1995) {
+	        push(@serc, $yr);
+	      } elsif ($yr >= 2005) {
+	        push(@pparc, $yr);
+	      } else {
+	        push(@clrc, $yr);
+	      }
 	    }
-	  }
+          }
 
-	  # Build up the copyright text
+	  # Build up the copyright text (not pretty or clever)
 	  my $ctext = '';
 	  $ctext .= _write_copyright( $COPYTEXT{SERC}, @serc );
 	  $ctext .= " "._write_copyright( $COPYTEXT{CLRC}, @clrc );
 	  $ctext .= " "._write_copyright( $COPYTEXT{PPARC}, @pparc );
+	  $ctext .= " "._write_copyright( $COPYTEXT{USER}, @user );
 	  if ($ctext) {
 	    $ctext .= " All Rights Reserved.";
 
@@ -192,6 +216,9 @@ sub _process {
 
       # Guess missing items
       $line->guess_defaults( File => $file );
+
+      # should we write defaults?
+      $line->write_defaults( $incdefs );
 
       # store type
       push(@types, $line->prologue_type);
