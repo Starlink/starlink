@@ -2586,8 +2586,9 @@ hypertext (\qt{.htx}) documents.
 \htmlref{documents}{sect:hypertextdocuments} do so using a WWW browser
 and will try to make use of one that you already have running, if
 possible. Otherwise a new one will be started. By default, one of the
-browsers in the list \st{firefox}, \st{mozilla}, \st{netscape}, \st{safari}
-and \st{mosaic} will be used (in that priority order).
+browsers in the list \st{firefox}, \st{mozilla}, \st{netscape},
+and \st{mosaic} will be used (in that priority order). On Mac OS X
+the default browser will be used.
 
 You can change the browser that is used by means of the HTX\_BROWSER
 environment variable. Thus, if you normally use the command \qt{mozilla} to
@@ -2632,6 +2633,9 @@ will be warned if this must be repeated by each subsequent HTX
 command (not all WWW browsers require this), as it will slow down your
 access to documents. Defining the \hi{DISPLAY} environment variable
 yourself will eliminate this delay.
+
+The DISPLAY variable is not required on Mac OS X. HTX does not support
+X-based WWW browsers on OS X.
 
 \subsection{\label{sect:browsercommunication}\xlabel{WWW_browser_communication}WWW Browser Communication}
 
