@@ -564,7 +564,14 @@ sub stringify {
 	if (defined $l) {
 	  if ($l =~ /\S/) {
 	    # not just a blank line
-	    $code .= $cchar . "     " . $l ."\n";
+            # special case Fortran continuation characters in a
+            # Invocation section if they are the first characters
+            my $spaces = " " x 5;
+            if ($section eq 'Invocation' && $l =~ /^:/) {
+               # one less space
+               $spaces = " " x 4;
+            }
+	    $code .= $cchar . $spaces . $l ."\n";
 	  } else {
 	    # blank line
 	    $code .= $cchar . "\n";
