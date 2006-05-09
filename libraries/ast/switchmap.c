@@ -113,6 +113,9 @@ f     The SwitchMap class does not define any new routines beyond those
 *        Original version.
 *     17-MAR-2006 (DSB):
 *        Guard against AST__BAD selector values.
+*     9-MAY-2006 (DSB):
+*        Check selector Mapping pointers are not NULL before calling
+*        astEqual in Equal.
 *class--
 */
 
@@ -260,14 +263,16 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
          fsmap2 = GetSelector( that, 1, &fsinv2 );
    
 /* Are they equal? */
-         if( ( !fsmap1 && !fsmap2 ) || astEqual( fsmap1, fsmap2 ) ) {
+         if( ( !fsmap1 && !fsmap2 ) || 
+             ( fsmap1 && fsmap2 && astEqual( fsmap1, fsmap2 ) ) ) {
    
 /* Get the inverse selector Mappings from the two SwitchMaps. */
             ismap1 = GetSelector( this, 0, &isinv1 );
             ismap2 = GetSelector( that, 0, &isinv2 );
    
 /* Are they equal? */
-            if( ( !ismap1 && !ismap2 ) || astEqual( ismap1, ismap2 ) ) {
+            if( ( !ismap1 && !ismap2 ) || 
+                ( ismap1 && ismap2 && astEqual( ismap1, ismap2 ) ) ) {
    
 /* Loop over the route mappings, breaking as soon as two unequal route
    Mappings are found. Re-instate the original values for the route
