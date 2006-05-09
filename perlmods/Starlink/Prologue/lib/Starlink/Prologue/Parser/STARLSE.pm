@@ -174,6 +174,37 @@ sub push_line {
 
 }
 
+=item B<tidy_content>
+
+Subclass variant of tidy_content(). The base class trims blank lines from
+the start and end of the section, this version also removes section terminators
+of the form 
+
+     {enter_changes_here}
+
+etc.
+
+  $parts->tidy_content;
+
+=cut
+
+sub tidy_content {
+  my $self =  shift;
+  $self->SUPER::tidy_content();
+
+  # look for terminator. Only has lower case and underscore characters.
+  my @content = $self->content;
+  if ($content[-1] =~ /^\{[a-z_]+\}$/) {
+    pop(@{$self->content});
+  }
+
+  # call base class again just in case we have a blank line left
+  $self->SUPER::tidy_content();
+
+}
+
+=back
+
 =head2 Class Methods
 
 =over 4
