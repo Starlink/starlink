@@ -10,6 +10,10 @@
 #  Type of Module:
 #     Shell script
 
+#  Invocation:
+#        browse doc
+#     or cat doc | browse
+
 #  Description:
 #     This script displays a document using a WWW browser. If necessary, it
 #     starts a new invocation of the browser. Otherwise, it uses an existing
@@ -20,15 +24,32 @@
 #     on standard input. These options are controlled by the setting of the
 #     HTX_WHERE environment variable.
 
-#  Invocation:
-#        browse doc
-#     or cat doc | browse
-
 #  Parameters:
 #     doc
 #        The optional specification of the document to be displayed, given
 #        either as a URL or the name of a local file which is accessible to the
 #        browser.
+
+#  Notes:
+#     -  Subject to the limitations imposed by each browser, this script
+#     attempts to use the most appropriate current browser invocation for
+#     displaying documents.
+#     -  It also attempts to manage temporary file space used to store any
+#     documents read from standard input.
+
+#  Implementation Deficiencies:
+#     -  Management of temporary files is somewhat imperfect due to the
+#     difficulty of knowing when the browser has finished with them. The
+#     strategy adopted is to leave the last 3 of these around but to remove
+#     older ones whenever a new one is created (the configuration files used
+#     by Mosaic are handled somewhat more precisely than this, however).
+#     -  In the case of Mosaic, temporary files are associated with a specific
+#     browser process ID, so it is possible to periodically determine if the
+#     associated browser has been stopped and remove all unnecessary files.
+#     With Netscape, however, the process ID is not known (it could be running
+#     on another machine) so some files will generally be left around. The
+#     main objective in this case is simply to prevent the number of files
+#     growing without limit.
 
 #  Environment Variables Used:
 #     DISPLAY
@@ -72,29 +93,26 @@
 #        -  If it has neither of these values, the "doc" argument is
 #        interpreted as a URL.
 
-#  Notes:
-#     -  Subject to the limitations imposed by each browser, this script
-#     attempts to use the most appropriate current browser invocation for
-#     displaying documents.
-#     -  It also attempts to manage temporary file space used to store any
-#     documents read from standard input.
-
-#  Implementation Deficiencies:
-#     -  Management of temporary files is somewhat imperfect due to the
-#     difficulty of knowing when the browser has finished with them. The
-#     strategy adopted is to leave the last 3 of these around but to remove
-#     older ones whenever a new one is created (the configuration files used
-#     by Mosaic are handled somewhat more precisely than this, however).
-#     -  In the case of Mosaic, temporary files are associated with a specific
-#     browser process ID, so it is possible to periodically determine if the
-#     associated browser has been stopped and remove all unnecessary files.
-#     With Netscape, however, the process ID is not known (it could be running
-#     on another machine) so some files will generally be left around. The
-#     main objective in this case is simply to prevent the number of files
-#     growing without limit.
-
 #  Copyright:
-#     Copyright (C) 1998 Central Laboratory of the Research Councils
+#     Copyright (C) 1998 Central Laboratory of the Research Councils.
+#     Copyright (C) 2004, 2006 Particle Physics and Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (Starlink, RAL)
