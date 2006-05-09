@@ -40,6 +40,13 @@
 *     STATUS = INTEGER (Given & Returned)
 *        Global status value.
 
+*  Notes:
+*     -  The input arrays must not contain any bad data.
+*     -  There is a routine for double-precision, and real data types:
+*     replace "x" in the routine name by D or R as appropriate.  The
+*     DATA1, DATA2, SORT1, SORT2 arrays and the maximum distance
+*     supplied to the routine must have the data type specified.
+
 *  Algorithm:
 *     This routine first sorts both arrays and then compares cumulative
 *     distribution functions.  The largest separation between these
@@ -49,13 +56,6 @@
 *  References:
 *     - Press et al, 1992, "Numerical Recipes in FORTRAN", 2nd edition
 *     (CUP).
-
-*  Notes:
-*     -  The input arrays must not contain any bad data.
-*     -  There is a routine for double-precision, and real data types:
-*     replace "x" in the routine name by D or R as appropriate.  The
-*     DATA1, DATA2, SORT1, SORT2 arrays and the maximum distance
-*     supplied to the routine must have the data type specified.
 
 *  Copyright:
 *     Copyright (C) 1996-1997 Central Laboratory of the Research
@@ -89,9 +89,6 @@
 *        Made generic and some tidying.  Reordered the N2 argument to
 *        adhere to the Starlink standard.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
  

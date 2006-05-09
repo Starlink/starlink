@@ -48,8 +48,6 @@
 *        within the central element.
 *     STATUS = INTEGER (Returned)
 *        The global status.
-*
-
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
@@ -83,9 +81,6 @@
 *        Fixed bug in evaluation of the dimension sizes.  Used the
 *        modern style variable declaration and comment indentation.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

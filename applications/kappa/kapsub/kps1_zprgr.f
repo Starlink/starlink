@@ -47,6 +47,11 @@
 *     STATUS = INTEGER (Given)
 *        Global status value.
 
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     arrays supplied to the routine must have the data type specified.
+
 *  Algorithm:
 *     The routine takes as input a data array and its dimensions,
 *     and also the start and finish lines and columns that are to be
@@ -67,11 +72,6 @@
 
 *  Implementation Deficiencies:
 *     No bad-pixel flag to improve efficiency.
-
-*  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
-*     arrays supplied to the routine must have the data type specified.
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council. All
@@ -100,10 +100,7 @@
 *  History:
 *     1991 May 28 (MJC):
 *        Original based on ZPLNSB in pre-0.8 KAPPA.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
+*     {enter_further_changes_here}
 
 *-
  

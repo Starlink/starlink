@@ -68,14 +68,6 @@
 *     STATUS = INTEGER( READ, WRITE )
 *        Value of the status on entering this subroutine.
 
-*  Algorithm:
-*     - Report the maximum and minimum values in the array.
-*     - Obtain the scaling limits, which must be different values.
-*       The polarity of the defaults is controlled by the input switch.
-*     - The scaled image is then produced with or without inversion,
-*       and with or without bad-pixel checking via a subroutine. Bad
-*       values are set to the defined value.
-
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
 *     the routine name by B, D, I, R or W as appropriate. The array and
@@ -83,6 +75,14 @@
 *     -  The array is normally inverted so that the image will appear
 *     the correct way round when displayed as the GKS routine
 *     to display the image inverts it.
+
+*  Algorithm:
+*     - Report the maximum and minimum values in the array.
+*     - Obtain the scaling limits, which must be different values.
+*       The polarity of the defaults is controlled by the input switch.
+*     - The scaled image is then produced with or without inversion,
+*       and with or without bad-pixel checking via a subroutine. Bad
+*       values are set to the defined value.
 
 *  Copyright:
 *     Copyright (C) 1990-1992 Science & Engineering Research Council.
@@ -126,9 +126,6 @@
 *       acceptable value (i.e. change .LT. to .LE.). This is because DSML
 *       can be zero  in the _DOUBLE version of this file.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
  

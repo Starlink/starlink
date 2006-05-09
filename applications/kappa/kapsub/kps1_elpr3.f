@@ -107,9 +107,6 @@
 *        Add the WMEAN argument.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
 
 *  Type Definitions:

@@ -55,6 +55,12 @@
 *     STATUS = INTEGER (Given and Returned)
 *        Global status parameter.
 
+*  Notes:
+*     -  There is a routine for double-precision and single-precision
+*     floating-point data types: replace "x" in the routine name by D
+*     or R as appropriate.  The INARR, INVAR, OUTARR, and OUTVAR
+*     arguments must have the data type specified.
+
 *  Algorithm:
 *     If status not o.k. - return
 *     Set up co-ordinates of the two array centres
@@ -89,12 +95,6 @@
 *        Endfor
 *     Endfor
 *     Return
-
-*  Notes:
-*     -  There is a routine for double-precision and single-precision
-*     floating-point data types: replace "x" in the routine name by D
-*     or R as appropriate.  The INARR, INVAR, OUTARR, and OUTVAR
-*     arguments must have the data type specified.
 
 *  Copyright:
 *     Copyright (C) 1985-1986, 1988-1989 Science & Engineering Research
@@ -140,9 +140,6 @@
 *        modern variable declarations.  Evaluate the transformation
 *        inline for greater efficiency.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
  

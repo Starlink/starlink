@@ -141,10 +141,7 @@
 *  History:
 *     1991 January 31 (MJC):
 *        Original version based upon KPS1_PUTx.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
 

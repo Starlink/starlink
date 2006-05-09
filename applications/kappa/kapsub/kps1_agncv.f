@@ -70,9 +70,6 @@
 *        genuine data or axis co-ordinates.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
  
 *  Type Definitions:

@@ -38,8 +38,6 @@
 *     -  There is a routine for the double precision and real data
 *     types: replace "x" in the routine name by D or R as appropriate.
 *     The AXIS and ARRAY arguments must have the data type specified.
-*
-
 
 *  Copyright:
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
@@ -68,10 +66,7 @@
 *  History:
 *     1995 September 18 (MJC):
 *        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
  

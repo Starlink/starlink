@@ -38,6 +38,13 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     ARRAY argument must have the data type specified.
+*     - If the number of right-angles for rotation is not 1, 2, or 3
+*     then STATUS will be set to SAI__ERROR and an error reported.
+
 *  Algorithm:
 *     If no error on entry then
 *        If no. of right angles to rotate is 1 then
@@ -94,13 +101,6 @@
 *        Endif
 *     Endif
 
-*  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
-*     ARRAY argument must have the data type specified.
-*     - If the number of right-angles for rotation is not 1, 2, or 3
-*     then STATUS will be set to SAI__ERROR and an error reported.
-
 *  Copyright:
 *     Copyright (C) 1983-1984, 1986, 1988-1989 Science & Engineering
 *     Research Council. Copyright (C) 1995 Central Laboratory of the
@@ -143,9 +143,6 @@
 *        Made generic from ROTAS2.  Used an SST prologue and modern
 *        variable declarations.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
  

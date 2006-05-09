@@ -71,9 +71,6 @@
 *        Use SHL_PAGTXT to output text.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
 
 *  Type Definitions:

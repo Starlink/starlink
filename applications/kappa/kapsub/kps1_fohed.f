@@ -34,6 +34,12 @@
 *     STATUS = INTEGER (Given)
 *        The global status.
 
+*  Notes:
+*     -  There is a routine for real and double-precision floating-
+*     point data: replace "x" in the routine name by D or R as
+*     appropriate.  The arrays and maximum difference supplied to
+*     the routine must have the data type specified.
+
 *  Algorithm:
 *     - The `untangling' process described in routine FFTFOR is
 *       reversed.
@@ -49,12 +55,6 @@
 *       invert the FFT.  The user is told what the maximum deviation is
 *       between any two estimates of the same pixel in the Hermitian
 *       FFT.
-
-*  Notes:
-*     -  There is a routine for real and double-precision floating-
-*     point data: replace "x" in the routine name by D or R as
-*     appropriate.  The arrays and maximum difference supplied to
-*     the routine must have the data type specified.
 
 *  Copyright:
 *     Copyright (C) 1988, 1990 Science & Engineering Research Council.
@@ -97,9 +97,6 @@
 *     1995 March 30 (MJC):
 *        Made generic from HERMIT.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
  

@@ -16,8 +16,8 @@
 
 *  Invocation:
 *      CALL INRE( CURSOR, ZONEOV, ZONEO, XCEN, YCEN, LBND, DIMS,
-*     :           XLOW, XHIGH, YLOW, YHIGH, PNLB, PNUB,
-*     :           X1, X2, Y1, Y2, STATUS )
+*    :           XLOW, XHIGH, YLOW, YHIGH, PNLB, PNUB,
+*    :           X1, X2, Y1, Y2, STATUS )
 
 *  Description:
 *     This subroutine defines a region of a 2-d array. If an image
@@ -179,9 +179,6 @@
 *     1992 Mar  3: Replaced AIF parameter-system calls by the extended
 *                  PAR library (RAL::CUR).
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

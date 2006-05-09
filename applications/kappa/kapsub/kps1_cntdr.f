@@ -96,6 +96,9 @@
 *     STATUS = INTEGER (Given)
 *        Global status value.
 
+*  Notes:
+*     -  Magic-value bad pixels are correctly processed.
+
 *  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     The routine makes a separate pass through the image for each
@@ -140,9 +143,6 @@
 *  Implementation Deficiencies:
 *     The contours are not smooth and the scanning algorithm can be made
 *     many times faster by not examining all pixels at all heights.
-
-*  Notes:
-*     -  Magic-value bad pixels are correctly processed.
 
 *  Copyright:
 *     Copyright (C) 1000, 1983, 1988-1989 Science & Engineering
@@ -198,9 +198,6 @@
 *     2006 April 12 (MJC):
 *        Remove unused variable and wrapped long lines.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
 

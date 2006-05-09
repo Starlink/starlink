@@ -14,8 +14,8 @@
 *     SUBROUTINE
 
 *  Invocation:
-*      CALL HSTLO( HIST, NHIST, HMIN, HMAX, NULL, XLOG, YLOG, NPOINT,
-*     :            XLOC, YLOC, STATUS )
+*     CALL HSTLO( HIST, NHIST, HMIN, HMAX, NULL, XLOG, YLOG, NPOINT,
+*    :            XLOC, YLOC, STATUS )
 
 *  Description:
 *     This routine computes the locus of an histogram for later
@@ -114,9 +114,6 @@
 *  History:
 *     1989 Apr 23: Original (RAL::CUR).
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

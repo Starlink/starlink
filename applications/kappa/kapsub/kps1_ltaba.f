@@ -75,9 +75,6 @@
 *        Correct colour-index offset when the palette is being used.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_new_bugs_here}
-
 *-
 
 *  Type Definitions:

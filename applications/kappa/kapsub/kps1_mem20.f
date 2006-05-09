@@ -70,9 +70,6 @@
 *        Name changed from KPS1_SET20 to KPS$MEM20.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
       
 *  Type Definitions:

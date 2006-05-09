@@ -55,9 +55,6 @@
 *        Total re-write for AST/PGPLOT/ARD V2.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
 
 *  Type Definitions:

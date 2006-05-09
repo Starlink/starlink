@@ -87,9 +87,6 @@
 *        Set seed using KPG1_PSEED instead of PDA_RNSED.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_new_bugs_here}
-
 *-
 
 *  Type Definitions:

@@ -123,9 +123,6 @@
 *        an error was reported if any stars could not be used.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
  
 *  Type Definitions:

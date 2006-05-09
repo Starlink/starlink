@@ -95,9 +95,6 @@
 *        Added args INK, X1, X2, Y1 and Y2.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
       
 *  Type Definitions:

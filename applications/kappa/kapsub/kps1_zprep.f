@@ -64,8 +64,6 @@
 *        selected.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-*
-
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
@@ -99,9 +97,6 @@
 *        Corrected the Purpose, and used modern-style commenting and
 *        variable declarations.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

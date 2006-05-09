@@ -83,9 +83,6 @@
 *        Modified to normalise the total data sum in the PSF to 1.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
       
 *  Type Definitions:

@@ -144,9 +144,6 @@
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_new_bugs_here}
-
 *-
 
 *  Type Definitions:

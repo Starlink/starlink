@@ -32,8 +32,6 @@
 *        The upper x co-ordinate bound of the histogram.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-*
-
 
 *  Copyright:
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
@@ -62,10 +60,7 @@
 *  History:
 *     1996 October 2 (MJC):
 *        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

@@ -46,8 +46,6 @@
 *  Prior Requirements:
 *     -  GKS or SGS should be active and there should be a current
 *     viewport or zone.
-*
-
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council. All
@@ -76,10 +74,7 @@
 *  History:
 *     1991 July 23 (MJC):
 *        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

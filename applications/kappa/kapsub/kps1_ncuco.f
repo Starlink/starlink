@@ -40,8 +40,6 @@
 *  Prior Requirements:
 *     -  An SGS device must be opened, and an SGS zone selected or
 *     created.
-*
-
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council. All
@@ -70,10 +68,7 @@
 *  History:
 *     1991 October 22 (MJC):
 *        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

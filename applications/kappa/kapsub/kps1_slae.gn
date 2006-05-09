@@ -46,8 +46,6 @@
 *     specified.
 *     -  An error report is made and bad status returned should the
 *     axis array have too few elements for interpolation.
-*
-
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
@@ -78,10 +76,7 @@
 *        Original version.
 *     2006 April 12 (MJC):
 *        Remove unused variables.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

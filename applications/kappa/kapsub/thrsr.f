@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     CALL THRSR( INARR, OUTARR, DIMS, THRLO, THRHI, NEWLO, NEWHI,
-*     :             STATUS )
+*    :             STATUS )
 
 *  Description:
 *     Takes an array of data and sets all values above a defined upper

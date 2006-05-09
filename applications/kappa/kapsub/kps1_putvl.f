@@ -88,10 +88,7 @@
 *  History:
 *     1995 May 9 (MJC):
 *        Original version based on TRA_PUTVL in HDSTRACE.
-*     {enter_any_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
 

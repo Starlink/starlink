@@ -31,6 +31,12 @@
 *     STATUS = INTEGER (Given)
 *        The global status.
 
+*  Notes:
+*     -  There is a routine for real and double-precision floating-
+*     point data: replace "x" in the routine name by D or R as
+*     appropriate.  The arrays and fill value supplied to the routine
+*     must have the data type specified.
+
 *  Algorithm:
 *     - The images may have been padded out at high column and
 *       line numbers (see preprocessing subroutine), therefore the
@@ -42,12 +48,6 @@
 *       unpadded data, and `reverse' in which the swap is done about a
 *       position equal to the `forward' position reflected through the
 *       image centre.
-
-*  Notes:
-*     -  There is a routine for real and double-precision floating-
-*     point data: replace "x" in the routine name by D or R as
-*     appropriate.  The arrays and fill value supplied to the routine
-*     must have the data type specified.
 
 *  Copyright:
 *     Copyright (C) 1988, 1990, 1994 Science & Engineering Research
@@ -89,9 +89,6 @@
 *     1995 March 30 (MJC):
 *        Made generic from FTQUAD.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 *  Type Definitions:

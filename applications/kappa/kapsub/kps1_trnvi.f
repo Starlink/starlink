@@ -46,6 +46,13 @@
 *     STATUS = INTEGER (Given)
 *        Global status value.
 
+*  Notes:
+*     -  This is a server subroutine for TRANDAT.  The code would be at
+*        the top level (i.e. TRANDAT) but for the requirement to
+*        transfer ASCII-file data into mapped work arrays.
+*     -  There is a routine for integer and floating-point data types:
+*        replace "x" in the routine name by I, D, or R as appropriate.
+
 *  Algorithm:
 *     -  Find the product of the number of elements within succeeding
 *     dimensions.
@@ -53,13 +60,6 @@
 *     -  For all points compute the pixel index (after the offset and
 *     scaling) for each dimension, and then convert to a pixel index in
 *     the output vector array. Set the value of the pixel.
-
-*  Notes:
-*     -  This is a server subroutine for TRANDAT.  The code would be at
-*        the top level (i.e. TRANDAT) but for the requirement to
-*        transfer ASCII-file data into mapped work arrays.
-*     -  There is a routine for integer and floating-point data types:
-*        replace "x" in the routine name by I, D, or R as appropriate.
 
 *  Prior Requirements:
 *     -  The output array should be initialised to zero or the magic
@@ -97,9 +97,6 @@
 *        Corrected the calculation of pixel index by removing a
 *        superfluous + 0.5 from the IFIX calculation.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
  

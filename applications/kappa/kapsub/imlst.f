@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     CALL IMLST( INARR, LBND, DIM1, DIM2, X1, Y1, X2, Y2, FNAME,
-*     :            FACTOR, STATUS )
+*    :            FACTOR, STATUS )
 
 *  Description:
 *     This routine generates a formatted listing of a 1-D or a 2-D
@@ -117,9 +117,6 @@
 *     1993 Feb 9  : Used the improved FIO_ASSOC and the new FIO_ANNUL.
 *                   (RAL::CUR).
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

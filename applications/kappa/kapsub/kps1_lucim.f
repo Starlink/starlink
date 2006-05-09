@@ -91,10 +91,7 @@
 *     1995 April 6 (MJC):
 *        Corrected typo's and made minor stylistic changes.
 *        Used the modern-style variable declarations.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
 

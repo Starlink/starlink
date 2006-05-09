@@ -67,6 +67,9 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     -  Uses the magic-value method for bad or undefined pixels.
+
 *  Algorithm:
 *     -  Calculate the number of panels produced by the knots.
 *     -  Initialise the rms sums.
@@ -76,9 +79,6 @@
 *        the result if requested.
 *     -  Form the sums for the rms error of the fit.
 *     -  At the end of the loop calculate the rms error.
-
-*  Notes:
-*     -  Uses the magic-value method for bad or undefined pixels.
 
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
@@ -116,9 +116,6 @@
 *     2006 April 12 (MJC):
 *        Remove unused variables.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
       

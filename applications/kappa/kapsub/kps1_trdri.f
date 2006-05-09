@@ -64,14 +64,6 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Algorithm:
-*     -  Get the number of the furthest column to be read.
-*     -  While the buffer is not full and there is no error, read a file
-*        record into a buffer and extract the required columns, storing
-*        them in the output file, and computing the bounds of the array.
-*        Report the context of an error should one occur.
-*     -  If the file was completely read, set a flag to indicate this.
-
 *  Notes:
 *     -  This is a server subroutine for TRANDAT.  The code would be at
 *        the top level (i.e. TRANDAT) but for the requirement to
@@ -83,6 +75,14 @@
 *        from the current line in the file.  Hence this routine can be
 *        called repeatedly as the the output array is expanded to
 *        accommodate the input data.
+
+*  Algorithm:
+*     -  Get the number of the furthest column to be read.
+*     -  While the buffer is not full and there is no error, read a file
+*        record into a buffer and extract the required columns, storing
+*        them in the output file, and computing the bounds of the array.
+*        Report the context of an error should one occur.
+*     -  If the file was completely read, set a flag to indicate this.
 
 *  Prior Requirements:
 *     -  The Fortran ASCII file must already be opened.
@@ -121,9 +121,6 @@
 *     1996 January 31 (MJC):
 *        Replaced NAG calls.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
  

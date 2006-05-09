@@ -111,10 +111,7 @@
 *  History:
 *     6-OCT-1998 (DSB):
 *        Original version, based on IRAS90:SALIA3.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

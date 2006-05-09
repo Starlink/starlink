@@ -17,8 +17,8 @@
 
 *  Invocation:
 *     CALL LINPLT( XDAT, YDAT, NELM, XLIMIT, YLIMIT, XLOW, YLOW, XHIGH,
-*     :             YHIGH, TITLE, XLAB, YLAB, MINTIC, MAJTIC, XLOG, YLOG,
-*     :             OUTTIC, THICK, STATUS )
+*    :             YHIGH, TITLE, XLAB, YLAB, MINTIC, MAJTIC, XLOG, YLOG,
+*    :             OUTTIC, THICK, STATUS )
 
 *  Description:
 *     This subroutine uses NCAR and SNX to draw annotated and labelled
@@ -134,9 +134,6 @@
 *     1988 Oct 25 : Original based on CNTAXS ( RAL::CUR )
 *     1991 Jun 21 : Allow for reversed axes. (RAL::CUR).
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

@@ -74,6 +74,9 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     -  Uses the magic-value method for bad or undefined pixels.
+
 *  Algorithm:
 *     -  Compare number of free fitting parameters with the number of
 *        bins and quit if there is insufficient data.  Also compare
@@ -92,9 +95,6 @@
 *     -  Put the solution coefficients into an array with the terms not
 *        required set to zero.
 *     -  Should the fit be not unique then warn the user.
-
-*  Notes:
-*     -  Uses the magic-value method for bad or undefined pixels.
 
 *  Copyright:
 *     Copyright (C) 1990-1991 Science & Engineering Research Council.
@@ -135,9 +135,6 @@
 *        Removed AA argument.  Used modern style of commenting and
 *        variable declarations.  Renamed fro PLY2D.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
       

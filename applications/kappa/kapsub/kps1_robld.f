@@ -51,6 +51,14 @@
 *     STATUS = INTEGER( UPDATE )
 *        The global status.
 
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     ARRIN, ARROUT, and WORK arguments of the routine must have the
+*     data type specified.
+*     - If an error occurs during the execution of this routine STATUS
+*     will be returned containing the appropriate error value.
+
 *  Algorithm:
 *     If no error on entry then
 *        ENDL is the position of the start of the last rotation box
@@ -95,14 +103,6 @@
 *        Endif
 *     Endif
 
-*  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
-*     ARRIN, ARROUT, and WORK arguments of the routine must have the
-*     data type specified.
-*     - If an error occurs during the execution of this routine STATUS
-*     will be returned containing the appropriate error value.
-
 *  Copyright:
 *     Copyright (C) 1983-1984, 1986, 1989 Science & Engineering
 *     Research Council. Copyright (C) 1995 Central Laboratory of the
@@ -142,9 +142,6 @@
 *        Made generic from ROTAS4.  Used an SST prologue and modern
 *        variable declarations.  Corrected grammatical errors.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
  

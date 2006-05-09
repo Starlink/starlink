@@ -114,9 +114,6 @@
 *        Re-wrote variances estimations.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
 
 *  Type definitions:

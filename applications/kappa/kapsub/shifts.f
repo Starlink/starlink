@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     CALL SHIFTS( SIZE, SHIFT, AXIS, INTSH, WHOLE, NEGAT, FRACT,
-*     :             STATUS )
+*    :             STATUS )
 
 *  Description:
 *     The variables INTSH, WHOLE, NEGAT, and FRACT are set according to
@@ -111,9 +111,6 @@
 *     1988 Jun 22 : Added identification to error reporting
 *                   (RL.STAR::CUR).
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

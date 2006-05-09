@@ -16,8 +16,8 @@
 
 *  Invocation:
 *      CALL MEDWTS( DIFF, STEP, NUMSAM, MEDPOS, MEDTHR, SAMSIZ, SAMINF,
-*     :             IDIM1, IDIM2, ARRIN, ODIM1, ODIM2, SAMPLE, SAMWT,
-*     :             ARROUT, STATUS )
+*    :             IDIM1, IDIM2, ARRIN, ODIM1, ODIM2, SAMPLE, SAMWT,
+*    :             ARROUT, STATUS )
 
 *  Description:
 *     The input array, ARRIN, is filtered using a weighted median
@@ -150,9 +150,6 @@
 *     1992 Jul 20: Fixed bug indexing when median is not computed.
 *                  (RL.STAR::CUR).
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

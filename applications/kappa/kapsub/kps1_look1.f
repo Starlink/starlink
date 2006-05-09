@@ -81,9 +81,6 @@
 *        Remove unused variable and wrapped long lines.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_new_bugs_here}
-
 *-
 
 *  Type Definitions:

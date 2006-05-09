@@ -60,10 +60,7 @@
 *     2006 April 12 (MJC):
 *        Remove unused variables, including CNF_PVAL, and wrapped 
 *        long lines.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
  

@@ -73,10 +73,7 @@
 *        requires "pixel" coords to have integer values at the centre
 *        of pixels, but Starlink pixel coords have integer value at 
 *        pixel corners.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

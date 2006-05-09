@@ -122,10 +122,7 @@
 *  History:
 *     2005 December 2 (MJC):
 *        Original version based upon KPG1_PLOTA by DSB.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

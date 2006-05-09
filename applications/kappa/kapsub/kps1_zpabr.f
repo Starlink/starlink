@@ -61,8 +61,6 @@
 *     -  There is a routine for real and double-precision data types:
 *     replace "x" in the routine name by R or D respectively.  The
 *     bounds supplied to the routine must have the data type specified.
-*
-
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council. All
@@ -93,10 +91,7 @@
 *        Original version.
 *     1991 June 17 (MJC):
 *        Converted to generic.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
  

@@ -75,10 +75,7 @@
 *  History:
 *     1995 May 9 (MJC)
 *        Original version based upon HDSTRACE routine TRA_PUTS.
-*     {enter_any_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
 

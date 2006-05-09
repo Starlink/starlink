@@ -51,7 +51,6 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
-*
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,9 +59,6 @@
 *     2006 April 12 (MJC):
 *        Remove unused variables and wrapped long lines.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

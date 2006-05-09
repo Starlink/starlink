@@ -59,6 +59,12 @@
 *        This is the global status, if this variable has an error value
 *        on entry then an immediate return will occur.
 
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     ARRIN and ARROUT arguments to the routine must have the data
+*     type specified.
+
 *  Algorithm:
 *     If no error then
 *        Copy input array into central area of output array
@@ -77,12 +83,6 @@
 *             array line
 *        Endfor
 *     Endif
-
-*  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
-*     ARRIN and ARROUT arguments to the routine must have the data
-*     type specified.
 
 *  Copyright:
 *     Copyright (C) 1983-1984, 1986, 1989, 1993 Science & Engineering
@@ -130,9 +130,6 @@
 *     1995 July 27 (MJC):
 *        Made generic (from MEDREP).  Used a modern prologue and style.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
  

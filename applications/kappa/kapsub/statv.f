@@ -17,9 +17,9 @@
 
 *  Invocation:
 *     CALL STATV ( ARRAY, DIM, NCLIP, CLIP, MAXMUM, MINMUM, TOTAL, MEAN,
-*     :             STDDEV, NINVAL, MAXPOS, MINPOS, MAXMCL, MINMCL,
-*     :             TOTLCL, MEANCL, STDVCL, NPIXCL, MXPSCL, MNPSCL,
-*     :             STATUS )
+*    :             STDDEV, NINVAL, MAXPOS, MINPOS, MAXMCL, MINMCL,
+*    :             TOTLCL, MEANCL, STDVCL, NPIXCL, MXPSCL, MNPSCL,
+*    :             STATUS )
 
 *  Description:
 *     This routine returns simples statistics of an array.  The

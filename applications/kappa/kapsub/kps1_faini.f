@@ -61,13 +61,6 @@
 *     STATUS = INTEGER (Given)
 *        Value of the status on entry.
 
-*  Algorithm:
-*     - Compute the mean and standard deviation of the array values.
-*     - Derive the scaling limits.
-*     - The scaled image is then produced with or without inversion,
-*       and with or without bad-pixel checking via a subroutine. Bad
-*       pixels are set to defined value.
-
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
 *     the routine name by B, D, I, R, or W as appropriate. The array
@@ -78,6 +71,13 @@
 *     to display the image inverts it.
 *     -  The statistical calculations are performed in double-precision
 *     arithmetic.
+
+*  Algorithm:
+*     - Compute the mean and standard deviation of the array values.
+*     - Derive the scaling limits.
+*     - The scaled image is then produced with or without inversion,
+*       and with or without bad-pixel checking via a subroutine. Bad
+*       pixels are set to defined value.
 
 *  Copyright:
 *     Copyright (C) 1990-1991 Science & Engineering Research Council.
@@ -109,9 +109,6 @@
 *     1991 July 23 (MJC):
 *        Added BADVAL argument.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
  

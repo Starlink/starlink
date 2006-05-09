@@ -38,8 +38,6 @@
 *        - NEGATIVE_DET --- A component of reflection is present.
 *        - CONSTANT_DET --- The scale factor is constant.
 *        - UNIT_DET     --- Areas (or volumes etc.) are preserved.
-*
-
 
 *  Copyright:
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
@@ -68,10 +66,7 @@
 *  History:
 *     1995 February 22 (MJC):
 *        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

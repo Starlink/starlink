@@ -31,17 +31,17 @@
 *     STATUS = INTEGER (Given)
 *        The global status.
 
-*  Algorithm:
-*     - The input complex data is overwritten by the power and phase
-*       data.  `Power' is here used to refer to the modulus of the
-*       complex value, and phase is arctan(imaginary/real) in
-*       radians.
-
 *  Notes:
 *     -  There is a routine for real and double-precision floating-
 *     point data: replace "x" in the routine name by D or R as
 *     appropriate.  The arrays supplied to the routine must have the
 *     data type specified.
+
+*  Algorithm:
+*     - The input complex data is overwritten by the power and phase
+*       data.  `Power' is here used to refer to the modulus of the
+*       complex value, and phase is arctan(imaginary/real) in
+*       radians.
 
 *  Copyright:
 *     Copyright (C) 1988, 1990 Science & Engineering Research Council.
@@ -83,9 +83,6 @@
 *     1995 March 30 (MJC):
 *        Made generic from REALIM.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 *  Type Definitions:

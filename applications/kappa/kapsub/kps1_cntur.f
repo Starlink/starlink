@@ -110,6 +110,12 @@
 *     STATUS  = INTEGER (Given)
 *        Global status value.
 
+*  Notes:
+*     -  Magic-value bad pixels are correctly processed.
+*     -  Uses pen 2 for plotting.  5 also is used when there is a
+*     threshold set.  For pen rotation these become pens 2 to 4 without
+*     a threshold, and 5 to 7 with a threshold.
+
 *  Algorithm:
 *     Check inherited status
 *     Initialise line patterns for annotated contours, or store the pen
@@ -184,12 +190,6 @@
 *     efficiency reasons.  Needs to handle smoothing options for
 *     sub-pixel resolution.
 
-*  Notes:
-*     -  Magic-value bad pixels are correctly processed.
-*     -  Uses pen 2 for plotting.  5 also is used when there is a
-*     threshold set.  For pen rotation these become pens 2 to 4 without
-*     a threshold, and 5 to 7 with a threshold.
-
 *  Prior Requirements:
 *     -  This routine uses SGS, NCAR and GKS graphics. The GKS device
 *     must already be open.
@@ -241,9 +241,6 @@
 *        Renamed from CNTTUR.  Used modern style prologue and
 *        commenting.  Added THRESH argument (for dashed lines).
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

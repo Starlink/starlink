@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     CALL MED3D( WKARR, WKDIM1, WKDIM2, WKDIM3, WTARR, GDDATA, ZNUMBR,
-*     :            MEDNAR, GODNUM, STATUS )
+*    :            MEDNAR, GODNUM, STATUS )
 
 *  Description:
 *     This routine takes as input a 3-d array with dimensions x,y,z.

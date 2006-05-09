@@ -112,9 +112,6 @@
 *        Modified to include bounding box args and INK for KPS1_VECT.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
       
 *  Type Definitions:

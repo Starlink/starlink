@@ -96,6 +96,9 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     -  Uses the magic-value method for bad or undefined pixels.
+
 *  Algorithm:
 *     -  Calculate the number of panels produced by the knots and the
 *        total number of spline coefficients.
@@ -108,9 +111,6 @@
 *        is valid over the whole image area.
 *     -  Obtain the spline coefficients of the least-squares fit.
 *     -  Should the fit be not unique then warn the user.
-
-*  Notes:
-*     -  Uses the magic-value method for bad or undefined pixels.
 
 *  Copyright:
 *     Copyright (C) 1990-1991 Science & Engineering Research Council.
@@ -156,9 +156,6 @@
 *     2006 April 12 (MJC):
 *        Remove unused variables.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
       

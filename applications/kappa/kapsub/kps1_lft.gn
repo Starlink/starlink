@@ -112,10 +112,7 @@
 *     18-JAN-2006 (PWD):
 *        Re-write counters into main loop so that the limits
 *        are used correctly.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
 

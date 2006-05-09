@@ -74,9 +74,6 @@
 *     1988 Jul 7  : Original (RL.STAR::CUR).
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
 
 *  Global Constants:

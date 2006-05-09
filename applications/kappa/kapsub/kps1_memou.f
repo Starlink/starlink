@@ -83,9 +83,6 @@
 *        Name changed from KPS1_SETOU to KPS1_MEMOU.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
       
 

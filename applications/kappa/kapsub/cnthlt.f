@@ -27,6 +27,9 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     -  The messages use ADAM parameters HEIGHT_LIST and HEIGHT_TITLE.
+
 *  Algorithm:
 *     -  Find the first and last heights used, watching out for special
 *        cases like only one height supplied.
@@ -35,9 +38,6 @@
 *     -  Continue to append heights until more than 60 characters have
 *        been used, then report the line of heights, and start a new
 *        line in the buffer.
-
-*  Notes:
-*     -  The messages use ADAM parameters HEIGHT_LIST and HEIGHT_TITLE.
 
 *  Prior Requirements:
 *     -  The contour levels and the flags should be sorted into order.
@@ -69,10 +69,7 @@
 *  History:
 *     1990 Mar 30 (MJC):
 *        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

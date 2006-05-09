@@ -70,6 +70,12 @@
 *     STATUS = INTEGER (Given & Returned)
 *        The interited status.
 
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     array and histogram limits supplied to the routine must have the
+*     data type specified.
+
 *  Algorithm:
 *     -  Determine the polarity of the scaling, the initial pen for the
 *     first histogram bin and the pen increment (+ or - one).  The
@@ -84,12 +90,6 @@
 
 *  Implementation Deficiencies:
 *     Histogram can look spiky because of integer rounding errors.
-
-*  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
-*     array and histogram limits supplied to the routine must have the
-*     data type specified.
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council. All
@@ -121,9 +121,6 @@
 *     1991 June 27 (MJC):
 *        Added MAXVAL argument, and permitted negative scaling.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 
@@ -288,4 +285,3 @@
       END IF
 
       END
-

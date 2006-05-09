@@ -16,7 +16,7 @@
 
 *  Invocation:
 *     CALL LISTSB( ARRAY, DIM1, DIM2, XLOW, YLOW, XUPP, YUPP, OPENF,
-*     :             FDI, FILNAM, STATUS )
+*    :             FDI, FILNAM, STATUS )
 
 *  Description:
 *     This routine takes an input 2-d array and lists out a specified

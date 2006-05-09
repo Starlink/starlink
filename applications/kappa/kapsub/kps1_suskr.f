@@ -27,18 +27,18 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Algorithm:
-*     - Calculate the mean number of data points per knot interval.
-*     - Place the knots this number of data points apart, interpolating
-*       linearly between the data positions to obtain the knot
-*       positions.
-
 *  Notes:
 *     -  Uses the magic-value method for bad or undefined pixels.
 *     -  There is a routine for double precision or real data types:
 *     replace "x" in the routine name by D or R as appropriate.  The
 *     X and XKNOT arguments supplied to the routine must have the data
 *     type specified.
+
+*  Algorithm:
+*     - Calculate the mean number of data points per knot interval.
+*     - Place the knots this number of data points apart, interpolating
+*       linearly between the data positions to obtain the knot
+*       positions.
 
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
@@ -72,9 +72,6 @@
 *        Renamed from SETKNT.  Made generic.  Transposed X and NX
 *        arguments.  Modern style.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
  

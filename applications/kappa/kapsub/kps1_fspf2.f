@@ -82,6 +82,9 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     -  Uses the magic-value method for bad or undefined pixels.
+
 *  Algorithm:
 *     -  Compare number of free fitting parameters with the number of
 *        bins and quit if there is insufficient data.  Also compare
@@ -100,9 +103,6 @@
 *     -  Put the solution coefficients into an array with the terms not
 *        required set to zero.
 *     -  Should the fit be not unique then warn the user.
-
-*  Notes:
-*     -  Uses the magic-value method for bad or undefined pixels.
 
 *  Copyright:
 *     Copyright (C) 1990-1991, 1993 Science & Engineering Research
@@ -146,9 +146,6 @@
 *        Replaced NAG calls.  As a result the AA argument was surplus
 *        to requirements.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
 

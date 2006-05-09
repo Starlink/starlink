@@ -60,6 +60,13 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     OUTARR argument supplied to the routine must have the data type
+*     specified.
+*     -  Uses the magic-value method for bad or undefined pixels.
+
 *  Algorithm:
 *     -  Scan through the bins a line at a time.
 *     -  If the Y co-ordinate is within the valid range then
@@ -67,13 +74,6 @@
 *        else
 *           Fill the line with bad values
 *        end if
-
-*  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
-*     OUTARR argument supplied to the routine must have the data type
-*     specified.
-*     -  Uses the magic-value method for bad or undefined pixels.
 
 *  Copyright:
 *     Copyright (C) 1990, 1993 Science & Engineering Research Council.
@@ -123,9 +123,6 @@
 *     1997 May 10 (MJC):
 *        Renamed from KPS1_FSPAx.  Reordered code to improve efficiency.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
  

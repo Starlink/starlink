@@ -97,9 +97,6 @@
 *        Changed amplitude set at centre to AMP, was 1.0.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
       
 *  Type Definitions:

@@ -75,9 +75,6 @@
 *        Correct conversion of pixels coords to pixel indices.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_new_bugs_here}
-
 *-
 
 *  Type Definitions:

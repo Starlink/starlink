@@ -96,9 +96,6 @@
 *        declarations.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
 
 *  Type Definitions:
@@ -364,4 +361,3 @@
       IF ( ILEVEL .GE. 1 ) CALL MSG_BLANK( STATUS )
 
       END
-

@@ -90,9 +90,6 @@
 *        Name changed from from KPS1_SETCS to KPS1_MEMCS.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
       
 

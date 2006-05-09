@@ -15,7 +15,7 @@
 
 *  Invocation:
 *      CALL MEDWV( DIM, ARRAY, NELM, MEDTHR, SAMSIZ, SAMINF,
-*     :            SAMPLE, SAMWT, MEDIAN, STATUS )
+*    :            SAMPLE, SAMWT, MEDIAN, STATUS )
 
 *  Description:
 *     The weighted median value of the input array is obtained. The
@@ -103,9 +103,6 @@
 *  History:
 *     1989 May 24: Original version (RAL::CUR).
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

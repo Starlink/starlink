@@ -47,18 +47,16 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Algorithm:
-*     -  Loop for all points in the list
-*     -  If the residual lies within the clipping range, increment the
-*        count of bins copied and copy the value, weight and position.
-
 *  Notes:
 *     -  There is a routine for double precision or real data types:
 *     replace "x" in the routine name by D or R as appropriate.  The
 *     FIT, X, Y, Z, and W arguments supplied to the routine must have
 *     the data type specified.
-*
 
+*  Algorithm:
+*     -  Loop for all points in the list
+*     -  If the residual lies within the clipping range, increment the
+*        count of bins copied and copy the value, weight and position.
 
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
@@ -92,9 +90,6 @@
 *        Made generic and renamed from CLPXYL.  Used modern style.
 *        Added Description.  Swapped FIT and EL arguments.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
  

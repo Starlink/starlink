@@ -60,17 +60,17 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     There is a routine for each numeric data type: replace "x" in the
+*     routine name by D, R, I, W, UW, B, UB as appropriate.  The array
+*     supplied to the routine must have the data type specified.
+
 *  Algorithm:
 *     Find initial estimates of the Gaussian amplitude, mean and
 *     width by centroiding and linear least-squares, using the
 *     lower quartile data point as an initial background estimate.
 *     Refine the estimates by repeatedly solving the linearised normal
 *     equations for a least-squares fit.
-
-*  Notes:
-*     There is a routine for each numeric data type: replace "x" in the
-*     routine name by D, R, I, W, UW, B, UB as appropriate.  The array
-*     supplied to the routine must have the data type specified.
 
 *  Copyright:
 *     Copyright (C) 1981, 1990 Science & Engineering Research Council.
@@ -112,9 +112,6 @@
 *        messages showing the requested and used tolerances replace
 *        the error message.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

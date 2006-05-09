@@ -16,7 +16,7 @@
 
 *  Invocation:
 *      CALL INVA( CURSOR, ZONEOV, ZONEO, XCEN, YCEN, LBND, DIM1, DIM2,
-*     :           ARRAY, XLOW, XHIGH, YLOW, YHIGH, PNV, STATUS )
+*    :           ARRAY, XLOW, XHIGH, YLOW, YHIGH, PNV, STATUS )
 
 *  Description:
 *     This subroutine reports the value of a pixel of a 2-d array. If an
@@ -136,9 +136,6 @@
 *     1992 Mar  3: Replaced AIF parameter-system calls by the extended
 *                  PAR library (RAL::CUR).
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

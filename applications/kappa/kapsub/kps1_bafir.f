@@ -64,6 +64,14 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     data and variance arrays supplied to this routine must have the
+*     data type specified.
+*     -  The state of the replacements (iteration, smoothing length,
+*     maximum change, rms change) is tabulated for verbose reporting.
+
 *  Algorithm:
 *     Iterate, replacing each bad pixel with a weighted mean of its
 *     valid neighbours in the same row and column.  The weights
@@ -84,14 +92,6 @@
 *
 *     See the Notes in FILLBAD for additional details and background to
 *     the algorithm.
-
-*  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
-*     data and variance arrays supplied to this routine must have the
-*     data type specified.
-*     -  The state of the replacements (iteration, smoothing length,
-*     maximum change, rms change) is tabulated for verbose reporting.
 
 *  Prior Requirements:
 *     -  The input variance array should be propagated from the input
@@ -129,10 +129,7 @@
 *     21-MAY-1998 (DSB):
 *        Added protection against division by zero if there are any
 *        zero variance values.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
  

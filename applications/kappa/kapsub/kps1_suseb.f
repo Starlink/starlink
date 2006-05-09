@@ -62,6 +62,9 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     -  Uses the magic-value method for bad or undefined pixels.
+
 *  Algorithm:
 *     -  Calculate the number of panels produced by the knots.
 *     -  Initialise the rms sums.
@@ -70,9 +73,6 @@
 *        requested.
 *     -  Form residuals and sums for the rms error of the fit.
 *     -  At the end of the loop calculate the rms error.
-
-*  Notes:
-*     -  Uses the magic-value method for bad or undefined pixels.
 
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
@@ -107,9 +107,6 @@
 *        no longer needed POINT and NPOINT arguments.  Renamed from
 *        SPL2EB.  Converted to modern style.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
       

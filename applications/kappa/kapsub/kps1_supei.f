@@ -75,6 +75,9 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     -  Uses the magic-value method for bad or undefined pixels.
+
 *  Algorithm:
 *     -  Initialise the rms sums.
 *     -  Scan through the pixels.
@@ -87,9 +90,6 @@
 *        interpolation.
 *     -  Form the sums for the rms error of the fit.
 *     -  At the end of the loop calculate the rms error.
-
-*  Notes:
-*     -  Uses the magic-value method for bad or undefined pixels.
 
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
@@ -122,9 +122,6 @@
 *     1996 October 8 (MJC):
 *        Removed NAG.  Modern style.  Renamed from PLY2EI.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
       

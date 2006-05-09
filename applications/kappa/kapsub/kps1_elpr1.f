@@ -129,9 +129,6 @@
 *        (this is a work around for a bug in ARD).
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
 
 *  Type Definitions:

@@ -43,18 +43,18 @@
 *     STATUS = INTEGER (Given)
 *        The global status.
 
+*  Notes:
+*     -  There is a routine for real and double-precision floating-
+*     point data: replace "x" in the routine name by D or R as
+*     appropriate.  The arrays and fill value supplied to the routine
+*     must have the data type specified.
+
 *  Algorithm:
 *     - If the output is to be filled with zeroes then do so.
 *     - Otherwise copy the input array, or a subset thereof, to the
 *       output, replacing any bad pixels with the fill value.  Pad the
 *       end of each line if necessary, and finally pad any remaining
 *       lines in the output.
-
-*  Notes:
-*     -  There is a routine for real and double-precision floating-
-*     point data: replace "x" in the routine name by D or R as
-*     appropriate.  The arrays and fill value supplied to the routine
-*     must have the data type specified.
 
 *  Copyright:
 *     Copyright (C) 1988, 1990 Science & Engineering Research Council.
@@ -98,9 +98,6 @@
 *     1995 March 30 (MJC):
 *        Made generic from FTPREP.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
  

@@ -86,8 +86,6 @@
 
 *  Prior Requirements:
 *     An SGS workstation must be open.
-*
-
 
 *  Copyright:
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
@@ -116,10 +114,7 @@
 *  History:
 *     1996 September 27 (MJC):
 *        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

@@ -60,6 +60,11 @@
 *     STATUS = INTEGER (Given and Returned)
 *        Global status parameter.
 
+*  Notes:
+*     -  There is a routine for real and double-prcision data types:
+*     replace "x" in the routine name by R or D as appropriate.  The
+*     arguments ARRAY, MAXV, and MINV must have the data type specified.
+
 *  Algorithm:
 *     The histogram of the image between the scaling limits is formed.
 *     Let the probability of a particular pen, r, being used be P(r),
@@ -82,11 +87,6 @@
 *
 *     For a much more detailed description of histogram equalisation
 *     see 'Digital Image Processing' by R.C.Gonzalez and P.Wintz.
-
-*  Notes:
-*     -  There is a routine for real and double-prcision data types:
-*     replace "x" in the routine name by R or D as appropriate.  The
-*     arguments ARRAY, MAXV, and MINV must have the data type specified.
 
 *  Copyright:
 *     Copyright (C) 1983, 1986, 1988-1990 Science & Engineering
@@ -145,9 +145,6 @@
 *        Added new CUMUL argument set to .TRUEE. to KPG1_GHSTx call
 *        and thus eliminate the HIST array argument.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
  

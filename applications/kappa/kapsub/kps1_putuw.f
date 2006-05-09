@@ -58,6 +58,10 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     -  There is a routine for each of the numeric data types: replace
+*     "x" in the routine name by B, D, I, R, UB, UW or W as appropriate.
+
 *  Algorithm:
 *     If status is bad then return
 *     Read a limited part of the data object slicing if an array
@@ -114,10 +118,6 @@
 *     Endif
 *     End
 
-*  Notes:
-*     -  There is a routine for each of the numeric data types: replace
-*     "x" in the routine name by B, D, I, R, UB, UW or W as appropriate.
-
 *  Prior Requirements:
 *     -  The text file associated with descriptor FD must already be
 *     opened if LOGEXM is .TRUE..
@@ -149,10 +149,7 @@
 *  History:
 *     1995 May 9 (MJC)
 *        Original version based upon HDSTRACE routine TRA_PUTX.
-*     {enter_any_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
  

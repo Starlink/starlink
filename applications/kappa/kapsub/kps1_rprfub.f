@@ -162,9 +162,6 @@
 *        Swapped order of POS indices and made it _DOUBLE for use with AST.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
       
 *  Type Definitions:

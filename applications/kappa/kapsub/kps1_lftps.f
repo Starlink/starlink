@@ -63,10 +63,7 @@
 *        Original version.
 *     2006 April 12 (MJC):
 *        Remove unused variable and correct invocation.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
 
