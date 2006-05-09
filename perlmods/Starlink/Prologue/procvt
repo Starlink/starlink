@@ -34,6 +34,12 @@ A corresponding C<Starlink::Prologue::Parser::> class must exist.
 Include fields that only include default content. Default is to skip empty fields
 if they will only result in default content.
 
+=item B<-normalise>
+
+If true, the prologue will be rewritten even if the prologue is in standard STARLSE
+format. This allows ordering of components to be normalised and can optionally include
+the removal or addition (depending on the -incdefs flag) of default section content.
+
 =item B<-version>
 
 Report the version number.
@@ -59,9 +65,10 @@ use Starlink::Prologue;
 use Starlink::Prologue::Parser;
 
 # Options
-my ($help, $man, $version, @parsers, $incdefs);
+my ($help, $man, $version, @parsers, $incdefs, $normalise);
 my $status = GetOptions("help" => \$help,
                         "incdefs" => \$incdefs,
+                        "normalise" => \$normalise,
                         "man" => \$man,
                         "version" => \$version,
                         "parsers=s" => \@parsers,
@@ -94,10 +101,14 @@ if (@ARGV) {
 	  last;
 	}
       }
-      if ($converted) {
+      if ($converted || $normalise) {
 	my %types = map { $_, undef } @$types;
-	print STDERR "Prologue in file $file contains ", join(", ",keys %types),
-	  " prologues. Converting...\n";
+        if ($converted) {
+           print STDERR "Prologue in file $file contains ", join(", ",keys %types),
+	         " prologues. Converting...\n";
+        } else {
+           print STDERR "Prologue in file $file will be normalised\n";
+        }
 
 	# open the input file for write
 	open( my $fh, ">", $file) || 
