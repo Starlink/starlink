@@ -51,15 +51,13 @@ my @STANDARD_HEADERS = (qw/
 			"Returned Value",
 			qw/
 			   Examples
+                           Notes
 			   Algorithm
 			   References
 			   /,
 			"Related Applications",
 			"Implementation Status",
 			"Implementation Deficiencies",
-			qw/
-			   Notes
-			   /,
 			&MISCELLANEOUS,
 			qw/
 			   Copyright
@@ -431,6 +429,27 @@ sub misc_sections {
   return @misc;
 }
 
+=item B<is_adam_task>
+
+Returns true if the prologue looks to be associated with an A-task, else
+returns false.
+
+=cut
+
+sub is_adam_task {
+  my $self = shift;
+  # Do we have ADAM parameters?
+  my @apars = $self->content( "ADAM Parameters" );
+  return 1 if @apars;
+
+  # is this prologue of Type "ADAM"
+  my @type_of_m = $self->content( "Type of Module" );
+  return 1 if (@type_of_m && $type_of_m[0] =~ /ADAM/);
+
+  # nope
+  return 0;
+}
+
 =back
 
 =head2 General
@@ -472,8 +491,7 @@ sub stringify {
   }
 
   # ADAM tasks put the Arguments in front of Description
-  my @type_of_m = $self->content( "Type of Module" );
-  if (@type_of_m && $type_of_m[0] =~ /ADAM/) {
+  if ($self->is_adam_task) {
     my $see_desc;
     my $see_args;
     my @new;
