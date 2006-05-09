@@ -16,11 +16,15 @@ char *cstring( const char *, int, int * );
 F77_SUBROUTINE(kps1_luted)( CHARACTER(CMD), INTEGER(STATUS) 
                             TRAIL(CMD) ){
 /*
+*+
 *  Name:
 *     kps1_luted
 
 *  Purpose:
 *     Activates the main LutEdit tcl script.
+
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This C function executes the LutEdit Tcl script in a child process.
@@ -31,6 +35,26 @@ F77_SUBROUTINE(kps1_luted)( CHARACTER(CMD), INTEGER(STATUS)
 *        lutedit script.
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
+
+*  Copyright:
+*     Copyright (C) 2001-2002, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -44,11 +68,9 @@ F77_SUBROUTINE(kps1_luted)( CHARACTER(CMD), INTEGER(STATUS)
 *        Replaced use of tmpnam with mkstemp.
 *     3-SEP-2004 (TIMJ):
 *        Now -Wall clean
-*     {enter_changes_here}
+*     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
+*-
 */
 
    GENPTR_CHARACTER(CMD)
@@ -146,15 +168,22 @@ F77_SUBROUTINE(kps1_luted)( CHARACTER(CMD), INTEGER(STATUS)
 
 void Error( const char *text, int *STATUS ) {
 /*
+*+
 *  Name:
 *     Error
 
 *  Purpose:
 *     Report an error using EMS.
 
+*  Language:
+*     Starlink C
+
 *  Description:
 *     The supplied text is used as the text of the error message.
 *     A blank parameter name is used.
+
+*  Notes:
+*     - If a NULL pointer is supplied for "text", no error is reported.
 
 *  Parameters:
 *     text
@@ -163,8 +192,27 @@ void Error( const char *text, int *STATUS ) {
 *        A pointer to the global status value. This should have been set
 *        to a suitable error value before calling this function.
 
-*  Notes:
-*     - If a NULL pointer is supplied for "text", no error is reported.
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
 */
 
    DECLARE_CHARACTER(param,1);
@@ -196,12 +244,16 @@ void Error( const char *text, int *STATUS ) {
 
 char *cstring( const char *fstring, int len, int *STATUS ) {
 /*
+*+
 *  Name:
 *     cstring
 
 *  Purpose:
 *     Returns a pointer to dynaically allocated memory holding a null
 *     terminated copy of an F77 string.
+
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This function returns a pointer to dynaically allocated memory 
@@ -215,7 +267,28 @@ char *cstring( const char *fstring, int len, int *STATUS ) {
 *        The length of the f77 string to be stored.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
 */
 
    char mess[81];
@@ -250,4 +323,3 @@ char *cstring( const char *fstring, int len, int *STATUS ) {
 
    return ret;
 }
-

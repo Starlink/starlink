@@ -30,11 +30,15 @@ static void sink( const char * );
 F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
                             INTEGER(FULL), INTEGER(STATUS) TRAIL(TITLE) ){
 /*
+*+
 *  Name:
 *     KPS1_TKAST
 
 *  Purpose:
 *     Displays an AST Object using a Tk interface.
+
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This C function creates a Tcl interpreter to execute the Tcl script
@@ -50,6 +54,26 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 *        the Object.
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
+
+*  Copyright:
+*     Copyright (C) 1997, 2002, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -68,11 +92,9 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 *        kappa.
 *     4-OCT-2004 (TIMJ):
 *        Fix compiler warnings
-*     {enter_changes_here}
+*     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
+*-
 */
 
    GENPTR_INTEGER(IAST)
@@ -215,15 +237,22 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 
 static void Error( const char *text, int *STATUS ) {
 /*
+*+
 *  Name:
 *     Error
 
 *  Purpose:
 *     Report an error using EMS.
 
+*  Language:
+*     Starlink C
+
 *  Description:
 *     The supplied text is used as the text of the error message.
 *     A blank parameter name is used.
+
+*  Notes:
+*     - If a NULL pointer is supplied for "text", no error is reported.
 
 *  Parameters:
 *     text
@@ -232,8 +261,27 @@ static void Error( const char *text, int *STATUS ) {
 *        A pointer to the global status value. This should have been set
 *        to a suitable error value before calling this function.
 
-*  Notes:
-*     - If a NULL pointer is supplied for "text", no error is reported.
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
 */
 
    DECLARE_CHARACTER(param,1);
@@ -265,11 +313,15 @@ static void Error( const char *text, int *STATUS ) {
 
 static char *Envir( const char *var, int *STATUS ){
 /*
+*+
 *  Name:
 *     Envir
 
 *  Purpose:
 *     Get an environment variable.
+
+*  Language:
+*     Starlink C
 
 *  Description:
 *     A pointer to the a string holding the value of the specified 
@@ -282,6 +334,27 @@ static char *Envir( const char *var, int *STATUS ){
 *     STATUS
 *        A pointer to the global status value. 
 
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
 */
    char *ret;
    char mess[80];
@@ -301,11 +374,15 @@ static char *Envir( const char *var, int *STATUS ){
 static void SetVar( Tcl_Interp *interp,  char *name,  char *value, 
              int flags, int *STATUS ){
 /*
+*+
 *  Name:
 *     SetVar
 
 *  Purpose:
 *     Sets a Tcl variable.
+
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This is equivalent to the Tcl function Tcl_SetVar, except that
@@ -314,7 +391,28 @@ static void SetVar( Tcl_Interp *interp,  char *name,  char *value,
 
 *  Parameters:
 *     As for Tcl_SetVar, except for addition of final STATUS argument.
-*     
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
 */
 
    char mess[80];
@@ -331,11 +429,15 @@ static void SetVar( Tcl_Interp *interp,  char *name,  char *value,
 
 static const char *GetVar( Tcl_Interp *interp,  char *name,  int flags, int *STATUS ){
 /*
+*+
 *  Name:
 *     GetVar
 
 *  Purpose:
 *     Gets a Tcl variable.
+
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This is equivalent to the Tcl function Tcl_GetVar, except that
@@ -344,7 +446,28 @@ static const char *GetVar( Tcl_Interp *interp,  char *name,  int flags, int *STA
 
 *  Parameters:
 *     As for Tcl_GetVar, except for addition of final STATUS argument.
-*     
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
 */
 
    char mess[80];
@@ -367,11 +490,15 @@ static const char *GetVar( Tcl_Interp *interp,  char *name,  int flags, int *STA
 static void SetSVar( Tcl_Interp *interp, const char *var, const char *string, 
                int len, int *STATUS ) {
 /*
+*+
 *  Name:
 *     SetSVar
 
 *  Purpose:
 *     Store an F77 string in a Tcl variable.
+
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This function stores the supplied F77 string in the specified Tcl
@@ -389,7 +516,28 @@ static void SetSVar( Tcl_Interp *interp, const char *var, const char *string,
 *        null.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
 */
 
    char *buf;
@@ -427,11 +575,15 @@ static void SetSVar( Tcl_Interp *interp, const char *var, const char *string,
 static void GetSVar( Tcl_Interp *interp, const char *var, char *string, 
               int len, int *STATUS ) {
 /*
+*+
 *  Name:
 *     GetSVar
 
 *  Purpose:
 *     Get an F77 string from a Tcl variable.
+
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This function gets a string from the specified Tcl
@@ -448,7 +600,28 @@ static void GetSVar( Tcl_Interp *interp, const char *var, char *string,
 *        The length of the F77 string.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
 */
 
    const char *tp;
@@ -475,11 +648,15 @@ static void GetSVar( Tcl_Interp *interp, const char *var, char *string,
 
 static void SetIVar( Tcl_Interp *interp, const char *var, int val, int *STATUS ) {
 /*
+*+
 *  Name:
 *     SetIVar
 
 *  Purpose:
 *     Store an integer in a Tcl variable.
+
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This function stores the integer in the specified Tcl variable.
@@ -493,7 +670,28 @@ static void SetIVar( Tcl_Interp *interp, const char *var, int val, int *STATUS )
 *        The value to store.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
 */
 
    char text[80];
@@ -510,11 +708,15 @@ static void SetIVar( Tcl_Interp *interp, const char *var, int val, int *STATUS )
 
 static void SetRVar( Tcl_Interp *interp, const char *var, float val, int *STATUS ) {
 /*
+*+
 *  Name:
 *     SetRVar
 
 *  Purpose:
 *     Store a floating point value in a Tcl variable.
+
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This function stores the supplied value in the specified Tcl variable.
@@ -528,7 +730,28 @@ static void SetRVar( Tcl_Interp *interp, const char *var, float val, int *STATUS
 *        The value to store.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
 */
 
    char text[80];
@@ -544,11 +767,15 @@ static void SetRVar( Tcl_Interp *interp, const char *var, float val, int *STATUS
 
 static void SetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *STATUS ) {
 /*
+*+
 *  Name:
 *     SetLVar
 
 *  Purpose:
 *     Store an F77 LOGICAL value in a Tcl variable.
+
+*  Language:
+*     Starlink C
 
 *  Description:
 *     This function stores the supplied value in the specified Tcl variable.
@@ -562,7 +789,28 @@ static void SetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *
 *        A pointer to the value to store.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
 */
 
    GENPTR_LOGICAL(val)
@@ -578,12 +826,16 @@ static void SetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *
 
 static void GetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *STATUS ) {
 /*
+*+
 *  Name:
 *     GetLVar
 
 *  Purpose:
 *     Retrieve a Tcl variable value and store it in an F77 LOGICAL
 *     variable.
+
+*  Language:
+*     Starlink C
 
 *  Parameters:
 *     interp = Tcl_Interp * (Given)
@@ -594,7 +846,28 @@ static void GetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *
 *        A pointer to the F77 variable to receive the returned value.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
 */
 
    GENPTR_LOGICAL(val)
@@ -616,11 +889,15 @@ static void GetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *
 
 static void GetRVar( Tcl_Interp *interp, const char *var, float *valptr, int *STATUS ) {
 /*
+*+
 *  Name:
 *     GetRVar
 
 *  Purpose:
 *     Retrieve a Tcl variable value and store it in a float.
+
+*  Language:
+*     Starlink C
 
 *  Parameters:
 *     interp = Tcl_Interp * (Given)
@@ -631,7 +908,28 @@ static void GetRVar( Tcl_Interp *interp, const char *var, float *valptr, int *ST
 *        A pointer to the variable to receive the returned value.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
 */
 
    const char *tp;
@@ -658,11 +956,15 @@ static void GetRVar( Tcl_Interp *interp, const char *var, float *valptr, int *ST
 
 static void GetIVar( Tcl_Interp *interp, const char *var, int *valptr, int *STATUS ) {
 /*
+*+
 *  Name:
 *     GetIVar
 
 *  Purpose:
 *     Retrieve a Tcl variable value and store it in an integer.
+
+*  Language:
+*     Starlink C
 
 *  Parameters:
 *     interp = Tcl_Interp * (Given)
@@ -673,7 +975,28 @@ static void GetIVar( Tcl_Interp *interp, const char *var, int *valptr, int *STAT
 *        A pointer to the variable to receive the returned value.
 *     STATUS = int * (Given and Returned)
 *        The inherited status.
-*     
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*-
 */
 
    const char *tp;
@@ -703,4 +1026,3 @@ static void sink( const char *text ){
 /* Sink function for use with astChannel. */
    if( fd && text ) fprintf( fd, "%s\n", text );
 }
-
