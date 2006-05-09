@@ -10,9 +10,11 @@
 
       firefox mozilla netscape safari mosaic
 
+   On Apple OS X HTX your default browser will be used instead of the
+   above list.
+
    HTX continues to honour the HTX_BROWSER environment variable, so if
    you have that set you will see no changes in behaviour.
-
 
    V1.2-10 (SER) 
    -------------
