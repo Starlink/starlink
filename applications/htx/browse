@@ -180,7 +180,7 @@
 #  If this is an OSX system the "open" command will do all the heavy lifting
 #  for us and will let us use the system default browser.
 
-      if test -f /usr/bin/sw_vers && "`/usr/bin/sw_vers -productName`" = 'Mac OS X'; then
+      if test -f /usr/bin/sw_vers && test "`/usr/bin/sw_vers -productName`" = 'Mac OS X'; then
 
 #  Manage scratch file space.
 #  -------------------------
