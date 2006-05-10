@@ -12,8 +12,12 @@
 *  Type of Module:
 *     ADAM A-task
 
-*  Invocation
+*  Invocation:
 *     CALL CONTOUR( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
 *  Description:
 *     This application produces a contour map of a 2-dimensional NDF on 
@@ -142,7 +146,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes. All attributes will be
@@ -296,7 +300,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes.  All attributes will be
@@ -321,10 +325,6 @@
 *        displayed if an illegal value is supplied.  If a null (!) value
 *        is supplied, the axes with the same indices as the two 
 *        significant NDF pixel axes are used.  [!]
-
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
 
 *  Examples:
 *     contour myfile 
@@ -417,6 +417,28 @@
 
 *  Implementation Deficiencies:
 *     Smooth-contour function is no longer available.
+
+*  Copyright:
+*     Copyright (C) 1988-1993 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1997-1999, 2001, 2004 Central Laboratory of
+*     the Research Councils. Copyright (C) 2006 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -514,7 +536,7 @@
 *        are no longer available.  Parameters ANNOTA, LABELFREQ, MAXRES,
 *        NOISY, RESOLUTION, and SMOOTHING withdrawn. 
 *     1997 May 31 (MJC):
-*     	 Added STATS, LENGTH, and NUMBER.
+*              Added STATS, LENGTH, and NUMBER.
 *     12-AUG-1998 (DSB):
 *        Major changes to base graphics on PGPLOT and handling of 
 *        co-ordinate systems on the AST library.
@@ -541,9 +563,6 @@
 *     2006 April 12 (MJC):
 *        Remove unused variables and wrapped long lines.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
 

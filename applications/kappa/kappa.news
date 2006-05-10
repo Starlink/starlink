@@ -83,6 +83,8 @@
    TRUE, causes output pixels to be set bad if the corresponding pixels in
    the reference NDF are good.
 
+   o  KAPPA is now released under the GNU Public Licence.
+
 Changes introduced in version 1.4-2
 
    o  The NDFTRACE application now displays the bounds of the NDF within 

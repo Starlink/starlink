@@ -310,3 +310,4 @@ EXTRA_DIST = multiplot.csh.in kappa_master.hlp $(HELP_FILES)
 CLEANFILES = $(BUILT_IFL_FILES) $(BUILT_IFC_FILES) $(MISC_BUILT_FILES)
 
 dist_starnews_DATA = kappa.news
+dist_pkgdata_DATA = LICENCE

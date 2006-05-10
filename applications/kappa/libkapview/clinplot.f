@@ -12,8 +12,12 @@
 *  Type of Module:
 *     ADAM A-task
 
-*  Invocation
+*  Invocation:
 *     CALL CLINPLOT( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
 *  Description:
 *     This application displays a three-dimensional NDF as a series
@@ -25,7 +29,7 @@
 *     The values can be mapped in various ways on to the graphics 
 *     surface (e.g. linearly, logarithmically); see parameters XMAP and
 *     YMAP).
-
+*
 *     Each line plot is drawn in a box whose location and extent
 *     corresponds to a spatial pixel.  It is like a magnified image
 *     display, but instead of a pixel being a solid block of colour,
@@ -39,13 +43,13 @@
 *     the grid of line plots (see parameter EXTAXES).  The appearance of
 *     these and the space they occupy may be controlled in detail (see
 *     parameters STYLE and MARGIN).  
-
+*
 *     The image is produced within the current graphics database
 *     picture.  The co-ordinates at the centre of the image, and the
 *     scale of the image can be controlled using parameters CENTRE,
 *     XMAGN and YMAGN.  Only the parts of the image that lie within the
 *     current picture are visible; the rest is clipped.
-
+*
 *     Each line plot may take several different forms such as a
 *     "join-the-dots" plot, a "staircase" plot, a "chain" plot, (see
 *     parameter MODE).  Errors on both the data values and the data
@@ -66,7 +70,6 @@
 *     several plots to be `stacked' together.  If a new plot is drawn
 *     over an existing plot, then there is an option to allow the new
 *     plot to be aligned with the existing plot (see parameter ALIGN).
-*
 
 *  Usage:
 *     clinplot ndf [comp] [mode] [xleft] [xright] [ybot] [ytop] [device]
@@ -258,7 +261,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value> 
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will
@@ -355,7 +358,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value> 
 *        is the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes.  All attributes will be
@@ -409,7 +412,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
@@ -548,10 +551,6 @@
 *        parameter YMAP is set to "ValueLog", then the supplied value
 *        should be the logarithm (base 10) of the bottom data value.
 *        See also parameter ALIGN. [!]
-
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
 
 *  Examples:
 *     clinplot cube useaxis=3
@@ -698,6 +697,26 @@
 *     not be type converted, but this is not expensive for the expected
 *     byte-type data.
 
+*  Copyright:
+*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
+*     Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -727,9 +746,6 @@
 *     2006 April 12 (MJC):
 *        Remove unused variables.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
 

@@ -15,8 +15,9 @@
 *  Invocation:
 *     CALL GDSTATE( STATUS )
 
-*  Usage:
-*     gdstate [device] [frame] 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
 *  Description:
 *     This application displays information about the current graphics
@@ -28,6 +29,9 @@
 *     picture if required (see parameter OUTLINE).
 *
 *     A list of the colours in the current palette is also produced.
+
+*  Usage:
+*     gdstate [device] [frame] 
 
 *  ADAM Parameters:
 *     COMMENT = LITERAL (Write)
@@ -107,7 +111,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value> is
 *        the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes. All attributes will be
@@ -135,10 +139,6 @@
 *     Y2 = LITERAL (Write)
 *        The highest value found within the current picture for axis 2 of the 
 *        requested co-ordinate Frame (see parameter FRAME).
-
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
 
 *  Examples:
 *     gdstate
@@ -185,6 +185,27 @@
 *  Related Applications:
 *     KAPPA: GDSET, GDCLEAR.
 
+*  Copyright:
+*     Copyright (C) 1989-1991 Science & Engineering Research Council.
+*     Copyright (C) 2000, 2002, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -218,9 +239,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

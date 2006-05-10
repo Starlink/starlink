@@ -12,8 +12,12 @@
 *  Type of Module:
 *     ADAM A-task
 
-*  Invocation
+*  Invocation:
 *     CALL DISPLAY( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
 *  Description:
 *     This application displays a one- or two-dimensional NDF as an 
@@ -108,7 +112,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
@@ -189,7 +193,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
@@ -197,7 +201,7 @@
 *        "Plotting Attributes" in SUN/95 for a description of the 
 *        available attributes.  Any unrecognised attributes are ignored 
 *        (no error is reported). 
-
+*
 *        Axis 1 is always the "data value" axis.  So for instance, to
 *        set the label for the data-value axis, assign a value to
 *        "Label(1)" in the supplied style. 
@@ -344,7 +348,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
@@ -380,10 +384,6 @@
 *        the image will be clipped to display fewer pixels.  See also
 *        parameters XMAGN, CENTRE, and FILL.  If a null (!) value is
 *        supplied, the value used is the value supplied for XMAGN. [!]
-
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
 
 *  Examples:
 *     display ngc6872 mode=p percentiles=[10,90] noaxes
@@ -481,6 +481,28 @@
 *     not be type converted, but this is not expensive for the expected
 *     byte-type data.
 
+*  Copyright:
+*     Copyright (C) 1990-1992 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1997-1999, 2001, 2004 Central Laboratory of
+*     the Research Councils. Copyright (C) 2006 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -562,9 +584,6 @@
 *        for the WCS->PIXEL transformation to be defined. Shorten 
 *        variable comments so that each fits entirely on one line.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
 

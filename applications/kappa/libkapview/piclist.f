@@ -25,7 +25,7 @@
 *     specified by its order in the list to be made the new current
 *     picture.  The list may either be reported or written to a text
 *     file.
-
+*
 *     The headed list has one line per picture.  Each line comprises
 *     a reference number; the picture's name, comment (up to 24
 *     characters), and label; and a flag to indicate whether or not
@@ -100,7 +100,27 @@
 *     pictures in the database for the chosen graphics device.
 *     Selecting only a subset by name is slightly faster.
 
-*  [optional_A_task_items]...
+*  Copyright:
+*     Copyright (C) 1991-1993 Science & Engineering Research Council.
+*     Copyright (C) 1995, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
@@ -124,9 +144,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

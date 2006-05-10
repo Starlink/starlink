@@ -19,15 +19,15 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Usage:
-*     gdclear [device] [current]
-
 *  Description:
 *     This application software resets a graphics device. In effect
 *     the device is cleared.  It purges the graphics-database entries
 *     for the device.  Optionally, only the current picture is cleared
 *     and the database unchanged. (Note the clearing of the current
 *     picture may not work on some graphics devices.)
+
+*  Usage:
+*     gdclear [device] [current]
 
 *  ADAM Parameters:
 *     CURRENT = _LOGICAL (Read)
@@ -46,6 +46,27 @@
 
 *  Related Applications:
 *     KAPPA: GDSET, GDSTATE.
+
+*  Copyright:
+*     Copyright (C) 1989-1992 Science & Engineering Research Council.
+*     Copyright (C) 1999, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -75,9 +96,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

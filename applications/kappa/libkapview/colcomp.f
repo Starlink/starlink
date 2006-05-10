@@ -12,8 +12,12 @@
 *  Type of Module:
 *     ADAM A-task
 
-*  Invocation
+*  Invocation:
 *     CALL COLCOMP( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
 *  Description:
 *     This application combines up to three 2-dimensional NDFs, using a
@@ -170,10 +174,6 @@
 *        portable, but can be very large, and slow to read and write. If
 *        a null (!) value is supplied, no PPM output is created. [!]
 
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
 *  Examples:
 *     colcomp m31_r m31_g m31_b m31_col m31_lut
 *        Combines the 3 NDFs m31_r, m31_g, and m31_b to create a colour
@@ -219,6 +219,27 @@
 *     -  Only data of type _REAL can be processed directly. Data of
 *     other types will be converted to _REAL before being processed.
 
+*  Copyright:
+*     Copyright (C) 1999, 2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+*     Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -235,9 +256,6 @@
 *     2006 April 12 (MJC):
 *        Remove unused variable and wrapped long lines.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
 

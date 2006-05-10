@@ -15,6 +15,10 @@
 *  Invocation:
 *     CALL SCATTER( STATUS )
 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
 *  Description:
 *     This application displays a 2-dimensional plot in which the
 *     horizontal axis corresponds to the data value in the NDF given
@@ -122,7 +126,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value> is
 *        the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes. All attributes will be
@@ -155,10 +159,6 @@
 *        by parameter PERC2. The value supplied may be greater than or less 
 *        than the value supplied for YBOT. [!]
 
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
 *  Examples:
 *     scatter cl123a cl123b 
 *        This displays a scatter plot of the data value in NDF cl123b 
@@ -179,6 +179,9 @@
 *     MARGIN. The world co-ordinates in the DATA picture will correspond
 *     to data value in the two NDFs.
 
+*  Related Applications:
+*     KAPPA:NORMALIZE.
+
 *  Implementation Status:
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -186,8 +189,26 @@
 *     numeric data types will undergo a type conversion before
 *     processing occurs.  
 
-*  Related Applications:
-*     KAPPA:NORMALIZE.
+*  Copyright:
+*     Copyright (C) 1999, 2001, 2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+*     Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -209,9 +230,6 @@
 *     2006 February 24 (MJC):
 *        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx calls.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

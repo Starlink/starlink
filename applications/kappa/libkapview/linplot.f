@@ -58,7 +58,7 @@
 *     element (in arc-minutes, degrees, etc.).  This offset is measured 
 *     along the path of the profile.  The choice of annotation for the 
 *     horizontal axis is controlled by parameter USEAXIS.
-*
+
 *  Usage:
 *     linplot ndf [comp] [mode] [xleft] [xright] [ybot] [ytop] [device]
 
@@ -169,7 +169,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
@@ -308,7 +308,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value> 
 *        is the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes.  All attributes will be
@@ -540,6 +540,27 @@
 *     Other non-complex data types will undergo a type conversion
 *     before the plot is drawn.
 
+*  Copyright:
+*     Copyright (C) 1998-2000, 2003-2004 Central Laboratory of the
+*     Research Councils. Copyright (C) 2006 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -576,9 +597,6 @@
 *     2006 April 12 (MJC):
 *        Remove unused variable and wrapped long lines.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
 

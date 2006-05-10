@@ -27,16 +27,16 @@
 *     be nominated to assist in defining the colour table via an
 *     histogram equalisation.  There are two stages to the running of
 *     this application.
-
+*
 *     1. The way in which the lookup table (LUT) is to distributed
 *     amongst the pens (colour indices) of the colour table is
 *     required.  Some pens are reserved by KAPPA as a palette,
 *     particularly for annotation.  This application only modifies the
 *     unreserved portion of the colour table.
-*        
+*
 *     2. The lookup table is now chosen from a programmed selection or
 *     read from an NDF.
-
+*
 *     The two stages may be repeated cyclically if desired.  To exit the
 *     loop give the null response, !, to a prompt.  Looping will not
 *     occur if the lookup table and the distribution method are supplied
@@ -160,6 +160,27 @@
 *     is performed using single- or double-precision floating point,
 *     as appropriate.
 
+*  Copyright:
+*     Copyright (C) 1991-1992, 1994 Science & Engineering Research
+*     Council. Copyright (C) 1995, 1999, 2001, 2004 Central Laboratory
+*     of the Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
@@ -192,9 +213,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
 

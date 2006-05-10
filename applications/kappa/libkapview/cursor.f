@@ -218,7 +218,7 @@
 *        can take any of the following values:
 *
 *        - "None" -- No graphics are produced.
-*       
+*
 *        - "Mark" -- Each position is marked by the symbol specified
 *        by parameter MARKER.
 *
@@ -302,7 +302,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value> is
 *        the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes. All attributes will be
@@ -317,7 +317,7 @@
 *        values reported on the screen: Format, Digits, Symbol, Unit. These
 *        may be suffixed with an axis number (eg "Digits(2)") to refer to 
 *        the values displayed for a specific axis. [current value]
-*
+
 *  Examples:
 *     cursor frame=pixel
 *        This obtains co-ordinates within any visible picture for the
@@ -383,6 +383,28 @@
 
 *  Related Applications:
 *     KAPPA: LISTSHOW, LISTMAKE, PICCUR; Figaro: ICUR, IGCUR.
+
+*  Copyright:
+*     Copyright (C) 1989-1993 Science & Engineering Research Council.
+*     Copyright (C) 1995-2001 Central Laboratory of the Research
+*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
+*     Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     JM: Jo Murray  (STARLINK)
@@ -461,10 +483,7 @@
 *        Added parameters SHOWDATA and COMP.
 *     7-FEB-2006 (DSB):
 *        Correct KPS1_CURDV to use only significant pixel axes
-**     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
 

@@ -117,7 +117,7 @@
 *        lower left corner of the graphics device), into BASEPIC
 *        co-ordinates.
 
-*   Notes:
+*  Notes:
 *     -  BASEPIC co-ordinates locate a position within the entire graphics 
 *     device. The bottom left corner of the device screen has BASEPIC 
 *     co-ordinates of (0,0). The shorter dimension of the screen has 
@@ -140,10 +140,30 @@
 *     picture. The bottom left corner of the current picture has CURNDC 
 *     co-ordinates of (0,0), and the top right corner has CURNDC
 *     co-ordinates (1,1).
-*
 
 *  Related Applications:
 *     KAPPA: GDSTATE, PICIN, PICXY.
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council.
+*     Copyright (C) 2001-2002, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -159,10 +179,7 @@
 *        Added CURNDC Frame.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
 *  Type Definitions:

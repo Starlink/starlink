@@ -12,11 +12,12 @@
 *  Type of Module:
 *     ADAM A-task
 
-*  Invocation
+*  Invocation:
 *     CALL LUTVIEW( STATUS )
 
-*  Usage:
-*     lutview [mode] [low] [high] [curpic] [device] 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
 *  Description:
 *     This application displays a key to the current colour table on the 
@@ -43,6 +44,9 @@
 *
 *     The appearance of the annotation my be controlled in detail using
 *     the STYLE parameter.
+
+*  Usage:
+*     lutview [mode] [low] [high] [curpic] [device] 
 
 *  ADAM Parameters:
 *     COMP = LITERAL (Read)
@@ -182,7 +186,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value> is
 *        the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes. All attributes will be
@@ -190,7 +194,7 @@
 *        Attributes" in SUN/95 for a description of the available
 *        attributes. Any unrecognised attributes are ignored (no error is
 *        reported). 
-*       
+*
 *        Axis 1 is always the "data value" axis, whether it is displayed 
 *        horizontally or vertically. So for instance, to set the label
 *        for the data value axis, assign a value to "Label(1)" in the 
@@ -214,10 +218,6 @@
 *        should be supplied as a list of formatted axis values separated 
 *        by spaces or commas. A null (!) value causes the lower left corner 
 *        of the BASE or (if CURPIC is TRUE) current picture to be used.
-
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
 
 *  Examples:
 *     lutview 
@@ -259,6 +259,26 @@
 *  Related Applications:
 *     KAPPA: DISPLAY, LUTABLE; Figaro: COLOUR.
 
+*  Copyright:
+*     Copyright (C) 1999-2002, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -280,9 +300,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 
