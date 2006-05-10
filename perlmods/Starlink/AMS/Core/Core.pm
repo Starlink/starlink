@@ -882,7 +882,7 @@ sub adamtask_exit {
   # Reset adam_started
   $adam_started = 0;
 
-  # Monoliths will kill themselves since they are Proc::SimpleKill
+  # Monoliths will kill themselves since they are Proc::Simple
   # objects
 
 }
@@ -1042,7 +1042,7 @@ Dave Terrett, SUN/186).
 =head1 REQUIREMENTS
 
 This module uses  IO::Pipe from the perl distribution and Proc::Simple
-(available from CPAN). Proc::SimpleKill is also used.
+(available from CPAN).
 
 The Starlink::ADAM and Starlink::EMS modules must be installed in
 order to use this module.
