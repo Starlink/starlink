@@ -16,6 +16,10 @@
 *  Invocation:
 *     CALL MFITTREND( STATUS )
 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
 *  Description:
 *     This routine fits trends to all lines of data in an NDF that lie
 *     parallel to a chosen axis.  The trends are characterised by
@@ -121,17 +125,29 @@
 *     -  All non-complex numeric data types can be handled.
 *     -  Handles data of up to 7 dimensions.
 
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
+*  Copyright:
+*     Copyright (C) Particle Physics and Astronomy Research Council.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PWD: Peter W. Draper (JAC, Durham University)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
-
-*  Copyright:
-*     Copyright (C) Particle Physics and Astronomy Research Council.
 
 *  History:
 *     14-SEP-2005 (PWD):
@@ -139,9 +155,6 @@
 *     2006 April 12 (MJC):
 *        Remove unused variables.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

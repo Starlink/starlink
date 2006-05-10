@@ -27,7 +27,7 @@
 *     also stored in the catalogue. The catalogue may be manipulated
 *     using the CURSA package (SUN/190), and is stored in either FITS
 *     binary format or the "Small Text List" (STL) format defined by CURSA.
-*     
+*
 *     If an NDF is specified using parameter NDF, then the positions should 
 *     be given in the current co-ordinate Frame of the NDF. Information
 *     describing the co-ordinate Frames available within the NDF will be 
@@ -127,7 +127,7 @@
 *
 *        - "Interface" -- The positions are obtained using parameter
 *        POSITION.
-*  
+*
 *        - "File" -- The positions are to be read from a text file
 *        specified using parameter FILE.
 *
@@ -235,6 +235,27 @@
 *  Related Applications:
 *     KAPPA: CURSOR, LISTSHOW; CURSA: XCATVIEW, CATSELECT.
 
+*  Copyright:
+*     Copyright (C) 1998-1999, 2001, 2004 Central Laboratory of the
+*     Research Councils. Copyright (C) 2006 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -252,9 +273,6 @@
 *     20-JAN-2006 (DSB):
 *        Added option "Good" for parameter MODE.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

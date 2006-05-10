@@ -12,19 +12,23 @@
 *  Type of Module:
 *     ADAM A-task
 
-*  Invocation
+*  Invocation:
 *     CALL TRANDAT( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
 *  Description:
 *     This application takes grid data contained in a free-format text
 *     file and stores them in the data array of an NDF.  The data file
 *     could contain, for example, mapping data  or results from
 *     simulations which are to be converted into an image for analysis.
-
+*
 *     There are two modes of operation which depend on whether the
 *     text file contains co-ordinate information, or solely data
 *     values (determined by parameter AUTO).
-     
+*
 *     a) AUTO=FALSE   If the file contains co-ordinate information the
 *     format of the data is tabular; the positions and values are
 *     arranged in columns and a record may contain information for only
@@ -33,7 +37,7 @@
 *     indicated by a hash or exclamation mark in the first column.
 *     Here is an example file (the vertical ellipses indicate missing
 *     lines in the file):
-
+*
 *         # Model 5, phi = 0.25,  eta = 1.7
 *         1 -40.0   40.0   1121.9
 *         2  0.0   30.0     56.3
@@ -43,7 +47,7 @@
 *         .    .      .       .
 *         .    .      .       .
 *         <EOF>
-
+*
 *     The records do not need to be ordered (but see the warning in the
 *     Notes), as the application searches for the maximum and minimum
 *     co-ordinates in each dimension so that it can define the size of
@@ -63,7 +67,7 @@
 *     where x is the supplied co-ordinate and xmin is the minimum
 *     supplied co-ordinate along an axis, scale is the value of
 *     parameter PSCALE, and IFIX converts from real to integer.
-
+*
 *     You are informed of the number of points found and the maximum
 *     and minimum co-ordinate values for each dimension.  There is no
 *     limit imposed by the application on the number of points or the
@@ -72,7 +76,7 @@
 *     made a typing error in the text file.  If you realise that this
 *     has indeed occurred just abort (!!) when prompted for the output
 *     NDF.
-
+*
 *     b) AUTO=TRUE   If the text file contains no co-ordinates, the
 *     format is quite flexible, however, the data are read into the
 *     data array in Fortran order, i.e. the first dimension is the most
@@ -83,7 +87,7 @@
 *     record may have trailing comments designated by a hash or
 *     exclamation mark.  Here is an example file, though a more regular
 *     format would be clearer for the human reader.
-
+*
 *         # test for the new TRANDAT
 *         23 45.3 ! a comment
 *         50.7,47.5 120. 46.67  47.89 42.4567
@@ -164,10 +168,6 @@
 *        column position must be different from those specified for
 *        the co-ordinate columns.  If there is duplication, new values
 *        for both POSCOLS and VALCOL will be requested. [3]
-
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
 
 *  Examples:
 *     trandat simdata.dat model
@@ -250,6 +250,27 @@
 *  Related Applications:
 *     CONVERT: ASCII2NDF, NDF2ASCII; SPECDRE: ASCIN, ASCOUT.
 
+*  Copyright:
+*     Copyright (C) 1990-1992 Science & Engineering Research Council.
+*     Copyright (C) 1995-1996, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -276,9 +297,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
 

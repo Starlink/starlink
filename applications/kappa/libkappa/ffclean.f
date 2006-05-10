@@ -4,7 +4,6 @@
 *     FFCLEAN
 
 *  Purpose:
-
 *     Removes defects from a substantially flat 1- or 2-dimensional NDF.
 
 *  Language:
@@ -118,7 +117,7 @@
 *     KAPPA: CHPIX, FILLBAD, GLITCH, MEDIAN, MSTATS, ZAPLIN;
 *     Figaro: BCLEAN, COSREJ, CLEAN, ISEDIT, MEDFILT, MEDSKY, TIPPEX.
 
-*  Implementation Status: 
+*  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
 *     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
 *     data structure and propagates all extensions.
@@ -127,7 +126,28 @@
 *     -  All non-complex numeric data types can be handled.  Arithmetic
 *     is performed using single- or double-precision floating point as
 *     appropriate.
-     
+
+*  Copyright:
+*     Copyright (C) 1981, 1990-1992 Science & Engineering Research
+*     Council. Copyright (C) 1995, 2004 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     RFWS: R. F. Warren-Smith (STARLINK)
 *     WG: Wei Gong  (STARLINK)
@@ -162,9 +182,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

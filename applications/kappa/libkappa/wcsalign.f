@@ -32,11 +32,11 @@
 *     Frame of the input NDF. If this fails, alignment occurs in the
 *     pixel co-ordinate Frame. A message indicating which Frame 
 *     alignment was achieved in is displayed.
-*     
+*
 *     Two algorithms are available for determining the output pixel
 *     values: resampling and rebinning (the method used is determined by
 *     the REBIN parameter). 
-
+*
 *     Two methods exist for determining the bounds of the output NDFs.
 *     First you can give values for parameters LBND and UBND
 *     which are then used as the pixel index bounds for all output
@@ -170,7 +170,7 @@
 *        valuable general-purpose scheme, intermediate in its visual
 *        effect on NDFs between the bilinear and nearest-neighbour
 *        schemes. 
-*         
+*
 *        - "SincCos" -- Uses the sinc(pi*x)cos(k*pi*x) kernel. Gives
 *        similar results to the "Sincsinc" scheme.
 *
@@ -313,6 +313,26 @@
 *        the names of the corresponding output NDFs are read from text
 *        file out.lis.
 
+*  Notes:
+*     -  WCS information (including the current co-ordinate Frame) is 
+*     propagated from the reference NDF to all output NDFs. 
+*     -  QUALITY is propagated from input to output only if parameter
+*     METHOD is set to "Nearest" and REBIN is set to FALSE.
+
+*  Related Applications:
+*     KAPPA: WCSFRAME, REGRID; CCDPACK: TRANNDF.
+
+*  Implementation Status:
+*     -  This routine correctly processes the DATA, VARIANCE, LABEL, 
+*     TITLE, UNITS, WCS, and HISTORY components of the input NDFs (see
+*     the METHOD parameter for notes on the interpretation of output
+*     variances).
+*     -  Processing of bad pixels and automatic quality masking are
+*     supported.
+*     -  All non-complex numeric data types can be handled. If REBIN is
+*     TRUE, the data type will be converted to one of _INTEGER, _DOUBLE
+*     or _REAL for processing.
+
 *  Choice of Algorithm:
 *     The algorithm used to produce the output images is determined by 
 *     the REBIN parameter, and is based either on resampling the output
@@ -328,7 +348,7 @@
 *     values by their allocated share of the input pixel value. The way 
 *     in which the input sample is divided between the output pixels 
 *     is determined by the METHOD parameter.
-
+*
 *     The two algorithms behaviour quite differently if the
 *     transformation from input to output includes any significant
 *     change of scale. In general, resampling will not alter the pixel
@@ -345,7 +365,7 @@
 *     input image.  However, rebinning is probably more appropriate if
 *     the image measures (for instance) flux per pixel, since rebinning
 *     takes account of the change in pixel size.
-*  
+*
 *     Another difference is that resampling guarantees to fill the
 *     output image with good pixel values (assuming the input image is
 *     filled with good input pixel values), whereas holes can be left by
@@ -392,25 +412,26 @@
 *     approximation, and can be minimised by reducing the value assigned
 *     to the ACC parameter. 
 
-*  Notes:
-*     -  WCS information (including the current co-ordinate Frame) is 
-*     propagated from the reference NDF to all output NDFs. 
-*     -  QUALITY is propagated from input to output only if parameter
-*     METHOD is set to "Nearest" and REBIN is set to FALSE.
+*  Copyright:
+*     Copyright (C) 1998-1999, 2001-2002, 2004 Central Laboratory of
+*     the Research Councils. Copyright (C) 2005 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
 
-*  Related Applications:
-*     KAPPA: WCSFRAME, REGRID; CCDPACK: TRANNDF.
-
-*  Implementation Status:
-*     -  This routine correctly processes the DATA, VARIANCE, LABEL, 
-*     TITLE, UNITS, WCS, and HISTORY components of the input NDFs (see
-*     the METHOD parameter for notes on the interpretation of output
-*     variances).
-*     -  Processing of bad pixels and automatic quality masking are
-*     supported.
-*     -  All non-complex numeric data types can be handled. If REBIN is
-*     TRUE, the data type will be converted to one of _INTEGER, _DOUBLE
-*     or _REAL for processing.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -437,10 +458,7 @@
 *        Add CONSERVE parameter, and Sombrero function methods.
 *     29-NOV-2005 (DSB):
 *        Pass the AUTOBN value to kps1_wala0.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
 

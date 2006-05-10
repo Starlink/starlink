@@ -12,17 +12,21 @@
 *  Type of Module:
 *     ADAM A-task
 
-*  Invocation
+*  Invocation:
 *     CALL KAPVERSION( STATUS )
 
-*  Usage:
-*     kapversion [compare] 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
 *  Description:
 *     This application will display the installed package version number,
 *     or compare the version number of the installed package against a 
 *     specified version number, reporting whether the installed package 
 *     is older, or younger, or equal to the specified version.
+
+*  Usage:
+*     kapversion [compare] 
 
 *  ADAM Parameters:
 *     COMPARE = LITERAL (Read)
@@ -51,10 +55,6 @@
 *
 *        The same value is also written to standard output.
 
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
 *  Examples:
 *     kapversion 
 *        Displays the version number of the installed package.
@@ -73,6 +73,26 @@
 *     install" command. An error will be reported if this file cannot be
 *     found.
 
+*  Copyright:
+*     Copyright (C) 1999 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -81,9 +101,6 @@
 *     3-NOV-1999 (DSB):
 *        Original version. 
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

@@ -87,7 +87,7 @@
 *        sub-strings should be numerical values as described below
 *        (default values will be used if these sub-strings are not
 *        provided).  The following options are available.
-
+*
 *        - lower,upper -- You can supply explicit lower and upper
 *        limiting values.  For example, "10,200" would set the histogram
 *        lower limit to 10 and its upper limit to 200.  No method name
@@ -121,11 +121,11 @@
 *        a first pass at the histogram.  They reduce the likelihood
 *        that all but a small number of values lie within a few
 *        histogram bins.
-*        
+*
 *        The extreme values are reported unless parameter RANGE is
 *        specified on the command line.  In this case extreme values
 *        are only calculated where necessary for the chosen method.
-
+*
 *        The method name can be abbreviated to a single character, and
 *        is case insensitive.  The initial value is "Range".  The 
 *        suggested defaults are the current values, or ! if these do 
@@ -146,7 +146,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes.  All attributes will be
@@ -234,6 +234,28 @@
 *     -  All non-complex numeric data types can be handled.
 *     -  Any number of NDF dimensions is supported.
 
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1998-2000, 2004 Central Laboratory of the
+*     Research Councils. Copyright (C) 2005-2006 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -278,9 +300,6 @@
 *     2006 April 12 (MJC):
 *        Remove unused variable and wrapped long lines.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

@@ -76,7 +76,7 @@
 *     supplied model includes noise (as indicated by parameter QUIET)
 *     then Pn is subtracted from Pg before evaluating the above
 *     expression.
-      
+
 *  Usage:
 *     wiener in psf out xcentre ycentre
 
@@ -151,7 +151,7 @@
 *        values to contribute to the restored result.  It can also be
 *        used to `fill in' small areas (i.e. smaller than the PSF) of
 *        bad pixels.
-*        
+*
 *        The numerical value given for WLIM specifies the minimum total
 *        weight associated with the good pixels in a smoothing box
 *        required to generate a good output pixel (weights for each
@@ -215,6 +215,26 @@
 *     -  All non-complex numeric data types can be handled.  Arithmetic
 *     is performed using single-precision floating point.
 
+*  Copyright:
+*     Copyright (C) 1995, 1998, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -234,9 +254,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

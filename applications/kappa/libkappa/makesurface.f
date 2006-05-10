@@ -25,10 +25,10 @@
 *     are read from a SURFACEFIT extension in an NDF (written by
 *     FITSURFACE), and are used to create a 2-dimensional surface of
 *     specified size and extent.  The surface is written to a new NDF.
-
+*
 *     The size and extent of the surface may be obtained from a template
 *     NDF or given explicitly.
-
+*
 *     Elements in the new NDF outside the defined range of the
 *     polynomial will be set to bad values.
 
@@ -109,6 +109,9 @@
 *     the original sense of the axis, otherwise the created surface will
 *     be flipped with respect to the image from which it was fitted.
 
+*  Related Applications:
+*     KAPPA: FITSURFACE, SURFIT.
+
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
 *     VARIANCE, LABEL, TITLE, UNITS, WCS, and HISTORY components of an 
@@ -119,14 +122,33 @@
 *     is performed in single- or double-precision floating point, as
 *     appropriate.
 
-*  Related Applications:
-*     KAPPA: FITSURFACE, SURFIT.
-
 *  Implementation Deficiencies:
 *     The ability to generate a spline surface is not yet available.
 *     One could be implemented using the subroutines called by SURFIT,
 *     but standard SPLINE data structure would need to be designed
 *     first.
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1997-1998, 2004 Central Laboratory of the
+*     Research Councils. Copyright (C) 2006 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     SMB: Steven M. Beard (ROE)
@@ -161,9 +183,6 @@
 *     2006 April 12 (MJC):
 *        Remove unused variable.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

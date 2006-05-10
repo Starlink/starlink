@@ -12,8 +12,12 @@
 *  Type of Module:
 *     ADAM A-task
 
-*  Invocation
+*  Invocation:
 *     CALL MATHS( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
 *  Description:
 *     This application allows arithmetic and mathematical functions to
@@ -163,10 +167,6 @@
 *        This parameter is ignored if the expression does not contain
 *        a token to at least one input NDF structure. [TRUE]
 
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
 *  Examples:
 *     maths "ia-1" dat2 ia=dat1
 *        The expression "ia-1" is evaluated to subtract 1 from each
@@ -227,7 +227,7 @@
 *     except that the output NDF does have inherit any variance
 *     information.
 *     -  There are additional tokens which can appear in the expression.
-
+*
 *     The set of 7 tokens named CA, CB, ... CG is used to obtain the
 *     data co-ordinates from the primary input NDF data structure.  Any
 *     of the 7 parameters may appear in the expression.  The order
@@ -236,7 +236,7 @@
 *     co-ordinates along the second axis.  There must be at least one
 *     input NDF in the expression to use the CA-CG tokens, and it must
 *     have dimensionality of at least the number of CA-CG tokens given.
-
+*
 *     The set of 7 tokens named XA, XB, ... XG is used to obtain the
 *     pixel co-ordinates from the primary input NDF data structure.  Any
 *     of the 7 parameters may appear in the expression.  The order
@@ -257,6 +257,21 @@
 *     point.  Single-precision will normally be used, but
 *     double-precision will be employed if any of the input NDF arrays
 *     has a numeric type of _DOUBLE.
+
+*  Related Applications:
+*     KAPPA: CREFRAME, SETAXIS, and numerous arithmetic tasks; Figaro:
+*     numerous arithmetic tasks.
+
+*  Implementation Status:
+*     -  This routine correctly processes the AXIS, DATA, QUALITY,
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
+*     input NDFs.  HISTORY and extensions are propagated from both the
+*     primary NDF and template NDF.
+*     -  Processing of bad pixels and automatic quality masking are
+*     supported.
+*     -  All non-complex numeric data types can be handled.
+*     -  NDFs with any number of dimensions can be processed.  The NDFs
+*     supplied as input need not all be the same shape.
 
 *  Calculating Variance:
 *     The algorithm used to calculate output variance values is
@@ -298,20 +313,26 @@
 *     to FALSE, then the execution time will be multiplied by an
 *     approximate factor (2N+1).
 
-*  Related Applications:
-*     KAPPA: CREFRAME, SETAXIS, and numerous arithmetic tasks; Figaro:
-*     numerous arithmetic tasks.
+*  Copyright:
+*     Copyright (C) 1989-1990 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1998-1999, 2002, 2004 Central Laboratory of
+*     the Research Councils. All Rights Reserved.
 
-*  Implementation Status:
-*     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
-*     input NDFs.  HISTORY and extensions are propagated from both the
-*     primary NDF and template NDF.
-*     -  Processing of bad pixels and automatic quality masking are
-*     supported.
-*     -  All non-complex numeric data types can be handled.
-*     -  NDFs with any number of dimensions can be processed.  The NDFs
-*     supplied as input need not all be the same shape.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm Currie (STARLINK)
@@ -350,9 +371,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 
@@ -1187,4 +1205,3 @@
       END IF
 
       END
-

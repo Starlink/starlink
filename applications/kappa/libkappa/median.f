@@ -26,13 +26,13 @@
 *     weighting functions and parameters that permit other symmetric
 *     weighting functions.  See parameter MODE and the topic
 *     "User-defined Weighting Functions".
-
+*
 *     A threshold for replacement of a value by the median can be set.
 *     If the absolute value of the difference between the actual value
 *     and the median is less than the threshold, the replacement will
 *     not occur.  The array boundary is dealt by either pixel
 *     replication or a reflection about the edge pixels of the array.
-
+*
 *     The WMF can be repeated iteratively a specified number of times,
 *     or it can be left to iterate continuously until convergence is
 *     achieved and no further changes are made to the data.  In the
@@ -42,7 +42,7 @@
 *     When damping is switched on data values are replaced not by the
 *     median value, but by a value midway between the original and the
 *     median.
-
+*
 *     Bad pixels are not included in the calculation of the median.
 *     There is a defined threshold which specifies minimum-allowable
 *     median position as a fraction of the median position when there
@@ -58,7 +58,7 @@
 *        Determines the type of padding required at the array edges
 *        before the filtering starts.  The alternatives are described
 *        below.
-
+*
 *          "Replication" - The values at the edge of the data array
 *                          are replicated into the padded area.  For
 *                          example, with STEP=2 one corner of the
@@ -102,10 +102,10 @@
 *     ITERATE = LITERAL (Read)
 *        Determines the type of iteration used.  The alternatives are
 *        described below.
-
+*
 *          "Specified"   - You specify the number of iterations
 *                          at each step size in the parameter NUMIT.
-
+*
 *          "Continuous"  - The filter iterates continuously until
 *                          convergence is achieved and the array is no
 *                          longer changed by the filter.  A damping
@@ -221,7 +221,7 @@
 *  Related Applications:
 *     KAPPA: BLOCK, CONVOLVE, FFCLEAN, GAUSMOOTH; Figaro: ICONV3,
 *     ISMOOTH, IXSMOOTH, MEDFILT.
-*     
+
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, LABEL, TITLE,
 *     UNITS, WCS and HISTORY components of an NDF data structure and
@@ -230,6 +230,27 @@
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.
+
+*  Copyright:
+*     Copyright (C) 1983-1984, 1986-1989, 1991-1993 Science &
+*     Engineering Research Council. Copyright (C) 1995, 1998, 2004
+*     Central Laboratory of the Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DB: Dave Baines (ROE)
@@ -300,9 +321,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 
@@ -837,4 +855,3 @@
       CALL NDF_END( STATUS )
 
       END
-

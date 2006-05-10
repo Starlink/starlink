@@ -16,6 +16,10 @@
 *  Invocation:
 *     CALL NORMALIZE( STATUS )
 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
 *  Description:
 *     This application compares the data values in one NDF against the
 *     corresponding values in the other NDF.  A least-squares
@@ -147,7 +151,7 @@
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
-*        
+*
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes. All attributes will be
@@ -195,10 +199,6 @@
 *        (with a small margin).  The value supplied may be greater than
 *        or less than the value supplied for YBOT.  [!]
 
-*  Arguments:
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
 *  Examples:
 *     normalize cl123a cl123b cl123c
 *        This normalises NDF cl123a to the NDF cl123b.  A plot of the
@@ -241,6 +241,9 @@
 *     parameter MARGIN.  The world co-ordinates in the DATA picture will
 *     correspond to data values in the two NDFs.
 
+*  Related Applications:
+*     CCDPACK: MAKEMOS.
+
 *  Implementation Status:
 *     -  The routine correctly processes the AXIS, DATA, QUALITY,
 *     VARIANCE, LABEL, TITLE, UNITS, WCS, and HISTORY components of an 
@@ -263,13 +266,32 @@
 *     first input NDF (IN1) by applying the calculated normalisation
 *     constants to IN1.
 
-*  Related Applications:
-*     CCDPACK: MAKEMOS.
-
 *  Implementation Deficiencies:
 *     -  Variances in the input data could be used in the fitting
 *     algorithm but are not at the moment.
 *     -  Bad pixels are nearly always assumed to be present.
+
+*  Copyright:
+*     Copyright (C) 1990-1992 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1998-1999, 2001, 2004 Central Laboratory of
+*     the Research Councils. Copyright (C) 2006 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -312,9 +334,6 @@
 *     2006 April 12 (MJC):
 *        Remove unused variable and wrapped long lines.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

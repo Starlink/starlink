@@ -150,17 +150,11 @@
 *     -  An error results if the input NDF has no bad values to replace.
 *     -  The progress of the iterations is reported.
 
-*  Timing:
-*     The time taken increases in proportion to the value of NITER.
-*     Adjusting the SIZE parameter to correspond to the largest regions
-*     of bad values will reduce the processing time.  See the Notes
-*     section.
- 
 *  Related Applications:
 *     KAPPA: CHPIX, GLITCH, MEDIAN, ZAPLIN; Figaro: BCLEAN,
 *     COSREJ, CLEAN, ISEDIT, MEDFILT, MEDSKY, REMBAD, TIPPEX.
 
-*  Implementation Status: 
+*  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
 *     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
 *     data structure and propagates all extensions.
@@ -170,7 +164,33 @@
 *     -  All non-complex numeric data types can be handled.  Arithmetic
 *     is performed using single- or double-precision floating point as
 *     appropriate.
-     
+
+*  Timing:
+*     The time taken increases in proportion to the value of NITER.
+*     Adjusting the SIZE parameter to correspond to the largest regions
+*     of bad values will reduce the processing time.  See the Notes
+*     section.
+
+*  Copyright:
+*     Copyright (C) 1995, 1998-1999, 2001, 2004 Central Laboratory of
+*     the Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -194,9 +214,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       
@@ -578,12 +595,3 @@
 *  End the routine.
       
       END
-
-
-
-
-
-
-
-
-

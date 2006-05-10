@@ -293,6 +293,13 @@
 *     will be stored in the output catalogue. Any further positions will be
 *     displayed on the screen but not stored in the output catalogue.
 
+*  Related Applications:
+*     KAPPA: PSF, CURSOR, LISTSHOW, LISTMAKE.
+
+*  Implementation Status:
+*     -  The processing of bad pixels and all non-complex numeric types
+*     is supported.
+
 *  Estimation of Centroid Positions:
 *     Each centroid position is obtained by projecting the data values
 *     within a search box centred on the supplied position, on to each
@@ -318,13 +325,6 @@
 *     the feature (see parameter CERROR).  Each realisation is processed
 *     identically to the actual data, and statistics are formed to derive
 *     the standard deviations.
-
-*  Implementation Status:
-*     -  The processing of bad pixels and all non-complex numeric types
-*     is supported.
-
-*  Related Applications:
-*     KAPPA: PSF, CURSOR, LISTSHOW, LISTMAKE.
 
 *  Copyright:
 *     Copyright (C) 1991, 1992, 1998-2001 Central Laboratory of 
@@ -380,9 +380,6 @@
 *        Protect some sections if status is bad. Prevents SEGV.
 *        Initialise some variables.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

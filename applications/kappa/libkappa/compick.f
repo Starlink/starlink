@@ -72,6 +72,13 @@
 *        sampling every third pixel, starting from the first wavelength
 *        at each image position, to form the NDF called arp244cs.
 
+*  Notes:
+*     -  The compression is centred on the origin of the pixel co-ordinate
+*     Frame. That is, if a position has a value p(i) on the i'th pixel 
+*     co-ordinate axis of the input NDF, then it will have position 
+*     p(i)/COMPRESS(i) on the corresponding axis of the output NDF. The
+*     pixel index bounds of the output NDF are chosen accordingly.
+
 *  Algorithm:
 *     -  Obtain the input NDF. Inquire its bounds and dimensions.
 *     -  Obtain the compression factors with acceptable ranges.  Abort
@@ -88,13 +95,6 @@
 *     arrays each axis array is processed one-dimensionally.
 *     -  Tidy the NDF system.
 
-*  Notes:
-*     -  The compression is centred on the origin of the pixel co-ordinate
-*     Frame. That is, if a position has a value p(i) on the i'th pixel 
-*     co-ordinate axis of the input NDF, then it will have position 
-*     p(i)/COMPRESS(i) on the corresponding axis of the output NDF. The
-*     pixel index bounds of the output NDF are chosen accordingly.
-
 *  Related Applications:
 *     KAPPA: BLOCK, COMPADD, COMPAVE, PIXDUPE, SQORST, RESAMPLE;
 *     Figaro: ISTRETCH.
@@ -107,6 +107,27 @@
 *     supported.
 *     -  All non-complex numeric data types can be handled.
 *     -  Any number of NDF dimensions is supported.
+
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1998, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -128,9 +149,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
 

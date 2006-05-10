@@ -42,7 +42,7 @@
 *        kaphelp classified classification
 *           This lists a one-line summary of each application in the
 *           given functionality classification.
-
+*
 *     See the Section "Navigating the Help Library" for details how to
 *     move around the help information, and to select the topics you
 *     want to view.
@@ -67,7 +67,10 @@
 *     -  If an error has occurred set all topics to be null.
 *     -  Get help on required topic.
 
-*  Navigating the Help Library:
+*  Implementation Status:
+*     -  Uses the portable help system.
+
+*  Navigating The Help Library:
 *     The help information is arranged hierarchically.  You can move
 *     around the help information whenever KAPHELP prompts.  This
 *     occurs when it has either presented a screen's worth of text or
@@ -94,7 +97,7 @@
 *
 *        o  a question mark "?" to redisplay the text for the current
 *           topic, including the list of topic or subtopic names; or
-* 
+*
 *        o  an ellipsis "..." to display all the text below the
 *           current point in the hierarchy.  For example, "BLOCK..."
 *           displays information on the BLOCK topic as well as
@@ -105,11 +108,11 @@
 *
 *        o  Just give the first few characters, e.g. "PARA" for
 *           Parameters.
-* 
+*
 *        o  Some topics are composed of several words separated by
 *           underscores.  Each word of the keyword may be abbreviated,
 *           e.g. "Colour_Set" can be shortened to "C_S".
-* 
+*
 *        o  The characters "%" and "*" act as wildcards, where the
 *           percent sign matches any single character, and asterisk
 *           matches any sequence of characters.  Thus to display
@@ -118,14 +121,32 @@
 *
 *        o  If a word contains, but does end with an asterisk wildcard,
 *           it must not be truncated.
-* 
+*
 *        o  The entered string must not contain leading or embedded
 *           spaces.
 *
 *     Ambiguous abbreviations result in all matches being displayed.
 
-*  Implementation Status:
-*     -  Uses the portable help system.
+*  Copyright:
+*     Copyright (C) 1986, 1988, 1991-1992 Science & Engineering
+*     Research Council. Copyright (C) 1995, 2004 Central Laboratory of
+*     the Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -150,9 +171,6 @@
 *     2004 July 27 (TIMJ):
 *        Switch to SHL library
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
 

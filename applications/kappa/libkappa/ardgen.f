@@ -59,7 +59,7 @@
 *        { operands=? operator=?
 *        { regions=?
 *        option
-      
+
 *  ADAM Parameters:
 *     ARDOUT = FILENAME (Write)
 *        Name of the text file in which to store the description of the
@@ -77,7 +77,7 @@
 *        The operator to use when combining two regions into a single
 *        region.  The pixels included in the resulting region depend on
 *        which of the following operators is selected.
-*    
+*
 *        - "AND" -- Pixels are included if they are in both of the regions
 *        specified by parameter OPERANDS.
 *
@@ -218,7 +218,7 @@
 *        Used to confirm that it is OK to proceed with an "Undo" option.
 *        The consequences of proceeding are described before the parameter 
 *        is obtained.
-*
+
 *  Examples:
 *     ardgen extract.txt circle exit startup=single 
 *        This example allows you to create a text file (extract.txt)
@@ -228,9 +228,6 @@
 *        useful in scripts or command procedures since there is no
 *        prompting.
 
-*  Related Applications:
-*     KAPPA: ARDPLOT, ARDMASK; CCDPACK; ESP.
-      
 *  Notes:
 *     -  An image must previously have been displayed on the graphics
 *     device.
@@ -276,14 +273,38 @@
 *      the NDF. WCS information will also be stored in the output text
 *      file allowing the stored positions to be converted to other systems 
 *      (pixel coordinates, for instance).
-      
+
+*  Related Applications:
+*     KAPPA: ARDPLOT, ARDMASK; CCDPACK; ESP.
+
+*  Copyright:
+*     Copyright (C) 1994 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1999, 2001 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
-*  History:   
+*  History:
 *     15-JUL-1994 (GJP)
 *        Original version
 *     11-NOV-1994 (GJP)
@@ -307,9 +328,6 @@
 *     30-AUG-2001 (DSB):
 *        Modify to use AST/PGPLOT and ARD V2. Added options Draw.
 *     {enter_further_changes_here}
-      
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 
@@ -720,4 +738,3 @@
       END IF
  
       END
-

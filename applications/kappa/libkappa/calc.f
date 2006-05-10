@@ -92,7 +92,7 @@
 
 *  Examples:
 *     The syntax in the following examples apply to the shell.
-*     
+*
 *     calc "27.3*1.26"
 *        The reports the value of the expression 27.3*1.26, i.e. 34.398.
 *     calc exp="(pa+pb+pc+pd)/4.0" pa=$med1 pb=$med2 pc=$med3 pd=$med4
@@ -108,11 +108,11 @@
 *     calc "sind(pa/fa)*fa" fa="log(abs(pb+pc))" pa=2.0e-4 pb=-1 pc=$x
 *        This evaluates sind(0.0002/log(abs($x-1)))*log(abs($x-1)) where
 *        $x is the value of the shell variable x.
-
+*
 *     For ICL usage only those expressions containing parentheses need
 *     to be in quotes, though ICL itself provides the arithmetic.  So
 *     the above examples would be
-
+*
 *     calc 27.3*1.26
 *        The reports the value of the expression 27.3*1.26, i.e. 34.398.
 *     calc exp="(pa+pb+pc+pd)/4.0" pa=(med1) pb=(med2) pc=(med3)
@@ -138,7 +138,26 @@
 *     core dump.  On Solaris, undefined values are set to one.  These
 *     are due to problems with the TRANSFORM infrastructure.
 
-*  [optional_A_task_items]...
+*  Copyright:
+*     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
@@ -147,9 +166,6 @@
 *     1995 August 14 (MJC):
 *        Original version.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

@@ -26,7 +26,7 @@
 *     rectangular bins, fitting a spline or polynomial surface to the
 *     bin values, and finally evaluating the surface for each pixel in
 *     the data array.
-
+*
 *     There is a selection of estimators by which representative
 *     values for each bin are determined.  There are several options to
 *     make the fit more accurate.  Values beyond upper and lower
@@ -37,11 +37,11 @@
 *     entirely within an extended object.  If a given bin contains more
 *     than a prescribed fraction of bad pixels, it is excluded from the
 *     fit.
-
+*
 *     The data array representing the background is evaluated at each
 *     pixel by one of two methods.  It is written to the output NDF
 *     structure.
-
+*
 *     The raw binned data, the weights, the fitted binned data and the
 *     residuals to the fit may be written to a logfile.  This also
 *     keeps a record of the input parameters and the rms error of the
@@ -183,6 +183,26 @@
 *     is performed using single- or double-precision floating point for
 *     FITTYPE = "Spline" or "Polynomial" respectively.
 
+*  Copyright:
+*     Copyright (C) 1996, 1998, 2000, 2004 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK).
 *     DSB: David S. Berry (STARLINK)
@@ -201,9 +221,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

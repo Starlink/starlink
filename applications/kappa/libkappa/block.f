@@ -122,18 +122,6 @@
 *        pixels in size.  Smoothed output values are generated only if
 *        at least 60% of the pixels in the smoothing box are good,
 *        otherwise the affected output pixel is bad.
-*        
-*  Timing:
-*     When using the mean estimator, the execution time is
-*     approximately proportional to the number of pixels in the image
-*     to be smoothed and is largely independent of the smoothing box
-*     size. This makes the routine particularly suitable for applying
-*     heavy smoothing to an image.  Execution time will be
-*     approximately doubled if a variance array is present in the input
-*     NDF.
-*
-*     The median estimator is much slower than the mean estimator, and
-*     is heavily dependent on the smoothing box size.
 
 *  Related Applications:
 *     KAPPA: CONVOLVE, FFCLEAN, GAUSMOOTH, MEDIAN; Figaro: ICONV3,
@@ -153,6 +141,40 @@
 *     -  All non-complex numeric data types can be handled.  Arithmetic
 *     is performed using single-precision floating point, or double
 *     precision, if appropriate.
+
+*  Timing:
+*     When using the mean estimator, the execution time is
+*     approximately proportional to the number of pixels in the image
+*     to be smoothed and is largely independent of the smoothing box
+*     size. This makes the routine particularly suitable for applying
+*     heavy smoothing to an image.  Execution time will be
+*     approximately doubled if a variance array is present in the input
+*     NDF.
+*
+*     The median estimator is much slower than the mean estimator, and
+*     is heavily dependent on the smoothing box size.
+
+*  Copyright:
+*     Copyright (C) 1990, 1992, 1994 Science & Engineering Research
+*     Council. Copyright (C) 1995, 1998, 2004 Central Laboratory of the
+*     Research Councils. Copyright (C) 2005 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
@@ -191,9 +213,6 @@
 *        Added support for smoothing all two-dimensional planes in a
 *        three-dimensional cube.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

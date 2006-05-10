@@ -36,7 +36,7 @@
 *     collapsed are combined together using one of a selection of
 *     estimators, including a mean, mode, or median, to produce the
 *     output pixel value.
-*
+
 *  Usage:
 *     chanmap in out axis nchan shape [low] [high] [estimator] [wlim]
 
@@ -197,7 +197,7 @@
 *     parallel to the pixel axes.  The algorithm used to choose the 
 *     pixel axis and the range of values to collapse along this pixel
 *     axis proceeds as follows.
-*     
+*
 *     The current Frame co-ordinates of the central pixel in the input
 *     NDF are determined (or some other point if the co-ordinates of the
 *     central pixel are undefined).  Two current Frame positions are
@@ -230,6 +230,26 @@
 *     -  All non-complex numeric data types can be handled.
 *     -  The origin of the output NDF is at (1,1).
 
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
@@ -245,10 +265,7 @@
 *     2006 April 28 (MJC):
 *        Removed call to KPS1_CLPA0 and called NDF_PTWCS after creating
 *        the SwitchMap.
-*     {enter_further_changes}
-
-*  Bugs:
-*     {note_new_bugs_here}
+*     {enter_further_changes_here}
 
 *-
 

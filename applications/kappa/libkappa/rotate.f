@@ -84,10 +84,6 @@
 *        a VARIANCE component, and FALSE otherwise.  Note that following
 *        this operation the errors are no longer independent.  [!]
 
-*  Notes:
-*     -  Bad pixels are ignored in the bi-linear interpolation.  If all
-*     four pixels are bad, the result is bad.
-
 *  Examples:
 *     rotate ns ew 90
 *        This rotates the array components in the NDF called ns by 90
@@ -121,6 +117,10 @@
 *        method.  The title of the output NDF is "Reoriented features 
 *        map".
 
+*  Notes:
+*     -  Bad pixels are ignored in the bi-linear interpolation.  If all
+*     four pixels are bad, the result is bad.
+
 *  Related Applications:
 *     KAPPA: FLIP, RESAMPLE; Figaro: IREVX, IREVY, IROT90.
 
@@ -146,6 +146,27 @@
 *     interpolation the arithmetic is performed using single- or
 *     double-precision floating point as appropriate; and for 90 and
 *     270-degree rotations _INTEGER is used for all integer types.
+
+*  Copyright:
+*     Copyright (C) 1995, 1998-1999, 2002, 2004 Central Laboratory of
+*     the Research Councils. Copyright (C) 2005-2006 Particle Physics &
+*     Astronomy Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -177,10 +198,7 @@
 *        rotation as a special case.
 *     2006 April 12 (MJC):
 *        Remove unused variables and wrapped long lines.
-*     {enter_any_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
 

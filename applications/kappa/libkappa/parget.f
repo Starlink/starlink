@@ -45,7 +45,7 @@
 *
 *     Single elements of an parameter array may also be accessed using
 *     the array index in parentheses.
-*
+
 *  Usage:
 *     parget parname applic 
 
@@ -118,10 +118,7 @@
 *        Increase the maximum path length.
 *     2-FEB-2006 (TIMJ):
 *        Use HDS_FIND rather than attempting to kluge DAT_ASSOC
-*    {enter_any_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
 

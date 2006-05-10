@@ -126,7 +126,7 @@
 *        valuable general-purpose scheme, intermediate in its visual
 *        effect on NDFs between the bi-linear and nearest-neighbour
 *        schemes. 
-*         
+*
 *        - "SincCos" -- Uses the sinc(pi*x)cos(k*pi*x) kernel.  Gives
 *        similar results to the "Sincsinc" scheme.
 *
@@ -283,6 +283,41 @@
 *        is forced to be (1:256,-20:172) regardless of the location
 *        of the transformed pixels of a119.
 
+*  Notes:
+*     - If the input NDF contains a VARIANCE component, a VARIANCE 
+*     component will be written to the output NDF.  It will be 
+*     calculated on the assumption that errors on the input data 
+*     values are statistically independent and that their variance
+*     estimates may simply be summed (with appropriate weighting 
+*     factors) when several input pixels contribute to an output data 
+*     value.  If this assumption is not valid, then the output error
+*     estimates may be biased.  In addition, note that the statistical
+*     errors on neighbouring output data values (as well as the 
+*     estimates of those errors) may often be correlated, even if the
+*     above assumption about the input data is correct, because of
+*     the sub-pixel interpolation schemes employed. 
+*
+*     - This task is based on the AST_RESAMPLE<X> and AST_REBIN<X> 
+*     routines described in SUN/210.
+
+*  Related Applications:
+*     KAPPA: FLIP, ROTATE, SLIDE, WCSADD, WCSALIGN.
+*     CCDPACK: TRANLIST, TRANNDF, WCSEDIT.
+
+*  Implementation Status:
+*     -  The LABEL, UNITS, and HISTORY components, and all extensions
+*     are propagated.  TITLE is controlled by the TITLE parameter. DATA,
+*     VARIANCE, and WCS are propagated after appropriate modification. 
+*     The QUALITY component is also propagated if Nearest-Neighbour
+*     interpolation is being used.  The AXIS component is not 
+*     propagated.
+*     -  Processing of bad pixels and automatic quality masking are
+*     supported.
+*     -  All non-complex numeric data types can be handled.  If REBIN is
+*     TRUE, the data type will be converted to one of _INTEGER, _DOUBLE
+*     or _REAL for processing.
+*     -  There can be an arbitrary number of NDF dimensions.
+
 *  Choice of Algorithm:
 *     The algorithm used to produce the output image is determined by 
 *     the REBIN parameter, and is based either on resampling the output
@@ -298,7 +333,7 @@
 *     values by their allocated share of the input pixel value.  The way
 *     in which the input sample is divided between the output pixels 
 *     is determined by the METHOD parameter.
-
+*
 *     The two algorithms behaviour quite differently if the
 *     transformation from input to output includes any significant
 *     change of scale.  In general, resampling will not alter the pixel
@@ -315,7 +350,7 @@
 *     input image.  However, rebinning is probably more appropriate if
 *     the image measures (for instance) flux per pixel, since rebinning
 *     takes account of the change in pixel size.
-*  
+*
 *     Another difference is that resampling guarantees to fill the
 *     output image with good pixel values (assuming the input image is
 *     filled with good input pixel values), whereas holes can be left by
@@ -361,41 +396,27 @@
 *     by the discontinuities between the adjacent panels of the
 *     approximation, and can be minimised by reducing the value assigned
 *     to the TOL parameter. 
-*
-*  Notes:
-*     - If the input NDF contains a VARIANCE component, a VARIANCE 
-*     component will be written to the output NDF.  It will be 
-*     calculated on the assumption that errors on the input data 
-*     values are statistically independent and that their variance
-*     estimates may simply be summed (with appropriate weighting 
-*     factors) when several input pixels contribute to an output data 
-*     value.  If this assumption is not valid, then the output error
-*     estimates may be biased.  In addition, note that the statistical
-*     errors on neighbouring output data values (as well as the 
-*     estimates of those errors) may often be correlated, even if the
-*     above assumption about the input data is correct, because of
-*     the sub-pixel interpolation schemes employed. 
-*
-*     - This task is based on the AST_RESAMPLE<X> and AST_REBIN<X> 
-*     routines described in SUN/210.
 
-*  Implementation Status:
-*     -  The LABEL, UNITS, and HISTORY components, and all extensions
-*     are propagated.  TITLE is controlled by the TITLE parameter. DATA,
-*     VARIANCE, and WCS are propagated after appropriate modification. 
-*     The QUALITY component is also propagated if Nearest-Neighbour
-*     interpolation is being used.  The AXIS component is not 
-*     propagated.
-*     -  Processing of bad pixels and automatic quality masking are
-*     supported.
-*     -  All non-complex numeric data types can be handled.  If REBIN is
-*     TRUE, the data type will be converted to one of _INTEGER, _DOUBLE
-*     or _REAL for processing.
-*     -  There can be an arbitrary number of NDF dimensions.
+*  Copyright:
+*     Copyright (C) 2001-2004 Central Laboratory of the Research
+*     Councils. Copyright (C) 2005-2006 Particle Physics & Astronomy
+*     Research Council. All Rights Reserved.
 
-*  Related Applications:
-*     KAPPA: FLIP, ROTATE, SLIDE, WCSADD, WCSALIGN.
-*     CCDPACK: TRANLIST, TRANNDF, WCSEDIT.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -427,9 +448,6 @@
 *     2006 April 12 (MJC):
 *        Remove unused variable and wrapped long lines (including code).
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

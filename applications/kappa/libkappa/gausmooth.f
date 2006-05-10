@@ -134,18 +134,6 @@
 *        of good input pixels is at least 0.1.  This will cause the
 *        smoothing operation to fill in moderately sized regions of bad
 *        pixels.
-*        
-*  Timing:
-*     For a circular PSF, the execution time is approximately
-*     proportional to the number of pixels in the image to be smoothed
-*     and to the value given for the BOX parameter.  By default, this
-*     latter value is proportional to the value given for FWHM.  For an
-*     elliptical PSF, the execution time is approximately proportional
-*     to the number of pixels in the image to be smoothed and to the
-*     product of the values given for the BOX parameter.  By default,
-*     these latter values are approximately proportional to the values
-*     given for FWHM.  Execution time will be approximately doubled if
-*     a variance array is present in the input NDF.
 
 *  Related Applications:
 *     KAPPA: BLOCK, CONVOLVE, FFCLEAN, MATHS, MEDIAN, PSF; Figaro:
@@ -161,6 +149,39 @@
 *     -  All non-complex numeric data types can be handled.  Arithmetic
 *     is performed using single-precision floating point, or double
 *     precision, if appropriate.
+
+*  Timing:
+*     For a circular PSF, the execution time is approximately
+*     proportional to the number of pixels in the image to be smoothed
+*     and to the value given for the BOX parameter.  By default, this
+*     latter value is proportional to the value given for FWHM.  For an
+*     elliptical PSF, the execution time is approximately proportional
+*     to the number of pixels in the image to be smoothed and to the
+*     product of the values given for the BOX parameter.  By default,
+*     these latter values are approximately proportional to the values
+*     given for FWHM.  Execution time will be approximately doubled if
+*     a variance array is present in the input NDF.
+
+*  Copyright:
+*     Copyright (C) 1000, 1990, 1992 Science & Engineering Research
+*     Council. Copyright (C) 1995, 1998, 2000, 2004 Central Laboratory
+*     of the Research Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
@@ -202,9 +223,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

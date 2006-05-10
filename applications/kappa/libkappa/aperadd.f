@@ -12,7 +12,7 @@
 *  Invocation:
 *     CALL APERADD( STATUS )
 
-*  Arguments:   
+*  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -173,6 +173,9 @@
 *     at the ARD files created by ARDGEN and the ARDGEN documentation.
 *     There is also a summary with examples in the main body of SUN/95.
 
+*  Related Applications:
+*     KAPPA: STATS, MSTATS, ARDGEN, ARDMASK, ARDPLOT, WCSFRAME.
+
 *  Implementation Status:
 *     -  This routine correctly processes the WCS, AXIS, DATA, and VARIANCE 
 *     components of an NDF data structure.
@@ -181,8 +184,25 @@
 *     -  Bad pixels and automatic quality masking are supported.
 *     -  All non-complex numeric data types can be handled.
 
-*  Related Applications:
-*     KAPPA: STATS, MSTATS, ARDGEN, ARDMASK, ARDPLOT, WCSFRAME.
+*  Copyright:
+*     Copyright (C) 2001, 2003-2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -197,9 +217,6 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

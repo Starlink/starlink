@@ -115,7 +115,7 @@
 *        which has 50 pixels along each side.  The same region of sky
 *        is represented, but the input image is squashed along both
 *        axes to fit the specified dimensions.
-
+*
 *  Sub-Pixel Interpolation Schemes:
 *     When squashing or stretching an NDF, a separate one-dimensional 
 *     resampling operation is performed for each of the dimensions
@@ -143,6 +143,9 @@
 *     above assumption about the input data is correct, because of
 *     the sub-pixel interpolation schemes employed.
 
+*  Related Applications:
+*     KAPPA: REGRID, SLIDE, WCSADD.
+
 *  Implementation Status:
 *     -  The LABEL, UNITS, and HISTORY components, and all extensions are 
 *     propagated. TITLE is controlled by the TITLE parameter. DATA,
@@ -154,8 +157,25 @@
 *     -  All non-complex numeric data types can be handled.
 *     -  There can be an arbitrary number of NDF dimensions.
 
-*  Related Applications:
-*     KAPPA: REGRID, SLIDE, WCSADD.
+*  Copyright:
+*     Copyright (C) 2002, 2004 Central Laboratory of the Research
+*     Councils. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MBT: Mark Taylor (Starlink)
