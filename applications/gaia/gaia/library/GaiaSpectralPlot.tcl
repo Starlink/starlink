@@ -121,7 +121,16 @@ itcl::class gaia::GaiaSpectralPlot {
       $short_help_win_ add_menu_short_help $File \
          {Close} {Close this window}
 
-      #  Use log for pliot axes.
+      #  Whether to constantly update the spectrum data limits.
+      $Options add checkbutton -label "Autoscale" \
+         -variable [scope itk_option(-autoscale)] \
+         -onvalue 1 \
+         -offvalue 0
+      add_menu_short_help $Options {Autoscale}  \
+         {Continuously change data limits of spectral plot,
+            otherwise fixed by last click (faster)}
+
+      #  Use log for plot axes.
       $Options add checkbutton \
          -label {Log X axis} \
          -variable [scope itk_option(-log_x_axis)] \
@@ -304,9 +313,10 @@ itcl::class gaia::GaiaSpectralPlot {
    #
    #  The axis defines the WCS axis that should be used for the plot X axis.
    #  If autoscale is true, then the plot should be rescaled so that the
-   #  spectrum fits. Otherwise the existing plot bounds are used.
-   #  The alow and ahigh arguments are the range along the axis to extract
-   #  and p1 and p2 the positions of the spectrum along the remaining two axes.
+   #  spectrum fits. Otherwise the existing plot bounds are used (unless the
+   #  local autoscale option is enabled, that takes precendence).  The alow and
+   #  ahigh arguments are the range along the axis to extract and p1 and p2 the
+   #  positions of the spectrum along the remaining two axes.
    public method display {accessor axis alow ahigh p1 p2 autoscale
                           {x {}} {y {}}} {
 
@@ -346,7 +356,7 @@ itcl::class gaia::GaiaSpectralPlot {
 
       #  When autoscaling (or just created one of the plots), set the frameset
       #  and the NDF data units.
-      if { $autoscale } {
+      if { $autoscale || $itk_option(-autoscale) } {
          set frameset [$accessor getaxiswcs $axis [expr $alow -1]]
          $itk_component(canvas) itemconfigure $spectrum_ -frameset $frameset
          #if { $spectrum2_ != {} } {
@@ -529,6 +539,9 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Identifying number for toolbox (shown in () in window title).
    itk_option define -number number Number 0 {}
+
+   #  Does spectral plot auto-update ranges.
+   itk_option define -autoscale autoscale AutoScale 0
 
    #  Tag to use for any graphics. Matches the ast_tag value used in GAIA
    #  to avoid the main canvas scaling the plot.

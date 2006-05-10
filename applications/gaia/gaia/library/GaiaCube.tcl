@@ -137,15 +137,6 @@ itcl::class gaia::GaiaCube {
          set itk_option(-usemmap) 0
       }
 
-      #  Whether to constantly update the spectrum data limits.
-      $Options add checkbutton -label "Autoscale" \
-         -variable [scope itk_option(-autoscale)] \
-         -onvalue 1 \
-         -offvalue 0
-      add_menu_short_help $Options {Autoscale}  \
-         {Continuously change data limits of spectral plot,
-            otherwise fixed by last click (faster)}
-
       #  Whether to constantly update the image cuts.
       $Options add checkbutton -label "Autocut" \
          -variable [scope itk_option(-autocut)] \
@@ -1086,7 +1077,7 @@ itcl::class gaia::GaiaCube {
 
       #  Also autoscale when single click, so that we are not fixed for
       #  all time.
-      if { $itk_option(-autoscale) || $action == "localstart" } {
+      if { $action == "localstart" } {
          busy {
             $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh \
                $ix $iy 1 $ccx $ccy
@@ -1259,9 +1250,6 @@ itcl::class gaia::GaiaCube {
    itk_option define -step step Step 1 {
       set step_ $itk_option(-step)
    }
-
-   #  Does spectral plot auto-update ranges.
-   itk_option define -autoscale autoscale AutoScale 0
 
    #  Whether to autoscale the cuts as every image slice is displayed.
    itk_option define -autocut autocut AutoCut 0
