@@ -27,15 +27,11 @@ void cupid_mon( int *adam_status ) {
 *  Purpose:
 *     Top-level CUPID function for A-task monolith on UNIX.
 
+*  Language:
+*     Starlink C
+
 *  Type of Module:
 *     ADAM A-task
-
-*  Synopsis:
-*     void cupid_mon( int *adam_status );
-
-*  Parameters:
-*     adam_status 
-*        Pointer to the global status variable used by the ADAM fixed part.
 
 *  Description:
 *     This is the top-level A-task monolith function for the CUPID
@@ -46,6 +42,33 @@ void cupid_mon( int *adam_status ) {
 *     is called after a successful matching of the input string with a
 *     valid task name.  If there is no match, an error report is made.
 
+*  Parameters:
+*     adam_status 
+*        Pointer to the global status variable used by the ADAM fixed part.
+
+*  Synopsis:
+*     void cupid_mon( int *adam_status );
+
+*  Copyright:
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -53,6 +76,7 @@ void cupid_mon( int *adam_status ) {
 *  History:
 *     28-SEP-2005 (DSB):
 *        Original version.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -135,5 +159,3 @@ void cupid_mon( int *adam_status ) {
    astFlushMemory( 1 );
 
 }
-
-
