@@ -693,7 +693,7 @@ itcl::class gaia::GaiaCube {
 
          #  Set name of the image displayed image section.
          set oldname $section_name_
-         set section_name_ "GaiaCubeSection[incr count_].sdf"
+         set section_name_ "GaiaTempCubeSection[incr count_].sdf"
 
          #  And create the dummy image NDF. Will have axis removed from
          #  the WCS and be the size and type of cube in other axes.
@@ -956,7 +956,7 @@ itcl::class gaia::GaiaCube {
       }
 
       #  Create a temporary file name.
-      set tmpimage_ "GaiaCube${count_}"
+      set tmpimage_ "GaiaTempCube${count_}"
       incr count_
 
       blt::busy hold $w_

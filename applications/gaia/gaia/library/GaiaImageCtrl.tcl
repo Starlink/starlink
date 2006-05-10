@@ -736,6 +736,15 @@ itcl::class gaia::GaiaImageCtrl {
       gaia::GaiaSearch::apply_history $this $filename $itk_option(-default_cut)
    }
 
+   # Add the current image to the history catalog under the given filename.
+   # Overridden so we can skip this, if image is marked as temporary (either
+   # locally or just by the filename convention).
+   public method add_history {filename} {
+      if { ! $itk_option(-temporary) && ! [string match {*GaiaTemp*} $filename] } {
+         SkyCatCtrl::add_history $filename
+      }
+   }
+
    #  Check if any other instance of this class is displaying the
    #  current image (used when deciding to delete file, shared
    #  temporary files are retained until all instances are released).
