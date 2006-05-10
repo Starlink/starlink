@@ -169,10 +169,6 @@ endif
 if ( ! ${?WWW_HOME} ) setenv WWW_HOME http://www.starlink.rl.ac.uk/
 
 #
-#  HTX browser.  If HTX_BROWSER is not defined, set it to netscape.
-if ( ! ${?HTX_BROWSER} ) setenv HTX_BROWSER netscape
-
-#
 #  MAN pages.  If none defined, create a default, then add to it.
 if ( ! ${?MANPATH} ) setenv MANPATH /usr/share/man:/usr/man:/usr/local/man:/usr/openwin/man
 setenv MANPATH @exec_prefix@/local/man:@exec_prefix@/man:${MANPATH} # Starlink
