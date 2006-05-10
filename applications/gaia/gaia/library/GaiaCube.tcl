@@ -143,8 +143,16 @@ itcl::class gaia::GaiaCube {
          -onvalue 1 \
          -offvalue 0
       add_menu_short_help $Options {Autoscale}  \
-         {Continuously change data limits,
+         {Continuously change data limits of spectral plot,
             otherwise fixed by last click (faster)}
+
+      #  Whether to constantly update the image cuts.
+      $Options add checkbutton -label "Autocut" \
+         -variable [scope itk_option(-autocut)] \
+         -onvalue 1 \
+         -offvalue 0
+      add_menu_short_help $Options {Autocut}  \
+         {Continuously change set the cuts of the image slices, data limits}
 
       #  Enable send to SPLAT.
       $Options add checkbutton -label "Enable SPLAT" \
@@ -737,8 +745,8 @@ itcl::class gaia::GaiaCube {
       lassign [$cubeaccessor_ getinfo $adr] realadr nel type
       $itk_option(-rtdimage) updateimagedata $realadr
 
-      #  If regenerating bring autocuts etc. into sync.
-      if { $regen } {
+      #  If regenerating or asked bring autocuts etc. into sync.
+      if { $regen || $itk_option(-autocut) } {
          $itk_option(-rtdimage) autocut -percent 98
       }
 
@@ -854,7 +862,7 @@ itcl::class gaia::GaiaCube {
          after cancel $afterId_
          set afterId_ {}
          # DEBUG
-         # puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
+         #puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
 
          #  Update the WCS so that the spectral axis coordinate is correct.
          update_wcs_
@@ -1254,6 +1262,9 @@ itcl::class gaia::GaiaCube {
 
    #  Does spectral plot auto-update ranges.
    itk_option define -autoscale autoscale AutoScale 0
+
+   #  Whether to autoscale the cuts as every image slice is displayed.
+   itk_option define -autocut autocut AutoCut 0
 
    #  Whether to use file mapping (quick startup), or direct io (fast
    #  spectral display).
