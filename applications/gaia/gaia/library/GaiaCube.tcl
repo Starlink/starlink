@@ -775,7 +775,6 @@ itcl::class gaia::GaiaCube {
    #  slice slider drag etc.).
    protected method update_wcs_ {} {
       set index [axis_pixel2grid_ $plane_]
-      puts "update_wcs_ index = $index"
       set frameset [$cubeaccessor_ getimagewcs $axis_ $index]
       if { $frameset != 0 } {
          $itk_option(-rtdimage) astreplace $frameset
