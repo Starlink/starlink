@@ -203,6 +203,9 @@ itcl::class gaia::GaiaAstDisplayDomains {
          set lwidth [expr max([string length $domain],$lwidth)]
       }
 
+      # Get the current base domain frame index.
+      set current [$itk_option(-rtdimage) astget current]
+
       set w $itk_component(readoutarea)
       blt::table $w
       foreach {domain dims} "$domains_" {
@@ -219,9 +222,19 @@ itcl::class gaia::GaiaAstDisplayDomains {
                entry $w.value$i$j -text "Value $j" \
                   -textvariable [scope values_($i,$j)]
             }
+
+            #  Move to this domain so short help displays label and unit.
+            $itk_option(-rtdimage) astset current $i
+            set label [$itk_option(-rtdimage) astget label\($j\)]
+            set unit [$itk_option(-rtdimage) astget unit\($j\)]
+            add_short_help $itk_component(value$i$j) "$label ($unit)"
+
             blt::table $w $itk_component(value$i$j) $i,$j -fill x
          }
       }
+
+      #  Restore default domain.
+      $itk_option(-rtdimage) astset current $current
       start_trace_
    }
    
