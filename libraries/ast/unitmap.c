@@ -62,6 +62,8 @@ f     The UnitMap class does not define any new routines beyond those
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitUnitMapVtab
 *        method.
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -113,6 +115,7 @@ AstUnitMap *astUnitMapId_( int, const char *, ... );
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
+static int Equal( AstObject *, AstObject * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static double Rate( AstMapping *, double *, int, int );
 static void Dump( AstObject *, AstChannel * );
@@ -120,6 +123,75 @@ static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 
 /* Member functions. */
 /* ================= */
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two UnitMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "unitmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     UnitMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two UnitMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a UnitMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the UnitMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstUnitMap *that;        
+   AstUnitMap *this;        
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two UnitMap structures. */
+   this = (AstUnitMap *) this_object;
+   that = (AstUnitMap *) that_object;
+
+/* Check the second object is a UnitMap. We know the first is a
+   UnitMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsAUnitMap( that ) ) {
+
+/* Get the number of inputs check they are the same for both. */
+      result = ( astGetNin( this ) == astGetNin( that ) );
+
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 void astInitUnitMapVtab_(  AstUnitMapVtab *vtab, const char *name ) {
 /*
 *+
@@ -157,6 +229,7 @@ void astInitUnitMapVtab_(  AstUnitMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
@@ -181,6 +254,7 @@ void astInitUnitMapVtab_(  AstUnitMapVtab *vtab, const char *name ) {
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
 
    parent_transform = mapping->Transform;
@@ -188,6 +262,7 @@ void astInitUnitMapVtab_(  AstUnitMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
    mapping->MapSplit = MapSplit;
    mapping->Rate = Rate;

@@ -68,6 +68,8 @@ f     The ZoomMap class does not define any new routines beyond those
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitZoomMapVtab
 *        method.
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -131,6 +133,7 @@ AstZoomMap *astZoomMapId_( int, double, const char *, ... );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );static double GetZoom( AstZoomMap * );
 static double Rate( AstMapping *, double *, int, int);
+static int Equal( AstObject *, AstObject * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
 static int TestZoom( AstZoomMap * );
@@ -196,6 +199,93 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else {
       (*parent_clearattrib)( this_object, attrib );
    }
+}
+
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two ZoomMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "zoommap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     ZoomMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two ZoomMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a ZoomMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the ZoomMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstZoomMap *that;        
+   AstZoomMap *this;        
+   int nin;
+   int nout;
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two ZoomMap structures. */
+   this = (AstZoomMap *) this_object;
+   that = (AstZoomMap *) that_object;
+
+/* Check the second object is a ZoomMap. We know the first is a
+   ZoomMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsAZoomMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
+
+/* If the Invert flags for the two ZoomMaps differ, it may still be possible 
+   for them to be equivalent. First compare the ZoomMaps if their Invert 
+   flags are the same. In this case all the attributes of the two ZoomMaps 
+   must be identical. */
+         if( astGetInvert( this ) == astGetInvert( that ) ) {
+            result = ( astEQUAL( this->zoom, that->zoom ) );
+
+/* If the Invert flags for the two ZoomMaps differ, the attributes of the two 
+   ZoomMaps must be inversely related to each other. */
+         } else {
+            result = ( astEQUAL( this->zoom, 1.0/that->zoom ) );
+
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
 }
 
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
@@ -371,6 +461,7 @@ void astInitZoomMapVtab_(  AstZoomMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
    mapping->MapSplit = MapSplit;
    mapping->Rate = Rate;

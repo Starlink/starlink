@@ -73,6 +73,8 @@ f     The SphMap class does not define any new routines beyond those
 *        method.
 *     11-JUN-2003 (DSB):
 *        Added PolarLong attribute.
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -145,6 +147,7 @@ static void SetPolarLong( AstSphMap *, double );
 
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );
+static int Equal( AstObject *, AstObject * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
 static void ClearAttrib( AstObject *, const char * );
@@ -211,6 +214,99 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else {
       (*parent_clearattrib)( this_object, attrib );
    }
+}
+
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two SphMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "sphmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     SphMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two SphMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a SphMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the SphMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstSphMap *that;        
+   AstSphMap *this;        
+   int nin;
+   int nout;
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two SphMap structures. */
+   this = (AstSphMap *) this_object;
+   that = (AstSphMap *) that_object;
+
+/* Check the second object is a SphMap. We know the first is a
+   SphMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsASphMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
+
+/* If the Invert flags for the two SphMaps differ, it may still be possible 
+   for them to be equivalent. First compare the SphMaps if their Invert 
+   flags are the same. In this case all the attributes of the two SphMaps 
+   must be identical. */
+         if( astGetInvert( this ) == astGetInvert( that ) ) {
+
+            if( astEQUAL( this->polarlong, that->polarlong ) &&
+                this->unitradius == that->unitradius ){
+               result = 1;
+            }
+
+/* If the Invert flags for the two SphMaps differ, the attributes of the two 
+   SphMaps must be inversely related to each other. */
+         } else {
+
+/* In the specific case of a SphMap, Invert flags must be equal. */
+            result = 0;
+
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
 }
 
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
@@ -396,6 +492,7 @@ void astInitSphMapVtab_(  AstSphMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
 
 /* Declare the class dump, copy and delete functions.*/

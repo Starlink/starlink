@@ -54,6 +54,8 @@ f     The ShiftMap class does not define any new routines beyond those
 *        Original version.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -130,6 +132,7 @@ static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void SetAttrib( AstObject *, const char * );
+static int Equal( AstObject *, AstObject * );
 static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 
 /* Function Macros */
@@ -191,6 +194,107 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    parent method for further interpretation. */
    (*parent_clearattrib)( this_object, attrib );
 
+}
+
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two ShiftMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "shiftmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     ShiftMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two ShiftMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a ShiftMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the ShiftMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstShiftMap *that;        
+   AstShiftMap *this;        
+   int i;           
+   int nin;
+   int nout;
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two ShiftMap structures. */
+   this = (AstShiftMap *) this_object;
+   that = (AstShiftMap *) that_object;
+
+/* Check the second object is a ShiftMap. We know the first is a
+   ShiftMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsAShiftMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
+
+/* If the Invert flags for the two ShiftMaps differ, it may still be possible 
+   for them to be equivalent. First compare the ShiftMaps if their Invert 
+   flags are the same. In this case all the attributes of the two ShiftMaps 
+   must be identical. */
+         if( astGetInvert( this ) == astGetInvert( that ) ) {
+            result = 1;
+            for( i = 0; i < nin; i++ ) {
+               if( !astEQUAL( this->shift[ i ], that->shift[ i ] ) ) {
+                  result = 0;
+                  break;
+               }
+            }                 
+
+/* If the Invert flags for the two ShiftMaps differ, the attributes of the two 
+   ShiftMaps must be inversely related to each other. */
+         } else {
+
+            result = 1;
+            for( i = 0; i < nin; i++ ) {
+               if( !astEQUAL( this->shift[ i ], -(that->shift[ i ] ) ) ) {
+                  result = 0;
+                  break;
+               }
+            }                 
+
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
 }
 
 static int GetObjSize( AstObject *this_object ) {
@@ -407,6 +511,7 @@ void astInitShiftMapVtab_(  AstShiftMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
    mapping->Rate = Rate;
    mapping->MapSplit = MapSplit;

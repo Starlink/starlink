@@ -75,6 +75,8 @@ f     The GrismMap class does not define any new routines beyond those
 *  History:
 *     18-JUN-2003 (DSB):
 *        Original version.
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -313,6 +315,7 @@ static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
 static void ClearAttrib( AstObject *, const char * );
 static void Dump( AstObject *, AstChannel * );
+static int Equal( AstObject *, AstObject * );
 static void SetAttrib( AstObject *, const char * );
 static void UpdateConstants( AstGrismMap * );
 
@@ -611,6 +614,108 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    }
 }
 
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two GrismMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "grismmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     GrismMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two GrismMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a GrismMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the GrismMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstGrismMap *that;        
+   AstGrismMap *this;        
+   int nin;
+   int nout;
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two GrismMap structures. */
+   this = (AstGrismMap *) this_object;
+   that = (AstGrismMap *) that_object;
+
+/* Check the second object is a GrismMap. We know the first is a
+   GrismMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsAGrismMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
+
+/* If the Invert flags for the two GrismMaps differ, it may still be possible 
+   for them to be equivalent. First compare the GrismMaps if their Invert 
+   flags are the same. In this case all the attributes of the two GrismMaps 
+   must be identical. */
+         if( astGetInvert( this ) == astGetInvert( that ) ) {
+
+            if( astEQUAL( this->nr, that->nr ) &&
+                astEQUAL( this->nrp, that->nrp ) &&
+                astEQUAL( this->waver, that->waver ) &&
+                astEQUAL( this->alpha, that->alpha ) &&
+                astEQUAL( this->g, that->g ) &&
+                astEQUAL( this->m, that->m ) &&
+                astEQUAL( this->eps, that->eps ) &&
+                astEQUAL( this->theta, that->theta ) &&
+                astEQUAL( this->k1, that->k1 ) &&
+                astEQUAL( this->k2, that->k2 ) &&
+                astEQUAL( this->k3, that->k3 ) ) {
+                result = 1;
+             }
+
+/* If the Invert flags for the two GrismMaps differ, the attributes of the two 
+   GrismMaps must be inversely related to each other. */
+         } else {
+
+/* In the specific case of a GrismMap, Invert flags must be equal. */
+            result = 0;
+
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -866,6 +971,7 @@ void astInitGrismMapVtab_(  AstGrismMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
 
 /* Declare the class dump, copy and delete functions.*/

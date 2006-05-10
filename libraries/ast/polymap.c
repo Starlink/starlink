@@ -63,6 +63,8 @@ f     The PolyMap class does not define any new routines beyond those
 *        Correct the indexing of keywords produced in the Dump function.
 *     20-APR-2006 (DSB):
 *        Guard against undefined transformations in Copy.
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -131,9 +133,165 @@ static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject *obj );
 static void Dump( AstObject *, AstChannel * );
+static int Equal( AstObject *, AstObject * );
 
 /* Member functions. */
 /* ================= */
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two PolyMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polymap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     PolyMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two PolyMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a PolyMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the PolyMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPolyMap *that;        
+   AstPolyMap *this;        
+   int i, j, k; 
+   int nin;
+   int nout;
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two PolyMap structures. */
+   this = (AstPolyMap *) this_object;
+   that = (AstPolyMap *) that_object;
+
+/* Check the second object is a PolyMap. We know the first is a
+   PolyMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsAPolyMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
+
+/* If the Invert flags for the two PolyMaps differ, it may still be possible 
+   for them to be equivalent. First compare the PolyMaps if their Invert 
+   flags are the same. In this case all the attributes of the two PolyMaps 
+   must be identical. */
+         if( astGetInvert( this ) == astGetInvert( that ) ) {
+
+            result = 1;
+
+            for( i = 0; i < nout && result; i++ ) {
+               if( this->ncoeff_f[ i ] != that->ncoeff_f[ i ] ||
+                   this->mxpow_i[ i ] != that->mxpow_i[ i ] ) {
+                  result = 0;
+               } 
+            }
+
+
+            if( this->coeff_f && that->coeff_f ) {
+               for( i = 0; i < nout && result; i++ ) {
+                  for( j = 0; j < this->ncoeff_f[ i ] && result; i++ ) {
+                     if( !EQUAL( this->coeff_f[ i ][ j ],
+                                 that->coeff_f[ i ][ j ] ) ) {
+                        result = 0;
+                     }
+                  }
+               }
+            }
+
+            if( this->power_f && that->power_f ) {
+               for( i = 0; i < nout && result; i++ ) {
+                  for( j = 0; j < this->ncoeff_f[ i ] && result; i++ ) {
+                     for( k = 0; k < nin && result; k++ ) {
+                        if( !EQUAL( this->power_f[ i ][ j ][ k ],
+                                    that->power_f[ i ][ j ][ k ] ) ) {
+                           result = 0;
+                        }
+                     }
+                  }
+               }
+            }
+
+            for( i = 0; i < nin && result; i++ ) {
+               if( this->ncoeff_i[ i ] != that->ncoeff_i[ i ] ||
+                   this->mxpow_f[ i ] != that->mxpow_f[ i ] ) {
+                  result = 0;
+               } 
+            }
+
+
+            if( this->coeff_i && that->coeff_i ) {
+               for( i = 0; i < nin && result; i++ ) {
+                  for( j = 0; j < this->ncoeff_i[ i ] && result; i++ ) {
+                     if( !EQUAL( this->coeff_i[ i ][ j ],
+                                 that->coeff_i[ i ][ j ] ) ) {
+                        result = 0;
+                     }
+                  }
+               }
+            }
+
+            if( this->power_i && that->power_i ) {
+               for( i = 0; i < nin && result; i++ ) {
+                  for( j = 0; j < this->ncoeff_i[ i ] && result; i++ ) {
+                     for( k = 0; k < nout && result; k++ ) {
+                        if( !EQUAL( this->power_i[ i ][ j ][ k ],
+                                    that->power_i[ i ][ j ][ k ] ) ) {
+                           result = 0;
+                        }
+                     }
+                  }
+               }
+            }
+
+/* If the Invert flags for the two PolyMaps differ, the attributes of the two 
+   PolyMaps must be inversely related to each other. */
+         } else {
+
+/* In the specific case of a PolyMap, Invert flags must be equal. */
+            result = 0;
+
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static void FreeArrays( AstPolyMap *this, int forward ) {
 /*
 *  Name:
@@ -298,6 +456,7 @@ void astInitPolyMapVtab_(  AstPolyMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
 
 /* Declare the destructor and copy constructor. */

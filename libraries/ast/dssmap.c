@@ -93,6 +93,8 @@ f     The DssMap class does not define any new routines beyond those
 *        method.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -167,10 +169,125 @@ static struct WorldCoor *BuildWcs( AstFitsChan *, const char *, const char * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject *obj );
 static void Dump( AstObject *, AstChannel * );
+static int Equal( AstObject *, AstObject * );
 
 static int GetObjSize( AstObject * );
 /* Member functions. */
 /* ================= */
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two DssMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "dssmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     DssMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two DssMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a DssMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the DssMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstDssMap *that;        
+   AstDssMap *this;        
+   int i;           
+   int nin;
+   int nout;
+   int result;
+   struct WorldCoor *this_wcs;
+   struct WorldCoor *that_wcs;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two DssMap structures. */
+   this = (AstDssMap *) this_object;
+   that = (AstDssMap *) that_object;
+
+/* Check the second object is a DssMap. We know the first is a
+   DssMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsADssMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
+
+/* If the Invert flags for the two DssMaps differ, it may still be possible 
+   for them to be equivalent. First compare the DssMaps if their Invert 
+   flags are the same. In this case all the attributes of the two DssMaps 
+   must be identical. */
+         if( astGetInvert( this ) == astGetInvert( that ) ) {
+
+            this_wcs = ( struct WorldCoor *) this->wcs;
+            that_wcs = ( struct WorldCoor *) that->wcs;
+
+            if( this_wcs->x_pixel_offset == that_wcs->x_pixel_offset &&
+                this_wcs->y_pixel_offset == that_wcs->y_pixel_offset &&
+                this_wcs->ppo_coeff[2] == that_wcs->ppo_coeff[2] &&
+                this_wcs->ppo_coeff[5] == that_wcs->ppo_coeff[5] &&
+                this_wcs->x_pixel_size == that_wcs->x_pixel_size &&
+                this_wcs->y_pixel_size == that_wcs->y_pixel_size &&
+                this_wcs->plate_dec == that_wcs->plate_dec &&
+                this_wcs->plate_ra == that_wcs->plate_ra ) {
+
+                result = 1;
+                for( i = 0; i < 13; i++ ) {
+                   if( this_wcs->amd_x_coeff[i] != that_wcs->amd_x_coeff[i] ||
+                       this_wcs->amd_y_coeff[i] != that_wcs->amd_y_coeff[i] ) {
+                      result = 0;
+                      break;
+                   }
+                } 
+
+             }
+
+/* If the Invert flags for the two DssMaps differ, the attributes of the two 
+   DssMaps must be inversely related to each other. */
+         } else {
+
+/* In the specific case of a DssMap, Invert flags must be equal. */
+            result = 0;
+
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static int GetObjSize( AstObject *this_object ) {
 /*
 *  Name:
@@ -667,6 +784,7 @@ void astInitDssMapVtab_(  AstDssMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge; 
 
 /* Declare the class dump, copy and delete function. */

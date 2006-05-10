@@ -99,6 +99,8 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *        Override astGetObjSize.
 *     22-FEB-2006 (DSB):
 *        Cache results returned by slaMappa in order to increase speed.
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -215,6 +217,7 @@ AstSlaMap *astSlaMapId_( int, const char *, ... );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *CvtString( int, const char **, int *, const char *[ MAX_SLA_ARGS ] );
 static int CvtCode( const char * );
+static int Equal( AstObject *, AstObject * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void AddSlaCvt( AstSlaMap *, int, const double * );
 static void Copy( const AstObject *, AstObject * );
@@ -234,6 +237,117 @@ static void J2000H( int, int, double *, double * );
 static int GetObjSize( AstObject * );
 /* Member functions. */
 /* ================= */
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two SlaMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "slamap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     SlaMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two SlaMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a SlaMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the SlaMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstSlaMap *that;        
+   AstSlaMap *this;        
+   const char *argdesc[ MAX_SLA_ARGS ]; 
+   const char *comment;      
+   int i, j;           
+   int nargs;                
+   int nin;
+   int nout;
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two SlaMap structures. */
+   this = (AstSlaMap *) this_object;
+   that = (AstSlaMap *) that_object;
+
+/* Check the second object is a SlaMap. We know the first is a
+   SlaMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsASlaMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
+
+/* If the Invert flags for the two SlaMaps differ, it may still be possible 
+   for them to be equivalent. First compare the SlaMaps if their Invert 
+   flags are the same. In this case all the attributes of the two SlaMaps 
+   must be identical. */
+         if( astGetInvert( this ) == astGetInvert( that ) ) {
+            if( this->ncvt == that->ncvt ) {
+               result = 1;
+               for( i = 0; i < this->ncvt && result; i++ ) {
+                  if( this->cvttype[ i ] != that->cvttype[ i ] ) {
+                     result = 0;
+                  } else {
+                     CvtString( this->cvttype[ i ], &comment, &nargs, 
+                                argdesc );
+                     for( j = 0; j < nargs; j++ ) {
+                        if( !astEQUAL( this->cvtargs[ i ][ j ],
+                                       that->cvtargs[ i ][ j ] ) ){
+                           result = 0;
+                           break;
+                        }
+                     }
+                  }
+               }
+            }
+
+/* If the Invert flags for the two SlaMaps differ, the attributes of the two 
+   SlaMaps must be inversely related to each other. */
+         } else {
+
+/* In the specific case of a SlaMap, Invert flags must be equal. */
+            result = 0;
+
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
+
 static int GetObjSize( AstObject *this_object ) {
 /*
 *  Name:
@@ -2171,6 +2285,7 @@ void astInitSlaMapVtab_(  AstSlaMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
 
 /* Declare the copy constructor, destructor and class dump

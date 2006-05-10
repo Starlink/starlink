@@ -85,6 +85,8 @@ f     The LutMap class does not define any new routines beyond those
 *        - MapMerge changed so that a LutMap will cancel with its own
 *        inverse.
 *        - Added attribute LutInterp
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -155,6 +157,7 @@ static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
+static int Equal( AstObject *, AstObject * );
 
 static const char *GetAttrib( AstObject *, const char * );
 static int TestAttrib( AstObject *, const char * );
@@ -221,6 +224,108 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else {
       (*parent_clearattrib)( this_object, attrib );
    }
+}
+
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two LutMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "lutmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     LutMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two LutMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a LutMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the LutMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstLutMap *that;        
+   AstLutMap *this;        
+   int i;           
+   int nin;
+   int nout;
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two LutMap structures. */
+   this = (AstLutMap *) this_object;
+   that = (AstLutMap *) that_object;
+
+/* Check the second object is a LutMap. We know the first is a
+   LutMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsALutMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
+
+/* If the Invert flags for the two LutMaps differ, it may still be possible 
+   for them to be equivalent. First compare the LutMaps if their Invert 
+   flags are the same. In this case all the attributes of the two LutMaps 
+   must be identical. */
+         if( astGetInvert( this ) == astGetInvert( that ) ) {
+ 
+            if( astEQUAL( this->start, that->start ) &&
+                astEQUAL( this->inc, that->inc ) &&
+                this->nlut == that->nlut &&
+                this->lutinterp == that->lutinterp ){
+
+               result = 1;
+               for( i = 0; i < this->nlut; i++ ) {
+                  if( !astEQUAL( (this->lut)[ i ], (that->lut)[ i ] ) ) {
+                     result = 0;
+                     break;
+                  }
+               }
+            }
+
+/* If the Invert flags for the two LutMaps differ, the attributes of the two 
+   LutMaps must be inversely related to each other. */
+         } else {
+
+/* In the specific case of a LutMap, Invert flags must be equal. */
+            result = 0;
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
 }
 
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
@@ -509,6 +614,7 @@ void astInitLutMapVtab_(  AstLutMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
 
 /* Declare the class dump, copy and delete functions.*/

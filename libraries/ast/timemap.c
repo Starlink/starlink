@@ -77,6 +77,8 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 *        Add 2006 leap second.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -194,6 +196,7 @@ static const char *CvtString( int, const char **, int *, int *, const char *[ MA
 static double Gmsta( double, double, int );
 static double Rate( AstMapping *, double *, int, int );
 static double Rcc( double, double, double, double, double );
+static int Equal( AstObject *, AstObject * );
 static int CvtCode( const char * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void AddArgs( int, double * );
@@ -206,6 +209,117 @@ static void TimeAdd( AstTimeMap *, const char *, const double[] );
 static int GetObjSize( AstObject * );
 /* Member functions. */
 /* ================= */
+
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two TimeMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "timemap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     TimeMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two TimeMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a TimeMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the TimeMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstTimeMap *that;        
+   AstTimeMap *this;        
+   const char *argdesc[ MAX_ARGS ]; 
+   const char *comment;      
+   int i, j;           
+   int nargs;              
+   int nin;
+   int nout;
+   int result;
+   int szargs;             
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two TimeMap structures. */
+   this = (AstTimeMap *) this_object;
+   that = (AstTimeMap *) that_object;
+
+/* Check the second object is a TimeMap. We know the first is a
+   TimeMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsATimeMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
+
+/* If the Invert flags for the two TimeMaps differ, it may still be possible 
+   for them to be equivalent. First compare the TimeMaps if their Invert 
+   flags are the same. In this case all the attributes of the two TimeMaps 
+   must be identical. */
+         if( astGetInvert( this ) == astGetInvert( that ) ) {
+            if( this->ncvt == that->ncvt ) {
+               result = 1;
+               for( i = 0; i < this->ncvt && result; i++ ) {
+                  if( this->cvttype[ i ] != that->cvttype[ i ] ) {
+                     result = 0;
+                  } else {
+                     CvtString( this->cvttype[ i ], &comment, &nargs, &szargs, argdesc );
+                     for( j = 0; j < nargs; j++ ) {
+                        if( !astEQUAL( this->cvtargs[ i ][ j ],
+                                       that->cvtargs[ i ][ j ] ) ){
+                           result = 0;
+                           break;
+                        }
+                     }
+                  }
+               }
+            }
+
+/* If the Invert flags for the two TimeMaps differ, the attributes of the two 
+   TimeMaps must be inversely related to each other. */
+         } else {
+
+/* In the specific case of a TimeMap, Invert flags must be equal. */
+            result = 0;
+
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static int GetObjSize( AstObject *this_object ) {
 /*
 *  Name:
@@ -1568,6 +1682,7 @@ void astInitTimeMapVtab_(  AstTimeMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;  
 
 /* Declare the copy constructor, destructor and class dump

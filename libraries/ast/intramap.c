@@ -91,6 +91,8 @@ f     The IntraMap class does not define any new routines beyond those
 *        Override astGetObjSize.
 *     1-MAR-2006 (DSB):
 *        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -190,6 +192,7 @@ static void ClearIntraFlag( AstIntraMap * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
+static int Equal( AstObject *, AstObject * );
 static void IntraReg( const char *, int, int, void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), void (*)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
 static void SetAttrib( AstObject *, const char * );
 static void SetIntraFlag( AstIntraMap *, const char * );
@@ -338,6 +341,100 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else {
       (*parent_clearattrib)( this_object, attrib );
    }
+}
+
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two IntraMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "intramap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     IntraMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two IntraMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a IntraMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the IntraMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstIntraMap *that;        
+   AstIntraMap *this;        
+   int nin;
+   int nout;
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two IntraMap structures. */
+   this = (AstIntraMap *) this_object;
+   that = (AstIntraMap *) that_object;
+
+/* Check the second object is a IntraMap. We know the first is a
+   IntraMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsAIntraMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
+
+/* If the Invert flags for the two IntraMaps differ, it may still be possible 
+   for them to be equivalent. First compare the IntraMaps if their Invert 
+   flags are the same. In this case all the attributes of the two IntraMaps 
+   must be identical. */
+         if( astGetInvert( this ) == astGetInvert( that ) ) {
+
+            if( this->ifun == that->ifun &&
+                this->intraflag && that->intraflag &&
+                !strcmp( this->intraflag, that->intraflag ) ) {
+               result = 1;
+            }
+
+/* If the Invert flags for the two IntraMaps differ, the attributes of the two 
+   IntraMaps must be inversely related to each other. */
+         } else {
+
+/* In the specific case of a IntraMap, Invert flags must be equal. */
+            result = 0;
+
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
 }
 
 static int GetObjSize( AstObject *this_object ) {
@@ -566,6 +663,7 @@ void astInitIntraMapVtab_(  AstIntraMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
 
 /* Store pointers to inherited methods that will be invoked explicitly

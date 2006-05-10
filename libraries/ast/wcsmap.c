@@ -186,6 +186,8 @@ f     The WcsMap class does not define any new routines beyond those
 *        Use dynamic rather than static memory for the parameter arrays in 
 *        the AstPrjPrm structure.Override astGetObjSize. This is to
 *        reduce the in-memory size of a WcsMap.
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -697,6 +699,7 @@ static const PrjData *FindPrjData( int );
 static const char *GetAttrib( AstObject *, const char * );
 static int CanMerge( AstMapping *, int, AstMapping *, int );
 static int CanSwap( AstMapping *, AstMapping *, int, int, int * );
+static int Equal( AstObject *, AstObject * );
 static int GetNP( AstWcsMap *, int );
 static int IsZenithal( AstWcsMap * );
 static int Map( AstWcsMap *, int, int, double *, double *, double *, double *);
@@ -1272,6 +1275,131 @@ static void CopyPV( AstWcsMap *in, AstWcsMap *out ) {
 /* Re-initialize the values stored in the "AstPrjPrm" structure. */
    InitPrjPrm( out );
 
+}
+
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two WcsMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "wcsmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     WcsMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two WcsMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a WcsMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the WcsMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstWcsMap *that;        
+   AstWcsMap *this;        
+   int i, j;           
+   int nin;
+   int nout;
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two WcsMap structures. */
+   this = (AstWcsMap *) this_object;
+   that = (AstWcsMap *) that_object;
+
+/* Check the second object is a WcsMap. We know the first is a
+   WcsMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsAWcsMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
+
+/* If the Invert flags for the two WcsMaps differ, it may still be possible 
+   for them to be equivalent. First compare the WcsMaps if their Invert 
+   flags are the same. In this case all the attributes of the two WcsMaps 
+   must be identical. */
+         if( astGetInvert( this ) == astGetInvert( that ) ) {
+
+            if( this->type == that->type &&
+                this->wcsaxis[ 0 ] == that->wcsaxis[ 0 ] &&
+                this->wcsaxis[ 1 ] == that->wcsaxis[ 1 ] ) {
+
+               result = 1;
+
+               if( this->np && that->np ){
+   
+                  for( i = 0; i < nout && result; i++ ) {
+   
+                     if( (this->np)[ i ] != (that->np)[ i ] ) {
+                        result = 0;
+   
+                     } else if( (this->p)[ i ] && !(this->p)[ i ] ) {
+                        result = 0;
+   
+                     } else if( !(this->p)[ i ] && (this->p)[ i ] ) {
+                        result = 0;
+   
+                     } else if( (this->p)[ i ] && (this->p)[ i ] ) {
+   
+                        for( j = 0; j < (this->np)[ i ]; j++ ) {
+                           if( !astEQUAL( (this->p)[ i ][ j ], 
+                                          (that->p)[ i ][ j ] ) ) {
+                              result = 0;
+                              break;
+                           }                  
+                        }
+                     }
+                  }
+               }
+
+            } else if( this->np || that->np ){
+               result = 0;
+            }
+
+/* If the Invert flags for the two WcsMaps differ, the attributes of the two 
+   WcsMaps must be inversely related to each other. */
+         } else {
+
+/* In the specific case of a WcsMap, Invert flags must be equal. */
+            result = 0;
+
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
 }
 
 static const PrjData *FindPrjData( int type ){
@@ -2076,6 +2204,7 @@ void astInitWcsMapVtab_(  AstWcsMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
 
 /* Declare the destructor and copy constructor. */

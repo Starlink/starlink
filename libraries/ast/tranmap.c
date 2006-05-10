@@ -68,6 +68,8 @@ f     The TranMap class does not define any new routines beyond those
 *        - Fix bug in MapSplit related to use of invert flags.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -128,6 +130,7 @@ AstTranMap *astTranMapId_( void *, void *, const char *, ... );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static double Rate( AstMapping *, double *, int, int );
 static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
+static int Equal( AstObject *, AstObject * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
@@ -137,6 +140,124 @@ static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *,
 static int GetObjSize( AstObject * );
 /* Member functions. */
 /* ================= */
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two TranMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "tranmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     TranMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two TranMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a TranMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the TranMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstTranMap *that;        
+   AstTranMap *this;        
+   int nin;
+   int nout;
+   int result;
+   int that_inv1;
+   int that_inv2;
+   int this_inv1;
+   int this_inv2;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two TranMap structures. */
+   this = (AstTranMap *) this_object;
+   that = (AstTranMap *) that_object;
+
+/* Check the second object is a TranMap. We know the first is a
+   TranMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsATranMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
+
+/* Temporarily re-instate the original Invert flag values. */
+         that_inv1 = astGetInvert( that->map1 );
+         that_inv2 = astGetInvert( that->map2 );
+         this_inv1 = astGetInvert( this->map1 );
+         this_inv2 = astGetInvert( this->map2 );
+
+         astSetInvert( this->map1, this->invert1 );
+         astSetInvert( this->map2, this->invert2 );
+         astSetInvert( that->map1, that->invert1 );
+         astSetInvert( that->map2, that->invert2 );
+
+/* If the Invert flags for the two TranMaps differ, it may still be possible 
+   for them to be equivalent. First compare the TranMaps if their Invert 
+   flags are the same. In this case all the attributes of the two TranMaps 
+   must be identical. */
+         if( astGetInvert( this ) == astGetInvert( that ) ) {
+            if( astEqual( this->map1, that->map1 ) &&
+                astEqual( this->map2, that->map2 ) ) {
+               result = 1;
+            }
+
+/* If the Invert flags for the two TranMaps differ, the attributes of the two 
+   TranMaps must be inversely related to each other. */
+         } else {
+
+            astInvert( that->map1 );
+            astInvert( that->map2 );
+
+            if( astEqual( this->map1, that->map2 ) &&
+                astEqual( this->map2, that->map1 ) ) {
+               result = 1;
+            }
+
+         }
+
+/* Restore the original Invert flag values. */
+         astSetInvert( this->map1, this_inv1 );
+         astSetInvert( this->map2, this_inv2 );
+         astSetInvert( that->map1, that_inv1 );
+         astSetInvert( that->map2, that_inv2 );
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static int GetObjSize( AstObject *this_object ) {
 /*
 *  Name:
@@ -359,6 +480,7 @@ void astInitTranMapVtab_(  AstTranMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->Decompose = Decompose;
    mapping->MapMerge = MapMerge;
    mapping->Rate = Rate;

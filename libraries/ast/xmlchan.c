@@ -190,15 +190,6 @@ c     - AST_XMLWARNINGS: Return warnings from previous read operation
 #define REDSHIFT_FRAME           "RedshiftFrame"
 #define DOPPLER_DEFINITION       "DopplerDefinition"
 
-/* Macros which return the maximum and minimum of two values. */
-#define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
-#define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
-
-/* Macro to check for equality of floating point values. We cannot
-   compare bad values directory because of the danger of floating point
-   exceptions, so bad values are dealt with explicitly. */
-#define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
-
 /* Returns string "an" or "a" depending on whether the first character of
    the supplied string is a vowel or not. */
 #define ANA(t) (t?(strchr("AaEeIiOoUu",t[0])?"an":"a"):"")
@@ -735,8 +726,8 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
             if( nspace == 1 ){
                if( astGetBounded( space_list[ 0 ] ) ) {
                   astGetRegionBounds( space_list[ 0 ], lbnd, ubnd );
-                  if( EQUAL( lbnd[ 0 ], ubnd[ 0 ] ) && 
-                      EQUAL( lbnd[ 1 ], ubnd[ 1 ] ) ) {
+                  if( astEQUAL( lbnd[ 0 ], ubnd[ 0 ] ) && 
+                      astEQUAL( lbnd[ 1 ], ubnd[ 1 ] ) ) {
                      space_val[ 0 ] = 0.5*( lbnd[ 0 ] + ubnd[ 0 ] );
                      space_val[ 1 ] = 0.5*( lbnd[ 1 ] + ubnd[ 1 ] );
                   }
@@ -829,7 +820,7 @@ static AstRegion *AstroCoordAreaReader( AstXmlChan *this, AstXmlElement *elem,
             if( nspec == 1 ){
                if( astGetBounded( spec_list[ 0 ] ) ) {
                   astGetRegionBounds( spec_list[ 0 ], lbnd, ubnd );
-                  if( EQUAL( lbnd[ 0 ], ubnd[ 0 ] ) ) {
+                  if( astEQUAL( lbnd[ 0 ], ubnd[ 0 ] ) ) {
                      spec_val = 0.5*( lbnd[ 0 ] + ubnd[ 0 ] );
                   }
                }
@@ -6196,10 +6187,10 @@ static AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem,
          if( is_sky && small[ 0 ] ) {
             laxcon = 1 - axlon;
 
-         } else if( EQUAL( x0[ 0 ], x0[ 3 ] ) ) {
+         } else if( astEQUAL( x0[ 0 ], x0[ 3 ] ) ) {
             laxcon = 0;
 
-         } else if( EQUAL( y0[ 0 ], y0[ 3 ] ) ) {
+         } else if( astEQUAL( y0[ 0 ], y0[ 3 ] ) ) {
             laxcon = 1;
 
          } else {
@@ -6214,10 +6205,10 @@ static AstRegion *PolygonReader( AstXmlChan *this, AstXmlElement *elem,
                if( is_sky && small[ i ] ) {
                   axcon = 1 - axlon;
       
-               } else if( EQUAL( x0[ i ], x0[ i - 1 ] ) ) {
+               } else if( astEQUAL( x0[ i ], x0[ i - 1 ] ) ) {
                   axcon = 0;
       
-               } else if( EQUAL( y0[ i ], y0[ i - 1 ] ) ) {
+               } else if( astEQUAL( y0[ i ], y0[ i - 1 ] ) ) {
                   axcon = 1;
       
                } else {

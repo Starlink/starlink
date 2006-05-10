@@ -67,6 +67,8 @@ f     The RateMap class does not define any new routines beyond those
 *        Original version.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -127,10 +129,117 @@ static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
+static int Equal( AstObject *, AstObject * );
 
 static int GetObjSize( AstObject * );
 /* Member functions. */
 /* ================= */
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two RateMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "ratemap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     RateMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two RateMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a RateMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the RateMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstRateMap *that;        
+   AstRateMap *this;        
+   int nin;
+   int nout;
+   int result;
+   int that_inv;
+   int this_inv;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two RateMap structures. */
+   this = (AstRateMap *) this_object;
+   that = (AstRateMap *) that_object;
+
+/* Check the second object is a RateMap. We know the first is a
+   RateMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsARateMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
+
+/* If the Invert flags for the two RateMaps differ, it may still be possible 
+   for them to be equivalent. First compare the RateMaps if their Invert 
+   flags are the same. In this case all the attributes of the two RateMaps 
+   must be identical. */
+         if( astGetInvert( this ) == astGetInvert( that ) ) {
+
+/* Temporarily re-instate the original Invert flag values. */
+            this_inv = astGetInvert( this->map );
+            that_inv = astGetInvert( that->map );
+            astSetInvert( this->map, this->invert );
+            astSetInvert( that->map, that->invert );
+
+            if( astEqual( this->map, that->map ) &&
+                this->iin == that->iin &&
+                this->iout == that->iout ){
+               result = 1;
+            }
+
+/* Restore the original Invert flag values. */
+            astSetInvert( this->map, this_inv );
+            astSetInvert( that->map, that_inv );
+
+/* If the Invert flags for the two RateMaps differ, the attributes of the two 
+   RateMaps must be inversely related to each other. */
+         } else {
+
+/* In the specific case of a RateMap, Invert flags must be equal. */
+            result = 0;
+
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static int GetObjSize( AstObject *this_object ) {
 /*
 *  Name:
@@ -267,6 +376,7 @@ void astInitRateMapVtab_(  AstRateMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
 
 /* Declare the copy constructor, destructor and class dump function. */

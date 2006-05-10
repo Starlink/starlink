@@ -188,6 +188,12 @@
 *           The AST library release number.
 *
 *     Protected:
+*        astEQUAL
+*           Compare two doubles for equality.
+*        astMAX
+*           Return maximum of two values.
+*        astMIN
+*           Return minimum of two values.
 *        astMAKE_CHECK
 *           Implement the astCheck<Class>_ function for a class.
 *        astMAKE_CLEAR
@@ -295,6 +301,8 @@
 *        Added ObjSize attribute.
 *     23-FEB-2006 (DSB):
 *        Moved AST__TUNULL from this file to memory.h.
+*     10-MAY-2006 (DSB):
+*        Added astEQUAL, astMAX and astMIN.
 *--
 */
 
@@ -314,6 +322,7 @@
 #include <stddef.h>
 #if defined(astCLASS)
 #include <stdarg.h>
+#include <float.h>
 #endif
 #if defined(MEM_DEBUG)
 #include <stdio.h>
@@ -1137,6 +1146,15 @@ int astTest##attribute##_( Ast##class *this ) { \
 /* Define the macros. */
 #define astPROTO_CHECK(class) Ast##class *astCheck##class##_( Ast##class * );
 #define astPROTO_ISA(class) int astIsA##class##_( const Ast##class * );
+
+/* Macros which return the maximum and minimum of two values. */
+#define astMAX(aa,bb) ((aa)>(bb)?(aa):(bb))
+#define astMIN(aa,bb) ((aa)<(bb)?(aa):(bb))
+
+/* Check for equality of floating point values. We cannot compare bad values 
+   directly because of the danger of floating point exceptions, so bad 
+   values are dealt with explicitly. */
+#define astEQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*astMAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
 /* AST__NULL. */
 /* ---------- */

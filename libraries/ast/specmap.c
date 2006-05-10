@@ -92,6 +92,8 @@ f     - AST_SPECADD: Add a spectral coordinate conversion to an SpecMap
 *        version dated 21/9/03.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     10-MAY-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -235,6 +237,7 @@ static double Refrac( double );
 static double TopoVel( double, double, FrameDef * );
 static double UserVel( double, double, FrameDef * );
 static int CvtCode( const char * );
+static int Equal( AstObject *, AstObject * );
 static int FrameChange( int, int, double *, double *, double *, double *, int );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int SystemChange( int, int, double *, double *, int );
@@ -247,6 +250,119 @@ static void SpecAdd( AstSpecMap *, const char *, const double[] );
 static int GetObjSize( AstObject * );
 /* Member functions. */
 /* ================= */
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two SpecMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     SpecMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two SpecMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a SpecMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the SpecMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstSpecMap *that;        
+   AstSpecMap *this;        
+   const char *argdesc[ MAX_ARGS ]; 
+   const char *comment;      
+   int argdec;             
+   int argra;              
+   int i, j;           
+   int nargs;              
+   int nin;
+   int nout;
+   int result;
+   int szargs;             
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two SpecMap structures. */
+   this = (AstSpecMap *) this_object;
+   that = (AstSpecMap *) that_object;
+
+/* Check the second object is a SpecMap. We know the first is a
+   SpecMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsASpecMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNin( that ) == nin && astGetNout( that ) == nout ) {
+
+/* If the Invert flags for the two SpecMaps differ, it may still be possible 
+   for them to be equivalent. First compare the SpecMaps if their Invert 
+   flags are the same. In this case all the attributes of the two SpecMaps 
+   must be identical. */
+         if( astGetInvert( this ) == astGetInvert( that ) ) {
+            if( this->ncvt == that->ncvt ) {
+               result = 1;
+               for( i = 0; i < this->ncvt && result; i++ ) {
+                  if( this->cvttype[ i ] != that->cvttype[ i ] ) {
+                     result = 0;
+                  } else {
+                     CvtString( this->cvttype[ i ], &comment, &argra, 
+                                &argdec, &nargs, &szargs, argdesc );
+                     for( j = 0; j < nargs; j++ ) {
+                        if( !astEQUAL( this->cvtargs[ i ][ j ],
+                                       that->cvtargs[ i ][ j ] ) ){
+                           result = 0;
+                           break;
+                        }
+                     }
+                  }
+               }
+            }
+
+/* If the Invert flags for the two SpecMaps differ, the attributes of the two 
+   SpecMaps must be inversely related to each other. */
+         } else {
+
+/* In the specific case of a SpecMap, Invert flags must be equal. */
+            result = 0;
+
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static int GetObjSize( AstObject *this_object ) {
 /*
 *  Name:
@@ -1726,6 +1842,7 @@ void astInitSpecMapVtab_(  AstSpecMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
 
 /* Declare the copy constructor, destructor and class dump
