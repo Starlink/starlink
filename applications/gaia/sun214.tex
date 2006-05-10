@@ -16,11 +16,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.19}
+\newcommand{\stardocnumber}    {214.20}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {3rd May 2006}
+\newcommand{\stardocdate}      {10th May 2006}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and Image Analysis Tool}
-\newcommand{\stardocversion}   {3.0-0}
+\newcommand{\stardocversion}   {3.0-1}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
@@ -883,9 +883,7 @@ the version of SkyCat that GAIA is based on are also available at
 to extend SkyCat or GAIA at the user interface level are recommended
 to read about ``SkyCat plugins''.
 
-\section{Recent \xlabel{changes}Changes}
-
-\section{This release 3.0-0}
+\section{Release notes for version 3.0-1}
 
 The most significant change in this release are many updates to the cube
 toolbox. This is now much faster at image slicing and handles FITS cubes as
@@ -935,6 +933,10 @@ There are also many minor changes in this release of GAIA:
 
     \item The cube slice display toolbox now has options for continuously
      looping (including "rock-and-roll").
+
+    \item The \mytt{Show all coordinates} toolbox now displays coordinates
+      from systems with more than 2 axes.
+
 \end{itemize}
 
 Finally in this release GAIA has undergone major changes in the way that it is
@@ -948,174 +950,6 @@ project, which has been terminated. Most of this new work has been carried out
 for the JAC Hawaii. If you want work on GAIA to continue then support it by
 contacting any current members of the PPARC Astronomy or Science committees
 and making your views known.
-
-\subsection{Release 2.8}
-
-This is a major release of GAIA (2.8.0) which can now display image planes
-from data cubes. Using this you can step through along an axis and display the
-image formed by the other two axes.  You can also combine a range of image
-planes or do the stepping using a timed animation. The displayed images
-created by this tool can be analysed just like any other image, but note the
-data format should be NDF for good efficiency.
-
-Other changes in this release:
-\begin{itemize}
- \item GAIA has been relinked against AST to fix a problem when the
-       presence of multiple possible astrometries in FITS headers
-       causes the image scale to be incorrectly estimated.
-
- \item Printing the `whole image' now works when repeated without exiting
-       GAIA.
-
- \item Incompatibilities in the WCS components of NDFs are now ignored (older
-       versions of AST cannot read newer encodings).
-
- \item A problem with coordinate readout coupling when using more than one
-       interactive slice or XY profile is being used.
-
- \item A error reading the CRPIX values in the blink/compare toolbox has been
-       fixed.
-\end{itemize}
-
-\subsection{Release - 2.7}
-This was a major release of GAIA incorporating two new automated astrometry
-toolboxes, a major re-write of the blink comparison toolbox and many
-changes and fixes.
-
-GAIA now offers two new toolboxes based on the Starlink
-AUTOASTROM \xref{SUN/242}{sun242} program. These make it possible to provide a
-minimum of positional information (image centre and scale) and then fit an
-astrometric solution. They also make it possible, for the first time, to fit
-optical distortions. The new toolboxes are available at:
-\begin{verbatim}
-     Image-Analysis->Astrometry Calibration->Automatic position matching
-\end{verbatim}
-One is for simple use and the other for advanced use.
-
-The blink comparison toolbox has been substantially upgraded in this
-release. New features are options to alignment to NDF origins or FITS CRPIX
-values. This gives much better behaviour when comparing images of different
-dimensions. Better performance (less flickering artifacts). The ability to
-drag images and enter image coordinate offsets. All images can now be viewed
-together or one-by-one as before. Images should now always scroll and the
-`Refresh' button has been removed.
-
-Other changes in this release
-\begin{itemize}
-     \item Spitzer/SIRTF FITS headers, including the optical distortion,
-       are now handled.
-
-     \item The NDF component chooser now allows the variance component to be
-       displayed as expected.
-
-     \item A new default percentage autocut option has been added.
-
-     \item Shared memory segments under Solaris should now be better behaved.
-
-     \item The handling of byte images is changed so \mytt{FITS BITPIX=8}
-       are correctly
-       interpreted as unsigned byte, not signed byte. This change mostly
-       effects the XY profile and contouring toolboxes.
-
-     \item An attempt to clear old WCS information from images before saving
-       is now made.
-
-     \item The \mytt{gaiadisp} command has been enhanced to load a list of
-       images into GAIA.
-
-     \item An experimental tabbed interface has been produced to make it
-       easier to view FITS MEF files. To try this out use the command:
-      \begin{verbatim}
-          $GAIA_DIR/tabbedgaia
-      \end{verbatim}
-
-     \item Long thin or tall images (2 pixels or more) now display a readout of
-       positions.
-
-     \item The \mytt{\$GAIA\_DIR/pix2wcs} and
-        \mytt{\$GAIA\_DIR/wcs2pix} scripts should be
-       working again.
-
-     \item The \mytt{\$GAIA\_DIR/displaycat} command now creates fully
-       functional
-       catalogue windows (previous these did not include any GAIA specific
-       changes).
-
-     \item The \mytt{-catalog} command-line option now accepts a list of
-       catalogues to
-       display immediately.
-
-     \item The polarimetry toolbox now correctly processes selection expressions
-       when column names are short forms of other names (i.e. when \mytt{P}
-       and \mytt{PI},
-       \mytt{DP} and \mytt{DPI} etc. are used). Previously an attempt to
-       interpret \mytt{\$PI} as
-        \mytt{\$P} would be made and subsequently fail.
-
-     \item Making name queries using the RedHat 9 build of GAIA failed
-       completely, sometimes causing a core dump from a child process.
-       This problem has now been resolved.
-
-     \item The interpretation of FITS -CAR projections is now a configuration
-       option. Previously this was fixed at assuming that all Cartesian
-       projections are simple linear mappings (this remains the default),
-       ignoring the possibility of spherical rotations. Refer to the CarLin
-       attribute of the AST (\xref{SUN/211}{sun211}) library for more about
-       this change.
-
-     \item Various changes to grid overlays have been implemented.
-       This now supports AST 3.2 super-script and sub-script, font and colour
-       changes within a string. Fonts drawn on the overlay grid can now be
-       scaled with image. Better matching of postscript font size to displayed
-       size has also been implemented. A long term memory leak has been cured
-       (only seen when drawing overlays).
-
-     \item A new configuration option \mytt{always\_merge} controls if the
-       primary header
-       of any FITS files are merged with those of extension being viewed to
-       create a full set of headers for creating a world coordinate system. By
-       default this merging no longer occurs when the primary HDU contains a
-       non dummy image.
-
-     \item Region statistics now also include values for the NDF variance
-       component.
-
-\end{itemize}
-
-\subsection{Release - 2.8}
-
-A major release of GAIA incorporating a new NDF cube handling facility.  GAIA
-will now detect 3D input data (ideally in NDF format) and display slices along
-one of the extra dimensions. This may be animated.
-
-You can also create a new image that is a combination of images between a
-range of indices. The tool also shows the world coordinates along the extra
-dimensions. All displayed and created images can be processed like any other
-image, so you can perform photometry, region statistics etc.
-
-The following minor issues have also been fixed.
-\begin{itemize}
-
-    \item A print of the "whole image" now works when repeated.
-
-    \item The astrometry tables now offer a button to project X,Y to RA,DEC
-      to complement the reset projection of RA,DEC to X,Y.
-
-    \item Incompatibilities in the WCS are now ignored (older versions of
-      AST cannot read newer encodings). This will naturally only effect
-      GAIA in future versions.
-
-    \item XY profiles now display a local value when a row or column contains
-      no valid values (previous this displayed zero, which occasionally
-      made the graphs scale to silly values).
-
-    \item Contouring toolbox bug fixed. If you entered an incorrect NDF name for
-      the second image, the error was never recovered and GAIA had to be
-      restarted.
-
-    \item Fixed problem with coordinate readout coupling when more than one
-      interactive slice or XY profile is being used.
-\end{itemize}
 
 \section{\xlabel{acknowledgements}Acknowledgements}
 

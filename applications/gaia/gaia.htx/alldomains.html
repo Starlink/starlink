@@ -16,7 +16,7 @@
 <p>This window will display interactive coordinates for all the
 systems that are known for the displayed image. It is of most interest
 to when displaying NDFs as you can inspect pixel coordinates, as well
-as grid and sky coordinates.
+as grid and sky coordinates.</p>
 
 <p>Usually FITS images will have only two built-in coordinate systems,
 the grid one shown in the X and Y readouts and a celestial one, shown
@@ -24,7 +24,7 @@ in the alpha and delta readouts, so this toolbox is of little interest
 to most FITS users at present. However, future standards will provide
 additional systems that describe things like the coordinates of each
 chip in a mosaic camera and the coordinates of the camera as a whole,
-as well as some celestial system.
+as well as some celestial system.</p>
 
 <p>NDF images have several coordinate systems associated with them:
 <ul>
@@ -42,10 +42,12 @@ as well as some celestial system.
 
    <li>SKY: if present this defines a celestial coordinate system.</li>
 </ul>
-Other coordinate systems may be present, if so then their coordinates
-will be shown. The software that produced these should describe what
-their meaning is. Note that if your NDF is using the coordinate system
-stored in its FITS extension then this may not apply and the systems
-available will be just the same as a FITS image.
+Other multi-dimensional coordinate systems may be present, if so then their
+coordinates will also be shown. The software that produced these should
+describe what their meaning is (note that in general a description of each
+value, usually a label and any units, will be shown in the short help, just
+place the pointer over the value to see this). Note that if your NDF is using
+the coordinate system stored in its FITS extension then this may not apply and
+the systems available will be just the same as a FITS image.</p>
 </body>
 </html>

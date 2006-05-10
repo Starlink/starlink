@@ -1,6 +1,6 @@
 
-  Release 3.0-0: 28th April 2006.
-  ===============================
+  Release 3.0-1: 10th May 2006.
+  =============================
 
   The most significant change in this release are many updates to the cube
   toolbox. This is now much faster at image slicing and handles FITS cubes as
@@ -49,6 +49,9 @@
 
     - The cube slice display toolbox now has options for continuously
       looping (including "rock-and-roll").
+
+    - The "Show all coordinates" toolbox now displays coordinates from 
+      systems with more than 2 axes.
 
   Finally in this release GAIA has undergone major changes in the way that it
   is built and distributed (it is now available in the Starlink CVS repository
