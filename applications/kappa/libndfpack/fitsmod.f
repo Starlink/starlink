@@ -218,14 +218,6 @@
 *        The editing instructions are stored in the text file called
 *        fitstable.txt.
 
-*  References:
-*     "A User's Guide for the Flexible Image Transport System (FITS)",
-*     NASA/Science Office of Science and Technology (1994).
-
-*  Related Applications:
-*     KAPPA: FITSEDIT, FITSEXIST, FITSEXP, FITSHEAD, FITSIMP, FITSLIST,
-*     FITSVAL, FITSWRITE.
-
 *  Notes:
 *     -  Requests to move, assign values or comments, the following
 *     reserved keywords in the FITS extension are ignored: SIMPLE,
@@ -243,6 +235,14 @@
 *     desired, you should inspect it using the command FITSLIST before
 *     exporting the data.  If there is something wrong, you may find it
 *     convenient to use command FITSEDIT to make minor corrections.
+
+*  References:
+*     "A User's Guide for the Flexible Image Transport System (FITS)",
+*     NASA/Science Office of Science and Technology (1994).
+
+*  Related Applications:
+*     KAPPA: FITSEDIT, FITSEXIST, FITSEXP, FITSHEAD, FITSIMP, FITSLIST,
+*     FITSVAL, FITSWRITE.
 
 *  Examples of The File Format:
 *     The best way to illustrate the options is by listing some example
@@ -466,10 +466,7 @@
 *        lines.  Removed unused variables.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
-*     {enter_any_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

@@ -102,9 +102,6 @@
 *        This chooses a co-ordinate Frame with domain WORLD if one exists, 
 *        or the PIXEL co-ordinate Frame otherwise.
 
-*  Related Applications:
-*     KAPPA: NDFTRACE, WCSREMOVE, WCSCOPY, WCSATTRIB
-
 *  Notes:
 *     -  The current co-ordinate Frame in the supplied NDF is not displayed 
 *     if a value is assigned to parameter FRAME on the command line.
@@ -112,6 +109,9 @@
 *     of the NDF.
 *     -  The NDFTRACE command can be used to examine the co-ordinate
 *     Frames in the WCS component of an NDF.
+
+*  Related Applications:
+*     KAPPA: NDFTRACE, WCSREMOVE, WCSCOPY, WCSATTRIB
 
 *  Copyright:
 *     Copyright (C) 1998-1999 Central Laboratory of the Research
@@ -143,9 +143,6 @@
 *     25-AUG-1999 (DSB):
 *        Add TOKEN arg in call to KPG1_ASFRM
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 *  Type Definitions:

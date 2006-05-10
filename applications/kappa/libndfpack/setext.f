@@ -138,6 +138,12 @@
 *        This renames the FILTER component of the PLATE extension in
 *        the NDF called virgo to WAVEBAND.
 
+*  Notes:
+*     -  The "PUT" option allows the creation of extension
+*     components with any of the primitive data types.
+*     -  The task creates the extension automatically if it does not
+*     exist and only allows one extension to be modified at a time.
+
 *  Related Applications:
 *     KAPPA: FITSIMP, FITSLIST, NDFTRACE; CCDPACK: CCDEDIT; Figaro:
 *     FITSKEYS; HDSTRACE; IRAS90: IRASTRACE, PREPARE.
@@ -150,12 +156,6 @@
 *     The operation of this utility is rather clunky and tedious.
 *     Something better could be designed, perhaps using object-oriented
 *     techniques.
-
-*  Notes:
-*     -  The "PUT" option allows the creation of extension
-*     components with any of the primitive data types.
-*     -  The task creates the extension automatically if it does not
-*     exist and only allows one extension to be modified at a time.
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
@@ -211,9 +211,6 @@
 *     30-SEP-2004 (PWD):
 *        Moved CNF_PAR to declaration section.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
 
 *-
 

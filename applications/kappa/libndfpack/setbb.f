@@ -98,13 +98,13 @@
 *        (i.e. reset to zero) without changing the state of any other
 *        bits in the mask.
 
-*  Related Applications:
-*     KAPPA: QUALTOBAD, REMQUAL, SETQUAL, SHOWQUAL; Figaro: Q2BAD.
-
 *  Notes:
 *     The bad-bits value will be disregarded if the NDF supplied does
 *     not have a quality component present.  A warning message will be
 *     issued if this should occur.
+
+*  Related Applications:
+*     KAPPA: QUALTOBAD, REMQUAL, SETQUAL, SHOWQUAL; Figaro: Q2BAD.
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
@@ -141,9 +141,6 @@
 *     1995 April 24 (MJC):
 *        Made usage and examples lowercase.  Added Related Applications.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

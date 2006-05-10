@@ -79,9 +79,6 @@
 *        This erases the values of the VARIANCE component within
 *        the NDF structure cube4, if it exists.
 
-*  Related Applications:
-*     KAPPA: ERRCLIP; Figaro: GOODVAR.
-
 *  Notes:
 *     -  All of the standard Fortran 77 intrinsic functions are
 *     available for use in the variance expression, plus a few others
@@ -90,6 +87,9 @@
 *     precision if appropriate) and are constrained to be non-negative.
 *     -  The data type of the VARIANCE component is set to match that of
 *     the DATA component.
+
+*  Related Applications:
+*     KAPPA: ERRCLIP; Figaro: GOODVAR.
 
 *  Copyright:
 *     Copyright (C) 1989-1990, 1992 Science & Engineering Research
@@ -133,9 +133,6 @@
 *     21-MAR-2004 (DSB):
 *        Added parameters FROM and COMP.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

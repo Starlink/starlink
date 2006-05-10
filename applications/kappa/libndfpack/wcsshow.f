@@ -146,9 +146,6 @@
 *        Delete dangling GRP identifiers.
 *     {enter_further_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
 *  Type Definitions:
       IMPLICIT NONE              ! no default typing allowed

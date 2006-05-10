@@ -151,15 +151,15 @@
 *        modified in order to precess them from the original (incorrect)
 *        equinox to J2000.
 
-*  Related Applications:
-*     KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD, AXLABEL, AXUNITS
-
 *  Notes:
 *     -  An error is reported if an attempt is made to set or clear the 
 *     Base Frame in the WCS component.
 *     -  The Domain names GRID, AXIS and PIXEL are reserved for use by
 *     the NDF library and an error will be reported if an attempt is made 
 *     to assign one of these values to any Frame.
+
+*  Related Applications:
+*     KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSCOPY, WCSADD, AXLABEL, AXUNITS
 
 *  Copyright:
 *     Copyright (C) 1998, 2001, 2003 Central Laboratory of the Research
@@ -193,9 +193,6 @@
 *     13-JAN-2003 (DSB):
 *        Added parameter REMAP.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 *  Type Definitions:

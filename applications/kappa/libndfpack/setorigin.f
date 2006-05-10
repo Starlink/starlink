@@ -62,14 +62,14 @@
 *        Sets the pixel origin of the NDF called betapic to be equal to
 *        that of the NDF called alphapic.
 
-*  Related Applications:
-*     KAPPA: SETBOUND.
-
 *  Notes:
 *     If the number of new pixel origin values is less than the number
 *     of NDF dimensions, then the pixel origin of the extra dimensions
 *     will remain unchanged.  If the number of values exceeds the number
 *     of NDF dimensions, then the excess values will be ignored.
+
+*  Related Applications:
+*     KAPPA: SETBOUND.
 
 *  Timing:
 *     Setting a new pixel origin is a quick operation whose timing does
@@ -114,9 +114,6 @@
 *     1995 April 24 (MJC):
 *        Made usage and examples lowercase.  Added Related Applications.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

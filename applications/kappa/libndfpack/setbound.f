@@ -84,9 +84,6 @@
 *        original NDF and then to pad it with a 5-pixel-wide border of
 *        bad pixels.
 
-*  Related Applications:
-*     KAPPA: NDFCOPY, SETORIGIN; Figaro: ISUBSET.
-
 *  Notes:
 *     This routine modifies the NDF in situ and will not release unused
 *     file space if the size of the NDF is reduced.  If recovery of
@@ -94,6 +91,9 @@
 *     NDFCOPY should be used.  This will copy the selected region of an
 *     NDF to a new data structure from which any unused space will be
 *     eliminated.
+
+*  Related Applications:
+*     KAPPA: NDFCOPY, SETORIGIN; Figaro: ISUBSET.
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
@@ -127,9 +127,6 @@
 *     1995 April 24 (MJC):
 *        Made usage and examples lowercase.  Added Related Applications.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

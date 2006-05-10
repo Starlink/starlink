@@ -94,10 +94,7 @@
 *  History:
 *     2005 October 6 (MJC):
 *        Original version, derived from FITSMOD code.
-*     {enter_any_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

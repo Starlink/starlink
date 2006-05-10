@@ -49,6 +49,23 @@
 *        are under the control of a keyword translation table held in
 *        the file fitstable.txt. 
 
+*  Notes:
+*     -  Requests to assign values to the following reserved keywords
+*     in the FITS extension are ignored: SIMPLE, BITPIX, NAXIS, NAXISn,
+*     EXTEND, PCOUNT, GCOUNT, XTENSION, BLOCKED, and END.
+*     -  Only scalar or one-element vector components may be
+*     transferred to the FITS extension.
+*     -  The data type of the component selects the type of the FITS
+*     value.
+*     -  If the destination keyword exists, the existing value and
+*     comment are replaced with the new values.
+*     -  If an error is found within a line, processing continues
+*     to the next line and the error reported.
+*     -  To be sure that the resultant FITS extension is what you
+*     desired, you should inspect it using the command fitslist before
+*     exporting the data.  If there is something wrong, you may find it
+*     convenient to use command FITSEDIT to make minor corrections.
+
 *  References:
 *     "A User's Guide for the Flexible Image Transport System (FITS)",
 *     NASA/Science Office of Science and Technology (1994).
@@ -69,23 +86,6 @@
 *     cards.  It then inserts the new values.  If there are multiple
 *     occurrences of a keyword, this process can leave behind cards
 *     having the token value '{undefined}'.
-
-*  Notes:
-*     -  Requests to assign values to the following reserved keywords
-*     in the FITS extension are ignored: SIMPLE, BITPIX, NAXIS, NAXISn,
-*     EXTEND, PCOUNT, GCOUNT, XTENSION, BLOCKED, and END.
-*     -  Only scalar or one-element vector components may be
-*     transferred to the FITS extension.
-*     -  The data type of the component selects the type of the FITS
-*     value.
-*     -  If the destination keyword exists, the existing value and
-*     comment are replaced with the new values.
-*     -  If an error is found within a line, processing continues
-*     to the next line and the error reported.
-*     -  To be sure that the resultant FITS extension is what you
-*     desired, you should inspect it using the command fitslist before
-*     exporting the data.  If there is something wrong, you may find it
-*     convenient to use command FITSEDIT to make minor corrections.
 
 *  Table Format:
 *     The keyword translation table should be held in a text file, with
@@ -168,10 +168,7 @@
 *        Original version.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
-*     {enter_any_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

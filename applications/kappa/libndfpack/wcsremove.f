@@ -48,12 +48,12 @@
 *        gaps left by the removed Frames (i.e. the original Frame 6 will
 *        become Frame 3, etc).
 
-*  Related Applications:
-*     KAPPA: NDFTRACE, WCSADD, WCSFRAME, WCSATTRIB, WCSCOPY
-
 *  Notes:
 *     - The Frames within the WCS component of an NDF may be examined 
 *     using application NDFTRACE. 
+
+*  Related Applications:
+*     KAPPA: NDFTRACE, WCSADD, WCSFRAME, WCSATTRIB, WCSCOPY
 
 *  Copyright:
 *     Copyright (C) 1998-2000 Central Laboratory of the Research
@@ -90,9 +90,6 @@
 *     20-SEP-2000 (DSB):
 *        Check STATUS before main loop.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 *  Type Definitions:

@@ -161,9 +161,6 @@
 *        file "background.ard". This text file could for instance have
 *        been created using routine ARDGEN.
 
-*  Related Applications:
-*     KAPPA: QUALTOBAD, REMQUAL, SHOWQUAL.
-
 *  Notes:
 *     -  All the quality names which are currently defined within an
 *     NDF can be listed by application SHOWQUAL.  Quality name
@@ -171,6 +168,9 @@
 *     If there is no room for any more quality names to be added to the
 *     NDF then REMQUAL can be used to remove a quality name in order to
 *     make room for the new quality names.
+
+*  Related Applications:
+*     KAPPA: QUALTOBAD, REMQUAL, SHOWQUAL.
 
 *  Copyright:
 *     Copyright (C) 1991, 1994 Science & Engineering Research Council.
@@ -212,10 +212,7 @@
 *        Use CNF_PVAL.
 *     2006 April 12 (MJC):
 *        Remove unused variables and wrapped long lines.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

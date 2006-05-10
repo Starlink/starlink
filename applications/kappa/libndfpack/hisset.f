@@ -69,13 +69,6 @@
 *        This sets the history-recording level to be quiet for the NDF
 *        called test42, so that only brief information is recorded.
 
-*  Related Applications:
-*     KAPPA: HISCOM, HISLIST, NDFTRACE.
-
-*  Implementation Deficiencies:
-*     There is no facility to erase history records before a given date
-*     or number.
-
 *  Notes:
 *     -  A HISTORY component is created if it does not exist within the
 *     NDF, except for MODE="Erase".
@@ -83,6 +76,13 @@
 *     history records, even if MODE="Disabled" provided the mode has
 *     changed.  Thus the history information will show where there may
 *     be gaps in the recording.
+
+*  Related Applications:
+*     KAPPA: HISCOM, HISLIST, NDFTRACE.
+
+*  Implementation Deficiencies:
+*     There is no facility to erase history records before a given date
+*     or number.
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
@@ -118,9 +118,6 @@
 *        the local variables in alphabetical order.  Used PAR_CHOIC.
 *        Corrected bug in NDF_HINFO call.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

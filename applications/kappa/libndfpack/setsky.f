@@ -244,10 +244,6 @@
 *        epoch 1983.4.  At the reference point the y-axis of the image
 *        points to 0.3 degrees east of north.
 
-*  Related Applications:
-*     ASTROM; IRAS90: SKYALIGN, SKYBOX, SKYGRID, SKYLINE, SKYMARK,
-*     SKYPOS, SKYWRITE. 
-
 *  Notes:
 *     - The GAIA image display tool (SUN/214) provides various interactive 
 *     tools for storing new WCS information within an NDF.
@@ -263,6 +259,10 @@
 *     structure will no longer correctly describe the sky co-ordinates
 *     associated with each pixel. For this reason (amongst others) it is
 *     better to set parameter IRAS90 to a false value.
+
+*  Related Applications:
+*     ASTROM; IRAS90: SKYALIGN, SKYBOX, SKYGRID, SKYLINE, SKYMARK,
+*     SKYPOS, SKYWRITE. 
 
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
@@ -304,9 +304,6 @@
 *     26-NOV-2001 (DSB):
 *        Added parameter IRAS90.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       
@@ -921,4 +918,3 @@
       END IF
 
       END
-

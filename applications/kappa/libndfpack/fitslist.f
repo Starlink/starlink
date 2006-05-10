@@ -43,12 +43,12 @@
 *        The contents of the FITS extension in NDF ngc205 are
 *        written to the text file ngcfits.lis.
 
-*  Related Applications:
-*     KAPPA: FITSEDIT, FITSHEAD; Figaro: FITSKEYS.
-
 *  Notes:
 *     -  If the NDF does not have a FITS extension the application will
 *     exit.
+
+*  Related Applications:
+*     KAPPA: FITSEDIT, FITSHEAD; Figaro: FITSKEYS.
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
@@ -81,10 +81,7 @@
 *        Original version.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

@@ -86,10 +86,7 @@
 *        Brought into KAPPA.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

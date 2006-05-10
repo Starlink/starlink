@@ -42,9 +42,6 @@
 *        This places the FITS headers stored in the text file called
 *        headers.lis in the FITS extension of the NDF called hh73.
 
-*  Related Applications:
-*     KAPPA: FITSEDIT, FITSEXP, FITSLIST; CONVERT: NDF2FITS.
-
 *  Notes:
 *     - The validation process performs the following checks on each
 *     header `card':
@@ -81,6 +78,9 @@
 *     exporting the data.  If there is something wrong, you may find it
 *     convenient to use command FITSEDIT to make minor corrections.
 
+*  Related Applications:
+*     KAPPA: FITSEDIT, FITSEXP, FITSLIST; CONVERT: NDF2FITS.
+
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1996, 1998 Central Laboratory of the Research
@@ -115,9 +115,6 @@
 *     4-JUN-1998 (DSB):
 *        Corrected typo in final context error message.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

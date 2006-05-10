@@ -199,9 +199,6 @@
 *        Passes the number of dimensions of the NDF called mydata
 *        into the ICL variable mdim.  No information is displayed.
 
-*  Related Applications:
-*     KAPPA: WCSFRAME; HDSTRACE
-
 *  Notes:
 *     -  If the WCS component of the NDF is undefined, then an attempt 
 *     is made to find WCS information from two other sources: first, an 
@@ -210,6 +207,9 @@
 *     displayed in the same way as the NDF WCS component.  Other KAPPA
 *     applications will use this WCS information as if it were stored in
 *     the WCS component.
+
+*  Related Applications:
+*     KAPPA: WCSFRAME; HDSTRACE
 
 *  Copyright:
 *     Copyright (C) 1990-1994 Science & Engineering Research Council.
@@ -288,9 +288,6 @@
 *     2006 February 10 (MJC)
 *        Wrap lines at 72.  English spelling.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       

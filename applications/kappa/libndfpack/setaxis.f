@@ -175,12 +175,6 @@
 *        This assigns the value 1.0E-05 to the axis width at index -16
 *        along the first axis of the NDF called cube.
 
-*  Related Applications:
-*     KAPPA: AXCONV, AXLABEL, AXUNITS; Figaro: LXSET, LYSET.
-
-*  Implementation Status:
-*     Processing is in single- or double-precision floating point.
-
 *  Notes:
 *     -  An end-of-file error results when MODE="File" and the file
 *     does not contain sufficient values to assign to the whole array.
@@ -194,6 +188,12 @@
 *     reading especially if you are using axis widths.
 *     -  There is no check, apart from constraints on parameter NEWVAL,
 *     that the variance is not negative and the widths are positive.
+
+*  Related Applications:
+*     KAPPA: AXCONV, AXLABEL, AXUNITS; Figaro: LXSET, LYSET.
+
+*  Implementation Status:
+*     Processing is in single- or double-precision floating point.
 
 *  File Format:
 *     The format is quite flexible.  The number of axis-array values
@@ -250,10 +250,7 @@
 *        Use CNF_PVAL
 *     30-SEP-2004 (PWD):
 *        Moved CNF_PAR to declaration section.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

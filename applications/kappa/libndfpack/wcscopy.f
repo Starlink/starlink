@@ -134,9 +134,6 @@
 *        52:251 on both axes which was squashed by SQORST to produce an
 *        image with 100 pixels on each axis.
 
-*  Related Applications:
-*     KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSADD, WCSATTRIB
-
 *  Notes:
 *     -  An error is reported if the transformation supplied using
 *     parameter TR is singular. 
@@ -149,6 +146,9 @@
 *     in the two NDFs when modifying the WCS component. Thus, if a null
 *     value is given for parameter TR, the supplied WCS component may
 *     still be modified if the two NDFs have different pixel origins. 
+
+*  Related Applications:
+*     KAPPA: NDFTRACE, WCSFRAME, WCSREMOVE, WCSADD, WCSATTRIB
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
@@ -178,9 +178,6 @@
 *     13-AUG-1998 (DSB):
 *        Original version.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 *  Type Definitions:

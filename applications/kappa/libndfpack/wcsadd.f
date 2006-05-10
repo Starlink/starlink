@@ -331,14 +331,14 @@
 *        the pixels of an NDF according to this transformation.
 *        No NDF is accessed.
 
-*  Related Applications:
-*     KAPPA: NDFTRACE, REGRID, WCSFRAME, WCSREMOVE, WCSATTRIB;
-*     CCDPACK: WCSEDIT.
-
 *  Notes:
 *     -  The new Frame has the same number of axes as the basis Frame.
 *     -  An error is reported if the transformation supplied using
 *     parameter TR is singular. 
+
+*  Related Applications:
+*     KAPPA: NDFTRACE, REGRID, WCSFRAME, WCSREMOVE, WCSATTRIB;
+*     CCDPACK: WCSEDIT.
 
 *  Copyright:
 *     Copyright (C) 1998-1999, 2001-2003 Central Laboratory of the
@@ -393,9 +393,6 @@
 *     2006 April 12 (MJC):
 *        Remove unused variables and wrapped long lines.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 *  Type Definitions:

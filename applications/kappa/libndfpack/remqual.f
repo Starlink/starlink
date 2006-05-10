@@ -79,10 +79,7 @@
 *        Original version.
 *     17-JAN-2002 (DSB):
 *        Brought into KAPPA.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       

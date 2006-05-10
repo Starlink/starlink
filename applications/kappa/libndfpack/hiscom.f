@@ -81,9 +81,6 @@
 *        wrapped to a width of 72 characters within the history
 *        records.
 
-*  Related Applications:
-*     KAPPA: HISLIST, HISSET, NDFTRACE.
-
 *  Notes:
 *     -  A HISTORY component is created if it does not exist within the
 *     NDF.  The width of the history record is 72 characters.
@@ -97,6 +94,9 @@
 *     -  The maximum line length in the file is 200 characters.
 *     -  Paragraphs should have fewer than 33 lines.  Longer ones will
 *     be divided.
+
+*  Related Applications:
+*     KAPPA: HISLIST, HISSET, NDFTRACE.
 
 *  Copyright:
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
@@ -125,10 +125,7 @@
 *  History:
 *     1995 June 28 (MJC):
 *        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     {enter_further_changes_here}
 
 *-
       
