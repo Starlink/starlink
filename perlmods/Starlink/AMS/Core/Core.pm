@@ -58,7 +58,7 @@ use IO::Pipe;
 # Use the Proc module to start the monoliths and keep track of process IDs
 use Proc::Simple 1.13;
 
-
+use File::Basename;
 
 # Global variable definitions
 # Global variables
@@ -375,7 +375,33 @@ sub adamtask {
       $icl_task_name_set = 1;
     }
     $ENV{ICL_TASK_NAME} = $taskname;
-    
+
+    # Check for the PERLAMS_VALGRIND_MONS and PERLAMS_VALGRIND_OPTS
+    # environment variables.
+    if( exists $ENV{PERLAMS_VALGRIND_MONS} ) {
+      my @mons;
+      if( $ENV{PERLAMS_VALGRIND_MONS} eq '*' ) {
+        my( $mon, undef, undef ) = fileparse( $image );
+        push @mons, $mon;
+      } else {
+        @mons = split /,/, $ENV{PERLAMS_VALGRIND_MONS};
+      }
+      foreach my $mon ( @mons ) {
+        if( $image =~ $mon ) {
+
+          my $opts;
+          if( exists( $ENV{PERLAMS_VALGRIND_OPTS} ) ) {
+            $opts = $ENV{PERLAMS_VALGRIND_OPTS} . " --log-file=valgrind.$mon";
+          } else {
+            $opts = "--log-file=valgrind.$mon";
+          }
+
+          $image = "valgrind $opts $image";
+        }
+        last;
+      }
+    }
+
     # Now execute the task in this new environment
     # and store the object.
     # Cant use a 'system' call since this does not return the PID
@@ -1001,6 +1027,26 @@ default (that just asks for the parameter value on the command line)
 and the variable contains this reference on startup. The subroutine
 takes three arguments (the parameter name, prompt string and default
 value) and should return the required value.
+
+=head2 B<valgrind>
+
+This module supports running the monoliths through the valgrind
+debugger. To do so, two environment variables are supplied:
+PERLAMS_VALGRIND_MONS and PERLAMS_VALGRIND_OPTS. PERLAMS_VALGRIND_MONS
+is a comma-separated list of monoliths that you wish to run through
+valgrind. If you wish to run all monoliths through valgrind, set this
+environment variable to '*'. PERLAMS_VALGRIND_OPTS lets you set
+valgrind options. Note that the "--log-file" option is already set so
+that log files will be of the form "valgrind.<monolith>.<pid>" in the
+process's current working directory.
+
+As an example, to trace open filehandles using sixteen levels of
+callers in the kappa_mon monolith, one would set the
+PERLAMS_VALGRIND_MONS environment variable to "kappa_mon", and the
+PERLAMS_VALGRIND_OPTS environment variable to "--track-fds=yes
+--num-callers=16". This will result in a log file in the process's
+current working directory of the form "valgrind.kappa_mon.<pid>",
+where <pid> is the process ID number.
 
 =head1 NOTES
 
