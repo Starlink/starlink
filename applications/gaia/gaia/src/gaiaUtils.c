@@ -9,7 +9,6 @@
  *      C
 
  *  Copyright:
- *     Copyright (C) 2006 Particle Physics and Astronomy Research Council
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
  *     All Rights Reserved.
 
