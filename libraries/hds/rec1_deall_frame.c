@@ -43,9 +43,32 @@
 /*    is set on entry, although no further error report will be made if it  */
 /*    subsequently fails under these circumstances.                         */
 
+/* Copyright:                                                               */
+/*    Copyright (C) 1991 Science & Engineering Research Council.            */
+/*    Copyright (C) 2000 Central Laboratory of the Research Councils.       */
+/*    Copyright (C) 2006 Particle Physics and Astronomy Research Council    */
+/*    All Rights Reserved.                                                  */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
+
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK, RAL)                               */
 /*    BKM:  B.K. McIlwrath    (STARLINK, RAL)                               */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -57,6 +80,8 @@
 /*       Removed the _invoke macro, which subverts the ems_ nesting.        */
 /*    22-JUN-2000 (BKM):                                                    */
 /*       Revise for extended format (64-bit) HDS files.                     */
+/*    11-MAY-2006 (TIMJ):                                                   */
+/*       Properly format INT_BIG in ems messages.                           */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -81,7 +106,7 @@
       if ( size <= 0 )
       {
          hds_gl_status = DAT__FATAL;
-         ems_seti_c( "SIZE", size );
+         dat1emsSetBigi( "SIZE", size );
          emsRep( "REC1_DEALL_FRAME_1",
                     "Routine rec1_deall_frame called with an invalid size \
 argument of ^SIZE (internal programming error).",
@@ -92,7 +117,7 @@ argument of ^SIZE (internal programming error).",
       else if ( bloc <= 0 )
       {
          hds_gl_status = DAT__FATAL;
-         ems_seti_c( "BLOC", bloc );
+         dat1emsSetBigi( "BLOC", bloc );
          emsRep( "REC1_DEALL_FRAME_2",
                     "Routine rec1_deall_frame called with an invalid bloc \
 argument of ^BLOC (internal programming error).",
