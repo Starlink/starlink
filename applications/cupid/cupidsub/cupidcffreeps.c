@@ -2,6 +2,7 @@
 #include "cupid.h"
 #include "ast.h"
 #include "mers.h"
+#include <float.h>
 
 CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel){
 /*
