@@ -9595,7 +9595,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 /* If a linear fit to the Mapping has been provided, then obtain
    pointers to the array of gradients and zero-points comprising the
    fit. */
-         grad = linear_fit + ndim_in;
+         grad = linear_fit + ndim_out;
          zero = linear_fit;
 
 /* Create a PointSet to hold the output grid coordinates and obtain an
@@ -9707,6 +9707,15 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
    are considered "changed", so we start by initialising the whole
    "accum" array.) */
                      for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+/*
+                        ptr_out[ coord_out ][ point ] = zero[ coord_out ];
+                        for ( idim = 0; idim < ndim_in; idim++ ) {
+                           ptr_out[ coord_out ][ point ] += 
+                                 grad[ idim + coord_out*ndim_in ] *
+                                 dim[ idim ];
+                        }
+*/
+
                         i1 = coord_out * ndim_in;
                         for ( idim = coord_in; idim >= 1; idim-- ) {
                            i2 = i1 + idim;
@@ -17311,6 +17320,7 @@ static void SpreadNearest##X( int ndim_out, \
                } else { \
                   bad = 0; \
                } \
+\
                if( !bad ) { \
 \
 /* Initialise the offset into the output array. Then loop to obtain \
@@ -18458,7 +18468,7 @@ static void TranGridSection( AstMapping *this, const double *linear_fit,
 /* If a linear fit to the Mapping has been provided, then obtain
    pointers to the array of gradients and zero-points comprising the
    fit. */
-         grad = linear_fit + ndim_in;
+         grad = linear_fit + ndim_out;
          zero = linear_fit;
 
 /* Create a PointSet to hold the output grid coordinates and obtain an
