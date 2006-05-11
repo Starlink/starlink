@@ -95,6 +95,7 @@ typedef struct SPItem  {
     double ymax;                /* Maximum physical Y coordinate for plot */
     double ymin;                /* Minimum physical Y coordinate for plot */
     int fixedscale;             /* If set do not scale item with canvas */
+    int isDSB;                  /* Spectral coordinates are dual sideband */
     int linewidth;              /* Width of polyline */
     int newplot;                /* Whether to regenerate plot */
     int numPoints;              /* Number of data values */
@@ -295,6 +296,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->framesets[1] = NULL;
     spPtr->height = 100.0;
     spPtr->interp = interp;
+    spPtr->isDSB = 0;
     spPtr->linecolour = None;
     spPtr->linewidth = 1;
     spPtr->newplot = 1;
@@ -350,6 +352,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         spPtr->framesets[0] = astFrameSet( f1, "" );
         astAddFrame( spPtr->framesets[0], AST__BASE, map, f2 );
         astExport( spPtr->framesets[0] );
+        spPtr->isDSB = 0;
         astEnd;
     }
 
@@ -410,7 +413,6 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     double *dataPtr;
     int i;
     int nel;
-    int type;
     long adr;
 
 #if DEBUG
@@ -645,6 +647,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
                        Drawable drawable, int x, int y, int width,
                        int height )
 {
+    AstFrame *picked;
     SPItem *spPtr = (SPItem *) itemPtr;
     double basebox[4];
     double xin[2];
@@ -688,7 +691,12 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         graphbox[0] = spPtr->header.x1 + xborder;
         graphbox[1] = spPtr->header.y2 - yborder;
         graphbox[2] = spPtr->header.x2 - xborder;
-        graphbox[3] = spPtr->header.y1;           /* No room for title */
+        if ( spPtr->isDSB ) {
+            graphbox[3] = spPtr->header.y1 + yborder; /* Room for upper axis */
+        }
+        else {
+            graphbox[3] = spPtr->header.y1;           /* No room for title */
+        }
 
         /* Set the limits of the drawing region in physical coordinates. Note
          * these are in the BASE frame of the frameset, not CURRENT
@@ -727,11 +735,50 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         /* And plot the grid axes, this is also only required when the
          * framesets change. */
         if ( spPtr->showaxes ) {
-                                             /* Make sure of the canvas */
+            
             astTk_SetCanvas( Tk_PathName( Tk_CanvasTkwin( canvas ) ) );
             astTk_Tag( spPtr->tagPtr );      /* Includes unique tag */
             ClearSubItems( canvas, spPtr );  /* Remove last grid */
-            astGrid( spPtr->plot );          /* Draw grid */
+
+            /* If the spectral axis is a DSBSpecFrame then we need to arrange
+             * to show the lower and upper sidebands, this involves drawing
+             * the grid twice, with different wavelength coordinates on the
+             * bottom and top of grid. */
+            if ( spPtr->isDSB ) {
+                const char *sideband = astGetC(spPtr->framesets[0],"SideBand");
+
+                /* Stop plot showing Y axes for the first grid and draw X
+                 * coordinates on bottom */
+                astSet( spPtr->plot, "DrawAxes(2)=0" );
+                astSet( spPtr->plot, "TextLab(2)=0" );
+                astSet( spPtr->plot, "NumLab(2)=0" );
+                astSet( spPtr->plot, "Edge(1)=bottom" );
+                astSet( spPtr->plot, "DrawTitle=0" );
+
+                astGrid( spPtr->plot );          /* Draw first grid */
+
+                /* Show Y axes this time and draw X coordinates on top */
+                astSet( spPtr->plot, "DrawAxes(2)=1" );
+                astSet( spPtr->plot, "TextLab(2)=1" );
+                astSet( spPtr->plot, "NumLab(2)=1" );
+                astSet( spPtr->plot, "Edge(1)=top" );
+
+                /* Switch sideband */
+                if ( strcmp( "USB", sideband ) == 0 ) {
+                    astSetC( spPtr->plot, "SideBand", "LSB" );
+                }
+                else {
+                    astSetC( spPtr->plot, "SideBand", "USB" );
+                }
+                astGrid( spPtr->plot );          /* Second grid */
+
+                /* Restore */
+                astSetC( spPtr->plot, "SideBand", sideband );
+            }                
+            else {
+                astGrid( spPtr->plot );          /* Draw grid */
+            }
+
             astTk_Tag( NULL );               /* Stop tagging */
         }
         if ( ! astOK ) astClearStatus;
@@ -1088,6 +1135,8 @@ static int FrameSetParseProc( ClientData clientData, Tcl_Interp *interp,
                               Tk_Window tkwin, CONST char *value,
                               char *widgRec, int offset )
 {
+    int iaxes[1];
+    AstFrame *picked;
     long longResult;
     SPItem *spPtr = (SPItem *) widgRec;
 
@@ -1103,6 +1152,13 @@ static int FrameSetParseProc( ClientData clientData, Tcl_Interp *interp,
     /* Make a clone of the frameset so that the original can be released */
     spPtr->framesets[0] = (AstFrameSet *) astClone((AstFrameSet *)longResult);
     spPtr->framesets[1] = (AstFrameSet *) NULL;
+
+    /* If this has a DSBSpecFrame the plotting is different, so find out.*/
+    iaxes[0] = 1;
+    picked = astPickAxes( spPtr->framesets[0], 1, iaxes, NULL );
+    spPtr->isDSB = astIsADSBSpecFrame( picked );
+    astAnnul( picked );
+
     return TCL_OK;
 }
 
