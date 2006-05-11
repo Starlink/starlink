@@ -488,6 +488,12 @@
             ELSE
                CALL CAT_EGT0C( COL( J ), VALUE, NULFLG, STATUS )
             END IF
+            
+*  The NULL value is '\0', don't want that in a TST so convert to <NULL>.
+            IF ( NULFLG ) THEN
+               VALUE = '<NULL>'
+            END IF
+
             IF ( J .NE. NUMCOL ) THEN
                ULEN = CHR_LEN( VALUE )
                LINE( ICUR: ) = VALUE( :ULEN ) // TAB
