@@ -20,7 +20,16 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine implementing the FLATFIELD task.
+*     This is the main routine implementing the FLATFIELD task. Each
+*     input file is propagated to a corresponding output file which is
+*     identical but contains flatfielded data. If the input data are
+*     already flatfielded, the user will be informed and no action
+*     will be performed on the data.
+
+*  Notes:
+*     At the moment an output file is propagated regardless of whether
+*     the input data are already flatfield or not. This is a waste of
+*     disk space :)
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -110,8 +119,8 @@
 void smurf_flatfield( int *status ) {
 
   smfData *ffdata = NULL;   /* Pointer to output data struct */
-  int flag;                 /* */
-  int i = 0;                    /* Counter, index */
+  int flag;                 /* Flag for how group is terminated */
+  int i = 0;                /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
   Grp *ogrp = NULL;         /* Output group of files */
   int outsize;              /* Total number of NDF names in the output group */
@@ -144,8 +153,7 @@ void smurf_flatfield( int *status ) {
       errFlush( status );
       msgSeti("I",i);
       msgSeti("N",size);
-      errRep(FUNC_NAME,
-	     "Unable to flatfield data from file ^I of ^N", status);
+      errRep(FUNC_NAME,	"Unable to flatfield data from file ^I of ^N", status);
     }
     /* Free resources for output data */
     smf_close_file( &ffdata, status );

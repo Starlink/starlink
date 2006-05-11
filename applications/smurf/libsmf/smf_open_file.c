@@ -33,7 +33,11 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine to open data files.
+*     This is the main routine to open data files. The routine finds
+*     the filename from the input Grp and index, and opens the
+*     file. The smfData struct is populated, along with the associated
+*     smfFile, smfHead and smfDA (if necessary). The history is read
+*     and stored for future reference.
 
 *  Notes:
 *     - If a file has no FITS header then status is set to SMF__NOHDR
@@ -253,7 +257,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	if ( pndf == NDF__NOID ) {
 	  if ( *status == SAI__OK ) {
 	    *status = SAI__ERROR;
-	    errRep(FUNC_NAME, " Unable to obtain an NDF identifier for the SCANFIT coefficients", status);
+	    errRep(FUNC_NAME, "Unable to obtain an NDF identifier for the SCANFIT coefficients", status);
 	  }
 	}
 
