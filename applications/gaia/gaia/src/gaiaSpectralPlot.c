@@ -753,6 +753,11 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
                 astSet( spPtr->plot, "TextLab(2)=0" );
                 astSet( spPtr->plot, "NumLab(2)=0" );
                 astSet( spPtr->plot, "Edge(1)=bottom" );
+
+                /* TickAll never works in this mode, so just switch it off */
+                astSet( spPtr->plot, "TickAll=0" );
+                
+                /* We never have room for a title, ever so it goes too */
                 astSet( spPtr->plot, "DrawTitle=0" );
 
                 astGrid( spPtr->plot );          /* Draw first grid */
