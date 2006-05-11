@@ -32,7 +32,10 @@
 *  Description:
 *     This is a handler routine for opening files specified in the
 *     input group, propagating them to output files and determining if
-*     the lower-level FLATFIELD task needs to be run.
+*     the lower-level FLATFIELD task needs to be run. For the case
+*     where there is no output file, a copy is made of the relevant
+*     input data only, and the smfData is created with no smfFile
+*     struct.
 
 *  Notes:
 
@@ -124,7 +127,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   int outndf;               /* Output NDF identifier */
   char *pname;              /* Pointer to input filename */
   size_t npts;              /* Number of data points */
-  int flags = 0;
+  int flags = 0;            /* Flags for creating smfFile and smfHead */
 
   if ( *status != SAI__OK ) return;
 
@@ -176,9 +179,8 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
     }
     /* If ffdata is NULL then populate a struct to work with */
     if ( *ffdata == NULL ) {
-      /*printf("Fudging\n");*/
       /* Note that we don't need to create a smfFile */
-      flags = SMF__NOCREATE_FILE;
+      flags |= SMF__NOCREATE_FILE;
       *ffdata = smf_deepcopy_smfData( data, 1, flags, status );
       /* Change data type to DOUBLE */
       if ( *status == SAI__OK) {
@@ -191,7 +193,6 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
       }
     }
     /* Flatfield the data */
-    /*      printf("doing flatfield\n");*/
     smf_flatfield( data, ffdata, flags, status );
 
   } else if ( *status == SMF__FLATN ) {
@@ -201,7 +202,9 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
     /* What if ffdata is NULL? */
     msgOutif(MSG__VERB, FUNC_NAME, "Data FF: Copying to output file ", status);
     if ( *ffdata == NULL ) {
-      flags = SMF__NOCREATE_FILE | SMF__NOCREATE_DA;
+      /* Don't need the smfFile or smfDA components */
+      flags |= SMF__NOCREATE_FILE;
+      flags |= SMF__NOCREATE_DA;
       *ffdata = smf_deepcopy_smfData( data, 0, flags, status );
     } else {
       /*      printf("using memcpy\n");*/
