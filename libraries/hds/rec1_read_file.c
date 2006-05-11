@@ -139,20 +139,23 @@ internal slot ^SLOT; container file is not open (internal programming error).",
       else
       {
 /*  Check the size request                                                  */
-	if (size == 0) {
+	if (size <= 0) {
 	  hds_gl_status = DAT__FILRD;
-	  dat1emsSetBigi( "FIRST", bloc );
+	  dat1emsSetBigi( "SIZE", size );
 	  rec1_fmsg( "FILE", slot );
-	  emsRep( "REC1_READ_FILE_1",
-		  "Request to read 0 blocks starting at block ^FIRST from file ^FILE",
+	  emsRep( "REC1_READ_FILE_1a",
+                    "Routine rec1_read_file called with an invalid size \
+argument of ^SIZE for file ^FILE (internal programming error).",
 		  &hds_gl_status );
 	  return hds_gl_status;
 	}
-	if (bloc == 0) {
+	if (bloc <= 0) {
 	  hds_gl_status = DAT__FILRD;
+	  dat1emsSetBigi( "BLOC", bloc );
 	  rec1_fmsg( "FILE", slot );
-	  emsRep( "REC1_READ_FILE_1",
-		  "Request to read block 0 from file ^FILE",
+	  emsRep( "REC1_READ_FILE_1b",
+                    "Routine rec1_read_file called with an invalid bloc \
+argument of ^BLOC for file ^FILE (internal programming error).",
 		  &hds_gl_status );
 	  return hds_gl_status;
 	}
