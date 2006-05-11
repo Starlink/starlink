@@ -109,7 +109,7 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
   HDSLoc *loc = NULL;       /* Locator to return */
   int itexists;             /* Flag to denote whether extension exists */
 
-  if ( *status != SAI__OK ) return;
+  if ( *status != SAI__OK ) return NULL;
 
   /* Retrieve NDF identifier from smfFile */
   if ( data == NULL ) {

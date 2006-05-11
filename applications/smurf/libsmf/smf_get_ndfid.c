@@ -116,7 +116,7 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
   int ndfid;                /* NDF identifier for named component */
   int place;                /* Placeholder for NDF */
 
-  if ( *status != SAI__OK ) return;
+  if ( *status != SAI__OK ) return NDF__NOID;
 
   /* Retrieve NDF identifier from smfFile */
   if ( loc == NULL ) {
