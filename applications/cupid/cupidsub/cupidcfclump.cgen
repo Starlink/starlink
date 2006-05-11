@@ -9,11 +9,15 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
                                  CupidPixelSet *ps, int *list_size, 
                                  double **mlist, int **plist ){
 /*
+*+
 *  Name:
 *     cupidCFClump<X>
 
 *  Purpose:
 *     Gather the information needed to produce an HDS clump structure.
+
+*  Language:
+*     Starlink C
 
 *  Synopsis:
 *     void cupidCFClump<X>( CGEN_TYPE *ipd, double *ipv, int *ipa, double rms, 
@@ -77,6 +81,26 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
 *     cupidCFClump... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
+*  Copyright:
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry
 *     {enter_new_authors_here}
@@ -88,7 +112,9 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
 
 *  Bugs:
 *     {note_any_bugs_here}
-*/      
+
+*-
+*/
 
 /* Local Variables: */
    double *pm;      /* Pointer to next value in "mlist" */
@@ -172,4 +198,3 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
       }
    }
 }
-

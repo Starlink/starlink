@@ -7,11 +7,15 @@
 
 int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax ){
 /*
+*+
 *  Name:
 *     cupidGCFindMax<X>
 
 *  Purpose:
 *     Find the element with the largest value in the supplied array. 
+
+*  Language:
+*     Starlink C
 
 *  Synopsis:
 *     int cupidGCFindMax<X>( CGEN_TYPE *array, int nel, int *imax )
@@ -30,7 +34,7 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax ){
 *        supplied array of the element with the largest value. A value of
 *        -1 is returned if there are no good values in the supplied array.
 
-*  Returned value:
+*  Returned Value:
 *     A flag indicating if all the supplied array values are bad.
 
 *  Notes:
@@ -40,6 +44,26 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax ){
 *     of the parameter list indicating the data type of the specific 
 *     cupidGCFindMax... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
+
+*  Copyright:
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David S. Berry
@@ -52,7 +76,9 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax ){
 
 *  Bugs:
 *     {note_any_bugs_here}
-*/      
+
+*-
+*/
 
 /* Local Variables: */
    int i;               /* Loop count */
@@ -87,4 +113,3 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax ){
    return ( ngood == 0 );
 
 }
-

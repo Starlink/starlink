@@ -15,12 +15,16 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
                                     int *lbnd, int *ubnd, int nel, HDSLoc *obj,
                                     float *rmask, void *out, const char *method ){
 /*
+*+
 *  Name:
 *     cupidSumClumps
 
 *  Purpose:
 *     Create an image holding the sum of the supplied clumps, and another
 *     holding a mask.
+
+*  Language:
+*     Starlink C
 
 *  Synopsis:
 *     void cupidSumClumps<X>( CGEN_TYPE *in, int ilevel, int ndim, int *lbnd, 
@@ -72,6 +76,26 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 *     parameter should be an integer and should be one of CUPID__DOUBLE, 
 *     CUPID__FLOAT, etc.
 
+*  Copyright:
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry
 *     {enter_new_authors_here}
@@ -83,7 +107,9 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 
 *  Bugs:
 *     {note_any_bugs_here}
-*/      
+
+*-
+*/
 
 /* Local Variables: */
    CGEN_TYPE *pd;       /* Pointer to next element of the "out" array */
@@ -260,4 +286,3 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 #undef GAUSSCLUMPS
 #undef REINHOLD
 #undef FELLWALKER
-

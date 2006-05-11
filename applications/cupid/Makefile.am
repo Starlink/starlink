@@ -85,6 +85,7 @@ TESTS = cupidtest.sh
 check_SCRIPTS = cupidtest.sh
 
 dist_starnews_DATA = cupid.news
+dist_pkgdata_DATA = LICENCE
 
 MISC_FILES = dtask_applic.lo cupid.shl history.help \
 cupid_mon version.dat cupid.csh cupid.icl cupid.sh

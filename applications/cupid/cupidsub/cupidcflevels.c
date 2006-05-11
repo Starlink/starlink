@@ -9,11 +9,15 @@
 double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
                        double rms, int *nlevels ){
 /*
+*+
 *  Name:
 *     cupidCFLevels
 
 *  Purpose:
 *     Get the contour levels for use by the ClumpFind algorithm.
+
+*  Language:
+*     Starlink C
 
 *  Synopsis:
 *     double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
@@ -35,10 +39,30 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
 *     nlevels
 *        Pointer to an int to receive the number of contour levels.
 
-*  Retured Value:
+*  Returned Value:
 *     A pointer to a dynamically allocated array containing "*nlevels"
 *     floating point contour values. It should be freed using astFree 
 *     when no longer needed. 
+
+*  Copyright:
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DSB: David S. Berry
@@ -51,7 +75,9 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
 
 *  Bugs:
 *     {note_any_bugs_here}
-*/      
+
+*-
+*/
 
 /* Local Variables: */
    char name[ 10 ];        /* Name of "LEVELn" value */
@@ -152,4 +178,3 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
    return ret;
 
 }
-

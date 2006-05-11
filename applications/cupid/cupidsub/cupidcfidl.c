@@ -7,12 +7,16 @@
 void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
                  int skip[3], int naxis, CupidPixelSet **clumps ){
 /*
+*+
 *  Name:
 *     cupidCFIdl
 
 *  Purpose:
 *     Transfer all the pixels in one PixelSet into another, using the
 *     algorithm of the Williams IDL ClumpFind implementation.
+
+*  Language:
+*     Starlink C
 
 *  Synopsis:
 *     void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
@@ -57,6 +61,26 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *        that a pointer to the PixelSet with index value "i" is stored at 
 *        element "i" of the "clumps" array.
 
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry
 *     {enter_new_authors_here}
@@ -68,7 +92,9 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 
 *  Bugs:
 *     {note_any_bugs_here}
-*/      
+
+*-
+*/
 
 /* Local Variables: */
    int *nebs;       /* Pointer to list of neighbouring clump indices */
@@ -194,4 +220,3 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
    ps->pop = 0;
 
 }
-

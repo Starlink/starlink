@@ -5,11 +5,15 @@
 void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa, 
                   int skip[3] ){
 /*
+*+
 *  Name:
 *     cupidCFXfer
 
 *  Purpose:
 *     Transfer all the pixels in one PixelSet into another.
+
+*  Language:
+*     Starlink C
 
 *  Synopsis:
 *     void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa, 
@@ -39,6 +43,26 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 *        the array using a single 1D vector index and using nD coords.
 *        Unused trailing elements should be filled with zero.
 
+*  Copyright:
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry
 *     {enter_new_authors_here}
@@ -50,7 +74,9 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 
 *  Bugs:
 *     {note_any_bugs_here}
-*/      
+
+*-
+*/
 
 /* Local Variables: */
    int *v1;         /* Pointer to element at start of this row */
@@ -139,4 +165,3 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
    }
 
 }
-

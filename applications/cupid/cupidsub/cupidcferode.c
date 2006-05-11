@@ -13,12 +13,16 @@ typedef struct Pix {
 int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
                   int skip[3], int naxis, CupidPixelSet **clumps ){
 /*
+*+
 *  Name:
 *     cupidCFErode
 
 *  Purpose:
 *     Transfer all the pixels in one PixelSet into another, using the
 *     algorithm of the Williams et al ClumpFind ApJ paper.
+
+*  Language:
+*     Starlink C
 
 *  Synopsis:
 *     int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
@@ -66,6 +70,26 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *     Non-zero if any pixels were transferred out of the source PixelSet. 
 *     Zero otherwise.
 
+*  Copyright:
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry
 *     {enter_new_authors_here}
@@ -77,7 +101,9 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 
 *  Bugs:
 *     {note_any_bugs_here}
-*/      
+
+*-
+*/
 
 /* Local Variables: */
    Pix *pix;        /* Pointer to a Pix structure describing transferred pixel */
@@ -211,4 +237,3 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
    return ( nxf > 0 );
 
 }
-

@@ -102,11 +102,15 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
                   int skip[3], int hindex, int naxis, int *n1, int *il1,  
                   int i1[27], int *n2, int *il2, CupidPixelSet **clumps ){
 /*
+*+
 *  Name:
 *     cupidCFNebs
 
 *  Purpose:
 *     Check if the neighbours of a specified pixel are already in a PixelSet.
+
+*  Language:
+*     Starlink C
 
 *  Synopsis:
 *     void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3], 
@@ -179,6 +183,26 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 *        PixelSets. The pixelSet identified by index "id" should be held
 *        in "clumps[id]".
 
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry
 *     {enter_new_authors_here}
@@ -190,7 +214,9 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 
 *  Bugs:
 *     {note_any_bugs_here}
-*/      
+
+*-
+*/
 
 /* Local Variables: */
    double d1;           /* Distance from pixel to nearest PixelSet peak */
@@ -356,6 +382,3 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 #undef CHECK_UPNEIGHBOUR 
 #undef CHECK_LONEIGHBOUR 
 #undef CHECK_NEIGHBOURS 
-
-
-

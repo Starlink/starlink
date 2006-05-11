@@ -4,11 +4,15 @@
 
 float cupidRanVal( int normal, float p[2] ){
 /*
+*+
 *  Name:
 *     cupidRanVal
 
 *  Purpose:
 *     Return a random sample from a uniform or normal distribution.
+
+*  Language:
+*     Starlink C
 
 *  Synopsis:
 *     float cupidRanVal( int normal, float p[2] )
@@ -30,6 +34,26 @@ float cupidRanVal( int normal, float p[2] ){
 *  Returned Value:
 *     The model value or gradient.
 
+*  Copyright:
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry
 *     {enter_new_authors_here}
@@ -41,7 +65,9 @@ float cupidRanVal( int normal, float p[2] ){
 
 *  Bugs:
 *     {note_any_bugs_here}
-*/      
+
+*-
+*/
 
 /* Local Variables: */
    float ret;             /* Returned value */
@@ -63,4 +89,3 @@ float cupidRanVal( int normal, float p[2] ){
    return ret;   
 
 }
-
