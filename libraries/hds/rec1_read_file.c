@@ -58,8 +58,29 @@
 /*    int rec1_read_file                                                    */
 /*       The global status value current on exit.                           */
 
+/* Copyright:                                                               */
+/*    Copyright (C) 1991 Science & Engineering Research Council             */
+/*    Copyright (C) 2006 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
+
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -74,6 +95,8 @@
 /*    2-OCT-1991 (RFWS):                                                    */
 /*       Check that the container file is open and report an error if it is */
 /*       not.                                                               */
+/*    10-MAY-2006 (TIMJ):                                                   */
+/*       Trap requests with zero size read or zero block. Fix empty if.     */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -105,18 +128,36 @@
       if ( !rec_ga_fcv[ slot ].open )
       {
          hds_gl_status = DAT__FILRD;
-         ems_seti_c( "FIRST", bloc );
-         ems_seti_c( "LAST", bloc + size - 1 );
-         ems_seti_c( "SLOT", slot );
+         dat1emsSetBigi( "FIRST", bloc );
+         dat1emsSetBigi( "LAST", bloc + size - 1 );
+         emsSeti( "SLOT", slot );
          emsRep( "REC1_READ_FILE_1",
                     "Unable to read blocks ^FIRST:^LAST from file on HDS \
 internal slot ^SLOT; container file is not open (internal programming error).",
                     &hds_gl_status );
       }
-
-/* Obtain the appropriate I/O channel/descriptor.                           */
       else
       {
+/*  Check the size request                                                  */
+	if (size == 0) {
+	  hds_gl_status = DAT__FILRD;
+	  dat1emsSetBigi( "FIRST", bloc );
+	  rec1_fmsg( "FILE", slot );
+	  emsRep( "REC1_READ_FILE_1",
+		  "Request to read 0 blocks starting at block ^FIRST from file ^FILE",
+		  &hds_gl_status );
+	  return hds_gl_status;
+	}
+	if (bloc == 0) {
+	  hds_gl_status = DAT__FILRD;
+	  rec1_fmsg( "FILE", slot );
+	  emsRep( "REC1_READ_FILE_1",
+		  "Request to read block 0 from file ^FILE",
+		  &hds_gl_status );
+	  return hds_gl_status;
+	}
+
+/* Obtain the appropriate I/O channel/descriptor.                           */
          iochan = rec_ga_fcv[ slot ].write;
          if ( iochan == REC__NOIOCHAN )
          {
@@ -172,12 +213,13 @@ internal slot ^SLOT; container file is not open (internal programming error).",
 /* Seek to the required starting position in the file and read the required */
 /* number of blocks.                                                        */
 #if HAVE_FSEEKO
-         if ( (readok = !fseeko( iochan, ( bloc - 1 )*REC__SZBLK, SEEK_SET ) ));
+	 /* make sure the bloc number is non-zero before this line */
+         if ( (readok = !fseeko( iochan, ( bloc - 1 )*REC__SZBLK, SEEK_SET ) ) )
 #else
-         if ( (readok = !fseek( iochan, ( bloc - 1 )*REC__SZBLK, SEEK_SET ) ));
+	 if ( (readok = !fseek( iochan, ( bloc - 1 )*REC__SZBLK, SEEK_SET ) ) )
 #endif
          {
-            fread( buffer, 1, size * REC__SZBLK, iochan );
+	   fread( buffer, 1, (size_t)(size * REC__SZBLK), iochan );
 
 /* Note if an error occurred and clear the error indicator. (Note that      */
 /* end-of-file conditions are ignored because these may happen if the file  */
@@ -195,8 +237,8 @@ internal slot ^SLOT; container file is not open (internal programming error).",
          {
             hds_gl_status = DAT__FILRD;
             emsSyser( "MESSAGE", errno );
-            ems_seti_c( "FIRST", bloc );
-            ems_seti_c( "LAST", bloc + size - 1 );
+            dat1emsSetBigi( "FIRST", bloc );
+            dat1emsSetBigi( "LAST", bloc + size - 1 );
             rec1_fmsg( "FILE", slot );
             emsRep( "REC1_READ_FILE_3",
                        "Unable to read blocks ^FIRST:^LAST from file ^FILE - \
