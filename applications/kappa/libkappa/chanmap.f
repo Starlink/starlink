@@ -252,6 +252,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -265,6 +266,9 @@
 *     2006 April 28 (MJC):
 *        Removed call to KPS1_CLPA0 and called NDF_PTWCS after creating
 *        the SwitchMap.
+*     11-MAY-2006 (DSB):
+*        Clear up inconsistencies between use of PIXEL and GRID co-ordinates
+*        when creating the output WCS FrameSet.
 *     {enter_further_changes_here}
 
 *-
@@ -346,6 +350,8 @@
                                  ! mapped array
       CHARACTER ESTIM*( 6 )      ! Method to use to estimate collapsed
                                  ! values
+      INTEGER GMAP               ! Pointer to Mapping from GRID Frame 
+                                 ! to Current Frame, input NDF
       DOUBLE PRECISION GRDPOS( NDIM ) ! Valid grid Frame position
       LOGICAL HIGHER             ! Significant dimensions above collapse
                                  ! axis?
@@ -518,6 +524,9 @@
      :                 /'co-ordinate Frame of ''^NDF'' (^T) is not '/
      :                 /'defined.', STATUS )
       END IF
+
+*  Extract the Mapping from GRID Frame to Current Frame. 
+      GMAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, STATUS )
 
 *  Select the collapse axis and limits thereon.
 *  ============================================
@@ -1169,51 +1178,58 @@
 *
 *  For each channel tile (i.e. ignoring any blocking) we proceed as
 *  below.
-*  a) Create a `route map' transforming two-dimensional PIXEL
-*  co-ordinates in the output array into three-dimensional PIXEL
+*  a) Create a `route map' transforming two-dimensional GRID
+*  co-ordinates in the output array into three-dimensional GRID
 *  co-ordinates in the input cube.  This comprises a shift of origin of
-*  the spatial PIXEL co-ordinates from the lower-left of the output 
+*  the spatial GRID co-ordinates from the lower-left of the output 
 *  array to the lower-left of the current tile, combined with a 
 *  conversion to three dimensions, using a constant---the average 
 *  co-ordinate along the collapsed axis---for the third dimension; and
-*  b) Create intervals using the range of spatial PIXEL co-ordinates.
+*  b) Create intervals using the range of spatial GRID co-ordinates.
 
 *  Once all the tiles have been pasted into the output array the
 *  steps are as follows.
-*  c) Form a SelectorMap using the array of spatial intervals from b).
+*  c) Form a SelectorMap using the array of spatial Intervals from b).
 *  d) In turn form a SwitchMap using the SelectorMap, and route maps
 *  from step a).
 *  e) Create a compound Mapping of the SwitchMap and the original
-*  PIXEL-to-current Frame Mapping.  The result maps from
-*  two-dimensional pixel to the input current Frame.
+*  3D GRID-to-current Frame Mapping.  The result maps from
+*  two-dimensional GRID coords to the input current Frame.
 *  f) Add a new Frame to the output FrameSet using the Mapping
-*  from step e) to connect the frameSet to the two-dimensional pixel
+*  from step e) to connect the frameSet to the two-dimensional GRID
 *  Frame.
 
-*  Create a ShiftMap from two-dimensional co-ordinates in the large
-*  output file (i.e. for the ICHth tile) to two-dimensional co-ordinates
-*  in the original cube.
+*  Create a ShiftMap from two-dimensional GRID co-ordinates in the large
+*  output file (i.e. for the ICHth tile) to two-dimensional GRID 
+*  co-ordinates in the original cube.
          DO J = 1, NDIMO
             SHIFTS( J ) = -DBLE( ( CHIND( J ) - 1 ) * CHDIMS( J ) )
          END DO
          SHIMAP = AST_SHIFTMAP( NDIMO, SHIFTS, ' ', STATUS )
 
 *  Create a PermMap increasing the dimensionality by one and setting
-*  the new dimension position to the average pixel position of the slab.
-         CHAVER = DBLE( UBNDS( JAXIS ) + LBNDS( JAXIS ) - 1 ) * 0.5D0
+*  the new dimension position to the average GRID position (within the
+*  input cube) of the slab.
+         CHAVER = DBLE( UBNDS( JAXIS ) + LBNDS( JAXIS ) - 1 ) * 0.5D0 
+     :            - DBLE( LBND( JAXIS ) ) + 1.5D0
          PERMAP = AST_PERMMAP( NDIMO, IPERM, NDIM, OPERM, CHAVER, ' ',
      :                         STATUS )
 
 *  Combine the ShiftMap and the PermMap to form the route map for the
-*  current tile.
+*  current tile.  The forward transformation of this Mapping goes from 
+*  2D GRID coords in the output image to 3D GRID coords in the input 
+*  cube.
          ROUMAP( ICH ) = AST_CMPMAP( SHIMAP, PERMAP, .TRUE., ' ',
      :                               STATUS )
 
-*  Note that this would need changing if the tiles did not abut.  Also
-*  the bounds are double precision.
+*  Create an Interval describing the region within the output 2D GRID Frame
+*  occupied by this tile.  Note that this would need changing if the tiles 
+*  did not abut.  Also the bounds are double precision.
          DO J = 1, NDIMO
-             DLBNDS( J ) = DBLE( ( CHIND( J ) - 1 ) * CHDIMS( J ) )
-             DUBNDS( J ) = DBLE( CHIND( J ) * CHDIMS( J ) ) - 1.0D-10
+             DLBNDS( J ) = DBLE( ( CHIND( J ) - 1 ) * CHDIMS( J ) ) +
+     :                     0.5D0 
+             DUBNDS( J ) = DBLE( CHIND( J ) * CHDIMS( J ) ) + 0.5D0 - 
+     :                     1.0D-10
          END DO
 
          SLABIN( ICH ) = AST_INTERVAL( PFRMO, DLBNDS, DUBNDS, AST__NULL,
@@ -1231,15 +1247,15 @@
      :                        ' ', STATUS )
 
 *  Combine in sequence the SwitchMap (that goes from two-dimensional
-*  PIXEL to three-dimensional PIXEL) with the Mapping from 
-*  three-dimensional PIXEL co-ordinates to the original 
+*  GRID to three-dimensional GRID) with the Mapping from 
+*  three-dimensional GRID co-ordinates to the original 
 *  three-dimensional current Frame. 
-      MAPC = AST_CMPMAP( SWIMAP, MAP, .TRUE., ' ', STATUS )
+      MAPC = AST_CMPMAP( SWIMAP, GMAP, .TRUE., ' ', STATUS )
 
 *  Add the input three-dimensional current Frame into the output 
 *  FrameSet, using the above Mapping to connect it to the
-*  two-dimensional PIXEL Frame.
-      CALL AST_ADDFRAME( IWCSO, IPIXO, MAPC,
+*  two-dimensional GRID Frame.
+      CALL AST_ADDFRAME( IWCSO, AST__BASE, MAPC,
      :                   AST_GETFRAME( IWCS, AST__CURRENT, STATUS ),
      :                   STATUS )
 
