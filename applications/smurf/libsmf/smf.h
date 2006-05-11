@@ -85,6 +85,8 @@
 *        - Change API for smf_check_smfData, smf_deepcopy_smfData
 *        - Add history to smf_construct_smfData
 *        - Add smf_history_add, smf_history_read
+*     2006-05-09 (AGG):
+*        Add smf_get_xloc and smf_get_ndfid
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -238,6 +240,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index,
 
 void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 		    smfData ** data, int *status);
+
 double smf_scale_tau ( const double tauwvm, const char *filter, int *status);
 
 void smf_subtract_plane( smfData *data, const char *fittype, int *status);
