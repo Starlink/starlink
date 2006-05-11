@@ -100,18 +100,14 @@ void smf_scanfit ( smfData *data, int order, int *status) {
 
   int cliptype;             /* Type of sigma clipping */
   double *poly;             /* Array of polynomial coefficients */
-  smfFile *file;            /* Pointer to input file struct */
   int i;                    /* Loop counter */
-  int indf;                 /* NDF identifier for input file */
   int lbnd[3];              /* Lower bound for coeff array (poly) */
   int nbol;                 /* Number of bolometers */
   int ncoeff;               /* Number of coefficients in baseline fit */
   int nframes = 1;          /* Number of frames in a scan */
   int npts;                 /* Number of data points in coefficient array */
-  int place;                /* Place holder for SCANFIT extension */
   HDSLoc *ploc = NULL;      /* Locator for SCANFIT coeffs */
   int pndf;                 /* NDF identifier for SCANFIT */
-  int scu2red;              /* NDF identifier for SCU2RED extension */
   int ubnd[3];              /* Upper bound for coeff array (poly) */
 
   if ( *status != SAI__OK ) return;
@@ -154,61 +150,46 @@ void smf_scanfit ( smfData *data, int order, int *status) {
     }
   }
 
-  /* Check if scanfit cpt is already present by presence of poly
-     pointer in smfData */
-  if ( data->poly != NULL ) {
-    msgOutif( MSG__VERB, FUNC_NAME, "Data have been fitted already: assuming that a recalculation is desired", status );
-  }
-
   nbol = (data->dims)[0] * (data->dims)[1];
   cliptype = 0;
 
-  /* Retrieve NDF identifier from smfFile */
-  file = data->file;
-  indf = file->ndfid;
-  /* See if SCU2RED extension exists */
-  ndfXstat( indf, "SCU2RED", &scu2red, status );
-  if ( scu2red ) {
-    /* OK, get a locator for it */
-    ndfXloc( indf, "SCU2RED", "WRITE", &ploc, status );
-    if ( ploc == NULL ) {
-      if ( *status == SAI__OK) {
-	    *status = SAI__ERROR;
-	    errRep(FUNC_NAME, "Unable to obtain an HDS locator to the SCU2RED extension, despite its existence", status);
-      }
-    }
+  /* Obtain the HDS locator for the SCU2RED extension */
+  ploc = smf_get_xloc( data, "SCU2RED", "SCUBA2_MAP_ARR", "WRITE", 0, 0, status);
+  if ( ploc == NULL ) {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "Unable to obtain an HDS locator", status);
+  }
 
-    /* Open SCANFIT extension */
-    /* Note: write access clears the contents of the NDF */
-    ndfOpen( ploc, "SCANFIT", "WRITE", "UNKNOWN", &pndf, &place, status );
-    /* Open new SCANFIT extension */
-
-    /* Set the lower and upper bounds of the 3-d array */
-    for (i=0; i<3; i++) {
-      lbnd[i] = 1;
-    }
-    ubnd[0] = (data->dims)[0];
-    ubnd[1] = (data->dims)[1];
-    ubnd[2] = ncoeff;
+  /* Set the lower and upper bounds of the 3-d array for the new
+     SCANFIT NDF */
+  for (i=0; i<3; i++) {
+    lbnd[i] = 1;
+  }
+  ubnd[0] = (data->dims)[0];
+  ubnd[1] = (data->dims)[1];
+  ubnd[2] = ncoeff;
     
-    /* Define properties of new extension */
-    ndfNew( "_DOUBLE", 3, lbnd, ubnd, &place, &pndf, status );
+  /* Open SCANFIT extension - note if SCANFIT exists, opening it with
+     WRITE access will overwrite the current contents */
+  pndf = smf_get_ndfid( ploc, "SCANFIT", "WRITE", "UNKNOWN", "_DOUBLE", 3, 
+			lbnd, ubnd, status );
+
+  /* Check the returned NDF identifier */
+  if ( pndf == NDF__NOID ) {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "Unable to obtain an NDF identifier for SCANFIT coefficients", 
+	   status );
+  } else {
 
     /* Map the pointer for polynomial coefficients */
     ndfMap( pndf, "DATA", "_DOUBLE", "WRITE", &poly, &npts, status );
 
-  } else {
-    msgOutif(MSG__VERB, FUNC_NAME, 
-	     "Warning: no SCU2RED extension. Creating a new one.", status);
-    /* Create scu2red extension */
-    /* Create scanfit extension inside scu2red */
-  }
-
-  /* Carry out fit, check status on return */
-  sc2math_fitsky ( cliptype, nbol, nframes, ncoeff, (data->pntr)[0],
-		   poly, status );
-  if ( *status != SAI__OK ) {
-    errRep(FUNC_NAME, "Unable to carry out scanfit", status);
+    /* Carry out fit, check status on return */
+    sc2math_fitsky ( cliptype, nbol, nframes, ncoeff, (data->pntr)[0],
+		     poly, status );
+    if ( *status != SAI__OK ) {
+      errRep(FUNC_NAME, "Unable to carry out scanfit", status);
+    }
   }
 
   /* Release the NDF resources */
