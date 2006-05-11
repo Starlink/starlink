@@ -185,7 +185,7 @@ int smf_dtype_check( const smfData* data, const char * type, smf_dtype itype,
 void smf_dtype_check_fatal( const smfData* data, const char * type, smf_dtype itype,
 		     int *status );
 
-char * smf_dtype_string( const smfData* data, int * status );
+char *smf_dtype_string( const smfData* data, int * status );
 
 size_t smf_dtype_size( const smfData* data, int * status );
 
@@ -210,6 +210,14 @@ void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, int
 void smf_flatten ( smfData *data, int *status );
 
 void smf_free( void * pntr, int * status );
+
+int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode, 
+		    const char *state, const char *dattype, const int ndims, 
+		    const int *lbnd, const int *ubnd, int *status );
+
+HDSLoc * smf_get_xloc ( const smfData *data, const char *extname, 
+			const char *extype, const char *accmode, 
+			const int ndims, const int *dims, int *status );
 
 int smf_history_check( const smfData* data, const char * appl, int *status);
 
