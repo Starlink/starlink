@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_mapbounds_apprx
+*     smf_mapbounds_approx
 
 *  Purpose:
 *     Automatically calculate the pixel bounds for a map given a projection
@@ -43,10 +43,17 @@
 *        Pointer to global status.
 
 *  Description:
-*     This function steps over a list of input files and calculates the
-*     bolometer->output map pixel transformation for the corner bolometers
-*     of the subarray in order to automatically determine the extent 
-*     of the map.
+
+*     This function determines the approximate map bounds based on the
+*     FITS keywords MAP_WDTH, MAP_HGHT, MAP_X, MAP_Y AND MAP_PA. It
+*     creates the WCS frameset, setting the tangent point to the RA,
+*     Dec centre.
+
+* Notes:
+*     Currently the simulator does not write MAP_PA: therefore this
+*     routine ignores the map PA and assumes that the map is oriented
+*     with the Y-axis parallel to the elevation axis.
+
 *  Authors:
 *     Edward Chapin (UBC)
 *     Tim Jenness (JAC, Hawaii)
@@ -104,29 +111,27 @@ void smf_mapbounds_approx( Grp *igrp,  int size, char *system, double lon_0,
 			   double lat_0, int flag, double pixsize, int *lbnd_out, 
 			   int *ubnd_out, AstFrameSet **outframeset, int *status ) {
 
-  /* Local Variables */
+  /* Local variables */
   smfData *data=NULL;          /* pointer to  SCUBA2 data struct */
+  int dxpix;                   /* Map X offset in pixels */
+  int dypix;                   /* Map Y offset in pixels */
   smfFile *file=NULL;          /* SCUBA2 data file information */
   AstFitsChan *fitschan=NULL;  /* Fits channels to construct WCS header */
   smfHead *hdr=NULL;           /* Pointer to data header this time slice */
+  int hghtpix;                 /* Map height in pixels */
   dim_t i;                     /* Loop counter */
   dim_t k;                     /* Loop counter */
+  double maphght;              /* Map height in radians */
+  double mappa = 0;            /* Map position angle in radians */
+  double mapwdth;              /* Map width in radians */
+  double mapx;                 /* Map X offset in radians */
+  double mapy;                 /* Map Y offset in radians */
   char *pname=NULL;            /* Name of currently opened data file */
   AstMapping *sky2map=NULL;    /* Mapping celestial->map coordinates */
+  int temp;                    /* Temporary variable  */
+  int wdthpix;                 /* Map width in pixels */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */ 
   double y_array_corners[4];   /* Y-Indices for corner pixels in array */ 
-
-  double mapwdth;
-  double maphght;
-  double mapx;
-  double mapy;
-  double mappa = 0;
-  int hghtpix;
-  int wdthpix;
-  int temp;
-  int dxpix;
-  int dypix;
-
 
   /* Main routine */
   if (*status != SAI__OK) return;
