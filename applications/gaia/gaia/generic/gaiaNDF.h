@@ -110,11 +110,6 @@ extern "C" {
     int gaiaNDFQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[], 
                             int *ndim, char **error_mess );
 
-    /* Query the coordinate of a position along the given axis. */
-    int gaiaNDFQueryCoord( int ndfid, int axis, double *coords, int ncoords, 
-                           int trailed, int format, char **coord, 
-                           char **error_mess );
-
     /* Map in an array component */
     int gaiaNDFMap( int ndfid, char *type, const char *access, 
                     const char* component, void **data, int *el, 
