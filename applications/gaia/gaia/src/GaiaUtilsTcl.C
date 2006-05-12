@@ -53,6 +53,8 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsUrlGet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 
@@ -66,6 +68,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::getaxiswcs", GaiaUtilsGtAxisWcs,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::astset", GaiaUtilsAstSet,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -206,6 +212,38 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
         free( error_mess );
     }
     return result;
+}
+
+/**
+ * Apply AST options to a FrameSet.
+ *
+ * There are two arguments, the address of the AST FrameSet and the options
+ * string ("option=value,option=value" etc.).
+ */
+static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrameSet *wcs;
+    long adr;
+    
+    /* Check arguments, only allow two. */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset options_string" );
+        return TCL_ERROR;
+    }
+
+    /* Get the frameset */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    wcs = (AstFrameSet *) adr;
+
+    /* Set the options */
+    astSet( wcs, Tcl_GetString( objv[2] ) );
+    if ( ! astOK ) {
+        return TCL_ERROR;
+    }
+    return TCL_OK;
 }
 
 /**
