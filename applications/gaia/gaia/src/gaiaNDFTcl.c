@@ -425,6 +425,7 @@ static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
 
     /* Get WCS, this is cached as the NDF library returns a copy each time so
      * any changes will be lost */
+    result = TCL_OK;
     if ( info->wcs == NULL ) {
         result = gaiaNDFGtWcs( info->ndfid, &info->wcs, &error_mess );
     }
