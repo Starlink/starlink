@@ -1086,6 +1086,7 @@ itcl::class gaia::GaiaCube {
          #  Set first-time reference position.
          set coord [get_coord_ $plane_ 0 0]
          if { $coord != {} } {
+            update ;# Make sure plot is created first.
             $spectrum_ set_ref_coord $coord
          }
       } else {

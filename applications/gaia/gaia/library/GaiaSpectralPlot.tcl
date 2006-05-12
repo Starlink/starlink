@@ -338,9 +338,9 @@ itcl::class gaia::GaiaSpectralPlot {
             +[code $itk_component(draw) deselect_objects]
 
          #  Make a reference line.
+         fitxy
          make_ref_line_
          set_to_ref_coord_
-         fitxy
       }
 
       #  Create the secondary plot, put this at the given x and y.
