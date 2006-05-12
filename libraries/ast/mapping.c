@@ -202,6 +202,10 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        the single precision "F" instantiation of the MAKE_REBINSEQ macro.
 *        Also correct the "nout = astGetNin" line in the MAKE_REBINSEQ
 *        macro to "nout = astGetNout".
+*     12-MAY-2006 (DSB):
+*        Modify SpecialBounds to include points slightly inside the
+*        corners. This is because some Mappings may have singularies at
+*        the the edges.
 *class--
 */
 
@@ -15101,6 +15105,9 @@ static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
    int coord;                    /* Loop counter for coordinates */
    int done;                     /* All corners done? */
    int face;                     /* Loop counter for faces */
+   int ic;                       /* Index of corner */
+   int icen;                     /* Index of centroid point */
+   int ncorner;                  /* Number of corners */
    int ncoord;                   /* Number of input coordinates */
    int npoint;                   /* Number of points */
    int origin;                   /* Origin lies within bounds? */
@@ -15119,6 +15126,11 @@ static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
    constrained region of the coordinate space. */
    ncoord = mapdata->nin;
    for ( npoint = 1, coord = 0; coord < ncoord; coord++ ) npoint *= 2;
+
+/* Also include a second point at each corner,offset slightly from the
+   corner towards the centroid */
+   ncorner = npoint;
+   npoint *= 2;
 
 /* Also include placing one at the centre of every face and one at the
    centroid of the constrained coordinate space. */
@@ -15217,7 +15229,17 @@ static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
          ptr_in[ coord ][ point ] = 0.5 * ( mapdata->lbnd[ coord ] +
                                             mapdata->ubnd[ coord ] );
       }
-      point++;
+      icen = point++;
+
+/* Add a set of positions which are offset slightly from each corner
+   towards the centroid. */
+      for ( ic = 0; ic < ncorner; ic++ ) {
+         for ( coord = 0; coord < ncoord; coord++ ) {
+            ptr_in[ coord ][ point ] = 0.999*ptr_in[ coord ][ ic ] + 
+                                       0.001*ptr_in[ coord ][ icen ];
+         }
+         point++;
+      }
 
 /* Finally, add the origin, if it lies within the constraints. */
       if ( origin ) {
