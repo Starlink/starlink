@@ -98,7 +98,7 @@
 *     CHARACTER and numeric data types.
 
 *  Implementation Deficiencies:
-*     Fortran does not provide all the intrinsic functions
+*     - Fortran does not provide all the intrinsic functions
 *     necessary for converting between the various data types.
 *     This file declares the functions which are supported
 *     in the VAX/VMS Fortran manual. Some conversions are
@@ -110,10 +110,8 @@
 *     defined as statement functions. These latter conversions
 *     are defined as external functions, and are found in the
 *     DCV object library.
-
-*  Implementation Deficiencies:
 *     -  REAL*16 and COMPLEX types are not included here, but may be
-*        added if required.
+*     added if required.
 
 *  Machine-specific features used:
 *     Many of the conversions defined in this file (especially
@@ -124,6 +122,22 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     SMB: Steven Beard (ROE)
@@ -148,9 +162,6 @@
 *     21-AUG-2005 (TIMJ):
 *        Autoconf for g95. IAND can not take typeless BOZ constants
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       
