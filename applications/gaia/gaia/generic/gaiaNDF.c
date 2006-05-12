@@ -84,25 +84,6 @@
 #define TCL_OK 0
 #define TCL_ERROR 1
 
-/*
- *  Structure to store information about an NDF.
- */
-struct NDFinfo {
-      char name[MAXNDFNAME]; /*  NDF name (within file)*/
-      int ndfid;             /*  NDF identifier */
-      int ncomp;             /*  Number of data components */
-      int type;              /*  NDF data type (as bitpix) */
-      int nx;                /*  First dimension of NDF */
-      int ny;                /*  Second dimension of NDF */
-      int readonly;          /*  Readonly access */
-      int havevar;           /*  Variance component exists */
-      int havequal;          /*  Quality array exists */
-      char *header;          /*  Pointer to FITS headers */
-      int hlen;              /*  Length of header */
-      struct NDFinfo *next;  /*  Pointer to next NDF with displayables */
-};
-typedef struct NDFinfo NDFinfo;
-
 /*  Prototypes for external Fortran routines */
 extern void F77_EXTERNAL_NAME(rtd_rdndf)( CHARACTER(ndfname),
                                           INTEGER(type),
@@ -492,6 +473,25 @@ int gaiaCreateNDF( const char *filename, int ndim, int lbnd[], int ubnd[],
  *  Multiple NDFs per container interface
  *  =====================================
  */
+
+/*
+ *  Structure to store information about an NDF.
+ */
+struct NDFinfo {
+      char name[MAXNDFNAME]; /*  NDF name (within file)*/
+      int ndfid;             /*  NDF identifier */
+      int ncomp;             /*  Number of data components */
+      int type;              /*  NDF data type (as bitpix) */
+      int nx;                /*  First dimension of NDF */
+      int ny;                /*  Second dimension of NDF */
+      int readonly;          /*  Readonly access */
+      int havevar;           /*  Variance component exists */
+      int havequal;          /*  Quality array exists */
+      char *header;          /*  Pointer to FITS headers */
+      int hlen;              /*  Length of header */
+      struct NDFinfo *next;  /*  Pointer to next NDF with displayables */
+};
+typedef struct NDFinfo NDFinfo;
 
 /*
  *   Name:
@@ -1360,82 +1360,4 @@ int gaiaNDFQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
     }
     emsRlse();
     return TCL_OK;
-}
-
-/**
- * Query the equivalent world coordinate of a pixel coordinate along the
- * given axis.
- *
- * Returns a coordinate value in *coord that may be formatted and trailed by
- * the axis units and label. The position along the axis is identified using
- * ncoords pixel coordinates, where ncoords must match the dimensionality of
- * the NDF (at least up to ncoords axes, axes beyond that are handled as
- * dummies). The coordinate returned is matched to the requested axis by being
- * the coordinate with the largest change wrt to a single pixel step. We need
- * to use this logic as the relationship between the NDF axes and the world
- * coordinates may not be straight-forward. Note that the value returned by
- * the coord argument should be immediately copied.
- */
-int gaiaNDFQueryCoord( int ndfid, int axis, double *coords, int trailed,
-                       int formatted, int ncoords, char **coord,
-                       char **error_mess )
-{
-    AstFrameSet *frameSet = NULL;
-    char *domain;
-    int current;
-    int base;
-    int i;
-    int nframes;
-    int pixel;
-    int result;
-    int status = SAI__OK;
-
-    emsMark();
-
-    /*  Get the NDF FrameSet */
-    ndfGtwcs( ndfid, &frameSet, &status );
-    if ( status != SAI__OK ) {
-        *error_mess = gaiaUtilsErrMessage();
-        emsRlse();
-        *coord = NULL;
-        return TCL_ERROR;
-    }
-
-    /*  Find the PIXEL domain. */
-    current = astGetI( frameSet, "Current" );
-    base = astGetI( frameSet, "Base" );
-    nframes = astGetI( frameSet, "Nframe" );
-    pixel = 0;
-    for ( i = 1; i <= nframes; i++ ) {
-        astSetI( frameSet, "Current", i );
-        domain = (char *)astGetC( frameSet, "Domain" );
-        if ( strcasecmp( domain, "PIXEL" ) == 0 ) {
-            pixel = i;
-            break;
-        }
-    }
-    astSetI( frameSet, "Current", current );
-    if ( pixel == 0 ) {
-        frameSet = (AstFrameSet *) astAnnul( frameSet );
-        *error_mess = strdup( "Cannot locate the PIXEL domain" );
-        *coord = NULL;
-        emsRlse();
-        return TCL_ERROR;
-    }
-
-    /*  This becomes the BASE frame. */
-    astSetI( frameSet, "Base", pixel );
-
-    /* Do the transformation */
-    result = gaiaUtilsQueryCoord( frameSet, axis, coords, trailed, formatted,
-                                  ncoords, coord, error_mess );
-
-    /*  Restore the base frame. */
-    astSetI( frameSet, "Base", base );
-    frameSet = (AstFrameSet *) astAnnul( frameSet );
-    emsRlse();
-    if ( !astOK ) {
-        astClearStatus;
-    }
-    return result;
 }
