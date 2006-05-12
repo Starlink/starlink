@@ -27,26 +27,26 @@
 *     structures, this application is sufficiently general to examine
 *     almost all HDS structures or objects.  The examination may also
 *     be written to a text file as well as being reported to the user.
-
+*
 *     For the specified ADAM data-system object (X) there are three
 *     cases which are handled:
-
+*
 *     1) X is a primitive object. The value, or the first and last few
 *        values of X are listed.
-
+*
 *     2) X is a structure.  The contents of the structure are
 *        listed. If a component is encountered which is itself a
 *        structure then its contents are listed down to a level of six
 *        nested structures.
-
+*
 *     3) X is an array of structures.  All elements will be listed
 *        if parameter FULL is set to TRUE; only the first element will
 *        be listed when parameter FULL is set to FALSE (default).
 *        Arrays of structures nested six deep can be listed.
-
+*
 *     Listings are in the following order: name; dimensions, if any;
 *     type; and value or comment.  Comments are enclosed in braces.
-
+*
 *     The values are normally listed at the end of each line, but may
 *     start on a new line.  The maximum number of lines of data values
 *     may also be set.  For all but the smallest arrays where the values
@@ -59,7 +59,7 @@
 *     is also used for long character values where there is only room
 *     to show the first and last few characters.  Bad values appear as
 *     asterisks.
-
+*
 *     The exact layout may be adjusted and is controlled by four
 *     additional parameters: a) the indentation of the type string with
 *     respect to the beginning of the name string; b) indentation of the
@@ -130,6 +130,13 @@
 *        examination.  Otherwise the format is 80 characters wide.
 *        [FALSE]
 
+*  Notes:
+*     This application allows far more flexibility in layout than
+*     earlier applications like LS and the original TRACE, though the
+*     order of the attributes of an object has been fixed and
+*     rearranged for standardisation, particularly for documentation
+*     purposes.  
+
 *  Algorithm:
 *     Get a locator to the HDS object
 *     If no error then
@@ -153,12 +160,25 @@
 *        Tidy up the HDS object.
 *     Endif
 
-*  Notes:
-*     This application allows far more flexibility in layout than
-*     earlier applications like LS and the original TRACE, though the
-*     order of the attributes of an object has been fixed and
-*     rearranged for standardisation, particularly for documentation
-*     purposes.  
+*  Copyright:
+*     Copyright (C) 1989, 1991-1993 Science & Engineering Research
+*     Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -189,9 +209,6 @@
 *        Renamed to HDSTRACE from TRACE to avoid a name clash on UNIX
 *        systems.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

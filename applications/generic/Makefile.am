@@ -11,6 +11,7 @@ nodist_include_HEADERS = DCV_FUN
 dist_staretc_DATA = $(AUX_FILES)
 
 dist_starnews_DATA = generic.news
+dist_pkgdata_DATA = LICENCE
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
