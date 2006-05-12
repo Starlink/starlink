@@ -231,6 +231,14 @@ itcl::class gaia::GaiaSpectralPlot {
       add_menu_short_help $Options {Axes font} \
          {Change the font used for axes labelling} \
 
+      #  If we have a GaiaSpecCoords instance use that to create a menu for
+      #  selecting a coordinate system.
+      if { $itk_option(-speccoords) != {} } {
+         set SpectralCoords [add_menubutton "Coords" left]
+         configure_menubutton "Coords" -underline 0
+         $itk_option(-speccoords) configure -menu $SpectralCoords
+      }
+
       #  Create the canvas. Pack inside a frame so that we can get the resize
       #  events and the new geometry to get the apparent size of canvas right.
       itk_component add canvasframe {
@@ -565,6 +573,10 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  The font to use when drawing the axes (AST integer).
    itk_option define -axes_font axes_font Axes_Font 0
+
+   #  A GaiaSpecCoords object for controlling the coordinate systems.
+   #  Actual control is handled by the GaiaCube instance.
+   itk_option define -speccoords speccoords SpecCoords {}
 
    #  Protected variables: (available to instance)
    #  --------------------

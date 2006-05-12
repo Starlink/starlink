@@ -350,6 +350,13 @@ itcl::class gaia::GaiaNDAccess {
       return 0
    }
 
+   #  Apply a strings of AST attributes to the WCS component of the dataset.
+   public method astset {attribs} {
+      set wcs [${type_}::getwcs $handle_]
+      return [gaiautils::astset $wcs $attribs]
+   }
+
+
    #  Configuration options: (public variables)
    #  ----------------------
 

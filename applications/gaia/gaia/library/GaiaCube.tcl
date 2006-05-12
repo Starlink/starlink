@@ -154,6 +154,13 @@ itcl::class gaia::GaiaCube {
       add_menu_short_help $Options {Enable SPLAT}  \
          {Enabled sending spectra to SPLAT (double click)}
 
+      #  Add the coordinate selecttion menu.
+      set SpectralCoords [add_menubutton "Coords" left]
+      configure_menubutton "Coords" -underline 0
+      set spec_coords_ [GaiaSpecCoords \#auto \
+                           -menu $SpectralCoords \
+                           -change_cmd [code $this coords_changed_]]
+
       #  Add window help.
       add_help_button cube "On Window..."
       add_short_help $itk_component(menubar).help \
@@ -607,6 +614,9 @@ itcl::class gaia::GaiaCube {
 
          #  Display spectra on mouse click.
          add_bindings_
+
+         #  Set up object to control units.
+         $spec_coords_ configure -accessor $cubeaccessor_ -axis 3
       }
    }
 
@@ -665,8 +675,25 @@ itcl::class gaia::GaiaCube {
          set trail [lassign $vlu value]
          $itk_component(indextype) configure -value $trail
 
+         #  Set up object to control units.
+         $spec_coords_ configure -axis $axis_
+
          set plane_ $plane_min_
          set_display_plane_ [expr ( $plane_max_ + $plane_min_ ) / 2] 1
+      }
+   }
+
+   #  Handle a change in the coordinate system. This requires all the local
+   #  coordinates to be udpated. Same as changing the axis, but without an
+   #  actual change.
+   protected method coords_changed_ {} {
+      set value $axis_
+      incr axis_
+      set_step_axis_ $value
+      if { $spectrum_ != {} } {
+         if { $last_cxcy_ != {} } {
+            eval display_spectrum_ localstart $last_cxcy_
+         }
       }
    }
 
@@ -1030,6 +1057,9 @@ itcl::class gaia::GaiaCube {
    # drag), or update during a drag.
    protected method display_spectrum_ {action cx cy} {
 
+      #  Retain coordinates for a possible update.
+      set last_cxcy_ "$cx $cy"
+
       #  Convert click coordinates from canvas coords to grid coords.
       set ccx [$itk_option(-canvas) canvasx $cx]
       set ccy [$itk_option(-canvas) canvasy $cy]
@@ -1040,6 +1070,7 @@ itcl::class gaia::GaiaCube {
          #  window to save real estate.
          set spectrum_ [GaiaSpectralPlot $w_.specplot \
                            -number $itk_option(-number) \
+                           -speccoords [code $spec_coords_] \
                            -shorthelpwin [scope $short_help_win_]]
 
          #  Make this a transient of main window, not this one.
@@ -1344,6 +1375,12 @@ itcl::class gaia::GaiaCube {
    #  GaiaImagePanel object used in the main window. Forced to update to
    #  reveal the slice information.
    protected variable rtdctrl_info_ {}
+
+   #  Object for controlling the spectral coordinates.
+   protected variable spec_coords_ {}
+
+   #  Last cx and cy values used in to open a spectrum.
+   protected variable last_cxcy_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

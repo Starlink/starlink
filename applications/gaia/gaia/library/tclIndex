@@ -100,6 +100,7 @@ set auto_index(::gaia::StarArdAnnPixel) [list source [file join $dir StarArdAnnP
 set auto_index(::gaia::StarArdRotBox) [list source [file join $dir StarArdRotBox.tcl]]
 set auto_index(::gaia::GaiaImagePrint) [list source [file join $dir GaiaImagePrint.tcl]]
 set auto_index(::gaia::GaiaAstGrid) [list source [file join $dir GaiaAstGrid.tcl]]
+set auto_index(::gaia::GaiaSpecCoords) [list source [file join $dir GaiaSpecCoords.tcl]]
 set auto_index(::gaia::GaiaApPhotom) [list source [file join $dir GaiaApPhotom.tcl]]
 set auto_index(::gaia::LabelFileChooser) [list source [file join $dir LabelFileChooser.tcl]]
 set auto_index(::gaia::GaiaEspSelectListEditor) [list source [file join $dir GaiaEspSelectListEditor.tcl]]
