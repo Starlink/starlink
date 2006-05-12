@@ -59,14 +59,17 @@
 #        If the DISPLAY variable cannot be set in this way, then an error will
 #        result. Not required on Apple OS X.
 #     HTX_BROWSER
-#        An optional command which will be used to invoke the WWW browser. This
-#        should contain a string corresponding to one of the supported WWW
-#        browsers (currently firefox, mozilla, netscape, safari and Mosaic) in
-#        order that the browser being used can be recognised. If this variable
-#        is not defined, then each of the browsers will be checked, see
-#        findbrowser for the priority used. If it is not recognised, then an
-#        error will result. On Apple OS X the default browser will be used if
-#        HTX_BROWSER is not set.
+#        This should be used to select the web browser to be used
+#        to view documents.  The variable should contain a string corresponding
+#        to one of the supported WWW browsers (currently firefox,
+#        mozilla, netscape and Mosaic) in order that the browser
+#        being used can be recognised. If this variable is not
+#        defined, then each of the browsers will be checked: see
+#        findbrowser for the priority used.  If it is not recognised,
+#        then an error will result.  On Mac OS X the system default
+#        browser will be used if HTX_BROWSER is not set; if it is
+#        set, it should be set to the application name of the chosen
+#        browser (eg, 'Safari'), not a path.
 #     HTX_SCRIPT
 #        The name of the script originally invoked by the user. This is used
 #        in the generation of warning and error messages.
@@ -180,9 +183,10 @@
 #  Mac OS X
 #  --------
 #  If this is an OSX system the "open" command will do all the heavy lifting
-#  for us and will let us use the system default browser.
+#  for us and will let us use the system default browser (match OS X
+#  and OS X Server).
 
-      if test -f /usr/bin/sw_vers && test "`/usr/bin/sw_vers -productName`" = 'Mac OS X'; then
+      if test -f /usr/bin/sw_vers && expr "`/usr/bin/sw_vers -productName`" : 'Mac OS X' >/dev/null; then
 
 #  Manage scratch file space.
 #  -------------------------
@@ -235,10 +239,12 @@
 #  warning messages on OS X.
          echo "Sending document to ${HTX_BROWSER} WWW browser..."
 	
-         if test -z $HTX_BROWSER; then
+         if test -z "$HTX_BROWSER"; then
+             echo open $url
              open $url
          else
-             open -a ${HTX_BROWSER} $url
+             echo open -a "${HTX_BROWSER}" $url
+             open -a "${HTX_BROWSER}" $url
          fi
 #  OS X stops here. The job is done.
 	 exit
