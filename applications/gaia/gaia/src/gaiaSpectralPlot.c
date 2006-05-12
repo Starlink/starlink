@@ -88,12 +88,12 @@ typedef struct SPItem  {
     double x, y;                /* Coordinates of item reference point */
     double xborder;             /* Fractional border for X plot axes, only
                                  * used when autoscaling using scale command */
-    double xmax;                /* Maximum physical X coordinate for plot */
-    double xmin;                /* Minimum physical X coordinate for plot */
+    double xleft;               /* Right-hand physical X coordinate for plot */
+    double xright;              /* Left-hand physical X coordinate for plot */
     double yborder;             /* Fractional border for Y plot axes, only
                                  * used when autoscaling using scale command */
-    double ymax;                /* Maximum physical Y coordinate for plot */
-    double ymin;                /* Minimum physical Y coordinate for plot */
+    double ybot;                /* Physical Y coordinate for plot top */
+    double ytop;                /* Physical Y coordinate for plot bottom */
     int fixedscale;             /* If set do not scale item with canvas */
     int isDSB;                  /* Spectral coordinates are dual sideband */
     int linewidth;              /* Width of polyline */
@@ -489,8 +489,8 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         spPtr->numPoints = nel;
 
         /* Read in data and work out limits */
-        spPtr->ymax = -DBL_MAX;
-        spPtr->ymin =  DBL_MAX;
+        spPtr->ytop = -DBL_MAX;
+        spPtr->ybot =  DBL_MAX;
 
         if ( adr == 0 ) {
             /* Read doubles from each word */
@@ -500,8 +500,8 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                     return TCL_ERROR;
                 }
                 if ( spPtr->dataPtr[i] != spPtr->badvalue ) {
-                    spPtr->ymin = MIN( spPtr->ymin, spPtr->dataPtr[i] );
-                    spPtr->ymax = MAX( spPtr->ymax, spPtr->dataPtr[i] );
+                    spPtr->ybot = MIN( spPtr->ybot, spPtr->dataPtr[i] );
+                    spPtr->ytop = MAX( spPtr->ytop, spPtr->dataPtr[i] );
                 }
             }
         }
@@ -515,8 +515,8 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             dataPtr = spPtr->dataPtr;
             for ( i = 0; i < nel; i++ ) {
                 if ( *dataPtr != spPtr->badvalue ) {
-                    spPtr->ymin = MIN( spPtr->ymin, *dataPtr );
-                    spPtr->ymax = MAX( spPtr->ymax, *dataPtr );
+                    spPtr->ybot = MIN( spPtr->ybot, *dataPtr );
+                    spPtr->ytop = MAX( spPtr->ytop, *dataPtr );
                 }
                 dataPtr++;
             }
@@ -525,15 +525,15 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         /* Check if data has no range, in that case just add +/- 1, so we can
          * plot something. During interactive updates that's better than
          * throwing an error. */
-        if ( spPtr->ymin == spPtr->ymax ) {
+        if ( spPtr->ybot == spPtr->ytop ) {
             /* No range */
-            spPtr->ymin -= 1.0;
-            spPtr->ymax += 1.0;
+            spPtr->ybot -= 1.0;
+            spPtr->ytop += 1.0;
         }
-        else if ( spPtr->ymin == DBL_MAX ) {
+        else if ( spPtr->ybot == DBL_MAX ) {
             /* All bad */
-            spPtr->ymin = -1.0;
-            spPtr->ymax =  1.0;
+            spPtr->ybot = -1.0;
+            spPtr->ytop =  1.0;
         }
 
     }
@@ -701,13 +701,13 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         /* Set the limits of the drawing region in physical coordinates. Note
          * these are in the BASE frame of the frameset, not CURRENT
          * coordinates */
-        xin[0] = spPtr->xmin;
-        xin[1] = spPtr->xmax;
-        yin[0] = spPtr->ymin;
-        yin[1] = spPtr->ymax;
+        xin[0] = spPtr->xleft;
+        xin[1] = spPtr->xright;
+        yin[0] = spPtr->ybot;
+        yin[1] = spPtr->ytop;
 #if DEBUG
-        fprintf( stderr, "xmin etc: %f,%f,%f,%f\n", spPtr->xmin, spPtr->ymin,
-                 spPtr->xmax, spPtr->ymax );
+        fprintf( stderr, "xleft etc: %f,%f,%f,%f\n", spPtr->xleft, spPtr->ybot,
+                 spPtr->xright, spPtr->ytop );
 #endif
 
         astTran2( spPtr->framesets[1], 2, xin, yin, 0, xout, yout );
@@ -717,10 +717,10 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         basebox[3] = yout[1];
 
         /* If the transformation fails, take a stab at some useful values. */
-        if ( basebox[0] == AST__BAD ) basebox[0] = spPtr->xmax;
-        if ( basebox[1] == AST__BAD ) basebox[1] = spPtr->ymin;
-        if ( basebox[2] == AST__BAD ) basebox[2] = spPtr->xmin;
-        if ( basebox[3] == AST__BAD ) basebox[3] = spPtr->ymax;
+        if ( basebox[0] == AST__BAD ) basebox[0] = spPtr->xright;
+        if ( basebox[1] == AST__BAD ) basebox[1] = spPtr->ybot;
+        if ( basebox[2] == AST__BAD ) basebox[2] = spPtr->xleft;
+        if ( basebox[3] == AST__BAD ) basebox[3] = spPtr->ytop;
         if ( ! astOK ) astClearStatus;
 
 #if DEBUG
@@ -1228,28 +1228,36 @@ static void GeneratePlotFrameSet( SPItem *spPtr )
     astTran1( spPtr->framesets[0], spPtr->numPoints, tmpPtr, 1,
               spPtr->coordPtr );
 
-    /* Set the axis range. */
-    spPtr->xmin = DBL_MAX;
-    spPtr->xmax = -DBL_MAX;
+    /* Set the axis range, pick first non-BAD values from ends (spectrum must
+     * be monotonic, so this is OK and keeps the natural order which can be
+     * actually be min to max or max to min). */
+    spPtr->xleft = DBL_MAX;
+    spPtr->xright = -DBL_MAX;
     for ( i = 0; i < spPtr->numPoints; i++ ) {
         if ( spPtr->coordPtr[i] != spPtr->badvalue ) {
-            spPtr->xmin = MIN( spPtr->xmin, spPtr->coordPtr[i] );
-            spPtr->xmax = MAX( spPtr->xmax, spPtr->coordPtr[i] );
+            spPtr->xleft = spPtr->coordPtr[i];
+            break;
+        }
+    }
+    for ( i = spPtr->numPoints - 1; i >= 0; i-- ) {
+        if ( spPtr->coordPtr[i] != spPtr->badvalue ) {
+            spPtr->xright = spPtr->coordPtr[i];
+            break;
         }
     }
 
     /* Check if coordinates have no range, in that case just add +/- 1, so we
      * can plot something. During interactive updates that's better than
      * throwing an error. */
-    if ( spPtr->xmin == spPtr->xmax ) {
+    if ( spPtr->xleft == spPtr->xright ) {
         /* No range */
-        spPtr->xmin -= 1.0;
-        spPtr->xmax += 1.0;
+        spPtr->xleft -= 1.0;
+        spPtr->xright += 1.0;
     }
-    else if ( spPtr->xmin == DBL_MAX ) {
+    else if ( spPtr->xleft == DBL_MAX ) {
         /* All bad */
-        spPtr->xmin = -1.0;
-        spPtr->xmax =  1.0;
+        spPtr->xleft = -1.0;
+        spPtr->xright =  1.0;
     }
 }
 
