@@ -18,7 +18,7 @@
 *     A number of values are read from the object and coded into one
 *     or more text lines in a concise manner.  The information may
 *     be written to an ASCII file.
-
+*
 *     The values are normally listed at the end of one line, but may
 *     start on a new line.  The maximum number of lines of data values
 *     may also be set.  For all but the smallest arrays where the values
@@ -28,7 +28,7 @@
 *     the line above with the ellipsis notation to indicate any missing
 *     values.  Note the number of elements shown depends on the number
 *     of characters that will fit on the line.
-
+*
 *     The reporting of values of character arrays may be formatted in
 *     one of two ways. One is that character-array-element values are
 *     concatenated to fill the available space and may span lines.
@@ -38,7 +38,7 @@
 *     values appears (for readability) at the end of previous line,
 *     rather than the beginning of the line containing the value of the
 *     last element.) In both formats, elements are delimited by commas.
-
+*
 *     If only a substring can be fitted into the space available then
 *     the ellipsis notation is used before the closing quotation mark
 *     to indicate this fact.
@@ -68,10 +68,6 @@
 *        The line of text to be output.
 *     STATUS = INTEGER( UPDATE )
 *        The global status.
-
-*  Prior requirements:
-*     -  The ASCII file associated with descriptor FD must already be
-*     opened.
 
 *  Algorithm:
 *     If status is bad then return
@@ -160,6 +156,30 @@
 *     Endif
 *     End
 
+*  Prior Requirements:
+*     -  The ASCII file associated with descriptor FD must already be
+*     opened.
+
+*  Copyright:
+*     Copyright (C) 1983, 1989, 1991 Science & Engineering Research
+*     Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
 *     JRG: Jack Giddings (UCL)
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -177,9 +197,6 @@
 *     1991 January 30 (MJC):
 *        Converted to the SST prologue.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 

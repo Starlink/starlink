@@ -24,6 +24,7 @@ TESTS = hdtest
 dist_check_SCRIPTS = hdtest
 
 dist_starnews_DATA = hdstrace.news
+dist_pkgdata_DATA = LICENCE
 
 EXTRA_DIST = hdstrace_test.sdf $(HELP_SOURCES)
 

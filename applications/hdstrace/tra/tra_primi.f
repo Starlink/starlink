@@ -20,7 +20,7 @@
 *     Puts out information and values for the primitive object with
 *     specified locator via the message system, or optionally written to
 *     an ASCII file.
-
+*
 *     The information comprises name, dimensions, type and value(s). See
 *     TRA_PUTx for details of the formatting options and layout.
 
@@ -59,10 +59,6 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Prior requirements:
-*     -  The ASCII file associated with file descriptor FD must be
-*     open.
-
 *  Algorithm:
 *     If no error on entry then
 *        Initialise message line, with indentation.
@@ -75,6 +71,30 @@
 *        Output the line as the only token in a message.
 *        If file output then output line to the log
 *     Endif
+
+*  Prior Requirements:
+*     -  The ASCII file associated with file descriptor FD must be
+*     open.
+
+*  Copyright:
+*     Copyright (C) 1984, 1989, 1991 Science & Engineering Research
+*     Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     DB: Dave Baines (ROE)
@@ -96,9 +116,6 @@
 *     1991 January 30 (MJC):
 *        Converted to the SST prologue.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
 
