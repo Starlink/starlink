@@ -40,12 +40,21 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <tcl.h>
 #include <ndf.h>
 #include "gaiaNDF.h"
 #include "gaiaHDS.h"
 #include "gaiaArray.h"
+#include "gaiaUtils.h"
+
+/* Struct for information associated with an identifier */
+struct NDFinfo {
+    int ndfid;             /* The NDF identifier */
+    AstFrameSet *wcs;      /* Full AST frameset for WCS */
+};
+typedef struct NDFinfo NDFinfo;
 
 /* Local prototypes */
 static int gaiaNDFTclBounds( ClientData clientData, Tcl_Interp *interp,
@@ -69,7 +78,11 @@ static int gaiaNDFTclOpen( ClientData clientData, Tcl_Interp *interp,
 static int gaiaNDFTclUnMap( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 
-static int importNdfIdentifier( Tcl_Interp *interp, Tcl_Obj *obj, int *indf );
+static int importNdfHandle( Tcl_Interp *interp, Tcl_Obj *obj, NDFinfo **info );
+static long exportNdfHandle( int ndfid, AstFrameSet *wcs );
+static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords, 
+                          int trailed, int formatted, int ncoords, 
+                          char **coord, char **error_mess );
 
 /**
  * Register all the NDF access commands.
@@ -120,13 +133,14 @@ int Ndf_Init( Tcl_Interp *interp )
 }
 
 /*
- * Import an NDF identifier from a Tcl_Obj. Returns TCL_ERROR if fails.
+ * Import an NDF back from a Tcl_Obj. Returns TCL_ERROR if fails.
  */
-static int importNdfIdentifier( Tcl_Interp *interp, Tcl_Obj *obj, int *indf )
+static int importNdfHandle( Tcl_Interp *interp, Tcl_Obj *obj, NDFinfo **info  )
 {
     Tcl_Obj *resultObj;
+    long adr;
 
-    if ( Tcl_GetIntFromObj( interp, obj, indf ) != TCL_OK ) {
+    if ( Tcl_GetLongFromObj( interp, obj, &adr ) != TCL_OK ) {
 
         /* Replace result with our message */
         resultObj = Tcl_GetObjResult( interp );
@@ -135,19 +149,35 @@ static int importNdfIdentifier( Tcl_Interp *interp, Tcl_Obj *obj, int *indf )
                                 (char *)NULL );
         return TCL_ERROR;
     }
+
+    /* Cast to a local NDFinfo struct */
+    *info = (NDFinfo *) adr;
     return TCL_OK;
 }
 
 /**
- * Open an NDF. The result is an NDF identifier (integer)
+ * Export an NDF identifier and return an NDFinfo struct.
+ */
+static long exportNdfHandle( int ndfid, AstFrameSet *wcs )
+{
+    NDFinfo *info = (NDFinfo *) malloc( sizeof( NDFinfo ) );
+
+    info->ndfid = ndfid;
+    info->wcs = wcs;
+
+    return (long) info;
+}
+
+/**
+ * Open an NDF. The result is the address of an NDFinfo struct.
  */
 static int gaiaNDFTclOpen( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] )
 {
+    Tcl_Obj *resultObj;
     char *error_mess;
     char *name;
-    int indf;
-    Tcl_Obj *resultObj;
+    int ndfid;
 
     /* Check arguments, only allow one, the filename */
     if ( objc != 2 ) {
@@ -160,8 +190,8 @@ static int gaiaNDFTclOpen( ClientData clientData, Tcl_Interp *interp,
 
     /* And open it */
     resultObj = Tcl_GetObjResult( interp );
-    if ( gaiaNDFOpen( name, &indf, &error_mess ) == TCL_OK ) {
-        Tcl_SetIntObj( resultObj, indf );
+    if ( gaiaNDFOpen( name, &ndfid, &error_mess ) == TCL_OK ) {
+        Tcl_SetLongObj( resultObj, exportNdfHandle( ndfid, NULL ) );
         return TCL_OK;
     }
     Tcl_SetStringObj( resultObj, error_mess, -1 );
@@ -170,7 +200,7 @@ static int gaiaNDFTclOpen( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Create a 2D NDF. The result is an NDF identifier (integer) opened for write
+ * Create a 2D NDF. The result is a handle to an NDF opened for write
  * access. Requires the data type, upper and lower bounds (two sets) and an
  * optional WCS (pointer to an ASTFrameSet, set to 0 for default WCS).
  */
@@ -220,7 +250,7 @@ static int gaiaNDFTclCreate( ClientData clientData, Tcl_Interp *interp,
     /* And create it and return the NDF identifier. */
     resultObj = Tcl_GetObjResult( interp );
     if ( gaiaCreateNDF( name, 2, lbnd, ubnd, type, wcs, &indf, &error_mess) ) {
-        Tcl_SetIntObj( resultObj, indf );
+        Tcl_SetLongObj( resultObj, exportNdfHandle( indf, wcs ) );
         return TCL_OK;
     }
     Tcl_SetStringObj( resultObj, error_mess, -1 );
@@ -229,25 +259,28 @@ static int gaiaNDFTclCreate( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Close an NDF.
+ * Close an NDF. Also frees the associated handle.
  */
 static int gaiaNDFTclClose( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] )
 {
-    int indf;
+    NDFinfo *info;
     int result;
 
-    /* Check arguments, only allow one, the ndf identifier */
+    /* Check arguments, only allow one, the NDF handle*/
     if ( objc != 2 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "ndf_identifier" );
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle" );
         return TCL_ERROR;
     }
 
-    /* Get the identifier */
-    result = importNdfIdentifier( interp, objv[1], &indf );
+    /* Get the NDF */
+    result = importNdfHandle( interp, objv[1], &info );
     if ( result == TCL_OK ) {
         /* Close NDF */
-        result = gaiaNDFClose( &indf );
+        result = gaiaNDFClose( &info->ndfid );
+        
+        /* Free the handle */
+        free( info );
     }
     return result;
 }
@@ -261,34 +294,34 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
                           int objc, Tcl_Obj *CONST objv[] )
 {
     ARRAYinfo *arrayInfo;
+    NDFinfo *ndfInfo;
     char *access;
     char *error_mess;
     char *error_mess2;
     char ctype[NDF__SZTYP+1];
     int el;
-    int indf;
     int oldmmap;
     int mmap;
     int result;
     int type;
     void *dataPtr;
 
-    /* Check arguments, allow two, the ndf identifier and whether to use file
+    /* Check arguments, allow two, the ndf handle and whether to use file
      * mapping, if using file mapping then the access mode is used (READ,
      * UPDATE or WRITE)  */
     if ( objc != 4 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "ndf_identifier ?usemmap? access" );
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle ?usemmap? access" );
         return TCL_ERROR;
     }
 
-    /* Get the identifier */
-    result = importNdfIdentifier( interp, objv[1], &indf );
+    /* Get the NDF */
+    result = importNdfHandle( interp, objv[1], &ndfInfo );
     if ( result == TCL_OK ) {
 
         /* Mmap mode. */
         result = Tcl_GetBooleanFromObj( interp, objv[2], &mmap );
         if ( result == TCL_OK ) {
-            result = gaiaNDFType( indf, "DATA", ctype, NDF__SZTYP+1,
+            result = gaiaNDFType( ndfInfo->ndfid, "DATA", ctype, NDF__SZTYP+1,
                                   &error_mess );
             type = gaiaArrayHDSType( ctype );
             if ( result == TCL_OK ) {
@@ -303,8 +336,8 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
 
                 /* Map data */
                 access = Tcl_GetString( objv[3] );
-                result = gaiaNDFMap( indf, ctype, access, "DATA", &dataPtr,
-                                     &el, &error_mess  );
+                result = gaiaNDFMap( ndfInfo->ndfid, ctype, access, 
+                                     "DATA", &dataPtr, &el, &error_mess );
 
                 /* Restore default MAP mode */
                 if ( gaiaHDSTune( "MAP", oldmmap, &error_mess2 ) != TCL_OK ) {
@@ -337,23 +370,23 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
 static int gaiaNDFTclUnMap( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] )
 {
+    NDFinfo *info;
     char *error_mess;
-    int indf;
     int result;
     long adr;
 
-    /* Check arguments, need two, the ndf identifier and ARRAYinfo address */
+    /* Check arguments, need two, the ndf handle and ARRAYinfo addresses */
     if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "ndf_identifier address" );
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle arrayinfo_address" );
         return TCL_ERROR;
     }
 
-    /* Get the identifier */
-    result = importNdfIdentifier( interp, objv[1], &indf );
+    /* Get the NDF */
+    result = importNdfHandle( interp, objv[1], &info);
     if ( result == TCL_OK ) {
 
         /* Unmap */
-        result = gaiaNDFUnmap( indf, "DATA", &error_mess );
+        result = gaiaNDFUnmap( info->ndfid, "DATA", &error_mess );
         if ( result != TCL_OK ) {
             Tcl_SetResult( interp, error_mess, TCL_VOLATILE );
             free( error_mess );
@@ -373,30 +406,32 @@ static int gaiaNDFTclUnMap( ClientData clientData, Tcl_Interp *interp,
 static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] )
 {
-    AstFrameSet *iwcs;
+    NDFinfo *info;
     Tcl_Obj *resultObj;
     char *error_mess;
-    int indf;
     int result;
 
-    /* Check arguments, only allow one the ndf identifier */
+    /* Check arguments, only allow one the ndf handle */
     if ( objc != 2 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "ndf_identifier" );
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle" );
         return TCL_ERROR;
     }
 
-    /* Get the identifier */
-    if( importNdfIdentifier( interp, objv[1], &indf ) != TCL_OK ) {
+    /* Get the NDF */
+    if( importNdfHandle( interp, objv[1], &info ) != TCL_OK ) {
         return TCL_ERROR;
     }
     resultObj = Tcl_GetObjResult( interp );
 
-    /* Get WCS */
-    result = gaiaNDFGtWcs( indf, &iwcs, &error_mess );
+    /* Get WCS, this is cached as the NDF library returns a copy each time so
+     * any changes will be lost */
+    if ( info->wcs == NULL ) {
+        result = gaiaNDFGtWcs( info->ndfid, &info->wcs, &error_mess );
+    }
 
     /* Export the WCS as a long containing the address */
     if ( result == TCL_OK ) {
-        Tcl_SetLongObj( resultObj, (long) iwcs );
+        Tcl_SetLongObj( resultObj, (long) info->wcs );
     }
     else {
         Tcl_SetStringObj( resultObj, error_mess, -1 );
@@ -411,24 +446,24 @@ static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
 static int gaiaNDFTclCGet( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] )
 {
+    NDFinfo *info;
     Tcl_Obj *resultObj;
     char *error_mess;
     char value[NDF__SZHIS+1];
-    int indf;
     int result;
 
-    /* Check arguments, need 2 the ndf identifier and the component */
+    /* Check arguments, need 2 the ndf handle and the component */
     if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "ndf_identifier component" );
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle component" );
         return TCL_ERROR;
     }
 
-    /* Get the identifier */
-    result = importNdfIdentifier( interp, objv[1], &indf );
+    /* Get the NDF */
+    result = importNdfHandle( interp, objv[1], &info );
     if ( result == TCL_OK ) {
         resultObj = Tcl_GetObjResult( interp );
         value[0] = '\0';
-        result = gaiaNDFCGet( indf, Tcl_GetString( objv[2] ), value,
+        result = gaiaNDFCGet( info->ndfid, Tcl_GetString( objv[2] ), value,
                               NDF__SZHIS+1, &error_mess );
         if ( result == TCL_OK ) {
             Tcl_SetStringObj( resultObj, value, -1 );
@@ -448,27 +483,27 @@ static int gaiaNDFTclCGet( ClientData clientData, Tcl_Interp *interp,
 static int gaiaNDFTclDims( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] )
 {
+    NDFinfo *info;
     Tcl_Obj *resultObj;
     char *error_mess;
     int i;
-    int indf;
     int dims[NDF__MXDIM];
     int ndim;
     int result;
     int trunc;
-
-    /* Check arguments, need the ndf identifier and whether to trim redundant
+    
+    /* Check arguments, need the ndf handle and whether to trim redundant
      * axes. */
     if ( objc != 2 && objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "ndf_identifier [?trunc?]" );
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle [?trunc?]" );
         return TCL_ERROR;
     }
 
-    /* Get the NDF identifier */
-    result = importNdfIdentifier( interp, objv[1], &indf );
+    /* Get the NDF */
+    result = importNdfHandle( interp, objv[1], &info );
     if ( result == TCL_OK ) {
         resultObj = Tcl_GetObjResult( interp );
-        result = gaiaNDFQueryDims( indf, NDF__MXDIM, dims, &ndim,
+        result = gaiaNDFQueryDims( info->ndfid, NDF__MXDIM, dims, &ndim,
                                    &error_mess );
         if ( result == TCL_OK ) {
 
@@ -509,29 +544,29 @@ static int gaiaNDFTclDims( ClientData clientData, Tcl_Interp *interp,
 static int gaiaNDFTclBounds( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] )
 {
+    NDFinfo *info;
     Tcl_Obj *resultObj;
     char *error_mess;
     int i;
-    int indf;
     int lbnd[NDF__MXDIM];
     int ndim;
     int result;
     int trunc;
     int ubnd[NDF__MXDIM];
 
-    /* Check arguments, need the ndf identifier and whether to trim redundant
+    /* Check arguments, need the ndf handle and whether to trim redundant
      * axes. */
     if ( objc != 2 && objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "ndf_identifier [?trunc?]" );
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle [?trunc?]" );
         return TCL_ERROR;
     }
 
-    /* Get the NDF identifier */
-    result = importNdfIdentifier( interp, objv[1], &indf );
+    /* Get the NDF */
+    result = importNdfHandle( interp, objv[1], &info );
     if ( result == TCL_OK ) {
         resultObj = Tcl_GetObjResult( interp );
-        result = gaiaNDFQueryBounds( indf, NDF__MXDIM, lbnd, ubnd, &ndim,
-                                     &error_mess );
+        result = gaiaNDFQueryBounds( info->ndfid, NDF__MXDIM, lbnd, ubnd, 
+                                     &ndim, &error_mess );
         if ( result == TCL_OK ) {
 
             /* Need to truncate? */
@@ -569,7 +604,7 @@ static int gaiaNDFTclBounds( ClientData clientData, Tcl_Interp *interp,
 /**
  * Return the coordinate of a position along a given axis.
  *
- * The second argument is the NDF identifier, the third the index of the axis,
+ * The second argument is the NDF handle, the third the index of the axis,
  * and the fourth a list of all the pixel indices needed to identify the
  * coordinate (so the list must have a number for each dimension of the NDF if
  * that isn'r true then any extra dimensions will be given the coordinate
@@ -580,6 +615,7 @@ static int gaiaNDFTclBounds( ClientData clientData, Tcl_Interp *interp,
 static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] )
 {
+    NDFinfo *info;
     Tcl_Obj **listObjv;
     Tcl_Obj *resultObj;
     char *coord;
@@ -588,20 +624,19 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
     int axis;
     int format;
     int i;
-    int indf;
     int ncoords;
     int result;
     int trailed;
 
     /* Check arguments */
     if ( objc != 6 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "ndf_identifier axis \
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle axis \
                           {c1 c2 .. cn} ?trail_units? ?format?" );
         return TCL_ERROR;
     }
 
-    /* Import NDF identifier */
-    result = importNdfIdentifier( interp, objv[1], &indf );
+    /* Import NDF  */
+    result = importNdfHandle( interp, objv[1], &info );
     if ( result == TCL_OK ) {
 
         /* Next arguments are the axis that the coordinate is required for
@@ -636,10 +671,16 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
 
                 resultObj = Tcl_GetObjResult( interp );
                 if ( result != TCL_ERROR ) {
-                    result = gaiaNDFQueryCoord( indf, axis, coords,
-                                                trailed, format,
-                                                ncoords, &coord,
-                                                &error_mess );
+                    if ( info->wcs == NULL ) {
+                        result = gaiaNDFGtWcs( info->ndfid, &info->wcs, 
+                                               &error_mess );
+                    }
+
+                    /* Do the transformation */
+                    result = queryNdfCoord( info->wcs, axis, coords,
+                                            trailed, format, ncoords,
+                                            &coord, &error_mess );
+
                     if ( result == TCL_OK ) {
                         Tcl_SetStringObj( resultObj, coord, -1 );
                     }
@@ -656,6 +697,60 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
         else {
             result = TCL_ERROR;
         }
+    }
+    return result;
+}
+
+/**
+ * Query the equivalent world coordinate of a pixel coordinate along the given
+ * axis. Selects the PIXEL domain from the frameSet (which must therefore be
+ * from an NDF) and works with that as the BASE domain.
+ */
+static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords, 
+                          int trailed, int formatted, int ncoords, 
+                          char **coord, char **error_mess )
+{
+    char *domain;
+    int current;
+    int base;
+    int i;
+    int nframes;
+    int pixel;
+    int result;
+
+    /*  Find the PIXEL domain. */
+    current = astGetI( frameSet, "Current" );
+    base = astGetI( frameSet, "Base" );
+    nframes = astGetI( frameSet, "Nframe" );
+    pixel = 0;
+    for ( i = 1; i <= nframes; i++ ) {
+        astSetI( frameSet, "Current", i );
+        domain = (char *)astGetC( frameSet, "Domain" );
+        if ( strcasecmp( domain, "PIXEL" ) == 0 ) {
+            pixel = i;
+            break;
+        }
+    }
+    astSetI( frameSet, "Current", current );
+    if ( pixel == 0 ) {
+        frameSet = (AstFrameSet *) astAnnul( frameSet );
+        *error_mess = strdup( "Cannot locate the PIXEL domain" );
+        *coord = NULL;
+        return TCL_ERROR;
+    }
+
+    /*  This becomes the BASE frame. */
+    astSetI( frameSet, "Base", pixel );
+
+    /* Do the transformation */
+    result = gaiaUtilsQueryCoord( frameSet, axis, coords, trailed, formatted,
+                                  ncoords, coord, error_mess );
+
+    /*  Restore the base frame. */
+    astSetI( frameSet, "Base", base );
+
+    if ( !astOK ) {
+        astClearStatus;
     }
     return result;
 }
