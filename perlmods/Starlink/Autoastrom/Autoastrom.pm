@@ -1352,6 +1352,9 @@ sub solve {
 
 # We cannot do automated astrometry corrections if we have fewer
 # than 2 objects, so croak if we do.
+  if( ! defined( $ndfcat ) ) {
+    croak "Catalog of extracted objects is undefined";
+  }
   if( $ndfcat->sizeof < 2 ) {
     croak "Only detected " . $ndfcat->sizeof . " objects in " . $self->ndf . ". Cannot perform automated astrometry corrections with so few objects";
   }
