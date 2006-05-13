@@ -1,11 +1,25 @@
-*+  UFACE_PWHLP - output help
       SUBROUTINE UFACE_PWHLP ( TOPIC, LIBRARY, FLAG, STATUS)
-*    Description :
+*+
+*  Name:
+*     UFACE_PWHLP
+
+*  Purpose:
+*     Output help
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     SUBROUTINE
+
+*  Invocation:
+*     CALL UFACE_PWHLP (TOPIC, LIBRARY, FLAG, STATUS)
+
+*  Description:
 *     Outputs help information to the terminal using the portable help
 *     system
-*    Invocation :
-*     CALL UFACE_PWHLP (TOPIC, LIBRARY, FLAG, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     LIBRARY=CHARACTER*(*) (given)
 *            the help library to be accessed. which
 *            must be as described in SUN 124.3.
@@ -15,42 +29,64 @@
 *            non-zero if help library search is required
 *     STATUS =INTEGER       (given and returned)
 *            status
-*    Method :
+
+*  Algorithm:
 *     Use system-dependent routine UFACE_SCRNSZ to obtain the
 *     width and height of the screen or window being used.
 *     Call HLP_HELP specifying routine UFACE_OPUT and UFACE_IPUT
 *     to handle line output and topic prompts respectively. Use the
 *     FLAG argument to determine if it is required to stay in the help
 *     system or return immediately.
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*     A. J. Chipperfield  (RLVAD::AJC)
-*     K. F. Hartley (kfh@uk.ac.rl.inf)
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1992-1994 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     AJC: A. J. Chipperfield  (RLVAD::AJC)
+*     KFG: K. F. Hartley (kfh@uk.ac.rl.inf)
+*     {enter_new_authors_here}
+
+*  History:
 *     19-MAY-1992 (AJC):
-*      Original copy of SUBPAR_PWHLP
-*      with SUBPAR changed to UFACE and SUP to UFC
-*      and change HLP_OUTHLP to HLP_HELP etc
+*       Original copy of SUBPAR_PWHLP
+*       with SUBPAR changed to UFACE and SUP to UFC
+*       and change HLP_OUTHLP to HLP_HELP etc
 *     09-DEC-1993 (AJC):
-*      For Unix comment out SCREEN sizing
+*       For Unix comment out SCREEN sizing
 *     15-FEB-1994 (AJC):
-*      Report library name if error
-*      {enter changes here}
-*    endhistory
-*    Type Definitions :
+*       Report library name if error
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
 
 *    Global constants
       INCLUDE 'SAE_PAR'
       INCLUDE 'UFACE_ERR'
-*    Import :
+*  Arguments Given:
       CHARACTER*(*)  TOPIC,LIBRARY
       INTEGER FLAG
 
-*    Status :
+*  Status:
       INTEGER        STATUS
 
 *    External references :
@@ -61,10 +97,10 @@
       EXTERNAL       UFACE_NAMETR
       external hlp_nametr
 
-*    Global Variables :
+*  Global Variables:
       INCLUDE 'UFACE_CMN'
 
-*    Local variables :
+*  Local Variables:
       INTEGER        FLAGS          ! Flags for HELP routine
       INTEGER        SCREEN_WIDTH   ! Screen width
       INTEGER        ISTAT          ! Local status

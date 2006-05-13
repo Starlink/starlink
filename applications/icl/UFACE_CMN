@@ -1,14 +1,63 @@
-*+  UFACE_CMN - UFACE common block for terminal i/o.
-*   JAC::REVA 23May84
-*   02.04.1985:  UFACE version (REVAD::BDK)
-*   18.12.1985:  add LOGSTATE for controlling logging and SHTASK for 
-*                controlling display of taskname (REVAD::BDK)
-*   19.12.1985:  add LOGFILE, LOGON, EAVESON and EAVESFILE (REVAD::BDK)
-*   20.06.1986:  add VMS_BATCH (REVAD::BDK)
-*   01.06.1990:  add LCOUNT and PAGSIZ (RLVAD::AJC)
-*   19.05.1992:  rename LCOUNT and PAGSIZ (RLVAD::AJC)
-*    9.12.1993:  Mod for Unix - make TERMCHAN INTEGER not INTEGER*2
-*                               Remove IOSB (RLVAD::AJC)
+*+
+*  Name:
+*     UFACE_CMN
+
+*  Purpose:
+*     UFACE common block for terminal i/o.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     COMMON BLOCK
+
+*  Copyright:
+*     Copyright (C) 1984-1986, 1990, 1992-1993 Science & Engineering
+*     Research Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     JAC::REVA
+*     BDK: Dennis Kelly (ROE)
+*     AJC: Alan Chipperfield (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     23-MAY-1984 (JAC::REVA):
+*      Original.
+*     02-APR-1985 (REVAD::BDK):
+*        UFACE version
+*     18-DEC-1985 (BDK):
+*        Add LOGSTATE for controlling logging and SHTASK for
+*        controlling display of taskname.
+*     19-DEC-1985 (REVAD::BDK):
+*        Add LOGFILE, LOGON, EAVESON and EAVESFILE
+*     20-JUN-1986 (REVAD::BDK):
+*        Add VMS_BATCH
+*     01-JUN-1990 (RLVAD::AJC):
+*        Add LCOUNT and PAGSIZ
+*     19-MAY-1992 (RLVAD::AJC):
+*        Rename LCOUNT and PAGSIZ
+*     09-DEC-1993 (RLVAD::AJC):
+*        Mod for Unix - make TERMCHAN INTEGER not INTEGER*2
+*        Remove IOSB.
+*     {enter_further_changes_here}
+
 *-
       INTEGER TERMCHAN         !  terminal input channel
 
