@@ -92,19 +92,6 @@
 #include "messys_err.h"
 /* Own include file */
 #include "icl_io.h"
-/*
- * dummy functions to stop the loader complaining about missing cnf functions
- * which we don't need! BKM
- */
-void cnf_imprt(void) {
-    fprintf(stderr, "used dummy cnf_imprt() in icl_io.o - check code!\n");
-    abort();
-
-}
-void cnf_exprt(void) {
-    fprintf(stderr, "used dummy cnf_exprt() in icl_io.o - check code!\n");
-    abort();
-}
 
 /* forward reference function delarations */
 void initscreen(int);
