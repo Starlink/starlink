@@ -41,7 +41,8 @@
 *  Description:
 *     Returns an NDF identifier for the specified NDF. A new NDF is
 *     created if necessary. If an error occurs a value of NDF__NOID is
-*     returned.
+*     returned. It is up to the user to annul the NDF returned by this
+*     routine.
 
 * Notes:
 *     - Note that if the named NDF exists, opening it with WRITE access
@@ -128,7 +129,12 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
   }
 
   /* Note: write access clears the contents of the NDF */
+  if ( strncmp( accmode, "WRITE", 5 ) == 0 ) {
+    msgOutif( MSG__VERB, FUNC_NAME, "Opening NDF with WRITE access: this will clear the current contents if the NDF exists.", status);
+  }
   ndfOpen( loc, name, accmode, state, &ndfid, &place, status );
+
+  /* What if accmode = READ? */
 
   /* Define properties of NDF */
   ndfNew( dattype, ndims, lbnd, ubnd, &place, &ndfid, status );
