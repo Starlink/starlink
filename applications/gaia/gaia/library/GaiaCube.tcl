@@ -154,12 +154,12 @@ itcl::class gaia::GaiaCube {
       add_menu_short_help $Options {Enable SPLAT}  \
          {Enabled sending spectra to SPLAT (double click)}
 
-      #  Add the coordinate selecttion menu.
+      #  Add the coordinate selection menu.
       set SpectralCoords [add_menubutton "Coords" left]
       configure_menubutton "Coords" -underline 0
       set spec_coords_ [GaiaSpecCoords \#auto \
-                           -menu $SpectralCoords \
                            -change_cmd [code $this coords_changed_]]
+      $spec_coords_ add_menu $SpectralCoords
 
       #  Add window help.
       add_help_button cube "On Window..."
@@ -616,7 +616,7 @@ itcl::class gaia::GaiaCube {
          add_bindings_
 
          #  Set up object to control units.
-         $spec_coords_ configure -accessor $cubeaccessor_ -axis 3
+         $spec_coords_ configure -axis 3 -accessor $cubeaccessor_
       }
    }
 
@@ -676,7 +676,7 @@ itcl::class gaia::GaiaCube {
          $itk_component(indextype) configure -value $trail
 
          #  Set up object to control units.
-         $spec_coords_ configure -axis $axis_
+         $spec_coords_ configure -axis $axis_ -accessor $cubeaccessor_
 
          set plane_ $plane_min_
          set_display_plane_ [expr ( $plane_max_ + $plane_min_ ) / 2] 1
@@ -1070,7 +1070,7 @@ itcl::class gaia::GaiaCube {
          #  window to save real estate.
          set spectrum_ [GaiaSpectralPlot $w_.specplot \
                            -number $itk_option(-number) \
-                           -speccoords [code $spec_coords_] \
+                           -spec_coords [code $spec_coords_] \
                            -shorthelpwin [scope $short_help_win_]]
 
          #  Make this a transient of main window, not this one.

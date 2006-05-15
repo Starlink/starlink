@@ -49,12 +49,18 @@ extern "C" {
 #include "gaiaUtils.h"
 
 /* Local prototypes */
-static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
-                               int objc, Tcl_Obj *CONST objv[] );
-static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
-                             int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstTest( ClientData clientData, Tcl_Interp *interp,
+                             int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
+                             int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsUrlGet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 
@@ -63,6 +69,22 @@ static int GaiaUtilsUrlGet( ClientData clientData, Tcl_Interp *interp,
  */
 int GaiaUtils_Init( Tcl_Interp *interp )
 {
+    Tcl_CreateObjCommand( interp, "gaiautils::astget", GaiaUtilsAstGet,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::astset", GaiaUtilsAstSet,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::asttest", GaiaUtilsAstTest,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::frameisa", GaiaUtilsFrameIsA,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
     Tcl_CreateObjCommand( interp, "gaiautils::get2dwcs", GaiaUtilsGt2DWcs,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
@@ -71,14 +93,172 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "gaiautils::astset", GaiaUtilsAstSet,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
-
     Tcl_CreateObjCommand( interp, "gaiautils::urlget", GaiaUtilsUrlGet,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
+    return TCL_OK;
+}
+
+/**
+ * Get the value of an AST attribute from a FrameSet.
+ *
+ * There are two arguments, the address of the AST FrameSet and the attribute.
+ */
+static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrameSet *wcs;
+    long adr;
+    const char *value;
+
+    /* Check arguments, only allow two. */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset attribute" );
+        return TCL_ERROR;
+    }
+
+    /* Get the frameset */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    wcs = (AstFrameSet *) adr;
+
+    /* Get the value */
+    value = astGetC( wcs, Tcl_GetString( objv[2] ) );
+    if ( ! astOK ) {
+        astClearStatus;
+        Tcl_SetResult( interp, "Failed to get AST attribute", TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+    Tcl_SetResult( interp, (char *) value, TCL_VOLATILE );
+    return TCL_OK;
+}
+
+/**
+ * Apply AST attributes to a FrameSet.
+ *
+ * There are two arguments, the address of the AST FrameSet and the attributes
+ * string ("option=value,option=value" etc.).
+ */
+static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrameSet *wcs;
+    long adr;
+
+    /* Check arguments, only allow two. */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset attributes" );
+        return TCL_ERROR;
+    }
+
+    /* Get the frameset */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    wcs = (AstFrameSet *) adr;
+
+    /* Set the attributes */
+    astSet( wcs, Tcl_GetString( objv[2] ) );
+    if ( ! astOK ) {
+        astClearStatus;
+        Tcl_SetResult( interp, "Failed to set AST attribute", TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+/**
+ * Test if the value of an AST attribute has been set.
+ *
+ * There are two arguments, the address of the AST FrameSet and the attribute.
+ */
+static int GaiaUtilsAstTest( ClientData clientData, Tcl_Interp *interp,
+                             int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrameSet *wcs;
+    long adr;
+    int test;
+
+    /* Check arguments, only allow two. */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset attribute" );
+        return TCL_ERROR;
+    }
+
+    /* Get the frameset */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    wcs = (AstFrameSet *) adr;
+
+    /* Do the test, an error equals not set */
+    test = astTest( wcs, Tcl_GetString( objv[2] ) );
+    if ( ! astOK ) {
+        astClearStatus;
+        test = 0;
+    }
+    Tcl_SetObjResult( interp, Tcl_NewBooleanObj( test ) );
+    return TCL_OK;
+}
+
+/**
+ * Check if a given AST FrameSet has an axis of a given frame type.
+ *
+ * Note we only support a pre-defined set of comparison frame types,
+ * at present these are "specframe" and "fluxframe".
+ */
+static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrame *picked;
+    AstFrameSet *wcs;
+    char *type;
+    int axes[1];
+    int axis;
+    int isa;
+    long adr;
+
+    /* Check arguments, only allow three, the frameset, axis and object type */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset axis object_type" );
+        return TCL_ERROR;
+    }
+
+    /* Get the frameset */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    wcs = (AstFrameSet *) adr;
+
+    /* Get the axis (AST index) */
+    if ( Tcl_GetIntFromObj( interp, objv[2], &axis ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    axes[0] = axis;
+    picked = (AstFrame *) astPickAxes( wcs, 1, axes, NULL );
+
+    /* Check type and do compare */
+    type = Tcl_GetString( objv[3] );
+    isa = 0;
+    if ( strcmp( type, "specframe" ) == 0 ) {
+        isa = astIsASpecFrame( picked );
+    }
+    else if ( strcmp( type, "dsbspecframe" ) == 0 ) {
+        isa = astIsADSBSpecFrame( picked );
+    }
+    else if ( strcmp( type, "fluxframe" ) == 0 ) {
+        isa = astIsAFluxFrame( picked );
+    }
+    else {
+        Tcl_SetResult( interp, "not a known frame type", TCL_VOLATILE );
+        astAnnul( picked );
+        return TCL_ERROR;
+    }
+
+    Tcl_SetObjResult( interp, Tcl_NewBooleanObj( isa ) );
+    astAnnul( picked );
     return TCL_OK;
 }
 
@@ -180,7 +360,7 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
     long adr;
 
     /* Check arguments, only allow three, the frameset and an axis number, plus
-     * offset */ 
+     * offset */
     if ( objc != 4 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "frameset axis offset" );
         return TCL_ERROR;
@@ -214,37 +394,6 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
     return result;
 }
 
-/**
- * Apply AST options to a FrameSet.
- *
- * There are two arguments, the address of the AST FrameSet and the options
- * string ("option=value,option=value" etc.).
- */
-static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
-                            int objc, Tcl_Obj *CONST objv[] )
-{
-    AstFrameSet *wcs;
-    long adr;
-    
-    /* Check arguments, only allow two. */
-    if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "frameset options_string" );
-        return TCL_ERROR;
-    }
-
-    /* Get the frameset */
-    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
-        return TCL_ERROR;
-    }
-    wcs = (AstFrameSet *) adr;
-
-    /* Set the options */
-    astSet( wcs, Tcl_GetString( objv[2] ) );
-    if ( ! astOK ) {
-        return TCL_ERROR;
-    }
-    return TCL_OK;
-}
 
 /**
  * Get a file from a specified URL and return its content as the result.
@@ -274,3 +423,4 @@ static int GaiaUtilsUrlGet( ClientData clientData, Tcl_Interp *interp,
     }
     return TCL_ERROR;
 }
+

@@ -233,10 +233,10 @@ itcl::class gaia::GaiaSpectralPlot {
 
       #  If we have a GaiaSpecCoords instance use that to create a menu for
       #  selecting a coordinate system.
-      if { $itk_option(-speccoords) != {} } {
+      if { $itk_option(-spec_coords) != {} } {
          set SpectralCoords [add_menubutton "Coords" left]
          configure_menubutton "Coords" -underline 0
-         $itk_option(-speccoords) configure -menu $SpectralCoords
+         $itk_option(-spec_coords) add_menu $SpectralCoords
       }
 
       #  Create the canvas. Pack inside a frame so that we can get the resize
@@ -576,7 +576,7 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  A GaiaSpecCoords object for controlling the coordinate systems.
    #  Actual control is handled by the GaiaCube instance.
-   itk_option define -speccoords speccoords SpecCoords {}
+   itk_option define -spec_coords spec_coords Spec_Coords {}
 
    #  Protected variables: (available to instance)
    #  --------------------

@@ -356,6 +356,24 @@ itcl::class gaia::GaiaNDAccess {
       return [gaiautils::astset $wcs $attribs]
    }
 
+   #  Get the value of an AST attribute.
+   public method astget {attrib} {
+      set wcs [${type_}::getwcs $handle_]
+      return [gaiautils::astget $wcs $attrib]
+   }
+
+   #  Test if the value of an AST attribute has been set.
+   public method asttest {attrib} {
+      set wcs [${type_}::getwcs $handle_]
+      return [gaiautils::asttest $wcs $attrib]
+   }
+
+   #  See if the axes of the dataset frameset is a known frametype. These
+   #  can be "specframe", "fluxframe" and "dsbspecframe".
+   public method isaxisframetype {axis type} {
+      set wcs [${type_}::getwcs $handle_]
+      return [gaiautils::frameisa $wcs $axis $type]
+   }
 
    #  Configuration options: (public variables)
    #  ----------------------

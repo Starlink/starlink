@@ -9,11 +9,17 @@
 #     Control the spectral coordinates of an AST FrameSet.
 
 #  Description:
-#     This class currently creates a menu populated with preset selections for
-#     the various coordinates systems that the spectral axis of a AST FrameSet
-#     might take (assuming the FrameSet contains an axis with has a
-#     SpecFrame). The FrameSet is accessed using an GaiaNDAccess instance.
 
+#     This class populates menus with preset selections for the various
+#     coordinates systems that the spectral axis of a AST FrameSet might take
+#     (assuming the FrameSet contains an axis with has a SpecFrame). The
+#     FrameSet is accessed using an GaiaNDAccess instance.
+#
+#     The disposition of the menu items can be changed to match those of 
+#     a new GaiaNDAccess instance (these will be greyed by setting to
+#     disabled when the axis of the FrameSet is not a SpecFrame and 
+#     the velocity items with be greyed if a rest frequency has not been
+#     defined).
 
 #  Invocations:
 #
@@ -87,8 +93,8 @@ itcl::class gaia::GaiaSpecCoords {
    #  ------------
    constructor {args} {
 
-      #  Evaluate any options, should include the menu we're to populate, the
-      #  GaiaNDAccess instance and the spectral axis index.
+      #  Evaluate any options, normally the initial GaiaNDAccess instance and
+      #  the spectral axis index. 
       eval configure $args
    }
 
@@ -101,12 +107,62 @@ itcl::class gaia::GaiaSpecCoords {
    #  Methods:
    #  --------
 
+   #  Add a menu to manage and configure it.
+   public method add_menu {menu} {
+      lappend menus_ $menu
+      populate_menu_ $menu
+      reconfigure_menus_
+   }
+
    #  Add items to a menu so that a known coordinate system can be selected.
-   protected method configure_menu_ {} {
+   protected method populate_menu_ {menu} {
       if { $menu != {} } {
-         foreach {descr unit system} $systems_ {
+         foreach {descr unit system} $simplesystems_ {
             $menu add command -label "$descr" \
                -command [code $this set_selected_system_ "$unit" "$system"]
+         }
+         foreach {descr unit system} $velocitysystems_ {
+            $menu add command -label "$descr" \
+               -command [code $this set_selected_system_ "$unit" "$system"]
+         }
+      }
+   }
+
+   #  Reconfigure all the managed menus to reflect the coordinates available
+   #  in the attached AST FrameSet. This disables items that cannot be applied
+   #  (a SpecFrame is required and a rest frequency for transformation to
+   #  velocities) and updates the default system.
+   protected method reconfigure_menus_ {} {
+      if { $menus_ != {} && $accessor != {} } {
+
+         #  Check if WCS a SpecFrame and has a rest frequency
+         set isaspecframe [$accessor isaxisframetype $axis "specframe"]
+         if { $isaspecframe } {
+            set haverestfreq [$accessor asttest "RestFreq($axis)"]
+         } else {
+            set haverestfreq 0
+         }
+
+         foreach menu $menus_ {
+            if { $isaspecframe } {
+               foreach {descr unit system} $simplesystems_ {
+                  $menu entryconfigure "$descr" -state normal
+               }
+            } else {
+               foreach {descr unit system} $simplesystems_ {
+                  $menu entryconfigure "$descr" -state disabled
+               }
+            }
+
+            if { $isaspecframe && $haverestfreq } {
+               foreach {descr unit system} $velocitysystems_ {
+                  $menu entryconfigure "$descr" -state normal
+               }
+            } else {
+               foreach {descr unit system} $velocitysystems_ {
+                  $menu entryconfigure "$descr" -state disabled
+               }
+            }
          }
       }
    }
@@ -125,29 +181,29 @@ itcl::class gaia::GaiaSpecCoords {
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  Define a menu to populate with items for selecting a coordinate system.
-   public variable menu {} {
-      configure_menu_
+   #  The GaiaNDAccess instance. Will cause the menus to be reconfigured.
+   public variable accessor {} {
+      reconfigure_menus_
    }
-
-   #  The GaiaNDAccess instance.
-   public variable accessor {}
 
    #  The spectral axis (AST index).
    public variable axis 3
 
-   #  A command to execute when the spectral coordinates are changed.
+   #  A command to execute when a spectral coordinate system is selected.
    public variable change_cmd {}
 
    #  Protected variables: (available to instance)
    #  --------------------
 
+   #  The menus we're managing. A simple list of names.
+   protected variable menus_ {}
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  List of the possible spectral coordinates. These are presented to the
-   #  user as units only. The system is assumed.
-   common systems_ {
+   #  List of the possible spectral coordinates, excluding velocities. 
+   #  These are presented to the user as units only. The system is assumed.
+   common simplesystems_ {
       "Angstroms" "Angstrom" "WAVE"
       "Nanometres" "nm" "WAVE"
       "Millimetres" "mm" "WAVE"
@@ -160,8 +216,13 @@ itcl::class gaia::GaiaSpecCoords {
       "Ergs" "erg" "ENER"
       "Electron-volts" "eV" "ENER"
       "Kilo-electron-volts" "keV" "ENER"
+      "Per-metre" "1/m" "WAVN"
+   }
+
+   #  List of the possible spectral coordinates involving velocities. 
+   #  These are presented to the user as units only. The system is assumed.
+   common velocitysystems_ {
       "Metres-per-sec (radio)" "m/s" "VRAD"
       "Kilometres-per-sec (radio)" "km/s" "VRAD"
-      "Per-metre" "1/m" "WAVN"
    }
 }
