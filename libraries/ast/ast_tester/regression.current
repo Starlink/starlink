@@ -1,9 +1,3 @@
-AST version  4.1- 0
-PutCards Ncards =  7
-PutCards Card =  1
-PutCards Card =  8
-PutCards Ncards =  7
-PutCards Card =  1
  Begin FitsChan 	# I/O channels to FITS files
     Card = 1 	# Index of current card
 #   Encod = "NATIVE" 	# Encoding system
@@ -34,16 +28,6 @@ PutCards Card =  1
     Nm7 = "        " 	# FITS keyword name
     Ty7 = "comment" 	# FITS keyword data type
  End FitsChan
- 
- 
- 
- 
- FITS test number  1
- ====================
- 
- 
- 
-AST_SHOW:
  Begin FrameSet 	# Set of inter-related coordinate systems
 #   Title = "IAU (1958) galactic coordinates; zenithal equal area projection" 	# Title of coordinate system
 #   Naxes = 2 	# Number of coordinate axes
@@ -107,6 +91,7 @@ AST_SHOW:
     Map2 = 	# Mapping between nodes 1 and 2
        Begin CmpMap 	# Compound Mapping
           Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
        IsA Mapping 	# Mapping between coordinate systems
           MapA = 	# First component Mapping
              Begin WinMap 	# Map one window on to another
@@ -166,31 +151,22 @@ AST_SHOW:
                                         Invert = 0 	# Mapping not inverted
                                      IsA Mapping 	# Mapping between coordinate systems
                                         M0 = 0.291480364581799 	# Forward matrix value
-                                        M1 = 0.506505471460186 	# Forward matrix value
-                                        M2 = -0.811474832908671 	# Forward matrix value
-                                        M3 = 0.171224898552328 	# Forward matrix value
-                                        M4 = -0.862236746712233 	# Forward matrix value
-                                        M5 = -0.476686298035564 	# Forward matrix value
-                                        M6 = -0.941127638091139 	# Forward matrix value
-                                        M7 = 0 	# Forward matrix value
-                                        M8 = -0.338051429254475 	# Forward matrix value
-                                        Form = "Full" 	# Matrix storage form
-                                     End MatrixMap
-                                  MapB = 	# Second component Mapping
-                                     Begin SphMap 	# Cartesian to Spherical mapping
-                                        Nin = 3 	# Number of input coordinates
-                                        Nout = 2 	# Number of output coordinates
-                                        Invert = 0 	# Mapping not inverted
-                                     IsA Mapping 	# Mapping between coordinate systems
-                                        UntRd = 1 	# All input vectors have unit length
-                                        PlrLg = -2.61046557479594 	# Polar longitude (rad.s)
-                                     End SphMap
-                               End CmpMap
-                         End CmpMap
-                   End CmpMap
-             End CmpMap
-       End CmpMap
- End FrameSet
+                                        M1 = 0.506505471460186 	# AST version  4.2- 1
+PutCards Ncards =  7
+PutCards Card =  1
+PutCards Card =  8
+PutCards Ncards =  7
+PutCards Card =  1
+ 
+ 
+ 
+ 
+ FITS test number  1
+ ====================
+ 
+ 
+ 
+AST_SHOW:
  
 REG_SINK:
 SIMPLE  =                    T / Written by IDL:  30-Jul-1997 05:35:42.00       
@@ -295,6 +271,7 @@ ENDAST_F= 'SkyFrame'           / End of object definition
 MAP2_A  = '        '           / Mapping between nodes 1 and 2                  
 BEGAST_H= 'CmpMap  '           / Compound Mapping                               
 NIN_A   =                    2 / Number of input coordinates                    
+ISSIMP_A=                    1 / Mapping has been simplified                    
 ISA_C   = 'Mapping '           / Mapping between coordinate systems             
 MAPA_A  = '        '           / First component Mapping                        
 BEGAST_I= 'WinMap  '           / Map one window on to another                   
@@ -448,8 +425,8 @@ REG_LINE:  119
      2.57      -21.8    
      1.79      -21.2    
      1.02      -20.6    
-    0.247      -20.0    
-   -0.520      -19.4    
+     .247      -20.0    
+    -.520      -19.4    
     -1.28      -18.8    
     -2.04      -18.1    
     -2.79      -17.4    
@@ -512,8 +489,8 @@ REG_LINE:  119
     -3.85       172.    
     -2.83       172.    
     -1.80       173.    
-   -0.761       174.    
-    0.293       175.    
+    -.761       174.    
+     .293       175.    
      1.36       176.    
      2.43       177.    
      3.52       178.    
@@ -557,9 +534,9 @@ REG_LINE:  171
      2.95      -56.2    
      2.30      -56.5    
      1.65      -56.7    
-    0.990      -56.9    
-    0.325      -57.2    
-   -0.348      -57.3    
+     .990      -56.9    
+     .325      -57.2    
+    -.348      -57.3    
     -1.03      -57.5    
     -1.71      -57.7    
     -2.41      -57.8    
@@ -676,8 +653,8 @@ REG_LINE:  171
     -3.94       191.    
     -2.75       191.    
     -1.59       192.    
-   -0.448       192.    
-    0.669       193.    
+    -.448       192.    
+     .669       193.    
      1.76       193.    
      2.83       193.    
      3.88       193.    
@@ -786,7 +763,7 @@ REG_LINE:  171
      97.3      -10.6    
      98.4      -7.51    
      99.3      -4.31    
-     100.     -0.976    
+     100.      -.976    
      101.       2.50    
      102.       6.12    
      103.       9.88    
@@ -924,7 +901,7 @@ REG_LINE:  119
      57.5      -14.3    
      58.2      -13.5    
      58.9      -12.7    
-     68.4      0.462    
+     68.4       .462    
      76.3       17.0    
      82.3       36.5    
      85.9       58.6    
@@ -1050,9 +1027,9 @@ REG_LINE:  197
      12.5       2.24    
      11.8       1.77    
      11.0       1.26    
-     10.3      0.730    
-     9.57      0.169    
-     8.87     -0.420    
+     10.3       .730    
+     9.57       .169    
+     8.87      -.420    
      8.18      -1.04    
      7.51      -1.68    
      6.86      -2.36    
@@ -1067,12 +1044,12 @@ REG_LINE:  197
      1.89      -9.65    
      1.46      -10.6    
      1.04      -11.6    
-    0.660      -12.5    
-    0.304      -13.6    
+     .660      -12.5    
+     .304      -13.6    
    -0.240E-01  -14.6    
-   -0.322      -15.7    
-   -0.589      -16.7    
-   -0.825      -17.8    
+    -.322      -15.7    
+    -.589      -16.7    
+    -.825      -17.8    
     -1.03      -19.0    
     -1.20      -20.1    
     -1.34      -21.3    
@@ -1084,12 +1061,12 @@ REG_LINE:  197
     -1.39      -28.6    
     -1.26      -29.8    
     -1.10      -31.1    
-   -0.889      -32.3    
-   -0.640      -33.6    
-   -0.348      -34.9    
+    -.889      -32.3    
+    -.640      -33.6    
+    -.348      -34.9    
    -0.127E-01  -36.1    
-    0.365      -37.4    
-    0.787      -38.7    
+     .365      -37.4    
+     .787      -38.7    
      1.25      -39.9    
      1.76      -41.2    
      2.32      -42.4    
@@ -1178,9 +1155,9 @@ REG_LINE:  197
      44.3      -2.64    
      43.6      -1.95    
      43.0      -1.29    
-     42.3     -0.665    
+     42.3      -.665    
      41.6     -0.645E-01
-     40.9      0.508    
+     40.9       .508    
      40.2       1.05    
      39.4       1.57    
      38.7       2.05    
@@ -1248,7 +1225,7 @@ REG_LINE:  197
      4.04       40.6    
      2.75       40.0    
      1.48       39.4    
-    0.220       38.8    
+     .220       38.8    
     -1.02       38.0    
     -2.25       37.3    
     -3.47       36.5    
@@ -1277,7 +1254,7 @@ REG_LINE:  197
     -24.4       6.45    
     -24.9       4.55    
     -25.3       2.59    
-    -25.7      0.576    
+    -25.7       .576    
     -26.0      -1.49    
     -26.3      -3.62    
     -26.5      -5.81    
@@ -1305,7 +1282,7 @@ REG_LINE:  197
     -7.15      -64.5    
     -4.82      -67.0    
     -2.34      -69.3    
-    0.268      -71.5    
+     .268      -71.5    
      3.01      -73.5    
      5.87      -75.3    
      8.84      -76.9    
@@ -1349,7 +1326,7 @@ REG_LINE:  197
      77.4      -6.71    
      77.3      -4.50    
      77.0      -2.34    
-     76.7     -0.250    
+     76.7      -.250    
      76.4       1.79    
      76.0       3.76    
      75.5       5.69    
@@ -1443,7 +1420,7 @@ REG_LINE:  197
      4.95       83.0    
      3.39       82.6    
      1.83       82.2    
-    0.284       81.8    
+     .284       81.8    
     -1.25       81.3    
     -2.78       80.8    
     -4.29       80.3    
@@ -1494,7 +1471,7 @@ REG_LINE:  197
     -48.2       11.1    
     -48.1       7.50    
     -47.8       3.67    
-    -47.3     -0.401    
+    -47.3      -.401    
     -46.7      -4.73    
     -45.9      -9.33    
     -44.9      -14.2    
@@ -1661,8 +1638,8 @@ REG_LINE:  158
     -3.30       203.    
     -2.39       204.    
     -1.47       204.    
-   -0.536       205.    
-    0.410       205.    
+    -.536       205.    
+     .410       205.    
      1.37       206.    
      2.33       206.    
      3.31       207.    
@@ -1816,8 +1793,8 @@ REG_LINE:  132
     -4.88       189.    
     -3.67       190.    
     -2.36       192.    
-   -0.951       193.    
-    0.557       194.    
+    -.951       193.    
+     .557       194.    
      2.16       195.    
      3.87       197.    
      5.66       198.    
@@ -2115,7 +2092,7 @@ REG_LINE:   15
      48.1       82.5    
 REG_LINE:   15
      3.39       82.6    
-    0.284       81.8    
+     .284       81.8    
     -2.78       80.8    
     -5.80       79.7    
     -8.77       78.6    
@@ -2173,8 +2150,8 @@ REG_LINE:   93
     -3.78      -83.1    
     -2.67      -83.8    
     -1.54      -84.6    
-   -0.395      -85.3    
-    0.764      -86.0    
+    -.395      -85.3    
+     .764      -86.0    
      1.94      -86.6    
      3.13      -87.2    
      4.33      -87.8    
@@ -2326,7 +2303,7 @@ REG_LINE:   15
      5.05      -55.1    
      3.58      -55.9    
      2.08      -56.5    
-    0.548      -57.1    
+     .548      -57.1    
     -1.03      -57.5    
     -2.64      -57.8    
     -4.30      -58.0    
@@ -2354,7 +2331,7 @@ REG_LINE:   15
 REG_LINE:   15
     -44.9      -14.2    
     -47.2      -7.52    
-    -49.4     -0.109    
+    -49.4      -.109    
     -51.4       8.02    
     -53.3       16.9    
     -54.8       26.4    
@@ -2385,7 +2362,7 @@ REG_LINE:   15
     -2.36       192.    
 REG_LINE:   15
     -2.36       192.    
-    0.299       192.    
+     .299       192.    
      2.83       193.    
      5.25       193.    
      7.56       193.    
@@ -2455,7 +2432,83 @@ REG_SCALES:
 REG_QCH: 
 REG_CAP:  0
 REG_CAP:  0
-REG_CAP:  2
+Forward matrix value
+                                        M2 = -0.811474832908671 	# Forward matrix value
+                                        M3 = 0.171224898552328 	# Forward matrix value
+                                        M4 = -0.862236746712233 	# Forward matrix value
+                                        M5 = -0.476686298035564 	# Forward matrix value
+                                        M6 = -0.941127638091139 	# Forward matrix value
+                                        M7 = 0 	# Forward matrix value
+                                        M8 = -0.338051429254475 	# Forward matrix value
+                                        Form = "Full" 	# Matrix storage form
+                                     End MatrixMap
+                                  MapB = 	# Second component Mapping
+                                     Begin SphMap 	# Cartesian to Spherical mapping
+                                        Nin = 3 	# Number of input coordinates
+                                        Nout = 2 	# Number of output coordinates
+                                        Invert = 0 	# Mapping not inverted
+                                     IsA Mapping 	# Mapping between coordinate systems
+                                        UntRd = 1 	# All input vectors have unit length
+                                        PlrLg = -2.61046557479594 	# Polar longitude (rad.s)
+                                     End SphMap
+                               End CmpMap
+                         End CmpMap
+                   End CmpMap
+             End CmpMap
+       End CmpMap
+ End FrameSet
+ Begin FrameSet 	# Set of inter-related coordinate systems
+#   Title = "Pixel coordinates; first pixel at (-100.5,-200.5)" 	# Title of coordinate system
+#   Naxes = 2 	# Number of coordinate axes
+#   Domain = "POLAR" 	# Coordinate system domain
+#   Lbl1 = "Pixel coordinate 1" 	# Label for axis 1
+#   Lbl2 = "Pixel coordinate 2" 	# Label for axis 2
+#   Uni1 = "pixel" 	# Units for axis 1
+#   Uni2 = "pixel" 	# Units for axis 2
+ IsA Frame 	# Coordinate system description
+    Nframe = 2 	# Number of Frames in FrameSet
+#   Base = 1 	# Index of base Frame
+    Currnt = 2 	# Index of current Frame
+    Nod1 = 2 	# Frame 1 is associated with node 2
+    Nod2 = 1 	# Frame 2 is associated with node 1
+    Lnk2 = 1 	# Node 2 is derived from node 1
+    Frm1 = 	# Frame number 1
+       Begin Frame 	# Coordinate system description
+          Title = "Data grid indices; first pixel at (1,1)     " 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "GRID" 	# Coordinate system domain
+#         Lbl1 = "Data grid index 1" 	# Label for axis 1
+#         Lbl2 = "Data grid index 2" 	# Label for axis 2
+#         Uni1 = "pixel" 	# Units for axis 1
+#         Uni2 = "pixel" 	# Units for axis 2
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Data grid index 1" 	# Axis Label
+                Symbol = "g1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Data grid index 2" 	# Axis Label
+                Symbol = "g2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+       End Frame
+    Frm2 = 	# Frame number 2
+       Begin Frame 	# Coordinate system description
+          Title = "Pixel coordinates; first pixel at (-100.5,-200.5)" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "POLAR" 	# Coordinate system domain
+#         Lbl1 = "Pixel coordinate 1" 	# Label for axis 1
+#         Lbl2 = "Pixel coordinate 2" 	# Label for axis 2
+#         Uni1 = "pixel" 	# Units for axis 1
+#         Uni2 = "pixel" 	# Units for axis 2
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 1" 	# Axis Label
+                REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
 REG_CAP:  2
@@ -2464,7 +2517,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '240'
-     4.00       80.2     TC -0.245      0.969    
+     4.00       80.2     TC  -.245       .969    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -2482,7 +2535,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '300'
-    -32.7       57.6     TC -0.791      0.612    
+    -32.7       57.6     TC  -.791       .612    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -2500,7 +2553,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '0'
-    -42.4      -13.7     BC  0.974      0.227    
+    -42.4      -13.7     BC   .974       .227    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -2518,7 +2571,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '60'
-     92.9      -15.7     BC -0.973      0.231    
+     92.9      -15.7     BC  -.973       .231    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -2536,7 +2589,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '120'
-     84.0       57.1     TC  0.798      0.602    
+     84.0       57.1     TC   .798       .602    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -2554,7 +2607,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '180'
-     47.5       80.0     TC  0.253      0.968    
+     47.5       80.0     TC   .253       .968    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -2660,7 +2713,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '-90'
-     27.7      -30.8     TC -0.899      0.438    
+     27.7      -30.8     TC  -.899       .438    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -2678,7 +2731,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '-60'
-     10.8      -54.2     TC -0.629      0.777    
+     10.8      -54.2     TC  -.629       .777    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -2696,7 +2749,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '-30'
-    -14.2      -58.8     TC  0.374      0.927    
+    -14.2      -58.8     TC   .374       .927    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -2714,7 +2767,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '0'
-    -47.2      -15.1     TC  0.937      0.350    
+    -47.2      -15.1     TC   .937       .350    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -2732,7 +2785,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '30'
-    -50.8       126.     BC -0.960      0.278    
+    -50.8       126.     BC  -.960       .278    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -2750,7 +2803,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '60'
-    -3.21       194.     BC -0.341      0.940    
+    -3.21       194.     BC  -.341       .940    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -2768,7 +2821,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '90'
-     27.2       187.     BC  0.711      0.704    
+     27.2       187.     BC   .711       .704    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -2779,7 +2832,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: ' A FITS test'
-     31.5       225.     BC   0.00       1.00    
+     31.5       225.     BC   .000       1.00    
  
  
  
@@ -2790,97 +2843,6 @@ REG_TEXT: ' A FITS test'
  
  
 AST_SHOW:
- Begin FrameSet 	# Set of inter-related coordinate systems
-#   Title = "Pixel coordinates; first pixel at (-100.5,-200.5)" 	# Title of coordinate system
-#   Naxes = 2 	# Number of coordinate axes
-#   Domain = "POLAR" 	# Coordinate system domain
-#   Lbl1 = "Pixel coordinate 1" 	# Label for axis 1
-#   Lbl2 = "Pixel coordinate 2" 	# Label for axis 2
-#   Uni1 = "pixel" 	# Units for axis 1
-#   Uni2 = "pixel" 	# Units for axis 2
- IsA Frame 	# Coordinate system description
-    Nframe = 2 	# Number of Frames in FrameSet
-#   Base = 1 	# Index of base Frame
-    Currnt = 2 	# Index of current Frame
-    Nod1 = 2 	# Frame 1 is associated with node 2
-    Nod2 = 1 	# Frame 2 is associated with node 1
-    Lnk2 = 1 	# Node 2 is derived from node 1
-    Frm1 = 	# Frame number 1
-       Begin Frame 	# Coordinate system description
-          Title = "Data grid indices; first pixel at (1,1)     " 	# Title of coordinate system
-          Naxes = 2 	# Number of coordinate axes
-          Domain = "GRID" 	# Coordinate system domain
-#         Lbl1 = "Data grid index 1" 	# Label for axis 1
-#         Lbl2 = "Data grid index 2" 	# Label for axis 2
-#         Uni1 = "pixel" 	# Units for axis 1
-#         Uni2 = "pixel" 	# Units for axis 2
-          Ax1 = 	# Axis number 1
-             Begin Axis 	# Coordinate axis
-                Label = "Data grid index 1" 	# Axis Label
-                Symbol = "g1" 	# Axis symbol
-                Unit = "pixel" 	# Axis units
-                Format = "%3.1f" 	# Format specifier
-             End Axis
-          Ax2 = 	# Axis number 2
-             Begin Axis 	# Coordinate axis
-                Label = "Data grid index 2" 	# Axis Label
-                Symbol = "g2" 	# Axis symbol
-                Unit = "pixel" 	# Axis units
-                Format = "%3.1f" 	# Format specifier
-             End Axis
-       End Frame
-    Frm2 = 	# Frame number 2
-       Begin Frame 	# Coordinate system description
-          Title = "Pixel coordinates; first pixel at (-100.5,-200.5)" 	# Title of coordinate system
-          Naxes = 2 	# Number of coordinate axes
-          Domain = "POLAR" 	# Coordinate system domain
-#         Lbl1 = "Pixel coordinate 1" 	# Label for axis 1
-#         Lbl2 = "Pixel coordinate 2" 	# Label for axis 2
-#         Uni1 = "pixel" 	# Units for axis 1
-#         Uni2 = "pixel" 	# Units for axis 2
-          Ax1 = 	# Axis number 1
-             Begin Axis 	# Coordinate axis
-                Label = "Pixel coordinate 1" 	# Axis Label
-                Symbol = "p1" 	# Axis symbol
-                Unit = "pixel" 	# Axis units
-                Format = "%3.1f" 	# Format specifier
-             End Axis
-          Ax2 = 	# Axis number 2
-             Begin Axis 	# Coordinate axis
-                Label = "Pixel coordinate 2" 	# Axis Label
-                Symbol = "p2" 	# Axis symbol
-                Unit = "pixel" 	# Axis units
-                Format = "%3.1f" 	# Format specifier
-             End Axis
-       End Frame
-    Map2 = 	# Mapping between nodes 1 and 2
-       Begin CmpMap 	# Compound Mapping
-          Nin = 2 	# Number of input coordinates
-       IsA Mapping 	# Mapping between coordinate systems
-          InvA = 1 	# First Mapping used in inverse direction
-          InvB = 1 	# Second Mapping used in inverse direction
-          MapA = 	# First component Mapping
-             Begin MathMap 	# Transformation using mathematical functions
-                Nin = 2 	# Number of input coordinates
-                Invert = 0 	# Mapping not inverted
-             IsA Mapping 	# Mapping between coordinate systems
-                Fwd1 = "r=sqrt(x*x+y*y)" 	# Forward function 1
-                Fwd2 = "theta=atan2(y,x)" 	# Forward function 2
-                Inv1 = "x=r*cos(theta)" 	# Inverse function 1
-                Inv2 = "y=r*sin(theta)" 	# Inverse function 2
-                SimpFI = 1 	# Forward-inverse pairs may simplify
-                SimpIF = 1 	# Inverse-forward pairs may simplify
-             End MathMap
-          MapB = 	# Second component Mapping
-             Begin WinMap 	# Map one window on to another
-                Nin = 2 	# Number of input coordinates
-                Invert = 0 	# Mapping not inverted
-             IsA Mapping 	# Mapping between coordinate systems
-                Sft1 = -101.5 	# Shift for axis 1
-                Sft2 = -201.5 	# Shift for axis 2
-             End WinMap
-       End CmpMap
- End FrameSet
  
 REG_SINK:
 COMMENT AST ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++    
@@ -3226,9 +3188,9 @@ REG_LINE:  197
     -2.49       85.5    
     -1.97       83.5    
     -1.42       81.6    
-   -0.838       79.7    
-   -0.219       77.8    
-    0.433       76.0    
+    -.838       79.7    
+    -.219       77.8    
+     .433       76.0    
      1.12       74.3    
      1.83       72.6    
      2.58       70.9    
@@ -3368,9 +3330,9 @@ REG_LINE:  197
      2.58       156.    
      1.83       154.    
      1.12       153.    
-    0.433       151.    
-   -0.219       149.    
-   -0.838       147.    
+     .433       151.    
+    -.219       149.    
+    -.838       147.    
     -1.42       145.    
     -1.97       143.    
     -2.49       141.    
@@ -3588,7 +3550,7 @@ REG_LINE:  197
     -21.4       110.    
     -21.3       107.    
     -21.1       103.    
-    -20.9      100.0    
+    -20.9       100.    
     -20.7       96.7    
     -20.3       93.4    
     -19.9       90.1    
@@ -3638,7 +3600,7 @@ REG_LINE:  197
     -6.47       5.99    
     -4.53       3.78    
     -2.55       1.71    
-   -0.540     -0.225    
+    -.540      -.225    
      1.51      -2.01    
      3.58      -3.65    
      5.69      -5.14    
@@ -3662,7 +3624,7 @@ REG_LINE:  197
      45.2      -5.19    
      47.3      -3.70    
      49.4      -2.07    
-     51.4     -0.290    
+     51.4      -.290    
      53.4       1.63    
      55.4       3.70    
      57.3       5.91    
@@ -3750,7 +3712,7 @@ REG_LINE:  197
      5.69       232.    
      3.58       231.    
      1.51       229.    
-   -0.540       227.    
+    -.540       227.    
     -2.55       225.    
     -4.53       223.    
     -6.47       221.    
@@ -3827,7 +3789,7 @@ REG_LINE:  197
     -33.6       11.2    
     -31.8       7.08    
     -29.8       3.06    
-    -27.8     -0.822    
+    -27.8      -.822    
     -25.7      -4.55    
     -23.6      -8.14    
     -21.4      -11.6    
@@ -3839,7 +3801,7 @@ REG_LINE:  197
     -7.04      -28.6    
     -4.49      -30.9    
     -1.89      -32.9    
-    0.740      -34.8    
+     .740      -34.8    
      3.40      -36.5    
      6.09      -37.9    
      8.81      -39.2    
@@ -3869,7 +3831,7 @@ REG_LINE:  197
      72.3      -11.7    
      74.5      -8.26    
      76.6      -4.68    
-     78.7     -0.956    
+     78.7      -.956    
      80.7       2.92    
      82.6       6.93    
      84.5       11.1    
@@ -3945,7 +3907,7 @@ REG_LINE:  197
      8.81       266.    
      6.09       265.    
      3.40       263.    
-    0.740       262.    
+     .740       262.    
     -1.89       260.    
     -4.49       258.    
     -7.04       256.    
@@ -4263,7 +4225,7 @@ REG_LINE:  128
      91.0      -61.7    
      94.1      -56.9    
      97.1      -51.9    
-    100.0      -46.7    
+     100.      -46.7    
      103.      -41.3    
      105.      -35.7    
      108.      -29.9    
@@ -4309,7 +4271,7 @@ REG_LINE:  128
      108.       257.    
      105.       263.    
      103.       268.    
-    100.0       274.    
+     100.       274.    
      97.1       279.    
      94.1       284.    
      91.0       289.    
@@ -4542,7 +4504,7 @@ REG_LINE:   63
     -14.3      -156.    
     -9.41      -159.    
     -4.52      -161.    
-    0.403      -163.    
+     .403      -163.    
      5.36      -165.    
      10.3      -166.    
      15.3      -167.    
@@ -4918,7 +4880,7 @@ REG_LINE:    2
      61.9       4.43    
 REG_LINE:    2
      62.6      -2.26    
-     63.6     -0.831    
+     63.6      -.831    
 REG_LINE:    2
      64.3      -7.52    
      65.3      -6.09    
@@ -5031,8 +4993,8 @@ REG_LINE:    2
     -73.4       19.9    
     -74.7       18.7    
 REG_LINE:    2
-    -68.3      0.672    
-    -69.4     -0.674    
+    -68.3       .672    
+    -69.4      -.674    
 REG_LINE:    2
     -55.2      -34.3    
     -56.0      -35.9    
@@ -5049,8 +5011,8 @@ REG_LINE:    2
     -9.89      -93.6    
     -10.2      -95.3    
 REG_LINE:    2
-    0.619      -99.6    
-    0.416      -101.    
+     .619      -99.6    
+     .416      -101.    
 REG_LINE:    2
      11.4      -103.    
      11.3      -105.    
@@ -5235,7 +5197,7 @@ REG_LINE:   15
      59.8       6.38    
      60.4       4.50    
      61.0       2.62    
-     61.6      0.740    
+     61.6       .740    
      62.3      -1.14    
      62.9      -3.02    
      63.5      -4.89    
@@ -5443,7 +5405,7 @@ REG_LINE:   15
      91.0      -61.7    
      94.1      -56.9    
      97.1      -51.9    
-    100.0      -46.7    
+     100.      -46.7    
      103.      -41.3    
      105.      -35.7    
      108.      -29.9    
@@ -5495,7 +5457,7 @@ REG_LINE:   15
      108.       257.    
      105.       263.    
      103.       268.    
-    100.0       274.    
+     100.       274.    
      97.1       279.    
      94.1       284.    
      91.0       289.    
@@ -5678,7 +5640,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '0.0'
-     27.8       114.     BC  0.952      0.306    
+     27.8       114.     BC   .952       .306    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -5696,7 +5658,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '50.0'
-     36.3       87.9     BC  0.952      0.306    
+     36.3       87.9     BC   .952       .306    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -5714,7 +5676,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '100.0'
-     44.7       61.6     BC  0.952      0.306    
+     44.7       61.6     BC   .952       .306    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -5732,7 +5694,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '150.0'
-     53.2       35.3     BC  0.952      0.306    
+     53.2       35.3     BC   .952       .306    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -5750,7 +5712,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '200.0'
-     61.6       9.02     BC  0.952      0.306    
+     61.6       9.02     BC   .952       .306    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -5768,7 +5730,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '250.0'
-     70.1      -17.3     BC  0.952      0.306    
+     70.1      -17.3     BC   .952       .306    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -5786,7 +5748,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '300.0'
-     78.5      -43.6     BC  0.952      0.306    
+     78.5      -43.6     BC   .952       .306    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -5804,7 +5766,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '350.0'
-     86.9      -69.9     BC  0.952      0.306    
+     86.9      -69.9     BC   .952       .306    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -5822,7 +5784,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '400.0'
-     95.4      -96.2     BC  0.952      0.306    
+     95.4      -96.2     BC   .952       .306    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -5840,7 +5802,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '450.0'
-     104.      -122.     BC  0.952      0.306    
+     104.      -122.     BC   .952       .306    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -5858,7 +5820,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '500.0'
-     112.      -149.     BC  0.952      0.306    
+     112.      -149.     BC   .952       .306    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -5876,7 +5838,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '550.0'
-     121.      -175.     BC  0.952      0.306    
+     121.      -175.     BC   .952       .306    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -6014,7 +5976,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '-3.0'
-    -80.3       82.7     BC  0.997      0.724E-01
+    -80.3       82.7     BC   .997      0.724E-01
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -6032,7 +5994,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '-2.5'
-    -59.8      -16.6     BC  0.936      0.352    
+    -59.8      -16.6     BC   .936       .352    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -6050,7 +6012,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '-2.0'
-    -18.4      -83.6     BC  0.673      0.740    
+    -18.4      -83.6     BC   .673       .740    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -6068,144 +6030,46 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '-1.5'
-     32.8      -102.     BC -0.145      0.989    
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
-REG_TEXT: '-0.5'
-     119.       9.22     BC -0.965      0.262    
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
-REG_TEXT: '0.0'
-     132.       113.     BC -1.000      0.125E-02
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
-REG_TEXT: '0.5'
-     119.       218.     TC  0.964      0.265    
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
-REG_TEXT: '1.0'
-     82.6       296.     TC  0.787      0.617    
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
-REG_TEXT: '2.5'
-    -59.8       243.     TC -0.936      0.352    
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
-REG_TEXT: '3.0'
-    -80.3       144.     TC -0.997      0.724E-01
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  1
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
-REG_TEXT: ' A FITS test'
-     31.0       313.     BC   0.00       1.00    
- 
- 
- 
- 
- FITS test number  3
- ====================
- 
- 
- 
-AST_SHOW:
+Symbol = "p1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 2" 	# Axis Label
+                Symbol = "p2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+       End Frame
+    Map2 = 	# Mapping between nodes 1 and 2
+       Begin CmpMap 	# Compound Mapping
+          Nin = 2 	# Number of input coordinates
+       IsA Mapping 	# Mapping between coordinate systems
+          InvA = 1 	# First Mapping used in inverse direction
+          InvB = 1 	# Second Mapping used in inverse direction
+          MapA = 	# First component Mapping
+             Begin MathMap 	# Transformation using mathematical functions
+                Nin = 2 	# Number of input coordinates
+                Invert = 0 	# Mapping not inverted
+             IsA Mapping 	# Mapping between coordinate systems
+                Fwd1 = "r=sqrt(x*x+y*y)" 	# Forward function 1
+                Fwd2 = "theta=atan2(y,x)" 	# Forward function 2
+                Inv1 = "x=r*cos(theta)" 	# Inverse function 1
+                Inv2 = "y=r*sin(theta)" 	# Inverse function 2
+                SimpFI = 1 	# Forward-inverse pairs may simplify
+                SimpIF = 1 	# Inverse-forward pairs may simplify
+             End MathMap
+          MapB = 	# Second component Mapping
+             Begin WinMap 	# Map one window on to another
+                Nin = 2 	# Number of input coordinates
+                Invert = 0 	# Mapping not inverted
+             IsA Mapping 	# Mapping between coordinate systems
+                Sft1 = -101.5 	# Shift for axis 1
+                Sft2 = -201.5 	# Shift for axis 2
+             End WinMap
+       End CmpMap
+ End FrameSet
  Begin FrameSet 	# Set of inter-related coordinate systems
 #   Title = "FK5 equatorial coordinates; mean equinox J2000.0; gnomonic projection" 	# Title of coordinate system
 #   Naxes = 2 	# Number of coordinate axes
@@ -6272,6 +6136,7 @@ AST_SHOW:
     Map2 = 	# Mapping between nodes 1 and 2
        Begin CmpMap 	# Compound Mapping
           Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
        IsA Mapping 	# Mapping between coordinate systems
           MapA = 	# First component Mapping
              Begin WinMap 	# Map one window on to another
@@ -6320,38 +6185,144 @@ AST_SHOW:
                                   Invert = 1 	# Mapping inverted
                                IsA Mapping 	# Mapping between coordinate systems
                                   UntRd = 1 	# All input vectors have unit length
-                                  PlrLg = 0 	# Polar longitude (rad.s)
-                               End SphMap
-                            MapB = 	# Second component Mapping
-                               Begin CmpMap 	# Compound Mapping
-                                  Nin = 3 	# Number of input coordinates
-                                  Nout = 2 	# Number of output coordinates
-                               IsA Mapping 	# Mapping between coordinate systems
-                                  MapA = 	# First component Mapping
-                                     Begin MatrixMap 	# Matrix transformation
-                                        Nin = 3 	# Number of input coordinates
-                                        Invert = 0 	# Mapping not inverted
-                                     IsA Mapping 	# Mapping between coordinate systems
-                                        M0 = -1 	# Forward matrix value
-                                        M1 = 1 	# Forward matrix value
-                                        M2 = -1 	# Forward matrix value
-                                        Form = "Diagonal" 	# Matrix storage form
-                                     End MatrixMap
-                                  MapB = 	# Second component Mapping
-                                     Begin SphMap 	# Cartesian to Spherical mapping
-                                        Nin = 3 	# Number of input coordinates
-                                        Nout = 2 	# Number of output coordinates
-                                        Invert = 0 	# Mapping not inverted
-                                     IsA Mapping 	# Mapping between coordinate systems
-                                        UntRd = 1 	# All input vectors have unit length
-                                        PlrLg = 0 	# Polar longitude (rad.s)
-                                     End SphMap
-                               End CmpMap
-                         End CmpMap
-                   End CmpMap
-             End CmpMap
-       End CmpMap
- End FrameSet
+                                  PlrLg = 0 	# Polar longit     32.8      -102.     BC  -.145       .989    
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
+REG_TEXT: '-0.5'
+     119.       9.22     BC  -.965       .262    
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
+REG_TEXT: '0.0'
+     132.       113.     BC  -1.00      0.125E-02
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
+REG_TEXT: '0.5'
+     119.       218.     TC   .964       .265    
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
+REG_TEXT: '1.0'
+     82.6       296.     TC   .787       .617    
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
+REG_TEXT: '2.5'
+    -59.8       243.     TC  -.936       .352    
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
+REG_TEXT: '3.0'
+    -80.3       144.     TC  -.997      0.724E-01
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  1
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
+REG_TEXT: ' A FITS test'
+     31.0       313.     BC   .000       1.00    
+ 
+ 
+ 
+ 
+ FITS test number  3
+ ====================
+ 
+ 
+ 
+AST_SHOW:
  
 REG_SINK:
 SIMPLE  =                    T / file does conform to FITS standard             
@@ -6594,6 +6565,7 @@ ENDAST_F= 'SkyFrame'           / End of object definition
 MAP2_A  = '        '           / Mapping between nodes 1 and 2                  
 BEGAST_H= 'CmpMap  '           / Compound Mapping                               
 NIN_A   =                    2 / Number of input coordinates                    
+ISSIMP_A=                    1 / Mapping has been simplified                    
 ISA_C   = 'Mapping '           / Mapping between coordinate systems             
 MAPA_A  = '        '           / First component Mapping                        
 BEGAST_I= 'WinMap  '           / Map one window on to another                   
@@ -6684,7 +6656,7 @@ ATTRIBUTES:
  Nout                :          1
  Class               :          4
  Tol                 :  0.100000E-01
- Gap(1)              :  0.523599    
+ Gap(1)              :   .523599    
  Border              : 0
  Invert              : 0
  TextLabGap          :  0.100000E-01
@@ -6735,7 +6707,7 @@ REG_LINE:    2
      48.1      -25.8    
      48.6      -27.4    
 REG_LINE:    2
-     49.2     -0.928    
+     49.2      -.928    
      49.9      -2.51    
 REG_LINE:    2
      49.8       24.8    
@@ -6807,19 +6779,19 @@ REG_LINE:    2
      1.78       125.    
      1.27       127.    
 REG_LINE:    2
-    0.747       101.    
+     .747       101.    
    -0.657E-02   102.    
 REG_LINE:    2
-    0.124       74.8    
+     .124       74.8    
     -1.11       76.1    
 REG_LINE:    2
    -0.740E-01   48.7    
     -3.82       48.5    
 REG_LINE:    2
-    0.156       22.6    
+     .156       22.6    
     -1.02       21.3    
 REG_LINE:    2
-    0.811      -3.08    
+     .811      -3.08    
     0.841E-01  -4.67    
 REG_LINE:    2
      1.88      -27.8    
@@ -6943,7 +6915,7 @@ REG_LINE:   15
      48.3      -22.3    
      48.6      -15.3    
      48.9      -8.13    
-     49.2     -0.928    
+     49.2      -.928    
      49.4       6.35    
      49.6       13.7    
      49.7       21.1    
@@ -7039,10 +7011,10 @@ REG_LINE:   15
      1.61       122.    
      1.29       115.    
      1.00       108.    
-    0.747       101.    
-    0.526       93.3    
-    0.339       85.9    
-    0.187       78.6    
+     .747       101.    
+     .526       93.3    
+     .339       85.9    
+     .187       78.6    
     0.696E-01   71.1    
    -0.132E-01   63.7    
    -0.611E-01   56.2    
@@ -7052,10 +7024,10 @@ REG_LINE:   15
    -0.519E-01   41.2    
     0.519E-02   33.7    
     0.971E-01   26.3    
-    0.224       18.9    
-    0.385       11.5    
-    0.581       4.18    
-    0.811      -3.08    
+     .224       18.9    
+     .385       11.5    
+     .581       4.18    
+     .811      -3.08    
      1.07      -10.3    
      1.37      -17.4    
      1.70      -24.4    
@@ -7281,7 +7253,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '12'
-     24.9      -148.     BC -0.654E-01  0.998    
+     24.9      -148.     BC -0.654E-01   .998    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7299,7 +7271,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '14'
-     35.1      -123.     BC -0.978      0.210    
+     35.1      -123.     BC  -.978       .210    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7317,7 +7289,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '16'
-     44.2      -49.2     BC -0.997      0.716E-01
+     44.2      -49.2     BC  -.997      0.716E-01
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7335,7 +7307,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '18'
-     47.5       50.9     BC -1.000     -0.942E-03
+     47.5       50.9     BC  -1.00     -0.942E-03
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7353,7 +7325,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '20'
-     44.1       151.     TC  0.997      0.732E-01
+     44.1       151.     TC   .997      0.732E-01
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7371,7 +7343,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '22'
-     34.9       223.     TC  0.977      0.213    
+     34.9       223.     TC   .977       .213    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7389,7 +7361,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '0'
-     24.9       248.     TC -0.236E-01  1.000    
+     24.9       248.     TC -0.236E-01   1.00    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7407,7 +7379,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '2'
-     14.8       222.     TC -0.978      0.210    
+     14.8       222.     TC  -.978       .210    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7425,7 +7397,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '4'
-     5.71       149.     TC -0.997      0.716E-01
+     5.71       149.     TC  -.997      0.716E-01
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7443,7 +7415,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '6'
-     2.43       48.7     BC  1.000      0.288E-03
+     2.43       48.7     BC   1.00      0.288E-03
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7461,7 +7433,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '8'
-     5.83      -51.1     BC  0.997      0.732E-01
+     5.83      -51.1     BC   .997      0.732E-01
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7479,7 +7451,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '10'
-     15.0      -124.     BC  0.977      0.215    
+     15.0      -124.     BC   .977       .215    
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7529,7 +7501,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '-90:00'
-     22.4       49.8     BC -1.000     -0.615E-03
+     22.4       49.8     BC  -1.00     -0.615E-03
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7547,7 +7519,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '59'
-     22.4       150.     BC -1.000     -0.615E-03
+     22.4       150.     BC  -1.00     -0.615E-03
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7565,7 +7537,7 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '-89:58'
-     22.3       250.     BC -1.000     -0.615E-03
+     22.3       250.     BC  -1.00     -0.615E-03
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -7576,4 +7548,36 @@ REG_QCH:
 REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: ' A FITS test'
-     30.9       313.     BC   0.00       1.00    
+     30.9       313.     BC   .000       1.00    
+ude (rad.s)
+                               End SphMap
+                            MapB = 	# Second component Mapping
+                               Begin CmpMap 	# Compound Mapping
+                                  Nin = 3 	# Number of input coordinates
+                                  Nout = 2 	# Number of output coordinates
+                               IsA Mapping 	# Mapping between coordinate systems
+                                  MapA = 	# First component Mapping
+                                     Begin MatrixMap 	# Matrix transformation
+                                        Nin = 3 	# Number of input coordinates
+                                        Invert = 0 	# Mapping not inverted
+                                     IsA Mapping 	# Mapping between coordinate systems
+                                        M0 = -1 	# Forward matrix value
+                                        M1 = 1 	# Forward matrix value
+                                        M2 = -1 	# Forward matrix value
+                                        Form = "Diagonal" 	# Matrix storage form
+                                     End MatrixMap
+                                  MapB = 	# Second component Mapping
+                                     Begin SphMap 	# Cartesian to Spherical mapping
+                                        Nin = 3 	# Number of input coordinates
+                                        Nout = 2 	# Number of output coordinates
+                                        Invert = 0 	# Mapping not inverted
+                                     IsA Mapping 	# Mapping between coordinate systems
+                                        UntRd = 1 	# All input vectors have unit length
+                                        PlrLg = 0 	# Polar longitude (rad.s)
+                                     End SphMap
+                               End CmpMap
+                         End CmpMap
+                   End CmpMap
+             End CmpMap
+       End CmpMap
+ End FrameSet
