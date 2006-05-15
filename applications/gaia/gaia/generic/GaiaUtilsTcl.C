@@ -127,8 +127,11 @@ static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
     /* Get the value */
     value = astGetC( wcs, Tcl_GetString( objv[2] ) );
     if ( ! astOK ) {
+        char *buf = ckalloc( 1024 );
+        sprintf( buf, "Failed to get AST attribute (%s)", 
+                 Tcl_GetString( objv[2] ) );
         astClearStatus;
-        Tcl_SetResult( interp, "Failed to get AST attribute", TCL_VOLATILE );
+        Tcl_SetResult( interp, buf, TCL_DYNAMIC );
         return TCL_ERROR;
     }
     Tcl_SetResult( interp, (char *) value, TCL_VOLATILE );
@@ -162,8 +165,11 @@ static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
     /* Set the attributes */
     astSet( wcs, Tcl_GetString( objv[2] ) );
     if ( ! astOK ) {
+        char *buf = ckalloc( 1024 );
+        sprintf( buf, "Failed to set AST attribute (%s)", 
+                 Tcl_GetString( objv[2] ) );
         astClearStatus;
-        Tcl_SetResult( interp, "Failed to set AST attribute", TCL_VOLATILE );
+        Tcl_SetResult( interp, buf, TCL_DYNAMIC );
         return TCL_ERROR;
     }
     return TCL_OK;
@@ -252,7 +258,10 @@ static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
         isa = astIsAFluxFrame( picked );
     }
     else {
-        Tcl_SetResult( interp, "not a known frame type", TCL_VOLATILE );
+        char *buf = ckalloc( 1024 );
+        sprintf( buf, "not a known frame type (%s)", type );
+        astClearStatus;
+        Tcl_SetResult( interp, buf, TCL_DYNAMIC );
         astAnnul( picked );
         return TCL_ERROR;
     }
