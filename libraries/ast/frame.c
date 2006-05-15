@@ -217,6 +217,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Added ObsLat and ObsLon attributes.
 *     1-MAR-2006 (DSB):
 *        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
+*     15-MAY-2006 (DSB):
+*        Remove unused global variable parent_equal.
 *class--
 */
 
@@ -651,7 +653,6 @@ static const char *(* parent_getattrib)( AstObject *, const char * );
 static int (* parent_testattrib)( AstObject *, const char * );
 static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_setattrib)( AstObject *, const char * );
-static int (* parent_equal)( AstObject *, AstObject * );
 
 /* Define other static variables. */
 static char label_buff[ LABEL_BUFF_LEN + 1 ]; /* Default Label string buffer */
@@ -4962,8 +4963,6 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
 
-   parent_equal = object->Equal;
-   object->Equal = Equal;
    parent_clearattrib = object->ClearAttrib;
    object->ClearAttrib = ClearAttrib;
    parent_getattrib = object->GetAttrib;
@@ -4977,6 +4976,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    new member functions implemented here. */
    mapping = (AstMappingVtab *) vtab;
 
+   object->Equal = Equal;
    mapping->GetIsSimple = GetIsSimple;
    mapping->GetNin = GetNin;
    mapping->GetNout = GetNout;
