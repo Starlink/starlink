@@ -45,13 +45,31 @@
       Once an image is displayed you are free to analyse it using the usual
       tools, such as the photometric or image region toolboxes.
     </p>
+
+    <h3>Coordinates</h3>
     <p>
-      The indices are what are normally known as NDF pixel indices. For FITS
-      cubes this will be just the grid index (starting from 1 to the length of
-      the chosen axis), for NDFs this will include the origin. If available
-      the actual world coordinates being used will be displayed, together with
-      a description of their meaning and units.
+      The indices used to select an image plane are what are normally known as
+      NDF pixel indices. For FITS cubes this will be just the grid indices
+      (starting from 1 to the length of the chosen axis), for NDFs this will
+      include the origin.
+    </p>
     <p>
+      When your cube has a world coordinate system defined (either as an NDF
+      WCS component, or as FITS headers) you will also see the coordinate of
+      the current slice displayed, together with a description of its
+      meaning and units.
+    </p>
+    <p>
+      For coordinate systems that define a spectral axis, you can also choose
+      to transform into other supported coordinate systems. These are listed
+      in the <tt>Coords</tt> menu (currently: angstroms, nm, mm, micrometres,
+      GHz, MHz, THz, KHz, J, ergs, eV, keV and 1/m, plus m/s and km/s (radio),
+      if a rest frequency is defined). Just choose one and the slice
+      coordinates and the spectral plot (if active) will be redisplayed to
+      show your new coordinates. This menu is replicated in the spectral plot
+      for convenience. To return to the initial system just choose the
+      <tt>Default</tt> item.
+    </p>
 
     <h3>Data formats and efficiency</h3>
     <p>

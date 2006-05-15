@@ -38,6 +38,37 @@
       all GAIA windows) be resized.
     </p>
 
+    <h3>The Coords menu</h3>
+    <p>
+      For cube coordinate systems that define a spectral axis, you can also
+      choose to transform into other supported coordinate systems. These are
+      listed in the <tt>Coords</tt> menu (currently: angstroms, nm, mm,
+      micrometres, GHz, MHz, THz, KHz, J, ergs, eV, keV and 1/m, plus m/s and
+      km/s (radio), if a rest frequency is defined). Just choose one and the
+      plot and slice coordinates will be redisplayed to show your new
+      coordinates. This menu is replicated in the cube toolbox plot for
+      convenience. To return to the initial system just choose the
+      <tt>Default</tt> item.
+    </p>
+    <p>
+      When your data do not describe a spectral axis the items in the
+      <tt>Coords</tt> menu will be greyed out.
+    </p>
+
+    <h3>The Options menu</h3>
+    <p>
+      There are various items available in this menu that mostly effect the
+      presentation of the spectrum. <tt>Autoscale</tt> is described above,
+      the log options should be obvious (but see the gotcha below) as should
+      the various presentational ones (which are useful when creating
+      hardcopies). The <tt>X min to max</tt> item controls how the X axis of
+      the plot is draw. When selected the minimum X coordinate will appear on
+      the left and the maximum on the right. For your data this might
+      correspond to the order of coordinates from the <tt>front</tt> to the
+      <tt>back</tt> of the cube, or it may not. Deselecting this always places
+      the coordinate from the front of the cube to the left.
+    </p>
+
     <h3>Taking a hardcopy</h3>
     <p>
       To either print a copy of the spectrum or save a copy to disk you can
