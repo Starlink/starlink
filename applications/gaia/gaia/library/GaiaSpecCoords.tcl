@@ -117,11 +117,11 @@ itcl::class gaia::GaiaSpecCoords {
    #  Add items to a menu so that a known coordinate system can be selected.
    protected method populate_menu_ {menu} {
       if { $menu != {} } {
-         foreach {descr unit system} $simplesystems_ {
+         foreach {descr unit system} $simple_systems_ {
             $menu add command -label "$descr" \
                -command [code $this set_selected_system_ "$unit" "$system"]
          }
-         foreach {descr unit system} $velocitysystems_ {
+         foreach {descr unit system} $velocity_systems_ {
             $menu add command -label "$descr" \
                -command [code $this set_selected_system_ "$unit" "$system"]
          }
@@ -145,21 +145,21 @@ itcl::class gaia::GaiaSpecCoords {
 
          foreach menu $menus_ {
             if { $isaspecframe } {
-               foreach {descr unit system} $simplesystems_ {
+               foreach {descr unit system} $simple_systems_ {
                   $menu entryconfigure "$descr" -state normal
                }
             } else {
-               foreach {descr unit system} $simplesystems_ {
+               foreach {descr unit system} $simple_systems_ {
                   $menu entryconfigure "$descr" -state disabled
                }
             }
 
             if { $isaspecframe && $haverestfreq } {
-               foreach {descr unit system} $velocitysystems_ {
+               foreach {descr unit system} $velocity_systems_ {
                   $menu entryconfigure "$descr" -state normal
                }
             } else {
-               foreach {descr unit system} $velocitysystems_ {
+               foreach {descr unit system} $velocity_systems_ {
                   $menu entryconfigure "$descr" -state disabled
                }
             }
@@ -171,9 +171,27 @@ itcl::class gaia::GaiaSpecCoords {
    #  Also eval the change_cmd is we have one.
    protected method set_selected_system_ {unit system} {
       if { $accessor != {} } {
-         $accessor astset "System($axis)=$system,Unit($axis)=$unit"
+         if { $system == "default" && [info exists default_system_($axis)] } {
+            $accessor astset $default_system_($axis)
+         } else {
+            $accessor astset "System($axis)=$system,Unit($axis)=$unit"
+         }
          if { $change_cmd != {} } {
             eval $change_cmd
+         }
+      }
+   }
+
+   #  Record the default system for a particular axis of an accessor.
+   protected method set_default_system_ {} {
+      if { $accessor != {} && ! [info exists default_system_($axis)] } {
+         if { [$accessor isaxisframetype $axis "specframe"] } {
+            set system [$accessor astget "System($axis)"]
+            set units [$accessor astget "Unit($axis)"]
+            set default_system_($axis) \
+               "System($axis)=$system,Unit($axis)=$units"
+         } else {
+            catch {unset default_system_(axis)}
          }
       }
    }
@@ -181,13 +199,24 @@ itcl::class gaia::GaiaSpecCoords {
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  The GaiaNDAccess instance. Will cause the menus to be reconfigured.
+   #  The GaiaNDAccess instance. Will cause the menus to be reconfigured,
+   #  and also updates the default system iff the accessor is changed.
    public variable accessor {} {
+      if { $last_accessor_ != $accessor } {
+         catch {unset default_system_}
+         set_default_system_
+         set last_accessor_ $accessor
+      }
       reconfigure_menus_
    }
 
-   #  The spectral axis (AST index).
-   public variable axis 3
+   #  The spectral axis (AST index). Updates the default system if needed.
+   public variable axis 3 {
+      set_default_system_
+   }
+
+   #  The last value for accessor, stops changes when is same.
+   protected variable last_accessor_ {}
 
    #  A command to execute when a spectral coordinate system is selected.
    public variable change_cmd {}
@@ -198,12 +227,17 @@ itcl::class gaia::GaiaSpecCoords {
    #  The menus we're managing. A simple list of names.
    protected variable menus_ {}
 
+   #  The default (that's initial) values for System and Unit for each axis.
+   #  Note initially unset array indexed by $axis.
+   protected variable default_system_
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
    #  List of the possible spectral coordinates, excluding velocities. 
    #  These are presented to the user as units only. The system is assumed.
-   common simplesystems_ {
+   common simple_systems_ {
+      "Default" "default" "default"
       "Angstroms" "Angstrom" "WAVE"
       "Nanometres" "nm" "WAVE"
       "Millimetres" "mm" "WAVE"
@@ -221,7 +255,7 @@ itcl::class gaia::GaiaSpecCoords {
 
    #  List of the possible spectral coordinates involving velocities. 
    #  These are presented to the user as units only. The system is assumed.
-   common velocitysystems_ {
+   common velocity_systems_ {
       "Metres-per-sec (radio)" "m/s" "VRAD"
       "Kilometres-per-sec (radio)" "km/s" "VRAD"
    }
