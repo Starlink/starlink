@@ -43,6 +43,8 @@
 *  History:
 *     2006-05-15 (AGG):
 *        Initial test version
+*     2006-05-15 (AGG):
+*        Add check for non-NULL poly pointer
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -141,6 +143,15 @@ void smf_fit_poly( const smfData *data, const int order, double *poly, int *stat
   /* Should check data type for double */
   smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status);
   if ( *status != SAI__OK) return;
+
+  /* Check that poly is not a NULL pointer */
+  if ( poly == NULL ) {
+    if ( *status == SAI__OK) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Input pointer for storing coefficients is NULL. Possible programming error.", status);
+      return;
+    }
+  }
 
   /* Assign pointer to input data array */
   /* of course, check status on return... */
