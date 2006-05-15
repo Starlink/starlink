@@ -100,6 +100,7 @@ typedef struct SPItem  {
     int newplot;                /* Whether to regenerate plot */
     int numPoints;              /* Number of data values */
     int showaxes;               /* Whether to show the grid */
+    int xminmax;                /* If true then use min->max X coordinates */
 } SPItem;
 
 static int tagCounter = 0;      /* Counter for creating unique tags */
@@ -172,6 +173,9 @@ static Tk_ConfigSpec configSpecs[] = {
 
     {TK_CONFIG_DOUBLE, "-xborder", (char *) NULL, (char *) NULL,
      "0.03", Tk_Offset(SPItem, xborder), TK_CONFIG_DONT_SET_DEFAULT},
+
+    {TK_CONFIG_BOOLEAN, "-xminmax", (char *) NULL, (char *) NULL,
+     "1", Tk_Offset(SPItem, xminmax), TK_CONFIG_DONT_SET_DEFAULT},
 
     {TK_CONFIG_DOUBLE, "-y", (char *) NULL, (char *) NULL,
      "0.0", Tk_Offset(SPItem, y), TK_CONFIG_DONT_SET_DEFAULT},
@@ -312,6 +316,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->width = 100.0;
     spPtr->x = 0.0;
     spPtr->xborder = 0.07;
+    spPtr->xminmax = 1;
     spPtr->y = 0.0;
     spPtr->yborder = 0.17;
 
@@ -1230,7 +1235,8 @@ static void GeneratePlotFrameSet( SPItem *spPtr )
 
     /* Set the axis range, pick first non-BAD values from ends (spectrum must
      * be monotonic, so this is OK and keeps the natural order which can be
-     * actually be min to max or max to min). */
+     * actually be min to max or max to min). Then apply the xminmax
+     * preference. */
     spPtr->xleft = DBL_MAX;
     spPtr->xright = -DBL_MAX;
     for ( i = 0; i < spPtr->numPoints; i++ ) {
@@ -1244,6 +1250,12 @@ static void GeneratePlotFrameSet( SPItem *spPtr )
             spPtr->xright = spPtr->coordPtr[i];
             break;
         }
+    }
+    if ( spPtr->xminmax ) {
+        double tmp;
+        tmp = MIN( spPtr->xleft, spPtr->xright );
+        spPtr->xright = MAX( spPtr->xleft, spPtr->xright );
+        spPtr->xleft = tmp;
     }
 
     /* Check if coordinates have no range, in that case just add +/- 1, so we

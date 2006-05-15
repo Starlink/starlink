@@ -130,6 +130,18 @@ itcl::class gaia::GaiaSpectralPlot {
          {Continuously change data limits of spectral plot,
             otherwise fixed by last click (faster)}
 
+      #  Whether to draw the X coordinates running min to max, or
+      #  as they are from the "front" to "back" of cube.
+      $Options add checkbutton \
+         -label {X min to max} \
+         -variable [scope itk_option(-xminmax)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this set_xminmax]
+      add_menu_short_help $Options {X min to max}  \
+         {Show X coordinates as minimum to maximum, 
+            otherwise cube "front" to "back" order}
+
       #  Use log for plot axes.
       $Options add checkbutton \
          -label {Log X axis} \
@@ -340,7 +352,7 @@ itcl::class gaia::GaiaSpectralPlot {
                            -x 25 -y 5 -width 650 -height 200 \
                            -linecolour $linecolour_ -linewidth 1 \
                            -gridoptions $gridoptions_ \
-                           -showaxes 1]
+                           -showaxes 1 -xminmax $itk_option(-xminmax)]
          #  Clicking on the plot deselects other graphics.
          $itk_component(canvas) bind $spectrum_ <1> \
             +[code $itk_component(draw) deselect_objects]
@@ -441,6 +453,12 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Set the anchor point for the spectrum.
    public method anchor {x y} {
       $itk_component(canvas) itemconfigure $spectrum_ -x $x -y $y
+   }
+
+   #  Set the xminmax value of spectrum.
+   public method set_xminmax {} {
+      $itk_component(canvas) itemconfigure \
+         $spectrum_ -xminmax $itk_option(-xminmax)
    }
 
    #  Resize the canvas to fit the size of enclosing frame.
@@ -564,6 +582,10 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Whether to show the coordinate ref line.
    itk_option define -show_ref_line show_ref_line \
       Show_Ref_Line 1
+
+   #  Whether to order X coordinates to run from min to max, or the cube
+   #  order.
+   itk_option define -xminmax xminmax XMinMax 1
 
    #  Whether to log coordintae axis.
    itk_option define -log_x_axis log_x_axis Log_X_Axis 0
