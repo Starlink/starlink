@@ -205,10 +205,12 @@
 *  locator to the current array element for an array of extensions.
       ELSE
          IF ( NDIM .EQ. 0 ) THEN
-            CALL NDF_XNEW( NDF, NAME, EXTYPE, 0, 0, SXLOC( 1 ), STATUS )
+            CALL NDF_XNEW( NDF, NAME, EXTYPE, 0, 0, 
+     :                     SXLOC( ELEVEL - 2 ), STATUS )
          ELSE
             CALL NDF_XNEW( NDF, NAME, EXTYPE, NDIM, DIMS, LOC, STATUS )
-            CALL DAT_CELL( LOC, NDIM, INDICE, SXLOC( 1 ), STATUS )
+            CALL DAT_CELL( LOC, NDIM, INDICE, 
+     :                     SXLOC( ELEVEL - 2 ), STATUS )
             CALL DAT_ANNUL( LOC, STATUS )
          END IF
       END IF
@@ -277,7 +279,7 @@
       CALL COF_T2HDS( FUNIT, SXLOC( NWORD - 2 ), STATUS )
 
 *  Annul all the locators.
-      DO LEVEL = 1, NWORD - 2
+      DO LEVEL = ELEVEL - 2, NWORD - 2
          CALL DAT_ANNUL( SXLOC( LEVEL ), STATUS )
       END DO
 
