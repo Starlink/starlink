@@ -27,11 +27,11 @@
 *  Description:
 *     This task carries out and stores a polynomial fit to the
 *     bolometer time streams, which can then be used for sky
-*     subtraction.
+*     subtraction. Errors are printed if the polynomial order is
+*     either negative or greater than the number of points (minus 1).
 
 *  Notes:
-*      - Polynomial orders other than 1 (ie a straight line) are not yet
-*        supported
+*     Non-integer values for the order are truncated.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -41,6 +41,9 @@
 *     2006-05-02 (AGG):
 *        Initial version, stripped out code from original simulator
 *        version
+*     2006-05-15 (AGG):
+*        - Checks for valid values of the polynomial order
+*        - Now calls new smf_fit_poly routine
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -99,7 +102,7 @@
 void smf_scanfit ( smfData *data, int order, int *status) {
 
   int cliptype;             /* Type of sigma clipping */
-  double *poly;             /* Array of polynomial coefficients */
+  double *poly = NULL;      /* Array of polynomial coefficients */
   int i;                    /* Loop counter */
   int lbnd[3];              /* Lower bound for coeff array (poly) */
   int nbol;                 /* Number of bolometers */
@@ -112,13 +115,6 @@ void smf_scanfit ( smfData *data, int order, int *status) {
 
   if ( *status != SAI__OK ) return;
 
-  /* HACK: check value of order, issue warning and reset to 1 until we
-     have a polynomial fitting routine */
-  if ( order != 1 ) {
-    msgSeti("O",order);
-    msgOut(FUNC_NAME, "Sorry polynomial of order ^O is not yet supported. Reverting to a linear fit (order = 1).", status);
-    order = 1;
-  }
   /* Set the number of coefficients */
   ncoeff = order + 1;
 
@@ -150,6 +146,27 @@ void smf_scanfit ( smfData *data, int order, int *status) {
     }
   }
 
+  /* Return with error if order is greater than the number of data
+     points */
+  if ( order >= nframes ) {
+    if ( *status == SAI__OK) {
+      msgSeti("O",order);
+      msgSeti("NF",nframes);
+      *status = SAI__ERROR;
+      errRep( FUNC_NAME, "Requested polynomial order, ^O, greater than or equal to number of points, ^NF. Unable to fit polynomial.", status );
+      return;
+    }
+  }
+  /* If order is -ve, something's wrong! */
+  if ( order < 0 ) {
+    if ( *status == SAI__OK) {
+      msgSeti("O",order);
+      *status = SAI__ERROR;
+      errRep( FUNC_NAME, "Polynomial order, ^O, is negative. Unable to fit polynomial", status );
+      return;
+    }
+  }
+
   nbol = (data->dims)[0] * (data->dims)[1];
   cliptype = 0;
 
@@ -161,7 +178,7 @@ void smf_scanfit ( smfData *data, int order, int *status) {
   }
 
   /* Set the lower and upper bounds of the 3-d array for the new
-     SCANFIT NDF */
+     SCANFIT NDF if necessary */
   for (i=0; i<3; i++) {
     lbnd[i] = 1;
   }
@@ -183,13 +200,16 @@ void smf_scanfit ( smfData *data, int order, int *status) {
 
     /* Map the pointer for polynomial coefficients */
     ndfMap( pndf, "DATA", "_DOUBLE", "WRITE", &poly, &npts, status );
+    /* Check status here... */
 
     /* Carry out fit, check status on return */
-    sc2math_fitsky ( cliptype, nbol, nframes, ncoeff, (data->pntr)[0],
-		     poly, status );
+    /*    sc2math_fitsky ( cliptype, nbol, nframes, ncoeff, (data->pntr)[0],
+	  poly, status );*/
+    smf_fit_poly ( data, order, poly, status );    
     if ( *status != SAI__OK ) {
       errRep(FUNC_NAME, "Unable to carry out scanfit", status);
     }
+    /* Store polynomial coefficients in output smfData */
   }
 
   /* Release the NDF resources */
