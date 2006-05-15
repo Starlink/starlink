@@ -194,6 +194,8 @@ size_t smf_dtype_size( const smfData* data, int * status );
 smf_dtype
 smf_dtype_fromstring( const char * dtype, int * status );
 
+void smf_fit_poly(const smfData *data, const int order, double *poly,  int *status);
+
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status);
 
 /* Do not return the result since we want the interface to remain the same when a
