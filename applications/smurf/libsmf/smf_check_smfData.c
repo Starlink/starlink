@@ -39,6 +39,8 @@
 *        - Add flags to determine whether smfFile, DA and Head elements
 *          should be checked
 *        - Add check for presence of history element
+*     2006-05-15 (AGG):
+*        Add check for existence of ncoeff/poly pointer in input smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -208,19 +210,27 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
 
   /* Check scanfit polynomial coefficients */
   /* Is there an easy way of checking consistency? */
-  if ( !(odata->ncoeff) ) {
-    odata->ncoeff = idata->ncoeff;
-  }
-  if ( odata->poly == NULL) {
-    npoly = (odata->dims)[0] * (odata->dims)[1] * odata->ncoeff;
-    opoly = smf_malloc( npoly, sizeof( double ), 0, status);
-    if ( *status == SAI__OK ) {
-      memcpy( opoly, idata->poly, npoly*sizeof( double ) );
-      odata->poly = opoly;
-    } else {
-      errRep(FUNC_NAME, "Unable to allocate memory for polynomial coefficients", status);
+  /* Check if the input data has the polynomial fits stored */
+
+  /* If so, then check if the output data has the polynomial fits */
+  if ( (idata->ncoeff) != 0 && (idata->poly) != NULL ) {
+    if ( !(odata->ncoeff) ) {
+      odata->ncoeff = idata->ncoeff;
     }
+    if ( odata->poly == NULL) {
+      npoly = (odata->dims)[0] * (odata->dims)[1] * odata->ncoeff;
+      opoly = smf_malloc( npoly, sizeof( double ), 0, status);
+      if ( *status == SAI__OK ) {
+	memcpy( opoly, idata->poly, npoly*sizeof( double ) );
+	odata->poly = opoly;
+      } else {
+	errRep(FUNC_NAME, "Unable to allocate memory for polynomial coefficients", status);
+      }
+    }
+  } else {
+    msgOutif(MSG__VERB, FUNC_NAME, "No polynomial fits in input data", status);
   }
+
 
   /* Check for history, copy from input if present */
   if ( odata->history == NULL && idata->history != NULL ) {
