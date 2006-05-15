@@ -213,6 +213,8 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *        Override ObsLat and ObsLon accessor methods.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     15-MAY-2006 (DSB):
+*        - Override astEqual.
 *class--
 */
 
@@ -782,6 +784,7 @@ static void CheckPerm( AstFrame *, const int *, const char * );
 static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
 static void ValidateAxisSelection( AstFrame *, int, const int *, const char * );
 static AstLineDef *LineDef( AstFrame *, const double[2], const double[2] );
+static int Equal( AstObject *, AstObject * );
 static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double ** );
 static int LineContains( AstFrame *, AstLineDef *, int, double * );
 static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2] );
@@ -2724,6 +2727,102 @@ static double Distance( AstFrame *this_frame,
    return result;
 }
 
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two FrameSets are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     FrameSet member function (over-rides the astEqual protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two FrameSets are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first FrameSet.
+*     that
+*        Pointer to the second FrameSet.
+
+*  Returned Value:
+*     One if the FrameSets are equivalent, zero otherwise.
+
+*  Notes:
+*     - The two FrameSets are considered equivalent if all the encapsulated 
+*     Frames are equal and all the encapsulated Mappings are equal.
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstFrameSet *that;            /* Pointer to the second FrameSet structure */
+   AstFrameSet *this;            /* Pointer to the first FrameSet structure */
+   int i;                        /* Loop index */
+   int result;                   /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Checks that the second object is of the same class as the first . */
+   if( !strcmp( astGetClass( this_object ), astGetClass( that_object ) ) ){
+
+/* Obtain pointers to the two FrameSet structures. */
+      this = (AstFrameSet *) this_object;
+      that = (AstFrameSet *) that_object;
+
+/* Check the number of nodes and frames are equal. Also check the indices 
+   of the base and current Frames are equal */
+      if( this->nframe == that->nframe && 
+          this->nnode == that->nnode &&
+          this->base == that->base && 
+          this->current == that->current ) {
+
+/* Check the Frames and nodes are equal. */
+          result = 1;
+          for ( i = 0; i < this->nframe; i++ ) {
+             if( !astEqual( this->frame[ i ], that->frame[ i ] ) ||
+                 this->node[ i ] != that->node[ i ] ){
+                result = 0;
+                break;
+             }
+          }
+
+/* Check the Mappings, links and invert flags are equal. */
+         if( result ) {
+            for ( i = 0; i < this->nnode - 1; i++ ) {
+               if( astEqual( this->map[ i ], that->map[ i ] ) ||
+                   this->link[ i ] != that->link[ i ] ||
+                   this->invert[ i ] != that->invert[ i ] ) {
+                  result = 0;
+                  break;
+               }
+            }
+         }
+      }
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static int Fields( AstFrame *this_frame, int axis, const char *fmt, 
                    const char *str, int maxfld, char **fields, 
                    int *nc, double *val ) {
@@ -4662,6 +4761,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    object->TestAttrib = TestAttrib;
 
    object->GetUseDefs = GetUseDefs;
+   object->Equal = Equal;
 
    mapping->GetNin = GetNin;
    mapping->GetNout = GetNout;
