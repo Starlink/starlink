@@ -1119,8 +1119,7 @@ itcl::class gaia::GaiaCube {
       #  all time.
       if { $action == "localstart" } {
          busy {
-            $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh \
-               $ix $iy 1 $ccx $ccy
+            $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh $ix $iy 1
          }
 
          #  Set first-time reference position.
@@ -1131,8 +1130,7 @@ itcl::class gaia::GaiaCube {
          }
       } else {
          busy {
-            $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh \
-               $ix $iy 0
+            $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh $ix $iy 0
          }
       }
    }
