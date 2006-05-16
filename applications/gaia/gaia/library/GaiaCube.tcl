@@ -546,7 +546,6 @@ itcl::class gaia::GaiaCube {
       #  Close spectrum plot.
       if { $spectrum_ != {} && [winfo exists $spectrum_] } {
          $spectrum_ close
-         remove_spectral_bindings_
       }
       if { $position_mark_ != {} } {
          $itk_option(-canvas) delete $position_mark_
@@ -554,6 +553,7 @@ itcl::class gaia::GaiaCube {
       if { $ref_position_mark_ != {} } {
          $itk_option(-canvas) delete $ref_position_mark_
       }
+      remove_spectral_bindings_
    }
 
    #  Methods:
@@ -564,9 +564,9 @@ itcl::class gaia::GaiaCube {
    public method close {} {
       stop_
       wm withdraw $w_
+
       if { $spectrum_ != {} && [winfo exists $spectrum_] } {
          $spectrum_ close
-         remove_spectral_bindings_
       }
       if { $position_mark_ != {} } {
          $itk_option(-canvas) delete $position_mark_
@@ -576,6 +576,7 @@ itcl::class gaia::GaiaCube {
          $itk_option(-canvas) delete $ref_position_mark_
          set ref_position_mark_ {}
       }
+      remove_spectral_bindings_
    }
 
    #  Open the chosen file as a cube.
@@ -1070,8 +1071,9 @@ itcl::class gaia::GaiaCube {
 
    #  Remove bindings from main canvas for spectral plot.
    protected method remove_spectral_bindings_ {} {
-      $itk_option(-canvas) bind all <1> {}
-      $itk_option(-canvas) bind all <B1-Motion> {}
+      $itk_option(-canvas) bind $itk_option(-rtdimage) <1> {}
+      $itk_option(-canvas) bind $itk_option(-rtdimage) <B1-Motion> {}
+      $itk_option(-canvas) bind all <Double-Button-1> {}
    }
 
    #  Display a spectrum in the local plot. Action can be "localstart" or
