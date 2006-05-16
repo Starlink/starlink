@@ -551,6 +551,9 @@ itcl::class gaia::GaiaCube {
       if { $position_mark_ != {} } {
          $itk_option(-canvas) delete $position_mark_
       }
+      if { $ref_position_mark_ != {} } {
+         $itk_option(-canvas) delete $ref_position_mark_
+      }
    }
 
    #  Methods:
@@ -567,8 +570,12 @@ itcl::class gaia::GaiaCube {
       }
       if { $position_mark_ != {} } {
          $itk_option(-canvas) delete $position_mark_
+         set position_mark_ {}
       }
-      set position_mark_ {}
+      if { $ref_position_mark_ != {} } {
+         $itk_option(-canvas) delete $ref_position_mark_
+         set ref_position_mark_ {}
+      }
    }
 
    #  Open the chosen file as a cube.
@@ -1224,6 +1231,15 @@ itcl::class gaia::GaiaCube {
             $spectrum_ display_reference $cubeaccessor_ $axis_ $alow $ahigh \
                $ix $iy
          }
+
+         #  Re-create the marker for the image position, if needed.
+         if { $ref_position_mark_ == {} } {
+            create_ref_position_marker_ $ccx $ccy
+         }
+
+         #  Move position marker on the image.
+         $itk_option(-canvas) coords $ref_position_mark_ $ccx $ccy
+
       } else {
 
          #  Correct to pixel indices.
@@ -1265,6 +1281,22 @@ itcl::class gaia::GaiaCube {
          [code $this display_spectrum_ localstart %x %y]
 
       $itk_option(-canvas) bind $position_mark_  <B1-Motion> \
+         [code $this display_spectrum_ localdrag %x %y]
+   }
+
+   #  Create the reference spectral position marker.
+   protected method create_ref_position_marker_ { cx cy } {
+
+      #  Note fixscale so that always same size, regardless of zoom.
+      set ref_position_mark_ [$itk_option(-canvas) create rtd_mark \
+                                 $cx $cy -type cross -scale 1 \
+                                 -fixscale 1 -size 7 -outline green]
+
+      #  Bindings so that main position mark moves when over this.
+      $itk_option(-canvas) bind $ref_position_mark_ <1> \
+         [code $this display_spectrum_ localstart %x %y]
+
+      $itk_option(-canvas) bind $ref_position_mark_  <B1-Motion> \
          [code $this display_spectrum_ localdrag %x %y]
    }
 
@@ -1387,6 +1419,9 @@ itcl::class gaia::GaiaCube {
 
    #  The position marker that corresponds to the spectrum.
    protected variable position_mark_ {}
+
+   #  The position marker that corresponds to the reference spectrum.
+   protected variable ref_position_mark_ {}
 
    #  The name for the dummy NDF, with updatable image section.
    protected variable section_name_ ""
