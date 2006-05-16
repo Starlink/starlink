@@ -535,6 +535,7 @@ itcl::class gaia::GaiaSpectralPlot {
       itk_component add draw {
          gaia::StarCanvasDraw $w_.draw \
             -canvas $itk_component(canvas) \
+            -rtdimage $this \
             -transient 1 \
             -center 0 \
             -withdraw 1 \
@@ -600,6 +601,20 @@ itcl::class gaia::GaiaSpectralPlot {
       $itk_component(canvas) configure -background $colour
       set background_ $colour
    }
+
+   #  "rtdimage" emulation, needed to support some actions of the
+   #  StarCanvasDraw instance (items that require width and height
+   #  information).
+   public method scale {} {
+      return 1
+   }
+   public method dispwidth {} {
+      return [winfo width $itk_component(canvasframe)]
+   }
+   public method dispheight {} {
+      return [winfo height $itk_component(canvasframe)]
+   }
+
 
    #  Configuration options: (public variables)
    #  ----------------------
