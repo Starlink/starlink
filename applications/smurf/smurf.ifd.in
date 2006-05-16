@@ -102,6 +102,13 @@ package @PACKAGE@ {
 	    helpkey *
 	  }
 
+	 parameter method {
+	    position 4
+            type _CHAR
+            prompt {Map-making method}
+            helpkey *
+	 }	
+
 	  parameter msg_filter {
 	    type _CHAR
 	    prompt {Message level}

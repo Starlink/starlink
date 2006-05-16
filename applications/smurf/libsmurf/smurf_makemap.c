@@ -121,25 +121,38 @@
 
 #define FUNC_NAME "smurf_makemap"
 #define TASK_NAME "MAKEMAP"
+#define LEN__METHOD 20
 
 void smurf_makemap( int *status ) {
 
   /* Local Variables */
   void *data_index[1];       /* Array of pointers to mapped arrays in ndf */
-  smfData *data=NULL;           /* pointer to  SCUBA2 data struct */
+  smfData *data=NULL;        /* pointer to  SCUBA2 data struct */
   int flag;                  /* Flag */
-  dim_t i;                      /* Loop counter */
+  dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   void *map=NULL;            /* Pointer to the rebinned map data */
+  char method[LEN__METHOD];  /* String for map-making method */
   int n;                     /* # elements in the output map */
   int ondf;                  /* output NDF identifier */
-  AstFrameSet *outframeset=NULL; /* Frameset containing sky->output mapping */
+  AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   float pixsize=3;           /* Size of an output map pixel in arcsec */
   int size;                  /* Number of files in input group */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance=NULL;       /* Pointer to the variance map */
   void *weights=NULL;        /* Pointer to the weights map */
+
+  /* Test variables */
+  int coordndf=NDF__NOID;      /* NDF identifier for coordinates */
+  dim_t j;                     /* Loop counter */
+  int *lut;                    /* The lookup table */
+  int nmap;                    /* Number of mapped elements */
+  int place=NDF__NOPL;         /* NDF place holder */
+  HDSLoc *smurfloc;            /* HDS locator to the SMURF extension */
+  HDSLoc *test=NULL;
+  int there;
+  double *bolodata;
 
   /* Main routine */
   ndfBegin();
@@ -152,14 +165,19 @@ void smurf_makemap( int *status ) {
   if( pixsize <= 0 ) {
     msgSetr("PIXSIZE", pixsize);
     *status = SAI__ERROR;
-    errRep("smurf_makemap", 
+    errRep(FUNC_NAME, 
 	   "Pixel size ^PIXSIZE is < 0.", status);
   }
 
+  /* Get METHOD */
+  parChoic( "METHOD", "REBIN", 
+	    "REBIN, ITERATE.", 1,
+	    method, LEN__METHOD, status);
+  
   /* Calculate the map bounds */
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
   smf_mapbounds( igrp, size, "icrs", 0, 0, 1, pixsize, lbnd_out, ubnd_out, 
-		 &outframeset, status );
+		 &outfset, status );
   if (*status != SAI__OK) {
     errRep(FUNC_NAME, "Unable to determine map bounds", status);
   }
@@ -176,63 +194,135 @@ void smurf_makemap( int *status ) {
 			(ubnd_out[1]-lbnd_out[1]+1), sizeof(double),
 			1, status );
 
-  /* Regrid the data */
-  msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Regrid data", status);
-  for(i=1; i<=size; i++ ) {
-    /* Read data from the ith input file in the group */      
-    smf_open_and_flatfield( igrp, NULL, i, &data, status );
+  /* Create the map using the chosen METHOD */
+  if( strncmp( method, "REBIN", 5 ) == 0 ) {
+    /* Simple Regrid of the data */
+    msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using REBIN method", 
+	     status);
 
-    /* Remove sky - assume MEAN is good enough for now */
-    smf_subtract_plane(data, "MEAN", status);
+    for(i=1; i<=size; i++ ) {
+      /* Read data from the ith input file in the group */      
+      smf_open_and_flatfield( igrp, NULL, i, &data, status );
+      
+      /* Remove sky - assume MEAN is good enough for now */
+      smf_subtract_plane(data, "MEAN", status);
 
-    /* Use raw WVM data to make the extinction correction */
-    smf_correct_extinction(data, "WVMR", 0, 0, status);
+      /* Use raw WVM data to make the extinction correction */
+      smf_correct_extinction(data, "WVMR", 0, 0, status);
+      
+      /* Check that the data dimensions are 3 (for time ordered data) */
+      if( *status == SAI__OK ) {
+	if( data->ndims != 3 ) {
+	  msgSeti("I",i);
+	  msgSeti("THEDIMS", data->ndims);
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, 
+		 "File ^I data has ^THEDIMS dimensions, should be 3.", 
+		 status);
+	}
+      }
+      
+      /* Check that the input data type is double precision */
+      if( *status == SAI__OK ) 
+	if( data->dtype != SMF__DOUBLE) {
+	  msgSeti("I",i);
+	  msgSetc("DTYPE", smf_dtype_string( data, status ));
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, 
+		 "File ^I has ^DTYPE data type, should be DOUBLE.",
+		 status);
+	}
+      
+      /* Rebin the data onto the output grid */
+      smf_rebinmap(data, i, size, outfset, lbnd_out, ubnd_out, 
+		   map, variance, weights, status );
+      
+      /* Close the data file */
+      if( data != NULL ) {
+	smf_close_file( &data, status);
+	data = NULL;
+      }
+      
+      /* Break out of loop over data files if bad status */
+      if (*status != SAI__OK) {
+	errRep(FUNC_NAME, "Rebinning step failed", status);
+	break;
+      }
+    }
+  } else if( strncmp( method, "ITERATE", 5 ) == 0 ) {
+    /* Iterative map-maker of the data */
+    msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using ITERATE method", 
+	     status);
+    
+    /* Loop over all data files to put in the pointing extension */
+    for(i=1; i<=size; i++ ) {
+      smf_open_file( igrp, i, "UPDATE", 1, &data, status );
 
-    /* Check that the data dimensions are 3 (for time ordered data) */
+      smf_mapcoord( data, outfset, lbnd_out, ubnd_out, status );
+
+      bolodata = (double *) (data->pntr)[0];
+
+      /* Simple test - regrid using the lookup table in the extension */
+
+      ndfXloc( (data->file)->ndfid, "SMURF", "READ", &smurfloc, status );
+	
+      ndfOpen( smurfloc, "MAPCOORD", "READ", "OLD", 
+	       &coordndf, &place, status );
+
+      ndfMap( coordndf, "DATA", "_INTEGER", "READ", data_index, &nmap, 
+	      status );    	
+
+      if( *status == SAI__OK ) {
+	
+	lut = data_index[0];
+
+	for( j=0; j<nmap; j++ ) {
+	  if( lut[j] != VAL__BADI ) {	    
+	    ((double *)map)[lut[j]] = ((double *)map)[lut[j]] + bolodata[j];
+	    ((double *)weights)[lut[j]]++;
+	  }
+	}
+
+      } else {
+	errRep( FUNC_NAME, "Unable to map LUT in SMURF extension",
+		status);
+      }
+
+      /* Clean Up */
+      
+      ndfUnmap( coordndf, "DATA", status );
+      ndfAnnul( &coordndf, status );
+      
+      datAnnul( &smurfloc, status );
+
+      smf_close_file( &data, status );
+    }
+
+    /* If status is OK try re-normalizing the map and set pixels without
+       any hits to VAL__BADD */
+
     if( *status == SAI__OK ) {
-      if( data->ndims != 3 ) {
-	msgSeti("I",i);
-	msgSeti("THEDIMS", data->ndims);
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, 
-	       "File ^I data has ^THEDIMS dimensions, should be 3.", 
-	       status);
+      for( j=0; j<(ubnd_out[0]-lbnd_out[0]+1)*(ubnd_out[1]-lbnd_out[1]+1);
+	   j++ ) {
+	if( ((double *)weights)[j] > 0 ) {
+	  ((double *)map)[j] = ((double *)map)[j] / ((double *)weights)[j];
+	  ((double *)variance)[j] = 1.;
+	} else {
+	  ((double *)map)[j] = VAL__BADD;
+	  ((double *)weights)[j] = VAL__BADD;
+	  ((double *)variance)[j] = VAL__BADD;
+	}
       }
     }
 
-    /* Check that the input data type is double precision */
-    if( *status == SAI__OK ) 
-      if( data->dtype != SMF__DOUBLE) {
-	msgSeti("I",i);
-	msgSetc("DTYPE", smf_dtype_string( data, status ));
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, 
-	       "File ^I has ^DTYPE data type, should be DOUBLE.",
-	       status);
-      }
-
-    /* Rebin the data onto the output grid */
-    smf_rebinmap(data, i, size, outframeset, lbnd_out, ubnd_out, 
-		 map, variance, weights, status );
-
-    /* Close the data file */
-    if( data != NULL ) {
-      smf_close_file( &data, status);
-      data = NULL;
-    }
-    /* Break out of loop over data files if bad status */
-    if (*status != SAI__OK) {
-      errRep(FUNC_NAME, "Rebinning step failed", status);
-      break;
-    }
   }
 
   /* Write FITS header */
-  ndfPtwcs( outframeset, ondf, status );
-
-  if( outframeset != NULL ) {
-    astAnnul( outframeset );
-    outframeset = NULL;
+  ndfPtwcs( outfset, ondf, status );
+  
+  if( outfset != NULL ) {
+    astAnnul( outfset );
+    outfset = NULL;
   }
   
   ndfUnmap( ondf, "DATA", status);
