@@ -16,11 +16,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.20}
+\newcommand{\stardocnumber}    {214.21}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {10th May 2006}
+\newcommand{\stardocdate}      {15th May 2006}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and Image Analysis Tool}
-\newcommand{\stardocversion}   {3.0-1}
+\newcommand{\stardocversion}   {3.0-2}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
@@ -433,13 +433,14 @@ GAIA provides the following normal ``image display tool'' features:
   displayed.
 
 \item Display of image planes and spectra from data cubes. Using this you can
-  step along an axis and display the image formed by the other two axes.
-  You can also combine a range of image planes or do the stepping
-  using a timed animation. The displayed images created by this tool can be
-  analysed in the image-analysis toolboxes. Finally a spectrum from the
-  hidden dimension of the cube can be displayed and updated interactively and
-  even sent to the Starlink SPLAT-VO program for analysis and additional
-  inspection.
+  step along an axis and display the image formed by the other two axes.  You
+  can also combine a range of image planes or do the stepping using a timed
+  animation. The displayed images created by this tool can be analysed in the
+  image-analysis toolboxes. A spectrum from the hidden dimension of the cube
+  can be displayed and updated interactively and even sent to the Starlink
+  SPLAT-VO program for analysis and additional inspection. Finally the
+  spectral coordinates can be interactively transformed between various
+  wavelength, frequency, energy and velocity systems.
 \end{itemize}
 
 \subsection{\xlabel{image_analysis_capabilities}Image analysis capabilities}
@@ -883,7 +884,7 @@ the version of SkyCat that GAIA is based on are also available at
 to extend SkyCat or GAIA at the user interface level are recommended
 to read about ``SkyCat plugins''.
 
-\section{Release notes for version 3.0-1}
+\section{Release notes for version 3.0-2}
 
 The most significant change in this release are many updates to the cube
 toolbox. This is now much faster at image slicing and handles FITS cubes as

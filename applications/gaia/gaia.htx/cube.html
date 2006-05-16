@@ -10,11 +10,13 @@
       <img src="cube.gif"/>
     <p>
       Using this toolbox you can interactively display successive images from
-      the planes of a cube and "spectra" for each pixel position from the
-      remaining dimension. The aim is to be as efficient as possible at these
-      two jobs, and very good speed is available on machines whose physical
-      memory is greater than the size of the cube.
+      the planes of a cube and <tt>spectra</tt> for each pixel position from
+      the remaining dimension. The aim is to be as efficient as possible at
+      these two jobs, and very good speed is available on machines whose
+      physical memory is greater than the size of the cube.
     </p>
+
+    <h3>Displaying image planes</h3>
     <p>
       To view an image plane from the cube, just select the file containing
       the cube and then use the axis control to choose an axis to step along
@@ -24,14 +26,6 @@
       set once for efficiency, but you can have an autocut applied to each
       slice by selecting the <tt>Autocut</tt> item in the <tt>Options</tt>
       menu.
-    </p>
-    <p align="center">
-      <img src="spectralplot.gif"/>
-    <p>
-      To display a spectrum just click, using mouse button 1, on a position on
-      the image. To see a continously updating spectrum, click and drag around
-      the image. See <a href="spectralplot.html">here</a> for more help on
-      spectral plotting.
     </p>
     <p>
       This simple behaviour can be enhanced using the extra controls in the
@@ -44,6 +38,19 @@
     <p>
       Once an image is displayed you are free to analyse it using the usual
       tools, such as the photometric or image region toolboxes.
+    </p>
+
+    <h3>Displaying spectra</h3>
+    <p align="center">
+      <img src="spectralplot.gif"/>
+    <p>
+      To display a spectrum just click, using mouse button 1, on a position on
+      the image. To see a continously updating spectrum, click and drag around
+      the image. You can create one <tt>reference</tt> spectrum (for comparing
+      regions of the cube) by double clicking on a point. This remains
+      displayed until you double click again, or change the range of value
+      displayed.  See <a href="spectralplot.html">here</a> for more help on
+      spectral plotting.
     </p>
 
     <h3>Coordinates</h3>
@@ -115,12 +122,15 @@
     <p>
       The spectral display tool is just that and offers no analysis
       features. If you want to perform a measurement on a spectrum (or say
-      compare it with one from the VO) then you can either extract it (using
-      some command-line tool like KAPPA NDFCOPY), or send it to the Starlink
-      SPLAT-VO program (best to only do this when displaying NDFs). If you
-      want to do this enable SPLAT by selecting the <tt>Enable SPLAT</tt> item
-      in the <tt>Options</tt> menu. Once you've done that you can send a
-      spectrum to SPLAT by double clicking on the relevant image pixel.
+      compare it with one from the VO, or with many from the same cube) then
+      you can either extract it (using some command-line tool like KAPPA
+      NDFCOPY), or send it to the Starlink SPLAT-VO program (best to only do
+      this when displaying NDFs). If you want to do this enable SPLAT by
+      selecting the <tt>Enable SPLAT</tt> item in the <tt>Options</tt>
+      menu. Once you've done that you can send a spectrum to SPLAT by double
+      clicking on the relevant image pixel (note this temporarily overrides
+      the default double click behaviour, which is to define a reference
+      spectrum).
     </p>
   </body>
 </html>
