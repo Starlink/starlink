@@ -647,20 +647,25 @@ itcl::class gaia::GaiaCube {
       }
    }
 
-   #  Set the axis we step along. A side-effect of this is to create the dummy
-   #  NDF that will be actually manipulated in the main display window. A
-   #  dummy NDF is used for FITS and NDF files as this is the simplest way
-   #  to make sure that the toolboxes can also access the data in an efficient
-   #  manner. When a toolbox access this file if will need to save the NDF
-   #  first to make sure that the data values are up to date.
-   protected method set_step_axis_ {value} {
+   #  Set the axis we step along.
+   #
+   #  If setplane is true (the default) then a side-effect of this is to
+   #  create the dummy NDF that will be actually manipulated in the main
+   #  display window and position on the central plane. A dummy NDF is used
+   #  for FITS and NDF files as this is the simplest way to make sure that the
+   #  toolboxes can also access the data in an efficient manner. When a
+   #  toolbox access this file if will need to save the NDF first to make sure
+   #  that the data values are up to date.
+   protected method set_step_axis_ {value {setplane 1}} {
       if { $value != $axis_ && $bounds_ != {} } {
          set axis_ $value
          set plane_min_ [lindex $bounds_ [expr (${axis_}-1)*2]]
          set plane_max_ [lindex $bounds_ [expr (${axis_}-1)*2+1]]
 
          $itk_component(index) configure -from $plane_min_ -to $plane_max_
-         $itk_component(index) configure -value $plane_min_
+         if { $setplane } {
+            $itk_component(index) configure -value $plane_min_
+         }
 
          $itk_component(lower) configure -from $plane_min_ -to $plane_max_
          $itk_component(upper) configure -from $plane_min_ -to $plane_max_
@@ -686,18 +691,26 @@ itcl::class gaia::GaiaCube {
          #  Set up object to control units.
          $spec_coords_ configure -axis $axis_ -accessor $cubeaccessor_
 
-         set plane_ $plane_min_
-         set_display_plane_ [expr ( $plane_max_ + $plane_min_ ) / 2] 1
+         #  Set an initial plane, if requested.
+         if { $setplane } {
+            set plane_ $plane_min_
+            set_display_plane_ [expr ( $plane_max_ + $plane_min_ ) / 2] 1
+         } else {
+            #  Otherwise update the displayed coordinate for the plane.
+            set coord [get_coord_ $plane_ 1 0]
+            $itk_component(indexlabel) configure -value $coord
+         }
       }
    }
 
    #  Handle a change in the coordinate system. This requires all the local
-   #  coordinates to be udpated. Same as changing the axis, but without an
+   #  coordinates to be updated. Same as changing the axis, but without an
    #  actual change.
    protected method coords_changed_ {} {
       set value $axis_
       incr axis_
-      set_step_axis_ $value
+      set_step_axis_ $value 0
+
       if { $spectrum_ != {} } {
          if { $last_cxcy_ != {} } {
             eval display_spectrum_ localstart $last_cxcy_
@@ -1219,11 +1232,11 @@ itcl::class gaia::GaiaCube {
          #  Correct collapse bounds to grid indices.
          set alow [axis_pixel2grid_ $lower_collapse_bound_]
          set ahigh [axis_pixel2grid_ $upper_collapse_bound_]
-         
+
          #  Make sure ix and iy are integers (zoomed images).
          set ix [expr round($iix)]
          set iy [expr round($iiy)]
-         
+
          #  Display it as a reference spectrum.
          busy {
             $spectrum_ display_reference $cubeaccessor_ $axis_ $alow $ahigh \
@@ -1242,7 +1255,7 @@ itcl::class gaia::GaiaCube {
 
          #  Correct to pixel indices.
          lassign [image_grid2pixel_ $iix $iiy] ix iy
-         
+
          #  Create the right section. Use collapse coords as bounds on the
          #  spectral axis.
          set range "$lower_collapse_bound_:$upper_collapse_bound_"
