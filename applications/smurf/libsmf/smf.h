@@ -85,8 +85,13 @@
 *        - Change API for smf_check_smfData, smf_deepcopy_smfData
 *        - Add history to smf_construct_smfData
 *        - Add smf_history_add, smf_history_read
+<<<<<<< smf.h
+*     2006-05-01 (EC):
+*        - Add smf_mapcoordinates
+=======
 *     2006-05-09 (AGG):
 *        Add smf_get_xloc and smf_get_ndfid
+>>>>>>> 0.40
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -264,6 +269,9 @@ void smf_mapbounds_approx( Grp *igrp,  int size, char *system, double lon_0,
 void smf_rebinmap( smfData *data, int index, int size, AstFrameSet *outframeset,
                    int *lbnd_out, int *ubnd_out, double *map, double *variance,
 		   double *weights, int *status );
+
+void smf_mapcoord( smfData *data, AstFrameSet *outfset, int *lbnd_out,
+		   int *ubnd_out, int *status );
 
 void smf_scanfit( smfData *data, int order, int *status );
 
