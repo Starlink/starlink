@@ -138,12 +138,12 @@ itcl::class gaia::GaiaCube {
       }
 
       #  Whether to constantly update the image cuts.
-      $Options add checkbutton -label "Autocut" \
+      $Options add checkbutton -label "Autocut images" \
          -variable [scope itk_option(-autocut)] \
          -onvalue 1 \
          -offvalue 0
-      add_menu_short_help $Options {Autocut}  \
-         {Continuously change set the cuts of the image slices, data limits}
+      add_menu_short_help $Options {Autocut images}  \
+         {Continuously change the display range of the image slices}
 
       #  Enable send to SPLAT.
       $Options add checkbutton -label "Enable SPLAT" \
