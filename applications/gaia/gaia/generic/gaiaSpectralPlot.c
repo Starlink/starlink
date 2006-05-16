@@ -11,6 +11,15 @@
  *     a plot. The two axes are determined using an AST spectral coordinate
  *     system (wavelength, frequency, velocity etc.) and an optional set of
  *     data units.
+ *
+ *     An additional polyline can also be drawn. This is intended to serve
+ *     as a reference spectrum and plays no part in determining the data
+ *     limits used in the plot.
+
+ *  Notes:
+ *     The reference spectrum idea is primitive and should not be
+ *     extended. Use a system that shares the AST plot (and uses several
+ *     instances of this item) if additional spectra are required.
 
  *  Copyright:
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -415,14 +424,15 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  *   supplied to support an additional spectrum (with the same coordinates, so
  *   must be from the same data set) to act as a "reference" spectrum. It is
  *   expected that this will be updated less frequently that the main
- *   spectrum.
+ *   spectrum and is not used to determine any data limits.
  *
  *      <canvas> coords <item> \
  *         "refpointer" memory_address_of_ARRAYinfo
  *
  *   A special feature (should be moved into some generic interface, but
- *   that's not possible for canvas items) is to convert an X coordinate into
- *   a canvas coordinate, using the plot. This uses the format:
+ *   that's not possible for canvas items, so some method of exporting the
+ *   plot would be required) is to convert an X coordinate into a canvas
+ *   coordinate, using the plot. This uses the format:
  *
  *      <canvas> coords <item> "convert" coordinate.
  *
@@ -548,7 +558,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         if ( spPtr->dataPtr == NULL ) {
             i = sizeof( double ) * nel;
             spPtr->dataPtr = (double *) ckalloc( i );
-            spPtr->coordPtr = (double *)ckalloc( i );
+            spPtr->coordPtr = (double *) ckalloc( i );
             spPtr->tmpPtr[0] = (double *) ckalloc( i );
             spPtr->tmpPtr[1] = (double *) ckalloc( i );
         }
@@ -1099,9 +1109,8 @@ static void SPTranslate( Tk_Canvas canvas, Tk_Item *itemPtr,
  *      This procedure is called to generate Postscript for the item.
  *
  * Results:
- *      Most of the drawing will be done by the AST components
- *      which the canvas should manage. We need to get the polyline to draw
- *      itself.
+ *      Most of the drawing will be done by the AST components which the
+ *      canvas should manage. We need to get the polylines to draw themselves.
  *
  * Side effects:
  *      None.
