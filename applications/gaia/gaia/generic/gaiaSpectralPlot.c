@@ -663,7 +663,7 @@ static int SPConfigure( Tcl_Interp *interp, Tk_Canvas canvas,
         if ( specPtr->specFlags & TK_CONFIG_OPTION_SPECIFIED ) {
             /* All will do for now! */
             spPtr->newplot = 1;
-            break;
+           break;
         }
     }
     ComputeBBox( canvas, spPtr );
@@ -1076,9 +1076,13 @@ static void SPScale( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
         spPtr->y = originY + scaleY * ( spPtr->y - originY );
         spPtr->width *= scaleX;
         spPtr->height *= scaleY;
+
+        /* Need to recompute plot to fit this change */
+        spPtr->newplot = 1;
     }
 
     ComputeBBox( canvas, spPtr );
+
     return;
 }
 
