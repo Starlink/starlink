@@ -18,7 +18,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                                          int *dims, double *par, double rms,
                                          double mlim, int imax, int ilevel, 
                                          int *lbnd, HDSLoc **ndfs, int iclump, 
-                                         int diag, double mean_peak, int maxbad ){
+                                         int diag, double mean_peak, 
+                                         int maxbad, int *area ){
 /*
 *+
 *  Name:
@@ -36,7 +37,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *                                  double rms, double mlim, int imax, 
 *                                  int ilevel, int *lbnd, HDSLoc **ndfs, 
 *                                  int iclump, int diag, double mean_peak,
-*                                  int maxbad )
+*                                  int maxbad, int *area )
 
 *  Description:
 *     This function removes the supplied Gaussian from the residuals array
@@ -89,6 +90,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *        The mean value of the most recent fitted peak values.
 *     maxbad
 *        Largest allowed number of bad pixels in a clump.
+*     area
+*        Pointer to an int in which to store the number of pixels
+*        contributing to the clump.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidGCUpdateArrays macro 
@@ -154,7 +158,6 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    double yy[ 3 ];        /* External coords of current pixel */
    int *plist;            /* Pointer to list holding pixel indices */
    int *pnext;            /* Pointer to next element in plist */
-   int area;              /* Total area of clump in pixels */
    int area_off;          /* Area of clump outside the data array, in pixels */
    int bad;               /* No of pixels that touch areas of bad pixels */
    int extend[ 3 ][ 2 ];  /* Flags indicating which box faces to extend */
@@ -227,7 +230,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    first = 1;
    peakok = 0;
    sum = 0.0;
-   area = 0;
+   *area = 0;
    area_off = 0;
    while( more ){
       more = 0;
@@ -299,7 +302,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                      sum += m;
 
 /* Count the total number of pixels contributing to the peak. */
-                     area++;
+                     (*area)++;
 
 /* If this pixel is within the data array, update the residuals array. */
                      if( ok ) {
@@ -392,7 +395,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 /* Display info */
    if( ilevel > 3 ) {
       msgSetd( "V", sum );
-      msgSeti( "N", area );
+      msgSeti( "N", *area );
       msgOut( "", "   Integrated clump intensity: ^V (in ^N pixels)", status );
 
       if( area_off ) {
@@ -400,6 +403,16 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
       } else if( bad > maxbad ) {
          msgOut( "", "   (the clump contains too many bad pixels)", status );
       }
+
+      msgSetd( "M", meanr );
+      msgOut( "", "   Mean residual: ^M", status );
+      msgSetd( "M", maxr );
+      msgOut( "", "   Max residual: ^M", status );
+      msgSetd( "M", minr );
+      msgOut( "", "   Min residual: ^M", status );
+      msgSetd( "M", sigr );
+      msgOut( "", "   Residual sigma: ^M", status );
+      
    }
 
 /* Dump the residuals to disk if required. */

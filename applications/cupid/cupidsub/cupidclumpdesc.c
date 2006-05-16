@@ -263,6 +263,8 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
          ret[ ndim ] = sx/s;
 
          v0 = sx2/s - ret[ ndim ]*ret[ ndim ];
+         if( v0 <= 0.0 ) v0 = 0.25;
+
          v = v0 - beamcorr[ 0 ]*beamcorr[ 0 ]/5.5451774;
          peakfactor = v0/v;
          *ok = ( v > 0 );
@@ -273,6 +275,8 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
             ret[ 1 + ndim ] = sy/s;
 
             v0 = sy2/s - ret[ 1 + ndim ]*ret[ 1 + ndim ];
+            if( v0 <= 0.0 ) v0 = 0.25;
+
             v = v0 - beamcorr[ 1 ]*beamcorr[ 1 ]/5.5451774;
             peakfactor *= v0/v;
             if( v > 0 ) {
@@ -287,6 +291,8 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
                ret[ 2 + ndim ] = sz/s;
 
                v0 = sz2/s - ret[ 2 + ndim ]*ret[ 2 + ndim ];
+               if( v0 <= 0.0 ) v0 = 0.25;
+
                v = v0 - beamcorr[ 2 ]*beamcorr[ 2 ]/5.5451774;
                peakfactor *= v0/v;
 

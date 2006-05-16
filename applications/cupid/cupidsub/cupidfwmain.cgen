@@ -177,6 +177,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    int nsz;        /* Longest jump between peaks in the z direction */
    int nv;         /* Vector index of next pixel along the route */
    int nzero;      /* No. of axes with zero displacement between pixels */
+   int percent;    /* Percent of pixels done */
+   int lpercent;   /* Previous displayed percent value */
    int ret;        /* The highest index value in "ipa" */
    int route_length;/* Number of pixels stored in "route" array */
    int skip0;      /* Total skip from centre to first 3x3x3 neighbour */
@@ -247,8 +249,11 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
       }
    }
 
-/* Make a copy of the ipa array. */
-   work = astStore( NULL, ipa, nel*sizeof(int) );
+/* Use a cellular automata to remove small isolated groups of usable
+   pixels from the above "ipa" array. This allocates new memory for the 
+   cleaned up array. */ 	 
+   if( ilevel > 1 ) msgOut( "", "Removing isolated pixels\n", status );
+   work = cupidRCA( ipa, NULL, nel, dims, skip, 0.1, VAL__MAXI, 0, -1, 1 );
 
 /* Initialise the pointer to an array holding the peak value in every clump. */
    peak_values = NULL;
@@ -260,7 +265,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    if( route ) {
 
 /* Prepare progress report. */
-      if( ilevel > 2 ) msgOut( "", "Walking...\n", status );
+      if( ilevel > 1 ) msgOut( "", "Walking...\n", status );
       count = 0;
 
 /* Store some useful constants. */
@@ -271,6 +276,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
       nsz = ( ndim > 2 ) ? maxjump : 0;
       nsy = ( ndim > 1 ) ? maxjump : 0;
       nsx = maxjump;
+      lpercent = 0;
 
 /* Scan through the "work" array, looking for usable pixels which have not
    yet been assigned to a clump (i.e. have a value of zero in "work"). */
@@ -429,7 +435,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    than 3x3x3. */
                      if( maxg <= 0 ) {
 
-                        if( ilevel > 2 ) {
+                        if( ilevel > 3 ) {
                            msgSeti( "P", iix );
                            if( ndim > 1 ) {
                               msgSetc( "P", "," );
@@ -489,7 +495,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Tell the user if we are jumping to a near-by pixel and continuing to
    walk up hill. */
-                        if( ilevel > 2 && iv != nv ) {
+                        if( ilevel > 3 && iv != nv ) {
                            msgSeti( "P", iix );
                            if( ndim > 1 ) {
                               msgSetc( "P", "," );
@@ -566,11 +572,15 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                }
 
 /* Issue a progress report if required.*/
-               if( ilevel > 2 ){
+               if( ilevel > 1 ){
                   if( ++count % 100000 == 0 && nel - count > 100000 ) {
-                     msgBlank( status );
-                     msgSeti( "F", (int)(100*(float)count/(float)nel) );
-                     msgOut( "", "  ^F % done", status );
+                     if( ilevel > 2 ) msgBlank( status );
+                     percent = (int)(100*(float)count/(float)nel);
+                     if( percent > lpercent ) {
+                        msgSeti( "F", percent );
+                        msgOut( "", "  ^F % done", status );
+                        lpercent = percent;
+                     }
                   }
                }
             }
@@ -579,17 +589,19 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    }
 
 /* Report completion of walk. */
-   if( ilevel > 2 ) {
+   if( ilevel > 1 ) {
       msgBlank( status );
       msgOut( "", "  100 % done", status );
+      msgBlank( status );
    }
 
 /* Smooth the boundaries between the clumps. This cellular automata replaces 
    each output pixels by the most commonly occuring value within a 3x3x3 
    cube of input pixels centred on the output pixel. Repeat this process
    a number of times as given by configuration parameter CleanIter. */
-   cleaniter = cupidConfigI( config, "CLEANITER", 3 );
+   cleaniter = cupidConfigI( config, "CLEANITER", 1 );
 
+   if( ilevel > 1 ) msgOut( "", "Cleaning clumps", status );
    m1 = work;
    m2 = ipa;
    for( iter = 0; iter < cleaniter; iter++ ) {
@@ -597,6 +609,11 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
       m3 = m1;
       m1 = m2;
       m2 = m3;
+      if( ilevel > 1 ) {
+         msgSeti( "I", iter + 1 );
+         msgSeti( "J", cleaniter );
+         msgOut( "", "Completed cleaning iteration ^I of ^J", status );
+      }
    }
 
 /* If the final results are not now in the "ipa" array, copy them to the
@@ -605,8 +622,10 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Amalgamate adjoining clumps if there is no significant dip between the
    clumps. */
+   if( ilevel > 1 ) msgOut( "", "Merging adjoining clumps", status );
    CGEN_FUNCTION(cupidFWJoin)( array, nel, ndim, dims, skip, rms, config, 
                                ipa, peak_values, &ret, ilevel );
+   if( ilevel > 1 ) msgOut( "", "Merging completed", status );
 
 /* Free resources. */
    peak_values = astFree( peak_values );

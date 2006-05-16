@@ -7,6 +7,22 @@
  data arrays.
 
 
+Changes introduced at V0.0-18:
+
+ - Guard against division by zero when using zero beam width with
+   GaussClumps.
+
+ - Add a signal handler that will allow GaussClumps to save the clumps
+   found so far when interupted using control-c.
+
+ - Change default for FellWalker.CleanIter from 3 to 1 (for greater speed
+   and more realistic clump shapes).
+
+ - Tidy up diagnostic information displayed by FellWalker
+
+ - Remove isolated pixels above the noise threshold before starting the
+   walking process in FellWalker.
+
 Changes introduced at V0.0-17:
 
  - Fixed various harmless compiler warnings.

@@ -228,6 +228,7 @@ void makeclumps() {
    float vgrad1[ 2 ];            /* Values for VGRAD1 parameter */
    float vgrad2[ 2 ];            /* Values for VGRAD2 parameter */
    int addnoise;                 /* Add Gaussian noise to output array? */
+   int area;                     /* Clump area */
    int dims[ 3 ];                /* Dimensions before axis permutation */
    int i;                        /* Loop count */
    int indf2;                    /* Identifier for output NDF without noise */
@@ -396,7 +397,7 @@ void makeclumps() {
    containing the clump data values, appended to the end of the array of
    NDF structures in the HDS object located by "obj". */
       cupidGCUpdateArraysF( NULL, NULL, nel, ndim, dims, par, rms, trunc, 0,
-                            0, lbnd, &obj, i, 0, 0.0, 0 );
+                            0, lbnd, &obj, i, 0, 0.0, 0, &area );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];

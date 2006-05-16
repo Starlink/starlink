@@ -7,6 +7,11 @@
 #include "star/hds.h"
 #include <math.h>
 #include <stdio.h>
+#include <signal.h>
+#include <setjmp.h>
+
+void cupidGCHandler( int );
+jmp_buf CupidGCHere;
 
 
 /* Global Variables: */
@@ -176,6 +181,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    double x[ CUPID__GCNP3 ]; /* Parameters describing new Gaussian clump */
    int *dims;           /* Pointer to array of array dimensions */
    int allbad;          /* Are all the residuals bad? */
+   int area;            /* Number of pixels contributing to the clump */
+   int area_thresh;     /* The lower threshold for clump areas */
    int diag;            /* Is extra diagnostic information required? */
    int el;              /* Number of elements in array */
    int i;               /* Loop count */
@@ -191,6 +198,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int npad;            /* No. of peaks below threshold for temination */
    int npeak;           /* The number of elements in the "peaks" array. */
    int nskip;           /* No. of failed fits since last good fit */
+   int area_below;      /* Count of consecutive clump areas below the threshold */
    int peaks_below;     /* Count of consecutive peaks below the threshold */
    void *res;           /* Pointer to residuals array */
 
@@ -244,7 +252,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    maxclump = cupidConfigI( gcconfig, "MAXCLUMPS", VAL__MAXI );
 
 /* The iterative process ends when "npad" consecutive clumps all had peak
-   values below "peak_thresh". */
+   values below "peak_thresh" or all had areas below "area_thresh". */
    npad = cupidConfigI( gcconfig, "NPAD", 10 );
 
 /* Get the RMS noise level to use. */
@@ -278,6 +286,10 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    of the RMS noise. */
       peak_thresh = cupidConfigD( gcconfig, "THRESH", 2.0 );
 
+/* Set the lower threshold for clump area to a user-specified number of
+   pixels. */
+      area_thresh = cupidConfigI( gcconfig, "MINPIX", 3 );
+
 /* Get the lowest value (normalised to the RMS noise level) at which
    model Gaussians should be evaluated. */
       mlim = cupidConfigD( gcconfig, "MODELLIM", 3.0 );
@@ -289,8 +301,9 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       iclump = 0;
 
 /* Indicate that no peaks have been found below the lower threshold for clump 
-   peak values. */
+   peak values, or below the lower area threshold. */
       peaks_below = 0;
+      area_below = 0;
 
 /* Initialise the variables used to keep track of the mean and standard
    deviation of the most recent "npeak" fitted peak values. */
@@ -302,11 +315,30 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       peaks = astMalloc( sizeof( double )*npeak );
       for( i = 0; i < npeak; i++ ) peaks[ i ] = 0.0;
 
-/* Loop round fitting a gaussian to the largest remaining peak in the
-   residuals array. */
+/* More initialisation. */
       iter = 1;
       niter = 0;
       nskip = 0;
+
+/* Use the setjmp function to define here to be the place to which the
+   signal handling function will jump when a signal is detected. Zero is
+   returned on the first invocation of setjmp. If a signal is detected,
+   a jump is made into setjmp which then returns a positive signal 
+   identifier. */
+      if( setjmp( CupidGCHere ) ) {
+         iter = 0;
+         msgBlank( status );
+         msgOut( "", "Interupt detected. Clumps found so far will be saved",
+                 status );
+         msgBlank( status );
+      }
+
+/* Set up a signal handler for the SIGINT (interupt) signal. If this
+   signal occurs, the function "cupidGCHandler" will be called. */
+      signal( SIGINT, cupidGCHandler );
+
+/* Loop round fitting a gaussian to the largest remaining peak in the
+   residuals array. */
       while( iter && *status == SAI__OK ) {
 
 /* Report the iteration number to the user if required. */
@@ -391,7 +423,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                   cupidGCUpdateArrays( type, res, ipd, el, ndim, dims,
                                        x, rms, mlim, imax, ilevel, slbnd,    
                                        &ret, iclump, diag, mean_peak,
-                                       maxbad );
+                                       maxbad, &area );
 
 /* Dump the modified residuals if required. */
                   if( ilevel > 5 ) {
@@ -410,6 +442,15 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                      peaks_below++;
                   } else {
                      peaks_below = 0;
+                  }
+
+/* If this clump has an area which is below the threshold, increment
+   the count of consecutive clumps with area below the threshold.
+   Otherwise, reset this count to zero. */
+                  if( area < area_thresh ) {
+                     area_below++;
+                  } else {
+                     area_below = 0;
                   }
 
 /* If the maximum number of clumps have now been found, exit.*/
@@ -434,6 +475,19 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                         msgSeti( "N", npad );
                         msgOut( "", "The previous ^N clumps all had peak "
                                 "values below the threshold.", status );
+                        msgBlank( status );
+                     }
+
+/* If the count of consecutive clumps with area below the threshold has reached
+   "Npad", terminate. */
+                  } else if( area_below == npad ) {
+                     iter = 0;
+ 
+                     if( ilevel > 2 ) msgBlank( status );
+                     if( ilevel > 3 ) {
+                        msgSeti( "N", npad );
+                        msgOut( "", "The previous ^N clumps all had areas "
+                                "below the threshold.", status );
                         msgBlank( status );
                      }
                   }
@@ -536,3 +590,22 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    return ret;
 
 }
+
+void cupidGCHandler( int sig ){
+/* 
+*  Name:
+*     cupidGCHandler
+
+*  Purpose:
+*     Called when an interupt occurs within GaussClumps.
+ 
+*  Description:
+*     This function is called when an interupt signal is detected during
+*     execution of the GaussClumps algorithm. It just jumps back to the 
+*     location defined by the global variable "CupidGCHere", returning the 
+*     signal value.
+*/
+   longjmp( CupidGCHere, sig );
+}
+
+

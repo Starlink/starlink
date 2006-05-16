@@ -290,9 +290,9 @@ void findclumps() {
 *     - GaussClumps.FwhmStart: An initial guess at the ratio of the typical 
 *     observed clump size to the instrument beam width. This is used to
 *     determine the starting point for the algorithm which finds the best
-*     fitting Gaussian for each clump. If no value is supplied, the
-*     initial guess at the clump size is based on the local profile
-*     around the pixel with peak value. []
+*     fitting Gaussian for each clump. If no value is supplied (or if
+*     FwhmBeam is zero), the initial guess at the clump size is based on 
+*     the local profile around the pixel with peak value. []
 *     - GaussClumps.MaxBad: The maximum number of bad pixels which may be
 *     included in a clump. Clumps will not be excluded if they contain
 *     more bad pixels than this value [4]
@@ -345,9 +345,10 @@ void findclumps() {
 *     - GaussClumps.VeloStart: An initial guess at the ratio of the typical 
 *     observed clump velocity width to the velocity resolution. This is used to
 *     determine the starting point for the algorithm which finds the best
-*     fitting Gaussian for each clump. If no value is supplied, the
-*     initial guess at the clump velocity width is based on the local profile
-*     around the pixel with peak value. Only used for 3D data. []
+*     fitting Gaussian for each clump. If no value is supplied (or if
+*     VeloRes is zero), the initial guess at the clump velocity width is 
+*     based on the local profile around the pixel with peak value. Only used 
+*     for 3D data. []
 *     - GaussClumps.Wmin: This parameter, together with GaussClumps.Wwidth, 
 *     determines which input data values are used when fitting a Gaussian to 
 *     a given peak in the data array. It specifies the minimum weight
@@ -516,7 +517,7 @@ void findclumps() {
 *     - FellWalker.CleanIter: This gives the number of times to apply the 
 *     cellular automata which cleans up the filled clumps. This cellular 
 *     automata replaces each clump index by the most commonly occuring 
-*     value within a 3x3x3 cube (or 2x2 square for 2D data) of neighbours. [3]
+*     value within a 3x3x3 cube (or 2x2 square for 2D data) of neighbours. [1]
 *     - FellWalker.FlatSlope: Any initial section to a walk which has an
 *     average gradient (measured over 4 steps) less than this value will not 
 *     be included in the clump. [1.0*RMS]

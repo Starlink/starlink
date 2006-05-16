@@ -1,7 +1,8 @@
 #include "sae_par.h"
 #include "ast.h"
 #include "cupid.h"
-#include "math.h"
+#include "mers.h"
+#include <math.h>
 
 /* Global Variables: */
 /* ================= */
@@ -187,10 +188,24 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 /* Get the FHWM of the instrument beam, in pixels, and store its square. */
       beamfwhm = cupidConfigD( config, "FWHMBEAM", 2.0 );
       cupidGC.beam_sq = beamfwhm*beamfwhm;
+      if( beamfwhm < 0.0 && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         msgSetd( "B", beamfwhm );
+         errRep( "CUPIDGCSETINIT_ERR1", "Illegal value (^B) supplied for "
+                 "configuration parameter GaussClumps.FWHMBeam.", status );
+         goto L999;
+      }
 
 /* Get the velocity resolution, in pixels (=channels), and store its square. */
       velres = cupidConfigD( config, "VELORES", 2.0 );
       cupidGC.velres_sq = velres*velres;
+      if( velres < 0.0 && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         msgSetd( "V", velres );
+         errRep( "CUPIDGCSETINIT_ERR1", "Illegal value (^V) supplied for "
+                 "configuration parameter GaussClumps.VeloRes.", status );
+         goto L999;
+      }
 
 /* Get the Chi-square stiffness parameter "Sa" which encourages the peak
    amplitude of the fitted gaussian close to the maximum value in the
@@ -328,14 +343,22 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    "fbeam".*/
    if( fbeam != VAL__BADD ) {
       fbeam_used = fbeam;
-   } else {
+
+   } else if( beamfwhm > 0.0 ){
       fbeam_used = fwhm_obs[ 0 ]/beamfwhm;
+
+   } else {
+      fbeam_used = fwhm_obs[ 0 ];
    }
    if( fbeam_used < 1.2 ) fbeam_used = 1.2;
 
 /* Find the initial guess at the intrinsic FWHM (i.e. the FWHM of the
    clump before being blurred by the instrument beam). */
-   par[ 3 ] = sqrt( fbeam_used*fbeam_used - 1.0 )*beamfwhm;
+   if( beamfwhm > 0.0 ) {
+      par[ 3 ] = sqrt( fbeam_used*fbeam_used - 1.0 )*beamfwhm;
+   } else {
+      par[ 3 ] = fwhm_obs[ 0 ];
+   }
 
 /* Now do the same for the second axis if necessary. Assume zero rotation
    of the elliptical clump shape. */
@@ -354,11 +377,20 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       par[ 7 ] = cupidGC.x_max[ 2 ];
       if( fvel != VAL__BADD ) {
          fvel_used = fvel;
-      } else {
+
+      } else if( velres > 0.0 ) {
          fvel_used = fwhm_obs[ 2 ]/velres;
+
+      } else {
+         fvel_used = fwhm_obs[ 2 ];
       }
+
       if( fvel_used < 1.1 ) fvel_used = 1.1;
-      par[ 8 ] = sqrt( fvel_used*fvel_used - 1.0 )*velres;
+      if( velres > 0.0 ) {
+         par[ 8 ] = sqrt( fvel_used*fvel_used - 1.0 )*velres;
+      } else {
+         par[ 8 ] = fwhm_obs[ 2 ];
+      }
       par[ 9 ] = 0.0;
       par[ 10 ] = 0.0;
    }
@@ -528,5 +560,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    cupidGC.initmodel = astGrow( cupidGC.initmodel, cupidGC.nel, sizeof( double ) );
    cupidGC.model = astGrow( cupidGC.model, cupidGC.nel, sizeof( double ) );
    cupidGC.resids = astGrow( cupidGC.resids, cupidGC.nel, sizeof( double ) );
+
+L999:;
 
 }
