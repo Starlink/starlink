@@ -70,28 +70,27 @@ typedef struct SPItem  {
     AstPlot *plot;              /* The AstPlot for drawing regions */
     Tcl_Interp *interp;         /* The Tcl interpreter */
     Tk_Anchor tkanchor;         /* Where to anchor relative to (x,y). */
-    Tk_Item *polyline;          /* rtdPolyline item context */
+    Tk_Item *polyline;          /* rtdPolyline for main line context */
+    Tk_Item *refpolyline;       /* rtdPolyline for reference line context */
     XColor *linecolour;         /* Foreground color for polyline */
+    XColor *reflinecolour;      /* Foreground color for reference polyline */
     char *datalabel;            /* The data units label */
     char *dataunits;            /* The data units */
     char *options;              /* AST options used when drawing item */
     char *tagPtr;               /* All tags in use for item */
     char utag[22];              /* Unique tag for AST graphics we create */
-    double *coordPtr;           /* Coordinates for each data value */
-    double *dataPtr;            /* Data values */
-    double *tmpPtr[2];          /* Temporary arrays for transformed
-                                 * coordinates etc. */
+    double *coordPtr;           /* Coordinates of main spectrum */
+    double *dataPtr;            /* Data values of main spectrum */
+    double *refDataPtr;         /* Data values for a reference spectrum */
+    double *tmpPtr[2];          /* Temporary arrays for transformed coordinates etc. */
     double badvalue;            /* The value to replace AST__BAD with */
     double height;              /* Height of item */
-    double refcoord;            /* Reference coordinate */
     double width;               /* Width of item */
     double x, y;                /* Coordinates of item reference point */
-    double xborder;             /* Fractional border for X plot axes, only
-                                 * used when autoscaling using scale command */
+    double xborder;             /* Fractional border for X plot axes, only used when autoscaling using scale command */
     double xleft;               /* Right-hand physical X coordinate for plot */
     double xright;              /* Left-hand physical X coordinate for plot */
-    double yborder;             /* Fractional border for Y plot axes, only
-                                 * used when autoscaling using scale command */
+    double yborder;             /* Fractional border for Y plot axes, only used when autoscaling using scale command */
     double ybot;                /* Physical Y coordinate for plot top */
     double ytop;                /* Physical Y coordinate for plot bottom */
     int fixedscale;             /* If set do not scale item with canvas */
@@ -153,7 +152,10 @@ static Tk_ConfigSpec configSpecs[] = {
      "100.0", Tk_Offset(SPItem, height), TK_CONFIG_DONT_SET_DEFAULT},
 
     {TK_CONFIG_COLOR, "-linecolour", (char *) NULL, (char *) NULL,
-     "black", Tk_Offset(SPItem, linecolour), TK_CONFIG_NULL_OK},
+     "blue", Tk_Offset(SPItem, linecolour), TK_CONFIG_NULL_OK},
+
+    {TK_CONFIG_COLOR, "-reflinecolour", (char *) NULL, (char *) NULL,
+     "green", Tk_Offset(SPItem, reflinecolour), TK_CONFIG_NULL_OK},
 
     {TK_CONFIG_PIXELS, "-linewidth", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(SPItem, linewidth), TK_CONFIG_DONT_SET_DEFAULT},
@@ -308,7 +310,9 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->options = NULL;
     spPtr->plot = NULL;
     spPtr->polyline = NULL;
-    spPtr->refcoord = 0.0;
+    spPtr->refDataPtr = NULL;
+    spPtr->reflinecolour = None;
+    spPtr->refpolyline = NULL;
     spPtr->tagPtr = NULL;
     spPtr->tkanchor = TK_ANCHOR_NW;
     spPtr->tmpPtr[0] = NULL;
@@ -361,8 +365,8 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         astEnd;
     }
 
-    /* Create the polyline we're going to use for drawing the spectrum, this
-     * is used directly for speed. */
+    /* Create the polylines we're going to use for drawing the spectrum,
+     * these will be used directly for speed. */
     {
         Tcl_Obj *dummyObjs[4];
         Tcl_Obj *obj = Tcl_NewDoubleObj( 0.0 );
@@ -378,6 +382,14 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                               (char *) NULL );
             return TCL_ERROR;
         }
+
+        if ( RtdLineCreate( interp, canvas, &spPtr->refpolyline, 4, dummyObjs )
+             != TCL_OK ) {
+            Tcl_AppendResult( interp, "\nInternal error: "
+                              "Failed to create refpolyline object",
+                              (char *) NULL );
+            return TCL_ERROR;
+        }
     }
 
     /* Initialise the GRF interface. */
@@ -390,7 +402,8 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  * SPCoords --
  *
  *   This procedure is invoked to process the "coords" widget command.
- *   This reads an list of doubles that are the spectral coordinates,
+ *
+ *   This reads a list of doubles that are the spectral coordinates,
  *   or accepts a pointer to an ARRAYinfo structure of already available
  *   values in one of the HDS types (_BYTE, _UBYTE, _WORD, _UWORD,
  *   _INTEGER, _REAL _DOUBLE). In the latter case you should use the format:
@@ -398,9 +411,19 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  *      <canvas> coords <item> \
  *         "pointer" memory_address_of_ARRAYinfo
  *
- *   A special feature (should be moved into some generic interface) is to
- *   convert an X coordinate into a canvas coordinate, using the plot. This
- *   uses the format:
+ *   This is also extended to allow another set of data points to be
+ *   supplied to support an additional spectrum (with the same coordinates, so
+ *   must be from the same data set) to act as a "reference" spectrum. It is
+ *   expected that this will be updated less frequently that the main
+ *   spectrum.
+ *
+ *      <canvas> coords <item> \
+ *         "refpointer" memory_address_of_ARRAYinfo
+ *
+ *   A special feature (should be moved into some generic interface, but
+ *   that's not possible for canvas items) is to convert an X coordinate into
+ *   a canvas coordinate, using the plot. This uses the format:
+ *
  *      <canvas> coords <item> "convert" coordinate.
  *
  * Results:
@@ -418,6 +441,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     double *dataPtr;
     int i;
     int nel;
+    int isref = 0;
     long adr;
 
 #if DEBUG
@@ -426,7 +450,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 
     if ( objc == 0 ) {
 	/*
-	 * Print the data values.
+	 * Print the main data values.
 	 */
 	Tcl_Obj *subobj, *obj = Tcl_NewObj();
 	for ( i = 0; i < spPtr->numPoints; i++ ) {
@@ -464,7 +488,12 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         /* Could be a list of doubles or a memory address. */
         nel = objc;
         adr = 0L;
-        if ( strcmp( optionPtr, "pointer" ) == 0 ) {
+        isref = 0;
+        if ( strcmp( optionPtr, "refpointer" ) == 0 ) {
+            isref = 1;
+        }
+
+        if ( strcmp( optionPtr, "pointer" ) == 0 || isref ) {
 
             /*  Memory address, sort this out. */
             if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
@@ -476,14 +505,46 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             nel = arrayInfo->el;
         }
 
-        /* Re-create various workspaces, if needed */
-        if ( spPtr->dataPtr != NULL && nel > spPtr->numPoints ) {
+        /* Reference spectra must have the same number of points and we must
+         * have a data spectrum already */
+        if ( isref ) {
+            if ( nel != spPtr->numPoints ) {
+                Tcl_SetResult( interp, "Reference spectra are required to"
+                               " have the same number of points as main"
+                               " spectrum", TCL_VOLATILE );
+                return TCL_ERROR;
+            }
+            if ( spPtr->dataPtr == NULL ) {
+                Tcl_SetResult( interp, "A reference spectrum can only be added"
+                               " after the main spectrum", TCL_VOLATILE );
+                return TCL_ERROR;
+            }
+            if ( spPtr->refDataPtr == NULL ) {
+                spPtr->refDataPtr = 
+                    (double *) ckalloc( sizeof( double ) * nel );
+            }
+        }
+        else if ( spPtr->dataPtr != NULL && nel > spPtr->numPoints ) {
+            /* Re-create various workspaces, if needed */
             ckfree( (char *) spPtr->dataPtr );
             ckfree( (char *) spPtr->coordPtr );
+            if ( spPtr->refDataPtr != NULL ) {
+                ckfree( (char *) spPtr->refDataPtr );
+                spPtr->refDataPtr = NULL;
+            }
             ckfree( (char *) spPtr->tmpPtr[0] );
             ckfree( (char *) spPtr->tmpPtr[1] );
             spPtr->dataPtr = NULL;
         }
+        else if ( spPtr->dataPtr != NULL && nel != spPtr->numPoints ) {
+            /* When the number of elements changes, the reference spectrum
+             * always becomes invalid . */
+            if ( spPtr->refDataPtr != NULL ) {
+                ckfree( (char *) spPtr->refDataPtr );
+                spPtr->refDataPtr = NULL;
+            }
+        }
+
         if ( spPtr->dataPtr == NULL ) {
             i = sizeof( double ) * nel;
             spPtr->dataPtr = (double *) ckalloc( i );
@@ -498,7 +559,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         spPtr->ybot =  DBL_MAX;
 
         if ( adr == 0 ) {
-            /* Read doubles from each word */
+            /* Read doubles from each word, cannot be reference spectrum */
             for ( i = 0; i < nel; i++ ) {
                 if ( Tcl_GetDoubleFromObj( interp, objv[i],
                                            &spPtr->dataPtr[i] ) != TCL_OK ) {
@@ -514,31 +575,40 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             /* Given ARRAYinfo address, convert type into double precision and
              * check for BAD values which are replaced with our bad value,
              * -DBL_MAX. */
-            gaiaArrayToDouble( arrayInfo, spPtr->badvalue, spPtr->dataPtr );
+            if ( isref ) { 
+                gaiaArrayToDouble( arrayInfo, spPtr->badvalue, 
+                                   spPtr->refDataPtr );
+            }
+            else {
+                gaiaArrayToDouble( arrayInfo, spPtr->badvalue, 
+                                   spPtr->dataPtr );
 
-            /* Get range of data */
-            dataPtr = spPtr->dataPtr;
-            for ( i = 0; i < nel; i++ ) {
-                if ( *dataPtr != spPtr->badvalue ) {
-                    spPtr->ybot = MIN( spPtr->ybot, *dataPtr );
-                    spPtr->ytop = MAX( spPtr->ytop, *dataPtr );
+                /* Get range of data */
+                dataPtr = spPtr->dataPtr;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( *dataPtr != spPtr->badvalue ) {
+                        spPtr->ybot = MIN( spPtr->ybot, *dataPtr );
+                        spPtr->ytop = MAX( spPtr->ytop, *dataPtr );
+                    }
+                    dataPtr++;
                 }
-                dataPtr++;
             }
         }
 
         /* Check if data has no range, in that case just add +/- 1, so we can
          * plot something. During interactive updates that's better than
          * throwing an error. */
-        if ( spPtr->ybot == spPtr->ytop ) {
-            /* No range */
-            spPtr->ybot -= 1.0;
-            spPtr->ytop += 1.0;
-        }
-        else if ( spPtr->ybot == DBL_MAX ) {
-            /* All bad */
-            spPtr->ybot = -1.0;
-            spPtr->ytop =  1.0;
+        if ( ! isref ) {
+            if ( spPtr->ybot == spPtr->ytop ) {
+                /* No range */
+                spPtr->ybot -= 1.0;
+                spPtr->ytop += 1.0;
+            }
+            else if ( spPtr->ybot == DBL_MAX ) {
+                /* All bad */
+                spPtr->ybot = -1.0;
+                spPtr->ytop =  1.0;
+            }
         }
 
     }
@@ -614,6 +684,9 @@ static void SPDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
     if ( spPtr->coordPtr != NULL ) {
         ckfree( (char *) spPtr->coordPtr );
     }
+    if ( spPtr->refDataPtr != NULL ) {
+        ckfree( (char *) spPtr->refDataPtr );
+    }
     if ( spPtr->tmpPtr[0] != NULL ) {
         ckfree( (char *) spPtr->tmpPtr[0] );
     }
@@ -628,6 +701,10 @@ static void SPDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
 
     if ( spPtr->polyline != NULL ) {
         RtdLineDelete( canvas, spPtr->polyline, display );
+    }
+
+    if ( spPtr->refpolyline != NULL ) {
+        RtdLineDelete( canvas, spPtr->refpolyline, display );
     }
 
     /* Delete any grid items */
@@ -654,12 +731,16 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 {
     AstFrame *picked;
     SPItem *spPtr = (SPItem *) itemPtr;
+    Tk_Item *polyline;
+    XColor *linecolour;
     double basebox[4];
+    double *dataPtr;
     double xin[2];
     double xout[2];
     double yin[2];
     double yout[2];
     float graphbox[4];
+    int i;
     int xborder;
     int yborder;
 
@@ -740,7 +821,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         /* And plot the grid axes, this is also only required when the
          * framesets change. */
         if ( spPtr->showaxes ) {
-            
+
             astTk_SetCanvas( Tk_PathName( Tk_CanvasTkwin( canvas ) ) );
             astTk_Tag( spPtr->tagPtr );      /* Includes unique tag */
             ClearSubItems( canvas, spPtr );  /* Remove last grid */
@@ -761,7 +842,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 
                 /* TickAll never works in this mode, so just switch it off */
                 astSet( spPtr->plot, "TickAll=0" );
-                
+
                 /* We never have room for a title, ever so it goes too */
                 astSet( spPtr->plot, "DrawTitle=0" );
 
@@ -784,7 +865,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 
                 /* Restore */
                 astSetC( spPtr->plot, "SideBand", sideband );
-            }                
+            }
             else {
                 astGrid( spPtr->plot );          /* Draw grid */
             }
@@ -794,28 +875,46 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         if ( ! astOK ) astClearStatus;
     }
 
-    /* Finally the spectrum, for speed we use direct control of a
-     * rtd_polyline instance.  First convert coordinates into canvas from
-     * current. */
-    astTran2( spPtr->plot, spPtr->numPoints, spPtr->coordPtr,
-              spPtr->dataPtr, 0, spPtr->tmpPtr[0], spPtr->tmpPtr[1] );
+    /* Finally the spectra, for speed we use direct control of two
+     * rtd_polyline instances.  First convert coordinates into canvas from
+     * current. Use two loops in case have reference spectrum, note reference
+     * spectrum is plotted first. */
+    for ( i = 0; i < 2; i++ ) {
+        if ( i == 0 ) {
+            if ( spPtr->refDataPtr == NULL ) {
+                /* No reference spectrum, skip to next loop */
+                continue;
+            }
+            dataPtr = spPtr->refDataPtr;
+            polyline = spPtr->refpolyline;
+            linecolour = spPtr->reflinecolour;
+        }
+        else {
+            dataPtr = spPtr->dataPtr;
+            polyline = spPtr->polyline;
+            linecolour = spPtr->linecolour;
+        }
 
-    /* Set line coordinates */
-    RtdLineQuickSetCoords( spPtr->interp, canvas, spPtr->polyline,
-                           spPtr->tmpPtr[0], spPtr->tmpPtr[1],
-                           spPtr->numPoints );
+        astTran2( spPtr->plot, spPtr->numPoints, spPtr->coordPtr,
+                  dataPtr, 0, spPtr->tmpPtr[0], spPtr->tmpPtr[1] );
 
-    RtdLineSetColour( display, spPtr->polyline, spPtr->linecolour );
-    RtdLineSetWidth( display, spPtr->polyline, spPtr->linewidth );
+        /* Set line coordinates */
+        RtdLineQuickSetCoords( spPtr->interp, canvas, polyline,
+                               spPtr->tmpPtr[0], spPtr->tmpPtr[1],
+                               spPtr->numPoints );
 
-    /* Do the draw. */
-    RtdLineDisplay( canvas, spPtr->polyline, display, drawable, x, y,
-                    width, height );
+        RtdLineSetColour( display, polyline, linecolour );
+        RtdLineSetWidth( display, polyline, spPtr->linewidth );
 
-    /* Reset AST if any errors occurred, don't want next draw to fail
-     * as well. */
-    if ( !astOK ) {
-        astClearStatus;
+        /* Do the draw. */
+        RtdLineDisplay( canvas, polyline, display, drawable, x, y,
+                        width, height );
+
+        /* Reset AST if any errors occurred, don't want next draw to fail
+         * as well. */
+        if ( !astOK ) {
+            astClearStatus;
+        }
     }
 }
 
@@ -1010,8 +1109,15 @@ static void SPTranslate( Tk_Canvas canvas, Tk_Item *itemPtr,
 static int SPToPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
                            Tk_Item *itemPtr, int prepass )
 {
-    return RtdLineToPostscript( interp, canvas, ((SPItem *)itemPtr)->polyline,
-                                prepass );
+    int result;
+    SPItem *spPtr = (SPItem *) itemPtr;
+
+    result = RtdLineToPostscript( interp, canvas, spPtr->polyline, prepass );
+    if ( result == TCL_OK && spPtr->refDataPtr != NULL ) {
+        result = RtdLineToPostscript( interp, canvas, spPtr->refpolyline, 
+                                      prepass );
+    }
+    return result;
 }
 
 /**
@@ -1429,5 +1535,3 @@ static void MakeSpectral( SPItem *spPtr )
     }
     astEnd;
 }
-
-
