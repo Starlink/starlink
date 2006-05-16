@@ -201,6 +201,20 @@ itcl::class gaia::GaiaSpectralPlot {
       add_menu_short_help $Options {Axes color} \
           {Change the colour of the plot axes}
 
+      #  Choose a colour for the reference spectrum.
+      $Options add cascade -label "Ref spec color" \
+         -menu [menu $Options.refspec]
+      foreach {index colour} $simplecolours_ {
+         $Options.refspec add radiobutton \
+            -background $colour \
+            -variable [scope refspeccolour_] \
+            -value $colour \
+            -label {    } \
+            -command [code $this set_refspeccolour $colour]
+      }
+      add_menu_short_help $Options {Ref spec color} \
+          {Change the colour of the reference spectrum}
+
       #  Choose a colour for the reference line.
       $Options add cascade -label "Ref line color" \
          -menu [menu $Options.refline]
@@ -352,7 +366,8 @@ itcl::class gaia::GaiaSpectralPlot {
                            -x 25 -y 5 -width 650 -height 200 \
                            -linecolour $linecolour_ -linewidth 1 \
                            -gridoptions $gridoptions_ \
-                           -showaxes 1 -xminmax $itk_option(-xminmax)]
+                           -showaxes 1 -xminmax $itk_option(-xminmax)\
+                           -reflinecolour $refspeccolour_]
          #  Clicking on the plot deselects other graphics.
          $itk_component(canvas) bind $spectrum_ <1> \
             +[code $itk_component(draw) deselect_objects]
@@ -399,6 +414,26 @@ itcl::class gaia::GaiaSpectralPlot {
       #      $itk_option(-canvas) move $spectrum2_ $dx $dy
       #   }
       #}
+
+      #  Finished with the spectral data.
+      $accessor release $adr
+   }
+
+   #  Display the reference spectrum.
+   #
+   #  All the given details should correspond to those given to the display
+   #  method.
+   public method display_reference {accessor axis alow ahigh p1 p2} {
+      
+      if { $spectrum_ == {} } {
+         return
+      }
+
+      #  Get the spectral data from the accessor.
+      lassign [$accessor getspectrum $axis $alow $ahigh $p1 $p2 1] adr
+
+      #  Pass in the data.
+      $itk_component(canvas) coords $spectrum_ refpointer $adr
 
       #  Finished with the spectral data.
       $accessor release $adr
@@ -551,6 +586,15 @@ itcl::class gaia::GaiaSpectralPlot {
       }
    }
 
+   #  Set the colour of the reference spectrum.
+   public method set_refspeccolour {colour} {
+      set refspeccolour_ $colour
+      if { $spectrum_ != {} } {
+         $itk_component(canvas) itemconfigure $spectrum_ \
+            -reflinecolour $refspeccolour_
+      }
+   }
+
    #  Set the colour of the canvas background.
    public method set_background {colour} {
       $itk_component(canvas) configure -background $colour
@@ -649,6 +693,9 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Current reference line colour.
    protected variable reflinecolour_ "red"
+
+   #  Current reference spectrum colour.
+   protected variable refspeccolour_ "green"
 
    #  The gridoptions that are currently in use.
    protected variable gridoptions_ {}

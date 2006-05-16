@@ -138,21 +138,22 @@ itcl::class gaia::GaiaCube {
       }
 
       #  Whether to constantly update the image cuts.
-      $Options add checkbutton -label "Autocut images" \
+      $Options add checkbutton -label "Autocut" \
          -variable [scope itk_option(-autocut)] \
          -onvalue 1 \
          -offvalue 0
-      add_menu_short_help $Options {Autocut images}  \
-         {Continuously change the display range of the image slices}
+      add_menu_short_help $Options {Autocut}  \
+         {Continuously change set the cuts of the image slices, data limits}
 
-      #  Enable send to SPLAT.
+      #  Enable send to SPLAT, this overrides the default double-click which
+      #  defines a reference spectrum.
       $Options add checkbutton -label "Enable SPLAT" \
          -command [code $this set_splat_bindings_] \
          -variable [scope itk_option(-use_splat)] \
          -onvalue 1 \
          -offvalue 0
       add_menu_short_help $Options {Enable SPLAT}  \
-         {Enabled sending spectra to SPLAT (double click)}
+         {Make double click send to SPLAT}
 
       #  Add the coordinate selection menu.
       set SpectralCoords [add_menubutton "Coords" left]
@@ -1019,18 +1020,19 @@ itcl::class gaia::GaiaCube {
       add_spectral_bindings_
    }
 
-   #  Add or disable SPLAT binding. XXX move this into GaiaSpectralPlot as a
-   #  more obvious control.
+   #  Add or disable SPLAT binding. XXX move SPLAT behaviour into
+   #  GaiaSpectralPlot as a more obvious control.
    protected method set_splat_bindings_ {} {
       global env
       if { [info exists env(SPLAT_DIR)] && $itk_option(-use_splat)} {
+         #  Double click sends to SPLAT.
          set splat_dir_ $env(SPLAT_DIR)
-
-         #  Button-1 does a lot already so use double click.
          $itk_option(-canvas) bind all <Double-Button-1> \
-            [code $this send_to_splat_ %x %y]
+            [code $this handle_double_click_ splat %x %y]
       } else {
-         $itk_option(-canvas) bind all <Double-Button-1> {}
+         #  Double click defines a reference spectrum.
+         $itk_option(-canvas) bind all <Double-Button-1> \
+            [code $this handle_double_click_ ref %x %y]
       }
    }
 
@@ -1190,35 +1192,62 @@ itcl::class gaia::GaiaCube {
       return [expr round($value+1-$zo)]
    }
 
-   #  Send a spectrum to SPLAT.
-   protected method send_to_splat_ {cx cy} {
+   #  Deal with a double click. This defines a reference spectrum or sends the
+   #  spectrum to SPLAT.
+   protected method handle_double_click_ {dest cx cy} {
 
       #  Convert click coordinates from canvas coords to grid coords.
       set ccx [$itk_option(-canvas) canvasx $cx]
       set ccy [$itk_option(-canvas) canvasy $cy]
       $itk_option(-rtdimage) convert coords $ccx $ccy canvas iix iiy image
 
-      #  Correct to pixel indices.
-      lassign [image_grid2pixel_ $iix $iiy] ix iy
+      if { $dest == "ref" } {
+         if { $spectrum_ == {} } {
+            return
+         }
 
-      #  Create the right section. Use collapse coords as bounds on the
-      #  spectral axis.
-      set range "$lower_collapse_bound_:$upper_collapse_bound_"
-      if { $axis_ == 1 } {
-         set section "($range,$ix,${iy}${close_section_}"
-      } elseif { $axis_ == 2 } {
-         set section "($ix,$range,${iy}${close_section_})"
+         #  Already have a plot, re-display if withdrawn.
+         if { [wm state $spectrum_] == "withdrawn" } {
+            $spectrum_ open
+         }
+
+         #  Correct collapse bounds to grid indices.
+         set alow [axis_pixel2grid_ $lower_collapse_bound_]
+         set ahigh [axis_pixel2grid_ $upper_collapse_bound_]
+         
+         #  Make sure ix and iy are integers (zoomed images).
+         set ix [expr round($iix)]
+         set iy [expr round($iiy)]
+         
+         #  Display it as a reference spectrum.
+         busy {
+            $spectrum_ display_reference $cubeaccessor_ $axis_ $alow $ahigh \
+               $ix $iy
+         }
       } else {
-         set section "($ix,$iy,${range}${close_section_}"
-      }
 
-      #  Send the section to SPLAT.
-      if { $splat_disp_ == {} } {
-         set splat_disp_ [GaiaForeignExec \#auto \
-                             -application $splat_dir_/splatdisp \
-                             -show_output 0]
+         #  Correct to pixel indices.
+         lassign [image_grid2pixel_ $iix $iiy] ix iy
+         
+         #  Create the right section. Use collapse coords as bounds on the
+         #  spectral axis.
+         set range "$lower_collapse_bound_:$upper_collapse_bound_"
+         if { $axis_ == 1 } {
+            set section "($range,$ix,${iy}${close_section_}"
+         } elseif { $axis_ == 2 } {
+            set section "($ix,$range,${iy}${close_section_})"
+         } else {
+            set section "($ix,$iy,${range}${close_section_}"
+         }
+
+         #  Send the section to SPLAT.
+         if { $splat_disp_ == {} } {
+            set splat_disp_ [GaiaForeignExec \#auto \
+                                -application $splat_dir_/splatdisp \
+                                -show_output 0]
+         }
+         $splat_disp_ runwith "${ndfname_}${section}" 0
       }
-      $splat_disp_ runwith "${ndfname_}${section}" 0
    }
 
    #  Create the spectral position marker.
