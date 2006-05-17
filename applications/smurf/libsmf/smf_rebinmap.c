@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_rebinmap( smfData *data, int index, int size, 
-*                    AstFrameSet *outframeset,
+*                    AstFrameSet *outfset,
 *                   int *lbnd_out, int *ubnd_out, 
 *                   double *map, double *variance, double *weights,
 *         	    int *status );
@@ -26,7 +26,7 @@
 *        Index of element in igrp
 *     size = int (Given)
 *        Number of elements in igrp
-*     outframeset = AstFrameSet* (Given)
+*     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping
 *     lbnd_out = double* (Given)
 *        2-element array pixel coord. for the lower bounds of the output map 
@@ -100,7 +100,7 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outframeset,
+void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
                    int *lbnd_out, int *ubnd_out, double *map, double *variance,
 		   double *weights, int *status ) {
 
@@ -109,7 +109,7 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outframeset
   AstCmpMap *bolo2map=NULL;     /* Combined mapping bolo->map coordinates */
   double  *boldata;             /* Pointer to bolometer data */
   smfHead *hdr=NULL;            /* Pointer to data header this time slice */
-  dim_t j;                      /* Loop counter */
+  dim_t i;                      /* Loop counter */
   int lbnd_in[2];               /* Lower pixel bounds for input maps */
   int nbol = 0;                 /* # of bolometers in the sub-array */
   int rebinflags;               /* Control the rebinning procedure */
@@ -121,26 +121,24 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outframeset
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* Get the system from the outframeset */
-  system = astGetC( outframeset, "system" );
+  /* Get the system from the outfset */
+  system = astGetC( outfset, "system" );
 
+  /* Calculate bounds in the input array */
   nbol = (data->dims)[0] * (data->dims)[1];
+  lbnd_in[0] = 0;
+  lbnd_in[1] = 0;
+  ubnd_in[0] = (data->dims)[0]-1;
+  ubnd_in[1] = (data->dims)[1]-1;
 
-  /* Loop over all time slices in the data */      
-  for( j=0; j<(data->dims)[2]; j++ ) {
+  for( i=0; i<(data->dims)[2]; i++ ) {
 	
-    smf_tslice_ast( data, j, 1, status);
+    smf_tslice_ast( data, i, 1, status);
 	
     if( *status == SAI__OK ) {
       hdr = data->hdr;
       sc2hdr = hdr->sc2head;
 	  
-      /* Calculate bounds in the input array */
-      lbnd_in[0] = 0;
-      lbnd_in[1] = 0;
-      ubnd_in[0] = (data->dims)[0]-1;
-      ubnd_in[1] = (data->dims)[1]-1;
-
       /* Get bolo -> sky mapping 
 	 Set the System attribute for the SkyFframe in input WCS 
 	 FrameSet and extract the IN_PIXEL->Sky mapping. */	  
@@ -155,8 +153,8 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outframeset
 	  
       if( sky2map == NULL ) { 
 	/* Extract the Sky->REF_PIXEL mapping. */
-	astSetC( outframeset, "SYSTEM", system );
-	sky2map = astGetMapping( outframeset, AST__CURRENT, 
+	astSetC( outfset, "SYSTEM", system );
+	sky2map = astGetMapping( outfset, AST__CURRENT, 
 				 AST__BASE );
       }
 	  
@@ -165,16 +163,16 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outframeset
 
       /*  Rebin this time slice*/
       rebinflags = 0;
-      if( (index == 1) && (j == 0) )                    /* Flags start rebin */
+      if( (index == 1) && (i == 0) )                    /* Flags start rebin */
 	rebinflags = rebinflags | AST__REBININIT;
 
-      if( (index == size) && (j == (data->dims)[2]-1) ) /* Flags end rebin */
+      if( (index == size) && (i == (data->dims)[2]-1) ) /* Flags end rebin */
 	rebinflags = rebinflags | AST__REBINEND;
 	  
       boldata = (data->pntr)[0];
       astRebinSeqD(bolo2map, 0.0,
 		   2, lbnd_in, ubnd_in,
-		   &(boldata[j*nbol]),
+		   &(boldata[i*nbol]),
 		   NULL, 
 		   AST__NEAREST, NULL, rebinflags, 0.1, 1000000, VAL__BADD,
 		   2,lbnd_out,ubnd_out,
