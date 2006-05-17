@@ -1273,8 +1273,10 @@
              DLBNDI( J ) = AST__BAD
              DUBNDI( J ) = AST__BAD
          END DO
-         DLBNDI( JAXIS ) = DBLE( LBNDS( JAXIS ) ) + 0.5D0
-         DUBNDI( JAXIS ) = DBLE( UBNDS( JAXIS ) ) + 0.5D0
+         DLBNDI( JAXIS ) = DBLE( LBNDS( JAXIS ) - LBND( JAXIS ) ) + 
+     :                     0.5D0
+         DUBNDI( JAXIS ) = DBLE( UBNDS( JAXIS ) - LBND( JAXIS ) ) + 
+     :                     1.5D0
 
          INSLAB( ICH ) = AST_INTERVAL( PFRMI, DLBNDI, DUBNDI, AST__NULL,
      :                                 ' ', STATUS )
