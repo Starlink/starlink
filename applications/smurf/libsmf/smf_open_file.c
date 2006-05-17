@@ -84,6 +84,8 @@
 *        Fix bug where allsc2heads wasn't being set
 *     2006-04-21 (AGG):
 *        Add history read
+*     2006-05-16 (AGG):
+*        Change msgOut to msgOutif
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -274,7 +276,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	ndfAnnul( &pndf, status );
 	datAnnul( &ploc, status );
       } else {
-	msgOut(FUNC_NAME, "Warning: no SCU2RED extension. Continuing anyway.", status);
+	msgOutif(MSG__VERB, FUNC_NAME, 
+		 "Warning: no SCU2RED extension. Continuing anyway.", status);
       }
     }
 
