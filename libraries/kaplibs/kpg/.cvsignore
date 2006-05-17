@@ -32,8 +32,11 @@ kpg1_cmpk.f
 kpg1_cmul.f
 kpg1_cmvd.f
 kpg1_cmvv.f
+kpg1_cpbd.f
+kpg1_cpnd.f  
 kpg1_cpnt.f
 kpg1_csub.f
+kpg1_ctcp.f
 kpg1_d2w2.f
 kpg1_dara.f
 kpg1_dcli.f
@@ -60,6 +63,7 @@ kpg1_hsta.f
 kpg1_hstf.f
 kpg1_hstq.f
 kpg1_inco.f
+kpg1_is3.f
 kpg1_iscl.f
 kpg1_litn.f
 kpg1_litr.f
@@ -79,6 +83,7 @@ kpg1_mthe.f
 kpg1_mul.f
 kpg1_mxme.f
 kpg1_mxmn.f
+kpg1_nbad.f
 kpg1_nois.f
 kpg1_nthm.f
 kpg1_numb.f
