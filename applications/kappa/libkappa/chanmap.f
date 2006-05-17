@@ -77,6 +77,12 @@
 *          "Rms"    -- Root-mean-square value.
 *          "Sigma"  -- Standard deviation about the unweighted mean.
 *          "Sum"    -- The total value.
+*
+*        The selection is restricted if each channel contains fewer
+*        than three pixels.  For instance, measures of dispersion like
+*        "Sigma" and "Iwd" are meaningless for single-pixel channels.
+*        If you supply an unavailable option, you will be informed,
+*        and presented with the available options.
 *        ["Mean"]
 *     HIGH = LITERAL (Read)
 *        Together with parameter LOW, this parameter defines the range 
@@ -267,8 +273,12 @@
 *        Removed call to KPS1_CLPA0 and called NDF_PTWCS after creating
 *        the SwitchMap.
 *     11-MAY-2006 (DSB):
-*        Clear up inconsistencies between use of PIXEL and GRID co-ordinates
-*        when creating the output WCS FrameSet.
+*        Clear up inconsistencies between use of PIXEL and GRID
+*        co-ordinates when creating the output WCS FrameSet.
+*     2006 May 15 (MJC):
+*        Restrict the choice of estimators by the number of pixels per
+*        channel.  Remove MINWID restriction.  Provide inverse Mapping
+*        for SelectorMap (merger of May 10 changes).
 *     {enter_further_changes_here}
 
 *-
@@ -301,12 +311,8 @@
       INTEGER MAXCHN             ! Maximum number of channels
       PARAMETER ( MAXCHN = 100 )
 
-      INTEGER MINWID             ! Minimum channel width in pixels
-      PARAMETER( MINWID = 3 )
-
       INTEGER NDIM               ! Input dimensionality required
       PARAMETER( NDIM = 3 )
-
 
 *  Local Variables:
       INTEGER AEL                ! Number of collapse axis elements
@@ -336,12 +342,16 @@
       DOUBLE PRECISION CURPOS( NDIM ) ! Valid current Frame position
       INTEGER D                  ! A dimension size
       DOUBLE PRECISION DLBND( NDIM ) ! Lower bounds in pixel co-ords
-      DOUBLE PRECISION DLBNDS( NDIM - 1 ) ! Slab lower bounds in pixel
-                                 ! spatial co-ords
+      DOUBLE PRECISION DLBNDI( NDIM ) ! Slab inverse lower bounds in 
+                                 ! GRID collapsed-axis co-ords
+      DOUBLE PRECISION DLBNDS( NDIM - 1 ) ! Slab lower bounds in GRID 
+                                 ! co-ords along uncollapsed axes
       CHARACTER DTYPE*( NDF__SZFTP ) ! Numeric type for output arrays
       DOUBLE PRECISION DUBND( NDIM ) ! Upper bounds in pixel co-ords
-      DOUBLE PRECISION DUBNDS( NDIM - 1 ) ! Slab bounds in pixel spatial 
-                                 ! co-ords
+      DOUBLE PRECISION DUBNDI( NDIM ) ! Inverse slab upper bounds in 
+                                 ! GRID collapsed-axis co-ords
+      DOUBLE PRECISION DUBNDS( NDIM - 1 ) ! Slab upper bounds in GRID 
+                                 ! co-ords along uncollapsed axes
       INTEGER ELC                ! Number of elements in a channel
                                  ! mapped array
       INTEGER ELI                ! Number of elements in an input mapped
@@ -350,6 +360,7 @@
                                  ! mapped array
       CHARACTER ESTIM*( 6 )      ! Method to use to estimate collapsed
                                  ! values
+      CHARACTER ESTIMO*( 78 )    ! List of available estimators
       INTEGER GMAP               ! Pointer to Mapping from GRID Frame 
                                  ! to Current Frame, input NDF
       DOUBLE PRECISION GRDPOS( NDIM ) ! Valid grid Frame position
@@ -368,6 +379,8 @@
       INTEGER INDFI              ! Input NDF identifier
       INTEGER INDFO              ! Output NDF identifier
       INTEGER INDFS              ! Input NDF-section identifier
+      INTEGER INSLAB( MAXCHN )   ! Pointers to inverse collapsed-axis 
+                                 ! slab intervals for each channel
       INTEGER IPAXCO             ! Pointers to mapped d.p. axis array
       INTEGER IPCH( 2 )          ! Pointers to mapped channel arrays
       INTEGER IPCO               ! Pointers to mapped co-ordinate array
@@ -382,6 +395,7 @@
       INTEGER IPW2               ! Pointer to second work array
       INTEGER IPW3               ! Pointer to third work array
       INTEGER IPWID              ! Pointers to mapped width work array
+      INTEGER ISEMAP             ! Inverse-SelectorMap pointer
       CHARACTER ITYPE*( NDF__SZTYP ) ! Numeric type for processing
       INTEGER IWCS               ! WCS FrameSet pointer
       INTEGER IWCSO              ! Output NDF's WCS FrameSet pointer
@@ -415,14 +429,14 @@
                                  ! array
       INTEGER NERR               ! Number of numerical errors
       INTEGER NC                 ! Used length of string
-      INTEGER ND                 ! Number of dimensniosn (dummy)
+      INTEGER ND                 ! Number of dimensions (dummy)
       INTEGER NDIMO              ! Number of pixel axes in output NDF
       INTEGER NOCHAN             ! Number of channels
       INTEGER NSHAPE             ! Number of shape values
       INTEGER NVAL               ! Number of values obtained (1)
       INTEGER OBL                ! Identifier for output-NDF block
       INTEGER ODIMS( NDF__MXDIM ) ! Output NDF dimensions
-      INTEGER OFFSET( NDF__MXDIM ) ! Channel image pixel offsets within
+      INTEGER OFFSET( NDF__MXDIM ) ! Channel-image pixel offsets within
                                  ! output array
       INTEGER OPERM( NDIM )      ! Output permutation
       INTEGER PERMAP             ! PermMap pointer
@@ -430,6 +444,7 @@
       DOUBLE PRECISION PIXPOS( NDF__MXDIM ) ! Valid pixel Frame position
       INTEGER PLACE              ! NDF placeholder
       DOUBLE PRECISION PPOS( 2, NDF__MXDIM ) ! Two pixel Frame positions
+      INTEGER PFRMI              ! Input PIXEL Frame pointer
       INTEGER PFRMO              ! Output PIXEL Frame pointer
       DOUBLE PRECISION PRJ       ! Vector length projected on to a pixel
                                  ! axis
@@ -443,7 +458,7 @@
                                  ! to current tile's origin
       INTEGER SHIMAP             ! SwitchMap pointer
       INTEGER SLABIN( MAXCHN )   ! Pointers to spatial-pixel slab 
-                                 ! intervals for each channel
+                                 ! Intervals for each channel
       INTEGER SWIMAP             ! SwitchMap pointer
       CHARACTER TTLC*( 255 )     ! Title of original current Frame
       INTEGER UBND( NDIM )       ! Upper pixel index bounds of the input
@@ -723,7 +738,7 @@
 *  The constraints are that the values are positive, and each
 *  channel must have at least three pixels.  (This may be made 
 *  dependent on the estimator.)
-      CALL PAR_GDR0I( 'SHAPE', 4, 1, MIN( 100, AEL / MINWID ), 
+      CALL PAR_GDR0I( 'SHAPE', 4, 1, MIN( MAXCHN, AEL ), 
      :                .FALSE., SHAPE( 1 ), STATUS )
 
       IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -734,6 +749,7 @@
       ELSE
          SHAPE( 2 ) = ( NOCHAN - 1 ) / SHAPE( 1 ) + 1
       END IF
+      
 
 *  Propagate the input to the output NDF and define latter's bounds.
 *  =================================================================
@@ -808,17 +824,28 @@
 *  Find the index of the PIXEL Frame in the output FrameSet.
       CALL KPG1_ASFFR( IWCSO, 'PIXEL', IPIXO, STATUS )
 
-*  Extract the Mapping from PIXEL Frame to Current Frame, and the
-*  Pixel Frame.
+*  Obtain the input and output PIXEL Frames.
+      PFRMI = AST_GETFRAME( IWCS, IPIX, STATUS )
       PFRMO = AST_GETFRAME( IWCSO, IPIXO, STATUS )
 
 *  Obtain the remaining parameters.
 *  ================================
 
+*  Let's define the number of pixels per channel.  First of all it's
+*  needed to restrict the options when its value is small.
+      PIXPCH = REAL( AEL ) / REAL( NOCHAN )
+      IF ( PIXPCH .GT. 3 ) THEN
+         ESTIMO = 'Mean,WMean,Mode,Median,Max,Min,Comax,Comin,Absdev,'/
+     :            /'RMS,Sigma,Sum,Iwc,Iwd,Integ'
+      ELSE IF ( PIXPCH .EQ. 1 ) THEN
+         ESTIMO = 'Mean,Max,Min,Comax,Comin,Sum,Iwc,Integ'
+      ELSE IF ( PIXPCH .EQ. 2 ) THEN
+         ESTIMO = 'Mean,WMean,Max,Min,Comax,Comin,Absdev,Sum,Iwc,Integ'
+      END IF
+
 *  Get the ESTIMATOR and WLIM parameters.
-      CALL PAR_CHOIC( 'ESTIMATOR', 'Mean','Mean,WMean,Mode,Median,Max,'/
-     :                /'Min,Comax,Comin,Absdev,RMS,Sigma,Sum,Iwc,Iwd,'/
-     :                /'Integ', .FALSE., ESTIM, STATUS )
+      CALL PAR_CHOIC( 'ESTIMATOR', 'Mean', ESTIMO,
+     :                .FALSE., ESTIM, STATUS )
 
       CALL PAR_GDR0R( 'WLIM', 0.3, 0.0, 1.0, .FALSE., WLIM, STATUS )
 
@@ -863,8 +890,7 @@
 *  Map the channel map.
       CALL KPG1_MAP( INDFO, COMP, ITYPE, 'WRITE', IPOUT, ELO, STATUS )
 
-*  Let's define the number of pixels per channel.
-      PIXPCH = REAL( AEL ) / REAL( NOCHAN )
+*  There may be bad pixels present.
       BAD = .TRUE.
 
 *  Set the pixel bounds of the slab NDF.
@@ -1185,18 +1211,23 @@
 *  array to the lower-left of the current tile, combined with a 
 *  conversion to three dimensions, using a constant---the average 
 *  co-ordinate along the collapsed axis---for the third dimension; and
-*  b) Create intervals using the range of spatial GRID co-ordinates.
+*  b) Create Intervals using the range of GRID co-ordinates along
+*  non-collapsed axes.
+*  c) Create Intervals using the range of GRID co-ordinates of each
+*  channel.
 
 *  Once all the tiles have been pasted into the output array the
 *  steps are as follows.
-*  c) Form a SelectorMap using the array of spatial Intervals from b).
-*  d) In turn form a SwitchMap using the SelectorMap, and route maps
-*  from step a).
-*  e) Create a compound Mapping of the SwitchMap and the original
-*  3D GRID-to-current Frame Mapping.  The result maps from
-*  two-dimensional GRID coords to the input current Frame.
-*  f) Add a new Frame to the output FrameSet using the Mapping
-*  from step e) to connect the frameSet to the two-dimensional GRID
+*  d) Form a SelectorMap using the array of spatial Intervals from b).
+*  e) Form an inverse SelectorMap using the array of collapsed-axis 
+*  Intervals from c).
+*  f) In turn form a SwitchMap using the forward and inverse 
+*  SelectorMaps from steps d) and e), and route maps from step a).
+*  g) Create a compound Mapping of the SwitchMap and the original
+*  three-dimensional GRID-to-current Frame Mapping.  The result maps 
+*  from two-dimensional GRID co-ordinates to the input current Frame.
+*  h) Add a new Frame to the output FrameSet using the Mapping
+*  from step g) to connect the FrameSet to the two-dimensional GRID
 *  Frame.
 
 *  Create a ShiftMap from two-dimensional GRID co-ordinates in the large
@@ -1217,14 +1248,15 @@
 
 *  Combine the ShiftMap and the PermMap to form the route map for the
 *  current tile.  The forward transformation of this Mapping goes from 
-*  2D GRID coords in the output image to 3D GRID coords in the input 
-*  cube.
+*  two-dimensional GRID co-ordinates in the output image to 
+*  three-dimensional GRID co-ordinates in the input cube.
          ROUMAP( ICH ) = AST_CMPMAP( SHIMAP, PERMAP, .TRUE., ' ',
      :                               STATUS )
 
-*  Create an Interval describing the region within the output 2D GRID Frame
-*  occupied by this tile.  Note that this would need changing if the tiles 
-*  did not abut.  Also the bounds are double precision.
+*  Create an Interval describing the region within the output 
+*  two-dimensional GRID Frame occupied by this tile.  Note that this 
+*  would need changing if the tiles did not abut.  Also the bounds are 
+*  double precision.
          DO J = 1, NDIMO
              DLBNDS( J ) = DBLE( ( CHIND( J ) - 1 ) * CHDIMS( J ) ) +
      :                     0.5D0 
@@ -1235,15 +1267,31 @@
          SLABIN( ICH ) = AST_INTERVAL( PFRMO, DLBNDS, DUBNDS, AST__NULL,
      :                                 ' ', STATUS )
 
+*  Create the inverse Interval.   The non-collapsed axes are unbounded.
+*  The collapsed axis is bounded by the GRID range of each tile.
+         DO J = 1, NDIM
+             DLBNDI( J ) = AST__BAD
+             DUBNDI( J ) = AST__BAD
+         END DO
+         DLBNDI( JAXIS ) = DBLE( LBNDS( JAXIS ) ) + 0.5D0
+         DUBNDI( JAXIS ) = DBLE( UBNDS( JAXIS ) ) + 0.5D0
+
+         INSLAB( ICH ) = AST_INTERVAL( PFRMI, DLBNDI, DUBNDI, AST__NULL,
+     :                                 ' ', STATUS )
+
 *  Free up the AST resources we don't need to retain outside of the
 *  channel loop.
          CALL AST_ANNUL( PERMAP, STATUS )
          CALL AST_ANNUL( SHIMAP, STATUS )
       END DO
 
-*  Create the SelectorMap and SwitchMap.
+*  Create the SelectorMap and the inverse SelectorMap, and hence the
+*  SwitchMap.
       SELMAP = AST_SELECTORMAP( NOCHAN, SLABIN, ' ', STATUS )
-      SWIMAP = AST_SWITCHMAP( SELMAP, AST__NULL, NOCHAN, ROUMAP,
+      ISEMAP = AST_SELECTORMAP( NOCHAN, INSLAB, ' ', STATUS )
+      CALL AST_INVERT( ISEMAP, STATUS )
+
+      SWIMAP = AST_SWITCHMAP( SELMAP, ISEMAP, NOCHAN, ROUMAP,
      :                        ' ', STATUS )
 
 *  Combine in sequence the SwitchMap (that goes from two-dimensional
