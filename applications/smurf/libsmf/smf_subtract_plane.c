@@ -202,6 +202,10 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
     errRep(FUNC_NAME, "Unknown FIT type, ^F: programming error?", status);
    }
 
+  /* Tell user we're removing the sky */
+  msgSetc("F", fittype);
+  msgOutif(MSG__VERB, FUNC_NAME, "Removing sky with method ^F", status);
+
   /* Do we have 2-D image or 3-D timeseries data? */
   if (data->ndims == 2) {
     nframes = 1;

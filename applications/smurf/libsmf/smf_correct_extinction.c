@@ -157,17 +157,18 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
   /* Check status */
   if (*status != SAI__OK) return;
 
-  if ( smf_history_check( data, FUNC_NAME, status) ) return;
+  if ( smf_history_check( data, FUNC_NAME, status) ) {
+    msgSetc("F", FUNC_NAME);
+    msgOutif( MSG__VERB, FUNC_NAME, 
+	      "^F has already been run on these data, returning to caller", status);
+    return;
+  }
 
   /* Do we have 2-D image data? */
   if (data->ndims == 2) {
-
     nframes = 1;
-
   } else if (data->ndims == 3 ) {
-
     nframes = (data->dims)[2];
-
   } else {
     /* Abort with an error if the number of dimensions is not 2 or 3 */
     if ( *status == SAI__OK) {
@@ -178,6 +179,11 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
 	     status);
     }
   }
+
+  /* Tell user we're correcting for extinction */
+  msgSetc("M", method);
+  msgOutif(MSG__VERB, FUNC_NAME, 
+	   "Correcting for extinction with method ^M", status);
 
   /* Should check data type for double */
   smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status);
