@@ -50,6 +50,7 @@ ADAM_C_ROUTINES = kaplibs_adam.c
 ADAM_GRAPHIC_F_ROUTINES = $(KPG_GRAPHIC_ADAM_NONGEN)
 
 GEN_F_ROUTINES = $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
+        $(KPG_DI_GEN:.gdi=.f) \
 	$(KPG_DIR_GEN:.gdir=.f) $(KPG_NXD_GEN:.gnxd=.f) \
 	$(KPG_BDIRW_GEN:.gbdirw=.f) $(KPG_NXB_GEN:.gnxb=.f) \
 	$(KPG_XC_GEN:.gxc=.f) $(KPG_XL_GEN:.gxl=.f) \
@@ -71,7 +72,7 @@ KPG_NXD_GEN = kpg1_cmul.gnxd
 
 # All numeric types
 KPG_N_GEN = bad2d.gn kpg1_bl1d.gn kpg1_bor2.gn \
-kpg1_cadd.gn kpg1_chva.gn kpg1_cmpk.gn \
+kpg1_cadd.gn kpg1_chva.gn kpg1_cmpk.gn kpg1_cpnd.gn \
 kpg1_csub.gn kpg1_elnm.gn kpg1_expo.gn kpg1_fill.gn \
 kpg1_flip.gn kpg1_frac.gn kpg1_gauf.gn kpg1_ghst.gn \
 kpg1_hsta.gn kpg1_hstq.gn kpg1_loct.gn kpg1_loga.gn \
@@ -100,15 +101,18 @@ kpg1_axbn.gdr kpg1_axco.gdr kpg1_axex.gdr kpg1_axgv.gdr \
 kpg1_axlv.gdr kpg1_axvl.gdr kpg1_bloc.gdr kpg1_bmed.gdr \
 kpg1_chax.gdr kpg1_chep.gdr kpg1_chev.gdr kpg1_cmav.gdr \
 kpg1_che2.gdr kpg1_cmad.gdr kpg1_cmvd.gdr kpg1_cmvv.gdr \
-kpg1_d2w2.gdr kpg1_dcli.gdr kpg1_div.gdr  kpg1_dwso.gdr \
-kpg1_ffr.gdr  kpg1_fftf.gdr kpg1_gaus.gdr \
+kpg1_cpbd.gdr kpg1_d2w2.gdr kpg1_dcli.gdr kpg1_div.gdr  \
+kpg1_dwso.gdr kpg1_ffr.gdr  kpg1_fftf.gdr kpg1_gaus.gdr \
 kpg1_hcon.gdr kpg1_hmlt.gdr kpg1_hsds.gdr kpg1_hsfl.gdr \
-kpg1_hstf.gdr kpg1_litn.gdr kpg1_ludc.gdr \
-kpg1_mdet.gdr kpg1_mono.gdr kpg1_mthe.gdr kpg1_pow.gdr \
+kpg1_hstf.gdr kpg1_is3.gdr  kpg1_litn.gdr kpg1_ludc.gdr \
+kpg1_mdet.gdr kpg1_mono.gdr kpg1_mthe.gdr kpg1_nbad.gdr \
+kpg1_pow.gdr \
 kpg1_prow.gdr kpg1_psfs.gdr kpg1_qntl.gdr kpg1_rfco.gdr \
 kpg1_ssaz.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_tral.gdr \
 kpg1_trbo.gdr kpg1_trig.gdr kpg1_trpi.gdr kpg1_unz2.gdr \
 kpg1_xyzw.gdr
+
+KPG_DI_GEN = kpg1_ctcp.gdi
 
 KPG_DIR_GEN = copa.gdir kpg1_chel.gdir kpg1_figr.gdir \
 kpg1_prsa.gdir kpg1_mul.gdir kpg1_sqsu.gdir 
@@ -163,19 +167,8 @@ kpg1_cmuld.f \
 kpg1_cnlim.f \
 kpg1_colnm.f \
 kpg1_copy.f \
-kpg1_cpbdd.f \
-kpg1_cpbdr.f \
-kpg1_cpndb.f \
-kpg1_cpndd.f \
-kpg1_cpndi.f \
-kpg1_cpndr.f \
-kpg1_cpndub.f \
-kpg1_cpnduw.f \
-kpg1_cpndw.f \
 kpg1_cpsty.f \
 kpg1_cshft.f \
-kpg1_ctcpd.f \
-kpg1_ctcpi.f \
 kpg1_danot.f \
 kpg1_dauni.f \
 kpg1_debug.f \
@@ -198,8 +191,6 @@ kpg1_hrcpr.f \
 kpg1_hsstp.f \
 kpg1_hstlo.f \
 kpg1_imprg.f \
-kpg1_is3d.f \
-kpg1_is3r.f \
 kpg1_isscs.f \
 kpg1_kgodr.f \
 kpg1_lintd.f \
@@ -211,8 +202,6 @@ kpg1_nacvt.f \
 kpg1_nag2r.f \
 kpg1_nagtc.f \
 kpg1_naptc.f \
-kpg1_nbadd.f \
-kpg1_nbadr.f \
 kpg1_ndfnm.f \
 kpg1_nmcol.f \
 kpg1_numfl.f \
@@ -370,15 +359,10 @@ kpg1_pltln.f
 
 
 .gn.f:
-	cp $< $(<:.gn=.gen)
-	$(FGENERIC)  -t n $(<:.gn=.gen)
-	rm $(<:.gn=.gen)
-
+	$(FGENERIC) $(<)
 
 .gdr.f:
-	cp $< $(<:.gdr=.gen)
-	$(FGENERIC)  -t dr $(<:.gdr=.gen)
-	rm $(<:.gdr=.gen)
+	$(FGENERIC) $(<)
 
 .gxc.f:
 	cp $< $(<:.gxc=.gen)
@@ -401,6 +385,9 @@ kpg1_pltln.f
 	rm $(<:.gnxb=.gen)
 
 .gir.f:
+	$(FGENERIC) $(<)
+
+.gdi.f:
 	$(FGENERIC) $(<)
 
 .gdir.f:
