@@ -95,12 +95,14 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ] ){
    int iy;             /* Input pixel GRID index on axis 2 */
    int iz;             /* Input pixel GRID index on axis 3 */
    int maxvotes;       /* Vote for currently winning party */
+   int target;         /* No. of votes that guarantees a party wins */
+   int nvotes;         /* No. of votes remaining to be counted */
    int np;             /* The number of parties available */
    int ox;             /* Output pixel GRID index on axis 1 */
    int oy;             /* Output pixel GRID index on axis 2 */
    int oz;             /* Output pixel GRID index on axis 3 */
-   int party[ 9 ];     /* The pixel value associated with each party */
-   int votes[ 9 ];     /* The number of votes for each party */
+   int party[ 27 ];    /* The pixel value associated with each party */
+   int votes[ 27 ];    /* The number of votes for each party */
    int winner;         /* Index of winning party */
 
 /* Initialise */
@@ -114,6 +116,11 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ] ){
 
 /* Check the memory was allocated. */
    if( ret ) {
+
+/* Store the number of votes that will guarantee that a party wins. */
+   target = 2;
+   if( dims[ 1 ] > 1 ) target = 5;
+   if( dims[ 2 ] > 1 ) target = 14;
 
 /* Get a pointer to the input pixel which would have GRID indices [0,0,0] 
    if the input array extended that far (in fact the first pixel in the
@@ -131,10 +138,8 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ] ){
 
 /* Loop round all input pixels in the neighbourhood of the current output 
    pixel, this is a cube of 3x3x3 input pixels, centred on the current
-   output pixel. Count how many of these input pixels are set to "on". If
-   the current output pixel is close to an edge of the array, there will be
-   fewer than 3x3x3 pixels in the cube. Count the total number of pixels
-   in the cube. */
+   output pixel. */
+               nvotes = 0;
                np = 0;
                pinz = pin0 + iv;
                for( iz = oz - 1; iz <= oz + 1; iz++ ) {
@@ -146,18 +151,32 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ] ){
                            for( ix = ox - 1; ix <= ox + 1; ix++ ) {
                               if( ix >= 1 && ix <= dims[ 0 ] ) {
 
+/* Each pixel in the 3x3x3 cube will have an integer value. Each distinct 
+   integer value is associated with a "party",and the number of occurrences
+   of the distinct value within the 3x3x3 cube equals the number of "votes"
+   for the party. See if the current pixel belongs to a previously found
+   party. If so, increment the number of votes for the party. If the number 
+   of votes cast for any party exceeds half the maximum possible number of 
+   votes, then it is not possible for another party to win. */
                                  for( ip = 0; ip < np; ip++ ) {
                                     if( party[ ip ] == *pin ) {
-                                       votes[ ip ]++;
+                                       if( ++votes[ ip ] >= target ) {
+                                          winner = ip;
+                                          goto L20;
+                                       }
                                        break;
                                     }
                                  }
 
+/* If not, initialise a new party, giving it a single vote. */
                                  if( ip == np ) {
                                     party[ ip ] = *pin;
                                     votes[ ip ] = 1;
                                     np++;
                                  }
+
+/* Increment the total number of votes cast. */
+                                 nvotes++;
 
                               }
                               pin++;
@@ -169,15 +188,30 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ] ){
                   pinz = pinz + skip[ 2 ];
                }
    
+/* We have now considered all the pixels in the 3x3x3 cube. See which
+   party got the most votes. */
                maxvotes = 0;
                winner = 0;
                for( ip = 0; ip < np; ip++ ) {
+
+/* See how many votes remain to be counted after the current party has
+   been counted. */
+                  nvotes -= votes[ ip ];
+
+/* If this party has more votes than any previous party, elect it as the
+   new leading party, and note how many votes it got. */
                   if( votes[ ip ] > maxvotes ) {
-                     maxvotes = votes[ ip ];
                      winner = ip;
+                     maxvotes = votes[ ip ];
+
+/* If the number of votes remaining to be counted is less than the votes
+   cast for this party, then there is no way any other party can win. */
+                     if( nvotes < maxvotes ) break;
                   }
                }
 
+/* Jump to here if we find a winner early. */
+L20:;
                *(pout++) = party[ winner ];
             }
          }
