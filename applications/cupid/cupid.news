@@ -15,6 +15,8 @@ Changes introduced at V0.0-18:
  - Issue a warning if configuration parameters are not separated by commas
    or new lines in the CONFIG value.
 
+ - Speed up FellWalker a bit.
+
 
 Changes introduced at V0.0-18:
 
