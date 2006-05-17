@@ -9,6 +9,15 @@
 
 Changes introduced at V0.0-18:
 
+ - Guard against null HDS locator errors when GaussClumps cannot find any 
+   clumps.
+
+ - Issue a warning if configuration parameters are not separated by commas
+   or new lines in the CONFIG value.
+
+
+Changes introduced at V0.0-18:
+
  - Guard against division by zero when using zero beam width with
    GaussClumps.
 
@@ -22,6 +31,7 @@ Changes introduced at V0.0-18:
 
  - Remove isolated pixels above the noise threshold before starting the
    walking process in FellWalker.
+
 
 Changes introduced at V0.0-17:
 

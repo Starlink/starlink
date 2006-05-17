@@ -831,7 +831,14 @@ void findclumps() {
 
 /* Otherwise, create an AST KeyMap holding the value for each configuration 
    setting, indexed using its name, display the config file if needed. */
-      if( !keymap ) kpg1Kymap( grp, &keymap, status );
+      if( !keymap && *status == SAI__OK ) {
+         kpg1Kymap( grp, &keymap, status );
+         if( *status != SAI__OK ) {
+            errRep( "FINDCLUMPS_ERR6", "Error reading configuration "
+                    "parameters specified by CONFIG.", status );
+            goto L999;
+         }
+      }
    }
 
 /* Delete the group, if any. */
@@ -974,15 +981,6 @@ L999:
 
 /* Release the HDS object containing the list of NDFs describing the clumps. */
    if( ndfs ) datAnnul( &ndfs, status );
-
-/* If an error has occurred, delete the Quality component and also delete the 
-   CUPID extension. */
-   if( *status != SAI__OK ) {
-      errBegin( status );
-      ndfReset( indf2, "QUALITY", status );
-      ndfXdel( indf2, "CUPID", status );
-      errEnd( status );
-   }
 
 /* End the NDF context */
    ndfEnd( status );

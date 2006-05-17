@@ -174,6 +174,10 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
       }
    }
 
+/* Return no levels if an error occurred. */
+   if( *status != SAI__OK ) ret = astFree( ret );
+   if( !ret ) *nlevels = 0;
+
 /* Return the array of contour levels. */
    return ret;
 
