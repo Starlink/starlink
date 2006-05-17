@@ -534,7 +534,13 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Tell the user how clumps are being returned. */
       if( ilevel > 0 ) {
-         datSize( ret, (size_t *) &nclump, status );
+
+         if( ret ) {
+            datSize( ret, (size_t *) &nclump, status );
+         } else {
+            nclump = 0;
+         }
+
          if( nclump == 0 ) msgOut( "", "No usable clumps found.", status );
    
          if( ilevel > 1 ) {
