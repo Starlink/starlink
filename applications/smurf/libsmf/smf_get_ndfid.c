@@ -55,6 +55,8 @@
 *  History:
 *     2006-05-09 (AGG):
 *        Initial version
+*     2006-05-16 (AGG):
+*        Add status checking, check if placeholder returned from ndfOpen
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -133,11 +135,22 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
     msgOutif( MSG__VERB, FUNC_NAME, "Opening NDF with WRITE access: this will clear the current contents if the NDF exists.", status);
   }
   ndfOpen( loc, name, accmode, state, &ndfid, &place, status );
+  if ( *status != SAI__OK ) {
+    errRep( FUNC_NAME, 
+	    "Call to ndfOpen failed: unable to obtain an NDF identifier", 
+	    status );
+    return NDF__NOID;
+  }
 
-  /* What if accmode = READ? */
-
-  /* Define properties of NDF */
-  ndfNew( dattype, ndims, lbnd, ubnd, &place, &ndfid, status );
+  /* No placeholder => NDF exists */
+  if ( place != NDF__NOPL ) {
+    /* Define properties of NDF */
+    ndfNew( dattype, ndims, lbnd, ubnd, &place, &ndfid, status );
+    if ( *status != SAI__OK ) {
+      errRep( FUNC_NAME, "Unable to create a new NDF", status );
+      return NDF__NOID;
+    }
+  }
 
   return ndfid;
 }
