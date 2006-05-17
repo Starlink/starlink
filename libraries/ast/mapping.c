@@ -206,6 +206,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Modify SpecialBounds to include points slightly inside the
 *        corners. This is because some Mappings may have singularies at
 *        the the edges.
+*     17-MAY-2006 (DSB):
+*        Correct the "nout = astGetNin" line in the MAKE_RESAMPLE
+*        and MAKE_REBIN macros to "nout = astGetNout".
 *class--
 */
 
@@ -8702,7 +8705,7 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
 \
 /* Obtain values for the Nin and Nout attributes of the Mapping. */ \
    nin = astGetNin( this ); \
-   nout = astGetNin( this ); \
+   nout = astGetNout( this ); \
 \
 /* If OK, check that the number of input grid dimensions matches the \
    number required by the Mapping and is at least 1. Report an error \
@@ -12313,7 +12316,7 @@ static int Resample##X( AstMapping *this, int ndim_in, \
 \
 /* Obtain values for the Nin and Nout attributes of the Mapping. */ \
    nin = astGetNin( this ); \
-   nout = astGetNin( this ); \
+   nout = astGetNout( this ); \
 \
 /* If OK, check that the number of input grid dimensions matches the \
    number required by the Mapping and is at least 1. Report an error \
