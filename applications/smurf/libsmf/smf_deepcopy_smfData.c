@@ -51,9 +51,12 @@
 *        output array
 *     2006-04-21 (AGG):
 *        - Update API to accept a flags to determine whether the smfFile,
-           smfDA and smfHead elements should be copied
+*          smfDA and smfHead elements should be copied
 *        - Make use of these SMF__NOCREATE_* flags
 *        - Copy history element only if present
+*     2006-05-16 (AGG):
+*        Check that ncoeff is non-zero before attempting to copy poly
+*        coefficients, add checking of malloc'ed pointers
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -160,6 +163,22 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
       } else {
 	nbytes = smf_dtype_size(old, status);
 	pntr[i] = smf_malloc( npts, nbytes, 0, status);
+	if ( pntr[i] == NULL ) {
+	  if ( i == 0) {
+	    msgSetc("C", "Data");
+	  } else if ( i == 1 ) {
+	    msgSetc("C", "Variance");
+	  } else {
+	    if ( *status == SAI__OK ) {
+	      *status = SAI__ERROR;
+	      errRep(FUNC_NAME, "Loop counter out of range. Possible programming error?", status);
+	      return NULL;
+	    }
+	  }
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, "Unable to allocate memory for ^C component", status);
+	  return NULL;
+	}
 	memcpy( pntr[i], (old->pntr)[i], nbytes*npts);
       }
     } else {
@@ -169,15 +188,29 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   /* Quality */
   if ( (old->pntr)[2] != NULL ) {
     pntr[2] = smf_malloc( npts, 1, 0, status);
+    if ( pntr[2] == NULL ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Unable to allocate memory for Quality component", status);
+      return NULL;
+    }
     memcpy( pntr[2], (old->pntr)[2], npts );
   } else {
     pntr[2] = NULL;
   }
 
-  /* Redefine npts */
-  npts = dims[0]*dims[1]*ncoeff;
-  poly = smf_malloc( npts, sizeof(double), 0, status);
-  memcpy( poly, old->poly, npts*sizeof(double));
+  /* Redefine npts for polynomial coefficients */
+  if ( ncoeff != 0 ) {
+    npts = dims[0]*dims[1]*ncoeff;
+    poly = smf_malloc( npts, sizeof(double), 0, status);
+    if ( *status != SAI__OK ) {
+      errRep(FUNC_NAME, 
+	     "Unable to allocate memory for polynomial coefficients", status);
+      return NULL;
+    }
+    memcpy( poly, old->poly, npts*sizeof(double));
+  } else {
+    msgOutif(MSG__VERB, FUNC_NAME, "Skipping copy of SCANFIT coefficients, ncoeff = 0", status);
+  }
 
   /* Copy smfHead if desired */
   if (! (flags & SMF__NOCREATE_HEAD) )
