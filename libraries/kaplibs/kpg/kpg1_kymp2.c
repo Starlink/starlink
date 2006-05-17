@@ -39,6 +39,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 *        Pointer to the global status variable.
 
 *  Notes:
+*     - Any equals signs that are included in the value string must be doubled.
 *     - Component names must contain only alphanumerical characters,
 *     underscores, plus and minus signs [a-zA-Z0-9_+\-], 
 *     - Any lower case characters contained in a component name will be
@@ -71,6 +72,9 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 *  History:
 *     30-SEP-2005 (DSB):
 *        Original version.
+*     17-MAY-2006 (DSB):
+*        Report an error if the value string contains any isolated equals
+*        signs. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -88,6 +92,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
    const char *equals;          /* Pointer to 1st equals sign */   
    char buf[ 10 ];              /* Text buffer for message symbols */
    char comp[ MAX_COMPLEN + 1 ];/* Buffer for component name */
+   int alert;                   /* Was previous character an equals sign? */
    int clen;                    /* Length of component name */
 
 /* Check the inherited status. */
@@ -112,6 +117,30 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
       errRep( "KPG1KYMP2_ERR2", "No value found in \"^S\".", status );
       goto L999;
    }
+
+/* Report an error if the value part of the string contains any equals signs 
+   that are not doubled. */
+   alert = 0;
+   c = equals;
+   while( *(++c) ) {
+      if( *c == '=' ) {
+         if( alert ) {
+            alert = 0;
+         } else {
+            alert = 1;
+         }
+
+      } else if( alert ) {
+         *status = SAI__ERROR;
+         msgSetc( "S", string );
+         errRep( "KPG1KYMP2_ERR6", "Missing commas between values "
+                 "in \"^S\".", status );
+         goto L999;
+
+      } else {
+         alert = 0;
+      }
+   }         
 
 /* Locate the first dot. */
    dot = strchr( string, '.' );  
@@ -161,7 +190,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 /* Terminate the copy of the component name */
    comp[ clen ] = 0;
 
-/* If the supplied keyword name contained only a single component, simply
+/* If the supplied keyword name contained only a single component, we will
    add the value to the supplied keymap. */
    if( cend == equals ) {
       astMapPut0C( keymap, comp, equals + 1, NULL );
