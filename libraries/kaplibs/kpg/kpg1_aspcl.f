@@ -146,6 +146,14 @@
                CLIP = .TRUE.
 
             END IF
+
+            IF( PUBND( I ) .GT. DUBND( I ) ) THEN
+               PUBND( I ) = DUBND( I )
+
+            ELSE IF( PUBND( I ) .LT. DUBND( I ) ) THEN
+               CLIP = .TRUE.
+
+            END IF
          END DO
 
 *  If any clipping is needed, apply it.
