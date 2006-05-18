@@ -583,6 +583,10 @@
 *        If annotated axes are not being drawn, remove the requirement 
 *        for the WCS->PIXEL transformation to be defined. Shorten 
 *        variable comments so that each fits entirely on one line.
+*     18-MAY-2006 (DSB):
+*        Handled base->current Mappings that have both transformations
+*        defined but which do not form a true inverse pair (as created by
+*        CHANMAP).
 *     {enter_further_changes_here}
 
 *-
@@ -633,6 +637,8 @@
       DOUBLE PRECISION DHI     ! Upper displayed data value limit
       DOUBLE PRECISION DLO     ! Lower displayed data value limit
       DOUBLE PRECISION GC( 2 ) ! GRID co-ords at image centre
+      DOUBLE PRECISION GX      ! X GRID co-ord at image centre
+      DOUBLE PRECISION GY      ! Y GRID co-ord at image centre
       INTEGER BPCI             ! Bad-pixel colour index
       INTEGER DIMS( NDIM )     ! Dimensions of input array
       INTEGER EL               ! Number of elements in the mapped array
@@ -677,6 +683,7 @@
       LOGICAL AXES             ! Annotated axes are to be drawn?
       LOGICAL BAD              ! Bad pixels are present in the image?
       LOGICAL BORDER           ! Border to be drawn?
+      LOGICAL CLIPAX           ! Should annotated axes be clipped?
       LOGICAL DEVCAN           ! Cancel DEVICE parameter?
       LOGICAL KEY              ! Produce a colour ramp as a key?
       LOGICAL NN               ! Map the LUT via nearest-neighbour?
@@ -949,8 +956,10 @@
       
 *  Get the GRID co-ordinates at the centre of the supplied NDF.  GRID
 *  co-ordinates are (1.0,1.0) at the centre of the first pixel.
-      GC( 1 ) = ( 1.0D0 + DBLE( DIMS( 1 ) ) ) / 2.0D0
-      GC( 2 ) = ( 1.0D0 + DBLE( DIMS( 2 ) ) ) / 2.0D0
+      GX = ( 1.0D0 + DBLE( DIMS( 1 ) ) ) / 2.0D0
+      GY = ( 1.0D0 + DBLE( DIMS( 2 ) ) ) / 2.0D0
+      GC( 1 ) = GX
+      GC( 2 ) = GY
 
 *  Convert these into the Current Frame of the NDF. 
       CALL AST_TRANN( IWCS, 1, 2, 1, GC, .TRUE., NCUR, 1, CC, 
@@ -985,15 +994,20 @@
      :                    'display.', STATUS )
          END IF
 
-         GC( 1 ) = ( 1.0D0 + DBLE( DIMS( 1 ) ) ) / 2.0D0
-         GC( 2 ) = ( 1.0D0 + DBLE( DIMS( 2 ) ) ) / 2.0D0
+         GC( 1 ) = GX
+         GC( 2 ) = GY
 
-*  If the centre pixel of the supplied NDF has no defined position then 
-*  we only access the CENTRE parameter if a value was supplied on the
-*  command line.  Otherwise, just use the centre of the GRID frame as 
-*  the centre for the displayed image.
-      ELSE IF( ( CC( 1 ) .NE. AST__BAD .AND. CC( 2 ) .NE. AST__BAD ) 
-     :         .OR. STATE .EQ. PAR__ACTIVE ) THEN
+*  Indicate that we may need to clip annotated axes.
+         CLIPAX = .TRUE.
+
+*  If the centre pixel of the supplied NDF has no defined position, or if
+*  tranforming the position back into GRID coords resulted in a very
+*  different GRID position, then we only access the CENTRE parameter if a 
+*  value was supplied on the command line.  
+      ELSE IF( ( CC( 1 ) .NE. AST__BAD .AND. CC( 2 ) .NE. AST__BAD .AND.
+     :           ABS( GC( 1 ) - GX ) .LT. 10 .AND.
+     :           ABS( GC( 2 ) - GY ) .LT. 10 ) .OR. 
+     :           STATE .EQ. PAR__ACTIVE ) THEN
 
 *  Obtain the Current Frame co-ordinates (returned in CC) to put at the 
 *  centre of the picture using parameter CENTRE.  Use the Current Frame 
@@ -1004,6 +1018,16 @@
 *  co-ordinates are returned in GC.
          CALL KPG1_GTPOS( 'CENTRE', IWCS, .TRUE., CC, GC, STATUS )
 
+*  Since the base->current mapping seems well behaved, indicate that we 
+*  do not need to clip annotated axes.
+         CLIPAX = .FALSE.
+
+*  Otherwise, just use the centre of the GRID frame as the centre for the 
+*  displayed image. Also indicate that we may need to clip annotated axes.
+      ELSE
+         GC( 1 ) = GX
+         GC( 2 ) = GY
+         CLIPAX = .TRUE.
       END IF
 
 *  Find the corresponding upper and lower bounds in GRID co-ordinates.
@@ -1215,6 +1239,10 @@
 *  DATA picture.
       CALL KPG1_PGPIX( IPLOT, 'PIXEL', WPLBND, WPUBND, NX, NY, 
      :                 %VAL( CNF_PVAL( IPCOL ) ), STATUS )
+
+*  If required, ensure that the annotated axes and border are restricted
+*  to regions of the plot that are well behaved.
+      IF( CLIPAX ) CALL KPG1_ASPCL( IPLOT, WILBND, WIUBND, STATUS )
 
 *  Draw the axes grid if required.
       IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
