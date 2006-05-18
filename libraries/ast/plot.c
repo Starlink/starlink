@@ -570,6 +570,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        Added escape sequences "%h+" and "%g+".
 *     21-MAR-2006 (DSB)
 *        Added extra status checks in TickMarks.
+*     18-MAY-2006 (DSB)
+*        Trans: use correct PointSet when tranforming to arbitrary
+*        clipping frame.
 *class--
 */
 
@@ -24675,7 +24678,7 @@ static AstPointSet *Trans( AstPlot *this, AstFrame *frm, AstMapping *mapping,
          } else {
             map = astGetMapping( this, AST__BASE, iframe );
          }
-         clip = astTransform( map, in, 1, NULL );
+         clip = astTransform( map, result, 1, NULL );
          map = astAnnul( map );
        }
 
