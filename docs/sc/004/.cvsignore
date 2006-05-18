@@ -1,0 +1,15 @@
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+config.log
+config.status
+configure
+sc4.aux
+sc4.dvi
+sc4.htx
+sc4.htx_tar
+sc4.log
+sc4.ps
+sc4.toc
+starconf.status

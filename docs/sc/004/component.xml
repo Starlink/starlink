@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sc4">
+  <version>2</version>
+  <path>docs/sc/004</path>
+  <description>C-shell Cookbook</description>
+  <abstract><p>
+      This cookbook describes the fundamentals of writing scripts
+      using the UNIX C shell.  It shows how to combine Starlink and
+      private applications with shell commands and constructs to
+      create powerful and time-saving tools for performing repetitive
+      jobs, creating data-processing pipelines, and encapsulating
+      useful recipes.  The cookbook aims to give practical and
+      reassuring examples to at least get you started without having
+      to consult a UNIX manual.  However, it does not offer a
+      comprehensive description of C-shell syntax to prevent you from
+      being overwhelmed or intimidated.  The topics covered are: how
+      to run a script, defining shell variables, prompting, arithmetic
+      and string processing, passing information between Starlink
+      applications, obtaining dataset attributes and FITS header
+      information, processing multiple files and filename
+      modification, command-line arguments and options, and loops.
+      There is also a glossary.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Malcolm J. Currie</name>
+    </person>
+  </developers>
+  <documentation> sc4</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997, 1998, 2005</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
