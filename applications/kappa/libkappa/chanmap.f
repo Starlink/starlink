@@ -279,6 +279,8 @@
 *        Restrict the choice of estimators by the number of pixels per
 *        channel.  Remove MINWID restriction.  Provide inverse Mapping
 *        for SelectorMap (merger of May 10 changes).
+*     2006 May 18 (MJC):
+*        Revise for new SelectorMap constructor.
 *     {enter_further_changes_here}
 
 *-
@@ -1288,9 +1290,12 @@
       END DO
 
 *  Create the SelectorMap and the inverse SelectorMap, and hence the
-*  SwitchMap.
-      SELMAP = AST_SELECTORMAP( NOCHAN, SLABIN, ' ', STATUS )
-      ISEMAP = AST_SELECTORMAP( NOCHAN, INSLAB, ' ', STATUS )
+*  SwitchMap.  For the inverse selector Mapping, indicate that positions
+*  that are bad on any axis should be assigned to the first tile.  This
+*  can help if (say) bad values are assigned to the spectral axis as a
+*  result of displaying only the spatial axes.
+      SELMAP = AST_SELECTORMAP( NOCHAN, SLABIN, AST__BAD, ' ', STATUS )
+      ISEMAP = AST_SELECTORMAP( NOCHAN, INSLAB, 1.0D0, ' ', STATUS )
       CALL AST_INVERT( ISEMAP, STATUS )
 
       SWIMAP = AST_SWITCHMAP( SELMAP, ISEMAP, NOCHAN, ROUMAP,
