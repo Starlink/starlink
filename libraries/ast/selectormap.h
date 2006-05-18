@@ -143,6 +143,7 @@ typedef struct AstSelectorMap {
 /* Attributes specific to objects in this class. */
    int nreg;                /* The number of Regions in the SelectorMap */
    AstRegion **reg;         /* Array of Region pointers */
+   double badval;           /* Output value for positions with bad axis values */
 
 } AstSelectorMap;
 
@@ -173,16 +174,16 @@ astPROTO_ISA(SelectorMap)             /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstSelectorMap *astSelectorMap_( int, void **, const char *, ... );
+AstSelectorMap *astSelectorMap_( int, void **, double, const char *, ... );
 #else
-AstSelectorMap *astSelectorMapId_( int, void **, const char *, ... );
+AstSelectorMap *astSelectorMapId_( int, void **, double, const char *, ... );
 #endif
 
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
 AstSelectorMap *astInitSelectorMap_( void *, size_t, int, AstSelectorMapVtab *,
-                                 const char *, int, AstRegion ** );
+                                     const char *, int, AstRegion **, double );
 
 /* Vtab initialiser. */
 void astInitSelectorMapVtab_( AstSelectorMapVtab *, const char * );
@@ -225,8 +226,8 @@ AstSelectorMap *astLoadSelectorMap_( void *, size_t, AstSelectorMapVtab *,
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-#define astInitSelectorMap(mem,size,init,vtab,name,nreg,regs) \
-astINVOKE(O,astInitSelectorMap_(mem,size,init,vtab,name,nreg,regs))
+#define astInitSelectorMap(mem,size,init,vtab,name,nreg,regs,badval) \
+astINVOKE(O,astInitSelectorMap_(mem,size,init,vtab,name,nreg,regs,badval))
 
 /* Vtab Initialiser. */
 #define astInitSelectorMapVtab(vtab,name) astINVOKE(V,astInitSelectorMapVtab_(vtab,name))

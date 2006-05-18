@@ -73,11 +73,13 @@ F77_LOGICAL_FUNCTION(ast_isaselectormap)( INTEGER(THIS),
 
 F77_INTEGER_FUNCTION(ast_selectormap)( INTEGER(NREG),
                                        INTEGER_ARRAY(REGS),
+                                       DOUBLE(BADVAL),
                                        CHARACTER(OPTIONS),
                                        INTEGER(STATUS)
                                        TRAIL(OPTIONS) ) {
    GENPTR_INTEGER(NREG)
    GENPTR_INTEGER_ARRAY(REGS)
+   GENPTR_DOUBLE(BADVAL)
    GENPTR_CHARACTER(OPTIONS)
    F77_INTEGER_TYPE(RESULT);
    int i;
@@ -101,7 +103,7 @@ F77_INTEGER_FUNCTION(ast_selectormap)( INTEGER(NREG),
       }
 
 
-      RESULT = astP2I( astSelectorMap( *NREG, (void **) regs, "%s", 
+      RESULT = astP2I( astSelectorMap( *NREG, (void **) regs, *BADVAL, "%s", 
                                        options ) );
       astFree( regs );
       astFree( options );

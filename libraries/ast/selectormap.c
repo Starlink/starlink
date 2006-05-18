@@ -76,6 +76,9 @@ f     The SelectorMap class does not define any new routines beyond those
 *  History:
 *     15-MAR-2006 (DSB):
 *        Original version.
+*     18-MAY-2006 (DSB):
+*        - Change logic for detecting interior points in function Transform.
+*        - Added BADVAL to contructor argument list.
 *class--
 */
 
@@ -126,7 +129,7 @@ static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstP
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
-AstSelectorMap *astSelectorMapId_( int, void **, const char *, ... );
+AstSelectorMap *astSelectorMapId_( int, void **, double, const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
@@ -204,9 +207,10 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
       nin = astGetNin( this );
       if( astGetNin( that ) == nin ) {
    
-/* Check they contain the same number of Regions. */
+/* Check they contain the same number of Regions, and have the same badval. */
          nreg = this->nreg;
-         if( that->nreg == nreg ) {
+         if( that->nreg == nreg ||
+             astEQUAL( that->badval, this->badval) ) {
    
 /* Loop over the Regions, breaking as soon as two unequal Regions are
    found. */
@@ -530,8 +534,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Attempt to simplify the SelectorMap on its own. */
 /* ============================================= */
 
-/* Otherwise, try to simplify each of the encapsulated Regions, noting
-   if any simplification takes place. */
+/* Try to simplify each of the encapsulated Regions, noting if any 
+   simplification takes place. */
    simp = 0;
    sreg = astMalloc( sizeof( AstRegion * )*nreg );
    if( astOK ) {
@@ -541,11 +545,12 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       }
 
 /* If any simplification took place, construct a new SelectorMap from these 
-    simplified Mappings. */
+   simplified Mappings. */
       if( simp ) { 
          (void) astAnnul( ( *map_list )[ where ] );
          ( *map_list )[ where ] = (AstMapping *) astSelectorMap( nreg, 
-                                                          (void **) sreg, "" );
+                                                          (void **) sreg, 
+                                                          map->badval, "" );
          result = where;
       }
 
@@ -691,8 +696,9 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    double **tptr;
    double *p2;             
    double *pout;
+   double badval;
+   int bad;
    int closed;
-   int inside;
    int icoord;
    int ipoint;
    int ireg;
@@ -732,9 +738,19 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
       ptr_out = astGetPoints( result );
       if( astOK ) {
 
-/* Initialise the output array to hold zeros. */
+/* Initialise the output array to hold -1 at any points that have
+   bad input axis values, and zero at all other points. */
          pout = ptr_out[ 0 ];
-         for( ipoint = 0; ipoint < npoint; ipoint++ ) *(pout++) = 0;
+         for( ipoint = 0; ipoint < npoint; ipoint++ ) {
+            bad = 0;
+            for( icoord = 0; icoord < ncoord; icoord++ ) {
+               if( ptr1[ icoord ][ ipoint ] == AST__BAD ) {
+                  bad = 1;
+                  break;
+               }
+            }
+            *(pout++) = bad ? -1 : 0;
+         }
 
 /* Loop round all Regions. */
          for( ireg = 1; ireg <= map->nreg; ireg++ ) {
@@ -754,24 +770,10 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
             pout = ptr_out[ 0 ];
             for( ipoint = 0; ipoint < npoint; ipoint++, p2++, pout++ ) {
 
-/* Any position which is 1) bad in the output PointSet, and 2) good in
-   the input PointSet, must be contained within the current Region, so
-   assign the (one-based) index of the current Region to the output
-   element. */
-               inside = 0;
-               if( *p2 == AST__BAD ) {
-                  for( icoord = 0; icoord < ncoord; icoord++ ) {
-                     if( ptr2[ icoord ][ ipoint ] == AST__BAD ){
-                        if( ptr1[ icoord ][ ipoint ] != AST__BAD ) {
-                           inside = 1;
-                           break;
-                        }
-                     } else {
-                        break;
-                     }
-                  }
-               }
-               if( inside ) *pout = ireg;
+/* Any position that has not already been assigned to a Region and is bad 
+   in the output PointSet must be contained within the current Region, so 
+   assign the (one-based) index of the current Region to the output element. */
+               if( *pout == 0 && *p2 == AST__BAD ) *pout = ireg;
             }
 
 /* Negate the Region to get it back to its original state. */
@@ -785,6 +787,14 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
             tptr = ptr1;
             ptr1 = ptr2;
             ptr2 = tptr;
+         }
+
+/* Replace -1 values in the output (that indicate that the input position
+   had at least one bad axis value) with the "badval".*/
+         badval = map->badval;
+         pout = ptr_out[ 0 ];
+         for( ipoint = 0; ipoint < npoint; ipoint++, pout++ ) {
+            if( *pout == -1 ) *pout = badval;
          }
       }
 
@@ -943,6 +953,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Local Variables: */
    AstSelectorMap *this;
    int i;
+   int set;
    char buf[ 20 ];    
 
 /* Check the global error status. */
@@ -980,6 +991,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       if( i > 0 ) astClearRegionFS( this->reg[ i ] );
    }
 
+/* BadVal. */
+/* ------- */
+   set = ( this->badval != AST__BAD );
+   astWriteDouble( channel, "BadVal", set, 1, this->badval, 
+                   "Output value for bad input positions" );
+
 }
 
 /* Standard class functions. */
@@ -989,7 +1006,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 astMAKE_ISA(SelectorMap,Mapping,check,&class_init)
 astMAKE_CHECK(SelectorMap)
 
-AstSelectorMap *astSelectorMap_( int nreg, void **regs_void, const char *options, ... ) {
+AstSelectorMap *astSelectorMap_( int nreg, void **regs_void, double badval,
+                                 const char *options, ... ) {
 /*
 *+
 *  Name:
@@ -1004,7 +1022,7 @@ AstSelectorMap *astSelectorMap_( int nreg, void **regs_void, const char *options
 *  Synopsis:
 *     #include "selectormap.h"
 *     AstSelectorMap *astSelectorMap( int nreg, AstRegion **regs,
-*                                     const char *options, ... )
+*                                     double badval, const char *options, ... )
 
 *  Class Membership:
 *     SelectorMap constructor.
@@ -1019,6 +1037,10 @@ AstSelectorMap *astSelectorMap_( int nreg, void **regs_void, const char *options
 *     regs
 *        An array of pointers to the Regions. Deep copies of these
 *        Regions are taken.
+*     badval
+*        The value to be returned by the forward transformation of the
+*        SelectorMap for any input positions that have a bad (AST__BAD) 
+*        value on any axis.
 *     options
 *        Pointer to a null terminated string containing an optional
 *        comma-separated list of attribute assignments to be used for
@@ -1087,7 +1109,7 @@ AstSelectorMap *astSelectorMap_( int nreg, void **regs_void, const char *options
 /* Initialise the SelectorMap, allocating memory and initialising the
    virtual function table as well if necessary. */
       new = astInitSelectorMap( NULL, sizeof( AstSelectorMap ), !class_init, &class_vtab,
-                              "SelectorMap", nreg, regs );
+                              "SelectorMap", nreg, regs, badval );
 
 /* If successful, note that the virtual function table has been
    initialised. */
@@ -1113,7 +1135,7 @@ AstSelectorMap *astSelectorMap_( int nreg, void **regs_void, const char *options
    return new;
 }
 
-AstSelectorMap *astSelectorMapId_( int nreg, void **regs_void, 
+AstSelectorMap *astSelectorMapId_( int nreg, void **regs_void, double badval, 
                                    const char *options, ... ) {
 /*
 *++
@@ -1130,8 +1152,8 @@ f     AST_SELECTORMAP
 *  Synopsis:
 c     #include "selectormap.h"
 c     AstSelectorMap *astSelectorMap( int nreg, AstRegion *regs[],
-c                                     const char *options, ... )
-f     RESULT = AST_SELECTORMAP( NREG, REGS, OPTIONS, STATUS )
+c                                     double badval, const char *options, ... )
+f     RESULT = AST_SELECTORMAP( NREG, REGS, BADVAL, OPTIONS, STATUS )
 
 *  Class Membership:
 *     SelectorMap constructor.
@@ -1157,7 +1179,7 @@ f     RESULT = AST_SELECTORMAP( NREG, REGS, OPTIONS, STATUS )
 *     position of the Region within the list of Regions supplied when the 
 *     SelectorMap was created, starting at 1 for the first Region). If an
 *     input position is not contained within any Region, a value of zero is 
-*     returned by teh forward transformation.
+*     returned by the forward transformation.
 *
 *     If a compound Mapping contains a SelectorMap in series with its own
 *     inverse, the combination of the two adjacent SelectorMaps will be 
@@ -1176,6 +1198,11 @@ f     REGS( NREG ) = INTEGER (Given)
 *        An array of pointers to the Regions. All the supplied Regions must 
 *        relate to the same coordinate Frame. The number of axes in this
 *        coordinate Frame defines the number of inputs for the SelectorMap.
+c     badval
+f     BADVAL = DOUBLE PRECISION (Given)
+*        The value to be returned by the forward transformation of the
+*        SelectorMap for any input positions that have a bad (AST__BAD) 
+*        value on any axis.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated string containing an optional
@@ -1263,7 +1290,8 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Initialise the SelectorMap, allocating memory and initialising the
    virtual function table as well if necessary. */
       new = astInitSelectorMap( NULL, sizeof( AstSelectorMap ), !class_init, 
-                                &class_vtab, "SelectorMap", nreg, regs );
+                                &class_vtab, "SelectorMap", nreg, regs,
+                                badval );
 
 /* If successful, note that the virtual function table has been
    initialised. */
@@ -1291,7 +1319,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 AstSelectorMap *astInitSelectorMap_( void *mem, size_t size, int init,
                                      AstSelectorMapVtab *vtab, const char *name,
-                                     int nreg, AstRegion **regs ) {
+                                     int nreg, AstRegion **regs, double badval ) {
 /*
 *+
 *  Name:
@@ -1307,7 +1335,7 @@ AstSelectorMap *astInitSelectorMap_( void *mem, size_t size, int init,
 *     #include "selectormap.h"
 *     AstSelectorMap *astInitSelectorMap( void *mem, size_t size, int init,
 *                                         AstSelectorMapVtab *vtab, const char *name,
-*                                         int nreg, AstRegion **regs ) 
+*                                         int nreg, AstRegion **regs, double badval ) 
 
 *  Class Membership:
 *     SelectorMap initialiser.
@@ -1351,6 +1379,10 @@ AstSelectorMap *astInitSelectorMap_( void *mem, size_t size, int init,
 *     regs
 *        An array holdiong pointers to the Regions. Deep copies are taken
 *        of these Regions.
+*     badval
+*        The value to be returned by the forward transformation of the
+*        SelectorMap for any input positions that have a bad (AST__BAD) 
+*        value on any axis.
 
 *  Returned Value:
 *     A pointer to the new SelectorMap.
@@ -1422,6 +1454,9 @@ AstSelectorMap *astInitSelectorMap_( void *mem, size_t size, int init,
          } else {
             new->nreg = 0;
          }
+
+/* Store other items */
+         new->badval = badval;
 
 /* If an error occurred, clean up by deleting the new object. */
          if ( !astOK ) new = astDelete( new );
@@ -1592,6 +1627,11 @@ AstSelectorMap *astLoadSelectorMap_( void *mem, size_t size,
 
 /* Number of Regions. */
       new->nreg = i;
+
+
+/* BadVal. */
+/* ------- */
+      new->badval = astReadDouble( channel, "badval", AST__BAD );
 
 /* If an error occurred, clean up by deleting the new SelectorMap. */
       if ( !astOK ) new = astDelete( new );
