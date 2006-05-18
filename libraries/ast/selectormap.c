@@ -953,7 +953,6 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Local Variables: */
    AstSelectorMap *this;
    int i;
-   int set;
    char buf[ 20 ];    
 
 /* Check the global error status. */
@@ -993,9 +992,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* BadVal. */
 /* ------- */
-   set = ( this->badval != AST__BAD );
-   astWriteDouble( channel, "BadVal", set, 1, this->badval, 
-                   "Output value for bad input positions" );
+   if( this->badval != AST__BAD ) {
+      astWriteDouble( channel, "BadVal", 1, 1, this->badval, 
+                      "Output value for bad input positions" );
+   }
 
 }
 
