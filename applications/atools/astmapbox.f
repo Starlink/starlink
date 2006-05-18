@@ -175,9 +175,6 @@
       NIN = AST_GETI( THIS, 'Nin', STATUS)
       NOUT = AST_GETI( THIS, 'Nout', STATUS) 
 
-      call ast_show( this, status )
-
-
       IF( ( NIN .GT. NDF__MXDIM .OR. NOUT .GT. NDF__MXDIM )
      :    .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
