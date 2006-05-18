@@ -198,7 +198,12 @@ AstSwitchMap *astLoadSwitchMap_( void *, size_t, AstSwitchMapVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-/* None. */
+#if defined(astCLASS)            /* Protected */
+
+int astSwitchList_( AstSwitchMap *, int, int *, AstMapping ***, int ** );
+
+#endif
+
 
 /* Function interfaces. */
 /* ==================== */
@@ -238,6 +243,9 @@ astINVOKE(O,astInitSwitchMap_(mem,size,init,vtab,name,astCheckMapping(fsmap),\
 /* Loader. */
 #define astLoadSwitchMap(mem,size,vtab,name,channel) \
 astINVOKE(O,astLoadSwitchMap_(mem,size,vtab,name,astCheckChannel(channel)))
+
+#define astSwitchList astSwitchList_
+
 #endif
 
 /* Interfaces to public member functions. */

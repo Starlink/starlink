@@ -1051,6 +1051,195 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
    return result;
 }
 
+
+int astSwitchList_( AstSwitchMap *this, int invert, int *nmap, 
+                    AstMapping ***map_list, int **invert_list ) {
+/*
+*+
+*  Name:
+*     astSwitchList
+
+*  Purpose:
+*     Extract the selector and route Mappings from a SwitchMap.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "switchmap.h"
+*     int astSwitchList( AstSwitchMap *this, int invert, int *nmap, 
+*                        AstMapping ***map_list, int **invert_list ) 
+
+*  Class Membership:
+*     SwitchMap member function.
+
+*  Description:
+*     This function extracts the route and selector Mappings form a
+*     SwitchMap.
+
+*  Parameters:
+*     this
+*        Pointer to the SwitchMap to be decomposed (it is not actually 
+*        modified by this function).
+*     invert
+*        The value to which the SwitchMap's Invert attribute is to be
+*        (notionally) set before performing the decomposition. Normally, 
+*        the value supplied here will be the actual Invert value obtained 
+*        from the SwitchMap (e.g. using astGetInvert).  Sometimes, however, 
+*        when a SwitchMap is encapsulated within another structure, that 
+*        structure may retain an Invert value (in order to prevent external
+*        interference) which should be used instead.
+*
+*        Note that the actual Invert value of the SwitchMap supplied is
+*        not used (or modified) by this function.
+*     nmap
+*        The address of an int in which to return a count of the number of
+*        individual Mappings in the decomposition. The supplied value is
+*        ignored.
+*     map_list
+*        Address of a pointer to an array of Mapping pointers. The value
+*        supplied on entry is ignored. On exit, it points at a dynamically 
+*        allocated array containing Mapping pointers ("*nmap" in number) that 
+*        result from the decomposition requested. 
+*
+*        The returned Mapping pointers returned will identify the following 
+*        sequence of Mappings; forward selector mapping (or NULL if the
+*        SwitchMap has no forward selector Mapping), inverse selector 
+*        mapping (or NULL if the SwitchMap has no inverse selector Mapping),
+*        the route Mappings in the order they were supplied when the 
+*        SwitchMap was constructed.
+*
+*        All the Mapping pointers returned by this function should be
+*        annulled by the caller, using astAnnul, when no longer
+*        required. The dynamic array holding these pointers should
+*        also be freed, using astFree.
+*     invert_list
+*        Address of a pointer to an array of int. The value supplied on 
+*        entry is ignored. On exit, it points at a dynamically allocated 
+*        array containing Invert attribute values ("*nmap" in number) that
+*        result from the decomposition requested. 
+*
+*        The returned Invert values returned identify the values which must
+*        be assigned to the Invert attributes of the corresponding
+*        Mappings (whose pointers are in the "*map_list" array) before
+*        they are applied. Note that these values may differ from the
+*        actual Invert attribute values of these Mappings, which are
+*        not relevant.
+*
+*        The dynamic array holding these values should be freed by the
+*        caller, using astFree, when no longer required.
+
+*  Returned Value:
+*     The number of route Mappings stored in the SwitchMap.
+
+*  Notes:
+*     - It is unspecified to what extent the original SwitchMap and the
+*     individual (decomposed) Mappings are inter-dependent. Consequently, 
+*     the individual Mappings cannot be modified without risking 
+*     modification of the original SwitchMap.
+*     - If this function is invoked with the global error status set,
+*     or if it should fail for any reason, then the *nmap value, the
+*     list of Mapping pointers and the list of Invert values will all
+*     be returned unchanged.
+*-
+*/
+
+/* Local Variables: */
+   AstMapping *map;              /* Pointer to Mapping to return */
+   int inv;                      /* Original Invert flag for Mapping */
+   int i;                        /* Route Mapping index */
+   int oldinv;                   /* Original Invert flag for SwitchMap */
+   int result;                   /* Returned value */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Store the numbe of route Mappings */
+   result = this->nroute;
+   *nmap = result + 2;
+
+/* Allocate the required arrays. */
+   *map_list = astMalloc( sizeof( AstMapping * )*(size_t) *nmap );
+   *invert_list = astMalloc( sizeof( int )*(size_t) *nmap );
+
+/* Check the pointers can be used safely. */
+   if( astOK ) {
+
+/* Temporaily set the requested Invert flag for the SwitchMap. */
+      oldinv = astGetInvert( this );
+      astSetInvert( this, invert );
+
+/* Get the forward selector Mapping. */
+      map = GetSelector( this, 1, &inv );
+
+/* If the SwitchMap has a forward selector Mapping, return a clone of the
+   Mapping pointer, and the invert flag to be used with it, then
+   re-instate the original invert flag value (which was modified by
+   GetSelector). */
+      if( map ) {
+         ( *map_list )[ 0 ] = astClone( map );
+         ( *invert_list )[ 0 ] = astGetInvert( map );
+         astSetInvert( map, inv );
+
+/* If the SwitchMap does not has a forward selector Mapping, return a
+   NULL pointer. */
+      } else {
+         ( *map_list )[ 0 ] = NULL;   
+         ( *invert_list )[ 0 ] = 0;
+      }
+
+/* Likewise, get and return the inverse selector Mapping.*/
+      map = GetSelector( this, 0, &inv );
+      if( map ) {
+         ( *map_list )[ 1 ] = astClone( map );
+         ( *invert_list )[ 1 ] = astGetInvert( map );
+         astSetInvert( map, inv );
+      } else {
+         ( *map_list )[ 1 ] = NULL;   
+         ( *invert_list )[ 1 ] = 0;
+      }
+
+/* Loop round all route Mappings. */
+      for( i = 0; i < result; i++ ){
+
+/* Get the next route Mapping. */
+         map = GetRoute( this, (double) i + 1.0, &inv );
+
+/* If the SwitchMap has a route Mapping for the current selector value, 
+   return a clone of the Mapping pointer, and the invert flag to be used 
+   with it, then re-instate the original invert flag value (which was 
+   modified by GetRoute). */
+         if( map ) {
+            ( *map_list )[ i + 2 ] = astClone( map );
+            ( *invert_list )[ i + 2 ] = astGetInvert( map );
+            astSetInvert( map, inv );
+
+/* If the SwitchMap does not has a route Mapping for the current selector
+   value, return a NULL pointer. */
+         } else {
+            ( *map_list )[ i + 2 ] = NULL;   
+            ( *invert_list )[ i + 2 ] = 0;
+         }
+
+      }
+
+/* Re-instate the original Ivert flag for the SwitchMap. */
+      astSetInvert( this, oldinv );
+
+   }
+
+/* If an error has occurred, free the returned arrays. */
+   if( !astOK ) {
+      *map_list = astFree( *map_list );
+      *invert_list= astFree( *invert_list );
+      result= 0;
+      *nmap = 0;
+   } 
+
+/* Return the result */
+   return result;
+}
+
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                                int forward, AstPointSet *out ) {
 /*
