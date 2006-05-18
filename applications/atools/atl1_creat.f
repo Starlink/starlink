@@ -52,6 +52,8 @@
 *        Changed call to FIO_ANNUL to FIO_CLOSE. Previously the output
 *        text file was not completely flushed when being used as a 
 *        monolith (e.g. from ICL), resulting in incomplete output files.
+*     11-MAY-2006 (DSB):
+*        Increase maximum line length to 300 characters.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -96,7 +98,7 @@
       CALL ATL1_RM( FNAME, STATUS )
 
 *  Open a new file and get an FIO identifier for it.
-      CALL FIO_OPEN( FNAME, 'WRITE', 'LIST', 132, FD, STATUS )
+      CALL FIO_OPEN( FNAME, 'WRITE', 'LIST', 300, FD, STATUS )
 
 *  Create an AST Channel to write to the file.
       CHAN = AST_CHANNEL( AST_NULL, ATL1_SNK, ' ', STATUS )
@@ -139,7 +141,7 @@
       COMMON /ATL1SNK/ FD
 
 *  Local Variables:
-      CHARACTER BUF*200
+      CHARACTER BUF*300
       INTEGER NC
 
 *  Check the inherited global status.

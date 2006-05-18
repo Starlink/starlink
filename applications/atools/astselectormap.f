@@ -50,9 +50,14 @@
 *     In practice, SelectorMaps are often used in conjunction with SwitchMaps.
 
 *  Usage:
-*     astselectormap reg1 reg2 options result
+*     astselectormap reg1 reg2 badval options result
 
 *  ADAM Parameters:
+*     BADVAL = LITERAL (Given)
+*        The floating point value to be returned by the forward transformation 
+*        of the SelectorMap for any input positions that have a bad (AST__BAD) 
+*        value on any axis. Anything containing the string "bad" (case
+*        insensitive) will be treated as AST__BAD.
 *     REG1-REG25 = LITERAL (Given)
 *        A set of 25 parameters associated with the NDFs or text files holding 
 *        the Regions. All the supplied Regions must relate to the same 
@@ -121,6 +126,8 @@
 
 *  Local Variables:
       CHARACTER PARAM*15
+      CHARACTER TEXT*30
+      DOUBLE PRECISION  BADVAL
       INTEGER IAT
       INTEGER NREG
       INTEGER RESULT
@@ -158,8 +165,17 @@
       END DO
  10   CONTINUE
 
+*  Get BADVAL, allowing for strings containinng "bad".
+      CALL PAR_GET0C( 'BADVAL', TEXT, STATUS )
+      CALL CHR_UCASE( TEXT )
+      IF( INDEX( 'BAD', TEXT ) .NE. 0 ) THEN
+         BADVAL = ast__bad
+      ELSE
+         CALL PAR_GET0D( 'BADVAL', BADVAL, STATUS )
+      END IF
+
 *  Create the required SelectorMap.
-      RESULT = AST_SELECTORMAP( NREG, REGS, ' ', STATUS )
+      RESULT = AST_SELECTORMAP( NREG, REGS, BADVAL, ' ', STATUS )
 
 *  Store the required attribute values.
       CALL ATL1_SETOP( 'OPTIONS', RESULT, STATUS )
