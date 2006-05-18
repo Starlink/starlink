@@ -15552,6 +15552,11 @@ KAPPA: \htmlref{PASTE}{PASTE},
             \sstitem
             {\tt "Sum"}    -- The total value.
          }
+         The selection is restricted if each channel contains fewer
+         than three pixels.  For instance, measures of dispersion like
+  	 "Sigma" and "Iwd" are meaningless for single-pixel channels.
+  	 If you supply an unavailable option, you will be informed,
+         and presented with the available options.
          {\tt ["Mean"]}
       }
       \sstsubsection{
