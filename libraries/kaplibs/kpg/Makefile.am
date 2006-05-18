@@ -147,6 +147,7 @@ kpg1_asira.f \
 kpg1_aslog.f \
 kpg1_asmrg.f \
 kpg1_asoff.f \
+kpg1_aspcl.f \
 kpg1_asprp.f \
 kpg1_aspsy.f \
 kpg1_asptp.f \
