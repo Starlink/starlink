@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sc2">
+  <version>3.1</version>
+  <path>docs/sc/002</path>
+  <description>The DX Cookbook</description>
+  <abstract><p>IBM DX (Data Explorer) is the data visualisation package 
+     recommended by Starlink, particularly for the visualisation of
+     three-dimensional scalar and vector data. This cookbook provides
+     a set of simple recipes for performing common operations using
+     DX. No prior knowledge of DX is required. You can use the recipes
+     as they are provided, if they are suitable for your purposes, or
+     alternatively you can use them as a starting point for generating
+     your own visualisations.
+
+     The cookbook also contains a brief summary of the DX data model.
+     It is useful to have at least some understanding of this data
+     model in order to use DX effectively.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A.C. Davenhall</name>
+    </person>
+  </developers>
+  <documentation> sc2</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
