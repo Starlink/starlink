@@ -386,7 +386,7 @@
       p2(2) = 80
       box(2) = ast_box( gridframe, 1, p1, p2, AST__NULL, ' ', status )
 
-      fs = ast_selectormap( 2, box, ' ', status )
+      fs = ast_selectormap( 2, box, AST__BAD, ' ', status )
 
 *  Inverse Selector Mapping: A PermMap which has an inverse transformation 
 *  which gives an input value of 1 for all output values. This means that the
