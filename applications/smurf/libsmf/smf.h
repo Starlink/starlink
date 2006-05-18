@@ -128,6 +128,13 @@
 #include "star/grp.h"
 #include "smf_typ.h"
 
+void smf_calc_stats( const smfData *data, const char *mode, const int index,
+                     int lo, int hi, double mean, double sigma, 
+		     int *status);
+
+double smf_calc_covar ( const smfData *data, const int i, const int j,
+			int lo, int hi, int *status);
+
 double smf_calc_wvm( const smfHead *hdr, int *status );
 
 void smf_check_flat ( const smfData *data, int *status );
