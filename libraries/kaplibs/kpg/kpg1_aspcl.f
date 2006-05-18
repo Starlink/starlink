@@ -17,9 +17,9 @@
 *     This routine imposes clipping on a Plot (using the AST_CLIP routine)
 *     that restricts drawing to the regions that seem well bahaved. 
 *     Specifically, drawing is restricted to a rectangular region within
-*     the PIXEL Frame of the Plot that is determined by transforming the
+*     the base Frame of the Plot that is determined by transforming the
 *     supplied PIXEL bounding box into the current Frame, then converting 
-*     it back to the PIXEL Frame.
+*     it to the base Frame.
 
 *  Arguments:
 *     IPLOT = INTEGER (Given)
@@ -84,6 +84,8 @@
 *  Local Variables:
       DOUBLE PRECISION DLBND( NDF__MXDIM )
       DOUBLE PRECISION DUBND( NDF__MXDIM )
+      DOUBLE PRECISION BLBND( NDF__MXDIM )
+      DOUBLE PRECISION BUBND( NDF__MXDIM )
       DOUBLE PRECISION PLBND( NDF__MXDIM )
       DOUBLE PRECISION PUBND( NDF__MXDIM )
       DOUBLE PRECISION CLBND( NDF__MXDIM )
@@ -156,9 +158,16 @@
             END IF
          END DO
 
-*  If any clipping is needed, apply it.
-         IF( CLIP ) CALL AST_CLIP( IPLOT, IPIX, PLBND, PUBND, STATUS )
-
+*  If any clipping is needed, convert it to the base Frame of the Plot and 
+*  then apply it.
+         IF( CLIP ) THEN
+            MAP = AST_GETMAPPING( IPLOT, IPIX, AST__BASE, STATUS )
+            DO I = 1, 2
+               CALL AST_MAPBOX( MAP, PLBND, PUBND, .TRUE., I, 
+     :                          BLBND( I ), BUBND( I ), XL, XU, STATUS )
+            END DO
+            CALL AST_CLIP( IPLOT, AST__BASE, BLBND, BUBND, STATUS )
+         END IF
       END IF
 
 *  End the AST context.
