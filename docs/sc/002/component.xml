@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="sc2">
-  <version>3.1</version>
+  <version>3</version>
   <path>docs/sc/002</path>
   <description>The DX Cookbook</description>
   <abstract><p>IBM DX (Data Explorer) is the data visualisation package 
