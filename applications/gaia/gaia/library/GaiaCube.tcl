@@ -399,6 +399,19 @@ itcl::class gaia::GaiaCube {
       }
       pack $itk_component(cruler) -side top -fill x
 
+      #  Whether to show the reference lines on the plot.
+      itk_component add showcollines {
+         StarLabelCheck $collapseTab.showlines \
+            -text "Show limits on plot:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope show_collapse_lines_] \
+            -command [code $this toggle_show_collapse_lines_]
+      }
+      pack $itk_component(showcollines) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(showcollines) \
+         {Show extent of collapse on plot with reference lines}
+
       itk_component add collower {
          GaiaSpectralPlotLine $collapseTab.collower \
             -gaiacube [code $this] \
@@ -974,12 +987,16 @@ itcl::class gaia::GaiaCube {
       }
 
       #  Create a temporary file name.
-      set tmpimage_ "GaiaTempCube${count_}"
+      set tmpimage_ "GaiaTempCollapse${count_}"
       incr count_
 
       blt::busy hold $w_
       $collapser_ runwiths "in=${ndfname_}$section out=$tmpimage_ axis=$axis_ \
                             estimator=$combination_type_ accept"
+
+      #  If the reference lines are displayed these need removing.
+      set show_collapse_lines_ 0
+      toggle_show_collapse_lines_
    }
 
    #  Display a collapsed image.
@@ -1292,6 +1309,25 @@ itcl::class gaia::GaiaCube {
    #     $splat_disp_ runwith "GaiaArdSpectrum"
    #  } msg
 
+   #  Toggle the display of the collapse reference lines.
+   protected method toggle_show_collapse_lines_ {} {
+      $itk_component(collower) configure -show_ref_line $show_collapse_lines_
+      $itk_component(colupper) configure -show_ref_line $show_collapse_lines_
+      if { $spectrum_ != {} } {
+         if { $show_collapse_lines_ } {
+            $spectrum_ make_ref_line 4
+            $spectrum_ make_ref_line 5
+            $spectrum_ set_ref_line_colour 4 "cyan"
+            $spectrum_ set_ref_line_colour 5 "cyan"
+            $itk_component(collower) configure -value $lower_bound_
+            $itk_component(colupper) configure -value $upper_bound_
+         } else {
+            $spectrum_ remove_ref_line 4
+            $spectrum_ remove_ref_line 5
+         }
+      }
+   }
+
    #  Toggle the display of the animation reference lines.
    protected method toggle_show_animation_lines_ {} {
       $itk_component(lower) configure -show_ref_line $show_animation_lines_
@@ -1300,6 +1336,8 @@ itcl::class gaia::GaiaCube {
          if { $show_animation_lines_ } {
             $spectrum_ make_ref_line 2
             $spectrum_ make_ref_line 3
+            $spectrum_ set_ref_line_colour 2 "yellow"
+            $spectrum_ set_ref_line_colour 3 "yellow"
             $itk_component(lower) configure -value $lower_bound_
             $itk_component(upper) configure -value $upper_bound_
          } else {
@@ -1446,6 +1484,10 @@ itcl::class gaia::GaiaCube {
    #  Whether to display the limits of the animation as reference lines in the
    #  plot.
    protected variable show_animation_lines_ 0
+
+   #  Whether to display the limits of the collapse as reference lines in the
+   #  plot.
+   protected variable show_collapse_lines_ 0
 
    #  Array of index-based controls. These are indexed by their ref_id.
    protected variable index_control_
