@@ -94,6 +94,8 @@ Error m_SXList( Object *in, Object*out){
 *  History:
 *     12-SEP-1995 (DSB):
 *        Original version
+*     19-MAY-2006 (DSB):
+*        Fix compilation problems.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,11 +110,15 @@ Error m_SXList( Object *in, Object*out){
       Array   array;
       char    buf[BUF_SIZE];
       char   *c;
+      char   *cp;
       Category cat;
       char    cr='\n';
+      double *dp;
       int     el;
       FILE   *fd;
       char   *file;
+      float  *fp;
+      int    *ip;
       int     i;
       int     j;
       int     len;
@@ -280,7 +286,9 @@ Error m_SXList( Object *in, Object*out){
                if( el < nel[i] ){
 
                   sprintf( p, "%-*s", ndim[i], (char *)pnt[i] );
-                  ( (char *) pnt[i]) += ndim[i];
+                  cp = (char *) ( pnt[i] );
+                  cp += ndim[i];
+                  pnt[i] = (void *) cp;
 
                } else {
                   sprintf( p, "%*c", ndim[i], ' ' );
@@ -297,7 +305,10 @@ Error m_SXList( Object *in, Object*out){
                         goto error;
                      }
                      if( el < nel[i] ){
-                        sprintf( p, "%- 5d", *(((char *)pnt[i])++) );
+                        cp = (char *)( pnt[i] );
+                        sprintf( p, "%- 5d", *cp );
+                        cp++;
+                        pnt[i] = (void *) cp;
                      } else {
                         sprintf( p, "%5c", ' ' );
                      }
@@ -309,7 +320,10 @@ Error m_SXList( Object *in, Object*out){
                         goto error;
                      }
                      if( el < nel[i] ){
-                        sprintf( p, "%- 12d", *(((int *)pnt[i])++) );
+                        ip = (int *)( pnt[i] );
+                        sprintf( p, "%- 12d", *ip );
+                        ip++;
+                        pnt[i] = (void *) ip;
                      } else {
                         sprintf( p, "%12c", ' ' );
                      }
@@ -321,7 +335,11 @@ Error m_SXList( Object *in, Object*out){
                         goto error;
                      }
                      if( el < nel[i] ){
-                        sprintf( p, "%- 13.6g", *(((float *)pnt[i])++) );
+                        fp = (float *)( pnt[i] );
+                        sprintf( p, "%- 13.6g", *fp );
+                        fp++;
+                        pnt[i] = (void *) fp;
+
                      } else {
                         sprintf( p, "%13c", ' ' );
                      }
@@ -333,7 +351,10 @@ Error m_SXList( Object *in, Object*out){
                         goto error;
                      }
                      if( el < nel[i] ){
-                        sprintf( p, "%- 13.6g", *(((double *)pnt[i])++) );
+                        dp = (double *)( pnt[i] );
+                        sprintf( p, "%- 13.6g", *dp );
+                        dp++;
+                        pnt[i] = (void *) dp;
                      } else {
                         sprintf( p, "%13c", ' ' );
                      }
