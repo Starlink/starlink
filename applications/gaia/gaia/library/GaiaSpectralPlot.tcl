@@ -20,12 +20,16 @@
 #     and provide many graphical elements that can be used to annotate the
 #     plot.  It is also possible to print the current display to a postscript
 #     printer or file and convert between various spectral coordinate systems.
+#
+#     Special positions in the spectrum can be identified using reference
+#     lines (these are drawn from the top to the bottom of the plot). There
+#     can be as many of these lines as needed.
 
 #  Invocations:
 #
 #        GaiaSpectralPlot object_name [configuration options]
 #
-#     This creates an instance of a GaiaPhotom object. The return is
+#     This creates an instance of a GaiaSpectralPlot object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -145,7 +149,7 @@ itcl::class gaia::GaiaSpectralPlot {
          -offvalue 0 \
          -command [code $this set_xminmax]
       add_menu_short_help $Options {X min to max}  \
-         {Show X coordinates as minimum to maximum, 
+         {Show X coordinates as minimum to maximum,
             otherwise cube "front" to "back" order}
 
       #  Use log for plot axes.
@@ -316,10 +320,14 @@ itcl::class gaia::GaiaSpectralPlot {
       }
       set spectrum_ {}
 
-      if { [info exists itk_component(canvas)] && $ref_line_ != {} } {
-         $itk_component(canvas) delete $ref_line_
+      if { [info exists itk_component(canvas)] } {
+         if { [::array exists ref_lines_] } {
+            foreach {id} [::array names ref_lines_] {
+               $itk_component(draw) delete_object $ref_lines_($id)
+            }
+            unset ref_lines_
+         }
       }
-      set ref_line_ {}
    }
 
    #  Print canvas, use a print dialog.
@@ -330,6 +338,28 @@ itcl::class gaia::GaiaSpectralPlot {
             -transient 1 \
             -pagewidth 7.5i
       }
+   }
+
+   #  Add the graphics menu and populate it.
+   protected method make_graphics_menu_ {} {
+      itk_component add draw {
+         gaia::StarCanvasDraw $w_.draw \
+            -canvas $itk_component(canvas) \
+            -rtdimage $this \
+            -transient 1 \
+            -center 0 \
+            -withdraw 1 \
+            -clipping 0 \
+            -shorthelpwin $itk_option(-shorthelpwin) \
+            -withtoolbox 1 \
+            -show_object_menu 1 \
+            -ignore_tag $itk_option(-ast_tag)
+      }
+
+      # Add menu and populate it.
+      set Graphics [add_menubutton "Graphics" left]
+      configure_menubutton Graphics -underline 0
+      $itk_component(draw) add_menuitems $Graphics
    }
 
    #  Display a spectrum. The data is wrapped by an instance of GaiaNDAccess.
@@ -360,10 +390,10 @@ itcl::class gaia::GaiaSpectralPlot {
          $itk_component(canvas) bind $spectrum_ <1> \
             +[code $itk_component(draw) deselect_objects]
 
-         #  Make a reference line.
+         #  Make the base reference line (always have one of these).
          fitxy
-         make_ref_line_
-         set_to_ref_coord_
+         make_ref_line 1
+         set_to_ref_coord_ 1
       }
 
       #  When autoscaling (or just created one of the plots), set the frameset
@@ -388,7 +418,7 @@ itcl::class gaia::GaiaSpectralPlot {
    #  All the given details should correspond to those given to the display
    #  method.
    public method display_reference {accessor axis alow ahigh p1 p2} {
-      
+
       if { $spectrum_ == {} } {
          return
       }
@@ -403,32 +433,100 @@ itcl::class gaia::GaiaSpectralPlot {
       $accessor release $adr
    }
 
-   #  Make the reference line item. This should be refreshed to the reference
+   #  Make a reference line item. This should be refreshed to the reference
    #  coordinate as necessary.
-   protected method make_ref_line_ {} {
-      if { $itk_option(-show_ref_line) } {
-         lassign [$itk_component(canvas) bbox $spectrum_] x0 y0 x1 y1
-         if { $x0 != {} } {
-            set ref_line_ [$itk_component(canvas) create line $x0 $y0 $x0 $y1 \
-                              -width 1 -fill $reflinecolour_]
+   public method make_ref_line {id} {
+      lassign [$itk_component(canvas) bbox $spectrum_] x0 y0 x1 y1
+      if { $x0 != {} } {
+         remove_ref_line $id
+
+         #  Make this create a canvasdraw column object...
+         $itk_component(draw) set_drawing_mode column \
+            [code $this created_ref_line_ $id]
+         $itk_component(draw) create_object $x0 $y0
+         $itk_component(draw) create_done $x0 $y0
+      }
+   }
+
+   #  Called when the creation of a reference line is completed. Records the
+   #  canvas id and sets the colour. Adds a notification call so we can see
+   #  when the line is dragged or deleted.
+   protected method created_ref_line_ {id cid args} {
+      set ref_lines_($id) $cid
+      $itk_component(canvas) itemconfigure $cid -fill $reflinecolour_
+
+      $itk_component(draw) add_notify_cmd $cid \
+         [code $this update_ref_line_ $id] 1
+
+      #  Add an additional binding to see when the button is released. Use
+      #  this to signal a drag stop.
+      $itk_component(canvas) bind $cid <ButtonRelease-1> \
+         "+[code $this update_ref_line_ $id released]"
+
+      if { ! [info exists xref_($id)] } {
+         set xref_($id) 0
+      }
+   }
+
+   #  Called when a reference line is updated, that's moved on the canvas or
+   #  deleted.
+   protected method update_ref_line_ {id mode} {
+
+      if { $mode == "move" || $mode == "released" } {
+         #  Convert canvas to axis coordinate and return this if a command has
+         #  been supplied. Note that the axis coordinate is return in the
+         #  equivalent of NDF pixel indices for convenience.
+         if { $itk_option(-ref_changed_cmd) != {} } {
+
+            lassign [$itk_component(canvas) coords $ref_lines_($id)] x0 y0 x1 y1
+            
+            #  From canvas to world.
+            set x0 [$itk_component(canvas) coords $spectrum_ convert 1 $x0]
+
+            #  This is the current world coord, so record it.
+            set xref_($id) $x0
+
+            #  World to grid.
+            set frameset [$itk_component(canvas) itemcget $spectrum_ -frameset]
+            set ind [gaiautils::getaxiscoord $frameset $x0 0]
+
+            eval $itk_option(-ref_changed_cmd) $id $ind $mode
+         }
+
+      } elseif { $mode == "delete" } {
+         unset ref_lines_($id)
+      }
+   }
+
+   #  Remove a reference line item.
+   public method remove_ref_line {id} {
+      if { [info exists ref_lines_($id)] } {
+         $itk_component(draw) delete_object $ref_lines_($id)
+      }
+   }
+
+   #  Set the coordinate of a reference line and optionally creates it.
+   public method set_ref_coord {id xcoord} {
+      if { $spectrum_ != {} } {
+         if { ! [info exists ref_lines_($id)] } {
+            make_ref_line $id
+         }
+         
+         #  Don't move unnecessarily.
+         if { $xref_($id) != $xcoord } {
+            set xref_($id) $xcoord
+            set_to_ref_coord_ $id
          }
       }
    }
 
-   #  Set the reference line coordinate. Use a special coords that
-   #  takes a world coordinate and returns a canvas coordinate.
-   public method set_ref_coord {xcoord} {
-      if { $spectrum_ != {} && $ref_line_ != {} } {
-         set xref_ [$itk_component(canvas) coords $spectrum_ convert $xcoord]
-         set_to_ref_coord_
-      }
-   }
-
-   #  Move reference line to the reference coordinate.
-   public method set_to_ref_coord_ {} {
-      if { $spectrum_ != {} && $ref_line_ != {} } {
-         lassign [$itk_component(canvas) coords $ref_line_] x0 y0 x1 y1
-         $itk_component(canvas) move $ref_line_ [expr $xref_ - $x0] 0
+   #  Move reference line to the reference coordinate. Reference coordinate in
+   #  world coordinates.
+   public method set_to_ref_coord_ {id} {
+      if { $spectrum_ != {} && [info exists ref_lines_($id)] } {
+         lassign [$itk_component(canvas) coords $ref_lines_($id)] x0 y0 x1 y1
+         set cx [$itk_component(canvas) coords $spectrum_ convert 0 $xref_($id)]
+         $itk_component(canvas) move $ref_lines_($id) [expr $cx - $x0] 0
       }
    }
 
@@ -437,11 +535,13 @@ itcl::class gaia::GaiaSpectralPlot {
       if { $spectrum_ != {} } {
          $itk_component(canvas) scale $spectrum_ -1 -1 -1 -1
 
-         # Resize the reference line.
-         if { $ref_line_ != {} } {
-            $itk_component(canvas) delete $ref_line_
-            make_ref_line_
-            set_to_ref_coord_
+         #  Resize the reference lines.
+         if { [::array exists ref_lines_] } {
+            foreach {id} [::array names ref_lines_] {
+               $itk_component(draw) delete_object $ref_lines_($id)
+               make_ref_line $id
+               set_to_ref_coord_ $id
+            }
          }
 
          # Fudge immediate update.
@@ -483,28 +583,6 @@ itcl::class gaia::GaiaSpectralPlot {
       }
    }
 
-   #  Add the graphics menu and populate it.
-   protected method make_graphics_menu_ {} {
-      itk_component add draw {
-         gaia::StarCanvasDraw $w_.draw \
-            -canvas $itk_component(canvas) \
-            -rtdimage $this \
-            -transient 1 \
-            -center 0 \
-            -withdraw 1 \
-            -clipping 0 \
-            -shorthelpwin $itk_option(-shorthelpwin) \
-            -withtoolbox 1 \
-            -show_object_menu 1 \
-            -ignore_tag $itk_option(-ast_tag)
-      }
-
-      # Add menu and populate it.
-      set Graphics [add_menubutton "Graphics" left]
-      configure_menubutton Graphics -underline 0
-      $itk_component(draw) add_menuitems $Graphics
-   }
-
    #  Update the applicable gridoptions.
    protected method update_gridoptions_ {} {
       set gridoptions_ \
@@ -534,9 +612,11 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Set the colour of the reference line.
    public method set_reflinecolour {colour} {
       set reflinecolour_ $colour
-      if { $ref_line_ != {} } {
-         $itk_component(canvas) itemconfigure $ref_line_ \
-            -fill $reflinecolour_
+      if { [::array exists ref_lines_] } {
+         foreach {id} [::array names ref_lines_] {
+            $itk_component(canvas) itemconfigure $ref_lines_($id) \
+               -fill $reflinecolour_
+         }
       }
    }
 
@@ -572,9 +652,6 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  The canvas, could be local or in the main image.
-   itk_option define -canvas canvas Canvas {}
-
    #  Identifying number for toolbox (shown in () in window title).
    itk_option define -number number Number 0 {}
 
@@ -590,10 +667,6 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Command to execute when the "close" method is invoked.
    itk_option define -close_cmd close_cmd Close_Cmd {}
-
-   #  Whether to show the coordinate ref line.
-   itk_option define -show_ref_line show_ref_line \
-      Show_Ref_Line 1
 
    #  Whether to order X coordinates to run from min to max, or the cube
    #  order.
@@ -612,17 +685,22 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Actual control is handled by the GaiaCube instance.
    itk_option define -spec_coords spec_coords Spec_Coords {}
 
+   #  A command to invoke when a reference line is moved (by interaction by
+   #  the user). The command will be trailed by the reference line id and 
+   #  the new world coordinate.
+   itk_option define -ref_changed_cmd ref_changed_cmd Ref_Changed_Cmd {}
+
    #  Protected variables: (available to instance)
    #  --------------------
 
    #  The main spectral_plot item.
    protected variable spectrum_ {}
 
-   #  The reference coordinate, canvas coords.
-   protected variable xref_ 0
+   #  The reference coordinates, canvas coords, indexed by id.
+   protected variable xref_
 
-   #  Reference line item.
-   protected variable ref_line_ {}
+   #  All reference line canvas ids, indexed by a user specified number.
+   protected variable ref_lines_
 
    #  Colours, two sets full and simple. These are the AST colours
    #  defined in grf_tkcan, plus some extra greys for the background
