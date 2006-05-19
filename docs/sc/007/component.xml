@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sc7">
+  <version>2</version>
+  <path>docs/sc/007</path>
+  <description>Simple Spectroscopy Reductions</description>
+  <abstract><p>This Cookbook describes the basic concepts and methods used in
+      optical astronomical spectroscopy; it is aimed at those new to
+      the field. Complete worked example reductions for both 1-D and
+      2-D longslit spectra, using real datasets, are described.
+      Common problems and their solutions are discussed.  A section on
+      related resources is included, as is a glossary of commonly used
+      terms This cookbook presents simple recipes for the photometric
+      calibration of CCD frames.  Using these recipes you can
+      calibrate the brightness of objects measured in CCD frames into
+      magnitudes in standard photometric systems, such as the
+      Johnson-Morgan UBV, system. The recipes use standard software
+      available at all Starlink sites.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Martin Clayton and Anthony Holloway</name>
+    </person>
+  </developers>
+  <documentation> sc7</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997, 1998</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
