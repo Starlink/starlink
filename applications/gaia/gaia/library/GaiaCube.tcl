@@ -262,7 +262,7 @@ itcl::class gaia::GaiaCube {
             -show_ref_line $show_animation_lines_ \
             -labelwidth $lwidth \
             -valuewidth 20 \
-            -coord_update_cmd [code $this set_lower_bound_]
+            -coord_update_cmd [code $this set_animate_lower_bound_]
       }
       set index_control_(2) $itk_component(lower)
       pack $itk_component(lower) -side top -fill x -ipadx 1m -ipady 2m
@@ -279,7 +279,7 @@ itcl::class gaia::GaiaCube {
             -show_ref_line $show_animation_lines_ \
             -labelwidth $lwidth \
             -valuewidth 20 \
-            -coord_update_cmd [code $this set_upper_bound_]
+            -coord_update_cmd [code $this set_animate_upper_bound_]
       }
       set index_control_(3) $itk_component(upper)
       pack $itk_component(upper) -side top -fill x -ipadx 1m -ipady 2m
@@ -640,9 +640,9 @@ itcl::class gaia::GaiaCube {
          $itk_component(colupper) configure -from $plane_min_ -to $plane_max_
 
          $itk_component(lower) configure -value $plane_min_
-         set_lower_bound_ $plane_min_
+         set_animate_lower_bound_ $plane_min_
          $itk_component(upper) configure -value $plane_max_
-         set_upper_bound_ $plane_max_
+         set_animate_upper_bound_ $plane_max_
 
          $itk_component(collower) configure -value $plane_min_
          set_collapse_lower_bound_ $plane_min_
@@ -771,7 +771,7 @@ itcl::class gaia::GaiaCube {
    #  Set the position of a spectral reference line.
    public method set_spec_ref_coord {id coord} {
       if { $spectrum_ != {} && $coord != {} } {
-         $spectrum_ set_ref_coord $id $coord
+         $spectrum_ set_ref_line_coord $id $coord
       }
    }
 
@@ -836,13 +836,13 @@ itcl::class gaia::GaiaCube {
    }
 
    #  Set the animation lower bound.
-   protected method set_lower_bound_ {bound} {
-      set lower_bound_ $bound
+   protected method set_animate_lower_bound_ {bound} {
+      set lower_animate_bound_ $bound
    }
 
    #  Set the animation upper bound.
-   protected method set_upper_bound_ {bound} {
-      set upper_bound_ $bound
+   protected method set_animate_upper_bound_ {bound} {
+      set upper_animate_bound_ $bound
    }
 
    #  Get the coordinate of an index along the current axis.
@@ -867,13 +867,13 @@ itcl::class gaia::GaiaCube {
    protected method start_ {} {
       set initial_seconds_ [clock clicks -milliseconds]
       if { $afterId_ == {} } {
-         if { $lower_bound_ > $upper_bound_ } {
-            set temp $lower_bound_
-            set lower_bound_ $upper_bound_
-            set upper_bound_ $temp
+         if { $lower_animate_bound_ > $upper_animate_bound_ } {
+            set temp $lower_animate_bound_
+            set lower_animate_bound_ $upper_animate_bound_
+            set upper_animate_bound_ $temp
          }
          set step_ $itk_option(-step)
-         set_display_plane_ $lower_bound_ 0
+         set_display_plane_ $lower_animate_bound_ 0
          increment_
       }
    }
@@ -908,9 +908,9 @@ itcl::class gaia::GaiaCube {
 
    #  Increment the displayed section by one.
    protected method increment_ {} {
-      if { $plane_ >= $lower_bound_ && $plane_ < $upper_bound_ } {
+      if { $plane_ >= $lower_animate_bound_ && $plane_ < $upper_animate_bound_ } {
          set_display_plane_ [expr ${plane_}+$step_] 0
-         if { $plane_ == $lower_bound_ } {
+         if { $plane_ == $lower_animate_bound_ } {
             #  At lower edge, running backwards, need to let it step below.
             set plane_ [expr ${plane_}+$step_]
          }
@@ -920,7 +920,7 @@ itcl::class gaia::GaiaCube {
          #  with rock 'n roll option.
          #  Check that we have a range, otherwise this will call increment_
          #  causing an eval depth exception.
-         if { $lower_bound_ == $upper_bound_ } {
+         if { $lower_animate_bound_ == $upper_animate_bound_ } {
             stop_
          } else {
             #  Force temporary halt as visual clue that end has arrived.
@@ -931,14 +931,14 @@ itcl::class gaia::GaiaCube {
                   #  Rock 'n roll, switch direction.
                   if { $step_ >= 1 } {
                      # Going up.
-                     set plane_ [expr $upper_bound_ - 1]
+                     set plane_ [expr $upper_animate_bound_ - 1]
                   } else {
                      # Going down.
-                     set plane_ $lower_bound_
+                     set plane_ $lower_animate_bound_
                   }
                   set step_ [expr -1*$step_]
                } else {
-                  set plane_ $lower_bound_
+                  set plane_ $lower_animate_bound_
                   #  Increment is always positive, put may be changed on fly.
                   set step_ [expr abs($step_)]
                }
@@ -1319,8 +1319,8 @@ itcl::class gaia::GaiaCube {
             $spectrum_ make_ref_line 5
             $spectrum_ set_ref_line_colour 4 "cyan"
             $spectrum_ set_ref_line_colour 5 "cyan"
-            $itk_component(collower) configure -value $lower_bound_
-            $itk_component(colupper) configure -value $upper_bound_
+            $itk_component(collower) configure -value $lower_collapse_bound_
+            $itk_component(colupper) configure -value $upper_collapse_bound_
          } else {
             $spectrum_ remove_ref_line 4
             $spectrum_ remove_ref_line 5
@@ -1338,8 +1338,8 @@ itcl::class gaia::GaiaCube {
             $spectrum_ make_ref_line 3
             $spectrum_ set_ref_line_colour 2 "yellow"
             $spectrum_ set_ref_line_colour 3 "yellow"
-            $itk_component(lower) configure -value $lower_bound_
-            $itk_component(upper) configure -value $upper_bound_
+            $itk_component(lower) configure -value $lower_animate_bound_
+            $itk_component(upper) configure -value $upper_animate_bound_
          } else {
             $spectrum_ remove_ref_line 2
             $spectrum_ remove_ref_line 3
@@ -1409,8 +1409,8 @@ itcl::class gaia::GaiaCube {
    protected variable plane_min_ 0
 
    #  Animation bounds.
-   protected variable lower_bound_ 0
-   protected variable upper_bound_ 0
+   protected variable lower_animate_bound_ 0
+   protected variable upper_animate_bound_ 0
 
    #  Collapse bounds.
    protected variable lower_collapse_bound_ 0
