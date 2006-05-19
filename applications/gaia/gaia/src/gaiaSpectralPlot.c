@@ -67,7 +67,7 @@
 
 #define DEBUG 0
 
-#define DOUBLE_LENGTH 25
+#define LONG_LENGTH 25
 
 /*
  * Define a structure for containing all the necessary information
@@ -432,9 +432,11 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  *   A special feature (should be moved into some generic interface, but
  *   that's not possible for canvas items, so some method of exporting the
  *   plot would be required) is to convert an X coordinate into a canvas
- *   coordinate, using the plot. This uses the format:
+ *   coordinate and vice-versa, using the plot. This uses the format:
  *
- *      <canvas> coords <item> "convert" coordinate.
+ *      <canvas> coords <item> "convert" ?toworld? coordinate.
+ *
+ *   Where tocanvas is a boolean.
  *
  * Results:
  *      Returns TCL_OK or TCL_ERROR, and sets interp->result.
@@ -479,14 +481,23 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             double yin[1];
             double xout[1];
             double yout[1];
-            Tcl_GetDoubleFromObj( interp, objv[1], &xin[0] );
+            int toworld;
+
+            if ( Tcl_GetBooleanFromObj( interp, objv[1], &toworld ) != TCL_OK
+                 ||
+                 Tcl_GetDoubleFromObj( interp, objv[2], &xin[0] ) != TCL_OK ) {
+                return TCL_ERROR;
+            }
+
             yin[0] = 0.0;
-            astTran2( spPtr->plot, 1, xin, yin, 0, xout, yout );
-            if ( !astOK ) {
+            astTran2( spPtr->plot, 1, xin, yin, toworld, xout, yout );
+            if ( !astOK || xout[0] == AST__BAD ) {
                 Tcl_SetObjResult( interp, Tcl_NewDoubleObj( 0.0 ) );
                 astClearStatus;
             }
-            Tcl_SetObjResult( interp, Tcl_NewDoubleObj( xout[0] ) );
+            else {
+                Tcl_SetObjResult( interp, Tcl_NewDoubleObj( xout[0] ) );
+            }
         }
         else {
             Tcl_SetObjResult( interp, objv[1] );
@@ -1302,9 +1313,9 @@ static char *FrameSetPrintProc( ClientData clientData, Tk_Window tkwin,
                                 Tcl_FreeProc **freeProcPtr )
 {
     SPItem *spPtr = (SPItem *) widgRec;
-    char *p = (char *) ckalloc( DOUBLE_LENGTH );
+    char *p = (char *) ckalloc( LONG_LENGTH );
 
-    Tcl_PrintDouble( (Tcl_Interp *) NULL, (long) spPtr->framesets[0], p );
+    sprintf( p, "%lu", (long) spPtr->framesets[0] );
 
     *freeProcPtr = TCL_DYNAMIC;
     return p;
