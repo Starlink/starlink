@@ -219,19 +219,20 @@ itcl::class gaia::GaiaSpectralPlot {
       add_menu_short_help $Options {Ref spec color} \
           {Change the colour of the reference spectrum}
 
-      #  Choose a colour for the reference line.
+      #  Choose a colour for the main reference line.
       $Options add cascade -label "Ref line color" \
          -menu [menu $Options.refline]
       foreach {index colour} $simplecolours_ {
          $Options.refline add radiobutton \
             -background $colour \
-            -variable [scope reflinecolour_] \
+            -variable [scope ref_lines_colour_(1)] \
             -value $colour \
             -label {    } \
-            -command [code $this set_reflinecolour $colour]
+            -command [code $this set_ref_line_colour 1 $colour]
       }
       add_menu_short_help $Options {Ref line color} \
-          {Change the colour of the reference line}
+          {Change the colour of the image slice reference line}
+      set ref_lines_colour_(1) "red"
 
       #  Choose a colour for the background.
       $Options add cascade -label "Background" \
@@ -469,7 +470,10 @@ itcl::class gaia::GaiaSpectralPlot {
    #  when the line is dragged or deleted.
    protected method created_ref_line_ {id cid args} {
       set ref_lines_($id) $cid
-      $itk_component(canvas) itemconfigure $cid -fill $reflinecolour_
+      if { ! [info exists ref_lines_colour_($id)] } {
+         set ref_lines_colour_($id) "cyan"
+      }
+      $itk_component(canvas) itemconfigure $cid -fill $ref_lines_colour_($id)
 
       $itk_component(draw) add_notify_cmd $cid \
          [code $this update_ref_line_ $id] 1
@@ -511,6 +515,7 @@ itcl::class gaia::GaiaSpectralPlot {
 
       } elseif { $mode == "delete" } {
          unset ref_lines_($id)
+         unset xref_($id)
       }
    }
 
@@ -625,14 +630,12 @@ itcl::class gaia::GaiaSpectralPlot {
       apply_gridoptions
    }
 
-   #  Set the colour of the reference line.
-   public method set_reflinecolour {colour} {
-      set reflinecolour_ $colour
-      if { [::array exists ref_lines_] } {
-         foreach {id} [::array names ref_lines_] {
-            $itk_component(canvas) itemconfigure $ref_lines_($id) \
-               -fill $reflinecolour_
-         }
+   #  Set the colour of a reference line.
+   public method set_ref_line_colour {id colour} {
+      set ref_lines_colour_($id) $colour
+      if { [::array exists ref_lines_] && [info exists ref_lines_($id)] } {
+         $itk_component(canvas) itemconfigure $ref_lines_($id) \
+            -fill $ref_lines_colour_($id)
       }
    }
 
@@ -718,6 +721,9 @@ itcl::class gaia::GaiaSpectralPlot {
    #  All reference line canvas ids, indexed by a user specified number.
    protected variable ref_lines_
 
+   #  Reference line colours. Indexed by same value as ref_lines_.
+   protected variable ref_lines_colour_ 
+
    #  Colours, two sets full and simple. These are the AST colours
    #  defined in grf_tkcan, plus some extra greys for the background
    #  choice. The grey indices are fakes, others are AST ones.
@@ -746,9 +752,6 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Current axes colour.
    protected variable axescolour_ 0 ;     # AST index of white
-
-   #  Current reference line colour.
-   protected variable reflinecolour_ "red"
 
    #  Current reference spectrum colour.
    protected variable refspeccolour_ "green"
