@@ -200,50 +200,28 @@ itcl::class gaia::GaiaCube {
 
       #  Slider that moves along the chosen axis.
       itk_component add index {
-         LabelEntryScale $w_.index \
+         GaiaSpectralPlotLine $w_.index \
+            -gaiacube [code $this] \
+            -ref_id 1 \
             -text {Index of plane:} \
             -value $plane_ \
+            -show_type 1 \
+            -show_ref_line 1 \
             -labelwidth $lwidth \
             -valuewidth 20 \
-            -from 1 \
-            -to 100 \
-            -increment 1 \
-            -resolution 1 \
-            -show_arrows 1 \
-            -anchor w \
-            -delay 25 \
-            -command [code $this set_display_plane_]
+            -coord_update_cmd [code $this set_display_plane_] \
+            -drag_update_cmd [code $this update_wcs_]
       }
+      set index_control_(1) $itk_component(index)
       pack $itk_component(index) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(index) \
          {Index of the image plane to display (along current axis)}
-
-      #  Button release on scale part of widget updates the WCS so that the
-      #  spectral coordinate is correct.
-      $itk_component(index) bindscale <ButtonRelease-1> [code $this update_wcs_]
-      $itk_component(index) bindentry <Return> [code $this update_wcs_]
-
-      #  Index coordinate.
-      itk_component add indexlabel {
-         LabelValue $w_.indexlabel \
-            -text {Coordinate of plane:} \
-            -labelwidth $lwidth
-      }
-      pack $itk_component(indexlabel) -side top -fill x
-
-      #  Index coordinate type.
-      itk_component add indextype {
-         LabelValue $w_.indextype \
-            -text {Coordinate type:} \
-            -labelwidth $lwidth
-      }
-      pack $itk_component(indextype) -side top -fill x
 
       #  Add tab window for choosing either the animation or collapse
       #  controls.
       itk_component add tabnotebook {
          iwidgets::tabnotebook $w_.tab \
-            -angle 0 -tabpos n -width 350 -height 320
+            -angle 0 -tabpos n -width 350 -height 350
       }
       pack $itk_component(tabnotebook) -fill both -expand 1
 
@@ -253,66 +231,60 @@ itcl::class gaia::GaiaCube {
       $itk_component(tabnotebook) add -label Collapse
       set collapseTab [$itk_component(tabnotebook) childsite 1]
 
-      #  Animation section. Choose upper and lower limits and then set it
-      #  away, need to loop around...
+      #  Animation section.
+      #
+      #  Choose upper and lower limits, and type of animation.
       itk_component add aruler {
          LabelRule $animationTab.aruler -text "Animation controls:"
       }
       pack $itk_component(aruler) -side top -fill x
 
+      #  Whether to show the reference lines on the plot.
+      itk_component add showanlines {
+         StarLabelCheck $animationTab.showlines \
+            -text "Show limits on plot:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope show_animation_lines_] \
+            -command [code $this toggle_show_animation_lines_]
+      }
+      pack $itk_component(showanlines) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(showanlines) \
+         {Show extent of animation on plot with reference lines}
+
       itk_component add lower {
-         LabelEntryScale $animationTab.lower \
+         GaiaSpectralPlotLine $animationTab.lower \
+            -gaiacube [code $this] \
+            -ref_id 2 \
             -text {Lower index:} \
-            -value 1 \
+            -value $plane_ \
+            -show_type 0 \
+            -show_ref_line $show_animation_lines_ \
             -labelwidth $lwidth \
             -valuewidth 20 \
-            -from 1 \
-            -to 100 \
-            -increment 1 \
-            -resolution 1 \
-            -show_arrows 1 \
-            -anchor w \
-            -delay 25 \
-            -command [code $this set_lower_bound_]
+            -coord_update_cmd [code $this set_lower_bound_]
       }
+      set index_control_(2) $itk_component(lower)
       pack $itk_component(lower) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(lower) \
          {Lower index used during animation}
 
-      #  Coordinate.
-      itk_component add lowerlabel {
-         LabelValue $animationTab.lowerlabel \
-            -text {Coordinate:} \
-            -labelwidth $lwidth
-      }
-      pack $itk_component(lowerlabel) -side top -fill x
-
       itk_component add upper {
-         LabelEntryScale $animationTab.upper \
+         GaiaSpectralPlotLine $animationTab.upper \
+            -gaiacube [code $this] \
+            -ref_id 3 \
             -text {Upper index:} \
-            -value 1 \
+            -value $plane_ \
+            -show_type 0 \
+            -show_ref_line $show_animation_lines_ \
             -labelwidth $lwidth \
             -valuewidth 20 \
-            -from 1 \
-            -to 100 \
-            -increment 1 \
-            -resolution 1 \
-            -show_arrows 1 \
-            -anchor w \
-            -delay 25 \
-            -command [code $this set_upper_bound_]
+            -coord_update_cmd [code $this set_upper_bound_]
       }
+      set index_control_(3) $itk_component(upper)
       pack $itk_component(upper) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(upper) \
          {Upper index used during animation}
-
-      #  Coordinate.
-      itk_component add upperlabel {
-         LabelValue $animationTab.upperlabel \
-            -text {Coordinate:} \
-            -labelwidth $lwidth
-      }
-      pack $itk_component(upperlabel) -side top -fill x
 
       #  Delay used in animation.
       itk_component add delay {
@@ -398,6 +370,8 @@ itcl::class gaia::GaiaCube {
 
       pack $itk_component(loopframe) -side top -fill x -ipadx 1m -ipady 2m
 
+
+      #  Animation stop and start.
       itk_component add animation {
          frame $animationTab.animation
       }
@@ -417,69 +391,47 @@ itcl::class gaia::GaiaCube {
       pack $itk_component(start) -side right -expand 1 -pady 3 -padx 3
       add_short_help $itk_component(start) {Start animation}
 
+      #  Collapse section.
+      #
       #  Use limits to create a collapsed image using KAPPA COLLAPSE.
-      #  Use a section to pass to COLLAPSE so we do not need to know the world
-      #  coordinates.
-
       itk_component add cruler {
          LabelRule $collapseTab.cruler -text "Collapse controls:"
       }
       pack $itk_component(cruler) -side top -fill x
 
       itk_component add collower {
-         LabelEntryScale $collapseTab.collower \
+         GaiaSpectralPlotLine $collapseTab.collower \
+            -gaiacube [code $this] \
+            -ref_id 4 \
             -text {Lower index:} \
             -value 1 \
+            -show_type 0 \
+            -show_ref_line 0 \
             -labelwidth $lwidth \
             -valuewidth 20 \
-            -from 1 \
-            -to 100 \
-            -increment 1 \
-            -resolution 1 \
-            -show_arrows 1 \
-            -anchor w \
-            -delay 25 \
-            -command [code $this set_collapse_lower_bound_]
+            -coord_update_cmd [code $this set_collapse_lower_bound_]
       }
+      set index_control_(4) $itk_component(collower)
       pack $itk_component(collower) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(collower) \
          {Lower index used for creating collapsed image}
 
-      #  Coordinate.
-      itk_component add collowerlabel {
-         LabelValue $collapseTab.collowerlabel \
-            -text {Coordinate:} \
-            -labelwidth $lwidth
-      }
-      pack $itk_component(collowerlabel) -side top -fill x
-
-
       itk_component add colupper {
-         LabelEntryScale $collapseTab.colupper \
+         GaiaSpectralPlotLine $collapseTab.colupper \
+            -gaiacube [code $this] \
+            -ref_id 5 \
             -text {Upper index:} \
             -value 1 \
+            -show_type 0 \
+            -show_ref_line 0 \
             -labelwidth $lwidth \
             -valuewidth 20 \
-            -from 1 \
-            -to 100 \
-            -increment 1 \
-            -resolution 1 \
-            -show_arrows 1 \
-            -anchor w \
-            -delay 25 \
-            -command [code $this set_collapse_upper_bound_]
+            -coord_update_cmd [code $this set_collapse_upper_bound_]
       }
+      set index_control_(5) $itk_component(colupper)
       pack $itk_component(colupper) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(colupper) \
          {Upper index used for creating collapsed image}
-
-      #  Coordinate.
-      itk_component add colupperlabel {
-         LabelValue $collapseTab.colupperlabel \
-            -text {Coordinate:} \
-            -labelwidth $lwidth
-      }
-      pack $itk_component(colupperlabel) -side top -fill x
 
       #  Method used for collapse.
       itk_component add combination {
@@ -684,10 +636,8 @@ itcl::class gaia::GaiaCube {
          $itk_component(colupper) configure -value $plane_max_
          set_collapse_upper_bound_ $plane_max_
 
-         #  Label and units.
-         set vlu [get_coord_ $plane_ 1 1]
-         set trail [lassign $vlu value]
-         $itk_component(indextype) configure -value $trail
+         #  Update the display of label and units in index component.
+         $itk_component(index) update_coords_type $plane_
 
          #  Set up object to control units.
          $spec_coords_ configure -axis $axis_ -accessor $cubeaccessor_
@@ -695,11 +645,10 @@ itcl::class gaia::GaiaCube {
          #  Set an initial plane, if requested.
          if { $setplane } {
             set plane_ $plane_min_
-            set_display_plane_ [expr ( $plane_max_ + $plane_min_ ) / 2] 1
+            set_display_plane_ [expr ($plane_max_ + $plane_min_)/2] 1
          } else {
             #  Otherwise update the displayed coordinate for the plane.
-            set coord [get_coord_ $plane_ 1 0]
-            $itk_component(indexlabel) configure -value $coord
+            $itk_component(index) configure -value $plane_
          }
       }
    }
@@ -801,27 +750,50 @@ itcl::class gaia::GaiaCube {
       }
       set last_slice_adr_ $adr
 
-      #  Update the displayed coordinate.
-      set coord [get_coord_ $plane_ 1 0]
-      $itk_component(indexlabel) configure -value $coord
-
       #  Make sure position show in slide matches this (note feedback is
       #  avoided as $newvalue != $plane_).
       $itk_component(index) configure -value $plane_
+   }
 
-      #  Move spectral reference position.
-      if { $spectrum_ != {} } {
-         set coord [get_coord_ $plane_ 0 0]
-         if { $coord != {} } {
-            $spectrum_ set_ref_coord $coord
-         }
+   #  Set the position of a spectral reference line.
+   public method set_spec_ref_coord {id coord} {
+      if { $spectrum_ != {} && $coord != {} } {
+         $spectrum_ set_ref_coord $id $coord
+      }
+   }
+
+   #  Handle the change in a spectral reference line, when done within the
+   #  plot (user interaction by dragging line).
+   protected method ref_line_moved_ {id coord action} {
+
+      #  Convert coord from grid indices to pixel indices.
+      set coord [axis_grid2pixel_ $coord]
+
+      #  Apply value to the right control, but avoiding new actions being
+      #  triggered, unless this is release when we want to reposition to the
+      #  exact control feedback.
+      if { $action == "move" } {
+         set oldvalue [$index_control_($id) cget -show_ref_line]
+         $index_control_($id) configure -show_ref_line 0
+      }
+      $index_control_($id) configure -value $coord
+
+      #  And get the associated action to run.
+      eval [$index_control_($id) cget -coord_update_cmd] $coord
+
+      #  If action is released also do the drag_update_cmd.
+      if { $action == "released" } {
+         eval [$index_control_($id) cget -drag_update_cmd]
+      }
+      if { $action == "move" } {
+         $index_control_($id) configure -show_ref_line $oldvalue
       }
    }
 
    #  Update the dummy NDF WCS so that it matches the current spectral
    #  coordinates. This should be done only when necessary (end of animation,
    #  slice slider drag etc.).
-   protected method update_wcs_ {} {
+   public method update_wcs_ {} {
       set index [axis_pixel2grid_ $plane_]
       set frameset [$cubeaccessor_ getimagewcs $axis_ $index]
       if { $frameset != 0 } {
@@ -853,17 +825,15 @@ itcl::class gaia::GaiaCube {
    #  Set the animation lower bound.
    protected method set_lower_bound_ {bound} {
       set lower_bound_ $bound
-      $itk_component(lowerlabel) configure -value [get_coord_ $bound 1 0]
    }
 
    #  Set the animation upper bound.
    protected method set_upper_bound_ {bound} {
       set upper_bound_ $bound
-      $itk_component(upperlabel) configure -value [get_coord_ $bound 1 0]
    }
 
    #  Get the coordinate of an index along the current axis.
-   protected method get_coord_ {index {formatted 1} {trail 0}} {
+   public method get_coord {index {formatted 1} {trail 0}} {
       #  Need index as a pixel coordinate.
       set pcoord [expr $index - 0.5]
       if { $axis_ == 1 } {
@@ -902,7 +872,7 @@ itcl::class gaia::GaiaCube {
          after cancel $afterId_
          set afterId_ {}
          # DEBUG
-         #puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
+         puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
 
          #  Update the WCS so that the spectral axis coordinate is correct.
          update_wcs_
@@ -970,13 +940,11 @@ itcl::class gaia::GaiaCube {
    #  Set the collapse lower bound.
    protected method set_collapse_lower_bound_ {bound} {
       set lower_collapse_bound_ $bound
-      $itk_component(collowerlabel) configure -value [get_coord_ $bound 1 0]
    }
 
    #  Set the collapse upper bound.
    protected method set_collapse_upper_bound_ {bound} {
       set upper_collapse_bound_ $bound
-      $itk_component(colupperlabel) configure -value [get_coord_ $bound 1 0]
    }
 
    # Set the combination type
@@ -985,6 +953,8 @@ itcl::class gaia::GaiaCube {
    }
 
    #  Collapse image and the display the result.
+   #  Use a section to pass to COLLAPSE so we do not need to know the world
+   #  coordinates.
    protected method collapse_ {} {
       set range "$lower_collapse_bound_:$upper_collapse_bound_"
       if { $axis_ == 1 } {
@@ -1095,13 +1065,11 @@ itcl::class gaia::GaiaCube {
          set spectrum_ [GaiaSpectralPlot $w_.specplot \
                            -number $itk_option(-number) \
                            -spec_coords [code $spec_coords_] \
+                           -ref_changed_cmd [code $this ref_line_moved_] \
                            -shorthelpwin [scope $short_help_win_]]
 
          #  Make this a transient of main window, not this one.
          wm transient $spectrum_ $itk_option(-gaia)
-
-         #  Display in main window as well.
-         $spectrum_ configure -canvas $itk_option(-canvas)
 
          #  Create the marker for the image position.
          create_position_marker_ $ccx $ccy
@@ -1137,11 +1105,11 @@ itcl::class gaia::GaiaCube {
             $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh $ix $iy 1
          }
 
-         #  Set first-time reference position.
-         set coord [get_coord_ $plane_ 0 0]
+         #  Set first-time position of the main reference line.
+         set coord [get_coord $plane_ 0 0]
          if { $coord != {} } {
             update ;# Make sure plot is created first.
-            $spectrum_ set_ref_coord $coord
+            set_spec_ref_coord 1 $coord
          }
       } else {
          busy {
@@ -1279,15 +1247,15 @@ itcl::class gaia::GaiaCube {
       }
    }
 
-   #  Create the spectral position marker.
-   #  XXX refactor into GaiaSpectralPlot. Should be same colour as reference
+   #  Create the main spectral line position marker.
+   #  XXX refactor into GaiaSpectralPlot. Should be same colour as spectral
    #  line.
    protected method create_position_marker_ { cx cy } {
 
       #  Note fixscale so that always same size, regardless of zoom.
       set position_mark_ [$itk_option(-canvas) create rtd_mark \
                              $cx $cy -type cross -scale 1 \
-                             -fixscale 1 -size 7 -outline red]
+                             -fixscale 1 -size 7 -outline blue]
 
       #  Bindings to move and select this.
       $itk_option(-canvas) bind $position_mark_ <1> \
@@ -1324,6 +1292,22 @@ itcl::class gaia::GaiaCube {
    #     $splat_disp_ runwith "GaiaArdSpectrum"
    #  } msg
 
+   #  Toggle the display of the animation reference lines.
+   protected method toggle_show_animation_lines_ {} {
+      $itk_component(lower) configure -show_ref_line $show_animation_lines_
+      $itk_component(upper) configure -show_ref_line $show_animation_lines_
+      if { $spectrum_ != {} } {
+         if { $show_animation_lines_ } {
+            $spectrum_ make_ref_line 2
+            $spectrum_ make_ref_line 3
+            $itk_component(lower) configure -value $lower_bound_
+            $itk_component(upper) configure -value $upper_bound_
+         } else {
+            $spectrum_ remove_ref_line 2
+            $spectrum_ remove_ref_line 3
+         }
+      }
+   }
 
    #  Configuration options: (public variables)
    #  ----------------------
@@ -1458,6 +1442,13 @@ itcl::class gaia::GaiaCube {
 
    #  Last cx and cy values used in to open a spectrum.
    protected variable last_cxcy_ {}
+
+   #  Whether to display the limits of the animation as reference lines in the
+   #  plot.
+   protected variable show_animation_lines_ 0
+
+   #  Array of index-based controls. These are indexed by their ref_id.
+   protected variable index_control_
 
    #  Common variables: (shared by all instances)
    #  -----------------
