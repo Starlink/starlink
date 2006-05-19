@@ -41,6 +41,7 @@
  *-
  */
 
+#include <float.h>
 #include <tcl.h>
 #include <HTTP.h>
 extern "C" {
@@ -53,12 +54,16 @@ static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
+                             int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstTest( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsGtAxisCoord( ClientData clientData, Tcl_Interp *interp,
+                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsUrlGet( ClientData clientData, Tcl_Interp *interp,
@@ -77,6 +82,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
+    Tcl_CreateObjCommand( interp, "gaiautils::astshow", GaiaUtilsAstShow,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
     Tcl_CreateObjCommand( interp, "gaiautils::asttest", GaiaUtilsAstTest,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
@@ -87,6 +96,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
 
     Tcl_CreateObjCommand( interp, "gaiautils::get2dwcs", GaiaUtilsGt2DWcs,
                           (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::getaxiscoord", 
+                          GaiaUtilsGtAxisCoord, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::getaxiswcs", GaiaUtilsGtAxisWcs,
@@ -172,6 +185,34 @@ static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
         Tcl_SetResult( interp, buf, TCL_DYNAMIC );
         return TCL_ERROR;
     }
+    return TCL_OK;
+}
+
+/**
+ * Show an AST object, useful for debugging.
+ *
+ * Just one argument, the address of the object.
+ */
+static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
+                             int objc, Tcl_Obj *CONST objv[] )
+{
+    AstObject *object;
+    long adr;
+
+    /* Check arguments, only allow one. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "ast_object" );
+        return TCL_ERROR;
+    }
+
+    /* Get the object */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    object = (AstObject *) adr;
+
+    astShow( object );
+
     return TCL_OK;
 }
 
@@ -346,6 +387,63 @@ static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
         free( error_mess );
     }
     return result;
+}
+
+/**
+ * Convert a 1D coordinate using a 1D frameset.
+ *
+ * There are three arguments, the address of the AST FrameSet, the coordinate
+ * to transform and whether to transform using the forward or inverse
+ * transform.
+ */
+static int GaiaUtilsGtAxisCoord( ClientData clientData, Tcl_Interp *interp,
+                                 int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrameSet *axiswcs;
+    double xin[1];
+    double xout[1];
+    int forward;
+    long adr;
+
+    /* Check arguments, only allow three, the frameset, the coordinate and
+     * whether to transform forward or backwards.
+     */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset coordinate ?forward?" );
+        return TCL_ERROR;
+    }
+
+    /* Get the frameset */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    axiswcs = (AstFrameSet *) adr;
+
+    /* Get the coordinate */
+    if ( Tcl_GetDoubleFromObj( interp, objv[2], &xin[0] ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    
+    /* Transformation direction */
+    if ( Tcl_GetBooleanFromObj( interp, objv[3], &forward ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Do the transformation. */
+    astTran1( axiswcs, 1, xin, forward, xout );
+    if ( ! astOK ) {
+        Tcl_SetResult( interp, "Failed to transform axis coordinate",
+                       TCL_VOLATILE );
+        astClearStatus;
+        return TCL_ERROR;
+    }
+    if ( xout[0] != AST__BAD ) {
+        Tcl_SetObjResult( interp, Tcl_NewDoubleObj( xout[0] ) );
+    }
+    else {
+        Tcl_SetObjResult( interp, Tcl_NewDoubleObj( 0.0 ) );
+    }
+    return TCL_OK;
 }
 
 /**
