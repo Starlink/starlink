@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sc/012</path>
+  <description>Writing your own Data Reduction Software</description>
+  <abstract><p>
+      This Cookbook shows you how to write your own software for
+      astronomical data reduction. There are two parts. The first part
+      introduces you to simple data reduction using Starlink's IMG
+      subroutine library. This hides a lot of the underlying
+      complications. The second part introduces you to the more
+      powerful (but more complex) NDF subroutine library for handling
+      data.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Jon Lockley</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
