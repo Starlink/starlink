@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sc6">
+  <version>4</version>
+  <path>docs/sc/006</path>
+  <description>The CCD Photometric Calibration Cookbook</description>
+  <abstract><p>This cookbook presents simple recipes for the
+      photometric calibration of CCD frames.  Using these recipes you
+      can calibrate the brightness of objects measured in CCD frames
+      into magnitudes in standard photometric systems, such as the
+      Johnson-Morgan UBV, system. The recipes use standard
+      software available at all Starlink sites.
+
+      The topics covered include: selecting standard stars, measuring
+      instrumental magnitudes and calibrating instrumental magnitudes
+      into a standard system.  The recipes are appropriate for use
+      with data acquired with optical CCDs and filters, operated in
+      standard ways, and describe the usual calibration technique of
+      observing standard stars.  The software is robust and reliable,
+      but the techniques are usually not suitable where very high
+      accuracy is required.
+
+      In addition to the recipes and scripts, sufficient background
+      material is presented to explain the procedures and techniques
+      used.  The treatment is deliberately practical rather than
+      theoretical, in keeping with the aim of providing advice on the
+      actual calibration of observations.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>J. Palmer and A.C. Davenhall</name>
+    </person>
+  </developers>
+  <documentation> sc6</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997, 1998, 1999, 2001</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
