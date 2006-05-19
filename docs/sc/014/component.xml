@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sc14">
+  <version>2</version>
+  <path>docs/sc/012</path>
+  <description>The Fibre Spectroscopy Cookbook</description>
+  <abstract><p>
+      This cookbook is an introduction to fibre spectroscopy and, in
+      particular, the techniques and software available for reducing
+      fibre-spectroscopy observations.  It covers the principal
+      common-user instruments available to UK astronomers: the
+      Anglo-Australian Telescope 2dF, WYFFOS/AUTOFIB2 on the William
+      Herschel Telescope and FLAIR on the UK Schmidt.  It is not a
+      manual for any particular package, though it does contain some
+      worked examples.
+      </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A.C. Davenhall}</name>
+    </person>
+  </developers>
+  <documentation> sc14</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1998, 1999</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
