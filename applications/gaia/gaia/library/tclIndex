@@ -39,6 +39,7 @@ set auto_index(::gaia::GaiaOptPhotom) [list source [file join $dir GaiaOptPhotom
 set auto_index(::gaia::Queue) [list source [file join $dir Queue.tcl]]
 set auto_index(::gaia::StarArdAnnTool) [list source [file join $dir StarArdAnnTool.tcl]]
 set auto_index(::gaia::GaiaPolTable) [list source [file join $dir GaiaPolTable.tcl]]
+set auto_index(::gaia::GaiaSpectralPlotLine) [list source [file join $dir GaiaSpectralPlotLine.tcl]]
 set auto_index(add_graphics_features) [list source [file join $dir graphics_features.tcl]]
 set auto_index(convert_coords) [list source [file join $dir graphics_features.tcl]]
 set auto_index(save_graphics) [list source [file join $dir graphics_features.tcl]]
