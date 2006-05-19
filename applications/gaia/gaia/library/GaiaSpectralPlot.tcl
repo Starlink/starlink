@@ -559,7 +559,9 @@ itcl::class gaia::GaiaSpectralPlot {
          #  Resize the reference lines.
          if { [::array exists ref_lines_] } {
             foreach {id} [::array names ref_lines_] {
+               set oldval $xref_($id)
                $itk_component(draw) delete_object $ref_lines_($id)
+               set xref_($id) $oldval
                make_ref_line $id
                set_to_ref_coord_ $id
             }
