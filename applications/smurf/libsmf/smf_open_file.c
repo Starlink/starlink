@@ -86,6 +86,8 @@
 *        Add history read
 *     2006-05-16 (AGG):
 *        Change msgOut to msgOutif
+*     2006-05-19 (EC):
+*        Map Q&V if not present before when mode is WRITE
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -283,9 +285,15 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
     if (isNDF) {
 
-      /* Check if we have Q and V components */
-      ndfState( indf, "QUALITY", &qexists, status);
-      ndfState( indf, "VARIANCE", &vexists, status);
+      if( strncmp( mode, "WRITE", 5 ) == 0 ) {
+	/* If WRITE we should map Q & V to create them */
+	qexists = 1;
+	vexists = 1;
+      } else {
+	/* Check if we have Q and V components otherwise */
+	ndfState( indf, "QUALITY", &qexists, status);
+	ndfState( indf, "VARIANCE", &vexists, status);
+      }
 
       /* Map each component as necessary */
       ndfMap( indf, "DATA", dtype, mode, &outdata[0], &nout, status );
