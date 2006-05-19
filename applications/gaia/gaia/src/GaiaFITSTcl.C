@@ -1,10 +1,10 @@
 /*+
  *  Name:
  *     GaiaFITSTcl
- 
+
  *  Purpose:
  *     Simple, that's without 2D bias, access to FITS from Tcl scripts.
- 
+
  *  Language:
  *     C++
 
@@ -27,10 +27,10 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  Authors:
  *     PWD: Peter W. Draper, JAC - University of Durham
- 
+
  *  History:
  *     5-APR-2006 (PWD):
  *        Original version.
@@ -97,11 +97,15 @@ static long exportFITSHandle( StarFitsIO *handle );
  */
 int Fits_Init( Tcl_Interp *interp )
 {
+    Tcl_CreateObjCommand( interp, "fits::close", GaiaFITSTclClose,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
     Tcl_CreateObjCommand( interp, "fits::getbounds", GaiaFITSTclBounds,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "fits::close", GaiaFITSTclClose,
+    Tcl_CreateObjCommand( interp, "fits::getc", GaiaFITSTclCGet,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -110,14 +114,6 @@ int Fits_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "fits::getdims", GaiaFITSTclDims,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
-
-    Tcl_CreateObjCommand( interp, "fits::getc", GaiaFITSTclCGet,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
-
-    Tcl_CreateObjCommand( interp, "fits::getwcs", GaiaFITSTclGtWcs,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -130,6 +126,10 @@ int Fits_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "fits::unmap", GaiaFITSTclUnMap,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "fits::getwcs", GaiaFITSTclGtWcs,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -239,7 +239,7 @@ static int GaiaFITSTclClose( ClientData clientData, Tcl_Interp *interp,
  * Map the FITS data array in the native type, using file mapping as
  * requested. The result is a memory address (long int) of an ARRAYinfo
  * struct. Note the data is raw and no byte swapping will be applied.
- * 
+ *
  * The access mode is currently ignored.
  */
 static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
@@ -257,7 +257,7 @@ static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
     /* Check arguments, allow three, the FITS identifier, whether to use file
      * mapping and the access mode. */
     if ( objc != 4 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, 
+        Tcl_WrongNumArgs( interp, 1, objv,
                           "fits_identifier ?usemmap? access" );
         return TCL_ERROR;
     }
@@ -583,10 +583,10 @@ static int GaiaFITSTclCoord( ClientData clientData, Tcl_Interp *interp,
                         break;
                     }
                     /* These are "pixel indices", so we need to convert to
-                     * FITS grid values. */ 
+                     * FITS grid values. */
                     coords[i] += 0.5;
                 }
-                
+
 
 
                 /* Whether to format value. */
