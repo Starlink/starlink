@@ -429,6 +429,8 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  *      <canvas> coords <item> \
  *         "refpointer" memory_address_of_ARRAYinfo
  *
+ *   To remove the reference spectrum pass in a memory address of 0. 
+ *
  *   A special feature (should be moved into some generic interface, but
  *   that's not possible for canvas items, so some method of exporting the
  *   plot would be required) is to convert an X coordinate into a canvas
@@ -521,6 +523,16 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                 Tcl_AppendResult( interp, "Failed to read ARRAYinfo pointer",
                                   (char *) NULL );
                 return TCL_ERROR;
+            }
+
+            /* If the address is 0 and this is a reference spectrum, that's a
+               request to clear it, just do that and return. */
+            if ( isref && adr == 0L ) {
+                if ( spPtr->refDataPtr != NULL ) {
+                    ckfree( (char *) spPtr->refDataPtr );
+                    spPtr->refDataPtr = NULL;
+                }
+                return TCL_OK;
             }
             arrayInfo = (ARRAYinfo *) adr;
             nel = arrayInfo->el;

@@ -140,6 +140,12 @@ itcl::class gaia::GaiaSpectralPlot {
          {Continuously change data limits of spectral plot,
             otherwise fixed by last click (faster)}
 
+      #  Remove the reference spectral from plot.
+      $Options add command -label "Remove ref spec" \
+         -command [code $this remove_reference]
+      add_menu_short_help $Options {Remove ref spec}  \
+         {Remove the reference spectrum from the plot}
+
       #  Whether to draw the X coordinates running min to max, or
       #  as they are from the "front" to "back" of cube.
       $Options add checkbutton \
@@ -432,6 +438,16 @@ itcl::class gaia::GaiaSpectralPlot {
       #  Finished with the spectral data.
       $accessor release $adr
    }
+
+   #  Remove the reference spectrum, if displayed.
+   public method remove_reference {} {
+
+      if { $spectrum_ == {} } {
+         return
+      }
+      $itk_component(canvas) coords $spectrum_ refpointer 0
+   }
+
 
    #  Make a reference line item. This should be refreshed to the reference
    #  coordinate as necessary.
