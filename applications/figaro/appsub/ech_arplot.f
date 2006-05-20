@@ -51,7 +51,6 @@ C     PGPOINT       (  "   ) Mark a single point.
 C     PGBOX         (  "   ) Draw axes for plot.
 C     PGBIN         (  "   ) Plot data as a histogram.
 C     PGLABEL       (  "   ) Label plot.
-C     GEN_EPOLYD    (GEN_ package) Evaluate a polynomial
 C
 C     Originally ARPLOT:               KS / CIT 14th June 1983
 C
@@ -80,7 +79,6 @@ C
 C     Functions
 C
       INTEGER I,ICH_ENCODE
-      DOUBLE PRECISION GEN_EPOLYD
 C
 C     Local variables
 C

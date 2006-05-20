@@ -39,7 +39,7 @@ C
 C
 C     Local variables
 C
-      INTEGER I,J,M,DM
+      INTEGER I,M,DM
       REAL XPLOT(2),YPLOT(2)
 C
 C     Lets start with the plot environment
