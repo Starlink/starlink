@@ -239,7 +239,6 @@ C
 C
 C     Local variables
 C
-      INTEGER   ADDRESS          ! Virtual memory address for data array
       LOGICAL   BITP             ! True once BITPIX found in header
       INTEGER   BITPIX           ! Value of BITPIX keyword
       DOUBLE PRECISION BSCALE    ! Value of BSCALE keyword
@@ -253,7 +252,6 @@ C
       CHARACTER CHR              ! General single character
       REAL      COEFF(2)         ! Coefficients for axis data values
       CHARACTER COMMENT*80       ! Comment for keyword
-      INTEGER   COUNT            ! Bad conversion count for one buffer
       INTEGER   CRDMAX           ! Maximum number of header 'cards' in
                                  ! header
       REAL      CRPIX(6)         ! Values of CRPIXn keywords

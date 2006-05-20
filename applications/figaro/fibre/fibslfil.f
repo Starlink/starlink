@@ -72,9 +72,9 @@
       real xa(spdim1),ya(spdim2),xadj(spdim2),x,y
       real size
       integer status,slot
-      integer i,ix,iy,npt,rx2chn,dims(2),out,dyn_element,pgcurse
+      integer i,ix,iy,npt,rx2chn,dims(2),out,pgcurse
       logical ifxcut,hex
-      character*72 output,ch*1
+      character*72 ch*1
 
 *  Find cursor position
 
