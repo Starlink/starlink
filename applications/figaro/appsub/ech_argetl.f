@@ -35,15 +35,16 @@ C                  output, 0 otherwise.
 C
 C     Subroutines / functions used -
 C
-C     ICH_LEN      (ICH_ package) Position of last non-blank char in string
+C     ICH_LEN      (ICH_ package) Position of last non-blank char in 
+C                  string
 C     PAR_WRUSER   (PAR_   "    ) Send message to user
 C
 C                                              KS / CIT 14th June 1984
 C     Modified:
 C
-C     5th Sept 1985   KS / AAO  ARFILE, WEIGHTS and CLASS parameters added.
-C                     Now looks for auto flag in output.  FSIGMA and
-C                     FORDER added.
+C     5th Sept 1985   KS / AAO  ARFILE, WEIGHTS and CLASS parameters
+C                     added. Now looks for auto flag in output.  FSIGMA
+C                     and FORDER added.
 C     19th Jul 1995   HME / UoE, Starlink. Add the ISTAT argument to
 C                     enable the caller to abort if the output file
 C                     could not be opened.
@@ -62,13 +63,9 @@ C
       REAL CHANS(NLMAX),WAVES(NLMAX),WEIGHTS(NLMAX),FSIGMA
       CHARACTER*(*) ARFILE
 C
-C     Functions
-C
-      INTEGER ICH_LEN
-C
 C     Local variables
 C
-      INTEGER IBRACK, IDOT, NFILE
+      INTEGER NFILE
       INTEGER STATUS, OSTAT, LSTAT
       CHARACTER AUTO*4, FILE*64, BUFFER*75
 C

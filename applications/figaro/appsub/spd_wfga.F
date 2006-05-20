@@ -962,7 +962,7 @@
       DOUBLE PRECISION FVAL
 
 *  Local Variables:
-      INTEGER I, J, K, L, M, N   ! Loop indices
+      INTEGER I, J               ! Loop indices
       DOUBLE PRECISION C( MAXCMP ) ! Gauss centre positions
       DOUBLE PRECISION P( MAXCMP ) ! Gauss peak heights
       DOUBLE PRECISION S( MAXCMP ) ! Gauss dispersions

@@ -44,8 +44,8 @@ C               lines have been selected.
 C
 C     Stolen & Modified ---> ECH_ARRECD         JKM / ESO 25. Nov. 1987.
 C
-C     WFL / AAO 29th May 1988. Prevent fall-over if too few lines have been
-C               identified in a given order.
+C     WFL / AAO 29th May 1988. Prevent fall-over if too few lines have
+C               been identified in a given order.
 C     WFL / AAO 30th May 1988. Sort prior to fit.
 C     WFL / AAO 31st May 1988. Attempt to avoid crashes with too few lines.
 C+
@@ -71,11 +71,11 @@ C
 C
 C     Local variables
 C
-      LOGICAL REPEAT,WARNING
+      LOGICAL WARNING
       INTEGER NC
       PARAMETER (NC=11)
       INTEGER M,DM,I,INET,ILAST,IGNORE,NC1,NC4
-      INTEGER J,NEXT,NEWNCF,STATUS
+      INTEGER J,NEWNCF
       REAL ADISP,END,RMS,RMSX,ST,VALUE,VALUE1
       DOUBLE PRECISION COEFFS(NC)
       CHARACTER CHARS*74
@@ -94,8 +94,8 @@ C     Initial value for counter at the end of last order
 C
       ILAST=0                           
 C
-C     This is the main loop over all orders, selecting lines, fitting them,
-C         and listing the results ...
+C     This is the main loop over all orders, selecting lines, fitting
+C     them and listing the results ...
 C
       DO M=M1,M2,DM
 C
