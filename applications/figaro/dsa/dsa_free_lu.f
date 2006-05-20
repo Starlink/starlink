@@ -75,7 +75,6 @@ C
 C
 C     Local variables
 C
-      CHARACTER ERROR*64         ! Error text
       INTEGER   I                ! Loop index
       INTEGER   IGNORE           ! Dummy status value - ignored
       CHARACTER NUMBER*8         ! Used to format LU number

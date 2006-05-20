@@ -96,7 +96,7 @@ C
 C
 C     Functions
 C
-      INTEGER DYN_ELEMENT, ICH_LEN
+      INTEGER ICH_LEN
       CHARACTER*16 ICH_CI
 C
 C     Local variables

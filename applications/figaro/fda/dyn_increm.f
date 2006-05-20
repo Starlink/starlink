@@ -84,9 +84,6 @@
       INTEGER I                  ! Loop index
       CHARACTER * ( 6 ) TYPEUC   ! Given type in upper case
 
-*  Internal References:
-      LOGICAL CHR_SIMLR          ! Case independent string comparison
-
 *  Global Constants:
       INCLUDE 'DSA_TYPES'        ! DSA data types and their sizes
 
