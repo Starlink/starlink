@@ -100,7 +100,6 @@
       save cur_flav, cur_plot
       integer vtype
       integer nels
-      integer nbytes
 
 * maximum number of components that could fit in "cube"
 
@@ -133,7 +132,7 @@
       character*8 flavs(MAX_FLAVS)
       include 'SAE_PAR'
       include 'PRM_PAR'
-      integer dumi,itmp
+      integer dumi
       real dumr
       character dumc
       include 'DYNAMIC_MEMORY'

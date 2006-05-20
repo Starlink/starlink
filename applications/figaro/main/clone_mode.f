@@ -59,9 +59,9 @@
       integer status
       include 'arc_dims'
       logical ifcomb,clopen,nocube,ifarc
-      integer ptr1,ptr2,ptr3,ptr4,ptr5,ptr6,ptr7,end6
+      integer ptr1,ptr2,ptr3,ptr4,ptr5,ptr6,ptr7
       integer slot,slot2,slot3,slot4,slot5,slot6,slot7
-      integer nbytes,ndims,dims(1)
+      integer ndims,dims(1)
       include 'SAE_PAR'
       include 'PRM_PAR'
       include 'CNF_PAR'          ! For CNF_PVAL function
