@@ -1700,15 +1700,40 @@ $(MANIFESTS)/sae: \
 	cd libraries/sae \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/sc12: \
+		$(MANIFESTS)/star2html
+	cd docs/sc/012 \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/sc13: \
 		$(MANIFESTS)/dvi2bitmap \
 		$(MANIFESTS)/sgmlkit
 	cd docs/sc/013 \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/sc2: \
+		$(MANIFESTS)/star2html
+	cd docs/sc/002 \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/sc3: \
 		$(MANIFESTS)/star2html
 	cd docs/sc/003 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sc4: \
+		$(MANIFESTS)/star2html
+	cd docs/sc/004 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sc6: \
+		$(MANIFESTS)/star2html
+	cd docs/sc/006 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sc7: \
+		$(MANIFESTS)/star2html
+	cd docs/sc/007 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/scb: \
@@ -1990,8 +2015,13 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/polpack \
 	$(MANIFESTS)/prm \
 	$(MANIFESTS)/rv \
+	$(MANIFESTS)/sc12 \
 	$(MANIFESTS)/sc13 \
+	$(MANIFESTS)/sc2 \
 	$(MANIFESTS)/sc3 \
+	$(MANIFESTS)/sc4 \
+	$(MANIFESTS)/sc6 \
+	$(MANIFESTS)/sc7 \
 	$(MANIFESTS)/sgmlkit \
 	$(MANIFESTS)/sgs \
 	$(MANIFESTS)/shl \

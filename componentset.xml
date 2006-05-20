@@ -647,7 +647,7 @@ and its coordinates are displayed.
 </component>
 
 <component id="gaia" support="S">
-  <version>3.0-2</version>
+  <version>3.0-3</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -1593,6 +1593,39 @@ to handle data from a variety of different instruments.
 </component>
 
 
+<component id="sc2">
+  <version>3</version>
+  <path>docs/sc/002</path>
+  <description>The DX Cookbook</description>
+  <abstract><p>IBM DX (Data Explorer) is the data visualisation package 
+     recommended by Starlink, particularly for the visualisation of
+     three-dimensional scalar and vector data. This cookbook provides
+     a set of simple recipes for performing common operations using
+     DX. No prior knowledge of DX is required. You can use the recipes
+     as they are provided, if they are suitable for your purposes, or
+     alternatively you can use them as a starting point for generating
+     your own visualisations.
+
+     The cookbook also contains a brief summary of the DX data model.
+     It is useful to have at least some understanding of this data
+     model in order to use DX effectively.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A.C. Davenhall</name>
+    </person>
+  </developers>
+  <documentation> sc2</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
 <component id="sc3">
   <version>2</version>
   <path>docs/sc/003</path>
@@ -1616,6 +1649,148 @@ to handle data from a variety of different instruments.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
     <year>2000, 2003</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sc4">
+  <version>2</version>
+  <path>docs/sc/004</path>
+  <description>C-shell Cookbook</description>
+  <abstract><p>
+      This cookbook describes the fundamentals of writing scripts
+      using the UNIX C shell.  It shows how to combine Starlink and
+      private applications with shell commands and constructs to
+      create powerful and time-saving tools for performing repetitive
+      jobs, creating data-processing pipelines, and encapsulating
+      useful recipes.  The cookbook aims to give practical and
+      reassuring examples to at least get you started without having
+      to consult a UNIX manual.  However, it does not offer a
+      comprehensive description of C-shell syntax to prevent you from
+      being overwhelmed or intimidated.  The topics covered are: how
+      to run a script, defining shell variables, prompting, arithmetic
+      and string processing, passing information between Starlink
+      applications, obtaining dataset attributes and FITS header
+      information, processing multiple files and filename
+      modification, command-line arguments and options, and loops.
+      There is also a glossary.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Malcolm J. Currie</name>
+    </person>
+  </developers>
+  <documentation> sc4</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997, 1998, 2005</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sc6">
+  <version>4</version>
+  <path>docs/sc/006</path>
+  <description>The CCD Photometric Calibration Cookbook</description>
+  <abstract><p>This cookbook presents simple recipes for the
+      photometric calibration of CCD frames.  Using these recipes you
+      can calibrate the brightness of objects measured in CCD frames
+      into magnitudes in standard photometric systems, such as the
+      Johnson-Morgan UBV, system. The recipes use standard
+      software available at all Starlink sites.
+
+      The topics covered include: selecting standard stars, measuring
+      instrumental magnitudes and calibrating instrumental magnitudes
+      into a standard system.  The recipes are appropriate for use
+      with data acquired with optical CCDs and filters, operated in
+      standard ways, and describe the usual calibration technique of
+      observing standard stars.  The software is robust and reliable,
+      but the techniques are usually not suitable where very high
+      accuracy is required.
+
+      In addition to the recipes and scripts, sufficient background
+      material is presented to explain the procedures and techniques
+      used.  The treatment is deliberately practical rather than
+      theoretical, in keeping with the aim of providing advice on the
+      actual calibration of observations.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>J. Palmer and A.C. Davenhall</name>
+    </person>
+  </developers>
+  <documentation> sc6</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997, 1998, 1999, 2001</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sc7">
+  <version>2</version>
+  <path>docs/sc/007</path>
+  <description>Simple Spectroscopy Reductions</description>
+  <abstract><p>This Cookbook describes the basic concepts and methods used in
+      optical astronomical spectroscopy; it is aimed at those new to
+      the field. Complete worked example reductions for both 1-D and
+      2-D longslit spectra, using real datasets, are described.
+      Common problems and their solutions are discussed.  A section on
+      related resources is included, as is a glossary of commonly used
+      terms This cookbook presents simple recipes for the photometric
+      calibration of CCD frames.  Using these recipes you can
+      calibrate the brightness of objects measured in CCD frames into
+      magnitudes in standard photometric systems, such as the
+      Johnson-Morgan UBV, system. The recipes use standard software
+      available at all Starlink sites.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Martin Clayton and Anthony Holloway</name>
+    </person>
+  </developers>
+  <documentation> sc7</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997, 1998</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sc12">
+  <version>1</version>
+  <path>docs/sc/012</path>
+  <description>Writing your own Data Reduction Software</description>
+  <abstract><p>
+      This Cookbook shows you how to write your own software for
+      astronomical data reduction. There are two parts. The first part
+      introduces you to simple data reduction using Starlink's IMG
+      subroutine library. This hides a lot of the underlying
+      complications. The second part introduces you to the more
+      powerful (but more complex) NDF subroutine library for handling
+      data.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Jon Lockley</name>
+    </person>
+  </developers>
+  <documentation> sc12</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997</year>
     <name>CLRC</name>
   </copyright>
 </component>
