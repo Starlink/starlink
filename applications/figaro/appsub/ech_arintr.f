@@ -122,7 +122,7 @@ C
 C     Functions
 C
       LOGICAL PAR_ABORT
-      INTEGER ICH_ENCODE,ICH_LEN,PGBEGIN
+      INTEGER ICH_ENCODE,ICH_LEN
       DOUBLE PRECISION GEN_EPOLYD
 C
 C     Local variables for new lines identified

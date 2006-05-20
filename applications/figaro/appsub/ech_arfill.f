@@ -21,14 +21,15 @@ C     (W) MLDATA  (Real Array MLDATA(NOFITS))  A Workspace array for
 C                 the order number * lambda product, which will be fit
 C                 in order to calculate other lambda's and fill OUTPUT.
 C     (W) WTS     (Real Array WTS(NOFITS)) The weights to be applied to
-C                 the MLDATA points; this array is set to 1.0 everywhere.
+C                 the MLDATA points; this array is set to 1.0 
+C                 everywhere.
 C     (>) F1      (Integer)  The first order number in OUTPUT.
 C     (>) F2      (Integer)  The last order number in OUTPUT.
 C
 C     Subroutines / Functions used:
 C
-C        FIG_WXYFIT - (FIGARO) -- fits a polynomial to a set of points with
-C                 adjustable weighting factors.
+C        FIG_WXYFIT - (FIGARO) -- fits a polynomial to a set of points 
+C                 with adjustable weighting factors.
 C
 C        GEN_EPOLYD - (GEN_pckg) -- returns the double precision evalua-
 C                 tion of a polynomial at a given x point.
@@ -56,7 +57,7 @@ C     Local Variables
 C
       INTEGER NMAX
       PARAMETER (NMAX=11)
-      INTEGER DY,I,J,K,N,NF,NSTAT,NEWNC,JORD
+      INTEGER DY,I,J,K,N,NF,NEWNC,JORD
 C     REAL XPLOT(100),YPLOT(100),TOP,BOT
       DOUBLE PRECISION COEFFS(NMAX)
 C

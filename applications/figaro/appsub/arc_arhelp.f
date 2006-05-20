@@ -22,7 +22,6 @@ C+
 C
 C     Local variables
 C
-      CHARACTER CHARS
       INTEGER STATUS
 C
 C     Clear screen.
