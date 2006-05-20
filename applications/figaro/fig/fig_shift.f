@@ -79,7 +79,6 @@ C
                                  ! continuum fit
       INTEGER   CFN              ! Pointer to the correlation function 
                                  ! array
-      INTEGER   CPTR             ! Dynamic-memory pointer to CORRL data
       INTEGER   FT0              ! Pointer to the fourier transform of 
                                  ! SPECT data
       INTEGER   FT1              ! Pointer to the fourier transform of

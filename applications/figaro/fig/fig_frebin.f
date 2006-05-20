@@ -80,7 +80,6 @@ C
       REAL FLUX                      ! Flux in input bin in overlap range
       INTEGER I                      ! Index variable through output data
       INTEGER NELM                   ! Index variable through input data
-      REAL NEWDATA                   ! New total flux sum value (temp)
       INTEGER OUTELM                 ! Number of element in output data
       REAL OVERLAP                   ! Overlap range in wavelength 
       DOUBLE PRECISION STOUT         ! Start wavelength of output bin
