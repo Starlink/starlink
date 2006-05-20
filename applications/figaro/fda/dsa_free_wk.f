@@ -130,9 +130,6 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Variables:
-      INTEGER I                  ! Loop index
-
 *.
 
 *  Begin error context.
