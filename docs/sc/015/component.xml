@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sc15">
+  <version>2</version>
+  <path>docs/sc/015</path>
+  <description>C-shell Cookbook</description>
+  <abstract><p>
+      This cookbook is a collection of introductory material covering
+      a wide range of topics dealing with data display, format
+      conversion and presentation. Along with this material are
+      pointers to more advanced documents dealing with the various
+      packages, and hints and tips about how to deal with commonly
+      occurring graphics problems.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A. Allan & D. Terrett</name>
+    </person>
+  </developers>
+  <documentation> sc15</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>2000</year>
+    <name>CLRC</name>
+  </copyright>
+</component>

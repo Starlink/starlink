@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sc/015</path>
+  <description>C-shell Cookbook</description>
+  <abstract><p>
+      This cookbook is a collection of introductory material covering
+      a wide range of topics dealing with data display, format
+      conversion and presentation. Along with this material are
+      pointers to more advanced documents dealing with the various
+      packages, and hints and tips about how to deal with commonly
+      occurring graphics problems.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>A. Allan & D. Terrett</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>2000</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
