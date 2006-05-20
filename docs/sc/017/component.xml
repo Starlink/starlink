@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sc17">
+  <version>1</version>
+  <path>docs/sc/017</path>
+  <description>The GAIA Cookbook</description>
+  <abstract><p>
+     GAIA (Graphical Astronomy and Image Analysis) is an interactive
+     astronomical image display and analysis tool.  It includes a
+     comprehensive suite of facilities for displaying and manipulating
+     images.  It also has extensive facilities for the astronomical
+     analysis of images, including: astrometric calibration, automatic
+     object detection and aperture, optimal and surface photometry.
+     GAIA can access images in most of the data formats common in
+     astronomy and can also retrieve copies of remote images and
+     catalogues via the Internet.
+
+     This cookbook is an introduction to GAIA.  It describes the
+     facilities that GAIA provides and gives some simple examples of
+     their use.  It refers to GAIA version 2.6 or higher.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A.C. Davenhall & P.W. Draper</name>
+    </person>
+  </developers>
+  <documentation> sc17</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>2001</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
