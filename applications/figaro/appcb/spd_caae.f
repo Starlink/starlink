@@ -96,7 +96,7 @@
       LOGICAL NORM2              ! Normalisation flag
       LOGICAL EXIST1             ! True if component exists
       LOGICAL EXIST2             ! True if component exists
-      INTEGER I, LB, UB          ! Temporary integers
+      INTEGER LB, UB             ! Temporary integers
       INTEGER PNTR1              ! Array pointer
       INTEGER PNTR2              ! Array pointer
       INTEGER NELM               ! Array size

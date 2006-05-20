@@ -189,7 +189,7 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local constants:
+*  Local Constants:
       REAL EPS                   ! Tolerance for coordinate linearity
       PARAMETER ( EPS = 1E-5 )
       REAL BADVAL                ! Bad value for NOD contouring routines
@@ -198,7 +198,7 @@
 *  Local Volatile Variables:
       LOGICAL XTHERE, STHERE     ! Existence of HDS components
       LOGICAL LINEAR             ! True for linear arrays
-      INTEGER I, J               ! Temporary integer
+      INTEGER I                  ! Temporary integer
       INTEGER WNDF( 3 )          ! Workspace NDF identifier
       INTEGER WPTR( 3 )          ! Workspace array pointers
       INTEGER NDIM               ! NDF dimensionality

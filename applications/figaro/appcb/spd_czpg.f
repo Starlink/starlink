@@ -31,7 +31,8 @@
 *     25 Jan 1995 (hme):
 *        Renamed from SPACY.
 *     15 Oct 1997 (acc):
-*        Change name RESAMPLE to RESAMP due to clash of names with FIGARO.
+*        Change name RESAMPLE to RESAMP due to clash of names with
+*        FIGARO.
 *     2005 May 31 (MJC):
 *        Use CNF_PVAL for pointers to mapped data.
 *     {enter_further_changes_here}
@@ -94,7 +95,6 @@
       CHARACTER * ( NDF__SZTYP ) DTYPE ! Data type in file
       CHARACTER * ( NDF__SZTYP ) ATYPE ! Axis type in file
       CHARACTER * ( NDF__SZTYP ) MTYPE ! Type in memory
-      CHARACTER * ( NDF__SZFTP ) FTYPE ! Unused
       CHARACTER * ( DAT__SZLOC ) XLOC ! Locator of .MORE.SPECDRE
       CHARACTER * ( 255 ) NDFNAM( 1 ) ! Name of current NDF
 

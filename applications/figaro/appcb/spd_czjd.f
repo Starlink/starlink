@@ -144,7 +144,7 @@
 
 *  Local Variables:
       LOGICAL FITTED             ! True if line fit succeeded
-      INTEGER I, J               ! Temporary integers
+      INTEGER I                  ! Temporary integer
       INTEGER MPIX               ! Slightly smaller than NPIX
       INTEGER LPIX, RPIX         ! Count good baseline pixels
       INTEGER PIXNO              ! Current pixel to check

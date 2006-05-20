@@ -139,10 +139,11 @@
 *  Local Variables:
       INTEGER PICID              ! Identifier for current AGI picture
       INTEGER ZONID              ! SGS zone identifier
-      INTEGER I, J, K            ! Temporary integers
+      INTEGER I, K               ! Temporary integers
       INTEGER IFAIL1, IFAIL2     ! PDA_DPOLFT stati
       INTEGER NIDENT             ! Number of valid IDs
-      INTEGER IDMIN, IDMAX       ! Indices into FDB corresp. to plot range
+      INTEGER IDMIN, IDMAX       ! Indices into FDB corresp. to plot 
+                                 ! range
       INTEGER NDEG               ! Highest degree fitted by PDA_DPOLFT
       REAL TEMP                  ! Temporary number
       REAL DELTA                 ! Temporary range
