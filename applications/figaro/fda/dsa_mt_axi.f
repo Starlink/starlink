@@ -96,25 +96,8 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      LOGICAL EXST1, EXST2       ! Whether structures exists
-      LOGICAL MATCH              ! Whether unit strings match
-      LOGICAL OK                 ! Whether dimensions match
-      INTEGER I                  ! Loop index
       INTEGER SLO1, SLO2         ! The reference slots
-      INTEGER LEN1, LEN2         ! Unit string lengths
-      INTEGER IPT1, IPT2         ! Pointers into strings
-      INTEGER NDIM1, NDIM2       ! Centre array dimensionalities
-      INTEGER NELM1, NELM2       ! Centre array sizes
-      INTEGER DIM1( NDF__MXDIM ) ! Centre array dimensions
-      INTEGER DIM2( NDF__MXDIM ) ! Centre array dimensions
-      INTEGER MSLOT1, MSLOT2     ! The map slots
-      INTEGER PNTR1, PNTR2       ! The array pointers
       INTEGER NERR               ! Number of discrepant pixel centres
-      INTEGER ERROR1             ! The first discrepand pixel centre
-      CHARACTER * ( 32 ) UNITS1, UNITS2 ! The axis units
-
-*  Internal References:
-      INTEGER CHR_LEN            ! Used length of a string
 
 *.
 
@@ -169,6 +152,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
+
 *  Local Variables:
       LOGICAL EXST1, EXST2       ! Whether structures exists
       LOGICAL MATCH              ! Whether unit strings match
@@ -185,9 +171,6 @@
       INTEGER NERR               ! Number of discrepant pixel centres
       INTEGER ERROR1             ! The first discrepand pixel centre
       CHARACTER * ( 32 ) UNITS1, UNITS2 ! The axis units
-
-*  Internal References:
-      INTEGER CHR_LEN            ! Used length of a string
 
 *.
 
