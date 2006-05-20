@@ -88,7 +88,7 @@
       logical keep,more
       logical par_quest
 
-      integer ptr1,dwaves,ptr3,nels,slot,slot2,slot3,slot4,pstat
+      integer ptr1,dwaves,ptr3,slot,slot2,slot3,slot4,pstat
       integer NLSET,oldj,len1
       parameter (NLSET = 40)
       integer numb(NLSET)

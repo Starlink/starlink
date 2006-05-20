@@ -131,7 +131,6 @@
       INTEGER FPARA              ! First parameter of this component
       LOGICAL CGOOD              ! True if component suitable
       REAL TESTR                 ! For equality test
-      DOUBLE PRECISION TESTD     ! For equality test
       CHARACTER * ( XCLEN ) TESTC ! For equality test
 
 *  Internal References:

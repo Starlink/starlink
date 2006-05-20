@@ -12,7 +12,7 @@ C           calculations to avoid rounding errors.
       IMPLICIT NONE
 
       DOUBLE PRECISION COEFF(3), PCOEFF(3), SC(2), TEMP
-      DOUBLE PRECISION PRODUCT, TEMP2, TEMP3, TEMP4
+      DOUBLE PRECISION PRODUCT, TEMP2, TEMP3
       REAL SCALE(2)
       INTEGER I, K, NC
 

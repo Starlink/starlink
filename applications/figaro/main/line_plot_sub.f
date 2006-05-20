@@ -80,7 +80,7 @@
       integer m
       integer hdatptr,fvalptr,totptr,adata,nbad,cnv_fmtcnv
       integer slot,slot2,slot3,slot4,slot5,slot6
-      integer status,basewk,ptr0,narray
+      integer status,basewk,ptr0
       logical highres
       real gaussian, lorentz
       external gaussian, lorentz

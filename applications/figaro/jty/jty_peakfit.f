@@ -13,7 +13,7 @@ C           and WIDTH.
 C         : TIMJ (JACH) DO loop must take integer args
 
       REAL VELOCITY(NPT), CFN(NPT)
-      REAL LPOLY, SCALE(2)
+      REAL SCALE(2)
       REAL V0, PEAK, WIDTH
       DOUBLE PRECISION A(3)
       LOGICAL*1 ERROR

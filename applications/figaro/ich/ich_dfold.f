@@ -25,7 +25,7 @@ C                  ICH_FOLD.
 C+
       CHARACTER*(*) STRING
 C
-      CHARACTER CHR,LITLA,LITLZ,ICH_LOWER
+      CHARACTER CHR,LITLA,LITLZ
 C
       LITLA='A'
       LITLZ='Z'

@@ -61,7 +61,6 @@
       integer ptr1,ptr2,ptr3,ptr4,slot,slot2,slot3,slot4
       logical par_quest
       logical loop
-      integer nels
       integer iopt,get_parnum
       integer NDICT,CENTVCHN,WIDVCHN,ECENVHEI
       parameter (NDICT = 4,
