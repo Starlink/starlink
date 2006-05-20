@@ -68,13 +68,8 @@ C     Parameters
 C
       INTEGER LU, STATUS
 C
-C     Functions used
-C
-      INTEGER ICH_LEN
-C
 C     Local variables
 C
-      CHARACTER ERROR*64         ! Error text
       INTEGER   I                ! Loop index
       INTEGER   SLOT             ! Number of available common table slot
 C

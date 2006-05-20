@@ -25,7 +25,8 @@ C                    array in question.
 C     (<) DFINED     (Logical,ref) True if array contents are defined,
 C                    false otherwise.
 C     (!) STATUS     (Integer,ref) Returned status value.  If a non-zero
-C                    status value is passed, this routine returns immediately.
+C                    status value is passed, this routine returns 
+C                    immediately.
 C
 C  Prior requirements:
 C     DSA_OPEN must have been called to initialise the system.
@@ -61,16 +62,13 @@ C
 C
 C     Local variables
 C
-      CHARACTER ARRAY_NAME*80              ! Name of actual array in structure
-      INTEGER   DTA_STATUS                 ! Status returned by DTA_ routines
-      INTEGER   IDIM                       ! Index through array dimensions
-      LOGICAL   KNOWN                      ! True if a known structure type
-      INTEGER   LENAME                     ! # chars in ARRAY_NAME
-      INTEGER   ODIM                       ! Number of origin values
-      INTEGER   ORIGIN(MAX_AXES)           ! Origins for structured arrays
-      LOGICAL   STRUCT                     ! True if named object a structure
-      CHARACTER TYPE*16                    ! Type of named object
-      CHARACTER VARIANT*16                 ! Variant for structured array
+      CHARACTER ARRAY_NAME*80    ! Name of actual array in structure
+      INTEGER   DTA_STATUS       ! Status returned by DTA_ routines
+      LOGICAL   KNOWN            ! True if a known structure type
+      INTEGER   LENAME           ! Number of chars in ARRAY_NAME
+      LOGICAL   STRUCT           ! True if named object a structure
+      CHARACTER TYPE*16          ! Type of named object
+      CHARACTER VARIANT*16       ! Variant for structured array
 C
 C     If bad status passed, return now.
 C
