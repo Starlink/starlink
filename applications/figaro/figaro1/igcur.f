@@ -63,7 +63,6 @@
       CHARACTER DEVICE*32        ! Plot device name
       INTEGER   DPTR             ! Dynamic-memory pointer to data array
       INTEGER   DSLOT            ! Map slot number used for data
-      INTEGER   I                !
       INTEGER   IGNORE           ! Used to ignore status codes
       CHARACTER IMAGE*132        ! Name of image file on current device
       INTEGER   IXEN             !

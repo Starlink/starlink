@@ -80,11 +80,7 @@ C
       INTEGER   NLINE            ! Second dimension of original image
       INTEGER   NPIX             ! First dimension of original image
       INTEGER   OPTR             ! Dynamic-mem pointer for OUTPUT data
-      LOGICAL   QEXIST           ! True if image has a quality array
-      INTEGER   QPTR             ! Dynamic-mem pointer for input quality
                                  ! array
-      INTEGER   QPTRO            ! Dynamic-mem pointer for output
-                                 ! quality array
       LOGICAL   REV              ! True if axis data needs reversing
       LOGICAL   SINGLE           ! True if axis width is a single value
       INTEGER   SLOT             ! Slot number for input mapped data
@@ -283,8 +279,8 @@ C
 C
 C     Local variables
 C
-      INTEGER SMALL,CURWRK,NEWRK,SMINC,LGINC,IYINC,IXINC
-      INTEGER IXRES1,IXRES2,IYRES1,IYRES2,I,J,IYIN
+      INTEGER SMALL,NEWRK,SMINC,LGINC,IYINC,IXINC
+      INTEGER IXRES1,IXRES2,IYRES1,IYRES2,I,J
       INTEGER OUTBASE,INBASE,OUTINDEX,ININDEX
 C
 C     Get the smaller of the two array dimensions
@@ -405,8 +401,8 @@ C
 C
 C     Local variables
 C
-      INTEGER SMALL,CURWRK,NEWRK,SMINC,LGINC,IYINC,IXINC
-      INTEGER IXRES1,IXRES2,IYRES1,IYRES2,I,J,IYIN
+      INTEGER SMALL,NEWRK,SMINC,LGINC,IYINC,IXINC
+      INTEGER IXRES1,IXRES2,IYRES1,IYRES2,I,J
       INTEGER OUTBASE,INBASE,OUTINDEX,ININDEX
 C
 C     Get the smaller of the two array dimensions

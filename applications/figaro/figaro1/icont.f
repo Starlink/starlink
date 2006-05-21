@@ -108,16 +108,13 @@ C
       REAL      DELTA            ! Increment between contour levels
       INTEGER   DPTR             ! Dynamic-memory pointer to data array
       INTEGER   DSLOT            ! Map slot number used for data
-      CHARACTER DUNITS*32        ! Structure data axis units
       DOUBLE PRECISION DUMMY     ! Dummy argument for GET_AXIS_INFO
       LOGICAL   ERASE            ! TRUE if the screen is to be wiped
       LOGICAL   EXIST            ! True if axis data array exists
-      LOGICAL   HARD             ! True if the output device is hard
       LOGICAL   HARDCOPY         ! True if hardcopy is required
       REAL      HIGH             ! The highest brightness level
       INTEGER   I                ! General loop index
       LOGICAL   IGNORE           ! Used to ignore status codes
-      INTEGER   INVOKE           ! Used to invoke functions
       INTEGER   IXEN             ! Last element to be plotted in x-axis
       INTEGER   IXST             ! First element to be plotted in x-axis
       INTEGER   IYEN             ! Last element to be plotted in y-axis
@@ -125,13 +122,11 @@ C
       LOGICAL   KNOWN            ! True if data range already known
       CHARACTER LABEL*64         ! The group label for all the plots
       REAL      LEVELS(MAX_CONT) ! Values of each of the contour levels
-      LOGICAL   LINES            ! See above
       REAL      LOW              ! The lowest brightness level
       INTEGER   NCONT            ! The number of contours
       INTEGER   NDELM            ! Total number of elements in the data
       INTEGER   NDIM             ! Number of dimensions in data 
                                  ! structure
-      INTEGER   NEXT             ! ICH_KEY arguement - ignored
       INTEGER   NX               ! The size of the data's 1st dimension
       INTEGER   NY               ! The size of the data's 2nd dimension
       LOGICAL   SAME_UNITS       ! True if units for both axes are same

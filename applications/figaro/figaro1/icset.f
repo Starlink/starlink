@@ -74,7 +74,6 @@ C
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
       INTEGER      IGNORE        ! Used to pass ignorable status
       INTEGER      NX, NY        ! Axis dimensions of data arrays
-      INTEGER      DSLOT         ! Map slot for input array
       INTEGER      IXEN          ! Last pixel to be set constant
       INTEGER      IXST          ! First  "   "  "   "      "
       INTEGER      IYEN          ! Last pixel to be set constant
@@ -188,10 +187,6 @@ C     Parameters
 C
       INTEGER I1, I2, I3, I4, NELM, NX, NY, IX, IY
       REAL VALUE, OUTPUT_ARRAY( NX,NY )
-C
-C     Local variables
-C
-      INTEGER I
 C
 C     Set region 
 C

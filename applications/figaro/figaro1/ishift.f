@@ -80,7 +80,6 @@ C
       INTEGER      DSLOT         ! Map slot number of input data array
       REAL         EXTRA         !
       CHARACTER    HIST(3)*50    ! History text.
-      INTEGER      IGNORE        ! Used to ignore status codes
       INTEGER      MODE          !
       INTEGER      NCXX          !
       INTEGER      NCXY          !
@@ -114,13 +113,11 @@ C
       REAL         XRESMIN       !
       REAL         XRESMAX       !
       REAL         XSHIFT        !
-      REAL         XSPLIT        !
       DOUBLE PRECISION YCOEFF(2,1) !
       LOGICAL      YLOG          !
       REAL         YRESMIN       !
       REAL         YRESMAX       !
       REAL         YSHIFT        !
-      REAL         YSPLIT        !
       LOGICAL      VEXIST        ! TRUE if a variance array exists
       INTEGER      VPTR          ! Dynamic-memory pointer to input
                                  ! variance 

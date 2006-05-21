@@ -62,7 +62,6 @@ C
       CHARACTER ICH_CI*13,ICH_CF*13
  
 C
-      CHARACTER COMMAND          ! Command character from cursor 
       CHARACTER DEVICE*32        ! PGPLOT device specification
       INTEGER   DIMS(2)          ! Image dimensions
       INTEGER   DSTATUS          ! Status on getting SOFT device
@@ -113,7 +112,6 @@ C
                                  ! data
       REAL      XST              ! Initial X-value
       CHARACTER XUNITS*32        ! Structure X-axis units
-      REAL      YVAL             ! Y value (Scan number) to plot        
 C     
 C     Initial values
 C
@@ -353,10 +351,6 @@ C
       BYTE QUALITY(NX)
       CHARACTER*(*) XLAB,ZLAB,PLAB
 C
-C     Functions
-C
-      INTEGER ICH_LEN,PGBEGIN
-C
 C     Colour for axes
 C
       INTEGER WHITE
@@ -364,10 +358,7 @@ C
 C
 C     Local variables
 C
-      LOGICAL APPEND
-      INTEGER I, LENGTH
-      REAL XVAL1, XVAL2, YVAL1, YVAL2
-      CHARACTER CHARS*64,TYPE*16
+      INTEGER I
 C
 C       Setup plot environment, and plot data.
 C

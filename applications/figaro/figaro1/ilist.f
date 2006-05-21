@@ -62,7 +62,6 @@ C
       CHARACTER FILENAME*132     ! The name of the output file
       LOGICAL   HARD             ! True if the output device is hard
       INTEGER   IGNORE           ! Used to pass ignorable status
-      INTEGER   ITEMP            ! Temporary integer storage
       INTEGER   IXEN             ! Last element to be plotted in x-axis
       INTEGER   IXST             ! First element to be plotted in x-axis
       INTEGER   IYEN             ! Last element to be plotted in y-axis
@@ -79,7 +78,6 @@ C
       INTEGER   STATUS           ! Status return from DSA_xxx routines
       CHARACTER STRINGS(2)*64    ! Receives data and axis information
       CHARACTER UNITS(3)*32      ! Units on each axis, and of data
-      REAL      VALUE            ! Temporary REAL
       LOGICAL   XEXIST           ! TRUE if an x-axis structure exists
       REAL      XMAX             !
       REAL      XMIN             !
@@ -263,7 +261,7 @@ C
 C     Functions
 C
       LOGICAL GEN_CHKNSF
-      INTEGER ICH_CLEAN,ICH_LEN,ICH_ENCODE
+      INTEGER ICH_CLEAN,ICH_ENCODE
 C
 C     Local variables
 C

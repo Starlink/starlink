@@ -41,7 +41,6 @@ C
 C     Local variables
 C
       INTEGER   DIMS(10)         ! Sizes of the dimensions of the data
-      INTEGER   ADDRESS          ! Address of dynamic memory element
       INTEGER   NDIM             ! Dimensionality of input structure
       INTEGER   NELM             ! Total number of elements in data
                                  ! array

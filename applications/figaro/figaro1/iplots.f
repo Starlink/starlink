@@ -85,8 +85,7 @@ C
 C     Functions
 C
       LOGICAL PAR_ABORT
-      INTEGER ICH_CLEAN,ICH_FOLD,ICH_LEN,ICH_KEY
-      REAL GEN_ELEMF
+      INTEGER ICH_CLEAN,ICH_FOLD,ICH_KEY
       CHARACTER ICH_CI*3
 C
 C     Real variable plot value limits - keeps plot range within
@@ -133,7 +132,6 @@ C
       CHARACTER LABEL*64         ! The group label for all the plots
       INTEGER   LASTY            ! Number of last cross-section on a 
                                  ! page
-      INTEGER   LLAB             ! Length of label string
       REAL      LOW              ! Minimum Y-value for a plot
       DOUBLE PRECISION MAGNITUDE ! Magnitude flag value for data
       INTEGER   NCROSS           ! Number of cross-sections plotted per

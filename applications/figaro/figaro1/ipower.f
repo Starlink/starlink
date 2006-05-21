@@ -57,15 +57,12 @@ C+
 C
 C     Functions
 C
-      INTEGER DSA_TYPESIZE
-      LOGICAL DSA_SAME_DATA
       CHARACTER*11 ICH_CI        ! Returns an integer as a string
       INTEGER ICH_LEN            ! Returns the length of a string
       LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
 C
-      INTEGER   BYTES            ! Bytes required for an array
       INTEGER   DIMS(10)         ! Image dimensions
       INTEGER   E2PTR            ! Dynamic pointer to second image data
       LOGICAL   ERRORS           ! True if image has variance data
