@@ -63,7 +63,6 @@ C
 C     Local variables
 C
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
-      INTEGER      DSLOT         ! Map slot number of input data array
       REAL         FRACT         ! see above
       INTEGER      IRPT          ! 
       INTEGER      NDIM          ! Number of dimensions in data
