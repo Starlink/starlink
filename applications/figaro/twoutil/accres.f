@@ -117,11 +117,11 @@
       character*(*) name,refnam
       character*2 mode,umode,fmode*1
       character*(*) chwork
-      integer nelm,work,status,mxdim,elret,ncomp,i
-      character*70 fulnam,dtanam,type*50,tname,nname
+      integer nelm,work,status,mxdim,ncomp,i
+      character*70 fulnam,dtanam,type*50,tname
       character*(DAT__SZLOC) nloc, cloc, dloc, chars1p,tloc
-      integer chr_len,dtalen,ilen,dyn_element,el,SIZE
-      logical state,prim
+      integer chr_len,dtalen,ilen,dyn_element,el
+      logical state
       external par_wruser
       save dtanam,dtalen
 
