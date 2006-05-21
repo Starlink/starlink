@@ -45,7 +45,6 @@ C
 C     Functions
 C
       LOGICAL PAR_ABORT
-      CHARACTER ICH_CI*12    ! Return an integer as a character string
       INTEGER ICH_CLEAN      ! Clip a string at first non-printing 
                              ! character
       INTEGER ICH_ENCODE     ! Encodes a character string

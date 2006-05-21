@@ -68,7 +68,6 @@ C
 C
 C     Local variables
 C
-      INTEGER      BYTES        ! Number of bytes of workspace required
       CHARACTER    DEVICE*64    ! Actual name of plotting device
       INTEGER      DIMS(10)     ! Sizes of dimensions of data
       REAL         DMAX         !

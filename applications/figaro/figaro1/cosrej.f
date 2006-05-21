@@ -74,7 +74,6 @@ C
 C
 C     Functions
 C
-      INTEGER    ICH_LEN
       CHARACTER  ICH_CI*5
 C
 C     Maximum number of spectra to be analysed.  This must match the

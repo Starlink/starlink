@@ -41,10 +41,6 @@ C+
       IMPLICIT NONE
 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-CC
-C     Functions
-C
-      INTEGER ICH_LEN
 C
 C     Local variables
 C
