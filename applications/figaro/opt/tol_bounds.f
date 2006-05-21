@@ -51,14 +51,14 @@
       real EFOLD
       parameter (EFOLD=2.35482004)
       character*54 chars
-      logical qstat,par_qnum,ok,duml
+      logical ok
       include 'PRM_PAR'
       integer NDICT,iopt,status,ul,i,np,len1
       integer PWIDTH, PHEIGHT, PCENTRE
       parameter (PWIDTH = 2, PHEIGHT = 3, PCENTRE = 4)
       real minval,conv
       parameter (NDICT = 7)
-      character*24 dict(NDICT),cdum*1
+      character*24 dict(NDICT)
       data dict/
      :     'F W_MIN : Minimum width',
      :     'F W_MAX : Maximum width',

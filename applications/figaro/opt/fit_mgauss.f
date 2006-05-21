@@ -165,7 +165,6 @@
 
       integer LIW
       parameter (LIW = 2)
-      integer iw(LIW)
       double precision gc1(n)
       double precision fc1
       integer i
@@ -190,7 +189,7 @@
       integer ifail
       double precision delta
       double precision MACH_PREC
-      integer wptr,nwork,bptr,gptr,dptr,varptr
+      integer wptr,bptr,gptr,dptr,varptr
       integer k,heslptr,pstat,nfree
       external grfun,mgmon
       integer len1

@@ -108,7 +108,6 @@
 
       integer LIW
       parameter (LIW = 1)
-      integer miw(LIW)
       integer rc,b,ajc,v,wn
 
 * PDA additional variables
@@ -118,23 +117,15 @@
       parameter (ftol = 1.0D0)
       double precision gtol
       parameter (gtol = 5.0D0)
-      double precision epsfcn
-      integer pda_lmdif
-      double precision diag(MAX_PARMS)
       integer mode
       parameter (mode = 1)
       double precision factor
       parameter (factor = 100.0D0)
       double precision info
-      double precision fjac(MAX_PARMS,MAX_PARMS)
       integer ldfjac
       parameter (ldfjac = max_parms)
-      integer ipvt(MAX_PARMS,MAX_PARMS)
-      double precision qtf(MAX_PARMS)
       double precision wa1(MAX_PARMS)
       
-      double precision wa3(MAX_PARMS)
-      double precision wa4(MAX_PARMS)
 
       integer lwa
 *      lwa= mpts*n+5*mpts+n
@@ -153,9 +144,8 @@
       real fitpar(MAX_PARMS)
       real fiterr(MAX_PARMS)
       integer iprint,ifail,maxcal,i,j,cmp,ref,ajtjc,d
-      integer sing,status,len1
+      integer sing
       double precision stepmax,eta,f
-      character*50 string
       include 'status_inc'
       include 'fit_coding_inc'
 
