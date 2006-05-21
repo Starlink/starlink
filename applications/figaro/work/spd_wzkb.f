@@ -106,8 +106,6 @@
 
 *     Local variables
       INTEGER i                  !General loop counter
-      REAL est_min_dispersion    !Estimated low dispersion
-      REAL est_max_dispersion    !Estimated high dispersion
       REAL scale
       REAL temp
       REAL min_id_pos

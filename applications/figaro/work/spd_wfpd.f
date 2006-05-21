@@ -226,9 +226,6 @@
 *  Local Variables:
       INTEGER I                  ! Data point counter
       INTEGER J                  ! Component counter
-      INTEGER K                  ! Free parameter counter
-      INTEGER M                  ! Tie counter
-      INTEGER LV( 3*MAXCMP )     ! PAR1(K) corr. to PAR0(LV(K))
       DOUBLE PRECISION ARG       ! Argument of exp function etc.
       DOUBLE PRECISION C( MAXCMP ) ! Scaling constants Theta
       DOUBLE PRECISION P( MAXCMP ) ! Emissivity exponents alpha
@@ -237,7 +234,6 @@
       DOUBLE PRECISION FJ( MAXCMP ) ! f_j(x_i)
       DOUBLE PRECISION FI        ! f(x_i)
       DOUBLE PRECISION LOGDIF    ! Relative importance of components
-      DOUBLE PRECISION DFDAK     ! df/da_k
 
 *  External References:
       DOUBLE PRECISION SPD_UAAQD ! Planck function value

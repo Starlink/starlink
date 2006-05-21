@@ -212,18 +212,15 @@
       DOUBLE PRECISION FVAL
 
 *  Local Variables:
-      INTEGER I, J, K, L, M, N   ! Loop indices
-      INTEGER TIE( MAXCMP )      ! List of tied components
+      INTEGER I, J               ! Loop indices
       DOUBLE PRECISION C( MAXCMP ) ! centre positions
       DOUBLE PRECISION P( MAXCMP ) ! peak heights
       DOUBLE PRECISION S( MAXCMP ) ! dispersions
       DOUBLE PRECISION GAUSS     ! f(x) at any one x
-      DOUBLE PRECISION DGAUSS    ! Any derivative of function
       DOUBLE PRECISION ARG       ! Argument of exp function
 
 *  Internal References:
       DOUBLE PRECISION SPD_UAATD ! Fit function value
-      DOUBLE PRECISION SPD_UAAUD ! Fit function derivative value
 
 *.
 
