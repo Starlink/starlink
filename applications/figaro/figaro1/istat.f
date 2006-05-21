@@ -94,9 +94,7 @@ C
       INTEGER   DDIMS(10)        ! Sizes of the dimensions of the data
       INTEGER   DPTR             ! Dynamic-memory pointer to data array
       INTEGER   DSLOT            ! Map slot number used for data
-      REAL      DUMMY            ! REAL dummy arguement
       INTEGER   IGNORE           ! Used to ignore status codes
-      INTEGER   INVOKE           ! Used to invoke functions
       INTEGER   IXEN             ! Last pixel to be counted along x-axis
       INTEGER   IXST             ! First "    "   "     "     "      "
       INTEGER   IYEN             ! Last  "    "   "     "     "   y-axis
@@ -117,7 +115,6 @@ C
       CHARACTER STRING*80        ! Output string
       REAL      TOTAL            ! Total of all values in pixels
       REAL      VALUE            ! Axis data value
-      LOGICAL   WHOLE            ! Value specified for WHOLE
       INTEGER   WPTR             ! Dynamic mem element for work array
       INTEGER   WSLOT            ! Slot number for workspace - ignored
       LOGICAL   XEXIST           ! True if X-axis info exists

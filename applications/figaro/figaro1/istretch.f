@@ -67,7 +67,7 @@ C+
 C
 C     Functions
 C
-      INTEGER ICH_LEN , DSA_TYPESIZE
+      INTEGER DSA_TYPESIZE
       LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
@@ -77,7 +77,6 @@ C
       INTEGER      DPTR          ! Dynamic-memory pointer to data array
       INTEGER      DSLOT         ! Map slot number of input data array
       REAL         EXTRA         ! 
-      INTEGER      IGNORE        ! Used to ignore status codes
       INTEGER      MODE          !
       INTEGER      NCXX          !
       INTEGER      NCXY          !
@@ -92,12 +91,10 @@ C
       INTEGER      OPTR          ! Dynamic-memory pointer to output data
                                  ! array
       INTEGER      OSLOT         ! Map slot number for output data array
-      INTEGER      PSLOT         ! Map slot number for workspace
       INTEGER      PX            ! Workspace pointer
       INTEGER      PXSLOT        ! Map slot number for workspace
       INTEGER      PY            ! Workspace pointer
       INTEGER      PYSLOT        ! Map slot number for workspace
-      LOGICAL      REALS         ! 
       INTEGER      STATUS        ! Running status for DSA_ routines
       REAL         VALS(20,20)   ! 
       REAL         VALUE         ! Temporary real number
@@ -109,14 +106,12 @@ C
       REAL         XRESMAX       ! 
       REAL         XSHIFT        !  
       REAL         XSTRCH        ! 
-      REAL         XSPLIT        ! 
       DOUBLE PRECISION YCOEFF(2,1) !
       LOGICAL      YLOG          ! 
       REAL         YRESMIN       ! 
       REAL         YRESMAX       ! 
       REAL         YSHIFT        ! 
       REAL         YSTRCH        ! 
-      REAL         YSPLIT        ! 
 C
 C     Parameter values for FIG_REBIN2D
 C

@@ -104,8 +104,7 @@ C+
 C
 C     Functions
 C
-      LOGICAL PAR_GIVEN
-      INTEGER ICH_CLEAN,ICH_FOLD,ICH_LEN,ICH_KEY
+      INTEGER ICH_FOLD,ICH_CLEAN,ICH_KEY
       REAL    GEN_ELEMF
       LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
@@ -124,7 +123,6 @@ C     Local variables
 C
       LOGICAL   AUTOSC           ! TRUE if AUTOSCALE is specified
       LOGICAL   AXES             ! TRUE if axes are to be drawn
-      REAL      BIAS             !
       INTEGER   CKEY             ! Colour code used by PGPLOT
       CHARACTER COLOUR*10        ! COLOUR specification
       CHARACTER DEVICE*32        ! PGPLOT device specification
@@ -135,19 +133,13 @@ C
       REAL      DLOW             !
       INTEGER   DPTR             ! Dynamic-memory pointer to data array
       INTEGER   DSLOT            ! Map slot number used for data
-      LOGICAL   DTWODIMS         ! True if data is two dimensional
       REAL      DUMMY            ! REAL dummy arguement
       CHARACTER DUNITS*32        ! Structure data axis units
       LOGICAL   ERASE            ! TRUE if the screen is to be wiped
       LOGICAL   HARD             ! True if the output device is hard
       REAL      HIGH             ! Maximum Y-value for a plot
       REAL      HIGHD            !
-      INTEGER   IDYMAX           ! The last cross-section to be plotted
-      INTEGER   IDYMIN           ! The first cross-section to be plotted
-      INTEGER   IGNORE           ! Used to ignore status codes
       INTEGER   INVOKE           ! Used to invoke functions
-      INTEGER   IDEN             ! Last element to be plotted in data
-      INTEGER   IDST             ! First element to be plotted in data
       INTEGER   INCY             ! +1 for normal plots, -1 for reverse
       INTEGER   IPTR             ! 
       LOGICAL   ISNEW            ! Is address new to CNF?
@@ -159,14 +151,11 @@ C
       INTEGER   IYEN             ! Last element to be plotted in y-axis
       INTEGER   IYST             ! First element to be plotted in y-axis
       CHARACTER LABEL*64         ! The group label for all the plots
-      INTEGER   LASTY            ! Number of last cross-section on a 
                                  ! page
-      LOGICAL   LINES            !
       INTEGER   LLAB             ! Length of label string
       REAL      LOW              ! Minimum Y-value for a plot
       REAL      MAGNITUDE        !
       INTEGER   MSPEC            !
-      INTEGER   NCH              !
       INTEGER   NDD              ! Dimensionality of input data 
                                  ! structure
       INTEGER   NDELM            ! Total number of elements in the data
@@ -174,10 +163,7 @@ C
                                  ! x-section
       INTEGER   ND2              ! Total number of cross-sections
       INTEGER   NEXT             ! ICH_KEY arguement - ignored
-      INTEGER   NPELMS           ! Number of array elements to be 
-                                 ! plotted
       INTEGER   NSPECT           ! Number of x-sections to be plotted
-      INTEGER   NXELM            ! Total number of elements in x-axis
       REAL      OFFSET           ! 
       LOGICAL   PISNEW           ! Previous CNF pointer to data new?
       REAL      RESET            !

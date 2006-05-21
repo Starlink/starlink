@@ -68,10 +68,8 @@ C     Local variables
 C
       INTEGER      BYTES         ! Number of bytes of workspace required
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
-      REAL         FACTOR        !
       CHARACTER    HIST(3)*50    ! Array for comments in the NDF history
       LOGICAL      ISNEW         ! Is address new to CNF?
-      INTEGER      IX            !
       INTEGER      IY            !
       INTEGER      NDIM          ! Number of dimensions in data
       INTEGER      NELM          ! Total number of elements in data
