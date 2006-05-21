@@ -54,7 +54,6 @@ C
       INTEGER      V2PTR        ! Dynamic memory pointer to 2nd variance array
       LOGICAL      ER2EXIST     ! TRUE if spectrum 2 has valid error data
       INTEGER      ER2SLOT      ! Map slot number of 2nd error array
-      LOGICAL      FLAG         ! TRUE if points with 0 error but non-0 data
       INTEGER      NDIM         ! Number of dimensions in data
       INTEGER      NELM         ! Total number of elements in data
       INTEGER      IGNORE       ! Used to pass ignorable status
@@ -182,7 +181,7 @@ C
 C
 C     Parameters
 C
-      LOGICAL E1MAP,E2MAP,FLAG
+      LOGICAL E1MAP,E2MAP
       INTEGER N
       REAL SPEC1(N), VSPEC1(N), SPEC2(N), VSPEC2(N)
       BYTE QSPEC1(N), QSPEC2(N)

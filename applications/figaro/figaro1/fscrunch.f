@@ -120,7 +120,6 @@ C
       DOUBLE PRECISION DWEND     ! WEND in double precision
       DOUBLE PRECISION DWSTART   ! WSTART in double precision
       DOUBLE PRECISION DVALUE    ! General double-precision real variable
-      INTEGER   DPTR             ! Dynamic mem dummy pointer
       INTEGER   EPTR             ! Dynamic mem pointer for input error array
       LOGICAL   ERRORS           ! True if spectrum has error information
       LOGICAL   EXIST            ! True if width values exist in data
@@ -142,7 +141,6 @@ C
       LOGICAL   LOGWR            ! Value of LOG keyword
       INTEGER   NBINR            ! Number of elements in scrunched 
                                  ! spectra
-      INTEGER   NCH              ! Number of characters in string
       INTEGER   NCHXU            ! Number of characters in X-units
                                  ! string
       INTEGER   NDIM             ! Number of data dimensions

@@ -60,31 +60,21 @@ C
       CHARACTER DUNITS*32        ! Structure data axis units
       INTEGER   DPTR             ! Dynamic-memory pointer to data array
       INTEGER   DSLOT            ! Dynamic-memory pointer to data array
-      CHARACTER ERROR*64         ! Error message string
       CHARACTER FILE*132         ! Name of the last file plotted
       LOGICAL   FIRST            ! TRUE if first time through loop
       REAL      HIGH             ! Maximum Y-value for a plot
-      INTEGER   IDEN             ! Last element to be plotted in data array
-      INTEGER   IDST             ! First element to be plotted in data array
       INTEGER   IGNORE           ! Used to send dummy status arguement
       INTEGER   INVOKE           ! Dummy function value
       INTEGER   IXPIX            ! Number of pixel nearest to cursor
-      INTEGER   IXST             ! First element to be plotted in x-axis
-      INTEGER   IYST             ! First element to be plotted in y-direction
-      CHARACTER LABEL*64         ! The group label for all the plots
-      INTEGER   LINE             ! Line on which text is to appear
       REAL      LOW              ! Minimum Y-value for a plot
       INTEGER   NDIM             ! Dimensionality of input data structure
-      INTEGER   NELM             ! Total number of elements in the data
       INTEGER   NX               ! Total number of elements per cross-section
       INTEGER   NEXT             ! Next character in string
-      INTEGER   NXELM            ! Total number of elements in x-axis array
       LOGICAL   REPEAT           ! Loop control variable, TRUE to go on
       INTEGER   STATUS           ! Status return from DSA_xxx routines
       CHARACTER STRING*80        ! Output string
       CHARACTER STRINGS(2)*64    ! Receives data and axis information
       REAL      VALUE            ! Temporary REAL
-      INTEGER   VDID             ! Display number
       REAL      X                ! Current cursor x-position
       REAL      XEN              ! Rightmost x-value on screen
       CHARACTER XLABEL*32        ! Structure x-axis label
