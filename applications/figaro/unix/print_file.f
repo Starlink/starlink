@@ -32,7 +32,7 @@
       character*(*) queue
       character*80 quenam,chars
       external out_routine
-      integer pstat,len1,len2,istat,system,access,rename,count
+      integer pstat,len1,len2,istat,system,access,count
       logical loop
 
 *

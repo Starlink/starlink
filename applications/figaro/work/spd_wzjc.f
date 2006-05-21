@@ -108,7 +108,7 @@
       PARAMETER ( RT8LN2 = 2.354820 )
 
 *  Local Variables:
-      INTEGER I, J               ! Temporary integers
+      INTEGER I                  ! Temporary integer
       INTEGER MSKELM             ! Number of pixels for line fit
       INTEGER LPIX, RPIX         ! Count good baseline pixels
       INTEGER CF( MAXGAU )       ! Full array of centre fit flags

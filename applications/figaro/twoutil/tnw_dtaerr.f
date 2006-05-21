@@ -30,7 +30,7 @@
       character*(*) action
       character*(*) structure
       integer chr_len
-      character*80 chars
+*      character*80 chars
       character*2 bss,bsn
       data bss/'\\'/
       bsn = bss(1:1)//'n'
