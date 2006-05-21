@@ -53,7 +53,7 @@
 *
       integer status,ipvt
       integer idf,i,j,k,ifail
-      double precision BETA99,factor,pt99,b99,g01caf
+      double precision BETA99,factor,pt99,b99
       double precision sum, det(2)
 
 * 99% confidence

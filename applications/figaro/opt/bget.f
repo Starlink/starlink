@@ -37,7 +37,7 @@
 * local
 *
       double precision a
-      double precision s11abf
+*      double precision s11abf
       double precision b
       double precision c
       double precision a1
