@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sc/005</path>
+  <description>The 2-D CCD Data Reduction Cookbook</description>
+  <abstract><p>This cookbook presents simple recipes and scripts for 
+      reducing direct images acquired with optical CCD detectors.
+      Using these recipes and scripts you can correct un-processed
+      images obtained from CCDs for various instrumental effects to
+      retrieve an accurate picture of the field of sky observed.  The
+      recipes and scripts use standard software available at all
+      Starlink sites.
+
+      The topics covered include: creating and applying bias and
+      flat-field corrections, registering frames and creating a stack
+      or mosaic of registered frames.  Related auxiliary tasks, such as
+      converting between different data formats, displaying images and
+      calculating image statistics are also presented.
+
+      In addition to the recipes and scripts, sufficient background
+      material is presented to explain the procedures and techniques
+      used.  The treatment is deliberately practical rather than
+      theoretical, in keeping with the aim of providing advice on the
+      actual reduction of observations. Additional material outlines
+      some of the differences between using conventional optical CCDs
+      and the similar arrays used to observe at infrared wavelengths.
+      </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>A.C. Davenhall, G.J. Privett & M.B. Taylor}</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1997, 1999, 2001</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
