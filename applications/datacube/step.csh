@@ -283,15 +283,15 @@ if ( ${pltimg} == "TRUE" ) then
 # Get the aspect ratio of the image.
    set iasp = `calc exp="'${dims[1]}/${dims[2]}'"`
 
-# Find the ratio of the aspect ratios.  The idea is match the shape
+# Find the ratio of the aspect ratios.  The idea is to match the shape
 # of the images best to the plotting region, and tile accordingly.
 # So if this ratio is near 1.0, the number of tiles in each axis
-# should be the same, i.e. the next enclosing square.  For small than 
+# should be the same, i.e. the next enclosing square.  Smaller than 
 # 1.0 it means that more images will fit across the width of the
 # base picture than will fit the height.
    set asp = `calc exp="'sqrt(${pasp}/${iasp})'"`
 
-# Now find the number of tiles along the side of for a square grid to
+# Now find the number of tiles along the side of a square grid to
 # accommodate all the channels.
    set gm = `calc exp="'nint(sqrt(${counter})+0.4999)'"`
 
@@ -342,13 +342,13 @@ if ( ${pltimg} == "TRUE" ) then
 
 # The formula for area depends on whether the image is limited in x or
 # y.  Find the aspect ratio of a single grid.  If this is greater than
-# the image aspect ratio, means the iamge is y-axis limited.
+# the image aspect ratio, means the image is y-axis limited.
             set gasp = `calc exp="'${pasp}*${j}/${i}'"`
             if ( `echo "if ( ${gasp} >= ${iasp} ) 1" | bc` ) then
                set area = `calc exp="'((1.0-2.0*${margin})**2)*${iasp}/${gasp}'"`
-             else
-                set area = `calc exp="'((1.0-2.0*${margin})**2)/${iasp}*${gasp}'"`
-             endif
+            else
+               set area = `calc exp="'((1.0-2.0*${margin})**2)/${iasp}*${gasp}'"`
+            endif
 
 # Determine the efficiency.
             set effic = `calc exp="'${area}*${used}'"`
