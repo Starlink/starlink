@@ -1,17 +1,9 @@
-config.guess
-config.sub
 *.tar.gz
 install-sh
 ltmain.sh
 missing
-sun237.aux
-sun237.dvi
-sun237.lof
-sun237.log
-sun237.toc
 make.log
 make.log.err
-datacube_mon.ifl
 .deps
 .libs
 *.la
@@ -25,6 +17,8 @@ autom4te.cache
 config.cache
 config.log
 config.status
+config.guess
+config.sub
 configure
 fac_240_err
 libtool
@@ -35,4 +29,5 @@ confdefs.h
 datacube.csh
 datacube.icl
 datacube_mon
+datacube_mon.ifl
 version.dat
