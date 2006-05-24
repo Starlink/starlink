@@ -78,9 +78,7 @@ C
 C
       INTEGER   DEGREE           ! Polynomial degree
       INTEGER   DIMS(2)          ! Image dimensions
-      INTEGER   DUMMY            ! Dummy argument
       LOGICAL   EXIST            ! True if error information available
-      INTEGER   IGNORE           ! Ignoreable status
       INTEGER   YS               ! Initial pixel number
       INTEGER   YE               ! Final pixel number
       INTEGER   NDIM             ! Number of image dimensions
@@ -273,11 +271,9 @@ C     the spacial profile.
 
       REAL MINVAL
       PARAMETER (MINVAL = 1.0E-8)
-
-C     Functions
-
-      CHARACTER*14 ICH_CI
-
+C
+C     Local variables
+C
       INTEGER IX,IY,JY
       REAL SUM
       INTEGER KPLUS1       ! Maximum degree plus 1
@@ -285,10 +281,9 @@ C     Functions
       INTEGER IFAIL,IFAIL2
       DOUBLE PRECISION DX,DX2,EPS
       INTEGER IGNORE
-      INTEGER J
       DOUBLE PRECISION VALUE,DUMMY
-      INTEGER NREJ,IMAX,NM
-      DOUBLE PRECISION R,RMAX,MEAN
+      INTEGER NREJ,IMAX
+      DOUBLE PRECISION R,RMAX
       INTEGER INDEX
       REAL FUNKNOWN_IN
       INTEGER NGOOD,NDEG

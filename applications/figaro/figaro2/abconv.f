@@ -58,7 +58,6 @@ C
 C
 C     Local variables
 C
-      INTEGER      ADDRESS       ! Address of dynamic-memory pointer
       REAL         BADVAL        ! Bad value
       CHARACTER    COMMAND*64    ! The actual Figaro command entered
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
@@ -82,7 +81,6 @@ C
       INTEGER      OPTR          ! Dynamic-memory pointer to output data
                                  ! array
       INTEGER      OSLOT         ! Map slot number for output data array
-      LOGICAL      QXIST         ! TRUE if a quality array exists
       INTEGER      STATUS        ! Running status for DSA_ routines
       INTEGER      ULEN(3)       ! Length in characters of the different
                                  ! units

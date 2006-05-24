@@ -117,8 +117,8 @@ C+
 C
 C     Functions
 C
-      LOGICAL PAR_ABORT, PAR_GIVEN 
-      INTEGER ICH_CLEAN, ICH_FOLD, ICH_KEY, ICH_LEN
+      LOGICAL PAR_ABORT
+      INTEGER ICH_CLEAN, ICH_FOLD, ICH_KEY
       REAL GEN_ELEMF
 C
 C     Real variable plot value limits - keeps plot range within
@@ -554,9 +554,7 @@ C
 C
 C     Local variables
 C
-      LOGICAL APPEND
-      INTEGER LENGTH
-      CHARACTER PGDEVL*64,CHARS*64,TYPE*16
+      CHARACTER PGDEVL*64
 C
 C        Ordinary plot.  Open plot. If OK, plot data.
 C
@@ -694,10 +692,9 @@ C
 C
 C     Local variables
 C
-      LOGICAL APPEND
-      INTEGER I, LENGTH
+      INTEGER I
       REAL XVAL1, XVAL2, YVAL1, YVAL2
-      CHARACTER PGDEVL*64,CHARS*64,TYPE*16
+      CHARACTER PGDEVL*64
 C
 C        Ordinary plot.  Open plot. If OK, plot data.
 C

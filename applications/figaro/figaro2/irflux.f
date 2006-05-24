@@ -337,7 +337,7 @@ C
 C     Local variables
 C
       INTEGER I
-      REAL E1, E2, F
+      REAL F
 C
 C     Functions
 C

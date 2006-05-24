@@ -339,8 +339,8 @@ C
       integer dumint,i,wslot,wslot2,wslot3,wslot4,wslot5,wslot6
       integer wpt1,wpt2,wpt3,wpt4,wpt5,wpt6
       integer iobj,isky,ixmin,ixmax,iymin,iymax,nbig
-      real low,high,x,y,pi,sum,sumsky,radius,oldlow,oldhigh,apparea
-      character opt*1,optup*1,table*20,ch*1,softdev*16
+      real low,high,x,y,sum,sumsky,radius,oldlow,oldhigh,apparea
+      character opt*1,optup*1,table*20,softdev*16
       logical continue,picture,init
 C
 C     Number of pixels used to draw a circle
@@ -851,7 +851,7 @@ C     Local variables
 C
       integer status,iy,i,ix
       real amin,amax
-      character softdev*20,dummy*1
+      character softdev*20
       logical init, ignore
 C
       data init /.true./
@@ -1236,8 +1236,6 @@ C+----------------------------------------------------------------------
 c
       implicit none
 c
-      integer   ich_len
-c
       character*(*) control
       integer       stapix(2),endpix(2)
       real          mag,ximv(2),yimv(2),square
@@ -1557,11 +1555,7 @@ C
 C+----------------------------------------------------------------------
 c
       implicit none
-c
-c    Function calls:                                        
-c
-      integer   ich_len
-c
+
 c    Given parameters:
 c
       real          
@@ -1577,8 +1571,6 @@ c
 c    Local variables:
 c
       integer       
-     :   mincol, maxcol,    ! maximum and minimum colour indices 
-                            ! available
      :   cispan,            ! number of colour values to be set
      :   i, j,              ! loop indices
      :   iarray(xdim,ydim), ! colour index array
@@ -1586,8 +1578,6 @@ c
      :   status             ! status variable
       real          
      :   rarray(xdim,ydim), ! array of ramp values
-     :   tran(6),           ! transformation coeffs., pixels to world 
-                            ! coords.
      :   xmax, xmin,        ! limits of the ramp viewport
      :   val                ! dummy variable
 

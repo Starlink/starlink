@@ -119,9 +119,9 @@ C
 C
 C     Functions used
 C
-      LOGICAL   FIG_KEYCHK, FIG_SCRCHK, FIT_QEOT
-      LOGICAL   PAR_ABORT, PAR_GIVEN, PAR_BATCH, PAR_QUEST
-      INTEGER   ICH_CLEAN, ICH_LEN
+      LOGICAL   FIG_KEYCHK, FIG_SCRCHK
+      LOGICAL   PAR_ABORT
+      INTEGER   ICH_CLEAN
       REAL      GEN_ELEMF
       CHARACTER GEN_NTH*2, ICH_CI*1
 C
@@ -148,7 +148,6 @@ C
       REAL      CHECK(80)        ! Record of keyword values
       CHARACTER COMMAND*16       ! Command being serviced
       CHARACTER COMMENT*64       ! Comment associated with keyword
-      LOGICAL   CURRENT          ! Value of CURRENT keyword
       DOUBLE PRECISION DELTA     ! Increment in linear axis values
       INTEGER   DIMS(10)         ! Dimensions of main data array
       INTEGER   DSA_STATUS       ! Inherited status used by DSA routines
@@ -163,7 +162,6 @@ C
       LOGICAL   FINISHED         ! Indicates data written OK to tape
       INTEGER   I                ! General loop index
       INTEGER   IDIM             ! Axis being processed
-      INTEGER   IGNORE           ! Don't care status variable
       INTEGER   INVOKE           ! Don't care function value
       LOGICAL   IOERR            ! Indicates a non-EOT I/O error
       INTEGER   IPTR             ! Dynamic mem element for data array
@@ -179,9 +177,6 @@ C
       INTEGER   OBJPTR           ! Counter through FITS items in 
                                  ! structure
       INTEGER   OBELM            ! Number of elements in a FITS item
-      LOGICAL   POSIT            ! Value of the POSITION keyword
-      CHARACTER POSN*6           ! String controlling tape positioning
-      LOGICAL   REWIND           ! Value of the REWIND keyword
       DOUBLE PRECISION SCALED(3) ! Calculated BSCALE values for BITPIXes
       INTEGER   SLOT             ! Marker for DSA mapping reference
       CHARACTER STRING*40        ! Used for axis label and units
@@ -191,9 +186,6 @@ C
       LOGICAL   SWAP             ! Indicates output is to be 
                                  ! byte-swapped
       INTEGER   STATUS           ! General non-DSA status variable
-      CHARACTER TAPE*16          ! Name of tape drive to use
-      LOGICAL   TIDYUP           ! Indicates tape should be tidied on 
-                                 ! EOT
       LOGICAL   TOPEN            ! Indicated tape was opened
       LOGICAL   TOTAPE           ! Indicates output is to tape
       CHARACTER TYPE*16          ! Type of main data array
@@ -846,7 +838,7 @@ C
 C
 C     Local variables
 C
-      INTEGER INVOKE, KEY, NEXT, STATUS
+      INTEGER KEY
       CHARACTER KNAME*8, STRING*72
 C
 C     See if name matches and if so check value

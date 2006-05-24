@@ -58,7 +58,7 @@ C
 C     Functions
 C
       LOGICAL    PAR_ABORT
-      INTEGER    ICH_LEN,DSA_TYPESIZE
+      INTEGER    DSA_TYPESIZE
       CHARACTER  ICH_CI*5
 C
 C     Local variables
@@ -66,8 +66,6 @@ C
       CHARACTER    AXINFO(2)*64  ! X-axis units and label.
       INTEGER      BYTES         !
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
-      INTEGER      DPTR          ! Dynamic-memory pointer to data array
-      INTEGER      DSLOT         ! Map slot number of input data array
       DOUBLE PRECISION DUMMY     ! Dummy argument for axis information
       INTEGER      DXPTR         ! Dynamic-memory pointer to input axis
                                  ! data
@@ -75,7 +73,6 @@ C
       LOGICAL      FAULT         !
       INTEGER      IGNORE        ! Used to pass ignorable status
       INTEGER      LUTAB         ! Logical unit number for table data
-      CHARACTER    NAME*132      !
       INTEGER      NDIM          ! Number of dimensions in data
       INTEGER      NX            ! Size of 1st dimension
       INTEGER      OPTR          ! Dynamic-memory pointer to output data
@@ -84,7 +81,6 @@ C
       INTEGER      OXPTR         ! Dynamic-memory pointer to output axis
                                  ! data
       INTEGER      OXSLOT        ! Map slot number of output axis data
-      CHARACTER    SPIKE*80      !
       INTEGER      STATUS        ! Running status for DSA_ routines
       CHARACTER    TABLE*132     !
       LOGICAL      TABOPN        !

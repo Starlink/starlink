@@ -120,9 +120,8 @@ C+
 C
 C     Functions used 
 C
-      LOGICAL PAR_BATCH, PAR_ABORT
+      LOGICAL PAR_ABORT
       INTEGER ICH_FOLD, ICH_LEN
-      INTEGER DSA_TYPESIZE
 C
 C     Maximum number of spectra
 C
@@ -162,7 +161,6 @@ C
       INTEGER   STATUS           ! Running status for DSA_ routines
       CHARACTER STRING*64        ! String used to hold output text
       CHARACTER TRACE*16         ! Trace mode.
-      INTEGER   TVSTATUS         ! Status from TVPCKG routines
       REAL      VALUE            ! Temporary real number
       INTEGER   VSTATUS          ! Status from VAR_ routines
       REAL      WIDTH            ! See above

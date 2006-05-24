@@ -495,9 +495,8 @@ C
 C
 C     Local variables
 C
-      LOGICAL APPEND,BUILD,ERRLOG,MORE,WRITE
+      LOGICAL BUILD,MORE
       REAL AMAX,AMIN,VALUE
-      CHARACTER*64 ERROR
 C
 C     Open soft plot device
 C

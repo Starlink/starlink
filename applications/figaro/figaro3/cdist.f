@@ -714,7 +714,7 @@ C
 C     Local variables
 C
       LOGICAL SAME
-      INTEGER IBASE, I, ID, IER, IFAIL, IFAIL2,
+      INTEGER IBASE, I, ID, IFAIL, IFAIL2,
      :    IS, IWPT, IX, IY, MD, NDEG, NOFF
       INTEGER PTRS(MAXSPEC)
       REAL C(MAXDEG+1)

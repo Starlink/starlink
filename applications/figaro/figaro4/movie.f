@@ -177,7 +177,6 @@
 
 *  Local variables:
       LOGICAL DONE               ! Loop control
-      REAL X, Y                  ! Unused PGCURS position
       CHARACTER * ( 1 ) DIALOG   ! DIALOG parameter
       CHARACTER * ( 1 ) MENU     ! Menu option
 

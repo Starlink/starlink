@@ -61,7 +61,6 @@ C+
 C
 C     Functions
 C
-      INTEGER ICH_ENCODE
       LOGICAL FIG_WCHECK
 C
 C     Local variables
@@ -75,12 +74,10 @@ C
       REAL      ENDS(4)          ! End values
       LOGICAL   FAULT            ! True if non-DSA fault occurs
       INTEGER   I                ! Loop variable
-      INTEGER   INVOKE           ! Used to format messages to user
       INTEGER   NCITEMS          ! Number of axis character items 
                                  ! retrieved
       INTEGER   NDIM             ! Number of dimensions
       INTEGER   NELM             ! Number of elements in image - ignored
-      INTEGER   NEXT             ! Used to format messages to user
       DOUBLE PRECISION NITEMS(1) ! Axis numeric items retrieved
       INTEGER   NNITEMS          ! Number of axis numeric items 
                                  ! retrieved
@@ -98,7 +95,6 @@ C
       INTEGER   SPIXPR           ! Dynamic-memory pointer for spiketrum
                                  ! axis data
       INTEGER   STATUS           ! Running status for DSA routines
-      CHARACTER STRING*64        ! Used to format messages to user
       LOGICAL   TABLED           ! True if table structure is found
       REAL      TIME             ! Exposure time
       INTEGER   TXPTR            ! Dynamic-memory pointer for workspace

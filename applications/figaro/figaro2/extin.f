@@ -39,39 +39,27 @@ C+
 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
-C     Functions used 
-C
-      INTEGER ICH_LEN,ICH_ENCODE
-C
 C     Local variables
 C
       REAL      AIRM             ! The air mass
-      REAL      BSECZ            !
       INTEGER   CPTR             ! Dynamic-memory pointer to coefficient
                                  ! array
       INTEGER   CSLOT            ! Map slot number of input coefficient 
                                  ! array
       INTEGER   DIMS(10)         ! Sizes of dimensions of data
       CHARACTER DUMMY*1          ! Dummy arguement for DATA_INFO routine
-      INTEGER   I                !
-      INTEGER   IGNORE           ! Used to ignore status errors
-      INTEGER   INVOKE           ! Used to invoke function calls
       LOGICAL   ISNEW            ! Is address new to CNF?
       INTEGER   IY               !
       LOGICAL   MAGS             !
       INTEGER   NDIM             ! Number of dimensions in data
-      INTEGER   NCELM            ! Total number of elements in 
-                                 ! coefficient array
       INTEGER   NELM             ! Total number of elements in data 
                                  ! array
-      INTEGER   NEXT             !
       INTEGER   NX               ! Size of 1st dimension
       INTEGER   NY               ! Size of 2nd dimension
       INTEGER   OPTR             ! Dynamic-memory pointer to output data
                                  ! array
       INTEGER   OSLOT            ! Map slot number output data array
       LOGICAL   PISNEW           ! Previous CNF pointer new?
-      REAL      SSECZ            !
       INTEGER   STATUS           ! Running status for DSA_ routines
       INTEGER   TPTR             ! Temp dynamic-memory pointer
       DOUBLE PRECISION  VALUE    ! Magnitude flag

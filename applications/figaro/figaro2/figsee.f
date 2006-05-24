@@ -38,7 +38,7 @@ C+
 C
 C     Functions used
 C
-      INTEGER ICH_ENCODE, ICH_LEN
+      INTEGER ICH_ENCODE
 C
 C     Number of FIGS detectors
 C
@@ -56,7 +56,6 @@ C
       INTEGER  J                 !
       INTEGER  NDIM              ! Number of dimensions in data
       INTEGER  NDET              ! The number of detectors to be used
-      INTEGER  NELM              ! Total number of elements in data
       INTEGER  NEXT              !
       INTEGER  NX                ! Size of 1st dimension
       INTEGER  OPTR              ! Dynamic-memory pointer to output data

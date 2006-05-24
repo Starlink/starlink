@@ -44,11 +44,9 @@ C
 C
 C     Local variables
 C
-      CHARACTER    COMMAND*64    ! The actual Figaro command entered
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
       DOUBLE PRECISION DUMMY     ! Dummy argument
       LOGICAL      FAULT         ! Set if a non-DSA error is deteccted
-      LOGICAL      FLCO          ! TRUE if the Figaro command was FLCONV
       INTEGER      I             ! General loop variable
       INTEGER      IGNORE        ! Used to pass ignorable status
       INTEGER      INTYPE        ! Type of input units, used to index
@@ -67,7 +65,6 @@ C
                                  ! units
       CHARACTER    UNITAB(5)*14  ! The names of the different units
       CHARACTER    UNITS*64      ! The units of the data
-      INTEGER      VAR           ! Flags a variance array 
       LOGICAL      VEXIST        ! TRUE if a variance array exists   
       INTEGER      VPTR          ! Dynamic-memory pointer to input 
                                  ! variance array 
@@ -487,9 +484,9 @@ C
 C
 C     Local variables
 C
-      INTEGER IELM, IWPTR, IGNORE
+      INTEGER IELM, IWPTR
       REAL    AMAX, FLAG, FMIN, SCALE, SCALES(5)
-      DOUBLE PRECISION F_NU, FACTOR, TEMP
+      DOUBLE PRECISION F_NU, TEMP
 C
       DATA SCALES/1000.,1.0,0.001,1.0,1.0/
       DATA FLAG,FMIN/10000.0,-1.7E38/

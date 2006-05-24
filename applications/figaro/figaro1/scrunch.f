@@ -186,7 +186,6 @@ C
       INTEGER   STATUS           ! Running status for DSA_ routines
       CHARACTER STRING*72        ! Used to format strings
       INTEGER   TPTR             ! Temporary pointer
-      CHARACTER TYPE*16          ! Data type
       REAL      VALUE            ! Value of some real parameters
       REAL      WEND             ! End wavelength
       REAL      WSTART           ! Start wavelength

@@ -143,8 +143,8 @@
       integer iwork
       integer status
       integer start,stop
-      integer ref,iopt,slot,slot2,slot2a,slot3,slot3a,slot3b
-      integer pstat,tst,tend
+      integer ref,iopt,slot2,slot2a,slot3,slot3a,slot3b
+      integer pstat,tst
       integer iwork1,iwork2,iwork3,get_parnum,ival1,ival2
       integer iter4
 

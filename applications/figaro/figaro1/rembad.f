@@ -73,7 +73,6 @@ C
       INTEGER   OXPTR            ! Temporary X pointer
       INTEGER   OSLOT            ! Temporary slot
       INTEGER   QPTR             ! Dynamic-memory pointer to quality
-      INTEGER   QSLOT            ! Map slot used for quality
       INTEGER   STATUS           ! Status return from DSA_ routines
       CHARACTER*80 STRING        ! To print message at end of programme
       INTEGER   XPTR             ! Dynamic-memory pointer to X-axis data

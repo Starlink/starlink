@@ -147,8 +147,6 @@ C
       REAL      SIZE             ! Length of array undergoing peak
                                  ! fitting
       INTEGER   SLOT             ! Slot number for mapped data - ignored
-      INTEGER   SPTR             ! Dynamic-memory pointer for spectrum
-                                 ! data
       INTEGER   STATUS           ! Running status for DSA routines
       CHARACTER STRING*64        ! Used to format user messages
       REAL      SUMSH            ! Shift sum

@@ -60,8 +60,6 @@ C
                                  ! string
       INTEGER  ICH_LEN           ! Position of last non-blank char in
                                  ! string
-      INTEGER ICH_ENCODE
-      INTEGER DSA_TYPESIZE
 C
 C     Local variables
 C
@@ -78,9 +76,9 @@ C
       LOGICAL CHANGE
       LOGICAL FAULT, SPACED
       INTEGER DIMS0(10),I
-      INTEGER IDIM, INVOKE, IIPTR, NDIM0, IGNORE, IERR, NBAD
+      INTEGER IIPTR, NDIM0, IGNORE, IERR, NBAD
       INTEGER  NELM0, NPTR
-      CHARACTER STRING*80, STRUCT*5, TYPE*10
+      CHARACTER STRING*80
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C

@@ -53,20 +53,13 @@ C
       INTEGER MAXDP1
       PARAMETER (MAXDP1=21)
 C
-C     Functions
-C
-      INTEGER DSA_TYPESIZE
-C
 C     Local variables
 C
-      INTEGER      BYTES         ! Number of bytes of workspace required
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
       INTEGER      DXPTR         ! Dynamic-memory pointer to workspace
       INTEGER      DYPTR         ! Dynamic-memory pointer to workspace
-      INTEGER      IGNORE        ! Used to pass ignorable status
       LOGICAL      LOGS          ! See above
       INTEGER      NDIM          ! Number of dimensions in data
-      INTEGER      NELM          ! Total number of elements in data
       INTEGER      NX            ! Size of 1st dimension
       INTEGER      OPTR          ! Dynamic-memory pointer to output data
                                  ! array
@@ -201,7 +194,7 @@ C
 C
 C     Local variables
 C
-      INTEGER DEGP1,I,ID,IER,IFAIL,IFAIL2,IOPT,NDEG,NPT
+      INTEGER DEGP1,I,IFAIL,IFAIL2,NDEG
       DOUBLE PRECISION XVAL,EPS
 C     
 C     Check value of ORDER

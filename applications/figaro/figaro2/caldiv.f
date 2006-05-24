@@ -57,8 +57,6 @@ C
 C     Local variables
 C
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
-      INTEGER      DPTR          ! Dynamic-memory pointer to data array
-      INTEGER      DSLOT         ! Map slot number of input data array
       CHARACTER    DUMMY*1       ! Dummy string arguement
       INTEGER      IGNORE        ! Used to pass ignorable status
       INTEGER      INVOKE        ! Used to invoke functions

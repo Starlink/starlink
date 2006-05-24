@@ -84,7 +84,7 @@ C+
 C
 C     Functions used
 C
-      INTEGER ICH_ENCODE, ICH_LEN
+      INTEGER ICH_LEN
       INTEGER DSA_TYPESIZE
       LOGICAL PAR_BATCH
       LOGICAL PAR_ABORT          ! (F)PAR abort flag
@@ -96,10 +96,8 @@ C
       INTEGER      DPTR          ! Dynamic-memory pointer to detector
                                  ! numbers
       INTEGER      EPTR          ! Dynamic-memory pointer to error array
-      CHARACTER*80 ERR           ! Error string
       CHARACTER*132 SPECTRUM     ! The input spectrum name
       CHARACTER*132 OUTPUT       ! The output spectrum name
-      INTEGER      I             !
       INTEGER      IGNORE        ! Used to pass ignorable status
       INTEGER      NDIM          ! Number of dimensions in data
       INTEGER      IXST          ! Start pixel for flatfielding
@@ -107,7 +105,6 @@ C
       INTEGER      LEN           ! Length of PIXNAME
       LOGICAL      MORE          ! TRUE if more ranges
       INTEGER      ND            ! Number of pixels
-      INTEGER      NELM          ! Total number of elements in data
       INTEGER      NPTR          ! Dynamic-memory pointer to NUM array
       INTEGER      NS            ! Number of scan positions
       INTEGER      NX            ! Size of 1st dimension
@@ -123,7 +120,6 @@ C
       INTEGER      SPTR          ! Dynamic-memory pointer to scan 
                                  ! positions
       INTEGER      STATUS        ! Running status for DSA_ routines
-      CHARACTER*80 STRING        ! Output string
       INTEGER      SUMPTR        ! Dynamic-memory pointer to SUM array
       INTEGER      UPTR          ! Dynamic-memory pointer to USES array
       REAL         XS            ! Starting X value

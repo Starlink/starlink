@@ -65,7 +65,6 @@ C+
 C
 C     Functions
 C
-      LOGICAL DSA_SAME_DATA
       LOGICAL PAR_ABORT    ! (F)PAR abort flag
 C
 C     Local variables

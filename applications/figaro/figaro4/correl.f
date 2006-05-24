@@ -99,9 +99,6 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References:
-      INTEGER CHR_LEN
-
 *  Local Variables:
       LOGICAL INFO
       LOGICAL VARUSE
@@ -121,8 +118,6 @@
       INTEGER DIM( NDF__MXDIM, 3 ) ! NDF dimensions
       INTEGER DPTR( 3 )          ! Data pointers
       INTEGER VPTR( 3 )          ! Variance pointers
-      CHARACTER * ( 6 ) DEVICE, DIRN, ACCESS ! Unused strings
-      CHARACTER * ( 64 ) NAME, SLICE ! Components of the input NDF name
       CHARACTER * ( 64 ) IN( 3 ) ! Names of the input NDF sections
       CHARACTER * ( 255 ) NDFNAM( 1 ) ! Name of current NDF
       INTEGER NS

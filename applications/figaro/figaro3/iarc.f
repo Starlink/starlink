@@ -204,8 +204,7 @@ C
       INTEGER   ORDER            !
       REAL      RMS              !
       REAL      RMSMAX           !
-      REAL      RSIGMA           ! See above
-      INTEGER   SCRPTR           ! Dynamic-memory pointer to workspace
+       INTEGER   SCRPTR           ! Dynamic-memory pointer to workspace
       REAL      SIGMA            !
       REAL      SIGMIN           !
       INTEGER   SPBYTES          ! Bytes in a single spectrum
@@ -1306,7 +1305,7 @@ C
 C
 C     Functions
 C
-      INTEGER ICH_LEN, ICH_ENCODE
+      INTEGER ICH_ENCODE
 C
 C     Local variables
 C

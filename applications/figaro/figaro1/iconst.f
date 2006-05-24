@@ -69,7 +69,6 @@ C+
 C
 C     Functions
 C
-      INTEGER ICH_LEN
       LOGICAL PAR_ABORT
 C
 C     Local variables
@@ -81,7 +80,6 @@ C
       REAL      FACTOR      ! The factor used to operate on the data
       REAL      FBAD        ! Flag value for 'FLOAT' data
       LOGICAL   FLAGS       ! True if image has flagged data values
-      INTEGER   INELM       ! Dynamic memory pointer to input data
       INTEGER   NDIM        ! The number of dimensions in the data
       INTEGER   NELM        ! The total number of elements in the data
       INTEGER   OUTELM      ! Dynamic memory pointer to output data

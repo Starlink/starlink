@@ -87,8 +87,8 @@ C+
 C
 C     Functions
 C
-      LOGICAL PAR_ABORT,PAR_BATCH,PAR_GIVEN
-      INTEGER GEN_BSEARCH,ICH_CLEAN,ICH_FOLD,ICH_LEN,ICH_KEY,PGBEGIN
+      LOGICAL PAR_ABORT
+      INTEGER PGBEGIN
       REAL GEN_ELEMF
 C
 C     Real variable plot value limits - keeps plot range within
@@ -105,11 +105,9 @@ C
 C     Local variables
 C
       LOGICAL   AUTOSC           ! TRUE if AUTOSCALE is specified
-      LOGICAL   AXES             ! TRUE if axes are to be drawn
       REAL      BIAS             ! Value of bias parameter
       CHARACTER COMMAND*96       ! The Figaro command passed
       CHARACTER DEVICE*32        ! PGPLOT device specification
-      INTEGER   DDIMS(10)        ! Sizes of the dimensions of the data
       CHARACTER DLAB*64          ! Plot data axis label
       CHARACTER DLABEL*32        ! Structure data axis label
       INTEGER   DPTR             ! Dynamic-memory pointer to data array
@@ -119,18 +117,13 @@ C
       CHARACTER DUNITS*32        ! Structure data axis units
       INTEGER   EPTR             ! Dynamic-memory pointer to error array
       LOGICAL   EREXIST          ! TRUE if the error array exists
-      CHARACTER ERROR*64         ! Error messages
       LOGICAL   ERRPLT           ! TRUE if the command is ELSPLOT
       INTEGER   ESLOT            ! Map slot number used for error
       LOGICAL   FAULT            ! TRUE if plotting terminates early
-      LOGICAL   HARDCOPY         ! TRUE if hardcopy is specified
       REAL      HIGH             ! Maximum Y-value for a plot
-      INTEGER   I                ! Loop index
       INTEGER   IGNORE           ! Used to ignore status codes
-      INTEGER   INVOKE           ! Used to invoke functions
       INTEGER   IXEN             ! Last element to be plotted in x-axis
       INTEGER   IXST             ! First element to be plotted in x-axis
-      CHARACTER LABEL*64         ! The label for the plot
       LOGICAL   LINES            ! Value of keyword LINES
       REAL      LOW              ! Minimum Y-value for a plot
       DOUBLE PRECISION MAGNITUDE ! Flag TRUE if data in magnitudes
@@ -138,7 +131,6 @@ C
                                  ! structure
       INTEGER   NDELM            ! Total number of elements in the data
       INTEGER   NX               ! X-dimension of data
-      INTEGER   NXELM            ! Total number of elements in x-axis
       CHARACTER PLAB*64          ! Label for plot
       LOGICAL   PLOPEN           ! Indicates plotting device open
       INTEGER   STATUS           ! Status return from DSA_xxx routines
@@ -161,9 +153,7 @@ C
       REAL      Y1               ! Position of bottom axis
       REAL      Y2               ! Position of top axis
       REAL      YM               ! Y size in meters
-      INTEGER   YPTR             ! Dynamic-memory pointer to y-axis data
       REAL      YSIZE            ! Physical width of plot, in metres
-      INTEGER   YSLOT            ! Map slot number used for y-axis info
 C
 C     Initialisation of DSA_ routines
 C
@@ -397,14 +387,6 @@ C
       INTEGER IXST,IXEN,NX,STATUS
       REAL XVALS(NX),ZVALS(NX),HIGH,LOW,XVST,XVEN
       CHARACTER*(*) XLAB,ZLAB,PLAB
-C
-C     Functions
-C
-      INTEGER ICH_LEN
-C
-C     Local variables
-C
-      INTEGER LENGTH
 C
 C     Make the plot
 C

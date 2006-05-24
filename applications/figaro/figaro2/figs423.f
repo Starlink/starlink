@@ -51,7 +51,6 @@ C     Local variables
 C
       CHARACTER COMENT*16        ! Comment associated with FITS items
       INTEGER   CUPTR            ! Dynamic-memory pointer for HCUBE data
-      INTEGER   CYCLES           ! No. of cycles to be used
       INTEGER   DIMS(10)         ! Image dimensions
       LOGICAL   EXIST            ! True if axis structure exists
       LOGICAL   FAULT            ! True if non-DSA problem occurs

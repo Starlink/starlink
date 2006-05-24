@@ -105,9 +105,6 @@ C     Local variables.  FT = Fourier transform
 C
       INTEGER   AR0PTR           ! Pointer to the first data array
       INTEGER   AR1PTR           ! Pointer to the second data array
-      INTEGER   ARRAY0           ! Pointer to workspace for SPECT data
-      INTEGER   ARRAY1           ! Pointer to workspace for TEMPLATE
-                                 ! data
       INTEGER   BDOUB            ! Number of bytes per double-prec.
                                  ! number
       INTEGER   BFLOAT           ! Number of bytes per floating-point
@@ -119,20 +116,15 @@ C
       REAL      CBPC             ! Cosine bell percentage coverage
       LOGICAL   CFIT             ! If false, disables the usual 
                                  ! continuum fit
-      INTEGER   CFN              ! Pointer to the correlation function 
-                                 ! array
       INTEGER   CFNPTR           ! Pointer to the correlation function
       INTEGER   CPTR             ! Dynamic memory pointer to CORRL data
       INTEGER   DIMS(1)          ! Accommodates data dimensions
-      INTEGER   FT0              ! Pointer to FT of SPECT data
       INTEGER   FT0PTR           ! Pointer to the transform of first 
                                  ! data array
-      INTEGER   FT1              ! Pointer to FT of TEMPLATE data
       INTEGER   FT1PTR           ! Pointer to the transform of
                                  ! second data array
       INTEGER   FTCPTR           ! Pointer to the transform of
                                  ! correlation
-      INTEGER   FTFCN            ! Pointer to FT of CORRL data
       INTEGER   IGNORE           ! Status for VAR_SETNUM and PAR_WRUSER
                                  ! calls
       LOGICAL   ISNEW            ! Is address new to CNF?
@@ -164,8 +156,6 @@ C
       INTEGER   WPTR             ! Temporary pointer
       REAL      XEND             ! Last axis data value used
       REAL      XSTART           ! First axis data value used 
-      INTEGER   XV               ! Pointer to array holding spectra 
-                                 ! pixel values
       REAL      ZPC              ! Percentage of spectrum covered at 
                                  ! each end by a cosine bell prior to
                                  ! fourier transformation

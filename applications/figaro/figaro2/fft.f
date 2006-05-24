@@ -116,8 +116,6 @@ C
                                  ! appropriate to N
       CHARACTER ICH_CI*12        ! Return an integer as a 
                                  ! character string
-      INTEGER ICH_CLEAN          ! Clip a string at first non-printing 
-                                 ! character
       INTEGER  ICH_LEN           ! Position of last non-blank char in
                                  ! string
       INTEGER  DSA_TYPESIZE      ! Returns byte size of data type  
@@ -131,20 +129,16 @@ C
       INTEGER   IPTR             ! Dynamic-memory pointer for image data
       INTEGER   NDIM             ! Number of image dimensions
       INTEGER   NELM             ! Number of elements in image - ignored
-      INTEGER   NX               ! First dimension of image
-      INTEGER   NY               ! Second dimension of image
       INTEGER   SLOT             ! Slot number for mapped data - ignored
-      INTEGER   SPTR             ! Dynamic-memory pointer for spectrum 
-                                 ! data
       INTEGER   STATUS           ! Running status for DSA routines
 
-      LOGICAL CHANGE, FAULT, FORWARD, IMAP
+      LOGICAL CHANGE, FAULT, FORWARD
       LOGICAL RFLAG
-      INTEGER DIMS2(10), DPTR, I, IDIM
-      INTEGER MAXDIM, NDIM2, NEXT
+      INTEGER DPTR, I
+      INTEGER MAXDIM, NEXT
       INTEGER NPTR, NWORK, PREV, ROTS(10), FSTAT, WPTR
-      CHARACTER AXIS*7, COMMAND*8
-      CHARACTER STRING*80, TYPE*16
+      CHARACTER COMMAND*8
+      CHARACTER STRING*80
 C
 C     Parameters controlling the way DSA_OUTPUT opens the spectrum file
 C

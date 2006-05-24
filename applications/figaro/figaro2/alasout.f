@@ -61,14 +61,13 @@ C+
 C
 C     Functions
 C
-      INTEGER ICH_LEN,DSA_TYPESIZE
+      INTEGER ICH_LEN
       REAL GEN_ELEMF
       LOGICAL PAR_ABORT          ! (F)PAR abort flag
 C
 C     Local variables
 C
       CHARACTER    ALAS*132      ! The filename for the output
-      INTEGER      BYTES         ! Size of the specified range in bytes
       REAL         D             ! Data value from the main input array
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
       INTEGER      DPTR          ! Dynamic-memory pointer to data array

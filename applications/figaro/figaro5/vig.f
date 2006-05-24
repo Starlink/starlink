@@ -159,17 +159,9 @@
 
       integer ptr1,ptr2,ptr3,ptr4,ptr5
 
-* amount of work space to grab
-
-      integer nels
-
 * FIGARO handles to VM
 
       integer slot,slot1,slot2,slot3,slot4,slot5,slot6,slot7
-
-* bytes required for r*8 array length nl
-
-      integer enl
 
 * bytes required for r*8 array length ni
 

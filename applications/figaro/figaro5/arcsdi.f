@@ -144,14 +144,13 @@
       integer isfail
       integer ixend
       integer ixstart
-      integer sptr
 
       integer workptr,slot,slot1,slot2,slot3,slot4,slot5,slot6,slot7
       integer slot8,slot9,slot10,slot11,slot12,slot13
       logical nocube
       logical new
       logical plotcorr
-      integer nbytes,ptr1,ptr2,ptr3,ptr4,ptr5,ptr6,ptr7,ptr8,ptr9,ptr10
+      integer ptr1,ptr2,ptr3,ptr4,ptr5,ptr6,ptr7,ptr8,ptr9,ptr10
       integer ptr11,aaptr
       logical par_given
       integer lu

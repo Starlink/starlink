@@ -75,8 +75,8 @@ C+
 C
 C     Functions
 C
-      LOGICAL PAR_ABORT, PAR_GIVEN 
-      INTEGER ICH_CLEAN, ICH_FOLD, ICH_KEY, ICH_LEN
+      LOGICAL PAR_ABORT
+      INTEGER ICH_CLEAN, ICH_FOLD, ICH_KEY
       REAL GEN_ELEMF
 C
 C     Floating point limits
@@ -412,7 +412,7 @@ C
       LOGICAL MORE,PQUEST
       INTEGER ISPECT,IPXST,IPXEN
       REAL HIGH,LOW,XPVST,XPVEN,TEMP
-      CHARACTER CHARS*64,TYPE*16
+      CHARACTER TYPE*16
 C
 C     If same scale is to be used for all, then work out the values now.
 C     

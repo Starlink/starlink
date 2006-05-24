@@ -43,7 +43,6 @@ C     Local variables
 C
 C
       INTEGER      DIMS(10)      ! Sizes of dimensions of data
-      INTEGER      IGNORE        ! Used to ignore status errors
       INTEGER      NDIM          ! Number of dimensions in data
       INTEGER      NELM          ! Total number of elements in data
       INTEGER      NX            ! Size of first image dimension

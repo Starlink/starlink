@@ -40,13 +40,8 @@ C+
 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 C
-C     Functions
-C
-      INTEGER ICH_LEN
-C
 C     Local variables
 C
-      CHARACTER*64 COMMAND       ! The actual FIGARO command requested
       INTEGER      DIMS(10)      ! The sizes of the data's dimensions
       REAL         HIGHFAC       ! UPPER factor used to operate on the 
                                  ! data

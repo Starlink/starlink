@@ -105,7 +105,6 @@ C
       INTEGER   APTR             ! Dynamic-memory pointer for axis data
       INTEGER   BDOUBP           ! Number of bytes per item of type
                                  ! 'DOUBLE'
-      INTEGER   BYTES            ! Bytes required for an array
       LOGICAL   CHANGE           ! True if change of shape is required
       INTEGER   COPYDATA         ! Indicates data arrays to be copied to
                                  ! new file
@@ -136,8 +135,6 @@ C
       INTEGER   SLOT             ! Slot number for mapped data - ignored
       INTEGER   SLOT1            ! Slot number for mapped data - ignored
       LOGICAL   SPACED           ! Used to format user messages
-      INTEGER   SPTR             ! Dynamic-memory pointer for spectrum
-                                 ! data
       INTEGER   STATUS           ! Running status for DSA routines
       CHARACTER STRING*80        ! Used to format user messages
       REAL      VEND             ! First data element in an axis array

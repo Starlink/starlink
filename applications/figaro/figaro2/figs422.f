@@ -76,20 +76,11 @@ C
 C
 C     Local variables
 C
-      INTEGER   BFLOAT           ! Number of bytes per item of type
-                                 ! 'FLOAT'
       INTEGER   BYTES            ! Bytes required for an array
       CHARACTER COMENT*32
-      CHARACTER CITEMS(2)*32     ! Axis character items retrieved
       INTEGER   FSTAT            ! Status for FIG routines
       INTEGER   HXPTR            ! Dynamic memory element for axis data
-      INTEGER   NCITEMS          ! Number of axis character items
-                                 ! retrieved
-      DOUBLE PRECISION NITEMS(1) ! Axis numeric items retrieved
-      INTEGER   NNITEMS          ! Number of axis numeric items
-                                 ! retrieved
       INTEGER   DIMS(10)         ! Image dimensions
-      INTEGER   IPTR             ! Dynamic memory element for image data
       INTEGER   NDIM             ! Number of image dimensions
       INTEGER   NELM             ! Number of elements in image - ignored
       INTEGER   NX               ! First dimension of image
@@ -106,10 +97,10 @@ C     Local variables
 C
       LOGICAL FAULT, REPEAT
       LOGICAL SELECT(416), SPLIT
-      INTEGER CUPTR, CY1, CY2, CYCLES, ICYEN, ICYST
-      INTEGER INVOKE, IST, IPOS, IX, LENGTH, MODE
-      INTEGER NEXT, NMSTAT,  OLEN, OPTR, OULEN, PLANES
-      INTEGER SFLAG, SWPERC, VECTOR(416)
+      INTEGER CUPTR, CY1, CY2, ICYEN, ICYST
+      INTEGER INVOKE, IX, LENGTH, MODE
+      INTEGER NEXT, OLEN, OPTR, OULEN, PLANES
+      INTEGER SFLAG, VECTOR(416)
       REAL DETSP, GRATORD, GRATS, GRATSP, GRT0ORD
       REAL GRTA2S, GRTPCH, STEP, WAVES(416), XEND, XMAX, XMIN, XSTART
       REAL VALUE

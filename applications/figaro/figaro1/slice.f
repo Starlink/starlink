@@ -63,7 +63,6 @@ C
 C
 C     Local variables
 C
-      INTEGER   ADDRESS          ! Address of dynamic memory element
       CHARACTER CITEMS(2)*32     ! Axis character items retrieved
       INTEGER   DIMS(2)          ! Dimensions of an array
       REAL      ENDS(4)          ! The ends of the slice

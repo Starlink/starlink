@@ -153,8 +153,7 @@
       integer isfail
       integer ixend
       integer ixstart
-      integer bytes2,nels,lu
-      integer sptr
+      integer lu
 
       integer ptr0,ptr1,ptr2,ptr3,ptr4,ptr5,ptr6,ptr7,ptr8,ptr9,ptr10
       integer ptr11

@@ -42,14 +42,13 @@ C+
 C
 C     Functions
 C
-      INTEGER ICH_ENCODE, ICH_LEN
+      INTEGER ICH_ENCODE
 C
 C     Local variables
 C
       INTEGER   DIMS(10)         ! Sizes of the dimensions of the data
       INTEGER   DPTR             ! Dynamic-memory pointer to data array
       INTEGER   DSLOT            ! Map slot number used for data
-      REAL      DUMMY            ! REAL dummy arguement
       INTEGER   IGNORE           ! Used to ignore status codes
       INTEGER   INVOKE           ! Used to invoke functions
       INTEGER   NDIM             ! Dimensionality of input data
@@ -61,7 +60,6 @@ C
                                  ! pixel
       INTEGER   STATUS           ! Status return from DSA_xxx routines
       CHARACTER STRING*80        ! Output message string
-      REAL      VALUE            ! Temporary REAL
       REAL      WIDTH            ! Width of highest peak
 C
 C     Initialisation of DSA_ routines

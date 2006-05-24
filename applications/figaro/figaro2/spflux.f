@@ -40,7 +40,7 @@ C+
 C
 C     Functions used 
 C
-      LOGICAL FIG_SCRCHK, FIG_WCHECK
+      LOGICAL FIG_SCRCHK
 C
 C     Local variables
 C

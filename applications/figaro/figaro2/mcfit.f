@@ -48,7 +48,7 @@ C+
 C
 C     Functions used 
 C
-      INTEGER DSA_TYPESIZE,ICH_ENCODE,ICH_LEN
+      INTEGER ICH_ENCODE,ICH_LEN
 C
 C     Maximum number of points to be used
 C
@@ -57,7 +57,6 @@ C
 C
 C     Local variables
 C
-      INTEGER      BYTES         ! Number of bytes of workspace required
       INTEGER      DIMS(2)       ! Sizes of dimensions of data
       DOUBLE PRECISION DUMMY     ! Dummy numeric value for data info
       INTEGER      IAX           ! Index through axes
@@ -251,7 +250,7 @@ C
 C
 C     Local variables
 C
-      INTEGER CPTR, I, IER, IFAIL, IFAIL2, INVB,
+      INTEGER CPTR, I, IFAIL, IFAIL2, INVB,
      :   INCR, IPT, IX, IXEN, IXST, IXV, NDEG
       INTEGER KPTR, NPTS, STATUS, WPTR
       REAL    TOTAL, XTOTAL

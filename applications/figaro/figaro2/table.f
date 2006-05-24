@@ -87,8 +87,6 @@ C
 C
         LOGICAL         MEMOPN, LISOPN, PRINT, DELETE, FAULT
 C
-        REAL            RLVAL
-C
 C
 C=======================================================================
 C

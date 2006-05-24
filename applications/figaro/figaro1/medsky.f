@@ -151,7 +151,6 @@ C
       CHARACTER NAME *32         ! Full name of log file - ignored
       INTEGER   NDIM             ! Number of dimensions in data
       INTEGER   NELM             ! Total number of elements in data
-      CHARACTER NEXT*132         ! Reference name of current image
       INTEGER   NFB              ! The number of bytes in a 'FLOAT'
       INTEGER   NFILE            ! Number of images in the input file
       INTEGER   NPIX             ! Number of pixels in the current batch

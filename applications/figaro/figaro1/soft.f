@@ -71,7 +71,6 @@ C
       CHARACTER DEVICE*7           ! Device parameter name
       LOGICAL   DRAW               ! Setting of DRAW keyword
       LOGICAL   DRAWDEF            ! Default setting for DRAW keyword
-      CHARACTER ERROR*80           ! Used for error text
       LOGICAL   FAULT              ! Indicates an error
       LOGICAL   FORCE              ! Setting of FORCE keyword
       CHARACTER GNSDEV*64          ! Device name from GNS list

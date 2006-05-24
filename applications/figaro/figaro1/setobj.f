@@ -96,7 +96,6 @@
 
 *  Local Variables:
       CHARACTER * ( 132 ) CVALUE
-      INTEGER I                  ! Loop variable
       CHARACTER * ( 64 ) MESSAG  ! Error message
       CHARACTER * ( DAT__SZLOC ) LOC ! HDS locator
 

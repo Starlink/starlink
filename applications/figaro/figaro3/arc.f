@@ -230,7 +230,6 @@ C
       INTEGER   DPTR             ! Dynamic-memory pointer to input data
       INTEGER   DSLOT            ! Map slot number of input data
       DOUBLE PRECISION DUMMY     ! Dummy arguement for magnitude flag
-      CHARACTER ERROR*64         ! Error message text
       CHARACTER FILE*132         ! Full name of arc spectrum file
       LOGICAL   FITTED           ! Set once wavelength fit is obtained
       INTEGER   FLOAT_SIZ        ! Size in bytes of a Figaro FLOAT
@@ -239,17 +238,12 @@ C
       LOGICAL   HARD             ! True if the arc is to be hard plotted
       REAL      HIGH             ! Maximum data-value for a plot
       LOGICAL   HPLOT            ! TRUE if hard plot is requested
-      INTEGER   IDUMMY           ! Integer dummy arguement
       INTEGER   IGNORE           ! Used to ignore status codes
       INTEGER   INVOKE           ! Used to invoke functions
       INTEGER   IOUT             ! Logical unit for output
       INTEGER   ISTAT            ! Status returned by ARGETL
-      INTEGER   ITEMP            ! Temporary integer storage
-      INTEGER   IVALUE           ! Dummy integer argument
       INTEGER   IXEN             ! Last element to be plotted in x-axis
       INTEGER   IXST             ! First element to be plotted in x-axis
-      INTEGER   IYEN             ! Last element to be plotted in y-axis
-      INTEGER   IYST             ! First element to be plotted in y-axis
       REAL      LOW              ! Minimum data-value for a plot
       LOGICAL   MICRONS          ! Wavelengths seem to be in microns?
       INTEGER   NCENT            ! Central pixel number
@@ -298,8 +292,6 @@ C
       INTEGER   XSLOT            ! Map slot number used for x-axis info
       LOGICAL   XS               ! Indicates lines to be shown using 
                                  ! 'X's.
-      REAL      XVEN             ! Last X-axis value to be plotted
-      REAL      XVST             ! First X-axis value to be plotted
 C
 C     Initialisation of DSA_ routines
 C

@@ -185,8 +185,6 @@ C
       REAL      RESET            ! Reset value for real parameter
       LOGICAL   SCRUNI           ! True if Figaro command is ISCRUNI
       INTEGER   SLOT             ! Slot number for mapped data - ignored
-      INTEGER   SPTR             ! Dynamic-memory pointer for spectrum
-                                 ! data
       REAL      SSKEW            ! No. of bins the input array is to be
                                  ! shifted 
       INTEGER   STATUS           ! Running status for DSA routines
