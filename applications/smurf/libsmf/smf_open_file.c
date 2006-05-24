@@ -88,6 +88,8 @@
 *        Change msgOut to msgOutif
 *     2006-05-19 (EC):
 *        Map Q&V if not present before when mode is WRITE
+*     2006-05-24 (AGG):
+*        Add status check in case SCANFIT extension doesn't exist
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -227,7 +229,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
     if ( *status == SAI__OK) {
       *status = SAI__ERROR;
       msgSeti( "NDIMS", ndims);
-      errRep( "smf_open_file", "Number of dimensions in output, ^NDIMS, is not equal to 2 or 3",status);
+      errRep( FUNC_NAME, "Number of dimensions in output, ^NDIMS, is not equal to 2 or 3",status);
     }
   }
 
@@ -258,28 +260,32 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	}
 	ndfOpen( ploc, "SCANFIT", "READ", "OLD", &pndf, &place, status );
 	/* Check status here in case not able to open NDF */
-	if ( pndf == NDF__NOID ) {
-	  if ( *status == SAI__OK ) {
+	if ( *status == SAI__OK ) {
+	  if ( pndf == NDF__NOID ) {
 	    *status = SAI__ERROR;
 	    errRep(FUNC_NAME, "Unable to obtain an NDF identifier for the SCANFIT coefficients", status);
 	  }
+
+	  /* Read and store the polynomial coefficients */
+	  ndfMap( pndf, "DATA", "_DOUBLE", "READ", &poly, &npoly, status );
+	  ndfDim( pndf, NDF__MXDIM, pdims, &npdims, status );
+	  (*data)->ncoeff = pdims[2];
+	  /* Allocate memory for poly coeffs & copy over */
+	  opoly = smf_malloc( npoly, sizeof( double ), 0, status);
+	  memcpy( opoly, poly, npoly*sizeof( double ) );
+	  (*data)->poly = opoly;
+
+	  /* Release these resources immediately as they're not needed */
+	  ndfAnnul( &pndf, status );
+	  datAnnul( &ploc, status );
+	} else {
+	  errAnnul(status);
+	  msgOutif(MSG__VERB, FUNC_NAME, 
+		   "SCU2RED exists, but not SCANFIT: we probably have STARE or DREAM data", status);
 	}
-
-	/* Read and store the polynomial coefficients */
-	ndfMap( pndf, "DATA", "_DOUBLE", "READ", &poly, &npoly, status );
-	ndfDim( pndf, NDF__MXDIM, pdims, &npdims, status );
-	(*data)->ncoeff = pdims[2];
-	/* Allocate memory for poly coeffs & copy over */
-	opoly = smf_malloc( npoly, sizeof( double ), 0, status);
-	memcpy( opoly, poly, npoly*sizeof( double ) );
-	(*data)->poly = opoly;
-
-	/* Release these resources immediately as they're not needed */
-	ndfAnnul( &pndf, status );
-	datAnnul( &ploc, status );
       } else {
 	msgOutif(MSG__VERB, FUNC_NAME, 
-		 "Warning: no SCU2RED extension. Continuing anyway.", status);
+		 "File has no SCU2RED extension. Thought you'd like to know...", status);
       }
     }
 
