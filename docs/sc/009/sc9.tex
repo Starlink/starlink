@@ -1,12 +1,21 @@
-\documentclass[11pt,twoside]{article}
-\usepackage{graphicx}
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
+% Fixed part
 \newcommand{\stardoccategory}  {Starlink Cookbook}
 \newcommand{\stardocinitials}  {SC}
 \newcommand{\stardocsource}    {sc\stardocnumber}
+\newcommand{\stardoccopyright} 
+{Copyright \copyright\ 1997 Council for the Central Laboratory of the Research C
+ouncils}
 \newcommand{\stardocnumber}    {9.1}
 \newcommand{\stardocauthors}   {M D Lawden\\
                                 Anne Charles}
@@ -17,6 +26,31 @@
 get to know how to use \LaTeX\ effectively.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sc.tex
+%
+%  Purpose:
+%     Template for Starlink Cookbook (SC) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     16-JUN-1997 (BLY):
+%        Original, based on SUN/SG templates.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
 \markboth{\stardocname}{\stardocname}
@@ -45,9 +79,9 @@ get to know how to use \LaTeX\ effectively.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
-%  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -82,7 +116,6 @@ get to know how to use \LaTeX\ effectively.}
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -93,30 +126,28 @@ get to know how to use \LaTeX\ effectively.}
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
 \newcommand{\htmladdnormallink}[2]{#1}
 \newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
 \newcommand{\hyperref}[4]{#2\ref{#4}#3}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
 
 %  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\textbf{LaTeX}{2}\texttt{{HTML}}}
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
 
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{\texttt{\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary 
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
+\renewcommand{\_}{\texttt{\symbol{95}}}
 
 % -----------------------------------------------------------------------------
 %  Debugging.
@@ -129,6 +160,7 @@ get to know how to use \LaTeX\ effectively.}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 \newcommand {\radec}   {$[\alpha,\delta\,]$}
@@ -174,8 +206,10 @@ get to know how to use \LaTeX\ effectively.}
 \begin{htmlonly}
    \xlabel{}
    \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
 
 % ? Add picture here if required.
 % ? End of picture
@@ -185,16 +219,15 @@ get to know how to use \LaTeX\ effectively.}
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents. 
 %  ================================
@@ -205,7 +238,6 @@ get to know how to use \LaTeX\ effectively.}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -220,13 +252,24 @@ get to know how to use \LaTeX\ effectively.}
 %  ==================
 \stardocabstract
 % ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex Copyright Statement
+%  =========================
+\begin{latexonly}
+\newpage
+\vspace*{\fill}
+\stardoccopyright
+\end{latexonly}
+% ? End of Latex copyright statement
+
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
  \newpage
  \begin{latexonly}
    \setlength{\parskip}{0mm}
-   \latexonlytoc
+    \tableofcontents
    \setlength{\parskip}{\medskipamount}
    \markboth{\stardocname}{\stardocname}
  \end{latexonly}
