@@ -1,0 +1,27 @@
+19/5/06:
+
+   - Provide spatial filtering to remove all spatial structure with scale
+   length greater than a user-specified value (do not apply filtering in
+   spectral axis).
+   
+   - A command to outline a specified clump on a 2D displayed image
+   
+   - Add some sort of clump orientation column
+   
+   - Include output columns that give clump positions and sizes in WCS units
+   
+   - Have an option to apply the cellular automata to clean up clumps found
+   by clumpfind.
+   
+   - Include used parameter values in the output catalogue (as catalogue
+   parameters)
+   
+   - Create a textual log file including a table of clump parameters
+
+
+
+(22/6/06): Have a second output NDF that contains a copy of the input
+   data with a quality mask. Provide an additional quality bit to represent
+   "on boundary".
+
+
