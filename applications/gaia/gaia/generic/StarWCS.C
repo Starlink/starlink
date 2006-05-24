@@ -1346,62 +1346,35 @@ int StarWCS::make2D()
         // Either too many signficant dimensions or our attempt to
         // pick out significant axes has failed.
         int naxes = 0;
-        if ( n < 1 ) {
 
-            // All transformed values are 0.0, this probably means we
-            // cannot easily pick a reference position to
-            // transform. Let's just try to pick out a skyframe, (only
-            // a skyframe should have the AsTime attribute and it
-            // should only have 2 dimensions) failing this use the
-            // first two axes.
-            char astime[10];
-            for ( i = 1; i <= nsky; i++ ) {
-                sprintf( astime, "AsTime(%d)", i );
-                if ( astGetC( wcs_, astime ) ) {
-                    naxes++;
-                    out1[i-1][0] = 1.0;
-                    out2[i-1][0] = 3.0;
-                    if ( naxes == 2 ) {
-                        break;
-                    }
+        // Let's just try to pick out a skyframe, (only a skyframe should have
+        // the AsTime attribute and it should only have 2 dimensions) failing
+        // this use the first two axes.
+        char astime[10];
+        for ( i = 1; i <= nsky; i++ ) {
+            sprintf( astime, "AsTime(%d)", i );
+            if ( astGetC( wcs_, astime ) ) {
+                naxes++;
+                out1[i-1][0] = 1.0;
+                out2[i-1][0] = 3.0;
+                if ( naxes == 2 ) {
+                    break;
                 }
-                else {
-                    astClearStatus;
-                }
+            }
+            else {
+                astClearStatus;
             }
         }
         if ( naxes != 2 ) {
-            // Fudge the transformations to pick the first two axes,
-            // or if we have lots, the two "most" significant ones
-            // (since units matter this may be less than useful!).
-            if ( n > 2 ) {
-                double maxdiff = 0.0;
-                double diff = 0.0;
-                int low = 0;
-                int high = 1;
-                for ( i = 0; i < nsky; i++ ) {
-                    diff = fabs( out1[i][0] - out2[i][0] );
-                    if ( diff > maxdiff ) {
-                        low = high;
-                        high = i;
-                    }
-
-                    // Initialisation while in loop.
-                    out1[i][0] = 0.0;
-                    out2[i][0] = 0.0;
-                }
-                out1[low][0] = 1.0;
-                out2[low][0] = 2.0;
-                out1[high][0] = 1.0;
-                out2[high][0] = 2.0;
+            //  Use first two axes.
+            for ( i = 0; i < nsky; i++ ) {
+                out1[i][0] = 0.0;
+                out2[i][0] = 0.0;
             }
-            else {
-                // No significant ones.
-                out1[0][0] = 1.0;
-                out2[0][0] = 2.0;
-                out1[1][0] = 1.0;
-                out2[1][0] = 2.0;
-            }
+            out1[0][0] = 1.0;
+            out2[0][0] = 2.0;
+            out1[1][0] = 1.0;
+            out2[1][0] = 2.0;
         }
     }
 
