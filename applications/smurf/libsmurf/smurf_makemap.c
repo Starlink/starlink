@@ -64,12 +64,14 @@
 *        Guard against null pointer when reporting error.
 *     2006-04-21 (AGG):
 *        Now calls sky removal and extinction correction routines.
+*     2006-05-24 (AGG):
+*        Check that the weights array pointer is not NULL
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
-*     All Rights Reserved.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Council and the University of British Columbia. All Rights
+*     Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -193,6 +195,10 @@ void smurf_makemap( int *status ) {
   weights = smf_malloc( (ubnd_out[0]-lbnd_out[0]+1) *
 			(ubnd_out[1]-lbnd_out[1]+1), sizeof(double),
 			1, status );
+  if ( weights == NULL ) {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "Unable to allocate memory for the weights array", status);
+  }
 
   /* Create the map using the chosen METHOD */
   if( strncmp( method, "REBIN", 5 ) == 0 ) {
