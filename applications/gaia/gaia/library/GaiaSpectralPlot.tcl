@@ -757,9 +757,28 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Apply the current grid options.
    public method apply_gridoptions {} {
       if { $spectrum_ != {} } {
+
+         #  Check if the log settings are sensible, if not issue a warning,
+         #  leave these set as autoscaling might change the limits.
+         if { $itk_option(-log_x_axis) == 1 } {
+            lassign [$itk_component(canvas) coords $spectrum_ limits] x0 y0 x1 y1
+            if { $x0 <= 0.0 || $x1 <= 0.0 } {
+               warning_dialog "Spectral coordinates include zero or less so \
+                               will not use logarithmic scaling" $w_
+            }
+         }
+         if { $itk_option(-log_y_axis) == 1 } {
+            lassign [$itk_component(canvas) coords $spectrum_ limits] x0 y0 x1 y1
+            if { $y0 <= 0.0 || $y1 <= 0.0 } {
+               warning_dialog "The range of data values include zero or \
+                               less so will not use logarithmic scaling" $w_
+            }
+         }
+
          update_gridoptions_
          $itk_component(canvas) itemconfigure $spectrum_ \
             -gridoptions $gridoptions_
+
       }
    }
 
@@ -842,7 +861,7 @@ itcl::class gaia::GaiaSpectralPlot {
    #  order.
    itk_option define -xminmax xminmax XMinMax 1
 
-   #  Whether to log coordintae axis.
+   #  Whether to log coordinate axis.
    itk_option define -log_x_axis log_x_axis Log_X_Axis 0
 
    #  Whether to log data axis.
