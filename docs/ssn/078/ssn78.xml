@@ -6737,7 +6737,10 @@ int main(int argc, char** argv)
             you <em>do</em> use it, you will have to make that
             available, either through
             <code>STAR_CHECK_PROGS(star2html)</code> or otherwise (see
-            <ref id="macro-check-progs"/>).</p>
+            <ref id="macro-check-progs"/>).</p> If you need to tune the
+            parameters used when running the <code>star2html</code> command, 
+            then assign these to the <code>STAR2HTML_FLAGS</code>
+            macro in <code>Makefile.am</code>. 
 
           <p>The default rule for compiling &latex; files simply runs &latex;
             twice.  If you need to do more than this -- for example to
