@@ -59,7 +59,7 @@ if %?LATEXDOCS%
 	LATEX=pdflatex; latex2dvi () { $(LATEX2DVI); }; \
 	  latex2dvi ${<:.tex=}
 .tex.htx_tar:
-	- @STAR2HTML@ $<
+	- @STAR2HTML@ $(STAR2HTML_FLAGS) $<
 	test -d ${<:.tex=.htx}
 	if test -f ${<:.tex=.htx_tar.extras}; then \
 	  for f in `cat ${<:.tex=.htx_tar.extras}`; do \
