@@ -961,7 +961,7 @@ AC_INIT(...)
             (<kbd>make dist</kbd>), do tests (<kbd>make
               check</kbd>), clean up (<kbd>make clean</kbd>,
             <kbd>make distclean</kbd> and <kbd>make
-              maintainer-clear</kbd>) and, in the case of Starlink
+              maintainer-clean</kbd>) and, in the case of Starlink
             automake, do an install along with an installation
             manifest.</p>
 
@@ -1975,6 +1975,10 @@ variables set, which could trick you into believing that they are
 
             </dl></p>
 
+          <p>Note that certain special characters, symbols, and the &latex; logo
+          copied from &latex; source will need to be replaced with XML entities
+          (see <em>Entity References</em> <docxref doc="SSN/70" />.</p>
+          
         </subsubsect>
 
       </subsect>
@@ -4674,7 +4678,7 @@ differently for the <code>sun123</code> document.  That code,
 <code>@STAR_LATEX_DOCUMENTATION_SUN123@</code> which is set to the
 default target list, and not <code>@STAR_LATEX_DOCUMENTATION@</code>.
 Documentation specified in this way does <em>not</em> -- contrary to
-appearances -- have to live in a similarly-named subdirectory of the
+appearances -- have to live in a similarly named subdirectory of the
 component directory; instead you will have to separately make sure that the
 documentation is built at build time.</p>
 
