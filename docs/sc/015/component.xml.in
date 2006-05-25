@@ -19,7 +19,7 @@
   </dependencies>
   <developers>
     <person>
-      <name>A. Allan & D. Terrett</name>
+      <name>A. Allan &amp; D. Terrett</name>
     </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
