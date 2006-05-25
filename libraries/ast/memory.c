@@ -80,6 +80,10 @@
 *        These are now conditionally compiled if the MEM_DEBUG macros is 
 *        defined (set by configuring AST with the --with-memdebug option).
 *        Also modified them to take into account MemoryCaching.
+*     24-MAY-2006 (DSB):
+*        Ensure that pointers to memory returned by this module are all
+*        aligned on 8 byte boundaries. This fixes problems with ualigned 
+*        memory access that could cause bus errors on Solaris. 
 */
 
 /* Include files. */
@@ -222,7 +226,7 @@
    allocated region of memory. */ \
    } else { \
       Memory *isdynmem;                /* Pointer to memory header */ \
-      isdynmem = ( (Memory *) ptr ) - 1; \
+      isdynmem = (Memory *) ( ptr - SIZEOF_MEMORY ); \
 \
 /* Check if the "magic number" in the header is valid and report an \
    error if it is not (but not if the global status is already \
@@ -283,6 +287,10 @@
    ( ~( ( ( (unsigned long) ptr ) ^ ( (unsigned long) size ) ) + \
              ( (unsigned long) 1 ) ) )
 
+/* A macro that returns the size of the a Memory structure padded to a
+   multiple of 8 bytes. */
+#define SIZEOF_MEMORY \
+   ( ( SizeOf_Memory != 0 ) ? SizeOf_Memory : SizeOfMemory() )
 
 
 /* Module Type Definitions. */
@@ -307,6 +315,11 @@ typedef struct Memory {
 
 /* Module Variables. */
 /* ================= */
+
+/* The size of a Memory header structure, padded to a multiple of 8
+   bytes. This value is initialised by the SizeOfMemory function, and
+   should be accessed using the SIZEOF_MEMORY macro. */
+static size_t SizeOf_Memory = 0;
 
 /* Extra stuff for debugging of memory management (tracking of leaks
    etc). */
@@ -368,6 +381,7 @@ static int Use_Cache = 0;
 
 /* Prototypes for Private Functions. */
 /* ================================= */
+static size_t SizeOfMemory( void );
 
 #ifdef MEM_DEBUG
 static void Issue( Memory * );
@@ -758,7 +772,7 @@ void *astFree_( void *ptr ) {
    if ( isdynamic ) {
 
 /* If OK, obtain a pointer to the memory header. */
-      mem = ( (Memory *) ptr ) - 1;
+      mem = (Memory *) ( ptr - SIZEOF_MEMORY );
 
 #ifdef MEM_DEBUG
       DeIssue( mem );
@@ -869,7 +883,7 @@ void *astGrow_( void *ptr, int n, size_t size ) {
 
 /* Obtain a pointer to the memory header and check if the new size
    exceeds that already allocated. */
-         mem = ( (Memory *) ptr ) - 1;
+         mem = (Memory *) ( ptr - SIZEOF_MEMORY );
          if ( mem->size < size ) {
 
 /* If so, calculate a possible new size by doubling the old
@@ -932,12 +946,13 @@ void *astMalloc_( size_t size ) {
 
 /* Local Variables: */
    Memory *mem;                  /* Pointer to space allocated by malloc */
+   void *result;                 /* Returned pointer */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
 
 /* Initialise. */
-   mem = NULL;
+   result = NULL;
 
 /* Check that the size requested is not negative and report an error
    if it is. */
@@ -960,7 +975,7 @@ void *astMalloc_( size_t size ) {
 
 /* Otherwise, allocate a new memory block using "malloc". */
       } else {      
-         mem = MALLOC( sizeof( Memory ) + size );
+         mem = MALLOC( SIZEOF_MEMORY + size );
 
 /* Report an error if malloc failed. */
          if ( !mem ) {
@@ -988,11 +1003,12 @@ void *astMalloc_( size_t size ) {
 
 /* Increment the memory pointer to the start of the region of
    allocated memory to be used by the caller.*/
-      mem++;
+      result = mem;
+      result += SIZEOF_MEMORY;
    }
 
 /* Return the result. */
-   return mem;
+   return result;
 }
 
 int astMemCaching_( int newval ){
@@ -1232,7 +1248,7 @@ void *astRealloc_( void *ptr, size_t size ) {
 
 /* If OK, obtain a pointer to the memory header. */
          } else {
-            mem = ( (Memory *) ptr ) - 1;
+            mem = (Memory *) ( ptr - SIZEOF_MEMORY );
 
 /* If the new size is zero, free the old memory and set a NULL return
    pointer value. */
@@ -1245,7 +1261,7 @@ void *astRealloc_( void *ptr, size_t size ) {
 
 /* If the cache is being used, for small memory blocks, do the equivalent of 
 
-               mem = realloc( mem, sizeof( Memory ) + size );
+               mem = realloc( mem, SIZEOF_MEMORY + size );
 
    using astMalloc, astFree and memcpy explicitly in order to ensure
    that the memory blocks are cached. */
@@ -1270,7 +1286,7 @@ void *astRealloc_( void *ptr, size_t size ) {
                   DeIssue( mem );
 #endif
 
-                  mem = REALLOC( mem, sizeof( Memory ) + size );
+                  mem = REALLOC( mem, SIZEOF_MEMORY + size );
 
 /* If this failed, report an error and return the original pointer
    value. */
@@ -1290,7 +1306,8 @@ void *astRealloc_( void *ptr, size_t size ) {
                      mem->id = -1;
                      Issue( mem );
 #endif
-                     result = mem + 1;
+                     result = mem;
+                     result += SIZEOF_MEMORY;
                   }
                }
             }
@@ -1355,11 +1372,57 @@ size_t astSizeOf_( const void *ptr ) {
    the memory size from the header which precedes it. */
    if ( ptr ){
       IS_DYNAMIC( ptr, isdynamic );
-      if( isdynamic ) size = ( ( (Memory *) ptr ) - 1 )->size;
+      if( isdynamic ) size = ( (Memory *) ( ptr - SIZEOF_MEMORY ) )->size;
    }
 
 /* Return the result. */
    return size;
+}
+
+static size_t SizeOfMemory( void ){
+/*
+*  Name:
+*     SizeOfMemory
+
+*  Purpose:
+*     Returns the size of a Memory structure, padded to an 8 byte
+*     boundary.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     size_t SizeOfMemory( void )
+
+*  Description:
+*     This function returns the size of a Memory structure used to
+*     store header information about any block of memory allocated by this
+*     module. The returned value may be larger than the actual size of
+*     the Memory structure in order to ensure that the pointer returned by
+*     astMalloc etc points to an 8 byte boundary. Failure to do this can
+*     result in some operating systems having problems. E.g Solaris
+*     requires this alignment if the returned pointer is going to be used to
+*     store doubles.
+
+*  Returned Value:
+*     The size to use for a Memory structure.
+
+*  Notes:
+*     - The returned value is also stored in the module variable
+*     SizeOf_Memory. 
+*/
+
+/* Get the basic size of a Memory structure. */
+   SizeOf_Memory = sizeof( Memory );
+
+/* Now increase the returned value to ensure it is a multiple of 8. Mask 
+   off all but the last 3 bits, xor with 0x7 to get the remainder, add 1 
+   to make it a multiple of 8 bytes. */
+   SizeOf_Memory += ((SizeOf_Memory & 0x7) ? ((SizeOf_Memory & 0x7) ^ 0x7) + 1 : 0);
+
+/* Return the value */
+   return SizeOf_Memory;
+
 }
 
 size_t astTSizeOf_( const void *ptr ) {
@@ -1416,7 +1479,8 @@ size_t astTSizeOf_( const void *ptr ) {
    the memory size from the header which precedes it. */
    if ( ptr ){
       IS_DYNAMIC( ptr, isdynamic );
-      if( isdynamic ) size = sizeof( Memory ) + ( ( (Memory *) ptr ) - 1 )->size;
+      if( isdynamic ) size = SIZEOF_MEMORY + 
+                             ( (Memory *) ( ptr - SIZEOF_MEMORY ) )->size;
    }
 
 /* Return the result. */
@@ -2179,10 +2243,10 @@ int astMemoryID_( void *ptr ){
    (i.e. is a direct pointer to a memory block allocated by asyMalloc).
    Therefore temporarily switch off error reporting so that we can test
    for this. */
-      mem = ( (Memory *) astMakePointer( (AstObject *) ptr ) ) - 1;
+      mem = (Memory *) ( astMakePointer( (AstObject *) ptr ) - SIZEOF_MEMORY );
 
       if( !astOK ) {
-         mem = ( (Memory *) ptr ) - 1;
+         mem = (Memory *) ( ptr - SIZEOF_MEMORY );
          astClearStatus;
       }
 
@@ -2301,7 +2365,7 @@ void astMemoryUse_( void *ptr, const char *verb ){
 *        A verb indicating what is being done to the pointer.
 *-
 */
-   if( ptr && (((Memory *)ptr)-1)->id == Watched_ID ) {
+   if( ptr && (((Memory *)(ptr-SIZEOF_MEMORY))->id == Watched_ID ) {
       if( !Quiet_Use || !strcmp( verb, ISSUED ) || 
                         !strcmp( verb, FREED ) ) {
          astMemoryAlarm( verb );
@@ -2585,7 +2649,7 @@ static void Issue( Memory *mem ) {
    Active_List = mem;
 
 /* Report that the pointer is being issued. */
-   astMemoryUse( mem + 1, ISSUED );
+   astMemoryUse( (void *) mem + SIZEOF_MEMORY, ISSUED );
 
 }
 
@@ -2621,7 +2685,7 @@ static void DeIssue( Memory *mem ) {
    if( !mem ) return;
 
 /* Report that the pointer is being freed. */
-   astMemoryUse( mem + 1, FREED );
+   astMemoryUse( (void *) mem + SIZEOF_MEMORY, FREED );
 
 /* Remove the block from the double linked list of active pointers. */
    next = mem->next;
