@@ -16,6 +16,9 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- A problem with unaligned memory access that could cause bus errors on 
+Solaris has been fixed.
+
 - A new function called astTune (or AST_TUNE) has been added which can be 
 used to get and set global AST tuning parameters. At the moment there are 
 only two such parameter, both of which are concerned with memory management 
