@@ -163,9 +163,9 @@ get to know how to use \LaTeX\ effectively.}
 %end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
-\newcommand {\radec}   {$[\alpha,\delta\,]$}
-\newcommand {\mhadec}  {$[-h,\delta\,]$}
-\newcommand {\azel}    {$[A,E\,]$}
+\newcommand{\radec}{$[\alpha,\delta\,]$}
+\newcommand{\mhadec}{$[-h,\delta\,]$}
+\newcommand{\azel}{$[A,E\,]$}
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -595,7 +595,8 @@ procedure file.
 
 \section{Displays\xlabel{displays}}
 
-{\small
+\small
+
 \verb+There are three main areas of help information: CAR\_HELP for information+\\
 \verb+about the CAR routines; CAT\_HELP for information about the catalogues and +\\
 \verb+SCAR\_HELP for general information.+\\
@@ -644,7 +645,8 @@ These are the catalogues online at RAL, (R = Access restricted):
   \end{description}
 \end{quote}
 \end{verbatim}
-}
+
+\normalsize
 
 \newpage
 
@@ -1302,15 +1304,15 @@ The following qualifiers are recognized:
       \emph{Direct} & NRECORDS & -- \\
       & KEYFIELD & \\ \hline
     \end{tabular}
-    \caption {Parameters required for access mode and medium}
+    \caption{Parameters required for access mode and medium}
   \end{center}
-\end {table}
+\end{table}
 
 ******************************************************************************
 
-\begin {table}
-  \begin {center}
-    \begin {tabular}{||l|l|l||}
+\begin{table}
+  \begin{center}
+    \begin{tabular}{||l|l|l||}
       \hline
       Primitive data type	& VAX FORTRAN type		& HDS type \\
       \hline
@@ -1320,10 +1322,10 @@ The following qualifiers are recognized:
       Logical			& \texttt{ LOGICAL}			& \texttt{ `\_LOGICAL'} \\
       Character		& \texttt{ CHARACTER[*n]}		& \texttt{ `\_CHAR[*n]'} \\
       \hline
-    \end {tabular}
-    \caption {Standard Primitive Data Types}
-  \end {center}
-\end {table}
+    \end{tabular}
+    \caption{Standard Primitive Data Types}
+  \end{center}
+\end{table}
 \end{verbatim}
 
 \newpage
@@ -1342,15 +1344,15 @@ The following qualifiers are recognized:
       \emph{Direct} & NRECORDS & -- \\
 & KEYFIELD & \\ \hline
     \end{tabular}
-    \caption {Parameters required for access mode and medium}
+    \caption{Parameters required for access mode and medium}
   \end{center}
-\end {table}
+\end{table}
 
 ******************************************************************************
 
-\begin {table}[h]
-  \begin {center}
-    \begin {tabular}{||l|l|l||}
+\begin{table}[h]
+  \begin{center}
+    \begin{tabular}{||l|l|l||}
       \hline
       Primitive data type	& VAX FORTRAN type		& HDS type \\
       \hline
@@ -1360,10 +1362,10 @@ The following qualifiers are recognized:
       Logical			& \texttt{ LOGICAL}			& \texttt{ `\_LOGICAL'} \\
       Character		& \texttt{ CHARACTER[*n]}		& \texttt{ `\_CHAR[*n]'} \\
       \hline
-    \end {tabular}
-    \caption {Standard Primitive Data Types}
-  \end {center}
-\end {table}
+    \end{tabular}
+    \caption{Standard Primitive Data Types}
+  \end{center}
+\end{table}
 
 \newpage
 
@@ -1494,9 +1496,9 @@ The following qualifiers are recognized:
       \put (51,65){\line(0,-1){6}}
       \put (73.5,59){\line(0,-1){5}}
       \put (87.5,54){\line(0,-1){8}}
-    \end {picture}
-    \caption {Functional analysis of INTERIM routines}
-    \label {functional_analysis_of_interim_routine}
+    \end{picture}
+    \caption{Functional analysis of INTERIM routines}
+    \label{functional_analysis_of_interim_routine}
   \end{center}
 \end{figure}
 \end{verbatim}
@@ -1555,15 +1557,16 @@ The following qualifiers are recognized:
       \put (51,65){\line(0,-1){6}}
       \put (73.5,59){\line(0,-1){5}}
       \put (87.5,54){\line(0,-1){8}}
-    \end {picture}
-    \caption {Functional analysis of INTERIM routines}
-    \label {functional_analysis_of_interim_routine}
+    \end{picture}
+    \caption{Functional analysis of INTERIM routines}
+    \label{functional_analysis_of_interim_routine}
   \end{center}
 \end{figure}
 
 \newpage
 
 \small
+
 \begin{verbatim}
 \begin{figure}
   \begin{center}
@@ -1582,10 +1585,10 @@ The following qualifiers are recognized:
       \put (63,32.5){\ldots}
       \put (53,22.5){\ldots}
     \end{picture}
-    \caption {SCAR Help system}
-    \label {scar_help_system}
-  \end {center}
-\end {figure}
+    \caption{SCAR Help system}
+    \label{scar_help_system}
+  \end{center}
+\end{figure}
 
 \begin{figure}
   \begin{center}
@@ -1613,12 +1616,13 @@ The following qualifiers are recognized:
       \put (82,12.5){--}
       \put (81,32.5){P,S}
       \put (0,40){\textbf{EDIT} mode:}
-    \end {picture}
-    \caption {Data flow in the editing process}
-    \label {data_flow_in_the_editing_process}
-  \end {center}
-\end {figure}
+    \end{picture}
+    \caption{Data flow in the editing process}
+    \label{data_flow_in_the_editing_process}
+  \end{center}
+\end{figure}
 \end{verbatim}
+
 \normalsize
 
 \newpage
@@ -1644,10 +1648,10 @@ The following qualifiers are recognized:
       \put (63,32.5){\ldots}
       \put (53,22.5){\ldots}
     \end{picture}
-    \caption {SCAR Help system}
-    \label {scar_help_system}
-  \end {center}
-\end {figure}
+    \caption{SCAR Help system}
+    \label{scar_help_system}
+  \end{center}
+\end{figure}
 
 \begin{figure}[h]
   \begin{center}
@@ -1675,11 +1679,11 @@ The following qualifiers are recognized:
       \put (82,12.5){--}
       \put (81,32.5){P,S}
       \put (0,40){\textbf{EDIT} mode:}
-    \end {picture}
-    \caption {Data flow in the editing process}
-    \label {data_flow_in_the_editing_process}
-  \end {center}
-\end {figure}
+    \end{picture}
+    \caption{Data flow in the editing process}
+    \label{data_flow_in_the_editing_process}
+  \end{center}
+\end{figure}
 
 \newpage
 
@@ -1719,11 +1723,11 @@ The following qualifiers are recognized:
       \put (15,51){\line(0,-1){1}}
       \put (20,80){\textbf{VMS File System}}
       \put (110,80){\textbf{HDS}}
-    \end {picture}
-    \caption {The relationship between VMS and HDS}
-    \label {the_relationship_between_VMS_and_HDS}
-  \end {center}
-\end {figure}
+    \end{picture}
+    \caption{The relationship between VMS and HDS}
+    \label{the_relationship_between_VMS_and_HDS}
+  \end{center}
+\end{figure}
 \end{verbatim}
 
 \newpage
@@ -1767,18 +1771,18 @@ The following qualifiers are recognized:
       \put (15,51){\line(0,-1){1}}
       \put (20,80){\textbf{VMS File System}}
       \put (110,80){\textbf{HDS}}
-    \end {picture}
-    \caption {The relationship between VMS and HDS}
-    \label {the_relationship_between_VMS_and_HDS}
-  \end {center}
-\end {figure}
+    \end{picture}
+    \caption{The relationship between VMS and HDS}
+    \label{the_relationship_between_VMS_and_HDS}
+  \end{center}
+\end{figure}
 
 \newpage
 
 \begin{verbatim}
-\begin {figure}
-  \begin {center}
-    \begin {picture}(130,43)
+\begin{figure}
+  \begin{center}
+    \begin{picture}(130,43)
       \thicklines
       \put (7,40){P(n)}
       \put (67,40){S(n)}
@@ -1812,11 +1816,11 @@ The following qualifiers are recognized:
       \put (100,15){\textbf{KEY}}
       \put (90,10){S(n) --- Structure object}
       \put (90,5){P(n) --- Primitive object}
-    \end {picture}
-    \caption {Diagrams of Structure Objects}
-    \label {diagrams_of_structure_objects}
-  \end {center}
-\end {figure}
+    \end{picture}
+    \caption{Diagrams of Structure Objects}
+    \label{diagrams_of_structure_objects}
+  \end{center}
+\end{figure}
 \end{verbatim}
 
 \newpage
@@ -1825,9 +1829,9 @@ The following qualifiers are recognized:
   \textbf{\LaTeX\ OUTPUT}
 \end{center}
 
-\begin {figure}[h]
-  \begin {center}
-    \begin {picture}(130,43)
+\begin{figure}[h]
+  \begin{center}
+    \begin{picture}(130,43)
       \thicklines
       \put (7,40){P(n)}
       \put (67,40){S(n)}
@@ -1861,19 +1865,19 @@ The following qualifiers are recognized:
       \put (100,15){\textbf{KEY}}
       \put (90,10){S(n) --- Structure object}
       \put (90,5){P(n) --- Primitive object}
-    \end {picture}
-    \caption {Diagrams of Structure Objects}
-    \label {diagrams_of_structure_objects}
-  \end {center}
-\end {figure}
+    \end{picture}
+    \caption{Diagrams of Structure Objects}
+    \label{diagrams_of_structure_objects}
+  \end{center}
+\end{figure}
 
 \newpage 
 
 \small
 \begin{verbatim}
-\begin {figure}
-  \begin {center}
-    \begin {picture}(110,35)
+\begin{figure}
+  \begin{center}
+    \begin{picture}(110,35)
       \thicklines
       \put (40,30){\framebox(30,5){SKY\_POSITION}}
       \put (40,25){\framebox(30,5){[equatorial]}}
@@ -1890,15 +1894,15 @@ The following qualifiers are recognized:
       \put (15,20){\vector(0,-1){5}}
       \put (55,25){\vector(0,-1){10}}
       \put (95,20){\vector(0,-1){5}}
-    \end {picture}
-    \caption {An Alternative Representation for SKY\_POSITION}
-    \label {an_alternative_representation_for_sky_position}
-  \end {center}
-\end {figure}
+    \end{picture}
+    \caption{An Alternative Representation for SKY\_POSITION}
+    \label{an_alternative_representation_for_sky_position}
+  \end{center}
+\end{figure}
 
-\begin {figure}
-  \begin {center}
-    \begin {picture}(40,25)
+\begin{figure}
+  \begin{center}
+    \begin{picture}(40,25)
       \thicklines
       \put (0,20){\framebox(40,5){parent RID}}
       \put (0,15){\framebox(25,5){reserve}}
@@ -1915,11 +1919,11 @@ The following qualifiers are recognized:
       \put (42,12){($1+3+4$ bits)}
       \put (42,7){(8 bits)}
       \put (42,2){(32 bits)}
-    \end {picture}
-    \caption {Structure of a Record Control Label}
-    \label {structure_of_a_record_control_label}
-  \end {center}
-\end {figure}
+    \end{picture}
+    \caption{Structure of a Record Control Label}
+    \label{structure_of_a_record_control_label}
+  \end{center}
+\end{figure}
 \end{verbatim}
 \normalsize
 
@@ -1929,9 +1933,9 @@ The following qualifiers are recognized:
   \textbf{\LaTeX\ OUTPUT}
 \end{center}
 
-\begin {figure}[h]
-  \begin {center}
-    \begin {picture}(110,35)
+\begin{figure}[h]
+  \begin{center}
+    \begin{picture}(110,35)
       \thicklines
       \put (40,30){\framebox(30,5){SKY\_POSITION}}
       \put (40,25){\framebox(30,5){[equatorial]}}
@@ -1948,15 +1952,15 @@ The following qualifiers are recognized:
       \put (15,20){\vector(0,-1){5}}
       \put (55,25){\vector(0,-1){10}}
       \put (95,20){\vector(0,-1){5}}
-    \end {picture}
-    \caption {An Alternative Representation for SKY\_POSITION}
-    \label {an_alternative_representation_for_sky_position}
-  \end {center}
-\end {figure}
+    \end{picture}
+    \caption{An Alternative Representation for SKY\_POSITION}
+    \label{an_alternative_representation_for_sky_position}
+  \end{center}
+\end{figure}
 
-\begin {figure}[h]
-  \begin {center}
-    \begin {picture}(40,25)
+\begin{figure}[h]
+  \begin{center}
+    \begin{picture}(40,25)
       \thicklines
       \put (0,20){\framebox(40,5){parent RID}}
       \put (0,15){\framebox(25,5){reserve}}
@@ -1973,19 +1977,17 @@ The following qualifiers are recognized:
       \put (42,12){($1+3+4$ bits)}
       \put (42,7){(8 bits)}
       \put (42,2){(32 bits)}
-    \end {picture}
-    \caption {Structure of a Record Control Label}
-   \label {structure_of_a_record_control_label}
-  \end {center}
-\end {figure}
+    \end{picture}
+    \caption{Structure of a Record Control Label}
+   \label{structure_of_a_record_control_label}
+  \end{center}
+\end{figure}
 
 \newpage
 
-%{\footnotesize
-%{\tiny
-{\scriptsize
+\scriptsize
 \begin{verbatim}
-        Put this before the `\begin{document}' command:
+        Put this before the `begin{document}' command:
 \newcommand {\radec}   {$[\alpha,\delta\,]$}
 \newcommand {\mhadec}  {$[-h,\delta\,]$}
 \newcommand {\azel}    {$[A,E\,]$}
@@ -2054,7 +2056,8 @@ The following qualifiers are recognized:
 \end{figure}
 
 \end{verbatim}
-}
+
+\normalsize
 
 \newpage
 
@@ -2123,8 +2126,8 @@ The following qualifiers are recognized:
 
 \newpage
 
-{\scriptsize
-%\tiny
+\scriptsize
+
 \begin{verbatim}
 \begin{figure}
   \begin{small}
@@ -2195,7 +2198,8 @@ coordinates).  Pick one of each and follow the flow downwards.  The sequences do
   from that level down have to be performed at the full pointing rate.
 \end{figure}
 \end{verbatim}
-}
+
+\normalsize
 
 \newpage
 
@@ -2271,7 +2275,7 @@ coordinates).  Pick one of each and follow the flow downwards.  The sequences do
 
 \newpage
 
-{\scriptsize
+\scriptsize
 \begin{verbatim}
 \begin{center}
   \begin{picture}(120,100)
@@ -2339,7 +2343,8 @@ coordinates).  Pick one of each and follow the flow downwards.  The sequences do
   \end{picture}
 \end{center}
 \end{verbatim}
-}
+
+\normalsize
 
 \newpage
 
