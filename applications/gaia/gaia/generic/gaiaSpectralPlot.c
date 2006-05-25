@@ -431,14 +431,17 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  *
  *   To remove the reference spectrum pass in a memory address of 0. 
  *
- *   A special feature (should be moved into some generic interface, but
+ *   Special features (should be moved into some generic interface, but
  *   that's not possible for canvas items, so some method of exporting the
- *   plot would be required) is to convert an X coordinate into a canvas
+ *   plot would be required) are convert an X coordinate into a canvas
  *   coordinate and vice-versa, using the plot. This uses the format:
  *
  *      <canvas> coords <item> "convert" ?toworld? coordinate.
  *
- *   Where tocanvas is a boolean.
+ *   Where tocanvas is a boolean, and to get the data limits of the plot
+ *   in world coordinates.
+ *
+ *      <canvas> coords <item> "limits"
  *
  * Results:
  *      Returns TCL_OK or TCL_ERROR, and sets interp->result.
@@ -462,6 +465,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     fprintf( stderr, "SPCoords() \n" );
 #endif
 
+    optionPtr = Tcl_GetString( objv[0] );
     if ( objc == 0 ) {
 	/*
 	 * Print the main data values.
@@ -474,23 +478,18 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 	Tcl_SetObjResult( interp, obj );
 	return TCL_OK;
     }
-
-    /*  Look for a request to convert a coordinate */
-    optionPtr = Tcl_GetString( objv[0] );
-    if ( strcmp( optionPtr, "convert" ) == 0 ) {
+    else if ( strcmp( optionPtr, "convert" ) == 0 ) {
+        /*  Look for a request to convert a coordinate or return the limits */
         if ( spPtr->plot != NULL ) {
             double xin[1];
             double yin[1];
             double xout[1];
             double yout[1];
             int toworld;
-
-            if ( Tcl_GetBooleanFromObj( interp, objv[1], &toworld ) != TCL_OK
-                 ||
+            if ( Tcl_GetBooleanFromObj( interp, objv[1], &toworld ) != TCL_OK ||
                  Tcl_GetDoubleFromObj( interp, objv[2], &xin[0] ) != TCL_OK ) {
                 return TCL_ERROR;
             }
-
             yin[0] = 0.0;
             astTran2( spPtr->plot, 1, xin, yin, toworld, xout, yout );
             if ( !astOK || xout[0] == AST__BAD ) {
@@ -506,144 +505,155 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         }
         return TCL_OK;
     }
-    else {
+    else if ( strcmp( optionPtr, "limits" ) == 0 ) {
+        Tcl_Obj *subobj;
+        Tcl_Obj *obj = Tcl_NewObj();
+        
+        subobj = Tcl_NewDoubleObj( spPtr->xleft );
+        Tcl_ListObjAppendElement( interp, obj, subobj );
+        subobj = Tcl_NewDoubleObj( spPtr->ybot );
+        Tcl_ListObjAppendElement( interp, obj, subobj );
+        subobj = Tcl_NewDoubleObj( spPtr->xright );
+        Tcl_ListObjAppendElement( interp, obj, subobj );
+        subobj = Tcl_NewDoubleObj( spPtr->ytop );
+        Tcl_ListObjAppendElement( interp, obj, subobj );
+        
+        Tcl_SetObjResult( interp, obj );
+        return TCL_OK;
+    }
 
-        /* Could be a list of doubles or a memory address. */
-        nel = objc;
-        adr = 0L;
-        isref = 0;
-        if ( strcmp( optionPtr, "refpointer" ) == 0 ) {
-            isref = 1;
+    /* Could be a list of doubles or a memory address. */
+    nel = objc;
+    adr = 0L;
+    isref = 0;
+    if ( strcmp( optionPtr, "refpointer" ) == 0 ) {
+        isref = 1;
+    }
+    
+    if ( strcmp( optionPtr, "pointer" ) == 0 || isref ) {
+        
+        /*  Memory address, sort this out. */
+        if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+            Tcl_AppendResult( interp, "Failed to read ARRAYinfo pointer",
+                              (char *) NULL );
+            return TCL_ERROR;
         }
-
-        if ( strcmp( optionPtr, "pointer" ) == 0 || isref ) {
-
-            /*  Memory address, sort this out. */
-            if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
-                Tcl_AppendResult( interp, "Failed to read ARRAYinfo pointer",
-                                  (char *) NULL );
-                return TCL_ERROR;
-            }
-
-            /* If the address is 0 and this is a reference spectrum, that's a
-               request to clear it, just do that and return. */
-            if ( isref && adr == 0L ) {
-                if ( spPtr->refDataPtr != NULL ) {
-                    ckfree( (char *) spPtr->refDataPtr );
-                    spPtr->refDataPtr = NULL;
-                }
-                return TCL_OK;
-            }
-            arrayInfo = (ARRAYinfo *) adr;
-            nel = arrayInfo->el;
-        }
-
-        /* Reference spectra must have the same number of points and we must
-         * have a data spectrum already */
-        if ( isref ) {
-            if ( nel != spPtr->numPoints ) {
-                Tcl_SetResult( interp, "Reference spectra are required to"
-                               " have the same number of points as main"
-                               " spectrum", TCL_VOLATILE );
-                return TCL_ERROR;
-            }
-            if ( spPtr->dataPtr == NULL ) {
-                Tcl_SetResult( interp, "A reference spectrum can only be added"
-                               " after the main spectrum", TCL_VOLATILE );
-                return TCL_ERROR;
-            }
-            if ( spPtr->refDataPtr == NULL ) {
-                spPtr->refDataPtr = 
-                    (double *) ckalloc( sizeof( double ) * nel );
-            }
-        }
-        else if ( spPtr->dataPtr != NULL && nel > spPtr->numPoints ) {
-            /* Re-create various workspaces, if needed */
-            ckfree( (char *) spPtr->dataPtr );
-            ckfree( (char *) spPtr->coordPtr );
+        
+        /* If the address is 0 and this is a reference spectrum, that's a
+           request to clear it, just do that and return. */
+        if ( isref && adr == 0L ) {
             if ( spPtr->refDataPtr != NULL ) {
                 ckfree( (char *) spPtr->refDataPtr );
                 spPtr->refDataPtr = NULL;
             }
-            ckfree( (char *) spPtr->tmpPtr[0] );
-            ckfree( (char *) spPtr->tmpPtr[1] );
-            spPtr->dataPtr = NULL;
+            return TCL_OK;
         }
-        else if ( spPtr->dataPtr != NULL && nel != spPtr->numPoints ) {
-            /* When the number of elements changes, the reference spectrum
-             * always becomes invalid . */
-            if ( spPtr->refDataPtr != NULL ) {
-                ckfree( (char *) spPtr->refDataPtr );
-                spPtr->refDataPtr = NULL;
-            }
+        arrayInfo = (ARRAYinfo *) adr;
+        nel = arrayInfo->el;
+    }
+    
+    /* Reference spectra must have the same number of points and we must
+     * have a data spectrum already */
+    if ( isref ) {
+        if ( nel != spPtr->numPoints ) {
+            Tcl_SetResult( interp, "Reference spectra are required to"
+                           " have the same number of points as main"
+                           " spectrum", TCL_VOLATILE );
+            return TCL_ERROR;
         }
-
         if ( spPtr->dataPtr == NULL ) {
-            i = sizeof( double ) * nel;
-            spPtr->dataPtr = (double *) ckalloc( i );
-            spPtr->coordPtr = (double *) ckalloc( i );
-            spPtr->tmpPtr[0] = (double *) ckalloc( i );
-            spPtr->tmpPtr[1] = (double *) ckalloc( i );
+            Tcl_SetResult( interp, "A reference spectrum can only be added"
+                           " after the main spectrum", TCL_VOLATILE );
+            return TCL_ERROR;
         }
-        spPtr->numPoints = nel;
-
-        /* Read in data and work out limits */
-        spPtr->ytop = -DBL_MAX;
-        spPtr->ybot =  DBL_MAX;
-
-        if ( adr == 0 ) {
-            /* Read doubles from each word, cannot be reference spectrum */
-            for ( i = 0; i < nel; i++ ) {
-                if ( Tcl_GetDoubleFromObj( interp, objv[i],
-                                           &spPtr->dataPtr[i] ) != TCL_OK ) {
-                    return TCL_ERROR;
-                }
-                if ( spPtr->dataPtr[i] != spPtr->badvalue ) {
-                    spPtr->ybot = MIN( spPtr->ybot, spPtr->dataPtr[i] );
-                    spPtr->ytop = MAX( spPtr->ytop, spPtr->dataPtr[i] );
-                }
+        if ( spPtr->refDataPtr == NULL ) {
+            spPtr->refDataPtr = 
+                (double *) ckalloc( sizeof( double ) * nel );
+        }
+    }
+    else if ( spPtr->dataPtr != NULL && nel > spPtr->numPoints ) {
+        /* Re-create various workspaces, if needed */
+        ckfree( (char *) spPtr->dataPtr );
+        ckfree( (char *) spPtr->coordPtr );
+        if ( spPtr->refDataPtr != NULL ) {
+            ckfree( (char *) spPtr->refDataPtr );
+            spPtr->refDataPtr = NULL;
+        }
+        ckfree( (char *) spPtr->tmpPtr[0] );
+        ckfree( (char *) spPtr->tmpPtr[1] );
+        spPtr->dataPtr = NULL;
+    }
+    else if ( spPtr->dataPtr != NULL && nel != spPtr->numPoints ) {
+        /* When the number of elements changes, the reference spectrum
+         * always becomes invalid . */
+        if ( spPtr->refDataPtr != NULL ) {
+            ckfree( (char *) spPtr->refDataPtr );
+            spPtr->refDataPtr = NULL;
+        }
+    }
+    
+    if ( spPtr->dataPtr == NULL ) {
+        i = sizeof( double ) * nel;
+        spPtr->dataPtr = (double *) ckalloc( i );
+        spPtr->coordPtr = (double *) ckalloc( i );
+        spPtr->tmpPtr[0] = (double *) ckalloc( i );
+        spPtr->tmpPtr[1] = (double *) ckalloc( i );
+    }
+    spPtr->numPoints = nel;
+    
+    /* Read in data and work out limits */
+    spPtr->ytop = -DBL_MAX;
+    spPtr->ybot =  DBL_MAX;
+    
+    if ( adr == 0 ) {
+        /* Read doubles from each word, cannot be reference spectrum */
+        for ( i = 0; i < nel; i++ ) {
+            if ( Tcl_GetDoubleFromObj( interp, objv[i],
+                                       &spPtr->dataPtr[i] ) != TCL_OK ) {
+                return TCL_ERROR;
             }
+            if ( spPtr->dataPtr[i] != spPtr->badvalue ) {
+                spPtr->ybot = MIN( spPtr->ybot, spPtr->dataPtr[i] );
+                spPtr->ytop = MAX( spPtr->ytop, spPtr->dataPtr[i] );
+            }
+        }
+    }
+    else {
+        /* Given ARRAYinfo address, convert type into double precision and
+         * check for BAD values which are replaced with our bad value,
+         * -DBL_MAX. */
+        if ( isref ) { 
+            gaiaArrayToDouble( arrayInfo, spPtr->badvalue, spPtr->refDataPtr );
         }
         else {
-            /* Given ARRAYinfo address, convert type into double precision and
-             * check for BAD values which are replaced with our bad value,
-             * -DBL_MAX. */
-            if ( isref ) { 
-                gaiaArrayToDouble( arrayInfo, spPtr->badvalue, 
-                                   spPtr->refDataPtr );
-            }
-            else {
-                gaiaArrayToDouble( arrayInfo, spPtr->badvalue, 
-                                   spPtr->dataPtr );
-
-                /* Get range of data */
-                dataPtr = spPtr->dataPtr;
-                for ( i = 0; i < nel; i++ ) {
-                    if ( *dataPtr != spPtr->badvalue ) {
-                        spPtr->ybot = MIN( spPtr->ybot, *dataPtr );
-                        spPtr->ytop = MAX( spPtr->ytop, *dataPtr );
-                    }
-                    dataPtr++;
+            gaiaArrayToDouble( arrayInfo, spPtr->badvalue, spPtr->dataPtr );
+            
+            /* Get range of data */
+            dataPtr = spPtr->dataPtr;
+            for ( i = 0; i < nel; i++ ) {
+                if ( *dataPtr != spPtr->badvalue ) {
+                    spPtr->ybot = MIN( spPtr->ybot, *dataPtr );
+                    spPtr->ytop = MAX( spPtr->ytop, *dataPtr );
                 }
+                dataPtr++;
             }
         }
-
-        /* Check if data has no range, in that case just add +/- 1, so we can
-         * plot something. During interactive updates that's better than
-         * throwing an error. */
-        if ( ! isref ) {
-            if ( spPtr->ybot == spPtr->ytop ) {
-                /* No range */
-                spPtr->ybot -= 1.0;
-                spPtr->ytop += 1.0;
-            }
-            else if ( spPtr->ybot == DBL_MAX ) {
-                /* All bad */
-                spPtr->ybot = -1.0;
-                spPtr->ytop =  1.0;
-            }
+    }
+    
+    /* Check if data has no range, in that case just add +/- 1, so we can
+     * plot something. During interactive updates that's better than
+     * throwing an error. */
+    if ( ! isref ) {
+        if ( spPtr->ybot == spPtr->ytop ) {
+            /* No range */
+            spPtr->ybot -= 1.0;
+            spPtr->ytop += 1.0;
         }
-
+        else if ( spPtr->ybot == DBL_MAX ) {
+            /* All bad */
+            spPtr->ybot = -1.0;
+            spPtr->ytop =  1.0;
+        }
     }
     return TCL_OK;
 }
