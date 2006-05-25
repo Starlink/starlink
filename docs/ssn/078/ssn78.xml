@@ -1977,8 +1977,19 @@ variables set, which could trick you into believing that they are
 
           <p>Note that certain special characters, symbols, and the &latex; logo
           copied from &latex; source will need to be replaced with XML entities
-          (see <em>Entity References</em> <docxref doc="SSN/70" />.</p>
-          
+          (see <em>Entity References</em> <docxref doc="SSN/70" />).
+          In particular, you will have to escape the
+          ampersand, left- and right-angle-bracket characters as
+          <code>&amp;amp;</code>, <code>&amp;lt;</code> and
+          <code>&amp;gt;</code> respectively.</p>
+
+          <p>The DTD for this file is included in the repository, at <webref
+          url='http://cvsweb.starlink.ac.uk/cvsweb.cgi/buildsupport/starconf/componentinfo.dtd'
+          ><code>buildsupport/starconf/componentinfo.dtd</code></webref>, with a
+          RelaxNG version at <webref
+          url='http://cvsweb.starlink.ac.uk/cvsweb.cgi/buildsupport/starconf/componentinfo.rnc'
+          ><code>buildsupport/starconf/componentinfo.rnc</code></webref>.</p>
+
         </subsubsect>
 
       </subsect>
@@ -3591,7 +3602,8 @@ as an overview.</p>
 <p>1. <code>component.xml</code>: every component has to have an
 XML-valid instance of this, as defined by
 <code>componentinfo.dtd</code> with element
-<code>&lt;component&gt;</code> at the root level.</p>
+<code>&lt;component&gt;</code> at the root level
+(see <ref id='componentxml'/>).</p>
 
 <p>2. A Makefile which implements most/all of the GNU standard
 targets<index>make targets</index>.
@@ -3809,9 +3821,9 @@ STAR_PREDIST_SOURCES(error.h.in version.h.in)
 @PREDIST@    -e 's,@PACKAGE_VERSION_RELEASE\@,$(PACKAGE_VERSION_RELEASE),' \
 @PREDIST@    -e 's,@PERL\@,$(PERL),'
 @PREDIST@error.h: error.h.in
-@PREDIST@	rm -f $@; $(predist_subs) $< >$@
+@PREDIST@	rm -f $@; $(predist_subs) $&lt; >$@
 @PREDIST@version.h: version.h.in
-@PREDIST@	rm -f $@; $(predist_subs) $< >$@
+@PREDIST@	rm -f $@; $(predist_subs) $&lt; >$@
 </verbatim>
           (this is the same technique that was illustrated in passing
           in the discussion of `installation locations' in <ref
@@ -4266,7 +4278,7 @@ STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
 install: config.h install-manifest.xml
          for subdir in $(SUBDIRS); do \
              echo making $@ in $$subdir; \
-             (cd $$subdir && $(MAKE) $(MDEFINES) $@) || exit 1; \
+             (cd $$subdir &amp;&amp; $(MAKE) $(MDEFINES) $@) || exit 1; \
          done
          $(srcdir)/mkinstalldirs $(STAR_MANIFEST_DIR)
          $(INSTALL_DATA) install-manifest.xml $(STAR_MANIFEST_DIR)/$(PRODUCT)
@@ -5229,7 +5241,7 @@ dtask_main.o: dtask_main.f
 install-exec-local: dtask_main.o
         $(mkdir_p) $(DESTDIR)$(libdir)
 	$(INSTALL_PROGRAM) dtask_main.o $(DESTDIR)$(libdir)
-        $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(libdir)/dtask_main.o" || :
+        $(MANIFEST) &amp;&amp; echo "MANIFEST:$(DESTDIR)$(libdir)/dtask_main.o" || :
 </verbatim>
 This first creates the library directory if necessary.  The rules then
 use the <code>$(INSTALL_PROGRAM)</code> command to install the object
@@ -6741,10 +6753,10 @@ int main(int argc, char** argv)
             you <em>do</em> use it, you will have to make that
             available, either through
             <code>STAR_CHECK_PROGS(star2html)</code> or otherwise (see
-            <ref id="macro-check-progs"/>).</p> If you need to tune the
+            <ref id="macro-check-progs"/>).  If you need to tune the
             parameters used when running the <code>star2html</code> command, 
             then assign these to the <code>STAR2HTML_FLAGS</code>
-            macro in <code>Makefile.am</code>. 
+            macro in <code>Makefile.am</code>.</p>
 
           <p>The default rule for compiling &latex; files simply runs &latex;
             twice.  If you need to do more than this -- for example to
