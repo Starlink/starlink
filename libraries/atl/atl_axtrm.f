@@ -327,7 +327,7 @@
      :                                      STATUS )
                                   END IF
         
-                                  CALL KPG1_MKLUT( KS, JU, NX, N, SFRM,
+                                  CALL ATL_MKLUT( KS, JU, NX, N, SFRM,
      :                                      %VAL( CNF_PVAL( IPOUT ) ),
      :                                      LUTMAP( IU ), STATUS )
 

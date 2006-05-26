@@ -1,4 +1,4 @@
-      PROGRAM ATL_TEST
+/*
 *+
 *  Name:
 *     ATL_TEST
@@ -53,39 +53,31 @@
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+#include "star/atl.h"
+#include "sae_par.h"
+#include "mers.h"
+#include <stdio.h>
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+main(){
 
-*  Status:
-      INTEGER STATUS             ! Global status
+   int status;
 
-*  Local Variables:
-
-*.
-
-*  Initialise inherited global status.
-      STATUS = SAI__OK
+/* Initialise the global status */
+   status = sai__ok;
 
 
 
-*  To be written........
+/* To be written........ */
 
 
 
 
-*  If an error occurred, then report a contextual message.
-      IF ( STATUS .NE. SAI__OK ) THEN
-
-         CALL ERR_REP( 'ATL_TEST_ERR6',
-     :   'ATL_TEST: ATL_ installation test failed.', STATUS )
-
-      ELSE
-         CALL MSG_OUT( ' ', 'ATL_ installation test passed.', STATUS )
-
-      END IF
-
-      END
+/* If an error occurred, then report a contextual message. */
+   if( status != sai__ok ) {
+      errRep( "", 'ATL_TEST: ATL_ installation test failed.', status );
+   } else {
+      msgOut( "", 'ATL_TEST: ATL_ installation test passed.', status );
+   }
+}
