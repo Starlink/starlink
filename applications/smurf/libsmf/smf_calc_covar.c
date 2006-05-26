@@ -47,6 +47,8 @@
 *  History:
 *     2006-05-17 (AGG):
 *        Initial test version
+*     2006-05-26 (AGG):
+*        Free allocated resources
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -108,7 +110,7 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
   double *idata = NULL;       /* Pointer to array for bolometer 1 data */
   double *jdata = NULL;       /* Pointer to array for bolometer 2 data */
   int temp;                   /* Temporary variable */
-  double covar = VAL__BADD;   /* Covariance */
+  double covar = VAL__BADD;   /* Covariance, initialuzed to bad */
 
   /* Check status */
   if (*status != SAI__OK) return covar;
@@ -211,6 +213,12 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
 
   /* Calculate stats */
   covar = gsl_stats_covariance( idata, 1, jdata, 1, npts );
+
+  /* Free resources */
+  if ( idata != NULL)
+    smf_free( idata, status );
+  if ( jdata != NULL)
+    smf_free( jdata, status );
 
   return covar;
 
