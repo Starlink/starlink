@@ -396,7 +396,7 @@ void PNGBitmap::write (const string filename)
 	// that the allocated space grows gracefully).
 	for (rows_alloc = 1; rows_alloc < h_; rows_alloc *= 2)
 	    ;
-	rows = new (const Byte*)[rows_alloc];
+	rows = new const Byte*[rows_alloc];
 	if (verbosity_ > normal)
 	    cerr << "PNGBitmap: allocated " << rows_alloc
 		 << "(" << h_ << ") row elements\n";
