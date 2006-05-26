@@ -60,12 +60,12 @@
 #include "mers.h"
 #include <stdio.h>
 
-main(){
+int main(){
 
    int status;
 
 /* Initialise the global status */
-   status = sai__ok;
+   status = SAI__OK;
 
 
 
@@ -75,9 +75,11 @@ main(){
 
 
 /* If an error occurred, then report a contextual message. */
-   if( status != sai__ok ) {
-      errRep( "", 'ATL_TEST: ATL_ installation test failed.', status );
+   if( status != SAI__OK ) {
+      errRep( "", "ATL_TEST: ATL_ installation test failed.", &status );
    } else {
-      msgOut( "", 'ATL_TEST: ATL_ installation test passed.', status );
+      msgOut( "", "ATL_TEST: ATL_ installation test passed.", &status );
    }
+
+   return status;
 }
