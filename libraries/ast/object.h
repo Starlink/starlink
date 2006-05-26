@@ -303,6 +303,9 @@
 *        Moved AST__TUNULL from this file to memory.h.
 *     10-MAY-2006 (DSB):
 *        Added astEQUAL, astMAX and astMIN.
+*     26-MAY-2006 (DSB):
+*        Make all system includes unconditional, so that makeh is not
+*        confused when creating ast.h.
 *--
 */
 
@@ -320,13 +323,9 @@
 /* C header files. */
 /* --------------- */
 #include <stddef.h>
-#if defined(astCLASS)
 #include <stdarg.h>
 #include <float.h>
-#endif
-#if defined(MEM_DEBUG)
 #include <stdio.h>
-#endif
 
 /* Macros. */
 /* ======= */
