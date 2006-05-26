@@ -6,7 +6,6 @@
 
 *  Purpose:
 *     Format a position for CURSOR.
-*     contoured.
 
 *  Language:
 *     Starlink Fortran 77
@@ -79,6 +78,8 @@
 *  History:
 *     15-OCT-1998 (DSB):
 *        Original version.
+*     26-MAY-2006 (DSB):
+*        Correct tabbing between output columns.
 *     {enter_further_changes_here}
 
 *-
@@ -150,7 +151,7 @@
 *  Are all axis values good?
          IF( CXY( I ) .EQ. AST__BAD ) GOOD = .FALSE.
 
-*  Append the axis symbol and an equals sign to thr returned text if
+*  Append the axis symbol and an equals sign to the returned text if
 *  required.
          IF( EXTRA ) THEN
 
@@ -208,7 +209,7 @@
 *  Tab to the start of the next column. Subsequent positions use the 
 *  same tabs even though the field widths will be smaller (due to the 
 *  abscence of the units strings).
-         IF( I .LT. NAX ) THEN
+         IF( I .LE. NAX ) THEN
             IF( NEWPIC ) THEN
                IAT = 6*( 1 + IAT/6 )
                ICOL( I ) = IAT
