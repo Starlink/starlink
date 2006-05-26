@@ -128,6 +128,8 @@
 #include "star/grp.h"
 #include "smf_typ.h"
 
+void smf_boxcar1 ( double *series, const int ninpts, int window, int *status);
+
 void smf_calc_stats( const smfData *data, const char *mode, const int index,
                      int lo, int hi, double mean, double sigma, 
 		     int *status);

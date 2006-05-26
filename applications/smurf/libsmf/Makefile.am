@@ -16,7 +16,7 @@ smf_open_and_flatfield.c \
 smf_flatfield.c smf_check_flat.c smf_flatten.c \
 smf_clone_data.c smf_scanfit.c smf_get_xloc.c smf_get_ndfid.c \
 smf_create_smfData.c smf_create_smfFile.c smf_create_smfHead.c \
-smf_create_smfDA.c \
+smf_create_smfDA.c smf_boxcar1.c \
 smf_construct_smfFile.c smf_construct_smfHead.c smf_construct_smfDA.c \
 smf_construct_smfData.c smf_deepcopy_smfFile.c \
 smf_deepcopy_smfHead.c smf_deepcopy_smfData.c smf_deepcopy_smfDA.c \
