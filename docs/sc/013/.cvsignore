@@ -1,0 +1,10 @@
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+config.log
+config.status
+configure
+sc13.htx_tar
+sc13.htx_tar.extras
+starconf.status
