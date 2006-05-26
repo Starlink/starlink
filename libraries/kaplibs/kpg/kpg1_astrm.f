@@ -41,7 +41,24 @@
 *     RA value because the relationship between RA and Dec is determined
 *     by the position and orientation of the slit on the sky. If it is
 *     not possible to determine the value for a dropped axis in this way,
+*     then what happens depends on whether or not any Frames can be found
+*     in the FrameSet that are Regions having a Domain name of "ROI<n>", 
+*     where "<n>" is a positive integer. If no such Frame can be found, 
 *     AST__BAD is supplied for the dropped axis.
+*
+*     If the supplied current Frame has too many axes, and one or more ROI 
+*     Regions are found in the FrameSet, then a new Frame is added into
+*     the FrameSet for each ROI Region found. These new Frames are all
+*     equivalent, containing axes from the supplied current Frame as
+*     specified by the USEAXIS parameter, and they are all connected to
+*     the supplied current Frame via a PermMap. Each PermMap has a
+*     forward transformation that simply drops the unwanted axis values.
+*     The inverse transformation of each PermMap supplies suitable values 
+*     for the unwanted axes. These are determined by transforming the
+*     bounding box of the corresponding ROI Region into the original current 
+*     Frame. The Domain name of the corresponding ROI Region is stored in
+*     the Ident attribute of the new Frame. The new Frame corresponding
+*     to the lowest numbered ROI Region is left as the current Frame on exit.
 
 *  Parameters:
 *     The name of the following environment parameter(s) are hard-wired 
@@ -108,6 +125,8 @@
 *        Original version.
 *     2-DEC-2005 (DSB):
 *        Added DEFAX to argument list.
+*     25-MAY-2006 (DSB):
+*        Added support for ROI Regions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -138,20 +157,34 @@
       INTEGER CHR_LEN
 
 *  Local Variables:
+      CHARACTER DOM*20
       CHARACTER TTL*80             
+      DOUBLE PRECISION CLBND
+      DOUBLE PRECISION CONST( NDF__MXDIM )
+      DOUBLE PRECISION CUBND
       DOUBLE PRECISION PX
+      DOUBLE PRECISION RLBND( NDF__MXDIM )
+      DOUBLE PRECISION RUBND( NDF__MXDIM )
+      DOUBLE PRECISION XL( NDF__MXDIM )
+      DOUBLE PRECISION XU( NDF__MXDIM )
       INTEGER BCMAP
       INTEGER CFRM
+      INTEGER CSTAT
       INTEGER CURAXES( NDF__MXDIM )
+      INTEGER CURF
+      INTEGER FRM
       INTEGER I                    
+      INTEGER IAX
       INTEGER IAXIS( NDF__MXDIM )  
+      INTEGER ICUR0
+      INTEGER ICUR1
       INTEGER INVAXES( NDF__MXDIM )
       INTEGER IPOUT
       INTEGER IS
       INTEGER IU
       INTEGER J
-      INTEGER K
       INTEGER JU
+      INTEGER K
       INTEGER KS
       INTEGER L
       INTEGER LTTL                 
@@ -165,10 +198,12 @@
       INTEGER NDIM
       INTEGER NEWCUR               
       INTEGER NFC                  
+      INTEGER NFRM
       INTEGER NX
       INTEGER PIXAXES( NDF__MXDIM )
       INTEGER SFRM
       LOGICAL MAPPED
+      LOGICAL UNIT
 *.
 
 *  Check the inherited global status.
@@ -380,35 +415,142 @@
 *  copy the AST__BAD value supplied by the following PermMap.
          IF( LUTMAP( 1 ) .EQ. AST__NULL ) THEN
             LUTMAP( 1 ) = AST_UNITMAP( 1, ' ', STATUS )
+            UNIT = .TRUE.
+         ELSE
+            UNIT = .FALSE.
          END IF
          MAP2 = AST_CLONE( LUTMAP( 1 ), STATUS )
 
          DO I = 2, NFC
             IF( LUTMAP( I ) .EQ. AST__NULL ) THEN
                LUTMAP( I ) = AST_UNITMAP( 1, '', STATUS )
+            ELSE
+               UNIT = .FALSE.
             END IF
             MAP2 = AST_CMPMAP( MAP2, LUTMAP( I ), .FALSE., ' ', 
      :                         STATUS )
          END DO
 
-
-*  Create the TranMap to combine these two Mappings.
-         CALL AST_INVERT( MAP2, STATUS )
-         MAP3 = AST_TRANMAP( MAP1, MAP2, ' ', STATUS )
+*  If the splitting gave us some advantage, create the TranMap to combine 
+*  these two Mappings.
+         IF( .NOT. UNIT ) THEN
+            CALL AST_INVERT( MAP2, STATUS )
+            MAP3 = AST_TRANMAP( MAP1, MAP2, ' ', STATUS )
 
 *  Create the following PermMap which has an input for every current
 *  Frame axis and an output for each selected axis.
-         MAP4 = AST_PERMMAP( NFC, INVAXES, NDIM, CURAXES, AST__BAD, 
-     :                       ' ', STATUS )
+            MAP4 = AST_PERMMAP( NFC, INVAXES, NDIM, CURAXES, AST__BAD, 
+     :                          ' ', STATUS )
 
 *  Combine the TranMap and the PermMap in series, and simplify.
-         MAP5 = AST_SIMPLIFY( AST_CMPMAP( MAP3, MAP4, .TRUE., ' ', 
-     :                                    STATUS ), STATUS )
+            MAP5 = AST_SIMPLIFY( AST_CMPMAP( MAP3, MAP4, .TRUE., ' ', 
+     :                                       STATUS ), STATUS )
 
 *  Add the selected axis Frame into the FrameSet using this CmpMap to
 *  connect it to the original current Frame. It becomes the current Frame.
-         CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP5, NEWCUR, 
-     :                      STATUS )
+            CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP5, NEWCUR, 
+     :                         STATUS )
+
+*  If splitting the Mapping did not allow us to assign a value to any
+*  unwanted axes, then we look to see if there are an Regions in the
+*  FrameSet with a Domain of "ROI<k>" where <k> is a positive integer.
+         ELSE
+
+*  Note the index of the original current Frame.
+            ICUR0 = AST_GETI( IWCS, 'Current', STATUS )
+
+*  Indicate the new current Frame has not yet been set. 
+            ICUR1 = AST__NOFRAME
+
+*  Loop round all Frames in the supplied FrameSet.
+            NFRM = AST_GETI( IWCS, 'Nframe', STATUS )
+            DO I = 1, NFRM
+               FRM = AST_GETFRAME( IWCS, I, STATUS )
+
+*  Pass on if this Frame is not a Region, or if its Domain value does not
+*  begin with the string "ROI".
+               IF( AST_ISAREGION( FRM, STATUS ) ) THEN
+                  DOM = AST_GETC( FRM, 'Domain', STATUS )
+                  IF( DOM( : 3 ) .EQ. 'ROI' .AND. 
+     :                STATUS .EQ. SAI__OK ) THEN
+
+*  Attempt to read an integer from the rest of the Domain name. Check the
+*  CHR status afterwards to see if an integer was read succesfully.
+                     CALL CHR_CTOI( DOM( 4 : ), K, CSTAT )
+                     IF( CSTAT .EQ. SAI__OK ) THEN
+
+*  Get the Mapping from the ROI Region to the original current Frame.
+                        MAP2 = AST_GETMAPPING( IWCS, I, ICUR0, STATUS )
+
+*  Get the bounding box of the Region
+                        CALL AST_GETREGIONBOUNDS( FRM, RLBND, RUBND, 
+     :                                            STATUS )
+
+*  Loop round all axes in the original current Frame.
+                        J = 1
+                        DO IAX = 1, NFC
+
+*  If this is not an unwanted axis, pass on.
+                           IF( INVAXES( IAX ) .LE. 0 ) THEN
+
+*  Find the bounds of the Region on the current output axis.
+                              CALL AST_MAPBOX( MAP2, RLBND, RUBND, 
+     :                                         .TRUE., IAX, CLBND,
+     :                                         CUBND, XL, XU, STATUS )
+
+*  Use the mid value as the value to be returned by the inverse
+*  transformation of the PermMap.
+                              CONST( J ) = 0.5*( CLBND + CUBND )
+                              INVAXES( IAX ) = -J
+
+                           END IF
+                        END DO
+
+*  Create the PermMap.
+                        MAP1 = AST_PERMMAP( NFC, INVAXES, NDIM, CURAXES, 
+     :                                      CONST, ' ', STATUS )
+
+*  Take a copy of the new current Frame and set its Ident attribute to
+*  identify the corresponding ROI Region.
+                        CURF = AST_COPY( NEWCUR, STATUS )
+                        CALL AST_SETC( CURF, 'Ident', DOM, STATUS )
+
+*  Add this Frame into the FrameSet using the above PermMap to connect it to 
+*  the original current Frame. It becomes the current Frame.
+                        CALL AST_ADDFRAME( IWCS, ICUR0, MAP1, CURF, 
+     :                                     STATUS )
+
+*  If the index of the new current Frame has not yet been noted, note it
+*  now.
+                        IF( ICUR1 .EQ. AST__NOFRAME ) THEN
+                           ICUR1 = AST_GETI( IWCS, 'Current', STATUS )
+                        END IF
+
+*  Annul AST resources.
+                        CALL AST_ANNUL( CURF, STATUS )
+                        CALL AST_ANNUL( MAP1, STATUS )
+                        CALL AST_ANNUL( MAP2, STATUS )
+
+                     END IF
+                  END IF
+               END IF
+
+               CALL AST_ANNUL( FRM, STATUS )
+            END DO
+
+*  If any ROI Regions were found, set the final current Frame. */
+            IF( ICUR1 .NE. AST__NOFRAME ) THEN
+               CALL AST_SETI( IWCS, 'Current', ICUR1, STATUS ) 
+
+*  Otherwise, we connect the new current Frame to the original using a
+*  PermMap that supplied AST__BAD for the unwanted axes. 
+            ELSE
+               MAP1 = AST_PERMMAP( NFC, INVAXES, NDIM, CURAXES, 
+     :                             AST__BAD, ' ', STATUS )
+               CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP1, NEWCUR, 
+     :                            STATUS )
+            END IF
+         END IF
 
 *  Now deal with cases where the original Current Frame has too few axes.
 *  ======================================================================
