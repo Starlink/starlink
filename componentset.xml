@@ -201,6 +201,33 @@ emission within 2- or 3- dimensional data arrays.
   </copyright>
 </component>
 
+<component id="cupid" support="S">
+  <version>0.0-6</version>
+  <path>applications/cupid</path>
+  <description>CUPID - AST applications</description>
+  <abstract><p>
+CUPID is a package of applications which identify and analyse clumps of
+emission within 2- or 3- dimensional data arrays.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build>mers</build><build>cnf</build><build>ifd</build><build>ndf</build><build>sae</build><build option='link'>kaplibs</build><build option='link'>ast</build><build option='link'>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David S. Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation> sun255</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>2005</year>
+    <name>Joint Astronomy Centre Hawaii</name>
+  </copyright>
+</component>
+
 <component id="cursa" support="S">
   <version>6.5</version>
   <path>applications/cursa</path>
@@ -647,7 +674,7 @@ and its coordinates are displayed.
 </component>
 
 <component id="gaia" support="S">
-  <version>3.0-3</version>
+  <version>3.0-1</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -852,6 +879,60 @@ Traces an HDS file
     </person>
   </developers>
   <bugreports>ussc@starlink.ac.uk</bugreports>
+</component>
+
+<component id="cupid" support="S">
+  <version>0.0-1</version>
+  <path>applications/cupid</path>
+  <description>CUPID - AST applications</description>
+  <abstract><p>
+CUPID is a package of applications which identify and analyse clumps of
+emission within 2- or 3- dimensional data arrays.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build>mers</build><build>cnf</build><build>ifd</build><build>ndf</build><build>sae</build><build option='link'>kaplibs</build><build option='link'>ast</build><build option='link'>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David S. Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation> sun255</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>2005</year>
+    <name>Joint Astronomy Centre Hawaii</name>
+  </copyright>
+</component>
+
+<component id="cupid" support="S">
+  <version>0.0-8</version>
+  <path>applications/cupid</path>
+  <description>CUPID - AST applications</description>
+  <abstract><p>
+CUPID is a package of applications which identify and analyse clumps of
+emission within 2- or 3- dimensional data arrays.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build>mers</build><build>cnf</build><build>ifd</build><build>ndf</build><build>sae</build><build option='link'>kaplibs</build><build option='link'>ast</build><build option='link'>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David S. Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation> sun255</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>2005</year>
+    <name>Joint Astronomy Centre Hawaii</name>
+  </copyright>
 </component>
 
 <component id="kappa" support="S">
@@ -1593,36 +1674,87 @@ to handle data from a variety of different instruments.
 </component>
 
 
-<component id="sc2">
-  <version>3</version>
-  <path>docs/sc/002</path>
-  <description>The DX Cookbook</description>
-  <abstract><p>IBM DX (Data Explorer) is the data visualisation package 
-     recommended by Starlink, particularly for the visualisation of
-     three-dimensional scalar and vector data. This cookbook provides
-     a set of simple recipes for performing common operations using
-     DX. No prior knowledge of DX is required. You can use the recipes
-     as they are provided, if they are suitable for your purposes, or
-     alternatively you can use them as a starting point for generating
-     your own visualisations.
-
-     The cookbook also contains a brief summary of the DX data model.
-     It is useful to have at least some understanding of this data
-     model in order to use DX effectively.
-    </p></abstract>
+<component id="ast" support="S">
+  <version>4.2-1</version>
+  <path>libraries/ast</path>
+  <description>WCS library</description>
+  <abstract>
+    <p>The AST library provides a comprehensive range of facilities for
+      attaching world coordinate systems to astronomical data, for
+      retrieving and interpreting that information in a variety of formats,
+      including FITS-WCS, and for generating graphical output based on it.</p>
+    <p>This library should be of interest to anyone writing
+      astronomical applications which need to manipulate coordinate system
+      data, especially celestial or spectral coordinate systems. AST
+      is portable and environment-independent.</p>
+  </abstract>
   <dependencies >
-    <sourceset>star2html</sourceset>
+    <sourceset>sst</sourceset><sourceset>htx</sourceset><build>sla</build><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
-      <name>A.C. Davenhall</name>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
     </person>
   </developers>
-  <documentation> sc2</documentation>
+  <documentation> sun210 sun211</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
-    <year>1997</year>
-    <name>CLRC</name>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+</component>
+
+<component id="ast" support="S">
+  <version>4.2-1</version>
+  <path>libraries/ast</path>
+  <description>WCS library</description>
+  <abstract>
+    <p>The AST library provides a comprehensive range of facilities for
+      attaching world coordinate systems to astronomical data, for
+      retrieving and interpreting that information in a variety of formats,
+      including FITS-WCS, and for generating graphical output based on it.</p>
+    <p>This library should be of interest to anyone writing
+      astronomical applications which need to manipulate coordinate system
+      data, especially celestial or spectral coordinate systems. AST
+      is portable and environment-independent.</p>
+  </abstract>
+  <dependencies >
+    <sourceset>sst</sourceset><sourceset>htx</sourceset><build>sla</build><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun210 sun211</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
   </copyright>
 </component>
 
@@ -1649,148 +1781,6 @@ to handle data from a variety of different instruments.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
     <year>2000, 2003</year>
-    <name>CLRC</name>
-  </copyright>
-</component>
-
-<component id="sc4">
-  <version>2</version>
-  <path>docs/sc/004</path>
-  <description>C-shell Cookbook</description>
-  <abstract><p>
-      This cookbook describes the fundamentals of writing scripts
-      using the UNIX C shell.  It shows how to combine Starlink and
-      private applications with shell commands and constructs to
-      create powerful and time-saving tools for performing repetitive
-      jobs, creating data-processing pipelines, and encapsulating
-      useful recipes.  The cookbook aims to give practical and
-      reassuring examples to at least get you started without having
-      to consult a UNIX manual.  However, it does not offer a
-      comprehensive description of C-shell syntax to prevent you from
-      being overwhelmed or intimidated.  The topics covered are: how
-      to run a script, defining shell variables, prompting, arithmetic
-      and string processing, passing information between Starlink
-      applications, obtaining dataset attributes and FITS header
-      information, processing multiple files and filename
-      modification, command-line arguments and options, and loops.
-      There is also a glossary.
-    </p></abstract>
-  <dependencies >
-    <sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Malcolm J. Currie</name>
-    </person>
-  </developers>
-  <documentation> sc4</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year>1997, 1998, 2005</year>
-    <name>CLRC</name>
-  </copyright>
-</component>
-
-<component id="sc6">
-  <version>4</version>
-  <path>docs/sc/006</path>
-  <description>The CCD Photometric Calibration Cookbook</description>
-  <abstract><p>This cookbook presents simple recipes for the
-      photometric calibration of CCD frames.  Using these recipes you
-      can calibrate the brightness of objects measured in CCD frames
-      into magnitudes in standard photometric systems, such as the
-      Johnson-Morgan UBV, system. The recipes use standard
-      software available at all Starlink sites.
-
-      The topics covered include: selecting standard stars, measuring
-      instrumental magnitudes and calibrating instrumental magnitudes
-      into a standard system.  The recipes are appropriate for use
-      with data acquired with optical CCDs and filters, operated in
-      standard ways, and describe the usual calibration technique of
-      observing standard stars.  The software is robust and reliable,
-      but the techniques are usually not suitable where very high
-      accuracy is required.
-
-      In addition to the recipes and scripts, sufficient background
-      material is presented to explain the procedures and techniques
-      used.  The treatment is deliberately practical rather than
-      theoretical, in keeping with the aim of providing advice on the
-      actual calibration of observations.
-    </p></abstract>
-  <dependencies >
-    <sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>J. Palmer and A.C. Davenhall</name>
-    </person>
-  </developers>
-  <documentation> sc6</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year>1997, 1998, 1999, 2001</year>
-    <name>CLRC</name>
-  </copyright>
-</component>
-
-<component id="sc7">
-  <version>2</version>
-  <path>docs/sc/007</path>
-  <description>Simple Spectroscopy Reductions</description>
-  <abstract><p>This Cookbook describes the basic concepts and methods used in
-      optical astronomical spectroscopy; it is aimed at those new to
-      the field. Complete worked example reductions for both 1-D and
-      2-D longslit spectra, using real datasets, are described.
-      Common problems and their solutions are discussed.  A section on
-      related resources is included, as is a glossary of commonly used
-      terms This cookbook presents simple recipes for the photometric
-      calibration of CCD frames.  Using these recipes you can
-      calibrate the brightness of objects measured in CCD frames into
-      magnitudes in standard photometric systems, such as the
-      Johnson-Morgan UBV, system. The recipes use standard software
-      available at all Starlink sites.
-    </p></abstract>
-  <dependencies >
-    <sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Martin Clayton and Anthony Holloway</name>
-    </person>
-  </developers>
-  <documentation> sc7</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year>1997, 1998</year>
-    <name>CLRC</name>
-  </copyright>
-</component>
-
-<component id="sc12">
-  <version>1</version>
-  <path>docs/sc/012</path>
-  <description>Writing your own Data Reduction Software</description>
-  <abstract><p>
-      This Cookbook shows you how to write your own software for
-      astronomical data reduction. There are two parts. The first part
-      introduces you to simple data reduction using Starlink's IMG
-      subroutine library. This hides a lot of the underlying
-      complications. The second part introduces you to the more
-      powerful (but more complex) NDF subroutine library for handling
-      data.
-    </p></abstract>
-  <dependencies >
-    <sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Jon Lockley</name>
-    </person>
-  </developers>
-  <documentation> sc12</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year>1997</year>
     <name>CLRC</name>
   </copyright>
 </component>
@@ -1825,99 +1815,6 @@ to handle data from a variety of different instruments.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
     <year>1999, 2001--2003</year>
-    <name>CLRC</name>
-  </copyright>
-</component>
-
-<component id="sc14">
-  <version>2</version>
-  <path>docs/sc/012</path>
-  <description>The Fibre Spectroscopy Cookbook</description>
-  <abstract><p>
-      This cookbook is an introduction to fibre spectroscopy and, in
-      particular, the techniques and software available for reducing
-      fibre-spectroscopy observations.  It covers the principal
-      common-user instruments available to UK astronomers: the
-      Anglo-Australian Telescope 2dF, WYFFOS/AUTOFIB2 on the William
-      Herschel Telescope and FLAIR on the UK Schmidt.  It is not a
-      manual for any particular package, though it does contain some
-      worked examples.
-      </p></abstract>
-  <dependencies >
-    <sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>A.C. Davenhall}</name>
-    </person>
-  </developers>
-  <documentation> sc14</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year>1998, 1999</year>
-    <name>CLRC</name>
-  </copyright>
-</component>
-
-<component id="sc15">
-  <version>2</version>
-  <path>docs/sc/015</path>
-  <description>C-shell Cookbook</description>
-  <abstract><p>
-      This cookbook is a collection of introductory material covering
-      a wide range of topics dealing with data display, format
-      conversion and presentation. Along with this material are
-      pointers to more advanced documents dealing with the various
-      packages, and hints and tips about how to deal with commonly
-      occurring graphics problems.
-    </p></abstract>
-  <dependencies >
-    <sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>A. Allan & D. Terrett</name>
-    </person>
-  </developers>
-  <documentation> sc15</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year>2000</year>
-    <name>CLRC</name>
-  </copyright>
-</component>
-
-<component id="sc17">
-  <version>1</version>
-  <path>docs/sc/017</path>
-  <description>The GAIA Cookbook</description>
-  <abstract><p>
-     GAIA (Graphical Astronomy and Image Analysis) is an interactive
-     astronomical image display and analysis tool.  It includes a
-     comprehensive suite of facilities for displaying and manipulating
-     images.  It also has extensive facilities for the astronomical
-     analysis of images, including: astrometric calibration, automatic
-     object detection and aperture, optimal and surface photometry.
-     GAIA can access images in most of the data formats common in
-     astronomy and can also retrieve copies of remote images and
-     catalogues via the Internet.
-
-     This cookbook is an introduction to GAIA.  It describes the
-     facilities that GAIA provides and gives some simple examples of
-     their use.  It refers to GAIA version 2.6 or higher.
-    </p></abstract>
-  <dependencies >
-    <sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>A.C. Davenhall & P.W. Draper</name>
-    </person>
-  </developers>
-  <documentation> sc17</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year>2001</year>
     <name>CLRC</name>
   </copyright>
 </component>
@@ -2100,6 +1997,37 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
+<component id="ary" support="S">
+  <version>1.2</version>
+  <path>libraries/ary</path>
+  <description>A Subroutine Library for Accessing ARRAY Data Structures</description>
+  <abstract><p> The ARY library is a set of routines for accessing
+  Starlink ARRAY data structures built using the Hierarchical Data
+  System (HDS).
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>prm</build><build>hds</build><build>chr</build><build>ems</build><link>hds</link><link>ems</link><link>chr</link><link>prm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation> sun11</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+</component>
+
 <component id="ast" support="S">
   <version>4.2-1</version>
   <path>libraries/ast</path>
@@ -2135,6 +2063,140 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun210 sun211</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+</component>
+
+<component id="ast" support="S">
+  <version>4.2-1</version>
+  <path>libraries/ast</path>
+  <description>WCS library</description>
+  <abstract>
+    <p>The AST library provides a comprehensive range of facilities for
+      attaching world coordinate systems to astronomical data, for
+      retrieving and interpreting that information in a variety of formats,
+      including FITS-WCS, and for generating graphical output based on it.</p>
+    <p>This library should be of interest to anyone writing
+      astronomical applications which need to manipulate coordinate system
+      data, especially celestial or spectral coordinate systems. AST
+      is portable and environment-independent.</p>
+  </abstract>
+  <dependencies >
+    <sourceset>sst</sourceset><sourceset>htx</sourceset><build>sla</build><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun210 sun211</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+</component>
+
+<component id="ast" support="S">
+  <version>4.2-1</version>
+  <path>libraries/ast</path>
+  <description>WCS library</description>
+  <abstract>
+    <p>The AST library provides a comprehensive range of facilities for
+      attaching world coordinate systems to astronomical data, for
+      retrieving and interpreting that information in a variety of formats,
+      including FITS-WCS, and for generating graphical output based on it.</p>
+    <p>This library should be of interest to anyone writing
+      astronomical applications which need to manipulate coordinate system
+      data, especially celestial or spectral coordinate systems. AST
+      is portable and environment-independent.</p>
+  </abstract>
+  <dependencies >
+    <sourceset>sst</sourceset><sourceset>htx</sourceset><build>sla</build><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun210 sun211</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+</component>
+
+<component id="atl" support="S">
+  <version>1.0</version>
+  <path>libraries/atl</path>
+  <description>ATL - A Library of AST Utility Routines</description>
+  <abstract><p>ATL provides routines that perform high-level AST-related 
+            functions.</p></abstract>
+  <dependencies >
+    <build>cnf</build><build>ast</build><build>sae</build><link>chr</link><link>mers</link><link>ast</link><link>psx</link><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation> sun256</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+</component>
+
+<component id="atl" support="S">
+  <version>1.0</version>
+  <path>libraries/atl</path>
+  <description>ATL - A Library of AST Utility Routines</description>
+  <abstract><p>ATL provides routines that perform high-level AST-related 
+            functions.</p></abstract>
+  <dependencies >
+    <build>cnf</build><build>ast</build><build>sae</build><link>chr</link><link>mers</link><link>ast</link><link>psx</link><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation> sun256</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
     <year></year>
@@ -3683,31 +3745,6 @@ GKS (SUN/83) should be used.</p></abstract>
   </developers>
   -->
   <documentation> sun88</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
-<component id="match" support="U">
-  <version>0.8-0</version>
-  <path>thirdparty/rit/match</path>
-  <description>MATCH</description>
-  <abstract><p>
-This package contains software to match one list of objects against
-another list, allowing for arbitrary translation, rotation, scaling,
-and some distortion.
-</p></abstract>
-    <dependencies >
-    
-  </dependencies>
-  <developers>
-    <!-- MATCH is maintained by Michael Richmond http://spiff.rit.edu/match,
-         but we need a local contact in the first instance.-->
-    <person>
-      <name>Peter W. Draper</name>
-      <uname>pwd</uname>
-      <email>p.w.draper@durham.ac.uk</email>
-      <role>owner</role>
-    </person>
-  </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 

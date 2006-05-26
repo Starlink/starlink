@@ -21,6 +21,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/ard \
 	$(MANIFESTS)/ast \
 	$(MANIFESTS)/astrom \
+	$(MANIFESTS)/atl \
 	$(MANIFESTS)/atools \
 	$(MANIFESTS)/blt \
 	$(MANIFESTS)/cat \
