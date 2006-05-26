@@ -68,6 +68,12 @@ void defineGaiaBitmaps(Tcl_Interp *interp) {
     #include "triangle.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("triangle"), (char*)triangle_bits, triangle_width, triangle_height);
 
+    #include "xrange.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("xrange"), (char*)xrange_bits, xrange_width, xrange_height);
+
+    #include "yrange.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("yrange"), (char*)yrange_bits, yrange_width, yrange_height);
+
     #include "gaia_logo.xpm"
     Tix_DefinePixmap(interp, Tk_GetUid("gaia_logo"), gaia_logo_xpm);
 
