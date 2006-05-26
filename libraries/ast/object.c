@@ -156,6 +156,9 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        Use astOK to protect against errors within astGrow.
 *     1-MAR-2006 (DSB):
 *        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
+*     26-MAY-2006 (DSB):
+*        Correct handling of commas within the attribute value supplied
+*        to astSetC.
 *class--
 */
 
@@ -2394,11 +2397,66 @@ void astSet##code##_( AstObject *this, const char *attrib, type value ) { \
 }
 
 /* Use this macro to create all the SetX_ private member functions. */
-MAKE_SETX(C,const char *,"%*s",3,0)
 MAKE_SETX(D,double,"%.*g",4,DBL_DIG)
 MAKE_SETX(F,float,"%.*g",4,FLT_DIG)
 MAKE_SETX(I,int,"%.*d",4,1)
 MAKE_SETX(L,long,"%.*ld",5,1)
+
+/* The astSetC_ function is implemented separately so that commas can be
+   handled. They are replaced by '\r' before calling astSet, and VSet
+   then converts them back to commas. */
+
+void astSetC_( AstObject *this, const char *attrib, const char *value ) {
+
+/* Local Variables: */
+   char *d;                      /* Pointer to next setting character */
+   char *setting;                /* Pointer to attribute setting string */
+   const char *c;                /* Pointer to next value character */
+   int nlen;                     /* Length of attribute name */
+   int vlen;                     /* Length of attribute value */
+
+/* Check the global status. */
+   if ( !astOK ) return;
+
+/* Allocate memory for a buffer holding the attribute name, followed by
+   an equals sign, followed by the supplied value with any commas replaced
+   by a carriage return "\r". */
+   nlen = (int) strlen( attrib );
+   vlen = (int) strlen( value );
+   setting = astMalloc( (size_t) ( nlen + vlen + 2 ) );
+
+/* Make a copy of the attribute name in the allocated memory. */
+   if ( astOK ) {
+      (void) memcpy( setting, attrib, (size_t) nlen );
+
+/* Append "=". */
+      (void) strcpy( setting + nlen, "=" );
+
+/* Append the supplied value, with commas changed to '\r' */
+      d = setting + nlen + 1;
+      c = value;
+      while( *c ) {
+         if( *c == ',' ) {
+            *d = '\r';
+         } else {
+            *d = *c;
+         }            
+         c++;
+         d++;
+      }
+
+/* Terminate the setting string. */
+      *d = 0;
+
+/* Invoke astSet to set the attribute value. */
+      astSet( this, setting );
+   }
+
+/* Free the allocated memory. */
+   setting = astFree( setting );
+}
+
+
 
 static void Show( AstObject *this ) {
 /*
@@ -2827,6 +2885,7 @@ static void VSet( AstObject *this, const char *settings, va_list args ) {
    char *buff1;                  /* Pointer to temporary string buffer */
    char *buff2;                  /* Pointer to temporary string buffer */
    char *buff3;                  /* Pointer to temporary string buffer */
+   char *eq1;                    /* Pointer to 1st equals sign */
    int buff_len;                 /* Length of temporary buffer */
    int i;                        /* Loop counter for characters */
    int j;                        /* Offset for revised assignment character */
@@ -2849,9 +2908,14 @@ static void VSet( AstObject *this, const char *settings, va_list args ) {
 
 /* Convert each comma in the string into '\n'. This is to distinguish
    commas initially present from those introduced by the formatting to
-   be performed below. */
-         for ( i = 0; i < len; i++ ) {
-            if ( buff1[ i ] == ',' ) buff1[ i ] = '\n';
+   be performed below. We only do this if there is more than one equals
+   sign in the setting string, since otherwise any commas are probably 
+   characters contained within a string attribute value. */
+         eq1 = strchr( buff1, '=' );
+         if( eq1 && strchr( eq1 + 1, '=' ) ) {
+            for ( i = 0; i < len; i++ ) {
+               if ( buff1[ i ] == ',' ) buff1[ i ] = '\n';
+            }
          }
 
 /* Calculate a size for a further buffer twice the size of the first
@@ -2914,11 +2978,16 @@ static void VSet( AstObject *this, const char *settings, va_list args ) {
 
 /* Before the '=' sign, convert all characters to lower case and move
    everything to the left to eliminate white space. Afer the '=' sign,
-   copy all characters to their new location unchanged. */
+   copy all characters to their new location unchanged. astSetC replaces 
+   commas in the attribute value by '\r' characters. Reverse this now. */
                      if ( !lo || !isspace( assign[ i ] ) ) {
-                        assign[ j++ ] = ( lo ? tolower( assign[ i ] ) :
+                        if( assign[ i ] == '\r' ) {
+                           assign[ j++ ] = ',';
+                        } else {
+                           assign[ j++ ] = ( lo ? tolower( assign[ i ] ) :
                                                assign[ i ] );
-		     }
+                        }
+                     }
                   }
 
 /* Terminate the revised assignment string and pass it to astSetAttrib
