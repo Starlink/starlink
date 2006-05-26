@@ -92,6 +92,7 @@
 
 *  Local Variables:
       DOUBLE PRECISION BBOX( 4 )
+      DOUBLE PRECISION D
       DOUBLE PRECISION XL( NDF__MXDIM )
       DOUBLE PRECISION XU( NDF__MXDIM )
       INTEGER MAP
@@ -108,6 +109,15 @@
       CALL AST_MAPBOX( MAP, DLBND, DUBND, .TRUE., 2, BBOX( 2 ), 
      :                 BBOX( 4 ), XL, XU, STATUS )
       CALL AST_ANNUL( MAP, STATUS )
+
+*  Shrink the box slightly to cater for rounding errors.
+      D = ( BBOX( 3 ) - BBOX( 1 ) )*1.0D-8
+      BBOX( 1 ) = BBOX( 1 ) + D
+      BBOX( 3 ) = BBOX( 3 ) - D
+
+      D = ( BBOX( 4 ) - BBOX( 2 ) )*1.0D-8
+      BBOX( 2 ) = BBOX( 2 ) + D
+      BBOX( 4 ) = BBOX( 4 ) - D
 
 *  Create a new Plot covering this area of GRAPHICS coords.
       GBOX( 1 ) = REAL( BBOX( 1 ) )      
