@@ -562,6 +562,9 @@
 *        _DOUBLE data (at the request of TimJ).
 *     2006 April 12 (MJC):
 *        Remove unused variables and wrapped long lines.
+*     3-MAY-2006 (DSB):
+*        - Take account of ROI Frames in the WCS FrameSet.
+*        - Ensure all variable comments are no longer than 1 line.
 *     {enter_further_changes_here}
 
 *-
@@ -596,75 +599,75 @@
       PARAMETER( MXCONT = 50 )
 
 *  Local Variables:
-      CHARACTER COMP*8           ! Component to be displayed
-      CHARACTER DTYPE*(NDF__SZFTP)! Type of the image after processing
+      CHARACTER COMP*8          ! Component to be displayed
+      CHARACTER DOM*20          ! Domain attribute for a Frame
+      CHARACTER DTYPE*(NDF__SZFTP)! Type of the image after processing 
+      CHARACTER IDENT*20        ! Ident attribute for a Frame
       CHARACTER ITYPE*(NDF__SZTYP)! Processing type of the image
-      CHARACTER MCOMP*8          ! Component to be mapped
-      CHARACTER MODE*20          ! Method for selecting contour heights
-      CHARACTER NDFNAM*255       ! Full NDF specification 
+      CHARACTER MCOMP*8         ! Component to be mapped
+      CHARACTER MODE*20         ! Method for selecting contour heights
+      CHARACTER NDFNAM*255      ! Full NDF specification 
       CHARACTER UNITS*(CUNITS + 5)! Units of the data
-      DOUBLE PRECISION BOX( 4 )  ! Bounds of image in pixel co-ordinates
-      DOUBLE PRECISION POS( 2 )  ! Label reference position
-      DOUBLE PRECISION XP( 2 )   ! Label text positions
-      DOUBLE PRECISION YP( 2 )   ! Label test positions
-      INTEGER CNTCLS( MXCONT )   ! No. of closed contours at each height
-      INTEGER CNTPEN( MXCONT )   ! Pen index used to draw each contour
-      INTEGER DIMS( NDIM )       ! Dimensions of input array
-      INTEGER EL                 ! Number of elements in the input array
-      INTEGER I                  ! General variable
-      INTEGER ICURR              ! Index of Current Frame
-      INTEGER IGRID              ! Index of GRID Frame in NDF's WCS 
-                                 ! FrameSet
-      INTEGER IGRP               ! GRP identifier for group holding pen 
-                                 ! definitions
-      INTEGER INDF               ! NDF identifier for input NDF
-      INTEGER INDFS              ! NDF identifier for visible NDF 
-                                 ! section
-      INTEGER IPICD              ! AGI id. for DATA picture
-      INTEGER IPICF              ! AGI id. for new FRAME picture
-      INTEGER IPICK              ! AGI id. for the KEY picture
-      INTEGER IPLOT              ! Pointer to AST Plot for DATA picture
-      INTEGER IPLOTK             ! Pointer to AST Plot for KEY picture
-      INTEGER IWCS               ! Pointer to the WCS FrameSet from NDF
-      INTEGER NC                 ! Number of characters in NDFNAM
-      INTEGER NCONT              ! Number of contour heights
-      INTEGER NCU                ! Number of characters in the units
-      INTEGER NFRM               ! Frame index increment between IWCS 
-                                 ! and IPLOT
-      INTEGER NKP                ! No. of values supplied for parameter
-                                 ! KEYPOS
-      INTEGER NMARG              ! No. of margin values given
-      INTEGER NVAL               ! No. of parameter values supplied
-      INTEGER PNTR               ! Pointer to array data
-      INTEGER SDIM( NDIM )       ! The significant NDF axes
-      INTEGER SLBND( NDIM )      ! Significant lower bounds of the image
-      INTEGER SUBND( NDIM )      ! Significant upper bounds of the image
-      INTEGER WKPNTR             ! Pointer to workspace
-      LOGICAL ALIGN              ! DATA picture aligned with a previous
-                                 ! picture?
-      LOGICAL AXES               ! Annotated axes are to be drawn?
-      LOGICAL BAD                ! Bad pixels are present in the image?
-      LOGICAL CLEAR              ! Clear screen before plotting?
-      LOGICAL CNTUSD( MXCONT )   ! Contour plotted at height in CNTLEV?
-      LOGICAL FAST               ! Draw contours quickly?
-      LOGICAL KEY                ! Key of the contour heights to be 
-                                 ! produced?
-      LOGICAL STATS              ! Contour statistics required?
-      REAL AREA( MXCONT )        ! Work array for storing areas in 
-                                 ! CNTSEL
-      REAL ASPECT                ! Aspect ratio of the input array
-      REAL CNTLEN( MXCONT )      ! Length of contours at each height
-      REAL CNTLEV( MXCONT )      ! Contour heights
-      REAL DUMMY                 ! Un-required argument value
-      REAL GSZ                   ! Size of 1 grid pixel in millimetres
-      REAL KEYOFF                ! Offset to top of key 
-      REAL KEYPOS( 2 )           ! Key position
-      REAL LABPOS( 2 )           ! Position for outline labels
-      REAL MARGIN( 4 )           ! Width of margins round DATA picture
-      REAL PERCNT( MXCONT )      ! Contour heights as percentiles 
-                                 ! (=fractions)
-      REAL UP( 2 )               ! Label up-vector
-      REAL Y1,Y2                 ! Vertical bounds of PGPLOT viewport
+      DOUBLE PRECISION BOX( 4 ) ! Bounds of image in pixel co-ordinates
+      DOUBLE PRECISION POS( 2 ) ! Label reference position
+      DOUBLE PRECISION RLBND( NDF__MXDIM )! Region lower bounds   
+      DOUBLE PRECISION RUBND( NDF__MXDIM )! Region upper bounds   
+      DOUBLE PRECISION XP( 2 )  ! Label text positions
+      DOUBLE PRECISION YP( 2 )  ! Label test positions
+      INTEGER CNTCLS( MXCONT )  ! No. of closed contours at each height
+      INTEGER CNTPEN( MXCONT )  ! Pen index used to draw each contour
+      INTEGER DIMS( NDIM )      ! Dimensions of input array
+      INTEGER EL                ! Number of elements in the input array
+      INTEGER FRM               ! Pointer to a Frame in Plot
+      INTEGER I                 ! General variable
+      INTEGER ICURR             ! Index of Current Frame
+      INTEGER IFRM              ! Index of Frame in Plot
+      INTEGER IGRID             ! Index of GRID Frame in WCS FrameSet
+      INTEGER IGRP              ! GRP id. for pen definitions group
+      INTEGER INDF              ! NDF id. for input NDF
+      INTEGER INDFS             ! NDF id. for visible NDF section
+      INTEGER IPICD             ! AGI id. for DATA picture
+      INTEGER IPICF             ! AGI id. for new FRAME picture
+      INTEGER IPICK             ! AGI id. for the KEY picture
+      INTEGER IPLOT             ! Pointer to AST Plot for DATA picture
+      INTEGER IPLOTK            ! Pointer to AST Plot for KEY picture
+      INTEGER IPLOTR            ! Pointer to AST Plot for a ROI
+      INTEGER IWCS              ! Pointer to the WCS FrameSet from NDF
+      INTEGER JFRM              ! Index of Frame in Plot
+      INTEGER NC                ! Number of characters in NDFNAM
+      INTEGER NCONT             ! Number of contour heights
+      INTEGER NCU               ! Number of characters in the units
+      INTEGER NFRM              ! Frame index increment 
+      INTEGER NKP               ! No. of values supplied for KEYPOS
+      INTEGER NMARG             ! No. of margin values given
+      INTEGER NREG              ! Number of Regions found so far
+      INTEGER NVAL              ! No. of parameter values supplied
+      INTEGER PNTR              ! Pointer to array data
+      INTEGER SDIM( NDIM )      ! The significant NDF axes
+      INTEGER SLBND( NDIM )     ! Significant lower bounds of the image
+      INTEGER SUBND( NDIM )     ! Significant upper bounds of the image
+      INTEGER WKPNTR            ! Pointer to workspace
+      LOGICAL ALIGN             ! DATA pic aligned with a previous pic?
+      LOGICAL AXES              ! Annotated axes are to be drawn?
+      LOGICAL BAD               ! Bad pixels are present in the image?
+      LOGICAL CLEAR             ! Clear screen before plotting?
+      LOGICAL CNTUSD( MXCONT )  ! Contour plotted at height in CNTLEV?
+      LOGICAL FAST              ! Draw contours quickly?
+      LOGICAL KEY               ! Make a key of the contour heights?
+      LOGICAL STATS             ! Contour statistics required?
+      REAL AREA( MXCONT )       ! Work array for areas in CNTSEL
+      REAL ASPECT               ! Aspect ratio of the input array
+      REAL CNTLEN( MXCONT )     ! Length of contours at each height
+      REAL CNTLEV( MXCONT )     ! Contour heights
+      REAL DUMMY                ! Un-required argument value
+      REAL GSZ                  ! Size of 1 grid pixel in millimetres
+      REAL KEYOFF               ! Offset to top of key 
+      REAL KEYPOS( 2 )          ! Key position
+      REAL LABPOS( 2 )          ! Position for outline labels
+      REAL MARGIN( 4 )          ! Width of margins round DATA picture
+      REAL PERCNT( MXCONT )     ! Contour heights as percentiles
+      REAL UP( 2 )              ! Label up-vector
+      REAL Y1,Y2                ! Vertical bounds of PGPLOT viewport
 *.
 
 *  Check the inherited global status.
@@ -993,7 +996,85 @@
 
 *  Re-instate the original Current Frame and draw the axes if required.
       CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
-      IF ( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
+      IF ( AXES ) THEN
+
+*  See if the WCS FrameSet in the supplied NDF defines any "Regions of
+*  interest". If so, each such region is given a separate set of
+*  annotated axes. We can do this test by looking at the Ident attribute
+*  of the current Frame since KPG1_ASGET will have set this to something
+*  begining with "ROI" if any regions of interest were found within the 
+*  WCS FrameSet.
+         IDENT = AST_GETC( IPLOT, 'Ident', STATUS )
+         IF( IDENT( : 3 ) .EQ. 'ROI' ) THEN
+
+*  Ensure a grid is not produced unless explicitly requested (ROI Regions
+*  can produce anomolous bad coords arounds the edges, thus causing the
+*  default value for Grid to become non-zero).
+            IF( .NOT. AST_TEST( IPLOT, 'GRID', STATUS ) ) THEN
+               CALL AST_SETL( IPLOT,' GRID', .FALSE., STATUS )
+            END IF
+
+*  Also ensure no title is produced unless specifically requested.
+            IF( .NOT. AST_TEST( IPLOT, 'DRAWTITLE', STATUS ) ) THEN
+               CALL AST_SETI( IPLOT, 'DRAWTITLE', 0, STATUS )
+            END IF
+
+*  Loop round all Frames in the Plot. 
+            NREG = 0
+            NFRM = AST_GETI( IPLOT, 'NFRAME', STATUS )
+            DO IFRM = 1, NFRM
+               FRM = AST_GETFRAME( IPLOT, IFRM, STATUS )
+
+*  Pass on unless this Frame is a Region with a Domain that begins with
+*  "ROI"
+               IF( AST_ISAREGION( FRM, STATUS ) )  THEN         
+                  DOM = AST_GETC( FRM, 'Domain', STATUS )
+                  IF( DOM( : 3 ) .EQ. 'ROI' ) THEN
+                     NREG = NREG + 1
+
+*  Attempt to locate a Frame that has the same value for its Ident
+*  attribute, making it the current Frame in the Plot.
+                     DO JFRM = 1, NFRM
+                        CALL AST_SETI( IPLOT, 'Current', JFRM, STATUS )
+                        IDENT = AST_GETC( IPLOT, 'Ident', STATUS )
+                        IF( IDENT .EQ. DOM ) THEN
+
+*  Create a new Plot that covers just the corresponding Region.
+                           CALL AST_GETREGIONBOUNDS( FRM, RLBND, RUBND, 
+     :                                           STATUS )
+                           CALL KPG1_ASCPL( IPLOT, IFRM, RLBND, RUBND,
+     :                                      IPLOTR, STATUS )
+
+*  Draw the axes grid if required, supressing axis labels and title for 
+*  all but the first.
+                           IF( NREG .GT. 1 ) THEN
+                              CALL AST_SETI( IPLOTR, 'TEXTLAB', 0, 
+     :                                       STATUS )
+                              CALL AST_SETI( IPLOTR, 'NUMLAB', 0, 
+     :                                       STATUS )
+                              CALL AST_SETI( IPLOTR, 'DRAWTITLE', 0, 
+     :                                       STATUS )
+                           END IF
+                           CALL KPG1_ASGRD( IPLOTR, IPICF, .TRUE., 
+     :                                      STATUS )
+
+*  Free the temporary Plot
+                           CALL AST_ANNUL( IPLOTR, STATUS )
+
+                        END IF
+                     END DO
+
+                  END IF
+
+               END IF
+               CALL AST_ANNUL( FRM, STATUS )
+            END DO
+         END IF
+
+*  If there are no ROI Frames, just draw the grid over the wholePlot.
+      ELSE
+         CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
+      END IF
 
 *  Plot the key if necessary (no key is needed if no real contours have
 *  been drawn).
