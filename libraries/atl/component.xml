@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="atl" support="S">
+  <version>1.0</version>
+  <path>libraries/atl</path>
+  <description>ATL - A Library of AST Utility Routines</description>
+  <abstract><p>ATL provides routines that perform high-level AST-related 
+            functions.</p></abstract>
+  <dependencies >
+    <build>cnf</build><build>ast</build><build>sae</build><link>chr</link><link>mers</link><link>ast</link><link>psx</link><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation> sun256</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+  <!-- <notes><p></p></notes> -->
+</component>

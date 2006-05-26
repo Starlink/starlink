@@ -22,7 +22,7 @@ test1_SOURCES = atl_test.f
 test1_LDADD = libatl.la `$(srcdir)/atl_link`
 
 PUBLIC_F_INCLUDES = ATL_PAR 
-PUBLIC_C_INCLUDES = alt.h
+PUBLIC_C_INCLUDES = atl.h
 PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 
 #  List of C functions required by both ADAM and standalone 

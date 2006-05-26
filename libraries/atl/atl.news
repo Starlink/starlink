@@ -1,0 +1,4 @@
+1 ALT_library
+
+An initial release (V1.0) of the new ATL library is now available. The ATL
+library contains high level AST-related utility functions. See SUN/256.
