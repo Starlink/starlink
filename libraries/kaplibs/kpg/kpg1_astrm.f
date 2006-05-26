@@ -476,6 +476,7 @@
 
 *  Attempt to read an integer from the rest of the Domain name. Check the
 *  CHR status afterwards to see if an integer was read succesfully.
+                     CSTAT = SAI__OK
                      CALL CHR_CTOI( DOM( 4 : ), K, CSTAT )
                      IF( CSTAT .EQ. SAI__OK ) THEN
 
