@@ -4820,7 +4820,7 @@ AstObject *astI2P_( int integer ) {
 *     Pack an integer Object ID into a pointer.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "object.h"
@@ -5194,7 +5194,7 @@ int astP2I_( AstObject *pointer ) {
 *     Extract an integer Object ID from a pointer.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "object.h"

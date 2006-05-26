@@ -157,12 +157,14 @@
 *           Returns the AST library version number.
 *        astEscapes
 *           Remove escape sequences from returned text strings?
+*        astP2I
+*           Retrieve an int from a pointer.
+*        astI2P
+*           Pack an int into a pointer.
 *
 *     Protected:
 *        astCheckObject
 *           Validate class membership.
-*        astI2P
-*           Pack an int into a pointer.
 *        astInitObject
 *           Initialise an Object.
 *        astInitObjectVtab
@@ -173,8 +175,6 @@
 *           Issue an identifier for an Object.
 *        astMakePointer
 *           Obtain a true C pointer from an Object identifier.
-*        astP2I
-*           Retrieve an int from a pointer.
 
 *  Macros:
 *     Public:
