@@ -84,6 +84,9 @@
 *        Ensure that pointers to memory returned by this module are all
 *        aligned on 8 byte boundaries. This fixes problems with ualigned 
 *        memory access that could cause bus errors on Solaris. 
+*     26-MAY-2006 (DSB):
+*        Cast (void *) pointers to (char *) before doing arithmetic on
+*        them (changes supplied by Micah Johnson).
 */
 
 /* Include files. */
@@ -226,7 +229,7 @@
    allocated region of memory. */ \
    } else { \
       Memory *isdynmem;                /* Pointer to memory header */ \
-      isdynmem = (Memory *) ( ptr - SIZEOF_MEMORY ); \
+      isdynmem = (Memory *) ( (char *) ptr - SIZEOF_MEMORY ); \
 \
 /* Check if the "magic number" in the header is valid and report an \
    error if it is not (but not if the global status is already \
@@ -772,7 +775,7 @@ void *astFree_( void *ptr ) {
    if ( isdynamic ) {
 
 /* If OK, obtain a pointer to the memory header. */
-      mem = (Memory *) ( ptr - SIZEOF_MEMORY );
+      mem = (Memory *) ( (char *) ptr - SIZEOF_MEMORY );
 
 #ifdef MEM_DEBUG
       DeIssue( mem );
@@ -883,7 +886,7 @@ void *astGrow_( void *ptr, int n, size_t size ) {
 
 /* Obtain a pointer to the memory header and check if the new size
    exceeds that already allocated. */
-         mem = (Memory *) ( ptr - SIZEOF_MEMORY );
+         mem = (Memory *) ( (char *) ptr - SIZEOF_MEMORY );
          if ( mem->size < size ) {
 
 /* If so, calculate a possible new size by doubling the old
@@ -1004,7 +1007,7 @@ void *astMalloc_( size_t size ) {
 /* Increment the memory pointer to the start of the region of
    allocated memory to be used by the caller.*/
       result = mem;
-      result += SIZEOF_MEMORY;
+      result = (char *) result + SIZEOF_MEMORY;
    }
 
 /* Return the result. */
@@ -1049,10 +1052,13 @@ int astMemCaching_( int newval ){
 
 /* Local Variables: */
    int i;
-   int id_list_size;
-   int *id_list;
    int result;
    Memory *mem;
+
+#ifdef MEM_DEBUG
+   int id_list_size;
+   int *id_list;
+#endif
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
@@ -1248,7 +1254,7 @@ void *astRealloc_( void *ptr, size_t size ) {
 
 /* If OK, obtain a pointer to the memory header. */
          } else {
-            mem = (Memory *) ( ptr - SIZEOF_MEMORY );
+            mem = (Memory *) ( (char *) ptr - SIZEOF_MEMORY );
 
 /* If the new size is zero, free the old memory and set a NULL return
    pointer value. */
@@ -1307,7 +1313,7 @@ void *astRealloc_( void *ptr, size_t size ) {
                      Issue( mem );
 #endif
                      result = mem;
-                     result += SIZEOF_MEMORY;
+                     result = (char *) result + SIZEOF_MEMORY;
                   }
                }
             }
@@ -1372,7 +1378,7 @@ size_t astSizeOf_( const void *ptr ) {
    the memory size from the header which precedes it. */
    if ( ptr ){
       IS_DYNAMIC( ptr, isdynamic );
-      if( isdynamic ) size = ( (Memory *) ( ptr - SIZEOF_MEMORY ) )->size;
+      if( isdynamic ) size = ( (Memory *) ( (char *) ptr - SIZEOF_MEMORY ) )->size;
    }
 
 /* Return the result. */
@@ -1480,7 +1486,7 @@ size_t astTSizeOf_( const void *ptr ) {
    if ( ptr ){
       IS_DYNAMIC( ptr, isdynamic );
       if( isdynamic ) size = SIZEOF_MEMORY + 
-                             ( (Memory *) ( ptr - SIZEOF_MEMORY ) )->size;
+                             ( (Memory *) ( (char *) ptr - SIZEOF_MEMORY ) )->size;
    }
 
 /* Return the result. */
