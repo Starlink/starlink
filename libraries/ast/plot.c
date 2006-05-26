@@ -573,6 +573,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *     18-MAY-2006 (DSB)
 *        Trans: use correct PointSet when tranforming to arbitrary
 *        clipping frame.
+*     26-MAY-2006 (DSB)
+*        Added LabelAt to TestAttrib.
 *class--
 */
 
@@ -22518,6 +22520,13 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == astSscanf( attrib, "gap(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestGap( this, axis - 1 );
+
+/* LabelAt(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "labelat(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      result = astTestLabelAt( this, axis - 1 );
 
 /* LogGap. */
 /* ---- */
