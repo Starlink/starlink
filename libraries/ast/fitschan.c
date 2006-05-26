@@ -678,6 +678,9 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        Correct documentation typo ("NCards" -> "Ncard").
 *     5-APR-2006 (DSB):
 *        Modify SpecTrans to convert CTYPE="LAMBDA" to CTYPE="WAVE".
+*     26-MAY-2006 (DSB):
+*        Guard against NULL comment pointer when converting RESTFREQ to 
+*        RESTFRQ in SpecTrans.
 *class--
 */
 
@@ -24001,12 +24004,14 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* Look for "MHz" and "GHz" within the comment. If found scale the value
    into Hz. */
          comm = CardComm( this );
-         if( strstr( comm, "GHz" ) ) {
-            dval *= 1.0E9;
-            comm = "[Hz] Rest Frequency";
-         } else if( strstr( comm, "MHz" ) ) {
-            dval *= 1.0E6;
-            comm = "[Hz] Rest Frequency";
+         if( comm ) {
+            if( strstr( comm, "GHz" ) ) {
+               dval *= 1.0E9;
+               comm = "[Hz] Rest Frequency";
+            } else if( strstr( comm, "MHz" ) ) {
+               dval *= 1.0E6;
+               comm = "[Hz] Rest Frequency";
+            }
          }
 
 /* Save a new RESTFRQ card in the FitsChan, so long as there is not
