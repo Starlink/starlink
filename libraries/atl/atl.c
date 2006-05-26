@@ -69,7 +69,7 @@ void atlAxtrm( AstFrameSet *iwcs, int *axes, int *lbnd, int *ubnd,
 
    ndim = astGetI( iwcs, "Nin" );
 
-   IWCS = astP2I( iwcs );
+   F77_EXPORT_INTEGER( astP2I( iwcs ), IWCS );
    F77_CREATE_INTEGER_ARRAY( AXES, ndim );
    F77_EXPORT_INTEGER_ARRAY( axes, AXES, ndim );
    F77_CREATE_INTEGER_ARRAY( LBND, ndim );
@@ -93,4 +93,55 @@ void atlAxtrm( AstFrameSet *iwcs, int *axes, int *lbnd, int *ubnd,
    return;
 }
 
+
+
+F77_SUBROUTINE(atl_mklut)( INTEGER(IX), 
+                           INTEGER(IY),
+                           INTEGER(NPNT),
+                           INTEGER(NVAR),
+                           INTEGER(FRM),
+                           DOUBLE_ARRAY(TABLE),
+                           INTEGER(MAP),
+                           INTEGER(STATUS) );
+
+void atlMklut( int ix, int iy, int npnt, int nvar, AstFrame *frm, 
+               double *table, AstMapping **map, int *status ){
+   DECLARE_INTEGER(IX);
+   DECLARE_INTEGER(IY);
+   DECLARE_INTEGER(NPNT);
+   DECLARE_INTEGER(NVAR);
+   DECLARE_INTEGER(FRM);
+   DECLARE_INTEGER(MAP);
+   DECLARE_INTEGER(STATUS);
+   int iobj;
+
+   if( !astOK ) return;
+
+   F77_EXPORT_INTEGER( ix, IX );
+   F77_EXPORT_INTEGER( iy, IY );
+   F77_EXPORT_INTEGER( npnt, NPNT );
+   F77_EXPORT_INTEGER( nvar, NVAR );
+   F77_EXPORT_INTEGER( astP2I( frm ), FRM );
+
+   F77_CALL(atl_mklut)( INTEGER_ARG(&IX),
+                        INTEGER_ARG(&IY),
+                        INTEGER_ARG(&NPNT),
+                        INTEGER_ARG(&NVAR),
+                        INTEGER_ARG(&FRM),
+                        DOUBLE_ARRAY_ARG(table),
+                        INTEGER_ARG(&MAP),
+                        INTEGER_ARG(&STATUS) );
+
+
+   if( astOK ) {
+      F77_IMPORT_INTEGER( MAP, iobj );
+      *map = astI2P( iobj );
+   } else {
+      *map = AST__NULL;
+   }      
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
 

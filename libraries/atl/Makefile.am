@@ -31,7 +31,7 @@ BASIC_C_ROUTINES = atl.c
 
 #  List of Fortran routines required by both ADAM and standalone 
 # libraries.
-BASIC_F_ROUTINES = atl_axtrm.f
+BASIC_F_ROUTINES = atl_axtrm.f atl_mklut.f
 
 dist_starnews_DATA = atl.news
 dist_pkgdata_DATA = LICENCE

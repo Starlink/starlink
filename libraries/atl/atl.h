@@ -55,6 +55,6 @@ enum { ATL__MXDIM  = 7 };
 /* Public function prototypes */
 /* -------------------------- */
 void atlAxtrm( AstFrameSet *, int *, int *, int *, double, int * );
-
+void atlMklut( int, int, int, int, AstFrame *, double *, AstMapping **, int * );
 
 #endif
