@@ -510,7 +510,7 @@ itcl::class gaia::GaiaSpectralPlot {
          #  Convert canvas to axis coordinate and return this if a command has
          #  been supplied. Note that the axis coordinate is return in the
          #  equivalent of NDF pixel indices for convenience.
-         if { $itk_option(-ref_changed_cmd) != {} } {
+         if { $itk_option(-ref_line_changed_cmd) != {} } {
 
             lassign [$itk_component(canvas) coords $ref_lines_($id)] x0 y0 x1 y1
             
@@ -524,7 +524,7 @@ itcl::class gaia::GaiaSpectralPlot {
             set frameset [$itk_component(canvas) itemcget $spectrum_ -frameset]
             set ind [gaiautils::getaxiscoord $frameset $x0 0]
 
-            eval $itk_option(-ref_changed_cmd) $id $ind $mode
+            eval $itk_option(-ref_line_changed_cmd) $id $ind $mode
          }
 
       } elseif { $mode == "delete" } {
@@ -586,8 +586,8 @@ itcl::class gaia::GaiaSpectralPlot {
       if { $x0 != {} } {
          remove_ref_range $id
 
-         #  Create a rectangle canvasdraw object.
-         $itk_component(draw) set_drawing_mode rectangle \
+         #  Create an xrange canvasdraw object.
+         $itk_component(draw) set_drawing_mode xrange \
             [code $this created_ref_range_ $id]
          $itk_component(draw) create_object $x0 $y0
          $itk_component(draw) create_done $x0 $y0
@@ -616,27 +616,32 @@ itcl::class gaia::GaiaSpectralPlot {
       if { ! [info exists ref_ranges_coord_($id)] } {
          set ref_ranges_coord_($id) "0 0"
       }
+
+      #  Deselect and select to get grips in right places, but do it after 
+      #  the draw component has finished.
+      after idle [code $itk_component(draw) deselect_object $cid]
+      after idle [code $itk_component(draw) select_object $cid]
    }
 
    #  Called when a reference range is updated, that's moved on the canvas or
    #  deleted.
    protected method update_ref_range_ {id mode} {
 
-      if { $mode == "move" || $mode == "released" } {
+      if { $mode == "move" || $mode == "resize" || $mode == "released" } {
          #  Convert canvas to axis coordinates and return this if a command has
          #  been supplied. Note that the axis coordinates are return in the
          #  equivalent of NDF pixel indices for convenience.
          if { $itk_option(-ref_range_changed_cmd) != {} } {
 
-            lassign [$itk_component(canvas) coords $ref_ranges_($id)] x0 y0 x1 y1
+            lassign [$itk_component(canvas) bbox $ref_ranges_($id)] x0 y0 x1 y1
             
             #  From canvas to world.
             set x0 [$itk_component(canvas) coords $spectrum_ convert 1 $x0]
             set x1 [$itk_component(canvas) coords $spectrum_ convert 1 $x1]
 
             #  These are the current world coords, so record them.
-            set ref_lines_coord_($id) "$x0 $x1"
-
+            set ref_ranges_coord_($id) "$x0 $x1"
+         
             #  World to grid.
             set frameset [$itk_component(canvas) itemcget $spectrum_ -frameset]
             set ind0 [gaiautils::getaxiscoord $frameset $x0 0]
@@ -644,7 +649,6 @@ itcl::class gaia::GaiaSpectralPlot {
 
             eval $itk_option(-ref_range_changed_cmd) $id $ind1 $ind0 $mode
          }
-
       } elseif { $mode == "delete" } {
          unset ref_ranges_($id)
          unset ref_ranges_coord_($id)
@@ -677,12 +681,20 @@ itcl::class gaia::GaiaSpectralPlot {
    #  are in world coordinates.
    public method move_ref_range_ {id} {
       if { $spectrum_ != {} && [info exists ref_ranges_($id)] } {
-         lassign [$itk_component(canvas) coords $ref_ranges_($id)] x0 y0 x1 y1
-         lassign $ref_ranges_($id) x0 x1
+         lassign [$itk_component(canvas) bbox $spectrum_] x0 y0 x1 y1
+         lassign $ref_ranges_coord_($id) x0 x1
+
          set cx0 [$itk_component(canvas) coords $spectrum_ convert 0 $x0]
          set cx1 [$itk_component(canvas) coords $spectrum_ convert 0 $x1]
-         #$itk_component(canvas) coords $ref_ranges_($id) $cx0 $y0 $cx1 $y1
-         $itk_component(canvas) coords $ref_ranges_($id) 0 0 100 100
+
+         #  A reference range is a 3 piece segmented line draw as |-|...
+         set centy [expr ($y0+$y1)/2]
+         set dy [expr abs($y1+$y0)*0.2]
+         set y0 [expr $centy+$dy]
+         set y1 [expr $centy-$dy]
+
+         $itk_component(canvas) coords $ref_ranges_($id) \
+            $cx0 $y0 $cx0 $y1 $cx0 $centy $cx1 $centy $cx1 $y0 $cx1 $y1
       }
    }
 
@@ -691,7 +703,7 @@ itcl::class gaia::GaiaSpectralPlot {
       set ref_ranges_colour_($id) $colour
       if { [::array exists ref_ranges_] && [info exists ref_ranges_($id)] } {
          $itk_component(canvas) itemconfigure $ref_ranges_($id) \
-            -outline $ref_ranges_colour_($id)
+            -fill $ref_ranges_colour_($id)
       }
    }
 
@@ -877,7 +889,7 @@ itcl::class gaia::GaiaSpectralPlot {
    #  A command to invoke when a reference line is moved (by interaction by
    #  the user). The command will be trailed by the reference line id and 
    #  the new world coordinate.
-   itk_option define -ref_changed_cmd ref_changed_cmd Ref_Changed_Cmd {}
+   itk_option define -ref_line_changed_cmd ref_line_changed_cmd Ref_Line_Changed_Cmd {}
 
    #  A command to invoke when a reference range is moved (by interaction by
    #  the user). The command will be trailed by the reference range id and 

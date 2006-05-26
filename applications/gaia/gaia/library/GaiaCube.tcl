@@ -212,7 +212,7 @@ itcl::class gaia::GaiaCube {
             -coord_update_cmd [code $this set_display_plane_] \
             -drag_update_cmd [code $this update_wcs_]
       }
-      set index_control_(1) $itk_component(index)
+      set ref_line_controls_(1) $itk_component(index)
       pack $itk_component(index) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(index) \
          {Index of the image plane to display (along current axis)}
@@ -245,46 +245,30 @@ itcl::class gaia::GaiaCube {
             -text "Show limits on plot:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth \
-            -variable [scope show_animation_lines_] \
-            -command [code $this toggle_show_animation_lines_]
+            -variable [scope show_animation_range_] \
+            -command [code $this toggle_show_animation_range_]
       }
       pack $itk_component(showanlines) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(showanlines) \
          {Show extent of animation on plot with reference lines}
 
-      itk_component add lower {
-         GaiaSpectralPlotLine $animationTab.lower \
+      itk_component add anibounds {
+         GaiaSpectralPlotRange $animationTab.bounds \
             -gaiacube [code $this] \
-            -ref_id 2 \
-            -text {Lower index:} \
-            -value $plane_ \
-            -show_type 0 \
-            -show_ref_line $show_animation_lines_ \
+            -ref_id 1 \
+            -text1 {Lower index:} \
+            -text2 {Upper index:} \
+            -value1 $plane_ \
+            -value2 $plane_ \
+            -show_ref_range $show_animation_range_ \
             -labelwidth $lwidth \
             -valuewidth 20 \
-            -coord_update_cmd [code $this set_animate_lower_bound_]
+            -coord_update_cmd [code $this set_animate_bounds_] \
       }
-      set index_control_(2) $itk_component(lower)
-      pack $itk_component(lower) -side top -fill x -ipadx 1m -ipady 2m
-      add_short_help $itk_component(lower) \
-         {Lower index used during animation}
-
-      itk_component add upper {
-         GaiaSpectralPlotLine $animationTab.upper \
-            -gaiacube [code $this] \
-            -ref_id 3 \
-            -text {Upper index:} \
-            -value $plane_ \
-            -show_type 0 \
-            -show_ref_line $show_animation_lines_ \
-            -labelwidth $lwidth \
-            -valuewidth 20 \
-            -coord_update_cmd [code $this set_animate_upper_bound_]
-      }
-      set index_control_(3) $itk_component(upper)
-      pack $itk_component(upper) -side top -fill x -ipadx 1m -ipady 2m
-      add_short_help $itk_component(upper) \
-         {Upper index used during animation}
+      set ref_range_controls_(1) $itk_component(anibounds)
+      pack $itk_component(anibounds) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(anibounds) \
+         {Lower and upper indices used during animation}
 
       #  Delay used in animation.
       itk_component add delay {
@@ -405,46 +389,30 @@ itcl::class gaia::GaiaCube {
             -text "Show limits on plot:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth \
-            -variable [scope show_collapse_lines_] \
-            -command [code $this toggle_show_collapse_lines_]
+            -variable [scope show_collapse_range_] \
+            -command [code $this toggle_show_collapse_range_]
       }
       pack $itk_component(showcollines) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(showcollines) \
          {Show extent of collapse on plot with reference lines}
 
-      itk_component add collower {
-         GaiaSpectralPlotLine $collapseTab.collower \
+      itk_component add colbounds {
+         GaiaSpectralPlotRange $collapseTab.bounds \
             -gaiacube [code $this] \
-            -ref_id 4 \
-            -text {Lower index:} \
-            -value 1 \
-            -show_type 0 \
-            -show_ref_line 0 \
+            -ref_id 2 \
+            -text1 {Lower index:} \
+            -text2 {Upper index:} \
+            -value1 $plane_ \
+            -value2 $plane_ \
+            -show_ref_range $show_collapse_range_ \
             -labelwidth $lwidth \
             -valuewidth 20 \
-            -coord_update_cmd [code $this set_collapse_lower_bound_]
+            -coord_update_cmd [code $this set_collapse_bounds_]
       }
-      set index_control_(4) $itk_component(collower)
-      pack $itk_component(collower) -side top -fill x -ipadx 1m -ipady 2m
-      add_short_help $itk_component(collower) \
-         {Lower index used for creating collapsed image}
-
-      itk_component add colupper {
-         GaiaSpectralPlotLine $collapseTab.colupper \
-            -gaiacube [code $this] \
-            -ref_id 5 \
-            -text {Upper index:} \
-            -value 1 \
-            -show_type 0 \
-            -show_ref_line 0 \
-            -labelwidth $lwidth \
-            -valuewidth 20 \
-            -coord_update_cmd [code $this set_collapse_upper_bound_]
-      }
-      set index_control_(5) $itk_component(colupper)
-      pack $itk_component(colupper) -side top -fill x -ipadx 1m -ipady 2m
-      add_short_help $itk_component(colupper) \
-         {Upper index used for creating collapsed image}
+      set ref_range_controls_(2) $itk_component(colbounds)
+      pack $itk_component(colbounds) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(colbounds) \
+         {Lower and upper indices used for creating collapsed image}
 
       #  Method used for collapse.
       itk_component add combination {
@@ -633,21 +601,16 @@ itcl::class gaia::GaiaCube {
             $itk_component(index) configure -value $plane_min_
          }
 
-         $itk_component(lower) configure -from $plane_min_ -to $plane_max_
-         $itk_component(upper) configure -from $plane_min_ -to $plane_max_
+         $itk_component(anibounds) configure -from $plane_min_ -to $plane_max_
+         $itk_component(colbounds) configure -from $plane_min_ -to $plane_max_
 
-         $itk_component(collower) configure -from $plane_min_ -to $plane_max_
-         $itk_component(colupper) configure -from $plane_min_ -to $plane_max_
+         $itk_component(anibounds) configure \
+            -value1 $plane_min_ -value2 $plane_max_
+         set_animate_bounds_ $plane_min_ $plane_max_
 
-         $itk_component(lower) configure -value $plane_min_
-         set_animate_lower_bound_ $plane_min_
-         $itk_component(upper) configure -value $plane_max_
-         set_animate_upper_bound_ $plane_max_
-
-         $itk_component(collower) configure -value $plane_min_
-         set_collapse_lower_bound_ $plane_min_
-         $itk_component(colupper) configure -value $plane_max_
-         set_collapse_upper_bound_ $plane_max_
+         $itk_component(colbounds) configure \
+            -value1 $plane_min_ -value2 $plane_max_
+         set_collapse_bounds_ $plane_min_ $plane_max_
 
          #  Update the display of label and units in index component.
          $itk_component(index) update_coords_type $plane_
@@ -775,6 +738,13 @@ itcl::class gaia::GaiaCube {
       }
    }
 
+   #  Set the position of a spectral reference range
+   public method set_spec_ref_range_coord {id coord1 coord2} {
+      if { $spectrum_ != {} && $coord1 != {} && $coord2 != {} } {
+         $spectrum_ set_ref_range_coord $id $coord1 $coord2
+      }
+   }
+
    #  Handle the change in a spectral reference line, when done within the
    #  plot (user interaction by dragging line).
    protected method ref_line_moved_ {id coord action} {
@@ -786,20 +756,49 @@ itcl::class gaia::GaiaCube {
       #  triggered, unless this is release when we want to reposition to the
       #  exact control feedback.
       if { $action == "move" } {
-         set oldvalue [$index_control_($id) cget -show_ref_line]
-         $index_control_($id) configure -show_ref_line 0
+         set oldvalue [$ref_line_controls_($id) cget -show_ref_line]
+         $ref_line_controls_($id) configure -show_ref_line 0
       }
-      $index_control_($id) configure -value $coord
+      $ref_line_controls_($id) configure -value $coord
 
       #  And get the associated action to run.
-      eval [$index_control_($id) cget -coord_update_cmd] $coord
+      eval [$ref_line_controls_($id) cget -coord_update_cmd] $coord
 
       #  If action is released also do the drag_update_cmd.
       if { $action == "released" } {
-         eval [$index_control_($id) cget -drag_update_cmd]
+         eval [$ref_line_controls_($id) cget -drag_update_cmd]
       }
       if { $action == "move" } {
-         $index_control_($id) configure -show_ref_line $oldvalue
+         $ref_line_controls_($id) configure -show_ref_line $oldvalue
+      }
+   }
+
+   #  Handle the change in a spectral reference range, when done within the
+   #  plot (user interaction by dragging line).
+   protected method ref_range_moved_ {id coord1 coord2 action} {
+
+      #  Convert coord from grid indices to pixel indices.
+      set coord1 [axis_grid2pixel_ $coord1]
+      set coord2 [axis_grid2pixel_ $coord2]
+
+      #  Apply value to the right control, but avoiding new actions being
+      #  triggered, unless this is release when we want to reposition to the
+      #  exact control feedback.
+      if { $action == "move" } {
+         set oldvalue [$ref_range_controls_($id) cget -show_ref_range]
+         $ref_range_controls_($id) configure -show_ref_range 0
+      }
+      $ref_range_controls_($id) configure -value1 $coord1 -value2 $coord2
+
+      #  And get the associated action to run.
+      eval [$ref_range_controls_($id) cget -coord_update_cmd] $coord1 $coord2
+
+      #  If action is released also do the drag_update_cmd.
+      if { $action == "released" } {
+         eval [$ref_range_controls_($id) cget -drag_update_cmd]
+      }
+      if { $action == "move" } {
+         $ref_range_controls_($id) configure -show_ref_range $oldvalue
       }
    }
 
@@ -835,14 +834,10 @@ itcl::class gaia::GaiaCube {
       $itk_option(-gaia) configure -check_for_cubes $check_for_cubes_
    }
 
-   #  Set the animation lower bound.
-   protected method set_animate_lower_bound_ {bound} {
-      set lower_animate_bound_ $bound
-   }
-
-   #  Set the animation upper bound.
-   protected method set_animate_upper_bound_ {bound} {
-      set upper_animate_bound_ $bound
+   #  Set the animation bounds.
+   protected method set_animate_bounds_ {bound1 bound2} {
+      set lower_animate_bound_ $bound1
+      set upper_animate_bound_ $bound2
    }
 
    #  Get the coordinate of an index along the current axis.
@@ -950,14 +945,10 @@ itcl::class gaia::GaiaCube {
       }
    }
 
-   #  Set the collapse lower bound.
-   protected method set_collapse_lower_bound_ {bound} {
-      set lower_collapse_bound_ $bound
-   }
-
-   #  Set the collapse upper bound.
-   protected method set_collapse_upper_bound_ {bound} {
-      set upper_collapse_bound_ $bound
+   #  Set the collapse bounds.
+   protected method set_collapse_bounds_ {bound1 bound2} {
+      set lower_collapse_bound_ $bound1
+      set upper_collapse_bound_ $bound2
    }
 
    # Set the combination type
@@ -989,14 +980,13 @@ itcl::class gaia::GaiaCube {
       #  Create a temporary file name.
       set tmpimage_ "GaiaTempCollapse${count_}"
       incr count_
-
       blt::busy hold $w_
       $collapser_ runwiths "in=${ndfname_}$section out=$tmpimage_ axis=$axis_ \
                             estimator=$combination_type_ accept"
 
       #  If the reference lines are displayed these need removing.
-      set show_collapse_lines_ 0
-      toggle_show_collapse_lines_
+      set show_collapse_range_ 0
+      toggle_show_collapse_range_
    }
 
    #  Display a collapsed image.
@@ -1082,7 +1072,8 @@ itcl::class gaia::GaiaCube {
          set spectrum_ [GaiaSpectralPlot $w_.specplot \
                            -number $itk_option(-number) \
                            -spec_coords [code $spec_coords_] \
-                           -ref_changed_cmd [code $this ref_line_moved_] \
+                           -ref_line_changed_cmd [code $this ref_line_moved_] \
+                           -ref_range_changed_cmd [code $this ref_range_moved_] \
                            -shorthelpwin [scope $short_help_win_]]
 
          #  Make this a transient of main window, not this one.
@@ -1309,40 +1300,33 @@ itcl::class gaia::GaiaCube {
    #     $splat_disp_ runwith "GaiaArdSpectrum"
    #  } msg
 
-   #  Toggle the display of the collapse reference lines.
-   protected method toggle_show_collapse_lines_ {} {
-      $itk_component(collower) configure -show_ref_line $show_collapse_lines_
-      $itk_component(colupper) configure -show_ref_line $show_collapse_lines_
+   #  Toggle the display of the collapse reference range.
+   protected method toggle_show_collapse_range_ {} {
+      $itk_component(colbounds) configure -show_ref_range $show_collapse_range_
       if { $spectrum_ != {} } {
-         if { $show_collapse_lines_ } {
-            $spectrum_ make_ref_line 4
-            $spectrum_ make_ref_line 5
-            $spectrum_ set_ref_line_colour 4 "cyan"
-            $spectrum_ set_ref_line_colour 5 "cyan"
-            $itk_component(collower) configure -value $lower_collapse_bound_
-            $itk_component(colupper) configure -value $upper_collapse_bound_
+         if { $show_collapse_range_ } {
+            $spectrum_ make_ref_range 2
+            $spectrum_ set_ref_range_colour 2 "cyan"
+            $itk_component(colbounds) configure \
+               -value1 $lower_collapse_bound_ -value2 $upper_collapse_bound_
          } else {
-            $spectrum_ remove_ref_line 4
-            $spectrum_ remove_ref_line 5
+            $spectrum_ remove_ref_range 2
          }
       }
    }
 
-   #  Toggle the display of the animation reference lines.
-   protected method toggle_show_animation_lines_ {} {
-      $itk_component(lower) configure -show_ref_line $show_animation_lines_
-      $itk_component(upper) configure -show_ref_line $show_animation_lines_
+   #  Toggle the display of the animation reference range.
+   protected method toggle_show_animation_range_ {} {
+      $itk_component(anibounds) configure -show_ref_range $show_animation_range_
       if { $spectrum_ != {} } {
-         if { $show_animation_lines_ } {
-            $spectrum_ make_ref_line 2
-            $spectrum_ make_ref_line 3
-            $spectrum_ set_ref_line_colour 2 "yellow"
-            $spectrum_ set_ref_line_colour 3 "yellow"
-            $itk_component(lower) configure -value $lower_animate_bound_
-            $itk_component(upper) configure -value $upper_animate_bound_
+         if { $show_animation_range_ } {
+
+            $spectrum_ make_ref_range 1
+            $spectrum_ set_ref_range_colour 1 "yellow"
+            $itk_component(anibounds) configure \
+               -value1 $lower_animate_bound_ -value2 $upper_animate_bound_
          } else {
-            $spectrum_ remove_ref_line 2
-            $spectrum_ remove_ref_line 3
+            $spectrum_ remove_ref_range 1
          }
       }
    }
@@ -1481,16 +1465,21 @@ itcl::class gaia::GaiaCube {
    #  Last cx and cy values used in to open a spectrum.
    protected variable last_cxcy_ {}
 
-   #  Whether to display the limits of the animation as reference lines in the
-   #  plot.
-   protected variable show_animation_lines_ 0
+   #  Whether to display the limits of the animation as a reference range in
+   #  the plot.
+   protected variable show_animation_range_ 0
 
-   #  Whether to display the limits of the collapse as reference lines in the
+   #  Whether to display the limits of the collapse as a reference range in the
    #  plot.
-   protected variable show_collapse_lines_ 0
+   protected variable show_collapse_range_ 0
 
-   #  Array of index-based controls. These are indexed by their ref_id.
-   protected variable index_control_
+   #  Array of index-based controls for the reference lines. These are indexed
+   #  by their ref_id.
+   protected variable ref_line_controls_
+
+   #  Array of index-based controls for the reference ranges. These are indexed
+   #  by their ref_id.
+   protected variable ref_range_controls_
 
    #  Common variables: (shared by all instances)
    #  -----------------
