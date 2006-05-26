@@ -69,29 +69,42 @@ const char *Source( void );
 
 int main(){
    AstChannel *channel;
-   AstObject *object;
+   AstFrameSet *fs;
    int status;
+   int axes[2], lbnd[2], ubnd[2];
+   double work[2700];
 
 /* Initialise the global status */
    status = SAI__OK;
+   astWatch( &status );
 
 /* Open the input file. */
    input_stream = fopen( "chanmap.ast", "r" );
 
 /* Create a Channel and read an Object from it. */
    channel = astChannel( Source, NULL, "" );
-   object = astRead( channel );
+   fs = (AstFrameSet *) astRead( channel );
 
 /* Annul the Channel and close the file when done. */
    channel = astAnnul( channel );
    (void) fclose( input_stream );
 
+/* Attemp to trim off the third axis from the 3D current Frame. */
+   axes[ 0 ] = 1;
+   axes[ 1 ] = 2;
+   lbnd[ 0 ] = 1;
+   ubnd[ 0 ] = 771;
+   lbnd[ 1 ] = 1;
+   ubnd[ 1 ] = 1314;
+   atlAxtrm( fs, axes, lbnd, ubnd, work, &status );
 
-
-/* To be written........ */
-
-
-
+/* Check the current Frame is a SkyFrame */
+   if( !astIsASkyFrame( astGetFrame( fs, AST__CURRENT ) ) ) {
+      if( status == SAI__OK ) {
+         status = SAI__ERROR;
+         errRep( "", "Error 1; current Frame is not a SkyFrame.", &status );
+       }
+    }  
 
 /* If an error occurred, then report a contextual message. */
    if( status != SAI__OK ) {
