@@ -38,12 +38,13 @@
 *  Description:
 *     This routine calculates the mean and standard deviation of a
 *     sample of points specified by three indices. The GSL routines
-*     gsl_stats_mean and gsl_stats_sd are used. The first index is
-*     which bolometer or timeslice we are interest in, the second and
-*     third mark the range of values to include in the sample. Note
-*     that the range lo to hi is INCLUSIVE. If both lo and hi are zero
-*     then the entire range is used. On error a mean and std deviation
-*     of VAL__BADD are returned.
+*     gsl_stats_wmean and gsl_stats_wsd are used to allow weighting
+*     down of bad values. The first index is which bolometer or
+*     timeslice we are interest in, the second and third mark the
+*     range of values to include in the sample. Note that the range lo
+*     to hi is INCLUSIVE. If both lo and hi are zero then the entire
+*     range is used. On error a mean and std deviation of VAL__BADD
+*     are returned.
 
 *  Notes: 
 
@@ -54,6 +55,10 @@
 *  History:
 *     2006-05-17 (AGG):
 *        Initial test version
+*     2006-05-26 (AGG):
+*        - Replace GSL calls with weighted versions to cope with 
+*          bad values
+*        - Free allocated resources
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -116,6 +121,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
   int nsamp;                  /* Number of samples */
   double *statsdata = NULL;   /* Pointer to array holding data for computing stats */
   int temp;                   /* Temporary variable */
+  double *weight = NULL;      /* Pointer to weights array */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -212,6 +218,13 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
     errRep( FUNC_NAME, "Unable to allocate memory for statistics array", status );
     return;
   }
+  /* Note the weights array is initialized to zero */
+  weight = smf_malloc( npts, sizeof(double), 1, status );
+  if ( weight == NULL ) {
+    errRep( FUNC_NAME, "Unable to allocate memory for weights array", status );
+    return;
+  }
+
 
   /* Set range of data. Use <= because the range is inclusive. */
   indata = (data->pntr)[0];
@@ -219,17 +232,28 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
     /* Pick out a bolometer time series */
     for ( k=lo; k<=hi; k++) {
       statsdata[k] = indata[index + k*nbol];
+      if ( statsdata[k] != VAL__BADD ) {
+	weight[k] = 1.0;
+      }
     }
   } else {
-    /* Pick out a range of bolomters from a timeslice */
+    /* Pick out a range of bolometers from a timeslice */
     for ( k=lo; k<=hi; k++) {
       statsdata[k] = indata[nbol*index + k];
+      if ( statsdata[k] != VAL__BADD ) {
+	weight[k] = 1.0;
+      }
     }
   }
 
   /* Calculate stats */
-  mean = gsl_stats_mean( statsdata, 1, npts );
+  mean = gsl_stats_wmean( weight, 1, statsdata, 1, npts );
 
-  sigma = gsl_stats_sd( statsdata, 1, npts );
+  sigma = gsl_stats_wsd( weight, 1, statsdata, 1, npts );
 
+  /* Free resources */
+  if ( statsdata != NULL)
+    smf_free( statsdata, status );
+  if ( weight != NULL)
+    smf_free( weight, status );
 }
