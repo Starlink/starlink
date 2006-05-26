@@ -57,15 +57,34 @@
 
 #include "star/atl.h"
 #include "sae_par.h"
+#include "ast.h"
 #include "mers.h"
 #include <stdio.h>
+#define LEN 200
+
+static FILE *input_stream;
+
+const char *Source( void );
+
 
 int main(){
-
+   AstChannel *channel;
+   AstObject *object;
    int status;
 
 /* Initialise the global status */
    status = SAI__OK;
+
+/* Open the input file. */
+   input_stream = fopen( "chanmap.ast", "r" );
+
+/* Create a Channel and read an Object from it. */
+   channel = astChannel( Source, NULL, "" );
+   object = astRead( channel );
+
+/* Annul the Channel and close the file when done. */
+   channel = astAnnul( channel );
+   (void) fclose( input_stream );
 
 
 
@@ -83,3 +102,12 @@ int main(){
 
    return status;
 }
+
+
+const char *Source( void ) {
+   static char buffer[ LEN + 2 ];
+   return fgets( buffer, LEN + 2, input_stream );
+}
+
+
+

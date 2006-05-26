@@ -36,3 +36,4 @@ BASIC_F_ROUTINES = atl_axtrm.f atl_mklut.f
 dist_starnews_DATA = atl.news
 dist_pkgdata_DATA = LICENCE
 
+EXTRA_DIST = chanmap.ast

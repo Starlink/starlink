@@ -1,0 +1,1195 @@
+ Begin FrameSet 	# Set of inter-related coordinate systems
+#   Title = "3-d compound coordinate system" 	# Title of coordinate system
+#   Naxes = 3 	# Number of coordinate axes
+#   Domain = "SKY-DSBSPECTRUM" 	# Coordinate system domain
+#   Epoch = 2006.11041904327 	# Julian epoch of observation
+#   Lbl1 = "Right ascension" 	# Label for axis 1
+#   Lbl2 = "Declination" 	# Label for axis 2
+#   Lbl3 = "Radio velocity (USB)" 	# Label for axis 3
+#   System = "Compound" 	# Coordinate system type
+#   Uni1 = "hh:mm:ss.s" 	# Units for axis 1
+#   Uni2 = "ddd:mm:ss" 	# Units for axis 2
+#   Uni3 = "km/s" 	# Units for axis 3
+#   Dir1 = 0 	# Plot axis 1 in reverse direction
+ IsA Frame 	# Coordinate system description
+    Nframe = 10 	# Number of Frames in FrameSet
+#   Base = 1 	# Index of base Frame
+    Currnt = 4 	# Index of current Frame
+    Nnode = 12 	# Number of nodes in FrameSet
+    Nod1 = 10 	# Frame 1 is associated with node 10
+    Nod2 = 11 	# Frame 2 is associated with node 11
+    Nod3 = 12 	# Frame 3 is associated with node 12
+    Nod4 = 3 	# Frame 4 is associated with node 3
+    Nod5 = 4 	# Frame 5 is associated with node 4
+    Nod6 = 5 	# Frame 6 is associated with node 5
+    Nod7 = 6 	# Frame 7 is associated with node 6
+    Nod8 = 7 	# Frame 8 is associated with node 7
+    Nod9 = 8 	# Frame 9 is associated with node 8
+    Nod10 = 9 	# Frame 10 is associated with node 9
+    Lnk2 = 1 	# Node 2 is derived from node 1
+    Lnk3 = 2 	# Node 3 is derived from node 2
+    Lnk4 = 2 	# Node 4 is derived from node 2
+    Lnk5 = 2 	# Node 5 is derived from node 2
+    Lnk6 = 2 	# Node 6 is derived from node 2
+    Lnk7 = 2 	# Node 7 is derived from node 2
+    Lnk8 = 2 	# Node 8 is derived from node 2
+    Lnk9 = 2 	# Node 9 is derived from node 2
+    Lnk10 = 1 	# Node 10 is derived from node 1
+    Lnk11 = 1 	# Node 11 is derived from node 1
+    Lnk12 = 1 	# Node 12 is derived from node 1
+    Frm1 = 	# Frame number 1
+       Begin Frame 	# Coordinate system description
+          Title = "Data grid indices; first pixel at (1,1)" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "GRID" 	# Coordinate system domain
+#         Lbl1 = "Data grid index 1" 	# Label for axis 1
+#         Lbl2 = "Data grid index 2" 	# Label for axis 2
+#         Uni1 = "pixel" 	# Units for axis 1
+#         Uni2 = "pixel" 	# Units for axis 2
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Data grid index 1" 	# Axis Label
+                Symbol = "g1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "0.0" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Data grid index 2" 	# Axis Label
+                Symbol = "g2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "0.0" 	# Format specifier
+             End Axis
+       End Frame
+    Frm2 = 	# Frame number 2
+       Begin Frame 	# Coordinate system description
+          Title = "Pixel coordinates; first pixel at (0.5,0.5)" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "PIXEL" 	# Coordinate system domain
+#         Lbl1 = "Pixel coordinate 1" 	# Label for axis 1
+#         Lbl2 = "Pixel coordinate 2" 	# Label for axis 2
+#         Uni1 = "pixel" 	# Units for axis 1
+#         Uni2 = "pixel" 	# Units for axis 2
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 1" 	# Axis Label
+                Symbol = "p1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "0.0" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 2" 	# Axis Label
+                Symbol = "p2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "0.0" 	# Format specifier
+             End Axis
+       End Frame
+    Frm3 = 	# Frame number 3
+       Begin Frame 	# Coordinate system description
+          Title = "Axis coordinates; first pixel at (0.5,0.5)" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "AXIS" 	# Coordinate system domain
+#         Lbl1 = "Axis 1" 	# Label for axis 1
+#         Lbl2 = "Axis 2" 	# Label for axis 2
+#         Uni1 = "pixel" 	# Units for axis 1
+#         Uni2 = "pixel" 	# Units for axis 2
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Axis 1" 	# Axis Label
+                Symbol = "a1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "0.0" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Axis 2" 	# Axis Label
+                Symbol = "a2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "0.0" 	# Format specifier
+             End Axis
+       End Frame
+    Frm4 = 	# Frame number 4
+       Begin CmpFrame 	# Compound coordinate system description
+          Ident = " " 	# Permanent Object identification string
+       IsA Object 	# AST Object
+#         Title = "3-d compound coordinate system" 	# Title of coordinate system
+#         Naxes = 3 	# Number of coordinate axes
+#         Domain = "SKY-DSBSPECTRUM" 	# Coordinate system domain
+#         Lbl1 = "Right ascension" 	# Label for axis 1
+#         Lbl2 = "Declination" 	# Label for axis 2
+#         Lbl3 = "Radio velocity (USB)" 	# Label for axis 3
+#         Uni1 = "hh:mm:ss.s" 	# Units for axis 1
+#         Uni2 = "ddd:mm:ss" 	# Units for axis 2
+#         Uni3 = "km/s" 	# Units for axis 3
+#         Dir1 = 0 	# Plot axis 1 in reverse direction
+       IsA Frame 	# Coordinate system description
+          FrameA = 	# First component Frame
+             Begin SkyFrame 	# Description of celestial coordinate system
+                Naxes = 2 	# Number of coordinate axes
+                Epoch = 2006.11041904327 	# Julian epoch of observation
+                System = "FK5" 	# Coordinate system type
+                ObsLat = 0.594787886453381 	# Observers geodetic latitude (rads)
+                ObsLon = -1.87829426713432 	# Observers geodetic longitude (rads)
+                Ax1 = 	# Axis number 1
+                   Begin SkyAxis 	# Celestial coordinate axis
+                   End SkyAxis
+                Ax2 = 	# Axis number 2
+                   Begin SkyAxis 	# Celestial coordinate axis
+                   End SkyAxis
+             IsA Frame 	# Coordinate system description
+                Proj = "gnomonic" 	# Description of sky projection
+                Eqnox = 2000 	# Julian epoch of mean equinox
+                SRefIs = "Ignored" 	# Not rotated (ref. pos. is ignored)
+                SRef1 = 1.4627604034858 	# Ref. pos. RA 5:35:14.4
+                SRef2 = -0.093822840630741 	# Ref. pos. Dec -5:22:32
+             End SkyFrame
+          FrameB = 	# Second component Frame
+             Begin DSBSpecFrame 	# Dual sideband spectral axis
+                Naxes = 1 	# Number of coordinate axes
+                Epoch = 2006.11041904327 	# Julian epoch of observation
+                System = "VRAD" 	# Coordinate system type
+                ObsLat = 0.594787886453381 	# Observers geodetic latitude (rads)
+                ObsLon = -1.87829426713432 	# Observers geodetic longitude (rads)
+                Ax1 = 	# Axis number 1
+                   Begin Axis 	# Coordinate axis
+                   End Axis
+             IsA Frame 	# Coordinate system description
+                SoR = "LSRK" 	# Standard of rest
+                RefRA = 1.4627604034858 	# Reference RA (rads, FK5 J2000)
+                RefDec = -0.093822840630741 	# Reference Dec (rads, FK5 J2000)
+                RstFrq = 345795990000 	# Rest frequency (Hz)
+                SrcVel = 9999.83355150687 	# Source velocity (m/s)
+                SrcVRF = "LSRK" 	# Source velocity rest frame
+                UFreq = "Hz" 	# Preferred units for frequency
+             IsA SpecFrame 	# Description of spectral coordinate system
+                DSBCen = 345737394139.481 	# Central frequency (Hz topo)
+                IF = -5028294783.62665 	# Intermediate frequency (Hz)
+                SideBn = "USB" 	# Represents upper sideband
+             End DSBSpecFrame
+       End CmpFrame
+    Frm5 = 	# Frame number 5
+       Begin Interval 	# Axis intervals
+#         Title = "Tile 1 bounds: (1:257,1:657)" 	# Title of coordinate system
+#         Naxes = 2 	# Number of coordinate axes
+#         Domain = "ROI1" 	# Coordinate system domain
+#         Epoch = 2000 	# Julian epoch of observation
+#         Lbl1 = "Data grid index 1" 	# Label for axis 1
+#         Lbl2 = "Data grid index 2" 	# Label for axis 2
+#         System = "Cartesian" 	# Coordinate system type
+#         Uni1 = "pixel" 	# Units for axis 1
+#         Uni2 = "pixel" 	# Units for axis 2
+       IsA Frame 	# Coordinate system description
+          Adapt = 1 	# Region adapts to coord sys changes
+          Frm = 	# Coordinate system
+             Begin Frame 	# Coordinate system description
+                Title = "Tile 1 bounds: (1:257,1:657)" 	# Title of coordinate system
+                Naxes = 2 	# Number of coordinate axes
+                Domain = "ROI1" 	# Coordinate system domain
+#               Lbl1 = "Data grid index 1" 	# Label for axis 1
+#               Lbl2 = "Data grid index 2" 	# Label for axis 2
+#               Uni1 = "pixel" 	# Units for axis 1
+#               Uni2 = "pixel" 	# Units for axis 2
+                Ax1 = 	# Axis number 1
+                   Begin Axis 	# Coordinate axis
+                      Label = "Data grid index 1" 	# Axis Label
+                      Symbol = "g1" 	# Axis symbol
+                      Unit = "pixel" 	# Axis units
+                      Format = "0.0" 	# Format specifier
+                   End Axis
+                Ax2 = 	# Axis number 2
+                   Begin Axis 	# Coordinate axis
+                      Label = "Data grid index 2" 	# Axis Label
+                      Symbol = "g2" 	# Axis symbol
+                      Unit = "pixel" 	# Axis units
+                      Format = "0.0" 	# Format specifier
+                   End Axis
+             End Frame
+          Points = 	# Points defining the shape
+             Begin PointSet 	# Container for a set of points
+                Npoint = 2 	# Number of points
+                Ncoord = 2 	# Number of coordinates per point
+                X1 = 0.5 	# Coordinate values...
+                X2 = 0.5
+                X3 = 257.4999999999
+                X4 = 657.4999999999
+             End PointSet
+       IsA Region 	# An area within a coordinate system
+       End Interval
+    Frm6 = 	# Frame number 6
+       Begin Interval 	# Axis intervals
+#         Title = "Tile 2 bounds: (258:514,1:657)" 	# Title of coordinate system
+#         Naxes = 2 	# Number of coordinate axes
+#         Domain = "ROI2" 	# Coordinate system domain
+#         Epoch = 2000 	# Julian epoch of observation
+#         Lbl1 = "Data grid index 1" 	# Label for axis 1
+#         Lbl2 = "Data grid index 2" 	# Label for axis 2
+#         System = "Cartesian" 	# Coordinate system type
+#         Uni1 = "pixel" 	# Units for axis 1
+#         Uni2 = "pixel" 	# Units for axis 2
+       IsA Frame 	# Coordinate system description
+          Adapt = 1 	# Region adapts to coord sys changes
+          Frm = 	# Coordinate system
+             Begin Frame 	# Coordinate system description
+                Title = "Tile 2 bounds: (258:514,1:657)" 	# Title of coordinate system
+                Naxes = 2 	# Number of coordinate axes
+                Domain = "ROI2" 	# Coordinate system domain
+#               Lbl1 = "Data grid index 1" 	# Label for axis 1
+#               Lbl2 = "Data grid index 2" 	# Label for axis 2
+#               Uni1 = "pixel" 	# Units for axis 1
+#               Uni2 = "pixel" 	# Units for axis 2
+                Ax1 = 	# Axis number 1
+                   Begin Axis 	# Coordinate axis
+                      Label = "Data grid index 1" 	# Axis Label
+                      Symbol = "g1" 	# Axis symbol
+                      Unit = "pixel" 	# Axis units
+                      Format = "0.0" 	# Format specifier
+                   End Axis
+                Ax2 = 	# Axis number 2
+                   Begin Axis 	# Coordinate axis
+                      Label = "Data grid index 2" 	# Axis Label
+                      Symbol = "g2" 	# Axis symbol
+                      Unit = "pixel" 	# Axis units
+                      Format = "0.0" 	# Format specifier
+                   End Axis
+             End Frame
+          Points = 	# Points defining the shape
+             Begin PointSet 	# Container for a set of points
+                Npoint = 2 	# Number of points
+                Ncoord = 2 	# Number of coordinates per point
+                X1 = 257.5 	# Coordinate values...
+                X2 = 0.5
+                X3 = 514.4999999999
+                X4 = 657.4999999999
+             End PointSet
+       IsA Region 	# An area within a coordinate system
+       End Interval
+    Frm7 = 	# Frame number 7
+       Begin Interval 	# Axis intervals
+#         Title = "Tile 3 bounds: (515:771,1:657)" 	# Title of coordinate system
+#         Naxes = 2 	# Number of coordinate axes
+#         Domain = "ROI3" 	# Coordinate system domain
+#         Epoch = 2000 	# Julian epoch of observation
+#         Lbl1 = "Data grid index 1" 	# Label for axis 1
+#         Lbl2 = "Data grid index 2" 	# Label for axis 2
+#         System = "Cartesian" 	# Coordinate system type
+#         Uni1 = "pixel" 	# Units for axis 1
+#         Uni2 = "pixel" 	# Units for axis 2
+       IsA Frame 	# Coordinate system description
+          Adapt = 1 	# Region adapts to coord sys changes
+          Frm = 	# Coordinate system
+             Begin Frame 	# Coordinate system description
+                Title = "Tile 3 bounds: (515:771,1:657)" 	# Title of coordinate system
+                Naxes = 2 	# Number of coordinate axes
+                Domain = "ROI3" 	# Coordinate system domain
+#               Lbl1 = "Data grid index 1" 	# Label for axis 1
+#               Lbl2 = "Data grid index 2" 	# Label for axis 2
+#               Uni1 = "pixel" 	# Units for axis 1
+#               Uni2 = "pixel" 	# Units for axis 2
+                Ax1 = 	# Axis number 1
+                   Begin Axis 	# Coordinate axis
+                      Label = "Data grid index 1" 	# Axis Label
+                      Symbol = "g1" 	# Axis symbol
+                      Unit = "pixel" 	# Axis units
+                      Format = "0.0" 	# Format specifier
+                   End Axis
+                Ax2 = 	# Axis number 2
+                   Begin Axis 	# Coordinate axis
+                      Label = "Data grid index 2" 	# Axis Label
+                      Symbol = "g2" 	# Axis symbol
+                      Unit = "pixel" 	# Axis units
+                      Format = "0.0" 	# Format specifier
+                   End Axis
+             End Frame
+          Points = 	# Points defining the shape
+             Begin PointSet 	# Container for a set of points
+                Npoint = 2 	# Number of points
+                Ncoord = 2 	# Number of coordinates per point
+                X1 = 514.5 	# Coordinate values...
+                X2 = 0.5
+                X3 = 771.4999999999
+                X4 = 657.4999999999
+             End PointSet
+       IsA Region 	# An area within a coordinate system
+       End Interval
+    Frm8 = 	# Frame number 8
+       Begin Interval 	# Axis intervals
+#         Title = "Tile 4 bounds: (1:257,658:1314)" 	# Title of coordinate system
+#         Naxes = 2 	# Number of coordinate axes
+#         Domain = "ROI4" 	# Coordinate system domain
+#         Epoch = 2000 	# Julian epoch of observation
+#         Lbl1 = "Data grid index 1" 	# Label for axis 1
+#         Lbl2 = "Data grid index 2" 	# Label for axis 2
+#         System = "Cartesian" 	# Coordinate system type
+#         Uni1 = "pixel" 	# Units for axis 1
+#         Uni2 = "pixel" 	# Units for axis 2
+       IsA Frame 	# Coordinate system description
+          Adapt = 1 	# Region adapts to coord sys changes
+          Frm = 	# Coordinate system
+             Begin Frame 	# Coordinate system description
+                Title = "Tile 4 bounds: (1:257,658:1314)" 	# Title of coordinate system
+                Naxes = 2 	# Number of coordinate axes
+                Domain = "ROI4" 	# Coordinate system domain
+#               Lbl1 = "Data grid index 1" 	# Label for axis 1
+#               Lbl2 = "Data grid index 2" 	# Label for axis 2
+#               Uni1 = "pixel" 	# Units for axis 1
+#               Uni2 = "pixel" 	# Units for axis 2
+                Ax1 = 	# Axis number 1
+                   Begin Axis 	# Coordinate axis
+                      Label = "Data grid index 1" 	# Axis Label
+                      Symbol = "g1" 	# Axis symbol
+                      Unit = "pixel" 	# Axis units
+                      Format = "0.0" 	# Format specifier
+                   End Axis
+                Ax2 = 	# Axis number 2
+                   Begin Axis 	# Coordinate axis
+                      Label = "Data grid index 2" 	# Axis Label
+                      Symbol = "g2" 	# Axis symbol
+                      Unit = "pixel" 	# Axis units
+                      Format = "0.0" 	# Format specifier
+                   End Axis
+             End Frame
+          Points = 	# Points defining the shape
+             Begin PointSet 	# Container for a set of points
+                Npoint = 2 	# Number of points
+                Ncoord = 2 	# Number of coordinates per point
+                X1 = 0.5 	# Coordinate values...
+                X2 = 657.5
+                X3 = 257.4999999999
+                X4 = 1314.4999999999
+             End PointSet
+       IsA Region 	# An area within a coordinate system
+       End Interval
+    Frm9 = 	# Frame number 9
+       Begin Interval 	# Axis intervals
+#         Title = "Tile 5 bounds: (258:514,658:1314)" 	# Title of coordinate system
+#         Naxes = 2 	# Number of coordinate axes
+#         Domain = "ROI5" 	# Coordinate system domain
+#         Epoch = 2000 	# Julian epoch of observation
+#         Lbl1 = "Data grid index 1" 	# Label for axis 1
+#         Lbl2 = "Data grid index 2" 	# Label for axis 2
+#         System = "Cartesian" 	# Coordinate system type
+#         Uni1 = "pixel" 	# Units for axis 1
+#         Uni2 = "pixel" 	# Units for axis 2
+       IsA Frame 	# Coordinate system description
+          Adapt = 1 	# Region adapts to coord sys changes
+          Frm = 	# Coordinate system
+             Begin Frame 	# Coordinate system description
+                Title = "Tile 5 bounds: (258:514,658:1314)" 	# Title of coordinate system
+                Naxes = 2 	# Number of coordinate axes
+                Domain = "ROI5" 	# Coordinate system domain
+#               Lbl1 = "Data grid index 1" 	# Label for axis 1
+#               Lbl2 = "Data grid index 2" 	# Label for axis 2
+#               Uni1 = "pixel" 	# Units for axis 1
+#               Uni2 = "pixel" 	# Units for axis 2
+                Ax1 = 	# Axis number 1
+                   Begin Axis 	# Coordinate axis
+                      Label = "Data grid index 1" 	# Axis Label
+                      Symbol = "g1" 	# Axis symbol
+                      Unit = "pixel" 	# Axis units
+                      Format = "0.0" 	# Format specifier
+                   End Axis
+                Ax2 = 	# Axis number 2
+                   Begin Axis 	# Coordinate axis
+                      Label = "Data grid index 2" 	# Axis Label
+                      Symbol = "g2" 	# Axis symbol
+                      Unit = "pixel" 	# Axis units
+                      Format = "0.0" 	# Format specifier
+                   End Axis
+             End Frame
+          Points = 	# Points defining the shape
+             Begin PointSet 	# Container for a set of points
+                Npoint = 2 	# Number of points
+                Ncoord = 2 	# Number of coordinates per point
+                X1 = 257.5 	# Coordinate values...
+                X2 = 657.5
+                X3 = 514.4999999999
+                X4 = 1314.4999999999
+             End PointSet
+       IsA Region 	# An area within a coordinate system
+       End Interval
+    Frm10 = 	# Frame number 10
+       Begin Interval 	# Axis intervals
+#         Title = "Tile 6 bounds: (515:771,658:1314)" 	# Title of coordinate system
+#         Naxes = 2 	# Number of coordinate axes
+#         Domain = "ROI6" 	# Coordinate system domain
+#         Epoch = 2000 	# Julian epoch of observation
+#         Lbl1 = "Data grid index 1" 	# Label for axis 1
+#         Lbl2 = "Data grid index 2" 	# Label for axis 2
+#         System = "Cartesian" 	# Coordinate system type
+#         Uni1 = "pixel" 	# Units for axis 1
+#         Uni2 = "pixel" 	# Units for axis 2
+       IsA Frame 	# Coordinate system description
+          Adapt = 1 	# Region adapts to coord sys changes
+          Frm = 	# Coordinate system
+             Begin Frame 	# Coordinate system description
+                Title = "Tile 6 bounds: (515:771,658:1314)" 	# Title of coordinate system
+                Naxes = 2 	# Number of coordinate axes
+                Domain = "ROI6" 	# Coordinate system domain
+#               Lbl1 = "Data grid index 1" 	# Label for axis 1
+#               Lbl2 = "Data grid index 2" 	# Label for axis 2
+#               Uni1 = "pixel" 	# Units for axis 1
+#               Uni2 = "pixel" 	# Units for axis 2
+                Ax1 = 	# Axis number 1
+                   Begin Axis 	# Coordinate axis
+                      Label = "Data grid index 1" 	# Axis Label
+                      Symbol = "g1" 	# Axis symbol
+                      Unit = "pixel" 	# Axis units
+                      Format = "0.0" 	# Format specifier
+                   End Axis
+                Ax2 = 	# Axis number 2
+                   Begin Axis 	# Coordinate axis
+                      Label = "Data grid index 2" 	# Axis Label
+                      Symbol = "g2" 	# Axis symbol
+                      Unit = "pixel" 	# Axis units
+                      Format = "0.0" 	# Format specifier
+                   End Axis
+             End Frame
+          Points = 	# Points defining the shape
+             Begin PointSet 	# Container for a set of points
+                Npoint = 2 	# Number of points
+                Ncoord = 2 	# Number of coordinates per point
+                X1 = 514.5 	# Coordinate values...
+                X2 = 657.5
+                X3 = 771.4999999999
+                X4 = 1314.4999999999
+             End PointSet
+       IsA Region 	# An area within a coordinate system
+       End Interval
+    Map2 = 	# Mapping between nodes 1 and 2
+       Begin UnitMap 	# Unit (null) Mapping
+          Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
+       IsA Mapping 	# Mapping between coordinate systems
+       End UnitMap
+    Map3 = 	# Mapping between nodes 2 and 3
+       Begin CmpMap 	# Compound Mapping
+          Nin = 2 	# Number of input coordinates
+          Nout = 3 	# Number of output coordinates
+          IsSimp = 1 	# Mapping has been simplified
+       IsA Mapping 	# Mapping between coordinate systems
+          MapA = 	# First component Mapping
+             Begin SwitchMap 	# Alternate regionalised Mapping
+                Nin = 2 	# Number of input coordinates
+                Nout = 3 	# Number of output coordinates
+                Invert = 0 	# Mapping not inverted
+             IsA Mapping 	# Mapping between coordinate systems
+                FSMap = 	# Forward selector Mapping
+                   Begin SelectorMap 	# Region identification Mapping
+                      Nin = 2 	# Number of input coordinates
+                      Nout = 1 	# Number of output coordinates
+                      Invert = 0 	# Mapping not inverted
+                      Inv = 0 	# Inverse transformation not defined
+                   IsA Mapping 	# Mapping between coordinate systems
+                      Reg1 = 	# Region of input space
+                         Begin Box 	# Axis intervals
+#                           Title = "Data grid indices; first pixel at (1,1)" 	# Title of coordinate system
+#                           Naxes = 2 	# Number of coordinate axes
+#                           Domain = "GRID" 	# Coordinate system domain
+#                           Epoch = 2000 	# Julian epoch of observation
+#                           Lbl1 = "Data grid index 1" 	# Label for axis 1
+#                           Lbl2 = "Data grid index 2" 	# Label for axis 2
+#                           System = "Cartesian" 	# Coordinate system type
+#                           Uni1 = "pixel" 	# Units for axis 1
+#                           Uni2 = "pixel" 	# Units for axis 2
+                         IsA Frame 	# Coordinate system description
+                            Closed = 1 	# Boundary is inside
+                            Adapt = 1 	# Region adapts to coord sys changes
+                            Frm = 	# Coordinate system
+                               Begin Frame 	# Coordinate system description
+                                  Title = "Data grid indices; first pixel at (1,1)" 	# Title of coordinate system
+                                  Naxes = 2 	# Number of coordinate axes
+                                  Domain = "GRID" 	# Coordinate system domain
+#                                 Lbl1 = "Data grid index 1" 	# Label for axis 1
+#                                 Lbl2 = "Data grid index 2" 	# Label for axis 2
+#                                 Uni1 = "pixel" 	# Units for axis 1
+#                                 Uni2 = "pixel" 	# Units for axis 2
+                                  Ax1 = 	# Axis number 1
+                                     Begin Axis 	# Coordinate axis
+                                        Label = "Data grid index 1" 	# Axis Label
+                                        Symbol = "g1" 	# Axis symbol
+                                        Unit = "pixel" 	# Axis units
+                                        Format = "0.0" 	# Format specifier
+                                     End Axis
+                                  Ax2 = 	# Axis number 2
+                                     Begin Axis 	# Coordinate axis
+                                        Label = "Data grid index 2" 	# Axis Label
+                                        Symbol = "g2" 	# Axis symbol
+                                        Unit = "pixel" 	# Axis units
+                                        Format = "0.0" 	# Format specifier
+                                     End Axis
+                               End Frame
+                            Points = 	# Points defining the shape
+                               Begin PointSet 	# Container for a set of points
+                                  Npoint = 2 	# Number of points
+                                  Ncoord = 2 	# Number of coordinates per point
+                                  X1 = 128.99999999995 	# Coordinate values...
+                                  X2 = 328.99999999995
+                                  X3 = 257.4999999999
+                                  X4 = 657.4999999999
+                               End PointSet
+                         IsA Region 	# An area within a coordinate system
+                         End Box
+                      Reg2 = 	# Region of input space
+                         Begin Box 	# Axis intervals
+#                           Title = "Data grid indices; first pixel at (1,1)" 	# Title of coordinate system
+#                           Naxes = 2 	# Number of coordinate axes
+#                           Domain = "GRID" 	# Coordinate system domain
+#                           Epoch = 2000 	# Julian epoch of observation
+#                           Lbl1 = "Data grid index 1" 	# Label for axis 1
+#                           Lbl2 = "Data grid index 2" 	# Label for axis 2
+#                           System = "Cartesian" 	# Coordinate system type
+#                           Uni1 = "pixel" 	# Units for axis 1
+#                           Uni2 = "pixel" 	# Units for axis 2
+                         IsA Frame 	# Coordinate system description
+                            Closed = 1 	# Boundary is inside
+                            Adapt = 1 	# Region adapts to coord sys changes
+                            Points = 	# Points defining the shape
+                               Begin PointSet 	# Container for a set of points
+                                  Npoint = 2 	# Number of points
+                                  Ncoord = 2 	# Number of coordinates per point
+                                  X1 = 385.99999999995 	# Coordinate values...
+                                  X2 = 328.99999999995
+                                  X3 = 514.4999999999
+                                  X4 = 657.4999999999
+                               End PointSet
+                         IsA Region 	# An area within a coordinate system
+                         End Box
+                      Reg3 = 	# Region of input space
+                         Begin Box 	# Axis intervals
+#                           Title = "Data grid indices; first pixel at (1,1)" 	# Title of coordinate system
+#                           Naxes = 2 	# Number of coordinate axes
+#                           Domain = "GRID" 	# Coordinate system domain
+#                           Epoch = 2000 	# Julian epoch of observation
+#                           Lbl1 = "Data grid index 1" 	# Label for axis 1
+#                           Lbl2 = "Data grid index 2" 	# Label for axis 2
+#                           System = "Cartesian" 	# Coordinate system type
+#                           Uni1 = "pixel" 	# Units for axis 1
+#                           Uni2 = "pixel" 	# Units for axis 2
+                         IsA Frame 	# Coordinate system description
+                            Closed = 1 	# Boundary is inside
+                            Adapt = 1 	# Region adapts to coord sys changes
+                            Points = 	# Points defining the shape
+                               Begin PointSet 	# Container for a set of points
+                                  Npoint = 2 	# Number of points
+                                  Ncoord = 2 	# Number of coordinates per point
+                                  X1 = 642.99999999995 	# Coordinate values...
+                                  X2 = 328.99999999995
+                                  X3 = 771.4999999999
+                                  X4 = 657.4999999999
+                               End PointSet
+                         IsA Region 	# An area within a coordinate system
+                         End Box
+                      Reg4 = 	# Region of input space
+                         Begin Box 	# Axis intervals
+#                           Title = "Data grid indices; first pixel at (1,1)" 	# Title of coordinate system
+#                           Naxes = 2 	# Number of coordinate axes
+#                           Domain = "GRID" 	# Coordinate system domain
+#                           Epoch = 2000 	# Julian epoch of observation
+#                           Lbl1 = "Data grid index 1" 	# Label for axis 1
+#                           Lbl2 = "Data grid index 2" 	# Label for axis 2
+#                           System = "Cartesian" 	# Coordinate system type
+#                           Uni1 = "pixel" 	# Units for axis 1
+#                           Uni2 = "pixel" 	# Units for axis 2
+                         IsA Frame 	# Coordinate system description
+                            Closed = 1 	# Boundary is inside
+                            Adapt = 1 	# Region adapts to coord sys changes
+                            Points = 	# Points defining the shape
+                               Begin PointSet 	# Container for a set of points
+                                  Npoint = 2 	# Number of points
+                                  Ncoord = 2 	# Number of coordinates per point
+                                  X1 = 128.99999999995 	# Coordinate values...
+                                  X2 = 985.99999999995
+                                  X3 = 257.4999999999
+                                  X4 = 1314.4999999999
+                               End PointSet
+                         IsA Region 	# An area within a coordinate system
+                         End Box
+                      Reg5 = 	# Region of input space
+                         Begin Box 	# Axis intervals
+#                           Title = "Data grid indices; first pixel at (1,1)" 	# Title of coordinate system
+#                           Naxes = 2 	# Number of coordinate axes
+#                           Domain = "GRID" 	# Coordinate system domain
+#                           Epoch = 2000 	# Julian epoch of observation
+#                           Lbl1 = "Data grid index 1" 	# Label for axis 1
+#                           Lbl2 = "Data grid index 2" 	# Label for axis 2
+#                           System = "Cartesian" 	# Coordinate system type
+#                           Uni1 = "pixel" 	# Units for axis 1
+#                           Uni2 = "pixel" 	# Units for axis 2
+                         IsA Frame 	# Coordinate system description
+                            Closed = 1 	# Boundary is inside
+                            Adapt = 1 	# Region adapts to coord sys changes
+                            Points = 	# Points defining the shape
+                               Begin PointSet 	# Container for a set of points
+                                  Npoint = 2 	# Number of points
+                                  Ncoord = 2 	# Number of coordinates per point
+                                  X1 = 385.99999999995 	# Coordinate values...
+                                  X2 = 985.99999999995
+                                  X3 = 514.4999999999
+                                  X4 = 1314.4999999999
+                               End PointSet
+                         IsA Region 	# An area within a coordinate system
+                         End Box
+                      Reg6 = 	# Region of input space
+                         Begin Box 	# Axis intervals
+#                           Title = "Data grid indices; first pixel at (1,1)" 	# Title of coordinate system
+#                           Naxes = 2 	# Number of coordinate axes
+#                           Domain = "GRID" 	# Coordinate system domain
+#                           Epoch = 2000 	# Julian epoch of observation
+#                           Lbl1 = "Data grid index 1" 	# Label for axis 1
+#                           Lbl2 = "Data grid index 2" 	# Label for axis 2
+#                           System = "Cartesian" 	# Coordinate system type
+#                           Uni1 = "pixel" 	# Units for axis 1
+#                           Uni2 = "pixel" 	# Units for axis 2
+                         IsA Frame 	# Coordinate system description
+                            Closed = 1 	# Boundary is inside
+                            Adapt = 1 	# Region adapts to coord sys changes
+                            Points = 	# Points defining the shape
+                               Begin PointSet 	# Container for a set of points
+                                  Npoint = 2 	# Number of points
+                                  Ncoord = 2 	# Number of coordinates per point
+                                  X1 = 642.99999999995 	# Coordinate values...
+                                  X2 = 985.99999999995
+                                  X3 = 771.4999999999
+                                  X4 = 1314.4999999999
+                               End PointSet
+                         IsA Region 	# An area within a coordinate system
+                         End Box
+                   End SelectorMap
+                ISMap = 	# Inverse selector Mapping
+                   Begin SelectorMap 	# Region identification Mapping
+                      Nin = 3 	# Number of input coordinates
+                      Nout = 1 	# Number of output coordinates
+                      Invert = 1 	# Mapping inverted
+                      Inv = 0 	# Inverse transformation not defined
+                   IsA Mapping 	# Mapping between coordinate systems
+                      Reg1 = 	# Region of input space
+                         Begin Interval 	# Axis intervals
+#                           Title = "Pixel coordinates; first pixel at (-129.5,-329.5,-30.5)" 	# Title of coordinate system
+#                           Naxes = 3 	# Number of coordinate axes
+#                           Domain = "PIXEL" 	# Coordinate system domain
+#                           Epoch = 2000 	# Julian epoch of observation
+#                           Lbl1 = "Pixel coordinate 1" 	# Label for axis 1
+#                           Lbl2 = "Pixel coordinate 2" 	# Label for axis 2
+#                           Lbl3 = "Pixel coordinate 3" 	# Label for axis 3
+#                           System = "Cartesian" 	# Coordinate system type
+#                           Uni1 = "pixel" 	# Units for axis 1
+#                           Uni2 = "pixel" 	# Units for axis 2
+#                           Uni3 = "pixel" 	# Units for axis 3
+                         IsA Frame 	# Coordinate system description
+                            Adapt = 1 	# Region adapts to coord sys changes
+                            Frm = 	# Coordinate system
+                               Begin Frame 	# Coordinate system description
+                                  Title = "Pixel coordinates; first pixel at (-129.5,-329.5,-30.5)" 	# Title of coordinate system
+                                  Naxes = 3 	# Number of coordinate axes
+                                  Domain = "PIXEL" 	# Coordinate system domain
+#                                 Lbl1 = "Pixel coordinate 1" 	# Label for axis 1
+#                                 Lbl2 = "Pixel coordinate 2" 	# Label for axis 2
+#                                 Lbl3 = "Pixel coordinate 3" 	# Label for axis 3
+#                                 Uni1 = "pixel" 	# Units for axis 1
+#                                 Uni2 = "pixel" 	# Units for axis 2
+#                                 Uni3 = "pixel" 	# Units for axis 3
+                                  Ax1 = 	# Axis number 1
+                                     Begin Axis 	# Coordinate axis
+                                        Label = "Pixel coordinate 1" 	# Axis Label
+                                        Symbol = "p1" 	# Axis symbol
+                                        Unit = "pixel" 	# Axis units
+                                        Format = "0.0" 	# Format specifier
+                                     End Axis
+                                  Ax2 = 	# Axis number 2
+                                     Begin Axis 	# Coordinate axis
+                                        Label = "Pixel coordinate 2" 	# Axis Label
+                                        Symbol = "p2" 	# Axis symbol
+                                        Unit = "pixel" 	# Axis units
+                                        Format = "0.0" 	# Format specifier
+                                     End Axis
+                                  Ax3 = 	# Axis number 3
+                                     Begin Axis 	# Coordinate axis
+                                        Label = "Pixel coordinate 3" 	# Axis Label
+                                        Symbol = "p3" 	# Axis symbol
+                                        Unit = "pixel" 	# Axis units
+                                        Format = "0.0" 	# Format specifier
+                                     End Axis
+                               End Frame
+                            Points = 	# Points defining the shape
+                               Begin PointSet 	# Container for a set of points
+                                  Npoint = 2 	# Number of points
+                                  Ncoord = 3 	# Number of coordinates per point
+                                  X3 = 0.5 	# Coordinate values...
+                                  X6 = 10.5
+                               End PointSet
+                         IsA Region 	# An area within a coordinate system
+                         End Interval
+                      Reg2 = 	# Region of input space
+                         Begin Interval 	# Axis intervals
+#                           Title = "Pixel coordinates; first pixel at (-129.5,-329.5,-30.5)" 	# Title of coordinate system
+#                           Naxes = 3 	# Number of coordinate axes
+#                           Domain = "PIXEL" 	# Coordinate system domain
+#                           Epoch = 2000 	# Julian epoch of observation
+#                           Lbl1 = "Pixel coordinate 1" 	# Label for axis 1
+#                           Lbl2 = "Pixel coordinate 2" 	# Label for axis 2
+#                           Lbl3 = "Pixel coordinate 3" 	# Label for axis 3
+#                           System = "Cartesian" 	# Coordinate system type
+#                           Uni1 = "pixel" 	# Units for axis 1
+#                           Uni2 = "pixel" 	# Units for axis 2
+#                           Uni3 = "pixel" 	# Units for axis 3
+                         IsA Frame 	# Coordinate system description
+                            Adapt = 1 	# Region adapts to coord sys changes
+                            Points = 	# Points defining the shape
+                               Begin PointSet 	# Container for a set of points
+                                  Npoint = 2 	# Number of points
+                                  Ncoord = 3 	# Number of coordinates per point
+                                  X3 = 10.5 	# Coordinate values...
+                                  X6 = 20.5
+                               End PointSet
+                         IsA Region 	# An area within a coordinate system
+                         End Interval
+                      Reg3 = 	# Region of input space
+                         Begin Interval 	# Axis intervals
+#                           Title = "Pixel coordinates; first pixel at (-129.5,-329.5,-30.5)" 	# Title of coordinate system
+#                           Naxes = 3 	# Number of coordinate axes
+#                           Domain = "PIXEL" 	# Coordinate system domain
+#                           Epoch = 2000 	# Julian epoch of observation
+#                           Lbl1 = "Pixel coordinate 1" 	# Label for axis 1
+#                           Lbl2 = "Pixel coordinate 2" 	# Label for axis 2
+#                           Lbl3 = "Pixel coordinate 3" 	# Label for axis 3
+#                           System = "Cartesian" 	# Coordinate system type
+#                           Uni1 = "pixel" 	# Units for axis 1
+#                           Uni2 = "pixel" 	# Units for axis 2
+#                           Uni3 = "pixel" 	# Units for axis 3
+                         IsA Frame 	# Coordinate system description
+                            Adapt = 1 	# Region adapts to coord sys changes
+                            Points = 	# Points defining the shape
+                               Begin PointSet 	# Container for a set of points
+                                  Npoint = 2 	# Number of points
+                                  Ncoord = 3 	# Number of coordinates per point
+                                  X3 = 20.5 	# Coordinate values...
+                                  X6 = 30.5
+                               End PointSet
+                         IsA Region 	# An area within a coordinate system
+                         End Interval
+                      Reg4 = 	# Region of input space
+                         Begin Interval 	# Axis intervals
+#                           Title = "Pixel coordinates; first pixel at (-129.5,-329.5,-30.5)" 	# Title of coordinate system
+#                           Naxes = 3 	# Number of coordinate axes
+#                           Domain = "PIXEL" 	# Coordinate system domain
+#                           Epoch = 2000 	# Julian epoch of observation
+#                           Lbl1 = "Pixel coordinate 1" 	# Label for axis 1
+#                           Lbl2 = "Pixel coordinate 2" 	# Label for axis 2
+#                           Lbl3 = "Pixel coordinate 3" 	# Label for axis 3
+#                           System = "Cartesian" 	# Coordinate system type
+#                           Uni1 = "pixel" 	# Units for axis 1
+#                           Uni2 = "pixel" 	# Units for axis 2
+#                           Uni3 = "pixel" 	# Units for axis 3
+                         IsA Frame 	# Coordinate system description
+                            Adapt = 1 	# Region adapts to coord sys changes
+                            Points = 	# Points defining the shape
+                               Begin PointSet 	# Container for a set of points
+                                  Npoint = 2 	# Number of points
+                                  Ncoord = 3 	# Number of coordinates per point
+                                  X3 = 30.5 	# Coordinate values...
+                                  X6 = 40.5
+                               End PointSet
+                         IsA Region 	# An area within a coordinate system
+                         End Interval
+                      Reg5 = 	# Region of input space
+                         Begin Interval 	# Axis intervals
+#                           Title = "Pixel coordinates; first pixel at (-129.5,-329.5,-30.5)" 	# Title of coordinate system
+#                           Naxes = 3 	# Number of coordinate axes
+#                           Domain = "PIXEL" 	# Coordinate system domain
+#                           Epoch = 2000 	# Julian epoch of observation
+#                           Lbl1 = "Pixel coordinate 1" 	# Label for axis 1
+#                           Lbl2 = "Pixel coordinate 2" 	# Label for axis 2
+#                           Lbl3 = "Pixel coordinate 3" 	# Label for axis 3
+#                           System = "Cartesian" 	# Coordinate system type
+#                           Uni1 = "pixel" 	# Units for axis 1
+#                           Uni2 = "pixel" 	# Units for axis 2
+#                           Uni3 = "pixel" 	# Units for axis 3
+                         IsA Frame 	# Coordinate system description
+                            Adapt = 1 	# Region adapts to coord sys changes
+                            Points = 	# Points defining the shape
+                               Begin PointSet 	# Container for a set of points
+                                  Npoint = 2 	# Number of points
+                                  Ncoord = 3 	# Number of coordinates per point
+                                  X3 = 40.5 	# Coordinate values...
+                                  X6 = 50.5
+                               End PointSet
+                         IsA Region 	# An area within a coordinate system
+                         End Interval
+                      Reg6 = 	# Region of input space
+                         Begin Interval 	# Axis intervals
+#                           Title = "Pixel coordinates; first pixel at (-129.5,-329.5,-30.5)" 	# Title of coordinate system
+#                           Naxes = 3 	# Number of coordinate axes
+#                           Domain = "PIXEL" 	# Coordinate system domain
+#                           Epoch = 2000 	# Julian epoch of observation
+#                           Lbl1 = "Pixel coordinate 1" 	# Label for axis 1
+#                           Lbl2 = "Pixel coordinate 2" 	# Label for axis 2
+#                           Lbl3 = "Pixel coordinate 3" 	# Label for axis 3
+#                           System = "Cartesian" 	# Coordinate system type
+#                           Uni1 = "pixel" 	# Units for axis 1
+#                           Uni2 = "pixel" 	# Units for axis 2
+#                           Uni3 = "pixel" 	# Units for axis 3
+                         IsA Frame 	# Coordinate system description
+                            Adapt = 1 	# Region adapts to coord sys changes
+                            Points = 	# Points defining the shape
+                               Begin PointSet 	# Container for a set of points
+                                  Npoint = 2 	# Number of points
+                                  Ncoord = 3 	# Number of coordinates per point
+                                  X3 = 50.5 	# Coordinate values...
+                                  X6 = 60.5
+                               End PointSet
+                         IsA Region 	# An area within a coordinate system
+                         End Interval
+                      BadVal = 1 	# Output value for bad input positions
+                   End SelectorMap
+                ISInv = 1 	# Inv selector used in inverse direction
+                RMap1 = 	# Route Mapping
+                   Begin PermMap 	# Coordinate permutation
+                      Nin = 2 	# Number of input coordinates
+                      Nout = 3 	# Number of output coordinates
+                      Invert = 0 	# Mapping not inverted
+                   IsA Mapping 	# Mapping between coordinate systems
+                      Out1 = 1 	# Output coordinate 1 = input coordinate 1
+                      Out2 = 2 	# Output coordinate 2 = input coordinate 2
+                      Out3 = -1 	# Output coordinate 3 = constant no. 1
+                      In1 = 1 	# Input coordinate 1 = output coordinate 1
+                      In2 = 2 	# Input coordinate 2 = output coordinate 2
+                      Nconst = 1 	# Number of constants
+                      Con1 = 5.5 	# Constant number 1
+                   End PermMap
+                RMap2 = 	# Route Mapping
+                   Begin CmpMap 	# Compound Mapping
+                      Nin = 2 	# Number of input coordinates
+                      Nout = 3 	# Number of output coordinates
+                      Invert = 0 	# Mapping not inverted
+                   IsA Mapping 	# Mapping between coordinate systems
+                      MapA = 	# First component Mapping
+                         Begin WinMap 	# Map one window on to another
+                            Nin = 2 	# Number of input coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            Sft1 = -257 	# Shift for axis 1
+                         End WinMap
+                      MapB = 	# Second component Mapping
+                         Begin PermMap 	# Coordinate permutation
+                            Nin = 2 	# Number of input coordinates
+                            Nout = 3 	# Number of output coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            Out1 = 1 	# Output coordinate 1 = input coordinate 1
+                            Out2 = 2 	# Output coordinate 2 = input coordinate 2
+                            Out3 = -1 	# Output coordinate 3 = constant no. 1
+                            In1 = 1 	# Input coordinate 1 = output coordinate 1
+                            In2 = 2 	# Input coordinate 2 = output coordinate 2
+                            Nconst = 1 	# Number of constants
+                            Con1 = 15.5 	# Constant number 1
+                         End PermMap
+                   End CmpMap
+                RMap3 = 	# Route Mapping
+                   Begin CmpMap 	# Compound Mapping
+                      Nin = 2 	# Number of input coordinates
+                      Nout = 3 	# Number of output coordinates
+                      Invert = 0 	# Mapping not inverted
+                   IsA Mapping 	# Mapping between coordinate systems
+                      MapA = 	# First component Mapping
+                         Begin WinMap 	# Map one window on to another
+                            Nin = 2 	# Number of input coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            Sft1 = -514 	# Shift for axis 1
+                         End WinMap
+                      MapB = 	# Second component Mapping
+                         Begin PermMap 	# Coordinate permutation
+                            Nin = 2 	# Number of input coordinates
+                            Nout = 3 	# Number of output coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            Out1 = 1 	# Output coordinate 1 = input coordinate 1
+                            Out2 = 2 	# Output coordinate 2 = input coordinate 2
+                            Out3 = -1 	# Output coordinate 3 = constant no. 1
+                            In1 = 1 	# Input coordinate 1 = output coordinate 1
+                            In2 = 2 	# Input coordinate 2 = output coordinate 2
+                            Nconst = 1 	# Number of constants
+                            Con1 = 25.5 	# Constant number 1
+                         End PermMap
+                   End CmpMap
+                RMap4 = 	# Route Mapping
+                   Begin CmpMap 	# Compound Mapping
+                      Nin = 2 	# Number of input coordinates
+                      Nout = 3 	# Number of output coordinates
+                      Invert = 0 	# Mapping not inverted
+                   IsA Mapping 	# Mapping between coordinate systems
+                      MapA = 	# First component Mapping
+                         Begin WinMap 	# Map one window on to another
+                            Nin = 2 	# Number of input coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            Sft2 = -657 	# Shift for axis 2
+                         End WinMap
+                      MapB = 	# Second component Mapping
+                         Begin PermMap 	# Coordinate permutation
+                            Nin = 2 	# Number of input coordinates
+                            Nout = 3 	# Number of output coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            Out1 = 1 	# Output coordinate 1 = input coordinate 1
+                            Out2 = 2 	# Output coordinate 2 = input coordinate 2
+                            Out3 = -1 	# Output coordinate 3 = constant no. 1
+                            In1 = 1 	# Input coordinate 1 = output coordinate 1
+                            In2 = 2 	# Input coordinate 2 = output coordinate 2
+                            Nconst = 1 	# Number of constants
+                            Con1 = 35.5 	# Constant number 1
+                         End PermMap
+                   End CmpMap
+                RMap5 = 	# Route Mapping
+                   Begin CmpMap 	# Compound Mapping
+                      Nin = 2 	# Number of input coordinates
+                      Nout = 3 	# Number of output coordinates
+                      Invert = 0 	# Mapping not inverted
+                   IsA Mapping 	# Mapping between coordinate systems
+                      MapA = 	# First component Mapping
+                         Begin WinMap 	# Map one window on to another
+                            Nin = 2 	# Number of input coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            Sft1 = -257 	# Shift for axis 1
+                            Sft2 = -657 	# Shift for axis 2
+                         End WinMap
+                      MapB = 	# Second component Mapping
+                         Begin PermMap 	# Coordinate permutation
+                            Nin = 2 	# Number of input coordinates
+                            Nout = 3 	# Number of output coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            Out1 = 1 	# Output coordinate 1 = input coordinate 1
+                            Out2 = 2 	# Output coordinate 2 = input coordinate 2
+                            Out3 = -1 	# Output coordinate 3 = constant no. 1
+                            In1 = 1 	# Input coordinate 1 = output coordinate 1
+                            In2 = 2 	# Input coordinate 2 = output coordinate 2
+                            Nconst = 1 	# Number of constants
+                            Con1 = 45.5 	# Constant number 1
+                         End PermMap
+                   End CmpMap
+                RMap6 = 	# Route Mapping
+                   Begin CmpMap 	# Compound Mapping
+                      Nin = 2 	# Number of input coordinates
+                      Nout = 3 	# Number of output coordinates
+                      Invert = 0 	# Mapping not inverted
+                   IsA Mapping 	# Mapping between coordinate systems
+                      MapA = 	# First component Mapping
+                         Begin WinMap 	# Map one window on to another
+                            Nin = 2 	# Number of input coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            Sft1 = -514 	# Shift for axis 1
+                            Sft2 = -657 	# Shift for axis 2
+                         End WinMap
+                      MapB = 	# Second component Mapping
+                         Begin PermMap 	# Coordinate permutation
+                            Nin = 2 	# Number of input coordinates
+                            Nout = 3 	# Number of output coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            Out1 = 1 	# Output coordinate 1 = input coordinate 1
+                            Out2 = 2 	# Output coordinate 2 = input coordinate 2
+                            Out3 = -1 	# Output coordinate 3 = constant no. 1
+                            In1 = 1 	# Input coordinate 1 = output coordinate 1
+                            In2 = 2 	# Input coordinate 2 = output coordinate 2
+                            Nconst = 1 	# Number of constants
+                            Con1 = 55.5 	# Constant number 1
+                         End PermMap
+                   End CmpMap
+             End SwitchMap
+          MapB = 	# Second component Mapping
+             Begin CmpMap 	# Compound Mapping
+                Nin = 3 	# Number of input coordinates
+             IsA Mapping 	# Mapping between coordinate systems
+                MapA = 	# First component Mapping
+                   Begin WinMap 	# Map one window on to another
+                      Nin = 3 	# Number of input coordinates
+                      Invert = 0 	# Mapping not inverted
+                   IsA Mapping 	# Mapping between coordinate systems
+                      Sft1 = -129 	# Shift for axis 1
+                      Sft2 = -329 	# Shift for axis 2
+                      Sft3 = -30 	# Shift for axis 3
+                   End WinMap
+                MapB = 	# Second component Mapping
+                   Begin CmpMap 	# Compound Mapping
+                      Nin = 3 	# Number of input coordinates
+                   IsA Mapping 	# Mapping between coordinate systems
+                      MapA = 	# First component Mapping
+                         Begin MatrixMap 	# Matrix transformation
+                            Nin = 3 	# Number of input coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            M0 = -3.63610279795969e-05 	# Forward matrix value
+                            M1 = 3.63610279795969e-05 	# Forward matrix value
+                            M2 = -488347.3475342 	# Forward matrix value
+                            Form = "Diagonal" 	# Matrix storage form
+                         End MatrixMap
+                      MapB = 	# Second component Mapping
+                         Begin CmpMap 	# Compound Mapping
+                            Nin = 3 	# Number of input coordinates
+                         IsA Mapping 	# Mapping between coordinate systems
+                            InvA = 1 	# First Mapping used in inverse direction
+                            MapA = 	# First component Mapping
+                               Begin WcsMap 	# FITS-WCS sky projection
+                                  Nin = 3 	# Number of input coordinates
+                                  Invert = 1 	# Mapping inverted
+                               IsA Mapping 	# Mapping between coordinate systems
+                                  Type = "TAN" 	# Gnomonic projection
+                               End WcsMap
+                            MapB = 	# Second component Mapping
+                               Begin CmpMap 	# Compound Mapping
+                                  Nin = 3 	# Number of input coordinates
+                                  Invert = 0 	# Mapping not inverted
+                               IsA Mapping 	# Mapping between coordinate systems
+                                  Series = 0 	# Component Mappings applied in parallel
+                                  MapA = 	# First component Mapping
+                                     Begin CmpMap 	# Compound Mapping
+                                        Nin = 2 	# Number of input coordinates
+                                        IsSimp = 1 	# Mapping has been simplified
+                                     IsA Mapping 	# Mapping between coordinate systems
+                                        InvA = 1 	# First Mapping used in inverse direction
+                                        MapA = 	# First component Mapping
+                                           Begin SphMap 	# Cartesian to Spherical mapping
+                                              Nin = 3 	# Number of input coordinates
+                                              Nout = 2 	# Number of output coordinates
+                                              Invert = 1 	# Mapping inverted
+                                           IsA Mapping 	# Mapping between coordinate systems
+                                              UntRd = 1 	# All input vectors have unit length
+                                              PlrLg = 0 	# Polar longitude (rad.s)
+                                           End SphMap
+                                        MapB = 	# Second component Mapping
+                                           Begin CmpMap 	# Compound Mapping
+                                              Nin = 3 	# Number of input coordinates
+                                              Nout = 2 	# Number of output coordinates
+                                              IsSimp = 1 	# Mapping has been simplified
+                                           IsA Mapping 	# Mapping between coordinate systems
+                                              MapA = 	# First component Mapping
+                                                 Begin MatrixMap 	# Matrix transformation
+                                                    Nin = 3 	# Number of input coordinates
+                                                    Invert = 0 	# Mapping not inverted
+                                                 IsA Mapping 	# Mapping between coordinate systems
+                                                    M0 = -0.0101016951205366 	# Forward matrix value
+                                                    M1 = -0.994169793679376 	# Forward matrix value
+                                                    M2 = 0.107351651553193 	# Forward matrix value
+                                                    M3 = -0.0931390474048858 	# Forward matrix value
+                                                    M4 = 0.107825884348362 	# Forward matrix value
+                                                    M5 = 0.989797300720205 	# Forward matrix value
+                                                    M6 = -0.99560186500639 	# Forward matrix value
+                                                    M7 = 0 	# Forward matrix value
+                                                    M8 = -0.0936852517517984 	# Forward matrix value
+                                                    Form = "Full" 	# Matrix storage form
+                                                 End MatrixMap
+                                              MapB = 	# Second component Mapping
+                                                 Begin SphMap 	# Cartesian to Spherical mapping
+                                                    Nin = 3 	# Number of input coordinates
+                                                    Nout = 2 	# Number of output coordinates
+                                                    Invert = 0 	# Mapping not inverted
+                                                 IsA Mapping 	# Mapping between coordinate systems
+                                                    UntRd = 1 	# All input vectors have unit length
+                                                    PlrLg = 1.4627604034858 	# Polar longitude (rad.s)
+                                                 End SphMap
+                                           End CmpMap
+                                     End CmpMap
+                                  MapB = 	# Second component Mapping
+                                     Begin CmpMap 	# Compound Mapping
+                                        Nin = 1 	# Number of input coordinates
+                                        IsSimp = 1 	# Mapping has been simplified
+                                     IsA Mapping 	# Mapping between coordinate systems
+                                        MapA = 	# First component Mapping
+                                           Begin WinMap 	# Map one window on to another
+                                              Nin = 1 	# Number of input coordinates
+                                              IsSimp = 1 	# Mapping has been simplified
+                                              Invert = 0 	# Mapping not inverted
+                                           IsA Mapping 	# Mapping between coordinate systems
+                                              Sft1 = 345737695700 	# Shift for axis 1
+                                           End WinMap
+                                        MapB = 	# Second component Mapping
+                                           Begin CmpMap 	# Compound Mapping
+                                              Nin = 1 	# Number of input coordinates
+                                              IsSimp = 1 	# Mapping has been simplified
+                                           IsA Mapping 	# Mapping between coordinate systems
+                                              MapA = 	# First component Mapping
+                                                 Begin SpecMap 	# Conversion between spectral coordinate systems
+                                                    Nin = 1 	# Number of input coordinates
+                                                    Invert = 0 	# Mapping not inverted
+                                                 IsA Mapping 	# Mapping between coordinate systems
+                                                    Nspec = 2 	# Number of conversion steps
+                                                    Spec1 = "FRTOVL" 	# Convert frequency to rel. velocity
+                                                    Spec1a = 345795990000 	# Rest frequency (Hz)
+                                                    Spec2 = "VLTOVR" 	# Convert relativistic to radio velocity
+                                                 End SpecMap
+                                              MapB = 	# Second component Mapping
+                                                 Begin ZoomMap 	# Zoom about the origin
+                                                    Nin = 1 	# Number of input coordinates
+                                                 IsA Mapping 	# Mapping between coordinate systems
+                                                    Zoom = 0.001 	# Zoom factor
+                                                 End ZoomMap
+                                           End CmpMap
+                                     End CmpMap
+                               End CmpMap
+                         End CmpMap
+                   End CmpMap
+             End CmpMap
+       End CmpMap
+    Map4 = 	# Mapping between nodes 2 and 4
+       Begin UnitMap 	# Unit (null) Mapping
+          Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
+       IsA Mapping 	# Mapping between coordinate systems
+       End UnitMap
+    Map5 = 	# Mapping between nodes 2 and 5
+       Begin UnitMap 	# Unit (null) Mapping
+          Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
+       IsA Mapping 	# Mapping between coordinate systems
+       End UnitMap
+    Map6 = 	# Mapping between nodes 2 and 6
+       Begin UnitMap 	# Unit (null) Mapping
+          Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
+       IsA Mapping 	# Mapping between coordinate systems
+       End UnitMap
+    Map7 = 	# Mapping between nodes 2 and 7
+       Begin UnitMap 	# Unit (null) Mapping
+          Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
+       IsA Mapping 	# Mapping between coordinate systems
+       End UnitMap
+    Map8 = 	# Mapping between nodes 2 and 8
+       Begin UnitMap 	# Unit (null) Mapping
+          Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
+       IsA Mapping 	# Mapping between coordinate systems
+       End UnitMap
+    Map9 = 	# Mapping between nodes 2 and 9
+       Begin UnitMap 	# Unit (null) Mapping
+          Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
+       IsA Mapping 	# Mapping between coordinate systems
+       End UnitMap
+    Map10 = 	# Mapping between nodes 1 and 10
+       Begin UnitMap 	# Unit (null) Mapping
+          Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
+       IsA Mapping 	# Mapping between coordinate systems
+       End UnitMap
+    Map11 = 	# Mapping between nodes 1 and 11
+       Begin WinMap 	# Map one window on to another
+          Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
+       IsA Mapping 	# Mapping between coordinate systems
+          Sft1 = -0.5 	# Shift for axis 1
+          Sft2 = -0.5 	# Shift for axis 2
+       End WinMap
+    Map12 = 	# Mapping between nodes 1 and 12
+       Begin WinMap 	# Map one window on to another
+          Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
+       IsA Mapping 	# Mapping between coordinate systems
+          Sft1 = -0.5 	# Shift for axis 1
+          Sft2 = -0.5 	# Shift for axis 2
+       End WinMap
+ End FrameSet
