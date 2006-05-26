@@ -79,7 +79,8 @@
 #        ELLPRO/FOU interface.
 #     1-FEB-2000 (PWD):
 #        Changed Norman's sector to "arc" and enabled.
-#
+#     25-MAY-2006 (PWD):
+#        Added `xrange' and `yrange' drawing modes.
 #-
 
 #.
@@ -210,30 +211,30 @@ itcl::class gaia::StarCanvasDraw {
             bind $canvas_ <Double-ButtonPress-1> \
                [code eval $this create_done $canvasX_ $canvasY_]
          }
-	 square {
-	     bind $canvas_ <1> \
-		     [code eval $this create_object $canvasX_ $canvasY_]
-	     bind $canvas_ <ButtonRelease-1> \
-		     [code eval $this check_done $canvasX_ $canvasY_ update_square]
-	     bind $canvas_ <B1-Motion> \
-		     [code eval $this update_square $canvasX_ $canvasY_]
-	     bind $canvas_ <Shift-B1-Motion> \
-		     [code eval $this update_square $canvasX_ $canvasY_]
-	     bind $canvas_ <Double-ButtonPress-1> \
-		     [code eval $this create_done $canvasX_ $canvasY_]
-	 }
-	 arc {
-	     bind $canvas_ <1> \
-		     [code eval $this create_object $canvasX_ $canvasY_]
-	     bind $canvas_ <ButtonRelease-1> \
-		     [code eval $this check_done $canvasX_ $canvasY_ update_arc]
-	     bind $canvas_ <B1-Motion> \
-		     [code eval $this update_arc $canvasX_ $canvasY_]
-	     bind $canvas_ <Shift-B1-Motion> \
-		     [code eval $this update_arc $canvasX_ $canvasY_]
-	     bind $canvas_ <Double-ButtonPress-1> \
-		     [code eval $this create_done $canvasX_ $canvasY_]
-	 }
+         square {
+             bind $canvas_ <1> \
+                     [code eval $this create_object $canvasX_ $canvasY_]
+             bind $canvas_ <ButtonRelease-1> \
+                     [code eval $this check_done $canvasX_ $canvasY_ update_square]
+             bind $canvas_ <B1-Motion> \
+                     [code eval $this update_square $canvasX_ $canvasY_]
+             bind $canvas_ <Shift-B1-Motion> \
+                     [code eval $this update_square $canvasX_ $canvasY_]
+             bind $canvas_ <Double-ButtonPress-1> \
+                     [code eval $this create_done $canvasX_ $canvasY_]
+         }
+         arc {
+             bind $canvas_ <1> \
+                     [code eval $this create_object $canvasX_ $canvasY_]
+             bind $canvas_ <ButtonRelease-1> \
+                     [code eval $this check_done $canvasX_ $canvasY_ update_arc]
+             bind $canvas_ <B1-Motion> \
+                     [code eval $this update_arc $canvasX_ $canvasY_]
+             bind $canvas_ <Shift-B1-Motion> \
+                     [code eval $this update_arc $canvasX_ $canvasY_]
+             bind $canvas_ <Double-ButtonPress-1> \
+                     [code eval $this create_done $canvasX_ $canvasY_]
+         }
          column {
             bind $canvas_ <1> \
                [code eval $this create_object $canvasX_ $canvasY_]
@@ -278,6 +279,30 @@ itcl::class gaia::StarCanvasDraw {
             bind $canvas_ <Control-1> \
                [code eval $this create_done $canvasX_ $canvasY_]
          }
+         xrange {
+             bind $canvas_ <1> \
+                     [code eval $this create_object $canvasX_ $canvasY_]
+             bind $canvas_ <ButtonRelease-1> \
+                     [code eval $this check_done $canvasX_ $canvasY_ update_xrange]
+             bind $canvas_ <B1-Motion> \
+                     [code eval $this update_xrange $canvasX_ $canvasY_]
+             bind $canvas_ <Shift-B1-Motion> \
+                     [code eval $this update_xrange $canvasX_ $canvasY_]
+             bind $canvas_ <Double-ButtonPress-1> \
+                     [code eval $this create_done $canvasX_ $canvasY_]
+         }
+         yrange {
+             bind $canvas_ <1> \
+                     [code eval $this create_object $canvasX_ $canvasY_]
+             bind $canvas_ <ButtonRelease-1> \
+                     [code eval $this check_done $canvasX_ $canvasY_ update_yrange]
+             bind $canvas_ <B1-Motion> \
+                     [code eval $this update_yrange $canvasX_ $canvasY_]
+             bind $canvas_ <Shift-B1-Motion> \
+                     [code eval $this update_yrange $canvasX_ $canvasY_]
+             bind $canvas_ <Double-ButtonPress-1> \
+                     [code eval $this create_done $canvasX_ $canvasY_]
+         }
       }
    }
 
@@ -298,14 +323,14 @@ itcl::class gaia::StarCanvasDraw {
                if { $draw } { draw_ellipse_selection_grips $id }
                $canvas_ addtag $w_.selected withtag $id
             }
-	    square {
-		if {$draw} {draw_square_selection_grips $id}
-		$canvas_ addtag $w_.selected withtag $id
-	    }
-	    arc {
-		if {$draw} {draw_arc_selection_grips $id}
-		$canvas_ addtag $w_.selected withtag $id
-	    }
+            square {
+                if {$draw} {draw_square_selection_grips $id}
+                $canvas_ addtag $w_.selected withtag $id
+            }
+            arc {
+                if {$draw} {draw_arc_selection_grips $id}
+                $canvas_ addtag $w_.selected withtag $id
+            }
             column -
             row -
             pixel {
@@ -514,7 +539,7 @@ itcl::class gaia::StarCanvasDraw {
             adjust_ellipse_selection $id
          }
       } elseif {"[$canvas_ type $id]" == "arc" } {
-	 adjust_arc_selection $id
+         adjust_arc_selection $id
       } elseif {"[$canvas_ type $id]" == "rtd_rotbox" } {
          adjust_ellipse_selection $id
       } elseif { [info exists types_($id)] && $types_($id) == "pointpoly" } {
@@ -621,7 +646,7 @@ itcl::class gaia::StarCanvasDraw {
       set centy [expr ($y0+$y1)/2]
       set hwid [expr $x-$centx > $y-$centy ? $x-$centx : $y-$centy]
       $canvas_ coords $obj_id_ [expr $centx-$hwid] [expr $centy-$hwid] \
-	       [expr $centx+$hwid] [expr $centy+$hwid]
+               [expr $centx+$hwid] [expr $centy+$hwid]
 
       if {[info exists notify_update_($id)]} {
          eval "$notify_update_($id) resize"
@@ -661,8 +686,8 @@ itcl::class gaia::StarCanvasDraw {
       foreach i [list "arc $arcx $arcy" "line $linex $liney"] {
          lassign $i side x y
          $canvas_ coords grip.$id.$side \
-	       [expr $x-$w] [expr $y-$w] \
-	       [expr $x+$w] [expr $y+$w]
+               [expr $x-$w] [expr $y-$w] \
+               [expr $x+$w] [expr $y+$w]
       }
    }
 
@@ -686,25 +711,25 @@ itcl::class gaia::StarCanvasDraw {
 
       set oa [$canvas_ itemcget $id -extent]
       if {$side == "arc"} {
-	 # oa in degrees
-	 set rad [expr sqrt($dx*$dx+$dy*$dy)]
-	 $canvas_ coords $id \
-	       [expr $centx-$rad] [expr $centy-$rad] \
-	       [expr $centx+$rad] [expr $centy+$rad]
-	 $canvas_ itemconfigure $id -start [expr $ang-($oa/2)]
+         # oa in degrees
+         set rad [expr sqrt($dx*$dx+$dy*$dy)]
+         $canvas_ coords $id \
+               [expr $centx-$rad] [expr $centy-$rad] \
+               [expr $centx+$rad] [expr $centy+$rad]
+         $canvas_ itemconfigure $id -start [expr $ang-($oa/2)]
       } else {
-	 # side=line
-	 set rad [expr sqrt($dx*$dx+$dy*$dy)/0.9]
-	 $canvas_ coords $id \
-	       [expr $centx-$rad] [expr $centy-$rad] \
-	       [expr $centx+$rad] [expr $centy+$rad]
-	 # pa in degrees
-	 set pa [$canvas_ itemcget $id -start]
-	 $canvas_ itemconfigure $id \
-	       -extent [expr abs($oa+2*($pa-$ang))] -start $ang
+         # side=line
+         set rad [expr sqrt($dx*$dx+$dy*$dy)/0.9]
+         $canvas_ coords $id \
+               [expr $centx-$rad] [expr $centy-$rad] \
+               [expr $centx+$rad] [expr $centy+$rad]
+         # pa in degrees
+         set pa [$canvas_ itemcget $id -start]
+         $canvas_ itemconfigure $id \
+               -extent [expr abs($oa+2*($pa-$ang))] -start $ang
       }
       if {[info exists notify_update_($id)]} {
-	 eval "$notify_update_($id) resize"
+         eval "$notify_update_($id) resize"
       }
    }
 
@@ -831,6 +856,30 @@ itcl::class gaia::StarCanvasDraw {
                  -stipple $itk_option(-stipplepattern)]
    }
 
+   #  Create and return an xrange object, use a segmented line.
+
+   method create_xrange {x y} {
+      return [$canvas_ create rtd_segment $x $y $x $y $x $y $x $y $x $y $x $y \
+                 -width $itk_option(-linewidth) \
+                 -fill [get_line_color] \
+                 -stipple $itk_option(-linestipple) \
+                 -arrow $itk_option(-arrowtype) \
+                 -smooth $itk_option(-smooth) \
+                 -arrowshape $itk_option(-arrowshape)]
+   }
+
+   #  Create and return a yrange object, use a segmented line.
+
+   method create_yrange {x y} {
+      return [$canvas_ create rtd_segment $x $y $x $y $x $y $x $y $x $y $x $y \
+                 -width $itk_option(-linewidth) \
+                 -fill [get_line_color] \
+                 -stipple $itk_option(-linestipple) \
+                 -arrow $itk_option(-arrowtype) \
+                 -smooth $itk_option(-smooth) \
+                 -arrowshape $itk_option(-arrowshape)]
+   }
+
    #  Create and return a arc object
 
    method create_arc {x y} {
@@ -856,8 +905,8 @@ itcl::class gaia::StarCanvasDraw {
       set newang [expr atan2(-$dy,$dx) * $rad_to_deg_]
 
       $canvas_ coords $obj_id_ \
-	    [expr $centx-$rad] [expr $centy-$rad] \
-	    [expr $centx+$rad] [expr $centy+$rad]
+            [expr $centx-$rad] [expr $centy-$rad] \
+            [expr $centx+$rad] [expr $centy+$rad]
       $canvas_ itemconfigure $obj_id_ -start [expr $newang-($oa/2)]
    }
 
@@ -1042,7 +1091,23 @@ itcl::class gaia::StarCanvasDraw {
        set centy [expr ($y0+$y1)/2]
        set hwid [expr $x-$centx > $y-$centy ? $x-$centx : $y-$centy]
        $canvas_ coords $obj_id_ [expr $centx-$hwid] [expr $centy-$hwid] \
-	       [expr $centx+$hwid] [expr $centy+$hwid]
+               [expr $centx+$hwid] [expr $centy+$hwid]
+   }
+
+   #  Update xrange.
+   method update_xrange {x y} {
+      lassign [$canvas_ bbox $obj_id_] x0 y0 x1 y1
+      set centy [expr ($y0+$y1)/2]
+      $canvas_ coords $obj_id_ \
+         $x0 $y0 $x0 $y1 $x0 $centy $x1 $centy $x1 $y0 $x1 $y1
+   }
+
+   #  Update yrange.
+   method update_yrange {x y} {
+      lassign [$canvas_ bbox $obj_id_] x0 y0 x1 y1
+      set centx [expr ($x0+$x1)/2]
+      $canvas_ coords $obj_id_ \
+         $x0 $y0 $x1 $y0 $centx $y0 $centx $y1 $x0 $y1 $x1 $y1
    }
 
    #  Update pixel to new position (obj_id_ not known when setting bindings
@@ -1219,10 +1284,8 @@ itcl::class gaia::StarCanvasDraw {
    #  List of drawing types available.
    protected variable drawing_modes_ {
       anyselect objselect line rectangle oval circle polygon polyline
-      text ellipse column row pixel rotbox pointpoly square arc
+      text ellipse column row pixel rotbox pointpoly square arc xrange yrange
    }
-   # I tried adding `arc' to this, but Tcl complained that `bitmap
-   # "arc" not defined'...
 
    #  Width of an image pixel.
    protected variable pixel_width_ 1
