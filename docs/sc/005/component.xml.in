@@ -33,7 +33,7 @@
   </dependencies>
   <developers>
     <person>
-      <name>A.C. Davenhall, G.J. Privett & M.B. Taylor}</name>
+      <name>A.C. Davenhall, G.J. Privett &amp; M.B. Taylor</name>
     </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
