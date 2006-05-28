@@ -28,5 +28,20 @@ $(EPSFILES): ssn78.mp
 ssn78.dvi: $(EPSFILES)
 ssn78.pdf: $(PDFFILES)
 
+# Make a tarball of the files which should be put on a webpage for 
+# downloading.  With the replacement ssn78->$(PACKAGE_NAME), the following
+# is pretty generic to other documentation packages.
+webpage-tarball.tar: ssn78.htx_tar ssn78.ps ssn78.texml_tar ssn78.pdf
+	rm -Rf tempdir; mkdir tempdir
+	rev=`sed -n '/\$$Revision/{s/[^0-9.]//gp;q;}' ssn78.xml`; \
+	  date >tempdir/VERSION-$$rev
+	cp ssn78.pdf tempdir
+	for f in ssn78.htx_tar ssn78.ps ssn78.texml_tar; do \
+	  gzip --best --stdout $$f >tempdir/$$f.gz; \
+	done
+	cd tempdir; tar xf ../ssn78.htx_tar
+	cd tempdir; tar cf ../$@ *
+	rm -Rf tempdir
+
 MOSTLYCLEANFILES = $(EPSFILES) $(PDFFILES) $(GIFFILES)
 CLEANFILES = $(stardocs_DATA)
