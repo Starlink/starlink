@@ -144,7 +144,7 @@ void smurf_makemap( int *status ) {
   void *map=NULL;            /* Pointer to the rebinned map data */
   char method[LEN__METHOD];  /* String for map-making method */
   int n;                     /* # elements in the output map */
-  Grp *ngrp = NULL;          /* Group of noise signal files */
+  Grp *ngrp = GRP__NOID;     /* Group of noise signal files */
   int ondf;                  /* output NDF identifier */
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   float pixsize=3;           /* Size of an output map pixel in arcsec */
@@ -283,15 +283,32 @@ void smurf_makemap( int *status ) {
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using ITERATE method", 
 	     status);
     
-    /* Check the groups corresponding to each model component */
-
     /* Loop over all input data files to put in the pointing extension */
     if( *status == SAI__OK ) {
       for(i=1; i<=size; i++ ) {
 	smf_open_file( igrp, i, "UPDATE", 1, &data, status );
 	smf_mapcoord( data, outfset, lbnd_out, ubnd_out, status );
 	smf_close_file( &data, status );
+
+	/* Set exit status if error */
+	if( *status != SAI__OK ) i=size;
       }
+    }
+
+    /* Check existence of groups corresponding to each model component */
+    if( astgrp == GRP__NOID ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "No ASTMODEL specified", status);      
+    }
+
+    if( atmgrp == GRP__NOID ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "No ATMMODEL specified", status);      
+    }
+
+    if( ngrp == GRP__NOID ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "No NOISEMODEL specified", status);      
     }
 
     /* Call the low-level iterative map-maker */
