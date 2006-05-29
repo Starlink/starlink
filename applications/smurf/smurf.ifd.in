@@ -103,11 +103,29 @@ package @PACKAGE@ {
 	  }
 
 	 parameter method {
-	    position 4
             type _CHAR
             prompt {Map-making method}
+	    default REBIN
             helpkey *
 	 }	
+
+         parameter astmodel {
+            type NDF
+            prompt {Output NDF time series estimate of astronomical signal}
+            helpkey *
+          }
+
+         parameter atmmodel {
+	    type NDF 	
+            prompt {Output NDF time series estimate of atmospheric signal}
+            helpkey *
+          }
+
+         parameter noisemodel {
+            type NDF
+            prompt {Output NDF time series estimate of noise}
+            helpkey *
+          }
 
 	  parameter msg_filter {
 	    type _CHAR

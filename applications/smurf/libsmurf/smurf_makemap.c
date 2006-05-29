@@ -66,6 +66,8 @@
 *        Now calls sky removal and extinction correction routines.
 *     2006-05-24 (AGG):
 *        Check that the weights array pointer is not NULL
+*     2006-05-25 (EC):
+*        Add iterative map-maker + associated command line parameters
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,9 +103,11 @@
 #include <string.h>
 #include <stdio.h>
 
+/* STARLINK includes */
 #include "ast.h"
 #include "mers.h"
 #include "par.h"
+#include "par_par.h"
 #include "prm_par.h"
 #include "ndf.h"
 #include "sae_par.h"
@@ -111,6 +115,7 @@
 #include "star/ndg.h"
 #include "star/grp.h"
 
+/* SMURF includes */
 #include "smurf_par.h"
 #include "smurflib.h"
 #include "libsmf/smf.h"
@@ -128,15 +133,18 @@
 void smurf_makemap( int *status ) {
 
   /* Local Variables */
+  Grp *astgrp = GRP__NOID;   /* Group of astronomical signal files */
+  Grp *atmgrp = GRP__NOID;   /* Group of atmospheric signal files */
   void *data_index[1];       /* Array of pointers to mapped arrays in ndf */
   smfData *data=NULL;        /* pointer to  SCUBA2 data struct */
   int flag;                  /* Flag */
   dim_t i;                   /* Loop counter */
-  Grp *igrp = NULL;          /* Group of input files */
+  Grp *igrp = GRP__NOID;     /* Group of input files */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   void *map=NULL;            /* Pointer to the rebinned map data */
   char method[LEN__METHOD];  /* String for map-making method */
   int n;                     /* # elements in the output map */
+  Grp *ngrp = NULL;          /* Group of noise signal files */
   int ondf;                  /* output NDF identifier */
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   float pixsize=3;           /* Size of an output map pixel in arcsec */
@@ -151,16 +159,31 @@ void smurf_makemap( int *status ) {
   int *lut;                    /* The lookup table */
   int nmap;                    /* Number of mapped elements */
   int place=NDF__NOPL;         /* NDF place holder */
-  HDSLoc *smurfloc;            /* HDS locator to the SMURF extension */
-  HDSLoc *test=NULL;
   int there;
   double *bolodata;
+  int parstate;              /* State of ADAM parameters */
 
   /* Main routine */
   ndfBegin();
   
   /* Get group of input files */
   ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
+
+  /* Create groups containing model components if defined */
+  parState( "ASTMODEL", &parstate, status );
+  if( parstate == PAR__ACTIVE ) {
+    ndgCreat( "ASTMODEL", igrp, &astgrp, &size, &flag, status );
+  }
+
+  parState( "ATMMODEL", &parstate, status );
+  if( parstate == PAR__ACTIVE ) {
+    ndgCreat( "ATMMODEL", igrp, &atmgrp, &size, &flag, status );
+  }
+
+  parState( "NOISEMODEL", &parstate, status );
+  if( parstate == PAR__ACTIVE ) {
+    ndgCreat( "NOISEMODEL", igrp, &ngrp, &size, &flag, status );
+  }
 
   /* Get the user defined pixel size */
   parGet0r( "PIXSIZE", &pixsize, status );
@@ -256,70 +279,25 @@ void smurf_makemap( int *status ) {
       }
     }
   } else if( strncmp( method, "ITERATE", 5 ) == 0 ) {
-    /* Iterative map-maker of the data */
+    /* Iterative map-maker */
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using ITERATE method", 
 	     status);
     
-    /* Loop over all data files to put in the pointing extension */
-    for(i=1; i<=size; i++ ) {
-      smf_open_file( igrp, i, "UPDATE", 1, &data, status );
+    /* Check the groups corresponding to each model component */
 
-      smf_mapcoord( data, outfset, lbnd_out, ubnd_out, status );
-
-      bolodata = (double *) (data->pntr)[0];
-
-      /* Simple test - regrid using the lookup table in the extension */
-
-      ndfXloc( (data->file)->ndfid, "SMURF", "READ", &smurfloc, status );
-	
-      ndfOpen( smurfloc, "MAPCOORD", "READ", "OLD", 
-	       &coordndf, &place, status );
-
-      ndfMap( coordndf, "DATA", "_INTEGER", "READ", data_index, &nmap, 
-	      status );    	
-
-      if( *status == SAI__OK ) {
-	
-	lut = data_index[0];
-
-	for( j=0; j<nmap; j++ ) {
-	  if( lut[j] != VAL__BADI ) {	    
-	    ((double *)map)[lut[j]] = ((double *)map)[lut[j]] + bolodata[j];
-	    ((double *)weights)[lut[j]]++;
-	  }
-	}
-
-      } else {
-	errRep( FUNC_NAME, "Unable to map LUT in SMURF extension",
-		status);
-      }
-
-      /* Clean Up */
-      
-      ndfUnmap( coordndf, "DATA", status );
-      ndfAnnul( &coordndf, status );
-      
-      datAnnul( &smurfloc, status );
-
-      smf_close_file( &data, status );
-    }
-
-    /* If status is OK try re-normalizing the map and set pixels without
-       any hits to VAL__BADD */
-
+    /* Loop over all input data files to put in the pointing extension */
     if( *status == SAI__OK ) {
-      for( j=0; j<(ubnd_out[0]-lbnd_out[0]+1)*(ubnd_out[1]-lbnd_out[1]+1);
-	   j++ ) {
-	if( ((double *)weights)[j] > 0 ) {
-	  ((double *)map)[j] = ((double *)map)[j] / ((double *)weights)[j];
-	  ((double *)variance)[j] = 1.;
-	} else {
-	  ((double *)map)[j] = VAL__BADD;
-	  ((double *)weights)[j] = VAL__BADD;
-	  ((double *)variance)[j] = VAL__BADD;
-	}
+      for(i=1; i<=size; i++ ) {
+	smf_open_file( igrp, i, "UPDATE", 1, &data, status );
+	smf_mapcoord( data, outfset, lbnd_out, ubnd_out, status );
+	smf_close_file( &data, status );
       }
     }
+
+    /* Call the low-level iterative map-maker */
+    smf_iteratemap( igrp, astgrp, atmgrp, ngrp, size, map, variance, weights,
+		    (ubnd_out[0]-lbnd_out[0]+1)*(ubnd_out[1]-lbnd_out[1]+1),
+		    status );
 
   }
 
@@ -336,7 +314,11 @@ void smurf_makemap( int *status ) {
   ndfAnnul( &ondf, status );
 
   smf_free( weights, status );
-  grpDelet( &igrp, status);
+  
+  if( igrp != GRP__NOID ) grpDelet( &igrp, status);
+  if( astgrp != GRP__NOID ) grpDelet( &astgrp, status );
+  if( atmgrp != GRP__NOID ) grpDelet( &atmgrp, status );
+  if( ngrp != GRP__NOID ) grpDelet( &ngrp, status );
   
   ndfEnd( status );
   

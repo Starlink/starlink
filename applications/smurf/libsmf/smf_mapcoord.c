@@ -126,6 +126,7 @@ void smf_mapcoord( smfData *data, AstFrameSet *outfset,
   int nx;
   int off_c, off_f;
 
+  AstFitsChan *fc=NULL;
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -153,59 +154,21 @@ void smf_mapcoord( smfData *data, AstFrameSet *outfset,
 	     status);
     }
 
-    /* Check for the existence of the SMURF extension */
-    ndfXstat( file->ndfid, "SMURF", &there, status );
+    /* Get HDS locator to the SMURF extension */
 
-    if( *status == SAI__OK ) {
-      if( there ) { 
-	/* Obtain access to SMURF extension if there */
-	ndfXloc( file->ndfid, "SMURF", "UPDATE", &smurfloc, status );
+    smurfloc = smf_get_xloc( data, "SMURF", "SMURF_Calculations",
+			     "UPDATE", 0, 0, status );
 
-	msgOutif(MSG__VERB, " ", 
-		 "SMF_MAPCOORD: Updating existing SMURF extension", 
-		 status);
-      } else {      
-	/* Otherwise create it*/
-
-	ndfXnew( file->ndfid, "SMURF", "SMURF_DATA", 0, 0, 
-		 &smurfloc, status );
-
-	msgOutif(MSG__VERB, " ", 
-		 "SMF_MAPCOORD: Creating new SMURF extension", status);
-      }
-    } else {
-      errRep( FUNC_NAME, "Unable to access SMURF extension", status);
-    }
-
-    /* Obtain NDF identifier/placeholder for coord. in scuba2 extension*/
-    ndfOpen( smurfloc, "MAPCOORD", "WRITE", "UNKNOWN", 
-	     &coordndf, &place, status );	
-
-    if( *status == SAI__OK ) {
-
-      if( (coordndf == NDF__NOID) && (place != NDF__NOPL) ) {
-	/* If new NDF create it at placeholder */
-	lbnd[0] = 0;
-	ubnd[0] = nbolo*data->dims[2]-1;
-	ndfNew( "_INTEGER", 1, lbnd, ubnd, &place, &coordndf, status );
-      } 
-
-      if( (coordndf == NDF__NOID) && (place == NDF__NOPL) ) {
-	/* If both the placeholder and ndf are void set bad status */
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME,
-	       "Problem getting MAPCOORD NDF identifier",
-	       status);
-      }
-    } else {
-      errRep( FUNC_NAME, 
-	      "Unable to access MAPCOORD in SMURF extension", status);
-    }
+    /* Obtain NDF identifier/placeholder for coord. in scuba2 extension*/    
+    lbnd[0] = 0;
+    ubnd[0] = nbolo*data->dims[2]-1;
+    coordndf = smf_get_ndfid( smurfloc, "MAPCOORD", "UPDATE", "UNKNOWN",
+			      "_INTEGER", 1, lbnd, ubnd, status );
 
     /* Map the data array */
     ndfMap( coordndf, "DATA", "_INTEGER", "WRITE", data_index, &nmap, 
 	    status );    
-
+    
     if( *status == SAI__OK ) {
       lut = data_index[0];
     } else {
@@ -316,9 +279,13 @@ void smf_mapcoord( smfData *data, AstFrameSet *outfset,
       if (*status != SAI__OK) goto CLEANUP;
     }
     
-    
-    /* Write frameset to the extension */
+    /* Write the FITS WCS header for the projection to the extension */
     /*ndfPtwcs( outfset, coordndf, status );*/
+
+    /*printf("Test of astWrite: %i\n",
+      astWrite( fc, outfset );
+    */
+
     
     /* Clean Up */
   CLEANUP:
