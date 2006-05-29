@@ -23,9 +23,9 @@
 *     astgrp = Grp* (Given)
 *        Group of output data files containing model of astronomical signal
 *     atmgrp = Grp* (Given)
-*        Group of input data files containing model of atmospheric signal
+*        Group of output data files containing model of atmospheric signal
 *     ngrp = Grp* (Given)
-*        Group of input data files containing model of residual noise
+*        Group of output data files containing model of residual noise
 *     gsize = int (Given)
 *        Number of elements in the groups
 *     map = double* (Returned)
