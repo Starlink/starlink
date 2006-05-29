@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_calc_stats ( const smfData *data, const char *mode, const int index,
-*                      int lo, int hi, double mean, double sigma,
+*                      int lo, int hi, double *mean, double *sigma,
 *                      int *status ) 
 
 *  Arguments:
@@ -28,9 +28,9 @@
 *        Lower index bound into array
 *     hi = int (Given)
 *        Upper index bound into array
-*     mean = double (Returned)
+*     mean = double* (Returned)
 *        Mean over specified interval
-*     sigma = double (Returned)
+*     sigma = double* (Returned)
 *        Standard deviation of sample
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -38,27 +38,29 @@
 *  Description:
 *     This routine calculates the mean and standard deviation of a
 *     sample of points specified by three indices. The GSL routines
-*     gsl_stats_wmean and gsl_stats_wsd are used to allow weighting
-*     down of bad values. The first index is which bolometer or
-*     timeslice we are interest in, the second and third mark the
-*     range of values to include in the sample. Note that the range lo
-*     to hi is INCLUSIVE. If both lo and hi are zero then the entire
-*     range is used. On error a mean and std deviation of VAL__BADD
-*     are returned.
+*     gsl_stats_mean and gsl_stats_sd are used. The first index is
+*     which bolometer or timeslice we are interest in, the second and
+*     third mark the range of values to include in the sample. Note
+*     that the range lo to hi is INCLUSIVE. If both lo and hi are zero
+*     then the entire range is used. On error a mean and std deviation
+*     of VAL__BADD are returned.
 
 *  Notes: 
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-05-17 (AGG):
 *        Initial test version
+*     2006-05-18 (EC):
+*        -Change mean/sigma to pointers so that they may be returned
+*        -Pointer math bugs / range checking
 *     2006-05-26 (AGG):
-*        - Replace GSL calls with weighted versions to cope with 
+*        - Replace GSL calls with weighted versions to cope with
 *          bad values
-*        - Free allocated resources
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -109,7 +111,7 @@
 #define FUNC_NAME "smf_calc_stats"
 
 void smf_calc_stats ( const smfData *data, const char *mode, const int index,
-                      int lo, int hi, double mean, double sigma, 
+                      int lo, int hi, double *mean, double *sigma, 
 		      int *status) {
 
   /* Local variables */
@@ -119,7 +121,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
   int nbol;                   /* Number of bolometers */
   int nmax;                   /* Max value for index */
   int nsamp;                  /* Number of samples */
-  double *statsdata = NULL;   /* Pointer to array holding data for computing stats */
+  double *statsdata = NULL;   /* Pointer to array for computing stats */
   int temp;                   /* Temporary variable */
   double *weight = NULL;      /* Pointer to weights array */
 
@@ -127,8 +129,8 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
   if (*status != SAI__OK) return;
 
   /* Initialize mean and std deviation to bad values */
-  mean = VAL__BADD;
-  sigma = VAL__BADD;
+  *mean = VAL__BADD;
+  *sigma = VAL__BADD;
 
   /* Do we have 2-D image or 3-D timeseries data? */
   if ( data->ndims != 3 ) {
@@ -149,12 +151,14 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
 
   /* Check mode */
   if ( strncmp( mode, "b", 1 ) == 0 ) {
-    msgOutif(MSG__VERB, FUNC_NAME, "Calculating stats for a fixed bolometer", status);
+    /*msgOutif(MSG__VERB, FUNC_NAME, "Calculating stats for a fixed bolometer", status);*/
+
     nmax = (data->dims)[0] * (data->dims)[1];
     nsamp = (data->dims)[2];
     nbol = nmax;
   } else if ( strncmp( mode, "t", 1 ) == 0 ) {
-    msgOutif(MSG__VERB, FUNC_NAME, "Calculating stats for a fixed timeslice", status);
+    /*msgOutif(MSG__VERB, FUNC_NAME, "Calculating stats for a fixed timeslice", status);*/
+
     nmax = (data->dims)[2];
     nsamp = (data->dims)[0] * (data->dims)[1];
     nbol = nsamp;
@@ -168,32 +172,35 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
   }
 
   /* Check index is in range */
-  if ( index > nmax || index < 0 ) {
+  if ( index >= nmax || index < 0 ) {
     if ( *status == SAI__OK) {
       msgSeti("I", index);
       msgSeti("N", nmax);
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Requested index, ^I, is out of range (max is ^N).", status);
+      errRep(FUNC_NAME, "Requested index, ^I, is out of range (max is ^N).", 
+	     status);
       return;
     }
   }
 
   /* Check requested range is valid */
-  if ( lo > nsamp || lo < 0 ) {
+  if ( lo >= nsamp || lo < 0 ) {
     if ( *status == SAI__OK) {
       msgSeti("J", lo);
       msgSeti("N", nsamp);
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Requested sample, ^J, is out of range (0 < lo < ^N).", status);
+      errRep(FUNC_NAME, "Requested sample, ^J, is out of range (0 < lo < ^N).",
+	     status);
       return;
     }
   }
-  if ( hi > nsamp || hi < 0 ) {
+  if ( hi >= nsamp || hi < 0 ) {
     if ( *status == SAI__OK) {
       msgSeti("J", hi);
       msgSeti("N", nsamp);
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Requested sample, ^J, is out of range (0 < hi < ^N).", status);
+      errRep(FUNC_NAME, "Requested sample, ^J, is out of range (0 < hi < ^N).",
+	     status);
       return;
     }
   }
@@ -203,7 +210,8 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
     temp = lo;
     lo = hi;
     hi = temp;
-    msgOutif(MSG__VERB, FUNC_NAME, "Oops - lo > hi. Swapping them round.", status);
+    msgOutif(MSG__VERB, FUNC_NAME, "Oops - lo > hi. Swapping them round.", 
+	     status);
   }
 
   /* If lo and hi are both zero then the whole range is assumed */
@@ -213,47 +221,59 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
 
   /* Allocate memory for data */
   npts = hi - lo + 1;
-  indata = smf_malloc( npts, sizeof(double), 1, status );
-  if ( indata == NULL ) {
-    errRep( FUNC_NAME, "Unable to allocate memory for statistics array", status );
-    return;
-  }
-  /* Note the weights array is initialized to zero */
-  weight = smf_malloc( npts, sizeof(double), 1, status );
-  if ( weight == NULL ) {
-    errRep( FUNC_NAME, "Unable to allocate memory for weights array", status );
+
+  statsdata = smf_malloc( npts, sizeof(double), 0, status );
+  if( statsdata == NULL ) {
+    errRep( FUNC_NAME, "Unable to allocate memory for statistics array", 
+	    status );
     return;
   }
 
+  /* Note the weights array is initialized to zero */
+  weight = smf_malloc( npts, sizeof(double), 1, status );
+  if( weight == NULL ) {
+    errRep( FUNC_NAME, "Unable to allocate memory for weight array", 
+	    status );
+    return;
+  }
 
   /* Set range of data. Use <= because the range is inclusive. */
   indata = (data->pntr)[0];
-  if ( strncmp( mode, "b", 1 ) == 0 ) {
-    /* Pick out a bolometer time series */
-    for ( k=lo; k<=hi; k++) {
-      statsdata[k] = indata[index + k*nbol];
-      if ( statsdata[k] != VAL__BADD ) {
-	weight[k] = 1.0;
+
+  if( indata != NULL ) {
+    if ( strncmp( mode, "b", 1 ) == 0 ) {
+      /* Pick out a bolometer time series */
+      for ( k=lo; k<=hi; k++) {
+	statsdata[k] = indata[index + k*nbol];
+	if ( statsdata[k] != VAL__BADD ) {
+	  weight[k] = 1.0;
+	}
+      }
+    } else {
+      /* Pick out a range of bolomters from a timeslice */
+      for ( k=lo; k<=hi; k++) {
+	statsdata[k] = indata[nbol*index + k];
+	if ( statsdata[k] != VAL__BADD ) {
+	  weight[k] = 1.0;
+	}
       }
     }
   } else {
-    /* Pick out a range of bolometers from a timeslice */
-    for ( k=lo; k<=hi; k++) {
-      statsdata[k] = indata[nbol*index + k];
-      if ( statsdata[k] != VAL__BADD ) {
-	weight[k] = 1.0;
-      }
-    }
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "Empty input data array.", status);
   }
 
   /* Calculate stats */
-  mean = gsl_stats_wmean( weight, 1, statsdata, 1, npts );
-
-  sigma = gsl_stats_wsd( weight, 1, statsdata, 1, npts );
+  if ( *status == SAI__OK) {
+    *mean = gsl_stats_wmean( weight, 1, statsdata, 1, npts );
+    *sigma = gsl_stats_wsd( weight, 1, statsdata, 1, npts );
+  }    
 
   /* Free resources */
   if ( statsdata != NULL)
     smf_free( statsdata, status );
   if ( weight != NULL)
     smf_free( weight, status );
+
+
 }

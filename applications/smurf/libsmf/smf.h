@@ -85,13 +85,10 @@
 *        - Change API for smf_check_smfData, smf_deepcopy_smfData
 *        - Add history to smf_construct_smfData
 *        - Add smf_history_add, smf_history_read
-<<<<<<< smf.h
 *     2006-05-01 (EC):
 *        - Add smf_mapcoordinates
-=======
 *     2006-05-09 (AGG):
 *        Add smf_get_xloc and smf_get_ndfid
->>>>>>> 0.40
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -131,7 +128,7 @@
 void smf_boxcar1 ( double *series, const int ninpts, int window, int *status);
 
 void smf_calc_stats( const smfData *data, const char *mode, const int index,
-                     int lo, int hi, double mean, double sigma, 
+                     int lo, int hi, double *mean, double *sigma, 
 		     int *status);
 
 double smf_calc_covar ( const smfData *data, const int i, const int j,
@@ -233,7 +230,7 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
 		    const char *state, const char *dattype, const int ndims, 
 		    const int *lbnd, const int *ubnd, int *status );
 
-HDSLoc * smf_get_xloc ( const smfData *data, const char *extname, 
+HDSLoc *smf_get_xloc ( const smfData *data, const char *extname, 
 			const char *extype, const char *accmode, 
 			const int ndims, const int *dims, int *status );
 
@@ -283,5 +280,14 @@ void smf_mapcoord( smfData *data, AstFrameSet *outfset, int *lbnd_out,
 		   int *ubnd_out, int *status );
 
 void smf_scanfit( smfData *data, int order, int *status );
+
+
+void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize, 
+			 int flags, double *map, double *mapweight, 
+			 double *mapvar, int msize, int *status );
+
+void smf_iteratemap( Grp *igrp, Grp *astgrp, Grp *atmgrp, Grp *ngrp, 
+		     int size, double *map, double *variance, double *weights,
+		     int msize, int *status );
 
 #endif /* SMF_DEFINED */
