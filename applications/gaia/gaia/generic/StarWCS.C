@@ -507,6 +507,13 @@ void StarWCS::setEquinox()
                 if ( ! astOK ) astClearStatus;
             }
         }
+        else if ( strncmp( "ICRS", system, 4 ) == 0 ) {
+            //  ICRS doesn't have an equinox, but we can pretend it does to a
+            //  high level of precision and just assume this is
+            //  FK5/J2000. This simplies transformations etc. that Skycat
+            //  supports.
+            strcpy( equinoxStr_, "J2000" );
+        }
     }
     if ( ! astOK ) astClearStatus;
 
@@ -1655,7 +1662,7 @@ int StarWCS::pix2wcs( double x, double y, double wcs[], int &ndim ) const
     double out[MAXDIM][1];
     in[0][0] = x;
     in[1][0] = y;
-    
+
     WCSAstTranN( wcs_, 1, 2, 1, in, 1, ndim, 1, out );
     for ( int i = 0; i < ndim; i++ ) {
         wcs[i] = out[i][0];
