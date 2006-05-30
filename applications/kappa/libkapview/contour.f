@@ -562,9 +562,11 @@
 *        _DOUBLE data (at the request of TimJ).
 *     2006 April 12 (MJC):
 *        Remove unused variables and wrapped long lines.
-*     3-MAY-2006 (DSB):
+*     23-MAY-2006 (DSB):
 *        - Take account of ROI Frames in the WCS FrameSet.
 *        - Ensure all variable comments are no longer than 1 line.
+*     30-MAY-2006 (DSB):
+*        Correct logic of IF-THEN-ELSE block controlling drawing of axes.
 *     {enter_further_changes_here}
 
 *-
@@ -1069,11 +1071,11 @@
                END IF
                CALL AST_ANNUL( FRM, STATUS )
             END DO
-         END IF
 
 *  If there are no ROI Frames, just draw the grid over the wholePlot.
-      ELSE
-         CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
+         ELSE
+            CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
+         END IF
       END IF
 
 *  Plot the key if necessary (no key is needed if no real contours have
