@@ -105,11 +105,14 @@ int main(){
       if( status == SAI__OK ) {
          status = SAI__ERROR;
          errRep( "", "Error 1; current Frame is not a SkyFrame.", &status );
-       }
-    }  
+      }
+   }  
 
 /* Check its Domain. */
-   printf("FFFFFFF %s\n", astGetC( cfrm, "Domain" ) );
+   if( astOK && strcmp( "SKY-ROI1", astGetC( cfrm, "Domain" ) ) ){
+      status = SAI__ERROR;
+      errRep( "", "Error 2; Incorrect Domain for SkyFrame.", &status );
+   }
 
 /* If an error occurred, then report a contextual message. */
    if( status != SAI__OK ) {
