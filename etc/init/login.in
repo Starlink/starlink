@@ -395,7 +395,8 @@ endif
 
 #
 #  PERIOD
-if ( -e @bindir@/period/period_main ) then
+if ( -e @bindir@/period ) then
+   setenv PERIOD_DIR @bindir@/period
    setenv PERIOD_HELP @starhelpdir@/period
 endif
 

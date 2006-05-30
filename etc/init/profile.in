@@ -116,6 +116,13 @@ if test -f @staretcdir@/jpleph.dat; then
    export JPL_DIR=@staretcdir@
 fi
 
+#  PERIOD
+
+if test -f @bindir@/period/period; then
+   export PERIOD_DIR=@bindir@/period
+   export PERIOD_HELP=@starhelpdir@/period
+fi
+
 #  Polpack
 
 if test -f @bindir@/polpack/polpack.sh; then
