@@ -1,4 +1,5 @@
-<!DOCTYPE componentset SYSTEM "componentinfo.dtd">
+<?xml version="1.0"?>
+<!-- DTD in buildsupport/starconf/componentinfo.dtd -->
 <componentset>
 
 <component id="astrom" support="S">
@@ -866,7 +867,7 @@ intended to work in conjunction with Starlink's various specialised
 packages.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>agi</build><build>ast</build><build>chr</build><build>cnf</build><build>fio</build><build>grp</build><build>hds</build><build>ifd</build><build>kaplibs</build><build>mag</build><build>mers</build><build>ndf</build><build>one</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>ard</build><build option='link'>kaplibs</build><build option='link'>one</build><build option='link'>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>pcs</build><build>agi</build><build>ast</build><build>chr</build><build>cnf</build><build>fio</build><build>grp</build><build>hds</build><build>ifd</build><build>kaplibs</build><build>mag</build><build>mers</build><build>ndf</build><build>one</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>ard</build><build option='link'>atl</build><build option='link'>kaplibs</build><build option='link'>one</build><build option='link'>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1106,6 +1107,34 @@ file extension stored in the standard Starlink NDF data format.
 <component id="period" status="obsolete" support="U">
   <version>5.0-3</version>
   <path>applications/obsolete/period</path>
+  <description>PERIOD - A Time-series analysis package</description>
+  <abstract><p>
+A software package designed to search for periodicities in data.
+  </p></abstract>
+  <dependencies >
+    <build option='link'>sae</build><build option='link'>psx</build><build option='link'>cfitsio</build><build option='link'>pgplot</build><build option='link'>mers</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>V S Dhillon</name>
+      <uname>vsd</uname>
+    </person>
+    <person>
+      <name>Grant J Privett</name>
+      <uname>gjp</uname>
+    </person>
+    <person>
+      <name>K P Duffey</name>
+      <uname>kpd</uname>
+    </person>
+  </developers>
+  <documentation> sun167 ssn25</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="period" support="U">
+  <version>5.0-3</version>
+  <path>applications/period</path>
   <description>PERIOD - A Time-series analysis package</description>
   <abstract><p>
 A software package designed to search for periodicities in data.
@@ -1722,7 +1751,7 @@ to handle data from a variety of different instruments.
   </dependencies>
   <developers>
     <person>
-      <name>A.C. Davenhall, G.J. Privett & M.B. Taylor}</name>
+      <name>A.C. Davenhall, G.J. Privett &amp; M.B. Taylor</name>
     </person>
   </developers>
   <documentation> sc5</documentation>
@@ -1813,8 +1842,8 @@ to handle data from a variety of different instruments.
   <path>docs/sc/009</path>
   <description>LaTeX Cookbook</description>
   <abstract><p>
-      This cookbook shows some examples of &latex; in action 
-      and should help you to get to know how to use &latex effectively.
+      This cookbook shows some examples of LaTeX in action 
+      and should help you to get to know how to use LaTeX effectively.
     </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
@@ -2215,7 +2244,7 @@ to handle data from a variety of different instruments.
   <abstract><p>ATL provides routines that perform high-level AST-related 
             functions.</p></abstract>
   <dependencies >
-    <build>cnf</build><build>ast</build><build>sae</build><link>chr</link><link>mers</link><link>ast</link><link>psx</link><sourceset>star2html</sourceset>
+    <build>cnf</build><build>fio</build><build>grp</build><build>ast</build><build>sae</build><link>chr</link><link>mers</link><link>ast</link><link>psx</link><link>fio</link><link>grp</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

@@ -74,6 +74,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/news \
 	$(MANIFESTS)/one \
 	$(MANIFESTS)/par \
+	$(MANIFESTS)/period \
 	$(MANIFESTS)/pcs \
 	$(MANIFESTS)/pda \
 	$(MANIFESTS)/pgp \
