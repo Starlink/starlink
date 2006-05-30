@@ -159,6 +159,9 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *     26-MAY-2006 (DSB):
 *        Correct handling of commas within the attribute value supplied
 *        to astSetC.
+*     30-MAY-2006 (DSB):
+*        Correct the correction made to handle commas within attribute
+*        values.
 *class--
 */
 
@@ -2402,38 +2405,32 @@ MAKE_SETX(F,float,"%.*g",4,FLT_DIG)
 MAKE_SETX(I,int,"%.*d",4,1)
 MAKE_SETX(L,long,"%.*ld",5,1)
 
+
 /* The astSetC_ function is implemented separately so that commas can be
-   handled. They are replaced by '\r' before calling astSet, and VSet
-   then converts them back to commas. */
+   handled. Since astSetC can only be used to set a single attribute
+   value, we know that any commas in the supplied value are included
+   within the attribuite value, rather than being used as delimiters 
+   between adjacent attribute settings. To avoid VSet using them as
+   delimiters, they are replaced here by '\r' before calling astSet, and 
+   VSetthen converts them back to commas. */
 
 void astSetC_( AstObject *this, const char *attrib, const char *value ) {
 
 /* Local Variables: */
    char *d;                      /* Pointer to next setting character */
+   char *newv;                   /* Pointer to new attribute value string */
    char *setting;                /* Pointer to attribute setting string */
    const char *c;                /* Pointer to next value character */
-   int nlen;                     /* Length of attribute name */
-   int vlen;                     /* Length of attribute value */
+   int len;                      /* Length of attribute name */
 
 /* Check the global status. */
    if ( !astOK ) return;
 
-/* Allocate memory for a buffer holding the attribute name, followed by
-   an equals sign, followed by the supplied value with any commas replaced
-   by a carriage return "\r". */
-   nlen = (int) strlen( attrib );
-   vlen = (int) strlen( value );
-   setting = astMalloc( (size_t) ( nlen + vlen + 2 ) );
-
-/* Make a copy of the attribute name in the allocated memory. */
-   if ( astOK ) {
-      (void) memcpy( setting, attrib, (size_t) nlen );
-
-/* Append "=". */
-      (void) strcpy( setting + nlen, "=" );
-
-/* Append the supplied value, with commas changed to '\r' */
-      d = setting + nlen + 1;
+/* Produce a copy of the supplied attribute vcalue in which any commas
+   are replaced by carriage returns ("\r"). */
+   newv = astMalloc( (size_t)( strlen( value ) + 1 ) );
+   if( newv ) {
+      d = newv;
       c = value;
       while( *c ) {
          if( *c == ',' ) {
@@ -2444,19 +2441,30 @@ void astSetC_( AstObject *this, const char *attrib, const char *value ) {
          c++;
          d++;
       }
-
-/* Terminate the setting string. */
       *d = 0;
+   
+/* Obtain the length of the attribute name and allocate memory to hold
+   this name plus the format specifier to be appended to it. */
+      len = (int) strlen( attrib );
+      setting = astMalloc( (size_t) ( len + 5 ) );
+
+/* Make a copy of the attribute name in the allocated memory. */
+      if ( astOK ) {
+         (void) memcpy( setting, attrib, (size_t) ( len + 1 ) );
+
+/* Append "=", followed by the format specifier, to construct a
+   suitable "setting" string for use by astSet. */
+         (void) strcat( setting, "=%*s" );
 
 /* Invoke astSet to set the attribute value. */
-      astSet( this, setting );
-   }
+         astSet( this, setting, 0, newv );
+      }
 
 /* Free the allocated memory. */
-   setting = astFree( setting );
+      setting = astFree( setting );
+   }
+   newv = astFree( newv );
 }
-
-
 
 static void Show( AstObject *this ) {
 /*
