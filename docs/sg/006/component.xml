@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sg6">
+  <version>3</version>
+  <path>docs/sg/004</path>
+  <description>Programmer's Facilities &amp; Documentation Guide</description>
+  <abstract><p>
+
+      This document contains a directory of the facilities available
+      to the ADAM programmer.  All documented aspects of ADAM
+      programming are covered, ranging from introductory
+      documentation, through applications programming to real-time and
+      system programming.  Each facility is briefly described along
+      with the type of work for which it might be used.  Most
+      importantly, this guide shows at a glance where to obtain the
+      relevant documentation.
+
+      It is hoped to update this document relatively frequently, so
+      that it serves as a guide to the latest ADAM developments.  Its
+      format, which includes an overall index, is designed to allow
+      its use as a table of contents for a personal file of
+      programming documentation.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>R.F. Warren-Smith</name>
+    </person>
+  </developers>
+  <documentation> sg6</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1990, 1992, 1994</year>
+    <name>CLRC</name>
+  </copyright>
+</component>

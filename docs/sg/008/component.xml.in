@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sg/008</path>
+  <description>An Introduction to Visualisation Software for Astronomy</description>
+  <abstract><p>
+      This document is an introduction to various common visualisation
+      techniques and packages which might be used on Starlink systems.
+      It is aimed at astronomers with complex datasets to display and
+      explore but no prior knowledge of visualisation techniques.  Its
+      purpose is to assist such an astronomer to find visualisation
+      software suitable for his problem.  It is not a manual for any
+      particular package.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>A C Davenhall</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1996, 1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>

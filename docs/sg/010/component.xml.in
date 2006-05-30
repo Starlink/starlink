@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>docs/sg/010</path>
+  <description>Preparing to Observe</description>
+  <abstract><p>
+      This document identifies a number of software applications and
+      packages that will prove useful to observers writing an
+      observing application or preparing for an observing run. A brief
+      description of the software is given.
+
+      WWW URLs are provided for WWW-based resources such a databases,
+      catalogues and on-line atlases.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Grant Privett</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>1997, 1998</year>
+    <name>CLRC</name>
+  </copyright>
+</component>

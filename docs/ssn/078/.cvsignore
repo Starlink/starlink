@@ -1,0 +1,17 @@
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+config.log
+config.status
+configure
+ssn78.log
+ssn78.pdf
+ssn78.htx_tar
+ssn78.texml
+ssn78.texml_tar
+ssn78.ps
+ssn78.toc
+ssn78-?.eps
+ssn78-?.pdf
+starconf.status

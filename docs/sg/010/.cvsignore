@@ -1,0 +1,15 @@
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+config.log
+config.status
+configure
+*.aux
+sg10.dvi
+sg10.htx
+sg10.htx_tar
+sg10.log
+sg10.ps
+sg10.toc
+starconf.status

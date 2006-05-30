@@ -1,0 +1,16 @@
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+config.log
+config.status
+configure
+sg8.aux
+sg8.dvi
+sg8.htx
+sg8.htx_tar
+sg8.log
+sg8.ps
+sg8.toc
+sg8-2-examples.tar
+starconf.status
