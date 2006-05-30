@@ -1,2 +1,2 @@
-echo -latl_adam `ast_link_adam` `err_link_adam`  `psx_link_adam` `chr_link_adam` \
+echo -latl_adam `grp_link_adam` `ast_link_adam` `err_link_adam`  `psx_link_adam` `chr_link_adam` \
 | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
