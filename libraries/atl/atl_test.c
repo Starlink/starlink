@@ -70,6 +70,7 @@ const char *Source( void );
 int main(){
    AstChannel *channel;
    AstFrameSet *fs;
+   AstFrame *cfrm;
    int status;
    int axes[2], lbnd[2], ubnd[2];
    double work[2700];
@@ -99,12 +100,16 @@ int main(){
    atlAxtrm( fs, axes, lbnd, ubnd, work, &status );
 
 /* Check the current Frame is a SkyFrame */
-   if( !astIsASkyFrame( astGetFrame( fs, AST__CURRENT ) ) ) {
+   cfrm = astGetFrame( fs, AST__CURRENT );
+   if( !astIsASkyFrame( cfrm ) ) {
       if( status == SAI__OK ) {
          status = SAI__ERROR;
          errRep( "", "Error 1; current Frame is not a SkyFrame.", &status );
        }
     }  
+
+/* Check its Domain. */
+   printf("FFFFFFF %s\n", astGetC( cfrm, "Domain" ) );
 
 /* If an error occurred, then report a contextual message. */
    if( status != SAI__OK ) {

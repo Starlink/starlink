@@ -2,13 +2,18 @@
 
 cincludedir = $(includedir)/star
 
-lib_LTLIBRARIES = libatl.la 
-dist_bin_SCRIPTS = atl_link 
+lib_LTLIBRARIES = libatl.la libatl_adam.la
+dist_bin_SCRIPTS = atl_link atl_link_adam
 
 libatl_la_SOURCES = \
         $(PUBLIC_INCLUDES) \
         $(BASIC_C_ROUTINES) \
         $(BASIC_F_ROUTINES) 
+
+libatl_adam_la_SOURCES = \
+        $(PUBLIC_INCLUDES) \
+        $(BASIC_C_ROUTINES) \
+        $(BASIC_F_ROUTINES) $(ADAM_F_ROUTINES)
 
 include_HEADERS = $(PUBLIC_F_INCLUDES)
 cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
@@ -31,7 +36,10 @@ BASIC_C_ROUTINES = atl.c
 
 #  List of Fortran routines required by both ADAM and standalone 
 # libraries.
-BASIC_F_ROUTINES = atl_axtrm.f atl_mklut.f
+BASIC_F_ROUTINES = atl_axtrm.f atl_mklut.f atl_rm.f atl_notif.f
+
+#  Additional Fortran routines required for the ADAM library.
+ADAM_F_ROUTINES = atl_creat.f
 
 dist_starnews_DATA = atl.news
 dist_pkgdata_DATA = LICENCE
