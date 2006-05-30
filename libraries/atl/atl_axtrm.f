@@ -62,9 +62,9 @@
 *     the transformed bounding box on each dropped axis. The Domain 
 *     name of the corresponding ROI Region is stored in the Ident 
 *     attribute of each new Frame so that later code can identify the 
-*     corresponding ROI Region. The new Frame corresponding to the 
-*     first ROI Region found in the FrameSet is left as the current 
-*     Frame on exit.
+*     corresponding ROI Region, and is also appended to the end of the 
+*     Frame's Domain. The new Frame corresponding to the first ROI 
+*     Region found in the FrameSet is left as the current Frame on exit.
 
 *  Arguments:
 *     IWCS = INTEGER (Given)
@@ -150,6 +150,7 @@
 
 *  Local Variables:
       CHARACTER DOM*20
+      CHARACTER NEWDOM*40
       CHARACTER TTL*80             
       DOUBLE PRECISION CLBND
       DOUBLE PRECISION CONST( ATL__MXDIM )
@@ -165,6 +166,7 @@
       INTEGER CURF
       INTEGER FRM
       INTEGER I                    
+      INTEGER IAT
       INTEGER IAX
       INTEGER IAXIS( ATL__MXDIM )  
       INTEGER ICUR0
@@ -483,10 +485,19 @@
      :                                      CONST, ' ', STATUS )
 
 *  Take a copy of the new current Frame and set its Ident attribute to
-*  identify the corresponding ROI Region.
+*  identify the corresponding ROI Region. Also append the same string to
+*  the end of the Domain name.
                         CURF = AST_COPY( NEWCUR, STATUS )
                         CALL AST_SETC( CURF, 'Ident', DOM, STATUS )
 
+                        CALL AST_SETC( CURF, 'Ident', DOM, STATUS )
+                        NEWDOM = AST_GETC( CURF, 'Domain', STATUS )
+  	                IAT = CHR_LEN( NEWDOM )
+  	                CALL CHR_APPND( "-", NEWDOM, IAT )
+  	                CALL CHR_APPND( DOM, NEWDOM, IAT )
+  	                CALL AST_SETC( CURF, 'Domain', NEWDOM( : IAT ), 
+     :                                 STATUS )
+ 
 *  Add this Frame into the FrameSet using the above PermMap to connect 
 *  it to the original current Frame. It becomes the current Frame.
                         CALL AST_ADDFRAME( IWCS, ICUR0, MAP1, CURF, 
