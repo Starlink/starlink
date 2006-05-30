@@ -28,7 +28,7 @@ dnl ATOOLS source files depend on include files from the following components
 STAR_DECLARE_DEPENDENCIES([build], [ast cnf hds fio grp ifd ndf par sae])
 
 dnl The ATOOLS link script links against the following components
-STAR_DECLARE_DEPENDENCIES([build], [kaplibs ast shl], [link])
+STAR_DECLARE_DEPENDENCIES([build], [kaplibs atl ast shl], [link])
 
 dnl Other dependencies
 STAR_DECLARE_DEPENDENCIES(sourceset, sst)

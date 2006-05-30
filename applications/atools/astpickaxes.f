@@ -119,7 +119,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get a Frame.
-      CALL ATL1_GTOBJ( 'THIS', 'Frame or FrameSet', AST_ISAFRAME, THIS, 
+      CALL ATL_GTOBJ( 'THIS', 'Frame or FrameSet', AST_ISAFRAME, THIS, 
      :                 STATUS )
 
 *  Get the axis indices for the new frame

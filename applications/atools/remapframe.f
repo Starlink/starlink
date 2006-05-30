@@ -113,14 +113,14 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get a FrameSet.
-      CALL ATL1_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, THIS, 
+      CALL ATL_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, THIS, 
      :                 STATUS )
 
 *  Get the index of the Frame.
       CALL ATL1_GTFRM( 'IFRAME', THIS, IFRAME, STATUS )
 
 *  Get the Mapping.
-      CALL ATL1_GTOBJ( 'MAP', 'Mapping', AST_ISAMAPPING, MAP, 
+      CALL ATL_GTOBJ( 'MAP', 'Mapping', AST_ISAMAPPING, MAP, 
      :                 STATUS )
 
 *  Remap the Frame.

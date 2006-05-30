@@ -152,7 +152,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get a Frame.
-      CALL ATL1_GTOBJ( 'FRAME', 'Frame', AST_ISAFRAME, FRAME, 
+      CALL ATL_GTOBJ( 'FRAME', 'Frame', AST_ISAFRAME, FRAME, 
      :                 STATUS )
 
 *  Get the other parameter.
@@ -167,7 +167,7 @@
 
 *  Get the uncertainty Frame.
       IF( STATUS .NE. SAI__OK ) GO TO 999
-      CALL ATL1_GTOBJ( 'UNC', 'Frame', AST_ISAFRAME, UNC, STATUS )
+      CALL ATL_GTOBJ( 'UNC', 'Frame', AST_ISAFRAME, UNC, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          UNC = ast__null

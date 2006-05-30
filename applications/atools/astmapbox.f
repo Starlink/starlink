@@ -163,7 +163,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the Mapping.
-      CALL ATL1_GTOBJ( 'THIS', 'Mapping', AST_ISAMAPPING, THIS,
+      CALL ATL_GTOBJ( 'THIS', 'Mapping', AST_ISAMAPPING, THIS,
      :                 STATUS )
 
 *  See if an NDF was used to specify the Mapping, by attempting to access the 

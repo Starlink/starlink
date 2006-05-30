@@ -119,7 +119,7 @@
          ELSE
 
 *  We delete any pre-existing file first. 
-            CALL ATL1_RM( FNAME, STATUS )
+            CALL ATL_RM( FNAME, STATUS )
 
 *  Open a new file and get an FIO identifier for it.
             CALL FIO_OPEN( FNAME, 'WRITE', 'LIST', 132, FD, STATUS )
@@ -148,7 +148,7 @@
          ELSE
 
 *  We delete any pre-existing file first. 
-            CALL ATL1_RM( FNAME, STATUS )
+            CALL ATL_RM( FNAME, STATUS )
 
 *  Open a new file and get an FIO identifier for it.
             CALL FIO_OPEN( FNAME, 'WRITE', 'LIST', 132, FD, STATUS )

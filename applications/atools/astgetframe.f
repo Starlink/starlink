@@ -95,7 +95,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get an AST Object.
-      CALL ATL1_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, IAST, 
+      CALL ATL_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, IAST, 
      :                 STATUS )
 
 *  Get the index of the required Frame.

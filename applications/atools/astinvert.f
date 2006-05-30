@@ -89,7 +89,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the Mapping.
-      CALL ATL1_GTOBJ( 'THIS', ' ', AST_NULL, THIS, STATUS )
+      CALL ATL_GTOBJ( 'THIS', ' ', AST_NULL, THIS, STATUS )
 
 *  Invert the Mapping.
       CALL AST_INVERT( THIS, STATUS )

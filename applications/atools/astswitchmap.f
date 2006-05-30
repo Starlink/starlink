@@ -233,7 +233,7 @@
 *  See if the SwitchMap is to be created on the basis of a file containing 
 *  the output from the FIGARO:ARC command. Attempt to get a GRP group holding 
 *  the content of the IARC output file.
-      CALL ATL1_GTGRP( 'IARCFILE', IGRP, STATUS )
+      CALL ATL_GTGRP( 'IARCFILE', IGRP, STATUS )
       IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Get the number of elements in the group. 
@@ -421,7 +421,7 @@
          CALL ERR_ANNUL( STATUS )
 
 *  Get the forward selector Mapping.
-         CALL ATL1_GTOBJ( 'FSMAP', 'Mapping', AST_ISAMAPPING, FSMAP, 
+         CALL ATL_GTOBJ( 'FSMAP', 'Mapping', AST_ISAMAPPING, FSMAP, 
      :                    STATUS )
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -429,7 +429,7 @@
          END IF
 
 *  Get the inverse selector Mapping.
-         CALL ATL1_GTOBJ( 'ISMAP', 'Mapping', AST_ISAMAPPING, ISMAP, 
+         CALL ATL_GTOBJ( 'ISMAP', 'Mapping', AST_ISAMAPPING, ISMAP, 
      :                    STATUS )
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -437,9 +437,9 @@
          END IF
 
 *  Get the first two route Mappings. These must be supplied.
-         CALL ATL1_GTOBJ( 'ROUTEMAP1', 'Mapping', AST_ISAMAPPING, 
+         CALL ATL_GTOBJ( 'ROUTEMAP1', 'Mapping', AST_ISAMAPPING, 
      :                    ROUTEMAPS( 1 ), STATUS )
-         CALL ATL1_GTOBJ( 'ROUTEMAP2', 'Mapping', AST_ISAMAPPING, 
+         CALL ATL_GTOBJ( 'ROUTEMAP2', 'Mapping', AST_ISAMAPPING, 
      :                    ROUTEMAPS( 2 ), STATUS )
 
 *  Loop round getting route Mappings until a null value is supplied. 
@@ -449,7 +449,7 @@
             PARAM = 'ROUTEMAP'
             IAT = 8
             CALL CHR_PUTI( NROUTE, PARAM, IAT )
-            CALL ATL1_GTOBJ( PARAM, 'Mapping', AST_ISAMAPPING, 
+            CALL ATL_GTOBJ( PARAM, 'Mapping', AST_ISAMAPPING, 
      :                       ROUTEMAPS( NROUTE ), STATUS )
             IF( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )

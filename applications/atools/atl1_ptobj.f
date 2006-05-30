@@ -157,7 +157,7 @@
 *  Store the FrameSet in the NDF, and annul the identifier.
             CALL NDF_PTWCS( IAST, INDF, STATUS )
             CALL NDF_MSG( 'NDF', INDF )
-            CALL ATL1_NOTIF( '   AST data written to NDF ''^NDF''.', 
+            CALL ATL_NOTIF( '   AST data written to NDF ''^NDF''.', 
      :                       STATUS )
             CALL NDF_ANNUL( INDF, STATUS )
 
@@ -167,12 +167,12 @@
      :            STATUS .EQ. DAT__OBJNF .OR.
      :            STATUS .EQ. DAT__FILNF ) THEN 
             CALL ERR_ANNUL( STATUS )
-            CALL ATL1_CREAT( PARAM, IAST, STATUS )
+            CALL ATL_CREAT( PARAM, IAST, STATUS )
          END IF
 
 *  If the AST Object was not a FrameSet, store the AST Object in a text file.
       ELSE
-         CALL ATL1_CREAT( PARAM, IAST, STATUS )
+         CALL ATL_CREAT( PARAM, IAST, STATUS )
       END IF
 
  999  CONTINUE

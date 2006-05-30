@@ -109,11 +109,11 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the first Frame.
-      CALL ATL1_GTOBJ( 'FRAME1', 'SpecFrame', AST_ISASPECFRAME, FRAME1, 
+      CALL ATL_GTOBJ( 'FRAME1', 'SpecFrame', AST_ISASPECFRAME, FRAME1, 
      :                 STATUS )
 
 *  Get the second Frame.
-      CALL ATL1_GTOBJ( 'FRAME2', 'FluxFrame', AST_ISAFLUXFRAME, FRAME2, 
+      CALL ATL_GTOBJ( 'FRAME2', 'FluxFrame', AST_ISAFLUXFRAME, FRAME2, 
      :                 STATUS )
 
 *  Create the required SpecFluxFrame.

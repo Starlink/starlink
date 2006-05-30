@@ -133,7 +133,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get a Frame.
-      CALL ATL1_GTOBJ( 'FRAME', 'Frame', AST_ISAFRAME, FRAME, 
+      CALL ATL_GTOBJ( 'FRAME', 'Frame', AST_ISAFRAME, FRAME, 
      :                 STATUS )
 
 *  Create the required FrameSet.

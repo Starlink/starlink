@@ -129,7 +129,7 @@
 *  If a value was supplied for SPECVAL, get a SpecFrame describing the
 *  coordinate system to which the SPECVAL value refers.
       IF( SPECVAL .NE. AST__BAD ) THEN
-         CALL ATL1_GTOBJ( 'SPECFRM', 'SpecFrame', AST_ISASPECFRAME, 
+         CALL ATL_GTOBJ( 'SPECFRM', 'SpecFrame', AST_ISASPECFRAME, 
      :                    SPECFRM, STATUS )
       ELSE
          SPECFRM = AST__NULL

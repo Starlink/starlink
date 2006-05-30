@@ -127,7 +127,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the Mapping.
-      CALL ATL1_GTOBJ( 'THIS', 'Mapping', AST_ISAMAPPING, THIS,
+      CALL ATL_GTOBJ( 'THIS', 'Mapping', AST_ISAMAPPING, THIS,
      :                 STATUS )
 
 *  Check that the the Nin and Nout attributes of the Mapping are both 2.
