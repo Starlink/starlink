@@ -28,6 +28,11 @@
 *     co-ordinates (AST-based applications should always use the Plot 
 *     stored with the picture in preference to the TRANSFORM structure 
 *     stored in the AGI database).
+*
+*     Any Frames that are Regions and have a Domain beginning with "ROI"
+*     are deleted from the Plot before saving it. Also, any Frames that 
+*     have an Ident value beginning with "ROI" are also deleted from the
+*     Frame (these may be added by KPG1_ASGET).
 
 *  Arguments:
 *     IPIC = INTEGER (Given)
@@ -89,6 +94,8 @@
 *        Added facilities for storing a TRANFORM structure with the DATA
 *        picture for the benefit of non-AST applications which require 
 *        access to AGI Data co-ordinates.
+*     26-MAY-2006 (DSB):
+*        Remove ROI-related Frames before saving the Plot.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -119,31 +126,34 @@
       PARAMETER ( NSAMP = 200 )
 
 *  Local Variables:
+      CHARACTER DOM*20             ! Frame Domain
+      CHARACTER IDENT*20           ! Frame Ident
       CHARACTER MODE*6             ! Access mode for picture's MORE structure
       CHARACTER MORLOC*(DAT__SZLOC)! HDS locator for picture's MORE structure
       DOUBLE PRECISION DX          ! X increment between axis samples
       DOUBLE PRECISION DY          ! Y increment between axis samples
       DOUBLE PRECISION OFFSET( 2 ) ! Offset constants
+      DOUBLE PRECISION RMS         ! RMS error of fit
       DOUBLE PRECISION SCALE( 2 )  ! Scale constants
       DOUBLE PRECISION XD( NSAMP ) ! X samples in AGI Data coords
-      DOUBLE PRECISION RMS         ! RMS error of fit
       DOUBLE PRECISION XW( NSAMP ) ! X samples in AGI world coords
       DOUBLE PRECISION YD( NSAMP ) ! Y samples in AGI Data coords
       DOUBLE PRECISION YW( NSAMP ) ! Y samples in AGI world coords
       INTEGER FRM                  ! Pointer to next Frame
       INTEGER I                    ! Frame index/loop counter
       INTEGER IDATA                ! Index of AXIS Frame in IPLOT
-      INTEGER IFRM                 ! Index of AGI_DATA Frame
+      INTEGER IFRM                 ! Frame index
       INTEGER IPIC0                ! Original current AGI picture identifier 
       INTEGER IPICL                ! AGI identifier for picture to use
+      INTEGER IPLOT2               ! Copy of supplied Plot 
       INTEGER IWORLD               ! Index of AGI world co-ord Frame in IPLOT
       INTEGER MAP                  ! AST pointer to WORLD->DATA Mapping
+      INTEGER NFRM                 ! Number of Frames in Plot
       LOGICAL MORE                 ! Does picture have a MORE structure?
       LOGICAL THERE                ! Does MORE have an AST_PLOT component?
       LOGICAL XDLIN                ! X Data axis linear?
       LOGICAL YDLIN                ! Y Data axis linear?
       REAL WX1, WX2, WY1, WY2      ! Bounds of picture in AGI world coords
-
 *.
 
 *  Check the inherited status. 
@@ -196,9 +206,35 @@
      :                    ' an AGI_DATA Frame in the graphics '//
      :                    'database (programming error).', STATUS )
 
-*  Otherwise, save the Plot in the database.
+*  Otherwise...
          ELSE
-            CALL KPG1_WWRT( IPLOT, 'AST_PLOT', MORLOC, STATUS )
+
+*  Take a copy of the supplied Plot,and remove any ROI related Frames
+*  from it.
+            IPLOT2 = AST_COPY( IPLOT, STATUS )
+            NFRM = AST_GETI( IPLOT2, 'NFrame', STATUS )
+            DO IFRM = NFRM, 1, -1
+               FRM = AST_GETFRAME( IPLOT2, IFRM, STATUS )
+               IF( AST_ISAREGION( FRM, STATUS ) ) THEN
+                  DOM = AST_GETC( FRM, 'Domain', STATUS )
+                  IF( DOM( : 3 ) .EQ. 'ROI' ) THEN
+                     CALL AST_REMOVEFRAME( IPLOT2, IFRM, STATUS )
+                  END IF
+               ELSE 
+                  IDENT = AST_GETC( FRM, 'Ident', STATUS )
+                  IF( IDENT( : 3 ) .EQ. 'ROI' ) THEN
+                     CALL AST_REMOVEFRAME( IPLOT2, IFRM, STATUS )
+                  END IF
+               END IF
+               CALL AST_ANNUL( FRM, STATUS )
+            END DO
+
+*  Save the Plot in the database.
+            CALL KPG1_WWRT( IPLOT2, 'AST_PLOT', MORLOC, STATUS )
+
+*  Annul the copied Plot.
+            CALL AST_ANNUL( IPLOT2, STATUS )
+
          END IF
 
 *  If no Plot was supplied, delete the AST_PLOT component within MORE if it 
