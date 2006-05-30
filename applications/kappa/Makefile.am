@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = kapsub ccdpack atools libndfpack libkapview libkappa
+SUBDIRS = kapsub ccdpack libndfpack libkapview libkappa
 
 dist_bin_SCRIPTS = $(PUBLICSCRIPTS) $(DYNSCRIPTS) $(STYLE_FILES) $(DEMO_FILES)
 
@@ -15,7 +15,7 @@ include_MESSAGES = kap_err.h KAP_ERR
 BUILT_SOURCES = $(include_MESSAGES)
 
 # Local Libraries that we always include in link
-LOCAL_LINK = kapsub/libkapsub.la atools/libatools.la ccdpack/libccdpack.la 
+LOCAL_LINK = kapsub/libkapsub.la ccdpack/libccdpack.la 
 
 bin_MONOLITHS = kappa_mon kapview_mon ndfpack_mon
 kappa_mon_SOURCES = kappa_mon.f

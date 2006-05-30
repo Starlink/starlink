@@ -392,6 +392,8 @@
 *        Created tokens for an error message.
 *     2006 April 12 (MJC):
 *        Remove unused variables and wrapped long lines.
+*     30-MAY-2006 (DSB)
+*        Changed ATL1 prefix to ATL.
 *     {enter_further_changes_here}
 
 *-
@@ -559,7 +561,7 @@
       ELSE IF ( MAPTYP .EQ. 'FILE' ) THEN
 
 *  Get the Mapping from the file named by the MAPIN parameter.
-         CALL ATL1_GTOBJ( 'MAPIN', 'Mapping', AST_ISAMAPPING, MAP,
+         CALL ATL_GTOBJ( 'MAPIN', 'Mapping', AST_ISAMAPPING, MAP,
      :                    STATUS )
 
 *  Create a Mapping representing a general linear transformation.
@@ -911,7 +913,7 @@
 
 *  Write the Mapping out to a text file. 
       IF( STATUS .NE. SAI__OK ) GO TO 999
-      CALL ATL1_CREAT( 'MAPOUT', MAP, STATUS )
+      CALL ATL_CREAT( 'MAPOUT', MAP, STATUS )
 
 *  If a null value was supplied, annull the error
       IF( STATUS .EQ. PAR__NULL ) THEN
@@ -922,7 +924,7 @@
 *  MAPOUT in the ifl file is a null.
          IF( INDF .EQ. NDF__NOID ) THEN
             CALL PAR_CANCL( 'MAPOUT', STATUS )
-            CALL ATL1_CREAT( 'MAPOUT', MAP, STATUS )
+            CALL ATL_CREAT( 'MAPOUT', MAP, STATUS )
          END IF
       END IF      
          

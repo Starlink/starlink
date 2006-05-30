@@ -38,7 +38,7 @@ dnl KAPPA source files depend on include files from the following components
 STAR_DECLARE_DEPENDENCIES([build], [agi ast chr cnf fio grp hds ifd kaplibs mag mers ndf one par pcs prm psx sae shl tcl tk trn])
 
 dnl The KAPPA link script links against the following components
-STAR_DECLARE_DEPENDENCIES([build], [ard kaplibs one shl], [link])
+STAR_DECLARE_DEPENDENCIES([build], [ard atl kaplibs one shl], [link])
 
 dnl We use the sst package to build documentation (prohlp)
 STAR_DECLARE_DEPENDENCIES([sourceset], [sst])
@@ -54,7 +54,7 @@ STAR_MESSGEN(kap_err.msg)
 
 AC_CONFIG_FILES([Makefile component.xml 
     kappa_mon.f ndfpack_mon.f kapview_mon.f kappa.ifd
-    atools/Makefile   kapsub/Makefile    libkapview/Makefile
+    kapsub/Makefile    libkapview/Makefile
     ccdpack/Makefile  libkappa/Makefile  libndfpack/Makefile])
 AC_CONFIG_FILES(kappa_link_adam,  [chmod +x kappa_link_adam])
 AC_CONFIG_FILES(lutedit.tcl,      [chmod +x lutedit.tcl])

@@ -447,6 +447,8 @@
 *        Added CONSERVE parameter and Sombrero methods.
 *     2006 April 12 (MJC):
 *        Remove unused variable and wrapped long lines (including code).
+*     30-MAY-2006 (DSB):
+*        Changed ATL1_ prefix to ATL_.
 *     {enter_further_changes_here}
 
 *-
@@ -571,20 +573,20 @@
       CALL KPG1_GTWCS( NDFI, WCSI, STATUS )
 
 *  Attempt to get an externally supplied Mapping; read it from a file.
-*  N.B. do not tell ATL1_GTOBJ to look for a Mapping, since in this 
+*  N.B. do not tell ATL_GTOBJ to look for a Mapping, since in this 
 *  case it will extract the Mapping from a FrameSet for us, which
 *  we need to do for ourselves if it is going to be done.  If a null 
 *  value is supplied, annul the error and indicate that the NDF is 
 *  to be mapped into its own current Frame.
       IF( STATUS .NE. SAI__OK ) GO TO 999
-      CALL ATL1_GTOBJ( 'MAPPING', ' ', AST_NULL, MAPX, STATUS )
+      CALL ATL_GTOBJ( 'MAPPING', ' ', AST_NULL, MAPX, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          CURENT = .TRUE.
          MAPX = WCSI
 
 *  In the event of any other error, write an explanatory comment 
-*  (ATL1_GTOBJ does not generate very user-friendly messages) and bail
+*  (ATL_GTOBJ does not generate very user-friendly messages) and bail
 *  out.
       ELSE IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'REGRID_ERR1', 'REGRID: $MAPPING does not '//
