@@ -12,6 +12,17 @@ dist_starnews_DATA = period.news
 
 dist_pkgdata_DATA = period_test.dat
 
+##  The on-line help, special PERIOD format.
+HELP_SOURCES = period_chisq.hlp period_freq.hlp period_output.hlp     \
+period_select.hlp period_clean.hlp period_ft.hlp period_pdm.hlp       \
+period_sig.hlp period_close.hlp period_help.hlp period_peaks.hlp      \
+period_sine.hlp period_detrend.hlp period_input.hlp period_period.hlp \
+period_status.hlp period_fake.hlp period_noise.hlp period_plt.hlp     \
+period_string.hlp period_fit.hlp period_ogip.hlp period_quit.hlp      \
+period_window.hlp period_fold.hlp period_open.hlp period_scargle.hlp
+
+starhelp_DATA = $(HELP_SOURCES)
+
 libperiod_la_SOURCES = period_add.f period_alloc.f period_alpha.f      \
 period_autolim.f period_case.f period_clean.f period_convolv.f	       \
 period_cval.f period_datastatus.f period_deall.f period_detrend.f      \
