@@ -57,8 +57,9 @@
 *     for the unwanted axes. These are determined by transforming the
 *     bounding box of the corresponding ROI Region into the original current 
 *     Frame. The Domain name of the corresponding ROI Region is stored in
-*     the Ident attribute of the new Frame. The new Frame corresponding
-*     to the lowest numbered ROI Region is left as the current Frame on exit.
+*     the Ident attribute of the new Frame, and is also appended to the
+*     end of the Frame's Domain. The new Frame corresponding to the lowest 
+*     numbered ROI Region is left as the current Frame on exit.
 
 *  Parameters:
 *     The name of the following environment parameter(s) are hard-wired 
@@ -127,6 +128,8 @@
 *        Added DEFAX to argument list.
 *     25-MAY-2006 (DSB):
 *        Added support for ROI Regions.
+*     30-MAY-2006 (DSB):
+*        Avoid the same Domain name being used for all ROI current Frames.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -158,6 +161,7 @@
 
 *  Local Variables:
       CHARACTER DOM*20
+      CHARACTER NEWDOM*40
       CHARACTER TTL*80             
       DOUBLE PRECISION CLBND
       DOUBLE PRECISION CONST( NDF__MXDIM )
@@ -174,6 +178,7 @@
       INTEGER CURF
       INTEGER FRM
       INTEGER I                    
+      INTEGER IAT
       INTEGER IAX
       INTEGER IAXIS( NDF__MXDIM )  
       INTEGER ICUR0
@@ -512,9 +517,17 @@
      :                                      CONST, ' ', STATUS )
 
 *  Take a copy of the new current Frame and set its Ident attribute to
-*  identify the corresponding ROI Region.
+*  identify the corresponding ROI Region. Also append the same string to
+*  the end of the Domain name.
                         CURF = AST_COPY( NEWCUR, STATUS )
                         CALL AST_SETC( CURF, 'Ident', DOM, STATUS )
+
+                        NEWDOM = AST_GETC( CURF, 'Domain', STATUS )
+                        IAT = CHR_LEN( NEWDOM )
+                        CALL CHR_APPND( "-", NEWDOM, IAT )
+                        CALL CHR_APPND( DOM, NEWDOM, IAT )
+                        CALL AST_SETC( CURF, 'Domain', NEWDOM( : IAT ), 
+     :                                 STATUS )
 
 *  Add this Frame into the FrameSet using the above PermMap to connect it to 
 *  the original current Frame. It becomes the current Frame.
