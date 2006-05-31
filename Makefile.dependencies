@@ -126,6 +126,7 @@ $(MANIFESTS)/atools: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
 		$(MANIFESTS)/cat \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
@@ -1788,6 +1789,36 @@ $(MANIFESTS)/scb: \
 	cd applications/scb \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/sg10: \
+		$(MANIFESTS)/star2html
+	cd docs/sg/010 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sg12: \
+		$(MANIFESTS)/star2html
+	cd docs/sg/012 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sg4: \
+		$(MANIFESTS)/star2html
+	cd docs/sg/004 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sg6: \
+		$(MANIFESTS)/star2html
+	cd docs/sg/004 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sg8: \
+		$(MANIFESTS)/star2html
+	cd docs/sg/008 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sg9: \
+		$(MANIFESTS)/star2html
+	cd docs/sg/009 \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/sgmlkit: \
 		$(MANIFESTS)/dvi2bitmap
 	cd applications/sgmlkit \
@@ -2075,6 +2106,12 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sc6 \
 	$(MANIFESTS)/sc7 \
 	$(MANIFESTS)/sc9 \
+	$(MANIFESTS)/sg10 \
+	$(MANIFESTS)/sg12 \
+	$(MANIFESTS)/sg4 \
+	$(MANIFESTS)/sg6 \
+	$(MANIFESTS)/sg8 \
+	$(MANIFESTS)/sg9 \
 	$(MANIFESTS)/sgmlkit \
 	$(MANIFESTS)/sgs \
 	$(MANIFESTS)/shl \

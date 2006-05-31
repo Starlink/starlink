@@ -47,7 +47,7 @@ to one of the functions within the AST library. ATOOLS thus provides a
 high-level interface to the AST library. 
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>ast</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>ifd</build><build>ndf</build><build>par</build><build>sae</build><build option='link'>kaplibs</build><build option='link'>ast</build><build option='link'>shl</build><sourceset>sst</sourceset>
+    <build>pcs</build><build>ast</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>ifd</build><build>ndf</build><build>par</build><build>sae</build><build option='link'>kaplibs</build><build option='link'>atl</build><build option='link'>ast</build><build option='link'>shl</build><sourceset>sst</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1104,34 +1104,6 @@ file extension stored in the standard Starlink NDF data format.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="period" status="obsolete" support="U">
-  <version>5.0-3</version>
-  <path>applications/obsolete/period</path>
-  <description>PERIOD - A Time-series analysis package</description>
-  <abstract><p>
-A software package designed to search for periodicities in data.
-  </p></abstract>
-  <dependencies >
-    <build option='link'>sae</build><build option='link'>psx</build><build option='link'>cfitsio</build><build option='link'>pgplot</build><build option='link'>mers</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>V S Dhillon</name>
-      <uname>vsd</uname>
-    </person>
-    <person>
-      <name>Grant J Privett</name>
-      <uname>gjp</uname>
-    </person>
-    <person>
-      <name>K P Duffey</name>
-      <uname>kpd</uname>
-    </person>
-  </developers>
-  <documentation> sun167 ssn25</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
 <component id="period" support="U">
   <version>5.0-3</version>
   <path>applications/period</path>
@@ -2013,6 +1985,190 @@ to handle data from a variety of different instruments.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
     <year>2001</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sg4">
+  <version>2</version>
+  <path>docs/sg/004</path>
+  <description>The Starlink Software Environment</description>
+  <abstract><p>
+      This is a comprehensive description of
+      the Starlink Software Environment.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M D Lawden &amp; K F Hartley</name>
+    </person>
+  </developers>
+  <documentation> sg4</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997, 1998, 2005</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sg6">
+  <version>3</version>
+  <path>docs/sg/004</path>
+  <description>Programmer's Facilities &amp; Documentation Guide</description>
+  <abstract><p>
+
+      This document contains a directory of the facilities available
+      to the ADAM programmer.  All documented aspects of ADAM
+      programming are covered, ranging from introductory
+      documentation, through applications programming to real-time and
+      system programming.  Each facility is briefly described along
+      with the type of work for which it might be used.  Most
+      importantly, this guide shows at a glance where to obtain the
+      relevant documentation.
+
+      It is hoped to update this document relatively frequently, so
+      that it serves as a guide to the latest ADAM developments.  Its
+      format, which includes an overall index, is designed to allow
+      its use as a table of contents for a personal file of
+      programming documentation.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>R.F. Warren-Smith</name>
+    </person>
+  </developers>
+  <documentation> sg6</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1990, 1992, 1994</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sg8">
+  <version>2</version>
+  <path>docs/sg/008</path>
+  <description>An Introduction to Visualisation Software for Astronomy</description>
+  <abstract><p>
+      This document is an introduction to various common visualisation
+      techniques and packages which might be used on Starlink systems.
+      It is aimed at astronomers with complex datasets to display and
+      explore but no prior knowledge of visualisation techniques.  Its
+      purpose is to assist such an astronomer to find visualisation
+      software suitable for his problem.  It is not a manual for any
+      particular package.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A C Davenhall</name>
+    </person>
+  </developers>
+  <documentation> sg8</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1996, 1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sg9">
+  <version>2</version>
+  <path>docs/sg/009</path>
+  <description>Introduction to Echelle Spectroscopy</description>
+  <abstract><p>
+      Echelle spectrographs are available as common-user instruments 
+      at several observatories and satellites.  These spectrographs 
+      offer the observer both a reasonably high resolution and a wide
+      wavelength-coverage; at the expense of a fairly complex
+      data-reduction procedure.
+
+      This document is intended as an introductory guide for observers
+      new to echelle work.  It includes outline information
+      on the main packages available for echelle data reduction.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Martin Clayton</name>
+    </person>
+  </developers>
+  <documentation> sg9</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1996</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sg10">
+  <version>2</version>
+  <path>docs/sg/010</path>
+  <description>Preparing to Observe</description>
+  <abstract><p>
+      This document identifies a number of software applications and
+      packages that will prove useful to observers writing an
+      observing application or preparing for an observing run. A brief
+      description of the software is given.
+
+      WWW URLs are provided for WWW-based resources such a databases,
+      catalogues and on-line atlases.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Grant Privett</name>
+    </person>
+  </developers>
+  <documentation> sg10</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1997, 1998</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sg12">
+  <version>2</version>
+  <path>docs/sg/012</path>
+  <description>An Introduction to IRAF</description>
+  <abstract><p>
+      This document is an introduction to the IRAF software package
+      and its use on Starlink systems.  IRAF is a powerful and
+      comprehensive environment for reducing and analysing
+      astronomical data.  It was developed at the National Optical
+      Astronomy Observatories, Tucson and is in widespread use around
+      the world.  IRAF has its own data file format, command language,
+      on-line help system and programming language.  It is a modular
+      system.  The basic core, which is always present, provides
+      general facilities for image processing and data reduction.  For
+      more specialised tasks additional packages are loaded to augment
+      the core system. Software for processing most sorts of
+      astronomical data is available for the IRAF environment.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>R. Morris, G.J. Privett &amp; A.C. Davenhall</name>
+    </person>
+  </developers>
+  <documentation> sg12</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1998, 1999</year>
     <name>CLRC</name>
   </copyright>
 </component>
