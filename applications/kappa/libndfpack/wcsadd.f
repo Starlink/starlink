@@ -561,7 +561,7 @@
       ELSE IF ( MAPTYP .EQ. 'FILE' ) THEN
 
 *  Get the Mapping from the file named by the MAPIN parameter.
-         CALL ATL_GTOBJ( 'MAPIN', 'Mapping', AST_ISAMAPPING, MAP,
+         CALL KPG1_GTOBJ( 'MAPIN', 'Mapping', AST_ISAMAPPING, MAP,
      :                    STATUS )
 
 *  Create a Mapping representing a general linear transformation.

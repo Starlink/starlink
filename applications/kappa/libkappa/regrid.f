@@ -573,20 +573,20 @@
       CALL KPG1_GTWCS( NDFI, WCSI, STATUS )
 
 *  Attempt to get an externally supplied Mapping; read it from a file.
-*  N.B. do not tell ATL_GTOBJ to look for a Mapping, since in this 
+*  N.B. do not tell KPG1_GTOBJ to look for a Mapping, since in this 
 *  case it will extract the Mapping from a FrameSet for us, which
 *  we need to do for ourselves if it is going to be done.  If a null 
 *  value is supplied, annul the error and indicate that the NDF is 
 *  to be mapped into its own current Frame.
       IF( STATUS .NE. SAI__OK ) GO TO 999
-      CALL ATL_GTOBJ( 'MAPPING', ' ', AST_NULL, MAPX, STATUS )
+      CALL KPG1_GTOBJ( 'MAPPING', ' ', AST_NULL, MAPX, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          CURENT = .TRUE.
          MAPX = WCSI
 
 *  In the event of any other error, write an explanatory comment 
-*  (ATL_GTOBJ does not generate very user-friendly messages) and bail
+*  (KPG1_GTOBJ does not generate very user-friendly messages) and bail
 *  out.
       ELSE IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'REGRID_ERR1', 'REGRID: $MAPPING does not '//
