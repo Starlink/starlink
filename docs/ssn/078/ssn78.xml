@@ -4839,7 +4839,7 @@ the build rule, which is generated automatically) in this
 <code>Makefile.am</code> file.</p>
 
 <p>Finally, note that this SC/3 directory uses the
-<code>.htx_tar.extra</code> mechanism which is described rather in
+<code>.htx_tar.extras</code> mechanism which is described rather in
 passing in <ref id="macro-latex-documentation"/>.</p>
 
 </subsubsect>
@@ -6794,7 +6794,7 @@ LATEX2DVI='$$LATEX $$1; bibtex $$1; $$LATEX $$1'
 
           <p>The configure option
             <code>--without-stardocs</code><index>configure!options!--without-stardocs</index>
-            suppresses building documenation.</p>
+            suppresses building documentation.</p>
 
 <p>It is occasionally necessary to add extra files to the
 <code>.htx</code> tarball -- for example <code>.gif</code> images, or
