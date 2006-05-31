@@ -13,6 +13,10 @@
 *  Invocation:
 *     CALL ATL_CREAT( PARAM, IAST, STATUS )
 
+*  Description:
+*     Write an AST Object to a text file or NDF specified using an environment
+*     parameter.
+
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The parameter name.

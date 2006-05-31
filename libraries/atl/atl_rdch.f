@@ -12,6 +12,9 @@
 *  Invocation:
 *     CALL ATL_RDCH( IGRP, IAST, STATUS )
 
+*  Description:
+*     Read an AST Object from a GRP group using a Channel.
+
 *  Arguments:
 *     IGRP = INTEGER (Given)
 *        An identifier for the group holding the text.

@@ -1,0 +1,10 @@
+#!/bin/csh
+set ff = " "
+foreach n (atl_*.f)
+   if( $n != "atl_test.f" ) then
+      set ff = "$ff $n"
+   endif
+end
+rm -f atl_routines.tex
+$STARCONF_DEFAULT_STARLINK/bin/sst/prolat \"$ff\" out=atl_routines.tex \
+                               noatask nodocument single nopage

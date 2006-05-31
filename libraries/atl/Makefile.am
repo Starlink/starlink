@@ -40,7 +40,7 @@ BASIC_F_ROUTINES = atl_axtrm.f atl_mklut.f atl_rm.f atl_notif.f \
 atl_rdgrp.f atl_rdfch.f atl_rdch.f
 
 #  Additional Fortran routines required for the ADAM library.
-ADAM_F_ROUTINES = atl_creat.f atl_gtgrp.f atl_gtobj.f
+ADAM_F_ROUTINES = atl_creat.f atl_gtgrp.f 
 
 dist_starnews_DATA = atl.news
 dist_pkgdata_DATA = LICENCE

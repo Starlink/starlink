@@ -9,6 +9,9 @@
 *  Language:
 *     Starlink Fortran 77
 
+*  Invocation:
+*     CALL ATL_RM( FILE, STATUS )
+
 *  Description:
 *     This subroutine calls the "PSX_REMOVE" RTL function to remove a
 *     specified file. No error occurs if the file cannot be removed for

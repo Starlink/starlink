@@ -12,6 +12,9 @@
 *  Invocation:
 *     CALL ATL_NOTIF( MSG, STATUS )
 
+*  Description:
+*     Print a message to the screen if ATOOLS_VERBOSE is set.
+
 *  Arguments:
 *     MSG = CHARACTER * ( * ) (Given)
 *        The message.
