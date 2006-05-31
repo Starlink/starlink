@@ -119,18 +119,18 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get a FrameSet.
-      CALL ATL_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, THIS, 
+      CALL KPG1_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, THIS, 
      :                 STATUS )
 
 *  Get the index of the basis Frame.
       CALL ATL1_GTFRM( 'IFRAME', THIS, IFRAME, STATUS )
 
 *  Get a Mapping.
-      CALL ATL_GTOBJ( 'MAP', 'Mapping', AST_ISAMAPPING, MAP, 
+      CALL KPG1_GTOBJ( 'MAP', 'Mapping', AST_ISAMAPPING, MAP, 
      :                 STATUS )
 
 *  Get a Frame.
-      CALL ATL_GTOBJ( 'FRAME', 'Frame', AST_ISAFRAME, FRAME, 
+      CALL KPG1_GTOBJ( 'FRAME', 'Frame', AST_ISAFRAME, FRAME, 
      :                 STATUS )
 
 *  Add the Frame into the FrameSet.

@@ -143,7 +143,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get a Frame. 
-      CALL ATL_GTOBJ( 'THIS', 'Frame', AST_ISAFRAME, THIS, STATUS )
+      CALL KPG1_GTOBJ( 'THIS', 'Frame', AST_ISAFRAME, THIS, STATUS )
 
 *  Get the new value for the ActiveUnit flag.
       CALL PAR_GET0L( 'VALUE', VAL, STATUS )

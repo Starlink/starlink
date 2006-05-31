@@ -141,9 +141,9 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the first two route Regions. These must be supplied.
-      CALL ATL_GTOBJ( 'REG1', 'Region', AST_ISAREGION, 
+      CALL KPG1_GTOBJ( 'REG1', 'Region', AST_ISAREGION, 
      :                 REGS( 1 ), STATUS )
-      CALL ATL_GTOBJ( 'REG2', 'Region', AST_ISAREGION, 
+      CALL KPG1_GTOBJ( 'REG2', 'Region', AST_ISAREGION, 
      :                 REGS( 2 ), STATUS )
 
 *  Loop round getting route Regions until a null value is supplied. 
@@ -153,7 +153,7 @@
          PARAM = 'REG'
          IAT = 3
          CALL CHR_PUTI( NREG, PARAM, IAT )
-         CALL ATL_GTOBJ( PARAM, 'Region', AST_ISAREGION, 
+         CALL KPG1_GTOBJ( PARAM, 'Region', AST_ISAREGION, 
      :                    REGS( NREG ), STATUS )
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )

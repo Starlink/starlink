@@ -114,10 +114,10 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the first Mapping.
-      CALL ATL_GTOBJ( 'MAP1', 'Mapping', AST_ISAMAPPING, MAP1, STATUS )
+      CALL KPG1_GTOBJ( 'MAP1', 'Mapping', AST_ISAMAPPING, MAP1, STATUS )
 
 *  Get the second Frame.
-      CALL ATL_GTOBJ( 'MAP2', 'Mapping', AST_ISAMAPPING, MAP2, STATUS )
+      CALL KPG1_GTOBJ( 'MAP2', 'Mapping', AST_ISAMAPPING, MAP2, STATUS )
 
 *  Create the required TranMap.
       RESULT = AST_TRANMAP( MAP1, MAP2, ' ', STATUS )

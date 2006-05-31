@@ -184,7 +184,7 @@
       CALL NDF_BEGIN
 
 *  Get the Mapping.
-      CALL ATL_GTOBJ( 'THIS', 'Mapping', AST_ISAMAPPING, THIS,
+      CALL KPG1_GTOBJ( 'THIS', 'Mapping', AST_ISAMAPPING, THIS,
      :                 STATUS )
 
 *  Determine the Nin and Nout attributes of the Mapping

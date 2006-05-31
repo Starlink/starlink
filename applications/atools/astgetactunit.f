@@ -99,7 +99,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get a Frame.
-      CALL ATL_GTOBJ( 'THIS', 'Frame', AST_ISAFRAME, THIS, STATUS )
+      CALL KPG1_GTOBJ( 'THIS', 'Frame', AST_ISAFRAME, THIS, STATUS )
 
 *  Get the flag.
       VAL = AST_GETACTIVEUNIT( THIS, STATUS )

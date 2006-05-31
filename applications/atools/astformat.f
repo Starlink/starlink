@@ -114,7 +114,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the Frame.
-      CALL ATL_GTOBJ( 'THIS', 'Frame', AST_ISAFRAME, THIS,
+      CALL KPG1_GTOBJ( 'THIS', 'Frame', AST_ISAFRAME, THIS,
      :                 STATUS )
 
 *  Get the axis index.

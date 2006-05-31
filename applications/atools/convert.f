@@ -126,11 +126,11 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the source Frame.
-      CALL ATL_GTOBJ( 'FROM', 'Frame or FrameSet', AST_ISAFRAME, 
+      CALL KPG1_GTOBJ( 'FROM', 'Frame or FrameSet', AST_ISAFRAME, 
      :                 FROM, STATUS )
 
 *  Get the destination Frame.
-      CALL ATL_GTOBJ( 'TO', 'Frame or FrameSet', AST_ISAFRAME, 
+      CALL KPG1_GTOBJ( 'TO', 'Frame or FrameSet', AST_ISAFRAME, 
      :                 TO, STATUS )
 
 *  Abort if an error has occurred.

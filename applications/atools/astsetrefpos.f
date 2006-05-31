@@ -121,7 +121,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the SpecFrame, check its class.
-      CALL ATL_GTOBJ( 'THIS', ' ', AST_NULL, THIS, STATUS )
+      CALL KPG1_GTOBJ( 'THIS', ' ', AST_NULL, THIS, STATUS )
 
       IF( AST_ISAFRAMESET( THIS, STATUS ) ) THEN
          SFRM = AST_GETFRAME( THIS, AST__CURRENT, STATUS )
@@ -142,7 +142,7 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the SkyFrame, check its class.
-      CALL ATL_GTOBJ( 'FRM', ' ', AST_NULL, FRM, STATUS )
+      CALL KPG1_GTOBJ( 'FRM', ' ', AST_NULL, FRM, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          UFRM = AST_SKYFRAME( ' ', STATUS )

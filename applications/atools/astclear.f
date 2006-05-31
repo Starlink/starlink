@@ -98,7 +98,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get an Object.
-      CALL ATL_GTOBJ( 'THIS', ' ', AST_NULL, THIS, STATUS )
+      CALL KPG1_GTOBJ( 'THIS', ' ', AST_NULL, THIS, STATUS )
 
 *  Get the name of the attribute.
       CALL PAR_GET0C( 'ATTRIB', ATTRIB, STATUS )

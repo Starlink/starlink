@@ -139,11 +139,11 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the target Frame.
-      CALL ATL_GTOBJ( 'TARGET', 'Frame or FrameSet', AST_ISAFRAME, 
+      CALL KPG1_GTOBJ( 'TARGET', 'Frame or FrameSet', AST_ISAFRAME, 
      :                 TARGET, STATUS )
 
 *  Get the template Frame.
-      CALL ATL_GTOBJ( 'TEMPLATE', 'Frame', AST_ISAFRAME, TEMPLT, 
+      CALL KPG1_GTOBJ( 'TEMPLATE', 'Frame', AST_ISAFRAME, TEMPLT, 
      :                 STATUS )
 
 *  Abort if an error has occurred.

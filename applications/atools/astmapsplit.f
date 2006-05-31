@@ -122,7 +122,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the Mapping.
-      CALL ATL_GTOBJ( 'THIS', 'Mapping', AST_ISAMAPPING, THIS,
+      CALL KPG1_GTOBJ( 'THIS', 'Mapping', AST_ISAMAPPING, THIS,
      :                 STATUS )
 
 *  Get the indices of the inputs to select.

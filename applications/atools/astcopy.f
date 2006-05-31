@@ -92,7 +92,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the object to copy.
-      CALL ATL_GTOBJ( 'THIS', 'Object', AST_ISAOBJECT, THIS, STATUS )
+      CALL KPG1_GTOBJ( 'THIS', 'Object', AST_ISAOBJECT, THIS, STATUS )
 
 *  Write the FrameSet out to a text file.
       CALL ATL1_PTOBJ( 'RESULT', ' ', THIS, STATUS )

@@ -106,10 +106,10 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the first Frame.
-      CALL ATL_GTOBJ( 'FRAME1', 'Frame', AST_ISAFRAME, FRAME1, STATUS )
+      CALL KPG1_GTOBJ( 'FRAME1', 'Frame', AST_ISAFRAME, FRAME1, STATUS )
 
 *  Get the second Frame.
-      CALL ATL_GTOBJ( 'FRAME2', 'Frame', AST_ISAFRAME, FRAME2, STATUS )
+      CALL KPG1_GTOBJ( 'FRAME2', 'Frame', AST_ISAFRAME, FRAME2, STATUS )
 
 *  Create the required Frame.
       RESULT = AST_CMPFRAME( FRAME1, FRAME2, ' ', STATUS )
