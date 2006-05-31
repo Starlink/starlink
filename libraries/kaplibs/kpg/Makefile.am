@@ -282,6 +282,7 @@ kpg1_gtaxv.f \
 kpg1_gtchv.f \
 kpg1_gtgrp.f \
 kpg1_gtndf.f \
+kpg1_gtobj.f \
 kpg1_gtpos.f \
 kpg1_lstar.f \
 kpg1_mklut.f \
