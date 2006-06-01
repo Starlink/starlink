@@ -73,13 +73,14 @@
 
 *  Usage:
 *     clinplot ndf [comp] [mode] [xleft] [xright] [ybot] [ytop] [device]
+*              abort=?
 
 *  ADAM Parameters:
 *     ABORT = _LOGICAL (Read)
 *        This parameter gives you a chance to abort whenever the number
 *        of plots is deemed too high---currently more than thirty plots
 *        along either axis---and thereby avoid a lengthy wait for the
-*        plotting to complete.  The current value is TRUE.
+*        plotting to complete.  The dynamic default is TRUE.
 *     ALIGN = _LOGICAL (Read)
 *        Controls whether or not the new plot grid should be aligned 
 *        with an existing grid plot.  If ALIGN is TRUE, the x-axis 
@@ -102,13 +103,14 @@
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        line plots.  In practice this governs whether or not interior
 *        axis tick marks appear around each line plot.  If a null (!) 
-*        value is supplied, the value used is FALSE regardless of whether
-*        the plot is being aligned with an existing plot (see parameter 
-*        ALIGN) or not.  In general axes only clutter the plots, unless
-*        the spatial data are sparse.  Interior tick marks, however,
-*        can help read values.  Annotated axes are normally drawn
-*        about the exterior axes of the lower-left plot through the
-*        REFAXES and REFSTYLE parameters.
+*        value is supplied, the value used is FALSE regardless of 
+*        whether the plot is being aligned with an existing plot (see 
+*        parameter ALIGN) or not.  In general axes only clutter the 
+*        plots, unless the spatial data are sparse.  Interior tick 
+*        marks, however, aid the estimation of co-ordinates of features.
+*        Annotated axes are normally drawn about the exterior axes of 
+*        the lower-left plot through the REFAXES and REFSTYLE 
+*        parameters.
 *
 *        Parameter USEAXIS determines the quantity used to annotate the
 *        horizontal axis.  The width of the margins left for the 
@@ -653,12 +655,12 @@
 *     -  For large cubes or spatial sections, the resolution of the 
 *     graphics device may allow only a fraction of the detail in the 
 *     data to be plotted.   So only small sections are recommended. 
-*     -  If no Title is specified via the STYLE parameter, then the Title
-*     component in the NDF is used as the default title for the annotated 
-*     axes. If the NDF does not have a Title component, then the default 
-*     title is taken from current co-ordinate Frame in the NDF. If this
-*     has not been set explicitly, then the name of the NDF is used as the
-*     default title.
+*     -  If no Title is specified via the STYLE parameter, then the 
+*     Title component in the NDF is used as the default title for the 
+*     annotated axes.  If the NDF does not have a Title component, then 
+*     the default title is taken from current co-ordinate Frame in the
+*     NDF.  If this has not been set explicitly, then the name of the 
+*     NDF is used as the default title.
 *     -  If all the data values at a spatial position are bad, no line
 *     plot is drawn at that location.  Where the combination of CENTRE,
 *     XMAGN, and YMAGN parameter values require image padding, a gap 
