@@ -55,7 +55,7 @@ datMove(HDSLoc **locator1,
    int              ncomp;
    int              entryy;
    int              i;
-   int              szcrv;
+   int              szcrv; /* TEMP - to remove */
    char             *name1;
 
    rid = rec_gl_ridzero;
@@ -87,7 +87,7 @@ datMove(HDSLoc **locator1,
 
 /* Import the second locator and return if it points to anything other than
    a single structure object.
-   Note - sets hds_gl_64bit appropiately for lcp2 */
+   NB Importing a locator sets hds_gl_64bit appropriately for that LCP */
 
    _call(dat1_import_loc(locator2, &lcp2 ));
    data2 = &lcp2->data;
@@ -98,6 +98,8 @@ datMove(HDSLoc **locator1,
 
    _call( dau_check_name( &name, nambuf ))
 
+/* SZSRV and SZCRV set for LCP2 at this stage                          */
+   
 /* Locate the recipient Structure Record Vector entry which contains the ID of
    the component record.        */
 
@@ -142,10 +144,9 @@ datMove(HDSLoc **locator1,
    rec_release_data( &data2->han, SZSRV, off, 'U', &srv );
 
    _call( hds_gl_status )
-
-   szcrv = SZCRV;
-   if (ncomp*szcrv == rcl.dlen)
-      _call(rec_extend_record(&han[0], szcrv * hds_gl_ncomp0))
+   
+   if (ncomp*SZCRV == rcl.dlen)
+      _call(rec_extend_record(&han[0], SZCRV * hds_gl_ncomp0))
 
 /* Locate the recipient Component Record Vector and ensure that an object of
    the same name does not already exist.        */
@@ -164,9 +165,9 @@ datMove(HDSLoc **locator1,
 /* Identify the record of the object to be moved and save the name in the
    recipient component list.    */
 
-   rec_get_rid( &data1->han, &rid );
    dat1_locate_name( crv, ncomp, &name1 );
    _chmove( DAT__SZNAM, nambuf, name1 );
+   rec_get_rid( &data1->han, &rid );
 
 /* Read the Record Control Label of the object to be moved and stick a handle
    on its parent component record.      */
@@ -195,8 +196,9 @@ datMove(HDSLoc **locator1,
    else                           /* NB, pro_exit won't have been called */
    {
       rec_get_rid( &data1->han, &rid1 );
-      hds_gl_64bit = rcl1.extended;
+      hds_gl_64bit = rec_ga_fcv[data1->han.slot].hds_version > REC__VERSION3;
       dat1_pack_crv( &rid1, 0, crv1 );
+      _chmove( DAT__SZNAM, nambuf, crv1 );
       _call( dat1_move_object( 1, &data1->han, crv1, &han[ 0 ],
                                crv + ncomp*SZCRV ) )
    }
@@ -204,7 +206,6 @@ datMove(HDSLoc **locator1,
 /* Bump the component count in the destination object and release the CRV. */
 
    ++ncomp;
-   hds_gl_64bit = rec_ga_fcv[han[0].slot].hds_version > REC__VERSION3;
    dat1_put_ncomp( &han[0], ncomp );
    rec_release_data( &han[0], rcl.dlen, 0, 'U', &crv );
 
@@ -343,10 +344,13 @@ int dat1_move_object(int ncomp, struct HAN *src, unsigned char *src_crv,
    struct RCL rcl1; /* Record Control Label for Struc / Prim Record  */
    struct RCL rcl2; /* Record Control Label for next lev Compon Rec  */
    struct ODL odl1; /* Object Descriptor Label for Struc / Prim Rec  */
+   struct ODL odl2; /* Object Descriptor Label for Struc / Sec Rec  */
    unsigned char *src_srv1;   /* Pointer to src next level SRV */
    unsigned char *des_srv1;   /* Pointer to des next level SRV */
    unsigned char *src_crv2;   /* Pointer to source next CRV    */
    unsigned char *des_crv2;   /* Pointer to dest next CRV      */
+   char *sname;       /* Pointer to source compoent name  */
+   char *dname;       /* Pointer to destination component name  */
    int           comp;        /* Component counter             */
    int           active;      /* Whether dynamic domain is active */
    struct HAN   src1; /* Handle to source Structure / Primitive Record */
@@ -356,12 +360,14 @@ int dat1_move_object(int ncomp, struct HAN *src, unsigned char *src_crv,
    int nelem;             /* Number of elements in source structure array  */
    int axis;              /* Axis counter                                  */
    int elem;              /* Element counter                               */
+   int nitem;             /* General item counter                          */
    struct HAN src2;       /* Handle to source next level Component Record  */
    struct HAN des2;       /* Handle to destin next level Component Record  */
    int        ncomp2;     /* Number of components at next level            */
    struct RID src_rid;
    struct RID des_rid;
    struct RID rid1;
+   int src1_dlen, src2_dlen;  /* Source records dlen                 */
 
 /* Go through each component of the source object moving it to the destination
    object. First stick a handle on the Record ID in the Component Record and
@@ -372,9 +378,16 @@ int dat1_move_object(int ncomp, struct HAN *src, unsigned char *src_crv,
    {
       SET_64BIT_MODE(src);
       dat1_unpack_crv( src_crv, comp, &rid1 );
+      dat1_locate_name( src_crv, comp, &sname );
+      SET_64BIT_MODE(des);
+      dat1_locate_name( des_crv, comp, &dname );
+      _chmove( DAT__SZNAM, sname, dname );
+      SET_64BIT_MODE(src);
       rec_get_handle( &rid1, src, &src1 );
       _invoke( rec_get_rcl( &src1,&rcl1 ))
+      _invoke( dat1_get_odl( &src1,&odl1 ))
       active  = rcl1.active;
+      _invoke( rec_locate_data( &src1, rcl1.dlen, 0, 'R', &spntr1 ) )
 
 /* Next, using the same Record Control Label (only class, zero, slen and
    dlen fields are needed), create an identical record in the destination
@@ -383,17 +396,21 @@ int dat1_move_object(int ncomp, struct HAN *src, unsigned char *src_crv,
    for write access automatically sets it active - it should be active if
    the domain it was copied from is active.     */
 
-      SET_64BIT_MODE(des);
+       src1_dlen = rcl1.dlen;
+       if(rcl1.class == DAT__STRUCTURE) {
+          nitem = rcl1.dlen / SZSRV;      
+          SET_64BIT_MODE(des);
+          rcl1.dlen = nitem * SZSRV;
+       } else {
+          SET_64BIT_MODE(des);
+       }
+      
       _invoke( rec_create_record( des, &rcl1, &des1 ))
-      SET_64BIT_MODE(src);
-      _invoke( dat1_get_odl( &src1,&odl1 ))
-      SET_64BIT_MODE(des);
       _invoke( dat1_put_odl( &des1,&odl1 ))
-      SET_64BIT_MODE(src);
-      _invoke( rec_locate_data( &src1, rcl1.dlen, 0, 'R', &spntr1 ) )
-      SET_64BIT_MODE(des);
       _invoke( rec_locate_data( &des1, rcl1.dlen, 0, 'W', &dpntr1 ) )
-      _chmove( rcl1.dlen, spntr1, dpntr1);
+      if(rcl1.class == DAT__PRIMITIVE) {
+         _chmove( rcl1.dlen, spntr1, dpntr1);
+      }
       if (!active)
          _invoke( rec_reset_record( &des1 ) )
 
@@ -401,7 +418,6 @@ int dat1_move_object(int ncomp, struct HAN *src, unsigned char *src_crv,
    Record Vector.       */
 
       rec_get_rid( &des1, &rid1 );
-      SET_64BIT_MODE(des);
       dat1_pack_crv( &rid1, comp, des_crv );
 
 /* If the component is primitive this is all that is necessary. If it is
@@ -427,20 +443,26 @@ int dat1_move_object(int ncomp, struct HAN *src, unsigned char *src_crv,
 
          for ( elem = 0; elem < nelem; elem++ )
          {
+            SET_64BIT_MODE(src);
             dat1_unpack_srv( src_srv1 + ( elem * SZSRV ), &src_rid );
             if  ( ( src_rid.bloc != 0 ) || ( src_rid.chip != 0 ) )
             {
                rec_get_handle( &src_rid, &src1, &src2 );
                _invoke( rec_get_rcl( &src2, &rcl2 ) )
-               active = rcl2.active;
-               _invoke( rec_create_record( &des1, &rcl2, &des2 ) )
                _invoke( dat1_get_ncomp( &src2, &ncomp2 ) )
-               _invoke( dat1_put_ncomp( &des2, ncomp2 ) )
                _invoke( rec_locate_data( &src2, rcl2.dlen, 0, 'R',
                                          &src_crv2 ) )
+               src2_dlen = rcl2.dlen;
+               active = rcl2.active;
+               SET_64BIT_MODE(src);
+               nitem = rcl2.dlen/SZCRV;
+               SET_64BIT_MODE(des);
+               rcl2.dlen = nitem*SZCRV;
+
+               _invoke( rec_create_record( &des1, &rcl2, &des2 ) )
+               _invoke( dat1_put_ncomp( &des2, ncomp2 ) )
                _invoke( rec_locate_data( &des2, rcl2.dlen, 0, 'W',
                                          &des_crv2 ) )
-               _chmove( rcl2.dlen, src_crv2, des_crv2 );
                if (!active) _invoke( rec_reset_record( &des2 ) )
 
 /* Identify the new record in the appropriate field of the destination      */
@@ -454,11 +476,12 @@ int dat1_move_object(int ncomp, struct HAN *src, unsigned char *src_crv,
                                           &des2, des_crv2 ) )
 
 /* Ditch the source and destination Component Record dynamic domains.       */
-               rec_release_data( &src2, rcl2.dlen, 0, 'R', &src_crv2 );
+               rec_release_data( &src2, src2_dlen, 0, 'R', &src_crv2 );
                rec_release_data( &des2, rcl2.dlen, 0, 'W', &des_crv2 );
 
 /* Rubout the source Component Record Vector and move on to the next        */
 /* element.                                                                 */
+
                _invoke( rec_delete_record( &src2 ) )
             }
          }
@@ -467,12 +490,12 @@ int dat1_move_object(int ncomp, struct HAN *src, unsigned char *src_crv,
 /* Ditch the source and destination Structure / Primitive Record dynamic
    domains.     */
 
-      rec_release_data( &src1, rcl1.dlen, 0, 'R', &spntr1 );
+      rec_release_data( &src1, src1_dlen, 0, 'R', &spntr1 );
       rec_release_data( &des1, rcl1.dlen, 0, 'W', &dpntr1 );
 
 /* Having copied and erased all the sub-structures of this component, rubout
-   the source object record and move on to the next component.  */
-
+   the source object record and move on to the next component. */
+   
       _invoke( rec_delete_record( &src1 ))
    }
    return hds_gl_status;
