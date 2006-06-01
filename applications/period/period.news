@@ -1,10 +1,20 @@
-1 PERIOD 5.0-2
+ PERIOD 5.0-3        01-JUN-2006
+ ============
+
+ PERIOD has been imported into the Starlink CVS repository. A memory
+ allocation bug has been fixed and the code updated to work on 64 bit
+ machines. 
+
+
+ PERIOD 5.0-2
+ ============
+
  Fixes a bug in the sine fitting subroutine, apparent with the CHISQ command
 
  Fixes a bug which caused OGIP to crash
   
-1 PERIOD - Time-series analysis package
-                                                       Expires: ????.??.??
+ PERIOD - Time-series analysis package
+ =====================================
 
  The PERIOD time-series analysis package has been updated.
 

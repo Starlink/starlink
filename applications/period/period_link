@@ -50,7 +50,7 @@
 
 #-
 
-      echo `psx_link` `cfitsio_link` `err_link` `pgp_link` \
+      echo `fio_link` `pgp_link` `cfitsio_link` `psx_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
