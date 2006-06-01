@@ -281,6 +281,8 @@
 *        for SelectorMap (merger of May 10 changes).
 *     2006 May 18 (MJC):
 *        Revise for new SelectorMap constructor.
+*     2006 May 26 (DSB):
+*        Added ROI<n> domain names for each channel.
 *     {enter_further_changes_here}
 
 *-
@@ -363,12 +365,14 @@
       CHARACTER ESTIM*( 6 )      ! Method to use to estimate collapsed
                                  ! values
       CHARACTER ESTIMO*( 78 )    ! List of available estimators
+      INTEGER GFRMO              ! Output GRID Frame pointer
       INTEGER GMAP               ! Pointer to Mapping from GRID Frame 
                                  ! to Current Frame, input NDF
       DOUBLE PRECISION GRDPOS( NDIM ) ! Valid grid Frame position
       LOGICAL HIGHER             ! Significant dimensions above collapse
                                  ! axis?
       INTEGER I                  ! Loop count
+      INTEGER IAT                ! Current length of string
       INTEGER IAXIS              ! Index of collapse axis within current
                                  ! Frame
       INTEGER IBL                ! Identifier for input-NDF block
@@ -376,6 +380,7 @@
       INTEGER IBLSIZ( NDIM )     ! Input-NDF sizes for processing 
                                  ! large datasets in blocks
       INTEGER ICH                ! Channel counter
+      INTEGER ICURR              ! Index of original current Frame
       INTEGER IERR               ! Position of first numerical error
       INTEGER INDFC              ! NDF identifier for single channel map
       INTEGER INDFI              ! Input NDF identifier
@@ -447,11 +452,11 @@
       INTEGER PLACE              ! NDF placeholder
       DOUBLE PRECISION PPOS( 2, NDF__MXDIM ) ! Two pixel Frame positions
       INTEGER PFRMI              ! Input PIXEL Frame pointer
-      INTEGER PFRMO              ! Output PIXEL Frame pointer
       DOUBLE PRECISION PRJ       ! Vector length projected on to a pixel
                                  ! axis
       DOUBLE PRECISION PRJMAX    ! Maximum vector length projected on to
                                  ! an axis
+      CHARACTER ROIDOM*20        ! Domain name for an ROI Region
       INTEGER ROUMAP( MAXCHN )   ! Route maps for each channel
       INTEGER SDIM( NDIM )       ! Significant dimensions
       INTEGER SELMAP             ! SelectorMap pointer
@@ -462,6 +467,7 @@
       INTEGER SLABIN( MAXCHN )   ! Pointers to spatial-pixel slab 
                                  ! Intervals for each channel
       INTEGER SWIMAP             ! SwitchMap pointer
+      CHARACTER TTL*( 255 )      ! Tile title 
       CHARACTER TTLC*( 255 )     ! Title of original current Frame
       INTEGER UBND( NDIM )       ! Upper pixel index bounds of the input
                                  ! NDF
@@ -475,6 +481,7 @@
                                  ! output NDF
       INTEGER UBNDS( NDIM )      ! Upper pixel index bounds of the
                                  ! slab of the input NDF
+      INTEGER UMAP               ! A two-dimensional UnitMap
       CHARACTER UNITS*( 60 )     ! Units of data 
       LOGICAL USEALL             ! Use the entire collapse pixel axis?
       LOGICAL VAR                ! Process variances?
@@ -826,9 +833,11 @@
 *  Find the index of the PIXEL Frame in the output FrameSet.
       CALL KPG1_ASFFR( IWCSO, 'PIXEL', IPIXO, STATUS )
 
-*  Obtain the input and output PIXEL Frames.
+*  Obtain the input PIXEL Frame.
       PFRMI = AST_GETFRAME( IWCS, IPIX, STATUS )
-      PFRMO = AST_GETFRAME( IWCSO, IPIXO, STATUS )
+
+*  Obtain the output GRID Frame.
+      GFRMO = AST_GETFRAME( IWCSO, AST__BASE, STATUS )
 
 *  Obtain the remaining parameters.
 *  ================================
@@ -1266,7 +1275,7 @@
      :                     1.0D-10
          END DO
 
-         SLABIN( ICH ) = AST_INTERVAL( PFRMO, DLBNDS, DUBNDS, AST__NULL,
+         SLABIN( ICH ) = AST_INTERVAL( GFRMO, DLBNDS, DUBNDS, AST__NULL,
      :                                 ' ', STATUS )
 
 *  Create the inverse Interval.   The non-collapsed axes are unbounded.
@@ -1313,6 +1322,56 @@
       CALL AST_ADDFRAME( IWCSO, AST__BASE, MAPC,
      :                   AST_GETFRAME( IWCS, AST__CURRENT, STATUS ),
      :                   STATUS )
+
+*  Make a two-dimensional UnitMap that will be used in the following 
+*  loop.
+      UMAP = AST_UNITMAP( 2, ' ', STATUS )
+
+*  Note the index of the current Frame.
+      ICURR = AST_GETI( IWCSO, 'Current', STATUS )
+
+*  Loop round the Regions defined above that describe the area of each
+*  tile in GRID co-ordinates, and add each one into the WCS FrameSet.
+      DO ICH = 1, NOCHAN
+
+*  Set the Domain name to "ROI<n>" where <n> is the index of the tile.
+*  This enables KPG1_ASTRM to identify the Region as defining a Region 
+*  Of Interest.
+         ROIDOM = 'ROI'
+         IAT = 3
+         CALL CHR_PUTI( ICH, ROIDOM, IAT )         
+         CALL AST_SETC( SLABIN( ICH ), 'Domain', ROIDOM( : IAT ), 
+     :                  STATUS )
+
+*  Set a meaningful title describing the tile.  This would be displayed,
+*  for instance, by "NDFTRACE FULLWCS".
+         CALL AST_GETREGIONBOUNDS( SLABIN( ICH ), DLBNDS, DUBNDS, 
+     :                             STATUS )
+
+         TTL = 'Tile '
+         IAT = 5
+         CALL CHR_PUTI( ICH, TTL, IAT )         
+         CALL CHR_APPND( ' bounds: (', TTL, IAT )         
+         CALL CHR_PUTI( NINT( DLBNDS( 1 ) ), TTL, IAT )         
+         CALL CHR_APPND( ':', TTL, IAT )         
+         CALL CHR_PUTI( NINT( DUBNDS( 1 ) ), TTL, IAT )         
+         CALL CHR_APPND( ',', TTL, IAT )         
+         CALL CHR_PUTI( NINT( DLBNDS( 2 ) ), TTL, IAT )         
+         CALL CHR_APPND( ':', TTL, IAT )         
+         CALL CHR_PUTI( NINT( DUBNDS( 2 ) ), TTL, IAT )         
+         CALL CHR_APPND( ')', TTL, IAT )         
+
+         CALL AST_SETC( SLABIN( ICH ), 'Title', TTL( : IAT ), 
+     :                  STATUS )
+
+*  Add the above Region into the output WCS FrameSet, using a UnitMap to
+*  connect it to the base (i.e. GRID) Frame.
+         CALL AST_ADDFRAME( IWCSO, AST__BASE, UMAP, SLABIN( ICH ),
+     :                      STATUS )
+      END DO
+
+*  Reinstate the original current Frame.
+      CALL AST_SETI( IWCSO, 'Current', ICURR, STATUS )
 
 *  Save this modified WCS FrameSet in the output NDF.
       CALL NDF_PTWCS( IWCSO, INDFO, STATUS )      
