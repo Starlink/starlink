@@ -566,7 +566,11 @@
 *        - Take account of ROI Frames in the WCS FrameSet.
 *        - Ensure all variable comments are no longer than 1 line.
 *     30-MAY-2006 (DSB):
-*        Correct logic of IF-THEN-ELSE block controlling drawing of axes.
+*        Correct logic of IF-THEN-ELSE block controlling drawing of 
+*        axes.
+*     2006 June 1 (MJC):
+*        Use KPS1_DISTL to draw title in correct place when ROI Frames
+*        are present.
 *     {enter_further_changes_here}
 
 *-
@@ -1009,6 +1013,9 @@
          IDENT = AST_GETC( IPLOT, 'Ident', STATUS )
          IF( IDENT( : 3 ) .EQ. 'ROI' ) THEN
 
+*  Draw a title if required. 
+            CALL KPS1_DISTL( IPLOT, STATUS )
+
 *  Ensure a grid is not produced unless explicitly requested (ROI Regions
 *  can produce anomolous bad coords arounds the edges, thus causing the
 *  default value for Grid to become non-zero).
@@ -1016,10 +1023,8 @@
                CALL AST_SETL( IPLOT,' GRID', .FALSE., STATUS )
             END IF
 
-*  Also ensure no title is produced unless specifically requested.
-            IF( .NOT. AST_TEST( IPLOT, 'DRAWTITLE', STATUS ) ) THEN
-               CALL AST_SETI( IPLOT, 'DRAWTITLE', 0, STATUS )
-            END IF
+*  Also ensure no further titles are produced.
+            CALL AST_SETI( IPLOT, 'DRAWTITLE', 0, STATUS )
 
 *  Loop round all Frames in the Plot. 
             NREG = 0
