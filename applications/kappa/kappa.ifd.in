@@ -3261,6 +3261,16 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter abort {
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath DEFAULT
+            default TRUE
+            prompt {Abort the plot?}
+            helpkey *
+          }
+
          parameter align {
             type _LOGICAL
             vpath DEFAULT
