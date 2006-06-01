@@ -75,6 +75,11 @@
 *     clinplot ndf [comp] [mode] [xleft] [xright] [ybot] [ytop] [device]
 
 *  ADAM Parameters:
+*     ABORT = _LOGICAL (Read)
+*        This parameter gives you a chance to abort whenever the number
+*        of plots is deemed too high---currently more than thirty plots
+*        along either axis---and thereby avoid a lengthy wait for the
+*        plotting to complete.  The current value is TRUE.
 *     ALIGN = _LOGICAL (Read)
 *        Controls whether or not the new plot grid should be aligned 
 *        with an existing grid plot.  If ALIGN is TRUE, the x-axis 
@@ -95,13 +100,15 @@
 *        the new plots.  A value of FALSE will be used otherwise. [!]
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
-*        line plots.  If a null (!) value is supplied, the value used
-*        is FALSE regardless of whether the plot is being aligned with 
-*        an existing plot (see parameter ALIGN) or not.  In general
-*        axes only clutter the plots, although interior tick marks
+*        line plots.  In practice this governs whether or not interior
+*        axis tick marks appear around each line plot.  If a null (!) 
+*        value is supplied, the value used is FALSE regardless of whether
+*        the plot is being aligned with an existing plot (see parameter 
+*        ALIGN) or not.  In general axes only clutter the plots, unless
+*        the spatial data are sparse.  Interior tick marks, however,
 *        can help read values.  Annotated axes are normally drawn
 *        about the exterior axes of the lower-left plot through the
-*        REFAXES parameter.
+*        REFAXES and REFSTYLE parameters.
 *
 *        Parameter USEAXIS determines the quantity used to annotate the
 *        horizontal axis.  The width of the margins left for the 
@@ -246,8 +253,8 @@
 *        0.0 otherwise.  The initial value is null.  [current value]
 *     LPSTYLE = LITERAL (Read)
 *        A group of attribute settings describing the plotting style to 
-*        use when drawing the annotated axes, data values, and error
-*        markers in the line plots.
+*        use when drawing the axes, data values, and error markers in 
+*        the line plots.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text 
@@ -269,6 +276,9 @@
 *        supplied.  See section "Plotting Attributes" in SUN/95 for a
 *        description of the available attributes.  Any unrecognised 
 *        attributes are ignored (no error is reported). 
+*
+*        By default the axes have interior tick marks, and are without
+*        labels and a title to avoid overprinting on adjacent plots.
 *
 *        The appearance of the data values is controlled by the 
 *        attributes Colour(Curves), Width(Curves), etc. (the synonym 
@@ -745,6 +755,10 @@
 *        from the plot.
 *     2006 April 12 (MJC):
 *        Remove unused variables.
+*     2006 June 1 (MJC):
+*        Add warning for overdense plots and related ABORT parameter.
+*        Attempt to clarify AXES parameter and list default axis
+*        style for LPSTYLE.
 *     {enter_further_changes_here}
 
 *-
@@ -760,6 +774,7 @@
       INCLUDE 'AST_PAR'        ! AST constants and function declarations
       INCLUDE 'PAR_ERR'        ! Parameter-system error definitions
       INCLUDE 'PAR_PAR'        ! Parameter-system constants
+      INCLUDE 'MSG_PAR'        ! Message-system constants
       INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
@@ -773,6 +788,8 @@
                                ! value
 
 *  Local Constants:
+      INTEGER MXPLOT           ! Maximum recommended number of plots
+      PARAMETER ( MXPLOT = 30 ) ! along an axis
       INTEGER NDIM             ! Dimensionality required
       PARAMETER ( NDIM = 3 )
       INTEGER NSPDIM           ! Dimensionality of spatial plane
@@ -791,6 +808,7 @@
       PARAMETER ( THTMAX = 0.72 )
 
 *  Local Variables:
+      LOGICAL ABORT            ! Abort the high-density plot?
       INTEGER AEL              ! No. of elements in mapped co-ord array
       LOGICAL ALIGN            ! DATA picture aligned with a previous
                                ! picture?
@@ -823,6 +841,7 @@
       LOGICAL DEFGRD           ! Use default GRID co-ordinates?
       REAL DEFMAR              ! Default MARGIN value
       LOGICAL DEVCAN           ! Cancel DEVICE parameter?
+      LOGICAL DEVOPN           ! Has a graphice device been opened?
       DOUBLE PRECISION DCC( NSPDIM ) ! Default current-Frame co-ords at
                                ! image centre
       DOUBLE PRECISION DGC( NDIM ) ! Default GRID co-ords at image 
@@ -1077,6 +1096,8 @@
       FRYCEG = .FALSE.
       FRYCEN = .FALSE.
 
+      DEVOPN = .FALSE.
+
 *  Get the main parameters of the data to be displayed.
 *  ====================================================
 
@@ -1197,6 +1218,25 @@
             SPAXIS( J ) = SDIM( I )
          END IF
       END DO
+
+*  Warn if the number of spatial pixels is large, likely leading to an
+*  unreadable plot and/or a very long elapsed time to plot.
+      IF ( DIMS( SPAXIS( 1 ) ) .GT. MXPLOT .OR. 
+     :     DIMS( SPAXIS( 2 ) ) .GT. MXPLOT ) THEN
+         CALL MSG_SETI( 'N', SPAXIS( 1 ) * SPAXIS( 2 ) )
+         CALL MSG_OUTIF( MSG__NORM, 'DENSITYMAX1',
+     :     'WARNING: the number of image pixels (^N) may result in '/
+     :     /'unreadable line plots and/or take a long time to plot.  '/
+     :     /'You may wish to abort at the next prompt and select a '/
+     :     /'smaller section or average image pixels before using '/
+     :     /'CLINPLOT.', STATUS )
+         CALL MSG_OUTIF( MSG__NORM, 'DENSITYMAX2',
+     :     'For a default X-window (780x512 pixels) a reasonable '/
+     :     /'maximum is 15x10 plots.  For PostScript hardcopy these '/
+     :     /'limits could be a few times larger.', STATUS )
+         CALL PAR_GTD0L( 'ABORT', .TRUE., .TRUE., ABORT, STATUS )
+         IF ( ABORT ) GOTO 999
+      END IF
 
 *  Obtain a two-dimensional mapping from the current to the base
 *  for the image axes.
@@ -1497,9 +1537,9 @@
 
 *  Set the dynamic default for the margins to place around the grid
 *  of line plots (a single value is used for all edges), and then get
-*  the margins to use.  For an inererior axes allow half a pixel margin.
+*  the margins to use.  For interior axes allow half a pixel margin.
 *  If exterior axes just allow a little room for any tick marks to not
-*  overprint the line plot. If there are no interior or exterior axes,
+*  overprint the line plot.  If there are no interior or exterior axes,
 *  using a dynamic default of zero avoids the unnecessary creation of
 *  FRAME pictures by KPG1_PLOTP.
       IF ( LPAXES ) THEN
@@ -1858,6 +1898,7 @@
      :                MARGIN, 0, ' ', ' ', 0.0, ASPECT, 'PIXEL', 
      :                BOX, PICIDD, PICIDF, PICIDN, IPLOTI, NFRM, ALIGN, 
      :                STATUS )
+      DEVOPN = .TRUE.
 
 *  It would be useful to know if the device was cleared or not.  So
 *  inquire of the parameter again.
@@ -2816,7 +2857,7 @@
       IF ( FRYCEN ) CALL PSX_FREE( IPYCEN, STATUS )
 
 *  Shutdown PGPLOT and the graphics database.
-      CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
+      IF ( DEVOPN ) CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
