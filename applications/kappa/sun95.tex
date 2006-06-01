@@ -15983,9 +15983,17 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
       plot to be aligned with the existing plot (see parameter ALIGN).
    }
    \sstusage{
-      clinplot ndf [comp] [mode] [xleft] [xright] [ybot] [ytop] [device]
+      clinplot ndf [comp] [mode] [xleft] [xright] [ybot] [ytop] [device] abort=?
    }
    \sstparameters{
+      \sstsubsection{
+         ABORT = \_LOGICAL (Read)
+      }{
+         This parameter gives you a chance to abort whenever the number
+         of plots is deemed too high---currently more than thirty plots
+         along either axis---and thereby avoid a lengthy wait for the
+         plotting to complete.  The dynamic default is {\tt TRUE}.
+      }
       \sstsubsection{
          ALIGN = \_LOGICAL (Read)
       }{
@@ -16012,13 +16020,16 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          AXES = \_LOGICAL (Read)
       }{
          {\tt TRUE} if labelled and annotated axes are to be drawn
-         around the line plots.  If a null ({\tt{!}}) value is
-         supplied, the value used is {\tt FALSE} regardless of whether
-         the plot is being aligned with an existing plot (see
-         parameter ALIGN) or not.  In general axes only clutter the
-         plots, although interior tick marks can help read values.
-         Annotated axes are normally drawn about the exterior axes of
-         the lower-left plot through the REFAXES parameter.
+	 around the line plots.  In practice this governs whether or
+	 not interior axis tick marks appear around each line plot.
+	 If a null ({\tt{!}}) value is supplied, the value used is
+	 {\tt FALSE} regardless of whether the plot is being aligned
+	 with an existing plot (see parameter ALIGN) or not.  In
+	 general axes only clutter the plots, unless the spatial data
+	 are sparse.  Interior tick marks, however, aid the estimation
+         of co-ordinates of features.  Annotated axes are normally 
+         drawn about the exterior axes of the lower-left plot through 
+         the REFAXES and REFSTYLE parameters.
 
          Parameter USEAXIS determines the quantity used to annotate the
          horizontal axis.  The width of the margins left for the
@@ -16233,6 +16244,9 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          supplied.  See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
+
+         By default the axes have interior tick marks, and are without
+         labels and a title to avoid overprinting on adjacent plots.
 
          The appearance of the data values is controlled by the
          attributes {\att Colour(Curves)}, {\att Width(Curves)},
