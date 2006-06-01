@@ -134,8 +134,8 @@
 #  Echo the link list.
 #  Sometimes the TCL_LIBS and TK_LIBS will include repeated information
 #  that must remain so we do not include them in the library reduction
-      all="`atl_link_adam` `ard_link_adam` `kaplibs_link_adam ${kaplibs_opts}` \
-           `shl_link_adam` `one_link_adam` `ref_link_adam`"
+      all="`ard_link_adam` `kaplibs_link_adam ${kaplibs_opts}` \
+           `atl_link_adam` `shl_link_adam` `one_link_adam` `ref_link_adam`"
 
       uniq=`echo $all \
            | awk 'BEGIN{RS=" ";FS="\n"}
