@@ -9,3 +9,4 @@ configure-output.log
 configure-output.log.err
 make.log
 make.log.err
+starconf.status
