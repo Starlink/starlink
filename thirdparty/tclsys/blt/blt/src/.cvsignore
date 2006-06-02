@@ -1,2 +1,6 @@
 Makefile
 bltConfig.h
+bltHash.h
+bltsh
+bltwish
+ 
