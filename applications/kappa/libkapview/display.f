@@ -590,6 +590,8 @@
 *     26-MAY-2006 (DSB):
 *        Handled WCS FrameSets that define specific regions ("Regions Of
 *        Interest") around which annotated grids should be drawn.
+*     2-JUN-2006 (DSB):
+*        Modified to use ATL_PLROI.
 *     {enter_further_changes_here}
 
 *-
@@ -630,7 +632,6 @@
 
 *  Local Variables:
       CHARACTER COMP*8           ! Component to be displayed
-      CHARACTER DOM*20         ! Domain attribute for a Frame
       CHARACTER FORM*( NDF__SZFRM ) ! Form of the output data array
       CHARACTER IDENT*20       ! Ident attribute for a Frame
       CHARACTER LABEL*255      ! Label for key
@@ -644,15 +645,11 @@
       DOUBLE PRECISION GC( 2 ) ! GRID co-ords at image centre
       DOUBLE PRECISION GX      ! X GRID co-ord at image centre
       DOUBLE PRECISION GY      ! Y GRID co-ord at image centre
-      DOUBLE PRECISION RLBND( NDF__MXDIM )! Region lower bounds   
-      DOUBLE PRECISION RUBND( NDF__MXDIM )! Region upper bounds   
       INTEGER BPCI             ! Bad-pixel colour index
       INTEGER DIMS( NDIM )     ! Dimensions of input array
       INTEGER EL               ! Number of elements in the mapped array
-      INTEGER FRM              ! Pointer to a Frame in Plot
       INTEGER I                ! General variable
       INTEGER IERR             ! Position of first conversion error
-      INTEGER IFRM             ! Index of Frame in Plot
       INTEGER INDF1            ! NDF id for input NDF
       INTEGER INDF2            ! NDF id for displayed NDF section
       INTEGER INDF3            ! NDF id for output NDF
@@ -666,7 +663,6 @@
       INTEGER IPLOTR           ! Pointer to AST Plot for a Region of interest
       INTEGER IPWORK           ! Pointer to work array for key
       INTEGER IWCS             ! Pointer to WCS FrameSet from the NDF
-      INTEGER JFRM             ! Index of Frame in Plot
       INTEGER LBND( NDF__MXDIM )! Lower pixel-index bounds of the image
       INTEGER LDIMS( NDIM )    ! Dimensions of LUT arrays
       INTEGER LEL              ! No. of elements in i/p and o/p LUTs
@@ -678,10 +674,11 @@
       INTEGER NERR             ! Number of conversion errors
       INTEGER NFRM             ! Number of Frames in Plot
       INTEGER NMARG            ! No. of margin values given
-      INTEGER NREG             ! Number of Regions found so far
+      INTEGER IREG             ! Region index
       INTEGER NX               ! First dimension of colour index array
       INTEGER NY               ! Second dimension of colour index array
       INTEGER OPNTR( 1 )       ! Pointer to output array data
+      INTEGER RPLOTS           ! KeyMap holding ROI plots
       INTEGER SDIM( NDIM )     ! The significant NDF axes
       INTEGER SLBND( NDIM )    ! Significant lower bounds of the image
       INTEGER STATE            ! State of a parameter
@@ -703,6 +700,7 @@
       REAL ASP0                ! Aspect ratio of the available space
       REAL ASPD                ! Aspect ratio of the data array
       REAL ASPECT              ! Aspect ratio of the DATA picture
+      REAL AXGAP               ! Gap between major tick marks
       REAL DEFMAR              ! Default MARGIN value
       REAL GLBND( NDIM )       ! Low grid co-ord bounds of PGPLOT window
       REAL GUBND( NDIM )       ! Hi grid co-ord bounds of PGPLOT window
@@ -756,8 +754,8 @@
 *  dimensions.  The NDF must have no more than two significant pixel axes 
 *  (i.e. pixel axes spanning more than one pixel).  A single significant 
 *  pixel axis is allowed.
-      CALL KPG1_ASGET( INDF1, NDIM, .FALSE., AXES, AXES, SDIM, 
-     :                 SLBND, SUBND, IWCS, STATUS )
+      CALL KPG1_ASGET( INDF1, NDIM, .FALSE., AXES .OR. BORDER, 
+     :                 AXES, SDIM, SLBND, SUBND, IWCS, STATUS )
 
 *  Store the number of current Frame axes.
       NCUR = AST_GETI( IWCS, 'NAXES', STATUS )
@@ -1260,108 +1258,58 @@
       IDENT = AST_GETC( IPLOT, 'Ident', STATUS )
       IF( IDENT( : 3 ) .EQ. 'ROI' ) THEN
 
-*  Draw a title if required. 
-         CALL KPS1_DISTL( IPLOT, STATUS )
-
-*  Ensure a grid is not produced unless explicitly requested (ROI Regions
-*  can produce anomolous bad coords arounds the edges, thus causing the
-*  default value for Grid to become non-zero).
-         IF( .NOT. AST_TEST( IPLOT, 'GRID', STATUS ) ) THEN
-            CALL AST_SETL( IPLOT,' GRID', .FALSE., STATUS )
+*  If required, get an AST KeyMap holding Plots covering the area of 
+*  each ROI.
+         IF( AXES .OR. BORDER ) THEN
+            CALL ATL_PLROI( IPLOT, RPLOTS, STATUS )
+         ELSE
+            RPLOTS = AST__NULL
          END IF
 
-*  Also ensure no further titles are produced.
-         CALL AST_SETI( IPLOT, 'DRAWTITLE', 0, STATUS )
-
-*  If axes are required, loop round all Frames in the Plot. 
+*  If required, draw annotated axes around each of these Plots.
          IF( AXES ) THEN
-            NREG = 0
-            NFRM = AST_GETI( IPLOT, 'NFRAME', STATUS )
-            DO IFRM = 1, NFRM
-               FRM = AST_GETFRAME( IPLOT, IFRM, STATUS )
 
-*  Pass on unless this Frame is a Region with a Domain that begins with
-*  "ROI"
-               IF( AST_ISAREGION( FRM, STATUS ) )  THEN         
-                  DOM = AST_GETC( FRM, 'Domain', STATUS )
-                  IF( DOM( : 3 ) .EQ. 'ROI' ) THEN
-                     NREG = NREG + 1
+*  Get the number of entries in the KeyMap and loop round them all.
+            DO IREG = 1, AST_MAPSIZE( RPLOTS, STATUS )
 
-*  Attempt to locate a Frame that has the same value for its Ident
-*  attribute, making it the current Frame in the Plot.
-                     DO JFRM = 1, NFRM
-                        CALL AST_SETI( IPLOT, 'Current', JFRM, STATUS )
-                        IDENT = AST_GETC( IPLOT, 'Ident', STATUS )
-                        IF( IDENT .EQ. DOM ) THEN
+*  Get the key with index IREG, and get a pointer to the Plot stored in
+*  the KeyMap with that key. Only proceed if the key is found (which is
+*  will be).
+               IF( AST_MAPGET0A( RPLOTS, AST_MAPKEY( RPLOTS, IREG,
+     :                                               STATUS ),
+     :                           IPLOTR, STATUS ) ) THEN
 
-*  Create a new Plot that covers just the corresponding Region.
-                           CALL AST_GETREGIONBOUNDS( FRM, RLBND, RUBND, 
-     :                                           STATUS )
-                           CALL KPG1_ASCPL( IPLOT, IFRM, RLBND, RUBND,
-     :                                      IPLOTR, STATUS )
-
-*  Draw the axes grid if required, supressing axis labels and title for 
-*  all but the first.
-                           IF( NREG .GT. 1 ) THEN
-                              CALL AST_SETI( IPLOTR, 'TEXTLAB', 0, 
-     :                                       STATUS )
-                              CALL AST_SETI( IPLOTR, 'NUMLAB', 0, 
-     :                                       STATUS )
-                              CALL AST_SETI( IPLOTR, 'DRAWTITLE', 0, 
-     :                                       STATUS )
-                           END IF
-                           CALL KPG1_ASGRD( IPLOTR, IPICF, .TRUE., 
-     :                                      STATUS )
-
-*  Free the temporary Plot
-                           CALL AST_ANNUL( IPLOTR, STATUS )
-
-                        END IF
-                     END DO
-
-                  END IF
+*  Draw the Annotated axes, and annul the Plot pointer.
+                  CALL KPG1_ASGRD( IPLOTR, IPICF, .TRUE., STATUS )
+                  CALL AST_ANNUL( IPLOTR, STATUS )
 
                END IF
-               CALL AST_ANNUL( FRM, STATUS )
             END DO
          END IF
 
 *  If a border is required, do the whole thing again, ensuring that the 
-*  relavant Plot attributes are cleared.
+*  relavant Plot attributes are cleared first.
          IF( BORDER ) THEN
+
             CALL AST_CLEAR( IPLOT, 'COLOUR', STATUS )
             CALL AST_CLEAR( IPLOT, 'WIDTH', STATUS )
             CALL AST_CLEAR( IPLOT, 'STYLE', STATUS )
             CALL KPG1_ASSET( 'KAPPA_DISPLAY', 'BORSTYLE', IPLOT, 
      :                        STATUS )
 
-            NFRM = AST_GETI( IPLOT, 'NFRAME', STATUS )
-            DO IFRM = 1, NFRM
-               FRM = AST_GETFRAME( IPLOT, IFRM, STATUS )
-               IF( AST_ISAREGION( FRM, STATUS ) )  THEN         
-                  DOM = AST_GETC( FRM, 'Domain', STATUS )
-                  IF( DOM( : 3 ) .EQ. 'ROI' ) THEN
-                     NREG = NREG + 1
-                     DO JFRM = 1, NFRM
-                        CALL AST_SETI( IPLOT, 'Current', JFRM, STATUS )
-                        IDENT = AST_GETC( IPLOT, 'Ident', STATUS )
-                        IF( IDENT .EQ. DOM ) THEN
-                           CALL AST_GETREGIONBOUNDS( FRM, RLBND, RUBND, 
-     :                                               STATUS )
-                           CALL KPG1_ASCPL( IPLOT, IFRM, RLBND, RUBND,
-     :                                      IPLOTR, STATUS )
-                           CALL KPG1_ASGRD( IPLOTR, IPICF, .FALSE., 
-     :                                      STATUS )
-                           CALL AST_ANNUL( IPLOTR, STATUS )	    
-                        END IF
-	    
-                     END DO
-                  END IF
-	    
+            DO IREG = 1, AST_MAPSIZE( RPLOTS, STATUS )
+               IF( AST_MAPGET0A( RPLOTS, AST_MAPKEY( RPLOTS, IREG,
+     :                                               STATUS ),
+     :                           IPLOTR, STATUS ) ) THEN
+                  CALL KPG1_ASGRD( IPLOTR, IPICF, .FALSE., STATUS )
+                  CALL AST_ANNUL( IPLOTR, STATUS )
                END IF
-               CALL AST_ANNUL( FRM, STATUS )
             END DO
+
          END IF
+
+*  Now Free the KeyMap (this will also free all the Plots in it).
+         IF( RPLOTS .NE. AST__NULL ) CALL AST_ANNUL( RPLOTS, STATUS )
 
 *  If no regions of interest were found, we just do a single annotated
 *  grid.
