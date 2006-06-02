@@ -56,5 +56,6 @@ enum { ATL__MXDIM  = 7 };
 /* -------------------------- */
 void atlAxtrm( AstFrameSet *, int *, int *, int *, double *, int * );
 void atlMklut( int, int, int, int, AstFrame *, double *, AstMapping **, int * );
+void atlPlroi( AstPlot *, AstKeyMap **, int * );
 
 #endif

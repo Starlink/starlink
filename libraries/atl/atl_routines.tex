@@ -130,6 +130,61 @@
    }
 }
 \sstroutine{
+   ATL\_CPPLA
+}{
+   Copy attributes from one Plot to another
+}{
+   \sstdescription{
+      This routine copies all public attribute values from one AST Plot to
+      another AST Plot. The attributes copied are those that affect the
+      visual appearance of the Plot.
+   }
+   \sstinvocation{
+      CALL ATL\_CPPLA( IPLOT1, IPLOT2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IPLOT1 = INTEGER (Given)
+      }{
+         The source Plot.
+      }
+      \sstsubsection{
+         IPLOT2 = INTEGER (Given)
+      }{
+         The destination Plot.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 2006 Central Laboratory of the Research Councils.
+      All Rights Reserved.
+   }
+   \sstdiytopic{
+      Licence
+   }{
+      This program is free software; you can redistribute it and/or
+      modify it under the terms of the GNU General Public License as
+      published by the Free Software Foundation; either version 2 of
+      the License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be
+      useful,but WITHOUT ANY WARRANTY; without even the implied
+      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+      PURPOSE. See the GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program; if not, write to the Free Software
+      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+      02111-1307, USA
+   }
+}
+\sstroutine{
    ATL\_CREAT
 }{
    Write an AST Object to a text file or NDF specified using an environment
@@ -175,6 +230,80 @@
 
       This program is distributed in the hope that it will be
       useful, but WITHOUT ANY WARRANTY; without even the implied
+      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+      PURPOSE. See the GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program; if not, write to the Free Software
+      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+      02111-1307, USA
+   }
+}
+\sstroutine{
+   ATL\_CUTPL
+}{
+   Create a Plot covering a sub-region of another Plot
+}{
+   \sstdescription{
+      This routine creates a new Plot with the same attributes as a
+      supplied Plot, but covering a sub-region within the world
+      coordinate system and graphics viewport.
+   }
+   \sstinvocation{
+      CALL ATL\_CUTPL( IPLOT1, IFRM, DLBND, DUBND, IPLOT2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IPLOT1 = INTEGER (Given)
+      }{
+         The source Plot.
+      }
+      \sstsubsection{
+         IFRM = INTEGER (Given)
+      }{
+         Index of the Frame within IPLOT1 in which the bounds are supplied.
+      }
+      \sstsubsection{
+         DLBND( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         The lower bounds of the region to be covered by the new Plot.
+         The number of axis values supplied should equal the number of
+         axes in the Frame identified by IFRM.
+      }
+      \sstsubsection{
+         DUBND( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         The upper bounds of the region to be covered by the new Plot.
+         The number of axis values supplied should equal the number of
+         axes in the Frame identified by IFRM.
+      }
+      \sstsubsection{
+         IPLOT2 = INTEGER (Returned)
+      }{
+         The new Plot.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 2006 Central Laboratory of the Research Councils.
+      All Rights Reserved.
+   }
+   \sstdiytopic{
+      Licence
+   }{
+      This program is free software; you can redistribute it and/or
+      modify it under the terms of the GNU General Public License as
+      published by the Free Software Foundation; either version 2 of
+      the License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be
+      useful,but WITHOUT ANY WARRANTY; without even the implied
       warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
       PURPOSE. See the GNU General Public License for more details.
 
@@ -462,6 +591,64 @@
    }
 }
 \sstroutine{
+   ATL\_PLROI
+}{
+   Create a set of Plots associated with each ROI in a given Plot
+}{
+   \sstdescription{
+      This routine searches the supplied Plot for ROI Frames (see
+      ATL\_AXTRM). For each ROI Frame found, it creates a new Plot
+      that covers just the region of graphics coords occupied by the
+      ROI. These new Plots are returned in an AST KeyMap.
+   }
+   \sstinvocation{
+      CALL ATL\_PLROI( IPLOT, RPLOTS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IPLOT = INTEGER (Given)
+      }{
+         The supplied Plot to search for ROI Frames.
+      }
+      \sstsubsection{
+         RPLOTS = INTEGER (Returned)
+      }{
+         An AST KeyMap holding the Plots associated with the ROI Frames.
+         The key used to identify each Plot within the KeyMap is the Domain
+         name of the corresponding ROI Frame.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 2006 Particle Physics \& Astronomy Research Council.
+      All Rights Reserved.
+   }
+   \sstdiytopic{
+      Licence
+   }{
+      This program is free software; you can redistribute it and/or
+      modify it under the terms of the GNU General Public License as
+      published by the Free Software Foundation; either version 2 of
+      the License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be
+      useful,but WITHOUT ANY WARRANTY; without even the implied
+      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+      PURPOSE. See the GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program; if not, write to the Free Software
+      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+      02111-1307, USA
+   }
+}
+\sstroutine{
    ATL\_RDCH
 }{
    Read an AST Object from a GRP group using a Channel
@@ -647,6 +834,57 @@
       Copyright (C) 1999 Central Laboratory of the Research Councils.
       Copyright (C) 2005 Particle Physics \& Astronomy Research Council.
       All Rights Reserved.
+   }
+   \sstdiytopic{
+      Licence
+   }{
+      This program is free software; you can redistribute it and/or
+      modify it under the terms of the GNU General Public License as
+      published by the Free Software Foundation; either version 2 of
+      the License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be
+      useful, but WITHOUT ANY WARRANTY; without even the implied
+      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+      PURPOSE. See the GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program; if not, write to the Free Software
+      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+      02111-1307, USA
+   }
+}
+\sstroutine{
+   ATL\_TTLPL
+}{
+   Display a Plot Title without using AST\_GRID
+}{
+   \sstdescription{
+      This routine display the Plot Title at the top of the area covered
+      by the Plot, but does not draw anything else (e.g. axes, tick
+      marks, borders, labels, etc). It does not need the inverse
+      transformation from current to base Frame to be defined in the Plot.
+   }
+   \sstinvocation{
+      CALL ATL\_TTLPL( IPLOT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IPLOT = INTEGER (Given)
+      }{
+         The Plot.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status value.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Councils. Copyright (C) 2006 Particle Physics \& Astronomy
+      Research Council. All Rights Reserved.
    }
    \sstdiytopic{
       Licence

@@ -93,6 +93,32 @@ void atlAxtrm( AstFrameSet *iwcs, int *axes, int *lbnd, int *ubnd,
    return;
 }
 
+F77_SUBROUTINE(atl_plroi)( INTEGER(IPLOT), 
+                           INTEGER(RPLOTS),
+                           INTEGER(STATUS) );
+
+void atlPlroi( AstPlot *iplot, AstKeyMap **rplots, int *status ){
+   DECLARE_INTEGER(IPLOT);
+   DECLARE_INTEGER(RPLOTS);
+   DECLARE_INTEGER(STATUS);
+   int irplots;
+
+   if( !astOK ) return;
+
+   F77_EXPORT_INTEGER( astP2I( iplot ), IPLOT );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(atl_plroi)( INTEGER_ARG(&IPLOT),
+                        INTEGER_ARG(&RPLOTS),
+                        INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_INTEGER( RPLOTS, irplots );
+   *rplots = astI2P( irplots );
+
+   return;
+}
+
 
 
 F77_SUBROUTINE(atl_mklut)( INTEGER(IX), 
