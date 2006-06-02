@@ -1141,7 +1141,10 @@ AC_DEFUN([STAR_EXAMPLES_FILES],
 # same as the use dependencies.
 #
 # -- Configure dependencies are those which must be satisfied before
-# this component can be successfully configured.
+# this component can be successfully configured.  In this case, we
+# also check that the corresponding manifest files have been installed
+# in current_MANIFESTS, and if not exit with a message, and the suggestion
+# that the user runs 'make configure-deps'.
 #
 # The point of this is that different dependencies are required at
 # different times.  The set of dependencies in the master makefile is
@@ -1170,17 +1173,37 @@ AC_DEFUN([STAR_EXAMPLES_FILES],
 # The macro may be called more than once.  The results of this macro
 # are expressed in the file component.xml in the component directory.
 AC_DEFUN([STAR_DECLARE_DEPENDENCIES],
-         [m4_ifval([$1], [], [AC_FATAL([$0: no type given])])dnl
-          m4_if(m4_bregexp([$1], 
-                           [^\(sourceset\|build\|link\|use\|test\|configure\)$]),
-                [0],
-                [],
-                [AC_FATAL([$0: unrecognised dependency type: $1])])dnl
-          m4_ifval([$2], [], [AC_FATAL([$0: no deplist given])])dnl
-          for _star_tmp in $2
-          do
-              STAR_DEPENDENCIES_CHILDREN="$STAR_DEPENDENCIES_CHILDREN<[$1]m4_ifval([$3], [ option='$3'], [])>$_star_tmp</$1>"
-          done
+ [m4_ifval([$1], [], [AC_FATAL([$0: no type given])])dnl
+  m4_if(m4_bregexp([$1], 
+                   [^\(sourceset\|build\|link\|use\|test\|configure\)$]),
+        [0],
+        [],
+        [AC_FATAL([$0: unrecognised dependency type: $1])])dnl
+  m4_ifval([$2], [], [AC_FATAL([$0: no deplist given])])dnl
+  for _star_tmp in $2
+  do
+    STAR_DEPENDENCIES_CHILDREN="$STAR_DEPENDENCIES_CHILDREN<[$1]m4_ifval([$3], [ option='$3'], [])>$_star_tmp</$1>"
+  done
+  m4_if([$1], [configure], [# check that configure-deps ran...
+  for _star_tmp in $2
+  do
+    echo "$as_me:$LINENO: checking for configure-deps/$_star_tmp" >&5
+    echo $ECHO_N "checking for configure-deps/$_star_tmp... $ECHO_C" >&6
+    if test -f $current_MANIFESTS/$_star_tmp; then
+      echo "$as_me:$LINENO: result: ok" >&5
+      echo "${ECHO_T}ok" >&6
+    else
+      echo "$as_me:$LINENO: result: not found!" >&5
+      echo "${ECHO_T}not found" >&6
+      echo "*** This package has a configure dependency on $_star_tmp" >&6
+      echo "    but that component doesn't appear to be installed." >&6
+      echo "    (I can't find $current_MANIFESTS/$_star_tmp:" >&6
+      echo "    have you forgotten to run 'make configure-deps'?)" >&6
+      echo "    Giving up!" >&6
+      exit 1
+    fi
+  done
+])dnl
 ])# STAR_DECLARE_DEPENDENCIES
 
 
