@@ -39,6 +39,8 @@
 *        Fix logic that ditinguishes sc2store from datGetc
 *     2005-11-29 (TIMJ):
 *        Use astPutFits rather than a callback (much easier)
+*     2006-06-02 (TIMJ):
+*        Fix compiler warnings. Check status.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -74,10 +76,10 @@
 #include <stdlib.h>
 #include "mers.h"
 #include <string.h>
+#include "smf.h"
 
-const char* astsource ( );
-
-void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status ) {
+void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, 
+		      int *status ) {
   size_t len;
   
   /* Sc2store header records are each null terminated at the last non-whitespace
@@ -89,6 +91,8 @@ void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *statu
   char *card = NULL;
   int i;
   int step = 0;
+
+  if (*status != SAI__OK) return;
 
   len = strlen( headrec );
 
