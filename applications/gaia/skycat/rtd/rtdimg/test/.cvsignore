@@ -1,4 +1,11 @@
 .log
 Makefile
 make.dep
+Test
 tRtd
+tRtdImage
+tRtdImageCtrl
+tRtdImageCut
+tRtdImageGraphics
+tRtdImagePick
+tRtdImageSpectrum
