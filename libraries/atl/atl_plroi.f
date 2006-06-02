@@ -86,15 +86,15 @@
       DOUBLE PRECISION RUBND( ATL__MXDIM )! Region upper bounds   
       INTEGER FRM              ! Pointer to a Frame in Plot
       INTEGER I                ! General variable
-      INTEGER ICURR            ! Index of original current Frame
       INTEGER IFRM             ! Index of Frame in Plot
-      INTEGER IPLOTR           ! Pointer to AST Plot for a Region of interest
+      INTEGER IPLOT2           ! Pointer to copy of supplied Plot 
+      INTEGER IPLOTR           ! Pointer to Plot for a Region of interest
       INTEGER JFRM             ! Index of Frame in Plot
       INTEGER NFRM             ! Number of Frames in Plot
       INTEGER NREG             ! Number of Regions found so far
+      LOGICAL GOTGAP1          ! Has Gap(1) been set?
+      LOGICAL GOTGAP2          ! Has Gap(2) been set?
       LOGICAL GRID             ! Draw a grid?
-      REAL AXGAP1              ! Gap between major tick marks on axis 1
-      REAL AXGAP2              ! Gap between major tick marks on axis 2
 *.
 
 *  Check the inherited global status.
@@ -102,13 +102,6 @@
 
 *  Create the AstKeyMap to hold the returned Plots.
       RPLOTS = AST_KEYMAP( ' ', STATUS )
-
-*  Note the original current Frame in the supplied Plot.
-      ICURR = AST_GETI( IPLOT, 'Current', STATUS )
-
-*  If a title is required, draw it now at the top of the whole pixel array
-*  before we start to produce the annotated axes for each individual ROI.
-      CALL ATL_TTLPL( IPLOT, STATUS )
 
 *  See if each ROI is to have a grid or not. We arrange that a grid is
 *  drawn only if one has been explicitly requested (ROI Regions can 
@@ -120,12 +113,36 @@
          GRID = .FALSE.
       END IF
 
+*  Note if gap sizes have been specified.
+      GOTGAP1 = AST_TEST( IPLOT, 'Gap(1)', STATUS )
+      GOTGAP2 = AST_TEST( IPLOT, 'Gap(2)', STATUS )
+
+*  Create a copy of the supplied Plot so we can change it without
+*  affecting later behaviour.
+      IPLOT2 = AST_COPY( IPLOT, STATUS )
+
+*  Fixate the attribute values in the copied Plot. This means that any
+*  attributes which have not explictly been assigned a value are
+*  explicitly assigned their default values. This prevents the continuous
+*  re-evaluation of default attribute values by AST which can be expensive.
+      CALL ATL_CPPLA( IPLOT, IPLOT2, .TRUE., STATUS )
+
+*  If a title is required, draw it now at the top of the whole pixel array
+*  before we start to produce the annotated axes for each individual ROI.
+      CALL ATL_TTLPL( IPLOT2, STATUS )
+
+*  Ensure no further title is drawn at the top of any ROI.
+      CALL AST_SETI( IPLOT2, 'DRAWTITLE', 0, STATUS )
+
+*  Ensure the grid is drawn only if required.
+      CALL AST_SETL( IPLOT2, 'GRID', GRID, STATUS )
+
 *  Loop round all Frames in the supplied Plot, counting the number of ROI
 *  Frames encountered.
       NREG = 0
-      NFRM = AST_GETI( IPLOT, 'NFRAME', STATUS )
+      NFRM = AST_GETI( IPLOT2, 'NFRAME', STATUS )
       DO IFRM = 1, NFRM
-         FRM = AST_GETFRAME( IPLOT, IFRM, STATUS )
+         FRM = AST_GETFRAME( IPLOT2, IFRM, STATUS )
 
 *  Pass on unless this Frame is a Region with a Domain that begins with
 *  "ROI"
@@ -137,38 +154,40 @@
 *  Attempt to locate a Frame that has the same value for its Ident
 *  attribute, making it the current Frame in the Plot.
                DO JFRM = 1, NFRM
-                  CALL AST_SETI( IPLOT, 'Current', JFRM, STATUS )
-                  IDENT = AST_GETC( IPLOT, 'Ident', STATUS )
+                  CALL AST_SETI( IPLOT2, 'Current', JFRM, STATUS )
+                  IDENT = AST_GETC( IPLOT2, 'Ident', STATUS )
                   IF( IDENT .EQ. DOM ) THEN
+
+*  If this is the first ROI, fix the gaps between major ticks so that 
+*  all ROIs use the same value. If the user specified a gap, then it
+*  will already be set so do nothing. Otherwise, clear the attribute,
+*  then get the default value and set it as the current value.
+                     IF( NREG .EQ. 1 ) THEN
+                        IF( .NOT. GOTGAP1 ) THEN
+                           CALL AST_CLEAR( IPLOT2, 'Gap(1)', STATUS )
+                           CALL AST_SETR( IPLOT2, 'Gap(1)',
+     :                                    AST_GETR( IPLOT2, 'Gap(1)',
+     :                                              STATUS ), STATUS )
+                        END IF
+                        IF( .NOT. GOTGAP2 ) THEN
+                           CALL AST_CLEAR( IPLOT2, 'Gap(2)', STATUS )
+                           CALL AST_SETR( IPLOT2, 'Gap(2)',
+     :                                    AST_GETR( IPLOT2, 'Gap(2)',
+     :                                              STATUS ), STATUS )
+                        END IF
+                     END IF
 
 *  Create a new Plot that covers just the corresponding Region.
                      CALL AST_GETREGIONBOUNDS( FRM, RLBND, RUBND, 
      :                                         STATUS )
-                     CALL ATL_CUTPL( IPLOT, IFRM, RLBND, RUBND,
+                     CALL ATL_CUTPL( IPLOT2, IFRM, RLBND, RUBND,
      :                               IPLOTR, STATUS )
-
-*  Ensure no title is drawn at the top of the ROI.
-                     CALL AST_SETI( IPLOTR, 'DRAWTITLE', 0, STATUS )
-
-*  Ensure the grid is drawn only if required.
-                     CALL AST_SETL( IPLOTR, 'GRID', GRID, STATUS )
 
 *  Suppress axis labels for all but the first.
                      IF( NREG .GT. 1 ) THEN
                         CALL AST_SETI( IPLOTR, 'TEXTLAB', 0, STATUS )
                         CALL AST_SETI( IPLOTR, 'NUMLAB', 0, STATUS )
-
-*  Record the gaps between major ticks that will be used for the
-*  first ROI.
-                     ELSE
-                        AXGAP1 = AST_GETR( IPLOTR, 'Gap(1)', STATUS )
-                        AXGAP2 = AST_GETR( IPLOTR, 'Gap(2)', STATUS )
                      END IF
-
-*  Ensure the gaps between major ticks are the same as used for the first
-*  ROI.
-                     CALL AST_SETR( IPLOTR, 'Gap(1)', AXGAP1, STATUS )
-                     CALL AST_SETR( IPLOTR, 'Gap(2)', AXGAP2, STATUS )
 
 *  Store the Plot in the returned KeyMap.
                      CALL AST_MAPPUT0A( RPLOTS, IDENT, IPLOTR, ' ', 
@@ -184,9 +203,7 @@
 
          END IF
          CALL AST_ANNUL( FRM, STATUS )
-      END DO
 
-*  Re-instate the original current Frame in the supplied Plot.
-      CALL AST_SETI( IPLOT, 'Current', ICURR, STATUS )
+      END DO
 
       END
