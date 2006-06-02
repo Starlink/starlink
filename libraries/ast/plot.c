@@ -576,8 +576,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *     26-MAY-2006 (DSB)
 *        Added LabelAt to TestAttrib.
 *     2-JUN-2006 (DSB)
-*        In MAKE_GET2, return the set value if a value has been set
+*        - In MAKE_GET2, return the set value if a value has been set
 *        without recalculating the defaults.
+*        - Fix bug that could cause segvio in Grid if clipping is used.
 *class--
 */
 
@@ -16167,15 +16168,15 @@ f        The global status.
    if( !loglabelset[ 0 ] ) astClearLogLabel( this, 0 );
    if( !loglabelset[ 1 ] ) astClearLogLabel( this, 1 );
 
+/* Restore the original value of the Clip attribute. */
+   if( clip != -1 ) astSetClip( this, clip );
+
 /* Free the 2D Plot. */
    this = astAnnul( this );
 
 /* Restore the original value of the flag which says whether graphical 
    escape sequences should be incldued in any returned text strings. */
    astEscapes( escs );
-
-/* Restore the original value of the Clip attribute. */
-   if( clip != -1 ) astSetClip( this, clip );
 
 /* Copy the total bounding box to the box which is returned by
    astBoundingBox. */
