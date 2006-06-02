@@ -571,6 +571,8 @@
 *     2006 June 1 (MJC):
 *        Use KPS1_DISTL to draw title in correct place when ROI Frames
 *        are present.
+*     2-JUN-2006 (DSB):
+*        Modified to use ATL_PLROI.
 *     {enter_further_changes_here}
 
 *-
@@ -606,9 +608,8 @@
 
 *  Local Variables:
       CHARACTER COMP*8          ! Component to be displayed
-      CHARACTER DOM*20          ! Domain attribute for a Frame
       CHARACTER DTYPE*(NDF__SZFTP)! Type of the image after processing 
-      CHARACTER IDENT*20        ! Ident attribute for a Frame
+      CHARACTER IDENT*20       ! Ident attribute for a Frame
       CHARACTER ITYPE*(NDF__SZTYP)! Processing type of the image
       CHARACTER MCOMP*8         ! Component to be mapped
       CHARACTER MODE*20         ! Method for selecting contour heights
@@ -616,18 +617,14 @@
       CHARACTER UNITS*(CUNITS + 5)! Units of the data
       DOUBLE PRECISION BOX( 4 ) ! Bounds of image in pixel co-ordinates
       DOUBLE PRECISION POS( 2 ) ! Label reference position
-      DOUBLE PRECISION RLBND( NDF__MXDIM )! Region lower bounds   
-      DOUBLE PRECISION RUBND( NDF__MXDIM )! Region upper bounds   
       DOUBLE PRECISION XP( 2 )  ! Label text positions
       DOUBLE PRECISION YP( 2 )  ! Label test positions
       INTEGER CNTCLS( MXCONT )  ! No. of closed contours at each height
       INTEGER CNTPEN( MXCONT )  ! Pen index used to draw each contour
       INTEGER DIMS( NDIM )      ! Dimensions of input array
       INTEGER EL                ! Number of elements in the input array
-      INTEGER FRM               ! Pointer to a Frame in Plot
       INTEGER I                 ! General variable
       INTEGER ICURR             ! Index of Current Frame
-      INTEGER IFRM              ! Index of Frame in Plot
       INTEGER IGRID             ! Index of GRID Frame in WCS FrameSet
       INTEGER IGRP              ! GRP id. for pen definitions group
       INTEGER INDF              ! NDF id. for input NDF
@@ -639,16 +636,16 @@
       INTEGER IPLOTK            ! Pointer to AST Plot for KEY picture
       INTEGER IPLOTR            ! Pointer to AST Plot for a ROI
       INTEGER IWCS              ! Pointer to the WCS FrameSet from NDF
-      INTEGER JFRM              ! Index of Frame in Plot
       INTEGER NC                ! Number of characters in NDFNAM
       INTEGER NCONT             ! Number of contour heights
       INTEGER NCU               ! Number of characters in the units
       INTEGER NFRM              ! Frame index increment 
       INTEGER NKP               ! No. of values supplied for KEYPOS
       INTEGER NMARG             ! No. of margin values given
-      INTEGER NREG              ! Number of Regions found so far
+      INTEGER IREG              ! Region index
       INTEGER NVAL              ! No. of parameter values supplied
       INTEGER PNTR              ! Pointer to array data
+      INTEGER RPLOTS            ! KeyMap holding ROI plots
       INTEGER SDIM( NDIM )      ! The significant NDF axes
       INTEGER SLBND( NDIM )     ! Significant lower bounds of the image
       INTEGER SUBND( NDIM )     ! Significant upper bounds of the image
@@ -1013,71 +1010,27 @@
          IDENT = AST_GETC( IPLOT, 'Ident', STATUS )
          IF( IDENT( : 3 ) .EQ. 'ROI' ) THEN
 
-*  Draw a title if required. 
-            CALL KPS1_DISTL( IPLOT, STATUS )
+*  Get an AST KeyMap holding Plots covering the area of each ROI.
+            CALL ATL_PLROI( IPLOT, RPLOTS, STATUS )
 
-*  Ensure a grid is not produced unless explicitly requested (ROI Regions
-*  can produce anomolous bad coords arounds the edges, thus causing the
-*  default value for Grid to become non-zero).
-            IF( .NOT. AST_TEST( IPLOT, 'GRID', STATUS ) ) THEN
-               CALL AST_SETL( IPLOT,' GRID', .FALSE., STATUS )
-            END IF
+*  Get the number of entries in the KeyMap and loop round them all.
+            DO IREG = 1, AST_MAPSIZE( RPLOTS, STATUS )
 
-*  Also ensure no further titles are produced.
-            CALL AST_SETI( IPLOT, 'DRAWTITLE', 0, STATUS )
+*  Get the key with index IREG, and get a pointer to the Plot stored in
+*  the KeyMap with that key. Only proceed if the key is found (which is
+*  will be).
+               IF( AST_MAPGET0A( RPLOTS, AST_MAPKEY( RPLOTS, IREG,
+     :                                               STATUS ),
+     :                           IPLOTR, STATUS ) ) THEN
 
-*  Loop round all Frames in the Plot. 
-            NREG = 0
-            NFRM = AST_GETI( IPLOT, 'NFRAME', STATUS )
-            DO IFRM = 1, NFRM
-               FRM = AST_GETFRAME( IPLOT, IFRM, STATUS )
-
-*  Pass on unless this Frame is a Region with a Domain that begins with
-*  "ROI"
-               IF( AST_ISAREGION( FRM, STATUS ) )  THEN         
-                  DOM = AST_GETC( FRM, 'Domain', STATUS )
-                  IF( DOM( : 3 ) .EQ. 'ROI' ) THEN
-                     NREG = NREG + 1
-
-*  Attempt to locate a Frame that has the same value for its Ident
-*  attribute, making it the current Frame in the Plot.
-                     DO JFRM = 1, NFRM
-                        CALL AST_SETI( IPLOT, 'Current', JFRM, STATUS )
-                        IDENT = AST_GETC( IPLOT, 'Ident', STATUS )
-                        IF( IDENT .EQ. DOM ) THEN
-
-*  Create a new Plot that covers just the corresponding Region.
-                           CALL AST_GETREGIONBOUNDS( FRM, RLBND, RUBND, 
-     :                                           STATUS )
-                           CALL KPG1_ASCPL( IPLOT, IFRM, RLBND, RUBND,
-     :                                      IPLOTR, STATUS )
-
-*  Draw the axes grid if required, supressing axis labels and title for 
-*  all but the first.
-                           IF( NREG .GT. 1 ) THEN
-                              CALL AST_SETI( IPLOTR, 'TEXTLAB', 0, 
-     :                                       STATUS )
-                              CALL AST_SETI( IPLOTR, 'NUMLAB', 0, 
-     :                                       STATUS )
-                              CALL AST_SETI( IPLOTR, 'DRAWTITLE', 0, 
-     :                                       STATUS )
-                           END IF
-                           CALL KPG1_ASGRD( IPLOTR, IPICF, .TRUE., 
-     :                                      STATUS )
-
-*  Free the temporary Plot
-                           CALL AST_ANNUL( IPLOTR, STATUS )
-
-                        END IF
-                     END DO
-
-                  END IF
+*  Draw the Annotated axes, and annul the Plot pointer.
+                  CALL KPG1_ASGRD( IPLOTR, IPICF, .TRUE., STATUS )
+                  CALL AST_ANNUL( IPLOTR, STATUS )
 
                END IF
-               CALL AST_ANNUL( FRM, STATUS )
             END DO
 
-*  If there are no ROI Frames, just draw the grid over the wholePlot.
+*  If there are no ROI Frames, just draw the grid over the whole Plot.
          ELSE
             CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
          END IF
