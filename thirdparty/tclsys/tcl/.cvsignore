@@ -7,12 +7,17 @@ autom4te.cache
 componentinfo.dtd
 config.log
 config.status
+configure-output.log
+configure-output.log.err
 libtool
 .libs
 *.m4
 install-manifest.xml
 starconf.status.local
+starconf.status
 stamp-h1
 make.log
+make.config
+make.log.err
 .deps
 
