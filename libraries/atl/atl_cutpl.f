@@ -126,13 +126,14 @@
       GBOX( 4 ) = REAL( BBOX( 4 ) )      
       IPLOT2 = AST_PLOT( IPLOT1, GBOX, BBOX, ' ', STATUS )
 
-*  Remove the unnecessary GRAPHICS Frame inherited from IPLOT1. It'sindex
+*  Remove the unnecessary GRAPHICS Frame inherited from IPLOT1. It's index
 *  number within IPLOT2 will be one more than its index number in IPLOT1.
       CALL AST_REMOVEFRAME( IPLOT2, 
      :                      AST_GETI( IPLOT1, 'Base', STATUS ) + 1,
      :                      STATUS )
 
-*  Copy the public attributes from IPLOT1 to IPLOT2.
-      CALL ATL_CPPLA( IPLOT1, IPLOT2, STATUS )
+*  Assign values to the public attributes of IPLOT2, copying them
+*  (whether default or user-supplied) from IPLOT1.
+      CALL ATL_CPPLA( IPLOT1, IPLOT2, .TRUE., STATUS )
 
       END

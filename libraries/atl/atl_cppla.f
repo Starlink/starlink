@@ -1,4 +1,4 @@
-      SUBROUTINE ATL_CPPLA( IPLOT1, IPLOT2, STATUS )
+      SUBROUTINE ATL_CPPLA( IPLOT1, IPLOT2, FIXATE, STATUS )
 *+
 *  Name:
 *     ATL_CPPLA
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ATL_CPPLA( IPLOT1, IPLOT2, STATUS )
+*     CALL ATL_CPPLA( IPLOT1, IPLOT2, FIXATE, STATUS )
 
 *  Description:
 *     This routine copies all public attribute values from one AST Plot to
@@ -22,6 +22,11 @@
 *        The source Plot.
 *     IPLOT2 = INTEGER (Given)
 *        The destination Plot.
+*     FIXATE = LOGICAL (Given)
+*        If .FALSE., then attribute values are only set in IPLOT2 if they
+*        have been assigned an explicit value (i.e. are not defaulted) in 
+*        IPLOT1. If .TRUE., then values are set explicitly in IPLOT2 whether 
+*        they are default values or not.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -69,6 +74,7 @@
 *  Arguments Given:
       INTEGER IPLOT1
       INTEGER IPLOT2
+      LOGICAL FIXATE
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -159,11 +165,12 @@
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Copy the values of all unqualified attribute that have been explicitly
-*  assigned a value. Ensure attributes that are unset in IPLOT1 are also
-*  unset in IPLOT2.
+*  Copy the values of all unqualified attribute. Unless FIXATE is .TRUE.,
+*  only those attributes that have explicitly been assigned a value are 
+*  copied (in which case we ensure attributes that are unset in IPLOT1 
+*  are also unset in IPLOT2).
       DO I = 1, NUATTR
-         IF( AST_TEST( IPLOT1, UNAME( I ), STATUS ) ) THEN 
+         IF( FIXATE .OR. AST_TEST( IPLOT1, UNAME( I ), STATUS ) ) THEN 
             CALL AST_SETC( IPLOT2, UNAME( I ), 
      :                     AST_GETC( IPLOT1, UNAME( I ), STATUS ),
      :                     STATUS )
@@ -178,7 +185,7 @@
          IAT = CHR_LEN( ATTR ) + 1
 
          ATTR( IAT : ) = '(1)'
-         IF( AST_TEST( IPLOT1, ATTR, STATUS ) ) THEN
+         IF( FIXATE .OR. AST_TEST( IPLOT1, ATTR, STATUS ) ) THEN
             CALL AST_SETC( IPLOT2, ATTR, 
      :                     AST_GETC( IPLOT1, ATTR, STATUS ),
      :                     STATUS )
@@ -187,7 +194,7 @@
          END IF
 
          ATTR( IAT : ) = '(2)'
-         IF( AST_TEST( IPLOT1, ATTR, STATUS ) ) THEN
+         IF( FIXATE .OR. AST_TEST( IPLOT1, ATTR, STATUS ) ) THEN
             CALL AST_SETC( IPLOT2, ATTR, 
      :                     AST_GETC( IPLOT1, ATTR, STATUS ),
      :                     STATUS )
@@ -204,7 +211,7 @@
 
          DO J = 1, NELEM
             ATTR( IAT : ) = ELEM( J )
-            IF( AST_TEST( IPLOT1, ATTR, STATUS ) ) THEN
+            IF( FIXATE .OR. AST_TEST( IPLOT1, ATTR, STATUS ) ) THEN
                CALL AST_SETC( IPLOT2, ATTR, 
      :                        AST_GETC( IPLOT1, ATTR, STATUS ),
      :                        STATUS )
