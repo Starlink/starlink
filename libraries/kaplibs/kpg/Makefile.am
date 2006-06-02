@@ -136,8 +136,6 @@ icmmm.f \
 inset.f \
 kpg1_abset.f \
 kpg1_arcol.f \
-kpg1_ascpa.f \
-kpg1_ascpl.f \
 kpg1_asdis.f \
 kpg1_asdsv.f \
 kpg1_asffr.f \
