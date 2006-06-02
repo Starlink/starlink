@@ -170,9 +170,6 @@
                      CALL AST_SETR( IPLOTR, 'Gap(1)', AXGAP1, STATUS )
                      CALL AST_SETR( IPLOTR, 'Gap(2)', AXGAP2, STATUS )
 
-             call ast_grid( iplotr, status )
-
-
 *  Store the Plot in the returned KeyMap.
                      CALL AST_MAPPUT0A( RPLOTS, IDENT, IPLOTR, ' ', 
      :                                  STATUS )
