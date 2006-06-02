@@ -73,9 +73,6 @@
 #include <stdio.h>
 #include <string.h>
 
-/* GSL includes */
-#include <gsl/gsl_statistics_double.h>
-
 /* Starlink includes */
 #include "sae_par.h"
 #include "ast.h"
