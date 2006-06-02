@@ -18,4 +18,6 @@ starmem_link
 Makefile
 Makefile.in
 configure
+make.log
+make.log.err
 
