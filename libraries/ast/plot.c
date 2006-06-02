@@ -575,6 +575,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        clipping frame.
 *     26-MAY-2006 (DSB)
 *        Added LabelAt to TestAttrib.
+*     2-JUN-2006 (DSB)
+*        In MAKE_GET2, return the set value if a value has been set
+*        without recalculating the defaults.
 *class--
 */
 
@@ -1189,7 +1192,7 @@ static void SetUsed##attr( AstPlot *this, int axis, type value ) { \
 *     Protected macro.
 
 *  Synopsis:
-*     MAKE_GET2(class,attribute,type,bad_value,assign)
+*     MAKE_GET2(class,attr,type,bad_value,assign)
 
 *  Class Membership:
 *     Defined by the Plot class.
@@ -1198,7 +1201,7 @@ static void SetUsed##attr( AstPlot *this, int axis, type value ) { \
 *     This macro expands to an implementation of a private member function of
 *     the form:
 *
-*        static <Type> Get<Attribute>( Ast<Class> *this )
+*        static <Type> GetUsed<Attr>( Ast<Class> *this )
 *
 *     which implement a method for getting a specified attribute value for a
 *     class. Note, no public interface function is created.
@@ -1211,9 +1214,10 @@ static void SetUsed##attr( AstPlot *this, int axis, type value ) { \
 *  Parameters:
 *     class
 *        The name (not the type) of the class to which the attribute belongs.
-*     attribute
+*     attr
 *        The name of the attribute whose value is to be obtained, as it
-*        appears in the function name (e.g. Label in "astGetLabel").
+*        appears in the function name (e.g. Label in "astGetLabel"). The
+*        string "Used" is added on to the front of the supplied value.
 *     type
 *        The C type of the attribute.
 *     bad_value
@@ -1229,27 +1233,33 @@ static void SetUsed##attr( AstPlot *this, int axis, type value ) { \
 */
 
 /* Define the macro. */
-#define MAKE_GET2(class,attribute,type,bad_value,assign) \
+#define MAKE_GET2(class,attr,type,bad_value,assign) \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static type Get##attribute( Ast##class * ); \
-static type Get##attribute( Ast##class *this ) { \
-   type result;                  /* Result to be returned */ \
+static type GetUsed##attr( Ast##class * ); \
+static type GetUsed##attr( Ast##class *this ) { \
+   type result;               /* Result to be returned */ \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return (bad_value); \
 \
-/* Re-calculate dynamic defaults by going through the motions of drawing \
-   the grid. Nothing is actually drawn because we set the protected \
+/* If the attribute is set, use its normal accessor. */\
+   if( astTest##attr( this ) ) {\
+      result = astGet##attr( this );\
+\
+/* Otherwise, re-calculate dynamic defaults by going through the motions of \
+   drawing the grid. Nothing is actually drawn because we set the protected \
    attribute Ink to zero first. The calculated values are stored in the \
    Plot structure. */ \
-   astSetInk( this, 0 ); \
-   astGrid( this ); \
-   astClearInk( this ); \
+   } else { \
+      astSetInk( this, 0 ); \
+      astGrid( this ); \
+      astClearInk( this ); \
 \
 /* Assign the result value. */ \
-   result = (assign); \
+      result = (assign); \
+   } \
 \
 /* Check for errors and clear the result if necessary. */ \
    if ( !astOK ) result = (bad_value); \
@@ -1273,7 +1283,7 @@ static type Get##attribute( Ast##class *this ) { \
 *     Protected macro.
 
 *  Synopsis:
-*     MAKE_SET2(class,attribute,type,component,assign)
+*     MAKE_SET2(class,attr,type,component,assign)
 
 *  Class Membership:
 *     Defined by the Plot class.
@@ -1282,7 +1292,7 @@ static type Get##attribute( Ast##class *this ) { \
 *     This macro expands to an implementation of a private member function of
 *     the form:
 *
-*        static void Set<Attribute>( Ast<Class> *this, <Type> value )
+*        static void SetUsed<Attr>( Ast<Class> *this, <Type> value )
 *
 *     which implements a method for setting a specified attribute value for a
 *     class.
@@ -1290,9 +1300,10 @@ static type Get##attribute( Ast##class *this ) { \
 *  Parameters:
 *      class
 *         The name (not the type) of the class to which the attribute belongs.
-*      attribute
+*      attr
 *         The name of the attribute to be set, as it appears in the function
-*         name (e.g. Label in "astSetLabel").
+*         name (e.g. Label in "astSetLabel"). The string "Used" is added
+*         to the front.
 *      type
 *         The C type of the attribute.
 *      component
@@ -1309,12 +1320,12 @@ static type Get##attribute( Ast##class *this ) { \
 */
 
 /* Define the macro. */
-#define MAKE_SET2(class,attribute,type,component,assign) \
+#define MAKE_SET2(class,attr,type,component,assign) \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static void Set##attribute( Ast##class *, type ); \
-static void Set##attribute( Ast##class *this, type value ) { \
+static void SetUsed##attr( Ast##class *, type ); \
+static void SetUsed##attr( Ast##class *this, type value ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -1923,8 +1934,8 @@ astMAKE_GET(Plot,Grid,int,0,(this->grid == -1 ? 0 : this->grid))
 astMAKE_SET(Plot,Grid,int,grid,( value ? 1 : 0 ))
 astMAKE_TEST(Plot,Grid,( this->grid != -1 ))
 
-MAKE_GET2(Plot,UsedGrid,int,0,this->ugrid)
-MAKE_SET2(Plot,UsedGrid,int,ugrid,( value ? 1 : 0 ))
+MAKE_GET2(Plot,Grid,int,0,this->ugrid)
+MAKE_SET2(Plot,Grid,int,ugrid,( value ? 1 : 0 ))
 
 /* Invisible. */
 /* ---------- */
@@ -2059,8 +2070,8 @@ astMAKE_SET(Plot,Border,int,border,( value ? 1 : 0 ))
 astMAKE_TEST(Plot,Border,( this->border != -1 ))
 astMAKE_GET(Plot,Border,int,1,(this->border == -1 ? 1 : this->border))
 
-MAKE_SET2(Plot,UsedBorder,int,uborder,( value ? 1 : 0 ))
-MAKE_GET2(Plot,UsedBorder,int,1,this->uborder)
+MAKE_SET2(Plot,Border,int,uborder,( value ? 1 : 0 ))
+MAKE_GET2(Plot,Border,int,1,this->uborder)
 
 /* Clip */
 /* ---- */
@@ -3123,8 +3134,8 @@ astMAKE_SET(Plot,Labelling,int,labelling,(value?1:0))
 astMAKE_TEST(Plot,Labelling,( this->labelling != -9999 ))
 astMAKE_GET(Plot,Labelling,int,0,(this->labelling == -9999 ? 0 : this->labelling))
 
-MAKE_SET2(Plot,UsedLabelling,int,ulbling,(value?1:0))
-MAKE_GET2(Plot,UsedLabelling,int,0,this->ulbling)
+MAKE_SET2(Plot,Labelling,int,ulbling,(value?1:0))
+MAKE_GET2(Plot,Labelling,int,0,this->ulbling)
 
 /* Edge. */
 /* ----- */
