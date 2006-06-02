@@ -1,0 +1,11 @@
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+config.log
+config.status
+configure
+configure-output.log
+configure-output.log.err
+make.log
+make.log.err

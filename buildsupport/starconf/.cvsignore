@@ -1,0 +1,16 @@
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+bootstrap.installed
+config.log
+config.status
+configure
+configure-output.log
+make.log
+make.log.err
+starconf
+starconf-deinstall
+starconf-finder
+starconf-validate
+starconf.m4
