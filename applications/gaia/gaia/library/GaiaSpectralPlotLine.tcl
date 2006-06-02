@@ -165,8 +165,10 @@ itcl::class gaia::GaiaSpectralPlotLine {
       set coord [$itk_option(-gaiacube) get_coord $plane 1 0]
       $itk_component(indexcoord) configure -value $coord
 
-      #  Reposition a related reference line in a spectral plot.
+      #  Reposition a related reference line in a spectral plot. Note this
+      #  must be unformatted.
       if { $itk_option(-show_ref_line) } {
+         set coord [$itk_option(-gaiacube) get_coord $plane 0 0]
          $itk_option(-gaiacube) set_spec_ref_coord $itk_option(-ref_id) $coord
       }
    }

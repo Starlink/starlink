@@ -198,8 +198,11 @@ itcl::class gaia::GaiaSpectralPlotRange {
       $itk_component(indexcoord1) configure -value $coord1
       $itk_component(indexcoord2) configure -value $coord2
 
-      #  Reposition a related reference range in a spectral plot.
+      #  Reposition a related reference range in a spectral plot. Note these
+      #  coordinates must be unformatted.
       if { $itk_option(-show_ref_range) } {
+         set coord1 [$itk_option(-gaiacube) get_coord $plane1 0 0]
+         set coord2 [$itk_option(-gaiacube) get_coord $plane2 0 0]
          $itk_option(-gaiacube) set_spec_ref_range_coord $itk_option(-ref_id) \
             $coord1 $coord2
       }
@@ -248,7 +251,7 @@ itcl::class gaia::GaiaSpectralPlotRange {
    itk_option define -to to To 100 {
       if { [info exists itk_component(index1)] } {
          $itk_component(index1) configure -to $itk_option(-to)
-         $itk_component(index1) configure -to $itk_option(-to)
+         $itk_component(index2) configure -to $itk_option(-to)
       }
    }
 
