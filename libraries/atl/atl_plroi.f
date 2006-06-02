@@ -153,13 +153,14 @@
 *  Ensure the grid is drawn only if required.
                      CALL AST_SETL( IPLOTR, 'GRID', GRID, STATUS )
 
-*  Supres axis labels for all but the first.
+*  Suppress axis labels for all but the first.
                      IF( NREG .GT. 1 ) THEN
                         CALL AST_SETI( IPLOTR, 'TEXTLAB', 0, STATUS )
                         CALL AST_SETI( IPLOTR, 'NUMLAB', 0, STATUS )
 
-*  Also, record the gaps between major ticks that will be used for the
+*  Record the gaps between major ticks that will be used for the
 *  first ROI.
+                     ELSE
                         AXGAP1 = AST_GETR( IPLOTR, 'Gap(1)', STATUS )
                         AXGAP2 = AST_GETR( IPLOTR, 'Gap(2)', STATUS )
                      END IF
@@ -168,6 +169,9 @@
 *  ROI.
                      CALL AST_SETR( IPLOTR, 'Gap(1)', AXGAP1, STATUS )
                      CALL AST_SETR( IPLOTR, 'Gap(2)', AXGAP2, STATUS )
+
+             call ast_grid( iplotr, status )
+
 
 *  Store the Plot in the returned KeyMap.
                      CALL AST_MAPPUT0A( RPLOTS, IDENT, IPLOTR, ' ', 
