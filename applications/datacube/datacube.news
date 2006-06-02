@@ -25,12 +25,12 @@ The following applications have been modified:
    o  multistack and stacker plot ordinate limits now always
    make visible all the spectra, regardless of the chosen offset.
 
-   o  peakmap now has -c option to specify the number of contour 
-   levels to plot; this may be zero to prevent contours be overlaid. 
-
    o  passband  does not dump WCS mappings in NDFCOPY.  Ensured that 
    the plots of spectra use the axis co-ordinate system.  Removed 
    unused -r option.
+
+   o  peakmap now has -c option to specify the number of contour 
+   levels to plot; this may be zero to prevent contours be overlaid. 
 
    o  step now plots the image slices in an optimally shaped grid
    rather than full size in quick succession, and thereby permits
