@@ -1486,9 +1486,16 @@ $(MANIFESTS)/period: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
+		$(MANIFESTS)/fio \
+		$(MANIFESTS)/gks \
+		$(MANIFESTS)/gns \
+		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/pgplot \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/pgp \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
