@@ -8,3 +8,4 @@ runtcl.static
 runwishx
 runwishx.standalone
 runwishx.static
+tclxConfig.sh
