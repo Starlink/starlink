@@ -12,11 +12,14 @@
 
 *  Authors:
 *     DSB: David S Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     26-MAY-2006 (DSB):
 *        Original version.
+*     02-JUN-2006 (TIMJ):
+*        Include prototypes.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -45,6 +48,7 @@
 /* ============= */
 #include "f77.h"                 
 #include "ast.h"
+#include "atl.h"
 
 /* Wrapper function implementations. */
 /* ================================= */
