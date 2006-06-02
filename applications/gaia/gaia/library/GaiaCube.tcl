@@ -89,6 +89,7 @@ itcl::class gaia::GaiaCube {
       eval itk_initialize $args
 
       set lwidth 20
+      set vwidth 20
 
       #  Set window properties.
       wm protocol $w_ WM_DELETE_WINDOW [code $this close]
@@ -208,17 +209,16 @@ itcl::class gaia::GaiaCube {
             -show_type 1 \
             -show_ref_line 1 \
             -labelwidth $lwidth \
-            -valuewidth 20 \
-            -coord_update_cmd [code $this set_display_plane_] \
-            -drag_update_cmd [code $this update_wcs_]
+            -valuewidth $vwidth \
+            -coord_update_cmd [code $this set_display_plane] \
+            -drag_update_cmd [code $this update_wcs]
       }
       set ref_line_controls_(1) $itk_component(index)
       pack $itk_component(index) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(index) \
          {Index of the image plane to display (along current axis)}
 
-      #  Add tab window for choosing either the animation or collapse
-      #  controls.
+      #  Add tab window for choosing either the helper controls.
       itk_component add tabnotebook {
          iwidgets::tabnotebook $w_.tab \
             -angle 0 -tabpos n -width 350 -height 350
@@ -231,6 +231,9 @@ itcl::class gaia::GaiaCube {
       $itk_component(tabnotebook) add -label Collapse
       set collapseTab [$itk_component(tabnotebook) childsite 1]
 
+      $itk_component(tabnotebook) add -label Chanmap
+      set chanmapTab [$itk_component(tabnotebook) childsite 2]
+
       #  Animation section.
       #
       #  Choose upper and lower limits, and type of animation.
@@ -239,141 +242,18 @@ itcl::class gaia::GaiaCube {
       }
       pack $itk_component(aruler) -side top -fill x
 
-      #  Whether to show the reference lines on the plot.
-      itk_component add showanlines {
-         StarLabelCheck $animationTab.showlines \
-            -text "Show limits on plot:" \
-            -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
-            -variable [scope show_animation_range_] \
-            -command [code $this toggle_show_animation_range_]
-      }
-      pack $itk_component(showanlines) -side top -fill x -ipadx 1m -ipady 2m
-      add_short_help $itk_component(showanlines) \
-         {Show extent of animation on plot with reference lines}
-
-      itk_component add anibounds {
-         GaiaSpectralPlotRange $animationTab.bounds \
+      itk_component add animation {
+         GaiaCubeAnimation $animationTab.animation \
             -gaiacube [code $this] \
             -ref_id 1 \
-            -text1 {Lower index:} \
-            -text2 {Upper index:} \
-            -value1 $plane_ \
-            -value2 $plane_ \
-            -show_ref_range $show_animation_range_ \
+            -lower_bound $plane_ \
+            -upper_bound $plane_ \
+            -show_ref_range 0 \
             -labelwidth $lwidth \
-            -valuewidth 20 \
-            -coord_update_cmd [code $this set_animate_bounds_] \
+            -valuewidth $vwidth
       }
-      set ref_range_controls_(1) $itk_component(anibounds)
-      pack $itk_component(anibounds) -side top -fill x -ipadx 1m -ipady 2m
-      add_short_help $itk_component(anibounds) \
-         {Lower and upper indices used during animation}
-
-      #  Delay used in animation.
-      itk_component add delay {
-         LabelEntryScale $animationTab.delay \
-            -text {Delay (milli):} \
-            -value $itk_option(-delay) \
-            -labelwidth $lwidth \
-            -valuewidth 20 \
-            -from 10 \
-            -to 1000 \
-            -increment 10 \
-            -resolution 10 \
-            -show_arrows 1 \
-            -anchor w \
-            -delay 25 \
-            -command [code $this set_delay_]
-      }
-      pack $itk_component(delay) -side top -fill x -ipadx 1m -ipady 2m
-      add_short_help $itk_component(delay) \
-         {Delay used during animation in milliseconds}
-
-      #  Step between planes.
-      itk_component add step {
-         LabelEntryScale $animationTab.step \
-            -text {Step:} \
-            -value $itk_option(-step) \
-            -labelwidth $lwidth \
-            -valuewidth 20 \
-            -from 1 \
-            -to 100 \
-            -increment 2 \
-            -resolution 1 \
-            -show_arrows 1 \
-            -anchor w \
-            -delay 25 \
-            -command [code $this set_step_]
-      }
-      pack $itk_component(step) -side top -fill x -ipadx 1m -ipady 2m
-      add_short_help $itk_component(step) \
-         {Step between frames of animation}
-
-      #  Looping behaviour.
-      itk_component add loopframe {
-         frame $animationTab.frame
-      }
-      itk_component add looplabel {
-         label $itk_component(loopframe).label \
-            -text "Looping:" \
-            -width 21 \
-            -anchor w
-      }
-      pack $itk_component(looplabel) -side left -fill none
-
-      itk_component add loopoff {
-         radiobutton $itk_component(loopframe).noloop \
-            -text "Off" \
-            -variable [scope loop_] \
-            -value "off"
-      }
-      pack $itk_component(loopoff) -side left -fill none
-      add_short_help $itk_component(loopoff) \
-         {Looping of animation off}
-
-      itk_component add loopon {
-         radiobutton $itk_component(loopframe).loopon \
-            -text "On" \
-            -variable [scope loop_] \
-            -value "on"
-      }
-      pack $itk_component(loopon) -side left -fill none
-      add_short_help $itk_component(loopon) \
-         {Looping on, restarts from beginning when at end}
-
-      itk_component add looprocknroll {
-         radiobutton $itk_component(loopframe).rocknroll \
-            -text "Rock 'n Roll" \
-            -variable [scope loop_] \
-            -value "rocknroll"
-      }
-      pack $itk_component(looprocknroll) -side left -fill none
-      add_short_help $itk_component(looprocknroll) \
-         {Looping on, goes into reverse when at end}
-
-      pack $itk_component(loopframe) -side top -fill x -ipadx 1m -ipady 2m
-
-
-      #  Animation stop and start.
-      itk_component add animation {
-         frame $animationTab.animation
-      }
+      set ref_range_controls_(1) $itk_component(animation)
       pack $itk_component(animation) -side top -fill x -ipadx 1m -ipady 2m
-
-      itk_component add stop {
-         button $itk_component(animation).stop -text Stop \
-            -command [code $this stop_]
-      }
-      pack $itk_component(stop) -side right -expand 1 -pady 3 -padx 3
-      add_short_help $itk_component(stop) {Stop animation}
-
-      itk_component add start {
-         button $itk_component(animation).start -text Start \
-            -command [code $this start_]
-      }
-      pack $itk_component(start) -side right -expand 1 -pady 3 -padx 3
-      add_short_help $itk_component(start) {Start animation}
 
       #  Collapse section.
       #
@@ -383,62 +263,38 @@ itcl::class gaia::GaiaCube {
       }
       pack $itk_component(cruler) -side top -fill x
 
-      #  Whether to show the reference lines on the plot.
-      itk_component add showcollines {
-         StarLabelCheck $collapseTab.showlines \
-            -text "Show limits on plot:" \
-            -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
-            -variable [scope show_collapse_range_] \
-            -command [code $this toggle_show_collapse_range_]
-      }
-      pack $itk_component(showcollines) -side top -fill x -ipadx 1m -ipady 2m
-      add_short_help $itk_component(showcollines) \
-         {Show extent of collapse on plot with reference lines}
-
-      itk_component add colbounds {
-         GaiaSpectralPlotRange $collapseTab.bounds \
+      itk_component add collapse {
+         GaiaCubeCollapse $collapseTab.collapse \
             -gaiacube [code $this] \
             -ref_id 2 \
-            -text1 {Lower index:} \
-            -text2 {Upper index:} \
-            -value1 $plane_ \
-            -value2 $plane_ \
-            -show_ref_range $show_collapse_range_ \
+            -lower_bound $plane_ \
+            -upper_bound $plane_ \
+            -show_ref_range 0 \
             -labelwidth $lwidth \
-            -valuewidth 20 \
-            -coord_update_cmd [code $this set_collapse_bounds_]
+            -valuewidth $vwidth
       }
-      set ref_range_controls_(2) $itk_component(colbounds)
-      pack $itk_component(colbounds) -side top -fill x -ipadx 1m -ipady 2m
-      add_short_help $itk_component(colbounds) \
-         {Lower and upper indices used for creating collapsed image}
+      set ref_range_controls_(2) $itk_component(collapse)
+      pack $itk_component(collapse) -side top -fill x -ipadx 1m -ipady 2m
 
-      #  Method used for collapse.
-      itk_component add combination {
-         LabelMenu $collapseTab.cattype \
+      #  Chanmap section.
+
+      itk_component add chanmapruler {
+         LabelRule $chanmapTab.chanmapruler -text "Channel map controls:"
+      }
+      pack $itk_component(chanmapruler) -side top -fill x
+
+      itk_component add chanmap {
+         GaiaCubeChanmap $chanmapTab.chanmap \
+            -gaiacube [code $this] \
+            -ref_id 3 \
+            -lower_bound $plane_ \
+            -upper_bound $plane_ \
+            -show_ref_range 0 \
             -labelwidth $lwidth \
-            -text "Combination method:" \
-            -variable [scope combination_type_]
+            -valuewidth $vwidth
       }
-      pack $itk_component(combination) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(combination) \
-         {Method to use when combining data, use median with care}
-
-      foreach {sname lname} $estimators_ {
-            $itk_component(combination) add \
-               -label $lname \
-               -value $sname \
-               -command [code $this set_combination_type_ $sname]
-      }
-
-      itk_component add collapse {
-         button $collapseTab.collapse -text Collapse \
-            -command [code $this collapse_]
-      }
-      pack $itk_component(collapse) -side top -expand 1 -pady 3 -padx 3
-      add_short_help $itk_component(collapse) \
-         {Display the combined image collapsed along the range}
+      set ref_range_controls_(3) $itk_component(chanmap)
+      pack $itk_component(chanmap) -side top -fill x -ipadx 1m -ipady 2m
 
       #  Close window.
       itk_component add close {
@@ -467,15 +323,6 @@ itcl::class gaia::GaiaCube {
          catch {::file delete $section_name_} msg
       }
 
-      #  Stop animation.
-      stop_
-
-      #  Release collapser task.
-      if { $collapser_ != {} } {
-         catch {$collapser_ delete_sometime}
-         set collapser_ {}
-      }
-
       #  Close spectrum plot.
       if { $spectrum_ != {} && [winfo exists $spectrum_] } {
          $spectrum_ close
@@ -495,7 +342,6 @@ itcl::class gaia::GaiaCube {
    #  Close window. If image is being replaced set dispsection false to
    #  avoid the section being loaded.
    public method close {} {
-      stop_
       wm withdraw $w_
 
       if { $spectrum_ != {} && [winfo exists $spectrum_] } {
@@ -510,6 +356,8 @@ itcl::class gaia::GaiaCube {
          set ref_position_mark_ {}
       }
       remove_spectral_bindings_
+
+      $itk_component(animation) stop
    }
 
    #  Open the chosen file as a cube.
@@ -529,13 +377,13 @@ itcl::class gaia::GaiaCube {
          #  Allow fourth dimension, as long as it is redundant.
          if { $ndims == 4 } {
             if { [expr [lindex $bounds_ 7] - [lindex $bounds_ 6]] == 0 } {
-               set close_section_ ",1)"
+               set_close_section_ ",1)"
                set bounds_ [lrange $bounds_ 0 5]
                set ndims 3
             }
          } else {
             #  Sections just close with parenthesis.
-            set close_section_ ")"
+            set_close_section_ ")"
          }
          if { $ndims != 3 } {
             error_dialog \
@@ -601,16 +449,9 @@ itcl::class gaia::GaiaCube {
             $itk_component(index) configure -value $plane_min_
          }
 
-         $itk_component(anibounds) configure -from $plane_min_ -to $plane_max_
-         $itk_component(colbounds) configure -from $plane_min_ -to $plane_max_
-
-         $itk_component(anibounds) configure \
-            -value1 $plane_min_ -value2 $plane_max_
-         set_animate_bounds_ $plane_min_ $plane_max_
-
-         $itk_component(colbounds) configure \
-            -value1 $plane_min_ -value2 $plane_max_
-         set_collapse_bounds_ $plane_min_ $plane_max_
+         $itk_component(animation) set_bounds $plane_min_ $plane_max_
+         $itk_component(collapse) set_bounds $plane_min_ $plane_max_
+         $itk_component(chanmap) set_bounds $plane_min_ $plane_max_
 
          #  Update the display of label and units in index component.
          $itk_component(index) update_coords_type $plane_
@@ -621,7 +462,7 @@ itcl::class gaia::GaiaCube {
          #  Set an initial plane, if requested.
          if { $setplane } {
             set plane_ $plane_min_
-            set_display_plane_ [expr ($plane_max_ + $plane_min_)/2] 1
+            set_display_plane [expr ($plane_max_ + $plane_min_)/2] 1
          } else {
             #  Otherwise update the displayed coordinate for the plane.
             $itk_component(index) configure -value $plane_
@@ -646,7 +487,7 @@ itcl::class gaia::GaiaCube {
 
    #  Set the plane to display and display it. When regen is true a new
    #  image NDF is displayed, otherwise just the NDF image data is updated.
-   protected method set_display_plane_ { newvalue {regen 0} } {
+   public method set_display_plane { newvalue {regen 0} } {
 
       #  Do nothing, if the plane remains the same.
       if { $newvalue == $plane_ || $ndfname_ == {} } {
@@ -680,7 +521,7 @@ itcl::class gaia::GaiaCube {
          $imageaccessor close
 
          #  Display this for the first time.
-         display_ $section_name_ 0
+         display $section_name_ 0
 
          #  Now delete old image slice (waited until released).
          if { $oldname != {} } {
@@ -781,36 +622,30 @@ itcl::class gaia::GaiaCube {
       set coord1 [axis_grid2pixel_ $coord1]
       set coord2 [axis_grid2pixel_ $coord2]
 
-      #  Apply value to the right control, but avoiding new actions being
-      #  triggered, unless this is release when we want to reposition to the
-      #  exact control feedback.
-      if { $action == "move" } {
-         set oldvalue [$ref_range_controls_($id) cget -show_ref_range]
-         $ref_range_controls_($id) configure -show_ref_range 0
-      }
-      $ref_range_controls_($id) configure -value1 $coord1 -value2 $coord2
+      #  Set the limits of the control and get it to configure itself.
+      $ref_range_controls_($id) configure \
+         -lower_bound $coord1 -upper_bound $coord2
 
-      #  And get the associated action to run.
-      eval [$ref_range_controls_($id) cget -coord_update_cmd] $coord1 $coord2
-
-      #  If action is released also do the drag_update_cmd.
-      if { $action == "released" } {
-         eval [$ref_range_controls_($id) cget -drag_update_cmd]
-      }
-      if { $action == "move" } {
-         $ref_range_controls_($id) configure -show_ref_range $oldvalue
-      }
+      $ref_range_controls_($id) ref_range_moved $coord1 $coord2 $action
    }
 
    #  Update the dummy NDF WCS so that it matches the current spectral
    #  coordinates. This should be done only when necessary (end of animation,
    #  slice slider drag etc.).
-   public method update_wcs_ {} {
+   public method update_wcs {} {
       set index [axis_pixel2grid_ $plane_]
       set frameset [$cubeaccessor_ getimagewcs $axis_ $index]
       if { $frameset != 0 } {
          $itk_option(-rtdimage) astreplace $frameset
       }
+   }
+
+   #  Set the characters used to close an NDF section. Pass on to other
+   #  objects with an interest (those that use NDF sections).
+   protected method set_close_section_ {value} {
+      set close_section_ $value
+      $itk_component(collapse) configure -close_section $value
+      $itk_component(chanmap) configure -close_section $value
    }
 
    #  Create a description of the slice. Note use short name so should
@@ -827,17 +662,11 @@ itcl::class gaia::GaiaCube {
    }
 
    #  Display an image.
-   protected method display_ {name {istemp 0} } {
+   public method display {name {istemp 0} } {
       $itk_option(-gaia) configure -check_for_cubes 0
       $itk_option(-gaia) open $name
       $itk_option(-gaia) configure -temporary $istemp
       $itk_option(-gaia) configure -check_for_cubes $check_for_cubes_
-   }
-
-   #  Set the animation bounds.
-   protected method set_animate_bounds_ {bound1 bound2} {
-      set lower_animate_bound_ $bound1
-      set upper_animate_bound_ $bound2
    }
 
    #  Get the coordinate of an index along the current axis.
@@ -856,155 +685,6 @@ itcl::class gaia::GaiaCube {
          set coord [$cubeaccessor_ getcoord $axis_ $section $formatted $trail]
       }
       return $coord
-   }
-
-   #  Start the animation.
-   protected method start_ {} {
-      set initial_seconds_ [clock clicks -milliseconds]
-      if { $afterId_ == {} } {
-         if { $lower_animate_bound_ > $upper_animate_bound_ } {
-            set temp $lower_animate_bound_
-            set lower_animate_bound_ $upper_animate_bound_
-            set upper_animate_bound_ $temp
-         }
-         set step_ $itk_option(-step)
-         set_display_plane_ $lower_animate_bound_ 0
-         increment_
-      }
-   }
-   protected variable initial_seconds_ 0
-
-   #  Stop the animation.
-   protected method stop_ {} {
-      if { $afterId_ != {} } {
-         after cancel $afterId_
-         set afterId_ {}
-         # DEBUG
-         puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
-
-         #  Update the WCS so that the spectral axis coordinate is correct.
-         update_wcs_
-      }
-   }
-
-   #  Set the animation delay.
-   protected method set_delay_ {delay} {
-      if { $delay <= 0 } {
-         configure -delay 1
-      } else {
-         configure -delay $delay
-      }
-   }
-
-   #  Set the animation step.
-   protected method set_step_ {step} {
-      configure -step $step
-   }
-
-   #  Increment the displayed section by one.
-   protected method increment_ {} {
-      if { $plane_ >= $lower_animate_bound_ && $plane_ < $upper_animate_bound_ } {
-         set_display_plane_ [expr ${plane_}+$step_] 0
-         if { $plane_ == $lower_animate_bound_ } {
-            #  At lower edge, running backwards, need to let it step below.
-            set plane_ [expr ${plane_}+$step_]
-         }
-         set afterId_ [after $itk_option(-delay) [code $this increment_]]
-      } else {
-         #  Off end so stop, or loop back to beginning, or go into reverse
-         #  with rock 'n roll option.
-         #  Check that we have a range, otherwise this will call increment_
-         #  causing an eval depth exception.
-         if { $lower_animate_bound_ == $upper_animate_bound_ } {
-            stop_
-         } else {
-            #  Force temporary halt as visual clue that end has arrived.
-            update idletasks
-            after 500
-            if { $loop_ != "off" } {
-               if { $loop_ != "on" } {
-                  #  Rock 'n roll, switch direction.
-                  if { $step_ >= 1 } {
-                     # Going up.
-                     set plane_ [expr $upper_animate_bound_ - 1]
-                  } else {
-                     # Going down.
-                     set plane_ $lower_animate_bound_
-                  }
-                  set step_ [expr -1*$step_]
-               } else {
-                  set plane_ $lower_animate_bound_
-                  #  Increment is always positive, put may be changed on fly.
-                  set step_ [expr abs($step_)]
-               }
-               increment_
-            } else {
-               stop_
-            }
-         }
-      }
-   }
-
-   #  Set the collapse bounds.
-   protected method set_collapse_bounds_ {bound1 bound2} {
-      set lower_collapse_bound_ $bound1
-      set upper_collapse_bound_ $bound2
-   }
-
-   # Set the combination type
-   protected method set_combination_type_ {type} {
-      set combination_type_ $type
-   }
-
-   #  Collapse image and the display the result.
-   #  Use a section to pass to COLLAPSE so we do not need to know the world
-   #  coordinates.
-   protected method collapse_ {} {
-      set range "$lower_collapse_bound_:$upper_collapse_bound_"
-      if { $axis_ == 1 } {
-         set section "($range,,$close_section_"
-      } elseif { $axis_ == 2 } {
-         set section "(,$range,$close_section_"
-      } else {
-         set section "(,,${range}${close_section_}"
-      }
-
-      #  Now startup the COLLAPSE application.
-      if { $collapser_ == {} } {
-         global env
-         set collapser_ [GaiaApp \#auto -application \
-                            $env(KAPPA_DIR)/collapse \
-                            -notify [code $this collapse_completed_]]
-      }
-
-      #  Create a temporary file name.
-      set tmpimage_ "GaiaTempCollapse${count_}"
-      incr count_
-      blt::busy hold $w_
-      $collapser_ runwiths "in=${ndfname_}$section out=$tmpimage_ axis=$axis_ \
-                            estimator=$combination_type_ accept"
-
-      #  If the reference lines are displayed these need removing.
-      set show_collapse_range_ 0
-      toggle_show_collapse_range_
-   }
-
-   #  Display a collapsed image.
-   private method collapse_completed_ {} {
-      set file {}
-      if { ! [file readable $tmpimage_] } {
-         if { ! [file readable ${tmpimage_}.sdf] } {
-            blt::busy release $w_
-            return
-         }
-         set file ${tmpimage_}.sdf
-      } else {
-         set file $tmpimage_
-      }
-      if { $file != {} } {
-         display_ $file 1
-      }
-      blt::busy release $w_
    }
 
    #  Configure canvas so we get any clicks on the image and can display
@@ -1096,8 +776,10 @@ itcl::class gaia::GaiaCube {
       }
 
       #  Correct collapse bounds to grid indices.
-      set alow [axis_pixel2grid_ $lower_collapse_bound_]
-      set ahigh [axis_pixel2grid_ $upper_collapse_bound_]
+      set lb [$itk_component(collapse) cget -lower_bound]
+      set ub [$itk_component(collapse) cget -upper_bound]
+      set alow [axis_pixel2grid_ $lb]
+      set ahigh [axis_pixel2grid_ $ub]
 
       #  Make sure ix and iy are integers (zoomed images).
       set ix [expr round($iix)]
@@ -1208,8 +890,10 @@ itcl::class gaia::GaiaCube {
          }
 
          #  Correct collapse bounds to grid indices.
-         set alow [axis_pixel2grid_ $lower_collapse_bound_]
-         set ahigh [axis_pixel2grid_ $upper_collapse_bound_]
+         set lb [$itk_component(collapse) cget -lower_bound]
+         set ub [$itk_component(collapse) cget -upper_bound]
+         set alow [axis_pixel2grid_ $lb]
+         set ahigh [axis_pixel2grid_ $ub]
 
          #  Make sure ix and iy are integers (zoomed images).
          set ix [expr round($iix)]
@@ -1236,7 +920,9 @@ itcl::class gaia::GaiaCube {
 
          #  Create the right section. Use collapse coords as bounds on the
          #  spectral axis.
-         set range "$lower_collapse_bound_:$upper_collapse_bound_"
+         set lb [$itk_component(collapse) cget -lower_bound]
+         set ub [$itk_component(collapse) cget -upper_bound]
+         set range "$lb:$ub"
          if { $axis_ == 1 } {
             set section "($range,$ix,${iy}${close_section_}"
          } elseif { $axis_ == 2 } {
@@ -1300,35 +986,41 @@ itcl::class gaia::GaiaCube {
    #     $splat_disp_ runwith "GaiaArdSpectrum"
    #  } msg
 
-   #  Toggle the display of the collapse reference range.
-   protected method toggle_show_collapse_range_ {} {
-      $itk_component(colbounds) configure -show_ref_range $show_collapse_range_
+   #  ==========================================
+   #  Utility methods for various helper classes
+   #  ==========================================
+
+   #  Make a reference range in the spectral plot, if shown. Use the given
+   #  identifier.
+   public method make_ref_range {id} {
       if { $spectrum_ != {} } {
-         if { $show_collapse_range_ } {
-            $spectrum_ make_ref_range 2
-            $spectrum_ set_ref_range_colour 2 "cyan"
-            $itk_component(colbounds) configure \
-               -value1 $lower_collapse_bound_ -value2 $upper_collapse_bound_
-         } else {
-            $spectrum_ remove_ref_range 2
-         }
+         $spectrum_ make_ref_range $id
       }
    }
 
-   #  Toggle the display of the animation reference range.
-   protected method toggle_show_animation_range_ {} {
-      $itk_component(anibounds) configure -show_ref_range $show_animation_range_
+   #  Remove a reference range from the spectral plot, if shown. Use the given
+   #  identifier.
+   public method remove_ref_range {id} {
       if { $spectrum_ != {} } {
-         if { $show_animation_range_ } {
-
-            $spectrum_ make_ref_range 1
-            $spectrum_ set_ref_range_colour 1 "yellow"
-            $itk_component(anibounds) configure \
-               -value1 $lower_animate_bound_ -value2 $upper_animate_bound_
-         } else {
-            $spectrum_ remove_ref_range 1
-         }
+         $spectrum_ remove_ref_range $id
       }
+   }
+
+   #  Set the colour of the identified reference range.
+   public method set_ref_range_colour {id colour} {
+      if { $spectrum_ != {} } {
+         $spectrum_ set_ref_range_colour $id $colour
+      }
+   }
+
+   #  Get the name of the cube (in NDF format).
+   public method get_ndfname {} {
+      return $ndfname_
+   }
+
+   #  Get the current axis.
+   public method get_axis {} {
+      return $axis_
    }
 
    #  Configuration options: (public variables)
@@ -1354,14 +1046,6 @@ itcl::class gaia::GaiaCube {
 
    #  Filters for selecting files.
    itk_option define -filter_types filter_types Filter_types {}
-
-   #  The animation delay (ms).
-   itk_option define -delay delay Delay 100
-
-   #  The animation step defined in interface.
-   itk_option define -step step Step 1 {
-      set step_ $itk_option(-step)
-   }
 
    #  Whether to autoscale the cuts as every image slice is displayed.
    itk_option define -autocut autocut AutoCut 0
@@ -1392,28 +1076,8 @@ itcl::class gaia::GaiaCube {
    protected variable plane_max_ 0
    protected variable plane_min_ 0
 
-   #  Animation bounds.
-   protected variable lower_animate_bound_ 0
-   protected variable upper_animate_bound_ 0
-
-   #  Collapse bounds.
-   protected variable lower_collapse_bound_ 0
-   protected variable upper_collapse_bound_ 0
-
-   #  The COLLAPSE task.
-   protected variable collapser_ {}
-
-   #  Combination method.
-   protected variable combination_type_ "Mean"
-
    #  The current axis.
    protected variable axis_ 1
-
-   #  Id of the animation thread.
-   protected variable afterId_ {}
-
-   #  Name of the temporary image just created.
-   protected variable tmpimage_
 
    #  The SPLAT home directory.
    protected variable splat_dir_ {}
@@ -1423,12 +1087,6 @@ itcl::class gaia::GaiaCube {
 
    #  Task controller for ardspectra
    protected variable ardspectra_ {}
-
-   #  How animation loops. Off by default.
-   protected variable loop_ "off"
-
-   #  The current value of step during an animation.
-   protected variable step_ 1
 
    #  Check for cubes setting of GAIA.
    protected variable check_for_cubes_ 1
@@ -1465,14 +1123,6 @@ itcl::class gaia::GaiaCube {
    #  Last cx and cy values used in to open a spectrum.
    protected variable last_cxcy_ {}
 
-   #  Whether to display the limits of the animation as a reference range in
-   #  the plot.
-   protected variable show_animation_range_ 0
-
-   #  Whether to display the limits of the collapse as a reference range in the
-   #  plot.
-   protected variable show_collapse_range_ 0
-
    #  Array of index-based controls for the reference lines. These are indexed
    #  by their ref_id.
    protected variable ref_line_controls_
@@ -1483,25 +1133,6 @@ itcl::class gaia::GaiaCube {
 
    #  Common variables: (shared by all instances)
    #  -----------------
-
-   #  All the known collapse estimators, short and long descriptions.
-
-   common estimators_ {
-      Mean Mean
-      WMean {Weighted Mean}
-      Mode Mode
-      Median Median
-      Absdev {Mean absolute deviation}
-      Comax {Co-ordinate of the maximum value}
-      Comin {Co-ordinate of the minimum value}
-      Integ {Integrated value}
-      Iwc {Intensity-weighted co-ordinate}
-      Iwd {Intensity-weighted dispersion}
-      Max Maximum
-      Min Minimum
-      Rms RMS
-      Sigma {Standard deviation}
-      Sum Sum}
 
    #  The temporary image count.
    common count_ 0
