@@ -23,7 +23,8 @@
 
 *  Description:
 *     This is the SMURF free routine. It should be used in preference
-*     to system free() and should be paired with a SMURF allocation routine.
+*     to system free() and should be paired with a SMURF allocation routine
+*     (smf_malloc).
 
 *  Authors:
 *     Tim Jenness (TIMJ)
@@ -31,6 +32,9 @@
 
 *  History:
 *     2006-01-25 (TIMJ):
+*        Original version.
+*     2006-06-01 (TIMJ):
+*        Fix warning.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -64,6 +68,8 @@
 /* Starlink includes */
 #include "ast.h"
 #include "sae_par.h"
+
+#include "smf.h"
 
 #define FUNC_NAME "smf_free"
 
