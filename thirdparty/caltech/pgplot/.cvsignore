@@ -19,3 +19,5 @@ libtool
 starconf.m4
 starconf.status
 starconf.status.local
+make.log
+make.log.err
