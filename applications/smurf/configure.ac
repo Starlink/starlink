@@ -27,10 +27,36 @@ STAR_CHECK_PROGS( hlib )
 
 STAR_MESSGEN( [ libsmf/smf_err.msg ] )
 
+dnl Use --with-gsl=/opt/local to append /opt/local to lib and include paths
+dnl Allow --with-gsl=path to work
+AC_ARG_WITH(gsl,
+        [ --with-gsl=path      Path to use for GSL libraries and include files ],
+        if test "$withval" = "yes"; then
+          gslextrapath=default
+        elif test "$withval" = "no"; then
+          gslextrapath=
+        else
+          gslextrapath=$withval
+        fi,
+        gslextrapath=default)
+
+if test -n "$gslextrapath"; then
+        if test "$gslextrapath" != default; then
+           CPPFLAGS="$CPPFLAGS -I$gslextrapath/include"
+           LIBS="$LIBS -L$gslextrapath/lib"
+        fi
+fi
+
 dnl    External libraries
 LIBS="$LIBS -L/usr/lib64"
-AC_CHECK_LIB( gslcblas, cblas_dsdot )
-AC_CHECK_LIB( gsl, gsl_acosh )
+AC_CHECK_LIB( [gslcblas], [cblas_dsdot], [], [
+         echo "Error! Couldn't find libgslcblas. Retry with --with-gsl option?"
+        exit -1
+        ] )
+AC_CHECK_LIB( [gsl], [gsl_acosh], [], [
+        echo "Error! Couldn't find libgsl. Retry with --with-gsl option?"
+        exit -1
+	] )
 
 AC_CHECK_HEADERS(math.h)
 AC_CHECK_HEADERS(gsl/gsl_math.h)
