@@ -1,7 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
-starexamples_DATA = $(distdir)-scripts.tar
 
 sc3.htx_tar: sc3-scripts.tex
 
@@ -20,9 +19,4 @@ sc3-scripts.tex: scripts
 	    echo '\end{verbatim}'; \
 	fi; done > ../$@
 
-$(distdir)-scripts.tar: scripts
-	DN=$(distdir)-scripts; \
-	    mkdir $$DN; \
-	    for f in scripts/*; do if test -f $$f; then cp $$f $$DN; fi; done;\
-	    tar cf $@ $$DN; \
-	    rm -Rf $$DN
+SUBDIRS = scripts
