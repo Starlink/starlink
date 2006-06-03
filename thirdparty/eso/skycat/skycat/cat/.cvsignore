@@ -7,6 +7,7 @@ config.status
 configure.in-
 conftest.C
 install
+makefile.mk
 make_skycatlib.sh
 sta01999
 timestamp

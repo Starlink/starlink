@@ -2,5 +2,6 @@ Makefile
 config.log
 config.status
 install
+makefile.mk
 tclutilConfig.sh
 tmp

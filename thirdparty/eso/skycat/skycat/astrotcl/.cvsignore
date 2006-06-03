@@ -4,3 +4,4 @@ config.log
 config.status
 install
 tmp
+makefile.mk
