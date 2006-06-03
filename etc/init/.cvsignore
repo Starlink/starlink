@@ -10,6 +10,8 @@ config.status
 configure
 cshrc
 login
+make.log
+make.log.err
 starconf.m4
 starconf.status
 starconf.status.local
