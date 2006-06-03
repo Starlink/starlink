@@ -1,7 +1,7 @@
 PGP_ERR
 blah.pl
 check_errcode.pl
-core.9619
+core.*
 fac_1508_err
 grfont.dat
 pack
@@ -31,6 +31,6 @@ install-manifest.xml
 starconf.status.local
 stamp-h1
 make.log
+make.log.err
 .deps
 
-make.log.err
