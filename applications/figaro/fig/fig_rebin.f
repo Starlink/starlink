@@ -153,7 +153,6 @@ C Declaration of arguments.
       LOGICAL CFLUX,LOGW,LOGWR
       REAL*4 WDATA(NPIX),RBIN(NRBIN),WAVES(NPIX),WAVESR(NRBIN)
 C Declaration of variables.
-      character*16 m1,m2,m3        !debug test
       REAL*4 WDATA1,WDATA2,WDATA3
       REAL*8 DX,A,B,C,D,DD,DDD,Y
       LOGICAL LSTART
