@@ -1,0 +1,10 @@
+Makefile
+checkout-fixup
+config.log
+config.status
+configure-output.log
+libtool
+libtoolize
+make.log
+make.log.err
+ 
