@@ -136,7 +136,6 @@
 
 *  Local Variables:
       LOGICAL EXIST              ! Whether a structure exists
-      INTEGER I                  ! Loop index
       INTEGER NDIM               ! NDF dimensionality
       INTEGER LBND( NDF__MXDIM ) ! NDF lower bounds
       INTEGER UBND( NDF__MXDIM ) ! NDF upper bounds
