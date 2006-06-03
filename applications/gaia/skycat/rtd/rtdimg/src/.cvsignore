@@ -1,4 +1,5 @@
 .objs
+colormaps.C
 ImageColor.C.save
 Makefile
 Makefile.tmp
