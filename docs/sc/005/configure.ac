@@ -16,6 +16,9 @@ STAR_DEFAULTS(docs-only)
 
 STAR_LATEX_DOCUMENTATION(sc5)
 
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile component.xml examples/Makefile 
+                examples/data/Makefile examples/data/bias/Makefile
+                examples/data/flats/Makefile examples/data/targets/Makefile
+                examples/scripts/Makefile)
 
 AC_OUTPUT
