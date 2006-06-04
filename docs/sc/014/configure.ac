@@ -16,6 +16,6 @@ STAR_DEFAULTS(docs-only)
 
 STAR_LATEX_DOCUMENTATION(sc14)
 
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile component.xml examples/Makefile examples/flair/Makefile examples/hydra/Makefile)
 
 AC_OUTPUT
