@@ -4730,6 +4730,7 @@ void astMapPut0##X##_( AstKeyMap *this, const char *key, Xtype value, \
    (**astMEMBER(this,KeyMap,MapPut0##X))(this,key,value,comment ); \
 }
 MAKE_MAPPUT0_(D,double)
+MAKE_MAPPUT0_(F,float)
 MAKE_MAPPUT0_(I,int)
 MAKE_MAPPUT0_(C,const char *)
 MAKE_MAPPUT0_(A,AstObject *)
@@ -4742,6 +4743,7 @@ void astMapPut1##X##_( AstKeyMap *this, const char *key, int size, Xtype value[]
    (**astMEMBER(this,KeyMap,MapPut1##X))(this,key,size,value,comment ); \
 }
 MAKE_MAPPUT1_(D,double)
+MAKE_MAPPUT1_(F,float)
 MAKE_MAPPUT1_(I,int)
 MAKE_MAPPUT1_(C,const char *)
 MAKE_MAPPUT1_(A,AstObject *)
@@ -4753,6 +4755,7 @@ int astMapGet0##X##_( AstKeyMap *this, const char *key, Xtype *value ){ \
    return (**astMEMBER(this,KeyMap,MapGet0##X))(this,key,value); \
 }
 MAKE_MAPGET0_(D,double)
+MAKE_MAPGET0_(F,float)
 MAKE_MAPGET0_(I,int)
 MAKE_MAPGET0_(C,const char *)
 MAKE_MAPGET0_(A,AstObject *)
@@ -4766,6 +4769,7 @@ int astMapGet1##X##_( AstKeyMap *this, const char *key, int mxval, int *nval, \
    return (**astMEMBER(this,KeyMap,MapGet1##X))(this,key,mxval,nval,value); \
 }
 MAKE_MAPGET1_(D,double)
+MAKE_MAPGET1_(F,float)
 MAKE_MAPGET1_(I,int)
 MAKE_MAPGET1_(A,AstObject *)
 #undef MAKE_MAPGET1_
