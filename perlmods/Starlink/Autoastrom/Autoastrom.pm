@@ -1218,7 +1218,7 @@ sub solve {
       }
       err_end( $STATUS );
 
-      my $template = new Starlink::AST::SkyFrame( "System=FK5" );
+      my $template = Starlink::AST::SkyFrame->new( "System=FK5" );
       $frameset = $wcs->FindFrame( $template, "" );
 
       if( defined( $frameset ) ) {
@@ -1246,7 +1246,7 @@ sub solve {
 # Check the FITS header for WCS information.
       my $hdr = new Astro::FITS::Header::NDF( File => $self->ndf );
       my $wcs = $hdr->get_wcs;
-      my $template = new Starlink::AST::SkyFrame( "System=FK5" );
+      my $template = Starlink::AST::SkyFrame->new( "System=FK5" );
       $frameset = $wcs->FindFrame( $template, "" );
       if( defined( $frameset ) ) {
         $self->printstd( "--I Using WCS information from FITS headers.\n" ) if $self->starlink_output;
@@ -1386,7 +1386,8 @@ sub solve {
                                   );
     $self->printstd( sprintf( "--I %s read in, %d entries.\n",
                               $self->skycatcatalogue_in,
-                              $querycat->sizeof ) );
+                              $querycat->sizeof ) )
+      if $self->starlink_output;
   } else {
 
 # Query the SkyCat catalogue.
@@ -1770,7 +1771,7 @@ sub solve {
 
 # Update the NDF catalogue with the new WCS. First get the FK5
 # frameset for the WCS.
-    my $template = new Starlink::AST::SkyFrame( "System=FK5" );
+    my $template = Starlink::AST::SkyFrame->new( "System=FK5" );
     $frameset = $newwcs->FindFrame( $template, "" );
     if( ! defined( $frameset ) ) {
       croak "Could not find FK5 SkyFrame to do X/Y to RA/Dec translation";
