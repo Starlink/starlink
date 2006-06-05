@@ -52,6 +52,8 @@
 *  History:
 *     13-NOV-2004 (DSB):
 *        Original version.
+*     5-JUN-2006 (DSB):
+*        Added support for single precision entries.
 *-
 */
 
@@ -75,6 +77,7 @@
 #define AST__DOUBLETYPE 2
 #define AST__STRINGTYPE 3
 #define AST__OBJECTTYPE 4
+#define AST__FLOATTYPE 5
 
 /* Type Definitions. */
 /* ================= */
@@ -122,19 +125,23 @@ typedef struct AstKeyMapVtab {
 /* Properties (e.g. methods) specific to this class. */
    void (* MapPut0I)( AstKeyMap *, const char *, int, const char * );
    void (* MapPut0D)( AstKeyMap *, const char *, double, const char * );
+   void (* MapPut0F)( AstKeyMap *, const char *, float, const char * );
    void (* MapPut0C)( AstKeyMap *, const char *, const char *, const char * );
    void (* MapPut0A)( AstKeyMap *, const char *, AstObject *, const char * );
    void (* MapPut1I)( AstKeyMap *, const char *, int, int[], const char * );
    void (* MapPut1D)( AstKeyMap *, const char *, int, double[], const char * );
+   void (* MapPut1F)( AstKeyMap *, const char *, int, float[], const char * );
    void (* MapPut1C)( AstKeyMap *, const char *, int, const char *[], const char * );
    void (* MapPut1A)( AstKeyMap *, const char *, int, AstObject *[], const char * );
    int (* MapGet0I)( AstKeyMap *, const char *, int * );
    int (* MapGet0D)( AstKeyMap *, const char *, double * );
+   int (* MapGet0F)( AstKeyMap *, const char *, float * );
    int (* MapGet0C)( AstKeyMap *, const char *, const char ** );
    int (* MapGet0A)( AstKeyMap *, const char *, AstObject ** );
    int (* MapGet1A)( AstKeyMap *, const char *, int, int *, AstObject ** );
    int (* MapGet1C)( AstKeyMap *, const char *, int, int, int *, char * );
    int (* MapGet1D)( AstKeyMap *, const char *, int, int *, double * );
+   int (* MapGet1F)( AstKeyMap *, const char *, int, int *, float * );
    int (* MapGet1I)( AstKeyMap *, const char *, int, int *, int * );
    void (* MapRemove)( AstKeyMap *, const char * );
    int (* MapSize)( AstKeyMap * );
@@ -189,9 +196,11 @@ void astMapPut1AId_( AstKeyMap *, const char *, int, AstObject *[], const char *
 const char *astMapKey_( AstKeyMap *, int );
 int astMapGet0C_( AstKeyMap *, const char *, const char ** );
 int astMapGet0D_( AstKeyMap *, const char *, double * );
+int astMapGet0F_( AstKeyMap *, const char *, float * );
 int astMapGet0I_( AstKeyMap *, const char *, int * );
 int astMapGet1C_( AstKeyMap *, const char *, int, int, int *, char * );
 int astMapGet1D_( AstKeyMap *, const char *, int, int *, double * );
+int astMapGet1F_( AstKeyMap *, const char *, int, int *, float * );
 int astMapGet1I_( AstKeyMap *, const char *, int, int *, int * );
 int astMapHasKey_( AstKeyMap *, const char * );
 int astMapLength_( AstKeyMap *, const char * );
@@ -201,9 +210,11 @@ int astMapType_( AstKeyMap *, const char * );
 void astMapPut0A_( AstKeyMap *, const char *, AstObject *, const char * );
 void astMapPut0C_( AstKeyMap *, const char *, const char *, const char * );
 void astMapPut0D_( AstKeyMap *, const char *, double, const char * );
+void astMapPut0F_( AstKeyMap *, const char *, float, const char * );
 void astMapPut0I_( AstKeyMap *, const char *, int, const char * );
 void astMapPut1C_( AstKeyMap *, const char *, int, const char *[], const char * );
 void astMapPut1D_( AstKeyMap *, const char *, int, double *, const char * );
+void astMapPut1F_( AstKeyMap *, const char *, int, float *, const char * );
 void astMapPut1I_( AstKeyMap *, const char *, int, int *, const char * );
 void astMapRemove_( AstKeyMap *, const char * );
 
@@ -253,16 +264,20 @@ astINVOKE(O,astLoadKeyMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 #define astMapPut0I(this,key,value,comment) astINVOKE(V,astMapPut0I_(astCheckKeyMap(this),key,value,comment))
 #define astMapPut0D(this,key,value,comment) astINVOKE(V,astMapPut0D_(astCheckKeyMap(this),key,value,comment))
+#define astMapPut0F(this,key,value,comment) astINVOKE(V,astMapPut0F_(astCheckKeyMap(this),key,value,comment))
 #define astMapPut0C(this,key,value,comment) astINVOKE(V,astMapPut0C_(astCheckKeyMap(this),key,value,comment))
 #define astMapPut0A(this,key,value,comment) astINVOKE(V,astMapPut0A_(astCheckKeyMap(this),key,astCheckObject(value),comment))
 #define astMapPut1I(this,key,size,value,comment) astINVOKE(V,astMapPut1I_(astCheckKeyMap(this),key,size,value,comment))
 #define astMapPut1D(this,key,size,value,comment) astINVOKE(V,astMapPut1D_(astCheckKeyMap(this),key,size,value,comment))
+#define astMapPut1F(this,key,size,value,comment) astINVOKE(V,astMapPut1F_(astCheckKeyMap(this),key,size,value,comment))
 #define astMapPut1C(this,key,size,value,comment) astINVOKE(V,astMapPut1C_(astCheckKeyMap(this),key,size,value,comment))
 #define astMapGet0I(this,key,value) astINVOKE(V,astMapGet0I_(astCheckKeyMap(this),key,value))
 #define astMapGet0D(this,key,value) astINVOKE(V,astMapGet0D_(astCheckKeyMap(this),key,value))
+#define astMapGet0F(this,key,value) astINVOKE(V,astMapGet0F_(astCheckKeyMap(this),key,value))
 #define astMapGet0C(this,key,value) astINVOKE(V,astMapGet0C_(astCheckKeyMap(this),key,value))
 #define astMapGet1I(this,key,mxval,nval,value) astINVOKE(V,astMapGet1I_(astCheckKeyMap(this),key,mxval,nval,value))
 #define astMapGet1D(this,key,mxval,nval,value) astINVOKE(V,astMapGet1D_(astCheckKeyMap(this),key,mxval,nval,value))
+#define astMapGet1F(this,key,mxval,nval,value) astINVOKE(V,astMapGet1F_(astCheckKeyMap(this),key,mxval,nval,value))
 #define astMapGet1C(this,key,l,mxval,nval,value) astINVOKE(V,astMapGet1C_(astCheckKeyMap(this),key,l,mxval,nval,value))
 #define astMapRemove(this,key) astINVOKE(V,astMapRemove_(astCheckKeyMap(this),key))
 #define astMapSize(this) astINVOKE(V,astMapSize_(astCheckKeyMap(this)))
