@@ -59,7 +59,6 @@ if test "${TCL_PREFIX}" != ""; then
       AC_MSG_RESULT(no)
    fi
    LIBS="$my_save_LIBS"
-   AM_CONDITIONAL(HAVE_ITCL, [test -n "$have_itcl"])
 
    have_blt=1
    my_save_LIBS="$LIBS"
@@ -75,7 +74,6 @@ if test "${TCL_PREFIX}" != ""; then
       AC_MSG_RESULT(no)
    fi
    LIBS="$my_save_LIBS"
-   AM_CONDITIONAL(HAVE_BLT, [test -n "$have_blt"])
 
    LDFLAGS=$my_save_LDFLAGS
 fi
