@@ -53,6 +53,8 @@
 *  History:
 *     13-NOV-2004 (DSB):
 *        Original version.
+*     5-JUN-2006 (DSB):
+*        Added support for single precision entries.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -199,6 +201,29 @@ F77_SUBROUTINE(ast_mapput0d)( INTEGER(THIS),
    )
 }
 
+F77_SUBROUTINE(ast_mapput0r)( INTEGER(THIS),
+                              CHARACTER(KEY),
+                              REAL(VALUE),
+                              CHARACTER(COMMENT),
+                              INTEGER(STATUS)
+                              TRAIL(KEY)
+                              TRAIL(COMMENT) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_REAL(VALUE)
+   GENPTR_CHARACTER(COMMENT)
+   char *comment, *key;
+
+   astAt( "AST_MAPPUT0R", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      comment = astString( COMMENT, COMMENT_length );
+      astMapPut0F( astI2P( *THIS ), key, *VALUE, comment );
+      astFree( key );
+      astFree( comment );
+   )
+}
+
 F77_SUBROUTINE(ast_mapput1a)( INTEGER(THIS),
                               CHARACTER(KEY),
                               INTEGER(SIZE),
@@ -329,6 +354,31 @@ F77_SUBROUTINE(ast_mapput1d)( INTEGER(THIS),
    )
 }
 
+F77_SUBROUTINE(ast_mapput1r)( INTEGER(THIS),
+                              CHARACTER(KEY),
+                              INTEGER(SIZE),
+                              REAL_ARRAY(VALUE),
+                              CHARACTER(COMMENT),
+                              INTEGER(STATUS)
+                              TRAIL(KEY)
+                              TRAIL(COMMENT) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(SIZE)
+   GENPTR_REAL_ARRAY(VALUE)
+   GENPTR_CHARACTER(COMMENT)
+   char *comment, *key;
+
+   astAt( "AST_MAPPUT1R", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      comment = astString( COMMENT, COMMENT_length );
+      astMapPut1F( astI2P( *THIS ), key, *SIZE, VALUE, comment );
+      astFree( key );
+      astFree( comment );
+   )
+}
+
 
 F77_LOGICAL_FUNCTION(ast_mapget0i)( INTEGER(THIS),
                                     CHARACTER(KEY),
@@ -365,6 +415,26 @@ F77_LOGICAL_FUNCTION(ast_mapget0d)( INTEGER(THIS),
    astWatchSTATUS(
       key = astString( KEY, KEY_length );
       RESULT = astMapGet0D( astI2P( *THIS ), key, VALUE ) ? F77_TRUE : F77_FALSE;
+      astFree( key );
+   )
+   return RESULT;
+}
+
+F77_LOGICAL_FUNCTION(ast_mapget0r)( INTEGER(THIS),
+                                    CHARACTER(KEY),
+                                    REAL(VALUE),
+                                    INTEGER(STATUS)
+                                    TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_REAL(VALUE)
+   F77_LOGICAL_TYPE(RESULT);
+   char *key;
+
+   astAt( "AST_MAPGET0R", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      RESULT = astMapGet0F( astI2P( *THIS ), key, VALUE ) ? F77_TRUE : F77_FALSE;
       astFree( key );
    )
    return RESULT;
@@ -466,10 +536,34 @@ F77_LOGICAL_FUNCTION(ast_mapget1d)( INTEGER(THIS),
    F77_LOGICAL_TYPE(RESULT);
    char *key;
 
-   astAt( "AST_MAPGET1I", NULL, 0 );
+   astAt( "AST_MAPGET1D", NULL, 0 );
    astWatchSTATUS(
       key = astString( KEY, KEY_length );
       RESULT = astMapGet1D( astI2P( *THIS ), key, *MXVAL, NVAL, VALUE ) ? F77_TRUE : F77_FALSE;
+      astFree( key );
+   )
+   return RESULT;
+}
+
+F77_LOGICAL_FUNCTION(ast_mapget1r)( INTEGER(THIS),
+                                    CHARACTER(KEY),
+                                    INTEGER(MXVAL),
+                                    INTEGER(NVAL),
+                                    REAL_ARRAY(VALUE),
+                                    INTEGER(STATUS)
+                                    TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(MXVAL)
+   GENPTR_INTEGER(NVAL)
+   GENPTR_REAL_ARRAY(VALUE)
+   F77_LOGICAL_TYPE(RESULT);
+   char *key;
+
+   astAt( "AST_MAPGET1R", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      RESULT = astMapGet1F( astI2P( *THIS ), key, *MXVAL, NVAL, VALUE ) ? F77_TRUE : F77_FALSE;
       astFree( key );
    )
    return RESULT;
