@@ -579,6 +579,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - In MAKE_GET2, return the set value if a value has been set
 *        without recalculating the defaults.
 *        - Fix bug that could cause segvio in Grid if clipping is used.
+*     5-JUN-2006 (DSB)
+*        Do not change the box returned by astBoundBox as a consequence
+*        of calling astGetAttrib.
 *class--
 */
 
@@ -1468,6 +1471,7 @@ static float Box_ubnd[ 2 ] = {FLT_MIN, FLT_MIN };
    GText. */
 static float Boxp_lbnd[ 2 ] = {FLT_MAX, FLT_MAX };
 static float Boxp_ubnd[ 2 ] = {FLT_MIN, FLT_MIN };
+static int Boxp_freeze = 0;
 
 /* Variables used to stored buffered poly lines (see functions Opoly, Bpoly
    and Apoly). */
@@ -4722,10 +4726,12 @@ f     with STATUS set to an error value, or if it should fail for any
    class = astGetClass( this_nd );
 
 /* Initialise the bounding box for primitives produced by this call. */
-   Boxp_lbnd[ 0 ] = FLT_MAX;
-   Boxp_lbnd[ 1 ] = FLT_MAX;
-   Boxp_ubnd[ 0 ] = FLT_MIN;
-   Boxp_ubnd[ 1 ] = FLT_MIN;
+   if( !Boxp_freeze ) {
+      Boxp_lbnd[ 0 ] = FLT_MAX;
+      Boxp_lbnd[ 1 ] = FLT_MAX;
+      Boxp_ubnd[ 0 ] = FLT_MIN;
+      Boxp_ubnd[ 1 ] = FLT_MIN;
+   }
 
 /* Check the base Frame of the Plot is 2-D. */
    naxes = astGetNin( this_nd );
@@ -8065,10 +8071,12 @@ f     contains any coordinates with the value AST__BAD.
    } 
 
 /* Initialise the bounding box for primitives produced by this call. */
-   Boxp_lbnd[ 0 ] = FLT_MAX;
-   Boxp_lbnd[ 1 ] = FLT_MAX;
-   Boxp_ubnd[ 0 ] = FLT_MIN;
-   Boxp_ubnd[ 1 ] = FLT_MIN;
+   if( !Boxp_freeze ) {
+      Boxp_lbnd[ 0 ] = FLT_MAX;
+      Boxp_lbnd[ 1 ] = FLT_MAX;
+      Boxp_ubnd[ 0 ] = FLT_MIN;
+      Boxp_ubnd[ 1 ] = FLT_MIN;
+   }
 
 /* Draw the curve. The break information is stored in an external structure
    where it can be accessed by public methods which return information
@@ -9258,7 +9266,7 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
    lj = astFree( (void *) lj );
 
 /* If OK, update the box containing all drawn graphics primitives. */
-   if( ink && astOK ) {
+   if( ink && astOK && !Boxp_freeze ) {
       for( i = 0; i < 4; i++ ){
          Boxp_lbnd[ 0 ] = MIN( xbn[ i ], Boxp_lbnd[ 0 ] );
          Boxp_ubnd[ 0 ] = MAX( xbn[ i ], Boxp_ubnd[ 0 ] );
@@ -12728,10 +12736,12 @@ f        The global status.
    if( astOK ){   
 
 /* Initialise the bounding box for primitives produced by this call. */
-      Boxp_lbnd[ 0 ] = FLT_MAX;
-      Boxp_lbnd[ 1 ] = FLT_MAX;
-      Boxp_ubnd[ 0 ] = FLT_MIN;
-      Boxp_ubnd[ 1 ] = FLT_MIN;
+      if( !Boxp_freeze ) {
+         Boxp_lbnd[ 0 ] = FLT_MAX;
+         Boxp_lbnd[ 1 ] = FLT_MAX;
+         Boxp_ubnd[ 0 ] = FLT_MIN;
+         Boxp_ubnd[ 1 ] = FLT_MIN;
+      }
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
@@ -13055,7 +13065,7 @@ static void GLine( AstPlot *this, int n, const float *x,
                 class );
 
 /* Otherwise, update the box containing all drawn graphics primitives. */
-   } else {
+   } else if( !Boxp_freeze ){
       for( i = 0; i < n; i++ ) {
          Boxp_lbnd[ 0 ] = MIN( x[ i ], Boxp_lbnd[ 0 ] );
          Boxp_ubnd[ 0 ] = MAX( x[ i ], Boxp_ubnd[ 0 ] );
@@ -13147,7 +13157,7 @@ static void GMark( AstPlot *this, int n, const float *x,
                 class );
 
 /* Otherwise, update the box containing all drawn graphics primitives. */
-   } else {
+   } else if( !Boxp_freeze ){
       for( i = 0; i < n; i++ ) {
          Boxp_lbnd[ 0 ] = MIN( x[ i ], Boxp_lbnd[ 0 ] );
          Boxp_ubnd[ 0 ] = MAX( x[ i ], Boxp_ubnd[ 0 ] );
@@ -13536,6 +13546,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Obtain the length of the attrib string. */
    len = strlen( attrib );
+
+/* Indicate that the current bound box should not be changed during the
+   execution of this function (this may happen if a grid is drawn to get
+   the default value for an attribute such as Labelling). */
+   Boxp_freeze = 1;
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
@@ -14137,6 +14152,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else {
       result = (*parent_getattrib)( this_object, attrib );
    }
+
+/* Unfreeze the bound box so that it may be updated by subsequent
+   plotting functions. */
+   Boxp_freeze = 0;
 
 /* Return the result. */
    return result;
@@ -16180,10 +16199,12 @@ f        The global status.
 
 /* Copy the total bounding box to the box which is returned by
    astBoundingBox. */
-   Boxp_lbnd[ 0 ] = Box_lbnd[ 0 ];
-   Boxp_lbnd[ 1 ] = Box_lbnd[ 1 ];
-   Boxp_ubnd[ 0 ] = Box_ubnd[ 0 ]; 
-   Boxp_ubnd[ 1 ] = Box_ubnd[ 1 ]; 
+   if( !Boxp_freeze ){
+      Boxp_lbnd[ 0 ] = Box_lbnd[ 0 ];
+      Boxp_lbnd[ 1 ] = Box_lbnd[ 1 ];
+      Boxp_ubnd[ 0 ] = Box_ubnd[ 0 ]; 
+      Boxp_ubnd[ 1 ] = Box_ubnd[ 1 ]; 
+   }
 
 /* Return. */
    return;
@@ -16284,10 +16305,12 @@ f     coordinates with the value AST__BAD, nor if LENGTH has this value.
    } 
 
 /* Initialise the bounding box for primatives produced by this call. */
-   Boxp_lbnd[ 0 ] = FLT_MAX;
-   Boxp_lbnd[ 1 ] = FLT_MAX;
-   Boxp_ubnd[ 0 ] = FLT_MIN;
-   Boxp_ubnd[ 1 ] = FLT_MIN;
+   if( !Boxp_freeze ) {
+      Boxp_lbnd[ 0 ] = FLT_MAX;
+      Boxp_lbnd[ 1 ] = FLT_MAX;
+      Boxp_ubnd[ 0 ] = FLT_MIN;
+      Boxp_ubnd[ 1 ] = FLT_MIN;
+   }
 
 /* Validate the axis index, converting the axis index to be zero-based. */
    (void) astValidateAxis( this, axis - 1, method );
@@ -19869,10 +19892,12 @@ f     - If any marker position is clipped (see AST_CLIP), then the
    }
 
 /* Initialise the bounding box for primatives produced by this call. */
-   Boxp_lbnd[ 0 ] = FLT_MAX;
-   Boxp_lbnd[ 1 ] = FLT_MAX;
-   Boxp_ubnd[ 0 ] = FLT_MIN;
-   Boxp_ubnd[ 1 ] = FLT_MIN;
+   if( !Boxp_freeze ) {
+      Boxp_lbnd[ 0 ] = FLT_MAX;
+      Boxp_lbnd[ 1 ] = FLT_MAX;
+      Boxp_ubnd[ 0 ] = FLT_MIN;
+      Boxp_ubnd[ 1 ] = FLT_MIN;
+   }
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
@@ -21001,10 +21026,12 @@ f        The global status.
    } 
 
 /* Initialise the bounding box for primatives produced by this call. */
-   Boxp_lbnd[ 0 ] = FLT_MAX;
-   Boxp_lbnd[ 1 ] = FLT_MAX;
-   Boxp_ubnd[ 0 ] = FLT_MIN;
-   Boxp_ubnd[ 1 ] = FLT_MIN;
+   if( !Boxp_freeze ) {
+      Boxp_lbnd[ 0 ] = FLT_MAX;
+      Boxp_lbnd[ 1 ] = FLT_MAX;
+      Boxp_ubnd[ 0 ] = FLT_MIN;
+      Boxp_ubnd[ 1 ] = FLT_MIN;
+   }
 
 /* Check the current Frame of the Plot has ncoord axes. */
    naxes = astGetNout( this );
@@ -22912,10 +22939,12 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
    escs = astEscapes( 1 );
 
 /* Initialise the bounding box for primatives produced by this call. */
-   Boxp_lbnd[ 0 ] = FLT_MAX;
-   Boxp_lbnd[ 1 ] = FLT_MAX;
-   Boxp_ubnd[ 0 ] = FLT_MIN;
-   Boxp_ubnd[ 1 ] = FLT_MIN;
+   if( !Boxp_freeze ) {
+      Boxp_lbnd[ 0 ] = FLT_MAX;
+      Boxp_lbnd[ 1 ] = FLT_MAX;
+      Boxp_ubnd[ 0 ] = FLT_MIN;
+      Boxp_ubnd[ 1 ] = FLT_MIN;
+   }
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
