@@ -5,7 +5,8 @@
       integer status,map,map2,ival,aval,l,ivec(2),avec(4),nval,i,iat
       character cval*20,cvec(3)*10,key*20
       double precision dval, dvec(2)
-      logical gota, gotc, gotd, goti
+      logical gota, gotc, gotd, goti, gotr
+      real rval
 
       status = sai__ok
 
@@ -13,6 +14,7 @@
 
       call ast_MapPut0i( map, 'Fredi', 1999, 'com 1', status )
       call ast_MapPut0d( map, 'Fredd', 1999.9D0, 'com2 ', status )
+      call ast_MapPut0r( map, 'Fredr', 1999.9, 'com2 ', status )
       call ast_MapPut0c( map, 'Fredc', 'Hello', ' ', status )
       call ast_MapPut0A( map, 'Freda', ast_skyframe( ' ', status ), 
      :                   ' ', status )
@@ -48,6 +50,10 @@
          call stopit( status, 'Error -5' )
       end if  
 
+      if( ast_maptype( map, 'Fredr', status ) .ne. AST__FLOATTYPE) then
+         call stopit( status, 'Error -5b' )
+      end if  
+
       if( ast_maptype( map, 'Fredi', status ) .ne. AST__INTTYPE ) then
          call stopit( status, 'Error -4' )
       end if  
@@ -63,13 +69,14 @@
       map2 = ast_copy( map, status )
 
 
-      if( ast_mapsize( map2, status ) .ne. 4 ) then
+      if( ast_mapsize( map2, status ) .ne. 5 ) then
          write(*,*) ast_mapsize( map2, status )
          call stopit( status, 'Error 0' )
       end if  
 
       goti = .false.
       gotd = .false.
+      gotr = .false.
       gotc = .false.
       gota = .false.
 
@@ -79,6 +86,8 @@
             goti = .true.
          else if( .not. gotd .and. key .eq. 'Fredd' ) then
             gotd = .true.
+         else if( .not. gotr .and. key .eq. 'Fredr' ) then
+            gotr = .true.
          else if( .not. gotc .and. key .eq. 'Fredc' ) then
             gotc = .true.
          else if( .not. gota .and. key .eq. 'Freda' ) then
@@ -88,7 +97,8 @@
          endif
       end do
 
-      if( .not. ( goti .AND. gotd .AND. gotc .AND. gota ) ) then
+      if( .not. ( goti .AND. gotd .AND. gotc 
+     :            .AND. gota .and. gotr) ) then
          call stopit( status, 'Error nokey' )
       endif
 
@@ -109,6 +119,13 @@
       else if( dval .ne. 1999.9D0 ) then
          write(*,*) dval - 1999.9D0
          call stopit( status, 'Error 4' )
+      end if  
+      
+      if( .not. ast_mapget0r( map2, 'Fredr', rval, status ) ) then
+         call stopit( status, 'Error 3b' )
+      else if( rval .ne. 1999.9 ) then
+         write(*,*) rval - 1999.9
+         call stopit( status, 'Error 4b' )
       end if  
       
       if( .not. ast_mapget0c( map2, 'Fredc', cval, l, status ) ) then
@@ -132,6 +149,12 @@
       else if( dval .ne. 1999 ) then
          write(*,*) dval
          call stopit( status, 'Error 11' )
+      end if  
+      
+      if( .not. ast_mapget0r( map2, 'Fredi', rval, status ) ) then
+         call stopit( status, 'Error 10b' )
+      else if( rval .ne. 1999 ) then
+         call stopit( status, 'Error 11b' )
       end if  
       
       if( .not. ast_mapget0c( map2, 'Fredi', cval, l, status ) ) then
