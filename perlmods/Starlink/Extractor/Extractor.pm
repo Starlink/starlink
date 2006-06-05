@@ -687,6 +687,8 @@ sub _write_param_temp_file {
   print $fh "B_WORLD\n" if ! $self->quick;
   print $fh "ERRB_WORLD\n" if ! $self->quick;
   print $fh "ISOAREA_IMAGE\n";
+  print $fh "FWHM_IMAGE\n";
+  print $fh "FWHM_WORLD\n" if ! $self->quick;
   print $fh "FLAGS\n";
 
   close $fh;
