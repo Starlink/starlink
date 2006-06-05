@@ -27,7 +27,7 @@ AC_CHECK_FUNCS(round)
 AC_CHECK_HEADERS([jpeglib.h])
 AC_CHECK_LIB(jpeg,jpeg_start_compress)
 
-STAR_DECLARE_DEPENDENCIES(build, [ems gwm mers nbs pcs sae starx])
+STAR_DECLARE_DEPENDENCIES(build, [ems gwm jpeg mers nbs pcs sae starx tcl tk])
 STAR_DECLARE_DEPENDENCIES(configure, [jpeg tcl tk])
 
 STAR_LATEX_DOCUMENTATION([sun186 sun219])
