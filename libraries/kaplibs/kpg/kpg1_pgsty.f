@@ -34,7 +34,7 @@
 *     SET = LOGICAL (Given)
 *        Should the Plot values be made curent? Otherwise the values in
 *        ATTRS are made current.
-*     ATTS( * ) = REAL (Given and Returned)
+*     ATTS( * ) = DOUBLE PRECISION (Given and Returned)
 *        On entry, the attribute values to set if SET is .FALSE., These
 *        should have been obtained from a previous call to this routine.
 *        On exit, the attribute values current on entry to this routine
@@ -70,6 +70,8 @@
 *  History:
 *     6-MAR-1998 (DSB):
 *        Original version.
+*     5-JUN-2006 (DSB):
+*        Correct prologue description of ATTRS.
 *     {enter_further_changes_here}
 
 *  Bugs:
