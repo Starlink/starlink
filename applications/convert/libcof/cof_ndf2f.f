@@ -230,6 +230,8 @@
 *        Document the multi-NDF rules.
 *     2006 April 13 (MJC):
 *        Remove unused variables.
+*     6-JUN-2006 (DSB):
+*        Guard against CHR_FIND not finding a dot.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -541,9 +543,11 @@
             CALL CHR_FIND( NDFNAM, '.', .TRUE., DOTPOS )
 
 *  Set the component name.
-            CALL FTPKYS( FUNIT, 'HDSNAME', NDFNAM( DOTPOS+1: ), 
-     :                   'Component name hierarchical structure',
-     :                   FSTAT )
+            IF( DOTPOS .LT. NC ) THEN 
+               CALL FTPKYS( FUNIT, 'HDSNAME', NDFNAM( DOTPOS+1: ), 
+     :                      'Component name hierarchical structure',
+     :                      FSTAT )
+            END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
