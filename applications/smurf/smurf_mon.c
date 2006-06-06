@@ -172,6 +172,8 @@ void smurf_mon( int * status ) {
     smurf_remsky( status );
   } else if (strcmp( taskname, "SCANFIT" ) == 0 ) {
     smurf_scanfit( status );
+  } else if (strcmp( taskname, "SIM" ) == 0 ) {
+    smurf_sim( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

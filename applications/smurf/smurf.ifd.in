@@ -294,6 +294,103 @@ package @PACKAGE@ {
 	  }
      }
 
+     action dreamwts {
+
+          parameter ndf {
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL CURRENT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Input data file}
+          }
+          parameter piston {
+            position 2
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            ppath GLOBAL CURRENT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Piston weights matrix name}
+          }
+          parameter pixel {
+            position 3
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            ppath GLOBAL CURRENT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Pixel weights matrix name}
+          }
+
+          parameter msg_filter {
+	    type _CHAR
+	    prompt {Message level}
+	    default NORM
+	    vpath DEFAULT	
+	    helpkey *
+	  }
+
+     }
+     action sim {
+
+          parameter obsxmlfile {
+            position 1
+            type _CHAR
+            prompt {Observation XML file}
+            vpath {PROMPT}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+          parameter simxmlfile {
+            position 2
+            type _CHAR
+            prompt {Simulation XML file}
+            vpath {PROMPT}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+          parameter seed {
+            position 3
+            type _INTEGER
+            prompt {Value for random number generator}
+            vpath {PROMPT}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+          parameter outdir {
+            position 4
+            type _CHAR
+            prompt {Directory for output file(s)}
+            vpath {PROMPT}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+          parameter maxwrite {
+            position 5
+            type _INTEGER
+            prompt {Number of samples to write in output file}
+            vpath {PROMPT}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+          parameter msg_filter {
+	    type _CHAR
+	    prompt {Message level}
+	    default NORM
+	    vpath DEFAULT	
+	    helpkey *
+	  }
+
+     }
+   
+
    }
 
    icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
