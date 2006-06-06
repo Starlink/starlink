@@ -28,6 +28,7 @@ $install = $StarConfig{Star_Bin};
 # $ndflibs = -lndf -lpsx -lary -lhds -lcnf -lerr -lerr_standalone -lems -lchr -lprm -lprm_a 
 $ndflibs = qx/ndf_link/;
 $cnfrtllibs = qx/cnfrtl_link/;
+$ndflibs .= qx/ one_link/;
 
 die "No NDF libraries were found.\n This may imply that the ndf_link command is not in your path." if $ndflibs !~ /./;
 
@@ -97,6 +98,7 @@ WriteMakefile(
     'INSTALLBIN'=> $install,
     'MAP_TARGET'=> "ndfperl",
     'NAME'      => 'NDF',
+    'EXE_FILES' => [qw/ ndffitswcs /],
     'OPTIMIZE'  => $optimize,
     'DISTNAME'  => 'NDF',
     'VERSION_FROM' => 'NDF.pm', # finds $VERSION

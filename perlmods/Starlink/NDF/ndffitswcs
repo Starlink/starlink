@@ -1,0 +1,117 @@
+#!perl
+
+=head1 NAME
+
+ndffitswcs - Dump the FITS world coordinate cards for this NDF WCS
+
+=head1 SYNOPSIS
+
+ ndffitswcs blah.sdf
+ ndffitswcs --encoding=FITS-CLASS blah.sdf
+
+=head1 DESCRIPTION
+
+Dump a FITS header representation of the World Coordinates stored
+within an NDF. More convenient than converting to FITS.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<encoding>
+
+Default encoding is FITS-WCS. Other encordings supported by AST
+can be given here.
+
+=back
+
+=cut
+
+use strict;
+use Pod::Usage;
+use Getopt::Long;
+use Starlink::AST;
+use NDF;
+
+# Options
+my ($help, $man, $version, $encoding);
+my $status = GetOptions("help" => \$help,
+                        "man" => \$man,
+                        "version" => \$version,
+			"encoding=s" => \$encoding,
+                       );
+
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+if ($version) {
+  my $id = '$Id$ ';
+  print "ndffitswcs - Dump WCS as FITS header cards\n";
+  print " CVS revision: $id\n";
+  exit;
+}
+
+# Read the file name
+my $file = shift(@ARGV);
+my $status = 0;
+
+$encoding = "FITS-WCS" unless defined $encoding;
+
+# begin actual program
+
+err_begin($status);
+
+ndf_find(&NDF::DAT__ROOT, $file, my $indf, $status);
+
+my $wcs = ndfGtwcs( $indf, $status);
+
+# Create FitsChan and set encoding
+my $fchan = new Starlink::AST::FitsChan();
+$fchan->Set("Encoding", $encoding);
+
+# write the WCS object to the FITS channel
+my $wstat = $fchan->Write( $wcs );
+
+if ($wstat == 0) {
+  print STDERR "Unable to represent WCS as FITS headers using encoding $encoding\n";
+  exit;
+}
+
+# rewind
+$fchan->Clear( "Card" );
+
+# find out how many cards we have
+my $ncards = $fchan->Get("Ncard");
+
+# write result to STDOUT
+for (my $i = 1; $i <= $ncards; $i++) {
+  my $result = $fchan->FindFits( "%f", my $card, 1 );
+  last if !$result;
+  print $card ."\n";
+}
+
+err_end($status);
+
+=head1 AUTHOR
+
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+=cut
