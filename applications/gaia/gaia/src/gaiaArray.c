@@ -559,9 +559,10 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
         *nel = (size_t) dims[axis];
     }
     else {
-        lower = MAX( 0,          MIN( arange[0], arange[1] ) );
-        upper = MIN( dims[axis], MAX( arange[1], arange[0] ) );
-        *nel = upper - lower + 1;
+        lower = MAX( 0,              MIN( arange[0], arange[1] ) );
+        upper = MIN( dims[axis] - 1, MAX( arange[1], arange[0] ) );
+        upper++;
+        *nel = upper - lower;
     }
     length = (*nel) * gaiaArraySizeOf( intype );
     if ( cnfmalloc == 1 ) {
