@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@" support="U">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/pisa</path>
+  <description>OBSERVE --- Check Star Observability</description>
+  <abstract><p>
+      OBSERVE is designed to allow you to get a quick overview of the
+      observability of a star through the year from the geographical
+      location selected.  You will be prompted for the RA and Dec of
+      the star, the telescope (you can also specify arbitrary
+      locations), and the year.  On the selected GKS graphics device a
+      plot will be drawn that tells you, for all dates of the year,
+      the star rising and setting times and the times that it is
+      30degrees above the horizon, the times of astronomical
+      twilight, the phase and rising and setting times of the Moon as
+      well as its distance from the star in question.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Julian Osborne, Jeremy Ashley, &amp; Grant Privett</name>
+      <uname>pwd</uname>
+      <email>ussc@star.rl.ac.uk</email>
+      <role>librarian</role>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

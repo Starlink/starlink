@@ -1,0 +1,81 @@
+INTERFACE OBSERVE
+   PARAMETER AGAIN
+      TYPE '_CHAR'
+      PROMPT 'New telescope (T); New Star (S); Both (B) or QUIT (Q)'
+      HELP 'Select an option to continue with a new plot or (Q)uit'
+      IN 'T','S','B','Q'
+   ENDPARAMETER
+   PARAMETER DEVICE
+      TYPE '_CHAR'
+      PROMPT 'Output graphics device (e.g. ps_l)'
+      HELP 'Enter a device name or type "?" (with quotes) for a full list'
+      PPATH 'CURRENT,DEFAULT'
+      DEFAULT 'ps_l'
+   ENDPARAMETER
+   PARAMETER NUMBER
+      TYPE '_INTEGER'
+      PROMPT 'Enter telescope number, or 0 for other'
+      HELP 'Select a telescope from the list above'
+      PPATH 'CURRENT'
+      RANGE 0,99
+   ENDPARAMETER
+   PARAMETER TELESCOPE
+      TYPE '_CHAR'
+      PROMPT 'Name of telescope'
+      PPATH 'CURRENT'
+   ENDPARAMETER
+   PARAMETER LATITUDE
+      TYPE '_CHAR'
+      PROMPT 'Telescope latitude (dd mm ss)'
+      PPATH 'CURRENT'
+   ENDPARAMETER
+   PARAMETER LONGITUDE
+      TYPE '_CHAR'
+      PROMPT 'Telescope longitude east (dd mm ss)'
+      PPATH 'CURRENT'
+   ENDPARAMETER
+   PARAMETER TIMEZONE
+      TYPE '_INTEGER'
+      PROMPT 'Time difference from UT'
+      HELP 'Integer number of hours.  E.g. France = 1, England = 0'
+      RANGE -12,12
+      PPATH 'CURRENT'
+   ENDPARAMETER
+   PARAMETER STAR
+      TYPE '_CHAR'
+      PROMPT 'Name of object'
+      HELP 'For display purposes only'
+      PPATH 'CURRENT'
+   ENDPARAMETER
+   PARAMETER RA
+      TYPE '_CHAR'
+      PROMPT 'Object coordinates (hh mm ss)'
+      PPATH 'CURRENT'
+   ENDPARAMETER
+   PARAMETER DEC
+      TYPE '_CHAR'
+      PROMPT 'Object coordinates (dd mm ss)'
+      PPATH 'CURRENT'
+   ENDPARAMETER
+   PARAMETER YEAR
+      TYPE '_INTEGER'
+      PROMPT 'Year of observation'
+      HELP 'Enter the year from which you wish to observe the object'
+      RANGE 1900,2100
+      PPATH 'CURRENT'
+   ENDPARAMETER
+   PARAMETER TEXTF
+      TYPE '_LOGICAL'
+      PROMPT 'Want text file output?'
+      HELP 'Enter Y if you want the rise time data printed out'
+      PPATH 'CURRENT'
+   ENDPARAMETER
+   PARAMETER OUT       # The name of the text file to contain the data.
+      TYPE '_CHAR'
+      KEYWORD 'OUT'
+      PROMPT 'Text file name'
+      PPATH 'CURRENT'
+      HELP 'Enter the name to be used for the output text file.'
+      DEFAULT OBSERVE.DAT
+    ENDPARAMETER
+ENDINTERFACE
