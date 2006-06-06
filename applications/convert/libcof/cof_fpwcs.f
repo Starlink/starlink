@@ -195,12 +195,12 @@
          IF( THERE ) THEN
             IF( ENCOD .NE. ' ' ) THEN
                CALL MSG_SETC( 'ENC', ENCOD )
-               CALL MSG_OUT( 'COF_FPWCS_MSG1', '  WARNING: Un-able '//
+               CALL MSG_OUT( 'COF_FPWCS_MSG1', '  WARNING: Unable '//
      :                       'to export WCS information using the '//
      :                       'specified FITS encoding ''^ENC''.', 
      :                       STATUS )
             ELSE
-               CALL MSG_OUT( 'COF_FPWCS_MSG2', '  WARNING: Un-able '//
+               CALL MSG_OUT( 'COF_FPWCS_MSG2', '  WARNING: Unable '//
      :                       'to export WCS information using any '//
      :                       'of the supported FITS encodings.', 
      :                       STATUS )
