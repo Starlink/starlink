@@ -12,10 +12,7 @@ dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
 AC_CONFIG_SRCDIR([sun146.tex])
 
-dnl    Include defaults for Starlink configurations
-dnl    Option `per-package-dirs' means that executables and help files
-dnl    are installed in package-specific directories.
-STAR_DEFAULTS(per-package-dirs)
+STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
