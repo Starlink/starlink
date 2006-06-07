@@ -53,6 +53,8 @@
 *        Added DRWDSB
 *     17-FEB-2006 DSB):
 *        Added ASTFIT.
+*     5-JUN-2006 (DSB):
+*        Added ASTPLN, ASTX1, ASTY1, ASTX2, ASTY2, ASTBLE 
 *     {enter_further_changes_here}
 
 *-
@@ -99,12 +101,34 @@
 *  as if it were a genuine AST Plot attribute.
       LOGICAL ASTFIT
 
+*  Pointer to an AST KeyMap used to communicate with KPG1_ASPLN.
+      INTEGER ASTPLN
+
+*  The X value at the left edge.
+      REAL ASTX1
+
+*  The Y value at the bottom edge.
+      REAL ASTY1 
+
+*  The X value at the right edge.
+      REAL ASTX2 
+
+*  The Y value at the top edge.
+      REAL ASTY2 
+
+*  Do not draw lines that touch an edge?
+      LOGICAL ASTBLE 
+
+
+
 *  Common Blocks:
 *  =============
 
 *  Non-character data.
       COMMON /KPG_AST1/ ASTLN, ASTPT, ASTGRP, ASTTSZ, ASTING, ASTOUG,
-     :                  ASTNPS, DRWDSB, ASTFIT
+     :                  ASTNPS, DRWDSB, ASTFIT, ASTPLN, ASTX1, ASTY1,
+     :                  ASTX2, ASTY2, ASTBLE 
+
 
 *  Character data.
       COMMON /KPG_AST2/  ASTLC, ASTGSP
