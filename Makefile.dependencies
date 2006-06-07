@@ -793,6 +793,8 @@ $(MANIFESTS)/fio: \
 	cd libraries/fio \
 	  && $(MAKE_CPT)
 
+# Component gaia has configure dependencies on { blt itcl tcl tk },
+# which must be built before this component is configured.
 $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/ard \
 		$(MANIFESTS)/ary \
@@ -1431,6 +1433,26 @@ $(MANIFESTS)/news: \
 	cd applications/news \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/observe: \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/fio \
+		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/pgplot \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/sla \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starx
+	cd applications/pisa \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/one: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
@@ -1623,6 +1645,7 @@ $(MANIFESTS)/polpack: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/ifd \
+		$(MANIFESTS)/jpeg \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
@@ -1649,6 +1672,7 @@ $(MANIFESTS)/polpack: \
 		$(MANIFESTS)/startcl \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/polpack \
 	  && $(MAKE_CPT)
@@ -1949,6 +1973,7 @@ $(MANIFESTS)/startcl: \
 		$(MANIFESTS)/gwm \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/jpeg \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/nbs \
 		$(MANIFESTS)/pcs \
@@ -1956,7 +1981,9 @@ $(MANIFESTS)/startcl: \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
-		$(MANIFESTS)/starx
+		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk
 	cd applications/startcl \
 	  && $(MAKE_CPT)
 

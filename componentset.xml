@@ -660,7 +660,7 @@ calibration and modification, grid overlays, blink comparison, defect patching
 and the ability to query on-line (WWW) catalogues.
 </p></abstract>
   <dependencies >
-    <build>pcs</build><build option='link'>ard</build><build option='link'>ast</build><build option='link'>blt</build><build option='link'>cat</build><build option='link'>cfitsio</build><build option='link'>generic</build><build option='link'>fio</build><build option='link'>img</build><build option='link'>itcl</build><build option='link'>pcs</build><build option='link'>pda</build><build option='link'>sae</build><build option='link'>startcl</build><build option='link'>sla</build><build option='link'>tcl</build><build option='link'>tclx</build><build option='link'>tk</build><sourceset>star2html</sourceset><use>convert</use><use>esp</use><use>extractor</use><use>kappa</use><use>photom</use><use>polpack</use><use>startcl</use><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>ard</build><build option='link'>ast</build><build option='link'>blt</build><build option='link'>cat</build><build option='link'>cfitsio</build><build option='link'>generic</build><build option='link'>fio</build><build option='link'>img</build><build option='link'>itcl</build><build option='link'>pcs</build><build option='link'>pda</build><build option='link'>sae</build><build option='link'>startcl</build><build option='link'>sla</build><build option='link'>tcl</build><build option='link'>tclx</build><build option='link'>tk</build><sourceset>star2html</sourceset><configure>tcl</configure><configure>tk</configure><configure>blt</configure><configure>itcl</configure><use>convert</use><use>esp</use><use>extractor</use><use>kappa</use><use>photom</use><use>polpack</use><use>startcl</use><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -973,6 +973,37 @@ them.
     </person>
   </developers>
   <documentation> sun195</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="observe" support="U">
+  <version>2.3</version>
+  <path>applications/pisa</path>
+  <description>OBSERVE --- Check Star Observability</description>
+  <abstract><p>
+      OBSERVE is designed to allow you to get a quick overview of the
+      observability of a star through the year from the geographical
+      location selected.  You will be prompted for the RA and Dec of
+      the star, the telescope (you can also specify arbitrary
+      locations), and the year.  On the selected GKS graphics device a
+      plot will be drawn that tells you, for all dates of the year,
+      the star rising and setting times and the times that it is
+      30degrees above the horizon, the times of astronomical
+      twilight, the phase and rising and setting times of the Moon as
+      well as its distance from the star in question.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build option='link'>sla</build><build option='link'>pgplot</build><build option='link'>fio</build><build option='link'>chr</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Julian Osborne, Jeremy Ashley, &amp; Grant Privett</name>
+      <uname>pwd</uname>
+      <email>ussc@star.rl.ac.uk</email>
+      <role>librarian</role>
+    </person>
+  </developers>
+  <documentation> sun146</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
@@ -1486,7 +1517,7 @@ UNIX).
     graphics user interfaces for Starlink applications in Tcl/Tk.</p>
   </abstract>
   <dependencies >
-    <build>ems</build><build>gwm</build><build>mers</build><build>nbs</build><build>pcs</build><build>sae</build><build>starx</build><configure>jpeg</configure><configure>tcl</configure><configure>tk</configure><sourceset>star2html</sourceset>
+    <build>ems</build><build>gwm</build><build>jpeg</build><build>mers</build><build>nbs</build><build>pcs</build><build>sae</build><build>starx</build><build>tcl</build><build>tk</build><configure>jpeg</configure><configure>tcl</configure><configure>tk</configure><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
