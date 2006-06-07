@@ -194,6 +194,9 @@
          ELSE IF ( NAME .EQ. 'CLINPLOT' ) THEN
             CALL CLINPLOT ( STATUS )
 
+         ELSE IF ( NAME .EQ. 'MYCLINPLOT' ) THEN
+            CALL MYCLINPLOT ( STATUS )
+
 *  Produces a colour composite image from 1, 2 or 3 NDFs.
          ELSE IF ( NAME .EQ. 'COLCOMP' ) THEN
             CALL COLCOMP ( STATUS )

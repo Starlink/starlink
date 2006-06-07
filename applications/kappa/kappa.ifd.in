@@ -3572,6 +3572,190 @@ package kappa {
 
       }
 
+      action myclinplot {
+         alias {myclinp(lot)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter axes {
+            type _LOGICAL
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
+            default TRUE
+            prompt {Produce annotated celestial axes?}
+            helpkey *
+          }
+
+         parameter blankedge {
+            type _LOGICAL
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
+            default TRUE
+            prompt {Remove annotation and ticks from edge cells?}
+            helpkey *
+          }
+
+         parameter clear {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Is the current picture to be cleared before plotting?}
+            helpkey *
+            default TRUE
+          }
+
+         parameter comp {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DYNAMIC DEFAULT
+            prompt {Component to display}
+            helpkey *
+            default Data
+          }
+
+         parameter datmax {
+            type _REAL
+            prompt {Maximum data value to display in each spectrum}
+            vpath DYNAMIC 
+            ppath DYNAMIC 
+            helpkey *
+          }
+
+         parameter datmin {
+            type _REAL
+            prompt {Minimum data value to display in each spectrum}
+            vpath DYNAMIC 
+            ppath DYNAMIC 
+            helpkey *
+          }
+
+         parameter device {
+            position 3
+            ptype DEVICE
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.GRAPHICS_DEVICE
+            prompt {Name of graphics device}
+            helpkey *
+          }
+
+         parameter fill {
+            type _LOGICAL
+            prompt {Fill the plotting area?}
+            vpath DYNAMIC DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter key {
+            type _LOGICAL
+            prompt {Do you want a key to the cell axes?}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+         parameter keypos {
+            size *
+            type _REAL
+            prompt {Horizontal and vertical position of key}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            helpkey *
+            default 0.05
+          }
+
+         parameter keystyle {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Plotting style for the key}
+            helpkey *
+            default !
+          }
+
+         parameter margin {
+            size *
+            type _REAL
+            prompt {Widths of margins around spatial axes}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DYNAMIC DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter ndf {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {3-dimensional array to be displayed}
+            helpkey *
+          }
+
+         parameter nx {
+            position 4
+            type _INTEGER
+            vpath DYNAMIC
+            ppath DYNAMIC DEFAULT
+            default 5
+            prompt {No. of spectra in each row}
+            helpkey *
+          }
+
+         parameter ny {
+            position 5
+            type _INTEGER
+            vpath DYNAMIC
+            ppath DYNAMIC DEFAULT
+            default 5
+            prompt {No. of spectra in each column}
+            helpkey *
+          }
+
+         parameter reflabel {
+            type _LOGICAL
+            prompt {Put labels around the first line plot?}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter specstyle {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Plotting style for the line plot axes}
+            helpkey *
+            default !
+          }
+
+         parameter style {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Plotting style for the spatial axes}
+            helpkey *
+            default !
+          }
+
+         parameter useaxis {
+            position 2
+            type _INTEGER
+            vpath DYNAMIC
+            ppath DYNAMIC DEFAULT
+            default 3
+            prompt {Spectral axis}
+            helpkey *
+          }
+
+      }
+
       action colcomp {
          alias {colc(omp)}
 
