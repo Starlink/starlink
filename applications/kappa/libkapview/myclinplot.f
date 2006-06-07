@@ -578,6 +578,9 @@
 *  above as the default.
       CALL KPG1_GTAXI( 'USEAXIS', CFRM, 1, SPAX, STATUS )
 
+*  Get the corresponding single-axis Frame.
+      SPFRM = AST_PICKAXES( CFRM, 1, SPAX, TMAP, STATUS )      
+
 *  Locate the corresponding pixel axis, if possible. If not possible,
 *  report an error.
       CALL AST_MAPSPLIT( CBMAP, 1, SPAX, SPBAX, SPMAP, STATUS )
