@@ -596,6 +596,11 @@
 *        Use KPG1_ASTTL to get the title.
 *     2006 April 12 (MJC):
 *        Remove unused variable and wrapped long lines.
+*     7-JUN-2006 (DSB):
+*        - Ensure variable comments are contained on a singleline (to ease
+*        sorting).
+*        - Allow alignment with an existing DATAPLOT Frame even if it is 
+*        not the current Frame.
 *     {enter_further_changes_here}
 
 *-
@@ -607,8 +612,7 @@
       INCLUDE 'SAE_PAR'          ! Global SSE definitions
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'NDF_PAR'          ! NDF constants
-      INCLUDE 'AST_PAR'          ! AST constants and function 
-                                 ! declarations
+      INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
@@ -631,23 +635,16 @@
       CHARACTER NDFNAM*( 255 )   ! Full NDF specification 
       CHARACTER TEXT*( 255 )     ! A general text string
       CHARACTER UNITS*( 20 )     ! Units of the data
-      CHARACTER XMAP*( 8 )       ! How to map the X axis on to the
-                                 ! screen
-      CHARACTER YMAP*( 8 )       ! How to map the Y axis on to the 
-                                 ! screen
-      DOUBLE PRECISION BL( 2 )   ! "W.w. want" X/Y values at 
-                                 ! bottom-left corner
-      DOUBLE PRECISION BLG( 2 )  ! "Uniform" X/Y values at bottom-left 
-                                 ! corner
+      CHARACTER XMAP*( 8 )       ! How to map X axis on to the screen
+      CHARACTER YMAP*( 8 )       ! How to map Y axis on to the screen
+      DOUBLE PRECISION BL( 2 )   ! X/Y "W.w.want" at bottom-left corner
+      DOUBLE PRECISION BLG( 2 )  ! X/Y "Uniform" at bottom-left corner
       DOUBLE PRECISION BOX( 4 )  ! Bounds of DATA picture 
       DOUBLE PRECISION DVAL      ! General double precision value
-      DOUBLE PRECISION FN( NDF__MXDIM ) ! End position in current Frame
-      DOUBLE PRECISION ST( NDF__MXDIM ) ! Start position in current 
-                                 ! Frame
-      DOUBLE PRECISION TR( 2 )   ! "W.w. want" X/Y values at top-right 
-                                 ! corner
-      DOUBLE PRECISION TRG( 2 )  ! "Uniform" X/Y values at top-right 
-                                 ! corner
+      DOUBLE PRECISION FN( NDF__MXDIM ) ! End pos. in current Frame
+      DOUBLE PRECISION ST( NDF__MXDIM ) ! Start pos. in current Frame
+      DOUBLE PRECISION TR( 2 )   ! X/Y "W.w. want" at top-right corner
+      DOUBLE PRECISION TRG( 2 )  ! X/Y "Uniform" at top-right corner
       DOUBLE PRECISION TXTPOS( 2 ) ! Key text centre position
       DOUBLE PRECISION XSMAX     ! Max X after inclusion of axis widths
       DOUBLE PRECISION XSMIN     ! Min X after inclusion of axis widths
@@ -655,18 +652,16 @@
       INTEGER AXMAPS( 2 )        ! Axis mappings for displayed data plot
       INTEGER DIAXIS             ! Default value for USEAXIS
       INTEGER DIM                ! Number of elements in the input array
-      INTEGER DPFS               ! FrameSet connecting old and new 
-                                 ! DATAPLOT Frames
+      INTEGER DPFS               ! FrameSet for old & new DATAPLOT Frmes
       INTEGER EL                 ! Number of mapped elements 
       INTEGER FREQ               ! Interval between error bars
       INTEGER FSET               ! Pointer to FrameSet 
       INTEGER I                  ! General variable
       INTEGER IAT                ! No. of characters in a string
       INTEGER IAXFR              ! Index of effective AXIS Frame in IWCS
-      INTEGER IAXIS              ! Index of axis used to annotate 
-                                 ! horizontal axis
-      INTEGER ICURR0             ! Index of original current Frame in 
-                                 ! Plot
+      INTEGER IAXIS              ! WCS axis used to annotate horiz. axis
+      INTEGER ICURR0             ! Index of orig. current Frame in Plot
+      INTEGER IDP                ! Index of DATAPLOT Frame
       INTEGER IHI                ! Index of last array element to use
       INTEGER ILO                ! Index of first array element to use
       INTEGER IMODE              ! Mode identifier
@@ -679,74 +674,53 @@
       INTEGER IPICK              ! AGI id. for the KEY picture
       INTEGER IPLOT              ! Pointer to AST Plot for DATA picture
       INTEGER IPLOTK             ! Pointer to AST Plot for KEY picture
-      INTEGER IPSTEP             ! Pointer to x axis widths in "w.w. 
-                                 ! want"
-      INTEGER IPXBAR             ! Pointer to x error bar limits in 
-                                 ! "w.w. want"
-      INTEGER IPXCEN             ! Pointer to x centres in "w.w. want" 
-                                 ! Frame
-      INTEGER IPXDAT             ! Pointer to supplied x axis centres
-      INTEGER IPXVAR             ! Pointer to supplied x centre
-                                 ! variances
-      INTEGER IPYBAR             ! Pointer to y error bar limits in 
-                                 ! "w.w. want"
-      INTEGER IPYCEN             ! Pointer to y data values in "w.w. 
-                                 ! want" Frame
+      INTEGER IPSTEP             ! P'nter to x axis "w.w.want" widths 
+      INTEGER IPXBAR             ! P'nter to x err bar "w.w.want" limits 
+      INTEGER IPXCEN             ! P'nter to x centres in "w.w.want" Frm
+      INTEGER IPXDAT             ! P'nter to supplied x axis centres
+      INTEGER IPXVAR             ! P'nter to supplied x centre variances
+      INTEGER IPYBAR             ! P'nter to y err bar "w.w.want" limits 
+      INTEGER IPYCEN             ! P'nter to y values in "w.w.want" Frm
       INTEGER IPYDAT             ! Pointer to supplied y data values
       INTEGER IPYVAR             ! Pointer to supplied y data variances
       INTEGER ISHAPE             ! Identifier for error bar shape
-      INTEGER IWCS               ! Pointer to the WCS FrameSet from the
-                                 ! NDF
-      INTEGER MAP                ! Pointer to "w.w. got"->"w.w. want"
-                                 ! Mapping 
-      INTEGER MONO               ! 0: Not monotonic, +1: increase. -1: 
-                                 ! decrease
+      INTEGER IWCS               ! P'nter to the WCS FrameSet from NDF
+      INTEGER MAP                ! P'nter to "w.w.got->w.w.want" Mapping 
+      INTEGER MONO               ! Gradient sign (0 = not monotonic)
       INTEGER MTYPE              ! PGPLOT marker type
       INTEGER NAX                ! No. of axes in current Frame
       INTEGER NAXNDF             ! No. of pixel axes in the base NDF
       INTEGER NC                 ! No. of characters in NDFNAM
       INTEGER NCU                ! Number of characters in the units
-      INTEGER NFRM               ! Frame index increment between IWCS
-                                 ! and IPLOT
+      INTEGER NFRM               ! Frm index increment form IWCS to IPLOT
       INTEGER NMARG              ! No. of margin values given
       INTEGER NVAL               ! No. of axis values supplied
-      INTEGER PMAP               ! PermMap pointer
       INTEGER PERM( NDF__MXDIM ) ! Dummy axis permutation array
+      INTEGER PMAP               ! PermMap pointer
       INTEGER SDIM( NDIM )       ! The significant NDF axes
       INTEGER SLBND( NDIM )      ! Significant lower bounds of the image
       INTEGER SUBND( NDIM )      ! Significant upper bounds of the image
-      INTEGER WCSMAP             ! Mapping from NDF GRID to current 
-                                 ! Frame
-      INTEGER WWGOT              ! Index of "what we've got" Frame in 
-                                 ! FSET
-      INTEGER WWWANT             ! Index of "what we want" Frame in FSET
-      LOGICAL ALIGN              ! Should new X axis be aligned with 
-                                 ! existing X axis?
+      INTEGER WCSMAP             ! Mapping from NDF GRID to current Frm
+      INTEGER WWGOT              ! Index of "w.w.got" Frame in FSET
+      INTEGER WWWANT             ! Index of "w.w.want" Frame in FSET
+      LOGICAL ALIGN              ! Align new X axis with existing X axis?
       LOGICAL AXES               ! Produce annotated axes?
       LOGICAL BAD                ! Bad values found?
       LOGICAL DIST               ! Show distance instead of axis value?
       LOGICAL ERRBAR             ! Display error bars?
-      LOGICAL FRSTEP             ! Free pointer to x-axis widths in 
-                                 ! "w.w. want"?
-      LOGICAL FRXBAR             ! Free pointer to x-error-bar limits in
-                                 ! "w.w. want"
-      LOGICAL FRXCEN             ! Free pointer to x centres in "w.w. 
-                                 ! want" Frame
-      LOGICAL FRYBAR             ! Free pointer to y error-bar limits in
-                                 ! "w.w. want"
-      LOGICAL FRYCEN             ! Free pointer to y data values in 
-                                 ! "w.w. want" Frame
-      LOGICAL KEY                ! Key of the contour heights to be 
-                                 ! produced?
-      LOGICAL NEWPIC             ! Is new Plot aligned with existing
-                                 ! DATA picture?
+      LOGICAL FRSTEP             ! Free IPSTEP p'nter?
+      LOGICAL FRXBAR             ! Free IPXBAR pointer?
+      LOGICAL FRXCEN             ! Free IPXCEN pointer?
+      LOGICAL FRYBAR             ! Free IPYBAR pointer?
+      LOGICAL FRYCEN             ! Free IPYCEN pointer?
+      LOGICAL KEY                ! Create key to contour heights?
+      LOGICAL NEWPIC             ! Is new Plot aligned with old DATA pic?
       LOGICAL NOINV              ! Did any mapping not have an inverse?
       LOGICAL OLDPIC             ! Was an existing DATA picture found?
       LOGICAL THERE              ! Does object exist?
       LOGICAL XVAR               ! Display x axis centre variances?
       LOGICAL YVAR               ! Display y data variances?
-      REAL HGT                   ! Height of text with horizontal 
-                                 ! baseline
+      REAL HGT                   ! Height of text with horiz. baseline
       REAL LNSP                  ! Line spacing in millimetres
       REAL MARGIN( 4 )           ! Width of margins round DATA picture
       REAL UP(2)                 ! Up vector
@@ -754,7 +728,6 @@
       REAL XCH                   ! Height of text with vertical baseline
       REAL XSIGMA                ! No. of std. devn's for X error bars
       REAL YSIGMA                ! No. of std. devn's for Y error bars
-
 *.
 
 *  Check the inherited global status.
@@ -1149,10 +1122,13 @@
 *  If we are drawing within an existing DATA picture...
       IF( OLDPIC ) THEN
 
-*  Is the current Frame in the Plot associated with the existing DATA
-*  picture a DATAPLOT Frame?  If not, it was not created by this
-*  application and so we cannot align the new picture with it.
-         IF( AST_GETC( IPLOT, 'DOMAIN', STATUS ) .EQ. 'DATAPLOT' ) THEN
+*  Try to find a Frame within the Plot that has a Domain of DATAPLOT.
+*  This application can only align with such Frames.
+         CALL KPG1_ASFFR( IPLOT, 'DATAPLOT', IDP, STATUS )
+
+* If such a Frame was found, make sure it is the current Frame.
+         IF( IDP .NE. AST__NOFRAME ) THEN
+            CALL AST_SETI( IPLOT, 'Current', IDP, STATUS )
 
 *  Attempt to find a Mapping from the DATAPLOT Frame in the existing 
 *  picture to the DATAPLOT Frame in the new picture.
