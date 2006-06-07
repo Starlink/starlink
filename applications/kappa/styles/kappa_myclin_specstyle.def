@@ -1,0 +1,36 @@
+#+
+#  Name:
+#     kappa_myclinplot_specstyle.def
+
+#  Purpose:
+#     Default SPECSTYLE for KAPPA application MYCLINPLOT.
+
+#  Description:
+#     This file specifies the plotting attributes to be used if the user
+#     does not give alternative values using the SPECSTYLE parameter of 
+#     application MYCLINPLOT.  See $KAPPA_DIR/kappa_style.def for more 
+#     information on KAPPA style files.
+
+#  Notes:
+#     -  Always include attribute axis qualifiers, etc, explicitly in this
+#     file.  For instance, say "textlab(1)=1" and "textlab(2)=1" instead of
+#     just "textlab=1".
+
+#  Authors:
+#     David S. Berry (JAC)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-JUN-2006 (DSB):
+#        Original version.
+#-
+
+#  Set colours for various elements of the plot.
+      colour(border)=grey
+      colour(grid)=grey
+      colour(ticks)=grey
+      colour(axes)=grey
+      colour(numlab)=cyan
+      colour(textlab)=cyan
+      colour(curves)=white
+
