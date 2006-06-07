@@ -304,6 +304,8 @@ kpg1_agref.f \
 kpg1_asagd.f \
 kpg1_ascrv.f \
 kpg1_asgrd.f \
+kpg1_asplg.f \
+kpg1_aspln.f \
 kpg1_asplt.f \
 kpg1_asreg.f \
 kpg1_asrgg.f \
