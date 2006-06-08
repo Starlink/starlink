@@ -90,6 +90,8 @@
 *        Map Q&V if not present before when mode is WRITE
 *     2006-05-24 (AGG):
 *        Add status check in case SCANFIT extension doesn't exist
+*     2006-06-08 (AGG):
+*        Set correct data type for QUALITY to fix HDS error
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -304,7 +306,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
       /* Map each component as necessary */
       ndfMap( indf, "DATA", dtype, mode, &outdata[0], &nout, status );
       if (qexists) {
-	ndfMap( indf, "QUALITY", dtype, mode, &outdata[2], &nout, status );
+	ndfMap( indf, "QUALITY", "_UBYTE", mode, &outdata[2], &nout, status );
       }
       if (vexists) {
 	ndfMap( indf, "VARIANCE", dtype, mode, &outdata[1], &nout, status );
