@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_CLPCP( SLBND, SUBND, SKBAX, SPBAX, CGX, CGY,
-     :                       NSAMP, ARRAY, X0, Y0, DX, DY, DATMAX, 
-     :                       DATMIN, GOOD, WORK1, WORK2, WORK3,
+     :                       NSAMP, ARRAY, X0, Y0, DX, DY, YTOP, 
+     :                       YBOT, GOOD, WORK1, WORK2, WORK3,
      :                       STATUS )
 *+
 *  Name:
@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     CALL KPS1_CLPCP( SLBND, SUBND, SKBAX, SPBAX, CGX, CGY,
-*                      NSAMP, ARRAY, X0, Y0, DX, DY, DATMAX, 
-*                      DATMIN, GOOD, WORK1, WORK2, WORK3, STATUS )
+*                      NSAMP, ARRAY, X0, Y0, DX, DY, YTOP, 
+*                      YBOT, GOOD, WORK1, WORK2, WORK3, STATUS )
 
 *  Description:
 *     This routine extracts the spatral data to be plotted in a single 
@@ -57,9 +57,9 @@
 *     DY = REAL (Given)
 *        The height (in GRAPHICS units) of the cell in which the spectrum
 *        will be drawn.
-*     DATMAX = REAL (Given)
+*     YTOP = REAL (Given)
 *        The maximum data value to be displayed in a cell.
-*     DATMIN = REAL (Given)
+*     YBOT = REAL (Given)
 *        The minimum data value to be displayed in a cell.
 *     GOOD = LOGICAL (Returned)
 *        Returned .TRUE. if the returned spectrum contains any good 
@@ -127,8 +127,8 @@
       DOUBLE PRECISION Y0
       DOUBLE PRECISION DX
       DOUBLE PRECISION DY
-      REAL DATMAX
-      REAL DATMIN
+      REAL YTOP
+      REAL YBOT
 
 *  Arguments Returned:
       LOGICAL GOOD
@@ -159,7 +159,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check the MAX and MIN data values are not equal.
-      IF( DATMAX .EQ. DATMIN ) THEN
+      IF( YTOP .EQ. YBOT ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'KPS1_CLPCP_ERR1', 'Maximum and minimum data '//
      :                 'values are equal', STATUS )
@@ -203,8 +203,8 @@
       END DO
 
 *  Get the scale and zero for converting data value into GRAPHICS Y value.
-      B = DY/( DATMAX - DATMIN )
-      A = Y0 - B*DATMIN
+      B = DY/( YTOP - YBOT )
+      A = Y0 - B*YBOT
 
 *  If the number of samples equals the spectral axis dimension, there is
 *  no binning to be done.
@@ -212,7 +212,9 @@
 
 *  Copy the data values from the supplied array to the returned work array.
          DO I = 1, NSAMP
-            IF( ARRAY( IV ) .NE. VAL__BADR ) THEN
+            IF( ARRAY( IV ) .NE. VAL__BADR .AND.
+     :          ARRAY( IV ) .LE. YTOP .AND.
+     :          ARRAY( IV ) .GE. YBOT ) THEN
                GOOD = .TRUE.
                WORK2( I ) = A + B*ARRAY( IV )
             ELSE
@@ -236,7 +238,9 @@
 
 *  If the data value is good, determine which bin to put it in, and then
 *  increment the bin sum and count.
-            IF( ARRAY( IV ) .NE. VAL__BADR ) THEN
+            IF( ARRAY( IV ) .NE. VAL__BADR .AND.
+     :          ARRAY( IV ) .LE. YTOP .AND.
+     :          ARRAY( IV ) .GE. YBOT ) THEN
                J = NINT( 0.5 + NSAMP*( I - 0.5 )/DIM( SPBAX ) )
                WORK2( J ) = WORK2( J ) + ARRAY( IV )
                WORK3( J ) = WORK3( J ) + 1
