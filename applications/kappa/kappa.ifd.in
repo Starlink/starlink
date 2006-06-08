@@ -3613,7 +3613,7 @@ package kappa {
             default Data
           }
 
-         parameter datmax {
+         parameter ytop {
             type _REAL
             prompt {Maximum data value to display in each spectrum}
             vpath DYNAMIC 
@@ -3621,7 +3621,7 @@ package kappa {
             helpkey *
           }
 
-         parameter datmin {
+         parameter ybot {
             type _REAL
             prompt {Minimum data value to display in each spectrum}
             vpath DYNAMIC 
@@ -3664,7 +3664,7 @@ package kappa {
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             helpkey *
-            default 0.05
+            default 0.03
           }
 
          parameter keystyle {
@@ -3674,6 +3674,15 @@ package kappa {
             prompt {Plotting style for the key}
             helpkey *
             default !
+          }
+
+         parameter lmode {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {How to choose default y-axis bounds}
+            helpkey *
+            default Range
           }
 
          parameter margin {
