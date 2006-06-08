@@ -564,7 +564,7 @@
       INTEGER I               ! Loop count
       INTEGER IAGDAT          ! Index of AGI_DATA Frame
       INTEGER IAT             ! No. of characters in the string
-      INTEGER ICOL( NDF__MXDIM )! Min. col. no. for start of each field
+      INTEGER ICOL( NDF__MXDIM )! Min. col. no. for start of WCS col.
       INTEGER IGRP1           ! GRP id. for group of formatted posns
       INTEGER IGRP2           ! GRP id. for group of text strings
       INTEGER IMARK           ! PGPLOT marker type
@@ -596,6 +596,7 @@
       INTEGER NPNT            ! No. of cursor positions supplied 
       INTEGER NSTR            ! No. of marker strings supplied 
       INTEGER OLDCOL          ! Original marker colour index
+      INTEGER PCOL( NDF__MXDIM )! Min. col. no. for start of PIXEL col.
       INTEGER PNTR            ! Pointer to the required NDF component
       INTEGER RBMODE          ! PGPLOT rubber band mode
       INTEGER SIGDIM          ! No. of significant axes in NDF 
@@ -628,6 +629,9 @@
       REAL Y2                 ! PGPLOT Y world coord at top right
       REAL YAC( MAXPTS )      ! PGPLOT Y world coord at all positions
       REAL YC                 ! PGPLOT Y world coord at curnt cursor pos
+
+      DATA PCOL / NDF__MXDIM*0 /
+
 *.
 
 *  Check the inherited global status.
@@ -1212,41 +1216,31 @@
                   NOUTIP = AST_COPY( IPLOT, STATUS )
                END IF
 
-*  Ensure that new tab positions are calculated when displaying the axis
-*  values.
-               SETTAB = .TRUE.
+*  Display a header row showing the axis symbols and units for this
+*  picture, and determine new column widths.
+               IF( .NOT. QUIET ) THEN
+                  IAT = 1
+                  LINE = ' '
+                  CALL KPS1_CURHD( FRM1, MAP1, XC, YC, NAX, IAT, LINE, 
+     :                             ICOL, STATUS )
+                  CALL MSG_OUT( ' ', LINE( : IAT ), STATUS )
+               END IF
 
             END IF
 
-*  Map the GRAPHICS position into the required Frame, and format the results 
-*  including axis symbols and units only if this is a new picture. 
+*  Map the GRAPHICS position into the required Frame, and format the 
+*  results.
             LINE = ' '
-            IAT = 1
-            CALL KPS1_CURFM( FRM1, MAP1, XC, YC, NAX, NEWPIC, NEWPIC, 
-     :                       SETTAB, IAT, LINE, ICOL, GOOD, CXY, 
-     :                       STATUS )
-
-*  If this is not a new picture, ensure the next point is reported using
-*  the same tab positions as the one just displayed. This means that new
-*  tabs will be calculated for the 1st and 2nd points after a new picture
-*  has been selected.
-            IF( .NOT. NEWPIC ) SETTAB = .FALSE.
-
+            IAT = 0
+            CALL KPS1_CURFM( FRM1, MAP1, XC, YC, NAX, ICOL, 
+     :                       IAT, LINE, GOOD, CXY, STATUS )
 
 *  Display the formatted values on the screen if required.
             IF( .NOT. QUIET ) CALL MSG_OUT( ' ', LINE( : IAT ), STATUS )
 
-*  Now format the position again, for inclusion in the log file. Do not
-*  include axis symbols or units.
-            LOGLIN = ' '
-            JAT = 1
-            CALL KPS1_CURFM( FRM1, MAP1, XC, YC, NAX, .FALSE., NEWPIC, 
-     :                       NEWPIC, JAT, LOGLIN, JCOL, GOOD, CXY, 
-     :                       STATUS )
-
-*  Append the formatted values to the GRP group which will be written out
-*  to the log file at the end.
-            CALL GRP_PUT( IGRP1, 1, LOGLIN( : JAT ), 0, STATUS ) 
+*  Append the formatted values to the GRP group which will be written 
+*  out to the log file at the end.
+            CALL GRP_PUT( IGRP1, 1, LINE( : IAT ), 0, STATUS ) 
 
 *  If required, show the corresponding pixel co-ordinates. Do not display
 *  them if pixel co-ords are already being displayed.
@@ -1255,11 +1249,9 @@
             IF( SHPIX .AND. IPIX .NE. AST__NOFRAME .AND.
      :          DOM .NE. 'PIXEL' ) THEN
 
-*  Map the GRAPHICS position into the PIXEL Frame, and format the results 
-*  without axis symbols. Indent by 3 spaces.
-               CALL KPS1_CURFM( FRM2, MAP2, XC, YC, NAXP, .FALSE., 
-     :                          NEWPIC, NEWPIC, IAT, LINE, ICOL, PGOOD,
-     :                          PXY, STATUS )
+*  Map the GRAPHICS position into the PIXEL Frame. Indent by 3 spaces.
+               CALL KPS1_CURFM( FRM2, MAP2, XC, YC, NAXP, PCOL,
+     :                          IAT, LINE, PGOOD, PXY, STATUS )
             END IF
 
 *  If required, show the NDF pixel value. Map the GRAPHICS position into the 

@@ -1,6 +1,5 @@
-      SUBROUTINE KPS1_CURFM( FRM, MAP, XC, YC, NAX, EXTRA, NEWPIC, 
-     :                       SETTAB, IAT, LINE, ICOL, GOOD, CXY, 
-     :                       STATUS )
+      SUBROUTINE KPS1_CURFM( FRM, MAP, XC, YC, NAX, ICOL, IAT, LINE, 
+     :                       GOOD, CXY, STATUS )
 *+
 *  Name:
 *     KPS1_CURFM
@@ -12,13 +11,13 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CURFM( FRM, MAP, XC, YC, NAX, EXTRA, NEWPIC, SETTAB, 
-*                      IAT, LINE, ICOL, GOOD, CXY, STATUS )
+*     CALL KPS1_CURFM( FRM, MAP, XC, YC, NAX, ICOL, IAT, LINE, GOOD, 
+*                      CXY, STATUS )
 
 *  Description:
 *     This routine formats a position for application CURSOR. The
-*     position is supplied in GRAPHICS co-ordinates. It is mapped into the 
-*     required Frame before being formatted.
+*     position is supplied in GRAPHICS co-ordinates. It is mapped into 
+*     the required Frame before being formatted.
 
 *  Arguments:
 *     FRM = INTEGER (Given)
@@ -32,22 +31,12 @@
 *        The Y GRAPHICS co-ordinate.
 *     NAX = INTEGER (Given)
 *        The number of axes in FRM.
-*     EXTRA = LOGICAL (Given)
-*        If .TRUE., then axis symbols (and units if NEWPIC is .TRUE.) are 
-*        included in the formatted text returned in LINE.
-*     NEWPIC = LOGICAL (Given)
-*        If .TRUE., then axis units are included in the formatted text 
-*        returned in LINE (if EXTRA is .TRUE.).
-*     SETTAB = LOGICAL (Given)
-*        If .TRUE., then the tab positions in ICOL are initialised.
-*        Otherwise, the supplied tab positions are re-used.
+*     ICOL( NAX ) = INTEGER (Given)
+*        The tab positions for each column of axis values. 
 *     IAT = INTEGER (Given and Returned)
 *        The number of characters in LINE.
 *     LINE = CHARACTER * ( * ) (Given and Returned)
 *        The text.
-*     ICOL( NAX ) = INTEGER (Given and Returned)
-*        The tab positions for each column of axis values. Initialised if
-*        SETTAB is .TRUE. (should be left unchanged between calls).
 *     GOOD = LOGICAL (Returned)
 *        Were all axis value good in Frame FRM?
 *     CXY( NAX ) = DOUBLE PRECISION (Returned)
@@ -85,7 +74,7 @@
 *     26-MAY-2006 (DSB):
 *        Correct tabbing between output columns.
 *     8-JUN-2006 (DSB):
-*        Added argument SETTAB.
+*        Modified so that it never includes axis labels and units.
 *     {enter_further_changes_here}
 
 *-
@@ -103,14 +92,11 @@
       REAL XC
       REAL YC
       INTEGER NAX
-      LOGICAL EXTRA
-      LOGICAL NEWPIC
-      LOGICAL SETTAB
+      INTEGER ICOL( NAX )
 
 *  Arguments Given and Returned:
       INTEGER IAT
       CHARACTER LINE*(*)
-      INTEGER ICOL( NAX )
 
 *  Arguments Returned:
       LOGICAL GOOD
@@ -120,13 +106,10 @@
       INTEGER STATUS             ! Global status
       
 *  Local Variables:
-      CHARACTER ATTRIB*20        ! AST attribute name
       CHARACTER FMT*30           ! Formatted axis value
-      CHARACTER SYM*30           ! Axis symbol
-      CHARACTER UNIT*30          ! Axis Units string
       DOUBLE PRECISION GXY( 2 )  ! Graphics position
       INTEGER I                  ! Loop count
-      INTEGER INDENT             ! Indentation for each axis value
+      INTEGER INDENT             ! Indent from start of line
       INTEGER JAT                ! No. of characters in the string
 *.
 
@@ -145,85 +128,29 @@
 *  Assume all axis values are good in the required Frame.
       GOOD = .TRUE.
 
-*  Note the indentation, and then reset it.
+*  Note the initial indent.
       INDENT = IAT
-      IAT = 0
 
 *  Loop round each axis.
       DO I = 1, NAX
 
-*  Indent each axis value.
-         IAT = IAT + INDENT
+*  Go to the start of the column for this axis, or to the next tab stop
+*  if we have already passed the column for this axis.
+         IF( IAT .LE. ICOL( I ) + INDENT ) THEN
+            IAT = ICOL( I ) + INDENT
+         ELSE
+            IAT = 6*( 1 + IAT/6 )
+         END IF
 
 *  Are all axis values good?
          IF( CXY( I ) .EQ. AST__BAD ) GOOD = .FALSE.
-
-*  Append the axis symbol and an equals sign to the returned text if
-*  required.
-         IF( EXTRA ) THEN
-
-*  Form the name of the Symbol attribute for this axis.
-            ATTRIB = 'Symbol('
-            JAT = 7
-            CALL CHR_PUTI( I, ATTRIB, JAT )
-            CALL CHR_APPND( ')', ATTRIB, JAT )
-
-*  Get the symbol string.
-            SYM = AST_GETC( FRM, ATTRIB( : JAT ), STATUS) 
-
-*  Remove any PGPLOT escape sequences.
-            CALL KPG1_PGESC( SYM, STATUS )
-
-*  Create a "symbol=value" string.
-            IF( SYM .NE. ' ' ) THEN
-               CALL CHR_APPND( SYM, LINE, IAT )
-               CALL CHR_APPND( ' =', LINE, IAT )
-               IAT = IAT + 1
-            END IF
-
-         END IF
 
 *  Format and append the axis value.
          FMT = AST_FORMAT( FRM, I, CXY( I ), STATUS )
          CALL CHR_APPND( FMT, LINE, IAT )
 
-*  Append the axis units to the returned text if required, and if this
-*  is the first position in a new picture.
-         IF( EXTRA .AND. NEWPIC ) THEN
-
-*  Form the name of the Unit attribute for this axis.
-            ATTRIB = 'Unit('
-            JAT = 5
-            CALL CHR_PUTI( I, ATTRIB, JAT )
-            CALL CHR_APPND( ')', ATTRIB, JAT )
-
-*  Get the unit string.
-            UNIT = AST_GETC( FRM, ATTRIB( : JAT ), STATUS) 
-
-*  Remove any PGPLOT escape sequences.
-            CALL KPG1_PGESC( UNIT, STATUS )
-
-*  Create a "symbol=value" string.
-            IF( UNIT .NE. ' ' ) THEN
-               IAT = IAT + 1
-               CALL CHR_APPND( '(', LINE, IAT )
-               CALL CHR_APPND( UNIT, LINE, IAT )
-               CALL CHR_APPND( ')', LINE, IAT )
-            END IF
-
-         END IF
-
-*  Tab to the start of the next column. Subsequent positions use the 
-*  same tabs even though the field widths will be smaller (due to the 
-*  abscence of the units strings).
-         IF( I .LE. NAX ) THEN
-            IF( NEWPIC .OR. SETTAB ) THEN
-               IAT = 6*( 1 + IAT/6 )
-               IF( SETTAB ) ICOL( I ) = IAT
-            ELSE 
-               IAT = MAX( ICOL( I ), 6*( 1 + IAT/6 ) )
-            END IF
-         END IF
+*  Add on a trailing space.
+         IF( I .NE. NAX ) IAT = IAT + 1
 
       END DO
 
