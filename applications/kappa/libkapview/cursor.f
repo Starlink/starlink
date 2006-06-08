@@ -483,145 +483,151 @@
 *        Added parameters SHOWDATA and COMP.
 *     7-FEB-2006 (DSB):
 *        Correct KPS1_CURDV to use only significant pixel axes
+*     8-JUN-2006 (DSB):
+*        - Only include axis symbols when reporting the first point in a
+*        new picture.
+*        - Save on horizontal white space by using different tab positions 
+*        for the first point in a picture.
 *     {enter_further_changes_here}
 
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+      IMPLICIT NONE           ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'          ! HDS constants
-      INCLUDE 'GRP_PAR'          ! GRP constants
-      INCLUDE 'NDF_PAR'          ! NDF constants
-      INCLUDE 'CNF_PAR'          ! CNF constants
-      INCLUDE 'AST_PAR'          ! AST constants
-      INCLUDE 'PRM_PAR'          ! VAL__ constants
-      INCLUDE 'PAR_ERR'          ! Parameter-system errors
-      INCLUDE 'AGI_ERR'          ! AGI error constants
+      INCLUDE 'SAE_PAR'       ! Standard SAE constants
+      INCLUDE 'DAT_PAR'       ! HDS constants
+      INCLUDE 'GRP_PAR'       ! GRP constants
+      INCLUDE 'NDF_PAR'       ! NDF constants
+      INCLUDE 'CNF_PAR'       ! CNF constants
+      INCLUDE 'AST_PAR'       ! AST constants
+      INCLUDE 'PRM_PAR'       ! VAL__ constants
+      INCLUDE 'PAR_ERR'       ! Parameter-system errors
+      INCLUDE 'AGI_ERR'       ! AGI error constants
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS          ! Global status
 
 *  External References:
-      INTEGER CHR_LEN            ! Used length of a string
+      INTEGER CHR_LEN         ! Used length of a string
 
 *  Local Constants:
-      INTEGER MAXPTS             ! Maximum number of positions
+      INTEGER MAXPTS          ! Maximum number of positions
       PARAMETER ( MAXPTS = 200 )
 
-      INTEGER SZNAM              ! Length of picture name
+      INTEGER SZNAM           ! Length of picture name
       PARAMETER ( SZNAM = 15 )
 
-      INTEGER ANC                ! ANCHOR mode
+      INTEGER ANC             ! ANCHOR mode
       PARAMETER ( ANC = 1 )
 
-      INTEGER DYN                ! DYNAMIC mode
+      INTEGER DYN             ! DYNAMIC mode
       PARAMETER ( DYN = 2 )
 
-      INTEGER CUR                ! CURRENT mode
+      INTEGER CUR             ! CURRENT mode
       PARAMETER ( CUR = 3 )
 
 *  Local Variables:
-      CHARACTER AMES( 3 )*30     ! Informational messages about use of cursor
+      CHARACTER AMES( 3 )*30  ! Cursor usage messages 
       CHARACTER CNAME*( DAT__SZNAM )! Name of current picture
-      CHARACTER COMENT*256       ! Comment for the latest picture
-      CHARACTER COMP*8           ! Component to be displayed
-      CHARACTER DOM*20           ! Domain of Current Frame in Plot
-      CHARACTER JUST*2           ! Justification for text strings
-      CHARACTER KEYS*3           ! Keys which activate each cursor action
-      CHARACTER LABEL*( SZNAM )  ! Picture label
-      CHARACTER LINE*256         ! Text buffer for screen
-      CHARACTER LOGLIN*256       ! Text buffer for log file
-      CHARACTER MCOMP*8          ! Component to be mapped
-      CHARACTER MODE*10          ! Mode for selecting pictures
-      CHARACTER NAME*( DAT__SZNAM ) ! Name of pictures which can be selected
-      CHARACTER PLOT*15          ! Nature of required graphics
+      CHARACTER COMENT*256    ! Comment for the latest picture
+      CHARACTER COMP*8        ! Component to be displayed
+      CHARACTER DOM*20        ! Domain of Current Frame in Plot
+      CHARACTER JUST*2        ! Justification for text strings
+      CHARACTER KEYS*3        ! Keys which activate each cursor action
+      CHARACTER LABEL*( SZNAM )! Picture label
+      CHARACTER LINE*256      ! Text buffer for screen
+      CHARACTER LOGLIN*256    ! Text buffer for log file
+      CHARACTER MCOMP*8       ! Component to be mapped
+      CHARACTER MODE*10       ! Mode for selecting pictures
+      CHARACTER NAME*( DAT__SZNAM )! Name of pic.s that can be selected
+      CHARACTER PLOT*15       ! Nature of required graphics
       CHARACTER PNAME*( DAT__SZNAM )! Name for the latest picture
-      CHARACTER PURP*80          ! Purpose for using cursor
-      CHARACTER REFNAM*256       ! Reference name
-      CHARACTER TEXT*80          ! Marker text
+      CHARACTER PURP*80       ! Purpose for using cursor
+      CHARACTER REFNAM*256    ! Reference name
+      CHARACTER TEXT*80       ! Marker text
       DOUBLE PRECISION CXY( NDF__MXDIM )! Current Frame position
-      DOUBLE PRECISION GXY( 2 )  ! Graphics position
+      DOUBLE PRECISION GXY( 2 )! Graphics position
       DOUBLE PRECISION PXY( NDF__MXDIM )! PIXEL Frame position
-      DOUBLE PRECISION START( NDF__MXDIM ) ! Position at start of polygon edge
-      DOUBLE PRECISION XB        ! Cursor X position in BASE world co-ords
-      DOUBLE PRECISION XY( MAXPTS, NDF__MXDIM ) ! Array of all x,y data co-ordinates
-      DOUBLE PRECISION XYOUT( MAXPTS, NDF__MXDIM ) ! X,Y co-ords in 1st picture
-      DOUBLE PRECISION YB        ! Cursor Y position in BASE world co-ords
-      INTEGER ACT                ! Cursor choice
-      INTEGER BMAP               ! GRAPHICS to BASE world co-ords Mapping
-      INTEGER EL                 ! Number of mapped elements
-      INTEGER FRM1               ! Pointer to required Frame
-      INTEGER FRM2               ! Pointer to required secondary Frame
-      INTEGER GRPSIZ             ! No. of elements in a GRP group
-      INTEGER I                  ! Loop count
-      INTEGER IAGDAT             ! Index of AGI_DATA Frame
-      INTEGER IAT                ! No. of characters in the string
-      INTEGER ICOL( NDF__MXDIM ) ! Minimum column no. for start of each field
-      INTEGER IGRP1              ! GRP identifier for group of formatted posns
-      INTEGER IGRP2              ! GRP identifier for group of text strings
-      INTEGER IMARK              ! PGPLOT marker type
-      INTEGER IMODE              ! Mode of operation
-      INTEGER INDF1              ! NDF identifier for associated NDF
-      INTEGER IPIC               ! AGI id for current picture
-      INTEGER IPIC0              ! Current (input) picture identifier
-      INTEGER IPIC1              ! Picture identifier for 1st selected picture
-      INTEGER IPIC2              ! AGI id for new picture
-      INTEGER IPICB              ! BASE picture identifier
-      INTEGER IPIX               ! Index of PIXEL Frame
-      INTEGER IPLOT              ! Plot for current picture
-      INTEGER IPLOTB             ! Plot for BASE picture
-      INTEGER JAT                ! No. of characters in the string
-      INTEGER JCOL( NDF__MXDIM ) ! Minimum column no. for start of each field
-      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of the associated NDF
-      INTEGER MAP1               ! Pointer to Base->Current Mapping
-      INTEGER MAP2               ! Pointer to Base->secondary Frame Mapping
-      INTEGER MAXP               ! Max. no. of positions which may be supplied.
-      INTEGER MINP               ! Min. no. of positions which may be supplied.
-      INTEGER NACT               ! No. of cursor actions 
-      INTEGER NAX                ! No. of axes in current position
-      INTEGER NAXP               ! No. of axes in polygon Plot
-      INTEGER NDIM               ! Number of pixel axes in associated NDF
-      INTEGER NOUTAX             ! No. of axes in first selected picture
-      INTEGER NOUTIP             ! Pointer to Plot for first selected picture
-      INTEGER NOUTPS             ! No. of positons in first selected picture
-      INTEGER NP                 ! The number of positions selected
-      INTEGER NPNT               ! No. of cursor positions supplied 
-      INTEGER NSTR               ! No. of marker strings supplied 
-      INTEGER OLDCOL             ! Original marker colour index
-      INTEGER PNTR               ! Pointer to the required NDF component
-      INTEGER RBMODE             ! PGPLOT rubber band mode
-      INTEGER SIGDIM             ! No. of significant axes in NDF 
-      INTEGER SLBND( NDF__MXDIM )! Significant lower bounds of the associated NDF
-      INTEGER SUBND( NDF__MXDIM )! Significant uper bounds of the associated NDF
-      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of the associated NDF
-      LOGICAL CLOSE              ! Close the polygon?
-      LOGICAL DESC               ! Describe each Coordinate Frame?
-      LOGICAL FIRST              ! Reading first position in any picture?
-      LOGICAL GEO                ! Draw geodesic polygons?
-      LOGICAL GOOD               ! Are all axis values good?
-      LOGICAL GOTNAM             ! Reference name obtained for the NDF?
-      LOGICAL INFO               ! Display mouse instructions?
-      LOGICAL LOOP               ! Continue to get a new cursor position?
-      LOGICAL NEWPIC             ! Reading first position in a new picture?
-      LOGICAL PGOOD              ! Are all pixel axis values good?
-      LOGICAL PLURAL             ! Use the plural form of a word in a message?
-      LOGICAL QUIET              ! Run quietly?
-      LOGICAL SAME               ! Is given picture same as current picture?
-      LOGICAL SHDATA             ! Display data values from the associated NDF?
-      LOGICAL SHPIX              ! Are additional PIXEL co-ords to be displayed?
-      LOGICAL THERE              ! Is the NDF component in a defined state?
-      REAL OLDSIZ                ! Original marker size
-      REAL X1                    ! PGPLOT X world coord at bottom left
-      REAL X2                    ! PGPLOT X world coord at top right
-      REAL XAC( MAXPTS )         ! PGPLOT X world coord at all positions
-      REAL XC                    ! PGPLOT X world coord at current cursor posn
-      REAL Y1                    ! PGPLOT Y world coord at bottom left
-      REAL Y2                    ! PGPLOT Y world coord at top right
-      REAL YAC( MAXPTS )         ! PGPLOT Y world coord at all positions
-      REAL YC                    ! PGPLOT Y world coord at current cursor posn
+      DOUBLE PRECISION START( NDF__MXDIM )! Polygon edge start position
+      DOUBLE PRECISION XB     ! Cursor X position in BASE world co-ords
+      DOUBLE PRECISION XY( MAXPTS, NDF__MXDIM )! All x,y data co-ord.s
+      DOUBLE PRECISION XYOUT( MAXPTS, NDF__MXDIM )! 1st pic. X,Y co-ords
+      DOUBLE PRECISION YB     ! Cursor Y position in BASE world co-ords
+      INTEGER ACT             ! Cursor choice
+      INTEGER BMAP            ! GRAPHICS to BASE world co-ords Mapping
+      INTEGER EL              ! Number of mapped elements
+      INTEGER FRM1            ! Pointer to required Frame
+      INTEGER FRM2            ! Pointer to required secondary Frame
+      INTEGER GRPSIZ          ! No. of elements in a GRP group
+      INTEGER I               ! Loop count
+      INTEGER IAGDAT          ! Index of AGI_DATA Frame
+      INTEGER IAT             ! No. of characters in the string
+      INTEGER ICOL( NDF__MXDIM )! Min. col. no. for start of each field
+      INTEGER IGRP1           ! GRP id. for group of formatted posns
+      INTEGER IGRP2           ! GRP id. for group of text strings
+      INTEGER IMARK           ! PGPLOT marker type
+      INTEGER IMODE           ! Mode of operation
+      INTEGER INDF1           ! NDF identifier for associated NDF
+      INTEGER IPIC            ! AGI id for current picture
+      INTEGER IPIC0           ! Current (input) picture identifier
+      INTEGER IPIC1           ! AGI id. for 1st selected picture
+      INTEGER IPIC2           ! AGI id for new picture
+      INTEGER IPICB           ! BASE picture identifier
+      INTEGER IPIX            ! Index of PIXEL Frame
+      INTEGER IPLOT           ! Plot for current picture
+      INTEGER IPLOTB          ! Plot for BASE picture
+      INTEGER JAT             ! No. of characters in the string
+      INTEGER JCOL( NDF__MXDIM )! Min. col. no. for start of each field
+      INTEGER LBND( NDF__MXDIM )! Lower bounds of the associated NDF
+      INTEGER MAP1            ! Pointer to Base->Current Mapping
+      INTEGER MAP2            ! Pointer to Base->secondary Frame Mapping
+      INTEGER MAXP            ! Max. no. of pos'ns that may be supplied
+      INTEGER MINP            ! Min. no. of pos'ns that may be supplied
+      INTEGER NACT            ! No. of cursor actions 
+      INTEGER NAX             ! No. of axes in current position
+      INTEGER NAXP            ! No. of axes in polygon Plot
+      INTEGER NDIM            ! Number of pixel axes in associated NDF
+      INTEGER NOUTAX          ! No. of axes in first selected picture
+      INTEGER NOUTIP          ! P'nter to Plot for 1stc selected picture
+      INTEGER NOUTPS          ! No. of pos'ns in 1st selected picture
+      INTEGER NP              ! The number of positions selected
+      INTEGER NPNT            ! No. of cursor positions supplied 
+      INTEGER NSTR            ! No. of marker strings supplied 
+      INTEGER OLDCOL          ! Original marker colour index
+      INTEGER PNTR            ! Pointer to the required NDF component
+      INTEGER RBMODE          ! PGPLOT rubber band mode
+      INTEGER SIGDIM          ! No. of significant axes in NDF 
+      INTEGER SLBND( NDF__MXDIM )! Significant lower bounds of NDF
+      INTEGER SUBND( NDF__MXDIM )! Significant upper bounds of NDF
+      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of the NDF
+      LOGICAL CLOSE           ! Close the polygon?
+      LOGICAL DESC            ! Describe each Coordinate Frame?
+      LOGICAL FIRST           ! Reading first position in any picture?
+      LOGICAL GEO             ! Draw geodesic polygons?
+      LOGICAL GOOD            ! Are all axis values good?
+      LOGICAL GOTNAM          ! Reference name obtained for the NDF?
+      LOGICAL INFO            ! Display mouse instructions?
+      LOGICAL LOOP            ! Continue to get a new cursor position?
+      LOGICAL NEWPIC          ! Reading first position in a new picture?
+      LOGICAL PGOOD           ! Are all pixel axis values good?
+      LOGICAL PLURAL          ! Use plural form of a word in a message?
+      LOGICAL QUIET           ! Run quietly?
+      LOGICAL SAME            ! Is given pic. same as current pic.?
+      LOGICAL SETTAB          ! Find new tab pos'ns for displayed line?
+      LOGICAL SHDATA          ! Display data values from the NDF?
+      LOGICAL SHPIX           ! Display additional PIXEL co-ords?
+      LOGICAL THERE           ! Is the NDF component in a defined state?
+      REAL OLDSIZ             ! Original marker size
+      REAL X1                 ! PGPLOT X world coord at bottom left
+      REAL X2                 ! PGPLOT X world coord at top right
+      REAL XAC( MAXPTS )      ! PGPLOT X world coord at all positions
+      REAL XC                 ! PGPLOT X world coord at curnt cursor pos
+      REAL Y1                 ! PGPLOT Y world coord at bottom left
+      REAL Y2                 ! PGPLOT Y world coord at top right
+      REAL YAC( MAXPTS )      ! PGPLOT Y world coord at all positions
+      REAL YC                 ! PGPLOT Y world coord at curnt cursor pos
 *.
 
 *  Check the inherited global status.
@@ -1206,14 +1212,26 @@
                   NOUTIP = AST_COPY( IPLOT, STATUS )
                END IF
 
+*  Ensure that new tab positions are calculated when displaying the axis
+*  values.
+               SETTAB = .TRUE.
+
             END IF
 
 *  Map the GRAPHICS position into the required Frame, and format the results 
-*  including axis symbols. 
+*  including axis symbols and units only if this is a new picture. 
             LINE = ' '
             IAT = 1
-            CALL KPS1_CURFM( FRM1, MAP1, XC, YC, NAX, .TRUE., NEWPIC, 
-     :                       IAT, LINE, ICOL, GOOD, CXY, STATUS )
+            CALL KPS1_CURFM( FRM1, MAP1, XC, YC, NAX, NEWPIC, NEWPIC, 
+     :                       SETTAB, IAT, LINE, ICOL, GOOD, CXY, 
+     :                       STATUS )
+
+*  If this is not a new picture, ensure the next point is reported using
+*  the same tab positions as the one just displayed. This means that new
+*  tabs will be calculated for the 1st and 2nd points after a new picture
+*  has been selected.
+            IF( .NOT. NEWPIC ) SETTAB = .FALSE.
+
 
 *  Display the formatted values on the screen if required.
             IF( .NOT. QUIET ) CALL MSG_OUT( ' ', LINE( : IAT ), STATUS )
@@ -1223,7 +1241,8 @@
             LOGLIN = ' '
             JAT = 1
             CALL KPS1_CURFM( FRM1, MAP1, XC, YC, NAX, .FALSE., NEWPIC, 
-     :                       JAT, LOGLIN, JCOL, GOOD, CXY, STATUS )
+     :                       NEWPIC, JAT, LOGLIN, JCOL, GOOD, CXY, 
+     :                       STATUS )
 
 *  Append the formatted values to the GRP group which will be written out
 *  to the log file at the end.
@@ -1239,8 +1258,8 @@
 *  Map the GRAPHICS position into the PIXEL Frame, and format the results 
 *  without axis symbols. Indent by 3 spaces.
                CALL KPS1_CURFM( FRM2, MAP2, XC, YC, NAXP, .FALSE., 
-     :                          NEWPIC, IAT, LINE, ICOL, PGOOD, PXY, 
-     :                          STATUS )
+     :                          NEWPIC, NEWPIC, IAT, LINE, ICOL, PGOOD,
+     :                          PXY, STATUS )
             END IF
 
 *  If required, show the NDF pixel value. Map the GRAPHICS position into the 

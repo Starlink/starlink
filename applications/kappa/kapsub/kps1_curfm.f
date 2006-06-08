@@ -1,5 +1,6 @@
       SUBROUTINE KPS1_CURFM( FRM, MAP, XC, YC, NAX, EXTRA, NEWPIC, 
-     :                       IAT, LINE, ICOL, GOOD, CXY, STATUS )
+     :                       SETTAB, IAT, LINE, ICOL, GOOD, CXY, 
+     :                       STATUS )
 *+
 *  Name:
 *     KPS1_CURFM
@@ -11,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CURFM( FRM, MAP, XC, YC, NAX, EXTRA, NEWPIC, IAT, LINE, 
-*                      ICOL, GOOD, CXY, STATUS )
+*     CALL KPS1_CURFM( FRM, MAP, XC, YC, NAX, EXTRA, NEWPIC, SETTAB, 
+*                      IAT, LINE, ICOL, GOOD, CXY, STATUS )
 
 *  Description:
 *     This routine formats a position for application CURSOR. The
@@ -37,13 +38,16 @@
 *     NEWPIC = LOGICAL (Given)
 *        If .TRUE., then axis units are included in the formatted text 
 *        returned in LINE (if EXTRA is .TRUE.).
+*     SETTAB = LOGICAL (Given)
+*        If .TRUE., then the tab positions in ICOL are initialised.
+*        Otherwise, the supplied tab positions are re-used.
 *     IAT = INTEGER (Given and Returned)
 *        The number of characters in LINE.
 *     LINE = CHARACTER * ( * ) (Given and Returned)
 *        The text.
 *     ICOL( NAX ) = INTEGER (Given and Returned)
 *        The tab positions for each column of axis values. Initialised if
-*        NEWPIC is .TRUE. (should be left unchanged between calls).
+*        SETTAB is .TRUE. (should be left unchanged between calls).
 *     GOOD = LOGICAL (Returned)
 *        Were all axis value good in Frame FRM?
 *     CXY( NAX ) = DOUBLE PRECISION (Returned)
@@ -80,6 +84,8 @@
 *        Original version.
 *     26-MAY-2006 (DSB):
 *        Correct tabbing between output columns.
+*     8-JUN-2006 (DSB):
+*        Added argument SETTAB.
 *     {enter_further_changes_here}
 
 *-
@@ -99,6 +105,7 @@
       INTEGER NAX
       LOGICAL EXTRA
       LOGICAL NEWPIC
+      LOGICAL SETTAB
 
 *  Arguments Given and Returned:
       INTEGER IAT
@@ -210,10 +217,10 @@
 *  same tabs even though the field widths will be smaller (due to the 
 *  abscence of the units strings).
          IF( I .LE. NAX ) THEN
-            IF( NEWPIC ) THEN
+            IF( NEWPIC .OR. SETTAB ) THEN
                IAT = 6*( 1 + IAT/6 )
-               ICOL( I ) = IAT
-            ELSE
+               IF( SETTAB ) ICOL( I ) = IAT
+            ELSE 
                IAT = MAX( ICOL( I ), 6*( 1 + IAT/6 ) )
             END IF
          END IF
