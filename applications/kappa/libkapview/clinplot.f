@@ -1232,18 +1232,6 @@
 *  earlier.
          CALL KPG1_GDGET( IPICD, AST__NULL, .FALSE., IPLOTD, STATUS )
 
-*  The above Plot may unnecessary Frames intis, so we start again from
-*  scratch with a Plot that contains just a GRAPHICS Frame, and then add
-*  Frames that may be of interest to other applications. Remove all Frames 
-*  except for the base (GRAPHICS) Frame. 
-         I = AST_GETI( IPLOTD, 'Nframe', STATUS )
-         DO WHILE( I .GT. 0 )
-            IF( I .NE. AST_GETI( IPLOTD, 'Base', STATUS ) ) THEN
-               CALL AST_REMOVEFRAME( IPLOTD, I, STATUS )
-            END IF
-            I = I - 1
-         END DO
-
 *  Add in the DATAPLOT Frame (which describes the data value/frequency axes
 *  for the first valid cell). LINPLOT can align with this Frame.
          CALL AST_ADDFRAME( IPLOTD, AST__BASE, DPMAP, DPF, STATUS )
