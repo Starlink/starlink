@@ -1,7 +1,7 @@
-      SUBROUTINE MYCLINPLOT( STATUS )
+      SUBROUTINE CLINPLOT( STATUS )
 *+
 *  Name:
-*     MYCLINPLOT
+*     CLINPLOT
 
 *  Purpose:
 *     Draws a spatial grid of line plots for an axis of a cube NDF.
@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL MYCLINPLOT( STATUS )
+*     CALL CLINPLOT( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -70,7 +70,7 @@
 *     text used may often be too small to read.
 
 *  Usage:
-*     myclinplot ndf [useaxis] [device] [nx] [ny]
+*     clinplot ndf [useaxis] [device] [nx] [ny]
 
 *  ADAM Parameters:
 *     AXES = _LOGICAL (Read)
@@ -320,35 +320,35 @@
 *        default is chosen in a manner determined by parameter LMODE. []
 
 *  Examples:
-*     myclinplot cube useaxis=3
+*     clinplot cube useaxis=3
 *        Plots a set of line plots of data values versus position
 *        along the third axis for the three-dimensional NDF called
 *        cube on the current graphics device.  Axes are drawn around
 *        the grid of plots indicating the spatial positions in the
 *        current co-ordinate Frame.  The third axis may not be
 *        spectral and the other two axes need not be spatial.
-*     myclinplot cube margin=0.1
+*     clinplot cube margin=0.1
 *        As above, but if a search locates a spectral axis in the
 *        world co-ordinate system, this is plotted along the
 *        horizontal of the line plots, and the other axes are deemed
 *        to be spatial. Also the margin for the spatial axes is
 *        reduced to 0.1 to allow more room for the grid of line plots.
-*     myclinplot map(~5,~5,) useaxis=3 noaxes
+*     clinplot map(~5,~5,) useaxis=3 noaxes
 *        Plots data values versus position for the central 5-by-5
 *        pixel region of the three-dimensional NDF called map on the
 *        current graphics device.  No spatial axes are drawn.
-*     myclinplot map(~5,~5,) useaxis=3 noaxes device=ps_l
+*     clinplot map(~5,~5,) useaxis=3 noaxes device=ps_l
 *        As the previous example but now the output goes to a text
 *        file (pgplot.ps) which can be printed on a PostScript
 *        printer.
-*     myclinplot nearc v style="'title=Ne Arc variance'" useaxis=1 
+*     clinplot nearc v style="'title=Ne Arc variance'" useaxis=1 
 *               reflabel=f
 *        Plots variance values versus position along axis 1, for each
 *        spatial position in dimensions two and three, for the three
 *        dimensional NDF called nearc on the current graphics device.
 *        The plot has a title of "Ne Arc variance".  No labels are
 *        drawn around the lower-left line plot.
-*     myclinplot ndf=speccube noclear specstyle="colour(curves)=blue"
+*     clinplot ndf=speccube noclear specstyle="colour(curves)=blue"
 *        Plots data values versus pixel co-ordinate at each spatial
 *        position for the three-dimensional NDF called speccube on the
 *        current graphics device.  The plot is drawn over any existing
@@ -664,7 +664,7 @@
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'AX', AST_GETC( CFRM, ATTR( : IAT ), 
      :                                  STATUS ) )
-         CALL ERR_REP( 'MYCLINPLOT_ERR1', 'The ^AX axis is not '//
+         CALL ERR_REP( 'CLINPLOT_ERR1', 'The ^AX axis is not '//
      :                 'parallel to a pixel axis.', STATUS )
 
       END IF
@@ -699,7 +699,7 @@
 
       IF( STATUS .EQ. SAI__OK .AND. NK .NE. 2 ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'MYCLINPLOT_ERR2', 'Cannot associate the '//
+         CALL ERR_REP( 'CLINPLOT_ERR2', 'Cannot associate the '//
      :                 'non-spectral axes with a pair of pixel axes.', 
      :                 STATUS )
       END IF
@@ -828,14 +828,14 @@
          END IF
   
 *  Start up the graphics system, creating a KEY picture.
-         CALL KPG1_PLOT( SKWCS, 'UNKNOWN', 'KAPPA_MYCLIN', 
+         CALL KPG1_PLOT( SKWCS, 'UNKNOWN', 'KAPPA_CLINPLOT', 
      :                   NDFNAM( : IAT ), MARGIN, 1, 'KEY ', 'R', KW, 
      :                   ASPECT, 'PIXEL', BOX, IPICD, IPICF, IPICK, 
      :                   IPLOT, NFRM, ALIGN, STATUS )
 
 *  Otherwise, start up the graphics system, creating no KEY picture.
       ELSE
-         CALL KPG1_PLOT( SKWCS, 'UNKNOWN', 'KAPPA_MYCLIN', 
+         CALL KPG1_PLOT( SKWCS, 'UNKNOWN', 'KAPPA_CLINPLOT', 
      :                   NDFNAM( : IAT ), MARGIN, 0, ' ', ' ', 0.0, 
      :                   ASPECT, 'PIXEL', BOX, IPICD, IPICF, IPICK, 
      :                   IPLOT, NFRM, ALIGN, STATUS )
@@ -947,7 +947,7 @@
      :                            %VAL( CNF_PVAL( IPW2 ) ),
      :                            .FALSE., .FALSE., 0.0D0, 0.0D0, 0.0D0,
      :                            'SPECSTYLE', IPLOT3, 2, 0, 0, 0, 
-     :                            'KAPPA_MYCLIN', STATUS )
+     :                            'KAPPA_CLINPLOT', STATUS )
 
 *  Increment the number of cells done so far.
                   NCELL = NCELL + 1
@@ -1077,7 +1077,7 @@
      :                                       AST__CURRENT, STATUS )
 
 *  Set the style for plotting in the line plot.
-                     CALL KPG1_ASSET( 'KAPPA_MYCLIN', 'SPECSTYLE', 
+                     CALL KPG1_ASSET( 'KAPPA_CLINPLOT', 'SPECSTYLE', 
      :                                 IPLOT2, STATUS )
 
 *  Ensure no title or minor tick marks are produced.
@@ -1311,7 +1311,7 @@
             END IF
 
 *  Set the style for plotting in the key picture. 
-            CALL KPG1_ASSET( 'KAPPA_MYCLIN', 'KEYSTYLE', IPLOTK, 
+            CALL KPG1_ASSET( 'KAPPA_CLINPLOT', 'KEYSTYLE', IPLOTK, 
      :                       STATUS )
 
 *  Draw the key to the right of the contour plot and aligned with
@@ -1348,7 +1348,7 @@
 
 *  Add a context report if anything went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'CLINPLOT_ERR', 'MYCLINPLOT: Failed to plot '//
+         CALL ERR_REP( 'CLINPLOT_ERR', 'CLINPLOT: Failed to plot '//
      :                 'line plots of a three-dimensional data set.', 
      :                 STATUS )
       END IF
