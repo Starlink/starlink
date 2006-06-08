@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_CLPKY( IPLOT, DATMAX, DATMIN, SPBND, SPFRM, 
-     :                       LABEL, UNIT, FRMOFF, STATUS )
+      SUBROUTINE KPS1_CLPKY( IPLOT, YTOP, YMIN, SPBND, SPFRM,           
+     :                       LABEL, UNIT, FRMOFF, STATUS )             
 *+
 *  Name:
 *     KPS1_CLPKY
@@ -11,25 +11,26 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CLPKY( IPLOT, DATMAX, DATMIN, SPBND, SPFRM, LABEL, UNIT,
+*     CALL KPS1_CLPKY( IPLOT, YTOP, YMIN, SPBND, SPFRM, LABEL, UNIT,
 *                      FRMOFF, STATUS )
 
 *  Description:
-*     This routine plots the range of data value and spectral axis value
-*     covered by a single cell in a CLINPLOT plot. It also displays
-*     details of the data value axis and spectral axis.
+*     This routine plots the range of data value and spectral axis 
+*     value covered by a single cell in a CLINPLOT plot. It also 
+*     displays details of the data value axis and spectral axis.
 
 *  Arguments:
 *     IPLOT = INTEGER (Given)
 *        Pointer to the AST Plot.  
-*     DATMAX = REAL (Given)
+*     YTOP = REAL (Given)
 *        The largest data value.
-*     DATMIN = REAL (Given)
+*     YMIN = REAL (Given)
 *        The smallest data value.
 *     SPBND( 2 ) = DOUBLE PRECISION (Given)
 *        The bounds of the WCS spectral axis.
 *     SPFRM = INTEGER (Given)
-*        A pointer to the AST Frame that describes the spectral WCS axis.
+*        A pointer to the AST Frame that describes the spectral WCS 
+*        axis.
 *     LABEL = CHARACTER * ( * ) (Given)
 *        The Label component from the displayed NDF.
 *     UNIT = CHARACTER * ( * ) (Given)
@@ -80,8 +81,8 @@
 
 *  Arguments Given:
       INTEGER IPLOT
-      REAL DATMAX
-      REAL DATMIN
+      REAL YTOP
+      REAL YMIN
       DOUBLE PRECISION SPBND( 2 )
       INTEGER SPFRM
       CHARACTER LABEL*(*)
@@ -99,7 +100,7 @@
       PARAMETER ( ARAT = 1.5 )
 
       INTEGER LINELN             ! Max no. of characters on a single
-      PARAMETER ( LINELN = 23 )  ! line of the heading.
+      PARAMETER ( LINELN = 30 )  ! line of the heading.
 
 *  Local variables :
       CHARACTER LINE*(LINELN)    ! One line text string
@@ -107,19 +108,22 @@
       CHARACTER SUNIT*20         ! Spectral unit
       CHARACTER TEXT*200         ! Multi-line text string
       DOUBLE PRECISION ATTR( 20 )! Saved graphics attribute values
+      DOUBLE PRECISION POS( 2 )  ! GRAPHICS coords at bot. left corner
       INTEGER IAT                ! Line break position
+      INTEGER OLDESC             ! Old value of AST escape flag
       LOGICAL FIRST              ! Is this the first line?
       LOGICAL MORE               ! Draw another line?
       REAL HGT                   ! Height for text
+      REAL UP( 2 )               ! Up vector
       REAL X                     ! X at bottom left of string
       REAL X1                    ! Lower x bound of key picture
       REAL X2                    ! Upper x bound of key picture
-      REAL XCH                   ! Height of text with vertical baseline
+      REAL XCH                   ! Height of text with vert. baseline
       REAL XL                    ! X co-ordinate of left justified text
       REAL XM                    ! X extent of key picture, in metres
       REAL Y1                    ! Lower y bound of key picture
       REAL Y2                    ! Upper y bound of key picture
-      REAL YC                    ! Y co-ordinate of centre of key object
+      REAL YC                    ! Y co-ord of centre of key object
       REAL YM                    ! Y extent of key picture, in metres
 *.
 
@@ -144,40 +148,62 @@
       CALL KPG1_PGSHT( HGT, STATUS )
 
 *  Establish the plotting style used by the supplied Plot for drawing
-*  strings drawn with AST_TEXT. Save the current PGPLOT attribute values in 
-*  ATTR.
+*  strings drawn with AST_TEXT. Save the current PGPLOT attribute 
+*  values in ATTR.
       CALL KPG1_PGSTY( IPLOT, 'STRINGS', .TRUE., ATTR, STATUS )
 
 *  Get the corresponding PGPLOT character height in world co-ordinates.
       CALL PGQCS( 4, XCH, HGT )
 
+*  Ensure that the current Frame in the Plot is the GRAPHICS Frame.
+      CALL AST_SETI( IPLOT, 'Current', AST_GETI( IPLOT, 'Base',
+     :                                           STATUS ),
+     :               STATUS )
+
+*  Ensure AST escape sequences are retained within attribute values
+*  returned by AST_GETC. We do this since we will be plotting the 
+*  strings using AST_TEXT which is able to interpret such escape 
+*  sequences.
+      OLDESC = AST_ESCAPES( 1, STATUS )
+
 *  Determine the vertical position for the top line of text in the key.
       YC = FRMOFF*( Y2 - Y1 ) + Y1 - HGT
 
-*  Display each line of the key.  Note, the X co-ordinate gets modified by
-*  the call to KPG1_PGTXT so use a temporary copy (XL) in order not to lose
-*  the left-hand X value.
-      XL = X1 
-      CALL KPG1_PGTXT( 0.0, 'Data value axis:', XL, YC, STATUS )
-      YC = YC - 1.3 * HGT
+*  Set the up vector for horizontal text.
+      UP( 1 ) = 0.0
+      UP( 2 ) = 1.0
+
+*  Initialise the position of the bottom left corner of the next string
+*  to be drawn.
+      POS( 1 ) = X1
+      POS( 2 ) = YC
+
+*  Display each line of the key.  
+      CALL AST_TEXT( IPLOT, 'Data value axis:', POS, UP, 'BL', STATUS )
+      POS( 2 ) = POS( 2 ) - 1.3 * HGT
+
 
       LINE = ' '
       IAT = 0
       CALL CHR_APPND( '  Top:', LINE, IAT )
       IAT = IAT + 1
-      CALL CHR_PUTR( DATMAX, LINE, IAT )
-      XL = X1 
-      CALL KPG1_PGTXT( 0.0, LINE( :IAT ), XL, YC, STATUS )
-      YC = YC - 1.3 * HGT
+      CALL CHR_PUTR( YTOP, LINE, IAT )
+
+      CALL AST_TEXT( IPLOT, LINE( : IAT ), POS, UP, 'BL', STATUS )
+      POS( 2 ) = POS( 2 ) - 1.3 * HGT
+
+
 
       LINE = ' '
       IAT = 0
       CALL CHR_APPND( '  Bottom:', LINE, IAT )
       IAT = IAT + 1
-      CALL CHR_PUTR( DATMIN, LINE, IAT )
-      XL = X1 
-      CALL KPG1_PGTXT( 0.0, LINE( :IAT ), XL, YC, STATUS )
-      YC = YC - 1.3 * HGT
+      CALL CHR_PUTR( YMIN, LINE, IAT )
+
+      CALL AST_TEXT( IPLOT, LINE( : IAT ), POS, UP, 'BL', STATUS )
+      POS( 2 ) = POS( 2 ) - 1.3 * HGT
+
+
 
       IF( UNIT .NE. ' ' ) THEN 
          LINE = ' '
@@ -185,10 +211,12 @@
          CALL CHR_APPND( '  Unit:', LINE, IAT )
          IAT = IAT + 1
          CALL CHR_APPND( UNIT, LINE, IAT )
-         XL = X1 
-         CALL KPG1_PGTXT( 0.0, LINE( :IAT ), XL, YC, STATUS )
-         YC = YC - 1.3 * HGT
+
+         CALL AST_TEXT( IPLOT, LINE( : IAT ), POS, UP, 'BL', STATUS )
+         POS( 2 ) = POS( 2 ) - 1.3 * HGT
       END IF
+
+
 
       IF( LABEL .NE. ' ' ) THEN 
          TEXT = ' '
@@ -197,53 +225,71 @@
          IAT = IAT + 1
          CALL CHR_APPND( LABEL, TEXT, IAT )
 
-*  Since Label ispotentially long, split it up into lines of no more 
+*  Since Label is potentially long, split it up into lines of no more 
 *  than LINELN characters. Add an appropriate number of spaces to the
-*  start of each line.
-         IAT = 0
-         MORE = .TRUE.
-         FIRST = .TRUE.
-         DO WHILE( MORE ) 
-            CALL CHR_LINBR( TEXT, IAT, LINE ) 
-            IF( IAT .EQ. 0 ) THEN
-               MORE = .FALSE.
-            ELSE 
-               XL = X1 
-               IF( FIRST ) THEN
-                  CALL KPG1_PGTXT( 0.0, '  '//LINE, XL, YC, STATUS )
-                  FIRST = .FALSE.
+*  start of each line. We do not do this if the string contains any
+*  escape sequences since the CHR_LINBR does not know to exclude escape
+*  sequences when calculating the length of a line.
+         IF( INDEX( TEXT, '%' ) .NE. 0 .AND.
+     :       INDEX( TEXT, '+' ) .NE. 0 ) THEN
+            CALL AST_TEXT( IPLOT, TEXT( : IAT ), POS, UP, 'BL', STATUS )
+            POS( 2 ) = POS( 2 ) - 1.3 * HGT
+
+         ELSE
+
+            IAT = 0
+            MORE = .TRUE.
+            FIRST = .TRUE.
+            DO WHILE( MORE ) 
+               CALL CHR_LINBR( TEXT, IAT, LINE ) 
+               IF( IAT .EQ. 0 ) THEN
+                  MORE = .FALSE.
                ELSE 
-                  CALL KPG1_PGTXT( 0.0, '    '//LINE, XL, YC, STATUS )
+                  XL = X1 
+                  IF( FIRST ) THEN
+                     CALL AST_TEXT( IPLOT, '  '//LINE, POS, UP, 'BL', 
+     :                              STATUS )
+                     FIRST = .FALSE.
+                  ELSE 
+                     CALL AST_TEXT( IPLOT, '    '//LINE, POS, UP, 'BL',
+     :                              STATUS )
+                  END IF
+                  POS( 2 ) = POS( 2 ) - 1.3 * HGT
                END IF
-               YC = YC - 1.3 * HGT
-            END IF
-         END DO
+            END DO
+         END IF
 
       END IF
 
-      YC = YC - 1.3 * HGT
 
-      XL = X1 
-      CALL KPG1_PGTXT( 0.0, 'Spectral axis:', XL, YC, STATUS )
-      YC = YC - 1.3 * HGT
+
+      POS( 2 ) = POS( 2 ) - 1.3 * HGT
+      CALL AST_TEXT( IPLOT, 'Spectral axis:', POS, UP, 'BL', STATUS )
+      POS( 2 ) = POS( 2 ) - 1.3 * HGT
+
+
 
       LINE = ' '
       IAT = 0
       CALL CHR_APPND( '  Left:', LINE, IAT )
       IAT = IAT + 1
       CALL CHR_PUTR( REAL( SPBND( 1 ) ), LINE, IAT )
-      XL = X1 
-      CALL KPG1_PGTXT( 0.0, LINE( :IAT ), XL, YC, STATUS )
-      YC = YC - 1.3 * HGT
+
+      CALL AST_TEXT( IPLOT, LINE( :IAT ), POS, UP, 'BL', STATUS )
+      POS( 2 ) = POS( 2 ) - 1.3 * HGT
+
+
 
       LINE = ' '
       IAT = 0
       CALL CHR_APPND( '  Right:', LINE, IAT )
       IAT = IAT + 1
       CALL CHR_PUTR( REAL( SPBND( 2 ) ), LINE, IAT )
-      XL = X1 
-      CALL KPG1_PGTXT( 0.0, LINE( :IAT ), XL, YC, STATUS )
-      YC = YC - 1.3 * HGT
+
+      CALL AST_TEXT( IPLOT, LINE( :IAT ), POS, UP, 'BL', STATUS )
+      POS( 2 ) = POS( 2 ) - 1.3 * HGT
+
+
 
       SUNIT = AST_GETC( SPFRM, 'Unit', STATUS )
       IF( SUNIT .NE. ' ' ) THEN 
@@ -252,10 +298,12 @@
          CALL CHR_APPND( '  Unit:', LINE, IAT )
          IAT = IAT + 1
          CALL CHR_APPND( SUNIT, LINE, IAT )
-         XL = X1 
-         CALL KPG1_PGTXT( 0.0, LINE( :IAT ), XL, YC, STATUS )
-         YC = YC - 1.3 * HGT
+
+         CALL AST_TEXT( IPLOT, LINE( :IAT ), POS, UP, 'BL', STATUS )
+         POS( 2 ) = POS( 2 ) - 1.3 * HGT
       END IF
+
+
 
       SLABEL = AST_GETC( SPFRM, 'Label', STATUS )
       IF( SLABEL .NE. ' ' ) THEN 
@@ -266,25 +314,36 @@
          CALL CHR_APPND( SLABEL, TEXT, IAT )
 
 *  Since Label is potentially long, split it up into lines of no more 
-*  than LINELN characters.
-         IAT = 0
-         FIRST = .TRUE.
-         MORE = .TRUE.
-         DO WHILE( MORE ) 
-            CALL CHR_LINBR( TEXT, IAT, LINE ) 
-            IF( IAT .EQ. 0 ) THEN
-               MORE = .FALSE.
-            ELSE 
-               XL = X1 
-               IF( FIRST ) THEN
-                  CALL KPG1_PGTXT( 0.0, '  '//LINE, XL, YC, STATUS )
-                  FIRST = .FALSE.
+*  than LINELN characters (unless it contains any escape sequences).
+         IF( INDEX( TEXT, '%' ) .NE. 0 .AND.
+     :       INDEX( TEXT, '+' ) .NE. 0 ) THEN
+            CALL AST_TEXT( IPLOT, TEXT( : IAT ), POS, UP, 'BL', STATUS )
+            POS( 2 ) = POS( 2 ) - 1.3 * HGT
+
+         ELSE
+
+            IAT = 0
+            MORE = .TRUE.
+            FIRST = .TRUE.
+            DO WHILE( MORE ) 
+               CALL CHR_LINBR( TEXT, IAT, LINE ) 
+               IF( IAT .EQ. 0 ) THEN
+                  MORE = .FALSE.
                ELSE 
-                  CALL KPG1_PGTXT( 0.0, '    '//LINE, XL, YC, STATUS )
+                  XL = X1 
+                  IF( FIRST ) THEN
+                     CALL AST_TEXT( IPLOT, '  '//LINE, POS, UP, 'BL', 
+     :                              STATUS )
+                     FIRST = .FALSE.
+                  ELSE 
+                     CALL AST_TEXT( IPLOT, '    '//LINE, POS, UP, 'BL',
+     :                              STATUS )
+                  END IF
+                  POS( 2 ) = POS( 2 ) - 1.3 * HGT
                END IF
-               YC = YC - 1.3 * HGT
-            END IF
-         END DO
+            END DO
+         END IF
+
       END IF
 
 *  If the spectral axis is described by a SpecFrame, include SpecFrame
@@ -296,9 +355,12 @@
          IAT = IAT + 1
          CALL CHR_APPND( AST_GETC( SPFRM, 'StdOfRest', STATUS ), LINE, 
      :                   IAT )
-         XL = X1 
-         CALL KPG1_PGTXT( 0.0, LINE( :IAT ), XL, YC, STATUS )
-         YC = YC - 1.3 * HGT
+
+         CALL AST_TEXT( IPLOT, LINE( :IAT ), POS, UP, 'BL', 
+     :                  STATUS )
+         POS( 2 ) = POS( 2 ) - 1.3 * HGT
+
+
 
          IF( AST_TEST( SPFRM, 'RestFreq', STATUS ) ) THEN
             LINE = ' '
@@ -307,18 +369,18 @@
             IAT = IAT + 1
             CALL CHR_PUTR( AST_GETR( SPFRM, 'RestFreq', STATUS ),
      :                     LINE, IAT )
-            XL = X1 
-            CALL KPG1_PGTXT( 0.0, LINE( :IAT ), XL, YC, STATUS )
-            YC = YC - 1.3 * HGT
-            XL = X1 
-            CALL KPG1_PGTXT( 0.0, '                 (GHz)', XL, YC, 
-     :                       STATUS )
-            YC = YC - 1.3 * HGT
+
+
+            CALL AST_TEXT( IPLOT, LINE( :IAT ), POS, UP, 'BL', 
+     :                     STATUS )
+            POS( 2 ) = POS( 2 ) - 1.3 * HGT
+            CALL AST_TEXT( IPLOT, '                 (GHz)', POS, UP,
+     :                     'BL', STATUS )
+            POS( 2 ) = POS( 2 ) - 1.3 * HGT
+
          END IF
-      
 
       END IF
-
 
 *  Re-establish the original plotting style.
       CALL KPG1_PGSTY( IPLOT, 'STRINGS', .FALSE., ATTR, STATUS )
