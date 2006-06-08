@@ -1,5 +1,4 @@
       SUBROUTINE MYCLINPLOT( STATUS )
-
 *+
 *  Name:
 *     MYCLINPLOT
@@ -21,68 +20,84 @@
 *        The global status.
 
 *  Description:
-*     This application displays a three-dimensional NDF as a series
-*     of line plots of array value against position, arranged on a 
+*     This application displays a three-dimensional NDF as a series of
+*     line plots of array value against position, arranged on a
 *     uniform spatial grid and plotted on the current graphics device.
-*     The vertical axis of each line plot represents array value, and 
+*     The vertical axis of each line plot represents array value, and
 *     the horizontal axis represents position along a chosen axis (see
-*     parameter USEAXIS).  All the line plots have the same axis limits.
+*     parameter USEAXIS).  All the line plots have the same axis
+*     limits.
 *
-*     This application will typically be used to display a grid of 
-*     spectra taken from a cube in which the current WCS Frame includes
-*     one spectral axis (e.g. frequency) and two spatial axes (e.g. RA
-*     and Dec). A rectangular grid of NX by NY points (see parameters 
-*     NX and NY) is defined over the spatial extent of the cube, and a 
-*     spectrum is drawn at each such point. If NX and NY equal the spatial 
-*     dimensions of the cube (which is the default for spatial axes of 
-*     less than 31 pixels), then one spectrum is drawn for every spatial 
-*     pixel in the cube. For speed, the spectrum will be binned up so
-*     that the number of elements in the spectrum does not exceed the 
-*     horizontal number of device pixels available for the line plot.
+*     This application will typically be used to display a grid of
+*     spectra taken from a cube in which the current WCS Frame
+*     includes one spectral axis (e.g. frequency) and two spatial axes
+*     (e.g. RA and Dec). For this reason the following documentation
+*     refers to the "spectral axis" and the "spatial axes". However,
+*     cubes containing other types of axes can also be displayed, and
+*     refererences to "spectral" and "spatial" axes should be
+*     interpreted appropriately.
 *
-*     Annotated axes for the spatial co-ordinates may be drawn around 
+*     A rectangular grid of NX by NY points (see parameters NX and NY)
+*     is defined over the spatial extent of the cube, and a spectrum
+*     is drawn at each such point. If NX and NY equal the spatial
+*     dimensions of the cube (which is the default for spatial axes of
+*     less than 31 pixels), then one spectrum is drawn for every
+*     spatial pixel in the cube. For speed, the spectrum will be
+*     binned up so that the number of elements in the spectrum does
+*     not exceed the horizontal number of device pixels available for
+*     the line plot.
+*
+*     Annotated axes for the spatial co-ordinates may be drawn around
 *     the grid of line plots (see parameter AXES).  The appearance of
 *     these and the space they occupy may be controlled in detail (see
-*     parameters STYLE and MARGIN). 
+*     parameters STYLE and MARGIN).
 *
-*     The bounds of the plot on both axes can be specified using
-*     parameters XLEFT, XRIGHT, YBOT and YTOP.  If not specified they
-*     take default values which encompass the entire supplied data set.
-*     The defaults for YBOT and YTOP can be selected in several ways
-*     including percentiles (see parameter LMODE).
+*     The data value at the top and bottom of each line plot can be
+*     specified using parameters YBOT and YTOP. The defaults can be
+*     selected in several ways including percentiles (see parameter
+*     LMODE).
 *
 *     The current picture is usually cleared before plotting the new
-*     picture, but parameter CLEAR can be used to prevent this, allowing
-*     several plots to be `stacked' together.  If a new plot is drawn
-*     over an existing plot, then there is an option to allow the new
-*     plot to be aligned with the existing plot (see parameter ALIGN).
+*     picture, but parameter CLEAR can be used to prevent this,
+*     allowing the plot (say) to be drawn over the top of a previously
+*     displayed grey scale image.
+*
+*     The range and nature of the vertical and horizontal axes in each
+*     line plot can be displayed in a key to the right of the main
+*     plot (see parameter KEY). Also, an option exists to add
+*     numerical labels to the first (i.e. bottom left) line plot, see
+*     parameter REFLABEL. However, due to the nature of the plot, the
+*     text used may often be too small to read.
 
 *  Usage:
 *     myclinplot ndf [useaxis] [device] [nx] [ny]
 
 *  ADAM Parameters:
 *     AXES = _LOGICAL (Read)
-*        TRUE if labelled and annotated axes describing the spatial axes 
-*        are to be drawn around the outer edges of the plot. The appearance 
-*        of the axes can be controlled using the STYLE parameter. The
-*        dynamic default is to draw axes only if the CLEAR parameter 
-*        indicates that the graphics device is not being cleared.  []
+*        TRUE if labelled and annotated axes describing the spatial
+*        are to be drawn around the outer edges of the plot. The
+*	 appearance of the axes can be controlled using the STYLE
+*	 parameter. The dynamic default is to draw axes only if the
+*	 CLEAR parameter indicates that the graphics device is not
+*	 being cleared.  []
 *     BLANKEDGE = _LOGICAL (Read)
-*        If TRUE then no tick marks or labels are placed on the edges of
-*        line plots that touch the outer spatial axes (other edges that
-*        do not touch the outer axes will still be annotated). This can 
-*        avoid existing tick marks being over-written when drawing a grid 
-*        of spectra over the top of a picture that includes annotated axes. 
-*        The dynamic default is TRUE if and only if the graphics device
-*        is not being cleared (i.e. parameter CLEAR is FALSE) and no
-*        spatial axes are being drawn (i.e. parameter AXES is FALSE). []
+*        If TRUE then no tick marks or labels are placed on the edges
+*        of line plots that touch the outer spatial axes (other edges
+*        that do not touch the outer axes will still be annotated).
+*        This can avoid existing tick marks being over-written when
+*        drawing a grid of spectra over the top of a picture that
+*        includes annotated axes. The dynamic default is TRUE if and
+*        only if the graphics device is not being cleared (i.e.
+*        parameter CLEAR is FALSE) and no spatial axes are being drawn
+*        (i.e. parameter AXES is FALSE). []
 *     CLEAR = _LOGICAL (Read)
-*        If TRUE the current picture is cleared before the plot is 
-*        drawn. IF FALSE, then the display is left uncleared and an 
-*        attempt is made to align the spatial axes of the new plot with
-*        any spatial axes of the existing plot. Thus, for instance, a while 
-*        light image may be displayed using DISPLAY, and then spectra
-*        drawn over the top of the image using this application. [TRUE]
+*        If TRUE the current picture is cleared before the plot is
+*        drawn. IF FALSE, then the display is left uncleared and an
+*        attempt is made to align the spatial axes of the new plot
+*        with any spatial axes of the existing plot. Thus, for
+*        instance, a while light image may be displayed using DISPLAY,
+*        and then spectra drawn over the top of the image using this
+*        application. [TRUE]
 *     COMP = LITERAL (Read)
 *        The NDF array component to be displayed.  It may be "Data",
 *        "Quality", "Variance", or "Error" (where "Error" is an
@@ -90,44 +105,39 @@
 *        variance values to be displayed).  If "Quality" is specified,
 *        then the quality values are treated as numerical values (in
 *        the range 0 to 255). ["Data"]
-*     DATMAX = _REAL (Read)
-*        The data value for the top edge of each line plot. The dynamic
-*        default is the largest data value in the NDF. []
-*     DATMIN = _REAL (Read)
-*        The data value for the bottom edge of each line plot. The dynamic
-*        default is the largest data value in the NDF. []
 *     DEVICE = DEVICE (Read)
 *        The name of the graphics device used to display the cube.
 *        [current graphics device]
 *     FILL = _LOGICAL (Read)
-*        If FILL is set to TRUE, then the display will be `stretched' to 
-*        fill the current picture in both directions.  This can be useful 
-*        to elongate the spectra to reveal more detail by using more of 
-*        the display surface at the cost of different spatial scales, and 
-*        when the spatial axes have markedly different dimensions.  The 
-*        dynamic default is TRUE if either of the spatial diensions is one. 
-*        and FALSE otherwise. []
+*        If FILL is set to TRUE, then the display will be `stretched'
+*        to fill the current picture in both directions.  This can be
+*        useful to elongate the spectra to reveal more detail by using
+*        more of the display surface at the cost of different spatial
+*        scales, and when the spatial axes have markedly different
+*        dimensions.  The dynamic default is TRUE if either of the
+*        spatial diensions is one. and FALSE otherwise. []
 *     KEY = _LOGICAL (Read)
 *        If TRUE, then a "key" will be drawn to the right of the plot.
-*        The key will include information about the vertical and horizontal 
-*        axes of the line plots, including the maximum and minimum value
-*        covered by the axis and the quantity represented by the axis. The 
-*        appearance of this key can be controlled using parameter KEYSTYLE, 
-*        and its position can be controlled using parameter KEYPOS. [TRUE]
+*        The key will include information about the vertical and
+*        horizontal axes of the line plots, including the maximum and
+*        minimum value covered by the axis and the quantity
+*        represented by the axis. The appearance of this key can be
+*        controlled using parameter KEYSTYLE, and its position can be
+*        controlled using parameter KEYPOS. [TRUE]
 *     KEYPOS() = _REAL (Read)
-*        Two values giving the position of the key.  The first value 
-*        gives the gap between the right-hand edge of the contour map 
-*        and the left-hand edge of the key (0.0 for no gap, 1.0 for the 
-*        largest gap).  The second value gives the vertical position of 
-*        the top of the key (1.0 for the highest position, 0.0 for the 
-*        lowest).  If the second value is not given, the top of the key
-*        is placed level with the top of the contour map.  Both values 
-*        should be in the range 0.0 to 1.0.  If a key is produced, then 
-*        the right-hand margin specified by parameter MARGIN is ignored.
-*        [current value]
+*        Two values giving the position of the key.  The first value
+*        gives the gap between the right-hand edge of the contour map
+*        and the left-hand edge of the key (0.0 for no gap, 1.0 for
+*        the largest gap).  The second value gives the vertical
+*        position of the top of the key (1.0 for the highest position,
+*        0.0 for the lowest).  If the second value is not given, the
+*        top of the key is placed level with the top of the contour
+*        map.  Both values should be in the range 0.0 to 1.0.  If a
+*        key is produced, then the right-hand margin specified by
+*        parameter MARGIN is ignored. [current value]
 *     KEYSTYLE = GROUP (Read)
-*        A group of attribute settings describing the plotting style to
-*        use for the key (see parameter KEY). 
+*        A group of attribute settings describing the plotting style
+*        to use for the key (see parameter KEY).
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text 
@@ -150,62 +160,110 @@
 *        available attributes.  Any unrecognised attributes are ignored 
 *        (no error is reported). 
 *
-*        The appearance of the text in the key can be changed by setting 
-*        new values for the attributes Colour(Strings), Font(Strings), etc. 
-*        [current value] 
+*        The appearance of the text in the key can be changed by
+*        setting new values for the attributes Colour(Strings),
+*        Font(Strings), etc. [current value]
+*     LMODE = LITERAL (Read)
+*        LMODE specifies how the defaults for parameters YBOT and YTOP
+*        (the lower and upper limit of the vertical axis of each line
+*        plot) should be found.  The supplied string should consist of
+*        up to three sub-strings, separated by commas.  The first
+*        sub-string must specify the method to use.  If supplied, the
+*        other two sub-strings should be numerical values as described
+*        below (default values will be used if these sub-strings are
+*        not provided).  The following methods are available.
+*      
+*        - "Range" -- The minimum and maximum data values in the
+*        supplied cube are used as the defaults for YBOT and YTOP.  No
+*        other sub-strings are needed by this option.
+*      
+*        - "Extended" -- The minimum and maximum data values in the
+*        cube are extended by percentages of the data range, specified
+*        by the second and third sub-strings.  For instance, if the
+*        value "Ex,10,5" is supplied, then the default for YBOT is set
+*        to the minimum data value minus 10% of the data range, and
+*        the default for YTOP is set to the maximum data value plus 5%
+*        of the data range.  If only one value is supplied, the second
+*        value defaults to the supplied value.  If no values are
+*        supplied, both values default to "2.5".
+*      
+*          - "Percentile" -- The default values for YBOT and YTOP are
+*        set to the specified percentiles of the data in the supplied
+*        cube. For instance, if the value "Per,10,99" is supplied,
+*        then the default for YBOT is set so that the lowest 10% of
+*        the plotted points are off the bottom of the plot, and the
+*        default for YTOP is set so that the highest 1% of the points
+*        are off the top of the plot.  If only one value, p1, is
+*        supplied, the second value, p2, defaults to (100 - p1).  If
+*        no values are supplied, the values default to "5,95".
+*      
+*        - "Sigma" -- The default values for YBOT and YTOP are set to
+*        the specified numbers of standard deviations below and above
+*        the mean of the data.  For instance, if the value
+*        "sig,1.5,3.0" is supplied, then the default for YBOT is set
+*        to the mean of the data minus 1.5 standard deviations, and
+*        the default for YTOP is set to the mean plus 3 standard
+*        deviations.  If only one value is supplied, the second value
+*        defaults to the supplied value.  If no values are provided
+*        both default to "3.0".
+*
+*        The method name can be abbreviated to a single character, and
+*        is case insensitive.  The initial value is "Range". 
+*        [current value]
 *     MARGIN( 4 ) = _REAL (Read)
-*        The widths of the margins to leave around the outer spatial axes 
-*        for axis annotations, given as fractions of the corresponding 
-*        dimension of the current picture.  The actual margins used may be 
-*        increased to preserve the aspect ratio of the data.  Four 
-*        values may be given, in the order: bottom, right, top, left.
-*        If fewer than four values are given, extra values are used 
-*        equal to the first supplied value.  If these margins are too 
-*        narrow any axis annotation may be clipped.  If a null (!) value
-*        is supplied, the value used is (for all edges); 0.15 if 
-*        annotated axes are being produced; and 0.0 otherwise.  The
-*        initial default is null. [current value]
+*        The widths of the margins to leave around the outer spatial
+*        axes for axis annotations, given as fractions of the
+*        corresponding dimension of the current picture.  The actual
+*        margins used may be increased to preserve the aspect ratio of
+*        the data.  Four values may be given, in the order: bottom,
+*        right, top, left. If fewer than four values are given, extra
+*        values are used equal to the first supplied value.  If these
+*        margins are too narrow any axis annotation may be clipped.
+*        If a null (!) value is supplied, the value used is (for all
+*        edges); 0.15 if annotated axes are being produced; and 0.0
+*        otherwise.  The initial default is null. [current value]
 *     NDF = NDF (Read)
 *        The input NDF structure containing the data to be displayed.
 *        It should have three significant axes, i.e. whose dimensions
 *        are greater than 1.
 *     NX = _INTEGER (Read)
-*        The number of spectra to draw in each row. The spectra will be
-*        equally spaced over the bounds of the X pixel axis. The dynamic
-*        default is the number of pixels along the X axis of the NDF, so
-*        long as this value is no more than 30. If the X axis spans more
-*        than 30 pixels, then the dynamic default is 30 (meaning that some
-*        spatial pixels will be ignored). []
+*        The number of spectra to draw in each row. The spectra will
+*        be equally spaced over the bounds of the X pixel axis. The
+*        dynamic default is the number of pixels along the X axis of
+*        the NDF, so long as this value is no more than 30. If the X
+*        axis spans more than 30 pixels, then the dynamic default is
+*        30 (meaning that some spatial pixels will be ignored). []
 *     NY = _INTEGER (Read)
-*        The number of spectra to draw in each column. The spectra will be
-*        equally spaced over the bounds of the Y pixel axis. The dynamic
-*        default is the number of pixels along the Y axis of the NDF, so
-*        long as this value is no more than 30. If the Y axis spans more
-*        than 30 pixels, then the dynamic default is 30 (meaning that some
-*        spatial pixels will be ignored). []
+*        The number of spectra to draw in each column. The spectra
+*        will be equally spaced over the bounds of the Y pixel axis.
+*        The dynamic default is the number of pixels along the Y axis
+*        of the NDF, so long as this value is no more than 30. If the
+*        Y axis spans more than 30 pixels, then the dynamic default is
+*        30 (meaning that some spatial pixels will be ignored). []
 *     REFLABEL = _LOGICAL (Read)
-*        If TRUE then the first line plot (i.e. the lower left spectrum)
-*        will be annotated with numerical and textual labels describing
-*        the two axes. Note, due to the small size of the line plot, such
-*        text may be too small to read on some graphics devices. 
-*        [current value]
+*        If TRUE then the first line plot (i.e. the lower left
+*        spectrum) will be annotated with numerical and textual labels
+*        describing the two axes. Note, due to the small size of the
+*        line plot, such text may be too small to read on some
+*        graphics devices. [current value]
 *     SPECSTYLE = LITERAL (Read)
-*        A group of attribute settings describing the plotting style to 
-*        use when drawing the axes and data values in the spectrum line plots.
+*        A group of attribute settings describing the plotting style
+*        to use when drawing the axes and data values in the spectrum
+*        line plots.
 *
-*        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text 
-*        file preceded by an up-arrow character "^".  Such text files
-*        should contain further comma-separated lists which will be read
-*        and interpreted in the same manner.  Attribute settings are 
-*        applied in the order in which they occur within the list, with
-*        later settings overriding any earlier settings given for the
-*        same attribute.
-*
+*        A comma-separated list of strings should be given in which
+*        each string is either an attribute setting, or the name of a
+*        text file preceded by an up-arrow character "^".  Such text
+*        files should contain further comma-separated lists which will
+*        be read and interpreted in the same manner.  Attribute
+*        settings are applied in the order in which they occur within
+*        the list, with later settings overriding any earlier settings
+*        given for the same attribute.
+*    
 *        Each individual attribute setting should be of the form:
-*
-*           <name>=<value>
-*
+*    
+*             <name>=<value>
+*    
 *        where <name> is the name of a plotting attribute, and <value> 
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will
@@ -213,17 +271,17 @@
 *        supplied.  See section "Plotting Attributes" in SUN/95 for a
 *        description of the available attributes.  Any unrecognised 
 *        attributes are ignored (no error is reported). 
-*
+*    
 *        By default the axes have interior tick marks, and are without
 *        labels and a title to avoid overprinting on adjacent plots.
-*
+*    
 *        The appearance of the data values is controlled by the 
 *        attributes Colour(Curves), Width(Curves), etc. (the synonym 
 *        Lines may be used in place of Curves).  [current value]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
 *        use for the annotated outer spatial axes (see parameter AXES). 
-*
+* 
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text 
 *        file preceded by an up-arrow character "^".  Such text files
@@ -232,74 +290,82 @@
 *        are applied in the order in which they occur within the list, 
 *        with later settings over-riding any earlier settings given for 
 *        the same attribute.
-*
+* 
 *        Each individual attribute setting should be of the form:
-*
+* 
 *           <name>=<value>
 *
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
-*        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section 
-*        "Plotting Attributes" in SUN/95 for a description of the 
-*        available attributes.  Any unrecognised attributes are ignored 
-*        (no error is reported). [current value] 
+*        be used for any unspecified attributes.  All attributes will
+*        be defaulted if a null value (!) is supplied.  See section
+*        "Plotting Attributes" in SUN/95 for a description of the
+*        available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported). [current value]
 *     USEAXIS = LITERAL (Read)
-*        The WCS axis that will appear along the horizontal axis of each
-*        line plot (the other 2 axes will be used as the spatial axes).  
-*        The axis can be specified by its integer index within the 
-*        current Frame of the NDF (in the range 1 to 3 in the current 
-*        Frame), or by its symbol string.  A list of acceptable values 
-*        is displayed if an illegal value is supplied.  The dynamic
-*        default is the index of any spectral axis found in the current 
-*        Frame of the NDF. []
+*        The WCS axis that will appear along the horizontal axis of
+*        each line plot (the other 2 axes will be used as the spatial
+*        axes). The axis can be specified by its integer index within
+*        the current Frame of the NDF (in the range 1 to 3 in the
+*        current Frame), or by its symbol string.  A list of
+*        acceptable values is displayed if an illegal value is
+*        supplied.  The dynamic default is the index of any spectral
+*        axis found in the current Frame of the NDF. []
+*     YBOT = _REAL (Read)
+*        The data value for the bottom edge of each line plot. The
+*        dynamic default is chosen in a manner determined by parameter
+*        LMODE. []
+*     YTOP = _REAL (Read)
+*        The data value for the top edge of each line plot. The dynamic
+*        default is chosen in a manner determined by parameter LMODE. []
 
 *  Examples:
 *     myclinplot cube useaxis=3
 *        Plots a set of line plots of data values versus position
-*        along the third axis for the three-dimensional NDF called cube 
-*        on the current graphics device.  Axes are drawn around the grid 
-*        of plots indicating the spatial positions in the current 
-*        co-ordinate Frame.  The third axis may not be spectral and the 
-*        other two axes need not be spatial.
+*        along the third axis for the three-dimensional NDF called
+*        cube on the current graphics device.  Axes are drawn around
+*        the grid of plots indicating the spatial positions in the
+*        current co-ordinate Frame.  The third axis may not be
+*        spectral and the other two axes need not be spatial.
 *     myclinplot cube margin=0.1
 *        As above, but if a search locates a spectral axis in the
-*        world co-ordinate system, this is plotted along the horizontal
-*        of the line plots, and the other axes are deemed to be spatial.
-*        Also the margin for the spatial axes is reduced to 0.1 to allow 
-*        more room for the grid of line plots.
+*        world co-ordinate system, this is plotted along the
+*        horizontal of the line plots, and the other axes are deemed
+*        to be spatial. Also the margin for the spatial axes is
+*        reduced to 0.1 to allow more room for the grid of line plots.
 *     myclinplot map(~5,~5,) useaxis=3 noaxes
-*        Plots data values versus position for the central 5-by-5 pixel
-*        region of the three-dimensional NDF called map on the current
-*        graphics device.  No spatial axes are drawn.
+*        Plots data values versus position for the central 5-by-5
+*        pixel region of the three-dimensional NDF called map on the
+*        current graphics device.  No spatial axes are drawn.
 *     myclinplot map(~5,~5,) useaxis=3 noaxes device=ps_l
-*        As the previous example but now the output goes to a text file 
-*        (pgplot.ps) which can be printed on a PostScript printer.
+*        As the previous example but now the output goes to a text
+*        file (pgplot.ps) which can be printed on a PostScript
+*        printer.
 *     myclinplot nearc v style="'title=Ne Arc variance'" useaxis=1 
-*              reflabel=f
+*               reflabel=f
 *        Plots variance values versus position along axis 1, for each
 *        spatial position in dimensions two and three, for the three
-*        dimensional NDF called nearc on the current graphics 
-*        device.  The plot has a title of "Ne Arc variance".  No
-*        labels are drawn around the lower-left line plot.
+*        dimensional NDF called nearc on the current graphics device.
+*        The plot has a title of "Ne Arc variance".  No labels are
+*        drawn around the lower-left line plot.
 *     myclinplot ndf=speccube noclear specstyle="colour(curves)=blue"
 *        Plots data values versus pixel co-ordinate at each spatial
-*        position for the three-dimensional NDF called speccube on the 
-*        current graphics device.  The plot is drawn over any existing plot 
-*        and inherits the spatial bounds of the previous plot.  The data 
-*        are drawn in blue, probably to distinguish it from the previous 
-*        plot drawn in a different colour.
+*        position for the three-dimensional NDF called speccube on the
+*        current graphics device.  The plot is drawn over any existing
+*        plot and inherits the spatial bounds of the previous plot.
+*        The data are drawn in blue, probably to distinguish it from
+*        the previous plot drawn in a different colour.
 
-*  Notes:
-*     -  If no Title is specified via the STYLE parameter, then the 
-*     Title component in the NDF is used as the default title for the 
-*     annotated axes.  If the NDF does not have a Title component, then 
-*     the default title is taken from current co-ordinate Frame in the
-*     NDF.  If this has not been set explicitly, then the name of the 
-*     NDF is used as the default title.
-*     -  If all the data values at a spatial position are bad, no line
-*     plot is drawn at that location.  
-
+*   Notes:
+*      -  If no Title is specified via the STYLE parameter, then the 
+*      Title component in the NDF is used as the default title for the 
+*      annotated axes.  If the NDF does not have a Title component, then
+*      the default title is taken from current co-ordinate Frame in the
+*      NDF.  If this has not been set explicitly, then the name of the 
+*      NDF is used as the default title.
+*      -  If all the data values at a spatial position are bad, no line
+*      plot is drawn at that location.  
+*
 *  Related Applications:
 *     KAPPA: DISPLAY, LINPLOT, MLINPLOT; Figaro: SPECGRID; SPLAT.
 
@@ -349,6 +415,7 @@
       INCLUDE 'PAR_ERR'         ! PAR error constants
       INCLUDE 'AST_PAR'         ! AST constants
       INCLUDE 'NDF_PAR'         ! NDF constants
+      INCLUDE 'PRM_PAR'         ! VAL constants
       INCLUDE 'CNF_PAR'         ! CNF constants
 
 *  Status:
@@ -365,12 +432,14 @@
       PARAMETER( MXSPEC = 100 )    
 
       REAL KW                   ! Width of KEY picture as a fraction of
-      PARAMETER( KW = 0.15 )    ! current picture width
+      PARAMETER( KW = 0.18 )    ! current picture width
 
 *  Local Variables:
       CHARACTER ATTR*20         ! AST attribute name
+      CHARACTER COMP*8          ! Component to be displayed
       CHARACTER LABEL*40        ! NDF Label component
       CHARACTER MAPKEY*20       ! Key for next polyline description
+      CHARACTER MCOMP*8         ! Component to be mapped
       CHARACTER NDFNAM*255      ! Full NDF specification 
       CHARACTER UNIT*20         ! NDF Unit component
       DOUBLE PRECISION ATTRS( 5 )! Original plotting attribute values
@@ -389,18 +458,18 @@
       DOUBLE PRECISION SHIFTS( 2 ) ! Shifts from G2D Frame to P2D Frame
       DOUBLE PRECISION SPBND( 2 )! Bounds of spctral WCS value
       INTEGER BFRM              ! Pointer to base Frame in Plot
-      INTEGER SKYF              ! Pointer to 2D celestial WCS Frame
       INTEGER CBMAP             ! Pointer to current->base Mapping
       INTEGER CFRM              ! Pointer to current Frame in Plot
       INTEGER CGX               ! X GRID index at spectrum
       INTEGER CGY               ! Y GRID index at spectrum
-      INTEGER CMAP( MXSPEC*MXSPEC )! GRAPHICS->GRID Mapping for each cell
+      INTEGER CMAP( MXSPEC*MXSPEC )! GRAPHICS->GRID Mapping for a cell
       INTEGER CPM               ! A CmpMap
-      INTEGER CREG( MXSPEC*MXSPEC )! GRAPHICS Interval for each cell
+      INTEGER CREG( MXSPEC*MXSPEC )! GRAPHICS Interval for a cell
       INTEGER DATF              ! The data value Frame
-      INTEGER DPF               ! DATAPLOT Frame
       INTEGER DIM( NDIM )       ! The pixel NDF axis dimensions
       INTEGER DIMS( NDIM )      ! Dimensions of input array
+      INTEGER DPF               ! DATAPLOT Frame
+      INTEGER DPMAP             ! 1st cell GRAPHICS->DATAPLOT Mapping 
       INTEGER EL                ! No. of mapped elements
       INTEGER FS                ! FrameSet describing cell coords
       INTEGER G2D               ! Pointer to 2D celestial GRID Frame
@@ -420,20 +489,21 @@
       INTEGER IPLOT3            ! Plot for plotting line curves
       INTEGER IPLOT4            ! Plot for spatial axes
       INTEGER IPLOTD            ! Plot stored with DATA picture
-      INTEGER IPLOTK            ! Pointer to AST Plot for KEY picture
-      INTEGER IPN               ! Pointer to no. of pointers per polyline
-      INTEGER IPW1              ! Pointer to work array 1
-      INTEGER IPW2              ! Pointer to work array 2
-      INTEGER IPW3              ! Pointer to work array 3
-      INTEGER IPX               ! Pointer to array of graphics X values
-      INTEGER IPY               ! Pointer to array of graphics Y values
-      INTEGER IWCS              ! Pointer to the WCS FrameSet from NDF
+      INTEGER IPLOTK            ! P'nter to AST Plot for KEY picture
+      INTEGER IPN               ! P'nter to no. of pointers per polyline
+      INTEGER IPW1              ! P'nter to work array 1
+      INTEGER IPW2              ! P'nter to work array 2
+      INTEGER IPW3              ! P'nter to work array 3
+      INTEGER IPX               ! P'nter to array of graphics X values
+      INTEGER IPY               ! P'nter to array of graphics Y values
+      INTEGER IWCS              ! P'nter to the WCS FrameSet from NDF
       INTEGER IX                ! Index of cell in row
       INTEGER IY                ! Index of cell in column
-      INTEGER KM                ! Subsiduary KeyMap holding polyline info
+      INTEGER KM                ! Subsiduary KeyMap for polyline info
       INTEGER MAXPOS            ! Position of maximum data value
       INTEGER MINPOS            ! Position of minimum data value
       INTEGER NCELL             ! Number of cells in plot
+      INTEGER NCU               ! Number of characters in the units
       INTEGER NFRM              ! Increment in Frame index      
       INTEGER NINVAL            ! No. of bad values
       INTEGER NK                ! Number of celestial axes
@@ -456,7 +526,8 @@
       INTEGER SKBAX( NDF__MXDIM )! Indices of celestial GRID axes
       INTEGER SKFRM             ! Pointer to celestial WCS Frame
       INTEGER SKMAP             ! Celestial WCS->grid Mapping
-      INTEGER SKWCS             ! Pointer to the WCS FrameSet for sky axes
+      INTEGER SKWCS             ! P'nter to WCS FrameSet for sky axes
+      INTEGER SKYF              ! Pointer to 2D celestial WCS Frame
       INTEGER SLBND( NDIM )     ! Significant lower bounds of the image
       INTEGER SLM               ! A SelectorMap
       INTEGER SPAX              ! Index of spectral WCS axis
@@ -474,15 +545,12 @@
       LOGICAL AXES              ! Annotated axes are to be drawn?
       LOGICAL BLEDGE            ! Leaves edge spec plots bare?
       LOGICAL CGOOD( MXSPEC, MXSPEC )! Was a spectrum drawn in the cell?
-      LOGICAL CLEAR             ! Is the screen to be cleared on opening?
+      LOGICAL CLEAR             ! Is screen to be cleared on opening?
       LOGICAL FIRST             ! Is the first cell yet to be annotated?
       LOGICAL KEY               ! Make a key of the contour heights?
-      LOGICAL TICKS             ! Draw ticks round each spectrum cell?
       LOGICAL REFLAB            ! Draw labels around the first spectrum?
-      INTEGER NCU               ! Number of characters in the units
+      LOGICAL TICKS             ! Draw ticks round each spectrum cell?
       REAL ASPECT               ! Aspect ratio of the input array
-      REAL DATMAX               ! Max data value to be displayed
-      REAL DATMIN               ! Min data value to be displayed
       REAL DUMMY                ! Un-required argument value
       REAL DX1                  ! Unused
       REAL DX2                  ! Width of viewport in device pixels
@@ -506,9 +574,8 @@
       REAL Y                    ! GRAPHICS Y at next line
       REAL Y1                   ! GRAPHICS Y at bottom of Plot
       REAL Y2                   ! GRAPHICS Y at top of Plot
-      INTEGER DPMAP             ! GRAPHICS->DATAPLOT Mapping for 1st cell
-      CHARACTER MCOMP*8         ! Component to be mapped
-      CHARACTER COMP*8          ! Component to be displayed
+      REAL YBOT                 ! Min data value to be displayed
+      REAL YTOP                 ! Max data value to be displayed
 *.
 
 *  Check the inherited global status.
@@ -524,8 +591,7 @@
 
 *  Begin an NDF context.
       CALL NDF_BEGIN
-
-
+ 
 *  Obtain the NDF and extract the required information from it
 *  ===========================================================
 
@@ -545,8 +611,7 @@
 *  Get the Label and Unit from the NDF.
       UNIT = ' '
       CALL KPG1_DAUNI( INDF, MCOMP, UNIT, NCU, STATUS )
-
-      LABEL = ' '
+       LABEL = ' '
       CALL NDF_CGET( INDF, 'Label', LABEL, STATUS )      
 
 *  Get an AST pointer to a FrameSet describing the co-ordinate Frames
@@ -562,8 +627,7 @@
       CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
       BFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
       CBMAP = AST_GETMAPPING( IWCS, AST__CURRENT, AST__BASE, STATUS )
-
-
+ 
 *  Identify the axis that is to drawn as a spectrum, and get individual 
 *  Mappings and Frames for the spectral and spatial axes.
 *  ====================================================================
@@ -602,6 +666,7 @@
      :                                  STATUS ) )
          CALL ERR_REP( 'MYCLINPLOT_ERR1', 'The ^AX axis is not '//
      :                 'parallel to a pixel axis.', STATUS )
+
       END IF
 
 *  Abort if an error has occurred.
@@ -659,8 +724,7 @@
       DIM( 1 ) = SUBND( SKBAX( 1 ) ) - SLBND( SKBAX( 1 ) ) + 1
       DIM( 2 ) = SUBND( SKBAX( 2 ) ) - SLBND( SKBAX( 2 ) ) + 1
       DIM( 3 ) = SUBND( SPBAX( 1 ) ) - SLBND( SPBAX( 1 ) ) + 1
-
-
+ 
 *  Set up the graphics system
 *  ==========================
 
@@ -780,23 +844,25 @@
 
 *  Ensure the Title attribute of the Plot has a useful value.
       CALL KPG1_ASTTL( IPLOT, SKWCS, INDF, STATUS )
-
-
+ 
 *  Define the extent of each cell in the grid of line plots
 *  ========================================================
 
 *  See how many spectra are to be included in the grid.
       NX = MIN( 30, DIM( 1 ) )
       NY = MIN( 30, DIM( 2 ) )
-      CALL PAR_GDR0I( 'NX', NX, 1, DIM( 1 ), .FALSE., NX, STATUS )
-      CALL PAR_GDR0I( 'NY', NY, 1, DIM( 2 ), .FALSE., NY, STATUS )
+      CALL PAR_GDR0I( 'NX', NX, 1, MIN( MXSPEC, DIM( 1 ) ), .FALSE., 
+     :                 NX, STATUS )
+      CALL PAR_GDR0I( 'NY', NY, 1, MIN( MXSPEC, DIM( 2 ) ), .FALSE., 
+     :                 NY, STATUS )
 
 *  Get the bounds of the current PGPLOT window (this is the same as the
 *  bounds of the Plot in the GRAPHICS Frame).
       IF( STATUS  .EQ. SAI__OK ) THEN 
          CALL PGQWIN( X1, X2, Y1, Y2 )
 
-*  Find the width and height of each spectrum's cell in the GRAPHICS Frame.
+*  Find the width and height of each spectrum's cell in the GRAPHICS 
+*  Frame.
          DX = DBLE( X2 - X1 )/DBLE( NX )
          DY = DBLE( Y2 - Y1 )/DBLE( NY )
 
@@ -804,26 +870,37 @@
          MINDIM = X2 - X1
          IF( Y2 - Y1 .LT. MINDIM ) MINDIM = Y2 - Y1
 
-*  Find the max and min data values to display. Use the max and min
-*  values in the data as the defaults.
-         CALL KPG1_MXMNR( .TRUE., EL, %VAL( CNF_PVAL( IPD ) ), NINVAL, 
-     :                    DATMAX, DATMIN, MAXPOS, MINPOS, STATUS )
+*  Find suitable default values for YTOP and YBOT.
+         YBOT = VAL__BADR
+         YTOP = VAL__BADR
+         CALL KPG1_GRLM3( 'LMODE', EL, %VAL( CNF_PVAL( IPD ) ), 
+     :                    %VAL( CNF_PVAL( IPD ) ), .FALSE.,
+     :                    0.0, YBOT, YTOP, STATUS )
 
-         CALL PAR_DEF0R( 'DATMAX', DATMAX, STATUS )
-         CALL PAR_GET0R( 'DATMAX', DATMAX, STATUS )
-         CALL PAR_DEF0R( 'DATMIN', DATMIN, STATUS )
-         CALL PAR_GET0R( 'DATMIN', DATMIN, STATUS )
+*  Ensure the limits are not equal.
+         IF( YBOT .EQ. YTOP ) THEN
+            IF( YBOT .NE. 0.0 ) THEN
+               YTOP = 2.0*YBOT
+            ELSE
+               YTOP = 1.0D0
+            END IF
+         END IF
+
+*  Find the max and min data values to display. 
+         CALL PAR_DEF0R( 'YTOP', YTOP, STATUS )
+         CALL PAR_GET0R( 'YTOP', YTOP, STATUS )
+         CALL PAR_DEF0R( 'YBOT', YBOT, STATUS )
+         CALL PAR_GET0R( 'YBOT', YBOT, STATUS )
 
 *  Get the number of device pixels across a single line plot
          CALL PGQVSZ( 3, DX1, DX2, DY1, DY2 )
 
-*  Decide on the number of spectral samples to use for each line plot. There 
-*  is no point in using more than the number of device pixels across a
-*  single cell.
+*  Decide on the number of spectral samples to use for each line plot. 
+*  There is no point in using more than the number of device pixels 
+*  across a single cell.
          NSAMP = DIM( 3 )
          IF( NSAMP .GT. NINT( DX2/NX ) ) NSAMP = NINT( DX2/NX )
-
-
+ 
 *  Draw all the spectra (but not the axes or borders)
 *  ==================================================
 
@@ -858,7 +935,7 @@
                CALL KPS1_CLPCP( SLBND, SUBND, SKBAX, SPBAX( 1 ), CGX, 
      :                          CGY, NSAMP, %VAL( CNF_PVAL( IPD ) ),
      :                          INA( 1 ), INA( 2 ),
-     :                          DX, DY, DATMAX, DATMIN, CGOOD( IX, IY ), 
+     :                          DX, DY, YTOP, YBOT, CGOOD( IX, IY ), 
      :                          %VAL( CNF_PVAL( IPW1 ) ),
      :                          %VAL( CNF_PVAL( IPW2 ) ), 
      :                          %VAL( CNF_PVAL( IPW3 ) ), STATUS )
@@ -868,13 +945,12 @@
                   CALL KPG1_PLTLN( NSAMP, 1, NSAMP , 
      :                            %VAL( CNF_PVAL( IPW1 ) ),
      :                            %VAL( CNF_PVAL( IPW2 ) ),
-     :                            .FALSE., .FALSE., 0.0D0, 0.0D0, 0.0D0, 
+     :                            .FALSE., .FALSE., 0.0D0, 0.0D0, 0.0D0,
      :                            'SPECSTYLE', IPLOT3, 2, 0, 0, 0, 
      :                            'KAPPA_MYCLIN', STATUS )
-               END IF
 
-*  Increment the inumber of cells done so far.
-               NCELL = NCELL + 1
+*  Increment the number of cells done so far.
+                  NCELL = NCELL + 1
 
 *  We now create a Mapping from 2D GRAPHICS to 4D (GRID1,GRID2,GRID3,DATA)
 *  within the current cell that we will use later when constructing the 
@@ -882,47 +958,49 @@
 *  produce a WinMap that maps the GRAPHICS coords box covered by this
 *  cell onto the corresponding ranges of GRID coord (on the SPBAX axis)
 *  and data value.
-               INB( 1 ) = INA( 1 ) + DX
-               INB( 2 ) = INA( 2 ) + DY
-               OUTA( 1 ) = 0.5D0
-               OUTA( 2 ) = DATMIN
-               OUTB( 1 ) = DIM( 3 ) + 0.5D0
-               OUTB( 2 ) = DATMAX
-               WM = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
+                  INB( 1 ) = INA( 1 ) + DX
+                  INB( 2 ) = INA( 2 ) + DY
+                  OUTA( 1 ) = 0.5D0
+                  OUTA( 2 ) = YBOT
+                  OUTB( 1 ) = DIM( 3 ) + 0.5D0
+                  OUTB( 2 ) = YTOP
+                  WM = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', 
+     :                             STATUS )
 
-*  Now produce a PermMap that copies the spectral GRID axis valeu and data
-*  value, and introduces constant values for the spatial GRID axes.
-               INP( 1 ) = SPBAX( 1 )
-               INP( 2 ) = 4
-   
-               OUTP( SKBAX( 1 ) ) = -1
-               OUTP( SKBAX( 2 ) ) = -2
-               OUTP( SPBAX( 1 ) ) = 1
-               OUTP( 4 ) = 2
-   
-               CON( 1 ) = CGX
-               CON( 2 ) = CGY
-   
-               PM = AST_PERMMAP( 2, INP, 4, OUTP, CON, ' ', STATUS )
+*  Now produce a PermMap that copies the spectral GRID axis valeu and 
+*  data value, and introduces constant values for the spatial GRID axes.
+                  INP( 1 ) = SPBAX( 1 )
+                  INP( 2 ) = 4
+      
+                  OUTP( SKBAX( 1 ) ) = -1
+                  OUTP( SKBAX( 2 ) ) = -2
+                  OUTP( SPBAX( 1 ) ) = 1
+                  OUTP( 4 ) = 2
+      
+                  CON( 1 ) = CGX
+                  CON( 2 ) = CGY
+      
+                  PM = AST_PERMMAP( 2, INP, 4, OUTP, CON, ' ', STATUS )
 
 *  Combine these two Mappings in series to get a Mapping from 2D Graphics
 *  coords to (GRID1,GRID2,GRID3,DATA) within the current cell.
-               CMAP( NCELL ) = AST_CMPMAP( WM, PM, .TRUE., ' ', STATUS )
+                  CMAP( NCELL ) = AST_CMPMAP( WM, PM, .TRUE., ' ', 
+     :                                        STATUS )
 
 *  Produce an Interval that covers the cell.
-               CREG( NCELL ) = AST_INTERVAL( GRFRM, INA, INB, AST__NULL,
-     :                                       ' ', STATUS )
+                  CREG( NCELL ) = AST_INTERVAL( GRFRM, INA, INB, 
+     :                                          AST__NULL, ' ', STATUS )
+               END IF
             END DO
-            CALL PGEBUF
 
-         END DO
+            CALL PGEBUF
+          END DO
 
 *  Free the work arrays
          CALL PSX_FREE( IPW1, STATUS )
          CALL PSX_FREE( IPW2, STATUS )
          CALL PSX_FREE( IPW3, STATUS )
-
-
+ 
 *  Now draw all annotated axes, borders, etc.
 *  ==========================================
 
@@ -963,10 +1041,10 @@
 *  Store the bounds of the area within the GF Frame that is to be mapped 
 *  onto each spectrum's cell.
          BBOX( 1 ) = 0.5
-         BBOX( 2 ) = DATMIN
+         BBOX( 2 ) = YBOT
          BBOX( 3 ) = DBLE( SUBND( SPBAX( 1 ) ) - 
      :                     SLBND( SPBAX( 1 ) ) ) + 1.5D0
-         BBOX( 4 ) = DATMAX
+         BBOX( 4 ) = YTOP
 
 *  Indicate we have not yet draw a spectrum.
          FIRST = .TRUE.   
@@ -1096,8 +1174,7 @@
      :                                %VAL( CNF_PVAL( IPY ) ), 
      :                                %VAL( CNF_PVAL( IPN ) ), 
      :                                STATUS )
-
-                  END IF
+                   END IF
                END IF
             END DO
             CALL PGEBUF
@@ -1113,10 +1190,12 @@
 *  allow room for the annotation associated with the spectral plots, and
 *  for the interior tick marks.
             TL = AST_GETR( IPLOT, 'MajTickLen', STATUS )
+
             IF( TL .GT. 0.0 ) THEN
                SMARGX = SMARGX + TL*MINDIM
                SMARGY = SMARGY + TL*MINDIM
             END IF
+
             DGLB( 1 ) = X1 - 1.5*SMARGX
             DGLB( 2 ) = Y1 - 1.5*SMARGY
             DGUB( 1 ) = X2 + 1.5*SMARGX
@@ -1183,8 +1262,7 @@
 
 *  Store the modified Plot back in the AGI database
          CALL KPG1_GDPUT( IPICD, 'PIXEL', ' ', IPLOTD, STATUS )
-
-
+ 
 *  Plot the key if necessary.
 *  ==========================
          IF ( KEY ) THEN
@@ -1238,7 +1316,7 @@
 
 *  Draw the key to the right of the contour plot and aligned with
 *  the top axis.
-            CALL KPS1_CLPKY( IPLOTK, DATMAX, DATMIN, SPBND, SPFRM, 
+            CALL KPS1_CLPKY( IPLOTK, YTOP, YBOT, SPBND, SPFRM, 
      :                       LABEL, UNIT, KEYOFF, STATUS )
 
 *  Report a context message if anything went wrong.
@@ -1246,8 +1324,8 @@
                CALL ERR_REP( 'CLINPLOT_NOKEY', 'Error while creating '//
      :                       'the key.', STATUS )
             END IF
-         END IF
 
+         END IF
       END IF
 
 *  Tidy up.
