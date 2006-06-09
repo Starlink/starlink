@@ -283,6 +283,9 @@
 *        Revise for new SelectorMap constructor.
 *     2006 May 26 (DSB):
 *        Added ROI<n> domain names for each channel.
+*     2006 June 9 (MJC):
+*        Use a temporary NDF as intermediary to obtain file-size 
+*        compression of the output NDF.
 *     {enter_further_changes_here}
 
 *-
@@ -386,6 +389,7 @@
       INTEGER INDFI              ! Input NDF identifier
       INTEGER INDFO              ! Output NDF identifier
       INTEGER INDFS              ! Input NDF-section identifier
+      INTEGER INDFT              ! Temporary-NDF identifier
       INTEGER INSLAB( MAXCHN )   ! Pointers to inverse collapsed-axis 
                                  ! slab intervals for each channel
       INTEGER IPAXCO             ! Pointers to mapped d.p. axis array
@@ -760,34 +764,8 @@
       END IF
       
 
-*  Propagate the input to the output NDF and define latter's bounds.
-*  =================================================================
-
-*  Create the output NDF by propagation from the input NDF.  This
-*  results in history, etc., being passed on.  The shape and 
-*  dimensionality will be wrong but this will be corrected later.
-      CALL LPG_PROP( INDFI, 'Units', 'OUT', INDFO, STATUS )
-
-*  Set the title of the output NDF.
-      CALL KPG1_CCPRO( 'TITLE', 'TITLE', INDFI, INDFO, STATUS )
-
-*  See if the input NDF has a Variance component.
-      CALL NDF_STATE( INDFI, 'VARIANCE', VAR, STATUS )
-
-*  Store a list of components to be accessed.
-      IF ( VAR ) THEN
-         COMP = 'DATA,VARIANCE'
-      ELSE
-         COMP = 'DATA'
-      END IF
-
-*  Determine the numeric type to be used for processing the input
-*  data and variance (if any) arrays.  Since the subroutines that
-*  perform the collapse need the data and variance arrays in the same
-*  data type, the component list is used.  This application supports
-*  single- and double-precision floating-point processing.
-      CALL NDF_MTYPE( '_REAL,_DOUBLE', INDFI, INDFO, COMP, ITYPE, DTYPE,
-     :                STATUS )
+*  Define the output NDF's bounds.
+*  ===============================
 
 *  Determine whether or not there are significant dimensions above
 *  the collapse axis.
@@ -814,6 +792,22 @@
          ODIMS( I ) = 1
       END DO
 
+*  Propagate the input to a temporary NDF.
+*  =======================================
+
+*  We want to avoid creating an NDF of roughly the same size as the
+*  input, when there's been significant compression of the number of
+*  pixels.  If we merely propagate then adjust the dimensions, HDS does
+*  not free up the space initially allocated.  Therefore we create a
+*  temporary NDF, and once its dimensions are correct, we can copy it
+*  to the actual output NDF.
+      CALL NDF_TEMP( PLACE, STATUS )
+
+*  Create the temporary NDF by propagation from the input NDF.  This
+*  results in history, etc., being passed on.  The shape and 
+*  dimensionality will be wrong but this will be corrected later.
+      CALL NDF_SCOPY( INDFI, 'Units', PLACE, INDFT, STATUS )
+
 *  Adjust output NDF to its new shape.
 *  ===================================
 
@@ -825,7 +819,32 @@
 *  WCS, and add the SwitchMap Frame at the end.
 
 *  Set the output NDF bounds to the required values.
-      CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFO, STATUS ) 
+      CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFT, STATUS ) 
+
+*  Now copy from the adjusted temporary NDF to the user-specified
+*  output NDF, that should have the correct file size.
+      CALL LPG_PROP( INDFT, 'Units', 'OUT', INDFO, STATUS )
+
+*  Set the title of the output NDF.
+      CALL KPG1_CCPRO( 'TITLE', 'TITLE', INDFI, INDFO, STATUS )
+
+*  See if the input NDF has a Variance component.
+      CALL NDF_STATE( INDFI, 'VARIANCE', VAR, STATUS )
+
+*  Store a list of components to be accessed.
+      IF ( VAR ) THEN
+         COMP = 'DATA,VARIANCE'
+      ELSE
+         COMP = 'DATA'
+      END IF
+
+*  Determine the numeric type to be used for processing the input
+*  data and variance (if any) arrays.  Since the subroutines that
+*  perform the collapse need the data and variance arrays in the same
+*  data type, the component list is used.  This application supports
+*  single- and double-precision floating-point processing.
+      CALL NDF_MTYPE( '_REAL,_DOUBLE', INDFI, INDFO, COMP, ITYPE, DTYPE,
+     :                STATUS )
 
 *  Get the WCS FrameSet from the output NDF.
       CALL NDF_GTWCS( INDFO, IWCSO, STATUS )
