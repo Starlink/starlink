@@ -82,6 +82,7 @@ sub new {
 # Set up default options.
   $auto->aperture( 5.0 ) if ( ! defined( $auto->aperture ) );
   $auto->catalogue( 'USNO@ESO' ) if( ! defined( $auto->catalogue ) );
+  $auto->crowded( 0 ) if ( ! defined( $auto->crowded ) );
   $auto->defects( 'warn' ) if ( ! defined( $auto->defects ) );
   $auto->detection_threshold( 5.0 ) if ( ! defined( $auto->detection_threshold ) );
   $auto->insert( 1 ) if ( ! defined( $auto->insert ) );
@@ -211,6 +212,23 @@ sub ccdcatalogue {
     $self->{CCDCATALOGUE} = $ccdcatalogue;
   }
   return $self->{CCDCATALOGUE};
+}
+
+=item B<crowded>
+
+Whether or not the autoastrom is being run on a crowded field. This is
+primarily used for speed considerations, as a smaller region of the
+frame will be used to detect objects in.
+
+=cut
+
+sub crowded {
+  my $self = shift;
+  if( @_ ) {
+    my $crowded = shift;
+    $self->{CROWDED} = $crowded;
+  }
+  return $self->{CROWDED};
 }
 
 =item B<defects>
@@ -1341,10 +1359,12 @@ sub solve {
     $ext->phot_apertures( $self->aperture );
     $ext->messages( $self->messages );
     $ext->timeout( $self->timeout );
+    $ext->crowded( $self->crowded );
 
     $ndfcat = $ext->extract( frame => $self->ndf,
                              filter => $self->filter,
-                             quality => 0, );
+                             quality => 0,
+                           );
     $self->printstd( sprintf( "--I Extracted %d objects from NDF.\n", $ndfcat->sizeof ) )
       if $self->starlink_output;
     $self->rawcatalogue( $ndfcat );
@@ -1358,6 +1378,8 @@ sub solve {
   if( $ndfcat->sizeof < 2 ) {
     croak "Only detected " . $ndfcat->sizeof . " objects in " . $self->ndf . ". Cannot perform automated astrometry corrections with so few objects";
   }
+
+
 
 # Limit the number of objects in the detected catalogue, if necessary.
   my $filtered_ndfcat = new Astro::Catalog;
@@ -1390,63 +1412,118 @@ sub solve {
       if $self->starlink_output;
   } else {
 
+    if( $self->crowded ) {
+
+      my $width = $xmax - $xmin;
+      my $height = $ymax - $ymin;
+
+      # Need to get the central coordinates of each of the five query
+      # positions. The radii are easy to work out.
+      my @coords;
+      my @radii;
+
+      # Central coordinates will be the first one done.
+      push @coords, $cencoords;
+
+      # The radius is going to be that circle that encompasses a
+      # rectangle centred on the central position with sides that are
+      # 25% the dimensions of the array.
+      #
+      # Find the coordinates of one of the corners.
+      ( my $corn_ra, my $corn_dec ) = $frameset->Tran2( [$xmin+0.375*$width],
+                                                        [$ymin+0.375*$height],
+                                                        1);
+      my $corn_coords = new Astro::Coords( ra => $corn_ra->[0],
+                                           dec => $corn_dec->[0],
+                                           type => 'J2000',
+                                           units => 'radians' );
+
+      my $r0 = $cencoords->distance( $corn_coords );
+      my $rad0 = $r0->arcmin;
+      push @radii, $rad0;
+
+=head1 COMMENT
+
+      # Now for the corners. They're boxes that are 10% of the
+      # width/height. We can set up one Tran2 call to save time. Find
+      # coordinates in the following order: bottom-left centre,
+      # bottom-left corner, top-left centre, top-left corner,
+      # bottom-right centre, bottom-right corner, top-right centre,
+      # top-right corner.
+      ( my $ra_ref, my $dec_ref ) = $frameset->Tran2( [ $xmin + 0.075 * $width,
+                                                        $xmin,
+                                                        $xmin + 0.075 * $width,
+                                                        $xmin,
+                                                        $xmax - 0.075 * $width,
+                                                        $xmax,
+                                                        $xmax - 0.075 * $width,
+                                                        $xmax ],
+                                                      [ $ymin + 0.075 * $height,
+                                                        $ymin,
+                                                        $ymax - 0.075 * $height,
+                                                        $ymax,
+                                                        $ymin + 0.075 * $height,
+                                                        $ymin,
+                                                        $ymax - 0.075 * $height,
+                                                        $ymax ],
+                                                      1 );
+
+      # Just push them on in order.
+      my $coords1 = new Astro::Coords( ra => $ra_ref->[0],
+                                       dec => $dec_ref->[0],
+                                       type => 'J2000',
+                                       units => 'radians' );
+      push @coords, $coords1;
+      my $r1 = $coords1->distance( new Astro::Coords( ra => $ra_ref->[1],
+                                                      dec => $dec_ref->[1],
+                                                      type => 'J2000',
+                                                      units => 'radians' ) );
+      push @radii, $r1->arcmin;
+      my $coords2 = new Astro::Coords( ra => $ra_ref->[2],
+                                       dec => $dec_ref->[2],
+                                       type => 'J2000',
+                                       units => 'radians' );
+      push @coords, $coords2;
+      my $r2 = $coords2->distance( new Astro::Coords( ra => $ra_ref->[3],
+                                                      dec => $dec_ref->[3],
+                                                      type => 'J2000',
+                                                      units => 'radians' ) );
+      push @radii, $r2->arcmin;
+      my $coords3 = new Astro::Coords( ra => $ra_ref->[4],
+                                       dec => $dec_ref->[4],
+                                       type => 'J2000',
+                                       units => 'radians' );
+      push @coords, $coords3;
+      my $r3 = $coords3->distance( new Astro::Coords( ra => $ra_ref->[5],
+                                                      dec => $dec_ref->[5],
+                                                      type => 'J2000',
+                                                      units => 'radians' ) );
+      push @radii, $r3->arcmin;
+      my $coords4 = new Astro::Coords( ra => $ra_ref->[6],
+                                       dec => $dec_ref->[6],
+                                       type => 'J2000',
+                                       units => 'radians' );
+      push @coords, $coords4;
+      my $r4 = $coords4->distance( new Astro::Coords( ra => $ra_ref->[7],
+                                                      dec => $dec_ref->[7],
+                                                      type => 'J2000',
+                                                      units => 'radians' ) );
+      push @radii, $r4->arcmin;
+
+=cut
+
+      # Do the queries.
+      $querycat = new Astro::Catalog;
+      for my $i ( 0 .. $#coords ) {
+        my $tempquerycat = $self->query_skycat( $coords[$i], $radii[$i] );
+        my @newstars = $tempquerycat->allstars;
+        $querycat->pushstar( @newstars );
+      }
+
+    } else {
+
 # Query the SkyCat catalogue.
-    my $racen = $cencoords->ra2000;
-    my $deccen = $cencoords->dec2000;
-    $racen->str_delim(' ');
-    $deccen->str_delim(' ');
-
-    $racen = "$racen";
-    $deccen = "$deccen";
-    $racen =~ s/^\s+//;
-    $deccen =~ s/^\s+//;
-
-    my $skycatstring = $self->catalogue;
-    my @skycatnames = split /,/, $skycatstring;
-
-    foreach my $skycatname ( @skycatnames ) {
-
-      $self->printstd( sprintf( "--I Obtaining catalogue from %s.\n",
-                                $skycatname ) )
-        if $self->starlink_output;
-
-      my $query;
-      eval {
-        $query = new Astro::Catalog::Query::SkyCat( catalog => $skycatname,
-                                                    RA => "$racen",
-                                                    Dec => "$deccen",
-                                                    Radius => $radius,
-                                                  );
-      };
-      if( $@ ) {
-        $self->printerr( "Error setting up SkyCat query: $@" );
-        $self->printerr( "Trying next catalogue in list.\n" );
-        next;
-      }
-
-      if( defined( $self->skycatconfig ) ) {
-        $query->cfg_file( $self->skycatconfig );
-      }
-      eval {
-        $querycat = $query->querydb();
-      };
-
-      if( $@ ) {
-        $self->printerr( "Error retrieving catalogue from $skycatname: $@" );
-        $self->printerr( "Trying next catalogue in list.\n" );
-        next;
-      }
-
-      $self->printstd( sprintf( "--I Obtained catalogue, %d entries, from %s.\n",
-                                $querycat->sizeof,
-                                $skycatname ) )
-        if $self->starlink_output;
-
-      last if $querycat->sizeof != 0;
-
-      $self->printerr( "Retrieved zero objects from $skycatname. Trying next catalogue.\n" );
-      $self->printerr( "Trying next catalogue in list.\n" );
-
+      $querycat = $self->query_skycat( $cencoords, $radius );
     }
   }
 
@@ -1742,46 +1819,45 @@ sub solve {
 
   } # End iteration loop.
 
-
 # Stick the WCS into the NDF, if requested.
-    if( $self->insert ) {
-      my $STATUS = &NDF::SAI__OK;
-      err_begin($STATUS);
-      ndf_begin();
-      ndf_open( &NDF::DAT__ROOT(), $self->ndf, 'UPDATE', 'OLD', my $ndf_id, my $place, $STATUS );
+  if( $self->insert ) {
+    my $STATUS = &NDF::SAI__OK;
+    err_begin($STATUS);
+    ndf_begin();
+    ndf_open( &NDF::DAT__ROOT(), $self->ndf, 'UPDATE', 'OLD', my $ndf_id, my $place, $STATUS );
 
-      ndfPtwcs( $newwcs, $ndf_id, $STATUS );
-      ndf_annul( $ndf_id, $STATUS );
+    ndfPtwcs( $newwcs, $ndf_id, $STATUS );
+    ndf_annul( $ndf_id, $STATUS );
 
-      # extract error messages and annul error status
-      ndf_end($STATUS);
-      if( $STATUS != &NDF::SAI__OK ) {
-        my ( $oplen, @errs );
-        do {
-          err_load( my $param, my $parlen, my $opstr, $oplen, $STATUS );
-          push @errs, $opstr;
-        } until ( $oplen == 1 );
-        err_annul( $STATUS );
-        err_end( $STATUS );
-        croak "Error writing new WCS to NDF:\n" . join "\n", @errs;
-      }
+    # extract error messages and annul error status
+    ndf_end($STATUS);
+    if( $STATUS != &NDF::SAI__OK ) {
+      my ( $oplen, @errs );
+      do {
+        err_load( my $param, my $parlen, my $opstr, $oplen, $STATUS );
+        push @errs, $opstr;
+      } until ( $oplen == 1 );
+      err_annul( $STATUS );
       err_end( $STATUS );
-      $self->printstd( "--I WCS updated in " . $self->ndf . ".\n" ) if $self->starlink_output;
+      croak "Error writing new WCS to NDF:\n" . join "\n", @errs;
     }
+    err_end( $STATUS );
+    $self->printstd( "--I WCS updated in " . $self->ndf . ".\n" ) if $self->starlink_output;
+  }
 
 # Update the NDF catalogue with the new WCS. First get the FK5
 # frameset for the WCS.
-    my $template = Starlink::AST::SkyFrame->new( "System=FK5" );
-    $frameset = $newwcs->FindFrame( $template, "" );
-    if( ! defined( $frameset ) ) {
-      croak "Could not find FK5 SkyFrame to do X/Y to RA/Dec translation";
-    }
+  my $template = Starlink::AST::SkyFrame->new( "System=FK5" );
+  $frameset = $newwcs->FindFrame( $template, "" );
+  if( ! defined( $frameset ) ) {
+    croak "Could not find FK5 SkyFrame to do X/Y to RA/Dec translation";
+  }
 
 # Modify the RA/Dec for each item.
-    foreach my $item ( @{$ndfcat->stars} ) {
-      my( $ra, $dec ) = $frameset->Tran2( [$item->x],
-                                          [$item->y],
-                                          1 );
+  foreach my $item ( @{$ndfcat->stars} ) {
+    my( $ra, $dec ) = $frameset->Tran2( [$item->x],
+                                        [$item->y],
+                                        1 );
     my $coords = new Astro::Coords( ra    => $ra->[0],
                                     dec   => $dec->[0],
                                     type  => 'J2000',
@@ -2067,6 +2143,84 @@ sub _determine_search_params {
   }
 
   return ( $cencoords, $radius, $lbnd[0], $ubnd[0], $lbnd[1], $ubnd[1] );
+
+}
+
+=item B<query_skycat>
+
+Perform a wrapped SkyCat query.
+
+  my $catalog = $self->query_skycat( $coords, $radius );
+
+Returns an Astro::Catalog object.
+
+=cut
+
+sub query_skycat {
+  my $self = shift;
+  my $coords = shift;
+  my $radius = shift;
+
+  my $racen = $coords->ra2000;
+  my $deccen = $coords->dec2000;
+  $racen->str_delim(' ');
+  $deccen->str_delim(' ');
+
+  $racen = "$racen";
+  $deccen = "$deccen";
+  $racen =~ s/^\s+//;
+  $deccen =~ s/^\s+//;
+
+  my $skycatstring = $self->catalogue;
+  my @skycatnames = split /,/, $skycatstring;
+
+  my $querycat;
+
+  foreach my $skycatname ( @skycatnames ) {
+
+    $self->printstd( sprintf( "--I Obtaining catalogue from %s.\n",
+                              $skycatname ) )
+      if $self->starlink_output;
+
+    my $query;
+    eval {
+      $query = new Astro::Catalog::Query::SkyCat( catalog => $skycatname,
+                                                  RA => "$racen",
+                                                  Dec => "$deccen",
+                                                  Radius => $radius,
+                                                );
+    };
+    if( $@ ) {
+      $self->printerr( "Error setting up SkyCat query: $@" );
+      $self->printerr( "Trying next catalogue in list.\n" );
+      next;
+    }
+
+    if( defined( $self->skycatconfig ) ) {
+      $query->cfg_file( $self->skycatconfig );
+    }
+    eval {
+      $querycat = $query->querydb();
+    };
+
+    if( $@ ) {
+      $self->printerr( "Error retrieving catalogue from $skycatname: $@" );
+      $self->printerr( "Trying next catalogue in list.\n" );
+      next;
+    }
+
+    $self->printstd( sprintf( "--I Obtained catalogue, %d entries, from %s.\n",
+                              $querycat->sizeof,
+                              $skycatname ) )
+      if $self->starlink_output;
+
+    last if $querycat->sizeof != 0;
+
+    $self->printerr( "Retrieved zero objects from $skycatname. Trying next catalogue.\n" );
+    $self->printerr( "Trying next catalogue in list.\n" );
+  }
+
+  return $querycat;
 
 }
 
