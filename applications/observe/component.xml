@@ -4,7 +4,7 @@
 
 <component id="observe" support="U">
   <version>2.3</version>
-  <path>applications/pisa</path>
+  <path>applications/observe</path>
   <description>OBSERVE --- Check Star Observability</description>
   <abstract><p>
       OBSERVE is designed to allow you to get a quick overview of the
