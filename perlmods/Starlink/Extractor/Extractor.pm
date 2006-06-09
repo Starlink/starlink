@@ -365,6 +365,101 @@ sub extract {
       $catalog->pushstar( @newstars );
     }
 
+  } elsif( defined( $self->crowded ) && $self->crowded ) {
+
+    # We're operating on a crowded field, so just take a central
+    # region with sides equal to 25% of the width and height of the
+    # array.
+
+    # To do this we first need the NDF dimensions.
+    my $STATUS = 0;
+    err_begin( $STATUS );
+    ndf_begin();
+    ndf_find( &NDF::DAT__ROOT(), $ndf, my $ndf_id, $STATUS );
+    ndf_bound( $ndf_id, 2, my @lbnd, my @ubnd, my $ndim, $STATUS );
+    ndf_annul( $ndf_id, $STATUS );
+    ndf_end( $STATUS );
+    if( $STATUS != &NDF::SAI__OK ) {
+      my ( $oplen, @errs );
+      do {
+        err_load( my $param, my $parlen, my $opstr, $oplen, $STATUS );
+        push @errs, $opstr;
+      } until ( $oplen == 1 );
+      err_annul( $STATUS );
+      err_end( $STATUS );
+      croak "Error determining NDF pixel bounds:\n" . join "\n", @errs;
+    }
+    err_end( $STATUS );
+    if( $ndim != 2 ) {
+      croak "Cannot run SExtractor on a non-2D image\n";
+    }
+
+    my $height = $ubnd[1] - $lbnd[1];
+    my $width = $ubnd[0] - $lbnd[0];
+
+    my $x_origin = $lbnd[0];
+    my $y_origin = $lbnd[1];
+
+    # Central patch.
+    my %region = ( x_start => int( $lbnd[0] + 0.375 * $width ),
+                   x_end   => int( $lbnd[0] + 0.625 * $width ),
+                   y_start => int( $lbnd[1] + 0.375 * $height ),
+                   y_end   => int( $lbnd[1] + 0.625 * $height ),
+                 );
+
+    # Get a new temporary file name for the catalogue.
+    $self->_catalog_file_name( 1 );
+    $self->catalog_name( $self->_catalog_file_name );
+    $self->_write_config_temp_file;
+
+    # Set up the NDF region.
+    my $ndfregion = '(';
+    $ndfregion   .= $region{x_start};
+    $ndfregion   .= ':';
+    $ndfregion   .= $region{x_end};
+    $ndfregion   .= ',';
+    $ndfregion   .= $region{y_start};
+    $ndfregion   .= ':';
+    $ndfregion   .= $region{y_end};
+    $ndfregion   .= ')';
+
+    # Do the extraction.
+    my $ams = new Starlink::AMS::Init(1);
+    my $set_messages = $ams->messages;
+    if( ! defined( $set_messages ) ) {
+      $ams->messages( $self->messages );
+    }
+    $ams->timeout( $self->timeout );
+    if( ! defined $TASK ) {
+      $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
+    }
+    my $STATUS = $TASK->contactw;
+    if( ! $STATUS ) {
+      croak "Could not contact EXTRACTOR monolith";
+    }
+    $STATUS = $TASK->obeyw("extract", "image=$ndf$ndfregion config=" . $self->_config_file_name );
+    if( $STATUS != SAI__OK && $STATUS != &Starlink::ADAM::DTASK__ACTCOMPLETE ) {
+      ( my $facility, my $ident, my $text ) = get_facility_error( $STATUS );
+      croak "Error in running EXTRACTOR: $STATUS - $text";
+    }
+
+    # Form a catalogue from Astro::Catalog.
+    my $newcatalog = new Astro::Catalog( Format => 'SExtractor',
+                                         File => $self->_catalog_file_name,
+                                         ReadOpt => { Filter => $filter },
+                                       );
+
+    # We need to add x_start and y_start to the x and y positions of
+    # each detected object.
+    foreach my $star ( $newcatalog->stars ) {
+      $star->x( $star->x + $region{x_start} - $x_origin );
+      $star->y( $star->y + $region{y_start} - $y_origin );
+    }
+
+    # Merge it in with the main catalog;
+    my @newstars = $newcatalog->allstars;
+    $catalog->pushstar( @newstars );
+
   } else {
 
     # Just do the extraction.
@@ -444,6 +539,25 @@ sub defaults {
 # Set the ADAM task parameters if they're not already set.
   if( ! defined( $self->messages ) ) { $self->messages( 0 ); }
   if( ! defined( $self->timeout ) ) { $self->timeout( 60 ); }
+}
+
+=item B<crowded>
+
+Whether or not the extraction is run on a crowded field. If set to
+true, then only the corners and a central region will be used for
+extraction. This is typically used to speed up automated astrometry
+calculations, and is not useful in the slightest for extracting all
+the objects in a frame. Defaults to false.
+
+=cut
+
+sub crowded {
+  my $self = shift;
+  if( @_ ) {
+    my $crowded = shift;
+    $self->{CROWDED} = $crowded;
+  }
+  return $self->{CROWDED};
 }
 
 =item B<checkerboard>
