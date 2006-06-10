@@ -1450,7 +1450,7 @@ $(MANIFESTS)/observe: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx
-	cd applications/pisa \
+	cd applications/observe \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/one: \
