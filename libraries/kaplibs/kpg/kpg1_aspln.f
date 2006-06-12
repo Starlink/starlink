@@ -68,6 +68,8 @@
 *  History:
 *     5-JUN-2006 (DSB):
 *        Original version.
+*     12-JUN-2006 (DSB):
+*        Avoid direct access to the KPG_AST common blocks.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -83,20 +85,13 @@
       INCLUDE 'DAT_PAR'          ! Needed by KPG_AST
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
-*  Global Variables:
-      INCLUDE 'KPG_AST'          ! KPG AST common block
-*        ASTPLN = INTEGER (Read and Write)
-*           Pointer to an AST KeyMap.
-*        ASTX1 = REAL (Read)
-*           The X value at the left edge.
-*        ASTY1 = REAL (Read)
-*           The Y value at the bottom edge.
-*        ASTX2 = REAL (Read)
-*           The X value at the right edge.
-*        ASTY2 = REAL (Read)
-*           The Y value at the top edge.
-*        ASTBLE = LOGICAL (Read)
-*           Do not draw lines that touch an edge?
+*  External References:
+      INTEGER KPG1_GETASTPLN
+      LOGICAL KPG1_GETASTBLE
+      REAL KPG1_GETASTX1
+      REAL KPG1_GETASTX2
+      REAL KPG1_GETASTY1
+      REAL KPG1_GETASTY2
 
 *  Arguments Given:
       INTEGER N
@@ -109,7 +104,12 @@
       INTEGER IAT                ! Used length of string
       INTEGER KM                 ! KeyMap holding supplied N, X and Y 
       INTEGER LSTAT              ! Local status used within this routine
+      INTEGER PLN                ! Pointer to an AST KeyMap
       LOGICAL BAD                ! Should the line be ignored?
+      REAL X1                    ! The X value at the left edge
+      REAL X2                    ! The X value at the right edge
+      REAL Y1                    ! The Y value at the bottom edge
+      REAL Y2                    ! The Y value at the top edge
 *.
 
 *  Assume no error.
@@ -121,15 +121,22 @@
 *  Check some points are being drawn. 
       IF( N .GT. 0 ) THEN
 
+* Save local copies of the reqired global variables.
+         PLN = KPG1_GETASTPLN()
+         X1 = KPG1_GETASTX1()
+         Y1 = KPG1_GETASTY1()
+         X2 = KPG1_GETASTX2()
+         Y2 = KPG1_GETASTY2()
+
 *  If we are keeping the edges blank, see if any of the points in the
 *  polyline touch the edge.
          BAD = .FALSE.
-         IF( ASTBLE ) THEN
+         IF( KPG1_GETASTBLE() ) THEN
             DO I = 1, N
-               IF( ABS( X( I ) - ASTX1 ) .LT. 0.1 .OR.
-     :             ABS( X( I ) - ASTX2 ) .LT. 0.1 .OR.
-     :             ABS( Y( I ) - ASTY1 ) .LT. 0.1 .OR.
-     :             ABS( Y( I ) - ASTY2 ) .LT. 0.1 ) THEN
+               IF( ABS( X( I ) - X1 ) .LT. 0.1 .OR.
+     :             ABS( X( I ) - X2 ) .LT. 0.1 .OR.
+     :             ABS( Y( I ) - Y1 ) .LT. 0.1 .OR.
+     :             ABS( Y( I ) - Y2 ) .LT. 0.1 ) THEN
                   BAD = .TRUE.
                   GO TO 10
                END IF
@@ -151,9 +158,9 @@
 *  "POLYLINE<i>" where <i> is an integer index.
          KEY = 'POLYLINE'
          IAT = 8
-         CALL CHR_PUTI( AST_MAPSIZE( ASTPLN, LSTAT ) + 1, KEY, IAT )
+         CALL CHR_PUTI( AST_MAPSIZE( PLN, LSTAT ) + 1, KEY, IAT )
    
-         CALL AST_MAPPUT0A( ASTPLN, KEY( : IAT ), KM, ' ', LSTAT )
+         CALL AST_MAPPUT0A( PLN, KEY( : IAT ), KM, ' ', LSTAT )
 
 *  Tidy up.
          CALL AST_ANNUL( KM, LSTAT )

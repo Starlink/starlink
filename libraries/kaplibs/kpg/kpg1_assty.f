@@ -83,7 +83,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants
-      INCLUDE 'DAT_PAR'          ! HDS constants (needed by KPG_AST)
       INCLUDE 'CTM_PAR'          ! CTM_ Colour-Table Management constants
 
 *  Arguments Given:

@@ -64,6 +64,8 @@
 *  History:
 *     5-JUN-2006 (DSB):
 *        Original version.
+*     12-JUN-2006 (DSB):
+*        Avoid direct access to the KPG_AST common blocks.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -78,21 +80,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Needed by KPG_AST
 
-*  Global Variables:
-      INCLUDE 'KPG_AST'          ! KPG AST common block
-*        ASTPLN = INTEGER (Read and Write)
-*           Pointer to an AST KeyMap.
-*        ASTX1 = REAL (Write)
-*           The X value at the left edge.
-*        ASTY1 = REAL (Write)
-*           The Y value at the bottom edge.
-*        ASTX2 = REAL (Write)
-*           The X value at the right edge.
-*        ASTY2 = REAL (Write)
-*           The Y value at the top edge.
-*        ASTBLE = LOGICAL (Write)
-*           Do not draw lines that touch an edge?
-
 *  Arguments Given:
       INTEGER KEYMAP
       LOGICAL BLEDGE
@@ -103,11 +90,11 @@
 *.
 
 *  Store the supplied values.
-      ASTPLN = KEYMAP
-      ASTX1 = X1
-      ASTY1 = Y1
-      ASTX2 = X2
-      ASTY2 = Y2
-      ASTBLE = BLEDGE
+      CALL KPG1_SETASTPLN( KEYMAP )
+      CALL KPG1_SETASTX1( X1 )
+      CALL KPG1_SETASTY1( Y1 )
+      CALL KPG1_SETASTX2( X2 )
+      CALL KPG1_SETASTY2( Y2 )
+      CALL KPG1_SETASTBLE( BLEDGE )
 
       END
