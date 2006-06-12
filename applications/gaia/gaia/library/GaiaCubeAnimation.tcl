@@ -244,7 +244,7 @@ itcl::class gaia::GaiaCubeAnimation {
 
    #  Handle the change in the spectral reference range (user interaction by
    #  dragging or resizing range).
-   public method ref_range_moved {coord1 coord2 action} {
+   public method ref_range_moved {id coord1 coord2 action} {
 
       #  Inhibit feedback to graphics reference range, before applying the new
       #  bounds. 
@@ -264,21 +264,21 @@ itcl::class gaia::GaiaCubeAnimation {
 
    #  Set the animation bounds.
    protected method set_animate_bounds_ {bound1 bound2} {
-      configure -lower_bound $bound1 -upper_bound $bound2
+      configure -lower_limit $bound1 -upper_limit $bound2
    }
 
    #  Start the animation.
    protected method start_ {} {
       set initial_seconds_ [clock clicks -milliseconds]
       if { $afterId_ == {} } {
-         if { $itk_option(-lower_bound) > $itk_option(-upper_bound) } {
-            set temp $itk_option(-lower_bound)
-            set itk_option(-lower_bound) $itk_option(-upper_bound)
-            set itk_option(-upper_bound) $temp
+         if { $itk_option(-lower_limit) > $itk_option(-upper_limit) } {
+            set temp $itk_option(-lower_limit)
+            set itk_option(-lower_limit) $itk_option(-upper_limit)
+            set itk_option(-upper_limit) $temp
          }
          set step_ $itk_option(-step)
-         set plane_ $itk_option(-lower_bound)
-         $itk_option(-gaiacube) set_display_plane $itk_option(-lower_bound) 0
+         set plane_ $itk_option(-lower_limit)
+         $itk_option(-gaiacube) set_display_plane $itk_option(-lower_limit) 0
          increment_
       }
    }
@@ -313,12 +313,12 @@ itcl::class gaia::GaiaCubeAnimation {
 
    #  Increment the displayed section by one.
    protected method increment_ {} {
-      if { $plane_ >= $itk_option(-lower_bound) && 
-           $plane_ < $itk_option(-upper_bound) } {
+      if { $plane_ >= $itk_option(-lower_limit) && 
+           $plane_ < $itk_option(-upper_limit) } {
          set plane_ [expr ${plane_}+$step_]
          $itk_option(-gaiacube) set_display_plane $plane_ 0
 
-         if { $plane_ == $itk_option(-lower_bound) } {
+         if { $plane_ == $itk_option(-lower_limit) } {
             #  At lower edge, running backwards, need to let it step below.
             set plane_ [expr ${plane_}+$step_]
          }
@@ -328,7 +328,7 @@ itcl::class gaia::GaiaCubeAnimation {
          #  with rock 'n roll option.
          #  Check that we have a range, otherwise this will call increment_
          #  causing an eval depth exception.
-         if { $itk_option(-lower_bound) == $itk_option(-upper_bound) } {
+         if { $itk_option(-lower_limit) == $itk_option(-upper_limit) } {
             stop
          } else {
             #  Force temporary halt as visual clue that end has arrived.
@@ -339,14 +339,14 @@ itcl::class gaia::GaiaCubeAnimation {
                   #  Rock 'n roll, switch direction.
                   if { $step_ >= 1 } {
                      # Going up.
-                     set plane_ [expr $itk_option(-upper_bound) - 1]
+                     set plane_ [expr $itk_option(-upper_limit) - 1]
                   } else {
                      # Going down.
-                     set plane_ $itk_option(-lower_bound)
+                     set plane_ $itk_option(-lower_limit)
                   }
                   set step_ [expr -1*$step_]
                } else {
-                  set plane_ $itk_option(-lower_bound)
+                  set plane_ $itk_option(-lower_limit)
                   #  Increment is always positive, put may be changed on fly.
                   set step_ [expr abs($step_)]
                }
@@ -366,8 +366,8 @@ itcl::class gaia::GaiaCubeAnimation {
          $itk_option(-gaiacube) make_ref_range $itk_option(-ref_id)
          $itk_option(-gaiacube) set_ref_range_colour \
             $itk_option(-ref_id) "yellow"
-         $itk_component(bounds) configure -value1 $itk_option(-lower_bound) \
-            -value2 $itk_option(-upper_bound)
+         $itk_component(bounds) configure -value1 $itk_option(-lower_limit) \
+            -value2 $itk_option(-upper_limit)
       } else {
          $itk_option(-gaiacube) remove_ref_range $itk_option(-ref_id)
       }
@@ -394,8 +394,8 @@ itcl::class gaia::GaiaCubeAnimation {
    itk_option define -show_ref_range show_ref_range Show_Ref_Range 0
 
    #  Animation bounds.
-   itk_option define -lower_bound lower_bound Lower_Bound 0
-   itk_option define -upper_bound upper_bound Upper_Bound 0
+   itk_option define -lower_limit lower_limit Lower_Limit 0
+   itk_option define -upper_limit upper_limit Upper_Limit 0
 
    #  Width of labels.
    itk_option define -labelwidth labelwidth LabelWidth 20

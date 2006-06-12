@@ -35,7 +35,7 @@
 #     See individual method declarations below.
 
 #  Inheritance:
-#     util::TopLevelWidget
+#     gaia::GaiaCubeApps
 
 #  Copyright:
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -76,45 +76,33 @@ itcl::class gaia::GaiaCubeChanmap {
 
    #  Inheritances:
    #  -------------
-   inherit util::FrameWidget
+   inherit gaia::GaiaCubeApps
 
    #  Nothing
 
    #  Constructor:
    #  ------------
    constructor {args} {
+      eval gaia::GaiaCubeApps::constructor $args -ref_colour "magenta"
+   } {
 
       #  Evaluate any options [incr Tk].
       eval itk_initialize $args
+   }
 
-      #  Whether to show the chanmap limits as a range object on the
-      #  spectral plot.
-      itk_component add showrange {
-         StarLabelCheck $w_.showrange \
-            -text "Show limits on plot:" \
-            -onvalue 1 -offvalue 0 \
-            -labelwidth $itk_option(-labelwidth) \
-            -variable [scope itk_option(-show_ref_range)] \
-            -command [code $this toggle_show_ref_range_]
-      }
-      pack $itk_component(showrange) -side top -fill x -ipadx 1m -ipady 2m
-      add_short_help $itk_component(showrange) \
-         {Show extent of chanmap data on plot with a reference range figure}
+   #  Destructor:
+   #  -----------
+   destructor  {
+      #  Nothing to do.
+   }
 
-      itk_component add bounds {
-         GaiaSpectralPlotRange $w_.bounds \
-            -gaiacube $itk_option(-gaiacube) \
-            -ref_id $itk_option(-ref_id) \
-            -text1 {Lower index:} \
-            -text2 {Upper index:} \
-            -show_ref_range $itk_option(-show_ref_range) \
-            -labelwidth $itk_option(-labelwidth) \
-            -valuewidth $itk_option(-valuewidth) \
-            -coord_update_cmd [code $this set_chanmap_bounds_]
-      }
-      pack $itk_component(bounds) -side top -fill x -ipadx 1m -ipady 2m
-      add_short_help $itk_component(bounds) \
-         {Lower and upper indices used for creating chanmap image}
+   #  Methods:
+   #  --------
+
+   protected method add_controls_ {} {
+
+      #  Use default controls (range and combination method).
+      GaiaCubeApps::add_controls_
 
       #  The number of channels to create.
       itk_component add nchan {
@@ -155,127 +143,30 @@ itcl::class gaia::GaiaCubeChanmap {
       pack $itk_component(shape) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(shape) \
          {Number of channels along the X-axis of the output image}
-
-      #  Method used for the chanmap collapses.
-      itk_component add combination {
-         LabelMenu $w_.cattype \
-            -labelwidth $itk_option(-labelwidth) \
-            -text "Combination method:" \
-            -variable [scope combination_type_]
-      }
-      pack $itk_component(combination) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(combination) \
-         {Method to use when combining data, use median with care}
-
-      foreach {sname lname} $estimators_ {
-            $itk_component(combination) add \
-               -label $lname \
-               -value $sname \
-               -command [code $this set_combination_type_ $sname]
-      }
-
-      itk_component add chanmap {
-         button $w_.chanmap -text Chanmap \
-            -command [code $this chanmap_]
-      }
-      pack $itk_component(chanmap) -side top -expand 1 -pady 3 -padx 3
-      add_short_help $itk_component(chanmap) \
-         {Create the channel map and display it}
-
    }
 
-   #  Destructor:
-   #  -----------
-   destructor  {
+   #  Run the CHANMAP application.
+   protected method run_main_app_ {ndfname axis lb ub} {
 
-      #  Release task.
-      if { $chanmap_ != {} } {
-         catch {$chanmap_ delete_sometime}
-         set chanmap_ {}
-      }
-   }
-
-   #  Methods:
-   #  --------
-
-   #  Set the minimum and maximum possible bounds.
-   public method set_bounds {plane_min plane_max} {
-      $itk_component(bounds) configure -from $plane_min -to $plane_max
-      $itk_component(bounds) configure -value1 $plane_min -value2 $plane_max
-      set_chanmap_bounds_ $plane_min $plane_max
-   }
-
-   #  Handle the change in the spectral reference range (user interaction by
-   #  dragging or resizing range).
-   public method ref_range_moved {coord1 coord2 action} {
-
-      #  Inhibit feedback to graphics reference range, before applying the new
-      #  bounds.
-      if { $action == "move" } {
-         set oldvalue [$itk_component(bounds) cget -show_ref_range]
-         $itk_component(bounds) configure -show_ref_range 0
-      }
-
-      #  Update the bounds.
-      $itk_component(bounds) configure -value1 $coord1 -value2 $coord2
-      set_chanmap_bounds_ $coord1 $coord2
-
-      if { $action == "move" } {
-         $itk_component(bounds) configure -show_ref_range $oldvalue
-      }
-   }
-
-   #  Set the chanmap collapse bounds.
-   protected method set_chanmap_bounds_ {bound1 bound2} {
-      configure -lower_bound $bound1 -upper_bound $bound2
-   }
-
-   # Set the combination type
-   protected method set_combination_type_ {type} {
-      set combination_type_ $type
-   }
-
-   #  Create the channel map image and the display the result.
-   #  Use a section to pass to CHANMAP so we do not need to know the world
-   #  coordinates along the collapse axis.
-   protected method chanmap_ {} {
-      set lb [expr min($itk_option(-lower_bound),$itk_option(-upper_bound))]
-      set ub [expr max($itk_option(-lower_bound),$itk_option(-upper_bound))]
-      set range "$lb:$ub"
-      set axis [$itk_option(-gaiacube) get_axis]
-      if { $axis == 1 } {
-         set section "($range,,$itk_option(-close_section)"
-      } elseif { $axis == 2 } {
-         set section "(,$range,$itk_option(-close_section)"
-      } else {
-         set section "(,,${range}${itk_option(-close_section)}"
-      }
-
-      #  Now startup the CHANMAP application.
-      if { $chanmap_ == {} } {
+      #  Start up the CHANMAP application, if not done.
+      if { $maintask_ == {} } {
          global env
-         set chanmap_ [GaiaApp \#auto -application \
+         set maintask_ [GaiaApp \#auto -application \
                             $env(KAPPA_DIR)/chanmap \
-                            -notify [code $this chanmap_completed_]]
+                            -notify [code $this app_completed_]]
       }
 
       #  Create a temporary file name.
       set tmpimage_ "GaiaTempChanmap${count_}"
       incr count_
-      blt::busy hold $w_
-      set ndfname [$itk_option(-gaiacube) get_ndfname]
-      $chanmap_ runwiths "in=${ndfname}$section out=$tmpimage_ axis=$axis \
-                          estimator=$combination_type_ \
+      $maintask_ runwiths "in=$ndfname out=$tmpimage_ axis=$axis \
+                          low=$lb high=$ub estimator=$combination_type_ \
                           nchan=$itk_option(-nchan) \
                           shape=$itk_option(-shape) accept"
-
-      #  If the reference lines are displayed these need removing.
-      set itk_option(-show_ref_range) 0
-      toggle_show_ref_range_
    }
 
    #  Display the chanmap image.
-   private method chanmap_completed_ {} {
+   protected method app_do_present_ {} {
       set file {}
       if { ! [file readable $tmpimage_] } {
          if { ! [file readable ${tmpimage_}.sdf] } {
@@ -288,22 +179,6 @@ itcl::class gaia::GaiaCubeChanmap {
       }
       if { $file != {} } {
          $itk_option(-gaiacube) display $file 1
-      }
-      blt::busy release $w_
-   }
-
-   #  Toggle the display of the chanmap reference range.
-   protected method toggle_show_ref_range_ {} {
-      $itk_component(bounds) configure \
-         -show_ref_range $itk_option(-show_ref_range)
-      if { $itk_option(-show_ref_range) } {
-         $itk_option(-gaiacube) make_ref_range $itk_option(-ref_id)
-         $itk_option(-gaiacube) set_ref_range_colour \
-            $itk_option(-ref_id) "magenta"
-         $itk_component(bounds) configure -value1 $itk_option(-lower_bound) \
-            -value2 $itk_option(-upper_bound)
-      } else {
-         $itk_option(-gaiacube) remove_ref_range $itk_option(-ref_id)
       }
    }
 
@@ -320,29 +195,6 @@ itcl::class gaia::GaiaCubeChanmap {
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  The related GaiaCube instance.
-   itk_option define -gaiacube gaiacube GaiaCube {}
-
-   #  The identifier of the reference range.
-   itk_option define -ref_id ref_id Ref_Id 3
-
-   #  Whether to show the reference range.
-   itk_option define -show_ref_range show_ref_range Show_Ref_Range 0
-
-   #  Animation bounds.
-   itk_option define -lower_bound lower_bound Lower_Bound 0
-   itk_option define -upper_bound upper_bound Upper_Bound 0
-
-   #  Width of labels.
-   itk_option define -labelwidth labelwidth LabelWidth 20
-
-   #  Width of values.
-   itk_option define -valuewidth valuewidth ValueWidth 20
-
-   #  The terminator characters for closing a section. May specify
-   #  a final redundant axis, should be updated with the GaiaCube instance.
-   itk_option define -close_section close_section Close_Section ")"
-
    #  The number of channels to create in the map.
    itk_option define -nchan nchan Nchan 4
 
@@ -352,42 +204,8 @@ itcl::class gaia::GaiaCubeChanmap {
    #  Protected variables: (available to instance)
    #  --------------------
 
-   #  Maximum and minimum possible value for plane.
-   protected variable plane_max_ 0
-   protected variable plane_min_ 0
-
-   #  The CHANMAP task.
-   protected variable chanmap_ {}
-
-   #  Combination method.
-   protected variable combination_type_ "Mean"
-
-   #  Name of the temporary image just created.
-   protected variable tmpimage_
-
    #  Common variables: (shared by all instances)
    #  -----------------
-   #  All the known chanmap collapse estimators, short and long descriptions.
-   common estimators_ {
-      Mean Mean
-      WMean {Weighted Mean}
-      Mode Mode
-      Median Median
-      Absdev {Mean absolute deviation}
-      Comax {Co-ordinate of the maximum value}
-      Comin {Co-ordinate of the minimum value}
-      Integ {Integrated value}
-      Iwc {Intensity-weighted co-ordinate}
-      Iwd {Intensity-weighted dispersion}
-      Max Maximum
-      Min Minimum
-      Rms RMS
-      Sigma {Standard deviation}
-      Sum Sum
-   }
-
-   #  The temporary image count.
-   common count_ 0
 
 #  End of class definition.
 }
