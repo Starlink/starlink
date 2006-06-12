@@ -17,7 +17,7 @@ smurf_mon_TASKS = extinction flatfield makemap remsky qlmakemap scanfit sim
 DA_FILES = sc2da/sc2store.c sc2da/sc2math.c sc2da/smurf_ers.c \
 sc2da/sc2ast.c
 
-SIM_FILES = libsim/dsim.c 
+#SIM_FILES = libsim/dsim.c 
 #libsim/sc2sim.c libsim/heatrun.c
 
 WVM_FILES = wvm/wvmOpt.c wvm/wvmTau.c wvm/wvmCal.c

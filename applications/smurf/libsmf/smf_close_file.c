@@ -52,6 +52,8 @@
 *        - Free new allsc2heads component, not sc2head
 *        - Free flatfield information if isSc2store
 *        - respect new isCloned flag in smfHead
+*     2006-06-12 (EC):
+*        Free resources associated with .SMURF.MAPCOORD extension if needed
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -115,11 +117,12 @@ void smf_close_file( smfData ** data, int * status ) {
   (*data)->refcount--;
   if ((*data)->refcount > 0 ) return;
   
-  /* Get the header, since we need it for the file checking */
+  /* Get the header and file, since we need them for checking */
   hdr = (*data)->hdr;
 
-  /* now file information */
+
   file = (*data)->file;
+  /* now file information */
   if (file != NULL) {
 
     if ( file->isSc2store ) {
@@ -130,9 +133,20 @@ void smf_close_file( smfData ** data, int * status ) {
 
     } else if ( file->ndfid != NDF__NOID ) {
 
+      /* First annul mapcoord NDF if it exists (frees memory used by LUT) */
+      if( file->mapcoordid != NDF__NOID ) {
+	ndfAnnul( &(file->mapcoordid), status );
+      }
+
+      /* Annul the smurfloc HDS locator if it exists */
+      if( file->smurfloc != NULL ) {
+	datAnnul( &(file->smurfloc), status );
+      }
+
       /* Annul the NDF (which will unmap things) */
       ndfAnnul( &(file->ndfid), status );
-
+      
+	
     } else {
       /* No file so free the data */
       freedata = 1;

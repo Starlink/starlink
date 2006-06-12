@@ -92,6 +92,8 @@
 *        Add status check in case SCANFIT extension doesn't exist
 *     2006-06-08 (AGG):
 *        Set correct data type for QUALITY to fix HDS error
+*     2006-06-12 (EC):
+*        NULL pointers associated with .SMURF.MAPCOORD extension
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -144,16 +146,16 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   int indf;                  /* NDF identified for input file */
   int ndfdims[NDF__MXDIM];   /* Array containing size of each axis of array */
   int ndims;                 /* Number of dimensions in data */
-  int qexists;               /* Boolean flag for presence of QUALITY component */
-  int vexists;               /* Boolean flag for presence of VARIANCE component */
-  int pexists;               /* Boolean flag for presence of SCU2RED component */
+  int qexists;               /* Boolean for presence of QUALITY component */
+  int vexists;               /* Boolean for presence of VARIANCE component */
+  int pexists;               /* Boolean for presence of SCU2RED component */
   char filename[GRP__SZNAM+1]; /* Input filename, derived from GRP */
   char *pname;               /* Pointer to input filename */
   void *outdata[] = { NULL, NULL, NULL }; /* Array of pointers to
 					     output data components:
 					     one each for DATA,
 					     QUALITY and VARIANCE */
-  int isNDF = 1;             /* Flag to specify whether a file has been flatfielded */
+  int isNDF = 1;             /* Flag to indicate if file flatfielded */
   int isTseries = 0;         /* Flag to specify whether the data are
 				in time series format */
   int itype = SMF__NULL;     /* Data type for DATA (and VARIANCE) array(s) */
@@ -189,7 +191,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   HDSLoc *ploc = NULL;       /* Locator for SCANFIT coeffs */
   int pndf;                  /* NDF identifier for SCU2RED */
   int place;                 /* NDf placeholder for SCANFIT extension */
-  int npoly;                 /* Number of points in polynomial coefficient array */
+  int npoly;                 /* Number points in polynomial coeff array */
   double *poly;              /* Pointer to array of polynomial coefficients */
   double *opoly;             /* Pointer to store in output struct */
   int npdims;                /* Number of dimensions in the polynomial array */
@@ -202,6 +204,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
     *data = NULL;
     return;
   }
+
   /* Return the NDF identifier */
   ndgNdfas( igrp, index, mode, &indf, status );
   /* Determine the dimensions of the DATA component */
@@ -231,7 +234,9 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
     if ( *status == SAI__OK) {
       *status = SAI__ERROR;
       msgSeti( "NDIMS", ndims);
-      errRep( FUNC_NAME, "Number of dimensions in output, ^NDIMS, is not equal to 2 or 3",status);
+      errRep( FUNC_NAME, 
+	      "Number of dimensions in output, ^NDIMS, is not equal to 2 or 3",
+	      status);
     }
   }
 
@@ -244,9 +249,13 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
   /* If all's well, proceed */
   if ( *status == SAI__OK) {
-
     file = (*data)->file;
     hdr = (*data)->hdr;
+
+    /* Null MAPCOORD extension pointers - they get allocated elsewhere */
+    (*data)->lut = NULL;
+    file->mapcoordid=NDF__NOID;
+    file->smurfloc=NULL;
 
     /* If we have timeseries data then look for and read polynomial
        scan fit coefficients. */
@@ -293,15 +302,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
     if (isNDF) {
 
-      if( strncmp( mode, "WRITE", 5 ) == 0 ) {
-	/* If WRITE we should map Q & V to create them */
-	qexists = 1;
-	vexists = 1;
-      } else {
-	/* Check if we have Q and V components otherwise */
-	ndfState( indf, "QUALITY", &qexists, status);
-	ndfState( indf, "VARIANCE", &vexists, status);
-      }
+      ndfState( indf, "QUALITY", &qexists, status);
+      ndfState( indf, "VARIANCE", &vexists, status);
 
       /* Map each component as necessary */
       ndfMap( indf, "DATA", dtype, mode, &outdata[0], &nout, status );
@@ -319,7 +321,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	/* Read the FITS headers */
 	kpgGtfts( indf, &fits, status );
 
-	/* If we don't have a time series, then we can retrieve the stored WCS info */
+	/* If not time series, then we can retrieve the stored WCS info */
 	if ( !isTseries ) {
 	  ndfGtwcs( indf, &iwcs, status);
 	  hdr->wcs = iwcs;

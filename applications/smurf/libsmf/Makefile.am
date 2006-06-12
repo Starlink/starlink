@@ -24,7 +24,8 @@ smf_mapbounds.c smf_mapbounds_approx.c smf_rebinmap.c \
 smf_check_smfData.c smf_check_smfDA.c smf_check_smfFile.c smf_check_smfHead.c \
 smf_calc_wvm.c smf_subtract_poly.c smf_subtract_plane.c smf_fit_poly.c \
 smf_calc_stats.c smf_calc_covar.c \
-smf_mapcoord.c smf_simplerebinmap.c smf_iteratemap.c
+smf_mapcoord.c smf_simplerebinmap.c smf_iteratemap.c \
+smf_open_mapcoord.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 

@@ -290,4 +290,6 @@ void smf_iteratemap( Grp *igrp, Grp *astgrp, Grp *atmgrp, Grp *ngrp,
 		     int size, double *map, double *variance, double *weights,
 		     int msize, int *status );
 
+smf_open_mapcoord( smfData *data, int *status );
+
 #endif /* SMF_DEFINED */

@@ -21,6 +21,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Tim Jenness (JAC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -49,6 +50,8 @@
 *        Add nframes and curframe to smfHead
 *     2006-04-21 (AGG):
 *        Add history to smfData
+*     2006-06-12 (EC):
+*        Added smurfloc/mapcoordid to smfFile & lut to smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -67,7 +70,7 @@
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
-*     You should have received a copy of the GNU General Public
+     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
 *     MA 02111-1307, USA
@@ -113,6 +116,8 @@ typedef struct smfFile {
   int isSc2store;            /* True if file opened by sc2store library */
   int isTstream;             /* True if file contains time series data */
   char name[SMF_PATH_MAX+1]; /* Name of file */
+  HDSLoc *smurfloc;          /* HDS locator for SMURF extension */
+  int mapcoordid;            /* NDF identifier for SMURF.MAPCOORD */
 } smfFile;
 
 /* Contains header general header information obtained from the file */
@@ -148,13 +153,14 @@ typedef struct smfData {
   smfHead * hdr;           /* Header information */
   smfDA * da;              /* If sc2store, associated data arrays */
   smf_dtype dtype;         /* Data type of DATA and VARIANCE arrays */
-  void * pntr[3];          /* Array of pointers to DATA, VARIANCE and QUALITY */
+  void * pntr[3];          /* Array of pointers to DATA/VARIANCE/QUALITY */
   dim_t dims[NDF__MXDIM];  /* Dimensions of data array */
   int ndims;               /* Number of active dimensions in "dims" */
   int refcount;            /* Reference count for data object */
   int virtual;             /* Flag for extracted timeslices */
   double *poly;            /* Polynomial scan fits */
   int ncoeff;              /* Number of coefficients in polynomial */
+  int * lut;               /* Pointing lookup table */
   AstKeyMap *history;      /* History entries */
 } smfData;
 
