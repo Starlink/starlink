@@ -314,7 +314,7 @@
 
 #  For Fortran, link with the AST SLALIB interface and the Fortran library via
 #  the SLALIB link script (if found).
-      f) args="${args} -last_slalib `\`find sla_link\``"
+      f) args="${args} `\`find sla_link\``"
          f77='y';;
 
 #  Otherwise, link with the internal GPLed cut down C version of SLALIB.

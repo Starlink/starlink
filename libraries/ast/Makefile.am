@@ -297,7 +297,6 @@ lib_LTLIBRARIES = \
     libast_grf_2.0.la \
     libast_grf_3.2.la \
     libast_pgplot.la \
-    libast_slalib.la \
     libast_pal.la \
     libast_wcslib.la
 
@@ -317,7 +316,6 @@ libast_ems_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_grf_2.0_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_grf_3.2_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_pgplot_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
-libast_slalib_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_pal_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_wcslib_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 endif
@@ -349,9 +347,6 @@ libast_grf_3_2_la_SOURCES = grf_3.2.c
 
 #  The graphics module that uses PGPLOT for graphical output.
 libast_pgplot_la_SOURCES = grf_pgplot.c
-
-#  The interface between C code and the FORTRAN version of SLALIB.
-libast_slalib_la_SOURCES = sla.c
 
 #  Modules adapted from the wcslib library.
 libast_wcslib_la_SOURCES = proj.c wcstrig.c tpn.c
