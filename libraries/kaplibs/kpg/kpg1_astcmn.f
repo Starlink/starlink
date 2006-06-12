@@ -23,11 +23,23 @@
 *       KPG1_SETASTGSP( CHAR ) - Set ASTGSP character
 *       KPG1_SETASTDSB( DRDSB ) - Set DRWDSB flag
 *       KPG1_SETASTFIT( FIT ) - Set FIT flag
+*       KPG1_SETASTPLN( PLN ) - KeyMap used to store details of lines drawn
+*       KPG1_SETASTBLE( BLE ) - Are plot edges to be kept free of ticks etc?
+*       KPG1_SETASTX1( X1 ) - Left hand X value in Plot.
+*       KPG1_SETASTX2( X2 ) - Right hand X value in Plot.
+*       KPG1_SETASTY1( Y1 ) - Bottom Y value in Plot.
+*       KPG1_SETASTY2( Y2 ) - Top Y value in Plot.
 *       KPG1_GETASTNPS()
 *       KPG1_GETASTING()
 *       KPG1_GETASTOUG()
 *       KPG1_GETASTDSB() 
 *       KPG1_GETASTFIT() 
+*       KPG1_GETASTPLN() 
+*       KPG1_GETASTBLE() 
+*       KPG1_GETASTX1() 
+*       KPG1_GETASTX2() 
+*       KPG1_GETASTY1() 
+*       KPG1_GETASTY2() 
 
 *  Notes:
 *     Since the routines are only 3 lines long, they are all in 
@@ -69,6 +81,8 @@
 *        Added DRWDSB.
 *     16-DEC-2005 (DSB):
 *        Added FIT (FileInTitle).
+*     12-JUN-2006 (DSB):
+*        Added PLN, BLE, X1, X2, Y1, Y2.
 *     {enter_further_changes_here}
 
 *-
@@ -118,6 +132,64 @@
       ASTGSP = GSP
       END
 
+      SUBROUTINE KPG1_SETASTPLN( PLN )
+      IMPLICIT NONE
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'KPG_AST'
+      INTEGER PLN
+
+      ASTPLN = PLN
+      END
+
+      SUBROUTINE KPG1_SETASTBLE( BLE )
+      IMPLICIT NONE
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'KPG_AST'
+      LOGICAL BLE
+
+      ASTBLE = BLE
+      END
+
+      SUBROUTINE KPG1_SETASTX1( X1 )
+      IMPLICIT NONE
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'KPG_AST'
+      REAL X1
+
+      ASTX1 = X1
+      END
+
+      SUBROUTINE KPG1_SETASTX2( X2 )
+      IMPLICIT NONE
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'KPG_AST'
+      REAL X2
+
+      ASTX2 = X2
+      END
+
+      SUBROUTINE KPG1_SETASTY1( Y1 )
+      IMPLICIT NONE
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'KPG_AST'
+      REAL Y1
+
+      ASTY1 = Y1
+      END
+
+      SUBROUTINE KPG1_SETASTY2( Y2 )
+      IMPLICIT NONE
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'KPG_AST'
+      REAL Y2
+
+      ASTY2 = Y2
+      END
+
+
+
+
+
       LOGICAL FUNCTION KPG1_GETASTDSB ()
       IMPLICIT NONE
       INCLUDE 'DAT_PAR'
@@ -157,4 +229,56 @@
 
       KPG1_GETASTING = ASTING
       END
+
+      INTEGER FUNCTION KPG1_GETASTPLN ()
+      IMPLICIT NONE
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'KPG_AST'
+
+      KPG1_GETASTPLN = ASTPLN
+      END
+
+      LOGICAL FUNCTION KPG1_GETASTBLE ()
+      IMPLICIT NONE
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'KPG_AST'
+
+      KPG1_GETASTBLE = ASTBLE
+      END
+
+      REAL FUNCTION KPG1_GETASTX1 ()
+      IMPLICIT NONE
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'KPG_AST'
+
+      KPG1_GETASTX1 = ASTX1
+      END
+
+      REAL FUNCTION KPG1_GETASTX2 ()
+      IMPLICIT NONE
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'KPG_AST'
+
+      KPG1_GETASTX2 = ASTX2
+      END
+
+      REAL FUNCTION KPG1_GETASTY1 ()
+      IMPLICIT NONE
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'KPG_AST'
+
+      KPG1_GETASTY1 = ASTY1
+      END
+
+      REAL FUNCTION KPG1_GETASTY2 ()
+      IMPLICIT NONE
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'KPG_AST'
+
+      KPG1_GETASTY2 = ASTY2
+      END
+
+
+
+
 
