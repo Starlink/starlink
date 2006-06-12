@@ -1,5 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
+cincludedir = $(includedir)/star
 dist_bin_SCRIPTS = sla_link sla_link_adam
 dist_pkgdata_DATA = SLA_CONDITIONS read.me
 
@@ -10,10 +11,14 @@ lib_LTLIBRARIES = libsla.la
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 libsla_la_SOURCES = \
+        $(PUBLIC_INCLUDES) \
 	$(F_ROUTINES) \
+	$(C_ROUTINES) \
 	$(FPP_ROUTINES)
 libsla_la_LIBADD = $(LTLIBOBJS)
 libsla_la_LDFLAGS = -version-info $(libsla_la_version_info)
+
+cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
 
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
@@ -21,9 +26,15 @@ if !NOPIC
 libsla_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
+PUBLIC_F_INCLUDES = 
+PUBLIC_C_INCLUDES = slalib.h
+PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
+
 FPP_ROUTINES = \
 	random.F \
 	gresid.F
+
+C_ROUTINES = sla.c
 
 F_ROUTINES = addet.f afin.f airmas.f altaz.f amp.f ampqk.f aop.f	\
     aoppa.f aoppat.f aopqk.f atmdsp.f atms.f atmt.f av2m.f bear.f	\
@@ -57,5 +68,4 @@ sla_test_SOURCES = sla_test.f
 sla_test_LDADD = libsla.la
 
 dist_starnews_DATA = sla.news
-dist_pkgdata_DATA = SLA_CONDITIONS
 DISTCLEANFILES = gresid.F random.F wait.f
