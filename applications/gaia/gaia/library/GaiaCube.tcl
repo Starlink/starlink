@@ -88,8 +88,8 @@ itcl::class gaia::GaiaCube {
       #  Evaluate any options [incr Tk].
       eval itk_initialize $args
 
-      set lwidth 20
-      set vwidth 20
+      set lwidth 16
+      set vwidth 10
 
       #  Set window properties.
       wm protocol $w_ WM_DELETE_WINDOW [code $this close]
@@ -221,7 +221,7 @@ itcl::class gaia::GaiaCube {
       #  Add tab window for choosing either the helper controls.
       itk_component add tabnotebook {
          iwidgets::tabnotebook $w_.tab \
-            -angle 0 -tabpos n -width 350 -height 350
+            -angle 0 -tabpos n -width 400 -height 400
       }
       pack $itk_component(tabnotebook) -fill both -expand 1
 
@@ -234,9 +234,11 @@ itcl::class gaia::GaiaCube {
       $itk_component(tabnotebook) add -label Chanmap
       set chanmapTab [$itk_component(tabnotebook) childsite 2]
 
+      $itk_component(tabnotebook) add -label Baseline
+      set baselineTab [$itk_component(tabnotebook) childsite 3]
+
       #  Animation section.
-      #
-      #  Choose upper and lower limits, and type of animation.
+
       itk_component add aruler {
          LabelRule $animationTab.aruler -text "Animation controls:"
       }
@@ -246,18 +248,17 @@ itcl::class gaia::GaiaCube {
          GaiaCubeAnimation $animationTab.animation \
             -gaiacube [code $this] \
             -ref_id 1 \
-            -lower_bound $plane_ \
-            -upper_bound $plane_ \
+            -lower_limit $plane_ \
+            -upper_limit $plane_ \
             -show_ref_range 0 \
             -labelwidth $lwidth \
             -valuewidth $vwidth
       }
       set ref_range_controls_(1) $itk_component(animation)
-      pack $itk_component(animation) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(animation) -side top -fill both -ipadx 1m -ipady 2m
 
       #  Collapse section.
-      #
-      #  Use limits to create a collapsed image using KAPPA COLLAPSE.
+
       itk_component add cruler {
          LabelRule $collapseTab.cruler -text "Collapse controls:"
       }
@@ -267,14 +268,14 @@ itcl::class gaia::GaiaCube {
          GaiaCubeCollapse $collapseTab.collapse \
             -gaiacube [code $this] \
             -ref_id 2 \
-            -lower_bound $plane_ \
-            -upper_bound $plane_ \
+            -lower_limit $plane_ \
+            -upper_limit $plane_ \
             -show_ref_range 0 \
             -labelwidth $lwidth \
             -valuewidth $vwidth
       }
       set ref_range_controls_(2) $itk_component(collapse)
-      pack $itk_component(collapse) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(collapse) -side top -fill both -ipadx 1m -ipady 2m
 
       #  Chanmap section.
 
@@ -287,14 +288,36 @@ itcl::class gaia::GaiaCube {
          GaiaCubeChanmap $chanmapTab.chanmap \
             -gaiacube [code $this] \
             -ref_id 3 \
-            -lower_bound $plane_ \
-            -upper_bound $plane_ \
+            -lower_limit $plane_ \
+            -upper_limit $plane_ \
             -show_ref_range 0 \
             -labelwidth $lwidth \
             -valuewidth $vwidth
       }
       set ref_range_controls_(3) $itk_component(chanmap)
-      pack $itk_component(chanmap) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(chanmap) -side top -fill both -ipadx 1m -ipady 2m
+
+      #  Baseline subtraction section.
+
+      itk_component add baselineruler {
+         LabelRule $baselineTab.baselineruler \
+            -text "Baseline subtraction controls:"
+      }
+      pack $itk_component(baselineruler) -side top -fill x
+
+      itk_component add baseline {
+         GaiaCubeBaseline $baselineTab.baseline \
+            -gaiacube [code $this] \
+            -ref_id 4 \
+            -lower_limit $plane_ \
+            -upper_limit $plane_ \
+            -show_ref_range 0 \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth
+      }
+      set ref_range_controls_(4) $itk_component(baseline)
+      pack $itk_component(baseline) -side top -fill both -expand 1 \
+         -ipadx 1m -ipady 2m
 
       #  Close window.
       itk_component add close {
@@ -377,13 +400,13 @@ itcl::class gaia::GaiaCube {
          #  Allow fourth dimension, as long as it is redundant.
          if { $ndims == 4 } {
             if { [expr [lindex $bounds_ 7] - [lindex $bounds_ 6]] == 0 } {
-               set_close_section_ ",1)"
+               set close_section_ ",1)"
                set bounds_ [lrange $bounds_ 0 5]
                set ndims 3
             }
          } else {
             #  Sections just close with parenthesis.
-            set_close_section_ ")"
+            set close_section_ ")"
          }
          if { $ndims != 3 } {
             error_dialog \
@@ -452,6 +475,7 @@ itcl::class gaia::GaiaCube {
          $itk_component(animation) set_bounds $plane_min_ $plane_max_
          $itk_component(collapse) set_bounds $plane_min_ $plane_max_
          $itk_component(chanmap) set_bounds $plane_min_ $plane_max_
+         $itk_component(baseline) set_bounds $plane_min_ $plane_max_
 
          #  Update the display of label and units in index component.
          $itk_component(index) update_coords_type $plane_
@@ -623,10 +647,16 @@ itcl::class gaia::GaiaCube {
       set coord2 [axis_grid2pixel_ $coord2]
 
       #  Set the limits of the control and get it to configure itself.
-      $ref_range_controls_($id) configure \
-         -lower_bound $coord1 -upper_bound $coord2
+      if { $id > 4 } {
+         $ref_range_controls_(4) configure \
+                                     -lower_limit $coord1 -upper_limit $coord2
+         $ref_range_controls_(4) ref_range_moved $id $coord1 $coord2 $action
 
-      $ref_range_controls_($id) ref_range_moved $coord1 $coord2 $action
+      } else {
+         $ref_range_controls_($id) configure \
+                                      -lower_limit $coord1 -upper_limit $coord2
+         $ref_range_controls_($id) ref_range_moved $id $coord1 $coord2 $action
+      }
    }
 
    #  Update the dummy NDF WCS so that it matches the current spectral
@@ -638,14 +668,6 @@ itcl::class gaia::GaiaCube {
       if { $frameset != 0 } {
          $itk_option(-rtdimage) astreplace $frameset
       }
-   }
-
-   #  Set the characters used to close an NDF section. Pass on to other
-   #  objects with an interest (those that use NDF sections).
-   protected method set_close_section_ {value} {
-      set close_section_ $value
-      $itk_component(collapse) configure -close_section $value
-      $itk_component(chanmap) configure -close_section $value
    }
 
    #  Create a description of the slice. Note use short name so should
@@ -776,8 +798,8 @@ itcl::class gaia::GaiaCube {
       }
 
       #  Correct collapse bounds to grid indices.
-      set lb [$itk_component(collapse) cget -lower_bound]
-      set ub [$itk_component(collapse) cget -upper_bound]
+      set lb [$itk_component(collapse) cget -lower_limit]
+      set ub [$itk_component(collapse) cget -upper_limit]
       set alow [axis_pixel2grid_ $lb]
       set ahigh [axis_pixel2grid_ $ub]
 
@@ -890,8 +912,8 @@ itcl::class gaia::GaiaCube {
          }
 
          #  Correct collapse bounds to grid indices.
-         set lb [$itk_component(collapse) cget -lower_bound]
-         set ub [$itk_component(collapse) cget -upper_bound]
+         set lb [$itk_component(collapse) cget -lower_limit]
+         set ub [$itk_component(collapse) cget -upper_limit]
          set alow [axis_pixel2grid_ $lb]
          set ahigh [axis_pixel2grid_ $ub]
 
@@ -920,8 +942,8 @@ itcl::class gaia::GaiaCube {
 
          #  Create the right section. Use collapse coords as bounds on the
          #  spectral axis.
-         set lb [$itk_component(collapse) cget -lower_bound]
-         set ub [$itk_component(collapse) cget -upper_bound]
+         set lb [$itk_component(collapse) cget -lower_limit]
+         set ub [$itk_component(collapse) cget -upper_limit]
          set range "$lb:$ub"
          if { $axis_ == 1 } {
             set section "($range,$ix,${iy}${close_section_}"
