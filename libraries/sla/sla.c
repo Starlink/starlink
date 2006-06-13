@@ -68,8 +68,70 @@
 #include <stdlib.h>              /* Malloc etc */
 
 
-/* Function implementations. */
-/* ========================= */
+/* Functions needed to avoid a dependence on CNF. */
+/* ============================================== */
+
+static void slaStringExport( const char *, char *, int );
+static void slaStringExport( const char *source_c, char *dest_f, int dest_len ) {
+/*
+*+
+*  Name:
+*     slaStringExport
+
+*  Purpose:
+*     Export a C string to a FORTRAN string.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     void slaStringExport( const char *source_c, char *dest_f, int dest_len )
+
+*  Description:
+*     This function creates a FORTRAN string from a C string, storing
+*     it in the supplied memory. If the C string is shorter than the
+*     space allocated for the FORTRAN string, then it is padded with
+*     blanks. If the C string is longer than the space allocated for
+*     the FORTRAN string, then the string is truncated.
+
+*  Parameters:
+*     source_c 
+*        A pointer to the input C string.
+*     dest_f 
+*        A pointer to the output FORTRAN string.
+*     dest_len 
+*        The length of the output FORTRAN string.
+
+*  Notes:
+*     - This function is potentially platform-specific. For example,
+*     if FORTRAN strings were passed by descriptor, then the
+*     descriptor address would be passed as "dest_f" and this must
+*     then be used to locate the actual FORTRAN character data.
+*     - This function is equivalent to cnfExprt but is included here to
+*     avoid SLALIB becomeing dependent on CNF.
+*-
+*/
+
+/* Local Variables:*/
+   int i;                        /* Loop counter for characters */
+
+/* Check the supplied pointers. */
+   if ( !source_c || !dest_f ) return;
+
+/* Copy the characters of the input C string to the output FORTRAN
+   string, taking care not to go beyond the end of the FORTRAN
+   string.*/
+   for ( i = 0; source_c[ i ] && ( i < dest_len ); i++ ) {
+      dest_f[ i ] = source_c[ i ];
+   }
+
+/* Fill the rest of the output FORTRAN string with blanks. */
+   for ( ; i < dest_len; i++ ) dest_f[ i ] = ' ';
+}
+
+
+/* SLALIB wrapper implementations. */
+/* =============================== */
 /* Fortran routine prototype. */
 F77_SUBROUTINE(sla_addet)( DOUBLE(RM),
                            DOUBLE(DM),
@@ -1265,7 +1327,7 @@ void slaDeuler ( char *order, double phi, double theta, double psi,
    THETA = theta;
    PSI   = psi;
 
-   cnfExprt( order, ORDER, 4 );
+   slaStringExport( order, ORDER, 4 );
 
    F77_CALL (sla_deuler) ( CHARACTER_ARG(ORDER),
                            DOUBLE_ARG(&PHI),
