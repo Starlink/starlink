@@ -23,8 +23,8 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_MONOLITHS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [agi ast cat chr cnf fio generic gks gns grp hds idi mag mers ndf ndg par pcs prm psx sae snx trn])
-STAR_DECLARE_DEPENDENCIES(link, [agi ast cat fio grp mag mers ndf ndg pcs pda pgplot prm psx psx snx trn])
+STAR_DECLARE_DEPENDENCIES(build, [agi ast atl cat chr cnf fio generic gks gns grp hds idi mag mers ndf ndg par pcs prm psx sae snx trn])
+STAR_DECLARE_DEPENDENCIES(link, [agi ast atl cat fio grp mag mers ndf ndg pcs pda pgplot prm psx psx snx trn])
 STAR_DECLARE_DEPENDENCIES(sourceset, [htx sst])
 
 dnl    There are numerous messgen files, and all should be listed here, so
