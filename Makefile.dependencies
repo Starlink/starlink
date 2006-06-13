@@ -166,6 +166,7 @@ $(MANIFESTS)/atools: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/trn
 	cd applications/atools \
 	  && $(MAKE_CPT)
@@ -230,8 +231,6 @@ $(MANIFESTS)/cat: \
 	cd libraries/cat \
 	  && $(MAKE_CPT)
 
-# Component ccdpack has configure dependencies on { blt itcl tcl tk },
-# which must be built before this component is configured.
 $(MANIFESTS)/ccdpack: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ard \
@@ -415,6 +414,7 @@ $(MANIFESTS)/cupid: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/trn
 	cd applications/cupid \
 	  && $(MAKE_CPT)
@@ -953,7 +953,8 @@ $(MANIFESTS)/hdstools: \
 		$(MANIFESTS)/shl \
 		$(MANIFESTS)/sst \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/tcl
 	cd applications/hdstools \
 	  && $(MAKE_CPT)
 
@@ -1026,8 +1027,11 @@ $(MANIFESTS)/idi: \
 	cd libraries/idi \
 	  && $(MAKE_CPT)
 
+# Component ifd has configure dependencies on { tcl },
+# which must be built before this component is configured.
 $(MANIFESTS)/ifd: \
-		$(MANIFESTS)/star2html
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/tcl
 	cd applications/ifd \
 	  && $(MAKE_CPT)
 
@@ -1296,6 +1300,7 @@ $(MANIFESTS)/kaprh: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/trn
 	cd applications/kaprh \
 	  && $(MAKE_CPT)

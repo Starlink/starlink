@@ -13,6 +13,11 @@ dnl    Locate the tclsh binary.
 dnl    Do not care which version of tclsh
 STAR_CHECK_PROGS(tclsh)
 
+dnl    But depend on Starlink Tcl to make sure one is always available
+dnl    during the configure stage.
+STAR_DECLARE_DEPENDENCIES(build, [tcl])
+STAR_DECLARE_DEPENDENCIES(configure, [tcl])
+
 AC_CONFIG_FILES([Makefile component.xml])
 
 dnl    Make substitutions in some of the script files. 

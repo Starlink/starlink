@@ -14,7 +14,7 @@
     by the Starlink or IRAF environments.</p>
   </abstract>
   <dependencies >
-    <sourceset>star2html</sourceset>
+    <sourceset>star2html</sourceset><build>tcl</build><configure>tcl</configure>
   </dependencies>
   <developers>
     <person>
