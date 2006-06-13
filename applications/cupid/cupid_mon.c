@@ -7,9 +7,6 @@
 /* Declare global variables used throughout cupid */
 /* ---------------------------------------------- */
 
-/* A pointer to the global status variable.*/
-int *cupid_global_status;
-
 /* PixelSet cache used by the ClumpFind algorithm. */
 CupidPixelSet **cupid_ps_cache = NULL;
 int cupid_ps_cache_size = 0;
@@ -18,7 +15,7 @@ int cupid_ps_cache_size = 0;
 extern F77_SUBROUTINE(task_get_name)( CHARACTER(name), INTEGER(status) TRAIL(name) );
 
 
-void cupid_mon( int *adam_status ) {
+void cupid_mon( int *status ) {
 /*
 *+
 *  Name:
@@ -43,11 +40,11 @@ void cupid_mon( int *adam_status ) {
 *     valid task name.  If there is no match, an error report is made.
 
 *  Parameters:
-*     adam_status 
+*     status 
 *        Pointer to the global status variable used by the ADAM fixed part.
 
 *  Synopsis:
-*     void cupid_mon( int *adam_status );
+*     void cupid_mon( int *status );
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
@@ -91,7 +88,7 @@ void cupid_mon( int *adam_status ) {
    int ast_caching;               /* Initial value of AST MemoryCaching tuning parameter */
 
 /* Check the inherited status. */
-   if( *adam_status != SAI__OK ) return;
+   if( *status != SAI__OK ) return;
 
 /* Obtain the command from the environment.  This returns uppercase names. */
    F77_EXPORT_INTEGER( SAI__OK, fstatus );
@@ -100,39 +97,32 @@ void cupid_mon( int *adam_status ) {
                              TRAIL_ARG(fname) );
    cnfImprt( fname, fname_length, name );
    F77_FREE_CHARACTER(fname);
-   F77_IMPORT_INTEGER( &fstatus, adam_status );
-
-/* Store an external pointer to the adam status variable so that other CUPID 
-   functions can access it without needing it to be passed as a function 
-   parameter. */
-   cupid_global_status = adam_status;
+   F77_IMPORT_INTEGER( &fstatus, status );
 
 /* Make AST use the same variable for its inherited status. */
-   astWatch( adam_status );
+   astWatch( status );
 
 /* Tell AST to re-cycle memory when possible. */
    ast_caching = astTune( "MemoryCaching", 1 );
 
 /* Check the string against valid A-task names---if matched then call
-   the relevant A-task. Since these functions do not have an expliciti
-   "status" parameter, they cannot be built as stand-alone atasks using
-   "alink". */
+   the relevant A-task. */
 
 /* Identifies emission clumps within a 2- or 3D NDF. */
    if( !strcmp( name, "FINDCLUMPS" ) ) {
-      findclumps();
+      findclumps( status );
 
 /* Give help on CUPID commands. */
    } else if( !strcmp( name, "CUPIDHELP" ) ) {
-      cupidhelp();
+      cupidhelp( status );
 
 /* Create simulated data containing clumps and noise. */
    } else if( !strcmp( name, "MAKECLUMPS" ) ) {
-      makeclumps();
+      makeclumps( status );
 
 /* Extract clump parameters from another image */
    } else if( !strcmp( name, "EXTRACTCLUMPS" ) ) {
-      extractclumps();
+      extractclumps( status );
 
 
 
@@ -142,9 +132,9 @@ void cupid_mon( int *adam_status ) {
 
 
 /* Report an error if the command name is not recognised. */
-   } else if( *adam_status == SAI__OK ) {
-      *adam_status = SAI__ERROR;
-      errRep( "CUPID_MON_NOCOM", "CUPID: No such command ^CMD.", adam_status );
+   } else if( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep( "CUPID_MON_NOCOM", "CUPID: No such command ^CMD.", status );
    }
 
 /* Re-instate the original value of the AST ObjectCaching tuning

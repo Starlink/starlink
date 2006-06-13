@@ -8,7 +8,7 @@
 
 HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                         double *ipv, double rms, AstKeyMap *config, int velax,
-                        int ilevel, double beamcorr[ 3 ]  ){
+                        int ilevel, double beamcorr[ 3 ], int *status ){
 /*
 *+
 *  Name:
@@ -25,7 +25,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, 
 *                             void *ipd, double *ipv, double rms, 
 *                             AstKeyMap *config, int velax, int ilevel,
-*                             double beamcorr[ 3 ]  )
+*                             double beamcorr[ 3 ], int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -70,6 +70,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        instrumental smoothing along each pixel axis. The clump widths
 *        stored in the output catalogue are reduced to correct for this
 *        smoothing.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     A locator for a new HDS object which is an array of NDF structures.
@@ -114,6 +116,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 */
 
 /* Local Variables: */
+
    AstKeyMap *cfconfig; /* Configuration parameters for this algorithm */
    CupidPixelSet **clumps;/* Pointer to list of PixelSet pointers */
    CupidPixelSet *ps;   /* Pointer to PixelSet */
@@ -173,26 +176,26 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    astMapPut0A( cfconfig, CUPID__CONFIG, astCopy( config ), NULL );
 
 /* Return the instrumental smoothing FWHMs */
-   beamcorr[ 0 ] = cupidConfigD( cfconfig, "FWHMBEAM", 2.0 );
+   beamcorr[ 0 ] = cupidConfigD( cfconfig, "FWHMBEAM", 2.0, status );
    beamcorr[ 1 ] = beamcorr[ 0 ];
    if( ndim == 3 ) {
       beamcorr[ 2 ] = beamcorr[ 0 ];
-      beamcorr[ velax ]= cupidConfigD( cfconfig, "VELORES", 2.0 );
+      beamcorr[ velax ]= cupidConfigD( cfconfig, "VELORES", 2.0, status );
    }
 
 /* See if clumps are allowed to touch an edge of the data array. */
-   allow_edge = cupidConfigI( cfconfig, "ALLOWEDGE", 0 );
+   allow_edge = cupidConfigI( cfconfig, "ALLOWEDGE", 0, status );
 
 /* Get the value which defines whether two pixels are neighbours or not.
    The default value is equalto the number of axes in the data array. */
-   naxis = cupidConfigI( cfconfig, "NAXIS", ndim );
+   naxis = cupidConfigI( cfconfig, "NAXIS", ndim, status );
 
 /* Get the RMS noise level to use. */
-   rms = cupidConfigD( cfconfig, "RMS", rms );
+   rms = cupidConfigD( cfconfig, "RMS", rms, status );
 
 /* See if the IDL implementation of ClumpFind should be emulated rather than 
    the algorithm described in the original Williams et al ApJ paper. */
-   idl = cupidConfigI( cfconfig, "IDLALG", 0 );
+   idl = cupidConfigI( cfconfig, "IDLALG", 0, status );
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array, and the skip in 1D vector index needed to
@@ -254,7 +257,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }
 
 /* Get the contour levels at which to check for clumps. */
-      levels = cupidCFLevels( cfconfig, maxd, mind, rms, &nlevels );
+      levels = cupidCFLevels( cfconfig, maxd, mind, rms, &nlevels, status );
 
 /* Initialise the largest data value in the remaining unassigned pixels. */
       maxrem = maxd;
@@ -278,7 +281,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          if( clevel <= maxrem ) {
             clumps = cupidCFScan( type, ipd, ipa, el, ndim, dims, skip, 
                                   clumps, idl, clevel, &index, naxis, ilevel,
-                                  idl || ilev < nlevels - 1, slbnd, &maxrem );
+                                  idl || ilev < nlevels - 1, slbnd, &maxrem, status );
 
          } else if( ilevel > 2 ) {
             msgOut( "", "   No pixels found at this contour level.", status );
@@ -291,11 +294,11 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Get the minimum number of pixels allowed in a clump.*/
       if( nlevels > 1 ) {
          minpix = cupidDefMinPix( ndim, beamcorr, levels[ nlevels - 1 ],
-                                                  levels[ nlevels - 2 ] );
+                                                  levels[ nlevels - 2 ], status );
       } else {
          minpix = 5;
       }
-      minpix = cupidConfigI( cfconfig, "MINPIX", minpix );
+      minpix = cupidConfigI( cfconfig, "MINPIX", minpix, status );
 
 /* Loop round each clump */
       nminpix = 0;
@@ -310,17 +313,17 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          if( ps ){
             if( ps->pop < minpix ){
                nminpix++;
-               clumps[ ii ] = cupidCFFreePS( ps, NULL, 0 );
+               clumps[ ii ] = cupidCFFreePS( ps, NULL, 0, status );
 
             } else if( ps->edge && !allow_edge ){
                nedge++; 
-               clumps[ ii ] = cupidCFFreePS( ps, NULL, 0 );
+               clumps[ ii ] = cupidCFFreePS( ps, NULL, 0, status );
 
             } else if( ps->lbnd[ 0 ] == ps->ubnd[ 0 ] || 
                        ( ps->lbnd[ 1 ] == ps->ubnd[ 1 ] && ndim > 1 ) || 
                        ( ps->lbnd[ 2 ] == ps->ubnd[ 2 ] && ndim > 2 ) ) {
                nthin++;           
-               clumps[ ii ] = cupidCFFreePS( ps, NULL, 0 );
+               clumps[ ii ] = cupidCFFreePS( ps, NULL, 0, status );
 
             } else {
                nclump++;
@@ -400,12 +403,12 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims,
                               skip, slbnd, ps->index, ps->lbnd,
                               ps->ubnd, NULL, ret, 
-                              cupidConfigI( cfconfig, "MAXBAD", 4 ) );
+                              cupidConfigI( cfconfig, "MAXBAD", 4, status ), status );
       }
 
 /* Free resources */
       for( i = 0; i < index; i++ ) {
-         if( clumps[ i ] ) clumps[ i ] = cupidCFFreePS( clumps[ i ], NULL, 0 );
+         if( clumps[ i ] ) clumps[ i ] = cupidCFFreePS( clumps[ i ], NULL, 0, status );
       }
       clumps = astFree( clumps );
       levels = astFree( levels );
@@ -423,7 +426,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    cfconfig = astAnnul( cfconfig );
 
    for( i = 0; i < cupid_ps_cache_size; i++ ) {
-      cupid_ps_cache[ i ] = cupidCFDeletePS( cupid_ps_cache[ i ] );
+      cupid_ps_cache[ i ] = cupidCFDeletePS( cupid_ps_cache[ i ], status );
    }
    cupid_ps_cache = astFree( cupid_ps_cache );
    cupid_ps_cache_size = 0;

@@ -18,7 +18,7 @@ extern CupidGC cupidGC;
 
 
 double cupidGCModel( int ndim, double *x, double *par, int what, 
-                     int newx, int newp ){
+                     int newx, int newp, int *status ){
 /*
 *+
 *  Name:
@@ -32,7 +32,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 
 *  Synopsis:
 *     double cupidGCModel( int ndim, double *x, double *par, int what, 
-*                          int newx, int newp )
+*                          int newx, int newp, int *status )
 
 *  Description:
 *     This function evaluates the Gaussian model defined by the supplied
@@ -87,6 +87,8 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 *        invocation of this function. This causes cached intermediate values 
 *        to be re-used, thus speeding things up. A non-zero value should
 *        be supplied if "par" is not the saem as on the previous invocation.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     The model value or gradient.
@@ -134,6 +136,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 */
 
 /* Local Variables: */
+
    double demdp;           /* Rate of change of "em" wrt par[what] */
    double peakfactor_sq;   /* Square of the peak value factor */
    double t;               /* Temporary value */

@@ -2,7 +2,7 @@
 #include "cupid.h"
 #include "star/pda.h"
 
-float cupidRanVal( int normal, float p[2] ){
+float cupidRanVal( int normal, float p[2], int *status ){
 /*
 *+
 *  Name:
@@ -15,7 +15,7 @@ float cupidRanVal( int normal, float p[2] ){
 *     Starlink C
 
 *  Synopsis:
-*     float cupidRanVal( int normal, float p[2] )
+*     float cupidRanVal( int normal, float p[2], int *status )
 
 *  Description:
 *     This function returns a random sample from a uniform or normal
@@ -30,6 +30,8 @@ float cupidRanVal( int normal, float p[2] ){
 *        Element zero contains the mean of the distribution, element one
 *        contains the width (i.e. the standard deviation for a normal
 *        distribution, or the half-width for a uniform distribution).
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     The model value or gradient.
@@ -70,6 +72,7 @@ float cupidRanVal( int normal, float p[2] ){
 */
 
 /* Local Variables: */
+
    float ret;             /* Returned value */
 
 /* Initialise */

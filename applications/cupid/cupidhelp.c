@@ -5,7 +5,7 @@
 extern F77_SUBROUTINE(shl_adam)( CHARACTER(libnam), LOGICAL(isenv), 
                                  INTEGER(status) TRAIL(libnam) );
 
-void cupidhelp(){
+void cupidhelp( int *status ){
 /*
 *+
 *  Name:
@@ -84,7 +84,7 @@ void cupidhelp(){
 *     Ambiguous abbreviations result in all matches being displayed.
 
 *  Synopsis:
-*     void cupidhelp();
+*     void cupidhelp( int *status );
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.

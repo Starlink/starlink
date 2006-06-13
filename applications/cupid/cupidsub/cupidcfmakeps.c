@@ -4,7 +4,7 @@
 #include "mers.h"
 #include <float.h>
 
-CupidPixelSet *cupidCFMakePS( int index ){
+CupidPixelSet *cupidCFMakePS( int index, int *status ){
 /*
 *+
 *  Name:
@@ -17,7 +17,7 @@ CupidPixelSet *cupidCFMakePS( int index ){
 *     Starlink C
 
 *  Synopsis:
-*     CupidPixelSet *cupidCFMakePS( int index )
+*     CupidPixelSet *cupidCFMakePS( int index, int *status )
 
 *  Description:
 *     This function returns a pointer to an unused PixelSet structure.
@@ -31,6 +31,8 @@ CupidPixelSet *cupidCFMakePS( int index ){
 *  Parameters:
 *     index
 *        The index value to store in the PixelSet.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     A pointer to the PixelSet to be used.
@@ -71,6 +73,7 @@ CupidPixelSet *cupidCFMakePS( int index ){
 */
 
 /* Local Variables: */
+
    CupidPixelSet *ret;  /* The returned PixelSet pointer */
 
 /* Initialise */

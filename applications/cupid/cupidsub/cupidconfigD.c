@@ -3,7 +3,8 @@
 #include "prm_par.h"
 #include "cupid.h"
 
-double cupidConfigD( AstKeyMap *config, const char *name, double def ){
+double cupidConfigD( AstKeyMap *config, const char *name, double def,
+         int *status ){
 /*
 *+
 *  Name:
@@ -16,7 +17,8 @@ double cupidConfigD( AstKeyMap *config, const char *name, double def ){
 *     Starlink C
 
 *  Synopsis:
-*     double cupidConfigD( AstKeyMap *config, const char *name, double def );
+*     double cupidConfigD( AstKeyMap *config, const char *name, double def,
+*        int *status )
 
 *  Description:
 *     This function returns a named value from the supplied KeyMap. If
@@ -35,6 +37,8 @@ double cupidConfigD( AstKeyMap *config, const char *name, double def ){
 *        The name of the value to extract from the KeyMap.
 *     def
 *        The default value to use.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     The required value. The supplied default value is returned if an
@@ -76,6 +80,7 @@ double cupidConfigD( AstKeyMap *config, const char *name, double def ){
 */
 
 /* Local Variables: */
+
    AstObject *sconfig; /* Object pointer obtained from KeyMap */
    double ret;         /* The returned value */
 

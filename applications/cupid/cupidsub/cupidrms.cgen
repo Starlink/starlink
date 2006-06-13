@@ -6,7 +6,8 @@
 #include <math.h>
 
 
-double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen ){
+double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen,
+         int *status ){
 /*
 *+
 *  Name:
@@ -19,7 +20,8 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen ){
 *     Starlink C
 
 *  Synopsis:
-*     double cupidRms<X>( CGEN_TYPE *array, int nel, int rowlen )
+*     double cupidRms<X>( CGEN_TYPE *array, int nel, int rowlen,
+*        int *status )
 
 *  Description:
 *     This functions finds an estimate of the RMS noise in the supplied
@@ -43,6 +45,8 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen ){
 *        The number of elements in the supplied array. 
 *     rowlen 
 *        The number of elements spanned by the first pixel axis.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     The RMS noise estimate
@@ -91,6 +95,7 @@ double CGEN_FUNCTION(cupidRms)( CGEN_TYPE *array, int nel, int rowlen ){
 */
 
 /* Local Variables: */
+
    CGEN_TYPE *pr;         /* Pointer to next data value */
    CGEN_TYPE *w;          /* Pointer to work array */
    CGEN_TYPE *wr;         /* Pointer to next work value */

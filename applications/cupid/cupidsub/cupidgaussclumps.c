@@ -24,7 +24,7 @@ CupidGC cupidGC;
 
 HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                           double *ipv, double rms, AstKeyMap *config, int velax,
-                          int ilevel, double beamcorr[ 3 ] ){
+                          int ilevel, double beamcorr[ 3 ], int *status ){
 /*
 *+
 *  Name:
@@ -41,7 +41,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
 *                               void *ipd, double *ipv, double rms, 
 *                               AstKeyMap *config, int velax, int ilevel,
-*                               double beamcorr[ 3 ] )
+*                               double beamcorr[ 3 ], int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -102,6 +102,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        instrumental smoothing along each pixel axis. The clump widths
 *        stored in the output catalogue are reduced to correct for this
 *        smoothing.
+*     status
+*        Pointer to the inherited status value.
 
 *  Notes:
 *     - The specific form of algorithm used here is informed by a Fortran
@@ -164,6 +166,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 */
 
 /* Local Variables: */
+
    AstKeyMap *gcconfig; /* Configuration parameters for this algorithm */
    char buf[30];        /* File name buffer */
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
@@ -235,28 +238,28 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    astMapPut0A( gcconfig, CUPID__CONFIG, astCopy( config ), NULL );
 
 /* Return the instrumental smoothing FWHMs */
-   beamcorr[ 0 ] = cupidConfigD( gcconfig, "FWHMBEAM", 2.0 );
+   beamcorr[ 0 ] = cupidConfigD( gcconfig, "FWHMBEAM", 2.0, status );
    beamcorr[ 1 ] = beamcorr[ 0 ];
    if( ndim == 3 ) {
       beamcorr[ 2 ] = beamcorr[ 0 ];
-      beamcorr[ velax ]= cupidConfigD( gcconfig, "VELORES", 2.0 );
+      beamcorr[ velax ]= cupidConfigD( gcconfig, "VELORES", 2.0, status );
    }
 
 /* See if extra diagnostic info is required. */
-   diag = cupidConfigI( gcconfig, "DIAG", 0 );
+   diag = cupidConfigI( gcconfig, "DIAG", 0, status );
 
 /* Get the maximum allowed number of failed fits between succesful fits. */
-   maxskip = cupidConfigI( gcconfig, "MAXSKIP", 10 );
+   maxskip = cupidConfigI( gcconfig, "MAXSKIP", 10, status );
 
 /* Get the maximum allowed number of failed fits between succesful fits. */
-   maxclump = cupidConfigI( gcconfig, "MAXCLUMPS", VAL__MAXI );
+   maxclump = cupidConfigI( gcconfig, "MAXCLUMPS", VAL__MAXI, status );
 
 /* The iterative process ends when "npad" consecutive clumps all had peak
    values below "peak_thresh" or all had areas below "area_thresh". */
-   npad = cupidConfigI( gcconfig, "NPAD", 10 );
+   npad = cupidConfigI( gcconfig, "NPAD", 10, status );
 
 /* Get the RMS noise level to use. */
-   rms = cupidConfigD( gcconfig, "RMS", rms );
+   rms = cupidConfigD( gcconfig, "RMS", rms, status );
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array. We use the memory management functions of the 
@@ -284,18 +287,18 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Set the lower threshold for clump peaks to a user-specified multiple
    of the RMS noise. */
-      peak_thresh = cupidConfigD( gcconfig, "THRESH", 2.0 );
+      peak_thresh = cupidConfigD( gcconfig, "THRESH", 2.0, status );
 
 /* Set the lower threshold for clump area to a user-specified number of
    pixels. */
-      area_thresh = cupidConfigI( gcconfig, "MINPIX", 3 );
+      area_thresh = cupidConfigI( gcconfig, "MINPIX", 3, status );
 
 /* Get the lowest value (normalised to the RMS noise level) at which
    model Gaussians should be evaluated. */
-      mlim = cupidConfigD( gcconfig, "MODELLIM", 3.0 );
+      mlim = cupidConfigD( gcconfig, "MODELLIM", 3.0, status );
 
 /* Get the max allowed number of bad pixels in a clump. */
-      maxbad = cupidConfigI( gcconfig, "MAXBAD", 4 );
+      maxbad = cupidConfigI( gcconfig, "MAXBAD", 4, status );
 
 /* Initialise the number of clumps found so far. */
       iclump = 0;
@@ -307,8 +310,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Initialise the variables used to keep track of the mean and standard
    deviation of the most recent "npeak" fitted peak values. */
-      nsig = cupidConfigD( gcconfig, "NSIGMA", 3.0 );
-      npeak = cupidConfigI( gcconfig, "NPEAK", 9 );
+      nsig = cupidConfigD( gcconfig, "NSIGMA", 3.0, status );
+      npeak = cupidConfigI( gcconfig, "NPEAK", 9, status );
       ipeak = 0;
       sum_peak = 0.0;
       sum_peak2 = 0.0;
@@ -351,7 +354,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Find the 1D vector index of the elements with the largest value in the 
    residuals array. */
-         allbad = cupidGCFindMax( type, res, el, &imax );
+         allbad = cupidGCFindMax( type, res, el, &imax, status );
 
 /* Finish iterating if all the residuals are bad, or if too many iterations 
    have been performed since the last succesfully fitted clump. */
@@ -379,11 +382,11 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    on the current peak. */
          if( iter ) {
             cupidGCSetInit( type, res, ipv, ndim, dims, imax, rms, gcconfig,
-                            ( niter == 1 ), velax, x, slbnd );
+                            ( niter == 1 ), velax, x, slbnd, status );
 
 /* Find the best fitting parameters, starting from the above initial guess. 
    This returns a function value of zero if no fit could be performed. */
-            if( cupidGCFit( type, res, imax, x, &chisq ) ) {
+            if( cupidGCFit( type, res, imax, x, &chisq, status ) ) {
 
 /* Skip this fit if we have an estimate of the standard deviation of the
    "npeak" most recent clump peak values, and the peak value of the clump
@@ -423,17 +426,17 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                   cupidGCUpdateArrays( type, res, ipd, el, ndim, dims,
                                        x, rms, mlim, imax, ilevel, slbnd,    
                                        &ret, iclump, diag, mean_peak,
-                                       maxbad, &area );
+                                       maxbad, &area, status );
 
 /* Dump the modified residuals if required. */
                   if( ilevel > 5 ) {
                      sprintf( buf, "residuals%d", iclump );
-                     cupidGCDump( type, res, ndim, dims, buf );
+                     cupidGCDump( type, res, ndim, dims, buf, status );
                   }
 
 /* Display the clump parameters on the screen if required. */
                   cupidGCListClump( iclump, ndim, x, chisq, slbnd, ilevel,
-                                    rms );
+                                    rms, status );
 
 /* If this clump has a peak value which is below the threshold, increment
    the count of consecutive clumps with peak value below the threshold.

@@ -3,7 +3,7 @@
 #include "mers.h"
 
 void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
-                       int *lbnd, int ilevel, double rms ){
+                       int *lbnd, int ilevel, double rms, int *status ){
 /*
 *+
 *  Name:
@@ -17,7 +17,8 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 
 *  Synopsis:
 *     void cupidGCListClump( int iclump, int ndim, double *par, double chisq, 
-*                            int *lbnd, int ilevel, double rms )
+*                            int *lbnd, int ilevel, double rms,
+*                            int *status )
 
 *  Description:
 *     This function adds a clump to the output list. 
@@ -38,6 +39,8 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 *        The amount of information to display to standard output.
 *     rms
 *        The RMS noise level.
+*     status
+*        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
@@ -75,6 +78,7 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 */
 
 /* Local Variables: */
+
    int np;              /* Number of parameters */
 
 /* Abort if an error has already occurred. */

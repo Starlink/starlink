@@ -7,7 +7,8 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
                                  double rms, int velax, int nel, int ndim, 
                                  int dims[3], int skip[3], int *slbnd, 
                                  CupidPixelSet *ps, int *list_size, 
-                                 double **mlist, int **plist ){
+                                 double **mlist, int **plist,
+                                 int *status ){
 /*
 *+
 *  Name:
@@ -23,7 +24,8 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
 *     void cupidCFClump<X>( CGEN_TYPE *ipd, double *ipv, int *ipa, double rms, 
 *                           int velax, int nel, int ndim, int dims[3], 
 *                           int skip[3], int *slbnd, CupidPixelSet *ps, 
-*                           int *list_size, double **mlist, int **plist )
+*                           int *list_size, double **mlist, int **plist,
+*                           int *status )
 
 *  Description:
 *     This function gathers the information needed to produce an HDS clump 
@@ -72,6 +74,8 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
 *        not NULL on entry, then the memory located will be re-used. The
 *        grid coords of each pixel are stored in "ndim" consecutive elements 
 *        of this array.
+*     status
+*        Pointer to the inherited status value.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidCFClump macro 
@@ -117,6 +121,7 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
 */
 
 /* Local Variables: */
+
    double *pm;      /* Pointer to next value in "mlist" */
    double d;        /* Pixel value */
    double vmin;     /* Minimum value in the clump */

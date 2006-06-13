@@ -15,7 +15,7 @@ extern CupidGC cupidGC;
 
 
 void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims,
-                                 char *aname ){
+                                 char *aname, int *status ){
 /*
 *+
 *  Name:
@@ -28,7 +28,8 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidGCDump<X>( CGEN_TYPE *array, int ndim, int *dims, char *aname )
+*     void cupidGCDump<X>( CGEN_TYPE *array, int ndim, int *dims, char *aname,
+*        int *status )
 
 *  Description:
 *     This function is a diagnostic function which dumps the supplied
@@ -45,6 +46,8 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims,
 *     aname
 *        Only used if "array" is not NULL. It is a string giving the name
 *        of the NDF to produce.
+*     status
+*        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
@@ -82,6 +85,7 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims,
 */
 
 /* Local Variables: */
+
    CGEN_TYPE *adata;
    int indf, place, i, el, lbnd[3], ubnd[3], np;
    double *data;

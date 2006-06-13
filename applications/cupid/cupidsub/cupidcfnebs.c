@@ -100,7 +100,8 @@
 
 void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3], 
                   int skip[3], int hindex, int naxis, int *n1, int *il1,  
-                  int i1[27], int *n2, int *il2, CupidPixelSet **clumps ){
+                  int i1[27], int *n2, int *il2, CupidPixelSet **clumps,
+                  int *status ){
 /*
 *+
 *  Name:
@@ -115,7 +116,8 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 *  Synopsis:
 *     void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3], 
 *                     int skip[3], int hindex, int naxis, int *n1, 
-*                     int *il1, int i1[27], int *n2, int *il2, CupidPixelSet **clumps )
+*                     int *il1, int i1[27], int *n2, int *il2, CupidPixelSet **clumps,
+*                     int *status )
 
 *  Description:
 *     This function returns information about which, if any, PixelSets 
@@ -182,6 +184,8 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 *        Array holding a list of pointers to the currently existing
 *        PixelSets. The pixelSet identified by index "id" should be held
 *        in "clumps[id]".
+*     status
+*        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -219,6 +223,7 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 */
 
 /* Local Variables: */
+
    double d1;           /* Distance from pixel to nearest PixelSet peak */
    double d2;           /* Distance from pixel to other PixelSet peak */
    double dx;           /* X offset between pixel and PixelSet peak */

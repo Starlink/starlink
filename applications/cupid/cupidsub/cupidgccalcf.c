@@ -81,6 +81,7 @@ void cupidGCcalcf( int n, double *x, int *nf, double *f ){
 
 /* Local Variables: */
    int newx;              /* Are we dealing with a new parameter set? */
+   int status;            /* Local status value */
 
 /* If the invocation count has not changed we must be dealing with the
    same point as last time. If it has changed, record its value so that
@@ -93,7 +94,8 @@ void cupidGCcalcf( int n, double *x, int *nf, double *f ){
    }
 
 /* Calculate the chi squared value.*/
-   *f = cupidGCChiSq( cupidGC.ndim, x, -1, newx );
+   status = SAI__OK;
+   *f = cupidGCChiSq( cupidGC.ndim, x, -1, newx, &status );
 
 /* If a bad value was returned, indicate we cannot calculate the value.
    Return zero instead of VAL__BADD to avoid risk of numerical exceptions. */

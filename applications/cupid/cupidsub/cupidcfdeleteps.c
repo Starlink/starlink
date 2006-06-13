@@ -3,7 +3,7 @@
 #include "ast.h"
 #include "mers.h"
 
-CupidPixelSet *cupidCFDeletePS( CupidPixelSet *ps ){
+CupidPixelSet *cupidCFDeletePS( CupidPixelSet *ps, int *status ){
 /*
 *+
 *  Name:
@@ -16,7 +16,7 @@ CupidPixelSet *cupidCFDeletePS( CupidPixelSet *ps ){
 *     Starlink C
 
 *  Synopsis:
-*     CupidPixelSet *cupidCFDeletePS( CupidPixelSet *ps )
+*     CupidPixelSet *cupidCFDeletePS( CupidPixelSet *ps, int *status )
 
 *  Description:
 *     This function releases all resources used by a CupidPixelSet
@@ -25,6 +25,8 @@ CupidPixelSet *cupidCFDeletePS( CupidPixelSet *ps ){
 *  Parameters:
 *     ps
 *        Pointer to the CupidPixelSet structure to be freed.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     A NULL pointer.
@@ -65,6 +67,7 @@ CupidPixelSet *cupidCFDeletePS( CupidPixelSet *ps ){
 */
 
 /* Local Variables: */
+
 /* (none) */
 
 /* Free the memory used to hold the list of the indices of neighbouring

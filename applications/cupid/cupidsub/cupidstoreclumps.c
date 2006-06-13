@@ -16,7 +16,7 @@
 
 void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
                        int ndim, double beamcorr[ 3 ], const char *ttl,
-                       AstFrameSet *iwcs, int ilevel ){
+                       AstFrameSet *iwcs, int ilevel, int *status ){
 /*
 *+
 *  Name:
@@ -31,7 +31,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *  Synopsis:
 *     void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
 *                            int ndim, double beamcorr[ 3 ], const char *ttl, 
-*                            AstFrameSet *iwcs, int ilevel )
+*                            AstFrameSet *iwcs, int ilevel, int *status )
 
 *  Description:
 *     This function optionally saves the clump properties in an output
@@ -58,6 +58,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        The WCS FrameSet from the input data, or NULL.
 *     ilevel
 *        The level of information to display.
+*     status
+*        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
@@ -95,6 +97,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 */
 
 /* Local Variables: */
+
    AstFrame *frm1;              /* Frame describing clump parameters */
    AstFrame *frm2;              /* Frame describing clump centres */
    AstMapping *map;             /* Mapping from "frm1" to "frm2" */
@@ -196,7 +199,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    information which is the same for every clump (the parameter names, the 
    indices of the parameters holding the clump central position, and the 
    number of parameters). */
-         cpars = cupidClumpDesc( indf, beamcorr, cpars, &names, &ncpar, &ok );
+         cpars = cupidClumpDesc( indf, beamcorr, cpars, &names, &ncpar, &ok, status );
 
 /* If we have not yet done so, allocate memory to hold a table of clump 
    parameters. In this table, all the values for column 1 come first, 

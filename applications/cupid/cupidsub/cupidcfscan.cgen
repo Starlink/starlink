@@ -8,7 +8,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
                                             CupidPixelSet **clumps, int idl,
                                             double clevel, int *index,
                                             int naxis, int ilevel, int newok,
-                                            int *slbnd, double *maxpd ){
+                                            int *slbnd, double *maxpd,
+                                            int *status ){
 /*
 *+
 *  Name:
@@ -26,7 +27,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *                                     CupidPixelSet **clumps, int idl,
 *                                     double clevel, int *index, int naxis,
 *                                     int ilevel, int newok, int *slbnd, 
-*                                     double *maxpd )
+*                                     double *maxpd, int *status )
 
 *  Description:
 *     This function scans the data array for pixels at or above the
@@ -103,6 +104,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *     maxpd
 *        Pointer to a double in which to return the largest data value
 *        which has not yet been incorporated into a clump.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     A pointer to a possibly new array in which each element is a 
@@ -164,6 +167,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 */
 
 /* Local Variables: */
+
    CGEN_TYPE *pd;        /* Pointer to next data pixel */
    CupidPixelSet **ret;  /* The returned pointer */
    CupidPixelSet *ops;   /* Pointer to neighbouring PixelSet */
@@ -237,7 +241,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    different types of PixelSets; those which were identified at this contour
    level, and those which were identified at higher contour levels. */
                      cupidCFNebs( ipa, i, x, ndim, dims, skip, hindex, 
-                                  naxis, &n1, &il1,  i1, &n2, &il2, ret );
+                                  naxis, &n1, &il1,  i1, &n2, &il2, ret, status );
 
 /* If none of the neighbours of this pixel are assigned to a PixelSet which 
    was identified at this contour level, then we start a new PixelSet. */
@@ -253,14 +257,14 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 /* Allocate memory for a new PixelSet structure and initialise it. Also, put 
    the new PixelSet pointer into the relevant element of the returned array, 
    extending the array if necessary. */
-                        ps = cupidCFMakePS( *index );
+                        ps = cupidCFMakePS( *index, status );
                         ret = astGrow( ret, ++(*index), sizeof( CupidPixelSet * ) );
                         if( ret && ps ) {
                            ret[ ps->index ] = ps;
       
 /* Add the current pixel to this new PixelSet. */
                            cupidCFAddPixel( ipa, ps, i, x, (double ) *pd,
-                                            edge );
+                                            edge, status );
                         }
 
 /* If one or more of the neighbours of this pixel are assigned to PixelSets
@@ -268,7 +272,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    the PixelSet with the lowest index. */
                      } else {
                         ps = ret[ il1 ];
-                        cupidCFAddPixel( ipa, ps, i, x, (double ) *pd, edge );
+                        cupidCFAddPixel( ipa, ps, i, x, (double ) *pd, edge, status );
 
 /* If this pixel touches other PixelSets identified at this contour level, 
    then transfer the pixels contained in them all into the PixelSet with 
@@ -277,9 +281,9 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
                            for( ii = 0; ii < n1; ii++ ) {
                               ops = ret[ i1[ ii ] ];
                               if( ops && ops != ps ) {
-                                 cupidCFXfer( ops, ps, ipa, skip );
+                                 cupidCFXfer( ops, ps, ipa, skip, status );
                                  ret[ i1[ ii ] ] = cupidCFFreePS( ops, NULL, 
-                                                                  nel );
+                                                                  nel, status );
                               }
                            }
                         }
@@ -332,21 +336,21 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    transferred out of the new PixelSet.*/
          if( !idl ) {
             while( 1 ) {
-               if( !cupidCFErode( ps, ipa, ndim, dims, skip, naxis, ret ) ) break;
+               if( !cupidCFErode( ps, ipa, ndim, dims, skip, naxis, ret, status ) ) break;
             }
 
 /* Otherwise, we use the simpler algorithm implemented in later IDL
    versions of ClumpFind. This assigns each pixel in the PixelSet to the
    adjoining clump that has the closest peak pixel. */
          } else {
-            cupidCFIdl( ps, ipa, ndim, dims, skip, naxis, ret );
+            cupidCFIdl( ps, ipa, ndim, dims, skip, naxis, ret, status );
          }
 
 /* If the PixelSet is now empty, free the resources used by the PixelSet.
    If this PixelSet is currently the last in the list, decrement the length
    of the list. */
          if( ps->pop == 0 ) {
-            ret[ i ] = cupidCFFreePS( ps, NULL, nel );
+            ret[ i ] = cupidCFFreePS( ps, NULL, nel, status );
             if( i == *index - 1 ) (*index)--;
             if( ilevel > 3 ) msgOut( "", "      Transferred to adjoining "
                                      "PixelSets", status );
@@ -368,7 +372,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 
 /* If no new clumps are allowed, tell the user, and free the clump. */   
          } else {
-            ret[ i ] = cupidCFFreePS( ps, NULL, nel );
+            ret[ i ] = cupidCFFreePS( ps, NULL, nel, status );
             if( i == *index - 1 ) (*index)--;
             if( ilevel > 3 ) msgOut( "", "      Ignored (no new clumps "
                                      "can be started at this contour level).",

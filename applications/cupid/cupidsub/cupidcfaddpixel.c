@@ -2,7 +2,7 @@
 #include "cupid.h"
 
 void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d, 
-                      int edge ){
+                      int edge, int *status ){
 /*
 *+
 *  Name:
@@ -16,7 +16,7 @@ void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d,
 
 *  Synopsis:
 *     void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], 
-*                           double d, int edge )
+*                           double d, int edge, int *status )
 
 *  Description:
 *     This function adds a specified pixel of the input data array into a
@@ -42,6 +42,8 @@ void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d,
 *     edge
 *        A boolean flag indicating if the pixel is adjacent to any edge of 
 *        the data array.
+*     status
+*        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -79,6 +81,7 @@ void cupidCFAddPixel( int *ipa, CupidPixelSet *ps, int iv, int x[3], double d,
 */
 
 /* Local Variables: */
+
    int i;                /* Loop count */
 
 /* Abort if an error has already occurred. */

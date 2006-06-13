@@ -42,7 +42,7 @@ fptrap (int i)
 #endif
 
 
-void findclumps() {
+void findclumps( int *status ) {
 /*
 *+
 *  Name:
@@ -58,7 +58,7 @@ void findclumps() {
 *     ADAM A-task
 
 *  Synopsis:
-*     void findclumps();
+*     void findclumps( int *status );
 
 *  Description:
 *     This application identifies clumps of emission within a 1, 2 or 3 
@@ -793,7 +793,7 @@ void findclumps() {
 
    } else {
       ipv = NULL;
-      rms = cupidRms( type, ipd, el, subnd[ 0 ] - slbnd[ 0 ] + 1 );
+      rms = cupidRms( type, ipd, el, subnd[ 0 ] - slbnd[ 0 ] + 1, status );
    }   
 
 
@@ -847,19 +847,19 @@ void findclumps() {
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
       ndfs = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms, 
-                                keymap, velax, ilevel, beamcorr ); 
+                                keymap, velax, ilevel, beamcorr, status ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       ndfs = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel, beamcorr ); 
+                              keymap, velax, ilevel, beamcorr, status ); 
       
    } else if( !strcmp( method, "REINHOLD" ) ) {
       ndfs = cupidReinhold( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel, beamcorr ); 
+                              keymap, velax, ilevel, beamcorr, status ); 
       
    } else if( !strcmp( method, "FELLWALKER" ) ) {
       ndfs = cupidFellWalker( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel, beamcorr ); 
+                              keymap, velax, ilevel, beamcorr, status ); 
       
    } else if( *status == SAI__OK ) {
       *status = SAI__ERROR;
@@ -899,7 +899,7 @@ void findclumps() {
       ndfState( indf, "WCS", &gotwcs, status );
       cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, beamcorr, 
                         "Output from CUPID:FINDCLUMPS", gotwcs ? iwcs : NULL,
-                        ilevel );
+                        ilevel, status );
 
 /* Allocate room for a mask holding bad values for points which are not 
    inside any clump. */
@@ -908,7 +908,7 @@ void findclumps() {
 /* Create any output NDF by summing the contents of the NDFs describing the 
    found and usable clumps. This also fills the above mask array. */
       cupidSumClumps( type, ipd, ilevel, nsig, slbnd, subnd, el, ndfs, 
-                      rmask, ipo, method );
+                      rmask, ipo, method, status );
 
 /* Delete any existing quality name information from the output NDF, and 
    create a structure to hold new quality name info. */
@@ -931,7 +931,7 @@ void findclumps() {
       if( astMapGet0A( keymap, method, (AstObject *) &config ) ) {     
          config2 = astKeyMap( "" );
          astMapPut0A( config2, method, config, NULL );
-         cupidStoreConfig( xloc, config2 );
+         cupidStoreConfig( xloc, config2, status );
          astAnnul( config2 );
          astAnnul( config );
       }

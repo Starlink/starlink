@@ -4,7 +4,8 @@
 
 int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout, 
                                    int x0[3], int iv0, int vskip, 
-                                   int xskip[3], int dims[3] ){
+                                   int xskip[3], int dims[3],
+                                   int *status ){
 /*
 *+
 *  Name:
@@ -20,7 +21,7 @@ int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout,
 *  Synopsis:
 *     int cupidRCopyLine<X>( CGEN_TYPE *in, double *dout, int *vout, 
 *                            int x0[3], int iv0, int vskip, int xskip[3], 
-*                            int dims[3] )
+*                            int dims[3], int *status )
 
 *  Description:
 *     This functions copies a line of data from the input 3D array into
@@ -52,6 +53,8 @@ int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout,
 *        The skips in 3D GRID indices between pixels in the line.
 *     dims
 *        The number of pixels along each of the GRID axes in the 3D array.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     The number of values stored in each of "dout" and "vout".
@@ -100,6 +103,7 @@ int CGEN_FUNCTION(cupidRCopyLine)( CGEN_TYPE *in, double *dout, int *vout,
 */
 
 /* Local Variables: */
+
    int i;                 /* Index into returned arrays */
    int iv;                /* 1D vector index into supplied array */
    int x[ 3 ];            /* 3D GRID indices into supplied array */

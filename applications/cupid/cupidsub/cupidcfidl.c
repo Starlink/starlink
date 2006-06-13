@@ -5,7 +5,8 @@
 #include <limits.h>
 
 void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
-                 int skip[3], int naxis, CupidPixelSet **clumps ){
+                 int skip[3], int naxis, CupidPixelSet **clumps,
+                 int *status ){
 /*
 *+
 *  Name:
@@ -20,7 +21,8 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 
 *  Synopsis:
 *     void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
-*                      int skip[3], int naxis, CupidPixelSet **clumps )
+*                      int skip[3], int naxis, CupidPixelSet **clumps,
+*                      int *status )
 
 *  Description:
 *     This function transfer all the pixels in PixelSet "ps" to one of
@@ -60,6 +62,8 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *        Array holding pointers to all previously defined PixelSets, such 
 *        that a pointer to the PixelSet with index value "i" is stored at 
 *        element "i" of the "clumps" array.
+*     status
+*        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -97,6 +101,7 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 */
 
 /* Local Variables: */
+
    int *nebs;       /* Pointer to list of neighbouring clump indices */
    int *p;          /* Pointer to array of GRID coords at clump peak */
    int *v1;         /* Pointer to element at start of this row */
@@ -205,7 +210,7 @@ void cupidCFIdl( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 
 /* Transfer the pixel to the new PixelSet. */
                cupidCFAddPixel( ipa, clumps[ iclumpmin ], iv, x, VAL__MIND, 
-                                edge );
+                                edge, status );
             }
 
 /* Get the pointer to the next pixel in the source PixelSet bounding box. */

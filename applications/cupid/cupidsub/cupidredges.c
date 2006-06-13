@@ -8,7 +8,8 @@
 #define GRADSTEP 3
 
 void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
-                  double thresh, double noise, double rms, double flatslope ){
+                  double thresh, double noise, double rms, double flatslope,
+                  int *status ){
 /*
 *+
 *  Name:
@@ -23,7 +24,7 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 *  Synopsis:
 *     void cupidREdges( int nel, double *dval, int *dpos, int *mask, 
 *                       int minpix, double thresh, double noise, double rms,
-*                       double flatslope )
+*                       double flatslope, int *status )
 
 *  Description:
 *     This function finds the highest data value in the supplied 1D line 
@@ -65,6 +66,8 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 *     flatslope
 *        The minimum significant slope along a peak, in units of change
 *        in data value per pixel.
+*     status
+*        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -102,6 +105,7 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 */
 
 /* Local Variables: */
+
    double *pd;        /* Pointer to next data value */
    double deltav;     /* Minimum significant change in data value */
    double maxval;     /* Maximum data value found so far */

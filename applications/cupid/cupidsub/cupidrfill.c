@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <limits.h>
 
-int cupidRFill( int i0, int index, int *ipa, int nel, int skip[ 3 ] ){
+int cupidRFill( int i0, int index, int *ipa, int nel, int skip[ 3 ],
+         int *status ){
 /*
 *+
 *  Name:
@@ -16,7 +17,8 @@ int cupidRFill( int i0, int index, int *ipa, int nel, int skip[ 3 ] ){
 *     Starlink C
 
 *  Synopsis:
-*     int cupidRFill( int i0, int index, int *ipa, int nel, int skip[ 3 ] )
+*     int cupidRFill( int i0, int index, int *ipa, int nel, int skip[ 3 ],
+*        int *status )
 
 *  Description:
 *     This function identifies the clump edges surrounding a nominated pixel,
@@ -77,6 +79,8 @@ int cupidRFill( int i0, int index, int *ipa, int nel, int skip[ 3 ] ){
 *        the array using a single 1D vector index and using nD coords. This
 *        array should have 3 elements even if there are less than 3 pixel
 *        axes, and the extra elements should be filled with zero's.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     The number of pixels added to the clump. This will be zero if the
@@ -120,6 +124,7 @@ int cupidRFill( int i0, int index, int *ipa, int nel, int skip[ 3 ] ){
 */
 
 /* Local Variables: */
+
    int *new_surface;    /*  1D indices of pixels in next surface layer */
    int *ptemp;          /* Temporary storage during swap */
    int *surface;        /* 1D indices of pixels in current surface layer */

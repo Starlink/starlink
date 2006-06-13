@@ -6,7 +6,8 @@
 #include "cupid.h"
 #include <stdio.h>
 
-void cupidDumpI( int *array, int ndim, int *dims, int *slbnd ){
+void cupidDumpI( int *array, int ndim, int *dims, int *slbnd,
+         int *status ){
 /*
 *+
 *  Name:
@@ -19,7 +20,8 @@ void cupidDumpI( int *array, int ndim, int *dims, int *slbnd ){
 *     Starlink C
 
 *  Synopsis:
-*     void cupidDumpI( int *array, int ndim, int *dims, int *slbnd )
+*     void cupidDumpI( int *array, int ndim, int *dims, int *slbnd,
+*        int *status )
 
 *  Description:
 *     This function is a diagnostic function which dumps the supplied
@@ -34,6 +36,8 @@ void cupidDumpI( int *array, int ndim, int *dims, int *slbnd ){
 *        Pointer to the size of each pixel axis.
 *     slbnd
 *        Pointer to the lower pixel bounds of each pixel axis.
+*     status
+*        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
@@ -71,6 +75,7 @@ void cupidDumpI( int *array, int ndim, int *dims, int *slbnd ){
 */
 
 /* Local Variables: */
+
    int *adata;
    int indf, place, i, el, lbnd[3], ubnd[3];
    static int jj = 0;

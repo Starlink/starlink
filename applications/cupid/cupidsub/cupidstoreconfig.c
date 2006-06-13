@@ -6,7 +6,7 @@
 #include "cupid.h"
 #include <string.h>
 
-void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config ){
+void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config, int *status ){
 /*
 *+
 *  Name:
@@ -19,7 +19,7 @@ void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config ){
 *     Starlink C
 
 *  Synopsis:
-*     void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config )
+*     void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config, int *status )
 
 *  Description:
 *     This function extracts each keyword/value pair from the given 
@@ -30,6 +30,8 @@ void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config ){
 *        HDS locator for the CUPID extension.
 *     config
 *        An AST KeyMap holding the configuration parameters.
+*     status
+*        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
@@ -67,6 +69,7 @@ void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config ){
 */
 
 /* Local Variables: */
+
    Grp *grp;             /* Pointer to group */
    HDSLoc *aloc;         /* HDS locator for entire CONFIG array */
    HDSLoc *cloc;         /* HDS locator for single cell of ONFIG array */

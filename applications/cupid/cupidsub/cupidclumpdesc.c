@@ -5,7 +5,8 @@
 #include <math.h>
 
 double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars, 
-                        const char ***names, int *ncpar, int *ok ){
+                        const char ***names, int *ncpar, int *ok,
+                        int *status ){
 /*
 *+
 *  Name:
@@ -19,7 +20,8 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
 
 *  Synopsis:
 *     double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars, 
-*                             const char ***names, int *ncpar, int *ok )
+*                             const char ***names, int *ncpar, int *ok,
+*                             int *status )
 
 *  Description:
 *     This function calculates the parameters describing a single clump,
@@ -67,6 +69,8 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
 *        Pointer to an int in which to return a flag indicating if the
 *        clump can be used or not. This will be set to zero if the clump
 *        size is zero after correction for the effect of beam smoothing.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     A pointer to the array holding the returned clump parameters. This
@@ -110,6 +114,7 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
 */
 
 /* Local Variables: */
+
    double *ipd;             /* Pointer to start of data array */
    double *pd;              /* Pointer to next element of data array */
    double *ret;             /* Returned list of parameters */

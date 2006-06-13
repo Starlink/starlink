@@ -4,7 +4,8 @@
 
 double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims, 
                                         int imax, int *ax_max, int ax, 
-                                        double rms, double *off, double *cen ){
+                                        double rms, double *off, double *cen,
+                                        int *status ){
 /*
 *+
 *  Name:
@@ -19,7 +20,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *  Synopsis:
 *     double cupidGCProfWidth<X>( CGEN_TYPE *array, int ndim, int *dims, 
 *                                 int imax, int *ax_max, int ax, double rms, 
-*                                 double *off, double *cen )
+*                                 double *off, double *cen, int *status )
 
 *  Description:
 *     This functions produces an initial estimate of the width and
@@ -60,6 +61,8 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 *        GRID coordinate of the profile peak, on axis "ax".
 *        >>>>>  CURRENTLY THIS IS UNDER REVIEW. EXTRA CODE IS NEEDED TO
 *        CALCULATE THIS PROPERLY, AND IT MAY NOT HAVE MUCH EFFECT <<<<<<
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     The FWHM of the profile, in pixels.
@@ -108,6 +111,7 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
 */
 
 /* Local Variables: */
+
    double ret;           /* Sum of weighted axis values */
    double v1low;         /* Lowest data value found so far */
    double v2low;         /* Lowest data value found so far */

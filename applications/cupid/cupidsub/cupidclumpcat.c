@@ -6,7 +6,7 @@
 #include "star/kaplibs.h"
 
 void cupidClumpCat( const char *param, double *tab, int size, 
-                    int i, int ndim, const char *ttl ){
+                    int i, int ndim, const char *ttl, int *status ){
 /*
 *+
 *  Name:
@@ -21,7 +21,8 @@ void cupidClumpCat( const char *param, double *tab, int size,
 
 *  Synopsis:
 *     void cupidClumpCat( const char *param, char *loc, double *tab, 
-*                         int size, int i, int ndim, const char *ttl )
+*                         int size, int i, int ndim, const char *ttl,
+*                         int *status )
 
 *  Description:
 *     The clump parameters contained within the HDS object located by "loc" 
@@ -43,6 +44,8 @@ void cupidClumpCat( const char *param, double *tab, int size,
 *        The number of pixel axes in the data.
 *     ttl
 *        A title for the output catalogue (if any).
+*     status
+*        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
@@ -80,6 +83,7 @@ void cupidClumpCat( const char *param, double *tab, int size,
 */
 
 /* Local Variables: */
+
    AstFrame *frm1;               /* Frame describing clump parameters */
    AstFrame *frm2;               /* Frame describing clump centres */
    AstFrameSet *iwcs;            /* FrameSet to be stored in output catalogue */

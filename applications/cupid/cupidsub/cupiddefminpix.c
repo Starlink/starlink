@@ -2,7 +2,8 @@
 #include "cupid.h"
 #include "math.h"
 
-int cupidDefMinPix( int ndim, double *fwhm, double thresh, double minhgt ){
+int cupidDefMinPix( int ndim, double *fwhm, double thresh, double minhgt,
+         int *status ){
 /*
 *+
 *  Name:
@@ -16,7 +17,7 @@ int cupidDefMinPix( int ndim, double *fwhm, double thresh, double minhgt ){
 
 *  Synopsis:
 *     int cupidDefMinPix( int ndim, double *fwhm, double thresh, 
-*                            double minhgt )
+*                            double minhgt, int *status )
 
 *  Description:
 *     This function returns a default value for the MinPix configuration
@@ -38,6 +39,8 @@ int cupidDefMinPix( int ndim, double *fwhm, double thresh, double minhgt ){
 *        The background level at which clumps are truncated.
 *     minhgt
 *        The minimum peak value for a significant clump.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     The default MinPix value.
@@ -78,6 +81,7 @@ int cupidDefMinPix( int ndim, double *fwhm, double thresh, double minhgt ){
 */
 
 /* Local Variables: */
+
    double f;
    int ret;
 

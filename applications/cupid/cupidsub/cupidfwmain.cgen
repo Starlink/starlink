@@ -7,7 +7,8 @@
 
 int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                                 int dims[ 3 ], int skip[ 3 ], double rms, 
-                                AstKeyMap *config, int *ipa, int ilevel ){
+                                AstKeyMap *config, int *ipa, int ilevel,
+                                int *status ){
 /*
 *+
 *  Name:
@@ -22,7 +23,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *  Synopsis:
 *     int cupidFWMain<X>( CGEN_TYPE *array, int nel, int ndim, int dims[ 3 ],
 *                         int skip[ 3 ], double rms, AstKeyMap *config, 
-*                         int *ipa, int ilevel )
+*                         int *ipa, int ilevel, int *status )
 
 *  Description:
 *     This function decide which clump each data pixel belongs to and fills 
@@ -75,6 +76,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *        not in a clump are assigned -1.
 *     ilevel
 *        Amount of information to display.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     The largest clump index stored in "ipa" on return.
@@ -123,6 +126,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 */
 
 /* Local Variables: */
+
    CGEN_TYPE *pd;  /* Pointer to next "array" value */
    double *peak_values; /* Pointer to array holding peak value in each clump */
    double flat[ 4 ];/* Array containing most recent data values along route */
@@ -198,17 +202,17 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    if( *status != SAI__OK ) return ret;
 
 /* Get the lowest data value to be considered. */
-   noise = cupidConfigD( config, "NOISE", 2.0*rms );
+   noise = cupidConfigD( config, "NOISE", 2.0*rms, status );
 
 /* Get the largest jump (in pixels) which can be made from a local maximum 
    to a higher maximum in the neighbourhood of the first maximum. */
-   maxjump = cupidConfigI( config, "MAXJUMP", 4 );
+   maxjump = cupidConfigI( config, "MAXJUMP", 4, status );
 
 /* Get the difference in data value between adjacent pixels which marks
    the start of a walk. Any initial section of the walk which has an
    average gradient (measured over 4 steps) less than this value is not 
    assigned to any clump. */
-   flat_slope = cupidConfigD( config, "FLATSLOPE", rms );
+   flat_slope = cupidConfigD( config, "FLATSLOPE", rms, status );
 
 /* Walks which start at low level are ignored until they achieve the
    gradient specified by FLATSLOPE. Walks which start at high level are
@@ -253,7 +257,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    pixels from the above "ipa" array. This allocates new memory for the 
    cleaned up array. */ 	 
    if( ilevel > 1 ) msgOut( "", "Removing isolated pixels\n", status );
-   work = cupidRCA( ipa, NULL, nel, dims, skip, 0.1, VAL__MAXI, 0, -1, 1 );
+   work = cupidRCA( ipa, NULL, nel, dims, skip, 0.1, VAL__MAXI, 0, -1, 1, status );
 
 /* Initialise the pointer to an array holding the peak value in every clump. */
    peak_values = NULL;
@@ -599,13 +603,13 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    each output pixels by the most commonly occuring value within a 3x3x3 
    cube of input pixels centred on the output pixel. Repeat this process
    a number of times as given by configuration parameter CleanIter. */
-   cleaniter = cupidConfigI( config, "CLEANITER", 1 );
+   cleaniter = cupidConfigI( config, "CLEANITER", 1, status );
 
    if( ilevel > 1 ) msgOut( "", "Cleaning clumps", status );
    m1 = work;
    m2 = ipa;
    for( iter = 0; iter < cleaniter; iter++ ) {
-      (void) cupidRCA2( m1, m2, nel, dims, skip );
+      (void) cupidRCA2( m1, m2, nel, dims, skip, status );
       m3 = m1;
       m1 = m2;
       m2 = m3;
@@ -624,7 +628,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    clumps. */
    if( ilevel > 1 ) msgOut( "", "Merging adjoining clumps", status );
    CGEN_FUNCTION(cupidFWJoin)( array, nel, ndim, dims, skip, rms, config, 
-                               ipa, peak_values, &ret, ilevel );
+                               ipa, peak_values, &ret, ilevel, status );
    if( ilevel > 1 ) msgOut( "", "Merging completed", status );
 
 /* Free resources. */

@@ -5,7 +5,8 @@
 #include "prm_par.h"
 
 
-int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax ){
+int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
+         int *status ){
 /*
 *+
 *  Name:
@@ -18,7 +19,8 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax ){
 *     Starlink C
 
 *  Synopsis:
-*     int cupidGCFindMax<X>( CGEN_TYPE *array, int nel, int *imax )
+*     int cupidGCFindMax<X>( CGEN_TYPE *array, int nel, int *imax,
+*        int *status )
 
 *  Description:
 *     This functions finds the element with the largest value in the supplied 
@@ -33,6 +35,8 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax ){
 *        Pointer the location at which to return the index within the
 *        supplied array of the element with the largest value. A value of
 *        -1 is returned if there are no good values in the supplied array.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     A flag indicating if all the supplied array values are bad.
@@ -81,6 +85,7 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax ){
 */
 
 /* Local Variables: */
+
    int i;               /* Loop count */
    int ngood;           /* Number of good array values found */
    CGEN_TYPE maxval;    /* Largest value found so far */

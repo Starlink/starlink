@@ -11,7 +11,8 @@ typedef struct Pix {
 } Pix;
 
 int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
-                  int skip[3], int naxis, CupidPixelSet **clumps ){
+                  int skip[3], int naxis, CupidPixelSet **clumps,
+                  int *status ){
 /*
 *+
 *  Name:
@@ -26,7 +27,8 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 
 *  Synopsis:
 *     int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims, 
-*                       int skip[3], int naxis, CupidPixelSet **clumps )
+*                       int skip[3], int naxis, CupidPixelSet **clumps,
+*                       int *status )
 
 *  Description:
 *     This function transfer all the pixels in PixelSet "ps" which are
@@ -65,6 +67,8 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 *        Array holding pointers to all previously defined PixelSets, such 
 *        that a pointer to the PixelSet with index value "i" is stored at 
 *        element "i" of the "clumps" array.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     Non-zero if any pixels were transferred out of the source PixelSet. 
@@ -106,6 +110,7 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
 */
 
 /* Local Variables: */
+
    Pix *pix;        /* Pointer to a Pix structure describing transferred pixel */
    Pix *xflist;     /* Pointer to list of Pix structures describing transferred pixels */
    int *v1;         /* Pointer to element at start of this row */
@@ -175,7 +180,7 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
             if( *v == old_index ) {
                iv = v - ipa;
                cupidCFNebs( ipa, iv, x, ndim, dims, skip, old_index, 
-                            naxis, &n1, &il1,  i1, &n2, &il2, clumps );
+                            naxis, &n1, &il1,  i1, &n2, &il2, clumps, status );
 
 /* If this pixel adjoins another PixelSet, add its details to the end of the 
    list of pixels to be transferred to that PixelSet. */
@@ -216,7 +221,7 @@ int cupidCFErode( CupidPixelSet *ps, int *ipa, int ndim, int *dims,
    pix = xflist;
    for( i = 0; i < nxf; i++, pix++ ) {
       cupidCFAddPixel( ipa, clumps[ pix->ineb ], pix->iv, pix->x, VAL__MIND, 
-                       pix->edge );
+                       pix->edge, status );
    }
 
 /* Reduce the population of the source PixelSet. */

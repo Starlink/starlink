@@ -6,7 +6,7 @@
 #include "cupid.h"
 #include <string.h>
 
-AstKeyMap *cupidRetrieveConfig( HDSLoc *xloc ){
+AstKeyMap *cupidRetrieveConfig( HDSLoc *xloc, int *status ){
 /*
 *+
 *  Name:
@@ -19,7 +19,7 @@ AstKeyMap *cupidRetrieveConfig( HDSLoc *xloc ){
 *     Starlink C
 
 *  Synopsis:
-*     AstKeyMap *cupidRetrieveConfig( HDSLoc *xloc )
+*     AstKeyMap *cupidRetrieveConfig( HDSLoc *xloc, int *status )
 
 *  Description:
 *     This function reads the CONFIG component of the supplied CUPID
@@ -29,6 +29,8 @@ AstKeyMap *cupidRetrieveConfig( HDSLoc *xloc ){
 *  Parameters:
 *     xloc
 *        HDS locator for the CUPID extension.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     Pointer to a new AST KeyMap holding the configuration parameters.
@@ -69,6 +71,7 @@ AstKeyMap *cupidRetrieveConfig( HDSLoc *xloc ){
 */
 
 /* Local Variables: */
+
    AstKeyMap *ret;       /* Pointer to returned KeyMap */
    Grp *grp;             /* Pointer to group */
    HDSLoc *aloc;         /* HDS locator for entire CONFIG array */

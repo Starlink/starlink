@@ -9,7 +9,7 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
                                   int ndim, int dims[ 3 ], int skip[ 3 ], 
                                   int slbnd[ 3 ], int index, int clbnd[ 3 ], 
                                   int cubnd[ 3 ], AstKeyMap *extra,
-                                  HDSLoc *obj, int maxbad ){
+                                  HDSLoc *obj, int maxbad, int *status ){
 /*
 *+
 *  Name:
@@ -25,7 +25,8 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 *     HDSLoc *cupidNdfClump<X>( CGEN_TYPE *ipd, int *ipa, int nel, int ndim, 
 *                            int dims[ 3 ], int skip[ 3 ], int slbnd[ 3 ], 
 *                            int index, int clbnd[ 3 ], int cubnd[ 3 ], 
-*                            AstKeyMap *extra, HDSLoc *obj, int maxbad  )
+*                            AstKeyMap *extra, HDSLoc *obj, int maxbad,
+*                            int *status )
 
 *  Description:
 *     This function cannot be used with algorithms such as GaussClumps
@@ -80,6 +81,8 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 *        The maximum number of clump pixels which can border an area of
 *        bad pixels. If this number is exceeded the Unit component of the
 *        returned NDF is set to "BAD".
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     An HDS locator to the array of NDFs.
@@ -128,6 +131,7 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 */
 
 /* Local Variables: */
+
    HDSLoc *dloc;             /* Component locator */
    HDSLoc *ret;              /* The returned HDS object */
    HDSLoc *cloc;             /* Cell locator */

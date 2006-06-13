@@ -3,7 +3,7 @@
 #include <limits.h>
 
 int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ], 
-                      int dims[ 3 ], int peakval ){
+                      int dims[ 3 ], int peakval, int *status ){
 /*
 *+
 *  Name:
@@ -18,7 +18,8 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 
 *  Synopsis:
 *     int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, 
-*                           int skip[ 3 ], int dims[ 3 ], int peakval )
+*                           int skip[ 3 ], int dims[ 3 ], int peakval,
+*                           int *status )
 
 *  Description:
 *     This function is supplied with an array in which pixels marking the
@@ -63,6 +64,8 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 *        elements should be filled with one's.
 *     peakval
 *        The "ipa" value used to flag peaks.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     The largest integer clump identifier present in the "out" array.
@@ -104,6 +107,7 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 */
 
 /* Local Variables: */
+
    int *pa;              /* Pointer to next "ipa" element */
    int gp[ 3 ];          /* Grid coords of peak position */
    int i;                /* Index of next "ipa" element */
@@ -167,7 +171,7 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
                gp[ 1 ] = iy;
                gp[ 2 ] = iz;
                cupidRFillLine( ipa, out, nel, ndim, skip, dims, gp, i, 0,
-                               ipeak, 1, gpeak );
+                               ipeak, 1, gpeak, status );
             }
          }
       }
@@ -190,7 +194,7 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
                   gp[ 1 ] = iy;
                   gp[ 2 ] = iz;
                   cupidRFillLine( ipa, out, nel, ndim, skip, dims, gp, i, 1,
-                                  ipeak, 1, gpeak );
+                                  ipeak, 1, gpeak, status );
                }
             }
          }
@@ -213,7 +217,7 @@ int cupidRFillClumps( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
                      gp[ 1 ] = iy;
                      gp[ 2 ] = iz;
                      cupidRFillLine( ipa, out, nel, ndim, skip, dims, gp, i, 2,
-                                     ipeak, 1, gpeak );
+                                     ipeak, 1, gpeak, status );
                   }
                }
             }

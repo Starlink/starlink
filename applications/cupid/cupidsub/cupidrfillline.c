@@ -4,7 +4,7 @@
 
 void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ], 
                      int dims[ 3 ], int gp[ 3 ], int iv, int axis, int id,
-                     int depth, int *gpeak[ 3 ] ){
+                     int depth, int *gpeak[ 3 ], int *status ){
 /*
 *+
 *  Name:
@@ -20,7 +20,7 @@ void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 *     void cupidRFillLine( int *ipa, int *out, int nel, int ndim, 
 *                          int skip[ 3 ], int dims[ 3 ], int gp[ 3 ],
 *                          int iv, int axis, int id, int depth,
-*                          int *gpeak[ 3 ] )
+*                          int *gpeak[ 3 ], int *status )
 
 *  Description:
 *     This function fills the volume between the edges marked in the "ipa" 
@@ -79,6 +79,8 @@ void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 *        Stores the grid coords of each peak. The (x,y,z) values for peak 
 *        "ipeak" are stored at "gpeak[0][ipeak]", "gpeak[1][ipeak]", 
 *        "gpeak[2][ipeak]".
+*     status
+*        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -116,6 +118,7 @@ void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
 */
 
 /* Local Variables: */
+
    int dnew;             /* Squared distance to new peak */
    int dold;             /* Squared distance to old peak */
    int dx;               /* Increment in x */
@@ -173,7 +176,7 @@ void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
    next axis, starting at the current position. */
       if( depth < 3 ) {
          cupidRFillLine( ipa, out, nel, ndim, skip, dims, p, ii, iaxis, id, 
-                         depth + 1, gpeak );
+                         depth + 1, gpeak, status );
       }      
 
 /* Move to the next +ve axis position. */
@@ -221,7 +224,7 @@ void cupidRFillLine( int *ipa, int *out, int nel, int ndim, int skip[ 3 ],
    next axis, starting at the current position. */
       if( depth < 3 ) {
          cupidRFillLine( ipa, out, nel, ndim, skip, dims, p, ii, iaxis, id, 
-                         depth + 1, gpeak );
+                         depth + 1, gpeak, status );
       }      
 
 /* Move to the next -ve axis position. */

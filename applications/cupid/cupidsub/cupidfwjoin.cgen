@@ -8,7 +8,7 @@
 void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
                                  int dims[ 3 ], int skip[ 3 ], double rms, 
                                  AstKeyMap *config, int *ipa, double *peakvals,
-                                 int *npeak, int ilevel ){
+                                 int *npeak, int ilevel, int *status ){
 /*
 *+
 *  Name:
@@ -24,7 +24,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *     void cupidFWJoin<X>( CGEN_TYPE *array, int nel, int ndim,
 *                          int dims[ 3 ], int skip[ 3 ], double rms, 
 *                          AstKeyMap *config, int *ipa, double *peakvals,
-*                          int *npeak, int ilevel )
+*                          int *npeak, int ilevel, int *status )
 
 *  Description:
 *     This function identifies groups of adjoining clumps which have no
@@ -87,6 +87,8 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *        the clumps were merged.
 *     ilevel
 *        Amount of information to display.
+*     status
+*        Pointer to the inherited status value.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidFWJoin macro 
@@ -132,6 +134,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 */
 
 /* Local Variables: */
+
    double mindip;  /* Minimum dip between distinct peaks */
    double newv;    /* Data value at current scan line sample */
    double oldv;    /* Data value at previous scan line sample */
@@ -175,7 +178,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Get the minimum dip between two adjoining peaks necessary for the two
    peaks to be considered distinct. */
-   mindip = cupidConfigD( config, "MINDIP", 2.0*rms );
+   mindip = cupidConfigD( config, "MINDIP", 2.0*rms, status );
 
 /* Indicate that we have not as yet found any pair of adjoining clumps
    that have no significant intervening dip. */

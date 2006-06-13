@@ -3,7 +3,8 @@
 #include "cupid.h"
 
 int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
-               double thresh, int magic, int on, int off, int centre ){
+               double thresh, int magic, int on, int off, int centre,
+               int *status ){
 /*
 *+
 *  Name:
@@ -17,7 +18,8 @@ int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
 
 *  Synopsis:
 *     int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
-*                    double thresh, int magic, int on, int off, int centre )
+*                    double thresh, int magic, int on, int off, int centre,
+*                    int *status )
 
 *  Description:
 *     This function contracts (erodes) or expands (dilates) the pixels
@@ -63,6 +65,8 @@ int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
 *     centre
 *        If non-zero, then no output pixel will be set on if the
 *        corresponding input pixel is not on.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     A pointer to the output array. This will be equal to "out" if "out"
@@ -105,6 +109,7 @@ int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
 */
 
 /* Local Variables: */
+
    int *pin0;          /* Pointer to input pixel [0,0,0] */
    int *pin;           /* Pointer to input pixel */
    int *piny;          /* Pointer to input pixel at start of row */

@@ -9,7 +9,7 @@
 
 HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                          double *ipv, double rms, AstKeyMap *config, int velax,
-                         int ilevel, double beamcorr[ 3 ] ){
+                         int ilevel, double beamcorr[ 3 ], int *status ){
 /*
 *+
 *  Name:
@@ -26,7 +26,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, 
 *                              void *ipd, double *ipv, double rms, 
 *                              AstKeyMap *config, int velax, int ilevel,
-*                              double beamcorr[ 3 ] )
+*                              double beamcorr[ 3 ], int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -100,6 +100,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        instrumental smoothing along each pixel axis. The clump widths
 *        stored in the output catalogue are reduced to correct for this
 *        smoothing.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     A locator for a new HDS object which is an array of NDF structures.
@@ -144,6 +146,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 */
 
 /* Local Variables: */
+
    AstKeyMap *fwconfig; /* Configuration parameters for this algorithm */
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
    double *pd;          /* Pointer to next element of data array */
@@ -208,11 +211,11 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    astMapPut0A( fwconfig, CUPID__CONFIG, astCopy( config ), NULL );
 
 /* Return the instrumental smoothing FWHMs */
-   beamcorr[ 0 ] = cupidConfigD( fwconfig, "FWHMBEAM", 2.0 );
+   beamcorr[ 0 ] = cupidConfigD( fwconfig, "FWHMBEAM", 2.0, status );
    beamcorr[ 1 ] = beamcorr[ 0 ];
    if( ndim == 3 ) {
       beamcorr[ 2 ] = beamcorr[ 0 ];
-      beamcorr[ velax ]= cupidConfigD( fwconfig, "VELORES", 2.0 );
+      beamcorr[ velax ]= cupidConfigD( fwconfig, "VELORES", 2.0, status );
    }
 
 /* Find the size of each dimension of the data array, and the total number
@@ -235,12 +238,12 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    ipa = astMalloc( sizeof( int )*el );
 
 /* Get the RMS noise level to use. */
-   rms = cupidConfigD( fwconfig, "RMS", rms );
+   rms = cupidConfigD( fwconfig, "RMS", rms, status );
 
 /* Assign every data pixel to a clump and stores the clumps index in the
    corresponding pixel in "ipa". */
    maxid = cupidFWMain( type, ipd, el, ndim, dims, skip, rms, fwconfig,
-                        ipa, ilevel );
+                        ipa, ilevel, status );
 
 /* Abort if no clumps found. */
    if( maxid < 0 ) {
@@ -266,18 +269,18 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    if( cubnd ) {
 
 /* Get the lowest data value to be considered. */
-      noise = cupidConfigD( config, "NOISE", 2.0*rms );
+      noise = cupidConfigD( config, "NOISE", 2.0*rms, status );
 
 /* Get the minimum dip between two adjoining peaks necessary for the two
    peaks to be considered distinct. */
-      mindip = cupidConfigD( config, "MINDIP", 2.0*rms );
+      mindip = cupidConfigD( config, "MINDIP", 2.0*rms, status );
 
 /* Get the lowest allowed clump peak value. */
-      minhgt = cupidConfigD( fwconfig, "MINHEIGHT", mindip + noise );
+      minhgt = cupidConfigD( fwconfig, "MINHEIGHT", mindip + noise, status );
 
 /* Get the minimum allowed number of pixels in a clump. */
-      minpix = cupidDefMinPix( ndim, beamcorr, noise, minhgt );
-      minpix = cupidConfigI( fwconfig, "MINPIX", minpix );
+      minpix = cupidDefMinPix( ndim, beamcorr, noise, minhgt, status );
+      minpix = cupidConfigI( fwconfig, "MINPIX", minpix, status );
 
 /* Initialise a list to hold zero for every clump id. These values are
    used to count the number of pixels remaining in each clump. Also
@@ -419,7 +422,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          i = igood[ j ];
          ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims, skip, slbnd, 
                               i, clbnd + 3*i, cubnd + 3*i, NULL, ret,
-                              cupidConfigI( fwconfig, "MAXBAD", 4 ) );
+                              cupidConfigI( fwconfig, "MAXBAD", 4, status ), status );
       }
 
 /* Free resources */

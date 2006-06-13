@@ -3,7 +3,7 @@
 #include <string.h>
 
 void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa, 
-                  int skip[3] ){
+                  int skip[3], int *status ){
 /*
 *+
 *  Name:
@@ -17,7 +17,7 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 
 *  Synopsis:
 *     void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa, 
-*                       int skip[3] )
+*                       int skip[3], int *status )
 
 *  Description:
 *     This function transfer all the pixels in PixelSet "ps1" into
@@ -42,6 +42,8 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords.
 *        Unused trailing elements should be filled with zero.
+*     status
+*        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
@@ -79,6 +81,7 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 */
 
 /* Local Variables: */
+
    int *v1;         /* Pointer to element at start of this row */
    int *v2;         /* Pointer to element at start of this plane */
    int *v;          /* Pointer to next array element */

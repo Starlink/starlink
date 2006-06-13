@@ -17,7 +17,7 @@ extern CupidGC cupidGC;
 
 
 int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
-                               double *chisq ){
+                               double *chisq, int *status ){
 /*
 *+
 *  Name:
@@ -30,7 +30,8 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 *     Starlink C
 
 *  Synopsis:
-*     int cupidGCFit<X>( CGEN_TYPE *res, int imax, double *x, double *chisq );
+*     int cupidGCFit<X>( CGEN_TYPE *res, int imax, double *x, double *chisq,
+*        int *status )
 
 *  Description:
 *     This function fits a Gaussian to a peak in the supplied residuals
@@ -70,6 +71,8 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 *     chisq
 *        A pointer to a location at which to return the chi-squared
 *        associated with the returned fit.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     Non-zero if the fit was succesfully completed.
@@ -120,6 +123,7 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 */
 
 /* Local Variables: */
+
    double d[ CUPID__GCNP3 ]; /* Scale factors for each parameter */
    int n;                    /* Number of free parameters */
    int ret;                  /* Returned value */
@@ -171,15 +175,15 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
       cupidGC.nwf = 0;
 
       nf = 1;
-      cupidGCcalcf( n, x, &nf, &f0 );
-      cupidGCcalcg( n, x, &nf, g );
+      cupidGCcalcf( n, x, &nf, &f0, status );
+      cupidGCcalcg( n, x, &nf, g, status );
 
       for( i = 0; i < n; i++ ) {
          nf++;
          dx = 0.0000001*x[ i ];
          if( dx == 0.0 ) dx = 1.0E-6;
          x[ i ] += dx;
-         cupidGCcalcf( n, x, &nf, &f );
+         cupidGCcalcf( n, x, &nf, &f, status );
          printf("Par %d: %g %g %g %g\n", i, f, f0, f - f0, dx );
          printf("        %g %g\n", (f - f0)/dx, g[ i ] ); 
          x[ i ] -= dx;

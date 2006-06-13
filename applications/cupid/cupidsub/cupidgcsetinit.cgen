@@ -21,7 +21,7 @@ extern CupidGC cupidGC;
 void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
                                     int *dims, int imax, double rms, 
                                     AstKeyMap *config, int init, int velax, 
-                                    double *par, int *slbnd ){
+                                    double *par, int *slbnd, int *status ){
 /*
 *+
 *  Name:
@@ -37,7 +37,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 *     void cupidGCSetInit<X>( CGEN_TYPE *array, double *var, int ndim, 
 *                             int *dims, int imax, double rms, 
 *                             AstKeyMap *config, int init, int velax, 
-*                             double *par, int *slbnd )
+*                             double *par, int *slbnd, int *status )
 
 *  Description:
 *     This functions makes an initial guess at the Gaussian clump
@@ -77,6 +77,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 *     slbnd
 *        Pointer to array holding the lower pixel bounds of the user
 *        supplied NDF.
+*     status
+*        Pointer to the inherited status value.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidGCSetInit macro 
@@ -122,6 +124,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 */
 
 /* Local Variables: */
+
    double *pw;            /* Pointer to next weight value in work array */
    double *py;            /* Pointer to next data value in work array */
    double d2;             /* Sum of squared offsets */
@@ -165,28 +168,28 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 
 /* Parameters which control the modification of the weights done by 
    cupidGCChiSq (this modification is meant to give low weights to pixels
-   which do not influence the Gaussian model). */
-      cupidGC.nwf = cupidConfigI( config, "NWF", 10 );
-      cupidGC.minwf = cupidConfigD( config, "MINWF", 0.1 );
-      cupidGC.maxwf = cupidConfigD( config, "MAXWF", 2.0 );
+   which do not influence the Gaussian model, status ). */
+      cupidGC.nwf = cupidConfigI( config, "NWF", 10, status );
+      cupidGC.minwf = cupidConfigD( config, "MINWF", 0.1, status );
+      cupidGC.maxwf = cupidConfigD( config, "MAXWF", 2.0, status );
 
 /* Indicate background should be included in the fitting process. */
       cupidGC.fixback = 0;
 
 /* Maximum number of function evaluations to be used when fitting an 
    individual clump. */
-      cupidGC.maxnf = cupidConfigI( config, "MAXNF", 100 );
+      cupidGC.maxnf = cupidConfigI( config, "MAXNF", 100, status );
 
 /* See if a value has been supplied for the initial guess at the ratio 
    of the clump size to the beam width. */
-      fbeam = cupidConfigD( config, "FWHMSTART", VAL__BADD );
+      fbeam = cupidConfigD( config, "FWHMSTART", VAL__BADD, status );
 
 /* See if a value has been supplied for the initial guess at the ratio 
    of the clump velocity width to the velocity resolution. */
-      fvel = cupidConfigD( config, "VELOSTART", VAL__BADD );
+      fvel = cupidConfigD( config, "VELOSTART", VAL__BADD, status );
 
 /* Get the FHWM of the instrument beam, in pixels, and store its square. */
-      beamfwhm = cupidConfigD( config, "FWHMBEAM", 2.0 );
+      beamfwhm = cupidConfigD( config, "FWHMBEAM", 2.0, status );
       cupidGC.beam_sq = beamfwhm*beamfwhm;
       if( beamfwhm < 0.0 && *status == SAI__OK ) {
          *status = SAI__ERROR;
@@ -197,7 +200,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       }
 
 /* Get the velocity resolution, in pixels (=channels), and store its square. */
-      velres = cupidConfigD( config, "VELORES", 2.0 );
+      velres = cupidConfigD( config, "VELORES", 2.0, status );
       cupidGC.velres_sq = velres*velres;
       if( velres < 0.0 && *status == SAI__OK ) {
          *status = SAI__ERROR;
@@ -210,7 +213,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 /* Get the Chi-square stiffness parameter "Sa" which encourages the peak
    amplitude of the fitted gaussian close to the maximum value in the
    observed data. */
-      cupidGC.sa = cupidConfigD( config, "SA", 1.0 );
+      cupidGC.sa = cupidConfigD( config, "SA", 1.0, status );
 
 /* Get the Chi-square stiffness parameter "Sb" which encourages the 
    background value to stay close to its initial value. This is an extra
@@ -219,17 +222,17 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    points which have very low weight and is thus poorly constrained. It
    would thus be possibly to get completely erroneous background values  
    without this extra stiffness. */
-      cupidGC.sb = cupidConfigD( config, "SB", 0.1 );
+      cupidGC.sb = cupidConfigD( config, "SB", 0.1, status );
 
 /* Get the Chi-square stiffness parameter "S0" which encourages the peak
    amplitude of the fitted gaussian to be below the maximum value in the
    observed data. */
-      cupidGC.s0p1 = cupidConfigD( config, "S0", 1.0 ) + 1;
+      cupidGC.s0p1 = cupidConfigD( config, "S0", 1.0, status ) + 1;
 
 /* Get the Chi-square stiffness parameter "Sc" which encourages the peak
    position of the fitted gaussian to be close to the peak position in the
    observed data. */
-      cupidGC.sc4 = 4*cupidConfigD( config, "SC", 1.0 );
+      cupidGC.sc4 = 4*cupidConfigD( config, "SC", 1.0, status );
 
 /* The number of dimensions in the data. */
       cupidGC.ndim = ndim;
@@ -265,11 +268,11 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       fax[ cupidGC.dax[ 2 ] ] = 2; 
 
 /* Get the ratio of the weighting function FWHM to the observed FWHM. */
-      wwidth = cupidConfigD( config, "WWIDTH", 2.0 );
+      wwidth = cupidConfigD( config, "WWIDTH", 2.0, status );
 
 /* Get the factor which scales the observed FWHM on each axis to
    the half-width of the section of the data array to be be fitted.*/
-      wmin = cupidConfigD( config, "WMIN", 0.05 );
+      wmin = cupidConfigD( config, "WMIN", 0.05, status );
       if( wmin < 1.0E-8 ) wmin = 1.0E-8;
       beta = 0.5*wwidth*sqrt( -log( wmin )/ log( 2.0 ) );
 
@@ -321,7 +324,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    off = 0.0;
    fwhm_obs[ 0 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax, 
                                                 ax_max, cupidGC.dax[ 0 ], 
-                                                rms, &off, cupidGC.x_max );
+                                                rms, &off, cupidGC.x_max, status );
 
 /* Store the model centroid on internal axis 0 (i.e. axis 0 as used within
    the fitting algorithm). */
@@ -332,7 +335,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    if( ndim > 1 ) {
       fwhm_obs[ 1 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax, 
                                                 ax_max, cupidGC.dax[ 1 ], 
-                                                rms, &off, cupidGC.x_max + 1 );
+                                                rms, &off, cupidGC.x_max + 1, status );
       fwhm_obs[ 0 ] += fwhm_obs[ 1 ];
       fwhm_obs[ 0 ] *= 0.5;
       fwhm_obs[ 1 ] = fwhm_obs[ 0 ];
@@ -373,7 +376,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    if( ndim > 2 ) {
       fwhm_obs[ 2 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax,
                                                  ax_max, cupidGC.dax[ 2], rms, 
-                                                 &off, cupidGC.x_max + 2  );
+                                                 &off, cupidGC.x_max + 2, status );
       par[ 7 ] = cupidGC.x_max[ 2 ];
       if( fvel != VAL__BADD ) {
          fvel_used = fvel;

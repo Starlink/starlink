@@ -13,7 +13,8 @@
 
 void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim, 
                                     int *lbnd, int *ubnd, int nel, HDSLoc *obj,
-                                    float *rmask, void *out, const char *method ){
+                                    float *rmask, void *out, const char *method,
+                                    int *status ){
 /*
 *+
 *  Name:
@@ -29,7 +30,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 *  Synopsis:
 *     void cupidSumClumps<X>( CGEN_TYPE *in, int ilevel, int ndim, int *lbnd, 
 *                             int *ubnd, int nel, HDSLoc *obj, float *rmask, 
-*                             void *out, const char *method )
+*                             void *out, const char *method, int *status )
 
 *  Description:
 *     This function stores an image of the sum of all the found clumps
@@ -66,6 +67,8 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 *     method
 *        The name of the algorithm being used (e.g. "CLUMPFIND", "GAUSSCLUMPS",
 *        etc).
+*     status
+*        Pointer to the inherited status value.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidSumClumps macro 
@@ -112,6 +115,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 */
 
 /* Local Variables: */
+
    CGEN_TYPE *pd;       /* Pointer to next element of the "out" array */
    HDSLoc *cloc;        /* Locator for a cell of the NDF array */
    char unit[ 10 ];     /* NDF Unit component */

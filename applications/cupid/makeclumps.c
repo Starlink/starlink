@@ -21,7 +21,7 @@
    cupidGCmodel. Is is declared in cupidGaussClumps. */
 extern CupidGC cupidGC;
 
-void makeclumps() {
+void makeclumps( int *status ) {
 /*
 *+
 *  Name:
@@ -166,7 +166,7 @@ void makeclumps() {
 *     distribution on each axis.
 
 *  Synopsis:
-*     void makeclumps();
+*     void makeclumps( int *status );
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
@@ -375,21 +375,21 @@ void makeclumps() {
       }
 
 /* Determine the parameter values to use for the clump. */
-      par[ 0 ] = cupidRanVal( normal, peak );
+      par[ 0 ] = cupidRanVal( normal, peak, status );
       par[ 1 ] = 0.0;
-      par[ 2 ] = (int) cupidRanVal( 0, pos1 );
-      par[ 3 ] = cupidRanVal( normal, fwhm1 );
+      par[ 2 ] = (int) cupidRanVal( 0, pos1, status );
+      par[ 3 ] = cupidRanVal( normal, fwhm1, status );
 
       if( ndim > 1 ) {
-         par[ 4 ] = (int) cupidRanVal( 0, pos2 );
-         par[ 5 ] = cupidRanVal( normal, fwhm2 );
-         par[ 6 ] = cupidRanVal( 0, angle );
+         par[ 4 ] = (int) cupidRanVal( 0, pos2, status );
+         par[ 5 ] = cupidRanVal( normal, fwhm2, status );
+         par[ 6 ] = cupidRanVal( 0, angle, status );
 
          if( ndim > 2 ) {
-            par[ 7 ] = cupidRanVal( 0, pos3 );
-            par[ 8 ] = cupidRanVal( normal, fwhm3 );
-            par[ 9 ] = cupidRanVal( normal, vgrad1 );
-            par[ 10 ] = cupidRanVal( normal, vgrad2 );
+            par[ 7 ] = cupidRanVal( 0, pos3, status );
+            par[ 8 ] = cupidRanVal( normal, fwhm3, status );
+            par[ 9 ] = cupidRanVal( normal, vgrad1, status );
+            par[ 10 ] = cupidRanVal( normal, vgrad2, status );
          }
       }
 
@@ -397,7 +397,7 @@ void makeclumps() {
    containing the clump data values, appended to the end of the array of
    NDF structures in the HDS object located by "obj". */
       cupidGCUpdateArraysF( NULL, NULL, nel, ndim, dims, par, rms, trunc, 0,
-                            0, lbnd, &obj, i, 0, 0.0, 0, &area );
+                            0, lbnd, &obj, i, 0, 0.0, 0, &area, status );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];
@@ -410,7 +410,7 @@ void makeclumps() {
 /* Create the output data array by summing the contents of the NDFs
    describing the found clumps. */
    cupidSumClumps( CUPID__FLOAT, NULL, 0, ndim, lbnd, ubnd, nel, obj, 
-                   NULL, ipd2, "GAUSSCLUMPS" );
+                   NULL, ipd2, "GAUSSCLUMPS", status );
 
 /* Add Gaussian noise to the data. */
    if( *status == SAI__OK ) {
@@ -431,7 +431,7 @@ void makeclumps() {
    beamcorr[ 1 ] = beamfwhm;
    beamcorr[ 3 ] = velfwhm;
    cupidStoreClumps( "OUTCAT", xloc, obj, ndim, beamcorr,
-                     "Output from CUPID:MAKECLUMPS", NULL, 2 );
+                     "Output from CUPID:MAKECLUMPS", NULL, 2, status );
 
 /* Relase the extension locator.*/
    datAnnul( &xloc, status );

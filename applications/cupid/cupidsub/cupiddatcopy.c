@@ -3,7 +3,7 @@
 #include "mers.h"
 #include "cupid.h"
 
-void cupidDatCopy( HDSLoc *loc1, HDSLoc *loc2 ){
+void cupidDatCopy( HDSLoc *loc1, HDSLoc *loc2, int *status ){
 /*
 *+
 *  Name:
@@ -16,7 +16,7 @@ void cupidDatCopy( HDSLoc *loc1, HDSLoc *loc2 ){
 *     Starlink C
 
 *  Synopsis:
-*     void cupidDatCopy( HDSLoc *loc1, HDSLoc *loc2 )
+*     void cupidDatCopy( HDSLoc *loc1, HDSLoc *loc2, int *status )
 
 *  Description:
 *     This function copies the HDS structure located by "loc1" into the HDS
@@ -29,6 +29,8 @@ void cupidDatCopy( HDSLoc *loc1, HDSLoc *loc2 ){
 *     loc2
 *        HDS locator for the structure to receive the copy of "loc1". An 
 *        error is reported if this is a primitive.
+*     status
+*        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
@@ -66,6 +68,7 @@ void cupidDatCopy( HDSLoc *loc1, HDSLoc *loc2 ){
 */
 
 /* Local Variables: */
+
    HDSLoc *cloc;                /* Locator for structure component */
    char name[ DAT__SZNAM + 1 ]; /* Component name */
    int i;                       /* Index of next component */

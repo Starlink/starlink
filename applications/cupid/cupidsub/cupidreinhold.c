@@ -9,7 +9,7 @@
 
 HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                      double *ipv, double rms, AstKeyMap *config, int velax,
-                     int ilevel, double beamcorr[ 3 ] ){
+                     int ilevel, double beamcorr[ 3 ], int *status ){
 /*
 *+
 *  Name:
@@ -26,7 +26,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, 
 *                          void *ipd, double *ipv, double rms, 
 *                          AstKeyMap *config, int velax, int ilevel,
-*                          double beamcorr[ 3 ] )
+*                          double beamcorr[ 3 ], int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -69,6 +69,8 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        instrumental smoothing along each pixel axis. The clump widths
 *        stored in the output catalogue are reduced to correct for this
 *        smoothing.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     A locator for a new HDS object which is an array of NDF structures.
@@ -113,6 +115,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 */
 
 /* Local Variables: */
+
    AstKeyMap *rconfig;  /* Configuration parameters for this algorithm */
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
    double *pd;          /* Pointer to next element of data array */
@@ -180,11 +183,11 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    astMapPut0A( rconfig, CUPID__CONFIG, astCopy( config ), NULL );
 
 /* Return the instrumental smoothing FWHMs */
-   beamcorr[ 0 ] = cupidConfigD( rconfig, "FWHMBEAM", 2.0 );
+   beamcorr[ 0 ] = cupidConfigD( rconfig, "FWHMBEAM", 2.0, status );
    beamcorr[ 1 ] = beamcorr[ 0 ];
    if( ndim == 3 ) {
       beamcorr[ 2 ] = beamcorr[ 0 ];
-      beamcorr[ velax ]= cupidConfigD( rconfig, "VELORES", 2.0 );
+      beamcorr[ velax ]= cupidConfigD( rconfig, "VELORES", 2.0, status );
    }
 
 /* Find the size of each dimension of the data array, and the total number
@@ -204,19 +207,19 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    }
 
 /* Get various configuration parameters. */
-   rms = cupidConfigD( rconfig, "RMS", rms );
-   minlen = cupidConfigI( rconfig, "MINLEN", 4 );
-   noise = cupidConfigD( rconfig, "NOISE", 2*rms );
-   thresh = cupidConfigD( rconfig, "THRESH", noise + 2*rms );
-   flatslope = cupidConfigD( rconfig, "FLATSLOPE", rms );
+   rms = cupidConfigD( rconfig, "RMS", rms, status );
+   minlen = cupidConfigI( rconfig, "MINLEN", 4, status );
+   noise = cupidConfigD( rconfig, "NOISE", 2*rms, status );
+   thresh = cupidConfigD( rconfig, "THRESH", noise + 2*rms, status );
+   flatslope = cupidConfigD( rconfig, "FLATSLOPE", rms, status );
    cathresh = pow( 3, ndim ) - 1.0;
-   cathresh = cupidConfigI( rconfig, "CATHRESH", (int) cathresh );
-   caiter = cupidConfigI( rconfig, "CAITERATIONS", 1 );
-   fixiter = cupidConfigI( rconfig, "FIXCLUMPSITERATIONS", 1 );
+   cathresh = cupidConfigI( rconfig, "CATHRESH", (int) cathresh, status );
+   caiter = cupidConfigI( rconfig, "CAITERATIONS", 1, status );
+   fixiter = cupidConfigI( rconfig, "FIXCLUMPSITERATIONS", 1, status );
 
 /* Get the minimum allowed number of pixels in a clump. */
-   minpix = cupidDefMinPix( ndim, beamcorr, noise, thresh );
-   minpix = cupidConfigI( rconfig, "MINPIX", minpix );
+   minpix = cupidDefMinPix( ndim, beamcorr, noise, thresh, status );
+   minpix = cupidConfigI( rconfig, "MINPIX", minpix, status );
 
 /* Convert CATHRESH from a number of pixels to a fraction. */
    cathresh = cathresh/pow( 3, ndim );
@@ -237,14 +240,14 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    peaks which were not peaks in all scan directions). */
    if( ilevel > 2 ) msgOut( "", "Finding clump edges...", status );
    mask = cupidRInitEdges( type, ipd, el, ndim, dims, skip, minlen, thresh, 
-                           noise, rms, flatslope, &peakval );
+                           noise, rms, flatslope, &peakval, status );
 
 /* Dilate the edge regions using a cellular automata. This creates a new
    mask array in which a pixel is marked as an edge pixel if any of its
    neighbours are marked as edge pixels in the mask array created above. */
    if( ilevel > 2 ) msgOut( "", "Dilating clump edges...", status );
    mask2 = cupidRCA( mask, NULL, el, dims, skip, 0.0, peakval, CUPID__KEDGE, 
-                     CUPID__KBACK, 0 );
+                     CUPID__KBACK, 0, status );
 
 /* Erode the edge regions using a second cellular automata. This over-writes
    the original mask array so that a pixel is marked as an edge pixel if a
@@ -255,7 +258,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    m2 = mask2;
    for( i = 0; i < caiter; i++ ) {
       m1 = cupidRCA( m2, m1, el, dims, skip, cathresh, peakval, CUPID__KEDGE, 
-                     CUPID__KBACK, 0 );
+                     CUPID__KBACK, 0, status );
       m3 = m1;
       m1 = m2;
       m2 = m3;
@@ -265,7 +268,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    which peak they are close to. All the pixels around one peak form one
    clump. */
    if( ilevel > 2 ) msgOut( "", "Filling clumps...", status );
-   maxid = cupidRFillClumps( m2, m1, el, ndim, skip, dims, peakval );
+   maxid = cupidRFillClumps( m2, m1, el, ndim, skip, dims, peakval, status );
 
 /* Abort if no clumps found. */
    if( maxid < 0 ) {
@@ -282,7 +285,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    results back into the supplied "m1" array. */
    if( ilevel > 2 && fixiter >0 ) msgOut( "", "Smoothing clump boundaries...", status );
    for( i = 0; i < fixiter; i++ ) {
-      m2 = cupidRCA2( m1, m2, el, dims, skip );
+      m2 = cupidRCA2( m1, m2, el, dims, skip, status );
       m3 = m2;
       m2 = m1;
       m1 = m3;
@@ -434,7 +437,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          i = igood[ j ];
          ret = cupidNdfClump( type, ipd, m1, el, ndim, dims, skip, slbnd, 
                               i, clbnd + 3*i, cubnd + 3*i, NULL, ret,
-                              cupidConfigI( rconfig, "MAXBAD", 4 ) );
+                              cupidConfigI( rconfig, "MAXBAD", 4, status ), status );
       }
 
 /* Free resources */

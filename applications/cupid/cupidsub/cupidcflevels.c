@@ -7,7 +7,7 @@
 #include <float.h>
 
 double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
-                       double rms, int *nlevels ){
+                       double rms, int *nlevels, int *status ){
 /*
 *+
 *  Name:
@@ -21,7 +21,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
 
 *  Synopsis:
 *     double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
-*                            double rms, int *nlevels )
+*                            double rms, int *nlevels, int *status )
 
 *  Description:
 *     This function obtains a series of contour levels at which the 
@@ -38,6 +38,8 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
 *        The RMS noise level in the data.
 *     nlevels
 *        Pointer to an int to receive the number of contour levels.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array containing "*nlevels"
@@ -80,6 +82,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
 */
 
 /* Local Variables: */
+
    char name[ 10 ];        /* Name of "LEVELn" value */
    double *ret;            /* Pointer to returned array of contour levels */
    double cdelta;          /* Increment between contour levels */
@@ -102,7 +105,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
    while( 1 ) {
       i++;
       sprintf( name, "LEVEL%d", i );
-      clevel = cupidConfigD( config, name, VAL__BADD );
+      clevel = cupidConfigD( config, name, VAL__BADD, status );
       if( clevel == AST__BAD ) {
          i--;
          break;
@@ -140,7 +143,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
    } else {
 
 /* Get the lowest contour level using twice the RMS as the default. */
-      clow = cupidConfigD( config, "TLOW", 2.0*rms );
+      clow = cupidConfigD( config, "TLOW", 2.0*rms, status );
 
 /* Report an error if the lowest contour level is below the minimum value
    in the data array. */
@@ -157,7 +160,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
          cdelta = 2.0*rms; 
 
 /* Get the contour interval using the above default. */
-         cdelta = cupidConfigD( config, "DELTAT", cdelta );
+         cdelta = cupidConfigD( config, "DELTAT", cdelta, status );
 
 /* Find the number of levels needed for this deltat. */
          *nlevels = (int) ( ( maxd - clow )/cdelta );

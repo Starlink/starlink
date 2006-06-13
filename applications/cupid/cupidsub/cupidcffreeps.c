@@ -4,7 +4,8 @@
 #include "mers.h"
 #include <float.h>
 
-CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel){
+CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel,
+         int *status ){
 /*
 *+
 *  Name:
@@ -17,7 +18,8 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel){
 *     Starlink C
 
 *  Synopsis:
-*     CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel )
+*     CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel,
+*        int *status )
 
 *  Description:
 *     This function releases the resources used by a CupidPixelSet
@@ -35,6 +37,8 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel){
 *        NULL.
 *     nel
 *        The length of the "ipa" array, if supplied.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     A NULL pointer.
@@ -75,6 +79,7 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel){
 */
 
 /* Local Variables: */
+
    int i;              /* Index of neighbouring PixelSet */
 
    if( !ps ) return NULL;

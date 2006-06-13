@@ -84,6 +84,10 @@ void cupidGCcalcg( int n, double *x, int *nf, double *g ){
 /* Local Variables: */
    int ipar;              /* Parameter index */
    int newx;              /* Are we dealing with a new parameter set? */
+   int status;            /* Local status */
+
+/* Initialise local status */
+   status = SAI__OK;
 
 /* If the invocation count has not changed we must be dealing with the
    same point as last time. If it has changed, record its value so that
@@ -100,7 +104,7 @@ void cupidGCcalcg( int n, double *x, int *nf, double *g ){
       
 /* Calculate the rate of change of the chi-squared with respect to this
    parameter. */
-      g[ ipar ] = cupidGCChiSq( cupidGC.ndim, x, ipar, newx );
+      g[ ipar ] = cupidGCChiSq( cupidGC.ndim, x, ipar, newx, &status );
              
 /* The second and subsequent passes through this loop use the same "x"
    position as the first. */

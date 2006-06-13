@@ -12,7 +12,8 @@
 extern CupidGC cupidGC;
 
 
-double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
+double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
+         int *status ){
 /*
 *+
 *  Name:
@@ -25,7 +26,8 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
 *     Starlink C
 
 *  Synopsis:
-*     double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp )
+*     double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
+*        int *status )
 
 *  Description:
 *     This function evaluates the modified chi squared used to estimate
@@ -79,6 +81,8 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
 *        invocation of this function. This causes cached intermediate values 
 *        to be re-used, thus speeding things up. A non-zero value should
 *        be supplied if "xpar" is not the same as on the previous invocation.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     The chi-squared value or gradient.
@@ -119,6 +123,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
 */
 
 /* Local Variables: */
+
    double *par;            /* Pointer to parameter array to be used */
    double *pim;            /* Pointer for next initial model value */
    double *pm;             /* Pointer for storing next model value */
@@ -275,7 +280,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
 /* Get the Gaussian model value at the centre of the current pixel. Store 
    the residual between the Gaussian model at the centre of the current
    pixel and the current pixel's data value. */
-         m = cupidGCModel( ndim, x, par, -1, 1, ( iel == 0 ) );
+         m = cupidGCModel( ndim, x, par, -1, 1, ( iel == 0 ), status );
          res = *py - m;
 
 /* If the changing of the model parameters make little difference to the
@@ -389,7 +394,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
       ret = chisq;
 
       if( cupidGC.ilevel > 5 ) {
-         cupidGCDumpF( NULL, 0, NULL, NULL ); 
+         cupidGCDumpF( NULL, 0, NULL, NULL, status ); 
 
          msgSeti( "NF", cupidGC.nf );
          msgOut( "", "   Fit attempt ^NF:", status );
@@ -448,7 +453,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
 
 /* Get the rate of change of the Gaussian model value with respect to the
    required parameter, at the centre of the current pixel. */
-         g = cupidGCModel( ndim, x, par, what, 1, 0 );
+         g = cupidGCModel( ndim, x, par, what, 1, 0, status );
 
 /* Increment the running sum of the returned value. */
          ret += *pr*g;

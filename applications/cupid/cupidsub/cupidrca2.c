@@ -2,7 +2,8 @@
 #include "ast.h"
 #include "cupid.h"
 
-int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ] ){
+int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
+         int *status ){
 /*
 *+
 *  Name:
@@ -16,7 +17,7 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ] ){
 
 *  Synopsis:
 *     int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], 
-*                     int skip[ 3 ] )
+*                     int skip[ 3 ], int *status )
 
 *  Description:
 *     This function smoothes the boundaries between areas of constant value
@@ -41,6 +42,8 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ] ){
 *        The increment in 1D vector index required to move a distance of 1 
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords. 
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     A pointer to the output array. This will be equal to "out" if "out"
@@ -83,6 +86,7 @@ int *cupidRCA2( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ] ){
 */
 
 /* Local Variables: */
+
    int *pin0;          /* Pointer to input pixel [0,0,0] */
    int *pin;           /* Pointer to input pixel */
    int *piny;          /* Pointer to input pixel at start of row */

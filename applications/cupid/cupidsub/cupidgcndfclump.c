@@ -10,7 +10,7 @@
 void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms, 
                     int ndim, int *lbox, int *ubox, int list_size, 
                     double *mlist, int *plist, int *lbnd, int iclump,
-                    int *dax, AstKeyMap *extra, int bad ){
+                    int *dax, AstKeyMap *extra, int bad, int *status ){
 /*
 *+
 *  Name:
@@ -26,7 +26,8 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *     void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms, 
 *                         int ndim, int *lbox, int *ubox, int list_size, 
 *                         double *mlist, int *plist, int *lbnd, int iclump,
-*                         int *dax, AstKeyMap *extra, int bad )
+*                         int *dax, AstKeyMap *extra, int bad,
+*                         int *status )
 
 *  Description:
 *     This function creates a temporary NDF and stores the integrated 
@@ -102,6 +103,8 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *        Set the Unit component of the NDF to "BAD". This is used as a
 *        flag to indicate that the clump touches too many areas of bad
 *        pixels.
+*     status
+*        Pointer to the inherited status value.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
@@ -139,6 +142,7 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 */
 
 /* Local Variables: */
+
    char *cen[] = { "CENTRE1", "CENTRE2", "CENTRE3" };
    char *fwhm[] = { "FWHM1", "FWHM2", "FWHM3" };
    char *vgrad[] = { "VGRAD1", "VGRAD2", "VGRAD3" };

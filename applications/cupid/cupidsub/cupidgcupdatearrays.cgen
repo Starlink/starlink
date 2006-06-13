@@ -19,7 +19,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                                          double mlim, int imax, int ilevel, 
                                          int *lbnd, HDSLoc **ndfs, int iclump, 
                                          int diag, double mean_peak, 
-                                         int maxbad, int *area ){
+                                         int maxbad, int *area,
+                                         int *status ){
 /*
 *+
 *  Name:
@@ -37,7 +38,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *                                  double rms, double mlim, int imax, 
 *                                  int ilevel, int *lbnd, HDSLoc **ndfs, 
 *                                  int iclump, int diag, double mean_peak,
-*                                  int maxbad, int *area )
+*                                  int maxbad, int *area, int *status )
 
 *  Description:
 *     This function removes the supplied Gaussian from the residuals array
@@ -93,6 +94,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     area
 *        Pointer to an int in which to store the number of pixels
 *        contributing to the clump.
+*     status
+*        Pointer to the inherited status value.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidGCUpdateArrays macro 
@@ -138,6 +141,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 */
 
 /* Local Variables: */
+
    AstKeyMap *extra;      /* Keymap holding extra diagnostic information */
    CGEN_TYPE r0;          /* Supplied residual at initial peak */
    CGEN_TYPE r;           /* Current residual value */
@@ -288,7 +292,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 /* Find the Gaussian model value at the current pixel. This excludes any 
    background level because the background value in "par" was set to zero 
    before entring this loop. */
-                  m = cupidGCModel( ndim, xx, par, -1, 1, first );
+                  m = cupidGCModel( ndim, xx, par, -1, 1, first, status );
                   first = 0;
 
 /* If the model value is higher than the supplied limit, indicate that the
@@ -418,7 +422,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 /* Dump the residuals to disk if required. */
    if( ilevel > 4 ) {
       sprintf( name, "clump_residuals%d", iclump ); 
-      CGEN_FUNCTION(cupidGCDump)( res, ndim, dims, name );   
+      CGEN_FUNCTION(cupidGCDump)( res, ndim, dims, name, status );   
    }
 
 /* If required, create an NDF holding the clump data values so long as
@@ -471,7 +475,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 /* Create the NDF. */
       cupidGCNdfClump( ndfs, sum, diag ? par : NULL, rms, ndim, lbox, ubox, 
                        list_size, mlist, plist, lbnd, iclump, cupidGC.dax, 
-                       extra, ( bad > maxbad ) );
+                       extra, ( bad > maxbad ), status );
 
 /* Free resources */
       if( extra ) extra = astAnnul( extra );

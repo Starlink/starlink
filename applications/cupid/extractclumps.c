@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 
-void extractclumps() {
+void extractclumps( int *status ) {
 /*
 *+
 *  Name:
@@ -76,7 +76,7 @@ void extractclumps() {
 *        if the CUPID extension does not contain a CONFIG component. []
 
 *  Synopsis:
-*     void extractclumps();
+*     void extractclumps( int *status );
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -315,7 +315,8 @@ void extractclumps() {
       for( id = idmin; id <= idmax; id++ ) {
          i = 3*( id - idmin );
          ndfs = cupidNdfClump( type, ipd, ipa, el, nsig, dims, skip, slbnd, id,
-                               clbnd + i, cubnd + i, NULL, ndfs, VAL__MAXI );
+                               clbnd + i, cubnd + i, NULL, ndfs,
+                               VAL__MAXI, status );
       }
    }
 
@@ -336,7 +337,7 @@ void extractclumps() {
       }
 
 /* Retrieve any configuration parameters from the CUPID extension. */
-      config = cupidRetrieveConfig( xloc );
+      config = cupidRetrieveConfig( xloc, status );
 
 /* Get the beam sizes from the CONFIG array in the CUPID extension. */
       mconfig = NULL;
@@ -385,7 +386,7 @@ void extractclumps() {
       msgBlank( status );
       cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, beamcorr, 
                         "Output from CUPID:EXTRACTCLUMPS", 
-                        gotwcs ? iwcs : NULL, 1 );
+                        gotwcs ? iwcs : NULL, 1, status );
 
 /* Map the output pixel assignment array. */
       ndfMap( indf3, "DATA", "_INTEGER", "WRITE", (void *) &ipa, &el, status );
@@ -398,7 +399,7 @@ void extractclumps() {
 /* Create the output data array by summing the contents of the NDFs describing 
    the  found and usable clumps. This also fills the above mask array. */
       cupidSumClumps( type, ipd, 1, nsig, slbnd, subnd, el, ndfs, 
-                      rmask, ipa, method );
+                      rmask, ipa, method, status );
 
 /* Delete any existing quality name information from the output NDF, and 
    create a structure to hold new quality name info. */

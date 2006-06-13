@@ -6,7 +6,8 @@ int CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis,
                                      int xvec[ 3 ], double *work1, 
                                      int *work2, int *mask, int minpix,
                                      double thresh, double noise, 
-                                     double rms, double flatslope ){
+                                     double rms, double flatslope,
+                                     int *status ){
 /*
 *+
 *  Name:
@@ -24,7 +25,7 @@ int CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis,
 *                             int dims[ 3 ], int skip[ 3 ], int xvec[ 3 ], 
 *                             double *work1, int *work2, int *mask, int minpix,
 *                             double thresh, double noise, double rms, 
-*                             double flatslope )
+*                             double flatslope, int *status )
 
 *  Description:
 *     This function scans the given data array for clump edges by looking
@@ -100,6 +101,8 @@ int CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis,
 *     flatslope
 *        The minimum significant slope along a peak, in units of change
 *        in data value per pixel.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     The number of lines actually scanned.
@@ -148,6 +151,7 @@ int CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis,
 */
 
 /* Local Variables: */
+
    int iv0;        /* 1d vector index within "array" at start of line */
    int x0[ 3 ];    /* GRID coords within "array" at start of line */
    int x1[ 3 ];    /* Starting values for GRID axes when scanning the face */
@@ -255,12 +259,12 @@ int CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis,
    copied pixels are put into "work2". The number of values stored in
    each of these work arrays is returned. */
                      nval = CGEN_FUNCTION(cupidRCopyLine)( array, work1, work2,
-                                                 x0, ivx, vskip, xvec, dims );
+                                                 x0, ivx, vskip, xvec, dims, status );
 
 /* Identify peaks within this line of data, and flag the edges of the
    peaks within the mask array. */
                      cupidREdges( nval, work1, work2, mask, minpix, thresh, 
-                                  noise, rms, flatslope );
+                                  noise, rms, flatslope, status );
 
 /* Increment the number of lines scanned. */
                      ret++;
