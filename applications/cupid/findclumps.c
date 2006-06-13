@@ -66,14 +66,17 @@ void findclumps( int *status ) {
 *     removed form the data array. Information about the clumps is returned 
 *     in several different ways:
 *
-*     - A pixel mask identifying pixels as background pixels or clump
-*     pixels is written to the Quality array of the output NDF (see 
-*     parameter OUT). Two quality bits will be used; one is set if and only 
-*     if the pixel is contained within one or more clumps, the other is set 
-*     if and only if the pixel is not contained within any clump. These two 
-*     quality bits have names associated with them which can be used with 
-*     the KAPPA applications SETQUAL, QUALTOBAD, REMQUAL, SHOWQUAL. The 
-*     names used are "CLUMP" and "BACKGROUND". For instance, to overlay
+*     - A pixel mask identifying pixels as background, clump or edge
+*     pixels is written to the Quality array of each output NDF (see 
+*     parameters OUT and QOUT). Three quality bits will be used; one
+*     is set if and only if the pixel is contained within one or more 
+*     clumps, another is set if and only if the pixel is not contained within 
+*     any clump, and the other is set if and only if the pixel is in a 
+*     clump but on the edge of the clump (i.e. has one or more neighbouring
+*     pixels that are not inside a clump). These three quality bits have 
+*     names associated with them which can be used with the KAPPA 
+*     applications SETQUAL, QUALTOBAD, REMQUAL, SHOWQUAL. The names used 
+*     are "CLUMP", "BACKGROUND" and "EDGE". For instance, to overlay
 *     the outline of a set of 2D clumps held in NDF "fred" on a previously 
 *     displayed 2D image, do "qualtobad fred fred2 background" followed by 
 *     "contour noclear mode=good fred2".
@@ -196,6 +199,13 @@ void findclumps( int *status ) {
 *        markers identifying the positions of the clumps described in 
 *        file fred.FIT, overlaying the markers on top of the currently
 *        displayed image. [!]
+*     QOUT = NDF (Write)
+*        An optional output NDF that is a copy of the input NDF, except
+*        that any Quality component in the input NDF is discarded and a
+*        new one created. The new Quality component defines 3 flags that
+*        indicate if each pixel is inside a clump, on the edge of a clump
+*        or outside all clumps. If a null (!) value is supplied, no NDF is
+*        created. [!]
 *     REPCONF = _LOGICAL (Read)
 *        If a TRUE value is supplied, then the configuration parameters
 *        supplied by the CONFIG parameter will be listed to standard 
@@ -592,14 +602,19 @@ void findclumps( int *status ) {
 /* Local Variables: */
    AstFrameSet *iwcs;           /* Pointer to the WCS FrameSet */
    AstKeyMap *aconfig;          /* Pointer to KeyMap holding algorithm settings */
-   AstKeyMap *config;           /* Pointer to KeyMap holding used config settings */
    AstKeyMap *config2;          /* Pointer to KeyMap holding used config settings */
+   AstKeyMap *config;           /* Pointer to KeyMap holding used config settings */
    AstKeyMap *keymap;           /* Pointer to KeyMap holding all config settings */
    AstMapping *map;             /* Current->base Mapping from WCS FrameSet */
    AstMapping *tmap;            /* Unused Mapping */
    Grp *grp;                    /* GRP identifier for configuration settings */
    HDSLoc *ndfs;                /* Array of NDFs, one for each clump */
-   HDSLoc *xloc;                /* HDS locator for CUPID extension */
+   HDSLoc *nloc;                /* Locator for main output NDF. */
+   HDSLoc *nqloc;               /* Locator for Quality comp in main output NDF. */
+   HDSLoc *qloc;                /* Locator for Quality output NDF. */
+   HDSLoc *qxloc;               /* Locator for CUPID extension in Quality output */
+   HDSLoc *xloc;                /* Locator for CUPID extension in main output */
+   HDSLoc *xqnloc;              /* Locator for CUPID_NAMES component in extension */
    IRQLocs *qlocs;              /* HDS locators for quality name information */
    char *value;                 /* Pointer to GRP element buffer */
    char attr[ 30 ];             /* AST attribute name */
@@ -615,12 +630,14 @@ void findclumps( int *status ) {
    double sum;                  /* Sum of variances */
    float *rmask;                /* Pointer to cump mask array */
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
+   int dims[3];                 /* Pointer to array of array dimensions */
    int el;                      /* Number of array elements mapped */
    int gotwcs;                  /* Does input NDF contain a WCS FrameSet? */
    int i;                       /* Loop count */
    int ifr;                     /* Index of Frame within WCS FrameSet */
    int ilevel;                  /* Interaction level */
-   int indf2;                   /* Identifier for output NDF */
+   int indf3;                   /* Identifier for Quality output NDF */
+   int indf2;                   /* Identifier for main output NDF */
    int indf;                    /* Identifier for input NDF */
    int n;                       /* Number of values summed in "sum" */
    int ndim;                    /* Total number of pixel axes */
@@ -629,8 +646,10 @@ void findclumps( int *status ) {
    int repconf;                 /* Report configuration? */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
    int size;                    /* Size of the "grp" group */
+   int skip[3];         /* Pointer to array of axis skips */
    int slbnd[ NDF__MXDIM ];     /* The lower bounds of the significant pixel axes */
    int subnd[ NDF__MXDIM ];     /* The upper bounds of the significant pixel axes */
+   int there;                   /* Does object exist? */
    int type;                    /* Integer identifier for data type */
    int var;                     /* Does the i/p NDF have a Variance component? */
    int vax;                     /* Index of the velocity WCS axis (if any) */
@@ -686,6 +705,17 @@ void findclumps( int *status ) {
 
 /* Get the WCS FrameSet and the significant axis bounds. */
    kpg1Asget( indf, nsig, 1, 0, 0, sdim, slbnd, subnd, &iwcs, status );
+
+/* Find the size of each dimension of the data array, and the skip in 1D 
+   vector index needed to move by pixel along an axis. */
+   for( i = 0; i < nsig; i++ ) {
+      dims[ i ] = subnd[ i ] - slbnd[ i ] + 1;
+      skip[ i ] = ( i == 0 ) ? 1 : skip[ i - 1 ]*dims[ i - 1 ];
+   }
+   for( ; i < 3; i++ ) {
+      dims[ i ] = 1;
+      skip[ i ] = 0;
+   }
 
 /* If the NDF has 3 pixel axes, identify the velocity axis. */
    if( nsig == 3 && astGetI( iwcs, "Naxes" ) == 3 ) {
@@ -871,7 +901,7 @@ void findclumps( int *status ) {
 /* Skip the rest if no clumps were found. */
    if( ndfs ) {
 
-/* Create the output NDF and map the data array. */
+/* Create the main output NDF and map the data array. */
       ipo = NULL;
       ndfProp( indf, "AXIS,WCS,NOEXTENSION(CUPID)", "OUT", &indf2, 
                status );
@@ -915,15 +945,22 @@ void findclumps( int *status ) {
       irqDelet( indf2, status ); 
       irqNew( indf2, "CUPID", &qlocs, status );
 
-/* Add in two quality names; "CLUMP"and "BACKGROUND". */
+/* Add in quality names; "CLUMP", "BACKGROUND" and "EDGE". */
       irqAddqn( qlocs, "CLUMP", 0, "set iff a pixel is within a clump", 
                 status );
       irqAddqn( qlocs, "BACKGROUND", 0, "set iff a pixel is not within a clump", 
+                status );
+      irqAddqn( qlocs, "EDGE", 0, "set iff a pixel is on the edge of a clump", 
                 status );
 
 /* Transfer the pixel mask to the NDF quality array. */
       irqSetqm( qlocs, 1, "BACKGROUND", el, rmask, &n, status );
       irqSetqm( qlocs, 0, "CLUMP", el, rmask, &n, status );
+
+/* Find the edges of the clumps (all other pixels will be set to
+   VAL__BADR in "rmask"), and then set the "EDGE" Quality flag. */
+      cupidEdges( rmask, el, dims, skip, 1.0, VAL__BADR, status );
+      irqSetqm( qlocs, 0, "EDGE", el, rmask, &n, status );
 
 /* Store the configuration parameters relating to the used algorithm in the 
    CUPID extension. We put them into a new KeyMap so that the CUPID NDF
@@ -940,8 +977,46 @@ void findclumps( int *status ) {
       rmask = astFree( rmask );
       irqRlse( &qlocs, status );
 
-/* Relase the extension locator.*/
+/* If required create the QOUT output NDF containing a copy of the input
+   NDF (minus Quality). Annul the error if a null parameter value is
+   supplied. */
+      if( *status == SAI__OK ) {
+         ndfProp( indf, "Units,Data,Variance,Axis,Wcs", "QOUT", &indf3, 
+                  status ); 
+         if( *status == PAR__NULL ) {
+            errAnnul( status );
+
+/* Copy the Quality component and CUPID extension from the main output
+   NDF. */
+         } else {
+            nloc = NULL;
+            nqloc = NULL;
+            qloc = NULL;
+            qxloc = NULL;
+            xqnloc = NULL;
+
+            ndfLoc( indf2, "READ", &nloc, status );
+            datFind( nloc, "QUALITY", &nqloc, status );
+            ndfLoc( indf3, "READ", &qloc, status );
+            datCopy( nqloc, qloc, "QUALITY", status );
+            datAnnul( &nloc, status );
+            datAnnul( &nqloc, status );
+            datAnnul( &qloc, status );
+
+            ndfXstat( indf3, "CUPID", &there, status );
+            if( there ) ndfXdel( indf3, "CUPID", status );
+            ndfXnew( indf3, "CUPID", "CUPID", 0, 0, &qxloc, status );
+
+            datFind( xloc, "QUALITY_NAMES", &xqnloc, status );
+            datCopy( xqnloc, qxloc, "QUALITY_NAMES", status );
+            datAnnul( &qxloc, status );
+            datAnnul( &xqnloc, status );
+         }
+      }
+
+/* Release the extension locator.*/
       datAnnul( &xloc, status );
+
    }
 
 /* Report the configuration (if any). */

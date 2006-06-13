@@ -222,6 +222,7 @@ void cupidCFXfer( CupidPixelSet *, CupidPixelSet *, int *, int[3], int * );
 void cupidDatCopy( HDSLoc *, HDSLoc *, int * );
 void cupidDumpD( double *, int, int *, int *, int * );
 void cupidDumpI( int *, int, int *, int *, int * );
+void cupidEdges( float *, int, int[3], int[3], float, float, int * );
 void cupidGCListClump( int, int, double *, double, int *, int, double, int * );
 void cupidGCNdfClump( HDSLoc **, double, double *, double, int, int *, int *, int, double *, int *, int *, int, int *, AstKeyMap *, int, int * );
 void cupidGCcalcf( int, double *, int *, double * );

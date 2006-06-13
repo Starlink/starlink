@@ -133,6 +133,16 @@ package cupid {
             helpkey *
           }
 
+         parameter qout {
+            type NDF
+            access WRITE
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Copy of input NDF with Quality mask}
+            default !
+            helpkey *
+          }
+
          parameter repconf {
             type _LOGICAL
             access READ

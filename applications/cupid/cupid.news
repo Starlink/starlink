@@ -7,6 +7,14 @@
  data arrays.
 
 
+Changes introduced at V0.0-19:
+
+ - FINDCLUMPS has a new parameter, QOUT, which specifies the name of a
+   secondary output NDF. This secondary NDF holds a copy of the input NDF,
+   but with the Quality array (and associated quality name information)
+   copied from the main output NDF (specified by parameter OUT).
+
+
 Changes introduced at V0.0-18:
 
  - Guard against null HDS locator errors when GaussClumps cannot find any 

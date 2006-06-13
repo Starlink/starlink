@@ -21,7 +21,7 @@ cupidconfigI.c cupidgclistclump.c cupidgcmodel.c cupidgcchisq.c \
 cupidgccalcf.c cupidgccalcg.c cupidranval.c cupiddumpd.c \
 cupidcferode.c cupidstoreconfig.c cupidstoreclumps.c cupiddatcopy.c \
 cupidcfdeleteps.c cupidcffreeps.c cupidcfxfer.c cupidcfaddpixel.c \
-cupidcflevels.c cupiddumpi.c cupidclumpdesc.c cupidcfnebs.c \
+cupidcflevels.c cupiddumpi.c cupidclumpdesc.c cupidcfnebs.c cupidedges.c \
 cupidcfidl.c cupidcfmakeps.c cupidreinhold.c cupidredges.c cupidrca.c \
 cupidrfillline.c cupidrfillclumps.c cupidrca2.c cupidfellwalker.c \
 cupidgcndfclump.c cupiddefminpix.c cupidretrieveconfig.c \
