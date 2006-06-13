@@ -1156,13 +1156,13 @@ itcl::class gaia::GaiaContour {
       clear_contours 0
       if { $method == "magnitude" } {
          for {set i 0} {$i < $ncont} {incr i} {
-            $itk_component(value$i) configure -value \
-               [expr $start*pow(10.0,-0.4*$i*$incre)]
+            set value [expr $start*pow(10.0,-0.4*$i*$incre)]
+            $itk_component(value$i) configure -value [format "%g" $value]
          }
       } elseif { $method == "linear" } {
          for {set i 0} {$i < $ncont} {incr i} {
-            $itk_component(value$i) configure -value \
-               [expr $start+$i*$incre]
+            set value [expr $start+$i*$incre]
+            $itk_component(value$i) configure -value [format "%g" $value]
          }
       } else {
 
@@ -1178,8 +1178,8 @@ itcl::class gaia::GaiaContour {
 	    set incre [expr double($max-$min)/double($ncont)]
 	    set start [expr $min+$incre*0.5]
 	    for {set i 0} {$i < $ncont} {incr i} {
-	       $itk_component(value$i) configure -value \
-		  [expr $start+$i*$incre]
+               set value [expr $start+$i*$incre]
+	       $itk_component(value$i) configure -value [format "%g" $value]
 	    }
 	 } else {
 
