@@ -273,7 +273,9 @@ itcl::class gaia::GaiaAstDisplayDomains {
 
    #  Method to call when the displayed image changes.
    public method image_changed {} {
-      update_displays_
+      if { $trace_active_ } {
+         update_displays_
+      }
    }
 
    #  Start tracing changes in coordinates.
