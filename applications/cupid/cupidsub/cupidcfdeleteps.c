@@ -64,6 +64,9 @@ CupidPixelSet *cupidCFDeletePS( CupidPixelSet *ps ){
 *-
 */
 
+/* Local Variables: */
+/* (none) */
+
 /* Free the memory used to hold the list of the indices of neighbouring
    clumps. */   
    ps->nebs = astFree( ps->nebs );
