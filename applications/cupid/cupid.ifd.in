@@ -129,7 +129,7 @@ package cupid {
             vpath CURRENT,DEFAULT
             ppath CURRENT,DEFAULT
             prompt {Clump identification algorithm}
-            default GaussClumps
+            default ClumpFind
             helpkey *
           }
 
