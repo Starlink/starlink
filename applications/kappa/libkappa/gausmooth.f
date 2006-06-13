@@ -4,7 +4,7 @@
 *     GAUSMOOTH
 
 *  Purpose:
-*     Smooths a one- or two-dimensional image using a Gaussian filter.
+*     Smooths a one- to three-dimensional NDF using a Gaussian filter.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,15 +20,29 @@
 *        The global status.
 
 *  Description:
-*     This application applies a symmetrical filter to a one- or
-*     two-dimensional image so as to convolve it with a Gaussian point
-*     spread function (PSF) of specified width, or widths and
-*     orientation.  The image is held in an NDF data structure.
+*     This application smooths an NDF using a one- or two-dimensional
+*     symmetrical Gaussian point spread function (PSF) of specified 
+*     width, or widths and orientation.  Each output pixel is the
+*     PSF-weighted mean of the input pixels within the filter box. 
+*
+*     The NDF may have up to three dimensions.  If it has three
+*     dimensions, then the filter is applied in turn to each plane in
+*     the cube and the result written to the corresponding plane in the 
+*     output cube.  The orientation of the smoothing plane can be
+*     specified using the AXES parameter.
 
 *  Usage:
 *     gausmooth in out fwhm
 
 *  ADAM Parameters:
+*     AXES(2) = _INTEGER (Read)
+*        This parameter is only accessed if the NDF has exactly three 
+*        significant pixel axes.  It should be set to the indices of the
+*        NDF  pixel axes which span the plane in which smoothing is to
+*        be applied.  All pixel planes parallel to the specified plane 
+*        will be smoothed independently of each other.  The dynamic 
+*        default comprises the indices of the first two significant 
+*        axes in the NDF. []
 *     BOX() = _INTEGER (Read)
 *        The x and y sizes (in pixels) of the rectangular region over
 *        which the Gaussian PSF should be applied at each point.  The
@@ -62,8 +76,8 @@
 *        smoothing will increase in approximate proportion to the
 *        value(s) of FWHM.  The suggested default is the current value.
 *     IN = NDF (Read)
-*        The input NDF containing the one- or two-dimensional image to
-*        which Gaussian smoothing is to be applied.
+*        The input NDF containing the one-, two-, or three-dimensional 
+*        image to which Gaussian smoothing is to be applied.
 *     ORIENT = _REAL (Read)
 *        The orientation of the major axis of the elliptical Gaussian
 *        PSF, measured in degrees in an anti-clockwise direction from
@@ -164,8 +178,11 @@
 
 *  Copyright:
 *     Copyright (C) 1000, 1990, 1992 Science & Engineering Research
-*     Council. Copyright (C) 1995, 1998, 2000, 2004 Central Laboratory
-*     of the Research Councils. All Rights Reserved.
+*         Council. 
+*     Copyright (C) 1995, 1998, 2000, 2004 Central Laboratory
+*         of the Research Councils. All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -221,7 +238,10 @@
 *     19-APR-2000 (DSB):
 *        Increased upper limit on FWHM from 100 to 10000.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 June 9 (MJC):
+*        Added support for smoothing all two-dimensional planes in a
+*        three-dimensional cube.
 *     {enter_further_changes_here}
 
 *-
@@ -248,6 +268,7 @@
       CHARACTER * ( NDF__SZFTP ) DTYPE ! Numeric type for output arrays
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Numeric type for processing
       DOUBLE PRECISION WLIM      ! Limit on weighted sum of good pixels
+      INTEGER AXSUM              ! Sum of all significant pixel axes
       INTEGER BOX( NDIM )        ! Smoothing box size
       INTEGER BOXDEF( NDIM )     ! Default sizes for the rectangular box
       INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
@@ -256,23 +277,35 @@
       INTEGER IBOX               ! Smoothing box half-size
       INTEGER IERR               ! Index of the first type-conversion
                                  ! error
+      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF pixel axes
       INTEGER JBOX               ! Smoothing box half-size in y
                                  ! direction
+      INTEGER NAX                ! Number of significant pixel axes
       INTEGER NDF1               ! Identifier for input NDF
+      INTEGER NDF1B              ! Section of input NDF to be smoothed
       INTEGER NDF2               ! Identifier for output NDF
+      INTEGER NDF2B              ! Section of output NDF to be filled
       INTEGER NDIMS              ! Number of NDF dimensions
       INTEGER NERR               ! Number of type-conversion errors
       INTEGER NOFWHM             ! Number of FWHM values
       INTEGER NVAL               ! Number of BOX values
+      INTEGER PAXHI              ! Upper pixel bound of perp. axis 
+      INTEGER PAXLO              ! Lower pixel bound of perp. axis 
+      INTEGER PAXVAL             ! Current pixel value on perp. axis 
+      INTEGER PERPAX             ! Index of axis perp. to smoothing 
+                                 ! plane
       INTEGER PNTR1( 2 )         ! Pointers for mapped input arrays
       INTEGER PNTR2( 2 )         ! Pointers for mapped output arrays
       INTEGER SDIM( NDF__MXDIM ) ! Significant NDF dimensions
+      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF pixel axes
       INTEGER WDIM               ! Dimension of workspace array
       INTEGER WPNTR1             ! Mapped workspace pointer
       INTEGER WPNTR2             ! Mapped workspace pointer
       INTEGER WPNTR3             ! Mapped workspace pointer
       LOGICAL BAD                ! Check for bad input pixels?
+      LOGICAL BADDAT             ! Bad values stored in o/p data array?
       LOGICAL BADOUT             ! Bad pixels in output array?
+      LOGICAL BADVAR             ! Bad values stored in o/p variance?
       LOGICAL CIRCUL             ! Circular Gaussian PSF?
       LOGICAL SAMBAD             ! Propagate bad pixels to same place?
       LOGICAL VAR                ! Variance array present?
@@ -299,15 +332,54 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Access the input NDF and obtain the significant dimensions to smooth.
+*  =====================================================================
+
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
 *  Obtain the input NDF.
       CALL LPG_ASSOC( 'IN', 'READ', NDF1, STATUS )
 
-*  Find whether or not there are no more than two significant
-*  dimensions and which ones they are.
-      CALL KPG1_SDIMP( NDF1, NDIM, SDIM, STATUS )
+*  Determine the NDF bounds.  
+      CALL NDF_BOUND( NDF1, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
+
+*  Count the number of significant pixel axes, storing the indices of
+*  the first two in SDIM.  Also note the index of the first 
+*  insignificant pixel axis.
+      AXSUM = 0
+      NAX = 0
+      PERPAX = 0
+      DO I = 1, NDIMS
+         DIM( I ) = UBND( I ) - LBND( I ) + 1
+         IF ( DIM( I ) .GT. 1 ) THEN
+            NAX = NAX + 1
+            IF ( NAX .LT. 3 ) SDIM( NAX ) = I
+            AXSUM = AXSUM + I
+         ELSE IF ( PERPAX .EQ. 0 ) THEN
+            PERPAX = I
+         END IF
+      END DO
+
+*  If there is no insignificant axis, use an additional trailing axis.
+      IF ( PERPAX .EQ. 0 ) PERPAX = NDIMS + 1
+
+*  If there are exactly three significant pixel axes, see which two 
+*  span the plane to be smoothed.
+      IF ( NAX .EQ. 3 ) THEN
+         CALL PAR_GDR1I( 'AXES', 2, SDIM, 1, NDIMS, .TRUE., SDIM, 
+     :                   STATUS )
+
+*  Find the index of the pixel axis which is perpendicular to the 
+*  smoothing plane.
+         PERPAX = AXSUM - SDIM( 1 ) - SDIM( 2 )
+
+*  If the NDF does not have exactly three significant axes, find whether
+*  or not there are no more than two significant dimensions and which 
+*  ones they are.
+      ELSE
+         CALL KPG1_SDIMP( NDF1, NDIM, SDIM, STATUS )
+      END IF
 
 *  Exit if an error occurred.  This is needed because the significant
 *  dimensions are used as array indices.
@@ -315,9 +387,11 @@
 
 *  Determine its dimensions (note that only two significant dimensions
 *  can be accommodated).  Then ignore non-significant dimensions.
-      CALL NDF_DIM( NDF1, SDIM( NDIM ), DIM, NDIMS, STATUS )
       DIM( 1 ) = DIM( SDIM( 1 ) )
       DIM( 2 ) = DIM( SDIM( 2 ) )
+
+*  Decide whether the Gaussian smoothing is circularly symmetric or not.
+*  =====================================================================
 
 *  Determine if the input NDF is one or two-dimensional.
       CIRCUL = DIM( 1 ) .EQ. 1 .OR. DIM( 2 ) .EQ. 1
@@ -350,6 +424,8 @@
          SIGMA( I ) = FWHM( I ) / SQRT( 8.0 * LOG( 2.0 ) )
       END DO
 
+*  Obtain the other appropriate parameter values.
+*  ==============================================
       IF ( CIRCUL ) THEN
 
 *  Obtain a smoothing box size (this defines the absolute limits of the
@@ -360,7 +436,7 @@
          BOXDEF( 1 ) = 2 * NINT( 3.0 * SIGMA( 1 ) ) + 1
          CALL PAR_DEF1I( 'BOX', 1, BOXDEF, STATUS )
 
-         IF( STATUS .NE. SAI__OK ) GO TO 99
+         IF ( STATUS .NE. SAI__OK ) GO TO 99
          CALL PAR_GDRVI( 'BOX', NDIM, 1, VAL__MAXI, BOX, NVAL, STATUS )
 
          IF( STATUS .EQ. PAR__NULL ) THEN
@@ -446,6 +522,9 @@
       END IF
       CALL ERR_RLSE
 
+*  Determine which arrays to process and the precision.
+*  ====================================================
+
 *  Determine if a variance component is present and derive a list of
 *  the components to be processed.
       CALL NDF_STATE( NDF1, 'Variance', VAR, STATUS )
@@ -467,16 +546,11 @@
      :               STATUS )
       CALL NDF_STYPE( DTYPE, NDF2, COMP, STATUS )
 
-*  Map the input and output arrays.
-      CALL KPG1_MAP( NDF1, COMP, ITYPE, 'READ', PNTR1, EL, STATUS )
-      CALL KPG1_MAP( NDF2, COMP, ITYPE, 'WRITE', PNTR2, EL, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
-
 *  See if it is necessary to check for bad pixels in the input arrays.
       CALL NDF_MBAD( .TRUE., NDF1, NDF1, COMP, .FALSE., BAD, STATUS )
 
-*  Perform smoothing using a circular Gaussian PSF.
-*  ================================================
+*  Do the steps that can be performed outside the loop.
+*  ====================================================
       IF ( CIRCUL ) THEN
 
 *  Obtain workspace arrays for the smoothing algorithm and map them.
@@ -485,69 +559,16 @@
          CALL PSX_CALLOC( DIM( 1 ), ITYPE, WPNTR2, STATUS )
          CALL PSX_CALLOC( DIM( 1 ), ITYPE, WPNTR3, STATUS )
 
-*  Apply smoothing to the mapped data array, using the appropriate
-*  numeric type of processing.
-         IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_GAUSR( SIGMA, IBOX, SAMBAD, SNGL( WLIM ),
-     :                       DIM( 1 ), DIM( 2 ), BAD, .FALSE.,
-     :                       %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
-     :                       %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
-     :                       BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ), 
-     :                       %VAL( CNF_PVAL( WPNTR2 ) ),
-     :                       %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_GAUSD( SIGMA, IBOX, SAMBAD, WLIM, DIM( 1 ),
-     :                       DIM( 2 ), BAD, .FALSE., 
-     :                       %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( PNTR2( 1 ) ) ), BADOUT, 
-     :                       %VAL( CNF_PVAL( WPNTR1 ) ),
-     :                       %VAL( CNF_PVAL( WPNTR2 ) ), 
-     :                       %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
-         END IF
-
-*  Set the output bad-pixel flag of the data array.
-         CALL NDF_SBAD( BADOUT, NDF2, 'Data', STATUS )
-
-*  If a variance array is present, then also apply smoothing to it.
-         IF ( VAR ) THEN
-            IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_GAUSR( SIGMA, IBOX, SAMBAD, SNGL( WLIM ),
-     :                          DIM( 1 ), DIM( 2 ), BAD, .TRUE.,
-     :                          %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
-     :                          %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
-     :                          BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ), 
-     :                          %VAL( CNF_PVAL( WPNTR2 ) ),
-     :                          %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
-
-            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_GAUSD( SIGMA, IBOX, SAMBAD, WLIM, DIM( 1 ),
-     :                          DIM( 2 ), BAD, .TRUE.,
-     :                          %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
-     :                          %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
-     :                          BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ), 
-     :                          %VAL( CNF_PVAL( WPNTR2 ) ),
-     :                           %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
-            END IF
-
-*  Set the output bad-pixel flag of the variance array.
-            CALL NDF_SBAD( BADOUT, NDF2, 'Variance', STATUS )
-         END IF
-
-*  Release the temporary workspace arrays.
-         CALL PSX_FREE( WPNTR1, STATUS )
-         CALL PSX_FREE( WPNTR2, STATUS )
-         CALL PSX_FREE( WPNTR3, STATUS )
-
-*  Perform smoothing using an elliptical Gaussian PSF.
-*  ===================================================
       ELSE
-
-*  Obtain workspace arrays for the smoothing algorithm and map them.
          WDIM = ( 2 * IBOX + 1 ) * ( 2 * JBOX + 1 )
          CALL PSX_CALLOC( WDIM, '_REAL', WPNTR1, STATUS )
 
-*  Find the axis raio of the ellipical PSF.
+*  Get some more workspace for a double-precision version of the
+*  weights.
+         IF ( ITYPE .EQ. '_DOUBLE' )
+     :     CALL PSX_CALLOC( WDIM, ITYPE, WPNTR2, STATUS )
+
+*  Find the axis ratio of the ellipical PSF.
          AXISR = MAX( FWHM( 1 ), FWHM( 2 ) ) /
      :           MIN( FWHM( 1 ), FWHM( 2 ) )
 
@@ -555,14 +576,10 @@
 *  a Gaussian.
          CALL KPS1_PSEVL( AXISR, RORI, MIN( FWHM( 1 ), FWHM( 2 ) ),
      :                    2.0, 1, 2 * IBOX + 1, 1, 2 * JBOX + 1,
-     :                    REAL( IBOX )+0.5, REAL( JBOX )+0.5, 
+     :                    REAL( IBOX ) + 0.5, REAL( JBOX ) + 0.5, 
      :                    %VAL( CNF_PVAL( WPNTR1 ) ), STATUS )
 
          IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-
-*  Get some more workspace for a double-precision version of the
-*  weights.
-            CALL PSX_CALLOC( WDIM, ITYPE, WPNTR2, STATUS )
 
 *  Make a double-precision copy of the array of weights.
             CALL VEC_RTOD( .FALSE., WDIM, %VAL( CNF_PVAL( WPNTR1 ) ),
@@ -570,55 +587,160 @@
      :                     IERR, NERR, STATUS )
          END IF
 
+      END IF
+
+*  Loop around planes.
+*  ===================
+
+*  Initialise bad-data and bad-variance flags.
+      BADDAT = .FALSE.
+      BADVAR = .FALSE.
+
+*  Loop round every slice to be smoothed.
+      PAXLO = LBND( PERPAX )
+      PAXHI = UBND( PERPAX )
+      DO PAXVAL = PAXLO, PAXHI
+
+*  Get identifiers for the required slices of the input and output NDF.
+         LBND( PERPAX ) = PAXVAL
+         UBND( PERPAX ) = PAXVAL
+         CALL NDF_SECT( NDF1, NDF__MXDIM, LBND, UBND, NDF1B, STATUS )
+         CALL NDF_SECT( NDF2, NDF__MXDIM, LBND, UBND, NDF2B, STATUS )
+
+*  Map these input and output arrays.
+         CALL KPG1_MAP( NDF1B, COMP, ITYPE, 'READ', PNTR1, EL, STATUS )
+         CALL KPG1_MAP( NDF2B, COMP, ITYPE, 'WRITE', PNTR2, EL, STATUS )
+         IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+*  Perform smoothing using a circular Gaussian PSF.
+*  ================================================
+         IF ( CIRCUL ) THEN
+
 *  Apply smoothing to the mapped data array, using the appropriate
 *  numeric type of processing.
-         IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_AKERR( IBOX, JBOX, %VAL( CNF_PVAL( WPNTR1 ) ), 
-     :                       SAMBAD,
-     :                       SNGL( WLIM ), DIM( 1 ), DIM( 2 ), BAD,
-     :                       .FALSE., %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
-     :                       BADOUT, STATUS )
+            IF ( ITYPE .EQ. '_REAL' ) THEN
+               CALL KPG1_GAUSR( SIGMA, IBOX, SAMBAD, SNGL( WLIM ),
+     :                          DIM( 1 ), DIM( 2 ), BAD, .FALSE.,
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
+     :                          BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR2 ) ),
+     :                          %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
 
-         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_AKERD( IBOX, JBOX, %VAL( CNF_PVAL( WPNTR2 ) ), 
-     :                       SAMBAD,
-     :                       WLIM, DIM( 1 ), DIM( 2 ), BAD, .FALSE.,
-     :                       %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
-     :                       %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
-     :                       BADOUT, STATUS )
-         END IF
+            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+               CALL KPG1_GAUSD( SIGMA, IBOX, SAMBAD, WLIM, DIM( 1 ),
+     :                          DIM( 2 ), BAD, .FALSE., 
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), BADOUT, 
+     :                          %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                          %VAL( CNF_PVAL( WPNTR2 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
+            END IF
 
-*  Set the output bad-pixel flag of the data array.
-         CALL NDF_SBAD( BADOUT, NDF2, 'Data', STATUS )
+*  Update the bad-data flag.
+            IF ( BADOUT ) BADDAT = .TRUE.
 
 *  If a variance array is present, then also apply smoothing to it.
-         IF ( VAR ) THEN
+            IF ( VAR ) THEN
+               IF ( ITYPE .EQ. '_REAL' ) THEN
+                  CALL KPG1_GAUSR( SIGMA, IBOX, SAMBAD, SNGL( WLIM ),
+     :                             DIM( 1 ), DIM( 2 ), BAD, .TRUE.,
+     :                             %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
+     :                             BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR2 ) ),
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
+
+               ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+                  CALL KPG1_GAUSD( SIGMA, IBOX, SAMBAD, WLIM, DIM( 1 ),
+     :                             DIM( 2 ), BAD, .TRUE.,
+     :                             %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                             %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
+     :                             BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR2 ) ),
+     :                             %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
+               END IF
+
+*  Update the bad-variance flag.
+               IF ( BADOUT ) BADVAR = .TRUE.
+            END IF
+
+
+*  Perform smoothing using an elliptical Gaussian PSF.
+*  ===================================================
+         ELSE
+
+*  Apply smoothing to the mapped data array, using the appropriate
+*  numeric type of processing.
             IF ( ITYPE .EQ. '_REAL' ) THEN
                CALL KPG1_AKERR( IBOX, JBOX, %VAL( CNF_PVAL( WPNTR1 ) ), 
      :                          SAMBAD,
      :                          SNGL( WLIM ), DIM( 1 ), DIM( 2 ), BAD,
-     :                          .TRUE., %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
-     :                          %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                          .FALSE., %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
      :                          BADOUT, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPG1_AKERD( IBOX, JBOX, %VAL( CNF_PVAL( WPNTR2 ) ), 
      :                          SAMBAD,
-     :                          WLIM, DIM( 1 ), DIM( 2 ), BAD,
-     :                          .TRUE., %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
-     :                          %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                          WLIM, DIM( 1 ), DIM( 2 ), BAD, .FALSE.,
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                          BADOUT, STATUS )
             END IF
 
-*  Set the output bad-pixel flag of the variance array.
-            CALL NDF_SBAD( BADOUT, NDF2, 'Variance', STATUS )
+*  Update the bad-data flag.
+            IF ( BADOUT ) BADDAT = .TRUE.
+
+*  If a variance array is present, then also apply smoothing to it.
+            IF ( VAR ) THEN
+               IF ( ITYPE .EQ. '_REAL' ) THEN
+                  CALL KPG1_AKERR( IBOX, JBOX, 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ), SAMBAD,
+     :                             SNGL( WLIM ), DIM( 1 ), DIM( 2 ), 
+     :                             BAD, .TRUE., 
+     :                             %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
+     :                             %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                             BADOUT, STATUS )
+
+               ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+                  CALL KPG1_AKERD( IBOX, JBOX, 
+     :                             %VAL( CNF_PVAL( WPNTR2 ) ), SAMBAD,
+     :                             WLIM, DIM( 1 ), DIM( 2 ), BAD,
+     :                             .TRUE., 
+     :                             %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
+     :                             %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                             BADOUT, STATUS )
+               END IF
+
+*  Update the bad-variance flag.
+               IF ( BADOUT ) BADVAR = .TRUE.
+            END IF
+
          END IF
 
-*  Release the temporary workspace arrays.
-         CALL PSX_FREE( WPNTR1, STATUS )
-         IF ( ITYPE .EQ. '_DOUBLE' ) CALL PSX_FREE( WPNTR2, STATUS )
+*  Free the section identifiers.
+         CALL NDF_ANNUL( NDF1B, STATUS )
+         CALL NDF_ANNUL( NDF2B, STATUS )
 
+      END DO
+
+*  Set the output bad-pixel flag of the data array.
+      CALL NDF_SBAD( BADDAT, NDF2, 'Data', STATUS )
+
+*  Set the output bad-pixel flag of the variance array.
+      IF ( VAR ) CALL NDF_SBAD( BADVAR, NDF2, 'Variance', STATUS )
+
+*  Tidy up.
+*  ========
+
+*  Release the temporary workspace arrays.
+      CALL PSX_FREE( WPNTR1, STATUS )
+      IF ( CIRCUL ) THEN
+         CALL PSX_FREE( WPNTR2, STATUS )
+         CALL PSX_FREE( WPNTR3, STATUS )
+      ELSE
+         IF ( ITYPE .EQ. '_DOUBLE' ) CALL PSX_FREE( WPNTR2, STATUS )
       END IF
 
 *  Obtain a new title for the output NDF.  The input NDF's title was
@@ -633,8 +755,8 @@
 *  If an error occurred, then report contextual information.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'GAUSMOOTH_ERR',
-     :     'GAUSMOOTH: Error smoothing a two-dimensional image using '/
-     :     /'a Gaussian filter.', STATUS )
+     :     'GAUSMOOTH: Error smoothing an NDF using a one- or '/
+     :     /'two-dimensional Gaussian filter.', STATUS )
       END IF
 
       END
