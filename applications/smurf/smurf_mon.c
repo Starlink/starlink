@@ -61,6 +61,10 @@
 *        Add qlmakemap
 *     2006-04-12 (EC):
 *        Modified call to createwcs for new interface
+*     2006-06-06 (AGG):
+*        Add simulator task, sim
+*     2006-06-13 (AGG):
+*        Add dreamsolve
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -174,6 +178,8 @@ void smurf_mon( int * status ) {
     smurf_scanfit( status );
   } else if (strcmp( taskname, "SIM" ) == 0 ) {
     smurf_sim( status );
+  } else if (strcmp( taskname, "DREAMSOLVE" ) == 0 ) {
+    smurf_dreamsolve( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

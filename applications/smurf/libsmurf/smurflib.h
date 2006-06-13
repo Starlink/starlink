@@ -32,8 +32,10 @@
 *        Add remsky
 *     2006-03-16 (AGG):
 *        Add qlmakemap
-*     2006-06-06 (AGG)
+*     2006-06-06 (AGG):
 *        Add smurf_sim
+*     2006-06-13 (AGG):
+*        Add smurf_dreamsolve
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -70,5 +72,6 @@ void smurf_qlmakemap( int * );
 void smurf_remsky( int * );
 void smurf_scanfit( int * );
 void smurf_sim( int * );
+void smurf_dreamsolve( int * );
 
 #endif /* SMURF_LIB_DEFINED */
