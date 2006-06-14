@@ -1442,8 +1442,6 @@ sub solve {
       my $rad0 = $r0->arcmin;
       push @radii, $rad0;
 
-=head1 COMMENT
-
       # Now for the corners. They're boxes that are 10% of the
       # width/height. We can set up one Tran2 call to save time. Find
       # coordinates in the following order: bottom-left centre,
@@ -1468,49 +1466,53 @@ sub solve {
                                                         $ymax ],
                                                       1 );
 
-      # Just push them on in order.
+      # Bottom-left.
       my $coords1 = new Astro::Coords( ra => $ra_ref->[0],
                                        dec => $dec_ref->[0],
                                        type => 'J2000',
                                        units => 'radians' );
-      push @coords, $coords1;
+#      push @coords, $coords1;
       my $r1 = $coords1->distance( new Astro::Coords( ra => $ra_ref->[1],
                                                       dec => $dec_ref->[1],
                                                       type => 'J2000',
                                                       units => 'radians' ) );
-      push @radii, $r1->arcmin;
+#      push @radii, $r1->arcmin;
+
+      # Top-left.
       my $coords2 = new Astro::Coords( ra => $ra_ref->[2],
                                        dec => $dec_ref->[2],
                                        type => 'J2000',
                                        units => 'radians' );
-      push @coords, $coords2;
+#      push @coords, $coords2;
       my $r2 = $coords2->distance( new Astro::Coords( ra => $ra_ref->[3],
                                                       dec => $dec_ref->[3],
                                                       type => 'J2000',
                                                       units => 'radians' ) );
-      push @radii, $r2->arcmin;
+#      push @radii, $r2->arcmin;
+
+      # Bottom-right.
       my $coords3 = new Astro::Coords( ra => $ra_ref->[4],
                                        dec => $dec_ref->[4],
                                        type => 'J2000',
                                        units => 'radians' );
-      push @coords, $coords3;
+#      push @coords, $coords3;
       my $r3 = $coords3->distance( new Astro::Coords( ra => $ra_ref->[5],
                                                       dec => $dec_ref->[5],
                                                       type => 'J2000',
                                                       units => 'radians' ) );
-      push @radii, $r3->arcmin;
+#      push @radii, $r3->arcmin;
+
+      # Top-right.
       my $coords4 = new Astro::Coords( ra => $ra_ref->[6],
                                        dec => $dec_ref->[6],
                                        type => 'J2000',
                                        units => 'radians' );
-      push @coords, $coords4;
+#      push @coords, $coords4;
       my $r4 = $coords4->distance( new Astro::Coords( ra => $ra_ref->[7],
                                                       dec => $dec_ref->[7],
                                                       type => 'J2000',
                                                       units => 'radians' ) );
-      push @radii, $r4->arcmin;
-
-=cut
+#      push @radii, $r4->arcmin;
 
       # Do the queries.
       $querycat = new Astro::Catalog;
