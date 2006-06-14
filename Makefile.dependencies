@@ -231,6 +231,8 @@ $(MANIFESTS)/cat: \
 	cd libraries/cat \
 	  && $(MAKE_CPT)
 
+# Component ccdpack has configure dependencies on { blt itcl tcl tk },
+# which must be built before this component is configured.
 $(MANIFESTS)/ccdpack: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ard \
@@ -375,6 +377,7 @@ $(MANIFESTS)/cupid: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
 		$(MANIFESTS)/cat \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
@@ -507,6 +510,7 @@ $(MANIFESTS)/dipso: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
 		$(MANIFESTS)/cat \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
@@ -561,6 +565,7 @@ $(MANIFESTS)/echomop: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
 		$(MANIFESTS)/cat \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
@@ -1165,6 +1170,7 @@ $(MANIFESTS)/kaplibs: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
 		$(MANIFESTS)/cat \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
@@ -1260,6 +1266,7 @@ $(MANIFESTS)/kaprh: \
 		$(MANIFESTS)/ard \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
 		$(MANIFESTS)/cat \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
@@ -1635,6 +1642,7 @@ $(MANIFESTS)/polpack: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
 		$(MANIFESTS)/cat \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
