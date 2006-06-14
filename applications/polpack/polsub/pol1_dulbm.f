@@ -128,6 +128,8 @@
 *        Always map the NDF arrays as _REAL.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     14-JUN-2006 (DSB):
+*        Propagate NDF units.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -245,6 +247,7 @@
       CHARACTER * ( 40 ) LABEL   ! Label for output NDF
       CHARACTER * ( 3 ) PLANES   ! Quantities stored in output planes
       CHARACTER * ( DAT__SZLOC ) XLOC ! Locator for output POLPACK extension
+      CHARACTER * ( 60 ) UNIT    ! NDF units
       
       LOGICAL DESCOK             ! Image descriptors OK?
       LOGICAL GOTVAR             ! Was value supplied for parameter VARIANCE?
@@ -311,6 +314,10 @@
 *  NDF. Note, accept 3 dimensions since each input image may be a slice
 *  out of a 3D X/Y/frequency cube.
       CALL NDF_BOUND( NDFIN( 1 ), 3, LBND, UBND, NDIM, STATUS )
+
+*  Get the Units from the first NDF.
+      UNIT = ' '
+      CALL NDF_CGET( NDFIN( 1 ), 'Units', UNIT, STATUS )
 
 *  Store the bounds of the Z planes.
       IF( NDIM .EQ. 2 ) THEN
@@ -707,8 +714,9 @@
       CALL NDF_CPUT( TITLE, NDFOUT, 'TITLE', STATUS )
       CALL NDF_CINP( 'TITLE', NDFOUT, 'TITLE', STATUS )
 
-*  Set the LABEL component for the output.
+*  Set the LABEL and UNITS components for the output.
       CALL NDF_CPUT( LABEL, NDFOUT, 'LABEL', STATUS )
+      CALL NDF_CPUT( UNIT, NDFOUT, 'UNITS', STATUS )
 
 *  Create a POLPACK extension containing a character array identifying the
 *  quantities stored in each plane of the DATA array.

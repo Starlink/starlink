@@ -125,6 +125,8 @@
 *        axis.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     14-JUN-2006 (DSB):(TIMJ):
+*        Propagate NDF units.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -342,11 +344,12 @@
 
 *  Initially create the output NDF by propagation from the first input
 *  NDF. This will create a 2/3D NDF. We will convert it into a 3/4D NDF 
-*  later. Propagation from the input NDF ensures that WCS and AXIS  (etc)
-*  information is copied from input to output. The HISTORY, LABEL and 
+*  later. Propagation from the input NDF ensures that UNITS, WCS and AXIS  
+*  (etc) information is copied from input to output. The HISTORY, LABEL and 
 *  TITLE components (but no extensions) are also propagated.
-      CALL NDF_PROP( INDF1, 'WCS,AXIS,NOEXT(FITS,CCDPACK,POLPACK)', 
-     :               'OUT', INDFO, STATUS )
+      CALL NDF_PROP( INDF1, 'UNITS,WCS,AXIS,'//
+     :               'NOEXT(FITS,CCDPACK,POLPACK)', 'OUT', INDFO, 
+     :               STATUS )
 
 *  Set the LABEL component for the output.
       CALL NDF_CPUT( 'Stokes parameters (I, Q, U)', INDFO, 'LABEL', 
