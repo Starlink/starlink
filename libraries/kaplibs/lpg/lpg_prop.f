@@ -49,7 +49,8 @@
 *        A comma-separated list of the NDF components which are to be
 *        propagated to the new data structure. By default, the HISTORY,
 *        LABEL and TITLE components and all extensions are propagated.
-*        See the "Component Propagation" section for further details.
+*        See the "Component Propagation" section in the documentation
+*        for routine NDF_PROP within SUN/33 for further details.
 *     PARAM = CHARACTER * ( * ) (Given)
 *        Name of the parameter for the new NDF.
 *     INDF2 = INTEGER (Returned)
