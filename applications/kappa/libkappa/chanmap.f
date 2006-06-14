@@ -286,6 +286,10 @@
 *     2006 June 9 (MJC):
 *        Use a temporary NDF as intermediary to obtain file-size 
 *        compression of the output NDF.
+*     2006 June 14 (MJC):
+*        Allow for no WCS component in the supplied cube NDF; create
+*        a renamed copy of the current Frame to assure that there is 
+*        a three-dimensional Frame in the output NDF.
 *     {enter_further_changes_here}
 
 *-
@@ -371,6 +375,7 @@
       INTEGER GFRMO              ! Output GRID Frame pointer
       INTEGER GMAP               ! Pointer to Mapping from GRID Frame 
                                  ! to Current Frame, input NDF
+      LOGICAL GOTWCS             ! Input NDF contains WCS information?
       DOUBLE PRECISION GRDPOS( NDIM ) ! Valid grid Frame position
       LOGICAL HIGHER             ! Significant dimensions above collapse
                                  ! axis?
@@ -436,12 +441,14 @@
                                  ! 2-D Frame to 3-D Current Frame 
       INTEGER NAXC               ! Original number of current Frame axes
       INTEGER NBLOCK             ! Number of NDF blocks
+      INTEGER NC                 ! Used length of string
       INTEGER NCOMP              ! No. of components within cell of AXIS
                                  ! array
-      INTEGER NERR               ! Number of numerical errors
-      INTEGER NC                 ! Used length of string
       INTEGER ND                 ! Number of dimensions (dummy)
       INTEGER NDIMO              ! Number of pixel axes in output NDF
+      INTEGER NERR               ! Number of numerical errors
+      CHARACTER NEWDOM*( 2 )     ! Domain name for revised current Frame
+      INTEGER NEWFRM             ! Pointer to revised current Frame
       INTEGER NOCHAN             ! Number of channels
       INTEGER NSHAPE             ! Number of shape values
       INTEGER NVAL               ! Number of values obtained (1)
@@ -524,6 +531,26 @@
       CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
       NAXC = AST_GETI( CFRM, 'NAXES', STATUS )
       TTLC = AST_GETC( CFRM, 'TITLE', STATUS )
+
+*  While the NDF system makes GRID, AXIS, and PIXEL Frames accessible,
+*  even if there is no WCS component in the suppled NDF, NDF_PTWCS 
+*  (called later) strips out any Frames with Domain names GRID, AXIS, or
+*  PIXEL, regardless of how many axes those Frames have.  We must
+*  therefore add a new Frame with a different Domain name to preserve 
+*  the three-dimensional information in the two-dimensional NDF.
+      CALL NDF_STATE( INDFI, 'WCS', GOTWCS, STATUS )
+      IF ( .NOT. GOTWCS ) THEN
+         NEWDOM = '3D'
+         IAT = 2
+         CALL CHR_APPND( AST_GETC( CFRM, 'Domain', STATUS ),
+     :                   NEWDOM, IAT )
+         NEWFRM = AST_COPY( CFRM, STATUS )
+         CALL AST_SETC( NEWFRM, 'Domain', NEWDOM, STATUS )
+
+         CALL AST_ADDFRAME( IWCS, AST__CURRENT, 
+     :                      AST_UNITMAP( 3, ' ', STATUS ), NEWFRM, 
+     :                      STATUS )
+      END IF
 
 *  Find the index of the PIXEL Frame.
       CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
@@ -763,7 +790,6 @@
          SHAPE( 2 ) = ( NOCHAN - 1 ) / SHAPE( 1 ) + 1
       END IF
       
-
 *  Define the output NDF's bounds.
 *  ===============================
 
