@@ -400,6 +400,8 @@ sub extract {
     my $x_origin = $lbnd[0];
     my $y_origin = $lbnd[1];
 
+    my @regions;
+
     # Central patch.
     my %region = ( x_start => int( $lbnd[0] + 0.375 * $width ),
                    x_end   => int( $lbnd[0] + 0.625 * $width ),
@@ -407,58 +409,72 @@ sub extract {
                    y_end   => int( $lbnd[1] + 0.625 * $height ),
                  );
 
+    push @regions, \%region;
+
+    # Top-left corner;
+    my %region_tl = ( x_start => int( $lbnd[0] ),
+                      x_end   => int( $lbnd[0] + 0.15 * $width ),
+                      y_start => int( $ubnd[1] - 0.15 * $height ),
+                      y_end   => int( $ubnd[1] ) );
+#    push @regions, \%region_tl;
+
     # Get a new temporary file name for the catalogue.
     $self->_catalog_file_name( 1 );
     $self->catalog_name( $self->_catalog_file_name );
     $self->_write_config_temp_file;
 
-    # Set up the NDF region.
-    my $ndfregion = '(';
-    $ndfregion   .= $region{x_start};
-    $ndfregion   .= ':';
-    $ndfregion   .= $region{x_end};
-    $ndfregion   .= ',';
-    $ndfregion   .= $region{y_start};
-    $ndfregion   .= ':';
-    $ndfregion   .= $region{y_end};
-    $ndfregion   .= ')';
+    foreach my $region ( @regions ) {
 
-    # Do the extraction.
-    my $ams = new Starlink::AMS::Init(1);
-    my $set_messages = $ams->messages;
-    if( ! defined( $set_messages ) ) {
-      $ams->messages( $self->messages );
-    }
-    $ams->timeout( $self->timeout );
-    if( ! defined $TASK ) {
-      $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
-    }
-    my $STATUS = $TASK->contactw;
-    if( ! $STATUS ) {
-      croak "Could not contact EXTRACTOR monolith";
-    }
-    $STATUS = $TASK->obeyw("extract", "image=$ndf$ndfregion config=" . $self->_config_file_name );
-    if( $STATUS != SAI__OK && $STATUS != &Starlink::ADAM::DTASK__ACTCOMPLETE ) {
-      ( my $facility, my $ident, my $text ) = get_facility_error( $STATUS );
-      croak "Error in running EXTRACTOR: $STATUS - $text";
+      # Set up the NDF region.
+      my $ndfregion = '(';
+      $ndfregion   .= $region->{x_start};
+      $ndfregion   .= ':';
+      $ndfregion   .= $region->{x_end};
+      $ndfregion   .= ',';
+      $ndfregion   .= $region->{y_start};
+      $ndfregion   .= ':';
+      $ndfregion   .= $region->{y_end};
+      $ndfregion   .= ')';
+
+      # Do the extraction.
+      my $ams = new Starlink::AMS::Init(1);
+      my $set_messages = $ams->messages;
+      if( ! defined( $set_messages ) ) {
+        $ams->messages( $self->messages );
+      }
+      $ams->timeout( $self->timeout );
+      if( ! defined $TASK ) {
+        $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
+      }
+      my $STATUS = $TASK->contactw;
+      if( ! $STATUS ) {
+        croak "Could not contact EXTRACTOR monolith";
+      }
+      $STATUS = $TASK->obeyw("extract", "image=$ndf$ndfregion config=" . $self->_config_file_name );
+      if( $STATUS != SAI__OK && $STATUS != &Starlink::ADAM::DTASK__ACTCOMPLETE ) {
+        ( my $facility, my $ident, my $text ) = get_facility_error( $STATUS );
+        croak "Error in running EXTRACTOR: $STATUS - $text";
+      }
+
+      # Form a catalogue from Astro::Catalog.
+      my $newcatalog = new Astro::Catalog( Format => 'SExtractor',
+                                           File => $self->_catalog_file_name,
+                                           ReadOpt => { Filter => $filter },
+                                         );
+
+      # We need to add x_start and y_start to the x and y positions of
+      # each detected object.
+      foreach my $star ( $newcatalog->stars ) {
+        $star->x( $star->x + $region->{x_start} - $x_origin );
+        $star->y( $star->y + $region->{y_start} - $y_origin );
+      }
+
+      # Merge it in with the main catalog;
+      my @newstars = $newcatalog->allstars;
+      $catalog->pushstar( @newstars );
+
     }
 
-    # Form a catalogue from Astro::Catalog.
-    my $newcatalog = new Astro::Catalog( Format => 'SExtractor',
-                                         File => $self->_catalog_file_name,
-                                         ReadOpt => { Filter => $filter },
-                                       );
-
-    # We need to add x_start and y_start to the x and y positions of
-    # each detected object.
-    foreach my $star ( $newcatalog->stars ) {
-      $star->x( $star->x + $region{x_start} - $x_origin );
-      $star->y( $star->y + $region{y_start} - $y_origin );
-    }
-
-    # Merge it in with the main catalog;
-    my @newstars = $newcatalog->allstars;
-    $catalog->pushstar( @newstars );
 
   } else {
 
