@@ -343,8 +343,17 @@ package @PACKAGE@ {
      }
      action sim {
 
-          parameter obsxmlfile {
+          parameter simtype {
             position 1
+            type _CHAR
+            prompt {Simulation type (sim or heatrun)}
+            vpath {PROMPT}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+          parameter obsxmlfile {
+            position 2
             type _CHAR
             prompt {Observation XML file}
             vpath {PROMPT}
@@ -353,7 +362,7 @@ package @PACKAGE@ {
           }
 
           parameter simxmlfile {
-            position 2
+            position 3
             type _CHAR
             prompt {Simulation XML file}
             vpath {PROMPT}
@@ -362,7 +371,7 @@ package @PACKAGE@ {
           }
 
           parameter seed {
-            position 3
+            position 4
             type _INTEGER
             prompt {Value for random number generator}
             vpath {PROMPT}
@@ -371,7 +380,7 @@ package @PACKAGE@ {
           }
 
           parameter outdir {
-            position 4
+            position 5
             type _CHAR
             prompt {Directory for output file(s)}
             vpath {PROMPT}
@@ -380,7 +389,7 @@ package @PACKAGE@ {
           }
 
           parameter maxwrite {
-            position 5
+            position 6
             type _INTEGER
             prompt {Number of samples to write in output file}
             vpath {PROMPT}

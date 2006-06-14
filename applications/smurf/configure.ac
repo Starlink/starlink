@@ -47,6 +47,26 @@ if test -n "$gslextrapath"; then
         fi
 fi
 
+dnl Use --with-expat=/opt/local to append /opt/local to lib and include paths
+dnl Allow --with-expat=path to work
+AC_ARG_WITH(expat,
+	[ --with-expat=path    Path to use for Expat libraries and include files ],
+	if test "$withval" = "yes"; then
+	  epextrapath=default
+	elif test "$withval" = "no"; then
+	  epextrapath=
+	else
+	  epextrapath=$withval
+	fi,
+	epextrapath=default)
+
+if test -n "$epextrapath"; then
+	if test "$epextrapath" != default; then
+	   CPPFLAGS="$CPPFLAGS -I$epextrapath/include"
+	   LIBS="$LIBS -L$epextrapath/lib"
+	fi
+fi
+
 dnl    External libraries
 LIBS="$LIBS -L/usr/lib64"
 AC_CHECK_LIB( [gslcblas], [cblas_dsdot], [], [
@@ -56,6 +76,10 @@ AC_CHECK_LIB( [gslcblas], [cblas_dsdot], [], [
 AC_CHECK_LIB( [gsl], [gsl_acosh], [], [
         echo "Error! Couldn't find libgsl. Retry with --with-gsl option?"
         exit -1
+	] )
+AC_CHECK_LIB( [expat], [XML_SetUserData], [], [
+	echo "Error! Couldn't find libexpat. Retry with --with-expat option?"
+	exit -1
 	] )
 
 AC_CHECK_HEADERS(math.h)
