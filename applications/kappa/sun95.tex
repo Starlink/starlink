@@ -24374,15 +24374,32 @@ $\lsk$2CMPLX.
    Smooths a one- or two-dimensional image using a Gaussian filter
 }{
    \sstdescription{
-      This application applies a symmetrical filter to a one- or
-      two-dimensional image so as to convolve it with a Gaussian point
-      spread function (PSF) of specified width, or widths and
-      orientation.  The image is held in an \NDFref{NDF} data structure.
+      This application smooths an  \NDFref{NDF} using a one- or 
+      two-dimensional symmetrical Gaussian point spread function (PSF) 
+      of specified  width, or widths and orientation.  Each output pixel 
+      is the PSF-weighted mean of the input pixels within the filter box. 
+
+      The NDF may have up to three dimensions.  If it has three
+      dimensions, then the filter is applied in turn to each plane in
+      the cube and the result written to the corresponding plane in the 
+      output cube.  The orientation of the smoothing plane can be
+      specified using the AXES parameter.
+
    }
    \sstusage{
       gausmooth in out fwhm
    }
    \sstparameters{
+      \sstsubsection{
+         AXES(2) = \_INTEGER (Read)
+      }{
+         This parameter is only accessed if the NDF has exactly three 
+         significant pixel axes.  It should be set to the indices of the NDF 
+         pixel axes which span the plane in which smoothing is to be
+         applied. All pixel planes parallel to the specified plane will
+         be smoothed independently of each other.  The dynamic default
+         is the indices of the first two significant axes in the NDF.  {\tt []}
+      }
       \sstsubsection{
          BOX() = \_INTEGER (Read)
       }{
@@ -24424,8 +24441,8 @@ $\lsk$2CMPLX.
       \sstsubsection{
          IN = NDF (Read)
       }{
-         The input NDF containing the one- or two-dimensional image to which
-         Gaussian smoothing is to be applied.
+         The input NDF containing the one-, two-, or three-dimensional 
+         image to which Gaussian smoothing is to be applied.
       }
       \sstsubsection{
          ORIENT = \_REAL (Read)
@@ -50614,7 +50631,7 @@ The following applications have been modified:
          value of that pixel.
       \end{itemize}
 
-   \item [\htmlref{CONTOUR}{CONTOUR}] \mbox{}
+      \item [\htmlref{CONTOUR}{CONTOUR}] \mbox{}
       \begin{itemize}
          \item Parameter MODE has a new option to calculate contour heights
           called {\tt "Scale"}.  This sets a specified number of contour 
@@ -50625,7 +50642,6 @@ The following applications have been modified:
           before the contours are plotted, as controlled by the parameter
           CLEAR.
       \end{itemize}
-
 
    \item [\htmlref{COPYBAD}{COPYBAD}] \mbox{}
       \begin{itemize}
@@ -50659,6 +50675,15 @@ The following applications have been modified:
          given in FITSEXIST above.
       \end{itemize}
 
+   \item [\htmlref{GAUSMOOTH}{GAUSMOOTH}] \mbox{}
+      \begin{itemize}
+         \item This application can now smooth three-dimensional NDFs,
+         in the sense that it will smooth all the two-dimensional planes 
+         within a three-dimensional NDF independently, using the same 
+         two-dimensional Gaussian filter.  The smoothing plane can be 
+         parallel to any face of the cube.
+      \end{itemize}
+       
    \item [\htmlref{HISTOGRAM}{HISTOGRAM}] \mbox{}
       \begin{itemize}
          \item A new parameter called CUMUL has been added. Setting CUMUL
