@@ -20,7 +20,8 @@ AC_PROG_LIBTOOL
 STAR_MONOLITHS
 
 dnl    Build dependencies for this package.
-STAR_DECLARE_DEPENDENCIES([build], [sla pgplot fio chr],[link])
+STAR_DECLARE_DEPENDENCIES(build, [sae par])
+STAR_DECLARE_DEPENDENCIES(link, [sla pgp fio chr])
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 
 dnl    Need "hlib" command to build the help library.
