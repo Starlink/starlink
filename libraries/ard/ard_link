@@ -1,2 +1,6 @@
-echo -lard `ast_link` `sla_link` `grp_link` `chr_link` `err_link`  `psx_link` \
+
+#  All command-line switches are assumed to be for AST, see ast_link command.
+      ast_options=${1+"$@"}
+
+echo -lard `ast_link $ast_options` `sla_link` `grp_link` `chr_link` `err_link`  `psx_link` \
 | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'

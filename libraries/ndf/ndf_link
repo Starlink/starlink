@@ -21,13 +21,17 @@
 #     The script is normally invoked as part of a compiler command line,
 #     such as:
 #
-#        f77 -o program -L/star/lib `ndf_link` program.f
+#        f77 -o program -L/star/lib `ndf_link [ast_switches]` program.f
+#
+#     The possible values for [ast_switches] are the same as those available 
+#     to the ast_link command.
 
 #  Copyright:
 #     Copyright (C) 1997 Rutherford Appleton Laboratory
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     PWD: Peter W. Draper(JAC, Durham University)
 #     {enter_new_authors_here}
 
 #  History:
@@ -35,6 +39,8 @@
 #        Original version.
 #     14-JUL-1997 (RFWS)
 #        Added AST_ linking and improved "awk" script.
+#     15-JUN-2006 (PWD):
+#        Added ast_switches handling to pass on any AST linker options.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -44,11 +50,14 @@
 
 #.
 
+#  All command-line switches are assumed to be for AST.
+      ast_options=${1+"$@"}
+
 #  Echo the NDF library reference, followed by the list of options for
 #  packages on which the NDF library depends. Pass the result through an
 #  awk script to remove duplicate library references.
       echo -lndf `psx_link` `ary_link` `hds_link` `err_link` `ems_link` \
-           `chr_link` `prm_link` `ast_link -ems` \
+           `chr_link` `prm_link` `ast_link -ems $ast_options` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {if($1)f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
