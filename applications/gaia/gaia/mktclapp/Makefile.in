@@ -106,11 +106,12 @@ COMPIFL  = @STARLINK@/bin/compifl
 #  Define sets of ADAM libraries we need to link against. Note that
 #  ast_link and ndf_link must be carefully managed to avoid picking up
 #  default AST libraries for errors and graphics.
-AST_LIBS = -L$(STAR_LIB) `ast_link -myerr -mygrf -fsla` `sla_link`
+AST_OPTIONS = -myerr -mygrf -fsla
+AST_LIBS = -L$(STAR_LIB) `ast_link $(AST_OPTIONS)` `sla_link`
 AST_LIBS_NOGRF = -L$(STAR_LIB) `ast_link -myerr -fsla` `sla_link`
 STARTCL_OBJECT = $(STAR_LIB)/tclAdam.o
-ADAM_LIBS = -L$(STAR_LIB) `ard_link` `fio_link` $(STARTCL_OBJECT) \
-            `ams_link_adam` `ndf_link`  -lpda
+ADAM_LIBS = -L$(STAR_LIB) `ard_link $(AST_OPTIONS)` `fio_link` $(STARTCL_OBJECT) \
+            `ams_link_adam` `ndf_link $(AST_OPTIONS)`  -lpda
 
 #  Name of single binaries
 TKPROG = bin/gaia_swish
@@ -169,7 +170,7 @@ $(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o ../initFortran.o FORCE
 	$(LTLINK) $(CC_SWITCHES) tclAppInit.o gaia_stcl.o ../initFortran.o \
 	       -o $(TCLPROG)  \
 	       $(LD_SEARCH_FLAGS) \
-	       $(LDFLAG1) $(ADAM_LIBS) $(AST_LIBS_NOGRF) $(TCLLIBS) \
+	       $(LDFLAG1) $(ADAM_LIBS) $(AST_LIBS_NOGRF) $(LOCAL_LIBRARY) $(TCLLIBS) \
 	       $(LDFLAG2) $(EXTRA_LIBS)
 
 # initFortran lives in the parent directory
