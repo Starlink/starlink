@@ -123,10 +123,12 @@ COMPIFL  = @STARLINK@/bin/compifl
 #  ast_link and ndf_link must be carefully managed to avoid picking up
 #  default AST libraries for errors, graphics and SLA. We also use AST to 
 #  define what extra libraries are needed to link against Fortran.
-AST_LIBS = -L$(STAR_LIB) `ast_link -myerr -mygrf -fsla` `sla_link`
+AST_OPTIONS = -myerr -mygrf -fsla
+AST_LIBS = -L$(STAR_LIB) `ast_link $(AST_OPTIONS)` `sla_link`
+AST_LIBS_NOGRF = -L$(STAR_LIB) `ast_link -myerr -fsla` `sla_link`
 STARTCL_OBJECT = $(STAR_LIB)/tclAdam.o
-ADAM_LIBS = -L$(STAR_LIB) `ard_link` `fio_link` $(STARTCL_OBJECT) \
-            `ams_link_adam` `ndf_link`  -lpda
+ADAM_LIBS = -L$(STAR_LIB) `ard_link $(AST_OPTIONS)` `fio_link` $(STARTCL_OBJECT) \
+            `ams_link_adam` `ndf_link $(AST_OPTIONS)`  -lpda
 
 #  Libraries needed to link the "imcopy" program.
 CFITSIO_LIBS = -L$(STAR_LIB) `cfitsio_link`
@@ -186,9 +188,10 @@ $(DEMO_WISH): normallib tkAppInit.o initFortran.o FORCE
 $(DEMO_TCL): normallib tclAppInit.o initFortran.o FORCE
 	@echo "linking \"$(DEMO_TCL)\"..."
 	$(LTLINK) $(CC_SWITCHES)  tclAppInit.o initFortran.o -o $(DEMO_TCL) \
-	       $(LD_SEARCH_FLAGS) $(LDFLAG1) \
-	       $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) \
-	       $(TCLLIBS) $(LDFLAG2) $(EXTRA_LIBS)
+	       $(LD_SEARCH_FLAGS) \
+	       $(LDFLAG1) $(ADAM_LIBS) $(AST_LIBS_NOGRF) $(LOCAL_LIBRARY) $(TCLLIBS) \
+	       $(LDFLAG2) $(EXTRA_LIBS)
+
 
 $(GAIAMON): normallib gaiaMon.c gaiaMon.ifc
 	echo "linking \"$(GAIAMON)\"..."
