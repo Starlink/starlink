@@ -148,7 +148,7 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
-#include "slalib.h"              /* SLALIB interface */
+#include "pal.h"              /* SLALIB interface */
 #include "slamap.h"              /* Spatial sla mappings */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
@@ -443,33 +443,33 @@ static void AddArgs( int cvttype, double *cvtargs ) {
       break;
 
    case AST__MJDTOBEP:
-      cvtargs[ 2 ] = slaEpb( cvtargs[ 0 ] ) - slaEpb( 0.0 ) - cvtargs[ 1 ];
-      cvtargs[ 3 ] = slaEpb2d( cvtargs[ 1 ] ) - slaEpb2d( 0.0 ) - cvtargs[ 0 ];
+      cvtargs[ 2 ] = palSlaEpb( cvtargs[ 0 ] ) - palSlaEpb( 0.0 ) - cvtargs[ 1 ];
+      cvtargs[ 3 ] = palSlaEpb2d( cvtargs[ 1 ] ) - palSlaEpb2d( 0.0 ) - cvtargs[ 0 ];
       break;
 
    case AST__BEPTOMJD:
-      cvtargs[ 2 ] = slaEpb2d( cvtargs[ 0 ] ) - slaEpb2d( 0.0 ) - cvtargs[ 1 ];
-      cvtargs[ 3 ] = slaEpb( cvtargs[ 1 ] ) - slaEpb( 0.0 ) - cvtargs[ 0 ];
+      cvtargs[ 2 ] = palSlaEpb2d( cvtargs[ 0 ] ) - palSlaEpb2d( 0.0 ) - cvtargs[ 1 ];
+      cvtargs[ 3 ] = palSlaEpb( cvtargs[ 1 ] ) - palSlaEpb( 0.0 ) - cvtargs[ 0 ];
       break;
 
    case AST__MJDTOJEP:
-      cvtargs[ 2 ] = slaEpj( cvtargs[ 0 ] ) - slaEpj( 0.0 ) - cvtargs[ 1 ];
-      cvtargs[ 3 ] = slaEpj2d( cvtargs[ 1 ] ) - slaEpj2d( 0.0 ) - cvtargs[ 0 ];
+      cvtargs[ 2 ] = palSlaEpj( cvtargs[ 0 ] ) - palSlaEpj( 0.0 ) - cvtargs[ 1 ];
+      cvtargs[ 3 ] = palSlaEpj2d( cvtargs[ 1 ] ) - palSlaEpj2d( 0.0 ) - cvtargs[ 0 ];
       break;
 
    case AST__JEPTOMJD:
-      cvtargs[ 2 ] = slaEpj2d( cvtargs[ 0 ] ) - slaEpj2d( 0.0 ) - cvtargs[ 1 ];
-      cvtargs[ 3 ] = slaEpj( cvtargs[ 1 ] ) - slaEpj( 0.0 ) - cvtargs[ 0 ];
+      cvtargs[ 2 ] = palSlaEpj2d( cvtargs[ 0 ] ) - palSlaEpj2d( 0.0 ) - cvtargs[ 1 ];
+      cvtargs[ 3 ] = palSlaEpj( cvtargs[ 1 ] ) - palSlaEpj( 0.0 ) - cvtargs[ 0 ];
       break;
 
    case AST__TTTOTDB:
-      slaGeoc( cvtargs[ 2 ], 0.0, &r, &z );      
+      palSlaGeoc( cvtargs[ 2 ], 0.0, &r, &z );      
       cvtargs[ 3 ] = 0.001*r*AST__AU;
       cvtargs[ 4 ] = 0.001*z*AST__AU;
       break;
 
    case AST__TDBTOTT:
-      slaGeoc( cvtargs[ 2 ], 0.0, &r, &z );      
+      palSlaGeoc( cvtargs[ 2 ], 0.0, &r, &z );      
       cvtargs[ 3 ] = 0.001*r*AST__AU;
       cvtargs[ 4 ] = 0.001*z*AST__AU;
       break;
@@ -3682,13 +3682,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                if ( forward ) {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] = slaEpb( time[ point ] ) + args[ 2 ];
+                        time[ point ] = palSlaEpb( time[ point ] ) + args[ 2 ];
                      }
                   }
                } else {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] = slaEpb2d( time[ point ] ) + args[ 3 ];
+                        time[ point ] = palSlaEpb2d( time[ point ] ) + args[ 3 ];
                      }
                   }
                }
@@ -3700,13 +3700,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                if ( forward ) {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] = slaEpb2d( time[ point ] ) + args[ 2 ];
+                        time[ point ] = palSlaEpb2d( time[ point ] ) + args[ 2 ];
                      }
                   }
                } else {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] = slaEpb( time[ point ] ) + args[ 3 ];
+                        time[ point ] = palSlaEpb( time[ point ] ) + args[ 3 ];
                      }
                   }
                }
@@ -3718,13 +3718,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                if ( forward ) {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] = slaEpj( time[ point ] ) + args[ 2 ];
+                        time[ point ] = palSlaEpj( time[ point ] ) + args[ 2 ];
                      }
                   }
                } else {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] = slaEpj2d( time[ point ] ) + args[ 3 ];
+                        time[ point ] = palSlaEpj2d( time[ point ] ) + args[ 3 ];
                      }
                   }
                }
@@ -3736,13 +3736,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                if ( forward ) {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] = slaEpj2d( time[ point ] ) + args[ 2 ];
+                        time[ point ] = palSlaEpj2d( time[ point ] ) + args[ 2 ];
                      }
                   }
                } else {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] = slaEpj( time[ point ] ) + args[ 3 ];
+                        time[ point ] = palSlaEpj( time[ point ] ) + args[ 3 ];
                      }
                   }
                }
@@ -4050,7 +4050,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         gmstx = time[ point ] + args[ 1 ]/D2PI;
                         tdb = Gmsta( gmstx, args[ 0 ], 0 ) 
                               + args[ 0 ] + (32 + TTOFF)/SPD;
-                        time[ point ] += slaEqeqx( tdb )/D2PI;
+                        time[ point ] += palSlaEqeqx( tdb )/D2PI;
                      }
                   }
                } else {
@@ -4059,7 +4059,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         gmstx = time[ point ] + args[ 1 ]/D2PI;
                         tdb = Gmsta( gmstx, args[ 0 ], 0 ) 
                               + args[ 0 ] + (32+TTOFF)/SPD;
-                        time[ point ] -= slaEqeqx( tdb )/D2PI;
+                        time[ point ] -= palSlaEqeqx( tdb )/D2PI;
                      }
                   }
                }
@@ -4074,7 +4074,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         gmstx = time[ point ] + args[ 1 ]/D2PI;
                         tdb = Gmsta( gmstx, args[ 0 ], 0 ) 
                               + args[ 0 ] + (32+TTOFF)/SPD;
-                        time[ point ] -= slaEqeqx( tdb )/D2PI;
+                        time[ point ] -= palSlaEqeqx( tdb )/D2PI;
                      }
                   }
                } else {
@@ -4083,7 +4083,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         gmstx = time[ point ] + args[ 1 ]/D2PI;
                         tdb = Gmsta( gmstx, args[ 0 ], 0 ) 
                               + args[ 0 ] + (32 + TTOFF)/SPD;
-                        time[ point ] += slaEqeqx( tdb )/D2PI;
+                        time[ point ] += palSlaEqeqx( tdb )/D2PI;
                      }
                   }
                }

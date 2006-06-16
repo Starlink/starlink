@@ -163,7 +163,7 @@ f     - AST_CURRENTTIME: Return the current system time
 #include "cmpmap.h"              /* Compound Mappings */
 #include "unitmap.h"             /* Unit Mappings */
 #include "shiftmap.h"            /* Shift of origins */
-#include "slalib.h"              /* SlaLib interface */
+#include "pal.h"              /* SlaLib interface */
 
 
 /* Error code definitions. */
@@ -1013,14 +1013,14 @@ static const char *Format( AstFrame *this_frame, int axis, double value ) {
 
 /* Convert the MJD into a set of numeric date fields, plus day fraction,
    and format them. */
-         slaDjcl( mjd, &iy, &im, &id, &fd, &j );
+         palSlaDjcl( mjd, &iy, &im, &id, &fd, &j );
          d = buf;
          d += sprintf( d, "%4d-%2.2d-%2.2d", iy, im, id );
 
 /* If required, convert the day fraction into a set of numerical time
    fields. */
          if( ndp >= 0 ) {
-            slaDd2tf( ndp, fd, sign, ihmsf );
+            palSlaDd2tf( ndp, fd, sign, ihmsf );
 
 /* Format the time fields. */
             if( ndp > 0 ) {

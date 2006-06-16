@@ -154,7 +154,7 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 #include "mapping.h"             /* Coordinate Mappings */
 #include "cmpmap.h"              /* Compound Mappings */
 #include "unitmap.h"             /* Unit Mappings */
-#include "slalib.h"              /* SlaLib interface */
+#include "pal.h"              /* SlaLib interface */
 
 
 /* Error code definitions. */

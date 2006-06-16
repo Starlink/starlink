@@ -237,7 +237,7 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 #include "cmpmap.h"              /* Compund Mappings */
 #include "unitmap.h"             /* Unit Mappings */
 #include "permmap.h"             /* Axis permutations */
-#include "slalib.h"              /* SLALIB interface */
+#include "pal.h"              /* SLALIB interface */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -7520,7 +7520,7 @@ static double MatrixDet( int ndim, const double *matrix ){
       y = astMalloc( sizeof( double )*(size_t) ndim );
       if( y ) {
          for( i = 0; i < ndim; i++ ) y[ i ] = 1.0;
-         slaDmat( ndim, a, y, &result, &jf, iw );
+         palSlaDmat( ndim, a, y, &result, &jf, iw );
       }
       y = astFree( y );
       iw = astFree( iw );

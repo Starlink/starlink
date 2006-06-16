@@ -166,7 +166,7 @@ f     - AST_SPECADD: Add a spectral coordinate conversion to an SpecMap
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
-#include "slalib.h"              /* SLALIB interface */
+#include "pal.h"              /* SLALIB interface */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -702,13 +702,13 @@ static double BaryVel( double ra, double dec, FrameDef *def ) {
 
 /* Get the Cartesian vector towards the source, in the Cartesian FK5
    J2000 system. */
-   slaDcs2c( ra, dec, v );
+   palSlaDcs2c( ra, dec, v );
 
 /* If not already done so, get the Earth/Sun velocity and position vectors in 
    the same system. Speed is returned in units of AU/s. Store in the supplied 
    frame definition structure. */
    if( def->dvb[ 0 ] == AST__BAD ) {
-      slaEvp( def->epoch, 2000.0, def->dvb, dpb, dvh, dph );
+      palSlaEvp( def->epoch, 2000.0, def->dvb, dpb, dvh, dph );
   
 /* Change the barycentric velocity of the earth into the heliocentric 
    velocity of the barycentre. */
@@ -719,7 +719,7 @@ static double BaryVel( double ra, double dec, FrameDef *def ) {
 
 /* Return the component away from the source, of the velocity of the
    barycentre relative to the sun (in m/s). */
-   return -slaDvdv( v, def->dvb )*149.597870E9;
+   return -palSlaDvdv( v, def->dvb )*149.597870E9;
 
 }
 
@@ -1694,11 +1694,11 @@ static double GalVel( double ra, double dec, FrameDef *def ) {
 
 /* Get the component away from the source, of the velocity of the sun
    relative to the dynamic LSR (in km/s). */
-   s1 = (double) slaRvlsrd( (float) ra, (float) dec );
+   s1 = (double) palSlaRvlsrd( (float) ra, (float) dec );
 
 /* Get the component away from the source, of the velocity of the
    dynamic LSR relative to the galactic centre (in km/s). */
-   s2 = (double) slaRvgalc( (float) ra, (float) dec );
+   s2 = (double) palSlaRvgalc( (float) ra, (float) dec );
 
 /* Return the total velocity of the galactic centre away from the source,
    relative to the sun, in m/s. */
@@ -1755,17 +1755,17 @@ static double GeoVel( double ra, double dec, FrameDef *def ) {
 
 /* Get the Cartesian vector towards the source, in the Cartesian FK5
    J2000 system. */
-   slaDcs2c( ra, dec, v );
+   palSlaDcs2c( ra, dec, v );
 
 /* If not already done so, get the Earth/Sun velocity and position vectors in 
    the same system. Speed is returned in units of AU/s. Store in the supplied 
    frame definition structure. */
-   if( def->dvh[ 0 ] == AST__BAD ) slaEvp( def->epoch, 2000.0, dvb, dpb,
+   if( def->dvh[ 0 ] == AST__BAD ) palSlaEvp( def->epoch, 2000.0, dvb, dpb,
                                            def->dvh, dph );
   
 /* Return the component away from the source, of the velocity of the earths
    centre relative to the sun (in m/s). */
-   return -slaDvdv( v, def->dvh )*149.597870E9;
+   return -palSlaDvdv( v, def->dvh )*149.597870E9;
 }
 
 void astInitSpecMapVtab_(  AstSpecMapVtab *vtab, const char *name ) {
@@ -1893,7 +1893,7 @@ static double LgVel( double ra, double dec, FrameDef *def ) {
 
 /* Return the component away from the source, of the velocity of the
    local group relative to the sun (in m/s). */
-   return -1000.0*slaRvlg( (float) ra, (float) dec );
+   return -1000.0*palSlaRvlg( (float) ra, (float) dec );
 }
 
 static double LsrdVel( double ra, double dec, FrameDef *def ) {
@@ -1941,7 +1941,7 @@ static double LsrdVel( double ra, double dec, FrameDef *def ) {
    relative to the dynamical LSR (in m/s). This can also be thought of as the 
    velocity of the LSR towards the source relative to the sun. Return the
    negated value (i.e. velocity of lsrd *away from* the source. */
-   return -1000.0*slaRvlsrd( (float) ra, (float) dec );
+   return -1000.0*palSlaRvlsrd( (float) ra, (float) dec );
 }
 
 static double LsrkVel( double ra, double dec, FrameDef *def ) {
@@ -1989,7 +1989,7 @@ static double LsrkVel( double ra, double dec, FrameDef *def ) {
    relative to the kinematic LSR (in m/s). This can also be thought of as the 
    velocity of the LSR towards the source relative to the sun. Return the
    negated value (i.e. velocity of lsrk *away from* the source. */
-   return -1000.0*slaRvlsrk( (float) ra, (float) dec );
+   return -1000.0*palSlaRvlsrk( (float) ra, (float) dec );
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
@@ -3385,21 +3385,21 @@ static double TopoVel( double ra, double dec, FrameDef *def ) {
 /* If not already done so, get the parameters defining the transformation
    of mean ra and dec to apparent ra and dec, and store in the supplied frame 
    definition structure. */
-   if( def->amprms[ 0 ] == AST__BAD ) slaMappa( 2000.0, def->epoch, 
+   if( def->amprms[ 0 ] == AST__BAD ) palSlaMappa( 2000.0, def->epoch, 
                                                 def->amprms );
 
 /* Convert the source position from mean ra and dec to apparent ra and dec. */
-   slaMapqkz( ra, dec, def->amprms, &raa, &deca );
+   palSlaMapqkz( ra, dec, def->amprms, &raa, &deca );
 
 /* If not already done so, get the local apparent siderial time (in radians)
    and store in the supplied frame definition structure. */
-   if( def->last == AST__BAD ) def->last = slaGmst( def->epoch ) + 
-                                           slaEqeqx( def->epoch ) +
+   if( def->last == AST__BAD ) def->last = palSlaGmst( def->epoch ) + 
+                                           palSlaEqeqx( def->epoch ) +
                                            def->geolon;
 
 /* Get the component away from the source, of the velocity of the observer 
    relative to the centre of the earth (in m/s). */
-   vobs = 1000.0*slaRverot( (float) def->geolat, (float) raa, (float) deca, 
+   vobs = 1000.0*palSlaRverot( (float) def->geolat, (float) raa, (float) deca, 
                             (float) def->last );
 
 /* Get the component away from the source, of the velocity of the earth's 
@@ -3634,12 +3634,12 @@ static double UserVel( double ra, double dec, FrameDef *def ) {
    }
 
 /* Convert given J2000 RA,Dec to x,y,z. */
-   slaDcs2c( ra, dec, vb );
+   palSlaDcs2c( ra, dec, vb );
 
 /* Return the dot product with the user velocity. Invert it to get the
    velocity towards the observer (the def->veluser value is supposed to be
    positive if the source is moving away from the observer). */
-   return -slaDvdv( def->vuser, vb );
+   return -palSlaDvdv( def->vuser, vb );
 }
 
 /* Copy constructor. */

@@ -116,7 +116,7 @@ f     only within textual output (e.g. from AST_WRITE).
 
 /* Interface definitions. */
 /* ---------------------- */
-#include "slalib.h"              /* SLALIB interface */
+#include "pal.h"              /* SLALIB interface */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "pointset.h"            /* Sets of points (for AST__BAD) */
@@ -384,7 +384,7 @@ static double AxisDistance( AstAxis *this_axis, double v1, double v2 ) {
 
 /* Check both axis values are OK, and form the returned increment,
    normalizing it into the range +PI to -PI. */
-   if( v1 != AST__BAD && v2 != AST__BAD ) result = slaDrange( v2 - v1 );
+   if( v1 != AST__BAD && v2 != AST__BAD ) result = palSlaDrange( v2 - v1 );
 
 /* Return the result. */
    return result;
@@ -1013,8 +1013,8 @@ static void AxisNorm( AstAxis *this_axis, double *value ) {
       is_latitude = astGetAxisIsLatitude( this );
 
 /* Wrap the value into the appropriate range. */
-      if ( astOK ) *value = is_latitude ? slaDrange( *value ) :
-                                          slaDranrm( *value );
+      if ( astOK ) *value = is_latitude ? palSlaDrange( *value ) :
+                                          palSlaDranrm( *value );
    }
 }
 
@@ -3011,9 +3011,9 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name ) {
 
 /* Initialize constants for converting between hours, degrees and
    radians. */
-   slaDtf2r( 1, 0, 0.0, &hr2rad, &stat );
-   slaDaf2r( 1, 0, 0.0, &deg2rad, &stat );
-   slaDaf2r( 180, 0, 0.0, &pi, &stat );
+   palSlaDtf2r( 1, 0, 0.0, &hr2rad, &stat );
+   palSlaDaf2r( 1, 0, 0.0, &deg2rad, &stat );
+   palSlaDaf2r( 180, 0, 0.0, &pi, &stat );
    piby2 = 0.5*pi;
 }
 

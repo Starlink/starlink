@@ -112,7 +112,7 @@ f     The Polygon class does not define any new routines beyond those
 #include "polygon.h"             /* Interface definition for this class */
 #include "mapping.h"             /* Position mappings */
 #include "unitmap.h"             /* Unit Mapping */
-#include "slalib.h"              /* SLALIB library interface */
+#include "pal.h"              /* SLALIB library interface */
 #include "frame.h"               /* Coordinate system description */
 
 /* Error code definitions. */

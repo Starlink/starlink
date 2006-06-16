@@ -589,7 +589,7 @@ int astTest##attr##_( AstWcsMap *this, int axis ) { \
 #include "unitmap.h"             /* Unit mappings */
 #include "permmap.h"             /* Axis permutation mappings */
 #include "wcsmap.h"              /* Interface definition for this class */
-#include "slalib.h"              /* SLALIB function prototypes */
+#include "pal.h"              /* SLALIB function prototypes */
 #include "channel.h"             /* I/O channels */
 #include "proj.h"                /* WCSLIB projections and WCSLIB_MXPAR */
 
@@ -2506,17 +2506,17 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
    in the range [-90,90] (as required by the WCSLIB library). Any point with
    a latitude outside the range [-90,90] is converted to the equivalent
    point on the complementary meridian. */
-            latitude = AST__DR2D*slaDrange(  in1[ point ] );  
+            latitude = AST__DR2D*palSlaDrange(  in1[ point ] );  
             if ( latitude > 90.0 ){
                latitude = 180.0 - latitude;
-               longitude = AST__DR2D*slaDrange( AST__DPI + in0[ point ] );
+               longitude = AST__DR2D*palSlaDrange( AST__DPI + in0[ point ] );
 
             } else if ( latitude < -90.0 ){
                latitude = -180.0 - latitude;
-               longitude = AST__DR2D*slaDrange( AST__DPI + in0[ point ] );
+               longitude = AST__DR2D*palSlaDrange( AST__DPI + in0[ point ] );
 
             } else {
-               longitude = AST__DR2D*slaDrange( in0[ point ] );
+               longitude = AST__DR2D*palSlaDrange( in0[ point ] );
             }
 
 /* Call the relevant WCSLIB forward projection function. */

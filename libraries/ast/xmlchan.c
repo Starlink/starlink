@@ -228,7 +228,7 @@ c     - AST_XMLWARNINGS: Return warnings from previous read operation
 #include "prism.h"               /* Prism regions */
 #include "unitmap.h"             /* Unit Mappings */
 #include "unit.h"                /* Unit handling utilities */
-#include "slalib.h"              /* slalib functions */
+#include "pal.h"              /* slalib functions */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -2850,7 +2850,7 @@ static AstRegion *ConstraintReader( AstXmlChan *this, AstXmlElement *elem,
       vec[1] = 0.0;
       vec[2] = 0.0;
       ElemListD( this, scan->el[0][0], 3, vec );
-      slaDcc2s( vec, cen, cen + 1 );
+      palSlaDcc2s( vec, cen, cen + 1 );
 
 /* Get the offset, and convert to a radial distance in radians. */
       rad = acos( ElemValueD( this, scan->el[1][0], 1.0 ) );
@@ -4604,7 +4604,7 @@ static void Geod( double lat, double lon, double *phi, double *lambda ){
    earth, Z axis going through the north pole, X axis at (long,lat)=(0,0), 
    and Y axis at (long,lat) = (E90,0). Assume an equatorial sea level
    position. */
-   slaDcs2c( lon, lat, pos );
+   palSlaDcs2c( lon, lat, pos );
    pos[ 0 ] *= A0;
    pos[ 1 ] *= A0;
    pos[ 2 ] *= A0;

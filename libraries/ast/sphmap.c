@@ -97,7 +97,7 @@ f     The SphMap class does not define any new routines beyond those
 #include "channel.h"             /* I/O channels */
 #include "unitmap.h"             /* Unit (identity) Mappings */
 #include "sphmap.h"              /* Interface definition for this class */
-#include "slalib.h"              /* SLA transformations */
+#include "pal.h"              /* SLA transformations */
 #include "wcsmap.h"              /* For the AST__DPIBY2 (etc) constants */
 
 /* Error code definitions. */
@@ -1011,7 +1011,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Otherwise use a SLALIB function to do the conversion (SLALIB always
    returns zero at either pole which is why we make the above check). */
                } else {
-                  slaDcc2s( v, q0++, q1++ );
+                  palSlaDcc2s( v, q0++, q1++ );
                }
 
             } else {
@@ -1038,7 +1038,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Apply the mapping to every point. */
          for( point = 0; point < npoint; point++ ){
             if( *q0 != AST__BAD && *q1 != AST__BAD ){
-               slaDcs2c( *q0, *q1, v );
+               palSlaDcs2c( *q0, *q1, v );
                *(p0++) = v[ 0 ];
                *(p1++) = v[ 1 ];
                *(p2++) = v[ 2 ];

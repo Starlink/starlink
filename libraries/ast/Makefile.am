@@ -204,7 +204,7 @@ GRP_C_INCLUDE_FILES = \
     grf.h \
     loader.h \
     skyaxis.h \
-    slalib.h \
+    pal.h \
     slamac.h \
     stc.h \
     stcresourceprofile.h \
@@ -268,7 +268,7 @@ WCSLIB_FILES = \
 PAL_FILES = \
     COPYING.LIB \
     pal.c \
-    slalib.h \
+    pal.h \
     slamac.h
 
 

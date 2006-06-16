@@ -167,7 +167,7 @@ exceptions, so bad values are dealt with explicitly. */
 #include "pointset.h"            /* Sets of points/coordinates */
 #include "mapping.h"             /* Coordinate mappings (parent class) */
 #include "matrixmap.h"           /* Interface definition for this class */
-#include "slalib.h"              /* SLALIB function definitions */
+#include "pal.h"              /* SLALIB function definitions */
 #include "permmap.h"
 #include "zoommap.h"
 #include "unitmap.h"
@@ -1266,9 +1266,9 @@ static double *InvertMatrix( int form, int nrow, int ncol, double *matrix ){
    double det;                    /* Determinant of supplied matrix */
    double mval;                   /* Matrix element value */
    double *out;                   /* Pointer to returned inverse matrix */
-   double *vector;                /* Pointer to vector used by slaDmat */
+   double *vector;                /* Pointer to vector used by palSlaDmat */
    int i;                         /* Matrix element number */
-   int *iw;                       /* Pointer to workspace used by slaDmat */
+   int *iw;                       /* Pointer to workspace used by palSlaDmat */
    int nel;                       /* No. of elements in square matrix */
    int ndiag;                     /* No. of diagonal elements */
    int ok;                        /* Zero if any bad matrix values found */
@@ -1348,7 +1348,7 @@ static double *InvertMatrix( int form, int nrow, int ncol, double *matrix ){
 /* Obtain work space and attempt to invert the matrix using SLALIB, then 
    free the work space. */
                iw = (int *) astMalloc( sizeof(int)*(size_t) nrow );
-               if( astOK ) slaDmat( nrow, out, vector, &det, &sing, iw );
+               if( astOK ) palSlaDmat( nrow, out, vector, &det, &sing, iw );
                iw = (int *) astFree( (void *) iw );
 
             }

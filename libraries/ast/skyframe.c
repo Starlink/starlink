@@ -559,7 +559,7 @@ int astTest##attr##_( AstSkyFrame *this, int axis ) { \
 #include "matrixmap.h"           /* Matrix multiplication */
 #include "sphmap.h"              /* Cartesian<->Spherical transformations */
 #include "skyframe.h"            /* Interface definition for this class */
-#include "slalib.h"              /* SLALIB library interface */
+#include "pal.h"              /* SLALIB library interface */
 #include "wcsmap.h"              /* Factors of PI */
 
 /* Error code definitions. */
@@ -846,10 +846,10 @@ static double Angle( AstFrame *this_frame, const double a[],
             if( cc[ 0 ] != bb[ 0 ] || cc[ 1 ] != bb[ 1 ] ) {
 
 /* Find the angle from north to the line BA. */
-               anga = slaDbear( bb[ 0 ], bb[ 1 ], aa[ 0 ], aa[ 1 ] );
+               anga = palSlaDbear( bb[ 0 ], bb[ 1 ], aa[ 0 ], aa[ 1 ] );
 
 /* Find the angle from north to the line BC. */
-               angc = slaDbear( bb[ 0 ], bb[ 1 ], cc[ 0 ], cc[ 1 ] );
+               angc = palSlaDbear( bb[ 0 ], bb[ 1 ], cc[ 0 ], cc[ 1 ] );
 
 /* Find the difference. */
                result = angc - anga;
@@ -860,7 +860,7 @@ static double Angle( AstFrame *this_frame, const double a[],
                if( perm[ 0 ] != 0 ) result = piby2 - result;
 
 /* Fold the result into the range +/- PI. */
-               result = slaDrange( result );
+               result = palSlaDrange( result );
             }
          }
       }
@@ -1320,7 +1320,7 @@ static double Distance( AstFrame *this_frame,
          p2[ perm[ 1 ] ] = point2[ 1 ];
 
 /* Calculate the great circle distance between the points in radians. */
-         result = slaDsep( p1[ 0 ], p1[ 1 ], p2[ 0 ], p2[ 1 ] );
+         result = palSlaDsep( p1[ 0 ], p1[ 1 ], p2[ 0 ], p2[ 1 ] );
       }
    }
 
@@ -1774,8 +1774,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Format the Equinox as decimal years. Use a Besselian epoch if it
    will be less than 1984.0, otherwise use a Julian epoch. */
-         result = astFmtDecimalYr( ( equinox < slaEpj2d( 1984.0 ) ) ?
-                                   slaEpb( equinox ) : slaEpj( equinox ),
+         result = astFmtDecimalYr( ( equinox < palSlaEpj2d( 1984.0 ) ) ?
+                                   palSlaEpb( equinox ) : palSlaEpj( equinox ),
                                    DBL_DIG );
       }
 
@@ -2159,9 +2159,9 @@ static double GetEpoch( AstFrame *this_frame ) {
    setting. */
       system = astGetSystem( this );
       if( system  == AST__FK4 || system == AST__FK4_NO_E ) {
-         result = slaEpb2d( 1950.0 );
+         result = palSlaEpb2d( 1950.0 );
       } else {
-         result = slaEpj2d( 2000.0 );
+         result = palSlaEpj2d( 2000.0 );
       }
    }
 
@@ -3161,11 +3161,11 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	    pos = sprintf( buff, "FK4 equatorial %s", word );
             if( astTestEquinox( this ) || astGetUseDefs( this ) ) {
    	       pos += sprintf( buff + pos, "; mean equinox B%s", 
-		               astFmtDecimalYr( slaEpb( equinox ), 9 ) );
+		               astFmtDecimalYr( palSlaEpb( equinox ), 9 ) );
             }
             if( astTestEpoch( this ) || astGetUseDefs( this ) ) {
                pos += sprintf( buff + pos,
-                               "; epoch B%s", astFmtDecimalYr( slaEpb( epoch ), 9 ) );
+                               "; epoch B%s", astFmtDecimalYr( palSlaEpb( epoch ), 9 ) );
             }
 	    break;
 
@@ -3176,11 +3176,11 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	    pos = sprintf( buff, "FK4 equatorial %s; no E-terms", word );
             if( astTestEquinox( this ) || astGetUseDefs( this ) ) {
    	       pos += sprintf( buff + pos, "; mean equinox B%s", 
-		               astFmtDecimalYr( slaEpb( equinox ), 9 ) );
+		               astFmtDecimalYr( palSlaEpb( equinox ), 9 ) );
             }
             if( astTestEpoch( this ) || astGetUseDefs( this ) ) {
                pos += sprintf( buff + pos,
-                               "; epoch B%s", astFmtDecimalYr( slaEpb( epoch ), 9 ) );
+                               "; epoch B%s", astFmtDecimalYr( palSlaEpb( epoch ), 9 ) );
             }
 	    break;
 
@@ -3191,7 +3191,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	    pos = sprintf( buff, "FK5 equatorial %s", word );
             if( astTestEquinox( this ) || astGetUseDefs( this ) ) {
    	       pos += sprintf( buff + pos, "; mean equinox J%s", 
-		               astFmtDecimalYr( slaEpj( equinox ), 9 ) );
+		               astFmtDecimalYr( palSlaEpj( equinox ), 9 ) );
             }
 	    break;
 
@@ -3223,7 +3223,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	 case AST__GAPPT:
 	    pos = sprintf( buff,
                            "Geocentric apparent equatorial %s; "
-                           "; epoch J%s", word, astFmtDecimalYr( slaEpj( epoch ), 9 ) );
+                           "; epoch J%s", word, astFmtDecimalYr( palSlaEpj( epoch ), 9 ) );
 	    break;
 
 /* Ecliptic coordinates. */
@@ -3233,7 +3233,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	    pos = sprintf( buff, "Ecliptic %s", word );
             if( astTestEquinox( this ) || astGetUseDefs( this ) ) {
    	       pos += sprintf( buff + pos, "; mean equinox J%s", 
-		               astFmtDecimalYr( slaEpj( equinox ), 9 ) );
+		               astFmtDecimalYr( palSlaEpj( equinox ), 9 ) );
             }
 	    break;
 
@@ -3244,7 +3244,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	    pos = sprintf( buff, "Helio-ecliptic %s; mean equinox J2000", word );
             if( astTestEpoch( this ) || astGetUseDefs( this ) ) {
    	       pos += sprintf( buff + pos, "; epoch J%s", 
-		               astFmtDecimalYr( slaEpj( epoch ), 9 ) );
+		               astFmtDecimalYr( palSlaEpj( epoch ), 9 ) );
             }
 	    break;
 
@@ -3623,9 +3623,9 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
 
 /* Initialize constants for converting between hours, degrees and
    radians, etc. */
-   slaDtf2r( 1, 0, 0.0, &hr2rad, &stat );
-   slaDaf2r( 1, 0, 0.0, &deg2rad, &stat );
-   slaDaf2r( 180, 0, 0.0, &pi, &stat );
+   palSlaDtf2r( 1, 0, 0.0, &hr2rad, &stat );
+   palSlaDaf2r( 1, 0, 0.0, &deg2rad, &stat );
+   palSlaDaf2r( 180, 0, 0.0, &pi, &stat );
    piby2 = 0.5*pi;
 }
 
@@ -3772,7 +3772,7 @@ static int LineContains( AstFrame *this, AstLineDef *l, int def, double *point )
          if ( perm ) {
             p1[ perm[ 0 ] ] = point[ 0 ];
             p1[ perm[ 1 ] ] = point[ 1 ];
-            slaDcs2c( p1[ 0 ], p1[ 1 ], bb );
+            palSlaDcs2c( p1[ 0 ], p1[ 1 ], bb );
             b = bb;
          } else {
             b = NULL;
@@ -3790,7 +3790,7 @@ static int LineContains( AstFrame *this, AstLineDef *l, int def, double *point )
 
 /* Check that the point is 90 degrees away from the pole of the great
    circle containing the line. */
-        t1 = slaDvdv( sl->dir, b );
+        t1 = palSlaDvdv( sl->dir, b );
         t2 = 1.0E-7*sl->length;
         if( t2 < 1.0E-10 ) t2 = 1.0E-10;
         if( fabs( t1 ) <= t2 ) result = 1;
@@ -3910,9 +3910,9 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
 /* Point of intersection of the two great circles is perpendicular to the
    pole vectors of both great circles. Put the Cartesian coords in elements
    2 to 4 of the returned array. */
-      slaDvxv( sl1->dir, sl2->dir, temp );
+      palSlaDvxv( sl1->dir, sl2->dir, temp );
       b = crossing + 2;
-      slaDvn( temp, b, &len );
+      palSlaDvn( temp, b, &len );
 
 /* See if this point is within the length of both arcs. If so return it. */
       if( LineIncludes( sl2, b ) && LineIncludes( sl1, b ) ) {
@@ -3928,7 +3928,7 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
       }
 
 /* Store the spherical coords in elements 0 and 1 of the returned array. */
-      slaDcc2s( b, p, p + 1 );
+      palSlaDcc2s( b, p, p + 1 );
 
 /* Permute the spherical axis value into the order used by the SkyFrame. */
       perm = astGetPerm( this );
@@ -4037,12 +4037,12 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
 
 /* Convert each point into a 3-vector of unit length and store in the
    returned structure. */
-         slaDcs2c( p1[ 0 ], p1[ 1 ], result->start );
-         slaDcs2c( p2[ 0 ], p2[ 1 ], result->end );
+         palSlaDcs2c( p1[ 0 ], p1[ 1 ], result->start );
+         palSlaDcs2c( p2[ 0 ], p2[ 1 ], result->end );
 
 /* Calculate the great circle distance between the points in radians and
    store in the result structure. */
-         result->length = acos( slaDvdv( result->start, result->end ) );
+         result->length = acos( palSlaDvdv( result->start, result->end ) );
 
 /* Find a unit vector representing the pole of the system in which the
    equator is given by the great circle. This is such that going the
@@ -4050,16 +4050,16 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
    line. If the line has zero length, or 180 degrees length, the pole is
    undefined, so we use an arbitrary value. */
          if( result->length == 0.0 || result->length > pi - 5.0E-11 ) {
-            slaDcs2c( p1[ 0 ] + 0.01, p1[ 1 ] + 0.01, temp );
-            slaDvxv( result->start, temp, result->q );
+            palSlaDcs2c( p1[ 0 ] + 0.01, p1[ 1 ] + 0.01, temp );
+            palSlaDvxv( result->start, temp, result->q );
          } else {
-            slaDvxv( result->start, result->end, result->q );
+            palSlaDvxv( result->start, result->end, result->q );
          }
-         slaDvn( result->q, result->dir, &len );
+         palSlaDvn( result->q, result->dir, &len );
 
 /* Also store a point which is 90 degrees along the great circle from the
    start. */
-         slaDvxv( result->dir, result->start, result->q );
+         palSlaDvxv( result->dir, result->start, result->q );
 
 /* Store a pointer to the defining SkyFrame. */
          result->frame = this;
@@ -4123,9 +4123,9 @@ static int LineIncludes( SkyLineDef *l, double point[3] ) {
    the range 0 - 180 degs. Check it is less than the line length. Then
    check that the point is not more than 90 degs away from the quarter 
    point. */
-   t1 = slaDvdv( l->start, point );
+   t1 = palSlaDvdv( l->start, point );
    t2 = acos( t1 );
-   t3 = slaDvdv( l->q, point );   
+   t3 = palSlaDvdv( l->q, point );   
    return ( ((l->length > 0) ? t2 < l->length : t2 == 0.0 ) && t3 >= -1.0E-8 );
 }
 
@@ -4216,7 +4216,7 @@ static void LineOffset( AstFrame *this, AstLineDef *line, double par,
        v[ 2 ] = c * nz + s * sl->dir[ 2 ];
 
 /* Convert to lon/lat */
-      slaDcc2s( v, p, p + 1 );
+      palSlaDcc2s( v, p, p + 1 );
 
 /* Permute the spherical axis value into the order used by the SkyFrame. */
       perm = astGetPerm( this );
@@ -4445,10 +4445,10 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* Convert the equinox and epoch values (stored as Modified Julian
    Dates) into the equivalent Besselian and Julian epochs (as decimal
    years). */
-      equinox_B = slaEpb( equinox );
-      equinox_J = slaEpj( equinox );
-      epoch_B = slaEpb( epoch );
-      epoch_J = slaEpj( epoch );
+      equinox_B = palSlaEpb( equinox );
+      equinox_J = palSlaEpj( equinox );
+      epoch_B = palSlaEpb( epoch );
+      epoch_J = palSlaEpj( epoch );
 
 /* Formulate the conversion... */
 
@@ -4682,10 +4682,10 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    Dates) into the equivalent Besselian and Julian epochs (as decimal
    years). */
    if( astOK ) {
-      equinox_B = slaEpb( equinox );
-      equinox_J = slaEpj( equinox );
-      epoch_B = slaEpb( epoch );
-      epoch_J = slaEpj( epoch );
+      equinox_B = palSlaEpb( equinox );
+      equinox_J = palSlaEpj( equinox );
+      epoch_B = palSlaEpb( epoch );
+      epoch_J = palSlaEpj( epoch );
    }
 
 /* Check we need to do the conversion. */
@@ -5252,7 +5252,7 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 /* If not already done, obtain a value for pi from SLALIB by
    converting 180 degrees into radians. */
    if ( !init ) {   
-      slaDaf2r( 180, 0, 0.0, &pi, &stat );
+      palSlaDaf2r( 180, 0, 0.0, &pi, &stat );
       init = 1;
    }
 
@@ -5275,8 +5275,8 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 
 /* Fold the longitude value into the range 0 to 2*pi and the latitude into
    the range -pi to +pi. */
-         sky_long = slaDranrm( sky_long );
-         sky_lat = slaDrange( sky_lat );
+         sky_long = palSlaDranrm( sky_long );
+         sky_lat = palSlaDrange( sky_lat );
 
 /* If the latitude now exceeds pi/2, shift the longitude by pi in whichever
    direction will keep it in the range 0 to 2*pi. */
@@ -5299,11 +5299,11 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 
 /* If only the longitude value is valid, wrap it into the range 0 to 2*pi. */
       } else if ( sky_long != AST__BAD ) {
-         sky_long = slaDranrm( sky_long );
+         sky_long = palSlaDranrm( sky_long );
 
 /* If only the latitude value is valid, wrap it into the range -pi to +pi. */
       } else if ( sky_lat != AST__BAD ) {
-         sky_lat = slaDrange( sky_lat );
+         sky_lat = palSlaDrange( sky_lat );
 
 /* Then refect through one of the poles (as above), if necessary, to move it
    into the range -pi/2 to +pi/2. */
@@ -5321,7 +5321,7 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 /* If the NegLon attribute is set, and the longitude value is good,
    convert it into the range -pi to +pi. */
       if( sky_long != AST__BAD && astGetNegLon( this ) ) {
-         sky_long = slaDrange( sky_long );
+         sky_long = palSlaDrange( sky_long );
       }
 
 /* Return the new values, allowing for any axis permutation. */
@@ -5429,8 +5429,8 @@ static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
 
 /* Find the lowest latitude after normalisation. */
          if( ub[ 1 ] != AST__BAD &&  lb[ 1 ] != AST__BAD ){
-            t = slaDrange( ub[ 1 ] );
-            t2 = slaDrange( lb[ 1 ] );
+            t = palSlaDrange( ub[ 1 ] );
+            t2 = palSlaDrange( lb[ 1 ] );
             if( t2 < t ) t = t2;         
          } else {
             t = AST__BAD;
@@ -5452,8 +5452,8 @@ static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
 
 /* Find the highest latitude after normalisation. */
          if( ub[ 1 ] != AST__BAD &&  lb[ 1 ] != AST__BAD ){
-            t = slaDrange( ub[ 1 ] );
-            t2 = slaDrange( lb[ 1 ] );
+            t = palSlaDrange( ub[ 1 ] );
+            t2 = palSlaDrange( lb[ 1 ] );
             if( t2 > t ) t = t2;         
          } else {
             t = AST__BAD;
@@ -5579,17 +5579,17 @@ static void Offset( AstFrame *this_frame, const double point1[],
          p2[ perm[ 1 ] ] = point2[ 1 ];
 
 /* Convert each point into a 3-vector of unit length. */
-         slaDcs2c( p1[ 0 ], p1[ 1 ], v1 );
-         slaDcs2c( p2[ 0 ], p2[ 1 ], v2 );
+         palSlaDcs2c( p1[ 0 ], p1[ 1 ], v1 );
+         palSlaDcs2c( p2[ 0 ], p2[ 1 ], v2 );
 
 /* Find the cross product between these two vectors (the vector order
    is reversed here to compensate for the sense of rotation introduced
-   by slaDav2m and slaDmxv below). */
-         slaDvxv( v2, v1, v3 );
+   by palSlaDav2m and palSlaDmxv below). */
+         palSlaDvxv( v2, v1, v3 );
 
 /* Normalise the cross product vector, also obtaining its original
    modulus. */
-         slaDvn( v3, vrot, &vmod );
+         palSlaDvn( v3, vrot, &vmod );
 
 /* If the original modulus was zero, the input points are either
    coincident or diametrically opposite, so do not uniquely define a
@@ -5606,9 +5606,9 @@ static void Offset( AstFrame *this_frame, const double point1[],
 
 /* Convert the 3-vector back into spherical cooordinates and then
    constrain the longitude result to lie in the range 0 to 2*pi
-   (slaDcc2s doesn't do this itself). */
-               slaDcc2s( v3, &p3[ 0 ], &p3[ 1 ] );
-               p3[ 0 ] = slaDranrm( p3[ 0 ] );
+   (palSlaDcc2s doesn't do this itself). */
+               palSlaDcc2s( v3, &p3[ 0 ], &p3[ 1 ] );
+               p3[ 0 ] = palSlaDranrm( p3[ 0 ] );
 
 /* If the offset was not a multiple of pi, generate "bad" output
    coordinates. */
@@ -5628,13 +5628,13 @@ static void Offset( AstFrame *this_frame, const double point1[],
 /* Generate the rotation matrix that implements this rotation and use
    it to rotate the first input point (3-vector) to give the required
    result (3-vector). */
-            slaDav2m( vrot, mrot );
-            slaDmxv( mrot, v1, v3 );
+            palSlaDav2m( vrot, mrot );
+            palSlaDmxv( mrot, v1, v3 );
 
 /* Convert the 3-vector back into spherical cooordinates and then
    constrain the longitude result to lie in the range 0 to 2*pi. */
-            slaDcc2s( v3, &p3[ 0 ], &p3[ 1 ] );
-            p3[ 0 ] = slaDranrm( p3[ 0 ] );
+            palSlaDcc2s( v3, &p3[ 0 ], &p3[ 1 ] );
+            p3[ 0 ] = palSlaDranrm( p3[ 0 ] );
          }
 
 /* Permute the result coordinates to undo the effect of the SkyFrame
@@ -5737,16 +5737,16 @@ static AstMapping *OffsetMap( AstSkyFrame *this ){
 
 /* Convert each point into a 3-vector of unit length. The SkyRef position
    defines the X axis in the offset coord system. */
-         slaDcs2c( astGetSkyRef( this, lonaxis ), astGetSkyRef( this, lataxis ), vx );
-         slaDcs2c( astGetSkyRefP( this, lonaxis ), astGetSkyRefP( this, lataxis ), vp );
+         palSlaDcs2c( astGetSkyRef( this, lonaxis ), astGetSkyRef( this, lataxis ), vx );
+         palSlaDcs2c( astGetSkyRefP( this, lonaxis ), astGetSkyRefP( this, lataxis ), vp );
 
 /* The Y axis is perpendicular to both the X axis and the skyrefp
    position. That is, it is parallel to the cross product of the 2 above 
    vectors.*/
-         slaDvxv( vp, vx, vy );
+         palSlaDvxv( vp, vx, vy );
 
 /* Normalize the y vector. */
-         slaDvn( vy, vy, &vmod );
+         palSlaDvn( vy, vy, &vmod );
 
 /* Report an error if the modulus of the vector is zero.*/
          if( vmod == 0.0 ) {
@@ -5756,7 +5756,7 @@ static AstMapping *OffsetMap( AstSkyFrame *this ){
 
 /* If OK, form the Z axis as the cross product of the x and y axes. */
          } else {
-            slaDvxv( vx, vy, vz );
+            palSlaDvxv( vx, vy, vz );
 
          }
 
@@ -5766,16 +5766,16 @@ static AstMapping *OffsetMap( AstSkyFrame *this ){
 
 /* Convert each point into a 3-vector of unit length. The SkyRef position
    defines the Z axis in the offset coord system. */
-         slaDcs2c( astGetSkyRef( this, lonaxis ), astGetSkyRef( this, lataxis ), vz );
-         slaDcs2c( astGetSkyRefP( this, lonaxis ), astGetSkyRefP( this, lataxis ), vp );
+         palSlaDcs2c( astGetSkyRef( this, lonaxis ), astGetSkyRef( this, lataxis ), vz );
+         palSlaDcs2c( astGetSkyRefP( this, lonaxis ), astGetSkyRefP( this, lataxis ), vp );
 
 /* The Y axis is perpendicular to both the Z axis and the skyrefp
    position. That is, it is parallel to the cross product of the 2 above 
    vectors.*/
-         slaDvxv( vz, vp, vy );
+         palSlaDvxv( vz, vp, vy );
 
 /* Normalize the y vector. */
-         slaDvn( vy, vy, &vmod );
+         palSlaDvn( vy, vy, &vmod );
 
 /* Report an error if the modulus of the vector is zero.*/
          if( vmod == 0.0 ) {
@@ -5785,7 +5785,7 @@ static AstMapping *OffsetMap( AstSkyFrame *this ){
 
 /* If OK, form the X axis as the cross product of the y and z axes. */
          } else {
-            slaDvxv( vy, vz, vx );
+            palSlaDvxv( vy, vz, vx );
          }
       }
 
@@ -5975,13 +5975,13 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
 
 /* Calculate the position angle of the great circle at the required
    point. */
-         pa = atan2( slaDvdv( q3, q2 ), slaDvdv( q3, q1 ) );
+         pa = atan2( palSlaDvdv( q3, q2 ), palSlaDvdv( q3, q1 ) );
 
 /* Convert this from a pa into the required angle. */
          result = ( perm[ 0 ] == 0 )? pa: piby2 - pa;
 
 /* Ensure that the end angle is in the range 0 to 2*pi. */
-         result = slaDranrm( result );
+         result = palSlaDranrm( result );
 
 /* Permute the result coordinates to undo the effect of the SkyFrame
    axis permutation array. */
@@ -6289,15 +6289,15 @@ static void Resolve( AstFrame *this_frame, const double point1[],
          p3[ perm[ 1 ] ] = point3[ 1 ];
 
 /* Convert each point into a 3-vector of unit length. */
-         slaDcs2c( p1[ 0 ], p1[ 1 ], v1 );
-         slaDcs2c( p2[ 0 ], p2[ 1 ], v2 );
-         slaDcs2c( p3[ 0 ], p3[ 1 ], v3 );
+         palSlaDcs2c( p1[ 0 ], p1[ 1 ], v1 );
+         palSlaDcs2c( p2[ 0 ], p2[ 1 ], v2 );
+         palSlaDcs2c( p3[ 0 ], p3[ 1 ], v3 );
 
 /* Find the cross product between the first two vectors, and normalize is. 
    This is the unit normal to the great circle plane defining parallel 
    distance. */
-         slaDvxv( v2, v1, vtemp );
-         slaDvn( vtemp, n1, &vmod );
+         palSlaDvxv( v2, v1, vtemp );
+         palSlaDvn( vtemp, n1, &vmod );
 
 /* Return with bad values if the normal is undefined (i.e. if the first two 
    vectors are identical or diametrically opposite). */
@@ -6306,13 +6306,13 @@ static void Resolve( AstFrame *this_frame, const double point1[],
 /* Now take the cross product of the normal vector and v1. This gives a
    point, v5, on the great circle which is 90 degrees away from v1, in the
    direction of v2. */
-            slaDvxv( v1, n1, v5 );
+            palSlaDvxv( v1, n1, v5 );
 
 /* Find the cross product of the outlying point (point 3), and the vector
    n1 found above, and normalize it. This is the unit normal to the great 
    circle plane defining perpendicular distance. */
-            slaDvxv( v3, n1, vtemp );
-            slaDvn( vtemp, n2, &vmod );
+            palSlaDvxv( v3, n1, vtemp );
+            palSlaDvn( vtemp, n2, &vmod );
 
 /* Return with bad values if the normal is undefined (i.e. if the
    outlying point is normal to the great circle defining the basis 
@@ -6324,24 +6324,24 @@ static void Resolve( AstFrame *this_frame, const double point1[],
    This is the cross product of n1 and n2. No need to normalize this time 
    since both n1 and n2 are unit vectors, and so v4 will already be a
    unit vector. */
-               slaDvxv( n1, n2, v4 );
+               palSlaDvxv( n1, n2, v4 );
 
 /* The dot product of v4 and v1 is the cos of the parallel distance,
    d1, whilst the dot product of v4 and v5 is the sin of the parallel
    distance. Use these to get the parallel distance with the correct
    sign, in the range -PI to +PI. */
-               *d1 = atan2( slaDvdv( v4, v5 ), slaDvdv( v4, v1 ) );
+               *d1 = atan2( palSlaDvdv( v4, v5 ), palSlaDvdv( v4, v1 ) );
 
 /* The dot product of v4 and v3 is the cos of the perpendicular distance,
    d2, whilst the dot product of n1 and v3 is the sin of the perpendicular
    distance. Use these to get the perpendicular distance. */
-               *d2 = fabs( atan2( slaDvdv( v3, n1 ), slaDvdv( v3, v4 ) ) );
+               *d2 = fabs( atan2( palSlaDvdv( v3, n1 ), palSlaDvdv( v3, v4 ) ) );
 
 /* Convert the 3-vector representing the intersection of the two planes 
    back into spherical cooordinates and then constrain the longitude result 
    to lie in the range 0 to 2*pi. */
-               slaDcc2s( v4, &p4[ 0 ], &p4[ 1 ] );
-               p4[ 0 ] = slaDranrm( p4[ 0 ] );
+               palSlaDcc2s( v4, &p4[ 0 ], &p4[ 1 ] );
+               p4[ 0 ] = palSlaDranrm( p4[ 0 ] );
 
 /* Permute the result coordinates to undo the effect of the SkyFrame
    axis permutation array. */
@@ -6545,13 +6545,13 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
       p2[ perm[ 1 ] ] = point2[ 1 ];
 
 /* Convert these points into 3-vectors of unit length. */
-      slaDcs2c( p1[ 0 ], p1[ 1 ], v1 );
-      slaDcs2c( p2[ 0 ], p2[ 1 ], v2 );
+      palSlaDcs2c( p1[ 0 ], p1[ 1 ], v1 );
+      palSlaDcs2c( p2[ 0 ], p2[ 1 ], v2 );
 
 /* Find the cross product between the vectors, and normalize it. This is the 
    unit normal to the great circle plane defining parallel distance. */
-      slaDvxv( v2, v1, vtemp );
-      slaDvn( vtemp, n1, &vmod );
+      palSlaDvxv( v2, v1, vtemp );
+      palSlaDvn( vtemp, n1, &vmod );
 
 /* Return with bad values if the normal is undefined (i.e. if the first two 
    vectors are identical or diametrically opposite). */
@@ -6562,7 +6562,7 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
 /* Now take the cross product of the normal vector and v1. This gives a
    point, v5, on the great circle which is 90 degrees away from v1, in the
    direction of v2. */
-         slaDvxv( v1, n1, v5 );
+         palSlaDvxv( v1, n1, v5 );
       }
 
 /* Store pointers to the first two axis arrays in the returned PointSet. */
@@ -6594,13 +6594,13 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
                p3[ perm[ 1 ] ] = *point3y;
 
 /* Convert into a 3-vector of unit length. */
-               slaDcs2c( p3[ 0 ], p3[ 1 ], v3 );
+               palSlaDcs2c( p3[ 0 ], p3[ 1 ], v3 );
 
 /* Find the cross product of the outlying point (point 3), and the vector
    n1 found above, and normalize it. This is the unit normal to the great 
    circle plane defining perpendicular distance. */
-               slaDvxv( v3, n1, vtemp );
-               slaDvn( vtemp, n2, &vmod );
+               palSlaDvxv( v3, n1, vtemp );
+               palSlaDvn( vtemp, n2, &vmod );
 
 /* Return with bad values if the normal is undefined (i.e. if the
    outlying point is normal to the great circle defining the basis 
@@ -6615,18 +6615,18 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
    This is the cross product of n1 and n2. No need to normalize this time 
    since both n1 and n2 are unit vectors, and so v4 will already be a
    unit vector. */
-                  slaDvxv( n1, n2, v4 );
+                  palSlaDvxv( n1, n2, v4 );
 
 /* The dot product of v4 and v1 is the cos of the parallel distance,
    d1, whilst the dot product of v4 and v5 is the sin of the parallel
    distance. Use these to get the parallel distance with the correct
    sign, in the range -PI to +PI. */
-                  *d1 = atan2( slaDvdv( v4, v5 ), slaDvdv( v4, v1 ) );
+                  *d1 = atan2( palSlaDvdv( v4, v5 ), palSlaDvdv( v4, v1 ) );
 
 /* The dot product of v4 and v3 is the cos of the perpendicular distance,
    d2, whilst the dot product of n1 and v3 is the sin of the perpendicular
    distance. Use these to get the perpendicular distance. */
-                  *d2 = sign*atan2( slaDvdv( v3, n1 ), slaDvdv( v3, v4 ) );
+                  *d2 = sign*atan2( palSlaDvdv( v3, n1 ), palSlaDvdv( v3, v4 ) );
                }
             }
          }
@@ -7060,11 +7060,11 @@ static void SetLast( AstSkyFrame *this ) {
    difference between UT1 and UTC. This can be up to a second, corresponding 
    to 15 arc-seconds. We may need to do something about this later (like 
    having an attribute to specify the DUT value). */
-   gmst = slaGmst( utc );
+   gmst = palSlaGmst( utc );
 
 /* Add on the east longitude and the equation of equinoxes (no correction
    is done for polar motion), and return the answer. */
-   this->last = gmst + astGetObsLon( this ) + slaEqeqx( epoch );
+   this->last = gmst + astGetObsLon( this ) + palSlaEqeqx( epoch );
 
 /* Store the value in the SkyFrame structure for future use. */
    this->eplast = epoch;
@@ -8756,7 +8756,7 @@ astMAKE_GET(SkyFrame,Equinox,double,AST__BAD,(
             ( this->equinox != AST__BAD ) ? this->equinox :
                ( ( ( astGetSystem( this ) == AST__FK4 ) ||
                    ( astGetSystem( this ) == AST__FK4_NO_E ) ) ?
-                    slaEpb2d( 1950.0 ) : slaEpj2d( 2000.0 ) ) ))
+                    palSlaEpb2d( 1950.0 ) : palSlaEpj2d( 2000.0 ) ) ))
 
 /* Allow any Equinox value to be set, unless the System is Helio-ecliptic
    (in which case clear the value so that J2000 is used). */
@@ -9298,8 +9298,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
                ( system == AST__ECLIPTIC ) );
 
 /* Convert MJD to Besselian or Julian years, depending on the value. */
-   bessyr = ( dval < slaEpj2d( 1984.0 ) );
-   dval = bessyr ? slaEpb( dval ) : slaEpj( dval );
+   bessyr = ( dval < palSlaEpj2d( 1984.0 ) );
+   dval = bessyr ? palSlaEpb( dval ) : palSlaEpj( dval );
    astWriteDouble( channel, "Eqnox", set, helpful, dval,
                    bessyr ? "Besselian epoch of mean equinox" :
                             "Julian epoch of mean equinox" );
@@ -9777,8 +9777,8 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 /* Interpret this as Besselian or Julian depending on its value. */
       new->equinox = astReadDouble( channel, "eqnox", AST__BAD );
       if ( TestEquinox( new ) ) {
-         SetEquinox( new, ( new->equinox < 1984.0 ) ? slaEpb2d( new->equinox ) :
-                                                      slaEpj2d( new->equinox ) );
+         SetEquinox( new, ( new->equinox < 1984.0 ) ? palSlaEpb2d( new->equinox ) :
+                                                      palSlaEpj2d( new->equinox ) );
       }
 
 /* NegLon. */

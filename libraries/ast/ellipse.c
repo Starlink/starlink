@@ -87,7 +87,7 @@ f     The Ellipse class does not define any new routines beyond those
 #include "ellipse.h"             /* Interface definition for this class */
 #include "mapping.h"             /* Position mappings */
 #include "unitmap.h"             /* Unit Mapping */
-#include "slalib.h"              /* SLALIB library interface */
+#include "pal.h"              /* SLALIB library interface */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -304,7 +304,7 @@ AstRegion *astBestEllipse( AstPointSet *mesh, double *cen, AstRegion *unc ){
       for( ip = maxat + 1; ip < np; ip++ ) {
          if( dist[ ip ] != AST__BAD ) {
             r3 = dist[ ip ];
-            t3 = slaDrange( ang[ ip ] - a0 );
+            t3 = palSlaDrange( ang[ ip ] - a0 );
             break;
          }
       }
@@ -312,7 +312,7 @@ AstRegion *astBestEllipse( AstPointSet *mesh, double *cen, AstRegion *unc ){
          for( ip = 0; ip < maxat; ip++ ) {
             if( dist[ ip ] != AST__BAD ) {
                r3 = dist[ ip ];
-               t3 = slaDrange( ang[ ip ] - a0 );
+               t3 = palSlaDrange( ang[ ip ] - a0 );
                break;
             }
          }
@@ -326,7 +326,7 @@ AstRegion *astBestEllipse( AstPointSet *mesh, double *cen, AstRegion *unc ){
       for( ip = maxat - 1; ip > -1; ip-- ) {
          if( dist[ ip ] != AST__BAD ) {
             r1 = dist[ ip ];
-            t1 = slaDrange( ang[ ip ] - a0 );
+            t1 = palSlaDrange( ang[ ip ] - a0 );
             break;
          }
       }
@@ -334,7 +334,7 @@ AstRegion *astBestEllipse( AstPointSet *mesh, double *cen, AstRegion *unc ){
          for( ip = np - 1; ip > maxat; ip-- ) {
             if( dist[ ip ] != AST__BAD ) {
                r1 = dist[ ip ];
-               t1 = slaDrange( ang[ ip ] - a0 );
+               t1 = palSlaDrange( ang[ ip ] - a0 );
                break;
             }
          }

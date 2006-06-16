@@ -854,7 +854,7 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 #include "pointset.h" 
 #include "shiftmap.h" 
 #include "skyframe.h" 
-#include "slalib.h" 
+#include "pal.h" 
 #include "slamap.h"
 #include "specframe.h"
 #include "dsbspecframe.h"
@@ -2242,8 +2242,8 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
          rho_b = atan2( -cdlon_lat, cdelt[ axrot2 ] );
       }
 
-      if( fabs( slaDrange( rho_a - rho_b ) ) < 1.0E-2 ){
-         crota = 0.5*( slaDranrm( rho_a ) + slaDranrm( rho_b ) );
+      if( fabs( palSlaDrange( rho_a - rho_b ) ) < 1.0E-2 ){
+         crota = 0.5*( palSlaDranrm( rho_a ) + palSlaDranrm( rho_b ) );
          coscro = cos( crota );
          sincro = sin( crota );
 
@@ -2393,14 +2393,14 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
 /* The format used for the DATE-OBS keyword depends on the value of the
    keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
    Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]" format. */
-         slaCaldj( 99, 1, 1, &mjd99, &jj );
+         palSlaCaldj( 99, 1, 1, &mjd99, &jj );
          if( val < mjd99 ) {
-            slaDjcal( 0, val, iymdf, &jj );
+            palSlaDjcal( 0, val, iymdf, &jj );
             sprintf( combuf, "%2.2d/%2.2d/%2.2d", iymdf[ 2 ], iymdf[ 1 ], 
                      iymdf[ 0 ] - ( ( iymdf[ 0 ] > 1999 ) ? 2000 : 1900 ) ); 
          } else {
-            slaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
-            slaDd2tf( 3, fd, sign, ihmsf );
+            palSlaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
+            palSlaDd2tf( 3, fd, sign, ihmsf );
             sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
                      iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
                      ihmsf[2], ihmsf[3] ); 
@@ -2756,8 +2756,8 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
          rho_b = atan2( -cdlon_lat, cdelt[ axrot2 ] );
       }
 
-      if( fabs( slaDrange( rho_a - rho_b ) ) < 1.0E-2 ){
-         crota = 0.5*( slaDranrm( rho_a ) + slaDranrm( rho_b ) );
+      if( fabs( palSlaDrange( rho_a - rho_b ) ) < 1.0E-2 ){
+         crota = 0.5*( palSlaDranrm( rho_a ) + palSlaDranrm( rho_b ) );
          coscro = cos( crota );
          sincro = sin( crota );
 
@@ -2940,14 +2940,14 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
 /* The format used for the DATE-OBS keyword depends on the value of the
    keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
    Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]" format. */
-         slaCaldj( 99, 1, 1, &mjd99, &jj );
+         palSlaCaldj( 99, 1, 1, &mjd99, &jj );
          if( val < mjd99 ) {
-            slaDjcal( 0, val, iymdf, &jj );
+            palSlaDjcal( 0, val, iymdf, &jj );
             sprintf( combuf, "%2.2d/%2.2d/%2.2d", iymdf[ 2 ], iymdf[ 1 ], 
                      iymdf[ 0 ] - ( ( iymdf[ 0 ] > 1999 ) ? 2000 : 1900 ) ); 
          } else {
-            slaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
-            slaDd2tf( 3, fd, sign, ihmsf );
+            palSlaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
+            palSlaDd2tf( 3, fd, sign, ihmsf );
             sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
                      iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
                      ihmsf[2], ihmsf[3] ); 
@@ -4477,14 +4477,14 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 /* The format used for the DATE-OBS keyword depends on the value of the
    keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
    Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]" format. */
-         slaCaldj( 99, 1, 1, &mjd99, &jj );
+         palSlaCaldj( 99, 1, 1, &mjd99, &jj );
          if( val < mjd99 ) {
-            slaDjcal( 0, val, iymdf, &jj );
+            palSlaDjcal( 0, val, iymdf, &jj );
             sprintf( combuf, "%2.2d/%2.2d/%2.2d", iymdf[ 2 ], iymdf[ 1 ], 
                      iymdf[ 0 ] - ( ( iymdf[ 0 ] > 1999 ) ? 2000 : 1900 ) ); 
          } else {
-            slaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
-            slaDd2tf( 3, fd, sign, ihmsf );
+            palSlaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
+            palSlaDd2tf( 3, fd, sign, ihmsf );
             sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
                      iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
                      ihmsf[2], ihmsf[3] ); 
@@ -6110,7 +6110,7 @@ static double DateObs( const char *dateobs ) {
    if( ok ) { 
 
 /* Get the MJD at the start of the day. */
-      slaCaldj( yy, mm, dd, &ret, &j );
+      palSlaCaldj( yy, mm, dd, &ret, &j );
 
 /* If succesful, convert the hours, minutes and seconds to a fraction of
     a day, and add it onto the MJD found above. */
@@ -6129,7 +6129,7 @@ static double DateObs( const char *dateobs ) {
          secs += (double) sc;
 
 /*Convert the hours, minutes and seconds to a fractional day. */
-         slaDtf2d( hr, mn, secs, &days, &j );
+         palSlaDtf2d( hr, mn, secs, &days, &j );
 
 /* If succesful, add this onto the returned MJD. */
          if( j == 0 ) {
@@ -14990,17 +14990,17 @@ static int IRAFFromStore( AstFitsChan *this, FitsStore *store,
 /* The format used for the DATE-OBS keyword depends on the value of the
    keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
    Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]" format. */
-      slaCaldj( 99, 1, 1, &mjd99, &jj );
+      palSlaCaldj( 99, 1, 1, &mjd99, &jj );
       if( val < mjd99 ) {
 
-         slaDjcal( 0, val, iymdf, &jj );
+         palSlaDjcal( 0, val, iymdf, &jj );
          sprintf( combuf, "%2.2d/%2.2d/%2.2d", iymdf[ 2 ], iymdf[ 1 ], 
                   iymdf[ 0 ] - ( ( iymdf[ 0 ] > 1999 ) ? 2000 : 1900 ) ); 
 
       } else {
 
-         slaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
-         slaDd2tf( 3, fd, sign, ihmsf );
+         palSlaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
+         palSlaDd2tf( 3, fd, sign, ihmsf );
          sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
                   iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
                   ihmsf[2], ihmsf[3] ); 
@@ -16775,7 +16775,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
    missing g0 values will be assumed to be zero when we come to find the
    CRPIX values below. 
 
-   We use slaDmat to solve this system of simultaneous equations to get
+   We use palSlaDmat to solve this system of simultaneous equations to get
    crpix. The "y" array initially holds "w0" but is over-written to hold 
    "g0 - crpix". */
          mat = astMalloc( sizeof( double )*(size_t)( nout*nout ) );
@@ -16787,7 +16787,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
                for( j = 0; j < nout; j++ ) *(m++) = fullmat[ j ][ i ];
                y[ i ] = w0[ i ];
             }               
-            slaDmat( nout, mat, y, &det, &sing, iw );
+            palSlaDmat( nout, mat, y, &det, &sing, iw );
          }
          mat = astFree( mat );
          iw = astFree( iw );
@@ -16796,7 +16796,7 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
          for( j = 0; j < nout; j++ ) {
             colvec = fullmat[ j ];
 
-/* Get the CRPIX values from the "y" vector created above by slaDmat.
+/* Get the CRPIX values from the "y" vector created above by palSlaDmat.
    First deal with axes for which there are Mapping inputs. */
             if( j < nin ) {
                crp = g0[ j ] - y[ j ];
@@ -18257,7 +18257,7 @@ static double *OrthVector( int n, int m, double **in ){
 *     Where the indices are now not direct indices into the supplied and
 *     returned vectors, but indices into an array of indices which have
 *     been sorted into column magnitude order. This is now a set of MxM
-*     simultaneous linear equations which we can solve using slaDmat:
+*     simultaneous linear equations which we can solve using palSlaDmat:
 *
 *     MAT.R = V
 *
@@ -18266,7 +18266,7 @@ static double *OrthVector( int n, int m, double **in ){
 *     required vector (just the components which have *not* been set
 *     constant), and V is a constant vector equal to the column of values
 *     on the right hand side in the above set of simultaneous equations.
-*     The slaDmat function solves this equation to obtain R.
+*     The palSlaDmat function solves this equation to obtain R.
 
 *  Parameters:
 *     n
@@ -18371,7 +18371,7 @@ static double *OrthVector( int n, int m, double **in ){
    V vector (other elements hold the indices of the columns which are
    being ignored because they will be mutiplied by a value of zero - the
    assumed value of the corresponding components of the returned vector). We 
-   now copy the these values into arrays which can be passed to slaDmat. 
+   now copy the these values into arrays which can be passed to palSlaDmat. 
    First, initialise a pointer used to step through the mat array. */
       mel = mat;
 
@@ -18381,16 +18381,16 @@ static double *OrthVector( int n, int m, double **in ){
          d = in[ i ];
 
 /* Copy the required M elements of this supplied vector into the work array
-   which will be passed to slaDmat. */
+   which will be passed to palSlaDmat. */
          for( j = 0; j < m; j++ ) *(mel++) = d[ colperm[ j ] ];
 
 /* Put the next right-hand side value into the "rhs" array. */
          rhs[ i ] = -d[ colperm[ m ] ];
       }   
 
-/* Use slaDmat to find the first M elements of the returned array. These
+/* Use palSlaDmat to find the first M elements of the returned array. These
    are stored in "rhs", over-writing the original right-hand side values. */
-      slaDmat( m, mat, rhs, &det, &sing, iw );
+      palSlaDmat( m, mat, rhs, &det, &sing, iw );
 
 /* If the supplied vectors span fewer than M axes, the above call will fail. 
    In this case, annul the returned vector. */
@@ -19191,15 +19191,15 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
 /* The format used for the DATE-OBS keyword depends on the value of the
    keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
    Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]" format. */
-            slaCaldj( 99, 1, 1, &mjd99, &jj );
+            palSlaCaldj( 99, 1, 1, &mjd99, &jj );
             if( val < mjd99 ) {
-               slaDjcal( 0, val, iymdf, &jj );
+               palSlaDjcal( 0, val, iymdf, &jj );
                sprintf( combuf, "%2.2d/%2.2d/%2.2d", iymdf[ 2 ], iymdf[ 1 ], 
                         iymdf[ 0 ] - ( ( iymdf[ 0 ] > 1999 ) ? 2000 : 1900 ) ); 
       
             } else {
-               slaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
-               slaDd2tf( 3, fd, sign, ihmsf );
+               palSlaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
+               palSlaDd2tf( 3, fd, sign, ihmsf );
                sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
                         iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
                         ihmsf[2], ihmsf[3] ); 
@@ -21708,7 +21708,7 @@ static void SkyPole( AstWcsMap *map2, AstMapping *map3, int ilon, int ilat,
    takes the default value, replace it with AST__BAD to prevent an explicit 
    keyword being stored in the FitsChan. */
          GetFiducialNSC( map2, &phi0, &theta0 );
-         lonpole = slaDranrm( ptr1[ axlon ][ 0 ] );
+         lonpole = palSlaDranrm( ptr1[ axlon ][ 0 ] );
          if( delta0 >= theta0 ){
             deflonpole = 0.0;
          } else {
@@ -21846,19 +21846,19 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
 /* Convert the equinox to a Julian or Besselian epoch. Also get the
    reference frame and standard system. */
    if( !Ustrcmp( sys, "FK4") ){
-      eq = slaEpb( eq );
+      eq = palSlaEpb( eq );
       radesys = FK4;
       isys = RADEC;
       SetItemC( &(store->radesys), 0, s, "FK4" );
       
    } else if( !Ustrcmp( sys, "FK4_NO_E") || !Ustrcmp( sys, "FK4-NO-E") ){
-      eq = slaEpb( eq );
+      eq = palSlaEpb( eq );
       radesys = FK4NOE;
       isys = RADEC;
       SetItemC( &(store->radesys), 0, s, "FK4-NO-E" );
 
    } else if( !Ustrcmp( sys, "FK5" ) ){
-      eq = slaEpj( eq );
+      eq = palSlaEpj( eq );
       radesys = FK5;
       isys = RADEC;
       SetItemC( &(store->radesys), 0, s, "FK5" );
@@ -22003,7 +22003,7 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
       geolon = astGetObsLon( skyfrm );
       geolat = astGetObsLat( skyfrm );
       if( geolat != AST__BAD && geolon != AST__BAD ) {
-         slaGeoc( geolat, 0.0, &r, &z );
+         palSlaGeoc( geolat, 0.0, &r, &z );
          r *= AST__AU;
          SetItem( &(store->obsgeox), 0, 0, ' ', r*cos( geolon ) );
          SetItem( &(store->obsgeoy), 0, 0, ' ', r*sin( geolon ) );
@@ -22671,7 +22671,7 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
                   geolon = astGetObsLon( specfrm );
                   geolat = astGetObsLat( specfrm );
                   if( geolat != AST__BAD && geolon != AST__BAD ) {
-                     slaGeoc( geolat, 0.0, &r, &z );
+                     palSlaGeoc( geolat, 0.0, &r, &z );
                      r *= AST__AU;
                      SetItem( &(store->obsgeox), 0, 0, ' ', r*cos( geolon ) );
                      SetItem( &(store->obsgeoy), 0, 0, ' ', r*sin( geolon ) );
@@ -23532,7 +23532,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                if( 1 == astSscanf( cval + 1, " %lf ", &dval ) ){
 
 /* If it is a Besselian epoch, convert to Julian. */
-                  if( bj == 'B' ) dval = slaEpj( slaEpb2d( dval ) );
+                  if( bj == 'B' ) dval = palSlaEpj( palSlaEpb2d( dval ) );
 
 /* Replace the original EQUINOX card. */
                   SetValue( ret, "EQUINOX", (void *) &dval, AST__FLOAT, 
@@ -23982,7 +23982,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
              GetValue2( ret, this, FormatKey( "CRPIX", axlon + 1, -1, s ),
                         AST__FLOAT, (void *) &dval, 0, method, class ) ) {
             if( cdelti != 0.0 ) {   
-               dval = AST__DR2D*slaDrange( AST__DD2R*dval*cdelti )/cdelti;
+               dval = AST__DR2D*palSlaDrange( AST__DD2R*dval*cdelti )/cdelti;
                SetValue( ret, FormatKey( "CRPIX", axlon + 1, -1, s ), 
                          (void *) &dval, AST__FLOAT, CardComm( this ) );
             }
@@ -27380,17 +27380,17 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
 /* The format used for the DATE-OBS keyword depends on the value of the
    keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
    Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]" format. */
-            slaCaldj( 99, 1, 1, &mjd99, &jj );
+            palSlaCaldj( 99, 1, 1, &mjd99, &jj );
             if( val < mjd99 ) {
       
-               slaDjcal( 0, val, iymdf, &jj );
+               palSlaDjcal( 0, val, iymdf, &jj );
                sprintf( combuf, "%2.2d/%2.2d/%2.2d", iymdf[ 2 ], iymdf[ 1 ], 
                         iymdf[ 0 ] - ( ( iymdf[ 0 ] > 1999 ) ? 2000 : 1900 ) ); 
       
             } else {
       
-               slaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
-               slaDd2tf( 3, fd, sign, ihmsf );
+               palSlaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
+               palSlaDd2tf( 3, fd, sign, ihmsf );
                sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
                         iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
                         ihmsf[2], ihmsf[3] ); 
@@ -28168,7 +28168,7 @@ static AstMapping *WcsNative( AstFitsChan *this, FitsStore *store, char s,
 /* Limit the latitude to the range +/- PI/2, issuing a warning if the
    supplied CRVAL value is outside this range. The "alphap" variable is used 
    as workspace here. */
-      alphap = slaDrange( delta0 );  
+      alphap = palSlaDrange( delta0 );  
       delta0 = alphap;
       if ( delta0 > AST__DPIBY2 ){
          delta0 = AST__DPIBY2;
@@ -28535,8 +28535,8 @@ static int WcsNatPole( AstFitsChan *this, AstWcsMap *wcsmap, double alpha0,
                } else {
                   t4 = acos( t3 );
                }
-               deltap_1 = slaDrange( t1 + t4 );
-               deltap_2 = slaDrange( t1 - t4 );
+               deltap_1 = palSlaDrange( t1 + t4 );
+               deltap_2 = palSlaDrange( t1 - t4 );
 
 /* Select which of these two values of deltap to use. Values outside the
    range +/- PI/2 cannot be used. If both values are within this range
@@ -29202,9 +29202,9 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
 /* Convert the equinox to a Modified Julian Date. */
    if( equinox != AST__BAD ) { 
       if( bj == 'B' ) {
-         eqmjd = slaEpb2d( equinox );
+         eqmjd = palSlaEpb2d( equinox );
       } else {
-         eqmjd = slaEpj2d( equinox );
+         eqmjd = palSlaEpj2d( equinox );
       }
    } else {
       eqmjd = AST__BAD;
