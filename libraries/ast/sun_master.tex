@@ -802,13 +802,10 @@ are described here:
 
 \begin{enumerate}
 \item {\bf{Minimum Software Dependencies.}}
-The AST library depends on as little other software as possible. Only
-the widely-available SLALIB positional astronomy library
-(\xref{SUN/67}{sun67}{}) is required. Even here, the minimal required
-slalib code is included with the AST distribution, and is built as part
-of building the AST library. Alternatively, you have the choice of
-linking against an external, full version of SLALIB; either the Fortran 
-version available from Starlink or the C version available from tpoint.
+The AST library depends on no other other software\footnote{It now comes with a
+minimal cut-down version of the widely-available SLALIB positional astronomy 
+library (\xref{SUN/67}{sun67}{}), including just those functions needed
+by AST, and the previous dependency on SLALIB is no longer present}.
 
 \item {\bf{Environment Independence.}}
 AST is designed so that it can operate in a variety of ``programming
@@ -1542,9 +1539,6 @@ Software Collection installed then AST should already be available.
 If not, you can download the AST library by itself from
 \htmladdnormallink{http://www.starlink.ac.uk/ast/}
 {http://www.starlink.ac.uk/ast/}. 
-
-Note, AST requires the SLALIB library (\xref{SUN/67}{sun67}{}) to be 
-installed.
 
 \subsection{\ldots Structure an AST Program}
 
@@ -21144,6 +21138,10 @@ Frame and one of two component Frames contained within the CmpFrame. Thus
 is should now be possible to align a SkyFrame with a CmpFrame containing a
 SkyFrame and a SpecFrame (for instance). The returned Mapping produces bad
 values for the extra axes (i.e. for the SpecFrame axis in the above example).
+
+\item The \verb+ast\_link\_adam+ and \verb+ast\_link+ scripts now ignore the 
+\verb+-fsla+ and \verb+-csla+ options, and always link against the
+minimal cut-down version of SLALIB distributed as part of AST.
 
 \end{enumerate}
 

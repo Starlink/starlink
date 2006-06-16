@@ -16,6 +16,10 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- The ast_link_adam and ast_link scripts now ignore the -fsla and -csla
+options, and always link against the minimal cut-down version of SLALIB
+distributed as part of AST.
+
 - A problem with unaligned memory access that could cause bus errors on 
 Solaris has been fixed.
 
