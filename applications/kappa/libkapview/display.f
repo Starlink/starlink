@@ -754,7 +754,7 @@
 *  dimensions.  The NDF must have no more than two significant pixel axes 
 *  (i.e. pixel axes spanning more than one pixel).  A single significant 
 *  pixel axis is allowed.
-      CALL KPG1_ASGET( INDF1, NDIM, .FALSE., AXES .OR. BORDER, 
+      CALL KPG1_ASGET( INDF1, NDIM, .FALSE., AXES, 
      :                 AXES, SDIM, SLBND, SUBND, IWCS, STATUS )
 
 *  Store the number of current Frame axes.
@@ -1425,6 +1425,7 @@
 
 *  Output the bad pixel flag value accordingly unless the output NDF is 
 *  primitive.
+            FORM = ' '
             CALL NDF_FORM( INDF3, 'Data', FORM, STATUS )
             IF ( FORM .NE. 'PRIMITIVE' ) THEN
                CALL NDF_SBAD( BAD, INDF3, 'Data', STATUS )
