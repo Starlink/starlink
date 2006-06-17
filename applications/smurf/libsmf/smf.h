@@ -286,9 +286,9 @@ void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize,
 			 int flags, double *map, double *mapweight, 
 			 double *mapvar, int msize, int *status );
 
-void smf_iteratemap( Grp *igrp, Grp *astgrp, Grp *atmgrp, Grp *ngrp, 
-		     int size, double *map, double *variance, double *weights,
-		     int msize, int *status );
+void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
+ 		     double *map, double *variance, double *weights,
+	 	     int msize, int *status );
 
 void smf_open_mapcoord( smfData *data, int *status );
 

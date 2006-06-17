@@ -135,11 +135,14 @@ void smurf_makemap( int *status ) {
   /* Local Variables */
   Grp *astgrp = GRP__NOID;   /* Group of astronomical signal files */
   Grp *atmgrp = GRP__NOID;   /* Group of atmospheric signal files */
+  Grp *confgrp = GRP__NOID;  /* Group containing configuration file */
   void *data_index[1];       /* Array of pointers to mapped arrays in ndf */
   smfData *data=NULL;        /* pointer to  SCUBA2 data struct */
   int flag;                  /* Flag */
   dim_t i;                   /* Loop counter */
   Grp *igrp = GRP__NOID;     /* Group of input files */
+  AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
+  int ksize=0;               /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   void *map=NULL;            /* Pointer to the rebinned map data */
   char method[LEN__METHOD];  /* String for map-making method */
@@ -154,36 +157,22 @@ void smurf_makemap( int *status ) {
   void *weights=NULL;        /* Pointer to the weights map */
 
   /* Test variables */
-  int coordndf=NDF__NOID;      /* NDF identifier for coordinates */
-  dim_t j;                     /* Loop counter */
-  int *lut;                    /* The lookup table */
-  int nmap;                    /* Number of mapped elements */
-  int place=NDF__NOPL;         /* NDF place holder */
+  int coordndf=NDF__NOID;    /* NDF identifier for coordinates */
+  dim_t j;                   /* Loop counter */
+  int *lut;                  /* The lookup table */
+  int nmap;                  /* Number of mapped elements */
+  int place=NDF__NOPL;       /* NDF place holder */
   int there;
   double *bolodata;
   int parstate;              /* State of ADAM parameters */
+
+  int numiter=0;
 
   /* Main routine */
   ndfBegin();
   
   /* Get group of input files */
   ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
-
-  /* Create groups containing model components if defined */
-  parState( "ASTMODEL", &parstate, status );
-  if( parstate == PAR__ACTIVE ) {
-    ndgCreat( "ASTMODEL", igrp, &astgrp, &size, &flag, status );
-  }
-
-  parState( "ATMMODEL", &parstate, status );
-  if( parstate == PAR__ACTIVE ) {
-    ndgCreat( "ATMMODEL", igrp, &atmgrp, &size, &flag, status );
-  }
-
-  parState( "NOISEMODEL", &parstate, status );
-  if( parstate == PAR__ACTIVE ) {
-    ndgCreat( "NOISEMODEL", igrp, &ngrp, &size, &flag, status );
-  }
 
   /* Get the user defined pixel size */
   parGet0r( "PIXSIZE", &pixsize, status );
@@ -220,7 +209,8 @@ void smurf_makemap( int *status ) {
 			1, status );
   if ( weights == NULL ) {
     *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Unable to allocate memory for the weights array", status);
+    errRep(FUNC_NAME, "Unable to allocate memory for the weights array", 
+	   status);
   }
 
   /* Create the map using the chosen METHOD */
@@ -279,13 +269,53 @@ void smurf_makemap( int *status ) {
       }
     }
   } else if( strncmp( method, "ITERATE", 5 ) == 0 ) {
+
     /* Iterative map-maker */
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using ITERATE method", 
 	     status);
+
+    /* Read a group of configuration settings into keymap */
+    parState( "CONFIG", &parstate, status );
+    if( parstate == PAR__ACTIVE ) {
+      kpg1Gtgrp( "CONFIG", &confgrp, &ksize, status );
+      kpg1Kymap( confgrp, &keymap, status );
+      if( confgrp ) grpDelet( &confgrp, status );      
+    } else {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "CONFIG unspecified", status);      
+    }
     
+    /* Check for names of groups containing model components, and create */
+    /*
+      parState( "ASTMODEL", &parstate, status );
+      if( parstate == PAR__ACTIVE ) {
+      ndgCreat( "ASTMODEL", igrp, &astgrp, &size, &flag, status );
+      } else {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "No ASTMODEL specified", status);      
+      }
+      
+      parState( "ATMMODEL", &parstate, status );
+      if( parstate == PAR__ACTIVE ) {
+      ndgCreat( "ATMMODEL", igrp, &atmgrp, &size, &flag, status );
+      } else {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "No ATMMODEL specified", status);      
+      }
+      
+      parState( "NOISEMODEL", &parstate, status );
+      if( parstate == PAR__ACTIVE ) {
+      ndgCreat( "NOISEMODEL", igrp, &ngrp, &size, &flag, status );
+      } else {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "No NOISEMODEL specified", status);      
+      
+      }
+    */
+
     /* Loop over all input data files to put in the pointing extension */
     if( *status == SAI__OK ) {
-      for(i=1; i<=size; i++ ) {
+      for(i=1; i<=size; i++ ) {	
 	smf_open_file( igrp, i, "UPDATE", 1, &data, status );
 	smf_mapcoord( data, outfset, lbnd_out, ubnd_out, status );
 	smf_close_file( &data, status );
@@ -295,24 +325,8 @@ void smurf_makemap( int *status ) {
       }
     }
 
-    /* Check existence of groups corresponding to each model component */
-    if( astgrp == GRP__NOID ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "No ASTMODEL specified", status);      
-    }
-
-    if( atmgrp == GRP__NOID ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "No ATMMODEL specified", status);      
-    }
-
-    if( ngrp == GRP__NOID ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "No NOISEMODEL specified", status);      
-    }
-
     /* Call the low-level iterative map-maker */
-    smf_iteratemap( igrp, astgrp, atmgrp, ngrp, size, map, variance, weights,
+    smf_iteratemap( igrp, keymap, map, variance, weights,
 		    (ubnd_out[0]-lbnd_out[0]+1)*(ubnd_out[1]-lbnd_out[1]+1),
 		    status );
 
@@ -333,10 +347,12 @@ void smurf_makemap( int *status ) {
   smf_free( weights, status );
   
   if( igrp != GRP__NOID ) grpDelet( &igrp, status);
+  /*
   if( astgrp != GRP__NOID ) grpDelet( &astgrp, status );
   if( atmgrp != GRP__NOID ) grpDelet( &atmgrp, status );
   if( ngrp != GRP__NOID ) grpDelet( &ngrp, status );
-  
+  */
+
   ndfEnd( status );
   
   msgOutif(MSG__VERB," ","Map written.", status);

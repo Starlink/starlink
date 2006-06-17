@@ -109,20 +109,33 @@ package @PACKAGE@ {
             helpkey *
 	 }	
 
+	 parameter config {
+            type LITERAL
+            access READ
+            prompt {Map-maker tuning parameters}
+            helpkey *
+	 }
+
          parameter astmodel {
             type NDF
+            access WRITE
+            dynamic yes
             prompt {Output NDF time series estimate of astronomical signal}
             helpkey *
           }
 
          parameter atmmodel {
 	    type NDF 	
+            access WRITE
+            dynamic yes
             prompt {Output NDF time series estimate of atmospheric signal}
             helpkey *
           }
 
          parameter noisemodel {
             type NDF
+            access WRITE
+            dynamic yes
             prompt {Output NDF time series estimate of noise}
             helpkey *
           }

@@ -97,17 +97,22 @@
 
 #define FUNC_NAME "smf_iteratemap"
 
-
-void smf_iteratemap( Grp *igrp, Grp *astgrp, Grp *atmgrp, Grp *ngrp, 
-		     int gsize, double *map, double *variance, double *weights,
+void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map, 
+		     double *variance, double *weights,
 		     int msize, int *status ) {
 
   /* Local Variables */
-  int atmndf;                   /* Atmospheric signal NDF identifier */
-  smfData *atmdata;             /* Pointer to atmospheric data struct */
   int astndf;                   /* Astronomical signal NDF identifier */
   smfData *astdata;             /* Pointer to astronomical data struct */
+  Grp *astgrp=GRP__NOID;        /* Group of ast model files */
+  const char *astmodel;         /* Name of astmodel group */
+  int atmndf;                   /* Atmospheric signal NDF identifier */
+  smfData *atmdata;             /* Pointer to atmospheric data struct */
+  Grp *atmgrp=GRP__NOID;        /* Group of atmos model files */
+  const char *atmmodel;         /* Name of atmmodel group */
   int coordndf=NDF__NOID;       /* NDF identifier for coordinates */
+  int flag;                     /* Flag */
+  int gsize;                    /* Number of files in group */
   dim_t i;                      /* Loop counter */
   int indf;                     /* Input data NDF identifier */
   smfData *idata;               /* Pointer to input data struct */
@@ -121,6 +126,8 @@ void smf_iteratemap( Grp *igrp, Grp *astgrp, Grp *atmgrp, Grp *ngrp,
   int nmap;                     /* Number of elements mapped */
   int nbolo;                    /* Number of bolometers */
   int nndf;                     /* Residual noise NDF identifier */
+  Grp *ngrp=GRP__NOID;          /* Group of noise model files */
+  const char *nmodel;           /* Name of noisemodel group */
   dim_t numiter;                /* Total number iterations */
   int rebinflags;               /* Flags to control rebinning */
   double sigma;                 /* Estimate of standard deviation */
@@ -128,11 +135,55 @@ void smf_iteratemap( Grp *igrp, Grp *astgrp, Grp *atmgrp, Grp *ngrp,
   int ubnd[1];                  /* Pixel bounds for 1d pointing array */
   int vexists;                  /* flag for presence of VARIANCE component */
 
+  char *test;
+
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* Create all of the model files by copying the input files */
+  /* Get/check the CONFIG parameters stored in the keymap */
 
+  if( astMapGet0C( keymap, "ASTMODEL", &astmodel ) ) {
+    /* parPut0c( "ASTMODEL", astmodel, status ); */
+
+    /* parGet0c( "ASTMODEL", &test, status );
+       printf("Put ASTMODEL=%s\n", test); */
+
+    ndgCreat( "ASTMODEL", igrp, &astgrp, &gsize, &flag, status );
+  } else {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "ASTMODEL unspecified", status);      
+  }
+
+  if( astMapGet0C( keymap, "ATMMODEL", &atmmodel ) ) {
+    /* parPut0c( "ATMMODEL", atmmodel, status ); */
+
+    /* parGet0c( "ATMMODEL", &test, status );
+       printf("Put ATMMODEL=%s\n", test); */
+
+    ndgCreat( "ATMMODEL", igrp, &atmgrp, &gsize, &flag, status );
+  } else {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "ATMMODEL unspecified", status);      
+  }
+
+  if( astMapGet0C( keymap, "NOISEMODEL", &nmodel ) ) {
+    /* parPut0c( "NOISEMODEL", nmodel, status ); */
+
+    /* parGet0c( "NOISEMODEL", &test, status );
+       printf("Put NOISEMODEL=%s\n", test); */
+
+    ndgCreat( "NOISEMODEL", igrp, &ngrp, &gsize, &flag, status );
+  } else {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "NOISEMODEL unspecified", status);      
+  }
+
+  if( !astMapGet0I( keymap, "NUMITER", &numiter ) ) {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "NUMITER unspecified", status);      
+  }
+  
+  /* Create all of the model files by copying the input files */
   msgOut(" ", "SMF_ITERATEMAP: Create intermediate model files", status);
 
   for( i=1; i<=gsize; i++ ) {
@@ -167,8 +218,6 @@ void smf_iteratemap( Grp *igrp, Grp *astgrp, Grp *atmgrp, Grp *ngrp,
     ndfAnnul( &nndf, status);
   }
 
-  numiter = 5;
-  
   for( iter=0; iter<numiter; iter++ ) {
     
     msgSeti("ITER", iter+1);
@@ -329,4 +378,10 @@ void smf_iteratemap( Grp *igrp, Grp *astgrp, Grp *atmgrp, Grp *ngrp,
       }
     }
   }
+
+  /* Cleanup */
+  if( astgrp != GRP__NOID ) grpDelet( &astgrp, status );
+  if( atmgrp != GRP__NOID ) grpDelet( &atmgrp, status );
+  if( ngrp != GRP__NOID ) grpDelet( &ngrp, status );
+
 }
