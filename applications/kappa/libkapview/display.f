@@ -748,13 +748,16 @@
 *  See if annotated axes are required. 
       CALL PAR_GET0L( 'AXES', AXES, STATUS )
 
+*  See if a border is also required.
+      CALL PAR_GET0L( 'BORDER', BORDER, STATUS )
+
 *  Get an AST pointer to a FrameSet describing the co-ordinate Frames
-*  present in the NDF's WCS component.  If axes are being drawn, modify 
-*  it to ensure that the Base, PIXEL and Current frames all have two 
-*  dimensions.  The NDF must have no more than two significant pixel axes 
-*  (i.e. pixel axes spanning more than one pixel).  A single significant 
-*  pixel axis is allowed.
-      CALL KPG1_ASGET( INDF1, NDIM, .FALSE., AXES, 
+*  present in the NDF's WCS component.  If axes or borders are being 
+*  drawn, modify  it to ensure that the Base, PIXEL and Current frames 
+*  all have two dimensions.  The NDF must have no more than two 
+*  significant pixel axes (i.e. pixel axes spanning more than one 
+*  pixel).  A single significant pixel axis is allowed.
+      CALL KPG1_ASGET( INDF1, NDIM, .FALSE., AXES .OR. BORDER, 
      :                 AXES, SDIM, SLBND, SUBND, IWCS, STATUS )
 
 *  Store the number of current Frame axes.
@@ -771,9 +774,6 @@
 
 *  Determine the width of the margins to leave around the DATA picture.
 *  ====================================================================
-
-*  See if a border is also required.
-      CALL PAR_GET0L( 'BORDER', BORDER, STATUS )
 
 *  Set the dynamic default for the margins to place around the DATA
 *  picture (a single value is used for all edges), and then get the
@@ -1288,7 +1288,7 @@
          END IF
 
 *  If a border is required, do the whole thing again, ensuring that the 
-*  relavant Plot attributes are cleared first.
+*  relevant Plot attributes are cleared first.
          IF( BORDER ) THEN
 
             CALL AST_CLEAR( IPLOT, 'COLOUR', STATUS )
@@ -1322,7 +1322,7 @@
 *  Draw the axes grid if required.
          IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
 
-*  If a border is required, ensure that the relavant Plot attributes are
+*  If a border is required, ensure that the relevant Plot attributes are
 *  cleared, set the new style, and draw it.
          IF( BORDER ) THEN
             CALL AST_CLEAR( IPLOT, 'COLOUR', STATUS )
@@ -1425,7 +1425,6 @@
 
 *  Output the bad pixel flag value accordingly unless the output NDF is 
 *  primitive.
-            FORM = ' '
             CALL NDF_FORM( INDF3, 'Data', FORM, STATUS )
             IF ( FORM .NE. 'PRIMITIVE' ) THEN
                CALL NDF_SBAD( BAD, INDF3, 'Data', STATUS )
