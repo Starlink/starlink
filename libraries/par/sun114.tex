@@ -921,7 +921,8 @@ the most likely way to handle $n$-dimensional arrays of parameter
 values. 
 
 See 
-\xref{SUN/115}{sun115}{} Appendix~C for details of the specifications needed within
+\xref{SUN/115}{sun115}{parameter_specification_for_output_parameters} 
+\latexonly{Appendix~C} for details of the specifications needed within
 the interface file to deal with scalar and array output parameters. 
 
 \subsection{\xlabel{cancelling_a_parameter}Cancelling a Parameter}
@@ -991,12 +992,12 @@ dynamic default for parameter SHADE will be $-$1.0, and 0.0 otherwise.
 Note that in {\footnotesize ADAM} applications the {\em ppath\/} in the
 interface file must begin {\tt DYNAMIC} to ensure that the user of your
 application will be prompted with the dynamic default (see 
-\xref{SUN/115}{sun115}{}).
+\xref{SUN/115}{sun115}{the_ppath_field}).
 
 The {\footnotesize ADAM} parameter system also allows the dynamic 
 default to be used as the parameter value without prompting, through 
 the interface file {\em vpath\/} (see 
-\xref{SUN/115}{sun115}{}).
+\xref{SUN/115}{sun115}{the_vpath_field}).
 
 
 There are also routines that set the dynamic default for a vector
@@ -4217,8 +4218,8 @@ const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );] \listline
          will proceed in the same way as it does for input parameters.
          This can result in users being prompted for `a value'. This
          behaviour, and how to avoid it, is discussed further in the
-         Interface Module Reference Manual (
-         \xref{SUN/115}{sun115}{}).
+         Interface Module Reference Manual 
+         (\xref{SUN/115}{sun115}{parameter_specification_for_output_parameters}).
 
          \sstitem
          Limit checks for IN, RANGE, MIN/MAX are not applied.
@@ -4280,8 +4281,8 @@ const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );] \listline
          will proceed in the same way as it does for input parameters.
          This can result in users being prompted for `a value'. This
          behaviour, and how to avoid it, is discussed further in the
-         Interface Module Reference Manual (
-         \xref{SUN/115}{sun115}{}).
+         Interface Module Reference Manual 
+         (\xref{SUN/115}{sun115}{parameter_specification_for_output_parameters}).
 
          \sstitem
          Limit checks for IN, RANGE, MIN/MAX are not applied.
@@ -4355,8 +4356,8 @@ const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );] \listline
          will proceed in the same way as it does for input parameters.
          This can result in users being prompted for `a value'. This
          behaviour, and how to avoid it, is discussed further in the
-         Interface Module Reference Manual (
-         \xref{SUN/115}{sun115}{}).
+         Interface Module Reference Manual 
+         (\xref{SUN/115}{sun115}{parameter_specification_for_output_parameters}).
 
          \sstitem
          Limit checks for IN, RANGE, MIN/MAX are not applied.
@@ -4417,8 +4418,8 @@ const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );] \listline
          will proceed in the same way as it does for input parameters.
          This can result in users being prompted for `a value'. This
          behaviour, and how to avoid it, is discussed further in the
-         Interface Module Reference Manual (
-         \xref{SUN/115}{sun115}{}).
+         Interface Module Reference Manual 
+         (\xref{SUN/115}{sun115}{parameter_specification_for_output_parameters}).
 
          \sstitem
          Limit checks for IN, RANGE, MIN/MAX are not applied.
