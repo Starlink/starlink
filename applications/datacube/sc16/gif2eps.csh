@@ -13,6 +13,8 @@ unalias convert
 convert -page A4 -geometry 100% sc16.htx/sc16_atv.gif eps:sc16_atv.eps
 convert -page A4 -geometry 100% sc16.htx/sc16_compare.gif eps:sc16_compare.eps
 convert -page A4 -geometry 100% sc16.htx/sc16_cover.gif eps:sc16_cover.eps
+convert -page A4 -geometry 100% sc16.htx/sc16_gaia_cubetool.gif eps:sc16_gaia_cubetool.eps
+convert -page A4 -geometry 100% sc16.htx/sc16_gaia_spectrum.gif eps:sc16_gaia_spectrum.eps
 convert -page A4 -geometry 100% sc16.htx/sc16_mosaic.gif eps:sc16_mosaic.eps
 convert -page A4 -geometry 100% sc16.htx/sc16_passband.gif eps:sc16_passband.eps
 convert -page A4 -geometry 100% sc16.htx/sc16_peakmap.gif eps:sc16_peakmap.eps
