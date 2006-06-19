@@ -64,6 +64,9 @@
 *        Use autoconf for RECL.
 *     29-JUL-2004 (PWD):
 *        Increase file and device names to 256 chars.
+*     19-JUN-2006 (PWD):
+*        Change error messages so that it's easier to say which file is
+*        corrupt.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -147,7 +150,7 @@
 #if HAVE_FC_OPEN_READONLY
      :           READONLY,
 #endif
-     :           ERR=100)
+     :           ERR=101)
 
 *        Get our own node name
             CALL gns_1HOSTN( LOCNOD, L, STATUS)
@@ -155,7 +158,7 @@
             I = 1
    20       CONTINUE
             IF (I.GT.MAXNAI+1) GO TO 60
-            READ (UNIT=LUNGKS, END=70, FMT='(A)', ERR=110) REC
+            READ (UNIT=LUNGKS, END=70, FMT='(A)', ERR=120) REC
             IF (I.LE.MAXNAI) THEN
 
 *           Locate the field delimiters. IDEL(J) points to the character
@@ -185,7 +188,7 @@
                ELSE
                   STATUS = GNS__DBINV
                   CALL EMS_REP( 'GNS_1INITG_DBN1',
-     :                          'GNS database file has invalid format',
+     :                 'GNS names database file has invalid format (1)',
      :                          STATUS )
                   GO TO 70
                END IF
@@ -196,14 +199,14 @@
                   IF (IOERR.NE.0) THEN
                       STATUS = GNS__DBINV
                       CALL EMS_REP( 'GNS_1INITG_DBN2',
-     :                          'GNS database file has invalid format',
+     :                'GNS names database file has invalid format (2)',
      :                          STATUS )
                       GO TO 70
                   END IF
                ELSE
                   STATUS = GNS__DBINV
                   CALL EMS_REP( 'GNS_1INITG_DBN2',
-     :                          'GNS database file has invalid format',
+     :                 'GNS names database file has invalid format (3)',
      :                          STATUS )
                   GO TO 70
                END IF
@@ -297,12 +300,25 @@
   100 CONTINUE
       STATUS = GNS__DBOPE
       CALL EMS_REP( 'GNS_1INITG_DBOP',
-     :              'Unable to open GNS database file', STATUS )
+     :              'Unable to open GNS devices database file', STATUS )
+      GO TO 999
+  101 CONTINUE
+      STATUS = GNS__DBOPE
+      CALL EMS_REP( 'GNS_1INITG_DBOP',
+     :              'Unable to open GNS names database file', STATUS )
+      GO TO 999
+  120 CONTINUE
+      STATUS = GNS__DBINV
+      CALL EMS_REP( 'GNS_1INITG_DBN3',
+     :              'GNS names database file has invalid format (0)', 
+     :              STATUS )
+      CLOSE (UNIT=LUNGKS)
       GO TO 999
   110 CONTINUE
       STATUS = GNS__DBINV
       CALL EMS_REP( 'GNS_1INITG_DBN3',
-     :              'GNS database file has invalid format', STATUS )
+     :              'GNS devices database file has invalid format (0)', 
+     :              STATUS )
       CLOSE (UNIT=LUNGKS)
   999 CONTINUE
       END       
