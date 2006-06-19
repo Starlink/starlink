@@ -582,6 +582,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *     5-JUN-2006 (DSB)
 *        Do not change the box returned by astBoundBox as a consequence
 *        of calling astGetAttrib.
+*     19-JUN-2006 (DSB)
+*        Changed the default line 0.0 from zero to 1.0.
 *class--
 */
 
@@ -3733,7 +3735,7 @@ MAKE_SET(Colour,int,colour,value,AST__NPID)
 /* Line widths. Has a value of AST__BAD when not set yielding a
    default of 0.0. */
 MAKE_CLEAR(Width,width,AST__BAD,AST__NPID)
-MAKE_GET(Width,double,0.0,( this->width[axis] == AST__BAD ? 0.0 : this->width[axis] ),AST__NPID)
+MAKE_GET(Width,double,1.0,( this->width[axis] == AST__BAD ? 1.0 : this->width[axis] ),AST__NPID)
 MAKE_TEST(Width,( this->width[axis] != AST__BAD ),AST__NPID)
 MAKE_SET(Width,double,width,value,AST__NPID)
 
