@@ -38,6 +38,11 @@
 %        spelling and typo's corrected.
 %    2006 March 19 (MJC):
 %        Add section on gridspec with illustrated example.
+%    2006 June 16 (MJC):
+%        Add CHANMAP, and smoothing of planes by BLOCK and GAUSMOOTH.
+%        Introduce GAIA `3D' in a new illustrated subsection.  Enlarge
+%        LateX graphics 25%.  Revise figure placement from default.
+%
 %-
 
 % ? Specify used packages
@@ -57,7 +62,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {16.2}
 \newcommand{\stardocauthors}   {A.~Allan \& Malcolm J. Currie}
-\newcommand{\stardocdate}      {2006 March 17}
+\newcommand{\stardocdate}      {2006 June 16}
 \newcommand{\stardoctitle}     {The IFU Data-Product Cookbook}
 \newcommand{\stardocabstract}
 {This cookbook is a collection of material covering IFU data reduction and analysis. Along 
@@ -189,7 +194,7 @@ and hints and tips about how to deal with commonly occurring problems.}
 % Figure environment. Defined for latex2html. #1 is postscript file
 % #2 the qualifiers, #3 the gif file, #4 the label, #5 the caption.
 \newcommand{\myfig} [5] {
-  \begin{figure}
+  \begin{figure}[thb]
     \centering\includegraphics[#2]{#1}
     \typeout{#1 inserted on page \arabic{page}}
     \caption{\label{#4}#5}
@@ -318,6 +323,8 @@ and hints and tips about how to deal with commonly occurring problems.}
 \newcommand{\FIGARO}{{\footnotesize FIGARO}\normalsize}
 \newcommand{\FIGAROref}{\xref{\FIGARO}{sun86}{}}
 \newcommand{\FITSref}{\htmladdnormallink{FITS}{http://fits.gsfc.nasa.gov/}}
+\newcommand{\GAIA}{{\footnotesize GAIA}\normalsize}
+\newcommand{\GAIAref}{\xref{\GAIA}{sun214}{}}
 \newcommand{\IMSPEC}{{\footnotesize IMSPEC}\normalsize}
 \newcommand{\IRAF}{\footnotesize{IRAF}\normalsize}
 \newcommand{\IRAFref}{\htmladdnormallink{\IRAF}{http://iraf.noao.edu/iraf-homepage.html}}
@@ -685,7 +692,7 @@ the figure)
 \latexonly{Figure~\ref{sc16_uist_fig})} which is used as the input for the
 spectrometer in place of the long slit.
 
-\myfig{sc16_uist.eps}{height=0.4\textheight}{sc16_uist.gif}{sc16_uist_fig}{The UIST staggered slitlets.} 
+\myfig{sc16_uist.eps}{height=0.6\textheight}{sc16_uist.gif}{sc16_uist_fig}{The UIST staggered slitlets.} 
 
 Data acquisition, reduction and control software is provided by the
 \htmladdnormallink{JAC}{http://www.jach.hawaii.edu/} ORAC system.  The
@@ -1424,15 +1431,19 @@ Edits an NDF such that array values below and above two thresholds take constant
 \subsubsection{Cube manipulation}
 
 Slightly more complex is manipulation and resampling of the data cube
-itself.  The two most important utilities available to do this within
-\KAPPA\ are the \xref{{\bf collapse}}{sun95}{COLLAPSE} and
+itself.  The twhree most important utilities available to do this within
+\KAPPA\ are the \xref{{\bf collapse}}{sun95}{COLLAPSE}, 
+\xref{{\bf chanmap}}{sun95}{CHANMAP}, and
 \xref{{\bf ndfcopy}}{sun95}{NDFCOPY} applications.  {\bf collapse} can
 be used to produce \htmlref{white-light and passband}{sc16_vis} images\latexonly{ (see 
-Section~\ref{sc16_vis})} and velocity maps, while {\bf ndfcopy} can extract a single spectrum or 
+Section~\ref{sc16_vis})} and velocity maps, {\bf chanmap} creates an
+image of multiple passbands, while {\bf ndfcopy} can extract a single spectrum or 
 \htmlref{arbitrary cube sections}{sc16_vis} \latexonly{ (again see Section~\ref{sc16_vis} for
 details)}.
 
 \begin{itemize}
+\item{\xref{{\bf chanmap}}{sun95}{CHANMAP}}\\
+Creates a channel map from a cube NDF by compressing slices along a nominated axis
 \item{\xref{{\bf collapse}}{sun95}{COLLAPSE}}\\
 Reduces the number of axes in an $N$-dimensional NDF by compressing it along a nominated axis 
 \item{\xref{{\bf compadd}}{sun95}{COMPADD}}\\
@@ -1471,7 +1482,19 @@ Smooths a two-dimensional data array using a weighted median filter
 \item{\xref{{\bf rotate}}{sun95}{ROTATE}}\\
 Rotates two-dimensional NDF about its centre through any angle 
 \end{itemize}
- 
+
+Some tasks operate in two dimensions, but apply processing to a series
+of planes in a cube.  They permit, for example, to smooth spatially
+while retaining the spectral resolution.
+
+\begin{itemize}
+\item{\xref{{\bf block}}{sun95}{BLOCK}}\\
+Smooths an NDF using a one- or two-dimensional square or rectangular box filter
+\item{\xref{{\bf gausmooth}}{sun95}{GAUSMOOTH}}\\
+Smooths a one- or two-dimensional NDF using a Gaussian filter
+\end{itemize}
+
+
 \subsubsection{Pixel Operations}
 
 There are several applications which can carry out operations on
@@ -1901,7 +1924,6 @@ output is excised for clarity, denoted by a vertical ellipsis.
            Axis 2: -7:26:14 -> -7:25:44
            Axis 3: 345.762 -> 345.8139
 
-   %
 \end{verbatim}\normalsize
 
 The important information here is the boundary of the image in the
@@ -1917,6 +1939,70 @@ declination, and 345.762 to 345.8139 Ghz in frequency.
 % The $x$ and $y$ co-ordinates happen to be offsets in arcseconds from
 % the central pointing position, and is currently the default WCS
 % information inside a data cube from the TEIFU instrument.
+
+\newpage
+\subsection{\xlabel{sc16_gaia}GAIA data visualisation\label{sc16_gaia}}
+
+\GAIAref\ is a display and analysis tool widely used for two-dimensional
+data.  For many years the \GAIA\ tool had little to offer for cube
+visualisation.  Then came a toolbox for cubes to permit inspection of
+planes individually, or as an animation, or as a passband image by
+collapsing.  At the appropriately named Version 3.0, \GAIA\ offers
+further and growing facilities for cube analysis.  Check the {\tt
+\$GAIA\_DIR/gaia.news} file for the latest features that may extend
+upon those summarised below.
+
+If you start up \GAIA\ with a cube
+
+\small\begin{verbatim}
+   % gaia orion_mos_msk.sdf &
+\end{verbatim}\normalsize
+the cube toolbox appears (see
+\begin{htmlonly}
+the figure below)
+\end{htmlonly}
+\latexonly{Figure~\ref{sc16_gaia_cubetool_fig})} offering a choice of 
+axis to step along or collapse, and a selection of methods.  You can
+select a plane by giving its index or adjust the slider.  This could,
+for instance, let you define lower and upper limits of interest that
+are applied to the animation, or passband image (Collapse tab), tiled
+image of several passbands (Chanmap tab). The chosen limits apply to
+subsequent steps. If you need to access the Cube toolbox, go to the
+{\tt Open cube...} option in the {\tt File menu}.
+
+\myfig{sc16_gaia_cubetool.eps}{height=0.45\textheight}{sc16_gaia_cubetool.gif}{sc16_gaia_cubetool_fig}{The
+\GAIA\ toolbox for displaying a cube.}
+
+Once an image, be it a plane, passband image or map, you can use
+\GAIA's wide selection of 
+\xref{image-display facilities}{sun214}{image_display_capabilities}
+\latexonly{described in SUN/214} (also see \xref{SC/17}{sc17}{}) to enhance 
+the elements under investigation.  There are also many \xref{analysis
+capabilities}{sun214}{image_analysis_capabilities} mostly through the
+({\tt Image-Analysis} menu), including masking and flux measurement.
+
+For cubes the main additional feature (at the time of writing) is a
+dynamic spectrum display.  Once you have a representative image 
+displayed, if you click on the mouse over the image a line plot along
+the collapsed axis appears.  That will normally be a spectrum.
+As you drag the cursor holding down the first mouse button, the
+spectrum display updates to dynamically to reflect the current spatial
+location.  If you single click, the scaling limis adjust for the current
+pixel.  If you double-click at a location \GAIA\ creates a reference
+spectrum.  Then as you subsequently drag the mouse you can compare any
+of the spectra with the reference spectrum.   See 
+\begin{htmlonly}
+the figure below.
+\end{htmlonly}
+\latexonly{Figure~\ref{sc16_gaia_spectrum_fig}.}
+
+\myfig{sc16_gaia_spectrum.eps}{height=0.7\textheight}{sc16_gaia_spectrum.gif}{sc16_gaia_spectrum_fig}{\GAIA\ 
+displays a logarithmically scaled, collapsed cube, from which
+two spectra are shown.  The green reference spectrum is from the spatial position
+marked by the green cross, and the other spectrum corresponds to the
+blue cross.}
+
+Further features of the spectral viewer can be found in the online help.
 
 \subsection{\xlabel{sc16_idl}IDL and data visualisation\label{sc16_idl}}
 
@@ -2005,11 +2091,11 @@ the figures.
 These display a projection of an IFU data cube and
 the user operating on it with the cut and probe tools.
 
-\myfig{sc16_slicer3_cut.eps}{height=0.4\textheight}{sc16_slicer3_cut.gif}{sc16_slicer3_cut_fig}{The
+\myfig{sc16_slicer3_cut.eps}{height=0.5\textheight}{sc16_slicer3_cut.gif}{sc16_slicer3_cut_fig}{The
 IDL Slicer3 GUI showing a projection of an NDF data cube, with a cut
 running in the $\lambda$ direction.}
 
-\myfig{sc16_slicer3_probe.eps}{height=0.4\textheight}{sc16_slicer3_probe.gif}{sc16_slicer3_probe_fig}{The
+\myfig{sc16_slicer3_probe.eps}{height=0.5\textheight}{sc16_slicer3_probe.gif}{sc16_slicer3_probe_fig}{The
 IDL Slicer3 GUI showing a projection of and NDF data cube, along with
 the data probe.}
 
@@ -2033,7 +2119,7 @@ A list of the library routines, broken down by task, can be found at
 
 \subsubsection{ATV Image Viewer}
 
-\myfig{sc16_atv.eps}{height=0.4\textheight}{sc16_atv.gif}{sc16_atv_fig}{The
+\myfig{sc16_atv.eps}{height=0.5\textheight}{sc16_atv.gif}{sc16_atv_fig}{The
 \ATV\ viewer interface.} 
 
 \htmladdnormallink{\ATV}{http://www.physics.uci.edu/~barth/atv/}
@@ -2114,7 +2200,7 @@ both white-light and passband image, \emph{e.g.}\
    %
 \end{verbatim}\normalsize
 
-\myfig{sc16_squash.eps}{height=0.4\textheight}{sc16_squash.gif}{sc16_squash_fig}{The
+\myfig{sc16_squash.eps}{height=0.5\textheight}{sc16_squash.gif}{sc16_squash_fig}{The
 {\bf squash} script.} 
 
 Here we make a white-light image from the input data file {\tt
@@ -2159,7 +2245,7 @@ shell script, this time specify more restrictive $\lambda$ limits,
 would create a two-dimensional passband image, collapsing a
 200~\AA-wide section of the spectral axis.
 
-\myfig{sc16_passband.eps}{height=0.4\textheight}{sc16_passband_anim.gif}{sc16_passband_fig}{The
+\myfig{sc16_passband.eps}{height=0.5\textheight}{sc16_passband_anim.gif}{sc16_passband_fig}{The
 {\bf passband} script.} 
 
 Alternatively, we may choose to generate our passband image
@@ -2241,7 +2327,7 @@ below.
 
 \subsubsection{How do I step through passband images?}
 
-\myfig{sc16_step.eps}{height=0.4\textheight}{sc16_step.gif}{sc16_step_fig}{A
+\myfig{sc16_step.eps}{height=0.5\textheight}{sc16_step.gif}{sc16_step_fig}{A
 series of 500\AA\ passband images of 3C~27 produced by the
 {\bf step} shell script.} 
 
@@ -2319,13 +2405,20 @@ The script reads the NDF file in using the {\tt READ\_NDF} procedure,
 creates an IDL graphics window, and steps through the data cube in the
 wavelength direction a pixel at a time.
 
+There is now a \KAPPA\ command \xref{{\bf chanmap}}{sun95}{CHANMAP} task
+that forms an image of abutting channels or passbands of equal depth.
+Once created you may view the passband image with \GAIAref\ or
+\xref{{\bf display}}{sun95}{DISPLAY}.  To read off the
+three-dimensional co-ordinates of features, the latter requires 
+\xref{{\bf display}}{sun95}{CURSOR}.
+
 \subsubsection{How do I extract individual spectra?}
 
 The \xref{{\bf ripper}}{sun237}{ripper} shell script in the
 \DATACUBEref\ package was designed as a user-friendly interface over
 the \KAPPA\ \xref{{\bf ndfcopy}}{sun95}{NDFCOPY} application.
 
-\myfig{sc16_ripper.eps}{height=0.4\textheight}{sc16_ripper_anim.gif}{sc16_ripper_fig}{The
+\myfig{sc16_ripper.eps}{height=0.5\textheight}{sc16_ripper_anim.gif}{sc16_ripper_fig}{The
 {\bf ripper} script.} 
 
 \small\begin{verbatim}
@@ -2382,7 +2475,7 @@ the figure.
 \end{htmlonly}
 \latexonly{Figure~\ref{sc16_compare_fig}.}
 
-\myfig{sc16_compare.eps}{height=0.4\textheight}{sc16_compare.gif}{sc16_compare_fig}{The
+\myfig{sc16_compare.eps}{height=0.5\textheight}{sc16_compare.gif}{sc16_compare_fig}{The
 {\bf compare} script.} 
 
 For instance,
@@ -2471,7 +2564,7 @@ the figure)
 \latexonly{Figure~\ref{sc16_stacker_fig})} and \xref{{\bf
 multistack}}{sun237}{multistack} shell scripts.
 
-\myfig{sc16_stacker.eps}{height=0.4\textheight}{sc16_stacker_anim.gif}{sc16_stacker_fig}{The
+\myfig{sc16_stacker.eps}{height=0.5\textheight}{sc16_stacker_anim.gif}{sc16_stacker_fig}{The
 {\bf stacker} script.} 
 
 A run of the {\bf stacker} script is shown below.
@@ -2579,10 +2672,10 @@ spectra?\xlabel{sc16_gridmap}}
 For an overview visual inspection of the spectra in a cube, it is useful
 to plot many spectra simultaneously, albeit at a lower resolution, in
 their respective spatial locations.  While \KAPPA\ provides the
-\xref{clinplot}{sun95}{CLINPLOT} command to make such a grid, sometimes
+\xref{{\bf clinplot}}{sun95}{CLINPLOT} command to make such a grid, sometimes
 the sheer number of spatial pixels can make the spectra unreadable and
 will take some time to plot.  Therefore the \DATACUBE\ package
-provides the \xref{{\bf gridspec}}{sun237}{gridspec} shell script.  It
+offers the \xref{{\bf gridspec}}{sun237}{gridspec} shell script.  It
 has an option to average the spectra in the spatial domain, thereby
 reducing the number of spectra plotted by several times, generating
 more practical graphics quicker.   See
@@ -2622,7 +2715,7 @@ given for $x$ and $y$, the two values separated by a comma.
                
 \end{verbatim}\normalsize
 
-\myfig{sc16_gridspec.eps}{height=0.4\textheight}{sc16_gridspec.gif}{sc16_gridspec_fig}{The
+\myfig{sc16_gridspec.eps}{height=0.5\textheight}{sc16_gridspec.gif}{sc16_gridspec_fig}{The
 {\bf gridspec} script, operating on a subset of the 3C~27 observation
 consisting of the central core of the galaxy, averaging sixteen
 spectra in the cube for each spectrum plotted.  The exterior axes
@@ -2673,7 +2766,7 @@ the figure.
 \latexonly{Figure~\ref{sc16_velmap_fig}.}  Below is an
 example.
 
-\myfig{sc16_velmap.eps}{height=0.4\textheight}{sc16_velmap_anim.gif}{sc16_velmap_fig}{The
+\myfig{sc16_velmap.eps}{height=0.5\textheight}{sc16_velmap_anim.gif}{sc16_velmap_fig}{The
 {\bf velmap} script, operating on a sub-cube of the 3C~27 observation
 consisting of the central core of the galaxy.}
 
@@ -2803,7 +2896,7 @@ optical or radio.  It can also cope with NDFs in the
 Then comes the heart of the script---the 
 \xref{{\bf collapse}}{sun237}{COLLAPSE} task acting upon the spectral
 axis.  It derives the intensity-weighted velocity moment.  For simple
-spectra, {\emph i.e.} a single or dominant emission line, {\bf
+spectra, \emph{i.e.} a single or dominant emission line, {\bf
 collapse} finds a representative velocity for the line.
 
 The final stage is to display the map of the velocities.  It uses a
@@ -2828,7 +2921,7 @@ the figure.
 \latexonly{Figure~\ref{sc16_velmoment_fig}.}  Below is an
 example.
 
-\myfig{sc16_velmoment.eps}{height=0.4\textheight}{sc16_velmoment.gif}{sc16_velmoment_fig}{The
+\myfig{sc16_velmoment.eps}{height=0.5\textheight}{sc16_velmoment.gif}{sc16_velmoment_fig}{The
 {\bf velmoment} script, operating on a sub-cube of the 3C~27 observation
 consisting of the central core of the galaxy.}
 
@@ -2888,7 +2981,7 @@ the figure.
 {\bf peakmap} script allows you to manually refit any spectrum that
 you think may have been poorly fitted by the automatic process.
 
-\myfig{sc16_peakmap.eps}{height=0.4\textheight}{sc16_peakmap.gif}{sc16_peakmap_fig}{The {\tt peakmap} script.}
+\myfig{sc16_peakmap.eps}{height=0.5\textheight}{sc16_peakmap.gif}{sc16_peakmap_fig}{The {\tt peakmap} script.}
 
 It should be noted that generating a \xref{passband
 image}{sun237}{passband} of a line region, and a line-strength map
@@ -2931,7 +3024,7 @@ plane, additionally, the wavelength calibration of the two cubes you
 wish to mosaic may be entirely different, certainly the case for cubes
 coming from different instruments.
 
-\myfig{sc16_mosaic.eps}{height=0.4\textheight}{sc16_mosaic.gif}{sc16_mosaic_fig}{The
+\myfig{sc16_mosaic.eps}{height=0.5\textheight}{sc16_mosaic.gif}{sc16_mosaic_fig}{The
 white-light image of a mosaic of two data cubes created using {\bf makemos};
 a dashed line has been drawn on to the image for clarity.}
 
@@ -3302,9 +3395,9 @@ compiled under both Solaris and Tru64 UNIX, and with the adoption of
 {{\footnotesize GNOME}\normalsize} as the standard SUN desktop will
 increasing come installed by default on platforms other than Linux.
 
-\myfig{sc16_xvelmap.eps}{height=0.4\textheight}{sc16_xvelmap.gif}{sc16_xvelmap_fig}{An
+\myfig{sc16_xvelmap.eps}{height=0.5\textheight}{sc16_xvelmap.gif}{sc16_xvelmap_fig}{An
 {\bf XDialog} script based on {\bf velmap}; here it asks for an input file.}
-\myfig{sc16_xvelmap2.eps}{height=0.4\textheight}{sc16_xvelmap2.gif}{sc16_xvelmap2_fig}{The
+\myfig{sc16_xvelmap2.eps}{height=0.5\textheight}{sc16_xvelmap2.gif}{sc16_xvelmap2_fig}{The
 same {\bf XDialog} script later in the run; here we are prompted for the
 central wavelength of the line.} 
 
