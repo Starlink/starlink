@@ -579,7 +579,7 @@ AC_SUBST(STARLINK)
 #  Name of Fortran compiler, should be part of CVS environment?
 if test "${FC}" = ""; then
    echo "FC set to blank"
-   AC_CHECK_PROGS( FC, g77 f77, fort77 )
+   AC_CHECK_PROGS([FC, g77 f77, fort77])
 fi
 
 #  Compilation flags, for g77 we also need -fno-second-underscore. 
@@ -610,8 +610,13 @@ AC_CHECK_PROG(ALINK,alink,alink,${STARLINK}/bin/alink)
 #  Try to determine the extra libraries required to link a
 #  C/C++ program that has f77 libraries or subroutines.
 #--------------------------------------------------------------------
-
+#  Protect this against LIBS values, which are C specific (from Tcl).
+#  This is a general problem with testing Fortran properties, but
+#  only effects this macro.
+old_LIBS=$LIBS
+LIBS=
 AC_FC_LIBRARY_LDFLAGS
+LIBS=$old_LIBS
 
 #--------------------------------------------------------------------
 #	Propagate prefix argument as installation directory.
@@ -641,7 +646,7 @@ Configuration results (edit and run ./config.status to modify):
 C   Compiler            => $CC
 C++ Compiler            => $CXX
 C++ include flag        => $CXX_INCLUDE
-Fortran Compiier        => $FC
+Fortran Compiler        => $FC
 Iwidgets library files  => $IWIDGETS_LIBRARY
 "
 
