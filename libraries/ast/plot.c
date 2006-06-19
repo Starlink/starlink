@@ -3733,11 +3733,11 @@ MAKE_SET(Colour,int,colour,value,AST__NPID)
 *att--
 */
 /* Line widths. Has a value of AST__BAD when not set yielding a
-   default of 0.0. */
+   default of 1.0. */
 MAKE_CLEAR(Width,width,AST__BAD,AST__NPID)
 MAKE_GET(Width,double,1.0,( this->width[axis] == AST__BAD ? 1.0 : this->width[axis] ),AST__NPID)
 MAKE_TEST(Width,( this->width[axis] != AST__BAD ),AST__NPID)
-MAKE_SET(Width,double,width,value,AST__NPID)
+MAKE_SET(Width,double,width,(value!=0.00)?value:(astError(AST__ATTIN,"astSetWidth(Plot): Invalid zero value supplied for Width(%s) attribute",GrfItem(axis,NULL)),this->width[axis]),AST__NPID)
 
 /* Size. */
 /* ----- */
@@ -3787,7 +3787,7 @@ MAKE_SET(Width,double,width,value,AST__NPID)
 MAKE_CLEAR(Size,size,AST__BAD,AST__NPID)
 MAKE_GET(Size,double,1.0,( this->size[axis] == AST__BAD ? 1.0 : this->size[axis] ),AST__NPID)
 MAKE_TEST(Size,( this->size[axis] != AST__BAD ),AST__NPID)
-MAKE_SET(Size,double,size,value,AST__NPID)
+MAKE_SET(Size,double,size,(value!=0.00)?value:(astError(AST__ATTIN,"astSetSize(Plot): Invalid zero value supplied for Size(%s) attribute",GrfItem(axis,NULL)),this->size[axis]),AST__NPID)
 
 /* Member functions. */
 /* ================= */
@@ -15688,7 +15688,7 @@ static char *GrfItem( int item, const char *text ){
 *        The index of the graphical item.
 *     text
 *        A pointer to a string which will be appended to the textual
-*        description of the graphical iten. May be NULL.
+*        description of the graphical item. May be NULL.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated string holding the textual 
