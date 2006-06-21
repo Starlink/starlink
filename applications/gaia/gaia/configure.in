@@ -579,7 +579,7 @@ AC_SUBST(STARLINK)
 #  Name of Fortran compiler, should be part of CVS environment?
 if test "${FC}" = ""; then
    echo "FC set to blank"
-   AC_CHECK_PROGS([FC, g77 f77, fort77])
+   AC_CHECK_PROGS(FC, [g77 f77 fort77])
 fi
 
 #  Compilation flags, for g77 we also need -fno-second-underscore. 
