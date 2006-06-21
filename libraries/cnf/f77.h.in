@@ -52,6 +52,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991, 1993 Science & Engineering Research Council
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -72,6 +73,8 @@
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -196,6 +199,10 @@
 *        Add cnfRealloc
 *        Use starMalloc rather than malloc in F77_CREATE_POINTER_ARRAY
 *        (since it needs to match what goes on in cnfFree)
+*      21-JUN-2006 (PWD):
+*        Changed to use a different return type for REAL functions. This
+*        effects g77 under 64-bit, when the f2c bindings expect the return
+*        value of a REAL function to be a double, not a float.
 *     {enter_further_changes_here}
 *        
 
@@ -269,6 +276,7 @@
 
 #define F77_INTEGER_TYPE   int 
 #define F77_REAL_TYPE      float 
+#define F77_REAL_FUNCTION_TYPE      @REAL_FUNCTION_TYPE@
 #define F77_DOUBLE_TYPE    double 
 #define F77_LOGICAL_TYPE   int
 #define F77_CHARACTER_TYPE char
@@ -312,7 +320,7 @@
 /*  function.								    */
 
 #define F77_INTEGER_FUNCTION(X)   F77_INTEGER_TYPE F77_EXTERNAL_NAME(X)
-#define F77_REAL_FUNCTION(X)      F77_REAL_TYPE F77_EXTERNAL_NAME(X)
+#define F77_REAL_FUNCTION(X)      F77_REAL_FUNCTION_TYPE F77_EXTERNAL_NAME(X)
 #define F77_DOUBLE_FUNCTION(X)    F77_DOUBLE_TYPE F77_EXTERNAL_NAME(X)
 #define F77_LOGICAL_FUNCTION(X)   F77_LOGICAL_TYPE F77_EXTERNAL_NAME(X)
 #define F77_CHARACTER_FUNCTION(X) void F77_EXTERNAL_NAME(X)

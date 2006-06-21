@@ -44,6 +44,12 @@ STAR_DECLARE_DEPENDENCIES([build], [starmem])
 STAR_DECLARE_DEPENDENCIES([link],  [starmem])
 
 
+dnl   Check the return type of REAL Fortran functions. Under g77
+dnl   in -ff2c mode (the default), these return a double. Only
+dnl   seems to have an effect under 64-bit. Defines CNF_RETURN_FLOAT_TYPE
+dnl   to double or float.
+STAR_CNF_F2C_COMPATIBLE
+
 dnl   This package has no dependencies
 
 STAR_LATEX_DOCUMENTATION(sun209)
@@ -51,6 +57,6 @@ STAR_LATEX_DOCUMENTATION(sun209)
 dnl   Header checks.  
 AM_CONFIG_HEADER(config.h)
 
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile component.xml f77.h)
 
 AC_OUTPUT
