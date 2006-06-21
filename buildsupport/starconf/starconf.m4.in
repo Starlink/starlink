@@ -492,6 +492,85 @@ void func_two_() { return; }
 ])# STAR_CNF_COMPATIBLE_SYMBOLS
 
 
+# STAR_CNF_F2C_COMPATIBLE
+# -----------------------
+#
+# Work out if the compiler is using 'f2c' compatible calling conventions.
+#
+# The `f2c' calling conventions, used by GNU Fortran compilers, require
+# functions that return type REAL to actually return the C type 'double'
+# (there is also special handling of COMPLEX returns, but that's not supported
+# by CNF). When operating in 'non-f2c' mode such functions return the expected
+# C type 'float'.
+#
+# The effect of this macro is subsitute the variable REAL_FUNCTION_TYPE
+# to either float or double as required.
+#
+# This function is not infallable and will usually return float for GNU
+# compilers, as the calling convention seems to not matter on 32-bit platforms
+# for the test in use. A stronger test would be to attempt calling a intrinsic
+# function, which is supposed to fail. Non-GNU compilers should always
+# return float. However, this test is used as it is all that is required.
+#
+AC_DEFUN([STAR_CNF_F2C_COMPATIBLE],
+   [$_star_docs_only &&
+        AC_MSG_ERROR([STAR[]_CNF_F2C_SYMBOLS in docs-only dir])
+    AC_CACHE_CHECK([if $FC is in strict f2c compatible mode],
+       [star_cv_cnf_f2c_compatible],
+       [AC_REQUIRE([AC_PROG_FC])dnl
+        if test "$ac_cv_fc_compiler_gnu" = yes; then
+           AC_REQUIRE([AC_PROG_CC])dnl
+           AC_LANG_PUSH([C])
+           AC_LANG_CONFTEST([AC_LANG_SOURCE([
+float fred_() {
+   return 1.0f;
+}
+])])
+           if (eval $ac_compile) 2>&5
+           then
+               mv conftest.$ac_objext c-conftest.$ac_objext
+           else
+               AC_MSG_ERROR([cannot compile a C function!])
+           fi
+           AC_LANG_POP(C)
+           AC_LANG_PUSH([Fortran])
+           AC_LANG_CONFTEST([AC_LANG_SOURCE([
+      PROGRAM F2CTEST
+      REAL FRED
+      REAL R
+      R = FRED()
+      IF ( R .NE. 0.0 ) THEN
+         WRITE(*,*) 'no'
+      ELSE
+         WRITE(*,*) 'yes'
+      ENDIF
+      END
+])])
+           star_cv_cnf_f2c_compatible=yes
+           $FC $FCFLAGS $opt -o conftest conftest.f c-conftest.$ac_objext 2>&5
+           if test -r conftest
+           then
+              star_cv_cnf_f2c_compatible=`eval conftest | sed 's/\ //g'` > /dev/null
+           else
+              AC_MSG_ERROR([failed to link program]) 
+           fi
+           AC_LANG_POP([Fortran])
+           rm -f conftest* c-conftest*
+      else
+         # Not a GNU compiler.
+         star_cv_cnf_f2c_compatible=no
+      fi
+])
+    if test "$star_cv_cnf_f2c_compatible" = "yes"
+    then
+        AC_SUBST(REAL_FUNCTION_TYPE, double)
+    else
+        AC_SUBST(REAL_FUNCTION_TYPE, float)
+    fi
+])# STAR_CNF_F2C_COMPATIBLE
+
+
+
 # STAR_PATH_TCLTK([minversion=0], [options=''])
 # ---------------------------------------------
 #
