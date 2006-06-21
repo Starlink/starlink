@@ -126,13 +126,13 @@
 *        controlled using parameter KEYPOS. [TRUE]
 *     KEYPOS() = _REAL (Read)
 *        Two values giving the position of the key.  The first value
-*        gives the gap between the right-hand edge of the contour map
+*        gives the gap between the right-hand edge of the grid plot
 *        and the left-hand edge of the key (0.0 for no gap, 1.0 for
 *        the largest gap).  The second value gives the vertical
 *        position of the top of the key (1.0 for the highest position,
 *        0.0 for the lowest).  If the second value is not given, the
-*        top of the key is placed level with the top of the contour
-*        map.  Both values should be in the range 0.0 to 1.0.  If a
+*        top of the key is placed level with the top of the grid
+*        plot.  Both values should be in the range 0.0 to 1.0.  If a
 *        key is produced, then the right-hand margin specified by
 *        parameter MARGIN is ignored. [current value]
 *     KEYSTYLE = GROUP (Read)
@@ -547,7 +547,7 @@
       LOGICAL CGOOD( MXSPEC, MXSPEC )! Was a spectrum drawn in the cell?
       LOGICAL CLEAR             ! Is screen to be cleared on opening?
       LOGICAL FIRST             ! Is the first cell yet to be annotated?
-      LOGICAL KEY               ! Make a key of the contour heights?
+      LOGICAL KEY               ! Make a key of the grid co-ordinates?
       LOGICAL REFLAB            ! Draw labels around the first spectrum?
       LOGICAL TICKS             ! Draw ticks round each spectrum cell?
       REAL ASPECT               ! Aspect ratio of the input array
@@ -565,6 +565,7 @@
       REAL MINDIM               ! Minimum dimension of plot in mm
       REAL OFFX                 ! X offset from 1st to current cell
       REAL OFFY                 ! Y offset from 1st to current cell
+      REAL RHOPIC                ! Plot density for scaling ref. axes 
       REAL SMARGX               ! X margin used by spectral annotation
       REAL SMARGY               ! Y margin used by spectral annotation
       REAL TL                   ! MajTickLen value
@@ -592,10 +593,10 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
  
-*  Obtain the NDF and extract the required information from it
-*  ===========================================================
+*  Obtain the NDF and extract the required information from it.
+*  ============================================================
 
-*  Obtain the identifier of the NDF to be contoured.
+*  Obtain the identifier of the NDF to be plotted.
       CALL LPG_ASSOC( 'NDF', 'READ', INDF, STATUS )
 
 *  Find which component to display.  MCOMP is for use with NDF_MAP and 
@@ -677,7 +678,7 @@
       IN( 2 ) = DBLE( SUBND( SPBAX( 1 ) ) - SLBND( SPBAX( 1 ) ) + 1 )
       CALL AST_TRAN1( SPMAP, 2, IN, .FALSE., SPBND, STATUS )
 
-*  Identify the pixel axes associated with the 2 non-spectral axes.
+*  Identify the pixel axes associated with the two non-spectral axes.
       IF( SPAX .EQ. 1 ) THEN
          SKAX( 1 ) = 2
          SKAX( 2 ) = 3
@@ -804,15 +805,15 @@
 *  AGI database with the given pixel co-ordinate bounds (a KEY picture
 *  is also created if necessary, together with an enclosing FRAME 
 *  picture ). The PGPLOT viewport is set so that it matches 
-*  the area of the DATA picture.  World co-ordinates within the PGPLOT window 
-*  are set to millimetres from the bottom-left corner of the view surface. 
-*  An AST Plot is returned for drawing in the DATA picture.  The Base 
-*  (GRAPHICS) Frame in the Plot corresponds to millimetres from the 
-*  bottom-left corner of the viewport, and the Current Frame is 
-*  inherited from the NDF's WCS FrameSet.  A Plot is stored in the AGI
-*  database that has SKY coords as the current Frame. This will be extended
-*  later by adding a SKY-SPECTRUM Frame in to it (which will be left as
-*  the current Frame).
+*  the area of the DATA picture.  World co-ordinates within the PGPLOT 
+*  window are set to millimetres from the bottom-left corner of the 
+*  view surface.  An AST Plot is returned for drawing in the DATA 
+*  picture.  The Base (GRAPHICS) Frame in the Plot corresponds to 
+*  millimetres from the bottom-left corner of the viewport, and the 
+*  Current Frame is inherited from the NDF's WCS FrameSet.  A Plot is 
+*  stored in the AGI database that has SKY coords as the current Frame. 
+*  This will be extended later by adding a SKY-SPECTRUM Frame in to it 
+*  (which will be left as the current Frame).
 
 *  First deal with cases where a key is required...
       IF( KEY ) THEN
@@ -845,8 +846,8 @@
 *  Ensure the Title attribute of the Plot has a useful value.
       CALL KPG1_ASTTL( IPLOT, SKWCS, INDF, STATUS )
  
-*  Define the extent of each cell in the grid of line plots
-*  ========================================================
+*  Define the extent of each cell in the grid of line plots.
+*  =========================================================
 
 *  See how many spectra are to be included in the grid.
       NX = MIN( 30, DIM( 1 ) )
@@ -901,8 +902,8 @@
          NSAMP = DIM( 3 )
          IF( NSAMP .GT. NINT( DX2/NX ) ) NSAMP = NINT( DX2/NX )
  
-*  Draw all the spectra (but not the axes or borders)
-*  ==================================================
+*  Draw all the spectra (but not the axes or borders).
+*  ===================================================
 
 *  Create three work arrays to hold a single displayed spectrum.
          CALL PSX_CALLOC( NSAMP, '_DOUBLE', IPW1, STATUS )
@@ -916,9 +917,9 @@
 *  Get a pointer to the GRAPHICS Frame.
          GRFRM = AST_GETFRAME( IPLOT3, AST__BASE, STATUS )
 
-*  Draw the  line plots. Loop round each cell finding the indices on the 
+*  Draw the line plots. Loop round each cell finding the indices on the 
 *  spatial grid axes at which the spectrum is to be extracted, and the
-*  GRAPHICS coords of the lower left corner of the cell.
+*  GRAPHICS co-ordinates of the lower-left corner of the cell.
          NCELL = 0
          DO IY = 1, NY
             CGY = NINT( 0.5 + ( REAL( IY ) - 0.5 )*
@@ -931,7 +932,8 @@
      :                           REAL( DIM( 1 ) )/REAL( NX ) )
                INA( 1 ) = DBLE( X1 + ( IX - 1 )*DX )
 
-*  Copy the required samples from the spectral axis into the work arrays.
+*  Copy the required samples from the spectral axis into the work 
+*  arrays.
                CALL KPS1_CLPCP( SLBND, SUBND, SKBAX, SPBAX( 1 ), CGX, 
      :                          CGY, NSAMP, %VAL( CNF_PVAL( IPD ) ),
      :                          INA( 1 ), INA( 2 ),
@@ -952,12 +954,12 @@
 *  Increment the number of cells done so far.
                   NCELL = NCELL + 1
 
-*  We now create a Mapping from 2D GRAPHICS to 4D (GRID1,GRID2,GRID3,DATA)
-*  within the current cell that we will use later when constructing the 
-*  FrameSet to be stored with the DATA picture in the AGI database. First,
-*  produce a WinMap that maps the GRAPHICS coords box covered by this
-*  cell onto the corresponding ranges of GRID coord (on the SPBAX axis)
-*  and data value.
+*  We now create a Mapping from 2-D GRAPHICS to 4-D 
+*  (GRID1,GRID2,GRID3,DATA) within the current cell that we will use 
+*  later when constructing the FrameSet to be stored with the DATA 
+*  picture in the AGI database. First, produce a WinMap that maps the 
+*  GRAPHICS co-ordinate box covered by this cell on to the corresponding
+*  ranges of GRID co-ordinates (on the SPBAX axis) and data value.
                   INB( 1 ) = INA( 1 ) + DX
                   INB( 2 ) = INA( 2 ) + DY
                   OUTA( 1 ) = 0.5D0
@@ -967,7 +969,7 @@
                   WM = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', 
      :                             STATUS )
 
-*  Now produce a PermMap that copies the spectral GRID axis valeu and 
+*  Now produce a PermMap that copies the spectral GRID axis value and 
 *  data value, and introduces constant values for the spatial GRID axes.
                   INP( 1 ) = SPBAX( 1 )
                   INP( 2 ) = 4
@@ -982,8 +984,9 @@
       
                   PM = AST_PERMMAP( 2, INP, 4, OUTP, CON, ' ', STATUS )
 
-*  Combine these two Mappings in series to get a Mapping from 2D Graphics
-*  coords to (GRID1,GRID2,GRID3,DATA) within the current cell.
+*  Combine these two Mappings in series to get a Mapping from 2D 
+*  Graphics co-ordinates to (GRID1,GRID2,GRID3,DATA) within the current
+*  cell.
                   CMAP( NCELL ) = AST_CMPMAP( WM, PM, .TRUE., ' ', 
      :                                        STATUS )
 
@@ -1038,8 +1041,8 @@
          FS = AST_FRAMESET( GF, ' ', STATUS )
          CALL AST_ADDFRAME( FS, AST__BASE, GDMAP, DPF, STATUS )
 
-*  Store the bounds of the area within the GF Frame that is to be mapped 
-*  onto each spectrum's cell.
+*  Store the bounds of the area within the GF Frame that is to be mapped
+*  on to each spectrum's cell.
          BBOX( 1 ) = 0.5
          BBOX( 2 ) = YBOT
          BBOX( 3 ) = DBLE( SUBND( SPBAX( 1 ) ) - 
@@ -1057,11 +1060,12 @@
 *  Skip if no spectrum was drawn in this cell. 
                IF( CGOOD( IX, IY ) ) THEN
 
-*  If this is the first spectrum, we draw a grid round it using AST_GRID.
+*  If this is the first spectrum, we draw a grid around it using 
+*  AST_GRID.
                   IF( FIRST ) THEN
                      FIRST = .FALSE.              
 
-*  Get the bounds of the cell in GRAPHICS coords.
+*  Get the bounds of the cell in GRAPHICS co-ordinates.
                      GBOX( 1 ) = X1 + ( IX - 1 )*DX
                      GBOX( 2 ) = Y1 + ( IY - 1 )*DY
                      GBOX( 3 ) = GBOX( 1 ) + DX
@@ -1091,20 +1095,22 @@
      :                             STATUS )
                      END IF
 
-*  Reduce the text size (this is normally done by KPG1_PLOT, but the Plot
-*  we are using here was not created by KPG1_PLLOT).
+*  Reduce the text size (this is normally done by KPG1_PLOT, but the 
+*  Plot we are using here was not created by KPG1_PLOT).  The 
+*  non-linear scaling gives better results in practise than the linear.
+                     RHOPIC = SQRT( REAL( MAX( NX, NY ) ) )
                      CALL AST_SETR( IPLOT2, 'Size(NumLab1)', 
      :                              AST_GETR( IPLOT2, 'Size(NumLab1)', 
-     :                              STATUS )/MAX( NX, NY ), STATUS )
+     :                              STATUS )/ RHOPIC, STATUS )
                      CALL AST_SETR( IPLOT2, 'Size(NumLab2)', 
      :                              AST_GETR( IPLOT2, 'Size(NumLab2)', 
-     :                              STATUS )/MAX( NX, NY ), STATUS )
+     :                              STATUS )/ RHOPIC, STATUS )
                      CALL AST_SETR( IPLOT2, 'Size(TextLab1)', 
      :                              AST_GETR( IPLOT2, 'Size(TextLab1)', 
-     :                              STATUS )/MAX( NX, NY ), STATUS )
+     :                              STATUS )/ RHOPIC, STATUS )
                      CALL AST_SETR( IPLOT2, 'Size(TextLab2)', 
      :                              AST_GETR( IPLOT2, 'Size(TextLab2)', 
-     :                              STATUS )/MAX( NX, NY ), STATUS )
+     :                              STATUS )/ RHOPIC, STATUS )
 
 *  Draw lines using KPG1_ASPLN. This records details of the lines
 *  drawn in the AST KeyMap (TICKMAP) specified when calling KPG1_ASPLG.
@@ -1146,25 +1152,25 @@
                            END IF
                            CALL AST_ANNUL( KM, STATUS )
                         END IF
-                     END DO 
+                     END DO
 
 *  Allocate work space for arrays containing this number of points.
                      CALL PSX_CALLOC( NPTOT, '_REAL', IPX, STATUS )
                      CALL PSX_CALLOC( NPTOT, '_REAL', IPY, STATUS )
                      CALL PSX_CALLOC( NPOLY, '_INTEGER', IPN, STATUS )
 
-*  Establish the graphical attributes that AST_GRID uses to draw the tick
-*  marks.
+*  Establish the graphical attributes that AST_GRID uses to draw the 
+*  tick marks.
                     CALL KPG1_PGSTY( IPLOT2, 'TICKS', .TRUE., ATTRS, 
      :                               STATUS )
 
-*  For subsequent cells, draw the tick marks by translating the polylines
-*  stored in TICKMAP from the first cell to the current cell. This is
-*  faster than drawing the ticks using AST_GRID.
+*  For subsequent cells, draw the tick marks by translating the 
+*  polylines stored in TICKMAP from the first cell to the current cell. 
+*  This is faster than drawing the ticks using AST_GRID.
                   ELSE
 
-*  Find the offset in graphics coords form the bottom left corner of the
-*  first cell to be annotated to the current cell.
+*  Find the offset in graphics co-ordinates from the bottom-left corner 
+*  of the first cell to be annotated to the current cell.
                      OFFX = X1 + ( IX - 1 )*DX - GBOX( 1 )
                      OFFY = Y1 + ( IY - 1 )*DY - GBOX( 2 )
 
@@ -1207,33 +1213,33 @@
             CALL KPG1_ASGRD( IPLOT4, IPICF, .TRUE., STATUS )
          END IF
 
-*  Now store a suitable Plot with the DATA picture in the AGI database 
-*  ===================================================================
+*  Now store a suitable Plot with the DATA picture in the AGI database.
+*  ====================================================================
 
 *  Create a SelectorMap that identifies which cell any given GRAPHICS
 *  position is in.
          SLM = AST_SELECTORMAP( NCELL, CREG, AST__BAD, ' ', STATUS )
 
-*  Create a SwitchMap that transforms 2D Graphics coords into 4D
-*  (GRID1,GRID2,GRID3,DATA) coords.
+*  Create a SwitchMap that transforms 2D Graphics co-ordinates into 4D
+*  (GRID1,GRID2,GRID3,DATA) co-ordinates.
          SWM = AST_SWITCHMAP( SLM, AST__NULL, NCELL, CMAP, ' ', STATUS )
 
-*  Create a Mapping that transforms (GRID1,GRID2,GRID3,DATA) into the current
-*  Frame of the NDF's WCS FrameSet (with a 4th DATA axis).
+*  Create a Mapping that transforms (GRID1,GRID2,GRID3,DATA) into the 
+*  current Frame of the NDF's WCS FrameSet (with a fourth DATA axis).
          CALL AST_INVERT( CBMAP, STATUS )
          CPM = AST_CMPMAP( CBMAP, AST_UNITMAP( 1, ' ', STATUS ), 
      :                     .FALSE., ' ', STATUS )
          WCM = AST_CMPMAP( SWM, CPM, .TRUE., ' ', STATUS )
 
-*  Create a corresponding 4D Frame
+*  Create a corresponding 4D Frame.
          WCF = AST_CMPFRAME( CFRM, DATF, ' ', STATUS )
 
 *  Get the Plot stored with the DATA picture when KPG1_PLOT was called
 *  earlier.
          CALL KPG1_GDGET( IPICD, AST__NULL, .FALSE., IPLOTD, STATUS )
 
-*  Add in the DATAPLOT Frame (which describes the data value/frequency axes
-*  for the first valid cell). LINPLOT can align with this Frame.
+*  Add in the DATAPLOT Frame (that describes the data value/frequency 
+*  axes for the first valid cell). LINPLOT can align with this Frame.
          CALL AST_ADDFRAME( IPLOTD, AST__BASE, DPMAP, DPF, STATUS )
          
 *  Add in the SKY Frame (which describes the celestial axes of the outer
@@ -1244,8 +1250,8 @@
      :                                      AST__CURRENT, STATUS ),
      :                      SKYF, STATUS )
          
-*  Add in the (GRID1,GRID2,GRID3,DATA) Frame using the WCM Mapping to connect 
-*  it to the GRAPHICS (base) Frame.
+*  Add in the (GRID1,GRID2,GRID3,DATA) Frame using the WCM Mapping to 
+*  connect it to the GRAPHICS (base) Frame.
          CALL AST_ADDFRAME( IPLOTD, AST__BASE, WCM, WCF, STATUS )
 
 *  Store the modified Plot back in the AGI database
@@ -1302,7 +1308,7 @@
             CALL KPG1_ASSET( 'KAPPA_CLINPLOT', 'KEYSTYLE', IPLOTK, 
      :                       STATUS )
 
-*  Draw the key to the right of the contour plot and aligned with
+*  Draw the key to the right of the grid plot and aligned with
 *  the top axis.
             CALL KPS1_CLPKY( IPLOTK, YTOP, YBOT, SPBND, SPFRM, 
      :                       LABEL, UNIT, KEYOFF, STATUS )
