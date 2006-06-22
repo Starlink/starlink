@@ -1165,7 +1165,7 @@
 
 *  Establish the graphical attributes that AST_GRID uses to draw the 
 *  tick marks.
-                    CALL KPG1_PGSTY( IPLOT2, 'TICKS', .TRUE., ATTRS, 
+                     CALL KPG1_PGSTY( IPLOT2, 'TICKS', .TRUE., ATTRS, 
      :                               STATUS )
 
 *  For subsequent cells, draw the tick marks by translating the 
@@ -1209,10 +1209,10 @@
                SMARGY = SMARGY + TL*MINDIM
             END IF
 
-            DGLB( 1 ) = X1 - 1.5*SMARGX
-            DGLB( 2 ) = Y1 - 1.5*SMARGY
-            DGUB( 1 ) = X2 + 1.5*SMARGX
-            DGUB( 2 ) = Y2 + 1.5*SMARGY
+            DGLB( 1 ) = X1 - SMARGX
+            DGLB( 2 ) = Y1 - SMARGY
+            DGUB( 1 ) = X2 + SMARGX
+            DGUB( 2 ) = Y2 + SMARGY
             CALL ATL_CUTPL( IPLOT, AST__BASE, DGLB, DGUB, IPLOT4, 
      :                      STATUS )
 
@@ -1221,7 +1221,7 @@
 
 *  If a key is being drawn, move it to the right to take account of the 
 *  expansion to the spatial axes above.
-            IF( KEY ) KEYX = 1.5*SMARGX
+            IF( KEY ) KEYX = SMARGX
 
          END IF
 
