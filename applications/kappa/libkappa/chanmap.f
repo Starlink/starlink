@@ -290,6 +290,9 @@
 *        Allow for no WCS component in the supplied cube NDF; create
 *        a renamed copy of the current Frame to assure that there is 
 *        a three-dimensional Frame in the output NDF.
+*     22-JUN-2006 (DSB):
+*        Ensure that if the original current Frame is PIXEL, AXIS or 
+*        GRID, then the output contains a suitable 3D current Frame.
 *     {enter_further_changes_here}
 
 *-
@@ -357,6 +360,7 @@
                                  ! GRID collapsed-axis co-ords
       DOUBLE PRECISION DLBNDS( NDIM - 1 ) ! Slab lower bounds in GRID 
                                  ! co-ords along uncollapsed axes
+      CHARACTER DOM*( 20 )       ! Original current Frame Domain name
       CHARACTER DTYPE*( NDF__SZFTP ) ! Numeric type for output arrays
       DOUBLE PRECISION DUBND( NDIM ) ! Upper bounds in pixel co-ords
       DOUBLE PRECISION DUBNDI( NDIM ) ! Inverse slab upper bounds in 
@@ -375,7 +379,6 @@
       INTEGER GFRMO              ! Output GRID Frame pointer
       INTEGER GMAP               ! Pointer to Mapping from GRID Frame 
                                  ! to Current Frame, input NDF
-      LOGICAL GOTWCS             ! Input NDF contains WCS information?
       DOUBLE PRECISION GRDPOS( NDIM ) ! Valid grid Frame position
       LOGICAL HIGHER             ! Significant dimensions above collapse
                                  ! axis?
@@ -447,7 +450,7 @@
       INTEGER ND                 ! Number of dimensions (dummy)
       INTEGER NDIMO              ! Number of pixel axes in output NDF
       INTEGER NERR               ! Number of numerical errors
-      CHARACTER NEWDOM*( 2 )     ! Domain name for revised current Frame
+      CHARACTER NEWDOM*( 20 )    ! Domain name for revised current Frame
       INTEGER NEWFRM             ! Pointer to revised current Frame
       INTEGER NOCHAN             ! Number of channels
       INTEGER NSHAPE             ! Number of shape values
@@ -538,12 +541,12 @@
 *  PIXEL, regardless of how many axes those Frames have.  We must
 *  therefore add a new Frame with a different Domain name to preserve 
 *  the three-dimensional information in the two-dimensional NDF.
-      CALL NDF_STATE( INDFI, 'WCS', GOTWCS, STATUS )
-      IF ( .NOT. GOTWCS ) THEN
+      DOM = AST_GETC( CFRM, 'Domain', STATUS )
+      IF ( DOM .EQ. 'GRID' .OR. DOM .EQ. 'AXIS' .OR. 
+     :     DOM .EQ. 'PIXEL' ) THEN
          NEWDOM = '3D'
          IAT = 2
-         CALL CHR_APPND( AST_GETC( CFRM, 'Domain', STATUS ),
-     :                   NEWDOM, IAT )
+         CALL CHR_APPND( DOM, NEWDOM, IAT )
          NEWFRM = AST_COPY( CFRM, STATUS )
          CALL AST_SETC( NEWFRM, 'Domain', NEWDOM, STATUS )
 
