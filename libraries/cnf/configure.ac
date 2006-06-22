@@ -10,7 +10,7 @@ dnl   Require automake-1.6 at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl   Sanity-check: name a file in the source directory
-AC_CONFIG_SRCDIR([f77.h])
+AC_CONFIG_SRCDIR([f77.h.in])
 
 dnl   Include defaults for Starlink configurations
 STAR_DEFAULTS
