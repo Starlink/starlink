@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_CLPKY( IPLOT, YTOP, YMIN, SPBND, SPFRM,           
-     :                       LABEL, UNIT, FRMOFF, STATUS )             
+     :                       LABEL, UNIT, FRMOFF, KEYX, STATUS )             
 *+
 *  Name:
 *     KPS1_CLPKY
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL KPS1_CLPKY( IPLOT, YTOP, YMIN, SPBND, SPFRM, LABEL, UNIT,
-*                      FRMOFF, STATUS )
+*                      FRMOFF, KEYX, STATUS )
 
 *  Description:
 *     This routine plots the range of data value and spectral axis 
@@ -38,6 +38,9 @@
 *     FRMOFF = REAL (Given)
 *        The fractional position in the y direction of the top of the
 *        key within the viewport.  Zero is the bottom, 1.0 is the top.
+*     KEYX = DOUBLE PRECISION (Given)
+*        The horizontal offset (in mm to the right) to apply to the 
+*        key.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -68,6 +71,8 @@
 *  History:
 *     6-JUN-2006 (DSB):
 *        Original version.
+*     22-JUN-2006 (DSB):
+*        Added KEYX argument.
 *     {enter_further_changes_here}
 
 *-
@@ -88,6 +93,7 @@
       CHARACTER LABEL*(*)
       CHARACTER UNIT*(*)
       REAL FRMOFF
+      DOUBLE PRECISION KEYX
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -133,6 +139,9 @@
 *  Set the PGPLOT viewport and window to match the current AGI picture,
 *  and get the extent of the window in world coordinates, and metres.
       CALL KPG1_GDQPC( X1, X2, Y1, Y2, XM, YM, STATUS )
+
+*  Move the left hand edge to the right by the amount specified by KEYX.
+      X1 = X1 + 0.001*KEYX*( X2 - X1 )/XM
 
 *  Get the current PGPLOT character heights in world coordinates.
       CALL PGQCS( 4, XCH, HGT )

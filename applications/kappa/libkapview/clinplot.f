@@ -403,6 +403,9 @@
 *  History:
 *     7-JUN-2006 (DSB):
 *        Original version, based upon previous CLINPLOT by MJC.
+*     22-JUN-2006 (DSB):
+*        Key position changed to take account of horizontal expansion of
+*        the spatial axes.
 *     {enter_further_changes_here}
 
 *-
@@ -453,6 +456,7 @@
       DOUBLE PRECISION IN( 2 )  ! GRID coords
       DOUBLE PRECISION INA( 2 ) ! Corner A of window in input coords
       DOUBLE PRECISION INB( 2 ) ! Corner B of window in input coords
+      DOUBLE PRECISION KEYX     ! Horizontal key offset (in mm)
       DOUBLE PRECISION OUTA( 2 )! Corner A of window in output coords
       DOUBLE PRECISION OUTB( 2 )! Corner B of window in output coords
       DOUBLE PRECISION SHIFTS( 2 ) ! Shifts from G2D Frame to P2D Frame
@@ -565,7 +569,7 @@
       REAL MINDIM               ! Minimum dimension of plot in mm
       REAL OFFX                 ! X offset from 1st to current cell
       REAL OFFY                 ! Y offset from 1st to current cell
-      REAL RHOPIC                ! Plot density for scaling ref. axes 
+      REAL RHOPIC               ! Plot density for scaling ref. axes 
       REAL SMARGX               ! X margin used by spectral annotation
       REAL SMARGY               ! Y margin used by spectral annotation
       REAL TL                   ! MajTickLen value
@@ -1189,6 +1193,9 @@
 *  Reset the original graphical attributes.
          CALL KPG1_PGSTY( IPLOT2, 'TICKS', .FALSE., ATTRS, STATUS )
 
+*  Initialise the horizontal offset to apply to the key.
+         KEYX = 0.0
+
 *  Draw the spatial axes if required.
          IF( AXES ) THEN
 
@@ -1211,6 +1218,11 @@
 
 *  Draw the axes.
             CALL KPG1_ASGRD( IPLOT4, IPICF, .TRUE., STATUS )
+
+*  If a key is being drawn, move it to the right to take account of the 
+*  expansion to the spatial axes above.
+            IF( KEY ) KEYX = 1.5*SMARGX
+
          END IF
 
 *  Now store a suitable Plot with the DATA picture in the AGI database.
@@ -1311,7 +1323,7 @@
 *  Draw the key to the right of the grid plot and aligned with
 *  the top axis.
             CALL KPS1_CLPKY( IPLOTK, YTOP, YBOT, SPBND, SPFRM, 
-     :                       LABEL, UNIT, KEYOFF, STATUS )
+     :                       LABEL, UNIT, KEYOFF, KEYX, STATUS )
 
 *  Report a context message if anything went wrong.
             IF ( STATUS .NE. SAI__OK ) THEN
