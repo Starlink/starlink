@@ -74,6 +74,11 @@ fi
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+#  Perform the check that configures f77.h.in for the return type of REAL
+#  Fortran functions. On 64-bit g77 with f2c compatibility this is double
+#  not float.
+STAR_CNF_F2C_COMPATIBLE
+
 AC_CONFIG_HEADERS([config.h])
 
 dnl    Declare the build and use dependencies for this package
@@ -81,6 +86,6 @@ dnl    There are neither build nor use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun67)
 
-AC_CONFIG_FILES(Makefile component.xml vers.f veri.f)
+AC_CONFIG_FILES(Makefile component.xml vers.f veri.f f77.h)
 
 AC_OUTPUT

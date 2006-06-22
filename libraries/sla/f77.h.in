@@ -55,16 +55,37 @@
 
 *  Copyright:
 *     Copyright (C) 1991, 1993 Science & Engineering Research Council
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
 *     DSB: David S Berry (JAC)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
 *     13-JUN-2006 (DSB):
 *        Original version, copied from AST.
+*     22-JUN-2006 (PWD):
+*        Updated to include changes that handle the return type of 
+*        REAL functions (double, not float, on some platforms).
 *     {enter_further_changes_here}
 *        
 
@@ -137,6 +158,7 @@
 
 #define F77_INTEGER_TYPE   int 
 #define F77_REAL_TYPE      float 
+#define F77_REAL_FUNCTION_TYPE      @REAL_FUNCTION_TYPE@
 #define F77_DOUBLE_TYPE    double 
 #define F77_LOGICAL_TYPE   int
 #define F77_CHARACTER_TYPE char
@@ -180,7 +202,7 @@
 /*  function.								    */
 
 #define F77_INTEGER_FUNCTION(X)   F77_INTEGER_TYPE F77_EXTERNAL_NAME(X)
-#define F77_REAL_FUNCTION(X)      F77_REAL_TYPE F77_EXTERNAL_NAME(X)
+#define F77_REAL_FUNCTION(X)      F77_REAL_FUNCTION_TYPE F77_EXTERNAL_NAME(X)
 #define F77_DOUBLE_FUNCTION(X)    F77_DOUBLE_TYPE F77_EXTERNAL_NAME(X)
 #define F77_LOGICAL_FUNCTION(X)   F77_LOGICAL_TYPE F77_EXTERNAL_NAME(X)
 #define F77_CHARACTER_FUNCTION(X) void F77_EXTERNAL_NAME(X)
