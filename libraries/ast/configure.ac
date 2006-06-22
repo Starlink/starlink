@@ -68,6 +68,11 @@ AC_CHECK_DECLS([isnan],,,[#include <math.h>
 STAR_DECLARE_DEPENDENCIES(sourceset, [sst htx])
 STAR_DECLARE_DEPENDENCIES(build, sla)
 
+#  Perform the check that configures f77.h.in for the return type of REAL
+#  Fortran functions. On 64-bit g77 with f2c compatibility this is double
+#  not float.
+STAR_CNF_F2C_COMPATIBLE
+
 #   Declare the message file.  
 STAR_MESSGEN(ast_err.msg)
 
@@ -109,7 +114,7 @@ STAR_CHECK_PROGS(prolat, sst)   # prolat is part of SST
 
 AC_CONFIG_HEADERS(config.h)
 
-AC_CONFIG_FILES(Makefile component.xml ast_link)
+AC_CONFIG_FILES(Makefile component.xml ast_link f77.h)
 AC_CONFIG_FILES([ast_cpp], [chmod +x ast_cpp])
 #   Following are files which are substituted by the Makefile at
 #   distribution time, rather than by configure.  They are not distributed.
