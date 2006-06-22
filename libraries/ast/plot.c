@@ -584,6 +584,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        of calling astGetAttrib.
 *     19-JUN-2006 (DSB)
 *        Changed the default line 0.0 from zero to 1.0.
+*     22-JUN-2006 (DSB)
+*        Include axis textual labels and title in the bounding box
+*        created by AST_GRID and returned by AST_BOUNDINGBOX.
 *class--
 */
 
@@ -1470,7 +1473,7 @@ static float Box_ubnd[ 2 ] = {FLT_MIN, FLT_MIN };
 
 /* The lower and upper bounds of the graphics coordinates enclosing all
    drawn graphics primatives, maintained by functions GLine, GMark and 
-   GText. */
+   DrawText. */
 static float Boxp_lbnd[ 2 ] = {FLT_MAX, FLT_MAX };
 static float Boxp_ubnd[ 2 ] = {FLT_MIN, FLT_MIN };
 static int Boxp_freeze = 0;
@@ -23339,6 +23342,20 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 /* Release the memory allocated to store the title. */
       new_text = (char *) astFree( (void *) new_text );
       text = NULL;
+   }
+
+/* Include the labels in the bounding box held in global variables
+   Box_lbnd/ubnd. */
+   if( Box_lbnd[ 0 ] != FLT_MAX ) {
+      Box_lbnd[ 0 ] = MIN( Box_lbnd[ 0 ], Boxp_lbnd[ 0 ] );
+      Box_ubnd[ 0 ] = MAX( Box_ubnd[ 0 ], Boxp_ubnd[ 0 ] );
+      Box_lbnd[ 1 ] = MIN( Box_lbnd[ 1 ], Boxp_lbnd[ 1 ] );
+      Box_ubnd[ 1 ] = MAX( Box_ubnd[ 1 ], Boxp_ubnd[ 1 ] );
+   } else {
+      Box_lbnd[ 0 ] = Boxp_lbnd[ 0 ];
+      Box_ubnd[ 0 ] = Boxp_ubnd[ 0 ];
+      Box_lbnd[ 1 ] = Boxp_lbnd[ 1 ];
+      Box_ubnd[ 1 ] = Boxp_ubnd[ 1 ];
    }
 
 /* Return. */
