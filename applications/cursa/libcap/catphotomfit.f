@@ -196,10 +196,13 @@
 *     Report any error.
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     DSB: David S Berry (JAC)
 *  History:
 *     8/5/97   (ACD): Original version.
 *     16/11/97 (ACD): First stable version.
 *     5/4/01   (ACD): Added the quiet mode.
+*     22/6/06  (DSB): Initialised individual fixed value flags if FIXED 
+*                     is false.
 *-
 *  Type Definitions:
       IMPLICIT NONE
@@ -318,6 +321,15 @@
 
                NUMFIX = NUMFIX + 1
             END IF
+*
+*       If nothing is fixed set the flags to indicate this and initialise
+*       the fixed values to avoid compiler warnings.
+
+         ELSE
+            FZEROP = .FALSE.
+            FATMOS = .FALSE.
+            ZEROP = 0.0;
+            ATMOS = 0.0
          END IF
 
 *
