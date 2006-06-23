@@ -328,7 +328,7 @@
          ELSE
             FZEROP = .FALSE.
             FATMOS = .FALSE.
-            ZEROP = 0.0;
+            ZEROP = 0.0
             ATMOS = 0.0
          END IF
 
