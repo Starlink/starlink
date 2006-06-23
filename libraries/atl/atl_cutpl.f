@@ -24,13 +24,13 @@
 *     IFRM = INTEGER (Given)
 *        Index of the Frame within IPLOT1 in which the bounds are supplied.
 *     DLBND( * ) = DOUBLE PRECISION (Given)
-*        The lower bounds of the region to be covered by the new Plot.
-*        The number of axis values supplied should equal the number of
-*        axes in the Frame identified by IFRM.
+*        The axis values at the lower left corner of the region to be 
+*        covered by the new Plot. The number of axis values supplied should 
+*        equal the number of axes in the Frame identified by IFRM.
 *     DUBND( * ) = DOUBLE PRECISION (Given)
-*        The upper bounds of the region to be covered by the new Plot.
-*        The number of axis values supplied should equal the number of
-*        axes in the Frame identified by IFRM.
+*        The axis values at the upper right corner of the region to be 
+*        covered by the new Plot. The number of axis values supplied should 
+*        equal the number of axes in the Frame identified by IFRM.
 *     IPLOT2 = INTEGER (Returned)
 *        The new Plot.
 *     STATUS = INTEGER (Given and Returned)
@@ -63,6 +63,8 @@
 *  History:
 *     2-JUN-2006 (DSB):
 *        Original version.
+*     23-JUN-2006 (DSB):
+*        Retain axis direction (lost by use of AST_MAPBOX).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -93,9 +95,11 @@
 *  Local Variables:
       DOUBLE PRECISION BBOX( 4 )
       DOUBLE PRECISION D
+      DOUBLE PRECISION T
       DOUBLE PRECISION XL( ATL__MXDIM )
       DOUBLE PRECISION XU( ATL__MXDIM )
       INTEGER MAP
+      INTEGER NIN
       REAL GBOX( 4 )          
 
 *  Check the inherited status. 
@@ -108,7 +112,32 @@
      :                 BBOX( 3 ), XL, XU, STATUS )
       CALL AST_MAPBOX( MAP, DLBND, DUBND, .TRUE., 2, BBOX( 2 ), 
      :                 BBOX( 4 ), XL, XU, STATUS )
+
+*  Ensure the Mapped limits are the same way round as the supplied
+*  limits. To do this, we transform the supplied points explicitly using 
+*  AST_TRANN.
+      NIN = AST_GETI( AST_GETFRAME( IPLOT1, IFRM, STATUS ), 'Naxes',
+     :                STATUS )
+      CALL AST_TRANN( MAP, 1, NIN, 1, DLBND, .TRUE., 2, 1, XL, STATUS )
+      CALL AST_TRANN( MAP, 1, NIN, 1, DUBND, .TRUE., 2, 1, XU, STATUS )
       CALL AST_ANNUL( MAP, STATUS )
+
+*  Ensure that the bounds of the base Frame box found by AST_MAPBOX are 
+*  the same way round as the bounds found by transforming the supplied
+*  positions.
+      IF( XL( 1 ) .LT. XU( 1 ) .AND. BBOX( 1 ) .GT. BBOX( 3 ) .OR.
+     :    XL( 1 ) .GT. XU( 1 ) .AND. BBOX( 1 ) .LT. BBOX( 3 ) ) THEN
+         T = BBOX( 1 )
+         BBOX( 1 ) = BBOX( 3 )
+         BBOX( 3 ) = T
+      END IF
+
+      IF( XL( 2 ) .LT. XU( 2 ) .AND. BBOX( 2 ) .GT. BBOX( 4 ) .OR.
+     :    XL( 2 ) .GT. XU( 2 ) .AND. BBOX( 2 ) .LT. BBOX( 4 ) ) THEN
+         T = BBOX( 2 )
+         BBOX( 2 ) = BBOX( 4 )
+         BBOX( 4 ) = T
+      END IF
 
 *  Shrink the box slightly to cater for rounding errors.
       D = ( BBOX( 3 ) - BBOX( 1 ) )*1.0D-8
