@@ -21,7 +21,7 @@ STAR_MONOLITHS
 
 dnl    Build dependencies for this package.
 STAR_DECLARE_DEPENDENCIES(build, [par sae])
-STAR_DECLARE_DEPENDENCIES(link, [chr fio mers par pgp sla])
+STAR_DECLARE_DEPENDENCIES(build, [chr fio mers par pgp sla], link)
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 
 dnl    Need "hlib" command to build the help library.
