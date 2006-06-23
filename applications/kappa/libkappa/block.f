@@ -240,7 +240,6 @@
       CHARACTER * ( 6 ) ESTIM    ! Method to estimate smoothed values
       CHARACTER * ( NDF__SZFTP ) DTYPE ! Numeric type for output arrays
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Numeric type for processing
-      INTEGER AXSUM              ! Sum of all significant pixel axes
       INTEGER BOX( NDIM )        ! Smoothing box size
       INTEGER BOXSIZ             ! Number of pixels in smoothing box
       INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
@@ -248,12 +247,10 @@
       INTEGER I                  ! Loop counter
       INTEGER IBOX( NDIM )       ! Smoothing box half-size
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF pixel axes
-      INTEGER NAX                ! Number of significant pixel axes
       INTEGER NDF1               ! Identifier for input NDF
       INTEGER NDF1B              ! Section of input NDF to be smoothed
       INTEGER NDF2               ! Identifier for output NDF
       INTEGER NDF2B              ! Section of output NDF to be filled
-      INTEGER NDIMS              ! Number of NDF dimensions
       INTEGER NLIM               ! Minimum good pixel limit
       INTEGER NVAL               ! Number of values obtained
       INTEGER PAXHI              ! Upper pixel bound of perp. axis 
@@ -282,48 +279,13 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Obtain the input NDF.
-      CALL LPG_ASSOC( 'IN', 'READ', NDF1, STATUS )
-
-*  Determine the NDF bounds.  
-      CALL NDF_BOUND( NDF1, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
-
-*  Count the number of significant pixel axes, storing the indices of
-*  the first two in SDIM. Also note the index of the first insignificant
-*  pixel axis.
-      AXSUM = 0
-      NAX = 0
-      PERPAX = 0
-      DO I = 1, NDIMS
-         DIM( I ) = UBND( I ) - LBND( I ) + 1
-         IF( DIM( I ) .GT. 1 ) THEN
-            NAX = NAX + 1
-            IF( NAX .LT. 3 ) SDIM( NAX ) = I
-            AXSUM = AXSUM + I
-         ELSE IF( PERPAX .EQ. 0 ) THEN
-            PERPAX = I
-         END IF
-      END DO
-
-*  If there is no insignificant axis, use an additional trailing axis.
-      IF( PERPAX .EQ. 0 ) PERPAX = NDIMS + 1
-
-*  If there are exactly three significant pixel axes, see which two 
-*  span the plane to be smoothed.
-      IF( NAX .EQ. 3 ) THEN
-         CALL PAR_GDR1I( 'AXES', 2, SDIM, 1, NDIMS, .TRUE., SDIM, 
-     :                   STATUS )
-
-*  Find the index of the pixel axis which is perpendicular to the 
-*  smoothing plane.
-         PERPAX = AXSUM - SDIM( 1 ) - SDIM( 2 )
-
-*  If the NDF does not have exactly three significant axes, find 
-*  whether or not there are no more than two significant dimensions and 
-*  which ones they are.
-      ELSE
-         CALL KPG1_SDIMP( NDF1, NDIM, SDIM, STATUS )
-      END IF
+*  Obtain the input NDF, its significant axes up to the maximum two
+*  dimensions for processing, and the NDF's bounds.  If the NDF
+*  possesses three significant dimensions, obtain an iteration axis
+*  through parameter AXES, so that planes along that axis can be 
+*  processed in sequence.
+      CALL KPG1_GNDFP( 'IN', 'AXES', NDIM, 'READ', NDF1, SDIM, LBND,
+     :                 UBND, PERPAX, STATUS )
 
 *  Exit if an error occurred.  This is needed because the significant
 *  dimensions are used as array indices.
@@ -332,8 +294,8 @@
 *  Determine its dimensions.  Note that only two dimensions can be
 *  accommodated, but of these only one need be siginifcant.  Then
 *  ignore non-significant dimensions.
-      DIM( 1 ) = DIM( SDIM( 1 ) )
-      DIM( 2 ) = DIM( SDIM( 2 ) )
+      DIM( 1 ) = UBND( SDIM( 1 ) ) - LBND( SDIM( 1 ) ) + 1
+      DIM( 2 ) = UBND( SDIM( 2 ) ) - LBND( SDIM( 1 ) ) + 1
 
 *  Obtain the smoothing box sizes, duplicating the value if only a
 *  single value is given.  Each box size must be a positive odd number,
@@ -402,6 +364,7 @@
 
 *  Obtain workspace arrays for the smoothing algorithm and map them.
       IF ( ESTIM .EQ. 'MEAN' ) THEN
+         
          CALL PSX_CALLOC( DIM( 1 ), ITYPE, WPNTR1, STATUS )
          CALL PSX_CALLOC( DIM( 1 ), '_INTEGER', WPNTR2, STATUS )
       ELSE
