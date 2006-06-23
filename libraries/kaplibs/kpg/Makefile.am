@@ -270,6 +270,7 @@ kpg1_gaxlb.f \
 kpg1_getim.f \
 kpg1_getyp.f \
 kpg1_gilst.f \
+kpg1_gndfp.f \
 kpg1_gnlbu.f \
 kpg1_gntit.f \
 kpg1_gpcol.f \
