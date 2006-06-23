@@ -41,11 +41,12 @@
 *  ADAM Parameters:
 *     AXES(2) = _INTEGER (Read)
 *        This parameter is only accessed if the NDF has exactly three 
-*        significant pixel axes. It should be set to the indices of the
+*        significant pixel axes.  It should be set to the indices of the
 *        NDF  pixel axes which span the plane in which smoothing is to
-*        be applied. All pixel planes parallel to the specified plane will
-*        be smoothed independently of each other. The dynamic default
-*        is the indices of the first two significant axes in the NDF. []
+*        be applied.  All pixel planes parallel to the specified plane 
+*        will be smoothed independently of each other.  The dynamic 
+*        default is the indices of the first two significant axes in 
+*        the NDF. []
 *     BOX(2) = _INTEGER (Read)
 *        The x and y sizes (in pixels) of the rectangular box to be
 *        applied to smooth the image.  If only a single value is given,
@@ -236,7 +237,7 @@
 
 *  Local Variables:
       CHARACTER * ( 13 ) COMP    ! List of components to process
-      CHARACTER * ( 6 ) ESTIM    ! Method to use to estimate smoothed values
+      CHARACTER * ( 6 ) ESTIM    ! Method to estimate smoothed values
       CHARACTER * ( NDF__SZFTP ) DTYPE ! Numeric type for output arrays
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Numeric type for processing
       INTEGER AXSUM              ! Sum of all significant pixel axes
@@ -258,7 +259,7 @@
       INTEGER PAXHI              ! Upper pixel bound of perp. axis 
       INTEGER PAXLO              ! Lower pixel bound of perp. axis 
       INTEGER PAXVAL             ! Current pixel value on perp. axis 
-      INTEGER PERPAX             ! Index of axis perp. to smoothing plane
+      INTEGER PERPAX             ! Index axis perp. to smoothing plane
       INTEGER PNTR1( 2 )         ! Pointers for mapped input arrays
       INTEGER PNTR2( 2 )         ! Pointers for mapped output arrays
       INTEGER SDIM( NDF__MXDIM ) ! Significant NDF dimensions
@@ -266,12 +267,13 @@
       INTEGER WPNTR1             ! Mapped workspace pointer
       INTEGER WPNTR2             ! Mapped workspace pointer
       LOGICAL BAD                ! Check for bad input pixels?
-      LOGICAL BADDAT             ! Bad values stored in output data array?
+      LOGICAL BADDAT             ! Bad values stored in o/p data array?
       LOGICAL BADOUT             ! Bad pixels in output array?
-      LOGICAL BADVAR             ! Bad values stored in output variance array?
+      LOGICAL BADVAR             ! Bad values stored in o/p var. array?
       LOGICAL SAMBAD             ! Propagate bad pixels to same place?
       LOGICAL VAR                ! Variance array present?
       REAL WLIM                  ! Fraction of good pixels required
+
 *.
 
 *  Check inherited global status.
@@ -286,7 +288,7 @@
 *  Determine the NDF bounds.  
       CALL NDF_BOUND( NDF1, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
 
-*  Count the number of significant pixel axes, storing the indicies of
+*  Count the number of significant pixel axes, storing the indices of
 *  the first two in SDIM. Also note the index of the first insignificant
 *  pixel axis.
       AXSUM = 0
@@ -306,18 +308,19 @@
 *  If there is no insignificant axis, use an additional trailing axis.
       IF( PERPAX .EQ. 0 ) PERPAX = NDIMS + 1
 
-*  If there are exactly 3 significant pixel axes, see which two span the
-*  plane to be smoothed.
+*  If there are exactly three significant pixel axes, see which two 
+*  span the plane to be smoothed.
       IF( NAX .EQ. 3 ) THEN
          CALL PAR_GDR1I( 'AXES', 2, SDIM, 1, NDIMS, .TRUE., SDIM, 
      :                   STATUS )
 
-*  Find the index of the pixel axis which is perpendicular to the smoothing
-*  plane.
+*  Find the index of the pixel axis which is perpendicular to the 
+*  smoothing plane.
          PERPAX = AXSUM - SDIM( 1 ) - SDIM( 2 )
 
-*  If the NDF does not have exactly 3 significant axes, find whether or not 
-*  there are no more than two significant dimensions and which ones they are.
+*  If the NDF does not have exactly three significant axes, find 
+*  whether or not there are no more than two significant dimensions and 
+*  which ones they are.
       ELSE
          CALL KPG1_SDIMP( NDF1, NDIM, SDIM, STATUS )
       END IF
@@ -442,7 +445,7 @@
      :                          %VAL( CNF_PVAL( WPNTR1 ) ), 
      :                          %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
             ELSE
-               CALL KPG1_BMEDR( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
+               CALL KPG1_BMEDR( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ),
      :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
      :                          IBOX( 1 ), IBOX( 2 ),
      :                          NLIM, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
@@ -464,7 +467,7 @@
      :                          %VAL( CNF_PVAL( WPNTR1 ) ), 
      :                          %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
             ELSE
-               CALL KPG1_BMEDD( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
+               CALL KPG1_BMEDD( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ),
      :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
      :                          IBOX( 1 ), IBOX( 2 ),
      :                          NLIM, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
@@ -483,7 +486,7 @@
 *  being used.
          IF ( VAR .AND. ESTIM .EQ. 'MEAN' ) THEN
             IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_BLOCR( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
+               CALL KPG1_BLOCR( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ),
      :                          %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
      :                          IBOX( 1 ), IBOX( 2 ),
      :                          NLIM, %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
@@ -492,7 +495,7 @@
      :                          %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
          
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_BLOCD( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
+               CALL KPG1_BLOCD( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ),
      :                          %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
      :                          IBOX( 1 ), IBOX( 2 ),
      :                          NLIM, %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
@@ -511,8 +514,8 @@
 
       END DO
 
-*  Indicate whether or not the output data and/or variance array has bad 
-*  pixels.
+*  Indicate whether or not the output data and/or variance array has 
+*  bad  pixels.
       CALL NDF_SBAD( BADDAT, NDF2, 'Data', STATUS )
       IF ( VAR .AND. ESTIM .EQ. 'MEAN' ) THEN
          CALL NDF_SBAD( BADVAR, NDF2, 'Variance', STATUS )
