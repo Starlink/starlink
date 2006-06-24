@@ -91,6 +91,7 @@
 #include "smurf_typ.h"
 #define SMF_PATH_MAX GRP__SZNAM
 #define SMF_NAME_MAX GRP__SZNAM
+#define SMF__MXSMF 4 /* Maximum number of smfDatas in a smfArray */
 
 /* Different data types supported by SMURF */
 
@@ -163,6 +164,13 @@ typedef struct smfData {
   int * lut;               /* Pointing lookup table */
   AstKeyMap *history;      /* History entries */
 } smfData;
+
+/* This structure is a container for multiple smfDatas */
+
+typedef struct smfArray {
+  void *sdata[SMF__MXSMF]; /* Pointers to smfDatas */
+  int ndat;                /* Number of smfDatas in current smfArray */
+} smfArray;
 
 #endif /* SMF_TYP_DEFINED */
 
