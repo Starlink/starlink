@@ -1449,15 +1449,23 @@ $(MANIFESTS)/observe: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
+		$(MANIFESTS)/fio \
+		$(MANIFESTS)/gks \
+		$(MANIFESTS)/gns \
+		$(MANIFESTS)/graphpar \
+		$(MANIFESTS)/gwm \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/pgp \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
+		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starx
 	cd applications/observe \
 	  && $(MAKE_CPT)
 
