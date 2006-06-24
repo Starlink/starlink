@@ -290,6 +290,18 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
  		     double *map, double *variance, double *weights,
 	 	     int msize, int *status );
 
+void smf_dream_setjig( char subarray[], int npath, double grid_step_x, 
+  double grid_step_y, double jigpath[][2], int *status);
+
+smfArray *smf_create_smfArray( const size_t size, int *status );
+
+void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status );
+
 void smf_open_mapcoord( smfData *data, int *status );
+
+void smf_dreamsolve( smfData *data, Grp *pixgrp, Grp *pstgrp, int index, 
+		     int *status );
+
+/*void smf_createwcs(  int *status);*/
 
 #endif /* SMF_DEFINED */
