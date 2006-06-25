@@ -68,6 +68,8 @@
 *        Check that the weights array pointer is not NULL
 *     2006-05-25 (EC):
 *        Add iterative map-maker + associated command line parameters
+*     2006-06-24 (ED):
+*        Iterative map-maker parameters given in CONFIG file
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -114,6 +116,8 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/kaplibs.h"
+
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -133,8 +137,6 @@
 void smurf_makemap( int *status ) {
 
   /* Local Variables */
-  Grp *astgrp = GRP__NOID;   /* Group of astronomical signal files */
-  Grp *atmgrp = GRP__NOID;   /* Group of atmospheric signal files */
   Grp *confgrp = GRP__NOID;  /* Group containing configuration file */
   void *data_index[1];       /* Array of pointers to mapped arrays in ndf */
   smfData *data=NULL;        /* pointer to  SCUBA2 data struct */
@@ -147,26 +149,14 @@ void smurf_makemap( int *status ) {
   void *map=NULL;            /* Pointer to the rebinned map data */
   char method[LEN__METHOD];  /* String for map-making method */
   int n;                     /* # elements in the output map */
-  Grp *ngrp = GRP__NOID;     /* Group of noise signal files */
   int ondf;                  /* output NDF identifier */
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
+  int parstate;              /* State of ADAM parameters */
   float pixsize=3;           /* Size of an output map pixel in arcsec */
   int size;                  /* Number of files in input group */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance=NULL;       /* Pointer to the variance map */
   void *weights=NULL;        /* Pointer to the weights map */
-
-  /* Test variables */
-  int coordndf=NDF__NOID;    /* NDF identifier for coordinates */
-  dim_t j;                   /* Loop counter */
-  int *lut;                  /* The lookup table */
-  int nmap;                  /* Number of mapped elements */
-  int place=NDF__NOPL;       /* NDF place holder */
-  int there;
-  double *bolodata;
-  int parstate;              /* State of ADAM parameters */
-
-  int numiter=0;
 
   /* Main routine */
   ndfBegin();
@@ -220,6 +210,7 @@ void smurf_makemap( int *status ) {
 	     status);
 
     for(i=1; i<=size; i++ ) {
+
       /* Read data from the ith input file in the group */      
       smf_open_and_flatfield( igrp, NULL, i, &data, status );
       
@@ -285,43 +276,27 @@ void smurf_makemap( int *status ) {
       errRep(FUNC_NAME, "CONFIG unspecified", status);      
     }
     
-    /* Check for names of groups containing model components, and create */
-    /*
-      parState( "ASTMODEL", &parstate, status );
-      if( parstate == PAR__ACTIVE ) {
-      ndgCreat( "ASTMODEL", igrp, &astgrp, &size, &flag, status );
-      } else {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "No ASTMODEL specified", status);      
-      }
-      
-      parState( "ATMMODEL", &parstate, status );
-      if( parstate == PAR__ACTIVE ) {
-      ndgCreat( "ATMMODEL", igrp, &atmgrp, &size, &flag, status );
-      } else {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "No ATMMODEL specified", status);      
-      }
-      
-      parState( "NOISEMODEL", &parstate, status );
-      if( parstate == PAR__ACTIVE ) {
-      ndgCreat( "NOISEMODEL", igrp, &ngrp, &size, &flag, status );
-      } else {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "No NOISEMODEL specified", status);      
-      
-      }
-    */
-
     /* Loop over all input data files to put in the pointing extension */
     if( *status == SAI__OK ) {
       for(i=1; i<=size; i++ ) {	
-	smf_open_file( igrp, i, "UPDATE", 1, &data, status );
-	smf_mapcoord( data, outfset, lbnd_out, ubnd_out, status );
-	smf_close_file( &data, status );
+
+        smf_open_file( igrp, i, "UPDATE", 1, &data, status );
+        if( *status != SAI__OK) {
+          errRep(FUNC_NAME, "Bad status opening smfData", status);      
+        }
+          
+        smf_mapcoord( data, outfset, lbnd_out, ubnd_out, status );
+        if( *status != SAI__OK) {
+          errRep(FUNC_NAME, "Bad status calculating MAPCOORD", status);      
+        }
+
+        smf_close_file( &data, status );
+        if( *status != SAI__OK) {
+          errRep(FUNC_NAME, "Bad status closing smfData", status);      
+        }          
 
 	/* Set exit status if error */
-	if( *status != SAI__OK ) i=size;
+	if( *status != SAI__OK ) i=size;        
       }
     }
 
