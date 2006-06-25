@@ -36,6 +36,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     12-NOV-1996 (RFWS):
@@ -59,6 +60,9 @@
 *        Added SLA_DE2H and SLA_DH2E
 *     12-JUN-2006 (DSB):
 *        Moved from AST to SLALIB.
+*     25-JUN-2006 (TIMJ):
+*        Add SLA_AIRMAS.
+*-
 */
 
 /* Header files. */
@@ -183,6 +187,16 @@ void slaAmpqk ( double ra, double da, double amprms[21],
                         DOUBLE_ARG(&DM) );
    *rm = RM;
    *dm = DM;
+}
+
+F77_DOUBLE_FUNCTION(sla_airmas)( DOUBLE(ZD) );
+
+double slaAirmas( double zd ) {
+  DECLARE_DOUBLE(ZD);
+  double result;
+  ZD = zd;
+  result = F77_CALL(sla_airmas)( DOUBLE_ARG(&ZD) );
+  return result;
 }
 
 F77_SUBROUTINE(sla_caldj)( INTEGER(IY),
