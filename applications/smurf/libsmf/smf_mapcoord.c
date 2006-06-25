@@ -293,9 +293,7 @@ void smf_mapcoord( smfData *data, AstFrameSet *outfset,
     if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
     if (bolo2map) bolo2map = astAnnul( bolo2map );
     
-    ndfUnmap( coordndf, "DATA", status );
-    ndfAnnul( &coordndf, status );
-    
+    ndfAnnul( &coordndf, status );    
     datAnnul( &smurfloc, status );
 
     smf_free( outmapcoord, status );

@@ -146,8 +146,7 @@ void smf_close_file( smfData ** data, int * status ) {
 
       /* Annul the NDF (which will unmap things) */
       ndfAnnul( &(file->ndfid), status );
-      
-	
+      	
     } else {
       /* No file so free the data */
       freedata = 1;
@@ -187,7 +186,8 @@ void smf_close_file( smfData ** data, int * status ) {
      in a separate action as temp storage */
   if (freedata) {
     for (i = 0; i < 3; i++ ) {
-      if ( ((*data)->pntr)[i] != NULL ) smf_free( ((*data)->pntr)[i], status );
+      if ( ((*data)->pntr)[i] != NULL ) 
+        smf_free( ((*data)->pntr)[i], status );
     }
   } else if (isSc2store) {
     /* just the data array */
