@@ -285,7 +285,7 @@ void smurf_makemap( int *status ) {
           errRep(FUNC_NAME, "Bad status opening smfData", status);      
         }
           
-        smf_mapcoord( data, outfset, lbnd_out, ubnd_out, status );
+        smf_calc_mapcoord( data, outfset, lbnd_out, ubnd_out, status );
         if( *status != SAI__OK) {
           errRep(FUNC_NAME, "Bad status calculating MAPCOORD", status);      
         }
@@ -295,7 +295,7 @@ void smurf_makemap( int *status ) {
           errRep(FUNC_NAME, "Bad status closing smfData", status);      
         }          
 
-	/* Set exit status if error */
+	/* Exit loop if error status */
 	if( *status != SAI__OK ) i=size;        
       }
     }
@@ -322,13 +322,12 @@ void smurf_makemap( int *status ) {
   smf_free( weights, status );
   
   if( igrp != GRP__NOID ) grpDelet( &igrp, status);
-  /*
-  if( astgrp != GRP__NOID ) grpDelet( &astgrp, status );
-  if( atmgrp != GRP__NOID ) grpDelet( &atmgrp, status );
-  if( ngrp != GRP__NOID ) grpDelet( &ngrp, status );
-  */
 
   ndfEnd( status );
   
-  msgOutif(MSG__VERB," ","Map written.", status);
+  if( *status == SAI__OK ) {
+    msgOutif(MSG__VERB," ","MAKEMAP succeeded, map written.", status);
+  } else {
+    msgOutif(MSG__VERB," ","MAKEMAP failed.", status);
+  }
 }

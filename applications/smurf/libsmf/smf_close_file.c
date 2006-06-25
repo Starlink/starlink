@@ -54,6 +54,8 @@
 *        - respect new isCloned flag in smfHead
 *     2006-06-12 (EC):
 *        Free resources associated with .SMURF.MAPCOORD extension if needed
+*     2006-06-25 (EC):
+*        Now put MAPCOORD into SCU2RED extension
 *     {enter_further_changes_here}
 
 *  Copyright:
