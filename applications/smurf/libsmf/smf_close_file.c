@@ -93,6 +93,7 @@
 
 void smf_close_file( smfData ** data, int * status ) {
 
+  smfDA   * da;           /* pointer to smfDA in smfData */
   smfHead * hdr;          /* pointer to smfHead in smfData */
   int       i;            /* loop counter */
   smfFile * file;         /* pointer to smfFile in smfData */
@@ -174,7 +175,12 @@ void smf_close_file( smfData ** data, int * status ) {
   }
 
   /* Now the smfDA itself */
-  if ( (*data)->da != NULL ) smf_free( (*data)->da, status );
+  if ( (*data)->da != NULL ) {
+    da = (*data)->da;
+    smf_free( da->flatcal, status );
+    smf_free( da->flatpar, status );
+    smf_free( da, status );
+  }
 
   /* Free the data arrays if they are non-null (they should have been
      freed if they were mapped to a file but not if they were stored
