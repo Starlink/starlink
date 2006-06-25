@@ -311,6 +311,6 @@ void smf_open_mapcoord( smfData *data, int *status );
 void smf_dreamsolve( smfData *data, Grp *pixgrp, Grp *pstgrp, int index, 
 		     int *status );
 
-/*void smf_createwcs(  int *status);*/
+void smf_close_mapcoord( smfData *data, int *status );
 
 #endif /* SMF_DEFINED */

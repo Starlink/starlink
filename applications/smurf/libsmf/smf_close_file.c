@@ -123,9 +123,11 @@ void smf_close_file( smfData ** data, int * status ) {
   /* Get the header and file, since we need them for checking */
   hdr = (*data)->hdr;
 
+  /* Before annulling close NDF try closing SCU2RED.MAPCOORD */
+  smf_close_mapcoord( *data, status );
 
-  file = (*data)->file;
   /* now file information */
+  file = (*data)->file;
   if (file != NULL) {
 
     if ( file->isSc2store ) {
@@ -135,12 +137,6 @@ void smf_close_file( smfData ** data, int * status ) {
       isSc2store = 1;
 
     } else if ( file->ndfid != NDF__NOID ) {
-
-      /* First annul mapcoord NDF if it exists (frees memory used by LUT) */
-      if( file->mapcoordid != NDF__NOID ) {
-	ndfAnnul( &(file->mapcoordid), status );
-      }
-
       /* Annul the NDF (which will unmap things) */
       ndfAnnul( &(file->ndfid), status );
       	
