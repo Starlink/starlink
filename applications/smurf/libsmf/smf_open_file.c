@@ -255,7 +255,6 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
     /* Null MAPCOORD extension pointers - they get allocated elsewhere */
     (*data)->lut = NULL;
     file->mapcoordid=NDF__NOID;
-    file->smurfloc=NULL;
 
     /* If we have timeseries data then look for and read polynomial
        scan fit coefficients. */

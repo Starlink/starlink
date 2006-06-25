@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smf_mapcoord
+*     smf_calc_mapcoord
 
 *  Purpose:
-*     Generate a .SMURF.MAPCOORD extension to store pixel coordinates
+*     Generate a .SCU2RED.MAPCOORD extension to store pixel coordinates
 
 *  Language:
 *     Starlink ANSI C
@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_mapcoord( smfData *data, AstFrameSet *outfset,
+*     smf_calc_mapcoord( smfData *data, AstFrameSet *outfset,
 *                   int *lbnd_out, int *ubnd_out, int *status );
 
 *  Arguments:
@@ -29,7 +29,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     This function creates a .SMURF.MAPCOORD extension in the NDF
+*     This function creates a .SCU2RED.MAPCOORD extension in the NDF
 *  associated with data based on outfset & lbnd/ubnd_out
 *
 *     
@@ -39,6 +39,8 @@
 *  History:
 *     2006-05-16 (EC):
 *        Initial version
+*     2006-06-25 (EC):
+*        Changed function name from smf_mapcoord to smf_calc_mapcoord
 
 *  Notes:
 
@@ -75,15 +77,14 @@
 #include "ndf.h"
 #include "prm_par.h"
 #include "sae_par.h"
-
 #include "star/hds.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-#define FUNC_NAME "smf_mapcoord"
+#define FUNC_NAME "smf_calc_mapcoord"
 
-void smf_mapcoord( smfData *data, AstFrameSet *outfset, 
+void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, 
 		   int *lbnd_out, int *ubnd_out, int *status ) {
 
   /* Local Variables */
@@ -110,7 +111,7 @@ void smf_mapcoord( smfData *data, AstFrameSet *outfset,
   int nmap;                    /* Number of mapped elements */
   double *outmapcoord;         /* map coordinates for each bolometer */
   int place=NDF__NOPL;         /* NDF place holder */
-  HDSLoc *smurfloc=NULL;       /* HDS locator to the SMURF extension */
+  HDSLoc *scu2redloc=NULL;     /* HDS locator to the SCU2RED extension */
   AstMapping *sky2map=NULL;    /* Mapping celestial->map coordinates */
   char stat[81];               /* Status of ndf open */
   const char *system;          /* Coordinate system */
@@ -154,15 +155,14 @@ void smf_mapcoord( smfData *data, AstFrameSet *outfset,
 	     status);
     }
 
-    /* Get HDS locator to the SMURF extension */
-
-    smurfloc = smf_get_xloc( data, "SMURF", "SMURF_Calculations",
+    /* Get HDS locator to the SCU2RED extension */
+    scu2redloc = smf_get_xloc( data, "SCU2RED", "REDUCED",
 			     "UPDATE", 0, 0, status );
 
     /* Obtain NDF identifier/placeholder for coord. in scuba2 extension*/    
     lbnd[0] = 0;
     ubnd[0] = nbolo*data->dims[2]-1;
-    coordndf = smf_get_ndfid( smurfloc, "MAPCOORD", "UPDATE", "UNKNOWN",
+    coordndf = smf_get_ndfid( scu2redloc, "MAPCOORD", "UPDATE", "UNKNOWN",
 			      "_INTEGER", 1, lbnd, ubnd, status );
 
     /* Map the data array */
@@ -172,7 +172,7 @@ void smf_mapcoord( smfData *data, AstFrameSet *outfset,
     if( *status == SAI__OK ) {
       lut = data_index[0];
     } else {
-      errRep( FUNC_NAME, "Unable to map LUT in SMURF extension",
+      errRep( FUNC_NAME, "Unable to map LUT in SCU2RED extension",
 	      status);
     }
         
@@ -294,7 +294,7 @@ void smf_mapcoord( smfData *data, AstFrameSet *outfset,
     if (bolo2map) bolo2map = astAnnul( bolo2map );
     
     ndfAnnul( &coordndf, status );    
-    datAnnul( &smurfloc, status );
+    datAnnul( &scu2redloc, status );
 
     smf_free( outmapcoord, status );
         

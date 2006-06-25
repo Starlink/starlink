@@ -139,11 +139,6 @@ void smf_close_file( smfData ** data, int * status ) {
 	ndfAnnul( &(file->mapcoordid), status );
       }
 
-      /* Annul the smurfloc HDS locator if it exists */
-      if( file->smurfloc != NULL ) {
-	datAnnul( &(file->smurfloc), status );
-      }
-
       /* Annul the NDF (which will unmap things) */
       ndfAnnul( &(file->ndfid), status );
       	

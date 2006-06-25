@@ -89,6 +89,8 @@
 *        - Add smf_mapcoordinates
 *     2006-05-09 (AGG):
 *        Add smf_get_xloc and smf_get_ndfid
+*     2006-05-09 (EC):
+*        Renamed smf_mapcoord to smf_calc_mapcoord
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -138,7 +140,7 @@ double smf_calc_wvm( const smfHead *hdr, int *status );
 
 void smf_check_flat ( const smfData *data, int *status );
 
-void smf_check_smfData ( const smfData *idata, smfData *odata, const int flags, 
+void smf_check_smfData ( const smfData *idata, smfData *odata, const int flags,
 			 int *status );
 
 void smf_check_smfDA ( const smfData *idata, smfData *odata, int *status );
@@ -195,8 +197,8 @@ smfFile * smf_deepcopy_smfFile ( const smfFile *old, int * status );
 int smf_dtype_check( const smfData* data, const char * type, smf_dtype itype,
 		     int *status );
 
-void smf_dtype_check_fatal( const smfData* data, const char * type, smf_dtype itype,
-		     int *status );
+void smf_dtype_check_fatal( const smfData* data, const char * type, 
+                            smf_dtype itype, int *status );
 
 char *smf_dtype_string( const smfData* data, int * status );
 
@@ -205,22 +207,25 @@ size_t smf_dtype_size( const smfData* data, int * status );
 smf_dtype
 smf_dtype_fromstring( const char * dtype, int * status );
 
-void smf_fit_poly(const smfData *data, const int order, double *poly,  int *status);
+void smf_fit_poly(const smfData *data, const int order, double *poly,  
+                  int *status);
 
-void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status);
+void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, 
+                      int *status);
 
-/* Do not return the result since we want the interface to remain the same when a
-   string is required. If we return a string we have to know who should free it */
+/* Do not return result since we want the interface to remain the same when a
+   string is required. If we return a string we must know who should free it */
 void smf_fits_getI( const smfHead * hdr, const char * cardname, int * result, 
 		    int * status );
-void smf_fits_getD( const smfHead * hdr, const char * cardname, double * result, 
-		    int * status );
-void smf_fits_getF( const smfHead * hdr, const char * cardname, float * result, 
-		    int * status );
-void smf_fits_getS( const smfHead * hdr, const char * cardname, char result[70], 
-		    size_t len, int * status );
+void smf_fits_getD( const smfHead * hdr, const char * cardname, 
+                    double * result, int * status );
+void smf_fits_getF( const smfHead * hdr, const char * cardname, 
+                    float * result, int * status );
+void smf_fits_getS( const smfHead * hdr, const char * cardname, 
+                    char result[70], size_t len, int * status );
 
-void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, int *status );
+void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, 
+                     int *status );
 
 void smf_flatten ( smfData *data, int *status );
 
@@ -244,9 +249,11 @@ void smf_history_add( smfData* data, const char * appl,
 void smf_history_write( const smfData* data, const char * appl, 
 			const char * text, int *status);
 
-void smf_insert_tslice ( smfData **idata, smfData *tdata, int index, int *status );
+void smf_insert_tslice ( smfData **idata, smfData *tdata, int index, 
+                         int *status );
 
-void * smf_malloc( size_t nelem, size_t bytes_per_elem, int zero, int * status );
+void * smf_malloc( size_t nelem, size_t bytes_per_elem, int zero, 
+                   int * status );
 
 void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, 
 			      smfData **ffdata, int *status);
@@ -260,7 +267,8 @@ void smf_subtract_plane( smfData *data, const char *fittype, int *status);
 
 void smf_subtract_poly( smfData *data, int *status );
 
-void smf_tslice ( const smfData *idata, smfData **tdata, int index, int *status );
+void smf_tslice ( const smfData *idata, smfData **tdata, int index, 
+                  int *status );
 
 void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
 
@@ -272,12 +280,13 @@ void smf_mapbounds_approx( Grp *igrp,  int size, char *system, double lon_0,
 		    double lat_0, int flag, double pixsize, int *lbnd_out, 
 		    int *ubnd_out, AstFrameSet **outframeset, int *status );
 
-void smf_rebinmap( smfData *data, int index, int size, AstFrameSet *outframeset,
-                   int *lbnd_out, int *ubnd_out, double *map, double *variance,
+void smf_rebinmap( smfData *data, int index, int size, 
+                   AstFrameSet *outframeset, int *lbnd_out, int *ubnd_out,
+                   double *map, double *variance,
 		   double *weights, int *status );
 
-void smf_mapcoord( smfData *data, AstFrameSet *outfset, int *lbnd_out,
-		   int *ubnd_out, int *status );
+void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int *lbnd_out,
+                        int *ubnd_out, int *status );
 
 void smf_scanfit( smfData *data, int order, int *status );
 

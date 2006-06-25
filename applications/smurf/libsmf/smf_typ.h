@@ -117,7 +117,6 @@ typedef struct smfFile {
   int isSc2store;            /* True if file opened by sc2store library */
   int isTstream;             /* True if file contains time series data */
   char name[SMF_PATH_MAX+1]; /* Name of file */
-  HDSLoc *smurfloc;          /* HDS locator for SMURF extension */
   int mapcoordid;            /* NDF identifier for SMURF.MAPCOORD */
 } smfFile;
 
