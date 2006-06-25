@@ -91,6 +91,8 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
+#include "sys/time.h"
+
 #define FUNC_NAME "smf_iteratemap"
 
 void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map, 
@@ -128,6 +130,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   int numiter;                  /* Total number iterations */
   int rebinflags;               /* Flags to control rebinning */
   double sigma;                 /* Estimate of standard deviation */
+
+  struct timeval tm;
+  struct timezone tz;
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -303,6 +308,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
         }
         
         /* Close files */
+
         smf_close_file( &idata, status );
         smf_close_file( &atmdata, status );
         smf_close_file( &astdata, status );    
@@ -369,7 +375,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
                 /* Sample the map into astdata */
                 ((double *)(astdata->pntr)[0])[j] = map[lut[j]];
 	      
-                /* Re-estimate the noise signal as input - atmdata - astdata */
+                /* Re-estimate noise signal as input - atmdata - astdata */
                 ((double *)(ndata->pntr)[0])[j] = 
                   ((double *)(idata->pntr)[0])[j] - 
                   ((double *)(atmdata->pntr)[0])[j] - map[lut[j]];
@@ -394,7 +400,15 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
 	
           /* Close files */
           smf_close_file( &idata, status );    
+
+          gettimeofday(&tm, &tz);
+          printf("Start: %i . %i\n", tm.tv_sec, tm.tv_usec);
+          
           smf_close_file( &astdata, status );    
+          
+          gettimeofday(&tm, &tz);
+          printf("End: %i . %i\n", tm.tv_sec, tm.tv_usec);
+
           smf_close_file( &atmdata, status );    
           smf_close_file( &ndata, status );    
         }
