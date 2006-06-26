@@ -55,6 +55,7 @@
 *-
 */
 
+#include <string.h>
 #include "star/atl.h"
 #include "sae_par.h"
 #include "ast.h"
@@ -67,7 +68,7 @@ static FILE *input_stream;
 const char *Source( void );
 
 
-int main(){
+int main( void ){
    AstChannel *channel;
    AstFrameSet *fs;
    AstFrame *cfrm;
