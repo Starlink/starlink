@@ -50,6 +50,8 @@
 *        statically within application code are no longer allowed). Also,
 *        NULL pointers are used consistently in C to represent null
 *        groups (i.e. the F77 GRP__NOID value).
+*     25-JUN-2006 (TIMJ):
+*        Add grpCopy.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -498,4 +500,35 @@ void grpGrpex( const char *grpexp, const Grp *grp1, Grp *grp2,
   F77_IMPORT_INTEGER( ADDED, *added );
   F77_IMPORT_LOGICAL( FLAG, *flag );
 
+}
+
+F77_SUBROUTINE(grp_copy)( INTEGER(IGRP1), INTEGER(INDXLO),
+			  INTEGER(INDXHI), LOGICAL(REJECT),
+			  INTEGER(IGRP2), INTEGER(STATUS));
+
+Grp * grpCopy( const Grp* grp1, int indxlo, int indxhi, int reject,
+	       int * status ) {
+  DECLARE_INTEGER(IGRP1);
+  DECLARE_INTEGER(IGRP2);
+  DECLARE_INTEGER(INDXLO);
+  DECLARE_INTEGER(INDXHI);
+  DECLARE_LOGICAL(REJECT);
+  DECLARE_INTEGER(STATUS);
+
+  Grp * ret = NULL;
+
+  IGRP1 = grpC2F( grp1, status );
+  F77_EXPORT_LOGICAL( reject, REJECT );
+  F77_EXPORT_INTEGER( indxlo, INDXLO );
+  F77_EXPORT_INTEGER( indxhi, INDXHI );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_CALL(grp_copy)( INTEGER_ARG(&IGRP1), INTEGER_ARG(&INDXLO),
+		      INTEGER_ARG(&INDXHI), LOGICAL_ARG(&REJECT),
+		      INTEGER_ARG(&IGRP2), INTEGER_ARG(&STATUS));
+
+  F77_IMPORT_INTEGER( STATUS, *status );
+
+  ret = grpF2C( IGRP2, status );
+  return ret;
 }

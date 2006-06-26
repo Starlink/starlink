@@ -1,6 +1,7 @@
 #if !defined( GRP_INCLUDED )  /* Include this file only once */
 #define GRP_INCLUDED
 /*
+*+
 *  Name:
 *     grp.h
 
@@ -39,6 +40,9 @@
 *        Add grpInfoc
 *      26-FEB-2006 (TIMJ):
 *        Add grpGrpex
+*     25-JUN-2006 (TIMJ):
+*        Add grpCopy.
+
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -60,6 +64,7 @@
 *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 *     MA 02111-1307, USA
 
+*-
 */
 
 /* We need CNF to define Fortran */
@@ -104,6 +109,8 @@ typedef struct Grp Grp;
 
 /* Public function prototypes */
 /* -------------------------- */
+Grp * grpCopy( const Grp* grp1, int indxlo, int indxhi, int reject,
+              int * status );
 void grpDelet( Grp **, int * );
 void grpGrpex( const char * grpexp, const Grp * igrp1, Grp * igrp2,
                int* size, int *added, int * flag, int * status );
