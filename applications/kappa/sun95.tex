@@ -15552,8 +15552,8 @@ KAPPA: \htmlref{PASTE}{PASTE},
             \sstitem
             {\tt "Sum"}    -- The total value.
          }
-         The selection is restricted if each channel contains fewer
-         than three pixels.  For instance, measures of dispersion like
+         The selection is restricted if each channel contains three
+         or fewer pixels.  For instance, measures of dispersion like
   	 "Sigma" and "Iwd" are meaningless for single-pixel channels.
   	 If you supply an unavailable option, you will be informed,
          and presented with the available options.
@@ -15602,7 +15602,7 @@ KAPPA: \htmlref{PASTE}{PASTE},
          NCHAN = \_INTEGER (Read)
       }{
          The number of channels to appear in the channel map.  It must
-         be a positive integer up to the lesser of 100 or one third of
+         be a positive integer up to the lesser of 100 or 
          the number of pixels along the collapsed axis.
       }
       \sstsubsection{
@@ -15615,8 +15615,10 @@ KAPPA: \htmlref{PASTE}{PASTE},
       }{
          The number of channels along the $x$ axis of the output NDF.  The
          number along the $y$ axis will be (NCHAN-1)/SHAPE.  A null value
-         ({\tt{!}}) asks the application to select a shape.  It will generate
-         one that gives the most square output NDF possible.
+         ({\tt{!}}) asks the application to select a shape.  It will 
+         generate one that gives the most square output NDF possible.  
+         The value must be positive and no more than the value of 
+         parameter NCHAN.
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
