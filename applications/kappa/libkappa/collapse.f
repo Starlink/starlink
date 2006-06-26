@@ -279,6 +279,9 @@
 *        Obtain bounds for each block passed to KPS1_CLPSx, rather
 *        than the full array.  Do not use workspace if higher
 *        dimensions are 1.
+*     2006 June 23 (MJC):
+*        Use a temporary NDF as intermediary to obtain file-size 
+*        compression of the output NDF.
 *     {enter_further_changes_here}
 
 *-
@@ -362,9 +365,10 @@
       INTEGER IBLSIZ( NDF__MXDIM ) ! Input-NDF sizes for processing 
                                  ! large datasets in blocks
       INTEGER IERR               ! Position of first numerical error
-      INTEGER INDF1              ! Input NDF identifier
-      INTEGER INDF2              ! Output NDF identifier
+      INTEGER INDFI              ! Input NDF identifier
+      INTEGER INDFO              ! Output NDF identifier
       INTEGER INDFS              ! Input NDF-section identifier
+      INTEGER INDFT              ! Temporary-NDF identifier
       INTEGER IPAXCO             ! Pointers to mapped d.p. axis array
       INTEGER IPCO               ! Pointers to mapped co-ordinate array
       INTEGER IPIN( 2 )          ! Pointers to mapped input arrays
@@ -404,6 +408,7 @@
       INTEGER OBL                ! Identifier for output-NDF block
       INTEGER OBLSIZ( NDF__MXDIM ) ! Output-NDF sizes for processing 
                                  ! large datasets in blocks
+      INTEGER PLACE              ! NDF placeholder
       INTEGER UBND( NDF__MXDIM ) ! Upper pixel index bounds of the input
                                  ! NDF
       INTEGER UBNDO( NDF__MXDIM )! Upper pixel index bounds of the 
@@ -430,13 +435,13 @@
       CALL NDF_BEGIN
 
 *  Obtain the input NDF.
-      CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
+      CALL LPG_ASSOC( 'IN', 'READ', INDFI, STATUS )
 
 *  Get the bounds of the NDF.
-      CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+      CALL NDF_BOUND( INDFI, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Get the WCS FrameSet from the NDF.
-      CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
+      CALL KPG1_GTWCS( INDFI, IWCS, STATUS )
 
 *  Extract the current and base Frames, and get the number of axes in 
 *  the current Frame, and its title.
@@ -454,7 +459,7 @@
       IF( .NOT. AST_GETL( MAP, 'TRANINVERSE', STATUS ) .AND.
      :    STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL NDF_MSG( 'NDF', INDF1 )
+         CALL NDF_MSG( 'NDF', INDFI )
          CALL MSG_SETC( 'T', TTLC )
          CALL ERR_REP( 'COLLAPSE_ERR1', 'The transformation from the '/
      :                 /'current co-ordinate Frame of ''^NDF'' '/
@@ -464,7 +469,7 @@
       ELSE IF( .NOT. AST_GETL( MAP, 'TRANFORWARD', STATUS ) .AND.
      :         STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL NDF_MSG( 'NDF', INDF1 )
+         CALL NDF_MSG( 'NDF', INDFI )
          CALL MSG_SETC( 'T', TTLC )
          CALL ERR_REP( 'COLLAPSE_ERR2', 'The transformation from '/
      :                 /'pixel co-ordinates to the current '/
@@ -634,34 +639,8 @@
       CALL MSG_BLANK( ' ', STATUS )
       AEL = JHI - JLO + 1
 
-*  Propagate the input to the output NDF and define latter's bounds.
-*  =================================================================
-
-*  Create the output NDF by propagation from the input NDF.  This
-*  results in history, etc., being passed on.  The shape and 
-*  dimensionality will be wrong but this will be corrected later.
-      CALL LPG_PROP( INDF1, 'Axis,Units', 'OUT', INDF2, STATUS )
-
-*  Set the title of the output NDF.
-      CALL KPG1_CCPRO( 'TITLE', 'TITLE', INDF1, INDF2, STATUS )
-
-*  See if the input NDF has a Variance component.
-      CALL NDF_STATE( INDF1, 'VARIANCE', VAR, STATUS )
-
-*  Store a list of components to be accessed.
-      IF ( VAR ) THEN
-         COMP = 'DATA,VARIANCE'
-      ELSE
-         COMP = 'DATA'
-      END IF
-
-*  Determine the numeric type to be used for processing the input
-*  data and variance (if any) arrays.  Since the subroutines that
-*  perform the collapse need the data and variance arrays in the same
-*  data type, the component list is used.  This application supports
-*  single- and double-precision floating-point processing.
-      CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF1, INDF2, COMP, ITYPE, DTYPE,
-     :                STATUS )
+*  Define the output NDF's bounds.
+*  ===============================
 
 *  The output NDF will have one fewer axes than the input NDF.
       NDIMO = NDIM - 1
@@ -692,17 +671,69 @@
          END DO
       END IF
 
+*  Propagate the input to a temporary NDF.
+*  =======================================
+
+*  We want to avoid creating an NDF of roughly the same size as the
+*  input, when there's been significant compression of the number of
+*  pixels.  If we merely propagate then adjust the dimensions, HDS does
+*  not free up the space initially allocated.  Therefore we create a
+*  temporary NDF, and once its dimensions are correct, we can copy it
+*  to the actual output NDF.
+      CALL NDF_TEMP( PLACE, STATUS )
+
+*  Create the temporary NDF by propagation from the input NDF.  This
+*  results in history, etc., being passed on.  The shape and 
+*  dimensionality will be wrong but this will be corrected later.
+      CALL NDF_SCOPY( INDFI, 'Axis,Units', PLACE, INDFT, STATUS )
+
+*  Set the temporary output NDF bounds to the required values.  This 
+*  will change the lengths of the current AXIS arrays (but we have a 
+*  copy of the originals in OLDAXIS), and reduce the dimensionality by
+*  one.
+      CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFT, STATUS ) 
+
+*  Now copy from the adjusted temporary NDF to the user-specified
+*  output NDF, that should have the correct file size.  As the 
+*  temporary NDF is then no longer required, release its resources.
+      CALL LPG_PROP( INDFT, 'Axis,Units', 'OUT', INDFO, STATUS )
+      CALL NDF_ANNUL( INDFT, STATUS )
+
+*  Set the title of the output NDF.
+      CALL KPG1_CCPRO( 'TITLE', 'TITLE', INDFI, INDFO, STATUS )
+
+*  Obtain the component and processing data type.
+*  ==============================================
+
+*  See if the input NDF has a Variance component.
+      CALL NDF_STATE( INDFI, 'VARIANCE', VAR, STATUS )
+
+*  Store a list of components to be accessed.
+      IF ( VAR ) THEN
+         COMP = 'DATA,VARIANCE'
+      ELSE
+         COMP = 'DATA'
+      END IF
+
+*  Determine the numeric type to be used for processing the input
+*  data and variance (if any) arrays.  Since the subroutines that
+*  perform the collapse need the data and variance arrays in the same
+*  data type, the component list is used.  This application supports
+*  single- and double-precision floating-point processing.
+      CALL NDF_MTYPE( '_REAL,_DOUBLE', INDFI, INDFO, COMP, ITYPE, DTYPE,
+     :                STATUS )
+
 *  Adjust output NDF to its new shape.
 *  ===================================
 
-*  The shape and size of the output NDF created above will be wrong, so
-*  we need to correct it by removing the collapse axis.  This is easy if
-*  it is the final axis (we would just use NDF_SBND with specifying 
-*  NDIM-1 axes), but is not so easy if the collapse axis is not the
-*  final axis.  In this case, we do th following:
-*    1) - Save copies of an AXIS structures in the output NDF (because
-*         the following step will change their lengths to match the new
-*         bounds).
+*  The shape and size of the (temporary) output NDF created above will 
+*  be wrong, so we need to correct it by removing the collapse axis.  
+*  This is easy if it is the final axis (we would just use NDF_SBND
+*  specifying  NDIM-1 axes), but is not so easy if the collapse axis is 
+*  not the final axis.  In this case, we do the following.
+*    1) - Save copies of an AXIS structures in the temporary NDF 
+*         (because the following step will change their lengths to 
+*         match the new bounds).
 *    2) - Change the bounds and dimensionality of the NDF to the
 *         appropriate values.
 *    3) - Restore the saved AXIS structures, permuting them so that they
@@ -711,13 +742,13 @@
 *         original Base Frame.
 
 *  First see if the AXIS component is defined.
-      CALL NDF_STATE( INDF2, 'AXIS', GOTAX, STATUS )
+      CALL NDF_STATE( INDFO, 'AXIS', GOTAX, STATUS )
 
 *  If so, we need to save copies of the AXIS structures.
       IF ( GOTAX ) THEN
 
 *  Get an HDS locator to the NDF structure,
-         CALL NDF_LOC( INDF2, 'UPDATE', LOC1, STATUS )
+         CALL NDF_LOC( INDFO, 'UPDATE', LOC1, STATUS )
 
 *  Get a locator for the AXIS component.
          CALL DAT_FIND( LOC1, 'AXIS', LOC2, STATUS )
@@ -730,13 +761,8 @@
 
       END IF
 
-*  Set the output NDF bounds to the required values.  This will change
-*  the lengths of the current AXIS arrays (but we have a copy of the
-*  originals in OLDAXIS), and reduce the dimensionality by one.
-      CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDF2, STATUS ) 
-
 *  We now re-instate any AXIS structures, in their new order.
-      IF( GOTAX ) THEN
+      IF ( GOTAX ) THEN
 
 *  Promote the NDF locator to a primary locator so that the HDS
 *  container file is not closed when the NDF identifier is annulled.
@@ -746,19 +772,19 @@
 *  This would result in NDF_ANNUL reporting an error, so we temporarily
 *  map the DATA array (which puts it into a defined state) to prevent
 *  this.
-         CALL NDF_MAP( INDF2, 'DATA', ITYPE, 'WRITE', IPOUT( 1 ), EL2, 
+         CALL NDF_MAP( INDFO, 'DATA', ITYPE, 'WRITE', IPOUT( 1 ), EL2, 
      :                 STATUS ) 
 
 *  Annul the supplied NDF identifier so that we can change the contents
 *  of the NDF using HDS, without getting out of step with the NDFs
 *  libraries description of the NDF. 
-         CALL NDF_ANNUL( INDF2, STATUS )
+         CALL NDF_ANNUL( INDFO, STATUS )
 
 *  Loop round each cell in the returned AXIS structure.
          DO I = 1, NDIMO
 
 *  Get a locator to this cell in the NDFs AXIS array.
-            CALL DAT_CELL( LOC2, 1, I, LOC4, STATUS ) 
+            CALL DAT_CELL( LOC2, 1, I, LOC4, STATUS )
 
 *  Empty it of any components
             CALL DAT_NCOMP( LOC4, NCOMP, STATUS )
@@ -771,7 +797,7 @@
             END DO
 
 *  Get a locator to the corresponding cell in the OLDAXIS array.
-            CALL DAT_CELL( LOC3, 1, AXES( I ), LOC5, STATUS ) 
+            CALL DAT_CELL( LOC3, 1, AXES( I ), LOC5, STATUS )
 
 *  We now copy all the components of the OLDAXIS cell into the AXIS 
 *  cell.  Find the number of components, and loop round them.
@@ -809,7 +835,7 @@
          CALL DAT_ANNUL( LOC2, STATUS )
 
 *  Import the modified NDF back into the NDF system.
-         CALL NDF_FIND( LOC1, ' ', INDF2, STATUS ) 
+         CALL NDF_FIND( LOC1, ' ', INDFO, STATUS ) 
 
 *  Annul the NDF locator.
          CALL DAT_ANNUL( LOC1, STATUS )
@@ -829,7 +855,7 @@
      :                 GRDPOS, STATUS )
 
 *  Save this modified WCS FrameSet in the output NDF.
-      CALL NDF_PTWCS( IWCSO, INDF2, STATUS )      
+      CALL NDF_PTWCS( IWCSO, INDFO, STATUS )      
 
 *  Obtain the remaining parameters.
 *  ================================
@@ -854,7 +880,7 @@
          CALL CHR_PUTC( ')', ATTRIB, NC )
          UNITS = AST_GETC( IWCS, ATTRIB( :NC ), STATUS )
 
-         CALL NDF_CPUT( UNITS, INDF2, 'Units', STATUS )
+         CALL NDF_CPUT( UNITS, INDFO, 'Units', STATUS )
 
 *  New unit is the existing unit times the co-ordinate's unit.  So
 *  obtain each unit and concatenate the two inserting a blank between
@@ -867,13 +893,13 @@
          AUNITS = AST_GETC( IWCS, ATTRIB( :NC ), STATUS )
 
          UNITS = ' '
-         CALL NDF_CGET( INDF1, 'Unit', UNITS, STATUS )
-         CALL NDF_CLEN( INDF1, 'Unit', NC, STATUS )
+         CALL NDF_CGET( INDFI, 'Unit', UNITS, STATUS )
+         CALL NDF_CLEN( INDFI, 'Unit', NC, STATUS )
          NC = NC + 1
          UNITS( NC:NC ) = ' '
          CALL CHR_APPND( AUNITS, UNITS, NC )
 
-         CALL NDF_CPUT( UNITS, INDF2, 'Units', STATUS )
+         CALL NDF_CPUT( UNITS, INDFO, 'Units', STATUS )
       END IF
 
 *  Process in blocks.
@@ -924,9 +950,9 @@
       LBNDS( JAXIS ) = JLO
       UBNDS( JAXIS ) = JHI
       IF ( USEALL ) THEN
-         INDFS = INDF1
+         INDFS = INDFI
       ELSE
-         CALL NDF_SECT( INDF1, NDIM, LBNDS, UBNDS, INDFS, STATUS )
+         CALL NDF_SECT( INDFI, NDIM, LBNDS, UBNDS, INDFS, STATUS )
       END IF
 
 *  Determine the number of blocks.
@@ -937,7 +963,7 @@
       DO IBLOCK = 1, NBLOCK
          CALL NDF_BEGIN
          CALL NDF_BLOCK( INDFS, NDIM, IBLSIZ, IBLOCK, IBL, STATUS ) 
-         CALL NDF_BLOCK( INDF2, NDIMO, OBLSIZ, IBLOCK, OBL, STATUS ) 
+         CALL NDF_BLOCK( INDFO, NDIMO, OBLSIZ, IBLOCK, OBL, STATUS ) 
 
 *  Map the NDF arrays and workspace required.
 *  ==========================================
