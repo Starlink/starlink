@@ -119,6 +119,8 @@
 *  History:
 *     26-MAY-2006 (DSB):
 *        Original version, derived from KPG1_ASTRM.
+*     26-JUN-2006 (DSB):
+*        Shrink the ROI bounds before transforming it into current Frame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -155,6 +157,7 @@
       DOUBLE PRECISION CLBND
       DOUBLE PRECISION CONST( ATL__MXDIM )
       DOUBLE PRECISION CUBND
+      DOUBLE PRECISION DELTA
       DOUBLE PRECISION PX
       DOUBLE PRECISION RLBND( ATL__MXDIM )
       DOUBLE PRECISION RUBND( ATL__MXDIM )
@@ -459,6 +462,14 @@
 *  Get the bounding box of the Region
                         CALL AST_GETREGIONBOUNDS( FRM, RLBND, RUBND, 
      :                                            STATUS )
+
+*  Shrink the bounding box slightly to reduce the effect of rounding errors
+*  (positions exactly on the boundary of a Region can be tricky to transform).
+                        DO IAX = 1, AST_GETI( FRM, 'Naxes', STATUS )
+                           DELTA = 0.005*( RUBND( IAX ) - RLBND( IAX ) )
+                           RUBND( IAX ) = RUBND( IAX ) - DELTA
+                           RLBND( IAX ) = RLBND( IAX ) + DELTA
+                        END DO
 
 *  Loop round all axes in the original current Frame.
                         J = 1
