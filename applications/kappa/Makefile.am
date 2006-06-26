@@ -101,6 +101,11 @@ help/lutread.hlp help/lutspec.hlp help/lutwarm.hlp help/lutzebra.hlp \
 help/outline.hlp help/picbase.hlp help/picdata.hlp help/picframe.hlp \
 help/picgrid.hlp help/piclast.hlp help/picxy.hlp
 
+#  Monolith help files.
+
+MON_HELP_FILES = libkappa/kapmon.hlp libkapview/kapview.hlp \
+libndfpack/ndfpack.hlp 
+
 #  Define the tasks for each monolith.
 
 KAPPA_TASKS = div pow add aperadd ardgen ardmask block cadd calc      \
@@ -198,9 +203,8 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 .hlp.shl:
 	@HLIB@ $<
 
-kappa.hlp: kappa_master.hlp $(HELP_FILES)
-	cat kappa_master.hlp libkappa/kapmon.hlp libkapview/kapview.hlp \
-	    libndfpack/ndfpack.hlp $(HELP_FILES) > kappa.hlp
+kappa.hlp: kappa_master.hlp $(MON_HELP_FILES) $(HELP_FILES) 
+	cat kappa_master.hlp $(MON_HELP_FILES) $(HELP_FILES) > kappa.hlp
 
 # Fixup scripts with bin location
 # The scripts needs to have installation locations edited into them
