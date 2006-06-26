@@ -51,6 +51,9 @@
 *  History:
 *     2-JUN-2006 (DSB):
 *        Original version.
+*     26-JUN-2006 (DSB):
+*        Take account of the direction of the Y axis when deciding the Y
+*        value for the title.
 *     {enter_further_changes_here}
 
 *-
@@ -133,9 +136,16 @@
      :                     STATUS )
          END DO   
 
+*  Determine if the Plot has a reversed Y axis (i.e.smallest Y value at
+*  the top). Then choose the Y value for the bottom edge of the Title.
+         IF( AST_GETL( IPLOT, 'Direction(2)', STATUS ) ) THEN
+            POS( 2 ) = UBND( 2 ) + 0.05*( UBND( 2 ) - LBND( 2 ) )
+         ELSE
+            POS( 2 ) = LBND( 2 ) - 0.05*( UBND( 2 ) - LBND( 2 ) )
+         END IF
+
 *  Draw the title centred above the bounding box.
          POS( 1 ) = 0.5*( LBND( 1 ) + UBND( 1 ) )
-         POS( 2 ) = UBND( 2 ) + 0.05*( UBND( 2 ) - LBND( 2 ) )
          UP( 1 ) = 0.0
          UP( 2 ) = 1.0
          CALL AST_TEXT( IPLOTT, TTL, POS, UP, 'CB', STATUS )
