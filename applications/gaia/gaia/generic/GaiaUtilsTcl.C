@@ -66,6 +66,8 @@ static int GaiaUtilsGtAxisCoord( ClientData clientData, Tcl_Interp *interp,
                                  int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsGtROIPlots( ClientData clientData, Tcl_Interp *interp,
+                                int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsUrlGet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 
@@ -74,6 +76,11 @@ static int GaiaUtilsUrlGet( ClientData clientData, Tcl_Interp *interp,
  */
 int GaiaUtils_Init( Tcl_Interp *interp )
 {
+    Tcl_CreateObjCommand( interp, "gaiautils::getroiplots",
+                          GaiaUtilsGtROIPlots,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
     Tcl_CreateObjCommand( interp, "gaiautils::astget", GaiaUtilsAstGet,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
@@ -98,7 +105,7 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "gaiautils::getaxiscoord", 
+    Tcl_CreateObjCommand( interp, "gaiautils::getaxiscoord",
                           GaiaUtilsGtAxisCoord, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -141,7 +148,7 @@ static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
     value = astGetC( wcs, Tcl_GetString( objv[2] ) );
     if ( ! astOK ) {
         char *buf = ckalloc( 1024 );
-        sprintf( buf, "Failed to get AST attribute (%s)", 
+        sprintf( buf, "Failed to get AST attribute (%s)",
                  Tcl_GetString( objv[2] ) );
         astClearStatus;
         Tcl_SetResult( interp, buf, TCL_DYNAMIC );
@@ -179,7 +186,7 @@ static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
     astSet( wcs, Tcl_GetString( objv[2] ) );
     if ( ! astOK ) {
         char *buf = ckalloc( 1024 );
-        sprintf( buf, "Failed to set AST attribute (%s)", 
+        sprintf( buf, "Failed to set AST attribute (%s)",
                  Tcl_GetString( objv[2] ) );
         astClearStatus;
         Tcl_SetResult( interp, buf, TCL_DYNAMIC );
@@ -423,7 +430,7 @@ static int GaiaUtilsGtAxisCoord( ClientData clientData, Tcl_Interp *interp,
     if ( Tcl_GetDoubleFromObj( interp, objv[2], &xin[0] ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    
+
     /* Transformation direction */
     if ( Tcl_GetBooleanFromObj( interp, objv[3], &forward ) != TCL_OK ) {
         return TCL_ERROR;
@@ -499,6 +506,60 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
         free( error_mess );
     }
     return result;
+}
+
+/**
+ * Return a list of Plots that cover each ROI found in a Plot.
+ *
+ * The arguments are the address of a Plot.
+ */
+static int GaiaUtilsGtROIPlots( ClientData clientData, Tcl_Interp *interp,
+                                int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrameSet *axiswcs;
+    AstKeyMap *rplots;
+    AstPlot *roiPlot;
+    AstPlot *plot;
+    Tcl_Obj *resultObj;
+    char *error_mess;
+    const char *key;
+    int i;
+    int result;
+    int size;
+    long adr;
+
+    /* Check arguments, only allow one, the Plot frameset. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "plot" );
+        return TCL_ERROR;
+    }
+
+    /* Get the Plot */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    plot = (AstPlot *) adr;
+
+    /* Do the work (slight deferral to deal with ADAM status). */
+    if ( gaiaUtilsAtlPlROI( plot, &rplots, &error_mess ) != TCL_OK ) {
+        Tcl_SetResult( interp, error_mess, TCL_VOLATILE );
+        free( error_mess );
+        return TCL_ERROR;
+    }
+
+    /* Convert keymap into a Tcl list */
+    resultObj = Tcl_GetObjResult( interp );
+
+    size = astMapSize( rplots );
+    for ( i = 0; i < size; i++ ) {
+        key = astMapKey( rplots, i );
+        astMapGet0A( rplots, key, &roiPlot );
+        Tcl_ListObjAppendElement( interp, resultObj,
+                                  Tcl_NewLongObj( (long) roiPlot ) );
+    }
+    astAnnul( rplots );
+
+    return TCL_OK;
 }
 
 
