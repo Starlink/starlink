@@ -9,6 +9,7 @@
 extern "C" {
 #endif
 #include <ast.h>
+#include <star/atl.h>
 
     /* Construct an error message string from the current ADAM status. */
     char *gaiaUtilsErrMessage();
@@ -29,7 +30,13 @@ extern "C" {
                              int trailed, int formatted, int ncoords, 
                              char **coord, char **error_mess );
 
+    /* Get Plots for each ROI in a Plot */
+    int gaiaUtilsAtlPlROI( AstPlot *plot, AstKeyMap **rplots, 
+                           char **error_mess );
 
+    /* Trim current frame axes and identify any ROIs */
+    int gaiaUtilsAtlAxTrm( AstFrameSet *frameset, int axes[], int lbnd[], 
+                           int ubnd[], double work[], char **error_mess );
 
 #ifdef __cplusplus
 }

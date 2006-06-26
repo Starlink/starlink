@@ -511,3 +511,45 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
     astEnd;
     return TCL_OK;
 }
+
+
+/*
+ * Wrapper for the ATL_PLROI function. Takes an AST Plot and returns a list of
+ * Plots, one for each ROI found in the Plot.
+ */
+int gaiaUtilsAtlPlROI( AstPlot *plot, AstKeyMap **rplots, char **error_mess )
+{
+    int status = SAI__OK;
+    
+    emsMark();
+    atlPlroi( plot, rplots, &status );
+    if ( status != SAI__OK ) {
+        emsRlse();
+        *error_mess = gaiaUtilsErrMessage();
+        *rplots = NULL;
+        return 0;
+    }
+    emsRlse();
+    return 1;
+}
+
+/*
+ * Wrapper for the ATL_AXTRM function. Takes an AST FrameSet and returns
+ * one with any ROI's identified and trims the current frame to the given
+ * axes (if needed).
+ */
+int gaiaUtilsAtlAxTrm( AstFrameSet *frameset, int axes[], int lbnd[], 
+                       int ubnd[],  double work[], char **error_mess )
+{
+    int status = SAI__OK;
+    emsMark();
+    atlAxtrm( frameset, axes, lbnd, ubnd, work, &status );
+    if ( status != SAI__OK ) {
+        emsRlse();
+        *error_mess = gaiaUtilsErrMessage();
+        return 0;
+    }
+    emsRlse();
+    return 1;
+}
+
