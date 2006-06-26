@@ -4,7 +4,8 @@
 *     CONVOLVE
 
 *  Purpose:
-*     Convolves a pair of 1- or 2-dimensional NDFs together
+*     Convolves a pair of NDFs where the smoothing NDF is one- or
+*     two-dimensional
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,15 +21,30 @@
 *        The global status.
 
 *  Description:
-*     This application smooths a 1- or 2-dimensional NDF using a Point-
-*     Spread Function given by a second NDF.  The output NDF is
-*     normalised to the same mean data value as the input NDF, 
-*     and is the same size as the input NDF.
+*     This application smooths an NDF using a Point-Spread Function 
+*     given by a second NDF.  The output NDF is normalised to the same
+*     mean data value as the input NDF, and is the same size as the 
+*     input NDF.
+
+*     The NDF being smoothed may have up to three dimensions.  If it
+*     has three significant dimensions, then the filter must be 
+*     two-dimensional, and it is applied in turn to each plane in the 
+*     cube and the result written to the corresponding plane in the 
+*     output cube.  The orientation of the smoothing plane can be 
+*     specified using the AXES parameter.
 
 *  Usage:
 *     convolve in psf out xcentre ycentre
 
 *  ADAM Parameters:
+*     AXES(2) = _INTEGER (Read)
+*        This parameter is only accessed if the NDF has exactly three 
+*        significant pixel axes.  It should be set to the indices of the
+*        NDF pixel axes which span the plane in which smoothing is to
+*        be applied.  All pixel planes parallel to the specified plane 
+*        will be smoothed independently of each other.  The dynamic 
+*        default is the indices of the first two significant axes in 
+*        the NDF. []
 *     IN = NDF (Read)
 *        The input NDF containing the array to be smoothed.
 *     OUT = NDF (Write)
@@ -41,7 +57,10 @@
 *        constant background is removed from the PSF before use.  This
 *        background level is equal to the minimum of the absolute value
 *        in the four corner pixel values.  The PSF is assumed to be
-*        zero beyond the bounds of the supplied NDF.
+*        zero beyond the bounds of the supplied NDF.  It should have
+*        the same number of dimensions as the NDF being smoothed, unless
+*        the input NDF has three significant dimensions, whereupon the
+*        PSF must be two-dimensional.
 *     TITLE = LITERAL (Read)
 *        A title for the output NDF.  A null (!) value means using the
 *        title of the input NDF. [!]
@@ -120,6 +139,8 @@
 *     Copyright (C) 1992 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998, 2004 Central Laboratory of the Research
 *     Councils. All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -156,7 +177,10 @@
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 June 22 (MJC):
+*        Added support for smoothing all two-dimensional planes in a
+*        three-dimensional cube.
 *     {enter_further_changes_here}
 
 *-
@@ -166,6 +190,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'PAR_ERR'          ! PAR__ error constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
@@ -174,36 +199,49 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
+      INTEGER NDIM               ! Dimensionality required
+      PARAMETER ( NDIM = 2 )
+
       REAL PSFFRA                ! Threshold for finding PSF dimensions
       PARAMETER ( PSFFRA = 0.01 )
 
 *  Local Variables:
       LOGICAL BAD                ! Are there bad pixels in the array?
-      INTEGER DIM1( 2 )          ! Dimensions of supplied input NDF
-      INTEGER DIM2( 2 )          ! Dimensions of supplied PSF NDF
+      LOGICAL BADDAT             ! Bad values stored in o/p data array?
+      LOGICAL BADOUT             ! Bad pixels in output array?
+      CHARACTER * ( 13 ) COMP    ! List of components to process
+      INTEGER DIMI( 2 )          ! Dimensions of supplied input NDF
+      INTEGER DIMP( 2 )          ! Dimensions of supplied PSF NDF
       INTEGER EL                 ! No. of elements in mapped array
-      INTEGER INDF1              ! Identifier for input array NDF
-      INTEGER INDF2              ! Identifier for PSF NDF
-      INTEGER INDF3              ! Identifier for output array NDF
-      INTEGER IP1( 2 )           ! Pointer to mapped input arrays
-      INTEGER IP2                ! Pointer to mapped PSF DATA array
-      INTEGER IP3( 2 )           ! Pointer to mapped output arrays
+      INTEGER INDFI              ! Identifier for input array NDF
+      INTEGER INDFIB             ! Section of input NDF to be smoothed
+      INTEGER INDFO              ! Identifier for output array NDF
+      INTEGER INDFOB             ! Section of output NDF to be filled
+      INTEGER INDFP              ! Identifier for PSF NDF
+      INTEGER IPI( 2 )           ! Pointer to mapped input arrays
+      INTEGER IPO( 2 )           ! Pointer to mapped output arrays
+      INTEGER IPP                ! Pointer to mapped PSF DATA array
       INTEGER IPW1               ! Pointer to mapped work array
       INTEGER IPW2               ! Pointer to mapped work array
       INTEGER IPW3               ! Pointer to mapped work array
       INTEGER IPW4               ! Pointer to mapped work array
       INTEGER IPW5               ! Pointer to mapped work array
-      INTEGER NLIN               ! 2nd dimension for internal arrays
-      INTEGER NPIX               ! 1st dimension for internal arrays
+      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF pixel axes
+      INTEGER NLIN               ! Second dimension for internal arrays
+      INTEGER NPIX               ! First dimension for internal arrays
+      INTEGER PAXHI              ! Upper pixel bound of perp. axis 
+      INTEGER PAXLO              ! Lower pixel bound of perp. axis 
+      INTEGER PAXVAL             ! Current pixel value on perp. axis 
+      INTEGER PERPAX             ! Index of axis perp. to smoothing 
+                                 ! plane
       INTEGER PSFXSZ             ! Width of PSF on 1st axis
       INTEGER PSFYSZ             ! Width of PSF on 2nd axis
-      INTEGER SDIM1( 2 )         ! Indices of used axes for i/p
-      INTEGER SDIM2( 2 )         ! Indices of used axes for psf
-      INTEGER SLBND1( 2 )        ! Low bounds of used axes of i/p
-      INTEGER SLBND2( 2 )        ! Low bounds of used axes of psf
-      INTEGER SUBND1( 2 )        ! High bounds of used axes of i/p
-      INTEGER SUBND2( 2 )        ! High bounds of used axes of psf
-      LOGICAL VAR                ! Does the input NDF have a VARIANCE array?
+      INTEGER SDIMI( 2 )         ! Indices of used axes for i/p
+      INTEGER SDIMP( 2 )         ! Indices of used axes for psf
+      INTEGER SLBNDP( 2 )        ! Low bounds of used axes of psf
+      INTEGER SUBNDP( 2 )        ! High bounds of used axes of psf
+      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF pixel axes
+      LOGICAL VAR                ! Does input NDF have a VARIANCE array?
       INTEGER W1DIM( 2 )         ! Dimensions of work array 1
       REAL WLIM                  ! Fraction of good i/p pixels required
       INTEGER XCEN               ! X index of PSF centre pixel
@@ -214,92 +252,67 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Access the input NDF and obtain the significant dimensions to smooth.
+*  =====================================================================
+
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Get the input NDF, ensuring that it has no more than two significant
-*  dimensions.  Also find the axes to be used and their bounds.
-      CALL KPG1_GTNDF( 'IN', 2, .FALSE., 'READ', INDF1, SDIM1, SLBND1, 
-     :                 SUBND1, STATUS )
+*  Obtain the input NDF, its significant axes up to the maximum two
+*  dimensions for processing, and the NDF's bounds.  If the NDF
+*  possesses three significant dimensions, obtain an iteration axis
+*  through parameter AXES, so that planes along that axis can be 
+*  processed in sequence.
+      CALL KPG1_GNDFP( 'IN', 'AXES', NDIM, 'READ', INDFI, SDIMI, LBND,
+     :                 UBND, PERPAX, STATUS )
 
 *  Form the dimensions on the axes to be used of the input array.
-      DIM1( 1 ) = SUBND1( 1 ) - SLBND1( 1 ) + 1
-      DIM1( 2 ) = SUBND1( 2 ) - SLBND1( 2 ) + 1
+      DIMI( 1 ) = UBND( SDIMI( 1 ) ) - LBND( SDIMI( 1 ) ) + 1
+      DIMI( 2 ) = UBND( SDIMI( 2 ) ) - LBND( SDIMI( 2 ) ) + 1
+
+*  Determine which arrays to process.
+*  ==================================
 
 *  See if the input array has associated variance values.
-      CALL NDF_STATE( INDF1, 'VAR', VAR, STATUS )
-
-*  Map the required components of the input array.
+      CALL NDF_STATE( INDFI, 'VAR', VAR, STATUS )
       IF ( VAR ) THEN
-         CALL KPG1_MAP( INDF1, 'DATA,VAR', '_DOUBLE', 'READ', IP1, EL,
-     :                 STATUS )
+         COMP = 'Data,Variance'
       ELSE
-         CALL KPG1_MAP( INDF1, 'DATA', '_DOUBLE', 'READ', IP1, EL, 
-     :                 STATUS )
-      END IF         
-      
+         COMP = 'Data'
+      END IF
+
+*  Obtain the PSF and its significant dimensions.
+*  ==============================================
+
 *  Get the NDF containing the PSF, ensuring that it has no more than
-*  two significant dimensions.  Also find the axes to use and their
-*  bounds.
-      CALL KPG1_GTNDF( 'PSF', 2, .FALSE., 'READ', INDF2, SDIM2, SLBND2,
-     :                 SUBND2, STATUS )
+*  two significant dimensions, unless the input NDF has three
+*  significant dimensions, whereupon the PSF must be two-dimensional.  
+*  Also find the axes to use and their bounds.
+      IF ( PERPAX .GT. 0 ) THEN
+         CALL KPG1_GTNDF( 'PSF', NDIM, .TRUE., 'READ', INDFP, SDIMP, 
+     :                    SLBNDP, SUBNDP, STATUS )
+      ELSE
+         CALL KPG1_GTNDF( 'PSF', NDIM, .FALSE., 'READ', INDFP, SDIMP, 
+     :                    SLBNDP, SUBNDP, STATUS )
+      END IF
 
 *  Form the dimensions on the significant axes of the PSF.
-      DIM2( 1 ) = SUBND2( 1 ) - SLBND2( 1 ) + 1
-      DIM2( 2 ) = SUBND2( 2 ) - SLBND2( 2 ) + 1
-      
+      DIMP( 1 ) = SUBNDP( 1 ) - SLBNDP( 1 ) + 1
+      DIMP( 2 ) = SUBNDP( 2 ) - SLBNDP( 2 ) + 1
+
+*  Check and parameter for bad pixels.
+*  ===================================
+
 *  See if there are any bad pixels in the PSF.  If so, report an error
 *  and abort.
-      CALL NDF_BAD( INDF2, 'DATA', .TRUE., BAD, STATUS )
+      CALL NDF_BAD( INDFP, 'DATA', .TRUE., BAD, STATUS )
       IF ( BAD .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'CONVOLVE_ERR1', 'The PSF contains bad or '/
      :     /'missing pixel values.', STATUS )
          GO TO 999
       END IF
-         
-*  Map the PSF 'DATA' array.
-      CALL KPG1_MAP( INDF2, 'DATA', '_DOUBLE', 'READ', IP2, EL, STATUS )
 
-*  Get workspace for use by the routine which finds the PSF size.
-      W1DIM( 1 ) = MAX( DIM2( 1 ), DIM2( 2 ) )
-      W1DIM( 2 ) = 2
-      CALL PSX_CALLOC( W1DIM( 1 ) * W1DIM( 2 ), '_DOUBLE', IPW1,
-     :                 STATUS )
-
-*  Get the approximate width of the PSF along both array axes.
-*  Internal arrays will be padded with a blank margin of this size to
-*  reduce edge effects caused by wrap-around in the convolution.
-      CALL KPG1_PSFSD( %VAL( CNF_PVAL( IP2 ) ), DIM2( 1 ), DIM2( 2 ), 
-     :                 %VAL( CNF_PVAL( IPW1 ) ),
-     :                 W1DIM( 1 ), W1DIM( 2 ), PSFFRA, 1, PSFXSZ,
-     :                 PSFYSZ, STATUS )
-
-*  Add this margin onto the input array dimensions to get the
-*  dimensions of the internal arrays used within the convolution
-*  process, and then check that this array size can be handled by the
-*  FFT routines.  If not, increase the array size until it can.
-      CALL FTSIZE( DIM1( 1 ) + 2 * PSFXSZ, NPIX, STATUS )
-      CALL FTSIZE( DIM1( 2 ) + 2 * PSFYSZ, NLIN, STATUS )
-
-*  Propagate the output NDF from the input array NDF, copying WCS, UNITS,
-*  AXIS and QUALITY components (the default components HISTORY, TITLE
-*  and LABEL and all extensions are also copied).
-      CALL LPG_PROP( INDF1, 'WCS,UNITS,AXIS,QUALITY', 'OUT', INDF3, 
-     :               STATUS )
-      
-*  Map the required components of the output array.
-      IF ( VAR ) THEN
-         CALL KPG1_MAP( INDF3, 'DATA,VAR', '_DOUBLE', 'WRITE', IP3, EL,
-     :                 STATUS )
-      ELSE
-         CALL KPG1_MAP( INDF3, 'DATA', '_DOUBLE', 'WRITE', IP3, EL, 
-     :                 STATUS )
-      END IF         
-      
-*  Abort if an error has occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999
-      
 *  Obtain the minimum fraction of good pixels which should be used to
 *  calculate an output pixel value.  Test if a null value is specified
 *  and set WLIM negative, annulling the error.
@@ -316,12 +329,49 @@
 
       END IF
 
+*  Obtain the PSF width and centre.
+*  ================================
+
+*  Map the PSF 'DATA' array.
+      CALL KPG1_MAP( INDFP, 'DATA', '_DOUBLE', 'READ', IPP, EL, STATUS )
+
+*  Get workspace for use by the routine which finds the PSF size.
+      W1DIM( 1 ) = MAX( DIMP( 1 ), DIMP( 2 ) )
+      W1DIM( 2 ) = 2
+      CALL PSX_CALLOC( W1DIM( 1 ) * W1DIM( 2 ), '_DOUBLE', IPW1,
+     :                 STATUS )
+
+*  Get the approximate width of the PSF along both array axes.
+*  Internal arrays will be padded with a blank margin of this size to
+*  reduce edge effects caused by wrap-around in the convolution.
+      CALL KPG1_PSFSD( %VAL( CNF_PVAL( IPP ) ), DIMP( 1 ), DIMP( 2 ), 
+     :                 %VAL( CNF_PVAL( IPW1 ) ),
+     :                 W1DIM( 1 ), W1DIM( 2 ), PSFFRA, 1, PSFXSZ,
+     :                 PSFYSZ, STATUS )
+
+*  Add this margin on to the input-array dimensions to get the
+*  dimensions of the internal arrays used within the convolution
+*  process, and then check that this array size can be handled by the
+*  FFT routines.  If not, increase the array size until it can.
+      CALL FTSIZE( DIMI( 1 ) + 2 * PSFXSZ, NPIX, STATUS )
+      CALL FTSIZE( DIMI( 2 ) + 2 * PSFYSZ, NLIN, STATUS )
+
 *  Get the co-ordinates of the centre of the PSF within the supplied
 *  NDF.  The default is the centre of the NDF.
-      CALL PAR_GDR0I( 'XCENTRE', ( SLBND2( 1 ) + SUBND2( 1 ) ) / 2,
-     :                SLBND2( 1 ), SUBND2( 1 ), .FALSE., XCEN, STATUS )
-      CALL PAR_GDR0I( 'YCENTRE', ( SLBND2( 2 ) + SUBND2( 2 ) ) / 2,
-     :                SLBND2( 2 ), SUBND2( 2 ), .FALSE., YCEN, STATUS )
+      CALL PAR_GDR0I( 'XCENTRE', ( SLBNDP( 1 ) + SUBNDP( 1 ) ) / 2,
+     :                SLBNDP( 1 ), SUBNDP( 1 ), .FALSE., XCEN, STATUS )
+      CALL PAR_GDR0I( 'YCENTRE', ( SLBNDP( 2 ) + SUBNDP( 2 ) ) / 2,
+     :                SLBNDP( 2 ), SUBNDP( 2 ), .FALSE., YCEN, STATUS )
+
+
+*  Create the output NDF and workspace.
+*  ====================================
+
+*  Propagate the output NDF from the input array NDF, copying WCS,
+*  UNITS, AXIS, and QUALITY components (the default components HISTORY, 
+*  TITLE, LABEL, and all extensions are also copied).
+      CALL LPG_PROP( INDFI, 'WCS,UNITS,AXIS,QUALITY', 'OUT', INDFO, 
+     :               STATUS )
 
 *  Get the required workspace.
       CALL PSX_CALLOC( NPIX * NLIN, '_DOUBLE', IPW2, STATUS )
@@ -330,27 +380,66 @@
       CALL PSX_CALLOC( 3 * MAX( NPIX, NLIN ) + 15, '_DOUBLE', IPW5, 
      :                 STATUS )
 
-*  Call a lower level routine to do the work.
-      CALL KPS1_CNVLV( VAR, DIM1( 1 ), DIM1( 2 ), 
-     :                 %VAL( CNF_PVAL( IP1( 1 ) ) ),
-     :                 %VAL( CNF_PVAL( IP1( 2 ) ) ), 
-     :                 DIM2( 1 ), DIM2( 2 ),
-     :                 %VAL( CNF_PVAL( IP2 ) ), XCEN - SLBND2( 1 ) + 1,
-     :                 YCEN - SLBND2( 2 ) + 1, NPIX, NLIN, WLIM, 
-     :                 %VAL( CNF_PVAL( IP3( 1 ) ) ), 
-     :                 %VAL( CNF_PVAL( IP3( 2 ) ) ), BAD,
-     :                 %VAL( CNF_PVAL( IPW2 ) ), 
-     :                 %VAL( CNF_PVAL( IPW3 ) ), 
-     :                 %VAL( CNF_PVAL( IPW4 ) ),
-     :                 %VAL( CNF_PVAL( IPW5 ) ), STATUS )
+*  Abort if an error has occurred.
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Set the bad pixel flags for the output NDF components.
-      CALL NDF_SBAD( BAD, INDF3, 'DATA', STATUS )
-      IF ( VAR ) CALL NDF_SBAD( BAD, INDF3, 'VAR', STATUS )
+*  Loop around planes.
+*  ===================
+
+*  Initialise bad-data flag.
+      BADDAT = .FALSE.
+
+*  Loop round every slice to be smoothed.
+      PAXLO = LBND( PERPAX )
+      PAXHI = UBND( PERPAX )
+      DO PAXVAL = PAXLO, PAXHI
+
+*  Get identifiers for the required slices of the input and output NDF.
+         LBND( PERPAX ) = PAXVAL
+         UBND( PERPAX ) = PAXVAL
+         CALL NDF_SECT( INDFI, NDF__MXDIM, LBND, UBND, INDFIB, STATUS )
+         CALL NDF_SECT( INDFO, NDF__MXDIM, LBND, UBND, INDFOB, STATUS )
+
+*  Map these input and output arrays.
+         CALL KPG1_MAP( INDFIB, COMP, '_DOUBLE', 'READ', IPI, EL,
+     :                  STATUS )
+         CALL KPG1_MAP( INDFOB, COMP, '_DOUBLE', 'WRITE', IPO, EL,
+     :                  STATUS )
+
+*  Abort if an error has occurred.
+         IF ( STATUS .NE. SAI__OK ) GO TO 999
+      
+*  Call a lower level routine to do the work.
+         CALL KPS1_CNVLV( VAR, DIMI( 1 ), DIMI( 2 ), 
+     :                    %VAL( CNF_PVAL( IPI( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( IPI( 2 ) ) ), 
+     :                    DIMP( 1 ), DIMP( 2 ),
+     :                    %VAL( CNF_PVAL( IPP ) ), 
+     :                    XCEN - SLBNDP( 1 ) + 1,
+     :                    YCEN - SLBNDP( 2 ) + 1, NPIX, NLIN, WLIM, 
+     :                    %VAL( CNF_PVAL( IPO( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( IPO( 2 ) ) ), BADOUT,
+     :                    %VAL( CNF_PVAL( IPW2 ) ), 
+     :                    %VAL( CNF_PVAL( IPW3 ) ), 
+     :                    %VAL( CNF_PVAL( IPW4 ) ),
+     :                    %VAL( CNF_PVAL( IPW5 ) ), STATUS )
+
+*  Update the bad-data flag.
+         IF ( BADOUT ) BADDAT = .TRUE.
+
+*  Free the section identifiers.
+         CALL NDF_ANNUL( INDFIB, STATUS )
+         CALL NDF_ANNUL( INDFOB, STATUS )
+
+      END DO
+
+*  Set the bad-pixel flags for the output NDF components.
+      CALL NDF_SBAD( BADDAT, INDFO, 'DATA', STATUS )
+      IF ( VAR ) CALL NDF_SBAD( BADDAT, INDFO, 'VAR', STATUS )
 
 *  Obtain a new title for the output NDF, with the default value
 *  being the input array title.
-      CALL KPG1_CCPRO( 'TITLE', 'Title', INDF1, INDF3, STATUS )
+      CALL KPG1_CCPRO( 'TITLE', 'Title', INDFI, INDFO, STATUS )
       
 *  Jump to here if an error has occurred.
  999  CONTINUE
@@ -363,7 +452,7 @@
       CALL PSX_FREE( IPW5, STATUS )
       
 *  If an error occurred, delete the output NDF.
-      IF ( STATUS .NE. SAI__OK ) CALL NDF_DELET( INDF3, STATUS )
+      IF ( STATUS .NE. SAI__OK ) CALL NDF_DELET( INDFO, STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
