@@ -5,3 +5,4 @@ autom4te.cache
 config.log
 config.status
 configure
+starconf.status
