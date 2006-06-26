@@ -1,29 +1,67 @@
-/* psmerge.c
+/*
+*+
+*  Name:
+*     psmerge
 
-   This program merges one or more Encapsulated Postscript (EPS) files
-   into a single postscript file that can be sent to a printer.
-   Arbritrary origin shifts scaling and rotations can be applied to each
-   EPS file independently.
+*  Purpose:
+*     This program merges one or more Encapsulated Postscript (EPS) files
+*     into a single postscript file that can be sent to a printer.
+*     Arbritrary origin shifts scaling and rotations can be applied to each
+*     EPS file independently.
 
-   The command parameters are a list of EPS files each optionally
-   preceeded by -s -t and -r to specify a scale factor, translation (in
-   points) and rotation (in degrees anti-clockwise). The transformations 
-   are applied in the order given and are cumulative (ie. -r45 -r45 will
-   rotation the picture by 90 degrees) but the transformation is  reset 
-   to the identity transformation after each EPS file.
+*  Language:
+*     Starlink ANSI C
 
-   The x and y values for -s and -t are separated by a single character
-   (eg. -s0.5x1.0) which can be any character other than a digit.
+*  Description:
+*     The command parameters are a list of EPS files each optionally
+*     preceeded by -s -t and -r to specify a scale factor, translation (in
+*     points) and rotation (in degrees anti-clockwise). The transformations 
+*     are applied in the order given and are cumulative (ie. -r45 -r45 will
+*     rotation the picture by 90 degrees) but the transformation is  reset 
+*     to the identity transformation after each EPS file.
+*
+*     The x and y values for -s and -t are separated by a single character
+*     (eg. -s0.5x1.0) which can be any character other than a digit.
+*
+*     The merged file is sent to the standard output.
 
-   The merged file is sent to the standard output.
+*  Copyright:
+*     Copyright (C) 1992-1993 Science & Engineering Research Council.
+*     Copyright (C) 2002 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
 
-   D L Terrett, Starlink Jun 1992.
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
-	22 Apr 1993	D L Terrett	Change BoundingBox comment to 
-					integers.
+*  Authors:
+*     DLT: D. L. Terrett (Starlink)
+*     RTP: Roy Platon (Starlink)
+*     {enter_new_authors_here}
 
-    12 Feb 2002 R T Platon  Changed scanf method to accept '0xn'
-*/
+*  History:
+*     01-JUN-1992 (DLT):
+*        Original version.
+*     22-APR-1993 (DLT):
+*        Change BoundingBox comment to integers.
+*     12-FEB-2002 (RTP):
+*        Changed scanf method to accept '0xn'
+*     {enter_further_changes_here}
+
+*-
+ */
 
 /*
    If it wasn't necessary to handle the %%BoundingBox and %%DocumentFont
