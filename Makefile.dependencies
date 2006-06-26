@@ -804,6 +804,7 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/ard \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
 		$(MANIFESTS)/blt \
 		$(MANIFESTS)/cat \
 		$(MANIFESTS)/cfitsio \
@@ -812,6 +813,7 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
+		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gwm \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
@@ -819,6 +821,7 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/itcl \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \
