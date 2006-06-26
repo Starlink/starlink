@@ -129,7 +129,8 @@ itcl::class gaia::GaiaAstDisplayDomains {
       #  We need read outs for all domains known to the displayed
       #  image.
       itk_component add readoutarea {
-         frame $w_.readoutarea
+         iwidgets::scrolledframe $w_.readoutarea -height 200 -width 550 \
+            -vscrollmode dynamic -hscrollmode dynamic
       }
       update_displays_
 
@@ -145,7 +146,7 @@ itcl::class gaia::GaiaAstDisplayDomains {
 
       #  Pack window.
       pack $itk_component(rule) -side top -fill x -ipadx 1m -ipady 1m
-      pack $itk_component(readoutarea) -side top -fill both -pady 3 -padx 3
+      pack $itk_component(readoutarea) -side top -fill both -expand 1 -pady 3 -padx 3
       pack $itk_component(actionframe) -side bottom -fill x -pady 3 -padx 3
       pack $itk_component(close) -side right -expand 1 -pady 1 -padx 1
 
@@ -206,7 +207,7 @@ itcl::class gaia::GaiaAstDisplayDomains {
       # Get the current base domain frame index.
       set current [$itk_option(-rtdimage) astget current]
 
-      set w $itk_component(readoutarea)
+      set w [$itk_component(readoutarea) childsite]
       blt::table $w
       foreach {domain dims} "$domains_" {
          incr i
