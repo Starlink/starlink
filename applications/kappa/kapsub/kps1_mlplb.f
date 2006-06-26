@@ -117,6 +117,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -124,6 +125,8 @@
 *        Original version.
 *     2006 April 12 (MJC):
 *        Remove unused variable and wrapped long lines.
+*     2006 June 23 (MJC):
+*        Delete labels' group identifier during tidying.
 *     {enter_further_changes_here}
 
 *-
@@ -498,8 +501,9 @@
 
  999  CONTINUE
 
-*  Delete any group holding pen defintions.
+*  Delete any group holding pen definitions or labels.
       IF( IGRP1 .NE. GRP__NOID ) CALL GRP_DELET( IGRP1, STATUS )
+      IF( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, STATUS )
 
 *  Release resources used to store the synonyms.
       CALL KPG1_ASPSY( ' ', ' ', STATUS )
