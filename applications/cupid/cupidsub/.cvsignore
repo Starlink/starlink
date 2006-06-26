@@ -7,6 +7,7 @@ Makefile.in
 cupidcfclump.c
 cupidcfscan.c
 cupidcfxtend.c
+cupidfwjoin.c
 cupidgcdump.c
 cupidgcfindmax.c
 cupidgcfit.c
@@ -16,6 +17,7 @@ cupidgcupdatearrays.c
 cupidkcheckface.c
 cupidkcopyline.c
 cupidkinitedges.c
+cupidndfclump.c
 cupidrms.c
 cupidsumclumps.c
 cupidfwmain.c
