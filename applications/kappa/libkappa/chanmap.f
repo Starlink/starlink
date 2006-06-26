@@ -78,8 +78,8 @@
 *          "Sigma"  -- Standard deviation about the unweighted mean.
 *          "Sum"    -- The total value.
 *
-*        The selection is restricted if each channel contains fewer
-*        than three pixels.  For instance, measures of dispersion like
+*        The selection is restricted if each channel contains three or
+*        fewer pixels.  For instance, measures of dispersion like
 *        "Sigma" and "Iwd" are meaningless for single-pixel channels.
 *        If you supply an unavailable option, you will be informed,
 *        and presented with the available options.
@@ -116,8 +116,8 @@
 *        fragmented into channels.  [!]
 *     NCHAN = _INTEGER (Read)
 *        The number of channels to appear in the channel map.  It must 
-*        be a positive integer up to the lesser of 100 or one third of
-*        the number of pixels along the collapsed axis.
+*        be a positive integer up to the lesser of 100 or the number of
+*        pixels along the collapsed axis.
 *     OUT = NDF (Write)
 *        The output NDF.
 *     SHAPE = _INTEGER (Read)
@@ -125,6 +125,8 @@
 *        number along the y axis will be 1+(NCHAN-1)/SHAPE.  A null 
 *        value (!) asks the application to select a shape.  It will
 *        generate one that gives the most square output NDF possible.
+*        The value must be positive and no more than the value of 
+*        parameter NCHAN.
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
 *        propagates the title from the input NDF to the output NDF.  [!]
@@ -775,14 +777,15 @@
 
 *  Obtain the number of channels and their arrangement.
 *  ====================================================
-      CALL PAR_GDR0I( 'NCHAN', 6, 1, MAXCHN, .FALSE., NOCHAN, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  The constraints are that the values are positive, and each
-*  channel must have at least three pixels.  (This may be made 
-*  dependent on the estimator.)
-      CALL PAR_GDR0I( 'SHAPE', 4, 1, MIN( MAXCHN, AEL ), 
-     :                .FALSE., SHAPE( 1 ), STATUS )
+*  channel must have at least one pixel.
+      CALL PAR_GDR0I( 'NCHAN', 6, 1, MIN( MAXCHN, AEL ), .FALSE., 
+     :                NOCHAN, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+      CALL PAR_GDR0I( 'SHAPE', 4, 1, NOCHAN, .FALSE., SHAPE( 1 ),
+     :                STATUS )
 
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -851,8 +854,10 @@
       CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFT, STATUS ) 
 
 *  Now copy from the adjusted temporary NDF to the user-specified
-*  output NDF, that should have the correct file size.
+*  output NDF, that should have the correct file size.  As the 
+*  temporary NDF is then no longer required, release its resources.
       CALL LPG_PROP( INDFT, 'Units', 'OUT', INDFO, STATUS )
+      CALL NDF_ANNUL( INDFT, STATUS )
 
 *  Set the title of the output NDF.
       CALL KPG1_CCPRO( 'TITLE', 'TITLE', INDFI, INDFO, STATUS )
@@ -893,12 +898,12 @@
 *  Let's define the number of pixels per channel.  First of all it's
 *  needed to restrict the options when its value is small.
       PIXPCH = REAL( AEL ) / REAL( NOCHAN )
-      IF ( PIXPCH .GT. 3 ) THEN
+      IF ( INT( PIXPCH ) .GT. 3 ) THEN
          ESTIMO = 'Mean,WMean,Mode,Median,Max,Min,Comax,Comin,Absdev,'/
      :            /'RMS,Sigma,Sum,Iwc,Iwd,Integ'
-      ELSE IF ( PIXPCH .EQ. 1 ) THEN
+      ELSE IF ( INT( PIXPCH ) .EQ. 1 ) THEN
          ESTIMO = 'Mean,Max,Min,Comax,Comin,Sum,Iwc,Integ'
-      ELSE IF ( PIXPCH .EQ. 2 ) THEN
+      ELSE IF ( INT( PIXPCH ) .GE. 2 ) THEN
          ESTIMO = 'Mean,WMean,Max,Min,Comax,Comin,Absdev,Sum,Iwc,Integ'
       END IF
 
