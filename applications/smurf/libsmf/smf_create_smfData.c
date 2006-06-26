@@ -144,6 +144,7 @@ smf_create_smfData( int flags, int * status ) {
     (data->dims)[i] = 0;
   }
 
+  data->lut = NULL;
   return data;
 
  CLEANUP:

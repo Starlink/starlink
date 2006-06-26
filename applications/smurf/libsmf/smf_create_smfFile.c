@@ -100,6 +100,7 @@ smf_create_smfFile( int * status ) {
 
   /* Initialise smfFile */
   file->ndfid = NDF__NOID;
+  file->mapcoordid = NDF__NOID;
   file->isSc2store = 0;
   file->isTstream = 0;
   (file->name)[0] = '\0';
