@@ -219,7 +219,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
 *     15-MAY-2006 (DSB):
 *        Remove unused global variable parent_equal.
-*class--
+*     26-JUN-2006 (DSB):
+*        Document the use of the Direction attribute by the Plot class.
 */
 
 /* Module Macros. */
@@ -9874,6 +9875,10 @@ static int ValidateSystem( AstFrame *this, AstSystemType system, const char *met
 *        The Direction attribute of a FrameSet axis is the same as
 *        that of its current Frame (as specified by the Current
 *        attribute).
+*     Plot
+*        The Direction attribute of the base Frame in a Plot is set to
+*        indicate the sense of the two graphics axes, as implied by the 
+*        graphics bounding box supplied when the Plot was created.
 
 *  Notes:
 *     - When specifying this attribute by name, it should be

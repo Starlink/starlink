@@ -587,6 +587,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *     22-JUN-2006 (DSB)
 *        Include axis textual labels and title in the bounding box
 *        created by AST_GRID and returned by AST_BOUNDINGBOX.
+*     26-JUN-2006 (DSB)
+*        Set the Direction attribute in the base Frame of a Plot if an
+*        axis is reversed.
 *class--
 */
 
@@ -27039,9 +27042,6 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    new = (AstPlot *) astInitFrameSet( mem, size, 0, (AstFrameSetVtab *) vtab,
                                       name, graphicsframe );
 
-/* Annul the frame. */
-   graphicsframe = astAnnul( graphicsframe );
-
    if ( astOK ) {
 
 /* Initialise the Plot data. */
@@ -27066,6 +27066,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
          new->xhi = gbox[ 0 ];
          new->xlo = gbox[ 2 ];
          new->xrev = 1;
+         astSetDirection( graphicsframe, 0, 0 );
       }
        if( graphbox[ 1 ] <= graphbox[ 3 ] ){
          new->ylo = gbox[ 1 ];
@@ -27075,6 +27076,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
          new->yhi = gbox[ 1 ];
          new->ylo = gbox[ 3 ];
          new->yrev = 1;
+         astSetDirection( graphicsframe, 1, 0 );
       }
 
 /* Store the bounds of the Plot within the base Frame of the supplied
@@ -27314,6 +27316,9 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
       new->ngat = 0;
 
    }
+
+/* Annul the frame. */
+   graphicsframe = astAnnul( graphicsframe );
 
 /* If an error occurred, clean up by deleting the new object. */
    if ( !astOK ) new = astDelete( new );
