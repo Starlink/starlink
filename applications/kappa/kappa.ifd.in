@@ -3297,22 +3297,6 @@ package kappa {
             default Data
           }
 
-         parameter ytop {
-            type _REAL
-            prompt {Maximum data value to display in each spectrum}
-            vpath DYNAMIC 
-            ppath DYNAMIC 
-            helpkey *
-          }
-
-         parameter ybot {
-            type _REAL
-            prompt {Minimum data value to display in each spectrum}
-            vpath DYNAMIC 
-            ppath DYNAMIC 
-            helpkey *
-          }
-
          parameter device {
             position 3
             ptype DEVICE
@@ -3444,6 +3428,22 @@ package kappa {
             ppath DYNAMIC DEFAULT
             default 3
             prompt {Spectral axis}
+            helpkey *
+          }
+
+         parameter ybot {
+            type _REAL
+            prompt {Minimum data value to display in each spectrum}
+            vpath DYNAMIC 
+            ppath DYNAMIC 
+            helpkey *
+          }
+
+         parameter ytop {
+            type _REAL
+            prompt {Maximum data value to display in each spectrum}
+            vpath DYNAMIC 
+            ppath DYNAMIC 
             helpkey *
           }
 
@@ -8729,6 +8729,16 @@ package kappa {
          alias {conv(olve)}
 
          helplib {$KAPPA_HELP}
+
+         parameter axes {
+            type _INTEGER
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
+            default !
+            prompt {Indices of pixel axes spanning the convolution plane}
+            helpkey *
+            size *
+          }
 
          parameter in {
             position 1
