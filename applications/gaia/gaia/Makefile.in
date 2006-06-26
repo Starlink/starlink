@@ -127,8 +127,9 @@ AST_OPTIONS = -myerr -mygrf
 AST_LIBS = -L$(STAR_LIB) `ast_link $(AST_OPTIONS)` `sla_link`
 AST_LIBS_NOGRF = -L$(STAR_LIB) `ast_link -myerr` `sla_link`
 STARTCL_OBJECT = $(STAR_LIB)/tclAdam.o
-ADAM_LIBS = -L$(STAR_LIB) `ard_link $(AST_OPTIONS)` `fio_link` $(STARTCL_OBJECT) \
-            `ams_link_adam` `ndf_link $(AST_OPTIONS)`  -lpda
+ADAM_LIBS = -L$(STAR_LIB) `atl_link` `ard_link $(AST_OPTIONS)` \
+            `fio_link` $(STARTCL_OBJECT) `ams_link_adam` \
+            `ndf_link $(AST_OPTIONS)`  -lpda
 FCLIBS = @FCLIBS@
 
 #  Libraries needed to link the "imcopy" program.
