@@ -67,7 +67,7 @@ if test "X$STAR_LARGEFILE_CFLAGS" != "X"; then
 fi
 
 dnl    Declare dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [ard ast blt cat cfitsio generic dnl
+STAR_DECLARE_DEPENDENCIES(build, [ard atl ast blt cat cfitsio generic dnl
 fio img itcl pcs pda sae startcl sla tcl tclx tk], link)
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 STAR_DECLARE_DEPENDENCIES(configure, [tcl tk blt itcl])
