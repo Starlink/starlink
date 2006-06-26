@@ -95,6 +95,7 @@
 #include <sstream>
 #include "error.h"
 #include "StarWCS.h"
+#include "gaiaUtils.h"
 
                                     //  Trig conversion factors.
 static const double pi_ = 3.14159265358979323846;
@@ -1208,10 +1209,11 @@ int StarWCS::astSetAttrib( const char *what, const char *value )
 
 int StarWCS::make2D()
 {
-    int inperm[MAXDIM];
-    int outperm[MAXDIM];
     double zero[MAXDIM];
     int i;
+    int inperm[MAXDIM];
+    int outperm[MAXDIM];
+
     for ( i = 0; i < MAXDIM; i++ ) {
         zero[i] = 0.0;
     }
@@ -1385,35 +1387,32 @@ int StarWCS::make2D()
         }
     }
 
-    // Choose the selected axes from the skyframe (should be just 2 by
-    // now).
+    //  Choose the selected axes from the skyframe (should be just 2 by
+    //  now).
     n = 0;
-    int izero = -1;
+    int axes[MAXDIM];
     for ( i = 0; i < nsky; i++ ) {
         if ( fabs( out1[i][0] - out2[i][0] ) > DBL_EPSILON ) {
-            outperm[n++] = i + 1;
-            inperm[i] = n;
-        }
-        else {
-            if ( out1[i][0] != AST__BAD ) { // Single valued coordinate
-                zero[abs(izero) - 1] = out1[i][0];
-            }
-            else {
-                zero[abs(izero) - 1] = 0.0;
-            }
-            inperm[i] = izero--;
+            axes[n++] = i + 1;
         }
     }
-    newframe = (AstFrame *) astPickAxes( skyframe, 2, outperm, NULL );
 
-    // Create a mapping for this permutation that doesn't have <bad>
-    // values as the result.
-    map = (AstMapping *)astPermMap( nsky, inperm, 2, outperm, zero, "" );
-
-    // Now add this frame to the FrameSet.
-    astAddFrame( wcs_, isky, map, newframe );
-    newframe = (AstFrame *) astAnnul( newframe );
-    map = (AstMapping *) astAnnul( map );
+    //  And extract them. Use the ATL routine as this also does some 
+    //  work to make sure that any ROIs are picked up and Ident'd. That's
+    //  important for grid plotting.
+    int lbnd[2];
+    int ubnd[2];
+    lbnd[0] = 1;
+    lbnd[1] = 1;
+    ubnd[0] = nxpix_;
+    ubnd[1] = nypix_;
+    double *work = new double[max(nxpix_,nypix_)*2+1];
+    char *error_mess;
+    if ( gaiaUtilsAtlAxTrm( wcs_, axes, lbnd, ubnd, work, &error_mess ) == 0 ) {
+        astSetStatus( 1 );     /* Trip a !astOK */
+        free( error_mess );
+    }
+    delete[] work;
 
     //  Release local frames.
     baseframe = (AstFrame *) astAnnul( baseframe );
