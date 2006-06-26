@@ -10,6 +10,10 @@
  PostScript Handling Utility' (SUN/164).  There is a hypertext version 
  available (`showme sun164' or `findme psmerge').
 
+ v1.0-7 now released under the GPL.
+
+ v1.0-6 build using GNU autotools.
+
  v1.0-5 is a maintenance release to update the PSMERGE makefile and solve a bug
  in the arguement handling, which caused arguments like '-t0x72' to cause a
  segmentation violation on Linux.
