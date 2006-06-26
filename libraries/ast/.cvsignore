@@ -44,4 +44,4 @@ starconf.status.local
 stamp-h1
 make.log
 .deps
-
+f77.h

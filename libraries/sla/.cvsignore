@@ -24,7 +24,7 @@ starconf.status.local
 stamp-h1
 make.log
 .deps
-
+f77.h
 starconf.status
 config.h.in
 make.log.err
