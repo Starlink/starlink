@@ -1613,14 +1613,17 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
             }
 
             //  Final job before plotting the grid is to look for any ROIs.
-            //  These require a Plot each.
+            //  These require a Plot each. ROI are marked with Ident values
+            //  of ROI<n> (by atlAxTrm).
             if ( astOK && ! inerror ) {
-                AstKeyMap *rplots;
-                char *error_mess;
-                AstPlot *roiPlot;
-                if ( gaiaUtilsAtlPlROI( plot, &rplots, &error_mess ) ) {
-                    int size = astMapSize( rplots );
-                    if ( size > 0 ) {
+                const char *ident = astGetC( plot, "Ident" );
+                if ( ident != NULL && strlen( ident ) > 3 &&
+                     ident[0] == 'R' && ident[1] == 'O' && ident[2] == 'I' ) {
+                    AstKeyMap *rplots;
+                    char *error_mess;
+                    AstPlot *roiPlot;
+                    if ( gaiaUtilsAtlPlROI( plot, &rplots, &error_mess ) ) {
+                        int size = astMapSize( rplots );
                         for ( int i = 0; i < size; i++ ) {
                             char const *key = astMapKey( rplots, i );
                             astMapGet0A( rplots, key, &roiPlot );
@@ -1630,16 +1633,16 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
                             }
                             roiPlot = (AstPlot *) astAnnul( roiPlot );
                         }
-                    } else {
-                        //  Draw a single grid no ROIs.
-                        astGrid( plot );
+                        rplots = (AstKeyMap *) astAnnul( rplots );
                     }
-                    rplots = (AstKeyMap *) astAnnul( rplots );
+                    else {
+                        inerror = 1;
+                        error( error_mess );
+                        free( error_mess );
+                    }
                 }
                 else {
-                    //  Something went wrong, attempt to draw a single
-                    //  grid anyway.
-                    free( error_mess );
+                    //  No ROIs.
                     astGrid( plot );
                 }
             }
