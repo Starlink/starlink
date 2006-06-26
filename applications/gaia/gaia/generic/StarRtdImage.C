@@ -1,17 +1,17 @@
 /*+
  *  Name:
  *     StarRtdImage
- 
+
  *  Language:
  *     C++
- 
+
  *  Purpose:
  *     Defines the members of the StarRtdImage class.
- 
+
  *  Authors:
  *     P.W. Draper (PWD)
  *     Allan Brighton, ESO (ALLAN)
- 
+
  *  Copyright:
  *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -32,7 +32,7 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  History:
  *     15-FEB-1996 (PWD):
  *        Original version.
@@ -188,7 +188,7 @@
  *        Added direct NDF access commands. These are used to access cubes.
  *     14-DEC-2005 (PWD):
  *        Various update for Skycat 2.7.4.
- *     21-MAR-2006 (PWD): 
+ *     21-MAR-2006 (PWD):
  *        Removed direct NDF access commands. These are now available
  *        via the ndf:: commands. See gaiaNDFTcl.
  *     30-MAR-2006 (PWD):
@@ -239,6 +239,7 @@
 #include "rtdDtrn.h"
 #include "GaiaRtdRemote.h"
 #include "gaiaNDF.h"
+#include "gaiaUtils.h"
 #include "slasubs.h"
 
 // Include any foreign commands. These are processed by the "foreign"
@@ -753,9 +754,9 @@ StarWCS* StarRtdImage::getStarWCSPtr( ImageData* image )
 //+
 //   StarRtdImage::updateImageDataCmd.
 //
-//   Replace and update the image data. Requires the address of some 
+//   Replace and update the image data. Requires the address of some
 //   memory that contains data of exactly the same size and data type as that
-//   already in use. If that's not true then undefined things will happen.  
+//   already in use. If that's not true then undefined things will happen.
 //
 //   The only argument is a memory address stored in a long.
 //-
@@ -789,7 +790,7 @@ int StarRtdImage::updateImageDataCmd( int argc, char *argv[] )
 //-
 int StarRtdImage::volatileCmd( int argc, char *argv[] )
 {
-    if ( ! image_ ) { 
+    if ( ! image_ ) {
         return TCL_OK;
     }
     if ( argc == 0 ) {
@@ -1611,9 +1612,36 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
                 }
             }
 
-            //  Draw the grid.
+            //  Final job before plotting the grid is to look for any ROIs.
+            //  These require a Plot each.
             if ( astOK && ! inerror ) {
-                astGrid( plot );
+                AstKeyMap *rplots;
+                char *error_mess;
+                AstPlot *roiPlot;
+                if ( gaiaUtilsAtlPlROI( plot, &rplots, &error_mess ) ) {
+                    int size = astMapSize( rplots );
+                    if ( size > 0 ) {
+                        for ( int i = 0; i < size; i++ ) {
+                            char const *key = astMapKey( rplots, i );
+                            astMapGet0A( rplots, key, &roiPlot );
+                            astGrid( roiPlot );
+                            if ( ! astOK ) {
+                                astClearStatus;
+                            }
+                            roiPlot = (AstPlot *) astAnnul( roiPlot );
+                        }
+                    } else {
+                        //  Draw a single grid no ROIs.
+                        astGrid( plot );
+                    }
+                    rplots = (AstKeyMap *) astAnnul( rplots );
+                }
+                else {
+                    //  Something went wrong, attempt to draw a single
+                    //  grid anyway.
+                    free( error_mess );
+                    astGrid( plot );
+                }
             }
 
             //  Free the plot.
@@ -2064,7 +2092,7 @@ int StarRtdImage::astreadCmd( int argc, char *argv[] )
 //
 //     If not already taken a clone of what is reckoned to be the original WCS
 //     associated with the image is also made. This can be restored using the
-//     "astrestore original" command.  
+//     "astrestore original" command.
 //-
 int StarRtdImage::astreplaceCmd( int argc, char *argv[] )
 {
@@ -2114,7 +2142,7 @@ int StarRtdImage::astreplaceCmd( int argc, char *argv[] )
     //  Update any views to use this information.
     if ( updateViews( 2 ) != TCL_OK ) {
         return TCL_ERROR;
-    } 
+    }
     else {
         return TCL_OK;
     }
@@ -4797,7 +4825,7 @@ int StarRtdImage::ndfCmdDisplay( int argc, char *argv[], NDFIO *ndf )
     // Create an image composed of all of the requested image extensions.
     // Note the copy of imio created here is really a container-file per NDF
     // (see gaiaCloneMNDF). That's probably not optimal, but is reasonably
-    // light-weight. 
+    // light-weight.
     image_ = ImageData::makeCompoundImage( name(), imio, ndfList, numNDFs,
                                            biasimage_->biasInfo(), verbose() );
     if ( ! image_) {
@@ -5344,7 +5372,7 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
 
         //  Could be FITS file. No funny possibilities for these names.
         char* p = strchr( *fullname, '.' );
-        if ( p && ( strstr( p, ".fit" ) != NULL || 
+        if ( p && ( strstr( p, ".fit" ) != NULL ||
                     strstr( p, ".fts" ) != NULL ) ) {
 
             //  Is a FITS name, does file exist? If not assume might
@@ -5471,7 +5499,7 @@ int StarRtdImage::fileExists( const char *filename )
 //-
 int StarRtdImage::objectCmd( int argc, char *argv[] )
 {
-    if ( ! image_ ) { 
+    if ( ! image_ ) {
         return TCL_OK;
     }
     if ( argc == 0 ) {
