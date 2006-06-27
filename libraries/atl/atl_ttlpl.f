@@ -138,7 +138,10 @@
 
 *  Determine if the Plot has a reversed Y axis (i.e.smallest Y value at
 *  the top). Then choose the Y value for the bottom edge of the Title.
-         IF( AST_GETL( IPLOT, 'Direction(2)', STATUS ) ) THEN
+*  The Direction value is set in the base Frame, but we have previously
+*  made the base Frame also the current Frame in IPLOTT so we can just
+*  use the Direction value form the IPLOTT current Frame.
+         IF( AST_GETL( IPLOTT, 'Direction(2)', STATUS ) ) THEN
             POS( 2 ) = UBND( 2 ) + 0.05*( UBND( 2 ) - LBND( 2 ) )
          ELSE
             POS( 2 ) = LBND( 2 ) - 0.05*( UBND( 2 ) - LBND( 2 ) )
