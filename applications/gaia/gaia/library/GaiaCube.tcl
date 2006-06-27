@@ -350,13 +350,15 @@ itcl::class gaia::GaiaCube {
       if { $spectrum_ != {} && [winfo exists $spectrum_] } {
          $spectrum_ close
       }
-      if { $position_mark_ != {} } {
-         $itk_option(-canvas) delete $position_mark_
+      if { [winfo exists $itk_option(-canvas)] } {
+         if { $position_mark_ != {} } {
+            $itk_option(-canvas) delete $position_mark_
+         }
+         if { $ref_position_mark_ != {} } {
+            $itk_option(-canvas) delete $ref_position_mark_
+         }
+         remove_spectral_bindings_
       }
-      if { $ref_position_mark_ != {} } {
-         $itk_option(-canvas) delete $ref_position_mark_
-      }
-      remove_spectral_bindings_
    }
 
    #  Methods:
