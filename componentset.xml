@@ -1,4 +1,5 @@
-<!DOCTYPE componentset SYSTEM "componentinfo.dtd">
+<?xml version="1.0"?>
+<!-- DTD in buildsupport/starconf/componentinfo.dtd -->
 <componentset>
 
 <component id="astrom" support="S">
@@ -1276,7 +1277,7 @@ package.
 </component>
 
 <component id="psmerge" support="U">
-  <version>1.0-6</version>
+  <version>1.0-7</version>
   <path>applications/psmerge</path>
   <description>Merge EPS files</description>
   <abstract><p>
