@@ -250,6 +250,16 @@ itcl::class gaia::GaiaAstGrid {
          -offvalue 0 \
          -command [code $this set_font_resize_]
 
+      #  Normal or channel map defaults. Start with normal.
+      $Options add checkbutton  -label {Chanmap defaults} \
+         -variable [scope chanmap_defaults_] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this toggle_chanmap_defaults_]
+      set chanmap_defaults_ 0
+      set elementattrib_ $normalelementattrib_
+      set position_($this,labelling) "interior"
+
       #  Create the tab notebook for containing each page of options.
       itk_component add TabNoteBook {
          ::iwidgets::tabnotebook $w_.tab -angle 30 -tabpos w \
@@ -982,7 +992,6 @@ itcl::class gaia::GaiaAstGrid {
             -variable [scope position_($this,labelling)] \
             -command [code $this redraw_]
       }
-      set position_($this,labelling) "interior"
       pack $itk_component(Labelling) -side top -fill x -ipadx 1m -ipady 1m
 
       #  LabelAt, where to place the numeric labels. These require
@@ -1753,6 +1762,20 @@ itcl::class gaia::GaiaAstGrid {
       return $newvalue
    }
 
+
+   #  Control the defaults used. These are for channel maps or the usual
+   #  single-image gridded form.
+   protected method toggle_chanmap_defaults_ {} {
+      if { $chanmap_defaults_ } {
+         set elementattrib_ $chanmapelementattrib_
+         set position_($this,labelling) "exterior"
+      } else {
+         set elementattrib_ $normalelementattrib_
+         set position_($this,labelling) "interior"
+      }
+      reset_element_
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -1796,17 +1819,23 @@ itcl::class gaia::GaiaAstGrid {
 
    #  Short and long names of elements that can be plotted and their
    #  defaults.
-   protected variable elementannounce_ \
-      {Display elements:}
-   protected variable elementattrib_ {
+   protected variable elementannounce_ {Display elements:}
+   protected variable elementattrib_ {} 
+
+   #  Variation on elements for normal grids and those for channel maps.
+   protected variable normalelementattrib_ {
       border {Outer Border} 0 grid {Grid Lines} 1 numlab Numbers 1
       drawtitle {Plot Title} 1 drawaxes Axes 1 textlab {Axes Labels} 1
       tickall {Tick All Axes} 0 labelunits {Axes Units} 0}
 
+   protected variable chanmapelementattrib_ {
+      border {Outer Border} 1 grid {Grid Lines} 0 numlab Numbers 1
+      drawtitle {Plot Title} 1 drawaxes Axes 1 textlab {Axes Labels} 1
+      tickall {Tick All Axes} 1 labelunits {Axes Units} 0}
+
    #  Short and long names of elements that can have their colour
    #  modified and their defaults.
-   protected variable colourannounce_ \
-      {Element colouring:}
+   protected variable colourannounce_ {Element colouring:}
    protected variable colourattrib_ \
       {title {Plot Title}  11 grid {Grid Lines} 6
        border {Border Lines} 0 numlab {Numbers} 3 axes {Axes} 2
@@ -1884,8 +1913,7 @@ itcl::class gaia::GaiaAstGrid {
 
    #  Names of all the possible systems we can plot in and their
    #  need for epoch and equinox qualifiers.
-   protected variable systemannounce_ \
-      {Grid celestial coordinate system:}
+   protected variable systemannounce_ {Grid celestial coordinate system:}
    protected variable systemattrib_ \
       {default 1 1 fk5 0 1 fk4 1 1 fk4-no-e 1 1 gappt 1 0 ecliptic 0 1
          galactic 0 0 supergalactic 0 0 pixels 0 0}
@@ -1903,12 +1931,10 @@ itcl::class gaia::GaiaAstGrid {
       "default J2000.0 B1950.0 [clock format [clock seconds] -format {%Y-%b-%d}]"
 
    #  Names of sensible equinoxes.
-   protected variable equinoxmap_ \
-      {default J2000.0 B1950.0}
+   protected variable equinoxmap_ {default J2000.0 B1950.0}
 
    #  Short and long names of any labels that can be modified.
-   protected variable labelannounce_ \
-      {Plot labels:}
+   protected variable labelannounce_ {Plot labels:}
    protected variable labelattrib_ \
       {title {Main Title} {label(1)} {X Axis} {label(2)} {Y Axis}}
 
@@ -1935,6 +1961,9 @@ itcl::class gaia::GaiaAstGrid {
 
    #  Unique tag for this grid. 
    protected variable grid_tag_ {}
+
+   #  Whether to configure to channel map defaults, or not.
+   protected variable chanmap_defaults_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------
