@@ -1088,14 +1088,11 @@ AstSelectorMap *astSelectorMap_( int nreg, void **regs_void, double badval,
    if ( !astOK ) return new;
 
 /* Report an error if no Regions have been supplied. */
-   if( nreg <= 0 ) {
-      astError( AST__BDPAR, "astSelectorMap(SelectorMap): Bad number of "
-                "Regions (%d) specified.", nreg );
+   if( nreg <= 0 ) astError( AST__BDPAR, "astSelectorMap(SelectorMap): "
+                            "Bad number of Regions (%d) specified.", nreg );
 
 /* Otherwise create an array to hold the Region pointers. */
-   } else {
-      regs = astMalloc( sizeof( AstRegion * )*nreg );
-   }
+   regs = astMalloc( sizeof( AstRegion * )*nreg );
 
 /* Obtain and validate pointers to the Region structures provided. */
    if( astOK ) {
@@ -1269,14 +1266,11 @@ f     function is invoked with STATUS set to an error value, or if it
    if ( !astOK ) return new;
 
 /* Report an error if no Regions have been supplied. */
-   if( nreg <= 0 ) {
-      astError( AST__BDPAR, "astSelectorMap(SelectorMap): Bad number of "
-                "Regions (%d) specified.", nreg );
+   if( nreg <= 0 ) astError( AST__BDPAR, "astSelectorMap(SelectorMap): "
+                             "Bad number of Regions (%d) specified.", nreg );
 
-/* Otherwise create an array to hold the Region pointers. */
-   } else {
-      regs = astMalloc( sizeof( AstRegion * )*nreg );
-   }
+/* Create an array to hold the Region pointers. */
+   regs = astMalloc( sizeof( AstRegion * )*nreg );
 
 /* Obtain and validate pointers to the Region structures provided. */
    if( astOK ) {

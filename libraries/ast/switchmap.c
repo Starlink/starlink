@@ -798,11 +798,17 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    if( map->fsmap ) {
       fsinv_old = astGetInvert( map->fsmap );
       astSetInvert( map->fsmap, map->fsinv );
+   } else {
+      fsinv_old = 0;
    }
+
    if( map->ismap ) {
       isinv_old = astGetInvert( map->ismap );
       astSetInvert( map->ismap, map->isinv );
+   } else {
+      isinv_old = 0;
    }
+
    rinv_old = astMalloc( sizeof( int )*nroute );
    if( astOK ) {
       for( i = 0; i < nroute; i++ ) {
@@ -1813,14 +1819,12 @@ AstSwitchMap *astSwitchMap_( void *fsmap_void, void *ismap_void, int nroute,
    if ( !astOK ) return new;
 
 /* Report an error if no route Mappings have been supplied. */
-   if( nroute <= 0 ) {
-      astError( AST__BDPAR, "astSwitchMap(SwitchMap): Bad number of "
-                "route Mappings (%d) specified.", nroute );
+   if( nroute <= 0 ) astError( AST__BDPAR, "astSwitchMap(SwitchMap): "
+                               "Bad number of route Mappings (%d) specified.", 
+                               nroute );
 
 /* Otherwise create an array to hold the route Mapping pointers. */
-   } else {
-      routemaps = astMalloc( sizeof( AstMapping * )*nroute );
-   }
+   routemaps = astMalloc( sizeof( AstMapping * )*nroute );
 
 /* Obtain and validate pointers to the Mapping structures provided. */
    if( astOK ) {
@@ -2063,14 +2067,12 @@ f     function is invoked with STATUS set to an error value, or if it
    if ( !astOK ) return new;
 
 /* Report an error if no route Mappings have been supplied. */
-   if( nroute <= 0 ) {
-      astError( AST__BDPAR, "astSwitchMap(SwitchMap): Bad number of "
-                "route Mappings (%d) specified.", nroute );
+   if( nroute <= 0 ) astError( AST__BDPAR, "astSwitchMap(SwitchMap): "
+                               " Bad number of route Mappings (%d) specified.", 
+                               nroute );
 
 /* Otherwise create an array to hold the route Mapping pointers. */
-   } else {
-      routemaps = astMalloc( sizeof( AstMapping * )*nroute );
-   }
+   routemaps = astMalloc( sizeof( AstMapping * )*nroute );
 
 /* Obtain and validate pointers to the Mapping structures provided. */
    if( astOK ) {
