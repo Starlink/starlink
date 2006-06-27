@@ -161,22 +161,21 @@ itcl::class gaia::GaiaSpectralPlotRange {
    #  Methods:
    #  --------
 
-   #  The slider1 position has changed. Update the displayed world coordinate
-   #  and issue the coord changed command.
+   #  The slider1 position has changed. 
    protected method picked_plane1_ { plane1 } {
       set plane2 [$itk_component(index2) cget -value]
-      update_coords_ $plane1 $plane2
-
-      #  Make change known.
-      if { $itk_option(-coord_update_cmd) != {} } {
-         eval $itk_option(-coord_update_cmd) $plane1 $plane2
-      }
+      apply_changes_ $plane1 $plane2
    }
 
-   #  The slider2 position has changed. Update the displayed world coordinate
-   #  and issue the coord changed command.
+   #  The slider2 position has changed. 
    protected method picked_plane2_ { plane2 } {
       set plane1 [$itk_component(index1) cget -value]
+      apply_changes_ $plane1 $plane2
+   }
+
+   #  Update the displayed world coordinate and issue the coord changed
+   #  command. 
+   protected method apply_changes_ {plane1 plane2} {
       update_coords_ $plane1 $plane2
 
       #  Make change known.
@@ -227,16 +226,24 @@ itcl::class gaia::GaiaSpectralPlotRange {
    itk_option define -coordtext1 coordtext1 CoordText1 "Coordinate of plane:"
    itk_option define -coordtext2 coordtext2 CoordText2 "Coordinate of plane:"
 
-   #  The index pairs.
+   #  The index pairs. These are clipped if necessary.
    itk_option define -value1 value1 Value1 1 {
       if { [info exists itk_component(index1)] } {
          $itk_component(index1) configure -value $itk_option(-value1)
+         set v [$itk_component(index1) cget -value] 
+         if { $v != $itk_option(-value1) } {
+            set itk_option(-value1) $v
+         }
          update_coords_ $itk_option(-value1) $itk_option(-value2)
       }
    }
    itk_option define -value2 value2 Value2 1 {
       if { [info exists itk_component(index2)] } {
          $itk_component(index2) configure -value $itk_option(-value2)
+         set v [$itk_component(index2) cget -value] 
+         if { $v != $itk_option(-value2) } {
+            set itk_option(-value2) $v
+         }
          update_coords_ $itk_option(-value1) $itk_option(-value2)
       }
    }
