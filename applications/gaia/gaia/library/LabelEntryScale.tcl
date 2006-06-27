@@ -259,6 +259,7 @@ itcl::class util::LabelEntryScale {
               if { $v > $to } {
                  set v $to
               }
+              set itk_option(-value) $v
            }
            
            #  Now update values.
