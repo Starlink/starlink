@@ -346,6 +346,13 @@ itcl::class gaia::GaiaCube {
          catch {::file delete $section_name_} msg
       }
 
+      #  Delete any registered temporary files.
+      foreach filename $temp_files_ {
+         if { [file exists $filename] } {
+            catch {file delete $filename}
+         }
+      }
+
       #  Close spectrum plot.
       if { $spectrum_ != {} && [winfo exists $spectrum_] } {
          $spectrum_ close
@@ -528,7 +535,16 @@ itcl::class gaia::GaiaCube {
          set plane_ $newvalue
       }
 
-      #  If regenerating create the dummy NDF.
+      #  If regenerating create the dummy NDF. Note this is also needed when
+      #  an image has replaced the dummy NDF (collapses, chanmaps etc.).
+      #  Check this is by querying the object name, it should change.
+      if { ! $regen } {
+         set newobject [$itk_option(-rtdimage) object]
+         if { $newobject != $fullobject_ } {
+            set regen 1
+         }
+      }
+
       if { $regen } {
 
          #  Set name of the image displayed image section.
@@ -557,7 +573,6 @@ itcl::class gaia::GaiaCube {
                   "WARNING: Failed to delete old image section: $msg"
             }
          }
-
       }
 
       #  Now copy this plane from the cube and update the image.
@@ -584,7 +599,8 @@ itcl::class gaia::GaiaCube {
 
       #  Set the object description of this slice to include the
       #  cube slice.
-      $itk_option(-rtdimage) object "[slice_display_name_] ($object_)"
+      set fullobject_ "[slice_display_name_] ($object_)"
+      $itk_option(-rtdimage) object $fullobject_
       $rtdctrl_info_ updateValues
 
       # Release memory from last time and save pointer.
@@ -685,12 +701,21 @@ itcl::class gaia::GaiaCube {
       return ${itk_option(-cube)}${section}
    }
 
-   #  Display an image.
+   #  Display an image. Note these cannot be temporary in the normal sense, 
+   #  that messes up the interaction. We deal with temporary images locally.
    public method display {name {istemp 0} } {
       $itk_option(-gaia) configure -check_for_cubes 0
       $itk_option(-gaia) open $name
-      $itk_option(-gaia) configure -temporary $istemp
+      if { $istemp } {
+         register_temp_file $name
+      }
       $itk_option(-gaia) configure -check_for_cubes $check_for_cubes_
+   }
+
+   #  Register a temporary file. These will be deleted along with this 
+   #  object.
+   public method register_temp_file {filename} {
+      lappend temp_files_ $filename
    }
 
    #  Get the coordinate of an index along the current axis.
@@ -1137,6 +1162,10 @@ itcl::class gaia::GaiaCube {
    #  The object value set in the cube (used in slice object).
    protected variable object_ {}
 
+   #  The object value set in the main display. Used to check we still
+   #  have control of the dummy slice.
+   protected variable fullobject_ {}
+
    #  GaiaImagePanel object used in the main window. Forced to update to
    #  reveal the slice information.
    protected variable rtdctrl_info_ {}
@@ -1154,6 +1183,10 @@ itcl::class gaia::GaiaCube {
    #  Array of index-based controls for the reference ranges. These are indexed
    #  by their ref_id.
    protected variable ref_range_controls_
+
+   #  A list of temporary files, these will be deleted when the object
+   #  is destroyed.
+   protected variable temp_files_ ""
 
    #  Common variables: (shared by all instances)
    #  -----------------
