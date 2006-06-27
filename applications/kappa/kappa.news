@@ -1,26 +1,7 @@
 1 KAPPA_Version_1.5
 
-   A new release of KAPPA (v1.5) has been made.  The main changes are:
-
-   o  A new application called MAKESNR has been added.  This command
-   creates a signal-to-noise array from an NDF with defined VARIANCE
-   component, rejecting unusably small variances.
-
-   o  SETVAR now provides the option to copy values from another NDF
-   into the Variance component of the NDF being modified.
-
-   o  A new application called WCSMOSAIC has been added.  This command
-   mosaics a group of input NDFs using the associated WCS information
-   to align them.
-
-   o  A new application INTERLEAVE to form a higher-resolution NDF by
-   interleaving a set of NDFs of the same dimensionality.
-
-   o  A new application MFITTREND for multiple fitting of trends to 
-   individual data lines of multi-dimensional NDFs has been added.  The
-   trends are actually polynomials, which can be restricted to selected 
-   co-ordinate ranges, making this a useful tool for fitting the 
-   continua of independent spectra stored in data cubes.
+   A new release of KAPPA (v1.5) has been made.  The main changes are
+   listed below.
 
    o  A new application CHANMAP creates a two-dimensional channel map 
    from a three-dimensional NDF by collapsing along a nominated pixel 
@@ -33,12 +14,26 @@
    spectral-line data cubes.  In addition to the normal spectral axes
    around a line plot, there may be spatial axes drawn around the grid.
 
+   o  A new application INTERLEAVE to form a higher-resolution NDF by
+   interleaving a set of NDFs of the same dimensionality.
+
+   o  A new application called MAKESNR has been added.  This command
+   creates a signal-to-noise array from an NDF with defined VARIANCE
+   component, rejecting unusably small variances.
+
+   o  A new application MFITTREND for multiple fitting of trends to 
+   individual data lines of multi-dimensional NDFs has been added.  The
+   trends are actually polynomials, which can be restricted to selected 
+   co-ordinate ranges, making this a useful tool for fitting the 
+   continua of independent spectra stored in data cubes.
+
+   o  A new application called WCSMOSAIC has been added.  This command
+   mosaics a group of input NDFs using the associated WCS information
+   to align them.
+
    o  FITSEXIST is now a self-contained application.  It needs only 
    read access to an NDF, unlike the former version that was an alias
    to FITSMOD.  It should be faster too.
-
-   o  A new parameter called CUMUL has been added to HISTOGRAM.  Setting
-   CUMUL to TRUE will result in a cumulative histogram being produced.
 
    o  The WCSALIGN and REGRID applications now have options for using a
    rebinning algorithm rather than a resampling algorithm.  Rebinning
@@ -54,8 +49,9 @@
    first kind.
 
    o  The default values for the TOL parameter for REGRID, and the ACC
-   parameter for WCSALIGN, have been reduced to 0.05, in order to reduce
-   artifacts when transforming large images with flux conservation.
+   parameter for WCSALIGN, have been reduced to 0.05, in order to
+   reduce artefacts when transforming large images with flux 
+   conservation.
 
    o  CURSOR can now display the pixel value at each selected position
    (if the position falls within the bounds of a displayed NDF).  This
@@ -65,6 +61,24 @@
    modified comprises one pixel, OLDVAL stores the original value of 
    that pixel.
 
+   o  CONTOUR parameter MODE has a new option to calculate contour 
+   heights called "Scale".  This sets a specified number of contour 
+   levels to be equally spaced between two pixel values that you supply.
+
+   o  CONVOLVE and GAUSMOOTH can now smooth three-dimensional NDFs,
+   in the sense that it will apply the PSF convolution or Gaussian
+   filter respectively to all the two-dimensional planes within a 
+   three-dimensional NDF independently.  The smoothing plane can be
+   parallel to any face of the cube and is defined by the new 
+   parameter AXES.
+   
+   o  COPYBAD now has an extra parameter called INVERT which, if set
+   TRUE, causes output pixels to be set bad if the corresponding pixels
+   in the reference NDF are good.
+
+   o  A new parameter called CUMUL has been added to HISTOGRAM.  Setting
+   CUMUL to TRUE will result in a cumulative histogram being produced.
+
    o  The MODE parameter in LISTMAKE now has an option "Good" which is 
    like the existing "Pixel" option in that it creates a list 
    containing pixel centres taken from the supplied NDF, but differs in
@@ -72,16 +86,11 @@
    the NDF Data array (the "Pixel" option stores all pixel centres, 
    whether the pixel values are good or bad).
 
-   o  CONTOUR parameter MODE has a new option to calculate contour 
-   heights called "Scale".  This sets a specified number of contour 
-   levels to be equally spaced between two pixel values that you supply.
-
    o  LOOK parameter FORMAT has an extra option "cglist".  This is like 
    "clist" except that bad values are not included in the list.
 
-   o  COPYBAD now has an extra parameter called INVERT which, if set
-   TRUE, causes output pixels to be set bad if the corresponding pixels in
-   the reference NDF are good.
+   o  SETVAR now provides the option to copy values from another NDF
+   into the Variance component of the NDF being modified.
 
    o  KAPPA is now released under the GNU Public Licence.
 
@@ -92,10 +101,10 @@ Changes introduced in version 1.4-2
    NDF within the current WCS Frame are written to the new output
    parameters FLBND and FUBND.
 
-   o The BLOCK application can now smooth 3-d NDFs, in the sense that it 
-   will smooth all the 2-d planes within a 3-d NDF independently, using 
-   the same 2-dimensional box.  The smoothing plane can be parallel to 
-   any face of the cube.
+   o The BLOCK application can now smooth three-dimensional NDFs, in the 
+   sense that it will smooth all the two-dimensional planes within a 
+   three-dimensional NDF independently, using the same two-dimensional 
+   box.  The smoothing plane can be parallel to any face of the cube.
 
 Changes introduced in version 1.4-1
 
