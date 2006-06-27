@@ -766,7 +766,7 @@ static void SPDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
  *      None.
  *
  * Side effects:
- *      ItemPtr is drawn in drawable...
+ *      ItemPtr is drawn in drawable, or not if an error occurs.
  */
 static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
                        Drawable drawable, int x, int y, int width,
@@ -861,6 +861,13 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         spPtr->plot = astPlot( spPtr->framesets[1], graphbox, basebox,
                                (spPtr->options == NULL ? "" : spPtr->options));
 
+        if ( spPtr->plot == NULL ) {
+            if ( !astOK ) {
+                astClearStatus;
+            }
+            return;
+        }
+
         /* And plot the grid axes, this is also only required when the
          * framesets change. */
         if ( spPtr->showaxes ) {
@@ -918,46 +925,48 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         if ( ! astOK ) astClearStatus;
     }
 
-    /* Finally the spectra, for speed we use direct control of two
+    /* Always plot the spectra, for speed we use direct control of two
      * rtd_polyline instances.  First convert coordinates into canvas from
      * current. Use two loops in case have reference spectrum, note reference
      * spectrum is plotted first. */
-    for ( i = 0; i < 2; i++ ) {
-        if ( i == 0 ) {
-            if ( spPtr->refDataPtr == NULL ) {
-                /* No reference spectrum, skip to next loop */
-                continue;
+    if ( spPtr->plot != NULL ) {
+        for ( i = 0; i < 2; i++ ) {
+            if ( i == 0 ) {
+                if ( spPtr->refDataPtr == NULL ) {
+                    /* No reference spectrum, skip to next loop */
+                    continue;
+                }
+                dataPtr = spPtr->refDataPtr;
+                polyline = spPtr->refpolyline;
+                linecolour = spPtr->reflinecolour;
             }
-            dataPtr = spPtr->refDataPtr;
-            polyline = spPtr->refpolyline;
-            linecolour = spPtr->reflinecolour;
-        }
-        else {
-            dataPtr = spPtr->dataPtr;
-            polyline = spPtr->polyline;
-            linecolour = spPtr->linecolour;
-        }
+            else {
+                dataPtr = spPtr->dataPtr;
+                polyline = spPtr->polyline;
+                linecolour = spPtr->linecolour;
+            }
+            
+            astTran2( spPtr->plot, spPtr->numPoints, spPtr->coordPtr,
+                      dataPtr, 0, spPtr->tmpPtr[0], spPtr->tmpPtr[1] );
+            
+            /* Set line coordinates */
+            RtdLineQuickSetCoords( spPtr->interp, canvas, polyline,
+                                   spPtr->tmpPtr[0], spPtr->tmpPtr[1],
+                                   spPtr->numPoints );
+            
+            RtdLineSetColour( display, polyline, linecolour );
+            RtdLineSetWidth( display, polyline, spPtr->linewidth );
+            
+            /* Do the draw. */
+            RtdLineDisplay( canvas, polyline, display, drawable, x, y,
+                            width, height );
+        }            
+    }
 
-        astTran2( spPtr->plot, spPtr->numPoints, spPtr->coordPtr,
-                  dataPtr, 0, spPtr->tmpPtr[0], spPtr->tmpPtr[1] );
-
-        /* Set line coordinates */
-        RtdLineQuickSetCoords( spPtr->interp, canvas, polyline,
-                               spPtr->tmpPtr[0], spPtr->tmpPtr[1],
-                               spPtr->numPoints );
-
-        RtdLineSetColour( display, polyline, linecolour );
-        RtdLineSetWidth( display, polyline, spPtr->linewidth );
-
-        /* Do the draw. */
-        RtdLineDisplay( canvas, polyline, display, drawable, x, y,
-                        width, height );
-
-        /* Reset AST if any errors occurred, don't want next draw to fail
-         * as well. */
-        if ( !astOK ) {
-            astClearStatus;
-        }
+    /* Reset AST if any errors occurred, don't want next draw to fail
+     * as well. */
+    if ( !astOK ) {
+        astClearStatus;
     }
 }
 
