@@ -238,9 +238,10 @@ itcl::class util::LabelEntryScale {
            set notrace_ 1
            #  Update range to reflect this, if possible. Assumes -to
            #  -from already set.
+           set from $itk_option(-from)
+           set to $itk_option(-to)
            if { ! $itk_option(-fix_range) } {
-              set from $itk_option(-from)
-              set to $itk_option(-to)
+              #  Expand range, if needed.
               if { $v < $from} {
                  set from $v
               }
@@ -249,6 +250,14 @@ itcl::class util::LabelEntryScale {
               }
               if { $from != {} && $to != {} } { 
                  config -from $from -to $to
+              }
+           } else {
+              #  Clip to range.
+              if { $v < $from} {
+                 set v $from
+              }
+              if { $v > $to } {
+                 set v $to
               }
            }
            

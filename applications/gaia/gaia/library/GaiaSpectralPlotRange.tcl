@@ -103,6 +103,7 @@ itcl::class gaia::GaiaSpectralPlotRange {
             -show_arrows 1 \
             -anchor w \
             -delay 25 \
+            -fix_range 1 \
             -command [code $this picked_plane1_]
       }
       pack $itk_component(index1) -side top -fill x
@@ -129,6 +130,7 @@ itcl::class gaia::GaiaSpectralPlotRange {
             -show_arrows 1 \
             -anchor w \
             -delay 25 \
+            -fix_range 1 \
             -command [code $this picked_plane2_]
       }
       pack $itk_component(index2) -side top -fill x
@@ -192,7 +194,6 @@ itcl::class gaia::GaiaSpectralPlotRange {
 
    #  Update the coordinates readout to show values for two planes.
    protected method update_coords_ {plane1 plane2} {
-
       set coord1 [$itk_option(-gaiacube) get_coord $plane1 1 0]
       set coord2 [$itk_option(-gaiacube) get_coord $plane2 1 0]
       $itk_component(indexcoord1) configure -value $coord1

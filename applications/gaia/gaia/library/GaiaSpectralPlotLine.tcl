@@ -104,6 +104,7 @@ itcl::class gaia::GaiaSpectralPlotLine {
             -show_arrows 1 \
             -anchor w \
             -delay 25 \
+            -fix_range 1 \
             -command [code $this picked_plane_]
       }
       pack $itk_component(index) -side top -fill x
