@@ -1019,7 +1019,7 @@ best of the relevant tools from both systems to get the job done.
 \subsection{Functionality of KAPPA}
 
 \subsubsection{Applications}
-Currently, \KAPPA\ has about 180 commands that are available
+Currently, \KAPPA\ has nearly 200 commands that are available
 both from the UNIX C-shell and from the \ICLref\ command language.
 They provide the following facilities for data processing:
 
@@ -1030,8 +1030,8 @@ NDF \htmlref{FITS extension}{se:fitsairlock};
 \item \htmlref{generation of test data}{cl:datagen}, and
 \htmlref{NDF creation from text files}{TRANDAT};
 \item setting and examining \htmlref{NDF components}{ap:NDFformat};
-\item \htmlref{definition}{cl:wcs}, or \htmlref{calculation of a sky co-ordinate
-system}{SETSKY};
+\item \htmlref{world co-ordinate systems}{cl:wcs}, and 
+\htmlref{calculation of a sky co-ordinate system}{SETSKY};
 \item arithmetic including a \htmlref{powerful application}{MATHS}
 that handles expressions;
 \item \htmlref{pixel and region editing}{cl:pixedit}, including polygons and
@@ -1041,18 +1041,19 @@ filtering}{GLITCH}; and \htmlref{pasting arrays over others}{PASTE};
 whose variances are too large}{ERRCLIP};
 \item configuration change: \htmlref{flip}{FLIP},
 \htmlref{rotate}{ROTATE}, \htmlref{shift}{SLIDE},
-\htmlref{reshape}{RESHAPE}, subset, change
-dimensionality;
+\htmlref{reshape}{RESHAPE}, subset, \htmlref{permute axes}{PERMAXES}
+change dimensionality;
 \item \htmlref{normalisation}{NORMALIZE} of NDF pairs;
 \item \htmlref{compression and expansion of images}{cl:compexp};
 \item \htmlref{generalised resampling}{cl:regrid} of NDFs using
 arbitrary transformations;
+\item \htmlref{mosaic creation}{WCSMOSAIC};
 \item filtering: \htmlref{box}{BLOCK}, \htmlref{Gaussian}{GAUSMOOTH},
 and \htmlref{median smoothing}{MEDIAN}; very efficient
 \htmlref{Fourier transform}{FOURIER}, \htmlref{convolution}{CONVOLVE};
 \item deconvolution: \htmlref{maximum-entropy}{MEM2D},
 \htmlref{Lucy-Richardson}{LUCY}, \htmlref{Wiener filter}{WIENER};
-\item \htmlref{two-dimensional-surface fitting}{cl:surfit};
+\item \htmlref{surface and trend fitting}{cl:surfit};
 \item statistics including \htmlref{ordered statistics}{HISTAT},
 \htmlref{histogram}{HISTOGRAM}; \htmlref{pixel-by-pixel
 statistics over a sequence of images}{MSTATS};
@@ -1078,9 +1079,10 @@ a selection of scaling modes and many options such as axes;
 tables and palettes}{se:coltab} (for axes, annotation, coloured markers
 and borders);
 \item line graphics: \htmlref{contouring}{CONTOUR}; histogram; \htmlref{line
-plots}{LINPLOT} of one-dimensional arrays, and \htmlref{multiple-line
-plot}{MLINPLOT} of images; \htmlref{pie sections}{ELPROF}, and slices
-through an image; \htmlref{vector plot}{VECPLOT} of image.
+plot}{LINPLOT} of one-dimensional arrays, \htmlref{multiple-line
+plot}{MLINPLOT} of images, and a \htmlref{grid of line plots}{CLINPLOT}
+for cubes; \htmlref{pie sections}{ELPROF}, and slices
+through an image; \htmlref{vector plot}{VECPLOT} of an image.
 \item many aspects of the appearance of line graphics can be tailored
 to individual needs and stored within \htmlref{`style files'}{se:style}.
 \end{itemize} 
@@ -1099,10 +1101,11 @@ and \IRAF, using an automatic-data conversion facility
 (\CONVERTref\normalsize , \xref{SSN/20}{ssn20}{}).  
 
 Although oriented to image processing, many commands will work on NDFs
-of arbitrary dimension and others operate on both spectra and images.
-Many applications handle all non-complex data types directly, for
-efficient memory and disc usage.  Those that do not will usually
-undergo automatic data conversion to produce the desired result.
+of arbitrary dimension and others operate on both spectra and images,
+and cubes.  Many applications handle all non-complex data types
+directly, for efficient memory and disc usage.  Those that do not will
+usually undergo automatic data conversion to produce the desired
+result.
 
 \KAPPA's graphics are produced using the widely used
 \PGPLOTref\ \normalsize package, and are thus device independent.  
@@ -50645,6 +50648,15 @@ The following applications have been modified:
           CLEAR.
       \end{itemize}
 
+   \item [\htmlref{CONVOLVE}{CONVOLVE}] \mbox{}
+      \begin{itemize}
+         \item This application can now smooth three-dimensional NDFs,
+         in the sense that it will apply the PSF convolution to all 
+         the two-dimensional planes within a three-dimensional NDF 
+         independently.  The smoothing plane can be parallel to any face 
+         of the cube and is defined by a new parameter AXES.
+      \end{itemize}
+       
    \item [\htmlref{COPYBAD}{COPYBAD}] \mbox{}
       \begin{itemize}
          \item COPYBAD now has an extra parameter called INVERT which, if set
@@ -50683,7 +50695,8 @@ The following applications have been modified:
          in the sense that it will smooth all the two-dimensional planes 
          within a three-dimensional NDF independently, using the same 
          two-dimensional Gaussian filter.  The smoothing plane can be 
-         parallel to any face of the cube.
+         parallel to any face of the cube, and is defined by a new 
+         parameter AXES.
       \end{itemize}
        
    \item [\htmlref{HISTOGRAM}{HISTOGRAM}] \mbox{}
