@@ -43,10 +43,12 @@
 #undef rtdEVT_POSIX 
 #endif 
 #ifdef __cplusplus
+#ifndef CONST
 extern "C" {
 #define CONST const
 #else
 #define CONST
+#endif
 #endif
 
 /*
