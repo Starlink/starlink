@@ -414,13 +414,15 @@ itcl::class gaia::GaiaSpectralPlot {
       }
 
       #  When autoscaling (or just created one of the plots), set the frameset
-      #  and the NDF data units.
+      #  and the NDF data units, and the offset to the start of the spectrum.
       if { $autoscale || $itk_option(-autoscale) } {
-         set frameset [$accessor getaxiswcs $axis [expr $alow -1]]
+         set frameset [$accessor getaxiswcs $axis]
+
          $itk_component(canvas) itemconfigure $spectrum_ -frameset $frameset
          $itk_component(canvas) itemconfigure $spectrum_ \
             -dataunits [$accessor getc units] \
-            -datalabel [$accessor getc label]
+            -datalabel [$accessor getc label] \
+            -offset [expr $alow -1]
       }
 
       #  Pass in the data.
@@ -523,6 +525,8 @@ itcl::class gaia::GaiaSpectralPlot {
             #  World to grid.
             set frameset [$itk_component(canvas) itemcget $spectrum_ -frameset]
             set ind [gaiautils::getaxiscoord $frameset $x0 0]
+
+            puts "ind = $ind"
 
             eval $itk_option(-ref_line_changed_cmd) $id $ind $mode
          }
