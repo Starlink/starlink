@@ -850,11 +850,21 @@ itcl::class gaia::GaiaCube {
             update ;# Make sure plot is created first.
             set_spec_ref_coord 1 $coord
          }
+
+         #  And reposition any graphics, if the collapse bounds have changed. 
+         if { $lb != $llb_ || $ub != $lub_ } {
+            $spectrum_ fitxy
+         }
+
       } else {
          busy {
             $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh $ix $iy 0
          }
       }
+      
+      #  Record collapse bounds, these are checked.
+      set llb_ $lb
+      set lub_ $ub
    }
 
    #  Convert grid indices to pixel indices along image axes.
@@ -1187,6 +1197,11 @@ itcl::class gaia::GaiaCube {
    #  A list of temporary files, these will be deleted when the object
    #  is destroyed.
    protected variable temp_files_ ""
+   
+   #  Last lower and upper collapse bounds. When these change any reference
+   #  graphics should be updated.
+   protected variable llb_ ""
+   protected variable lub_ ""
 
    #  Common variables: (shared by all instances)
    #  -----------------
