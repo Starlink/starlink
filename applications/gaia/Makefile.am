@@ -111,13 +111,11 @@ $(GAIA_FILES): $(SKYCAT_FILES) $(SKYCAT_TEST_FILES)
 ##  Clean recurses into these directories.
 clean-local:
 	- rm -r -f built
-	- (cd tcl; make clean )
 	- (cd skycat; make clean )
 	- (cd gaia; make clean )
 
 distclean-local:
 	- rm -r -f built
-	- (cd tcl; make distclean )
 	- (cd skycat; make distclean )
 	- (cd gaia; make distclean )
 
@@ -125,7 +123,7 @@ distclean-local:
 MAINTAINERCLEANFILES = $(SKYCAT_FILES) $(GAIA_FILES)
 
 ##  Need all the source code in the sub-directories.
-EXTRA_DIST = gaia skycat tcl gaia.news sun214fig.ps gaia.htx
+EXTRA_DIST = gaia skycat gaia.news sun214fig.ps gaia.htx
 
 ##  Additional files. These have traditionally gone into bindir.
 gaiasupportdir = $(bindir)
@@ -142,7 +140,6 @@ demodata.tar:
 dist-hook:
 	rm -rf `find $(distdir) -type d -name CVS`
 	rm -rf `find $(distdir) -type l`
-	- (cd $(distdir)/tcl; make distclean);
 	- (cd $(distdir)/skycat; make distclean);
 	- (cd $(distdir)/gaia; make distclean);
 
