@@ -2622,7 +2622,7 @@ package kappa {
             vpath PROMPT
             ppath GLOBAL CURRENT
             association <->GLOBAL.DATA_ARRAY
-            prompt {The NDF to be modified}
+            prompt {The NDF to be read or modified}
             helpkey *
           }
 
