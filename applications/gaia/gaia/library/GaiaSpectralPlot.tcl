@@ -526,8 +526,6 @@ itcl::class gaia::GaiaSpectralPlot {
             set frameset [$itk_component(canvas) itemcget $spectrum_ -frameset]
             set ind [gaiautils::getaxiscoord $frameset $x0 0]
 
-            puts "ind = $ind"
-
             eval $itk_option(-ref_line_changed_cmd) $id $ind $mode
          }
 
