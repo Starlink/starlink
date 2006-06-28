@@ -50,6 +50,8 @@ extern "C" {
 #include "gaiaUtils.h"
 
 /* Local prototypes */
+static int GaiaUtilsAstCopy( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
@@ -78,6 +80,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
 {
     Tcl_CreateObjCommand( interp, "gaiautils::getroiplots",
                           GaiaUtilsGtROIPlots,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::astcopy", GaiaUtilsAstCopy,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -119,6 +125,43 @@ int GaiaUtils_Init( Tcl_Interp *interp )
 
     return TCL_OK;
 }
+
+/**
+ * Create a deep copy of an AST object.
+ *
+ * There is one argument, the address of the AST object. The result
+ * is the address of the new object.
+ */
+static int GaiaUtilsAstCopy( ClientData clientData, Tcl_Interp *interp,
+                             int objc, Tcl_Obj *CONST objv[] )
+{
+    AstObject *newObject;
+    AstObject *oldObject;
+    long adr;
+
+    /* Check arguments, only allow one. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "object" );
+        return TCL_ERROR;
+    }
+
+    /* Get the object */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    oldObject = (AstObject *) adr;
+
+    /* Export the new object as a long containing the address */
+    newObject = (AstObject *) astCopy( oldObject );
+    if ( astOK ) {
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) newObject ) );
+        return TCL_OK;
+    }
+    astClearStatus;
+    Tcl_SetResult( interp, "Failed to copy an AST object", TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
 
 /**
  * Get the value of an AST attribute from a FrameSet.
@@ -198,17 +241,27 @@ static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
 /**
  * Show an AST object, useful for debugging.
  *
- * Just one argument, the address of the object.
+ * First argument is the address of the object and the second the type of
+ * display required, native, FITS or XML. Default is native. If a third
+ * argument is given it can only be the encoding type for a FITS channel.
  */
+static void write_out( const char *card )
+{
+    fprintf( stdout, "%s\n", card );
+}
 static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] )
 {
+    AstFitsChan *fitschan;
     AstObject *object;
+    AstXmlChan *xmlchan;
+    int nwrite;
     long adr;
 
-    /* Check arguments, only allow one. */
-    if ( objc != 2 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "ast_object" );
+    /* Check arguments, allo up to three  */
+    if ( objc < 2 || objc > 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, 
+                          "ast_object [native|FITS|XML] [FITSencoding]" );
         return TCL_ERROR;
     }
 
@@ -218,8 +271,45 @@ static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
     }
     object = (AstObject *) adr;
 
-    astShow( object );
-
+    /* Determine type of channel */
+    nwrite = 0;
+    if ( objc == 2 || strcmp( Tcl_GetString( objv[2] ), "native" ) == 0 ) {
+        astShow( object );
+        nwrite = 1;
+        if ( !astOK ) {
+            Tcl_SetResult( interp, "Failed to write object via native channel",
+                           TCL_VOLATILE );
+        }
+    }
+    else if ( strcmp( Tcl_GetString( objv[2] ), "FITS" ) == 0 ) {
+        if ( objc == 4 ) {
+            fitschan = (AstFitsChan *) astFitsChan( NULL, &write_out,
+                                                    "Encoding=%s",
+                                                    Tcl_GetString( objv[3] ) );
+        } 
+        else {
+            fitschan = (AstFitsChan *) astFitsChan( NULL, &write_out, "" );
+        }
+        nwrite = astWrite( fitschan, object );
+        if ( !astOK || nwrite == 0 ) {
+            Tcl_SetResult( interp, "Failed to write object via FITS channel",
+                           TCL_VOLATILE );
+        }
+        fitschan = (AstFitsChan *) astAnnul( fitschan );
+    }
+    else if ( strcmp( Tcl_GetString( objv[2] ), "XML" ) == 0 ) {
+        xmlchan = (AstXmlChan *) astXmlChan( NULL, &write_out, "" );
+        nwrite = astWrite( xmlchan, object );
+        if ( !astOK || nwrite == 0 ) {
+            Tcl_SetResult( interp, "Failed to write object via XML channel",
+                           TCL_VOLATILE );
+        }
+        xmlchan = (AstXmlChan *) astAnnul( xmlchan );
+    }
+    if ( !astOK || nwrite == 0 ) {
+        if ( !astOK ) astClearStatus;
+        return TCL_ERROR;
+    }
     return TCL_OK;
 }
 
@@ -457,10 +547,8 @@ static int GaiaUtilsGtAxisCoord( ClientData clientData, Tcl_Interp *interp,
  * Extract a WCS for a specific axis from a full WCS. The result is
  * the address of an AST FrameSet.
  *
- * There are four arguments, the address of the AST FrameSet, the axis to
- * extract, an offset and the coordinate of a value along the axis.  The
- * offset is for the GRID domain and is used when a section of a WCS is
- * required (set this to 0 when not needed, this is the NDF origin).
+ * There are two arguments, the address of the AST FrameSet and the axis to
+ * extract.
  */
 static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] )
@@ -469,14 +557,12 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
     AstFrameSet *axiswcs;
     char *error_mess;
     int axis;
-    int offset;
     int result;
     long adr;
 
-    /* Check arguments, only allow three, the frameset and an axis number, plus
-     * offset */
-    if ( objc != 4 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "frameset axis offset" );
+    /* Check arguments, only allow two, the frameset and an axis number. */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset axis" );
         return TCL_ERROR;
     }
 
@@ -486,16 +572,12 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
     }
     fullwcs = (AstFrameSet *) adr;
 
-    /* Get the axis and offset */
+    /* Get the axis */
     axis = -1;
-    offset = 0;
     if ( Tcl_GetIntFromObj( interp, objv[2], &axis ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    if ( Tcl_GetIntFromObj( interp, objv[3], &offset ) != TCL_OK ) {
-        return TCL_ERROR;
-    }
-    result= gaiaUtilsGtAxisWcs( fullwcs, axis, offset, &axiswcs, &error_mess );
+    result= gaiaUtilsGtAxisWcs( fullwcs, axis, &axiswcs, &error_mess );
 
     /* Export the new WCS as a long containing the address */
     if ( result == TCL_OK ) {
