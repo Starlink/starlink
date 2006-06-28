@@ -210,12 +210,10 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Return a WCS describing the coordinates of a given WCS axis. Note axes
    #  may or may not be fixed to a given dataset axis, that isn't worried
-   #  about here. The shift value is used when an offset in grid position
-   #  along the axis is required (set to 0 for no effect). Usually this will
-   #  be the alow value used in a call to getspectrum.
-   public method getaxiswcs {axis shift} {
+   #  about here. 
+   public method getaxiswcs {axis} {
       set wcs [${type_}::getwcs $handle_]
-      return [gaiautils::getaxiswcs $wcs $axis $shift]
+      return [gaiautils::getaxiswcs $wcs $axis]
    }
 
    #  Return the address of a spectral line of data. This will only
