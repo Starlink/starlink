@@ -123,8 +123,8 @@ extern "C" {
     int gaiaNDFGtWcs( int ndfid, AstFrameSet **iwcs, char **error_mess );
 
     /* Get a frameset for a specified axis */
-    int gaiaNDFGtAxisWcs( int ndfid, int axis, int offset, 
-                          AstFrameSet **iwcs, char **error_mess );
+    int gaiaNDFGtAxisWcs( int ndfid, int axis, AstFrameSet **iwcs, 
+                          char **error_mess );
 
 #ifdef __cplusplus
 }

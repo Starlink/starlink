@@ -1306,11 +1306,9 @@ int gaiaNDFGtWcs( int ndfid, AstFrameSet **iwcs, char **error_mess )
 
 /**
  * Get an AST frameset that describes the coordinates of a given axis.
- * Axes are in the AST sense, i.e. start at 1. The offset value is a shift
- * that should be applied to the GRID coordinates (useful when the NDF data
- * has been sectioned outside of the NDF library, this is the origin).
+ * Axes are in the AST sense, i.e. start at 1.
  */
-int gaiaNDFGtAxisWcs( int ndfid, int axis, int offset, AstFrameSet **iwcs,
+int gaiaNDFGtAxisWcs( int ndfid, int axis, AstFrameSet **iwcs, 
                       char **error_mess )
 {
    AstFrameSet *fullwcs;
@@ -1319,7 +1317,7 @@ int gaiaNDFGtAxisWcs( int ndfid, int axis, int offset, AstFrameSet **iwcs,
    if ( gaiaNDFGtWcs( ndfid, &fullwcs, error_mess ) == 1 ) {
        return TCL_ERROR;
    }
-   result = gaiaUtilsGtAxisWcs( fullwcs, axis, offset, iwcs, error_mess );
+   result = gaiaUtilsGtAxisWcs( fullwcs, axis, iwcs, error_mess );
    fullwcs = (AstFrameSet *) astAnnul( fullwcs );
    return result;
 }
