@@ -42,14 +42,17 @@
 #define _POSIX_SOURCE 1
 #undef rtdEVT_POSIX 
 #endif 
+
 #ifdef __cplusplus
-#ifndef CONST
 extern "C" {
+#ifndef CONST
 #define CONST const
-#else
+#endif
+#else  /* __cplusplus */
+#ifndef CONST
 #define CONST
 #endif
-#endif
+#endif /* __cplusplus */
 
 /*
  * DEFINES
