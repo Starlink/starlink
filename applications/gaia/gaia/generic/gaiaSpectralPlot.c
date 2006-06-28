@@ -107,6 +107,7 @@ typedef struct SPItem  {
     int linewidth;              /* Width of polyline */
     int newplot;                /* Whether to regenerate plot */
     int numPoints;              /* Number of data values */
+    int offset;                 /* The offset of the given spectrum along the base frame of the FrameSet (NDF origin -1 ). */
     int showaxes;               /* Whether to show the grid */
     int xminmax;                /* If true then use min->max X coordinates */
 } SPItem;
@@ -163,11 +164,14 @@ static Tk_ConfigSpec configSpecs[] = {
     {TK_CONFIG_COLOR, "-linecolour", (char *) NULL, (char *) NULL,
      "blue", Tk_Offset(SPItem, linecolour), TK_CONFIG_NULL_OK},
 
-    {TK_CONFIG_COLOR, "-reflinecolour", (char *) NULL, (char *) NULL,
-     "green", Tk_Offset(SPItem, reflinecolour), TK_CONFIG_NULL_OK},
-
     {TK_CONFIG_PIXELS, "-linewidth", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(SPItem, linewidth), TK_CONFIG_DONT_SET_DEFAULT},
+
+    {TK_CONFIG_INT, "-offset", (char *) NULL, (char *) NULL,
+     "0.0", Tk_Offset(SPItem, offset), TK_CONFIG_DONT_SET_DEFAULT},
+
+    {TK_CONFIG_COLOR, "-reflinecolour", (char *) NULL, (char *) NULL,
+     "green", Tk_Offset(SPItem, reflinecolour), TK_CONFIG_NULL_OK},
 
     {TK_CONFIG_BOOLEAN, "-showaxes", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(SPItem, showaxes), TK_CONFIG_DONT_SET_DEFAULT},
@@ -1389,7 +1393,7 @@ static void GeneratePlotFrameSet( SPItem *spPtr )
      */
     tmpPtr = spPtr->tmpPtr[0];
     for ( i = 0; i < spPtr->numPoints; i++ ) {
-        tmpPtr[i] = (double) ( i + 1 );
+        tmpPtr[i] = (double) ( i + 1 + spPtr->offset );
     }
     astTran1( spPtr->framesets[0], spPtr->numPoints, tmpPtr, 1,
               spPtr->coordPtr );
