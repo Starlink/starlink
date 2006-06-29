@@ -76,6 +76,8 @@
 *  History:
 *     6-JUN-2003 (DSB):
 *        Original version.
+*     29-JUN-2006 (DSB):
+*        Only close log file if it was opened.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -183,7 +185,7 @@
       CALL GRP_DELET( IGRP, STATUS )
 
 *  Close the file.
-      CALL FIO_ANNUL( FD, STATUS )
+      IF( LOG ) CALL FIO_ANNUL( FD, STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )
