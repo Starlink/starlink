@@ -80,7 +80,10 @@ f     The detailed behaviour of AST_READ and AST_WRITE, when used with
 c     all use of astRead is destructive, so that FITS header cards
 f     all use of AST_READ is destructive, so that FITS header cards
 *     are consumed in the process of reading an Object, and are
-*     removed from the FitsChan.
+*     removed from the FitsChan (this deletion can be prevented for 
+*     specific cards by calling the 
+c     astRetainFits function).
+f     AST_RETAINFITS routine).
 *
 *     If the encoding in use allows only a single Object description
 *     to be stored in a FitsChan (e.g. the DSS, FITS-WCS and FITS-IRAF
@@ -128,6 +131,8 @@ c     - astPutFits: Store a FITS header card in a FitsChan
 f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 c     - astPutCards: Stores a set of FITS header card in a FitsChan
 f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
+c     - astRetainFits: Ensure current card is retained in a FitsChan
+f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
@@ -681,6 +686,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *     26-MAY-2006 (DSB):
 *        Guard against NULL comment pointer when converting RESTFREQ to 
 *        RESTFRQ in SpecTrans.
+*     29-JUN-2006 (DSB):
+*        Added astRetainFits.
 *class--
 */
 
@@ -832,6 +839,14 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
    Two different levels of "newness" are available. */
 #define NEW1 4
 #define NEW2 8
+
+/* "PROTECTED" - This flag indicates that the the card should not be
+   removed form the FitsChan when an Object is read using astRead. If
+   this flag is not set, then the card will dehave as if it has been 
+   deleted if it was used in the construction of the returned AST Object. */
+#define PROTECTED 16
+
+
 
 /* Include files. */
 /* ============== */
@@ -1194,6 +1209,7 @@ static void DistortMaps( AstFitsChan *, FitsStore *, char, int , AstMapping **, 
 static void Dump( AstObject *, AstChannel * );
 static void Empty( AstFitsChan * );
 static void FindWcs( AstFitsChan *, int, const char *, const char * );
+static void RetainFits( AstFitsChan * );
 static void SetFitsCF( AstFitsChan *, const char *, double *, const char *, int );
 static void SetFitsCI( AstFitsChan *, const char *, int *, const char *, int );
 static void SetFitsCN( AstFitsChan *, const char *, const char *, const char *, int );
@@ -14504,6 +14520,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name ) {
    vtab->PutCards = PutCards;   
    vtab->PutFits = PutFits;   
    vtab->DelFits = DelFits;   
+   vtab->RetainFits = RetainFits;   
    vtab->FindFits = FindFits;   
    vtab->KeyFields = KeyFields;
    vtab->Empty = Empty;
@@ -17518,9 +17535,9 @@ static void MarkCard( AstFitsChan *this ){
 *  Description:
 *     The current card is marked as having been "provisionally used" in
 *     the construction of an AST object. If the Object is constructed 
-*     succesfully, such cards are marked as havign been definitely used,
+*     succesfully, such cards are marked as having been definitely used,
 *     and they are then considered to have been removed from the FitsChan.
-
+ 
 *  Parameters:
 *     this
 *        Pointer to the FitsChan containing the list of cards.
@@ -17536,10 +17553,12 @@ static void MarkCard( AstFitsChan *this ){
    is not defined. */
    if( !astOK || !this->card ) return;
 
-/* Set the PROVISIONALLY_USED flag in the current card. */
+/* Set the PROVISIONALLY_USED flag in the current card, but only if the
+   PROTECTED flag is not set. */
    flags = ( (FitsCard *) this->card )->flags;
-   ( (FitsCard *) this->card )->flags = flags | PROVISIONALLY_USED;
-
+   if( !( flags & PROTECTED ) ) {
+      ( (FitsCard *) this->card )->flags = flags | PROVISIONALLY_USED;
+   }
 }
 
 static int MoveCard( AstFitsChan *this, int move, const char *method,
@@ -20081,6 +20100,70 @@ static void ReadFromSource( AstFitsChan *this ){
       astSetCard( this, icard );
 
    }
+
+}
+
+static void RetainFits( AstFitsChan *this ){
+/*
+*++
+*  Name:
+c     astRetainFits
+f     AST_RetainFITS
+
+*  Purpose:
+*     Indicate that the current card in a FitsChan should be retained.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "fitschan.h"
+c     void astRetainFits( AstFitsChan *this )
+f     CALL AST_RETAINFITS( THIS, STATUS )
+
+*  Class Membership:
+*     FitsChan method.
+
+*  Description:
+c     This function 
+f     This routine
+*     stores a flag with the current card in the FitsChan indicating that
+*     the card should not be removed from the FitsChan when an Object is 
+*     read from the FitsChan using
+c     astRead.
+f     AST_READ.
+*
+*     Cards that have not been flagged in this way are removed when a
+*     read operation completes succesfully, but only if the card was used
+*     in the process of creating the returned AST Object. Any cards that
+*     are irrelevant to the creation of the AST Object are retained whether 
+*     or not they are flagged.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the FitsChan.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - This function returns without action if the FitsChan is
+*     initially positioned at the "end-of-file" (i.e. if the Card
+*     attribute exceeds the number of cards in the FitsChan).
+*     - The current card is not changed by this function.
+*--
+*/
+
+/* Local variables: */
+   int flags;
+
+/* Return if the global error status has been set, or the current card
+   is not defined. */
+   if( !astOK || !this->card ) return;
+
+/* Set the PROTECTED flag in the current card. */
+   flags = ( (FitsCard *) this->card )->flags;
+   ( (FitsCard *) this->card )->flags = flags | PROTECTED;
 
 }
 
@@ -32730,7 +32813,10 @@ f     The detailed behaviour of AST_READ and AST_WRITE, when used with
 c     all use of astRead is destructive, so that FITS header cards
 f     all use of AST_READ is destructive, so that FITS header cards
 *     are consumed in the process of reading an Object, and are
-*     removed from the FitsChan.
+*     removed from the FitsChan (this deletion can be prevented for 
+*     specific cards by calling the 
+c     astRetainFits function).
+f     AST_RETAINFITS routine).
 *
 *     If the encoding in use allows only a single Object description
 *     to be stored in a FitsChan (e.g. the DSS, FITS-WCS and FITS-IRAF
@@ -33654,6 +33740,11 @@ void astDelFits_( AstFitsChan *this ){
    (**astMEMBER(this,FitsChan,DelFits))(this);
 }
 
+void astRetainFits_( AstFitsChan *this ){
+   if( !astOK ) return;
+   (**astMEMBER(this,FitsChan,RetainFits))(this);
+}
+
 int astFitsEof_( AstFitsChan *this ){
    if( !this ) return 1;
    return (**astMEMBER(this,FitsChan,FitsEof))( this );
@@ -33841,6 +33932,10 @@ static void ListFC( AstFitsChan *this, const char *ttl ) {
    this->card = cardo;
 } 
 */
+
+
+
+
 
 
 

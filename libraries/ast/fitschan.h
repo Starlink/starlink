@@ -197,6 +197,7 @@ typedef struct AstFitsChanVtab {
 /* Properties (e.g. methods) specific to this class. */
    void (* Empty)( AstFitsChan * );
    void (* DelFits)( AstFitsChan * );
+   void (* RetainFits)( AstFitsChan * );
    int (* FindFits)( AstFitsChan *, const char *, char [81], int );
    void (* PutFits)( AstFitsChan *, const char [81], int );
    void (* PutCards)( AstFitsChan *, const char * );
@@ -311,6 +312,7 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, AstFitsChanVtab *,
    void astPutCards_( AstFitsChan *, const char * );
    int  astFindFits_( AstFitsChan *, const char *, char [81], int );
    void astDelFits_( AstFitsChan * );
+   void astRetainFits_( AstFitsChan * );
    void astSetFitsCF_( AstFitsChan *, const char *, double *, const char *, int  );
    void astSetFitsCI_( AstFitsChan *, const char *, int *, const char *, int  );
    void astSetFitsF_( AstFitsChan *, const char *, double, const char *, int  );
@@ -442,6 +444,9 @@ astINVOKE(V,astPutCards_(astCheckFitsChan(this),cards))
 
 #define astDelFits(this) \
 astINVOKE(V,astDelFits_(astCheckFitsChan(this)))
+
+#define astRetainFits(this) \
+astINVOKE(V,astRetainFits_(astCheckFitsChan(this)))
 
 #define astFindFits( this, name, card, inc ) \
 astINVOKE(V,astFindFits_(astCheckFitsChan(this),name,card,inc))
