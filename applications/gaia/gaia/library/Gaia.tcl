@@ -1126,6 +1126,13 @@ itcl::class gaia::Gaia {
       }
    }
 
+   #  Create the polarimetry toolbox and display a catalogue (intended for us
+   #  as a remote control method).
+   public method display_polarimetry_catalog {catalog} {
+      make_toolbox polarimetry 0 1
+      return [$itk_component(polarimetry) opener $catalog]
+   }
+
    #  Start the demonstration toolbox.
    public method make_demo_toolbox {name {cloned 0}} {
       itk_component add $name {
