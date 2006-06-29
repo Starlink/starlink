@@ -590,6 +590,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *     26-JUN-2006 (DSB)
 *        Set the Direction attribute in the base Frame of a Plot if an
 *        axis is reversed.
+*     29-JUN-2006 (DSB)
+*        Guard against astGap calls that reach a minimum gap size.
 *class--
 */
 
@@ -14288,6 +14290,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
    int i;                    /* Axis index */
    int ihi;                  /* Highest tick mark index */
    int ilo;                  /* Lowest tick mark index */
+   int nochange;             /* No. of ineffective attempts to change gap size */
 
    static AstFrame *frame;          /* Pointer to the current Frame */
    static AstMapping *map;          /* Pointer to Base->Current Mapping */
@@ -14583,6 +14586,10 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
          gap_too_large = 0;
          gap_too_small = 0;
 
+/* So far, there have been no ineffective attempts to change the gap
+   size. */
+         nochange = 0;
+
 /* Loop round until a gap size is found which gives an acceptable number
    of tick marks. Upto 10 gap sizes are tried. */
          for( i = 0; i < 10 && astOK; i++ ){
@@ -14597,6 +14604,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
    otherwise we just retain the values created from the previous run with
    this gap size. */
             if( new_used_gap != used_gap ) {
+               nochange = 0;
                old_used_gap = used_gap;
                used_gap = new_used_gap;
                if( *ticks ) *ticks = astFree( *ticks );
@@ -14605,10 +14613,12 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
                                        used_gap, cen, ngood[ axis ], 
                                        ptr[ axis ], ticks );
 
-/* If the gap size has not changed do an extra pass through this loop. */
-            } else {
+/* If the gap size has not changed do an extra pass through this loop,
+   but only do this a maximum of 5 times in siccession. */
+            } else if( nochange < 5 ) {
+               nochange++;
                i--;
-            }
+            } 
 
 /* If the number of ticks is unacceptable, try a different gap size. If the
    gap was too large to produce any ticks, try using half the gap size. */
