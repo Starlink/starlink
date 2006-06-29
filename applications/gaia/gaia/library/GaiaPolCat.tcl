@@ -104,24 +104,12 @@ itcl::class gaia::GaiaPolCat {
 #  ===========
    destructor {
 
-#  If a large GaiaPolData is about to be destroyed, display a message 
-#  explaining what is going on and that it could take some time to complete...
+#  If a large GaiaPolData is about to be destroyed, then pause for a moment.
       if { [catch {set nrow [$data_ getNrow]}] } { set nrow 0 }
       if { $nrow > 10000 && [$data_ refCount] == 1 } {
-         set w .info_dialog
-         catch {destroy $w}
-         util::DialogWidget $w \
-               -title Information \
-               -text "Releasing resources for the very large\ncatalogue [$data_ getFile].\nThis could take a while. Please wait..." \
-               -buttons "" \
-               -bitmap info
-         tkwait visibility $w
          after 1000 {set a 1}
-         update idletasks
          tkwait variable a
-
          catch {$data_ annull}
-
          catch {destroy $w}
 
 #  If the catalogue is small, or if this is not the final reference to
