@@ -54,6 +54,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -69,6 +70,8 @@
 *     30-JAN-2006 (DSB):
 *        - Display source velocity in the current velocity system, if
 *        possible.
+*     28-JUN-2006 (TIMJ):
+*        Add some TimeFrame attributes.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -111,6 +114,7 @@
       CHARACTER SOR*30           ! Spectral standard of rest 
       CHARACTER SREFIS*10        ! Value of SkyFrame SkyRefIs attribute
       CHARACTER SYS*30           ! Sky coordinate system
+      CHARACTER TSC*30           ! Time Scale of TimeFrame
       DOUBLE PRECISION EP        ! Epoch of observation
       DOUBLE PRECISION EQ        ! Epoch of reference equinox
       DOUBLE PRECISION FD        ! Fraction of day (+ve)
@@ -258,7 +262,7 @@
 
 *  Display the system.
             CALL MSG_OUT( 'WCS_SYS', 
-     :                 IND( : NIND )//'System              : ^SYS ^OFF', 
+     :                 IND( : NIND )//'System              : ^SYS ^OFF',
      :                 STATUS )
 
 *  Display the reference position, if it is being used.
@@ -421,7 +425,7 @@
             IF( AST_TEST( FRM, 'RefRA', STATUS ) ) THEN
                POSBUF = ' '
                IAT = 0
-               CALL CHR_APPND( AST_GETC( FRM, 'RefRA', STATUS ), POSBUF, 
+               CALL CHR_APPND( AST_GETC( FRM, 'RefRA', STATUS ), POSBUF,
      :                         IAT )
                CALL CHR_APPND( ',', POSBUF, IAT )
                IAT = IAT + 1
@@ -475,6 +479,74 @@
      :                STATUS )
 
             END IF
+
+*  If the Frame is a TimeFrame, display its attributes
+         ELSE IF ( AST_ISATIMEFRAME( FRM, STATUS ) ) THEN
+
+*  Time System
+            SYS = AST_GETC( FRM, 'SYSTEM', STATUS )
+            IF ( SYS .EQ. 'MJD' ) THEN
+               LABEL = 'Modified Julian Date'
+            ELSE IF ( SYS .EQ. 'JD' ) THEN
+               LABEL = 'Julian Date'
+            ELSE IF ( SYS .EQ. 'JEPOCH' ) THEN
+               LABEL = 'Julian Epoch'
+            ELSE IF ( SYS .EQ. 'BEPOCH' ) THEN
+               LABEL = 'Besselian Epoch'
+            ELSE
+               LABEL = SYS
+            END IF
+
+            CALL MSG_SETC( 'SYS', LABEL )
+            CALL MSG_SETC( 'SYS', ' (' )
+            CALL MSG_SETC( 'SYS', AST_GETC( FRM, 'UNIT(1)', STATUS ) ) 
+            CALL MSG_SETC( 'SYS', ')' )
+            CALL MSG_OUT( 'WCS_SYS', 
+     :                 IND( : NIND )//'System              : ^SYS', 
+     :                 STATUS )
+
+*  Time Scale
+            TSC = AST_GETC( FRM, 'TIMESCALE', STATUS )
+            IF ( TSC .EQ. 'TAI' ) THEN
+               LABEL = 'International Atomic Time (TAI)'
+            ELSE IF ( TSC .EQ. 'UTC' ) THEN
+               LABEL = 'Coordinated Universal Time (UTC)'
+            ELSE IF ( TSC .EQ. 'UT1' ) THEN
+               LABEL = 'Universal Time (UT1)'
+            ELSE IF ( TSC .EQ. 'GMST' ) THEN
+               LABEL = 'Greenwich Mean Sidereal Time (GMST)'
+            ELSE IF ( TSC .EQ. 'LAST' ) THEN
+               LABEL = 'Local Apparent Sidereal Time (LAST)'
+            ELSE IF ( TSC .EQ. 'LMST' ) THEN
+               LABEL = 'Local Mean Sidereal Time (LMST)'
+            ELSE IF ( TSC .EQ. 'TT' ) THEN
+               LABEL = 'Terrestrial Time (TT)'
+            ELSE IF ( TSC .EQ. 'TDB' ) THEN
+               LABEL = 'Barycentric Dynamical Time (TDB)'
+            ELSE IF ( TSC .EQ. 'TCB' ) THEN
+               LABEL = 'Barycentric Coordinate Time (TCB)'
+            ELSE IF ( TSC .EQ. 'TCG' ) THEN
+               LABEL = 'Geocentric Coordinate Time (TCG)'
+            ELSE
+               LABEL = TSC
+            END IF
+
+            CALL MSG_SETC( 'TSC', LABEL )
+            CALL MSG_OUT( 'WCS_TSC', 
+     :                 IND( : NIND )//'Time Scale          : ^TSC', 
+     :                 STATUS )
+
+*  TimeOrigin
+            IF( AST_TEST( FRM, 'TimeOrigin', STATUS ) ) THEN
+               CALL MSG_SETC( 'TIMEOR',
+     :              AST_GETC( FRM, 'TIMEORIGIN', STATUS ) )
+            ELSE
+               CALL MSG_SETC( 'TIMEOR', '<not defined>' )
+            END IF
+
+            CALL MSG_OUT( 'WCS_TIMEOR',
+     :                 IND( : NIND )//'Time Origin         : ^TIMEOR',
+     :                 STATUS )
 
          END IF
 
