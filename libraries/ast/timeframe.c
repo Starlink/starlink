@@ -109,8 +109,9 @@ f     - AST_CURRENTTIME: Return the current system time
 *     1-MAR-2006 (DSB):
 *        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
 *     29-JUN-2006 (DSB):
-*        Activate astAbbrev function for abbreviating leading fields in
+*        - Activate astAbbrev function for abbreviating leading fields in
 *        plot labels.
+*        - Include TimeOrigin in default Label.
 *class--
 */
 
@@ -1541,7 +1542,7 @@ static double GetTimeOriginCur( AstTimeFrame *this ) {
 *  Description:
 *     This function returns the TimeOrigin attribute for a TimeFrame, in
 *     the current units of the TimeFrame. The protected astGetTimeOrigin
-*     method can be used to obtain the time origin in the defaultunits of 
+*     method can be used to obtain the time origin in the default units of 
 *     the TimeFrame's System.
 
 *  Parameters:
@@ -1839,7 +1840,10 @@ static const char *GetLabel( AstFrame *this, int axis ) {
    AstMapping *map;              /* Mapping between units */
    AstSystemType system;         /* Code identifying type of time coordinates */
    char *new_lab;                /* Modified label string */
+   const char *fmt;              /* Pointer to original Format string */
    const char *result;           /* Pointer to label string */
+   double orig;                  /* Time origin (seconds) */
+   int fmtSet;                   /* Was Format attribute set? */
    int ndp;                      /* Number of decimal places for seconds field */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
 
@@ -1862,7 +1866,8 @@ static const char *GetLabel( AstFrame *this, int axis ) {
 
 /* If the Format attribute indicates that time values will be formatted
    as dates, then choose a suitable label. */
-      if( DateFormat( astGetFormat( this, 0 ), &ndp ) ) {
+      fmt = astGetFormat( this, 0 );
+      if( DateFormat( fmt, &ndp ) ) {
          result = ( ndp >= 0 ) ? "Date/Time" : "Date";
 
 /* Otherwise, identify the time coordinate system described by the 
@@ -1874,6 +1879,35 @@ static const char *GetLabel( AstFrame *this, int axis ) {
          if ( astOK ) {
             result = strcpy( buff, SystemLabel( system ) );
             buff[ 0 ] = toupper( buff[ 0 ] );
+
+/* If a non-zero TimeOrigin has been specified, include the offset now as a 
+   date/time string. */
+            orig = astGetTimeOrigin( this );
+            if( orig != 0.0 ) {
+
+/* Save the Format attribute, and then temporarily set it to give a date/time 
+   string. */
+               fmtSet = astTestFormat( this, 0 );
+               astSetFormat( this, 0, "iso.0" );
+
+/* Format the origin value as an absolute time and append it to the
+   returned label string. Note, the origin always corresponds to a
+   TimeFrame axis value of zero. */
+               sprintf( buff + strlen( buff ), " offset from %s", 
+                        astFormat( this, 0, 0.0 ) );
+
+/* Re-instate the original Format value. */
+               if( fmtSet ) {
+                  astSetFormat( this, 0, fmt );                        
+               } else {
+                  astClearFormat( this, 0 );
+               }
+
+/* If the time of day is "00:00:00", remove it. */
+               if( !strcmp( buff + strlen( buff ) - 8, "00:00:00" ) ) {
+                  buff[ strlen( buff ) - 8 ] = 0;
+               }
+            }
 
 /* Modify this default to take account of the current value of the Unit 
    attribute, if set. */
