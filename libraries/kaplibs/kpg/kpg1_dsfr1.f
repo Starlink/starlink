@@ -121,6 +121,7 @@
       DOUBLE PRECISION IFF       ! Intermediate frequency
       DOUBLE PRECISION MJD       ! Modified Julian Date corresponding to Epoch
       DOUBLE PRECISION SRCVEL    ! Source velocity 
+      DOUBLE PRECISION TIMEOR    ! Time Origin
       DOUBLE PRECISION TMP       ! Temporary storage
       INTEGER FRM2               ! Modified copy of supplied Frame
       INTEGER FS                 ! FrameSet connecting original and modified Frames
@@ -538,8 +539,9 @@
 
 *  TimeOrigin
             IF( AST_TEST( FRM, 'TimeOrigin', STATUS ) ) THEN
+               TIMEOR = AST_GETD( FRM, 'TIMEORIGIN', STATUS );
                CALL MSG_SETC( 'TIMEOR',
-     :              AST_GETC( FRM, 'TIMEORIGIN', STATUS ) )
+     :              AST_FORMAT( FRM, 1, TIMEOR, STATUS ) )
             ELSE
                CALL MSG_SETC( 'TIMEOR', '<not defined>' )
             END IF
