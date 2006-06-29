@@ -161,6 +161,9 @@
 *        - SPECFRAME  -- A one-dimensional Frame representing positions
 *                        within an electromagnetic spectrum.
 *
+*        - TIMEFRAME  -- A one-dimensional Frame representing moments
+*                        in time.
+*
 *        [!]
 *     INVEXP = LITERAL (Read)
 *        The expressions to be used for the inverse co-ordinate 
@@ -394,6 +397,8 @@
 *        Remove unused variables and wrapped long lines.
 *     30-MAY-2006 (DSB)
 *        Changed ATL1 prefix to ATL.
+*     29-JUN-2006 (DSB)
+*        Added support for TimeFrames.
 *     {enter_further_changes_here}
 
 *-
@@ -784,6 +789,8 @@
             FRMTYP = 'SpecFrame'
          ELSE IF( AST_ISASKYFRAME( FRMB, STATUS ) ) THEN
             FRMTYP = 'SkyFrame'
+         ELSE IF( AST_ISATIMEFRAME( FRMB, STATUS ) ) THEN
+            FRMTYP = 'TimeFrame'
          ELSE
             FRMTYP = 'Frame'
          END IF
@@ -793,7 +800,8 @@
 
 *  Find the class for the new Frame.
          CALL PAR_CHOIC( 'FRMTYPE', FRMTYP, 'Frame,SkyFrame,'//
-     :                   'SpecFrame', .FALSE., FRMTYP, STATUS )
+     :                   'SpecFrame,TimeFrame', .FALSE., FRMTYP, 
+     :                   STATUS )
 
 *  If a null value was supplied, simply copy the basis Frame */
          IF( STATUS .EQ. PAR__NULL ) THEN
@@ -807,8 +815,13 @@
          ELSE
             IF( FRMTYP .EQ. 'SKYFRAME' ) THEN
                FRMN = AST_SKYFRAME( ' ', STATUS )
+
             ELSE IF( FRMTYP .EQ. 'SPECFRAME' ) THEN
                FRMN = AST_SPECFRAME( ' ', STATUS )
+
+            ELSE IF( FRMTYP .EQ. 'TIMEFRAME' ) THEN
+               FRMN = AST_TIMEFRAME( ' ', STATUS )
+
             ELSE 
                FRMN = AST_FRAME( AST_GETI( MAP, 'NOUT', STATUS ), ' ', 
      :                           STATUS )
