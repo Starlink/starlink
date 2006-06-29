@@ -16,6 +16,18 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- The FitsChan class has been changed so that it writes out a VELOSYS
+keyword when creating a FITS-WCS encoding (VELOSYS indicates the
+topocentric apparent velocity of the standard of rest). FitsChan also
+strips out VELOSYS keywords when reading a FrameSet from a FITS-WCS
+encoding.
+
+- The FitsChan class has a new method called astRetainFits (AST_RETAINFITS)
+that indicates that the current card in the FitsChan should not be
+stripped out of the FitsChan when an AST Object is read from the FitsChan.
+Unless this method is used, all cards that were involved in the creation
+of the AST Object will be stripped from the FitsChan afte a read operation.
+
 - The ast_link_adam and ast_link scripts now ignore the -fsla and -csla
 options, and always link against the minimal cut-down version of SLALIB
 distributed as part of AST.

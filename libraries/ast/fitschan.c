@@ -687,7 +687,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        Guard against NULL comment pointer when converting RESTFREQ to 
 *        RESTFRQ in SpecTrans.
 *     29-JUN-2006 (DSB):
-*        Added astRetainFits.
+*        - Added astRetainFits.
+*        - Consume VELOSYS FITS-WCS keywords when reading an object.
+*        - Write out VELOSYS FITS-WCS keywords when writing an object.
 *class--
 */
 
@@ -949,6 +951,7 @@ typedef struct FitsStore {
    double ***restfrq;
    double ***restwav;
    double ***zsource;
+   double ***velosys;
    double ***asip;
    double ***bsip;
    double ***apsip;
@@ -8385,6 +8388,7 @@ static void FindWcs( AstFitsChan *this, int last, const char *method, const char
              Match( keyname, "SPECSYS%0c", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "SSYSSRC%0c", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "ZSOURCE%0c", 0, NULL, &nfld, method, class ) ||
+             Match( keyname, "VELOSYS%0c", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "RESTFRQ%0c", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "MJD_AVG%0c", 0, NULL, &nfld, method, class ) ||
              Match( keyname, "OBSGEO-X", 0, NULL, &nfld, method, class ) ||
@@ -8789,6 +8793,7 @@ static FitsStore *FitsToStore( AstFitsChan *this, int encoding,
       ret->restfrq = NULL;
       ret->restwav = NULL;
       ret->zsource = NULL;
+      ret->velosys = NULL;
       ret->asip = NULL;
       ret->bsip = NULL;
       ret->apsip = NULL;
@@ -9038,6 +9043,7 @@ static FitsStore *FreeStore( FitsStore *store ){
    FreeItem( &(store->restfrq) );
    FreeItem( &(store->restwav) );
    FreeItem( &(store->zsource) );
+   FreeItem( &(store->velosys) );
    FreeItem( &(store->asip) );
    FreeItem( &(store->bsip) );
    FreeItem( &(store->apsip) );
@@ -9418,6 +9424,7 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
       ret->restfrq = NULL;
       ret->restwav = NULL;
       ret->zsource = NULL;
+      ret->velosys = NULL;
       ret->asip = NULL;
       ret->bsip = NULL;
       ret->apsip = NULL;
@@ -22277,8 +22284,8 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
    AstMapping *tmap5;      /* A temporary Mapping */
    AstMapping *tmap6;      /* A temporary Mapping */
    AstSpecFrame *specfrm;  /* The SpecFrame defining current WCS axis */
-   char *x_sys[ 4 ];       /* Basic spectral systems */
    char *cname;            /* Pointer to CNAME value */
+   char *x_sys[ 4 ];       /* Basic spectral systems */
    char ctype[ MXCTYPELEN ]; /* The value for the FITS CTYPE keyword */
    char lin_unit[ 20 ];    /* Linear spectral Units being used */
    char orig_system[ 40 ]; /* Value of System attribute for current WCS axis */
@@ -22293,11 +22300,11 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
    double geolat;          /* Geodetic latitude of observer (radians) */
    double geolon;          /* Geodetic longitude of observer (radians) */
    double gval;            /* Value of grism parameter at reference point  */
+   double imagfreq;        /* Image sideband equivalent to the rest frequency (Hz) */
    double lbnd_s;          /* Lower bound on spectral axis */
    double pv;              /* Value of projection parameter */
    double r;               /* Distance (in AU) from earth axis */
    double restfreq;        /* Rest frequency (Hz) */
-   double imagfreq;        /* Image sideband equivalent to the rest frequency (Hz) */
    double ubnd_s;          /* Upper bound on spectral axis */
    double vsource;         /* Rel.vel. of source (m/s) */
    double xval;            /* Value of "X" system at reference point  */
@@ -22309,6 +22316,7 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
    int npix;               /* Number of pixel axes */
    int nwcs;               /* Number of WCS axes */
    int paxis;              /* Axis index within primary Frame */
+   int sourcevrf;          /* Rest Frame in which SourceVel is accesed */
 
 /* Initialise */
    ret = NULL;
@@ -22796,7 +22804,34 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
                      cval = GetFitsSor( astGetC( specfrm, "SourceVRF" ) );
                      if( cval ) SetItemC( &(store->ssyssrc), 0, s, cval );
                   }
+               } else {
+                  vsource = AST__BAD;
                }
+
+/* Store the VELOSYS value (not strictly needed since it can be
+   determined from the other values, but FITS-WCS paper III says it can be
+   useful). We temporarily change the source velocity to be zero m/s
+   in the main rest frame (StdOfRest) (unless the main rest frame is
+   already the source rest frame). We then change the source rest
+   frame to topocentric and get the source velocity (i.e. the velocity of
+   the main rest Frame) in the topocentric system. We then re-instate the
+   original attribute values if they were set. */
+               if( astGetStdOfRest( specfrm ) != AST__SCSOR ) {
+                  sourcevrf = astGetSourceVRF( specfrm );
+                  astSetSourceVRF( specfrm, astGetStdOfRest( specfrm ) );
+                  astSetSourceVel( specfrm, 0.0 );
+               } else {
+                  vsource = AST__BAD;
+               }
+
+               astSetSourceVRF( specfrm, AST__TPSOR );
+               SetItem( &(store->velosys), 0, 0, s, 
+                        astGetSourceVel( specfrm ) );
+   
+               if( vsource != AST__BAD ){
+                  astSetSourceVRF( specfrm, sourcevrf );
+                  astSetSourceVel( specfrm, vsource );
+               } 
 
 /* Indicate that this axis has been described. */
                axis_done[ iax ] = 1;
@@ -26984,6 +27019,22 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
          jm = 0;
          s = keynam[ strlen( keynam ) - 1 ];
 
+/* Is this a primary VELOSYS keyword? */
+      } else if( Match( keynam, "VELOSYS", 0, fld, &nfld, method, class ) ){
+         item = &(store->velosys);
+         type = AST__FLOAT;
+         i = 0;
+         jm = 0;
+         s = ' ';
+
+/* Is this a secondary VELOSYS keyword? */
+      } else if( Match( keynam, "VELOSYS%1c", 0, fld, &nfld, method, class ) ){
+         item = &(store->velosys);
+         type = AST__FLOAT;
+         i = 0;
+         jm = 0;
+         s = keynam[ strlen( keynam ) - 1 ];
+
 /* Is this a primary RESTFRQ keyword? */
       } else if( Match( keynam, "RESTFRQ", 0, fld, &nfld, method, class ) ){
          item = &(store->restfrq);
@@ -27543,6 +27594,11 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
       val = GetItem( &(store->zsource), 0, 0, s, NULL, method, class );
       if( val != AST__BAD ) SetValue( this, FormatKey( "ZSOURCE", -1, -1, s ),
                                       &val, AST__FLOAT, "[] Redshift of source" );
+
+/* VELOSYS - topocentric apparent radial velocity of the standard of rest. */
+      val = GetItem( &(store->velosys), 0, 0, s, NULL, method, class );
+      if( val != AST__BAD ) SetValue( this, FormatKey( "VELOSYS", -1, -1, s ),
+                                      &val, AST__FLOAT, "[m/s] Topo. apparent velocity of rest frame" );
 
 /* RESTFRQ - rest frequency */
       val = GetItem( &(store->restfrq), 0, 0, s, NULL, method, class );

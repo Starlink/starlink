@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.22}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {25th May 2006}
+\newcommand{\stardocdate}      {29th June 2006}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -19235,7 +19235,8 @@ as the SourceVel attribute).}
 the SpecFrame, if it has been set explicitly (the SourceVel value is
 first converted from apparent radial velocity to redshift).}
 
-\fitskey{VELOSYS\emph{a}}{Ignored.}{Never written.}
+\fitskey{VELOSYS\emph{a}}{Ignored.}{Set from the attributes of the
+SpecFrame that define the standard of rest and the observers position.}
 
 \fitskey{RESTFRQ\emph{a}}{Used to set the RestFreq
 attribute of the SpecFrame.}{Set from the RestFreq attribute of the
@@ -21080,6 +21081,23 @@ occurred in the AST library between versions V4.1 and V4.2 (the
 current version):
 
 \begin{enumerate}
+
+\item The FitsChan class has been changed so that it writes out a VELOSYS
+keyword when creating a FITS-WCS encoding (VELOSYS indicates the topocentric 
+apparent velocity of the standard of rest). FitsChan also strips out VELOSYS 
+keywords when reading a FrameSet from a FITS-WCS encoding.
+
+\item The FitsChan class has a new method called 
+c+
+astRetainFits
+c-
+f+
+AST\_RETAINFITS
+f-
+that indicates that the current card in the FitsChan should not be
+stripped out of the FitsChan when an AST Object is read from the FitsChan.
+Unless this method is used, all cards that were involved in the creation
+of the AST Object will be stripped from the FitsChan afte a read operation.
 
 \item A problem with unaligned memory access that could cause bus errors on 
 Solaris has been fixed.
