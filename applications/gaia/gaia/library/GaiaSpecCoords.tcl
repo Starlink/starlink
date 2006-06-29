@@ -174,7 +174,12 @@ itcl::class gaia::GaiaSpecCoords {
          if { $system == "default" && [info exists default_system_($axis)] } {
             $accessor astset $default_system_($axis)
          } else {
-            $accessor astset "System($axis)=$system,Unit($axis)=$unit"
+            if { $unit != "" } {
+               $accessor astset "System($axis)=$system,Unit($axis)=$unit"
+            } else {
+               #  Unit-less system.
+               $accessor astset "System($axis)=$system"
+            }
          }
          if { $change_cmd != {} } {
             eval $change_cmd
@@ -258,5 +263,6 @@ itcl::class gaia::GaiaSpecCoords {
    common velocity_systems_ {
       "Metres-per-sec (radio)" "m/s" "VRAD"
       "Kilometres-per-sec (radio)" "km/s" "VRAD"
+      "Redshift" "" "ZOPT"
    }
 }
