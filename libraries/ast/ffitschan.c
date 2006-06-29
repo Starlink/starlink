@@ -20,6 +20,7 @@
 *     AST_ISAFITSCHAN
 *     AST_PUTCARDS
 *     AST_PUTFITS
+*     AST_RETAINFITS
 *     AST_SETFITS<X>
 *     AST_GETFITS<X>
 
@@ -332,6 +333,16 @@ F77_SUBROUTINE(ast_delfits)( INTEGER(THIS),
    astAt( "AST_DELFITS", NULL, 0 );
    astWatchSTATUS(
       astDelFits( astI2P( *THIS ) );   
+   )
+}
+
+F77_SUBROUTINE(ast_retainfits)( INTEGER(THIS),
+                             INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+
+   astAt( "AST_RETAINFITS", NULL, 0 );
+   astWatchSTATUS(
+      astretainFits( astI2P( *THIS ) );   
    )
 }
 
