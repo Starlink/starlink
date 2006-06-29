@@ -342,7 +342,7 @@ F77_SUBROUTINE(ast_retainfits)( INTEGER(THIS),
 
    astAt( "AST_RETAINFITS", NULL, 0 );
    astWatchSTATUS(
-      astretainFits( astI2P( *THIS ) );   
+      astRetainFits( astI2P( *THIS ) );   
    )
 }
 
