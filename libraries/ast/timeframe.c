@@ -108,6 +108,9 @@ f     - AST_CURRENTTIME: Return the current system time
 *        but use the ObsLat/ObsLon attributes internally.
 *     1-MAR-2006 (DSB):
 *        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
+*     29-JUN-2006 (DSB):
+*        Activate astAbbrev function for abbreviating leading fields in
+*        plot labels.
 *class--
 */
 
@@ -2608,13 +2611,8 @@ void astInitTimeFrameVtab_(  AstTimeFrameVtab *vtab, const char *name ) {
    parent_unformat = frame->Unformat;
    frame->Unformat = Unformat;
 
-/* Abbreviation of date fields doesn't look quite right at the moment, so
-   supress it. 
-
    parent_abbrev = frame->Abbrev;
    frame->Abbrev = Abbrev;
-
-*/
 
    parent_gap = frame->Gap;
    frame->Gap = Gap;
