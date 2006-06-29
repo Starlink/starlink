@@ -591,7 +591,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        Set the Direction attribute in the base Frame of a Plot if an
 *        axis is reversed.
 *     29-JUN-2006 (DSB)
-*        Guard against astGap calls that reach a minimum gap size.
+*        - Guard against astGap calls that reach a minimum gap size.
+*        - Sort out splitting of long axis labels (such as date/time
+*        strings produced by TimeFrames).
 *class--
 */
 
@@ -1745,7 +1747,7 @@ static TickInfo *TickMarks( AstPlot *, int, double *, double *, int *, const cha
 static char **CheckLabels2( AstPlot *, AstFrame *, int, double *, int, char **, double );
 static char *FindWord( char *, const char *, const char ** );
 static char *GrfItem( int, const char * );
-static const char *FormatValue( AstPlot *, AstFrame *, int, double );
+static const char *SplitValue( AstPlot *, const char *, int * );
 static const char *JustMB( AstPlot *, int, const char *, float *, float *, float, float, const char *, float, float, float, float, float *, float *, const char *, const char * );
 static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char * );
 static double GetTicks( AstPlot *, int, double *, double **, int *, int *, int, int *, double *, const char *, const char * );
@@ -5582,7 +5584,7 @@ static int CheckLabels( AstPlot *this, AstFrame *frame, int axis,
    val[ axis ] = ticks[ 0 ];
    val[ 1 - axis ] = refval;
    astNorm( frame, val );
-   label = FormatValue( this, frame, axis, val[ axis ] );
+   label = astFormat( frame, axis, val[ axis ] );
 
 /* Allocate memory holding a copy of the formatted value, and store a
    pointer to this copy in the list of labels. */
@@ -5598,7 +5600,7 @@ static int CheckLabels( AstPlot *this, AstFrame *frame, int axis,
       val[ axis ] = ticks[ i ];
       val[ 1 - axis ] = refval;
       astNorm( frame, val );
-      label = FormatValue( this, frame, axis, val[ axis ] );
+      label = astFormat( frame, axis, val[ axis ] );
       if( label ){
 
 /* Unless checks have been supressed, compare this label with the previous 
@@ -5730,7 +5732,7 @@ static char **CheckLabels2( AstPlot *this, AstFrame *frame, int axis,
          val[ axis ] = ticks[ i ];
          val[ 1 - axis ] = refval;
          astNorm( frame, val );
-         label = FormatValue( this, frame, axis, val[ axis ] );
+         label = astFormat( frame, axis, val[ axis ] );
          if( label ){
 
 /* Get the length of the new label. */
@@ -12051,134 +12053,6 @@ static char *FindWord( char *ptr, const char *d, const char **p ) {
    return ret;
 }
 
-
-static const char *FormatValue( AstPlot *this, AstFrame *frm, int axis, 
-                                double value ) {
-/*
-*  Name:
-*     FormatValue
-
-*  Purpose:
-*     Format a coordinate value for a Frame axis.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "timeframe.h"
-*     const char *FormatValue( AstPlot *this, AstFrame *frm, int axis, 
-*                              double value )
-
-*  Class Membership:
-*     Plot member function 
-
-*  Description:
-*     This function provides the same functionality as the Frame
-*     astFormat method, with the addition that long formatted values (such
-*     as the date/time format produced by the TimeFrame class) are split 
-*     if possible onto two line sby inclusion of Plot escape sequences.
-
-*  Parameters:
-*     this
-*        Pointer to the Plot.
-*     frm
-*        Pointer to the Frame.
-*     axis
-*        The number of the axis (zero-based) for which formatting is to be
-*        performed.
-*     value
-*        The coordinate value to be formatted, in radians.
-
-*  Returned Value:
-*     A pointer to a null-terminated string containing the formatted value.
-
-*  Notes:
-*     -  A NULL pointer will be returned if this function is invoked with the
-*     global error status set, or if it should fail for any reason.
-*/
-
-/* Local Variables: */
-   char *d;    
-   const char *result;    
-   int i;
-   int id;
-   int idmin;
-   int imin;
-   int l;
-   int lead_spaces;
-   int linelen;
-   int naft;
-   int nbef;
-   static char buf[ 200 ];
-
-/* Check the global error status. */
-   if ( !astOK ) return NULL;
-
-/* Format the value using the astFormat method. */
-   result = astFormat( frm, axis, value );
-
-/* Do nothing more if the formatted value already contains graphical
-   escape sequences, or if graphical escapes sequences are not being
-   interpreted. */
-   if( result && astGetEscape( this ) && !HasEscapes( result ) ) {
-
-/* Find a space close to the centre of the formatted string. */
-      l = strlen( result );
-      idmin = 2*l;
-      imin = -1;
-      for( i = 0; i < l; i++ ) {
-         if( isspace( result[ i ] ) ) {
-            id = abs( i - l/2 );
-            if( id < idmin ) {
-               idmin = id;
-               imin = i;
-            }
-         }
-      }
-
-/* Do nothing if no spaces were found */
-      if( imin != -1 ) {
-
-/* How many characters before and after the space? */
-         nbef = imin;
-         naft = l - imin - 1;         
-
-/* Find the length of the longer line (top or bottom). */
-         linelen = ( nbef > naft ) ? nbef : naft;
-
-/* Copy the top line into the buffer, centering it by padding with spaces. */
-         for( i = 0; i < linelen; i++ ) buf[ i ] = ' ';
-         lead_spaces = ( linelen - nbef )/2;
-         for( i = 0; i < nbef; i++ ) buf[ i + lead_spaces ] = result[ i ];
-
-/* Add an escape sequence which moves the pen down 1 character height. */
-         d = buf + linelen;
-         d += sprintf( d, "%%v100+" );
-
-/* Add an escape sequence which moves the pen backwards 1 line length (this 
-   is approximate). */         
-         d += sprintf( d, "%%<%d+", (int) ( 60.0*linelen + 0.5 ) );
-
-/* Copy the bottom line into the buffer, centering it by padding with spaces. */
-         for( i = 0; i < linelen; i++ ) d[ i ] = ' ';
-         lead_spaces = ( linelen - naft )/2;
-         for( i = 0; i < naft; i++ ) d[ i + lead_spaces ] = result[ i + nbef + 1 ];
-
-/* Terminate it. */
-         d[ linelen ] = 0;         
-
-/* Return a pointer to the buffer. */
-         result = buf;         
-      }
-   }
-
-/* If an error occurred, clear the returned value. */
-   if ( !astOK ) result = NULL;
-
-/* Return the result. */
-   return result;
-}
-
 static AstFrameSet *Fset2D( AstFrameSet *fset, int ifrm ) {
 /*
 *  Name:
@@ -14618,7 +14492,14 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
             } else if( nochange < 5 ) {
                nochange++;
                i--;
-            } 
+
+            } else if( astOK ){
+               astError( AST__VSMAL, "%s(%s): Cannot produce enough major "
+                         "tick marks on axis %d using the current axis "
+                         "format (\"%s\").", method, class, axis + 1, 
+                         astGetFormat( frame, axis ) );
+               break;
+            }
 
 /* If the number of ticks is unacceptable, try a different gap size. If the
    gap was too large to produce any ticks, try using half the gap size. */
@@ -20393,8 +20274,8 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
    if( !astOK ) return ret;
 
 /* Get the bounds of the box containing the new label. */
-   DrawText( this, 0, esc, text, x, y, just, upx, upy, xbn, ybn, NULL,
-             method, class );
+   DrawText( this, 0, esc, text, x, y, just, upx, upy, 
+             xbn, ybn, NULL, method, class );
 
 /* If the bounding box was obtained succesfully... */
    if( astOK ) {
@@ -20539,6 +20420,7 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
    int root;              /* Index of unabbreviated label */
    int root_found;        /* Has the root label been decided on? */
    int rootoff;           /* Distance from middle to root label */
+   int split;             /* Indicates whether to split labels into 2 lines */
 
 /* Return without action if an error has occurred, or there are no labels to 
    draw. */
@@ -20591,6 +20473,10 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
       FindDPTZ( frame, axis, fmt, ll->text, &dp, &nz );
       if( dp > mxdp ) mxdp = dp;
    }
+
+/* Indicate that we do not yet know whether SplitValue should split labels
+   into two lines or not. */
+   split = 0;
 
 /* Find the highest priority label (the "root" label). This label is
    never abbreviated to remove leading fields, and is never omitted due to
@@ -20651,10 +20537,12 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
 
             if( !root_found ) {
 
-               if( axis == 0 || !Overlap( this, -1, esc, ll->text, (float) ll->x, 
-                                          (float) ll->y, ll->just, 
-                                          (float) ll->upx, (float) ll->upy, box,
-                                          method, class ) ) {
+               if( axis == 0 || !Overlap( this, -1, esc, 
+                                          SplitValue( this, ll->text, &split ), 
+                                          (float) ll->x, (float) ll->y, 
+                                          ll->just, (float) ll->upx, 
+                                          (float) ll->upy, box, method, 
+                                          class ) ) {
                   root = i;
                   rootoff = abs( i - lab0 );
 
@@ -20799,9 +20687,9 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
    boxes. */
       nleft = 1;
       ll = list + root;
-      olap = Overlap( this, -1, esc, ll->atext, (float) ll->x, (float) ll->y, 
-                      ll->just, (float) ll->upx, (float) ll->upy, box, 
-                      method, class );
+      olap = Overlap( this, -1, esc, SplitValue( this, ll->atext, &split ), 
+                      (float) ll->x, (float) ll->y, ll->just, (float) ll->upx, 
+                      (float) ll->upy, box, method, class );
 
 /* Now look for labels which would overlap. First, check labels above the root 
    label. Do not count overlaps where the two abbreviated labels have the same text. */
@@ -20811,9 +20699,10 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
          ll++;
          if( ll->priority >= 0 ) {
             if( strcmp( ll->atext, latext ) ) {
-               if( Overlap( this, -1, esc, ll->atext, (float) ll->x, (float) ll->y, 
-                         ll->just, (float) ll->upx, (float) ll->upy, box, 
-                         method, class ) ){
+               if( Overlap( this, -1, esc, SplitValue( this, ll->atext, &split ),
+                            (float) ll->x, (float) ll->y, ll->just, 
+                            (float) ll->upx, (float) ll->upy, box, method, 
+                            class ) ){
                   olap++;
                } else {
                   nleft++;
@@ -20830,9 +20719,10 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
          ll--;
          if( ll->priority >= 0 ) {
             if( strcmp( ll->atext, latext ) ) {
-               if( Overlap( this, -1, esc, ll->atext, (float) ll->x, (float) ll->y, 
-                            ll->just, (float) ll->upx, (float) ll->upy, box, 
-                            method, class ) ){
+               if( Overlap( this, -1, esc, SplitValue( this, ll->atext, &split ),
+                            (float) ll->x, (float) ll->y, ll->just, 
+                            (float) ll->upx, (float) ll->upy, box, method, 
+                            class ) ){
                   olap++;
                } else {
                   nleft++;
@@ -20902,19 +20792,20 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
    for( i = 0; i < nlab; i++ ) {
       ll++;
       if( ll->priority >= 0 ) {
-
+         
 /* Check that this label does not overlap any labels drawn for previous
    axes (we know from the above processing that it will not overlap any
    other label on the current axis). */
-         if( !Overlap( this, -1, esc, ll->atext, (float) ll->x, (float) ll->y, 
-                       ll->just, (float) ll->upx, (float) ll->upy, box, 
-                       method, class ) ) {
+         if( !Overlap( this, -1, esc, SplitValue( this, ll->atext, &split ), 
+                       (float) ll->x, (float) ll->y, ll->just, (float) ll->upx,
+                       (float) ll->upy, box, method, class ) ) {
 
 /* Draw the abbreviated label text, and get the bounds of the box containing 
-   the new label. */
-            DrawText( this, 1, esc, ll->atext, (float) ll->x, (float) ll->y, 
-                      ll->just, (float) ll->upx, (float) ll->upy, xbn, ybn, 
-                      NULL, method, class );
+   the new label, splitting long formatted values (such as produced by 
+   TimeFrames) into two lines. */
+            DrawText( this, 1, esc, SplitValue( this, ll->atext, &split ), 
+                      (float) ll->x, (float) ll->y, ll->just, (float) ll->upx, 
+                      (float) ll->upy, xbn, ybn, NULL, method, class );
          }
       }
    }
@@ -22208,6 +22099,196 @@ static void SetLogPlot( AstPlot *this, int axis, int ival ){
       }
    }
 } 
+
+static const char *SplitValue( AstPlot *this, const char *value, int *split ) {
+/*
+*  Name:
+*     FormatValue
+
+*  Purpose:
+*     Format a coordinate value for a Frame axis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     static const char *SplitValue( AstPlot *this, const char *value, 
+*                                    int *split )
+
+*  Class Membership:
+*     Plot member function 
+
+*  Description:
+*     This function splits long formatted values (such as the date/time 
+*     format produced by the TimeFrame class) if possible onto two lines
+*     by inclusion of Plot escape sequences.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     value
+*        The formatted coordinate value.
+*     split
+*        Pointer to an integer that controls behaviour:
+*
+*        0 - Split the line if it is too long, and return a value of +1
+*            in *split.
+*        1 - Split the line even if it does not need splitting, making
+*            the first line blank and the second line containing all the 
+*            supplied text (*split is unchanged on exit).
+
+*  Returned Value:
+*     A pointer to a static buffer containing a null-terminated string 
+*     holding the (possibly split) formatted value. This will be a copy of
+*     the supplied pointer if the string does not need to be split.
+
+*  Notes:
+*     -  A NULL pointer will be returned if this function is invoked with the
+*     global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   char *d;    
+   const char *result;    
+   float rsp;         
+   int aft_end;
+   int aft_start;
+   int bef_end;
+   int bef_start;
+   int i;
+   int id;
+   int idmin;
+   int imin;
+   int l;
+   int naft;
+   int nbef;
+   int nlong;
+   int nshort;
+   int nsp;       
+   static char buf[ 200 ];
+
+/* Initialise */
+   result = value;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Do nothing more if the formatted value already contains graphical
+   escape sequences, or if graphical escapes sequences are not being
+   interpreted. */
+   if( value && astGetEscape( this ) && !HasEscapes( value ) ) {
+
+/* We split the line if the line is long or if *split was non-zero on
+   entry. In this case always return *split equal to 1. */
+      l = strlen( value );
+      if( *split || l > 9 ) {
+         *split = 1;
+
+/* Find a space close to the centre of the formatted string. */
+         idmin = 2*l;
+         imin = -1;
+         for( i = 0; i < l; i++ ) {
+            if( isspace( value[ i ] ) ) {
+               id = abs( i - l/2 );
+               if( id < idmin ) {
+                  idmin = id;
+                  imin = i;
+               }
+            }
+         }
+
+/* Initialse the pointer into the returned buffer at which the next
+   character will be placed. */
+         d = buf;
+
+/* If no spaces were found... */
+         if( imin == -1 ) {
+
+/* Fill the first line with spaces. */
+            for( i = 0; i < l; i++ ) *(d++) = ' ';
+
+/* Add an escape sequence that moves down by one character height. */
+            d += sprintf( d, "%%v170+" );
+
+/* Add the whole of the supplied text. */
+            for( i = 0; i < l; i++ ) *(d++) = value[ i ];
+   
+/* If a space was found... */
+         } else {
+
+/* Find the first and last non-blank characters before the mid-space. */
+            bef_start = -1;
+            bef_end = -1;
+            for( i = 0; i < imin; i++ ) {
+               if( !isspace( value[ i ] ) ) {
+                  if( bef_start == -1 ) bef_start = i;
+                  bef_end = i;
+               }
+            }
+
+/* Find the first and last non-blank characters after the mid-space. */
+            aft_start = -1;
+            aft_end = -1;
+            for( i = imin + 1; i < l; i++ ) {
+               if( !isspace( value[ i ] ) ) {
+                  if( aft_start == -1 ) aft_start = i;
+                  aft_end = i;
+               }
+            }
+
+/* How many significant characters before and after the space? */
+            nbef = bef_end - bef_start + 1;
+            naft = aft_end - aft_start + 1;
+
+/* Get the lengths of the longer and shorter line. */
+            if( nbef > naft ) {
+               nlong = nbef;
+               nshort = naft;
+            } else {
+               nlong = naft;
+               nshort = nbef;
+            }
+
+/* Find the fractional number of spaces before the significant text of the 
+   shorter line.*/
+            rsp = 0.5*( nlong - nshort + 1 );
+  
+/* If the top line is the shorter line, put some spaces in at the start. */
+            if( nbef < naft ) {
+               nsp = (int) rsp;
+               for( i = 0; i < nsp; i++ ) *(d++) = ' ';
+            }
+
+/* Add the significant text from the top line. */
+            for( i = bef_start; i <= bef_end; i++ ) *(d++) = value[ i ];
+
+/* Add an escape sequence that moves down by one character height. */
+            d += sprintf( d, "%%v100+" );
+
+
+/* Add an escape sequence that moves to the left by the required amount. */
+            d += sprintf( d, "%%<%d+", (int) ( 60.0*( (float) nlong - rsp )) );
+
+/* Add the significant text from the bottom line. */
+            for( i = aft_start; i <= aft_end; i++ ) *(d++) = value[ i ];
+
+         }
+
+/* Terminate it. */
+         *d = 0;         
+
+/* Return a pointer to the buffer. */
+         result = buf;         
+      }
+   }
+
+/* If an error occurred, clear the returned value. */
+   if ( !astOK ) result = NULL;
+
+/* Return the result. */
+   return result;
+}
 
 const char *astStripEscapes_( const char *text ) {
 /*
@@ -23896,7 +23977,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* Not all subclasses of Frame support this format specifier, so format a 
    test value, and see if it has two fields, the first of which is "10".
    If not, we cannot use log labels so re-instate the original format. */
-      nf = astFields( frame, axis, "%&g", FormatValue( this, frame, axis, 1.0E4 ),
+      nf = astFields( frame, axis, "%&g", astFormat( frame, axis, 1.0E4 ),
                       MAXFLD, fields, nc, &junk );
       if( nf != 2 || nc[ 0 ] != 2 || strncmp( fields[ 0 ], "10", 2 ) ) {
          if( old_format ) {
