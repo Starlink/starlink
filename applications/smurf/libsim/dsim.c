@@ -1,4 +1,4 @@
-/* dsim - routines for supporting DREAM simulation */
+/* dsim - routines for supporting SCUBA-2 simulations */
 
 #include <errno.h>
 #include <stdio.h>
@@ -497,7 +497,6 @@ int *status          /* global status (given and returned) */
 
 }
 
-
 /*+ dsim_calctime - calculte UT + LST arrays given a start time */
 
 void dsim_calctime
@@ -556,6 +555,39 @@ int *status          /* global status (given and returned) */
     /* Calculate LST from GMST using telescope longitude */
     lst[i] = fmod(gst - lon + D2PI,D2PI);
   }
+}
+
+/*+ dsim_calctrans - calculate sky zenith % atmospheric transmission */
+
+void dsim_calctrans
+(
+double lambda,        /* wavelength in metres (given) */
+double *trans,        /* % atmospheric transmission (returned) */
+double tauCSO,        /* CSO optical depth (given) */
+int *status           /* global status (given and returned) */
+)
+
+/*  Description :
+     Calculate the atmospheric transmission equivalent to the given 
+     optical depth for this wavelength band.  This is essentially the
+     opposite of dsim_calctau.
+
+   Authors :
+    J.Balfour (UBC)
+
+   History :
+    19Jun2006:  original (jbalfour@phas.ubc.ca)
+*/
+
+{
+   if ( fabs ( lambda - 0.45e-3 ) < 0.1e-3 )
+   {
+      *trans = 100 / exp ( 26.2 * ( tauCSO - 0.014 ) );
+   }
+   else
+   {
+      *trans = 100 / exp ( 4.02 * ( tauCSO - 0.001 ) );
+   }
 }
 
 /*+ dsim_crepoints - simulate image of identical gaussian sources */
@@ -1111,6 +1143,7 @@ int *status                     /* global status */
    double current;                 /* bolometer current in amps */
    double flux;                    /* flux at bolometer in pW */
    int frame;                      /* frame counter */
+   double meanatm;                 /* mean expected atmospheric signal (pW) */
    double skytrans;                /* sky transmission (%) */
    double time;                    /* time from start of observation */
    double xpos;                    /* X measurement position */
@@ -1121,7 +1154,9 @@ int *status                     /* global status */
 
    if ( !StatusOkP(status) ) return; 
 
-
+   /* Get the mean atmospheric signal */
+   dsim_calctrans ( inx.lambda, &skytrans, sinx.tauzen, status );
+   dsim_atmsky ( inx.lambda, skytrans, &meanatm, status );
 
    for ( bol=0; bol<nboll; bol++ )
    {
@@ -1165,7 +1200,7 @@ int *status                     /* global status */
          }
          else
          {
-            atmvalue = sinx.meanatm;
+            atmvalue = meanatm;
          }
 
 /* Calculate atmospheric transmission */
@@ -1197,11 +1232,11 @@ int *status                     /* global status */
          if ( sinx.add_hnoise == 1 )
          {
             flux = flux + 
-	      ( inx.targetpow - sinx.meanatm - telemission ) * heater[bol];
+	      ( inx.targetpow - meanatm - telemission ) * heater[bol];
          }
 	 else
 	 {
-            flux = flux + ( inx.targetpow - sinx.meanatm - telemission );
+            flux = flux + ( inx.targetpow - meanatm - telemission );
          }
 
 
@@ -1728,7 +1763,7 @@ int *status             /* global status (given and returned) */
     ynear = (int) (skycoord[nboll+i] - 1. + 0.5);
     
     if( (xnear >= 0) && (xnear < astnaxes[0]) && 
-        (ynear >= 0) && (ynear < astnaxes[1]) )
+        (ynear >= 0) && (ynear < astnaxes[1]) ) 
       dbuf[i] = astsim[xnear + astnaxes[0]*ynear];
     
     else dbuf[i] = 0;
@@ -2050,15 +2085,9 @@ int *status              /* global status (given and returned) */
    dlength = 16;
    tlength = 16;
 
-   strcpy ( tname, argv[1] );
-   strcpy ( obs_name, getenv ( "SMURF_SIM_XML" ) );
-   strcat ( obs_name, "/" );
-   strcat ( obs_name, tname );
+   strcpy ( obs_name, argv[1] );
 
-   strcpy ( tname, argv[2] );
-   strcpy ( sim_name, getenv ( "SMURF_SIM_XML" ) );
-   strcat ( sim_name, "/" );
-   strcat ( sim_name, tname );
+   strcpy ( sim_name, argv[2] );
 
    *rseed = atoi ( argv[3] );
    *savebols = 0;
@@ -2079,23 +2108,6 @@ int *status              /* global status (given and returned) */
    dxml_returnXML ( inx, status );
    dxml_readsimXML ( sim_name, status );
    dxml_returnsimXML ( sinx, status );
-
-/* Expand file names */
-
-   strcpy ( tname, sinx->astname );
-   strcpy ( sinx->astname, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( sinx->astname, "/" );
-   strcat ( sinx->astname, tname );
-
-   strcpy ( tname, sinx->atmname );
-   strcpy ( sinx->atmname, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( sinx->atmname, "/" );
-   strcat ( sinx->atmname, tname );
-
-   strcpy ( tname, inx->bolfile );
-   strcpy ( inx->bolfile, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( inx->bolfile, "/" );
-   strcat ( inx->bolfile, tname );
 
    dream_timenow( dlength, tlength, 0, cur_day, cur_time, NULL, NULL, status );
 
@@ -2234,33 +2246,17 @@ int *status              /* global status (given and returned) */
 
 /* XML observation file" */
 
-   strcpy ( tname, argv[1] );
-   strcpy ( obs_name, getenv ( "SMURF_SIM_XML" ) );
-   strcat ( obs_name, "/" );
-   strcat ( obs_name, tname );
+   strcpy ( obs_name, argv[1] );
 
 /* Output text file file */
 
-   strcpy ( tname, argv[2] );
-   strcpy ( outfile, getenv ( "SMURF_SIM_OUT" ) );
-   strcat ( outfile, "/" );
-   strcat ( outfile, tname );
-
+   strcpy ( outfile, argv[2] );
 
 /*  Read all parameters from the scuba_definition file */
 
    dxml_readXML ( obs_name, status );
 
    dxml_returnXML ( inx, status );
-
-
-/* Expand file names */
-
-
-   strcpy ( tname, inx->bolfile );
-   strcpy ( inx->bolfile, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( inx->bolfile, "/" );
-   strcat ( inx->bolfile, tname );
 
 }
 
@@ -2313,15 +2309,9 @@ int *status              /* global status (given and returned) */
    dlength = 16;
    tlength = 16;
 
-   strcpy ( tname, argv[1] );
-   strcpy ( obs_name, getenv ( "SMURF_SIM_XML" ) );
-   strcat ( obs_name, "/" );
-   strcat ( obs_name, tname );
+   strcpy ( obs_name, argv[1] );
 
-   strcpy ( tname, argv[2] );
-   strcpy ( sim_name, getenv ( "SMURF_SIM_XML" ) );
-   strcat ( sim_name, "/" );
-   strcat ( sim_name, tname );
+   strcpy ( sim_name, argv[2] );
 
    *rseed = atoi ( argv[3] );
    *fluxJy = atof ( argv[4] );
@@ -2355,29 +2345,6 @@ int *status              /* global status (given and returned) */
        printf ( "dsim_getpointpar : Got simulation parameters\n" );
    }
    
-   
-/* Expand file names */
-
-   strcpy ( tname, sinx->astname );
-   strcpy ( sinx->astname, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( sinx->astname, "/" );
-   strcat ( sinx->astname, tname );
-
-   strcpy ( tname, sinx->atmname );
-   strcpy ( sinx->atmname, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( sinx->atmname, "/" );
-   strcat ( sinx->atmname, tname );
-
-   strcpy ( tname, inx->bolfile );
-   strcpy ( inx->bolfile, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( inx->bolfile, "/" );
-   strcat ( inx->bolfile, tname );
-
-/* Overwrite dataname with output filename */
-
-   strcpy ( inx->dataname, sinx->astname );
-
-
    if ( inx->nvert == 0 )
    {
       nspc = 256;
@@ -3120,15 +3087,9 @@ int *status              /* global status (given and returned) */
    dlength = 16;
    tlength = 16;
 
-   strcpy ( tname, argv[1] );
-   strcpy ( obs_name, getenv ( "SMURF_SIM_XML" ) );
-   strcat ( obs_name, "/" );
-   strcat ( obs_name, tname );
+   strcpy ( obs_name, argv[1] );
 
-   strcpy ( tname, argv[2] );
-   strcpy ( sim_name, getenv ( "SMURF_SIM_XML" ) );
-   strcat ( sim_name, "/" );
-   strcat ( sim_name, tname );
+   strcpy ( sim_name, argv[2] );
 
    *rseed = atoi ( argv[3] );
    *exponent = atof ( argv[4] );
@@ -3157,27 +3118,6 @@ int *status              /* global status (given and returned) */
    {
        printf ( "dsim_getskypar : Got simulation parameters\n" );
    }
-
-/* Expand file names */
-
-   strcpy ( tname, sinx->astname );
-   strcpy ( sinx->astname, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( sinx->astname, "/" );
-   strcat ( sinx->astname, tname );
-
-   strcpy ( tname, sinx->atmname );
-   strcpy ( sinx->atmname, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( sinx->atmname, "/" );
-   strcat ( sinx->atmname, tname );
-
-   strcpy ( tname, inx->bolfile );
-   strcpy ( inx->bolfile, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( inx->bolfile, "/" );
-   strcat ( inx->bolfile, tname );
-
-/* Overwrite dataname with output filename */
-
-   strcpy ( inx->dataname, sinx->atmname );
 
    if ( inx->nvert == 0 )
    {
@@ -3235,26 +3175,16 @@ int *status              /* global status (given and returned) */
    dlength = 16;
    tlength = 16;
 
-   strcpy ( tname, argv[1] );
-   strcpy ( obs_name, getenv ( "SMURF_SIM_XML" ) );
-   strcat ( obs_name, "/" );
-   strcat ( obs_name, tname );
+   strcpy ( obs_name, argv[1] );
 
-   strcpy ( tname, argv[2] );
-   strcpy ( sim_name, getenv ( "SMURF_SIM_XML" ) );
-   strcat ( sim_name, "/" );
-   strcat ( sim_name, tname );
+   strcpy ( sim_name, argv[2] );
 
    *rseed = atoi ( argv[3] );
    *fluxJy = atof ( argv[4] );
    *mapwidth = atoi ( argv[5] );
    *pixsize = atoi ( argv[6] );
    
-   strcpy ( file_name, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( file_name, "/" );
-   strcat ( file_name, argv[7] );
-
-
+   strcpy ( file_name, argv[7] );
 
 /*  Read all parameters from the scuba_definition file */
 
@@ -3265,31 +3195,6 @@ int *status              /* global status (given and returned) */
    dxml_readsimXML ( sim_name, status );
 
    dxml_returnsimXML ( sinx, status );
-
-/* Expand file names */
-
-   strcpy ( tname, sinx->astname );
-   strcpy ( sinx->astname, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( sinx->astname, "/" );
-   strcat ( sinx->astname, tname );
-
-   strcpy ( tname, sinx->atmname );
-   strcpy ( sinx->atmname, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( sinx->atmname, "/" );
-   strcat ( sinx->atmname, tname );
-
-   strcpy ( tname, inx->bolfile );
-   strcpy ( inx->bolfile, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( inx->bolfile, "/" );
-   strcat ( inx->bolfile, tname );
-
-/* Overwrite dataname with parameter */
-
-   strcpy ( tname, argv[5] );
-   strcpy ( inx->dataname, getenv ( "SMURF_SIM_IN" ) );
-   strcat ( inx->dataname, "/" );
-   strcat ( inx->dataname, tname );
-
 
    if ( inx->nvert == 0 )
    {
@@ -3537,7 +3442,7 @@ int *status            /* global status (given and returned) */
    /* Create the storage space */
    
    *astsim = (double *) calloc ( naxes[0]*naxes[1], sizeof(double)  );
-   
+
    if ( *astsim != 0 ) {
      fits_read_subset ( fptr, TDOUBLE, pstart, pend, inc, 0, *astsim, &anynull,
 			status );
@@ -3688,12 +3593,13 @@ int *status              /* global status (given and returned) */
    double decay;                  /* bolometer time constant (msec) */
    int j;                         /* loop counter */
    double lst;                    /* local sidereal time in radians */
+   double meanatm;                /* mean expected atmospheric signal (pW) */
    int nboll;                     /* total number of bolometers */
    double p;                      /* parallactic angle (radians) */
    double photonsigma;            /* typical photon noise level in pW */
    double samptime;               /* sample time in sec */
    int savebols;                  /* flag for bol details (unused here) */
-
+   double trans;                  /* average transmission */
 
    if ( !StatusOkP(status) ) return;
 
@@ -3734,9 +3640,11 @@ int *status              /* global status (given and returned) */
    dsim_response ( inx->lambda, NCOEFFS, coeffs, status );
 
    /*  Calculate the parameters for simulating digitisation */
-   
+
+   dsim_calctrans ( inx->lambda, &trans, sinx->tauzen, status );
+   dsim_atmsky ( inx->lambda, trans, &meanatm, status );   
    dsim_getsigma ( inx->lambda, sinx->bandGHz, sinx->aomega,
-		   (sinx->telemission+sinx->meanatm), &photonsigma, status );
+		   (sinx->telemission+meanatm), &photonsigma, status );
    
    dsim_getscaling ( NCOEFFS, coeffs, inx->targetpow, photonsigma,
 		     digmean, digscale, digcurrent, status );
@@ -5504,6 +5412,7 @@ int *status                  /* global status (given and returned) */
   double flux;                    /* flux at bolometer in pW */
   double fnoise;                  /* 1/f noise value */
   int i;                          /* loop counter */
+  double meanatm;                 /* mean expected atmospheric signal (pW) */
   double phase;                   /* 1/f phase calculation */
   int pos;                        /* lookup in noise coefficients */
   double skytrans;                /* sky transmission (%) */
@@ -5515,13 +5424,17 @@ int *status                  /* global status (given and returned) */
   
   
   if ( !StatusOkP(status) ) return; 
-    
+   
   /* Sample astronomical sky image */
   dsim_getast_wcs( nboll, xbolo, ybolo, bolo2map, astsim, astnaxes, dbuf,
 		   status);
 
   /* Get time when frame taken in seconds */
   time = start_time + frame * samptime;
+
+  /* Get the mean atmospheric signal */
+  dsim_calctrans ( inx.lambda, &skytrans, sinx.tauzen, status );
+  dsim_atmsky ( inx.lambda, skytrans, &meanatm, status );
   
   for ( bol=0; bol<nboll; bol++ ) {
     xpos = position[0] + xbc[bol] + 0.5 * (double)astnaxes[0] * astscale;
@@ -5567,7 +5480,7 @@ int *status                  /* global status (given and returned) */
       }
     }
     else {
-      atmvalue = sinx.meanatm;
+      atmvalue = meanatm;
     }
     
     /* Calculate atmospheric transmission */
@@ -5595,10 +5508,10 @@ int *status                  /* global status (given and returned) */
     
     if ( sinx.add_hnoise == 1 ) {
       flux = flux + 
-	( inx.targetpow - sinx.meanatm - telemission ) * heater[bol];
+	( inx.targetpow - meanatm - telemission ) * heater[bol];
     }
     else {
-      flux = flux + ( inx.targetpow - sinx.meanatm - telemission );
+      flux = flux + ( inx.targetpow - meanatm - telemission );
     }
     
     /*  Convert to current with bolometer power offset.
@@ -5980,6 +5893,7 @@ double atmscale,             /* pixel size in simulated atm background
                                 (given) */
 double *atmsim,              /* atmospheric emission (given) */
 double coeffs[],             /* bolometer response coeffs (given) */
+AstFrameSet *fset,           /* World Coordinate transformations */
 double heater[],             /* bolometer heater ratios (given) */
 int nboll,                   /* total number of bolometers (given) */
 int frame,                   /* number of current frame (given) */
@@ -5990,7 +5904,7 @@ double samptime,             /* sample time in sec (given) */
 double start_time,           /* time at start of scan in sec  (given) */
 double telemission,          /* power from telescope emission (given) */
 double *weights,             /* impulse response (given) */
-AstCmpMap *bolo2map,         /* mapping bolo->sky image coordinates */
+AstMapping *sky2map,         /* Mapping celestial->map coordinates */
 double *xbolo,               /* native X offsets of bolometers */
 double *ybolo,               /* native Y offsets of bolometers */
 double *xbc,                 /* nasmyth X offsets of bolometers */
@@ -6007,23 +5921,30 @@ int *status                  /* global status (given and returned) */
     Authors :
      B.D.Kelly (ROE)
      E.Chapin (UBC)
+     J.Balfour (UBC)
 
     History :
      08Jul2005: original (bdk@roe.ac.uk)
      28Feb2006: modified to use framesets to connect bolos with actual
                 WCS info for input sky image (ec)
      29Mar2006: renamed from dsim_pongframe to be used generically (ec)
+     29Jun2006: added per-bolometer atmospheric correction from elevation.
 */
 
 {
 
+  double airmass;                 /* airmass for each bolometer */
   double astvalue;                /* obs. astronomical value in pW */
   double atmvalue;                /* obs. atmospheric emission in pW */
   int bol;                        /* counter for indexing bolometers */
+  AstMapping *bolo2azel=NULL;     /* Mapping bolo-azel coordinates */
+  AstCmpMap *bolo2map=NULL;       /* Combined mapping bolo->map coordinates */
+  AstMapping *bolo2sky=NULL;      /* Mapping bolo->celestial coordinates */
   double current;                 /* bolometer current in amps */
   double flux;                    /* flux at bolometer in pW */
   double fnoise;                  /* 1/f noise value */
   int i;                          /* loop counter */
+  double meanatm;                 /* mean expected atmospheric signal (pW) */
   double phase;                   /* 1/f phase calculation */
   int pos;                        /* lookup in noise coefficients */
   double skytrans;                /* sky transmission (%) */
@@ -6032,37 +5953,59 @@ int *status                  /* global status (given and returned) */
   double xsky;                    /* X position on sky screen */
   double ypos;                    /* Y measurement position */
   double ysky;                    /* Y position on sky screen */
-  
+  double *skycoord;               /* az & el coordinates */
+  int lbnd_in[2];                 /* Pixel bounds for astTranGrid */
+  int ubnd_in[2];
+  int lbnd_out[2];
+  int ubnd_out[2];
+
   
   if ( !StatusOkP(status) ) return; 
-    
+
+  /* Concatenate mappings to get bolo->astronomical image coordinates */
+  astSetC( fset, "SYSTEM", "icrs" );
+  bolo2sky = astGetMapping( fset, AST__BASE, AST__CURRENT );
+  bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );  
+
   /* Sample astronomical sky image */
   dsim_getast_wcs( nboll, xbolo, ybolo, bolo2map, astsim, astnaxes, dbuf,
 		   status);
 
+  /* Extract bolo->AzEl mapping */
+  astSetC( fset, "SYSTEM", "AZEL" );
+  bolo2azel = astGetMapping( fset, AST__BASE, AST__CURRENT );
+
+  /* Allocate space for array */
+  skycoord = (double *) calloc ( nboll*2, sizeof( double ) );
+
+  lbnd_in[0] = 1;
+  ubnd_in[0] = BOLROW;
+  lbnd_in[1] = 1;
+  ubnd_in[1] = BOLCOL;
+
+  /* Transform bolo offsets into positions in azel and store in 
+     skycoord */
+  astTranGrid ( bolo2azel, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1, 
+                2, nboll, skycoord );  
+
   /* Get time when frame taken in seconds */
   time = start_time + frame * samptime;
-  
+
+  /* Get the mean atmospheric signal */
+  dsim_calctrans ( inx.lambda, &skytrans, sinx.tauzen, status );
+  dsim_atmsky ( inx.lambda, skytrans, &meanatm, status );
+
   for ( bol=0; bol<nboll; bol++ ) {
+
+    /* Calculate the elevation correction. */
+    airmass = 1.0 / sin ( skycoord[nboll + bol] );
+
     xpos = position[0] + xbc[bol] + 0.5 * (double)astnaxes[0] * astscale;
     ypos = position[1] + ybc[bol] + 0.5 * (double)astnaxes[1] * astscale;
-    
-    /*  Interpolate bolometer position on astronomical image.
-	The scalar ASTVALUE contains the interpolated astronomical map 
-	value for the current position (XPOS,YPOS). */
-    
-    /*
-      dsim_getast ( xpos, ypos, inx.bol_distx, astscale, astnaxes[0],
-      astsim, &astvalue, status );
-      if ( !StatusOkP(status) ) {
-      printf ( 
-      "dsim_pongframe: failed to interpolate image bol=%d x=%e y=%e\n",
-      bol, xpos, ypos );
-      break;
-    }
-    */
 
+    /* Get the observed astronomical value in Jy and convert it to pW. */
     astvalue = dbuf[bol];
+    astvalue = astvalue * 1.0e-5 * AST__DPI * 0.25 * DIAMETER * DIAMETER * sinx.bandGHz;
 
     /*  Lookup atmospheric emission - offset to near centre of the atm frame.
 	A typical windspeed moves the sky screen at equivalent to 5000 arcsec
@@ -6072,6 +6015,9 @@ int *status                  /* global status (given and returned) */
     
     xsky = xpos + sinx.atmxvel * time + sinx.atmzerox;
     ysky = ypos + sinx.atmyvel * time + sinx.atmzeroy;
+
+    /* If the add atmospheric emission flag is set, use bilinear interpolation
+       to find the atmvalue from the input file. */
     if ( sinx.add_atm == 1 ) {
       dsim_getbilinear ( xsky, ysky, atmscale, atmnaxes[0], atmsim, 
 			 &atmvalue, status );
@@ -6086,14 +6032,19 @@ int *status                  /* global status (given and returned) */
 	printf ( "status = %d\n", *status );
       }
     }
+    /* Otherwise, calculate the atmvalue from the tau */
     else {
-      atmvalue = sinx.meanatm;
+      atmvalue = meanatm;
     }
+
+    /* Apply the elevation correction */
+    atmvalue = atmvalue * airmass;
     
-    /* Calculate atmospheric transmission */
-    
+    /* Calculate atmospheric transmission for this bolometer */
     dsim_atmtrans ( inx.lambda, atmvalue, &skytrans, status );
-    
+ 
+    atmvalue = atmvalue / airmass;
+
     /*  Add atmospheric and telescope emission.
 	TELEMISSION is a constant value for all bolometers. */
     
@@ -6115,10 +6066,10 @@ int *status                  /* global status (given and returned) */
     
     if ( sinx.add_hnoise == 1 ) {
       flux = flux + 
-	( inx.targetpow - sinx.meanatm - telemission ) * heater[bol];
+	( inx.targetpow - meanatm - telemission ) * heater[bol];
     }
     else {
-      flux = flux + ( inx.targetpow - sinx.meanatm - telemission );
+      flux = flux + ( inx.targetpow - meanatm - telemission );
     }
     
     /*  Convert to current with bolometer power offset.
@@ -6157,6 +6108,10 @@ int *status                  /* global status (given and returned) */
     dbuf[bol] = current;
     
   }
+
+  fset = astAnnul(fset);
+  bolo2sky = astAnnul(bolo2sky);
+  bolo2map = astAnnul(bolo2map);
   
 }
 
