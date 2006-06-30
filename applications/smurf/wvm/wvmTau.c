@@ -13,6 +13,9 @@
   History:
 
 	$Log$
+	Revision 0.2  2006/06/30 18:22:59  jbalfour
+	Added tau2pwv routine.
+	
 	Revision 0.1  2006/02/07 22:29:50  agibb
 	WVM files necessary for calculating tau from the WVM temperature measurements
 	
@@ -119,6 +122,34 @@ double pwv2tau(double airMass, double mmH2O_a) {
     printf("mult is: %f\n", mult);
     printf("Final Tau is: %f\n", wvm_temp/mult);
   }
+
   return wvm_temp/mult;
 }
+
+/* 
+   Function:
+	tau2pwv converts the optical depth seen at 225GHz relative to
+        the zenith into a value representing millimeters of water vapor.
+        This is done using the look-up table tau_table found in 
+        wvmTau.h.
+
+   Author:
+	J.Balfour: jbalfour@phas.ubc.ca
+ */
+double tau2pwv(double tau) {
+
+  int i = 0;
+
+  /* Get the closest approximation to this tau, and return
+     the corresponding pwv */
+
+  while ( tau_table[i] <= tau ) {
+    i++;
+  }//while
+
+  return ( double ) i / 10.0;
+
+}//tau2pwv
+  
+  
 
