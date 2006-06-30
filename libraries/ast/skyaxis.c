@@ -100,6 +100,8 @@ f     only within textual output (e.g. from AST_WRITE).
 *        string starts with a '%' character.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     30-JUN-2006 (DSB):
+*        Guard against a null "str1" value in AxisAbbrev.
 *class--
 */
 
@@ -264,8 +266,9 @@ static const char *AxisAbbrev( AstAxis *this_axis, const char *fmt,
 *        format specifier used to format the two values.
 *     str1
 *        Pointer to a constant null-terminated string containing the
-*        first formatted value.
-*     str1
+*        first formatted value. If this is null, the returned pointer
+*        points to the start of the final field in str2.
+*     str2
 *        Pointer to a constant null-terminated string containing the
 *        second formatted value.
 
@@ -301,26 +304,35 @@ static const char *AxisAbbrev( AstAxis *this_axis, const char *fmt,
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Find the fields within the two strings. */
-   nf1 = astAxisFields( this_axis, fmt, str1, 3, fld1, nc1, NULL );
+/* Find the fields within the "str2" string. */
    nf2 = astAxisFields( this_axis, fmt, str2, 3, fld2, nc2, NULL );
 
+/* If "str1" was not supplied, return a pointer to the final field in
+   "str2". */
+   if( !str1 ) {
+      result = fld2[ nf2 - 1 ];
+
+/* Otherwise, find the fields within the "str1" string. */
+   } else {
+      nf1 = astAxisFields( this_axis, fmt, str1, 3, fld1, nc1, NULL );
+
 /* Loop to inspect corresponding fields from each string. */
-   for ( i = 0; i < nf1 && i < nf2; i++ ) {
+      for ( i = 0; i < nf1 && i < nf2; i++ ) {
 
 /* If the fields are different, break out of the loop. */
-      if ( nc1[ i ] != nc2[ i ] || 
-           strncmp( fld1[ i ], fld2[ i ], nc1[ i ] ) ) {
-         break;
+         if ( nc1[ i ] != nc2[ i ] || 
+              strncmp( fld1[ i ], fld2[ i ], nc1[ i ] ) ) {
+            break;
 
 /* Otherwise, move the returned poitner on to point to the start of the
    next field in str2. If we are already at the last field in str2,
    return a pointer to the terminating null. */
-      } else {
-         if ( i + 1 < nf2 ) {
-            result = fld2[ i + 1 ];
          } else {
-            result = strchr( str2, '\0' );
+            if ( i + 1 < nf2 ) {
+               result = fld2[ i + 1 ];
+            } else {
+               result = strchr( str2, '\0' );
+            }
          }
       }
    }

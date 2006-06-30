@@ -714,8 +714,9 @@ static const char *Abbrev( AstFrame *this_frame, int axis,  const char *fmt,
 *        format specification used to format the two values.
 *     str1
 *        Pointer to a constant null-terminated string containing the
-*        first formatted value.
-*     str1
+*        first formatted value. If this is null, the returned pointer
+*        points to the start of the final field in str2.
+*     str2
 *        Pointer to a constant null-terminated string containing the
 *        second formatted value.
 

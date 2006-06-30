@@ -214,7 +214,9 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
 *     15-MAY-2006 (DSB):
-*        - Override astEqual.
+*        Override astEqual.
+*     30-JUN-2006 (DSB):
+*        Allow astAbbrev to have a null "str1" value.
 *class--
 */
 
@@ -968,8 +970,9 @@ static const char *Abbrev( AstFrame *this_frame, int axis, const char *fmt,
 *        format specification used to format the two values.
 *     str1
 *        Pointer to a constant null-terminated string containing the
-*        first formatted value.
-*     str1
+*        first formatted value. If this is null, the returned pointer
+*        points to the start of the final field in str2.
+*     str2
 *        Pointer to a constant null-terminated string containing the
 *        second formatted value.
 

@@ -221,6 +221,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Remove unused global variable parent_equal.
 *     26-JUN-2006 (DSB):
 *        Document the use of the Direction attribute by the Plot class.
+*     30-JUN-2006 (DSB):
+*        Allow astAbbrev to have a null "str1" value.
 */
 
 /* Module Macros. */
@@ -862,8 +864,9 @@ static const char *Abbrev( AstFrame *this, int axis,  const char *fmt,
 *        format specification used to format the two values.
 *     str1
 *        Pointer to a constant null-terminated string containing the
-*        first formatted value.
-*     str1
+*        first formatted value. If this is null, the returned pointer
+*        points to the start of the final field in str2.
+*     str2
 *        Pointer to a constant null-terminated string containing the
 *        second formatted value.
 

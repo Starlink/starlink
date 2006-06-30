@@ -81,6 +81,8 @@ f     only within textual output (e.g. from AST_WRITE).
 *        not quite zero.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     30-JUN-2006 (DSB):
+*        Guard against a null "str1" value in AxisAbbrev.
 *class--
 */
 
@@ -248,8 +250,9 @@ static const char *AxisAbbrev( AstAxis *this, const char *fmt,
 *        format specifier used to format the two values.
 *     str1
 *        Pointer to a constant null-terminated string containing the
-*        first formatted value.
-*     str1
+*        first formatted value. If this is null, the returned pointer
+*        points to the start of the final field in str2.
+*     str2
 *        Pointer to a constant null-terminated string containing the
 *        second formatted value.
 
@@ -285,7 +288,7 @@ static const char *AxisAbbrev( AstAxis *this, const char *fmt,
    We return the value of "str2", unless the two strings are
    identical, in which case we return a pointer to the final null in
    "str2". */
-   if ( !strcmp( str1, str2 ) ) result += strlen( str2 );
+   if( str1 && !strcmp( str1, str2 ) ) result += strlen( str2 );
 
 /* Return the result. */
    return result;
