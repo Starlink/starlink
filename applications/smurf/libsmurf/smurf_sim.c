@@ -31,8 +31,8 @@
 *     built in earlier versions of the simulator: staresim, dreamsim, 
 *     pongsim
 
-*     The heatrun method generates a heater flat-field measurement from simulated data
-*     for each of a range of heater settings.
+*     The heatrun method generates a heater flat-field measurement 
+*     from simulated data for each of a range of heater settings.
 
 *  ADAM Parameters:
 *     TBD
@@ -170,8 +170,6 @@ void smurf_sim( int *status ) {
   double *base_el=NULL;           /* El of BASE telescope position */
   double *base_p=NULL;            /* Parall. ang. of BASE at time step */
   int bol;                        /* counter for indexing bolometers */
-  AstCmpMap *bolo2map=NULL;       /* Combined mapping bolo->map coordinates */
-  AstMapping *bolo2sky=NULL;      /* Mapping bolo->celestial coordinates */
   double *bor_az=NULL;            /* Az of telescope in spherical coord. */
   double *bor_dec=NULL;           /* telescope dec. spherical coordinates */
   double *bor_el=NULL;            /* El of telescope in spherical coord. */
@@ -244,6 +242,7 @@ void smurf_sim( int *status ) {
   char *pars[4];                  /* parameter list */
   double pwvlos;                  /* mm precip. wat. vapor. line of site */
   double *posptr=NULL;            /* pointing: nasmyth offsets from cen. */ 
+  double pwvzen;                  /* zenith precipital water vapour (mm) */
   double *pzero=NULL;             /* bolometer power offsets */
   int rowsize;                    /* row size for flatfield */
   int rseed;                      /* seed for random number generator */
@@ -313,7 +312,6 @@ void smurf_sim( int *status ) {
       leading to the same series of pzero and heater offsets */
   srand(53);
 
-;
   msgOutif(MSG__VERB, FUNC_NAME, "Initialise instrument.", status);
 
   dsim_instrinit ( 4, pars, &inx, &sinx, &rseed, coeffs, &digcurrent,
@@ -345,9 +343,6 @@ void smurf_sim( int *status ) {
 
       /* Do a simulation */
 
-      /* Get the output directory name */
-      strcpy ( inx.dataname, getenv ( "SMURF_SIM_OUT" ) );
-
       /* Get the file close time */
       parGet0i("MAXWRITE", &maxwrite, status);
 
@@ -366,6 +361,149 @@ void smurf_sim( int *status ) {
 	  curtok = strtok (NULL, ", ");
        }//while
 
+      /* Get simulation of astronomical image as smoothed by PSF */
+      msgOutif(MSG__VERB, FUNC_NAME, 
+	       "Get astronomical image", status);        
+
+      dsim_initast ( sinx.astname, &astscale, astnaxes, &astsim, &fitswcs, 
+		     status );
+
+      /* Extract the Sky->map pixel mapping for the astronomical image */
+      astSetC( fitswcs, "SYSTEM", "icrs" );
+      sky2map = astGetMapping( fitswcs, AST__CURRENT, AST__BASE );
+
+      /*  Get simulation of static atmospheric background. */
+      dsim_initatm ( sinx.atmname, &atmscale, atmnaxes, &atmsim, status );
+
+      /*  Re-initialise random number generator to give a different sequence
+	  each time by using the given seed. */
+      srand ( rseed );
+
+      /* Initialize SMU nasmyth jiggle offsets to 0 */
+      for( i=0; i<DREAM__MXSIM; i++ ) {
+	for( j=0; j<2; j++ ) {
+	  jigptr[i][j] = 0;
+	}//for
+      }//for
+
+      switch( mode ) {
+
+      case stare:
+	/* Stare just points at a nasmyth offset of 0 from the map centre */
+	msgOut( FUNC_NAME, "Do a STARE observation", status ); 
+	count = inx.numsamples;
+	posptr = (double *)calloc ( count*2, sizeof(double) );
+	memset( posptr, 0, count*2*sizeof(double) );
+	break;
+
+      case pong:
+	/* Call dsim_getpong to get pong pointing solution */
+	msgOut( FUNC_NAME, "Do a PONG observation", status ); 
+	accel[0] = 432.0;
+	accel[1] = 540.0;
+	vmax[0] = inx.pong_vmax;        /*200.0;*/
+	vmax[1] = inx.pong_vmax;        /*200.0;*/
+	dsim_getpong ( inx.pong_angle, inx.pong_gridcount, 
+		       inx.pong_spacing, accel, vmax, samptime, grid,
+		       &count, &posptr, status );
+	break;
+
+      case dream:
+	/* Call dsim_getpat to get the dream pointing solution */
+	msgOut( FUNC_NAME, "Do a DREAM observation", status );
+
+
+	/*  Get jiggle pattern.
+	    jigptr[*][0] - X-coordinate in arcsec per time of the Jiggle position.
+	    jigptr[*][1] - Y-coordinate in arcsec per time of the Jiggle position.
+	    The number of values is returned in count, and should be equal
+	    to the number of samples per cycle. */
+	dsim_getpat ( inx.nvert, inx.smu_samples, inx.sample_t,
+		      inx.smu_offset+sinx.smu_terr, inx.conv_shape, 
+		      inx.conv_sig, inx.smu_move, inx.jig_step_x, 
+		      inx.jig_step_y, inx.jig_vert, &jigsamples, jigptr,
+		      status );
+
+	count = jigsamples*sinx.ncycle;
+
+	/* dream uses the SMU to do the jiggle pattern so the posptr
+	   is just set to 0 */
+	posptr = (double *)calloc ( count*2, sizeof(double) );
+	memset( posptr, 0, count*2*sizeof(double) );    
+
+	break;
+
+      default: /* should never be reached...*/
+	msgSetc( "MODE", inx.obsmode );
+	errRep("", "^MODE is not a supported observation mode", status);
+	break;
+      }//switch
+
+      msgSeti( "COUNT", count );
+      msgOutif( MSG__VERB, FUNC_NAME, 
+	       "Count = ^COUNT", status );      
+
+      /* allocate workspace */
+
+      dbuf = (double *)calloc ( count*nbol, sizeof(double) );
+      digits = (int *)calloc ( count*nbol, sizeof(int) );
+      dksquid = (int *)calloc ( count*inx.nboly, sizeof(int) );
+      mjuldate = (double *)calloc ( count, sizeof(double) );
+      lst = (double *)calloc ( count, sizeof(double) );
+
+      base_az = (double *)calloc ( count, sizeof(double) );
+      base_el = (double *)calloc ( count, sizeof(double) );
+      base_p = (double *)calloc ( count, sizeof(double) );
+      bor_az = (double *)calloc ( count, sizeof(double) );
+      bor_el = (double *)calloc ( count, sizeof(double) );
+      bor_ra = (double *)calloc ( count, sizeof(double) );
+      bor_dec = (double *)calloc ( count, sizeof(double) );
+      jig_x_hor = (double *)calloc ( count, sizeof(double) );
+      jig_y_hor = (double *)calloc ( count, sizeof(double) );
+      airmass = (double *)calloc ( count, sizeof(double) );
+
+      /* calculate UT/LST at each tick of the simulator clock */  
+      dsim_calctime( inx.mjdaystart, samptime, count,
+		     mjuldate, lst, status );
+
+      sigma = 1.0e-9;
+      corner = 0.01;
+      nterms = 20;
+
+      if ( sinx.add_fnoise == 1 ) {
+	/*  Create an instrumental 1/f noise sequence for each bolometer by 
+	    generating random amplitudes for the sine and cosine 
+	    components of the lowest few frequencies, suitably scaled. */
+
+	msgOutif( MSG__VERB, FUNC_NAME, 
+		  "Create 1/f coefficients", status );     
+
+	for ( bol=0; bol<nbol; bol++ ) {
+
+	  msgSeti( "BOL", bol );
+	  msgOutif(MSG__VERB, FUNC_NAME, 
+		  "1/f for bolometer number ^BOL", status);  
+
+	  dsim_getinvf ( sigma, corner, samptime, nterms, 
+			 &(noisecoeffs[bol*3*nterms]), status );
+	  msgOutif(MSG__VERB, FUNC_NAME, 
+		  "1/f noise array made", status);
+	}//for
+      }//if
+
+
+      msgSeti( "DSTART", inx.mjdaystart );
+      msgSeti( "YR", date_yr );
+      msgSeti( "MO", date_mo );
+      msgSeti( "DAY", date_da );
+      msgOutif(MSG__VERB, FUNC_NAME, 
+	       "Start observing at MFD ^DSTART, ^YR-^MO-^DAY", status);
+
+      /* KLUDGE - write out the subarray name */ 
+      //fprintf(tempfile,"%s\n",sinx.subname);
+
+      /*count = 1;*/
+
        /* For each subarray, generate the corresponding output file */
 
        for ( k = 0; k < narray; k++ ) {
@@ -377,175 +515,18 @@ void smurf_sim( int *status ) {
 	  sc2ast_name2num( sinx.subname, &subnum, status );
 
 	  /* Get flatfield data */
-	  sprintf ( heatname, "%s/%sheat%04i%02i%02i_00001", 
-		    getenv ( "SMURF_SIM_IN" ), sinx.subname, date_yr, 
-		    date_mo, date_da );
+	  sprintf ( heatname, "%sheat%04i%02i%02i_00001", 
+		    sinx.subname, date_yr, date_mo, date_da );
  
 	  sc2store_rdflatcal ( heatname, SC2STORE_FLATLEN, &colsize, &rowsize,
 			       &nflat, flatname, &flatcal, &flatpar, status );
 
-	  /* Get simulation of astronomical image as smoothed by PSF */
-	  msgOutif(MSG__VERB, FUNC_NAME, 
-		   "Get astronomical image", status);        
-
-	  dsim_initast ( sinx.astname, &astscale, astnaxes, &astsim, &fitswcs, 
-			 status );
-
-	  /* Extract the Sky->map pixel mapping for the astronomical image */
-	  astSetC( fitswcs, "SYSTEM", "icrs" );
-	  sky2map = astGetMapping( fitswcs, AST__CURRENT, AST__BASE );
-
-	  /*  Get simulation of static atmospheric background. */
-	  dsim_initatm ( sinx.atmname, &atmscale, atmnaxes, &atmsim, status );
-
-	  /*  Re-initialise random number generator to give a different sequence
-	      each time by using the given seed. */
-	  srand ( rseed );
-
-	  /* Initialize SMU nasmyth jiggle offsets to 0 */
-	  for( i=0; i<DREAM__MXSIM; i++ ) {
-	    for( j=0; j<2; j++ ) {
-	      jigptr[i][j] = 0;
-	    }//for
-          }//for
-
-	  switch( mode ) {
-
-	  case stare:
-	    /* Stare just points at a nasmyth offset of 0 from the map centre */
-	    msgOut( FUNC_NAME, "Do a STARE observation", status ); 
-	    count = inx.numsamples;
-	    posptr = (double *)calloc ( count*2, sizeof(double) );
-	    memset( posptr, 0, count*2*sizeof(double) );
-	    break;
-
-	  case pong:
-	    /* Call dsim_getpong to get pong pointing solution */
-	    msgOut( FUNC_NAME, "Do a PONG observation", status ); 
-	    accel[0] = 432.0;
-	    accel[1] = 540.0;
-	    vmax[0] = inx.pong_vmax;        /*200.0;*/
-	    vmax[1] = inx.pong_vmax;        /*200.0;*/
-	    dsim_getpong ( inx.pong_angle, inx.pong_gridcount, 
-			   inx.pong_spacing, accel, vmax, samptime, grid,
-			   &count, &posptr, status );
-	    break;
-
-	  case dream:
-	    /* Call dsim_getpat to get the dream pointing solution */
-	    msgOut( FUNC_NAME, "Do a DREAM observation", status );
-
-
-	    /*  Get jiggle pattern.
-		jigptr[*][0] - X-coordinate in arcsec per time of the Jiggle position.
-		jigptr[*][1] - Y-coordinate in arcsec per time of the Jiggle position.
-		The number of values is returned in count, and should be equal
-		to the number of samples per cycle. */
-	    dsim_getpat ( inx.nvert, inx.smu_samples, inx.sample_t,
-			  inx.smu_offset+sinx.smu_terr, inx.conv_shape, 
-			  inx.conv_sig, inx.smu_move, inx.jig_step_x, 
-			  inx.jig_step_y, inx.jig_vert, &jigsamples, jigptr,
-			  status );
-
-	    count = jigsamples*sinx.ncycle;
-
-	    /* dream uses the SMU to do the jiggle pattern so the posptr
-	       is just set to 0 */
-	    posptr = (double *)calloc ( count*2, sizeof(double) );
-	    memset( posptr, 0, count*2*sizeof(double) );    
-
-	    break;
-
-	  default: /* should never be reached...*/
-	    msgSetc( "MODE", inx.obsmode );
-	    errRep("", "^MODE is not a supported observation mode", status);
-	    break;
-	  }//switch
-
-	  msgSeti( "COUNT", count );
-	  msgOutif( MSG__VERB, FUNC_NAME, 
-		   "Count = ^COUNT", status );      
-
-	  /* allocate workspace */
-
-	  dbuf = (double *)calloc ( count*nbol, sizeof(double) );
-	  digits = (int *)calloc ( count*nbol, sizeof(int) );
-	  dksquid = (int *)calloc ( count*inx.nboly, sizeof(int) );
-	  mjuldate = (double *)calloc ( count, sizeof(double) );
-	  lst = (double *)calloc ( count, sizeof(double) );
-
-	  base_az = (double *)calloc ( count, sizeof(double) );
-	  base_el = (double *)calloc ( count, sizeof(double) );
-	  base_p = (double *)calloc ( count, sizeof(double) );
-	  bor_az = (double *)calloc ( count, sizeof(double) );
-	  bor_el = (double *)calloc ( count, sizeof(double) );
-	  bor_ra = (double *)calloc ( count, sizeof(double) );
-	  bor_dec = (double *)calloc ( count, sizeof(double) );
-	  jig_x_hor = (double *)calloc ( count, sizeof(double) );
-	  jig_y_hor = (double *)calloc ( count, sizeof(double) );
-	  airmass = (double *)calloc ( count, sizeof(double) );
-
-	  /* calculate UT/LST at each tick of the simulator clock */  
-	  dsim_calctime( inx.mjdaystart, samptime, count,
-			 mjuldate, lst, status );
-
-	  /* Calculate atmospheric optical depth for mean sky */
-
-	  /*
-	    dsim_atmtrans ( inx.lambda, sinx.meanatm, &skytrans, &status );
-
-	    if ( dream_trace ( 1 ) ) { 
-	    printf ( "scansim : Calculate tau-  status = %d\n",
-	    status );
-	    }
-	    dsim_calctau ( inx.lambda, skytrans, sinx.airmass, &tauCSO, &tau850,
-	    &tau450, &status );
-	  */
-
-	  sigma = 1.0e-9;
-	  corner = 0.01;
-	  nterms = 20;
-
-	  if ( sinx.add_fnoise == 1 ) {
-	    /*  Create an instrumental 1/f noise sequence for each bolometer by 
-		generating random amplitudes for the sine and cosine 
-		components of the lowest few frequencies, suitably scaled. */
-
-	    msgOutif( MSG__VERB, FUNC_NAME, 
-		      "Create 1/f coefficients", status );     
-
-	    for ( bol=0; bol<nbol; bol++ ) {
-
-	      msgSeti( "BOL", bol );
-	      msgOutif(MSG__VERB, FUNC_NAME, 
-		      "1/f for bolometer number ^BOL", status);  
-
-	      dsim_getinvf ( sigma, corner, samptime, nterms, 
-			     &(noisecoeffs[bol*3*nterms]), status );
-	      msgOutif(MSG__VERB, FUNC_NAME, 
-		      "1/f noise array made", status);
-	    }//for
-	  }//if
-;
-
-	  msgSeti( "DSTART", inx.mjdaystart );
-	  msgSeti( "YR", date_yr );
-	  msgSeti( "MO", date_mo );
-	  msgSeti( "DAY", date_da );
-	  msgOutif(MSG__VERB, FUNC_NAME, 
-		   "Start observing at MFD ^DSTART, ^YR-^MO-^DAY", status);
-
-	  /* Go through the scan pattern, writing to disk every ~30sec */
+          /* Go through the scan pattern, writing to disk every ~30sec */
 
 	  outscan = 0;
 	  start_time = 0.0;
 	  nwrite = 0;
 	  firstframe = 0;
-
-	  /* KLUDGE - write out the subarray name */ 
-	  fprintf(tempfile,"%s\n",sinx.subname);
-
-	  /*count = 1;*/
 
 	  for ( frame=0; frame<count; frame++ ) {
 
@@ -625,24 +606,14 @@ void smurf_sim( int *status ) {
 			      bor_az[frame], bor_el[frame],
 			      jig_x_hor[frame], jig_y_hor[frame],
 			      mjuldate[frame], &fset, status);
-	    astSetC( fset, "SYSTEM", "icrs" );
-	    bolo2sky = astGetMapping( fset, AST__BASE, AST__CURRENT );
-
-
-	    /* Concatenate mappings to get bolo->astronmical image coordinates */
-	    bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );
 
 	    /* simulate one frame of data */
 	    dsim_simframe ( inx, sinx, astnaxes, astscale, astsim, atmnaxes,
-			    atmscale, atmsim, coeffs, heater, nbol, frame, nterms,
-			    noisecoeffs, pzero, samptime, start_time, 
-			    sinx.telemission, weights, bolo2map, xbolo, ybolo, 
+			    atmscale, atmsim, coeffs, fset, heater, nbol, frame,
+                            nterms, noisecoeffs, pzero, samptime, start_time, 
+			    sinx.telemission, weights, sky2map, xbolo, ybolo, 
 			    xbc, ybc, &(posptr[frame*2]), &(dbuf[nbol*nwrite]), 
 			    status );
-
-	    fset = astAnnul(fset);
-	    bolo2sky = astAnnul(bolo2sky);
-	    bolo2map = astAnnul(bolo2map);
 
 	    nwrite++;
 
@@ -653,9 +624,8 @@ void smurf_sim( int *status ) {
 			      digcurrent, digits, status );
 
 	      /* Compress and store as NDF */
-	      sprintf ( filename, "%s/%s%04i%02i%02i_00001_%04d", 
-			inx.dataname, sinx.subname, date_yr, date_mo, date_da, 
-			outscan+1 );
+	      sprintf ( filename, "%s%04i%02i%02i_00001_%04d", 
+			sinx.subname, date_yr, date_mo, date_da, outscan+1 );
 
 	      msgSetc( "FILENAME", filename );
 	      msgOut( FUNC_NAME, "Writing ^FILENAME", status ); 
@@ -726,15 +696,18 @@ void smurf_sim( int *status ) {
 		   the correct (input) values for CSO tau and the PWV using
 		   wvmOpt. */
 
+                /* Determine pwv from tauzen */
+                pwvzen = tau2pwv (sinx.tauzen);
+
 		/* Line of site pwv      */
-		pwvlos = airmass[firstframe+j]*sinx.pwvzen;
+		pwvlos = airmass[firstframe+j]*pwvzen;
 
 		/* Effective water temp. */
 		twater = sinx.atstart + 273.15 - 10;
+
 		/* Not physically unreasonable number... Note it's negative
 		   because of a missed -ve sign in the wvmEst */
 		drytau183 = -0.03;        
-
 
 		/* Only update once every 240 samples */
 		if( (firstframe+j) % 240 == 0 )
@@ -750,7 +723,7 @@ void smurf_sim( int *status ) {
 	      sinx.airmass = airmass[firstframe+j];
 
 	      /* Calculate tau CSO from the pwv */
-	      tauCSO = pwv2tau(airmass[firstframe+j],sinx.pwvzen);
+	      tauCSO = pwv2tau(airmass[firstframe+j],pwvzen);
 
 	      /* Free pointers */
 	      dsim_ndfwrdata( inx.ra, inx.dec, sinx.add_atm, sinx.add_fnoise,
@@ -774,7 +747,7 @@ void smurf_sim( int *status ) {
         }// for each frame
     
      }//for each subarray
-
+   
      fclose(tempfile);
      msgOutif( MSG__VERB, FUNC_NAME, 
 	       "!!! This sim is kludged to write positions to junk.txt", status );
@@ -786,9 +759,6 @@ void smurf_sim( int *status ) {
   else if ( mode == heatrun ) {
 
      /* Do a heatrun */
-
-     /* Get the output directory name */
-     strcpy ( inx.dataname, getenv ( "SMURF_SIM_IN" ) );
 
      numsamples = inx.heatnum;
 
@@ -906,8 +876,7 @@ void smurf_sim( int *status ) {
       }
 
       /* Get the name of this flatfield solution */
-      sprintf ( filename, "%s/%sheat%04i%02i%02i_00001", 
-		inx.dataname, sinx.subname, date_yr, date_mo, date_da );
+      sprintf ( filename, "%sheat%04i%02i%02i_00001", sinx.subname, date_yr, date_mo, date_da );
 
       msgSetc( "FILENAME", filename );
       msgOut( FUNC_NAME, "Writing ^FILENAME", status ); 
