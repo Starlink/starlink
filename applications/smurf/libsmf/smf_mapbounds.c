@@ -139,16 +139,24 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
     
     if( *status == SAI__OK ) {
       file = data->file;
-      pname =  file->name;
-      msgSetc("FILE", pname);
-      msgSeti("THISFILE", i);
-      msgSeti("NUMFILES", size);
-      msgOutif(MSG__VERB, " ", 
-	       "SMF_MAPBOUNDS: Processing ^THISFILE/^NUMFILES ^FILE",
-	       status);
+
+      if( file != NULL ) {
+        pname =  file->name;
+        msgSetc("FILE", pname);
+        msgSeti("THISFILE", i);
+        msgSeti("NUMFILES", size);
+        msgOutif(MSG__VERB, " ", 
+                 "SMF_MAPBOUNDS: Processing ^THISFILE/^NUMFILES ^FILE",
+                 status);
+      } else {
+        *status = SAI__ERROR;
+        errRep( "smf_mapbounds", 
+                "No smfFile associated with smfData.", status);
+      }
     }
-    else
-      errRep( "smf_mapbounds", "Couldn't open input file.", status );
+    else {
+      errRep( "smf_mapbounds", "Couldn't open data file.", status );
+    }
 
     /* Check that the data dimensions are 3 (for time ordered data) */
     if( *status == SAI__OK ) {
@@ -176,8 +184,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
             
       /* Get the astrometry for all the time slices in this data file */
       
-      for( j=0; j<(data->dims)[2]; j++ ) {
-	
+      for( j=0; j<(data->dims)[2]; j++ ) {	
 	smf_tslice_ast( data, j, 1, status);
 	
 	if( *status == SAI__OK ) {
@@ -243,7 +250,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 	  /* clean up ast objects */
 	  bolo2sky = astAnnul( bolo2sky );
 	  bolo2map = astAnnul( bolo2map );
-
 	}
 
 	/* Break out of loop over time slices if bad status */
@@ -295,6 +301,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   if (fitschan) fitschan = astAnnul( fitschan );
 
   if( data != NULL )
-    smf_close_file( &data, status);
+    smf_close_file( &data, status );
 
 }
