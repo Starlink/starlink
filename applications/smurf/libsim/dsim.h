@@ -98,6 +98,16 @@ double *tau450,      /* 450 optical depth (returned) */
 int *status          /* global status (given and returned) */
 );
 
+/*+ dsim_calctrans - calculate sky zenith % atmospheric transmission */
+
+void dsim_calctrans
+(
+double lambda,        /* wavelength in metres (given) */
+double *trans,        /* % atmospheric transmission (returned) */
+double tauCSO,        /* CSO optical depth (given) */
+int *status           /* global status (given and returned) */
+);
+
 /*+ dsim_calctime - calculte UT + LST arrays given a start time */
 
 void dsim_calctime
@@ -331,7 +341,7 @@ double *ybolo,          /* y-bolometer coordinates for array (given) */
 AstCmpMap *bolo2map,    /* mapping bolo->sky image coordinates (given ) */
 double *astsim,         /* astronomical image (given) */
 long astnaxes[2],       /* dimensions of simulated image (given) */
-double *dbuf,         /* pointer to bolo output (returned) */
+double *dbuf,           /* pointer to bolo output (returned) */
 int *status             /* global status (given and returned) */
 );
 
@@ -1053,6 +1063,7 @@ double atmscale,             /* pixel size in simulated atm background
                                 (given) */
 double *atmsim,              /* atmospheric emission (given) */
 double coeffs[],             /* bolometer response coeffs (given) */
+AstFrameSet *fset,           /* World Coordinate transformations */
 double heater[],             /* bolometer heater ratios (given) */
 int nboll,                   /* total number of bolometers (given) */
 int frame,                   /* number of current frame (given) */
@@ -1063,7 +1074,7 @@ double samptime,             /* sample time in sec (given) */
 double start_time,           /* time at start of scan in sec  (given) */
 double telemission,          /* power from telescope emission (given) */
 double *weights,             /* impulse response (given) */
-AstCmpMap *bolo2map,         /* mapping bolo->sky image coordinates */
+AstMapping *sky2map,         /* Mapping celestial->map coordinates */
 double *xbolo,               /* native X offsets of bolometers */
 double *ybolo,               /* native Y offsets of bolometers */
 double *xbc,                 /* nasmyth X offsets of bolometers */
