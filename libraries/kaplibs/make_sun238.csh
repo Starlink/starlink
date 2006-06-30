@@ -1,110 +1,83 @@
-#!/bin/tcsh
-      echo "Gathering files to put in sun238"
+#!/bin/tcsh 
 
-#  Ensure the sdt grp command is available.
-      source $SDT_DIR/startup.csh
+# Create file "documented_files" in each subdirectory containing the
+# names of the files to be documented.
 
-#  Fetch the master tex file holdiong the fixed part of the document.
-      fetch sun238.master
+foreach dir (aif ctg fts ira irq kpg lpg)
+   cd $dir
 
-#  Create a temporary directory for the sources
-      mkdir tsources
+# Get a basic list of files. For IRQ and IRA, only document IRQ_ and IRA_
+# routines (not IRQ1_ or IRA1_).
+   rm -f temp-files >& /dev/null
 
-#  Empty all tar files into this directory
-      cd tsources 
-      foreach n (../*.tar)
-         tar -xf $n
+   if( $dir != "irq" && $dir != "ira" ) then 
+      foreach file (*.f *.g*)
+         echo $file >> temp-files
       end
 
-#  Delete any files to be excluded.
-      foreach n (`grp exclude`)
-         rm -f $n
+   else
+      foreach file (${dir}_*.f ${dir}_*.g*)
+         echo $file >> temp-files
       end
+   endif
 
-#  Create a temporary directory for the docs
-      cd ..
-      mkdir tdocs
+# Only document those files that are mentioned in Makefile.am and are not
+# blockdata or common block definition files.
+   rm -f documented_files >& /dev/null
 
-#  Move all the .f files which need to be documented in sun238.tex
-#  into in the temporary docs directory.
-      foreach n (ctg lpg aif fts1 ira kpg1)
-         cp tsources/${n}_*.f tdocs >& /dev/null
-      end
+   foreach file (`cat temp-files`)
+      grep -q $file Makefile.am
+      set s1 = $status
 
-#  Remove the sources directory.
-      rm -rf tsources
+      grep -q "BLOCK DATA" $file
+      set s2 = $status
 
-#  Move the master document into the docs directory
-      cd tdocs
-      mv ../sun238.master .
+      if( $s1 == 0 && $s2 == 1 ) then
+         echo $file >> documented_files
+      else
+         echo "Ignoring $dir/$file"
+      endif
+   end
 
-#  Run SST:prolat on all the .f files, putting the output in prolat.tex
-      source $INSTALL/bin/sst/start
-      echo "Running prolat on all .f files"
-      rm -f prolat.tex
-      foreach f (*.f)      
-         rm -f .sst.tmp
-         prolat in=$f out=$f.tex noatask single nopage nodocument >& $f.err
-         grep "\!\!" $f.err
-         if( $status == 1 ) then
-            cat $f.tex  >> prolat.tex
-            rm $f.err
-         else
-           cat $f.err
-         endif
-      end
+   rm -rf temp-files
 
-#  Insert this file, together with a list of all routines, into sun238.tex
-      echo "Running make_sun238.tcl"
-      $KAPLIBS_DEV/bin/make_sun238.tcl
+   cd ..
+end
 
-#  Copy the final sun238.tex to the parent directory.
-      cp sun238.tex ..
+# Copy the sun header to the output tex file.
+cp sun_head.tex sun238.tex
 
-#  Move to the parent directory.
-      cd ..
+# Add a noteroutine for each documented file
+foreach dir (aif ctg fts ira irq kpg lpg)
+   cd $dir
+   ../make_noteroutines.pl > notes
+   grep -q \!\!\! notes
+   if( $status == 0 ) then
+      cat notes
+      exit
+   endif
+   cat notes >> ../sun238.tex
+   cd ..
+end
 
-#  Store a copy of the .tex file in KAPLIBS_SYS.
-      cp -f sun238.tex $KAPLIBS_SYS
+# Copy the middle section of the fixed text 
+cat sun_mid.tex >> sun238.tex
 
-#  Create the hypertext docs.
-      echo "Running star2html"
-      star2html sun238.tex
+# Add an sstroutine for each documented file
+foreach dir (aif ctg fts ira irq kpg lpg)
+   cd $dir
 
-#  Temporaily tar up the htx files.
-      tar -cvhf tmp.tar sun238.htx
+   foreach file ( `cat documented_files`)
+      set name = `echo $file | sed -e 's/\.[^\.]*$//'`
+      rm -f $name.tex >& /dev/null
+      $STARCONF_DEFAULT_STARLINK/bin/sst/prolat $file out=$name.tex \
+                                   noatask nodocument single nopage > /dev/null
+   end
 
-#  Create a htx.index file and move it into the tdocs directory.
-      echo "Linking sun238.htx"
-      unsetenv HTX_NOLINK
-      hlink .
-      mv sun238.htx/htx.index tdocs
-      setenv HTX_NOLINK 1
+   cat *.tex >> ../sun238.tex
+   rm -f *.tex documented_files >& /dev/null
+   cd ..
+end
 
-#  Replaced the linked htx directory with the unlinked original.
-      rm -rf sun238.htx
-      tar -xf tmp.tar
-      rm -f tmp.tar
-
-#  Move into the tdocs directory and create the kaplibs.js file containing
-#  a javascript description of the documented prologues. Move it into the
-#  hypertext directory.
-      cd tdocs
-      echo "Making kaplibs.js"
-      $KAPLIBS_DEV/bin/make-js.tcl kaplibs
-      mv kaplibs.js ../sun238.htx
-      cd ..
-
-#  Move the other files needed for the prologue searching tool into the
-#  hypertext directory.
-      mv `grp searchtools` sun238.htx
-
-#  Tar up the hypertext docs.
-      tar -cvhf sun238.htx_tar sun238.htx
-      rm -rf sun238.htx
-
-#  Store a copy of the hypertext docs in KAPLIBS_SYS.
-      cp -f sun238.htx_tar $KAPLIBS_SYS
-
-#  Delete the docs directory.
-      rm -rf tdocs
+# Copy the footer
+cat sun_tail.tex >> sun238.tex

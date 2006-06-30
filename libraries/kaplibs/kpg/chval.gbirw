@@ -3,6 +3,9 @@
 *  Name:
 *     CHVAL<T>
 
+*  Purpose:
+*     Replace a specified pixel value.
+   
 *  Description:
 *     This routine replaces a specified pixel with an input
 *     value and returns the old value of the pixel.
