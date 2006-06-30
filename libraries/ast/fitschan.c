@@ -22822,6 +22822,7 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
                   astSetSourceVel( specfrm, 0.0 );
                } else {
                   vsource = AST__BAD;
+                  sourcevrf = AST__NOSOR;
                }
 
                astSetSourceVRF( specfrm, AST__TPSOR );
