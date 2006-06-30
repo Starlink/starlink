@@ -36,7 +36,7 @@
 </component>
 
 <component id="atools" support="S">
-  <version>1.9-0</version>
+  <version>1.9-1</version>
   <path>applications/atools</path>
   <description>ATOOLS - AST applications</description>
   <abstract><p>
