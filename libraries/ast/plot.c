@@ -594,6 +594,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - Guard against astGap calls that reach a minimum gap size.
 *        - Sort out splitting of long axis labels (such as date/time
 *        strings produced by TimeFrames).
+*     30-JUN-2006 (DSB)
+*        If abbreviating labels, display the last field for identical 
+*        neighbours rather than the whole value.
 *class--
 */
 
@@ -1747,7 +1750,7 @@ static TickInfo *TickMarks( AstPlot *, int, double *, double *, int *, const cha
 static char **CheckLabels2( AstPlot *, AstFrame *, int, double *, int, char **, double );
 static char *FindWord( char *, const char *, const char ** );
 static char *GrfItem( int, const char * );
-static const char *SplitValue( AstPlot *, const char *, int * );
+static const char *SplitValue( AstPlot *, const char *, int, int * );
 static const char *JustMB( AstPlot *, int, const char *, float *, float *, float, float, const char *, float, float, float, float, float *, float *, const char *, const char * );
 static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char * );
 static double GetTicks( AstPlot *, int, double *, double **, int *, int *, int, int *, double *, const char *, const char * );
@@ -20538,7 +20541,8 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
             if( !root_found ) {
 
                if( axis == 0 || !Overlap( this, -1, esc, 
-                                          SplitValue( this, ll->text, &split ), 
+                                          SplitValue( this, ll->text,
+                                                      axis, &split ), 
                                           (float) ll->x, (float) ll->y, 
                                           ll->just, (float) ll->upx, 
                                           (float) ll->upy, box, method, 
@@ -20649,17 +20653,21 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
                   }
                }
 
-/* If only one of these two neighbouring labels was found, we abbreviate the 
-   current label by comparing it with the one found neighbouring label. */
-               if( !lllo ) {
-                  ll->atext = abb ? astAbbrev( frame, axis, fmt, llhi->text, 
-                                               ll->text ) : ll->text;
-                  if( !(ll->atext)[0] ) ll->atext = ll->text;
+/* If we are not abbreviating, use the full text as the abbreviated text.*/
+               if( !abb ) {
+                  ll->atext = ll->text;
+
+/* Otherwise, if only one of these two neighbouring labels was found, we 
+   abbreviate the current label by comparing it with the one found 
+   neighbouring label. If they are identical, we use the last field as
+   the abbreviated text. */
+               } else if( !lllo ) {
+                  ll->atext = astAbbrev( frame, axis, fmt, llhi->text, 
+                                         ll->text );
 
                } else if( !llhi ) {
-                  ll->atext = abb ? astAbbrev( frame, axis, fmt, lllo->text, 
-                                               ll->text ) : ll->text;
-                  if( !(ll->atext)[0] ) ll->atext = ll->text;
+                  ll->atext = astAbbrev( frame, axis, fmt, lllo->text, 
+                                         ll->text );
 
 /* If two neighbouring labels were found, we abbreviate the current label
    by comparing it with both neighbouring labels, and choosing the shorter
@@ -20677,8 +20685,15 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
                   } else {
                      ll->atext = texthi;
                   }
-                  if( !(ll->atext)[0] ) ll->atext = ll->text;
                } 
+
+/* If the two fields are identical, the abbreviated text returned by
+   astAbbrev will be a null string. In this case, find the start of the 
+   last field in the formatted value (using astAbbrev again), and use 
+   that as the abbreviated text. */
+               if( !(ll->atext)[0] ) {
+                  ll->atext = astAbbrev( frame, axis, fmt, NULL, ll->text );
+               }
             }
          }
       }
@@ -20687,7 +20702,8 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
    boxes. */
       nleft = 1;
       ll = list + root;
-      olap = Overlap( this, -1, esc, SplitValue( this, ll->atext, &split ), 
+      olap = Overlap( this, -1, esc, 
+                      SplitValue( this, ll->atext, axis, &split ), 
                       (float) ll->x, (float) ll->y, ll->just, (float) ll->upx, 
                       (float) ll->upy, box, method, class );
 
@@ -20699,7 +20715,8 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
          ll++;
          if( ll->priority >= 0 ) {
             if( strcmp( ll->atext, latext ) ) {
-               if( Overlap( this, -1, esc, SplitValue( this, ll->atext, &split ),
+               if( Overlap( this, -1, esc, 
+                            SplitValue( this, ll->atext, axis, &split ),
                             (float) ll->x, (float) ll->y, ll->just, 
                             (float) ll->upx, (float) ll->upy, box, method, 
                             class ) ){
@@ -20719,7 +20736,8 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
          ll--;
          if( ll->priority >= 0 ) {
             if( strcmp( ll->atext, latext ) ) {
-               if( Overlap( this, -1, esc, SplitValue( this, ll->atext, &split ),
+               if( Overlap( this, -1, esc, 
+                            SplitValue( this, ll->atext, axis, &split ),
                             (float) ll->x, (float) ll->y, ll->just, 
                             (float) ll->upx, (float) ll->upy, box, method, 
                             class ) ){
@@ -20796,14 +20814,16 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
 /* Check that this label does not overlap any labels drawn for previous
    axes (we know from the above processing that it will not overlap any
    other label on the current axis). */
-         if( !Overlap( this, -1, esc, SplitValue( this, ll->atext, &split ), 
+         if( !Overlap( this, -1, esc, 
+                       SplitValue( this, ll->atext, axis, &split ), 
                        (float) ll->x, (float) ll->y, ll->just, (float) ll->upx,
                        (float) ll->upy, box, method, class ) ) {
 
 /* Draw the abbreviated label text, and get the bounds of the box containing 
    the new label, splitting long formatted values (such as produced by 
    TimeFrames) into two lines. */
-            DrawText( this, 1, esc, SplitValue( this, ll->atext, &split ), 
+            DrawText( this, 1, esc, 
+                      SplitValue( this, ll->atext, axis, &split ), 
                       (float) ll->x, (float) ll->y, ll->just, (float) ll->upx, 
                       (float) ll->upy, xbn, ybn, NULL, method, class );
          }
@@ -22100,7 +22120,8 @@ static void SetLogPlot( AstPlot *this, int axis, int ival ){
    }
 } 
 
-static const char *SplitValue( AstPlot *this, const char *value, int *split ) {
+static const char *SplitValue( AstPlot *this, const char *value, int axis,
+                               int *split ) {
 /*
 *  Name:
 *     FormatValue
@@ -22114,7 +22135,7 @@ static const char *SplitValue( AstPlot *this, const char *value, int *split ) {
 *  Synopsis:
 *     #include "plot.h"
 *     static const char *SplitValue( AstPlot *this, const char *value, 
-*                                    int *split )
+*                                    int axis, int *split )
 
 *  Class Membership:
 *     Plot member function 
@@ -22129,6 +22150,11 @@ static const char *SplitValue( AstPlot *this, const char *value, int *split ) {
 *        Pointer to the Plot.
 *     value
 *        The formatted coordinate value.
+*     axis
+*        Indicates whether or not short lines should be split by
+*        including a blank first line. If zero, and if "*split" is non-zero, 
+*        then short lines are put onto the second line,and the first line
+*        is blank.
 *     split
 *        Pointer to an integer that controls behaviour:
 *
@@ -22205,11 +22231,15 @@ static const char *SplitValue( AstPlot *this, const char *value, int *split ) {
 /* If no spaces were found... */
          if( imin == -1 ) {
 
+/*  If axis is zero, we add a blank first line. */
+            if( axis == 0 ) {
+
 /* Fill the first line with spaces. */
-            for( i = 0; i < l; i++ ) *(d++) = ' ';
+               for( i = 0; i < l; i++ ) *(d++) = ' ';
 
 /* Add an escape sequence that moves down by one character height. */
-            d += sprintf( d, "%%v170+" );
+               d += sprintf( d, "%%v170+" );
+            }
 
 /* Add the whole of the supplied text. */
             for( i = 0; i < l; i++ ) *(d++) = value[ i ];
