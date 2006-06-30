@@ -4,6 +4,9 @@
 *     KPG1_GTOBJ
 
 *  Purpose:
+*     Get an AST Object using an environment parameter.
+
+*  Description:
 *     Get an AST Object from an NDF, FITS file or text file using an 
 *     environment parameter.
 
