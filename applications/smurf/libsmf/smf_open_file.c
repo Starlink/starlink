@@ -94,6 +94,8 @@
 *        Set correct data type for QUALITY to fix HDS error
 *     2006-06-12 (EC):
 *        NULL pointers associated with .SMURF.MAPCOORD extension
+*     2006-06-30 (EC):
+*        Now NULL pointers in smf_create_smf*, changed to .SCU2RED.MAPCOORD
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -251,10 +253,6 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   if ( *status == SAI__OK) {
     file = (*data)->file;
     hdr = (*data)->hdr;
-
-    /* Null MAPCOORD extension pointers - they get allocated elsewhere */
-    (*data)->lut = NULL;
-    file->mapcoordid=NDF__NOID;
 
     /* If we have timeseries data then look for and read polynomial
        scan fit coefficients. */
