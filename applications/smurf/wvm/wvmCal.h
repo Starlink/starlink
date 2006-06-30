@@ -9,6 +9,7 @@
 #define DEBUG_OPT_FUNC     0    /* 1 = turn on printing in optimization function 0=no */
 
 double pwv2tau(double airMass, double mmH2O_a);
+double tau2pwv(double tau);
 void wvmCal(int cycleCnt,float * data,float eta,
 	      float tAmb, float * tSky,float * tSys, FILE *rawFP);
 void wvmOpt(float airMass,float tAmb,float * tSky,
