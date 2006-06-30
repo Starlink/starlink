@@ -108,9 +108,9 @@
 
 
 #if defined(__STDC__) || defined(VMS)
-#define CONST const
+#define CNF_CONST const
 #else
-#define CONST
+#define CNF_CONST
 #endif
 
 /*  -----  Macros common to calling C from FORTRAN and FORTRAN from C  ---- */
@@ -224,19 +224,19 @@
 /*  single argument; the name of the parameter. On most systems, a numeric  */
 /*  argument is passed as a pointer.					    */
 
-#define INTEGER(X)     F77_INTEGER_TYPE *CONST X
-#define REAL(X)        F77_REAL_TYPE    *CONST X
-#define DOUBLE(X)      F77_DOUBLE_TYPE  *CONST X
-#define LOGICAL(X)     F77_LOGICAL_TYPE *CONST X
-#define BYTE(X)        F77_BYTE_TYPE    *CONST X
-#define WORD(X)        F77_WORD_TYPE    *CONST X
-#define UBYTE(X)       F77_UBYTE_TYPE   *CONST X
-#define UWORD(X)       F77_UWORD_TYPE   *CONST X
+#define INTEGER(X)     F77_INTEGER_TYPE *CNF_CONST X
+#define REAL(X)        F77_REAL_TYPE    *CNF_CONST X
+#define DOUBLE(X)      F77_DOUBLE_TYPE  *CNF_CONST X
+#define LOGICAL(X)     F77_LOGICAL_TYPE *CNF_CONST X
+#define BYTE(X)        F77_BYTE_TYPE    *CNF_CONST X
+#define WORD(X)        F77_WORD_TYPE    *CNF_CONST X
+#define UBYTE(X)       F77_UBYTE_TYPE   *CNF_CONST X
+#define UWORD(X)       F77_UWORD_TYPE   *CNF_CONST X
 
 /*  Pointer arguments. Define a pointer type for passing pointer values	    */
 /*  between subroutines.						    */
 
-#define POINTER(X)     F77_POINTER_TYPE *CONST X
+#define POINTER(X)     F77_POINTER_TYPE *CNF_CONST X
 
 /*  EXTERNAL arguments. Define a passed subroutine or function name */
 #define SUBROUTINE(X)  void (*X)()
@@ -253,16 +253,16 @@
 
 /*  Array arguments.							    */
 
-#define INTEGER_ARRAY(X)     F77_INTEGER_TYPE *CONST X
-#define REAL_ARRAY(X)        F77_REAL_TYPE    *CONST X
-#define DOUBLE_ARRAY(X)      F77_DOUBLE_TYPE  *CONST X
-#define LOGICAL_ARRAY(X)     F77_LOGICAL_TYPE *CONST X
-#define BYTE_ARRAY(X)        F77_BYTE_TYPE    *CONST X
-#define WORD_ARRAY(X)        F77_WORD_TYPE    *CONST X
-#define UBYTE_ARRAY(X)       F77_UBYTE_TYPE   *CONST X
-#define UWORD_ARRAY(X)       F77_UWORD_TYPE   *CONST X
+#define INTEGER_ARRAY(X)     F77_INTEGER_TYPE *CNF_CONST X
+#define REAL_ARRAY(X)        F77_REAL_TYPE    *CNF_CONST X
+#define DOUBLE_ARRAY(X)      F77_DOUBLE_TYPE  *CNF_CONST X
+#define LOGICAL_ARRAY(X)     F77_LOGICAL_TYPE *CNF_CONST X
+#define BYTE_ARRAY(X)        F77_BYTE_TYPE    *CNF_CONST X
+#define WORD_ARRAY(X)        F77_WORD_TYPE    *CNF_CONST X
+#define UBYTE_ARRAY(X)       F77_UBYTE_TYPE   *CNF_CONST X
+#define UWORD_ARRAY(X)       F77_UWORD_TYPE   *CNF_CONST X
 
-#define POINTER_ARRAY(X)     F77_POINTER_TYPE *CONST X
+#define POINTER_ARRAY(X)     F77_POINTER_TYPE *CNF_CONST X
 
 /*  Macros to handle character arguments.				    */
 
@@ -274,9 +274,9 @@
 /*  GENPTR_CHARACTER macro is null, otherwise it works on intermediate	    */
 /*  variables.								    */
 
-#define CHARACTER(X)             F77_CHARACTER_TYPE *CONST X
+#define CHARACTER(X)             F77_CHARACTER_TYPE *CNF_CONST X
 #define TRAIL(X)                 ,int X ## _length
-#define CHARACTER_ARRAY(X)       F77_CHARACTER_TYPE *CONST X
+#define CHARACTER_ARRAY(X)       F77_CHARACTER_TYPE *CNF_CONST X
 
 
 /*  ---  Getting Pointers to Arguments  ---				    */
@@ -671,11 +671,11 @@
 #undef  F77_CHARACTER_ARRAY_ARG_TYPE
 #define F77_CHARACTER_ARRAY_ARG_TYPE struct dsc$descriptor_a
 #undef  CHARACTER
-#define CHARACTER(X) F77_CHARACTER_ARG_TYPE *CONST X/**/_arg
+#define CHARACTER(X) F77_CHARACTER_ARG_TYPE *CNF_CONST X/**/_arg
 #undef  TRAIL
 #define TRAIL(X)
 #undef  CHARACTER_ARRAY
-#define CHARACTER_ARRAY(X)  F77_CHARACTER_ARRAY_ARG_TYPE *CONST X/**/_arg
+#define CHARACTER_ARRAY(X)  F77_CHARACTER_ARRAY_ARG_TYPE *CNF_CONST X/**/_arg
 #undef  GENPTR_CHARACTER
 #define GENPTR_CHARACTER(X) \
    F77_CHARACTER_TYPE *X = X/**/_arg->dsc$a_pointer; \
