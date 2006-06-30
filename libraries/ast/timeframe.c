@@ -115,6 +115,8 @@ f     - AST_CURRENTTIME: Return the current system time
 *     30-JUN-2006 (DSB):
 *        When splitting a date/time string into fields, allow each field 
 *        to include a decimal point.
+*     30-JUN-2006 (DSB):
+*        Allow astAbbrev to have a null "str1" value.
 
 *class--
 */
@@ -332,8 +334,9 @@ static const char *Abbrev( AstFrame *this_frame, int axis,  const char *fmt,
 *        format specification used to format the two values.
 *     str1
 *        Pointer to a constant null-terminated string containing the
-*        first formatted value.
-*     str1
+*        first formatted value. If this is null, the returned pointer
+*        points to the start of the final field in str2.
+*     str2
 *        Pointer to a constant null-terminated string containing the
 *        second formatted value.
 
@@ -381,7 +384,32 @@ static const char *Abbrev( AstFrame *this_frame, int axis,  const char *fmt,
    if( !df ) {
       result = (*parent_abbrev)( this_frame, axis,  fmt, str1, str2 );
 
-/* Otherwise. */
+/* Otherwise, if no "str1" string was supplied find the start of the 
+   last field in "str2". */
+   } else if( !str1 ){
+
+/* Initialise a pointer to the start of the next field in the "str2" string
+   (skip leading spaces). */
+      p2 = str2;
+      while( *p2 && isspace( *p2 ) ) p2++;
+            
+/* Check the entire string, saving the start of the next field as the
+   returned pointer. */
+      while( *p2 ) {
+         result = p2;
+
+/* Each field in a date/time field consists of digits only (and maybe a
+   decimal point). Find the number of leading digits/dots in this field
+   and increment the point to the following character (the first delimiter
+   character). */
+         p2 += strspn( p2, "0123456789." );
+
+/* Skip inter-field (non-numeric) delimiters. */
+         p2 += strcspn( p2, "0123456789." );
+      }
+
+/* Otherwise, if an "str1" string was supplied find the start of the 
+   first differing field in "str2". */
    } else {
 
 /* Initialise pointers to the start of the next field in each string
