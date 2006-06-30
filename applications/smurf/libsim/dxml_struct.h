@@ -4,6 +4,7 @@
     B.D.Kelly (bdk@roe.ac.uk)
     A.G. Gibb (agg@astro.ubc.ca)
     E.L. Chapin (echapin@phas.ubc.ca)
+    J. Balfour (jbalfour@phas.ubc.ca)
 
    History :
     14Feb2003 : original (bdk)
@@ -20,6 +21,8 @@
     24Jan2006 : add pwvzen / atstart / atend (ec)
     23Feb2006 : add mjdaystart (ec)
     03Mar2006 : add pong* (ec)
+    15Jun2006 : replace pwvzen with tauzen (jb)
+    29Jun2006 : removed dataname (jb)
 */
 
 struct dxml_struct {
@@ -33,7 +36,6 @@ struct dxml_struct {
 				 3 - sinc(dx).sinc(dy) after first 1.0
 				 4 - bessel tapered */
   double conv_sig;            /* convolution function parameter */
-  char dataname[DREAM__FLEN]; /* name of data output file */
   double dec;                 /* declination in radians */
   double distfac;             /* distortion factor (0=no distortion) */
   char flatname[DREAM__FLEN]; /* name of flatfield algorithm */
@@ -112,10 +114,10 @@ struct dxml_sim_struct
   double naspol;              /* polarisation of Nasmyth optics (%) */
   double nastrans;            /* transmission of Nasmyth optics (%) */
   int ncycle;                 /* Number of cycles through the pattern */
-  double pwvzen;              /* Zenith precipital water vapour (mm) */
   double smu_terr;            /* SMU timing error */
   char subname[80];           /* name of subarray */
   double telemission;         /* telescope background pW per pixel */
+  double tauzen;              /* optical depth at 225GHz at the zenith */
   double xpoint;              /* X pointing offset on sky (arcsec) */
   double ypoint;              /* Y pointing offset on sky (arcsec) */
   };

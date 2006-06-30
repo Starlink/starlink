@@ -58,7 +58,6 @@ static double XML_casspol;             /* polarisation of Cass optics (%) */
 static double XML_casstrans;           /* transmission of Cass optics (%) */
 static int XML_conv_shape;             /* Possible convolution functions are Gaussian (=0) */
 static double XML_conv_sig;            /* convolution function parameter */
-static char XML_dataname[DREAM__FLEN]; /* name of file for DREAM data */
 static double XML_dec;                 /* declination in radians */
 static double XML_distfac;             /* distortion factor (0=no distortion) */
 static char XML_flatname[DREAM__FLEN]; /* name of flatfield algorithm */
@@ -102,7 +101,6 @@ static double XML_pong_angle;          /* angle of pattern relative to tel.
 static int XML_pong_gridcount;         /* number of grid lines (odd) (given) */
 static double XML_pong_spacing;        /* grid spacing in arcsec (given) */
 static double XML_pong_vmax;           /* Telescope max vel. (arcsec/sec) */
-static double XML_pwvzen;              /* Zen. precipital water vapour (mm) */
 static double XML_ra;                  /* Right Ascension in radians */
 static double XML_sample_t;            /* sample interval in msec */
 static int XML_smu_move;               /* Code for the SMU move algorithm */
@@ -112,6 +110,7 @@ static double XML_smu_terr;            /* SMU timing error in msec */
 static char XML_subname[80];           /* name of subarray */
 static int XML_subsysnr;               /* subsystem number */
 static double XML_targetpow;           /* target bolometer power input pW */
+static double XML_tauzen;              /* optical depth at 225GHz at the zenith */
 static double XML_telemission;         /* telescope background pW */
 static char XML_wt0_name[DREAM__FLEN]; /* name of file for pixel weights */
 static char XML_wt1_name[DREAM__FLEN]; /* name of file for piston weights */
@@ -349,7 +348,6 @@ int *status                /* global status (given and returned) */
    XML_casstrans = 98.0;   
    XML_conv_shape = 1;
    XML_conv_sig = 1.0;
-   strcpy ( XML_dataname, "" );
    XML_dec = 0.0;
    XML_distfac = 0.0;
    strcpy ( XML_flatname, "POLYNOMIAL" );
@@ -384,7 +382,6 @@ int *status                /* global status (given and returned) */
    XML_pong_gridcount = 7;
    XML_pong_spacing = 240.0;
    XML_pong_vmax = 200.0;
-   XML_pwvzen = 1.0;   
    XML_ra = 0.0;
    XML_sample_t = 5.0;
    XML_smu_move = 8;
@@ -394,6 +391,7 @@ int *status                /* global status (given and returned) */
    strcpy ( XML_subname, "" );
    XML_subsysnr = 1;
    XML_targetpow = 25.0;
+   XML_tauzen = 0.052583;
    XML_telemission = 4.0;
    strcpy ( XML_wt0_name, "" );
    strcpy ( XML_wt1_name, "" );
@@ -637,7 +635,6 @@ int *status                /* global status (given and returned) */
    fprintf ( fd, " bolfile = %s\n", inx.bolfile );
    fprintf ( fd, " conv_shape = %d\n", inx.conv_shape );
    fprintf ( fd, " conv_sig = %e\n", inx.conv_sig );
-   fprintf ( fd, " dataname = %s\n", inx.dataname );
    fprintf ( fd, " dec = %e\n", inx.dec );
    fprintf ( fd, " distfac = %e\n", inx.distfac );
    fprintf ( fd, " flatname = %s\n", inx.flatname );
@@ -708,6 +705,7 @@ int *status                    /* global status (given and retuned) */
     04Feb2005 : add telemission (bdk)
     14Apr2005 : add airmass (agg)
     24Jan2006 : airmass derived quantity, added pwvzen/atstart/atend (ec)
+    15Jun2006 : replaced pwvzen with tauzen (jb)
 */
 
 {
@@ -745,9 +743,9 @@ int *status                    /* global status (given and retuned) */
    inx->naspol = XML_naspol;
    inx->nastrans = XML_nastrans;
    inx->ncycle = XML_ncycle;
-   inx->pwvzen = XML_pwvzen;
    inx->smu_terr = XML_smu_terr;
    strcpy ( inx->subname, XML_subname );
+   inx->tauzen = XML_tauzen;
    inx->telemission = XML_telemission;
    inx->xpoint = XML_xpoint;
    inx->ypoint = XML_ypoint;
@@ -787,7 +785,6 @@ int *status                /* global status (given and retuned) */
    strcpy ( inx->bolfile, XML_bolfile );
    inx->conv_shape = XML_conv_shape;
    inx->conv_sig = XML_conv_sig;
-   strcpy ( inx->dataname, XML_dataname );
    inx->dec = XML_dec;
    inx->distfac = XML_distfac;
    strcpy ( inx->flatname, XML_flatname );
@@ -1131,9 +1128,9 @@ const char **atts              /* array of name-value pairs (given) */
    {
       dxml_cvtdouble ( name, atts[1], &XML_telemission, &status );
    }
-   else if ( strcmp ( name, "pwvzen" ) == 0 )
+   else if ( strcmp ( name, "tauzen" ) == 0 )
    {
-      dxml_cvtdouble ( name, atts[1], &XML_pwvzen, &status );
+     dxml_cvtdouble ( name, atts[1], &XML_tauzen, &status );
    }
    else if ( strcmp ( name, "atstart" ) == 0 )
    {
@@ -1263,10 +1260,6 @@ const char **atts              /* array of name-value pairs (given) */
    else if ( strcmp ( name, "conv_sig" ) == 0 )
    {
       dxml_cvtdouble ( name, atts[1], &XML_conv_sig, &status );
-   }
-   else if ( strcmp ( name, "dataname" ) == 0 )
-   {
-      strcpy ( XML_dataname, atts[1] );
    }
    else if ( strcmp ( name, "dec" ) == 0 )
    {
