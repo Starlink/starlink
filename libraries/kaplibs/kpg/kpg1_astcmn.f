@@ -16,6 +16,9 @@
 *     KPG_AST common block from outside of the KPG library. Routines
 *     are only added on demand.
 
+*  Invocation:
+*     CALL KPG1_SETASTxxx    or   VALUE = KPG1_GETASTxxx
+
 *  Implementation Details:
 *     The following routines are available:
 *       KPG1_SETASTLN( LN ) - Set the ASTLN integer
