@@ -539,7 +539,7 @@
 
 *  TimeOrigin
             IF( AST_TEST( FRM, 'TimeOrigin', STATUS ) ) THEN
-               TIMEOR = AST_GETD( FRM, 'TIMEORIGIN', STATUS );
+               TIMEOR = AST_GETD( FRM, 'TIMEORIGIN', STATUS )
                CALL MSG_SETC( 'TIMEOR',
      :              AST_FORMAT( FRM, 1, TIMEOR, STATUS ) )
             ELSE
