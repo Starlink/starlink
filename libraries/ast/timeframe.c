@@ -112,6 +112,10 @@ f     - AST_CURRENTTIME: Return the current system time
 *        - Activate astAbbrev function for abbreviating leading fields in
 *        plot labels.
 *        - Include TimeOrigin in default Label.
+*     30-JUN-2006 (DSB):
+*        When splitting a date/time string into fields, allow each field 
+*        to include a decimal point.
+
 *class--
 */
 
@@ -391,12 +395,12 @@ static const char *Abbrev( AstFrame *this_frame, int axis,  const char *fmt,
       result = p2;
       while( *p1 && *p2 ) {
 
-/* Each field in a date/time field consists of digits only. Find the
-   number of leading digits in each string */
-         nc1 = strspn( p1, "0123456789" );
-         nc2 = strspn( p2, "0123456789" );
+/* Each field in a date/time field consists of digits only (and maybe a
+   decimal point). Find the number of leading digits/dots in each string */
+         nc1 = strspn( p1, "0123456789." );
+         nc2 = strspn( p2, "0123456789." );
 
-/* If the next field has different lengthsin the two strings, or of the 
+/* If the next field has different lengths in the two strings, or of the 
    content of the fields differ, break out of th eloop, leaving "result"
    pointing to the start of the current field. */
          if( nc1 != nc2 || strncmp( p1, p2, nc1 ) ) {
@@ -409,8 +413,8 @@ static const char *Abbrev( AstFrame *this_frame, int axis,  const char *fmt,
             p2 += nc2;
 
 /* Skip inter-field (non-numeric) delimiters. */
-            p1 += strcspn( p1, "0123456789" );
-            p2 += strcspn( p2, "0123456789" );
+            p1 += strcspn( p1, "0123456789." );
+            p2 += strcspn( p2, "0123456789." );
          }
 
 /* Prepare to check the next field. */
