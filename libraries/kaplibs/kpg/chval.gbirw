@@ -4,7 +4,7 @@
 *     CHVAL<T>
 
 *  Purpose:
-*     Replace a specified pixel value.
+*     Replaces a specified pixel value.
    
 *  Description:
 *     This routine replaces a specified pixel with an input
@@ -61,7 +61,7 @@
 *     02111-1307, USA
 
 *  Authors:
-*     Malcolm J. Currie STARLINK (RAL::CUR)
+*     MJC: Malcolm J. Currie (STARLINK)
 
 *  History:
 *     26-OCT-1988 (MJC):
@@ -69,7 +69,7 @@
 *     24-NOV-1990 (MJC):
 *         Used double precision for processing large integer values.
 *     17-APR-2006 (TIMJ):
-*         Make generic
+*         Make generic.
 
 *-
 
