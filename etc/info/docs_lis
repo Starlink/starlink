@@ -240,6 +240,9 @@ SUN                            STARLINK USER NOTES                           SUN
 243.03  2004-05-19 PWD   49   SPLAT - a spectral analysis tool
 245.01  2002-01-21 AJC   36   HDSTOOLS - Tools to display and edit HDS objects
 246.02  2004-06-01 ST    25   ORAC-DR - integral field spectroscopy data reduction
+247.01  2004-08-13 acd   ??   XRT: ROSAT XRT Data Reduction
+248.01  2005-04-29 nxg   ??   Building Starlink Software
+249.02  2005-06-08 mbt   ??   INT-WFC - Astrometric Calibration for the INT Wide Field Camera
 251.02  2004-05-28 SER   22   Getting Started with STARJAVA
 253.01  2004-05-05 MBT   22   TOPCAT - Tool for OPerations on Catalogues And Tables
 254.01  2004-04-21 AA    22   FROG - A Time Series Analysis Package
