@@ -164,7 +164,7 @@ class RtdImageOptions : public TkImageOptions {
     virtual char *get_rtd_options() {return (char *)rtd_options_;}
 
     // destructor
-    ~RtdImageOptions() {
+    virtual ~RtdImageOptions() {
         if ( manage ) {
             delete rtd_options_;
         }
@@ -191,24 +191,24 @@ class RtdImageOptions : public TkImageOptions {
 #define RTD_OPTION(x) Tk_Offset(Rtd_Options, x)
 
 #define RTD_OPTIONS \
-    {TK_CONFIG_BOOLEAN, "-usexshm",     NULL, NULL, "1", RTD_OPTION(usexshm),     0}, \
-    {TK_CONFIG_BOOLEAN, "-usexsync",    NULL, NULL, "1", RTD_OPTION(usexsync),    0}, \
-    {TK_CONFIG_BOOLEAN, "-verbose",     NULL, NULL, "0", RTD_OPTION(verbose),     0}, \
-    {TK_CONFIG_BOOLEAN, "-debug",       NULL, NULL, "0", RTD_OPTION(debug),       0}, \
-    {TK_CONFIG_BOOLEAN, "-shm_header",  NULL, NULL, "0", RTD_OPTION(shm_header),  0}, \
-    {TK_CONFIG_BOOLEAN, "-shm_data",    NULL, NULL, "0", RTD_OPTION(shm_data),    0}, \
-    {TK_CONFIG_INT,     "-displaymode", NULL, NULL, "1", RTD_OPTION(displaymode), 0}, \
-    {TK_CONFIG_INT,     "-min_colors",  NULL, NULL, "1", RTD_OPTION(min_colors),  0}, \
-    {TK_CONFIG_INT,     "-max_colors",  NULL, NULL, "1", RTD_OPTION(max_colors),  0}, \
-    {TK_CONFIG_INT,     "-fitwidth",    NULL, NULL, "0", RTD_OPTION(fitWidth),    0}, \
-    {TK_CONFIG_INT,     "-fitheight",   NULL, NULL, "0", RTD_OPTION(fitHeight),   0}, \
-    {TK_CONFIG_INT,     "-fillwidth",   NULL, NULL, "0", RTD_OPTION(fillWidth),   0}, \
-    {TK_CONFIG_INT,     "-fillheight",  NULL, NULL, "0", RTD_OPTION(fillHeight),  0}, \
-    {TK_CONFIG_BOOLEAN, "-subsample",   NULL, NULL, "1", RTD_OPTION(subsample),   0}, \
-    {TK_CONFIG_INT,     "-sampmethod",  NULL, NULL, "0", RTD_OPTION(sampmethod),  0}, \
-    {TK_CONFIG_STRING,  "-file",        NULL, NULL, "",  RTD_OPTION(file),        0}, \
-    {TK_CONFIG_STRING,  "-newimagecmd", NULL, NULL, "",  RTD_OPTION(newImageCmd), 0}, \
-    {TK_CONFIG_STRING,  "-name",        NULL, NULL, "",  RTD_OPTION(name), 0}
+    {TK_CONFIG_BOOLEAN, "-usexshm",     NULL, NULL, "1", RTD_OPTION(usexshm),     0, NULL}, \
+    {TK_CONFIG_BOOLEAN, "-usexsync",    NULL, NULL, "1", RTD_OPTION(usexsync),    0, NULL}, \
+    {TK_CONFIG_BOOLEAN, "-verbose",     NULL, NULL, "0", RTD_OPTION(verbose),     0, NULL}, \
+    {TK_CONFIG_BOOLEAN, "-debug",       NULL, NULL, "0", RTD_OPTION(debug),       0, NULL}, \
+    {TK_CONFIG_BOOLEAN, "-shm_header",  NULL, NULL, "0", RTD_OPTION(shm_header),  0, NULL}, \
+    {TK_CONFIG_BOOLEAN, "-shm_data",    NULL, NULL, "0", RTD_OPTION(shm_data),    0, NULL}, \
+    {TK_CONFIG_INT,     "-displaymode", NULL, NULL, "1", RTD_OPTION(displaymode), 0, NULL}, \
+    {TK_CONFIG_INT,     "-min_colors",  NULL, NULL, "1", RTD_OPTION(min_colors),  0, NULL}, \
+    {TK_CONFIG_INT,     "-max_colors",  NULL, NULL, "1", RTD_OPTION(max_colors),  0, NULL}, \
+    {TK_CONFIG_INT,     "-fitwidth",    NULL, NULL, "0", RTD_OPTION(fitWidth),    0, NULL}, \
+    {TK_CONFIG_INT,     "-fitheight",   NULL, NULL, "0", RTD_OPTION(fitHeight),   0, NULL}, \
+    {TK_CONFIG_INT,     "-fillwidth",   NULL, NULL, "0", RTD_OPTION(fillWidth),   0, NULL}, \
+    {TK_CONFIG_INT,     "-fillheight",  NULL, NULL, "0", RTD_OPTION(fillHeight),  0, NULL}, \
+    {TK_CONFIG_BOOLEAN, "-subsample",   NULL, NULL, "1", RTD_OPTION(subsample),   0, NULL}, \
+    {TK_CONFIG_INT,     "-sampmethod",  NULL, NULL, "0", RTD_OPTION(sampmethod),  0, NULL}, \
+    {TK_CONFIG_STRING,  "-file",        NULL, NULL, "",  RTD_OPTION(file),        0, NULL}, \
+    {TK_CONFIG_STRING,  "-newimagecmd", NULL, NULL, "",  RTD_OPTION(newImageCmd), 0, NULL}, \
+    {TK_CONFIG_STRING,  "-name",        NULL, NULL, "",  RTD_OPTION(name),        0, NULL}
 
 
 /*
