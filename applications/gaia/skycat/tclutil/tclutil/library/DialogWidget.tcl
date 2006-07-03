@@ -27,7 +27,9 @@ itcl::class util::DialogWidget {
 	global ::$variable_
 
 	wm iconname $w_ DialogWidget
-	wm transient $w_ [winfo parent $w_]
+        if {[winfo parent $w_] != "." } {
+           wm transient $w_ [winfo parent $w_]
+        }
 
 	# The top frame has one frame for the message and bitmap
 	# and another for extensions defined in derived classes.
