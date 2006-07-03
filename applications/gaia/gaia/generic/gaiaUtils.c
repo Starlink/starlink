@@ -133,7 +133,6 @@ int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, AstFrameSet **iwcs,
    double zero[1];
    int i;
    int iaxes[1];
-   int baxes[1];
    int inperm[MAXDIM];
    int nin;
    int nout;
@@ -501,7 +500,7 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
 }
 
 
-/*
+/**
  * Wrapper for the ATL_PLROI function. Takes an AST Plot and returns a list of
  * Plots, one for each ROI found in the Plot.
  */
@@ -521,7 +520,7 @@ int gaiaUtilsAtlPlROI( AstPlot *plot, AstKeyMap **rplots, char **error_mess )
     return 1;
 }
 
-/*
+/**
  * Wrapper for the ATL_AXTRM function. Takes an AST FrameSet and returns
  * one with any ROI's identified and trims the current frame to the given
  * axes (if needed).
@@ -541,3 +540,85 @@ int gaiaUtilsAtlAxTrm( AstFrameSet *frameset, int axes[], int lbnd[],
     return 1;
 }
 
+
+/**
+ * Read a set of FITS cards (80 character non-NULL terminated strings stored
+ * at a single memory location) into an AST FITS channel, and return the
+ * channel. The result is 1 if there were no errors.
+ */
+int gaiaUtilsGtFitsChan( char header[], int ncards, AstFitsChan **fitschan )
+{
+    char card[81];
+    char *ptr;
+    int i;
+
+    /*  Create and fill a FITS channel with the given cards. */
+    *fitschan = astFitsChan( NULL, NULL, "" );
+    if ( astOK ) {
+        ptr = header;
+        for ( i = 0 ; i < ncards; i++, ptr += 80 ) {
+            memcpy( card, (void *)ptr, (size_t) 80 );
+            card[80] = '\0';
+            
+            /*  Read all cards up to, but not including, the END card. */
+            if ( ! ( card[0] == 'E' && card[1] == 'N' && card[2] == 'D'
+                     && ( card[3] == '\0' || card[3] == ' ' ) ) ) {
+                astPutFits( *fitschan, card, 0 );
+                if ( !astOK ) {
+                    /*  If an error occurs with a card, just continue, it's
+                     *  almost certainly something trivial like a formatting
+                     *  problem. */
+                    astClearStatus;
+                }
+            }
+            else {
+                /* End of the cards. */
+                break;
+            }
+        }
+        astClear( *fitschan, "Card" );
+    }
+
+    if ( !astOK ) {
+        astClearStatus;
+        return 0;
+    }
+    return 1;
+}
+
+
+/**
+ * Read a set of FITS cards (80 character non-NULL terminated strings stored
+ * at a single memory location) and return a FrameSet if they contain a WCS 
+ * with the given encoding (NULL for the default). Returns an AST FrameSet if
+ * successful and a result of 1.
+ */
+int gaiaUtilsGtFitsWcs( char header[], int ncards, char *encoding, 
+                        AstFrameSet **iwcs )
+{
+    AstFitsChan *fitschan;
+    int result = 0;
+    *iwcs = NULL;
+
+    /*  Create and fill a FITS channel with the given cards. */
+    if ( gaiaUtilsGtFitsChan( header, ncards, &fitschan ) ) {
+
+        /*  Set the encoding, if given */
+        if ( encoding != NULL ) {
+            astSet( fitschan, "Encoding=%s", encoding );
+        }
+
+        /*  Read the WCS */
+        *iwcs = (AstFrameSet *) astRead( fitschan );
+        if ( *iwcs == NULL ) {
+            result = 0;
+        }
+        else {
+            result = 1;
+        }
+        fitschan = (AstFitsChan *) astAnnul( fitschan );
+    }
+    if ( ! astOK ) astClearStatus;
+
+    return result;
+}
