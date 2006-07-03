@@ -1,18 +1,18 @@
 /*+
  *  Name:
  *     gaiaNDF
- 
+
  *  Purpose:
  *     Primitive access to NDFs for GAIA.
- 
+
  *  Language:
  *     C
- 
+
  *  Notes:
  *     These routines initially existed as using CNF to call Fortran from C++
  *     seemed very difficult (CNF preprocessor problems), but they are now the
  *     C interface to the NDF functions that GAIA requires.
- 
+
  *  Copyright:
  *     Copyright (C) 1995-2005 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -36,7 +36,7 @@
 
  *   Authors:
  *      PWD: Peter W. Draper, Starlink - University of Durham
- 
+
  *   History:
  *      18-JAN-1995 (PWD):
  *         Original version.
@@ -83,6 +83,9 @@
 /*  TCL_OK and TCL_ERROR */
 #define TCL_OK 0
 #define TCL_ERROR 1
+
+/*  Maximum number of NDF dimensions */
+#define MAXDIM 7
 
 /*  Prototypes for external Fortran routines */
 extern void F77_EXTERNAL_NAME(rtd_rdndf)( CHARACTER(ndfname),
@@ -432,12 +435,12 @@ int gaiaMapComponent( int ndfid, void **data, const char* component,
  *     Create a new simple NDF.
  *
  *  Description:
- *     Create a new NDF with the given type (HDS format) and bounds. 
+ *     Create a new NDF with the given type (HDS format) and bounds.
  *     Add the given WCS (NULL for none). The components can be accessed using
  *     gaiaMapComponent.
  */
-int gaiaCreateNDF( const char *filename, int ndim, int lbnd[], int ubnd[], 
-                   const char *type, AstFrameSet *wcs, 
+int gaiaCreateNDF( const char *filename, int ndim, int lbnd[], int ubnd[],
+                   const char *type, AstFrameSet *wcs,
                    int *indf, char **error_mess )
 {
     int place;
@@ -1241,8 +1244,8 @@ int gaiaNDFCGet( int ndfid, const char* component, char *value,
  * Map an NDF component with a given data type. Returns data and number of
  * elements.
  */
-int gaiaNDFMap( int ndfid, char *type, const char *access, 
-                const char* component, void **data, int *el, 
+int gaiaNDFMap( int ndfid, char *type, const char *access,
+                const char* component, void **data, int *el,
                 char **error_mess )
 {
    int status = SAI__OK;
@@ -1285,13 +1288,91 @@ int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess )
 /**
  * Get the AST frameset that defines the NDF WCS. Returns the address of the
  * frameset.
+ *
+ * To match the behaviour in KAPPA (and the Fortran part of GAIA), if the
+ * WCS component isn't present we look for a FITS WCS and attempt to use
+ * that. If that fails a default NDF WCS is returned.
  */
 int gaiaNDFGtWcs( int ndfid, AstFrameSet **iwcs, char **error_mess )
 {
-   int status = SAI__OK;
+    AstFrameSet *fitswcs;
+    AstPermMap *permMap;
+    HDSLoc *fitsloc = NULL;
+    double zero[1];
+    int ndfaxes;
+    int fitsaxes;
+    int exists = 0;
+    int i;
+    int inperm[MAXDIM];
+    int outperm[MAXDIM];
+    int status = SAI__OK;
+    size_t ncard = 0;
+    void *fitsptr = NULL;
+    int ndfframes;
+    int fitscurrent;
 
-   emsMark();
-   ndfGtwcs( ndfid, iwcs, &status );
+    emsMark();
+
+    /* Check if the WCS component exists */
+    ndfState( ndfid, "WCS", &exists, &status );
+
+    /* Read it, we always need it */
+    ndfGtwcs( ndfid, iwcs, &status );
+
+    /* If there's no WCS, we just have the PIXEL, AXES and GRID domains, there
+     * may be some addition WCS information in the FITS extension, see if we
+     * can use that. */
+    if ( ! exists ) {
+        ndfXstat( ndfid, "FITS", &exists, &status );
+        if ( exists ) {
+            ndfXloc( ndfid, "FITS", "READ", &fitsloc, &status );
+            datMapV( fitsloc, "_CHAR*80", "READ", &fitsptr, &ncard, &status );
+            if ( gaiaUtilsGtFitsWcs( (char *) fitsptr, (int) ncard,
+                                     NULL, &fitswcs ) ) {
+
+                /* Read a WCS, we need to join this to the NDF WCS via the
+                 * base frame. This will use a UnitMap, extra dimensions will
+                 * be just thrown away using a PermMap (or could give up?). */
+                ndfaxes = astGetI( *iwcs, "Nin" );
+                fitsaxes = astGetI( fitswcs, "Nin" );
+
+                for ( i = 0; i < ndfaxes; i++ ) {
+                    inperm[i] = i + 1;
+                    outperm[i] = i + 1;
+                }
+
+                if ( fitsaxes > ndfaxes ) {
+                    for ( i = ndfaxes; i < fitsaxes; i++ ) {
+                        inperm[i] = -1;
+                        outperm[i] = -1;
+                    }
+                }
+                else if ( fitsaxes < ndfaxes ) {
+                    for ( i = fitsaxes; i < ndfaxes; i++ ) {
+                        inperm[i] = -1;
+                        outperm[i] = -1;
+                    }
+                }
+
+                /* Use PermMap to join FITS base frame to NDF base frame */
+                zero[0] = 0.0;
+                permMap = astPermMap( fitsaxes, inperm, ndfaxes, outperm,
+                                      zero, "" );
+
+                ndfframes = astGetI( *iwcs, "Nframe" );
+                fitscurrent = astGetI( fitswcs, "Current" );
+
+                /* Join the base frames together (GRID to GRID) */
+                astInvert( fitswcs );
+                astAddFrame( *iwcs, AST__BASE, permMap, fitswcs );
+
+                /* Current frame of FITS WCS becomes the Current frame */
+                astSetI( *iwcs, "Current", ndfframes + fitscurrent );
+                astAnnul( fitswcs );
+           }
+           datAnnul( &fitsloc, &status );
+       }
+   }
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
