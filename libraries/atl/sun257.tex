@@ -6,10 +6,10 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun256.0}
-\newcommand{\stardocnumber}    {256.0}
+\newcommand{\stardocsource}    {sun257.0}
+\newcommand{\stardocnumber}    {257.0}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {26th May 2006}
+\newcommand{\stardocdate}      {3rd July 2006}
 \newcommand{\stardoctitle}     {ATL \\ [1ex]
                                 A Library of AST Utility Routines}
 \newcommand{\stardocversion}   {Version 1.0}
@@ -220,12 +220,8 @@
 % ? Document Abstract. (if used)
 %   ==================
 
-GRP provides facilities for handling groups of objects which can be described by
-character strings (e.g. file names, astronomical objects, numerical values,
-etc). Facilities are provided for storing and retrieving such character strings
-within groups, and for passing groups of character strings between applications
-by means of a text file. It also allows the creation of groups in which each
-element is a modified version of an element in another group.
+ALT provides high level utility functions for handling WCS and other
+AST-related tasks.
 
 % ? End of document
 % -----------------------------------------------------------------------------
@@ -661,7 +657,7 @@ higher-level utility tasks.
       visual appearance of the Plot.
    }
    \sstinvocation{
-      CALL ATL\_CPPLA( IPLOT1, IPLOT2, STATUS )
+      CALL ATL\_CPPLA( IPLOT1, IPLOT2, FIXATE, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -673,6 +669,14 @@ higher-level utility tasks.
          IPLOT2 = INTEGER (Given)
       }{
          The destination Plot.
+      }
+      \sstsubsection{
+         FIXATE = LOGICAL (Given)
+      }{
+         If .FALSE., then attribute values are only set in IPLOT2 if they
+         have been assigned an explicit value (i.e. are not defaulted) in
+         IPLOT1. If .TRUE., then values are set explicitly in IPLOT2 whether
+         they are default values or not.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -787,16 +791,16 @@ higher-level utility tasks.
       \sstsubsection{
          DLBND( $*$ ) = DOUBLE PRECISION (Given)
       }{
-         The lower bounds of the region to be covered by the new Plot.
-         The number of axis values supplied should equal the number of
-         axes in the Frame identified by IFRM.
+         The axis values at the lower left corner of the region to be
+         covered by the new Plot. The number of axis values supplied should
+         equal the number of axes in the Frame identified by IFRM.
       }
       \sstsubsection{
          DUBND( $*$ ) = DOUBLE PRECISION (Given)
       }{
-         The upper bounds of the region to be covered by the new Plot.
-         The number of axis values supplied should equal the number of
-         axes in the Frame identified by IFRM.
+         The axis values at the upper right corner of the region to be
+         covered by the new Plot. The number of axis values supplied should
+         equal the number of axes in the Frame identified by IFRM.
       }
       \sstsubsection{
          IPLOT2 = INTEGER (Returned)

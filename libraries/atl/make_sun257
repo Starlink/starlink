@@ -5,8 +5,8 @@ foreach n (atl_*.f)
       set ff = "$ff $n"
    endif
 end
-rm -f atl_routines.tex sun256.tex
+rm -f atl_routines.tex sun257.tex
 $STARCONF_DEFAULT_STARLINK/bin/sst/prolat \"$ff\" out=atl_routines.tex \
                                noatask nodocument single nopage
-cat sun_head.tex atl_routines.tex sun_tail.tex > sun256.tex
+cat sun_head.tex atl_routines.tex sun_tail.tex > sun257.tex
 
