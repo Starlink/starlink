@@ -177,6 +177,16 @@ itcl::class gaia::GaiaSpectralPlot {
       add_menu_short_help $Options {Log Y axis}  \
          {Try to use a log scale for Y axis (fails when range includes zero)}
 
+      #   Display cordinate label.
+      $Options add checkbutton \
+         -label {Coordinate label} \
+         -variable [scope itk_option(-show_label)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this toggle_show_label_]
+      add_menu_short_help $Options {Coordinate label}  \
+         {Show the extraction coordinates of the spectrum}
+
       #  Choose a colour for the spectral line.
       $Options add cascade -label "Line color" \
          -menu [menu $Options.line]
@@ -344,6 +354,12 @@ itcl::class gaia::GaiaSpectralPlot {
             }
             unset ref_ranges_
          }
+
+         #  Label.
+         if { $label_ != {} } {
+            $itk_component(canvas) delete $label_
+            set label_ {}
+         }
       }
    }
 
@@ -454,11 +470,54 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Remove the reference spectrum, if displayed.
    public method remove_reference {} {
-
       if { $spectrum_ == {} } {
          return
       }
       $itk_component(canvas) coords $spectrum_ refpointer 0
+   }
+
+   #  Set the value of the label. This is optional can be any string, but
+   #  is expected to be the coordinates of the spectrum, when appropriate.
+   #  Set to blank to remove.
+   public method update_label {value} {
+      if { $itk_option(-show_label) } {
+         if { $label_ == {} } {
+            $itk_component(draw) set_drawing_mode text \
+               [code $this created_label_ $value]
+            $itk_component(draw) create_object 0 0
+            $itk_component(draw) create_done 0 0
+         } else {
+            $itk_component(canvas) itemconfigure $label_ -text $value
+         }
+      }
+   }
+
+   protected method created_label_ {value id args} {
+      set label_ $id
+      $itk_component(canvas) itemconfigure $label_ -anchor sw -text $value
+      position_label_
+      
+      #  Make sure label is deselected after creation (selection is in 
+      #  create_done, so use after to call later).
+      after idle "$itk_component(draw) deselect_object $id"
+   }
+
+   #  Position label just above bottom of plot.
+   protected method position_label_ {} {
+      lassign [$itk_component(canvas) bbox $spectrum_] x0 y0 x1 y1
+      incr x0 4
+      incr y1 -4
+      $itk_component(canvas) coords $label_ $x0 $y1
+   }
+
+   #  Remove the label, if not wanted.
+   protected method toggle_show_label_ {} {
+      if { ! $itk_option(-show_label) } {
+         if { $label_ != {} } {
+            $itk_component(canvas) delete $label_
+            set label_ {}
+         }
+      }
    }
 
    #===========================================================================
@@ -472,7 +531,7 @@ itcl::class gaia::GaiaSpectralPlot {
       lassign [$itk_component(canvas) bbox $spectrum_] x0 y0 x1 y1
       if { $x0 != {} } {
          remove_ref_line $id
-         
+
          #  Create a column canvasdraw object.
          $itk_component(draw) set_drawing_mode column \
             [code $this created_ref_line_ $id]
@@ -515,7 +574,7 @@ itcl::class gaia::GaiaSpectralPlot {
          if { $itk_option(-ref_line_changed_cmd) != {} } {
 
             lassign [$itk_component(canvas) coords $ref_lines_($id)] x0 y0 x1 y1
-            
+
             #  From canvas to world.
             set x0 [$itk_component(canvas) coords $spectrum_ convert 1 $x0]
 
@@ -548,7 +607,7 @@ itcl::class gaia::GaiaSpectralPlot {
          if { ! [info exists ref_lines_($id)] } {
             make_ref_line $id
          }
-         
+
          #  Don't move unnecessarily.
          if { $ref_lines_coord_($id) != $xcoord } {
             set ref_lines_coord_($id) $xcoord
@@ -619,7 +678,7 @@ itcl::class gaia::GaiaSpectralPlot {
          set ref_ranges_coord_($id) "0 0"
       }
 
-      #  Deselect and select to get grips in right places, but do it after 
+      #  Deselect and select to get grips in right places, but do it after
       #  the draw component has finished.
       after idle [code $itk_component(draw) deselect_object $cid]
       after idle [code $itk_component(draw) select_object $cid]
@@ -636,14 +695,14 @@ itcl::class gaia::GaiaSpectralPlot {
          if { $itk_option(-ref_range_changed_cmd) != {} } {
 
             lassign [$itk_component(canvas) bbox $ref_ranges_($id)] x0 y0 x1 y1
-            
+
             #  From canvas to world.
             set x0 [$itk_component(canvas) coords $spectrum_ convert 1 $x0]
             set x1 [$itk_component(canvas) coords $spectrum_ convert 1 $x1]
 
             #  These are the current world coords, so record them.
             set ref_ranges_coord_($id) "$x0 $x1"
-         
+
             #  World to grid.
             set frameset [$itk_component(canvas) itemcget $spectrum_ -frameset]
             set ind0 [gaiautils::getaxiscoord $frameset $x0 0]
@@ -670,7 +729,7 @@ itcl::class gaia::GaiaSpectralPlot {
          if { ! [info exists ref_ranges_($id)] } {
             make_ref_range $id
          }
-         
+
          #  Don't move unnecessarily.
          if { $ref_ranges_coord_($id) != "$x0 $x1" } {
             set ref_ranges_coord_($id) "$x0 $x1"
@@ -736,6 +795,11 @@ itcl::class gaia::GaiaSpectralPlot {
                make_ref_range $id
                move_ref_range_ $id
             }
+         }
+
+         #  Reposition label.
+         if { $label_ != {} } {
+            position_label_
          }
 
          # Fudge immediate update.
@@ -839,7 +903,7 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  "rtdimage" emulation.
    #
-   #  Needed to support some actions of the StarCanvasDraw instance 
+   #  Needed to support some actions of the StarCanvasDraw instance
    #  (items that require width and height information).
    public method scale {} {
       return 1
@@ -889,20 +953,26 @@ itcl::class gaia::GaiaSpectralPlot {
    itk_option define -spec_coords spec_coords Spec_Coords {}
 
    #  A command to invoke when a reference line is moved (by interaction by
-   #  the user). The command will be trailed by the reference line id and 
+   #  the user). The command will be trailed by the reference line id and
    #  the new world coordinate.
    itk_option define -ref_line_changed_cmd ref_line_changed_cmd Ref_Line_Changed_Cmd {}
 
    #  A command to invoke when a reference range is moved (by interaction by
-   #  the user). The command will be trailed by the reference range id and 
+   #  the user). The command will be trailed by the reference range id and
    #  the new world coordinates.
    itk_option define -ref_range_changed_cmd ref_range_changed_cmd Ref_Range_Changed_Cmd {}
+
+   #  Whether to show the label or not.
+   itk_option define -show_label show_label Show_Label 0
 
    #  Protected variables: (available to instance)
    #  --------------------
 
    #  The main spectral_plot item.
    protected variable spectrum_ {}
+
+   #  The label.
+   protected variable label_ {}
 
    #  All reference line canvas ids, indexed by a user specified number.
    protected variable ref_lines_
@@ -911,7 +981,7 @@ itcl::class gaia::GaiaSpectralPlot {
    protected variable ref_lines_coord_
 
    #  Reference line colours , indexed as ref_lines_.
-   protected variable ref_lines_colour_ 
+   protected variable ref_lines_colour_
 
    #  All reference range canvas ids, indexed by a user specified number.
    protected variable ref_ranges_
@@ -920,7 +990,7 @@ itcl::class gaia::GaiaSpectralPlot {
    protected variable ref_ranges_coord_
 
    #  Reference range colours, indexed as ref_ranges_.
-   protected variable ref_ranges_colour_ 
+   protected variable ref_ranges_colour_
 
    #  Colours, two sets full and simple. These are the AST colours
    #  defined in grf_tkcan, plus some extra greys for the background

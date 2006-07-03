@@ -701,7 +701,7 @@ itcl::class gaia::GaiaCube {
       return ${itk_option(-cube)}${section}
    }
 
-   #  Display an image. Note these cannot be temporary in the normal sense, 
+   #  Display an image. Note these cannot be temporary in the normal sense,
    #  that messes up the interaction. We deal with temporary images locally.
    public method display {name {istemp 0} } {
       $itk_option(-gaia) configure -check_for_cubes 0
@@ -712,7 +712,7 @@ itcl::class gaia::GaiaCube {
       $itk_option(-gaia) configure -check_for_cubes $check_for_cubes_
    }
 
-   #  Register a temporary file. These will be deleted along with this 
+   #  Register a temporary file. These will be deleted along with this
    #  object.
    public method register_temp_file {filename} {
       lappend temp_files_ $filename
@@ -851,17 +851,20 @@ itcl::class gaia::GaiaCube {
             set_spec_ref_coord 1 $coord
          }
 
-         #  And reposition any graphics, if the collapse bounds have changed. 
+         #  And reposition any graphics, if the collapse bounds have changed.
          if { $lb != $llb_ || $ub != $lub_ } {
             $spectrum_ fitxy
          }
-
       } else {
          busy {
             $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh $ix $iy 0
          }
       }
-      
+
+      #  Display the current coordinate for reference.
+      lassign [$itk_option(-rtdimage) astpix2cur $iix $iiy] ra dec
+      $spectrum_ update_label "$ra, $dec"
+
       #  Record collapse bounds, these are checked.
       set llb_ $lb
       set lub_ $ub
@@ -1197,7 +1200,7 @@ itcl::class gaia::GaiaCube {
    #  A list of temporary files, these will be deleted when the object
    #  is destroyed.
    protected variable temp_files_ ""
-   
+
    #  Last lower and upper collapse bounds. When these change any reference
    #  graphics should be updated.
    protected variable llb_ ""
