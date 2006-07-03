@@ -48,13 +48,17 @@
 extern "C" {
 #include <ast.h>
 }
+#include "gaiaUtils.h"
 
 /* Standard return values, success and failure to match TCL */
-#define TCL_OK 0
-#define TCL_ERROR 1
+static const int TCL_OK = 0;
+static const int TCL_ERROR = 1;
 
 /* Maximum dimensions */
-#define MAX_DIM 7
+static const int MAX_DIM = 7;
+
+//  Number of characters in a FITS header card.
+static const int FITSCARD = 80;
 
 /**
  * Open a FITS file and move to the indicated extension. Returns a StarFitsIO
@@ -142,31 +146,14 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
 
     // Read headers using a FITS channel.
     AstFitsChan *fitschan = astFitsChan( NULL, NULL, "" );
-    char card[81];
-    char *ptr = (char *) header;
-    int ncard = (int) lheader / 80;
-    for ( int i = 0 ; i < ncard; i++, ptr += 80 ) {
-        memcpy( card, (void *)ptr, (size_t) 80 );
-        card[80] = '\0';
-
-        //  Read all cards up to, but not including, the END card.
-        if ( ! ( card[0] == 'E' && card[1] == 'N' && card[2] == 'D'
-                 && ( card[3] == '\0' || card[3] == ' ' ) ) ) {
-            astPutFits( fitschan, card, 0 );
-            if ( !astOK ) {
-                //  If an error occurs with a card, just continue, it's almost
-                //  certainly something trivial like a formatting problem.
-                astClearStatus;
-            }
-        }
-        else {
-            break;
-        }
-    }
+    int ncard = (int) lheader / FITSCARD;
+    gaiaUtilsGtFitsChan( (char *) header, ncard, &fitschan );
 
     // Look for the image dimensions.
     astClear( fitschan, "Card" );
     int i = 0;
+    char card[FITSCARD+1];
+    char *ptr = (char *) header;
     while( astFindFits( fitschan, "NAXIS%d", card, 1 ) ) {
         if ( ( ptr = strstr( card, "=" ) ) != (char *)NULL ) {
             sscanf( ++ptr, "%d", &dims[i++] );
