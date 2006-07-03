@@ -137,69 +137,69 @@ static Tk_CustomOption framesetOption = {
 static Tk_ConfigSpec configSpecs[] = {
 
     {TK_CONFIG_ANCHOR, "-anchor", (char *) NULL, (char *) NULL,
-     "nw", Tk_Offset(SPItem, tkanchor), TK_CONFIG_DONT_SET_DEFAULT},
+     "nw", Tk_Offset(SPItem, tkanchor), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_DOUBLE, "-badvalue", (char *) NULL, (char *) NULL,
-     "0.0", Tk_Offset(SPItem, badvalue), TK_CONFIG_DONT_SET_DEFAULT},
+     "0.0", Tk_Offset(SPItem, badvalue), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_STRING, "-datalabel", (char *) NULL, (char *) NULL,
-     "Data value", Tk_Offset(SPItem, datalabel), TK_CONFIG_NULL_OK},
+     "Data value", Tk_Offset(SPItem, datalabel), TK_CONFIG_NULL_OK, NULL},
 
     {TK_CONFIG_STRING, "-dataunits", (char *) NULL, (char *) NULL,
-     "", Tk_Offset(SPItem, dataunits), TK_CONFIG_NULL_OK},
+     "", Tk_Offset(SPItem, dataunits), TK_CONFIG_NULL_OK, NULL},
 
     {TK_CONFIG_BOOLEAN, "-fixedscale", (char *) NULL, (char *) NULL,
-     "0", Tk_Offset(SPItem, fixedscale), TK_CONFIG_DONT_SET_DEFAULT},
+     "0", Tk_Offset(SPItem, fixedscale), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_CUSTOM, "-frameset", (char *) NULL, (char *) NULL,
      (char *) NULL, Tk_Offset(SPItem, framesets), TK_CONFIG_NULL_OK,
      &framesetOption},
 
     {TK_CONFIG_STRING, "-gridoptions", (char *) NULL, (char *) NULL,
-     "DrawTitle=0", Tk_Offset(SPItem, options), TK_CONFIG_NULL_OK},
+     "DrawTitle=0", Tk_Offset(SPItem, options), TK_CONFIG_NULL_OK, NULL},
 
     {TK_CONFIG_DOUBLE, "-height", (char *) NULL, (char *) NULL,
-     "100.0", Tk_Offset(SPItem, height), TK_CONFIG_DONT_SET_DEFAULT},
+     "100.0", Tk_Offset(SPItem, height), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_COLOR, "-linecolour", (char *) NULL, (char *) NULL,
-     "blue", Tk_Offset(SPItem, linecolour), TK_CONFIG_NULL_OK},
+     "blue", Tk_Offset(SPItem, linecolour), TK_CONFIG_NULL_OK, NULL},
 
     {TK_CONFIG_PIXELS, "-linewidth", (char *) NULL, (char *) NULL,
-     "1", Tk_Offset(SPItem, linewidth), TK_CONFIG_DONT_SET_DEFAULT},
+     "1", Tk_Offset(SPItem, linewidth), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_INT, "-offset", (char *) NULL, (char *) NULL,
-     "0.0", Tk_Offset(SPItem, offset), TK_CONFIG_DONT_SET_DEFAULT},
+     "0.0", Tk_Offset(SPItem, offset), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_COLOR, "-reflinecolour", (char *) NULL, (char *) NULL,
-     "green", Tk_Offset(SPItem, reflinecolour), TK_CONFIG_NULL_OK},
+     "green", Tk_Offset(SPItem, reflinecolour), TK_CONFIG_NULL_OK, NULL},
 
     {TK_CONFIG_BOOLEAN, "-showaxes", (char *) NULL, (char *) NULL,
-     "1", Tk_Offset(SPItem, showaxes), TK_CONFIG_DONT_SET_DEFAULT},
+     "1", Tk_Offset(SPItem, showaxes), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_CUSTOM, "-tags", (char *) NULL, (char *) NULL,
      (char *) NULL, Tk_Offset(SPItem, tagPtr), TK_CONFIG_NULL_OK,
      &tagsOption},
 
     {TK_CONFIG_DOUBLE, "-width", (char *) NULL, (char *) NULL,
-     "100.0", Tk_Offset(SPItem, width), TK_CONFIG_DONT_SET_DEFAULT},
+     "100.0", Tk_Offset(SPItem, width), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_DOUBLE, "-x", (char *) NULL, (char *) NULL,
-     "0.0", Tk_Offset(SPItem, x), TK_CONFIG_DONT_SET_DEFAULT},
+     "0.0", Tk_Offset(SPItem, x), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_DOUBLE, "-xborder", (char *) NULL, (char *) NULL,
-     "0.03", Tk_Offset(SPItem, xborder), TK_CONFIG_DONT_SET_DEFAULT},
+     "0.03", Tk_Offset(SPItem, xborder), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_BOOLEAN, "-xminmax", (char *) NULL, (char *) NULL,
-     "1", Tk_Offset(SPItem, xminmax), TK_CONFIG_DONT_SET_DEFAULT},
+     "1", Tk_Offset(SPItem, xminmax), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_DOUBLE, "-y", (char *) NULL, (char *) NULL,
-     "0.0", Tk_Offset(SPItem, y), TK_CONFIG_DONT_SET_DEFAULT},
+     "0.0", Tk_Offset(SPItem, y), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_DOUBLE, "-yborder", (char *) NULL, (char *) NULL,
-     "0.20", Tk_Offset(SPItem, yborder), TK_CONFIG_DONT_SET_DEFAULT},
+     "0.20", Tk_Offset(SPItem, yborder), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
-     (char *) NULL, 0, 0}
+     (char *) NULL, 0, 0, NULL}
 };
 
 /*
@@ -255,7 +255,12 @@ static Tk_ItemType spectralPlotType = {
     (Tk_ItemSelectionProc *) NULL, /* selectionProc  */
     (Tk_ItemInsertProc *) NULL,    /* insertProc     */
     (Tk_ItemDCharsProc *) NULL,    /* dTextProc      */
-    (Tk_ItemType *) NULL           /* nextPtr        */
+    (Tk_ItemType *) NULL,          /* nextPtr        */
+    (char *) NULL,                 /* Reserved for future extension. */
+    0,                             /* Reserved for future extension. */
+    (char *) NULL,                 /* Reserved for future extension. */
+    (char *) NULL                  /* Reserved for future extension. */
+
 };
 
 
@@ -433,7 +438,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  *      <canvas> coords <item> \
  *         "refpointer" memory_address_of_ARRAYinfo
  *
- *   To remove the reference spectrum pass in a memory address of 0. 
+ *   To remove the reference spectrum pass in a memory address of 0.
  *
  *   Special features (should be moved into some generic interface, but
  *   that's not possible for canvas items, so some method of exporting the
@@ -512,7 +517,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     else if ( strcmp( optionPtr, "limits" ) == 0 ) {
         Tcl_Obj *subobj;
         Tcl_Obj *obj = Tcl_NewObj();
-        
+
         subobj = Tcl_NewDoubleObj( spPtr->xleft );
         Tcl_ListObjAppendElement( interp, obj, subobj );
         subobj = Tcl_NewDoubleObj( spPtr->ybot );
@@ -521,7 +526,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         Tcl_ListObjAppendElement( interp, obj, subobj );
         subobj = Tcl_NewDoubleObj( spPtr->ytop );
         Tcl_ListObjAppendElement( interp, obj, subobj );
-        
+
         Tcl_SetObjResult( interp, obj );
         return TCL_OK;
     }
@@ -533,16 +538,16 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     if ( strcmp( optionPtr, "refpointer" ) == 0 ) {
         isref = 1;
     }
-    
+
     if ( strcmp( optionPtr, "pointer" ) == 0 || isref ) {
-        
+
         /*  Memory address, sort this out. */
         if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
             Tcl_AppendResult( interp, "Failed to read ARRAYinfo pointer",
                               (char *) NULL );
             return TCL_ERROR;
         }
-        
+
         /* If the address is 0 and this is a reference spectrum, that's a
            request to clear it, just do that and return. */
         if ( isref && adr == 0L ) {
@@ -555,7 +560,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         arrayInfo = (ARRAYinfo *) adr;
         nel = arrayInfo->el;
     }
-    
+
     /* Reference spectra must have the same number of points and we must
      * have a data spectrum already */
     if ( isref ) {
@@ -571,7 +576,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             return TCL_ERROR;
         }
         if ( spPtr->refDataPtr == NULL ) {
-            spPtr->refDataPtr = 
+            spPtr->refDataPtr =
                 (double *) ckalloc( sizeof( double ) * nel );
         }
     }
@@ -595,7 +600,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             spPtr->refDataPtr = NULL;
         }
     }
-    
+
     if ( spPtr->dataPtr == NULL ) {
         i = sizeof( double ) * nel;
         spPtr->dataPtr = (double *) ckalloc( i );
@@ -604,11 +609,11 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         spPtr->tmpPtr[1] = (double *) ckalloc( i );
     }
     spPtr->numPoints = nel;
-    
+
     /* Read in data and work out limits */
     spPtr->ytop = -DBL_MAX;
     spPtr->ybot =  DBL_MAX;
-    
+
     if ( adr == 0 ) {
         /* Read doubles from each word, cannot be reference spectrum */
         for ( i = 0; i < nel; i++ ) {
@@ -626,12 +631,12 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         /* Given ARRAYinfo address, convert type into double precision and
          * check for BAD values which are replaced with our bad value,
          * -DBL_MAX. */
-        if ( isref ) { 
+        if ( isref ) {
             gaiaArrayToDouble( arrayInfo, spPtr->badvalue, spPtr->refDataPtr );
         }
         else {
             gaiaArrayToDouble( arrayInfo, spPtr->badvalue, spPtr->dataPtr );
-            
+
             /* Get range of data */
             dataPtr = spPtr->dataPtr;
             for ( i = 0; i < nel; i++ ) {
@@ -643,7 +648,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             }
         }
     }
-    
+
     /* Check if data has no range, in that case just add +/- 1, so we can
      * plot something. During interactive updates that's better than
      * throwing an error. */
@@ -776,7 +781,6 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
                        Drawable drawable, int x, int y, int width,
                        int height )
 {
-    AstFrame *picked;
     SPItem *spPtr = (SPItem *) itemPtr;
     Tk_Item *polyline;
     XColor *linecolour;
@@ -949,22 +953,22 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
                 polyline = spPtr->polyline;
                 linecolour = spPtr->linecolour;
             }
-            
+
             astTran2( spPtr->plot, spPtr->numPoints, spPtr->coordPtr,
                       dataPtr, 0, spPtr->tmpPtr[0], spPtr->tmpPtr[1] );
-            
+
             /* Set line coordinates */
             RtdLineQuickSetCoords( spPtr->interp, canvas, polyline,
                                    spPtr->tmpPtr[0], spPtr->tmpPtr[1],
                                    spPtr->numPoints );
-            
+
             RtdLineSetColour( display, polyline, linecolour );
             RtdLineSetWidth( display, polyline, spPtr->linewidth );
-            
+
             /* Do the draw. */
             RtdLineDisplay( canvas, polyline, display, drawable, x, y,
                             width, height );
-        }            
+        }
     }
 
     /* Reset AST if any errors occurred, don't want next draw to fail
@@ -1173,7 +1177,7 @@ static int SPToPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
 
     result = RtdLineToPostscript( interp, canvas, spPtr->polyline, prepass );
     if ( result == TCL_OK && spPtr->refDataPtr != NULL ) {
-        result = RtdLineToPostscript( interp, canvas, spPtr->refpolyline, 
+        result = RtdLineToPostscript( interp, canvas, spPtr->refpolyline,
                                       prepass );
     }
     return result;
