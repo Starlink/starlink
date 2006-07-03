@@ -111,7 +111,7 @@ SUN                            STARLINK USER NOTES                           SUN
 039.02  1995-02-28 RWS   25   PRIMDAT - Processing primitive numerical data 1.0, PG
 040.05  1995-08-02 acc   39   CHR - Character handling routines 2.0, PM
 042.05  1996-12-06 gjp   6    DAOPHOT - Stellar photometry package V1.2
-045.13  2002-08-20 aa    38   PHOTOM - An aperture photometry package v1.8-3
+045.13  2002-08-20 ne    38   PHOTOM - An aperture photometry package v1.8-3
 048.08  2002-01-30 bkm   51   AGI - Applications graphics interface
 050.24  2004-03-05 dm    58   DIPSO - Friendly spectrum analysis program v3.5
 053.03  1996-10-01 acc   8    ECHWIND - Echelle spectrograph observation planning
@@ -159,7 +159,7 @@ SUN                            STARLINK USER NOTES                           SUN
 134.03  1992-03-30 ajc   34   ADAM - Guide to writing instrumentation tasks
 136.06  1997-11-18 MJB   2    FITSIO - Disk FITS I/O routines 5.03
 137.07  2004-04-22 pah   102  PONGO - Interactive data plotting 2.0
-139.16  2002-09-05 aa    220  CCDPACK - CCD data reduction package v4.0
+139.16  2002-09-05 pwd   220  CCDPACK - CCD data reduction package v4.0
 143.04  2001-07-20 ajc   34   FIO/RIO - Fortran file I/O routines 1.5, PM
 144.15  2001-08-17 AJC   18   ADAM - Unix version 4
 145.06  1996-07-12 bs    58   UNIX - An introduction
@@ -213,7 +213,7 @@ SUN                            STARLINK USER NOTES                           SUN
 211.15  2004-04-23 dsb   413  AST - World Coordinate Systems library (C version)
 212.12  2003-07-21 MJB   67   Starlink Software CD-ROM User's Guide
 213.02  1998-09-22 gjp   10   FLUXES - JCMT position and flux density calibration
-214.15  2004-04-28 ng    14   GAIA - Graphical astronomy & image analysis tool
+214.15  2004-04-28 pwd   14   GAIA - Graphical astronomy & image analysis tool
 216.08  2003-04-03 jfl   182  SURF - SCUBA User Reduction Facility
 217.02  1997-12-11 AJC   15   Running Starlink Applications from IRAF CL
 218.01  1997-05-22 MJB   2    JPEG - The JPEG library and utilities
@@ -221,7 +221,7 @@ SUN                            STARLINK USER NOTES                           SUN
 221.01  1997-12-22 AJC   2    KAPPA for IRAF
 223.07  2003-02-26 dsb   104  POLPACK - An Imaging Polarimetry reduction package
 224.02  2000-02-10 AJC   12   HDSPAR - HDS Parameter routine v1.1 PM
-226.08  2004-04-24 ajc   12   EXTRACTOR - An astronomical source detection program
+226.08  2004-04-24 pwd   12   EXTRACTOR - An astronomical source detection program
 227.02  2003-05-07 MJB   4    CFITSIO - Disk FITS input/output functions
 228.05  2003-05-06 fe    42   STARPERL - Starlink Perl modules
 229.01  1999-12-16 hme   14   The Global Section Datafile (GSD) access library
