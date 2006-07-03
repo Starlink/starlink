@@ -53,6 +53,8 @@
 *        Added KPG1_RGNDF and KPG1_WGNDF.
 *     25-APR-2006 (TIMJ):
 *        Add kpgPtfts
+*     03-JUL-2006 (TIMJ):
+*        Add kpgStatd
 
 *-
 */
@@ -93,5 +95,13 @@ void irqSetqm( IRQLocs *, int, const char *, int, float *, int *, int * );
 
 int kpgGtfts( int, AstFitsChan ** fchan, int * status );
 int kpgPtfts( int, const AstFitsChan * fchan, int * status );
+
+void kpgStatd( int bad, int el, const double data[], int nclip, 
+	       const float clip[],
+	       int * ngood, int *imin, double * dmin, int * imax,
+	       double * dmax, double * sum, double * mean, double * stdev,
+	       int * ngoodc, int * iminc, double * dminc, int * imaxc,
+	       double * dmaxc,
+	       double * sumc, double * meanc, double * stdevc, int * status );
 
 #endif
