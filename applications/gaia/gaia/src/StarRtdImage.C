@@ -346,7 +346,8 @@ static Tk_ImageType starRtdImageType = {
     TkImage::FreeImage,                  /* freeProc */
     TkImage::DeleteImage,                /* deleteProc */
     (Tk_ImagePostscriptProc *) NULL,     /* postscriptProc */
-    (Tk_ImageType *) NULL                /* nextPtr */
+    (Tk_ImageType *) NULL,               /* nextPtr */
+    (char *) NULL                        /* reserved */
 };
 
 
@@ -359,7 +360,7 @@ static Tk_ImageType starRtdImageType = {
 static Tk_ConfigSpec configSpecs_[] = {
     RTD_OPTIONS,                       // See RtdImage.h
     GAIA_OPTIONS,                      // See StarRtdImage.h
-    {TK_CONFIG_END, NULL, NULL, NULL, NULL, 0, 0}
+    {TK_CONFIG_END, NULL, NULL, NULL, NULL, 0, 0, NULL}
 };
 
 //+
@@ -843,44 +844,19 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
         ostringstream message;
         if ( origset_ ) {
 
-            //  WCS has been modified so we need to store this in the
-            //  headers, before saving the file. The stratedy is to
-            //  clear the headers of any existing WCS content and then
-            //  write the new WCS. This supercedes the old method
-            //  which was to read a single WCS and then try to write
-            //  the new WCS using that encoding.
-            AstFitsChan *chan = (AstFitsChan *)astFitsChan( NULL, NULL, "" );
-
-            //  Now add all the current FITS headers to this channel.
+            //  WCS has been modified so we need to store this in the headers,
+            //  before saving the file. The stratedy is to clear the headers
+            //  of any existing WCS content and then write the new WCS. This
+            //  supercedes the old method which was to read a single WCS and
+            //  then try to write the new WCS using that encoding.
             Mem oldhead = image_->header();
-            char *oldptr = (char *) oldhead.ptr();
-            size_t oldsize = oldhead.size();
-            char card[FITSCARD+1];
-            int ncard = (int) oldsize / FITSCARD;
+            int ncard = (int) oldhead.size() / FITSCARD;
+            AstFitsChan *chan;
+            gaiaUtilsGtFitsChan( (char *) oldhead.ptr(), ncard, &chan );
 
-            for ( int i = 0 ; i < ncard; i++, oldptr += FITSCARD ) {
-                memcpy( card, (void *)oldptr, (size_t)FITSCARD );
-                card[FITSCARD] = '\0';  // Always NULL terminated,
-
-                //  Read all cards up to, but not including, the END card.
-                if ( ! ( card[0] == 'E' && card[1] == 'N' && card[2] == 'D'
-                         && ( card[3] == '\0' || card[3] == ' ' ) ) ) {
-                    astPutFits( chan, card, 0 );
-                    if ( !astOK ) {
-
-                        //  If an error occurs with a card, just
-                        //  continue, it's almost certainly something
-                        //  trivial like a formatting problem.
-                        astClearStatus;
-                    }
-                } else {
-                    break;
-                }
-            }
-
-            //  Read the headers until no more WCS's can be
-            //  extracted. The default encoding is what AST's returns
-            //  as the first valid read.
+            //  Read the headers until no more WCS's can be extracted. The
+            //  default encoding is what AST's returns as the first valid
+            //  read.
             const char *default_encoding = NULL;
             const char *test_encoding = NULL;
             astSet( chan, "Clean=1" );
@@ -906,27 +882,29 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             }
 
             if ( default_encoding != NULL ) {
-                // A successful initial default encoding is the
-                // permanent default for writing back.
+
+                // A successful initial default encoding is the permanent
+                // default for writing back.
                 astSet( chan, "Encoding=%s", default_encoding );
             }
             else {
-                // Nothing read from the channel. So default encoding
-                // is untrustworthy. If this was a FITS file with no
-                // WCS then writing a Native encoding is bad, but is
-                // the correct thing to do for an NDF, but NDF
-                // channels should always read since they have PIXEL
-                // etc., so just need to test for FITS image.
+
+                // Nothing read from the channel. So default encoding is
+                // untrustworthy. If this was a FITS file with no WCS then
+                // writing a Native encoding is bad, but is the correct thing
+                // to do for an NDF, but NDF channels should always read since
+                // they have PIXEL etc., so just need to test for FITS image.
                 if ( isfits() ) {
                     astSet( chan, "Encoding=FITS-WCS" );
                     default_encoding = astGetC( chan, "Encoding" );
                 }
             }
 
-            //  If the card position is still at the beginning for any
-            //  reason then we should move it past the standard
-            //  headers, these are those up to the last NAXIS card.
+            //  If the card position is still at the beginning for any reason
+            //  then we should move it past the standard headers, these are
+            //  those up to the last NAXIS card.
             int startCard = astGetI( chan, "card" );
+            char card[FITSCARD+1];
             if ( astGetI( chan, "Card" ) <= 1 ) {
                 while( astFindFits( chan, "NAXIS%d", card, 1 ) ) {
                     startCard = astGetI( chan, "card" );
@@ -934,14 +912,13 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                 astSetI( chan, "Card", startCard );
             }
 
-            //  Now we can try to add the WCS encoding. The encoding
-            //  type of the channel is set to the type of the WCS
-            //  object just read (or Native and FITS-WCS for NDFs and
-            //  FITS). The first attempt to update will use whatever
-            //  this is set to. If this fails (shouldn't now we clear
-            //  the FITS headers of all WCS information) then an
-            //  attempt to write a native encoding will be made, if
-            //  the default type wasn't native already.
+            //  Now we can try to add the WCS encoding. The encoding type of
+            //  the channel is set to the type of the WCS object just read (or
+            //  Native and FITS-WCS for NDFs and FITS). The first attempt to
+            //  update will use whatever this is set to. If this fails
+            //  (shouldn't now we clear the FITS headers of all WCS
+            //  information) then an attempt to write a native encoding will
+            //  be made, if the default type wasn't native already.
             StarWCS* wcsp = getStarWCSPtr();
             if ( !wcsp ) {
                 return TCL_ERROR;
@@ -4789,7 +4766,7 @@ int StarRtdImage::ndfCmdDisplay( int argc, char *argv[], NDFIO *ndf )
 	    return TCL_ERROR;
         }
 
-	if ( numNDFs > (int) sizeof( ndfList ) / sizeof( int ) ) {
+	if ( numNDFs > (int) ( sizeof( ndfList ) / sizeof( int ) ) ) {
 	    return fmt_error( "StarRtdImage::ndfCmdDisplay: too many "
                               "NDFs: %d (max 256)", numNDFs );
         }
