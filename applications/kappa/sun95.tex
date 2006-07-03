@@ -8174,7 +8174,7 @@ attribute of the sky Frame, we could say:
       }{
          This sets the {\att Format} attribute for axis 2 in the current
          co-ordinate Frame in the NDF called {\tt ngc5128}, so that axis 
-         values are formated as separate degrees, minutes and seconds field,
+         values are formatted as separate degrees, minutes and seconds field,
          separated by blanks.  The seconds field has two decimal places.
          This assumes the current co-ordinate Frame in the NDF is a
          celestial co-ordinate Frame (\emph{i.e.} a SkyFrame).
@@ -44407,18 +44407,18 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       attribute to revert to its default value.
 
       The operation performed by this application is controlled by
-      parameter MODE, and can be:
+      parameter MODE, and can:
 
       \sstitemlist{
 
          \sstitem
-         display the value of an attribute.
+         display the value of an attribute;
 
          \sstitem
-         set a new value for an attribute.
+         set a new value for an attribute;
 
          \sstitem
-         clear an attribute value.
+         clear an attribute value; and
 
          \sstitem
          test the state of an attribute.
@@ -44440,20 +44440,10 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
    }
    \sstparameters{
       \sstsubsection{
-         NAME = LITERAL (Read)
-      }{
-         The attribute name
-      }
-      \sstsubsection{
-         NDF = NDF (Read and Write)
-      }{
-         The NDF to be modified.
-      }
-      \sstsubsection{
          MODE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The operation to be performed on the attribute specified by
-         parameter NAME: It can be one of the following options.
+         parameter NAME.  It can be one of the following options.
 
          \ssthitemlist{
 
@@ -44478,6 +44468,17 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
             parameter STATE.
 
          }
+         The initial suggested default is {\tt "Get"}.
+      }
+      \sstsubsection{
+         NAME = LITERAL (Read)
+      }{
+         The attribute name.
+      }
+      \sstsubsection{
+         NDF = NDF (Read and Write)
+      }{
+         The NDF to be modified.  When MODE={\tt "Get"}, the access is Read only.
       }
       \sstsubsection{
          NEWVAL = LITERAL (Read)
@@ -44519,12 +44520,13 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstexamplesubsection{
          wcsattrib my\_spec set System freq
       }{
-         This sets the \htmlattref{System}{System}~ attribute of the current co-ordinate Frame in
-         the NDF called my\_Spec so that the Frame represents frequency
-         (this assumes the current Frame is a
-         \xref{SpecFrame}{sun210}{SpecFrame}).  The Mappings
-         between the current Frame and the other Frames are modified to take
-         account of the change of system.
+
+         This sets the \htmlattref{System}{System}~ attribute of the
+	 current co-ordinate Frame in the NDF called my\_Spec so that
+	 the Frame represents frequency (this assumes the current
+	 Frame is a \xref{SpecFrame}{sun210}{SpecFrame}).  The
+	 Mappings between the current Frame and the other Frames are
+	 modified to take account of the change of system.
       }
       \sstexamplesubsection{
          wcsattrib ngc5128 set title "Polarization map of Centaurus-A"
@@ -44541,20 +44543,21 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstexamplesubsection{
          wcsattrib my\_data set format(1) "\%10.5G"
       }{
-         This sets the \htmlattref{Format}{Format(axis)}~ attribute for axis 1 in the current co-ordinate
-         Frame in the NDF called my\_data, so that axis values are
-         formated as floating point values using a minimum field width of
-         ten characters, and displaying five significant figures.  An exponent is
-         used if necessary.
+         This sets the \htmlattref{Format}{Format(axis)}~ attribute for axis 1 in 
+         the current co-ordinate Frame in the NDF called my\_data, so
+	 that axis values are formatted as floating-point values using
+	 a minimum field width of ten characters, and displaying five
+	 significant figures.  An exponent is used if necessary.
       }
       \sstexamplesubsection{
          wcsattrib ngc5128 set format(2) bdms.2
       }{
-         This sets the \htmlattref{Format}{Format(axis)}~ attribute for axis 2 in the current co-ordinate
-         Frame in the NDF called ngc5128, so that axis values are formated as
-         separate degrees, minutes and seconds field, separated by blanks.
-         The seconds field has two decimal places.  This assumes the current
-         co-ordinate Frame in the NDF is a celestial co-ordinate Frame.
+         This sets the \htmlattref{Format}{Format(axis)}~ attribute for axis 2 in 
+         the current co-ordinate Frame in the NDF called ngc5128, so that axis 
+         values are formatted as separate degrees, minutes and seconds
+         fields, separated by blanks.  The seconds field has two decimal places. 
+         This assumes the current co-ordinate Frame in the NDF is a celestial 
+         co-ordinate Frame.
       }
       \sstexamplesubsection{
          wcsattrib my\_data get label(1)
