@@ -102,6 +102,9 @@ static const double pi_ = 3.14159265358979323846;
 static const double r2d_ = 180.0/pi_;
 static const double d2r_ = pi_/180.0;
 
+//  Number of characters in a FITS header card.
+static const int FITSCARD = 80;
+
 //  Initialize static members.
 int StarWCS::carlin_ = 1;
 
@@ -126,19 +129,19 @@ extern "C" {
 //
 static void ccard( char *card, const char *keyword, char const *value )
 {
-    char buf[81];
+    char buf[FITSCARD+1];
     sprintf(buf, "%-8.8s= '%.21s' /", keyword, value);
     sprintf(card, "%-80s", buf);
 }
 static void icard( char *card, const char *keyword, int value )
 {
-    char buf[81];
+    char buf[FITSCARD+1];
     sprintf(buf, "%-8.8s= %20d /", keyword, value);
     sprintf(card, "%-80s", buf);
 }
 static void dcard(char *card, const char *keyword, double value)
 {
-    char  buf[81];
+    char  buf[FITSCARD+1];
     sprintf(buf, "%-8.8s= %20f /", keyword, value);
     sprintf(card, "%-80s", buf);
 }
@@ -149,15 +152,15 @@ static void dcard(char *card, const char *keyword, double value)
 StarWCS::StarWCS( const char *header, const size_t lheader )
   : wcs_(NULL),
     equinox_(0.0),
+    extraPrecision_(0),
+    xrefpix_(0.0),
+    yrefpix_(0.0),
     raIndex_(1),
     decIndex_(2),
     xSecPix_(0.0),
     ySecPix_(0.0),
     issky_(1),
-    warnings_(NULL),
-    extraPrecision_(0),
-    xrefpix_(0.0),
-    yrefpix_(0.0)
+    warnings_(NULL)
 {
     equinoxStr_[0] = '\0';
     projection_[0] = '\0';
@@ -172,35 +175,16 @@ StarWCS::StarWCS( const char *header, const size_t lheader )
             // This should be a FITS header which we need to read it in
             // through a FITS channel.
             AstFitsChan *fitschan = astFitsChan( NULL, NULL, "" );
-            char card[81];
-            char *ptr = (char *) header;
-            int ncard = (int) lheader / 80;
-            for ( int i = 0 ; i < ncard; i++, ptr += 80 ) {
-                memcpy( card, (void *)ptr, (size_t) 80 );
-                card[80] = '\0';
-
-                //  Read all cards up to, but not including, the END card.
-                if ( ! ( card[0] == 'E' && card[1] == 'N' && card[2] == 'D'
-                         && ( card[3] == '\0' || card[3] == ' ' ) ) ) {
-                    astPutFits( fitschan, card, 0 );
-                    if ( !astOK ) {
-
-                        //  If an error occurs with a card, just
-                        //  continue, it's almost certainly something
-                        //  trivial like a formatting problem.
-                        astClearStatus;
-                    }
-                }
-                else {
-                    break;
-                }
-            }
-
+            int ncard = (int) lheader / FITSCARD;
+            gaiaUtilsGtFitsChan( (char *) header, ncard, &fitschan );
+            
             // Look for the image dimensions and store these if found. We
             // need these for calculating the size of the image in world
             // coordinates and AST doesn't retain this information.
             ndims_ = 2;
             astClear( fitschan, "Card" );
+            char card[FITSCARD+1];
+            char *ptr;
             if ( astFindFits( fitschan, "NAXIS", card, 1 ) ) {
                 if ( ( ptr = strstr( card, "=" ) ) != (char *)NULL ) {
                     sscanf( ++ptr, "%d", &ndims_ );
@@ -1063,7 +1047,7 @@ int StarWCS::set( double ra, double dec,
 
     //  Create a FITS channel to which we will send our header cards.
     AstFitsChan *fitschan = astFitsChan( NULL, NULL, "" );
-    char card[81];
+    char card[FITSCARD+1];
     icard( card, "NAXIS", 2 );
     astPutFits( fitschan, card, 0 );
 
@@ -1513,7 +1497,7 @@ void StarWCS::constructWarning( const char *encoding, int failed,
     }
 
     //  Set up variables and a stream to write to.
-    char card[81];
+    char card[FITSCARD+1];
     char *equinox;
     int nwarns = 0;
     std::ostringstream os;
