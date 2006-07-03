@@ -6,6 +6,9 @@
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  01 Jun 94  Created
+# Peter W. Draper 03 Jul 06  Stop . being used as a parent, that is usually
+#                            in a withdrawn state. Why hasn't this been a 
+#                            problem before?
 
 itk::usual DialogWidget {}
 
