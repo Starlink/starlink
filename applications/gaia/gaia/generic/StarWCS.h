@@ -83,6 +83,9 @@ protected:
   //  Projection, if known.
   char projection_[10];
 
+  //  Show extra precision for milli-arcsec resolution.
+  int extraPrecision_;
+
   //  Reference pixels (again if known).
   double xrefpix_;
   double yrefpix_;
@@ -132,9 +135,6 @@ protected:
 
   //  Pointer to warnings string.
   char *warnings_;
-
-  //  Show extra precision for milli-arcsec resolution.
-  int extraPrecision_;
 
   //  Whether CAR projections are broken linear. Applies to all instances.
   static int carlin_;

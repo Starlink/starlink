@@ -38,6 +38,14 @@ extern "C" {
     int gaiaUtilsAtlAxTrm( AstFrameSet *frameset, int axes[], int lbnd[],
                            int ubnd[], double work[], char **error_mess );
 
+    /* Read FITS headers (char array) into a FITS channel */
+    int gaiaUtilsGtFitsChan( char header[], int ncards, 
+                             AstFitsChan **fitschan );
+
+    /* Read FITS headers and return a FrameSet */
+    int gaiaUtilsGtFitsWcs( char header[], int ncards, char *encoding, 
+                            AstFrameSet **iwcs );
+
 #ifdef __cplusplus
 }
 #endif

@@ -120,10 +120,10 @@ class StarRtdImageOptions : public RtdImageOptions
 //  Define the Tk config options specific to GAIA.
 #define GAIA_OPTION(x) Tk_Offset(Gaia_Options, x)
 #define GAIA_OPTIONS \
-{TK_CONFIG_STRING, "-ast_tag",   NULL, NULL, "ast_element", GAIA_OPTION(ast_tag),   0}, \
-{TK_CONFIG_STRING, "-component", NULL, NULL, "data",        GAIA_OPTION(component), 0}, \
-{TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1",           GAIA_OPTION(plot_wcs),  0}, \
-{TK_CONFIG_INT,    "-ukirt_ql",  NULL, NULL, "0",           GAIA_OPTION(ukirt_ql),  0}
+{TK_CONFIG_STRING, "-ast_tag",   NULL, NULL, "ast_element", GAIA_OPTION(ast_tag),   0, NULL}, \
+{TK_CONFIG_STRING, "-component", NULL, NULL, "data",        GAIA_OPTION(component), 0, NULL}, \
+{TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1",           GAIA_OPTION(plot_wcs),  0, NULL}, \
+{TK_CONFIG_INT,    "-ukirt_ql",  NULL, NULL, "0",           GAIA_OPTION(ukirt_ql),  0, NULL}
 
 class StarRtdImage : public Skycat
 {
