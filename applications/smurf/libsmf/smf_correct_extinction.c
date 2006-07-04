@@ -68,6 +68,8 @@
 *        Store and monitor all three WVM temperatures
 *     2006-04-21 (AGG):
 *        Check and update history if routine successful
+*     2006-07-04 (AGG):
+*        Update calls to slaAirmas to reflect new C interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -105,15 +107,12 @@
 #include "mers.h"
 #include "msg_par.h"
 #include "prm_par.h"
+#include "star/slalib.h"
 
 /* SMURF includes */
 #include "smf.h"
 #include "smurf_par.h"
 #include "smurf_typ.h"
-
-/* Fortran prototypes */
-#include "f77.h"
-F77_DOUBLE_FUNCTION(sla_airmas)( double * );
 
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_correct_extinction"
@@ -299,16 +298,13 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
       if (indata[index] != VAL__BADD) {
 	if (!quick) {
 	  zd = M_PI_2 - yout[indices[i]];
-	  airmass = F77_CALL(sla_airmas)( &zd );
+	  airmass = slaAirmas( zd );
 	  extcorr = exp(airmass*tau);
 	}
 	indata[index] *= extcorr;
 	/*	if (vardata != NULL && vardata[index] != VAL__BADD) {
 	  vardata[index] *= extcorr*extcorr;
 	  }*/
-	/*    printf( "Zenith distance: %f, Airmass: %f El: %f\n",zd, airmass);*/
-	/*    printf("Index: %" DIM_T_FMT "  Data: %f  Correction: %f\n",
-	      index, indata[index], (exp(airmass*tau)));*/
       }
     }
 
