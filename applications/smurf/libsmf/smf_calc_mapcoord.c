@@ -104,7 +104,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset,
   int lbnd_in[2];              /* Pixel bounds for asttrangrid */
   int ubnd[1];                 /* Pixel bounds for 1d pointing array */
   int ubnd_in[2];              /* Pixel bounds for asttrangrid */
-  int *lut;                    /* The lookup table */
+  int *lut = NULL;             /* The lookup table */
   /*AstMatrixMap *map2index=NULL; *//* Mapping for linear combination */
   double mat[2];               /* Matrix for linear combination */
   int nbolo;                   /* Number of bolometers */
