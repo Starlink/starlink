@@ -73,8 +73,9 @@
 
 #define FUNC_NAME "smf_close_mapcoord"
 
-smf_close_mapcoord( smfData *data, int *status ) {
-  smfFile *file=NULL;        /* Pointer to smfFile */
+void smf_close_mapcoord( smfData *data, int *status ) {
+
+  smfFile *file = NULL;        /* Pointer to smfFile */
   
   /* Main routine */
   if (*status != SAI__OK) return;

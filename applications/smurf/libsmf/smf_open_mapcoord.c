@@ -76,7 +76,7 @@
 
 #define FUNC_NAME "smf_open_mapcoord"
 
-smf_open_mapcoord( smfData *data, int *status ) {
+void smf_open_mapcoord( smfData *data, int *status ) {
   int lbnd[1];                  /* Pixel bounds for 1d pointing array */
   void *mapptr[3];              /* Pointer to array of mapped components */
   int nbolo;                    /* Number of bolometers */
