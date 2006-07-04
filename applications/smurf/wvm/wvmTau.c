@@ -13,6 +13,9 @@
   History:
 
 	$Log$
+	Revision 0.3  2006/07/04 17:09:50  jbalfour
+	Commenting on tau2pwv lookup table
+	
 	Revision 0.2  2006/06/30 18:22:59  jbalfour
 	Added tau2pwv routine.
 	
@@ -131,7 +134,9 @@ double pwv2tau(double airMass, double mmH2O_a) {
 	tau2pwv converts the optical depth seen at 225GHz relative to
         the zenith into a value representing millimeters of water vapor.
         This is done using the look-up table tau_table found in 
-        wvmTau.h.
+        wvmTau.h.  The values in the tau2pwv lookup table represent the 
+        tau values for pwvs ranging from 0.0 to 10.0 (incrementing by 0.1).  
+        The values were calculated using pwv2tau and an airmass of 1.0. 
 
    Author:
 	J.Balfour: jbalfour@phas.ubc.ca

@@ -17,6 +17,9 @@
  
  *  History:
 	$Log$
+	Revision 0.3  2006/07/04 17:09:55  jbalfour
+	Commenting on tau2pwv lookup table
+	
 	Revision 0.2  2006/06/30 18:22:29  jbalfour
 	added tau<->pwv lookup table.
 	
@@ -73,7 +76,9 @@ static const double coefs_m1[3] = {0.038863637, -0.18578918, 0.034048884};
 static const double coefs_m2[3] = {-0.0073803229, 0.027694585, -0.010215906};
 static const double coefs_c[3] = {-0.026203715, 1.1069635, 0.073422855};
 
-/* tau2pwv lookup table */
+/* tau2pwv lookup table : These values represent the tau values for pwvs
+   ranging from 0.0 to 10.0 (incrementing by 0.1).  The values were 
+   calculated using pwv2tau and an airmass of 1.0. */
 
 static const double tau_table[101] = { 0.0,
     0.0298435, 0.0298455, 0.0311965, 0.0331185, 0.0354685,
