@@ -133,7 +133,10 @@ void GaiaFITSUnmap( Mem *dataPtr )
 /**
  * Get the WCS as an AstFrameSet from the current HDU headers. Also returns
  * the array dimensions. The dims array should have MAX_DIM elements. The
- * number of dimensions returned is ndims.
+ * number of dimensions returned is ndims. If no valid WCS is found a dummy
+ * one (with the correct dimensionality) connecting GRID and PIXEL is
+ * returned, this will include the pixel origins, if any LBOUND keywords are
+ * present.
  */
 int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
                    int dims[], int *ndims )
@@ -153,7 +156,7 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
     astClear( fitschan, "Card" );
     int i = 0;
     char card[FITSCARD+1];
-    char *ptr = (char *) header;
+    char *ptr;
     while( astFindFits( fitschan, "NAXIS%d", card, 1 ) ) {
         if ( ( ptr = strstr( card, "=" ) ) != (char *)NULL ) {
             sscanf( ++ptr, "%d", &dims[i++] );
@@ -161,14 +164,37 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
     }
     *ndims = i;
 
-    // Now try to read in the FITS headers to create a frameset
+    // Now try to read in the FITS headers to create a frameset.
     astClear( fitschan, "Card" );
     *iwcs = (AstFrameSet *) astRead( fitschan );
 
     if ( *iwcs == AST__NULL ) {
-        astClearStatus;
-        astEnd;
-        return TCL_ERROR;
+        if ( ! astOK ) astClearStatus;
+
+        // No (valid) frameset, just create a basic one with a GRID and PIXEL
+        // domain. Check for LBOUND values, these are used by CONVERT to set
+        // the NDF origin.
+        double dlbnd[MAX_DIM];
+        for ( i = 0; i < MAX_DIM; i++ ) {
+            dlbnd[i] = 0.0;
+        }
+
+        astClear( fitschan, "Card" );
+        int lbnd;
+        i = 0;
+        while( astFindFits( fitschan, "LBOUND%d", card, 1 ) ) {
+            if ( ( ptr = strstr( card, "=" ) ) != (char *)NULL ) {
+                sscanf( ++ptr, "%d", &lbnd );
+                dlbnd[i] = (double) ( lbnd - 1 );
+                i++;
+            }
+        }
+
+        AstFrame *f1 = astFrame( *ndims, "Domain=GRID" );
+        AstFrame *f2 = astFrame( *ndims, "Domain=PIXEL" );
+        AstShiftMap *map = astShiftMap( *ndims, dlbnd, "" );
+        *iwcs = astFrameSet( f1, "" );
+        astAddFrame( *iwcs, AST__BASE, map, f2 );
     }
 
     astExport( *iwcs );
