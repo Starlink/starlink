@@ -39,7 +39,7 @@
       is shown by a vertical line (red by default). This will updated as you
       move through the cube slice-by-slice (the position of the spectrum on
       the image is shown by a cross). You can also move through slices by
-      dragging this line around, other reference lines created by the cube
+      dragging this line around, other reference ranges created by the cube
       toolbox can also be dragged around.
     <p>
     <p>
@@ -76,7 +76,14 @@
       the left and the maximum on the right. For your data this might
       correspond to the order of coordinates from the <tt>front</tt> to the
       <tt>back</tt> of the cube, or it may not. Deselecting this always places
-      the coordinate from the front of the cube to the left.
+      the coordinate from the front of the cube to the left. 
+    </p>
+    <p>
+      The <tt>Coordinate label</tt> option controls whether a simple readout
+      of the current image coordinates of the spectrum is displayed in the
+      lower left-hand part of the plot. This is a graphics item, so the font
+      and colour can be controlled by the <tt>Graphics</tt> menu (although
+      these changes will be undone the next time that the plot is opened).
     </p>
 
     <h3>Taking a hardcopy</h3>
@@ -91,7 +98,7 @@
     <p>
       For either axis to be drawn using log spacing the limits cannot include
       the value zero. When this is detected the axes are drawn using a linear
-      spacing.
+      spacing and you will be warned.
     </p>
   </body>
 </html>

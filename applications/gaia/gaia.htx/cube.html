@@ -28,16 +28,9 @@
       menu.
     </p>
     <p>
-      This simple behaviour can be enhanced using the extra controls in the
-      lower panes. Using these you can automatically step through a range of
-      indices (with three options for continuous looping), or you can create a
-      white light image that is produced by collapsing a range of planes
-      (there are options to control the collapse in various ways, such as
-      mean, mode, median, and integrated value, see the KAPPA COLLAPSE help).
-    </p>
-    <p>
       Once an image is displayed you are free to analyse it using the usual
-      tools, such as the photometric or image region toolboxes.
+      tools, such as the photometric or image region toolboxes. Channel maps
+      may have a grid overlaid.
     </p>
 
     <h3>Displaying spectra</h3>
@@ -45,7 +38,7 @@
       <img src="spectralplot.gif"/>
     <p>
       To display a spectrum just click, using mouse button 1, on a position on
-      the image. To see a continously updating spectrum, click and drag around
+      the image. To see a continuously updating spectrum, click and drag around
       the image. You can create one <tt>reference</tt> spectrum (for comparing
       regions of the cube) by double clicking on a point. This remains
       displayed until you double click again, or change the range of value
@@ -53,12 +46,101 @@
       spectral plotting.
     </p>
 
+    <h3>Cube handling actions</h3>
+    <p>
+      Various action tabs of controls are shown in the lower pane. These
+      currently allow you to animate through a range of indices, collapse the
+      cube to a white-light image, create a "channel map" and subtract a
+      fitted baseline.
+    <p>
+    <h5>Animation</h5>
+    <p>
+      Using these controls you can automatically step through a range of
+      indices. At the end of the range you can choose to either stop 
+      (<tt>Off</tt>), continuously start again from the beginning 
+      (<tt>On</tt>) or continuously reverse direction 
+      (<tt>Rock 'n Roll</tt>). The limits to animate over can be controlled
+      using the sliders, or you can select "Show limits on plot:" to interact
+      with a graphic displayed over the spectral plot.
+    </p>
+    <h5>Collapse</h5>
+    <p>
+      These controls run the KAPPA application COLLAPSE to create white-light
+      images of various kinds. The collapse range is controlled as in the
+      Animation tab. The combination method provides a wide range of methods,
+      including: 
+    </p>
+    <ul>
+      <li> <tt>Mean</tt> - Mean value </li>
+      <li> <tt>WMean</tt> - Weighted mean in which each data value is weighted
+        by the reciprocal of the associated variance.</li> 
+      <li> <tt>Mode</tt> - Modal value</li>
+      <li> <tt>Median</tt> - Median value. Note that this is extremely memory
+        and CPU intensive for large datasets; use with care!</li>
+      <li> <tt>Absdev</tt> - Mean absolute deviation from the unweighted
+        mean.</li> 
+      <li> <tt>Comax</tt> - Co-ordinate of the maximum value.</li>
+      <li> <tt>Comin</tt> - Co-ordinate of the minimum value.</li>
+      <li> <tt>Integ</tt> - Integrated value, being the sum of the products of
+        the value and pixel width in world co-ordinates.</li> 
+      <li> <tt>Iwc</tt> - Intensity-weighted co-ordinate, being the sum of
+        each value times its co-ordinate, all divided by the integrated value
+        (see the <tt>Integ</tt> option).</li> 
+      <li> <tt>Iwd</tt> - Intensity-weighted dispersion of the co-ordinate,
+        normalised like <tt>Iwc</tt> by the integrated value.</li> 
+      <li> <tt>Max</tt> - Maximum value.</li>
+      <li> <tt>Min</tt> - Minimum value.</li>
+      <li> <tt>Rms</tt> - Root-mean-square value.</li>
+      <li> <tt>Sigma</tt> - Standard deviation about the unweighted mean.</li>
+      <li> <tt>Sum</tt> - The total value.</li>
+    </ul>
+
+    <h5>Chanmap</h5>
+    <p>
+      These controls run the KAPPA application CHANMAP to create a 
+      <tt>channel map</tt> image. A channel map image consists of image tiles,
+      each tile being the result of collapsing a range of planes in a cube.
+      These ranges are chosen to create a given number of tiles between two
+      limits (which can be the whole cube).
+    </p>
+    <p>
+      The full range for collapsing is controlled as in the Animation tab and
+      same combination methods are used as in the Collapse tab (see above).
+    </p>
+    <p>
+      Once a channel-map is displayed it can have a grid overlaid, and you can
+      inspect the coordinates of each tile. The average value of the collapsed
+      axis can be seen in the 
+      <tt>Image-Analysis->Change coordinates->Show all coordinates...</tt>
+      toolbox, just track the mouse over the tile you want to investigate.
+
+    <h5>Baseline</h5>
+    <p>
+      These controls run the KAPPA application MFITTREND to fit and subtract
+      baselines from each spectrum in the cube. The baseline is estimated as a
+      polynomial fit, of the selected order. Each spectrum is fitted
+      independently and the data selected for each fit can include up to four
+      ranges along the spectral axis. To define a range you must
+      <tt>Enable</tt> it and then chose the lower and upper indices. These can
+      be visualised in the spectral plot by selecting <tt>Show limits on
+      plot:</tt> (in fact you can drag and resize these on the plot). Once ran
+      the new cube replaces the old one and you can inspect it for success. If
+      you want to keep the new cube then inspect the current directory for the
+      latest file called <tt>GaiaTempCube[n].sdf</tt> (where <tt>[n]</tt> is
+      some integer that increments for each new cube). This will not be
+      deleted when GAIA exits (so you must do this yourself from
+      time-to-time).
+    </p>
+    <p>
+
+
     <h3>Coordinates</h3>
     <p>
       The indices used to select an image plane are what are normally known as
       NDF pixel indices. For FITS cubes this will be just the grid indices
       (starting from 1 to the length of the chosen axis), for NDFs this will
-      include the origin.
+      include the origin (this will also be true of FITS files converted from
+      NDFs).
     </p>
     <p>
       When your cube has a world coordinate system defined (either as an NDF
@@ -71,10 +153,10 @@
       to transform into other supported coordinate systems. These are listed
       in the <tt>Coords</tt> menu (currently: angstroms, nm, mm, micrometres,
       GHz, MHz, THz, KHz, J, ergs, eV, keV and 1/m, plus m/s and km/s (radio),
-      if a rest frequency is defined). Just choose one and the slice
-      coordinates and the spectral plot (if active) will be redisplayed to
-      show your new coordinates. This menu is replicated in the spectral plot
-      for convenience. To return to the initial system just choose the
+      and redshift if a rest frequency is defined). Just choose one and the
+      slice coordinates and the spectral plot (if active) will be redisplayed
+      to show your new coordinates. This menu is replicated in the spectral
+      plot for convenience. To return to the initial system just choose the
       <tt>Default</tt> item.
     </p>
 
@@ -96,7 +178,7 @@
       gives a good compromise between startup speed and access speed. However,
       for very large cubes (2Gb and up) the access speed can suffer as the
       data is only read incrementally on demand. This is particularly
-      noticable when plotting spectra (which are usually accessed sparsely
+      noticeable when plotting spectra (which are usually accessed sparsely
       being in the third dimension), typically this manifests itself as a very
       slow response, which suddenly becomes much faster after clicking on the
       cube many times. To avoid this behaviour you can choose to read the cube
@@ -132,5 +214,6 @@
       the default double click behaviour, which is to define a reference
       spectrum).
     </p>
+
   </body>
 </html>
