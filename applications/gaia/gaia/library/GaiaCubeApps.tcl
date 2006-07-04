@@ -172,9 +172,15 @@ itcl::class gaia::GaiaCubeApps {
          add_short_help $itk_component(combination) \
             {Method to use when combining data, use median with care}
          
-         foreach {sname lname} $estimators_ {
+         set top [winfo toplevel $w_]
+         foreach {sname descr} $estimators_ {
+            if { $descr != "" } {
+               set label "$sname ($descr)"
+            } else {
+               set label "$sname"
+            }
             $itk_component(combination) add \
-               -label $lname \
+               -label $label \
                -value $sname \
                -command [code $this set_combination_type_ $sname]
          }
@@ -407,10 +413,10 @@ itcl::class gaia::GaiaCubeApps {
    #  All the known collapse estimators for COLLAPSE and CHANMAP, short and
    #  long descriptions.
    common estimators_ {
-      Mean Mean
+      Mean ""
       WMean {Weighted Mean}
-      Mode Mode
-      Median Median
+      Mode ""
+      Median ""
       Absdev {Mean absolute deviation}
       Comax {Co-ordinate of the maximum value}
       Comin {Co-ordinate of the minimum value}
@@ -419,9 +425,9 @@ itcl::class gaia::GaiaCubeApps {
       Iwd {Intensity-weighted dispersion}
       Max Maximum
       Min Minimum
-      Rms RMS
+      Rms ""
       Sigma {Standard deviation}
-      Sum Sum
+      Sum ""
    }
 
    #  The temporary image count.
