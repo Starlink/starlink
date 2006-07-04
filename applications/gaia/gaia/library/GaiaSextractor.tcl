@@ -930,13 +930,13 @@ itcl::class gaia::GaiaSextractor {
             -increment 0.1  \
             -resolution 0.1 \
             -show_arrows 1 \
+            -from 0.1 \
+            -to 10.0 \
             -fix_range 1 \
             -validate real \
             -anchor w \
             -value $values_(deteffic) \
             -textvariable [scope values_(deteffic)] \
-            -from 0.1 \
-            -to 10.0 \
             -command [code $this set_values_ deteffic]
       }
       pack $itk_component(deteffic) -side top -fill x -ipadx 1m -ipady 1m
