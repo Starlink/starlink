@@ -50,7 +50,7 @@ FILES        = \
  .gaFilters gaiacut zoomcutandflip
 
 PROGRAMS     = gaia.sh gaiadisp.sh gaiaremote.sh \
-               displaycat tabbedgaia.sh
+               displaycat displaypolcat tabbedgaia.sh
 
 all:
 
