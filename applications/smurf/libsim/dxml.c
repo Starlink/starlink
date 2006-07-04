@@ -8,6 +8,7 @@
 #include <time.h>
 #include <errno.h>
 #include <expat.h>
+#include <ctype.h>
 
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
