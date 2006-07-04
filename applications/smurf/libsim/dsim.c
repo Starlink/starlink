@@ -390,7 +390,7 @@ int *status          /* global status (given and returned) */
    static double bindr[BOLCOL*BOLROW]; /* bolometer indices */
    int subnum;      /* subarray number */
 
-   int i;
+   /*int i;*/
 
    if ( !StatusOkP(status) ) return;
 
@@ -1652,16 +1652,16 @@ int *status             /* global status (given and returned) */
 */
 
 {
-  int i,j;                  /* Loop counter */
+  int i/*,j*/;                  /* Loop counter */
   int xnear;                /* Nearest-neighbour x-pixel coordinate */
-  double *xsky;             /* x-sky image coordinates */
+  /*double *xsky;*/             /* x-sky image coordinates */
   int ynear;                /* Nearest-neighbour y-pixel coordinate */
-  double *ysky;             /* y-sky image coordinates */
+  /*double *ysky;*/             /* y-sky image coordinates */
   double *skycoord;         /* x- and y- sky map pixel coordinates */
   int lbnd_in[2];           /* Pixel bounds for astRebin */
   int ubnd_in[2];
-  int lbnd_out[2];
-  int ubnd_out[2];
+  /*int lbnd_out[2];
+    int ubnd_out[2];*/
 
   if ( !StatusOkP(status) ) return;
 
@@ -2030,7 +2030,7 @@ int *status         /* global status (given and returned) */
 
 {
 
-  if ( !StatusOkP(status) ) return;
+  if ( !StatusOkP(status) ) return none;
 
   if( strcmp( name, "STARE" ) == 0 ) return stare;
   else if( strcmp( name, "DSTARE" ) == 0 ) return dstare;
@@ -2078,7 +2078,6 @@ int *status              /* global status (given and returned) */
    int tlength;                   /* length of time string */
    char cur_day[16];              /* date string */ 
    char cur_time[16];             /* time string */ 
-   char tname[132];               /* temporary copy of file name */
 
    if ( !StatusOkP(status) ) return;
 
@@ -2238,9 +2237,6 @@ int *status              /* global status (given and returned) */
 {
    char obs_name[132];            /* XML observation file name */
 
-   char tname[132];               /* temporary copy of file name */
-
-
    if ( !StatusOkP(status) ) return;
 
 
@@ -2296,8 +2292,6 @@ int *status              /* global status (given and returned) */
 
    int dlength;                   /* length of date string */
    int tlength;                   /* length of time string */
-   char tname[132];               /* temporary copy of file name */
-
 
    if ( !StatusOkP(status) ) return;
 
@@ -3075,7 +3069,6 @@ int *status              /* global status (given and returned) */
 
    int dlength;                   /* length of date string */
    int tlength;                   /* length of time string */
-   char tname[132];               /* temporary copy of file name */
 
    if ( !StatusOkP(status) ) return;
 
@@ -3167,8 +3160,6 @@ int *status              /* global status (given and returned) */
 
    int dlength;                   /* length of date string */
    int tlength;                   /* length of time string */
-   char tname[132];               /* temporary copy of file name */
-
 
    if ( !StatusOkP(status) ) return;
 
@@ -4055,10 +4046,10 @@ int *status       /* global status (given and returned) */
   double map_pa;     /* Map PA in degrees  */
   double map_x = 0;  /* Map X offset in arcsec */
   double map_y = 0;  /* Map Y offset in arcsec */
-  double x_min;      /* Maximum extend of pointing centre offsets */
-  double x_max;
-  double y_min;
-  double y_max;
+  double x_min = 0;  /* Maximum extend of pointing centre offsets */
+  double x_max = 0;
+  double y_min = 0;
+  double y_max = 0;
   
   if ( !StatusOkP(status) ) return;
   
@@ -5956,9 +5947,6 @@ int *status                  /* global status (given and returned) */
   double *skycoord;               /* az & el coordinates */
   int lbnd_in[2];                 /* Pixel bounds for astTranGrid */
   int ubnd_in[2];
-  int lbnd_out[2];
-  int ubnd_out[2];
-
   
   if ( !StatusOkP(status) ) return; 
 
