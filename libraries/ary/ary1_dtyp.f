@@ -53,6 +53,8 @@
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -72,6 +74,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     David S Berry (JAC):
 *     {enter_new_authors_here}
 
 *  History:
@@ -85,6 +88,8 @@
 *        Installed support for primitive arrays.
 *     1-MAR-1990 (RFWS):
 *        Removed declaration of un-referenced function.
+*     8-MAY-2006 (DSB):
+*        Installed support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -176,9 +181,10 @@
                   DCB_DLOC( IDCB ) = ARY__NOLOC
                END IF
 
-*  Simple arrays.
-*  =============
-            ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) THEN
+*  Simple and scaled arrays.
+*  =========================
+            ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' .OR.
+     :                DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
 
 *  Find the DATA component, storing a locator to it in the DCB, and
 *  obtain its type, which is also stored in the DCB.
@@ -209,8 +215,17 @@
      :                               DCB_CPX( IDCB ), STATUS )
                      IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  If so, then get a locator to it for the DCB and obtain its type.
+*  Is so, report an error if we are creating a scaled array.
                         IF ( DCB_CPX( IDCB ) ) THEN
+                           IF( DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
+                              STATUS = ARY__USFRM
+                              CALL ERR_REP( 'ARY1_DSTP_SCMX', 
+     :                                 'Complex scaled arrays are '//
+     :                                 'currently unsupported by the '//
+     :                                 'ARY library.', STATUS )
+                           END IF 
+
+*  Otherwise, get a locator to it for the DCB and obtain its type.
                            CALL DAT_FIND( DCB_LOC( IDCB ),
      :                                    'IMAGINARY_DATA',
      :                                    DCB_ILOC( IDCB ), STATUS )

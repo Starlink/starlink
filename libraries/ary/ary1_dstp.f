@@ -86,6 +86,8 @@
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -105,6 +107,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -120,6 +123,8 @@
 *     10-OCT-1990 (RFWS):
 *        Changed to call ARY1_PAREN as a temporary work around for
 *        problems with DAT_PAREN.
+*     8-MAY-2006 (DSB):
+*        Installed support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -177,6 +182,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER * ( DAT__SZLOC ) LOCC ! Component locator
       CHARACTER * ( DAT__SZLOC ) LOCP ! Parent structure locator
       CHARACTER * ( DAT__SZNAM ) NAME ! Object name
       INTEGER DIM( ARY__MXDIM )  ! Data component dimension sizes
@@ -354,6 +360,47 @@
 
 *  Determine whether any data conversion errors occurred.
                   DCE = DCE .OR. IDCE
+               END IF
+            END IF
+
+*  Scaled arrays.
+*  =============
+         ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
+
+*  Ensure that scaling and data type information is available in the DCB.
+            CALL ARY1_DSCL( IDCB, STATUS )
+            CALL ARY1_DTYP( IDCB, STATUS )
+            IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  Change the external data type. This is the data type of the scale and
+*  zero terms (the data type of the arrays of scaled values is left
+*  unchanged).
+               CALL DAT_FIND( DCB_SCLOC( IDCB ), 'SCALE', LOCC, STATUS )
+               CALL DAT_RETYP( LOCC, TYPE, STATUS )
+               CALL DAT_ANNUL( LOCC, STATUS )
+
+               CALL DAT_FIND( DCB_SCLOC( IDCB ), 'ZERO', LOCC, STATUS ) 
+               CALL DAT_RETYP( LOCC, TYPE, STATUS )
+               CALL DAT_ANNUL( LOCC, STATUS )
+
+               DCE = .FALSE.
+
+*  If a non-complex type is required, but the type was originally
+*  complex, then annul the imaginary component locator and erase the
+*  component.
+               IF ( ( .NOT. CMPLX ) .AND. DCB_CPX( IDCB ) ) THEN
+                  CALL DAT_ANNUL( DCB_ILOC( IDCB ), STATUS )
+                  DCB_ILOC( IDCB ) = ARY__NOLOC
+                  CALL DAT_ERASE( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
+     :                            STATUS )
+
+*  If a complex type is required but the type was originally
+*  non-complex, then report an error.
+               ELSE IF ( CMPLX .AND. ( .NOT. DCB_CPX( IDCB ) ) ) THEN
+                  STATUS = ARY__USFRM
+                  CALL ERR_REP( 'ARY1_DSTP_SCMX', 'Complex scaled '//
+     :                          'arrays are currently unsupported '//
+     :                          'by the ARY library.', STATUS )
                END IF
             END IF
 

@@ -30,7 +30,13 @@ PRIVATE_INCLUDES = ARY_ACB ARY_CONST ARY_DCB ARY_MCB ARY_PCB ARY_TCB
 PUBLIC_INCLUDES = ARY_PAR
 include_MESSAGES = ARY_ERR
 
-F_ROUTINES = ary1_init.f ary1_accok.f ary1_adiag.f ary1_anl.f	       \
+GEN_F_ROUTINES = $(ARY_N_GEN:.gn=.f) 
+
+F_ROUTINES = $(NONGEN_F_ROUTINES) $(GEN_F_ROUTINES)
+
+ARY_N_GEN = ary_sszx.gn ary1_gtnx.gn ary1_gt1x.gn
+
+NONGEN_F_ROUTINES = ary1_init.f ary1_accok.f ary1_adiag.f ary1_anl.f   \
 ary1_annpl.f ary1_antmp.f ary1_bad.f ary1_badb.f ary1_badd.f	       \
 ary1_badi.f ary1_badr.f ary1_badub.f ary1_baduw.f ary1_badw.f	       \
 ary1_bpp.f ary1_bppb.f ary1_bppd.f ary1_bppi.f ary1_bppr.f	       \
@@ -45,10 +51,8 @@ ary1_dcrep.f ary1_ddiag.f ary1_del.f ary1_dfrm.f ary1_diag.f	       \
 ary1_dimp.f ary1_dmod.f ary1_dp2s.f ary1_drst.f ary1_ds2p.f	       \
 ary1_dsbd.f ary1_dsbnd.f ary1_dsft.f ary1_dsta.f ary1_dstp.f	       \
 ary1_dtyp.f ary1_dvfy.f ary1_eqbnd.f ary1_expid.f ary1_ffs.f	       \
-ary1_gmrb.f ary1_gt1b.f ary1_gt1d.f ary1_gt1i.f ary1_gt1r.f	       \
-ary1_gt1ub.f ary1_gt1uw.f ary1_gt1w.f ary1_gtn.f ary1_gtnb.f	       \
-ary1_gtnd.f ary1_gtni.f ary1_gtnr.f ary1_gtnub.f ary1_gtnuw.f	       \
-ary1_gtnw.f ary1_hunmp.f ary1_id2ac.f ary1_imp.f ary1_impid.f	       \
+ary1_gmrb.f ary1_gtn.f \
+ary1_hunmp.f ary1_id2ac.f ary1_imp.f ary1_impid.f	       \
 ary1_imppl.f ary1_inbnd.f ary1_intyp.f ary1_iobw.f ary1_maps.f	       \
 ary1_mdiag.f ary1_mpsr.f ary1_mpsw.f ary1_nel.f ary1_nxtsl.f	       \
 ary1_pbnd.f ary1_pt1b.f ary1_pt1d.f ary1_pt1i.f ary1_pt1r.f	       \
@@ -66,7 +70,8 @@ ary_imprt.f ary_isacc.f ary_isbas.f ary_ismap.f ary_istmp.f ary_map.f  \
 ary_mapz.f ary_msg.f ary_ndim.f ary_new.f ary_newp.f ary_noacc.f       \
 ary_offs.f ary_place.f ary_reset.f ary_same.f ary_sbad.f ary_sbnd.f    \
 ary_sect.f ary_shift.f ary_size.f ary_ssect.f ary_state.f ary_stype.f  \
-ary_temp.f ary_trace.f ary_type.f ary_unmap.f ary_valid.f ary_verfy.f
+ary_temp.f ary_trace.f ary_type.f ary_unmap.f ary_valid.f ary_verfy.f \
+ary1_cpscl.f ary1_dscl.f ary1_vscl.f
 
 BUILT_SOURCES = ARY_ERR
 
@@ -86,4 +91,10 @@ dist_pkgdata_DATA = LICENCE
 EXTRA_DIST = ary_err.msg
 
 CLEANFILES = ARY_ERR
+
+.gn.f:
+	cp $< $(<:.gn=.gen)
+	$(FGENERIC)  -t n -u $(<:.gn=.gen)
+	rm $(<:.gn=.gen)
+
 

@@ -15,13 +15,13 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {11.3}
+\newcommand{\stardocnumber}    {11.4}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith}
-\newcommand{\stardocdate}      {28th April 1998}
+\newcommand{\stardocdate}      {4th July 2006}
 \newcommand{\stardoctitle}     {ARY\\[2.5ex]
                                 A Subroutine Library for Accessing\\
                                 ARRAY Data Structures}
-\newcommand{\stardocversion}   {Version 1.1}
+\newcommand{\stardocversion}   {Version 1.2}
 \newcommand{\stardocmanual}    {Reference Manual}
 \newcommand{\stardocabstract}  {%
 The ARY library is a set of routines for accessing Starlink ARRAY data 
@@ -585,8 +585,60 @@ Since most ARY\_ routines closely resemble the equivalent NDF\_ routine,
 their use, in conjunction with the detailed routine descriptions contained in 
 Appendix~\ref{ss:routinedescriptions} of this document. 
 
-Note that at present, the ARY\_ system only supports the ``primitive'' and
-``simple'' forms of the ARRAY data structure. 
+
+
+\section{\xlabel{array_storage_forms}Array Storage Forms}
+\label{array_storage_forms}
+
+Note that at present, the ARY\_ system provides full support only for the 
+``primitive'' and ``simple'' forms of the ARRAY data structure. 
+
+However, some support is also provided for the ``scaled'' form described
+in SGP/38. This form is the same as the ``simple'' form except that two
+extra scalar values are included that describe a linear scaling from the
+stored array values to the data values of interest to an external user.
+These two scalars are referred to as SCALE and ZERO. The external
+(unscaled) data values are derived from the stored (scaled) data values
+as follows:
+
+\begin{eqn*}
+ unscaled = SCALE*scaled + ZERO
+\end{eqn}
+
+The following points should be noted:
+
+\begin{enumerate}
+
+\item Scaled arrays are ``read-only''. An error will be reported if an
+attempt is made to map a scaled array for WRITE or UPDATE access. When
+mapped for READ access, the pointer returned by ARY\_MAP provides access
+to the \emph{unscaled} data values - that is, the mapped values are the
+result of applying the scale and zero terms to the stored values.
+
+Currently, the scaled (i.e. stored) data values cannot be accessed
+directly.
+
+\item Scaled arrays cannot be created directly. Instead, a simple array must
+first be created (using ARY\_NEW), and this can then be converted to a scaled
+array by assigning scale and zero values to it using ARY\_SSZ<T>. So a
+typical program could create a simple array, map it for write access,
+store the scaled data values in the mapped simple array, unmap the
+array, and then associate scale and zero values with the array, thus
+converting it to a scaled array.
+
+\item Scaled arrays cannot have complex data types. An error will be
+reported if an attempt is made to to import an HDS structure describing a
+complex scaled array, or to assign scale and zero values to an array with
+complex data values.
+
+\item When applied to a scaled array, the ARY\_TYPE and ARY\_FTYPE routines 
+return information about the data type of the unscaled data values. In
+practice, this means that they return the data type of the SCALE and ZERO
+constants, rather than the data type of the array holding the stored
+(scaled) data values.
+
+\end{enumerate}
+
 
 \section{\xlabel{compiling_and_linking}Compiling and Linking}
 \label{compiling_and_linking}

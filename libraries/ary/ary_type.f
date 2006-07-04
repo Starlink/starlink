@@ -59,11 +59,14 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
 *     14-JUN-1989 (RFWS):
 *        Original version.
+*     15-MAY-2006 (DSB):
+*        Add support for scaled arrays.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -84,6 +87,8 @@
       INCLUDE 'ARY_DCB'          ! ARY_ Data Control Block
 *        DCB_TYP( ACB_MXDCB ) = CHARACTER * ( DAT__SZTYP ) (Read)
 *           Numeric type string for data object.
+*        DCB_FRM( ACB_MXDCB ) = CHARACTER * ( ARY__SZFRM ) (Read)
+*           Storage form for array.
 
       INCLUDE 'ARY_ACB'          ! ARY_ Access Control Block
 *        ACB_IDCB( ARY__MXACB ) = INTEGER (Read)
@@ -99,6 +104,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local variables:
+      CHARACTER TY*(DAT__SZTYP)  ! Intermediate data type
       INTEGER IACB               ! Index to ACB entry
       INTEGER IDCB               ! Index to data object entry in the DCB
 
@@ -114,11 +120,18 @@
 *  Get the DCB index for the data object.
          IDCB = ACB_IDCB( IACB )
 
-*  Ensure that type information is available.
+*  Ensure that storage form, type and scaling information is available.
+         CALL ARY1_DFRM( IDCB, STATUS )
          CALL ARY1_DTYP( IDCB, STATUS )
+         CALL ARY1_DSCL( IDCB, STATUS )
 
 *  Copy the numeric type string to the output argument.
-         CALL ARY1_CCPY( DCB_TYP( IDCB ), TYPE, STATUS )
+         IF( DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
+            CALL CMP_TYPE( DCB_SCLOC( IDCB ), 'SCALE', TY, STATUS )
+            CALL ARY1_CCPY( TY, TYPE, STATUS )
+         ELSE
+            CALL ARY1_CCPY( DCB_TYP( IDCB ), TYPE, STATUS )
+         END IF
       END IF
        
 *  If an error occurred, then report context information and call the

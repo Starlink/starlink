@@ -49,7 +49,7 @@
 *        The global status.
 
 *  Notes:
-*     -  This routine may also be used to map primitive arrays.
+*     -  This routine may also be used to map scaled and primitive arrays.
 
 *  Prior requirements:
 *     -  Appropriate entries relating to the region of data to be mapped
@@ -78,6 +78,8 @@
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -97,6 +99,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -107,6 +110,8 @@
 *     21-MAR-1990 (RFWS):
 *        Changed to pass the maximum dimensionality (of the data object
 *        and mapped array) to ARY1_GTN.
+*     24-APR-2006 (DSB):
+*        Add support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -188,7 +193,6 @@
       INTEGER IMCB               ! Index to entry in MCB
       INTEGER NDIMA              ! Number of access dimensions
       INTEGER NDIMD              ! Number of data object dimensions
-
 *.
 
 *  Set an initial value for the MLOC argument.
@@ -215,11 +219,12 @@
 1     CONTINUE
 
 *  If the mapping region (and mapping transfer region) comprises the
-*  whole data object and no data type conversion is required, then clone
-*  a locator to the entire data component and map it for access directly
+*  whole data object and no data type conversion or scaling is required, then 
+*  clone a locator to the entire data component and map it for access directly
 *  using HDS.
       IF ( MCB_WHOLE( IMCB ) .AND.
-     :     CHR_SIMLR( TYPE, DCB_TYP( IDCB ) ) ) THEN
+     :     CHR_SIMLR( TYPE, DCB_TYP( IDCB ) ) .AND.
+     :     DCB_FRM( IDCB ) .NE. 'SCALED' ) THEN
          CALL DAT_CLONE( LOC, MLOC, STATUS )
          CALL DAT_MAP( MLOC, TYPE, MODE, NDIMD, DIM, PNTR, STATUS )
          COPY = .FALSE.
@@ -227,11 +232,12 @@
 
 *  Otherwise, if the mapping transfer region fills the mapping region
 *  and the data component dimensionality does not exceed the maximum
-*  dimensionality of an HDS slice and no data type conversion is
+*  dimensionality of an HDS slice and no data type conversion or scaling is
 *  required, then a slice of the data can be mapped directly using HDS.
       ELSE IF ( MCB_MRFUL( IMCB ) .AND.
      :          ( NDIMD .LE. ARY__MXHSL ) .AND.
-     :          CHR_SIMLR( TYPE, DCB_TYP( IDCB ) ) ) THEN
+     :          CHR_SIMLR( TYPE, DCB_TYP( IDCB ) ) .AND.
+     :          DCB_FRM( IDCB ) .NE. 'SCALED' ) THEN
 
 *  Calculate the bounds of the data component slice required.
          DO 2 I = 1, NDIMD
@@ -250,6 +256,9 @@
 *  surrounded by "bad" values, so a copy must be made.
       ELSE IF ( MCB_MTREX( IMCB ) ) THEN
 
+*  Ensure any required scale and zero terms are available.
+         CALL ARY1_DSCL( IDCB, STATUS )
+
 *  Create and map a temporary object, then read the data in the mapping
 *  transfer region into it, padding the rest of the mapped array with
 *  "bad" values.
@@ -258,7 +267,7 @@
      :                  DCB_LBND( 1, IDCB ), DCB_UBND( 1, IDCB ),
      :                  MCB_LMTR( 1, IMCB ), MCB_UMTR( 1, IMCB ),
      :                  TYPE, MCB_LMRB( 1, IMCB ), MCB_UMRB( 1, IMCB ),
-     :                  .TRUE., PNTR, DCE, STATUS )
+     :                  .TRUE., DCB_SCLOC( IDCB ), PNTR, DCE, STATUS )
          COPY = .TRUE.
 
 *  In all other cases, there is no data to be transferred, so simply

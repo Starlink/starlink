@@ -74,6 +74,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -81,6 +82,8 @@
 *        Original version.
 *     13-FEB-1990 (RFWS):
 *        Installed support for primitive arrays.
+*     5-MAY-2006 (DSB):
+*        Installed support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,10 +143,11 @@
 *  Handle each form of array in turn.
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Primitive and simple arrays.
-*  ===========================
-*  Both forms of array are handled here.
+*  Primitive, scaled and simple arrays.
+*  ====================================
+*  All forms of array are handled here.
          IF ( ( DCB_FRM( IDCB ) .EQ. 'PRIMITIVE' ) .OR.
+     :        ( DCB_FRM( IDCB ) .EQ. 'SCALED' ) .OR.
      :        ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) ) THEN
 
 *  If the array is primitive, then it must first be converted to simple

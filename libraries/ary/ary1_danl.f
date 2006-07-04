@@ -110,6 +110,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -131,6 +132,8 @@
 *     16-MAR-1990 (RFWS):
 *        Changed so that an error is reported on release of an undefined
 *        array only if UPDATE access is available.
+*     26-APR-2006 (DSB):
+*        Add support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -226,9 +229,10 @@
                   DCB_DLOC( IDCB ) = ARY__NOLOC
                END IF
 
-*  Simple arrays.
-*  =============
-            ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) THEN
+*  Simple and scaled arrays.
+*  =========================
+            ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' .OR.
+     :                DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
 
 *  If data component locators have been acquired for the DCB, then annul
 *  the non-imaginary component locator.
@@ -241,6 +245,12 @@
                      CALL DAT_ANNUL( DCB_ILOC( IDCB ), STATUS )
                      DCB_ILOC( IDCB ) = ARY__NOLOC
                   END IF
+               END IF
+
+*  Annul any object holding scale information.
+               IF( DCB_KSCL( IDCB ) .AND. 
+     :             DCB_SCLOC( IDCB ) .NE. DAT__NOLOC ) THEN
+                  CALL DAT_ANNUL( DCB_SCLOC( IDCB ), STATUS )
                END IF
 
 *  If the DCB form information was not recognised, then report an error.

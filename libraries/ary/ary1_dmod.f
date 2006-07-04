@@ -70,6 +70,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -84,6 +85,8 @@
 *        under error conditions.
 *     12-FEB-1990 (RFWS):
 *        Installed support for primitive arrays.
+*     5-MAY-2006 (DSB):
+*        Installed support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -145,10 +148,11 @@
          CALL ARY1_DFRM( IDCB, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 9999
 
-*  Primitive and simple arrays.
-*  ===========================
-*  These are both handled in the same way.
+*  Primitive, scaled and simple arrays.
+*  ====================================
+*  These are all handled in the same way.
          IF ( ( DCB_FRM( IDCB ) .EQ. 'PRIMITIVE' ) .OR.
+     :        ( DCB_FRM( IDCB ) .EQ. 'SCALED' ) .OR.
      :        ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) ) THEN
 
 *  Ensure that type (and complexity) information, component locators and

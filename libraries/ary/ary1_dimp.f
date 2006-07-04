@@ -51,6 +51,8 @@
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -70,6 +72,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -86,6 +89,8 @@
 *        externally-defined groups.
 *     12-FEB-1990 (RFWS):
 *        Added support for primitive arrays.
+*     26-APR-2006 (DSB):
+*        Added support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -182,6 +187,7 @@
          DCB_KMOD( IDCB ) = .FALSE.
          DCB_KSTA( IDCB ) = .FALSE.
          DCB_KBAD( IDCB ) = .FALSE.
+         DCB_KSCL( IDCB ) = .FALSE.
 
 *  Initialise the reference and mapping counts and set the disposal
 *  mode to 'KEEP', indicating that this is not a temporary object.
@@ -202,6 +208,7 @@
 *  If the array has a supported form, then obtain the data object file
 *  and path names and enter them into the DCB.
             IF ( ( DCB_FRM( IDCB ) .EQ. 'PRIMITIVE' ) .OR.
+     :           ( DCB_FRM( IDCB ) .EQ. 'SCALED' ) .OR.
      :           ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) ) THEN
                CALL HDS_TRACE( DCB_LOC( IDCB ), NLEV, DCB_PATH( IDCB ),
      :                         DCB_FILE( IDCB ), STATUS )

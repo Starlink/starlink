@@ -62,6 +62,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -129,9 +130,10 @@
          IF ( DCB_FRM( IDCB ) .EQ. 'PRIMITIVE' ) THEN
             DCB_BAD( IDCB ) = .TRUE.
 
-*  Simple arrays.
-*  =============
-         ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) THEN
+*  Simple and scaled arrays.
+*  =========================
+         ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' .OR.
+     :             DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
 
 *  See if the BAD_PIXEL component is present and supply a default value
 *  of .TRUE. if it is not.

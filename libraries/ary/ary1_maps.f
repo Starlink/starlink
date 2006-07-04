@@ -40,7 +40,7 @@
 *        The global status.
 
 *  Notes:
-*     -  This routine may also be used to map a primitive array.
+*     -  This routine may also be used to map a scaled or primitive array.
 
 *  Algorithm:
 *     -  Validate the access data type string.
@@ -271,13 +271,13 @@
       CHARACTER * ( ARY__SZMOD ) MODE ! Data access mode
       CHARACTER * ( ARY__SZTYP ) VTYPE ! Validated data type string
       INTEGER DIM( ARY__MXDIM )  ! Array (ACB) dimension sizes
-      INTEGER DIMI( ARY__MXDIM ) ! Data object (DCB) dimension sizes
+C     INTEGER DIMI( ARY__MXDIM ) ! Data object (DCB) dimension sizes
       INTEGER EL                 ! Number of array elements to be mapped
-      INTEGER ELI                ! Number of elements to initialise
+C     INTEGER ELI                ! Number of elements to initialise
       INTEGER I                  ! Loop counter for dimensions
       INTEGER IDCB               ! Index to data object entry in the DCB
       INTEGER IMCB               ! Index to mapping entry in the MCB
-      INTEGER PNTR               ! Pointer to mapped data component
+C     INTEGER PNTR               ! Pointer to mapped data component
       LOGICAL BAD                ! Whether to check for "bad" values
       LOGICAL DCE                ! Data conversion error?
       LOGICAL ENTIRE             ! Entire object filled with values?

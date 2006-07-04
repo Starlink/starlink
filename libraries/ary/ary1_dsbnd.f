@@ -99,6 +99,8 @@
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -118,6 +120,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -134,6 +137,8 @@
 *     10-OCT-1990 (RFWS):
 *        Changed to call ARY1_PAREN as a temporary work around for
 *        problems with DAT_PAREN.
+*     5-MAY-2006 (DSB):
+*        Installed support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -304,9 +309,10 @@
                END IF
             END IF
 
-*  Simple arrays.
-*  =============
-         ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) THEN
+*  Simple and scaled arrays.
+*  =========================
+         ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' .OR.
+     :             DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
 
 *  Ensure that data type, state and bounds information is available for
 *  the data object in the DCB.

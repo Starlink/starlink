@@ -73,6 +73,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -84,6 +85,8 @@
 *        Added missing space to error message.
 *     12-FEB-1990 (RFWS):
 *        Added support for primitive arrays.
+*     26-APR-2006 (DSB):
+*        Added support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -186,9 +189,10 @@
                DCB_UBND( I, IDCB ) = 1
 2           CONTINUE
 
-*  Simple arrays.
-*  =============
-         ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) THEN
+*  Simple and scaled arrays.
+*  =========================
+         ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' .OR.
+     :             DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
 
 *  Ensure that data type information is available, then obtain the shape
 *  of the non-imaginary array component.

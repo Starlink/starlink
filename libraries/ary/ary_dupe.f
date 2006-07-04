@@ -92,6 +92,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -107,6 +108,8 @@
 *        form-dependent part of the routine.
 *     13-FEB-1990 (RFWS):
 *        Installed support for primitive arrays.
+*     5-MAY-2006 (DSB):
+*        Installed support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -252,6 +255,27 @@
      :                            ACB_LBND( 1, IACB1 ),
      :                            ACB_UBND( 1, IACB1 ), PCB_TMP( IPCB ),
      :                            PCB_LOC( IPCB ), IDCB2, STATUS )
+
+*  Scaled arrays.
+*  =============
+               ELSE IF ( DCB_FRM( IDCB1 ) .EQ. 'SCALED' ) THEN
+
+*  Ensure that data type and bounds information is available for the
+*  data object.
+                  CALL ARY1_DTYP( IDCB1, STATUS )
+                  CALL ARY1_DBND( IDCB1, STATUS )
+
+*  Create a new simple array data object with the same attributes and an 
+*  entry in the DCB.
+                  CALL ARY1_DCRE( DCB_TYP( IDCB1 ), 
+     :                            DCB_CPX( IDCB1 ), ACB_NDIM( IACB1 ),
+     :                            ACB_LBND( 1, IACB1 ),
+     :                            ACB_UBND( 1, IACB1 ), PCB_TMP( IPCB ),
+     :                            PCB_LOC( IPCB ), IDCB2, STATUS )
+
+*  Copy the scale information to the new DCB entry. This converts the DCB
+*  entry into a scaled array.
+                  CALL ARY1_CPSCL( IDCB1, IDCB2, STATUS )
 
 *  If the DCB form entry was not recognised, then report an error.
                ELSE
