@@ -1,14 +1,18 @@
 1 ARY - ARRAY data structure access routines
                                                      Expires: **.**.**
 
- A new release (v1.1-9) of the ARY library is now available.
+ A new release (v1.2) of the ARY library is now available.
+
+ v1.2
+
+    Add read-only support for scaled arrays.
 
  v1.1-9
 
-   This is a maintenance release to update the build system to use
-   Gnu autoconf.
+    This is a maintenance release to update the build system to use
+    Gnu autoconf.
 
-   The library is now released under the GPL.
+    The library is now released under the GPL.
 
  v1.1-8
 
