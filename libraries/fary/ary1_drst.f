@@ -59,6 +59,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,6 +76,8 @@
 *        Added support for the DCB_INIT array.
 *     12-FEB-1990 (RFWS):
 *        Installed support for primitive arrays.
+*     5-MAY-2006 (DSB):
+*        Installed support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -137,9 +140,10 @@
                CALL DAT_RESET( DCB_DLOC( IDCB ), STATUS )
             END IF
 
-*  Simple arrays.
-*  =============
-         ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) THEN
+*  Simple and scaled arrays.
+*  =========================
+         ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' .OR.
+     :             DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
 
 *  Ensure that data type information and component locators are
 *  available in the DCB.

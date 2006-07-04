@@ -73,6 +73,8 @@
 *     23-FEB-1990 (RFWS):
 *        Removed check on whether the array is actually mapped; this is
 *        now done at a lower level.
+*     4-JULY-2006 (DSB):
+*        Add support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,10 +124,11 @@
 *  Handle each form of array in turn, calling the appropriate routine to
 *  unmap it.
 
-*  Primitive and simple arrays.
+*  Primitive, simple and scaled arrays.
 *  ===========================
       IF ( ( DCB_FRM( IDCB ) .EQ. 'PRIMITIVE' ) .OR.
-     :     ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) ) THEN
+     :     ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) .OR.
+     :     ( DCB_FRM( IDCB ) .EQ. 'SCALED' ) ) THEN
          CALL ARY1_UMPS( IACB, STATUS )
 
 *  If the form entry in the DCB was not recognised, then report an

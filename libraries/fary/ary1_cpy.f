@@ -98,6 +98,8 @@
 *  Copyright:
 *     Copyright (C) 1989, 1990, 1991 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -117,6 +119,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -150,6 +153,8 @@
 *        Changed the placeholder type to ARRAY.
 *     22-OCT-1991 (RFWS):
 *        Removed unused variable.
+*     26-APR-2006 (DSB):
+*        Add support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -176,6 +181,8 @@
 *           Data object storage form.
 *        DCB_TYP( ARY__MXDCB ) = CHARACTER * ( ARY__SZTYP ) (Read)
 *           Numeric type of data object.
+*        DCB_SCLOC( ARY__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
+*           Structure containing scale and zero values.
 
       INCLUDE 'ARY_ACB'          ! ARY_ Access Control Block
 *        ACB_CUT( ARY__MXACB ) = LOGICAL (Read)
@@ -213,6 +220,7 @@
       INTEGER PNTR2( 2 )         ! Pointer to mapped output data
       LOGICAL BAD                ! Bad pixel flag
       LOGICAL PBND               ! Whether bounds are primitive
+      LOGICAL SCALED             ! Whether array is scaled
 
 *.
 
@@ -249,6 +257,9 @@
       ELSE
          CALL ARY1_DFRM( IDCB1, STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  Set a flag if it is scaled.
+            SCALED = ( DCB_FRM( IDCB1 ) .EQ. 'SCALED' )
 
 *  Handle each form of array in turn...
 
@@ -377,9 +388,10 @@
                   END IF
                END IF
 
-*  Simple arrays.
-*  =============
-            ELSE IF ( DCB_FRM( IDCB1 ) .EQ. 'SIMPLE' ) THEN
+*  Simple and scaled arrays.
+*  =========================
+            ELSE IF ( DCB_FRM( IDCB1 ) .EQ. 'SIMPLE' .OR.
+     :                SCALED ) THEN
 
 *  Ensure that data type information is available in the DCB.
                CALL ARY1_DTYP( IDCB1, STATUS )
@@ -496,6 +508,11 @@
 *  Transfer the bad pixel flag to the new array.
                         CALL ARY1_BAD( IACBC, .FALSE., BAD, STATUS )
                         CALL ARY1_SBD( BAD, IACB2, STATUS )
+
+*  Transfer the SCALE and ZERO values (if it is a scaled array), and
+*  change its storage form to scaled.
+                        IF( SCALED ) CALL ARY1_CPSCL( IDCB1, IDCB2, 
+     :                                                STATUS )
                      END IF
 
 *  Annul the cloned ACB entry.

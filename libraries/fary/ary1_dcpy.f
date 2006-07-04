@@ -106,6 +106,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -132,6 +133,8 @@
 *     10-OCT-1990 (RFWS):
 *        Changed to call ARY1_PAREN as a temporary work around for
 *        problems with DAT_PAREN.
+*     26-APR-2006 (DSB):
+*        Add support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -232,6 +235,7 @@
       CHARACTER * ( DAT__SZNAM ) NAME ! Object name
       INTEGER I                  ! Loop counter for dimensions
       INTEGER NLEV               ! Levels in HDS path name
+      LOGICAL SCALED             ! Whether array is scaled
 
 *.
 
@@ -250,6 +254,9 @@
 
 *  Ensure that form information is available in the DCB.
          CALL ARY1_DFRM( IDCB1, STATUS )
+
+*  Set a flag if it is scaled.
+         SCALED = ( DCB_FRM( IDCB1 ) .EQ. 'SCALED' )
 
 *  Handle each form of array in turn.
          IF ( STATUS .EQ. SAI__OK ) THEN
@@ -303,9 +310,13 @@
      :                         STATUS )
                DCB_ILOC( IDCB2 ) = ARY__NOLOC
 
-*  Simple arrays.
-*  =============
-            ELSE IF ( DCB_FRM( IDCB1 ) .EQ. 'SIMPLE' ) THEN
+*  There is no scaling information
+               DCB_KSCL( IDCB2 ) = .FALSE.
+
+*  Simple and scaled arrays.
+*  =========================
+            ELSE IF ( DCB_FRM( IDCB1 ) .EQ. 'SIMPLE' .OR.
+     :                SCALED ) THEN
 
 *  Ensure that data type, bounds and bad pixel flag information are
 *  available in the DCB.
@@ -349,6 +360,9 @@
      :                          DCB_LOC( IDCB2 ), STATUS )
                CALL ARY1_CPYNC( DCB_LOC( IDCB1 ), 'ORIGIN',
      :                          DCB_LOC( IDCB2 ), STATUS )
+
+*  Transfer the SCALE and ZERO values (if it is a scaled array).
+               IF( SCALED ) CALL ARY1_CPSCL( IDCB1, IDCB2, STATUS )
 
 *  If the form information in the DCB was not recognised, then report an
 *  error.

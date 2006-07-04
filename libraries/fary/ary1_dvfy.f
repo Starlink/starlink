@@ -63,6 +63,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,6 +73,8 @@
 *        Installed support for primitive arrays.
 *     9-MAR-1990 (RFWS):
 *        Added annulling of locators associated with DCB flags.
+*     8-MAY-2006 (DSB):
+*        Installed support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -154,9 +157,10 @@
             CALL ARY1_DSTA( IDCB, STATUS )
             CALL ARY1_DMOD( IDCB, STATUS )
 
-*  Simple arrays.
-*  =============
-         ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) THEN
+*  Simple and scaled arrays.
+*  =========================
+         ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' .AND.
+     :             DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
 
 *  Clear all relevant DCB flags and annul associated locators.
             IF ( DCB_KTYP( IDCB ) ) THEN
@@ -175,6 +179,7 @@
             DCB_KBAD( IDCB ) = .FALSE.
             DCB_KSTA( IDCB ) = .FALSE.
             DCB_KMOD( IDCB ) = .FALSE.
+            DCB_KSCL( IDCB ) = .FALSE.
 
 *  Get new information about the data object, causing all associated
 *  checking to be performed. If this stage completes successfully, then
@@ -185,6 +190,7 @@
             CALL ARY1_DBAD( IDCB, STATUS )
             CALL ARY1_DSTA( IDCB, STATUS )
             CALL ARY1_DMOD( IDCB, STATUS )
+            CALL ARY1_DSCL( IDCB, STATUS )
 
 *  Obtain the number of components in the array structure.
             CALL DAT_NCOMP( DCB_LOC( IDCB ), NCOMP, STATUS )

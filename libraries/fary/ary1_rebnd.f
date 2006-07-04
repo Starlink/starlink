@@ -353,8 +353,8 @@
 
 *  Read the appropriate part of the old array into this workspace.
                CALL ARY1_GTN( .FALSE., TYPE, LOC, NDIM, LBND, UBND,
-     :                        LX, UX, TYPE, LX, UX, .FALSE., TPNTR, DCE,
-     :                        STATUS )
+     :                        LX, UX, TYPE, LX, UX, .FALSE., 
+     :                        DAT__NOLOC, TPNTR, DCE, STATUS )
             END IF
 
 *  Calculate the dimension sizes for the new array.

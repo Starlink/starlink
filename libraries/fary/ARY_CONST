@@ -142,7 +142,7 @@
 *  determines the number of types of array access over which control
 *  can be exercised.
       INTEGER ARY__MXACC
-      PARAMETER ( ARY__MXACC = 5 )
+      PARAMETER ( ARY__MXACC = 6 )
 
 *  Identifier for the BOUNDS access control flag.
       INTEGER ARY__BOUND
@@ -163,6 +163,10 @@
 *  Identifier for the WRITE access control flag.
       INTEGER ARY__WRITE
       PARAMETER ( ARY__WRITE = 5 )
+
+*  Identifier for the SCALE access control flag.
+      INTEGER ARY__SCALE
+      PARAMETER ( ARY__SCALE = 6 )
 
 *  Data system description.
 *  =======================

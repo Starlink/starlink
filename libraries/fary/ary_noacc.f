@@ -22,7 +22,7 @@
 *  Arguments:
 *     ACCESS = CHARACTER * ( * ) (Given)
 *        The type of access to be disabled: 'BOUNDS', 'DELETE',
-*        'MODIFY', 'SHIFT', 'TYPE' or 'WRITE'.
+*        'MODIFY', 'SCALE', 'SHIFT', 'TYPE' or 'WRITE'.
 *     IARY = INTEGER (Given)
 *        Array identifier.
 *     STATUS = INTEGER (Given and Returned)
@@ -36,6 +36,7 @@
 *     -  'DELETE' prevents the array being deleted.
 *     -  'MODIFY' prevents any form of modification to the array (i.e.
 *     it disables all the other access types).
+*     -  'SCALE' prevents the scale and zero values from being changed.
 *     -  'SHIFT' prevents pixel-index shifts from being applied to a
 *     base array.
 *     -  'TYPE' prevents the data type of the array from being altered.
@@ -51,6 +52,8 @@
 *  Copyright:
 *     Copyright (C) 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -70,11 +73,14 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
 *     1-SEP-1989 (RFWS):
 *        Original version.
+*     15-MAY-2006 (DSB):
+*        Added SCALE.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -136,8 +142,13 @@
             ACB_ACC( ARY__DELET, IACB ) = .FALSE.
             ACB_ACC( ARY__SHIFT, IACB ) = .FALSE.
             ACB_ACC( ARY__TYPE, IACB ) = .FALSE.
+            ACB_ACC( ARY__SCALE, IACB ) = .FALSE.
             ACB_ACC( ARY__WRITE, IACB ) = .FALSE.
             
+*  ...SCALE access; prevents the array's scale and zero values being altered.
+         ELSE IF ( CHR_SIMLR( ACCESS, 'SCALE' ) ) THEN
+            ACB_ACC( ARY__SCALE, IACB ) = .FALSE.
+
 *  ...SHIFT access; prevents pixel index shifts from being applied to
 *  the array.
          ELSE IF ( CHR_SIMLR( ACCESS, 'SHIFT' ) ) THEN

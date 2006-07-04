@@ -1,6 +1,6 @@
       SUBROUTINE ARY1_GTN( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD, LSUB,
-     :                     USUB, ATYPE, LBNDA, UBNDA, PAD, PNTR, DCE,
-     :                     STATUS )
+     :                     USUB, ATYPE, LBNDA, UBNDA, PAD, SCLOC, 
+     :                     PNTR, DCE, STATUS )
 *+
 *  Name:
 *     ARY1_GTN
@@ -13,15 +13,15 @@
 
 *  Invocation:
 *     CALL ARY1_GTN( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD, LSUB, USUB,
-*     ATYPE, LBNDA, UBNDA, PAD, PNTR, DCB, STATUS )
+*                    ATYPE, LBNDA, UBNDA, PAD, SCLOC, PNTR, DCB, STATUS )
 
 *  Description:
 *     The routine extracts an n-dimensional subregion of any numeric
 *     data type from a primitive numeric HDS array, making use of lower
 *     and upper bounds information for both arrays. Data type conversion
-*     is performed if necessary, with bad pixel testing if required.
-*     Optionally, the surrounding region of the output array which does
-*     not receive data may be padded with "bad" values. The output array
+*     and scaling is performed if necessary, with bad pixel testing if 
+*     required. Optionally, the surrounding region of the output array which 
+*     does not receive data may be padded with "bad" values. The output array
 *     which receives the extracted data is passed by pointer.
 
 *  Arguments:
@@ -53,6 +53,10 @@
 *     PAD = LOGICAL (Given)
 *        Whether to fill regions of the output array which do not
 *        receive data with "bad" values.
+*     SCLOC = CHARACTER * ( * ) (Given)
+*        Locator to an HDS object containing the scale and zero terms to
+*        apply to the stored values. If this is DAT__NOLOC then no
+*        scaling will be performed.
 *     PNTR = INTEGER (Given)
 *        Pointer to the output array which is to receive the extracted
 *        data. The pointer value itself is not changed by this routine,
@@ -89,6 +93,8 @@
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -108,6 +114,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -118,6 +125,8 @@
 *        affecting error messages.
 *     22-MAR-1990 (RFWS):
 *        Added further explanation to the notes section.
+*     24-APR-2006 (DSB):
+*        Added arguments SCLOC.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -148,8 +157,9 @@
       INTEGER LBNDA( NDIM )
       INTEGER UBNDA( NDIM )
       LOGICAL PAD
+      CHARACTER * ( * ) SCLOC
       INTEGER PNTR
-
+       
 *  Arguments Returned:
       LOGICAL DCE
 
@@ -178,37 +188,37 @@
 *  turn, calling the appropriate routine to extract the data subregion.
          IF ( TYPE .EQ. '_BYTE' ) THEN
             CALL ARY1_GTNB( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
-     :                      LSUB, USUB, LBNDA, UBNDA, PAD,
+     :                      LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                      %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
  
          ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
             CALL ARY1_GTNUB( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
-     :                       LSUB, USUB, LBNDA, UBNDA, PAD,
+     :                       LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                       %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
  
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
             CALL ARY1_GTND( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
-     :                      LSUB, USUB, LBNDA, UBNDA, PAD,
+     :                      LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                      %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
  
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
             CALL ARY1_GTNI( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
-     :                      LSUB, USUB, LBNDA, UBNDA, PAD,
+     :                      LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                      %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
  
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN
             CALL ARY1_GTNR( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
-     :                      LSUB, USUB, LBNDA, UBNDA, PAD,
+     :                      LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                      %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
  
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
             CALL ARY1_GTNW( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
-     :                      LSUB, USUB, LBNDA, UBNDA, PAD,
+     :                      LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                      %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
  
          ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
             CALL ARY1_GTNUW( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD,
-     :                       LSUB, USUB, LBNDA, UBNDA, PAD,
+     :                       LSUB, USUB, LBNDA, UBNDA, PAD, SCLOC,
      :                       %VAL( CNF_PVAL( PNTR ) ), DCE, STATUS )
  
 

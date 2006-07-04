@@ -29,4 +29,5 @@ VARIN	<variant value invalid>
 XSDIM	<too many array dimensions>
 FRMCV	<storage form conversion error>
 NOTSP	<facility not yet supported>
+SCLIN	<invalid scaling information in scaled array>
 .END

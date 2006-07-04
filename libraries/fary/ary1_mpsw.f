@@ -45,7 +45,7 @@
 *        The global status.
 
 *  Notes:
-*     -  This routine may also be used to map primitive arrays.
+*     -  This routine may also be used to map scaled or primitive arrays.
 
 *  Prior requirements:
 *     -  Appropriate entries relating to the region of data to be
@@ -72,6 +72,8 @@
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -98,6 +100,8 @@
 *        Original version.
 *     2-MAR-1990 (RFWS):
 *        Added initialisation of the MLOC argument.
+*     24-APR-2006 (DSB):
+*        Add support for scaled arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -196,22 +200,24 @@
 1     CONTINUE
 
 *  If the mapping region (and mapping transfer region) comprises the
-*  whole data object and no data type conversion is required, then
-*  clone a locator to the entire data component and map it for WRITE
+*  whole data object and no data type conversion or scaling is required, 
+*  then clone a locator to the entire data component and map it for WRITE
 *  access directly using HDS.
       IF ( MCB_WHOLE( IMCB ) .AND.
-     :     CHR_SIMLR( TYPE, DCB_TYP( IDCB ) ) ) THEN
+     :     CHR_SIMLR( TYPE, DCB_TYP( IDCB ) ) .AND.
+     :     DCB_FRM( IDCB ) .NE. 'SCALED' ) THEN
          CALL DAT_CLONE( LOC, MLOC, STATUS )
          CALL DAT_MAP( MLOC, TYPE, 'WRITE', NDIMD, DIM, PNTR, STATUS )
          COPY = .FALSE.
 
 *  Otherwise, if the mapping transfer region fills the mapping region
 *  and the data component dimensionality does not exceed the maximum
-*  dimensionality of an HDS slice and no data type conversion is
+*  dimensionality of an HDS slice and no data type conversion or scaling is
 *  required, then a slice of the data can be mapped directly using HDS.
       ELSE IF ( MCB_MRFUL( IMCB ) .AND.
      :          ( NDIMD .LE. ARY__MXHSL ) .AND.
-     :          CHR_SIMLR( TYPE, DCB_TYP( IDCB ) ) ) THEN
+     :          CHR_SIMLR( TYPE, DCB_TYP( IDCB ) ) .AND.
+     :          DCB_FRM( IDCB ) .NE. 'SCALED' ) THEN
 
 *  Calculate the bounds of the data component slice required.
          DO 2 I = 1, NDIMD

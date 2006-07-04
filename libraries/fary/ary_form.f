@@ -28,9 +28,9 @@
 *     -  The symbolic constant ARY__SZFRM may be used for declaring the
 *     length of a character variable to hold the storage form of an
 *     array. This constant is defined in the include file ARY_PAR.
-*     -  At present, the ARY_ routines only support "primitive" and
-*     "simple" arrays, so only the values 'PRIMITIVE' and 'SIMPLE' can
-*     be returned.
+*     -  At present, the ARY_ routines only support "primitive", "scaled"
+*     and "simple" arrays, so only the values 'PRIMITIVE', 'SCALED' and 
+*     'SIMPLE' can be returned.
 
 *  Algorithm:
 *     -  Import the array identifier.
@@ -39,13 +39,11 @@
 *     -  Copy the form string to the output argument.
 *     -  If an error occurred, then report context information.
 
-*  Implementation Deficiencies:
-*     -  Currently, only simple arrays are supported, so only the value
-*     'SIMPLE' will be returned.
-
 *  Copyright:
 *     Copyright (C) 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or

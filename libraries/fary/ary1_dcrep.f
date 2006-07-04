@@ -275,6 +275,7 @@
             DCB_STA( IDCB ) = .FALSE.
             DCB_INIT( IDCB ) = .FALSE.
             DCB_KSTA( IDCB ) = .TRUE.
+            DCB_KSCL( IDCB ) = .FALSE.
 
 *  Set the disposal mode according to whether it is a temporary object
 *  or not.

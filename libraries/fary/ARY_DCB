@@ -28,6 +28,8 @@
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -47,6 +49,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,6 +59,8 @@
 *        Tidied comments.
 *     5-MAR-1990 (RFWS):
 *        Made comments system-independent.
+*     24-APR-2006 (DSB):
+*        Added items for SCALED variant (DCB_KSCL DCB_SCLOC)
 *     {enter_further_changes_here}
 
 *-
@@ -173,6 +178,22 @@
       INTEGER DCB_LBND( ARY__MXDIM, ARY__MXDCB )
       INTEGER DCB_UBND( ARY__MXDIM, ARY__MXDCB )
 
+*  Scale information.
+*  ==================
+*  If a slot is in use and the DCB_KSCL entry is .TRUE. and the storage 
+*  form is "scaled", then this entry contains a locator to a temporary HDS 
+*  structure containing two components named SCALE and ZERO, which hold the 
+*  values used to convert stored (scaled) data values into external 
+*  (unscaled) data values:
+*
+*     external = scale*stored + zero
+*
+*  If DCB_KSCL is .FALSE., then this information is not available or is out 
+*  of date, in which case DAT__NOLOC is stored. DAT__NOLOC is also stored if
+*  the array storage form is no "scaled".
+      LOGICAL DCB_KSCL( ARY__MXDCB )
+      CHARACTER * ( DAT__SZLOC ) DCB_SCLOC( ARY__MXDCB )
+
 *  Accumulated pixel index shifts.
 *  ==============================
 *  If a slot is in use, then the DCB_SFT entry holds an accumulated sum
@@ -195,13 +216,13 @@
 
 *  Character data.
       COMMON /ARY1_DCB1/ DCB_DLOC, DCB_DSP, DCB_FILE, DCB_FRM, DCB_ILOC,
-     :                   DCB_LOC, DCB_MOD, DCB_PATH, DCB_TYP
+     :                   DCB_LOC, DCB_MOD, DCB_PATH, DCB_TYP, DCB_SCLOC
 
 *  Non-character data.
       COMMON /ARY1_DCB2/ DCB_BAD, DCB_CPX, DCB_INIT, DCB_KBAD, DCB_KBND,
      :                   DCB_KFRM, DCB_KMOD, DCB_KSTA, DCB_KTYP,
      :                   DCB_LBND, DCB_NDIM, DCB_NREAD, DCB_NWRIT,
      :                   DCB_REFCT, DCB_SFT, DCB_STA, DCB_UBND,
-     :                   DCB_USED
+     :                   DCB_USED, DCB_KSCL 
 
 *.

@@ -1,27 +1,27 @@
-      SUBROUTINE ARY1_GTND( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD, LSUB,
-     :                        USUB, LBNDA, UBNDA, PAD, ARRAY, DCE,
+      SUBROUTINE ARY1_GTN<T>( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD, LSUB,
+     :                        USUB, LBNDA, UBNDA, PAD, SCLOC, ARRAY, DCE, 
      :                        STATUS )
 *+
 *  Name:
-*     ARY1_GTND
+*     ARY1_GTN<T>
  
 *  Purpose:
-*     Get a DOUBLE PRECISION n-dimensional subregion of an HDS object.
+*     Get a <TYPE> n-dimensional subregion of an HDS object.
  
 *  Language:
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL ARY1_GTND( BAD, LOC, NDIM, LBNDD, UBNDD, LSUB, USUB, LBNDA,
-*     UBNDA, PAD, ARRAY, DCE, STATUS )
+*     CALL ARY1_GTN<T>( BAD, HTYPE, LOC, NDIM, LBNDD, UBNDD, LSUB, USUB, LBNDA,
+*                       UBNDA, PAD, SCLOC, ARRAY, DCE, STATUS )
  
 *  Description:
 *     The routine extracts an n-dimensional subregion from a numeric
 *     HDS array and transfers the data to an n-dimensional subregion of
-*     a DOUBLE PRECISION Fortran array, making use of lower and upper bounds
-*     information for both arrays. Data type conversion is performed if
-*     necessary, with bad pixel testing if required. Optionally, the
-*     surrounding region of the output array which does not receive
+*     a <TYPE> Fortran array, making use of lower and upper bounds
+*     information for both arrays. Data type conversion and scaling is 
+*     performed if necessary, with bad pixel testing if required. Optionally, 
+*     the surrounding region of the output array which does not receive
 *     data may be padded with "bad" values.
  
 *  Arguments:
@@ -50,8 +50,12 @@
 *     PAD = LOGICAL (Given)
 *        Whether to fill regions of the output array which do not
 *        receive data with "bad" values.
-*     ARRAY( * ) = DOUBLE PRECISION (Returned)
-*        Output DOUBLE PRECISION array.
+*     SCLOC = CHARACTER * ( * ) (Given)
+*        Locator to an HDS object containing the scale and zero terms to
+*        apply to the stored values. If this is DAT__NOLOC then no
+*        scaling will be performed.
+*     ARRAY( * ) = <TYPE> (Returned)
+*        Output <TYPE> array.
 *     DCE = LOGICAL (Returned)
 *        Whether an error occurred during data type conversion.
 *     STATUS = INTEGER (Given and Returned)
@@ -140,6 +144,8 @@
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics & Engineering Research Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -159,6 +165,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
  
 *  History:
@@ -172,9 +179,11 @@
 *        added message token to prevent '$' from affecting error
 *        messages.
 *     13-MAR-1990 (RFWS):
-*        Changed to call ARY1_BADD instead of VEC_BADD.
+*        Changed to call ARY1_BADB instead of VEC_BADB.
 *     22-MAR-1990 (RFWS):
 *        Added further explanation to the notes section.
+*     24-APR-2006 (DSB):
+*        Made generic and added arguments DOSCL, SCALE and ZERO.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -204,13 +213,17 @@
       INTEGER LBNDA( NDIM )
       INTEGER UBNDA( NDIM )
       LOGICAL PAD
+      CHARACTER * ( * ) SCLOC
  
 *  Arguments Returned:
-      DOUBLE PRECISION ARRAY( * )
+      <TYPE> ARRAY( * )
       LOGICAL DCE
  
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  External References:
+      <TYPE> VAL_ITO<T>
  
 *  Local variables:
       CHARACTER * ( ARY__SZTYP ) TYPE ! HDS data type
@@ -222,6 +235,8 @@
       INTEGER ED                 ! End of "bad" (unwanted) data region
       INTEGER ESLICE( 1 )        ! End of data slice
       INTEGER I                  ! (Current) dimension count
+      INTEGER ISCALE             ! Integer version of scale factor
+      INTEGER IZERO              ! Integer version of zero offset
       INTEGER NCONTG             ! Number of contiguous data values
       INTEGER SA                 ! Start of "bad" output array region
       INTEGER SSLICE( 1 )        ! Start of data slice
@@ -229,7 +244,9 @@
       INTEGER STRDD( ARY__MXDIM ) ! Dimension strides for data object
       LOGICAL CONTIG             ! Whether data values are contiguous
       LOGICAL DCESLC             ! Data conversion error in slice?
- 
+      <TYPE> SCALE               ! Scale term for stored values 
+      <TYPE> ZERO                ! Zero term for stored values 
+      LOGICAL DOSCL              ! Should scaling be applied?
 *.
  
 *  Check inherited global status.
@@ -242,13 +259,33 @@
          CALL CHR_UCASE( TYPE )
       ELSE
          STATUS = ARY__FATIN
-         CALL MSG_SETC( 'ROUTINE', 'ARY1_GTND' )
+         CALL MSG_SETC( 'ROUTINE', 'ARY1_GTN<T>' )
          CALL MSG_SETC( 'BADHTYPE', HTYPE )
-         CALL ERR_REP( 'ARY1_GTND_TYP',
+         CALL ERR_REP( 'ARY1_GTN<T>_TYP',
      :   'Routine ^ROUTINE called with an invalid HTYPE ' //
      :   'argument of ''^BADHTYPE'' (internal programming error).',
      :   STATUS )
          GO TO 9999
+      END IF
+
+*  Extract the scale and zero values from the supplied HDS object,
+*  converting them to the required data type.
+      IF( SCLOC .NE. DAT__NOLOC ) THEN
+         IF( '<T>' .EQ. 'B' .OR. '<T>' .EQ. 'UB' .OR. 
+     :       '<T>' .EQ. 'W' .OR. '<T>' .EQ. 'UW' ) then
+            CALL CMP_GET0I( SCLOC, 'SCALE', ISCALE, STATUS )     
+            CALL CMP_GET0I( SCLOC, 'ZERO', IZERO, STATUS )     
+            SCALE = VAL_ITO<T>( .FALSE., ISCALE, STATUS )
+            ZERO = VAL_ITO<T>( .FALSE., IZERO, STATUS )
+         ELSE
+
+            CALL CMP_GET0<T>( SCLOC, 'SCALE', SCALE, STATUS )     
+            CALL CMP_GET0<T>( SCLOC, 'ZERO', ZERO, STATUS )     
+         END IF
+
+         DOSCL = ( SCALE .NE. 1<CONST> .OR. ZERO .NE. 0<CONST> )
+      ELSE
+         DOSCL = .FALSE.
       END IF
  
 *  Initialise the stride of dimension no. 1 for the data and output
@@ -332,7 +369,7 @@
 *  which is not to receive data with bad values (if required).
          IF ( I .LE. DCONTG ) THEN
             IF ( PAD .AND. ( EA .GE. SA ) ) THEN
-               CALL ARY1_BADD( EA - SA + 1, ARRAY( SA ), STATUS )
+               CALL ARY1_BAD<T>( EA - SA + 1, ARRAY( SA ), STATUS )
                IF ( STATUS .NE. SAI__OK ) GO TO 9999
             END IF
  
@@ -345,8 +382,9 @@
  
 *  Transfer the data to the appropriate part of the output array and
 *  annul the slice. Note if a data conversion error occurred.
-            CALL ARY1_GT1D( BAD, SLICE, TYPE, NCONTG, ARRAY( EA + 1 ),
-     :      DCESLC, STATUS )
+            CALL ARY1_GT1<T>( BAD, SLICE, TYPE, NCONTG, DOSCL,
+     :                        SCALE, ZERO, ARRAY( EA + 1 ),
+     :                        DCESLC, STATUS )
             CALL DAT_ANNUL( SLICE, STATUS )
             SLICE = ARY__NOLOC
             IF ( STATUS .NE. SAI__OK ) GO TO 9999
@@ -407,7 +445,7 @@
 *  last data transfer with bad values.
 6     CONTINUE
       IF ( PAD .AND. ( EA .GE. SA ) ) THEN
-         CALL ARY1_BADD( EA - SA + 1, ARRAY( SA ), STATUS )
+         CALL ARY1_BAD<T>( EA - SA + 1, ARRAY( SA ), STATUS )
       END IF
 9999  CONTINUE
  
@@ -416,7 +454,7 @@
       VEC = ARY__NOLOC
  
 *  Call error tracing routine and exit.
-      IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_GTND',
+      IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_GTN<T>',
      :STATUS )
  
       END

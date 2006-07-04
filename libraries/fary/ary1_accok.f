@@ -42,6 +42,8 @@
 *  Copyright:
 *     Copyright (C) 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -61,6 +63,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB:David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,6 +73,8 @@
 *        Changed to allow BOUNDS and SHIFT access regardless of the
 *        access control flag settings if the object being accessed is
 *        not a base array.
+*     8-MAY-2006 (DSB):
+*        Prevent write access to any scaled array.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -88,11 +93,17 @@
       INCLUDE 'ARY_ERR'          ! ARY_ error codes
 
 *  Global Variables:
+      INCLUDE 'ARY_DCB'          ! ARY_ Data Control Block
+*        DCB_FRM( ARY__MXDCB ) = CHARACTER * ( ARY__SZFRM ) (Read)
+*           Data object form.
+
       INCLUDE 'ARY_ACB'          ! ARY_ Access Control Block
 *        ACB_ACC( ARY__MXACC, ARY_MXACB ) = LOGICAL (Read)
 *           Access control flags.
 *        ACB_CUT( ARY__MXACB ) = LOGICAL (Read )
 *           Whether the array is a cut.
+*        ACB_IDCB( ARY__MXACB ) = INTEGER (Read)
+*           Index to the data object entry in the DCB.
 
 *  Arguments Given:
       INTEGER IACB
@@ -107,6 +118,8 @@
 *  External References:
       LOGICAL CHR_SIMLR          ! Case insensitive string comparison
 
+*  Local variables:
+      INTEGER IDCB               ! Index to data object entry in the DCB
 *.
 
 *  Check inherited global status.
@@ -132,9 +145,20 @@
       ELSE IF ( CHR_SIMLR( ACCESS, 'TYPE' ) ) THEN
          OK = ACB_ACC( ARY__TYPE, IACB )
 
+*  ...SCALE access.
+      ELSE IF ( CHR_SIMLR( ACCESS, 'SCALE' ) ) THEN
+         OK = ACB_ACC( ARY__SCALE, IACB )
+
 *  ...WRITE access.
       ELSE IF ( CHR_SIMLR( ACCESS, 'WRITE' ) ) THEN
          OK = ACB_ACC( ARY__WRITE, IACB )
+
+*  Write access is currently not provided to any scaled array.
+         IF( OK) THEN
+            IDCB = ACB_IDCB( IACB )
+            CALL ARY1_DFRM( IDCB, STATUS )         
+            IF ( DCB_FRM( IDCB ) .EQ. 'SCALED' ) OK = .FALSE.
+         END IF
 
 *  If the access type was not recognised, then report an error.
       ELSE

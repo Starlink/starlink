@@ -1,0 +1,231 @@
+      SUBROUTINE ARY1_GT1<T>( BAD, LOC, TYPE, EL, DOSCL, SCALE, ZERO,
+     :                        RESULT, DCE, STATUS )
+*+
+*  Name:
+*     ARY1_GT1<T>
+ 
+*  Purpose:
+*     Read a 1-dimensional array of <COMM> values from an HDS object.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL ARY1_GT1<T>( BAD, LOC, TYPE, EL, DOSCL, SCALE, ZERO, RESULT, 
+*                       DCE, STATUS )
+ 
+*  Description:
+*     The routine reads a 1-dimensional array of <COMM> values from an
+*     HDS object. The object must also be 1-dimensional and must
+*     contain exactly the number of elements to be read. Data type
+*     conversion from any primitive numeric HDS data type is performed
+*     if necessary, with optional testing for bad pixel values.
+ 
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether to test for bad pixel values.
+*     LOC = CHARACTER * ( * ) (Given)
+*        Locator to 1-dimensional HDS object to be read.
+*     TYPE = CHARACTER * ( * ) (Given)
+*        HDS data type of the object to be read. This must be in upper
+*        case.
+*     EL = INTEGER (Given)
+*        Number of array elements to be read.
+*     DOSCL = LOGICAL (Given)
+*        If .TRUE., then the copied data values are scaled so that
+*        "new value = old value * SCALE + ZERO" before returning them.
+*     SCALE = <TYPE> (Given)
+*        The scale factor. Only used if DOSCL is .TRUE.
+*     ZERO = <TYPE> (Given)
+*        The zero point. Only used if DOSCL is .TRUE.
+*     RESULT( N ) = <TYPE> (Returned)
+*        The array of <COMM> values.
+*     DCE = LOGICAL (Returned)
+*        Whether any data type conversion errors occurred (the affected
+*        elements of the RESULT array are set to bad values if this
+*        happens).
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+ 
+*  Algorithm:
+*     -  Initialise.
+*     -  If no data type conversion is required, then get the data
+*     values directly.
+*     -  If type conversion is required, then map the data without type
+*     conversion, perform the conversion explicitly and unmap the data.
+ 
+*  Copyright:
+*     Copyright (C) 1989 Science & Engineering Research Council.
+*     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     13-JUN-1989 (RFWS):
+*        Original version.
+*     18-SEP-1989 (RFWS):
+*        Changed DAT_UNMAP call to ARY1_HUNMP to ensure unmapping under
+*        error conditions.
+*     24-APR-2006 (DSB):
+*        Made generic and added arguments DOSCL, SCALE and ZERO.
+*     {enter_further_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! DAT_ public constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM_ type conversions
+ 
+*  Arguments Given:
+      LOGICAL BAD
+      CHARACTER * ( * ) LOC
+      CHARACTER * ( * ) TYPE
+      INTEGER EL
+      LOGICAL DOSCL
+      <TYPE> SCALE
+      <TYPE> ZERO
+ 
+*  Arguments Returned:
+      <TYPE> RESULT(*)
+      LOGICAL DCE
+ 
+*  Status:
+      INTEGER STATUS             ! Global status
+ 
+*  Local variables:
+      INTEGER DIM( 1 )           ! Object dimension array
+      INTEGER PNTR               ! Pointer to mapped data
+      DOUBLE PRECISION V1        ! First limit on scaled value
+      DOUBLE PRECISION V2        ! Second limit on scaled value
+      <LTYPE> VMAX               ! Maximum scaled value 
+      <LTYPE> VMIN               ! Minimum scaled value 
+      INTEGER I                  ! Element index
+*.
+ 
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+ 
+*  Initialise.
+      DIM( 1 ) = EL
+ 
+*  If no data type conversion is required, then read the data values
+*  directly.
+      IF ( TYPE .EQ. '<HTYPE>' ) THEN
+         DCE = .FALSE.
+         CALL DAT_GET( LOC, '<HTYPE>', 1, DIM, RESULT, STATUS )
+ 
+*  If type conversion is required, then map the data without type
+*  conversion, perform the type conversion explicitly and unmap the
+*  data.
+      ELSE
+         CALL DAT_MAP( LOC, TYPE, 'READ', 1, DIM, PNTR, STATUS )
+         CALL ARY1_CVT<T>( BAD, EL, TYPE, PNTR, RESULT, DCE, STATUS )
+         CALL ARY1_HUNMP( LOC, STATUS )
+      END IF
+ 
+*  If required, scale the returned value
+      IF( DOSCL ) THEN
+
+*  If the scale is zero, fill the result with bad values.
+         IF( SCALE .EQ. 0<CONST> ) THEN 
+            DO I = 1, EL
+               RESULT( I ) = VAL__BAD<T>
+            END DO
+
+*  Otherwise, find the largest and smallest value that will still be within 
+*  the range of the requested data type after scaling.
+         ELSE
+            V1 = DBLE( VAL__MAX<T> - ZERO )/DBLE( SCALE )
+            V2 = DBLE( VAL__MIN<T> - ZERO )/DBLE( SCALE )
+
+            IF( V1 .GT. V2 ) THEN
+   
+               IF( V1 .GT. DBLE( VAL__MAX<T> ) ) THEN
+                  VMAX = VAL__MAX<T>
+               ELSE
+                  VMAX = NUM_DTO<T>( V1 )
+               END IF
+   
+               IF( V2 .LT. DBLE( VAL__MIN<T> ) ) THEN
+                  VMIN = VAL__MIN<T>
+               ELSE
+                  VMIN = NUM_DTO<T>( V2 )
+               END IF
+   
+            ELSE
+   
+               IF( V2 .GT. DBLE( VAL__MAX<T> ) ) THEN
+                  VMAX = VAL__MAX<T>
+               ELSE
+                  VMAX = NUM_DTO<T>( V2 )
+               END IF
+   
+               IF( V1 .LT. DBLE( VAL__MIN<T> ) ) THEN
+                  VMIN = VAL__MIN<T>
+               ELSE
+                  VMIN = NUM_DTO<T>( V1 )
+               END IF
+   
+            END IF
+
+*  Scale the values, checking for bad values or not as required.
+            IF( BAD ) THEN
+               DO I = 1, EL
+                  IF( RESULT( I ) .NE. VAL__BAD<T> ) THEN
+                     IF( RESULT( I ) .GE. VMIN .AND. 
+     :                   RESULT( I ) .LE. VMAX ) THEN
+                        RESULT( I ) = RESULT( I )*SCALE + ZERO
+                     ELSE
+                        RESULT( I ) = VAL__BAD<T>
+                     END IF
+                  END IF
+               END DO
+            ELSE
+               DO I = 1, EL
+                  IF( RESULT( I ) .GE. VMIN .AND. 
+     :                RESULT( I ) .LE. VMAX ) THEN
+                     RESULT( I ) = RESULT( I )*SCALE + ZERO
+                  ELSE
+                     RESULT( I ) = VAL__BAD<T>
+                  END IF
+               END DO
+            END IF
+
+         END IF
+      END IF
+
+*  Call error tracing routine and exit.
+      IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_GT1<T>',
+     :STATUS )
+ 
+      END
