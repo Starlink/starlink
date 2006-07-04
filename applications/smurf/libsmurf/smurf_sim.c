@@ -158,7 +158,6 @@ void smurf_sim( int *status ) {
   double accel[2];                /* telescope accelerations (arcsec) */
   float aeff[3];                  /* output of wvmOpt */
   double *airmass=NULL;           /* mean airmass of observation */
-  double angle;                   /* rotation angle of pattern in radians */
   char arraynames[80];            /* list of unparsed subarray names */
   long astnaxes[2];               /* dimensions of simulated image */
   double astscale;                /* pixel size in simulated image */
@@ -180,12 +179,10 @@ void smurf_sim( int *status ) {
   double bor_x_nas=0;             /* boresight x-nasmyth tanplane offset */
   double coeffs[NCOEFFS];         /* bolometer response coeffs */
   int colsize;                    /* column size for flatfield */
-  static char command[256];       /* command string to operating system */
   double corner;                  /* corner frequency in Hz */
   int count;                      /* number of samples in full pattern */
   double current;                 /* bolometer current in amps */
   char *curtok=NULL;              /* current subarray name being parsed */
-  int cycle_samples;              /* number of samples per cycle */
   int date_da;                    /* day corresponding to MJD */
   double date_df;                 /* day fraction corresponding to MJD */
   int date_mo;                    /* month corresponding to MJD */
@@ -213,7 +210,6 @@ void smurf_sim( int *status ) {
   int frame;                      /* frame counter */
   AstFrameSet *fset=NULL;         /* World coordinate transformations */
   double grid[64][2];             /* PONG grid coordinates */
-  int gridcount;                  /* PONG grid number, must be odd */
   struct sc2head *head;           /* per-frame headers */
   double *heater=NULL;            /* bolometer heater ratios */
   char heatname[DREAM__FLEN];     /* name of flatfield cal file */
@@ -242,7 +238,7 @@ void smurf_sim( int *status ) {
   char *pars[4];                  /* parameter list */
   double pwvlos;                  /* mm precip. wat. vapor. line of site */
   double *posptr=NULL;            /* pointing: nasmyth offsets from cen. */ 
-  double pwvzen;                  /* zenith precipital water vapour (mm) */
+  double pwvzen = 0;              /* zenith precipital water vapour (mm) */
   double *pzero=NULL;             /* bolometer power offsets */
   int rowsize;                    /* row size for flatfield */
   int rseed;                      /* seed for random number generator */
@@ -250,21 +246,16 @@ void smurf_sim( int *status ) {
   double samptime;                /* sample time in sec */
   char seedchar[LEN__METHOD];     /* string representation of rseed */
   double sigma;                   /* instrumental white noise */
-  char simtype[LEN__METHOD];      /* simulation type (sim or heatrun) */
   char simxmlfile[LEN__METHOD];   /* Simulation XML file */
   AstMapping *sky2map=NULL;       /* Mapping celestial->map coordinates */
-  double skytrans;                /* sky transmission (%) */
   double sky_az=0;                /* effective az on sky (bor+jig) */
   double sky_el=0;                /* effective el on sky (bor+jig) */
   double sky_x_hor=0;             /* effective x hor. off. on sky (bor+jig) */
   double sky_y_hor=0;             /* effective y hor. off. on sky (bor+jig) */
-  double spacing;                 /* grid spacing in arcsec */
   double start_time;              /* time of start of current scan */
   char subarrays[4][80];          /* list of parsed subarray names */
   int subnum;                     /* Subarray number */
   double tauCSO;                  /* CSO zenith optical depth */
-  double tau450;                  /* 450 zenith optical depth */
-  double tau850;                  /* 850 zenith optical depth */
   float tbri[3];                  /* simulated wvm measurements */
   float teff[3];                  /* output of wvmOpt */
   double temp1;                   /* store temporary values */
@@ -280,10 +271,6 @@ void smurf_sim( int *status ) {
   double *ybc=NULL;               /* projected NAS Y offsets of bolometers 
 				     in arcsec */
   double *ybolo=NULL;             /* Native bolo y-offsets */
-  char ymd[25];                   /* Date-time in contracted ISO format */
-
-  int ii;
-  int *pp;
 
   /* For debugging purposes - write pointing data to file */
   tempfile = fopen( "junk.txt", "w" );
@@ -596,7 +583,7 @@ void smurf_sim( int *status ) {
 		    lst[frame],
 		    base_az[frame], base_el[frame],
 		    bor_x_hor, bor_y_hor, 
-		    jig_x_hor, jig_y_hor, 
+		    *jig_x_hor, *jig_y_hor, 
 		    sky_az, sky_el,
 		    bor_ra[frame], bor_dec[frame] );
 
