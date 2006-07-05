@@ -1,10 +1,12 @@
 ## Process this file with automake to produce Makefile.in
 
+cincludedir = $(includedir)/star
+
 lib_LTLIBRARIES = libard.la libard_adam.la
 dist_bin_SCRIPTS = ard_link ard_link_adam
 
 libard_la_SOURCES = \
-        $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) \
+        $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) $(BASIC_C_ROUTINES) \
         $(BASIC_F_ROUTINES) $(STANDALONE_F_ROUTINES) $(BLOCKDATA)
 
 libard_adam_la_SOURCES = \
@@ -13,17 +15,23 @@ libard_adam_la_SOURCES = \
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
-include_MESSAGES = ARD_ERR
+include_MESSAGES = ARD_ERR ard_err.h
+cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
 
-BUILT_SOURCES = ARD_ERR
+BUILT_SOURCES = ARD_ERR ard_err.h
 
 #  Define test programs.
-TESTS = test1
-check_PROGRAMS = test1
+TESTS = test1 test2
+check_PROGRAMS = test1 test2
 test1_SOURCES = ard_test.f
 test1_LDADD = libard.la `ast_link` `sla_link` `grp_link` `chr_link` \
 	`err_link`  `psx_link`
 
+test2_SOURCES = ard_ctest.c
+test2_LDADD = libard.la `ast_link` `sla_link` `grp_link` `chr_link` \
+	`err_link`  `psx_link`
+
+PUBLIC_C_INCLUDES = ard.h
 
 PRIVATE_INCLUDES = ARD_COM ARD_CONST
 
@@ -53,6 +61,7 @@ BASIC_F_ROUTINES = \
   ard1_fplot.f ard1_ceil.f \
   ard1_cntdr.F ard1_eval.F
 
+BASIC_C_ROUTINES = ard.c
 
 STANDALONE_F_ROUTINES =
 
