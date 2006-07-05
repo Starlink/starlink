@@ -151,6 +151,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.3  2006/07/05 21:28:46  timj
+*     sculib_airmass now has double precision args
+*
 *     Revision 1.2  2005/08/15 08:40:03  timj
 *     check for %LOC vs LOC in surf_skydip.F
 *
@@ -347,8 +350,8 @@ c
       REAL    AIR_MODEL(N_MODEL)        ! Airmass values for MODEL
       REAL    AIRMASS(MAX_FIT_DATA)     ! Array of AIRMASS data
       REAL    AIRMASST(MAX_FIT_DATA)    ! First Array of AIRMASS data
-      REAL    AIRMASS_START             ! Start airmass
-      REAL    AIRMASS_END               ! End airmass
+      DOUBLE PRECISION AIRMASS_START    ! Start airmass
+      DOUBLE PRECISION AIRMASS_END      ! End airmass
       REAL    AIRMASS_TVAR(MAX_FIT_DATA)! First Array of AIRMASS variance
       REAL    AIRMASS_VAR(MAX_FIT_DATA) ! Array of AIRMASS variance
       REAL    AIRSTEP                   ! AIRMASS increment for DO loop
@@ -392,6 +395,7 @@ c
       INTEGER DUM_QUAL_PTR              ! Scratch space 3
       INTEGER DUMMY_PTR_END             ! Scratch space 4 end
       INTEGER DUMMY_PTR                 ! Scratch space 4
+      DOUBLE PRECISION DTEMP            ! Temp double
       REAL    EL                        ! Elevation in radians used for loop
       REAL    EL0                       ! Elevation at start of measurement
       REAL    ELEV_STEP                 ! Elevation increment
@@ -495,6 +499,7 @@ c
       REAL    T_TEL                     ! Temperature of telescope
       INTEGER UBND (MAXDIM)             ! upper bounds of array
       REAL    WAVE                      ! Selectred wavelength
+      DOUBLE PRECISION ZD               ! Zenith distance
       CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC ! Locator to EXTENSIONS
 
 *  External functions:
@@ -934,26 +939,26 @@ c
 *     Assume the middle of the sample is the relevant elevation
 *     for the read out
                   EL = EL0 + ( (REAL(I-1)+0.5) * SAM_DX * FSIGN )
-                  
+
 *     Convert elevation to airmass
-                  EL = REAL(PI/2.0D0) - EL
-                  CALL SCULIB_AIRMASS (EL, RTEMP, STATUS)
+                  ZD = (PI/2.0D0) - DBLE(EL)
+                  CALL SCULIB_AIRMASS (ZD, DTEMP, STATUS)
 
 *     For information
                   CALL MSG_SETI('M', MEASUREMENT)
                   CALL MSG_SETI('INT', I)
-                  CALL MSG_SETR('EL',EL)
-                  CALL MSG_SETR('AM',RTEMP)
+                  CALL MSG_SETR('EL',EL/DEG2RAD)
+                  CALL MSG_SETR('AM',REAL(DTEMP))
                   CALL MSG_SETI('N', OFFSET+I)
                   CALL MSG_OUTIF(MSG__VERB, ' ',
      :                 ' Meas ^M, Int ^INT, Offset ^N El: '//
-     :                 '^EL Airmass: ^AM',
+     :                 '^EL deg Airmass: ^AM',
      :                 STATUS)
 
 
 *     Store it in the airmass array
                   IF (STATUS .EQ. SAI__OK) THEN
-                     DAIRMASST(OFFSET+I) = DBLE(RTEMP)
+                     DAIRMASST(OFFSET+I) = DTEMP
                      DAIRMASS_TVAR(OFFSET+I) = 0.0D0
                   END IF
 
@@ -966,17 +971,17 @@ c
 *     Assume constant space between airmasses
 
 *     Start airmass
-            EL = (REAL(PI)/2.0) - START_EL * DEG2RAD
-            CALL SCULIB_AIRMASS (EL, AIRMASS_START, STATUS)
+            ZD = (PI/2.0) - DBLE( START_EL * DEG2RAD )
+            CALL SCULIB_AIRMASS (ZD, AIRMASS_START, STATUS)
 
 *     End airmass
-            EL = (REAL(PI)/2.0) - END_EL * DEG2RAD
-            CALL SCULIB_AIRMASS (EL, AIRMASS_END, STATUS)
+            ZD = (PI/2.0) - DBLE( END_EL * DEG2RAD )
+            CALL SCULIB_AIRMASS (ZD, AIRMASS_END, STATUS)
 
-            AIRSTEP = (AIRMASS_END - AIRMASS_START) / 
+            AIRSTEP = REAL(AIRMASS_END - AIRMASS_START) / 
      :           REAL(N_MEASUREMENTS - 1)
             DO I = 1, N_MEASUREMENTS
-               AIRMASST(I) = AIRMASS_START + AIRSTEP * REAL(I-1)
+               AIRMASST(I) = REAL(AIRMASS_START) + AIRSTEP * REAL(I-1)
 
 *  Calculate the error Delta A = (TAN / SIN) Delta EL
 *     TAN = 1/SQRT((AIR-1)(AIR+1))
