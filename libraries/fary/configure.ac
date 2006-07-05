@@ -29,7 +29,7 @@ AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [sae prm hds chr ems])
+STAR_DECLARE_DEPENDENCIES([build], [sae prm hds chr ems generic])
 STAR_DECLARE_DEPENDENCIES([link],  [hds ems chr prm])
 
 dnl    List the sun/ssn/... numbers which document this package and
