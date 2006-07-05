@@ -145,12 +145,15 @@
 
 
 *  Copyright:
-*     Copyright (C) 1995-2004 Particle Physics and Astronomy
+*     Copyright (C) 1995-2006 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.4  2006/07/05 21:29:40  timj
+*     fix copyright year
+*
 *     Revision 1.3  2006/07/05 21:28:46  timj
 *     sculib_airmass now has double precision args
 *
