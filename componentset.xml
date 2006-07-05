@@ -648,7 +648,7 @@ and its coordinates are displayed.
 </component>
 
 <component id="gaia" support="S">
-  <version>3.0-4</version>
+  <version>3.0-5</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -2352,7 +2352,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ary" support="S">
-  <version>1.1-9</version>
+  <version>1.2</version>
   <path>libraries/ary</path>
   <description>A Subroutine Library for Accessing ARRAY Data Structures</description>
   <abstract><p> The ARY library is a set of routines for accessing
