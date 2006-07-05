@@ -44,6 +44,9 @@
 *     $Id$
 *     5-AUG-1993: Original version.
 *     $Log$
+*     Revision 1.7  2006/07/05 21:27:57  timj
+*     output elevation when below horizon
+*
 *     Revision 1.6  2005/09/22 01:54:43  timj
 *     pull constants out of loops and make sure that we minimize type conversion by making SCULIB_AIRMASS use double precision
 *
@@ -119,8 +122,10 @@
 
       IF (COS_Z .LE. 0.0D0) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP (' ', 'SCULIB_AIRMASS: point is below horizon',
-     :     STATUS)
+         CALL MSG_SETD( 'EL', 90.0D0 - ( Z * Q ) )
+         CALL ERR_REP (' ', 
+     :        'SCULIB_AIRMASS: point is below horizon (^EL deg)',
+     :        STATUS)
       ELSE
  
          AIRMASS = 1.0D0 / COS_Z
