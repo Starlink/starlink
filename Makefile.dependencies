@@ -75,6 +75,7 @@ $(MANIFESTS)/ary: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
+		$(MANIFESTS)/generic \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/prm \
@@ -133,6 +134,7 @@ $(MANIFESTS)/atools: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
+		$(MANIFESTS)/generic \
 		$(MANIFESTS)/gks \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
@@ -342,6 +344,7 @@ $(MANIFESTS)/convert: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/figaro \
 		$(MANIFESTS)/fio \
+		$(MANIFESTS)/generic \
 		$(MANIFESTS)/gks \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
@@ -384,6 +387,7 @@ $(MANIFESTS)/cupid: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
+		$(MANIFESTS)/generic \
 		$(MANIFESTS)/gks \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
@@ -572,6 +576,7 @@ $(MANIFESTS)/echomop: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
+		$(MANIFESTS)/generic \
 		$(MANIFESTS)/gks \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
@@ -1409,6 +1414,7 @@ $(MANIFESTS)/ndf: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
+		$(MANIFESTS)/generic \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/prm \
@@ -1426,6 +1432,7 @@ $(MANIFESTS)/ndg: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
+		$(MANIFESTS)/generic \
 		$(MANIFESTS)/grp \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
@@ -1656,6 +1663,7 @@ $(MANIFESTS)/polpack: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
+		$(MANIFESTS)/generic \
 		$(MANIFESTS)/gks \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
