@@ -74,7 +74,7 @@ F77_SUBROUTINE(ard_grpex)( CHARACTER(desc),
 
 
 /* Interface wrappers. */
-void ardWork( Grp *grp,
+void ardWork( const Grp *grp,
               int ndim,
               const int *lbnd,
               const int *ubnd,
@@ -184,7 +184,7 @@ void ardWork( Grp *grp,
 
 
 void ardGrpex( const char *desc,
-               Grp *grp1,
+               const Grp *grp1,
                Grp **grp2,
                int *flag,
                int *status ) {

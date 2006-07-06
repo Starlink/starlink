@@ -47,7 +47,7 @@
 
 /* Note these use Grp pointers, not integer identifiers. */
 
-void ardWork( Grp *grp,
+void ardWork( const Grp *grp,
               int ndim,
               const int *lbnd,
               const int *ubnd,
@@ -62,7 +62,7 @@ void ardWork( Grp *grp,
               int *status );
 
 void ardGrpex( const char *desc,
-               Grp *grp1,
+               const Grp *grp1,
                Grp **grp2,
                int *flag,
                int *status );
