@@ -45,6 +45,9 @@
 *  History:
 *     2006-04-21 (AGG):
 *        Initial version, copied from smf_history_write
+*     2006-07-06 (AGG):
+*        Check for presence of HISTORY component in NDF before
+*        attempting to write
 
 *  Notes:
 *     - SMURF subroutines should choose history "application" names
@@ -99,20 +102,31 @@
 void smf_history_add(  smfData* data, const char * appl, 
 			const char * text, int *status) {
 
-  smfFile *file = NULL;/* data->file */
-  int done;            /* Flag to denote whether history entry has been added */
-  AstKeyMap *history;
+  smfFile *file = NULL; /* data->file */
+  int done;             /* Flag to denote whether history entry has been added */
+  AstKeyMap *history;   /* AstKeyMap storing history information */
+  int state = 0;        /* Flag to denote whether history component exists in NDF */
 
   /* Check entry status */
   if (*status != SAI__OK) return;
 
-  /* check that we have a smfData */
+  /* Check that we have a smfData */
   if ( data == NULL ) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME,
 	    "Supplied smfData is a NULL pointer. Possible programming error.",
 	    status);
     return;
+  }
+
+  /* If we have a file, write the history entry into the file ONLY if
+     the history component already exists.  */
+  file = data->file;
+  if ( file !=NULL ) {
+    ndfState( file->ndfid, "HISTORY", &state, status );
+    if ( state == 1 ) {
+      smf_history_write( data, appl, text, status);
+    }
   }
 
   /* Now add entry to the history AstKeyMap if not already present */
@@ -122,12 +136,6 @@ void smf_history_add(  smfData* data, const char * appl,
     astMapPut0I( data->history, appl, 1, "" );
   } else if ( !astMapGet0I( data->history, appl, &done ) ) {
     astMapPut0I( data->history, appl, 1, "" );
-  }
-
-  /* If we have a file, write the history entry into the file */
-  file = data->file;
-  if ( file !=NULL ) {
-    smf_history_write( data, appl, text, status);
   }
 
 }
