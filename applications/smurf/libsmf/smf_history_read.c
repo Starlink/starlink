@@ -38,6 +38,9 @@
 *  History:
 *     2006-04-19 (AGG):
 *        Initial version, copied from smf_history_check
+*     2006-07-05 (AGG):
+*        Check for presence of history component before attempting to
+*        read
 
 *  Notes:
 *     - Checks are made assuming the subroutine names are lower case
@@ -92,6 +95,7 @@ void smf_history_read( smfData* data,int *status) {
   int nrec = 0;               /* Number of history records */
   char refappl[NDF__SZAPP+1]; /* Name of application from header record */
   AstKeyMap *history = NULL;  /* History to be stored in the smfData */
+  int state;                  /* State of history component */
 
   /* Check entry status */
   if (*status != SAI__OK) return;
@@ -128,38 +132,44 @@ void smf_history_read( smfData* data,int *status) {
     return;
   }
 
-  /* Found out how many history records we have */
-  ndfHnrec( file->ndfid, &nrec, status );
+  /* Check the state of the history component */
+  ndfState( file->ndfid, "HISTORY", &state, status );
 
-  if ( *status == SAI__OK ) {
+  /* If it exists, then continue to populate the AstKeyMap */
+  if ( state == 1 ) {
+    /* Found out how many history records we have */
+    ndfHnrec( file->ndfid, &nrec, status );
 
-    /* Create AstKeyMap */
-    history = astKeyMap("");
-    /* Stop with an error if the history could not be created */
-    if ( history == AST__NULL) {
-      if ( *status == SAI__OK ){
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "Unable to create history AstKeyMap", status);
+    if ( *status == SAI__OK ) {
+      /* Create AstKeyMap */
+      history = astKeyMap("");
+      /* Stop with an error if the history could not be created */
+      if ( history == AST__NULL) {
+	if ( *status == SAI__OK ){
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, "Unable to create history AstKeyMap", status);
+	}
+      }
+
+      /* History records start at 1 */
+      for (i = 1; i <= nrec; i++ ) {
+	/* Retrieve history record */
+	ndfHinfo(file->ndfid, "APPLICATION", i, refappl, NDF__SZAPP, status);
+	/* Pick out the SMF_ routines which write their own history entries */
+	if ( strncmp( refappl, "smf_", 4 ) == 0 ) {
+	  /* Insert record into history. Note that previous values are
+	     overwritten, thus avoiding duplicate entries. */
+	  astMapPut0I( history, refappl, 1, "" );
+	}
       }
     }
-
-    /* History records start at 1 */
-    for (i = 1; i <= nrec; i++ ) {
-      /* Retrieve history record */
-      ndfHinfo(file->ndfid, "APPLICATION", i, refappl, NDF__SZAPP, status);
-      /* Pick out the SMF_ routines which write their own history entries */
-      if ( strncmp( refappl, "smf_", 4 ) == 0 ) {
-	/*	printf("refappl = %s\n",refappl);*/
-	/* Insert record into history. Note that previous values are
-	   overwritten, thus avoiding duplicate entries. */
-	astMapPut0I( history, refappl, 1, "" );
-      }
-    }
+  } else {
+    /* Inform user if no history */
+    msgOutif(MSG__VERB, FUNC_NAME, "No history component present. Continuing but this may cause problems later.", status);
   }
+
   /* Store history in smfData */
   data->history = history;
   /*astShow(history);*/
 
-
-  return;
 }
