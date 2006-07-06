@@ -1,4 +1,77 @@
 
+The text below (after the '***' line) is the form of the Starlink
+software licence which was used until the Project moved to a GPL
+licence in 2003.
+
+At that point, the Project's `conditions' statement changed to the
+following:
+
+
+
+The Starlink Software Collection is Copyright (C) 1980-2003, Council
+for the Central Laboratory of the Research Councils (``CCLRC''),
+except where noted internally, or discussed below.
+
+The Starlink Project has recently made the decision to license its own
+software under the GNU General Public License (GPL) as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version. However, this transition is not, and
+may never be, complete, and the following points should be borne in
+mind.
+
+* All the code produced by the Starlink Project itself is copyright
+  CCLRC and is distributed under the terms of the GPL.
+
+* Some software packages include a CONDITIONS statement which refers
+  to, or contains the text within, <THIS FILE>. These are also copyright
+  CCLRC and this conditions statement should be taken to refer instead
+  to the GPL.
+
+* Some packages include third-party code which is either non-GPL code
+  or whose copyright and licence status is unclear. These packages are
+  therefore not (or not clearly) GPL.
+
+* Some packages consist largely of code donated in gentler times, when
+  issues of copyright and licences were unimportant and largely
+  unrecorded. For these packages, some or all of the licence,
+  copyright and even authorship is unknown, but they cannot be safely
+  taken to be public domain. You can safely assume only that they have
+  a broad `academic use only' licence. This set of packages includes
+  at least Figaro.
+
+If you wish to use the code for a purpose for which the licence
+conditions, authorship or copyright are important, you should consult
+the project at ussc@star.rl.ac.uk.
+
+This Software is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this Software; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA. You can also find the GPL on the GNU web site.
+
+Some of the code distributed here refers to an earlier version of the
+Starlink Software Licence, located at
+
+http://www.starlink.rl.ac.uk/store/conditions.html
+
+which permitted non-commercial use only. This licence has been
+superseded, and any references to that licence should be taken to
+refer to this licence instead.
+
+In addition, we ask you to consider acknowledging the Collection in
+any program or publication in which you use it. For general
+publications, we suggest `The authors acknowledge the data analysis
+facilities provided by the Starlink Project which is run by CCLRC on
+behalf of PPARC.
+
+
+************************* Original licence follows *************************
+
+
                        Starlink Software Licence
                        =========================
  
