@@ -48,6 +48,9 @@
 *        Initial version.
 *     2006-05-05 (AGG):
 *        Add called to ndfHend to allow multiple distinct history writes
+*     2006-07-05 (AGG):
+*        Check for presence of history component before attempting to
+*        write
 
 *  Notes:
 *     - SMURF subroutines should choose history "application" names
@@ -106,6 +109,7 @@ void smf_history_write( const smfData* data, const char * appl,
 			const char * text, int *status) {
   smfFile *file = NULL;  /* data->file */
   char *linarr[1];       /* Pointer to char * text */
+  int state;             /* State of history component in NDF */
 
   /* Check entry status */
   if (*status != SAI__OK) return;
@@ -144,9 +148,18 @@ void smf_history_write( const smfData* data, const char * appl,
     return;
   }
 
-  /* Write the information to the file */
-  linarr[0] = (char *)text; /* fix warning when const passed to linarr */
-  ndfHput("NORMAL", appl, 0, 1, linarr, 1, 1, 1, file->ndfid, status );
-  ndfHend( status ); /* Needed to write a separate line for each call of ndfHput */
+  /* Check that we have a history component to write to */
+  ndfState( file->ndfid, "HISTORY", &state, status );
+  if ( state == 1 ) {
+    /* If present, write the information to the file */
+    linarr[0] = (char *)text; /* fix warning when const passed to linarr */
+    ndfHput("NORMAL", appl, 0, 1, linarr, 1, 1, 1, file->ndfid, status );
+    /* Needed to write a separate line for each call of ndfHput */
+    ndfHend( status ); 
+  } else {
+    /* Inform user if no history */
+    msgOutif(MSG__VERB, FUNC_NAME, "No history component present to write to. Continuing but this may cause problems later.", status);
+
+  }
 
 }
