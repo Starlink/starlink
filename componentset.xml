@@ -1,4 +1,5 @@
-<!DOCTYPE componentset SYSTEM "componentinfo.dtd">
+<?xml version="1.0"?>
+<!-- DTD in buildsupport/starconf/componentinfo.dtd -->
 <componentset>
 
 <component id="astrom" support="S">
@@ -852,39 +853,6 @@ Traces an HDS file
     </person>
   </developers>
   <bugreports>ussc@starlink.ac.uk</bugreports>
-</component>
-
-<component id="polpack" support="S">
-  <version>3.1-3</version>
-  <path>applications/polpack</path>
-  <description>POLPACK - An Imaging Polarimetry Reduction Package</description>
-  <abstract><p>
-POLPACK is a package of applications for
-reducing imaging polarimetry or spectropolarimetry data. They cover
-registration, sky subtraction, calculation of Stokes parameters, and
-display of vector maps.  
-</p></abstract>
-  <dependencies >
-    <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>startcl</build><build>tcl</build><build>trn</build><build>ifd</build><build option='link'>sla</build><build option='link'>nbs</build><build option='link'>kaplibs</build><build option='link'>shl</build><build option='link'>tcl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><use>startcl</use><sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>David Berry</name>
-      <uname>dsb</uname>
-      <email>dsb@ast.man.ac.uk</email>
-      <role>owner</role>
-    </person>
-    <person>
-      <name>Tim Gledhill</name>
-      <uname>tmg</uname>
-    </person>
-  </developers>
-  <documentation> sun223</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year></year>
-    <name>Council for the Central Laboratory of the Research Councils</name>
-  </copyright>
 </component>
 
 <component id="kappa" support="S">
@@ -2352,7 +2320,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ard" support="S">
-  <version>2.0-6</version>
+  <version>2.0-7</version>
   <path>libraries/ard</path>
   <description>ASCII Region Definition</description>
   <abstract><p>The ARD (ASCII Region Definition) system provides a 
@@ -2407,48 +2375,6 @@ to handle data from a variety of different instruments.
     </person>
   </developers>
   <documentation> sun11</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year></year>
-    <name>Council for the Central Laboratory of the Research Councils</name>
-  </copyright>
-</component>
-
-<component id="ast" support="S">
-  <version>4.2</version>
-  <path>libraries/ast</path>
-  <description>WCS library</description>
-  <abstract>
-    <p>The AST library provides a comprehensive range of facilities for
-      attaching world coordinate systems to astronomical data, for
-      retrieving and interpreting that information in a variety of formats,
-      including FITS-WCS, and for generating graphical output based on it.</p>
-    <p>This library should be of interest to anyone writing
-      astronomical applications which need to manipulate coordinate system
-      data, especially celestial or spectral coordinate systems. AST
-      is portable and environment-independent.</p>
-  </abstract>
-  <dependencies >
-    <sourceset>sst</sourceset><sourceset>htx</sourceset><build>sla</build><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Rodney Warren-Smith</name>
-      <uname>rfws</uname>
-    </person>
-    <person>
-      <name>David Berry</name>
-      <uname>dsb</uname>
-      <email>dsb@ast.man.ac.uk</email>
-      <role>owner</role>
-    </person>
-    <person>
-      <name>Norman Gray</name>
-      <uname>nxg</uname>
-      <email>norman@astro.gla.ac.uk</email>
-    </person>
-  </developers>
-  <documentation> sun210 sun211</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
     <year></year>
