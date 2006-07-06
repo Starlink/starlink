@@ -1,0 +1,7 @@
+## level_support,descrip,comment,
+A,Unconditional ,Unconditional support, by Starlink staff, at short notice. Compatibility with other software will be maintained. ,
+B,High ,High level of support, but with reservations based on geographical, response time or control factors. (This category includes commercial software.) ,
+C,Best Efforts ,Best efforts, by a named individual. ,
+D,Little/None ,Little or no support available. ,
+E,Obsolescent ,Obsolescent. ,
+N,,No support level given. ,

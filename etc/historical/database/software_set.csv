@@ -1,0 +1,8 @@
+## set_soft,descrip,comment,
+A,Additional,Additional items - like GCC ,
+B,Base ,non-Starlink software provided for sites,
+C,Standard ,,
+D,Devolved ,Software distribution not done by RAL ,
+O,Option ,,
+R,Restricted,,
+S,Secure ,(VMS) ,
