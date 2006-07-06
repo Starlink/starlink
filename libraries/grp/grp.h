@@ -127,7 +127,7 @@ void grpValid( Grp *, int *, int * );
 /* -------------------------------------------------------------------- */
 Grp *grpFree( Grp *, int * );
 Grp *grpF2C( F77_INTEGER_TYPE, int * );
-F77_INTEGER_TYPE grpC2F( Grp *, int * );
+F77_INTEGER_TYPE grpC2F( const Grp *, int * );
 
 
 

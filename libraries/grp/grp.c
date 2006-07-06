@@ -162,7 +162,7 @@ Grp *grpF2C( F77_INTEGER_TYPE IGRP, int * status ) {
 
 /* Return the Fortran ID value for a given Grp structure. */
 /* ------------------------------------------------------------------- */
-F77_INTEGER_TYPE grpC2F( Grp *grp, int *status ){
+F77_INTEGER_TYPE grpC2F( const Grp *grp, int *status ){
    F77_INTEGER_TYPE ret;
    int slot;
 
