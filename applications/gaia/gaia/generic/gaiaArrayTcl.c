@@ -46,6 +46,8 @@
 #include <gaiaArray.h>
 
 /* Local prototypes */
+static int gaiaArrayRegionSpectrum( ClientData clientData, Tcl_Interp *interp,
+                                    int objc, Tcl_Obj *CONST objv[] );
 static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int gaiaArrayImage( ClientData clientData, Tcl_Interp *interp,
@@ -61,6 +63,11 @@ static int gaiaArrayInfo( ClientData clientData, Tcl_Interp *interp,
 int Array_Init( Tcl_Interp *interp )
 {
     Tcl_CreateObjCommand( interp, "array::release", gaiaArrayRelease,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "array::getregionspectrum", 
+                          gaiaArrayRegionSpectrum,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -80,6 +87,126 @@ int Array_Init( Tcl_Interp *interp )
 }
 
 /**
+ * Extract a "region" spectrum from a data cube. The region is a 2D ARD 
+ * description in the image plane. Each region is combined into point of the
+ * resultant spectrum.
+ *
+ * The cube must be available as a memory address to an ARRAYinfo structure,
+ * the arguments are:
+ *
+ *   1)     the memory address (a long)
+ *   2&3&4) the cube dimensions (three arguments)
+ *   5)     the axis defining the spectral direction 1, 2 or 3.
+ *   6&7)   the lower and upper bounds along axis line (-1's for all), grid
+ *          indices.
+ *   8)     the ARD description, with grid coordinates.
+ *   9)     the combination method, only mean is supported at present.
+ *   10)    a boolean indicating whether the extracted data should be
+ *          registered with CNF so that it can be released by CNF
+ *          (NDFs will require this).
+ *
+ * The result is the memory address of an ARRAYinfo struct.
+ */
+static int gaiaArrayRegionSpectrum( ClientData clientData, Tcl_Interp *interp,
+                                    int objc, Tcl_Obj *CONST objv[] )
+{
+    ARRAYinfo *arrayInfo;
+    char *description;
+    char *method;
+    int arange[2];
+    int axis;
+    int cnfMalloc;
+    int dims[3];
+    int nel = 0;
+    int outtype;
+    long adr;
+    void *outPtr;
+
+    /* Check arguments */
+    if ( objc != 11 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "address dim1 dim2 dim3 "
+                          "axis axis_lower axis_upper ard_description "
+                          "combination_method ?cnf_register?" );
+        return TCL_ERROR;
+    }
+
+    /* Get cube memory address */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read data pointer",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+    arrayInfo = (ARRAYinfo *) adr;
+
+    /* Cube dimensions */
+    if ( ( Tcl_GetIntFromObj( interp, objv[2], &dims[0] ) != TCL_OK ) ||
+         ( Tcl_GetIntFromObj( interp, objv[3], &dims[1] ) != TCL_OK ) ||
+         ( Tcl_GetIntFromObj( interp, objv[4], &dims[2] ) != TCL_OK ) ) {
+        Tcl_AppendResult( interp, ": failed to read cube dimensions",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
+    /* Axis of spectrum */
+    if ( Tcl_GetIntFromObj( interp, objv[5], &axis ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read spectral axis",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
+    /* Correct to array indices (these are 0 based). */
+    axis--;
+
+    /* Range of axis */
+    if ( ( Tcl_GetIntFromObj( interp, objv[6], &arange[0] ) != TCL_OK ) ||
+         ( Tcl_GetIntFromObj( interp, objv[7], &arange[1] ) != TCL_OK ) ) {
+        Tcl_AppendResult( interp, ": failed to read axis ranges",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
+    /* Correct to array indices from grid ones and set to either end if values
+     * are -1 */
+    if ( arange[0] == -1 ) {
+        arange[0] = 0;
+    }
+    else {
+        arange[0]--;
+    }
+    if ( arange[1] == -1 ) {
+        arange[1] = dims[axis];
+    }
+    else {
+        arange[1]--;
+    }
+
+    /* ARD description */
+    description = Tcl_GetString( objv[8] );
+
+    /* Combination method */
+    method = Tcl_GetString( objv[9] );
+
+    /* CNF registered memory */
+    if ( Tcl_GetBooleanFromObj( interp, objv[10], &cnfMalloc ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read spectral axis",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
+    /* Extraction */
+    gaiaArrayRegionSpectrumFromCube( arrayInfo, dims, axis, arange, 
+                                     description, cnfMalloc, &outPtr, &nel,
+                                     &outtype );
+
+    /* Export results as an ARRAYinfo struct */
+    arrayInfo = gaiaArrayCreateInfo( outPtr, outtype, nel, 0, 0, 0, 1.0, 0.0,
+                                     cnfMalloc );
+    Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) arrayInfo ) );
+
+    return TCL_OK;
+}
+
+/**
  * Extract a line of data from a cube.
  *
  * The cube must be available as a memory address to an ARRAYinfo structure,
@@ -94,7 +221,7 @@ int Array_Init( Tcl_Interp *interp )
  *          define the "position" of the line
  *   10)    a boolean indicating whether the extracted data should be
  *          registered with CNF so that it can be released by CNF
- *          (NDF's will require this).
+ *          (NDFs will require this).
  *
  * The result is the memory address of an ARRAYinfo struct.
  */
