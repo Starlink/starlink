@@ -24,12 +24,15 @@
 *        Pointer to global status.
 
 *  Description:
-*     This function adds smfDatas to a smfArray structure.
+*     This function adds a given smfData to a smfArray structure. A
+*     check is made that the smfArray is not filled already before
+*     adding the smfData.
 
 *  Notes:
-*     - Free this memory using smf_close_file
-*     - Data arrays are not populated by this routine. The pointers
-*       are set to NULL.
+*     This routine makes the assumption that there cannot be more than
+*     2*SMF__MXSMF smfDatas in a smfArray, essentially allowing the
+*     grouping of all four SCUBA-2 subarrays at both
+*     wavelengths. Something a little more flexible is desireable.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -81,17 +84,18 @@
 
 #define FUNC_NAME "smf_addto_smfArray"
 
-void smf_addto_smfArray( smfArray *ary, const smfData *data, int * status ) {
+void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status ) {
 
-  size_t ndat;
-  int i;
+  size_t ndat;         /* Number of smfDatas that can be added */
+  int i;               /* Loop counter */
 
   if (*status != SAI__OK) return;
 
+  /* Retrieve number of smfDatas */
   ndat = ary->ndat;
 
   /* Check for valid number of smfData pointers */
-  if ( ndat < 1 || ndat > SMF__MXSMF) {
+  if ( ndat < 1 || ndat > 2*SMF__MXSMF ) {
     if ( *status == SAI__OK ) {
       msgSeti("N",ndat);
       *status = SAI__ERROR;
@@ -102,12 +106,13 @@ void smf_addto_smfArray( smfArray *ary, const smfData *data, int * status ) {
     }
   }
 
-  /* Loop over pointers in the smfArray: set */
-  for ( i=0; i<ndat; i++) {
-    /* Check if pointer is NULL */
+  /* Loop over pointers in the smfArray */
+  for ( i=0; i<ndat; i++ ) {
+    /* Check if pointer is NULL and if so point to input smfData */
     if ( (ary->sdata)[i] == NULL ) {
       (ary->sdata)[i] = data;
-      break;
+      /* Done so return */
+      return;
     } else if ( i == ndat - 1 ) {
       if ( *status == SAI__OK ) {
 	*status = SAI__ERROR;
