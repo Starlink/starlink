@@ -92,10 +92,6 @@
 
 *  Local variables:
       CHARACTER * ( DAT__SZLOC ) LOC2 ! Locator to SCALE or ZERO component
-      DOUBLE PRECISION SCALE     ! The scale value
-      DOUBLE PRECISION ZERO      ! The zero value
-      INTEGER DIM( ARY__MXDIM )  ! Dimensions of SCALE or ZERO component
-      INTEGER NDIM               ! No. of dimensions
       LOGICAL THERE              ! Whether a component exists
 
 *.
