@@ -48,6 +48,9 @@
 #include <sae_par.h>
 #include <ems.h>
 #include <ems_par.h>
+#include <star/ard.h>
+#include <star/grp.h>
+#include <prm_par.h>
 
 #define TCL_OK 0
 #define TCL_ERROR 1
@@ -123,9 +126,9 @@ char *gaiaUtilsErrMessage()
 
 /**
  * Get an AST frameset that describes the coordinates of a given axis.
- * Axes are in the AST sense, i.e. start at 1. 
+ * Axes are in the AST sense, i.e. start at 1.
  */
-int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, AstFrameSet **iwcs, 
+int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, AstFrameSet **iwcs,
                         char **error_mess )
 {
    AstFrame *tmpframe;
@@ -507,7 +510,7 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
 int gaiaUtilsAtlPlROI( AstPlot *plot, AstKeyMap **rplots, char **error_mess )
 {
     int status = SAI__OK;
-    
+
     emsMark();
     atlPlroi( plot, rplots, &status );
     if ( status != SAI__OK ) {
@@ -525,7 +528,7 @@ int gaiaUtilsAtlPlROI( AstPlot *plot, AstKeyMap **rplots, char **error_mess )
  * one with any ROI's identified and trims the current frame to the given
  * axes (if needed).
  */
-int gaiaUtilsAtlAxTrm( AstFrameSet *frameset, int axes[], int lbnd[], 
+int gaiaUtilsAtlAxTrm( AstFrameSet *frameset, int axes[], int lbnd[],
                        int ubnd[],  double work[], char **error_mess )
 {
     int status = SAI__OK;
@@ -559,7 +562,7 @@ int gaiaUtilsGtFitsChan( char header[], int ncards, AstFitsChan **fitschan )
         for ( i = 0 ; i < ncards; i++, ptr += 80 ) {
             memcpy( card, (void *)ptr, (size_t) 80 );
             card[80] = '\0';
-            
+
             /*  Read all cards up to, but not including, the END card. */
             if ( ! ( card[0] == 'E' && card[1] == 'N' && card[2] == 'D'
                      && ( card[3] == '\0' || card[3] == ' ' ) ) ) {
@@ -589,11 +592,11 @@ int gaiaUtilsGtFitsChan( char header[], int ncards, AstFitsChan **fitschan )
 
 /**
  * Read a set of FITS cards (80 character non-NULL terminated strings stored
- * at a single memory location) and return a FrameSet if they contain a WCS 
+ * at a single memory location) and return a FrameSet if they contain a WCS
  * with the given encoding (NULL for the default). Returns an AST FrameSet if
  * successful and a result of 1.
  */
-int gaiaUtilsGtFitsWcs( char header[], int ncards, char *encoding, 
+int gaiaUtilsGtFitsWcs( char header[], int ncards, char *encoding,
                         AstFrameSet **iwcs )
 {
     AstFitsChan *fitschan;
@@ -621,4 +624,53 @@ int gaiaUtilsGtFitsWcs( char header[], int ncards, char *encoding,
     if ( ! astOK ) astClearStatus;
 
     return result;
+}
+
+/**
+ * Convert a 2D ARD description into a mask. The description should be in GRID
+ * coordinates. The mask should be at least dims[0]*dims[1]. The area used in
+ * the mask is returned in the lbnd and ubnd arrays, so they need to be of
+ * size at least 2 (strictly the returned bounds are the ARD interior bounds).
+ */
+int gaiaUtilsCreateArdMask( char *desc, int maskPtr[], int dims[], int lbnd[],
+                            int ubnd[], char **error_mess )
+{
+    Grp *grp;
+    float c[1];
+    int flag;
+    int index;
+    int inlbnd[2];
+    int lbnde[2];
+    int lbndi[2];
+    int status = SAI__OK;
+    int inubnd[2];
+    int ubnde[2];
+    int ubndi[2];
+
+    inlbnd[0] = 1;
+    inlbnd[1] = 1;
+    inubnd[0] = dims[0];
+    inubnd[1] = dims[1];
+
+    emsMark();
+
+    c[0] = VAL__BADR;
+    grp = NULL;
+    ardGrpex( desc, NULL, &grp, &flag, &status );
+
+    /*  Create the mask. */
+    index = 2;
+    ardWork( grp, 2, inlbnd, inubnd, c, 0, &index, maskPtr, lbnd, ubnd, 
+             lbnde, ubnde, &status ); 
+
+    /* Free the group */
+    grpDelet( &grp, &status );
+
+    if ( status != SAI__OK ) {
+        emsRlse();
+        *error_mess = gaiaUtilsErrMessage();
+        return 0;
+    }
+    emsRlse();
+    return 1;
 }
