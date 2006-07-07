@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     pntr = smf_create_smfData( int * status );
+*     pntr = smf_create_smfData( int flags, int * status );
 
 *  Arguments:
 *     flags = int (Given)
@@ -53,6 +53,8 @@
 *        Initial version
 *     2006-02-17 (AGG):
 *        Add scanfit polynomial initialization
+*     2006-07-01 (AGG):
+*        Change args to smf_free
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -99,7 +101,7 @@
 smfData *
 smf_create_smfData( int flags, int * status ) {
 
-  /* need to make sure that any memory we malloc will be freed on error 
+  /* Need to make sure that any memory we malloc will be freed on error 
      so make sure we NULL all pointers first. */
   smfData * data = NULL;   /* Main data struct */
   smfHead * hdr = NULL;    /* Data header */
@@ -148,10 +150,10 @@ smf_create_smfData( int flags, int * status ) {
   return data;
 
  CLEANUP:
-  smf_free( data, status );
-  smf_free( file, status );
-  smf_free( hdr, status );
-  smf_free( da, status );
+  smf_free( &data, status );
+  smf_free( &file, status );
+  smf_free( &hdr, status );
+  smf_free( &da, status );
   
   return NULL;
 }
