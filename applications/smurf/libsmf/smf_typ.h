@@ -52,6 +52,8 @@
 *        Add history to smfData
 *     2006-06-12 (EC):
 *        Added smurfloc/mapcoordid to smfFile & lut to smfData
+*     2006-06-25 (AGG):
+*        Add smfGroup, smfArray
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -167,9 +169,16 @@ typedef struct smfData {
 /* This structure is a container for multiple smfDatas */
 
 typedef struct smfArray {
-  void *sdata[SMF__MXSMF]; /* Pointers to smfDatas */
+  smfData **sdata;         /* Pointers to smfDatas */
   int ndat;                /* Number of smfDatas in current smfArray */
 } smfArray;
+
+typedef struct smfGroup {
+  Grp *grp;                /* Copy of input Grp */
+  int **subgroups;         /* Array of indices into Grp */
+  int ngroups;             /* Number of subgroups */
+  int nrelated;            /* Maximum number of related files */
+} smfGroup;
 
 #endif /* SMF_TYP_DEFINED */
 
