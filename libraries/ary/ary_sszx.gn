@@ -61,6 +61,9 @@
 *  History:
 *     15-MAY-2006 (DSB):
 *        Original version.
+*     7-JUL-2006 (DSB):
+*        Check for primitive arrays and convert to simple,before
+*        converting to scaled.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -75,6 +78,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
       INCLUDE 'ARY_PAR'          ! ARY_ public constants
+      INCLUDE 'ARY_ERR'          ! ARY_ error constants
       INCLUDE 'ARY_CONST'        ! ARY_ private constants
 
 *  Global Variables:
@@ -109,7 +113,27 @@
 *  Get the DCB entry associated with this ACB entry.
          IDCB = ACB_IDCB( IACB )
 
-*  Ensure that components exist in the data object to hold the scale and
+*  If the array is primitive, then it must first be converted to
+*  simple storage form in order to set the scaling. Check if the 
+*  data object is mapped for access. Report an error if it is.
+         IF ( DCB_FRM( IDCB ) .EQ. 'PRIMITIVE' ) THEN
+            IF ( ( DCB_NWRIT( IDCB ) .NE. 0 ) .OR.
+     :           ( DCB_NREAD( IDCB ) .NE. 0 ) ) THEN
+               STATUS = ARY__ISMAP
+               CALL DAT_MSG( 'ARRAY', DCB_LOC( IDCB ) )
+               CALL ERR_REP( 'ARY_SSZ_MAP',
+     :               'The array ^ARRAY is mapped for access, ' //
+     :               'perhaps through another identifier ' //
+     :               '(possible programming error).', STATUS )
+
+*  Otherwise, perform the conversion.
+            ELSE
+               CALL ARY1_DP2S( IDCB, STATUS )
+            END IF
+         END IF
+
+*  We can now deal with simple arrays alone. Ensure that scaling 
+*  components exist in the data object to hold the scale and
 *  zero values. Then put the supplied values into them.
          CALL CMP_MOD( DCB_LOC( IDCB ), 'SCALE', '<HTYPE>', 0, 0, STATUS )
          CALL DAT_FIND( DCB_LOC( IDCB ), 'SCALE', LOCC, STATUS )
