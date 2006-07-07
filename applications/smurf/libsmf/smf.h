@@ -91,6 +91,9 @@
 *        Add smf_get_xloc and smf_get_ndfid
 *     2006-05-09 (EC):
 *        Renamed smf_mapcoord to smf_calc_mapcoord
+*     2006-07-07 (AGG):
+*        Add smf_grp_related, smf_construct_smfGroup,
+*        smf_open_related, smf_close_related and smf_close_smfGroup
 *     {enter_further_changes_here}
 
 *  Copyright:
