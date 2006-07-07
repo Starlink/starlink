@@ -74,6 +74,8 @@
 *        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
 *     6-APR-2006 (DSB):
 *        Modify CleanExp to convert "MJY/STER" to standard form ("MJy/sr").
+*     7-JUL-2006 (DSB):
+*        Correct initialisation of "word" flag in CleanExp. 
 */
 
 /* Module Macros. */
@@ -322,7 +324,7 @@ static const char *CleanExp( const char *exp ) {
    counted as alphanumeric. */
    start = exp;
    p = (char *) exp - 1;
-   word = ISWORD( *p );
+   word = ISWORD( *( p + 1 ) );
    ntok = 0;
    tok = NULL;
    while( *(++p) ){
