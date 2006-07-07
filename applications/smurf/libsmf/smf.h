@@ -311,6 +311,19 @@ void smf_open_mapcoord( smfData *data, int *status );
 void smf_dreamsolve( smfData *data, Grp *pixgrp, Grp *pstgrp, int index, 
 		     int *status );
 
+void smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave, 
+		      smfGroup **group, int *status );
+
+smfGroup * smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups, 
+				   const int nrelated, int *status );
+
+void smf_open_related( const smfGroup *group, const int subindex, smfArray **relfiles, 
+		       int *status );
+
+void smf_close_related( smfArray **relfiles, int *status );
+
 void smf_close_mapcoord( smfData *data, int *status );
+
+void smf_close_smfGroup( smfGroup **group, int *status );
 
 #endif /* SMF_DEFINED */

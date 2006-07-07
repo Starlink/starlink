@@ -4,7 +4,8 @@ noinst_LTLIBRARIES = libsmf.la
 libsmf_la_SOURCES = $(C_ROUTINES)
 
 C_ROUTINES = smf_correct_extinction.c smf_scale_tau.c \
-smf_fits_crchan.c \
+smf_grp_related.c smf_construct_smfGroup.c smf_close_smfGroup.c \
+smf_fits_crchan.c smf_open_related.c smf_close_related.c \
 smf_free.c smf_malloc.c \
 smf_open_file.c smf_close_file.c \
 smf_dtype_check.c smf_dtype_string.c smf_dtype_size.c smf_dtype_check_fatal.c \
@@ -23,9 +24,10 @@ smf_deepcopy_smfHead.c smf_deepcopy_smfData.c smf_deepcopy_smfDA.c \
 smf_mapbounds.c smf_mapbounds_approx.c smf_rebinmap.c \
 smf_check_smfData.c smf_check_smfDA.c smf_check_smfFile.c smf_check_smfHead.c \
 smf_calc_wvm.c smf_subtract_poly.c smf_subtract_plane.c smf_fit_poly.c \
-smf_calc_stats.c smf_calc_covar.c \
+smf_calc_stats.c smf_calc_covar.c smf_dream_setjig.c \
+smf_create_smfArray.c smf_addto_smfArray.c \
 smf_calc_mapcoord.c smf_simplerebinmap.c smf_iteratemap.c \
-smf_open_mapcoord.c smf_close_mapcoord.c
+smf_open_mapcoord.c smf_close_mapcoord.c smf_dreamsolve.c 
 
 noinst_INCLUDES = smf.h smf_typ.h
 
