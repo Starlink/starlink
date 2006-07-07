@@ -86,6 +86,13 @@ extern "C" {
     /* Normalise an array from FITS to HDS-like format */
     void gaiaArrayNormalise( ARRAYinfo *info );
 
+    /* Extract a region as a spectrum from a cube */ 
+    void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], 
+                                          int axis, int arange[2], 
+                                          char *region, int cnfmalloc, 
+                                          void **outPtr, int *nel,
+                                          int *outtype );
+
 #ifdef __cplusplus
 }
 #endif

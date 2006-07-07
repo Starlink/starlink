@@ -46,6 +46,10 @@ extern "C" {
     int gaiaUtilsGtFitsWcs( char header[], int ncards, char *encoding, 
                             AstFrameSet **iwcs );
 
+    /* Convert ARD description into a mask */
+    int gaiaUtilsCreateArdMask( char *desc, int maskPtr[], int dims[], 
+                                int lbnd[], int ubnd[], char **error_mess );
+
 #ifdef __cplusplus
 }
 #endif
