@@ -90,7 +90,6 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER LOC*(DAT__SZLOC) ! Locator for new scale structure
       CHARACTER LOCC*(DAT__SZLOC)! Locator for component
       INTEGER IACB               ! Index to array entry in the ACB
       INTEGER IDCB               ! Index to array entry in the DCB
