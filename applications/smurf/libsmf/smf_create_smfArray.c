@@ -26,12 +26,15 @@
 *        Pointer to newly created smfArray. NULL on error.
 
 *  Description:
-*     This function allocates memory for a smfArray structure
+*     This function allocates memory for a smfArray structure, sets
+*     the pointers to smfDatas to NULL and sets the number of smfDatas
+*     to be stored.
 
 *  Notes:
-*     - Free this memory using smf_close_file
-*     - Data arrays are not populated by this routine. The pointers
-*       are set to NULL.
+*     This routine makes the assumption that there cannot be more than
+*     2*SMF__MXSMF smfDatas in a smfArray, essentially allowing the
+*     grouping of all four SCUBA-2 subarrays at both
+*     wavelengths. Something a little more flexible is desireable.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -40,6 +43,9 @@
 *  History:
 *     2006-06-02 (AGG):
 *        Initial version, copy from smf_create_smfData
+*     2006-07-07 (AGG):
+*        Allocate space for smfDatas, increase maximum size to
+*        2*SMF__MXSMF
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -85,7 +91,7 @@
 
 smfArray *smf_create_smfArray( const size_t size, int * status ) {
 
-  /* need to make sure that any memory we malloc will be freed on error 
+  /* Need to make sure that any memory we malloc will be freed on error 
      so make sure we NULL all pointers first. */
   smfArray *ary = NULL;    /* Main struct */
   int i;
@@ -112,7 +118,7 @@ smfArray *smf_create_smfArray( const size_t size, int * status ) {
   }
   /* Check that we're not asking to create more smfDatas than we're
      allowed to */
-  if ( size > SMF__MXSMF ) {
+  if ( size > 2*SMF__MXSMF ) {
     if ( *status == SAI__OK ) {
       msgSeti("S",size);
       msgSeti("M",SMF__MXSMF);
@@ -124,7 +130,10 @@ smfArray *smf_create_smfArray( const size_t size, int * status ) {
     }
   }
 
-  /* Set pointers to NULL */
+  /* Allocate space for smfDatas */
+  ary->sdata = smf_malloc( size, sizeof(smfData), 0, status );;
+
+  /* Set each pointer to NULL */
   for ( i=0; i<size; i++) {
     (ary->sdata)[i] = NULL;
   }
