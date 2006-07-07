@@ -209,6 +209,10 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     17-MAY-2006 (DSB):
 *        Correct the "nout = astGetNin" line in the MAKE_RESAMPLE
 *        and MAKE_REBIN macros to "nout = astGetNout".
+*     7-JUL-2006 (DSB):
+*        Change -CHAR_MAX value (used as a "not set" value for boolean
+*        attributes) to +CHAR_MAX, since some compilers do not allow
+*        chars to have negative values.
 *class--
 */
 
@@ -20393,13 +20397,13 @@ f     performed with the AST_INVERT routine.
 *        affected by selecting a new base or current Frame.
 *att--
 */
-/* This ia a boolean value (0 or 1) with a value of -CHAR_MAX when
+/* This ia a boolean value (0 or 1) with a value of CHAR_MAX when
    undefined but yielding a default of zero. */
-astMAKE_CLEAR(Mapping,Invert,invert,-CHAR_MAX)
-astMAKE_GET(Mapping,Invert,int,0,( ( this->invert == -CHAR_MAX ) ?
+astMAKE_CLEAR(Mapping,Invert,invert,CHAR_MAX)
+astMAKE_GET(Mapping,Invert,int,0,( ( this->invert == CHAR_MAX ) ?
                                    0 : this->invert ))
 astMAKE_SET(Mapping,Invert,int,invert,( this->issimple=0,(value!=0) ))
-astMAKE_TEST(Mapping,Invert,( this->invert != -CHAR_MAX ))
+astMAKE_TEST(Mapping,Invert,( this->invert != CHAR_MAX ))
 
 /*
 *att++
@@ -20589,13 +20593,13 @@ c     representation of a Mapping produced by the astWrite function.
 f     representation of a Mapping produced by the AST_WRITE routine.
 *att--
 */
-/* This ia a boolean value (0 or 1) with a value of -CHAR_MAX when
+/* This ia a boolean value (0 or 1) with a value of CHAR_MAX when
    undefined but yielding a default of zero. */
-astMAKE_CLEAR(Mapping,Report,report,-CHAR_MAX)
-astMAKE_GET(Mapping,Report,int,0,( ( this->report == -CHAR_MAX ) ?
+astMAKE_CLEAR(Mapping,Report,report,CHAR_MAX)
+astMAKE_GET(Mapping,Report,int,0,( ( this->report == CHAR_MAX ) ?
                                    0 : this->report ))
 astMAKE_SET(Mapping,Report,int,report,( value != 0 ))
-astMAKE_TEST(Mapping,Report,( this->report != -CHAR_MAX ))
+astMAKE_TEST(Mapping,Report,( this->report != CHAR_MAX ))
 
 /*
 *att++
@@ -20723,7 +20727,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    out = (AstMapping *) objout;
 
 /* Clear the output Report attribute. */
-   out->report = -CHAR_MAX;
+   out->report = CHAR_MAX;
 }
 
 /* Destructor. */
@@ -21034,8 +21038,8 @@ AstMapping *astInitMapping_( void *mem, size_t size, int init,
       new->tran_inverse = ( tran_inverse != 0 );
 
 /* Initialise other attributes to their undefined values. */
-      new->invert = -CHAR_MAX;
-      new->report = -CHAR_MAX;
+      new->invert = CHAR_MAX;
+      new->report = CHAR_MAX;
       new->issimple = 0;
 
 /* If an error occurred, clean up by deleting the new object. */
@@ -21181,7 +21185,7 @@ AstMapping *astLoadMapping_( void *mem, size_t size,
 
 /* Invert. */
 /* ------- */
-      new->invert = astReadInt( channel, "invert", -CHAR_MAX );
+      new->invert = astReadInt( channel, "invert", CHAR_MAX );
       if ( TestInvert( new ) ) SetInvert( new, new->invert );
 
 /* IsSimple. */
@@ -21198,7 +21202,7 @@ AstMapping *astLoadMapping_( void *mem, size_t size,
 
 /* Report. */
 /* ------- */
-      new->report = astReadInt( channel, "report", -CHAR_MAX );
+      new->report = astReadInt( channel, "report", CHAR_MAX );
       if ( TestReport( new ) ) SetReport( new, new->report );
 
 /* If an error occurred, clean up by deleting the new Mapping. */
