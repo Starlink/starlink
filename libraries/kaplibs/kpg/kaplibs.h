@@ -104,6 +104,7 @@ void kpgStatd( int, int, const double[], int, const float[], int *, int *,
                double * , int * );
 
 void kpg1Wwrt( AstObject *, const char *, const HDSLoc *, int * );
+void kpg1Wread( const HDSLoc *, const char *, AstObject **, int * );
 
 
 #endif
