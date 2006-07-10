@@ -111,17 +111,16 @@
 *  If it is not, then report an error.
          IF ( .NOT. OK ) THEN
             STATUS = ARY__ACDEN
-            IDCB = ACB_IDCB( IACB )
             CALL DAT_MSG( 'ARRAY', DCB_LOC( IDCB ) )
 
 *  ...Use an upper case version of the access type.
             UACC = ACCESS
             CALL CHR_UCASE( UACC )
             CALL MSG_SETC( 'ACCESS', UACC )
-            CALL ERR_REP( 'ARY1_CHACC_NO',
-     :      '^ACCESS access to the array ^ARRAY is not available ' //
-     :      'or has been disabled (possible programming error).',
-     :      STATUS )
+            CALL ERR_REP( 'ARY1_CHACC_NO', '^ACCESS access to the '//
+     :                    'array ^ARRAY is not available or has been '//
+     :                    'disabled (possible programming error).', 
+     :                    STATUS )
          END IF
       END IF
        

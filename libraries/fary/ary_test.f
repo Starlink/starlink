@@ -62,13 +62,19 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( DAT__SZLOC ) LOC ! Top-level HDS locator
+      CHARACTER FORM*30          ! Array form
+      CHARACTER LOC*( DAT__SZLOC ) ! Top-level HDS locator
+      CHARACTER TYPE*30          ! Array type
       INTEGER DIM( 2 )           ! Array dimensions
       INTEGER EL                 ! Number of mapped elements
       INTEGER IARY               ! Array identifier
+      INTEGER IARY2              ! Second array identifier
       INTEGER ISUM               ! Sum of array elements
+      INTEGER LBND( 2 )          ! Scaled array bounds
       INTEGER PLACE              ! Array placeholder
       INTEGER PNTR               ! Pointer to mapped array
+      INTEGER UBND( 2 )          ! Scaled array bounds
+      LOGICAL OK                 ! Was error correctly reported?
 
 *  Local Data:
       DATA DIM / 10, 20 /
@@ -110,18 +116,129 @@
       CALL ARY_ANNUL( IARY, STATUS )
       CALL HDS_ERASE( LOC, STATUS )
 
+*  Check if the test ran OK. If not, report an error.
+      IF( STATUS .EQ. SAI__OK .AND. ISUM .NE. 20100 ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'ISUM', ISUM )
+         CALL ERR_REP( 'ART_TEST_SER0', 'Bad data sum ^ISUM (should '//
+     :                 'be 20100).', STATUS )
+      END IF
+
+
+
+*  Do similar tests for scaled arrays...
+
+*  Create an HDS file and create a new _WORD 2D simple array in it. Fill the
+*  array with integers equal to the element index.
+      CALL HDS_NEW( 'ary_test2', 'TEST', 'TEST', 0, 0, LOC, STATUS )
+      CALL ARY_PLACE( LOC, 'TEST', PLACE, STATUS )
+
+      LBND( 1 ) = -100
+      LBND( 2 ) = -200
+      UBND( 1 ) = 100
+      UBND( 2 ) = 0
+      CALL ARY_NEW( '_WORD', 2, LBND, UBND, PLACE, IARY, STATUS )
+      CALL ARY_MAP( IARY, '_INTEGER', 'WRITE', PNTR, EL, STATUS )
+      CALL FILL( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
+      CALL ARY_UNMAP( IARY, STATUS )
+
+*  Set scale and zero terms for this simple array, and then check that
+*  the storage form is now SCALED.
+      CALL ARY_SSZR( IARY, 2.0, -1.2, STATUS )
+      CALL ARY_FORM( IARY, FORM, STATUS )
+      IF( FORM .NE. 'SCALED' .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'F', FORM )
+         CALL ERR_REP( 'ART_TEST_SER1', 'Bad form ^F for scaled array',
+     :                  STATUS )
+      END IF
+
+*  Check the data type is _REAL (because the scale and zero were set as
+*  reals).
+      CALL ARY_TYPE( IARY, TYPE, STATUS )
+      IF( TYPE .NE. '_REAL' .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'T', TYPE )
+         CALL ERR_REP( 'ART_TEST_SER2', 'Bad type ^T for scaled array',
+     :                  STATUS )
+      END IF
+
+*  Map the array and check that the mapped values include the effect of
+*  the above scaling.
+      CALL ARY_MAP( IARY, '_REAL', 'READ', PNTR, EL, STATUS )
+      CALL BACKR( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
+      CALL ARY_UNMAP( IARY, STATUS )
+
+*  Close the HDS file and then re-open it.
+      CALL ARY_ANNUL( IARY, STATUS )
+      CALL DAT_ANNUL( LOC, STATUS )
+      CALL HDS_OPEN( 'ary_test2', 'READ', LOC, STATUS )
+
+*  Import the array and check that it has SCALED storage form, and check
+*  the mapped array values are correct.
+      CALL ARY_FIND( LOC, 'TEST', IARY, STATUS )
+      CALL ARY_FORM( IARY, FORM, STATUS )
+      IF( FORM .NE. 'SCALED' .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'F', FORM )
+         CALL ERR_REP( 'ART_TEST_SER3', 'Bad form ^F for scaled array',
+     :                  STATUS )
+      END IF
+
+      CALL ARY_MAP( IARY, '_REAL', 'READ', PNTR, EL, STATUS )
+      CALL BACKR( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
+      CALL ARY_UNMAP( IARY, STATUS )
+
+*  Check an "Access denied" error is reported if we try to map a scaled
+*  array for update or write access.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL ERR_MARK
+         OK = .TRUE.
+         CALL ARY_MAP( IARY, '_REAL', 'UPDATE', PNTR, EL, STATUS )
+         IF( STATUS .NE. ARY__ACDEN ) THEN
+            OK = .FALSE.
+         ELSE
+            CALL ERR_ANNUL( STATUS )
+         END IF 
+   
+         CALL ERR_END( STATUS )
+   
+         IF( .NOT. OK .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'ART_TEST_SER4', 'No error on modifying a '//
+     :                    'scaled array', STATUS )
+         END IF
+      END IF
+
+*  Copy the scaled array to a new temporary array.
+      CALL ARY_TEMP( PLACE, STATUS )
+      CALL ARY_COPY( IARY, PLACE, IARY2, STATUS )
+
+*  Check the values in the copied array are correct.
+      CALL ARY_MAP( IARY2, '_REAL', 'READ', PNTR, EL, STATUS )
+      CALL BACKR( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
+      CALL ARY_UNMAP( IARY2, STATUS )
+
+*  Check the storage form of the copy.
+      CALL ARY_FORM( IARY2, FORM, STATUS )
+      IF( FORM .NE. 'SIMPLE' .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'F', FORM )
+         CALL ERR_REP( 'ART_TEST_SER5', 'Bad form ^F for simple array',
+     :                  STATUS )
+      END IF
+
+*  Delete the HDS file.
+      CALL ARY_ANNUL( IARY, STATUS )
+      CALL HDS_ERASE( LOC, STATUS )
+
 *  Close down HDS.
       CALL HDS_STOP( STATUS )
 
-*  Check if the test ran OK. If so, then report success.
-      IF ( ( STATUS .EQ. SAI__OK ) .AND. ( ISUM .EQ. 20100 ) ) THEN
-         WRITE( *, * ) '   ARY installation test succeeded.'
-
-*  Otherwise, report an error.
-      ELSE
-         IF ( STATUS .EQ. SAI__OK ) STATUS = SAI__ERROR
-         CALL ERR_REP( 'ARY_TEST_ERR',
-     :   'ARY_TEST: ARY installation test failed.', STATUS )
+*  Report a context error.
+      IF( STATUS .NE. SAI__OK ) THEN 
+         CALL ERR_REP( 'ARY_TEST_ERR', 'ARY_TEST: ARY installation '//
+     :                 'test failed.', STATUS )
       END IF
 
       END
@@ -270,3 +387,49 @@
  1    CONTINUE
 
       END
+
+
+
+
+*  Fill the supplied array with integers equal to the element index.
+      SUBROUTINE FILL( EL, ARRAY, STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INTEGER I, EL, STATUS
+      INTEGER ARRAY( EL )
+
+      IF( STATUS .NE. SAI__OK ) RETURN      
+      
+      DO I = 1, EL
+         ARRAY( I ) = I
+      END DO
+
+      END
+
+
+
+*  Check the supplied array has values equal to 2.0*element index - 1.2
+      SUBROUTINE BACKR( EL, ARRAY, STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INTEGER I, EL, STATUS
+      REAL ARRAY( EL ), VAL
+
+      IF( STATUS .NE. SAI__OK ) RETURN      
+
+      DO I = 1, 10
+         VAL = 2.0*I - 1.2 
+         IF( ABS( ARRAY( I ) - VAL ) .GT. 1.0E-6 ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETR( 'B', ARRAY( I ) )
+            CALL MSG_SETR( 'SB', 2.0*I - 1.2 )
+            CALL MSG_SETI( 'I', I )
+            CALL ERR_REP( 'ARY_TEST_E10', 'Bad value (^B) at element '//
+     :                    '^I. Should be ^SB.', STATUS )
+            RETURN
+         END IF
+      END DO
+
+      END
+
+

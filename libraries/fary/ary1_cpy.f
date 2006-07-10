@@ -155,6 +155,11 @@
 *        Removed unused variable.
 *     26-APR-2006 (DSB):
 *        Add support for scaled arrays.
+*     10-JUL-2006 (DSB):
+*        Ensure that the result of copying a scaled array is a simple
+*        array. This is because scaled arrays are read-only, so we need
+*        to be able to create a simple array from a scaled array if we are 
+*        ever going to be able to change the values in the array.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -208,6 +213,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER NEWTYP*(DAT__SZTYP)! Data type for mapped arrays
       INTEGER EL                 ! Number of data elements per component
       INTEGER IACBC              ! Index to cloned ACB entry
       INTEGER ICOMP              ! Loop counter for array components
@@ -233,10 +239,22 @@
 *  Get the DCB index for the data object to be copied.
       IDCB1 = ACB_IDCB( IACB1 )
 
-*  If the input array is a base array, then check to see that there is
-*  no conflicting mapped access for write or update in effect. Report an
-*  error if there is.
-      IF ( .NOT. ACB_CUT( IACB1 ) ) THEN
+*  Ensure that form information is available for it in the DCB.
+      CALL ARY1_DFRM( IDCB1, STATUS )
+
+*  Set a flag if it is scaled.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         SCALED = ( DCB_FRM( IDCB1 ) .EQ. 'SCALED' )
+      ELSE
+         SCALED = .FALSE.
+      END IF
+
+*  If the input array is a base array, but is not a scaled array, then check 
+*  to see that there is no conflicting mapped access for write or update in 
+*  effect. Report an error if there is. We exclude scaled arrays since
+*  these need to be converted to simple form, in the same way that an array 
+*  section is copied.
+      IF ( .NOT. ACB_CUT( IACB1 ) .AND. .NOT. SCALED ) THEN
          IF ( DCB_NWRIT( IDCB1 ) .NE. 0 ) THEN
             STATUS = ARY__ISMAP
             CALL DAT_MSG( 'ARRAY', DCB_LOC( IDCB1 ) )
@@ -252,16 +270,9 @@
             CALL ARY1_CRNBA( IDCB2, IACB2, STATUS )
          END IF
 
-*  If it is not a base array, then ensure that form information is
-*  available for it in the DCB.
-      ELSE
-         CALL ARY1_DFRM( IDCB1, STATUS )
-         IF ( STATUS .EQ. SAI__OK ) THEN
-
-*  Set a flag if it is scaled.
-            SCALED = ( DCB_FRM( IDCB1 ) .EQ. 'SCALED' )
-
 *  Handle each form of array in turn...
+      ELSE
+         IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Primitive arrays.
 *  ================
@@ -396,9 +407,17 @@
 *  Ensure that data type information is available in the DCB.
                CALL ARY1_DTYP( IDCB1, STATUS )
 
-*  Create a new data object (with an entry in the DCB) with the correct
-*  type and bounds to accommodate the copied data.
-               CALL ARY1_DCRE( DCB_TYP( IDCB1 ), DCB_CPX( IDCB1 ),
+*  Get the required data type for the new array.
+               IF( SCALED ) THEN
+                  CALL CMP_TYPE( DCB_SCLOC( IDCB1 ), 'SCALE', NEWTYP, 
+     :                           STATUS )
+               ELSE 
+                  NEWTYP = DCB_TYP( IDCB1 )
+               END IF
+
+*  Create a new simple data object (with an entry in the DCB) with the 
+*  correct type and bounds to accommodate the copied data.
+               CALL ARY1_DCRE( NEWTYP, DCB_CPX( IDCB1 ),
      :                         ACB_NDIM( IACB1 ), ACB_LBND( 1, IACB1 ),
      :                         ACB_UBND( 1, IACB1 ), TEMP, LOC, IDCB2,
      :                         STATUS )
@@ -421,12 +440,12 @@
       
 *  Map the input array for reading through the cloned ACB entry and the
 *  output array for writing.
-                        CALL ARY1_MAPS( IACBC, DCB_TYP( IDCB1 ),
-     :                                  DCB_CPX( IDCB1 ), 'READ',
-     :                                  PNTR1( 1 ), PNTR1( 2 ), STATUS )
-                        CALL ARY1_MAPS( IACB2, DCB_TYP( IDCB1 ),
-     :                                  DCB_CPX( IDCB1 ), 'WRITE',
-     :                                  PNTR2( 1 ), PNTR2( 2 ), STATUS )
+                        CALL ARY1_MAPS( IACBC, NEWTYP, DCB_CPX( IDCB1 ), 
+     :                                  'READ', PNTR1( 1 ), PNTR1( 2 ), 
+     :                                  STATUS )
+                        CALL ARY1_MAPS( IACB2, NEWTYP, DCB_CPX( IDCB1 ), 
+     :                                  'WRITE', PNTR2( 1 ), PNTR2( 2 ), 
+     :                                  STATUS )
 
 *  Find the number of data components to be copied and the number of
 *  elements in each component.
@@ -445,14 +464,14 @@
 *  output.
 
 *  ...byte data.
-                           IF ( DCB_TYP( IDCB1 ) .EQ. '_BYTE' ) THEN
+                           IF ( NEWTYP .EQ. '_BYTE' ) THEN
                               CALL VEC_BTOB( .FALSE., EL,
      :                               %VAL( CNF_PVAL( PNTR1( ICOMP ) ) ),
      :                               %VAL( CNF_PVAL( PNTR2( ICOMP ) ) ),
      :                               IERR, NERR, STATUS )
 
 *  ...unsigned byte data.
-                           ELSE IF ( DCB_TYP( IDCB1 ) .EQ. '_UBYTE' )
+                           ELSE IF ( NEWTYP .EQ. '_UBYTE' )
      :                     THEN
                               CALL VEC_UBTOUB( .FALSE., EL,
      :                               %VAL( CNF_PVAL( PNTR1( ICOMP ) ) ),
@@ -460,7 +479,7 @@
      :                               IERR, NERR, STATUS )
 
 *  ...double precision data.
-                           ELSE IF ( DCB_TYP( IDCB1 ) .EQ. '_DOUBLE' )
+                           ELSE IF ( NEWTYP .EQ. '_DOUBLE' )
      :                     THEN
                               CALL VEC_DTOD( .FALSE., EL,
      :                               %VAL( CNF_PVAL( PNTR1( ICOMP ) ) ),
@@ -468,7 +487,7 @@
      :                               IERR, NERR, STATUS )
 
 *  ...integer data.
-                          ELSE IF ( DCB_TYP( IDCB1 ) .EQ. '_INTEGER' )
+                          ELSE IF ( NEWTYP .EQ. '_INTEGER' )
      :                    THEN
                               CALL VEC_ITOI( .FALSE., EL,
      :                               %VAL( CNF_PVAL( PNTR1( ICOMP ) ) ),
@@ -476,7 +495,7 @@
      :                               IERR, NERR, STATUS )
 
 *  ...real data.
-                           ELSE IF ( DCB_TYP( IDCB1 ) .EQ. '_REAL' )
+                           ELSE IF ( NEWTYP .EQ. '_REAL' )
      :                     THEN
                               CALL VEC_RTOR( .FALSE., EL,
      :                               %VAL( CNF_PVAL( PNTR1( ICOMP ) ) ),
@@ -484,7 +503,7 @@
      :                               IERR, NERR, STATUS )
 
 *  ...word data.
-                           ELSE IF ( DCB_TYP( IDCB1 ) .EQ. '_WORD' )
+                           ELSE IF ( NEWTYP .EQ. '_WORD' )
      :                     THEN
                               CALL VEC_WTOW( .FALSE., EL,
      :                               %VAL( CNF_PVAL( PNTR1( ICOMP ) ) ),
@@ -492,7 +511,7 @@
      :                               IERR, NERR, STATUS )
 
 *  ...unsigned word data.
-                           ELSE IF ( DCB_TYP( IDCB1 ) .EQ. '_UWORD' )
+                           ELSE IF ( NEWTYP .EQ. '_UWORD' )
      :                     THEN
                               CALL VEC_UWTOUW( .FALSE., EL,
      :                               %VAL( CNF_PVAL( PNTR1( ICOMP ) ) ),
@@ -509,10 +528,6 @@
                         CALL ARY1_BAD( IACBC, .FALSE., BAD, STATUS )
                         CALL ARY1_SBD( BAD, IACB2, STATUS )
 
-*  Transfer the SCALE and ZERO values (if it is a scaled array), and
-*  change its storage form to scaled.
-                        IF( SCALED ) CALL ARY1_CPSCL( IDCB1, IDCB2, 
-     :                                                STATUS )
                      END IF
 
 *  Annul the cloned ACB entry.

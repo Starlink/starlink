@@ -169,9 +169,8 @@
 *  Otherwise, find the largest and smallest value that will still be within 
 *  the range of the requested data type after scaling.
          ELSE
-            V1 = DBLE( VAL__MAX<T> - ZERO )/DBLE( SCALE )
-            V2 = DBLE( VAL__MIN<T> - ZERO )/DBLE( SCALE )
-
+            V1 = DBLE( VAL__MAX<T> ) - DBLE( ZERO )/DBLE( SCALE )
+            V2 = DBLE( VAL__MIN<T> ) - DBLE( ZERO )/DBLE( SCALE )
             IF( V1 .GT. V2 ) THEN
    
                IF( V1 .GT. DBLE( VAL__MAX<T> ) ) THEN

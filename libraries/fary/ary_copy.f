@@ -31,7 +31,9 @@
 *        The global status.
 
 *  Notes:
-*     -  If this routine is called with STATUS set, then a value of
+*     - The result of copying a scaled array will be an equivalent simple 
+*     array.
+*     - If this routine is called with STATUS set, then a value of
 *     ARY__NOID will be returned for the IARY2 argument, although no
 *     further processing will occur. The same value will also be
 *     returned if the routine should fail for any reason. In either

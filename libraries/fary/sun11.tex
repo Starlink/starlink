@@ -618,6 +618,9 @@ result of applying the scale and zero terms to the stored values.
 Currently, the scaled (i.e. stored) data values cannot be accessed
 directly.
 
+\item The result of copying a scaled array (using ARY\_COPY) will be an
+equivalent simple array.
+
 \item Scaled arrays cannot be created directly. Instead, a simple array must
 first be created (using ARY\_NEW), and this can then be converted to a scaled
 array by assigning scale and zero values to it using ARY\_SSZ<T>. So a
