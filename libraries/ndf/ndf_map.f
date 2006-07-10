@@ -43,6 +43,11 @@
 *     of these mapped components will be returned (in the specified
 *     order) in the elements of the array PNTR, which must be of
 *     sufficient size to accommodate them.
+*     - If the array is stored in scaled form, then the mapped values
+*     will be the result of applying the approproate scale and zero terms
+*     to the elements of the underlying array.
+*     - Scaled arrays are read-only. An error will be reported if the array 
+*     is stored in scaled form and the access mode is UPDATE or WRITE.
 *     -  The result of mapping the QUALITY component with a data type
 *     other than '_UBYTE' is not defined and should not be used.
 *     -  If this routine is called with STATUS set, then a value of 1

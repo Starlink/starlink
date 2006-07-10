@@ -68,18 +68,24 @@ int main( int argc, char *argv[] ) {
 /* Status:                                                                  */
    int status;
 
+/* Local Constants:                                                         */
+#define SCALE 2.0
+#define ZERO -1.0
+
 /* Local Variables:                                                         */
+   HDSLoc * xloc = NULL;         /* Locator of extension                    */
+   char form[30];                /* Storage form */
+   char type[ 30 ];              /* Buffer for array data type             */
    int dim[ 2 ] = { 10, 20 };    /* NDF dimensions                          */
-   int lbnd[ 3 ] = { 1, 1, 1 };
-   int ubnd[ 3 ] = { 10, 20, 30 };
    int el;                       /* Number of mapped elements               */
    int i;                        /* Loop counter for array elements         */
    int indf;                     /* NDF identifier                          */
    int isum = 0;                 /* Sum of array elements                   */
-   int place;                    /* NDF placeholder                         */
-   void *pntr;                   /* Pointer to mapped array                 */
-   HDSLoc * xloc = NULL;         /* Locator of extension                    */
    int itemp;                    /* Temporary integer */
+   int lbnd[ 3 ] = { 1, 1, 1 };
+   int place;                    /* NDF placeholder                         */
+   int ubnd[ 3 ] = { 10, 20, 30 };
+   void *pntr;                   /* Pointer to mapped array                 */
 
 /* Initialise the global status.                                            */
    status = SAI__OK;
@@ -88,7 +94,7 @@ int main( int argc, char *argv[] ) {
    cnfInitRTL( argc, argv );
    ndfInit( argc, argv, &status );
 
-   /* Try two different techniques */
+/* Try two different techniques */
    ndfPlace( NULL, "ndf_ptest", &place, &status );
    ndfNew( "_REAL", 2, lbnd, ubnd, &place, &indf, &status );
    ndfMap( indf, "DATA", "_REAL","WRITE", &pntr, &el, &status );
@@ -107,11 +113,34 @@ int main( int argc, char *argv[] ) {
       for ( i = 0; i < el; i++ ) ( (float *) pntr )[ i ] = (float) ( i + 1 );
    }
 
-   /* Create an extension */
+/* Create an extension */
    ndfXnew( indf, "TEST", "TESTME", 0, dim, &xloc, &status );
    datAnnul( &xloc, &status );
    ndfXpt0i( 42, indf, "TEST", "INT", &status );
 
+/* Set the scale and zero terms for the NDF (this converts it from a simple
+   NDF to a scaled NDF). First unmap the data array. */
+   ndfUnmap( indf, "Data", &status );
+   ndfSszd( SCALE, ZERO, indf, "Data", &status );
+
+/* Check that the form is now SCALED. */
+   ndfForm( indf, "Data", form, 30, &status );
+   if( strcmp( form,"SCALED" ) && status == SAI__OK ) {
+      status = SAI__ERROR;
+      msgSetc( "F", form );
+      ems_rep_c( "NDF_TEST_ERR0", "Incorrect array form \"^F\".", &status );
+   }      
+
+/* Check the data type is now _DOUBLE (this is because we stored _DOUBLE
+   scale and zero values above). */
+   ndfType( indf, "Data", type, 30, &status ); 
+   if( status == SAI__OK ) {
+      if( strcmp( type, "_DOUBLE" ) ) {
+         status = SAI__ERROR;
+         ems_rep_c( "NDF_TEST_ERR1", "Scaled array is not of type _DOUBLE.", 
+                    &status );
+      }
+   }
 
 /* Clean up.                                                                */
    ndfAnnul( &indf, &status );
@@ -119,7 +148,26 @@ int main( int argc, char *argv[] ) {
 /* Re-open the NDF.                                                         */
    ndfOpen( NULL, "ndf_test.sdf", "update", "old", &indf, &place, &status );
 
-/* Map its data array.                                                      */
+/* Map its data array for update access. This should cause an error since
+   the array is stored in scaled form. */
+   if( status == SAI__OK ) {
+      errMark();
+      ndfMap( indf, "Data", "_integer", "update", &pntr, &el, &status );
+      if( status == 232753514 ) {  /* ARY__ACDEN */
+         errAnnul( &status );   
+      } else if( status == SAI__OK ) {
+         status = SAI__ERROR;
+         ems_rep_c( "NDF_TEST_ERR1", "No error reported when mapping a "
+                    "scaled array for update access.", &status );
+      } else {
+         msgSeti( "S", status );
+         ems_rep_c( "NDF_TEST_ERR1", "An incorrect error (^S) reported when mapping a "
+                    "scaled array for update access.", &status );
+      }
+      errRlse();
+   }
+
+/* Map its data array again, this time for read access. */
    ndfMap( indf, "Data", "_integer", "read", &pntr, &el, &status );
 
 /* Sum the data elements.                                                   */
@@ -140,7 +188,7 @@ int main( int argc, char *argv[] ) {
    ndfDelet( &indf, &status );
 
 /* Check if the test ran OK. If so, then report success.                    */
-   if ( ( status == SAI__OK ) && ( isum == 20100 ) ) {
+   if ( ( status == SAI__OK ) && ( isum == SCALE*20100 + el*ZERO ) ) {
       (void) printf( "***************************************\n"
                      "*                                     *\n"
                      "*  NDF C installation test succeeded  *\n"

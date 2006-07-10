@@ -4179,3 +4179,122 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
+
+
+F77_SUBROUTINE(ndf_sszi)( INTEGER(SCALE),
+                          INTEGER(ZERO),
+                          INTEGER(indf),
+                          CHARACTER(comp),
+                          INTEGER(status)
+                          TRAIL(comp) );
+
+void ndfSszi( int scale,
+              int zero,
+              int indf,
+              const char *comp,
+              int *status ) {
+
+DECLARE_INTEGER(fscale);
+DECLARE_INTEGER(fzero);
+DECLARE_INTEGER(findf);
+DECLARE_CHARACTER_DYN(fcomp);
+DECLARE_INTEGER(fstatus);
+
+   F77_EXPORT_INTEGER( scale, fscale );
+   F77_EXPORT_INTEGER( zero, fzero );
+   F77_EXPORT_INTEGER( indf, findf );
+   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
+   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_EXPORT_INTEGER( *status, fstatus );
+
+   F77_CALL(ndf_sszi)( INTEGER_ARG(&fscale),
+                       INTEGER_ARG(&fzero),
+                       INTEGER_ARG(&findf),
+                       CHARACTER_ARG(fcomp),
+                       INTEGER_ARG(&fstatus)
+                       TRAIL_ARG(fcomp) );
+
+   F77_FREE_CHARACTER( fcomp );
+   F77_IMPORT_INTEGER( fstatus, *status );
+
+   return;
+}
+
+F77_SUBROUTINE(ndf_sszr)( REAL(SCALE),
+                          REAL(ZERO),
+                          INTEGER(indf),
+                          CHARACTER(comp),
+                          INTEGER(status)
+                          TRAIL(comp) );
+
+void ndfSszr( float scale,
+              float zero,
+              int indf,
+              const char *comp,
+              int *status ) {
+
+DECLARE_REAL(fscale);
+DECLARE_REAL(fzero);
+DECLARE_INTEGER(findf);
+DECLARE_CHARACTER_DYN(fcomp);
+DECLARE_INTEGER(fstatus);
+
+   F77_EXPORT_REAL( scale, fscale );
+   F77_EXPORT_REAL( zero, fzero );
+   F77_EXPORT_INTEGER( indf, findf );
+   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
+   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_EXPORT_INTEGER( *status, fstatus );
+
+   F77_CALL(ndf_sszr)( REAL_ARG(&fscale),
+                       REAL_ARG(&fzero),
+                       INTEGER_ARG(&findf),
+                       CHARACTER_ARG(fcomp),
+                       INTEGER_ARG(&fstatus)
+                       TRAIL_ARG(fcomp) );
+
+   F77_FREE_CHARACTER( fcomp );
+   F77_IMPORT_INTEGER( fstatus, *status );
+
+   return;
+}
+
+F77_SUBROUTINE(ndf_sszd)( DOUBLE(SCALE),
+                          DOUBLE(ZERO),
+                          INTEGER(indf),
+                          CHARACTER(comp),
+                          INTEGER(status)
+                          TRAIL(comp) );
+
+void ndfSszd( double scale,
+              double zero,
+              int indf,
+              const char *comp,
+              int *status ) {
+
+DECLARE_DOUBLE(fscale);
+DECLARE_DOUBLE(fzero);
+DECLARE_INTEGER(findf);
+DECLARE_CHARACTER_DYN(fcomp);
+DECLARE_INTEGER(fstatus);
+
+   F77_EXPORT_DOUBLE( scale, fscale );
+   F77_EXPORT_DOUBLE( zero, fzero );
+   F77_EXPORT_INTEGER( indf, findf );
+   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
+   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_EXPORT_INTEGER( *status, fstatus );
+
+   F77_CALL(ndf_sszd)( DOUBLE_ARG(&fscale),
+                       DOUBLE_ARG(&fzero),
+                       INTEGER_ARG(&findf),
+                       CHARACTER_ARG(fcomp),
+                       INTEGER_ARG(&fstatus)
+                       TRAIL_ARG(fcomp) );
+
+   F77_FREE_CHARACTER( fcomp );
+   F77_IMPORT_INTEGER( fstatus, *status );
+
+   return;
+}
+

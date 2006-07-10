@@ -32,9 +32,9 @@
 *     length of a character variable to hold the storage form of an NDF
 *     array component. This constant is defined in the include file
 *     NDF_PAR.
-*     -  At present, the NDF_ routines only support "primitive" and
-*     "simple" arrays, so only the values 'PRIMITIVE' and 'SIMPLE' can
-*     be returned.
+*     -  At present, the NDF_ routines only support "primitive", "simple" 
+*     and "scaled" arrays, so only the values 'PRIMITIVE', 'SIMPLE' and
+*     'SCALED' can be returned.
 
 *  Algorithm:
 *     -  Import the NDF identifier.

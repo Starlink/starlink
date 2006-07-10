@@ -36,6 +36,9 @@
 *     information.
 *     -  The value returned for the QUALITY component is always
 *     '_UBYTE'.
+*     -  The numeric type of a scaled array is determined by the numeric
+*     type of the scale and zero terms, not by the numeric type of the
+*     underlying array elements.
 *     -  The symbolic constant NDF__SZTYP may be used for declaring the
 *     length of a character variable which is to hold the numeric type
 *     of an NDF array component. This constant is defined in the

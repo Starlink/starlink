@@ -1,6 +1,10 @@
 NDF Library
 -----------
 
+V1.6-2
+   Limited support for NDF array components stored in scaled form is now 
+   available.
+
 V1.6-1
    For the C interface, all routines that used to take or return
    HDS Locators as char buffers of size DAT__SZLOC, have been modified

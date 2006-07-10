@@ -8,11 +8,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {33.8}
 \newcommand{\stardocauthors}   {R.F.~Warren-Smith}
-\newcommand{\stardocdate}      {31th January 2005}
+\newcommand{\stardocdate}      {10th July 2006}
 \newcommand{\stardoctitle}     {NDF \\ [1ex]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
-\newcommand{\stardocversion}   {Version 1.5}
+\newcommand{\stardocversion}   {Version 1.6}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -2307,6 +2307,13 @@ attempts involves update or write access, although the same component may be
 accessed any number of times (through different identifiers) for read access
 alone.
 
+In addition, arrays stored in scaled form (rather than primitive
+or simple form), are currently read-only. An error will be reported if an
+attempt is made to map a scaled array component for update or write access.
+If you need to modify the values in a scaled array, then you should first
+make a copy of the NDF. Copying an NDF automatically converts all scaled
+arrays into simple arrays, and so the copied array can be mapped for any 
+type of access.
 
 \section{\xlabel{bad_pixels}\label{ss:badpixels}BAD PIXELS}
 
@@ -3682,8 +3689,7 @@ of the building-blocks from which an NDF is constructed.
 In the present document, the terminology has been changed slightly.
 In particular, the term \st{storage form\/} is used in preference to
 \st{variant\/} to avoid possible confusion with \st{variance},
-although the  
-meaning is unchanged.
+although the meaning is unchanged.
 
 \subsection{\xlabel{obtaining_the_storage_form}Obtaining the Storage Form}
 
@@ -3713,8 +3719,8 @@ The storage form is established when an NDF is first created (see
 At present there is no way of explicitly changing it, but in some
 circumstances it may be changed implicitly (see
 \S\ref{ss:implicitformchange}). 
-At present, only two storage forms are supported, so only the values
-`SIMPLE' and `PRIMITIVE' can be returned by NDF\_FORM. 
+At present, only three storage forms are supported, so only the values
+`SIMPLE', 'SCALED' and `PRIMITIVE' can be returned by NDF\_FORM. 
 These are described below.
 
 \subsection{\xlabel{simple_storage_form}\label{ss:simpleform}Simple Storage Form}
@@ -3728,6 +3734,64 @@ This, together with other ancillary information is held in a single
 
 There are no special restrictions on the use of \st{simple\/} arrays and most
 applications will not need to be aware of the use of this storage form. 
+
+\subsection{\xlabel{scaled_storage_form}\label{ss:scaledform}Scaled Storage Form}
+
+In this form of storage, the values stored internally within an NDF's array 
+component are a scaled form of the external values of interest to
+application code. Specifically, the internal scaled values are related to
+the external unscaled values via:
+
+\begin{verbatim}
+         (unscaled value) = ZERO + (scaled value) * SCALE
+\end{verbatim}
+
+where ZERO and SCALE are two constant values stored with the array. In
+all other respects, a scaled array is exactly like a simple array.
+
+Support for scaled arrays is currently limited, since it is anticipated
+that they will only be of interest as an archive format. The following
+details should be noted:
+
+\begin{enumerate}
+
+\item Scaled arrays are ``read-only''. An error will be reported if an
+attempt is made to map a scaled array for WRITE or UPDATE access. When
+mapped for READ access, the pointer returned by NDF\_MAP provides access
+to the \emph{unscaled} data values - that is, the mapped values are the
+result of applying the scale and zero terms to the stored (scaled) values.
+
+Currently, the scaled (i.e. stored) data values cannot be accessed
+directly. If you want to change the array values in a scaled array, first
+take a copy of the NDF and then modify the array values in the
+copy\footnote{Copying a scaled array produces an equivalent simple
+array.}.
+
+\item The result of copying a scaled array (for instance, using
+NDF\_PROP, \emph{etc.}) will be an equivalent simple array.
+
+\item Scaled arrays cannot be created directly. Instead, a simple array
+must first be created (\emph{e.g.} using NDF\_NEW), and this can then be
+converted to a scaled array by assigning scale and zero values to it
+using NDF\_SSZ<T>. So a typical program could create a simple array, map
+it for write access, store the scaled data values in the mapped simple
+array, unmap the array, and then associate scale and zero values with the
+array, thus converting it to a scaled array.
+
+\item Scaled arrays cannot have complex data types. An error will be
+reported if an attempt is made to to import an HDS structure describing a
+complex scaled array, or to assign scale and zero values to an array with
+complex data values.
+
+\item When applied to a scaled array, the NDF\_TYPE and NDF\_FTYPE routines 
+return information about the data type of the unscaled data values. In
+practice, this means that they return the data type of the SCALE and ZERO
+constants, rather than the data type of the array holding the stored
+(scaled) data values.
+
+\end{enumerate}
+
+
 
 \subsection{\xlabel{primitive_storage_form}\label{ss:implicitformchange}\label{ss:primitiveform}Primitive Storage Form}
 
@@ -13319,9 +13383,10 @@ locator}{sun92}{using_locators}}
          NDF\_PAR.
 
          \sstitem
-         At present, the NDF\_ routines only support \hi{"}primitive\hi{"} and
-         \hi{"}simple\hi{"} arrays, so only the values \hi{'}PRIMITIVE\hi{'} and \hi{'}SIMPLE\hi{'} can
-         be returned.
+         At present, the NDF\_ routines only support \hi{"}primitive\hi{"},
+         \hi{"}simple\hi{"} and \hi{"}scaled\hi{"} arrays, so only the 
+         values \hi{'}PRIMITIVE\hi{'}, \hi{'}SIMPLE\hi{'} and 
+         \hi{'}SCALED\hi{'} can be returned.
       }
    }
 }
@@ -13370,6 +13435,11 @@ locator}{sun92}{using_locators}}
          lowest precision full data type to which the values held in all
          the specified components can be converted without unnecessary
          loss of information.
+
+         \sstitem 
+         The numeric type of a scaled array is determined by the numeric
+         type of the scale and zero terms, not by the numeric type of the
+         underlying array elements.
 
          \sstitem
          The value returned for the QUALITY component is always
@@ -14519,6 +14589,16 @@ locator}{sun92}{using_locators}}
          \sstitem
          The result of mapping the QUALITY component with a data type
          other than \hi{'}\_UBYTE\hi{'} is not defined and should not be used.
+
+         \sstitem
+         If the array is stored in scaled form, then the mapped values
+         will be the result of applying the approproate scale and zero terms
+         to the elements of the underlying array.
+
+         \sstitem
+         Scaled arrays are read-only. An error will be reported if the
+         array is stored in scaled form and the access mode is update or 
+         write.
 
          \sstitem
          If this routine is called with STATUS set, then a value of 1
@@ -16767,6 +16847,76 @@ locator}{sun92}{using_locators}}
       }
    }
 }
+
+\sstroutine{
+   NDF\_SSZx
+}{
+   Set new scale and zero values for an NDF array component
+}{
+   \sstdescription{
+      The routine sets new values for the scale and zero values
+      associated with an NDF arraycomponent. If the array is stored
+      in simple or primitive form, then the storage form is changed
+      to scaled.
+   }
+   \sstinvocation{
+      CALL NDF\_SSZx( SCALE, ZERO, INDF, COMP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         SCALE = ? (Given)
+      }{
+         The new value for the scaling factor.
+      }
+      \sstsubsection{
+         ZERO = ? (Given)
+      }{
+         The new value for the zero offset.
+      }
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         COMP = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the NDF array component; {\tt '}DATA{\tt '} or {\tt '}VARIANCE{\tt '}.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the standard Fortran numerical data
+         types: integer, real and double precision. Replace the (lower case) {\tt "}x{\tt "}
+         in the routine name by I, R or D as appropriate.
+
+         \sstitem
+         A comma-separated list of component names may also be
+         supplied, in which case the same scale and zero values will be
+         used for each component in turn.
+
+         \sstitem
+         This routine may only be used to change the scaling of a base
+         NDF. If it is called with an array which is not a base array,
+         then it will return without action. No error will result.
+
+         \sstitem
+         An error will result if the array component, or any part of it,
+         is currently mapped for access (e.g. through another identifier).
+
+         \sstitem
+         This routine has no effect on components which are in an
+         undefined state.
+      }
+   }
+}
 \sstroutine{
    NDF\_STATE
 }{
@@ -17077,6 +17227,11 @@ which is significant.
          lowest precision numeric type to which all the specified
          components can be converted without unnecessary loss of
          information.
+
+         \sstitem 
+         The numeric type of a scaled array is determined by the numeric
+         type of the scale and zero terms, not by the numeric type of the
+         underlying array elements.
 
          \sstitem
          The value returned for the QUALITY component is always
@@ -18442,10 +18597,10 @@ another NDF (for example, ``NDF.AXIS(2)'').
 
 \end{enumerate}
 
-\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.5}
+\subsection{Changes Introduced in V1.5}
 
 The following describes the most significant changes which occurred in
-the NDF\_ system between versions V1.4 and V1.5 (the current version):
+the NDF\_ system between versions V1.4 and V1.5:
 
 \begin{enumerate}
 \item An interface to the library has been added which is callable
@@ -18464,6 +18619,19 @@ of the NDF\_ library).
 
 \item This document (\xref{SUN/33}{sun33}{}) has been updated to
 reflect recent changes to the library.
+\end{enumerate}
+
+\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.6}
+
+The following describes the most significant changes which occurred in
+the NDF\_ system between versions V1.5 and V1.6 (the current version):
+
+\begin{enumerate}
+\item Limited support for NDF array components stored in ``scaled'' form
+has been introduced. The new routine NDF\_SSZx will associate scale and
+zero values with an existing array component, thus converting it into a
+scaled array. See \S\ref{ss:scaledform}.
+
 \end{enumerate}
 
 No changes to existing applications should be required, nor is any
