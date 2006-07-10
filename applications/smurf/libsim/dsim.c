@@ -7,9 +7,21 @@
 #include <math.h>
 #include <time.h>
 
-#include "sae_par.h"
+/* STARLINK includes */
 #include "ast.h"
+#include "mers.h"
+#include "par.h"
+#include "par_par.h"
+#include "prm_par.h"
 #include "ndf.h"
+#include "sae_par.h"
+#include "star/hds.h"
+#include "star/ndg.h"
+#include "star/grp.h"
+#include "star/kaplibs.h"
+
+/* SMURF includes */
+#include "libsmf/smf.h"
 
 #include "fitsio.h"
 
@@ -1633,7 +1645,7 @@ double *xbolo,          /* x-bolometer coordinates for array (given) */
 double *ybolo,          /* y-bolometer coordinates for array (given) */
 AstCmpMap *bolo2map,    /* mapping bolo->sky image coordinates (given ) */
 double *astsim,         /* astronomical image (given) */
-long astnaxes[2],       /* dimensions of simulated image (given) */
+int astnaxes[2],        /* dimensions of simulated image (given) */
 double *dbuf,           /* pointer to bolo output (returned) */
 int *status             /* global status (given and returned) */
 )
@@ -1761,9 +1773,8 @@ int *status             /* global status (given and returned) */
     /* Fortran 2d array so stored by column rather than row! */
     xnear = (int) (skycoord[i] - 1. + 0.5);
     ynear = (int) (skycoord[nboll+i] - 1. + 0.5);
-    
     if( (xnear >= 0) && (xnear < astnaxes[0]) && 
-        (ynear >= 0) && (ynear < astnaxes[1]) ) 
+        (ynear >= 0) && (ynear < astnaxes[1]) )
       dbuf[i] = astsim[xnear + astnaxes[0]*ynear];
     
     else dbuf[i] = 0;
@@ -3295,7 +3306,6 @@ int *status        /* global status (given and returned) */
 
 }
 
-
 /*+ dsim_hor2eq - get telescope position and orientation */
 
 void dsim_hor2eq
@@ -3352,7 +3362,7 @@ void dsim_initast
 (
 char *filename,        /* name of input file (given) */
 double *pixsize,       /* pixel size in arcsec (returned) */
-long naxes[2],         /* dimensions of image (returned) */ 
+int naxes[2],          /* dimensions of image (returned) */ 
 double **astsim,       /* array to hold returned image (returned) */
 AstFrameSet **fitswcs, /* frameset containing WCS of FITS image */
 int *status            /* global status (given and returned) */
@@ -3364,90 +3374,78 @@ int *status            /* global status (given and returned) */
    Authors :
     B.D.Kelly (ROE)
     E.Chapin (UBC)
+    J.Balfour (UBC)
 
    History :
     19July2001:  original (bdk@roe.ac.uk)
     20Aug2002 : C version (bdk)
     14Nov2003 : read the image from a FITS file (bdk)
     28Feb2005 : Extract WCS info from FITS header (ec)
+    07July2006 : converted to use NDF instead of FITS files
 */
 
 {
-   int anynull;            /* null element reporter */
-   int bitpix;             /* FITS storage type */
-   char card[132];         /* Single FITS card */
-   char comment[132];      /* FITS header comment */
-   int exists;             /* whether or not the filename exists */
-   AstFitsChan *fc=NULL;   /* FITS channels for retrieving WCS */
-   fitsfile *fptr;         /* pointer to FITS data */
+
+   smfData *data=NULL;     /* pointer to  SCUBA2 data struct */
+   int el = 0;             /* number of elements mapped */
+   FILE *f;                /* file pointer */
+   Grp *igrp = GRP__NOID;  /* Group of input files */
+   smfHead *hdr;           /* Pointer to header in odata */
    int i;                  /* loop counter */
-   long inc[2];            /* FITS sampling parameter */
+   int *indf;              /* NDF identifier */
    int naxis;              /* array dimensionality */
-   int nchan;              /* Number of channels in FITS header */
-   long pend[2];           /* subarray end coordinates */
-   long pstart[2];         /* subarray start coordinates */
+   int size = 1;           /* number of items in igrp */
 
    if ( !StatusOkP(status) ) return;
 
- /* Check to make sure the input file exists, then open it, 
-   and read the header information */
-
-   exists = 0;
-   fits_file_exists( filename, &exists, status );
-
-   if ( !exists ) {
+   /* Check to make sure the input file exists, then open it, 
+      and read the header information */
+      
+   if ( f = fopen ( filename, "r" ) ) {
+      fclose ( f );
+   } else {
       *status = DITS__APP_ERROR;
       printf ( "dsim_initast: file %s could not be found.\n", filename );
       printf ( "\n" );
       return;
-   }//if
-
-   fits_open_image ( &fptr, filename, 0, status );
-   fits_read_key ( fptr, TDOUBLE, "PIXSIZE", pixsize, comment, status );
-   
-   /* Get the WCS information from the FITS header */
-
-   fits_get_hdrspace( fptr, &nchan, NULL, status );
-   fc = astFitsChan ( NULL, NULL, "" );
- 
-   for( i=1; i<=nchan; i++ ) {
-     fits_read_record( fptr, i, card, status );
-     astPutFits( fc, card, 0 );
    }
 
-   astClear( fc, "Card" );
-   *fitswcs = astRead(fc);
+   igrp = grpNew ( "GRP", status );
+   grpPut1 ( igrp, filename, 1, status );
+   smf_open_file( igrp, 1, "READ", 1, &data, status);
 
-   fc = astAnnul(fc);
+   hdr = data->hdr;
+   smf_fits_getD ( hdr, "PIXSIZE", pixsize, status );
 
-   /* Find the array size */
+   /* Retrieve the NDF identifier and get the WCS information 
+      from the FITS header */
+   ndgNdfas( igrp, 1, "READ", indf, status );
+   ndfGtwcs( *indf, fitswcs, status );
+   if ( *fitswcs == NULL ) { 
+      *status = DITS__APP_ERROR;
+      printf ( "dsim_initast: could not retrieve wcs information.\n", filename );
+      printf ( "\n" );
+      return;
+   }
    
-   fits_get_img_param ( fptr, 2, &bitpix, &naxis, naxes, status );
-   pstart[0] = 1;
-   pstart[1] = 1;
-   pend[0] = naxes[0];
-   pend[1] = naxes[1];
-   inc[0] = 1;
-   inc[1] = 1;
-
+   /* Determine the dimensions of the DATA array */
+   ndfDim( *indf, 2, naxes, &naxis, status );
+  
    /* Create the storage space */
-   
-   *astsim = (double *) calloc ( naxes[0]*naxes[1], sizeof(double)  );
+   *astsim = (double *) calloc ( naxes[0]*naxes[1], sizeof(double) );
 
    if ( *astsim != 0 ) {
-     fits_read_subset ( fptr, TDOUBLE, pstart, pend, inc, 0, *astsim, &anynull,
-			status );
-     
-     fits_close_file ( fptr, status );
-     
-     fits_report_error ( stderr, *status );
-     
+
+     /* Store the image */
+     ndfMap ( *indf, "DATA", "_DOUBLE", "READ", astsim, &el, status );
+
    } else {
      *status = DITS__APP_ERROR;
      printf ( "dsim_initast: failed to allocate memory\n" );
      printf ( strerror(errno) );
      printf ( "\n" );
-   }
+   }   
+
 }
 
 
@@ -3457,7 +3455,7 @@ void dsim_initatm
 (
 char *filename,    /* name of input file (given) */
 double *pixsize,   /* pixel size in arcsec (returned) */
-long naxes[2],     /* dimensions of image (returned) */ 
+int naxes[2],     /* dimensions of image (returned) */ 
 double **atmsim,   /* array to hold returned image (returned) */
 int *status        /* global status (given and returned) */
 )
@@ -3468,74 +3466,68 @@ int *status        /* global status (given and returned) */
 
    Authors :
     B.D.Kelly (ROE)
+    J.Balfour (UBC)
 
    History :
     19July2001:  original (bdk@roe.ac.uk)
     20Aug2002 : C version (bdk)
     14Nov2003 : read the image from a FITS file (bdk)
+    07July2006 : converted to use NDF instead of FITS files
 */
 
 {
-   int anynull;            /* null element reporter */
-   int bitpix;             /* FITS storage type */
-   char comment[132];      /* FITS header comment */
-   int exists;             /* whether or not the filename exists */
-   fitsfile *fptr;         /* pointer to FITS data */
-   long inc[2];            /* FITS sampling parameter */
+
+   smfData *data=NULL;     /* pointer to  SCUBA2 data struct */
+   int el = 0;             /* number of elements mapped */
+   FILE *f;                /* file pointer */
+   Grp *igrp = GRP__NOID;  /* Group of input files */
+   smfHead *hdr;           /* Pointer to header in odata */
+   int i;                  /* loop counter */
+   int *indf;              /* NDF identifier */
    int naxis;              /* array dimensionality */
-   long pend[2];           /* subarray end coordinates */
-   long pstart[2];         /* subarray start coordinates */
+   int size = 1;           /* number of items in igrp */
 
    if ( !StatusOkP(status) ) return;
 
-/* Check to make sure the input file exists, then open it, 
-   and read the header information */
-
-   exists = 0;
-   fits_file_exists ( filename, &exists, status );
-
-   if ( !exists ) {
+   /* Check to make sure the input file exists, then open it, 
+      and read the header information */
+      
+   if ( f = fopen ( filename, "r" ) ) {
+      fclose ( f );
+   } else {
       *status = DITS__APP_ERROR;
-      printf ( "dsim_initatm: file %s could not be found.\n", filename );
+      printf ( "dsim_initast: file %s could not be found.\n", filename );
       printf ( "\n" );
       return;
-   }//if
-
-   fits_open_image ( &fptr, filename, 0, status );
-   fits_read_key ( fptr, TDOUBLE, "PIXSIZE", pixsize, comment, status );
-
-/* Find the array size */
-
-   fits_get_img_param ( fptr, 2, &bitpix, &naxis, naxes, status );
-   pstart[0] = 1;
-   pstart[1] = 1;
-   pend[0] = naxes[0];
-   pend[1] = naxes[1];
-   inc[0] = 1;
-   inc[1] = 1;
-
-/* Create the storage space */
-
-   *atmsim = (double *) calloc ( naxes[0]*naxes[1], sizeof(double)  );
-
-   if ( *atmsim != 0 )
-   {
-
-      fits_read_subset ( fptr, TDOUBLE, pstart, pend, inc, 0, *atmsim, &anynull,
-        status );
-
-      fits_close_file ( fptr, status );
-
-      fits_report_error ( stderr, *status );
-
    }
-   else
-   {
-      *status = DITS__APP_ERROR;
-      printf ( "dsim_initatm: failed to allocate memory\n" );
-      printf ( strerror(errno) );
-      printf ( "\n" );
-   }
+
+   igrp = grpNew ( "GRP", status );
+   grpPut1 ( igrp, filename, 1, status );
+   smf_open_file( igrp, 1, "READ", 1, &data, status);
+
+   hdr = data->hdr;
+   smf_fits_getD ( hdr, "PIXSIZE", pixsize, status );
+
+   /* Retrieve the NDF identifier and determine the dimensions 
+      of the DATA array */
+   ndgNdfas( igrp, 1, "READ", indf, status );
+   ndfDim( *indf, 2, naxes, &naxis, status );
+  
+   /* Create the storage space */
+   *atmsim = (double *) calloc ( naxes[0]*naxes[1], sizeof(double) );
+
+   if ( *atmsim != 0 ) {
+
+     /* Store the image */
+     ndfMap ( *indf, "DATA", "_DOUBLE", "READ", atmsim, &el, status );
+
+   } else {
+     *status = DITS__APP_ERROR;
+     printf ( "dsim_initatm: failed to allocate memory\n" );
+     printf ( strerror(errno) );
+     printf ( "\n" );
+   }   
+
 }
 
 
@@ -5350,7 +5342,7 @@ void dsim_pongframe
 (
 struct dxml_struct inx,      /* structure for values from XML (given) */
 struct dxml_sim_struct sinx, /* structure for sim values from XML (given)*/
-long astnaxes[2],            /* dimensions of simulated image (given) */
+int astnaxes[2],            /* dimensions of simulated image (given) */
 double astscale,             /* pixel size in simulated image (given) */
 double *astsim,              /* astronomical sky (given) */
 long atmnaxes[2],            /* dimensions of simulated atm background
@@ -5457,7 +5449,7 @@ int *status                  /* global status (given and returned) */
     xsky = xpos + sinx.atmxvel * time + sinx.atmzerox;
     ysky = ypos + sinx.atmyvel * time + sinx.atmzeroy;
     if ( sinx.add_atm == 1 ) {
-      dsim_getbilinear ( xsky, ysky, atmscale, atmnaxes[0], atmsim, 
+      dsim_getbilinear ( xsky, ysky, atmscale, (long)atmnaxes[0], atmsim, 
 			 &atmvalue, status );
       if ( !StatusOkP(status) ) {
 	printf ( 
@@ -5875,10 +5867,10 @@ void dsim_simframe
 (
 struct dxml_struct inx,      /* structure for values from XML (given) */
 struct dxml_sim_struct sinx, /* structure for sim values from XML (given)*/
-long astnaxes[2],            /* dimensions of simulated image (given) */
+int astnaxes[2],             /* dimensions of simulated image (given) */
 double astscale,             /* pixel size in simulated image (given) */
 double *astsim,              /* astronomical sky (given) */
-long atmnaxes[2],            /* dimensions of simulated atm background
+int atmnaxes[2],             /* dimensions of simulated atm background
                                 (given) */
 double atmscale,             /* pixel size in simulated atm background
                                 (given) */
@@ -6102,7 +6094,6 @@ int *status                  /* global status (given and returned) */
   bolo2map = astAnnul(bolo2map);
   
 }
-
 
 /*+ dsim_smooth - apply smoothing kernel */
 

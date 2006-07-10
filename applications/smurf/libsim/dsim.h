@@ -340,7 +340,7 @@ double *xbolo,          /* x-bolometer coordinates for array (given) */
 double *ybolo,          /* y-bolometer coordinates for array (given) */
 AstCmpMap *bolo2map,    /* mapping bolo->sky image coordinates (given ) */
 double *astsim,         /* astronomical image (given) */
-long astnaxes[2],       /* dimensions of simulated image (given) */
+int astnaxes[2],       /* dimensions of simulated image (given) */
 double *dbuf,           /* pointer to bolo output (returned) */
 int *status             /* global status (given and returned) */
 );
@@ -630,7 +630,7 @@ void dsim_initast
 (
 char *filename,        /* name of input file (given) */
 double *pixsize,       /* pixel size in arcsec (returned) */
-long naxes[2],         /* dimensions of image (returned) */ 
+int naxes[2],         /* dimensions of image (returned) */ 
 double **astsim,       /* array to hold returned image (returned) */
 AstFrameSet **fitswcs, /* frameset containing WCS of FITS image */
 int *status            /* global status (given and returned) */
@@ -642,7 +642,7 @@ void dsim_initatm
 (
 char *filename,    /* name of input file (given) */
 double *pixsize,   /* pixel size in arcsec (returned) */
-long naxes[2],     /* dimensions of image (returned) */ 
+int naxes[2],     /* dimensions of image (returned) */ 
 double **atmsim,   /* array to hold returned image (returned) */
 int *status        /* global status (given and returned) */
 );
@@ -962,7 +962,7 @@ void dsim_pongframe
 (
 struct dxml_struct inx,      /* structure for values from XML (given) */
 struct dxml_sim_struct sinx, /* structure for sim values from XML (given)*/
-long astnaxes[2],            /* dimensions of simulated image (given) */
+int astnaxes[2],            /* dimensions of simulated image (given) */
 double astscale,             /* pixel size in simulated image (given) */
 double *astsim,              /* astronomical sky (given) */
 long atmnaxes[2],            /* dimensions of simulated atm background
@@ -1054,10 +1054,10 @@ void dsim_simframe
 (
 struct dxml_struct inx,      /* structure for values from XML (given) */
 struct dxml_sim_struct sinx, /* structure for sim values from XML (given)*/
-long astnaxes[2],            /* dimensions of simulated image (given) */
+int astnaxes[2],            /* dimensions of simulated image (given) */
 double astscale,             /* pixel size in simulated image (given) */
 double *astsim,              /* astronomical sky (given) */
-long atmnaxes[2],            /* dimensions of simulated atm background
+int atmnaxes[2],            /* dimensions of simulated atm background
                                 (given) */
 double atmscale,             /* pixel size in simulated atm background
                                 (given) */
