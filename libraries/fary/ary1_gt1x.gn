@@ -89,6 +89,8 @@
 *        error conditions.
 *     24-APR-2006 (DSB):
 *        Made generic and added arguments DOSCL, SCALE and ZERO.
+*     10-JUL-2006 (DSB):
+*        Correct placement of NUM_ include statements.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -103,8 +105,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversions
-      INCLUDE 'NUM_DEF_CVT'      ! NUM_ type conversions
  
 *  Arguments Given:
       LOGICAL BAD
@@ -130,6 +130,10 @@
       <LTYPE> VMAX               ! Maximum scaled value 
       <LTYPE> VMIN               ! Minimum scaled value 
       INTEGER I                  ! Element index
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM_ type conversions
 *.
  
 *  Check inherited global status.
