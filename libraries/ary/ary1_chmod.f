@@ -73,6 +73,8 @@
 *        Further re-write to call ARY1_CHACC to check if access is
 *        available instead of inspecting the access control flags
 *        directly.
+*     7-JUL-2006 (DSB):
+*        Prevent UPDATE or WRITE access if the array is a scaled array.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -86,7 +88,20 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
+      INCLUDE 'ARY_PAR'          ! ARY_ public constants
+      INCLUDE 'ARY_CONST'        ! ARY_ private constants
       INCLUDE 'ARY_ERR'          ! ARY_ error codes
+
+*  Global Variables:
+      INCLUDE 'ARY_DCB'          ! ARY_ Data Control Block
+*        DCB_LOC( ARY__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
+*           Data object locator.
+*        DCB_FRM( ARY__MXDCB ) = CHARACTER * ( ARY__SZFRM ) (Read)
+*           Form of data object.
+
+      INCLUDE 'ARY_ACB'          ! ARY_ Access Control Block
+*        ACB_IDCB( ARY__MXACB ) = INTEGER (Read)
+*           Index to data object entry in the DCB.
 
 *  Arguments Given:
       INTEGER IACB
@@ -98,6 +113,9 @@
 *  External references:
       LOGICAL CHR_SIMLR          ! Case insensitive string comparison
 
+*  Local Variables:
+      CHARACTER * ( ARY__SZACC ) UMODE ! Upper case version of MODE
+      INTEGER IDCB               ! Index to data object entry in the DCB
 *.
 
 *  Check inherited global status.
@@ -109,6 +127,24 @@
      :     CHR_SIMLR( MODE, 'UPDATE' ) ) THEN
          CALL ARY1_CHACC( IACB, 'WRITE', STATUS )
 
+*  If WRITE access is available, further check that the array is not stored 
+*  in scaled format. First ensure that form information is available in the 
+*  DCB. Then report an error if the form is SCALED.
+         IDCB = ACB_IDCB( IACB )
+         CALL ARY1_DFRM( IDCB, STATUS )
+         IF ( STATUS .EQ. SAI__OK .AND. 
+     :        DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
+            STATUS = ARY__ACDEN
+            CALL DAT_MSG( 'ARRAY', DCB_LOC( IDCB ) )
+            UMODE = MODE
+            CALL CHR_UCASE( UMODE )
+            CALL MSG_SETC( 'MODE', UMODE )
+            CALL ERR_REP( 'ARY1_CHMOD_NO', 'The array ^ARRAY cannot '//
+     :                    'be mapped for ^MODE access because it is '//
+     :                    'a scaled array (possible programming '//
+     :                    'error).', STATUS )
+         END IF
+
 *  No action is needed if READ access is requested.
       ELSE IF ( CHR_SIMLR( MODE, 'READ' ) ) THEN
          CONTINUE
@@ -118,9 +154,9 @@
          STATUS = ARY__FATIN
          CALL MSG_SETC( 'ROUTINE', 'ARY1_CHMOD' )
          CALL MSG_SETC( 'BADMODE', MODE )
-         CALL ERR_REP( 'ARY1_CHMOD_MODE',
-     :   'Routine ^ROUTINE called with an invalid MODE argument ' //
-     :   'of ''^BADMODE'' (internal programming error).', STATUS )
+         CALL ERR_REP( 'ARY1_CHMOD_MODE', 'Routine ^ROUTINE called '//
+     :                 'with an invalid MODE argument of ''^BADMODE'''//
+     :                 ' (internal programming error).', STATUS )
       END IF
 
 *  Call error tracing routine and exit.

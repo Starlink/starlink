@@ -75,6 +75,9 @@
 *        not a base array.
 *     8-MAY-2006 (DSB):
 *        Prevent write access to any scaled array.
+*     7-JUL-2006 (DSB):
+*        Delegate responsibilty for preventing write access to scaled 
+*        array to ARY1_CHACC.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -152,13 +155,6 @@
 *  ...WRITE access.
       ELSE IF ( CHR_SIMLR( ACCESS, 'WRITE' ) ) THEN
          OK = ACB_ACC( ARY__WRITE, IACB )
-
-*  Write access is currently not provided to any scaled array.
-         IF( OK) THEN
-            IDCB = ACB_IDCB( IACB )
-            CALL ARY1_DFRM( IDCB, STATUS )         
-            IF ( DCB_FRM( IDCB ) .EQ. 'SCALED' ) OK = .FALSE.
-         END IF
 
 *  If the access type was not recognised, then report an error.
       ELSE
