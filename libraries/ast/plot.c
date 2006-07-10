@@ -597,6 +597,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *     30-JUN-2006 (DSB)
 *        If abbreviating labels, display the last field for identical 
 *        neighbours rather than the whole value.
+*     10-JUL-2006 (DSB)
+*        Make astStripEscapes public so it can be used by the NDF library.
 *class--
 */
 
@@ -22322,36 +22324,54 @@ static const char *SplitValue( AstPlot *this, const char *value, int axis,
 
 const char *astStripEscapes_( const char *text ) {
 /*
-*+
+*++
 *  Name:
-*     astStripEscapes
+c     astStripEscapes
+f     AST_STRIPESCAPES
 
 *  Purpose:
-*     Remove escape sequences from a string.
+*     Remove AST escape sequences from a string.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
-*     #include "plot.h"
-*     const char *astStripEscapes( const char *text )
+c     #include "plot.h"
+c     const char *astStripEscapes( const char *text )
+f     RESULT = AST_STRIPESCAPES( TEXT )
 
 *  Description:
-*     This function modifies the supplied string by removing any
-*     graphical escape sequences.
+*     This function removes AST escape sequences from a supplied string,
+*     returning the resulting text as the function value. The behaviour
+*     of this function can be controlled by invoking the 
+c     astEscapes function,
+f     AST_ESCAPES routine,
+*     which can be used to supress or enable the removal of escape
+*     sequences by this function.
+*
+*     AST escape sequences are used by the Plot class to modify the
+*     appearance and position of sub-strings within a plotted text string.
+*     See the "Escape" attribute for further information.
 
 *  Parameters:
-*     text
-*        Pointer to the string to be checked.
+c     text
+c        Pointer to the string to be checked.
+f     TEXT
+f        The string to be checked.
 
 *  Returned Value:
-*     Pointer to the modified string. If no escape sequences were found
-*     in the supplied string,then a copy of the supplied pointer is
-*     returned. Otherwise, the pointer will point to a static buffer 
-*     holding the modified text. This text will be over-written by
-*     subsequent invocations of this function.
+c     astStripEscapes()
+f     AST_STRIPESCAPES = CHARACTER 
+c        Pointer to the modified string. If no escape sequences were found
+c        in the supplied string, then a copy of the supplied pointer is
+c        returned. Otherwise, the pointer will point to a static buffer 
+c        holding the modified text. This text will be over-written by
+c        subsequent invocations of this function. If the astEscapes function
+f        The modified string. If the AST_ESCAPES routine
+*        has been called indicating that escape sequences should not be
+*        stripped, then the supplied string is returned without change.
 
-*-
+*--
 */
 
 /* Local Constants: */
@@ -22371,8 +22391,9 @@ const char *astStripEscapes_( const char *text ) {
    result= text;
 
 /* Check inherited status and supplied pointer. Also return if the 
-   string contains no escape sequences. */
-   if( !astOK || !text || !HasEscapes( text ) ) return result;
+   string contains no escape sequences or if stripping of escapes has
+   been supressed. */
+   if( !astOK || astEscapes( -1 ) || !text || !HasEscapes( text ) ) return result;
 
 /* Initialise a pointer to the next character to be read from the
    supplied string. */

@@ -29,6 +29,7 @@
 *     AST_GRFSET
 *     AST_GRFPUSH
 *     AST_GRFPOP
+*     AST_STRIPESCAPES
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
@@ -75,6 +76,8 @@
 *        Added AST_BOUNDINGBOX.
 *     8-JAN-2003 (DSB):
 *        Include "string.h".
+*     10-JUL-2006 (DSB):
+*        Add AST_STRIPESCAPES
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -525,3 +528,44 @@ static int FGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
    return ( *(int (*)( REAL(alpha), REAL(beta) ) )
                   this->grffun[ AST__GSCALES ])( REAL_ARG(alpha), REAL_ARG(beta) );
 }
+
+
+/* NO_CHAR_FUNCTION indicates that the f77.h method of returning a
+   character result doesn't work, so add an extra argument instead and
+   wrap this function up in a normal FORTRAN 77 function (in the file
+   plot.f). */
+#if NO_CHAR_FUNCTION
+F77_SUBROUTINE(ast_stripescapes_a)( CHARACTER(RESULT),
+#else
+F77_SUBROUTINE(ast_stripescapes)( CHARACTER_RETURN_VALUE(RESULT),
+#endif
+                          CHARACTER(TEXT),
+                          INTEGER(STATUS)
+#if NO_CHAR_FUNCTION
+                          TRAIL(RESULT)
+#endif
+                          TRAIL(TEXT) ) {
+   GENPTR_CHARACTER(RESULT)
+   GENPTR_CHARACTER(TEXT)
+   char *text;
+   const char *result; 
+   int i;
+
+   astAt( "AST_STRIPESCAPES", NULL, 0 );
+   astWatchSTATUS(
+      text = astString( TEXT, TEXT_length );
+      result = astStripEscapes( text );
+      i = 0;
+      if ( astOK ) {             /* Copy result */
+         for ( ; result[ i ] && i < RESULT_length; i++ ) {
+            RESULT[ i ] = result[ i ];
+         }
+      }
+      while ( i < RESULT_length ) RESULT[ i++ ] = ' '; /* Pad with blanks */
+      astFree( text );
+   )
+}
+
+
+
+

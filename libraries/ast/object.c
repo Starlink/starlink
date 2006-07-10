@@ -5482,6 +5482,11 @@ c        This macro applies to all Objects.
 f        This routine applies to all Objects.
 
 *  Notes:
+*     - This function also controls whether the 
+c     astStripEscapes 
+f     AST_STRIPESCAPES
+*     function removes escape sequences from the supplied string, or
+*     returns the supplied string without change.
 *     - This function attempts to execute even if an error has already
 *     occurred.
 
