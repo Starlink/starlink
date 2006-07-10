@@ -287,6 +287,8 @@
 *        NDF__SZTYP (NDF__SZTYP is for a numeric type of an NDF).
 *     2006 February 10 (MJC)
 *        Wrap lines at 72.  English spelling.
+*     12-JUL-2006 (DSB):
+*        Use KPG1_CGET (which removes escape sequences) instead of NDF_CGET.
 *     {enter_further_changes_here}
 
 *-
@@ -435,7 +437,7 @@
 *  value.
       CALL NDF_STATE( INDF, 'Title', THERE, STATUS )
       IF ( THERE ) THEN
-         CALL NDF_CGET( INDF, 'Title', CCOMP, STATUS )
+         CALL KPG1_CGET( INDF, 'Title', CCOMP, STATUS )
          IF ( REPORT ) THEN
             CALL MSG_SETC( 'TITLE', CCOMP )
             CALL MSG_OUT( 'M_TITLE', '      Title:  ^TITLE', STATUS )
@@ -451,7 +453,7 @@
 *  value.
       CALL NDF_STATE( INDF, 'Label', THERE, STATUS )
       IF ( THERE ) THEN
-         CALL NDF_CGET( INDF, 'Label', CCOMP, STATUS )
+         CALL KPG1_CGET( INDF, 'Label', CCOMP, STATUS )
          IF ( REPORT ) THEN
             CALL MSG_SETC( 'LABEL', CCOMP )
             CALL MSG_OUT( 'M_LABEL', '      Label:  ^LABEL', STATUS )
@@ -467,7 +469,7 @@
 *  value.
       CALL NDF_STATE( INDF, 'Units', THERE, STATUS )
       IF ( THERE ) THEN
-         CALL NDF_CGET( INDF, 'Units', CCOMP, STATUS )
+         CALL KPG1_CGET( INDF, 'Units', CCOMP, STATUS )
          IF ( REPORT ) THEN
             CALL MSG_SETC( 'UNITS', CCOMP )
             CALL MSG_OUT( 'M_UNITS', '      Units:  ^UNITS', STATUS )
