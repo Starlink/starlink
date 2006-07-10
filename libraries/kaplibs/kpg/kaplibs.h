@@ -55,6 +55,8 @@
 *        Add kpgPtfts
 *     03-JUL-2006 (TIMJ):
 *        Add kpgStatd
+*     10-JUL-2006 (DSB):
+*        Add kpg1_wwrt and kpg1_wread.
 
 *-
 */
@@ -96,12 +98,12 @@ void irqSetqm( IRQLocs *, int, const char *, int, float *, int *, int * );
 int kpgGtfts( int, AstFitsChan ** fchan, int * status );
 int kpgPtfts( int, const AstFitsChan * fchan, int * status );
 
-void kpgStatd( int bad, int el, const double data[], int nclip, 
-	       const float clip[],
-	       int * ngood, int *imin, double * dmin, int * imax,
-	       double * dmax, double * sum, double * mean, double * stdev,
-	       int * ngoodc, int * iminc, double * dminc, int * imaxc,
-	       double * dmaxc,
-	       double * sumc, double * meanc, double * stdevc, int * status );
+void kpgStatd( int, int, const double[], int, const float[], int *, int *, 
+               double *, int *, double *, double *, double *, double *, 
+               int *, int *, double *, int *, double *, double *, double *, 
+               double * , int * );
+
+void kpg1Wwrt( AstObject *, const char *, const HDSLoc *, int * );
+
 
 #endif

@@ -51,6 +51,8 @@
 *        Update GRP interface
 *     30-JUN-2006 (TIMJ):
 *        Add kpg1_statd
+*     10-JUL-2006 (DSB):
+*        Add kpg1_wwrt and kpg1_wread.
 *     {enter_further_changes_here}
 
 *-
@@ -603,5 +605,90 @@ void irqSetqm( IRQLocs *locs, int bad, const char *qname, int size,
 }
 
 
+/* ------------------------------- */
 
+F77_SUBROUTINE(kpg1_wwrt)( INTEGER(IAST),
+                           CHARACTER(NAME), 
+                           CHARACTER(LOC), 
+                           INTEGER(STATUS)
+                           TRAIL(NAME)
+                           TRAIL(LOC) );
+
+void kpg1Wwrt( AstObject *obj, const char *name, const HDSLoc *loc, 
+               int *status ){
+   DECLARE_INTEGER(IAST);
+   DECLARE_CHARACTER_DYN(NAME);
+   DECLARE_CHARACTER(LOC,DAT__SZLOC);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( astP2I( obj ), IAST );
+
+   F77_CREATE_CHARACTER( NAME, strlen( name ) );
+   F77_EXPORT_CHARACTER( name, NAME, NAME_length );
+
+   if ( loc == NULL ) {
+      F77_EXPORT_LOCATOR( DAT__ROOT, LOC );
+   } else {
+      HDS_EXPORT_CLOCATOR( loc, LOC, status );
+   }
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_wwrt)( INTEGER_ARG(&IAST),
+                        CHARACTER_ARG(NAME),
+                        CHARACTER_ARG(LOC),
+                        INTEGER_ARG(&STATUS)
+                        TRAIL_ARG(NAME)
+                        TRAIL_ARG(LOC) );
+
+   F77_FREE_CHARACTER( NAME );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_wread)( CHARACTER(LOC), 
+                            CHARACTER(NAME), 
+                            INTEGER(IAST),
+                            INTEGER(STATUS)
+                            TRAIL(LOC)
+                            TRAIL(NAME) );
+
+void kpg1Wread( const HDSLoc *loc, const char *name, AstObject **obj, 
+                int *status ){
+   DECLARE_CHARACTER(LOC,DAT__SZLOC);
+   DECLARE_CHARACTER_DYN(NAME);
+   DECLARE_INTEGER(IAST);
+   DECLARE_INTEGER(STATUS);
+
+   if ( loc == NULL ) {
+      F77_EXPORT_LOCATOR( DAT__ROOT, LOC );
+   } else {
+      HDS_EXPORT_CLOCATOR( loc, LOC, status );
+   }
+
+   F77_CREATE_CHARACTER( NAME, strlen( name ) );
+   F77_EXPORT_CHARACTER( name, NAME, NAME_length );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_wread)( CHARACTER_ARG(LOC),
+                         CHARACTER_ARG(NAME),
+                         INTEGER_ARG(&IAST),
+                         INTEGER_ARG(&STATUS)
+                         TRAIL_ARG(LOC)
+                         TRAIL_ARG(NAME) );
+   {
+      int tmp;
+      F77_IMPORT_INTEGER( IAST, tmp );
+      *obj = astI2P( tmp );
+   }
+
+   F77_FREE_CHARACTER( NAME );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
 
