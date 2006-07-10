@@ -126,9 +126,9 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
    int ibin;                 /* Histohgram bin index */
    int indf2;                /* Identifier for output NDF */
    int indf;                 /* Identifier for input NDF */
-   int maxbin;               /* Index of bin with largest population */
+   int maxbin = 0;           /* Index of bin with largest population */
    int maxpop;               /* The largest bin population in the histogram */
-   int minbin;               /* Index of bin with smallest population */
+   int minbin = 0;           /* Index of bin with smallest population */
    int minpop;               /* Smallest bin population found so far */
    int nbad;                 /* Number of rejected pixels */
    int size;                 /* Size of GRP group */
