@@ -442,6 +442,13 @@ This will include native PGPLOT in the link list, and cause all GKS and IDI
 related items to be removed.
 
 
+
+\section{Changes in Version 2.8}
+\begin{itemize}
+\item Added KPG1\_CGET, which returns the value of an NDF character 
+     component removing any AST or PGPLOT escape sequences.
+\end{itemize}
+
 \section{Changes in Version 2.7}
 \begin{itemize}
 \item A new routine LPG\_REPLA has been added. It controls a new option
@@ -18952,6 +18959,83 @@ from one graphical element to another.
    }{
       Copyright (C) 1998 Central Laboratory of the Research Councils.
       Copyright (C) 2005 Particle Physics \& Astronomy Research Council.
+      All Rights Reserved.
+   }
+   \sstdiytopic{
+      Licence
+   }{
+      This program is free software; you can redistribute it and/or
+      modify it under the terms of the GNU General Public License as
+      published by the Free Software Foundation; either version 2 of
+      the License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be
+      useful,but WITHOUT ANY WARRANTY; without even the implied
+      warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+      PURPOSE. See the GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program; if not, write to the Free Software
+      Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+      02111-1307, USA
+   }
+}
+\sstroutine{
+   KPG1\_CGET
+}{
+   Obtain an NDF character component, removing escape sequences
+}{
+   \sstdescription{
+      The routine obtains the value of the specified character
+      component of an NDF (i.e. the value of the LABEL, TITLE or UNITS
+      component). It is identical to NDF\_CGET except that any PGPLOT or
+      AST escape sequences in the string are removed.
+   }
+   \sstinvocation{
+      CALL KPG1\_CGET( INDF, COMP, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         COMP = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the character component whose value is required:
+         {\tt '}LABEL{\tt '}, {\tt '}TITLE{\tt '} or {\tt '}UNITS{\tt '}.
+      }
+      \sstsubsection{
+         VALUE = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The component{\tt '}s value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the requested component is in an undefined state, then the
+         VALUE argument will be returned unchanged. A suitable default
+         should therefore be established before calling this routine.
+
+         \sstitem
+         If the length of the VALUE argument is too short to
+         accommodate the returned result without losing significant
+         (non-blank) trailing characters, then this will be indicated by
+         an appended ellipsis, i.e. {\tt '}...{\tt '}. No error will result.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 2006 Particle Physics \& Astronomy Research Council.
       All Rights Reserved.
    }
    \sstdiytopic{

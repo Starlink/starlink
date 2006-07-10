@@ -164,6 +164,7 @@ kpg1_axrng.f \
 kpg1_axtyp.f \
 kpg1_bilnr.f \
 kpg1_ceil.f \
+kpg1_cget.f \
 kpg1_cmuld.f \
 kpg1_cnlim.f \
 kpg1_colnm.f \
