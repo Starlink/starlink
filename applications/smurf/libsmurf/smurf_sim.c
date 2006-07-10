@@ -159,10 +159,10 @@ void smurf_sim( int *status ) {
   float aeff[3];                  /* output of wvmOpt */
   double *airmass=NULL;           /* mean airmass of observation */
   char arraynames[80];            /* list of unparsed subarray names */
-  long astnaxes[2];               /* dimensions of simulated image */
+  int astnaxes[2];                /* dimensions of simulated image */
   double astscale;                /* pixel size in simulated image */
   double *astsim=NULL;            /* astronomical sky */
-  long atmnaxes[2];               /* dimensions of simulated atm background */
+  int atmnaxes[2];                /* dimensions of simulated atm background */
   double atmscale;                /* pixel size in simulated atm background */
   double *atmsim=NULL;            /* atmospheric emission */
   double *base_az=NULL;           /* Az of telescope base */
@@ -351,7 +351,6 @@ void smurf_sim( int *status ) {
       /* Get simulation of astronomical image as smoothed by PSF */
       msgOutif(MSG__VERB, FUNC_NAME, 
 	       "Get astronomical image", status);        
-
       dsim_initast ( sinx.astname, &astscale, astnaxes, &astsim, &fitswcs, 
 		     status );
 
