@@ -156,7 +156,13 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  If the box is null, return without doing anything.                  
+*   Initialize the returned bounding box.
+      DO I = 1, NDIM
+         RUBOX( I ) = VAL__MINI
+         RLBOX( I ) = VAL__MAXI
+      END DO
+
+*  If the input box is null, return without doing anything.                  
       IF( LBOX( 1 ) .NE. VAL__MINI ) THEN
 
 *  Find the inverse of the supplied transformation (i.e. from pixel to
@@ -165,12 +171,6 @@
 
 *  Store the square of the circle radius.
          RSQ = PAR( NDIM + 1 )**2
-
-*   Initialize the returned bounding box.
-         DO I = 1, NDIM
-            RUBOX( I ) = VAL__MINI
-            RLBOX( I ) = VAL__MAXI
-         END DO
 
 *  Working in a variable number of dimensions introduces complications
 *  not met if the dimensionality is fixed; particularly, arrays cannot
