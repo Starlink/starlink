@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 dist_bin_SCRIPTS = ary_link ary_link_adam
+cincludedir = $(includedir)/star
 
 # Note that "classic" has a libary and libary_adam but they
 # are identical. Since everyone goes through the _link scripts
@@ -21,14 +22,17 @@ if !NOPIC
 libary_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
-include_HEADERS = $(PUBLIC_INCLUDES)
+include_HEADERS = $(PUBLIC_F_INCLUDES)
+cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 PRIVATE_INCLUDES = ARY_ACB ARY_CONST ARY_DCB ARY_MCB ARY_PCB ARY_TCB
 
-PUBLIC_INCLUDES = ARY_PAR
-include_MESSAGES = ARY_ERR
+PUBLIC_F_INCLUDES = ARY_PAR
+PUBLIC_C_INCLUDES = 
+PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
+include_MESSAGES = ary_err.h ARY_ERR
 
 GEN_F_ROUTINES = $(ARY_N_GEN:.gn=.f) 
 
@@ -73,7 +77,7 @@ ary_sect.f ary_shift.f ary_size.f ary_ssect.f ary_state.f ary_stype.f  \
 ary_temp.f ary_trace.f ary_type.f ary_unmap.f ary_valid.f ary_verfy.f \
 ary1_cpscl.f ary1_dscl.f ary1_vscl.f
 
-BUILT_SOURCES = ARY_ERR
+BUILT_SOURCES = $(include_MESSAGES)
 
 
 # Testing
