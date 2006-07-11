@@ -130,6 +130,8 @@
 #include "star/grp.h"
 #include "smf_typ.h"
 
+void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status );
+
 void smf_boxcar1 ( double *series, const int ninpts, int window, int *status);
 
 void smf_calc_stats( const smfData *data, const char *mode, const int index,
@@ -156,6 +158,12 @@ void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
 
 void smf_close_file( smfData **, int *status);
 
+void smf_close_mapcoord( smfData *data, int *status );
+
+void smf_close_related( smfArray **relfiles, int *status );
+
+void smf_close_smfGroup( smfGroup **group, int *status );
+
 void smf_correct_extinction( smfData *data, const char *method, 
 			     const int quick, double tau, int *status);
 
@@ -166,6 +174,8 @@ smfFile* smf_create_smfFile( int * status );
 smfHead* smf_create_smfHead( int * status );
 
 smfDA*   smf_create_smfDA( int * status );
+
+smfArray *smf_create_smfArray( const size_t size, int *status );
 
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
@@ -186,6 +196,10 @@ smf_construct_smfHead( smfHead * tofill,
 		       AstFrameSet * wcs, AstFitsChan * fitshdr,
 		       struct sc2head * allsc2heads,
 		       dim_t curframe, dim_t nframes, int * status );
+
+smfGroup * 
+smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups, 
+			const int nrelated, int *status );
 
 
 smfHead * smf_deepcopy_smfHead ( const smfHead *old, int * status);
@@ -242,6 +256,9 @@ HDSLoc *smf_get_xloc ( const smfData *data, const char *extname,
 			const char *extype, const char *accmode, 
 			const int ndims, const int *dims, int *status );
 
+void smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave, 
+		      smfGroup **group, int *status );
+
 int smf_history_check( const smfData* data, const char * appl, int *status);
 
 void smf_history_read( smfData* data, int *status);
@@ -255,6 +272,10 @@ void smf_history_write( const smfData* data, const char * appl,
 void smf_insert_tslice ( smfData **idata, smfData *tdata, int index, 
                          int *status );
 
+void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
+ 		     double *map, double *variance, double *weights,
+	 	     int msize, int *status );
+
 void * smf_malloc( size_t nelem, size_t bytes_per_elem, int zero, 
                    int * status );
 
@@ -263,6 +284,11 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index,
 
 void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 		    smfData ** data, int *status);
+
+void smf_open_mapcoord( smfData *data, int *status );
+
+void smf_open_related( const smfGroup *group, const int subindex, smfArray **relfiles, 
+		       int *status );
 
 double smf_scale_tau ( const double tauwvm, const char *filter, int *status);
 
@@ -298,35 +324,8 @@ void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize,
 			 int flags, double *map, double *mapweight, 
 			 double *mapvar, int msize, int *status );
 
-void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
- 		     double *map, double *variance, double *weights,
-	 	     int msize, int *status );
-
-void smf_dream_setjig( char subarray[], int npath, double grid_step_x, 
-  double grid_step_y, double jigpath[][2], int *status);
-
-smfArray *smf_create_smfArray( const size_t size, int *status );
-
-void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status );
-
-void smf_open_mapcoord( smfData *data, int *status );
-
 void smf_dreamsolve( smfData *data, Grp *pixgrp, Grp *pstgrp, int index, 
 		     int *status );
 
-void smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave, 
-		      smfGroup **group, int *status );
-
-smfGroup * smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups, 
-				   const int nrelated, int *status );
-
-void smf_open_related( const smfGroup *group, const int subindex, smfArray **relfiles, 
-		       int *status );
-
-void smf_close_related( smfArray **relfiles, int *status );
-
-void smf_close_mapcoord( smfData *data, int *status );
-
-void smf_close_smfGroup( smfGroup **group, int *status );
 
 #endif /* SMF_DEFINED */
