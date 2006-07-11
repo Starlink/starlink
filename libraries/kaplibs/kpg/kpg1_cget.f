@@ -108,10 +108,10 @@
      :               %VAL( LEN( COMP ) ), %VAL( BUFLEN ) )
 
 *  Remove AST escape sequences.
-      REMESC = AST_ESCAPES( 0, STATUS );
+      REMESC = AST_ESCAPES( 0, STATUS )
       VALUE = AST_STRIPESCAPES( %VAL( CNF_PVAL( IPBUF ) ), STATUS, 
      :                          %VAL( BUFLEN ) )
-      REMESC = AST_ESCAPES( REMESC, STATUS );
+      REMESC = AST_ESCAPES( REMESC, STATUS )
 
 *  Remove PGPLOT escape sequences.
       CALL KPG1_PGESC( VALUE, STATUS )
