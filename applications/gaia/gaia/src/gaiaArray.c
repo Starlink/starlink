@@ -374,8 +374,8 @@ void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
     int normtype;
     int type = cubeinfo->type;
     size_t nel;
-    void *normPtr;
-    void *outPtr;
+    void *normPtr = NULL;
+    void *outPtr = NULL;
 
     /* Get the raw image data */
     outPtr = NULL;
@@ -1014,6 +1014,7 @@ void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
         }
     }
     fullMaskPtr = malloc( planeSize * sizeof( int ) );
+    lbnd[0] = ubnd[0] = lbnd[1] = ubnd[1] = 0;
     if ( gaiaUtilsCreateArdMask( region, fullMaskPtr, mdims, lbnd, ubnd,
                                  &error_mess ) != 1 ) {
 
