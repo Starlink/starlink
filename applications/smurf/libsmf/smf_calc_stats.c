@@ -61,6 +61,9 @@
 *     2006-05-26 (AGG):
 *        - Replace GSL calls with weighted versions to cope with
 *          bad values
+*     2006-07-10 (AGG):
+*        - Fix indexing bug
+*        - Eliminate GSL calls, now call kpg1_statd
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -92,15 +95,13 @@
 #include <stdio.h>
 #include <string.h>
 
-/* GSL includes */
-#include <gsl/gsl_statistics_double.h>
-
 /* Starlink includes */
 #include "sae_par.h"
 #include "ast.h"
 #include "mers.h"
 #include "msg_par.h"
 #include "prm_par.h"
+#include "star/kaplibs.h"
 
 /* SMURF includes */
 #include "smf.h"
@@ -109,6 +110,9 @@
 
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_calc_stats"
+
+/* Maximum number of sigma-clipping values */
+#define MXCLIP 5
 
 void smf_calc_stats ( const smfData *data, const char *mode, const int index,
                       int lo, int hi, double *mean, double *sigma, 
@@ -124,6 +128,27 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
   double *statsdata = NULL;   /* Pointer to array for computing stats */
   int temp;                   /* Temporary variable */
   double *weight = NULL;      /* Pointer to weights array */
+
+  int nclip = 0;              /* Number of K-sigma clipping iterations to apply */
+  float clip[ MXCLIP ];       /* Array of clipping limits for successive iterations,
+				 expressed as standard deviations. */
+
+  int bad = 1;                /* Do we check for bad pixels? Default to yes */
+  int ngood;                  /* Number of valid pixels before clipping */
+  int imin;                   /* */
+  double dmin;                /* */
+  int imax;                   /* */
+  double dmax;                /* */
+  double sum;                 /* Sum of valid pixels before clipping */
+  double stdev;               /* Standard deviation of the above */
+  int ngoodc;                 /* */
+  int iminc;                  /* */
+  double dminc;               /* */
+  int imaxc;                  /* */
+  double dmaxc;               /* */
+  double sumc;                /* Sum of valid pixels after clipping */
+  double meanc;               /* Mean of valid pixels after clipping */
+  double stdevc;              /* Standard deviation of the above*/
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -212,11 +237,22 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
     hi = temp;
     msgOutif(MSG__VERB, FUNC_NAME, "Oops - lo > hi. Swapping them round.", 
 	     status);
-  }
+  }  
 
   /* If lo and hi are both zero then the whole range is assumed */
   if ( lo == 0 && hi == 0 ) {
     hi = nsamp - 1;
+  }
+
+  /* Check if they're equal */
+  if ( lo == hi ) {
+    if ( *status == SAI__OK) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, 
+	     "Requested index range is zero (lo = hi). Unable to compute statistics.", 
+	     status);
+      return;
+    }
   }
 
   /* Allocate memory for data */
@@ -239,22 +275,21 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
 
   /* Set range of data. Use <= because the range is inclusive. */
   indata = (data->pntr)[0];
-
   if( indata != NULL ) {
     if ( strncmp( mode, "b", 1 ) == 0 ) {
       /* Pick out a bolometer time series */
       for ( k=lo; k<=hi; k++) {
-	statsdata[k] = indata[index + k*nbol];
-	if ( statsdata[k] != VAL__BADD ) {
-	  weight[k] = 1.0;
+	statsdata[k-lo] = indata[index + k*nbol];
+	if ( statsdata[k-lo] != VAL__BADD ) {
+	  weight[k-lo] = 1.0;
 	}
       }
     } else {
-      /* Pick out a range of bolomters from a timeslice */
+      /* Pick out a range of bolometers from a timeslice */
       for ( k=lo; k<=hi; k++) {
-	statsdata[k] = indata[nbol*index + k];
-	if ( statsdata[k] != VAL__BADD ) {
-	  weight[k] = 1.0;
+	statsdata[k-lo] = indata[nbol*index + k];
+	if ( statsdata[k-lo] != VAL__BADD ) {
+	  weight[k-lo] = 1.0;
 	}
       }
     }
@@ -265,8 +300,10 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
 
   /* Calculate stats */
   if ( *status == SAI__OK) {
-    *mean = gsl_stats_wmean( weight, 1, statsdata, 1, npts );
-    *sigma = gsl_stats_wsd( weight, 1, statsdata, 1, npts );
+    kpgStatd( bad, npts, statsdata, nclip, clip, 
+	      &ngood, &imin, &dmin, &imax, &dmax, &sum, mean, sigma,
+	      &ngoodc, &iminc, &dminc, &imaxc, &dmaxc, &sumc, &meanc, &stdevc,
+	      status);
   }    
 
   /* Free resources */
