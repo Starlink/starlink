@@ -4,7 +4,7 @@
 *     smf_calc_stats
 
 *  Purpose:
-*     Low-level routine to compute statistics using GSL
+*     Low-level routine to compute statistics of a range of values
 
 *  Language:
 *     Starlink ANSI C
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_calc_stats ( const smfData *data, const char *mode, const int index,
-*                      int lo, int hi, double *mean, double *sigma,
+*                      int lo, int hi, double *mean, double *stdev,
 *                      int *status ) 
 
 *  Arguments:
@@ -30,7 +30,7 @@
 *        Upper index bound into array
 *     mean = double* (Returned)
 *        Mean over specified interval
-*     sigma = double* (Returned)
+*     stdev = double* (Returned)
 *        Standard deviation of sample
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -63,7 +63,9 @@
 *          bad values
 *     2006-07-10 (AGG):
 *        - Fix indexing bug
-*        - Eliminate GSL calls, now call kpg1_statd
+*        - Eliminate GSL calls, now call kpgStatd
+*     2006-07-11 (AGG):
+*        Delete weight-setting code
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -115,7 +117,7 @@
 #define MXCLIP 5
 
 void smf_calc_stats ( const smfData *data, const char *mode, const int index,
-                      int lo, int hi, double *mean, double *sigma, 
+                      int lo, int hi, double *mean, double *stdev, 
 		      int *status) {
 
   /* Local variables */
@@ -127,25 +129,28 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
   int nsamp;                  /* Number of samples */
   double *statsdata = NULL;   /* Pointer to array for computing stats */
   int temp;                   /* Temporary variable */
-  double *weight = NULL;      /* Pointer to weights array */
 
-  int nclip = 0;              /* Number of K-sigma clipping iterations to apply */
+  /* Current list of variables for kpgStatd - move into API as appropriate */
+  int nclip = 0;              /* Number of K-sigma clipping iterations to apply: 
+				 none at present  */
   float clip[ MXCLIP ];       /* Array of clipping limits for successive iterations,
 				 expressed as standard deviations. */
-
   int bad = 1;                /* Do we check for bad pixels? Default to yes */
   int ngood;                  /* Number of valid pixels before clipping */
-  int imin;                   /* */
-  double dmin;                /* */
-  int imax;                   /* */
-  double dmax;                /* */
+  int imin;                   /* Index where the pixel with the lowest value was 
+				 (first) found before clipping */
+  double dmin;                /* Minimum pixel value in the array before clipping */
+  int imax;                   /* Index where the pixel with the highest value was 
+				 (first) found before clipping*/
+  double dmax;                /* Maximum pixel value in the array before clipping */
   double sum;                 /* Sum of valid pixels before clipping */
-  double stdev;               /* Standard deviation of the above */
-  int ngoodc;                 /* */
-  int iminc;                  /* */
-  double dminc;               /* */
-  int imaxc;                  /* */
-  double dmaxc;               /* */
+  int ngoodc;                 /* Number of valid pixels in the array after clipping */
+  int iminc;                  /* Index where the pixel with the lowest value was 
+				 (first) found after clipping */
+  double dminc;               /* Minimum pixel value in the array after clipping */
+  int imaxc;                  /* Index where the pixel with the highest value was 
+				 (first) found after clipping */
+  double dmaxc;               /* Maximum pixel value in the array after clipping */
   double sumc;                /* Sum of valid pixels after clipping */
   double meanc;               /* Mean of valid pixels after clipping */
   double stdevc;              /* Standard deviation of the above*/
@@ -155,7 +160,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
 
   /* Initialize mean and std deviation to bad values */
   *mean = VAL__BADD;
-  *sigma = VAL__BADD;
+  *stdev = VAL__BADD;
 
   /* Do we have 2-D image or 3-D timeseries data? */
   if ( data->ndims != 3 ) {
@@ -265,14 +270,6 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
     return;
   }
 
-  /* Note the weights array is initialized to zero */
-  weight = smf_malloc( npts, sizeof(double), 1, status );
-  if( weight == NULL ) {
-    errRep( FUNC_NAME, "Unable to allocate memory for weight array", 
-	    status );
-    return;
-  }
-
   /* Set range of data. Use <= because the range is inclusive. */
   indata = (data->pntr)[0];
   if( indata != NULL ) {
@@ -280,17 +277,11 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
       /* Pick out a bolometer time series */
       for ( k=lo; k<=hi; k++) {
 	statsdata[k-lo] = indata[index + k*nbol];
-	if ( statsdata[k-lo] != VAL__BADD ) {
-	  weight[k-lo] = 1.0;
-	}
       }
     } else {
       /* Pick out a range of bolometers from a timeslice */
       for ( k=lo; k<=hi; k++) {
 	statsdata[k-lo] = indata[nbol*index + k];
-	if ( statsdata[k-lo] != VAL__BADD ) {
-	  weight[k-lo] = 1.0;
-	}
       }
     }
   } else {
@@ -301,7 +292,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
   /* Calculate stats */
   if ( *status == SAI__OK) {
     kpgStatd( bad, npts, statsdata, nclip, clip, 
-	      &ngood, &imin, &dmin, &imax, &dmax, &sum, mean, sigma,
+	      &ngood, &imin, &dmin, &imax, &dmax, &sum, mean, stdev,
 	      &ngoodc, &iminc, &dminc, &imaxc, &dmaxc, &sumc, &meanc, &stdevc,
 	      status);
   }    
@@ -309,8 +300,5 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
   /* Free resources */
   if ( statsdata != NULL)
     smf_free( statsdata, status );
-  if ( weight != NULL)
-    smf_free( weight, status );
-
 
 }
