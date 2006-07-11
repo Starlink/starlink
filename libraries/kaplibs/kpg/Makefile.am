@@ -200,6 +200,7 @@ kpg1_listc.f \
 kpg1_lutin.f \
 kpg1_lutk2.f \
 kpg1_map.f \
+kpg1_mxmnx.f \
 kpg1_nacvt.f \
 kpg1_nag2r.f \
 kpg1_nagtc.f \

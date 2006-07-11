@@ -7,6 +7,8 @@ and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
 Version 2.8
+   - Added KPG1_MXMNX, which provides a single interface to the
+     existing generic KPG1_MXMN<T> routines.
    - Added KPG1_CGET, which returns the value of an NDF character 
      component removing any AST or PGPLOT escape sequences.
    - kaplibs_link script now works without attempting to load ADAM
