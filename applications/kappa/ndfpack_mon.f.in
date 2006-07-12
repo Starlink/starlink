@@ -261,6 +261,10 @@
          ELSE IF ( NAME .EQ. 'NDFCOPY' ) THEN
             CALL NDFCOPY ( STATUS )
 
+*  Compresses an NDF 
+         ELSE IF ( NAME .EQ. 'NDFCOMPRESS' ) THEN
+            CALL NDFCOMPRESS ( STATUS )
+
 *  Displays the attributes of an NDF data structure.
          ELSE IF ( NAME .EQ. 'NDFTRACE' ) THEN
             CALL NDFTRACE ( STATUS )
