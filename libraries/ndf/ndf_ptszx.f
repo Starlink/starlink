@@ -1,7 +1,7 @@
-      SUBROUTINE NDF_SSZR( SCALE, ZERO, INDF, COMP, STATUS )
+      SUBROUTINE NDF_PTSZR( SCALE, ZERO, INDF, COMP, STATUS )
 *+
 *  Name:
-*     NDF_SSZR
+*     NDF_PTSZR
 
 *  Purpose:
 *     Set new scale and zero values for an NDF array component
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDF_SSZR( SCALE, ZERO, INDF, COMP, STATUS )
+*     CALL NDF_PTSZR( SCALE, ZERO, INDF, COMP, STATUS )
 
 *  Description:
 *     The routine sets new values for the scale and zero values
@@ -191,7 +191,7 @@
                   IF ( NDF1_SIMLR( COMP( F : L ), 'AXIS',
      :                             NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZR_AXI',
+                     CALL ERR_REP( 'NDF_PTSZR_AXI',
      :               'Scale and zero values cannot be set for an ' //
      :               'AXIS component (possible programming error).',
      :               STATUS )
@@ -204,7 +204,7 @@
                      IF ( ACB_DMAP( IACB ) ) THEN
 
                         STATUS = NDF__ACDEN
-                        CALL ERR_REP( 'NDF_SSZR_SZMP',
+                        CALL ERR_REP( 'NDF_PTSZR_SZMP',
      :                  'Scale and zero values cannot be set for a ' //
      :                  'DATA component since the array is currently '//
      :                  'mapped for access (possible programming '//
@@ -213,7 +213,7 @@
 *  Otherwise, use the ARY_ system to set the scale and zero values for
 *  the data array.
                      ELSE
-                        CALL ARY_SSZR( ACB_DID( IACB ), SCALE, ZERO, 
+                        CALL ARY_PTSZR( ACB_DID( IACB ), SCALE, ZERO, 
      :                                   STATUS )
                      END IF
 
@@ -223,7 +223,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'EXTENSION',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZR_EXT',
+                     CALL ERR_REP( 'NDF_PTSZR_EXT',
      :               'Scale and zero values cannot be set for an ' //
      :               'EXTENSION (possible programming error).', STATUS )
 
@@ -233,7 +233,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'HISTORY',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZR_HIS',
+                     CALL ERR_REP( 'NDF_PTSZR_HIS',
      :               'Scale and zero values cannot be set for an ' //
      :               'HISTORY component (possible programming error).',
      :               STATUS )
@@ -244,7 +244,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'LABEL',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZR_LAB',
+                     CALL ERR_REP( 'NDF_PTSZR_LAB',
      :               'Scale and zero values cannot be set for an ' //
      :               'LABEL component (possible programming error).',
      :               STATUS )
@@ -255,7 +255,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'QUALITY',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZR_QUA',
+                     CALL ERR_REP( 'NDF_PTSZR_QUA',
      :               'Scale and zero values cannot be set for an ' //
      :               'QUALITY component (possible programming error).',
      :               STATUS )
@@ -266,7 +266,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'TITLE',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZR_TIT',
+                     CALL ERR_REP( 'NDF_PTSZR_TIT',
      :               'Scale and zero values cannot be set for an ' //
      :               'TITLE component (possible programming error).',
      :               STATUS )
@@ -277,7 +277,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'UNITS',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZR_UNI',
+                     CALL ERR_REP( 'NDF_PTSZR_UNI',
      :               'Scale and zero values cannot be set for an ' //
      :               'UNITS component (possible programming error).',
      :               STATUS )
@@ -289,7 +289,7 @@
      :                                  NDF__MINAB ) ) THEN
                      IF ( ACB_VMAP( IACB ) ) THEN
                         STATUS = NDF__ACDEN
-                        CALL ERR_REP( 'NDF_SSZR_SZMP',
+                        CALL ERR_REP( 'NDF_PTSZR_SZMP',
      :                  'Scale and zero values cannot be set for a ' //
      :                  'VARIANCE component since the array is '//
      :                  'currently mapped for access (possible '//
@@ -307,7 +307,7 @@
 
 *  If it exists, then set the scaling.
                            IF ( THERE ) THEN
-                              CALL ARY_SSZR( ACB_VID( IACB ), SCALE, 
+                              CALL ARY_PTSZR( ACB_VID( IACB ), SCALE, 
      :                                         ZERO, STATUS )
                            END IF
                         END IF
@@ -317,7 +317,7 @@
                   ELSE
                      STATUS = NDF__CNMIN
                      CALL MSG_SETC( 'BADCOMP', COMP( F : L ) )
-                     CALL ERR_REP( 'NDF_SSZR_COMP',
+                     CALL ERR_REP( 'NDF_PTSZR_COMP',
      :                             'Invalid array component name ' //
      :                             '''^BADCOMP'' specified ' //
      :                             '(possible programming error).',
@@ -336,7 +336,7 @@
 *  processed, then report an error.
          IF ( ( STATUS .EQ. SAI__OK ) .AND. ( NCOMP .EQ. 0 ) ) THEN
             STATUS = NDF__NOCMP
-            CALL ERR_REP( 'NDF_SSZR_NONE',
+            CALL ERR_REP( 'NDF_PTSZR_NONE',
      :                    'No array component name specified ' //
      :                    '(possible programming error).', STATUS )
          END IF
@@ -345,17 +345,17 @@
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'NDF_SSZR_ERR',
-     :   'NDF_SSZR: Error setting the scale and zero values for an '//
+         CALL ERR_REP( 'NDF_PTSZR_ERR',
+     :   'NDF_PTSZR: Error setting the scale and zero values for an '//
      :   'NDF array component.', STATUS )
-         CALL NDF1_TRACE( 'NDF_SSZR', STATUS )
+         CALL NDF1_TRACE( 'NDF_PTSZR', STATUS )
       END IF
 
       END
-      SUBROUTINE NDF_SSZI( SCALE, ZERO, INDF, COMP, STATUS )
+      SUBROUTINE NDF_PTSZI( SCALE, ZERO, INDF, COMP, STATUS )
 *+
 *  Name:
-*     NDF_SSZI
+*     NDF_PTSZI
 
 *  Purpose:
 *     Set new scale and zero values for an NDF array component
@@ -364,7 +364,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDF_SSZI( SCALE, ZERO, INDF, COMP, STATUS )
+*     CALL NDF_PTSZI( SCALE, ZERO, INDF, COMP, STATUS )
 
 *  Description:
 *     The routine sets new values for the scale and zero values
@@ -544,7 +544,7 @@
                   IF ( NDF1_SIMLR( COMP( F : L ), 'AXIS',
      :                             NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZI_AXI',
+                     CALL ERR_REP( 'NDF_PTSZI_AXI',
      :               'Scale and zero values cannot be set for an ' //
      :               'AXIS component (possible programming error).',
      :               STATUS )
@@ -557,7 +557,7 @@
                      IF ( ACB_DMAP( IACB ) ) THEN
 
                         STATUS = NDF__ACDEN
-                        CALL ERR_REP( 'NDF_SSZI_SZMP',
+                        CALL ERR_REP( 'NDF_PTSZI_SZMP',
      :                  'Scale and zero values cannot be set for a ' //
      :                  'DATA component since the array is currently '//
      :                  'mapped for access (possible programming '//
@@ -566,7 +566,7 @@
 *  Otherwise, use the ARY_ system to set the scale and zero values for
 *  the data array.
                      ELSE
-                        CALL ARY_SSZI( ACB_DID( IACB ), SCALE, ZERO, 
+                        CALL ARY_PTSZI( ACB_DID( IACB ), SCALE, ZERO, 
      :                                   STATUS )
                      END IF
 
@@ -576,7 +576,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'EXTENSION',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZI_EXT',
+                     CALL ERR_REP( 'NDF_PTSZI_EXT',
      :               'Scale and zero values cannot be set for an ' //
      :               'EXTENSION (possible programming error).', STATUS )
 
@@ -586,7 +586,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'HISTORY',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZI_HIS',
+                     CALL ERR_REP( 'NDF_PTSZI_HIS',
      :               'Scale and zero values cannot be set for an ' //
      :               'HISTORY component (possible programming error).',
      :               STATUS )
@@ -597,7 +597,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'LABEL',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZI_LAB',
+                     CALL ERR_REP( 'NDF_PTSZI_LAB',
      :               'Scale and zero values cannot be set for an ' //
      :               'LABEL component (possible programming error).',
      :               STATUS )
@@ -608,7 +608,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'QUALITY',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZI_QUA',
+                     CALL ERR_REP( 'NDF_PTSZI_QUA',
      :               'Scale and zero values cannot be set for an ' //
      :               'QUALITY component (possible programming error).',
      :               STATUS )
@@ -619,7 +619,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'TITLE',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZI_TIT',
+                     CALL ERR_REP( 'NDF_PTSZI_TIT',
      :               'Scale and zero values cannot be set for an ' //
      :               'TITLE component (possible programming error).',
      :               STATUS )
@@ -630,7 +630,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'UNITS',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZI_UNI',
+                     CALL ERR_REP( 'NDF_PTSZI_UNI',
      :               'Scale and zero values cannot be set for an ' //
      :               'UNITS component (possible programming error).',
      :               STATUS )
@@ -642,7 +642,7 @@
      :                                  NDF__MINAB ) ) THEN
                      IF ( ACB_VMAP( IACB ) ) THEN
                         STATUS = NDF__ACDEN
-                        CALL ERR_REP( 'NDF_SSZI_SZMP',
+                        CALL ERR_REP( 'NDF_PTSZI_SZMP',
      :                  'Scale and zero values cannot be set for a ' //
      :                  'VARIANCE component since the array is '//
      :                  'currently mapped for access (possible '//
@@ -660,7 +660,7 @@
 
 *  If it exists, then set the scaling.
                            IF ( THERE ) THEN
-                              CALL ARY_SSZI( ACB_VID( IACB ), SCALE, 
+                              CALL ARY_PTSZI( ACB_VID( IACB ), SCALE, 
      :                                         ZERO, STATUS )
                            END IF
                         END IF
@@ -670,7 +670,7 @@
                   ELSE
                      STATUS = NDF__CNMIN
                      CALL MSG_SETC( 'BADCOMP', COMP( F : L ) )
-                     CALL ERR_REP( 'NDF_SSZI_COMP',
+                     CALL ERR_REP( 'NDF_PTSZI_COMP',
      :                             'Invalid array component name ' //
      :                             '''^BADCOMP'' specified ' //
      :                             '(possible programming error).',
@@ -689,7 +689,7 @@
 *  processed, then report an error.
          IF ( ( STATUS .EQ. SAI__OK ) .AND. ( NCOMP .EQ. 0 ) ) THEN
             STATUS = NDF__NOCMP
-            CALL ERR_REP( 'NDF_SSZI_NONE',
+            CALL ERR_REP( 'NDF_PTSZI_NONE',
      :                    'No array component name specified ' //
      :                    '(possible programming error).', STATUS )
          END IF
@@ -698,17 +698,17 @@
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'NDF_SSZI_ERR',
-     :   'NDF_SSZI: Error setting the scale and zero values for an '//
+         CALL ERR_REP( 'NDF_PTSZI_ERR',
+     :   'NDF_PTSZI: Error setting the scale and zero values for an '//
      :   'NDF array component.', STATUS )
-         CALL NDF1_TRACE( 'NDF_SSZI', STATUS )
+         CALL NDF1_TRACE( 'NDF_PTSZI', STATUS )
       END IF
 
       END
-      SUBROUTINE NDF_SSZD( SCALE, ZERO, INDF, COMP, STATUS )
+      SUBROUTINE NDF_PTSZD( SCALE, ZERO, INDF, COMP, STATUS )
 *+
 *  Name:
-*     NDF_SSZD
+*     NDF_PTSZD
 
 *  Purpose:
 *     Set new scale and zero values for an NDF array component
@@ -717,7 +717,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDF_SSZD( SCALE, ZERO, INDF, COMP, STATUS )
+*     CALL NDF_PTSZD( SCALE, ZERO, INDF, COMP, STATUS )
 
 *  Description:
 *     The routine sets new values for the scale and zero values
@@ -897,7 +897,7 @@
                   IF ( NDF1_SIMLR( COMP( F : L ), 'AXIS',
      :                             NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZD_AXI',
+                     CALL ERR_REP( 'NDF_PTSZD_AXI',
      :               'Scale and zero values cannot be set for an ' //
      :               'AXIS component (possible programming error).',
      :               STATUS )
@@ -910,7 +910,7 @@
                      IF ( ACB_DMAP( IACB ) ) THEN
 
                         STATUS = NDF__ACDEN
-                        CALL ERR_REP( 'NDF_SSZD_SZMP',
+                        CALL ERR_REP( 'NDF_PTSZD_SZMP',
      :                  'Scale and zero values cannot be set for a ' //
      :                  'DATA component since the array is currently '//
      :                  'mapped for access (possible programming '//
@@ -919,7 +919,7 @@
 *  Otherwise, use the ARY_ system to set the scale and zero values for
 *  the data array.
                      ELSE
-                        CALL ARY_SSZD( ACB_DID( IACB ), SCALE, ZERO, 
+                        CALL ARY_PTSZD( ACB_DID( IACB ), SCALE, ZERO, 
      :                                   STATUS )
                      END IF
 
@@ -929,7 +929,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'EXTENSION',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZD_EXT',
+                     CALL ERR_REP( 'NDF_PTSZD_EXT',
      :               'Scale and zero values cannot be set for an ' //
      :               'EXTENSION (possible programming error).', STATUS )
 
@@ -939,7 +939,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'HISTORY',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZD_HIS',
+                     CALL ERR_REP( 'NDF_PTSZD_HIS',
      :               'Scale and zero values cannot be set for an ' //
      :               'HISTORY component (possible programming error).',
      :               STATUS )
@@ -950,7 +950,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'LABEL',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZD_LAB',
+                     CALL ERR_REP( 'NDF_PTSZD_LAB',
      :               'Scale and zero values cannot be set for an ' //
      :               'LABEL component (possible programming error).',
      :               STATUS )
@@ -961,7 +961,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'QUALITY',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZD_QUA',
+                     CALL ERR_REP( 'NDF_PTSZD_QUA',
      :               'Scale and zero values cannot be set for an ' //
      :               'QUALITY component (possible programming error).',
      :               STATUS )
@@ -972,7 +972,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'TITLE',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZD_TIT',
+                     CALL ERR_REP( 'NDF_PTSZD_TIT',
      :               'Scale and zero values cannot be set for an ' //
      :               'TITLE component (possible programming error).',
      :               STATUS )
@@ -983,7 +983,7 @@
                   ELSE IF ( NDF1_SIMLR( COMP( F : L ), 'UNITS',
      :                                  NDF__MINAB ) ) THEN
                      STATUS = NDF__CNMIN
-                     CALL ERR_REP( 'NDF_SSZD_UNI',
+                     CALL ERR_REP( 'NDF_PTSZD_UNI',
      :               'Scale and zero values cannot be set for an ' //
      :               'UNITS component (possible programming error).',
      :               STATUS )
@@ -995,7 +995,7 @@
      :                                  NDF__MINAB ) ) THEN
                      IF ( ACB_VMAP( IACB ) ) THEN
                         STATUS = NDF__ACDEN
-                        CALL ERR_REP( 'NDF_SSZD_SZMP',
+                        CALL ERR_REP( 'NDF_PTSZD_SZMP',
      :                  'Scale and zero values cannot be set for a ' //
      :                  'VARIANCE component since the array is '//
      :                  'currently mapped for access (possible '//
@@ -1013,7 +1013,7 @@
 
 *  If it exists, then set the scaling.
                            IF ( THERE ) THEN
-                              CALL ARY_SSZD( ACB_VID( IACB ), SCALE, 
+                              CALL ARY_PTSZD( ACB_VID( IACB ), SCALE, 
      :                                         ZERO, STATUS )
                            END IF
                         END IF
@@ -1023,7 +1023,7 @@
                   ELSE
                      STATUS = NDF__CNMIN
                      CALL MSG_SETC( 'BADCOMP', COMP( F : L ) )
-                     CALL ERR_REP( 'NDF_SSZD_COMP',
+                     CALL ERR_REP( 'NDF_PTSZD_COMP',
      :                             'Invalid array component name ' //
      :                             '''^BADCOMP'' specified ' //
      :                             '(possible programming error).',
@@ -1042,7 +1042,7 @@
 *  processed, then report an error.
          IF ( ( STATUS .EQ. SAI__OK ) .AND. ( NCOMP .EQ. 0 ) ) THEN
             STATUS = NDF__NOCMP
-            CALL ERR_REP( 'NDF_SSZD_NONE',
+            CALL ERR_REP( 'NDF_PTSZD_NONE',
      :                    'No array component name specified ' //
      :                    '(possible programming error).', STATUS )
          END IF
@@ -1051,10 +1051,10 @@
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'NDF_SSZD_ERR',
-     :   'NDF_SSZD: Error setting the scale and zero values for an '//
+         CALL ERR_REP( 'NDF_PTSZD_ERR',
+     :   'NDF_PTSZD: Error setting the scale and zero values for an '//
      :   'NDF array component.', STATUS )
-         CALL NDF1_TRACE( 'NDF_SSZD', STATUS )
+         CALL NDF1_TRACE( 'NDF_PTSZD', STATUS )
       END IF
 
       END

@@ -122,7 +122,7 @@ int main( int argc, char *argv[] ) {
 /* Set the scale and zero terms for the NDF (this converts it from a simple
    NDF to a scaled NDF). First unmap the data array.                        */
    ndfUnmap( indf, "Data", &status );
-   ndfSszd( SCALE, ZERO, indf, "Data", &status );
+   ndfPtszd( SCALE, ZERO, indf, "Data", &status );
 
 /* Check that the form is now SCALED.                                       */
    ndfForm( indf, "Data", form, 30, &status );

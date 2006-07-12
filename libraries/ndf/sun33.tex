@@ -3773,7 +3773,7 @@ NDF\_PROP, \emph{etc.}) will be an equivalent simple array.
 \item Scaled arrays cannot be created directly. Instead, a simple array
 must first be created (\emph{e.g.} using NDF\_NEW), and this can then be
 converted to a scaled array by assigning scale and zero values to it
-using NDF\_SSZ<T>. So a typical program could create a simple array, map
+using NDF\_PTSZ<T>. So a typical program could create a simple array, map
 it for write access, store the scaled data values in the mapped simple
 array, unmap the array, and then associate scale and zero values with the
 array, thus converting it to a scaled array.
@@ -10546,6 +10546,8 @@ The following is an example \xref{ADAM}{sg4}{} interface file
             {Obtain an NDF placeholder}
 \noteroutine{NDF\_PROP( INDF1, CLIST, PARAM, INDF2, STATUS )}
             {Propagate NDF information to create a new NDF via the ADAM parameter system}
+\noteroutine{NDF\_PTSZx( SCALE, ZERO, INDF, COMP, STATUS )}
+            {Store new scale and zero factors for a scaled array in an NDF}
 \noteroutine{NDF\_PTWCS( IWCS, INDF, STATUS )}
             {Store world coordinate system information in an NDF}
 \noteroutine{NDF\_QMASK( QUAL, BADBIT )}
@@ -15962,6 +15964,75 @@ locator}{sun92}{using_locators}}
    }
 }
 \sstroutine{
+   NDF\_PTSZx
+}{
+   Set new scale and zero values for an NDF array component
+}{
+   \sstdescription{
+      The routine sets new values for the scale and zero values
+      associated with an NDF arraycomponent. If the array is stored
+      in simple or primitive form, then the storage form is changed
+      to scaled.
+   }
+   \sstinvocation{
+      CALL NDF\_PTSZx( SCALE, ZERO, INDF, COMP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         SCALE = REAL (Given)
+      }{
+         The new value for the scaling factor.
+      }
+      \sstsubsection{
+         ZERO = REAL (Given)
+      }{
+         The new value for the zero offset.
+      }
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         COMP = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the NDF array component; {\tt '}DATA{\tt '} or {\tt '}VARIANCE{\tt '}.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the standard Fortran numerical data
+         types: integer, real and double precision. Replace the (lower case) {\tt "}x{\tt "}
+         in the routine name by I, R or D as appropriate.
+
+         \sstitem
+         A comma-separated list of component names may also be
+         supplied, in which case the same scale and zero values will be
+         used for each component in turn.
+
+         \sstitem
+         This routine may only be used to change the scaling of a base
+         NDF. If it is called with an array which is not a base array,
+         then it will return without action. No error will result.
+
+         \sstitem
+         An error will result if the array component, or any part of it,
+         is currently mapped for access (e.g. through another identifier).
+
+         \sstitem
+         This routine has no effect on components which are in an
+         undefined state.
+      }
+   }
+}
+\sstroutine{
    NDF\_PTWCS
 }{
    Store world coordinate system information in an NDF
@@ -16849,7 +16920,7 @@ locator}{sun92}{using_locators}}
 }
 
 \sstroutine{
-   NDF\_SSZx
+   NDF\_PTSZx
 }{
    Set new scale and zero values for an NDF array component
 }{
@@ -16860,7 +16931,7 @@ locator}{sun92}{using_locators}}
       to scaled.
    }
    \sstinvocation{
-      CALL NDF\_SSZx( SCALE, ZERO, INDF, COMP, STATUS )
+      CALL NDF\_PTSZx( SCALE, ZERO, INDF, COMP, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -18282,6 +18353,12 @@ Appendix~\ref{ss:cinterface}.\\[1.0ex]
             {Obtain an NDF placeholder}
 \noteroutineC{\xlabel{ndfProp}void \htmlref{ndfProp}{NDF_PROP}}{( int indf1, const char $*$clist, const char $*$param, int $*$indf2, int $*$status );}
             {Propagate NDF information to create a new NDF via the ADAM parameter system}
+\noteroutineC{\xlabel{ndfPtszd}void \htmlref{ndfPtszd}{NDF_PTSZx}}{( double scale, double zero, int indf, const char $*$comp, int $*$status );}
+            {Store new scale and zero factors for a scaled array in an NDF}
+\noteroutineC{\xlabel{ndfPtszi}void \htmlref{ndfPtszi}{NDF_PTSZx}}{( int scale, int zero, int indf, const char $*$comp, int $*$status );}
+            {Store new scale and zero factors for a scaled array in an NDF}
+\noteroutineC{\xlabel{ndfPtszr}void \htmlref{ndfPtszr}{NDF_PTSZx}}{( float scale, float zero, int indf, const char $*$comp, int $*$status );}
+            {Store new scale and zero factors for a scaled array in an NDF}
 \noteroutineC{\xlabel{ndfPtwcs}void \htmlref{ndfPtwcs}{NDF_PTWCS}}{( AstFrameSet $*$iwcs, int indf, int $*$status );}
             {Store world coordinate system information in an NDF}
 \noteroutineC{\xlabel{ndfQmask}int \htmlref{ndfQmask}{NDF_QMASK}}{( unsigned char qual, unsigned char badbit );}
@@ -18628,7 +18705,7 @@ the NDF\_ system between versions V1.5 and V1.6 (the current version):
 
 \begin{enumerate}
 \item Limited support for NDF array components stored in ``scaled'' form
-has been introduced. The new routine NDF\_SSZx will associate scale and
+has been introduced. The new routine NDF\_PTSZx will associate scale and
 zero values with an existing array component, thus converting it into a
 scaled array. See \S\ref{ss:scaledform}.
 

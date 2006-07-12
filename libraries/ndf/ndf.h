@@ -568,6 +568,24 @@ void ndfProp( int indf1,
               int *indf2,
               int *status );
 
+void ndfPtszi( int scale,
+               int zero,
+               int indf,
+               const char *comp,
+               int *status );
+
+void ndfPtszr( float scale,
+              float zero,
+              int indf,
+              const char *comp,
+              int *status );
+
+void ndfPtszd( double scale,
+              double zero,
+              int indf,
+              const char *comp,
+              int *status );
+
 #define ndfPtwcs(iwcs,indf,status) ndfPtwcs_((AstFrameSet *)(iwcs),indf,status)
 void ndfPtwcs_( AstFrameSet *iwcs,
                 int indf,
