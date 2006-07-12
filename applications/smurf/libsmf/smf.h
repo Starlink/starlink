@@ -324,8 +324,5 @@ void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize,
 			 int flags, double *map, double *mapweight, 
 			 double *mapvar, int msize, int *status );
 
-void smf_dreamsolve( smfData *data, Grp *pixgrp, Grp *pstgrp, int index, 
-		     int *status );
-
 
 #endif /* SMF_DEFINED */
