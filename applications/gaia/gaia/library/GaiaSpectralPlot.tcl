@@ -395,7 +395,28 @@ itcl::class gaia::GaiaSpectralPlot {
       $itk_component(draw) add_menuitems $Graphics
    }
 
-   #  Display a spectrum. The data is wrapped by an instance of GaiaNDAccess.
+   #  Display a spectrum extracted from a 2D region. The data is wrapped by an
+   #  instance of GaiaNDAccess.
+   #
+   #  The extraction region is defined using a 2D ARD description and data
+   #  from each region in a plane is combined to a spectral point using the
+   #  specified combination method.
+   #
+   #  The axis defines the WCS axis that should be used for the plot X axis.
+   #  If autoscale is true, then the plot should be rescaled so that the
+   #  spectrum fits. Otherwise the existing plot bounds are used (unless the
+   #  local autoscale option is enabled, that takes precendence).  The alow and
+   #  ahigh arguments are the range along the axis to extract.
+   public method display_region {accessor axis alow ahigh desc meth \
+                                 autoscale} {
+      #  Get the spectral data from the accessor.
+      #  XXXX Note assumes WCS & data array axes are aligned and in same order.
+      set adr [$accessor getregionspectrum $axis $alow $ahigh $desc $meth 1]
+      display_spectrum_ $adr $accessor $axis $alow $autoscale
+   }
+
+   #  Display a spectrum extracted from a point. The data is wrapped by an
+   #  instance of GaiaNDAccess.
    #
    #  The axis defines the WCS axis that should be used for the plot X axis.
    #  If autoscale is true, then the plot should be rescaled so that the
@@ -408,6 +429,14 @@ itcl::class gaia::GaiaSpectralPlot {
       #  Get the spectral data from the accessor.
       #  XXXX Note assumes WCS & data array axes are aligned and in same order.
       lassign [$accessor getspectrum $axis $alow $ahigh $p1 $p2 1] adr
+      display_spectrum_ $adr $accessor $axis $alow $autoscale
+   }
+
+   #  Display a spectrum whose data are pointed at by "adr". The associated
+   #  cube is wrapped by an instance of GaiaNDAccess (accessor) and the
+   #  axis and offset along that axis, used to extract the spectrum are
+   #  axis and alow. Autoscale determines how the plot limits are determined.
+   protected method display_spectrum_ {adr accessor axis alow autoscale} {
 
       #  Create the main spectral_plot.
       if { $spectrum_ == {} } {
@@ -448,7 +477,28 @@ itcl::class gaia::GaiaSpectralPlot {
       $accessor release $adr
    }
 
-   #  Display the reference spectrum.
+   #  Display a reference spectrum extracted from a region.
+   #
+   #  All the given details should correspond to those given to the 
+   #  displayregion method.
+   public method display_region_reference {accessor axis alow ahigh desc \
+                                           meth} {
+
+      if { $spectrum_ == {} } {
+         return
+      }
+
+      #  Get the spectral data from the accessor.
+      set adr [$accessor getregionspectrum $axis $alow $ahigh $desc $meth 1]
+
+      #  Pass in the data.
+      $itk_component(canvas) coords $spectrum_ refpointer $adr
+
+      #  Finished with the spectral data.
+      $accessor release $adr
+   }
+
+   #  Display a reference spectrum extracted from a point.
    #
    #  All the given details should correspond to those given to the display
    #  method.
@@ -496,8 +546,8 @@ itcl::class gaia::GaiaSpectralPlot {
       set label_ $id
       $itk_component(canvas) itemconfigure $label_ -anchor sw -text $value
       position_label_
-      
-      #  Make sure label is deselected after creation (selection is in 
+
+      #  Make sure label is deselected after creation (selection is in
       #  create_done, so use after to call later).
       after idle "$itk_component(draw) deselect_object $id"
    }
