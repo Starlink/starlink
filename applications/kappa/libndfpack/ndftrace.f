@@ -125,7 +125,8 @@
 *        equal to the number of axes in the current WCS Frame (see 
 *        FDIM).  Celestial axis values will be in units of radians.
 *     FORM = LITERAL (Write)
-*        The storage form of the NDF's data array.
+*        The storage form of the NDF's data array. This will be "SIMPLE",
+*        "PRIMITIVE" or "SCALED".
 *     FTITLE( ) = LITERAL (Write)
 *        The title of each co-ordinate Frame stored in the WCS component
 *        of the NDF.  The elements in this parameter correspond to those
@@ -171,6 +172,15 @@
 *        A TRUE value suppresses the reporting of the NDF's attributes.
 *        It is intended for procedures and scripts where only the
 *        output parameters are needed. [FALSE]
+*     SCALE = _DOUBLE (Write)
+*        The scale factor associated with the data array. This will be
+*        1.0 unless the Data array is stored in SCALED form. See also
+*        SCTYPE, ZERO and FORM. The unscaled data values are derived from
+*        the scaled values as follows: "unscaled = SCALE*scaled + ZERO".
+*     SCTYPE = LITERAL (Write)
+*        The data type of the scaled values stored in the NDF's data 
+*        array. This will be the same as TYPE unless the Data array is
+*        stored in SCALED form. See also FORM, SCALE and ZERO.
 *     TITLE = LITERAL (Write)
 *        The title of the NDF.
 *     TYPE = LITERAL (Write)
@@ -187,6 +197,11 @@
 *     WIDTH( ) = _LOGICAL (Write)
 *        Whether or not there are axis width arrays present in the NDF.
 *        This is only written when FULLAXIS is TRUE and AXIS is TRUE.
+*     ZERO = _DOUBLE (Write)
+*        The zero offset associated with the data array. This will be
+*        0.0 unless the Data array is stored in SCALED form. See also
+*        SCTYPE, SCALE and FORM. The unscaled data values are derived from
+*        the scaled values as follows: "unscaled = SCALE*scaled + ZERO".
 
 *  Examples:
 *     ndftrace mydata
@@ -287,8 +302,10 @@
 *        NDF__SZTYP (NDF__SZTYP is for a numeric type of an NDF).
 *     2006 February 10 (MJC)
 *        Wrap lines at 72.  English spelling.
-*     12-JUL-2006 (DSB):
+*     10-JUL-2006 (DSB):
 *        Use KPG1_CGET (which removes escape sequences) instead of NDF_CGET.
+*     12-JUL-2006 (DSB):
+*        Include information about scaled arrays. Reorder declarations.
 *     {enter_further_changes_here}
 
 *-
@@ -314,48 +331,49 @@
       INTEGER MXFRM              ! Maximum number of WCS Frames
       PARAMETER ( MXFRM = 32 )
 
+      INTEGER SZBUF              ! Size of text buffer
+      PARAMETER ( SZBUF = NDF__MXDIM * ( 2 * VAL__SZI + 3 ) - 2 )
+
+
 *  Local Variables:
       BYTE BADBIT                ! Bad-bits mask
-      CHARACTER * ( 35 ) APPN    ! Last recorded application name
-      CHARACTER * ( 15 ) ATTRIB  ! AST attribute name
-      CHARACTER * ( 8 ) BINSTR   ! Binary bad-bits mask string
-      CHARACTER * ( 80 ) ALABEL( NDF__MXDIM ) ! Axis label
-      CHARACTER * ( 80 ) AUNITS( NDF__MXDIM ) ! Axis units
-      CHARACTER * ( 80 ) CCOMP   ! Character component
-      CHARACTER * ( 80 ) FLABEL( NDF__MXDIM ) ! WCS axis label
-      CHARACTER * ( 80 ) FUNIT( NDF__MXDIM ) ! WCS axis units
-      CHARACTER * ( 80 ) FRMDMN  ! Frame domain
-      CHARACTER * ( 80 ) FRMTTL  ! Frame title
-      CHARACTER * ( 80 ) WCSDMN( MXFRM )  ! Frame domains
-      CHARACTER * ( 80 ) WCSTTL( MXFRM )  ! Frame titles
-      CHARACTER * ( DAT__SZLOC ) XLOC ! Extension locator
-      CHARACTER * ( DAT__SZTYP ) TYPE ! Data type
-      CHARACTER * ( NDF__MXDIM * ( 2 * VAL__SZI + 3 ) - 2 ) BUF ! Text 
-                                 ! buffer for shape information
-      CHARACTER * ( NDF__SZFRM ) CFORM( NDF__MXDIM ) ! Type for axis 
-                                 ! centres 
-      CHARACTER * ( NDF__SZFRM ) FORM ! Storage form
-      CHARACTER * ( NDF__SZFTP ) FTYPE ! Full data type
-      CHARACTER * ( NDF__SZHDT ) CREAT ! History component creation date
-      CHARACTER * ( NDF__SZHDT ) DATE ! Date of last history update
-      CHARACTER * ( NDF__SZHUM ) HMODE ! History update mode
-      CHARACTER * ( NDF__SZTYP ) ATYPE ! Type for axis extent value
-      CHARACTER * ( NDF__SZTYP ) CTYPE( NDF__MXDIM ) ! Type for axis 
-                                 ! centres 
-      CHARACTER * ( DAT__SZTYP ) XTYPE( MXEXTN ) ! Extension name
-      CHARACTER * ( NDF__SZXNM ) XNAME( MXEXTN ) ! Extension name
-      DOUBLE PRECISION AEND( NDF__MXDIM )  ! End of NDF extent along an
-                                 ! axis
-      DOUBLE PRECISION ASTART( NDF__MXDIM )! Start of NDF extent along 
-                                 ! an axis
-      DOUBLE PRECISION GFIRST( 1, NDF__MXDIM ) ! GRID coords of first
-                                 ! pixel
+      CHARACTER ALABEL( NDF__MXDIM )*80 ! Axis label
+      CHARACTER APPN*35          ! Last recorded application name
+      CHARACTER ATTRIB*15        ! AST attribute name
+      CHARACTER ATYPE*( NDF__SZTYP )! Type for axis extent value
+      CHARACTER AUNITS( NDF__MXDIM )*80 ! Axis units
+      CHARACTER BINSTR*8         ! Binary bad-bits mask string
+      CHARACTER BUF*( SZBUF )    ! Text buffer for shape information
+      CHARACTER CCOMP*80         ! Character component
+      CHARACTER CFORM( NDF__MXDIM )*( NDF__SZFRM ) ! Axis centre type
+      CHARACTER CREAT*( NDF__SZHDT )! History component creation date
+      CHARACTER CTYPE( NDF__MXDIM )*( NDF__SZTYP )! Axis centre type
+      CHARACTER DATE*( NDF__SZHDT ) ! Date of last history update
+      CHARACTER FLABEL( NDF__MXDIM )*80 ! WCS axis label
+      CHARACTER FORM*( NDF__SZFRM ) ! Storage form
+      CHARACTER FRMDMN*80        ! Frame domain
+      CHARACTER FRMTTL*80        ! Frame title
+      CHARACTER FTYPE*( NDF__SZFTP )! Full data type
+      CHARACTER FUNIT( NDF__MXDIM )*80  ! WCS axis units
+      CHARACTER HMODE*( NDF__SZHUM ) ! History update mode
+      CHARACTER SCTYP*(DAT__SZTYP)! Data type for scaled arrays
+      CHARACTER TYPE*( DAT__SZTYP )! Data type
+      CHARACTER WCSDMN( MXFRM )*80 ! Frame domains
+      CHARACTER WCSTTL( MXFRM )*80 ! Frame titles
+      CHARACTER XLOC*( DAT__SZLOC )! Extension locator
+      CHARACTER XNAME( MXEXTN )*( NDF__SZXNM ) ! Extension name
+      CHARACTER XTYPE( MXEXTN )*( DAT__SZTYP ) ! Extension name
+      DOUBLE PRECISION AEND( NDF__MXDIM )! Axis value at end of axis
+      DOUBLE PRECISION ASTART( NDF__MXDIM )! Axis value at start of axis
+      DOUBLE PRECISION GFIRST( 1, NDF__MXDIM ) ! GRID coords of 1st pix.
       DOUBLE PRECISION LBIN( NDF__MXDIM )  ! Lower GRID bounds
       DOUBLE PRECISION LBOUT( NDF__MXDIM ) ! Lower WCS bounds
+      DOUBLE PRECISION SCALE      ! Scale factor for scaled arrays
       DOUBLE PRECISION UBIN( NDF__MXDIM )  ! Upper GRID bounds
       DOUBLE PRECISION UBOUT( NDF__MXDIM ) ! Upper WCS bounds
       DOUBLE PRECISION XL( NDF__MXDIM ) ! GRID position at lower limit
       DOUBLE PRECISION XU( NDF__MXDIM ) ! GRID position at upper limit
+      DOUBLE PRECISION ZERO       ! Zero offset for scaled arrays
       INTEGER AXPNTR( 1 )        ! Pointer to axis centres
       INTEGER BBI                ! Bad-bits value as an integer
       INTEGER DIGVAL             ! Binary digit value
@@ -365,16 +383,14 @@
       INTEGER I                  ! Loop counter for dimensions
       INTEGER IAT                ! Used length of string
       INTEGER IAXIS              ! Loop counter for axes
-      INTEGER ICURR              ! Index of Current Frame in WCS 
-                                 ! FrameSet
+      INTEGER ICURR              ! Current Frame index in WCS FrameSet
       INTEGER IDIG               ! Loop counter for binary digits
       INTEGER IEXTN              ! Extension index
       INTEGER IFRAME             ! Frame index
       INTEGER INDF               ! NDF identifier
       INTEGER IWCS               ! AST identifier for NDF's WCS FrameSet
       INTEGER LBND( NDF__MXDIM ) ! Lower pixel-index bounds
-      INTEGER MAP                ! AST Mapping from GRID to current WCS 
-                                 ! Frame
+      INTEGER MAP                ! GRID -> current WCS Frame Mapping
       INTEGER N                  ! Loop counter for extensions
       INTEGER NC                 ! Character count
       INTEGER NDIM               ! Number of dimensions
@@ -389,8 +405,7 @@
       LOGICAL AVAR( NDF__MXDIM ) ! NDF axis-variance components defined?
       LOGICAL BAD                ! Bad pixel flag
       LOGICAL FULLAX             ! Display full axis information?
-      LOGICAL FULLFR             ! Display more details for each WCS 
-                                 ! Frame?
+      LOGICAL FULLFR             ! Display details for each WCS Frame?
       LOGICAL FULLWC             ! Display full WCS information?
       LOGICAL MONOTO( NDF__MXDIM ) ! Axis monotonic flags
       LOGICAL NORM( NDF__MXDIM ) ! Axis normalisation flags
@@ -797,6 +812,64 @@
      :                 STATUS )
       END IF
 
+*  Display extra information about scaled arrays.
+      IF( FORM .EQ. 'SCALED' ) THEN
+         CALL NDF_SCTYP( INDF, 'Data', SCTYP, STATUS )
+         CALL NDF_GTSZD( INDF, 'Data', SCALE, ZERO, STATUS )
+
+
+         IF ( REPORT ) THEN
+            CALL MSG_SETC( 'SCTY', SCTYP )
+            CALL MSG_OUT( 'DATA_SCTYP', '         Scaled type :  ^SCTY',
+     :                    STATUS )
+
+            IF( FTYPE .EQ. '_DOUBLE' ) THEN
+               CALL MSG_SETD( 'SCAL', SCALE )
+               CALL MSG_OUT( 'DATA_SCALE', '         Scale factor:  '//
+     :                       '^SCAL', STATUS )
+               CALL MSG_SETD( 'ZERO', ZERO )
+               CALL MSG_OUT( 'DATA_ZERO',  '         Zero offset :  '//
+     :                       '^ZERO', STATUS )
+
+            ELSE IF( FTYPE .EQ. '_REAL' ) THEN
+               CALL MSG_SETR( 'SCAL', REAL( SCALE ) )
+               CALL MSG_OUT( 'DATA_SCALE', '         Scale factor:  '//
+     :                       '^SCAL', STATUS )
+               CALL MSG_SETR( 'ZERO', REAL( ZERO ) )
+               CALL MSG_OUT( 'DATA_ZERO',  '         Zero offset :  '//
+     :                       '^ZERO', STATUS )
+
+            ELSE 
+               CALL MSG_SETI( 'SCAL', NINT( SCALE ) )
+               CALL MSG_OUT( 'DATA_SCALE', '         Scale factor:  '//
+     :                       '^SCAL', STATUS )
+               CALL MSG_SETI( 'ZERO', NINT( ZERO ) )
+               CALL MSG_OUT( 'DATA_ZERO',  '         Zero offset :  '//
+     :                       '^ZERO', STATUS )
+            END IF    
+         END IF
+
+      ELSE
+         SCTYP = FTYPE
+         SCALE = 1.0
+         ZERO = 0.0
+      END IF
+
+      CALL PAR_PUT0C( 'SCTYPE', SCTYP, STATUS )
+
+      IF( FTYPE .EQ. '_DOUBLE' ) THEN
+         CALL PAR_PUT0D( 'SCALE', SCALE, STATUS )
+         CALL PAR_PUT0D( 'ZERO', ZERO, STATUS )
+
+      ELSE IF( FTYPE .EQ. '_REAL' ) THEN
+         CALL PAR_PUT0R( 'SCALE', REAL( SCALE ), STATUS )
+         CALL PAR_PUT0R( 'ZERO', REAL( ZERO ), STATUS )
+
+      ELSE 
+         CALL PAR_PUT0I( 'SCALE', NINT( SCALE ), STATUS )
+         CALL PAR_PUT0I( 'ZERO', NINT( ZERO ), STATUS )
+      END IF
+
 *  Determine if the data values are defined. Issue a warning message if
 *  they are not.
       CALL NDF_STATE( INDF, 'Data', THERE, STATUS )
@@ -863,6 +936,43 @@
             CALL MSG_SETC( 'FORM', FORM )
             CALL MSG_OUT( 'VAR_FORM', '      Storage form:  ^FORM',
      :                    STATUS )
+         END IF
+
+*  Display extra information about scaled arrays.
+         IF( FORM .EQ. 'SCALED' ) THEN
+            CALL NDF_SCTYP( INDF, 'Variance', SCTYP, STATUS )
+            CALL NDF_GTSZD( INDF, 'Variance', SCALE, ZERO, STATUS )
+         
+            IF ( REPORT ) THEN
+               CALL MSG_SETC( 'SCTY', SCTYP )
+               CALL MSG_OUT( 'VAR_SCTYP', 
+     :                       '         Scaled type :  ^SCTY', STATUS )
+
+               IF( FTYPE .EQ. '_DOUBLE' ) THEN
+                  CALL MSG_SETD( 'SCAL', SCALE )
+                  CALL MSG_OUT( 'VAR_SCALE', '         Scale factor:'//
+     :                          '  ^SCAL', STATUS )
+                  CALL MSG_SETD( 'ZERO', ZERO )
+                  CALL MSG_OUT( 'VAR_ZERO',  '         Zero offset :'//
+     :                          '  ^ZERO', STATUS )
+	       
+               ELSE IF( FTYPE .EQ. '_REAL' ) THEN
+                  CALL MSG_SETR( 'SCAL', REAL( SCALE ) )
+                  CALL MSG_OUT( 'VAR_SCALE', '         Scale factor:'//
+     :                          '  ^SCAL', STATUS )
+                  CALL MSG_SETR( 'ZERO', REAL( ZERO ) )
+                  CALL MSG_OUT( 'VAR_ZERO',  '         Zero offset :'//
+     :                          '  ^ZERO', STATUS )
+	       
+               ELSE 
+                  CALL MSG_SETI( 'SCAL', NINT( SCALE ) )
+                  CALL MSG_OUT( 'VAR_SCALE', '         Scale factor:'//
+     :                          '  ^SCAL', STATUS )
+                  CALL MSG_SETI( 'ZERO', NINT( ZERO ) )
+                  CALL MSG_OUT( 'VAR_ZERO',  '         Zero offset :'//
+     :                          '  ^ZERO', STATUS )
+               END IF    
+            END IF
          END IF
 
 *  Disable automatic quality masking and see if the variance component
