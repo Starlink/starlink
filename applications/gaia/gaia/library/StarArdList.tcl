@@ -154,12 +154,7 @@ itcl::class gaia::StarArdList {
    #  Destructor:
    #  -----------
    destructor  {
-      #  Remove all ARD objects.
-      for { set i 1 } { $i <= $highest_index_ } { incr i } {
-         if { [info exists objects_($i)] && $objects_($i) != {} } {
-            delete object $objects_($i)
-         }
-      }
+      clear
    }
 
    #  Methods:
@@ -240,6 +235,30 @@ itcl::class gaia::StarArdList {
       return $ok
    }
 
+   #  Get the full current description as a string.
+   method get_description {} {
+      set desc ""
+      for {set i 1} {$i <= $highest_index_} {incr i} {
+         if { [info exists objects_($i)] } {
+            append desc [$objects_($i) getard]
+         }
+      }
+      return $desc
+   }
+
+   #  Get the description of the currently selected objects as a string.
+   method get_selected_description {} {
+      set desc ""
+      for {set i 1} {$i <= $highest_index_} {incr i} {
+         if { [info exists objects_($i)] } {
+            if { [$objects_($i) is_selected] } { 
+               append desc [$objects_($i) getard]
+            }
+         }
+      }
+      return $desc
+   }
+
    #  Create an ARD region of the given type.
    method create_region {type {resize 1} {desc ""}} {
       if { [string first $type $known_types_] != -1 } {
@@ -272,6 +291,15 @@ itcl::class gaia::StarArdList {
        }
    }
 
+   #  Apply a command to an object, the index is that returned with
+   #  notify_created_cmd. The command must clearly be a valid one
+   #  for a StarArdPrim object.
+   method apply_cmd {index args} {
+      if { [info exists objects_($index)] } {
+         eval $objects_($index) $args
+      }
+   }
+
    #  Set and/or return a string containing all the known region types.
    method known_types {newtypes} {
       if {$newtypes == {} } {
@@ -280,6 +308,18 @@ itcl::class gaia::StarArdList {
          set known_types_ $newtypes
          return $known_types_
       }
+   }
+
+   #  Remove all ARD objects.
+   method clear {} {
+      for { set i 1 } { $i <= $highest_index_ } { incr i } {
+         if { [info exists objects_($i)] && $objects_($i) != {} } {
+            delete object $objects_($i)
+         }
+      }
+      unset objects_
+      set selected_ {}
+      set highest_index_ 0
    }
 
    #  Deal with object deletion from lists (note this is call back
