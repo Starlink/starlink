@@ -54,6 +54,8 @@
 *        Added smurfloc/mapcoordid to smfFile & lut to smfData
 *     2006-06-25 (AGG):
 *        Add smfGroup, smfArray
+*     2006-07-12 (EC):
+*        Added enumerated typedef smf_modeltype
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -104,6 +106,17 @@ typedef enum smf_dtype {
   SMF__DOUBLE,
   SMF__USHORT,
 } smf_dtype;
+
+/* Different types of model components used by iterative map-maker */
+
+typedef enum smf_modeltype {
+  SMF__AST=0,             /* Astronomical signal */
+  SMF__COM=1,             /* Common-mode signal */
+  SMF__CUM=2,             /* Cummulative signal */
+  SMF__NOI=3,             /* Noise */
+  SMF__RES=4,             /* Residual signal */
+} smf_modeltype;
+
 
 /* Flags for smf_create_smf* 
    Must be individual bits in a single integer

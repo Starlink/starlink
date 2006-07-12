@@ -94,6 +94,8 @@
 *     2006-07-07 (AGG):
 *        Add smf_grp_related, smf_construct_smfGroup,
 *        smf_open_related, smf_close_related and smf_close_smfGroup
+*     2006-07-11 (EC):
+*        Add smf_model_create, smf_model_getnames
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -323,6 +325,26 @@ void smf_scanfit( smfData *data, int order, int *status );
 void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize, 
 			 int flags, double *map, double *mapweight, 
 			 double *mapvar, int msize, int *status );
+
+void smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave, 
+		      smfGroup **group, int *status );
+
+smfGroup * smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups, 
+				   const int nrelated, int *status );
+
+void smf_open_related( const smfGroup *group, const int subindex, smfArray **relfiles, 
+		       int *status );
+
+void smf_close_related( smfArray **relfiles, int *status );
+
+void smf_close_mapcoord( smfData *data, int *status );
+
+void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp, 
+		       int *status);
+
+void smf_model_getname( smf_modeltype type, const char *name, int *status);
+
+void smf_close_smfGroup( smfGroup **group, int *status );
 
 
 #endif /* SMF_DEFINED */
