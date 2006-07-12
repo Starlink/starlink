@@ -273,6 +273,12 @@ itcl::class gaia::StarArdPrim {
    public variable unary_operator {} {}
    public variable binary_operator {.OR.} {}
 
+   #  Command to execute when updates occur. Subclasses are expected to
+   #  access this directly (historical reasons).
+   public variable notify_update_cmd {} {
+      set notify_update_cmd_ $notify_update_cmd
+   }
+
    #  Protected variables: (available to instance)
    #  --------------------
 
