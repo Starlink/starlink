@@ -163,6 +163,10 @@ itcl::class gaia::GaiaCubeChanmap {
                           low=$lb high=$ub estimator=$combination_type_ \
                           nchan=$itk_option(-nchan) \
                           shape=$itk_option(-shape) accept"
+
+      #  Tell cube to use these limits for spectral extraction.
+      $itk_option(-gaiacube) set_extraction_range \
+         $itk_option(-lower_limit) $itk_option(-upper_limit)
    }
 
    #  Display the chanmap image.
