@@ -75,6 +75,8 @@
       INTEGER PNTR               ! Pointer to mapped array
       INTEGER UBND( 2 )          ! Scaled array bounds
       LOGICAL OK                 ! Was error correctly reported?
+      REAL SCALE                 ! Scale factor
+      REAL ZERO                  ! Zero offset
 
 *  Local Data:
       DATA DIM / 10, 20 /
@@ -146,11 +148,28 @@
 *  the storage form is now SCALED.
       CALL ARY_PTSZR( IARY, 2.0, -1.2, STATUS )
       CALL ARY_FORM( IARY, FORM, STATUS )
+
       IF( FORM .NE. 'SCALED' .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'F', FORM )
          CALL ERR_REP( 'ART_TEST_SER1', 'Bad form ^F for scaled array',
      :                  STATUS )
+      END IF
+
+      CALL ARY_GTSZR( IARY, SCALE, ZERO, STATUS )
+
+      IF( SCALE .NE. 2.0 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETR( 'S', SCALE )
+         CALL ERR_REP( 'ART_TEST_SER1', 'Bad scale (^S) for scaled '//
+     :                 'array', STATUS )
+      END IF
+
+      IF( ZERO .NE. -1.2 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETR( 'Z', ZERO )
+         CALL ERR_REP( 'ART_TEST_SER1', 'Bad zero (^Z) for scaled '//
+     :                 'array', STATUS )
       END IF
 
 *  Check the data type is _REAL (because the scale and zero were set as

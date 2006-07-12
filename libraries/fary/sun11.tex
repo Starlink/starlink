@@ -715,6 +715,8 @@ routines.
             {Obtain the storage form of an array}
 \noteroutine{ARY\_FTYPE( IARY, FTYPE, STATUS )}
             {Obtain the full data type of an array}
+\noteroutine{ARY\_GTSZx( IARY, SCALE, ZERO, STATUS )}
+            {Get the scale and zero values for a scaled array}
 \noteroutine{ARY\_IMPRT( LOC, IARY, STATUS )}
             {Import an array into the ARY\_ system from HDS}
 \noteroutine{ARY\_ISACC( IARY, ACCESS, ISACC, STATUS )}
@@ -1569,6 +1571,42 @@ Creation and Control of Identifiers}
          The symbolic constant ARY\_\_SZFTP may be used for declaring the
          length of a character variable to hold the full data type of an
          array. This constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_GTSZ$<$T$>$
+}{
+   Get the scale and zero values for an array
+}{
+   \sstdescription{
+      The routine returns the scale and zero values associated with an array.
+      If the array is not stored in scaled form, then values of 1.0 and 0.0
+      are returned.
+   }
+   \sstinvocation{
+      CALL ARY\_GTSZ$<$T$>$( IARY, SCALE, ZERO, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         SCALE = $<$TYPE$>$ (Returned)
+      }{
+         The scaling factor.
+      }
+      \sstsubsection{
+         ZERO = $<$TYPE$>$ (Returned)
+      }{
+         The zero offset.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
       }
    }
 }

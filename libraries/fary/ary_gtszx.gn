@@ -1,0 +1,137 @@
+      SUBROUTINE ARY_GTSZ<T>( IARY, SCALE, ZERO, STATUS )
+*+
+*  Name:
+*     ARY_GTSZ<T>
+
+*  Purpose:
+*     Get the scale and zero values for an array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL ARY_GTSZ<T>( IARY, SCALE, ZERO, STATUS )
+
+*  Description:
+*     The routine returns the scale and zero values associated with an array. 
+*     If the array is not stored in scaled form, then values of 1.0 and 0.0
+*     are returned.
+
+*  Arguments:
+*     IARY = INTEGER (Given)
+*        Array identifier.
+*     SCALE = <TYPE> (Returned)
+*        The scaling factor.
+*     ZERO = <TYPE> (Returned)
+*        The zero offset.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     DSB: David S Berry (JAC)
+*     {enter_new_authors_here}
+
+*  History:
+*     12-JUL-2006 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! DAT_ public constants
+      INCLUDE 'ARY_PAR'          ! ARY_ public constants
+      INCLUDE 'ARY_ERR'          ! ARY_ error constants
+      INCLUDE 'ARY_CONST'        ! ARY_ private constants
+
+*  Global Variables:
+      INCLUDE 'ARY_DCB'          ! ARY_ Data Control Block
+      INCLUDE 'ARY_ACB'          ! ARY_ Access Control Block
+
+*  Arguments Given:
+      INTEGER IARY
+
+*  Arguments Returned:
+      <TYPE> SCALE
+      <TYPE> ZERO
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      CHARACTER LOCC*(DAT__SZLOC)! Locator for component
+      INTEGER IACB               ! Index to array entry in the ACB
+      INTEGER IDCB               ! Index to array entry in the DCB
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Import the array identifier.
+      CALL ARY1_IMPID( IARY, IACB, STATUS )
+
+*  Get the DCB entry associated with this ACB entry.
+      IDCB = ACB_IDCB( IACB )
+
+*  Ensure that form information is available for the array.
+      CALL ARY1_DFRM( IDCB, STATUS )
+
+*  If the array is primitive or scaled, return 1.0 and 0.0. 
+      IF ( DCB_FRM( IDCB ) .NE. 'SCALED' ) THEN
+         SCALE = 1.0
+         ZERO = 0.0
+
+*  For scaled arrays, ensure scaling information is available.
+      ELSE
+         CALL ARY1_DSCL( IDCB, STATUS )
+
+*  Get the scale and zero values from the scaling information structure
+*  stored in the DCB.
+         CALL DAT_FIND( DCB_SCLOC( IDCB ), 'SCALE', LOCC, STATUS )
+         CALL DAT_GET( LOCC, '<HTYPE>', 0, 0, SCALE, STATUS )
+         CALL DAT_ANNUL( LOCC, STATUS )
+
+         CALL DAT_FIND( DCB_SCLOC( IDCB ), 'ZERO', LOCC, STATUS )
+         CALL DAT_GET( LOCC, '<HTYPE>', 0, 0, ZERO, STATUS )
+         CALL DAT_ANNUL( LOCC, STATUS )
+
+      END IF
+
+*  If an error occurred, then report context information and call the
+*  error tracing routine.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'ARY_GTSZ<T>_ERR', 'ARY_GTSZ<T>: Error getting '//
+     :                 'the scale and zero values for an array.',
+     :                 STATUS )
+         CALL ARY1_TRACE( 'ARY_GTSZ<T>', STATUS )
+      END IF
+
+      END

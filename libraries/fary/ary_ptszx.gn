@@ -113,6 +113,9 @@
 *  Get the DCB entry associated with this ACB entry.
          IDCB = ACB_IDCB( IACB )
 
+*  Ensure information about the storage form is available.
+         CALL ARY1_DFRM( IDCB, STATUS )
+
 *  If the array is primitive, then it must first be converted to
 *  simple storage form in order to set the scaling. Check if the 
 *  data object is mapped for access. Report an error if it is.
@@ -149,7 +152,6 @@
 *  object.
          CALL CMP_MODC( DCB_LOC( IDCB ), 'VARIANT', 6, 0, 0, STATUS )
          CALL CMP_PUT0C( DCB_LOC( IDCB ), 'VARIANT', 'SCALED', STATUS )
-         CALL ARY1_DFRM( IDCB, STATUS )
 
          IF( STATUS .EQ. SAI__OK ) THEN 
             DCB_FRM( IDCB ) = 'SCALED'
