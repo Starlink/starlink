@@ -32,6 +32,7 @@
 *        The global status.
 
 *  Notes:
+*     -  Duplicating a scaled array produces and equivalent simple array.
 *     -  If this routine is called with STATUS set, then a value of
 *     ARY__NOID will be returned for the IARY2 argument, although no
 *     further processing will occur. The same value will also be
@@ -110,6 +111,9 @@
 *        Installed support for primitive arrays.
 *     5-MAY-2006 (DSB):
 *        Installed support for scaled arrays.
+*     12-JUL-2006 (DSB):
+*        Changed so that that duplicating a scaled array produces a simple 
+*        array.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -239,9 +243,10 @@
                      END IF
                   END IF
 
-*  Simple arrays.
-*  =============
-               ELSE IF ( DCB_FRM( IDCB1 ) .EQ. 'SIMPLE' ) THEN
+*  Simple and scaled arrays.
+*  =========================
+               ELSE IF ( DCB_FRM( IDCB1 ) .EQ. 'SIMPLE' .OR.
+     :                   DCB_FRM( IDCB1 ) .EQ. 'SCALED' ) THEN
 
 *  Ensure that data type and bounds information is available for the
 *  data object.
@@ -249,33 +254,14 @@
                   CALL ARY1_DBND( IDCB1, STATUS )
 
 *  Create a new data object with the same attributes and an entry in the
-*  DCB.
+*  DCB. This is a simple array. The act of duplicating a scaled array
+*  creates a simple array.
                   CALL ARY1_DCRE( DCB_TYP( IDCB1 ), DCB_CPX( IDCB1 ),
      :                            ACB_NDIM( IACB1 ),
      :                            ACB_LBND( 1, IACB1 ),
      :                            ACB_UBND( 1, IACB1 ), PCB_TMP( IPCB ),
      :                            PCB_LOC( IPCB ), IDCB2, STATUS )
 
-*  Scaled arrays.
-*  =============
-               ELSE IF ( DCB_FRM( IDCB1 ) .EQ. 'SCALED' ) THEN
-
-*  Ensure that data type and bounds information is available for the
-*  data object.
-                  CALL ARY1_DTYP( IDCB1, STATUS )
-                  CALL ARY1_DBND( IDCB1, STATUS )
-
-*  Create a new simple array data object with the same attributes and an 
-*  entry in the DCB.
-                  CALL ARY1_DCRE( DCB_TYP( IDCB1 ), 
-     :                            DCB_CPX( IDCB1 ), ACB_NDIM( IACB1 ),
-     :                            ACB_LBND( 1, IACB1 ),
-     :                            ACB_UBND( 1, IACB1 ), PCB_TMP( IPCB ),
-     :                            PCB_LOC( IPCB ), IDCB2, STATUS )
-
-*  Copy the scale information to the new DCB entry. This converts the DCB
-*  entry into a scaled array.
-                  CALL ARY1_CPSCL( IDCB1, IDCB2, STATUS )
 
 *  If the DCB form entry was not recognised, then report an error.
                ELSE
