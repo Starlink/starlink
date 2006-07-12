@@ -586,6 +586,24 @@ void ndfPtszd( double scale,
               const char *comp,
               int *status );
 
+void ndfGtszi( int indf,
+               const char *comp,
+               int *scale,
+               int *zero,
+               int *status );
+
+void ndfGtszr( int indf,
+              const char *comp,
+              float *scale,
+              float *zero,
+              int *status );
+
+void ndfGtszd( int indf,
+              const char *comp,
+              double *scale,
+              double *zero,
+              int *status );
+
 #define ndfPtwcs(iwcs,indf,status) ndfPtwcs_((AstFrameSet *)(iwcs),indf,status)
 void ndfPtwcs_( AstFrameSet *iwcs,
                 int indf,

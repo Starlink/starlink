@@ -10473,6 +10473,8 @@ The following is an example \xref{ADAM}{sg4}{} interface file
             {Obtain the storage form of an NDF array component}
 \noteroutine{NDF\_FTYPE( INDF, COMP, FTYPE, STATUS )}
             {Obtain the full type of an NDF array component}
+\noteroutine{NDF\_GTSZx( INDF, COMP, SCALE, ZERO, STATUS )}
+            {Get scale and zero factors for a scaled array in an NDF}
 \noteroutine{NDF\_GTUNE( TPAR, VALUE, STATUS )}
             {Obtain the value of an NDF\_ system tuning parameter}
 \noteroutine{NDF\_GTWCS( INDF, IWCS, STATUS )}
@@ -13456,6 +13458,56 @@ locator}{sun92}{using_locators}}
    }
 }
 \sstroutine{
+   NDF\_GTSZx
+}{
+   Get the scale and zero values for an NDF array component
+}{
+   \sstdescription{
+      The routine returns the scale and zero values associated with an
+      NDF array component. If the array is stored in simple or primitive
+      form, then values of 1.0 and 0.0 are returned.
+   }
+   \sstinvocation{
+      CALL NDF\_GTSZx( INDF, COMP, SCALE, ZERO, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         COMP = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the NDF array component; {\tt '}DATA{\tt '} or {\tt '}VARIANCE{\tt '}.
+      }
+      \sstsubsection{
+         SCALE = ? (Returned)
+      }{
+         The new value for the scaling factor.
+      }
+      \sstsubsection{
+         ZERO = ? (Returned)
+      }{
+         The new value for the zero offset.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the standard Fortran numerical data
+         types: integer, real and double precision. Replace the (lower case) {\tt "}x{\tt "}
+         in the routine name by I, R or D as appropriate.
+      }
+   }
+}
+\sstroutine{
    NDF\_GTUNE
 }{
    Obtain the value of an NDF\_ system tuning parameter
@@ -15979,12 +16031,12 @@ locator}{sun92}{using_locators}}
    }
    \sstarguments{
       \sstsubsection{
-         SCALE = REAL (Given)
+         SCALE = ? (Given)
       }{
          The new value for the scaling factor.
       }
       \sstsubsection{
-         ZERO = REAL (Given)
+         ZERO = ? (Given)
       }{
          The new value for the zero offset.
       }
@@ -18277,6 +18329,12 @@ Appendix~\ref{ss:cinterface}.\\[1.0ex]
             {Obtain the storage form of an NDF array component}
 \noteroutineC{\xlabel{ndfFtype}void \htmlref{ndfFtype}{NDF_FTYPE}}{( int indf, const char $*$comp, char $*$ftype, int ftype\_length, int $*$status );}
             {Obtain the full type of an NDF array component}
+\noteroutineC{\xlabel{ndfGtszd}void \htmlref{ndfGtszd}{NDF_GTSZx}}{( int indf, const char $*$comp, double $*$scale, double $*$zero, int $*$status );}
+            {Get scale and zero factors for a scaled array in an NDF}
+\noteroutineC{\xlabel{ndfGtszi}void \htmlref{ndfGtszi}{NDF_GTSZx}}{( int indf, const char $*$comp, int $*$scale, int $*$zero, int $*$status );}
+            {Get scale and zero factors for a scaled array in an NDF}
+\noteroutineC{\xlabel{ndfGtszr}void \htmlref{ndfGtszr}{NDF_GTSZx}}{( int indf, const char $*$comp, float $*$scale, float $*$zero, int $*$status );}
+            {Get scale and zero factors for a scaled array in an NDF}
 \noteroutineC{\xlabel{ndfGtune}void \htmlref{ndfGtune}{NDF_GTUNE}}{( const char $*$tpar, int $*$value, int $*$status );}
             {Obtain the value of an NDF\_ system tuning parameter}
 \noteroutineC{\xlabel{ndfGtwcs}void \htmlref{ndfGtwcs}{NDF_GTWCS}}{( int indf, AstFrameSet $**$iwcs, int $*$status );}
