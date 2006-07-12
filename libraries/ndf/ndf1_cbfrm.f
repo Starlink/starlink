@@ -61,11 +61,14 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
 *     22-OCT-1990 (RFWS):
 *        Original version.
+*     12-JUL-2006 (DSB):
+*        Ensure SCALED arrays are converted to SIMPLE arrays.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -115,6 +118,11 @@
             END IF
  1       CONTINUE
  2       CONTINUE
+
+*  See if the storage form is scaled. If so, convert to simple.
+      ELSE IF ( CHR_SIMLR( FORM, 'SCALED' ) ) THEN
+         FORM = 'SIMPLE'
+
       END IF
        
 *  Call error tracing routine and exit.
