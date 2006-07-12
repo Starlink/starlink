@@ -28,7 +28,6 @@
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
 
-
  *   Authors:
  *      PWD: Peter W. Draper, Starlink - University of Durham
 
@@ -636,16 +635,20 @@ int gaiaUtilsCreateArdMask( char *desc, int maskPtr[], int dims[], int lbnd[],
                             int ubnd[], char **error_mess )
 {
     Grp *grp;
+    char *descend;
+    char *endptr;
+    char *ptr;
+    char buf[255];
     float c[1];
     int flag;
     int index;
     int inlbnd[2];
-    int lbnde[2];
-    int lbndi[2];
-    int status = SAI__OK;
     int inubnd[2];
+    int lbnde[2];
+    int status = SAI__OK;
+    int sublen;
     int ubnde[2];
-    int ubndi[2];
+    size_t desclen;
 
     inlbnd[0] = 1;
     inlbnd[1] = 1;
@@ -656,7 +659,31 @@ int gaiaUtilsCreateArdMask( char *desc, int maskPtr[], int dims[], int lbnd[],
 
     c[0] = VAL__BADR;
     grp = NULL;
-    ardGrpex( desc, NULL, &grp, &flag, &status );
+    
+    /* If necessary pass in description in pieces as ardGrpex cannot accept
+     * more than 255 characters per expression. This is indicated when the
+     * string is too long and the breaks happen at embedded newlines. */
+    desclen = strlen( desc );
+    if ( desclen < 254 ) {
+        ardGrpex( desc, NULL, &grp, &flag, &status );
+    }
+    else {
+        ptr = desc;
+        descend = ptr + desclen;
+        while ( ptr < descend ) {
+            endptr = strchr( ptr, '\n' );
+            if ( endptr == NULL ) {
+                endptr = desc + desclen;
+            }
+            sublen = endptr - ptr;
+            strncpy( buf, ptr, sublen );
+            buf[sublen] = '\0';
+            if ( strlen( buf ) != 0 ) {
+                ardGrpex( buf, NULL, &grp, &flag, &status );
+            }
+            ptr = endptr + 1;
+        }
+    }
 
     /*  Create the mask. */
     index = 2;
