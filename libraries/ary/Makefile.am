@@ -38,7 +38,7 @@ GEN_F_ROUTINES = $(ARY_N_GEN:.gn=.f)
 
 F_ROUTINES = $(NONGEN_F_ROUTINES) $(GEN_F_ROUTINES)
 
-ARY_N_GEN = ary_sszx.gn ary1_gtnx.gn ary1_gt1x.gn
+ARY_N_GEN = ary_ptszx.gn ary1_gtnx.gn ary1_gt1x.gn
 
 NONGEN_F_ROUTINES = ary1_init.f ary1_accok.f ary1_adiag.f ary1_anl.f   \
 ary1_annpl.f ary1_antmp.f ary1_bad.f ary1_badb.f ary1_badd.f	       \

@@ -1,7 +1,7 @@
-      SUBROUTINE ARY_SSZ<T>( IARY, SCALE, ZERO, STATUS )
+      SUBROUTINE ARY_PTSZ<T>( IARY, SCALE, ZERO, STATUS )
 *+
 *  Name:
-*     ARY_SSZ<T>
+*     ARY_PTSZ<T>
 
 *  Purpose:
 *     Set new scale and zero values for a scaled array.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARY_SSZ<T>( IARY, SCALE, ZERO, STATUS )
+*     CALL ARY_PTSZ<T>( IARY, SCALE, ZERO, STATUS )
 
 *  Description:
 *     The routine sets new values for the scale and zero values
@@ -121,7 +121,7 @@
      :           ( DCB_NREAD( IDCB ) .NE. 0 ) ) THEN
                STATUS = ARY__ISMAP
                CALL DAT_MSG( 'ARRAY', DCB_LOC( IDCB ) )
-               CALL ERR_REP( 'ARY_SSZ_MAP',
+               CALL ERR_REP( 'ARY_PTSZ_MAP',
      :               'The array ^ARRAY is mapped for access, ' //
      :               'perhaps through another identifier ' //
      :               '(possible programming error).', STATUS )
@@ -168,10 +168,10 @@
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'ARY_SSZ<T>_ERR', 'ARY_SSZ<T>: Error setting '//
+         CALL ERR_REP( 'ARY_PTSZ<T>_ERR', 'ARY_PTSZ<T>: Error setting '//
      :                 'new scale and zero values for an array.',
      :                 STATUS )
-         CALL ARY1_TRACE( 'ARY_SSZ<T>', STATUS )
+         CALL ARY1_TRACE( 'ARY_PTSZ<T>', STATUS )
       END IF
 
       END
