@@ -75,7 +75,7 @@ ary_mapz.f ary_msg.f ary_ndim.f ary_new.f ary_newp.f ary_noacc.f       \
 ary_offs.f ary_place.f ary_reset.f ary_same.f ary_sbad.f ary_sbnd.f    \
 ary_sect.f ary_shift.f ary_size.f ary_ssect.f ary_state.f ary_stype.f  \
 ary_temp.f ary_trace.f ary_type.f ary_unmap.f ary_valid.f ary_verfy.f \
-ary1_cpscl.f ary1_dscl.f ary1_vscl.f
+ary1_cpscl.f ary1_dscl.f ary1_vscl.f ary_sctyp.f
 
 BUILT_SOURCES = $(include_MESSAGES)
 
