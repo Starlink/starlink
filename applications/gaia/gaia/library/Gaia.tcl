@@ -489,7 +489,7 @@ itcl::class gaia::Gaia {
       set index [$m index "Reopen"]
       insert_menuitem $m $index command "Open cube..." \
          {Open a cube and display image sections from it} \
-         -command [code $this make_toolbox opencube 0 1]
+         -command [code $this make_opencube_toolbox]
 
       #  Close also needs the command changing to delete the object.
       $m entryconfigure "Close" \
@@ -1160,16 +1160,31 @@ itcl::class gaia::Gaia {
       }
    }
 
-   #  Create the startup options toolbox.
-   public method make_opencube_toolbox {name {cloned 0}} {
-      itk_component add $name {
-         GaiaCube $w_.\#auto \
-            -gaia $w_ \
-            -canvas [$image_ get_canvas] \
-            -rtdimage [$image_ get_image] \
-            -transient $itk_option(-transient_tools) \
-            -number $clone_ \
-            -filter_types $itk_option(-file_types) \
+   #  Create the open cube toolbox. Note this is different from the usual
+   #  toolboxes, as it lives in the File menu and requires that certain
+   #  actions are taken when the toolbox is reused and there can only be one.
+   public method make_opencube_toolbox {} {
+
+      #  If the window exists then just raise it.
+      if { [info exists itk_component(opencube) ] && 
+           [winfo exists $itk_component(opencube) ] } {
+
+         wm deiconify $itk_component(opencube)
+         raise $itk_component(opencube)
+         $itk_component(opencube) open
+      } else {
+
+         busy {
+            itk_component add opencube {
+               GaiaCube $w_.\#auto \
+                  -gaia $w_ \
+                  -canvas [$image_ get_canvas] \
+                  -rtdimage [$image_ get_image] \
+                  -transient $itk_option(-transient_tools) \
+                  -number $clone_ \
+                  -filter_types $itk_option(-file_types)
+            }
+         }
       }
    }
 
@@ -1199,7 +1214,7 @@ itcl::class gaia::Gaia {
          #  No trivial cubes?
          if { $naxis1 != 1 && $naxis2 != 1 && $naxis3 != 1 } {
             #  Load it into cube browser.
-            make_toolbox opencube 0 1
+            make_opencube_toolbox
             set msg {}
             set result [catch {$itk_component(opencube) configure \
                                   -cube $itk_option(-file)} msg]
