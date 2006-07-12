@@ -26,7 +26,7 @@
 *  Parameters :
 *     token = const char * (Given)
 *        Message token to use.
-*     value = INT_BIG (Given)
+*     value = UINT_BIG (Given)
 *        Value to store in token.
 
 *  Notes:
