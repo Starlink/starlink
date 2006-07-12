@@ -20,7 +20,13 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine implementing the MAKEMAP task.
+*     This is an optimized routine implementing a modified version of
+*     the MAKEMAP task for the QUICK-LOOK SCUBA-2 pipeline. The
+*     map-bounds are retrieved from the FITS header based on the
+*     specified map size. The bolometer drifts are removed using the
+*     fitted polynomials, the sky is removed by subtracting the mean
+*     level per time slice and then the data are extinction corrected
+*     using the MEANWVM tau value (at 225 GHz) from the FITS header.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -45,6 +51,9 @@
 *        correction.
 *     2006-04-21 (AGG):
 *        Now use quicker MEAN sky subtraction rather than polynomials
+*     2006-07-12 (AGG):
+*        Return polynomial subtraction since it removes bolometer
+*        drifts, not the sky
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -164,8 +173,11 @@ void smurf_qlmakemap( int *status ) {
     /* Read data from the ith input file in the group */
     smf_open_and_flatfield( igrp, NULL, i, &data, status );
 
-    /*smf_subtract_poly( data, status );*/
+    /* Remove bolometer drifts */
+    smf_subtract_poly( data, status );
+    /* Remove sky */
     smf_subtract_plane( data, "MEAN", status );
+    /* Correct extinction */
     smf_fits_getD( data->hdr, "MEANWVM", &tau, status);
     smf_correct_extinction( data, "CSOTAU", 1, tau, status);
 
