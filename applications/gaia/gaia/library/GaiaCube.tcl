@@ -225,17 +225,42 @@ itcl::class gaia::GaiaCube {
       }
       pack $itk_component(tabnotebook) -fill both -expand 1
 
+      $itk_component(tabnotebook) add -label Spectrum
+      set spectrumTab [$itk_component(tabnotebook) childsite 0]
+
       $itk_component(tabnotebook) add -label Animation
-      set animationTab [$itk_component(tabnotebook) childsite 0]
+      set animationTab [$itk_component(tabnotebook) childsite 1]
 
       $itk_component(tabnotebook) add -label Collapse
-      set collapseTab [$itk_component(tabnotebook) childsite 1]
+      set collapseTab [$itk_component(tabnotebook) childsite 2]
 
       $itk_component(tabnotebook) add -label Chanmap
-      set chanmapTab [$itk_component(tabnotebook) childsite 2]
+      set chanmapTab [$itk_component(tabnotebook) childsite 3]
 
       $itk_component(tabnotebook) add -label Baseline
-      set baselineTab [$itk_component(tabnotebook) childsite 3]
+      set baselineTab [$itk_component(tabnotebook) childsite 4]
+
+      #  Spectrum section.
+      itk_component add sruler {
+         LabelRule $spectrumTab.sruler -text "Spectrum controls:"
+      }
+      pack $itk_component(sruler) -side top -fill x
+
+      set ref_ids 1
+      itk_component add spectrum {
+         GaiaCubeSpectrum $spectrumTab.spectrum \
+            -gaiacube [code $this] \
+            -gaia $itk_option(-gaia) \
+            -ref_id $ref_ids \
+            -lower_limit $plane_ \
+            -upper_limit $plane_ \
+            -show_ref_range 0 \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -spec_coords [code $spec_coords_]
+      }
+      set ref_range_controls_($ref_ids) $itk_component(spectrum)
+      pack $itk_component(spectrum) -side top -fill both -ipadx 1m -ipady 2m
 
       #  Animation section.
 
@@ -244,17 +269,18 @@ itcl::class gaia::GaiaCube {
       }
       pack $itk_component(aruler) -side top -fill x
 
+      incr ref_ids
       itk_component add animation {
          GaiaCubeAnimation $animationTab.animation \
             -gaiacube [code $this] \
-            -ref_id 1 \
+            -ref_id $ref_ids \
             -lower_limit $plane_ \
             -upper_limit $plane_ \
             -show_ref_range 0 \
             -labelwidth $lwidth \
             -valuewidth $vwidth
       }
-      set ref_range_controls_(1) $itk_component(animation)
+      set ref_range_controls_($ref_ids) $itk_component(animation)
       pack $itk_component(animation) -side top -fill both -ipadx 1m -ipady 2m
 
       #  Collapse section.
@@ -264,17 +290,18 @@ itcl::class gaia::GaiaCube {
       }
       pack $itk_component(cruler) -side top -fill x
 
+      incr ref_ids
       itk_component add collapse {
          GaiaCubeCollapse $collapseTab.collapse \
             -gaiacube [code $this] \
-            -ref_id 2 \
+            -ref_id $ref_ids \
             -lower_limit $plane_ \
             -upper_limit $plane_ \
             -show_ref_range 0 \
             -labelwidth $lwidth \
             -valuewidth $vwidth
       }
-      set ref_range_controls_(2) $itk_component(collapse)
+      set ref_range_controls_($ref_ids) $itk_component(collapse)
       pack $itk_component(collapse) -side top -fill both -ipadx 1m -ipady 2m
 
       #  Chanmap section.
@@ -284,20 +311,21 @@ itcl::class gaia::GaiaCube {
       }
       pack $itk_component(chanmapruler) -side top -fill x
 
+      incr ref_ids
       itk_component add chanmap {
          GaiaCubeChanmap $chanmapTab.chanmap \
             -gaiacube [code $this] \
-            -ref_id 3 \
+            -ref_id $ref_ids \
             -lower_limit $plane_ \
             -upper_limit $plane_ \
             -show_ref_range 0 \
             -labelwidth $lwidth \
             -valuewidth $vwidth
       }
-      set ref_range_controls_(3) $itk_component(chanmap)
+      set ref_range_controls_($ref_ids) $itk_component(chanmap)
       pack $itk_component(chanmap) -side top -fill both -ipadx 1m -ipady 2m
 
-      #  Baseline subtraction section.
+      #  Baseline subtraction section. Must be the last.
 
       itk_component add baselineruler {
          LabelRule $baselineTab.baselineruler \
@@ -305,17 +333,18 @@ itcl::class gaia::GaiaCube {
       }
       pack $itk_component(baselineruler) -side top -fill x
 
+      set baseline_id_ [incr ref_ids]
       itk_component add baseline {
          GaiaCubeBaseline $baselineTab.baseline \
             -gaiacube [code $this] \
-            -ref_id 4 \
+            -ref_id $baseline_id_ \
             -lower_limit $plane_ \
             -upper_limit $plane_ \
             -show_ref_range 0 \
             -labelwidth $lwidth \
             -valuewidth $vwidth
       }
-      set ref_range_controls_(4) $itk_component(baseline)
+      set ref_range_controls_($baseline_id_) $itk_component(baseline)
       pack $itk_component(baseline) -side top -fill both -expand 1 \
          -ipadx 1m -ipady 2m
 
@@ -353,43 +382,31 @@ itcl::class gaia::GaiaCube {
          }
       }
 
-      #  Close spectrum plot.
-      if { $spectrum_ != {} && [winfo exists $spectrum_] } {
-         $spectrum_ close
-      }
-      if { [winfo exists $itk_option(-canvas)] } {
-         if { $position_mark_ != {} } {
-            $itk_option(-canvas) delete $position_mark_
-         }
-         if { $ref_position_mark_ != {} } {
-            $itk_option(-canvas) delete $ref_position_mark_
-         }
-         remove_spectral_bindings_
-      }
+      #  Close spectrum plot, also removes any graphics and bindings.
+      $itk_component(spectrum) close
+
+      #  Halt any animations.
+      $itk_component(animation) stop
    }
 
    #  Methods:
    #  --------
 
-   #  Close window. If image is being replaced set dispsection false to
-   #  avoid the section being loaded.
+   #  Close window.
    public method close {} {
       wm withdraw $w_
 
-      if { $spectrum_ != {} && [winfo exists $spectrum_] } {
-         $spectrum_ close
-      }
-      if { $position_mark_ != {} } {
-         $itk_option(-canvas) delete $position_mark_
-         set position_mark_ {}
-      }
-      if { $ref_position_mark_ != {} } {
-         $itk_option(-canvas) delete $ref_position_mark_
-         set ref_position_mark_ {}
-      }
-      remove_spectral_bindings_
+      #  Close spectrum plot.
+      $itk_component(spectrum) close
 
+      #  Halt any animations.
       $itk_component(animation) stop
+   }
+
+   #  Undo some of the effects of close. Do not reopen cube, that would 
+   #  be expensive and reset too much.
+   public method open {} {
+      $itk_component(spectrum) open
    }
 
    #  Open the chosen file as a cube.
@@ -432,10 +449,8 @@ itcl::class gaia::GaiaCube {
 
          #  Set axis and display the plane for first time.
          set axis_ 2
+         $itk_component(axis) configure -value 3
          set_step_axis_ 3
-
-         #  Display spectra on mouse click.
-         add_bindings_
 
          #  Set up object to control units.
          $spec_coords_ configure -axis 3 -accessor $cubeaccessor_
@@ -481,6 +496,7 @@ itcl::class gaia::GaiaCube {
             $itk_component(index) configure -value $plane_min_
          }
 
+         $itk_component(spectrum) set_bounds $plane_min_ $plane_max_
          $itk_component(animation) set_bounds $plane_min_ $plane_max_
          $itk_component(collapse) set_bounds $plane_min_ $plane_max_
          $itk_component(chanmap) set_bounds $plane_min_ $plane_max_
@@ -510,12 +526,7 @@ itcl::class gaia::GaiaCube {
       set value $axis_
       incr axis_
       set_step_axis_ $value 0
-
-      if { $spectrum_ != {} } {
-         if { $last_cxcy_ != {} } {
-            eval display_spectrum_ localstart $last_cxcy_
-         }
-      }
+      $itk_component(spectrum) coord_system_changed
    }
 
    #  Set the plane to display and display it. When regen is true a new
@@ -603,7 +614,7 @@ itcl::class gaia::GaiaCube {
       $itk_option(-rtdimage) object $fullobject_
       $rtdctrl_info_ updateValues
 
-      # Release memory from last time and save pointer.
+      #  Release memory from last time and save pointer.
       if { $last_slice_adr_ != 0 } {
          $cubeaccessor_ release $last_slice_adr_
       }
@@ -614,18 +625,14 @@ itcl::class gaia::GaiaCube {
       $itk_component(index) configure -value $plane_
    }
 
-   #  Set the position of a spectral reference line.
+   #  Set the position of a reference line shown in the plot.
    public method set_spec_ref_coord {id coord} {
-      if { $spectrum_ != {} && $coord != {} } {
-         $spectrum_ set_ref_line_coord $id $coord
-      }
+      $itk_component(spectrum) set_spec_ref_coord $id $coord
    }
 
-   #  Set the position of a spectral reference range
+   #  Set the position of a reference range shown in the plot.
    public method set_spec_ref_range_coord {id coord1 coord2} {
-      if { $spectrum_ != {} && $coord1 != {} && $coord2 != {} } {
-         $spectrum_ set_ref_range_coord $id $coord1 $coord2
-      }
+      $itk_component(spectrum) set_spec_ref_range_coord $id $coord1 $coord2
    }
 
    #  Handle the change in a spectral reference line, when done within the
@@ -633,7 +640,7 @@ itcl::class gaia::GaiaCube {
    protected method ref_line_moved_ {id coord action} {
 
       #  Convert coord from grid indices to pixel indices.
-      set coord [axis_grid2pixel_ $coord]
+      set coord [axis_grid2pixel $coord]
 
       #  Apply value to the right control, but avoiding new actions being
       #  triggered, unless this is release when we want to reposition to the
@@ -661,27 +668,23 @@ itcl::class gaia::GaiaCube {
    protected method ref_range_moved_ {id coord1 coord2 action} {
 
       #  Convert coord from grid indices to pixel indices.
-      set coord1 [axis_grid2pixel_ $coord1]
-      set coord2 [axis_grid2pixel_ $coord2]
+      set coord1 [axis_grid2pixel $coord1]
+      set coord2 [axis_grid2pixel $coord2]
 
       #  Set the limits of the control and get it to configure itself.
-      if { $id > 4 } {
-         $ref_range_controls_(4) configure \
-                                     -lower_limit $coord1 -upper_limit $coord2
-         $ref_range_controls_(4) ref_range_moved $id $coord1 $coord2 $action
-
-      } else {
-         $ref_range_controls_($id) configure \
-                                      -lower_limit $coord1 -upper_limit $coord2
-         $ref_range_controls_($id) ref_range_moved $id $coord1 $coord2 $action
+      if { $id > $baseline_id_ } {
+         set id $baseline_id_
       }
+      $ref_range_controls_($id) configure -lower_limit $coord1 \
+                                          -upper_limit $coord2
+      $ref_range_controls_($id) ref_range_moved $id $coord1 $coord2 $action
    }
 
    #  Update the dummy NDF WCS so that it matches the current spectral
    #  coordinates. This should be done only when necessary (end of animation,
    #  slice slider drag etc.).
    public method update_wcs {} {
-      set index [axis_pixel2grid_ $plane_]
+      set index [axis_pixel2grid $plane_]
       set frameset [$cubeaccessor_ getimagewcs $axis_ $index]
       if { $frameset != 0 } {
          $itk_option(-rtdimage) astreplace $frameset
@@ -718,6 +721,11 @@ itcl::class gaia::GaiaCube {
       lappend temp_files_ $filename
    }
 
+   #  Get the coordinate of the current plane along the current axis.
+   public method get_plane_coord {{formatted 1} {trail 0} } {
+      return [get_coord $plane_ $formatted $trail]
+   }
+
    #  Get the coordinate of an index along the current axis.
    public method get_coord {index {formatted 1} {trail 0}} {
       #  Need index as a pixel coordinate.
@@ -736,142 +744,13 @@ itcl::class gaia::GaiaCube {
       return $coord
    }
 
-   #  Configure canvas so we get any clicks on the image and can display
-   #  the associated spectra.
-   protected method add_bindings_ {} {
-
-      #  Bindings for sending to SPLAT (or not).
-      set_splat_bindings_
-
-      #  Bindings for GaiaSpectralPlot instance.
-      add_spectral_bindings_
-   }
-
-   #  Add or disable SPLAT binding. XXX move SPLAT behaviour into
-   #  GaiaSpectralPlot as a more obvious control.
+   #  Add or disable SPLAT bindings used by spectral extraction tool.
    protected method set_splat_bindings_ {} {
-      global env
-      if { [info exists env(SPLAT_DIR)] && $itk_option(-use_splat)} {
-         #  Double click sends to SPLAT.
-         set splat_dir_ $env(SPLAT_DIR)
-         $itk_option(-canvas) bind all <Double-Button-1> \
-            [code $this handle_double_click_ splat %x %y]
-      } else {
-         #  Double click defines a reference spectrum.
-         $itk_option(-canvas) bind all <Double-Button-1> \
-            [code $this handle_double_click_ ref %x %y]
-      }
-   }
-
-
-   #  Add bindings to rtdimage in the main canvas for spectral plot.
-   #  These are single-click and drag-click on the image and cross.
-   protected method add_spectral_bindings_ {} {
-
-      $itk_option(-canvas) bind $itk_option(-rtdimage) <1> \
-         [code $this display_spectrum_ localstart %x %y]
-
-      $itk_option(-canvas) bind $itk_option(-rtdimage)  <B1-Motion> \
-         [code $this display_spectrum_ localdrag %x %y]
-   }
-
-   #  Remove bindings from main canvas for spectral plot.
-   protected method remove_spectral_bindings_ {} {
-      $itk_option(-canvas) bind $itk_option(-rtdimage) <1> {}
-      $itk_option(-canvas) bind $itk_option(-rtdimage) <B1-Motion> {}
-      $itk_option(-canvas) bind all <Double-Button-1> {}
-   }
-
-   #  Display a spectrum in the local plot. Action can be "localstart" or
-   # "localdrag", to start a spectral display (sets the initial scale of a
-   # drag), or update during a drag.
-   protected method display_spectrum_ {action cx cy} {
-
-      #  Retain coordinates for a possible update.
-      set last_cxcy_ "$cx $cy"
-
-      #  Convert click coordinates from canvas coords to grid coords.
-      set ccx [$itk_option(-canvas) canvasx $cx]
-      set ccy [$itk_option(-canvas) canvasy $cy]
-      $itk_option(-rtdimage) convert coords $ccx $ccy canvas iix iiy image
-
-      if { $spectrum_ == {} } {
-         #  Need to create a spectrum plot. Note show short help in this
-         #  window to save real estate.
-         set spectrum_ [GaiaSpectralPlot $w_.specplot \
-                           -number $itk_option(-number) \
-                           -spec_coords [code $spec_coords_] \
-                           -ref_line_changed_cmd [code $this ref_line_moved_] \
-                           -ref_range_changed_cmd [code $this ref_range_moved_] \
-                           -shorthelpwin [scope $short_help_win_]]
-
-         #  Make this a transient of main window, not this one.
-         wm transient $spectrum_ $itk_option(-gaia)
-
-         #  Create the marker for the image position.
-         create_position_marker_ $ccx $ccy
-
-      } else {
-
-         #  Already have a plot, re-display if withdrawn.
-         if { [wm state $spectrum_] == "withdrawn" } {
-            $spectrum_ open
-         }
-
-         #  Re-create the marker for the image position.
-         if { $position_mark_ == {} } {
-            create_position_marker_ $ccx $ccy
-         }
-      }
-
-      #  Correct collapse bounds to grid indices.
-      set lb [$itk_component(collapse) cget -lower_limit]
-      set ub [$itk_component(collapse) cget -upper_limit]
-      set alow [axis_pixel2grid_ $lb]
-      set ahigh [axis_pixel2grid_ $ub]
-
-      #  Make sure ix and iy are integers (zoomed images).
-      set ix [expr round($iix)]
-      set iy [expr round($iiy)]
-
-      #  Move position marker on the image.
-      $itk_option(-canvas) coords $position_mark_ $ccx $ccy
-
-      #  Also autoscale when single click, so that we are not fixed for
-      #  all time.
-      if { $action == "localstart" } {
-         busy {
-            $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh $ix $iy 1
-         }
-
-         #  Set first-time position of the main reference line.
-         set coord [get_coord $plane_ 0 0]
-         if { $coord != {} } {
-            update ;# Make sure plot is created first.
-            set_spec_ref_coord 1 $coord
-         }
-
-         #  And reposition any graphics, if the collapse bounds have changed.
-         if { $lb != $llb_ || $ub != $lub_ } {
-            $spectrum_ fitxy
-         }
-      } else {
-         busy {
-            $spectrum_ display $cubeaccessor_ $axis_ $alow $ahigh $ix $iy 0
-         }
-      }
-
-      #  Display the current coordinate for reference.
-      lassign [$itk_option(-rtdimage) astpix2cur $iix $iiy] ra dec
-      $spectrum_ update_label "$ra, $dec"
-
-      #  Record collapse bounds, these are checked.
-      set llb_ $lb
-      set lub_ $ub
+      $itk_component(spectrum) configure -use_splat $itk_option(-use_splat)
    }
 
    #  Convert grid indices to pixel indices along image axes.
-   protected method image_grid2pixel_ {x y} {
+   public method image_grid2pixel {x y} {
       if { $axis_ == 1 } {
          set xo [lindex $bounds_ 2]
          set yo [lindex $bounds_ 4]
@@ -890,7 +769,7 @@ itcl::class gaia::GaiaCube {
    }
 
    #  Convert grid index to pixel index along the selected axis.
-   protected method axis_grid2pixel_ { value } {
+   public method axis_grid2pixel { value } {
       if { $axis_ == 1 } {
          set zo [lindex $bounds_ 0]
       } elseif { $axis_ == 2 } {
@@ -902,7 +781,7 @@ itcl::class gaia::GaiaCube {
    }
 
    #  Convert pixel indices to grid indices along image axes.
-   protected method image_pixel2grid_ {x y} {
+   public method image_pixel2grid {x y} {
       if { $axis_ == 1 } {
          set xo [lindex $bounds_ 2]
          set yo [lindex $bounds_ 4]
@@ -921,7 +800,7 @@ itcl::class gaia::GaiaCube {
    }
 
    #  Convert pixel index to grid index along the selected axis.
-   protected method axis_pixel2grid_ { value } {
+   public method axis_pixel2grid { value } {
       if { $axis_ == 1 } {
          set zo [lindex $bounds_ 0]
       } elseif { $axis_ == 2 } {
@@ -932,122 +811,6 @@ itcl::class gaia::GaiaCube {
       return [expr round($value+1-$zo)]
    }
 
-   #  Deal with a double click. This defines a reference spectrum or sends the
-   #  spectrum to SPLAT.
-   protected method handle_double_click_ {dest cx cy} {
-
-      #  Convert click coordinates from canvas coords to grid coords.
-      set ccx [$itk_option(-canvas) canvasx $cx]
-      set ccy [$itk_option(-canvas) canvasy $cy]
-      $itk_option(-rtdimage) convert coords $ccx $ccy canvas iix iiy image
-
-      if { $dest == "ref" } {
-         if { $spectrum_ == {} } {
-            return
-         }
-
-         #  Already have a plot, re-display if withdrawn.
-         if { [wm state $spectrum_] == "withdrawn" } {
-            $spectrum_ open
-         }
-
-         #  Correct collapse bounds to grid indices.
-         set lb [$itk_component(collapse) cget -lower_limit]
-         set ub [$itk_component(collapse) cget -upper_limit]
-         set alow [axis_pixel2grid_ $lb]
-         set ahigh [axis_pixel2grid_ $ub]
-
-         #  Make sure ix and iy are integers (zoomed images).
-         set ix [expr round($iix)]
-         set iy [expr round($iiy)]
-
-         #  Display it as a reference spectrum.
-         busy {
-            $spectrum_ display_reference $cubeaccessor_ $axis_ $alow $ahigh \
-               $ix $iy
-         }
-
-         #  Re-create the marker for the image position, if needed.
-         if { $ref_position_mark_ == {} } {
-            create_ref_position_marker_ $ccx $ccy
-         }
-
-         #  Move position marker on the image.
-         $itk_option(-canvas) coords $ref_position_mark_ $ccx $ccy
-
-      } else {
-
-         #  Correct to pixel indices.
-         lassign [image_grid2pixel_ $iix $iiy] ix iy
-
-         #  Create the right section. Use collapse coords as bounds on the
-         #  spectral axis.
-         set lb [$itk_component(collapse) cget -lower_limit]
-         set ub [$itk_component(collapse) cget -upper_limit]
-         set range "$lb:$ub"
-         if { $axis_ == 1 } {
-            set section "($range,$ix,${iy}${close_section_}"
-         } elseif { $axis_ == 2 } {
-            set section "($ix,$range,${iy}${close_section_})"
-         } else {
-            set section "($ix,$iy,${range}${close_section_}"
-         }
-
-         #  Send the section to SPLAT.
-         if { $splat_disp_ == {} } {
-            set splat_disp_ [GaiaForeignExec \#auto \
-                                -application $splat_dir_/splatdisp \
-                                -show_output 0]
-         }
-         $splat_disp_ runwith "${ndfname_}${section}" 0
-      }
-   }
-
-   #  Create the main spectral line position marker.
-   #  XXX refactor into GaiaSpectralPlot. Should be same colour as spectral
-   #  line.
-   protected method create_position_marker_ { cx cy } {
-
-      #  Note fixscale so that always same size, regardless of zoom.
-      set position_mark_ [$itk_option(-canvas) create rtd_mark \
-                             $cx $cy -type cross -scale 1 \
-                             -fixscale 1 -size 7 -outline blue]
-
-      #  Bindings to move and select this.
-      $itk_option(-canvas) bind $position_mark_ <1> \
-         [code $this display_spectrum_ localstart %x %y]
-
-      $itk_option(-canvas) bind $position_mark_  <B1-Motion> \
-         [code $this display_spectrum_ localdrag %x %y]
-   }
-
-   #  Create the reference spectral position marker.
-   protected method create_ref_position_marker_ { cx cy } {
-
-      #  Note fixscale so that always same size, regardless of zoom.
-      set ref_position_mark_ [$itk_option(-canvas) create rtd_mark \
-                                 $cx $cy -type cross -scale 1 \
-                                 -fixscale 1 -size 7 -outline green]
-
-      #  Bindings so that main position mark moves when over this.
-      $itk_option(-canvas) bind $ref_position_mark_ <1> \
-         [code $this display_spectrum_ localstart %x %y]
-
-      $itk_option(-canvas) bind $ref_position_mark_  <B1-Motion> \
-         [code $this display_spectrum_ localdrag %x %y]
-   }
-
-   #  XXX Devel code for region spectra (was in display_spectrum_).
-   #  if { $ardspectra_ == {} } {
-   #     global gaia_dir
-   #     set ardspectra_ [GaiaApp \#auto -application $gaia_dir/ardspectra]
-   #  }
-   #  set arddesc "CIRCLE($ix,$iy,20)"
-   #  $ardspectra_  runwiths "in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
-   #  catch {
-   #     $splat_disp_ runwith "GaiaArdSpectrum"
-   #  } msg
-
    #  ==========================================
    #  Utility methods for various helper classes
    #  ==========================================
@@ -1055,24 +818,18 @@ itcl::class gaia::GaiaCube {
    #  Make a reference range in the spectral plot, if shown. Use the given
    #  identifier.
    public method make_ref_range {id} {
-      if { $spectrum_ != {} } {
-         $spectrum_ make_ref_range $id
-      }
+      $itk_component(spectrum) make_ref_range $id
    }
 
    #  Remove a reference range from the spectral plot, if shown. Use the given
    #  identifier.
    public method remove_ref_range {id} {
-      if { $spectrum_ != {} } {
-         $spectrum_ remove_ref_range $id
-      }
+      $itk_component(spectrum) remove_ref_range $id
    }
 
    #  Set the colour of the identified reference range.
    public method set_ref_range_colour {id colour} {
-      if { $spectrum_ != {} } {
-         $spectrum_ set_ref_range_colour $id $colour
-      }
+      $itk_component(spectrum) set_ref_range_colour $id $colour
    }
 
    #  Get the name of the cube (in NDF format).
@@ -1083,6 +840,23 @@ itcl::class gaia::GaiaCube {
    #  Get the current axis.
    public method get_axis {} {
       return $axis_
+   }
+
+   #  Allow support classes access to the cubeaccessor. This access
+   #  should be considered readonly.
+   public method get_cubeaccessor {} {
+      return $cubeaccessor_
+   }
+
+   #  Get the current axis.
+   public method get_close_section {} {
+      return $close_section_
+   }
+
+   #  Set the spectral extraction range. Tools that display collapsed images
+   #  will probably want to do this.
+   public method set_extraction_range {lower upper} {
+      $itk_component(spectrum) ref_range_moved 1 $lower $upper none
    }
 
    #  Configuration options: (public variables)
@@ -1100,7 +874,7 @@ itcl::class gaia::GaiaCube {
       set rtdctrl_info_ [$rtdctrl component info]
    }
 
-   #  The canvas. Used for displaying spectra.
+   #  The canvas.
    itk_option define -canvas canvas Canvas {}
 
    #  The rtdimage instance.
@@ -1141,26 +915,8 @@ itcl::class gaia::GaiaCube {
    #  The current axis.
    protected variable axis_ 1
 
-   #  The SPLAT home directory.
-   protected variable splat_dir_ {}
-
-   #  Task controller for splatdisp command.
-   protected variable splat_disp_ {}
-
-   #  Task controller for ardspectra
-   protected variable ardspectra_ {}
-
    #  Check for cubes setting of GAIA.
    protected variable check_for_cubes_ 1
-
-   #  The spectrum plot item.
-   protected variable spectrum_ {}
-
-   #  The position marker that corresponds to the spectrum.
-   protected variable position_mark_ {}
-
-   #  The position marker that corresponds to the reference spectrum.
-   protected variable ref_position_mark_ {}
 
    #  The name for the dummy NDF, with updatable image section.
    protected variable section_name_ ""
@@ -1186,9 +942,6 @@ itcl::class gaia::GaiaCube {
    #  Object for controlling the spectral coordinates.
    protected variable spec_coords_ {}
 
-   #  Last cx and cy values used in to open a spectrum.
-   protected variable last_cxcy_ {}
-
    #  Array of index-based controls for the reference lines. These are indexed
    #  by their ref_id.
    protected variable ref_line_controls_
@@ -1201,10 +954,8 @@ itcl::class gaia::GaiaCube {
    #  is destroyed.
    protected variable temp_files_ ""
 
-   #  Last lower and upper collapse bounds. When these change any reference
-   #  graphics should be updated.
-   protected variable llb_ ""
-   protected variable lub_ ""
+   #  The ref_id value of the baseline controls. Must be last.
+   protected variable baseline_id_ ""
 
    #  Common variables: (shared by all instances)
    #  -----------------

@@ -1,0 +1,883 @@
+#+
+#  Name:
+#     GaiaCubeSpectrum
+
+#  Type of Module:
+#     [incr Tk] class
+
+#  Purpose:
+#     Controls for spectral display from a cube.
+
+#  Description:
+#     This class creates a panel of controls for determining how the
+#     spectrum is extracted from a cube. The extraction can be from a point
+#     and or ARD regions.
+
+#  Invocations:
+#
+#        GaiaCubeSpectrum object_name [configuration options]
+#
+#     This creates an instance of a GaiaCubeSpectrum object. The return is
+#     the name of the object.
+#
+#        object_name configure -configuration_options value
+#
+#     Applies any of the configuration options (after the instance has
+#     been created).
+#
+#        object_name method arguments
+#
+#     Performs the given method on this object.
+
+#  Configuration options:
+#     See itk_option definitions below.
+
+#  Methods:
+#     See individual method declarations below.
+
+#  Inheritance:
+#     util::TopLevelWidget
+
+#  Copyright:
+#     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     PWD: Peter Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     10-JUL-2006 (PWD):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
+#.
+
+itk::usual GaiaCubeSpectrum {}
+
+itcl::class gaia::GaiaCubeSpectrum {
+
+   #  Inheritances:
+   #  -------------
+   inherit util::FrameWidget
+
+   #  Nothing
+
+   #  Constructor:
+   #  ------------
+   constructor {args} {
+
+      #  Evaluate any options [incr Tk].
+      eval itk_initialize $args
+
+      #  Whether to enable spectral extraction.
+      itk_component add extraction {
+         StarLabelCheck $w_.extraction \
+            -text "Spectrum extraction:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $itk_option(-labelwidth) \
+            -variable [scope itk_option(-extraction)] \
+            -command [code $this toggle_extraction_]
+      }
+      pack $itk_component(extraction) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(extraction) {Display extracted spectrum}
+
+      #  Whether to show the extraction limits as a range object on the
+      #  spectral plot.
+      itk_component add showrange {
+         StarLabelCheck $w_.showrange \
+            -text "Show limits on plot:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $itk_option(-labelwidth) \
+            -variable [scope itk_option(-show_ref_range)] \
+            -command [code $this toggle_show_ref_range_]
+      }
+      pack $itk_component(showrange) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(showrange) \
+         {Show extent of spectral extraction on plot with a reference range
+            figure}
+
+      itk_component add bounds {
+         GaiaSpectralPlotRange $w_.bounds \
+            -gaiacube $itk_option(-gaiacube) \
+            -ref_id $itk_option(-ref_id) \
+            -text1 {Lower index:} \
+            -text2 {Upper index:} \
+            -value1 $itk_option(-lower_limit) \
+            -value2 $itk_option(-upper_limit) \
+            -show_ref_range $itk_option(-show_ref_range) \
+            -labelwidth $itk_option(-labelwidth) \
+            -valuewidth $itk_option(-valuewidth) \
+            -coord_update_cmd [code $this set_extraction_bounds_]
+      }
+      pack $itk_component(bounds) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(bounds) \
+         {Lower and upper indices used for extraction}
+
+      #  Stop point tracking, can be confusing then also using regions.
+      itk_component add pointtracking {
+         StarLabelCheck $w_.pointtracking \
+            -text "Point tracking:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $itk_option(-labelwidth) \
+            -variable [scope itk_option(-point_tracking)] \
+            -command [code $this toggle_point_tracking_]
+      }
+      pack $itk_component(pointtracking) \
+         -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(pointtracking) \
+         {Do point extraction of spectrum, otherwise not}
+
+      #  Add region controls.
+      add_region_controls_
+
+      #  Add reference spectrum controls. Just "set" and "clear".
+      itk_component add rframe {
+         frame $w_.rframe
+      }
+      itk_component add reflabel {
+         label $itk_component(rframe).reflabel -text "Reference:" \
+            -width $itk_option(-labelwidth)
+      }
+      itk_component add setref {
+         button $itk_component(rframe).setref -text "Set" \
+            -command [code $this set_reference]
+      }
+      itk_component add clearref {
+         button $itk_component(rframe).clearref -text "Clear" \
+            -command [code $this clear_reference]
+      }
+      pack $itk_component(rframe) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(reflabel) -side left -expand 0 -ipadx 1m
+      pack $itk_component(setref) $itk_component(clearref) \
+         -side left -expand 0 -anchor w -ipadx 1m -padx 1m
+
+      add_short_help $itk_component(setref) \
+         {Make current spectrum the reference}
+      add_short_help $itk_component(clearref) \
+         {Clear the reference spectrum}
+
+      #  Set initial bindings.
+      toggle_extraction_
+   }
+
+   #  Destructor:
+   #  -----------
+   destructor  {
+      close
+      if { $toolbox_ != {} } {
+         delete object $toolbox_
+      }
+   }
+
+   #  Methods:
+   #  --------
+
+   #  Handle a close. This disables any interactions and graphics.
+   public method close {} {
+
+      #  Close the plot.
+      if { $spectrum_ != {} && [winfo exists $spectrum_] } {
+         $spectrum_ close
+      }
+
+      #  Remove any graphics displayed on the main image and remove
+      #  bindings.
+      remove_position_markers_
+      remove_bindings_
+      remove_regions_
+   }
+
+   #  Open, undo some of the actions of close.
+   public method open {} {
+      toggle_extraction_
+   }
+
+   #  Toggle whether we're extracting spectra or not.
+   protected method toggle_extraction_ {} {
+      if { $itk_option(-extraction) } {
+         add_bindings_
+      } else {
+         remove_bindings_
+         remove_position_markers_
+      }
+   }
+
+   #  Toggle whether point tracking is being done. Can be confusing when
+   #  this is used at the same time as regions, but not always.
+   protected method toggle_point_tracking_ {} {
+      if { $itk_option(-point_tracking) } {
+         #  Setup normal bindings.
+         add_bindings_
+      } else {
+         #  Remove normal bindings.
+         remove_bindings_
+         remove_position_markers_
+      }
+   }
+
+   #  Configure canvas so we get any clicks on the image and can display
+   #  the associated spectra.
+   protected method add_bindings_ {} {
+
+      #  Bindings for normal spectral extraction tracking.
+      add_spectral_bindings_
+
+      #  Bindings for handling double click.
+      set_double_click_bindings_
+   }
+
+   #  Set double click bindings. These can be configured to send the spectrum
+   #  to SPLAT, or to set the reference spectrum in the plot. The SPLAT option
+   #  only works for point extraction and for NDFs.
+   protected method set_double_click_bindings_ {} {
+      global env
+
+      if { [info exists env(SPLAT_DIR)] && $itk_option(-use_splat)} {
+         #  Double click sends to SPLAT.
+         set splat_dir_ $env(SPLAT_DIR)
+         $canvas_ bind all <Double-Button-1> \
+            [code $this send_to_splat_ %x %y]
+      } else {
+         #  Double click defines a reference spectrum.
+         $canvas_ bind all <Double-Button-1> \
+            [code $this display_point_reference_spectrum %x %y]
+      }
+   }
+
+   #  Add bindings to the rtdimage in the main canvas for spectral plot.
+   #  These are single-click and drag-click on the image and cross.
+   protected method add_spectral_bindings_ {} {
+
+      $canvas_ bind $rtdimage_ <1> \
+         [code $this display_point_spectrum_ localstart %x %y]
+
+      $canvas_ bind $rtdimage_  <B1-Motion> \
+         [code $this display_point_spectrum_ localdrag %x %y]
+   }
+
+   #  Remove bindings from main canvas for spectral plot.
+   protected method remove_bindings_ {} {
+      $canvas_ bind $rtdimage_ <1> {}
+      $canvas_ bind $rtdimage_ <B1-Motion> {}
+      $canvas_ bind all <Double-Button-1> {}
+   }
+
+   #  If not available create the spectral plot, otherwise activate it.
+   protected method make_plot_ {} {
+      if { $spectrum_ == {} } {
+         #  Need to create a spectrum plot. Note show short help in this
+         #  window to save real estate.
+         set cube $itk_option(-gaiacube)
+         set spectrum_ \
+            [GaiaSpectralPlot $w_.specplot \
+                -number [$itk_option(-gaia) cget -number] \
+                -spec_coords $itk_option(-spec_coords) \
+                -ref_line_changed_cmd [code $cube ref_line_moved_] \
+                -ref_range_changed_cmd [code $cube ref_range_moved_] \
+                -shorthelpwin $itk_option(-gaia)]
+
+         #  Make this a transient of main window, not this one.
+         wm transient $spectrum_ $itk_option(-gaia)
+      } else {
+         #  Already have a plot, re-display if withdrawn.
+         if { [wm state $spectrum_] == "withdrawn" } {
+            $spectrum_ open
+         }
+      }
+   }
+
+   #  Display a spectrum in the local plot. Action can be "localstart" or
+   # "localdrag", to start a spectral display (sets the initial scale of a
+   # drag), or update during a drag.
+   protected method display_point_spectrum_ {action cx cy} {
+
+      #  Retain coordinates for a possible update.
+      set last_cxcy_ "$cx $cy"
+      set last_region_ {}
+
+      #  Convert click coordinates from canvas coords to grid coords.
+      set ccx [$canvas_ canvasx $cx]
+      set ccy [$canvas_ canvasy $cy]
+      $rtdimage_ convert coords $ccx $ccy canvas iix iiy image
+
+      #  Make the spectral plot available.
+      make_plot_
+
+      #  Re-create the marker for the image position.
+      if { $position_mark_ == {} } {
+         create_position_marker_ $ccx $ccy
+      }
+
+      #  Correct spectral extraction bounds to grid indices.
+      set lb $itk_option(-lower_limit)
+      set ub $itk_option(-upper_limit)
+      set alow [$itk_option(-gaiacube) axis_pixel2grid $lb]
+      set ahigh [$itk_option(-gaiacube) axis_pixel2grid $ub]
+
+      #  Make sure ix and iy are integers (zoomed images).
+      set ix [expr round($iix)]
+      set iy [expr round($iiy)]
+
+      #  Move position marker on the image.
+      $canvas_ coords $position_mark_ $ccx $ccy
+
+      #  Also autoscale when single click, so that we are not fixed for
+      #  all time.
+      set cubeaccessor [$itk_option(-gaiacube) get_cubeaccessor]
+      set axis [$itk_option(-gaiacube) get_axis]
+      if { $action == "localstart" } {
+         busy {
+            $spectrum_ display $cubeaccessor $axis $alow $ahigh $ix $iy 1
+         }
+
+         #  Set first-time position of the main reference line. This is
+         #  the position of the current image slice.
+         set coord [$itk_option(-gaiacube) get_plane_coord 0 0]
+         if { $coord != {} } {
+            update;                     # Make sure plot is created first.
+            set_spec_ref_coord 1 $coord
+         }
+
+         #  And reposition any graphics, if the extraction bounds have
+         #  changed.
+         if { $lb != $llb_ || $ub != $lub_ } {
+            $spectrum_ fitxy
+         }
+      } else {
+         busy {
+            $spectrum_ display $cubeaccessor $axis $alow $ahigh $ix $iy 0
+         }
+      }
+
+      #  Display the current coordinate for reference.
+      lassign [$rtdimage_ astpix2cur $iix $iiy] ra dec
+      $spectrum_ update_label "$ra, $dec"
+
+      #  Record extraction bounds, these are checked.
+      set llb_ $lb
+      set lub_ $ub
+   }
+
+   #  Display a region spectrum in the local plot. Action can be "localstart"
+   #  or "localdrag", to start a spectral display (sets the initial scale of a
+   #  drag), or update during a drag.
+   protected method display_region_spectrum_ {action region} {
+
+      #  Retain region for a possible update.
+      set last_region_ $region
+      set last_cxcy_ {}
+
+      #  Make the spectral plot available.
+      make_plot_
+
+      #  Correct spectral extraction bounds to grid indices.
+      set lb $itk_option(-lower_limit)
+      set ub $itk_option(-upper_limit)
+      set alow [$itk_option(-gaiacube) axis_pixel2grid $lb]
+      set ahigh [$itk_option(-gaiacube) axis_pixel2grid $ub]
+
+      #  Also autoscale when doing a localstart.
+      set cubeaccessor [$itk_option(-gaiacube) get_cubeaccessor]
+      set axis [$itk_option(-gaiacube) get_axis]
+      if { $action == "localstart" } {
+         busy {
+            $spectrum_ display_region $cubeaccessor $axis $alow $ahigh \
+               $region "mean" 1
+         }
+
+         #  Set first-time position of the main reference line. This is
+         #  the position of the current image slice.
+         set coord [$itk_option(-gaiacube) get_plane_coord 0 0]
+         if { $coord != {} } {
+            update;                     # Make sure plot is created first.
+            set_spec_ref_coord 1 $coord
+         }
+
+         #  And reposition any graphics, if the extraction bounds have
+         #  changed.
+         if { $lb != $llb_ || $ub != $lub_ } {
+            $spectrum_ fitxy
+         }
+      } else {
+         busy {
+            $spectrum_ display_region $cubeaccessor $axis $alow $ahigh \
+               $region "mean" 0
+         }
+      }
+
+      #  Cannot display the current coordinate, so make sure it is empty.
+      $spectrum_ update_label ""
+
+      #  Record extraction bounds, these are checked.
+      set llb_ $lb
+      set lub_ $ub
+   }
+
+   #  Send an NDF section to SPLAT for display. Initial coordinates are
+   #  a canvas position.
+   protected method send_to_splat_ {cx cy} {
+
+      #  Convert click coordinates from canvas coords to grid coords.
+      set ccx [$canvas_ canvasx $cx]
+      set ccy [$canvas_ canvasy $cy]
+      $rtdimage_ convert coords $ccx $ccy canvas iix iiy image
+
+      #  Correct to pixel indices.
+      lassign [$itk_option(-gaiacube) image_grid2pixel $iix $iiy] ix iy
+      
+      #  Create the right section. Use extraction bounds on the
+      #  spectral axis.
+      set lb $itk_option(-lower_limit)
+      set ub $itk_option(-upper_limit)
+      set range "$lb:$ub"
+      set axis [$itk_option(-gaiacube) get_axis]
+      set close_section [$itk_option(-gaiacube) get_close_section]
+      if { $axis == 1 } {
+         set section "($range,$ix,${iy}${close_section}"
+      } elseif { $axis == 2 } {
+         set section "($ix,$range,${iy}${close_section})"
+      } else {
+         set section "($ix,$iy,${range}${close_section}"
+      }
+      
+      #  Send the section to SPLAT.
+      if { $splat_disp_ == {} } {
+         set splat_disp_ [GaiaForeignExec \#auto \
+                             -application $splat_dir_/splatdisp \
+                             -show_output 0]
+      }
+      set ndfname [$itk_option(-gaiacube) get_ndfname]
+      $splat_disp_ runwith "${ndfname}${section}" 0
+   }
+
+   #  Extract and display a position as a reference spectrum. The
+   #  plot must already exist.
+   public method display_point_reference_spectrum {cx cy} {
+
+      #  Must already have a plot, re-display if withdrawn.
+      if { $spectrum_ == {} } {
+         return
+      }
+      $spectrum_ open
+
+      #  Convert coordinates from canvas coords to grid coords.
+      set ccx [$canvas_ canvasx $cx]
+      set ccy [$canvas_ canvasy $cy]
+      $rtdimage_ convert coords $ccx $ccy canvas iix iiy image
+
+      #  Correct extraction bounds to grid indices.
+      set lb $itk_option(-lower_limit)
+      set ub $itk_option(-upper_limit)
+      set alow [$itk_option(-gaiacube) axis_pixel2grid $lb]
+      set ahigh [$itk_option(-gaiacube) axis_pixel2grid $ub]
+
+      #  Make sure ix and iy are integers (zoomed images).
+      set ix [expr round($iix)]
+      set iy [expr round($iiy)]
+
+      #  Display it as a reference spectrum.
+      set cubeaccessor [$itk_option(-gaiacube) get_cubeaccessor]
+      set axis [$itk_option(-gaiacube) get_axis]
+      busy {
+         $spectrum_ display_reference $cubeaccessor $axis $alow $ahigh $ix $iy
+      }
+
+      #  Re-create the marker for the image position, if needed.
+      if { $ref_position_mark_ == {} } {
+         create_ref_position_marker_ $ccx $ccy
+      }
+
+      #  Move position marker on the image.
+      $canvas_ coords $ref_position_mark_ $ccx $ccy
+   }
+
+   #  Extract and display a region as a reference spectrum. The
+   #  plot must already exist.
+   public method display_region_reference_spectrum {region} {
+
+      #  Must already have a plot, re-display if withdrawn.
+      if { $spectrum_ == {} } {
+         return
+      }
+      $spectrum_ open
+
+      #  Correct extraction bounds to grid indices.
+      set lb $itk_option(-lower_limit)
+      set ub $itk_option(-upper_limit)
+      set alow [$itk_option(-gaiacube) axis_pixel2grid $lb]
+      set ahigh [$itk_option(-gaiacube) axis_pixel2grid $ub]
+
+      #  Display it as a reference spectrum.
+      set cubeaccessor [$itk_option(-gaiacube) get_cubeaccessor]
+      set axis [$itk_option(-gaiacube) get_axis]
+      busy {
+         $spectrum_ display_region_reference $cubeaccessor $axis $alow $ahigh \
+            $region "mean"
+      }
+
+      #  Reference position marker doesn't apply.
+      if { $ref_position_mark_ != {} } {
+         remove_position_markers_
+      }
+   }
+
+   #  Set the current spectrum (that is the last one extracted) as the
+   #  reference spectrum.
+   public method set_reference {} {
+      if { $spectrum_ != {} } {
+         if { $last_cxcy_ != {} } {
+
+            #  Point spectrum.
+            eval display_point_reference_spectrum $last_cxcy_
+
+         } elseif { $last_region_ != {} } {
+
+            #  Region spectrum.
+            display_region_reference_spectrum $last_region_
+         }
+      }
+   }
+
+   #  Clear the reference spectrum.
+   public method clear_reference {} {
+      if { $spectrum_ != {} } {
+         $spectrum_ remove_reference
+      }
+   }
+
+   #  Create the main spectral line position marker.
+   protected method create_position_marker_ { cx cy } {
+
+      #  Note fixscale so that always same size, regardless of zoom.
+      set position_mark_ [$canvas_ create rtd_mark $cx $cy -type cross \
+                             -scale 1 -fixscale 1 -size 7 -outline blue]
+
+      #  Bindings to move and select this.
+      $canvas_ bind $position_mark_ <1> \
+         [code $this display_point_spectrum_ localstart %x %y]
+
+      $canvas_ bind $position_mark_  <B1-Motion> \
+         [code $this display_point_spectrum_ localdrag %x %y]
+   }
+
+   #  Create the reference spectral position marker.
+   protected method create_ref_position_marker_ { cx cy } {
+
+      #  Note fixscale so that always same size, regardless of zoom.
+      set ref_position_mark_ [$canvas_ create rtd_mark $cx $cy -type cross \
+                                 -scale 1 -fixscale 1 -size 7 \
+                                 -outline green]
+
+      #  Bindings so that main position mark moves when over this.
+      $canvas_ bind $ref_position_mark_ <1> \
+         [code $this display_point_spectrum_ localstart %x %y]
+
+      $canvas_ bind $ref_position_mark_  <B1-Motion> \
+         [code $this display_point_spectrum_ localdrag %x %y]
+   }
+
+   #  Remove the position markers.
+   protected method remove_position_markers_ {} {
+      if { [winfo exists $canvas_] } {
+         if { $position_mark_ != {} } {
+            $canvas_ delete $position_mark_
+            set position_mark_ {}
+         }
+         if { $ref_position_mark_ != {} } {
+            $canvas_ delete $ref_position_mark_
+            set ref_position_mark_ {}
+         }
+      }
+   }
+
+
+   #  Add controls for choosing a region shape.
+   protected method add_region_controls_ {} {
+      set toolbox_ [StarArdTool \#auto \
+                       -rtdimage $rtdimage_ \
+                       -canvasdraw $canvasdraw_ \
+                       -canvas $canvas_ \
+                       -maxcol 9 \
+                       -notify_created_cmd [code $this region_created_]\
+                       -notify_started_cmd [code $this region_started_]]
+
+      #  Just use sensible types, no Pixel.
+      set types [$toolbox_ get_known_types]
+      regsub "Pixel" $types "" clean_types
+      $toolbox_ known_types $clean_types
+
+      #  Pack buttons like a labelled object.
+      itk_component add bframe {
+         frame $w_.bframe
+      }
+      itk_component add blabel {
+         label $itk_component(bframe).label -text "Define region:" \
+            -width $itk_option(-labelwidth)
+      }
+
+      set buttons_ [$toolbox_ make_types_frame $itk_component(bframe).tools]
+      add_short_help $buttons_ {Choose a region, then draw on main image}
+
+      pack $itk_component(bframe) -side top -fill x -expand 1 -ipadx 1m
+      pack $itk_component(blabel) -side left -expand 0 -ipadx 1m
+      pack $buttons_ -side left -expand 0 -anchor w -ipadx 1m
+   }
+
+   #  Method to deal with the creation of a region.
+   protected method region_created_ {index id} {
+
+      #  Configure underlying object to pass on movements and resizes, when
+      #  the object is selected or deselected and return coordinates in GRID.
+      $toolbox_ apply_cmd $index configure \
+         -notify_update_cmd [code $this region_update_] \
+         -use_origins 0 \
+         -notify_selected_cmd [code $this update_region_selection]
+
+      #  Display the first extraction.
+      display_region_spectrum_ localstart [$toolbox_ get_selected_description]
+
+      #  Bindings are disabled when object creation starts, so reenable.
+      toggle_extraction_
+   }
+
+   #  Method to deal with the start of region creation.
+   protected method region_started_ {} {
+
+      #  Stop point tracking from interfering with interaction.
+      remove_bindings_
+   }
+
+   #  Deal with notification that a region has been updated. Need to extract
+   #  the current ARD description and display the extracted spectrum.
+   protected method region_update_ {} {
+      display_region_spectrum_ localdrag [$toolbox_ get_selected_description]
+   }
+
+   #  Region has been selected or deselected. Only react to selected which
+   #  means extract spectrum with autoscaling.
+   public method update_region_selection {state} {
+      if { $state == "selected" } {
+         display_region_spectrum_ localstart \
+            [$toolbox_ get_selected_description]
+      }
+   }
+
+   #  Remove all the regions.
+   protected method remove_regions_ {} {
+      $toolbox_ clear
+   }
+
+   #  Set the minimum and maximum possible bounds of the extraction.
+   public method set_bounds {plane_min plane_max} {
+      $itk_component(bounds) configure -from $plane_min -to $plane_max
+      $itk_component(bounds) configure -value1 $plane_min -value2 $plane_max
+      set_extraction_bounds_ $plane_min $plane_max
+   }
+
+   #  Handle the change in the extraction reference range (user interaction by
+   #  dragging or resizing range shown in plot).
+   public method ref_range_moved {id coord1 coord2 action} {
+
+      #  Inhibit feedback to graphics reference range, before applying the new
+      #  bounds.
+      if { $action == "move" } {
+         set oldvalue [$itk_component(bounds) cget -show_ref_range]
+         $itk_component(bounds) configure -show_ref_range 0
+      }
+
+      #  Update the bounds.
+      $itk_component(bounds) configure -value1 $coord1 -value2 $coord2
+      set_extraction_bounds_ $coord1 $coord2
+
+      if { $action == "move" } {
+         $itk_component(bounds) configure -show_ref_range $oldvalue
+      }
+   }
+
+   #  Set the extraction bounds.
+   protected method set_extraction_bounds_ {bound1 bound2} {
+      configure -lower_limit $bound1 -upper_limit $bound2
+   }
+
+   #  Toggle the display of the reference range.
+   protected method toggle_show_ref_range_ {} {
+      $itk_component(bounds) configure \
+         -show_ref_range $itk_option(-show_ref_range)
+      if { $itk_option(-show_ref_range) } {
+         $itk_option(-gaiacube) make_ref_range $itk_option(-ref_id)
+         $itk_option(-gaiacube) set_ref_range_colour \
+            $itk_option(-ref_id) "orange"
+         $itk_component(bounds) configure \
+            -value1 $itk_option(-lower_limit) \
+            -value2 $itk_option(-upper_limit)
+      } else {
+         $itk_option(-gaiacube) remove_ref_range $itk_option(-ref_id)
+      }
+   }
+
+   #  Make a reference range in the spectral plot, if shown. Use the given
+   #  identifier.
+   public method make_ref_range {id} {
+      if { $spectrum_ != {} } {
+         $spectrum_ make_ref_range $id
+      }
+   }
+
+   #  Remove a reference range from the spectral plot, if shown. Use the
+   #  given identifier.
+   public method remove_ref_range {id} {
+      if { $spectrum_ != {} } {
+         $spectrum_ remove_ref_range $id
+      }
+   }
+
+   #  Set the colour of the identified reference range.
+   public method set_ref_range_colour {id colour} {
+      if { $spectrum_ != {} } {
+         $spectrum_ set_ref_range_colour $id $colour
+      }
+   }
+
+   #  Update the spectral plot if the coordinate system has been changed.
+   #  Re-extracts the last spectrum.
+   public method coord_system_changed {} {
+      if { $spectrum_ != {} } {
+         if { $last_cxcy_ != {} } {
+            eval display_point_spectrum_ localstart $last_cxcy_
+         } elseif { $last_region_ != {} } {
+            display_region_spectrum_ localstart $last_region_
+         }
+      }
+   }
+
+   #  Set the position of a reference line shown in the plot.
+   public method set_spec_ref_coord {id coord} {
+      if { $spectrum_ != {} && $coord != {} } {
+         $spectrum_ set_ref_line_coord $id $coord
+      }
+   }
+
+   #  Set the position of a reference range shown in the plot.
+   public method set_spec_ref_range_coord {id coord1 coord2} {
+      if { $spectrum_ != {} && $coord1 != {} && $coord2 != {} } {
+         $spectrum_ set_ref_range_coord $id $coord1 $coord2
+      }
+   }
+
+   #  Configuration options: (public variables)
+   #  ----------------------
+
+   #  Whether to extract spectra, or not.
+   itk_option define -extraction extraction Extraction 1
+
+   #  The related GaiaCube instance.
+   itk_option define -gaiacube gaiacube GaiaCube {}
+
+   #  The related Gaia instance.
+   itk_option define -gaia gaia Gaia {} {
+      if { $itk_option(-gaia) != {} } {
+         set image_ [$itk_option(-gaia) get_image]
+         set rtdimage_ [$image_ get_image]
+         set canvasdraw_ [$image_ component draw]
+         set canvas_ [$image_ get_canvas]
+      }
+   }
+
+   #  The identifier of the reference range.
+   itk_option define -ref_id ref_id Ref_Id 1
+
+   #  Whether to show the reference range.
+   itk_option define -show_ref_range show_ref_range Show_Ref_Range 0
+
+   #  Extraction bounds.
+   itk_option define -lower_limit lower_limit Lower_Limit 0
+   itk_option define -upper_limit upper_limit Upper_Limit 0
+
+   #  Width of labels.
+   itk_option define -labelwidth labelwidth LabelWidth 20
+
+   #  Width of values.
+   itk_option define -valuewidth valuewidth ValueWidth 20
+
+   #  Enable/disable point tracking and extraction.
+   itk_option define -point_tracking point_tracking Point_Tracking 1
+
+   #  Whether to enable or disabled the SPLAT mouse bindings.
+   itk_option define -use_splat use_splat Use_Splat 0 {
+      if { $canvas_ != {} } {
+         set_double_click_bindings_
+      }
+   }
+
+   #  GaiaSpecCoords instance used by related GaiaCube.
+   itk_option define -spec_coords spec_coords Spec_Coords {}
+
+   #  Protected variables: (available to instance)
+   #  --------------------
+
+   #  The spectrum plot item.
+   protected variable spectrum_ {}
+
+   #  Maximum and minimum possible value for plane.
+   protected variable plane_max_ 0
+   protected variable plane_min_ 0
+
+   #  Useful components of GAIA.
+   protected variable image_ {}
+   protected variable rtdimage_ {}
+   protected variable canvasdraw_ {}
+   protected variable canvas_ {}
+
+   #  Toolbox in charge of ARD regions.
+   protected variable toolbox_ {}
+
+   #  The ARD buttons.
+   protected variable buttons_ {}
+
+   #  Last cx and cy values used to open a spectrum.
+   protected variable last_cxcy_ {}
+
+   #  Last region used to open a spectrum.
+   protected variable last_region_ {}
+
+   #  Last lower and upper extraction bounds. When these change any
+   #  reference graphics should be updated.
+   protected variable llb_ ""
+   protected variable lub_ ""
+
+   #  The SPLAT home directory.
+   protected variable splat_dir_ {}
+
+   #  Task controller for splatdisp command.
+   protected variable splat_disp_ {}
+
+   #  The position marker that corresponds to the spectrum.
+   protected variable position_mark_ {}
+
+   #  The position marker that corresponds to the reference spectrum.
+   protected variable ref_position_mark_ {}
+
+   #  Common variables: (shared by all instances)
+   #  -----------------
+
+#  End of class definition.
+}
