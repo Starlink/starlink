@@ -81,7 +81,10 @@ kpg1_mmth.gn kpg1_mxme.gn kpg1_mxmn.gn kpg1_nois.gn \
 kpg1_nthm.gn kpg1_numb.gn kpg1_past.gn kpg1_pois.gn \
 kpg1_pxdp.gn kpg1_retr.gn kpg1_rmap.gn kpg1_stat.gn \
 kpg1_stor.gn kpg1_tdli.gn kpg1_thrs.gn kpg1_trli.gn \
-kpg1_trsp.gn kpg1_vasv.gn kpg1_wmod.gn 
+kpg1_trsp.gn kpg1_vasv.gn kpg1_wmod.gn \
+kpg1_sclb.gn  kpg1_scli.gn   kpg1_scluw.gn \
+kpg1_sclub.gn  kpg1_sclw.gn
+
 
 # All except logical (include char)
 KPG_XL_GEN = kpg1_qsrt.gxl
@@ -222,6 +225,7 @@ kpg1_rcatw.f \
 kpg1_rdast.f \
 kpg1_reprt.f \
 kpg1_rglmt.f \
+kpg1_scalx.f \
 kpg1_sclof.f \
 kpg1_sdimp.f \
 kpg1_secsh.f \
