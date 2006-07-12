@@ -283,6 +283,9 @@ itcl::class gaia::StarCanvasObject {
          }
       }
       set selected_ 1
+      if { $notify_selected_cmd != {} } {
+         eval $notify_selected_cmd selected
+      }
    }
 
    #  Object is deselected so colour it.
@@ -300,13 +303,21 @@ itcl::class gaia::StarCanvasObject {
          }
       }
       set selected_ 0
+      if { $notify_selected_cmd != {} } {
+         eval $notify_selected_cmd deselected
+      }
    }
 
    #  Convert from canvas coordinates to image coordinates.
    method image_coord { x y } {
       if { $rtdimage != {} } {
          $rtdimage convert coords $x $y canvas x y image
-	 $rtdimage origin xo yo
+         if { $use_origins } {
+            $rtdimage origin xo yo
+         } else {
+            set xo 1.0
+            set yo 1.0
+         }
          set x [expr $x-1.5+$xo]
          set y [expr $y-1.5+$yo]
       }
@@ -345,7 +356,12 @@ itcl::class gaia::StarCanvasObject {
    #  Convert from image coordinates to canvas coordinates.
    method canvas_coord { x y } {
       if { $rtdimage != {} } {
-	 $rtdimage origin xo yo
+         if { $use_origins } {
+            $rtdimage origin xo yo
+         } else {
+            set xo 1.0
+            set yo 1.0
+         }
          set x [expr $x+1.5-$xo]
          set y [expr $y+1.5-$yo]
          $rtdimage convert coords $x $y image x y canvas
@@ -431,6 +447,11 @@ itcl::class gaia::StarCanvasObject {
    #  Command to execute if item is deleted.
    public variable notify_delete_cmd {} {}
 
+   #  Command to execute when object is selected or deselected. The
+   #  command will have a single argument "selected" or "deselected"
+   #  appended to the command.
+   public variable notify_selected_cmd {}
+
    #  Set colours selected and deselected objects.
    public variable selected_colour white {}
    public variable deselected_colour green {}
@@ -452,6 +473,9 @@ itcl::class gaia::StarCanvasObject {
    #  into displayed canvas size and coordinates to image.
    public variable rtdimage {} {}
 
+   #  Whether to include the NDF origin information in any image coordinates.
+   public variable use_origins 1 {}
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -466,7 +490,7 @@ itcl::class gaia::StarCanvasObject {
 
    #  Command to execute after interactive object is completed.
    protected variable create_cmd_ {}
-
+   
    #  Common variables: (shared by all instances)
    #  -----------------
 
