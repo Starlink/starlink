@@ -10568,6 +10568,8 @@ The following is an example \xref{ADAM}{sg4}{} interface file
             {Set new pixel-index bounds for an NDF}
 \noteroutine{NDF\_SCOPY( INDF1, CLIST, PLACE, INDF2, STATUS )}
             {Selectively copy NDF components to a new location}
+\noteroutine{NDF\_SCTYP( INDF, COMP, TYPE, STATUS )}
+            {Obtain the numeric type of a scaled NDF array component}
 \noteroutine{NDF\_SECT( INDF1, NDIM, LBND, UBND, INDF2, STATUS )}
             {Create an NDF section}
 \noteroutine{NDF\_SHIFT( NSHIFT, SHIFT, INDF, STATUS )}
@@ -16648,6 +16650,66 @@ locator}{sun92}{using_locators}}
    }
 }
 \sstroutine{
+   NDF\_SCTYP
+}{
+   Obtain the numeric type of a scaled NDF array component
+}{
+   \sstdescription{
+      The routine returns the numeric type of a scaled NDF array component
+      as an upper-case character string (e.g. {\tt '}\_REAL{\tt '}). The returned type
+      describes the values stored in the array, before they are unscaled
+      using the associated scale and zero values. Use NDF\_TYPE if you
+      need the data type of the array after it has been unscaled.
+   }
+   \sstinvocation{
+      CALL NDF\_SCTYP( INDF, COMP, TYPE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         COMP = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the NDF array component whose type is required:
+         {\tt '}DATA{\tt '} or {\tt '}VARIANCE{\tt '}.
+      }
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Numeric type of the component.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the array is not stored in SCALED form, then this routine
+         returns the same type as the ARY\_TYPE routine.
+
+         \sstitem
+         A comma-separated list of component names may also be supplied
+         to this routine. In this case the result returned will be the
+         lowest precision numeric type to which all the specified
+         components can be converted without unnecessary loss of
+         information.
+
+         \sstitem
+         The symbolic constant NDF\_\_SZTYP may be used for declaring the
+         length of a character variable which is to hold the numeric type
+         of an NDF array component. This constant is defined in the
+         include file NDF\_PAR.
+      }
+   }
+}
+\sstroutine{
    NDF\_SECT
 }{
    Create an NDF section
@@ -18435,6 +18497,9 @@ Appendix~\ref{ss:cinterface}.\\[1.0ex]
             {Set new pixel-index bounds for an NDF}
 \noteroutineC{\xlabel{ndfScopy}void \htmlref{ndfScopy}{NDF_SCOPY}}{( int indf1, const char $*$clist, int $*$place, int $*$indf2, int $*$status );}
             {Selectively copy NDF components to a new location}
+\noteroutineC{\xlabel{ndfSctyp}void \htmlref{ndfSctyp}{NDF_SCTYP}}{( int indf, const char $*$comp, char $*$type, int type\_length, int $*$status );}
+            {Obtain the numeric type of a scaled NDF array component}
+
 \newpage
 \noteroutineC{\xlabel{ndfSect}void \htmlref{ndfSect}{NDF_SECT}}{( int indf1, int ndim, const int lbnd[~], const int ubnd[~], int $*$indf2,\argbrk\ int $*$status );}
             {Create an NDF section}

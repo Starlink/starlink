@@ -3381,6 +3381,45 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
+F77_SUBROUTINE(ndf_sctyp)( INTEGER(indf),
+                          CHARACTER(comp),
+                          CHARACTER(type),
+                          INTEGER(status)
+                          TRAIL(comp)
+                          TRAIL(type) );
+
+void ndfSctyp( int indf,
+              const char *comp,
+              char *type,
+              int type_length,
+              int *status ) {
+
+DECLARE_INTEGER(findf);
+DECLARE_CHARACTER_DYN(fcomp);
+DECLARE_CHARACTER_DYN(ftype);
+DECLARE_INTEGER(fstatus);
+
+   F77_EXPORT_INTEGER( indf, findf );
+   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
+   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_CHARACTER( ftype, type_length-1 );
+   F77_EXPORT_INTEGER( *status, fstatus );
+
+   F77_CALL(ndf_sctyp)( INTEGER_ARG(&findf),
+                       CHARACTER_ARG(fcomp),
+                       CHARACTER_ARG(ftype),
+                       INTEGER_ARG(&fstatus)
+                       TRAIL_ARG(fcomp)
+                       TRAIL_ARG(ftype) );
+
+   F77_FREE_CHARACTER( fcomp );
+   F77_IMPORT_CHARACTER( ftype, ftype_length, type );
+   F77_FREE_CHARACTER( ftype );
+   F77_IMPORT_INTEGER( fstatus, *status );
+
+   return;
+}
+
 F77_SUBROUTINE(ndf_unmap)( INTEGER(indf),
                            CHARACTER(comp),
                            INTEGER(status)

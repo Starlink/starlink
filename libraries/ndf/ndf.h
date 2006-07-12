@@ -688,6 +688,12 @@ void ndfTune( int value,
               const char *tpar,
               int *status );
 
+void ndfSctyp( int indf,
+              const char *comp,
+              char *type,
+              int type_length,
+              int *status );
+
 void ndfType( int indf,
               const char *comp,
               char *type,
