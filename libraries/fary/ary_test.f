@@ -172,6 +172,25 @@
      :                 'array', STATUS )
       END IF
 
+      CALL ARY_SCTYP( IARY, TYPE, STATUS )
+
+      IF( TYPE .NE. '_WORD' .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'T', TYPE )
+         CALL ERR_REP( 'ART_TEST_SER1', 'Bad scaled type (^T) for '//
+     :                 'scaled array', STATUS )
+      END IF
+
+      CALL ARY_TYPE( IARY, TYPE, STATUS )
+
+      IF( TYPE .NE. '_REAL' .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'T', TYPE )
+         CALL ERR_REP( 'ART_TEST_SER1', 'Bad unscaled type (^T) for '//
+     :                 'scaled array', STATUS )
+      END IF
+
+
 *  Check the data type is _REAL (because the scale and zero were set as
 *  reals).
       CALL ARY_TYPE( IARY, TYPE, STATUS )

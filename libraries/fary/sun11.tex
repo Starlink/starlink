@@ -755,6 +755,8 @@ routines.
             {Set the bad-pixel flag for an array}
 \noteroutine{ARY\_SBND( NDIM, LBND, UBND, IARY, STATUS )}
             {Set new pixel-index bounds for an array}
+\noteroutine{ARY\_SCTYP( IARY, TYPE, STATUS )}
+            {Obtain the numeric type of a scaled array}
 \noteroutine{ARY\_SECT( IARY1, NDIM, LBND, UBND, IARY2, STATUS )}
             {Create an array section}
 \noteroutine{ARY\_SHIFT( NSHIFT, SHIFT, IARY, STATUS )}
@@ -2550,6 +2552,53 @@ Creation and Control of Identifiers}
          eliminate any processing which might otherwise be needed to
          retain the existing values. This step is not necessary with an
          array section, where no processing of pixel values takes place.
+      }
+   }
+}
+\sstroutine{
+   ARY\_SCTYP
+}{
+   Obtain the numeric type of a scaled array
+}{
+   \sstdescription{
+      The routine returns the numeric type of a scaled array as an
+      upper-case character string (e.g. {\tt '}\_REAL{\tt '}). The returned type
+      describes the values stored in the array, before they are unscaled
+      using the associated scale and zero values. Use ARY\_TYPE if you
+      need the data type of the array after it has been unscaled.
+   }
+   \sstinvocation{
+      CALL ARY\_SCTYP( IARY, TYPE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Numeric type of the array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the array is not stored in SCALED form, then this routine
+         returns the same type as the ARY\_TYPE routine.
+
+         \sstitem
+         The symbolic constant ARY\_\_SZTYP may be used for declaring the
+         length of a character variable which is to hold the numeric type
+         of an array. This constant is defined in the include file
+         ARY\_PAR.
       }
    }
 }
