@@ -4,7 +4,7 @@
 *     smf_close_mapcoord
 
 *  Purpose:
-*     Close .SCU2RED.MAPCOORD in smfData
+*     Close MAPCOORD in smfData
 
 *  Language:
 *     Starlink ANSI C
@@ -22,7 +22,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     Search for .SCU2RED.MAPCOORD and free resources.
+*     Search for MAPCOORD and free resources.
 *
 *     
 *  Authors:
@@ -90,7 +90,7 @@ void smf_close_mapcoord( smfData *data, int *status ) {
       if( *status == SAI__OK ) {
         data->lut = NULL;
       } else {
-        errRep( FUNC_NAME, "Error annulling SCU2RED.MAPCOORD", status );
+        errRep( FUNC_NAME, "Error annulling MAPCOORD", status );
       }
     }
   }

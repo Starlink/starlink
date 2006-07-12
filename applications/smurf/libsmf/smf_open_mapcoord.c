@@ -4,7 +4,7 @@
 *     smf_open_mapcoord
 
 *  Purpose:
-*     Load .SCU2RED.MAPCOORD extension into smfData
+*     Load MAPCOORD extension into smfData
 
 *  Language:
 *     Starlink ANSI C
@@ -22,7 +22,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     Search for .SCU2RED.MAPCOORD extension and map pointer to lookup table.
+*     Search for MAPCOORD extension and map pointer to lookup table.
 *     For use with files that are left open! smf_close_file frees resources.
 *
 *     
@@ -32,6 +32,8 @@
 *  History:
 *     2006-06-08 (EC):
 *        Initial version
+*     2006-07-07 (EC):
+*        Changed name of the extension to MAPCOORD from SCU2RED.MAPCOORD
 
 *  Notes:
 
@@ -81,17 +83,17 @@ void smf_open_mapcoord( smfData *data, int *status ) {
   void *mapptr[3];              /* Pointer to array of mapped components */
   int nbolo;                    /* Number of bolometers */
   int nmap;                     /* Number of elements mapped */
-  HDSLoc *scu2redloc=NULL;        /* HDS locator to the SCU2RED extension */
+  HDSLoc *mapcoordloc=NULL;        /* HDS locator to the MAPCOORD extension */
   int ubnd[1];                  /* Pixel bounds for 1d pointing array */
   
   /* Main routine */
   if (*status != SAI__OK) return;
   
-  /* Get HDS locator for the SCU2RED extension  */
-  scu2redloc = smf_get_xloc( data, "SCU2RED", "SCU2RED_Calculations",
+  /* Get HDS locator for the MAPCOORD extension  */
+  mapcoordloc = smf_get_xloc( data, "MAPCOORD", "MAPCOORD_Calculations",
                            "READ", 0, 0, status );
 
-  /* Since other things may eventually get put into the SCU2RED
+  /* Since other things may eventually get put into the MAPCOORD
      extension, and to prevent it from having problems if called multiple
      times, check for NULL states first for the HDS locator / NDF id / LUT
      before trying to get them */
@@ -103,8 +105,8 @@ void smf_open_mapcoord( smfData *data, int *status ) {
     ubnd[0] = nbolo*(data->dims)[2]-1;
 
     if( (data->file)->mapcoordid == NDF__NOID ) {
-      (data->file)->mapcoordid = smf_get_ndfid( scu2redloc, 
-						"MAPCOORD", "READ", "UNKNOWN",
+      (data->file)->mapcoordid = smf_get_ndfid( mapcoordloc, 
+						"LUT", "READ", "UNKNOWN",
 						"_INTEGER", 1, lbnd, ubnd, 
 						status );
     }
@@ -116,16 +118,16 @@ void smf_open_mapcoord( smfData *data, int *status ) {
       if( *status == SAI__OK ) {
 	data->lut = mapptr[0];
       } else {
-	errRep( FUNC_NAME, "Unable to map LUT in SCU2RED extension",
+	errRep( FUNC_NAME, "Unable to map LUT in MAPCOORD extension",
 		status);
       }
     }
   
     /* Annul the HDS locator to the extension */
-    datAnnul( &scu2redloc , status );
+    datAnnul( &mapcoordloc , status );
   } else {
     errRep( FUNC_NAME, 
-            "Couldn't get locator for SCU2RED extension",
+            "Couldn't get locator for MAPCOORD extension",
             status);
   }
 }
