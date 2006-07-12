@@ -227,6 +227,7 @@
  
 *  Local variables:
       CHARACTER * ( ARY__SZTYP ) TYPE ! HDS data type
+      CHARACTER * ( DAT__SZLOC ) LOCSZ ! Locator to scale/zero value
       CHARACTER * ( DAT__SZLOC ) SLICE ! Locator to data slice
       CHARACTER * ( DAT__SZLOC ) VEC ! Locator to vectorised data
       INTEGER DCONTG             ! Dimension containing contiguous data
@@ -271,17 +272,14 @@
 *  Extract the scale and zero values from the supplied HDS object,
 *  converting them to the required data type.
       IF( SCLOC .NE. DAT__NOLOC ) THEN
-         IF( '<T>' .EQ. 'B' .OR. '<T>' .EQ. 'UB' .OR. 
-     :       '<T>' .EQ. 'W' .OR. '<T>' .EQ. 'UW' ) then
-            CALL CMP_GET0I( SCLOC, 'SCALE', ISCALE, STATUS )     
-            CALL CMP_GET0I( SCLOC, 'ZERO', IZERO, STATUS )     
-            SCALE = VAL_ITO<T>( .FALSE., ISCALE, STATUS )
-            ZERO = VAL_ITO<T>( .FALSE., IZERO, STATUS )
-         ELSE
 
-            CALL CMP_GET0<T>( SCLOC, 'SCALE', SCALE, STATUS )     
-            CALL CMP_GET0<T>( SCLOC, 'ZERO', ZERO, STATUS )     
-         END IF
+         CALL DAT_FIND( SCLOC, 'SCALE', LOCSZ, STATUS )
+         CALL DAT_GET( LOCSZ, '<HTYPE>', 0, 0, SCALE, STATUS )
+         CALL DAT_ANNUL( LOCSZ, STATUS )
+
+         CALL DAT_FIND( SCLOC, 'ZERO', LOCSZ, STATUS )
+         CALL DAT_GET( LOCSZ, '<HTYPE>', 0, 0, ZERO, STATUS )
+         CALL DAT_ANNUL( LOCSZ, STATUS )
 
          DOSCL = ( SCALE .NE. 1<CONST> .OR. ZERO .NE. 0<CONST> )
       ELSE
