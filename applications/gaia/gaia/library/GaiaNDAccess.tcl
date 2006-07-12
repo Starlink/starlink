@@ -235,6 +235,29 @@ itcl::class gaia::GaiaNDAccess {
       return 0
    }
 
+   #  Return the address of a spectral line of data extracted from an image
+   #  region projected along the spectral axis. This will only work for cubes
+   #  and requires that the complete data are mapped first.  The axis is the
+   #  spectral axis along which the line will be extracted (1,2,3). The alow
+   #  and ahigh values define a range along the axis to extract (-1 for end
+   #  points). The desc argument is a 2D ARD description of the area to
+   #  extract, and method the data combination technique (each spectral
+   #  position is the combination of data from the ARD region of an image
+   #  plane), only "mean" is supported at present. All coordinates should be be
+   #  in the GRID domain.  The trunc argument provides for the removal of any 
+   #  trailing redundant axes (that axes of size 1, the first three must be 
+   #  significant). Note desc may contain newlines etc.
+   public method getregionspectrum {axis alow ahigh desc method trunc} {
+      if { $addr_ != 0 } {
+         set dims [getdims $trunc]
+         lassign [eval "array::getregionspectrum \
+                           $addr_ $dims $axis $alow $ahigh \$desc $method \
+                           $cnfmap_"] adr
+         return $adr
+      }
+      return 0
+   }
+
    #  Access the data of an image plane. This will only work for cubes and
    #  requires that the complete data are mapped first. The axis is the
    #  spectral axis along which the image will be extracted (1,2,3), the index
