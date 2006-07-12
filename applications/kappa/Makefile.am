@@ -127,7 +127,7 @@ pictrans picvis scatter vecplot
 
 NDFPACK_TASKS = axconv axlabel axunits erase fitsdin fitsexist fitsexp \
 fitsimp fitsin fitslist fitsmod fitstext fitsval hiscom hislist hisset \
-native ndfcopy ndftrace setaxis setbad setbb setbound setext setlabel \
+native ndfcompress ndfcopy ndftrace setaxis setbad setbb setbound setext setlabel \
 setnorm setorigin setsky settitle settype setunits setvar wcsadd \
 wcsattrib wcscopy wcsframe wcsremove wcsshow chain reshape showqual \
 setqual remqual qualtobad
@@ -226,7 +226,7 @@ kappa.csh kappa.icl kappa.sh
 
 
 BUILT_IFC_FILES = chain.ifc fitsmod.ifc fitstext.ifc hiscom.ifc \
-fitsval.ifc hislist.ifc hisset.ifc native.ifc ndfcopy.ifc \
+fitsval.ifc hislist.ifc hisset.ifc native.ifc ndfcompress.ifc ndfcopy.ifc \
 ndftrace.ifc qualtobad.ifc remqual.ifc reshape.ifc \
 setaxis.ifc setbad.ifc setbb.ifc setbound.ifc \
 setext.ifc setlabel.ifc setnorm.ifc setorigin.ifc \
@@ -294,7 +294,7 @@ fitsin.ifl fitslist.ifl fitsmod.ifl fitstext.ifl \
 gdclear.ifl gdnames.ifl gdset.ifl gdstate.ifl \
 hiscom.ifl hislist.ifl hisset.ifl kapview_mon.ifl \
 linplot.ifl lutable.ifl lutedit.ifl lutsave.ifl \
-lutview.ifl mlinplot.ifl native.ifl ndfcopy.ifl \
+lutview.ifl mlinplot.ifl native.ifl ndfcompress.ifl ndfcopy.ifl \
 ndfpack_mon.ifl ndftrace.ifl paldef.ifl palentry.ifl \
 palread.ifl palsave.ifl piccur.ifl picdef.ifl \
 picempty.ifl picentire.ifl picin.ifl piclabel.ifl \

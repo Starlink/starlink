@@ -1005,6 +1005,95 @@ package kappa {
 
       }
 
+      action ndfcompress {
+         alias {ndfcom(press)}
+
+         helplib {$KAPPA_HELP}
+
+          parameter dscale {
+            type _DOUBLE
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Scale factor for Data component}
+            helpkey *
+            default !
+          }
+
+          parameter dzero {
+            type _DOUBLE
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Zero offset for Data component}
+            helpkey *
+            default !
+          }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input NDF}
+            helpkey *
+          }
+
+          parameter method {
+            position 3
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default SCALE
+            prompt {Compression method}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output NDF}
+            helpkey *
+          }
+
+          parameter scaledtype {
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default _WORD
+            prompt {Data type for scaled values}
+            helpkey *
+          }
+
+          parameter vscale {
+            type _DOUBLE
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Scale factor for Variance component}
+            helpkey *
+            default !
+          }
+
+          parameter vzero {
+            type _DOUBLE
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Zero offset for Variance component}
+            helpkey *
+            default !
+          }
+
+      }
+
       action ndfcopy {
          alias {ndfc(opy)}
 
@@ -1381,6 +1470,22 @@ package kappa {
             helpkey *
           }
 
+         parameter scale {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter sctype {
+            size *
+            type LITERAL
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
          parameter title {
             type LITERAL
             access WRITE
@@ -1434,6 +1539,14 @@ package kappa {
             type _LOGICAL
             access WRITE
             vpath INTERNAL
+            helpkey *
+          }
+
+         parameter zero {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0
             helpkey *
           }
 
