@@ -144,7 +144,7 @@
 
 *  Set scale and zero terms for this simple array, and then check that
 *  the storage form is now SCALED.
-      CALL ARY_SSZR( IARY, 2.0, -1.2, STATUS )
+      CALL ARY_PTSZR( IARY, 2.0, -1.2, STATUS )
       CALL ARY_FORM( IARY, FORM, STATUS )
       IF( FORM .NE. 'SCALED' .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR

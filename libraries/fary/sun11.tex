@@ -623,7 +623,7 @@ equivalent simple array.
 
 \item Scaled arrays cannot be created directly. Instead, a simple array must
 first be created (using ARY\_NEW), and this can then be converted to a scaled
-array by assigning scale and zero values to it using ARY\_SSZ<T>. So a
+array by assigning scale and zero values to it using ARY\_PTSZ<T>. So a
 typical program could create a simple array, map it for write access,
 store the scaled data values in the mapped simple array, unmap the
 array, and then associate scale and zero values with the array, thus
@@ -743,6 +743,8 @@ routines.
             {Obtain the pixel offset between two arrays}
 \noteroutine{ARY\_PLACE( LOC, NAME, PLACE, STATUS )}
             {Obtain an array placeholder}
+\noteroutine{ARY\_PTSZx( IARY, SCALE, ZERO, STATUS )}
+            {Set new scale and zero values for a scaled array}
 \noteroutine{ARY\_RESET( IARY, STATUS )}
             {Reset an array to an undefined state}
 \noteroutine{ARY\_SAME( IARY1, IARY2, SAME, ISECT, STATUS )}
@@ -2247,6 +2249,55 @@ Creation and Control of Identifiers}
          further processing will occur. The same value will also be
          returned if the routine should fail for any reason. The ARY\_\_NOPL
          constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_PTSZ$<$T$>$
+}{
+   Set new scale and zero values for a scaled array
+}{
+   \sstdescription{
+      The routine sets new values for the scale and zero values
+      associated with an array. If the array is stored in simple form,
+      then the storage form is changed to scaled.
+   }
+   \sstinvocation{
+      CALL ARY\_PTSZ$<$T$>$( IARY, SCALE, ZERO, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         SCALE = $<$TYPE$>$ (Given)
+      }{
+         The new value for the scaling factor.
+      }
+      \sstsubsection{
+         ZERO = $<$TYPE$>$ (Given)
+      }{
+         The new value for the zero offset.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine may only be used to change the type of a base
+         array. If it is called with an array which is not a base array,
+         then it will return without action. No error will result.
+
+         \sstitem
+         An error will result if the array, or any part of it, is
+         currently mapped for access (e.g. through another identifier).
       }
    }
 }
