@@ -192,12 +192,12 @@ itcl::class gaia::StarArdTool {
       eval configure $args
 
       #  Create the StarArdList object to deal with the ARD objects.
-      # (allan: 4.2.99: added "code" for correct scope in tcl8)
       set object_list_ [code [gaia::${routine_prefix}List \#auto \
 				 -canvasdraw $canvasdraw \
 				 -canvas $canvas \
 				 -rtdimage $rtdimage \
-				 -notify_created_cmd [code $this created_object_] \
+				 -notify_created_cmd \
+                                    [code $this created_object_] \
 				 -selected_colour $selected_colour \
 				 -deselected_colour $deselected_colour \
 				 -continuous_updates $continuous_updates]]
@@ -301,15 +301,38 @@ itcl::class gaia::StarArdTool {
       return $ok
    }
 
+   #  Return a description of all regions as a string.
+   method get_description {} {
+      return [$object_list_ get_description]
+   }
+
+   #  Return a description of the currently selected regions as a string.
+   method get_selected_description {} {
+      return [$object_list_ get_selected_description]
+   }
+
    #  Create an ARD region of the given type.
    method create_region {type} {
       disable_types_frame
+      if { $notify_started_cmd != {} } {
+         eval $notify_started_cmd
+      }
       $object_list_ create_region $type
    }
 
    #  Method to deal with ARD object created callback.
-   private method created_object_ {args} {
-       enable_types_frame
+   private method created_object_ {index id} {
+      enable_types_frame
+      if { $notify_created_cmd != {} } {
+         eval $notify_created_cmd $index $id
+      }
+   }
+
+   #  Apply a command to an object, the index is that returned with
+   #  notify_created_cmd. The command must clearly be a valid one
+   #  for a StarArdPrim object.
+   method apply_cmd {index args} {
+      eval $object_list_ apply_cmd $index $args
    }
 
    #  Create the frame for selecting an ARD type to draw.
@@ -376,6 +399,22 @@ itcl::class gaia::StarArdTool {
       }
    }
 
+   #  Get the known ARD types (allows the buttons shown to be
+   #  controlled ).
+   method get_known_types {} {
+      if { $object_list_ != {} } {
+         return [$object_list_ known_types ""]
+      }
+      return ""
+   }
+
+   #  Clear all ARD objects.
+   method clear {} {
+      if { $object_list_ != {} } {
+         $object_list_ clear
+      }
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -411,6 +450,13 @@ itcl::class gaia::StarArdTool {
          $object_list_ configure -deselected_colour $deselected_colour
       }
    }
+
+   #  Command to execute when a new object has been created.
+   public variable notify_created_cmd {}
+
+   #  Command to execute when object creation is started by pressing one of
+   #  the buttons.
+   public variable notify_started_cmd {}
 
    #  Change continuous updates of object information.
    public variable continuous_updates 1 {
