@@ -30,6 +30,13 @@
    co-ordinate ranges, making this a useful tool for fitting the 
    continua of independent spectra stored in data cubes.
 
+   o  A new application NDFCOMPRESS compresses an NDF so that it 
+   occupies less disk space.  The initial version has only one 
+   compression method, which scales using a linear transformation such 
+   that data values fit into a smaller data type.  Applications 
+   accessing the compressed NDF can reconstruct the original unscaled 
+   values.
+
    o  A new application called WCSMOSAIC has been added.  This command
    mosaics a group of input NDFs using the associated WCS information
    to align them.
