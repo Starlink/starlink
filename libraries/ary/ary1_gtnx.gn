@@ -184,6 +184,8 @@
 *        Added further explanation to the notes section.
 *     24-APR-2006 (DSB):
 *        Made generic and added arguments DOSCL, SCALE and ZERO.
+*     13-JUL-2006 (DSB):
+*        Initialise DCONTG to avoid compiler warnings.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -306,6 +308,7 @@
 *  array.
       CONTIG = .TRUE.
       NCONTG = 1
+      DCONTG = 1
  
 *  Loop through each dimension.
       DO 12 I = 1, NDIM
