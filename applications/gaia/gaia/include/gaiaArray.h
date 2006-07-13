@@ -11,6 +11,9 @@ enum { HDS_UNKNOWN = -1,
        HDS_UBYTE, HDS_BYTE, HDS_UWORD, HDS_WORD, HDS_INTEGER, HDS_REAL,
        HDS_DOUBLE };
 
+/* Combination types */
+enum { GAIA_ARRAY_MEAN, GAIA_ARRAY_MEDIAN };
+
 /**
  * An array structure. One of these stores various useful information about an
  * array, such as its memory address, number of elements, data type and
@@ -89,9 +92,9 @@ extern "C" {
     /* Extract a region as a spectrum from a cube */ 
     void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], 
                                           int axis, int arange[2], 
-                                          char *region, int cnfmalloc, 
-                                          void **outPtr, int *nel,
-                                          int *outtype );
+                                          char *region, int method, 
+                                          int cnfmalloc, void **outPtr, 
+                                          int *nel, int *outtype );
 
 #ifdef __cplusplus
 }

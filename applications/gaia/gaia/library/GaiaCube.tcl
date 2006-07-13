@@ -88,7 +88,7 @@ itcl::class gaia::GaiaCube {
       #  Evaluate any options [incr Tk].
       eval itk_initialize $args
 
-      set lwidth 16
+      set lwidth 18
       set vwidth 10
 
       #  Set window properties.
