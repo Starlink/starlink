@@ -1282,7 +1282,19 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
         break;
 
         case HDS_INTEGER: {
-            if ( haveblank ) {
+            if ( scaled && haveblank ) {
+                int *ip = (int *)inPtr;
+                double *op = (double *)*outPtr;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( op[i] != inBlank ) {
+                        op[i] = ip[i] * bscale + bzero;
+                    }
+                    else {
+                        op[i] = VAL__BADD;
+                    }
+                }
+            }
+            else if ( haveblank ) {
                 int *ptr = (int *)inPtr;
                 for ( i = 0; i < nel; i++ ) {
                     if ( ptr[i] == inBlank ) {
@@ -1290,7 +1302,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                     }
                 }
             }
-            if ( scaled ) {
+            else if ( scaled ) {
                 int *ip = (int *)inPtr;
                 double *op = (double *)*outPtr;
                 for ( i = 0; i < nel; i++ ) {
@@ -1306,7 +1318,22 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
         break;
 
         case HDS_WORD: {
-            if ( haveblank ) {
+            if ( haveblank && scaled ) {
+                short blank = (short) inBlank;
+                short *ip = (short *)inPtr;
+                float *op = (float *)*outPtr;
+                float zero = (float) bzero;
+                float scale = (float) bscale;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ip[i] != blank ) {
+                        op[i] = ip[i] * scale + zero;
+                    }
+                    else {
+                        op[i] = VAL__BADR;
+                    }
+                }
+            } 
+            else if ( haveblank ) {
                 short blank = (short) inBlank;
                 short *ptr = (short *)inPtr;
                 for ( i = 0; i < nel; i++ ) {
@@ -1315,7 +1342,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                     }
                 }
             }
-            if ( scaled ) {
+            else if ( scaled ) {
                 short *ip = (short *)inPtr;
                 float *op = (float *)*outPtr;
                 float zero = (float) bzero;
@@ -1333,7 +1360,22 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
         break;
 
         case HDS_UWORD: {
-            if ( haveblank ) {
+            if ( scaled && haveblank ) {
+                unsigned short blank = (unsigned short) inBlank;
+                unsigned short *ip = (unsigned short *)inPtr;
+                float *op = (float *)*outPtr;
+                float zero = (float) bzero;
+                float scale = (float) bscale;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ip[i] != blank ) {
+                        op[i] = ip[i] * scale + zero;
+                    }
+                    else {
+                        op[i] = VAL__BADR;
+                    }
+                }
+            }
+            else if ( haveblank ) {
                 unsigned short blank = (unsigned short) inBlank;
                 unsigned short *ptr = (unsigned short *)inPtr;
                 for ( i = 0; i < nel; i++ ) {
@@ -1342,7 +1384,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                     }
                 }
             }
-            if ( scaled ) {
+            else if ( scaled ) {
                 unsigned short *ip = (unsigned short *)inPtr;
                 float *op = (float *)*outPtr;
                 float zero = (float) bzero;
@@ -1360,7 +1402,22 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
         break;
 
         case HDS_BYTE: {
-            if ( haveblank ) {
+            if ( scaled && haveblank ) {
+                char blank = (char) inBlank;
+                char *ip = (char *)inPtr;
+                float *op = (float *)*outPtr;
+                float zero = (float) bzero;
+                float scale = (float) bscale;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ip[i] != blank ) {
+                        op[i] = ip[i] * scale + zero;
+                    }
+                    else {
+                        op[i] = VAL__BADR;
+                    }
+                }
+            }
+            else if ( haveblank ) {
                 char blank = (char) inBlank;
                 char *ptr = (char *)inPtr;
                 for ( i = 0; i < nel; i++ ) {
@@ -1369,7 +1426,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                     }
                 }
             }
-            if ( scaled ) {
+            else if ( scaled ) {
                 char *ip = (char *)inPtr;
                 float *op = (float *)*outPtr;
                 float zero = (float) bzero;
@@ -1387,7 +1444,22 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
         break;
 
         case HDS_UBYTE: {
-            if ( haveblank ) {
+            if ( scaled && haveblank ) {
+                unsigned char blank = (unsigned char) inBlank;
+                unsigned char *ip = (unsigned char *)inPtr;
+                float *op = (float *)*outPtr;
+                float zero = (float) bzero;
+                float scale = (float) bscale;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ip[i] != blank ) {
+                        op[i] = ip[i] * scale + zero;
+                    }
+                    else {
+                        op[i] = VAL__BADR;
+                    }
+                }
+            }
+            else if ( haveblank ) {
                 unsigned char blank = (unsigned char) inBlank;
                 unsigned char *ptr = (unsigned char *)inPtr;
                 for ( i = 0; i < nel; i++ ) {
@@ -1396,7 +1468,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                     }
                 }
             }
-            if ( scaled ) {
+            else if ( scaled ) {
                 unsigned char *ip = (unsigned char *)inPtr;
                 float *op = (float *)*outPtr;
                 float zero = (float) bzero;
