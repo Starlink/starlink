@@ -41,6 +41,8 @@
 #  include "star/hds_types.h"
 #endif
 
+#include "f77.h"
+
 /* This function converts an HDSLoc to a Fortran string buffer */
 
 /* The optional freeing of memory is problematic since it stops
@@ -54,6 +56,40 @@ void datExportFloc ( HDSLoc **clocator, int free, int loc_length,
 
 void datImportFloc( const char flocator[DAT__SZLOC], int loc_length, 
 		    HDSLoc **clocator, int * status);
+
+/* Convert an array of dimensions (hdsdim) to an array of fortran
+   integer dimensions */
+F77_INTEGER_TYPE *
+hdsDimC2F( int ndim, const hdsdim dims[], 
+	   F77_INTEGER_TYPE fdims[DAT__MXDIM], int * status );
+
+/* Convert an array of Fortran INTEGER dimensions into an array
+   of hdsdim */
+
+hdsdim *
+hdsDimF2C( int ndim, const F77_INTEGER_TYPE fdims[],
+	   hdsdim cdims[DAT__MXDIM], int * status );
+
+/* Macro to convert a single hdsdim integer to a single
+   Fortran integer, checking for truncation. Will set status
+   to DAT__DTRNC if truncation occurs. There is no optimizaton
+   for the case where the hdsdim is a signed int.
+*/
+
+#define HDSDIM2INT( subname, cint, fint, status )			\
+  if ( cint > (hdsdim)INT_MAX ) {					\
+    fint = 0;								\
+    if (*status == DAT__OK) {						\
+      *status = DAT__DTRNC;						\
+      dat1emsSetHdsdim( "DIM", cint );					\
+      emsRep( " ",							\
+	      subname							\
+	      "Dimension truncated when exporting to Fortran int (^DIM)", \
+	      status );							\
+    }									\
+  } else {								\
+    fint = (F77_INTEGER_TYPE)cint;					\
+  }
 
 
 /* There are also a drop in replacement for the CNF Locator macros,
