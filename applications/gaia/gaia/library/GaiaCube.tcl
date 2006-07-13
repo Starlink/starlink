@@ -609,9 +609,9 @@ itcl::class gaia::GaiaCube {
       }
 
       #  Set the object description of this slice to include the
-      #  cube slice.
-      set fullobject_ "[slice_display_name_] ($object_)"
-      $itk_option(-rtdimage) object $fullobject_
+      #  cube slice. Get it back for comparison (can be truncated)"
+      $itk_option(-rtdimage) object "[slice_display_name_] ($object_)"
+      set fullobject_ [$itk_option(-rtdimage) object]
       $rtdctrl_info_ updateValues
 
       #  Release memory from last time and save pointer.
