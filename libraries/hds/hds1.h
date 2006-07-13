@@ -247,6 +247,7 @@ typedef hdsdim HDS_PTYPE;
 
       void dat1emsSetBigi( const char * token, INT_BIG value );
       void dat1emsSetBigu( const char * token, UINT_BIG value );
+      void dat1emsSetHdsdim( const char * token, hdsdim value );
 
 /* Fixups for various machine deficiencies:				    */
 /* =======================================				    */
