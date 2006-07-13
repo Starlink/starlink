@@ -12030,6 +12030,8 @@ picture.}
  Multiplies two NDF data structures.}
 \menuitem{NATIVE}{
  Converts an HDS object to native machine data representation.}
+\menuitem{NDFCOMPRESS}{
+ Compresses an NDF so that it occupies less disk space.}
 \menuitem{NDFCOPY}{
  Copies an NDF (or \htmlref{NDF section}{se:ndfsect}) to a new location.}
 \menuitem{NDFTRACE}{
@@ -12505,6 +12507,8 @@ functions as follows.
  Reduces the size of an NDF by picking equally spaced pixels.
 \classitem{INTERLEAVE}
  Forms a higher-resolution NDF by interleaving a set of NDFs.
+\classitem{NDFCOMPRESS}
+ Compresses an NDF so that it occupies less disk space.
 \classitem{PIXDUPE}
  Expands an NDF by pixel duplication.
 \classitem{REGRID}
@@ -12578,6 +12582,8 @@ functions as follows.
 %
 \item {\large\bf NDF array components}
 \begin{description}
+\classitem{NDFCOMPRESS}
+ Compresses an NDF so that it occupies less disk space.
 \classitem{NDFCOPY}
  Copies an NDF (or NDF section) to a new location.
 \classitem{PERMAXES}
@@ -12668,6 +12674,7 @@ functions as follows.
 \end{description}
 \vspace*{0.7ex}
 %
+\goodbreak
 \label{cl:wcs}
 \item {\large\bf NDF World Co-ordinate Systems}
 \begin{description}
@@ -12821,6 +12828,7 @@ WCS component of an NDF.
 
 \vspace*{-1ex}
 
+\goodbreak
 {\large
 \begin{center}
 {\bf SCRIPTING TOOLS}
@@ -32906,6 +32914,133 @@ KAPPA: \htmlref{ADD}{ADD},
 }
 
 \sstroutine{
+   NDFCOMPRESS
+}{
+   Compresses an NDF so that it occupies less disk space
+}{
+   \sstdescription{
+      This application creates a copy of an \NDFref{NDF} that occupies less 
+      disk space.  This compression does not affect the data values seen by
+      subsequent application, since all applications will automatically
+      uncompress the data.
+
+      Currently the only compression method available is to scale the data
+      values using a linear transformation so that they fit into a smaller
+      data type.  A description of the scaling uses is stored with the output
+      NDF so that later application can reconstruct the original unscaled
+      values.
+   }
+   \sstusage{
+      ndfcompress in out method
+   }
+   \sstparameters{
+      \sstsubsection{
+         DSCALE = \_DOUBLE (Read)
+      }{
+         The scale factor to use for the Data component, when compressing
+         with METHOD set to SCALE. If a null ({\tt{!}}) value is supplied for
+         DSCALE or DZERO, default values will be used for both that cause
+         the scaled data values to occupy 96\% of the available range of the
+         data type selected using parameter SCALETYPE.  {\tt [!]}
+      }
+      \sstsubsection{
+         DZERO = \_DOUBLE (Read)
+      }{
+         The zero offset to use for the Data component, when compressing
+         with METHOD set to SCALE. If a null ({\tt{!}}) value is supplied for
+         DSCALE or DZERO, default values will be used for both that cause
+         the scaled data values to occupy 96\% of the available range of the
+         data type selected using parameter SCALETYPE. {\tt [!]}
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The input NDF.
+      }
+      \sstsubsection{
+         METHOD = LITERAL (Read)
+      }{
+         The compression method to use. Currently the only supported
+         value is {\tt "SCALE"}.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output NDF.
+      }
+      \sstsubsection{
+         SCALETYPE = \htmlref{LITERAL}{se:parmenu} (Read)
+      }{
+         The \htmlref{data type}{ap:HDStypes} to use for the scaled data 
+         values.  This is only used if METHOD is {\tt "SCALED"}.  It can be 
+         one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "\_INTEGER"} -- 4-byte signed integers
+
+            \sstitem
+            {\tt "\_WORD"} -- 2-byte signed integers
+
+            \sstitem
+            {\tt "\_UWORD"} -- 2-byte unsigned integers
+
+            \sstitem
+            {\tt "\_BYTE"} -- 1-byte signed integers
+
+            \sstitem
+            {\tt "\_UBYTE"} -- 1-byte unsigned integers
+
+         }
+         The same data type is used for both DATA and (if required)
+         VARIANCE components of the output NDF.  The initial default 
+         value is {\tt "\_WORD"}.  {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         VSCALE = \_DOUBLE (Read)
+      }{
+         The scale factor to use for the VARIANCE component, when
+         compressing with METHOD set to SCALE.  If a null ({\tt{!}}) value is
+         supplied for VSCALE or VZERO, default values will be used for
+         both that cause the scaled variance values to occupy 96\% of
+         the available range of the data type selected using parameter
+         SCALETYPE. {\tt [!]}
+      }
+      \sstsubsection{
+         VZERO = \_DOUBLE (Read)
+      }{
+         The zero factor to use for the VARIANCE component, when
+         compressing with METHOD set to SCALE.  If a null ({\tt{!}}) value is
+         supplied for VSCALE or VZERO, default values will be used for
+         both that cause the scaled variance values to occupy 96\% of
+         the available range of the data type selected using parameter
+         SCALETYPE.  {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ndfcompress infile outfile scale scaletype=\_uword
+      }{
+         Copies the contents of the NDF structure infile to the new
+         structure outfile, scaling the values so that they fit into
+         unsigned 2-byte integers.  The scale and zero values used are
+         chosen automatically.
+      }
+   }
+   \sstdiytopic{
+      Related Applications:
+   }{
+      KAPPA: \htmlref{NDFCOPY}{NDFCOPY}.
+   }
+   \sstimplementationstatus{
+      The TITLE, LABEL, UNITS, DATA, VARIANCE, QUALITY, AXIS, WCS, and
+      HISTORY components are copied by this routine, together with all
+      extensions.
+   }
+}
+
+\sstroutine{
    NDFCOPY
 }{
    Copies an NDF (or NDF section) to a new location
@@ -50620,6 +50755,12 @@ The following new applications have been added:
        axis using polynomials up to order 15.  Regions containing
        features such as spectral lines or stars may be masked.  It has
        an option to subtract the trend fits from the supplied NDF.
+   \item [\htmlref{NDFCOMPRESS}{NDFCOMPRESS}] \mbox{}
+       Compresses an NDF so that it occupies less disk space.  The
+       initial version has only one compression method, which scales
+       using a linear transformation such that data values fit into a
+       smaller data type.  Applications accessing the compressed NDF
+       can reconstruct the original unscaled values.
    \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}] \mbox{}
        Tiles a group of NDFs using World Co-ordinate System information.
        It is like \htmlref{WCSALIGN}{WCSALIGN} but operates on more
@@ -51094,6 +51235,8 @@ functions as follows.
  Reduces the size of an NDF by picking equally spaced pixels.
 \classitem{INTERLEAVE}
  Forms a higher-resolution NDF by interleaving a set of NDFs.
+\classitem{NDFCOMPRESS}
+ Compresses an NDF so that it occupies less disk space.
 \classitem{PIXDUPE}
  Expands an NDF by pixel duplication.
 \classitem{REGRID}
@@ -51167,6 +51310,8 @@ functions as follows.
 %
 \item {\large\bf NDF array components}
 \begin{description}
+\classitem{NDFCOMPRESS}
+ Compresses an NDF so that it occupies less disk space.
 \classitem{NDFCOPY}
  Copies an NDF (or NDF section) to a new location.
 \classitem{PERMAXES}
@@ -51257,6 +51402,7 @@ functions as follows.
 \end{description}
 \vspace*{0.7ex}
 %
+\goodbreak
 \item {\large\bf NDF World Co-ordinate Systems}
 \begin{description}
 \classitem{PERMAXES}
@@ -51406,6 +51552,7 @@ functions as follows.
 
 \vspace*{-1ex}
 
+\goodbreak
 {\large
 \begin{center}
 {\bf SCRIPTING TOOLS}
