@@ -630,6 +630,7 @@ int gaiaUtilsGtFitsWcs( char header[], int ncards, char *encoding,
  * coordinates. The mask should be at least dims[0]*dims[1]. The area used in
  * the mask is returned in the lbnd and ubnd arrays, so they need to be of
  * size at least 2 (strictly the returned bounds are the ARD interior bounds).
+ * When the mask is empty the bound shoulds all be set to 0.
  */
 int gaiaUtilsCreateArdMask( char *desc, int maskPtr[], int dims[], int lbnd[],
                             int ubnd[], char **error_mess )
@@ -689,6 +690,13 @@ int gaiaUtilsCreateArdMask( char *desc, int maskPtr[], int dims[], int lbnd[],
     index = 2;
     ardWork( grp, 2, inlbnd, inubnd, c, 0, &index, maskPtr, lbnd, ubnd, 
              lbnde, ubnde, &status ); 
+
+    /* If either of the lower bounds are greater than the upper, then there
+     * are no pixels in the mask (says the ARD docs). Return all bounds 0 in
+     * that case. */ 
+    if ( lbnd[0] > ubnd[0] || lbnd[1] > ubnd[1] ) {
+        lbnd[0] = ubnd[0] = lbnd[1] = ubnd[1] = 0;
+    }
 
     /* Free the group */
     grpDelet( &grp, &status );
