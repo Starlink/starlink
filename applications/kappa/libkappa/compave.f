@@ -35,33 +35,35 @@
 *  ADAM Parameters:
 *     ALIGN = LITERAL (Read)
 *        This parameter controls the placement of the compression boxes
-*        within the input NDF (also see parameter TRIM). It can take any 
-*        of the following values:
+*        within the input NDF (also see parameter TRIM).  It can take 
+*        any of the following values:
 *
 *        - "ORIGIN" --- The compression boxes are placed so that the
-*        origin of the pixel co-ordinate Frame (i.e. pixel coords (0,0)) in 
-*        the input NDF corresponds to a corner of a compression box. This 
-*        results in the pixel origin being retained in the output NDF. For 
-*        instance, if a pair of 2-dimensional images which have previously
-*        been aligned in pixel co-ordinates are compressed, then using this
-*        option ensures that the compressed images will also be aligned
-*        in pixel co-ordinates.
+*        origin of the pixel co-ordinate Frame (i.e. pixel co-ordinates 
+*        (0,0)) in  the input NDF corresponds to a corner of a 
+*        compression box.  This results in the pixel origin being 
+*        retained in the output NDF.  For instance, if a pair of 
+*        two-dimensional images which have previously been aligned in 
+*        pixel co-ordinates are compressed, then using this option 
+*        ensures that the compressed images will also be aligned in 
+*        pixel co-ordinates.
 *
 *        - "FIRST" --- The compression boxes are placed so that the
 *        first pixel in the input NDF (for instance, the bottom-left
-*        pixel in a 2-dimensional image) corresponds to the first pixel
-*        in a compression box. This can result in the pixel origin being
-*        shifted by up to one compression box in the output image. Thus,
-*        images which were previously aligned in pixel co-ordinates may
-*        not be aligned after compression. You may want to use this option
-*        if you are using a very large box to reduce the number of
-*        dimensions in the data (for instance averaging across the entire
-*        width of an image to produce a 1-dimensional array).
+*        pixel in a two-dimensional image) corresponds to the first 
+*        pixel in a compression box.  This can result in the pixel 
+*        origin being shifted by up to one compression box in the output
+*        image.  Thus, images which were previously aligned in pixel 
+*        co-ordinates may not be aligned after compression.  You may 
+*        want to use this option if you are using a very large box to
+*        reduce the number of dimensions in the data (for instance 
+*        averaging across the entire width of an image to produce a 
+*        one-dimensional array).
 *
 *        - "LAST" --- The compression boxes are placed so that the
 *        last pixel in the input NDF (for instance, the top-right
-*        pixel in a 2-dimensional image) corresponds to the last pixel
-*        in a compression box. See the "FIRST" option above for further 
+*        pixel in a two-dimensional image) corresponds to the last pixel
+*        in a compression box.  See the "FIRST" option above for further
 *        comments.
 *                                                             ["ORIGIN"]
 *     AXWEIGHT = _LOGICAL (Read)
@@ -76,7 +78,8 @@
 *        fewer are supplied the last value in the list of compression
 *        factors is given to the remaining dimensions.  Thus if a
 *        uniform compression is required in all dimensions, just one
-*        value need be entered. The suggested default is the current value. 
+*        value need be entered.  The suggested default is the current 
+*        value. 
 *     IN  = NDF (Read)
 *        The NDF structure to be reduced in size.
 *     OUT = NDF (Write)
@@ -91,15 +94,16 @@
 *        Title for the output NDF structure.  A null value (!)
 *        propagates the title from the input NDF to the output NDF. [!]
 *     TRIM = _LOGICAL (Read)
-*        If parameter TRIM is set TRUE, the output NDF only contains data
-*        for compression boxes which are entirely contained within the 
-*        input NDF. Any pixels around the edge of the input NDF which are 
-*        not contained within a compression box are ignored. If TRIM is set 
-*        FALSE, the output NDF contains data for all compression boxes which 
-*        have any overlap with the input NDF. All pixels outside the
-*        bounds of the NDF are assumed to be bad. That is, any boxes which 
-*        extend beyond the bounds of the input NDF are padded with bad 
-*        pixels. See also parameter ALIGN. [current value]
+*        If parameter TRIM is set TRUE, the output NDF only contains 
+*        data for compression boxes which are entirely contained within 
+*        the input NDF.  Any pixels around the edge of the input NDF 
+*        that are not contained within a compression box are ignored. 
+*        If TRIM is set FALSE, the output NDF contains data for all 
+*        compression boxes which have any overlap with the input NDF. 
+*        All pixels outside the bounds of the NDF are assumed to be bad.
+*        That is, any boxes which extend beyond the bounds of the input
+*        NDF are padded with bad pixels.  See also parameter ALIGN. 
+*        [current value]
 *     WEIGHT = _LOGICAL (Read)
 *        When there is a variance array present in the NDF and
 *        WEIGHT=TRUE the application forms weighted averages of the
@@ -132,17 +136,18 @@
 *        would result in a sixteen-fold reduction in the array
 *        components.
 *     compave cosmos profile [10000,1] wlim=0 align=first trim=no
-*        This compresses the 2-dimensional NDF called cosmos to produce a 
-*        1-dimensional NDF called profile. This is done using a
-*        compression box which is 1 pixel high, but which is wider than
-*        the whole input image. Each pixel in the output NDF thus 
-*        corresponds to the average of the corresponding row in the
+*        This compresses the two-dimensional NDF called cosmos to
+*        produce a one-dimensional NDF called profile.  This is done 
+*        using a compression box which is one pixel high, but which is 
+*        wider than the whole input image.  Each pixel in the output NDF
+*        thus corresponds to the average of the corresponding row in the
 *        input image. WLIM is set to zero to ensure that bad pixels
-*        are ignored. ALIGN is set to FIRST so that each compression box 
-*        is flush with the left edge of the input image. TRIM is set to
-*        NO so that compression boxes which extend outside the bounds of
-*        the input image (which will be all of them if the input image is
-*        narrower than 10000 pixels) are retained in the output NDF.
+*        are ignored.  ALIGN is set to FIRST so that each compression 
+*        box is flush with the left edge of the input image.  TRIM is 
+*        set to NO so that compression boxes which extend outside the 
+*        bounds of the input image (which will be all of them if the 
+*        input image is narrower than 10000 pixels) are retained in the
+*        output NDF.
 *     compave cosmos galaxy 4 wlim=1.0
 *        This compresses the NDF called cosmos averaging four times in
 *        each dimension, and stores the reduced data in the NDF called
@@ -180,9 +185,9 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, VARIANCE,
-*     LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF and
-*     propagates all extensions.  QUALITY is not processed since it is
-*     a series of flags, not numerical values.
+*     LABEL, TITLE, UNITS, WCS, and HISTORY components of the input NDF
+*     and propagates all extensions.  QUALITY is not processed since it
+*     is a series of flags, not numerical values.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.
@@ -206,8 +211,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59, Temple Place,,Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -224,8 +229,8 @@
 *     27-FEB-1998 (DSB):
 *        Type of local variable AXWT corrected from INTEGER to LOGICAL.
 *     10-JUN-1998 (DSB):
-*        Propagate WCS component. Ensure each output dimension is at least
-*        one pixel long. 
+*        Propagate WCS component.  Ensure each output dimension is at 
+*        least one pixel long. 
 *     12-OCT-1998 (DSB):
 *        Changed the way in which the bounds of the output image are
 *        determined so that pixel origin information is retained.
@@ -272,7 +277,8 @@
      :  TYPE * ( NDF__SZTYP )  ! Data type of an array component
 
       DOUBLE PRECISION
-     :  MATRIX( NDF__MXDIM*NDF__MXDIM ),! Matrix component of linear mapping
+     :  MATRIX( NDF__MXDIM*NDF__MXDIM ),! Matrix component of linear 
+                               ! mapping
      :  OFFSET( NDF__MXDIM )   ! Translation component of linear mapping
 
       INTEGER
@@ -284,7 +290,7 @@
      :  CMPMAX( NDF__MXDIM ),  ! Maximum compression factors
      :  CMPMIN( NDF__MXDIM ),  ! Minimum compression factors
      :  COMPRS( NDF__MXDIM ),  ! Compression factors
-     :  D,                     ! No. of o/p pixels from ref. to i/p pixel 1
+     :  D,                     ! No. o/p pixels from ref. to i/p pixel 1
      :  EL,                    ! Number of elements in mapped array
      :  ELA,                   ! Number of elements in input axis array
      :  ELWS1,                 ! Number of elements in summation
@@ -300,10 +306,9 @@
 
       INTEGER
      :  NDFI,                  ! Identifier to the whole input NDF
-     :  NDFIS,                 ! Identifier to the used section of the input NDF
+     :  NDFIS,                 ! Identifier to used section of input NDF
      :  NDFO,                  ! Identifier to the output NDF
-     :  NDFS,                  ! Identifier to the section of the input
-                               ! NDF
+     :  NDFS,                  ! Identifier to the section of input NDF
      :  NDIM,                  ! Dimensionality of the NDF
      :  NDIMI,                 ! Actual dimensionality of the NDF
      :  NLIM,                  ! Minimum number of elements in input
@@ -311,7 +316,8 @@
      :  ODIMS( NDF__MXDIM ),   ! Dimensions of output array
      :  PNTRI( 2 ),            ! Pointer to input array component(s)
      :  PNTRO( 2 ),            ! Pointer to output array component(s)
-     :  REF( NDF__MXDIM ),     ! I/p pixel coords at bottom left of a comp. box
+     :  REF( NDF__MXDIM ),     ! I/p pixel co-ords at bottom left of a 
+                               ! comp. box
      :  TOTCMP,                ! Total compression factor
      :  UBND( NDF__MXDIM ),    ! Upper bounds of input NDF
      :  UBNDO( NDF__MXDIM ),   ! Upper bounds of output NDF
@@ -324,7 +330,8 @@
      :  AXWT,                  ! Axis weighted averages
      :  PRESTY,                ! Preserve the input array's data type in
                                ! the output arrays
-     :  TRIM,                  ! Trim i/p image to a whole number of boxes?
+     :  TRIM,                  ! Trim i/p image to a whole number of 
+                               ! boxes?
      :  VAR,                   ! Variance is present
      :  WEIGHT,                ! Weighting is required if variance is
                                ! present
@@ -336,7 +343,6 @@
 *.
 
 *  Check the global status.
-
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Start an NDF context.
@@ -433,13 +439,14 @@
 *  Compute the output NDF's dimensions.
 *  ====================================
 
-*  See how the placement of the compression boxes is to be chosen. "ORIGIN"
-*  results in boxes being placed so that the origin of pixel co-ordinates 
-*  in the input NDF is co-incident with the bottom left corner of a 
-*  compression box. "First" results in the first pixel (i.e. the bottom 
-*  left pixel in a 2D array) being the first pixel in the first compression 
-*  box. "Last" results in the last pixel (i.e. the top right pixel in a 2D 
-*  array) being the last pixel in the last compression box. 
+*  See how the placement of the compression boxes is to be chosen. 
+*  "ORIGIN" results in boxes being placed so that the origin of pixel 
+*  co-ordinates in the input NDF is co-incident with the bottom-left 
+*  corner of a compression box.  "First" results in the first pixel 
+*  (i.e. the bottom left pixel in a two-dimensional array) being the 
+*  first pixel in the first compression box.  "Last" results in the last
+*  pixel (i.e. the top-right pixel in a two-dimensional array) being the
+*  last pixel in the last compression box. 
       CALL PAR_CHOIC( 'ALIGN', 'Origin', 'Origin,First,Last', .TRUE., 
      :                ALIGN, STATUS )
 
@@ -467,11 +474,11 @@
       CALL PAR_GET0L( 'TRIM', TRIM, STATUS )
 
 *  Work out the bounds for the output array and the size of the output 
-*  array from the input array dimensions, compression factor and alignment.  
-*  Also modify the input bounds so that they correspond to the section of 
-*  the input image which is actually used. Trim or pad the input image to
-*  make it a whole number of compression boxes, as required by parameter
-*  TRIM.
+*  array from the input array dimensions, compression factor and 
+*  alignment.  Also modify the input bounds so that they correspond to 
+*  the section of the input image which is actually used.  Trim or pad 
+*  the input image to make it a whole number of compression boxes, as 
+*  required by parameter TRIM.
       DO I = 1, NDIM
          D = KPG1_CEIL( REAL( 1 - REF( I ) )/REAL( COMPRS( I ) ) ) - 1
 
@@ -502,7 +509,8 @@
 *  output image).
       CALL NDF_SECT( NDFI, NDIMI, LBND, UBND, NDFIS, STATUS )
 
-*  Annul the original input NDF and use the section create above instead.
+*  Annul the original input NDF and use the section created above 
+*  instead.
       CALL NDF_ANNUL( NDFI, STATUS )
       NDFI = NDFIS
 
@@ -629,13 +637,13 @@
          END IF
       END IF
 
-*    Tidy the data and variance arrays.
+*  Tidy the data and variance arrays.
       CALL NDF_UNMAP( NDFI, COMP, STATUS )
       CALL NDF_UNMAP( NDFO, COMP, STATUS )
 
-*    Tidy the second workspace array, since it's type may not be
-*    constant when processing the axis arrays---it could be the
-*    implementation type or _INTEGER.
+*  Tidy the second workspace array, since its type may not be
+*  constant when processing the axis arrays---it could be the
+*  implementation type or _INTEGER.
       CALL PSX_FREE( WPNTR2, STATUS )
 
 *  Compress AXIS centre and variance arrays.
@@ -708,7 +716,7 @@
             ADIMS( 1 ) = IDIMS( IAXIS )
 
 *  Compress the input array to make the output array by averaging in
-*  non-overlapping boxes.  Note that each axis array is 1-dimensional,
+*  non-overlapping boxes.  Note that each axis array is one-dimensional,
 *  so pass just the required dimension, and compression factor.  Call
 *  the appropriate routine depending on whether there is variance or
 *  not, and the implementation type.  Since the original averaging
@@ -805,7 +813,7 @@
 
 *  Compress the input width array to make the output array by SUMMING
 *  in non-overlapping boxes.  Note that each axis array is
-*  1-dimensional, so pass just the required dimension, and compression
+*  one-dimensional, so pass just the required dimension, and compression
 *  factor.  Call the appropriate routine depending on the
 *  implementation type.  Since the original workspace is sufficiently
 *  large, initialised each time it is used we can re-cycle just one
@@ -841,8 +849,8 @@
       END IF
 
 *  Propagate the WCS component, incorporating a linear mapping between
-*  pixel coordinates. This mapping is described by a matrix and an offset
-*  vector. Set these up. 
+*  pixel co-ordinates.  This mapping is described by a matrix and an 
+*  offset vector.  Set these up. 
       DO I = 1, NDIMI * NDIMI
          MATRIX( I ) = 0.0D0
       END DO
