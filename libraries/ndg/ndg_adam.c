@@ -29,10 +29,12 @@
 *        Port from GRP
 *     28-FEB-2006 (DSB):
 *        Use grpF2C and grpC2F.
+*     11-JUL-2006 (TIMJ):
+*        Add some const-ing
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -99,7 +101,7 @@ void ndgAssoc( char * param, int verb, Grp ** igrp, int *size, int * flag, int *
 
 F77_SUBROUTINE(ndg_creat)( CHARACTER(PARAM), INTEGER(IGRP0), INTEGER(IGRP), INTEGER(SIZE), LOGICAL(FLAG), INTEGER(STATUS) TRAIL(PARAM) );
 
-void ndgCreat( char * param, Grp *igrp0, Grp ** igrp, int *size, int * flag, int *status 
+void ndgCreat( char * param, const Grp *igrp0, Grp ** igrp, int *size, int * flag, int *status 
 ){
    DECLARE_INTEGER(IGRP0);
    DECLARE_INTEGER(IGRP);
