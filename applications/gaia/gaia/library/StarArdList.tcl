@@ -317,7 +317,7 @@ itcl::class gaia::StarArdList {
             delete object $objects_($i)
          }
       }
-      unset objects_
+      catch {unset objects_}
       set selected_ {}
       set highest_index_ 0
    }
