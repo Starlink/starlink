@@ -25,38 +25,40 @@
 *     subsequent application, since all applications will automatically
 *     uncompress the data.
 
-*     Currently the only compression method available is to scale the data 
-*     values using a linear transformation so that they fit into a smaller 
-*     data type. A description of the scaling uses is stored with the output 
-*     NDF so that later application can beconstruct the origial unscaled 
-*     values.
+*     Currently the only compression method available is to scale the 
+*     data values using a linear transformation so that they fit into a 
+*     smaller data type.  A description of the scaling uses is stored 
+*     with the output NDF so that later application can reconstruct the 
+*     original unscaled values.
 
 *  Usage:
 *     ndfcompress in out method
 
 *  ADAM Parameters:
-*     DSCALE = DOUBLE PRECISION (Read)
-*        The scale factor to use for the Data component, when compressing 
-*        with METHOD set to SCALE. If a null (!) value is supplied for
-*        DSCALE or DZERO, default values will be used for both that cause
-*        the scaled data values to occupy 96% of the available range of the 
-*        data type selected using parameter SCALETYPE. [!]
-*     DZERO = DOUBLE PRECISION (Read)
-*        The zero offset to use for the Data component, when compressing 
-*        with METHOD set to SCALE. If a null (!) value is supplied for
-*        DSCALE or DZERO, default values will be used for both that cause
-*        the scaled data values to occupy 96% of the available range of the 
-*        data type selected using parameter SCALETYPE. [!]
+*     DSCALE = _DOUBLE (Read)
+*        The scale factor to use for the DATA component, when 
+*        compressing with METHOD set to "SCALE".  If a null (!) value is
+*        supplied for DSCALE or DZERO, default values will be used for 
+*        both that cause the scaled data values to occupy 96% of the 
+*        available range of the data type selected using parameter 
+*        SCALETYPE.  [!]
+*     DZERO = _DOUBLE (Read)
+*        The zero offset to use for the DATA component, when compressing
+*        with METHOD set to SCALE.  If a null (!) value is supplied for
+*        DSCALE or DZERO, default values will be used for both that 
+*        cause the scaled data values to occupy 96% of the available 
+*        range of the data type selected using parameter SCALETYPE.  [!]
 *     IN = NDF (Read)
 *        The input NDF.
 *     METHOD = LITERAL (Read)
-*        The compression method to use. Currently the only supported
-*        value is 'SCALE'.
+*        The compression method to use.  Currently the only supported
+*        value is "SCALE".
 *     OUT = NDF (Write)
 *        The output NDF.
 *     SCALETYPE = LITERAL (Read)
-*        The data type to use for the scaled data values. Only used if 
-*        METHOD is SCALED. It can be one of:
+*        The data type to use for the scaled data values.  It is only 
+*        used if METHOD is "SCALED".  It can be one of the following
+*        options.
 *
 *        - "_INTEGER" -- 4 byte signed integers 
 *
@@ -68,36 +70,36 @@
 *
 *        - "_UBYTE" -- 1 byte unsigned integers 
 *
-*        The same data type is used for both Data and (if required)
-*        Variance components of the output NDF. The initial default value 
-*        is "_WORD".   [current value]
-*     VSCALE = DOUBLE PRECISION (Read)
-*        The scale factor to use for the Variance component, when
+*        The same data type is used for both DATA and (if required)
+*        VARIANCE components of the output NDF.  The initial default 
+*        value is "_WORD".   [current value]
+*     VSCALE = _DOUBLE (Read)
+*        The scale factor to use for the VARIANCE component, when
 *	 compressing with METHOD set to SCALE. If a null (!) value is
 *        supplied for VSCALE or VZERO, default values will be used for 
 *        both that cause the scaled variance values to occupy 96% of 
 *        the available range of the data type selected using parameter 
-*        SCALETYPE. [!]
-*     VZERO = DOUBLE PRECISION (Read)
-*        The zero factor to use for the Variance component, when
-*	 compressing with METHOD set to SCALE. If a null (!) value is
+*        SCALETYPE.  [!]
+*     VZERO = _DOUBLE (Read)
+*        The zero factor to use for the VARIANCE component, when
+*	 compressing with METHOD set to SCALE.  If a null (!) value is
 *        supplied for VSCALE or VZERO, default values will be used for 
 *        both that cause the scaled variance values to occupy 96% of 
 *        the available range of the data type selected using parameter 
-*        SCALETYPE. [!]
+*        SCALETYPE.  [!]
 
 *  Examples:
-*     ndfcompress infile outfile scale scaletype="_uword"
+*     ndfcompress infile outfile scale scaletype=_uword
 *        Copies the contents of the NDF structure infile to the new
 *        structure outfile, scaling the values so that they fit into 
-*        unsigned 2 byte integers. The scale and zero values used are
+*        unsigned 2-byte integers. The scale and zero values used are
 *        chosen automatically.
 
 *  Related Applications:
 *     KAPPA: NDFCOPY.
 
 *  Implementation Status:
-*     The TITLE, LABEL, UNITS, DATA, VARIANCE, QUALITY, AXIS, WCS and 
+*     The TITLE, LABEL, UNITS, DATA, VARIANCE, QUALITY, AXIS, WCS, and 
 *     HISTORY components are copied by this routine, together with all 
 *     extensions.  
 
@@ -214,7 +216,7 @@
 *  Set the output NDF to have the selected data type.
          CALL NDF_STYPE( STYPE, INDF2, 'Data,Variance', STATUS )
 
-*  Loop round the Data and Variance array
+*  Loop round the Data and Variance arrays.
          CALL MSG_BLANK( STATUS )
          DO I = 1, 2
 
@@ -231,17 +233,17 @@
      :                       STATUS ) 
                CALL NDF_BAD( INDF1, COMP( I ), .FALSE., BAD, STATUS ) 
 
-*  Check that no error has occurred. This is so that we can be sure that 
-*  any PAR__NULL error following the next two PAR_GET0D calls was generated 
-*  by one of the two PAR calls.
+*  Check that no error has occurred.  This is so that we can be sure 
+*  that  any PAR__NULL error following the next two PAR_GET0D calls was 
+*  generated  by one of the two PAR calls.
                IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the scale and zero values from the user.
                CALL PAR_GET0D( SCLPAR( I ), SCALE, STATUS )
                CALL PAR_GET0D( ZERPAR( I ), ZERO, STATUS )
 
-*  If a null value was supplied for either, annul the error and calculate 
-*  default values.
+*  If a null value was supplied for either, annul the error and 
+*  calculate default values.
                IF( STATUS .EQ. PAR__NULL ) THEN
                   CALL ERR_ANNUL( STATUS )
 
@@ -328,7 +330,7 @@
 *  set if the array is mapped.
                CALL NDF_UNMAP( INDF2, COMP( I ), STATUS )
 
-*  Set the output bad pixel flag.
+*  Set the output bad-pixel flag.
                CALL NDF_SBAD( BADOUT, INDF2, COMP( I ), STATUS )
 
 *  Give a warning if any input pixel values did not fit into the output
