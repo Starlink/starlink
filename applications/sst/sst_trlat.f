@@ -28,7 +28,8 @@
 
 *  Copyright:
 *     Copyright (C) 1990, 1994 Science & Engineering Research Council.
-*     Copyright (C) 2005 Particls Physics & Engineering Research Council.
+*     Copyright (C) 2005, 2006  Particle Physics & Engineering Research 
+*        Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -49,6 +50,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
 *     DSB: David S. Berry 
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,6 +74,8 @@
 *        Made double \ sensitive to the compiler capabilities.
 *     28-SEP-2005 (DSB):
 *        Ignored "Synopsis" sections.
+*     2006 July 12 (MJC):
+*        Ignore "Licence" and "Copyright" sections.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,7 +101,7 @@
 
 *  Local Constants:
       INTEGER MXKEY              ! Max. no of search keys
-      PARAMETER ( MXKEY = 20 )
+      PARAMETER ( MXKEY = 22 )
 
       INTEGER SZKEY              ! Size of search keys
       PARAMETER ( SZKEY = 30 )
@@ -353,10 +357,12 @@
       NAME( 18 ) = 'Implementation Deficiencies'
       NAME( 19 ) = 'Language'
       NAME( 20 ) = 'Synopsis'
+      NAME( 21 ) = 'Licence'
+      NAME( 22 ) = 'Copyright'
       
 *  Loop to find all remaining sections.
 1     CONTINUE                   ! Start of 'DO WHILE' loop
-      CALL SST_NSECT( .FALSE., 20, NAME, HEADER, FIRST, LAST, STATUS )
+      CALL SST_NSECT( .FALSE., 22, NAME, HEADER, FIRST, LAST, STATUS )
       IF ( ( HEADER .NE. 0 ) .AND. ( FIRST .LE. LAST ) ) THEN
 
 *  Remove any trailing colon from the section heading.
