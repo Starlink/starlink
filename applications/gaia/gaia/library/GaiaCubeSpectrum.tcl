@@ -401,7 +401,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       if { $action == "localstart" } {
          busy {
             $spectrum_ display_region $cubeaccessor $axis $alow $ahigh \
-               $region "mean" 1
+               $region $combination_type_ 1
          }
 
          #  Set first-time position of the main reference line. This is
@@ -420,7 +420,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       } else {
          busy {
             $spectrum_ display_region $cubeaccessor $axis $alow $ahigh \
-               $region "mean" 0
+               $region $combination_type_ 0
          }
       }
 
@@ -531,7 +531,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       set axis [$itk_option(-gaiacube) get_axis]
       busy {
          $spectrum_ display_region_reference $cubeaccessor $axis $alow $ahigh \
-            $region "mean"
+            $region $combination_type_
       }
 
       #  Reference position marker doesn't apply.
@@ -640,6 +640,31 @@ itcl::class gaia::GaiaCubeSpectrum {
       pack $itk_component(bframe) -side top -fill x -expand 1 -ipadx 1m
       pack $itk_component(blabel) -side left -expand 0 -ipadx 1m
       pack $buttons_ -side left -expand 0 -anchor w -ipadx 1m
+
+      #  Choice of combination method.
+      itk_component add combination {
+         LabelMenu $w_.combination \
+            -labelwidth $itk_option(-labelwidth) \
+            -text "Combination method:" \
+            -variable [scope combination_type_]
+      }
+      pack $itk_component(combination) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(combination) \
+         {Region data combination method}
+         
+      $itk_component(combination) add \
+         -label Mean \
+         -value mean \
+         -command [code $this set_combination_type_ "mean"]
+      $itk_component(combination) add \
+         -label Median \
+         -value median \
+         -command [code $this set_combination_type_ "median"]
+   }
+
+   #  Set the combination type used for regions.
+   protected method set_combination_type_ {value} {
+      set combination_type_ $value
    }
 
    #  Method to deal with the creation of a region.
@@ -875,6 +900,9 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  The position marker that corresponds to the reference spectrum.
    protected variable ref_position_mark_ {}
+
+   #  The region data combination type.
+   protected variable combination_type_ "mean"
 
    #  Common variables: (shared by all instances)
    #  -----------------

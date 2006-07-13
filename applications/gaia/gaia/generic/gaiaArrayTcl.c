@@ -100,7 +100,7 @@ int Array_Init( Tcl_Interp *interp )
  *   6&7)   the lower and upper bounds along axis line (-1's for all), grid
  *          indices.
  *   8)     the ARD description, with grid coordinates.
- *   9)     the combination method, only mean is supported at present.
+ *   9)     the combination method, only mean and median are supported.
  *   10)    a boolean indicating whether the extracted data should be
  *          registered with CNF so that it can be released by CNF
  *          (NDFs will require this).
@@ -112,7 +112,7 @@ static int gaiaArrayRegionSpectrum( ClientData clientData, Tcl_Interp *interp,
 {
     ARRAYinfo *arrayInfo;
     char *description;
-    char *method;
+    int method;
     int arange[2];
     int axis;
     int cnfMalloc;
@@ -184,7 +184,12 @@ static int gaiaArrayRegionSpectrum( ClientData clientData, Tcl_Interp *interp,
     description = Tcl_GetString( objv[8] );
 
     /* Combination method */
-    method = Tcl_GetString( objv[9] );
+    if ( strcmp( Tcl_GetString( objv[9] ), "mean" ) == 0 ) {
+        method = GAIA_ARRAY_MEAN;
+    }
+    else {
+        method = GAIA_ARRAY_MEDIAN;
+    }
 
     /* CNF registered memory */
     if ( Tcl_GetBooleanFromObj( interp, objv[10], &cnfMalloc ) != TCL_OK ) {
@@ -195,8 +200,8 @@ static int gaiaArrayRegionSpectrum( ClientData clientData, Tcl_Interp *interp,
 
     /* Extraction */
     gaiaArrayRegionSpectrumFromCube( arrayInfo, dims, axis, arange, 
-                                     description, cnfMalloc, &outPtr, &nel,
-                                     &outtype );
+                                     description, method, cnfMalloc, 
+                                     &outPtr, &nel, &outtype );
 
     /* Export results as an ARRAYinfo struct */
     arrayInfo = gaiaArrayCreateInfo( outPtr, outtype, nel, 0, 0, 0, 1.0, 0.0,

@@ -71,18 +71,18 @@ static char *hdstypes[] = {
 static void DataNormalise( void *inPtr, int intype, int nel,
                            int isfits, int haveblank, int inBlank,
                            double bscale, double bzero, int cnfmalloc,
-                           int freescaled, void **outPtr, 
+                           int freescaled, void **outPtr,
                            int *outtype );
 
-static void RawImageFromCube( ARRAYinfo *cubeinfo, int dims[], int axis, 
-                              int index, void **outPtr, size_t *nel, 
+static void RawImageFromCube( ARRAYinfo *cubeinfo, int dims[], int axis,
+                              int index, void **outPtr, size_t *nel,
                               int cnfmalloc );
 
-static void RawSubImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis, 
-                                 int index, int lbnd[2], int ubnd[2], 
+static void RawSubImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
+                                 int index, int lbnd[2], int ubnd[2],
                                  void **outPtr, size_t *nel, int cnfmalloc );
 
-static void GetSubImage( void *inPtr, int dims[2], int nbytes, int lbnd[2], 
+static void GetSubImage( void *inPtr, int dims[2], int nbytes, int lbnd[2],
                          int ubnd[2], void *outPtr );
 
 /**
@@ -384,7 +384,7 @@ void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
     /* Normalise the data to remove byte-swapping and unrecognised
      * BAD values, and convert from a scaled variant. For NDFs this is a
      * null op. */
-    DataNormalise( outPtr, type, nel, cubeinfo->isfits, cubeinfo->haveblank, 
+    DataNormalise( outPtr, type, nel, cubeinfo->isfits, cubeinfo->haveblank,
                    cubeinfo->blank, cubeinfo->bscale, cubeinfo->bzero,
                    cnfmalloc, 1, &normPtr, &normtype );
 
@@ -399,8 +399,8 @@ void gaiaArrayImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
  * memory may be pre-allocated (when it isn't make sure *outPtr is set to
  * NULL). No normalisation of the data is attempted.
  */
-static void RawImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis, 
-                              int index, void **outPtr, size_t *nel, 
+static void RawImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
+                              int index, void **outPtr, size_t *nel,
                               int cnfmalloc )
 {
     char *ptr;
@@ -533,8 +533,8 @@ static void RawImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
  * are given by the lbnd and ubnd arrays, these define the extents of the
  * region to extract.
  */
-static void RawSubImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis, 
-                                 int index, int lbnd[2], int ubnd[2], 
+static void RawSubImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
+                                 int index, int lbnd[2], int ubnd[2],
                                  void **outPtr, size_t *nel, int cnfmalloc )
 {
     char *iptr;
@@ -660,7 +660,7 @@ static void RawSubImageFromCube( ARRAYinfo *cubeinfo, int dims[3], int axis,
  * inPtr. The data type is unknown, so the correct number of bytes per pixel
  * is used.
  */
-static void GetSubImage( void *inPtr, int dims[2], int nbytes, int lbnd[2], 
+static void GetSubImage( void *inPtr, int dims[2], int nbytes, int lbnd[2],
                          int ubnd[2], void *outPtr )
 {
     char *iptr;
@@ -894,8 +894,8 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
 
     /* Normalise the data to remove byte-swapping and unrecognised
      * BAD values transform scaled FITS integer data. */
-    DataNormalise( *outPtr, intype, *nel, info->isfits, info->haveblank, 
-                   info->blank, info->bscale, info->bzero, cnfmalloc, 1, 
+    DataNormalise( *outPtr, intype, *nel, info->isfits, info->haveblank,
+                   info->blank, info->bscale, info->bzero, cnfmalloc, 1,
                    &normPtr, outtype );
     *outPtr = normPtr;
 }
@@ -933,7 +933,8 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
  *         The region to combine each image plane of data in. This is an
  *         ARD description (usually a simple CIRCLE, RECT, etc.).
  *     method
- *         The combination method, 0 for mean, 1 for median, 2 for mode.
+ *         The combination method, GAIA_ARRAY_MEAN or GAIA_ARRAY_MEDIAN
+ *         (defined in gaiaArray.h).
  *     cnfmalloc
  *         Whether to use cnfMalloc to allocate the image data. Otherwise
  *         malloc will be used.
@@ -953,25 +954,29 @@ void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
  *     (full of zeros) will be returned.
  */
 void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
-                                      int arange[2], char *region,
+                                      int arange[2], char *region, int method,
                                       int cnfmalloc, void **outPtr, int *nel,
                                       int *outtype )
 {
     char *error_mess;
     double sum;
     int *fullMaskPtr;
-    int *subMaskPtr;
     int *maskPtr;
+    int *subMaskPtr;
     int count;
     int i;
     int idummy;
     int intype = info->type;
     int j;
+    int k;
+    int l;
     int lbnd[2];
     int lower;
-    int planeSize;
+    int m;
+    int n;
     int maskSize;
     int mdims[2];
+    int planeSize;
     int ubnd[2];
     int upper;
     size_t length;
@@ -1044,13 +1049,17 @@ void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
     free( fullMaskPtr );
 
     /* Walk the cube extracting each image plane in turn.  */
+    /* ==================================================  */
 
     /* Allocate memory for the image slice, do this just once. Note that FITS
      * scaled data still allocates memory each image extraction and this is
      * intype as the data is raw. */
     tmpPtr = malloc( maskSize * gaiaArraySizeOf( intype ) );
 
-#define EXTRACT_AND_COMBINE(outtype,badFlag)                            \
+    /* Use some poor man's generics to get the extraction and combination code
+     * for all the supported data types. */
+
+#define EXTRACT_AND_COMBINE_MEAN(outtype,badFlag)                       \
 {                                                                       \
     void *imagePtr;                                                     \
     outtype *ptr;                                                       \
@@ -1089,31 +1098,127 @@ void gaiaArrayRegionSpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
     }                                                                   \
 }
 
+
+#define EXTRACT_AND_COMBINE_MEDIAN(outtype,badFlag)                     \
+{                                                                       \
+    outtype *imagePtr;                                                  \
+    outtype *specPtr;                                                   \
+    outtype x;                                                          \
+    outtype t;                                                          \
+    specPtr = (outtype *) *outPtr;                                      \
+    for ( i = lower; i < upper; i++ ) {                                 \
+        RawSubImageFromCube( info, dims, axis, i, lbnd, ubnd, &tmpPtr,  \
+                             &sdummy, 0 );                              \
+        DataNormalise( tmpPtr, intype, maskSize, info->isfits,          \
+                       info->haveblank, info->blank, info->bscale,      \
+                       info->bzero, 0, 0, (void **) &imagePtr,          \
+                       &idummy );                                       \
+        /* Need to clean out masked and bad values for this one */      \
+        count = 0;                                                      \
+        for ( j = 0; j < maskSize; j++ ) {                              \
+            if ( subMaskPtr[j] >= 2 && imagePtr[j] != badFlag ) {       \
+                imagePtr[count] = imagePtr[j];                          \
+                count++;                                                \
+            }                                                           \
+        }                                                               \
+        if ( count > 0 ) {                                              \
+            /* Find K'th value, using Wirth's algorithm */              \
+            /* Original implementation by N. Devillard */               \
+            k = count&1 ? count/2 : count/2 - 1;                        \
+            l = 0;                                                      \
+            m = count - 1;                                              \
+            while ( l < m ) {                                           \
+                x = imagePtr[k];                                        \
+                n = l;                                                  \
+                j = m;                                                  \
+                do {                                                    \
+                    while ( imagePtr[n] < x ) n++;                      \
+                    while ( x < imagePtr[j] ) j--;                      \
+                    if ( n <= j ) {                                     \
+                        t = imagePtr[n];                                \
+                        imagePtr[n] = imagePtr[j];                      \
+                        imagePtr[j] = t;                                \
+                        n++;                                            \
+                        j--;                                            \
+                    }                                                   \
+                }                                                       \
+                while ( n <= j );                                       \
+                if ( j < k ) l = n;                                     \
+                if ( k < n ) m = j;                                     \
+            }                                                           \
+            *specPtr = (outtype) imagePtr[k];                           \
+        }                                                               \
+        else {                                                          \
+            *specPtr = (outtype) 0;                                     \
+        }                                                               \
+        specPtr++;                                                      \
+        if ( imagePtr != tmpPtr ) {                                     \
+            free( imagePtr );                                           \
+        }                                                               \
+    }                                                                   \
+}
+
     switch ( *outtype )
         {
             case HDS_DOUBLE:
-                EXTRACT_AND_COMBINE(double,VAL__BADD)
+                if ( method == GAIA_ARRAY_MEAN ) {
+                    EXTRACT_AND_COMBINE_MEAN(double,VAL__BADD)
+                } 
+                else {
+                    EXTRACT_AND_COMBINE_MEDIAN(double,VAL__BADD)
+                }
             break;
             case HDS_REAL:
-                EXTRACT_AND_COMBINE(float,VAL__BADR)
+                if ( method == GAIA_ARRAY_MEAN ) {
+                    EXTRACT_AND_COMBINE_MEAN(float,VAL__BADR)
+                }
+                else {
+                    EXTRACT_AND_COMBINE_MEDIAN(float,VAL__BADR)
+                }
             break;
             case HDS_INTEGER:
-                EXTRACT_AND_COMBINE(int,VAL__BADI)
+                if ( method == GAIA_ARRAY_MEAN ) {
+                    EXTRACT_AND_COMBINE_MEAN(int,VAL__BADI)
+                }
+                else {
+                    EXTRACT_AND_COMBINE_MEDIAN(int,VAL__BADI)
+                }
             break;
             case HDS_WORD:
-                EXTRACT_AND_COMBINE(short,VAL__BADW)
+                if ( method == GAIA_ARRAY_MEAN ) {
+                    EXTRACT_AND_COMBINE_MEAN(short,VAL__BADW)
+                }
+                else {
+                    EXTRACT_AND_COMBINE_MEDIAN(short,VAL__BADW)
+                }
             break;
             case HDS_UWORD:
-                EXTRACT_AND_COMBINE(unsigned short,VAL__BADUW)
+                if ( method == GAIA_ARRAY_MEAN ) {
+                    EXTRACT_AND_COMBINE_MEAN(unsigned short,VAL__BADUW)
+                }
+                else {
+                    EXTRACT_AND_COMBINE_MEDIAN(unsigned short,VAL__BADUW)
+                }
             break;
             case HDS_BYTE:
-                EXTRACT_AND_COMBINE(char,VAL__BADB)
+                if ( method == GAIA_ARRAY_MEAN ) {
+                    EXTRACT_AND_COMBINE_MEAN(char,VAL__BADB)
+                }
+                else {
+                    EXTRACT_AND_COMBINE_MEDIAN(char,VAL__BADB)
+                }
             break;
             case HDS_UBYTE:
-                EXTRACT_AND_COMBINE(unsigned char,VAL__BADUB)
+                if ( method == GAIA_ARRAY_MEAN ) {
+                    EXTRACT_AND_COMBINE_MEAN(unsigned char,VAL__BADUB)
+                }
+                else {
+                    EXTRACT_AND_COMBINE_MEDIAN(unsigned char,VAL__BADUB)
+                }
             break;
         }
-#undef EXTRACT_AND_COMBINE
+#undef EXTRACT_AND_COMBINE_MEAN
+#undef EXTRACT_AND_COMBINE_MEDIAN
 
     free( subMaskPtr );
     free( tmpPtr );
@@ -1173,9 +1278,9 @@ void gaiaArrayFree( ARRAYinfo *info, int cnfMalloc )
  *  If a scaled array is created the input data will be freed (since it is
  *  designed to replace this), unless freescaled is set to 0.
  */
-static void DataNormalise( void *inPtr, int intype, int nel, int isfits, 
-                           int haveblank, int inBlank, double bscale, 
-                           double bzero, int cnfmalloc, int freescaled, 
+static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
+                           int haveblank, int inBlank, double bscale,
+                           double bzero, int cnfmalloc, int freescaled,
                            void **outPtr, int *outtype )
 {
     int i;
@@ -1332,7 +1437,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
                         op[i] = VAL__BADR;
                     }
                 }
-            } 
+            }
             else if ( haveblank ) {
                 short blank = (short) inBlank;
                 short *ptr = (short *)inPtr;
