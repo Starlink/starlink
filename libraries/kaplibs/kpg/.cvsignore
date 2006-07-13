@@ -100,6 +100,11 @@ kpg1_retr.f
 kpg1_retv.f
 kpg1_rfco.f                      
 kpg1_rmap.f
+kpg1_sclb.f
+kpg1_scli.f
+kpg1_sclub.f
+kpg1_scluw.f
+kpg1_sclw.f
 kpg1_sqsu.f
 kpg1_ssaz.f
 kpg1_stat.f
