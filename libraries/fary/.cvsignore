@@ -29,3 +29,9 @@ starconf.status
 ary_test
 make.log.err
 sun11.dvi
+
+ary1_gt1x.f
+ary1_gtnx.f
+ary_err.h
+ary_gtszx.f
+ary_ptszx.f
