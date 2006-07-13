@@ -31,10 +31,12 @@
 *        Add ndgAsexp
 *     28-FEB-2006 (DSB):
 *        Use grpC2F and grpF2C.
+*     12-JUL-2006 (TIMJ):
+*        Add ndgNdfcr
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -61,6 +63,9 @@
 #include "sae_par.h"
 #include "par_par.h"
 #include "star/grp.h"
+#include "star/hds_types.h"
+#include "star/hds_fortran.h"
+#include "ndf.h"
 #include "ndg.h"
 
 /* Wrapper function implementations. */
@@ -69,7 +74,7 @@
 F77_SUBROUTINE(ndg_ndfas)( INTEGER(IGRP), INTEGER(INDEX), CHARACTER(MODE), INTEGER(INDF), 
 INTEGER(STATUS) TRAIL(MODE) );
 
-void ndgNdfas( Grp *igrp, int index, char * mode, int * indf, int * status ) {
+void ndgNdfas( const Grp *igrp, int index, const char mode[], int * indf, int * status ) {
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(INDEX);
    DECLARE_CHARACTER(MODE, 10);
@@ -91,10 +96,47 @@ void ndgNdfas( Grp *igrp, int index, char * mode, int * indf, int * status ) {
    return;
 }
 
+F77_SUBROUTINE(ndg_ndfcr)( INTEGER(IGRP), INTEGER(INDEX), CHARACTER(FTYPE), INTEGER(NDIM),
+			   INTEGER(LBND), INTEGER(UBND), INTEGER(INDF), INTEGER(STATUS)
+			   TRAIL(FTYPE) );
+
+void ndgNdfcr( const Grp* igrp, int index, const char ftype[], int ndim,
+	       const hdsdim lbnd[], const hdsdim ubnd[], int * indf, int * status ) {
+
+  DECLARE_INTEGER(IGRP);
+  DECLARE_INTEGER(INDEX);
+  DECLARE_CHARACTER(FTYPE, NDF__SZFTP);
+  DECLARE_INTEGER(NDIM);
+  DECLARE_INTEGER_ARRAY_DYN(LBND);
+  DECLARE_INTEGER_ARRAY_DYN(UBND);
+  DECLARE_INTEGER(INDF);
+  DECLARE_INTEGER(STATUS);
+
+  DECLARE_INTEGER_ARRAY( LBND_DUMMY, NDF__MXDIM );
+  DECLARE_INTEGER_ARRAY( UBND_DUMMY, NDF__MXDIM );
+
+  IGRP = grpC2F( igrp, status );
+  F77_EXPORT_INTEGER( index, INDEX );
+  F77_EXPORT_CHARACTER( ftype, FTYPE, NDF__SZFTP );
+  F77_EXPORT_INTEGER( ndim, NDIM );
+  LBND = hdsDimC2F( ndim, lbnd, LBND_DUMMY, status );
+  UBND = hdsDimC2F( ndim, ubnd, UBND_DUMMY, status );
+  F77_EXPORT_INTEGER(*status, STATUS );
+
+  F77_CALL(ndg_ndfcr)( INTEGER_ARG(&IGRP), INTEGER_ARG(&INDEX), CHARACTER_ARG(FTYPE),
+		       INTEGER_ARG(&NDIM), INTEGER_ARRAY_ARG(LBND), INTEGER_ARRAY_ARG(UBND),
+		       INTEGER_ARG(&INDF), INTEGER_ARG(&STATUS)
+		       TRAIL_ARG(FTYPE) );
+
+  F77_IMPORT_INTEGER( STATUS, *status );
+  F77_IMPORT_INTEGER( INDF, *indf );
+
+}
+
 
 F77_SUBROUTINE(ndg_ndfpr)( INTEGER(INDF1), CHARACTER(CLIST), INTEGER(IGRP), INTEGER(INDEX), INTEGER(INDF2), INTEGER(STATUS) TRAIL(CLIST));
 
-void ndgNdfpr( int indf1, char * clist, Grp *igrp, int index, int * indf2, int * status) {
+void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, int index, int * indf2, int * status) {
 
   DECLARE_INTEGER(INDF1);
   DECLARE_CHARACTER(CLIST, 128);
@@ -122,7 +164,8 @@ void ndgNdfpr( int indf1, char * clist, Grp *igrp, int index, int * indf2, int *
 F77_SUBROUTINE(ndg_asexp)( CHARACTER(GRPEXP), LOGICAL(VERB), INTEGER(IGRP1), INTEGER(IGRP2),
 			   INTEGER(SIZE), LOGICAL(FLAG), INTEGER(STATUS) TRAIL(GRPEXP) );
 
-void ndgAsexp( char * grpexp, int verb, Grp *igrp1, Grp ** igrp2, int *size, int * flag, int *status ){
+void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp ** igrp2, int *size, int * flag,
+	       int *status ){
    DECLARE_INTEGER(IGRP1);
    DECLARE_INTEGER(IGRP2);
    DECLARE_INTEGER(SIZE);

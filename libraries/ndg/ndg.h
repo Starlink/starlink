@@ -56,12 +56,23 @@
 /* Need Grp type definitions */
 #include "star/grp.h"
 
+/* Need HDS dim type */
+#include "star/hds_types.h"
+
 /* Public function prototypes */
 /* -------------------------- */
-void ndgAsexp( char * grpexp, int verb, Grp *igrp1, Grp ** igrp2, int *size, int * flag, int *status );
-void ndgAssoc( char * param, int verb, Grp **igrp, int *size, int * flag, int *status );
-void ndgCreat( char * param, Grp *igrp0, Grp **igrp, int *size, int * flag, int *status);
-void ndgNdfas( Grp *igrp, int index, char * mode, int * indf, int * status );
-void ndgNdfpr( int indf1, char * clist, Grp *igrp, int index, int * indf2, int * status);
+void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp ** igrp2,
+	       int *size, int * flag, int *status );
+void ndgAssoc( char * param, int verb, Grp **igrp, int *size, int * flag,
+	       int *status );
+void ndgCreat( char * param, const Grp *igrp0, Grp **igrp, int *size,
+	       int * flag, int *status);
+void ndgNdfas( const Grp *igrp, int index, const char mode[], int * indf,
+	       int * status );
+void ndgNdfcr( const Grp *igrp, int index, const char ftype[], int ndim,
+	       const hdsdim lbnd[], const hdsdim ubnd[],
+	       int * indf, int * status );
+void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, int index,
+	       int * indf2, int * status);
 
 #endif
