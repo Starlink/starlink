@@ -446,10 +446,15 @@ sub _GText {
 
      # select the font object
      my $fi = $external->[EXT_ATTR]->{TEXT}->{FONT};
-     my $font = $external->[EXT_ATTR]->{FONTS}->[$fi];
+
+     my %fontparams;
+     if ( exists $external->[EXT_ATTR]->{FONTS}->[$fi] ) {
+       %fontparams = %{ $external->[EXT_ATTR]->{FONTS}->[$fi] };
+     }
 
      # size in pixels is specified as negative number
-     $font->configure( '-size' => (-1 * $charh ) );
+     my $font = $canvas->Font( %fontparams, '-size' => (-1 * $charh ) );
+
      # Add the font to the %opts hash
      $opts{'-font'} = $font;
 
@@ -1057,29 +1062,30 @@ sub _init_canvas_attrs {
   # it has to be per-widget rather than global
   my @fonts;
 
-  # Simple font
-  $fonts[1] = $canvas->Font( -family => 'Courier',
+  # Simple font - can not cache the font itself since size and colour
+  # control may not be respected if many changes are made between refreshes
+  $fonts[1] = { -family => 'Courier',
 			     -slant => 'roman',
 			     -size => 12,
-			   );
+		};
 
   # roman font
-  $fonts[2] = $canvas->Font( -family => 'Times',
+  $fonts[2] = { -family => 'Times',
 			     -slant => 'roman',
 			     -size => 12,
-			   );
+	      };
 
   # italic
-  $fonts[3] = $canvas->Font( -family => 'Time',
+  $fonts[3] = { -family => 'Time',
 			     -slant => 'italic',
 			     -size => 12,
-			   );
+	      };
 
   # script
-  $fonts[4] = $canvas->Font( -family => 'Helvetica',
+  $fonts[4] = { -family => 'Helvetica',
 			     -slant => 'italic',
 			     -size => 12,
-			   );
+	      };
 
   $attr->{FONTS} = \@fonts;
 
