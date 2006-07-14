@@ -82,6 +82,12 @@ _text_and_box( $e, "Testing", 0.2, 0.6, "CC", 1, 0);
 _text_and_box( $e, "TestingCC", 0.4, 0.6, "CC", -1, 0);
 _text_and_box( $e, "TestingBL", 0.4, 0.6, "BL", -1, 0);
 
+( $status, $old_value) = Starlink::AST::Tk::_GAttr( $e, Starlink::AST::Grf::GRF__SIZE(),
+						    2,
+						    Starlink::AST::Grf::GRF__TEXT() );
+_text_and_box( $e, "Size", 0.6, 0.3, "CC", 1, 0);
+
+
 # enter Tk mainloop()
 MainLoop();
 
