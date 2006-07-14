@@ -32,7 +32,15 @@ datAnnul(HDSLoc **locator,
 
 /* If the locator is valid, then annul the control packet.                  */
 
+/* Set a new error context                                                  */
+   emsMark();
+   
    dat1_import_loc(*locator, &lcp );
+
+   if( hds_gl_status == DAT__LOCER )
+      emsAnnul(&hds_gl_status);
+   emsRlse();
+   
    if ( lcp != NULL )
    {
       dat1_annul_lcp( &lcp );

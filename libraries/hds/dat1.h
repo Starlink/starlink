@@ -252,7 +252,7 @@ if (!_ok(*status))\
          int read;		 /* Read-only?				    */
          int struc;		 /* Structure object?			    */
          int valid;		 /* Locator is valid			    */
-         int version;            /* HDS file format version                 */
+         int erased;             /* Target of LCP has been erased by datErase*/
 #if defined ( vms )
          struct dsc$descriptor vmsdsc; /* Descriptor for mapped characters  */
 #endif

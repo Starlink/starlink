@@ -63,6 +63,9 @@
 /*       Try to be a bit cleverer when printing a bad locator               */
 /*    01-DEC-2005 (TIMJ):                                                   */
 /*       Abandon any attempt to print the contents of the struct            */
+/*    14-JUL-2006 (BKM)                                                     */
+/*       Produce a more informative message if the file record has been     */
+/*       erased.                                                            */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -111,6 +114,21 @@
             valid = (*lcp)->data.valid;
          }
 
+/* Check if we know that something has called 'rec_delete_record' on the   */
+/* target of the LCP.                                                      */
+         if ( valid )
+         {
+            if ( (*lcp)->data.erased )
+            {
+                hds_gl_status = DAT__LOCER;
+                emsSetnc( "NAME", (*lcp)->data.name, DAT__SZNAM );
+                emsRep( "DAT1_IMPORT_LOC_1",
+                             "Locator target for \'^NAME\' has been \
+erased - only annuling this locator is allowed).",
+                             &hds_gl_status );
+            }
+         }
+            
 /* If still OK, then read the associated Record Control Label and check     */
 /* that the Record ID of the record's parent, as stored in the LCP, matches */
 /* the RID stored in the actual record.                                     */
@@ -126,7 +144,7 @@
                {
                   hds_gl_status = DAT__INCHK;
                   emsSetnc( "NAME", (*lcp)->data.name, DAT__SZNAM );
-                  emsRep( "DAT1_IMPORT_LOC_1",
+                  emsRep( "DAT1_IMPORT_LOC_2",
                              "Locator refers to an object \'^NAME\' which no \
 longer exists (possible programming error or corrupted HDS container file).",
                              &hds_gl_status );
@@ -143,7 +161,7 @@ longer exists (possible programming error or corrupted HDS container file).",
 	    /* Store the pointer */
 	    sprintf(strpntr, "%p", loc ); 
 	    emsSetc( "PNTR", strpntr );
-            emsRep( "DAT1_IMPORT_LOC_2",
+            emsRep( "DAT1_IMPORT_LOC_3",
 		    "HDS locator invalid for import: value==^PNTR (possible programming error).",
                        &hds_gl_status );
          }

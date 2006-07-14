@@ -6,6 +6,7 @@
 
 .BASE		100
 LOCIN	<Locator invalid>
+LOCER   <Locator target erased>
 TYPIN	<Type invalid>
 NAMIN	<Name invalid>
 MODIN	<Mode invalid>
@@ -51,5 +52,4 @@ FILWR	<File write error>
 NOMEM	<Memory allocation error>
 WLDIN	<Wild-card search context invalid>
 NOCMP   <No component name>
-DTRNC   <Dimensions truncate in Fortran INTEGER*4>
 .END

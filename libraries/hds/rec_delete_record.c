@@ -7,6 +7,7 @@
 #include "rec.h"                 /* Public rec_ definitions                 */
 #include "rec1.h"                /* Internal rec_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
+#include "dat1.h"                /* Private DAT definitions                 */
 
 int rec_delete_record( const struct HAN *han )
 {
@@ -45,6 +46,8 @@ int rec_delete_record( const struct HAN *han )
 /*       Changed access mode to 'U' in rec_locate_block.                    */
 /*    27-JUN-2000  (BKM):                                                   */
 /*       Revise for extended format (64-bit) HDS files.                     */
+/*    14-JUN-2006  (BKM)                                                    */
+/*       Mark any LCPs which refer to this record with an 'erased' flag     */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -60,7 +63,8 @@ int rec_delete_record( const struct HAN *han )
    unsigned char *cdom;          /* Pointer to Control Domain               */
    unsigned char *ddom;          /* Pointer to Dynamic Domain               */
    unsigned char *lrb;           /* Pointer to Logical Record Block         */
-
+   int i;                        /* Loop counter                            */
+   struct LCP *lcp;
 /*.                                                                         */
 
 /* Check the inherited global status.                                       */
@@ -107,6 +111,17 @@ int rec_delete_record( const struct HAN *han )
 /* Release the Logical Record Block.                                        */
    if ( lrb != NULL )
       rec_release_block( han->slot, han->rid.bloc );
+
+/* Mark any LCP which refer to this record as erased                        */
+   lcp = dat_ga_wlq;
+   for(i=0; i<dat_gl_wlqsize; i++) {
+      if((*lcp).data.han.slot == han->slot &&
+         (*lcp).data.han.rid.bloc == han->rid.bloc &&
+         (*lcp).data.han.rid.chip == han->rid.chip ) {
+         (*lcp).data.erased = 1;
+      }
+      lcp = (*lcp).flink;
+   }
 
 /* Return the current global status value.                                  */
    return hds_gl_status;

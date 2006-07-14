@@ -69,6 +69,7 @@
 
 *  Authors
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     BKM:  Brian McIlwrath (ex-Starlink, RAL)
 *     {enter_new_authors_here}
 
 *  History :
@@ -79,6 +80,8 @@
 *        - Add "extra" information
 *     14-FEB-2006 (TIMJ):
 *        Do not set status to bad if hdsTrace returns bad status.
+*     14-JUL-2006 (BKM)
+*        Make erased locators non-fatal
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -293,6 +296,8 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
 	 }
 	 lcp = lcp->flink;
       }
+      if( hds_gl_status == DAT__LOCER)
+         emsAnnul(&hds_gl_status);
       emsRlse;
    }
    return hds_gl_status;
