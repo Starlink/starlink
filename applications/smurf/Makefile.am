@@ -12,7 +12,7 @@ bin_MONOLITHS = smurf_mon
 smurf_mon_SOURCES = smurf_mon.c $(DA_FILES) $(WVM_FILES) $(SIM_FILES)
 
 # Tasks
-smurf_mon_TASKS = extinction flatfield makemap remsky qlmakemap scanfit sim dreamsolve
+smurf_mon_TASKS = extinction flatfield makemap remsky qlmakemap scanfit sc2sim dreamsolve
 
 DA_FILES = sc2da/sc2store.c sc2da/sc2math.c sc2da/smurf_ers.c \
 sc2da/sc2ast.c
