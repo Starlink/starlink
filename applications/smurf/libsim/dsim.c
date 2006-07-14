@@ -1456,8 +1456,8 @@ int *status         /* global status (given and returned) */
 
    if ( nframes > 10 )
    {
-      scan = calloc ( nframes, sizeof(double) );
-      ht = calloc ( nframes, sizeof(double) );
+      scan = smf_malloc ( nframes, sizeof(double), 1, status );
+      ht = smf_malloc ( nframes, sizeof(double), 1, status );
 
       for ( i=0; i<nframes; i++ )
       {
@@ -1500,7 +1500,7 @@ int *status         /* global status (given and returned) */
          }
       }
 
-      free ( scan );
+      smf_free ( scan, status );
    }
 }
 
@@ -1715,8 +1715,8 @@ int *status             /* global status (given and returned) */
   /* Allocate space for arrays */
   
   /*
-  xsky = (double *) calloc( nboll, sizeof(double) );
-  ysky = (double *) calloc( nboll, sizeof(double) );
+  xsky = (double *) smf_malloc( nboll, sizeof(double), 1, status );
+  ysky = (double *) smf_malloc( nboll, sizeof(double), 1, status );
   */
 
   /* Transform bolo offsets into positions on the input sky image 
@@ -1745,15 +1745,15 @@ int *status             /* global status (given and returned) */
     else dbuf[i] = 0;
   }
   
-  free(xsky);
-  free(ysky);
+  smf_free(xsky, status);
+  smf_free(ysky, status);
   */
 
   /* astTranGrid method ----------------------------------------- */
 
   /* Allocate space for arrays */
 
-  skycoord = (double *) calloc( nboll*2, sizeof(double) );
+  skycoord = (double *) smf_malloc( nboll*2, sizeof(double), 1, status );
 
   lbnd_in[0] = 1;
   ubnd_in[0] = BOLROW;
@@ -1780,7 +1780,7 @@ int *status             /* global status (given and returned) */
     else dbuf[i] = 0;
   }
 
-  free(skycoord);
+  smf_free(skycoord, status);
 }
 
 /*+ dsim_getbilinear - bilinear interpolation on an image */
@@ -1966,7 +1966,6 @@ int *status              /* global status (given and returned) */
    }
 
 }
-
 
 /*+ dsim_getinvf - return a compressed form of 1/f noise */
 
@@ -2458,7 +2457,7 @@ int *status          /* global status (given and returned) */
       (*pongcount) += curroff;
    }
 
-   *posptr = (double *) calloc ( (*pongcount)*2, sizeof(double) );
+   *posptr = (double *) smf_malloc ( (*pongcount)*2, sizeof(double), 1, status );
 
    curroff = 0;
 
@@ -3362,7 +3361,7 @@ void dsim_initast
 (
 char *filename,        /* name of input file (given) */
 double *pixsize,       /* pixel size in arcsec (returned) */
-int naxes[2],          /* dimensions of image (returned) */ 
+int naxes[2],         /* dimensions of image (returned) */ 
 double **astsim,       /* array to hold returned image (returned) */
 AstFrameSet **fitswcs, /* frameset containing WCS of FITS image */
 int *status            /* global status (given and returned) */
@@ -3386,65 +3385,59 @@ int *status            /* global status (given and returned) */
 
 {
 
-   smfData *data=NULL;     /* pointer to  SCUBA2 data struct */
-   int el = 0;             /* number of elements mapped */
+   smfData *data=NULL;     /* pointer to SCUBA2 data struct */
    FILE *f;                /* file pointer */
+   smfFile *file=NULL;     /* pointer to SCUBA2 data file struct */
    Grp *igrp = GRP__NOID;  /* Group of input files */
-   smfHead *hdr;           /* Pointer to header in odata */
-   int i;                  /* loop counter */
-   int *indf;              /* NDF identifier */
-   int naxis;              /* array dimensionality */
-   int size = 1;           /* number of items in igrp */
+   smfHead *hdr;           /* Pointer to header in data */
+   int indf;               /* NDF identifier */
 
    if ( !StatusOkP(status) ) return;
 
    /* Check to make sure the input file exists, then open it, 
       and read the header information */
       
-   if ( f = fopen ( filename, "r" ) ) {
+   if ( ( f = fopen ( filename, "r" ) ) ) {
       fclose ( f );
    } else {
       *status = DITS__APP_ERROR;
       printf ( "dsim_initast: file %s could not be found.\n", filename );
-      printf ( "\n" );
+      printf ( "\n" );  
       return;
    }
 
    igrp = grpNew ( "GRP", status );
    grpPut1 ( igrp, filename, 1, status );
    smf_open_file( igrp, 1, "READ", 1, &data, status);
-
+ 
    hdr = data->hdr;
    smf_fits_getD ( hdr, "PIXSIZE", pixsize, status );
 
    /* Retrieve the NDF identifier and get the WCS information 
       from the FITS header */
-   ndgNdfas( igrp, 1, "READ", indf, status );
-   ndfGtwcs( *indf, fitswcs, status );
+   file = data->file;
+   indf = file->ndfid;
+   ndfGtwcs( indf, fitswcs, status );
    if ( *fitswcs == NULL ) { 
       *status = DITS__APP_ERROR;
-      printf ( "dsim_initast: could not retrieve wcs information.\n", filename );
+      printf ( "dsim_initast: could not retrieve wcs information from %s.\n", filename );
       printf ( "\n" );
       return;
    }
    
-   /* Determine the dimensions of the DATA array */
-   ndfDim( *indf, 2, naxes, &naxis, status );
-  
-   /* Create the storage space */
-   *astsim = (double *) calloc ( naxes[0]*naxes[1], sizeof(double) );
+   /* Retrieve the dimensions and the DATA array */
+   if ( ( data->ndims ) != 2 ) {
+      *status = DITS__APP_ERROR;
+      printf ( "dsim_initast: DATA component of %s  should have 2", filename ); 
+      printf ( "dimensions, but it has  %i.\n", data->ndims );
+      printf ( "\n" );
+      return;
+   }
 
-   if ( *astsim != 0 ) {
-
-     /* Store the image */
-     ndfMap ( *indf, "DATA", "_DOUBLE", "READ", astsim, &el, status );
-
-   } else {
-     *status = DITS__APP_ERROR;
-     printf ( "dsim_initast: failed to allocate memory\n" );
-     printf ( strerror(errno) );
-     printf ( "\n" );
-   }   
+   naxes[0] = (data->dims)[0];
+   naxes[1] = (data->dims)[1];
+   
+   *astsim = (data->pntr)[0];  
 
 }
 
@@ -3478,21 +3471,16 @@ int *status        /* global status (given and returned) */
 {
 
    smfData *data=NULL;     /* pointer to  SCUBA2 data struct */
-   int el = 0;             /* number of elements mapped */
    FILE *f;                /* file pointer */
    Grp *igrp = GRP__NOID;  /* Group of input files */
-   smfHead *hdr;           /* Pointer to header in odata */
-   int i;                  /* loop counter */
-   int *indf;              /* NDF identifier */
-   int naxis;              /* array dimensionality */
-   int size = 1;           /* number of items in igrp */
+   smfHead *hdr;           /* Pointer to header in data */
 
    if ( !StatusOkP(status) ) return;
 
    /* Check to make sure the input file exists, then open it, 
       and read the header information */
       
-   if ( f = fopen ( filename, "r" ) ) {
+   if ( ( f = fopen ( filename, "r" ) ) ) {
       fclose ( f );
    } else {
       *status = DITS__APP_ERROR;
@@ -3508,25 +3496,20 @@ int *status        /* global status (given and returned) */
    hdr = data->hdr;
    smf_fits_getD ( hdr, "PIXSIZE", pixsize, status );
 
-   /* Retrieve the NDF identifier and determine the dimensions 
-      of the DATA array */
-   ndgNdfas( igrp, 1, "READ", indf, status );
-   ndfDim( *indf, 2, naxes, &naxis, status );
-  
-   /* Create the storage space */
-   *atmsim = (double *) calloc ( naxes[0]*naxes[1], sizeof(double) );
 
-   if ( *atmsim != 0 ) {
+   /* Retrieve the dimensions and the DATA array */
+   if ( ( data->ndims ) != 2 ) {
+      *status = DITS__APP_ERROR;
+      printf ( "dsim_initast: DATA component of %s  should have 2", filename );
+      printf ( "dimensions, but it has  %i.\n", data->ndims ); 
+      printf ( "\n" );
+      return;
+   }
 
-     /* Store the image */
-     ndfMap ( *indf, "DATA", "_DOUBLE", "READ", atmsim, &el, status );
-
-   } else {
-     *status = DITS__APP_ERROR;
-     printf ( "dsim_initatm: failed to allocate memory\n" );
-     printf ( strerror(errno) );
-     printf ( "\n" );
-   }   
+   naxes[0] = (data->dims)[0];
+   naxes[1] = (data->dims)[1];
+   
+   *atmsim = (data->pntr)[0]; 
 
 }
 
@@ -3609,12 +3592,12 @@ int *status              /* global status (given and returned) */
    nboll = inx->nbolx * inx->nboly;
    
    decay = 5.0;
-   *heater = (double *)calloc ( nboll, sizeof(double) );
-   *pzero = (double *)calloc ( nboll, sizeof(double) );
-   *xbc = (double *)calloc ( nboll, sizeof(double) );
-   *ybc = (double *)calloc ( nboll, sizeof(double) );
-   *xbolo = (double *)calloc ( nboll, sizeof(double) );
-   *ybolo = (double *)calloc ( nboll, sizeof(double) );
+   *heater = (double *)smf_malloc ( nboll, sizeof(double), 1, status );
+   *pzero = (double *)smf_malloc ( nboll, sizeof(double), 1, status  );
+   *xbc = (double *)smf_malloc ( nboll, sizeof(double), 1, status  );
+   *ybc = (double *)smf_malloc ( nboll, sizeof(double), 1, status  );
+   *xbolo = (double *)smf_malloc ( nboll, sizeof(double), 1, status  );
+   *ybolo = (double *)smf_malloc ( nboll, sizeof(double), 1, status  );
    
    /*  Initialise the standard bolometer response function.
        The routine sets the values for 6 polynomial coefficients which
@@ -4599,7 +4582,6 @@ int *status        /* global status (given and returned) */
    sc2store_free ( status );
 }
 
-
 /*+ dsim_ndfwrpol - digitise and compress the polarimeter simulation and store
     as NDF */
 
@@ -5282,7 +5264,7 @@ int *status        /* global status (given and returned) */
 /* Initialise the coadd frame */
 
    framesize = ncol * nrow;
-   rdata = (double *)calloc ( framesize*numsamples, sizeof(double) );
+   rdata = (double *) smf_malloc ( framesize*numsamples, sizeof(double), 1, status  );
 
    for ( j=0; j<framesize; j++ )
    {
@@ -5332,7 +5314,7 @@ int *status        /* global status (given and returned) */
 /* Close the file */
 
    sc2store_free ( status );
-   free ( rdata );
+   smf_free ( rdata, status );
 }
 
 
@@ -5535,7 +5517,6 @@ int *status                  /* global status (given and returned) */
   }
   
 }
-
 
 /*+ dsim_ptoi - convert input pW to bolometer current */
 
@@ -5939,7 +5920,7 @@ int *status                  /* global status (given and returned) */
   double *skycoord;               /* az & el coordinates */
   int lbnd_in[2];                 /* Pixel bounds for astTranGrid */
   int ubnd_in[2];
-  
+ 
   if ( !StatusOkP(status) ) return; 
 
   /* Concatenate mappings to get bolo->astronomical image coordinates */
@@ -5956,7 +5937,7 @@ int *status                  /* global status (given and returned) */
   bolo2azel = astGetMapping( fset, AST__BASE, AST__CURRENT );
 
   /* Allocate space for array */
-  skycoord = (double *) calloc ( nboll*2, sizeof( double ) );
+  skycoord = (double *) smf_malloc ( nboll*2, sizeof( double ), 1, status  );
 
   lbnd_in[0] = 1;
   ubnd_in[0] = BOLROW;
