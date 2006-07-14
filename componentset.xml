@@ -856,7 +856,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.5-1</version>
+  <version>1.5-2</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1427,7 +1427,7 @@ UNIX).
 </component>
 
 <component id="sst" support="S">
-  <version>1.1</version>
+  <version>1.1-1</version>
   <path>applications/sst</path>
   <description>SST - A Simple Software Tools Package</description>
   <abstract><p>SST is now considered obsolete; it is included to
