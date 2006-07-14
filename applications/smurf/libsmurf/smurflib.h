@@ -71,7 +71,7 @@ void smurf_makemap( int * );
 void smurf_qlmakemap( int * );
 void smurf_remsky( int * );
 void smurf_scanfit( int * );
-void smurf_sim( int * );
+void smurf_sc2sim( int * );
 void smurf_dreamsolve( int * );
 
 #endif /* SMURF_LIB_DEFINED */

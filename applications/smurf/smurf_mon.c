@@ -176,8 +176,8 @@ void smurf_mon( int * status ) {
     smurf_remsky( status );
   } else if (strcmp( taskname, "SCANFIT" ) == 0 ) {
     smurf_scanfit( status );
-  } else if (strcmp( taskname, "SIM" ) == 0 ) {
-    smurf_sim( status );
+  } else if (strcmp( taskname, "SC2SIM" ) == 0 ) {
+    smurf_sc2sim( status );
   } else if (strcmp( taskname, "DREAMSOLVE" ) == 0 ) {
     smurf_dreamsolve( status );
   } else {
