@@ -512,7 +512,7 @@ int *status                /* global status (given and returned) */
             sprintf( buf,
               "%s at line %d\n",
               XML_ErrorString(XML_GetErrorCode(parser)),
-              XML_GetCurrentLineNumber(parser) );
+	      (double)XML_GetCurrentLineNumber(parser) );
             *status = DITS__APP_ERROR;
             sprintf ( errmess, 
               "dxml:Error parsing simulator XML file, status = %s", 
@@ -589,7 +589,7 @@ int *status                /* global status (given and returned) */
             sprintf( buf,
               "%s at line %d\n",
               XML_ErrorString(XML_GetErrorCode(parser)),
-              XML_GetCurrentLineNumber(parser) );
+	      (double)XML_GetCurrentLineNumber(parser) );
             *status = DITS__APP_ERROR;
             sprintf ( errmess, "dxml:Error parsing XML file, status = %s", 
               buf );
