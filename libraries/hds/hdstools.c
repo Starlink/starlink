@@ -300,8 +300,18 @@ hdsShow(const char *topic_str,
             hdsTrace( &locator, &nlev, path.body,
                      file.body, &tracestat,
                      STR_K_LENGTH, STR_K_LENGTH);
-            if (!_ok(tracestat))
-               *status   = tracestat;
+            if (!_ok(tracestat)) {
+	      if (tracestat == DAT__LOCER) {
+		/* An erased locator can be ignored */
+		emsAnnul(&tracestat);
+	      } else {
+		/* need to be careful to make sure that the right
+		   status is set given that we return hds_gl_status
+		   but the caller would like *status set. */
+		*status   = tracestat;
+		hds_gl_status = *status;
+	      }
+	    }
             else
             {
                len = strlen(path.body);
