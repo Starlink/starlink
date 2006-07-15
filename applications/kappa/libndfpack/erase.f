@@ -52,12 +52,14 @@
 *        $AGI_USER/agi_restar.sdf.
 
 *  Related Applications:
-*     Figaro: CREOBJ, DELOBJ, RENOBJ.
+*     Figaro: CREOBJ, DELOBJ, RENOBJ; HDSTOOLS: HCREATE, HDELETE, 
+*     HRENAME.
 
 *  Copyright:
 *     Copyright (C) 1990, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research 
+*        Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -79,7 +81,6 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
-*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -92,8 +93,11 @@
 *     1995 April 24 (MJC):
 *        Made usage and examples lowercase.  Added Related Applications.
 *        Sorted the variable declarations.
-*     14-JUL-2006 (TIMJ):
-*        Cancel OBJECT parameter so that locator count does not increase.
+*     2006 July 14 (MJC):
+*        Cancel the OBJECT parameter to prevent the locator count from
+*        incrementing.  Test for DAT__OBJNF as DAT_EXIST returns this 
+*        instead of the documented PAR__ERROR should the object not
+*        exist.  Added HDSTOOLS to Related Applications.  
 *     {enter_further_changes_here}
 
 *-
@@ -104,6 +108,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ constants
+      INCLUDE 'DAT_ERR'          ! DAT_ error constants
       INCLUDE 'FIO_PAR'          ! FIO_ public constants
       INCLUDE 'PAR_ERR'          ! PAR_ error codes
 
@@ -141,7 +146,7 @@
 
 *  If the object does not exist, then annul the error and make a new
 *  error report.
-      IF ( STATUS .EQ. PAR__ERROR ) THEN
+      IF ( STATUS .EQ. PAR__ERROR . OR. STATUS .EQ. DAT__OBJNF ) THEN
          LOC = ' '
          CALL ERR_ANNUL( STATUS )
          STATUS = SAI__ERROR
@@ -210,11 +215,14 @@
          END IF
       END IF
 
+*  DAT_EXIST creates a parameter object named the same as the component 
+*  and when the monolith checks for open locators it doesn't know to 
+*  filter this locator.  Hence cancel the parameter before this check
+*  happens.
+      CALL DAT_CANCL( 'OBJECT', STATUS )
+      
 *  Close the error context.
       CALL ERR_RLSE
-
-*  Cancel the parameter so that our locator count is not affected on exit
-      CALL DAT_CANCL( 'OBJECT', STATUS )
 
 *  If an error occurred, then add context information.
       IF ( STATUS .NE. SAI__OK ) THEN
