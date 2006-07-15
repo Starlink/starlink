@@ -57,6 +57,7 @@
 *  Copyright:
 *     Copyright (C) 1990, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -78,6 +79,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -90,6 +92,8 @@
 *     1995 April 24 (MJC):
 *        Made usage and examples lowercase.  Added Related Applications.
 *        Sorted the variable declarations.
+*     14-JUL-2006 (TIMJ):
+*        Cancel OBJECT parameter so that locator count does not increase.
 *     {enter_further_changes_here}
 
 *-
@@ -208,6 +212,9 @@
 
 *  Close the error context.
       CALL ERR_RLSE
+
+*  Cancel the parameter so that our locator count is not affected on exit
+      CALL DAT_CANCL( 'OBJECT', STATUS )
 
 *  If an error occurred, then add context information.
       IF ( STATUS .NE. SAI__OK ) THEN
