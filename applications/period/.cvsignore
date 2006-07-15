@@ -11,4 +11,5 @@ configure
 libtool
 period
 starconf.status
-
+make.log
+make.log.err
