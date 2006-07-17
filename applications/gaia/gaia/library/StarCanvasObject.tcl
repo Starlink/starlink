@@ -187,6 +187,10 @@ itcl::class gaia::StarCanvasObject {
       set selected_ 1
       set canvas_id_ $id
       $canvasdraw add_notify_cmd $id "[code $this update $id]" 0
+      #  Stop the creation of any more objects while this one completes
+      #  (can be asynchronous).
+      $canvasdraw set_drawing_mode anyselect
+
       update $id create
       add_bindings_ $id
       $canvas addtag $tag withtag $id
