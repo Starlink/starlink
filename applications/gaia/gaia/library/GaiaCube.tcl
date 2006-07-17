@@ -146,16 +146,6 @@ itcl::class gaia::GaiaCube {
       add_menu_short_help $Options {Autocut}  \
          {Continuously change set the cuts of the image slices, data limits}
 
-      #  Enable send to SPLAT, this overrides the default double-click which
-      #  defines a reference spectrum.
-      $Options add checkbutton -label "Enable SPLAT" \
-         -command [code $this set_splat_bindings_] \
-         -variable [scope itk_option(-use_splat)] \
-         -onvalue 1 \
-         -offvalue 0
-      add_menu_short_help $Options {Enable SPLAT}  \
-         {Make double click send to SPLAT}
-
       #  Add the coordinate selection menu.
       set SpectralCoords [add_menubutton "Coords" left]
       configure_menubutton "Coords" -underline 0
@@ -221,7 +211,7 @@ itcl::class gaia::GaiaCube {
       #  Add tab window for choosing either the helper controls.
       itk_component add tabnotebook {
          iwidgets::tabnotebook $w_.tab \
-            -angle 0 -tabpos n -width 400 -height 400
+            -angle 0 -tabpos n -width 400 -height 420
       }
       pack $itk_component(tabnotebook) -fill both -expand 1
 
@@ -744,11 +734,6 @@ itcl::class gaia::GaiaCube {
       return $coord
    }
 
-   #  Add or disable SPLAT bindings used by spectral extraction tool.
-   protected method set_splat_bindings_ {} {
-      $itk_component(spectrum) configure -use_splat $itk_option(-use_splat)
-   }
-
    #  Convert grid indices to pixel indices along image axes.
    public method image_grid2pixel {x y} {
       if { $axis_ == 1 } {
@@ -889,9 +874,6 @@ itcl::class gaia::GaiaCube {
    #  Whether to use file mapping (quick startup), or direct io (fast
    #  spectral display).
    itk_option define -usemmap usemmap UseMmap 1
-
-   #  Whether to enable or disabled the SPLAT mouse bindings.
-   itk_option define -use_splat use_splat Use_Splat 0
 
    #  Protected variables: (available to instance)
    #  --------------------
