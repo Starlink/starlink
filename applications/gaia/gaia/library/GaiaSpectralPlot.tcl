@@ -479,7 +479,7 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Display a reference spectrum extracted from a region.
    #
-   #  All the given details should correspond to those given to the 
+   #  All the given details should correspond to those given to the
    #  displayregion method.
    public method display_region_reference {accessor axis alow ahigh desc \
                                            meth} {
@@ -928,6 +928,9 @@ itcl::class gaia::GaiaSpectralPlot {
          $itk_component(canvas) itemconfigure $spectrum_ \
             -linecolour $linecolour_
       }
+      if { $itk_option(-colour_changed_cmd) != {} } {
+         eval $itk_option(-colour_changed_cmd) "spectrum" $colour
+      }
    }
 
    #  Set the colour of the axes.
@@ -942,6 +945,9 @@ itcl::class gaia::GaiaSpectralPlot {
       if { $spectrum_ != {} } {
          $itk_component(canvas) itemconfigure $spectrum_ \
             -reflinecolour $refspeccolour_
+      }
+      if { $itk_option(-colour_changed_cmd) != {} } {
+         eval $itk_option(-colour_changed_cmd) "reference" $colour
       }
    }
 
@@ -964,7 +970,6 @@ itcl::class gaia::GaiaSpectralPlot {
    public method dispheight {} {
       return [winfo height $itk_component(canvasframe)]
    }
-
 
    #  Configuration options: (public variables)
    #  ----------------------
@@ -1014,6 +1019,11 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Whether to show the label or not.
    itk_option define -show_label show_label Show_Label 0
+
+   #  Command to execute when the colour of the spectral line is changed.
+   #  The result will be appended by "spectrum" or "reference" and the
+   #  new colour.
+   itk_option define -colour_changed_cmd colour_changed_cmd Colour_Change_Cmd {}
 
    #  Protected variables: (available to instance)
    #  --------------------

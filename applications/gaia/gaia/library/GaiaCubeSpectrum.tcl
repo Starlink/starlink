@@ -293,6 +293,7 @@ itcl::class gaia::GaiaCubeSpectrum {
                 -spec_coords $itk_option(-spec_coords) \
                 -ref_line_changed_cmd [code $cube ref_line_moved_] \
                 -ref_range_changed_cmd [code $cube ref_range_moved_] \
+                -colour_changed_cmd [code $this spec_colour_changed_] \
                 -shorthelpwin $itk_option(-gaia)]
 
          #  Make this a transient of main window, not this one.
@@ -564,12 +565,30 @@ itcl::class gaia::GaiaCubeSpectrum {
       }
    }
 
+   #  Handle a change in one of the colours used by the spectral plot. These
+   #  are propagated to the markers and ARD regions.
+   protected method spec_colour_changed_ {what colour} {
+      if { $what == "spectrum" } {
+         $toolbox_ -selected_colour $colour
+         set position_mark_colour_ $colour
+         if { $position_mark_ != {} } {
+            $canvas_ itemconfigure $position_mark_ -outline $colour
+         }
+      } elseif { $what == "reference" } {
+         set ref_position_mark_colour_ $colour
+         if { $ref_position_mark_ != {} } {
+            $canvas_ itemconfigure $ref_position_mark_ -outline $colour
+         }
+      }
+   }
+
    #  Create the main spectral line position marker.
    protected method create_position_marker_ { cx cy } {
 
       #  Note fixscale so that always same size, regardless of zoom.
       set position_mark_ [$canvas_ create rtd_mark $cx $cy -type cross \
-                             -scale 1 -fixscale 1 -size 7 -outline blue]
+                             -scale 1 -fixscale 1 -size 7 \
+                             -outline $position_mark_colour_]
 
       #  Bindings to move and select this.
       $canvas_ bind $position_mark_ <1> \
@@ -585,7 +604,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       #  Note fixscale so that always same size, regardless of zoom.
       set ref_position_mark_ [$canvas_ create rtd_mark $cx $cy -type cross \
                                  -scale 1 -fixscale 1 -size 7 \
-                                 -outline green]
+                                 -outline $ref_position_mark_colour_]
 
       #  Bindings so that main position mark moves when over this.
       $canvas_ bind $ref_position_mark_ <1> \
@@ -617,6 +636,8 @@ itcl::class gaia::GaiaCubeSpectrum {
                        -canvasdraw $canvasdraw_ \
                        -canvas $canvas_ \
                        -maxcol 9 \
+                       -selected_colour $position_mark_colour_ \
+                       -deselected_colour "red" \
                        -notify_created_cmd [code $this region_created_]\
                        -notify_started_cmd [code $this region_started_]]
 
@@ -900,6 +921,10 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  The position marker that corresponds to the reference spectrum.
    protected variable ref_position_mark_ {}
+
+   #  Colours of the markers (and selected ARD regions).
+   protected variable position_mark_colour_ "blue"
+   protected variable ref_position_mark_colour_ "green"
 
    #  The region data combination type.
    protected variable combination_type_ "mean"
