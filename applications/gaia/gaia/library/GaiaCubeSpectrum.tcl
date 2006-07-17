@@ -175,6 +175,34 @@ itcl::class gaia::GaiaCubeSpectrum {
       add_short_help $itk_component(clearref) \
          {Clear the reference spectrum}
 
+      #  Add controls to send a spectrum to SPLAT.
+      itk_component add sframe {
+         frame $w_.sframe
+      }
+      itk_component add splatlabel {
+         label $itk_component(sframe).splatlabel -text "SPLAT-VO:" \
+            -width $itk_option(-labelwidth)
+      }
+      itk_component add sendtosplat {
+         button $itk_component(sframe).sendtosplat -text "Send" \
+            -command [code $this send_to_splat_]
+      }
+      pack $itk_component(sframe) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(splatlabel) -side left -expand 0 -ipadx 1m
+      pack $itk_component(sendtosplat) -side left -expand 0 -anchor w \
+         -ipadx 1m -padx 1m
+
+      #  If SPLAT isn't available this is greyed out.
+      global env
+      if { [info exists env(SPLAT_DIR)] } {
+         set splat_dir_ $env(SPLAT_DIR)
+      } else {
+         $itk_component(sendtosplat) configure -state disabled
+      }
+
+      add_short_help $itk_component(sendtosplat) \
+         {Send last point spectrum to SPLAT-VO (NDF only)}
+
       #  Set initial bindings.
       toggle_extraction_
    }
@@ -235,37 +263,8 @@ itcl::class gaia::GaiaCubeSpectrum {
    }
 
    #  Configure canvas so we get any clicks on the image and can display
-   #  the associated spectra.
+   #  the associated point spectra.
    protected method add_bindings_ {} {
-
-      #  Bindings for normal spectral extraction tracking.
-      add_spectral_bindings_
-
-      #  Bindings for handling double click.
-      set_double_click_bindings_
-   }
-
-   #  Set double click bindings. These can be configured to send the spectrum
-   #  to SPLAT, or to set the reference spectrum in the plot. The SPLAT option
-   #  only works for point extraction and for NDFs.
-   protected method set_double_click_bindings_ {} {
-      global env
-
-      if { [info exists env(SPLAT_DIR)] && $itk_option(-use_splat)} {
-         #  Double click sends to SPLAT.
-         set splat_dir_ $env(SPLAT_DIR)
-         $canvas_ bind all <Double-Button-1> \
-            [code $this send_to_splat_ %x %y]
-      } else {
-         #  Double click defines a reference spectrum.
-         $canvas_ bind all <Double-Button-1> \
-            [code $this display_point_reference_spectrum %x %y]
-      }
-   }
-
-   #  Add bindings to the rtdimage in the main canvas for spectral plot.
-   #  These are single-click and drag-click on the image and cross.
-   protected method add_spectral_bindings_ {} {
 
       $canvas_ bind $rtdimage_ <1> \
          [code $this display_point_spectrum_ localstart %x %y]
@@ -278,7 +277,6 @@ itcl::class gaia::GaiaCubeSpectrum {
    protected method remove_bindings_ {} {
       $canvas_ bind $rtdimage_ <1> {}
       $canvas_ bind $rtdimage_ <B1-Motion> {}
-      $canvas_ bind all <Double-Button-1> {}
    }
 
    #  If not available create the spectral plot, otherwise activate it.
@@ -433,15 +431,22 @@ itcl::class gaia::GaiaCubeSpectrum {
       set lub_ $ub
    }
 
-   #  Send an NDF section to SPLAT for display. Initial coordinates are
-   #  a canvas position.
-   protected method send_to_splat_ {cx cy} {
+   #  Send an NDF section to SPLAT for display. The coordinates used are those
+   #  from the last position click. ARD regions are not supported (yet) and
+   #  neither are non-NDFs.
+   protected method send_to_splat_ {} {
+      if { $spectrum_ == {} || $last_cxcy_ == {} } {
+         info_dialog "No point spectrum has been extracted" $w_
+         return
+      }
+
+      lassign $last_cxcy_ cx cy
 
       #  Convert click coordinates from canvas coords to grid coords.
       set ccx [$canvas_ canvasx $cx]
       set ccy [$canvas_ canvasy $cy]
       $rtdimage_ convert coords $ccx $ccy canvas iix iiy image
-
+      
       #  Correct to pixel indices.
       lassign [$itk_option(-gaiacube) image_grid2pixel $iix $iiy] ix iy
       
@@ -469,7 +474,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       set ndfname [$itk_option(-gaiacube) get_ndfname]
       $splat_disp_ runwith "${ndfname}${section}" 0
    }
-
+         
    #  Extract and display a position as a reference spectrum. The
    #  plot must already exist.
    public method display_point_reference_spectrum {cx cy} {
@@ -866,13 +871,6 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  Enable/disable point tracking and extraction.
    itk_option define -point_tracking point_tracking Point_Tracking 1
-
-   #  Whether to enable or disabled the SPLAT mouse bindings.
-   itk_option define -use_splat use_splat Use_Splat 0 {
-      if { $canvas_ != {} } {
-         set_double_click_bindings_
-      }
-   }
 
    #  GaiaSpecCoords instance used by related GaiaCube.
    itk_option define -spec_coords spec_coords Spec_Coords {}
