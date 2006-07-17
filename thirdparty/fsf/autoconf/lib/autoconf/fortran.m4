@@ -537,6 +537,7 @@ fi
 #
 # Known compilers:
 #  f77/f90/f95: generic compiler names
+#  g95: GNU Fortran 95 comiler
 #  g77: GNU Fortran 77 compiler
 #  gfortran: putative GNU Fortran 95+ compiler (in progress)
 #  fort77: native F77 compiler under HP-UX (and some older Crays)
@@ -559,7 +560,7 @@ fi
 #  autoconf. The same problem arises (with no easy solution) on some Digital
 #  compilers: f95 fails on .F files, f90 succeeds.)
 #
-m4_define([_AC_F95_FC], [lf95 f95 fort xlf95 ifc efc pgf95 gfortran])
+m4_define([_AC_F95_FC], [g95 lf95 f95 fort xlf95 ifc efc pgf95 gfortran])
 m4_define([_AC_F90_FC], [f90 xlf90 pgf90 epcf90])
 m4_define([_AC_F77_FC], [g77 f77 xlf frt pgf77 fort77 fl32 af77 'f77 -old_f77'])
 AC_DEFUN([_AC_PROG_FC],
