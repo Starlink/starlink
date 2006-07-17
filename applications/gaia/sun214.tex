@@ -16,11 +16,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.22}
+\newcommand{\stardocnumber}    {214.23}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {6th July 2006}
+\newcommand{\stardocdate}      {17th July 2006}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and Image Analysis Tool}
-\newcommand{\stardocversion}   {3.0-5}
+\newcommand{\stardocversion}   {3.1-0}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
@@ -738,8 +738,8 @@ routines (such as those used in the photometry toolbox) will still
 need to be able to convert these files into NDFs, using the on-the-fly
 facility, so if you define your own conversion facilities make sure
 that you include a FITS converter (note these doesn't apply to FITS
-data cubes, GAIA handles converting these into NDFs for the various toolboxes
-directly).
+data cubes, GAIA handles converting these into NDFs for the various 
+toolboxes directly).
 
 To display any of these images in GAIA just type the full disk-file
 name on the command-line (either when you start GAIA or by using the
@@ -884,12 +884,14 @@ the version of SkyCat that GAIA is based on are also available at
 to extend SkyCat or GAIA at the user interface level are recommended
 to read about ``SkyCat plugins''.
 
-\section{Release notes for version 3.0-2}
+\section{Release notes for version 3.1-0}
 
-The most significant change in this release are many updates to the cube
-toolbox. This is now much faster at image slicing and handles FITS cubes as
-well as NDF cubes. It also features an all new, built-in, interactive spectral
-readout display.
+The most significant changes in this release are in cube handling. The toolbox
+is now much faster at image slicing and handles FITS cubes as well as NDF
+cubes. It also features an all new, built-in, real-time interactive spectral
+extraction display, which features point and region extraction. It also has
+new controls for creating channel map images and selecting ranges for baseline
+subtraction. On 64bit platforms cubes greater than 2Gb can be handled.
 
 As part of these cube handling updates, all the image analysis toolboxes now
 also work on cube slices. Spectral analysis features are provided by SPLAT-VO,
@@ -943,8 +945,8 @@ There are also many minor changes in this release of GAIA:
 Finally in this release GAIA has undergone major changes in the way that it is
 built and distributed (it is now available in the Starlink CVS repository and
 uses the unified build procedures). During this change IRAF support has been
-dropped (although the IRAF support files are still available in the CVS
-repository).
+dropped, although the IRAF support files are still available in the CVS
+repository.
 
 Long-term users should note that GAIA is no longer supported by the Starlink
 project, which has been terminated. Most of this new work has been carried out

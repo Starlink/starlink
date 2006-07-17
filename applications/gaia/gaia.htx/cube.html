@@ -10,10 +10,10 @@
       <img src="cube.gif"/>
     <p>
       Using this toolbox you can interactively display successive images from
-      the planes of a cube and <tt>spectra</tt> for each pixel position from
-      the remaining dimension. The aim is to be as efficient as possible at
-      these two jobs, and very good speed is available on machines whose
-      physical memory is greater than the size of the cube.
+      the planes of a cube and <tt>spectra</tt> from the remaining
+      dimension. The aim is to be as efficient as possible at these two jobs,
+      and very good speed is available on machines whose physical memory is
+      greater than the size of the cube.
     </p>
 
     <h3>Displaying image planes</h3>
@@ -33,22 +33,54 @@
       may have a grid overlaid.
     </p>
 
-    <h3>Displaying spectra</h3>
+    <h3>Extracting and displaying spectra</h3>
     <p align="center">
       <img src="spectralplot.gif"/>
     <p>
-      To display a spectrum just click, using mouse button 1, on a position on
-      the image. To see a continuously updating spectrum, click and drag around
-      the image. You can create one <tt>reference</tt> spectrum (for comparing
-      regions of the cube) by double clicking on a point. This remains
-      displayed until you double click again, or change the range of value
-      displayed.  See <a href="spectralplot.html">here</a> for more help on
-      spectral plotting.
+      <font color="red">Quick start:</font> To display a spectrum extracted
+      from a point, just click, using mouse button 1, on a position on the
+      image. To see a continuously updating spectrum, click and drag around
+      the image. The controls in the <tt>Spectrum</tt> tab offer enhancements
+      to this basic behaviour.
+    </p>
+    <p>
+      The extraction limits along the spectral axis are the full range by
+      default. To extract a smaller range of values you can use the 
+      <tt>Lower index:</tt> and <tt>Upper index:</tt> controls. The new
+      extraction limits are not used until you click on the image again.
+      To see these limits graphically (that is displayed in the spectrum that
+      is already extracted), select <tt>Show limits on plot:</tt>.
+    </p>
+    <p>
+      As well as extracting a spectrum along a point (a pixel), you can
+      extract a spectrum defined by a region by drawing an ARD region shape on
+      the image. This is done by pressing one of the buttons <tt>Define
+      region:</tt> and dragging out a shape on the image. Each value in the
+      spectrum is evaluated by combining all the pixels within the region. By
+      default this is just a simple mean, but you can choose a median instead.
+    </p>
+    <p>
+      Note that you can draw more than one shape, but the extracted spectrum
+      is just that of the selected shapes. To select more than one shape you
+      click on it while holding down the control key. Note that when
+      interacting with shapes the single pixel extraction mode is still
+      enabled, so if you click off the region you will get another extracted
+      spectrum. This can be confusing so you can disable this by
+      deselecting <tt>Point tracking:</tt>
+    </p>
+    <p>
+      It is possible to have two extracted spectra on display at the same
+      time. The second one is known as a reference spectrum. To create a
+      reference spectrum press the <tt>Set</tt> in the <tt>Reference:</tt>
+      line. This copies the currently extracted spectrum to be the reference
+      one (and can be a region extracted spectrum), naturally <tt>Clear</tt>
+      removes the reference spectrum. Note that the reference spectrum does
+      not take part in the auto-scaling of the plot.
     </p>
 
     <h3>Cube handling actions</h3>
     <p>
-      Various action tabs of controls are shown in the lower pane. These
+      Other various action tabs of controls are shown in the lower pane. These
       currently allow you to animate through a range of indices, collapse the
       cube to a white-light image, create a "channel map" and subtract a
       fitted baseline.
@@ -133,7 +165,6 @@
     </p>
     <p>
 
-
     <h3>Coordinates</h3>
     <p>
       The indices used to select an image plane are what are normally known as
@@ -163,7 +194,7 @@
     <h3>Data formats and efficiency</h3>
     <p>
       The toolbox should handle both NDF and FITS data cubes with more-or-less
-      equal efficiency (NDF's may be slightly more efficient for some
+      equal efficiency (NDFs may be slightly more efficient for some
       integer data types). Other formats will be converted into NDFs on the
       fly. For large datasets that isn't optimal, so you should convert the
       data yourself to NDF first. The CONVERT package has many applications for
@@ -207,13 +238,9 @@
       compare it with one from the VO, or with many from the same cube) then
       you can either extract it (using some command-line tool like KAPPA
       NDFCOPY), or send it to the Starlink SPLAT-VO program (best to only do
-      this when displaying NDFs). If you want to do this enable SPLAT by
-      selecting the <tt>Enable SPLAT</tt> item in the <tt>Options</tt>
-      menu. Once you've done that you can send a spectrum to SPLAT by double
-      clicking on the relevant image pixel (note this temporarily overrides
-      the default double click behaviour, which is to define a reference
-      spectrum).
+      this when displaying NDFs). If you want to do this press the
+      <tt>Send</tt> button. This will be greyed out if SPLAT-VO is not
+      available on your system.
     </p>
-
   </body>
 </html>
