@@ -569,7 +569,7 @@ itcl::class gaia::GaiaCubeSpectrum {
    #  are propagated to the markers and ARD regions.
    protected method spec_colour_changed_ {what colour} {
       if { $what == "spectrum" } {
-         $toolbox_ -selected_colour $colour
+         $toolbox_ configure -selected_colour $colour
          set position_mark_colour_ $colour
          if { $position_mark_ != {} } {
             $canvas_ itemconfigure $position_mark_ -outline $colour
