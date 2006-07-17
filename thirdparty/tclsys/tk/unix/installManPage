@@ -1,6 +1,11 @@
 #!/bin/sh
 
+# Set important variables to null, so we don't lose if the user
+# has set these.
+S=
 ZIP=:
+Z=
+SUFFIX=
 while true; do
     case $1 in
         -s | --symlinks  )      S="-s ";;
