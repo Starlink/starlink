@@ -35,8 +35,10 @@
 
 *  Description:
 *     Check the existence of the specified HDS locator, creating it if
-*     it does not exist. Returns a pointer to an HDS locator If an
-*     error occurs a NULL pointer is returned.
+*     it does not exist. Returns a pointer to an HDS locator. If an
+*     error occurs a NULL pointer is returned, including the case that
+*     the file is not open for write access if a new extension has to
+*     be created.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -45,6 +47,9 @@
 *  History:
 *     2006-05-09 (AGG):
 *        Initial version
+*     2006-07-17 (AGG):
+*        Check that the file is open for write access if a new
+*        extension is needed
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -108,6 +113,8 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
   int indf;                 /* NDF identifier for input file */
   HDSLoc *loc = NULL;       /* Locator to return */
   int itexists;             /* Flag to denote whether extension exists */
+  int isacc = 0;            /* Flag to denote whether the file is open
+			       for write access */
 
   if ( *status != SAI__OK ) return NULL;
 
@@ -152,8 +159,20 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
     msgSetc("E", extname);
     msgOutif(MSG__VERB, FUNC_NAME, 
 	     "Warning: no extension named ^E. Creating it now.", status);
-    /* Create scu2red extension */
-    ndfXnew( indf, extname, extype, ndims, dims, &loc, status );
+    /* Create new extension but first check that the NDF is open for
+       WRITE access */
+    ndfIsacc( indf, "WRITE", &isacc, status );
+    if (isacc) {
+      ndfXnew( indf, extname, extype, ndims, dims, &loc, status );
+    } else {
+      if ( *status == SAI__OK ) {
+	*status = SAI__ERROR;
+	errRep(FUNC_NAME, 
+	       "Unable to create new extension: file is not open for write access", 
+	       status);
+	return NULL;
+      }
+    }
   }
 
   return loc;
