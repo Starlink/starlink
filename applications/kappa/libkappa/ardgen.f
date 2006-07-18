@@ -327,6 +327,8 @@
 *        Do not cancel DEVICE when the graphics system is closed down.
 *     30-AUG-2001 (DSB):
 *        Modify to use AST/PGPLOT and ARD V2. Added options Draw.
+*     18-JUL-2006 (DSB):
+*        Ensure all GRP groups are deleted before returning.
 *     {enter_further_changes_here}
 
 *-
@@ -719,7 +721,12 @@
 *   Closedown sequence.
 *   ===================
 
-*  Delete the group.
+*  Delete all groups.
+      DO I = 1, MXGRP
+         IF( GRPS( I ) .NE. GRP__NOID ) THEN
+            CALL GRP_DELET( GRPS( I ), STATUS )
+         END IF
+      END DO
       CALL GRP_DELET( IGRP, STATUS )
          
 *  Close down AGI and PGPLOT.
