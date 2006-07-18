@@ -1,5 +1,5 @@
       SUBROUTINE ARY1_RETYP( PAREN, NAME, TYPE, STATE, BAD, NDIM, DIM,
-     :                       NTYPE, LOC, DCE, STATUS )
+     :                       NTYPE, DEFER, LOC, DCE, STATUS )
 *+
 *  Name:
 *     ARY1_RETYP
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL ARY1_RETYP( PAREN, NAME, TYPE, STATE, BAD, NDIM, DIM, NTYPE,
-*     LOC, DCE, STATUS )
+*                      DEFER, LOC, DCE, STATUS )
 
 *  Description:
 *     The routine changes the data type of a primitive numeric HDS
@@ -44,6 +44,8 @@
 *     NTYPE = CHARACTER * ( * ) (Given)
 *        The new data type required for the object. This must be a
 *        primitive numeric HDS data type string (case insensitive).
+*     DEFER = LOGICAL (Given)
+*        Should creation of the new HDS arrays be deferred?
 *     LOC = CHARACTER * ( * ) (Given and Returned)
 *        HDS locator to the object whose type is to be changed. Note
 *        that type conversion involves erasing the object and creating
@@ -106,6 +108,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -115,6 +118,8 @@
 *        Changed to ensure that the data object is set to the expected
 *        state (defined or undefined) even if its data type does not
 *        need alteration.
+*     18-JUL-2006 (DSB):
+*        Add DEFER argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,6 +145,7 @@
       INTEGER NDIM
       INTEGER DIM( NDIM )
       CHARACTER * ( * ) NTYPE
+      LOGICAL DEFER
 
 *  Arguments Given and Returned:
       CHARACTER * ( * ) LOC
@@ -161,7 +167,7 @@
       INTEGER I                  ! Loop counter for dimensions
       INTEGER OLDPTR             ! Pointer to mapped old data
       INTEGER PNTR               ! Pointer to mapped new data
-
+      LOGICAL THERE              ! Does the named component exist?
 *.
 
 *  Check inherited global status.
@@ -173,7 +179,7 @@
 *  appropriate.
       DCE = .FALSE.
       IF ( CHR_SIMLR( TYPE, NTYPE ) ) THEN
-         IF ( .NOT. STATE ) THEN
+         IF ( .NOT. STATE .AND. LOC .NE. ARY__NOLOC ) THEN
             CALL DAT_RESET( LOC, STATUS )
          END IF
 
@@ -182,13 +188,18 @@
 *  object and erase it.
       ELSE
          IF ( .NOT. STATE ) THEN
-            CALL DAT_ANNUL( LOC, STATUS )
-            LOC = ARY__NOLOC
-            CALL DAT_ERASE( PAREN, NAME, STATUS )
+            IF( LOC .NE. ARY__NOLOC ) THEN 
+               CALL DAT_ANNUL( LOC, STATUS )
+               LOC = ARY__NOLOC
+            END IF
+            CALL DAT_THERE( PAREN, NAME, THERE, STATUS )
+            IF( THERE ) CALL DAT_ERASE( PAREN, NAME, STATUS )
 
 *  Create a new object of the required type and obtain a locator to it.
-            CALL DAT_NEW( PAREN, NAME, NTYPE, NDIM, DIM, STATUS )
-            CALL DAT_FIND( PAREN, NAME, LOC, STATUS )
+            IF( .NOT. DEFER ) THEN
+               CALL DAT_NEW( PAREN, NAME, NTYPE, NDIM, DIM, STATUS )
+               CALL DAT_FIND( PAREN, NAME, LOC, STATUS )
+            END IF
 
 *  If STATE is .TRUE., then the object's data values must be converted.
 *  Create a temporary structure and move the old data object into it.

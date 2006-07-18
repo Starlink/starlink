@@ -83,6 +83,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -102,6 +103,8 @@
 *        Added statement to reset IARY under error conditions.
 *     20-OCT-1989 (RFWS):
 *        Added support for temporary placeholders.
+*     17-JUL-2006 (DSB):
+*        Added value for DEFER parameter when calling ARY1_DCRE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -172,7 +175,7 @@
 *  Create a new simple array structure in place of the placeholder
 *  object, obtaining a DCB entry which refers to it.
          IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL ARY1_DCRE( TYPE, CMPLX, NDIM, LBND, UBND,
+            CALL ARY1_DCRE( .FALSE., TYPE, CMPLX, NDIM, LBND, UBND,
      :                      PCB_TMP( IPCB ), PCB_LOC( IPCB ), IDCB,
      :                      STATUS )
          END IF

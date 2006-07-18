@@ -135,6 +135,8 @@
 *        problems with DAT_PAREN.
 *     26-APR-2006 (DSB):
 *        Add support for scaled arrays.
+*     17-JUL-2006 (DSB):
+*        Ensure the data object arrays are available.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -251,6 +253,9 @@
       IF ( STATUS .NE. SAI__OK ) THEN
          IDCB2 = 0
       ELSE
+
+*  Ensure the data object arrays are available.
+         CALL ARY1_DOBJ( IDCB1, STATUS )
 
 *  Ensure that form information is available in the DCB.
          CALL ARY1_DFRM( IDCB1, STATUS )

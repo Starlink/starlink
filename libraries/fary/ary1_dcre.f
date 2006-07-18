@@ -1,5 +1,5 @@
-      SUBROUTINE ARY1_DCRE( TYPE, CMPLX, NDIM, LBND, UBND, TEMP, LOC,
-     :                      IDCB, STATUS )
+      SUBROUTINE ARY1_DCRE( DEFER, TYPE, CMPLX, NDIM, LBND, UBND, TEMP, 
+     :                      LOC, IDCB, STATUS )
 *+
 *  Name:
 *     ARY1_DCRE
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARY1_DCRE( TYPE, CMPLX, NDIM, LBND, UBND, TEMP, LOC, IDCB,
-*     STATUS )
+*     CALL ARY1_DCRE( DEFER, TYPE, CMPLX, NDIM, LBND, UBND, TEMP, LOC, 
+*                     IDCB, STATUS )
 
 *  Description:
 *     The routine converts an array placeholder object into a simple
@@ -21,6 +21,16 @@
 *     annulled afterwards.
 
 *  Arguments:
+*     DEFER = LOGICAL (Given)
+*        Should the creation of the HDS primitive array be defered until
+*        it is mapped? This is useful if the properties of the array
+*        (i.e. bounds and type) may be changed before it is mapped in
+*        such a way as to reduce the size of the array. If the creation
+*        of the HDS array is not deferred, then the final size of the 
+*        container file may be larger than necessary size HDS does not 
+*        clean up any unneeded disk space leftby reducing the size of a
+*        previously created object. A deferred array is indicated by the
+*        fact that it has a null locator for its non-imaginary component.
 *     TYPE = CHARACTER * ( * ) (Given)
 *        Data type of the array to be created; an HDS primitive numeric
 *        data type string (case insensitive).
@@ -68,6 +78,8 @@
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -87,6 +99,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -107,6 +120,8 @@
 *     22-MAR-1990 (RFWS):
 *        Call HDS_TUNE to optimise for the expected maximum number of
 *        structure components.
+*     17-JUL-2006 (DSB):
+*        Added DEFER parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -184,6 +199,7 @@
 *           Upper bounds of data object.
 
 *  Arguments Given:
+      LOGICAL DEFER
       CHARACTER * ( * ) TYPE
       LOGICAL CMPLX
       INTEGER NDIM
@@ -236,22 +252,25 @@
 *  Tune HDS for the expected maximum number of structure components.
          CALL HDS_TUNE( 'NCOMP', 5, STATUS )
 
-*  Create the non-imaginary data component and obtain a locator to it.
-*  Store the locator in the DCB.
-         CALL DAT_NEW( DCB_LOC( IDCB ), 'DATA', TYPE, NDIM, DIM,
-     :                 STATUS ) 
+*  If we are not defering the creation of the HDS array, create the 
+*  non-imaginary data component and obtain a locator to it. Store the 
+*  locator in the DCB.
          DCB_DLOC( IDCB ) = ARY__NOLOC
-         CALL DAT_FIND( DCB_LOC( IDCB ), 'DATA', DCB_DLOC( IDCB ),
-     :                  STATUS )
+         DCB_ILOC( IDCB ) = ARY__NOLOC
+         IF( .NOT. DEFER ) THEN 
+            CALL DAT_NEW( DCB_LOC( IDCB ), 'DATA', TYPE, NDIM, DIM,
+     :                    STATUS ) 
+            CALL DAT_FIND( DCB_LOC( IDCB ), 'DATA', DCB_DLOC( IDCB ),
+     :                     STATUS )
 
 *  If a complex array is required, then create and locate the imaginary
 *  component similarly.
-         IF ( CMPLX ) THEN
-            CALL DAT_NEW( DCB_LOC( IDCB ), 'IMAGINARY_DATA', TYPE,
-     :                    NDIM, DIM, STATUS )
-            DCB_ILOC( IDCB ) = ARY__NOLOC
-            CALL DAT_FIND( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
-     :                     DCB_ILOC( IDCB ), STATUS )
+            IF ( CMPLX ) THEN
+               CALL DAT_NEW( DCB_LOC( IDCB ), 'IMAGINARY_DATA', TYPE,
+     :                       NDIM, DIM, STATUS )
+               CALL DAT_FIND( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
+     :                        DCB_ILOC( IDCB ), STATUS )
+            END IF
          END IF
 
 *  Create the ORIGIN component and enter the lower bounds information.
@@ -263,9 +282,13 @@
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL DAT_ANNUL( DCB_LOC( IDCB ), STATUS )
             DCB_LOC( IDCB ) = ARY__NOLOC
-            CALL DAT_ANNUL( DCB_DLOC( IDCB ), STATUS )
-            DCB_DLOC( IDCB ) = ARY__NOLOC
-            IF ( CMPLX ) THEN
+
+            IF( DCB_DLOC( IDCB ) .NE. ARY__NOLOC ) THEN
+               CALL DAT_ANNUL( DCB_DLOC( IDCB ), STATUS )
+               DCB_DLOC( IDCB ) = ARY__NOLOC
+            END IF
+
+            IF ( CMPLX .AND. DCB_ILOC( IDCB ) .NE. ARY__NOLOC ) THEN
                CALL DAT_ANNUL( DCB_ILOC( IDCB ), STATUS )
                DCB_ILOC( IDCB ) = ARY__NOLOC
             END IF

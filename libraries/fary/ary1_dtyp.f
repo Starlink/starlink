@@ -128,6 +128,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      LOGICAL ARY1_DEFR          ! Array creation deferred?
+
 *  Local variables:
       CHARACTER * ( DAT__SZTYP ) TYPE ! HDS data type
       LOGICAL NUMER              ! Whether the data type is numeric
@@ -139,6 +142,19 @@
 
 *  If type information is not available, then inspect the data object.
       IF ( .NOT. DCB_KTYP( IDCB ) ) THEN
+
+*  Report an error if the creation of the data arrays has been deferred.
+*  The only situation in which creation is deferred is if ARY1_DCRE(P) i
+*  called with its DEFER parameter set TRUE. In this case, all the 
+*  required information should already be available because ARY1_DCRE(P) 
+*  will have set it up.
+         IF( ARY1_DEFR( IDCB, STATUS ) ) THEN
+            STATUS = ARY__UNDEF
+            CALL ERR_REP( 'ARY1_DTYP_ERR1', 'ARY1_DTYP: Cannot get '//
+     :                    'type information because the creation of '//
+     :                    'the supplied array has been deferred '//
+     :                    '(ARY programming error).', STATUS )
+         END IF
 
 *  Ensure that form information is available.
          CALL ARY1_DFRM( IDCB, STATUS )

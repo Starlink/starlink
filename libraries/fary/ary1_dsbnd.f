@@ -139,6 +139,8 @@
 *        problems with DAT_PAREN.
 *     5-MAY-2006 (DSB):
 *        Installed support for scaled arrays.
+*     17-JUL-2006 (DSB):
+*        Guard against null DCB_DLOC locators.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -250,9 +252,11 @@
 *  creating a new one, so annul the non-imaginary component locator
 *  which will be re-acquired later.
                IF ( .NOT. CVT ) THEN
-                  CALL DAT_ANNUL( DCB_DLOC( IDCB ), STATUS )
-                  DCB_DLOC( IDCB ) = ARY__NOLOC
-
+                  IF( DCB_DLOC( IDCB ) .NE. ARY__NOLOC ) THEN 
+                     CALL DAT_ANNUL( DCB_DLOC( IDCB ), STATUS )
+                     DCB_DLOC( IDCB ) = ARY__NOLOC
+                  END IF
+                
 *  Obtain a locator to the array's parent structure and obtain the name
 *  of the array.
                   LOCP = ARY__NOLOC

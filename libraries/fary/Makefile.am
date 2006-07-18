@@ -55,7 +55,7 @@ ary1_dcrep.f ary1_ddiag.f ary1_del.f ary1_dfrm.f ary1_diag.f	       \
 ary1_dimp.f ary1_dmod.f ary1_dp2s.f ary1_drst.f ary1_ds2p.f	       \
 ary1_dsbd.f ary1_dsbnd.f ary1_dsft.f ary1_dsta.f ary1_dstp.f	       \
 ary1_dtyp.f ary1_dvfy.f ary1_eqbnd.f ary1_expid.f ary1_ffs.f	       \
-ary1_gmrb.f ary1_gtn.f \
+ary1_dobj.f ary1_gmrb.f ary1_gtn.f ary1_defr.f ary1_dfppl.f \
 ary1_hunmp.f ary1_id2ac.f ary1_imp.f ary1_impid.f	       \
 ary1_imppl.f ary1_inbnd.f ary1_intyp.f ary1_iobw.f ary1_maps.f	       \
 ary1_mdiag.f ary1_mpsr.f ary1_mpsw.f ary1_nel.f ary1_nxtsl.f	       \

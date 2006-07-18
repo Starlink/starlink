@@ -82,11 +82,14 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
 *     1-NOV-1990 (RFWS):
 *        Original version.
+*     17-JUL-2006 (DSB):
+*        Ensure that any deferred data arrays are created.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -136,6 +139,9 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Ensure that any deferred data arrays are created.
+      CALL ARY1_DOBJ( IDCB, STATUS )
 
 *  Ensure that data type information and component locators are
 *  available for the data object in the DCB.

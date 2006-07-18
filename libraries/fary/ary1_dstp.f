@@ -125,6 +125,9 @@
 *        problems with DAT_PAREN.
 *     8-MAY-2006 (DSB):
 *        Installed support for scaled arrays.
+*     17-JUL-2006 (DSB):
+*        Cater for arrays in which the creation of the data arrays has
+*        been deferred.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -190,6 +193,7 @@
       INTEGER I                  ! Loop counter for dimensions
       INTEGER PNTR               ! Pointer to mapped component data
       LOGICAL IDCE               ! Imaginary data conversion error?
+      LOGICAL DEFER              ! Has creation of HDS arrays been deferred?
 
 *.
 
@@ -201,6 +205,10 @@
 
 *  Handle each form of array in turn.
       IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  See if the creation of the HDS arrays holding the array values is
+*  being deferred until the array is mapped.
+         DEFER = ( DCB_DLOC( IDCB ) .EQ. ARY__NOLOC )
 
 *  Primitive arrays.
 *  ================
@@ -226,8 +234,10 @@
 *  erasing the existing object and creating a new one, so annul the
 *  non-imaginary component locator which will be re-acquired later.
                IF ( .NOT. CMPLX ) THEN
-                  CALL DAT_ANNUL( DCB_DLOC( IDCB ), STATUS )
-                  DCB_DLOC( IDCB ) = ARY__NOLOC
+                  IF( .NOT. DEFER ) THEN 
+                     CALL DAT_ANNUL( DCB_DLOC( IDCB ), STATUS )
+                     DCB_DLOC( IDCB ) = ARY__NOLOC
+                  END IF
 
 *  Obtain a locator to the array's parent structure and obtain the name
 *  of the array.
@@ -240,14 +250,23 @@
                   CALL ARY1_RETYP( LOCP, NAME, DCB_TYP( IDCB ),
      :                             DCB_STA( IDCB ), .TRUE.,
      :                             DCB_NDIM( IDCB ), DIM, TYPE,
-     :                             DCB_LOC( IDCB ), DCE, STATUS )
+     :                             DEFER, DCB_LOC( IDCB ), DCE, STATUS )
 
-*  Annul the parent locator and re-acquire the non-imaginary component
-*  locator by cloning the data object locator.
+*  Re-acquire the non-imaginary component locator by cloning the data object 
+*  locator. We leave a null locator of the creation of the HDS array has been 
+*  deferred, but we create a placeholder to indicate that a primitive
+*  array should be created.
+                  IF( .NOT. DEFER ) THEN  
+                     CALL DAT_CLONE( DCB_LOC( IDCB ), DCB_DLOC( IDCB ),
+     :                               STATUS )
+                  ELSE
+                     CALL ARY1_DFPPL( LOCP, NAME, DCB_LOC( IDCB ), 
+     :                                STATUS )
+                  END IF
+
+*  Annul the parent locator.
                   CALL DAT_ANNUL( LOCP, STATUS )
                   LOCP = ARY__NOLOC
-                  CALL DAT_CLONE( DCB_LOC( IDCB ), DCB_DLOC( IDCB ),
-     :                            STATUS )
 
 *  If the new data type is complex, then the array must be converted to
 *  simple storage form.
@@ -265,27 +284,32 @@
 *  Otherwise, change the numeric type of the non-imaginary component in
 *  what is now a simple array.
                      CALL ARY1_RETYP( DCB_LOC( IDCB ), 'DATA',
-     :                                DCB_TYP( IDCB ), DCB_STA( IDCB ),
-     :                                .TRUE., DCB_NDIM( IDCB ), DIM,
-     :                                TYPE, DCB_DLOC( IDCB ), DCE,
-     :                                STATUS )
+     :                               DCB_TYP( IDCB ), DCB_STA( IDCB ),
+     :                               .TRUE., DCB_NDIM( IDCB ), DIM,
+     :                               TYPE, DEFER, DCB_DLOC( IDCB ), DCE,
+     :                               STATUS )
 
 *  Create a new imaginary component and obtain a locator to it for
-*  storage in the DCB.
-                     CALL DAT_NEW( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
-     :                             TYPE, DCB_NDIM( IDCB ), DIM, STATUS )
+*  storage in the DCB.Only do this if the non-imaginary component is 
+*  available (if not, the creation of the HDS arrays is being deferred).
                      DCB_ILOC( IDCB ) = ARY__NOLOC
-                     CALL DAT_FIND( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
-     :                              DCB_ILOC( IDCB ), STATUS )
+                     IF( .NOT. DEFER ) THEN
+                        CALL DAT_NEW( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
+     :                                TYPE, DCB_NDIM( IDCB ), DIM, 
+     :                                STATUS )
+                        CALL DAT_FIND( DCB_LOC( IDCB ), 
+     :                                 'IMAGINARY_DATA',
+     :                                 DCB_ILOC( IDCB ), STATUS )
 
 *  If the data object state is "defined", then map the new imaginary
 *  component and fill it with zeros. Then unmap it.
-                     IF ( DCB_STA( IDCB ) ) THEN
-                        CALL DAT_MAP( DCB_ILOC( IDCB ), TYPE, 'WRITE',
-     :                                DCB_NDIM( IDCB ), DIM, PNTR,
-     :                                STATUS )
-                        CALL ARY1_VZERO( TYPE, EL, PNTR, STATUS )
-                        CALL ARY1_HUNMP( DCB_ILOC( IDCB ), STATUS )
+                        IF ( DCB_STA( IDCB ) ) THEN
+                           CALL DAT_MAP( DCB_ILOC( IDCB ), TYPE, 
+     :                                   'WRITE', DCB_NDIM( IDCB ), DIM, 
+     :                                   PNTR, STATUS )
+                           CALL ARY1_VZERO( TYPE, EL, PNTR, STATUS )
+                           CALL ARY1_HUNMP( DCB_ILOC( IDCB ), STATUS )
+                        END IF
                      END IF
                   END IF
                END IF
@@ -316,7 +340,8 @@
                CALL ARY1_RETYP( DCB_LOC( IDCB ), 'DATA',
      :                          DCB_TYP( IDCB ), DCB_STA( IDCB ),
      :                          DCB_BAD( IDCB ), DCB_NDIM( IDCB ), DIM,
-     :                          TYPE, DCB_DLOC( IDCB ), DCE, STATUS )
+     :                          TYPE, DEFER, DCB_DLOC( IDCB ), DCE, 
+     :                          STATUS )
                IDCE = .FALSE.
                IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -324,37 +349,44 @@
 *  then change the numeric type of the imaginary component.
                   IF ( CMPLX .AND. DCB_CPX( IDCB ) ) THEN
                      CALL ARY1_RETYP( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
-     :                                DCB_TYP( IDCB ), DCB_STA( IDCB ),
-     :                                DCB_BAD( IDCB ), DCB_NDIM( IDCB ),
-     :                                DIM, TYPE, DCB_ILOC( IDCB ),IDCE,
-     :                                STATUS )
+     :                               DCB_TYP( IDCB ), DCB_STA( IDCB ),
+     :                               DCB_BAD( IDCB ), DCB_NDIM( IDCB ),
+     :                               DIM, TYPE, DEFER, DCB_ILOC( IDCB ),
+     :                               IDCE, STATUS )
 
 *  If a non-complex type is required, but the type was originally
 *  complex, then annul the imaginary component locator and erase the
 *  component.
                   ELSE IF ( ( .NOT. CMPLX ) .AND. DCB_CPX( IDCB ) ) THEN
-                     CALL DAT_ANNUL( DCB_ILOC( IDCB ), STATUS )
-                     DCB_ILOC( IDCB ) = ARY__NOLOC
-                     CALL DAT_ERASE( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
-     :                               STATUS )
+                     IF( .NOT. DEFER ) THEN
+                        CALL DAT_ANNUL( DCB_ILOC( IDCB ), STATUS )
+                        DCB_ILOC( IDCB ) = ARY__NOLOC
+                        CALL DAT_ERASE( DCB_LOC( IDCB ), 
+     :                                  'IMAGINARY_DATA', STATUS )
+                     END IF
 
 *  If a complex type is required but the type was originally
-*  non-complex, then create and locate a new imaginary component.
+*  non-complex, then create and locate a new imaginary component (unless
+*  the creation of the HDS arrays has been deferred).
                   ELSE IF ( CMPLX .AND. ( .NOT. DCB_CPX( IDCB ) ) ) THEN
-                     CALL DAT_NEW( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
-     :                             TYPE, DCB_NDIM( IDCB ), DIM, STATUS )
-                     DCB_ILOC( IDCB ) = ARY__NOLOC
-                     CALL DAT_FIND( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
-     :                              DCB_ILOC( IDCB ), STATUS )
+                     IF( .NOT. DEFER ) THEN
+                        CALL DAT_NEW( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
+     :                                TYPE, DCB_NDIM( IDCB ), DIM, 
+     :                                STATUS )
+                        DCB_ILOC( IDCB ) = ARY__NOLOC
+                        CALL DAT_FIND( DCB_LOC( IDCB ), 
+     :                                 'IMAGINARY_DATA',
+     :                                 DCB_ILOC( IDCB ), STATUS )
 
 *  If the data object state is "defined", then map the new imaginary
 *  component and fill it with zeros. Then unmap it.
-                     IF ( DCB_STA( IDCB ) ) THEN
-                        CALL DAT_MAP( DCB_ILOC( IDCB ), TYPE, 'WRITE',
-     :                                DCB_NDIM( IDCB ), DIM, PNTR,
-     :                                STATUS )
-                        CALL ARY1_VZERO( TYPE, EL, PNTR, STATUS )
-                        CALL ARY1_HUNMP( DCB_ILOC( IDCB ), STATUS )
+                        IF ( DCB_STA( IDCB ) ) THEN
+                           CALL DAT_MAP( DCB_ILOC( IDCB ), TYPE, 
+     :                                   'WRITE', DCB_NDIM( IDCB ), DIM, 
+     :                                   PNTR, STATUS )
+                           CALL ARY1_VZERO( TYPE, EL, PNTR, STATUS )
+                           CALL ARY1_HUNMP( DCB_ILOC( IDCB ), STATUS )
+                        END IF
                      END IF
                   END IF
 
@@ -389,10 +421,12 @@
 *  complex, then annul the imaginary component locator and erase the
 *  component.
                IF ( ( .NOT. CMPLX ) .AND. DCB_CPX( IDCB ) ) THEN
-                  CALL DAT_ANNUL( DCB_ILOC( IDCB ), STATUS )
-                  DCB_ILOC( IDCB ) = ARY__NOLOC
-                  CALL DAT_ERASE( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
-     :                            STATUS )
+                  IF( .NOT. DEFER ) THEN 
+                     CALL DAT_ANNUL( DCB_ILOC( IDCB ), STATUS )
+                     DCB_ILOC( IDCB ) = ARY__NOLOC
+                     CALL DAT_ERASE( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
+     :                               STATUS )
+                  END IF
 
 *  If a complex type is required but the type was originally
 *  non-complex, then report an error.

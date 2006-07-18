@@ -86,6 +86,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     BKM:  B.K. McIlwrath    (STARLINK)
+*     DSB:  David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -93,6 +94,8 @@
 *        Original, derived from the ARY_NEW routine.
 *     15-JAN-1996 (BKM):
 *        Bug in initialisation of LBND corrected.
+*     17-JUL-2006 (DSB):
+*        Added value for DEFER parameter when calling ARY1_DCREP.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -180,8 +183,9 @@
 *  Create a new simple array structure in place of the placeholder
 *  object, obtaining a DCB entry which refers to it.
             IF ( STATUS .EQ. SAI__OK ) THEN
-               CALL ARY1_DCREP( VTYPE, NDIM, UBND, PCB_TMP( IPCB ),
-     :                          PCB_LOC( IPCB ), IDCB, STATUS )
+               CALL ARY1_DCREP( .FALSE., VTYPE, NDIM, UBND, 
+     :                          PCB_TMP( IPCB ), PCB_LOC( IPCB ), IDCB, 
+     :                          STATUS )
             END IF
          END IF
 

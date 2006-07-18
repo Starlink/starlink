@@ -1,4 +1,5 @@
-      SUBROUTINE ARY1_DCREP( TYPE, NDIM, UBND, TEMP, LOC, IDCB, STATUS )
+      SUBROUTINE ARY1_DCREP( DEFER, TYPE, NDIM, UBND, TEMP, LOC, IDCB, 
+     :                       STATUS )
 *+
 *  Name:
 *     ARY1_DCREP
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARY1_DCREP( TYPE, NDIM, UBND, TEMP, LOC, IDCB, STATUS )
+*     CALL ARY1_DCREP( DEFER, TYPE, NDIM, UBND, TEMP, LOC, IDCB, STATUS )
 
 *  Description:
 *     The routine converts an array placeholder object into a primitive
@@ -19,6 +20,16 @@
 *     annulled afterwards.
 
 *  Arguments:
+*     DEFER = LOGICAL (Given)
+*        Should the creation of the HDS primitive array be defered until
+*        it is mapped? This is useful if the properties of the array
+*        (i.e. bounds and type) may be changed before it is mapped in
+*        such a way as to reduce the size of the array. If the creation
+*        of the HDS array is not deferred, then the final size of the 
+*        container file may be larger than necessary size HDS does not 
+*        clean up any unneeded disk space leftby reducing the size of a
+*        previously created object. A deferred array is indicated by the
+*        fact that it has a null locator for its non-imaginary component.
 *     TYPE = CHARACTER * ( * ) (Given)
 *        Data type of the array to be created; an HDS primitive numeric
 *        data type string (case insensitive).
@@ -91,6 +102,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -101,6 +113,8 @@
 *     10-OCT-1990 (RFWS):
 *        Changed to call ARY1_PAREN as a temporary work around for
 *        problems with DAT_PAREN.
+*     17-JUL-2006 (DSB):
+*        Added DEFER parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -178,6 +192,7 @@
 *           Upper bounds of data object.
 
 *  Arguments Given:
+      LOGICAL DEFER
       CHARACTER * ( * ) TYPE
       INTEGER NDIM
       INTEGER UBND( NDIM )
@@ -221,10 +236,21 @@
          LOC = ARY__NOLOC
          CALL DAT_ERASE( LOCP, NAME, STATUS )
          
-*  Create a new primitive array of the required type and shape in its
-*  place and obtain a new locator to it.
-         CALL DAT_NEW( LOCP, NAME, TYPE, NDIM, UBND, STATUS ) 
-         CALL DAT_FIND( LOCP, NAME, LOC, STATUS )
+*  If we are not defering the creation of the HDS array, create a new 
+*  primitive array of the required type and shape in its place and obtain 
+*  a new locator to it.
+         IF( .NOT. DEFER ) THEN
+            CALL DAT_NEW( LOCP, NAME, TYPE, NDIM, UBND, STATUS ) 
+            CALL DAT_FIND( LOCP, NAME, LOC, STATUS )
+
+*  If we are defering creation of the array, create an ARRAY structure
+*  containing a single component called Variant that is set to the value
+*  "PRIMITIVE". This is picked up by the ARY1_DFRM routine, and used as 
+*  an indication that the array is primitive (actually, will be primitive
+*  when it is created).
+         ELSE
+            CALL ARY1_DFPPL( LOCP, NAME, LOC, STATUS )
+         END IF
 
 *  Annul the parent structure locator.
          CALL DAT_ANNUL( LOCP, STATUS )
@@ -242,10 +268,14 @@
          CALL HDS_TRACE( DCB_LOC( IDCB ), NLEV, DCB_PATH( IDCB ),
      :                   DCB_FILE( IDCB ), STATUS )
 
-*  Obtain a non-imaginary component locator by cloning the data object
-*  locator and set a null imaginary component locator.
+*  If we are not deferring creation of the array, obtain a non-imaginary 
+*  component locator by cloning the data object locator. If we are
+*  deferring creation, retain a null locator.
          DCB_DLOC( IDCB ) = ARY__NOLOC
-         CALL DAT_CLONE( DCB_LOC( IDCB ), DCB_DLOC( IDCB ), STATUS )
+         IF( .NOT. DEFER ) CALL DAT_CLONE( DCB_LOC( IDCB ), 
+     :                                     DCB_DLOC( IDCB ), STATUS )
+
+*  Set a null imaginary component locator.
          DCB_ILOC( IDCB ) = ARY__NOLOC
 
 *  If there was an error, then clean up by annulling all the locators

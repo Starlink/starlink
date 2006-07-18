@@ -64,6 +64,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,6 +83,10 @@
 *     14-JAN-1992 (RFWS):
 *        Added handling of character string length for the mapped
 *        variance value to ensure UNIX compatibility.
+*     17-JUL-2006 (DSB):
+*        Include "PRIMITIVE" as a valid Variant value (this variant is
+*        an internal flag used to indicate that the ARRAY structure will 
+*        be replaced at some point by a primitive array).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -256,6 +261,13 @@
      :                                     %VAL( LENV ) ) ) THEN
                                     DCB_FRM( IDCB ) = 'POLYNOMIAL'
 
+*  ...defered primitive array.
+                                 ELSE IF ( CHR_SIMLR(
+     :                                     %VAL( CNF_PVAL( PNTR ) ),
+     :                                     'PRIMITIVE',
+     :                                     %VAL( LENV ) ) ) THEN
+                                    DCB_FRM( IDCB ) = 'PRIMITIVE'
+
 *  If the VARIANT value is not recognised, then report an error.
                                  ELSE
                                     STATUS = ARY__VARIN
@@ -290,6 +302,6 @@
       END IF
 
 *  Call error tracing routine and exit.
-      IF( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_DFRM', STATUS )
+      IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_DFRM', STATUS )
 
       END

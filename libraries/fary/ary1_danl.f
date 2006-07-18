@@ -134,6 +134,8 @@
 *        array only if UPDATE access is available.
 *     26-APR-2006 (DSB):
 *        Add support for scaled arrays.
+*     17-JUL-2006 (DSB):
+*        Watch out for deferred arrays that have no data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -224,7 +226,8 @@
 
 *  If a data component locator has been acquired for the DCB, then
 *  annul it.
-               IF ( DCB_KTYP( IDCB ) ) THEN
+               IF ( DCB_KTYP( IDCB ) .AND. 
+     :              DCB_DLOC( IDCB ) .NE. ARY__NOLOC ) THEN
                   CALL DAT_ANNUL( DCB_DLOC( IDCB ), STATUS )
                   DCB_DLOC( IDCB ) = ARY__NOLOC
                END IF
@@ -236,7 +239,8 @@
 
 *  If data component locators have been acquired for the DCB, then annul
 *  the non-imaginary component locator.
-               IF ( DCB_KTYP( IDCB ) ) THEN
+               IF ( DCB_KTYP( IDCB ) .AND.
+     :              DCB_DLOC( IDCB ) .NE. ARY__NOLOC ) THEN
                   CALL DAT_ANNUL( DCB_DLOC( IDCB ), STATUS )
                   DCB_DLOC( IDCB ) = ARY__NOLOC
 

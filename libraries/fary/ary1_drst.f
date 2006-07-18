@@ -78,6 +78,9 @@
 *        Installed support for primitive arrays.
 *     5-MAY-2006 (DSB):
 *        Installed support for scaled arrays.
+*     17-JUL-2006 (DSB):
+*        Check for deferred arrays (which have ARY__NOLOC for their
+*        DCB_DLOC locator).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -137,7 +140,9 @@
             IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Reset the state of the HDS data component.
-               CALL DAT_RESET( DCB_DLOC( IDCB ), STATUS )
+               IF( DCB_DLOC( IDCB ) .NE. ARY__NOLOC ) THEN 
+                  CALL DAT_RESET( DCB_DLOC( IDCB ), STATUS )
+               END IF
             END IF
 
 *  Simple and scaled arrays.
@@ -151,9 +156,11 @@
             IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Reset the state of the HDS data component(s).
-               CALL DAT_RESET( DCB_DLOC( IDCB ), STATUS )
-               IF ( DCB_CPX( IDCB ) ) THEN
-                  CALL DAT_RESET( DCB_ILOC( IDCB ), STATUS )
+               IF( DCB_DLOC( IDCB ) .NE. ARY__NOLOC ) THEN 
+                  CALL DAT_RESET( DCB_DLOC( IDCB ), STATUS )
+                  IF ( DCB_CPX( IDCB ) ) THEN
+                     CALL DAT_RESET( DCB_ILOC( IDCB ), STATUS )
+                  END IF
                END IF
             END IF
 
