@@ -1,4 +1,4 @@
-sun256.ps
+sun257.ps
 test1
 *.lo
 *.la
@@ -26,4 +26,4 @@ make.log
 
 starconf.status
 make.log.err
-sun256.dvi
+sun257.dvi
