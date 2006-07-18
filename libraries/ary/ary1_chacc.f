@@ -111,6 +111,7 @@
 *  If it is not, then report an error.
          IF ( .NOT. OK ) THEN
             STATUS = ARY__ACDEN
+            IDCB = ACB_IDCB( IACB )
             CALL DAT_MSG( 'ARRAY', DCB_LOC( IDCB ) )
 
 *  ...Use an upper case version of the access type.

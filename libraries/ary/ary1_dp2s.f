@@ -71,6 +71,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -79,6 +80,9 @@
 *     10-OCT-1990 (RFWS):
 *        Changed to call ARY1_PAREN as a temporary work around for
 *        problems with DAT_PAREN.
+*     17-JUL-2006 (DSB):
+*        Cater for arrays in which the creation of the data arrays has
+*        been deferred.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -121,7 +125,7 @@
       CHARACTER * ( DAT__SZNAM ) NAME ! Data object name
       CHARACTER * ( DAT__SZNAM ) TNAME ! Temporary component name
       INTEGER DUMMY( 1 )         ! Dummy dimension array
-
+      LOGICAL DEFER              ! Defer creation of data arrys(s)?
 *.
 
 *  Check inherited global status.
@@ -134,8 +138,13 @@
 *  Annul the non-imaginary data component locator (for primitive
 *  objects, the main data object locator will point to the same
 *  object).
-      CALL DAT_ANNUL( DCB_DLOC( IDCB ), STATUS )
-      DCB_DLOC( IDCB ) = ARY__NOLOC
+      IF( DCB_DLOC( IDCB ) .NE. ARY__NOLOC ) THEN
+         CALL DAT_ANNUL( DCB_DLOC( IDCB ), STATUS )
+         DCB_DLOC( IDCB ) = ARY__NOLOC
+         DEFER = .FALSE.
+      ELSE
+         DEFER = .TRUE.
+      END IF
 
 *  Obtain a locator to the parent structure which contains the data
 *  object.
@@ -163,7 +172,11 @@
 *  Move the original primitive array into the DATA component within
 *  the new ARRAY structure. Store the locator to the resulting new
 *  "simple" array in the DCB.
-      CALL DAT_MOVE( DCB_LOC( IDCB ), LOC, 'DATA', STATUS )
+      IF( DEFER ) THEN 
+         CALL DAT_ANNUL( DCB_LOC( IDCB ), STATUS )
+      ELSE
+         CALL DAT_MOVE( DCB_LOC( IDCB ), LOC, 'DATA', STATUS )
+      END IF
       DCB_LOC( IDCB ) = LOC
 
 *  Rename the new object, back to its original name.
@@ -171,8 +184,10 @@
 
 *  Obtain a locator to the non-imaginary data component and store it in
 *  the DCB.
-      CALL DAT_FIND( DCB_LOC( IDCB ), 'DATA', DCB_DLOC( IDCB ),
-     :               STATUS )
+      IF( .NOT. DEFER ) THEN 
+         CALL DAT_FIND( DCB_LOC( IDCB ), 'DATA', DCB_DLOC( IDCB ),
+     :                  STATUS )
+      END IF
 
 *  Note the array form is now 'SIMPLE'.
       DCB_FRM( IDCB ) = 'SIMPLE'

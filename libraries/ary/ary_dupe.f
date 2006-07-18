@@ -114,6 +114,10 @@
 *     12-JUL-2006 (DSB):
 *        Changed so that that duplicating a scaled array produces a simple 
 *        array.
+*     17-JUL-2006 (DSB):
+*        Changed so that creation of the HDS array is deferred until it
+*        is needed. This prevents arrays being created that are larger
+*        than they need to be.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -226,14 +230,14 @@
 *  the DCB. Create a primitive array if possible. Otherwise create a
 *  simple array.
                      IF ( PBND ) THEN
-                        CALL ARY1_DCREP( DCB_TYP( IDCB1 ),
+                        CALL ARY1_DCREP( .TRUE., DCB_TYP( IDCB1 ),
      :                                   ACB_NDIM( IACB1 ),
      :                                   ACB_UBND( 1, IACB1 ),
      :                                   PCB_TMP( IPCB ),
      :                                   PCB_LOC( IPCB ), IDCB2,
      :                                   STATUS )
                      ELSE
-                        CALL ARY1_DCRE( DCB_TYP( IDCB1 ),
+                        CALL ARY1_DCRE( .TRUE., DCB_TYP( IDCB1 ),
      :                                  DCB_CPX( IDCB1 ),
      :                                  ACB_NDIM( IACB1 ),
      :                                  ACB_LBND( 1, IACB1 ),
@@ -256,8 +260,8 @@
 *  Create a new data object with the same attributes and an entry in the
 *  DCB. This is a simple array. The act of duplicating a scaled array
 *  creates a simple array.
-                  CALL ARY1_DCRE( DCB_TYP( IDCB1 ), DCB_CPX( IDCB1 ),
-     :                            ACB_NDIM( IACB1 ),
+                  CALL ARY1_DCRE( .TRUE., DCB_TYP( IDCB1 ), 
+     :                            DCB_CPX( IDCB1 ), ACB_NDIM( IACB1 ),
      :                            ACB_LBND( 1, IACB1 ),
      :                            ACB_UBND( 1, IACB1 ), PCB_TMP( IPCB ),
      :                            PCB_LOC( IPCB ), IDCB2, STATUS )

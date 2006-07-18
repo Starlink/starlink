@@ -121,6 +121,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -154,6 +155,9 @@
 *        improve efficiency for applications which process entire
 *        arrays in pieces. A flag to control this behaviour will have
 *        to be added later.
+*     17-JUL2006 (DSB):
+*        Add a call to ARY1_DOBJ to ensure that any deferred arrays have
+*        been created.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -328,9 +332,10 @@ C     INTEGER PNTR               ! Pointer to mapped data component
             CALL ARY1_CHCMA( IACB, MODE, STATUS )
 
 *  Obtain the data object index in the DCB and ensure that state
-*  information is available for the DCB entry.
+*  information and a data object is available for the DCB entry.
             IDCB = ACB_IDCB( IACB )
             CALL ARY1_DSTA( IDCB, STATUS )
+            CALL ARY1_DOBJ( IDCB, STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Calculate the dimension sizes of the array to be mapped and the

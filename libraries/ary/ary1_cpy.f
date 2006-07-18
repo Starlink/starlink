@@ -160,6 +160,8 @@
 *        array. This is because scaled arrays are read-only, so we need
 *        to be able to create a simple array from a scaled array if we are 
 *        ever going to be able to change the values in the array.
+*     17-JUL-2006 (DSB):
+*        Add value for DEFER when calling ARY1_DCRE(P).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -290,12 +292,12 @@
 *  type and bounds to accommodate the copied data. Create a primitive
 *  array if possible. Otherwise, create a simple array.
                   IF ( PBND ) THEN
-                     CALL ARY1_DCREP( DCB_TYP( IDCB1 ),
+                     CALL ARY1_DCREP( .FALSE., DCB_TYP( IDCB1 ),
      :                                ACB_NDIM( IACB1 ),
      :                                ACB_UBND( 1, IACB1 ), TEMP, LOC,
      :                                IDCB2, STATUS )
                   ELSE
-                     CALL ARY1_DCRE( DCB_TYP( IDCB1 ), .FALSE.,
+                     CALL ARY1_DCRE( .FALSE., DCB_TYP( IDCB1 ), .FALSE.,
      :                               ACB_NDIM( IACB1 ),
      :                               ACB_LBND( 1, IACB1 ),
      :                               ACB_UBND( 1, IACB1 ), TEMP, LOC,
@@ -417,7 +419,7 @@
 
 *  Create a new simple data object (with an entry in the DCB) with the 
 *  correct type and bounds to accommodate the copied data.
-               CALL ARY1_DCRE( NEWTYP, DCB_CPX( IDCB1 ),
+               CALL ARY1_DCRE( .FALSE., NEWTYP, DCB_CPX( IDCB1 ),
      :                         ACB_NDIM( IACB1 ), ACB_LBND( 1, IACB1 ),
      :                         ACB_UBND( 1, IACB1 ), TEMP, LOC, IDCB2,
      :                         STATUS )

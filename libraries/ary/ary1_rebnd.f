@@ -13,7 +13,8 @@
 
 *  Invocation:
 *     CALL ARY1_REBND( PAREN, NAME, TYPE, STATE, NDIM, LBND, UBND,
-*     NNDIM, NLBND, NUBND, LOC, SAME, DRX, LX, UX, STATUS )
+*                      NNDIM, NLBND, NUBND, LOC, SAME, DRX, LX, 
+*                      UX, STATUS )
 
 *  Description:
 *     The routine changes the bounds of a primitive numeric HDS object
@@ -149,6 +150,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -169,6 +171,9 @@
 *     7-DEC-1989 (RFWS):
 *        Changed the dimensions of LX and UX back to ARY__MXDIM as the
 *        previous change introduced a bug in the call to ARY1_GTN.
+*     18-JUL-2006 (DSB):
+*        Check for null LOC values (e.g. supplied if creation of the HDS
+*        arrays has been deferred - as is done by ARY_DUPE).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -225,6 +230,7 @@
       LOGICAL DCE                ! Whether data conversion errors occur
       LOGICAL FULL               ! Temporary data copy fills new array?
       LOGICAL NEWOBJ             ! Whether a new data object is needed
+      LOGICAL THERE              ! Does the named component exist?
 
 *.
 
@@ -262,7 +268,7 @@
 
 *  Ensure that the data object is in the expected state by resetting it
 *  if appropriate.
-         IF ( .NOT. STATE ) THEN
+         IF ( .NOT. STATE .AND. LOC .NE. ARY__NOLOC ) THEN
             CALL DAT_RESET( LOC, STATUS )
          END IF
 
@@ -365,16 +371,20 @@
 *  If a new data object is required, then annul the locator to the
 *  original object and erase it.
             IF ( NEWOBJ ) THEN
-               CALL DAT_ANNUL( LOC, STATUS )
-               LOC = ARY__NOLOC
-               CALL DAT_ERASE( PAREN, NAME, STATUS )
+               IF( LOC .NE. ARY__NOLOC ) THEN
+                  CALL DAT_ANNUL( LOC, STATUS )
+                  LOC = ARY__NOLOC
+               END IF
+
+               CALL DAT_THERE( PAREN, NAME, THERE, STATUS )
+               IF( THERE ) CALL DAT_ERASE( PAREN, NAME, STATUS )
 
 *  Create the new object and obtain a locator to it.
                CALL DAT_NEW( PAREN, NAME, TYPE, NNDIM, DIM, STATUS )
                CALL DAT_FIND( PAREN, NAME, LOC, STATUS )
 
 *  If the same data object is being re-used, then alter its shape.
-            ELSE
+            ELSE IF( LOC .NE. ARY__NOLOC ) THEN 
                CALL DAT_ALTER( LOC, NNDIM, DIM, STATUS )
 
 *  Ensure that the object is in the expected state by resetting it if
