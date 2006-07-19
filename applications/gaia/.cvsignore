@@ -17,6 +17,7 @@ config.status
 configure
 demodata.tar
 displaycat
+displaypolcat
 gaia.sh
 gaiaMon
 gaiaMon.ifc
