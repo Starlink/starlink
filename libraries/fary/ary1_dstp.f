@@ -305,7 +305,7 @@
 *  component and fill it with zeros. Then unmap it.
                         IF ( DCB_STA( IDCB ) ) THEN
                            CALL DAT_MAP( DCB_ILOC( IDCB ), TYPE, 
-     :                                   'WRITE', DCB_NDIM( IDCB ), DIM, 
+     :                                   'WRITE', DCB_NDIM( IDCB ), DIM,
      :                                   PNTR, STATUS )
                            CALL ARY1_VZERO( TYPE, EL, PNTR, STATUS )
                            CALL ARY1_HUNMP( DCB_ILOC( IDCB ), STATUS )
@@ -382,7 +382,7 @@
 *  component and fill it with zeros. Then unmap it.
                         IF ( DCB_STA( IDCB ) ) THEN
                            CALL DAT_MAP( DCB_ILOC( IDCB ), TYPE, 
-     :                                   'WRITE', DCB_NDIM( IDCB ), DIM, 
+     :                                   'WRITE', DCB_NDIM( IDCB ), DIM,
      :                                   PNTR, STATUS )
                            CALL ARY1_VZERO( TYPE, EL, PNTR, STATUS )
                            CALL ARY1_HUNMP( DCB_ILOC( IDCB ), STATUS )
