@@ -208,8 +208,9 @@ c      call ast_listissued( 'teststc' )
      :    call stopit( status, 'Error 2a' )
 
       if( ast_getc( obj, 'label(3)', status ) .ne. 
-     :              'Modified Julian Date' ) 
-     :    call stopit( status, 'Error 2b' )
+     :    'Modified Julian Date offset from 1999-07-23 16:00:00' ) THEN
+         call stopit( status, 'Error 2b' )
+      end if
 
       if( ast_getc( obj, 'domain(1)', status ) .ne. 'SKY' )
      :    call stopit( status, 'Error 3' )
@@ -731,8 +732,10 @@ c      end if
      :              'Julian Date [TT] offset from 1968-05-23 12:00:00' ) 
      :    call stopit( status, 'Error 2a' )
 
-      if( ast_getc( obj, 'label(3)', status ) .ne. 'Julian Date' ) 
-     :    call stopit( status, 'Error 2b' )
+      if( ast_getc( obj, 'label(3)', status ) .ne. 
+     :    'Julian Date offset from 1968-05-23 12:00:00' ) THEN
+         call stopit( status, 'Error 2b' )
+      endif
 
       if( ast_getc( obj, 'domain(1)', status ) .ne. 'SKY' )
      :    call stopit( status, 'Error 3' )
@@ -994,8 +997,10 @@ c      end if
       if( ast_getc( obj, 'domain(3)', status ) .ne. 'TIME' ) 
      :    call stopit( status, 'Error 2' )
 
-      if( ast_getc( obj, 'label(3)', status ) .ne. 'Julian Date' ) 
-     :    call stopit( status, 'Error 2b' )
+      if( ast_getc( obj, 'label(3)', status ) .ne.
+     :    'Julian Date offset from 1968-05-23 12:00:00' ) THEN
+         call stopit( status, 'Error 2b' )
+      end if
 
       if( ast_getc( obj, 'domain(1)', status ) .ne. 'SKY' )
      :    call stopit( status, 'Error 3' )
@@ -1242,7 +1247,9 @@ c      end if
      :    call stopit( status, 'Error 2' )
 
       if( ast_getc( obj, 'label(3)', status ) .ne. 
-     :    'Modified Julian Date' ) call stopit( status, 'Error 2b' )
+     :    'Modified Julian Date offset from 1900-01-01' ) THEN
+         call stopit( status, 'Error 2b' )
+      end if
 
       if( ast_getc( obj, 'domain(1)', status ) .ne. 'SKY' )
      :    call stopit( status, 'Error 3' )
@@ -1469,7 +1476,9 @@ c      end if
      :    call stopit( status, 'Error 2' )
 
       if( ast_getc( obj, 'label(3)', status ) .ne. 
-     :    'Modified Julian Date' ) call stopit( status, 'Error 2b' )
+     :    'Modified Julian Date offset from 2004-07-15 08:23:56' ) then
+         call stopit( status, 'Error 2b' )
+      end if
 
       if( ast_getc( obj, 'domain(1)', status ) .ne. 'SKY' )
      :    call stopit( status, 'Error 3' )
