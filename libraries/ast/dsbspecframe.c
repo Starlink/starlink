@@ -23,7 +23,9 @@ f     AST_DSBSPECFRAME
 *     When quoting a position within such a spectrum, it is necessary to
 *     indicate whether the quoted position is the USB position or the 
 *     corresponding LSB position. The SideBand attribute provides this
-*     indication.
+*     indication. Another option that the SideBand attribute provides is
+*     to represent a spectral position by its topocentric offset from the 
+*     LO frequency.
 *
 *     In practice, the LO frequency is specified by giving the distance
 *     from the LO frequency to some "central" spectral position. Typically 
@@ -120,8 +122,9 @@ f     The DSBSpecFrame class does not define any new routines beyond those
    "protected" symbols available. */
 #define astCLASS DSBSpecFrame
 
+#define LSB -1
+#define LO  0
 #define USB 1
-#define LSB 0
 
 /* Include files. */
 /* ============== */
@@ -179,6 +182,7 @@ AstDSBSpecFrame *astDSBSpecFrameId_( const char *, ... );
 /* ======================================== */
 
 static AstMapping *TopoMap( AstDSBSpecFrame *, int, const char * );
+static AstMapping *ToLOMapping( AstDSBSpecFrame *, const char * );
 static AstMapping *ToLSBMapping( AstDSBSpecFrame *, const char * );
 static AstMapping *ToUSBMapping( AstDSBSpecFrame *, const char * );
 static const char *GetAttrib( AstObject *, const char * );
@@ -411,7 +415,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "sideband" ) ) {
       ival = astGetSideBand( this );
       if ( astOK ) {
-         result = ( ival == USB ) ? "USB" : "LSB";
+         result = ( ival == USB ) ? "USB" : (( ival == LO ) ? "LO" : "LSB" );
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
@@ -532,9 +536,10 @@ static double GetImagFreq( AstDSBSpecFrame *this ) {
 
 /* Local Variables: */
    AstDSBSpecFrame *rf_frame;/* DSBSpecFrame describing the rest frequency */
-   AstMapping *map;         /* Pointer to "Observed to Image" mapping */
-   double result;           /* The returned frequency */
-   double rf;               /* Rest frequency in observed sideband */
+   AstMapping *map;          /* Pointer to "Observed to Image" mapping */
+   double result;            /* The returned frequency */
+   double rf;                /* Rest frequency in observed sideband */
+   int sb;                   /* SideBand value */
 
 /* Check the global error status. */
    if ( !astOK ) return AST__BAD;
@@ -551,10 +556,17 @@ static double GetImagFreq( AstDSBSpecFrame *this ) {
 
 /* Create a Mapping which transforms positions from the observed to the
    image sideband. */
-   if( astGetSideBand( rf_frame ) == USB ) {
+   sb = astGetSideBand( rf_frame );
+   if( sb == USB ) {
       map = ToLSBMapping( rf_frame, "astGetImagFreq" );
-   } else {
+
+   } else if( sb == LSB ) {
       map = ToUSBMapping( rf_frame, "astGetImagFreq" );
+
+   } else {
+      astError( AST__INTER, "astGetImagFreq(%s): Illegal sideband value "
+                "(%d) encountered (internal AST programming error).", 
+                astGetClass( this ), sb );
    }
 
 /* Get the rest frequency in Hz, and transform it using the above Mapping. */
@@ -756,112 +768,6 @@ void astInitDSBSpecFrameVtab_(  AstDSBSpecFrameVtab *vtab, const char *name ) {
 
 /* Declare the class delete function.*/
    astSetDump( vtab, Dump, "DSBSpecFrame", "Dual sideband spectral axis" );
-
-}
-
-static AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method ){
-/*
-*  Name:
-*     ToLSBMapping
-
-*  Purpose:
-*     Create a Mapping which transforms a DSBSpecFrame to the lower
-*     sideband.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "dsbspecframe.h"
-*     AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method )
-
-*  Class Membership:
-*     DSBSpecFrame member function 
-
-*  Description:
-*     This function returns a pointer to a new Mapping which transforms
-*     positions in the supplied DSBSpecFrame to the lower sideband. This
-*     will be a UnitMap if the DSBSpecFrame already represents the lower
-*     sideband.
-
-*  Parameters:
-*     this
-*        Pointer to the DSBSpecFrame.
-*     method
-*        Pointer to a null-terminated string containing the name of the
-*        public invoking method. This is only used in the construction of
-*        error messages. 
-
-*  Returned Value:
-*     Pointer to a new Mapping.
-
-*  Notes:
-*     - A NULL pointer will be returned if this function is invoked
-*     with the global error status set, or if it should fail for any
-*     reason.
-*/
-
-/* Local Variables: */
-   AstMapping *fmap;         /* LSB to USB (topo freq) */
-   AstMapping *map1;         /* This to USB (topo freq) */
-   AstMapping *map2;         /* This (LSB) to This (USB) */
-   AstMapping *result;       /* Pointer to the returned Mapping */
-   AstMapping *tmap;         /* This to topocentric freq */
-   double f_lo;              /* Local oscillator freq (topo Hz) */
-   double f_lsb_a;           /* First LSB freq */
-   double f_lsb_b;           /* Second LSB freq */
-   double f_usb_a;           /* First USB freq */
-   double f_usb_b;           /* Second USB freq */
-
-/* Initialise. */
-   result = NULL;
-
-/* Check the global error status. */
-   if ( !astOK ) return result;
-
-/* If the DSBSpecFrame already represents the LSB, return a UnitMap.*/
-   if( astGetSideBand( this ) == LSB ) {
-      result = (AstMapping *) astUnitMap( 1, "" );
-
-/* If the DSBSpecFrame represents the USB, create a suitable WinMap. */
-   } else {
-
-/* Find the Mapping from the spectral system described by this SpecFrame to 
-   topocentric frequency in Hz. */
-      tmap = TopoMap( this, 1, method );         
-
-/* Calculate the local oscillator frequency (topocentric in Hertz). */
-      VerifyAttrs( this, "create a Mapping to lower sideband", 
-                   "IF DSBCentre", "astGetImagFreq" );
-      f_lo = astGetDSBCentre( this ) + astGetIF( this );
-
-/* Create a 1D WinMap which converts f_usb to f_lsb. */
-      f_usb_a = 0.0;
-      f_usb_b = 2*f_lo;
-      f_lsb_a = 2*f_lo;
-      f_lsb_b = 0.0;
-      fmap = (AstMapping *) astWinMap( 1, &f_usb_a, &f_usb_b, &f_lsb_a, &f_lsb_b, "" );
-      
-/* Construct the Mapping: input to f_usb, f_usb to f_lsb, f_lsb to input */
-      map1 = (AstMapping *) astCmpMap( tmap, fmap, 1, "" );
-      astInvert( tmap );
-      map2 = (AstMapping *) astCmpMap( map1, tmap, 1, "" );
-
-/* Simplify */
-      result = astSimplify( map2 );
-
-/* Free resources */
-      tmap = astAnnul( tmap );
-      fmap = astAnnul( fmap );
-      map1 = astAnnul( map1 );
-      map2 = astAnnul( map2 );
-   }
-
-/* Return NULL if an error has occurred. */
-   if( !astOK ) result = astAnnul( result );
-
-/* Return the result. */
-   return result;
 
 }
 
@@ -1294,6 +1200,9 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
       } else if( astChrMatch( "lsb", setting+ival ) ) {
          astSetSideBand( this, LSB );
 
+      } else if( astChrMatch( "lo", setting+ival ) ) {
+         astSetSideBand( this, LO );
+
       } else if( astChrMatch( "observed", setting+ival ) ) {
          astSetSideBand( this, ( astGetIF( this ) > 0 ) ? LSB : USB );
 
@@ -1600,6 +1509,239 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    return result;
 }
 
+static AstMapping *ToLOMapping( AstDSBSpecFrame *this, const char *method ){
+/*
+*  Name:
+*     ToLOMapping
+
+*  Purpose:
+*     Create a Mapping which transforms a DSBSpecFrame to offset from the
+*     local oscillator frequency.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "dsbspecframe.h"
+*     AstMapping *ToLOMapping( AstDSBSpecFrame *this, const char *method )
+
+*  Class Membership:
+*     DSBSpecFrame member function 
+
+*  Description:
+*     This function returns a pointer to a new Mapping which transforms
+*     positions in the supplied DSBSpecFrame into an offset from the local 
+*     oscillator frequency. This will be a UnitMap if the DSBSpecFrame 
+*     already represents offset from the local oscillator frequency.
+
+*  Parameters:
+*     this
+*        Pointer to the DSBSpecFrame.
+*     method
+*        Pointer to a null-terminated string containing the name of the
+*        public invoking method. This is only used in the construction of
+*        error messages. 
+
+*  Returned Value:
+*     Pointer to a new Mapping.
+
+*  Notes:
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstMapping *fmap;         /* LSB to USB (topo freq) */
+   AstMapping *map1;         /* This to USB (topo freq) */
+   AstMapping *map2;         /* This (LSB) to This (USB) */
+   AstMapping *result;       /* Pointer to the returned Mapping */
+   AstMapping *tmap;         /* This to topocentric freq */
+   double f_lo;              /* Local oscillator freq (topo Hz) */
+   double f_in_a;            /* First LSB or USB freq */
+   double f_in_b;            /* Second LSB or USB freq */
+   double f_out_a;           /* First LO freq */
+   double f_out_b;           /* Second LO freq */
+   int sb;                   /* SideBand value */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* If the DSBSpecFrame already represents LO offset, return a UnitMap.*/
+   sb = astGetSideBand( this );
+   if( sb == LO ) {
+      result = (AstMapping *) astUnitMap( 1, "" );
+
+/* If the DSBSpecFrame represents the USB or LSB, create a suitable WinMap. */
+   } else {
+
+/* Find the Mapping from the spectral system described by this SpecFrame to 
+   topocentric frequency in Hz. */
+      tmap = TopoMap( this, 1, method );         
+
+/* Calculate the local oscillator frequency (topocentric in Hertz). */
+      VerifyAttrs( this, "create a Mapping to upper sideband", 
+                   "IF DSBCentre", "astGetImagFreq" );
+      f_lo = astGetDSBCentre( this ) + astGetIF( this );
+
+/* Create a 1D WinMap which converts f_in to f_out. */
+      if( sb == LSB ) {
+         f_in_a = 0.0;
+         f_in_b = f_lo;
+         f_out_a = f_lo;
+         f_out_b = 0.0;
+      } else {
+         f_in_a = 0.0;
+         f_in_b = -f_lo;
+         f_out_a = f_lo;
+         f_out_b = 0.0;
+      }
+
+      fmap = (AstMapping *) astWinMap( 1, &f_in_a, &f_in_b, &f_out_a, &f_out_b, "" );
+      
+/* Construct the Mapping: input to f_in, f_in to f_out, f_out to input */
+      map1 = (AstMapping *) astCmpMap( tmap, fmap, 1, "" );
+      astInvert( tmap );
+      map2 = (AstMapping *) astCmpMap( map1, tmap, 1, "" );
+
+/* Simplify */
+      result = astSimplify( map2 );
+
+/* Free resources */
+      tmap = astAnnul( tmap );
+      fmap = astAnnul( fmap );
+      map1 = astAnnul( map1 );
+      map2 = astAnnul( map2 );
+   }
+
+/* Return NULL if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
+
+}
+
+static AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method ){
+/*
+*  Name:
+*     ToLSBMapping
+
+*  Purpose:
+*     Create a Mapping which transforms a DSBSpecFrame to the lower
+*     sideband.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "dsbspecframe.h"
+*     AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method )
+
+*  Class Membership:
+*     DSBSpecFrame member function 
+
+*  Description:
+*     This function returns a pointer to a new Mapping which transforms
+*     positions in the supplied DSBSpecFrame to the lower sideband. This
+*     will be a UnitMap if the DSBSpecFrame already represents the lower
+*     sideband.
+
+*  Parameters:
+*     this
+*        Pointer to the DSBSpecFrame.
+*     method
+*        Pointer to a null-terminated string containing the name of the
+*        public invoking method. This is only used in the construction of
+*        error messages. 
+
+*  Returned Value:
+*     Pointer to a new Mapping.
+
+*  Notes:
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstMapping *fmap;         /* LSB to USB (topo freq) */
+   AstMapping *map1;         /* This to USB (topo freq) */
+   AstMapping *map2;         /* This (LSB) to This (USB) */
+   AstMapping *result;       /* Pointer to the returned Mapping */
+   AstMapping *tmap;         /* This to topocentric freq */
+   double f_lo;              /* Local oscillator freq (topo Hz) */
+   double f_out_a;           /* First LSB freq */
+   double f_out_b;           /* Second LSB freq */
+   double f_in_a;            /* First USB or LO freq */
+   double f_in_b;            /* Second USB or LO freq */
+   int sb;                   /* SideBand value */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* If the DSBSpecFrame already represents the LSB, return a UnitMap.*/
+   sb = astGetSideBand( this );
+   if( sb == LSB ) {
+      result = (AstMapping *) astUnitMap( 1, "" );
+
+/* If the DSBSpecFrame represents the USB or LO offset, create a suitable 
+   WinMap. */
+   } else {
+
+/* Find the Mapping from the spectral system described by this SpecFrame to 
+   topocentric frequency in Hz. */
+      tmap = TopoMap( this, 1, method );         
+
+/* Calculate the local oscillator frequency (topocentric in Hertz). */
+      VerifyAttrs( this, "create a Mapping to lower sideband", 
+                   "IF DSBCentre", "astGetImagFreq" );
+      f_lo = astGetDSBCentre( this ) + astGetIF( this );
+
+/* Create a 1D WinMap which converts USB or LO to LSB. */
+      if( sb == USB ) {
+         f_in_a = 0.0;
+         f_in_b = 2*f_lo;
+         f_out_a = 2*f_lo;
+         f_out_b = 0.0;
+      } else {
+         f_in_a = 0.0;
+         f_in_b = f_lo;
+         f_out_a = f_lo;
+         f_out_b = 0.0;
+      }
+
+      fmap = (AstMapping *) astWinMap( 1, &f_in_a, &f_in_b, &f_out_a, &f_out_b, "" );
+      
+/* Construct the Mapping: input to f_in, f_in to f_out, f_out to input */
+      map1 = (AstMapping *) astCmpMap( tmap, fmap, 1, "" );
+      astInvert( tmap );
+      map2 = (AstMapping *) astCmpMap( map1, tmap, 1, "" );
+
+/* Simplify */
+      result = astSimplify( map2 );
+
+/* Free resources */
+      tmap = astAnnul( tmap );
+      fmap = astAnnul( fmap );
+      map1 = astAnnul( map1 );
+      map2 = astAnnul( map2 );
+   }
+
+/* Return NULL if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
+
+}
+
 static AstMapping *TopoMap( AstDSBSpecFrame *this, int forward, 
                             const char *method ){
 /*
@@ -1750,10 +1892,11 @@ static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method ){
    AstMapping *result;       /* Pointer to the returned Mapping */
    AstMapping *tmap;         /* This to topocentric freq */
    double f_lo;              /* Local oscillator freq (topo Hz) */
-   double f_lsb_a;           /* First LSB freq */
-   double f_lsb_b;           /* Second LSB freq */
-   double f_usb_a;           /* First USB freq */
-   double f_usb_b;           /* Second USB freq */
+   double f_in_a;            /* First LSB or LO freq */
+   double f_in_b;            /* Second LSB or LO freq */
+   double f_out_a;           /* First USB freq */
+   double f_out_b;           /* Second USB freq */
+   int sb;                   /* SideBand value */
 
 /* Initialise. */
    result = NULL;
@@ -1762,10 +1905,12 @@ static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method ){
    if ( !astOK ) return result;
 
 /* If the DSBSpecFrame already represents the USB, return a UnitMap.*/
-   if( astGetSideBand( this ) == USB ) {
+   sb = astGetSideBand( this );
+   if( sb == USB ) {
       result = (AstMapping *) astUnitMap( 1, "" );
 
-/* If the DSBSpecFrame represents the LSB, create a suitable WinMap. */
+/* If the DSBSpecFrame represents the LSB, or LO offset, create a suitable 
+   WinMap. */
    } else {
 
 /* Find the Mapping from the spectral system described by this SpecFrame to 
@@ -1777,14 +1922,22 @@ static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method ){
                    "IF DSBCentre", "astGetImagFreq" );
       f_lo = astGetDSBCentre( this ) + astGetIF( this );
 
-/* Create a 1D WinMap which converts f_lsb to f_usb. */
-      f_lsb_a = 0.0;
-      f_lsb_b = 2*f_lo;
-      f_usb_a = 2*f_lo;
-      f_usb_b = 0.0;
-      fmap = (AstMapping *) astWinMap( 1, &f_lsb_a, &f_lsb_b, &f_usb_a, &f_usb_b, "" );
+/* Create a 1D WinMap which converts f_in to f_out. */
+      if( sb == LSB ) {
+         f_in_a = 0.0;
+         f_in_b = 2*f_lo;
+         f_out_a = 2*f_lo;
+         f_out_b = 0.0;
+      } else {
+         f_in_a = 0.0;
+         f_in_b = -f_lo;
+         f_out_a = f_lo;
+         f_out_b = 0.0;
+      }
+
+      fmap = (AstMapping *) astWinMap( 1, &f_in_a, &f_in_b, &f_out_a, &f_out_b, "" );
       
-/* Construct the Mapping: input to f_lsb, f_lsb to f_usb, f_usb to input */
+/* Construct the Mapping: input to f_in, f_in to f_out, f_out to input */
       map1 = (AstMapping *) astCmpMap( tmap, fmap, 1, "" );
       astInvert( tmap );
       map2 = (AstMapping *) astCmpMap( map1, tmap, 1, "" );
@@ -1806,6 +1959,7 @@ static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method ){
    return result;
 
 }
+
 static void VerifyAttrs( AstDSBSpecFrame *this, const char *purp, 
                          const char *attrs, const char *method ) {
 /*
@@ -2099,16 +2253,17 @@ astMAKE_TEST(DSBSpecFrame,IF,( this->ifr != AST__BAD ))
 
 *  Description:
 *     This attribute indicates whether the DSBSpecFrame currently
-*     represents its lower or upper sideband. When querying the current 
-*     value, the returned string is always one of "usb" (for upper) or 
-*     "lsb" (for lower). When setting a new value, any of the strings "lsb", 
-*     "usb", "observed" or "image" may be supplied (case insensitive). The 
-*     "observed" sideband is which ever sideband (upper or lower) contains 
-*     the central spectral position given by attribute DSBCentre, and the 
-*     "image" sideband is the other sideband. It is the sign of the IF
-*     attribute which determines if the observed sideband is the upper or 
-*     lower sideband. The default value for SideBand is the observed
-*     sideband.
+*     represents its lower or upper sideband, or an offset from the local
+*     oscillator frequency. When querying the current value, the returned 
+*     string is always one of "usb" (for upper sideband), "lsb" (for lower
+*     sideband), or "lo" (for offset from the local oscillator frequency). 
+*     When setting a new value, any of the strings "lsb", "usb", "observed",
+*     "image" or "lo" may be supplied (case insensitive). The "observed" 
+*     sideband is which ever sideband (upper or lower) contains the central 
+*     spectral position given by attribute DSBCentre, and the "image" 
+*     sideband is the other sideband. It is the sign of the IF attribute 
+*     which determines if the observed sideband is the upper or lower 
+*     sideband. The default value for SideBand is the observed sideband.
 
 *  Applicability:
 *     DSBSpecFrame
@@ -2116,13 +2271,13 @@ astMAKE_TEST(DSBSpecFrame,IF,( this->ifr != AST__BAD ))
 
 *att--
 */
-/* Protected access to the SideBand attribute uses non-zero value to
-   indicate USB and zero to indicate LSB. */
+/* Protected access to the SideBand attribute uses -9999 to indicate
+   "unset". Other negative values mean "LSB", zero means "LO" and
+   positive values mean "USB". */
 astMAKE_CLEAR(DSBSpecFrame,SideBand,sideband,-9999)
-astMAKE_SET(DSBSpecFrame,SideBand,int,sideband,(value?USB:LSB))
+astMAKE_SET(DSBSpecFrame,SideBand,int,sideband,((value<0)?LSB:((value==0)?LO:USB)))
 astMAKE_TEST(DSBSpecFrame,SideBand,( this->sideband != -9999 ))
-astMAKE_GET(DSBSpecFrame,SideBand,int,USB,(this->sideband == -9999 ? 
-((astGetIF( this )>0)?LSB:USB):this->sideband))
+astMAKE_GET(DSBSpecFrame,SideBand,int,USB,(this->sideband == -9999 ? ((astGetIF( this )>0)?LSB:USB):this->sideband))
 
 /* Copy constructor. */
 /* ----------------- */
@@ -2161,6 +2316,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Local Variables: */
    AstDSBSpecFrame *this;        /* Pointer to the DSBSpecFrame structure */
+   const char *cval;             /* Attribute value */
+   const char *comm;             /* Attribute comment */
    double dval;                  /* Attribute value */
    int ival;                     /* Attribute value */
    int set;                      /* Is attribute set? */
@@ -2199,9 +2356,19 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* -------- */
    set = TestSideBand( this );
    ival = set ? GetSideBand( this ) : astGetSideBand( this );
-   astWriteString( channel, "SideBn", set, 1, ival ? "USB" : "LSB", 
-                   ival ? "Represents upper sideband" : 
-                          "Represents lower sideband");
+   if( ival == LSB ) {
+      cval = "LSB";
+      comm = "Represents lower sideband";
+
+   } else if( ival == LO ) {
+      cval = "LO";
+      comm = "Represents offset from LO frequency";
+
+   } else {
+      cval = "USB";
+      comm = "Represents upper sideband";
+   }
+   astWriteString( channel, "SideBn", set, 1, cval, comm );
 }
 
 /* Standard class functions. */
@@ -2248,7 +2415,9 @@ f     RESULT = AST_DSBSPECFRAME( OPTIONS, STATUS )
 *     When quoting a position within such a spectrum, it is necessary to
 *     indicate whether the quoted position is the USB position or the 
 *     corresponding LSB position. The SideBand attribute provides this
-*     indication.
+*     indication. Another option that the SideBand attribute provides is
+*     to represent a spectral position by its topocentric offset from the 
+*     LO frequency.
 *
 *     In practice, the LO frequency is specified by giving the distance
 *     from the LO frequency to some "central" spectral position. Typically 
@@ -2637,6 +2806,8 @@ AstDSBSpecFrame *astLoadDSBSpecFrame_( void *mem, size_t size,
             new->sideband = USB;
          } else if( !strcmp( text, "LSB" ) ) {
             new->sideband = LSB;
+         } else if( !strcmp( text, "LO" ) ) {
+            new->sideband = LO;
          } else {
             astError( AST__ATTIN, "astRead(%s): Invalid SideBand description "
                       "\"%s\".", astGetClass( channel ), text );
