@@ -35,6 +35,7 @@ install-manifest.xml
 starconf.status.local
 stamp-h1
 make.log
+make.log.err
 .deps
 cupid.h
 make_doc
