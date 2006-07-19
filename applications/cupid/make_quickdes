@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl 
 
    $state = 0;
    open( INFILE, "<$ARGV[0]" );
