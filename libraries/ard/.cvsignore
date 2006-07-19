@@ -1,5 +1,6 @@
 test1
 ARD_ERR
+ard_err.h
 fac_1520_err
 sun183.ps
 *.lo
@@ -24,10 +25,10 @@ install-manifest.xml
 starconf.status.local
 stamp-h1
 make.log
+make.log.err
 .deps
 
 starconf.status
 config.h
 config.h.in
-make.log.err
 sun183.dvi
