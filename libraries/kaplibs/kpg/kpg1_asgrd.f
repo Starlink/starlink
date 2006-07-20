@@ -40,7 +40,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998, 2000 Central Laboratory of the Research Councils.
-*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2005, 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -61,6 +61,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -80,6 +81,9 @@
 *     20-JUL-2006 (DSB):
 *        Do not annotate the "other" sideband if the current sideband is 
 *        LO (offset from local oscillator).
+*     20-JUL-2006 (TIMJ):
+*        Can not obtain the SideBand in the same IF clause that checks
+*        to see whether we have a DSBSpecframe.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -120,6 +124,8 @@
       INTEGER IPLOT2               ! Modified Plot
       INTEGER MAP                  ! Pointer to an unused Mapping
       LOGICAL BOX                  ! Was a simple box drawn?
+      LOGICAL ISDSB                ! This is a DSBSpecFrame
+      LOGICAL ISDSBLO              ! DSBSpecFrame represents LO sideband
       REAL A                       ! Scale factor
       REAL AX1                     ! X NDC coord at left of AGI picture
       REAL AX2                     ! X NDC coord at right of AGI picture
@@ -211,9 +217,21 @@
      :                   TEXT, IAT )
 
          AX = AST_PICKAXES( IPLOT2, 1, 1, MAP, STATUS )
-         IF( KPG1_GETASTDSB() .AND. 
-     :       AST_ISADSBSPECFRAME( AX, STATUS ) .AND.
-     :       AST_GETC( AX, 'SideBand', STATUS ) .NE. 'LO' ) THEN
+
+*  Fortran does not short circuit IF tests so we can not do an AST_GETC
+*  for sideband until we know we have a DSBSpecFrame
+         ISDSB = .FALSE.
+         ISDSBLO = .FALSE.
+         IF ( KPG1_GETASTDSB() .AND.
+     :        AST_ISADSBSPECFRAME( AX, STATUS ) ) THEN
+            ISDSB = .TRUE.
+            IF (AST_GETC( AX, 'SideBand', STATUS ) .NE. 'LO' ) THEN
+               ISDSBLO = .TRUE.
+            END IF
+         END IF
+
+*  If SideBand is in LO mode we do not need a display on the top
+         IF( ISDSB .AND. ISDSBLO ) THEN
             AEDGE = 'Edge(1)'
             ASB = 'SideBand(1)'
             AGAP = 'TextLabGap(1)'
