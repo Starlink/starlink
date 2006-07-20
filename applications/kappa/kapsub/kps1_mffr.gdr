@@ -1,0 +1,176 @@
+      SUBROUTINE KPS1_MFFR<T>( COMPRS, EL, ARRAY, MAXRNG, NRANGE, 
+     :                       RANGES, STATUS )
+*+
+*  Name:
+*     KPS1_MFFRx
+
+*  Purpose:
+*     Determines the ranges of good pixels in an array. 
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_MFFRx( COMPRS, EL, ARRAY, MAXRNG, NRANGE, RANGES, 
+*                     STATUS )
+
+*  Description:
+*     The regions encompassing the non-bad elements are determined.
+*     The ranges are resclaed by the binning factor.
+
+*  Arguments:
+*     COMPRS = INTEGER (Given)
+*        The binning factor, i.e. the number of elements of the original
+*        unbinned array were ccombined to form one element of ARRAY.
+*     CLIP( NCLIP ) = REAL (Given)
+*        The clipping levels in standard deviations for the rejection 
+*        of outliers.
+*     EL = INTEGER (Given)
+*        The number of elements in the line to analysed.
+*     ARRAY( EL ) = ? (Given)
+*        The binned and averaged array.
+*     MAXRNG = INTEGER (Given)
+*        The maximum number of ranges.
+*     NRANGE = INTEGER (Returned)
+*        The number of ranges returned.  This is always a multiple of
+*        two, i.e pairs of lower and uper ranges.
+*     RANGES( MAXRNG ) = INTEGER (Returned)
+*        The ranges to include in the detrending fits found from the 
+*        averaged and binned representative line.  Each
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for double-precision and real data types:
+*     replace "x" in the routine name by D or R as appropriate.  The
+*     ARRAY argument supplied to the routine must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2006 June 2 (MJC):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Bad values
+
+*  Arguments Given:
+      INTEGER COMPRS
+      INTEGER EL
+      <TYPE> ARRAY( EL )
+      INTEGER MAXRNG
+
+*  Arguments Returned:
+      INTEGER NRANGE
+      INTEGER RANGES( MAXRNG )
+      
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      INTEGER OPTBIN              ! Nominal number of bins
+      PARAMETER ( OPTBIN = 32 )
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter
+      INTEGER K                  ! Loop counter
+      INTEGER R                  ! Range index
+      LOGICAL START              ! At the start of a range?
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise returned values.
+      NRANGE = 2
+      RANGES( 1 ) = 1
+      RANGES( 2 ) = EL * COMPRS
+
+      I = 1
+      R = 1
+      START = .FALSE.
+
+      DO WHILE ( I .LE. EL .AND. .NOT. START )
+         IF ( ARRAY( I ) .EQ. VAL__BAD<T> ) THEN
+            I = I + 1
+         ELSE
+            RANGES( R ) = ( I - 1 ) * COMPRS + 1
+            START = .TRUE.
+         END IF
+      END DO
+
+      IF ( .NOT. START ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'KPS1_MFFRx_ALLBAD',
+     :                 'All pixels in average line are bad.',
+     :                 STATUS )
+         NRANGE = 0
+         GOTO 999
+      END IF
+
+      I = I + 1
+      DO WHILE ( I .LE. EL .AND. R .LE. MAXRNG )
+         IF ( ARRAY( I ) .EQ. VAL__BAD<T> ) THEN
+            RANGES( 2 * R ) = COMPRS * ( I - 1 )
+            R = R + 1
+            IF ( R .LE. MAXRNG ) THEN
+               K = I
+               START = .FALSE.
+               DO WHILE ( .NOT. START .AND. K .LE. EL ) 
+                  IF ( ARRAY( K ) .NE. VAL__BAD<T> ) THEN
+                     RANGES( 2 * R - 1 ) = ( K - 1 ) * COMPRS + 1
+                     START = .TRUE.
+                  ELSE
+                     K = K + 1
+                  END IF
+               END DO
+               I = K
+            END IF
+         END IF
+         I = I + 1
+      END DO
+
+*  Complete a pair.
+      IF ( START ) THEN
+         RANGES( 2 * R ) = COMPRS * EL
+         NRANGE = 2 * R
+
+*  We have incremented the number of ranges but the remaining
+*  elements were bad.  So decrement that counter.
+      ELSE
+         NRANGE = 2 * ( R - 1 )
+      END IF
+
+  999 CONTINUE
+      END

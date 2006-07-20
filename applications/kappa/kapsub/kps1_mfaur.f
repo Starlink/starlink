@@ -1,0 +1,260 @@
+      SUBROUTINE KPS1_MFAUR( INDF, DTAXIS, NCLIP, CLIP, MAXRNG,
+     :                       NRANGE, RANGES, STATUS )
+*+
+*  Name:
+*     KPS1_MFAUR
+
+*  Purpose:
+*     Determines automatically ranges of pixels to be included in 
+*     fitting by MFITTREND.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_MFAUR( INDF, DTAXIS, NCLIP, CLIP, MAXRNG, NRANGE,
+*                      RANGES, STATUS )
+
+*  Description:
+*     This routine serves MFITTREND.  It averages a section defined 
+*     through the supplied identifier to create a one-dimensional
+*     representative line of data that is being detrended by MFITTREND.
+*     Then the routine fits a straight line to this line of data, and 
+*     sigma-clipped outliers rejected.  The regions encompassing the 
+*     unrejected parts of the line are returned.
+
+*  Arguments:
+*     INDF = INTEGER (Given)
+*        The NDF identifier of the representative section to be 
+*        averaged and analysed.
+*     DTAXIS = INTEGER (Given)
+*        The axis index of the dimension that is being detrended.
+*     NCLIP = INTEGER (Given)
+*        The number of clipping cycles for the rejection of outliers.
+*     CLIP( NCLIP ) = REAL (Given)
+*        The clipping levels in standard deviations for the rejection 
+*        of outliers.
+*     MAXRNG = INTEGER (Given)
+*        The maximum number of ranges.
+*     NRANGE = INTEGER (Returned)
+*        The number of ranges returned.  This is always a multiple of
+*        two, i.e pairs of lower and upper ranges.
+*     RANGES( MAXRNG ) = INTEGER (Returned)
+*        The ranges to include in the detrending fits found from the 
+*        averaged representative line.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  The default number of bins along the line is 32.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2006 May 31 (MJC):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+
+*  Arguments Given:
+      INTEGER INDF
+      INTEGER DTAXIS
+      INTEGER NCLIP
+      REAL CLIP( NCLIP )
+      INTEGER MAXRNG
+
+*  Arguments Returned:
+      INTEGER NRANGE
+      INTEGER RANGES( MAXRNG )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER KPG1_FLOOR         ! Most positive integer .LE. given real
+      INTEGER KPG1_CEIL          ! Most negative integer .GE. given real
+
+*  Local Constants:
+      INTEGER OPTBIN              ! Nominal number of bins
+      PARAMETER ( OPTBIN = 32 )
+
+*  Local Variables:
+      INTEGER COMPRS( NDF__MXDIM ) ! Compression factors
+      INTEGER D                  ! No. of o/p pixels from reference to 
+                                 ! i/p pixel 1
+      CHARACTER DTYPE *( NDF__SZFTP ) ! Numeric type for output arrays
+      INTEGER EL                 ! Number of mapped elements
+      INTEGER ELWS1              ! Number of elements in summation 
+                                 ! workspace
+      INTEGER ELWS2              ! No. of elements in counting workspace
+      INTEGER I                  ! Loop counter
+      INTEGER IDIMS( NDF__MXDIM ) ! Dimensions of input NDF
+      INTEGER IERR               ! Position of first error (dummy)
+      INTEGER IPAL               ! Pointer to averaged line
+      CHARACTER ITYPE * ( NDF__SZTYP ) ! Numeric type for processing
+      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of input NDF
+      INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
+      INTEGER NBIN               ! Number of bins
+      INTEGER NDIM               ! Number of dimensions
+      INTEGER NERR               ! Number of errors
+      INTEGER ODIMS( NDF__MXDIM )! Dimensions of output array
+      INTEGER PNTRI( 1 )         ! Pointer to input array component
+      INTEGER PNTRO( 1 )         ! Pointer to output array component
+      INTEGER REF( NDF__MXDIM )  ! I/p pixel co-ords at bottom left of 
+                                 ! a compression box
+      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of input NDF
+      INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
+      INTEGER WPNTR1             ! Pointer to workspace
+      INTEGER WPNTR2             ! Pointer to workspace
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+      
+*  Find the shape and bound of the section.
+      CALL NDF_DIM( INDF, NDF__MXDIM, IDIMS, NDIM, STATUS )
+      CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+
+*  Work out the bounds for the output array and the size of the output 
+*  array from the input array dimensions, compression factor and 
+*  alignment to origin.  Also modify the input bounds so that they 
+*  correspond to the section of the input array that is actually used. 
+      DO I = 1, MAX( 2, NDIM )
+         IF ( I .NE. DTAXIS ) THEN
+            COMPRS( I ) = IDIMS( I )
+         ELSE
+            NBIN = MIN( IDIMS( I ), OPTBIN )
+            COMPRS( I ) = IDIMS( I ) / NBIN
+         END IF
+
+*  Align with the origin.  However, leave it parameterised in case this 
+*  alignment no longer is no longer the only option.
+         REF( I ) = LBND( I ) - 1
+         D = KPG1_CEIL( REAL( 1 - REF( I ) ) / REAL( COMPRS( I ) ) ) - 1
+
+*  Pad the input image to make it a whole number of compression boxes.
+         LBNDO( I ) = KPG1_FLOOR( REAL( LBND( I ) - 1 - REF( I ) )
+     :                           / REAL( COMPRS( I ) ) ) - D + 1
+         UBNDO( I ) = MAX( LBNDO( I ), 
+     :                     KPG1_CEIL( REAL( UBND( I ) - REF( I ) )
+     :                               / REAL( COMPRS( I ) ) ) - D )
+
+         ODIMS( I ) = UBNDO( I ) - LBNDO( I ) + 1
+
+         LBND( I ) = 1 + REF( I ) + COMPRS( I ) * ( LBNDO( I ) - 1 + D )
+         UBND( I ) = REF( I ) + COMPRS( I ) * ( UBNDO( I ) + D )
+         IDIMS( I ) = UBND( I ) - LBND( I ) + 1
+      END DO
+
+*  Determine the numeric type to be used for processing the sample
+*  lines.  This step supports single- and double-precision
+*  floating-point processing.
+      CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF, INDF, 'Data', ITYPE, 
+     :                DTYPE, STATUS )
+
+*  Map the array component of the section.
+      CALL KPG1_MAP( INDF, 'Data', ITYPE, 'READ', PNTRI, EL, STATUS )
+
+*  Obtain workspace for the averaged spectrum.
+      CALL PSX_CALLOC( IDIMS( DTAXIS ), ITYPE, IPAL, STATUS )
+
+*  Set the quantity of workspace required for averaging.  In order to
+*  save time by not annulling and then re-creating slightly
+*  different-sized summation work arrays, the first is made
+*  sufficiently large to to satisfy all requests.  Also set the type of
+*  the space for counting required by the appropriate averaging
+*  subroutine.
+      ELWS1 = 1
+      DO I = 1, NDIM
+         ELWS1 = MAX( ELWS1, IDIMS( I ) )
+      END DO
+      ELWS1 = ELWS1 * 2
+      ELWS2 = IDIMS( 1 )
+
+*  Obtain some workspace for the averaging and map them.  First find
+*  the quantity and the type of the counting space required.
+      CALL PSX_CALLOC( ELWS1, ITYPE, WPNTR1, STATUS )
+      CALL PSX_CALLOC( ELWS2, '_INTEGER', WPNTR2, STATUS )
+
+*  Average the lines in the section.  The routine expects at least two
+*  dimensions.
+      IF ( ITYPE .EQ. '_REAL' ) THEN
+         CALL KPG1_CMAVR( MAX( 2, NDIM ), IDIMS, 
+     :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                    COMPRS, 1,  %VAL( CNF_PVAL( IPAL ) ),
+     :                    %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                    %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+         CALL KPG1_CMAVD( MAX( 2, NDIM ), IDIMS, 
+     :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                    COMPRS, 1, %VAL( CNF_PVAL( IPAL ) ),
+     :                    %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                    %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
+      END IF
+
+*  Free workspaces arrays used for compression.
+      CALL PSX_FREE( WPNTR1, STATUS )
+      CALL PSX_FREE( WPNTR2, STATUS )
+
+*  Tidy the input data array.
+      CALL NDF_UNMAP( INDF, 'Data', STATUS )
+
+*  Perform fits and iteratively reject outliers.
+      IF ( ITYPE .EQ. '_REAL' ) THEN
+         CALL KPS1_MFEDR( NCLIP, CLIP, ODIMS( DTAXIS ), 
+     :                    %VAL( CNF_PVAL( IPAL ) ), STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+         CALL KPS1_MFEDD( NCLIP, CLIP, ODIMS( DTAXIS ), 
+     :                    %VAL( CNF_PVAL( IPAL ) ), STATUS )
+      END IF
+
+*  Determine the ranges from the good elements remaining in the line.
+      IF ( ITYPE .EQ. '_REAL' ) THEN
+          CALL KPS1_MFFRR( COMPRS( DTAXIS ), ODIMS( DTAXIS ),
+     :                     %VAL( CNF_PVAL( IPAL ) ), MAXRNG, NRANGE, 
+     :                     RANGES, STATUS )
+
+      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+          CALL KPS1_MFFRD( COMPRS( DTAXIS ), ODIMS( DTAXIS ),
+     :                     %VAL( CNF_PVAL( IPAL ) ), MAXRNG, NRANGE, 
+     :                     RANGES, STATUS )
+      END IF
+
+*  We have finished with the averaged line.
+      CALL PSX_FREE( IPAL, STATUS )
+
+      END
