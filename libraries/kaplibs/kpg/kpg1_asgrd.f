@@ -77,6 +77,9 @@
 *     16-DEC-2005 (DSB):
 *        Allow user to prevent annotation of unused DSBSpecFrame axis
 *        using the pseudo-attribute "DrawDSB".
+*     20-JUL-2006 (DSB):
+*        Do not annotate the "other" sideband if the current sideband is 
+*        LO (offset from local oscillator).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -209,7 +212,8 @@
 
          AX = AST_PICKAXES( IPLOT2, 1, 1, MAP, STATUS )
          IF( KPG1_GETASTDSB() .AND. 
-     :       AST_ISADSBSPECFRAME( AX, STATUS ) ) THEN
+     :       AST_ISADSBSPECFRAME( AX, STATUS ) .AND.
+     :       AST_GETC( AX, 'SideBand', STATUS ) .NE. 'LO' ) THEN
             AEDGE = 'Edge(1)'
             ASB = 'SideBand(1)'
             AGAP = 'TextLabGap(1)'
