@@ -74,6 +74,8 @@
 *        Add some TimeFrame attributes.
 *     20-JUL-2006 (DSB):
 *        Allow SideBand to be LO offset.
+*     20-JUL-2006 (TIMJ):
+*        Add some defensive programming to the SideBand string
 *     {enter_changes_here}
 
 *  Bugs:
@@ -455,8 +457,11 @@
                   CALL MSG_SETC( 'SB',  'Upper' )
                ELSE IF( SIDEBN .EQ. 'LSB') THEN
                   CALL MSG_SETC( 'SB',  'Lower' )
-               ELSE 
+               ELSE  IF ( SIDEBN .EQ. 'LO' ) THEN
                   CALL MSG_SETC( 'SB',  'Offset from local oscillator' )
+               ELSE
+*  Defensive
+                  CALL MSG_SETC( 'SB', SIDEBN )
                END IF
 
                CALL MSG_OUT( 'WCS_SBND', 
