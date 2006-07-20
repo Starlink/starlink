@@ -1,0 +1,80 @@
+      SUBROUTINE IMG1_CFREE( POINT, STATUS )
+*+
+*  Name:
+*     IMG1_CFREE
+
+*  Purpose:
+*     Frees memory allocated by IMG1_CALLO (VMS version).
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCD1_MFREE( POINT, STATUS )
+
+*  Description:
+*     This routine frees memory allocated by the routine IMG1_MALLO.
+*     It attempts to free memory even if status is set on entry.
+
+*  Arguments:
+*     POINT = INTEGER (Given)
+*       Pointer to the memory which is to be deallocated.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - VMS specific. Deals with character descriptors and releases the
+*     character descriptor itself as well as the main character array.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     6-SEP-1994 (PDRAPER):
+*        Original version based on David Berry's GRP routine GRP1_CPOIN.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'IMG_CONST'        ! IMG internal constants
+      
+*  Arguments Given:
+      INTEGER POINT
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER IPMAIN             ! Pointer to main character array
+      INTEGER STRLEN             ! Length of string
+      
+*.
+
+*  Start a begin-end error block.
+      CALL ERR_BEGIN( STATUS )
+
+*  Extract from the descriptor, the start address of the area of memory
+*  holding the character data.
+      CALL IMG1_RDESC( %VAL( POINT ), STRLEN, IPMAIN, STATUS )
+
+*  Free the memory used to hold the descriptor.
+      CALL PSX_FREE( POINT, STATUS )
+
+*  And free the main character array too.
+      CALL PSX_FREE( IPMAIN, STATUS )
+
+*  End of begin-end error block.
+      CALL ERR_END( STATUS )
+      
+      END
+* $Id$
