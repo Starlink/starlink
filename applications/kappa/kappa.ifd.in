@@ -12492,6 +12492,15 @@ iraf! {
 
          helplib {$KAPPA_HELP}
 
+         parameter auto {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Automatic selection of fitting ranges?}
+            default FALSE
+            helpkey *
+          }
+
          parameter axis {
             position 2
             type LITERAL
@@ -12500,6 +12509,16 @@ iraf! {
             default 3
             prompt {Axis of trends}
             helpkey *
+          }
+
+         parameter clip {
+            type _REAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Clipping standard deviations to reject outliers}
+            helpkey *
+            default 2 2.5 3
+            size *
           }
 
           parameter in {
@@ -12558,6 +12577,15 @@ iraf! {
             ppath CURRENT DEFAULT
             default FALSE
             prompt {Subtract trends}
+            helpkey *
+          }
+
+         parameter section {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT
+            prompt {Section to be averaged to determine fitting ranges}
+            default !
             helpkey *
           }
 
