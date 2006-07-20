@@ -350,7 +350,7 @@
 *  Determine its dimensions (note that only two significant dimensions
 *  can be accommodated).  Then ignore non-significant dimensions.
       DIM( 1 ) = UBND( SDIM( 1 ) ) - LBND( SDIM( 1 ) ) + 1
-      DIM( 2 ) = UBND( SDIM( 2 ) ) - LBND( SDIM( 1 ) ) + 1
+      DIM( 2 ) = UBND( SDIM( 2 ) ) - LBND( SDIM( 2 ) ) + 1
 
 *  Decide whether the Gaussian smoothing is circularly symmetric or not.
 *  =====================================================================

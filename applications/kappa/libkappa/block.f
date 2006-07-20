@@ -295,7 +295,7 @@
 *  accommodated, but of these only one need be siginifcant.  Then
 *  ignore non-significant dimensions.
       DIM( 1 ) = UBND( SDIM( 1 ) ) - LBND( SDIM( 1 ) ) + 1
-      DIM( 2 ) = UBND( SDIM( 2 ) ) - LBND( SDIM( 1 ) ) + 1
+      DIM( 2 ) = UBND( SDIM( 2 ) ) - LBND( SDIM( 2 ) ) + 1
 
 *  Obtain the smoothing box sizes, duplicating the value if only a
 *  single value is given.  Each box size must be a positive odd number,
