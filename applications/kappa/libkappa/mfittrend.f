@@ -27,6 +27,10 @@
 *     that only lies within a series of co-ordinate ranges along the
 *     selected axis.
 *
+*     The ranges may be determined automatically by averaging lines,
+*     binning neighbouring pixels within the average line, performing a
+*     linear fit, and rejecting the outliers, iteratively.
+*     
 *     Once the trends have been determined they can either be stored
 *     directly or subtracted from the input data.  If stored directly
 *     they can be subtracted later.  The advantage of that approach is
@@ -43,6 +47,9 @@
 *     mfittrend in axis ranges order out
 
 *  ADAM Parameters:
+*     AUTO = _LOGICAL (Read)
+*        If TRUE, the ranges that define the trends are determined
+*        automatically, and parameter RANGES is ignored.  [FALSE]
 *     AXIS = LITERAL (Read)
 *        The axis of the current co-ordinate system that defines the
 *        direction of the trends.  This is specified by its integer 
@@ -53,6 +60,11 @@
 *        parallel to the NDF pixel axes, then the pixel axis which is
 *        most nearly parallel to the specified current Frame axis will
 *        be used.  AXIS defaults to the last axis.  [!]
+*     CLIP() = _REAL (Read)
+*        Array of standard-deviation limits for progressive clipping 
+*        of pixel values while determining the fitting ranges 
+*        automatically.  It is therefore only applicable when AUTO=TRUE.
+*        Between one and five values may be supplied. [2,2.5,3]
 *     IN = NDF (Read & Write)
 *        The input NDF.  On successful completion this may have the
 *        trends subtracted, but only if SUBTRACT and MODIFYIN are both
@@ -78,6 +90,21 @@
 *        ranges is determined by the current axis of the world
 *        co-ordinate system that corresponds to the trend axis.  Up to
 *        ten pairs of values are allowed.  [!]
+*     SECTION = LITERAL (Read)
+*        The region from which representative lines are averaged
+*        in automatic mode to determine the regions to fit trends.  It
+*        is therefore only accessed when AUTO=TRUE and the
+*        dimensionality of the input NDF is more than 1.  The value is 
+*        defined as an NDF section, so that ranges can be defined along 
+*        any axis, and be given as pixel indices or axis (data) 
+*        co-ordinates.  The pixel axis corresponding to parameter AXIS
+*        is ignored.   So for example, if the pixel axis were 3 in a
+*        cube, the value "3:5,4," would average all the lines 
+*        in elements in columns 3 to 5 and row 4.  See "NDF sections" 
+*        in SUN/95, or the online documentation for details.  
+*
+*        A null  value (!) requests that a representative region around 
+*        the centre be used.  [!]
 *     SUBTRACT = _LOGICAL (Read)
 *        Whether not to subtract the trends from the input NDF or not. 
 *        If not, then the trends will be evaluated and written to a new 
@@ -154,89 +181,104 @@
 *        Original version, some parts from COLLAPSE.
 *     2006 April 12 (MJC):
 *        Remove unused variables.
+*     2006 May 31 (MJC):
+*        Added option for automatic estimations of the ranges.
 *     {enter_further_changes_here}
 
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE             ! No implicit typing
+      IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      INCLUDE 'AST_PAR'         ! AST parameters and functions
-      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
-      INCLUDE 'NDF_PAR'         ! NDF_ public constants
-      INCLUDE 'PAR_ERR'         ! Parameter-system errors
-
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST parameters and functions
+      INCLUDE 'DAT_PAR'          ! Data-system constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'PAR_ERR'          ! Parameter-system errors
+      INCLUDE 'PRM_PAR'          ! Magic-value definitions
 
 *  Status:
-      INTEGER STATUS            ! Global status
+      INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER KPG1_FLOOR        ! Most positive integer .LE. a given 
-                                ! real
-      INTEGER KPG1_CEIL         ! Most negative integer .GE. a given
-                                ! real
+      INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given 
+                                 ! real
+      INTEGER KPG1_CEIL          ! Most negative integer .GE. a given
+                                 ! real
+
+*  Local Constants:
+      INTEGER MAXRNG            ! Maximum number of range limits
+      PARAMETER( MAXRNG = 20 )
+
+      INTEGER MXCLIP             ! Maximum number of clips of the data
+      PARAMETER ( MXCLIP = 5 )
 
 *  Local Variables:
-      CHARACTER * ( 255 ) TTLC  ! Title of original current Frame
+      CHARACTER COMP * ( 15 )    ! List of array components to process
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Numeric type for processing
+      CHARACTER * ( DAT__SZLOC ) LOC ! Locator for the input NDF
+      CHARACTER * ( 80 ) SECT    ! Section specifier
+      CHARACTER * ( 255 ) TTLC   ! Title of original current Frame
       DOUBLE PRECISION CPOS( 2, NDF__MXDIM ) ! Two current Frame 
-                                ! positions
+                                 ! positions
       DOUBLE PRECISION CURPOS( NDF__MXDIM ) ! A valid current Frame 
-                                ! position
-      DOUBLE PRECISION DLBND( NDF__MXDIM ) ! Lower bounds in pixel
-                                ! co-ords
-      DOUBLE PRECISION DRANGE( 20 ) ! The fit ranges world co-ordinates
-      DOUBLE PRECISION DUBND( NDF__MXDIM ) ! Upper bounds in pixel 
-                                ! co-ords
+                                 ! position
+      DOUBLE PRECISION DLBND( NDF__MXDIM ) ! Lower bounds, pixel co-ords
+      DOUBLE PRECISION DRANGE( MAXRNG ) ! Fit ranges world co-ordinates
+      DOUBLE PRECISION DUBND( NDF__MXDIM ) ! Upper bounds, pixel co-ords
       DOUBLE PRECISION PIXPOS( NDF__MXDIM ) ! A valid pixel Frame
-                                ! position
+                                 ! position
       DOUBLE PRECISION PPOS( 2, NDF__MXDIM ) ! Two pixel Frame positions
-      DOUBLE PRECISION PRJ      ! Vector length projected onto a pixel
-                                ! axis
-      DOUBLE PRECISION PRJMAX   ! Maximum vector length projected onto 
-                                ! an axis
-      INTEGER AREA              ! Area of axes orthogonal to fit axis
-      INTEGER CFRM              ! Current frame
+      DOUBLE PRECISION PRJ       ! Vector length projected on to a pixel
+                                 ! axis
+      DOUBLE PRECISION PRJMAX    ! Maximum vector length projected on to
+                                 ! an axis
+      INTEGER AREA               ! Area of axes orthogonal to fit axis
+      INTEGER CFRM               ! Current frame
       INTEGER DIMS( NDF__MXDIM ) ! Dimensions of NDF
-      INTEGER EL                ! Number of mapped elements
-      INTEGER I                 ! Loop variable
-      INTEGER IAXIS             ! Index of axis within current Frame
-      INTEGER INNDF             ! NDF identifier if input NDF
-      INTEGER IPAS              ! Pointer to workspace
-      INTEGER IPBS              ! Pointer to coefficients
-      INTEGER IPDAT( 1 )        ! Pointer to NDF data component
-      INTEGER IPIX              ! Index of PIXEL Frame within WCS 
-                                ! FrameSet
-      INTEGER IPTMP( 1 )        ! Pointer to temporary NDF component
-      INTEGER IPVAR( 1 )        ! Pointer to NDF variance component
-      INTEGER IPWRK1            ! Pointer to workspace
-      INTEGER IPWRK2            ! Pointer to workspace
-      INTEGER IWCS              ! AST FrameSet identifier
-      INTEGER JAXIS             ! Index of axis within pixel Frame
-      INTEGER JHI               ! High pixel index for axis
-      INTEGER JLO               ! Low pixel index for axis
+      INTEGER EL                 ! Number of mapped elements
+      INTEGER I                  ! Loop variable
+      INTEGER IAXIS              ! Index of axis within current Frame
+      INTEGER INNDF              ! NDF identifier of input NDF
+      INTEGER IPAS               ! Pointer to workspace
+      INTEGER IPBS               ! Pointer to coefficients
+      INTEGER IPDAT( 2 )         ! Pointer to NDF data & variance comp's
+      INTEGER IPIX               ! Index of PIXEL Frame within FrameSet
+      INTEGER IPTMP( 1 )         ! Pointer to temporary NDF component
+      INTEGER IPVAR( 1 )         ! Pointer to NDF variance component
+      INTEGER IPWRK1             ! Pointer to workspace
+      INTEGER IPWRK2             ! Pointer to workspace
+      INTEGER IWCS               ! AST FrameSet identifier
+      INTEGER JAXIS              ! Index of axis within pixel Frame
+      INTEGER JHI                ! High pixel index for axis
+      INTEGER JLO                ! Low pixel index for axis
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF
-      INTEGER MAP               ! PIXEL Frame to Current Frame Mapping
-                                ! pointer
-      INTEGER NAXC              ! Number of axes in current frame
-      INTEGER NDIM              ! Number of NDF dimensions
-      INTEGER NRANGE            ! Number of range values (not pairs)
-      INTEGER ORDER             ! The order of the polynomial to fit
-      INTEGER OUTNDF            ! NDF identifier of output NDF
-      INTEGER RANGES( 20 )      ! The fit ranges pixels
+      INTEGER MAP                ! PIXEL Frame to Current Frame Mapping
+                                 ! pointer
+      INTEGER NAXC               ! Number of axes in current frame
+      INTEGER NCLIP              ! Number of clips of averaged data
+      INTEGER NCSECT             ! Number of characters in section
+      INTEGER NDFS               ! NDF identifier of section
+      INTEGER NDIM               ! Number of NDF dimensions
+      INTEGER NRANGE             ! Number of range values (not pairs)
+      INTEGER ORDER              ! The order of the polynomial to fit
+      INTEGER OUTNDF             ! NDF identifier of output NDF
+      INTEGER RANGES( MAXRNG )   ! The fit ranges pixels
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
-      LOGICAL HASBAD            ! Input NDF may have BAD pixels?
-      LOGICAL HAVVAR            ! Have a variance component?
-      LOGICAL MODIN             ! Modify input NDF by subtracting fits?
-      LOGICAL SUBTRA            ! Subtract fit from data?
-      LOGICAL USEALL            ! Use the entire axis?
-      LOGICAL USEVAR            ! Use variance as weights in fits?
+      LOGICAL AUTO               ! Determine regions automatically?
+      LOGICAL HASBAD             ! Input NDF may have BAD pixels?
+      LOGICAL HAVVAR             ! Have a variance component?
+      LOGICAL MODIN              ! Modify input NDF by subtracting fits?
+      LOGICAL SUBTRA             ! Subtract fit from data?
+      LOGICAL USEALL             ! Use the entire axis?
+      LOGICAL USEVAR             ! Use variance as weights in fits?
+      REAL CLIP( MXCLIP )        ! Clipping sigmas during binning
 
 *.
 
-*  Future development notes: Should look at storing the coefficients and
+*  Future development notes: should look at storing the coefficients and
 *  write a model evaluating application MAKETREND?  This would follow
 *  the KAPPA model more closely and allow the fit to be undone, even
 *  when subtracting directly.  Maybe a need for a statistics-generating
@@ -287,8 +329,23 @@
          DIMS( I ) = UBND( I ) - LBND( I ) + 1
       END DO
 
-*  Get the fit ranges
-*  ==================
+*  Do we have any variances to use for weights and should they be used?
+      CALL NDF_STATE( INNDF, 'Variance', HAVVAR, STATUS )
+      IF ( HAVVAR ) THEN
+         CALL PAR_GET0L( 'VARIANCE', USEVAR, STATUS )
+         COMP = 'Data,Variance'
+      ELSE
+         USEVAR = .FALSE.
+         COMP = 'Data'
+      END IF
+
+*  Get the fit ranges.
+*  ===================
+      USEALL = .FALSE.
+
+*  Manual or automatic estimation?
+      CALL PAR_GET0L( 'AUTO', AUTO, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the WCS FrameSet from the NDF.
       CALL KPG1_GTWCS( INNDF, IWCS, STATUS )
@@ -319,8 +376,8 @@
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INNDF )
          CALL MSG_SETC( 'T', TTLC )
-         CALL ERR_REP( 'MFITTREND_ERR2', 'The transformation from the'//
-     :                 ' current co-ordinate Frame of ''^NDF'' '//
+         CALL ERR_REP( 'MFITTREND_ERR2', 'The transformation from '//
+     :                 'the current co-ordinate Frame of ''^NDF'' '//
      :                 '(^T) to pixel co-ordinates is not defined.',
      :                 STATUS )
 
@@ -330,33 +387,35 @@
          CALL NDF_MSG( 'NDF', INNDF )
          CALL MSG_SETC( 'T', TTLC )
          CALL ERR_REP( 'MFITTREND_ERR3', 'The transformation from '//
-     :                 'pixel co-ordinates to the current co-ordinate'//
-     :                 ' Frame of ''^NDF'' (^T) is not defined.',
-     :                 STATUS )
+     :                 'pixel co-ordinates to the current '//
+     :                 'co-ordinate Frame of ''^NDF'' (^T) is not '//
+     :                 'defined.', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+      IF ( .NOT. AUTO ) THEN
 
 *  Get the ranges to use. These values are transformed from current
 *  co-ordinates along the fit axis to pixel co-ordinates on some
 *  NDF axis (we've yet to determine).
-      DRANGE( 1 ) = AST__BAD
-      CALL KPG1_GTAXV( 'RANGES', 20, .FALSE., CFRM, IAXIS, DRANGE,
-     :                 NRANGE, STATUS )
+         DRANGE( 1 ) = AST__BAD
+         CALL KPG1_GTAXV( 'RANGES', MAXRNG, .FALSE., CFRM, IAXIS,
+     :                    DRANGE, NRANGE, STATUS )
 
 *  If a null value was supplied then we should use the full extent.
-      IF ( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
-         USEALL = .TRUE.
-      ELSE
-         USEALL = .FALSE.
+         IF ( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            USEALL = .TRUE.
+         ELSE
 
 *  Ranges must come in pairs.
-         IF ( 2 * ( NRANGE / 2 ) .NE. NRANGE ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'MFITTREND_ERR4',
-     :                    'Range values must be supplied in pairs',
-     :                    STATUS )
-            GO TO 999
+            IF ( 2 * ( NRANGE / 2 ) .NE. NRANGE ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'MFITTREND_ERR4',
+     :                       'Range values must be supplied in pairs',
+     :                       STATUS )
+               GO TO 999
+            END IF
          END IF
       END IF
 
@@ -382,7 +441,7 @@
 
 *  If no ranges were supplied, modify the values in these positions by
 *  an arbitrary amount.
-      IF ( USEALL ) THEN
+      IF ( AUTO .OR. USEALL ) THEN
          IF ( CURPOS( IAXIS ) .NE. 0.0 ) THEN
             CPOS( 1, IAXIS ) = 0.99 * CURPOS( IAXIS )
             CPOS( 2, IAXIS ) = 1.01 * CURPOS( IAXIS )
@@ -425,20 +484,66 @@
          END IF
       END DO
 
+*  Automatic mode to define ranges.
+*  --------------------------------
+      IF ( AUTO ) THEN
+
+*  Obtain the clipping thresholds.
+         NCLIP = 0
+         CALL PAR_GDRVR( 'CLIP', MXCLIP, 1.0, VAL__MAXR,
+     :                   CLIP, NCLIP, STATUS )
+         IF ( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            NCLIP = 3
+            CLIP( 1 ) = 2.0
+            CLIP( 2 ) = 2.5
+            CLIP( 3 ) = 3.0
+
+         ELSE IF ( STATUS .NE. SAI__OK ) THEN
+            GOTO 999
+
+         END IF
+
+*  Obtain the NDF section of the test region.
+         CALL KPS1_MFGNS( 'SECTION', JAXIS, NDIM, DIMS, NCSECT,
+     :                    SECT, STATUS )
+
+*  Obtain a locator to the input NDF.
+         CALL NDF_LOC( INNDF, 'Read', LOC, STATUS )
+
+*  Create the section in the input array.  Allow dfor a null string
+*  for a one-dimensional NDF.
+         IF ( NCSECT .GT. 0 ) THEN
+            CALL NDF_FIND( LOC, '(' // SECT( :NCSECT ) // ')', NDFS,
+     :                     STATUS )
+         ELSE
+            CALL NDF_FIND( LOC, '()', NDFS, STATUS )
+         END IF
+
+*  Form ranges by averaging the lines in the section, and then
+*  performing a fit, and rejecting outliers.
+         CALL KPS1_MFAUR( NDFS, JAXIS, NCLIP, CLIP, MAXRNG, NRANGE, 
+     :                    RANGES, STATUS )
+
+*  Convert the GRID co-ordinates of the RANGES to pixel co-ordinates.
+         DO I = 1, NRANGE
+            RANGES( I ) = RANGES( I ) + LBND( JAXIS ) - 1
+         END DO
+
 *  OK, use NDF axis JAXIS. Pick full extent if no values were given.
-      IF ( USEALL ) THEN
+      ELSE IF ( USEALL ) THEN
          RANGES( 1 ) = LBND( JAXIS )
          RANGES( 2 ) = UBND( JAXIS )
          NRANGE = 2
-      ELSE
 
 *  Project the given ranges into pixel co-ordinates.
+      ELSE
          DO I = 1, NRANGE, 2
             CPOS( 1, IAXIS ) = DRANGE( I + 1 )
             CPOS( 2, IAXIS ) = DRANGE( I )
 
             CALL AST_TRANN( MAP, 2, NAXC, 2, CPOS, .FALSE., NDIM, 2,
-     :                      PPOS,STATUS )
+     :                      PPOS, STATUS )
 
 *  Find the projection of the two test points onto the axis.
             JLO = KPG1_FLOOR( REAL( MIN( PPOS( 1, JAXIS ),
@@ -486,8 +591,8 @@
          RANGES( I ) = RANGES( I ) - LBND( JAXIS ) + 1
       END DO
 
-*  End of get fit ranges
-*  =====================
+*  Create output NDF.
+*  ==================
 
 *  If needed create a new output NDF based on the input NDF.
       IF ( SUBTRA ) THEN
@@ -505,14 +610,6 @@
      :                  STATUS )
       END IF
 
-*  Do we have any variances to use for weights and should they be used?
-      CALL NDF_STATE( INNDF, 'Variance', HAVVAR, STATUS )
-      IF ( HAVVAR ) THEN
-         CALL PAR_GET0L( 'VARIANCE', USEVAR, STATUS )
-      ELSE
-         USEVAR = .FALSE.
-      END IF
-
 *  Determine if the input NDF has an explicit no bad pixels flag. Could
 *  make the check really check if there's no variances as this speeds
 *  the calculations, but should let the user control that.
@@ -521,9 +618,12 @@
 *  Get the data type.
       CALL NDF_TYPE( INNDF, 'DATA', ITYPE, STATUS )
 
-*  Map in the data. Note we transfer the data component from the input
-*  NDF to the output NDF, as this saves on an unmap by HDS followed by a
-*  map by us (if we allowed this to propagate).
+*  Map the data. 
+*  =============
+
+*  Note we transfer the data component from the input NDF to the output 
+*  NDF, as this saves on an unmap by HDS followed by a map by us (if we 
+*  allowed this to propagate).
       IF ( SUBTRA ) THEN
          IF ( .NOT. MODIN ) THEN
             CALL NDF_MAP( INNDF, 'DATA', ITYPE, 'READ', IPTMP, EL,
@@ -567,9 +667,12 @@
          END IF
       END IF
 
-*  Allocate various workspaces. The requirements for these depends on
-*  the dimensionality. We need space for the cumilative coefficient sums
-*  and the coefficients themselves (Ax=B).
+*  Allocate various workspaces. 
+*  ============================
+
+*  The requirements for the workspaces depends on the dimensionality. 
+*  We need space for the cumulative coefficient sums and the 
+*  coefficients themselves (Ax=B).
       AREA = 1
       DO 5 I = 1, NDIM
          IF ( I .NE. JAXIS ) THEN
@@ -579,7 +682,7 @@
 
       IF ( USEVAR .OR. HASBAD ) THEN
          CALL PSX_CALLOC( AREA * ( ORDER + 1 ) * ( ORDER + 1 ),
-     :                    '_DOUBLE',IPAS, STATUS )
+     :                    '_DOUBLE', IPAS, STATUS )
       ELSE
 
 *  When there are no variances and we also know there are no BAD values
@@ -593,11 +696,13 @@
       CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_INTEGER', IPWRK2,
      :                 STATUS )
 
+*  Do the fits and optional subtraction. 
+*  =====================================
 
-*  Do the fits and optional subtraction. NB could reduce memory use by
-*  NDF blocking though planes for higher dimensional data, or just
-*  mapping the intersection of ranges, or individual ranges, but that
-*  would only be good if working with the last axis (need contiguity).
+*  N.B. could reduce memory use by NDF blocking though planes for 
+*  higher dimensional data, or just mapping the intersection of ranges, 
+*  or individual ranges, but that would only be good if working with the
+*  last axis (need contiguity).
       IF ( USEVAR .OR. HASBAD ) THEN
          IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPS1_LFTB( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
@@ -765,6 +870,9 @@
      :                     %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
      :                     %VAL( CNF_PVAL( IPBS ) ), STATUS )
       END IF
+
+*  Tidy.
+*  =====
 
 *  Free workspace.
       CALL PSX_FREE( IPAS, STATUS )
