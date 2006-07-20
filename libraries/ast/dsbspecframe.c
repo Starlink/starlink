@@ -564,6 +564,7 @@ static double GetImagFreq( AstDSBSpecFrame *this ) {
       map = ToUSBMapping( rf_frame, "astGetImagFreq" );
 
    } else {
+      map = NULL;
       astError( AST__INTER, "astGetImagFreq(%s): Illegal sideband value "
                 "(%d) encountered (internal AST programming error).", 
                 astGetClass( this ), sb );
