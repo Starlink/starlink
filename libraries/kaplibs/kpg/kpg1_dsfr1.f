@@ -72,6 +72,8 @@
 *        possible.
 *     28-JUN-2006 (TIMJ):
 *        Add some TimeFrame attributes.
+*     20-JUL-2006 (DSB):
+*        Allow SideBand to be LO offset.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -110,6 +112,7 @@
       CHARACTER MONTH( 12 )*3    ! Month names
       CHARACTER POSBUF*80        ! Buffer for position
       CHARACTER PRJ*50           ! Sky projection
+      CHARACTER SIDEBN*10        ! SideBand value
       CHARACTER SIGN*1           ! Sign of day value
       CHARACTER SOR*30           ! Spectral standard of rest 
       CHARACTER SREFIS*10        ! Value of SkyFrame SkyRefIs attribute
@@ -447,10 +450,13 @@
             IF( AST_ISADSBSPECFRAME( FRM, STATUS ) ) THEN
 
 *  Current sideband
-               IF( AST_GETC( FRM, 'SIDEBAND', STATUS ) .EQ. 'USB') THEN
+               SIDEBN = AST_GETC( FRM, 'SIDEBAND', STATUS )
+               IF( SIDEBN .EQ. 'USB') THEN
                   CALL MSG_SETC( 'SB',  'Upper' )
-               ELSE
+               ELSE IF( SIDEBN .EQ. 'LSB') THEN
                   CALL MSG_SETC( 'SB',  'Lower' )
+               ELSE 
+                  CALL MSG_SETC( 'SB',  'Offset from local oscillator' )
                END IF
 
                CALL MSG_OUT( 'WCS_SBND', 
