@@ -35,8 +35,9 @@ kps1_lucsm.f kps1_lucy.f kps1_mdrfb.f kps1_mdrfd.f kps1_mdrfi.f \
 kps1_mdrfr.f kps1_mdrfub.f kps1_mdrfuw.f kps1_mdrfw.f kps1_mdrpb.f \
 kps1_mdrpd.f kps1_mdrpi.f kps1_mdrpr.f kps1_mdrpub.f kps1_mdrpuw.f \
 kps1_mdrpw.f kps1_mdset.f kps1_mdwtb.f kps1_mdwtd.f kps1_mdwti.f \
-kps1_mdwtr.f kps1_mdwtub.f kps1_mdwtuw.f kps1_mdwtw.f kps1_mlpcp.f \
-kps1_mlpcv.f kps1_mlpfs.f kps1_mlpky.f kps1_mlplb.f kps1_mlpml.f \
+kps1_mdwtr.f kps1_mdwtub.f kps1_mdwtuw.f kps1_mdwtw.f kps1_mfaur.f \
+kps1_mfgns.f kps1_mlpcp.f kps1_mlpcv.f kps1_mlpfs.f kps1_mlpky.f \
+kps1_mlplb.f kps1_mlpml.f \
 kps1_mlpmp.f kps1_mlpnd.f kps1_mlpng.f kps1_mlppn.f kps1_msa.f \
 kps1_mspad.f kps1_mspar.f kps1_mss.f kps1_mthcd.f kps1_mthcr.f \
 kps1_nmplt.f kps1_nom1b.f kps1_nom1d.f kps1_nom1i.f kps1_nom1r.f \
@@ -68,9 +69,6 @@ medwv.f shifts.f shiftx.f shifty.f statv.f thrsr.f kps1_lmkgd.f
 
 
 
-
-
-
 C_ROUTINES = kps1_luted.c
 
 TK_C_ROUTINES = kps1_tkast.c
@@ -91,7 +89,7 @@ KPG_N_GEN = kps1_apad.gen kps1_ardm.gen kps1_lapl.gen kps1_prmx.gen \
             kps1_cpb.gen
 
 KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr kps1_subi.gdr \
-             kps1_cnse.gdr
+             kps1_cnse.gdr kps1_mfed.gdr kps1_mffr.gdr
 
 KPG_BDIRW_GEN = kps1_dscl.gbdirw
 
@@ -123,5 +121,3 @@ AM_FCFLAGS = @TCL_CFLAGS@ @TK_CFLAGS@
 PRIVATE_INCLUDES = SFT_COM C1_COM
 
 EXTRA_DIST = $(PRIVATE_INCLUDES)
-
-
