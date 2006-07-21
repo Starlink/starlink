@@ -1126,10 +1126,10 @@ static void SPScale( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
         spPtr->y = originY + scaleY * ( spPtr->y - originY );
         spPtr->width *= scaleX;
         spPtr->height *= scaleY;
-
-        /* Need to recompute plot to fit this change */
-        spPtr->newplot = 1;
     }
+
+    /* Need to recompute plot to fit this change */
+    spPtr->newplot = 1;
 
     ComputeBBox( canvas, spPtr );
 
