@@ -870,6 +870,7 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Resize the canvas to fit the size of enclosing frame.
    public method resize {cw ch} {
+
       set fh [expr [winfo height $itk_component(canvasframe)]-10]
       if { $fh < $ch } {
          $itk_component(canvas) configure -height $fh
@@ -879,7 +880,14 @@ itcl::class gaia::GaiaSpectralPlot {
          $itk_component(canvas) configure -width $fw
       }
       $itk_component(canvas) configure -scrollregion "0 0 $fw $fh"
-      fitxy
+
+      #  Make the spectral plot scale to fit canvas and also re-draw itself.
+      #  That is needed to update the coordinate system.
+      $itk_component(canvas) scale $spectrum_ -1 -1 -1 -1
+      $itk_component(canvas) itemconfigure $spectrum_ -showaxes 1
+
+      #  Wait until the above completes before re-positioning graphics.
+      after idle [code $this fitxy]
    }
 
    #  Apply the current grid options.
