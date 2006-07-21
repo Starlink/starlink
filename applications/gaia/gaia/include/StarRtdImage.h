@@ -144,7 +144,7 @@ class StarRtdImage : public Skycat
                            Tk_ImageMaster master, ClientData *clientDataPtr );
 
    //  Replace the image data.
-   int updateImageDataCmd( int argc, char *argv[] );
+   int replaceImageDataCmd( int argc, char *argv[] );
 
    //  Run a foreign procedure.
    int foreignCmd( int argc, char *argv[] );
@@ -325,7 +325,7 @@ class StarRtdImage : public Skycat
    int biasimageCmd( int argc, char *argv[] );
 
    // Command to get or set the volatility status. Note this happens
-   // automatically when updateImageDataCmd is called.
+   // automatically when replaceImageDataCmd is called.
    int volatileCmd( int argc, char *argv[] );
 
  protected:

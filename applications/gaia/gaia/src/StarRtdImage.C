@@ -192,7 +192,7 @@
  *        Removed direct NDF access commands. These are now available
  *        via the ndf:: commands. See gaiaNDFTcl.
  *     30-MAR-2006 (PWD):
- *        Added updateImageDataCmd.
+ *        Added replaceImageDataCmd.
  *     26-APR-2006 (PWD):
  *        Added objectCmd and volatileCmd.
  *-
@@ -321,7 +321,7 @@ public:
     { "remotetcl",       &StarRtdImage::remoteTclCmd,       1, 1 },
     { "object",          &StarRtdImage::objectCmd,          0, 1 },
     { "slice",           &StarRtdImage::sliceCmd,          11, 11},
-    { "updateimagedata", &StarRtdImage::updateImageDataCmd, 1, 1 },
+    { "replaceimagedata",&StarRtdImage::replaceImageDataCmd, 1, 1 },
     { "usingxshm",       &StarRtdImage::usingxshmCmd,       0, 0 },
     { "volatile",        &StarRtdImage::volatileCmd,        0, 1 },
     { "xyprofile",       &StarRtdImage::xyProfileCmd,      14, 14}
@@ -754,7 +754,7 @@ StarWCS* StarRtdImage::getStarWCSPtr( ImageData* image )
 }
 
 //+
-//   StarRtdImage::updateImageDataCmd.
+//   StarRtdImage::replaceImageDataCmd.
 //
 //   Replace and update the image data. Requires the address of some
 //   memory that contains data of exactly the same size and data type as that
@@ -762,10 +762,10 @@ StarWCS* StarRtdImage::getStarWCSPtr( ImageData* image )
 //
 //   The only argument is a memory address stored in a long.
 //-
-int StarRtdImage::updateImageDataCmd( int argc, char *argv[] )
+int StarRtdImage::replaceImageDataCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::updateImageDataCmd" << std::endl;
+    cout << "Called StarRtdImage::replaceImageDataCmd" << std::endl;
 #endif
     long adr;
     if ( Tcl_ExprLong( interp_, argv[0], &adr ) != TCL_OK ) {

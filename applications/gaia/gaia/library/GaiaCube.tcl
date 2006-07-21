@@ -591,7 +591,7 @@ itcl::class gaia::GaiaCube {
       #  the displayed copy.
       lassign [$cubeaccessor_ getimage $axis_ $zp 1] adr
       lassign [$cubeaccessor_ getinfo $adr] realadr nel type
-      $itk_option(-rtdimage) updateimagedata $realadr
+      $itk_option(-rtdimage) replaceimagedata $realadr
 
       #  If regenerating or asked bring autocuts etc. into sync.
       if { $regen || $itk_option(-autocut) } {
