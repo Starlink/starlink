@@ -37,9 +37,15 @@
 *     -  Update the length (last non-blank character) of the output
 *     string.
 
+*  Notes:
+*     If the output string is too small to completely append the input
+*     string truncation will occur and IPOSN will be set to the end of
+*     STR2.
+
 *  Copyright:
 *     Copyright (C) 1983, 1984, 1988, 1991 Science & Engineering Research Council.
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -63,6 +69,7 @@
 *     ACD: A.C. Davenhall (ROE)
 *     AJC: A.J. Chipperfield (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -77,6 +84,9 @@
 *     22-JAN-1997 (AJC):
 *        Calculate new length from used length of STR1 which
 *        is probably shorter than STR2.
+*     20-JUL-2006 (TIMJ):
+*        If STR1 + STR2 exceeds the allocated size of STR2, make sure that
+*        IPOSN reflects the truncation.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,13 +110,16 @@
 
 *  Local Variables:
       INTEGER STR1LEN            ! Used length of STR1
+      INTEGER STR2SZ             ! Allocated size of STR2
 
 *.
 
       STR1LEN = CHR_LEN( STR1 )
-      IF ( LEN( STR2 ) .GT. IPOSN ) THEN
+      STR2SZ = LEN( STR2 )
+      IF ( STR2SZ .GT. IPOSN ) THEN
          STR2( IPOSN+1 : ) = STR1
          IPOSN = IPOSN + STR1LEN
+         IF ( IPOSN .GT. STR2SZ ) IPOSN = STR2SZ
       END IF
 
       END
