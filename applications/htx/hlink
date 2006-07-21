@@ -67,7 +67,7 @@
 #        The URL of the document server to be used for serving remote
 #        documents. This will be used as a prefix in all URLs that refer to
 #        remote documents. If this environment variable is not set, the value
-#        used is "http://star-www.rl.ac.uk/cgi-bin/htxserver".
+#        used is "http://www.starlink.ac.uk/cgi-bin/htxserver".
 
 #  Notes:
 #     Documents which are found on the HTX_PATH search path will be

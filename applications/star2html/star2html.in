@@ -765,7 +765,7 @@ package main;
 #  For local documents this would be:
 #     $DOCBASE = '/star/docs/';
 #  And for remote documents at RAL:
-$DOCBASE = 'http://star-www.rl.ac.uk/cgi-bin/htxserver/';
+$DOCBASE = 'http://www.starlink.ac.uk/cgi-bin/htxserver/';
 
 sub do_cmd_xref{
    local($_) = @_;

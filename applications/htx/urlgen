@@ -42,7 +42,7 @@
 #        The URL of the document server to be used for serving remote
 #        documents. This will be used as a prefix in all URLs that refer to
 #        remote documents. If this environment variable is not set, the value
-#        used is "http://star-www.rl.ac.uk/cgi-bin/htxserver".
+#        used is "http://www.starlink.ac.uk/cgi-bin/htxserver".
 #     HTX_WHERE
 #        If this is set to "l", it specifies that a local document is required
 #        and that no reference to a remote document server should be generated.
@@ -200,7 +200,7 @@
 #  remote server (provide a default for this if necessary). In this case there
 #  is no check that the document or label exists.
       if test ! -n "${done}" -a ! "${HTX_WHERE}" = 'l'; then
-         HTX_SERVER="${HTX_SERVER-http://star-www.rl.ac.uk/cgi-bin/htxserver}"
+         HTX_SERVER="${HTX_SERVER-http://www.starlink.ac.uk/cgi-bin/htxserver}"
          echo "${HTX_SERVER}/${docname}.htx/${docname}.html?xref_${label}"
       fi         
 

@@ -177,7 +177,7 @@
 
 #  Obtain the URL of the remote document server from the HTX_SERVER environment
 #  variable, supplying a suitable default if necessary.
-      HTX_SERVER="${HTX_SERVER-http://star-www.rl.ac.uk/cgi-bin/htxserver}"
+      HTX_SERVER="${HTX_SERVER-http://www.starlink.ac.uk/cgi-bin/htxserver}"
 
 #  Obtain the value of the HTX_PATH document search path, generating a suitable
 #  default if necessary.

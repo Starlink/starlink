@@ -36,7 +36,7 @@
 #        The URL of the document server to be used for serving remote
 #        documents. This will be used as a prefix in all URLs that refer to
 #        remote documents. If this environment variable is not set, the value
-#        used is "http://star-www.rl.ac.uk/cgi-bin/htxserver".
+#        used is "http://www.starlink.ac.uk/cgi-bin/htxserver".
 
 #  Prior Requirements:
 #     All documents must have up to date index files associated with them
@@ -121,7 +121,7 @@
 #  this will be the URL of a CGI script written to address a more complete
 #  remote document set via its own index files.)
       if test ! -n "${HTX_SERVER}"; then
-         server='http://star-www.rl.ac.uk/cgi-bin/htxserver'
+         server='http://www.starlink.ac.uk/cgi-bin/htxserver'
       else
          server="${HTX_SERVER}"
       fi
@@ -262,7 +262,7 @@
 #  the label used (i.e. HREF="xxx/doc.htx/xxx#xref_xxx") into a reference to
 #  the remote document server with the same document name and label fields
 #  still present in the appended document name (e.g.
-#  HREF="http://star-www.rl.ac.uk/cgi-bin/htxserver/doc.htx/xxx?xref_xxx").
+#  HREF="http://www.starlink.ac.uk/cgi-bin/htxserver/doc.htx/xxx?xref_xxx").
                   print( "s%\\(<\\n*[ 	]*[aA][ 	]\\n*[^>]*[hH][rR][eE][fF]\\n*[ 	]*=\\n*[ 	]*\"\\)[^ 	\"]*\\(/"i"\\.htx/[^ 	\"]*\\)[#?]\\(xref_[^  \"]*\"[^>]*>\\)%\\1"server"\\2?\\3%g" )
                }
             }
