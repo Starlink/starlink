@@ -493,6 +493,8 @@
 *     2006 April 12 (MJC):
 *        Remove unused variables, remove contour-plot references,
 *        corrected punctuation, and wrapped long lines.
+*     20-JUL-2006 (TIMJ):
+*        Fix valgrind warning with IPVIN.
 *     {enter_further_changes_here}
 
 *-
@@ -743,6 +745,7 @@
       CALL PAR_GET0L( 'ERRBAR', ERRBAR, STATUS )
 
 *  If so...
+      IPVIN = 0
       IF ( ERRBAR ) THEN
 
 *  Issue a warning if the data being displayed is not from the DATA
@@ -809,6 +812,7 @@
      :                .FALSE., TEXT, STATUS )
 
 *  Get an identifier for the mode, and get the marker type if required.
+      MTYPE = 0
       IF ( TEXT .EQ. 'HISTOGRAM' ) THEN
          IMODE = 1
       ELSE IF ( TEXT .EQ. 'LINE' ) THEN
