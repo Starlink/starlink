@@ -725,6 +725,7 @@ int StarRtdImage::loadFile()
 
     //  Restore transformations.
     image_->restoreParams( p, !autoSetCutLevels_ );
+    filename(file());  // keep filename
 
     //  Initialise the new image.
     return initNewImage();
@@ -3522,8 +3523,11 @@ int StarRtdImage::biasimageCmd( int argc, char *argv[] )
     cout << "Called StarRtdImage::biasimageCmd ("<< argv[0] << ")"<< std::endl;
 #endif
 
-    // Do nothing just yet...
-    return TCL_OK;
+    // Do nothing just yet, unless it's a FITS image.
+    if ( ! isfits() ) {
+        return TCL_OK;
+    }
+    return RtdImage::biasimageCmd( argc, argv );
 }
 
 
