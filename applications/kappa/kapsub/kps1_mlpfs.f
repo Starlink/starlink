@@ -125,7 +125,7 @@
 *  Local Variables:
       CHARACTER ATTR*20          ! Attribute name
       CHARACTER LAB*80           ! Label text string
-      CHARACTER TEXT*30          ! General text string
+      CHARACTER TEXT*120         ! General text string
       INTEGER AXES( 2 )          ! Axes to pick from an existing Frame 
       INTEGER IAT                ! No. of characters in a string
       INTEGER MAP1               ! Map pointer
