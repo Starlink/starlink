@@ -67,7 +67,7 @@
 *        Array of standard-deviation limits for progressive clipping 
 *        of pixel values while determining the fitting ranges 
 *        automatically.  It is therefore only applicable when AUTO=TRUE.
-*        Between one and five values may be supplied. [2,2.5,3]
+*        Between one and five values may be supplied.  [2,2,2.5,3]
 *     IN = NDF (Read & Write)
 *        The input NDF.  On successful completion this may have the
 *        trends subtracted, but only if SUBTRACT and MODIFYIN are both
@@ -92,7 +92,8 @@
 *        values along each data line to be used.  The units of these
 *        ranges is determined by the current axis of the world
 *        co-ordinate system that corresponds to the trend axis.  Up to
-*        ten pairs of values are allowed.  [!]
+*        ten pairs of values are allowed.  This parameter is not
+*        accessed when AUTO=TRUE.  [!]
 *     SECTION = LITERAL (Read)
 *        The region from which representative lines are averaged
 *        in automatic mode to determine the regions to fit trends.  It
@@ -106,7 +107,7 @@
 *        in elements in columns 3 to 5 and row 4.  See "NDF sections" 
 *        in SUN/95, or the online documentation for details.  
 *
-*        A null  value (!) requests that a representative region around 
+*        A null value (!) requests that a representative region around 
 *        the centre be used.  [!]
 *     SUBTRACT = _LOGICAL (Read)
 *        Whether not to subtract the trends from the input NDF or not. 
@@ -129,6 +130,9 @@
 *        the spectral axis is calibrated in Angstroms and that is the
 *        current co-ordinate system).  The fit is evaluated and
 *        written to the data cube called detrend.
+*     mfittrend in=cube axis=3 auto clip=[2,3] order=4 out=detrend
+*        As above except the fitting ranges are determined automatically
+*        with 2- then 3-sigma clipping.
 
 *  Notes:
 *     -  This application attempts to solve the problem of fitting 
