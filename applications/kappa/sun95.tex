@@ -31797,6 +31797,13 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       that only lies within a series of co-ordinate ranges along the
       selected axis.
 
+      The ranges may be determined automatically.  It this mode the
+      application averages selected lines, and bins neighbouring pixels
+      within this average line.  Then it performs a linear fit upon the
+      binned line, and rejects the outliers, iteratively with
+      standard-deviation clipping.  The ranges are the intervals between
+      the rejected points, rescaled to the original pixels.
+
       Once the trends have been determined they can either be stored
       directly or subtracted from the input data.  If stored directly
       they can be subtracted later.  The advantage of that approach is
@@ -31814,6 +31821,12 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
    }
    \sstparameters{
       \sstsubsection{
+         AUTO = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the ranges that define the trends are determined
+         automatically, and parameter RANGES is ignored.  {\tt [FALSE]}
+      }
+      \sstsubsection{
          AXIS =  \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The axis of the current co-ordinate system that defines the
@@ -31825,6 +31838,14 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          parallel to the NDF pixel axes, then the pixel axis which is
          most nearly parallel to the specified current Frame axis will
          be used.  AXIS defaults to the last axis. {\tt [!]}
+      }
+      \sstsubsection{
+         CLIP() = \_REAL (Read)
+      }{
+         Array of standard-deviation limits for progressive clipping 
+         of pixel values while determining the fitting ranges 
+         automatically.  It is therefore only applicable when AUTO={\tt TRUE}.
+         Between one and five values may be supplied.  {\tt [2,2,2.5,3]}
       }
       \sstsubsection{
          IN = NDF (Read \& Write)
@@ -31865,7 +31886,26 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          causes all the values along each data line to be used.  
          The units of these ranges is determined by the current axis of
          the world co-ordinate system that corresponds to the trend
-         axis.  Up to ten pairs of values are allowed. {\tt [!]}
+         axis.  Up to ten pairs of values are allowed.
+         This parameter is not accessed when AUTO={\tt TRUE}.  {\tt [!]}
+      }
+      \sstsubsection{
+         SECTION = LITERAL (Read)
+      }{
+         The region from which representative lines are averaged
+         in automatic mode to determine the regions to fit trends.  It
+         is therefore only accessed when AUTO={\tt TRUE} and the
+         dimensionality of the input NDF is more than 1.  The value is 
+         defined as an NDF section, so that ranges can be defined along 
+         any axis, and be given as pixel indices or axis (data) 
+         co-ordinates.  The pixel axis corresponding to parameter AXIS
+         is ignored.   So for example, if the pixel axis were 3 in a
+         cube, the value {\tt "3:5,4,"} would average all the lines 
+         in elements in columns 3 to 5 and row 4.  See 
+         \hyperref{NDF Sections}{Section~}{}{se:ndfsect} for details.
+
+         A null value ({\tt{!}}) requests that a representative region 
+         around the centre be used.  {\tt [!]}
       }
       \sstsubsection{
          SUBTRACT = \_LOGICAL (Read)
@@ -31893,25 +31933,44 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          mfittrend in=cube axis=3 ranges="1000,2000,3000,4000" order=4 out=detrend
       }{
          This example fits cubic polynomials to the spectral axis of
-         a data cube. The fits only use the data lying within the
+         a data cube.  The fits only use the data lying within the
          ranges 1000 to 2000 and 3000 to 4000 {\AA}ngstroms (assuming
          the spectral axis is calibrated in {\AA}ngstroms and that is the
          current co-ordinate system).  The fit is evaluated and
          written to the data cube called detrend.
       }
+      \sstexamplesubsection{
+         mfittrend in=cube axis=3 auto clip=[2,3] order=4 out=detrend
+      }{
+         As above except the fitting ranges are determined automatically
+         with 2- then 3-sigma clipping.
+      }
    }
    \sstnotes{
-      This application attempts to solve the problem of fitting numerous
-      polynomials in a least-squares sense and that do not follow the
-      natural ordering of the NDF data, in the most CPU-time-efficient
-      way possible.
+      \sstitemlist{
 
-      To do this requires the use of additional memory (of order one
-      less than the dimensionality of the NDF itself, times the
-      polynomial order squared).  To minimise the use of memory and get
-      the fastest possible determinations you should not use weighting
-      and assert that the input data do not have any BAD values (use the
-      application SETBAD to set the appropriate flag).
+         \sstitem
+         This application attempts to solve the problem of fitting
+	 numerous polynomials in a least-squares sense and that do not
+	 follow the natural ordering of the NDF data, in the most
+	 CPU-time-efficient way possible.
+
+         To do this requires the use of additional memory (of order
+	 one less than the dimensionality of the NDF itself, times the
+	 polynomial order squared).  To minimise the use of memory and
+	 get the fastest possible determinations you should not use
+	 weighting and assert that the input data do not have any BAD
+	 values (use the application SETBAD to set the appropriate
+	 flag).
+
+         \sstitem
+         You may need to determine empirically what is the best
+	 clipping limits and region to average if you choose to use
+	 the automatic range determination.  At present the binning
+	 factor is fixed to give 32 bins, unless the number of
+	 elements is fewer whereupon there is no binning with the
+	 averaged line.
+      }
    }
    \sstdiytopic{
       Related Applications
