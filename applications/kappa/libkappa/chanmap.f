@@ -749,7 +749,7 @@
      :               '   Forming channel map along pixel axis ^I '/
      :               /'between pixel ^L to pixel ^H inclusive.',
      :               STATUS )
-      CALL MSG_BLANK( ' ', STATUS )
+      CALL MSG_BLANK( STATUS )
       AEL = JHI - JLO + 1
 
 *  Set the bounds and dimensions of a single tile in the map.

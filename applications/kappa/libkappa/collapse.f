@@ -636,7 +636,7 @@
       CALL MSG_SETI( 'H', JHI )
       CALL MSG_OUT( 'COLLAPSE_MSG1', '   Collapsing pixel axis ^I '/
      :              /'from pixel ^L to pixel ^H inclusive...', STATUS )
-      CALL MSG_BLANK( ' ', STATUS )
+      CALL MSG_BLANK( STATUS )
       AEL = JHI - JLO + 1
 
 *  Define the output NDF's bounds.
