@@ -1,0 +1,225 @@
+/*
+*+
+*  Name:
+*     smf_open_newfile
+
+*  Purpose:
+*     Low-level file creation function
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     Library routine
+
+*  Invocation:
+
+*     smf_open_newfile( Grp * ingrp, int index, smf_dtype dtype, const
+*                       dim_t dims[], int ndims, int flags, smfData ** data, 
+*                       int *status);
+
+*  Arguments:
+*     ingrp = const Grp * (Given)
+*        NDG group identifier
+*     index = int (Given)
+*        Index corresponding to required file in group
+*     dtype = smf_dtype (Given)
+*        Data type of this smfData. Unsupported types result in an error.
+*     dims[] = dim_t (Given)
+*        Array of dimensions. Values will be copied from this array.
+*     ndims = int (Given)
+*        Number of dimensions in dims[]. Maximum of NDF__MXDIM.
+*     flags = int (Given)
+*        Flags to denote whether to create flatfield, header, or file components
+*     data = smfData ** (Returned)
+*        Pointer to pointer smfData struct to be filled with file info and data
+*        Should be freed using smf_close_file.
+*     status = int* (Given and Returned)
+*        Pointer to global status.
+
+*  Description:
+*     This is the main routine to create new data files. The user
+*     supplies a Grp and index and the properties of the DATA array
+*     they wish to create. The routine returns a populated smfData
+*     with the DATA pointer mapped and ready to accept values.
+*
+*     The routine only maps a DATA array; if VARIANCE and QUALITY
+*     components are desired then they should be added and mapped
+*     separately.
+*
+*     A simple NDF file is created with just a DATA array - the user
+*     can use smf_get_xloc and smf_get_ndfid to add more components
+
+*  Notes:
+*     - Cloned from smf_open_file.c
+*     - Limited to data with no more than 3 dimensions
+*     - Additional components added to this file must be unmapped
+        separately
+
+*  Authors:
+*     Andy Gibb (UBC)
+*     {enter_new_authors_here}
+
+*  History:
+*     2006-07-20 (AGG):
+*        Initial test version
+*     {enter_further_changes_here}
+
+*  Copyright:
+*     Copyright (C) 2006 University of British Columbia. All Rights
+*     Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
+
+/* Standard includes */
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+/* Starlink includes */
+#include "sae_par.h"
+#include "star/ndg.h"
+#include "star/grp.h"
+#include "ndf.h"
+#include "mers.h"
+#include "msg_par.h"
+#include "prm_par.h"
+#include "par.h"
+
+/* SMURF includes */
+#include "smf.h"
+#include "smf_typ.h"
+#include "smf_err.h"
+
+#define FUNC_NAME "smf_open_newfile"
+
+void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, const int ndims, 
+		       const dim_t dims[], int flags, smfData ** data, 
+		       int *status) {
+
+  /* Local variables */
+  int newndf;                   /* NDF identified for new file */
+  char *pname = NULL;           /* Pointer to filename */
+  int i;                        /* Loop counter */
+  char filename[GRP__SZNAM+1]; /* Input filename, derived from GRP */
+  char datatype[PAR__SZTYP];    /* String for data type */
+  int nel;                      /* Number of mapped elements */
+  smfFile *file = NULL;         /* Pointer to smfFile struct */
+
+  int lbnd[3];                  /* Array of lower bounds */
+  int ubnd[3];                  /* Array of upper bounds */
+  int isNDF = 1;                /* Flag to denote whether data are 1 or 2-D */
+  int isTstream = 0;            /* Flag to denote time series (3-D) data */
+  void *pntr[3] = { NULL, NULL, NULL }; /* Array of pointers for smfData */
+
+  if ( *status != SAI__OK ) return;
+
+  /* Return a null pointer to the smfData if the input grp is null */
+  if ( igrp == NULL ) {
+    *data = NULL;
+    return;
+  }
+
+  /* Create empty smfData with no extra components */
+  flags |= SMF__NOCREATE_DA;
+  flags |= SMF__NOCREATE_HEAD;
+  flags |= SMF__NOCREATE_FILE;
+  *data = smf_create_smfData( flags, status);
+
+  /* Set the requested data type */
+  (*data)->dtype = dtype;
+
+  /* Check requested dimensionality: currently only up to 3 dimensions */
+  if (ndims == 2 || ndims == 1) {
+    isNDF = 1;
+    isTstream = 0; /* Data are not in time series format */
+  } else if (ndims == 3) { /* Time series data */
+    /* Check if we want to write raw timeseries */
+    if ( dtype == SMF__USHORT ) {
+      isNDF = 0;   /* Data have not been flatfielded */
+    } else {
+      isNDF = 1;   /* Data have been flatfielded */
+    }
+    isTstream = 1; /* Data are in `time series' format */
+  } else {
+    /* Report an error due to an unsupported number of dimensions */
+    if ( *status == SAI__OK) {
+      *status = SAI__ERROR;
+      msgSeti( "NDIMS", ndims);
+      errRep( FUNC_NAME, 
+	      "Number of dimensions in output, ^NDIMS, is not equal to 1, 2 or 3",
+	      status);
+      return;
+    }
+  }
+
+  /* Set datatype string */
+  strncpy(datatype, smf_dtype_string( *data, status ), PAR__SZTYP);
+  if ( datatype == NULL ) {
+    if (*status == SAI__OK) {
+      *status = SAI__ERROR;
+      errRep( FUNC_NAME, "Unsupported data type. Unable to open new file.", 
+	      status );
+    }
+  }
+
+  /* Fill ubnd and lbnd arrays */
+  for ( i=0; i<ndims; i++) {
+    lbnd[i] = 1;
+    ubnd[i] = (int)(dims[i]);
+  }
+
+  /* Create new simple NDF */
+  ndgNdfcr( igrp, index, datatype, ndims, lbnd, ubnd, &newndf, status );
+  if ( *status != SAI__OK ) {
+    errRep(FUNC_NAME, "Unable to create new file", status);
+    return;
+  }
+
+  ndfMap(newndf, "DATA", datatype, "WRITE", &(pntr[0]), &nel, status);
+  if ( *status != SAI__OK ) {
+    errRep(FUNC_NAME, "Unable to map data array", status);
+    return;
+  }
+
+  /* Get filename from the group */
+  pname = filename;
+  grpGet( igrp, index, 1, &pname, SMF_PATH_MAX, status);
+  if ( *status != SAI__OK ) {
+    errRep(FUNC_NAME, "Unable to retrieve file name", status);
+    return;
+  }
+
+  file = smf_construct_smfFile( NULL, newndf, 0, isTstream, pname, 
+				status );
+  if ( *status != SAI__OK ) {
+    errRep(FUNC_NAME, "Unable to construct smfFile for new file", status);
+  }
+
+  *data = smf_construct_smfData( *data, file, NULL, NULL, dtype, pntr, dims, ndims, 
+				 0, 0, NULL, NULL, status);
+
+  if ( *status != SAI__OK ) {
+    errRep(FUNC_NAME, "Unable to construct smfData for new file", status);
+  }
+
+}
