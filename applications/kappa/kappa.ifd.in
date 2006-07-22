@@ -12517,7 +12517,7 @@ iraf! {
             ppath CURRENT DEFAULT
             prompt {Clipping standard deviations to reject outliers}
             helpkey *
-            default 2 2.5 3
+            default 2 2 2.5 3
             size *
           }
 
