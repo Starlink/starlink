@@ -12495,7 +12495,7 @@ iraf! {
          parameter auto {
             type _LOGICAL
             vpath DEFAULT
-            ppath DEFAULT
+            ppath CURRENT DEFAULT
             prompt {Automatic selection of fitting ranges?}
             default FALSE
             helpkey *
@@ -12566,9 +12566,18 @@ iraf! {
             vpath PROMPT
             ppath CURRENT DEFAULT
             default !
-            prompt {Coordinate ranges (pairs)}
+            prompt {Co-ordinate ranges (pairs)}
             helpkey *
             size *
+          }
+
+         parameter section {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Section to be averaged to determine fitting ranges}
+            default !
+            helpkey *
           }
 
          parameter subtract {
@@ -12577,15 +12586,6 @@ iraf! {
             ppath CURRENT DEFAULT
             default FALSE
             prompt {Subtract trends}
-            helpkey *
-          }
-
-         parameter section {
-            type LITERAL
-            vpath DEFAULT
-            ppath CURRENT
-            prompt {Section to be averaged to determine fitting ranges}
-            default !
             helpkey *
           }
 
