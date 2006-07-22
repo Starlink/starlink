@@ -27,10 +27,13 @@
 *     that only lies within a series of co-ordinate ranges along the
 *     selected axis.
 *
-*     The ranges may be determined automatically by averaging lines,
-*     binning neighbouring pixels within the average line, performing a
-*     linear fit, and rejecting the outliers, iteratively.
-*     
+*     The ranges may be determined automatically.  It this mode the
+*     application averages selected lines, and bins neighbouring pixels
+*     within this average line.  Then it performs a linear fit upon the
+*     binned line, and rejects the outliers, iteratively with
+*     standard-deviation clipping.  The ranges are the intervals between
+*     the rejected points, rescaled to the original pixels.
+*
 *     Once the trends have been determined they can either be stored
 *     directly or subtracted from the input data.  If stored directly
 *     they can be subtracted later.  The advantage of that approach is
@@ -128,10 +131,10 @@
 *        written to the data cube called detrend.
 
 *  Notes:
-*     This application attempts to solve the problem of fitting numerous
-*     polynomials in a least-squares sense and that do not follow the
-*     natural ordering of the NDF data, in the most CPU-time-efficient
-*     way possible.
+*     -  This application attempts to solve the problem of fitting 
+*     numerous polynomials in a least-squares sense and that do not 
+*     follow the natural ordering of the NDF data, in the most 
+*     CPU-time-efficient way possible.
 *
 *     To do this requires the use of additional memory (of order one
 *     less than the dimensionality of the NDF itself, times the
@@ -139,6 +142,11 @@
 *     the fastest possible determinations you should not use weighting
 *     and assert that the input data do not have any BAD values (use the
 *     application SETBAD to set the appropriate flag).
+*     -  You may need to determine empirically what is the best
+*     clipping limits and region to average if you choose to use the
+*     automatic range determination.  At present the binning factor
+*     is fixed to give 32 bins, unless the number of elements is
+*     fewer whereupon there is no binning with the averaged line.
 
 *  Related Applications:
 *     FIGARO: FITCONT, FITPOLY; CCDPACK: DEBIAS; KAPPA: SETBAD.
@@ -195,6 +203,7 @@
       INCLUDE 'AST_PAR'          ! AST parameters and functions
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'MSG_PAR'          ! Message-system constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
       INCLUDE 'PRM_PAR'          ! Magic-value definitions
@@ -209,7 +218,7 @@
                                  ! real
 
 *  Local Constants:
-      INTEGER MAXRNG            ! Maximum number of range limits
+      INTEGER MAXRNG             ! Maximum number of range limits
       PARAMETER( MAXRNG = 20 )
 
       INTEGER MXCLIP             ! Maximum number of clips of the data
@@ -393,7 +402,22 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-      IF ( .NOT. AUTO ) THEN
+      IF ( AUTO ) THEN
+         CALL MSG_BLANK( STATUS )
+         CALL MSG_OUTIF( MSG__NORM, 'AUTOWARN1',
+     :     'WARNING: The automatic mode has undergone only moderate '//
+     :     'testing.  Check that the regions used for fitting '//
+     :     'reported below are sensible, i.e. avoid features like '//
+     :     'spectral lines.', STATUS )
+         CALL MSG_BLANK( STATUS )
+         CALL MSG_OUTIF( MSG__NORM, 'AUTOWARN2',
+     :     'Feedback is welcome on the tuning of the CLIP '//
+     :     'parameter''s default, the size of the default averaging '//
+     :     'region, the binning resolution, and whether or not the '//
+     :     'simple linear fit is adequate for detecting features '//
+     :     'and not rejecting curvature in the trend.', STATUS )
+         CALL MSG_BLANK( STATUS )
+      ELSE
 
 *  Get the ranges to use. These values are transformed from current
 *  co-ordinates along the fit axis to pixel co-ordinates on some
@@ -583,7 +607,7 @@
          CALL MSG_SETI( 'H', RANGES( I + 1 ) )
          CALL MSG_OUT( ' ', '      ^L : ^H ', STATUS )
       END DO
-      CALL MSG_BLANK( ' ', STATUS )
+      CALL MSG_BLANK( STATUS )
 
 *  Convert ranges into indices of the NDF data arrays by correcting for
 *  the origin.
