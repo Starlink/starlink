@@ -1314,10 +1314,11 @@ static int FrameSetParseProc( ClientData clientData, Tcl_Interp *interp,
                               Tk_Window tkwin, CONST char *value,
                               char *widgRec, int offset )
 {
-    int iaxes[1];
     AstFrame *picked;
-    long longResult;
     SPItem *spPtr = (SPItem *) widgRec;
+    const char *sideband;
+    int iaxes[1];
+    long longResult;
 
     if ( Tcl_ExprLong( interp, value, &longResult ) != TCL_OK ) {
         return TCL_ERROR;
@@ -1336,6 +1337,16 @@ static int FrameSetParseProc( ClientData clientData, Tcl_Interp *interp,
     iaxes[0] = 1;
     picked = astPickAxes( spPtr->framesets[0], 1, iaxes, NULL );
     spPtr->isDSB = astIsADSBSpecFrame( picked );
+    if ( spPtr->isDSB ) {
+
+        /* If the sideband is set to "LO", then in fact we still treat this as
+         * a normal spectrum, check that. If this becomes switchable then this
+         * test will need to be applied everytime isDSB is accessed. */
+        sideband = astGetC( spPtr->framesets[0], "SideBand" );
+        if ( strcmp( "LO", sideband ) == 0 ) {
+            spPtr->isDSB = 0;
+        }
+    }
     astAnnul( picked );
 
     return TCL_OK;
