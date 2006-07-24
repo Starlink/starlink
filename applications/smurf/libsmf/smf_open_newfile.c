@@ -63,6 +63,8 @@
 *  History:
 *     2006-07-20 (AGG):
 *        Initial test version
+*     2006-07-24 (AGG):
+*        Change datatype to a char* and avoid strncpy()
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -120,8 +122,8 @@ void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, const int ndims,
   int newndf;                   /* NDF identified for new file */
   char *pname = NULL;           /* Pointer to filename */
   int i;                        /* Loop counter */
-  char filename[GRP__SZNAM+1]; /* Input filename, derived from GRP */
-  char datatype[PAR__SZTYP];    /* String for data type */
+  char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
+  char *datatype;               /* String for data type */
   int nel;                      /* Number of mapped elements */
   smfFile *file = NULL;         /* Pointer to smfFile struct */
 
@@ -173,7 +175,7 @@ void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, const int ndims,
   }
 
   /* Set datatype string */
-  strncpy(datatype, smf_dtype_string( *data, status ), PAR__SZTYP);
+  datatype = smf_dtype_string( *data, status );
   if ( datatype == NULL ) {
     if (*status == SAI__OK) {
       *status = SAI__ERROR;
