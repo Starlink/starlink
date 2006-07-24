@@ -198,7 +198,12 @@ itcl::class gaia::GaiaCubeBaseline {
       set tmpimage_ "GaiaTempCube${count_}"
       incr count_
 
-      #  Need to determine ranges.
+      #  Need to determine ranges. Note handle case when coordinate system
+      #  doesn't match the disk-file anymore.
+      lassign [$itk_option(-spec_coords) get_system] system units
+      if { $system != "default" && $system != {} } {
+         $itk_option(-spec_coords) set_system "default" "default" 1
+      }
       set ranges ""
       for {set i 0} {$i < $itk_option(-nranges)} {incr i} {
          if { $enable_range_($i) } {
@@ -209,6 +214,10 @@ itcl::class gaia::GaiaCubeBaseline {
             lappend ranges $lb $ub
          }
       }
+      if { $system != "default" && $system != {} } {
+         $itk_option(-spec_coords) set_system $system $units 1
+      }
+
       if { $ranges != {} } {
          set ranges [join $ranges ","]
          $maintask_ runwiths "in=$ndfname out=$tmpimage_ axis=$axis \
