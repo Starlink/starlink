@@ -229,13 +229,24 @@ itcl::class gaia::GaiaCubeApps {
    #  Run the application and display the result.
    protected method doit_ {} {
 
-      #  Convert pixel bounds to world coordinates. If this fails
-      #  then we need to set the current domain of the cube to PIXEL
-      #  before processing.
+      #  Convert pixel bounds to world coordinates of the cube's default
+      #  system. If this fails then we need to attempt the current domain of
+      #  the cube to PIXEL before processing.
       set lbp [expr min($itk_option(-lower_limit),$itk_option(-upper_limit))]
       set ubp [expr max($itk_option(-lower_limit),$itk_option(-upper_limit))]
+
+      #  One twist is that the coordinate system should match that of the
+      #  disk-resident cube, so check that the coordinate system hasn't been
+      #  changed, if so switch back to the default system (temporily).
+      lassign [$itk_option(-spec_coords) get_system] system units
+      if { $system != "default" && $system != {} } {
+         $itk_option(-spec_coords) set_system "default" "default" 1
+      }
       set lb [$itk_option(-gaiacube) get_coord $lbp 1 0]
       set ub [$itk_option(-gaiacube) get_coord $ubp 1 0]
+      if { $system != "default" && $system != {} } {
+         $itk_option(-spec_coords) set_system $system $units 1
+      }
 
       set set_current_domain_ 0
       if { $lb == {} && $ub == {} } {
@@ -351,6 +362,9 @@ itcl::class gaia::GaiaCubeApps {
 
    #  The related GaiaCube instance.
    itk_option define -gaiacube gaiacube GaiaCube {}
+
+   #  The spectral coordinates instance.
+   itk_option define -spec_coords spec_coords Spec_Coords {}
 
    #  The identifier of the reference range.
    itk_option define -ref_id ref_id Ref_Id 1
