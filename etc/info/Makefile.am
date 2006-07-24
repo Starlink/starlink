@@ -2,4 +2,4 @@
 
 ## Scripts which end up in the binary installation directory.
 
-stardocs_DATA = docs_lis
+stardocs_DATA = docs_lis mud.bib
