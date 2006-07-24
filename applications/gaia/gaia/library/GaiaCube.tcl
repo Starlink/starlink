@@ -513,10 +513,11 @@ itcl::class gaia::GaiaCube {
    #  coordinates to be updated. Same as changing the axis, but without an
    #  actual change.
    protected method coords_changed_ {} {
+      $itk_component(spectrum) coord_system_changed
+
       set value $axis_
       incr axis_
       set_step_axis_ $value 0
-      $itk_component(spectrum) coord_system_changed
    }
 
    #  Set the plane to display and display it. When regen is true a new
