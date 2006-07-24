@@ -666,12 +666,13 @@ itcl::class gaia::GaiaCube {
       set coord2 [axis_grid2pixel $coord2]
 
       #  Set the limits of the control and get it to configure itself.
+      set cid $id
       if { $id > $baseline_id_ } {
-         set id $baseline_id_
+         set cid $baseline_id_
       }
-      $ref_range_controls_($id) configure -lower_limit $coord1 \
+      $ref_range_controls_($cid) configure -lower_limit $coord1 \
                                           -upper_limit $coord2
-      $ref_range_controls_($id) ref_range_moved $id $coord1 $coord2 $action
+      $ref_range_controls_($cid) ref_range_moved $id $coord1 $coord2 $action
    }
 
    #  Update the dummy NDF WCS so that it matches the current spectral
