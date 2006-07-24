@@ -15,9 +15,9 @@
 #     (assuming the FrameSet contains an axis with has a SpecFrame). The
 #     FrameSet is accessed using an GaiaNDAccess instance.
 #
-#     The disposition of the menu items can be changed to match those of 
+#     The disposition of the menu items can be changed to match those of
 #     a new GaiaNDAccess instance (these will be greyed by setting to
-#     disabled when the axis of the FrameSet is not a SpecFrame and 
+#     disabled when the axis of the FrameSet is not a SpecFrame and
 #     the velocity items with be greyed if a rest frequency has not been
 #     defined).
 
@@ -94,7 +94,7 @@ itcl::class gaia::GaiaSpecCoords {
    constructor {args} {
 
       #  Evaluate any options, normally the initial GaiaNDAccess instance and
-      #  the spectral axis index. 
+      #  the spectral axis index.
       eval configure $args
    }
 
@@ -119,11 +119,11 @@ itcl::class gaia::GaiaSpecCoords {
       if { $menu != {} } {
          foreach {descr unit system} $simple_systems_ {
             $menu add command -label "$descr" \
-               -command [code $this set_selected_system_ "$unit" "$system"]
+               -command [code $this set_system "$system" "$unit" 0]
          }
          foreach {descr unit system} $velocity_systems_ {
             $menu add command -label "$descr" \
-               -command [code $this set_selected_system_ "$unit" "$system"]
+               -command [code $this set_system "$system" "$unit" 0]
          }
       }
    }
@@ -167,10 +167,11 @@ itcl::class gaia::GaiaSpecCoords {
       }
    }
 
-   #  Apply the selected system to the AST FrameSet. 
-   #  Also eval the change_cmd is we have one.
-   protected method set_selected_system_ {unit system} {
+   #  Set the system and unit of the AST FrameSet. Also eval the change_cmd if
+   #  we have one and it is requested (quiet false).
+   public method set_system {system unit {quiet 0} } {
       if { $accessor != {} } {
+
          if { $system == "default" && [info exists default_system_($axis)] } {
             $accessor astset $default_system_($axis)
          } else {
@@ -181,18 +182,31 @@ itcl::class gaia::GaiaSpecCoords {
                $accessor astset "System($axis)=$system"
             }
          }
-         if { $change_cmd != {} } {
+
+         if { ! $quiet && $change_cmd != {} } {
             eval $change_cmd
          }
       }
    }
 
-   #  Record the default system for a particular axis of an accessor.
-   protected method set_default_system_ {} {
-      if { $accessor != {} && ! [info exists default_system_($axis)] } {
+   #  Return a list containing the current system and units. If this isn't
+   #  a specframe then no system and units are returned.
+   public method get_system {} {
+      if { $accessor != {} } {
          if { [$accessor isaxisframetype $axis "specframe"] } {
             set system [$accessor astget "System($axis)"]
             set units [$accessor astget "Unit($axis)"]
+            return "$system $units"
+         }
+      }
+      return [list "" ""]
+   }
+
+   #  Record the default system for a particular axis of an accessor.
+   protected method record_default_system_ {} {
+      if { $accessor != {} && ! [info exists default_system_($axis)] } {
+         if { [$accessor isaxisframetype $axis "specframe"] } {
+            lassign [get_system] system units
             set default_system_($axis) \
                "System($axis)=$system,Unit($axis)=$units"
          } else {
@@ -209,7 +223,7 @@ itcl::class gaia::GaiaSpecCoords {
    public variable accessor {} {
       if { $last_accessor_ != $accessor } {
          catch {unset default_system_}
-         set_default_system_
+         record_default_system_
          set last_accessor_ $accessor
       }
       reconfigure_menus_
@@ -217,7 +231,7 @@ itcl::class gaia::GaiaSpecCoords {
 
    #  The spectral axis (AST index). Updates the default system if needed.
    public variable axis 3 {
-      set_default_system_
+      record_default_system_
    }
 
    #  The last value for accessor, stops changes when is same.
@@ -239,7 +253,7 @@ itcl::class gaia::GaiaSpecCoords {
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  List of the possible spectral coordinates, excluding velocities. 
+   #  List of the possible spectral coordinates, excluding velocities.
    #  These are presented to the user as units only. The system is assumed.
    common simple_systems_ {
       "Default" "default" "default"
@@ -258,7 +272,7 @@ itcl::class gaia::GaiaSpecCoords {
       "Per-metre" "1/m" "WAVN"
    }
 
-   #  List of the possible spectral coordinates involving velocities. 
+   #  List of the possible spectral coordinates involving velocities.
    #  These are presented to the user as units only. The system is assumed.
    common velocity_systems_ {
       "Metres-per-sec (radio)" "m/s" "VRAD"
