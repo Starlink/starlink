@@ -28,7 +28,7 @@ smf_calc_stats.c smf_calc_covar.c \
 smf_create_smfArray.c smf_addto_smfArray.c \
 smf_calc_mapcoord.c smf_simplerebinmap.c smf_iteratemap.c \
 smf_open_mapcoord.c smf_close_mapcoord.c \
-smf_model_create.c smf_model_getname.c 
+smf_model_create.c smf_model_getname.c smf_open_newfile.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 

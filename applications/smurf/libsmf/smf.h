@@ -143,6 +143,9 @@ void smf_calc_stats( const smfData *data, const char *mode, const int index,
 double smf_calc_covar ( const smfData *data, const int i, const int j,
 			int lo, int hi, int *status);
 
+void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int *lbnd_out,
+                        int *ubnd_out, int *status );
+
 double smf_calc_wvm( const smfHead *hdr, int *status );
 
 void smf_check_flat ( const smfData *data, int *status );
@@ -169,16 +172,6 @@ void smf_close_smfGroup( smfGroup **group, int *status );
 void smf_correct_extinction( smfData *data, const char *method, 
 			     const int quick, double tau, int *status);
 
-smfData* smf_create_smfData( int flags, int * status );
-
-smfFile* smf_create_smfFile( int * status );
-
-smfHead* smf_create_smfHead( int * status );
-
-smfDA*   smf_create_smfDA( int * status );
-
-smfArray *smf_create_smfArray( const size_t size, int *status );
-
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
 		       smfDA * da, smf_dtype dtype, void * pntr[3], 
@@ -203,6 +196,15 @@ smfGroup *
 smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups, 
 			const int nrelated, int *status );
 
+smfArray *smf_create_smfArray( const size_t size, int *status );
+
+smfData* smf_create_smfData( int flags, int * status );
+
+smfFile* smf_create_smfFile( int * status );
+
+smfHead* smf_create_smfHead( int * status );
+
+smfDA*   smf_create_smfDA( int * status );
 
 smfHead * smf_deepcopy_smfHead ( const smfHead *old, int * status);
 
@@ -219,12 +221,11 @@ int smf_dtype_check( const smfData* data, const char * type, smf_dtype itype,
 void smf_dtype_check_fatal( const smfData* data, const char * type, 
                             smf_dtype itype, int *status );
 
+smf_dtype smf_dtype_fromstring( const char * dtype, int * status );
+
 char *smf_dtype_string( const smfData* data, int * status );
 
 size_t smf_dtype_size( const smfData* data, int * status );
-
-smf_dtype
-smf_dtype_fromstring( const char * dtype, int * status );
 
 void smf_fit_poly(const smfData *data, const int order, double *poly,  
                   int *status);
@@ -261,12 +262,12 @@ HDSLoc *smf_get_xloc ( const smfData *data, const char *extname,
 void smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave, 
 		      smfGroup **group, int *status );
 
+void smf_history_add( smfData* data, const char * appl, 
+			const char * text, int *status);
+
 int smf_history_check( const smfData* data, const char * appl, int *status);
 
 void smf_history_read( smfData* data, int *status);
-
-void smf_history_add( smfData* data, const char * appl, 
-			const char * text, int *status);
 
 void smf_history_write( const smfData* data, const char * appl, 
 			const char * text, int *status);
@@ -281,6 +282,19 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 void * smf_malloc( size_t nelem, size_t bytes_per_elem, int zero, 
                    int * status );
 
+void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0, 
+		    double lat_0, int flag, double pixsize, int *lbnd_out, 
+		    int *ubnd_out, AstFrameSet **outframeset, int *status );
+
+void smf_mapbounds_approx( Grp *igrp,  int size, char *system, double lon_0, 
+		    double lat_0, int flag, double pixsize, int *lbnd_out, 
+		    int *ubnd_out, AstFrameSet **outframeset, int *status );
+
+void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp, 
+		       int *status);
+
+void smf_model_getname( smf_modeltype type, const char *name, int *status);
+
 void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, 
 			      smfData **ffdata, int *status);
 
@@ -289,10 +303,25 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
 void smf_open_mapcoord( smfData *data, int *status );
 
+void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, const int ndims, 
+		       const dim_t dims[], int flags, smfData ** data, 
+		       int *status);
+
 void smf_open_related( const smfGroup *group, const int subindex, smfArray **relfiles, 
 		       int *status );
 
+void smf_rebinmap( smfData *data, int index, int size, 
+                   AstFrameSet *outframeset, int *lbnd_out, int *ubnd_out,
+                   double *map, double *variance,
+		   double *weights, int *status );
+
 double smf_scale_tau ( const double tauwvm, const char *filter, int *status);
+
+void smf_scanfit( smfData *data, int order, int *status );
+
+void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize, 
+			 int flags, double *map, double *mapweight, 
+			 double *mapvar, int msize, int *status );
 
 void smf_subtract_plane( smfData *data, const char *fittype, int *status);
 
@@ -302,49 +331,5 @@ void smf_tslice ( const smfData *idata, smfData **tdata, int index,
                   int *status );
 
 void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
-
-void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0, 
-		    double lat_0, int flag, double pixsize, int *lbnd_out, 
-		    int *ubnd_out, AstFrameSet **outframeset, int *status );
-
-void smf_mapbounds_approx( Grp *igrp,  int size, char *system, double lon_0, 
-		    double lat_0, int flag, double pixsize, int *lbnd_out, 
-		    int *ubnd_out, AstFrameSet **outframeset, int *status );
-
-void smf_rebinmap( smfData *data, int index, int size, 
-                   AstFrameSet *outframeset, int *lbnd_out, int *ubnd_out,
-                   double *map, double *variance,
-		   double *weights, int *status );
-
-void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int *lbnd_out,
-                        int *ubnd_out, int *status );
-
-void smf_scanfit( smfData *data, int order, int *status );
-
-
-void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize, 
-			 int flags, double *map, double *mapweight, 
-			 double *mapvar, int msize, int *status );
-
-void smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave, 
-		      smfGroup **group, int *status );
-
-smfGroup * smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups, 
-				   const int nrelated, int *status );
-
-void smf_open_related( const smfGroup *group, const int subindex, smfArray **relfiles, 
-		       int *status );
-
-void smf_close_related( smfArray **relfiles, int *status );
-
-void smf_close_mapcoord( smfData *data, int *status );
-
-void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp, 
-		       int *status);
-
-void smf_model_getname( smf_modeltype type, const char *name, int *status);
-
-void smf_close_smfGroup( smfGroup **group, int *status );
-
 
 #endif /* SMF_DEFINED */
