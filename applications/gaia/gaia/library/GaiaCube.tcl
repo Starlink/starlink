@@ -289,7 +289,8 @@ itcl::class gaia::GaiaCube {
             -upper_limit $plane_ \
             -show_ref_range 0 \
             -labelwidth $lwidth \
-            -valuewidth $vwidth
+            -valuewidth $vwidth \
+            -spec_coords [code $spec_coords_]
       }
       set ref_range_controls_($ref_ids) $itk_component(collapse)
       pack $itk_component(collapse) -side top -fill both -ipadx 1m -ipady 2m
@@ -310,7 +311,8 @@ itcl::class gaia::GaiaCube {
             -upper_limit $plane_ \
             -show_ref_range 0 \
             -labelwidth $lwidth \
-            -valuewidth $vwidth
+            -valuewidth $vwidth \
+            -spec_coords [code $spec_coords_]
       }
       set ref_range_controls_($ref_ids) $itk_component(chanmap)
       pack $itk_component(chanmap) -side top -fill both -ipadx 1m -ipady 2m
@@ -332,7 +334,8 @@ itcl::class gaia::GaiaCube {
             -upper_limit $plane_ \
             -show_ref_range 0 \
             -labelwidth $lwidth \
-            -valuewidth $vwidth
+            -valuewidth $vwidth \
+            -spec_coords [code $spec_coords_]
       }
       set ref_range_controls_($baseline_id_) $itk_component(baseline)
       pack $itk_component(baseline) -side top -fill both -expand 1 \
