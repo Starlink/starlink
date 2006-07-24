@@ -39,6 +39,9 @@
 *     error occurs a NULL pointer is returned, including the case that
 *     the file is not open for write access if a new extension has to
 *     be created.
+*
+*     For returning locators to existing extensions the extype, ndims
+*     and dims can all be left blank (i.e. "", 0, 0 respectively).
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -50,6 +53,8 @@
 *     2006-07-17 (AGG):
 *        Check that the file is open for write access if a new
 *        extension is needed
+*     2006-07-24 (AGG):
+*        Update prologue for dealing with existing extensions
 *     {enter_further_changes_here}
 
 *  Copyright:
