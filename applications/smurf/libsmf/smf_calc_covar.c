@@ -78,7 +78,6 @@
 
 /* Standard includes */
 #include <stdio.h>
-#include <string.h>
 
 /* GSL includes */
 #include <gsl/gsl_statistics_double.h>
@@ -128,8 +127,7 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
     }
   } else {
     nframes = (data->dims)[2];
-    /*    nbol =  (data->dims)[0] * (data->dims)[1];*/
-    nbol =  1280;
+    nbol =  (data->dims)[0] * (data->dims)[1];
   }
 
   /* Should check data type for double */
