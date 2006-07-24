@@ -43,6 +43,9 @@
 *     created if necessary. If an error occurs a value of NDF__NOID is
 *     returned. It is up to the user to annul the NDF returned by this
 *     routine.
+*
+*     For accessing existing NDFs the dattype, ndims, lbnd and ubnd
+*     can all be left blank ("", 0, 0, 0 respectively).
 
 * Notes:
 *     - Note that if the named NDF exists, opening it with WRITE access
@@ -57,6 +60,8 @@
 *        Initial version
 *     2006-05-16 (AGG):
 *        Add status checking, check if placeholder returned from ndfOpen
+*     2006-07-24 (AGG):
+*        Update prologue for dealing with existing NDFs
 *     {enter_further_changes_here}
 
 *  Copyright:
