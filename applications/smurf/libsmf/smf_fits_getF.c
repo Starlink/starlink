@@ -40,6 +40,8 @@
 *     2006-01-24 (TIMJ):
 *        There is no "float" version of astGetFits, so use astGetFitsD
 *        and cast the result.
+*     2006-07-24 (TIMJ):
+*        Fix compiler warning by casting 0.0
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -96,7 +98,7 @@ void smf_fits_getF (const smfHead *hdr, const char * name, float * result, int *
   if (*status == SAI__OK) {
     *result = (float)astres;
   } else {
-    *result = 0.0;
+    *result = (float)0.0;
   }
 
   return;
