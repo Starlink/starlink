@@ -128,7 +128,8 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
     }
   } else {
     nframes = (data->dims)[2];
-    nbol =  (data->dims)[0] * (data->dims)[1];
+    /*    nbol =  (data->dims)[0] * (data->dims)[1];*/
+    nbol =  1280;
   }
 
   /* Should check data type for double */
@@ -136,7 +137,7 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
   if ( *status != SAI__OK) return covar;
 
   /* Check bolometer indices are in range */
-  if ( i > nframes || index < 0 ) {
+  if ( i > nframes || i < 0 ) {
     if ( *status == SAI__OK) {
       msgSeti("I", i);
       msgSeti("N", nframes);
@@ -145,7 +146,7 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
       return covar;
     }
   }
-  if ( j > nframes || index < 0 ) {
+  if ( j > nframes || j < 0 ) {
     if ( *status == SAI__OK) {
       msgSeti("I", j);
       msgSeti("N", nframes);
