@@ -171,9 +171,13 @@ itcl::class gaia::GaiaSpecCoords {
    #  we have one and it is requested (quiet false).
    public method set_system {system unit {quiet 0} } {
       if { $accessor != {} } {
-
-         if { $system == "default" && [info exists default_system_($axis)] } {
-            $accessor astset $default_system_($axis)
+         if { $system == "default" } {
+            
+            #  If this isn't set then no specframe, so at default already
+            #  and nothing to do.
+            if { [info exists default_system_($axis)] } {
+               $accessor astset $default_system_($axis)
+            }
          } else {
             if { $unit != "" } {
                $accessor astset "System($axis)=$system,Unit($axis)=$unit"
@@ -190,13 +194,19 @@ itcl::class gaia::GaiaSpecCoords {
    }
 
    #  Return a list containing the current system and units. If this isn't
-   #  a specframe then no system and units are returned.
+   #  a specframe then no system and units are returned. If the system is the
+   #  default one then the string "default" is returned.
    public method get_system {} {
       if { $accessor != {} } {
          if { [$accessor isaxisframetype $axis "specframe"] } {
             set system [$accessor astget "System($axis)"]
             set units [$accessor astget "Unit($axis)"]
-            return "$system $units"
+            set astatt "System($axis)=$system,Unit($axis)=$units"
+            if { [info exists default_system_] && 
+                 $astatt != $default_system_($axis) } {
+               return "$system $units"
+            }
+            return [list "default" "default"]
          }
       }
       return [list "" ""]
@@ -206,7 +216,8 @@ itcl::class gaia::GaiaSpecCoords {
    protected method record_default_system_ {} {
       if { $accessor != {} && ! [info exists default_system_($axis)] } {
          if { [$accessor isaxisframetype $axis "specframe"] } {
-            lassign [get_system] system units
+            set system [$accessor astget "System($axis)"]
+            set units [$accessor astget "Unit($axis)"]
             set default_system_($axis) \
                "System($axis)=$system,Unit($axis)=$units"
          } else {
