@@ -87,7 +87,7 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 
 int main() {
   char foo[] = " name 1111.1 ";
-  char mingw[] = "system= FK4_NO_E ";
+  char mingw[] = "system= FK4_NO_E";
 
   char bar[8];
   float ff;
