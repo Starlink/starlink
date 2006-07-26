@@ -86,14 +86,21 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 
 int main() {
   char foo[] = " name 1111.1 ";
+  char mingw[] = "system= FK4_NO_E ";
 
   char bar[8];
   float ff;
+  int system;
   int nc;
   int r;
 
   nc = 0;
   r = sscanf(foo, " %s %f %n", bar, &ff, &nc);
+
+  if ( nc == 13 ) {
+     nc = sscanf( mingw, "system= %n%*s %n", &system, &nc );
+     if ( nc != 0 ) nc = 13;
+  }
   exit( ( nc != 13 ) ? 0 : 1 );
 }
 
