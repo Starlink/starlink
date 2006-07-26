@@ -81,6 +81,11 @@ char *gaiaUtilsErrMessage()
 
     /* Recover error status from EMS */
     emsStat( &status_copy );
+    
+    /* Check for programming errors and protect against them */
+    if ( status_copy == SAI__OK ) {
+        return strdup( "No EMS error status (possible programming error)" );
+    }
 
     /* Loop until all error has been read */
     while ( status_copy != SAI__OK ) {
