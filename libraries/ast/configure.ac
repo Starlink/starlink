@@ -98,7 +98,7 @@ int main() {
   r = sscanf(foo, " %s %f %n", bar, &ff, &nc);
 
   if ( nc == 13 ) {
-     nc = sscanf( mingw, "system= %n%*s %n", &system, &nc );
+     r = sscanf( mingw, "system= %n%*s %n", &system, &nc );
      if ( nc != 0 ) nc = 13;
   }
   exit( ( nc != 13 ) ? 0 : 1 );
