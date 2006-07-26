@@ -42,6 +42,8 @@
  *        Have CPP define for large hds dim
  *     2006-Jan-04 (PWD):
  *        Use inttypes.h in preference to stdint.h.
+ *     2006-Jul-25 (PWD):
+ *        More fixes for MINGW handling of "long long" printfs.
 
  *  Copyright:
  *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -103,8 +105,13 @@
 #if HAVE_INT64_T && HAVE_UINT64_T
 #define INT_BIG "int64_t"
 #define UINT_BIG "uint64_t"
+#if __MINGW32__
+#define INT_BIG_S "I64d"
+#define INT_BIG_U "I64u"
+#else
 #define INT_BIG_S "lld"
 #define INT_BIG_U "llu"
+#endif
 #elif SIZEOF_LONG == 8
 #define INT_BIG "long int"
 #define UINT_BIG "unsigned long int"

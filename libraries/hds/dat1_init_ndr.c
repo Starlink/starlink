@@ -897,7 +897,7 @@ may require modification for use on this machine.",\
 /* Define a macro to format the minimum floating point values using a       */
 /* specified number of decimal digits of precision to determine how many    */
 /* characters are required.                                                 */
-#if HAVE_LONG_DOUBLE
+#if HAVE_LONG_DOUBLE && ! __MINGW32__
 #define _txtsizef( min, digits, txtsize )\
       {\
          char buf[ BUFSIZE + 1 ];/* Buffer for formatted value              */\
