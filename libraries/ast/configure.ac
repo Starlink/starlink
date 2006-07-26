@@ -77,7 +77,8 @@ STAR_CNF_F2C_COMPATIBLE
 STAR_MESSGEN(ast_err.msg)
 
 #   Test for non-ANSI behaviour in sscanf on some platforms, reported by
-#   Bill Joye. 
+#   Bill Joye. Also check for bad MINGW sscanf. That returns nc=0 in the
+#   System test.
 AC_MSG_CHECKING([whether the sscanf function is ANSI-compatible])
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
 
@@ -98,6 +99,7 @@ int main() {
   r = sscanf(foo, " %s %f %n", bar, &ff, &nc);
 
   if ( nc == 13 ) {
+     nc = 0;
      r = sscanf( mingw, "system= %n%*s %n", &system, &nc );
      if ( nc != 0 ) nc = 13;
   }
