@@ -1,6 +1,6 @@
 #ifndef HEADGEN___src_sc2store_sc2store_h
 #define HEADGEN___src_sc2store_sc2store_h 
- 
+
  
 /*+ sc2store_compress - compress frame of integers to unsigned short */
 
@@ -88,7 +88,7 @@ int *status        /* global status (given and returned) */
 void sc2store_headget
 (
 int frame,                    /* frame index (given) */
-struct sc2head *head,         /* header data for the frame (returned) */
+JCMTState *head,         /* header data for the frame (returned) */
 int *status                   /* global status (given and returned) */
 );
 
@@ -106,7 +106,7 @@ int *status                   /* global status (given and returned) */
 void sc2store_headput
 (
 int frame,                    /* frame index (given) */
-struct sc2head head,          /* header data for the frame (given) */
+JCMTState head,          /* header data for the frame (given) */
 int *status                   /* global status (given and returned) */
 );
 
@@ -248,7 +248,7 @@ int *rowsize,            /* number of pixels in row (returned) */
 int *nframes,            /* number of frames (returned) */
 int *nflat,              /* number of flat coeffs per bol (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
-struct sc2head **frhead, /* header data for each frame (returned) */
+JCMTState *frhead[],     /* header data for each frame (returned) */
 int **outdata,           /* pointer to data array (returned) */
 int **dksquid,           /* pointer to dark SQUID values (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
@@ -277,7 +277,7 @@ int rowsize,       /* number of bolometers in row (given) */
 int numsamples,    /* number of samples (given) */
 int nflat,         /* number of flat coeffs per bol (given) */
 char *flatname,    /* name of flatfield algorithm (given) */
-struct sc2head head[], /* header data for each frame (given) */
+JCMTState head[],  /* header data for each frame (given) */
 int *dbuf,         /* time stream data (given) */
 int *darksquid,    /* dark SQUID time stream data (given) */
 double *fcal,      /* flat-field calibration (given) */

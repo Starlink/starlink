@@ -96,6 +96,8 @@
 *        smf_open_related, smf_close_related and smf_close_smfGroup
 *     2006-07-11 (EC):
 *        Add smf_model_create, smf_model_getnames
+*     2006-07-26 (TIMJ):
+*        Replace sc2head with JCMTState.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -189,7 +191,7 @@ smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
 smfHead *
 smf_construct_smfHead( smfHead * tofill,
 		       AstFrameSet * wcs, AstFitsChan * fitshdr,
-		       struct sc2head * allsc2heads,
+		       JCMTState * allState,
 		       dim_t curframe, dim_t nframes, int * status );
 
 smfGroup * 

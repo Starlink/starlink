@@ -31,11 +31,14 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-02-03 (AGG):
 *        Initial test version
+*     2006-07-26 (TIMJ):
+*        sc2head no longer used. Use JCMTState instead.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -86,7 +89,7 @@
 double smf_calc_wvm( const smfHead *hdr, int *status ) {
 
   double airmass;           /* Airmass of current observation */
-  sc2head *sc2head;         /* sc2head struct containing TCS info */
+  JCMTState * state;        /* STATE struct containing TCS info */
   double tau;               /* Zenith tau at current wavelength */
   float wvm[3];             /* WVM temperature in the 3 channels */
 
@@ -102,14 +105,14 @@ double smf_calc_wvm( const smfHead *hdr, int *status ) {
   if ( *status != SAI__OK) return VAL__BADD;
 
   /* Store TCS info */
-  sc2head = hdr->sc2head;
+  state = hdr->state;
 
   /* Retrieve WVM brightness temperatures and the airmass from the
      header */
-  wvm[0] = sc2head->wvm_t12;
-  wvm[1] = sc2head->wvm_t42;
-  wvm[2] = sc2head->wvm_t78;
-  airmass = sc2head->tcs_airmass;
+  wvm[0] = state->wvm_t12;
+  wvm[1] = state->wvm_t42;
+  wvm[2] = state->wvm_t78;
+  airmass = state->tcs_airmass;
 
   /* Retrieve the ambient temperature */
   /* FUTURE: interpolate to current timeslice */

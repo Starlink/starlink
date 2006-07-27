@@ -47,27 +47,22 @@
 *     {enter_new_authors_here}
 
 *  History :
-*     2006-03-28: Original version (EC)
-*     2006-04-19: Added jiggle offsets, filename consistent with mjd (EC)
-*     2006-06-06  (AGG/EC/JB): Clone from smurf_makemap
-*     2006-06-09  Added heatrun task (JB)
-*     {enter_further_changes_here}
-
-*    History (HEATRUN task):
-*     2005-02-16:  original (bdk@roe.ac.uk)
-*     2005-05-18:  get xbc, ybc from instrinit (bdk)
-*     2005-05-20:  add flatcal (bdk)
-*     2005-06-17:  allocate workspace dynamically (bdk)
-*     2005-08-19:  do calibration fit, remove flux2cur flag check (bdk)
-*     2005-10-04:  change to new data interface (bdk)
-*     2006-01-13:  write subarray name (elc)
-*     2006-01-24:  write filter/atstart/atend (elc)
-*     2006-06-09:  added to smurf_sim (jb)
+*     28-MAR-2006 (EC):
+*        Original version (EC)
+*     19-APR-2006 (EC):
+*        Added jiggle offsets, filename consistent with mjd (EC)
+*     06-JUN-2006 (AGG/EC/JB):
+*        Clone from smurf_makemap
+*     09-JUN-2006 (JB):
+*        Added heatrun task from simulator (JB)
+*     26-JUL-2006 (TIMJ):
+*        Use JCMTState instead of sc2head.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006 University of British Columbia.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -116,7 +111,7 @@
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
 #include "sc2da/sc2store_par.h"
-#include "sc2da/sc2store_struct.h"
+#include "jcmt/state.h"
 #include "sc2da/sc2math.h"
 #include "sc2da/sc2store.h"
 #include "sc2da/sc2ast.h"
@@ -212,7 +207,7 @@ void smurf_sc2sim( int *status ) {
    int frame;                      /* frame counter */
    AstFrameSet *fset=NULL;         /* World coordinate transformations */
    double grid[64][2];             /* PONG grid coordinates */
-   struct sc2head *head;           /* per-frame headers */
+   JCMTState *head;                /* per-frame headers */
    double *heater=NULL;            /* bolometer heater ratios */
    char heatname[DREAM__FLEN];     /* name of flatfield cal file */
    double *heatptr;                /* pointer to list of heater settings */ 
@@ -339,8 +334,8 @@ void smurf_sc2sim( int *status ) {
       /* Get the file close time */
       parGet0i("MAXWRITE", &maxwrite, status);
 
-      /* Allocate space for the sc2head array */
-      head = ( struct sc2head * )smf_malloc( 1, sizeof( struct sc2head[maxwrite] ), 1, status );
+      /* Allocate space for the JCMTState array */
+      head = smf_malloc( maxwrite, sizeof( JCMTState ), 1, status );
 
       /* Annul fset here because we will re-calculate it later. */
       fset = astAnnul(fset);
@@ -687,7 +682,6 @@ void smurf_sc2sim( int *status ) {
 
 		  /* RTS -----------------------------------------------------------*/
 		  head[j].rts_num = firstframe+j;           /* sequence number?    */
-		  head[j].rts_step = inx.sample_t/1000.;    /* sample time in sec. */
 		  head[j].rts_end = mjuldate[firstframe+j]; /* end of integration  */ 
 
 		  /* TCS - Telescope tracking structure --------------------------- */
@@ -829,8 +823,8 @@ void smurf_sc2sim( int *status ) {
      dbuf = (double *)smf_malloc ( numsamples*nbol, sizeof(double), 1, status );
      digits = (int *)smf_malloc ( numsamples*nbol, sizeof(int), 1, status );
      dksquid = (int *)smf_malloc ( numsamples*inx.nboly, sizeof(int), 1, status );
-     head = (struct sc2head *)smf_malloc ( inx.numsamples, 
-					   sizeof(struct sc2head), 1, status );
+     head = smf_malloc ( numsamples, 
+			 sizeof(JCMTState), 1, status );
 
      /* Generate the list of heater settings */
 

@@ -54,6 +54,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,11 +72,14 @@
 *        subsequent timesteps
 *     2006-04-21 (AGG):
 *        Add history check, and update history if routine successful
+*     2006-07-26 (TIMJ):
+*        sc2head no longer used. Use JCMTState instead.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006 University of British Columbia.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -305,7 +309,7 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 
 	/*	printf("alpha = %g\n",alpha);*/
       }
-      dalpha = hdr->sc2head->tcs_az_ang - alpha;
+      dalpha = hdr->state->tcs_az_ang - alpha;
       alpha += dalpha;
       for (i=0; i< npts; i++) {
 	ynew[i] = yin[i] * cos( alpha );

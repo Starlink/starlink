@@ -34,11 +34,14 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-06-13 (AGG):
 *        Clone from smurf_makemap
+*     26-JUL-2006 (TIMJ):
+*        Remove unused sc2 includes.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -89,9 +92,7 @@
 #include "libsmf/smf_err.h"
 
 #include "sc2da/sc2store_par.h"
-#include "sc2da/sc2store_struct.h"
 #include "sc2da/sc2math.h"
-#include "sc2da/sc2store.h"
 #include "sc2da/sc2ast.h"
 #include "sc2da/dream_par.h"
 

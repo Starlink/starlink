@@ -54,6 +54,8 @@
 *     2006-07-12 (AGG):
 *        Return polynomial subtraction since it removes bolometer
 *        drifts, not the sky
+*     26-JUL-2006 (TIMJ):
+*        Remove unused sc2da includes.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -102,12 +104,6 @@
 #include "smurf_par.h"
 #include "smurflib.h"
 #include "libsmf/smf.h"
-
-#include "sc2da/sc2store_par.h"
-#include "sc2da/sc2store_struct.h"
-#include "sc2da/sc2math.h"
-#include "sc2da/sc2store.h"
-#include "sc2da/sc2ast.h"
 
 #define TASK_NAME "smurf_qlmakemap"
 

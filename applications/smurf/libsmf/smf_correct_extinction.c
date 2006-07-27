@@ -70,6 +70,8 @@
 *        Check and update history if routine successful
 *     2006-07-04 (AGG):
 *        Update calls to slaAirmas to reflect new C interface
+*     2006-07-26 (TIMJ):
+*        sc2head no longer used. Use JCMTState instead.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -247,9 +249,9 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
     hdr = data->hdr;
     /* See if we have a new WVM value */
     if (wvmr) {
-      newtwvm[0] = hdr->sc2head->wvm_t12;
-      newtwvm[1] = hdr->sc2head->wvm_t42;
-      newtwvm[2] = hdr->sc2head->wvm_t78;
+      newtwvm[0] = hdr->state->wvm_t12;
+      newtwvm[1] = hdr->state->wvm_t42;
+      newtwvm[2] = hdr->state->wvm_t78;
       /* Have any of the temperatures changed? */
       if (newtwvm[0] != oldtwvm[0]) {
 	newtau = 1;
@@ -290,7 +292,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
        the GRID coordinate frame */
     base = npts * k; /* Offset into 3d data array */
     if (quick) {
-      airmass = hdr->sc2head->tcs_airmass;
+      airmass = hdr->state->tcs_airmass;
       extcorr = exp(airmass*tau);
     }
     for (i=0; i < npts; i++ ) {

@@ -96,6 +96,8 @@
 *        NULL pointers associated with .SMURF.MAPCOORD extension
 *     2006-06-30 (EC):
 *        Now NULL pointers in smf_create_smf*, changed to .SCU2RED.MAPCOORD
+*     2006-07-26 (TIMJ):
+*        sc2head no longer used. Use JCMTState instead.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -177,7 +179,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   double * flatcal = NULL;
   double * flatpar = NULL;
   int * dksquid = NULL;
-  sc2head *sc2tmp = NULL;
+  JCMTState *tmpState = NULL;
 
   /* Pasted from readsc2ndf */
   int colsize;               /* number of pixels in column */
@@ -324,18 +326,19 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	  hdr->wcs = iwcs;
 	  hdr->nframes = 1;
 	} else {
-	  /* Need to get the location of the extension for sc2head parsing */
-	  ndfXloc( indf, "FRAMEDATA", "READ", &xloc, status );
+	  /* Need to get the location of the extension for STATE parsing */
+	  ndfXloc( indf, JCMT__EXTNAME, "READ", &xloc, status );
 	  /* And need to map the header */
 	  sc2store_headrmap( xloc, ndfdims[2], status );
 
 	  /* Malloc some memory to hold all the time series data */
-	  hdr->allsc2heads = smf_malloc( ndfdims[2], sizeof(sc2head),
+	  hdr->allState = smf_malloc( ndfdims[2], sizeof(JCMTState),
 					 1, status );
+
 	  /* Loop over each element, reading in the information */
-	  sc2tmp = hdr->allsc2heads;
+	  tmpState = hdr->allState;
 	  for (i=0; i<ndfdims[2]; i++) {
-	    sc2store_headget(i, &(sc2tmp[i]), status);
+	    sc2store_headget(i, &(tmpState[i]), status);
 	  }
 	  hdr->nframes = ndfdims[2];
 	  /* Unmap the headers */
@@ -370,25 +373,25 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
       }
 
       /* decide if we are storing header information */
-      sc2tmp = NULL;
+      tmpState = NULL;
 
       /* Read time series data from file */
       sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN, maxlen, maxfits, 
 			  &nfits, headrec, &colsize, &rowsize, 
 			  &nframes, &(da->nflat), da->flatname,
-			  &sc2tmp, &tdata, &dksquid, 
+			  &tmpState, &tdata, &dksquid, 
 			  &flatcal, &flatpar, 
 			  status);
 
       if (*status == SAI__OK) {
 
 	/* Free header info if no longer needed */
-	if (!withHdr && sc2tmp != NULL) {
+	if (!withHdr && tmpState != NULL) {
 	  /* can not use smf_free */
-	  free( sc2tmp );
-	  sc2tmp = NULL;
+	  free( tmpState );
+	  tmpState = NULL;
 	} else {
-	  hdr->allsc2heads = sc2tmp;
+	  hdr->allState = tmpState;
 	}
 
 	/* Tdata is malloced by rdtstream for our use */

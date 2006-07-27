@@ -26,11 +26,14 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2005-12-06 (AGG):
 *        Initial test version.
+*     26-JUL-2006 (TIMJ):
+*        Remove sc2store_struct
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -75,10 +78,7 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
-#include "sc2da/sc2store_par.h"
-#include "sc2da/sc2store_struct.h"
 #include "sc2da/sc2math.h"
-#include "sc2da/sc2store.h"
 
 void smf_flatten ( smfData *data, int *status ) {
 

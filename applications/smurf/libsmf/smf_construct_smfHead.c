@@ -15,7 +15,7 @@
 *  Invocation:
 *     pntr = smf_construct_smfHead( smfHead * tofill,
 *              AstFrameSet * wcs, AstFitsChan * fitshdr,
-*	       struct sc2head * allsc2heads,
+*              JCMTState * allState,
 *              dim_t curframe, int * status );
 
 *  Arguments:
@@ -27,7 +27,7 @@
 *        not the contents.
 *     fitshdr = AstFitsChan * (Given)
 *        FITS header. The pointer is copied, not the contents.
-*     allsc2heads = sc2head* (Given)
+*     allState = JCMTState* (Given)
 *        Pointer to array of time series information for all time slices.
 *        Should be at least "curslice" in size.
 *     curframe = dim_t (Given)
@@ -51,8 +51,8 @@
 *     - AST objects are neither cloned not copied by this routine.
 *       Use astCopy or astClone when calling if reference counts
 *       should be incremented.
-*     - sc2head is set to point into allsc2heads[curslice]
-*     - allsc2heads is not copied. In general the time series information
+*     - "state" is set to point into allState[curslice]
+*     - allState is not copied. In general the time series information
 *       can be copied between headers without being modified. If this
 *       memory should be freed by smf_close_file, set the isCloned flag
 *       to false.
@@ -71,6 +71,8 @@
 *        into allsc2heads.
 *     2006-03-23 (AGG):
 *        curslice changed to curframe, nframes added
+*     2006-07-26 (TIMJ):
+*        sc2head no longer used. Use JCMTState instead.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,7 +119,7 @@
 smfHead *
 smf_construct_smfHead( smfHead * tofill,
 		       AstFrameSet * wcs, AstFitsChan * fitshdr,
-		       struct sc2head * allsc2heads,
+		       JCMTState * allState,
 		       dim_t curframe, dim_t nframes, int * status ) {
 
   smfHead * hdr = NULL;   /* Header components */
@@ -134,8 +136,8 @@ smf_construct_smfHead( smfHead * tofill,
     hdr->fitshdr = fitshdr;
     hdr->curframe = curframe;
     hdr->nframes = nframes;
-    hdr->allsc2heads = allsc2heads;
-    hdr->sc2head = &(allsc2heads[curframe]);
+    hdr->allState = allState;
+    hdr->state = &(allState[curframe]);
     hdr->isCloned = 1;
   }
 

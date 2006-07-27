@@ -30,16 +30,20 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-04-04 (AGG):
 *        Initial version.
+*     2006-07-26 (TIMJ):
+*        sc2head no longer used. Use JCMTState instead.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006 University of British Columbia.
+*     Copyright (C) 2006 Particle Physics And Astronomy Research Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -77,18 +81,13 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 
-/* SC2DA routines */
-#include "sc2da/sc2store.h"
-#include "sc2da/sc2store_struct.h"
-
 #define FUNC_NAME "smf_check_smfHead"
 
 void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
 
   smfHead *ihdr;
   smfHead *ohdr;
-  sc2head *allsc2heads = NULL;
-  sc2head *sc2head;
+  JCMTState *allState = NULL;
   AstFrameSet *owcs;
   AstFrameSet *skyframe;
   dim_t nframes;
@@ -174,21 +173,21 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
     }
   }
 
-  /* Do we have the sc2head struct? */
-  if ( ohdr->allsc2heads == NULL) {
-    if ( ihdr->allsc2heads == NULL ) {
+  /* Do we have the STATE struct? */
+  if ( ohdr->allState == NULL) {
+    if ( ihdr->allState == NULL ) {
       if ( *status == SAI__OK) {
 	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "Input allsc2heads is NULL, possible programming error", status);
+	errRep(FUNC_NAME, "Input allState is NULL, possible programming error", status);
       }
     } else {
       nframes = ohdr->nframes;
-      allsc2heads = smf_malloc( 1, nframes*sizeof(struct sc2head), 0, status);
-      if ( allsc2heads == NULL) {
+      allState = smf_malloc( 1, nframes*sizeof(JCMTState), 0, status);
+      if ( allState == NULL) {
 	*status = SAI__ERROR;
-	errRep(FUNC_NAME,"Unable to allocate memory for allsc2heads", status);
+	errRep(FUNC_NAME,"Unable to allocate memory for allState", status);
       }
-      memcpy( allsc2heads, ihdr->allsc2heads, nframes*sizeof(struct sc2head) );
+      memcpy( allState, ihdr->allState, nframes*sizeof(JCMTState) );
     }
   }
 

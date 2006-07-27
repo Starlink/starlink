@@ -43,6 +43,8 @@
 *        initialise isCloned
 *     2006-03-23 (AGG):
 *        curslice changed to curframe, nframes added
+*     2006-07-26 (TIMJ):
+*        sc2head no longer used. Use JCMTState instead.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -106,8 +108,8 @@ smf_create_smfHead( int * status ) {
   hdr->fitshdr = NULL;
   hdr->curframe = 0;
   hdr->nframes = 0;
-  hdr->sc2head = NULL;
-  hdr->allsc2heads = NULL;
+  hdr->state = NULL;
+  hdr->allState = NULL;
   hdr->isCloned = 0;
   return hdr;
 }

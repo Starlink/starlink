@@ -43,15 +43,20 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-06-24 (AGG):
 *        Initial version
+*     2006-07-26 (TIMJ):
+*        sc2head no longer used. Use JCMTState instead.
+*     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia.  All Rights
-*     Reserved.
+*     Copyright (C) 2006 University of British Columbia.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -157,7 +162,7 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
       errRep(FUNC_NAME, "Unable to retrieve first timeslice", status);
       return;
     }
-    opentime = hdr->sc2head->rts_end;
+    opentime = hdr->state->rts_end;
     /* Set header for last time slice */
     frame = (data->dims)[2] - 1;
     smf_tslice_ast( data, frame, 0, status );
@@ -165,7 +170,7 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
       errRep(FUNC_NAME, "Unable to retrieve final timeslice", status);
       return;
     }
-    writetime = hdr->sc2head->rts_end;
+    writetime = hdr->state->rts_end;
     /* NEED TO CHECK WAVELENGTHS ARE THE SAME */
 
     /* Now to check if it's a related file... */

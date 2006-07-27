@@ -6,6 +6,7 @@
     05Dec2005 : include star/hds_types.h (EC)
     05Dec2005 : remove star/hds_types.h, star/hds.h and extra ndf.h (bdk)
     23Jan2006 : replace star/hds.h (bdk)
+    25Jul2006 : merge with ACSIS state structure usage (timj)
 */
 
 #include <string.h>
@@ -18,6 +19,7 @@
 #include "ast.h"
 #include "ndf.h"
 #include "mers.h"
+#include "f77.h"
 #include "Dits_Err.h"
 #include "Ers.h"
 
@@ -25,11 +27,10 @@
 
 #include "dream_par.h"
 
+#include "jcmt/state.h"
 #include "sc2store_par.h"
-#include "sc2store_struct.h"
 #include "sc2store_sys.h"
 #include "sc2store.h"
-
 
 static int sc2open = 0;            /* flag for file open */
 
@@ -39,6 +40,7 @@ HDSLoc *fdataloc = NULL;           /* HDS locator to FLATDATA structure */
 HDSLoc *fnameloc = NULL;           /* HDS locator to FLATNAME structure */
 HDSLoc *fparloc = NULL;            /* HDS locator to FLATPAR structure */
 HDSLoc *frameloc = NULL;           /* HDS locator to FRAMEDATA structure */
+HDSLoc *jcmtstateloc = NULL;       /* HDS locator to JCMTSTATE structure */
 HDSLoc *scu2redloc = NULL;         /* HDS locator to SCU2RED structure */
 static int indf;                   /* main NDF identifier */
 HDSLoc *sc2loc = NULL;             /* HDS locator to SCUBA2 structure */
@@ -46,54 +48,6 @@ static int sindf;                  /* NDF identifier for subtraction frame */
 static int findf;                  /* NDF identifier for flat calibration */
 static int zindf;                  /* NDF identifier for compression zero 
                                       offsets */
-
-/* Names and types of per-frame header items */
-
-static char *sc2store_names[SC2STORE_NUM][2] = 
-{
-   { "_REAL", "FTS_POS" },
-   { "_DOUBLE", "POL_ANG" },
-   { "_INTEGER", "RTS_NUM" },
-   { "_DOUBLE", "RTS_STEP" },
-   { "_DOUBLE", "RTS_END" },
-   { "_CHAR*80", "RTS_TASKS" },
-   { "_CHAR*80", "RTS_ERRS" },
-   { "_DOUBLE", "SC2_HEAT" },
-   { "_DOUBLE", "SMU_AZ_JIG_X" },
-   { "_DOUBLE", "SMU_AZ_JIG_Y" },
-   { "_DOUBLE", "SMU_X" },
-   { "_DOUBLE", "SMU_Y" },
-   { "_DOUBLE", "SMU_Z" },
-   { "_DOUBLE", "SMU_TR_OFF_X" },
-   { "_DOUBLE", "SMU_TR_OFF_Y" },
-   { "_DOUBLE", "TCS_AIRMASS" },
-   { "_CHAR*16", "TCS_AZ_SYS" },
-   { "_DOUBLE", "TCS_AZ_ANG" },
-   { "_DOUBLE", "TCS_AZ_AC1" },
-   { "_DOUBLE", "TCS_AZ_AC2" },
-   { "_DOUBLE", "TCS_AZ_DC1" },
-   { "_DOUBLE", "TCS_AZ_DC2" },
-   { "_DOUBLE", "TCS_AZ_BC1" },
-   { "_DOUBLE", "TCS_AZ_BC2" },
-   { "_INTEGER", "TCS_INDEX" },
-   { "_CHAR*32", "TCS_SOURCE" },
-   { "_CHAR*16", "TCS_TR_SYS" },
-   { "_DOUBLE", "TCS_TR_ANG" },
-   { "_DOUBLE", "TCS_TR_AC1" },
-   { "_DOUBLE", "TCS_TR_AC2" },
-   { "_DOUBLE", "TCS_TR_DC1" },
-   { "_DOUBLE", "TCS_TR_DC2" },
-   { "_DOUBLE", "TCS_TR_BC1" },
-   { "_DOUBLE", "TCS_TR_BC2" },
-   { "_REAL", "WVM_TH" },
-   { "_REAL", "WVM_T12" },
-   { "_REAL", "WVM_T42" },
-   { "_REAL", "WVM_T78" },
-   { "_REAL", "WVM_TW" },
-   { "_INTEGER", "WVM_QUAL" },
-   { "_REAL", "WVM_TIME" }
-};
-
 
 /*+ sc2store_compress - compress frame of integers to unsigned short */
 
@@ -218,6 +172,7 @@ int *status              /* global status (given and returned) */
     19Jun2005 : use ndfHcre to create history component on all NDFs (bdk)
     24Sep2005 : add nflat, flatname and flatpar to generalise flatfield 
                 storage, and use colsize and rowsize as names (bdk)
+    27Jul2006 : Create JCMTSTATE structure (timj)
 */
 
 {
@@ -339,9 +294,10 @@ int *status              /* global status (given and returned) */
    datMap ( fparloc, "_DOUBLE", "WRITE", 1, &nflat, (void **)flatpar, 
      status );
 
-/* Create storage for Header values for each frame */
+/* Create storage for Header values for each frame - store in JCMTSTATE */
 
-   sc2store_headcremap ( frameloc, nframes, status );
+   ndfXnew( indf, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0, &jcmtstateloc, status );
+   sc2store_headcremap ( jcmtstateloc, nframes, status );
 
 /* Create the structured extension for each frame */
 
@@ -513,9 +469,10 @@ int *status          /* global status (given and returned) */
    ndfUnmap ( findf, "DATA", &tstatus );
    ndfAnnul ( &findf, &tstatus );
 
-/* Release FRAMEDATA structure */
+/* Release FRAMEDATA and JCMTSTATE structure */
 
    datAnnul ( &frameloc, &tstatus );
+   datAnnul ( &jcmtstateloc, &tstatus );
 
 /* Unmap the main data array */
 
@@ -619,7 +576,7 @@ int *status        /* global status (given and returned) */
 void sc2store_headget
 (
 int frame,                    /* frame index (given) */
-struct sc2head *head,         /* header data for the frame (returned) */
+JCMTState *head,         /* header data for the frame (returned) */
 int *status                   /* global status (given and returned) */
 )
 /* Method :
@@ -629,57 +586,105 @@ int *status                   /* global status (given and returned) */
    History :
     19Aug2004 : original (bdk)
     17Feb2005 : add sc2_heat (bdk)
+    27Jul2006 : need to check for NULL-ness and handle all JCMTState (timj)
 */
 {
    if ( *status != SAI__OK ) return;
 
-   head->fts_pos = ((float *)(sc2store_ptr[FTS_POS]))[frame];
+   /* Note that we have to check for NULL in case we had a missing component.
+      We also check all possible struct members not just SCUBA-2 ones. This is
+      done so that SMURF can support the reading of the JCMTSTATE extension from other
+      instruments in addition to SCUBA-2. This routine is now JCMT-specific rather than
+      SCUBA-2 specific and could be factored out. All JCMTSTATE access could usefully be
+      factored out.
+   */
 
-   head->pol_ang = ((double *)sc2store_ptr[POL_ANG])[frame];
-   head->rts_num = ((int *)sc2store_ptr[RTS_NUM])[frame];
-   head->rts_step = ((double *)sc2store_ptr[RTS_STEP])[frame];
-   head->rts_end = ((double *)sc2store_ptr[RTS_END])[frame];
-   memcpy ( head->rts_tasks, 
-     (char *)sc2store_ptr[RTS_TASKS]+RTS_TASKS_LEN*frame, RTS_TASKS_LEN );
-   memcpy ( head->rts_errs, 
-     (char *)sc2store_ptr[RTS_ERRS]+RTS_ERRS_LEN*frame, RTS_ERRS_LEN );
-   head->sc2_heat = ((double *)sc2store_ptr[SC2_HEAT])[frame];
-   head->smu_az_jig_x = ((double *)sc2store_ptr[SMU_AZ_JIG_X])[frame];
-   head->smu_az_jig_y = ((double *)sc2store_ptr[SMU_AZ_JIG_Y])[frame];
-   head->smu_x = ((double *)sc2store_ptr[SMU_X])[frame];
-   head->smu_y = ((double *)sc2store_ptr[SMU_Y])[frame];
-   head->smu_z = ((double *)sc2store_ptr[SMU_Z])[frame];
-   head->smu_tr_off_x = ((double *)sc2store_ptr[SMU_TR_OFF_X])[frame];
-   head->smu_tr_off_y = ((double *)sc2store_ptr[SMU_TR_OFF_Y])[frame];
-   head->tcs_airmass = ((double *)sc2store_ptr[TCS_AIRMASS])[frame];
-   memcpy ( head->tcs_az_sys, 
-     (char *)sc2store_ptr[TCS_AZ_SYS]+TCS_AZ_SYS_LEN*frame, TCS_AZ_SYS_LEN );
-   head->tcs_az_ang = ((double *)sc2store_ptr[TCS_AZ_ANG])[frame];
-   head->tcs_az_ac1 = ((double *)sc2store_ptr[TCS_AZ_AC1])[frame];
-   head->tcs_az_ac2 = ((double *)sc2store_ptr[TCS_AZ_AC2])[frame];
-   head->tcs_az_dc1 = ((double *)sc2store_ptr[TCS_AZ_DC1])[frame];
-   head->tcs_az_dc2 = ((double *)sc2store_ptr[TCS_AZ_DC2])[frame];
-   head->tcs_az_bc1 = ((double *)sc2store_ptr[TCS_AZ_BC1])[frame];
-   head->tcs_az_bc2 = ((double *)sc2store_ptr[TCS_AZ_BC2])[frame];
-   head->tcs_index = ((int *)sc2store_ptr[TCS_INDEX])[frame];
-   memcpy ( head->tcs_source, 
-     (char *)sc2store_ptr[TCS_SOURCE]+TCS_SOURCE_LEN*frame, TCS_SOURCE_LEN );
-   memcpy ( head->tcs_tr_sys, 
-     (char *)sc2store_ptr[TCS_TR_SYS]+TCS_TR_SYS_LEN*frame, TCS_TR_SYS_LEN );
-   head->tcs_tr_ang = ((double *)sc2store_ptr[TCS_TR_ANG])[frame];
-   head->tcs_tr_ac1 = ((double *)sc2store_ptr[TCS_TR_AC1])[frame];
-   head->tcs_tr_ac2 = ((double *)sc2store_ptr[TCS_TR_AC2])[frame];
-   head->tcs_tr_dc1 = ((double *)sc2store_ptr[TCS_TR_DC1])[frame];
-   head->tcs_tr_dc2 = ((double *)sc2store_ptr[TCS_TR_DC2])[frame];
-   head->tcs_tr_bc1 = ((double *)sc2store_ptr[TCS_TR_BC1])[frame];
-   head->tcs_tr_bc2 = ((double *)sc2store_ptr[TCS_TR_BC2])[frame];
-   head->wvm_th = ((float *)sc2store_ptr[WVM_TH])[frame];
-   head->wvm_t12 = ((float *)sc2store_ptr[WVM_T12])[frame];
-   head->wvm_t42 = ((float *)sc2store_ptr[WVM_T42])[frame];
-   head->wvm_t78 = ((float *)sc2store_ptr[WVM_T78])[frame];
-   head->wvm_tw = ((float *)sc2store_ptr[WVM_TW])[frame];
-   head->wvm_qual = ((int *)sc2store_ptr[WVM_QUAL])[frame];
-   head->wvm_time = ((float *)sc2store_ptr[WVM_TIME])[frame];
+   /* use a macro to simplify things */
+#define RETRIEVE_STATE(state, index, type, bad )	\
+   if ( sc2store_ptr[index] ) { \
+     head->state = ((type *)sc2store_ptr[index])[frame]; \
+   } else { \
+     head->state = bad; \
+   }
+
+   RETRIEVE_STATE( rts_num, RTS_NUM, unsigned int, (unsigned int)VAL__BADI );
+   RETRIEVE_STATE( rts_end, RTS_END, double, VAL__BADD );
+
+   RETRIEVE_STATE( smu_x, SMU_X, double, VAL__BADD );
+   RETRIEVE_STATE( smu_y, SMU_Y, double, VAL__BADD );
+   RETRIEVE_STATE( smu_z, SMU_Z, double, VAL__BADD );
+   RETRIEVE_STATE( smu_jig_index, SMU_JIG_INDEX, int, VAL__BADI );
+   RETRIEVE_STATE( smu_az_jig_x, SMU_AZ_JIG_X, double, VAL__BADD );
+   RETRIEVE_STATE( smu_az_jig_y, SMU_AZ_JIG_Y, double, VAL__BADD );
+   RETRIEVE_STATE( smu_az_chop_x, SMU_AZ_CHOP_X, double, VAL__BADD );
+   RETRIEVE_STATE( smu_az_chop_y, SMU_AZ_CHOP_Y, double, VAL__BADD );
+   RETRIEVE_STATE( smu_tr_jig_x, SMU_TR_JIG_X, double, VAL__BADD );
+   RETRIEVE_STATE( smu_tr_jig_y, SMU_TR_JIG_Y, double, VAL__BADD );
+   RETRIEVE_STATE( smu_tr_chop_x, SMU_TR_CHOP_X, double, VAL__BADD );
+   RETRIEVE_STATE( smu_tr_chop_y, SMU_TR_CHOP_Y, double, VAL__BADD );
+
+   RETRIEVE_STATE( tcs_airmass, TCS_AIRMASS, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_az_ang, TCS_AZ_ANG, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_az_ac1, TCS_AZ_AC1, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_az_ac2, TCS_AZ_AC2, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_az_dc1, TCS_AZ_DC1, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_az_dc2, TCS_AZ_DC2, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_az_bc1, TCS_AZ_BC1, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_az_bc2, TCS_AZ_BC2, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_index,  TCS_INDEX, int, VAL__BADI );
+   RETRIEVE_STATE( tcs_tr_ang, TCS_TR_ANG, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_tr_ac1, TCS_TR_AC1, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_tr_ac2, TCS_TR_AC2, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_tr_dc1, TCS_TR_DC1, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_tr_dc2, TCS_TR_DC2, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_tr_bc1, TCS_TR_BC1, double, VAL__BADD );
+   RETRIEVE_STATE( tcs_tr_bc2, TCS_TR_BC2, double, VAL__BADD );
+
+   RETRIEVE_STATE( jos_drcontrol,  JOS_DRCONTROL, int, VAL__BADI );
+
+   RETRIEVE_STATE( enviro_rel_hum, ENVIRO_REL_HUM, float, VAL__BADR );
+   RETRIEVE_STATE( enviro_pressure, ENVIRO_PRESSURE, float, VAL__BADR );
+   RETRIEVE_STATE( enviro_air_temp, ENVIRO_AIR_TEMP, float, VAL__BADR );
+
+   RETRIEVE_STATE( wvm_th, WVM_TH, float, VAL__BADR );
+   RETRIEVE_STATE( wvm_t12, WVM_T12, float, VAL__BADR );
+   RETRIEVE_STATE( wvm_t42, WVM_T42, float, VAL__BADR );
+   RETRIEVE_STATE( wvm_t78, WVM_T78, float, VAL__BADR );
+   RETRIEVE_STATE( wvm_tw, WVM_TW, float, VAL__BADR );
+   RETRIEVE_STATE( wvm_qual, WVM_QUAL, int, VAL__BADI );
+   RETRIEVE_STATE( wvm_time, WVM_TIME, float, VAL__BADR );
+
+   RETRIEVE_STATE( sc2_heat, SC2_HEAT, double, VAL__BADD );
+
+   RETRIEVE_STATE( acs_exposure, ACS_EXPOSURE, float, VAL__BADR );
+   RETRIEVE_STATE( acs_no_prev_ref, ACS_NO_PREV_REF, int, VAL__BADI );
+   RETRIEVE_STATE( acs_no_next_ref, ACS_NO_NEXT_REF, int, VAL__BADI );
+   RETRIEVE_STATE( acs_no_ons, ACS_NO_ONS, int, VAL__BADI );
+
+   RETRIEVE_STATE( pol_ang, POL_ANG, double, VAL__BADD );
+   RETRIEVE_STATE( fts_pos, FTS_POS, float, VAL__BADR );
+
+   /* Now do the character arrays. We use cnfExprt to allow nul termination. Note that
+      the struct does allocate a space for a nul in addition to the HDS component size.
+    */
+
+#define RETRIEVE_CHAR( state, index, len ) \
+   if ( sc2store_ptr[index] ) { \
+     cnfImprt( (char*)sc2store_ptr[index]+len*frame, len, head->state ); \
+     (head->state)[len] = '\0'; \
+   } else { \
+     (head->state)[0] = '\0'; \
+   }
+
+   RETRIEVE_CHAR( smu_chop_phase, SMU_CHOP_PHASE, JCMT__SZSMU_CHOP_PHASE );
+   RETRIEVE_CHAR( tcs_beam, TCS_BEAM, JCMT__SZTCS_BEAM );
+   RETRIEVE_CHAR( tcs_source, TCS_SOURCE, JCMT__SZTCS_SOURCE );
+   RETRIEVE_CHAR( tcs_tr_sys, TCS_TR_SYS, JCMT__SZTCS_TR_SYS );
+   RETRIEVE_CHAR( acs_source_ro, ACS_SOURCE_RO, JCMT__SZACS_SOURCE_RO );
+
+   /* tidy name space */
+#undef RETRIEVE_STATE
+#undef RETRIEVE_CHAR
 }
 
 
@@ -702,44 +707,54 @@ int *status                   /* global status (given and returned) */
     23Nov2005 : Use Official C HDS interface (TIMJ)
     27Jan2006 : Kluge initialising of sc2store_loc[] array 
                 Risks, overwriting a valid locator (TIMJ)
+    27Jul2006 : Use ACSIS/SCUBA-2 merged approach (TIMJ)
 */
 {
    int dim[2];
    int j;
    int ndim;
+   int pos;
+   size_t len;
 
+   /* This routine only creates and maps SCUBA-2 components */
 
    if ( *status != SAI__OK ) return;
 
    dim[0] = nframes;
    ndim = 1;
 
-   for ( j=0; j<SC2STORE_NUM; j++ )
+   for ( j=0; j<JCMT_COMP_NUM; j++ )
    {
+     /* what index should we use? */
+     pos = hdsRecords[j].position;
+
      /* Should really initialise outside this routine */
-      sc2store_loc[j] = NULL;
-      datNew ( headloc, sc2store_names[j][1], sc2store_names[j][0], 
-        ndim, dim, status );
-      if ( *status != SAI__OK ) break;
-      datFind ( headloc, sc2store_names[j][1], &(sc2store_loc[j]), 
-        status );
+     sc2store_loc[pos] = NULL;
+     sc2store_ptr[pos] = NULL;
+
+     /* see if component is required for SCUBA-2 or not */
+     if ( hdsRecords[j].instrument & INST__SCUBA2 ) {
+       /* create the component */
+       datNew ( headloc, hdsRecords[j].name, hdsRecords[j].type, 
+		ndim, dim, status );
+       if ( *status != SAI__OK ) break;
+       datFind ( headloc, hdsRecords[j].name, &(sc2store_loc[pos]), 
+		 status );
+
+       if ( *status != SAI__OK ) break;
+       /* map the data array */
+       datMap ( sc2store_loc[pos], hdsRecords[j].type, "WRITE", 
+		ndim, dim, &(sc2store_ptr[pos]), status );
+
+       /* if this is a string component then we can fill it with blanks. Other components
+	  will not be initialised but they will always be filled later on. */
+       if (strncmp( "_CHAR", hdsRecords[j].type, 5) == 0) {
+	 datLen( sc2store_loc[pos], &len, status );
+	 memset( sc2store_ptr[pos], ' ', dim[0] * len );
+       }
+     }
 
       if ( *status != SAI__OK ) break;
-      datMap ( sc2store_loc[j], sc2store_names[j][0], "WRITE", 
-		   ndim, dim, &(sc2store_ptr[j]), status );
-
-      if ( *status != SAI__OK ) break;
-   }
-
-/* Fill the character-string items with spaces */
-
-   if ( *status == SAI__OK )
-   {
-      memset ( sc2store_ptr[RTS_TASKS], ' ', nframes*RTS_TASKS_LEN );
-      memset ( sc2store_ptr[RTS_ERRS], ' ', nframes*RTS_ERRS_LEN );
-      memset ( sc2store_ptr[TCS_AZ_SYS], ' ', nframes*TCS_AZ_SYS_LEN );
-      memset ( sc2store_ptr[TCS_SOURCE], ' ', nframes*TCS_SOURCE_LEN );
-      memset ( sc2store_ptr[TCS_TR_SYS], ' ', nframes*TCS_TR_SYS_LEN );
    }
 
 }
@@ -751,7 +766,7 @@ int *status                   /* global status (given and returned) */
 void sc2store_headput
 (
 int frame,                    /* frame index (given) */
-struct sc2head head,          /* header data for the frame (given) */
+JCMTState head,          /* header data for the frame (given) */
 int *status                   /* global status (given and returned) */
 )
 /* Method :
@@ -761,57 +776,80 @@ int *status                   /* global status (given and returned) */
    History :
     18Aug2004 : original (bdk)
     17Feb2005 : add sc2_heat (bdk)
+    27Jul2006 : use JCMTState (timj)
 */
 {
    if ( *status != SAI__OK ) return;
 
-   ((float *)(sc2store_ptr[FTS_POS]))[frame] = head.fts_pos;
+   /* Use a macro to make the code a bit more readable */
+#define STORE_STATE( state, index, type ) \
+   if (sc2store_ptr[index]) ((type *)sc2store_ptr[index])[frame] = head.state
 
-   ((double *)sc2store_ptr[POL_ANG])[frame] = head.pol_ang;
-   ((int *)sc2store_ptr[RTS_NUM])[frame] = head.rts_num;
-   ((double *)sc2store_ptr[RTS_STEP])[frame] = head.rts_step;
-   ((double *)sc2store_ptr[RTS_END])[frame] = head.rts_end;
-   memcpy ( (char *)sc2store_ptr[RTS_TASKS]+RTS_TASKS_LEN*frame, 
-     head.rts_tasks, RTS_TASKS_LEN );
-   memcpy ( (char *)sc2store_ptr[RTS_ERRS]+RTS_ERRS_LEN*frame, 
-     head.rts_errs, RTS_ERRS_LEN );
-   ((double *)sc2store_ptr[SC2_HEAT])[frame] = head.sc2_heat;
-   ((double *)sc2store_ptr[SMU_AZ_JIG_X])[frame] = head.smu_az_jig_x;
-   ((double *)sc2store_ptr[SMU_AZ_JIG_Y])[frame] = head.smu_az_jig_y;
-   ((double *)sc2store_ptr[SMU_X])[frame] = head.smu_x;
-   ((double *)sc2store_ptr[SMU_Y])[frame] = head.smu_y;
-   ((double *)sc2store_ptr[SMU_Z])[frame] = head.smu_z;
-   ((double *)sc2store_ptr[SMU_TR_OFF_X])[frame] = head.smu_tr_off_x;
-   ((double *)sc2store_ptr[SMU_TR_OFF_Y])[frame] = head.smu_tr_off_y;
-   ((double *)sc2store_ptr[TCS_AIRMASS])[frame] = head.tcs_airmass;
-   memcpy ( (char *)sc2store_ptr[TCS_AZ_SYS]+TCS_AZ_SYS_LEN*frame, 
-     head.tcs_az_sys, TCS_AZ_SYS_LEN );
-   ((double *)sc2store_ptr[TCS_AZ_ANG])[frame] = head.tcs_az_ang;
-   ((double *)sc2store_ptr[TCS_AZ_AC1])[frame] = head.tcs_az_ac1;
-   ((double *)sc2store_ptr[TCS_AZ_AC2])[frame] = head.tcs_az_ac2;
-   ((double *)sc2store_ptr[TCS_AZ_DC1])[frame] = head.tcs_az_dc1;
-   ((double *)sc2store_ptr[TCS_AZ_DC2])[frame] = head.tcs_az_dc2;
-   ((double *)sc2store_ptr[TCS_AZ_BC1])[frame] = head.tcs_az_bc1;
-   ((double *)sc2store_ptr[TCS_AZ_BC2])[frame] = head.tcs_az_bc2;
-   ((int *)sc2store_ptr[TCS_INDEX])[frame] = head.tcs_index;
-   memcpy ( (char *)sc2store_ptr[TCS_SOURCE]+TCS_SOURCE_LEN*frame, 
-     head.tcs_source, TCS_SOURCE_LEN );
-   memcpy ( (char *)sc2store_ptr[TCS_TR_SYS]+TCS_TR_SYS_LEN*frame, 
-     head.tcs_tr_sys, TCS_TR_SYS_LEN );
-   ((double *)sc2store_ptr[TCS_TR_ANG])[frame] = head.tcs_tr_ang;
-   ((double *)sc2store_ptr[TCS_TR_AC1])[frame] = head.tcs_tr_ac1;
-   ((double *)sc2store_ptr[TCS_TR_AC2])[frame] = head.tcs_tr_ac2;
-   ((double *)sc2store_ptr[TCS_TR_DC1])[frame] = head.tcs_tr_dc1;
-   ((double *)sc2store_ptr[TCS_TR_DC2])[frame] = head.tcs_tr_dc2;
-   ((double *)sc2store_ptr[TCS_TR_BC1])[frame] = head.tcs_tr_bc1;
-   ((double *)sc2store_ptr[TCS_TR_BC2])[frame] = head.tcs_tr_bc2;
-   ((float *)sc2store_ptr[WVM_TH])[frame] = head.wvm_th;
-   ((float *)sc2store_ptr[WVM_T12])[frame] = head.wvm_t12;
-   ((float *)sc2store_ptr[WVM_T42])[frame] = head.wvm_t42;
-   ((float *)sc2store_ptr[WVM_T78])[frame] = head.wvm_t78;
-   ((float *)sc2store_ptr[WVM_TW])[frame] = head.wvm_tw;
-   ((int *)sc2store_ptr[WVM_QUAL])[frame] = head.wvm_qual;
-   ((float *)sc2store_ptr[WVM_TIME])[frame] = head.wvm_time;
+#define STORE_CHAR( state, index, len ) \
+   if (sc2store_ptr[index]) cnfExprt( (char *)sc2store_ptr[index]+len*frame, head.state, len )
+
+   /* Real Time Sequencer */
+   STORE_STATE( rts_num, RTS_NUM, int );
+   STORE_STATE( rts_end, RTS_END, double );
+
+   /* Secondary Mirror */
+   STORE_STATE( smu_x, SMU_X, double );
+   STORE_STATE( smu_y, SMU_Y, double );
+   STORE_STATE( smu_z, SMU_Z, double );
+   STORE_CHAR( smu_chop_phase, SMU_CHOP_PHASE, JCMT__SZSMU_CHOP_PHASE );
+   STORE_STATE( smu_jig_index, SMU_JIG_INDEX, int );
+
+   STORE_STATE( smu_az_jig_x, SMU_AZ_JIG_X, double );
+   STORE_STATE( smu_az_jig_y, SMU_AZ_JIG_Y, double );
+   STORE_STATE( smu_az_chop_x, SMU_AZ_CHOP_X, double );
+   STORE_STATE( smu_az_chop_y, SMU_AZ_CHOP_Y, double );
+   STORE_STATE( smu_tr_jig_x, SMU_TR_JIG_X, double );
+   STORE_STATE( smu_tr_jig_y, SMU_TR_JIG_Y, double );
+   STORE_STATE( smu_tr_chop_x, SMU_TR_CHOP_X, double );
+   STORE_STATE( smu_tr_chop_y, SMU_TR_CHOP_Y, double );
+
+   /* Telescope Control System */
+   STORE_STATE( tcs_airmass, TCS_AIRMASS, double );
+   STORE_STATE( tcs_az_ang, TCS_AZ_ANG, double );
+   STORE_STATE( tcs_az_ac1, TCS_AZ_AC1, double );
+   STORE_STATE( tcs_az_ac2, TCS_AZ_AC2, double );
+   STORE_STATE( tcs_az_dc1, TCS_AZ_DC1, double );
+   STORE_STATE( tcs_az_dc2, TCS_AZ_DC2, double );
+   STORE_STATE( tcs_az_bc1, TCS_AZ_BC1, double );
+   STORE_STATE( tcs_az_bc2, TCS_AZ_BC2, double );
+   STORE_CHAR( tcs_beam, TCS_BEAM, JCMT__SZTCS_BEAM );
+   STORE_STATE( tcs_index, TCS_INDEX, int );
+   STORE_CHAR( tcs_source, TCS_SOURCE, JCMT__SZTCS_SOURCE );
+   STORE_CHAR( tcs_tr_sys, TCS_TR_SYS, JCMT__SZTCS_TR_SYS );
+   STORE_STATE( tcs_tr_ang, TCS_TR_ANG, double );
+   STORE_STATE( tcs_tr_ac1, TCS_TR_AC1, double );
+   STORE_STATE( tcs_tr_ac2, TCS_TR_AC2, double );
+   STORE_STATE( tcs_tr_dc1, TCS_TR_DC1, double );
+   STORE_STATE( tcs_tr_dc2, TCS_TR_DC2, double );
+   STORE_STATE( tcs_tr_bc1, TCS_TR_BC1, double );
+   STORE_STATE( tcs_tr_bc2, TCS_TR_BC2, double );
+
+   /* JOS control */
+   STORE_STATE( jos_drcontrol, JOS_DRCONTROL, int );
+
+   /* Water Vapour Monitor */
+   STORE_STATE( wvm_th, WVM_TH, float );
+   STORE_STATE( wvm_t12, WVM_T12, float );
+   STORE_STATE( wvm_t42, WVM_T42, float );
+   STORE_STATE( wvm_t78, WVM_T78, float );
+   STORE_STATE( wvm_tw, WVM_TW, float );
+   STORE_STATE( wvm_qual, WVM_QUAL, int );
+   STORE_STATE( wvm_time, WVM_TIME, float );
+
+   /* SCUBA-2 specific */
+   STORE_STATE( sc2_heat, SC2_HEAT, double );
+
+   /* FTS and polarimeter */
+   STORE_STATE( fts_pos, FTS_POS, float );
+   STORE_STATE( pol_ang, POL_ANG, double );
+
+#undef STORE_STATE
+#undef STORE_CHAR
 }
 
 
@@ -834,28 +872,52 @@ int *status                   /* global status (given and returned) */
     23Nov2005 : Use Official C HDS interface (TIMJ)
     27Jan2006 : Kluge initialising of sc2store_loc[] array 
                 Risks, overwriting a valid locator (TIMJ)
+    27Jul2005 : Use shared ACSIS/SCUBA-2 JCMTState scheme
 */
 {
    int dim[2];
    int j;
    int ndim;
-
+   int pos;
+   int isthere = 0;
 
    if ( *status != SAI__OK ) return;
 
    dim[0] = nframes;
    ndim = 1;
 
-   for ( j=0; j<SC2STORE_NUM; j++ )
+   for ( j=0; j<JCMT_COMP_NUM; j++ )
    {
-     /* Should really initialise outside this routine */
-      sc2store_loc[j] = NULL;
-      datFind ( headloc, sc2store_names[j][1], &(sc2store_loc[j]), 
-        status );
+     /* what index should we use? */
+     pos = hdsRecords[j].position;
 
-      if ( *status != SAI__OK ) break;
-      datMap ( sc2store_loc[j], sc2store_names[j][0], "READ", 
-        ndim, dim, &(sc2store_ptr[j]), status );
+     /* Should really initialise outside this routine */
+     sc2store_loc[pos] = NULL;
+     sc2store_ptr[pos] = NULL;
+
+     /* See if the component exists (it may be an ACSIS or SCUBA-2 file or whatever */
+     datThere( headloc, hdsRecords[j].name, &isthere, status );
+     if (isthere) {
+       datFind ( headloc, hdsRecords[j].name, &(sc2store_loc[pos]), 
+		 status );
+
+       if ( *status != SAI__OK ) break;
+       datMap ( sc2store_loc[pos], hdsRecords[j].type, "READ", 
+		ndim, dim, &(sc2store_ptr[pos]), status );
+     } else {
+       /* if missing and is a mandatory SCUBA-2 component then we need to complain
+	  somehow. Old files will be a problem if we set status to bad or we can just warn.
+	  Alternatively, we need to add a .mandatory component to hdsRecords for really need
+          this for SCUBA2 as opposed to would like it for scuba2. */
+       if ( hdsRecords[j].instrument & INST__SCUBA2 ) {
+	 if (*status == SAI__OK) {
+	   *status = DITS__APP_ERROR;
+	   sprintf( errmess, "Mandatory SCUBA-2 component not present in file. Can't find '%s'",
+		    hdsRecords[j].name);
+	   ErsRep( 0, status, errmess );
+	 }
+       }
+     }
 
       if ( *status != SAI__OK ) break;
    }
@@ -873,17 +935,21 @@ int *status                   /* global status (given and returned) */
 /*
    History :
     12Aug2004 : original (bdk)
+    27Jul2006 : check for NULL (timj)
 */
 {
    int j;
 
    if ( *status != SAI__OK ) return;
 
-   for ( j=0; j<SC2STORE_NUM; j++ )
+   for ( j=0; j<JCMT_COMP_NUM; j++ )
 
    {
-      datUnmap ( sc2store_loc[j], status );
-      datAnnul ( &(sc2store_loc[j]), status );
+     if (sc2store_loc[j] != NULL) {
+       datUnmap ( sc2store_loc[j], status );
+       sc2store_ptr[j] = NULL;
+       datAnnul ( &(sc2store_loc[j]), status );
+     }
    }
 }
 
@@ -929,7 +995,7 @@ int *status         /* global status (given and returned) */
    double *fcal;           /* pointer to flat field data */
    static char fitsrec[SC2STORE__MAXFITS][81];  /* store for FITS records */
    double *fpar;           /* pointer to flat field parameters */
-   struct sc2head *frhead; /* structure for headers for a frame */
+   JCMTState *frhead; /* structure for headers for a frame */
    int j;                  /* loop counter */
    int nfits;              /* number of FITS records */
    int rowsize;            /* number of pixels in row */
@@ -1472,11 +1538,13 @@ int *status              /* global status (given and returned) */
     30Sep2005 : change names to colsize and rowsize, add nflat, flatname,
                 flatpar (bdk)
     25Jan2006 : add access argument (bdk)
+    27Jul2006 : use JCMTSTATE extension (timj)
 */
 {
    int dim[3];             /* dimensions */
    int el;                 /* number of elements mapped */
    static int initialised = 0; /* first-time flag */
+   int isthere = 0;        /* is an extension present? */
    int ndim;               /* number of dimensions */
    int ndimx;              /* max number of dimensions */
    int nfdim;              /* number of flatpar dimensions */
@@ -1551,9 +1619,17 @@ int *status              /* global status (given and returned) */
    datMap ( fparloc, "_DOUBLE", "READ", 1, nflat, (void**)flatpar, 
      status );
 
-/* storage for Header values for each frame */
-
-   sc2store_headrmap ( frameloc, *nframes, status );
+/* storage for Header values for each frame - to import old frames we fallback
+   to FRAMEDATA if JCMT__EXTNAME is not present.
+ */
+   ndfXstat( indf, JCMT__EXTNAME, &isthere, status );
+   if (isthere) {
+     ndfXloc( indf, JCMT__EXTNAME, "READ", &jcmtstateloc, status );
+   } else {
+     /* needs to be cloned since they are annulled separately */
+     datClone( frameloc, &jcmtstateloc, status );
+   }
+   sc2store_headrmap ( jcmtstateloc, *nframes, status );
 
 /* structured extension for each frame */
 
@@ -1580,7 +1656,7 @@ int *rowsize,            /* number of pixels in row (returned) */
 int *nframes,            /* number of frames (returned) */
 int *nflat,              /* number of flat coeffs per bol (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
-struct sc2head **frhead, /* header data for each frame (returned) */
+JCMTState *frhead[],     /* header data for each frame (returned) */
 int **outdata,           /* pointer to data array (returned) */
 int **dksquid,           /* pointer to dark SQUID values (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
@@ -1653,8 +1729,8 @@ int *status              /* global status (given and returned) */
    {
       nbol = (*colsize) * (*rowsize);
       *outdata = (int *) calloc ( (*nframes)*nbol, sizeof(int) );
-      *frhead = (struct sc2head *) calloc ( (*nframes), 
-        sizeof(struct sc2head) );
+      *frhead = (JCMTState *) calloc ( (*nframes), 
+        sizeof(JCMTState) );
 
       for ( j=0; j<*nframes; j++ )
       {
@@ -1731,7 +1807,7 @@ int rowsize,       /* number of bolometers in row (given) */
 int numsamples,    /* number of samples (given) */
 int nflat,         /* number of flat coeffs per bol (given) */
 char *flatname,    /* name of flatfield algorithm (given) */
-struct sc2head head[], /* header data for each frame (given) */
+JCMTState head[],  /* header data for each frame (given) */
 int *dbuf,         /* time stream data (given) */
 int *darksquid,    /* dark SQUID time stream data (given) */
 double *fcal,      /* flat-field calibration (given) */

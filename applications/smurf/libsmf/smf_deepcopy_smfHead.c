@@ -44,6 +44,8 @@
 *        Initial version.
 *     2006-03-24 (AGG):
 *        Trap NULL allsc2heads
+*     2006-07-26 (TIMJ):
+*        sc2head no longer used. Use JCMTState instead.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -93,7 +95,7 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   smfHead *new = NULL;   /* New Header */
   dim_t nframes = 0;
   dim_t curframe = 0;
-  sc2head *allsc2heads = NULL;
+  JCMTState *allState = NULL;
   AstFitsChan *fitshdr = NULL;
 
   if (*status != SAI__OK) return NULL;
@@ -104,19 +106,19 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
 
   fitshdr = astCopy(old->fitshdr);
 
-  /* Only allocate space for allsc2heads if we have a non-NULL input
-     allsc2heads */
-  if ( old->allsc2heads != NULL) {
-    allsc2heads = smf_malloc( 1, nframes*sizeof(struct sc2head), 0, status);
-    if (  allsc2heads == NULL) {
+  /* Only allocate space for allState if we have a non-NULL input
+     allState */
+  if ( old->allState != NULL) {
+    allState = smf_malloc( 1, nframes*sizeof(JCMTState), 0, status);
+    if (  allState == NULL) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME,"Unable to allocate memory for allsc2heads", status);
+      errRep(FUNC_NAME,"Unable to allocate memory for allState", status);
     }
-    memcpy( allsc2heads, old->allsc2heads, nframes*sizeof(struct sc2head) );
+    memcpy( allState, old->allState, nframes*sizeof(JCMTState) );
   }
 
   /* Insert elements into new smfHead */
-  new = smf_construct_smfHead( new, NULL, fitshdr, allsc2heads, curframe, nframes, status );
+  new = smf_construct_smfHead( new, NULL, fitshdr, allState, curframe, nframes, status );
   if (*status != SAI__OK) {
     errRep(FUNC_NAME,"Unable to allocate memory for new smfHead structure",
 	   status );

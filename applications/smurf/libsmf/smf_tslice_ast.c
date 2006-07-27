@@ -74,6 +74,8 @@
 *        Store current frame in smfData
 *     2006-04-12 (EC):
 *        Added jig_az_x/y to createwcs call
+*     2006-07-26 (TIMJ):
+*        sc2head no longer used. Use JCMTState instead.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -113,7 +115,7 @@
 #include "star/hds_types.h"
 
 /* Data Acquisition Includes */
-#include "sc2da/sc2store_struct.h"
+#include "jcmt/state.h"
 #include "sc2da/sc2ast.h"
 #include "sc2da/sc2store.h"
 
@@ -127,7 +129,7 @@
 void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
 
   smfHead *       hdr;       /* Local copy of the header structure */
-  sc2head *       sc2tmp;    /* Local pointer to sc2head */
+  JCMTState *     tmpState;  /* Local pointer to STATE */
   int             subsysnum; /* Subsystem numeric id. 0 - 8 */
   char subarray[81];         /* Subarray name */
 
@@ -184,9 +186,9 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
     }
   }
 
-  /* Simply assign sc2head to the correct slice of allsc2heads */
-  sc2tmp = &((hdr->allsc2heads)[index]);
-  hdr->sc2head = sc2tmp;
+  /* Simply assign "state" to the correct slice of allState */
+  tmpState = &((hdr->allState)[index]);
+  hdr->state = tmpState;
   hdr->curframe = index;
   /* Create and store FrameSet only if the WCS info is wanted */
   if (needwcs) {
@@ -200,16 +202,16 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
     /* See if we have a WCS or not */
     if (hdr->wcs == NULL ) {
       /* Must create one */
-      sc2ast_createwcs( subsysnum, sc2tmp->tcs_az_ac1, sc2tmp->tcs_az_ac2,
-			sc2tmp->smu_az_jig_x, sc2tmp->smu_az_jig_y, 
-			sc2tmp->rts_end, &(hdr->wcs), status );
+      sc2ast_createwcs( subsysnum, tmpState->tcs_az_ac1, tmpState->tcs_az_ac2,
+			tmpState->smu_az_jig_x, tmpState->smu_az_jig_y, 
+			tmpState->rts_end, &(hdr->wcs), status );
     } else {
       /* Ideally we want to modify in place to reduce malloc/free */
       /* For now take the inefficient and simpler approach */
       astAnnul( hdr->wcs );
-      sc2ast_createwcs( subsysnum, sc2tmp->tcs_az_ac1, sc2tmp->tcs_az_ac2,
-			sc2tmp->smu_az_jig_x, sc2tmp->smu_az_jig_y, 
-			sc2tmp->rts_end, &(hdr->wcs), status );
+      sc2ast_createwcs( subsysnum, tmpState->tcs_az_ac1, tmpState->tcs_az_ac2,
+			tmpState->smu_az_jig_x, tmpState->smu_az_jig_y, 
+			tmpState->rts_end, &(hdr->wcs), status );
     }
 
     /* astShow( hdr->wcs ); */

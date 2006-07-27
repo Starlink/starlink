@@ -728,7 +728,7 @@ char subarray[],  /* name of the subarray */
 int numsamples,   /* number of samples (given) */
 int nflat,        /* number of flat coeffs per bol (given) */
 char *flatname,   /* name of flatfield algorithm (given) */
-struct sc2head *head, /* header data for each frame (given) */
+JCMTState head[], /* header data for each frame (given) */
 int *dbuf,        /* simulated data (given) */
 int *dksquid,     /* dark SQUID time stream data (given) */
 double *fcal,     /* flatfield calibration (given) */
@@ -779,14 +779,14 @@ int ncycle,        /* number of cycles (given) */
 int numsamples,    /* number of samples (given) */
 int nflat,         /* number of flat coeffs per bol (given) */
 char *flatname,    /* name of flatfield algorithm (given) */
-struct sc2head *head, /* header data for each frame (given) */
+JCMTState head[],  /* header data for each frame (given) */
 int *dbuf,         /* simulated data (given) */
 int *dksquid,      /* dark SQUID time stream data (given) */
 double *fcal,      /* flat-field calibration (given) */
 double *fpar,      /* flat-field parameters (given) */
-char filter[],    /* String representing filter (e.g. "850") (given) */
-double atstart,   /* Ambient temperature at start (Celsius) (given) */
-double atend,     /* Ambient temperature at end (Celsius) (given) */
+char filter[],     /* String representing filter (e.g. "850") (given) */
+double atstart,    /* Ambient temperature at start (Celsius) (given) */
+double atend,      /* Ambient temperature at end (Celsius) (given) */
 char *obsmode,     /* Observing mode */
 int *status        /* global status (given and returned) */
 );
@@ -809,14 +809,14 @@ char subarray[],   /* name of the subarray */
 int numsamples,    /* number of samples (given) */
 int nflat,         /* number of flat coeffs per bol (given) */
 char *flatname,    /* name of flatfield algorithm (given) */
-struct sc2head *head, /* header data for each frame (given) */
+JCMTState head[],  /* header data for each frame (given) */
 int *dbuf,         /* time stream data (given) */
 int *dksquid,      /* dark SQUID time stream data (given) */
 double *fcal,      /* flat-field calibration (given) */
 double *fpar,      /* flat-field parameters (given) */
-char filter[],    /* String representing filter (e.g. "850") (given) */
-double atstart,   /* Ambient temperature at start (Celsius) (given) */
-double atend,     /* Ambient temperature at end (Celsius) (given) */
+char filter[],     /* String representing filter (e.g. "850") (given) */
+double atstart,    /* Ambient temperature at start (Celsius) (given) */
+double atend,      /* Ambient temperature at end (Celsius) (given) */
 int *status        /* global status (given and returned) */
 );
 
@@ -840,14 +840,14 @@ int ncycle,        /* number of cycles (given) */
 int numsamples,    /* number of samples (given) */
 int nflat,         /* number of flat coeffs per bol (given) */
 char *flatname,    /* name of flatfield algorithm (given) */
-struct sc2head *head, /* header data for each frame (given) */
+JCMTState head[],  /* header data for each frame (given) */
 int *dbuf,         /* simulated data (given) */
 int *dksquid,      /* dark SQUID time stream data (given) */
 double *fcal,      /* flatfield calibration (given) */
 double *fpar,      /* flat-field parameters (given) */
-char filter[],    /* String representing filter (e.g. "850") (given) */
-double atstart,   /* Ambient temperature at start (Celsius) (given) */
-double atend,     /* Ambient temperature at end (Celsius) (given) */
+char filter[],     /* String representing filter (e.g. "850") (given) */
+double atstart,    /* Ambient temperature at start (Celsius) (given) */
+double atend,      /* Ambient temperature at end (Celsius) (given) */
 int *status        /* global status (given and returned) */
 );
 
@@ -874,7 +874,7 @@ char subarray[],  /* name of the subarray */
 int numsamples,   /* number of samples (given) */
 int nflat,        /* number of flat coeffs per bol (given) */
 char *flatname,   /* name of flatfield algorithm (given) */
-struct sc2head *head, /* header data for each frame (given) */
+JCMTState head[], /* header data for each frame (given) */
 int *dbuf,        /* simulated data (given) */
 int *dksquid,     /* dark SQUID time stream data (given) */
 double *fcal,     /* flatfield calibration (given) */
@@ -911,7 +911,7 @@ char subarray[],  /* name of the subarray */
 int numsamples,   /* number of samples (given) */
 int nflat,        /* number of flat coeffs per bol (given) */
 char *flatname,   /* name of flatfield algorithm (given) */
-struct sc2head *head, /* header data for each frame (given) */
+JCMTState head[], /* header data for each frame (given) */
 int *dbuf,        /* simulated data (given) */
 int *dksquid,     /* dark SQUID time stream data (given) */
 double *fcal,     /* flatfield calibration (given) */
@@ -944,14 +944,14 @@ char subarray[],   /* name of the subarray */
 int numsamples,    /* number of samples (given) */
 int nflat,         /* number of flat coeffs per bol (given) */
 char *flatname,    /* name of flatfield algorithm (given) */
-struct sc2head *head, /* header data for each frame (given) */
+JCMTState head[],  /* header data for each frame (given) */
 int *dbuf,         /* simulated data (given) */
 int *dksquid,      /* dark SQUID values (given) */
 double *fcal,      /* flatfield calibration (given) */
 double *fpar,      /* flatfield parameters (given) */
-char filter[],    /* String representing filter (e.g. "850") (given) */
-double atstart,   /* Ambient temperature at start (Celsius) (given) */
-double atend,     /* Ambient temperature at end (Celsius) (given) */
+char filter[],     /* String representing filter (e.g. "850") (given) */
+double atstart,    /* Ambient temperature at start (Celsius) (given) */
+double atend,      /* Ambient temperature at end (Celsius) (given) */
 char *obsmode,     /* Observing mode */
 int *status        /* global status (given and returned) */
 );

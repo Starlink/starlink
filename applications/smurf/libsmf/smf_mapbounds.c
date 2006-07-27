@@ -62,7 +62,8 @@
 *     2006-02-23 (EC):
 *        Fixed bug in frameset generation - tangent point in pixel coordinates
 *        was not getting set properly.
-
+*     2006-07-26 (TIMJ):
+*        sc2head no longer used. Use JCMTState instead.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -120,7 +121,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   dim_t j;                     /* Loop counter */
   dim_t k;                     /* Loop counter */
   char *pname=NULL;            /* Name of currently opened data file */
-  struct sc2head *sc2hdr=NULL; /* Pointer to sc2head for this time slice */
+  JCMTState *state=NULL;       /* Pointer to STATE for this time slice */
   AstMapping *sky2map=NULL;    /* Mapping celestial->map coordinates */
   int startboundcheck=1;       /* Flag for first check of map dimensions */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */ 
@@ -189,7 +190,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 	
 	if( *status == SAI__OK ) {
 	  hdr = data->hdr;
-	  sc2hdr = hdr->sc2head;
+	  state = hdr->state;
 	  
 	  /* Get bolo -> sky mapping 
 	     Set the System attribute for the SkyFframe in input WCS 
@@ -204,8 +205,8 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 
 	    /* If requested get lon_0/lat_0 from pointing BASE coord. */
 	    if( flag != 0 ) {
-	      lon_0 = sc2hdr->tcs_tr_bc1;
-	      lat_0 = sc2hdr->tcs_tr_bc2;
+	      lon_0 = state->tcs_tr_bc1;
+	      lat_0 = state->tcs_tr_bc2;
 	    }
 
 	    fitschan = astFitsChan ( NULL, NULL, "" );

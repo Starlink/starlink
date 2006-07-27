@@ -52,6 +52,8 @@
 *        sc2head is now embedded in smfHead
 *     2006-01-27 (TIMJ):
 *        sc2head is a pointer again!
+*     2006-07-26 (TIMJ):
+*        sc2head no longer used. Use JCMTState instead.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -95,7 +97,7 @@
 #include "smf_typ.h"
 
 /* Data Acquisition Includes */
-#include "sc2da/sc2store_struct.h"
+#include "jcmt/state.h"
 #include "sc2da/sc2ast.h"
 #include "sc2da/sc2store.h"
 
@@ -111,7 +113,7 @@ void smf_tslice (const smfData *idata, smfData **tdata, int index, int *status )
   int npts;                   /* Number of points in a time slice */
   int offset;                 /* Offset int othe time series for the
 				 start of the current frame */
-  struct sc2head *sc2hdr;     /* Pointer to sc2head data */
+  JCMTState *sc2hdr;          /* Pointer to STATE data */
   double *tslicedata;         /* Pointer to output data array */
 
   /* Allocate space for the tdata struct */
@@ -128,7 +130,7 @@ void smf_tslice (const smfData *idata, smfData **tdata, int index, int *status )
   }
   memcpy( hdr, idata->hdr, sizeof( smfHead ) );
   (*tdata)->hdr = hdr;
-  sc2hdr = hdr->sc2head;
+  sc2hdr = hdr->state;
   /* Retrieve the header for this time slice */
   sc2store_headget( index, sc2hdr, status);
 

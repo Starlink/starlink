@@ -56,6 +56,8 @@
 *        Add smfGroup, smfArray
 *     2006-07-12 (EC):
 *        Added enumerated typedef smf_modeltype
+*     2006-07-26 (TIMJ):
+*        sc2head replaced by JCMTState
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -87,7 +89,7 @@
 #define SMF_TYP_DEFINED
 
 #include "star/hds_types.h"
-#include "sc2da/sc2store_struct.h"
+#include "jcmt/state.h"
 #include "sc2da/sc2store_par.h"
 #include "ast.h"
 #include "ndf.h"
@@ -138,14 +140,14 @@ typedef struct smfFile {
 /* Contains header general header information obtained from the file */
 
 typedef struct smfHead {
-  sc2head *sc2head;         /* Pointer to current sc2head */
+  JCMTState *state;       /* Pointer to current STATE */
   AstFrameSet * wcs;        /* Frameset for a particular time slice (frame) */
   AstFitsChan * fitshdr;    /* FITS header from the file */
   dim_t curframe;           /* Index corresponding to current frame */
   dim_t nframes;            /* Number of frames in smfData */
-  int isCloned;             /* If false, allsc2heads is owned by this
+  int isCloned;             /* If false, allState is owned by this
 			       struct, if true it should not be freed */
-  sc2head *allsc2heads;     /* Array of sc2heads for every time slice */ 
+  JCMTState *allState;     /* Array of STATE for every time slice */ 
 } smfHead;
 
 /* This structure contains ancilliary information obtained from a raw

@@ -56,6 +56,8 @@
 *        Free resources associated with .SMURF.MAPCOORD extension if needed
 *     2006-06-25 (EC):
 *        Now put MAPCOORD into SCU2RED extension
+*     2006-07-26 (TIMJ):
+*        sc2head no longer used. Use JCMTState instead.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -133,7 +135,7 @@ void smf_close_file( smfData ** data, int * status ) {
     if ( file->isSc2store ) {
       /* Nothing to free here but we do need to free the data array
 	 using free() not smf_free [since sc2store uses native malloc]
-	 and also free the hdr->allsc2heads */
+	 and also free the hdr->allState */
       isSc2store = 1;
 
     } else if ( file->ndfid != NDF__NOID ) {
@@ -155,12 +157,12 @@ void smf_close_file( smfData ** data, int * status ) {
   if (hdr != NULL) {
     if (hdr->wcs != NULL) astAnnul( hdr->wcs );
     if (hdr->fitshdr != NULL) astAnnul( hdr->fitshdr );
-    if (hdr->allsc2heads != NULL && !hdr->isCloned) {
+    if (hdr->allState != NULL && !hdr->isCloned) {
       if (isSc2store) {
 	/* make sure we use free() */
-	free(hdr->allsc2heads);
+	free(hdr->allState);
       } else {
-	smf_free(hdr->allsc2heads, status);
+	smf_free(hdr->allState, status);
       }
     }
     smf_free( hdr, status );

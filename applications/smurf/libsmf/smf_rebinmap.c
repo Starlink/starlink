@@ -58,6 +58,8 @@
 *        Avoid an additional dereference
 *     2006-03-23 (AGG):
 *        Updated API: now takes a smfData rather than a Grp
+*     2006-07-26 (TIMJ):
+*        sc2head not actually used.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -113,7 +115,6 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
   int lbnd_in[2];               /* Lower pixel bounds for input maps */
   int nbol = 0;                 /* # of bolometers in the sub-array */
   int rebinflags;               /* Control the rebinning procedure */
-  struct sc2head *sc2hdr=NULL;  /* Pointer to sc2head for this time slice */
   AstMapping *sky2map=NULL;     /* Mapping celestial->map coordinates */
   int ubnd_in[2];               /* Upper pixel bounds for input maps */
   const char *system;           /* Coordinate system */
@@ -137,7 +138,6 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outfset,
 	
     if( *status == SAI__OK ) {
       hdr = data->hdr;
-      sc2hdr = hdr->sc2head;
 	  
       /* Get bolo -> sky mapping 
 	 Set the System attribute for the SkyFframe in input WCS 

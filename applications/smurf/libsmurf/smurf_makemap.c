@@ -70,6 +70,8 @@
 *        Add iterative map-maker + associated command line parameters
 *     2006-06-24 (ED):
 *        Iterative map-maker parameters given in CONFIG file
+*     26-JUL-2006 (TIMJ):
+*        Remove unused sc2* includes.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -123,12 +125,6 @@
 #include "smurf_par.h"
 #include "smurflib.h"
 #include "libsmf/smf.h"
-
-#include "sc2da/sc2store_par.h"
-#include "sc2da/sc2store_struct.h"
-#include "sc2da/sc2math.h"
-#include "sc2da/sc2store.h"
-#include "sc2da/sc2ast.h"
 
 #define FUNC_NAME "smurf_makemap"
 #define TASK_NAME "MAKEMAP"
