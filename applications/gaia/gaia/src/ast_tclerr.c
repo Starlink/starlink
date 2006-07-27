@@ -9,7 +9,7 @@
  *     This routine implements the AST error reporting mechanism to
  *     work though Tcl. Before this can be used a call to the routine
  *     errTcl_Init must be made. This establishes the name of the Tcl
- *     interpretor that should deal with report.
+ *     interpreter that should deal with the report.
  
  *  Copyright:
  *     Copyright (C) 1998 Central Laboratory of the Research Councils
@@ -57,6 +57,7 @@
 #include "ast.h"                 /* AST interface */
 #include "tcl.h"
 #include "ast_tclerr.h"          /* Interface to this module */
+#include "sae_par.h"
 
 /* C header files. */
 /* --------------- */
@@ -65,13 +66,15 @@
 
 /* Static variables. */
 /* ----------------- */
-static Tcl_Interp *Interp = NULL;  /* Tcl interpreter for any messages*/
-static int Report = 1;             /* Whether to report errors */
+static Tcl_Interp *Interp = NULL;    /* Tcl interpreter for any messages */
+static int Report = 1;               /* Whether to report errors, currently
+                                      * ignored  */
+static const char *lastError = NULL; /* The last error message */
+static int lastStatus = SAI__OK;     /* The last error status */
 
 /* Function implementations. */
 /* ========================= */
 
-void errTcl_Init( Tcl_Interp *newinterp) {
 /*
  *+
  *  Name:
@@ -95,10 +98,11 @@ void errTcl_Init( Tcl_Interp *newinterp) {
  
  *-
  */
-  Interp = newinterp;
+void errTcl_Init( Tcl_Interp *newinterp) 
+{
+    Interp = newinterp;
 }
 
-int errTcl_Inhibit( int report ) {
 /*
  *+
  *  Name:
@@ -123,13 +127,43 @@ int errTcl_Inhibit( int report ) {
  
  *-
  */
-  int oldvalue = Report;
-  Report = report;
-  return oldvalue;
+int errTcl_Inhibit( int report ) 
+{
+    int oldvalue = Report;
+    Report = report;
+    return oldvalue;
 }
 
+/*
+ *+
+ *  Name:
+ *     errTcl_LastError
+   
+ *  Purpose:
+ *     Returns the last error message and status.
+ 
+ *  Synopsis:
+ *     #include "tcl_err.h"
+ *     void errTcl_LastError( int *status, const char **message )
+ 
+ *  Description:
+ *     This function returns the last error status seen and the associated
+ *     message. The message is volatile and should be copied if kept.
+ 
+ *  Parameters:
+ *     int *status
+ *        The status value;
+ *     const char **message
+ *        The message.
+ 
+ *-
+ */
+void errTcl_LastError( int *status, const char **message ) 
+{
+    *status = lastStatus;
+    *message = lastError;
+}
 
-void astPutErr_( int status, const char *message ) {
 /*
  *+
  *  Name:
@@ -165,6 +199,8 @@ void astPutErr_( int status, const char *message ) {
  *     required.
  *-
  */
+void astPutErr_( int status, const char *message ) 
+{
   
     /* By default we pass any AST related to FITS back through the Tcl
      * interpreter and through standard error. These are important and
@@ -190,4 +226,11 @@ void astPutErr_( int status, const char *message ) {
         (void) fprintf( stderr, "%s%s\n", astOK ? "!! " : "!  ", message );
         (void) fflush(stderr);
     }
+
+    /* Keep references to the status and message */
+    if ( lastError != NULL ) {
+        free( lastError );
+    }
+    lastError = strdup( message );
+    lastStatus = status;
 }
