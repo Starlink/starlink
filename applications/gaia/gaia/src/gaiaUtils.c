@@ -514,13 +514,29 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
 int gaiaUtilsAtlPlROI( AstPlot *plot, AstKeyMap **rplots, char **error_mess )
 {
     int status = SAI__OK;
+    int status_check;
+    char *ptr;
 
     emsMark();
     atlPlroi( plot, rplots, &status );
     if ( status != SAI__OK ) {
-        emsRlse();
-        *error_mess = gaiaUtilsErrMessage();
+        emsStat( &status_check );
+        if ( status_check == SAI__OK ) {
+            /* AST error, not passed through EMS */
+            errTcl_LastError( &status_check, &ptr );
+            if ( ptr != NULL ) {
+                *error_mess = strdup( ptr );
+            }
+            else {
+                *error_mess = 
+                    strdup( "Unknown error dealing with channel map plots" );
+            }
+        }
+        else {
+            *error_mess = gaiaUtilsErrMessage();
+        }
         *rplots = NULL;
+        emsRlse();
         return 0;
     }
     emsRlse();
@@ -539,8 +555,8 @@ int gaiaUtilsAtlAxTrm( AstFrameSet *frameset, int axes[], int lbnd[],
     emsMark();
     atlAxtrm( frameset, axes, lbnd, ubnd, work, &status );
     if ( status != SAI__OK ) {
-        emsRlse();
         *error_mess = gaiaUtilsErrMessage();
+        emsRlse();
         return 0;
     }
     emsRlse();
