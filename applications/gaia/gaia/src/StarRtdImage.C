@@ -1490,9 +1490,44 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
         //  system). Note we create a new skyframe so that we can ensure
         //  the correct defaults, i.e. anything not set equals the default
         //  for that system, rather than the existing value.
+        //
+        //  However for channel map WCS's this strategy does not work and we
+        //  must fall back to setting the attributes of all the ROI frames and
+        //  clearing those not set (but things like formatting remain a
+        //  problem).  Note this also happens to the WCS, not the Plot.
         AstSkyFrame *newsky = NULL;
-        if ( equinox || epoch || system ) {
-            if ( ! showpixels ) {
+        if ( ( equinox || epoch || system ) && ! showpixels ) {
+            const char *ident = astGetC( wcs, "Ident" );
+            if ( ident != NULL && strncmp( "ROI", ident, 3 ) == 0  ) {
+                int icur = astGetI( wcs, "Current" );
+                int nframe = astGetI( wcs, "nframe" );
+                for ( int i = 1; i <= nframe; i++ ) {
+                    astSetI( wcs, "Current", i );
+                    if ( strncmp( "ROI", astGetC( wcs, "Ident" ), 3 ) == 0 ){
+                        if ( equinox ) {
+                            astSet( wcs, equinox );
+                        }
+                        else {
+                            astClear( wcs, "Equinox" );
+                        }
+                        if ( epoch ) {
+                            astSet( wcs, epoch );
+                        }
+                        else {
+                            astClear( wcs, "Epoch" );
+                        }
+                        if ( system ) {
+                            astSet( wcs, system );
+                        }
+                        else {
+                            astClear( wcs, "System" );
+                        }
+                    }
+                    if ( ! astOK ) astClearStatus;
+                }
+                astSetI( wcs, "Current", icur );
+            }
+            else {
                 newsky = astSkyFrame( "" );
                 if ( equinox ) {
                     astSet( newsky, equinox );
