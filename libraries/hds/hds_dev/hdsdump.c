@@ -55,6 +55,10 @@
 *     19-JUL-2006 (TIMJ):
 *      Fix compiler warnings. Use fseeko. Privatise some globals.
 *      Fix buffer overruns in unterminated strings.
+*     26-JUL-2006 (TIMJ):
+*      chip needs to be global (do not know why) to allow
+*      one of my test HDS files to dump without segv.
+*      Factor out fseek code.
 *     {enter_further_changes_here}
 
 *-
@@ -64,10 +68,18 @@
 void decode_type( int type, char **string);
 void decode_pdd( struct PDD *pdd );
 void add_block(INT_BIG bloc);
+void read_block ( FILE * fp, INT_BIG bloc, size_t nbytes, void * ptr );
 
 /* Global variables */
 INT_BIG nxtblk[50];
 INT_BIG blkcnt;
+
+/* for some as yet undetermined reason these two need to be globals to prevent
+   core dump on some large test files. Even though they are not used outside of main */
+
+   int  chip;						   /* Current chip  */
+
+
 
 int
 main(int argc, char **argv)
@@ -76,7 +88,6 @@ main(int argc, char **argv)
    INT_BIG cur_block;					   /* Current block */
    FILE *fp = NULL;
    unsigned char block[REC__SZBLK];                         /* Block buffer  */
-   int  chip;						   /* Current chip  */
    struct HCB hcb;					   /* HCB data      */
    struct RCL rcl;                                          /* RCL data      */
    struct RID rid;			      		   /* Record id     */
@@ -154,12 +165,7 @@ main(int argc, char **argv)
    do {
       tlrb++;
       cur_block = nxtblk[0];
-#if HAVE_FSEEKO
-      fseeko(fp, (cur_block-1) * REC__SZBLK, SEEK_SET);
-#else
-      fseek(fp, (cur_block-1) * REC__SZBLK, SEEK_SET);
-#endif
-      fread( block, 1, REC__SZBLK, fp );
+      read_block( fp, cur_block, REC__SZBLK, block );
 
       for( chip=0; chip < REC__MXCHIP ; chip+=rcl.size ) {
          ptr = block + REC__SZCBM + (chip * REC__SZCHIP ); 
@@ -213,12 +219,7 @@ main(int argc, char **argv)
                if( rcl.chain )
                {
                   printf("  From chained block:\n");
-#if HAVE_FSEEKO
-                  fseeko(fp, (cblk - 1) * REC__SZBLK, SEEK_SET);
-#else
-                  fseek(fp, (cblk - 1) * REC__SZBLK, SEEK_SET);
-#endif
-                  fread( tblk, 1, REC__SZBLK, fp );
+                  read_block( fp, cblk, REC__SZBLK, tblk );
                   ptr = tblk;
                }
                if(odl.naxes == 0) {
@@ -242,18 +243,13 @@ main(int argc, char **argv)
                if( rcl.chain )
                {
                   printf("  From chained block:\n");
-#if HAVE_FSEEKO
-                  fseeko(fp, (cblk - 1) * REC__SZBLK, SEEK_SET);
-#else
-                  fseek(fp, (cblk - 1) * REC__SZBLK, SEEK_SET);
-#endif
-                  fread( tblk, 1, REC__SZBLK, fp );
+                  read_block( fp, cblk, REC__SZBLK, tblk );
                   ptr = tblk;
                }
                for(j =0; j<i; j++ ) {
 		  _chmove( DAT__SZNAM, ptr, name );
 		  name[DAT__SZNAM] = '\0';
-		  dat1_unpack_crv( ptr, 0, &rid ),
+		  dat1_unpack_crv( ptr, 0, &rid );
                   printf("  Name = %s rid=(%" HDS_INT_BIG_S",%d)\n", name, rid.bloc, 
                          rid.chip);
                   if( rid.bloc > cur_block )
@@ -371,4 +367,31 @@ decode_pdd( struct PDD *pdd )
    }
           
    printf("dype = %s length=%d", string, (int)pdd->length);
+}
+
+void read_block ( FILE * fp, INT_BIG bloc, size_t nbytes, void * ptr ) {
+   int seek_stat;
+   int readok = 1;
+
+#if HAVE_FSEEKO
+   seek_stat = fseeko(fp, (bloc - 1) * nbytes, SEEK_SET);
+#else
+   seek_stat = fseek(fp, (bloc - 1) * nbytes, SEEK_SET);
+#endif
+
+   if (seek_stat == 0) {
+     fread( ptr, 1, nbytes, fp );
+     if (ferror(fp)) {
+       readok = 0;
+       clearerr(fp);
+     }
+   } else {
+     readok = 0;
+   }
+
+   if (!readok) { 
+     memset( ptr, 0, nbytes );
+     printf("Had trouble reading from file for some unknown reason. Not good.\n");
+     exit(1);
+   }
 }
