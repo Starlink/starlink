@@ -11,6 +11,9 @@ dist_noinst_SCRIPTS = smurf_link_adam
 bin_MONOLITHS = smurf_mon
 smurf_mon_SOURCES = smurf_mon.c $(DA_FILES) $(WVM_FILES) $(SIM_FILES)
 
+jcmtincludedir = $(includedir)/jcmt
+jcmtinclude_HEADERS = jcmt/state.h
+
 # Tasks
 smurf_mon_TASKS = extinction flatfield makemap remsky qlmakemap scanfit sc2sim dreamsolve
 
