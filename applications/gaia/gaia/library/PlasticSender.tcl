@@ -74,36 +74,39 @@ itcl::class gaia::PlasticSender {
       #  Get the actual image object which provides most of the useful
       #  methods.
       set image [$image_ctrl get_image]
+
+      #  If the image is FITS and has a filename which exists, 
+      #  we can just send a file: URL based on it.
       set file [$image cget -file]
-      if { $file != {} } {
-         
-         #  If the image is FITS and has a filename, we can just send a
-         #  file: URL based on it.
-         if { [$image isfits] } {
-            if { [catch {
-               set url [get_file_url_ $file]
-               $plastic_app send_message_async $msg_id $url $recipients
-            } msg] } {
-               error "error in FITS send: $::errorInfo"
-            }
-         } else {
-            #  Otherwise life is more complicated.  We have to write the 
-            #  image to a temporary FITS file, send the load message
-            #  synchronously, and then tidy up the file. This will
-            #  only work if the CONVERT package is available, so check that.
-            if { [info exists ::env(NDF_FORMATS_IN)] } {
-               if { [catch {
-                  set tmpfile [get_temp_file_ ".fits"]
-                  $image dump $tmpfile FITS-WCS
-                  set url [get_file_url_ $tmpfile]
-                  $plastic_app send_message_sync $msg_id $url $recipients
-                  ::file delete -force $tmpfile
-               } msg] } {
-                  error "error in NDF send: $::errorInfo"
-               }
-            } else {
-               error "Cannot send non-FITS images, no CONVERT support"
-            }
+      if { [$image isfits] && $file != {} && [::file exists $file] } {
+         if { [catch {
+            set url [get_file_url_ $file]
+            $plastic_app send_message_async $msg_id $url $recipients
+         } msg] } {
+            error "error in FITS send: $::errorInfo"
+         }
+
+      #  Otherwise life is more complicated.  We have to write the 
+      #  image to a temporary FITS file, send the load message
+      #  synchronously, and then tidy up the file.
+      } else {
+
+         #  If it's not FITS, this will only work if the CONVERT package
+         #  is available.
+         if { ! [$image isfits] && ! [info exists ::env(NDF_FORMATS_IN)] } {
+            error "Cannot send non-FITS images, no CONVERT support"
+         }
+
+         #  Attempt the write and send.
+         set tmpfile [get_temp_file_ ".fits"]
+         if { [catch {
+            $image dump $tmpfile FITS-WCS
+            set url [get_file_url_ $tmpfile]
+            $plastic_app send_message_sync $msg_id $url $recipients
+            ::file delete -force $tmpfile
+         } msg] } {
+            ::file delete -force $tmpfile
+            error "error in image send: $::errorInfo"
          }
       }
    }
