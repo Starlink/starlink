@@ -683,17 +683,19 @@ itcl::class gaia::Gaia {
          {Create and manipulate astrometry information} \
          -menu [menu $m.astrom]
 
-      add_menuitem $m.astrom cascade "Automatic position matching" \
-         {Create and manipulate astrometry information} \
-         -menu [menu $m.astrom.auto]
+      if { [info exists ::env(AUTOASTROM_DIR)] } {
+         add_menuitem $m.astrom cascade "Automatic position matching" \
+            {Create and manipulate astrometry information} \
+            -menu [menu $m.astrom.auto]
 
-      add_menuitem $m.astrom.auto command "Simple..." \
-         {Create a WCS for image using AUTOASTROM} \
-         -command [code $this make_toolbox simpleautoastrom]
-
-      add_menuitem $m.astrom.auto command "Advanced..." \
-         {Create a WCS for image using AUTOASTROM} \
-         -command [code $this make_toolbox advancedautoastrom]
+         add_menuitem $m.astrom.auto command "Simple..." \
+            {Create a WCS for image using AUTOASTROM} \
+            -command [code $this make_toolbox simpleautoastrom]
+         
+         add_menuitem $m.astrom.auto command "Advanced..." \
+            {Create a WCS for image using AUTOASTROM} \
+            -command [code $this make_toolbox advancedautoastrom]
+      }
 
       add_menuitem $m.astrom command "Fit to star positions..." \
          {Create a WCS for image using reference positions} \
