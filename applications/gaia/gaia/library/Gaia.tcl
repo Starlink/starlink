@@ -1706,31 +1706,36 @@ itcl::class gaia::Gaia {
          #  position.
          if { ! [catch {$image convert coords $ra $dec $units \
                            cx cy canvas} msg ] } {
-            $canvas coords $position_of_interest_ $cx $cy
-            set last_position_of_interest_ "$ra,$dec"
+            #  Check for AST__BAD returns.
+            if { [expr abs($cx)] < 1.0E20 } {
+               $canvas coords $position_of_interest_ $cx $cy
+               set last_position_of_interest_ "$ra,$dec"
 
-            #  Make sure the position is visible, cannot succeed when the
-            #  image is zoomed and the position is off image.
-            set dw [$image dispwidth]
-            set dh [$image dispheight]
-            set cw [winfo width $canvas]
-            set ch [winfo height $canvas]
-            if { $cw != 1 && $dw && $dh } {
-               set px [expr ($cx+0.0)/$dw]
-               set py [expr ($cy+0.0)/$dh]
-               set xrange [$canvas xview]
-               set yrange [$canvas yview]
-
-               #  Only move if the position is not currently visible, and
-               #  the image is larger than the window in at least one
-               #  dimension.
-               if { $dw > $cw || $dh > $ch } {
-                  if { $px < [lindex $xrange 0] || $px > [lindex $xrange 1] ||
-                       $py < [lindex $yrange 0] || $py > [lindex $yrange 1] } {
-                     $canvas xview moveto [expr (($cx-$cw/2.0)/$dw)]
-                     $canvas yview moveto [expr (($cy-$ch/2.0)/$dh)]
+               #  Make sure the position is visible, cannot succeed when the
+               #  image is zoomed and the position is off image.
+               set dw [$image dispwidth]
+               set dh [$image dispheight]
+               set cw [winfo width $canvas]
+               set ch [winfo height $canvas]
+               if { $cw != 1 && $dw && $dh } {
+                  set px [expr ($cx+0.0)/$dw]
+                  set py [expr ($cy+0.0)/$dh]
+                  set xrange [$canvas xview]
+                  set yrange [$canvas yview]
+                  
+                  #  Only move if the position is not currently visible, and
+                  #  the image is larger than the window in at least one
+                  #  dimension.
+                  if { $dw > $cw || $dh > $ch } {
+                     if { $px < [lindex $xrange 0] || $px > [lindex $xrange 1] ||
+                          $py < [lindex $yrange 0] || $py > [lindex $yrange 1] } {
+                        $canvas xview moveto [expr (($cx-$cw/2.0)/$dw)]
+                        $canvas yview moveto [expr (($cy-$ch/2.0)/$dh)]
+                     }
                   }
                }
+            } else {
+               error "Failed to set interest position: bad coordinates"
             }
          } else {
             error "Failed to set interest position: $msg"
