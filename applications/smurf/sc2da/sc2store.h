@@ -98,6 +98,7 @@ void sc2store_headcremap
 (
 HDSLoc *headloc,              /* HDS locator (given) */
 int nframes,                  /* number of frames to be created (given) */
+inst_t instrument,            /* instrument code (given) */
 int *status                   /* global status (given and returned) */
 );
 
@@ -116,6 +117,7 @@ void sc2store_headrmap
 (
 HDSLoc *headloc,              /* HDS locator (given) */
 int nframes,                  /* number of frames expected (given) */
+inst_t instrument,            /* instrument code (given) */
 int *status                   /* global status (given and returned) */
 );
 

@@ -297,7 +297,7 @@ int *status              /* global status (given and returned) */
 /* Create storage for Header values for each frame - store in JCMTSTATE */
 
    ndfXnew( indf, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0, &jcmtstateloc, status );
-   sc2store_headcremap ( jcmtstateloc, nframes, status );
+   sc2store_headcremap ( jcmtstateloc, nframes, INST__SCUBA2, status );
 
 /* Create the structured extension for each frame */
 
@@ -591,12 +591,13 @@ int *status                   /* global status (given and returned) */
 {
    if ( *status != SAI__OK ) return;
 
-   /* Note that we have to check for NULL in case we had a missing component.
-      We also check all possible struct members not just SCUBA-2 ones. This is
-      done so that SMURF can support the reading of the JCMTSTATE extension from other
-      instruments in addition to SCUBA-2. This routine is now JCMT-specific rather than
-      SCUBA-2 specific and could be factored out. All JCMTSTATE access could usefully be
-      factored out.
+   /* Note that we have to check for NULL in case we had a missing
+      component.  We also check all possible struct members not just
+      SCUBA-2 ones. This is done so that SMURF can support the reading
+      of the JCMTSTATE extension from other instruments in addition to
+      SCUBA-2. This routine is now JCMT-specific rather than SCUBA-2
+      specific and could be factored out. All JCMTSTATE access could
+      usefully be factored out.
    */
 
    /* use a macro to simplify things */
@@ -695,12 +696,15 @@ void sc2store_headcremap
 (
 HDSLoc *headloc,              /* HDS locator (given) */
 int nframes,                  /* number of frames to be created (given) */
+inst_t instrument,            /* instrument code (given) */
 int *status                   /* global status (given and returned) */
 )
 
 /* Method :
     Create HDS arrays of size nframes for each header type within the HDS
-    component identified by headloc and store the pointers. 
+    component identified by headloc and store the pointers. The instrument
+    code is used to determine which components are written. INST__ALL should
+    be used if all components are required.
 
    History :
     18Aug2004 : original (bdk)
@@ -708,6 +712,7 @@ int *status                   /* global status (given and returned) */
     27Jan2006 : Kluge initialising of sc2store_loc[] array 
                 Risks, overwriting a valid locator (TIMJ)
     27Jul2006 : Use ACSIS/SCUBA-2 merged approach (TIMJ)
+    28Jul2006 : Add instrument argument (TIMJ)
 */
 {
    int dim[2];
@@ -732,8 +737,8 @@ int *status                   /* global status (given and returned) */
      sc2store_loc[pos] = NULL;
      sc2store_ptr[pos] = NULL;
 
-     /* see if component is required for SCUBA-2 or not */
-     if ( hdsRecords[j].instrument & INST__SCUBA2 ) {
+     /* see if component is required for this instrument or not */
+     if ( hdsRecords[j].instrument & instrument ) {
        /* create the component */
        datNew ( headloc, hdsRecords[j].name, hdsRecords[j].type, 
 		ndim, dim, status );
@@ -746,8 +751,9 @@ int *status                   /* global status (given and returned) */
        datMap ( sc2store_loc[pos], hdsRecords[j].type, "WRITE", 
 		ndim, dim, &(sc2store_ptr[pos]), status );
 
-       /* if this is a string component then we can fill it with blanks. Other components
-	  will not be initialised but they will always be filled later on. */
+       /* if this is a string component then we can fill it with
+	  blanks. Other components will not be initialised but they
+	  will always be filled later on. */
        if (strncmp( "_CHAR", hdsRecords[j].type, 5) == 0) {
 	 datLen( sc2store_loc[pos], &len, status );
 	 memset( sc2store_ptr[pos], ' ', dim[0] * len );
@@ -860,12 +866,16 @@ void sc2store_headrmap
 (
 HDSLoc *headloc,              /* HDS locator (given) */
 int nframes,                  /* number of frames expected (given) */
+inst_t instrument,            /* instrument code (given) */
 int *status                   /* global status (given and returned) */
 )
 
 /* Method :
     Map HDS arrays of size nframes for each header type within the HDS
-    component identified by headloc and store the pointers. 
+    component identified by headloc and store the pointers. All components
+    that exist will be mapped. The instrument code is used to determine
+    whether a component is mandatory. Passing in INST__NONE will result in no
+    mandatory components.
 
    History :
     18Aug2004 : original (bdk)
@@ -873,6 +883,7 @@ int *status                   /* global status (given and returned) */
     27Jan2006 : Kluge initialising of sc2store_loc[] array 
                 Risks, overwriting a valid locator (TIMJ)
     27Jul2005 : Use shared ACSIS/SCUBA-2 JCMTState scheme
+    28Jul2006 : Add instrument argument (TIMJ)
 */
 {
    int dim[2];
@@ -895,7 +906,8 @@ int *status                   /* global status (given and returned) */
      sc2store_loc[pos] = NULL;
      sc2store_ptr[pos] = NULL;
 
-     /* See if the component exists (it may be an ACSIS or SCUBA-2 file or whatever */
+     /* See if the component exists (it may be an ACSIS or SCUBA-2
+	file or whatever) */
      datThere( headloc, hdsRecords[j].name, &isthere, status );
      if (isthere) {
        datFind ( headloc, hdsRecords[j].name, &(sc2store_loc[pos]), 
@@ -905,14 +917,15 @@ int *status                   /* global status (given and returned) */
        datMap ( sc2store_loc[pos], hdsRecords[j].type, "READ", 
 		ndim, dim, &(sc2store_ptr[pos]), status );
      } else {
-       /* if missing and is a mandatory SCUBA-2 component then we need to complain
-	  somehow. Old files will be a problem if we set status to bad or we can just warn.
-	  Alternatively, we need to add a .mandatory component to hdsRecords for really need
-          this for SCUBA2 as opposed to would like it for scuba2. */
-       if ( hdsRecords[j].instrument & INST__SCUBA2 ) {
+       /* if missing and is a mandatory component then we need
+	  to complain somehow. Old files will be a problem if we set
+	  status to bad or we can just warn.  Alternatively, we need
+	  to add a .mandatory component to hdsRecords for really need
+	  this for SCUBA2 as opposed to would like it for scuba2. */
+       if ( hdsRecords[j].instrument & instrument ) {
 	 if (*status == SAI__OK) {
 	   *status = DITS__APP_ERROR;
-	   sprintf( errmess, "Mandatory SCUBA-2 component not present in file. Can't find '%s'",
+	   sprintf( errmess, "Mandatory component not present in file. Can't find '%s'",
 		    hdsRecords[j].name);
 	   ErsRep( 0, status, errmess );
 	 }
@@ -1629,7 +1642,7 @@ int *status              /* global status (given and returned) */
      /* needs to be cloned since they are annulled separately */
      datClone( frameloc, &jcmtstateloc, status );
    }
-   sc2store_headrmap ( jcmtstateloc, *nframes, status );
+   sc2store_headrmap ( jcmtstateloc, *nframes, INST__SCUBA2, status );
 
 /* structured extension for each frame */
 

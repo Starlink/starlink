@@ -98,6 +98,8 @@
 *        Now NULL pointers in smf_create_smf*, changed to .SCU2RED.MAPCOORD
 *     2006-07-26 (TIMJ):
 *        sc2head no longer used. Use JCMTState instead.
+*     2006-07-28 (TIMJ):
+*        Use new API for sc2store_headrmap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -328,8 +330,9 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	} else {
 	  /* Need to get the location of the extension for STATE parsing */
 	  ndfXloc( indf, JCMT__EXTNAME, "READ", &xloc, status );
-	  /* And need to map the header */
-	  sc2store_headrmap( xloc, ndfdims[2], status );
+	  /* And need to map the header (all components for now until
+	     we learn how to translate instrument to constant.) */
+	  sc2store_headrmap( xloc, ndfdims[2], INST__NONE, status );
 
 	  /* Malloc some memory to hold all the time series data */
 	  hdr->allState = smf_malloc( ndfdims[2], sizeof(JCMTState),
