@@ -1,5 +1,5 @@
 
-  Release 3.1-0: 17th July 2006.
+  Release 3.2-0: 28th July 2006.
   ==============================
 
   The most significant changes in this release are in cube handling. The
@@ -22,6 +22,7 @@
   display of MEFs, and groups of NDFs, as a single image.
 
   There are also many minor changes in this release of GAIA:
+
 
     - GAIA can now display in-line compressed images (such as RICE from WFCAM).
       These are converted into temporary files on the fly and can be
@@ -55,6 +56,7 @@
 
     - The "Show all coordinates" toolbox now displays coordinates from
       systems with more than 2 axes.
+    
 
   Finally in this release GAIA has undergone major changes in the way that it
   is built and distributed (it is now available in the Starlink CVS repository

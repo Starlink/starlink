@@ -52,7 +52,7 @@ GAIA_TASKS = ardstat autocrop cat2tab tab2cat asc2tab tab2asc
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun214fig.ps
 
 ##  On-line help.
-starhelp_DATA = gaia.htx/*.html gaia.htx/*.gif
+#starhelp_DATA = gaia.htx/*.html gaia.htx/*.gif
 
 ##  Root of the local Tcl installation. This must be the Starlink tclsys,
 ##  as that contains some minor changes that support the creation of the
@@ -149,7 +149,9 @@ dist-hook:
 
 ##  Post-installation tasks. We need to set up the softlinks for the various
 ##  tasks in the monolith. Don't use the usually mechanisms as the gaiaMon
-##  monolith is created elsewhere.
+##  monolith is created elsewhere. Also the on-line help ends up in 
+##  $(starhelpdir), that should be $(starhelpdir).htx for showme etc.
+##  to work.
 install-exec-local:
 	cd $(DESTDIR)$(bindir); \
 	for t in $(GAIA_TASKS); do \
@@ -158,6 +160,13 @@ install-exec-local:
 	   $(LN_S) gaiaMon $$t; \
 	   $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(bindir)/$$t" || : ;\
 	done
+	cd $(starhelpdir)/..; \
+	pwd=`pwd`; \
+	echo "pwd = $${pwd} ($(starhelpdir))"; \
+	rm -f gaia.htx; \
+	echo $(LN_S) gaia gaia.htx; \
+	$(LN_S) gaia gaia.htx; \
+	$(MANIFEST) && echo "MANIFEST:$${pwd}/gaia.htx" || : ;
 
 ##  Install realtime parts of Skycat that have not been done yet.
 install-data-local:

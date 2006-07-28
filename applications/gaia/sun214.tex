@@ -16,11 +16,14 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.23}
-\newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {17th July 2006}
+\newcommand{\stardocnumber}    {214.24}
+\newcommand{\stardocauthors}   {Peter W. Draper, 
+                                Norman Gray, 
+                                David S. Berry \& 
+                                Mark Taylor }
+\newcommand{\stardocdate}      {28th July 2006}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and Image Analysis Tool}
-\newcommand{\stardocversion}   {3.1-0}
+\newcommand{\stardocversion}   {3.2-0}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
@@ -292,7 +295,8 @@ defect patching, polarization vector plotting and the ability to connect to
 resources available in on-line (WWW) catalogues and archives.
 
 GAIA also features tools for interactively displaying image planes from data
-cubes and plotting spectra from the hidden dimension.
+cubes and plotting spectra extracted from the third dimension. It can also 
+interoperate with other PLASTIC enabled applications.
 
 GAIA is a derivative of the
 \htmladdnormallinkfoot{SkyCat}{http://archive.eso.org/skycat/} image
@@ -780,6 +784,23 @@ note that this means that FITS files will now be accessed as foreign,
 \end{verbatim}
 \end{quote}
 
+\subsection{PLASTIC interoperability}
+
+PLASTIC stands for the PLatform for AStronomical Tool InterConnection.  It is
+a protocol which allows tools on the desktop to communicate with each other.
+Very briefly, the way it works is that applications can send messages to a
+central \mytt{hub process} which will then pass them on to other applications
+which can respond to them in some appropriate way (GAIA supports image display
+and position tracking). You will require a hub, of somekind, to use this.
+
+You can find more information about how it works, what applications
+are compatible, and how it can be useful at the
+\htmladdnormallinkfoot{PLASTIC}{http://plastic.sourceforge.net/} web site.
+You should note that PLASTIC is an evolving system, so future compatibility
+isn't guaranteed. To remove the \mytt{Interop} menu you can use the 
+\mytt{Startup options...} window located in the \mytt{File} menu.
+
+
 \section{\xlabel{configuration_options}\label{configuration_options}Configuration options}
 
 GAIA has many options that can be defined when starting it up. \textit{These
@@ -801,6 +822,7 @@ are best set using the \mytt{Startup options...} window located in the
  -extended\_precision&  Show milliarcsecond readout precision \\
  -float\_panel       &  Detach the control panel \\
  -focus\_follows\_mouse & Image and entry focus follows mouse pointer \\
+ -interop\_menu      &  Reveal the Interop menu for PLASTIC interactions (default: 1) \\
  -linear\_cartesian  &  Assume CAR projections are a linear mapping \\
  -quiet\_exit        & Issue a warning before exiting GAIA (default 0)\\
  -show\_hdu\_chooser & Automatically show the HDU chooser \\
@@ -884,7 +906,7 @@ the version of SkyCat that GAIA is based on are also available at
 to extend SkyCat or GAIA at the user interface level are recommended
 to read about ``SkyCat plugins''.
 
-\section{Release notes for version 3.1-0}
+\section{Release notes for version 3.2-0}
 
 The most significant changes in this release are in cube handling. The toolbox
 is now much faster at image slicing and handles FITS cubes as well as NDF
@@ -906,6 +928,12 @@ of MEFs, and groups of NDFs, as a single image.
 
 There are also many minor changes in this release of GAIA:
 \begin{itemize}
+ 
+    \item Support for a subset of the PLASTIC protocols has been added to
+    enable GAIA to interoperate with tools designed for the Virtual
+    Observatory.  See the new \mytt{Interop} menu in the main display and the
+    help page available in the on-line help.
+
     \item GAIA can now display in-line compressed images (such as RICE from
      WFCAM). These are converted into temporary files on the fly and can be
      used with all other tasks within GAIA.
