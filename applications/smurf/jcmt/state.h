@@ -21,6 +21,21 @@
 *     information between functions. Additionally, it defines the sizes of string
 *     members and the data types and names used by HDS (with ordering information).
 
+*  Notes:
+*     The following definitions can be used:
+*     - JCMT__EXTNAME and JCMT__EXTTYPE are the name and type of the standard extension
+*       in which to store STATE information.
+*     - INST__ACSIS / INST__SCUBA2 are bitmasks indicating whether an HDSdataRecord
+*       should be used for a particular instrument.
+*     - JCMT__SZ* are sizes of strings used in JCMTState structures.
+*     - Each JCMTState struct member has a corresponding upper-cased string defining a unique
+*       index allowing arrays of locators and pointers to be addressed by name.
+*     The following structures are defined:
+*     - JCMTState     : All STATE structure available
+*     - HDSdataRecord : Information on the individual HDS component in files.
+*     The following static data structures are available:
+*     - hdsRecords    : Array of HDSdataRecord structs to be used in files.
+
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     BDK: Dennis Kelly (UKATC, Edinburgh)
@@ -32,6 +47,8 @@
 *        Original version for ACSIS specwriter
 *     25-JUL-2006 (TIMJ):
 *        Merge ACSIS and SCUBA-2 into a single include file.
+*     27-JUL-2006 (TIMJ):
+*        Remove RTS_TASKS. Remove spurious ACSIS members. Add more docs.
 
 *  Copyright:
 *     Copyright (C) 2004, 2006 Particle Physics and Astronomy Research Council.
@@ -62,7 +79,6 @@
 #define JCMT__EXTTYPE  "RTS_ARR"
 
 /* Some sizes used for dimensioning the string arrays */
-#define JCMT__SZRTS_TASKS      80
 #define JCMT__SZTCS_SOURCE     32
 #define JCMT__SZTCS_TR_SYS     16
 #define JCMT__SZACS_RECEPTOR    5
@@ -84,7 +100,6 @@
 typedef struct JCMTState {
   unsigned int rts_num;
   double rts_end;    /* MJD TAI of end of sequence step */
-  char   rts_tasks[JCMT__SZRTS_TASKS + 1];
   double smu_x;
   double smu_y;
   double smu_z;
@@ -136,23 +151,6 @@ typedef struct JCMTState {
   char   acs_source_ro[JCMT__SZACS_SOURCE_RO+1];
   double pol_ang;
   float  fts_pos;
-
-
-
-  /* These are not related to the sequence as such but define the particular RECEPTOR
-     that is being associated with the sequence. The ACSIS specwriter writes this information
-     to a separate structure in the file and so could usefully be defined as a completely
-     separate struct. */
-  double acs_feedx;          /* X coordinate of feed "acs_feed" */
-  double acs_feedy;          /* Y coordinate of feed "acs_feed" */
-  int    acs_spec_window_id; /* SPW id used to assign subsystem */
-  unsigned int acs_feed;     /* Feed number */
-  float  acs_tsys;
-  float  acs_trx;
-
-  /* this should be passed into the acsSpecWriteTS explicitly */
-  unsigned int rts_endnum;  /* Highest number expected in this sequence */
-
 } JCMTState;
 
 /* Generate indices to allow the programmer to access individual elements
@@ -165,7 +163,6 @@ typedef enum
 {
    RTS_NUM,
    RTS_END,
-   RTS_TASKS,
    SMU_X,
    SMU_Y,
    SMU_Z,
@@ -241,7 +238,6 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
   {
     { RTS_NUM, "_INTEGER", "RTS_NUM", INST__ACSIS | INST__SCUBA2 },
     { RTS_END, "_DOUBLE", "RTS_END", INST__ACSIS | INST__SCUBA2 },
-    { RTS_TASKS, CHARTYP(JCMT__SZRTS_TASKS), "RTS_TASKS", INST__ACSIS | INST__SCUBA2 },
     { SMU_X, "_DOUBLE", "SMU_X", INST__ACSIS | INST__SCUBA2 },
     { SMU_Y, "_DOUBLE", "SMU_Y", INST__ACSIS | INST__SCUBA2 },
     { SMU_Z, "_DOUBLE", "SMU_Z", INST__ACSIS | INST__SCUBA2 },
