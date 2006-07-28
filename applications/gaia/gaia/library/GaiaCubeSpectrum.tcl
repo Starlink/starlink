@@ -201,7 +201,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       }
 
       add_short_help $itk_component(sendtosplat) \
-         {Send last point spectrum to SPLAT-VO (NDF only)}
+         {Send extracted spectrum to SPLAT-VO}
 
       #  Set initial bindings.
       toggle_extraction_
