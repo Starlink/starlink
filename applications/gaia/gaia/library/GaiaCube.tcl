@@ -371,7 +371,7 @@ itcl::class gaia::GaiaCube {
       #  Delete any registered temporary files.
       foreach filename $temp_files_ {
          if { [file exists $filename] } {
-            catch {file delete $filename}
+            catch {::file delete $filename}
          }
       }
 
@@ -412,6 +412,7 @@ itcl::class gaia::GaiaCube {
 
          $namer absolute
          set ndfname_ [$namer ndfname 0]
+         set type_ [$namer type]
          $cubeaccessor_ configure -dataset "$ndfname_"
          set bounds_ [$cubeaccessor_ getbounds 0]
          set ndims [expr [llength $bounds_]/2]
@@ -827,6 +828,11 @@ itcl::class gaia::GaiaCube {
       return $ndfname_
    }
 
+   #  Get the type of the cube.
+   public method get_type {} {
+      return $type_
+   }
+
    #  Get the current axis.
    public method get_axis {} {
       return $axis_
@@ -891,6 +897,9 @@ itcl::class gaia::GaiaCube {
 
    #  The name of the dataset, as an NDF specification (handle HDU and slices).
    protected variable ndfname_ {}
+
+   #  The filetype of the dataset, will be ".sdf" for NDFs.
+   protected variable type_ {}
 
    #  The current plane along the current axis.
    protected variable plane_ 1

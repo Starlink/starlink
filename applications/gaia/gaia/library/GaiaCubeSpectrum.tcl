@@ -210,10 +210,21 @@ itcl::class gaia::GaiaCubeSpectrum {
    #  Destructor:
    #  -----------
    destructor  {
+
+      #  Delete any temporary files.
+      if { $temp_files_ != {} } {
+         foreach filename $temp_files_ {
+            if { [file exists $filename] } {
+               catch {::file delete $filename}
+            }
+         }
+      }
+
       close
       if { $toolbox_ != {} } {
          delete object $toolbox_
       }
+
    }
 
    #  Methods:
@@ -431,50 +442,72 @@ itcl::class gaia::GaiaCubeSpectrum {
       set lub_ $ub
    }
 
-   #  Send an NDF section to SPLAT for display. The coordinates used are those
-   #  from the last position click. ARD regions are not supported (yet) and
-   #  neither are non-NDFs.
+   #  Send an NDF section to SPLAT for display, otherwise a temporary text
+   #  file is used. The coordinates used are those from the last position
+   #  click or selected region.
    protected method send_to_splat_ {} {
-      if { $spectrum_ == {} || $last_cxcy_ == {} } {
-         info_dialog "No point spectrum has been extracted" $w_
+      if { $spectrum_ == {} || ( $last_cxcy_ == {} && $last_region_ == {} ) } {
+         info_dialog "No spectrum has been extracted" $w_
          return
       }
 
-      lassign $last_cxcy_ cx cy
-
-      #  Convert click coordinates from canvas coords to grid coords.
-      set ccx [$canvas_ canvasx $cx]
-      set ccy [$canvas_ canvasy $cy]
-      $rtdimage_ convert coords $ccx $ccy canvas iix iiy image
-      
-      #  Correct to pixel indices.
-      lassign [$itk_option(-gaiacube) image_grid2pixel $iix $iiy] ix iy
-      
-      #  Create the right section. Use extraction bounds on the
-      #  spectral axis.
-      set lb $itk_option(-lower_limit)
-      set ub $itk_option(-upper_limit)
-      set range "$lb:$ub"
-      set axis [$itk_option(-gaiacube) get_axis]
-      set close_section [$itk_option(-gaiacube) get_close_section]
-      if { $axis == 1 } {
-         set section "($range,$ix,${iy}${close_section}"
-      } elseif { $axis == 2 } {
-         set section "($ix,$range,${iy}${close_section})"
-      } else {
-         set section "($ix,$iy,${range}${close_section}"
-      }
-      
-      #  Send the section to SPLAT.
+      #  If not already done, prepare for sending messages to SPLAT.
       if { $splat_disp_ == {} } {
          set splat_disp_ [GaiaForeignExec \#auto \
                              -application $splat_dir_/splatdisp \
                              -show_output 0]
       }
+
+      #  Create either an NDF section describing the point, or just
+      #  set the section to be the region that has been extracted.
       set ndfname [$itk_option(-gaiacube) get_ndfname]
-      $splat_disp_ runwith "${ndfname}${section}" 0
+      if { $last_cxcy_ != {} } {
+         lassign $last_cxcy_ cx cy
+
+         #  Convert click coordinates from canvas coords to grid coords.
+         set ccx [$canvas_ canvasx $cx]
+         set ccy [$canvas_ canvasy $cy]
+         $rtdimage_ convert coords $ccx $ccy canvas iix iiy image
+
+         #  Correct to pixel indices.
+         lassign [$itk_option(-gaiacube) image_grid2pixel $iix $iiy] ix iy
+
+         #  Create the right section. Use extraction bounds on the
+         #  spectral axis.
+         set lb $itk_option(-lower_limit)
+         set ub $itk_option(-upper_limit)
+         set range "$lb:$ub"
+         set axis [$itk_option(-gaiacube) get_axis]
+         set close_section [$itk_option(-gaiacube) get_close_section]
+         if { $axis == 1 } {
+            set section "($range,$ix,${iy}${close_section}"
+         } elseif { $axis == 2 } {
+            set section "($ix,$range,${iy}${close_section})"
+         } else {
+            set section "($ix,$iy,${range}${close_section}"
+         }
+      } else {
+         #  Region, clean up any leading spaces and keep to a sensible
+         #  length, finally remove any embedded newlines (polygons).
+         set cr [string range [string trim $last_region_] 0 80]
+         regsub -all {\n} $cr { } section
+      }
+
+      if { $last_cxcy_ != {} && [$itk_option(-gaiacube) get_type] == ".sdf" } {
+
+         #  NDF point spectrum, just send the section to SPLAT.
+         $splat_disp_ runwith "${ndfname}${section}" 0
+
+      } else {
+         #  Not an NDF, send a text file to SPLAT, use ndfname + section as
+         #  the shortname.
+         set filename "GaiaTempSpectrum[incr count_].txt"
+         $spectrum_ write_as_text $filename "${ndfname}:${section}"
+         $splat_disp_ runwith $filename 0
+         lappend temp_files_ $filename
+      }
    }
-         
+
    #  Extract and display a position as a reference spectrum. The
    #  plot must already exist.
    public method display_point_reference_spectrum {cx cy} {
@@ -677,7 +710,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       pack $itk_component(combination) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(combination) \
          {Region data combination method}
-         
+
       $itk_component(combination) add \
          -label Mean \
          -value mean \
@@ -927,8 +960,15 @@ itcl::class gaia::GaiaCubeSpectrum {
    #  The region data combination type.
    protected variable combination_type_ "mean"
 
+   #  A list of the temporary files we create. These are deleted on object
+   #  destruction.
+   protected variable temp_files_ {}
+
    #  Common variables: (shared by all instances)
    #  -----------------
+
+   #  Counter for temporary files.
+   common count_ 0
 
 #  End of class definition.
 }

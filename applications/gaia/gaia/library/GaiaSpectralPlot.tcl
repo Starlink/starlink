@@ -385,7 +385,7 @@ itcl::class gaia::GaiaSpectralPlot {
    }
 
    #  Write the current spectrum to a text file. Use SPLAT style.
-   public method write_as_text { filename } {
+   public method write_as_text { filename {shortname ""} } {
       if { $filename != {} && $spectrum_ != {} } {
          busy {
             set frameset [$itk_component(canvas) itemcget $spectrum_ -frameset]
@@ -397,10 +397,11 @@ itcl::class gaia::GaiaSpectralPlot {
             puts $fid "#BEGIN"
             puts $fid "# File created by GAIA"
 
-            #  Create a name for the spectrum.
-            catch {
-               set value [gaiautils::astget $frameset Title]
-               puts $fid "# name [regsub -all " " $value _]"
+            #  Set name of the spectrum.
+            if { $shortname == {} } {
+               puts $fid "# name $filename"
+            } else {
+               puts $fid "# name $shortname"
             }
 
             #  Write all known SpecFrame attributes.
@@ -501,7 +502,7 @@ itcl::class gaia::GaiaSpectralPlot {
 
       #  Get the spectral data from the accessor.
       #  XXXX Note assumes WCS & data array axes are aligned and in same order.
-      lassign [$accessor getspectrum $axis $alow $ahigh $p1 $p2 1] adr
+      set adr [$accessor getspectrum $axis $alow $ahigh $p1 $p2 1]
       display_spectrum_ $adr $accessor $axis $alow $autoscale
    }
 

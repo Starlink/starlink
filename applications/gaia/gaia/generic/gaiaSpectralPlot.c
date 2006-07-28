@@ -477,14 +477,17 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     optionPtr = Tcl_GetString( objv[0] );
     if ( objc == 0 ) {
 	/*
-	 * Print the coordinate and data values as pairs.
+	 * Print the coordinate and data values as pairs. BAD values are
+         * just ignored.
 	 */
 	Tcl_Obj *subobj, *obj = Tcl_NewObj();
 	for ( i = 0; i < spPtr->numPoints; i++ ) {
-	    subobj = Tcl_NewDoubleObj( spPtr->coordPtr[i] );
-	    Tcl_ListObjAppendElement( interp, obj, subobj );
-	    subobj = Tcl_NewDoubleObj( spPtr->dataPtr[i] );
-	    Tcl_ListObjAppendElement( interp, obj, subobj );
+            if ( spPtr->dataPtr[i] != spPtr->badvalue ) {
+                subobj = Tcl_NewDoubleObj( spPtr->coordPtr[i] );
+                Tcl_ListObjAppendElement( interp, obj, subobj );
+                subobj = Tcl_NewDoubleObj( spPtr->dataPtr[i] );
+                Tcl_ListObjAppendElement( interp, obj, subobj );
+            }
 	}
 	Tcl_SetObjResult( interp, obj );
 	return TCL_OK;
