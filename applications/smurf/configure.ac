@@ -84,6 +84,7 @@ AC_CHECK_LIB( [expat], [XML_SetUserData], [], [
 
 AC_CHECK_HEADERS(math.h)
 AC_CHECK_HEADERS(gsl/gsl_math.h)
+AC_CHECK_HEADERS(slamac.h)
 
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
