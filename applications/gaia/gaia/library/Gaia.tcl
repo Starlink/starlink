@@ -117,12 +117,14 @@ set about_skycat ""
 set about_gaia "
 Starlink GAIA version $gaia_version
 
-Copyright (C) 1997-2005 Central Laboratory of the Research Councils (U.K.)
+Copyright (C) 1997-2005 Central Laboratory of the Research Councils
+Copyright (C) 2006 Particle Physics and Astronomy Research Council
 
 Authors:
 Peter W. Draper (p.w.draper@durham.ac.uk)
 Norman Gray (norman@astro.gla.ac.uk)
 David S. Berry (dsb@ast.man.ac.uk)
+Mark Taylor (m.b.taylor@bristol.ac.uk)
 
 GAIA is derived from SkyCat version [skycat_version]
 Copyright (C) 1996-2001 ESO - European Southern Observatory
