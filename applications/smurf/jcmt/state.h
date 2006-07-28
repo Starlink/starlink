@@ -49,6 +49,8 @@
 *        Merge ACSIS and SCUBA-2 into a single include file.
 *     27-JUL-2006 (TIMJ):
 *        Remove RTS_TASKS. Remove spurious ACSIS members. Add more docs.
+*     28-JUL-2006 (TIMJ):
+*        Add inst_t enum.
 
 *  Copyright:
 *     Copyright (C) 2004, 2006 Particle Physics and Astronomy Research Council.
@@ -90,8 +92,13 @@
    usability can be checked by AND'ing the value in hdsRecord array with one of these.
  */
 
-#define INST__ACSIS   1
-#define INST__SCUBA2  2
+typedef enum {
+  /* Should be indvidual bits */
+  INST__NONE   = 0x00000000,  /* No instruments */
+  INST__ACSIS  = 0x00000001,
+  INST__SCUBA2 = 0x00000002,
+  INST__ALL    = 0xFFFFFFFF,  /* All bits set */
+} inst_t;
 
 /* This struct represents all the information available from a JCMT SEQUENCE as published
    in STATE structures by each task involved. Not all will be defined. The struct ordering
@@ -231,7 +238,7 @@ typedef struct HDSdataRecord {
   int  position;    /* actual position in list. Used so that JCMT_HEADLIST is not forced to be in same order. */
   char * type;
   char * name;
-  int  instrument;  /* bit mask indicating whether a particular instrument uses this field */
+  inst_t instrument;  /* bit mask indicating whether a particular instrument uses this field */
 } HDSdataRecord;
 
 static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
