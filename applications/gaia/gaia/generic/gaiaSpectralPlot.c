@@ -421,7 +421,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  *
  *   This procedure is invoked to process the "coords" widget command.
  *
- *   This reads a list of doubles that are the spectral coordinates,
+ *   This reads a list of doubles that are the spectral data values
  *   or accepts a pointer to an ARRAYinfo structure of already available
  *   values in one of the HDS types (_BYTE, _UBYTE, _WORD, _UWORD,
  *   _INTEGER, _REAL _DOUBLE). In the latter case you should use the format:
@@ -477,10 +477,12 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     optionPtr = Tcl_GetString( objv[0] );
     if ( objc == 0 ) {
 	/*
-	 * Print the main data values.
+	 * Print the coordinate and data values as pairs.
 	 */
 	Tcl_Obj *subobj, *obj = Tcl_NewObj();
 	for ( i = 0; i < spPtr->numPoints; i++ ) {
+	    subobj = Tcl_NewDoubleObj( spPtr->coordPtr[i] );
+	    Tcl_ListObjAppendElement( interp, obj, subobj );
 	    subobj = Tcl_NewDoubleObj( spPtr->dataPtr[i] );
 	    Tcl_ListObjAppendElement( interp, obj, subobj );
 	}

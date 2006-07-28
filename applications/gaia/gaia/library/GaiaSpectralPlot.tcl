@@ -117,11 +117,19 @@ itcl::class gaia::GaiaSpectralPlot {
       #  Add window help.
       add_help_button spectralplot "On Window..."
 
+      #  Add save to text file option.
+      $File add command -label {Save as text} \
+         -command [code $this save_as_text] \
+         -accelerator {Control-s}
+      bind $w_ <Control-s> [code $this save_as_text]
+      $short_help_win_ add_menu_short_help $File \
+         {Save as text} {Save current spectrum to a simple text file}
+
       #  Add print option.
       $File add command -label Print -command [code $this print] \
          -accelerator {Control-p}
       bind $w_ <Control-p> [code $this print]
-      $short_help_win_ add_menu_short_help Print \
+      $short_help_win_ add_menu_short_help $File \
          {Print} {Print window to file or printer}
 
       #  Set the close menu item.
@@ -360,6 +368,71 @@ itcl::class gaia::GaiaSpectralPlot {
             $itk_component(canvas) delete $label_
             set label_ {}
          }
+      }
+   }
+
+   #  Save the current spectrum to a text file.
+   public method save_as_text {} {
+      if { $spectrum_ != {} } {
+         set w [FileSelect .\#auto -title "Save spectrum to text file"]
+         if { [$w activate] } {
+            if { [catch {write_as_text [$w get]} msg] } {
+               error_dialog "Failed to write spectrum: $msg"
+            }
+         }
+         destroy $w
+      }
+   }
+
+   #  Write the current spectrum to a text file. Use SPLAT style.
+   public method write_as_text { filename } {
+      if { $filename != {} && $spectrum_ != {} } {
+         busy {
+            set frameset [$itk_component(canvas) itemcget $spectrum_ -frameset]
+
+            #  Open the output file.
+            set fid [::open $filename w]
+
+            #  Write the header section.
+            puts $fid "#BEGIN"
+            puts $fid "# File created by GAIA"
+
+            #  Create a name for the spectrum.
+            catch {
+               set value [gaiautils::astget $frameset Title]
+               puts $fid "# name [regsub -all " " $value _]"
+            }
+
+            #  Write all known SpecFrame attributes.
+            foreach att $specframe_atts_ {
+               write_ast_att_ $fid $frameset $att
+            }
+            
+            #  And units for future FluxFrames.
+            set units [$itk_component(canvas) itemcget $spectrum_ -dataunits]
+            if { $units != {} } {
+               puts $fid "# DataUnits $units"
+            }
+            set label [$itk_component(canvas) itemcget $spectrum_ -datalabel]
+            if { $label != {} } {
+               puts $fid "# DataLabel $label"
+            }
+            puts $fid "#END"
+
+            #  Now write the values.
+            foreach {x y} [$itk_component(canvas) coords $spectrum_] {
+               puts $fid "$x $y"
+            }
+
+            #  Finally close the file.
+            ::close $fid
+         }
+      }
+   }
+   protected method write_ast_att_ {fid frameset att} {
+      catch {
+         set value [gaiautils::astget $frameset $att]
+         puts $fid "# $att $value"
       }
    }
 
@@ -1116,6 +1189,33 @@ itcl::class gaia::GaiaSpectralPlot {
       14 "-adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
       15 "-adobe-courier-bold-o-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
       17 "-adobe-helvetica-bold-r-*-*-20-120-*-*-*-*-*-*"      "large screen"
+   }
+
+   #  Attributes that a DSBSpecFrame may have. Need to save these in the text 
+   #  format.
+   protected variable specframe_atts_ {
+      System 
+      Unit 
+      AlignSystem
+      Domain
+      Epoch
+      Format
+      Label
+      ObsLat
+      ObsLon
+      Symbol
+      Title
+      AlignStdOfRest 
+      RefDec
+      RefRA 
+      RestFreq
+      SourceVRF 
+      SourceVel 
+      StdOfRest 
+      DSBCentre
+      IF
+      SideBand
+      ImageFreq
    }
 
    #  Common variables: (shared by all instances)
