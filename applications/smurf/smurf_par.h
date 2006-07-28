@@ -153,4 +153,10 @@ error can not determine PI
 #undef DPI
 #undef DPIBY2
 
+
+/* Other conversions */
+
+/* Arcsec to Degrees */
+#define DAS2D (1/3600)
+
 #endif /* SMURF_PAR_DEFINED */
