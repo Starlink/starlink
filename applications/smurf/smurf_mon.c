@@ -65,6 +65,8 @@
 *        Add simulator task, sim
 *     2006-06-13 (AGG):
 *        Add dreamsolve
+*     2006-07-28 (TIMJ):
+*        Add MAKECUBE
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -172,6 +174,8 @@ void smurf_mon( int * status ) {
     smurf_makemap( status );
   } else if (strcmp( taskname, "QLMAKEMAP" ) == 0 ) {
     smurf_qlmakemap( status );
+  } else if (strcmp( taskname, "MAKECUBE" ) == 0 ) {
+    smurf_makecube( status );
   } else if (strcmp( taskname, "REMSKY" ) == 0 ) {
     smurf_remsky( status );
   } else if (strcmp( taskname, "SCANFIT" ) == 0 ) {

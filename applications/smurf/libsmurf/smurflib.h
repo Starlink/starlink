@@ -36,6 +36,8 @@
 *        Add smurf_sim
 *     2006-06-13 (AGG):
 *        Add smurf_dreamsolve
+*     2006-07-27 (TIMJ):
+*        Add MAKECUBE
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -69,6 +71,7 @@ void smurf_extinction( int * );
 void smurf_flatfield( int * );
 void smurf_makemap( int * );
 void smurf_qlmakemap( int * );
+void smurf_makecube( int * );
 void smurf_remsky( int * );
 void smurf_scanfit( int * );
 void smurf_sc2sim( int * );

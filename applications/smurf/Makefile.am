@@ -15,7 +15,7 @@ jcmtincludedir = $(includedir)/jcmt
 jcmtinclude_HEADERS = jcmt/state.h
 
 # Tasks
-smurf_mon_TASKS = extinction flatfield makemap remsky qlmakemap scanfit sc2sim dreamsolve
+smurf_mon_TASKS = extinction flatfield makemap remsky qlmakemap scanfit sc2sim dreamsolve makecube
 
 DA_FILES = sc2da/sc2store.c sc2da/sc2math.c sc2da/smurf_ers.c \
 sc2da/sc2ast.c
