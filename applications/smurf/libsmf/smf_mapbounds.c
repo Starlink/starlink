@@ -47,6 +47,7 @@
 *     bolometer->output map pixel transformation for the corner bolometers
 *     of the subarray in order to automatically determine the extent 
 *     of the map.
+
 *  Authors:
 *     Edward Chapin (UBC)
 *     Tim Jenness (JAC, Hawaii)
@@ -64,6 +65,8 @@
 *        was not getting set properly.
 *     2006-07-26 (TIMJ):
 *        sc2head no longer used. Use JCMTState instead.
+*     2006-07-27 (TIMJ):
+*        Do not use bare constant for rad to deg conversion.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -103,6 +106,7 @@
 #include "star/ndg.h"
 
 /* SMURF includes */
+#include "smurf_par.h"
 #include "libsmf/smf.h"
 #include "sc2da/sc2ast.h"
 
@@ -210,8 +214,8 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 	    }
 
 	    fitschan = astFitsChan ( NULL, NULL, "" );
-	    sc2ast_makefitschan( 0, 0, (-pixsize/3600), (pixsize/3600),
-				 (lon_0*57.29577951), (lat_0*57.29577951),
+	    sc2ast_makefitschan( 0, 0, (-pixsize*DAS2D), (pixsize*DAS2D),
+				 (lon_0*DR2D), (lat_0*DR2D),
 				 "RA---TAN", "DEC--TAN", fitschan, status );
 	    astClear( fitschan, "Card" );
 	    *outframeset = astRead( fitschan );
@@ -278,8 +282,8 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 
   fitschan = astFitsChan ( NULL, NULL, "" );
   sc2ast_makefitschan( -lbnd_out[0], -lbnd_out[1], 
-		       (-pixsize/3600), (pixsize/3600),
-		       (lon_0*57.29577951), (lat_0*57.29577951),
+		       (-pixsize/DAS2D), (pixsize*DAS2D),
+		       (lon_0*DR2D), (lat_0*DR2D),
 		       "RA---TAN", "DEC--TAN", fitschan, status );
   astClear( fitschan, "Card" );
   *outframeset = astRead( fitschan );
