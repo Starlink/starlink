@@ -31,14 +31,14 @@
 #                 26 Jul 00  Added specific bits of Tcl code from GAIA
 proc main {} {
    global argv argc env argv0
-   
+
    if {$argc != 1} {
       puts "usage: gaia_stcl.tcl output_file_name"
       exit 1
    }
    set outfile [lindex $argv 0]
    set fd [open $outfile w]
-   
+
    #  Set names of source directories.
    set tcl_library      @TCL_LIBRARY@
    set itcl_library     @ITCL_LIBRARY@
@@ -47,26 +47,26 @@ proc main {} {
 
    #  Set names of files needed from GAIA.
    set gaiafiles "GaiaImageName.tcl"
-   
+
    set srcdirs [list \
                    $tcl_library \
                    $itcl_library \
                    $tclx_library]
-   
-   #  Binary is standalone (only during testing). Stops sourcing of 
+
+   #  Binary is standalone (only during testing). Stops sourcing of
    #  external files otherwise.
    #  puts $fd "-standalone"
 
    #  But reads stdin.
    puts $fd "-read-stdin"
-   
+
    #  Set location of Tcl.
    puts $fd "-notk"
    puts $fd "-tcl-library \"$tcl_library\""
-   
+
    #  Name of the Et_AppInit file.
    puts $fd "tclAppInit.C"
-   
+
    #  Now add all the Tcl file from everywhere.
    foreach dir $srcdirs {
       if {[file exists $dir/tclIndex]} {
@@ -77,13 +77,37 @@ proc main {} {
          puts $fd "-dont-strip-tcl \"$file\""
       }
    }
-   
+
    #  Add useful bits of non-itk GAIA.
    foreach file "$gaiafiles" {
       puts $fd "-dont-strip-tcl \"$gaia_library/$file\""
    }
    puts $fd "-dont-strip-tcl \"$gaia_library/tclIndex\""
-  
+
+   #  Temporary stuff.
+   set tcldom_library   $gaia_library/xmlbits/tcldom3.0
+   set tclhttpd_library $gaia_library/xmlbits/tclhttpd3.5.1
+   set tcllib_library   $gaia_library/xmlbits/tcllib1.8
+   set tclsoap_library  $gaia_library/xmlbits/tclsoap1.6.8
+   set tclxml_library   $gaia_library/xmlbits/Tclxml3.1
+
+   set srcdirs [list \
+                   $tcldom_library \
+                   $tclhttpd_library \
+                   $tcllib_library \
+                   $tclsoap_library \
+                   $tclxml_library]
+
+   foreach dir $srcdirs {
+      if {[file exists $dir/tclIndex]} {
+         puts $fd "-dont-strip-tcl \"$dir/tclIndex\""
+      }
+      set tclfiles [glob -nocomplain $dir/*.tcl $dir/*/*.tcl]
+      foreach file "$tclfiles" {
+         puts $fd "-dont-strip-tcl \"$file\""
+      }
+   }
+
 }
 main
 exit

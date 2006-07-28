@@ -208,6 +208,7 @@ itcl::class gaia::GaiaStartup {
       set values_($this,extended_precision) 0
       set values_($this,float_panel) 0
       set values_($this,focus_follows_mouse) 1
+      set values_($this,interop_menu) 1
       set values_($this,linear_cartesian) 1
       set values_($this,max_scale) 20
       set values_($this,min_scale) -10
@@ -227,7 +228,7 @@ itcl::class gaia::GaiaStartup {
    protected method save_properties_ {} {
       foreach key "extended_precision show_hdu_chooser float_panel \
                    panel_orient with_zoom_window with_pan_window \
-                   with_colorramp focus_follows_mouse scrollbars \
+                   with_colorramp focus_follows_mouse interop_menu scrollbars \
                    transient_tools quiet_exit min_scale max_scale \
                    zoom_factor default_cut default_cmap default_itt \
                    linear_cartesian always_merge check_for_cubes" {
@@ -440,6 +441,18 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(checkforcubes) \
          {Check any opened files for cubes, if found open in cube toolbox}
       pack $itk_component(checkforcubes) -side top -fill x
+
+      #  Display the PLASTIC interop menu.
+      itk_component add interopmenu {
+         StarLabelCheck $w_.interopmenu \
+            -text "Show Interop menu:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope values_($this,interop_menu)]
+      }
+      add_short_help $itk_component(interopmenu) \
+         {Show the main Interop menu for PLASTIC interactions}
+      pack $itk_component(interopmenu) -side top -fill x
 
       #  Minimum zoom scale.
       itk_component add minscale {

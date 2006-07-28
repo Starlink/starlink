@@ -41,7 +41,11 @@ LDFLAG1 =
 LDFLAG2 =
 
 # -D flags
-DEFINES      = -DSHARED=@SHARED@ @TCLUTIL_DEFS@
+DEFINES         = -DSHARED=@SHARED@ @TCLUTIL_DEFS@ \
+                -DGAIA_VERSION=\"@GAIA_VERSION@\" \
+                -DGAIA_LIBRARY=\"@GAIA_BUILD_LIBRARY@\" \
+                -DIWIDGETS_VERSION=\"@IWIDGETS_VERSION@\" \
+                -DIWIDGETS_LIBRARY=\"@IWIDGETS_LIBRARY@\"
 
 # other flags to pass to compiler
 CFLAGS       = @CXXDEBUGFLAGS@

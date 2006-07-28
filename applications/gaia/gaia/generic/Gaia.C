@@ -193,6 +193,13 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     }
     Tcl_SetVar2(interp, "env", "GAIA_VERSION", GAIA_VERSION, TCL_GLOBAL_ONLY);
 
+
+    //  Temporary xmlbits.
+    sprintf(cmd, "set auto_path [linsert $auto_path 0 %s/xmlbits]", libDir );
+    if (Tcl_Eval(interp, cmd) != TCL_OK) {
+	return TCL_ERROR;
+    }
+
     //  Do the Iwidgets initialisation, needed for single binary as
     //  Iwidgets doesn't have a builtin C init function (so the script
     //  method for doing the init gets confused).

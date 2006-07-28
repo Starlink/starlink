@@ -60,6 +60,7 @@ All:./built/lib/gaia/gaia
 install-top:
 	test -d $(GAIA_LIBRARY) || mkdir -p $(GAIA_LIBRARY)
 	(cd $(GAIA_LIBRARY); rm -rf library; ln -s . library)
+	(cd xmlbits; $(MAKE) install-top)
 
 install-files: install-top
 	@set -x; for i in $(FILES) ; do \
@@ -68,11 +69,14 @@ install-files: install-top
 	for f in $(PROGRAMS); do \
 	    $(INSTALL) $$f $(GAIA_LIBRARY) ;\
 	done
+	(cd xmlbits; $(MAKE) install-files)
 
 install: install-files
 
 clean:
 	$(RM) *\~ "#"*
+	(cd xmlbits; $(MAKE) clean)
+
 
 index tclIndex: FORCE
 	./mkIndex.tcl

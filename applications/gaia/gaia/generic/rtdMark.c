@@ -40,6 +40,8 @@
  *        allows creation at different "scales" to be harmonized.
  *     03-APR-2006 (PWD):
  *        Added -fixscale to switch off scaling of size by scale method.
+ *     19-JUL-2006 (PWD):
+ *        Added -minscale to limit the possible scale to some value.
  *-
  *.
  */
@@ -75,6 +77,9 @@ typedef struct MarkItem  {
     XColor *outlineColor;          /* Colour of lines*/
     char *type;                    /* The type of marker as a string */
     double scale;                  /* Current scale factor */
+    double minscale;               /* Minimum possible scale factor */
+    double realscale;              /* Current scale factor, regardless of
+                                    * minscale setting */
     double x, y;                   /* Coordinates of reference point */
     int fixscale;                  /* Whether to scale the scale value */
     int size;                      /* Size of marker */
@@ -98,6 +103,8 @@ static Tk_ConfigSpec configSpecs[] = {
                         Tk_Offset(MarkItem, fixscale), TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_COLOR, "-fill", (char *) NULL, (char *) NULL, (char *) NULL, 
                       Tk_Offset(MarkItem, fillColor), TK_CONFIG_NULL_OK},
+    {TK_CONFIG_DOUBLE, "-minscale", (char *) NULL, (char *) NULL, "-1", 
+                       Tk_Offset(MarkItem, minscale), TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_COLOR, "-outline", (char *) NULL, (char *) NULL, "black", 
                       Tk_Offset(MarkItem, outlineColor), 0},
     {TK_CONFIG_CUSTOM, "-tags", (char *) NULL, (char *) NULL, (char *) NULL, 
@@ -238,6 +245,8 @@ static int CreateMark( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     markPtr->outlineColor = NULL;
     markPtr->outlineGC = None;
     markPtr->scale = 1.0;
+    markPtr->realscale = 1.0;
+    markPtr->minscale = -1.0;
     markPtr->shape = CIRCLE;
     markPtr->size = 7;
     markPtr->tkanchor = TK_ANCHOR_CENTER;
@@ -805,7 +814,8 @@ static int MarkToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *areaPtr )
  * ScaleMark --
  *
  *      This procedure is invoked to rescale a marker. If fixscale
- *      is set then only the position is scaled.
+ *      is set then only the position is scaled. If minscale is set greater
+ *      than zero then scaleX is limited to that value.
  *
  * Results:
  *      None.
@@ -825,13 +835,26 @@ static void ScaleMark( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
                        double originY, double scaleX, double scaleY )
 {
     MarkItem *markPtr = (MarkItem *) itemPtr;
+    double scale;
 
     /* Scale all coordinates and set their related values */
 
     markPtr->x = originX + scaleX*(markPtr->x - originX);
     markPtr->y = originY + scaleY*(markPtr->y - originY);
     if ( ! markPtr->fixscale ) {
-        markPtr->scale *= scaleX;
+
+        /*  realscale is the scale we would have without a minscale, 
+         *  when it is less than minscale the scale used is minscale.
+         *  This allows an absolute sense of what the scale is. */
+        markPtr->realscale *= scaleX;
+
+        if ( markPtr->minscale > 0.0 && 
+             markPtr->realscale < markPtr->minscale ) {
+            markPtr->scale = markPtr->minscale;
+        }
+        else {
+            markPtr->scale = markPtr->realscale;
+        }
     }
     ComputeMarkBbox(canvas, markPtr);
     return;

@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<title>Tool Interoperability using PLASTIC</title>
+</head>
+
+<body>
+<a name="xref_plastic"></a>
+<h2 align="center"><font color="red">Tool Interoperability using PLASTIC</font></h2>
+
+<h3>What is PLASTIC?</h3>
+
+<p>PLASTIC stands for the <u>PL</u>atform for 
+<u>AS</u>tronomical <u>T</u>ool <u>I</u>nter<u>C</u>onnection.
+It is a protocol which allows tools on the desktop to communicate 
+with each other.  Very briefly, the way it works is that applications
+can send messages to a central <strong>hub process</strong> which will
+then pass them on to other applications which can respond to them
+in some appropriate way.  The messages are things like "load this table"
+or "point at this position on the sky".
+Applications which currently talk PLASTIC include 
+<a href="http://www.starlink.ac.uk/topcat/">TOPCAT</a>,
+<a href="http://aladin.u-strasbg.fr/aladin.gml">Aladin</a>
+and various tools from the
+<a href="http://software.astrogrid.org/">AstroGrid project</a>.
+</p>
+
+<p>You can find more information about how it works, what applications
+are compatible, and how it can be useful at the
+<a href="http://plastic.sourceforge.net/">PLASTIC web site</a>.
+</p>
+
+<h3>How do I use GAIA with PLASTIC?</h3>
+
+<p>In order for PLASTIC communications to work, a PLASTIC hub must be
+running on your machine.  This is not part of GAIA and you will have
+to start it up separately.  The recommended way to do this is 
+currently to run the <strong>AstroGrid Workbench</strong>, 
+which can be started using Java WebStart by following links on the
+<a href="http://software.astrogrid.org/">AstroGrid website</a>.
+</p>
+
+<p>If the hub is running when GAIA starts up, GAIA will connect to it
+("register") automatically.  
+If you start the hub while GAIA is already running,
+you can connect to it by selecting the "Register"
+option from GAIA's "Interop" menu.  When registered,
+GAIA will listen out for messages from other applications and act
+on them.  If you want to stop GAIA responding to any
+such messages, you can select "Unregister" from the same menu.
+</p>
+
+<p>Also on the Interop menu are options to transmit the currently loaded
+image from GAIA to other tools.  The "Broadcast Image" item sends it
+to all registered applications, and the "Send Image" item sends it
+to just one of your choice - the submenu will show you which 
+applications are capable of receiving an image.
+If there are no applications currently 
+registered which know how to load an image, these won't have any effect.
+</p>
+
+<p>GAIA's PLASTIC capabilities are currently rather limited.
+It is hoped that in the future more options will be available,
+including exchanging catalogue data with other applications.
+</p>
+
+</body>
+</html>

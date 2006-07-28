@@ -21,6 +21,7 @@
 #  Authors:
 #     PWD: Peter Draper (STARLINK)
 #     ALLAN: Allan Brighton (ESO)
+#     MBT: Mark Taylor
 #     {enter_new_authors_here}
 
 #  Copyright:
@@ -102,6 +103,8 @@
 #     17-NOV-2005 (PWD):
 #        Update to Skycat version 2.7.4. No longer need to play with tkwait in
 #        noblock_clone.
+#     19-JUL-2006 (MBT):
+#        Added plastic support.
 #     {enter_changes_here}
 
 #-
@@ -158,7 +161,7 @@ Options:
  -catalog  "<c1> <c2> .." - open windows for the given catalogs on startup.
  -colorramp_height <n>    - height of colorramp window (default: 12).
  -component <component>   - NDF component to display (one of: data, variance)
- -check_for_cubes <bool>  - Check input files to see if they are cubes (default: 1) \\ 
+ -check_for_cubes <bool>  - Check input files to see if they are cubes (default: 1) \\
  -debug <bool>            - debug flag: run bg processes in fg.
  -default_cmap <cmap>     - default colormap.
  -default_itt <itt>       - default intensity transfer table.
@@ -167,6 +170,7 @@ Options:
  -float_panel <bool>      - put info panel in a popup window (default: 0).
  -focus_follows_mouse <bool> - entry focus follows mouse (default: 0).
  -linear_cartesian <bool> - assuming CAR projections are a linear mapping (default: 1).
+ -interop_menu <bool>     - reveal interop menu for PLASTIC interactions (default: 1).
  -max_scale <n>           - maximum scale for magnification menu (default: 20).
  -min_scale <n>           - minimum scale for magnification menu (default: -10).
  -panel_layout <layout>   - panel layout, one of: "saoimage", "reverse" or "default" .
@@ -222,6 +226,13 @@ itcl::class gaia::Gaia {
 
    #  Destructor:
    destructor {
+
+      #  If this is the final remaining instance of this class, attempt
+      #  to clear any current registration with a PLASTIC hub.
+      if {"[itcl::find objects -class gaia::Gaia]" == "$this"} {
+         stop_plastic_
+      }
+
       #  Clear up the images list (this isn't done correctly in
       #  SkyCat, it uses $w_ instead of $image_).
       global ::skycat_images
@@ -314,6 +325,11 @@ itcl::class gaia::Gaia {
             $w_ [code $image_] ::gaia::GaiaSearch $itk_option(-debug)
       }
 
+      #  Add the PLASTIC menu.
+      if {$itk_option(-interop_menu)} {
+         add_interop_menu
+      }
+
       #  Add the SkyCat graphics features (really a plugin, but we're
       #  not using these yet).
       add_graphics_features $w_
@@ -326,6 +342,16 @@ itcl::class gaia::Gaia {
 
       #  Check if any post display tasks are required.
       after 0 [code $this file_loaded_]
+
+      #  Attempt to register as PLASTIC listener, adding traces for some
+      #  callbacks we need when the status of the PLASTIC connection changes.
+      init_plastic_
+      trace variable [scope is_plastic_registered_] w \
+                     [code $this trace_plastic_reg_]
+      set is_plastic_registered_ $is_plastic_registered_
+      trace variable [scope apps_count_] w \
+                     [code $this trace_apps_count_]
+      set apps_count_ $apps_count_
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or
@@ -375,7 +401,7 @@ itcl::class gaia::Gaia {
 
       if { ! $itk_option(-tabbedgaia) } {
          ::tkwait visibility $w
-      } 
+      }
    }
 
    #  Add help for GAIA and SkyCat. Gets called a lot from base classes, so
@@ -748,6 +774,33 @@ itcl::class gaia::Gaia {
 	       {See a demonstration of GAIA (needs an empty directory)} \
 	       -command [code $this make_toolbox demo]
       }
+   }
+
+   #  Add a menubutton for PLASTIC activities.
+   public method add_interop_menu {} {
+
+      set interopmenu_ [add_menubutton Interop]
+      set m $interopmenu_
+      configure_menubutton Interop -underline 6
+      add_short_help $itk_component(menubar).interop \
+         {Interop menu: control application interoperability with PLASTIC}
+
+      add_menuitem $m command "Register" \
+         {Register GAIA with a running PLASTIC hub} \
+         -command [code start_plastic_]
+      add_menuitem $m command "Unregister" \
+         {Unregister GAIA with the PLASTIC hub} \
+         -command [code stop_plastic_]
+
+      $m add separator
+
+      set plastic_send_image_menu_ [menu $m.send_image]
+      add_menuitem $m command "Broadcast Image" \
+         {Send the current image to all PLASTIC-registered applications} \
+         -command [code $this plastic_send_image_]
+      add_menuitem $m cascade "Send Image" \
+         {Send the current image to a selected PLASTIC-registered application} \
+         -menu $plastic_send_image_menu_
    }
 
    #  Saving graphics with the image doesn't work so disable it.
@@ -1517,6 +1570,170 @@ itcl::class gaia::Gaia {
       set after_id_ [after 10000 [code $this loaded_eso_config_ 1 "timed out"]]
    }
 
+   #  Sends the currently displayed image via PLASTIC to other listening
+   #  applications.  If a non-empty recipients list is supplied, it gives
+   #  the IDs of applications to which th image will be sent.  Otherwise,
+   #  it will be broadcast to all.
+   public method plastic_send_image_ { {recipients {}} } {
+      if { [catch {
+         $plastic_sender_ send_image $image_ $recipients
+      } msg] } {
+         error_dialog "$msg"
+      }
+   }
+
+   #  Ensures that a PLASTIC listener object is in place for this class.
+   #  If no listener currently exists, create one.  If a hub is 
+   #  apparently running, try connecting to it.
+   #  We could in principle have multiple PLASTIC listeners, one for each
+   #  GAIA window, but for now use a common one for the whole application.
+   protected proc init_plastic_ {} {
+      if { $plastic_app_ == "" } {
+
+         #  Construct the listener object and store it in a common variable.
+         set responder [gaia::GaiaPlastic #auto]
+         set app [plastic::PlasticApp #auto [list [itcl::code $responder]]]
+
+         #  Configure it so that it keeps the is_plastic_registered_ 
+         #  common variable up to date.
+         $app configure -registered_variable [scope is_plastic_registered_]
+
+         #  Configure it so that it keeps the apps_count_ common variable
+         #  up to date.
+         [$app cget -app_tracker] configure -apps_variable [scope apps_count_]
+
+         #  If a hub appears to be running, have a go at registering with it.
+         if { [plastic::PlasticHub::is_hub_running] } {
+            if { [catch {
+               $app register
+            } msg] } {
+               puts "No PLASTIC service: $msg"
+            }
+         }
+
+         #  Construct a sender object which works in tandem with the
+         #  PlasticApp object to make outgoing calls.
+         set plastic_sender_ \
+             [code [gaia::PlasticSender #auto -plastic_app [code $app]]]
+
+         #  Store the listener in a common variable.
+         set plastic_app_ $app
+      }
+   }
+
+   #  Attempts to ensure that we are connected to a PLASTIC hub.
+   protected proc start_plastic_ {} {
+      if { ! $is_plastic_registered_ } {
+         if {[catch {
+            $plastic_app_ register
+         } msg]} {
+            error_dialog "No PLASTIC service: $msg"
+         }
+      }
+   }
+
+   #  Attempts to terminate any existing connection with a PLASTIC hub.
+   protected proc stop_plastic_ {} {
+      if { $is_plastic_registered_ } {
+         if {[catch {
+            $plastic_app_ unregister
+         } msg]} {
+            puts "Trouble unregistering from PLASTIC: $msg"
+         }
+      }
+   }
+
+   #  Invoked when we register or unregister with the PLASTIC hub.
+   protected method trace_plastic_reg_ {name element op} {
+      upvar $name is_reg 
+      set when_reg [expr {$is_reg ? "normal" : "disabled"}]
+      set when_unreg [expr {$is_reg ? "disabled" : "normal"}]
+      $interopmenu_ entryconfigure Register -state $when_unreg
+      $interopmenu_ entryconfigure Unregister -state $when_reg
+      $interopmenu_ entryconfigure {Broadcast Image} -state $when_reg
+      $interopmenu_ entryconfigure {Send Image} -state $when_reg
+   }
+
+   #  Invoked when someone else registers or unregisters with the PLASTIC hub.
+   protected method trace_apps_count_ {name element op} {
+      upvar $name napp
+
+      #  Rebuild the Send Image submenu so that it contains an up-to-date
+      #  list of all the applications that are prepared to receive images.
+      set m $plastic_send_image_menu_
+      $m delete 0 last
+      set send_id "ivo://votech.org/fits/image/loadFromURL"
+      set tracker [$plastic_app_ cget -app_tracker]
+      foreach app [$tracker get_supporting_apps $send_id] {
+         set appname [$app cget -name]
+         add_menuitem $m command "Send to $appname" \
+            {Send the current image to $appname} \
+            -command "$this plastic_send_image_ \[$app cget -id\]"
+      }
+   }
+
+   #  Position the point of interest graphics marker. Used by remote
+   #  applications. The ra and dec should be qualified by a units string, 
+   #  this should be "wcs equinox", "deg equinox", "image" etc. as 
+   #  required by the rtdimage convert command. The default equinox is J2000.
+   public method position_of_interest {ra dec units} {
+
+      #  If this is the same position remove marker.
+      if { "$ra,$dec" == $last_position_of_interest_ } {
+         if { $position_of_interest_ != {} } {
+            set canvas [$image_ get_canvas]
+            $canvas delete $position_of_interest_
+            set position_of_interest_ {}
+         }
+         set last_position_of_interest_ {}
+
+      } else {
+         set canvas [$image_ get_canvas]
+         set image [$image_ get_image]
+         lassign [$image scale] xs ys
+         if { $position_of_interest_ == {} } {
+            set position_of_interest_ [$canvas create rtd_mark 0 0 \
+                                          -type circle -scale $xs -fixscale 0 \
+                                          -minscale 1 -size 11 \
+                                          -outline "green"]
+         }
+
+         #  Transform to canvas coordinates and move the marker to that
+         #  position.
+         if { ! [catch {$image convert coords $ra $dec $units \
+                           cx cy canvas} msg ] } {
+            $canvas coords $position_of_interest_ $cx $cy
+            set last_position_of_interest_ "$ra,$dec"
+
+            #  Make sure the position is visible, cannot succeed when the
+            #  image is zoomed and the position is off image.
+            set dw [$image dispwidth]
+            set dh [$image dispheight]
+            set cw [winfo width $canvas]
+            set ch [winfo height $canvas]
+            if { $cw != 1 && $dw && $dh } {
+               set px [expr ($cx+0.0)/$dw]
+               set py [expr ($cy+0.0)/$dh]
+               set xrange [$canvas xview]
+               set yrange [$canvas yview]
+
+               #  Only move if the position is not currently visible, and
+               #  the image is larger than the window in at least one
+               #  dimension.
+               if { $dw > $cw || $dh > $ch } {
+                  if { $px < [lindex $xrange 0] || $px > [lindex $xrange 1] ||
+                       $py < [lindex $yrange 0] || $py > [lindex $yrange 1] } {
+                     $canvas xview moveto [expr (($cx-$cw/2.0)/$dw)]
+                     $canvas yview moveto [expr (($cy-$ch/2.0)/$dh)]
+                  }
+               }
+            }
+         } else {
+            error "Failed to set interest position: $msg"
+         }
+      }
+   }
+
    #  Start the application with the above class as the main window.
    #  This proc is called from tkAppInit.c when we are running the single
    #  binary version.
@@ -1847,6 +2064,9 @@ window gives you access to this."
    #  Whether to reveal the filters menu or not.
    itk_option define -filters filters Filters 0
 
+   #  Whether to reveal the interoperability menu or not.
+   itk_option define -interop_menu interop_menu Interop_Menu 1
+
    #  Redefine scrollbars to be true.
    itk_option define -scrollbars scrollbars Scrollbars 1
 
@@ -1951,8 +2171,20 @@ window gives you access to this."
    #  Control re-creation of the help menu (gets called from Rtd and SkyCat).
    protected variable help_menu_done_ 0
 
-   # Name of menu with toolboxes.
+   #  Name of menu with toolboxes.
    protected variable toolmenu_ {}
+
+   #  Name of menu for application interoperability.
+   protected variable interopmenu_ {}
+
+   #  Name of submenu for sending images via PLASTIC.
+   protected variable plastic_send_image_menu_
+
+   #  Canvas identifier of the position of interest.
+   protected variable position_of_interest_ {}
+
+   #  Last world coordinates of position of interest.
+   protected variable last_position_of_interest_ {}
 
    # -- Common variables --
 
@@ -1961,6 +2193,18 @@ window gives you access to this."
 
    # prefix to use to create new main windows.
    common prefix_ ".gaia"
+
+   # PLASTIC listener; takes care of communication with the hub.
+   common plastic_app_ {}
+
+   # PLASTIC sender; sends messages via the hub to other applications.
+   common plastic_sender_ {}
+
+   # Boolean variable which keeps track of whether we are registered with hub.
+   common is_plastic_registered_ 0
+
+   # Variable holding the number of applications currently registered with hub.
+   common apps_count_ 0
 }
 
 #  XXX redefine the body of AstroCat::new_catalog, as this contains a

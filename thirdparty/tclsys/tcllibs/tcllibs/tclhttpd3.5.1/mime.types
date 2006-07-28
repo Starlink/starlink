@@ -1,0 +1,111 @@
+#
+# Thanks to sanjay@clef.lcs.mit.edu
+# This is the mime.types shipped with the NCSA http server
+
+application/activemessage
+application/andrew-inset                       
+application/applefile
+application/atomicmail                         
+application/dca-rft                            
+application/dec-dx                             
+application/mac-binhex40	hqx
+application/macwriteii
+application/msword		doc dot
+application/ms-excel		xls xlw xla xlc xlm xlt
+application/ms-powerpoint	ppt pps pot
+application/ms-project		mpp
+application/x-msaccess		mdb
+application/x-msmetafile	wmf
+application/x-mswrite		wri
+application/x-msschedule	scd
+application/news-message-id                    
+application/news-transmission      
+application/octet-stream       bin core exe tgz gz Z zip          
+application/octet-stream       sun4 i86pc
+application/oda                oda
+application/pdf                pdf
+application/postscript         ai eps ps       
+application/remote-printing                    
+application/rtf                rtf             
+application/slate                              
+application/x-mif      mif
+application/x-javascript	js
+application/wita                               
+application/wordperfect5.1
+application/x-cgi		cgi
+application/x-csh              csh             
+application/x-dvi              dvi             
+application/x-hdf              hdf             
+application/x-latex            latex           
+application/x-netcdf           nc cdf          
+application/x-ns-proxy-autoconfig pac
+application/x-safetcl		thtml
+application/x-server-include	shtml
+application/x-sh               sh              
+application/x-tcl              tcl             
+application/x-tcl-subst		subst
+application/x-tcl-template	tml
+application/x-tcl-auth		auth
+application/x-tcl-snmp		snmp
+application/x-tcl-connect	xtcl
+application/x-tex              tex             
+application/x-texinfo          texinfo texi   
+application/x-troff            t tr roff       
+application/x-troff-man        man             
+application/x-troff-me         me              
+application/x-troff-ms         ms              
+application/x-wais-source      src             
+application/x-imagemap		map
+application/zip                zip             
+application/x-bcpio            bcpio           
+application/x-cpio             cpio            
+application/x-gtar             gtar            
+application/x-shar             shar            
+application/x-sv4cpio          sv4cpio         
+application/x-sv4crc           sv4crc          
+application/x-tar              tar             
+application/x-ustar            ustar           
+application/x-patch		patch
+audio/basic                    au snd          
+audio/x-aiff                   aif aiff aifc
+audio/x-wav                    wav             
+image/gif                      gif GIF        
+image/ief                      ief             
+image/jpeg                     jpeg jpg jpe
+image/tiff                     tiff tif        
+image/x-cmu-raster             ras
+image/x-portable-anymap        pnm             
+image/x-portable-bitmap        pbm             
+image/x-portable-graymap       pgm             
+image/x-portable-pixmap        ppm             
+image/x-rgb                    rgb
+image/x-xbitmap                xbm             
+image/x-xpixmap                xpm             
+image/x-xwindowdump            xwd             
+message/external-body
+message/news
+message/partial
+message/rfc822
+multipart/alternative
+multipart/appledouble
+multipart/digest
+multipart/mixed
+multipart/parallel
+text/html                      html htm
+text/plain                     txt
+text/richtext                  rtx             
+text/tab-separated-values      tsv             
+text/x-setext                  etx             
+text/xml		       xml
+application/xhtml+xml    xhtml
+text/css                       css
+video/mpeg                     mpeg mpg mpe    
+video/quicktime                qt mov          
+video/x-msvideo                avi             
+video/x-sgi-movie              movie           
+text/vnd.wap.wml                wml
+text/vnd.wap.wmlscript          wmls
+application/vnd.wap.wmlc        wmlc
+application/vnd.wap.wmscriptc   wmlsc
+image/vnd.wap.wbmp              wbmp
+audio/mpeg	mp3

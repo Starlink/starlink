@@ -1,0 +1,312 @@
+
+	XML Support For Tcl
+
+	TclXML Version 3.1
+
+Steve Ball, Explain
+
+This package provides XML parsers for Tcl scripts.  There is a generic
+front-end interface with plugin parser implementations.  A number of parser
+implementations or wrappers are provided:
+
+    *     James Clark's expat library.  This package is known as TclXML/expat.
+
+    *     Gnome libxml2 library.  This package is known as TclXML/libxml2.
+
+    *     A generic Tcl implementation (which does not require compilation).  This
+    package is known as TclXML/tcl.
+
+
+The package defines commands in the ::xml Tcl namespace:
+
+xml::parserclass info names
+
+
+xml::parser
+
+
+Other packages are also supplied to provide support for related standards.  In
+particular, work has commenced on the 'xpath' package for parsing XPath
+location paths.
+
+See the website [http://tclxml.sourceforge.net/] for more information on XML
+support for Tcl.
+
+Contact Steve Ball [mailto:Steve.Ball@explain.com.au] for information about
+this release.
+
+
+
+Installation
+============
+
+TclXML v3.1 features a pure-Tcl installer.
+
+    Future work on the installer will include an 'uninstall' capability, as well as
+    the capability to build the binary libraries in the package from the source.
+
+
+
+Dependencies
+------------
+
+Tcllib
+    http://www.tcl.tk/software/tcllib/ [http://www.tcl.tk/software/tcllib/]
+
+    In order for the Tcl-only parser to resolve external entities, the tcllib
+    package must be installed.
+
+    Be sure to get a version which includes the uri package.  Version 1.2 or better
+    is recommended.
+
+        *         GZip'd tarball [ftp://prdownloads.sf.net/tcllib/tcllib-1.3.tar.gz]
+
+        *         ZIP file [ftp://prdownloads.sf.net/tcllib/tcllib-1.3.zip]
+
+
+    The latest CVS snapshot may be found at the SourceForge project page
+    [http://sourceforge.net/projects/tcllib].
+
+
+
+Expat
+    Expat is only required for the compiled version of the TclXML/expat package.
+
+    TclXML/expat requires expat v0.2, with modifications by Ajuba Solutions.  This
+    is now supplied in the expat subdirectory of this distribution and will
+    maintained until TclXML has been resynchronised with the Expat SourceForge
+    project (volunteer needed!).
+
+
+
+libxml2
+    libxml2 is only required for the compiled version of the TclXML/libxml2
+    package.  libiconv may also be required.
+
+    The source code for libxml2 and libiconv is not supplied with this package.
+     Download libxml2 from xmlsoft.org [http://xmlsoft.org/] separately, and
+    libiconv from a GNU mirror site.
+
+    Version 2.6.9 (or better) is recommended.
+
+
+
+
+
+Pure-Tcl Installation (no compilation required)
+-----------------------------------------------
+
+The install.tcl script will install the pure-Tcl parser.  Run it using wish, eg.
+
+    wish install.tcl
+
+    If Tcl/Tk has been configured correctly on your system, you should be able to
+    simply double-click the script.
+
+If the pure-Tcl parser is good enough for you, then read no further.
+
+
+
+Compiled Installation
+---------------------
+
+
+
+Unix/Linux
+----------
+
+You must have Tcl/Tk version 8.2 or better installed on your system.  Tcl/Tk
+8.3 or better is recommended.
+
+Make sure you have Tcllib 1.2 (or better) installed.  Tcllib is still required,
+even for the compiled parser.
+
+If you wish to use TclXML/libxml2, make sure libxml2-2.6.9 (or better) is
+installed.
+
+Unpack the TclXML distribution and cd into the tclxml-3.1 directory.
+
+Run the configure script, with the --prefix and --enable-threads switches (the
+latter only if Tcl has been built with threads enabled).  For example, on my
+system I have Tcl 8.4 installed in /usr/local/tcl8.4 so I would use the command:
+
+    ./configure --prefix=/usr/local/tcl8.4 --enable-threads
+
+    make
+
+    Don't test the package using make test until all of the packages are installed
+    (it is a current deficiency of the build system that the individual modules
+    cannot be tested before installation - we hope to fix this soon!).
+
+    make install
+
+You may need to do this as root.  This installs the pure-Tcl parser class, as
+well as support files required for the next step.
+
+    cd expat
+
+Now TclXML/expat is about to be built.
+
+Use exactly the same configure command from step (4) above.
+
+    make
+
+    make install
+
+You may need to do this as root.  This installs the expat parser class.
+
+    cd ../libxml2
+
+Now TclXML/libxml2 is about to be built.  Remember, you must have built and
+installed libxml2 first.
+
+Use exactly the same configure command from step (4) above.
+
+    make
+
+    make install
+
+You may need to do this as root.  This installs the libxml2 parser class.
+
+    cd ..; make test
+
+
+
+Windows (MS VC++)
+-----------------
+
+    [Advice:  ActiveTcl includes binaries for TclXML.]
+
+You must have Tcl/Tk version 8.2 or better installed on your system.  Tcl/Tk
+8.3 or better is recommended.
+
+Before starting, download the binaries for libxml2 (or build them from source).
+ xmlsoft [http://xmlsoft.org/] has a link to the MS Windows binary distribution.
+
+If you have a TEA build environment setup, just use the normal
+configure/make/make install pattern.
+
+Alternatively, the win subdirectory contains a makefile.vc file for Visual
+Studio C++ v6.0.  This makefile builds both the expat and libxml2 parser
+classes.  In a Command Prompt window set up your environment so that nmake is
+on the path (by running VCVARS32.BAT), then type the following:
+
+    nmake -f makefile.vc TCLDIR=C:\Path\To\Tcl INSTALLDIR=C:\Path\To\Tcl LIBZDIR=C:\Path\To\libz LIBICONVDIR=C:\Path\To\libiconv LIBXML2DIR=C:\Path\To\libxml2
+
+As an example, on my system I have Tcl installed in C:\Tcl and the libxml2
+binaries unpacked in the directory C:\gnome.  Accordingly, I would use the
+following command line:
+
+    nmake -f makefile.vc TCLDIR=C:\Tcl INSTALLDIR=C:\Tcl LIBZDIR=C:\gnome\zlib-1.1.4.win32 LIBICONVDIR=C:\gnome\libiconv-1.9.1.win32 LIBXML2DIR=C:\gnome\libxml2-2.6.9.win32
+
+Install the package by appending 'install' to the command line used above, for
+example:
+
+    nmake -f makefile.vc TCLDIR=C:\Path\To\Tcl INSTALLDIR=C:\Path\To\Tcl LIBZDIR=C:\Path\To\libz LIBICONVDIR=C:\Path\To\libiconv LIBXML2DIR=C:\Path\To\libxml2 install
+
+
+
+Macintosh OS X
+--------------
+
+There are two ways to build TclXML under Mac OS X:
+
+The usual Unix way, see above.
+
+As an embedded Framework using Xcode.
+
+The macosx directory contains the Xcode files for building under OS X
+(Panther).  TclXML has been tested on OS X 10.3 (or is that X.3?).
+
+Start-up the project.  Make sure that the references to the libxml2 and Tcl
+external frameworks are correct.  Select the 'Make' target and build.  This
+builds everything.  The result is six Mac OS X Frameworks; three "normal" and
+three "embedded".  The embedded frameworks will be in the embedded subdirectory
+of the Build Products directory.  Copy tclxml.framework,
+TclXMLlibxml2.framework and expat.framework to any of the usual places for
+frameworks (~/Library/Frameworks, /Library/Frameworks, etc).
+
+For earlier version of OS X using Project Builder, you will have to retrieve a
+previous version of the Project Builder files from the CVS repository.
+
+
+
+Macintosh OS 9 (or earlier)
+---------------------------
+
+The installer script doesn't work properly on Macintosh yet, and the binary
+parsers have not been ported yet (sorry).
+
+Since the distribution has an all-Tcl parser, you can get a working parser
+fairly easily.
+
+Copy the library folder to the Tcl library folder in the Extensions folder of
+the System folder.
+
+Rename the library folder to tclxml3.1.  This isn't strictly necessary, but it
+helps keep things organised.
+
+You're on your own as far as the demos, programs and documentation go.
+
+
+
+Usage
+=====
+
+See the website for links to tutorials and the reference manual.
+
+In the meantime, here's a quick tutorial:
+
+    
+    package require xml
+    
+    set parser [xml::parser]
+    $parser configure -elementstartcommand EStart \
+        -characterdatacommand PCData
+    
+    proc EStart {tag attlist args} {
+        array set attr $attlist
+        puts "Element \"$tag\" started with [array size attr] attributes"
+    }
+    
+    proc PCData text {
+        incr ::count [string length $text]
+    }
+    
+    set count 0
+    $parser parse [read stdin]
+    
+    puts "The document contained $count characters"
+    exit 0
+
+
+
+
+XPath
+=====
+
+In addition to XML parsing packages, TclXML also provides a package for parsing
+XPath location paths.  The XPath package only parsing the path's syntax, it
+does interpret the path.  See TclDOM
+[http://tclxml.sourceforge.net/tcldom.html] for a package that will interpret
+XPath location paths.
+
+    This package is in its infancy, and does not support the full range of XPath
+    features.  Only a very limited subset of location paths are supported, of the
+    form "/simple/example[2]".  Paths within predicates will definitely fail.
+
+To use the XPath package:
+
+    
+    package require xpath
+
+
+To parse a location path:
+
+    
+    xpath::split {/simple/example}
+
+
+This returns a Tcl list, each element of which is a three element sublist:
+{axis node-test {?predicate ...?}}.
+
