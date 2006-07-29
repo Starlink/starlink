@@ -214,7 +214,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 	    }
 
 	    fitschan = astFitsChan ( NULL, NULL, "" );
-	    sc2ast_makefitschan( 0, 0, (-pixsize*DAS2D), (pixsize*DAS2D),
+	    sc2ast_makefitschan( 0.0, 0.0, (-pixsize*DAS2D), (pixsize*DAS2D),
 				 (lon_0*DR2D), (lat_0*DR2D),
 				 "RA---TAN", "DEC--TAN", fitschan, status );
 	    astClear( fitschan, "Card" );
@@ -282,7 +282,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 
   fitschan = astFitsChan ( NULL, NULL, "" );
   sc2ast_makefitschan( -lbnd_out[0], -lbnd_out[1], 
-		       (-pixsize/DAS2D), (pixsize*DAS2D),
+		       (-pixsize*DAS2D), (pixsize*DAS2D),
 		       (lon_0*DR2D), (lat_0*DR2D),
 		       "RA---TAN", "DEC--TAN", fitschan, status );
   astClear( fitschan, "Card" );
