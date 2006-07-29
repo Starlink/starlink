@@ -156,7 +156,7 @@ error can not determine PI
 
 /* Other conversions */
 
-/* Arcsec to Degrees */
-#define DAS2D (1/3600)
+/* Arcsec to Degrees  (1/3600) */
+#define DAS2D 0.00027777777777777777777777777777777777777777777778
 
 #endif /* SMURF_PAR_DEFINED */
