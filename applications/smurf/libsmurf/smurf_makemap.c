@@ -190,13 +190,15 @@ void smurf_makemap( int *status ) {
   variance = data_index[0];
 
   /* Allocate memory for weights and initialise to zero */
-  weights = smf_malloc( (ubnd_out[0]-lbnd_out[0]+1) *
-			(ubnd_out[1]-lbnd_out[1]+1), sizeof(double),
-			1, status );
-  if ( weights == NULL ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Unable to allocate memory for the weights array", 
-	   status);
+  if (*status == SAI__OK) {
+    weights = smf_malloc( (ubnd_out[0]-lbnd_out[0]+1) *
+			  (ubnd_out[1]-lbnd_out[1]+1), sizeof(double),
+			  1, status );
+    if ( weights == NULL  ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Unable to allocate memory for the weights array", 
+	     status);
+    }
   }
 
   /* Create the map using the chosen METHOD */
