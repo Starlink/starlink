@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     pntr = smf_construct_smfHead( smfHead * tofill,
-*              AstFrameSet * wcs, AstFitsChan * fitshdr,
-*              JCMTState * allState,
+*              AstFrameSet * wcs, AstFrameSet * tswcs,
+*              AstFitsChan * fitshdr, JCMTState * allState,
 *              dim_t curframe, int * status );
 
 *  Arguments:
@@ -24,6 +24,9 @@
 *        arguments. If NULL, the smfHead is malloced.
 *     wcs = AstFrameSet * (Given)
 *        Frameset for the world coordinates. The pointer is copied,
+*        not the contents.
+*     tswcs = AstrFrameSet * (Given)
+*        Frameset for the time series world coordinates. The pointer is copied,
 *        not the contents.
 *     fitshdr = AstFitsChan * (Given)
 *        FITS header. The pointer is copied, not the contents.
@@ -48,7 +51,7 @@
 *     is allocated by this routines.
 
 *  Notes:
-*     - AST objects are neither cloned not copied by this routine.
+*     - AST objects are neither cloned nor copied by this routine.
 *       Use astCopy or astClone when calling if reference counts
 *       should be incremented.
 *     - "state" is set to point into allState[curslice]
@@ -73,6 +76,8 @@
 *        curslice changed to curframe, nframes added
 *     2006-07-26 (TIMJ):
 *        sc2head no longer used. Use JCMTState instead.
+*     2006-07-26 (TIMJ):
+*        Add tswcs.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -118,7 +123,8 @@
 
 smfHead *
 smf_construct_smfHead( smfHead * tofill,
-		       AstFrameSet * wcs, AstFitsChan * fitshdr,
+		       AstFrameSet * wcs, AstFrameSet * tswcs,
+		       AstFitsChan * fitshdr,
 		       JCMTState * allState,
 		       dim_t curframe, dim_t nframes, int * status ) {
 
@@ -133,6 +139,7 @@ smf_construct_smfHead( smfHead * tofill,
 
   if (*status == SAI__OK) {
     hdr->wcs = wcs;
+    hdr->wcs = tswcs;
     hdr->fitshdr = fitshdr;
     hdr->curframe = curframe;
     hdr->nframes = nframes;

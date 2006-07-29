@@ -58,6 +58,8 @@
 *        Added enumerated typedef smf_modeltype
 *     2006-07-26 (TIMJ):
 *        sc2head replaced by JCMTState
+*     2006-07-28 (TIMJ):
+*        Add time series wcs (tswcs) to distinguish from 2d wcs in smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -140,8 +142,9 @@ typedef struct smfFile {
 /* Contains header general header information obtained from the file */
 
 typedef struct smfHead {
-  JCMTState *state;       /* Pointer to current STATE */
+  JCMTState *state;         /* Pointer to current STATE */
   AstFrameSet * wcs;        /* Frameset for a particular time slice (frame) */
+  AstFrameSet * tswcs;      /* Frameset for full time series (if time series) */
   AstFitsChan * fitshdr;    /* FITS header from the file */
   dim_t curframe;           /* Index corresponding to current frame */
   dim_t nframes;            /* Number of frames in smfData */

@@ -46,6 +46,8 @@
 *        Trap NULL allsc2heads
 *     2006-07-26 (TIMJ):
 *        sc2head no longer used. Use JCMTState instead.
+*     2006-07-28 (TIMJ):
+*        Add support for tswcs.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -97,6 +99,8 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   dim_t curframe = 0;
   JCMTState *allState = NULL;
   AstFitsChan *fitshdr = NULL;
+  AstFrameSet *tswcs = NULL;
+  AstFrameSet *wcs = NULL;
 
   if (*status != SAI__OK) return NULL;
 
@@ -104,7 +108,10 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   nframes = old->nframes;
   curframe = old->curframe;
 
-  fitshdr = astCopy(old->fitshdr);
+  if (old->fitshdr) fitshdr = astCopy(old->fitshdr);
+
+  if (old->wcs) wcs = astCopy(old->wcs);
+  if (old->tswcs) tswcs = astCopy(old->tswcs);
 
   /* Only allocate space for allState if we have a non-NULL input
      allState */
@@ -118,12 +125,8 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   }
 
   /* Insert elements into new smfHead */
-  new = smf_construct_smfHead( new, NULL, fitshdr, allState, curframe, nframes, status );
-  if (*status != SAI__OK) {
-    errRep(FUNC_NAME,"Unable to allocate memory for new smfHead structure",
-	   status );
-    return NULL;
-  } 
-
+  new = smf_construct_smfHead( new, wcs, tswcs, fitshdr, allState, curframe,
+			       nframes, status );
+  /* this could be NULL */
   return new;
 }

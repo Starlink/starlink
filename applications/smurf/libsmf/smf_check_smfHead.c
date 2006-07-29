@@ -24,7 +24,6 @@
 *        Pointer to global status.
 
 *  Description:
-
 *     This function checks all elements of a smfHead structure and
 *     copies values from the input structure if necessary
 
@@ -129,6 +128,16 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
       } else {
 	msgOutif(MSG__VERB, FUNC_NAME, "Output FrameSet has a SKYFRAME", status);
       }
+    }
+  }
+
+  /* Copy time series WCS if present and not in the output */
+  if ( ihdr->tswcs != NULL ) {
+    if (ohdr->tswcs == NULL) {
+      msgOutif(MSG__VERB, FUNC_NAME, 
+	       "Output data has no time series WCS, copying from input", status);
+      /* Copy over WCS from input */
+      ohdr->tswcs = astCopy(ihdr->tswcs);
     }
   }
 

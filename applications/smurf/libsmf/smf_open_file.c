@@ -99,7 +99,7 @@
 *     2006-07-26 (TIMJ):
 *        sc2head no longer used. Use JCMTState instead.
 *     2006-07-28 (TIMJ):
-*        Use new API for sc2store_headrmap
+*        Use new API for sc2store_headrmap. Read cube WCS into tswcs.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -174,7 +174,6 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   smfDA *da = NULL;          /* pointer to smfDA struct, initialize to NULL */
 
   AstFitsChan *fits = NULL;  /* AST FITS channel */
-  AstFrameSet *iwcs = NULL;  /* AST frame set    */
   HDSLoc * xloc = NULL;      /* Locator to time series headers */
 
   /* Flatfield parameters */
@@ -324,10 +323,12 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
 	/* If not time series, then we can retrieve the stored WCS info */
 	if ( !isTseries ) {
-	  ndfGtwcs( indf, &iwcs, status);
-	  hdr->wcs = iwcs;
+	  ndfGtwcs( indf, &(hdr->wcs), status);
 	  hdr->nframes = 1;
 	} else {
+	  /* Get the time series WCS */
+	  ndfGtwcs( indf, &(hdr->tswcs), status );
+
 	  /* Need to get the location of the extension for STATE parsing */
 	  ndfXloc( indf, JCMT__EXTNAME, "READ", &xloc, status );
 	  /* And need to map the header (all components for now until

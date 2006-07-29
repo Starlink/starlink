@@ -98,6 +98,8 @@
 *        Add smf_model_create, smf_model_getnames
 *     2006-07-26 (TIMJ):
 *        Replace sc2head with JCMTState.
+*     2006-07-28 (TIMJ):
+*        Add tswcs argument to smf_construct_smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -190,7 +192,8 @@ smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
 		      int * status );
 smfHead *
 smf_construct_smfHead( smfHead * tofill,
-		       AstFrameSet * wcs, AstFitsChan * fitshdr,
+		       AstFrameSet * wcs, AstFrameSet * tswcs,
+                       AstFitsChan * fitshdr,
 		       JCMTState * allState,
 		       dim_t curframe, dim_t nframes, int * status );
 
