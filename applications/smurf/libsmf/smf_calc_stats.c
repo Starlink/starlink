@@ -37,15 +37,17 @@
 
 *  Description:
 *     This routine calculates the mean and standard deviation of a
-*     sample of points specified by three indices. The GSL routines
-*     gsl_stats_mean and gsl_stats_sd are used. The first index is
-*     which bolometer or timeslice we are interest in, the second and
-*     third mark the range of values to include in the sample. Note
-*     that the range lo to hi is INCLUSIVE. If both lo and hi are zero
-*     then the entire range is used. On error a mean and std deviation
-*     of VAL__BADD are returned.
+*     sample of points specified by three indices. The Kappa routine
+*     kpgStatd is used. The first index is which bolometer or
+*     timeslice we are interest in, the second and third mark the
+*     range of values to include in the sample. If both lo and hi are
+*     zero then the entire range is used. On error a mean and std
+*     deviation of VAL__BADD are returned.
 
 *  Notes: 
+*     - The range lo to hi is INCLUSIVE.
+*     - Further API updates are likely in order to take fuller advantage
+*       of kpsStatd.
 
 *  Authors:
 *     Andy Gibb (UBC)
