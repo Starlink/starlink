@@ -14,8 +14,8 @@
 
 *  Invocation:
 
-*     smf_open_newfile( Grp * ingrp, int index, smf_dtype dtype, const
-*                       dim_t dims[], int ndims, int flags, smfData ** data, 
+*     smf_open_newfile( Grp * ingrp, int index, smf_dtype dtype, int ndims, 
+*                       const dim_t dims[], int flags, smfData ** data, 
 *                       int *status);
 
 *  Arguments:
