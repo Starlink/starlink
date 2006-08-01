@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 # Build libsmf before the applications
-SUBDIRS = libsmf libsmurf
+SUBDIRS = libsmf libacsis libsmurf
 
 # can not use surf_mon_FCFLAGS yet
 AM_FCFLAGS = -Isrc -Isc2da
@@ -26,7 +26,7 @@ libsim/fhead.c
 WVM_FILES = wvm/wvmOpt.c wvm/wvmTau.c wvm/wvmCal.c
 
 # Linking
-smurf_mon_LDADD = libsmurf/libsmurf.la libsmf/libsmf.la \
+smurf_mon_LDADD = libsmurf/libsmurf.la libacsis/libacsis.la libsmf/libsmf.la \
 	`$(srcdir)/smurf_link_adam`
 
 # Dynamically generated scripts
