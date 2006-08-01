@@ -7,20 +7,11 @@
 #  Purpose:
 #     Generate linker (ld) arguments for linking against SMURF.
 
+#  Language:
+#     Bourne Shell
+
 #  Type of Module:
 #     Bourne-shell script.
-
-#  Description:
-#     This script lists the linking qualifiers for the non-SMURF
-#     libraries used by SMURF.  It should be invoked by those building
-#     SMURF or other applications which use SMURF libraries in order to
-#     generate the correct arguments for the compiler (or ld) command.
-#     The arguments generated are written to the standard output.
-
-#     The script contains an awk script to remove duplicate references
-#     that result from other linker `options' files.  The file is
-#     needed because there would be too many references before the awk
-#     script could reduce them.
 
 #  Invocation:
 #     The script is normally invoked as part of a makefile command to
@@ -29,16 +20,44 @@
 #         $(ALINK) $(MONO_OBJECT) -o $(MONOLITH) `surf_libs` \
 #             -L$(STAR_LIB) `./surf_link_adam`
 
-#  Authors:
-#     TJ:   Tim Jenness (JACH)
-#     MJC:  Malcolm J. Currie (STARLINK)
-#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
-#     BLY:  M.J. Bly (Starlink, RAL)
-#     {enter_new_authors_here}
+#  Description:
+#     This script lists the linking qualifiers for the non-SMURF
+#     libraries used by SMURF.  It should be invoked by those building
+#     SMURF or other applications which use SMURF libraries in order to
+#     generate the correct arguments for the compiler (or ld) command.
+#     The arguments generated are written to the standard output.
+#
+#     The script contains an awk script to remove duplicate references
+#     that result from other linker `options' files.  The file is
+#     needed because there would be too many references before the awk
+#     script could reduce them.
 
 #  Copyright:
 #     Copyright (C) 1995,1996,1997,1998,1999,2005 Particle Physics and Astronomy
 #     Research Council. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     TIMJ:   Tim Jenness (JACH)
+#     MJC:  Malcolm J. Currie (STARLINK)
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     BLY:  M.J. Bly (Starlink, RAL)
+#     {enter_new_authors_here}
 
 #  History:
 #     1992 June 3 (MJC):
@@ -48,33 +67,30 @@
 #        the libraries listed in kappa_graphics and kappa_rest scripts.
 #     1995 October 26 (MJC)
 #        Added PDA and ARD.
-#     1997 June 12 (TJ)
+#     1997 June 12 (TIMJ)
 #        Convert from KAPPA to SURF
-#     1997 October (TJ)
+#     1997 October (TIMJ)
 #        Add the PGPLOT librarry.
-#     1998 April 20 (TJ)
-#	 Add GRP
-#     1999 July 2 (TJ)
+#     1998 April 20 (TIMJ)
+#         Add GRP
+#     1999 July 2 (TIMJ)
 #        Remove IRAS90 dependency
-#     2000 June 2 (TJ)
-#	 Remove SGS dependency.
-#     2000 August 21 (TJ)
+#     2000 June 2 (TIMJ)
+#         Remove SGS dependency.
+#     2000 August 21 (TIMJ)
 #        Add NDG
-#     2000 October 27 (TJ)
+#     2000 October 27 (TIMJ)
 #        Remove /star/lib since that makes it impossible to build
 #        on stardev system.
-#     2004 July 14 (TJ)
+#     2004 July 14 (TIMJ)
 #        Stop using SGS/GKS
-#     2004 July 27 (TJ)
+#     2004 July 27 (TIMJ)
 #        Use SHL
-#     2005 Sep 27 (TJ):
+#     2005 Sep 27 (TIMJ):
 #        Copy from surf_link_adam for SMURF usage
-#     2005 Nov 30 (TJ):
+#     2005 Nov 30 (TIMJ):
 #        Add KAPLIBS
 #     {enter_further_changes_here}
-
-#  Bugs:
-#     {note_any_bugs_here}
 
 #-
 
