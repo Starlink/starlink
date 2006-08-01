@@ -38,6 +38,8 @@
 *  History:
 *     31-JUL-2006 (TIMJ):
 *        Original version.
+*     01-AUG-2006 (TIMJ):
+*        INSTRUME keyword is not mandatory.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -102,11 +104,16 @@ smf_inst_get( const smfHead * hdr, int * status ) {
   astClear( hdr->fitshdr, "Card" );
   smf_fits_getS( hdr, "INSTRUME", instrume, SZFITSCARD, status );
 
-  if ( strncmp( instrume, "SCUBA-2", SZFITSCARD) == 0 ) {
-    return INST__SCUBA2;
-  } else if ( strncmp( instrume, "AZTEC", SZFITSCARD ) == 0 ) {
-    return INST__AZTEC;
+  if (*status == SAI__OK) {
+    if ( strncmp( instrume, "SCUBA-2", SZFITSCARD) == 0 ) {
+      return INST__SCUBA2;
+    } else if ( strncmp( instrume, "AZTEC", SZFITSCARD ) == 0 ) {
+      return INST__AZTEC;
+    }
   }
+
+  /* INSTRUME is not mandatory */
+  if (*status == SMF__NOKWRD) errAnnul( status );
 
   /* try the backend */
   if (*status == SAI__OK) {
