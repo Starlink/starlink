@@ -46,6 +46,8 @@
 *        Create string version from Double.
 *     2006-01-26 (TIMJ):
 *        Fix silly string copy bug.
+*     2006-07-31 (TIMJ):
+*        Use SMF__NOKWRD error condition.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -122,7 +124,7 @@ void smf_fits_getS (const smfHead *hdr, const char * name, char * result,
 
   if ( !astGetFitsS( hdr->fitshdr, name, &astres) ) {
     if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
+      *status = SMF__NOKWRD;
       msgSetc("FITS", name );
       errRep(FUNC_NAME, "Unable to retrieve item ^FITS from header",
 	     status);

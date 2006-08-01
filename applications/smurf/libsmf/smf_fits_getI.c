@@ -13,7 +13,8 @@
 *     C function
 
 *  Invocation:
-*     smf_fits_getI( const smfHead * hdr, const char * name, int * result, int * status );
+*     smf_fits_getI( const smfHead * hdr, const char * name, int * result,
+*                    int * status );
 
 *  Arguments:
 *     hdr = const smfHdr* (Given)
@@ -38,13 +39,15 @@
 *        Initial version.
 *     2005-11-29 (TIMJ):
 *        Indicate consting in prolog.
+*     2006-07-31 (TIMJ):
+*        Use SMF__NOKWRD error condition.
 *     {enter_further_changes_here}
 
 *  Notes:
 *     - See also smf_fits_getD and smf_fits_getS
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -76,6 +79,7 @@
 /* SMURF includes */
 #include "smf.h"
 #include "smf_typ.h"
+#include "smf_err.h"
 
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fits_getI"
@@ -102,7 +106,7 @@ void smf_fits_getI (const smfHead *hdr, const char * name, int * result, int * s
 
   if ( !astGetFitsI( hdr->fitshdr, name, result) ) {
     if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
+      *status = SMF__NOKWRD;
       msgSetc("FITS", name );
       errRep(FUNC_NAME, "Unable to retrieve item ^FITS from header",
 	     status);
