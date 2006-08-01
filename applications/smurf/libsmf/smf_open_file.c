@@ -100,6 +100,9 @@
 *        sc2head no longer used. Use JCMTState instead.
 *     2006-07-28 (TIMJ):
 *        Use new API for sc2store_headrmap. Read cube WCS into tswcs.
+*     2006-07-31 (TIMJ):
+*        Use SC2STORE__MAXFITS.
+*        Calculate "instrument".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -173,7 +176,6 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   smfHead *hdr = NULL;       /* pointer to smfHead struct */
   smfDA *da = NULL;          /* pointer to smfDA struct, initialize to NULL */
 
-  AstFitsChan *fits = NULL;  /* AST FITS channel */
   HDSLoc * xloc = NULL;      /* Locator to time series headers */
 
   /* Flatfield parameters */
@@ -184,8 +186,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
   /* Pasted from readsc2ndf */
   int colsize;               /* number of pixels in column */
-  char headrec[80][81];      /* FITS headers */
-  int maxfits = 80;          /* maximum number of FITS headers */
+  char headrec[SC2STORE__MAXFITS][81];      /* FITS headers read from sc2store */
   int maxlen = 81;           /* maximum length of a FITS header */
   int nfits;                 /* number of FITS headers */
   int nframes;               /* number of frames */
@@ -319,7 +320,30 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
       if (withHdr) {
 
 	/* Read the FITS headers */
-	kpgGtfts( indf, &fits, status );
+	kpgGtfts( indf, &(hdr->fitshdr), status );
+
+	/* Determine the instrument */
+	hdr->instrument = smf_inst_get( hdr, status );
+
+	/* On the basis of the instrument, we know need to fill in some
+	   additional header parameters. Some of these may be constants,
+	   whereas others may involve more file access. Currently we use
+	   a simple switch statement. We could modify this step to use
+	   vtables of function pointers.
+	*/
+	switch ( hdr->instrument ) {
+	case INST__ACSIS:
+	  /* acs_fill_smfHead( hdr, indf, status ); */
+	  break;
+	case INST__AZTEC:
+	  /* aztec_fill_smfHead( hdr, NDF__NOID, status ); */
+	  break;
+	default:
+	  break;
+	  /* SCUBA-2 has nothing special here because the focal plane
+	     coordinates are derived using an AST polyMap */
+	}
+	   
 
 	/* If not time series, then we can retrieve the stored WCS info */
 	if ( !isTseries ) {
@@ -331,9 +355,9 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
 	  /* Need to get the location of the extension for STATE parsing */
 	  ndfXloc( indf, JCMT__EXTNAME, "READ", &xloc, status );
-	  /* And need to map the header (all components for now until
-	     we learn how to translate instrument to constant.) */
-	  sc2store_headrmap( xloc, ndfdims[2], INST__NONE, status );
+	  /* And need to map the header making sure we have the right components
+	     for this instrument. */
+	  sc2store_headrmap( xloc, ndfdims[2], hdr->instrument, status );
 
 	  /* Malloc some memory to hold all the time series data */
 	  hdr->allState = smf_malloc( ndfdims[2], sizeof(JCMTState),
@@ -380,7 +404,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
       tmpState = NULL;
 
       /* Read time series data from file */
-      sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN, maxlen, maxfits, 
+      sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN, maxlen,
+			  SC2STORE__MAXFITS, 
 			  &nfits, headrec, &colsize, &rowsize, 
 			  &nframes, &(da->nflat), da->flatname,
 			  &tmpState, &tdata, &dksquid, 
@@ -418,8 +443,12 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	if (da->flatpar != NULL) memcpy(da->flatpar, flatpar,
 					sizeof(double)* da->nflat);
 
-	/* Create a FitsChan from te FITS headers */
-	smf_fits_crchan( nfits, phead, &fits, status); 
+	/* Create a FitsChan from the FITS headers */
+	if (withHdr) {
+	  smf_fits_crchan( nfits, phead, &(hdr->fitshdr), status); 
+	  /* Instrument must be SCUBA-2 */
+	  hdr->instrument = INST__SCUBA2;
+	}
 
 	/* Raw data type is integer */
 	itype = SMF__INTEGER;
@@ -462,12 +491,6 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
     if (*status == SAI__OK) {
       (*data)->dtype = itype;
       strncpy(file->name, pname, SMF_PATH_MAX);
-      if (withHdr) hdr->fitshdr = fits;
-
-      /* debug - show FITS info if it is defined */
-      if (withHdr && fits != NULL) {
-	/* astShow(fits); */
-      }
 
       /* Store the data in the smfData struct */
       for (i=0; i<3; i++) {
