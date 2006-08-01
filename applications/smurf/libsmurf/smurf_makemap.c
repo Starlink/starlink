@@ -70,8 +70,6 @@
 *        Add iterative map-maker + associated command line parameters
 *     2006-06-24 (ED):
 *        Iterative map-maker parameters given in CONFIG file
-*     26-JUL-2006 (TIMJ):
-*        Remove unused sc2* includes.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -126,6 +124,11 @@
 #include "smurflib.h"
 #include "libsmf/smf.h"
 
+#include "sc2da/sc2store_par.h"
+#include "sc2da/sc2math.h"
+#include "sc2da/sc2store.h"
+#include "sc2da/sc2ast.h"
+
 #define FUNC_NAME "smurf_makemap"
 #define TASK_NAME "MAKEMAP"
 #define LEN__METHOD 20
@@ -145,6 +148,7 @@ void smurf_makemap( int *status ) {
   void *map=NULL;            /* Pointer to the rebinned map data */
   char method[LEN__METHOD];  /* String for map-making method */
   int n;                     /* # elements in the output map */
+  Grp *ogrp = GRP__NOID;     /* Group containing output file */
   int ondf;                  /* output NDF identifier */
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   int parstate;              /* State of ADAM parameters */
@@ -153,6 +157,8 @@ void smurf_makemap( int *status ) {
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance=NULL;       /* Pointer to the variance map */
   void *weights=NULL;        /* Pointer to the weights map */
+  HDSLoc *weightsloc=NULL;   /* HDS locator of weights array */
+  int wndf;                  /* weights NDF identifier */
 
   /* Main routine */
   ndfBegin();
@@ -190,16 +196,21 @@ void smurf_makemap( int *status ) {
   variance = data_index[0];
 
   /* Allocate memory for weights and initialise to zero */
-  if (*status == SAI__OK) {
-    weights = smf_malloc( (ubnd_out[0]-lbnd_out[0]+1) *
-			  (ubnd_out[1]-lbnd_out[1]+1), sizeof(double),
-			  1, status );
-    if ( weights == NULL  ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Unable to allocate memory for the weights array", 
-	     status);
-    }
-  }
+  /*  weights = smf_malloc( (ubnd_out[0]-lbnd_out[0]+1) *
+			(ubnd_out[1]-lbnd_out[1]+1), sizeof(double),
+			1, status );
+  if ( weights == NULL ) {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "Unable to allocate memory for the weights array", 
+	   status);
+	   }*/
+                                    
+  /* Create an extension for the weights array */
+  ndfXnew ( ondf, "SCU2RED", "SCUBA2_WT_ARR", 0, 0, &weightsloc, status );
+  wndf = smf_get_ndfid ( weightsloc, "WEIGHTS", "WRITE", "NEW", 
+                         "_DOUBLE", 2, lbnd_out, ubnd_out, status );
+  ndfMap ( wndf, "DATA", "_DOUBLE", "WRITE", data_index, &n, status );
+  weights = data_index[0];  
 
   /* Create the map using the chosen METHOD */
   if( strncmp( method, "REBIN", 5 ) == 0 ) {
@@ -211,7 +222,7 @@ void smurf_makemap( int *status ) {
 
       /* Read data from the ith input file in the group */      
       smf_open_and_flatfield( igrp, NULL, i, &data, status );
-      
+;      
       /* Remove sky - assume MEAN is good enough for now */
       smf_subtract_plane(data, "MEAN", status);
 
@@ -240,11 +251,11 @@ void smurf_makemap( int *status ) {
 		 "File ^I has ^DTYPE data type, should be DOUBLE.",
 		 status);
 	}
-      
+     
       /* Rebin the data onto the output grid */
       smf_rebinmap(data, i, size, outfset, lbnd_out, ubnd_out, 
 		   map, variance, weights, status );
-      
+   
       /* Close the data file */
       if( data != NULL ) {
 	smf_close_file( &data, status);
@@ -315,10 +326,11 @@ void smurf_makemap( int *status ) {
   
   ndfUnmap( ondf, "DATA", status);
   ndfUnmap( ondf, "VARIANCE", status);
+  ndfUnmap( wndf, "DATA", status );
+  ndfAnnul ( &wndf, status );
   ndfAnnul( &ondf, status );
 
-  smf_free( weights, status );
-  
+  //  smf_free( weights, status );
   if( igrp != GRP__NOID ) grpDelet( &igrp, status);
 
   ndfEnd( status );
