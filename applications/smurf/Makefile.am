@@ -13,13 +13,17 @@ bin_MONOLITHS = smurf_mon
 smurf_mon_SOURCES = smurf_mon.c $(DA_FILES) $(WVM_FILES) $(SIM_FILES)
 
 # Tasks
-smurf_mon_TASKS = extinction flatfield makemap remsky qlmakemap scanfit sc2sim dreamsolve
+smurf_mon_TASKS = extinction flatfield makemap remsky qlmakemap scanfit sc2sim dreamsolve \
+	makecube
+
+# These files are not built inside a subdir because they are in CVS
+# under an alternate build system that SMURF can not modify.
 
 DA_FILES = sc2da/sc2store.c sc2da/sc2math.c sc2da/smurf_ers.c \
 sc2da/sc2ast.c
 
-SIM_FILES = libsc2sim/dream.c libsc2sim/dxml.c \
-libsc2sim/fhead.c
+SIM_FILES = libsim/dream.c libsim/dxml.c \
+libsim/fhead.c
 
 WVM_FILES = wvm/wvmOpt.c wvm/wvmTau.c wvm/wvmCal.c
 
