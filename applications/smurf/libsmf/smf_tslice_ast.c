@@ -129,7 +129,7 @@
 void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
 
   smfHead *       hdr;       /* Local copy of the header structure */
-  JCMTState *     tmpState;  /* Local pointer to STATE */
+  const JCMTState * tmpState;  /* Local pointer to STATE */
   int             subsysnum; /* Subsystem numeric id. 0 - 8 */
   char subarray[81];         /* Subarray name */
 
