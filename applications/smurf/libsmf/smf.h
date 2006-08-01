@@ -100,6 +100,8 @@
 *        Replace sc2head with JCMTState.
 *     2006-07-28 (TIMJ):
 *        Add tswcs argument to smf_construct_smfHead
+*     2006-07-31 (TIMJ):
+*        Add smf_inst_get
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -132,6 +134,7 @@
 #define SMF_DEFINED
 
 #include "ast.h"
+#include "jcmt/state.h"  /* for inst_t */
 #include "smurf_typ.h"
 #include "star/grp.h"
 #include "smf_typ.h"
@@ -279,6 +282,8 @@ void smf_history_write( const smfData* data, const char * appl,
 
 void smf_insert_tslice ( smfData **idata, smfData *tdata, int index, 
                          int *status );
+
+inst_t smf_inst_get( const smfHead * hdr, int * status );
 
 void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
  		     double *map, double *variance, double *weights,
