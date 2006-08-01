@@ -106,7 +106,7 @@ int *status           /* global status (given and returned) */
 {
    /* Local variables */
    double currentsigma;       /* photon noise current equivalent */
-   double meanplus;           /* current matching targetpow plus noise *
+   double meanplus;           /* current matching targetpow plus noise */
 
    /* Check status */
    if ( !StatusOkP(status) ) return;

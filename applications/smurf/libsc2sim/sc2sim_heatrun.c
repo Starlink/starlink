@@ -162,8 +162,6 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
    int bol;                        /* counter for indexing bolometers */
    double corner;                  /* corner frequency in Hz */
    double current;                 /* bolometer current in amps */
-   int count;                      /* number of samples in full pattern */
-   char *curtok=NULL;              /* current subarray name being parsed */
    int date_da;                    /* day corresponding to MJD */
    double date_df;                 /* day fraction corresponding to MJD */
    int date_mo;                    /* month corresponding to MJD */

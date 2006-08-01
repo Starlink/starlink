@@ -135,6 +135,7 @@
 
 /* SC2SIM includes */
 #include "sc2sim.h"
+#include "dream.h"
 
 /* Starlink includes */
 #include "ast.h"

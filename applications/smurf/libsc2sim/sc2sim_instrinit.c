@@ -110,6 +110,7 @@
 /* SC2SIM includes */
 #include "sc2sim.h"
 #include "sc2sim_par.h"
+#include "dream.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"

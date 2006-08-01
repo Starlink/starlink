@@ -123,8 +123,10 @@
 #include "star/ndg.h"
 #include "star/grp.h"
 
+#include "jcmt/state.h"
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
+#include "sc2da/sc2store.h"
 #include "sc2da/sc2store_par.h"
 #include "sc2da/sc2math.h"
 #include "sc2da/sc2ast.h"
@@ -157,7 +159,6 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
    double *base_az=NULL;           /* Az of telescope base */
    double *base_el=NULL;           /* El of BASE telescope position */
    double *base_p=NULL;            /* Parall. ang. of BASE at time step */
-   int bol;                        /* counter for indexing bolometers */
    double *bor_az=NULL;            /* Az of telescope in spherical coord. */
    double *bor_dec=NULL;           /* telescope dec. spherical coordinates */
    double *bor_el=NULL;            /* El of telescope in spherical coord. */
@@ -180,7 +181,6 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
    AstFitsChan *fc=NULL;           /* FITS channels for tanplane projection */
    char filename[DREAM__FLEN];     /* name of output file */
    int firstframe;                 /* first frame in an output set */
-   AstFrameSet *fitswcs=NULL;      /* Frameset for input image WCS */
    double *flatcal=NULL;           /* flatfield calibration */
    char flatname[SC2STORE_FLATLEN];/* flatfield algorithm name */
    double *flatpar=NULL;           /* flatfield parameters */

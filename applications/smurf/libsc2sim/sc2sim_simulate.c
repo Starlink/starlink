@@ -150,8 +150,10 @@
 #include "star/ndg.h"
 #include "star/grp.h"
 
+#include "jcmt/state.h"
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
+#include "sc2da/sc2store.h"
 #include "sc2da/sc2store_par.h"
 #include "sc2da/sc2math.h"
 #include "sc2da/sc2ast.h"
@@ -251,8 +253,6 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
    double pwvlos;                  /* mm precip. wat. vapor. line of site */
    double pwvzen = 0;              /* zenith precipital water vapour (mm) */
    int rowsize;                    /* row size for flatfield */
-   int scanpath = 0;               /* flag for scanpath test */
-   int scanlength = 0;             /* length of scanpath */
    double sigma;                   /* instrumental white noise */
    Grp *skygrp = GRP__NOID;        /* Group of input files */
    AstMapping *sky2map=NULL;       /* Mapping celestial->map coordinates */

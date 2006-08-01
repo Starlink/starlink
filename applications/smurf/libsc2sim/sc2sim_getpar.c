@@ -82,6 +82,7 @@
 
 /* Standard includes */
 #include <string.h>
+#include <stdlib.h>
 
 /* SC2SIM includes */
 #include "sc2sim.h"
