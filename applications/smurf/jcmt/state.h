@@ -51,6 +51,8 @@
 *        Remove RTS_TASKS. Remove spurious ACSIS members. Add more docs.
 *     28-JUL-2006 (TIMJ):
 *        Add inst_t enum.
+*     31-JUL-2006 (TIMJ):
+*        Add AZTEC instrument
 
 *  Copyright:
 *     Copyright (C) 2004, 2006 Particle Physics and Astronomy Research Council.
@@ -97,6 +99,7 @@ typedef enum {
   INST__NONE   = 0x00000000,  /* No instruments */
   INST__ACSIS  = 0x00000001,
   INST__SCUBA2 = 0x00000002,
+  INST__AZTEC  = 0x00000004,
   INST__ALL    = 0xFFFFFFFF,  /* All bits set */
 } inst_t;
 
