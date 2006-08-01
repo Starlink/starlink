@@ -48,6 +48,9 @@
 *        sc2head no longer used. Use JCMTState instead.
 *     2006-07-28 (TIMJ):
 *        Add support for tswcs.
+*     2006-06-31 (TIMJ):
+*        Add instrument and fplane*
+*        make sure memcpy is protected. Some tidy up.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -85,6 +88,7 @@
 #include "ndf.h"
 
 /* SMURF routines */
+#include "jcmt/state.h"
 #include "smf.h"
 #include "smf_typ.h"
 #include "smf_err.h"
@@ -101,6 +105,10 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   AstFitsChan *fitshdr = NULL;
   AstFrameSet *tswcs = NULL;
   AstFrameSet *wcs = NULL;
+  inst_t instrument = INST__NONE;
+  unsigned int ndet = 0;
+  double *fplanex = NULL;
+  double *fplaney = NULL;
 
   if (*status != SAI__OK) return NULL;
 
@@ -113,20 +121,41 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   if (old->wcs) wcs = astCopy(old->wcs);
   if (old->tswcs) tswcs = astCopy(old->tswcs);
 
+  if (old->instrument) instrument = old->instrument;
+
   /* Only allocate space for allState if we have a non-NULL input
      allState */
   if ( old->allState != NULL) {
-    allState = smf_malloc( 1, nframes*sizeof(JCMTState), 0, status);
-    if (  allState == NULL) {
-      *status = SAI__ERROR;
+    allState = smf_malloc( nframes, sizeof(*allState), 0, status);
+    if ( allState == NULL) {
+      /* Status should be bad from smf_malloc */
+      if (*status == SAI__OK) *status = SAI__ERROR;
       errRep(FUNC_NAME,"Unable to allocate memory for allState", status);
+    } else {
+      memcpy( allState, old->allState, nframes*sizeof(*allState) );
     }
-    memcpy( allState, old->allState, nframes*sizeof(JCMTState) );
   }
 
+  /* need to allocate focal plane offsets */
+  if (old->ndet > 0 && old->fplanex && old->fplaney) {
+    ndet = old->ndet;
+    fplanex = smf_malloc( ndet, sizeof(*fplanex), 0, status );
+    if (fplanex) memcpy( fplanex, old->fplanex, ndet*sizeof(*fplanex) );
+
+    fplaney = smf_malloc( ndet, sizeof(*fplaney), 0, status );
+    if (fplaney) memcpy( fplaney, old->fplaney, ndet*sizeof(*fplaney) );
+  } 
+
   /* Insert elements into new smfHead */
-  new = smf_construct_smfHead( new, wcs, tswcs, fitshdr, allState, curframe,
-			       nframes, status );
+  new = smf_construct_smfHead( new, instrument, wcs, tswcs, fitshdr,
+			       allState, curframe,
+			       nframes, ndet, fplanex, fplaney, status );
+
+  /* let people know where things are going wrong */
+  if (*status != SAI__OK) {
+    errRep( " ", FUNC_NAME ": error deep copying a smfHead", status );
+  }
+
   /* this could be NULL */
   return new;
 }

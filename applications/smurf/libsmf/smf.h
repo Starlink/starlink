@@ -194,11 +194,13 @@ smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
 		      int isTstream, const char * name,
 		      int * status );
 smfHead *
-smf_construct_smfHead( smfHead * tofill,
+smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       AstFrameSet * wcs, AstFrameSet * tswcs,
                        AstFitsChan * fitshdr,
-		       JCMTState * allState,
-		       dim_t curframe, dim_t nframes, int * status );
+		       const JCMTState * allState,
+		       dim_t curframe, dim_t nframes, unsigned int ndet,
+		       const double fplanex[], const double fplaney[],
+		       int * status );
 
 smfGroup * 
 smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups, 
@@ -319,6 +321,9 @@ void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, const int ndims,
 
 void smf_open_related( const smfGroup *group, const int subindex, smfArray **relfiles, 
 		       int *status );
+
+void * smf_realloc( void * pntr, size_t nelem, size_t bytes_per_elem,
+                   int * status );
 
 void smf_rebinmap( smfData *data, int index, int size, 
                    AstFrameSet *outframeset, int *lbnd_out, int *ubnd_out,

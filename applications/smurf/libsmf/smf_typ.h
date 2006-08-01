@@ -142,7 +142,8 @@ typedef struct smfFile {
 /* Contains header general header information obtained from the file */
 
 typedef struct smfHead {
-  JCMTState *state;         /* Pointer to current STATE */
+  const JCMTState *state;   /* Pointer to current STATE */
+  inst_t     instrument;    /* Instrument code */
   AstFrameSet * wcs;        /* Frameset for a particular time slice (frame) */
   AstFrameSet * tswcs;      /* Frameset for full time series (if time series) */
   AstFitsChan * fitshdr;    /* FITS header from the file */
@@ -150,7 +151,10 @@ typedef struct smfHead {
   dim_t nframes;            /* Number of frames in smfData */
   int isCloned;             /* If false, allState is owned by this
 			       struct, if true it should not be freed */
-  JCMTState *allState;     /* Array of STATE for every time slice */ 
+  const JCMTState *allState;/* Array of STATE for every time slice */ 
+  unsigned int ndet;        /* Number of focal plane detectors */
+  const double * fplanex;   /* X coords (radians) of focal plane detectors */
+  const double * fplaney;   /* Y coords (radians) of focal plane detectors */
 } smfHead;
 
 /* This structure contains ancilliary information obtained from a raw

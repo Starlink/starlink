@@ -13,15 +13,19 @@
 *     Subroutine
 
 *  Invocation:
-*     pntr = smf_construct_smfHead( smfHead * tofill,
+*     pntr = smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 *              AstFrameSet * wcs, AstFrameSet * tswcs,
-*              AstFitsChan * fitshdr, JCMTState * allState,
-*              dim_t curframe, int * status );
+*              AstFitsChan * fitshdr, const JCMTState * allState,
+*              dim_t curframe, unsigned int ndet,
+*              const double fplanex[], const double fplaney[],
+*              int * status );
 
 *  Arguments:
 *     tofill = smfHead* (Given)
 *        If non-NULL, this is the smfHead that is populated by the remaining
 *        arguments. If NULL, the smfHead is malloced.
+*     instrument = inst_t (Given)
+*        Instrument code. Can be INST__NONE.
 *     wcs = AstFrameSet * (Given)
 *        Frameset for the world coordinates. The pointer is copied,
 *        not the contents.
@@ -32,12 +36,18 @@
 *        FITS header. The pointer is copied, not the contents.
 *     allState = JCMTState* (Given)
 *        Pointer to array of time series information for all time slices.
-*        Should be at least "curslice" in size.
+*        Should be at least "curslice" in size. Contents are not copied.
 *     curframe = dim_t (Given)
 *        Current time index corresponding to the associated WCS. sc2head
 *        will be set to this location.
 *     nframes = dim_t (Given)
-*        Number of frames (timeslices) in data
+*        Number of frames (timeslices) in data.
+*     ndet = unsigned int (Given)
+*        Number of positions in fplanex, fplaney arrays. Number of detectors.
+*     fplanex = const double[] (Given)
+*        X Coordinates of bolometers/receptors in the focal plane (radians)
+*     fplanex = const double[] (Given)
+*        Y Coordinates of bolometers/receptors in the focal plane (radians)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -78,6 +88,8 @@
 *        sc2head no longer used. Use JCMTState instead.
 *     2006-07-26 (TIMJ):
 *        Add tswcs.
+*     2006-07-31 (TIMJ):
+*        Add instrument code. Add fplanex and fplaney.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -115,6 +127,7 @@
 #include "ndf.h"
 
 /* SMURF routines */
+#include "jcmt/state.h"
 #include "smf.h"
 #include "smf_typ.h"
 #include "smf_err.h"
@@ -122,11 +135,13 @@
 #define FUNC_NAME "smf_construct_smfHead"
 
 smfHead *
-smf_construct_smfHead( smfHead * tofill,
+smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       AstFrameSet * wcs, AstFrameSet * tswcs,
 		       AstFitsChan * fitshdr,
-		       JCMTState * allState,
-		       dim_t curframe, dim_t nframes, int * status ) {
+		       const JCMTState * allState,
+		       dim_t curframe, dim_t nframes, unsigned int ndet,
+		       const double fplanex[], const double fplaney[],
+		       int * status ) {
 
   smfHead * hdr = NULL;   /* Header components */
 
@@ -138,6 +153,7 @@ smf_construct_smfHead( smfHead * tofill,
   }
 
   if (*status == SAI__OK) {
+    hdr->instrument = instrument;
     hdr->wcs = wcs;
     hdr->wcs = tswcs;
     hdr->fitshdr = fitshdr;
@@ -145,6 +161,9 @@ smf_construct_smfHead( smfHead * tofill,
     hdr->nframes = nframes;
     hdr->allState = allState;
     hdr->state = &(allState[curframe]);
+    hdr->ndet = ndet;
+    hdr->fplanex = fplanex;
+    hdr->fplaney = fplaney;
     hdr->isCloned = 1;
   }
 

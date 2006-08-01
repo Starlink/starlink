@@ -47,6 +47,8 @@
 *        sc2head no longer used. Use JCMTState instead.
 *     2006-07-26 (TIMJ):
 *        Add tswcs.
+*     2006-07-31 (TIMJ):
+*        Add instrument code. Add fplanex, fplaney.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -106,6 +108,7 @@ smf_create_smfHead( int * status ) {
   }
 
   /* Initialise smfHead */
+  hdr->instrument = INST__NONE;
   hdr->wcs = NULL;
   hdr->tswcs = NULL;
   hdr->fitshdr = NULL;
@@ -113,6 +116,9 @@ smf_create_smfHead( int * status ) {
   hdr->nframes = 0;
   hdr->state = NULL;
   hdr->allState = NULL;
+  hdr->ndet = 0;
+  hdr->fplanex = NULL;
+  hdr->fplaney = NULL;
   hdr->isCloned = 0;
   return hdr;
 }

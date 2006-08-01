@@ -37,6 +37,8 @@
 *        Initial version.
 *     2006-07-26 (TIMJ):
 *        sc2head no longer used. Use JCMTState instead.
+*     2006-07-31 (TIMJ):
+*        Check fplanex/y and instrument
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -96,6 +98,9 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
   /* Retrieve headers */
   ihdr = idata->hdr;
   ohdr = odata->hdr;
+
+  /* instrument code */
+  if (ohdr->instrument == INST__NONE) ohdr->instrument = ihdr->instrument;
 
   /* Do we have WCS? */
   /* First check if INPUT WCS is null => we have time series data and
@@ -187,17 +192,45 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
     if ( ihdr->allState == NULL ) {
       if ( *status == SAI__OK) {
 	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "Input allState is NULL, possible programming error", status);
+	errRep(FUNC_NAME, "Input allState is NULL, possible programming error",
+	       status);
       }
     } else {
       nframes = ohdr->nframes;
-      allState = smf_malloc( 1, nframes*sizeof(JCMTState), 0, status);
-      if ( allState == NULL) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME,"Unable to allocate memory for allState", status);
+      if (*status == SAI__OK) {
+	allState = smf_malloc( nframes, sizeof(*allState), 0, status);
+	if ( allState == NULL) {
+	  if (*status == SAI__OK) *status = SAI__ERROR;
+	  errRep(FUNC_NAME,"Unable to allocate memory for allState", status);
+	} else {
+	  memcpy( allState, ihdr->allState, nframes*sizeof(*allState) );
+	}
       }
-      memcpy( allState, ihdr->allState, nframes*sizeof(JCMTState) );
     }
+  }
+
+  /* focal plane coordinate */
+  if (ohdr->ndet == 0 && ihdr->ndet > 0) {
+    if (ohdr->fplanex == NULL && ohdr->fplaney == NULL) {
+      ohdr->fplanex = smf_malloc( ihdr->ndet, sizeof(*(ohdr->fplanex)), 0,
+				  status );
+      if (ohdr->fplanex) {
+	memcpy( ohdr->fplanex, ihdr->fplanex, 
+		ihdr->ndet * sizeof(*(ohdr->fplanex)));
+      }
+      ohdr->fplaney = smf_malloc( ihdr->ndet, sizeof(*(ohdr->fplaney)), 0,
+				  status );
+      if (ohdr->fplaney) {
+	memcpy( ohdr->fplaney, ihdr->fplaney, 
+		ihdr->ndet * sizeof(*(ohdr->fplaney)));
+      }
+      ohdr->ndet = ihdr->ndet;
+    }
+  }
+
+  /* final report */
+  if (*status != SAI__OK) {
+    errRep( " ", FUNC_NAME ": error checking a smfHead", status );
   }
 
 }
