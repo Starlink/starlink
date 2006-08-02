@@ -15,7 +15,7 @@
 *  Invocation:
 
 *     smf_open_newfile( Grp * ingrp, int index, smf_dtype dtype, int ndims, 
-*                       const dim_t dims[], int flags, smfData ** data, 
+*                       const int dims[], int flags, smfData ** data, 
 *                       int *status);
 
 *  Arguments:
@@ -27,7 +27,7 @@
 *        Data type of this smfData. Unsupported types result in an error.
 *     ndims = int (Given)
 *        Number of dimensions in dims[]. Maximum of NDF__MXDIM.
-*     dims[] = dim_t (Given)
+*     dims[] = const int (Given)
 *        Array of dimensions. Values will be copied from this array.
 *     flags = int (Given)
 *        Flags to denote whether to create flatfield, header, or file components
@@ -191,7 +191,7 @@ void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, const int ndims,
   /* Fill ubnd and lbnd arrays */
   for ( i=0; i<ndims; i++) {
     lbnd[i] = 1;
-    ubnd[i] = (int)(dims[i]);
+    ubnd[i] = dims[i];
   }
 
   /* Create new simple NDF */
