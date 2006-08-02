@@ -54,6 +54,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MNB: Mike N. Birchall (AAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -73,9 +74,13 @@
 *        Added support for AAO/UKST 6dF data.
 *     2004 Sep 10 (TIMJ):
 *        Initialise some variables for FITSIO.
-*     2006 January  4 (MJC):
+*     2006 January 4 (MJC):
 *        Augment AAO instrument names (AAOMEGA and FMOS) that use the
 *        2df data structures.
+*     2006 May 12 (MNB):
+*        Added header check for AAOMOSFT=T to assert that this is AAO
+*        data format.  This is a fail safe to make the conversion work
+*        for data produced by new instruments on non AAO telescopes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -104,6 +109,8 @@
       PARAMETER( FITSOK = 0 )
 
 *  Local Variables:
+      CHARACTER * ( 20 ) AAOFTV  ! Value of AAOMOSFT keyword
+      LOGICAL AAOPRE             ! AAOMOSFT keyword is present?
       CHARACTER * ( 48 ) COMENT  ! Keyword comment
       INTEGER CPOS               ! Character position
       CHARACTER * ( 70 ) FILNAM  ! Value of FILENAME keyword
@@ -127,9 +134,11 @@
 *  Initialise the returned value.
       NAME = ' '
 
-*  Initialise some variables in case the compiler doesn't
+*  Initialise some variables in case the compiler doesn't.
       TELPRE = .FALSE.
       TELESC = ' '
+      AAOPRE= .FALSE.
+      AAOFTV= ' '
 
 *  Initialise the FITSIO status.  It's not the same as the Starlink
 *  status, which is reset by the fixed part.
@@ -140,7 +149,7 @@
 *  the HDU.  1 is the primary HDU.
       CALL FTGHDN( FUNIT, NHDU )
 
-*  Check no further if not the primary HDU
+*  Check no further if not the primary HDU.
       IF ( NHDU .GT. 1 ) THEN
          GOTO 999
       END IF
@@ -161,6 +170,10 @@
 
 *  Obtain the filename from the FILENAME keyword in the header.
       CALL COF_GKEYC( FUNIT, 'FILENAME', FILPRE, FILNAM, COMENT,
+     :                STATUS )
+     
+*  Check for AAO MOS Data Format keyword in the header.
+      CALL COF_GKEYC( FUNIT, 'AAOMOSFT', AAOPRE, AAOFTV, COMENT,
      :                STATUS )
 
 *  Test for ISO data.
@@ -256,12 +269,19 @@
      :          TELESC .EQ. 'UKST' ) THEN
          CALL CHR_UCASE( INSTRU )
          IF ( INSPRE .AND. ( INSTRU .EQ. 'CCD_1' .OR.
-     :        INSTRU .EQ. '2DF' .OR. INSTRU .EQ. '6DF' .OR.
-     :        INSTRU .EQ. 'AAOMEGA-2DF' .OR. INSTRU .EQ. 'FMOS' .OR.
-     :        INSTRU .EQ. 'AAOMEGA-IFU' ) ) THEN
+     :        INSTRU .EQ. '2DF' .OR. 
+     :        INSTRU .EQ. '6DF' .OR.
+     :        INSTRU .EQ. 'AAOMEGA-2DF' .OR. 
+     :        INSTRU .EQ. 'FMOS' .OR.
+     :        INSTRU .EQ. 'AAOMEGA-IFU' .OR. 
+     :        INSTRU .EQ. 'SPIRAL' ) ) THEN
             NAME = 'AAO2DF'
          END IF
 
+      ELSE IF ( AAOPRE .AND. 
+     :          AAOFTV( 1:1 ) .NE. 'F' .AND. 
+     :          AAOFTV( 1:1 ) .NE. 'f' ) THEN
+          NAME = 'AAO2DF'
       END IF
 
   999 CONTINUE
