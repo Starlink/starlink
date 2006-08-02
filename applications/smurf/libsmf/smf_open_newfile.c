@@ -25,12 +25,13 @@
 *        Index corresponding to required file in group
 *     dtype = smf_dtype (Given)
 *        Data type of this smfData. Unsupported types result in an error.
-*     dims[] = dim_t (Given)
-*        Array of dimensions. Values will be copied from this array.
 *     ndims = int (Given)
 *        Number of dimensions in dims[]. Maximum of NDF__MXDIM.
+*     dims[] = dim_t (Given)
+*        Array of dimensions. Values will be copied from this array.
 *     flags = int (Given)
 *        Flags to denote whether to create flatfield, header, or file components
+*        and create variance and quality arrays
 *     data = smfData ** (Returned)
 *        Pointer to pointer smfData struct to be filled with file info and data
 *        Should be freed using smf_close_file.
@@ -43,9 +44,11 @@
 *     they wish to create. The routine returns a populated smfData
 *     with the DATA pointer mapped and ready to accept values.
 *
-*     The routine only maps a DATA array; if VARIANCE and QUALITY
-*     components are desired then they should be added and mapped
-*     separately.
+*     The routine maps a DATA array by default. If VARIANCE and
+*     QUALITY components are desired then their creation can be
+*     controlled with the flags argument. Use SMF__MAP_VAR and
+*     SMF__MAP_QUAL respectively to obtain the VARIANCE and QUALITY
+*     arrays.
 *
 *     A simple NDF file is created with just a DATA array - the user
 *     can use smf_get_xloc and smf_get_ndfid to add more components
@@ -54,7 +57,7 @@
 *     - Cloned from smf_open_file.c
 *     - Limited to data with no more than 3 dimensions
 *     - Additional components added to this file must be unmapped
-        separately
+*       separately
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -65,6 +68,8 @@
 *        Initial test version
 *     2006-07-24 (AGG):
 *        Change datatype to a char* and avoid strncpy()
+*     2006-08-01 (AGG):
+*        Now map VARIANCE and QUALITY if desired
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -115,7 +120,7 @@
 #define FUNC_NAME "smf_open_newfile"
 
 void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, const int ndims, 
-		       const dim_t dims[], int flags, smfData ** data, 
+		       const int dims[], int flags, smfData ** data, 
 		       int *status) {
 
   /* Local variables */
@@ -142,10 +147,9 @@ void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, const int ndims,
   }
 
   /* Create empty smfData with no extra components */
-  flags |= SMF__NOCREATE_DA;
-  flags |= SMF__NOCREATE_HEAD;
-  flags |= SMF__NOCREATE_FILE;
+  flags |= SMF__NOCREATE_DA | SMF__NOCREATE_HEAD | SMF__NOCREATE_FILE;
   *data = smf_create_smfData( flags, status);
+  flags = 0;
 
   /* Set the requested data type */
   (*data)->dtype = dtype;
@@ -201,6 +205,20 @@ void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, const int ndims,
   if ( *status != SAI__OK ) {
     errRep(FUNC_NAME, "Unable to map data array", status);
     return;
+  }
+  if ( flags & SMF__MAP_VAR ) {
+    ndfMap(newndf, "VARIANCE", datatype, "WRITE", &(pntr[1]), &nel, status);
+    if ( *status != SAI__OK ) {
+      errRep(FUNC_NAME, "Unable to map variance array", status);
+      return;
+    }
+  }
+  if ( flags & SMF__MAP_QUAL ) {
+    ndfMap(newndf, "QUALITY", "_UBYTE", "WRITE", &(pntr[2]), &nel, status);
+    if ( *status != SAI__OK ) {
+      errRep(FUNC_NAME, "Unable to map quality array", status);
+      return;
+    }
   }
 
   /* Get filename from the group */
