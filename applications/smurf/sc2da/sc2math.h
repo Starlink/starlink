@@ -2,6 +2,52 @@
 #define HEADGEN___src_sc2math_sc2math_h 
  
  
+/*+ sc2math_choles - Factorize symmetric positive definite matrix */
+
+void sc2math_choles 
+( 
+int n,         /* Dimension of the matrix (given) */
+double a[],    /* Square matrix of NxN values.
+                  Only the lower-left triangle is given and returned.
+                  (given and returned) */
+int *loc,      /* Diagonal index in A giving the problem or the lowest value.
+                  (returned) */
+double *dmin,  /* Lowest value or problem value (returned) */
+int *ierr      /* Error code
+                   0 : Normal return.
+                   1 : There is loss of significance.
+                  -1 : Matrix not positive definite.
+                  (returned) */
+);
+
+/*+ sc2math_cholesky - Invert matrix according to the Cholesky method */
+
+void sc2math_cholesky 
+(
+int nunkno,     /* The number of unknowns (given) */
+double lmat[],  /* The lower left triangle of the equation matrix.
+                   This is a 1 dimensional array of dimension
+                   NUNKNO*(NUNKNO+1)/2 which must be filled before the
+                   call of this routine, and which is changed into the
+                   inverse matrix (given and returned) */
+int *loc,       /* Index nr in LMAT giving the lowest value.
+                   This must be a diagonal element (returned) */
+double *dmin,   /* Lowest value or problem value of the diagonal element
+                   with index nr LOC (returned) */
+int *err        /* Possible error code in factorizing the matrix (returned) */
+);
+
+/*+ sc2math_conval - Calculate a value of the convolution function */
+
+double sc2math_conval 
+(
+int conv_shape,     /* Code for convolution function (given) */
+double conv_sig,    /* Convolution function parameter (given) */
+double dx,          /* Distance from the centre in X (given) */
+double dy,          /* Distance from the centre in Y (given) */
+int *status         /* global status (given and returned) */
+);
+
 /*+  sc2math_convolve - convolve a dataset with a filter */
 
 void sc2math_convolve
@@ -25,6 +71,15 @@ double *y,                /* observed values (given) */
 double *coeffs,           /* coefficients of fit (returned) */
 double *variances,        /* variances of fit (returned) */
 int *status               /* global status (given and returned) */
+);
+
+/*+ sc2math_eq0  - Make equation matrix */
+
+void sc2math_eq0 
+(
+int nunkno,        /* The number of unknowns (given) */
+double lcoef[],    /* The known values (given) */
+double lmat[]      /* equation matrix (given and returned) */
 );
 
 /*+ sc2math_fitsky - fit a sky baseline for each bolometer */
@@ -52,6 +107,60 @@ double *fcal,       /* calibration coefficients (given) */
 double *fpar,       /* calibration parameters (given) */
 double *inptr,      /* measurement values (given and returned) */
 int *status         /* global status (given and returned) */
+);
+
+/*+ sc2math_get_cycle - Return data for a single measurement cycle */
+
+void sc2math_get_cycle 
+(
+int cur_cycle,    /* current cycle number (given) */
+int nsam_cycle,   /* number of samples per cycle (given) */
+int ncycle,       /* total number of cycles (given) */
+int r_nbol,       /* number of bolometers (given) */
+double drdata[],  /* full raw data set (given) */
+double sbuf[],    /* data for the current cycle (returned) */
+int *status       /* global status (given and returned) */
+);
+
+/*+ sc2math_gridext - Calculate the extent of the sky grid */
+
+void sc2math_gridext
+(
+int ngrid,           /* Number of grid positions within the jiggle area
+                        (given) */
+int gridpts[][2],    /* Table with relative grid offsets for a single
+                        bolometer (given) */
+int *xmin,           /* Grid limit in X-dir (returned) */
+int *xmax,           /* Grid limit in X-dir (returned) */
+int *ymin,           /* Grid limit in Y-dir (returned) */
+int *ymax,           /* Grid limit in Y-dir (returned) */
+int *status          /* global status (given and returned) */
+);
+
+/*+ sc2math_interpwt - Calculate the weight matrix for spatial interpolation */
+
+void sc2math_interpwt 
+(
+int npath,           /* Nr of rows (given) */
+int ngrid,            /* Nr of columns (given) */
+int conv_shape,      /* Code for convolution function (given) */
+double conv_sig,     /* Convolution function parameter (given) */
+double calc_t,       /* Time per path point in millisec (given) */
+double tbol,         /* Bolometer time constant in millisec (given) */
+double jigpath[][2], /* Table with jiggle path pos (given) */
+int jigpts[][2],     /* Table with grid positions (given) */
+double b[],          /* the weight factors (returned) */
+int *status          /* (given and returned) */
+);
+
+/*+ sc2math_invpdm - Invert positive definite matrix */
+
+void sc2math_invpdm 
+(
+int n,       /* Dimension of the matrix (given) */
+double a[]   /* Square Matrix with NxN points.
+                Only the lower-left triangle is given.
+                (given and returned) */
 );
 
 /*+ sc2math_linfit - straight line fit */
@@ -88,6 +197,30 @@ double array[10][10],  /* given matrix, its inverse is returned
                          (given and returned) */
 double *det,           /* determinant of ARRAY (returned) */
 int *status          /* global status (given and returned) */
+);
+
+/*+ sc2math_msv - Multiply matrix with column vector */
+
+void sc2math_msv 
+(
+int m,        /* Number of unknowns (given) */
+double s[],   /* Lower left triangle of a symmetric matrix of MxM (given) */
+double v[],   /* Vector with dimension M (given) */
+double x[]    /* Vector with dimension M with the result (returned) */
+);
+
+/*+ sc2math_pathwts - Pixel weights for SMU path */
+
+void sc2math_pathwts 
+(
+int conv_shape,       /* Code for convolution function (given) */
+double conv_sig,      /* Convolution function parameter (given) */
+int npath,            /* Nr of rows in wtpix (given) */
+double jigpath[][2],  /* Table with jiggle path pos. (given) */
+int ncol,             /* Nr of columns in wtpix (given) */
+int gridpts[][2],     /* Table with grid positions (given) */
+double wtpix[],       /* Matrix with pixel weights (returned) */
+int *status           /* global status (given and returned) */
 );
 
 /*+ sc2math_recurfit - fit a set of values with outlier rejection */
@@ -158,6 +291,17 @@ double *amplitude,  /* amplitude of the sine wave (returned) */
 int *status       /* global status (given and returned) */
 );
 
+/*+ sc2math_response - Calculate the response value */
+
+void sc2math_response
+(
+double f[],   /* Input function (given) */
+double w[],   /* Impulse response function (given) */
+int wdim,     /* Dimension of W (given) */
+int ix,       /* Index corresponding to response (given) */
+double *r     /* Response value (returned) */
+);
+
 /*+ sc2math_setcal - set flatfield calibration for a bolometer */
 
 void sc2math_setcal
@@ -202,123 +346,7 @@ double *phase,         /* phase of signal (returned) */
 int *status          /* global status (given and returned) */
 );
 
-/*+  sc2math_wavegen - generate sine and cosine signals */
-
-void sc2math_wavegen 
-( 
-double period,                 /* period in array elements (given) */
-int length,                  /* length of arrays (given) */
-double *sine,                  /* generated sine wave (returned) */
-double *cosine,                /* generated cosine wave (returned) */
-int *status                  /* global status (given and returned) */
-);
-
-/*+ dsolve_get_cycle - Return data for a single measurement cycle */
-
-void sc2math_get_cycle 
-(
-int cur_cycle,    /* current cycle number (given) */
-int nsam_cycle,   /* number of samples per cycle (given) */
-int ncycle,       /* total number of cycles (given) */
-int r_nbol,       /* number of bolometers (given) */
-double drdata[],  /* full raw data set (given) */
-double sbuf[],    /* data for the current cycle (returned) */
-int *status       /* global status (given and returned) */
-);
- 
-/*+ lsq_choles - Factorize symmetric positive definite matrix */
-
-void sc2math_choles 
-( 
-int n,         /* Dimension of the matrix (given) */
-double a[],    /* Square matrix of NxN values.
-                  Only the lower-left triangle is given and returned.
-                  (given and returned) */
-int *loc,      /* Diagonal index in A giving the problem or the lowest value.
-                  (returned) */
-double *dmin,  /* Lowest value or problem value (returned) */
-int *ierr      /* Error code
-                   0 : Normal return.
-                   1 : There is loss of significance.
-                  -1 : Matrix not positive definite.
-                  (returned) */
-);
-
-/*+ lsq_cholesky - Invert matrix according to the Cholesky method */
-
-void sc2math_cholesky 
-(
-int nunkno,     /* The number of unknowns (given) */
-double lmat[],  /* The lower left triangle of the equation matrix.
-                   This is a 1 dimensional array of dimension
-                   NUNKNO*(NUNKNO+1)/2 which must be filled before the
-                   call of this routine, and which is changed into the
-                   inverse matrix (given and returned) */
-int *loc,       /* Index nr in LMAT giving the lowest value.
-                   This must be a diagonal element (returned) */
-double *dmin,   /* Lowest value or problem value of the diagonal element
-                   with index nr LOC (returned) */
-int *err        /* Possible error code in factorizing the matrix (returned) */
-);
-
-/*+ lsq_eq0  - Make equation matrix */
-
-void sc2math_eq0 
-(
-int nunkno,        /* The number of unknowns (given) */
-double lcoef[],    /* The known values (given) */
-double lmat[]      /* equation matrix (given and returned) */
-);
-
-/*+ lsq_invpdm - Invert positive definite matrix */
-
-void sc2math_invpdm 
-(
-int n,       /* Dimension of the matrix (given) */
-double a[]   /* Square Matrix with NxN points.
-                Only the lower-left triangle is given.
-                (given and returned) */
-);
-
-/*+ lsq_msv - Multiply matrix with column vector */
-
-void sc2math_msv 
-(
-int m,        /* Number of unknowns (given) */
-double s[],   /* Lower left triangle of a symmetric matrix of MxM (given) */
-double v[],   /* Vector with dimension M (given) */
-double x[]    /* Vector with dimension M with the result (returned) */
-);
-
-/*+ lsq_sol - Solution of least square fit */
-
-void sc2math_sol 
-(
-int nunkno,      /* The number of unknowns (given) */
-int nequ,        /* The number of observed points (given) */
-double lmat[],   /* lower left triangle of inverted equation matrix
-                    (given) */
-double lvec[],   /* array containing the known vector (given) */
-double lssum,    /* The sum of the square of known terms (given) */
-double *lme,     /* Quality measure of the Least Square Solution (returned) */
-double lmex[],   /* rms errors of the vector of solutions (returned) */
-double lsol[]    /* solved parameters of the Least Square Solution
-                    (returned) */
-);
-
-/*+ lsq_vec - Make known vector */
-
-void sc2math_vec 
-(
-int nunkno,        /* The number of unknowns (given) */
-double lcoef[],    /* The known values (given) */
-double lknow,      /* The measured point, or observed value (given) */
-double lvec[],     /* array to contain the known vector 
-                      (given and returned) */ 
-double *lssum      /* sum of the square of known terms (returned) */
-);
-
-/*+ dream_smupath - Calculate the path positions of the SMU */
+/*+ sc2math_smupath - Calculate the path positions of the SMU */
 
 void sc2math_smupath 
 (
@@ -350,7 +378,7 @@ double jigpath[][2], /* Buffer containing the X and Y coordinates of each
 int *status          /* global status (given and returned) */
 );
 
-/*+ dream_smupos - Calculate the SMU position at an instant */
+/*+ sc2math_smupos - Calculate the SMU position at an instant */
 
 void sc2math_smupos
 (
@@ -365,79 +393,52 @@ double *y,          /* calculated Y-position (returned) */
 int *status         /* global status (given and returned) */
 );
 
-/*+ map_gridext - Calculate the extent of the sky grid */
+/*+ sc2math_sol - Solution of least square fit */
 
-void sc2math_gridext
+void sc2math_sol 
 (
-int ngrid,           /* Number of grid positions within the jiggle area
-                        (given) */
-int gridpts[][2],    /* Table with relative grid offsets for a single
-                        bolometer (given) */
-int *xmin,           /* Grid limit in X-dir (returned) */
-int *xmax,           /* Grid limit in X-dir (returned) */
-int *ymin,           /* Grid limit in Y-dir (returned) */
-int *ymax,           /* Grid limit in Y-dir (returned) */
-int *status          /* global status (given and returned) */
+int nunkno,      /* The number of unknowns (given) */
+int nequ,        /* The number of observed points (given) */
+double lmat[],   /* lower left triangle of inverted equation matrix
+                    (given) */
+double lvec[],   /* array containing the known vector (given) */
+double lssum,    /* The sum of the square of known terms (given) */
+double *lme,     /* Quality measure of the Least Square Solution (returned) */
+double lmex[],   /* rms errors of the vector of solutions (returned) */
+double lsol[]    /* solved parameters of the Least Square Solution
+                    (returned) */
 );
 
-/*+ weight_conval - Calculate a value of the convolution function */
-
-double sc2math_conval 
-(
-int conv_shape,     /* Code for convolution function (given) */
-double conv_sig,    /* Convolution function parameter (given) */
-double dx,          /* Distance from the centre in X (given) */
-double dy,          /* Distance from the centre in Y (given) */
-int *status         /* global status (given and returned) */
-);
-
-/*+ map_interpwt - Calculate the weight matrix for spatial interpolation */
-
-void sc2math_interpwt 
-(
-int npath,           /* Nr of rows (given) */
-int ngrid,            /* Nr of columns (given) */
-int conv_shape,      /* Code for convolution function (given) */
-double conv_sig,     /* Convolution function parameter (given) */
-double calc_t,       /* Time per path point in millisec (given) */
-double tbol,         /* Bolometer time constant in millisec (given) */
-double jigpath[][2], /* Table with jiggle path pos (given) */
-int jigpts[][2],     /* Table with grid positions (given) */
-double b[],          /* the weight factors (returned) */
-int *status          /* (given and returned) */
-);
- 
-/*+ weight_pathwts - Pixel weights for SMU path */
-
-void sc2math_pathwts 
-(
-int conv_shape,       /* Code for convolution function (given) */
-double conv_sig,      /* Convolution function parameter (given) */
-int npath,            /* Nr of rows in wtpix (given) */
-double jigpath[][2],  /* Table with jiggle path pos. (given) */
-int ncol,             /* Nr of columns in wtpix (given) */
-int gridpts[][2],     /* Table with grid positions (given) */
-double wtpix[],       /* Matrix with pixel weights (returned) */
-int *status           /* global status (given and returned) */
-);
-
-/*+ weight_response - Calculate the response value */
-
-void sc2math_response
-(
-double f[],   /* Input function (given) */
-double w[],   /* Impulse response function (given) */
-int wdim,     /* Dimension of W (given) */
-int ix,       /* Index corresponding to response (given) */
-double *r     /* Response value (returned) */
-);
-
-/*+ dream_trace - provide a flag for debugging level */
+/*+ sc2math_trace - provide a flag for debugging level */
 
 int sc2math_trace
 ( 
 int value       /* trace level (given) */
 );
 
+/*+ sc2math_vec - Make known vector */
 
+void sc2math_vec 
+(
+int nunkno,        /* The number of unknowns (given) */
+double lcoef[],    /* The known values (given) */
+double lknow,      /* The measured point, or observed value (given) */
+double lvec[],     /* array to contain the known vector 
+                      (given and returned) */ 
+double *lssum      /* sum of the square of known terms (returned) */
+);
+
+/*+  sc2math_wavegen - generate sine and cosine signals */
+
+void sc2math_wavegen 
+( 
+double period,                 /* period in array elements (given) */
+int length,                  /* length of arrays (given) */
+double *sine,                  /* generated sine wave (returned) */
+double *cosine,                /* generated cosine wave (returned) */
+int *status                  /* global status (given and returned) */
+);
+
+ 
+ 
 #endif
