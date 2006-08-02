@@ -173,6 +173,7 @@
 *     DSB: David S. Berry (STARLINK)
 *     JAB: Jeremy Bailey (AAO)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MNB: Mike N Birchall (AAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -232,6 +233,9 @@
 *        Remove unused variables.
 *     6-JUN-2006 (DSB):
 *        Guard against CHR_FIND not finding a dot.
+*     2006 June 15 (MNB):
+*        Added that AAO fibre-table conversion to occur for NDF extension with
+*        name "FIBRES_IFU" as well as "FIBRES".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -543,7 +547,7 @@
             CALL CHR_FIND( NDFNAM, '.', .TRUE., DOTPOS )
 
 *  Set the component name.
-            IF( DOTPOS .LT. NC ) THEN 
+            IF ( DOTPOS .LT. NC ) THEN
                CALL FTPKYS( FUNIT, 'HDSNAME', NDFNAM( DOTPOS+1: ), 
      :                      'Component name hierarchical structure',
      :                      FSTAT )
@@ -1015,7 +1019,8 @@
                   CALL DAT_TYPE( XLOC, XTYPE, STATUS )
 
 *  Define any special extensions.
-                  E2DF = XNAME .EQ. 'FIBRES' .AND.
+                  E2DF = ( XNAME .EQ. 'FIBRES' .OR. 
+     :                   XNAME .EQ. 'FIBRES_IFU' ) .AND. 
      :                   XTYPE .EQ. 'FIBRE_EXT'
 
 *  Skip over the FITS extension.
