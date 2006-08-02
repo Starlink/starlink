@@ -60,6 +60,8 @@
 *        sc2head replaced by JCMTState
 *     2006-07-28 (TIMJ):
 *        Add time series wcs (tswcs) to distinguish from 2d wcs in smfHead
+*     2006-08-01 (AGG):
+*        Add SMF__MAP_VAR and SMF__MAP_QUAL flags
 *     {enter_further_changes_here}
 
 *  Copyright:
