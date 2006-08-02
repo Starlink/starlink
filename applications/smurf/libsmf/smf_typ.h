@@ -98,7 +98,7 @@
 #include "star/grp.h"
 #include "smurf_typ.h"
 #define SMF_PATH_MAX GRP__SZNAM
-#define SMF_NAME_MAX GRP__SZNAM
+#define SMF_NAME_MAX GRP__SZFNM
 #define SMF__MXSMF 4 /* Maximum number of smfDatas in a smfArray */
 
 /* Different data types supported by SMURF */
@@ -128,6 +128,12 @@ typedef enum smf_modeltype {
 #define SMF__NOCREATE_DA 1
 #define SMF__NOCREATE_HEAD 2
 #define SMF__NOCREATE_FILE 4
+
+/* Flags for smf_open_newfile
+   Must be individual bits in a single integer
+*/
+#define SMF__MAP_VAR 8
+#define SMF__MAP_QUAL 16
 
 /* Global information about the data file itself */
 
@@ -162,10 +168,10 @@ typedef struct smfHead {
 */
 
 typedef struct smfDA {
-  double *flatcal;        /* pointer to flatfield calibration */
-  double *flatpar;        /* pointer to flatfield parameters */
+  double *flatcal;           /* pointer to flatfield calibration */
+  double *flatpar;           /* pointer to flatfield parameters */
   char flatname[SC2STORE_FLATLEN]; /* name of flatfield algorithm */
-  int nflat;              /* number of flat coeffs per bol */
+  int nflat;                 /* number of flat coeffs per bol */
 } smfDA;
 
 /* This struct is used to contain all information related to a particular
@@ -173,33 +179,36 @@ typedef struct smfDA {
 */
 
 typedef struct smfData {
-  smfFile * file;          /* File information */
-  smfHead * hdr;           /* Header information */
-  smfDA * da;              /* If sc2store, associated data arrays */
-  smf_dtype dtype;         /* Data type of DATA and VARIANCE arrays */
-  void * pntr[3];          /* Array of pointers to DATA/VARIANCE/QUALITY */
-  dim_t dims[NDF__MXDIM];  /* Dimensions of data array */
-  int ndims;               /* Number of active dimensions in "dims" */
-  int refcount;            /* Reference count for data object */
-  int virtual;             /* Flag for extracted timeslices */
-  double *poly;            /* Polynomial scan fits */
-  int ncoeff;              /* Number of coefficients in polynomial */
-  int * lut;               /* Pointing lookup table */
-  AstKeyMap *history;      /* History entries */
+  smfFile * file;            /* File information */
+  smfHead * hdr;             /* Header information */
+  smfDA * da;                /* If sc2store, associated data arrays */
+  smf_dtype dtype;           /* Data type of DATA and VARIANCE arrays */
+  void * pntr[3];            /* Array of pointers to DATA/VARIANCE/QUALITY */
+  dim_t dims[NDF__MXDIM];    /* Dimensions of data array */
+  int ndims;                 /* Number of active dimensions in "dims" */
+  int refcount;              /* Reference count for data object */
+  int virtual;               /* Flag for extracted timeslices */
+  double *poly;              /* Polynomial scan fits */
+  int ncoeff;                /* Number of coefficients in polynomial */
+  int * lut;                 /* Pointing lookup table */
+  AstKeyMap *history;        /* History entries */
 } smfData;
 
-/* This structure is a container for multiple smfDatas */
+/* This structure is a container for multiple, usually related,
+   smfDatas */
 
 typedef struct smfArray {
-  smfData **sdata;         /* Pointers to smfDatas */
-  int ndat;                /* Number of smfDatas in current smfArray */
+  smfData **sdata;           /* Pointers to smfDatas */
+  int ndat;                  /* Number of smfDatas in current smfArray */
 } smfArray;
 
+/* This struct is used to group related files together */
+
 typedef struct smfGroup {
-  Grp *grp;                /* Copy of input Grp */
-  int **subgroups;         /* Array of indices into Grp */
-  int ngroups;             /* Number of subgroups */
-  int nrelated;            /* Maximum number of related files */
+  Grp *grp;                  /* Copy of input Grp */
+  int **subgroups;           /* Array of indices into Grp */
+  int ngroups;               /* Number of subgroups */
+  int nrelated;              /* Maximum number of related files */
 } smfGroup;
 
 #endif /* SMF_TYP_DEFINED */
