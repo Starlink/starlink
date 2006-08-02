@@ -110,6 +110,7 @@
 *     DSB: David S. Berry (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MNB: Mike N Birchall (AAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -135,6 +136,9 @@
 *        Use CNF_PVAL.
 *     2006 April 13 (MJC):
 *        Remove unused variables.
+*     2006 June 15 (MNB):
+*        Added that the fibres table conversion be applied to ndf extensions
+*        with name "FIBRES_IFU" as well as "FIBRES".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -172,13 +176,12 @@
 
 *  Local Constants:
       INTEGER  FITSOK             ! Good status for FITSIO library
-      PARAMETER( FITSOK = 0 )
-      INTEGER  CLASS_LEN          ! Max length of observation class string
-      PARAMETER( CLASS_LEN = 10)  
+      PARAMETER ( FITSOK = 0 )
+      INTEGER  CLASS_LEN          ! Maximum length of observation-class
+      PARAMETER ( CLASS_LEN = 10 ) ! string 
 
 *  Local Variables:
-      LOGICAL BAD                ! True if bad values may be present in
-                                 ! array
+      LOGICAL BAD                ! Bad values may be present in array?
       INTEGER BITPIX             ! FITS file's BITPIX
       CHARACTER * ( 256 ) BUFFER ! BUFFER for writing error messages
       CHARACTER * ( CLASS_LEN ) CLASS   ! Observation class 
@@ -187,8 +190,7 @@
       INTEGER COLEXT             ! Character where extension name begins
       CHARACTER * ( 48 ) COMENT  ! Keyword comment
       CHARACTER * ( 8 ) COMP     ! NDF array component name
-      LOGICAL DARRAY             ! True if the current HDU contains a
-                                 ! data array
+      LOGICAL DARRAY             ! Current HDU contains a data array?
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions
       INTEGER EL                 ! Number of elements in array
       CHARACTER * ( DAT__SZLOC ) ELOC ! Locator to NDF extension (MORE)
@@ -215,16 +217,16 @@
       INTEGER NHEAD              ! Number of FITS header cards
       CHARACTER * ( DAT__SZLOC ) NLOC ! Locator to NUM_FIBRES component
       INTEGER NOBS               ! Number of rows in table
-      LOGICAL NONSDA             ! True if the current HDU contains a
-                                 ! non-standard data array
+      LOGICAL NONSDA             ! Current HDU contains a
+                                 ! non-standard data array?
       INTEGER NPOS               ! Character position in extension name
       CHARACTER * ( DAT__SZLOC ) OLOC ! Locator to OBJECT structure
       INTEGER PCOUNT             ! Value of FITS PCOUNT keyword
       INTEGER PLACE              ! NDF placeholder for <NDF> extension
-      LOGICAL WRTEXT             ! True if write NDF FITS extension
+      LOGICAL WRTEXT             ! Write NDF FITS extension?
       INTEGER PNTR( 1 )          ! Pointer to NDF array
       INTEGER REPNTR             ! Pointer to header-propagation flags
-      LOGICAL SIMPLE             ! True if the FITS file is simple
+      LOGICAL SIMPLE             ! FITS file is simple?
       LOGICAL THERE              ! Keyword is present?
       CHARACTER * ( DAT__SZNAM ) TYPE ! Data type
       CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to an NDF extension
@@ -657,10 +659,11 @@
 
 *  Create the FIBRES extension in the NDF.
 *  =======================================
-            IF ( EXTNAM .EQ. 'FIBRES' ) THEN
+            IF ( EXTNAM .EQ. 'FIBRES' .OR. 
+     :           EXTNAM .EQ. 'FIBRES_IFU' ) THEN
 
 *  Create the structure to hold the BINTABLE data.
-               CALL NDF_XNEW( NDF, 'FIBRES', 'FIBRE_EXT', 0, 0, FLOC,
+               CALL NDF_XNEW( NDF, EXTNAM, 'FIBRE_EXT', 0, 0, FLOC,
      :                        STATUS )
 
 *  Obtain the number of elements.
@@ -742,7 +745,8 @@
      :                           STATUS )
 
 *  Call routine to create the <TABLE> structure from the FITS binary
-*  or ASCII table. Header and Data FUNITs are the same (no inheritance)
+*  or ASCII table.  Header and Data FUNITs are the same (no 
+*  inheritance).
                   CALL COF_WRTAB( FUNIT, FUNIT, XLOC, STATUS )
 
 *  Tidy the locator to the extension.
