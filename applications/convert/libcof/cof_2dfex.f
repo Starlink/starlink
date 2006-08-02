@@ -58,6 +58,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MNB: Mike N Birchall (AAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,7 +76,13 @@
 *        No longer writes TNULLn keywords for non-integer columns,
 *        so as not to violate the FITS standard.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 June 15 (MNB):
+*        Added definitions for extra keywords relevent to "FIBRES_IFU"
+*        table be included in the conversion.  Also added "FIBRES_IFU"
+*        table column definitions.
+*     2006 August 1 (MJC):
+*        Modified some units strings to conform to the FITS standard.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,10 +114,15 @@
       INTEGER   FITSOK           ! Good status for FITSIO library
       PARAMETER( FITSOK = 0 )
 
-      INTEGER MXCOMP             ! Maximum number of components in the
+      INTEGER MXCSTD             ! Maximum number of components in the
                                  ! OBJECT structure or fields in the
-                                 ! binary table
-      PARAMETER ( MXCOMP = 16 )
+                                 ! binary table in standard mode
+      PARAMETER ( MXCSTD = 16 )
+
+      INTEGER MXCIFU             ! Maximum number of components in the
+                                 ! OBJECT structure or fields in the
+                                 ! binary table associated with the IFU
+      PARAMETER ( MXCIFU = 13 )
 
 *  Local Variables:
       CHARACTER * ( 80 ) BUFFER  ! BUFFER for writing error messages
@@ -134,6 +146,9 @@
       CHARACTER * ( 8 ) KEYWRD   ! FITS keyword
       INTEGER LEL                ! Loop counter for filling column with
                                  ! null values
+      INTEGER MXCOMP             ! Maximum number of components in the
+                                 ! OBJECT structure of fields in the
+                                 ! binary table
       INTEGER NC                 ! Number of characters
       INTEGER NCOMP              ! Number of components
       INTEGER NFIELD             ! Number of fields in table
@@ -147,12 +162,16 @@
                                  ! copy data into the binary table
       INTEGER STRLEN             ! Number of characters in component
                                  ! element
-      CHARACTER * ( 32 ) TDESC( MXCOMP ) ! Binary-table field
-                                 ! descriptions
-      CHARACTER * ( 3 ) TFORM( MXCOMP ) ! Binary-table TFORMn
+      CHARACTER * ( 32 ) TDESC( MXCSTD ) ! Table field descriptions
+      CHARACTER * ( 32 ) TDEIFU( MXCIFU ) ! IFU table descriptions
+      CHARACTER * ( 3 ) TFORM( MXCSTD ) ! Binary-table field formats
+      CHARACTER * ( 3 ) TFOIFU( MXCIFU ) ! IFU table field formats
       LOGICAL THERE              ! Component is present?
-      CHARACTER * ( 13 ) TTYPE( MXCOMP ) ! Binary-table field names
-      CHARACTER * ( 13 ) TUNIT( MXCOMP ) ! Binary-table units
+      CHARACTER * ( 13 ) TTYPE( MXCSTD ) ! Binary-table field names
+      CHARACTER * ( 13 ) TTYIFU( MXCIFU ) ! IFU table field names
+      CHARACTER * ( 13 ) TUNIT( MXCSTD ) ! Binary-table field units
+      CHARACTER * ( 13 ) TUNIFU( MXCIFU ) ! IFU table field units
+      
 
 *  Local Data:
       DATA TDESC / 'Object name', 'J2000 mean Right Ascension',
@@ -172,9 +191,32 @@
      :             'COMMENT', 'RETRACTOR', 'SWITCHFIELD',
      :             'SWITCHPARTNER' /
 
-      DATA TUNIT / ' ', 'radians', 'radians', 'microns', 'microns',
-     :             'microns', 'microns', 'radians', ' ', ' ',
-     :             'magnitudes', ' ', ' ', ' ', ' ', 'fibre number' /
+      DATA TUNIT / ' ', 'rad', 'rad', 'um', 'um', 'um', 'um', 'rad', 
+     :             ' ', ' ', 'mag', ' ', ' ', ' ', ' ', 'bin' /
+
+      DATA TDEIFU / 'Spectrum Identifier',
+     :              'Selection flag',
+     :              'Number of Spaxels',
+     :              'The length of the spectrum',
+     :              'Currently always zero?',
+     :              'Sky RA position',
+     :              'Always 1',
+     :              'Pivot number',
+     :              'ID from fibres_ifu.txt',
+     :              'X pos. within the spiral grid',
+     :              'Y pos. within the spiral grid', 
+     :              'Type code either U, D, P or S',
+     :              'Name' /
+
+      DATA TFOIFU / '1J', '1J', '1J', '1J', '1J', '1D', '1D', '1J',
+     :              '16A', '1J', '1J', '1A', '8A' /
+
+      DATA TTYIFU / 'SPEC_ID', 'SELECTED', 'NSPAX', 'SPEC_LEN', 
+     :              'SPEC_STA', 'XPOS', 'YPOS', 'GROUP_N',
+     :              'SPAX_ID', 'XGPOS', 'YGPOS', 'TYPE' , 'NAME' /
+
+      DATA TUNIFU / ' ', ' ', ' ', ' ', ' ', 'arcsec', 
+     :              'arcsec', ' ', ' ', ' ', ' ', ' ', ' ' /
 
 *.
 
@@ -184,6 +226,22 @@
 *  Define the null character.
       NULL = CHAR( 0 )
 
+*  Check if this is a IFU fibre table.
+*  ===================================
+      IF ( SNAME .EQ. 'FIBRES_IFU' ) THEN
+
+*  We use the FIBRES_IFU data
+          DO I = 1, MXCIFU
+	      TDESC( I ) = TDEIFU( I )
+	      TFORM( I ) = TFOIFU( I )
+	      TTYPE( I ) = TTYIFU( I )
+	      TUNIT( I ) = TUNIFU( I )
+	  ENDDO
+	  MXCOMP = MXCIFU
+      ELSE
+          MXCOMP = MXCSTD
+      ENDIF
+      
 *  Initialise the FITSIO status.  It's not the same as the Starlink
 *  status, which is reset by the fixed part.
       FSTAT = FITSOK
@@ -252,14 +310,13 @@
 *  Process by data type.  Note that the _DOUBLE bad values are replaced
 *  by NaNs and don't have TNULLn cards.  Null character values are
 *  recognised by the presence of the ASCII null as the first character.
-         IF ( I .EQ. 4 .OR. I .EQ. 5 .OR. I .EQ. 12 ) THEN
-
+         IF ( TFORM( I ) .EQ. '1J ') THEN
+            
 *  Insert the TNULLn card.
             CALL FTIKYJ( FUNIT, CRDNAM, VAL__BADI, 'Null value', FSTAT )
 
-         ELSE IF ( I .EQ. 6 .OR. I. EQ. 7 .OR.
-     :             I .EQ. 10 .OR. I .EQ. 16 ) THEN
-
+         ELSE IF ( TFORM( I ) .EQ. '1I' ) THEN
+              
 *  Insert the TNULLn card.  There is no FTIKYI routine so equate the
 *  word bad value to an integer and create an integer-valued card.
             IVALUE = VAL__BADW
@@ -282,9 +339,11 @@
 
 *  In most cases default display formats are likely to be fine.  Only 
 *  the following certainly look wrong using CURSA.
-         IF ( I .EQ. 4 .OR. I .EQ. 5 .OR.
-     :        I .EQ. 11 .OR. I .EQ. 12 ) THEN
-
+         IF ( TTYPE( I ) .EQ. 'X' .OR. 
+     :        TTYPE( I ) .EQ. 'Y' .OR. 
+     :        TTYPE( I ) .EQ. 'MAGNITUDE' .OR. 
+     :        TTYPE( I ) .EQ. 'PID' ) THEN
+ 
 *  Form the name of the keyword which will immediately precede the
 *  inserted TNULLn card.
             NC = 5
@@ -292,14 +351,14 @@
             CALL CHR_APPND( CN, CRDNAM, NC )
 
 *  These are the positions in microns.
-            IF ( I .EQ. 4 .OR. I .EQ. 5 ) THEN
+            IF ( TTYPE( I ) .EQ. 'X' .OR. TTYPE( I ) .EQ. 'Y' ) THEN
                DSPFMT = 'I7'
 
 *  The magnitudes.
-            ELSE IF ( I .EQ. 11 ) THEN
+            ELSE IF ( TTYPE( I ) .EQ. 'MAGNITUDE' ) THEN
                DSPFMT = 'F6.2'
 
-            ELSE IF ( I .EQ. 12 ) THEN
+            ELSE IF ( TTYPE( I ) .EQ. 'PID' ) THEN
                DSPFMT = 'I9'
             END IF
 
@@ -379,14 +438,14 @@
          IF ( KEYWRD .EQ. 'CENRA' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
-     :                   'Field centre mean Right Ascension (Radians)',
+     :                   'Field centre mean Right Ascension (rad)',
      :                   FSTAT )
 
 *  CENDEC
          ELSE IF ( KEYWRD .EQ. 'CENDEC' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
-     :                   'Field centre mean Declination (Radians)',
+     :                   'Field centre mean Declination (rad)',
      :                   FSTAT )
 
 *  CENEQNX
@@ -400,13 +459,13 @@
          ELSE IF ( KEYWRD .EQ. 'APPRA' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
-     :                   'Apparent Right Ascension (Radians)', FSTAT )
+     :                   'Apparent Right Ascension (rad)', FSTAT )
 
 *  APPDEC
          ELSE IF ( KEYWRD .EQ. 'APPDEC' ) THEN
             CALL DAT_GET0D( CLOC, DVALUE, STATUS )
             CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
-     :                   'Apparent Declination (Radians)', FSTAT )
+     :                   'Apparent Declination (rad)', FSTAT )
 
 *  APPEPOCH
          ELSE IF ( KEYWRD .EQ. 'APPEPOCH' ) THEN
@@ -466,13 +525,210 @@
          ELSE IF ( KEYWRD .EQ. 'XSWTCHOF' ) THEN
             CALL DAT_GET0I( CLOC, IVALUE, STATUS )
             CALL FTPKYJ( FUNIT, KEYWRD, IVALUE, 
-     :                   'Beam switch offset X (microns)', FSTAT )
+     :                   'Beam switch offset X (um)', FSTAT )
 
 *  YSWITCHOFFSET
          ELSE IF ( KEYWRD .EQ. 'YSWTCHOF' ) THEN
             CALL DAT_GET0I( CLOC, IVALUE, STATUS )
             CALL FTPKYJ( FUNIT, KEYWRD, IVALUE, 
-     :                   'Beam switch offset Y (microns)', FSTAT )
+     :                   'Beam switch offset Y (um)', FSTAT )
+
+* -------------------------------
+* AAOMEGA-IFU Non STRING KEYWORDS
+* -------------------------------
+
+*  ATMPRES
+         ELSE IF ( KEYWRD .EQ. 'ATMPRES' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Atmospheric pressure (millibars)', FSTAT )
+     
+*  ATMHRUM
+         ELSE IF ( KEYWRD .EQ. 'ATMHRUM' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Atmospheric relative humidity (percent)', 
+     :                   FSTAT )
+
+*  ATMTEMP
+         ELSE IF ( KEYWRD .EQ. 'ATMTEMP' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Atmospheric temperature (K)', FSTAT )
+     
+*  WLEN
+         ELSE IF ( KEYWRD .EQ. 'WLEN' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Refraction wavelength (nm)', FSTAT )
+     
+*  TELMA
+         ELSE IF ( KEYWRD .EQ. 'TELMA' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'AAT CCS MA value', FSTAT )
+     
+*  TELME
+         ELSE IF ( KEYWRD .EQ. 'TELME' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'AAT CCS ME value', FSTAT )
+     
+*  TELNP
+         ELSE IF ( KEYWRD .EQ. 'TELNP' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'AAT CCS NP value', FSTAT )
+
+*  TELCH
+         ELSE IF ( KEYWRD .EQ. 'TELCH' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'AAT CCS CH value', FSTAT )
+     
+*  TELHF
+         ELSE IF ( KEYWRD .EQ. 'TELHF' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'AAT CCS HF value', FSTAT )
+     
+*  PA
+         ELSE IF ( KEYWRD .EQ. 'PA' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Rotator Position Angle (deg)', FSTAT )
+     
+*  INST_ROT
+         ELSE IF ( KEYWRD .EQ. 'INST_ROT' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Instrument mount rotation (deg)', FSTAT )
+     
+*  INSTOFFX
+         ELSE IF ( KEYWRD .EQ. 'INSTOFFX' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Offset of instrument centre in X (um)', 
+     :                   FSTAT )
+     
+*  INSTOFFY
+         ELSE IF ( KEYWRD .EQ. 'INSTOFFY' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Offset of instrument centre in Y (um)',
+     :                   FSTAT )
+     
+*  TCRVL6
+         ELSE IF ( KEYWRD .EQ. 'TCRVL6' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Reference pixel J2000 Right Ascension (deg)', 
+     :                   FSTAT )
+     
+*  TCRVL7
+         ELSE IF ( KEYWRD .EQ. 'TCRVL7' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Reference pixel J2000 Declination (deg)',
+     :                   FSTAT )
+     
+*  TCRPX6
+         ELSE IF ( KEYWRD .EQ. 'TCRPX6' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Reference pixel x', FSTAT )
+     
+*  TCRPX7
+         ELSE IF ( KEYWRD .EQ. 'TCRPX7' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Reference pixel y', FSTAT )
+     
+*  TC6_6
+         ELSE IF ( KEYWRD .EQ. 'TC6_6' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Pixel transformation', FSTAT )
+     
+*  TC6_7
+         ELSE IF ( KEYWRD .EQ. 'TC6_7' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Pixel transformation', FSTAT )
+     
+*  TC7_6
+         ELSE IF ( KEYWRD .EQ. 'TC7_6' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Pixel transformation ', FSTAT )
+     
+*  TC7_7
+         ELSE IF ( KEYWRD .EQ. 'TC7_7' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Pixel transformation', FSTAT )
+     
+*  TCDLT6
+         ELSE IF ( KEYWRD .EQ. 'TCDLT6' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Co-ordinate increment', FSTAT )
+
+*  TCDLT7
+         ELSE IF ( KEYWRD .EQ. 'TCDLT7' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Co-ordinate increment', FSTAT )
+     
+*  TP66
+         ELSE IF ( KEYWRD .EQ. 'TP66' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Transformation matrix', FSTAT )
+     
+*  TP67
+         ELSE IF ( KEYWRD .EQ. 'TP67' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Transformation matrix', FSTAT )
+     
+*  TP76
+         ELSE IF ( KEYWRD .EQ. 'TP76' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Transformation matrix', FSTAT )
+
+*  TP77
+         ELSE IF ( KEYWRD .EQ. 'TP77' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Transformation matrix', FSTAT )
+     
+*  TCRD6
+         ELSE IF ( KEYWRD .EQ. 'TCRD6' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Random error in X', FSTAT )
+     
+*  TCRD7
+         ELSE IF ( KEYWRD .EQ. 'TCRD7' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Random error in Y', FSTAT )
+     
+*  TCSY6
+         ELSE IF ( KEYWRD .EQ. 'TCSY6' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Systematic error in X', FSTAT )
+     
+*  TCSY7
+         ELSE IF ( KEYWRD .EQ. 'TCSY7' ) THEN
+            CALL DAT_GET0D( CLOC, DVALUE, STATUS )
+            CALL FTPKYD( FUNIT, KEYWRD, DVALUE, VAL__SZD - 5,
+     :                   'Systematic error in Y', FSTAT )
+     
+
 
 *  The 2dF software seems to put in ASCII null characters perhaps due to
 *  some C usage.  These must be replaced with a blank.  Find the
@@ -510,6 +766,73 @@
             NC = CHR_LEN( CVALUE( :68 ) )
             CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ), ' ', FSTAT )
 
+* -------------------------------
+* AAOMEGA-IFU STRING KEYWORDS
+* -------------------------------
+
+*  ACTUTC
+         ELSE IF ( KEYWRD .EQ. 'ACTUTC' ) THEN
+            CALL DAT_GET0C( CLOC, CVALUE, STATUS )
+            CALL CHR_TRCHR( NULL, ' ', CVALUE, STATUS )
+            NC = CHR_LEN( CVALUE( :64 ) )
+            CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ),
+     :                   'UT of tweak', FSTAT )
+
+*  TOPEND
+         ELSE IF ( KEYWRD .EQ. 'TOPEND' ) THEN
+            CALL DAT_GET0C( CLOC, CVALUE, STATUS )
+            CALL CHR_TRCHR( NULL, ' ', CVALUE, STATUS )
+            NC = CHR_LEN( CVALUE( :64 ) )
+            CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ),
+     :                   'AAT Top-End name', FSTAT )
+
+*  TCTYP6
+         ELSE IF ( KEYWRD .EQ. 'TCTYP6' ) THEN
+            CALL DAT_GET0C( CLOC, CVALUE, STATUS )
+            CALL CHR_TRCHR( NULL, ' ', CVALUE, STATUS )
+            NC = CHR_LEN( CVALUE( :64 ) )
+            CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ),
+     :                   'Unit Type', FSTAT )
+	    
+*  TCTYP7
+         ELSE IF ( KEYWRD .EQ. 'TCTYP7' ) THEN
+            CALL DAT_GET0C( CLOC, CVALUE, STATUS )
+            CALL CHR_TRCHR( NULL, ' ', CVALUE, STATUS )
+            NC = CHR_LEN( CVALUE( :64 ) )
+            CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ),
+     :                   'Unit Type', FSTAT )
+	    
+*  TCUNI6
+         ELSE IF ( KEYWRD .EQ. 'TCUNI6' ) THEN
+            CALL DAT_GET0C( CLOC, CVALUE, STATUS )
+            CALL CHR_TRCHR( NULL, ' ', CVALUE, STATUS )
+            NC = CHR_LEN( CVALUE( :64 ) )
+            CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ), 'Unit', FSTAT )
+	    
+*  TCUNI7
+         ELSE IF ( KEYWRD .EQ. 'TCUNI7' ) THEN
+            CALL DAT_GET0C( CLOC, CVALUE, STATUS )
+            CALL CHR_TRCHR( NULL, ' ', CVALUE, STATUS )
+            NC = CHR_LEN( CVALUE( :64 ) )
+            CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ), 'Unit', FSTAT )
+	    
+*  TWCS6
+         ELSE IF ( KEYWRD .EQ. 'TWCS6' ) THEN
+            CALL DAT_GET0C( CLOC, CVALUE, STATUS )
+            CALL CHR_TRCHR( NULL, ' ', CVALUE, STATUS )
+            NC = CHR_LEN( CVALUE( :64 ) )
+            CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ),
+     :                   'Co-ordinate name', FSTAT )
+	    
+
+*  TWCS7
+         ELSE IF ( KEYWRD .EQ. 'TWCS7' ) THEN
+            CALL DAT_GET0C( CLOC, CVALUE, STATUS )
+            CALL CHR_TRCHR( NULL, ' ', CVALUE, STATUS )
+            NC = CHR_LEN( CVALUE( :64 ) )
+            CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ),
+     :                   'Co-ordinate name', FSTAT )
+	    
          END IF
 
 *  Tidy the locator to the object.
@@ -540,9 +863,10 @@
 
 *  Process by data type.  Start with the character arrays.
 *  -------------------------------------------------------
-         IF ( I .EQ. 1  .OR. I .EQ. 9 .OR. I .EQ. 13 .OR.
-     :        I .EQ. 14 .OR. I .EQ. 15 ) THEN
-
+         IF ( TFORM( I ) .EQ. '80A'  .OR. TFORM( I ) .EQ. '16A' .OR.
+     :        TFORM( I ) .EQ. '10A'  .OR. TFORM( I ) .EQ. '8A' .OR.
+     :        TFORM( I ) .EQ. '1A' ) THEN
+ 
             IF ( THERE ) THEN
 
 *  Obtain the length in characters of the component and map its values.
@@ -573,8 +897,7 @@
 
 *  Double-precision components
 *  ---------------------------
-         ELSE IF ( I .EQ. 2 .OR. I .EQ. 3 .OR.
-     :             I .EQ. 8 .OR. I .EQ. 11 ) THEN
+         ELSE IF ( TFORM( I ) .EQ. '1D' ) THEN
 
             IF ( THERE ) THEN
 
@@ -611,7 +934,7 @@
 
 *  Integer components
 *  ------------------
-         ELSE IF ( I .EQ. 4 .OR. I .EQ. 5 .OR. I .EQ. 12 ) THEN
+         ELSE IF ( TFORM( I ) .EQ. '1J' ) THEN
 
             IF ( THERE ) THEN
 
@@ -637,8 +960,7 @@
 
 *  Word components
 *  ---------------
-         ELSE IF ( I .EQ. 6 .OR. I. EQ. 7 .OR.
-     :             I .EQ. 10 .OR. I .EQ. 16 ) THEN
+         ELSE IF ( TFORM( I ) .EQ. '1I' ) THEN
 
             IF ( THERE ) THEN
 
