@@ -366,7 +366,7 @@ decode_pdd( struct PDD *pdd )
           string = "Unknown!!";
    }
           
-   printf("dype = %s length=%d", string, (int)pdd->length);
+   printf("dtype = %s length=%d", string, (int)pdd->length);
 }
 
 void read_block ( FILE * fp, INT_BIG bloc, size_t nbytes, void * ptr ) {
