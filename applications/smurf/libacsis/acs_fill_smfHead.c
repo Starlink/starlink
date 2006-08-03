@@ -118,9 +118,11 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
 
     /* need to convert from arcsec to radians since they are stored
        in arcsec in the ACSIS data files. */
-    for (i = 0; i < sizex; i++) {
-      fplanex[i] = fpntrx[i] * DAS2R;
-      fplaney[i] = fpntry[i] * DAS2R;
+    if (fplanex && fplaney) {
+      for (i = 0; i < sizex; i++) {
+	fplanex[i] = fpntrx[i] * DAS2R;
+	fplaney[i] = fpntry[i] * DAS2R;
+      }
     }
 
     /* now store in the header */
