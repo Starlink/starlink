@@ -114,7 +114,7 @@ C_ROUTINES = \
 	hdsState.c hdsStop.c hdsTune.c \
 	hdsWild.c hdserase.c hdsgroup.c hdslock.c hdsnew.c hdsnull.c \
 	hdsopclos.c hdstools.c  hdsInfoI.c \
-	dat1emsSetBigi.c dat1emsSetBigu.c \
+	dat1emsSetBigi.c dat1emsSetBigu.c dat1emsSetHdsdim.c \
 	rec1_alloc_frame.c rec1_clear_cbm.c rec1_close_file.c \
 	rec1_close_slot.c rec1_create_file.c rec1_deall_frame.c \
 	rec1_extend_file.c rec1_extend_frame.c rec1_find_file.c \
