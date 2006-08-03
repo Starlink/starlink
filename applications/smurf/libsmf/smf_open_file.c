@@ -145,6 +145,7 @@
 #include "sc2da/sc2store.h"
 #include "star/kaplibs.h"
 #include "kpg_err.h"
+#include "libacsis/acsis.h"
 
 #define FUNC_NAME "smf_open_file"
 
@@ -338,7 +339,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	*/
 	switch ( hdr->instrument ) {
 	case INST__ACSIS:
-	  /* acs_fill_smfHead( hdr, indf, status ); */
+	  acs_fill_smfHead( hdr, indf, status );
 	  break;
 	case INST__AZTEC:
 	  /* aztec_fill_smfHead( hdr, NDF__NOID, status ); */
