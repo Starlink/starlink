@@ -58,6 +58,8 @@
 *        Now put MAPCOORD into SCU2RED extension
 *     2006-07-26 (TIMJ):
 *        sc2head no longer used. Use JCMTState instead.
+*     2006-08-02 (TIMJ):
+*        Free fplane coordinates.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -157,12 +159,19 @@ void smf_close_file( smfData ** data, int * status ) {
   if (hdr != NULL) {
     if (hdr->wcs != NULL) astAnnul( hdr->wcs );
     if (hdr->fitshdr != NULL) astAnnul( hdr->fitshdr );
-    if (hdr->allState != NULL && !hdr->isCloned) {
-      if (isSc2store) {
-	/* make sure we use free() */
-	free(hdr->allState);
-      } else {
-	smf_free(hdr->allState, status);
+    if (!hdr->isCloned) {
+      /* we are responsible for this memory - although what happens
+	 when we are cloned and the original is freed first? Need
+	 to think carefully about memory management. */
+      if (hdr->allState != NULL) {
+	if (isSc2store) {
+	  /* make sure we use free() */
+	  free(hdr->allState);
+	} else {
+	  smf_free(hdr->allState, status);
+	}
+	if (hdr->fplanex) smf_free( hdr->fplanex, status );
+	if (hdr->fplaney) smf_free( hdr->fplaney, status );
       }
     }
     smf_free( hdr, status );
