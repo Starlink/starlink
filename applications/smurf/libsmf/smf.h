@@ -102,6 +102,8 @@
 *        Add tswcs argument to smf_construct_smfHead
 *     2006-07-31 (TIMJ):
 *        Add smf_inst_get
+*     2006-08-02 (AGG):
+*        Add smf_open_newfile and smf_open_ndf
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -179,16 +181,17 @@ void smf_close_smfGroup( smfGroup **group, int *status );
 void smf_correct_extinction( smfData *data, const char *method, 
 			     const int quick, double tau, int *status);
 
-smfData *
-smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
-		       smfDA * da, smf_dtype dtype, void * pntr[3], 
-		       const dim_t dims[], int ndims,
-		       int virtual, int ncoeff, double *poly, 
-		       AstKeyMap *history, int * status );
 smfDA *
 smf_construct_smfDA( smfDA * tofill, double * flatcal,
 		     double * flatpar, const char * flatname, int nflat,
 		     int * status );
+smfData *
+smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
+		       smfDA * da, smf_dtype dtype, void * pntr[3], 
+		       const int dims[], int ndims,
+		       int virtual, int ncoeff, double *poly, 
+		       AstKeyMap *history, int * status );
+
 smfFile *
 smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
 		      int isTstream, const char * name,
@@ -208,13 +211,13 @@ smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups,
 
 smfArray *smf_create_smfArray( const size_t size, int *status );
 
+smfDA * smf_create_smfDA( int * status );
+
 smfData* smf_create_smfData( int flags, int * status );
 
 smfFile* smf_create_smfFile( int * status );
 
 smfHead* smf_create_smfHead( int * status );
-
-smfDA*   smf_create_smfDA( int * status );
 
 smfHead * smf_deepcopy_smfHead ( const smfHead *old, int * status);
 
@@ -315,8 +318,11 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
 void smf_open_mapcoord( smfData *data, int *status );
 
-void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, const int ndims, 
-		       const dim_t dims[], int flags, smfData ** data, 
+void smf_open_ndf( const int newndf, char *accmode, char *filename, 
+		   smf_dtype dtype, smfData **ndata, int *status);
+
+void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, int ndims, 
+		       const int dims[], int flags, smfData ** data, 
 		       int *status);
 
 void smf_open_related( const smfGroup *group, const int subindex, smfArray **relfiles, 
