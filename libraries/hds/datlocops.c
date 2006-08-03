@@ -181,8 +181,11 @@ datCell( const HDSLoc *locator1,
    the # of subscripts specified.       */
 
    _call(dau_get_shape(data1, &naxes, axis))
-   if (naxes != ndim)
-      _call(DAT__DIMIN)
+   if (naxes != ndim) {
+      emsSeti( "NAX", naxes );
+      emsSeti( "NDIM" , ndim );
+      _callm(DAT__DIMIN," Arguments have ^NDIM axes but locator refers to ^NAX axes")
+   }
 
 /* Export the destination locator and copy all the LCP data fields.     */
 
@@ -207,8 +210,11 @@ datCell( const HDSLoc *locator1,
    that the required cell is within the bounds of the object.   */
 
    _call(dat1_get_off( naxes, axis, subs, &data2->offset) )
-   if (data2->offset >= data1->size)
-      _call(DAT__SUBIN)
+   if (data2->offset >= data1->size) {
+     dat1emsSetBigu( "OFF", data2->offset );
+     dat1emsSetBigu( "SIZE", data1->size );
+     _callm(DAT__SUBIN, " Offset into data array (^OFF) exceeds size (^SIZE).")
+   }
 
 /* Adjust the cell offset and mark the object as scalar.        */
 
@@ -467,11 +473,27 @@ dat1_get_off(int ndim, const HDS_PTYPE *dims, const HDS_PTYPE *subs,
    INT_BIG stride;
    int i;
 
+   if (hds_gl_status != DAT__OK) return hds_gl_status;
+
    stride  = 1;
    *offset = 0;
    for (i=0; i<ndim; i++)
    {
-      if (subs[i]>dims[i] || subs[i]<1) return hds_gl_status = DAT__SUBIN;
+      if (subs[i]>dims[i] || subs[i]<1)  {
+	hds_gl_status = DAT__SUBIN;
+	emsSeti( "I", i+1 ); /* Fortran indexing */
+	if (subs[i]>dims[i]) {
+	  dat1emsSetHdsdim( "SUBS", subs[i]);
+	  dat1emsSetHdsdim( "SIZE", dims[i] );
+	  emsRep( " ", "Subscript for dimension ^I exceeds max allowed value"
+		  " (^SUBS > ^SIZE) ", &hds_gl_status );
+	} else if (subs[i] < 1) {
+	  dat1emsSetHdsdim( "SUBS", subs[i]);
+	  emsRep( " ", "Subscript for dim ^I is out of range (^SUBS < 1)",
+		  &hds_gl_status );
+	}
+	return hds_gl_status;
+      }
       *offset += (subs[i]-1) * stride;
       stride  *= dims[i];
    }

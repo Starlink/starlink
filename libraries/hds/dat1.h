@@ -155,6 +155,21 @@ if (!_ok(*status))\
         }\
 }
 
+/* Check status and return on error after setting error message. Error
+   message can be supplied by caller. */
+#define _callm(event, errmsg)				\
+{\
+*status = (event);\
+if (!_ok(*status))\
+	{\
+        hds_gl_status = *status;\
+        emsRep(context_name,context_message errmsg,status);\
+	return hds_gl_status;\
+        }\
+}
+
+
+
 /* Check status and return void after setting error message */
 
 #define _callv(event)\
