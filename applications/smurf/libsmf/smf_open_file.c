@@ -40,7 +40,7 @@
 *     and stored for future reference.
 
 *  Notes:
-*     - If a file has no FITS header then status is set to SMF__NOHDR
+*     - If a file has no FITS header then a warning is issued
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -321,6 +321,11 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
 	/* Read the FITS headers */
 	kpgGtfts( indf, &(hdr->fitshdr), status );
+	/* Just continue if there are no FITS headers */
+	if ( *status == KPG__NOFTS ) {
+	  errRep(FUNC_NAME, "File has no FITS header - continuing but this may cause problems later", status );
+	  errAnnul( status );
+	}
 
 	/* Determine the instrument */
 	hdr->instrument = smf_inst_get( hdr, status );
