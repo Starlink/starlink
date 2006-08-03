@@ -48,6 +48,8 @@
 *        Fix silly string copy bug.
 *     2006-07-31 (TIMJ):
 *        Use SMF__NOKWRD error condition.
+*     2006-08-02 (TIMJ):
+*        astGetFitsS does not trim trailing space.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -99,6 +101,7 @@
 void smf_fits_getS (const smfHead *hdr, const char * name, char * result, 
 		    size_t len, int * status ) {
   char * astres; /* Pointer to AST static buffer */
+  int i;         /* Loop counter */
 
   /* Set a default value */
   result[0] = '\0';
@@ -142,6 +145,15 @@ void smf_fits_getS (const smfHead *hdr, const char * name, char * result,
       msgSeti("SZ", strlen(astres));
       errRep(FUNC_NAME, "String buffer too small to receive FITS item ^FITS"
 	     "(^LN < ^SZ)", status);
+    } else {
+      /* AST does not seem to trim trailing spaces from FITS cards */
+      for (i=strlen(astres); i >= 0; i--) {
+	/* if we are not at a space or nul break from loop */
+	if ( result[i] != ' ' && result[i] != '\0') {
+	  break;
+	}
+	result[i] = '\0';
+      }
     }
   }
 
