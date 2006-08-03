@@ -55,6 +55,8 @@
 *        extension is needed
 *     2006-07-24 (AGG):
 *        Update prologue for dealing with existing extensions
+*     2006-08-02 (AGG):
+*        Minor changes to user feedback from msgOutif
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -158,16 +160,17 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
     } else {
       msgSetc("E", extname);
       msgOutif(MSG__VERB, FUNC_NAME, 
-	       "Found extension named ^E.", status);
+	       "Found extension named ^E", status);
     }
   } else {
     msgSetc("E", extname);
     msgOutif(MSG__VERB, FUNC_NAME, 
-	     "Warning: no extension named ^E. Creating it now.", status);
+	     "Warning: no extension named ^E", status);
     /* Create new extension but first check that the NDF is open for
        WRITE access */
     ndfIsacc( indf, "WRITE", &isacc, status );
     if (isacc) {
+      msgOutif(MSG__VERB, FUNC_NAME, "Creating new extension, ^E", status );
       ndfXnew( indf, extname, extype, ndims, dims, &loc, status );
     } else {
       if ( *status == SAI__OK ) {
