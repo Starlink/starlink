@@ -10,7 +10,7 @@ AM_FCFLAGS = -Isrc -Isc2da
 dist_bin_SCRIPTS = $(DYNSCRIPTS) $(STATICSCRIPTS)
 dist_noinst_SCRIPTS = smurf_link_adam
 bin_MONOLITHS = smurf_mon
-smurf_mon_SOURCES = smurf_mon.c $(DA_FILES) $(WVM_FILES) $(SIM_FILES)
+smurf_mon_SOURCES = smurf_mon.c $(DA_FILES) $(WVM_FILES)
 
 # At the moment we want jcmt/state.h to be installed
 
@@ -26,9 +26,6 @@ smurf_mon_TASKS = extinction flatfield makemap remsky qlmakemap scanfit sc2sim d
 
 DA_FILES = sc2da/sc2store.c sc2da/sc2math.c sc2da/smurf_ers.c \
 sc2da/sc2ast.c
-
-SIM_FILES = libsc2sim/dream.c libsc2sim/dxml.c \
-libsc2sim/fhead.c
 
 WVM_FILES = wvm/wvmOpt.c wvm/wvmTau.c wvm/wvmCal.c
 
