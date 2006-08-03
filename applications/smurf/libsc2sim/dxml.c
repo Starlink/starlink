@@ -13,13 +13,11 @@
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
 
+#include "smurf_par.h"
+
 #include "dream_par.h"
 #include "dxml_struct.h"
 #include "dxml.h"
-
-#define PI 3.141592653
-#define HOURS2RAD (PI/12.0)
-#define DEG2RAD (PI/180.0)
 
 static char errmess[132];              /* error message string */
 
@@ -54,6 +52,12 @@ static double XML_bol_distx;           /* average bolometer distance */
 static double XML_bol_disty;           /* average bolometer distance */
 static char XML_bolfile[DREAM__FLEN];  /* name of file for bolometer
                                           details */
+static double XML_bous_angle;          /* angle of pattern relative to tel. 
+					  axes in rad. anticlockwise */
+static double XML_bous_pathlength;     /* length of scan path across sky (arcsec) */
+static int XML_bous_scancount;         /* number of scan lines */
+static double XML_bous_spacing;        /* scan line spacing in arcsec */
+static double XML_bous_vmax;           /* Telescope max vel. (arcsec/sec) */
 static double XML_cassang;             /* polarisation angle of Cass optics (deg) */
 static double XML_casspol;             /* polarisation of Cass optics (%) */
 static double XML_casstrans;           /* transmission of Cass optics (%) */
@@ -98,12 +102,16 @@ static char XML_obsmode[80];           /* Type of observation */
 static int XML_platenum;               /* number of waveplate rotations */
 static double XML_platerev;            /* waveplate rotation rev/sec */
 static double XML_pong_angle;          /* angle of pattern relative to tel. 
-					  axes in rad. anticlockwise (given) */
-static int XML_pong_gridcount;         /* number of grid lines (odd) (given) */
-static double XML_pong_spacing;        /* grid spacing in arcsec (given) */
+					  axes in rad. anticlockwise */
+static int XML_pong_gridcount;         /* number of grid lines (odd) */
+static double XML_pong_spacing;        /* grid spacing in arcsec */
 static double XML_pong_vmax;           /* Telescope max vel. (arcsec/sec) */
 static double XML_ra;                  /* Right Ascension in radians */
 static double XML_sample_t;            /* sample interval in msec */
+static double XML_scan_angle;          /* angle of pattern relative to tel. 
+					  axes in rad. anticlockwise */
+static double XML_scan_pathlength;     /* length of scan path across sky (arcsec) */
+static double XML_scan_vmax;           /* Telescope max vel. (arcsec/sec) */
 static int XML_smu_move;               /* Code for the SMU move algorithm */
 static double XML_smu_offset;          /* SMU phase shift */
 static int XML_smu_samples;            /* Nr of samples per jiggle vertex */
@@ -343,6 +351,11 @@ int *status                /* global status (given and returned) */
    XML_blindtrans = 93.0; 
    XML_bol_distx = 6.28;
    XML_bol_disty = 6.28;
+   XML_bous_angle = 0.4636476;
+   XML_bous_pathlength = 2000.0;
+   XML_bous_scancount = 7;
+   XML_bous_spacing = 240.0;
+   XML_bous_vmax = 200.0;
    strcpy ( XML_bolfile, "" );
    XML_cassang = 135.0;
    XML_casspol = 1.0;
@@ -385,6 +398,9 @@ int *status                /* global status (given and returned) */
    XML_pong_vmax = 200.0;
    XML_ra = 0.0;
    XML_sample_t = 5.0;
+   XML_scan_angle = 0.4636476;
+   XML_scan_pathlength = 2000.0;
+   XML_scan_vmax = 200.0;
    XML_smu_move = 8;
    XML_smu_offset = 0.0;
    XML_smu_samples = 0;
@@ -784,6 +800,11 @@ int *status                /* global status (given and retuned) */
    inx->bol_distx = XML_bol_distx;
    inx->bol_disty = XML_bol_disty;
    strcpy ( inx->bolfile, XML_bolfile );
+   inx->bous_angle=XML_bous_angle;
+   inx->bous_pathlength=XML_bous_pathlength;
+   inx->bous_scancount=XML_bous_scancount;
+   inx->bous_spacing=XML_bous_spacing;
+   inx->bous_vmax=XML_bous_vmax;
    inx->conv_shape = XML_conv_shape;
    inx->conv_sig = XML_conv_sig;
    inx->dec = XML_dec;
@@ -844,6 +865,9 @@ int *status                /* global status (given and retuned) */
    inx->pong_spacing=XML_pong_spacing;
    inx->pong_vmax=XML_pong_vmax;
    inx->ra = XML_ra;
+   inx->scan_angle=XML_scan_angle;
+   inx->scan_pathlength=XML_scan_pathlength;
+   inx->scan_vmax=XML_scan_vmax;
    inx->sample_t = XML_sample_t;
    inx->smu_move = XML_smu_move;
    inx->smu_offset = XML_smu_offset;
@@ -1265,7 +1289,7 @@ const char **atts              /* array of name-value pairs (given) */
    else if ( strcmp ( name, "dec" ) == 0 )
    {
       dxml_cvtsexdouble ( name, atts[1], &XML_dec, &status );
-      XML_dec *= DEG2RAD;
+      XML_dec *= DD2R;
    }
    else if ( strcmp ( name, "distfac" ) == 0 )
    {
@@ -1370,7 +1394,7 @@ const char **atts              /* array of name-value pairs (given) */
    else if ( strcmp ( name, "ra" ) == 0 )
    {
       dxml_cvtsexdouble ( name, atts[1], &XML_ra, &status );
-      XML_ra *= HOURS2RAD;
+      XML_ra *= DH2R;
    }
    else if ( strcmp ( name, "subsysnr" ) == 0 )
    {
@@ -1407,6 +1431,38 @@ const char **atts              /* array of name-value pairs (given) */
    else if ( strcmp ( name, "pong_vmax" ) == 0 )
    {
       dxml_cvtdouble ( name, atts[1], &XML_pong_vmax, &status );
+   }
+   else if ( strcmp ( name, "bous_angle" ) == 0 )
+   {
+      dxml_cvtdouble ( name, atts[1], &XML_bous_angle, &status );
+   }
+   else if ( strcmp ( name, "bous_pathlength" ) == 0 )
+   {
+      dxml_cvtdouble ( name, atts[1], &XML_bous_pathlength, &status );
+   }
+   else if ( strcmp ( name, "bous_scancount" ) == 0 )
+   {
+      dxml_cvtint ( name, atts[1], &XML_bous_scancount, &status );
+   }
+   else if ( strcmp ( name, "bous_spacing" ) == 0 )
+   {
+      dxml_cvtdouble ( name, atts[1], &XML_bous_spacing, &status );
+   }
+   else if ( strcmp ( name, "bous_vmax" ) == 0 )
+   {
+      dxml_cvtdouble ( name, atts[1], &XML_bous_vmax, &status );
+   }
+   else if ( strcmp ( name, "scan_angle" ) == 0 )
+   {
+      dxml_cvtdouble ( name, atts[1], &XML_scan_angle, &status );
+   }
+   else if ( strcmp ( name, "scan_pathlength" ) == 0 )
+   {
+      dxml_cvtdouble ( name, atts[1], &XML_scan_pathlength, &status );
+   }
+   else if ( strcmp ( name, "scan_vmax" ) == 0 )
+   {
+      dxml_cvtdouble ( name, atts[1], &XML_scan_vmax, &status );
    }
 }
 

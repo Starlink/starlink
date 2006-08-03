@@ -18,8 +18,6 @@
 #include "libsc2sim/dream_par.h"
 #include "libsc2sim/dream.h"
 
-#define DPI 3.1415926535897932384626433832795028841971693993751
-
 static int sub;                  /* Subsystem nr */
 static int nbolx;                /* number of bolometers in X direction */
 static int nboly;                /* number of bolometers in Y direction */
@@ -990,7 +988,7 @@ int *status          /* global status (given and returned) */
    }
    else if ( nvert == 1)
    {
-      anginc = 2.0 * DPI / (double)np;
+      anginc = 2.0 * M_PI / (double)np;
       for ( j=0; j<np; j++ )
       {
          jigpath[j][0] = 1.2 * jig_stepx * cos ( (double)j * anginc );
@@ -1086,8 +1084,8 @@ int *status         /* global status (given and returned) */
 
 /* 2 term not damped. */
 
-      mxv = sin ( DPI / 4.0 ) + sin ( 3.0 * DPI / 4.0 ) / 3.0;
-      theta = ( -DPI / 4.0 ) + offset * DPI / vertex_t;
+      mxv = sin ( M_PI / 4.0 ) + sin ( 3.0 * M_PI / 4.0 ) / 3.0;
+      theta = ( -M_PI / 4.0 ) + offset * M_PI / vertex_t;
       frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 ) / ( 2.0 * mxv ) 
            + 0.5 );
       *x = frac * ( vertxy[jend][0] - vertxy[jstart][0] ) + vertxy[jstart][0];
@@ -1098,10 +1096,10 @@ int *status         /* global status (given and returned) */
 
 /* 3 term not damped. */
 
-      mxv = sin ( DPI / 6.0 ) + sin ( 3.0 * DPI / 6.0 ) / 3.0 + 
-        sin ( 5.0 *DPI / 6.0 ) / 5.0; 
+      mxv = sin ( M_PI / 6.0 ) + sin ( 3.0 * M_PI / 6.0 ) / 3.0 + 
+        sin ( 5.0 *M_PI / 6.0 ) / 5.0; 
 
-      theta = ( -DPI / 6.0 ) + offset * DPI / vertex_t;
+      theta = ( -M_PI / 6.0 ) + offset * M_PI / vertex_t;
       frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 + 
            sin ( 5.0 * theta ) / 5.0 ) / ( 2.0 * mxv ) + 0.5 );
       *x = frac * ( vertxy[jend][0] - vertxy[jstart][0] ) + vertxy[jstart][0];
@@ -1113,9 +1111,9 @@ int *status         /* global status (given and returned) */
 
 /* 4 term not damped. */
 
-      mxv = sin ( DPI / 8.0 ) + sin ( 3.0 * DPI / 8.0 ) / 3.0 + 
-        sin ( 5.0 * DPI / 8.0 ) / 5.0 + sin ( 7.0 * DPI / 8.0 ) / 7.0; 
-      theta = (-DPI/8.0) + offset * DPI / vertex_t;
+      mxv = sin ( M_PI / 8.0 ) + sin ( 3.0 * M_PI / 8.0 ) / 3.0 + 
+        sin ( 5.0 * M_PI / 8.0 ) / 5.0 + sin ( 7.0 * M_PI / 8.0 ) / 7.0; 
+      theta = (-M_PI/8.0) + offset * M_PI / vertex_t;
       frac = 1.104 * ( ( sin(theta) + sin ( 3.0 * theta ) / 3.0 + 
         sin ( 5.0 * theta ) / 5.0 + sin ( 7.0 * theta ) / 7.0 ) 
         / ( 2.0 * mxv ) + 0.5 );
@@ -1128,9 +1126,9 @@ int *status         /* global status (given and returned) */
 
 /* 2 term flat end. */
 
-      mxv = sin(DPI/4.0) + sin(3.0*DPI/4.0) / 3.0;
-      theta = (-DPI/4.0) + offset * DPI / vertex_t;
-      if ( theta < DPI/4.0 )
+      mxv = sin(M_PI/4.0) + sin(3.0*M_PI/4.0) / 3.0;
+      theta = (-M_PI/4.0) + offset * M_PI / vertex_t;
+      if ( theta < M_PI/4.0 )
       {
          frac =1.02 * ( ( sin(theta) + sin(3.0*theta) / 3.0 ) / (2.0*mxv) + 0.5 );
       }
@@ -1147,9 +1145,9 @@ int *status         /* global status (given and returned) */
 
 /* 3 term flat end. */
 
-      mxv = sin(DPI/6.0) + sin(3.0*DPI/6.0) / 3.0 + sin(5.0*DPI/6.0) / 5.0;
-      theta = (-DPI/6.0) + offset * DPI / vertex_t;
-      if ( theta < DPI/6.0 )
+      mxv = sin(M_PI/6.0) + sin(3.0*M_PI/6.0) / 3.0 + sin(5.0*M_PI/6.0) / 5.0;
+      theta = (-M_PI/6.0) + offset * M_PI / vertex_t;
+      if ( theta < M_PI/6.0 )
       {
          frac = ( sin(theta) + sin(3.0*theta) / 3.0 +  sin(5.0*theta) / 5.0 ) / 
            (2.0*mxv) + 0.5;
@@ -1167,10 +1165,10 @@ int *status         /* global status (given and returned) */
 
 /* 4 term flat end. */
 
-      mxv = sin(DPI/8.0) + sin(3.0*DPI/8.0) / 3.0 + 
-        sin(5.0*DPI/8.0) / 5.0 + sin(7.0*DPI/8.0) / 7.0;
-      theta = -DPI/8.0 + offset * DPI / vertex_t;
-      if ( theta < DPI/8.0 )
+      mxv = sin(M_PI/8.0) + sin(3.0*M_PI/8.0) / 3.0 + 
+        sin(5.0*M_PI/8.0) / 5.0 + sin(7.0*M_PI/8.0) / 7.0;
+      theta = -M_PI/8.0 + offset * M_PI / vertex_t;
+      if ( theta < M_PI/8.0 )
       {
          frac = ( sin(theta) + sin(3.0*theta) / 3.0 + sin(5.0*theta) / 5.0 + 
            sin(7.0*theta) / 7.0 ) / (2.0*mxv) + 0.5;
@@ -1216,7 +1214,7 @@ int *status         /* global status (given and returned) */
    This is an experimental wave form, which may change often..
    Now it is a cosine waveform from 0 to 1 in the full time. */
 
-      frac = 0.5 * ( 1.0 - cos ( DPI * offset / vertex_t ) );
+      frac = 0.5 * ( 1.0 - cos ( M_PI * offset / vertex_t ) );
       *x = frac * ( vertxy[jend][0] - vertxy[jstart][0] ) + vertxy[jstart][0];
       *y = frac * ( vertxy[jend][1] - vertxy[jstart][1] ) + vertxy[jstart][1];
 
@@ -1276,10 +1274,10 @@ int *status       /* global status (given and returned) */
 
 /* 2 term not damped. */
 
-      mxv = sin ( DPI / 4.0 ) + sin ( 3.0 * DPI / 4.0 ) / 3.0;
+      mxv = sin ( M_PI / 4.0 ) + sin ( 3.0 * M_PI / 4.0 ) / 3.0;
       for ( i=0; i<npts; i++ )
       {
-         x = ( -DPI / 4.0 ) + (double)i * DPI / popepi;
+         x = ( -M_PI / 4.0 ) + (double)i * M_PI / popepi;
          a[i] = 1.104 * ( ( sin(x) + sin ( 3.0 * x ) / 3.0 ) / ( 2.0 * mxv ) 
            + 0.5 );
       }
@@ -1289,12 +1287,12 @@ int *status       /* global status (given and returned) */
 
 /* 3 term not damped. */
 
-      mxv = sin ( DPI / 6.0 ) + sin ( 3.0 * DPI / 6.0 ) / 3.0 + 
-        sin ( 5.0 *DPI / 6.0 ) / 5.0; 
+      mxv = sin ( M_PI / 6.0 ) + sin ( 3.0 * M_PI / 6.0 ) / 3.0 + 
+        sin ( 5.0 *M_PI / 6.0 ) / 5.0; 
 
       for ( i=0; i<npts; i++ )
       {
-         x = -DPI / 6.0 + (double)i * DPI / popepi;
+         x = -M_PI / 6.0 + (double)i * M_PI / popepi;
          a[i] = 1.104 * ( ( sin(x) + sin ( 3.0 * x ) / 3.0 + 
            sin ( 5.0 * x ) / 5.0 ) / ( 2.0 * mxv ) + 0.5 );
       }
@@ -1304,11 +1302,11 @@ int *status       /* global status (given and returned) */
 
 /* 4 term not damped. */
 
-      mxv = sin ( DPI / 8.0 ) + sin ( 3.0 * DPI / 8.0 ) / 3.0 + 
-        sin ( 5.0 * DPI / 8.0 ) / 5.0 + sin ( 7.0 * DPI / 8.0 ) / 7.0; 
+      mxv = sin ( M_PI / 8.0 ) + sin ( 3.0 * M_PI / 8.0 ) / 3.0 + 
+        sin ( 5.0 * M_PI / 8.0 ) / 5.0 + sin ( 7.0 * M_PI / 8.0 ) / 7.0; 
       for ( i=0; i<npts; i++ )
       {
-         x = (-DPI/8.0) + (double)i * DPI / popepi;
+         x = (-M_PI/8.0) + (double)i * M_PI / popepi;
          a[i] = 1.104 * ( ( sin(x) + sin ( 3.0 * x ) / 3.0 + 
            sin(5.0*x) / 5.0 + sin (7.0*x) / 7.0 ) / (2.0*mxv) + 0.5 );
       }
@@ -1318,11 +1316,11 @@ int *status       /* global status (given and returned) */
 
 /* 2 term flat end. */
 
-      mxv = sin(DPI/4.0) + sin(3.0*DPI/4.0) / 3.0;
+      mxv = sin(M_PI/4.0) + sin(3.0*M_PI/4.0) / 3.0;
       for ( i=0;i<npts; i++ )
       {
-         x = (-DPI/4.0) + (double)i * DPI / popepi;
-         if ( x < DPI/4.0 )
+         x = (-M_PI/4.0) + (double)i * M_PI / popepi;
+         if ( x < M_PI/4.0 )
          {
             a[i] =1.02 * ( ( sin(x) + sin(3.0*x) / 3.0 ) / (2.0*mxv) + 0.5 );
          }
@@ -1337,11 +1335,11 @@ int *status       /* global status (given and returned) */
 
 /* 3 term flat end. */
 
-      mxv = sin(DPI/6.0) + sin(3.0*DPI/6.0) / 3.0 + sin(5.0*DPI/6.0) / 5.0;
+      mxv = sin(M_PI/6.0) + sin(3.0*M_PI/6.0) / 3.0 + sin(5.0*M_PI/6.0) / 5.0;
       for ( i=0;i<npts; i++ )
       {
-         x = (-DPI/6.0) + (double)i * DPI / popepi;
-         if ( x < DPI/6.0 )
+         x = (-M_PI/6.0) + (double)i * M_PI / popepi;
+         if ( x < M_PI/6.0 )
          {
             a[i] = ( sin(x) + sin(3.0*x) / 3.0 +  sin(5.0*x) / 5.0 ) / 
               (2.0*mxv) + 0.5;
@@ -1357,12 +1355,12 @@ int *status       /* global status (given and returned) */
 
 /* 4 term flat end. */
 
-      mxv = sin(DPI/8.0) + sin(3.0*DPI/8.0) / 3.0 + 
-        sin(5.0*DPI/8.0) / 5.0 + sin(7.0*DPI/8.0) / 7.0;
+      mxv = sin(M_PI/8.0) + sin(3.0*M_PI/8.0) / 3.0 + 
+        sin(5.0*M_PI/8.0) / 5.0 + sin(7.0*M_PI/8.0) / 7.0;
       for ( i=0; i<npts; i++ )
       {
-         x = -DPI/8.0 + (double)i * DPI / popepi;
-         if ( x < DPI/8.0 )
+         x = -M_PI/8.0 + (double)i * M_PI / popepi;
+         if ( x < M_PI/8.0 )
          {
             a[i] = ( sin(x) + sin(3.0*x) / 3.0 + sin(5.0*x) / 5.0 + 
               sin(7.0*x) / 7.0 ) / (2.0*mxv) + 0.5;
@@ -1409,7 +1407,7 @@ int *status       /* global status (given and returned) */
 
       for ( i=0; i<npts; i++ )
       {
-         a[i] = ( cos ( DPI * ( (double)i - popepi ) / popepi ) + 1.0 ) / 2.0;
+         a[i] = ( cos ( M_PI * ( (double)i - popepi ) / popepi ) + 1.0 ) / 2.0;
       }
 
    }
