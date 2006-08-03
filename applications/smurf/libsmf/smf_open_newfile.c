@@ -15,7 +15,7 @@
 *  Invocation:
 
 *     smf_open_newfile( Grp * ingrp, int index, smf_dtype dtype, int ndims, 
-*                       const dim_t dims[], int flags, smfData ** data, 
+*                       const int dims[], int flags, smfData ** data, 
 *                       int *status);
 
 *  Arguments:
@@ -27,7 +27,7 @@
 *        Data type of this smfData. Unsupported types result in an error.
 *     ndims = int (Given)
 *        Number of dimensions in dims[]. Maximum of NDF__MXDIM.
-*     dims[] = const dim_t (Given)
+*     dims[] = const int (Given)
 *        Array of dimensions. Values will be copied from this array.
 *     flags = int (Given)
 *        Flags to denote whether to create flatfield, header, or file components
@@ -119,8 +119,8 @@
 
 #define FUNC_NAME "smf_open_newfile"
 
-void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, const int ndims, 
-		       const dim_t dims[], int flags, smfData ** data, 
+void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, int ndims, 
+		       const int dims[], int flags, smfData ** data, 
 		       int *status) {
 
   /* Local variables */
@@ -149,7 +149,6 @@ void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, const int ndims,
   /* Create empty smfData with no extra components */
   flags |= SMF__NOCREATE_DA | SMF__NOCREATE_HEAD | SMF__NOCREATE_FILE;
   *data = smf_create_smfData( flags, status);
-  flags = 0;
 
   /* Set the requested data type */
   (*data)->dtype = dtype;
