@@ -40,6 +40,8 @@
 *        Original version.
 *     01-AUG-2006 (TIMJ):
 *        INSTRUME keyword is not mandatory.
+*     02-AUG-2006 (TIMJ):
+*        Add verbose messaging. (at least for now)
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -106,8 +108,12 @@ smf_inst_get( const smfHead * hdr, int * status ) {
 
   if (*status == SAI__OK) {
     if ( strncmp( instrume, "SCUBA-2", SZFITSCARD) == 0 ) {
+      msgOutif( MSG__VERB, " ", "Data file contains SCUBA-2 data",
+		status );
       return INST__SCUBA2;
     } else if ( strncmp( instrume, "AZTEC", SZFITSCARD ) == 0 ) {
+      msgOutif( MSG__VERB, " ", "Data file contains AzTEC data",
+		status );
       return INST__AZTEC;
     }
   }
@@ -123,15 +129,18 @@ smf_inst_get( const smfHead * hdr, int * status ) {
     /* did we get something? */
     if (*status == SAI__OK) {
       if (strncmp( backend, "ACSIS", SZFITSCARD) == 0) {
+	msgOutif( MSG__VERB, " ", "Data file contains ACSIS data",
+		  status );
 	return INST__ACSIS;
       }
     } else {
       /* Clear status if BACKEND was missing since this is not fatal. */
       if (*status == SMF__NOKWRD) errAnnul( status );
-      return INST__NONE;
     }
-
   }
+
+  msgOutif( MSG__VERB, " ", "Did not recognize instrument",
+	    status );
 
   /* only get here if we've run out of choices */
   return INST__NONE;
