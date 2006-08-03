@@ -18,7 +18,7 @@
 *     Set message token for hdsdim integer.
 
 *  Invocation:
-*     dat1emsSetHdsdim( const char * token, UINT_BIG value );
+*     dat1emsSetHdsdim( const char * token, HDS_PTYPE value );
 
 *  Description :
 *     Version of emsSetu suitable for the hdsdim HDS type.
