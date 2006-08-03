@@ -51,6 +51,8 @@
 *     2006-06-31 (TIMJ):
 *        Add instrument and fplane*
 *        make sure memcpy is protected. Some tidy up.
+*     2006-08-02 (TIMJ):
+*        The new smfHead is not a clone.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -150,6 +152,9 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   new = smf_construct_smfHead( new, instrument, wcs, tswcs, fitshdr,
 			       allState, curframe,
 			       nframes, ndet, fplanex, fplaney, status );
+
+  /* see isCloned to 0 since we have allocated this memory */
+  if (new) new->isCloned = 0;
 
   /* let people know where things are going wrong */
   if (*status != SAI__OK) {
