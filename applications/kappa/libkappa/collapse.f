@@ -282,6 +282,11 @@
 *     2006 June 23 (MJC):
 *        Use a temporary NDF as intermediary to obtain file-size 
 *        compression of the output NDF.
+*     2006 August 4 (MJC):
+*        Fix bug propagating AXIS structure introduced from the
+*        previous modification.  The revised NDF_PROP enables the
+*        file-size compression, and thus the temporary NDF is no longer
+*        required.
 *     {enter_further_changes_here}
 
 *-
@@ -318,7 +323,7 @@
       CHARACTER ESTIM*( 6 )      ! Method to use to estimate collapsed
                                  ! values
       CHARACTER ITYPE*( NDF__SZTYP ) ! Numeric type for processing
-      CHARACTER LOC1*(DAT__SZLOC)! Locator to the whole NDF
+      CHARACTER LOC1*(DAT__SZLOC)! Locator to the output NDF
       CHARACTER LOC2*(DAT__SZLOC)! Locator to NDF AXIS array
       CHARACTER LOC3*(DAT__SZLOC)! Locator to copy of the original AXIS 
                                  ! array
@@ -368,7 +373,6 @@
       INTEGER INDFI              ! Input NDF identifier
       INTEGER INDFO              ! Output NDF identifier
       INTEGER INDFS              ! Input NDF-section identifier
-      INTEGER INDFT              ! Temporary-NDF identifier
       INTEGER IPAXCO             ! Pointers to mapped d.p. axis array
       INTEGER IPCO               ! Pointers to mapped co-ordinate array
       INTEGER IPIN( 2 )          ! Pointers to mapped input arrays
@@ -408,7 +412,6 @@
       INTEGER OBL                ! Identifier for output-NDF block
       INTEGER OBLSIZ( NDF__MXDIM ) ! Output-NDF sizes for processing 
                                  ! large datasets in blocks
-      INTEGER PLACE              ! NDF placeholder
       INTEGER UBND( NDF__MXDIM ) ! Upper pixel index bounds of the input
                                  ! NDF
       INTEGER UBNDO( NDF__MXDIM )! Upper pixel index bounds of the 
@@ -671,33 +674,13 @@
          END DO
       END IF
 
-*  Propagate the input to a temporary NDF.
-*  =======================================
+*  Propagate the input to the output NDF.
+*  ======================================
 
-*  We want to avoid creating an NDF of roughly the same size as the
-*  input, when there's been significant compression of the number of
-*  pixels.  If we merely propagate then adjust the dimensions, HDS does
-*  not free up the space initially allocated.  Therefore we create a
-*  temporary NDF, and once its dimensions are correct, we can copy it
-*  to the actual output NDF.
-      CALL NDF_TEMP( PLACE, STATUS )
-
-*  Create the temporary NDF by propagation from the input NDF.  This
+*  Create the output NDF by propagation from the input NDF.  This
 *  results in history, etc., being passed on.  The shape and 
-*  dimensionality will be wrong but this will be corrected later.
-      CALL NDF_SCOPY( INDFI, 'Axis,Units', PLACE, INDFT, STATUS )
-
-*  Set the temporary output NDF bounds to the required values.  This 
-*  will change the lengths of the current AXIS arrays (but we have a 
-*  copy of the originals in OLDAXIS), and reduce the dimensionality by
-*  one.
-      CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFT, STATUS ) 
-
-*  Now copy from the adjusted temporary NDF to the user-specified
-*  output NDF, that should have the correct file size.  As the 
-*  temporary NDF is then no longer required, release its resources.
-      CALL LPG_PROP( INDFT, 'Axis,Units', 'OUT', INDFO, STATUS )
-      CALL NDF_ANNUL( INDFT, STATUS )
+*  dimensionality will be wrong but they will be corrected later.
+      CALL LPG_PROP( INDFI, 'Axis,Units', 'OUT', INDFO, STATUS )
 
 *  Set the title of the output NDF.
       CALL KPG1_CCPRO( 'TITLE', 'TITLE', INDFI, INDFO, STATUS )
@@ -726,14 +709,14 @@
 *  Adjust output NDF to its new shape.
 *  ===================================
 
-*  The shape and size of the (temporary) output NDF created above will 
-*  be wrong, so we need to correct it by removing the collapse axis.  
-*  This is easy if it is the final axis (we would just use NDF_SBND
-*  specifying  NDIM-1 axes), but is not so easy if the collapse axis is 
-*  not the final axis.  In this case, we do the following.
-*    1) - Save copies of an AXIS structures in the temporary NDF 
-*         (because the following step will change their lengths to 
-*         match the new bounds).
+*  The shape and size of the output NDF created above will be wrong, so
+*  we need to correct it by removing the collapse axis.  This is easy 
+*  if it is the final axis (we would just use NDF_SBND specifying 
+*  NDIM-1 axes), but is not so easy if the collapse axis is not the 
+*  final axis.  In this case, we do the following.
+*    1) - Save copies of an AXIS structure in the output NDF (because
+*         the following step will change their lengths to match the new
+*         bounds).
 *    2) - Change the bounds and dimensionality of the NDF to the
 *         appropriate values.
 *    3) - Restore the saved AXIS structures, permuting them so that they
@@ -747,10 +730,10 @@
 *  If so, we need to save copies of the AXIS structures.
       IF ( GOTAX ) THEN
 
-*  Get an HDS locator to the NDF structure,
+*  Get an HDS locator to the output NDF structure.
          CALL NDF_LOC( INDFO, 'UPDATE', LOC1, STATUS )
 
-*  Get a locator for the AXIS component.
+*  Get a locator to the AXIS component.
          CALL DAT_FIND( LOC1, 'AXIS', LOC2, STATUS )
 
 *  Take a copy of the AXIS component and call it OLDAXIS.
@@ -758,8 +741,12 @@
 
 *  Get a locator for OLDAXIS.
          CALL DAT_FIND( LOC1, 'OLDAXIS', LOC3, STATUS )
-
       END IF
+
+*  Set the output NDF bounds to the required values.  This will change
+*  the lengths of the current AXIS arrays (but we have a copy of the
+*  originals in OLDAXIS), and reduce the dimensionality by one.
+      CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFO, STATUS ) 
 
 *  We now re-instate any AXIS structures, in their new order.
       IF ( GOTAX ) THEN
