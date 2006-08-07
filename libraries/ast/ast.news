@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V4.2) of the Starlink AST (astrometry) library is
+   A new release (V4.3) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,13 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+-  The astGetFitsS (AST_GETFITSS) function now strips trailing white space
+from the returned string.
+
+
+Main Changes in Version 4.2
+---------------------------
 
 - The SideBand attribute of the DSBSpecFrame class can now take the
 option "LO" in addition to "USB" and "LSB". The new option causes the

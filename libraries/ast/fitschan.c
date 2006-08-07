@@ -690,6 +690,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        - Added astRetainFits.
 *        - Consume VELOSYS FITS-WCS keywords when reading an object.
 *        - Write out VELOSYS FITS-WCS keywords when writing an object.
+*     7-AUG-2006 (DSB):
+*        - Remove trailing spaces from the string returned by astGetFitsS.
 *class--
 */
 
@@ -12019,6 +12021,7 @@ c     -  Zero
 *     -  .FALSE.
 *     is returned as the function value if an error has already occurred, 
 *     or if this function should fail for any reason.
+*     - When returning a string value, any trailing spaces will be removed.
 *--
 */
 
@@ -12034,8 +12037,10 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value ){ \
    char *lcom;            /* Supplied keyword comment */ \
    char *lname;           /* Supplied keyword name */ \
    char *lvalue;          /* Supplied keyword value */ \
+   char *string;          /* Pointer to returned string value */ \
+   char *c;               /* Pointer to next character */ \
    int ret;               /* The returned value */ \
-   size_t sz;                /* Data size */ \
+   size_t sz;             /* Data size */ \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return 0; \
@@ -12062,8 +12067,23 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value ){ \
                    lname, CardData( this, &sz ), type_names[ ftype ] ); \
       } \
 \
+/* If the returned value is a string, replace trailing spaces with null \
+   characters. */ \
+      if( astOK ) { \
+         if( ftype == AST__STRING ) { \
+            string = *( (char **) value ); \
+            if( string ) { \
+               c = string + strlen( string ) - 1; \
+               while( *c == ' ' && c > string ) { \
+                  *c = 0; \
+                  c--; \
+               } \
+            } \
+         } \
+\
 /* Indicate that a value is available. */ \
-      if( astOK ) ret = 1; \
+         ret = 1; \
+      } \
 \
    } \
 \
