@@ -599,6 +599,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        neighbours rather than the whole value.
 *     10-JUL-2006 (DSB)
 *        Make astStripEscapes public so it can be used by the NDF library.
+*     7-AUG-2006 (DSB)
+*        Increase the number of attempts to find a new gap size from 5 to
+*        25 in GetTicks.
 *class--
 */
 
@@ -14493,8 +14496,8 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
                                        ptr[ axis ], ticks );
 
 /* If the gap size has not changed do an extra pass through this loop,
-   but only do this a maximum of 5 times in siccession. */
-            } else if( nochange < 5 ) {
+   but only do this a maximum of 25 times in succession. */
+            } else if( nochange < 25 ) {
                nochange++;
                i--;
 
