@@ -347,13 +347,15 @@ itcl::class gaia::Gaia {
 
       #  Attempt to register as PLASTIC listener, adding traces for some
       #  callbacks we need when the status of the PLASTIC connection changes.
-      init_plastic_
-      trace variable [scope is_plastic_registered_] w \
-                     [code $this trace_plastic_reg_]
-      set is_plastic_registered_ $is_plastic_registered_
-      trace variable [scope apps_count_] w \
-                     [code $this trace_apps_count_]
-      set apps_count_ $apps_count_
+      if {$itk_option(-interop_menu)} {
+         init_plastic_
+         trace variable [scope is_plastic_registered_] w \
+                        [code $this trace_plastic_reg_]
+         set is_plastic_registered_ $is_plastic_registered_
+         trace variable [scope apps_count_] w \
+                        [code $this trace_apps_count_]
+         set apps_count_ $apps_count_
+      }
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or
