@@ -78,6 +78,8 @@
 *     2006 February 17 (MJC):
 *        Converted to two-pass algorithm.  It's slower but far more
 *        stable.
+*     2006 August 6 (MJC):
+*        Exclude data with non-positive or bad variance.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -157,6 +159,8 @@
 *  sums to derive the mean.
          DO 5 J = 1, NLINES
             IF (  STACK( I, J ) .NE. VAL__BAD<T> .AND.
+     :             VARS( I, J ) .NE. VAL__BAD<T> .AND.
+     :             VARS( I, J ) .GT. VAL__SML<T> .AND.
      :           COORDS( I, J ) .NE. VAL__BAD<T> ) THEN
 
 *  Conversion increment good value counter.
@@ -189,6 +193,8 @@
             SUM = 0.0D0
             DO 6 J = 1, NLINES
                IF (  STACK( I, J ) .NE. VAL__BAD<T> .AND.
+     :                VARS( I, J ) .NE. VAL__BAD<T> .AND.
+     :                VARS( I, J ) .GT. VAL__SML<T> .AND.
      :              COORDS( I, J ) .NE. VAL__BAD<T> ) THEN
 
 *  Convert input type to double precision before forming sums.

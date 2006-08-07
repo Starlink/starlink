@@ -65,6 +65,7 @@
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     BRADC: Brad Cavanagh (JAC)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -76,7 +77,9 @@
 *        are typical for each line. This was never the case.
 *     11-OCT-2004 (BRADC):
 *        No longer use NUM_CMN.
-*     {enter_changes_here}
+*     2006 August 6 (MJC):
+*        Exclude data with non-positive or bad variance.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -153,7 +156,9 @@
 
 *  Loop over all possible contributing pixels.
          DO 2 J = 1, NLINES
-            IF( STACK( I, J ) .NE. VAL__BADR ) THEN
+            IF ( STACK( I, J ) .NE. VAL__BADR .AND.
+     :           VARS( J ) .NE. VAL__BADR .AND.
+     :           VARS( J ) .GT. VAL__SMLR ) THEN
 
 *  Increment good value counter.
                NGOOD = NGOOD + 1
@@ -208,8 +213,8 @@
                RVAL2 = REAL( VAL + DBLE( NSIGMA ) * SQRT( VAR ) )
 
 *  Clip unwanted data.
-               CALL CCG1_CLIPR( WRK1, NGOOD, RVAL1, RVAL2, IGOOD, STATUS
-     : )
+               CALL CCG1_CLIPR( WRK1, NGOOD, RVAL1, RVAL2, IGOOD,
+     :                          STATUS )
 
 *  If any values have been rejected then form new mean.
                IF ( IGOOD .GT. 0 ) THEN
@@ -219,7 +224,7 @@
                      SUM1 = 0.0D0
                      SUM2 = 0.0D0
                      DO 3 J = 1, NGOOD
-                        IF( WRK1( J ) .NE. VAL__BADR ) THEN
+                        IF ( WRK1( J ) .NE. VAL__BADR ) THEN
                            
 *  Increment sums.
                            SUM2 = SUM2 + DBLE( WRK1( J ) * WRK2( J ) )
