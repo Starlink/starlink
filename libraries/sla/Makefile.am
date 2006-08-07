@@ -63,11 +63,14 @@ F_ROUTINES = addet.f afin.f airmas.f altaz.f amp.f ampqk.f aop.f	\
     ue2el.f ue2pv.f unpcd.f v2tp.f vdv.f veri.f vers.f vn.f vxv.f	\
     wait.f xy2xy.f zd.f
 
-TESTS = sla_test
-check_PROGRAMS = sla_test
+TESTS = sla_test slaTest
+check_PROGRAMS = sla_test slaTest
 
 sla_test_SOURCES = sla_test.f
 sla_test_LDADD = libsla.la
+
+slaTest_SOURCES = slaTest.c
+slaTest_LDADD   = libsla.la @FCLIBS@
 
 dist_starnews_DATA = sla.news
 DISTCLEANFILES = gresid.F random.F wait.f

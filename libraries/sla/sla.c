@@ -62,6 +62,9 @@
 *        Moved from AST to SLALIB.
 *     25-JUN-2006 (TIMJ):
 *        Add SLA_AIRMAS.
+*     07-AUG-2006 (TIMJ):
+*        Import cnfImprt from CNF.
+*        Add SLA_OBS
 *-
 */
 
@@ -70,12 +73,16 @@
 #include "f77.h"                 /* FORTRAN <-> C interface macros (SUN/209) */
 #include "slalib.h"              /* Prototypes for C SLALIB functions */
 #include <stdlib.h>              /* Malloc etc */
+#include <string.h>              /* string manipulation */
 
 
 /* Functions needed to avoid a dependence on CNF. */
 /* ============================================== */
 
 static void slaStringExport( const char *, char *, int );
+static void slaStringImport( const char *source_f, int source_len,
+			     char *dest_c );
+
 static void slaStringExport( const char *source_c, char *dest_f, int dest_len ) {
 /*
 *+
@@ -112,7 +119,7 @@ static void slaStringExport( const char *source_c, char *dest_f, int dest_len ) 
 *     descriptor address would be passed as "dest_f" and this must
 *     then be used to locate the actual FORTRAN character data.
 *     - This function is equivalent to cnfExprt but is included here to
-*     avoid SLALIB becomeing dependent on CNF.
+*     avoid SLALIB becoming dependent on CNF.
 *-
 */
 
@@ -132,6 +139,94 @@ static void slaStringExport( const char *source_c, char *dest_f, int dest_len ) 
 /* Fill the rest of the output FORTRAN string with blanks. */
    for ( ; i < dest_len; i++ ) dest_f[ i ] = ' ';
 }
+
+void slaStringImport( const char *source_f, int source_len, char *dest_c )
+
+/*
+*+
+*  Name:
+*     slaStringImportt
+
+*  Purpose:
+*     Import a FORTRAN string into a C string
+
+*  Type:
+*     Protected function.
+
+*  Language:
+*     ANSI C
+
+*  Invocation:
+*     slaStringImport( source_f, source_len, dest_c )
+
+*  Description:
+*     Import a FORTRAN string into a C string, discarding trailing
+*     blanks. The NUL character is appended to the C string after
+*     the last non-blank character. The input string and output string
+*     pointers can point to the same location if the string is to be
+*     modified in place (but care must be taken to allow for the additional
+*     C terminator when allocating memory).
+
+*  Arguments:
+*     const char *source_f (Given)
+*        A pointer to the input FORTRAN string
+*     int source_len (Given)
+*        The length of the input FORTRAN string
+*     char *dest_c (Returned via pointer)
+*        A pointer to the output C string. Can be same as source.
+
+*  Notes:
+*     -  No check is made that there is sufficient space allocated to
+*        the C string to hold the FORTRAN string and a terminating null.
+*        It is responsibility of the programmer to check this.
+*     -  This function is equivalent to cnfImprt but is included here to
+*        avoid SLALIB becoming dependent on CNF.
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     AJC: Alan Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     27-MAR-1991 (PMA):
+*        Original version.
+*     22-MAY-1996 (AJC):
+*        Correct description re trailing blanks
+*     24-SEP-1998 (AJC):
+*        Specify const char * for input strings
+*     25-NOV-2005 (TIMJ):
+*        Allow the strings to be identical
+*     {enter_changes_here}
+
+*-
+
+*...........................................................................*/
+
+{
+/* Local Variables:							    */
+
+   int i;			 /* Loop counter			    */
+
+
+/* Find the last non blank character in the input FORTRAN string.	    */
+
+   for( i = source_len - 1 ; ( i >= 0 ) && ( source_f[i] == ' ' ) ; i-- )
+      ;
+
+/* Put a null character at the end of the output C string.		    */
+
+   dest_c[i+1] = '\0';
+
+/* Copy the characters from the input FORTRAN string to the output C	    */
+/* string if the strings are different.				      	    */
+
+   if (dest_c != source_f ) {
+     memmove( dest_c, source_f, (size_t)i+1 );
+   }
+}
+
+
 
 
 /* SLALIB wrapper implementations. */
@@ -1406,4 +1501,65 @@ void slaDh2e ( double az, double el, double phi, double *ha, double *dec ) {
 }
 
 
+F77_SUBROUTINE(sla_obs)( INTEGER(I),
+			 CHARACTER(C),
+			 CHARACTER(NAME),
+			 DOUBLE(W),
+			 DOUBLE(P),
+			 DOUBLE(H)
+			 TRAIL(C)
+			 TRAIL(NAME) );
 
+/* Note that SLA insists that "c" has space for 10 characters + nul
+   and "name" has space for 40 characters + nul */
+
+void
+slaObs( int n, char *c, char *name, double *w, double *p, double *h  ) {
+
+  DECLARE_INTEGER( N );
+  DECLARE_CHARACTER( C, 10 );
+  DECLARE_CHARACTER( NAME, 40 );
+  DECLARE_DOUBLE( W );
+  DECLARE_DOUBLE( P );
+  DECLARE_DOUBLE( H );
+
+  if (n < 1) {
+    /* C needs to be imported */
+    slaStringExport( c, C, 10 );
+  } else {
+    /* initialise C */
+    slaStringExport( "", C, 10 );
+  }
+  F77_EXPORT_INTEGER( n, N );
+
+  /* w, p and h are not touched on error but for consistency this means
+     we copy the current values to Fortran so that we can correctly copy
+     back the result. */
+  F77_EXPORT_DOUBLE( *w, W );
+  F77_EXPORT_DOUBLE( *p, P );
+  F77_EXPORT_DOUBLE( *h, H );
+
+  /* call the routine */
+  F77_CALL(sla_obs)( INTEGER_ARG(&N),
+		     CHARACTER_ARG(C),
+		     CHARACTER_ARG(NAME),
+		     DOUBLE_ARG(&W),
+		     DOUBLE_ARG(&P),
+		     DOUBLE_ARG(&H)
+		     TRAIL_ARG(C)
+		     TRAIL_ARG(NAME) );
+
+  /* extract results */
+  slaStringImport( NAME, 40, name );
+  if (n > 0 && name[0] != '?') {
+    /* only do this if we know we used a numeric input and if the result
+       for the NAME is not '?' (since we are not allowed to alter the string
+       in that case). This allows people
+       to call slaObs with a string constant */
+    slaStringImport( C, 10, c );
+  }
+  F77_IMPORT_DOUBLE( W, *w );
+  F77_IMPORT_DOUBLE( P, *p );
+  F77_IMPORT_DOUBLE( H, *h );
+
+}

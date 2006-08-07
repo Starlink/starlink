@@ -74,6 +74,10 @@ fi
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+dnl   We need this for the tests
+AC_FC_MAIN
+AC_FC_LIBRARY_LDFLAGS
+
 #  Perform the check that configures f77.h.in for the return type of REAL
 #  Fortran functions. On 64-bit g77 with f2c compatibility this is double
 #  not float.
