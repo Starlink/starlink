@@ -691,7 +691,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        - Consume VELOSYS FITS-WCS keywords when reading an object.
 *        - Write out VELOSYS FITS-WCS keywords when writing an object.
 *     7-AUG-2006 (DSB):
-*        - Remove trailing spaces from the string returned by astGetFitsS.
+*        - Remove trailing spaces from the string returned by astGetFitsS
+*        if the original string contains 8 or fewer characters.
 *class--
 */
 
@@ -12021,7 +12022,15 @@ c     -  Zero
 *     -  .FALSE.
 *     is returned as the function value if an error has already occurred, 
 *     or if this function should fail for any reason.
-*     - When returning a string value, any trailing spaces will be removed.
+*     - The FITS standard says that string keyword values should be
+*     padded with trailing spaces if they are shorter than 8 characters.
+*     For this reason, trailing spaces are removed from the string
+*     returned by 
+c     astGetFitsS
+f     AST_GETFITSS
+*     if the original string (including any trailing spaces) contains 8 
+*     or fewer characters. Trailing spaces are not removed from longer
+*     strings.
 *--
 */
 
@@ -12039,6 +12048,7 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value ){ \
    char *lvalue;          /* Supplied keyword value */ \
    char *string;          /* Pointer to returned string value */ \
    char *c;               /* Pointer to next character */ \
+   int cl;                /* Length of string value */ \
    int ret;               /* The returned value */ \
    size_t sz;             /* Data size */ \
 \
@@ -12067,16 +12077,19 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value ){ \
                    lname, CardData( this, &sz ), type_names[ ftype ] ); \
       } \
 \
-/* If the returned value is a string, replace trailing spaces with null \
-   characters. */ \
+/* If the returned value is a string containing 8 or fewer characters, \
+   replace trailing spaces with null characters. */ \
       if( astOK ) { \
          if( ftype == AST__STRING ) { \
             string = *( (char **) value ); \
             if( string ) { \
-               c = string + strlen( string ) - 1; \
-               while( *c == ' ' && c > string ) { \
-                  *c = 0; \
-                  c--; \
+               cl =strlen( string ); \
+               if( cl <= 8 ) { \
+                  c = string + cl - 1; \
+                  while( *c == ' ' && c > string ) { \
+                     *c = 0; \
+                     c--; \
+                  } \
                } \
             } \
          } \
@@ -20475,7 +20488,7 @@ static void RoundFString( char *text, int width ){
       while( end >= text ) *(end--) = ' ';
    }
 
-/* Im a minimum field width was given, shunt the text to the left in
+/* If a minimum field width was given, shunt the text to the left in
    order to reduce the used field width to the specified value. This
    requires there to be some leading spaces (because we do not want to
    loose any non-blank characters from the left hand end of the string).

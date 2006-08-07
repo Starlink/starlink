@@ -17,7 +17,8 @@ Main Changes in this Version
 ----------------------------
 
 -  The astGetFitsS (AST_GETFITSS) function now strips trailing white space
-from the returned string.
+from the returned string, if the original string contains 8 or fewer
+characters.
 
 
 Main Changes in Version 4.2
