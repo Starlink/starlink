@@ -68,6 +68,7 @@
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     BRADC: Brad Cavanagh (JAC)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -77,7 +78,9 @@
 *        Added argument CALCMV.
 *     11-OCT-2004 (BRADC):
 *        No longer use NUM_CMN.
-*     {enter_changes_here}
+*     2006 August 6 (MJC):
+*        Exclude data with non-positive variance.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -154,8 +157,9 @@
 
 *  Loop over all possible contributing pixels.
          DO 2 J = 1, NLINES
-            IF( STACK( I, J ) .NE. VAL__BADR .AND.
-     :           VARS( I, J ) .NE. VAL__BADR ) THEN
+            IF ( STACK( I, J ) .NE. VAL__BADR .AND.
+     :            VARS( I, J ) .NE. VAL__BADR .AND.
+     :            VARS( I, J ) .GT. VAL__SMLR ) THEN
 
 *  Increment good value counter.
                NGOOD = NGOOD + 1
@@ -191,7 +195,7 @@
             CALL CCG1_IS3R( WRK1, WRK2, POINT, NGOOD, STATUS )
 
 *  Find the weighted median.
-            IF( CALCMV ) THEN
+            IF ( CALCMV ) THEN
                CALL CCG1_WTM3R( CALCMV, WRK1, WRK2, SVAR, NGOOD, USED,
      :                          COVEC( 1, NGOOD ), VAL, VAR, STATUS )
             ELSE

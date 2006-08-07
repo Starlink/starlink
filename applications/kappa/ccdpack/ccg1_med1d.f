@@ -55,6 +55,7 @@
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     BRADC: Brad Cavanagh (JAC)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -62,7 +63,9 @@
 *        Original version.
 *     11-OCT-2004 (BRADC):
 *        No longer use NUM_CMN.
-*     {enter_changes_here}
+*     2006 August 6 (MJC):
+*        Exclude data with non-positive variance.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -118,7 +121,7 @@
 *.
 
 
-*  Check inherited global status.
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Set the numeric error and set error flag value.
@@ -135,8 +138,9 @@
 *  Loop over all possible contributing pixels forming weighted mean
 *  sums.
          DO 5 J = 1, NLINES
-            IF( STACK( I, J ) .NE. VAL__BADD .AND.
-     :           VARS( I, J ) .NE. VAL__BADD ) THEN
+            IF ( STACK( I, J ) .NE. VAL__BADD .AND.
+     :            VARS( I, J ) .NE. VAL__BADD .AND.
+     :            VARS( I, J ) .GT. VAL__SMLD ) THEN
 
 *  Convert input type to double precision before forming sums should be
 *  no numeric errors on this attempt.
