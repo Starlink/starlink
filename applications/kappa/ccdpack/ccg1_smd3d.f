@@ -65,6 +65,7 @@
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     BRADC: Brad Cavanagh (JAC)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -76,6 +77,8 @@
 *        are typical for each line. This was never the case.
 *     11-OCT-2004 (BRADC):
 *        No longer use NUM_CMN.
+*     2006 August 6 (MJC):
+*        Exclude data with non-positive or bad variance.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -157,7 +160,9 @@
 
 *  Loop over all possible contributing pixels.
          DO 2 J = 1, NLINES
-            IF( STACK( I, J ) .NE. VAL__BADD ) THEN
+            IF ( STACK( I, J ) .NE. VAL__BADD .AND.
+     :           VARS( J ) .NE. VAL__BADD .AND.
+     :           VARS( J ) .GT. VAL__SMLD ) THEN
 
 *  Increment good value counter.
                NGOOD = NGOOD + 1

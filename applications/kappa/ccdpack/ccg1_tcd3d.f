@@ -67,7 +67,9 @@
 *        No longer use NUM_CMN.
 *     2006 April 12 (MJC):
 *        Remove unused variable.
-*     {enter_changes_here}
+*     2006 August 6 (MJC):
+*        Exclude data with non-positive or bad variance.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -140,7 +142,9 @@
 
 *  Loop over all possible contributing pixels.
          DO 2 J = 1, NLINES
-            IF( STACK( I, J ) .NE. VAL__BADD ) THEN
+            IF ( STACK( I, J ) .NE. VAL__BADD .AND.
+     :           VARS( J ) .NE. VAL__BADD .AND.
+     :           VARS( J ) .GT. VAL__SMLD ) THEN
 
 *  Increment good value counter.
                NGOOD = NGOOD + 1

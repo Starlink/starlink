@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_SCD3( NSIGMA, STACK, NPIX, NLINES, VARS, MINPIX,
+*     CALL CCG1_SCD3D( NSIGMA, STACK, NPIX, NLINES, VARS, MINPIX,
 *                     RESULT, WRK1, WRK2, NCON, POINT, USED, STATUS )
 
 *  Description:
@@ -65,6 +65,7 @@
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     BRADC: Brad Cavanagh (JAC)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -76,7 +77,9 @@
 *        are typical for each line. This was never the case.
 *     11-OCT-2004 (BRADC):
 *        No longer use NUM_CMN.
-*     {enter_changes_here}
+*     2006 August 6 (MJC):
+*        Exclude data with non-positive or bad variance.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -153,7 +156,9 @@
 
 *  Loop over all possible contributing pixels.
          DO 2 J = 1, NLINES
-            IF( STACK( I, J ) .NE. VAL__BADD ) THEN
+            IF ( STACK( I, J ) .NE. VAL__BADD .AND.
+     :           VARS( J ) .NE. VAL__BADD .AND.
+     :           VARS( J ) .GT. VAL__SMLD ) THEN
 
 *  Increment good value counter.
                NGOOD = NGOOD + 1
@@ -210,8 +215,8 @@
                DVAL2 = VAL + DBLE( NSIGMA ) * SQRT( VAR )
 
 *  Clip unwanted data.
-               CALL CCG1_CLIPD( WRK1, NGOOD, DVAL1, DVAL2, IGOOD, STATUS
-     : )
+               CALL CCG1_CLIPD( WRK1, NGOOD, DVAL1, DVAL2, IGOOD,
+     :                          STATUS )
 
 *  If any values have been rejected then form new mean.
                IF ( IGOOD .GT. 0 ) THEN
