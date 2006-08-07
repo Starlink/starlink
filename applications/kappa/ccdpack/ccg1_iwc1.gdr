@@ -69,6 +69,8 @@
 *        inverse data variance in the weights.
 *     2006 February 9 (MJC):
 *        Correct normalisation of the returned variances.
+*     2006 August 6 (MJC):
+*        Exclude data with non-positive variance.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -148,6 +150,7 @@
          DO 5 J = 1, NLINES
             IF (  STACK( I, J ) .NE. VAL__BAD<T> .AND.
      :             VARS( I, J ) .NE. VAL__BAD<T> .AND.
+     :             VARS( I, J ) .GT. VAL__SML<T> .AND.
      :           COORDS( I, J ) .NE. VAL__BAD<T> ) THEN
 
 *  Conversion increment good value counter.
