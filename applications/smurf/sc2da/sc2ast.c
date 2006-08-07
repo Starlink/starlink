@@ -2,6 +2,7 @@
 #include <math.h>
 #include <string.h>
 
+#include "star/slalib.h"
 #include "sae_par.h"
 #include "ast.h"
 #include "ndf.h"
@@ -100,6 +101,7 @@ int *status             /* global status (given and returned) */
      12Apr2006 : added jig_az_x/y, remove extra_frames from interface (ec)
      18Apr2006 : Use a ShiftMap to apply jig_az_x/y (dsb)
      19Apr2006 : Only use shiftmap if non-zero jig_az_x/y (ec)
+     7Aug2006  : Correct rotation matrix in sc2ast_maketanmap (dsb)
 */
 
 {
@@ -346,11 +348,11 @@ int *status             /* global status (given and returned) */
       map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
                                                       flipmap, 1, "" );
 
-/* Correct for polynomial distortion */
+/* Correct for polynomial distortion */      
       polymap = astPolyMap( 2, 2, 14, coeff_f, 14, coeff_i, "" );
       map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
-                                                      polymap, 1, "" );
-
+						      polymap, 1, "" );
+      
 /* Convert from mm to radians (but these coords are still cartesian (x,y)
    (i.e. measured in the tangent plane) rather than spherical (lon,lat)
    measured on the sky. */
@@ -963,23 +965,29 @@ int *status               /* global status (given and returned) */
    pole, the X axis points to (lon,lat)=(0,0) and the Y axis points to 
    (lon,lat) = (90 degs,0) (the slalib convention). */
 
+
+
+
+/*   slaDeuler( "ZYZ", -lat, PI/2-lat, -lon, mat ); */
+
+
    ct = cos( lat );
    st = sin( lat );
    cn = cos( lon );
    sn = sin( lon );
 
-   t1 = cn*st;
-   t2 = sn*ct;
-   t3 = ct*cn;
+   t1 = ct*st;
+   t2 = -st*st;
+   t3 = ct*ct;
 
-   mat[ 0 ] = t1*ct;
-   mat[ 1 ] = -t1*st - t2;
-   mat[ 2 ] = t3;
-   mat[ 3 ] = st*t2 + t1;
-   mat[ 4 ] = -sn*st*st + t3;
-   mat[ 5 ] = t2;
-   mat[ 6 ] = -ct*ct;
-   mat[ 7 ] = st*ct;
+   mat[ 0 ] = t1*cn - st*sn;
+   mat[ 1 ] = t2*cn - sn*ct;
+   mat[ 2 ] = -ct*cn;
+   mat[ 3 ] = t1*sn + st*cn;
+   mat[ 4 ] = t2*sn + cn*ct;
+   mat[ 5 ] = -ct*sn;
+   mat[ 6 ] = t3;
+   mat[ 7 ] = -t1;
    mat[ 8 ] = st;
 
    matmap = astMatrixMap( 3, 3, 0, mat, "" );
