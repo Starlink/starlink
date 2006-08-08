@@ -28,26 +28,25 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <ctype.h>
 #include "f77.h"
 #include "sae_par.h"
 #include "merswrap.h"
+#include "star/grp.h"
 #include <tcl.h>
 
 #define DTOR 0.017453292519943295769
 
-#define GRP__NOID 0
 #define PACK_DIR "POLPACK_DIR"
 #define CVAL_LENGTH 80   
 
-extern F77_SUBROUTINE(grp_grpsz)( INTEGER(igrp), INTEGER(size),
-                                  INTEGER(status) );
-extern F77_SUBROUTINE(grp_infoc)( INTEGER(igrp), INTEGER(index),
-                                  CHARACTER(item), CHARACTER(value),
-                                  INTEGER(status) TRAIL(item) TRAIL(value) );
 extern F77_SUBROUTINE(err_rep)( CHARACTER(param), CHARACTER(mess),
                                 INTEGER(STATUS) TRAIL(param) TRAIL(mess) );
 
 extern F77_SUBROUTINE(cat_rapnd)( INTEGER(ciout), INTEGER(status) );
+extern F77_SUBROUTINE(cat_put0c)( INTEGER(gid), CHARACTER(val), LOGICAL(no), INTEGER(status) TRAIL(val) );
+extern F77_SUBROUTINE(cat_put0i)( INTEGER(gid), INTEGER(val), LOGICAL(no), INTEGER(status) );
 extern F77_SUBROUTINE(cat_put0r)( INTEGER(gid), REAL(val), LOGICAL(no), INTEGER(status) );
 extern F77_SUBROUTINE(cat_put0d)( INTEGER(gid), DOUBLE(dval), LOGICAL(no), INTEGER(status) );
 
@@ -58,7 +57,7 @@ static char *split( char * );
 static void Error( const char *, int * );
 static const char *Envir( const char *, int * );
 static void SetVar( FILE *, char *, char *, int, int * );
-static char *GetName( int, int, int * );
+static char *GetName( Grp *, int, int * );
 static void SetSVar( FILE *, const char *, const char *, int, int * );
 static int GetSVar( const char *, char *, int, int * );
 static void SetIVar( FILE *, const char *, int, int * );
@@ -198,6 +197,8 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *        TCL script.
 *     7-OCT-2002 (DSB):
 *        Replaced tmpnam calls with mkstemp.
+*     8-AUG-2006 (DSB):
+*        Use C interface for GRP.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -238,6 +239,11 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 
 #define BUFLEN 512
 
+   Grp *grp1;
+   Grp *grp2;
+   Grp *grp3;
+   Grp *grp4;
+   Grp *grps;
    char buf[BUFLEN];
    char *dir = NULL;
    char *name = NULL;
@@ -247,8 +253,6 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    char *value = NULL;
    int i;
    int report;
-   int j;
-   int n;                      
    int size;
    FILE *fd = NULL;
    int fd1, fd2;
@@ -293,36 +297,42 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
       SetVar( fd, "REFONLY", "0", 0, STATUS );
    }
 
+/* Create Grp structures holding the supplied GRPidentifiers. */
+   grp1 = grpF2C( *IGRP1, STATUS );
+   grp2 = grpF2C( *IGRP2, STATUS );
+   grp3 = grpF2C( *IGRP3, STATUS );
+   grp4 = grpF2C( *IGRP4, STATUS );
+   grps = grpF2C( *IGRPS, STATUS );
+
 /* Get the number of images to process. */
-   F77_CALL(grp_grpsz)( INTEGER_ARG(IGRP1), INTEGER_ARG(&size),
-                        INTEGER_ARG(STATUS) );
+   grpGrpsz( grp1, &size, STATUS );
 
 /* Append the name of the input images in the file to variable "in_list". */
    for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
-      name = GetName( *IGRP1, i, STATUS );
+      name = GetName( grp1, i, STATUS );
       SetVar( fd, "in_list", name, 1, STATUS );
    }
 
 /* If producing Stokes parameters as output, store the name of the output
    data set in variable "stokes". */
-   if( *IGRP4 != GRP__NOID ) {
-      name = GetName( *IGRP4, 1, STATUS );
+   if( grp4 ) {
+      name = GetName( grp4, 1, STATUS );
       SetVar( fd, "stokes", name, 0, STATUS );
    }
 
 /* Store the name of the O-ray output images in Tcl variable "o_list". */
-   if( *IGRP2 != GRP__NOID ) {
+   if( grp2 ) {
       for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
-         name = GetName( *IGRP2, i, STATUS );
+         name = GetName( grp2, i, STATUS );
          SetVar( fd, "o_list", name, 1, STATUS );
       }
    }
 
 /* Do the same for the E-ray output images (if in dual-beam mode). */
-   if( *IGRP3 != GRP__NOID ) {
+   if( grp3 ) {
       if( F77_ISTRUE(*DBEAM) ) {
          for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
-            name = GetName( *IGRP3, i, STATUS );
+            name = GetName( grp3, i, STATUS );
             SetVar( fd, "e_list", name, 1, STATUS );
          }
       }
@@ -331,7 +341,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 /* Store the sky frames in "sky_list" if any have been supplied. */
    if( *SSIZE > 0 ) {
       for( i = 1; i <= *SSIZE && *STATUS == SAI__OK; i++ ){
-         name = GetName( *IGRPS, i, STATUS );
+         name = GetName( grps, i, STATUS );
          SetVar( fd, "sky_list", name, 1, STATUS );
       }
    }
@@ -374,7 +384,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    if( LOGFIL_length > 0 ) {
       SetSVar( fd, "ATASK_LOGFILE", LOGFIL, LOGFIL_length, STATUS );
    }
-   if( *IGRP4 != GRP__NOID ) {
+   if( grp4 ) {
       SetSVar( fd, "ATASK_POLMODE", MODE, MODE_length, STATUS );
    }
 
@@ -520,7 +530,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                (void) GetSVar( value, SELCOL, SELCOL_length, STATUS );
 
             } else if( !strcmp( buf, "ATASK_MODE" ) ) {
-               if( *IGRP4 != GRP__NOID ) {
+               if( grp4 ) {
                   (void) GetSVar( value, MODE, MODE_length, STATUS );
                }
             } 
@@ -535,6 +545,14 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 
 /* Free the memory holding the TCL script name. */
    if( script ) free( script );
+
+/* Free the Grp structures holding the supplied GRP identifiers. */
+   grp1 = grpFree( grp1, STATUS );
+   grp2 = grpFree( grp2, STATUS );
+   grp3 = grpFree( grp3, STATUS );
+   grp4 = grpFree( grp4, STATUS );
+   grps = grpFree( grps, STATUS );
+
 
 }
 
@@ -639,8 +657,6 @@ static void SetVar( FILE *fd,  char *name,  char *value, int list, int *STATUS )
 *     
 */
 
-   char mess[80];
-
    if( *STATUS != SAI__OK ) return;
 
 
@@ -656,7 +672,7 @@ static void SetVar( FILE *fd,  char *name,  char *value, int list, int *STATUS )
    fputs( "\"\n", fd );
 }
 
-static char *GetName( int igrp, int i, int *STATUS ) {
+static char *GetName( Grp *grp, int i, int *STATUS ) {
 /*
 *  Name:
 *     GetName
@@ -666,14 +682,14 @@ static char *GetName( int igrp, int i, int *STATUS ) {
 
 *  Description:
 *     This function returns a pointer to a null-terminated C string holding 
-*     an element of a supplied GRP group.
+*     an element of a supplied GRP group, converted to upper case.
 
 *  Parameters:
-*     igrp = int (Given)
-*        The GRP identifier for the group.
+*     grp = Grp * (Given)
+*        Pointer to the GRP group.
 *     i = int (Given)
 *        The index of the element to return.
-*     STATUS = *int (Given and Returned)
+*     STATUS = int * (Given and Returned)
 *        The inherited status.
 
 *  Returned Value:
@@ -682,50 +698,17 @@ static char *GetName( int igrp, int i, int *STATUS ) {
 *     
 */
 
-   DECLARE_CHARACTER(item,4);
-   DECLARE_CHARACTER(name,256);
-   DECLARE_INTEGER(IGRP);
-   DECLARE_INTEGER(I);
+/* Local Variables */
    static char buffer[256];
-   char *ret;
-   int j;
 
 /* Check the inherited status. */
    if( *STATUS != SAI__OK ) return NULL;
 
-/* Store a Fortran string with the value "NAME" for use with GRP_INFOC. */
-   item[0] = 'N';
-   item[1] = 'A';
-   item[2] = 'M';
-   item[3] = 'E';
-
 /* Get the name from the group. */
-   IGRP = igrp;
-   I = i;
-
-   F77_CALL(grp_infoc)( INTEGER_ARG(&IGRP), INTEGER_ARG(&I),
-                        CHARACTER_ARG(item), CHARACTER_ARG(name),
-                        INTEGER_ARG(STATUS) TRAIL_ARG(item)
-                        TRAIL_ARG(name) );
-
-/* Replace all trailing blank characters in the returned Fortran string with 
-   null characters. */
-   if( *STATUS == SAI__OK ) {
-      strcpy( buffer, name );
-      for( j = name_length - 1; j >= 0; j-- ) {
-         if( isspace( (int) buffer[j] ) ) {
-            buffer[j] = 0;
-         } else {
-            break;
-         }
-      }
-      ret = buffer;
-   } else {
-      ret = NULL;
-   }
+   grpInfoc( grp, i, "NAME", buffer, 256, STATUS );
 
 /* Return the pointer. */
-   return ret;
+   return ( *STATUS == SAI__OK ) ? buffer : NULL;
 }
 
 static void SetSVar( FILE *interp, const char *var, const char *string, 
@@ -817,7 +800,7 @@ static int GetSVar( const char *val, char *string, int len, int *STATUS ) {
    int i;
 
 /* Check the inherited status. */
-   if( *STATUS != SAI__OK ) return;
+   if( *STATUS != SAI__OK ) return 0;
 
    for( i = 0; i < len; i++ ) string[ i ] = ' ';
    n = strlen( val );
@@ -1295,7 +1278,7 @@ static char *cstring( const char *fstring, int len, int *STATUS ) {
 *     cstring
 
 *  Purpose:
-*     Returns a pointer to dynaically allocated memory holding a null
+*     Returns a pointer to dynamically allocated memory holding a null
 *     terminated copy of an F77 string.
 
 *  Description:
@@ -1319,7 +1302,7 @@ static char *cstring( const char *fstring, int len, int *STATUS ) {
    ret = NULL;
 
 /* Check the inherited status. */
-   if( *STATUS != SAI__OK ) return;
+   if( *STATUS != SAI__OK ) return ret;
 
 /* Find the length excluding any trailing spaces. */
    len = len - 1;
@@ -1421,7 +1404,7 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
    DECLARE_CHARACTER(cval,CVAL_LENGTH);
    char mess[255];
    char *file;
-   int i, ok, n, use, nc, found, type;
+   int ok, n, use, nc, found, type;
    char buf[81];
    char txtbuf[81];
    char *p, *e, *q, *key, *pkey;

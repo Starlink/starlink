@@ -16,7 +16,6 @@
 #define FITSCOMCOL         32
 #define FITSCARDLEN        80
 #define MXLIT              80
-#define GRP__NOID          0
 
 /* A macro which tests a character to see if it can be used within a FITS 
    keyword name. We include lower case letters here, but they are considered
@@ -39,6 +38,7 @@
 #include "cnf.h" 
 #include "mers.h" 
 #include "ast.h" 
+#include "star/grp.h"
 #include <ctype.h>
 #include <float.h>
 #include <limits.h>
@@ -54,19 +54,9 @@
 
 /* Prototypes for Functions. */
 /* ========================= */
-extern F77_SUBROUTINE(grp_infoc)( INTEGER(igrp), INTEGER(index),
-                                  CHARACTER(item), CHARACTER(value),
-                                  INTEGER(status) TRAIL(item) TRAIL(value) );
-
-extern F77_SUBROUTINE(grp_index)( CHARACTER(name), INTEGER(igrp),
-                                  INTEGER(start), INTEGER(index), 
-                                  INTEGER(status) TRAIL(name) );
-
 extern F77_SUBROUTINE(chr_ctod)( CHARACTER(cval), DOUBLE(dval),
                                  INTEGER(status) TRAIL(cval) );
 
-char *pol1GetName( int, int, int * );
-int pol1FindName( int, char *, int * );
 int pol1Split( const char *, char **, char **, char **, int *);
 int pol1Ustrcmp( const char *, const char * );
 int pol1Ustrncmp( const char *, const char *, size_t );
@@ -76,14 +66,14 @@ unsigned char *pol1Fchr( unsigned char *, unsigned char *,
                          unsigned char, int * );
 
 int pol1Teval( unsigned char *, unsigned char *, AstFitsChan *, 
-                int, int, char **, char *, int * );
+                Grp *, Grp *, char **, char *, int * );
 
 int pol1Ceval( unsigned char *, unsigned char *, AstFitsChan *, 
-                int, int, char **, char *, int * );
+               Grp *, Grp *, char **, char *, int * );
 
 unsigned char *pol1Seval( unsigned char *, unsigned char *, 
-                          AstFitsChan *, int, int, 
-                          int, char **, char *, int *, 
+                          AstFitsChan *, int, Grp *, 
+                          Grp *, char **, char *, int *, 
                           int * );
 
 int pol1Cmpr( char *, char *, char *, char * );
@@ -188,6 +178,9 @@ F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
 *  History:
 *     23-APR-1999 (DSB):
 *        Original version.
+*     8-AUG-2006 (DSB):
+*        Change to use GRP C interface.
+*        Fix bug that caused mis-handling of spaces.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -196,7 +189,7 @@ F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
 */
 
 
-/* Argyments: */
+/* Arguments: */
       GENPTR_CHARACTER(EXPR)
       GENPTR_INTEGER(FCHAN)
       GENPTR_INTEGER(IGRP1)
@@ -206,6 +199,8 @@ F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
       GENPTR_INTEGER(STATUS)
 
 /* Local Variables: */
+      Grp *grp1;              /* Pointer to IGRP1 group */
+      Grp *grp2;              /* Pointer to IGRP2 group */
       char *c;                /* Pointer to next input character */
       char quote;             /* The opening quote character */
       char *v;                /* Pointer to start of returned value string */
@@ -269,7 +264,7 @@ F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
    non-zero if any characters are found which can only appear within
    character functions. Also remove any uncessarary delimiters before
    or after an equals sign or a concatentation operator (//). */
-         } else if( *c == ' ' || *c == ',' && quote == ' ' ){
+         } else if( ( *c == ' ' || *c == ',' ) && quote == ' ' ){
             if( *( d - 1 ) != DELIM && 
                 *( d - 1 ) != EQUALS &&
                 *( d - 1 ) != CONCAT ) *(d++) = DELIM;
@@ -312,11 +307,19 @@ F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
 /* Terminate the string. */
       *d = 0;
 
+/* Convert the supplied F77 GRP identifiers into C GRP pointers. */
+      grp1 = grpF2C( *IGRP1, STATUS );
+      grp2 = grpF2C( *IGRP2, STATUS );
+
 /* Process the whole expression. */
       v = VALUE;
       vl = VALUE + VALUE_length - 1;
-      ok = pol1Ceval( expr, d, astI2P( *FCHAN ), *IGRP1, *IGRP2, &v, 
-                            vl, STATUS ) || ok;
+      ok = pol1Ceval( expr, d, astI2P( *FCHAN ), grp1, grp2, &v, 
+                      vl, STATUS ) || ok;
+
+/* Free the Grp structurs used to hold the F77 GRP identifiers. */
+      grp1 = grpFree( grp1, STATUS );
+      grp2 = grpFree( grp2, STATUS );
 
 /* Pad the returned string with spaces. */
       for( ; v < vl; v++ ) *v = ' ';
@@ -337,7 +340,7 @@ F77_SUBROUTINE(pol1_ceval)( CHARACTER(EXPR), INTEGER(FCHAN), INTEGER(IGRP1),
 }
 
 int pol1Ceval( unsigned char *e0, unsigned char *e1, AstFitsChan *fchan, 
-                 int igrp1, int igrp2, char **v, char *vl, int *status ){
+               Grp *grp1, Grp *grp2, char **v, char *vl, int *status ){
 /*
 *  Name:
 *     pol1Ceval
@@ -350,7 +353,7 @@ int pol1Ceval( unsigned char *e0, unsigned char *e1, AstFitsChan *fchan,
 
 *  Synopsis:
 *     int pol1Ceval( unsigned char *e0, unsigned char *e1, 
-*                    AstFitsChan *fchan, int igrp1, int igrp2, char **v, 
+*                    AstFitsChan *fchan, Grp *grp1, Grp *grp2, char **v, 
 *                    char *vl, int *status )
 
 *  Description:
@@ -370,12 +373,12 @@ int pol1Ceval( unsigned char *e0, unsigned char *e1, AstFitsChan *fchan,
 *        A pointer to an AST FitsChan containing the FITS header cards to 
 *        be used when resolving references to FITS keywords contained in
 *        the expression.
-*     igrp1 
-*        A GRP identifier for a group holding HDS data types. Ignored
-*        if either igrp1 or igrp2 is GRP__NOID.
-*     igrp1
-*        A GRP identifier for a group holding FITS keyword names. Ignored
-*        if either igrp1 or igrp2 is GRP__NOID.
+*     grp1 
+*        Pointer to the GRP group holding HDS data types. Ignored
+*        if either grp1 or grp2 is NULL.
+*     grp2
+*        Pointer to the GRP group holding FITS keyword names. Ignored
+*        if either grp1 or grp2 is NULL.
 *     v 
 *        Address of a pointer to the start of the string to receive the string
 *        corresponding to the expression. The pointer is updated on exit
@@ -402,6 +405,8 @@ int pol1Ceval( unsigned char *e0, unsigned char *e1, AstFitsChan *fchan,
 *  History:
 *     26-APR-1999 (DSB):
 *        Original version.
+*     8-AUG-2006 (DSB):
+*        Change to use GRP C interface.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -410,7 +415,6 @@ int pol1Ceval( unsigned char *e0, unsigned char *e1, AstFitsChan *fchan,
 */
 
 /* Local Variables: */
-      int nest;               /* Level of parenthesis nesting */
       int ok;                 /* Was expression evaluated succesfully? */
       unsigned char *d;       /* Pointer to next output character */
       unsigned char *e;       /* Pointer to first character in the next term */
@@ -430,7 +434,7 @@ int pol1Ceval( unsigned char *e0, unsigned char *e1, AstFitsChan *fchan,
          e = pol1Fchr( d, e1, CONCAT, status );
 
 /* Process this term. */
-         ok = ok && pol1Teval( d, e, fchan, igrp1, igrp2, v, vl, status );
+         ok = ok && pol1Teval( d, e, fchan, grp1, grp2, v, vl, status );
 
 /* Make d point to the first character in the next term. */
          d = e + 1;
@@ -1147,7 +1151,7 @@ int pol1Ustrncmp( const char *a, const char *b, size_t n ){
 }
 
 int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan, 
-               int igrp1, int igrp2, char **v, char *vl, int *status ){
+               Grp *grp1, Grp *grp2, char **v, char *vl, int *status ){
 /*
 *  Name:
 *     pol1Teval
@@ -1160,7 +1164,7 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
 
 *  Synopsis:
 *     int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan, 
-*                    int igrp1, int igrp2, char **v, char *vl, int *status )
+*                    Grp *grp1, Grp *grp2, char **v, char *vl, int *status )
 
 *  Description:
 *   This routine evaluates a single term of an expression. A term has the
@@ -1191,12 +1195,12 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
 *        A pointer to an AST FitsChan containing the FITS header cards to 
 *        be used when resolving references to FITS keywords contained in
 *        the expression.
-*     igrp1 
-*        A GRP identifier for a group holding HDS data types. Ignored
-*        if either igrp1 or igrp2 is GRP__NOID.
-*     igrp1
-*        A GRP identifier for a group holding FITS keyword names. Ignored
-*        if either igrp1 or igrp2 is GRP__NOID.
+*     grp1 
+*        Pointer to the GRP group holding HDS data types. Ignored
+*        if either grp1 or grp2 is NULL.
+*     grp2
+*        Pointer to the GRP group holding FITS keyword names. Ignored
+*        if either grp1 or grp2 is NULL.
 *     v 
 *        Address of a pointer to the start of the string to receive the string
 *        corresponding to the expression. The pointer is updated on exit
@@ -1223,6 +1227,8 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
 *  History:
 *     26-APR-1999 (DSB):
 *        Original version.
+*     8-AUG-2006 (DSB):
+*        Change to use GRP C interface.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -1243,7 +1249,6 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
       char *v0;           /* Pointer to returned string */
       int dummy;          /* Dummy argument */
       int ok;             /* Expression ok? */
-      int type;           /* AST data type */
       int test_done;      /* Have any comparisons been performed? */
       int match_found;    /* Have any matches been found? */
 
@@ -1267,7 +1272,7 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
 
 /* The first component in the term gives a value which may be modified by
    later words in the term. Store the corresponding string at v. */
-      d = pol1Seval( t0, t1, fchan, 1, igrp1, igrp2, v, vl, &ok, status );
+      d = pol1Seval( t0, t1, fchan, 1, grp1, grp2, v, vl, &ok, status );
       if( *status != SAI__OK ) return ok;
 
 /* The character following the first component must be a delimiter or the
@@ -1288,7 +1293,7 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
    keywords here. */
          lhs0 = lhs;
          lhs1 = lhs;
-         e = pol1Seval( d, t1, fchan, 0, igrp1, igrp2, &lhs1, 
+         e = pol1Seval( d, t1, fchan, 0, grp1, grp2, &lhs1, 
                         lhs0 + MXLIT - 1, &dummy, status );
          if( *status != SAI__OK ) return ok;
 
@@ -1311,7 +1316,7 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
    references to FITS keywords here. */
          rhs0 = rhs;
          rhs1 = rhs;
-         f = pol1Seval( e, t1, fchan, 0, igrp1, igrp2, &rhs1, rhs0 + MXLIT - 1, 
+         f = pol1Seval( e, t1, fchan, 0, grp1, grp2, &rhs1, rhs0 + MXLIT - 1, 
                         &dummy, status );
          if( *status != SAI__OK ) {
             *status = SAI__ERROR;
@@ -1351,8 +1356,8 @@ int pol1Teval( unsigned char *t0, unsigned char *t1, AstFitsChan *fchan,
 
 
 unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1, 
-                          AstFitsChan *fchan, int fitsok, int igrp1, 
-                          int igrp2, char **v, char *vl, int *ok, 
+                          AstFitsChan *fchan, int fitsok, Grp *grp1, 
+                          Grp *grp2, char **v, char *vl, int *ok, 
                           int *status ){
 /*
 *  Name:
@@ -1366,8 +1371,8 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 
 *  Synopsis:
 *     unsigned char *polSeval( unsigned char *t0, unsigned char *t1, 
-*                              AstFitsChan *fchan, int fitsok, int igrp1, 
-*                              int igrp2, char **v, char *vl, int *ok, 
+*                              AstFitsChan *fchan, int fitsok, Grp *grp1, 
+*                              Grp *grp2, char **v, char *vl, int *ok, 
 *                              int *status )
 
 *  Description:
@@ -1399,12 +1404,12 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 *     fitsok
 *        If non-zero, then the first component can be a reference to a
 *        FITS keyword, in which case the stored string is the keyword value.
-*     igrp1 
-*        A GRP identifier for a group holding HDS data types. Ignored
-*        if either igrp1 or igrp2 is GRP__NOID.
-*     igrp1
-*        A GRP identifier for a group holding FITS keyword names. Ignored
-*        if either igrp1 or igrp2 is GRP__NOID.
+*     grp1 
+*        Pointer to a GRP group holding HDS data types. Ignored if either 
+*        grp1 or grp2 is NULL.
+*     grp1
+*        Pointer to a GRP group holding FITS keyword names. Ignored if either 
+*        grp1 or grp2 is NULL.
 *     v 
 *        Address of a pointer to the start of the string to receive the string
 *        corresponding to the expression. 
@@ -1432,6 +1437,9 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 *  History:
 *     26-APR-1999 (DSB):
 *        Original version.
+*     8-AUG-2006 (DSB):
+*        Change to use GRP C interface.
+*        Fix bug that caused mis-interpretation of quoted strings.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -1445,10 +1453,11 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
       char *name;         /* Pointer to start of FITS keyword name */
       char *text;         /* Pointer to declared data type text string */
       char *value;        /* Pointer to start of FITS keyword value */
+      char buffer[256];   /* Buffer for GRP element */
       char card[81];      /* Entire FITS header card for found keyword */
       char fname[20];     /* Null-terminated FITS keyword name string */
       int dtype;          /* Declared data type */
-      int idec;           /* Index of FITS name within IGRP2 */
+      int idec;           /* Index of FITS name within GRP2 */
       int type;           /* AST data type */
       unsigned char *d;   /* Pointer to next delimiter */
       unsigned char *e;   /* Pointer to next unsigned character*/
@@ -1482,7 +1491,7 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
          }
 
 /*  Process the string within the parentheses as a new expression. */
-         *ok = pol1Ceval( d + 1, e, fchan, igrp1, igrp2, v, vl, status );
+         *ok = pol1Ceval( d + 1, e, fchan, grp1, grp2, v, vl, status );
          if( *status == SAI__OK ) ret = e + 1;
             
 /* If the first character is a quoted string. */
@@ -1571,10 +1580,14 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 /* See if it is explicitly declared in the control table. The declared 
    type over-rides the natural type. */
                dtype = AST__NOTYPE;
-               if( igrp1 != GRP__NOID && igrp2 != GRP__NOID ) {
-                  idec = pol1FindName( igrp2, name, status );
+               if( grp1 != NULL && grp2 != NULL ) {
+                  grpIndex( name, grp2, 1, &idec, status );
                   if( idec > 0 ) {
-                     text = pol1GetName( igrp1, idec, status );
+
+/* Get it using grpInfoc, which converts the name to upper case. */
+                     grpInfoc( grp1, idec, "NAME", buffer, 256, status );
+                     text = ( *status == SAI__OK ) ? buffer : NULL;     
+
                      if( !pol1Ustrcmp( text, "_DOUBLE") || 
                          !pol1Ustrcmp( text, "_REAL") ){
                         dtype = AST__FLOAT;
@@ -1651,7 +1664,7 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 /* If it cannot be a FITS keyword, return the first component as a literal
    string. */
          } else {
-            for( ; d < ret & *v < vl; d++ ) *((*v)++) = *d;
+            for( ; d < ret && *v < vl; d++ ) *((*v)++) = *d;
             *ok = 0;
          }
       }
@@ -1659,129 +1672,6 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
       return ret;
 
 }
-
-
-char *pol1GetName( int igrp, int i, int *status ) {
-/*
-*  Name:
-*     pol1GetName
-
-*  Purpose:
-*     Gets an element out of a GRP group.
-
-*  Description:
-*     This function returns a pointer to a null-terminated C string holding 
-*     an element of a supplied GRP group.
-
-*  Parameters:
-*     igrp 
-*        The GRP identifier for the group.
-*     i 
-*        The index of the element to return.
-*     status 
-*        The inherited status.
-
-*  Returned Value:
-*     A pointer to a static string holding the element. This string should not 
-*     be modified or freed by the caller.
-*     
-*/
-
-      DECLARE_CHARACTER(item,4);
-      DECLARE_CHARACTER(name,256);
-      DECLARE_INTEGER(IGRP);
-      DECLARE_INTEGER(I);
-      static char buffer[256];
-      char *ret;
-      int j;
-
-/* Check the inherited status. */
-      if( *status != SAI__OK ) return NULL;
-
-/* Store a Fortran string with the value "NAME" for use with GRP_INFOC. */
-      item[0] = 'N';
-      item[1] = 'A';
-      item[2] = 'M';
-      item[3] = 'E';
-
-/* Get the name from the group. */
-      IGRP = igrp;
-      I = i;
-
-      F77_CALL(grp_infoc)( INTEGER_ARG(&IGRP), INTEGER_ARG(&I),
-                           CHARACTER_ARG(item), CHARACTER_ARG(name),
-                           INTEGER_ARG(status) TRAIL_ARG(item)
-                           TRAIL_ARG(name) );
-
-/* Replace all trailing blank characters in the returned Fortran string with 
-   null characters. */
-      if( *status == SAI__OK ) {
-         strcpy( buffer, name );
-         for( j = name_length - 1; j >= 0; j-- ) {
-            if( isspace( (int) buffer[j] ) ) {
-               buffer[j] = 0;
-            } else {
-               break;
-            }
-         }
-         ret = buffer;
-      } else {
-         ret = NULL;
-      }
-
-/* Return the pointer. */
-      return ret;
-}
-
-int pol1FindName( int igrp, char *name, int *status ){
-/*
-*  Name:
-*     pol1FindName
-
-*  Purpose:
-*     Finds an element in a GRP group.
-
-*  Description:
-*     This function searches for a given element within a GRP group and
-*     returns its index within the group.
-
-*  Parameters:
-*     igrp 
-*        The GRP identifier for the group.
-*     name
-*        A null terminated string to search for.
-*     status 
-*        The inherited status.
-
-*  Returned Value:
-*     The index of the found string, or zero if the string was not found
-*     or if an error occurred.
-*/
-
-      DECLARE_CHARACTER(FNAME,256);
-      DECLARE_INTEGER(IGRP);
-      DECLARE_INTEGER(I);
-      DECLARE_INTEGER(START);
-      int i;
-
-/* Check the inherited status. */
-      if( *status != SAI__OK ) return 0;
-
-/* Copy the supplied null-terminated C string into a fixed length Fortran
-   string padded with spaces. */
-      for( i = 0; i < strlen( name ); i++ ) FNAME[ i ] = name[ i ];
-      for( ; i < FNAME_length; i++ ) FNAME[ i ] = ' ';
-
-/* Get the name from the group. */
-      IGRP = igrp;
-      START = 1;
-      F77_CALL(grp_index)( CHARACTER_ARG(FNAME), INTEGER_ARG(&IGRP),
-                           INTEGER_ARG(&START), INTEGER_ARG(&I), 
-                           INTEGER_ARG(status) TRAIL_ARG(FNAME) );
-
-      return (int) I;
-}
-
 
 F77_SUBROUTINE(pol1_gtfit)( INTEGER(FCHAN), CHARACTER(NAME), CHARACTER(VALUE), 
                             CHARACTER(TYPE), LOGICAL(THERE), INTEGER(STATUS) 
@@ -1846,7 +1736,6 @@ F77_SUBROUTINE(pol1_gtfit)( INTEGER(FCHAN), CHARACTER(NAME), CHARACTER(VALUE),
 /* Local Variables: */
       AstFitsChan *fchan;
       char *a;
-      char *b;
       char *comment;
       char *fname;
       char *name;
