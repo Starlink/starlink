@@ -82,6 +82,8 @@
 *        Moved into sc2sim_heatrun 
 *     2006-07-28 (JB):
 *        Changed sc2head to JCMTState
+*     2006-08-08 (EC):
+*        Removed slaDjcl prototype and instead include star/slalib.h
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -131,6 +133,7 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/slalib.h"
 
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
@@ -146,9 +149,6 @@
 #include "libsmf/smf.h"
 
 #include "f77.h"
-
-/* prototype for slalib routine that calculates mjd -> calendar date */
-void slaDjcl(double djm, int *iy, int *im, int *id, double *fd, int *j);
 
 #define FUNC_NAME "sc2sim_heatrun"
 #define LEN__METHOD 20

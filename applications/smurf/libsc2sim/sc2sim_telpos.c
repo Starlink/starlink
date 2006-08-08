@@ -44,6 +44,8 @@
 *        Original
 *     2006-07-21 (JB):
 *        Split from dsim.c
+*     2006-07-08 (EC)
+*        Replace cut-and-pasted slaDe2h/slaPa with library calls 
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -75,6 +77,7 @@
 
 /* Starlink includes */
 #include "ast.h"
+#include "star/slalib.h"
 
 /* SC2SIM includes */
 #include "sc2sim.h"
@@ -92,15 +95,12 @@ int *status          /* global status (given and returned) */
 
 {
    /* Local variables */
-   double cosp;      /* intermediate result */
    double phi;       /* latitude of telescope in radians */
    double ha;        /* hour angle in radians */
-   double r;         /* intermediate result */
-   double sinp;      /* intermediate result */
-   double x;         /* cartesian coordinates */
-   double y;         /* cartesian coordinates */
-   double z;         /* cartesian coordinates */
   
+   double sinp;      /* Intermediate result */
+   double cosp;      /* intermediate result */
+
     /* Check status */
    if ( !StatusOkP(status) ) return;
 
@@ -108,37 +108,8 @@ int *status          /* global status (given and returned) */
    phi = ( 19.0 + (49.0/60.0) + (33.0/3600.0) ) / AST__DR2D;
    ha = lst - ra;
 
-   /* Equivalent to slaDe2h ( ha, dec, phi, az, el );  */
+   slaDe2h( ha, dec, phi, az, el );
 
-   /* Az,El as x,y,z */
-   x = - cos(ha) * cos(dec) * sin(phi) + sin(dec) * cos(phi);
-   y = - sin(ha) * cos(dec);
-   z = cos(ha) * cos(dec) * cos(phi) + sin(dec) * sin(phi);
-
-   /* To spherical */
-   r = sqrt ( x*x + y*y );
-
-   if ( r < 1.0e-20 ) {
-      *az = 0.0;
-   } else {
-      *az = atan2 ( y, x );
-   }//if-else
-
-   if ( *az < 0.0 ) {
-      *az += 2.0 * AST__DPI;
-   }//if
-
-   *el = atan2 ( z, r );
-
-   /* *p = slaPa ( ha, dec, phi ); */
-
-   sinp = cos ( phi ) * sin ( ha );
-   cosp = sin ( phi ) * cos ( dec) - cos ( phi ) * sin ( dec) * cos ( ha );
-
-   if ( sinp != 0.0 || cosp != 0.0 ) {
-      *p = atan2 ( sinp, cosp );
-   } else {
-      *p = 0.0;
-   }//if-else
+   *p = slaPa( ha, dec, phi );
 
 }//sc2sim_telpos

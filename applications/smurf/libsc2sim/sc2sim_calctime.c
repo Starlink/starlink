@@ -43,6 +43,8 @@
 *        Original
 *     2006-07-20 (JB):
 *        Split from dsim.c
+*     2006-07-08 (EC)
+*        Replace cut-and-pasted slaGmst with library call 
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -74,6 +76,7 @@
 
 /* Starlink includes */
 #include "ast.h"
+#include "star/slalib.h"
 
 /* SC2SIM includes */
 #include "sc2sim.h"
@@ -113,17 +116,10 @@ int *status          /* global status (given and returned) */
    for(i=0; i<nsamp; i++) {
       ut[i] = mjdaystart + ((double) i)*sampday;
 
-      /* Julian centuries from fundamental epoch J2000 to this UT */
-      tu = ( ut[i] - 51544.5 ) / 36525.0;
+      gst = slaGmst( ut[i] );
 
-      /* GMST at this UT */
-      gst = dmod ( ut[i], 1.0 ) * D2PI +
-         ( 24110.54841 +
-	    ( 8640184.812866 +
-	  (      0.093104 - 6.2e-6 * tu ) * tu ) * tu ) * DS2R;
-    
       /* Calculate LST from GMST using telescope longitude */
-      lst[i] = fmod(gst - lon + D2PI,D2PI);
+      lst[i] = fmod(gst - lon + D2PI, D2PI);
    }//for
 
 }//sc2sim_calctime

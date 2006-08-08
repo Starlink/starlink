@@ -42,6 +42,8 @@
 *        Original
 *     2006-07-21 (JB):
 *        Split from dsim.c
+*     2006-07-08 (EC)
+*        Replace cut-and-pasted slaDh2e with library call 
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -71,6 +73,9 @@
 /* Standard includes */
 #include <math.h>
 
+/* Starlink includes */
+#include "star/slalib.h"
+
 /* SC2SIM includes */
 #include "sc2sim.h"
 
@@ -86,7 +91,7 @@ int *status         /* global status (given and returned) */
 
 {
    /* Local variables */
-   double phi, ha, x, y, z, r;
+   double phi, ha;
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
@@ -94,19 +99,7 @@ int *status         /* global status (given and returned) */
    /* JCMT is 19:49:33 N */
    phi = ( 19.0 + (49.0/60.0) + (33.0/3600.0) ) / AST__DR2D;
 
-/*
-   Equivalent to slaDh2e ( az, el, phi, ha, dec );
-*/
-
-   /* HA,Dec as x,y,z */
-   x = - cos(az) * cos(el) * sin(phi) + sin(el) * cos(phi);
-   y = - sin(az) * cos(el);
-   z = cos(az) * cos(el) * cos(phi) + sin(el) * sin(phi);
-
-   /* To spherical */
-   r = sqrt ( x * x + y * y );
-   ha = ( r == 0.0 ) ? 0.0 : atan2 ( y, x ) ;
-   *dec = atan2 ( z, r );
+   slaDh2e( az, el, phi, &ha, dec );
 
    *ra = lst - ha;
 
