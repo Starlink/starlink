@@ -64,6 +64,7 @@
 
 *  Authors:
 *     B.D.Kelly (ROE)
+*     J. Balfour (UBC)
 *     E.Chapin (UBC)
 *     {enter_new_authors_here}
 
@@ -118,7 +119,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
-#include "sc2da/sc2ast.h"s
+#include "sc2da/sc2ast.h"
 #include "smurf_par.h"
 
 /* Starlink Includes */
