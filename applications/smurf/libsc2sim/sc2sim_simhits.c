@@ -73,6 +73,8 @@
 *        Cloned from sc2sim_simulate
 *     2006-07-28 (JB):
 *        Changed sc2head to JCMTState
+*     2006-08-08 (JB)
+*        Replaced call to sc2sim_hor2eq with call to slaDh2e
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -122,6 +124,7 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/slalib.h"
 
 #include "jcmt/state.h"
 #include "sc2da/Dits_Err.h"
@@ -202,6 +205,7 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
    int nflat;                      /* number of flat coeffs per bol */
    int nwrite;                     /* number of frames to write */
    int outscan;                    /* count of scans completed */
+   double phi;                     /* latitude (radians) */
    double *posptr=NULL;            /* pointing: nasmyth offsets from cen. */ 
    int rowsize;                    /* row size for flatfield */
    double sky_az=0;                /* effective az on sky (bor+jig) */
@@ -415,9 +419,13 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 	    airmass[frame] = 1/sin(sky_el);
 	 else airmass[frame] = 1000.;
 
-	 /* Calculate equatorial from horizontal */
-	 sc2sim_hor2eq( bor_az[frame], bor_el[frame], lst[frame], 
-		        &temp1, &temp2, status );
+         /* Calculate equatorial from horizontal */
+
+         /* JCMT is 19:49:33 N */
+         phi = ( 19.0 + (49.0/60.0) + (33.0/3600.0) ) / AST__DR2D;
+         slaDh2e( bor_az[frame], bor_el[frame], phi, &temp1, &temp2 );
+         temp1 = lst[frame] - temp1;
+
 	 bor_ra[frame] = temp1;
 	 bor_dec[frame] = temp2;
 
