@@ -80,6 +80,8 @@
 *        Split from dsim.c
 *     2006-08-07 (EC)
 *        Removed dependence on sc2sim_telpos & sc2sim_bolcoords
+*     2006-08-08 (EC)
+*        Include sc2ast.h
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -116,6 +118,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "sc2da/sc2ast.h"s
 #include "smurf_par.h"
 
 /* Starlink Includes */
@@ -231,14 +234,13 @@ int *status              /* global status (given and returned) */
       a tangent plane projection because we chose El=0 */
 
    astSetC( fset, "SYSTEM", "AzEl" );
-   astTran2 ( fset, nboll, *ybolo, *xbolo, 1, *xbc, *ybc );
+   astTran2( fset, nboll, *ybolo, *xbolo, 1, *xbc, *ybc );
 
    /* xbc and ybc are in radians at this point. Convert to arcsec */
    for ( j=0; j<nboll; j++ ) {
      (*xbc)[j] *= DR2AS;
      (*ybc)[j] *= DR2AS;
    }
-
 
    /* Setup world coordinate information and get the bolometer positions in
       Nasmyth and native coordinates */
