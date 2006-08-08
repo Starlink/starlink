@@ -52,6 +52,8 @@
 *        groups (i.e. the F77 GRP__NOID value).
 *     25-JUN-2006 (TIMJ):
 *        Add grpCopy.
+*     8-AUG-2006 (DSB):
+*        Add grpIndex
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -481,7 +483,7 @@ void grpGrpex( const char *grpexp, const Grp *grp1, Grp *grp2,
   DECLARE_LOGICAL(FLAG);
   DECLARE_INTEGER(STATUS);
 
-  IGRP1 = grpC2F( grp1, status );
+  IGRP1 = grpC2F( (Grp *) grp1, status );
   IGRP2 = grpC2F( grp2, status );
 
   F77_CREATE_CHARACTER( GRPEXP, strlen(grpexp) );
@@ -501,6 +503,37 @@ void grpGrpex( const char *grpexp, const Grp *grp1, Grp *grp2,
   F77_IMPORT_LOGICAL( FLAG, *flag );
 
 }
+
+
+F77_SUBROUTINE(grp_index)( CHARACTER(NAME), INTEGER(IGRP),
+                           INTEGER(START), INTEGER(INDEX),
+                           INTEGER(STATUS) TRAIL(NAME) );
+
+void grpIndex( const char *name, const Grp *grp, int start, int *index, 
+               int *status ){
+  DECLARE_CHARACTER_DYN(NAME);
+  DECLARE_INTEGER(IGRP);
+  DECLARE_INTEGER(START);
+  DECLARE_INTEGER(INDEX);
+  DECLARE_INTEGER(STATUS);
+
+  IGRP = grpC2F( (Grp *) grp, status );
+
+  F77_CREATE_CHARACTER( NAME, strlen(name) );
+  F77_EXPORT_CHARACTER( name, NAME, NAME_length );
+  F77_EXPORT_INTEGER( start, START );
+  F77_EXPORT_INTEGER( *status, STATUS );
+  
+  F77_CALL(grp_index)( CHARACTER_ARG(NAME), INTEGER_ARG(&IGRP),
+                       INTEGER_ARG(&START), INTEGER_ARG(&INDEX),
+                       INTEGER_ARG(&STATUS) TRAIL_ARG(NAME) );
+
+  F77_FREE_CHARACTER( NAME );
+  F77_IMPORT_INTEGER( STATUS, *status );
+  F77_IMPORT_INTEGER( INDEX, *index );
+
+}
+
 
 F77_SUBROUTINE(grp_copy)( INTEGER(IGRP1), INTEGER(INDXLO),
 			  INTEGER(INDXHI), LOGICAL(REJECT),

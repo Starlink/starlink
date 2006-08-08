@@ -38,13 +38,15 @@
 *        consistent with other Starlink wrappers).
 *     24-FEB-2006 (TIMJ):
 *        Add grpInfoc
-*      26-FEB-2006 (TIMJ):
+*     26-FEB-2006 (TIMJ):
 *        Add grpGrpex
 *     25-JUN-2006 (TIMJ):
 *        Add grpCopy.
 *     07-AUG-2006 (TIMJ):
 *        GRP__NOID should not be publicly visible from C.
 *        Use a NULL pointer instead.
+*     8-AUG-2006 (DSB):
+*        Add grpIndex
 
 
 *  Copyright:
@@ -110,19 +112,17 @@ typedef struct Grp Grp;
 
 /* Public function prototypes */
 /* -------------------------- */
-Grp * grpCopy( const Grp* grp1, int indxlo, int indxhi, int reject,
-              int * status );
+Grp * grpCopy( const Grp *, int, int, int, int * );
 void grpDelet( Grp **, int * );
-void grpGrpex( const char * grpexp, const Grp * igrp1, Grp * igrp2,
-               int* size, int *added, int * flag, int * status );
+void grpGrpex( const char *, const Grp *, Grp *, int *, int *, int *, int * );
 void grpGrpsz( Grp *, int *, int * );
 void grpGet( Grp *, int, int, char *const *, int, int * );
 void grpInfoc( Grp *, int , const char *, char *, size_t, int * );
-void grpInfoi( Grp *grp, int index, const char * item, int * value, 
-	       int *status);
+void grpInfoi( Grp *, int, const char *, int *, int * );
 Grp *grpNew( const char *, int * );
 void grpPut1( Grp *, const char *, int, int * );
 void grpValid( Grp *, int *, int * );
+void grpIndex( const char *, const Grp *, int, int *, int * );
 
 /* Semi-Public function prototypes: For Fortran interface wrappers only */
 /* -------------------------------------------------------------------- */
