@@ -70,39 +70,6 @@ AstFrameSet **fset,     /* constructed 3-D frameset (returned) */
 int *status             /* global status (given and returned) */
 );
 
-/*+ sc2ast_kludgemodjuldate - kludge for the modified julian date */
-
-double sc2ast_kludgemodjuldate
-( 
-double ra,           /* Right Ascension in radians (given) */
-int *status          /* global status (given and returned) */
-);
-
-/*+ sc2ast_telpos - get telescope position and orientation */
-
-void sc2ast_telpos
-( 
-double ra,           /* Right Ascension in radians (given) */
-double dec,          /* Declination in radians (given) */
-double lst,          /* local sidereal time in radians (given) */
-double *az,          /* Azimuth in radians (returned) */
-double *el,          /* Elevation in radians (returned) */
-double *p            /* Parallactic angle in radians (returned) */
-);
-
-/*+ sc2ast_createwcs_compat - create WCS descriptionusing old parameters */
-
-void sc2ast_createwcs_compat
-(
-int subnum,             /* subarray number, 0-7 (given) */
-double ra,              /* Right Ascension of the telescope boresight */
-double dec,             /* Declination of the telescope boresight */
-double el,              /* Boresight elevation in radians (given) */
-double p,               /* No longer used (pass any dummy value) */
-AstFrameSet **fset,     /* constructed frameset (returned) */
-int *status             /* global status (given and returned) */
-);
-
 /*+ sc2ast_maketanmap - create a Mapping representing a tangent plane 
                         projection */
 
