@@ -42,6 +42,9 @@
 *        Add grpGrpex
 *     25-JUN-2006 (TIMJ):
 *        Add grpCopy.
+*     07-AUG-2006 (TIMJ):
+*        GRP__NOID should not be publicly visible from C.
+*        Use a NULL pointer instead.
 
 
 *  Copyright:
@@ -77,10 +80,8 @@
 /* Public Constants */
 /* ---------------- */
 
-/* An illegal GRP_ identifier value. This value can sometimes be
-   specified by an application in place of a GRP_ identifier in order
-   to supress some operation. */
-enum { GRP__NOID  = 0 };
+
+/* Note that GRP__NOIDs role in C is to use a NULL pointer. */
 
 /* Maximum length of a group expression. */
 enum { GRP__SZGEX  = 255 };
