@@ -102,6 +102,8 @@
 *        Split from dsim.c
 *     2006-07-28 (JB):
 *        Changed sc2head to JCMTState
+*     2006-08-08 (EC):
+*        Added INSTRUME FITS keyword
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -275,6 +277,10 @@ int *status       /* global status (given and returned) */
 		   "OBSMODE", obsmode,
 		   "Observing mode", status );
 
+   fhead_putfits ( TSTRING,
+		   "INSTRUME", "SCUBA-2",
+		   "Instrument type", status );
+   
    /* Determine extent of the map from posptr + known size of the arrays */
    for( i=0; i<numsamples; i++ ) {
     
