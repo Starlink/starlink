@@ -65,6 +65,8 @@
 *     07-AUG-2006 (TIMJ):
 *        Import cnfImprt from CNF.
 *        Add SLA_OBS
+*     08-AUG-2006 (TIMJ):
+*        Add SLA_PA
 *-
 */
 
@@ -1562,4 +1564,24 @@ slaObs( int n, char *c, char *name, double *w, double *p, double *h  ) {
   F77_IMPORT_DOUBLE( P, *p );
   F77_IMPORT_DOUBLE( H, *h );
 
+}
+
+F77_DOUBLE_FUNCTION(sla_pa)( DOUBLE(HA), DOUBLE(DEC), DOUBLE(PHI) );
+
+double
+slaPa ( double ha, double dec, double phi ) {
+  DECLARE_DOUBLE(HA);
+  DECLARE_DOUBLE(DEC);
+  DECLARE_DOUBLE(PHI);
+  DECLARE_DOUBLE(RETVAL);
+  double retval;
+
+  F77_EXPORT_DOUBLE( ha, HA );
+  F77_EXPORT_DOUBLE( dec, DEC );
+  F77_EXPORT_DOUBLE( phi, PHI );
+
+  RETVAL = F77_CALL(sla_pa)( DOUBLE_ARG(&HA), DOUBLE_ARG(&DEC), DOUBLE_ARG(&PHI));
+
+  F77_IMPORT_DOUBLE( RETVAL, retval );
+  return retval;
 }
