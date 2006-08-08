@@ -35,6 +35,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -42,6 +43,8 @@
 *        Clone from smurf_makemap
 *     26-JUL-2006 (TIMJ):
 *        Remove unused sc2 includes.
+*     2006-08-07 (EC)
+*        Replaced sc2ast_createwcs_compat call with sc2ast_createwcs placeholder
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -500,9 +503,18 @@ void smurf_dreamsolve ( int *status ) {
 	  astBegin;
 	  smf_fits_getS( hdr, "SUBARRAY", subname, LEN__METHOD, status );
 	  sc2ast_name2num ( subname, &subnum, status );
+
 	  /* Temporary kludge to avoid breaking the simulator */
-	  sc2ast_createwcs_compat ( subnum, ra, dec, elevation, p, &fset,
-				    status );
+          /*
+            sc2ast_createwcs_compat ( subnum, ra, dec, elevation, p, &fset,
+            status );
+          */
+
+          /* This call is a placeholder. Probably this should be replaced
+             with a call to smf_tslice_ast at each time step. EC */
+          sc2ast_createwcs( subnum, azimuth, elevation, 0, 0, 0, &fset, 
+                            status );
+
 	  /* Shift the coordinate system to allow for the DREAM map
 	     being larger than the subarray */
 	  sc2ast_moveframe ( -(double)vxmin, -(double)vymin, fset, status );
