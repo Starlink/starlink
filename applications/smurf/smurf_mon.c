@@ -254,11 +254,12 @@ void smurf_mon( int * status ) {
     msgSetc( "NAME", taskname );
     msgSeti( "NFIL0", nfil0 );
     msgSeti( "NFIL1", nfil1 );
-    msgOut( "SMURF_NLOC", "WARNING: The number of active "
+    msgOut( "SMURF_NFIL", "WARNING: The number of active "
 	    "HDS container files increased from ^NFIL0 to ^NFIL1 "
 	    "during execution of ^NAME (" PACKAGE_UPCASE " programming "
 	    " error).", status);
     msgBlank(status);
+    hdsShow("FILES", status);
   }
   errEnd( status );
 
