@@ -170,6 +170,7 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
        WRITE access */
     ndfIsacc( indf, "WRITE", &isacc, status );
     if (isacc) {
+      msgSetc("E", extname);
       msgOutif(MSG__VERB, FUNC_NAME, "Creating new extension, ^E", status );
       ndfXnew( indf, extname, extype, ndims, dims, &loc, status );
     } else {
