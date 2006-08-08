@@ -78,6 +78,8 @@
 *        Added xbolo/ybolo
 *     2006-07-21 (JB):
 *        Split from dsim.c
+*     2006-08-07 (EC)
+*        Removed dependence on sc2sim_telpos & sc2sim_bolcoords
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -114,6 +116,10 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "smurf_par.h"
+
+/* Starlink Includes */
+#include "ast.h"
 
 void sc2sim_instrinit
 ( 
@@ -141,6 +147,7 @@ int *status              /* global status (given and returned) */
    /* Local variables */
    double azimuth;                /* Azimuth in radians */
    double decay;                  /* bolometer time constant (msec) */
+   AstFrameSet *fset=NULL;        /* Frameset to calculate xbc + ybc */
    int j;                         /* loop counter */
    double lst;                    /* local sidereal time in radians */
    double meanatm;                /* mean expected atmospheric signal (pW) */
@@ -149,6 +156,7 @@ int *status              /* global status (given and returned) */
    double photonsigma;            /* typical photon noise level in pW */
    double samptime;               /* sample time in sec */
    int savebols;                  /* flag for bol details (unused here) */
+   int subnum;                    /* subarray number */
    double trans;                  /* average transmission */
 
    /* Check status */
@@ -204,26 +212,54 @@ int *status              /* global status (given and returned) */
  
    /* Get the subsystem number */ 
    
-   /*sc2ast_name2num( sinx->subname, &(inx->subsysnr), status );*/
+   sc2ast_name2num( sinx->subname, &subnum, status );
+
+   /* Get the native x- and y- (GRID) coordinates of each bolometer */
    
-   /* Setup world coordinate information and get the bolometer positions in
-      Nasmyth and native coordinates */
-   
-   lst = inx->ra;
-
-   sc2sim_telpos ( inx->ra, inx->dec, lst, &azimuth, elevation, &p, status );
-
-   sc2sim_bolcoords ( sinx->subname, inx->ra, inx->dec, *elevation, p,
-		    "NASMYTH", &nboll, *xbc, *ybc, status );
-
    sc2sim_bolnatcoords( *xbolo, *ybolo, &nboll, status );
    
-   /* Convert Nasmyth coordinates from mm to arcsec */
+   /* Since sc2sim_simframe still needs xbc & ybc to interpolate values from
+      the sky noise image, calculate them here. Get rid of the old call
+      to sc2sim_bolcoords. For now just make a dummy scuba2 frameset at
+      some fixed elevation. To do this properly we would actually want to
+      calculate xbc and ybc on-the-fly as the telescope points at different
+      regions of the sky. */
+
+   sc2ast_createwcs( subnum, 0, 0, 0, 0, 53795.0, &fset, status ); 
+
+   /* If we do an AzEl projection for each bolometer it is very nearly
+      a tangent plane projection because we chose El=0 */
+
+   astSetC( fset, "SYSTEM", "AzEl" );
+   astTran2 ( fset, nboll, *ybolo, *xbolo, 1, *xbc, *ybc );
+
+   /* xbc and ybc are in radians at this point. Convert to arcsec */
    for ( j=0; j<nboll; j++ ) {
+     (*xbc)[j] *= DR2AS;
+     (*ybc)[j] *= DR2AS;
+   }
+
+
+   /* Setup world coordinate information and get the bolometer positions in
+      Nasmyth and native coordinates */
+   /*
+     lst = inx->ra;
+     sc2sim_telpos ( inx->ra, inx->dec, lst, &azimuth, elevation, &p, status );
+   */
+   
+   /*
+     sc2sim_bolcoords ( sinx->subname, inx->ra, inx->dec, *elevation, p,
+     "NASMYTH", &nboll, *xbc, *ybc, status );
+   */
+   /* Convert Nasmyth coordinates from mm to arcsec */
+   /*
+     for ( j=0; j<nboll; j++ ) {
      (*xbc)[j] *= MM2SEC;
      (*ybc)[j] *= MM2SEC;
-   }
-   
+     }
+   */
+                    
+
    sc2sim_getspread ( nboll, *pzero, *heater, status );
 
 }//sc2sim_instrinit
