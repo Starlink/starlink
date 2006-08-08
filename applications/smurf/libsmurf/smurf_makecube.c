@@ -180,7 +180,7 @@ void smurf_makecube( int *status ) {
 
   smf_close_file( &data, status );
   
-  if( igrp != GRP__NOID ) grpDelet( &igrp, status);
+  if( igrp != NULL) grpDelet( &igrp, status);
 
   ndfEnd( status );
   

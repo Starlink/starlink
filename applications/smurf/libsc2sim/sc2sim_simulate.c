@@ -100,6 +100,8 @@
 *        Moved into sc2sim_simulate 
 *     2006-07-28 (JB):
 *        Changed sc2head to JCMTState
+*     2006-08-07 (TIMJ):
+*        GRP__NOID is not a Fortran concept.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -254,7 +256,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
    double pwvzen = 0;              /* zenith precipital water vapour (mm) */
    int rowsize;                    /* row size for flatfield */
    double sigma;                   /* instrumental white noise */
-   Grp *skygrp = GRP__NOID;        /* Group of input files */
+   Grp *skygrp = NULL;        /* Group of input files */
    AstMapping *sky2map=NULL;       /* Mapping celestial->map coordinates */
    double sky_az=0;                /* effective az on sky (bor+jig) */
    double sky_el=0;                /* effective el on sky (bor+jig) */

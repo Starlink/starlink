@@ -68,8 +68,10 @@
 *        Check that the weights array pointer is not NULL
 *     2006-05-25 (EC):
 *        Add iterative map-maker + associated command line parameters
-*     2006-06-24 (ED):
+*     2006-06-24 (EC):
 *        Iterative map-maker parameters given in CONFIG file
+*     2006-08-07 (TIMJ):
+*        GRP__NOID is not a Fortran concept.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -136,19 +138,19 @@
 void smurf_makemap( int *status ) {
 
   /* Local Variables */
-  Grp *confgrp = GRP__NOID;  /* Group containing configuration file */
+  Grp *confgrp = NULL;  /* Group containing configuration file */
   void *data_index[1];       /* Array of pointers to mapped arrays in ndf */
   smfData *data=NULL;        /* pointer to  SCUBA2 data struct */
   int flag;                  /* Flag */
   dim_t i;                   /* Loop counter */
-  Grp *igrp = GRP__NOID;     /* Group of input files */
+  Grp *igrp = NULL;     /* Group of input files */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int ksize=0;               /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   void *map=NULL;            /* Pointer to the rebinned map data */
   char method[LEN__METHOD];  /* String for map-making method */
   int n;                     /* # elements in the output map */
-  Grp *ogrp = GRP__NOID;     /* Group containing output file */
+  Grp *ogrp = NULL;     /* Group containing output file */
   int ondf;                  /* output NDF identifier */
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   int parstate;              /* State of ADAM parameters */
@@ -331,7 +333,7 @@ void smurf_makemap( int *status ) {
   ndfAnnul( &ondf, status );
 
   //  smf_free( weights, status );
-  if( igrp != GRP__NOID ) grpDelet( &igrp, status);
+  if( igrp != NULL ) grpDelet( &igrp, status);
 
   ndfEnd( status );
   

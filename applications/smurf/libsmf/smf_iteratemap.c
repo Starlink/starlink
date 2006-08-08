@@ -40,7 +40,8 @@
 *     map of the astronomical signal.
 *     
 *  Authors:
-*     Edward Chapin (UBC)
+*     EC: Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -48,6 +49,8 @@
 *        Initial version.
 *     2006-06-24 (EC):
 *        Parameters given by keymap
+*     2006-08-07 (TIMJ):
+*        GRP__NOID is not a Fortran concept.
 
 *  Notes:
 
@@ -417,8 +420,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   }
 
   /* Cleanup */
-  if( astgrp != GRP__NOID ) grpDelet( &astgrp, status );
-  if( atmgrp != GRP__NOID ) grpDelet( &atmgrp, status );
-  if( ngrp != GRP__NOID ) grpDelet( &ngrp, status );
+  if( astgrp != NULL ) grpDelet( &astgrp, status );
+  if( atmgrp != NULL ) grpDelet( &atmgrp, status );
+  if( ngrp != NULL ) grpDelet( &ngrp, status );
 
 }
