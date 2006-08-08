@@ -752,7 +752,11 @@ int *status               /* global status (given and returned) */
    (lon,lat) = (90 degs,0) (the slalib convention). */
 
 
-/*   slaDeuler( "ZYZ", -lat, PI/2-lat, -lon, mat ); */
+/*
+   Note that we deliberately do not call slaDeuler here since we are
+   worried about performance issues when this routine will be called
+   repeatedly. The required call is: */
+   /* slaDeuler( "ZYZ", -lat, PI/2-lat, -lon, mat ); */
 
 
    ct = cos( lat );
