@@ -1641,11 +1641,7 @@ itcl::class gaia::Gaia {
    #  Attempts to terminate any existing connection with a PLASTIC hub.
    protected proc stop_plastic_ {} {
       if { $is_plastic_registered_ } {
-         if {[catch {
-            $plastic_app_ unregister
-         } msg]} {
-            puts "Trouble unregistering from PLASTIC: $msg"
-         }
+         $plastic_app_ unregister
       }
    }
 
