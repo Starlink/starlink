@@ -182,7 +182,11 @@ itcl::class plastic::PlasticApp {
    #  registered.  If it is not currently registered, nothing happens.
    public method unregister {} {
       if {$client_id_ != ""} {
-         $hub_ execute unregister $client_id_
+         if {[catch {
+            $hub_ execute unregister $client_id_
+         } msg]} {
+            puts "Trouble unregistering from PLASTIC: $msg"
+         }
          set_client_id_ ""
       }
    }
