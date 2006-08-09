@@ -23,6 +23,7 @@
     03Mar2006 : add pong* (ec)
     15Jun2006 : replace pwvzen with tauzen (jb)
     29Jun2006 : removed dataname (jb)
+    04Aug2006 : added bous & singlescan parameters (jb)
 */
 
 #include "libsc2sim/dream_par.h"
@@ -31,6 +32,12 @@ struct dxml_struct {
   double bol_distx;           /* average bolometer distance */
   double bol_disty;           /* average bolometer distance */
   char bolfile[DREAM__FLEN];  /* name of file for bolometer details */
+  double bous_angle;          /* angle of pattern relative to telescope
+				 axes in radians anticlockwise  */
+  double bous_pathlength;     /* length of path across sky (arcsec) */
+  int bous_scancount;         /* number of scan lines  */
+  double bous_spacing;        /* scan line spacing in arcsec  */
+  double bous_vmax;           /* Telescope max velocities */
   int conv_shape;             /* Possible convolution functions are
 				 0 - Gaussian
 				 1 - sinc(dx).sinc(dy)
@@ -63,14 +70,18 @@ struct dxml_struct {
   int nvert;                  /* Nr of vertices in the Jiggle pattern */
   char obsmode[80];           /* Type of observation */
   double pong_angle;          /* angle of pattern relative to telescope
-				 axes in radians anticlockwise (given) */
-  int pong_gridcount;         /* number of grid lines (odd) (given) */
-  double pong_spacing;        /* grid spacing in arcsec (given) */
+				 axes in radians anticlockwise */
+  int pong_gridcount;         /* number of grid lines (odd) */
+  double pong_spacing;        /* grid spacing in arcsec */
   double pong_vmax;           /* Telescope max velocities (arcsec/sec) */
   int platenum;               /* number of waveplate rotations */
   double platerev;            /* waveplate rotation rev/sec */
   double ra;                  /* right ascension in radians */
   double sample_t;            /* sample time in msec */
+  double scan_angle;          /* angle of pattern relative to telescope
+				 axes in radians anticlockwise  */
+  double scan_pathlength;     /* length of path across sky (arcsec) */
+  double scan_vmax;           /* Telescope max velocities */
   int smu_move;               /* Code for the SMU move algorithm */
   double smu_offset;          /* SMU phase shift */
   int smu_samples;            /* Nr of samples per jiggle vertex */
