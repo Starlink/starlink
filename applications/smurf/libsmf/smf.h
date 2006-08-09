@@ -104,6 +104,8 @@
 *        Add smf_inst_get
 *     2006-08-02 (AGG):
 *        Add smf_open_newfile and smf_open_ndf
+*     2006-08-02 (TIMJ):
+*        smf_open_newfile should take dim_t
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -322,7 +324,7 @@ void smf_open_ndf( const int newndf, char *accmode, char *filename,
 		   smf_dtype dtype, smfData **ndata, int *status);
 
 void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, int ndims, 
-		       const int dims[], int flags, smfData ** data, 
+		       const dim_t dims[], int flags, smfData ** data, 
 		       int *status);
 
 void smf_open_related( const smfGroup *group, const int subindex, smfArray **relfiles, 

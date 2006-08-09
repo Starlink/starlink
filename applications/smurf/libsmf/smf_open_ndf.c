@@ -41,16 +41,20 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-08-02 (AGG):
 *        Initial test version
+*     2006-08-08 (TIMJ):
+*        Can not treat dim_t and int interchangeably.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006 University of British Columbia
+*     and the Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -102,11 +106,13 @@ void smf_open_ndf( const int newndf, char *accmode, char *filename,
   void *datarr[3] = { NULL, NULL, NULL }; /* Pointers for data */
   char *datatype;               /* String for data type */
   int dims[NDF__MXDIM];         /* Extent of each dimension */
+  dim_t ddims[NDF__MXDIM];      /* dim_t version of dimensions */
   int flags = 0;                /* Flags for creating smfDA, smfFile and 
 				   smfHead components in the output smfData */
   int ndat;                     /* Number of elements mapped in the requested NDF */
   int ndims;                    /* Number of dimensions in the requested NDF */
   smfFile *newfile = NULL;      /* New smfFile with details of requested NDF */
+  int i;                        /* loop counter */
 
   if ( *status != SAI__OK ) return;
 
@@ -154,8 +160,14 @@ void smf_open_ndf( const int newndf, char *accmode, char *filename,
     errRep( FUNC_NAME, "Unable to construct new smfFile", status );
   }
 
+  if (*status == SAI__OK) {
+    for (i=0; i<ndims; i++) {
+      ddims[i] = (dim_t)dims[i];
+    }
+  }
+
   /* And populate the new smfData */
   *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, dtype, datarr, 
-				    dims, ndims, 0, 0, NULL, NULL, status );
+				    ddims, ndims, 0, 0, NULL, NULL, status );
 
 }

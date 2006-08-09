@@ -15,7 +15,7 @@
 *  Invocation:
 
 *     smf_open_newfile( Grp * ingrp, int index, smf_dtype dtype, int ndims, 
-*                       const int dims[], int flags, smfData ** data, 
+*                       const dim_t dims[], int flags, smfData ** data, 
 *                       int *status);
 
 *  Arguments:
@@ -27,7 +27,7 @@
 *        Data type of this smfData. Unsupported types result in an error.
 *     ndims = int (Given)
 *        Number of dimensions in dims[]. Maximum of NDF__MXDIM.
-*     dims[] = const int (Given)
+*     dims[] = const dim_t (Given)
 *        Array of dimensions. Values will be copied from this array.
 *     flags = int (Given)
 *        Flags to denote whether to create flatfield, header, or file components
@@ -61,6 +61,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,6 +71,8 @@
 *        Change datatype to a char* and avoid strncpy()
 *     2006-08-01 (AGG):
 *        Now map VARIANCE and QUALITY if desired
+*     2006-08-08 (TIMJ):
+*        Use dim_t as much as possible.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -120,7 +123,7 @@
 #define FUNC_NAME "smf_open_newfile"
 
 void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, int ndims, 
-		       const int dims[], int flags, smfData ** data, 
+		       const dim_t dims[], int flags, smfData ** data, 
 		       int *status) {
 
   /* Local variables */
@@ -190,7 +193,8 @@ void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, int ndims,
   /* Fill ubnd and lbnd arrays */
   for ( i=0; i<ndims; i++) {
     lbnd[i] = 1;
-    ubnd[i] = dims[i];
+    /* should check for overflow */
+    ubnd[i] = (int)dims[i];
   }
 
   /* Create new simple NDF */

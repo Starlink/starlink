@@ -16,7 +16,7 @@
 *     pntr = smf_construct_smfData( smfData * tofill, smfFile * file, 
 *                      smfHead * hdr, 
 *		       smfDA * da, smf_dtype dtype, void * pntr[3], 
-*		       const int dims[], int ndims,
+*		       const dim_t dims[], int ndims,
 *		       int virtual, int ncoeff, double *poly, int * status );
 
 *  Arguments:
@@ -39,7 +39,7 @@
 *     pntr[3] = void* (Given)
 *        Array of pointers to data, variance and quality. Pointers will
 *        be copied from this array.
-*     dims[] = const int (Given)
+*     dims[] = const dim_t (Given)
 *        Array of dimensions. Values will be copied from this array.
 *     ndims = int (Given)
 *        Number of dimensions in dims[]. Maximum of NDF__MXDIM.
@@ -187,7 +187,7 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
       }
       data->ndims = ndims;
       for (i = 0; i < ndims; i++ ) {
-	(data->dims)[i] = (dim_t)dims[i];
+	(data->dims)[i] = dims[i];
       }
       data->ncoeff = ncoeff;
       data->poly = poly;
