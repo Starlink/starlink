@@ -415,6 +415,33 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
     
      break;
 
+   case singlescan:
+     /* Call sc2sim_getsinglescan to get scan pointing solution */
+     msgOut( FUNC_NAME, "Do a SINGLESCAN observation", status );
+     accel[0] = 432.0;
+     accel[1] = 540.0;
+     vmax[0] = inx->scan_vmax;        /*200.0;*/
+     vmax[1] = inx->scan_vmax;        /*200.0;*/
+
+     sc2sim_getsinglescan ( inx->scan_angle, inx->scan_pathlength, 
+		            accel, vmax, samptime, &count, &posptr, status );  
+    
+     break;
+
+   case bous:
+     /* Call sc2sim_getbous to get boustrophedon pointing solution */
+     msgOut( FUNC_NAME, "Do a BOUS observation", status );
+     accel[0] = 432.0;
+     accel[1] = 540.0;
+     vmax[0] = inx->bous_vmax;        /*200.0;*/
+     vmax[1] = inx->bous_vmax;        /*200.0;*/
+
+     sc2sim_getbous ( inx->bous_angle, inx->bous_pathlength,
+                      inx->bous_scancount, inx->bous_spacing,  
+		      accel, vmax, samptime, &count, &posptr, status );  
+    
+     break;
+
    case dream:
      /* Call sc2sim_getpat to get the dream pointing solution */
      msgOut( FUNC_NAME, "Do a DREAM observation", status );

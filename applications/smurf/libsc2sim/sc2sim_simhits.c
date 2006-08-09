@@ -252,14 +252,6 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 
    switch( mode ) {
 
-   case stare:
-     /* Stare just points at a nasmyth offset of 0 from the map centre */
-     msgOut( FUNC_NAME, "Do a STARE observation", status ); 
-     count = inx->numsamples;
-     posptr = smf_malloc ( count*2, sizeof(*posptr), 1, status );
-     memset( posptr, 0, count*2*sizeof(double) );
-     break;
-
    case pong:
      /* Call sc2sim_getpong to get pong pointing solution */
      msgOut( FUNC_NAME, "Do a PONG observation", status ); 
@@ -274,30 +266,32 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
     
      break;
 
-   case dream:
-     /* Call sc2sim_getpat to get the dream pointing solution */
-     msgOut( FUNC_NAME, "Do a DREAM observation", status );
+   case singlescan:
+     /* Call sc2sim_getsinglescan to get scan pointing solution */
+     msgOut( FUNC_NAME, "Do a SINGLESCAN observation", status );
+     accel[0] = 432.0;
+     accel[1] = 540.0;
+     vmax[0] = inx->scan_vmax;        /*200.0;*/
+     vmax[1] = inx->scan_vmax;        /*200.0;*/
 
-
-     /*  Get jiggle pattern.
-   	 jigptr[*][0] - X-coordinate in arcsec per time of the Jiggle position.
-	 jigptr[*][1] - Y-coordinate in arcsec per time of the Jiggle position.
-	 The number of values is returned in count, and should be equal
-	 to the number of samples per cycle. */
-     sc2sim_getpat ( inx->nvert, inx->smu_samples, inx->sample_t,
-		   inx->smu_offset+sinx->smu_terr, inx->conv_shape, 
-		   inx->conv_sig, inx->smu_move, inx->jig_step_x, 
-		   inx->jig_step_y, inx->jig_vert, &jigsamples, jigptr,
-		   status );
-
-     count = jigsamples*sinx->ncycle;
-
-     /* dream uses the SMU to do the jiggle pattern so the posptr
-        is just set to 0 */
-     posptr = smf_malloc ( count*2, sizeof(*posptr), 1, status );
-     memset( posptr, 0, count*2*sizeof(double) );    
-
+     sc2sim_getsinglescan ( inx->scan_angle, inx->scan_pathlength, 
+		            accel, vmax, samptime, &count, &posptr, status );  
+    
      break;
+
+   case bous:
+     /* Call sc2sim_getbous to get boustrophedon pointing solution */
+     msgOut( FUNC_NAME, "Do a BOUS observation", status );
+     accel[0] = 432.0;
+     accel[1] = 540.0;
+     vmax[0] = inx->bous_vmax;        /*200.0;*/
+     vmax[1] = inx->bous_vmax;        /*200.0;*/
+
+     sc2sim_getbous ( inx->bous_angle, inx->bous_pathlength,
+                      inx->bous_scancount, inx->bous_spacing,  
+		      accel, vmax, samptime, &count, &posptr, status );  
+
+     break;    
 
    default: /* should never be reached...*/
      msgSetc( "MODE", inx->obsmode );
