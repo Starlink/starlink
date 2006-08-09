@@ -32,7 +32,7 @@
 #include <ctype.h>
 #include "f77.h"
 #include "sae_par.h"
-#include "merswrap.h"
+#include "mers.h"
 #include "star/grp.h"
 #include <tcl.h>
 
@@ -40,9 +40,6 @@
 
 #define PACK_DIR "POLPACK_DIR"
 #define CVAL_LENGTH 80   
-
-extern F77_SUBROUTINE(err_rep)( CHARACTER(param), CHARACTER(mess),
-                                INTEGER(STATUS) TRAIL(param) TRAIL(mess) );
 
 extern F77_SUBROUTINE(cat_rapnd)( INTEGER(ciout), INTEGER(status) );
 extern F77_SUBROUTINE(cat_put0c)( INTEGER(gid), CHARACTER(val), LOGICAL(no), INTEGER(status) TRAIL(val) );
@@ -54,7 +51,6 @@ extern F77_SUBROUTINE(cat_put0d)( INTEGER(gid), DOUBLE(dval), LOGICAL(no), INTEG
 static Tcl_Interp *interp=NULL;
 
 static char *split( char * );
-static void Error( const char *, int * );
 static const char *Envir( const char *, int * );
 static void SetVar( FILE *, char *, char *, int, int * );
 static char *GetName( Grp *, int, int * );
@@ -268,7 +264,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    fd1 = mkstemp( file_name );
    if( fd1 == -1 ){
       *STATUS = SAI__ERROR;
-      Error( "Unable to create a temporary \"doplkaA\" file name.", 
+      errRep( " ", "Unable to create a temporary \"doplkaA\" file name.", 
               STATUS );
       return;
    } else {
@@ -281,7 +277,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    fd = fopen( file_name, "w" );
    if( !fd ){
       *STATUS = SAI__ERROR;
-      Error( "Unable to create a temporary file using \"fopen\".", STATUS );
+      errRep( " ", "Unable to create a temporary file using \"fopen\".", STATUS );
       return;
    } 
 
@@ -394,7 +390,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    fd2 = mkstemp( outfile_name );
    if( fd2 == -1 ){
       *STATUS = SAI__ERROR;
-      Error( "Unable to create a temporary \"doplkaB\" file name.", 
+      errRep( " ", "Unable to create a temporary \"doplkaB\" file name.", 
               STATUS );
       return;
    } else {
@@ -418,7 +414,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                                            + 1 ) );
       if( !script ) {
          *STATUS = SAI__ERROR;
-         Error( "Failed to allocate memory for full TCL script name.", 
+         errRep( " ", "Failed to allocate memory for full TCL script name.", 
                  STATUS );
       } else {
          strcpy( script, dir );
@@ -455,7 +451,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 
          if( report && *STATUS == SAI__OK ){
             *STATUS = SAI__ERROR;
-            Error( "Messages received from the TCL script.", STATUS );
+            errRep( " ", "Messages received from the TCL script.", STATUS );
          }
 
          fclose( fd );
@@ -556,56 +552,6 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 
 }
 
-static void Error( const char *text, int *STATUS ) {
-/*
-*  Name:
-*     Error
-
-*  Purpose:
-*     Report an error using EMS.
-
-*  Description:
-*     The supplied text is used as the text of the error message.
-*     A blank parameter name is used.
-
-*  Parameters:
-*     text
-*        The error message text. Only the first 80 characters are used.
-*     STATUS
-*        A pointer to the global status value. This should have been set
-*        to a suitable error value before calling this function.
-
-*  Notes:
-*     - If a NULL pointer is supplied for "text", no error is reported.
-*/
-
-   DECLARE_CHARACTER(param,1);
-   DECLARE_CHARACTER(mess,80);
-   int j;
-
-/* Check the supplied pointer. */
-   if( text ) {
-
-/* Set the parameter name to a blank string. */
-      param[0] = ' ';
-
-/* Copy the first "mess_length" characters of the supplied message into 
-      "mess". */
-      strncpy( mess, text, mess_length );
-
-/* Pad any remaining bytes with spaces (and replace the terminating null
-   character with a space). */
-      for( j = strlen(mess); j < mess_length; j++ ) {
-         mess[ j ] = ' ';
-      }
-
-/* Report the error. */
-      F77_CALL(err_rep)( CHARACTER_ARG(param), CHARACTER_ARG(mess),
-                         INTEGER_ARG(STATUS) TRAIL_ARG(param) 
-                         TRAIL_ARG(mess) );
-   }
-}
-
 static const char *Envir( const char *var, int *STATUS ){
 /*
 *  Name:
@@ -635,7 +581,7 @@ static const char *Envir( const char *var, int *STATUS ){
    if( !ret ) {
       *STATUS = SAI__ERROR;
       sprintf( mess, "Failed to get environment variable \"%s\".", var );
-      Error( mess, STATUS );
+      errRep( " ", mess, STATUS );
    }
 
    return ret;
@@ -764,9 +710,9 @@ static void SetSVar( FILE *interp, const char *var, const char *string,
    } else {
       *STATUS = SAI__ERROR;
       sprintf( mess, "Unable to allocate %d bytes of memory. ", len + 1 );
-      Error( mess, STATUS );
+      errRep( " ", mess, STATUS );
       sprintf( mess, "Failed to initialise Tcl variable \"%s\".", var );
-      Error( mess, STATUS );
+      errRep( " ", mess, STATUS );
    }
 
 }
@@ -969,9 +915,9 @@ static void GetRVar( const char *val, float *valptr, int *STATUS ) {
    if( sscanf( val, "%g", valptr ) != 1 ) {
       *STATUS = SAI__ERROR;
       sprintf( mess, "\"%s\" is not a floating point value.", val );
-      Error( mess, STATUS );
+      errRep( " ", mess, STATUS );
       sprintf( mess, "Failed to obtained a value for a Tcl variable." );
-      Error( mess, STATUS );
+      errRep( " ", mess, STATUS );
    }
 }
 
@@ -1001,9 +947,9 @@ static void GetIVar( const char *val, int *valptr, int *STATUS ) {
    if( sscanf( val, "%d", valptr ) != 1 ) {
       *STATUS = SAI__ERROR;
       sprintf( mess, "\"%s\" is not an integer value.", val );
-      Error( mess, STATUS );
+      errRep( " ", mess, STATUS );
       sprintf( mess, "Failed to obtained a value for Tcl variable." );
-      Error( mess, STATUS );
+      errRep( " ", mess, STATUS );
    }
 }
 
@@ -1123,7 +1069,7 @@ F77_SUBROUTINE(pol1_tclex)( CHARACTER(FILE), INTEGER(STATUS)
          } else {
             sprintf( mess, "Error executing Tcl script %.50s", file );
          }
-         Error( mess, STATUS );
+         errRep( " ", mess, STATUS );
       }
 
 /*  Free memory used to hold the null-terminated file name */
@@ -1259,7 +1205,7 @@ F77_SUBROUTINE(pol1_tclgt)( CHARACTER(VARNAM), INTEGER(ELEM),
             } else {
                sprintf( mess, "Error executing Tcl command '%.50s'", buf );
             }
-            Error( mess, STATUS );
+            errRep( " ", mess, STATUS );
 
 /* If succesful, return an F77 copy of the result string. */
          } else if( *interp->result ) {
@@ -1323,7 +1269,7 @@ static char *cstring( const char *fstring, int len, int *STATUS ) {
    } else {
       *STATUS = SAI__ERROR;
       sprintf( mess, "Unable to allocate %d bytes of memory. ", len + 1 );
-      Error( mess, STATUS );
+      errRep( " ", mess, STATUS );
    }
 
    return ret;
@@ -1425,7 +1371,7 @@ F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
       if( !fd ) {
          *STATUS = SAI__ERROR;
          sprintf( mess, "pol1_rdtdt: Error opening file '%s'.\n", file );
-         Error( mess, STATUS );
+         errRep( " ", mess, STATUS );
          return;
       }
 
