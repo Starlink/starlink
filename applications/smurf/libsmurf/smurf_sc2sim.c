@@ -45,8 +45,6 @@
 *          Number of samples to write in output file
 *     SIMTYPE = CHAR (Read)
 *          Simulation type
-*     TESTTYPE = CHAR (Read)
-*          Scantest type
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -75,8 +73,6 @@
 *     2006-01-13:  write subarray name (elc)
 *     2006-01-24:  write filter/atstart/atend (elc)
 *     2006-06-09:  added to smurf_sim (jb)
-*     2006-08-08 (EC):
-*        Removed slaDjcl prototype and instead include star/slalib.h
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -126,7 +122,6 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 #include "star/grp.h"
-#include "star/slalib.h"
 
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
@@ -143,6 +138,10 @@
 
 #include "wvm/wvmCal.h" /* Water Vapor Monitor routines */
 #include "f77.h"
+
+/* prototype for slalib routine that calculates mjd -> calendar date */
+void slaDjcl(double djm, int *iy, int *im, int *id, double *fd, int *j);
+
 
 #define FUNC_NAME "smurf_sc2sim"
 #define TASK_NAME "SC2SIM"
@@ -246,7 +245,7 @@ void smurf_sc2sim( int *status ) {
                         filter, heater, maxwrite, mode, nbol, pzero, rseed, 
                         samptime, weights, xbc, xbolo, ybc, ybolo, status);
 
-   }  else if ( mode == pong ) {
+   }  else if ( mode == pong || mode == singlescan || mode == bous ) {
 
       /* Do a simulation */
 
