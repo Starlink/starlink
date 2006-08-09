@@ -85,6 +85,8 @@ int *status         /* global status (given and returned) */
    else if( strcmp( name, "PONG" ) == 0 ) return pong;
    else if( strcmp( name, "POLSPIN" ) == 0 ) return polspin;
    else if( strcmp( name, "HEATRUN" ) == 0 ) return heatrun;
+   else if( strcmp( name, "BOUS" ) == 0 ) return bous;
+   else if( strcmp( name, "SINGLESCAN" ) == 0 ) return singlescan;
    else return none;
 
 }//sc2sim_getobsmode
