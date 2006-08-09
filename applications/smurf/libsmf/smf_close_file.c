@@ -36,6 +36,9 @@
 *     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
+*  Notes:
+*     - Attemps to free resources even if status is bad on entry.
+
 *  History:
 *     2005-11-28 (TIMJ):
 *        Initial test version
@@ -60,6 +63,9 @@
 *        sc2head no longer used. Use JCMTState instead.
 *     2006-08-02 (TIMJ):
 *        Free fplane coordinates.
+*     2006-08-08 (TIMJ):
+*        Do not return immediately if status is bad.
+*        Annul tswcs.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -106,7 +112,8 @@ void smf_close_file( smfData ** data, int * status ) {
   int       freedata = 0; /* should the data arrays be freed? */
   int       isSc2store = 0; /* is this sc2Store data */
 
-  if ( *status != SAI__OK) return;
+  /* we need to be able to clean up even if input status is bad -
+     this requires some defensive programming. */
 
   if ( *data == NULL ) {
     if ( *status == SAI__OK ) {
@@ -115,7 +122,7 @@ void smf_close_file( smfData ** data, int * status ) {
       errRep( ERRFUNC, "Attempt to close file when smfData pointer is NULL (possible programming error)", 
 	      status );
     }
-    /* null pointer so just return */
+    /* null pointer so just return since there is nothing to free */
     return;
   }
 
@@ -158,6 +165,7 @@ void smf_close_file( smfData ** data, int * status ) {
   /* Tidy up the header */
   if (hdr != NULL) {
     if (hdr->wcs != NULL) astAnnul( hdr->wcs );
+    if (hdr->tswcs != NULL) astAnnul( hdr->tswcs );
     if (hdr->fitshdr != NULL) astAnnul( hdr->fitshdr );
     if (!hdr->isCloned) {
       /* we are responsible for this memory - although what happens
@@ -170,9 +178,9 @@ void smf_close_file( smfData ** data, int * status ) {
 	} else {
 	  smf_free(hdr->allState, status);
 	}
-	if (hdr->fplanex) smf_free( hdr->fplanex, status );
-	if (hdr->fplaney) smf_free( hdr->fplaney, status );
       }
+      if (hdr->fplanex) smf_free( hdr->fplanex, status );
+      if (hdr->fplaney) smf_free( hdr->fplaney, status );
     }
     smf_free( hdr, status );
   }

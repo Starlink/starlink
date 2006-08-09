@@ -27,12 +27,17 @@
 *     
 *  Authors:
 *     Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     2006-06-25 (EC):
 *        Initial version
+*     2006-08-08 (TIMJ):
+*        Do not return immediately if status is bad.
 
 *  Notes:
+*     - This function attempts to free resources even if status is bad
+*       on entry.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -77,8 +82,9 @@ void smf_close_mapcoord( smfData *data, int *status ) {
 
   smfFile *file = NULL;        /* Pointer to smfFile */
   
-  /* Main routine */
-  if (*status != SAI__OK) return;
+  /* We are freeing resources so we should not return if status
+     is bad. Instead we should be defensive and check pointers
+     before dereferencing them. */
   
   file = data->file;
 
