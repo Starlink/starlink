@@ -133,12 +133,12 @@
 void smurf_makecube( int *status ) {
 
   /* Local Variables */
-  Grp *confgrp = GRP__NOID;  /* Group containing configuration file */
+  Grp *confgrp = NULL;  /* Group containing configuration file */
   void *data_index[1];       /* Array of pointers to mapped arrays in ndf */
   smfData *data=NULL;        /* pointer to  SCUBA2 data struct */
   int flag;                  /* Flag */
   dim_t i;                   /* Loop counter */
-  Grp *igrp = GRP__NOID;     /* Group of input files */
+  Grp *igrp = NULL;     /* Group of input files */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int ksize=0;               /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
@@ -175,6 +175,14 @@ void smurf_makecube( int *status ) {
   }
   
   smf_open_file( igrp, 1, "READ", 1, &data, status );
+
+  /* make sure we have a cube with a freq axis */
+  if ( *status == SAI__OK && data->hdr->instrument != INST__ACSIS) {
+    *status = SAI__ERROR;
+    errRep( FUNC_NAME, "Only ACSIS instrument data can be regridded into a cube",
+	    status );
+  }
+
 
   msgOut(" ","Test program to read ACSIS cubes.", status);
 
