@@ -81,6 +81,8 @@
 *        Add scanfit polynomial variables
 *     2006-04-21 (AGG):
 *        Add history AstKeyMap
+*     2006-08-08 (TIMJ):
+*        Should use dim_t not int (again)!
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -127,7 +129,7 @@
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
 		       smfDA * da, smf_dtype dtype, void * pntr[3], 
-		       const int dims[], int ndims,
+		       const dim_t dims[], int ndims,
 		       int virtual, int ncoeff, double *poly, 
 		       AstKeyMap *history, int * status ) {
 

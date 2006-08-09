@@ -190,7 +190,7 @@ smf_construct_smfDA( smfDA * tofill, double * flatcal,
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
 		       smfDA * da, smf_dtype dtype, void * pntr[3], 
-		       const int dims[], int ndims,
+		       const dim_t dims[], int ndims,
 		       int virtual, int ncoeff, double *poly, 
 		       AstKeyMap *history, int * status );
 
