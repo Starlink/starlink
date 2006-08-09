@@ -11,5 +11,6 @@ struct bolpix             /* pixel location of bolometer */
        };
 
 /* Enumerated type for observing modes */
-typedef enum {stare, dstare, dream, pong, polspin, heatrun, none} obsMode;
+typedef enum {stare, dstare, dream, pong, polspin, heatrun, 
+              bous, singlescan, none} obsMode;
 #endif /* SC2SIM_STRUCT_DEFINED */
