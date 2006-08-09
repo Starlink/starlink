@@ -227,17 +227,17 @@ double *value,       /* value sampled from image (returned) */
 int *status          /* global status (given and returned) */
 );
 
-void sc2sim_getbousscan
+void sc2sim_getbous
 (
 double angle,        /* angle of pattern relative to telescope
                         axes in radians anticlockwise (given) */
 double pathlength,   /* length of scanpath (arcsec) (given) */
-double scanspacing,  /* distance between scans (arcsec) (given) */
-int numscans,        /* total number of scans (given) */
+int scancount,       /* total number of scans (given) */
+double spacing,      /* distance between scans (arcsec) (given) */
 double accel[2],     /* telescope accelerations (arcsec) (given) */
 double vmax[2],      /* telescope maximum velocities (arcsec) (given) */
 double samptime,     /* sample interval in sec (given) */
-int *poscount,       /* number of positions in pattern (returned) */
+int *bouscount,      /* number of positions in pattern (returned) */
 double **posptr,     /* list of positions (returned) */
 int *status          /* global status (given and returned) */
 );
@@ -249,16 +249,6 @@ double corner,       /* corner frequency, where 1/f dispersion=sigma (given)*/
 double samptime,     /* time per data sample (given) */
 double nterms,       /* number of frequencies calculated (given) */
 double *noisecoeffs, /* 1/f spectrum (returned) */
-int *status          /* global status (given and returned) */
-);
-
-void sc2sim_getlissajous
-(
-int gridcount,       /* number of grid lines (odd) (given) */
-double spacing,      /* grid spacing in arcsec (given) */
-double samptime,     /* sample interval in sec (given) */
-int *lisscount,      /* number of positions in pattern (returned) */
-double **posptr,     /* list of positions (returned) */
 int *status          /* global status (given and returned) */
 );
 
@@ -373,15 +363,15 @@ double *sigma,         /* photon noise in pW (returned) */
 int *status            /* global status (given and returned) */
 );
 
-void sc2sim_getsimplescan
+void sc2sim_getsinglescan
 (
 double angle,        /* angle of pattern relative to telescope
                         axes in radians anticlockwise (given) */
+double pathlength,   /* length of scanpath (arcsec) (given) */
 double accel[2],     /* telescope accelerations (arcsec) (given) */
 double vmax[2],      /* telescope maximum velocities (arcsec) (given) */
 double samptime,     /* sample interval in sec (given) */
-double pathlength,   /* length of scanpath (arcsec) (given) */
-int *poscount,       /* number of positions in pattern (returned) */
+int *scancount,      /* number of positions in pattern (returned) */
 double **posptr,     /* list of positions (returned) */
 int *status          /* global status (given and returned) */
 );
