@@ -88,6 +88,7 @@ int *status             /* global status (given and returned) */
      7Aug2006  : Correct rotation matrix in sc2ast_maketanmap (dsb)
      7Aug2006  : Removed sc2ast_createwcs_compat + related kludges (ec)
      10Aug2006 : More corrections to the rotation matrix in sc2ast_maketanmap (dsb)
+     10Aug2006 : Added "rot" parameter to sc2ast_maketanmap (dsb)
 */
 
 {
@@ -360,7 +361,7 @@ int *status             /* global status (given and returned) */
 
 /* Create a Mapping from these Cartesian Nasmyth coords (in rads) to spherical 
    AzEl coords (in rads). */
-   azelmap = sc2ast_maketanmap( az, el, azel_cache, status );
+   azelmap = sc2ast_maketanmap( az, el, azel_cache, el, status );
 
 /* Calculate final mapping with SMU position correction only if needed */
    if( (!az_jig_x) && (!az_jig_y) ) {
@@ -684,23 +685,25 @@ int *status             /* global status (given and returned) */
 
 AstMapping *sc2ast_maketanmap
 (
-double lon,               /* Celestial longitude at ref point (rads) */
-double lat,               /* Celestial latitude at ref point (rads) */
-AstMapping *cache[ 2 ],   /* Cached Mappings (supply as NULL on 1st call) */
-int *status               /* global status (given and returned) */
+double lon,              /* Celestial longitude at ref point (rads) */
+double lat,              /* Celestial latitude at ref point (rads) */
+AstMapping *cache[ 2 ],  /* Cached Mappings (supply as NULL on 1st call) */
+double rot,              /* Rotation needed to align input Y axis with North */
+int *status              /* global status (given and returned) */
 )
 /* Method :
     The forward transformation of the returned Mapping transforms 
     cartesian tangent plane offsets in radians, into celestial longitude
     and latitude values, in radians. The reference point of the tangent
-    plane is put at the supplied longitude and latitude position. It is
-    assumed that the second cartesian input axis is parallel to celestial
-    north.
+    plane is put at the supplied longitude and latitude position. 
 
     The "cache" array should be filled with NULL values before the first
     call to this function. It will be returned holding AST pointers to
     Mappings which will be needed on subsequent calls (these pointers are
     exempted from AST context handling).
+
+    If the input Cartesian coordinates represent Nasmyth (X,Y) coords,
+    then the "rot" angle should be the elevation of the boresight.
 
    Authors :
      D.S.Berry (dsb@ast.man.ac.uk)
@@ -714,7 +717,7 @@ int *status               /* global status (given and returned) */
    AstMatrixMap *matmap;
    AstCmpMap *m1;
    AstWcsMap *wcsmap;
-   double t1, t2, t3, ct, cn, st, sn, mat[ 9 ];
+   double t1, t2, t3, ct, cn, st, sn, mat[ 3 ][ 3 ];
 
 /* Check the inherited status. */
    if ( *status != SAI__OK ) return NULL;
@@ -740,12 +743,12 @@ int *status               /* global status (given and returned) */
 
 /* The required Mapping consists of the "cache[ 1 ]" Mapping, followed by
    a suitable MatrixMap which rotates the tangent point to the requested
-   spherical (az,el) coordinates, and rotates the Nasmyth Y axis to 
+   spherical (az,el) coordinates, and rotates the Caresian Y axis to 
    celestial north (elevation). followed by the "cache[ 0 ]" Mapping. The
    logic follows that of FITS-WCS paper II (which is what the WcsMap
    class assumes). The reference point of the TAN projection is at the 
    north pole of the "native" spherical coordinate system. The matrix map
-   first rotates about the Z axis by -lat (to rotate the Nasmyth Y axis to
+   first rotates about the Z axis by -rot (to rotate the Cartesian Y axis to
    north), then rotates about the Y axis by -(pi/2-lat) (to rotate the
    reference point from the native north pole to the celestial north pole), 
    then rotates about the Z axis by -lon (to rotate the prime native meridian 
@@ -753,36 +756,8 @@ int *status               /* global status (given and returned) */
    pole, the X axis points to (lon,lat)=(0,0) and the Y axis points to 
    (lon,lat) = (90 degs,0) (the slalib convention). */
 
-
-/*
-   Note that we deliberately do not call slaDeuler here since we are
-   worried about performance issues when this routine will be called
-   repeatedly. The required call is: 
-
-   slaDeuler( "ZYZ", -lat, -(PIBY2-lat), -lon, mat ); 
-
-/*
-
-   ct = cos( lat );
-   st = sin( lat );
-   cn = cos( lon );
-   sn = sin( lon );
-
-   t1 = ct*st;
-   t2 = -st*st;
-   t3 = -ct*ct;
-
-   mat[ 0 ] = t1*cn - st*sn;
-   mat[ 1 ] = t2*cn - sn*ct;
-   mat[ 2 ] = ct*cn;
-   mat[ 3 ] = t1*sn + st*cn;
-   mat[ 4 ] = t2*sn + cn*ct;
-   mat[ 5 ] = ct*sn;
-   mat[ 6 ] = t3;
-   mat[ 7 ] = t1;
-   mat[ 8 ] = st;
-
-   matmap = astMatrixMap( 3, 3, 0, mat, "" );
+   slaDeuler( "ZYZ", -rot, -(PIBY2-lat), -lon, mat ); 
+   matmap = astMatrixMap( 3, 3, 0, (double *) mat, "" );
 
 /* Create the required compound Mapping. */
    m1 = astCmpMap( cache[ 1 ], matmap, 1, "" );
