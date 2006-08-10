@@ -188,6 +188,9 @@ f     The WcsMap class does not define any new routines beyond those
 *        reduce the in-memory size of a WcsMap.
 *     10-MAY-2006 (DSB):
 *        Override astEqual.
+*     10-AUG-2006 (DSB):
+*        Correct astLoadWcsMap to take acount of the different number of
+*        PVi_m values that can be associated with each axis.
 *class--
 */
 
@@ -589,7 +592,7 @@ int astTest##attr##_( AstWcsMap *this, int axis ) { \
 #include "unitmap.h"             /* Unit mappings */
 #include "permmap.h"             /* Axis permutation mappings */
 #include "wcsmap.h"              /* Interface definition for this class */
-#include "pal.h"              /* SLALIB function prototypes */
+#include "pal.h"                 /* SLALIB function prototypes */
 #include "channel.h"             /* I/O channels */
 #include "proj.h"                /* WCSLIB projections and WCSLIB_MXPAR */
 
@@ -612,8 +615,8 @@ int astTest##attr##_( AstWcsMap *this, int axis ) { \
    projection. */
 typedef struct PrjData {
    int prj;                     /* WCSLIB projection identifier value */
-   int mxpar;                   /* Max no. of lon axis projection parameters */
-   int mxpar2;                  /* Max no. of lat axis projection parameters */
+   int mxpar;                   /* Max no. of lat axis projection parameters */
+   int mxpar2;                  /* Max no. of lon axis projection parameters */
    char desc[60];               /* Long projection description */
    char ctype[5];               /* FITS CTYPE identifying string */
    int (* WcsFwd)(double, double, struct AstPrjPrm *, double *, double *);
@@ -5368,6 +5371,7 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size,
    int axis;                    /* Axis index */
    int i;                       /* Axis index */
    int m;                       /* Parameter index */
+   int mxpar;                   /* Maximum number of PVi_m values */
 
 /* Initialise. */
    new = NULL;
@@ -5456,7 +5460,16 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size,
 /* PVi_m. */
 /* -------*/
       for( i = 0; i < astGetNin( new ); i++ ){
-         for( m = 0; m < prjdata->mxpar; m++ ){
+
+         if( i == new->wcsaxis[ 0 ] ) {
+            mxpar = prjdata->mxpar2;
+         } else if( i == new->wcsaxis[ 1 ] ) {
+            mxpar = prjdata->mxpar;
+         } else {
+            mxpar = 0;
+         } 
+
+         for( m = 0; m < mxpar; m++ ){
             (void) sprintf( buff, "pv%d_%d", i + 1, m );
             pv = astReadDouble( channel, buff, AST__BAD );
             if( pv != AST__BAD ) SetPV( new, i, m, pv );
