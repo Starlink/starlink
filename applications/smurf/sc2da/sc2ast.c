@@ -13,6 +13,7 @@ static char errmess[132];              /* For DRAMA error messages */
 
 #define MM2RAD 2.4945e-5               /* scale at array in radians */
 #define PIBY2 1.57079632679
+#define PI 2*PIBY2 
 #define PIX2MM 1.135                   /* pixel interval in mm */
 #define SPD 86400.0                    /* Seconds per day */
 #define JCMT_LON "W155:28:37.20"       /* Longitude of JCMT */
@@ -86,6 +87,7 @@ int *status             /* global status (given and returned) */
      19Apr2006 : Only use shiftmap if non-zero jig_az_x/y (ec)
      7Aug2006  : Correct rotation matrix in sc2ast_maketanmap (dsb)
      7Aug2006  : Removed sc2ast_createwcs_compat + related kludges (ec)
+     10Aug2006 : More corrections to the rotation matrix in sc2ast_maketanmap (dsb)
 */
 
 {
@@ -744,7 +746,7 @@ int *status               /* global status (given and returned) */
    class assumes). The reference point of the TAN projection is at the 
    north pole of the "native" spherical coordinate system. The matrix map
    first rotates about the Z axis by -lat (to rotate the Nasmyth Y axis to
-   north), then rotates about the Y axis by (pi/2-lat) (to rotate the
+   north), then rotates about the Y axis by -(pi/2-lat) (to rotate the
    reference point from the native north pole to the celestial north pole), 
    then rotates about the Z axis by -lon (to rotate the prime native meridian 
    to the prime celestial meridian). Here the Z axis points to the north
@@ -755,9 +757,11 @@ int *status               /* global status (given and returned) */
 /*
    Note that we deliberately do not call slaDeuler here since we are
    worried about performance issues when this routine will be called
-   repeatedly. The required call is: */
-   /* slaDeuler( "ZYZ", -lat, PI/2-lat, -lon, mat ); */
+   repeatedly. The required call is: 
 
+   slaDeuler( "ZYZ", -lat, -(PIBY2-lat), -lon, mat ); 
+
+/*
 
    ct = cos( lat );
    st = sin( lat );
@@ -766,16 +770,16 @@ int *status               /* global status (given and returned) */
 
    t1 = ct*st;
    t2 = -st*st;
-   t3 = ct*ct;
+   t3 = -ct*ct;
 
    mat[ 0 ] = t1*cn - st*sn;
    mat[ 1 ] = t2*cn - sn*ct;
-   mat[ 2 ] = -ct*cn;
+   mat[ 2 ] = ct*cn;
    mat[ 3 ] = t1*sn + st*cn;
    mat[ 4 ] = t2*sn + cn*ct;
-   mat[ 5 ] = -ct*sn;
+   mat[ 5 ] = ct*sn;
    mat[ 6 ] = t3;
-   mat[ 7 ] = -t1;
+   mat[ 7 ] = t1;
    mat[ 8 ] = st;
 
    matmap = astMatrixMap( 3, 3, 0, mat, "" );
