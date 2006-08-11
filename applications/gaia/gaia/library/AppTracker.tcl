@@ -70,6 +70,7 @@ itcl::class plastic::AppTracker {
       check_hub_
       add_app_ $id
       update_apps_variable_
+      return $VOID
    }
 
    #  Invoked when an application unregisters from the hub.
@@ -78,6 +79,7 @@ itcl::class plastic::AppTracker {
       check_hub_
       unset apps_($id)
       update_apps_variable_
+      return $VOID
    }
 
    #  Returns a list of external plastic::ApplicationItem objects
@@ -159,4 +161,7 @@ itcl::class plastic::AppTracker {
    #  Internal array used to store the currently registered applications.
    #  It is a clientId->ApplicationItem mapping.
    protected variable apps_
+
+   #  Return value for XML-RPC methods declared void.
+   protected common VOID [list]
 }
