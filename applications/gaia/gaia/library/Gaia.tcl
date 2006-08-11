@@ -1969,6 +1969,11 @@ window gives you access to this."
       }
    }
 
+   #  Returns the PLASTIC sender object, if there is one.
+   public proc get_plastic_sender {} {
+      return $plastic_sender_
+   }
+
    #  Retrieve the ESO config file, returning its content as the result.
    protected method get_eso_config_ {} {
       return [gaiautils::urlget $itk_option(-eso_config_file)]
