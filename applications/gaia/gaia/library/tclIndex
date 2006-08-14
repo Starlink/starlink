@@ -97,6 +97,7 @@ set auto_index(::gaia::GaiaPlastic) [list source [file join $dir GaiaPlastic.tcl
 set auto_index(::gaia::GaiaPlastic::get_gaia_) [list source [file join $dir GaiaPlastic.tcl]]
 set auto_index(::gaia::GaiaPlastic::get_file_) [list source [file join $dir GaiaPlastic.tcl]]
 set auto_index(::gaia::GaiaPlastic::get_temp_file_) [list source [file join $dir GaiaPlastic.tcl]]
+set auto_index(::gaia::GaiaPlastic::next_symbol_spec_) [list source [file join $dir GaiaPlastic.tcl]]
 set auto_index(::gaia::GaiaPolAction) [list source [file join $dir GaiaPolAction.tcl]]
 set auto_index(::gaia::GaiaPolCat) [list source [file join $dir GaiaPolCat.tcl]]
 set auto_index(::gaia::GaiaPolData) [list source [file join $dir GaiaPolData.tcl]]
