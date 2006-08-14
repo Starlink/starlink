@@ -1667,7 +1667,7 @@ itcl::class gaia::Gaia {
          foreach app [$tracker get_supporting_apps $send_id] {
             set appname [$app cget -name]
             add_menuitem $m command "Send to $appname" \
-               {Send the current image to $appname} \
+               "Send the current image to $appname" \
                -command "$this plastic_send_image_ \[$app cget -id\]"
          }
       }
@@ -1970,7 +1970,12 @@ window gives you access to this."
 
    #  Returns the PLASTIC sender object, if there is one.
    public proc get_plastic_sender {} {
-      return $plastic_sender_
+      return [code $plastic_sender_]
+   }
+
+   #  Returns the PLASTIC application object, if there is one.
+   public proc get_plastic_app {} {
+      return [code $plastic_app_]
    }
 
    #  Retrieve the ESO config file, returning its content as the result.
