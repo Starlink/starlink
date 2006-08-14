@@ -141,7 +141,7 @@ itcl::class gaia::GaiaPlastic {
          set tst_file [get_temp_file_ .TAB]
          [get_stilts_] execute tpipe \
                        ifmt=votable ofmt=tst in=$url out=$tst_file \
-                       "cmd=setparam symbol '$cat_symbol_spec'"
+                       "cmd=setparam symbol '[next_symbol_spec_]'"
          set window [display_table_ $tst_file $table_id]
          set cat_windows_($table_id) $window
       } msg]
@@ -150,7 +150,7 @@ itcl::class gaia::GaiaPlastic {
       if { ! $failure } {
          return $TRUE
       } else {
-         error_dialog "Failed to load table from PLASTIC:\n$msg"
+         error_dialog "Failed to load catalogue from PLASTIC:\n$msg"
          return $FALSE
       }
    }
@@ -260,13 +260,25 @@ itcl::class gaia::GaiaPlastic {
       error "No free files with name like $tryfile"
    }
 
+   #  Provides a suitable value for the "symbol_id" column in a TST table.
+   #  This is what determines how plotted symbols will appear on the
+   #  image (unless changed).  This function endeavours to return a 
+   #  different symbol each time it is called (though may repeat eventually).
+   protected proc next_symbol_spec_ {} {
+      set shapes {circle square plus cross diamond}
+      set colors {cyan yellow blue red grey50 green magenta}
+      set shape [lindex $shapes [expr $symbol_idx_ % [llength $shapes]]]
+      set color [lindex $colors [expr $symbol_idx_ % [llength $colors]]]
+      set size 6
+      incr symbol_idx_
+      return [list {} \
+                   [list $shape $color {} {} {} {}] \
+                   [list $size {}]]
+   }
 
 
    #  Instance variables:
    #  -------------------
-
-   #  Specification for plot symbols in catalogues acquired from PLASTIC.
-   public variable cat_symbol_spec {{} {circle yellow {} {} {} {}} {6 {}}}
 
    #  Name of the active instance of GaiaUrlGet.
    protected variable urlget_ {}
@@ -285,4 +297,7 @@ itcl::class gaia::GaiaPlastic {
    #  Constants for returning from boolean-declared XML-RPC methods.
    protected common FALSE [rpcvar boolean 0]
    protected common TRUE [rpcvar boolean 1]
+
+   #  Index of the last new symbol type used.
+   protected common symbol_idx_ 0
 }
