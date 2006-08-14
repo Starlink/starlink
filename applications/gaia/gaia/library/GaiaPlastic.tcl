@@ -45,7 +45,7 @@
 #     {enter_new_authors_here}
 
 #  History:
-#     13-JUL-2006 (MBT)
+#     13-JUL-2006 (MBT):
 #        Original version.
 #     {enter_further_changes_here}
 
@@ -85,8 +85,8 @@ itcl::class gaia::GaiaPlastic {
    }
 
    #  Load a FITS file specified as a URL into the display.
-   public method  ivo://votech.org/fits/image/loadFromURL {sender_id img_url
-                                                           args} {
+   public method ivo://votech.org/fits/image/loadFromURL {sender_id img_url
+                                                          args} {
       set basegaia [get_gaia_]
       if { $basegaia != {} } {
          set fname [get_file_ $img_url]
@@ -106,7 +106,7 @@ itcl::class gaia::GaiaPlastic {
 
    #  Point at a coordinate by drawing an identifier graphic, ra and dec
    #  are both in decimal degrees.
-   public method  ivo://votech.org/sky/pointAtCoords {sender_id ra dec args} {
+   public method ivo://votech.org/sky/pointAtCoords {sender_id ra dec args} {
       set basegaia [get_gaia_]
       if { $basegaia != {} } {
          if { ![catch {$basegaia position_of_interest $ra $dec "deg J2000"}]} {
@@ -115,6 +115,101 @@ itcl::class gaia::GaiaPlastic {
       }
       return $FALSE
    }
+
+   #  Execute a GAIA command.
+   #
+   #  Nice idea, but at the current PLASTIC version (v0.5), which 
+   #  basically lacks any security measures, it would be dangerous 
+   #  to allow any registered application to execute arbitrary Tcl code.
+#  public method ivo://plastic.starlink.ac.uk/gaia/execute {sender_id args} {
+#     eval $args
+#  }
+
+   #  Load a VOTable as a catalogue.
+   public method ivo://votech.org/votable/loadFromURL {sender_id url args} {
+
+      #  Second argument, if present, is a tag for the table.  If not 
+      #  present, use the URL.
+      if {$args == ""} {
+         set table_id $url
+      } else {
+         set table_id [lindex $args 0]
+      }
+
+      #  Convert the VOTable to TST format and display it.
+      set failure [catch {
+         set tst_file [get_temp_file_ .TAB]
+         [get_stilts_] execute tpipe \
+                       ifmt=votable ofmt=tst in=$url out=$tst_file \
+                       "cmd=setparam symbol '$cat_symbol_spec'"
+         set window [display_table_ $tst_file $table_id]
+         set cat_windows_($table_id) $window
+      } msg]
+
+      #  Return as appropriate.
+      if { ! $failure } {
+         return $TRUE
+      } else {
+         error_dialog "Failed to load table from PLASTIC:\n$msg"
+         return $FALSE
+      }
+   }
+
+   #  Display only a selection of the rows from a previously loaded catalogue.
+   public method ivo://votech.org/votable/showObjects {sender_id table_id
+                                                       idx_list args} {
+      if {[info exists cat_windows_($table_id)]} {
+         $cat_windows_($table_id) select_indices $idx_list
+         return $TRUE
+      } else {
+         return $FALSE
+      }
+   }
+
+   #  Highlight a single row from a previously loaded catalaogue.
+   public method ivo://votech.org/votable/highlightObject {sender_id table_id
+                                                           idx args} {
+      if {[info exists cat_windows_($table_id)]} {
+         $cat_windows_($table_id) highlight_index $idx
+         return $TRUE
+      } else {
+         return $FALSE
+      }
+   }
+
+   #  Protected methods:
+   #  ------------------
+
+   #  Download and display a file.
+   protected method display_file_ {filename type} {
+      set basegaia [get_gaia_]
+      if { $basegaia != {} } {
+         $basegaia open $filename
+      }
+      delete object $urlget_
+      set urlget_ {}
+   }
+
+   #  Displays a catalogue in TST format.
+   #  Returns the GaiaSearch widget which displays the catalogue.
+   protected method display_table_ {filename table_id} {
+      set images [skycat::SkyCat::get_skycat_images]
+      set ctrlwidget [lindex $images 0]
+      set gaia [winfo parent $ctrlwidget]
+      set window [::cat::AstroCat::open_catalog_window \
+                    $filename $ctrlwidget ::gaia::PlasticSearch 0 $gaia]
+      $window configure -table_id $table_id
+      return $window
+   }
+
+   #  Return a Stilts instance belonging to this object.
+   protected method get_stilts_ {} {
+      if {$stilts_ == ""} {
+         set stilts_ [gaia::Stilts #auto -debug 0]
+      }
+      return $stilts_
+   }
+
 
    #  Utility procs:
    #  --------------
@@ -125,16 +220,6 @@ itcl::class gaia::GaiaPlastic {
          return [winfo parent $image]
       }
       return ""
-   }
-
-   #  Download and display a file.
-   protected method display_file_ {filename type} {
-      set basegaia [get_gaia_]
-      if { $basegaia != {} } {
-         $basegaia open $filename
-      }
-      delete object $urlget_
-      set urlget_ {}
    }
 
    #  Tries to turn a URL into a file name.  If the URL uses the file:
@@ -151,9 +236,53 @@ itcl::class gaia::GaiaPlastic {
       }
    }
 
+   #  Get the name of a file it's OK to use for scratch space.
+   #  The exten argument gives a file extension (e.g. ".fits").
+   protected proc get_temp_file_ {exten} {
+      set tmpdir ""
+      foreach trydir {/tmp /usr/tmp .} {
+         if {[file isdirectory $trydir] && [file writable $trydir]} {
+            set tmpdir $trydir
+            break
+         }
+      }
+      if { $tmpdir == "" } {
+         error "No temporary directory"
+      }
+
+      set basefile "${tmpdir}/gaia_temp_"
+      for { set ix 1 } { $ix < 100 } { incr ix } {
+         set tryfile "$tmpdir/gaia_temp_$ix$exten"
+         if {! [file exists $tryfile] } {
+            return $tryfile
+         }
+      }
+      error "No free files with name like $tryfile"
+   }
+
+
+
+   #  Instance variables:
+   #  -------------------
+
+   #  Specification for plot symbols in catalogues acquired from PLASTIC.
+   public variable cat_symbol_spec {{} {circle yellow {} {} {} {}} {6 {}}}
 
    #  Name of the active instance of GaiaUrlGet.
    protected variable urlget_ {}
-   private common TRUE [rpcvar boolean 1]
-   private common FALSE [rpcvar boolean 0]
+
+   #  Stilts object for executing STILTS commands.
+   protected variable stilts_ {}
+
+
+   #  Class variables:
+   #  ----------------
+
+   #  Array of GaiaSearch windows which have been opened to display 
+   #  PLASTIC-acquired tables.  The array is indexed by table_id.
+   protected common cat_windows_
+
+   #  Constants for returning from boolean-declared XML-RPC methods.
+   protected common FALSE [rpcvar boolean 0]
+   protected common TRUE [rpcvar boolean 1]
 }
