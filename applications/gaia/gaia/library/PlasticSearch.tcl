@@ -63,23 +63,47 @@ itcl::class gaia::PlasticSearch {
    public method init {} {
       GaiaSearch::init
 
-      #  Add a new menu for PLASTIC-related activities.
-      set m [add_menubutton Interop]
-      configure_menubutton Interop -underline 6
-      add_short_help $itk_component(menubar).interop \
-         {Interop menu: catalogue-related tool interoperability using PLASTIC}
+      set plastic_app_ [gaia::Gaia::get_plastic_app]
+      if {$plastic_app_ != ""} {
 
-      $m add checkbutton -label "Selection broadcasts row index" \
-         -variable [scope send_rows] 
-      $m add checkbutton -label "Selection broadcasts row position" \
-         -variable [scope send_radecs]
+         #  Add a new menu for PLASTIC-related activities.
+         set interopmenu_ [add_menubutton Interop]
+         set m $interopmenu_
+         configure_menubutton Interop -underline 6
+         add_short_help $itk_component(menubar).interop \
+            {Interop menu: catalogue-related tool interoperability using PLASTIC}
 
-      add_menuitem $m command "Broadcast current search" \
-         {Send all visible rows to PLASTIC applications} \
-         -command [code $this transmit_info {}]
-      add_menuitem $m command "Broadcast current selection" \
-         {Send current row selection to PLASTIC applications} \
-         -command [code $this transmit_selection {}]
+         $m add checkbutton -label "Selection broadcasts row index" \
+            -variable [scope send_rows] 
+         $m add checkbutton -label "Selection broadcasts row position" \
+            -variable [scope send_radecs]
+
+         $m add separator
+
+         set send_info_menu [menu $m.send_info]
+         add_menuitem $m command "Broadcast current search" \
+            {Send all visible rows to PLASTIC applications} \
+            -command [code $this transmit_info {}]
+         add_menuitem $m cascade "Send current search" \
+            {Send all visible rows to a selected PLASTIC application} \
+            -menu $send_info_menu
+ 
+         set send_selection_menu [menu $m.send_selection]
+         add_menuitem $m command "Broadcast current selection" \
+            {Send current row selection to PLASTIC applications} \
+            -command [code $this transmit_selection {}]
+         add_menuitem $m cascade "Send current selection" \
+            {Send current row selection to a selected PLASTIC application} \
+            -menu $send_selection_menu
+
+         #  Arrange for the menu to be kept up to date with the current
+         #  state of the PLASTIC connection.
+         $plastic_app_ plastic_reg_command [code $this plastic_reg_changed_]
+         plastic_reg_changed_
+         set tracker [$plastic_app_ cget -app_tracker]
+         $tracker plastic_apps_command [code $this plastic_apps_changed_]
+         plastic_apps_changed_
+      }
    }
 
    #  Selects the rows identified by a given list of integer values.
@@ -174,45 +198,45 @@ itcl::class gaia::PlasticSearch {
    public method activate_selected_row {} {
 
       #  Send the row index to PLASTIC if required.
-      if {[catch {
-         set sender [gaia::Gaia::get_plastic_sender]
-         if {$sender != "" && $table_id != ""} {
-            set rows [$results_ get_selected]
-            if {[llength $rows] == 1} {
-               set row [lindex $rows 0]
-               set base_idx [lsearch [all_rows_] $row]
-               if {$base_idx >= 0} {
-                  $sender send_row $table_id $base_idx {}
+      if {$send_rows} {
+         if {[catch {
+            set sender [gaia::Gaia::get_plastic_sender]
+            if {$sender != "" && $table_id != ""} {
+               set rows [$results_ get_selected]
+               if {[llength $rows] == 1} {
+                  set row [lindex $rows 0]
+                  set base_idx [lsearch [all_rows_] $row]
+                  if {$base_idx >= 0} {
+                     $sender send_row $table_id $base_idx {}
+                  }
                }
             }
+         } msg]} {
+            puts "row activation error: $msg"
          }
-      } msg]} {
-         puts "row activation error: $msg"
       }
 
       #  Send the row sky position to PLASTIC if required.
-      if {[catch {
-         set sender [gaia::Gaia::get_plastic_sender]
-         set ra_col [$w_.cat ra_col]
-         set dec_col [$w_.cat dec_col]
-         if {$sender != "" && $table_id != "" &&
-             $ra_col >= 0 && $dec_col >= 0} {
-             set rows [$results_ get_selected]
-             if {[llength $rows] == 1} {
-                set row [lindex $rows 0]
-                set ra  [lindex $row $ra_col]]
-                set dec [lindex $row $dec_col]
-                $sender send_radec $ra $dec {}
-             }
+      if {$send_radecs} {
+         if {[catch {
+            set sender [gaia::Gaia::get_plastic_sender]
+            set ra_col [$w_.cat ra_col]
+            set dec_col [$w_.cat dec_col]
+            if {$sender != "" && $table_id != "" &&
+                $ra_col >= 0 && $dec_col >= 0} {
+                set rows [$results_ get_selected]
+                if {[llength $rows] == 1} {
+                   set row [lindex $rows 0]
+                   set ra  [lindex $row $ra_col]]
+                   set dec [lindex $row $dec_col]
+                   $sender send_radec $ra $dec {}
+                }
+            }
+         } msg]} {
+            puts "row activation error: $msg"
          }
-      } msg]} {
-         puts "row activation error: $msg"
       }
    }
-
-   #  ID of the table loaded into this widget.  This is the ID used by 
-   #  PLASTIC messages to identify the table.
-   public variable table_id {}
 
    #  Returns a list of all the rows in the table loaded into this widget.
    #  This is a superset of the rows currently visible.
@@ -220,9 +244,60 @@ itcl::class gaia::PlasticSearch {
       return [$w_.cat query]
    }
 
+   #  Called when the PLASTIC connection goes up or down.
+   protected method plastic_reg_changed_ {} {
+
+      #  Configure the menu items all enabled/disabled according to whether
+      #  there is a PLASTIC connection.
+      if {$plastic_app_ != ""} {
+         set is_reg [$plastic_app_ is_registered]
+      } else {
+         set is_reg 0
+      }
+      set when_reg [expr {$is_reg ? "normal" : "disabled"}]
+      set nitem [$interopmenu_ index last]
+      for {set item 0} {$item <= $nitem} {incr item} {
+         catch {$interopmenu_ entryconfigure $item -state $when_reg}
+      }
+   }
+
+   #  Called when external applications register or unregister with PLASTIC.
+   protected method plastic_apps_changed_ {} {
+
+      #  Configure some of the cascade menus so that they have one entry
+      #  for each of the currently registered PLASTIC applications
+      #  capable of receiving the relevant messages.
+      set selection_menu $interopmenu_.send_selection
+      set info_menu $interopmenu_.send_info
+      $info_menu delete 0 last
+      $selection_menu delete 0 last
+      if {[$plastic_app_ is_registered]} {
+         set tracker [$plastic_app_ cget -app_tracker]
+         set msg_id "ivo://votech.org/votable/showObjects"
+         set msg_apps [$tracker get_supporting_apps $msg_id]
+         foreach app $msg_apps {
+            set appname [$app cget -name]
+            set appid [$app cget -id]
+            add_menuitem $info_menu command "Send to $appname" \
+               "Send all visible rows to $appname" \
+               -command "[code $this transmit_info $appid]"
+            add_menuitem $selection_menu command "Send to $appname" \
+               "Send current row selection to $appname" \
+               -command "[code $this transmit_selection $appid]"
+         }
+      }
+   }
+
+   #  ID of the table loaded into this widget.  This is the ID used by 
+   #  PLASTIC messages to identify the table.
+   public variable table_id {}
+
    #  Whether to broadcast each row index when it is highlighted.
    public variable send_rows 1
 
    #  Whether to broadcast each row sky position when it is highlighted.
    public variable send_radecs 0
+
+   protected variable plastic_app_
+   protected variable interopmenu_
 }
