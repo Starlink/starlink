@@ -47,11 +47,6 @@
 #  Performs the given method on this object
 
 #  Configuration options:
-#     -registered_variable
-#        Contains the name of a boolean variable which will be kept up
-#        to date with the status of this application - 1 when it is and
-#        0 when it isn't.  Putting a trace on this variable is a suitable
-#        way of getting callbacks when the hub connection goes up/down.
 #     -app_tracker:
 #        An agent which keeps track of the applications currently
 #        registered with the hub.  This should usually be a
@@ -270,21 +265,34 @@ itcl::class plastic::PlasticApp {
       set_client_id_ ""
    }
 
+   #  Returns a boolean value indicating whether the application is 
+   #  currently [believed to be] registered with a live hub.
+   public method is_registered {} {
+      return [expr {$client_id_ != ""}]
+   }
+
+   #  Adds a callback command to be executed when the PLASTIC registration
+   #  status changes.  An attempt will be made to execute the given command 
+   #  when this application registers or unregisters with a hub 
+   #  (or when that may have happened).
+   public method plastic_reg_command {cmd} {
+      lappend plastic_reg_commands_ $cmd
+   }
+
+   #  Performs the requested callbacks when the registration status 
+   #  may have changed.
+   protected method inform_plastic_reg_ {} {
+      foreach cmd $plastic_reg_commands_ {
+         catch {eval $cmd}
+      }
+   }
+
    #  Internal method to set the value of the client_id_ variable.
    #  client_id_ is used internally to indicate whether we are currently
    #  registered with a hub (we're not if it's an empty string).
-   private method set_client_id_ {cid} {
+   protected method set_client_id_ {cid} {
       set client_id_ $cid
-      update_registered_variable_
-   }
-
-   #  Makes sure that the registered_variable is up to date with the current
-   #  state of this object.
-   private method update_registered_variable_ {} {
-      if {$registered_variable != ""} {
-         set cid $client_id_
-         set $registered_variable [expr {$cid != ""}]
-      }
+      inform_plastic_reg_
    }
 
    #  Returns a list of all the agents that will be used to respond to
@@ -386,10 +394,6 @@ itcl::class plastic::PlasticApp {
 
    #  Public variables:
    #  ----------------
-   public variable registered_variable {} {
-      update_registered_variable_
-   }
-
    public variable app_tracker [code [plastic::AppTracker #auto]] {
       $app_tracker configure -hub [code $hub_] -self $client_id_
    }
@@ -399,6 +403,7 @@ itcl::class plastic::PlasticApp {
    private variable hub_
    private variable user_agents_
    private variable client_id_ {}
+   private variable plastic_reg_commands_ {}
 
    #  Common variables:
    #  ----------------

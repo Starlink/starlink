@@ -345,16 +345,17 @@ itcl::class gaia::Gaia {
       #  Check if any post display tasks are required.
       after 0 [code $this file_loaded_]
 
-      #  Attempt to register as PLASTIC listener, adding traces for some
-      #  callbacks we need when the status of the PLASTIC connection changes.
+      #  Attempt to register as PLASTIC listener, adding callbacks to be
+      #  informed when the status of the PLASTIC connection changes.
       if {$itk_option(-interop_menu)} {
          init_plastic_
-         trace variable [scope is_plastic_registered_] w \
-                        [code $this trace_plastic_reg_]
-         set is_plastic_registered_ $is_plastic_registered_
-         trace variable [scope apps_count_] w \
-                        [code $this trace_apps_count_]
-         set apps_count_ $apps_count_
+         if { $plastic_app_ != "" } {
+            $plastic_app_ plastic_reg_command [code $this plastic_reg_changed_]
+            plastic_reg_changed_
+            set tracker [$plastic_app_ cget -app_tracker]
+            $tracker plastic_apps_command [code $this plastic_apps_changed_]
+            plastic_apps_changed_
+         }
       }
    }
 
@@ -1600,14 +1601,6 @@ itcl::class gaia::Gaia {
          set responder [gaia::GaiaPlastic #auto]
          set app [plastic::PlasticApp #auto [list [itcl::code $responder]]]
 
-         #  Configure it so that it keeps the is_plastic_registered_ 
-         #  common variable up to date.
-         $app configure -registered_variable [scope is_plastic_registered_]
-
-         #  Configure it so that it keeps the apps_count_ common variable
-         #  up to date.
-         [$app cget -app_tracker] configure -apps_variable [scope apps_count_]
-
          #  If a hub appears to be running, have a go at registering with it.
          if { [plastic::PlasticHub::is_hub_running] } {
             if { [catch {
@@ -1646,8 +1639,13 @@ itcl::class gaia::Gaia {
    }
 
    #  Invoked when we register or unregister with the PLASTIC hub.
-   protected method trace_plastic_reg_ {name element op} {
-      upvar $name is_reg 
+   protected method plastic_reg_changed_ {} {
+      if {$plastic_app_ != ""} {
+         set is_reg [$plastic_app_ is_registered]
+      } else {
+         set is_reg 0
+      }
+      set is_plastic_registered_ $is_reg
       set when_reg [expr {$is_reg ? "normal" : "disabled"}]
       set when_unreg [expr {$is_reg ? "disabled" : "normal"}]
       $interopmenu_ entryconfigure Register -state $when_unreg
@@ -1657,20 +1655,21 @@ itcl::class gaia::Gaia {
    }
 
    #  Invoked when someone else registers or unregisters with the PLASTIC hub.
-   protected method trace_apps_count_ {name element op} {
-      upvar $name napp
+   protected method plastic_apps_changed_ {} {
 
       #  Rebuild the Send Image submenu so that it contains an up-to-date
       #  list of all the applications that are prepared to receive images.
       set m $plastic_send_image_menu_
       $m delete 0 last
-      set send_id "ivo://votech.org/fits/image/loadFromURL"
-      set tracker [$plastic_app_ cget -app_tracker]
-      foreach app [$tracker get_supporting_apps $send_id] {
-         set appname [$app cget -name]
-         add_menuitem $m command "Send to $appname" \
-            {Send the current image to $appname} \
-            -command "$this plastic_send_image_ \[$app cget -id\]"
+      if {[$plastic_app_ is_registered]} {
+         set send_id "ivo://votech.org/fits/image/loadFromURL"
+         set tracker [$plastic_app_ cget -app_tracker]
+         foreach app [$tracker get_supporting_apps $send_id] {
+            set appname [$app cget -name]
+            add_menuitem $m command "Send to $appname" \
+               {Send the current image to $appname} \
+               -command "$this plastic_send_image_ \[$app cget -id\]"
+         }
       }
    }
 
@@ -2214,9 +2213,6 @@ window gives you access to this."
 
    # Boolean variable which keeps track of whether we are registered with hub.
    common is_plastic_registered_ 0
-
-   # Variable holding the number of applications currently registered with hub.
-   common apps_count_ 0
 }
 
 #  XXX redefine the body of AstroCat::new_catalog, as this contains a
