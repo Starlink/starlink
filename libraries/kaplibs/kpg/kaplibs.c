@@ -53,6 +53,8 @@
 *        Add kpg1_statd
 *     10-JUL-2006 (DSB):
 *        Add kpg1_wwrt and kpg1_wread.
+*     14-AUG-2006 (DSB):
+*        Added kpg1_mxmnd, kpg1_mxmnr and kpg1_mxmni.
 *     {enter_further_changes_here}
 
 *-
@@ -691,4 +693,164 @@ void kpg1Wread( const HDSLoc *loc, const char *name, AstObject **obj,
 
    return;
 }
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_mxmnr)( LOGICAL(BAD), 
+                            INTEGER(EL), 
+                            REAL_ARRAY(ARRAY), 
+                            INTEGER(NINVAL), 
+                            REAL(MAXMUM), 
+                            REAL(MINMUM),
+                            INTEGER(MAXPOS),
+                            INTEGER(MINPOS), 
+                            INTEGER(STATUS) );
+
+void kpg1Mxmnr( int bad, int el, float *array, int *ninval, float *maxmum, 
+                float *minmum, int *maxpos, int *minpos, int *status ){
+
+   DECLARE_LOGICAL(BAD);
+   DECLARE_INTEGER(EL);
+   DECLARE_REAL_ARRAY_DYN(ARRAY);
+   DECLARE_INTEGER(NINVAL);
+   DECLARE_REAL(MAXMUM);
+   DECLARE_REAL(MINMUM);
+   DECLARE_INTEGER(MAXPOS);
+   DECLARE_INTEGER(MINPOS);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_LOGICAL( bad, BAD );
+   F77_EXPORT_INTEGER( el, EL );
+   F77_CREATE_REAL_ARRAY( ARRAY, el );
+   F77_ASSOC_REAL_ARRAY( ARRAY, array );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_mxmnr)( LOGICAL_ARG(&BAD),
+                         INTEGER_ARG(&EL),
+                         REAL_ARRAY_ARG(ARRAY),
+                         INTEGER_ARG(&NINVAL),
+                         REAL_ARG(&MAXMUM),
+                         REAL_ARG(&MINMUM),
+                         INTEGER_ARG(&MAXPOS),
+                         INTEGER_ARG(&MINPOS),
+                         INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_REAL_ARRAY( ARRAY, array, el );
+   F77_IMPORT_INTEGER( NINVAL, *ninval );
+   F77_IMPORT_REAL( MAXMUM, *maxmum );
+   F77_IMPORT_REAL( MINMUM, *minmum );
+   F77_IMPORT_INTEGER( MAXPOS, *maxpos );
+   F77_IMPORT_INTEGER( MINPOS, *minpos );
+
+   F77_FREE_REAL( ARRAY );
+
+}
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_mxmni)( LOGICAL(BAD), 
+                            INTEGER(EL), 
+                            INTEGER_ARRAY(ARRAY), 
+                            INTEGER(NINVAL), 
+                            INTEGER(MAXMUM), 
+                            INTEGER(MINMUM),
+                            INTEGER(MAXPOS),
+                            INTEGER(MINPOS), 
+                            INTEGER(STATUS) );
+
+void kpg1Mxmni( int bad, int el, int *array, int *ninval, int *maxmum, 
+                int *minmum, int *maxpos, int *minpos, int *status ){
+
+   DECLARE_LOGICAL(BAD);
+   DECLARE_INTEGER(EL);
+   DECLARE_INTEGER_ARRAY_DYN(ARRAY);
+   DECLARE_INTEGER(NINVAL);
+   DECLARE_INTEGER(MAXMUM);
+   DECLARE_INTEGER(MINMUM);
+   DECLARE_INTEGER(MAXPOS);
+   DECLARE_INTEGER(MINPOS);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_LOGICAL( bad, BAD );
+   F77_EXPORT_INTEGER( el, EL );
+   F77_CREATE_INTEGER_ARRAY( ARRAY, el );
+   F77_ASSOC_INTEGER_ARRAY( ARRAY, array );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_mxmni)( LOGICAL_ARG(&BAD),
+                         INTEGER_ARG(&EL),
+                         INTEGER_ARRAY_ARG(ARRAY),
+                         INTEGER_ARG(&NINVAL),
+                         INTEGER_ARG(&MAXMUM),
+                         INTEGER_ARG(&MINMUM),
+                         INTEGER_ARG(&MAXPOS),
+                         INTEGER_ARG(&MINPOS),
+                         INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_INTEGER_ARRAY( ARRAY, array, el );
+   F77_IMPORT_INTEGER( NINVAL, *ninval );
+   F77_IMPORT_INTEGER( MAXMUM, *maxmum );
+   F77_IMPORT_INTEGER( MINMUM, *minmum );
+   F77_IMPORT_INTEGER( MAXPOS, *maxpos );
+   F77_IMPORT_INTEGER( MINPOS, *minpos );
+
+   F77_FREE_INTEGER( ARRAY );
+
+}
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_mxmnd)( LOGICAL(BAD), 
+                            INTEGER(EL), 
+                            DOUBLE_ARRAY(ARRAY), 
+                            INTEGER(NINVAL), 
+                            DOUBLE(MAXMUM), 
+                            DOUBLE(MINMUM),
+                            INTEGER(MAXPOS),
+                            INTEGER(MINPOS), 
+                            INTEGER(STATUS) );
+
+void kpg1Mxmnd( int bad, int el, double *array, int *ninval, double *maxmum, 
+                double *minmum, int *maxpos, int *minpos, int *status ){
+
+   DECLARE_LOGICAL(BAD);
+   DECLARE_INTEGER(EL);
+   DECLARE_DOUBLE_ARRAY_DYN(ARRAY);
+   DECLARE_INTEGER(NINVAL);
+   DECLARE_DOUBLE(MAXMUM);
+   DECLARE_DOUBLE(MINMUM);
+   DECLARE_INTEGER(MAXPOS);
+   DECLARE_INTEGER(MINPOS);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_LOGICAL( bad, BAD );
+   F77_EXPORT_INTEGER( el, EL );
+   F77_CREATE_DOUBLE_ARRAY( ARRAY, el );
+   F77_ASSOC_DOUBLE_ARRAY( ARRAY, array );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_mxmnd)( LOGICAL_ARG(&BAD),
+                         INTEGER_ARG(&EL),
+                         DOUBLE_ARRAY_ARG(ARRAY),
+                         INTEGER_ARG(&NINVAL),
+                         DOUBLE_ARG(&MAXMUM),
+                         DOUBLE_ARG(&MINMUM),
+                         INTEGER_ARG(&MAXPOS),
+                         INTEGER_ARG(&MINPOS),
+                         INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_DOUBLE_ARRAY( ARRAY, array, el );
+   F77_IMPORT_INTEGER( NINVAL, *ninval );
+   F77_IMPORT_DOUBLE( MAXMUM, *maxmum );
+   F77_IMPORT_DOUBLE( MINMUM, *minmum );
+   F77_IMPORT_INTEGER( MAXPOS, *maxpos );
+   F77_IMPORT_INTEGER( MINPOS, *minpos );
+
+   F77_FREE_DOUBLE( ARRAY );
+
+}
+
 
