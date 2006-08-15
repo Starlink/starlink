@@ -223,6 +223,7 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Document the use of the Direction attribute by the Plot class.
 *     30-JUN-2006 (DSB):
 *        Allow astAbbrev to have a null "str1" value.
+*class--
 */
 
 /* Module Macros. */
