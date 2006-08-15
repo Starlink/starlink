@@ -70,11 +70,14 @@
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
 *     14-JUN-2001 (MBT):
 *        Original version.
+*     15-AUG-2006 (MBT):
+*        Changed to use C interface for GRP and NDG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -86,6 +89,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "sae_par.h"
+#include "star/grp.h"
+#include "star/ndg.h"
 #include "grp_par.h"
 #include "tcl.h"
 #include "cnf.h"
@@ -98,30 +103,24 @@
 
 /* Local constants. */
 #define NFIELD 6                    /* Number of fields returned by NDG_GTSUP */
-      const int nfield = NFIELD;    /* Number of fields returned by NDG_GTSUP */
-      const F77_INTEGER_TYPE one = 1; /* Unity */
-      const F77_LOGICAL_TYPE false = F77_FALSE; /* Logical false */
 
 /* Local variables. */
+      Grp *outgrp;                  /* GRP group for output group */
+      Tcl_Obj *ob;                  /* Element of result list */
+      Tcl_Obj *result;              /* Result returned to Tcl caller */
       char *grpex;                  /* Input group expression */
       char *pc;                     /* Pointer to character */
+      char const *ffields[ NFIELD ];/* Pointers to supplementary data */
+      char *pname;                  /* Pointer to GRP element buffer */
       char name[ GRP__SZNAM + 1 ];  /* Name of an expanded item */
-      char field[ GRP__SZNAM + 1 ]; /* Supplementary data field */
+      char supdat[ NFIELD ][ GRP__SZNAM + 1 ]; /* Supplementary data */
+      int flag;                     /* NDG trailing character flag */
       int gtsup;                    /* Get supplementary information? */
       int i;                        /* Loop variable */
       int j;                        /* Loop variable */
       int nflag;                    /* Number of flags supplied */
+      int size;                     /* Number of items in output group */
       int unblank;                  /* Pattern string is not empty */
-      Tcl_Obj *ob;                  /* Element of result list */
-      Tcl_Obj *result;              /* Result returned to Tcl caller */
-      F77_INTEGER_TYPE errgid;      /* GRP identifier for inaccessible group */
-      F77_INTEGER_TYPE outgid;      /* GRP identifier for output group */       
-      F77_INTEGER_TYPE size;        /* Number of items in output group */
-      F77_LOGICAL_TYPE flag;        /* NDG trailing character flag */
-      DECLARE_CHARACTER( fgrpex, GRP__SZNAM ); /* Fortran version of grpex */
-      DECLARE_CHARACTER( fname, GRP__SZNAM); /* Fortran version of name */
-      char ffields[ GRP__SZNAM * NFIELD ]; /* Fortran supplementary data */
-      int ffields_length = GRP__SZNAM; /* Length of ffields strings */
 
 /* Process flags. */
       gtsup = 0;
@@ -151,23 +150,17 @@
       if ( unblank ) {
 
 /* Prepare arguments for passing to NDG. */
-         cnfExprt( grpex, fgrpex, fgrpex_length );
-         errgid = GRP__NOID;
-         outgid = GRP__NOID;
+         outgrp = NULL;
 
 /* Generate a new group to put the results into. */
          STARCALL(
-            F77_CALL(ndg_asexp)( CHARACTER_ARG(fgrpex), LOGICAL_ARG(&false),
-                                 INTEGER_ARG(&errgid), INTEGER_ARG(&outgid), 
-                                 INTEGER_ARG(&size), LOGICAL_ARG(&flag), 
-                                 INTEGER_ARG(status)
-                                 TRAIL_ARG(fgrpex) );
+            ndgAsexp( grpex, 0, NULL, &outgrp, &size, &flag, status );
          )
       }
 
 /* If the string was blank, fake an empty result. */
       else {
-         outgid = GRP__NOID;
+         outgrp = NULL;
          size = 0;
       }
 
@@ -179,28 +172,23 @@
 
 /* Only the name is required. */
          if ( ! gtsup ) {
+            pname = name;
             STARCALL(
-               F77_CALL(grp_get)( INTEGER_ARG(&outgid), INTEGER_ARG(&i),
-                                  INTEGER_ARG(&one), 
-                                  CHARACTER_ARG(fname), INTEGER_ARG(status)
-                                  TRAIL_ARG(fname) );
+               grpGet( outgrp, i, 1, &pname, GRP__SZNAM, status );
             )
-            cnfImprt( fname, fname_length, name );
             ob = Tcl_NewStringObj( name, -1 );
          }
 
 /* Supplementary information is required. */
          else {
+            for( j = 0; j < 6; j++ ) ffields[ j ] = supdat[ j ];
             STARCALL(
-               F77_CALL(ndg_gtsup)( INTEGER_ARG(&outgid), INTEGER_ARG(&i),
-                                    CHARACTER_ARG(ffields), INTEGER_ARG(status)
-                                    TRAIL_ARG(ffields) );
+               ndgGtsup( outgrp, i, ffields, GRP__SZNAM, status );
             )
             ob = Tcl_NewListObj( 0, (Tcl_Obj **) NULL );
             for ( j = 0; j < NFIELD; j++ ) {
-               cnfImprt( ffields + GRP__SZNAM * j, GRP__SZNAM, field );
                Tcl_ListObjAppendElement( interp, ob, 
-                                         Tcl_NewStringObj( field, -1 ) );
+                                         Tcl_NewStringObj( ffields[ j ], -1 ) );
             }
          }
 
@@ -209,9 +197,9 @@
       }
 
 /* Annul the group. */
-      if ( outgid != GRP__NOID ) {
+      if ( outgrp ) {
          STARCALL(
-            F77_CALL(grp_delet)( INTEGER_ARG(&outgid), INTEGER_ARG(status) );
+            grpDelet( &outgrp, status );
          )
       }
 
