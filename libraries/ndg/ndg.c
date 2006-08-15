@@ -33,6 +33,8 @@
 *        Use grpC2F and grpF2C.
 *     12-JUL-2006 (TIMJ):
 *        Add ndgNdfcr
+*     8-AUG-2006 (DSB):
+*        Added ndgGtsup
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -195,3 +197,41 @@ void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp ** igrp2, in
 
    return;
 }
+
+
+
+F77_SUBROUTINE(ndg_gtsup)( INTEGER(IGRP), INTEGER(I), CHARACTER_ARRAY(FIELDS),
+                           INTEGER(STATUS) TRAIL(FIELDS) );
+
+/* Note the addition of a "len" parameter following the "fields" array.
+   This should be supplied equal to the allocated length of the shortest 
+   string for which a pointer has been supplied in "fields". This length
+   should include room for the trailing null. */
+
+void ndgGtsup( const Grp *grp, int i, char const *fields[6], int len, int *status ){
+   DECLARE_INTEGER(IGRP);
+   DECLARE_INTEGER(I);
+   DECLARE_CHARACTER_ARRAY_DYN(FIELDS);
+   DECLARE_INTEGER(STATUS);
+
+   IGRP = grpC2F( grp, status );
+
+   F77_EXPORT_INTEGER( i, I );
+   F77_CREATE_CHARACTER_ARRAY(FIELDS,len-1,6);
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(ndg_gtsup)( INTEGER_ARG(&IGRP),
+                        INTEGER_ARG(&I),
+                        CHARACTER_ARRAY_ARG(FIELDS),
+                        INTEGER_ARG(&STATUS) 
+                        TRAIL_ARG(FIELDS) );
+
+   F77_IMPORT_CHARACTER_ARRAY_P(FIELDS,FIELDS_length,((char *const *)fields),
+                                len,6);
+   F77_FREE_CHARACTER(FIELDS);
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
+
