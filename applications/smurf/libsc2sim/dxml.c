@@ -430,45 +430,46 @@ int *status               /* global status (given and returned) */
   
    Authors :
     J.Balfour (jbalfour@physics.ubc.ca)
+    E.Chapin (echapin@phas.ubc.ca)
 
    History :
     15May2006 : Original (jb)
+    16Aug2006 : Fixed memory leak (EC)
 */
 
 {
 
-   int length;             /* length of the supplied string */
-   int i = 0;              /* iterator to change each character */
-   char *convert;          /* uppercase version of the string */
+  int length;             /* length of the supplied string */
+  int i = 0;              /* iterator to change each character */
+  char *convert;          /* uppercase version of the string */
+  
+  if ( *status != 0 ) return lower;
+  
+  /* Get the length of the original string excluding NULL terminator*/
+  length = strlen(lower);
+  
+  /* Copy and convert the string to uppercase */
+  
+  convert = (char *)malloc(length+1); /* Include the terminator in length */
+  strcpy (convert, lower);
+  
+  while (*convert != '\0') {
+    *convert = toupper(*convert);
+    convert++;
+    i++;
+  }
+  
+  /* Check to make sure the entire string converted */
+  
+  if ( length != strlen(convert - i) ) {
+    *status = DITS__APP_ERROR;
+    ErsRep ( 0, status, 
+             "fhead library: error converting string to uppercase" );
+  }
+  
+  return convert - i;
 
-   if ( *status != 0 ) return lower;
-
-/* Get the length of the original string */
-
-   length = strlen(lower);
-
-/* Copy and convert the string to uppercase */
-
-   convert = (char *)malloc(length);
-   strcpy (convert, lower);
-
-   while (*convert != '\0') {
-      *convert = toupper(*convert);
-      convert++;
-      i++;
-   }//while
-
-/* Check to make sure the entire string converted */
-
-   if ( length != strlen(convert - i) ) {
-      *status = DITS__APP_ERROR;
-      ErsRep ( 0, status, 
-        "fhead library: error converting string to uppercase" );
-	}//if
-
-   return convert - i;
-
-}//dxml_makeUpper
+}
 
 
 /*+ dxml_readsimXML - read simulation details from a file */
