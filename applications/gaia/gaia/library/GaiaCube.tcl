@@ -571,6 +571,13 @@ itcl::class gaia::GaiaCube {
          #  Display this for the first time.
          display $section_name_ 0
 
+         #  Make sure everything is up-to-date (new data has been accepted by
+         #  the RtdImage) so that the data replacement happens on the file
+         #  we've just loaded (can get out of sync when unexpected errors
+         #  autoloading Tcl scripts occur, which defer the newImage acceptance
+         #  callbacks).
+         update
+
          #  Now delete old image slice (waited until released).
          if { $oldname != {} } {
             catch {::file delete $oldname} msg
