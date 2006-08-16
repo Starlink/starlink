@@ -83,6 +83,8 @@
 *        Removed dependence on sc2sim_telpos & sc2sim_bolcoords
 *     2006-08-08 (EC)
 *        Include sc2ast.h
+*     2006-08-15 (EC)
+*        Use sc2ast_get_gridcoords instead of sc2sim_bolnatcoords
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -220,7 +222,9 @@ int *status              /* global status (given and returned) */
 
    /* Get the native x- and y- (GRID) coordinates of each bolometer */
    
-   sc2sim_bolnatcoords( *xbolo, *ybolo, &nboll, status );
+   /*sc2sim_bolnatcoords( *xbolo, *ybolo, &nboll, status );*/
+
+   sc2ast_get_gridcoords( *xbolo, *ybolo, status );
    
    /* Since sc2sim_simframe still needs xbc & ybc to interpolate values from
       the sky noise image, calculate them here. Get rid of the old call
