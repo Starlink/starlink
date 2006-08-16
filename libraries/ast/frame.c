@@ -223,6 +223,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Document the use of the Direction attribute by the Plot class.
 *     30-JUN-2006 (DSB):
 *        Allow astAbbrev to have a null "str1" value.
+*     16-AUG-2006 (DSB):
+*        Correct "Class Applicability" to "Applicability".
 *class--
 */
 
@@ -1406,7 +1408,7 @@ static int AxIn( AstFrame *this, int axis, double lo, double hi, double val,
 *  Returned Value:
 *     Non-zero if the test value is inside the interval. 
 
-*  Class Applicability:
+*  Applicability:
 *     Frame
 *        Uses simple Euclidean test
 *     SkyFrame
@@ -2286,8 +2288,7 @@ f     FROM = INTEGER (Given)
 *        coordinate system. Note that the Base attribute of this
 *        FrameSet may be modified by this function to indicate which
 *        intermediate coordinate system was used (see under
-*        "FrameSets" in the "Class Applicability" section for
-*        details).
+*        "FrameSets" in the "Applicability" section for details).
 c     to
 f     TO = INTEGER (Given)
 *        Pointer to a Frame which represents the "destination"
@@ -2299,8 +2300,7 @@ f     TO = INTEGER (Given)
 *        coordinate system. Note that the Base attribute of this
 *        FrameSet may be modified by this function to indicate which
 *        intermediate coordinate system was used (see under
-*        "FrameSets" in the "Class Applicability" section for
-*        details).
+*        "FrameSets" in the "Applicability" section for details).
 c     domainlist
 f     DOMAINLIST = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated character string containing a
