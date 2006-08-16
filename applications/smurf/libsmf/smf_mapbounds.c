@@ -67,6 +67,8 @@
 *        sc2head no longer used. Use JCMTState instead.
 *     2006-07-27 (TIMJ):
 *        Do not use bare constant for rad to deg conversion.
+*     2006-08-15 (EC):
+*        Fixed off-by-one errors in GRID coordinates
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -176,19 +178,18 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
     }
 
     if( *status == SAI__OK) {
-      /* Get the bolo offsets for each corner of the array */
-      x_array_corners[0] = 0;
-      x_array_corners[1] = 0;
-      x_array_corners[2] = (data->dims)[0] - 1;
-      x_array_corners[3] = (data->dims)[0] - 1;
+      /* Get the bolo GRID coordinates for each corner of the array */
+      x_array_corners[0] = 1;
+      x_array_corners[1] = 1;
+      x_array_corners[2] = (data->dims)[0];
+      x_array_corners[3] = (data->dims)[0];
       
-      y_array_corners[0] = 0;
-      y_array_corners[1] = (data->dims)[1] - 1;
-      y_array_corners[2] = 0;
-      y_array_corners[3] = (data->dims)[1] - 1;
+      y_array_corners[0] = 1;
+      y_array_corners[1] = (data->dims)[1];
+      y_array_corners[2] = 1;
+      y_array_corners[3] = (data->dims)[1];
             
       /* Get the astrometry for all the time slices in this data file */
-      
       for( j=0; j<(data->dims)[2]; j++ ) {	
 	smf_tslice_ast( data, j, 1, status);
 	

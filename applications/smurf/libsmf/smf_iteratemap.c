@@ -99,7 +99,7 @@
 #define FUNC_NAME "smf_iteratemap"
 
 void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map, 
-		     double *variance, double *weights,
+		     double *mapvar, double *weights,
 		     int msize, int *status ) {
 
   /* Local Variables */
@@ -134,8 +134,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   int rebinflags;               /* Flags to control rebinning */
   double sigma;                 /* Estimate of standard deviation */
 
-  struct timeval tm;
-  struct timezone tz;
+  /*
+    struct timeval tm;
+    struct timezone tz;
+  */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -144,60 +146,21 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   grpGrpsz( igrp, &isize, status );
 
   /* Create empty groups for time-series model components */
-  astgrp = grpNew( "AST model component", status );
-  atmgrp = grpNew( "ATM model component", status );
-  ngrp = grpNew( "NOISE model component", status );
+
+  msgOut(" ", "SMF_ITERATEMAP: Create model containers", status);
+
+  smf_model_create( igrp, SMF__AST, &astgrp, status );
+  smf_model_create( igrp, SMF__COM, &atmgrp, status );
+  smf_model_create( igrp, SMF__RES, &ngrp, status );
+
+  if( astgrp ) grpDelet( &astgrp, status );
+  if( atmgrp ) grpDelet( &atmgrp, status );
+  if( ngrp ) grpDelet( &ngrp, status );
+
+  return;
 
   /* Get/check the CONFIG parameters stored in the keymap */
 
-  if( *status == SAI__OK ) {
-    if( astMapGet0C( keymap, "ASTMODEL", &astname ) ) {
-      grpGrpex( astname, igrp, astgrp, &gsize, &added, &flag, status );
-
-      if( (*status == SAI__OK) && (gsize != isize) ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "Size of ASTGRP != size of IGRP", status);      
-      }
-    } else {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "ASTMODEL unspecified", status);      
-    }
-  } else {
-    errRep(FUNC_NAME, "Couldn't create group for ASTMODEL", status);      
-  }
-
-  if( *status == SAI__OK ) {
-    if( astMapGet0C( keymap, "ATMMODEL", &atmname ) ) {
-      grpGrpex( atmname, igrp, atmgrp, &gsize, &added, &flag, status );
-
-      if( (*status == SAI__OK) && (gsize != isize) ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "Size of ATMGRP != size of IGRP", status);      
-      }
-    } else {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "ATMMODEL unspecified", status);      
-    }
-  } else {
-    errRep(FUNC_NAME, "Couldn't create group for ATMMODEL", status);      
-  }
-
-  if( *status == SAI__OK ) {
-    if( astMapGet0C( keymap, "NOISEMODEL", &nname ) ) {
-      grpGrpex( nname, igrp, ngrp, &gsize, &added, &flag, status );
-
-      if( (*status == SAI__OK) && (gsize != isize) ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "Size of NGRP != size of IGRP", status);      
-      }
-    } else {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "NOISEMODEL unspecified", status);      
-    }
-  } else {
-    errRep(FUNC_NAME, "Couldn't create group for NOISEMODEL", status);      
-  }
-  
   if( *status == SAI__OK ) {
     if( !astMapGet0I( keymap, "NUMITER", &numiter ) ) {
       *status = SAI__ERROR;
@@ -206,47 +169,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   } else {
     errRep(FUNC_NAME, "Couldn't get NUMITER", status);      
   }  
-
-  /* Create all of the model files by copying the input files */
-  msgOut(" ", "SMF_ITERATEMAP: Create intermediate model files", status);
-
-  for( i=1; i<=gsize; i++ ) {
-
-    /* Open the input file DATA array and propagate it to the output
-       model files (QUALITY and VARIANCE only need to get stored
-       once) */       
-
-    ndgNdfas( igrp, i, "UPDATE", &indf, status );
-
-    ndgNdfpr( indf, " ", astgrp, i, &astndf, status );
-    ndgNdfpr( indf, " ", atmgrp, i, &atmndf, status );
-    ndgNdfpr( indf, " ", ngrp, i, &nndf, status );
-
-    /* MAP the variance in the input file to create if not there */
-    ndfMap( indf, "VARIANCE", "_DOUBLE", "WRITE", &mapptr[1], &nmap, 
-	    status );
-
-    /* Annul the input NDF */
-    ndfAnnul( &indf, status);
-    
-    /* Set parameters of the DATA/VARIANCE arrays, map them so that they're
-       defined on exit and then annul */
-
-    ndfMap( astndf, "DATA", "_DOUBLE", "WRITE", &(mapptr[0]), &nmap, status );
-    ndfAnnul( &astndf, status);
-
-    ndfMap( atmndf, "DATA", "_DOUBLE", "WRITE", &(mapptr[0]), &nmap, status );
-    ndfAnnul( &atmndf, status);
-
-    ndfMap( nndf, "DATA", "_DOUBLE", "WRITE", &(mapptr[0]), &nmap, status );
-    ndfAnnul( &nndf, status);
-
-    /* Exit loop if bad status */
-    if( *status != SAI__OK ) {
-      errRep(FUNC_NAME, "Couldn't create NDFs for model components", status);
-      i = gsize;
-    }
-  }
 
   if( *status == SAI__OK ) {
     for( iter=0; iter<numiter; iter++ ) {    
@@ -344,7 +266,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
           smf_simplerebinmap( (double *)(astdata->pntr)[0], 
                               (double *)(idata->pntr)[1], lut, 
                               nbolo*(astdata->dims)[2], rebinflags,
-                              map, weights, variance, msize, status );
+                              map, weights, mapvar, msize, status );
 	
           /* Close files */
           smf_close_file( &idata, status );   
@@ -404,13 +326,17 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
           /* Close files */
           smf_close_file( &idata, status );    
 
-          gettimeofday(&tm, &tz);
-          printf("Start: %i . %i\n", tm.tv_sec, tm.tv_usec);
-          
+	  /*
+	    gettimeofday(&tm, &tz);
+	    printf("Start: %i . %i\n", tm.tv_sec, tm.tv_usec);
+	  */
+
           smf_close_file( &astdata, status );    
           
-          gettimeofday(&tm, &tz);
-          printf("End: %i . %i\n", tm.tv_sec, tm.tv_usec);
+	  /*
+	    gettimeofday(&tm, &tz);
+	    printf("End: %i . %i\n", tm.tv_sec, tm.tv_usec);
+	  */
 
           smf_close_file( &atmdata, status );    
           smf_close_file( &ndata, status );    
@@ -420,8 +346,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   }
 
   /* Cleanup */
-  if( astgrp != NULL ) grpDelet( &astgrp, status );
-  if( atmgrp != NULL ) grpDelet( &atmgrp, status );
-  if( ngrp != NULL ) grpDelet( &ngrp, status );
+  if( astgrp ) grpDelet( &astgrp, status );
+  if( atmgrp ) grpDelet( &atmgrp, status );
+  if( ngrp ) grpDelet( &ngrp, status );
 
 }

@@ -45,6 +45,8 @@
 *        Changed function name from smf_mapcoord to smf_calc_mapcoord
 *     2006-07-10 (EC):
 *        Only re-calculate LUT when necessary
+*     2006-08-15 (EC):
+*        Fixed off-by-one errors in *bnd_in
 
 *  Notes:
 
@@ -294,10 +296,10 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset,
 	/* Calculate bounds in the input array. 
 	   Note: I had to swap the ranges for the two axes from what seemed to
 	   make the most sense to me!  EC */
-	lbnd_in[0] = 0;
-	ubnd_in[0] = (data->dims)[0]-1; 
-	lbnd_in[1] = 0;
-	ubnd_in[1] = (data->dims)[1]-1;
+	lbnd_in[0] = 1;
+	ubnd_in[0] = (data->dims)[0]; 
+	lbnd_in[1] = 1;
+	ubnd_in[1] = (data->dims)[1];
 	
 	/* Loop over time slices */
 	for( i=0; i<(data->dims)[2]; i++ ) {
@@ -307,8 +309,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset,
 	    
 	    /* Get bolo -> sky mapping 
 	       Set the System attribute for the SkyFframe in input WCS 
-	       FrameSet and extract the IN_PIXEL->Sky mapping. */	  
-	    
+	       FrameSet and extract the IN_PIXEL->Sky mapping. */ 
 	    astSetC( (data->hdr)->wcs, "SYSTEM", system );
 	    bolo2sky = astGetMapping( data->hdr->wcs, AST__BASE, 
 				      AST__CURRENT );
