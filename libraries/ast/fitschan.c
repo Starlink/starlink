@@ -77,13 +77,19 @@ f     (e.g. using AST_FINDFITS or AST_READ).
 c     The detailed behaviour of astRead and astWrite, when used with
 f     The detailed behaviour of AST_READ and AST_WRITE, when used with
 *     a FitsChan, depends on the encoding in use. In general, however,
-c     all use of astRead is destructive, so that FITS header cards
-f     all use of AST_READ is destructive, so that FITS header cards
+c     all successful use of astRead is destructive, so that FITS header cards
+f     all successful use of AST_READ is destructive, so that FITS header cards
 *     are consumed in the process of reading an Object, and are
 *     removed from the FitsChan (this deletion can be prevented for 
 *     specific cards by calling the 
 c     astRetainFits function).
 f     AST_RETAINFITS routine).
+*     An unsuccessful call of 
+c     astRead
+f     AST_READ
+*     (for instance, caused by the FitsChan not containing the necessary
+*     FITS headers cards needed to create an Object) results in the
+*     contents of the FitsChan being left unchanged.
 *
 *     If the encoding in use allows only a single Object description
 *     to be stored in a FitsChan (e.g. the DSS, FITS-WCS and FITS-IRAF
@@ -693,6 +699,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     7-AUG-2006 (DSB):
 *        - Remove trailing spaces from the string returned by astGetFitsS
 *        if the original string contains 8 or fewer characters.
+*     16-AUG-2006 (DSB):
+*        - Document non-destructive nature of unsuccessful astRead calls.
 *class--
 */
 

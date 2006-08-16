@@ -87,6 +87,9 @@ f     - AST_WRITE: Write an Object to a Channel
 *     1-NOV-2003 (DSB):
 *        Change the initialiser so that it accepts source and sink
 *        wrapper functions as arguments (for use by derived classes).
+*     16-AUG-2006 (DSB):
+*        - Document non-destructive nature of unsuccessful astRead calls
+*        on a FitsChan.
 *class--
 */
 
@@ -1701,6 +1704,22 @@ f     AST_READ = INTEGER
 *        A pointer to the new Object. The class to which this will
 *        belong is determined by the input data, so is not known in
 *        advance.
+
+*  Class Applicability:
+*     FitsChan
+c        All successful use of astRead on a FitsChan is destructive, so that
+f        All successful use of AST_READ on a FitsChan is destructive, so that 
+*        FITS header cards are consumed in the process of reading an Object, 
+*        and are removed from the FitsChan (this deletion can be prevented 
+*        for specific cards by calling the FitsChan
+c        astRetainFits function).
+f        AST_RETAINFITS routine).
+*        An unsuccessful call of 
+c        astRead
+f        AST_READ
+*        (for instance, caused by the FitsChan not containing the necessary
+*        FITS headers cards needed to create an Object) results in the
+*        contents of the FitsChan being left unchanged.
 
 *  Notes:
 *     - A null Object pointer (AST__NULL) will be returned, without
