@@ -136,14 +136,6 @@ double ybc[],        /* projected Y coords of bolometers (returned) */
 int *status          /* global status (given and returned) */
 );
 
-void sc2sim_bolnatcoords 
-(
-double *xbolo,        /* projected X coords of bolometers (returned) */
-double *ybolo,        /* projected Y coords of bolometers (returned) */
-int *bol,             /* bolometer counter (returned) */
-int *status           /* global status (given and returned) */
-);
-
 void sc2sim_bousscan ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
                        double digcurrent, double digmean, 
                        double digscale, char filter[], 
