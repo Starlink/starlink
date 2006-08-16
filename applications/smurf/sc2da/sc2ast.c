@@ -213,8 +213,6 @@ int *status             /* global status (given and returned) */
 
 
 
-
-
 /* Check the sub-array number. If it is -1, free the cached AST objects and 
    return. Otherwise, report an error if the value is illegal. We do
    this before checking the inherited status so that the memory is freed
@@ -282,6 +280,7 @@ int *status             /* global status (given and returned) */
 
 /* The GRID domain locates the [0][0] pixel at coordinates (1,1). Shift
    these so that the [0][0] pixel is at the origin of a coordinate system */
+
       zshift[0] = -1.0;
       zshift[1] = -1.0;
       zshiftmap = astShiftMap ( 2, zshift, "" );
@@ -291,8 +290,9 @@ int *status             /* global status (given and returned) */
    because the pixel separation is the same in both coordinates and is
    accurately constant. A ZoomMap can be used for this. */
       zoommap = astZoomMap ( 2, PIX2MM, "" );
+
       map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
-                                                      zoommap, 1, "" );
+						      zoommap, 1, "" );
 
 /* The mm coords now have to be rotated through an angle approximating
    a multiple of 90 degrees */
@@ -336,6 +336,7 @@ int *status             /* global status (given and returned) */
                                                       flipmap, 1, "" );
 
 /* Correct for polynomial distortion */      
+
       polymap = astPolyMap( 2, 2, 14, coeff_f, 14, coeff_i, "" );
       map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
 						      polymap, 1, "" );
@@ -768,4 +769,70 @@ int *status              /* global status (given and returned) */
 /* Return the required Mapping.*/
    return result;
 
+}
+
+
+/*
+*+
+*  Name:
+*     sc2ast_get_gridcoords
+
+*  Purpose:
+*     Get native (GRID) bolometer coordinates for SCUBA2 subarray
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     Subroutine
+
+*  Invocation:
+*     sc2sim_get_gridcoords ( double *row, double *col, int *status )
+
+*  Arguments:
+*     row = double* (Returned)
+*        Row GRID coords of bolometers
+*     col = double* (Returned)
+*        Column GRID coords of bolometers
+*     status = int* (Given and Returned)
+*        Pointer to global status.
+
+*  Description:
+*     Calculate the native GRID coordinates of each bolometer in the 
+*     subarray, in the same order they are stored in memory / identified
+*     in framesets created by sc2ast_createwcs
+
+*  Authors:
+*     E.Chapin (UBC)
+*     {enter_new_authors_here}
+
+*  History :
+*     2006-02-28 (EC):
+*        Original
+*     2006-07-20 (JB):
+*        Split from dsim.c
+*     2006-08-15 (EC):
+*        - Fixed off-by-one errors
+*        - Renamed to sc2ast_get_gridcoords from sc2sim_bolnatcoords
+
+*/
+
+void sc2ast_get_gridcoords ( double *row, double *col, int *status ) {
+  /* Local variables */
+  int i;           /* row counter */
+  int j;           /* column counter */
+  int bol;         /* bolometer counter */
+
+  /* Check status */
+  if ( !StatusOkP(status) ) return;
+  
+  /* Get the grid coordinates */
+  bol = 0;
+  for( j=1; j<=SC2AST_BOLROW; j++ ) {
+    for( i=1; i<=SC2AST_BOLCOL; i++ ) {
+      row[bol] = (double)i;
+      col[bol] = (double)j;
+      bol++;
+    }
+  }
 }

@@ -1,6 +1,66 @@
+/*
+*+
+*  Name:
+*     sc2ast.h
+
+*  Purpose:
+*     Prototypes for the sc2ast library
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     Header File
+
+*  Invocation:
+*     #include "sc2ast.h"
+
+*  Description:
+*     Prototypes used by the sc2ast functions.
+
+*  Authors:
+*     B.D.Kelly (bdk@roe.ac.uk)
+*     Tim Jenness (timj@jach.hawaii.edu)
+*     D.S. Berry (dsb@ast.man.ac.uk)
+*     E.Chapin (echapin@phas.ubc.ca)
+*     {enter_new_authors_here}
+
+*  History:
+*     2006-08-15 (EC):
+*        Placed comments at top of header, added SC2AST_BOLCOL/BOLROW
+*     {enter_further_changes_here}
+
+*  Copyright:
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     University of British Columbia.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
+
 #ifndef HEADGEN___src_sc2ast_sc2ast_h
 #define HEADGEN___src_sc2ast_sc2ast_h 
  
+#define SC2AST_BOLROW 40
+#define SC2AST_BOLCOL 32
  
 /*+ sc2ast_createwcs - create WCS description */
 
@@ -83,5 +143,7 @@ int *status              /* global status (given and returned) */
 );
 
  
- 
+/* Calculate GRID coordinates for each bolometer */
+void sc2ast_get_gridcoords ( double *row, double *col, int *status );
+
 #endif
