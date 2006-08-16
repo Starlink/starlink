@@ -104,14 +104,27 @@ itcl::class gaia::PlasticSearch {
          $tracker plastic_apps_command [code $this plastic_apps_changed_]
          plastic_apps_changed_
       }
+
+      #  Store the initial set of rows in two ways: first as a normal 
+      #  list of the row contents, and second as an array of row indices
+      #  keyed by the row contents.  Both of these may be required for 
+      #  efficient operations later on.  Although this set of rows may
+      #  not continue to match the set currently displayed by this widget,
+      #  it is the set with reference to which PLASTIC messages relating 
+      #  to the table contained here must be understood.
+      set idx 0
+      set all_rows_ [$w_.cat query]
+      foreach row $all_rows_ {
+         set all_row_idxs_($row) $idx
+         incr idx
+      }
    }
 
    #  Selects the rows identified by a given list of integer values.
    public method select_indices {idx_list} {
       set info {}
-      set all [all_rows_]
       foreach idx $idx_list {
-         lappend info [lindex $all $idx]
+         lappend info [lindex $all_rows_ $idx]
       }
       set_info $headings_ $info
    }
@@ -125,7 +138,7 @@ itcl::class gaia::PlasticSearch {
       #  very efficient (search through all rows for an identical match)
       #  but I don't see how else it can be done using the existing data
       #  structures available to this class.
-      set row [lindex [all_rows_] $idx]
+      set row [lindex $all_rows_ $idx]
       set info_idx [lsearch $info_ $row]
       if {$row >= 0} {
 
@@ -173,16 +186,10 @@ itcl::class gaia::PlasticSearch {
       if {[catch {
          set sender [gaia::Gaia::get_plastic_sender]
          if {$sender != "" && $table_id != ""} {
-            set all_rows [all_rows_]
             set idx_list {}
-
-            #  This list is shockingly inefficient, being an O(N*M) full-text
-            #  match of the M selected rows against the N rows in the 
-            #  whole list.  Don't know how else it can be done though.
             foreach row $rows {
-               set idx [lsearch $all_rows $row]
-               if {$idx > -1} {
-                  lappend idx_list $idx
+               if {[info exists all_row_idxs_($row)]} {
+                  lappend idx_list $all_row_idxs_($row)
                }
             }
             $sender send_selection $table_id $idx_list $recipients 
@@ -205,9 +212,8 @@ itcl::class gaia::PlasticSearch {
                set rows [$results_ get_selected]
                if {[llength $rows] == 1} {
                   set row [lindex $rows 0]
-                  set base_idx [lsearch [all_rows_] $row]
-                  if {$base_idx >= 0} {
-                     $sender send_row $table_id $base_idx {}
+                  if {[info exists all_row_idxs_($row)]} {
+                     $sender send_row $table_id $all_row_idxs_($row) {}
                   }
                }
             }
@@ -236,12 +242,6 @@ itcl::class gaia::PlasticSearch {
             puts "row activation error: $msg"
          }
       }
-   }
-
-   #  Returns a list of all the rows in the table loaded into this widget.
-   #  This is a superset of the rows currently visible.
-   protected method all_rows_ {} {
-      return [$w_.cat query]
    }
 
    #  Called when the PLASTIC connection goes up or down.
@@ -298,6 +298,15 @@ itcl::class gaia::PlasticSearch {
    #  Whether to broadcast each row sky position when it is highlighted.
    public variable send_radecs 0
 
+   #  List of all the rows in the initial table
+   protected variable all_rows_
+
+   #  Array with each row in the initial table as keys and row index as values.
+   protected variable all_row_idxs_
+
+   #  PlasticApp object used for PLASTIC connections.
    protected variable plastic_app_
+
+   #  Interoperability menu.
    protected variable interopmenu_
 }
