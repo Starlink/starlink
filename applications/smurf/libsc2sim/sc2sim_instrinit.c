@@ -85,6 +85,8 @@
 *        Include sc2ast.h
 *     2006-08-15 (EC)
 *        Use sc2ast_get_gridcoords instead of sc2sim_bolnatcoords
+*     2006-08-16 (EC)
+*        Fixed mis-handling of bad error status
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -126,147 +128,139 @@
 
 /* Starlink Includes */
 #include "ast.h"
+#include "sae_par.h"
 
-void sc2sim_instrinit
-( 
-int argc,                /* argument count (given) */
-char **argv,             /* argument list (given) */
-struct dxml_struct *inx, /* structure for values from XML file (returned) */
-struct dxml_sim_struct *sinx, /* structure for values from XML file(returned) */
-int *rseed,              /* seed for random number generator (returned)*/
-double coeffs[NCOEFFS],  /* bolometer response coeffs (returned) */
-double *digcurrent,      /* digitisation mean current (returned) */
-double *digmean,         /* digitisation mean value (returned) */
-double *digscale,        /* digitisation scale factore (returned) */
-double *elevation,       /* telescope elevation (radians) (returned) */
-double weights[],        /* impulse response (returned) */
-double **heater,         /* bolometer heater ratios (returned) */
-double **pzero,          /* bolometer power offsets (returned) */
-double **xbc,            /* X offsets of bolometers in arcsec (returned) */
-double **ybc,            /* Y offsets of bolometers in arcsec (returned) */
-double **xbolo,          /* Native bolo x-offsets */
-double **ybolo,          /* Native bolo x-offsets */
-int *status              /* global status (given and returned) */
-)
+void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
+                       struct dxml_sim_struct *sinx, int *rseed,
+                       double coeffs[NCOEFFS], double *digcurrent,
+                       double *digmean, double *digscale, double *elevation,
+                       double weights[], double **heater, double **pzero,
+                       double **xbc, double **ybc, double **xbolo,
+                       double **ybolo, int *status ) {
 
-{
-   /* Local variables */
-   double azimuth;                /* Azimuth in radians */
-   double decay;                  /* bolometer time constant (msec) */
-   AstFrameSet *fset=NULL;        /* Frameset to calculate xbc + ybc */
-   int j;                         /* loop counter */
-   double lst;                    /* local sidereal time in radians */
-   double meanatm;                /* mean expected atmospheric signal (pW) */
-   int nboll;                     /* total number of bolometers */
-   double p;                      /* parallactic angle (radians) */
-   double photonsigma;            /* typical photon noise level in pW */
-   double samptime;               /* sample time in sec */
-   int savebols;                  /* flag for bol details (unused here) */
-   int subnum;                    /* subarray number */
-   double trans;                  /* average transmission */
+  /* Local variables */
+  double azimuth;                /* Azimuth in radians */
+  double decay;                  /* bolometer time constant (msec) */
+  AstFrameSet *fset=NULL;        /* Frameset to calculate xbc + ybc */
+  int j;                         /* loop counter */
+  double lst;                    /* local sidereal time in radians */
+  double meanatm;                /* mean expected atmospheric signal (pW) */
+  int nboll;                     /* total number of bolometers */
+  double p;                      /* parallactic angle (radians) */
+  double photonsigma;            /* typical photon noise level in pW */
+  double samptime;               /* sample time in sec */
+  int savebols;                  /* flag for bol details (unused here) */
+  int subnum;                    /* subarray number */
+  double trans;                  /* average transmission */
 
-   /* Check status */
-   if ( !StatusOkP(status) ) return;
+  /* Check status */
+  if ( !StatusOkP(status) ) return;
 
-   /* Initialise tracing */
-   dream_traceinit();
+  /* Initialise tracing */
+  dream_traceinit();
    
-   /* Get control parameters */
-    if ( dream_trace ( 1 ) ) {
-     printf ( "staresim : Start of the program\n" );
-   }
+  /* Get control parameters */
+  if ( dream_trace ( 1 ) ) {
+    printf ( "staresim : Start of the program\n" );
+  }
 
-   sc2sim_getpar ( argc, argv, inx, sinx, rseed, &savebols, status );
+  sc2sim_getpar ( argc, argv, inx, sinx, rseed, &savebols, status );
 
-   samptime = inx->sample_t / 1000.0;
+  samptime = inx->sample_t / 1000.0;
    
-   /* Initialise bolometer characteristics */
-   dream_bolinit ( 1, inx->nbolx, inx->nboly, status );
+  /* Initialise bolometer characteristics */
+  dream_bolinit ( 1, inx->nbolx, inx->nboly, status );
    
-   /* Get the bolometer information */
-   nboll = inx->nbolx * inx->nboly;
-   
-   decay = 5.0;
-   *heater = smf_malloc ( nboll, sizeof(**heater), 1, status );
-   *pzero = smf_malloc ( nboll, sizeof(**pzero), 1, status  );
-   *xbc = smf_malloc ( nboll, sizeof(**xbc), 1, status  );
-   *ybc = smf_malloc ( nboll, sizeof(**ybc), 1, status  );
-   *xbolo = smf_malloc ( nboll, sizeof(**xbolo), 1, status  );
-   *ybolo = smf_malloc ( nboll, sizeof(**ybolo), 1, status  );
-   
-   /*  Initialise the standard bolometer response function.
-       The routine sets the values for 6 polynomial coefficients which
-       translate input power in pico Watts to output current in Amp. */
-   sc2sim_response ( inx->lambda, NCOEFFS, coeffs, status );
+  /* Get the bolometer information */
+  if( *status == SAI__OK ) {
+    nboll = inx->nbolx * inx->nboly;
+  }     
 
-   /*  Calculate the parameters for simulating digitisation */
-   sc2sim_calctrans ( inx->lambda, &trans, sinx->tauzen, status );
-   sc2sim_atmsky ( inx->lambda, trans, &meanatm, status );   
-   sc2sim_getsigma ( inx->lambda, sinx->bandGHz, sinx->aomega,
-		   (sinx->telemission+meanatm), &photonsigma, status );
+  decay = 5.0;
+  *heater = smf_malloc ( nboll, sizeof(**heater), 1, status );
+  *pzero = smf_malloc ( nboll, sizeof(**pzero), 1, status  );
+  *xbc = smf_malloc ( nboll, sizeof(**xbc), 1, status  );
+  *ybc = smf_malloc ( nboll, sizeof(**ybc), 1, status  );
+  *xbolo = smf_malloc ( nboll, sizeof(**xbolo), 1, status  );
+  *ybolo = smf_malloc ( nboll, sizeof(**ybolo), 1, status  );
+
+  /*  Initialise the standard bolometer response function.
+      The routine sets the values for 6 polynomial coefficients which
+      translate input power in pico Watts to output current in Amp. */
+  sc2sim_response ( inx->lambda, NCOEFFS, coeffs, status );
+
+  /*  Calculate the parameters for simulating digitisation */
+  sc2sim_calctrans ( inx->lambda, &trans, sinx->tauzen, status );
+  sc2sim_atmsky ( inx->lambda, trans, &meanatm, status );   
+  sc2sim_getsigma ( inx->lambda, sinx->bandGHz, sinx->aomega,
+                    (sinx->telemission+meanatm), &photonsigma, status );
    
-   sc2sim_getscaling ( NCOEFFS, coeffs, inx->targetpow, photonsigma,
-		     digmean, digscale, digcurrent, status );
+  sc2sim_getscaling ( NCOEFFS, coeffs, inx->targetpow, photonsigma,
+                      digmean, digscale, digcurrent, status );
   
    
-   /*  Initialise the bolometer impulse response
-       WEIGHTS contain 16 coefficients in reversed order given by
-       exp(-ti/DECAY) divided by the sum of all 16 values.
-       This is practically identical to the fb.exp(-t1.fb) formula
-       used in the DREAM software with fb=1/DECAY. */
-   sc2sim_getweights ( decay, inx->sample_t, DREAM__MXIRF, weights, status );
+  /*  Initialise the bolometer impulse response
+      WEIGHTS contain 16 coefficients in reversed order given by
+      exp(-ti/DECAY) divided by the sum of all 16 values.
+      This is practically identical to the fb.exp(-t1.fb) formula
+      used in the DREAM software with fb=1/DECAY. */
+  sc2sim_getweights ( decay, inx->sample_t, DREAM__MXIRF, weights, status );
  
-   /* Get the subsystem number */ 
+  /* Get the subsystem number */ 
    
-   sc2ast_name2num( sinx->subname, &subnum, status );
+  sc2ast_name2num( sinx->subname, &subnum, status );
 
-   /* Get the native x- and y- (GRID) coordinates of each bolometer */
+  /* Get the native x- and y- (GRID) coordinates of each bolometer */
    
-   /*sc2sim_bolnatcoords( *xbolo, *ybolo, &nboll, status );*/
+  /*sc2sim_bolnatcoords( *xbolo, *ybolo, &nboll, status );*/
 
-   sc2ast_get_gridcoords( *xbolo, *ybolo, status );
+  sc2ast_get_gridcoords( *xbolo, *ybolo, status );
    
-   /* Since sc2sim_simframe still needs xbc & ybc to interpolate values from
-      the sky noise image, calculate them here. Get rid of the old call
-      to sc2sim_bolcoords. For now just make a dummy scuba2 frameset at
-      some fixed elevation. To do this properly we would actually want to
-      calculate xbc and ybc on-the-fly as the telescope points at different
-      regions of the sky. */
+  /* Since sc2sim_simframe still needs xbc & ybc to interpolate values from
+     the sky noise image, calculate them here. Get rid of the old call
+     to sc2sim_bolcoords. For now just make a dummy scuba2 frameset at
+     some fixed elevation. To do this properly we would actually want to
+     calculate xbc and ybc on-the-fly as the telescope points at different
+     regions of the sky. */
 
-   sc2ast_createwcs( subnum, 0, 0, 0, 0, 53795.0, &fset, status ); 
+  sc2ast_createwcs( subnum, 0, 0, 0, 0, 53795.0, &fset, status ); 
 
-   /* If we do an AzEl projection for each bolometer it is very nearly
-      a tangent plane projection because we chose El=0 */
+  /* If we do an AzEl projection for each bolometer it is very nearly
+     a tangent plane projection because we chose El=0 */
 
-   astSetC( fset, "SYSTEM", "AzEl" );
-   astTran2( fset, nboll, *ybolo, *xbolo, 1, *xbc, *ybc );
+  if( *status == SAI__OK ) {
 
-   /* xbc and ybc are in radians at this point. Convert to arcsec */
-   for ( j=0; j<nboll; j++ ) {
-     (*xbc)[j] *= DR2AS;
-     (*ybc)[j] *= DR2AS;
-   }
+    astSetC( fset, "SYSTEM", "AzEl" );
+    astTran2( fset, nboll, *ybolo, *xbolo, 1, *xbc, *ybc );
+     
+    /* xbc and ybc are in radians at this point. Convert to arcsec */
+    for ( j=0; j<nboll; j++ ) {
+      (*xbc)[j] *= DR2AS;
+      (*ybc)[j] *= DR2AS;
+    }
+     
+    /* Setup world coordinate information and get the bolometer positions in
+       Nasmyth and native coordinates */
+    /*
+      lst = inx->ra;
+      sc2sim_telpos ( inx->ra, inx->dec, lst, &azimuth, elevation, &p, 
+      status );
+    */
+     
+    /*
+      sc2sim_bolcoords ( sinx->subname, inx->ra, inx->dec, *elevation, p,
+      "NASMYTH", &nboll, *xbc, *ybc, status );
+    */
+    /* Convert Nasmyth coordinates from mm to arcsec */
+    /*
+      for ( j=0; j<nboll; j++ ) {
+      (*xbc)[j] *= MM2SEC;
+      (*ybc)[j] *= MM2SEC;
+      }
+    */
+     
+     
+    sc2sim_getspread ( nboll, *pzero, *heater, status );
+  }
 
-   /* Setup world coordinate information and get the bolometer positions in
-      Nasmyth and native coordinates */
-   /*
-     lst = inx->ra;
-     sc2sim_telpos ( inx->ra, inx->dec, lst, &azimuth, elevation, &p, status );
-   */
-   
-   /*
-     sc2sim_bolcoords ( sinx->subname, inx->ra, inx->dec, *elevation, p,
-     "NASMYTH", &nboll, *xbc, *ybc, status );
-   */
-   /* Convert Nasmyth coordinates from mm to arcsec */
-   /*
-     for ( j=0; j<nboll; j++ ) {
-     (*xbc)[j] *= MM2SEC;
-     (*ybc)[j] *= MM2SEC;
-     }
-   */
-                    
-
-   sc2sim_getspread ( nboll, *pzero, *heater, status );
-
-}//sc2sim_instrinit
+}
