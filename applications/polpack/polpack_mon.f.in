@@ -19,8 +19,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-* Description:
-
+*  Description:
 *     This is the top-level A-task monolith subroutine for the suite of A-tasks
 *     associated with the POLPACK package. The chosen command is obtained from
 *     the ADAM routine TASK_GET_NAME. The command may be specified from the
@@ -30,8 +29,27 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
 *  Authors:
+*     BC:  Brad Cavanagh (JAC)
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
@@ -51,10 +69,9 @@
 *        Added POLWRTCL.
 *     7-DEC-2000 (DSB):
 *        Added POLRDTCL.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_new_bugs_here}
+*     16-AUG-2006 (BC):
+*        Add GRP and locator leak checker.
+*     {enter_further_changes_here}
 
 *-
 
@@ -63,6 +80,8 @@
 
 *  Global Constants:
       INCLUDE  'SAE_PAR'          ! SSE global definitions
+      INCLUDE  'GRP_PAR'          ! GRP definitions
+      INCLUDE  'DAT_PAR'          ! DAT definitions
       INCLUDE  'PAR_PAR'          ! Parameter system definitions
 
 *  Status:
@@ -73,12 +92,23 @@
                                   ! any trailing blanks
 
 *  Local Variables:
+      CHARACTER FILTER*( 60 )     ! HDS_INFOI filter string
       CHARACTER NAME*( PAR__SZNAM ) ! Action name 
+      INTEGER IPOSN               ! Position in string
+      INTEGER LSTAT               ! Local status
+      INTEGER NGRP0               ! Number of active GRP groups on entry
+      INTEGER NGRP1               ! Number of active GRP groups on exit
+      INTEGER NLOC0               ! Number of active locators on entry
+      INTEGER NLOC1               ! Number of active locators on exit
+
 
 *.
 
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Note the current number of active GRP identifiers.
+      CALL GRP_INFOI( GRP__NOID, 0, 'NGRP', NGRP0, STATUS )
 
 *  Free up any compiled expressions currently in use by CAT. This should
 *  be done by CAT itself, but it can't (at the moment).
@@ -89,6 +119,18 @@
 
 *  Obtain the action name.
       CALL TASK_GET_NAME( NAME, STATUS )      
+
+*  Need to construct a string to filter out parameter locators
+*  from the list of active locators. Need monolith and taskname
+*  excluded. Also seem to need HDS_SCRATCH excluded.
+      FILTER = '!KAPVIEW_MON,!HDS_SCRATCH,!GLOBAL,!'
+      IPOSN = CHR_LEN( FILTER )
+      CALL CHR_APPND(NAME, FILTER, IPOSN)
+
+*  Note the current number of active locators (excluding parameter
+*  system
+      CALL HDS_INFOI( DAT__NOLOC, 'LOCATORS', FILTER,
+     :     NLOC0, STATUS )
 
 *  Define the current application name for history. The package version
 *  number gets substituted in here when the POLPACK release source tar file 
@@ -171,6 +213,55 @@
      :     'POLPACK: No such command ^CMD.', STATUS )
 
       END IF
+
+*  Note the current number of active GRP identifiers. Do this in a new
+*  error reporting context so that we get the correct value even if an
+*  error has occurred.
+      CALL ERR_BEGIN( STATUS )
+      CALL GRP_INFOI( GRP__NOID, 0, 'NGRP', NGRP1, STATUS )
+
+*  If there are more active groups now than there were on entry, there
+*  must be a problem (GRP identifiers are not being freed somewhere). So
+*  report it.
+      IF( STATUS .EQ. SAI__OK .AND. NGRP1 .GT. NGRP0 ) THEN
+         CALL MSG_BLANK( STATUS )
+         CALL MSG_SETC( 'NAME', NAME )
+         CALL MSG_SETI( 'NGRP0', NGRP0 )
+         CALL MSG_SETI( 'NGRP1', NGRP1 )
+         CALL MSG_OUT( 'PPACK_NGRP', 'WARNING: The number of active '//
+     :             'GRP identifiers increased from ^NGRP0 to ^NGRP1 '//
+     :             'during execution of ^NAME (POLPACK programming '//
+     :             ' error).', STATUS )
+         CALL GRP_INFOI( GRP__NOID, 0, 'ACTIVE', NGRP1, STATUS )
+         CALL MSG_BLANK( STATUS )
+      END IF
+      CALL ERR_END( STATUS )
+
+*  Note the current number of active locators. Do this in a new
+*  error reporting context so that we get the correct value even if an
+*  error has occurred.
+      CALL ERR_MARK
+      LSTAT = SAI__OK
+      CALL HDS_INFOI( DAT__NOLOC, 'LOCATORS', FILTER,
+     :     NLOC1, LSTAT )
+
+*  If there are more active locators now than there were on entry, there
+*  must be a problem (HDS locators are not being freed somewhere). So
+*  report it.
+      IF( LSTAT .EQ. SAI__OK .AND. NLOC1 .GT. NLOC0 ) THEN
+         CALL MSG_BLANK( LSTAT )
+         CALL MSG_SETC( 'NAME', NAME )
+         CALL MSG_SETI( 'NLOC0', NLOC0 )
+         CALL MSG_SETI( 'NLOC1', NLOC1 )
+         CALL MSG_OUT( 'PPACK_NLOC', 'WARNING: The number of active '//
+     :             'HDS locators increased from ^NLOC0 to ^NLOC1 '//
+     :             'during execution of ^NAME (POLPACK programming '//
+     :             'error).', LSTAT )
+         CALL MSG_BLANK( LSTAT )
+      END IF
+      IF (LSTAT .NE. SAI__OK) CALL ERR_ANNUL( LSTAT )
+
+      CALL ERR_RLSE
 
 *  End and return.
 
