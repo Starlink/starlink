@@ -77,7 +77,7 @@ C
 C     Initially, set all coefficients zero.
 C
       DO I=1,M+1
-         COEFFS(I)=0.
+         COEFFS(I)=0D0
       END DO
 C
 C     Bail out if too many points, or too high a degree
@@ -107,13 +107,13 @@ C
             CALL PAR_WRUSER('Error in PDA_DPOLFT',STATUS)
          ELSE
 C
-C           Convert coefficients to power series form
+C           Convert coefficients to power-series form in the
+C           desired order.
 C
-            CALL PDA_DPCOEF(M,0D0,COEFFS,A2,IFAIL2)
+            CALL PDA_DPCOEF(-M,0D0,COEFFS,A2,IFAIL2)
             IF (IFAIL2.NE.0) THEN
                CALL PAR_WRUSER('Error in PDA_DPCOEF',STATUS)
             END IF
-            CALL GEN_REVR8(COEFFS,M+1,1,.TRUE.,COEFFS)
          END IF
       END IF
 C
