@@ -13,15 +13,15 @@
 *     C function
 
 *  Invocation:
-*     smf_simplerebinmap( double *data, double *variance, int *lut, int size, 
-*                         double *map, double *mapweight, double *mapvar,
-*         	          int flags, int *status );
+*     smf_simplerebinmap( double *data, double *variance, int *lut, int dsize, 
+*			  int flags, double *map, double *mapvar, int msize, 
+*                         int *status )
 
 *  Arguments:
 *     data = double* (Given)
 *        Pointer to data stream to be re-gridded
 *     variance = double* (Given)
-*        Pointer to array giving data variance
+*        Pointer to array giving data variance (ignore if NULL pointer)
 *     lut = int* (Given)
 *        1-d LUT for indices of data points in map
 *     dsize = int (Given)
@@ -33,7 +33,7 @@
 *     mapweight = double* (Returned)
 *        Relative weighting for each pixel in map
 *     mapvar = double* (Returned)
-*        Variance of each pixel in map
+*        Variance of each pixel in map 
 *     msize = int (Given)
 *        Number of pixels in map
 *     status = int* (Given and Returned)
@@ -49,6 +49,8 @@
 *  History:
 *     2006-05-17 (EC):
 *        Initial version.
+*     2006-08-16 (EC):
+*        Rebin the case that no variance array is given
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -111,14 +113,24 @@ void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize,
     memset( mapvar, 0, msize*sizeof(double) );
   }
 
-  /* Accumulate data and weights */
-  for( i=0; i<dsize; i++ ) {
-    /* Check that the LUT, data and variance values are valid */
-    if( (lut[i] != VAL__BADI) && (data[i] != VAL__BADD) && 
-	(variance[i] != VAL__BADD) && (variance[i] != 0) ) {
-
-      map[lut[i]] += data[i]/variance[i];
-      mapweight[lut[i]] += 1/variance[i];
+  if( variance ) {
+    /* Accumulate data and weights in the case that variances are given*/
+    for( i=0; i<dsize; i++ ) {
+      /* Check that the LUT, data and variance values are valid */
+      if( (lut[i] != VAL__BADI) && (data[i] != VAL__BADD) && 
+          (variance[i] != VAL__BADD) && (variance[i] != 0) ) {        
+        map[lut[i]] += data[i]/variance[i];
+        mapweight[lut[i]] += 1/variance[i];
+      }
+    }
+  } else {
+    /* Accumulate data and weights when no variances are given */
+    for( i=0; i<dsize; i++ ) {
+      /* Check that the LUT, data and variance values are valid */
+      if( (lut[i] != VAL__BADI) && (data[i] != VAL__BADD) ) {
+        map[lut[i]] += data[i];
+        mapweight[lut[i]] ++;
+      }
     }
   }
 
