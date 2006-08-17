@@ -21,7 +21,7 @@
 #  Environment Variables Used:
 #     The script outputs the value of:
 #
-#       "$INSTALL/docs:$INSTALL/help:$STARLINK/docs:$STARLINK/help"
+#       "$INSTALL/docs:$INSTALL/help:$INSTALL/starjava/docs:$STARLINK/docs:$STARLINK/help:$STARLINK/starjava/docs"
 #
 #     where the environment variable INSTALL defaults to "$HOME/star" and
 #     the environment variable STARLINK defaults to "/star" if not defined.
@@ -41,9 +41,11 @@
 
 #  Copyright:
 #     Copyright (C) 1995 The Central Laboratory of the Research Councils
+#     Copyright (C) 2006 Particle Physics and Astronomy Research Council
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     PWD: Peter W. Draper (JAC, Durham University)
 #     {enter_new_authors_here}
 
 #  History:
@@ -53,6 +55,8 @@
 #        Changed to provide the default search path only.
 #     19-OCT-1995 (RFWS):
 #        Allow the script to be edited during installation.
+#     17-AUG-2006 (PWD):
+#        Add starjava/docs directory.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -76,12 +80,12 @@
 #  If "install" and "starlink" have the same values, then output a simplified
 #  search path.
       if test "${install}" = "${starlink}"; then
-         echo "${starlink}/docs:${starlink}/help"
+         echo "${starlink}/docs:${starlink}/help:${starlink}/starjava/docs"
 
 #  Otherwise, output the full search path.
       else
          echo \
-         "${install}/docs:${install}/help:${starlink}/docs:${starlink}/help"
+         "${install}/docs:${install}/help::${install}/starjava/docs:${starlink}/docs:${starlink}/help:${starlink}/starjava/docs"
       fi
 
 #  End of script.
