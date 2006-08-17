@@ -31,7 +31,7 @@ WVM_FILES = wvm/wvmOpt.c wvm/wvmTau.c wvm/wvmCal.c
 
 # Linking
 
-smurf_mon_LDADD = libsmurf/libsmurf.la libsmf/libsmf.la libsc2sim/libsc2sim.la \
+smurf_mon_LDADD = libsmurf/libsmurf.la libsc2sim/libsc2sim.la libsmf/libsmf.la \
                   libacsis/libacsis.la  `$(srcdir)/smurf_link_adam`
 
 # Dynamically generated scripts
