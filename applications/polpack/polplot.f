@@ -383,6 +383,7 @@
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
  
 *  Authors:
+*     BC: Brad Cavanagh (JAC, Hawaii)
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
@@ -417,6 +418,9 @@
 *        the key style.
 *     22-SEP-2004 (TIMJ):
 *        Use CNF_PVAL
+*     16-AUG-2006 (BC):
+*        Shut down the graphics database using KPG1_PGCLS instead of
+*        AGP_DEASS, which doesn't seem to clear the AGI database properly.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1355,8 +1359,8 @@
       CALL PSX_FREE( IPY2, STATUS )
       IF( GOTZ ) CALL PSX_FREE( IPZ, STATUS )
 
-*  Shut down the graphics database.
-      CALL AGP_DEASS( 'DEVICE', .TRUE., STATUS )
+*  Shutdown PGPLOT and the graphics database.
+      CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
 *  Release the catalogue identifier.
       CALL CAT_TRLSE( CI, STATUS )
