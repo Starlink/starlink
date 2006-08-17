@@ -671,9 +671,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        - WcsCelestial: Modified so that the FITS reference point is
 *        stored as the SkyFrame SkyRef attribute value.
 *     7-OCT-2005 (DSB):
-*        - Make astGetFits<X> public.
+*        Make astGetFits<X> public.
 *     30-NOV-2005 (DSB):
-*        - Add support for undefined FITS keyword values.
+*        Add support for undefined FITS keyword values.
 *     5-DEC-2005 (DSB):
 *        - Include an IMAGFREQ keyword in the output when writing a 
 *        DSBSpecFrame out using FITS-WCS encoding.
@@ -697,10 +697,13 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        - Consume VELOSYS FITS-WCS keywords when reading an object.
 *        - Write out VELOSYS FITS-WCS keywords when writing an object.
 *     7-AUG-2006 (DSB):
-*        - Remove trailing spaces from the string returned by astGetFitsS
+*        Remove trailing spaces from the string returned by astGetFitsS
 *        if the original string contains 8 or fewer characters.
 *     16-AUG-2006 (DSB):
-*        - Document non-destructive nature of unsuccessful astRead calls.
+*        Document non-destructive nature of unsuccessful astRead calls.
+*     17-AUG-2006 (DSB):
+*        Fix bugs so that the value of the Clean attribute is honoured
+*        even if an error has occurred.
 *class--
 */
 
@@ -12928,9 +12931,17 @@ static void FixUsed( AstFitsChan *this, int reset, int used, int remove,
    FitsCard *card0;        /* Pointer to current FitsCard */
    int *flags;             /* Pointer to flags mask for the current card */
    int old_ignoreused;     /* Original value of external variable IgnoreUsed */
+   int old_status;         /* Original inherited status value */
+   int rep;                /* Original error reporting flag */
 
 /* Return if no FitsChan was supplied, or if the FitsChan is empty. */
    if ( !this || !this->head ) return;
+
+/* Temporarily clear any bad status value and supress error reporting in
+  this function. */
+   old_status = astStatus;
+   astClearStatus;
+   rep = astReporting( 0 );
 
 /* Indicate that we should not skip over cards marked as having been
    read. */
@@ -13007,8 +13018,9 @@ static void FixUsed( AstFitsChan *this, int reset, int used, int remove,
    read should be skipped over. */
    IgnoreUsed = old_ignoreused;
 
-/* Return */
-   return;
+/* Re-instate the original status value and error reporting condition. */
+   astReporting( rep );
+   astSetStatus( old_status );
 
 }
 
@@ -32160,7 +32172,7 @@ f     AST_READ.
 *att--
 */
 astMAKE_CLEAR(FitsChan,Clean,clean,-1)
-astMAKE_GET(FitsChan,Clean,int,1,(this->clean == -1 ? 0 : this->clean))
+astMAKE_GET(FitsChan,Clean,int,0,(this->clean == -1 ? 0 : this->clean))
 astMAKE_SET(FitsChan,Clean,int,clean,( value ? 1 : 0 ))
 astMAKE_TEST(FitsChan,Clean,( this->clean != -1 ))
 
