@@ -4,7 +4,7 @@
 *     smf_model_getname
 
 *  Purpose:
-*     Obtain a character string name given a smf_modeltype
+*     Return strings representation of a smf_modeltype
 
 *  Language:
 *     Starlink ANSI C
@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_model_getname( smf_modeltype type, const char *name, int *status);
+*     const char *smf_model_getname( smf_modeltype type, int *status);
 
 *  Arguments:
 *     type = smf_modeltype
@@ -37,6 +37,7 @@
 *        Initial Version
 *     2006-08-16 (EC):
 *        Use group expressions for model names (expects _flat for igrp names)
+*        Changed technique/interface to look like smf_dtype_string
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -80,36 +81,39 @@
 
 #define FUNC_NAME "smf_model_getname"
 
-void smf_model_getname( smf_modeltype type, const char *name, int *status) {
+char *smf_model_getname( smf_modeltype type, int *status) {
 
   /* Local Variables */
+  char *retval = NULL;
 
   /* Main routine */
   if (*status != SAI__OK) return;
 
   switch( type ) {
   case SMF__AST:
-    sprintf( name, "*|flat|ast|" );
+    retval = "*|flat|ast|";
     break;
     
   case SMF__COM:
-    sprintf( name, "*|flat|com|" );
+    retval = "*|flat|com|";
     break;
 
   case SMF__CUM:
-    sprintf( name, "*|flat|cum|" );
+    retval = "*|flat|cum|";
     break;
 
   case SMF__NOI:
-    sprintf( name, "*|flat|noi|" );
+    retval = "*|flat|noi|";
     break;
 
   case SMF__RES:
-    sprintf( name, "*|flat|res|" );
+    retval = "*|flat|res|";
     break;
 
   default:
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "Invalid smf_modeltype given.", status);        
   }
+
+  return retval;
 }

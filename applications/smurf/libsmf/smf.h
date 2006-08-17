@@ -95,7 +95,7 @@
 *        Add smf_grp_related, smf_construct_smfGroup,
 *        smf_open_related, smf_close_related and smf_close_smfGroup
 *     2006-07-11 (EC):
-*        Add smf_model_create, smf_model_getnames
+*        Add smf_model_create, smf_model_getname
 *     2006-07-26 (TIMJ):
 *        Replace sc2head with JCMTState.
 *     2006-07-28 (TIMJ):
@@ -106,6 +106,8 @@
 *        Add smf_open_newfile and smf_open_ndf
 *     2006-08-02 (TIMJ):
 *        smf_open_newfile should take dim_t
+*     2006-08-16 (EC):
+*        changed interface for smf_model_getname
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -310,7 +312,7 @@ void smf_mapbounds_approx( Grp *igrp,  int size, char *system, double lon_0,
 void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp, 
 		       int *status);
 
-void smf_model_getname( smf_modeltype type, const char *name, int *status);
+char *smf_model_getname( smf_modeltype type, int *status);
 
 void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, 
 			      smfData **ffdata, int *status);

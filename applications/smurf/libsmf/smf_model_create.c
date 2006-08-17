@@ -92,7 +92,7 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
   smfData *idata=NULL;          /* Pointer to input smfdata data */
   int isize=0;                  /* Number of files in input group */
   void *mapptr[3];              /* Pointer to array of mapped components */
-  char mname[SMF_NAME_MAX];     /* String model component name */
+  char *mname=NULL;             /* String model component name */
   int mndf=NDF__NOID;           /* Model NDF identifier */
   int msize=0;                  /* Number of files in model group */
   int ubnd[NDF__MXDIM];         /* Upper bounds of model data array */
@@ -108,7 +108,10 @@ void smf_model_create( Grp *igrp, smf_modeltype mtype, Grp **mgrp,
 
   /* Create group of NDF names with model name suffix */
   *mgrp = grpNew( "model component", status );
-  smf_model_getname( mtype, mname, status );
+  mname = smf_model_getname( mtype, status );
+
+  printf("!!!!!!!!! mname=%s\n", mname);
+
   grpGrpex( mname, igrp, *mgrp, &msize, &added, &flag, status );
 
   if( (*status == SAI__OK) && (msize != isize) ) {
