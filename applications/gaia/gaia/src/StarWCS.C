@@ -96,6 +96,7 @@
 #include "error.h"
 #include "StarWCS.h"
 #include "gaiaUtils.h"
+#include "define.h"
 
                                     //  Trig conversion factors.
 static const double pi_ = 3.14159265358979323846;
@@ -864,19 +865,16 @@ double StarWCS::width() const
 
     double point1[2], point2[2];
     double xin[2], yin[2], xout[2], yout[2];
-    double dist;
+    double dist1, dist2, dist;
 
-    // Compute the image width as a distance 1.0 -> nxpix_ about the
-    // centre of the image, so first set up image coordinates
-    // describing this position.
-    xin[0] = 1.0;
-    xin[1] = (double) nxpix_;
+    // Compute image width in two parts, 1->nxpix_/2, nxpix_/2->nxpix_ along
+    // the centre of the image. This tries to avoid problems when the image
+    // edges are at the same point on the sky (all-sky images).
     yin[0] = yin[1] = 0.5 * (double) nypix_;
 
-    // Transform these image positions into sky coordinates.
+    xin[0] = 1.0;
+    xin[1] = (double) nxpix_/2;
     astTran2( wcs_, 2, xin, yin, 1, xout, yout );
-
-    // And now get the distance between these positions in degrees.
     if ( raIndex_ == 1 ) {
         point1[1] = xout[0];
         point1[0] = yout[0];
@@ -889,15 +887,38 @@ double StarWCS::width() const
         point2[0] = xout[1];
         point2[1] = yout[1];
     }
-    dist = astDistance( wcs_, point1, point2 );
+    dist1 = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
     if ( dist == AST__BAD ) {
         return 0.0;
     }
 
-    //  Check that distance isn't 0 or very small, this indicates that
-    //  edge of image is same coordinate. If so use arcsec per pixel
-    //  estimate.
+    xin[0] = (double) nxpix_/2;
+    xin[1] = (double) nxpix_;
+    astTran2( wcs_, 2, xin, yin, 1, xout, yout );
+    if ( raIndex_ == 1 ) {
+        point1[1] = xout[0];
+        point1[0] = yout[0];
+        point2[1] = xout[1];
+        point2[0] = yout[1];
+    }
+    else {
+        point1[0] = xout[0];
+        point1[1] = yout[0];
+        point2[0] = xout[1];
+        point2[1] = yout[1];
+    }
+    dist2 = astDistance( wcs_, point1, point2 );
+    if ( ! astOK ) astClearStatus;
+    if ( dist == AST__BAD ) {
+        return 0.0;
+    }
+    
+    dist = dist1 + dist2;
+
+    //  Check that distance isn't 0, this indicates that edge of image
+    //  is same coordinate (and above didn't help). If so use arcsec per pixel
+    //  estimate. 
     if ( dist == 0.0 || dist < DBL_EPSILON ) {
         dist = xSecPix_ * nxpix_;
     }
@@ -918,19 +939,16 @@ double StarWCS::height() const
 
     double point1[2], point2[2];
     double xin[2], yin[2], xout[2], yout[2];
-    double dist;
+    double dist1, dist2, dist;
 
-    // Compute the image height as a distance 1.0 -> nypix_ about the
-    // centre of the image, so first set up image coordinates
-    // describing this position.
+    // Compute image width in two parts, 1->nypix_/2, nypix_/2->nypix_ along
+    // the centre of the image. This tries to avoid problems when the image
+    // edges are at the same point on the sky (all-sky images).
     xin[0] = xin[1] = 0.5 * (double) nxpix_;
+
     yin[0] = 1.0;
-    yin[1] = (double) nypix_;
-
-    // Transform these image positions into sky coordinates.
+    yin[1] = (double) nypix_/2;
     astTran2( wcs_, 2, xin, yin, 1, xout, yout );
-
-    // And now get the distance between these positions in radians.
     if ( raIndex_ == 1 ) {
         point1[0] = xout[0];
         point1[1] = yout[0];
@@ -943,14 +961,38 @@ double StarWCS::height() const
         point2[1] = xout[1];
         point2[0] = yout[1];
     }
-    dist = astDistance( wcs_, point1, point2 );
+    dist1 = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
     if ( dist == AST__BAD ) {
         return 0.0;
     }
 
+    yin[0] = (double) nypix_/2;
+    yin[0] = (double) nypix_;
+    astTran2( wcs_, 2, xin, yin, 1, xout, yout );
+    if ( raIndex_ == 1 ) {
+        point1[0] = xout[0];
+        point1[1] = yout[0];
+        point2[0] = xout[1];
+        point2[1] = yout[1];
+    }
+    else {
+        point1[1] = xout[0];
+        point1[0] = yout[0];
+        point2[1] = xout[1];
+        point2[0] = yout[1];
+    }
+    dist2 = astDistance( wcs_, point1, point2 );
+    if ( ! astOK ) astClearStatus;
+    if ( dist == AST__BAD ) {
+        return 0.0;
+    }
+    
+    dist = dist1 + dist2;
+
     //  Check that distance isn't 0, this indicates that edge of image
-    //  is same coordinate. If so use arcsec per pixel estimate.
+    //  is same coordinate (and above didn't help). If so use arcsec per pixel
+    //  estimate. 
     if ( dist == 0.0 || dist < DBL_EPSILON ) {
         dist = ySecPix_ * nypix_;
     }
@@ -998,6 +1040,7 @@ double StarWCS::radius() const
     }
     dist = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
+
     if ( dist == AST__BAD ) {
         return 0.0;
     }
@@ -1012,6 +1055,19 @@ double StarWCS::radius() const
     }
     else {
         dist *= 60.0 * r2d_;
+    }
+
+    // The above is sensitive to sky-sized images (which have a maximum radius
+    // of pi/2, when we want 2pi), so try some other guesses and pick the
+    // largest, within reason (width/height can blow up at poles).
+    double hwidth = width() * 0.5;
+    double hheight = height() * 0.5;
+    double maxdist = dist * 3.0;
+    if ( hwidth < maxdist ) {
+        dist = max( hwidth, dist );
+    }
+    if ( hheight < maxdist ) {
+        dist = max( hheight, dist );
     }
     return dist;
 }
