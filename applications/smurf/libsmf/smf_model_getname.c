@@ -35,6 +35,8 @@
 *  History:
 *     2006-07-06 (EC):
 *        Initial Version
+*     2006-08-16 (EC):
+*        Use group expressions for model names (expects _flat for igrp names)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -87,23 +89,23 @@ void smf_model_getname( smf_modeltype type, const char *name, int *status) {
 
   switch( type ) {
   case SMF__AST:
-    sprintf( name, "ast" );
+    sprintf( name, "*|flat|ast|" );
     break;
     
   case SMF__COM:
-    sprintf( name, "com" );
+    sprintf( name, "*|flat|com|" );
     break;
 
   case SMF__CUM:
-    sprintf( name, "cum" );
+    sprintf( name, "*|flat|cum|" );
     break;
 
   case SMF__NOI:
-    sprintf( name, "noi" );
+    sprintf( name, "*|flat|noi|" );
     break;
 
   case SMF__RES:
-    sprintf( name, "res" );
+    sprintf( name, "*|flat|res|" );
     break;
 
   default:

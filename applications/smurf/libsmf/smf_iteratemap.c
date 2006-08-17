@@ -51,6 +51,8 @@
 *        Parameters given by keymap
 *     2006-08-07 (TIMJ):
 *        GRP__NOID is not a Fortran concept.
+*     2006-08-16 (EC):
+*        Intermediate step: Old routine works with new model container code
 
 *  Notes:
 
@@ -113,7 +115,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   Grp *atmgrp=NULL;             /* Group of atmos model files */
   const char *atmname;          /* Name of atmmodel group */
   int flag;                     /* Flag */
-  int gsize;                    /* Number of files in group */
   dim_t i;                      /* Loop counter */
   int indf;                     /* Input data NDF identifier */
   smfData *idata;               /* Pointer to input data struct */
@@ -153,12 +154,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
   smf_model_create( igrp, SMF__COM, &atmgrp, status );
   smf_model_create( igrp, SMF__RES, &ngrp, status );
 
-  if( astgrp ) grpDelet( &astgrp, status );
-  if( atmgrp ) grpDelet( &atmgrp, status );
-  if( ngrp ) grpDelet( &ngrp, status );
-
-  return;
-
   /* Get/check the CONFIG parameters stored in the keymap */
 
   if( *status == SAI__OK ) {
@@ -178,7 +173,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
              status);
       
       msgOut(" ", "SMF_ITERATEMAP: Calculate ATM/AST model", status);
-      for( i=1; i<=gsize; i++ ) {
+      for( i=1; i<=isize; i++ ) {
         
         /* Open files */
         smf_open_file( igrp, i, "UPDATE", 0, &idata, status );
@@ -202,8 +197,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
                 ((double *)(astdata->pntr)[0])[j*nbolo + k] = 
                   ((double *)(idata->pntr)[0])[j*nbolo + k] - mean; 
 
-                /* Set initial variance to 1 for all data points */
-                ((double *)(idata->pntr)[1])[j*nbolo + k] = 1.; 
+                /* If VARIANCE exists, set initial value to 1 for all data 
+                   points */
+                if( (idata->pntr)[1] ) {
+                  ((double *)(idata->pntr)[1])[j*nbolo + k] = 1.; 
+                }
               }
 	    
             } else {
@@ -241,7 +239,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
       
       msgOut(" ", "SMF_ITERATEMAP: Rebin AST signal to estimate MAP", status);
       if( *status == SAI__OK ) {
-        for( i=1; i<=gsize; i++ ) {
+        for( i=1; i<=isize; i++ ) {
           /* Open files */
           smf_open_file( igrp, i, "READ", 0, &idata, status );
           smf_open_file( astgrp, i, "READ", 0, &astdata, status );
@@ -260,7 +258,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
           if( i == 1 )                                      
             rebinflags = rebinflags | AST__REBININIT;
 	
-          if( i == gsize ) 
+          if( i == isize ) 
             rebinflags = rebinflags | AST__REBINEND;
 	
           smf_simplerebinmap( (double *)(astdata->pntr)[0], 
@@ -277,7 +275,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
       msgOut(" ", "SMF_ITERATEMAP: Sample MAP, calculate NOISE", status);
 
       if( *status == SAI__OK ) {
-        for( i=1; i<=gsize; i++ ) {
+        for( i=1; i<=isize; i++ ) {
           /* Open files */
           smf_open_file( igrp, i, "UPDATE", 0, &idata, status );
           smf_open_file( astgrp, i, "WRITE", 0, &astdata, status );
@@ -312,11 +310,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, double *map,
              new estimate of clean noise signals */
           for( j=0; j<nbolo; j++ ) {
             smf_calc_stats( ndata, "b", j, 0, 0, &mean, &sigma, status );      
+
             /* At each time slice insert noise estimate^2 into variance
-               for each data point */
-	  
-            for( k=0; k<(astdata->dims)[2]; k++ ) {
-              ((double *)(idata->pntr)[1])[k*nbolo + j] = sigma*sigma;
+               for each data point (if VARIANCE component exists) */
+            if( (idata->pntr)[1] ) {
+              for( k=0; k<(astdata->dims)[2]; k++ ) {
+                ((double *)(idata->pntr)[1])[k*nbolo + j] = sigma*sigma;
+              }
             }
 	  
             /* Jump out if there was a problem */
