@@ -42,11 +42,14 @@
 
 #  Authors:
 #     MBT: Mark Taylor
+#     PWD: Peter W. Draper
 #     {enter_new_authors_here}
 
 #  History:
 #     13-JUL-2006 (MBT):
 #        Original version.
+#     18-AUG-2006 (PWD):
+#        Modified to run the stilts process in the background.
 #     {enter_further_changes_here}
 
 #-
@@ -121,7 +124,7 @@ itcl::class gaia::GaiaPlastic {
    #  The script argument contains the executable Tcl.
    #  The checksum argument contains the hexadecimal md5 hash of the
    #  content of ~/.gaia-cookie followed by the content of the script
-   #  argument.  As a convenience, the cookie may be present either 
+   #  argument.  As a convenience, the cookie may be present either
    #  with or without a trailing newline.
    public method ivo://plastic.starlink.ac.uk/gaia/executeMd5 {sender_id script
                                                                checksum args} {
@@ -139,22 +142,27 @@ itcl::class gaia::GaiaPlastic {
    #  Load a VOTable as a catalogue.
    public method ivo://votech.org/votable/loadFromURL {sender_id url args} {
 
-      #  Second argument, if present, is a tag for the table.  If not 
+      #  Second argument, if present, is a tag for the table.  If not
       #  present, use the URL.
       if {$args == ""} {
-         set table_id $url
+         set table_id_ $url
       } else {
-         set table_id [lindex $args 0]
+         set table_id_ [lindex $args 0]
       }
 
-      #  Convert the VOTable to TST format and display it.
+      #  Convert the VOTable to TST format and display it when the
+      #  conversion is completed.
       set failure [catch {
-         set tst_file [get_temp_file_ .TAB]
+         set tst_file_ [get_temp_file_ .TAB]
          [get_stilts_] execute tpipe \
-                       ifmt=votable ofmt=tst in=$url out=$tst_file \
+                       ifmt=votable ofmt=tst in=$url out=$tst_file_ \
                        "cmd=setparam symbol '[next_symbol_spec_]'"
-         set window [display_table_ $tst_file $table_id]
-         set cat_windows_($table_id) $window
+
+         #  Wait for long running conversion to complete as we need the status
+         #  return. 
+         if { $tst_file_ != {} } {
+            tkwait variable [scope tst_file_]
+         }
       } msg]
 
       #  Return as appropriate.
@@ -164,6 +172,18 @@ itcl::class gaia::GaiaPlastic {
          error_dialog "Failed to load catalogue from PLASTIC:\n$msg"
          return $FALSE
       }
+   }
+
+   #  Called when the STILTS command completes. Only job is to display
+   #  the table, if conversion was successful.
+   protected method stilts_completed_ {} {
+      if { $tst_file_ != {}  && [file exists $tst_file_] } {
+         set window [display_table_ $tst_file_ $table_id_]
+         set cat_windows_($table_id_) $window
+      } else {
+         error "Failed to load catalogue from PLASTIC message"
+      }
+      set tst_file_ {}
    }
 
    #  Display only a selection of the rows from a previously loaded catalogue.
@@ -216,7 +236,8 @@ itcl::class gaia::GaiaPlastic {
    #  Return a Stilts instance belonging to this object.
    protected method get_stilts_ {} {
       if {$stilts_ == ""} {
-         set stilts_ [gaia::Stilts #auto -debug 0]
+         set stilts_ [gaia::Stilts \#auto -debug 0 \
+                         -notify_cmd [code $this stilts_completed_]]
       }
       return $stilts_
    }
@@ -273,7 +294,7 @@ itcl::class gaia::GaiaPlastic {
 
    #  Provides a suitable value for the "symbol_id" column in a TST table.
    #  This is what determines how plotted symbols will appear on the
-   #  image (unless changed).  This function endeavours to return a 
+   #  image (unless changed).  This function endeavours to return a
    #  different symbol each time it is called (though may repeat eventually).
    protected proc next_symbol_spec_ {} {
       set shapes {circle square plus cross diamond}
@@ -297,11 +318,16 @@ itcl::class gaia::GaiaPlastic {
    #  Stilts object for executing STILTS commands.
    protected variable stilts_ {}
 
+   #  Name of the TST we're generating.
+   protected variable tst_file_ {}
+
+   #  Table identifier of the TST we're generating.
+   protected variable table_id_ {}
 
    #  Class variables:
    #  ----------------
 
-   #  Array of GaiaSearch windows which have been opened to display 
+   #  Array of GaiaSearch windows which have been opened to display
    #  PLASTIC-acquired tables.  The array is indexed by table_id.
    protected common cat_windows_
 
