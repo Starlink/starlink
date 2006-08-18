@@ -46,11 +46,15 @@
    
 #  Authors:
 #     MBT: Mark Taylor
+#     PWD: Peter W. Draper
 #     {enter_new_authors_here}
             
 #  History:
 #     8-AUG-2006 (MBT):
 #        Original version.
+#     18-AUG-2006 (PWD):
+#        Extend to use GaiaForeignExec to queue the request and run in 
+#        a background process.
 #     {enter_further_changes_here}
 
 #- 
@@ -68,6 +72,13 @@ itcl::class gaia::Stilts {
       }
    }
 
+   #  Destructor.
+   destructor {
+      if { $stilts_app_ != {} } {
+         $stilts_app_ delete_sometime
+      }
+   }
+
    #  Returns true if a working STILTS binary has been found, and hence
    #  the execute method is expected to work.
    public method is_working {} {
@@ -79,8 +90,12 @@ itcl::class gaia::Stilts {
    #  more information.
    public method execute {stilts_cmd args} {
       if {[is_working]} {
-         set execargs [concat $stilts_bin_ $stilts_flags_ $stilts_cmd $args]
-         return [eval exec $execargs]
+         if { $stilts_app_ == {} } {
+            set stilts_app_ [GaiaForeignExec \#auto \
+                                -notify [code $this completed_] \
+                                -application $stilts_bin_]
+         }
+         eval $stilts_app_ runwith $stilts_flags_ $stilts_cmd $args
       } else {
          set warning {No executable file ${STILTS_DIR}/stilts}
          if {!$warned_} {
@@ -88,6 +103,13 @@ itcl::class gaia::Stilts {
             error_dialog $warning
          }
          error $warning
+      }
+   }
+
+   #  Called when the last execute command has completed.
+   protected method completed_ {} {
+      if { $notify_cmd != {} } {
+         eval $notify_cmd
       }
    }
 
@@ -114,6 +136,8 @@ itcl::class gaia::Stilts {
       configure_flags_
    }
 
+   #  Command to execute when a command completes.
+   public variable notify_cmd {}
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -121,12 +145,15 @@ itcl::class gaia::Stilts {
    #  Path to STILTS executable.
    protected variable stilts_bin_ {}
 
+   #  The controller class for running the STILTS executable.
+   protected variable stilts_app_ {}
+
    #  Flags array for STILTS command.
    protected variable stilts_flags_ {}
 
    #  Protected common varabiables:
    #  -----------------------------
 
-   #  Wnether a warning about non-functional STILTS has been posted yet.
+   #  Whether a warning about non-functional STILTS has been posted yet.
    protected common warned_ 0
 }
