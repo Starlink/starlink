@@ -104,6 +104,8 @@
 *        GRP__NOID is not a Fortran concept.
 *     2006-08-08 (JB)
 *        Replaced call to sc2sim_hor2eq with call to slaDh2e
+*     2006-08-17 (TIMJ):
+*        Don't rely on a loop variable outside of the loop
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -753,10 +755,10 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 	}
 
 	/* For now just set to the last airmass calculated */
-	sinx->airmass = airmass[firstframe+j];
+	sinx->airmass = airmass[firstframe+nwrite-1];
 
 	/* Calculate tau CSO from the pwv */
-	tauCSO = pwv2tau(airmass[firstframe+j],pwvzen);
+	tauCSO = pwv2tau(airmass[firstframe+nwrite-1],pwvzen);
 
 	/* Free pointers */
 
