@@ -122,11 +122,13 @@ itcl::class gaia::PlasticSearch {
 
    #  Selects the rows identified by a given list of integer values.
    public method select_indices {idx_list} {
-      set info {}
-      foreach idx $idx_list {
-         lappend info [lindex $all_rows_ $idx]
+      busy {
+         set info {}
+         foreach idx $idx_list {
+            lappend info [lindex $all_rows_ $idx]
+         }
+         set_info $headings_ $info
       }
-      set_info $headings_ $info
    }
 
    #  Highlights one of the rows in the table represented by this object.
@@ -187,12 +189,14 @@ itcl::class gaia::PlasticSearch {
          set sender [gaia::Gaia::get_plastic_sender]
          if {$sender != "" && $table_id != ""} {
             set idx_list {}
-            foreach row $rows {
-               if {[info exists all_row_idxs_($row)]} {
-                  lappend idx_list $all_row_idxs_($row)
+            busy {
+               foreach row $rows {
+                  if {[info exists all_row_idxs_($row)]} {
+                     lappend idx_list $all_row_idxs_($row)
+                  }
                }
+               $sender send_selection $table_id $idx_list $recipients 
             }
-            $sender send_selection $table_id $idx_list $recipients 
          }
       } msg]} {
          puts "selection send error: $msg"
