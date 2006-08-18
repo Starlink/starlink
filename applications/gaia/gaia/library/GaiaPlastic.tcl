@@ -52,6 +52,7 @@
 #-
 
 package require rpcvar
+package require md5 1.4.4
 namespace import -force rpcvar::*
 
 itcl::class gaia::GaiaPlastic {
@@ -117,13 +118,23 @@ itcl::class gaia::GaiaPlastic {
    }
 
    #  Execute a GAIA command.
-   #
-   #  Nice idea, but at the current PLASTIC version (v0.5), which 
-   #  basically lacks any security measures, it would be dangerous 
-   #  to allow any registered application to execute arbitrary Tcl code.
-#  public method ivo://plastic.starlink.ac.uk/gaia/execute {sender_id args} {
-#     eval $args
-#  }
+   #  The script argument contains the executable Tcl.
+   #  The checksum argument contains the hexadecimal md5 hash of the
+   #  content of ~/.gaia-cookie followed by the content of the script
+   #  argument.  As a convenience, the cookie may be present either 
+   #  with or without a trailing newline.
+   public method ivo://plastic.starlink.ac.uk/gaia/executeMd5 {sender_id script
+                                                               checksum args} {
+      set cookie [[gaia::GaiaCookie::get_instance] cget -cookie]
+      set hash [string toupper $checksum]
+      set hash1 [string toupper [md5::md5 "$cookie$script"]]
+      set hash2 [string toupper [md5::md5 "$cookie\n$script"]]
+      if {$hash == $hash1 || $hash == $hash2} {
+         return [eval $script]
+      } else {
+         return "Request rejected - bad MD5 checksum"
+      }
+   }
 
    #  Load a VOTable as a catalogue.
    public method ivo://votech.org/votable/loadFromURL {sender_id url args} {
