@@ -135,7 +135,8 @@ itcl::class gaia::GaiaCookie {
    #  nword is a measure of how long you want it to be 
    #  (how many 2-byte groups it contains).
    protected proc create_cookie_ {nword} {
-      random seed [clock clicks]
+      #  Note: use clock seconds, not clock clicks to get 32 bit value.
+      random seed [clock seconds]
       set c [pid]
       for {set i 0} {$i < $nword} {incr i} {
          append c [format -%04x [random 65536]]
