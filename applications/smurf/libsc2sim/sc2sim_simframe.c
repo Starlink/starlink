@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     sc2sim_sc2sim
+*     sc2sim_simframe
 
 *  Purpose:
 *     Simulate a single frame of bolometer data
@@ -46,7 +46,7 @@
 *        World Coordinate transformations
 *     heater = double[] (Given)
 *        Bolometer heater ratios
-*     nboll = int (Given)
+*     nbol = int (Given)
 *        Total number of bolometers
 *     frame = int (Given)
 *        Number of current frame
@@ -104,6 +104,9 @@
 *        Added per-bolometer atmospheric correction from elevation.
 *     2006-07-21 (JB):
 *        Split from dsim.c
+*     2006-08-18 (EC):
+*        Don't annul fset at the end
+*        Improved status handing
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -139,9 +142,12 @@
 
 /* Starlink includes */
 #include "ast.h"
+#include "sae_par.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+
+#define FUNC_NAME "sc2sim_simframe"
 
 void sc2sim_simframe
 ( 
@@ -158,7 +164,7 @@ double *atmsim,              /* atmospheric emission (given) */
 double coeffs[],             /* bolometer response coeffs (given) */
 AstFrameSet *fset,           /* World Coordinate transformations */
 double heater[],             /* bolometer heater ratios (given) */
-int nboll,                   /* total number of bolometers (given) */
+int nbol,                    /* total number of bolometers (given) */
 int frame,                   /* number of current frame (given) */
 int nterms,                  /* number of 1/f noise coeffs (given) */
 double *noisecoeffs,         /* 1/f noise coeffs (given) */
@@ -209,157 +215,200 @@ int *status                  /* global status (given and returned) */
    /* Concatenate mappings to get bolo->astronomical image coordinates */
    astSetC( fset, "SYSTEM", "icrs" );
    bolo2sky = astGetMapping( fset, AST__BASE, AST__CURRENT );
-   bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );  
+   if( !astOK ) {
+     *status = SAI__ERROR;
+     errRep(FUNC_NAME, "AST error extracting bolo->sky mapping", 
+	    status);
+   }
+
+   if( *status == SAI__OK ) {
+     bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );  
+     if( !astOK ) {
+       *status = SAI__ERROR;
+       errRep(FUNC_NAME, "AST error calculating bolo->image pixel mapping", 
+	      status);
+     }
+   }
 
    /* Sample astronomical sky image */
-   sc2sim_getast_wcs( nboll, xbolo, ybolo, bolo2map, astsim, astnaxes, dbuf,
-		    status);
+   if( *status == SAI__OK ) {
+     sc2sim_getast_wcs( nbol, xbolo, ybolo, bolo2map, astsim, astnaxes, dbuf,
+			status);
+   }
 
-   /* Extract bolo->AzEl mapping */
-   astSetC( fset, "SYSTEM", "AZEL" );
-   bolo2azel = astGetMapping( fset, AST__BASE, AST__CURRENT );
+   if( *status == SAI__OK ) {
+     /* Extract bolo->AzEl mapping */
+     astSetC( fset, "SYSTEM", "AZEL" );
+     bolo2azel = astGetMapping( fset, AST__BASE, AST__CURRENT );
+
+     if( !astOK ) {
+       *status = SAI__ERROR;
+       errRep(FUNC_NAME, "AST error calculating bolo->AzEl mapping", 
+	      status);
+     }
+   }
+
 
    /* Allocate space for array */
-   skycoord = smf_malloc ( nboll*2, sizeof(*skycoord), 1, status  );
+   if( *status == SAI__OK ) {
+     skycoord = smf_malloc ( nbol*2, sizeof(*skycoord), 1, status  );
+     
+     lbnd_in[0] = 1;
+     ubnd_in[0] = BOLROW;
+     lbnd_in[1] = 1;
+     ubnd_in[1] = BOLCOL;
 
-   lbnd_in[0] = 1;
-   ubnd_in[0] = BOLROW;
-   lbnd_in[1] = 1;
-   ubnd_in[1] = BOLCOL;
+     /* Transform bolo offsets into positions in azel and store in 
+	skycoord */
+     astTranGrid ( bolo2azel, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1, 
+		   2, nbol, skycoord );  
 
-   /* Transform bolo offsets into positions in azel and store in 
-      skycoord */
-   astTranGrid ( bolo2azel, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1, 
-                 2, nboll, skycoord );  
+     if( !astOK ) {
+       *status = SAI__ERROR;
+       errRep(FUNC_NAME, "AST error evaluating bolo->AzEl mapping", 
+	      status);
+     }
+   }
 
    /* Get time when frame taken in seconds */
-   time = start_time + frame * samptime;
+   if( *status == SAI__OK ) {
+     time = start_time + frame * samptime;
+   }
 
    /* Get the mean atmospheric signal */
    sc2sim_calctrans ( inx.lambda, &skytrans, sinx.tauzen, status );
    sc2sim_atmsky ( inx.lambda, skytrans, &meanatm, status );
 
-   for ( bol=0; bol<nboll; bol++ ) {
+   if( *status == SAI__OK ) {
+     for ( bol=0; bol<nbol; bol++ ) {
 
-      /* Calculate the elevation correction. */
-      airmass = 1.0 / sin ( skycoord[nboll + bol] );
+       /* Calculate the elevation correction. */
+       airmass = 1.0 / sin ( skycoord[nbol + bol] );
 
-      xpos = position[0] + xbc[bol] + 0.5 * (double)astnaxes[0] * astscale;
-      ypos = position[1] + ybc[bol] + 0.5 * (double)astnaxes[1] * astscale;
-
-      /* Get the observed astronomical value in Jy and convert it to pW. */
-      astvalue = dbuf[bol];
-      astvalue = astvalue * 1.0e-5 * AST__DPI * 0.25 * DIAMETER 
-                 * DIAMETER * sinx.bandGHz;
-
-      /* Lookup atmospheric emission - offset to near centre of the atm frame.
-	 A typical windspeed moves the sky screen at equivalent to 5000 arcsec
-	 per sec.
-	 The scalar ATMVALUE contains the atmosphere map value for the 
-	 current position (XPOS,YPOS). */
-    
-      xsky = xpos + sinx.atmxvel * time + sinx.atmzerox;
-      ysky = ypos + sinx.atmyvel * time + sinx.atmzeroy;
-
-      /* If the add atmospheric emission flag is set, use bilinear interpolation
-         to find the atmvalue from the input file. */
-      if ( sinx.add_atm == 1 ) {
-
+       xpos = position[0] + xbc[bol] + 0.5 * (double)astnaxes[0] * astscale;
+       ypos = position[1] + ybc[bol] + 0.5 * (double)astnaxes[1] * astscale;
+       
+       /* Get the observed astronomical value in Jy and convert it to pW. */
+       astvalue = dbuf[bol];
+       astvalue = astvalue * 1.0e-5 * AST__DPI * 0.25 * DIAMETER 
+	 * DIAMETER * sinx.bandGHz;
+       
+       /* Lookup atmospheric emission - offset to near centre of the atm frame.
+	  A typical windspeed moves the sky screen at equivalent to 5000 arcsec
+	  per sec.
+	  The scalar ATMVALUE contains the atmosphere map value for the 
+	  current position (XPOS,YPOS). */
+       
+       xsky = xpos + sinx.atmxvel * time + sinx.atmzerox;
+       ysky = ypos + sinx.atmyvel * time + sinx.atmzeroy;
+       
+       /* If the add atmospheric emission flag is set, use bilinear interpolation
+	  to find the atmvalue from the input file. */
+       if ( sinx.add_atm == 1 ) {
+	 
          sc2sim_getbilinear ( xsky, ysky, atmscale, atmnaxes[0], atmsim, 
 			      &atmvalue, status );
-
+	 
          if ( !StatusOkP(status) ) {
-	    printf ( "sc2sim_simframe: failed to interpolate sky bol=%d x=%e y=%e\n",
-		     bol, xpos, ypos );
-	    break;
-         }//if
-
+	   printf ( "sc2sim_simframe: failed to interpolate sky bol=%d x=%e y=%e\n",
+		    bol, xpos, ypos );
+	   break;
+         }
+	 
          if ( dream_trace ( 4 ) ) { 
-	    printf ( "sc2sim : atm emission interpolated\n" );
-	    printf ( "status = %d\n", *status );
-         }//if
-
-      } else {
+	   printf ( "sc2sim : atm emission interpolated\n" );
+	   printf ( "status = %d\n", *status );
+         }
+	 
+       } else {
          /* Otherwise, calculate the atmvalue from the tau */
          atmvalue = meanatm;
-      }//if-else
+       }
+       
+       /* Apply the elevation correction */
+       atmvalue = atmvalue * airmass;
+       
+       /* Calculate atmospheric transmission for this bolometer */
+       sc2sim_atmtrans ( inx.lambda, atmvalue, &skytrans, status );
+       
+       if( *status == SAI__OK ) {
+	 atmvalue = atmvalue / airmass;
+	 
+	 /*  Add atmospheric and telescope emission.
+	     TELEMISSION is a constant value for all bolometers. */
+	 flux = 0.01 * skytrans * astvalue + atmvalue + telemission;
+       
+	 /*  Add offset due to photon noise */
+       }	 
 
-      /* Apply the elevation correction */
-      atmvalue = atmvalue * airmass;
-    
-      /* Calculate atmospheric transmission for this bolometer */
-      sc2sim_atmtrans ( inx.lambda, atmvalue, &skytrans, status );
- 
-      atmvalue = atmvalue / airmass;
-
-      /*  Add atmospheric and telescope emission.
-	  TELEMISSION is a constant value for all bolometers. */
-      flux = 0.01 * skytrans * astvalue + atmvalue + telemission;
-    
-      /*  Add offset due to photon noise */
-    
-      if ( sinx.add_pns == 1 ) {
-
+       if ( sinx.add_pns == 1 ) {
          sc2sim_addpnoise ( inx.lambda, sinx.bandGHz, sinx.aomega, 
 		            samptime, &flux, status );
-      
+	 
          if ( dream_trace ( 4 ) ) { 
-	    printf ( "sc2sim : photon noise added\n" );
-	    printf ( "status = %d\n", *status );
-         }//if
+	   printf ( "sc2sim : photon noise added\n" );
+	   printf ( "status = %d\n", *status );
+         }
+	 
+       }
+       
+       /* Add heater, assuming mean heater level is set to add onto meanatm and
+	  TELEMISSION to give targetpow */
+       
+       if( *status == SAI__OK ) {
+	 if ( sinx.add_hnoise == 1 ) {
+	   flux = flux + ( inx.targetpow - meanatm - telemission ) * 
+	     heater[bol];
+	 } else {
+	   flux = flux + ( inx.targetpow - meanatm - telemission );
+	 }
+       }
 
-      }//if
-    
-      /* Add heater, assuming mean heater level is set to add onto meanatm and
-         TELEMISSION to give targetpow */
-    
-      if ( sinx.add_hnoise == 1 ) {
-         flux = flux + ( inx.targetpow - meanatm - telemission ) * heater[bol];
-      } else {
-         flux = flux + ( inx.targetpow - meanatm - telemission );
-      }//if-else
-    
-      /* Convert to current with bolometer power offset.
-	 The bolometer offset in PZERO(BOL) is added to the FLUX, and then
-	 the power in FLUX is converted to a current in scalar CURRENT with 
-	 help of the polynomial expression with coefficients in COEFFS(*) */
-      if ( sinx.flux2cur == 1 ) {
-
+       /* Convert to current with bolometer power offset.
+	  The bolometer offset in PZERO(BOL) is added to the FLUX, and then
+	  the power in FLUX is converted to a current in scalar CURRENT with 
+	  help of the polynomial expression with coefficients in COEFFS(*) */
+       if ( sinx.flux2cur == 1 ) {
+	 
          sc2sim_ptoi ( flux, NCOEFFS, coeffs, pzero[bol], &current, status );
-
+	 
          if ( dream_trace ( 4 ) ) { 
-	    printf ( "sc2sim : converted to current\n" );
-	    printf ( "status = %d\n", *status );
-         }//if
-
-      } else {
+	   printf ( "sc2sim : converted to current\n" );
+	   printf ( "status = %d\n", *status );
+         }
+	 
+       } else {
          current = flux;
-      }//if-else
-    
-      if ( sinx.add_fnoise == 1 ) {
-      
+       }
+       
+       if ( (sinx.add_fnoise == 1) && (*status == SAI__OK) ) {
+	 
          /*  Add instrumental 1/f noise to the smoothed data in output */
          pos = bol * nterms * 3;
          fnoise = 0.0;
          time = start_time + frame * samptime;
-
+	 
          for ( i=0; i<nterms*3; i+=3 ) {
-	    phase = fmod ( time, noisecoeffs[pos+i] ) / noisecoeffs[pos+i];
-	    fnoise += noisecoeffs[pos+i+1] * cos ( 2.0 * AST__DPI * phase )
-	            + noisecoeffs[pos+i+2] * sin ( 2.0 * AST__DPI * phase );
-         }//for
-
+	   phase = fmod ( time, noisecoeffs[pos+i] ) / noisecoeffs[pos+i];
+	   fnoise += noisecoeffs[pos+i+1] * cos ( 2.0 * AST__DPI * phase )
+	     + noisecoeffs[pos+i+2] * sin ( 2.0 * AST__DPI * phase );
+         }
+	 
          current += fnoise;
+	 
+       }
+       
+       dbuf[bol] = current;
       
-      }//if
-
-      dbuf[bol] = current;
-    
-   }//for
-
-   fset = astAnnul(fset);
-   bolo2sky = astAnnul(bolo2sky);
-   bolo2map = astAnnul(bolo2map);
-  
-}//sc2sim_simframe
+       /* Break out of loop if bad status */
+       if( *status != SAI__OK ) {
+	 bol = nbol;
+       }
+     }
+   }
+ 
+   if( bolo2sky) bolo2sky = astAnnul(bolo2sky);
+   if( bolo2map ) bolo2map = astAnnul(bolo2map);
+   
+}
 
