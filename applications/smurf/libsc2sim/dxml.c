@@ -783,6 +783,7 @@ int *status                /* global status (given and retuned) */
 
    Authors :
     B.D.Kelly (bdk@roe.ac.uk)
+    E.Chapin
 
    History :
     12Nov2002 : Original (bdk)
@@ -790,6 +791,7 @@ int *status                /* global status (given and retuned) */
     02Oct2003 : calculate gridpts from range instead of copying list (bdk)
     17Oct2003 : add targetpow (bdk)
     06Oct2005 : add flatname (bdk)
+    18Aug2006 : Fixed leak in upper-casing of obsmode (EC)
 */
 
 {
@@ -797,6 +799,7 @@ int *status                /* global status (given and retuned) */
    int ix;                 /* grid offset */
    int iy;                 /* grid offset */
    int j;
+   char *obsmode_upcase=NULL; /* upper case string for obsmode */
 
    inx->bol_distx = XML_bol_distx;
    inx->bol_disty = XML_bol_disty;
@@ -856,8 +859,12 @@ int *status                /* global status (given and retuned) */
    inx->ngrid = XML_ngrid;
    inx->numsamples = XML_numsamples;
    inx->nvert = XML_nvert;
+
 /* Convert obsmode to uppercase */
-   strcpy ( XML_obsmode, dxml_makeupper(XML_obsmode, status ) );
+   obsmode_upcase = dxml_makeupper(XML_obsmode, status );
+   strcpy ( XML_obsmode, obsmode_upcase );
+   free( obsmode_upcase );
+
    strcpy( inx->obsmode, XML_obsmode );
    inx->platenum = XML_platenum;
    inx->platerev = XML_platerev;

@@ -73,6 +73,7 @@
 *     2006-01-13:  write subarray name (elc)
 *     2006-01-24:  write filter/atstart/atend (elc)
 *     2006-06-09:  added to smurf_sim (jb)
+*     2006-08-18:  fixed memory leak (elc)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -284,5 +285,12 @@ void smurf_sc2sim( int *status ) {
      errRep("", "^MODE is not a supported observation mode", status);
 
   }//else
-  
+ 
+   /* Free resources */
+
+   smf_free( pars[0], status );
+   smf_free( pars[1], status );
+   smf_free( pars[2], status );
+   smf_free( pars[3], status );
+
 }
