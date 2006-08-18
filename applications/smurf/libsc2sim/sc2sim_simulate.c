@@ -108,8 +108,8 @@
 *        Don't rely on a loop variable outside of the loop
 *     2006-08-18 (EC)
 *        Improved status handling, constants from smurf_par
-*     2006-08-18 (EC)
 *        Fixed large number of memory leaks
+*        Removed unnecessary fopen/ndfGtwcs calls
 
 *     {enter_further_changes_here}
 
@@ -199,7 +199,6 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   double *airmass=NULL;           /* mean airmass of observation */
   char arraynames[80];            /* list of unparsed subarray names */
   smfData *astdata=NULL;          /* pointer to SCUBA2 data struct */
-  smfFile *astfile=NULL;          /* pointer to SCUBA2 data file struct */
   smfHead *asthdr=NULL;           /* pointer to header in data */
   int astnaxes[2];                /* dimensions of simulated image */
   double astscale;                /* pixel size in simulated image */
@@ -232,21 +231,18 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   int *digits=NULL;               /* output data buffer */
   int *dksquid=NULL;              /* dark squid values */
   double drytau183;               /* Broadband 183 GHz zenith optical depth */
-  FILE *f=NULL;                   /* File pointer */
   AstFitsChan *fc=NULL;           /* FITS channels for tanplane projection */
   char filename[DREAM__FLEN];     /* name of output file */
-  int firstframe;                 /* first frame in an output set */
+  int firstframe=0;               /* first frame in an output set */
   AstFrameSet *fitswcs=NULL;      /* Frameset for input image WCS */
   double *flatcal=NULL;           /* flatfield calibration */
   char flatname[SC2STORE_FLATLEN];/* flatfield algorithm name */
   double *flatpar=NULL;           /* flatfield parameters */
   int frame;                      /* frame counter */
   AstFrameSet *fs=NULL;           /* frameset for tanplane projection */
-  AstFrameSet *fset=NULL;         /* World coordinate transformations */
   double grid[64][2];             /* PONG grid coordinates */
   JCMTState *head;                /* per-frame headers */
   char heatname[DREAM__FLEN];     /* name of flatfield cal file */
-  int indf;                       /* NDF identifier */
   int i;                          /* loop counter */
   int j;                          /* loop counter */
   double jigptr[DREAM__MXSIM][2]; /* pointing: nas jiggle offsets from cen. */
@@ -259,9 +255,9 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   int narray = 0;                 /* number of subarrays to generate */
   int nflat;                      /* number of flat coeffs per bol */
   static double noisecoeffs[DREAM__MXBOL*3*60]; /* noise coefficients */
-  int nterms;                     /* number of 1/f noise frequencies */
-  int nwrite;                     /* number of frames to write */
-  int outscan;                    /* count of scans completed */
+  int nterms=0;                   /* number of 1/f noise frequencies */
+  int nwrite=0;                   /* number of frames to write */
+  int outscan=0;                  /* count of scans completed */
   double phi;                     /* latitude (radians) */
   double *posptr=NULL;            /* pointing: nasmyth offsets from cen. */ 
   double pwvlos;                  /* mm precip. wat. vapor. line of site */
@@ -274,7 +270,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   double sky_el=0;                /* effective el on sky (bor+jig) */
   double sky_x_hor=0;             /* effective x hor. off. on sky (bor+jig) */
   double sky_y_hor=0;             /* effective y hor. off. on sky (bor+jig) */
-  double start_time;              /* time of start of current scan */
+  double start_time=0;            /* time of start of current scan */
   char subarrays[4][80];          /* list of parsed subarray names */
   int subnum;                     /* Subarray number */
   double tauCSO=0;                /* CSO zenith optical depth */
@@ -293,7 +289,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   ndfBegin();
 
   /* Allocate space for the JCMTState array */
-  head = smf_malloc( maxwrite, sizeof( JCMTState ), 1, status );
+  head = smf_malloc( maxwrite, sizeof( *head ), 1, status );
 
   if( *status == SAI__OK ) {
     /* Calculate year/month/day corresponding to MJD at start */
@@ -317,6 +313,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
     }
     
     /* Check to ensure that the astronomical and atmospheric images exist. */
+    /* Not required
     if ( ( f = fopen ( sinx->astname, "r" ) ) ) {
       fclose ( f );
     } else {
@@ -334,6 +331,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
       *status = DITS__APP_ERROR;
       return;
     }
+    */
   }
 
   /* Get simulation of astronomical and atmospheric images. */
@@ -350,7 +348,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
    
 
   /* Retrieve the astscale and atmscale from the FITS headers. */
-  if( *status = SAI__OK ) {
+  if( *status == SAI__OK ) {
     asthdr = astdata->hdr;
     smf_fits_getD ( asthdr, "PIXSIZE", &astscale, status );
   }
@@ -361,11 +359,17 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   }
 
   /* Retrieve the WCS info from the astronomical image. */
+
+  if( *status == SAI__OK ) {
+    fitswcs = astdata->hdr->wcs;
+  }    
+
+  /* Not Necessary
   if( *status == SAI__OK ) {
     astfile = astdata->file;
     indf = astfile->ndfid;     
     ndfGtwcs( indf, &fitswcs, status );        
-
+    
     if( (fitswcs == NULL) && (*status == SAI__OK) ) { 
       msgSetc ( "FILENAME", sinx->astname );          
       msgOut(FUNC_NAME, "Could not retrieve wcs information from ^FILENAME.", 
@@ -374,6 +378,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
       return;
     }
   }
+  */
 
   /* Check the dimensions of the ast and atm data. */
   if( *status == SAI__OK ) {
@@ -404,18 +409,25 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
     /* Extract the Sky->map pixel mapping for the astronomical image */
     astSetC( fitswcs, "SYSTEM", "icrs" );
     sky2map = astGetMapping( fitswcs, AST__CURRENT, AST__BASE ); 
+    
+    if( !astOK ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "AST error extracting sky->image pixel mapping", 
+	     status);
+    }
 
-    /*  Re-initialise random number generator to give a different sequence
-        each time by using the given seed. */
-    srand ( rseed );
-
-    /* Initialize SMU nasmyth jiggle offsets to 0 */
-    for( i=0; i<DREAM__MXSIM; i++ ) {
-      for( j=0; j<2; j++ ) {
-        jigptr[i][j] = 0;
+    if( *status == SAI__OK ) {
+      /*  Re-initialise random number generator to give a different sequence
+	  each time by using the given seed. */
+      srand ( rseed );
+      
+      /* Initialize SMU nasmyth jiggle offsets to 0 */
+      for( i=0; i<DREAM__MXSIM; i++ ) {
+	for( j=0; j<2; j++ ) {
+	  jigptr[i][j] = 0;
+	}
       }
     }
-    
 
     /* Get the relevant pointing solution for the telescope based on the
        observation type */
@@ -598,12 +610,10 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 
     /* Go through the scan pattern, writing to disk periodically */
     
-    if( *status == SAI__OK ) {
-      outscan = 0;
-      start_time = 0.0;
-      nwrite = 0;
-      firstframe = 0;
-    }
+    outscan = 0;
+    start_time = 0.0;
+    nwrite = 0;
+    firstframe = 0;
     
     for ( frame=0; frame<count; frame++ ) {
       
@@ -648,13 +658,16 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
       astClear( fc, "Card" );
       fs = astRead( fc );
 
-      astTran2( fs, 1, &bor_x_hor, &bor_y_hor, 1, &temp1, &temp2 );
-
-      if( !astOK ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "AST error calculating telescope position", 
-               status);
+      if( *status == SAI__OK ) {
+	astTran2( fs, 1, &bor_x_hor, &bor_y_hor, 1, &temp1, &temp2 );
+	if( !astOK ) {
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, "AST error calculating telescope position", 
+		 status);
+	}
       }
+
+
       
       if( *status == SAI__OK ) {
         bor_az[frame] = fmod(temp1+2.*AST__DPI,2.*AST__DPI);
@@ -668,9 +681,12 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 
         sky_az = fmod(temp1+2.*AST__DPI,2.*AST__DPI);
         sky_el = fmod(temp2+2.*AST__DPI,2.*AST__DPI);
-        fs = astAnnul(fs);
-        fc = astAnnul(fc);
       }
+      
+      /* Free AST resources */
+      if( fs ) fs = astAnnul(fs);
+      if( fc ) fc = astAnnul(fc);
+
 
       if( !astOK ) {
         *status = SAI__ERROR;
@@ -700,17 +716,20 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
       sc2ast_createwcs( subnum, 
 			bor_az[frame], bor_el[frame],
 			jig_x_hor[frame], jig_y_hor[frame],
-			mjuldate[frame], &fset, status);
+			mjuldate[frame], &fs, status);
       
       /* simulate one frame of data */
       sc2sim_simframe ( *inx, *sinx, astnaxes, astscale, astdata->pntr[0], 
 			atmnaxes, atmscale, atmdata->pntr[0], coeffs, 
-			fset, heater, nbol, frame, nterms, noisecoeffs, 
+			fs, heater, nbol, frame, nterms, noisecoeffs, 
 			pzero, samptime, start_time, sinx->telemission, 
 			weights, sky2map, xbolo, ybolo, xbc, ybc, 
 			&(posptr[frame*2]), &(dbuf[nbol*nwrite]), status );
       nwrite++;
       
+      /* Annul AST objects associated with this time slice */
+      if( fs ) fs = astAnnul( fs );
+
       if ( (*status == SAI__OK) &&
            (( nwrite == maxwrite ) || frame == count-1) ) {
 	/* Digitise the numbers */
@@ -853,7 +872,17 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
     if( *status != SAI__OK ) {
       k = narray;
     }
+   
+    /* Free buffers that get allocated for each subarray */
+    if( flatcal ) {
+      free( flatcal );
+      flatcal = NULL;
+    }
     
+    if( flatpar ) {
+      free( flatpar );
+      flatpar = NULL;
+    }
   }
   
   /* Release memory. */
@@ -879,6 +908,8 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 
   smf_close_file( &astdata, status);
   smf_close_file( &atmdata, status);
+
+  if( sky2map ) sky2map = astAnnul( sky2map );
 
   grpDelet( &skygrp, status);
 
