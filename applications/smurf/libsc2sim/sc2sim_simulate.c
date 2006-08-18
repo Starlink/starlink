@@ -108,6 +108,8 @@
 *        Don't rely on a loop variable outside of the loop
 *     2006-08-18 (EC)
 *        Improved status handling, constants from smurf_par
+*     2006-08-18 (EC)
+*        Fixed large number of memory leaks
 
 *     {enter_further_changes_here}
 
@@ -513,14 +515,14 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
               "Count = ^COUNT", status );
   }
 
-  /* Allocated buffers for simulated data */
+  /* Allocated buffers for quantities that are calculated at each
+     time-slice */
 
   dbuf = smf_malloc ( count*nbol, sizeof(*dbuf), 1, status );
   digits = smf_malloc ( count*nbol, sizeof(*digits), 1, status );
   dksquid = smf_malloc ( count*inx->nboly, sizeof(*dksquid), 1, status );
   mjuldate = smf_malloc ( count, sizeof(*mjuldate), 1, status );
-  lst = smf_malloc ( count, sizeof(*lst), 1, status );
-  
+  lst = smf_malloc ( count, sizeof(*lst), 1, status );  
   base_az = smf_malloc ( count, sizeof(*base_az), 1, status );
   base_el = smf_malloc ( count, sizeof(*base_el), 1, status );
   base_p = smf_malloc ( count, sizeof(*base_p), 1, status );
@@ -855,6 +857,26 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   }
   
   /* Release memory. */
+
+  smf_free( head, status );
+  smf_free( posptr, status );
+
+  smf_free( dbuf, status );
+  smf_free( digits, status );
+  smf_free( dksquid, status );
+  smf_free( mjuldate, status );
+  smf_free( lst, status );
+  smf_free( base_az, status );
+  smf_free( base_el, status );
+  smf_free( base_p, status );
+  smf_free( bor_az, status );
+  smf_free( bor_el, status );
+  smf_free( bor_ra, status );
+  smf_free( bor_dec, status );
+  smf_free( jig_x_hor, status );
+  smf_free( jig_y_hor, status );
+  smf_free( airmass, status );
+
   smf_close_file( &astdata, status);
   smf_close_file( &atmdata, status);
 
