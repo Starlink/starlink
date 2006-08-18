@@ -1617,7 +1617,7 @@ itcl::class gaia::Gaia {
             if { [catch {
                $app register
             } msg] } {
-               puts "No PLASTIC service: $msg"
+               puts "Failed to register with a PLASTIC hub: $msg" $w_
             }
          }
 
@@ -1637,7 +1637,7 @@ itcl::class gaia::Gaia {
          if {[catch {
             $plastic_app_ register
          } msg]} {
-            error_dialog "No PLASTIC service: $msg"
+            info_dialog "Failed to register with a PLASTIC hub: \n$msg"
          }
       }
    }
