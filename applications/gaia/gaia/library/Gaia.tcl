@@ -229,10 +229,18 @@ itcl::class gaia::Gaia {
    #  Destructor:
    destructor {
 
-      #  If this is the final remaining instance of this class, attempt
+      #  If this is the final remaining instance of this class, do some
+      #  application-wide clear up.
       #  to clear any current registration with a PLASTIC hub.
       if {"[itcl::find objects -class gaia::Gaia]" == "$this"} {
+
+         #  Inform the PLASTIC hub that we are ceasing operations.
          stop_plastic_
+
+         #  Delete cookie file.
+         if {$cookie_ != ""} {
+            delete object $cookie_
+         }
       }
 
       #  Clear up the images list (this isn't done correctly in
@@ -326,6 +334,9 @@ itcl::class gaia::Gaia {
          cat::AstroCat::add_catalog_menu \
             $w_ [code $image_] ::gaia::GaiaSearch $itk_option(-debug)
       }
+
+      #  Initialise a cookie for remote control authentication.
+      set cookie_ [gaia::GaiaCookie::get_instance]
 
       #  Add the PLASTIC menu.
       if {$itk_option(-interop_menu)} {
@@ -2201,6 +2212,9 @@ window gives you access to this."
 
    #  Last world coordinates of position of interest.
    protected variable last_position_of_interest_ {}
+
+   #  GaiaCookie object.
+   protected variable cookie_ {}
 
    # -- Common variables --
 
