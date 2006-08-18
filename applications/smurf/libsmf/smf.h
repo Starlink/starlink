@@ -268,6 +268,9 @@ void smf_flatten ( smfData *data, int *status );
 
 void smf_free( void * pntr, int * status );
 
+void smf_get_gridcoords ( double *row, double *col, int nrow, int ncol,
+			     int *status );
+
 int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode, 
 		    const char *state, const char *dattype, const int ndims, 
 		    const int *lbnd, const int *ubnd, int *status );

@@ -87,6 +87,8 @@
 *        Use sc2ast_get_gridcoords instead of sc2sim_bolnatcoords
 *     2006-08-16 (EC)
 *        Fixed mis-handling of bad error status
+*     2006-08-16 (EC)
+*        Call smf_get_gridcoords instead of sc2ast_get_gridcoords
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -145,13 +147,22 @@ void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
   int j;                         /* loop counter */
   double lst;                    /* local sidereal time in radians */
   double meanatm;                /* mean expected atmospheric signal (pW) */
-  int nboll;                     /* total number of bolometers */
+  int nbol=0;                    /* total number of bolometers */
   double p;                      /* parallactic angle (radians) */
   double photonsigma;            /* typical photon noise level in pW */
   double samptime;               /* sample time in sec */
   int savebols;                  /* flag for bol details (unused here) */
   int subnum;                    /* subarray number */
   double trans;                  /* average transmission */
+
+
+  /*
+    double junk[1000];
+    void *junkpointer=NULL;
+    smf_free( junkpointer, status );
+    smf_boxcar1( junk, 1000, 3, status );
+  */
+
 
   /* Check status */
   if ( !StatusOkP(status) ) return;
@@ -173,16 +184,17 @@ void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
    
   /* Get the bolometer information */
   if( *status == SAI__OK ) {
-    nboll = inx->nbolx * inx->nboly;
+    nbol = inx->nbolx * inx->nboly;
   }     
 
   decay = 5.0;
-  *heater = smf_malloc ( nboll, sizeof(**heater), 1, status );
-  *pzero = smf_malloc ( nboll, sizeof(**pzero), 1, status  );
-  *xbc = smf_malloc ( nboll, sizeof(**xbc), 1, status  );
-  *ybc = smf_malloc ( nboll, sizeof(**ybc), 1, status  );
-  *xbolo = smf_malloc ( nboll, sizeof(**xbolo), 1, status  );
-  *ybolo = smf_malloc ( nboll, sizeof(**ybolo), 1, status  );
+  *heater = smf_malloc ( nbol, sizeof(**heater), 1, status );
+  *pzero = smf_malloc ( nbol, sizeof(**pzero), 1, status  );
+  *xbc = smf_malloc ( nbol, sizeof(**xbc), 1, status  );
+  *ybc = smf_malloc ( nbol, sizeof(**ybc), 1, status  );
+  *xbolo = smf_malloc ( nbol, sizeof(**xbolo), 1, status  );
+  *ybolo = smf_malloc ( nbol, sizeof(**ybolo), 1, status  );
+
 
   /*  Initialise the standard bolometer response function.
       The routine sets the values for 6 polynomial coefficients which
@@ -212,10 +224,11 @@ void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
 
   /* Get the native x- and y- (GRID) coordinates of each bolometer */
    
-  /*sc2sim_bolnatcoords( *xbolo, *ybolo, &nboll, status );*/
+  /*sc2sim_bolnatcoords( *xbolo, *ybolo, &nbol, status );*/
 
-  sc2ast_get_gridcoords( *xbolo, *ybolo, status );
-   
+  /* KLUDGE */
+  smf_get_gridcoords( *xbolo, *ybolo, BOLROW, BOLCOL, status );
+
   /* Since sc2sim_simframe still needs xbc & ybc to interpolate values from
      the sky noise image, calculate them here. Get rid of the old call
      to sc2sim_bolcoords. For now just make a dummy scuba2 frameset at
@@ -231,10 +244,10 @@ void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
   if( *status == SAI__OK ) {
 
     astSetC( fset, "SYSTEM", "AzEl" );
-    astTran2( fset, nboll, *ybolo, *xbolo, 1, *xbc, *ybc );
+    astTran2( fset, nbol, *ybolo, *xbolo, 1, *xbc, *ybc );
      
     /* xbc and ybc are in radians at this point. Convert to arcsec */
-    for ( j=0; j<nboll; j++ ) {
+    for ( j=0; j<nbol; j++ ) {
       (*xbc)[j] *= DR2AS;
       (*ybc)[j] *= DR2AS;
     }
@@ -249,18 +262,18 @@ void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
      
     /*
       sc2sim_bolcoords ( sinx->subname, inx->ra, inx->dec, *elevation, p,
-      "NASMYTH", &nboll, *xbc, *ybc, status );
+      "NASMYTH", &nbol, *xbc, *ybc, status );
     */
     /* Convert Nasmyth coordinates from mm to arcsec */
     /*
-      for ( j=0; j<nboll; j++ ) {
+      for ( j=0; j<nbol; j++ ) {
       (*xbc)[j] *= MM2SEC;
       (*ybc)[j] *= MM2SEC;
       }
     */
      
      
-    sc2sim_getspread ( nboll, *pzero, *heater, status );
+    sc2sim_getspread ( nbol, *pzero, *heater, status );
   }
 
 }

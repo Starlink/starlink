@@ -28,6 +28,8 @@
 *  History:
 *     2006-08-15 (EC):
 *        Placed comments at top of header, added SC2AST_BOLCOL/BOLROW
+*     2006-08-17 (EC):
+*        Removed SC2AST_BOLCOL/BOLROW,sc2ast_get_gridcoords->smf_get_gridcoords
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -58,9 +60,6 @@
 
 #ifndef HEADGEN___src_sc2ast_sc2ast_h
 #define HEADGEN___src_sc2ast_sc2ast_h 
- 
-#define SC2AST_BOLROW 40
-#define SC2AST_BOLCOL 32
  
 /*+ sc2ast_createwcs - create WCS description */
 
@@ -141,9 +140,5 @@ AstMapping *cache[ 2 ],  /* Cached Mappings (supply as NULL on 1st call) */
 double rot,              /* Rotation needed to align input Y axis with North */
 int *status              /* global status (given and returned) */
 );
-
- 
-/* Calculate GRID coordinates for each bolometer */
-void sc2ast_get_gridcoords ( double *row, double *col, int *status );
 
 #endif
