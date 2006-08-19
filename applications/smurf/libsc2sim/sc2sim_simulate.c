@@ -843,14 +843,18 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
         }
 
 	/* Write the data out to a file */
-	sc2sim_ndfwrdata( inx->ra, inx->dec, sinx->add_atm, 
+	/*	sc2sim_ndfwrdata( inx->ra, inx->dec, sinx->add_atm, 
 			  sinx->add_fnoise, sinx->add_pns, sinx->flux2cur,
 			  sinx->airmass, sinx->airmass, tauCSO, 
 			  inx->lambda, filename, inx->nbolx, inx->nboly, 
 			  inx->sample_t, sinx->subname, nwrite, nflat, 
 			  flatname, head, digits, dksquid, flatcal, 
 			  flatpar, filter, sinx->atstart, sinx->atend, 
-			  &(posptr[firstframe*2]), inx->obsmode, status );
+			  &(posptr[firstframe*2]), inx->obsmode, status );*/
+	sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, nwrite, nflat, 
+			  flatname, head, digits, dksquid, flatcal, 
+			  flatpar, filter, &(posptr[firstframe*2]), jigsamples, 
+			  jigptr, status);
 
 	msgSetc( "FILENAME", filename );
 	msgOut( FUNC_NAME, "Done ^FILENAME", status ); 

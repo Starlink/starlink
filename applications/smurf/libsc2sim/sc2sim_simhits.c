@@ -492,13 +492,16 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 	    }//for
 
 	    /* Free pointers */
-	    sc2sim_ndfwrdata( inx->ra, inx->dec, sinx->add_atm, sinx->add_fnoise,
+	    /*	    sc2sim_ndfwrdata( inx->ra, inx->dec, sinx->add_atm, sinx->add_fnoise,
 			      sinx->add_pns, sinx->flux2cur, sinx->airmass, 
 			      sinx->airmass, tauCSO, inx->lambda, filename, 
 			      inx->nbolx, inx->nboly, inx->sample_t, sinx->subname, 
 			      nwrite, nflat, flatname, head, digits, dksquid, 
 			      flatcal, flatpar, filter, sinx->atstart, sinx->atend, 
-			      posptr, inx->obsmode, status );
+			      posptr, inx->obsmode, status );*/
+	    sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, nwrite, nflat, 
+			      flatname, head, digits, dksquid, flatcal, 
+			      flatpar, filter, posptr, jigsamples, jigptr, status);
 
 	    msgSetc( "FILENAME", filename );
 	    msgOut( FUNC_NAME, "Done ^FILENAME", status ); 
