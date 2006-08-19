@@ -319,12 +319,14 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
    msgOut( FUNC_NAME, "Writing ^FILENAME", status ); 
 
    /* Store the data in output file file_name */
-
-   sc2sim_ndfwrheat ( sinx->add_atm, sinx->add_fnoise, sinx->add_pns,
+   /*   sc2sim_ndfwrheat ( sinx->add_atm, sinx->add_fnoise, sinx->add_pns,
                       inx->heatstart, inx->heatstep, filename, inx->nbolx, 
                       inx->nboly, inx->sample_t, sinx->subname, numsamples, 
                       nflat, flatname, head, digits, dksquid, flatcal, 
-                      flatpar, filter, sinx->atstart, sinx->atend, status );    
+                      flatpar, filter, sinx->atstart, sinx->atend, status );*/
+
+   sc2sim_ndfwrheat( inx, sinx, filename, numsamples, nflat, flatname, head, 
+		     digits, dksquid, flatcal, flatpar, filter, status );
 
    msgSetc( "FILENAME", filename );
    msgOut( FUNC_NAME, "Done ^FILENAME", status ); 
