@@ -17,6 +17,20 @@ int pixval[],           /* incompressible values (returned) */
 int *status             /* global status (given and returned) */
 );
 
+/*+ sc2store_credream - create DREAM extension in output file */
+
+void sc2store_credream
+(
+int jig_vert[][2],       /* Array containing jiggle vertices (given) */
+int nvert,               /* Number of vertices in DREAM pattern (given)  */
+int **jigvert,           /* Pointer to stored jiggle vertices (returned) */
+double jig_path[][2],    /* Array containing SMU path (given) */
+int npath,               /* Number of points along SMU path in DREAM pattern 
+			    (given) */
+double **jigpath,        /* Pointer to stored jiggle path (returned) */
+int *status              /* Global status (given and returned) */
+);
+
 /*+ sc2store_creimages - create structure to store images */
 
 void sc2store_creimages
@@ -284,9 +298,12 @@ int *dbuf,         /* time stream data (given) */
 int *darksquid,    /* dark SQUID time stream data (given) */
 double *fcal,      /* flat-field calibration (given) */
 double *fpar,      /* flat-field parameters (given) */
+char obsmode[],    /* Observing mode (given) */
+int jig_vert[][2], /* Array of jiggle vertices (given) */
+int nvert,         /* Number of jiggle vertices (given) */
+double jig_path[][2], /* Path of SMU during jiggle cycle (given) */
+int npath,         /* Number of positions in jiggle path (given) */
 int *status        /* global status (given and returned) */
-);
-
- 
+); 
  
 #endif

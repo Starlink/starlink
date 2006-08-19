@@ -48,6 +48,9 @@ static int sindf;                  /* NDF identifier for subtraction frame */
 static int findf;                  /* NDF identifier for flat calibration */
 static int zindf;                  /* NDF identifier for compression zero 
                                       offsets */
+HDSLoc *drmloc = NULL;              /* HDS locator to DREAM parameters */
+static int jigvndf;                 /* NDF identifier for jiggle vertices */
+static int jigpndf;                 /* NDF identifier for the SMU path */
 
 /*+ sc2store_compress - compress frame of integers to unsigned short */
 
@@ -117,6 +120,97 @@ int *status             /* global status (given and returned) */
    }
 }
 
+/*+ sc2store_credream - create DREAM extension in output file */
+
+void sc2store_credream
+(
+int jig_vert[][2],       /* Array containing jiggle vertices (given) */
+int nvert,               /* Number of vertices in DREAM pattern (given)  */
+int **jigvert,           /* Pointer to stored jiggle vertices (returned) */
+double jig_path[][2],    /* Array containing SMU path (given) */
+int npath,               /* Number of points along SMU path in DREAM pattern 
+			    (given) */
+double **jigpath,        /* Pointer to stored jiggle path (returned) */
+int *status              /* Global status (given and returned) */
+)
+/*
+  History :
+  08Aug2006 : original (agg)
+
+*/
+{
+  int el;
+  int lbnd[2];
+  int ubnd[2];
+  int place;
+
+  /* Get new HDS locator for DREAM extension  */
+  ndfXnew ( indf, "DREAM", "DREAM_PAR", 0, 0, &drmloc, status );
+  if ( drmloc == NULL ) {
+    if ( *status == SAI__OK) {
+      *status = SAI__ERROR;
+      errRep("", "Unable to create NDF extension for DREAM", status);
+    }
+  }
+
+  /* Create NDF for jigvert array */
+  ndfPlace ( drmloc, "JIGVERT", &place, status );
+  if ( place == NDF__NOPL ) {
+    if ( *status == SAI__OK) {
+      *status = SAI__ERROR;
+      errRep("", "Unable to create placeholder for DREAM jigvert array", status);
+    }
+  }
+  lbnd[0] = 1;
+  lbnd[1] = 1;
+  ubnd[0] = nvert;
+  ubnd[1] = 2;
+  ndfNew ( "_INTEGER", 2, lbnd, ubnd, &place, &jigvndf, status );
+  if ( jigvndf == NDF__NOID ) {
+    if ( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep("", "Unable to obtain an NDF identifier for the jigvert array", status);
+    }
+  }
+  /* Map jigvert array so that it's ready to fill */
+  ndfMap ( jigvndf, "DATA", "_INTEGER", "WRITE", (void *)jigvert, &el, 
+	   status );
+  if ( jigvert == NULL ) {
+    if ( *status == SAI__OK) {
+      *status = SAI__ERROR;
+      errRep("", "Unable to map DREAM jigvert array", status);
+    }
+  }
+
+  /* Create NDF for jigpath array */
+  ndfPlace ( drmloc, "JIGPATH", &place, status );
+  if ( place == NDF__NOPL ) {
+    if ( *status == SAI__OK) {
+      *status = SAI__ERROR;
+      errRep("", "Unable to create placeholder for DREAM jigpath array", status);
+    }
+  }
+  lbnd[0] = 1;
+  lbnd[1] = 1;
+  ubnd[0] = npath;
+  ubnd[1] = 2;
+  ndfNew ( "_DOUBLE", 2, lbnd, ubnd, &place, &jigpndf, status );
+  if ( jigpndf == NDF__NOID ) {
+    if ( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep("", "Unable to obtain an NDF identifier for the jigpath array", status);
+    }
+  }
+  ndfMap ( jigpndf, "DATA", "_DOUBLE", "WRITE", (void *)jigpath, &el, 
+	   status );
+  if ( jigpath == NULL ) {
+    if ( *status == SAI__OK) {
+      *status = SAI__ERROR;
+      errRep("", "Unable to map DREAM jigpath array", status);
+    }
+  }
+
+}
 
 
 /*+ sc2store_creimages - create structure to store images */
@@ -181,7 +275,6 @@ int *status              /* global status (given and returned) */
    int lbnd[3];                /* lower dimension bounds */
    int place;                  /* NDF placeholder */
    int ubnd[3];                /* upper dimension bounds */
-
 
    if ( *status != SAI__OK ) return;
 
@@ -421,6 +514,7 @@ int *status          /* global status (given and returned) */
     12Aug2004 : original (bdk)
     04Oct2005 : check sc2open flag (bdk)
     23Jan2006 : annul scu2redloc (bdk)
+    20Jul2006 : annul DREAM extension (agg)
 */
 
 {
@@ -440,6 +534,15 @@ int *status          /* global status (given and returned) */
 /* Free the locator for the SCUBA2 structure*/
 
    datAnnul ( &sc2loc, &tstatus );
+
+/* Release DREAM parameters */
+   if ( drmloc != NULL ) {
+     ndfUnmap ( jigvndf, "DATA", &tstatus );
+     ndfAnnul ( &jigvndf, &tstatus );
+     ndfUnmap ( jigpndf, "DATA", &tstatus );
+     ndfAnnul ( &jigpndf, &tstatus );
+     datAnnul ( &drmloc, &tstatus );
+   }
 
 /* Release Header values for each frame */
 
@@ -1000,6 +1103,7 @@ int *status         /* global status (given and returned) */
     25Jan2006 : add access argument to sc2store_rdtstream (bdk)
     26Jan2006 : pass-in access argument to sc2store_rdtstream (bdk)
     13Mar2006 : copied over from map.c (agg)
+    14Mar2006 : change FHEAD__MXREC to SC2STORE__MAXFITS (agg)
 */
 
 {
@@ -1768,8 +1872,6 @@ int *status              /* global status (given and returned) */
    sc2open = 1; 
 }
 
-
-
 /*+ sc2store_wrfitshead - write the FITS headers */
 
 void sc2store_wrfitshead
@@ -1825,6 +1927,11 @@ int *dbuf,         /* time stream data (given) */
 int *darksquid,    /* dark SQUID time stream data (given) */
 double *fcal,      /* flat-field calibration (given) */
 double *fpar,      /* flat-field parameters (given) */
+char *obsmode,    /* Observing mode (given) */
+int jig_vert[][2], /* Array of jiggle vertices (given) */
+int nvert,         /* Number of jiggle vertices (given) */
+double jig_path[][2], /* Path of SMU during jiggle cycle (given) */
+int npath,         /* Number of positions in jiggle path (given) */
 int *status        /* global status (given and returned) */
 )
 
@@ -1840,6 +1947,7 @@ int *status        /* global status (given and returned) */
      24Sep2005:  original (bdk)
      04Oct2005 : check if sc2store already has an open file (bdk)
      08Dec2005 : check status after sc2store_cremap (bdk)
+     08Aug2006 : add call to credream if we have a DREAM obs (agg)
 */
 
 {
@@ -1852,6 +1960,8 @@ int *status        /* global status (given and returned) */
    int framesize;                   /* number of pixels in a frame */
    int i;                           /* loop counter */
    int j;                           /* loop counter */
+   double *jigpath;                 /* Pointer to SMU jiggle path */
+   int *jigvert;                    /* Pointer to SMU jiggle vertices */
    int npix;                        /* number of incompressible pixels */
    static int pixnum[DREAM__MXBOL]; /* indices of incompressible pixels */
    static int pixval[DREAM__MXBOL]; /* values of incompressible pixels */
@@ -1868,9 +1978,9 @@ int *status        /* global status (given and returned) */
       return;
    }
 
-   sc2store_cremap ( file_name, colsize, rowsize, numsamples, nflat,
-     flatname, &bzero, &data, &dksquid, &stackz, &flatcal, &flatpar,
-     status );
+   sc2store_cremap ( file_name, colsize, rowsize, numsamples, nflat, flatname,
+		     &bzero, &data, &dksquid, &stackz, &flatcal, &flatpar,
+		     status );
 
    framesize = colsize * rowsize;
 
@@ -1926,6 +2036,25 @@ int *status        /* global status (given and returned) */
          flatpar[j] = fpar[j];
       }
 
+   }
+
+   /* Create DREAM extension ONLY if we have DREAM data */
+   if ( strncmp( obsmode, "DREAM", 5 ) == 0 ) {
+     sc2store_credream( jig_vert, nvert, &jigvert, jig_path, npath, &jigpath, 
+			status );
+     /* Copy the DREAM data into the array: Fortran order */
+     if ( *status == SAI__OK ) {
+       /* First jigvert */
+       for ( j=0; j<nvert; j++ ) {
+	 jigvert[j] = jig_vert[j][0];
+	 jigvert[j+nvert] = jig_vert[j][1];
+       }
+       /* Then jigpath */
+       for ( j=0; j<npath; j++ ) {
+	 jigpath[j] = jig_path[j][0];
+	 jigpath[j+npath] = jig_path[j][1];
+       }
+     }
    }
 
 /* Store the FITS headers */
