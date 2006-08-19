@@ -13,54 +13,30 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_ndfwrdata ( double ra, double dec, int add_atm, int add_fnoise,
-*                        int add_pns, int flux2cur, double amstart, double amend,
-*                        double meanwvm, double obslam, char file_name[], 
-*                        int ncol, int nrow, double sample_t, char subarray[],
+*     sc2sim_ndfwrdata ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
+*                        double meanwvm, char file_name[], 
 *                        int numsamples, int nflat, char *flatname, 
-*                        struct sc2head *head, int *dbuf, int *dksquid, 
+*                        JCMTState *head, int *dbuf, int *dksquid, 
 *                        double *fcal, double *fpar, char filter[], 
-*                        double atstart, double atend, double *posptr,
-*                        char *obsmode, int *status )
+*                        double *posptr, int jigsamples, double jigptr[][2],
+*                        int *status )
 
 *  Arguments:
-*     ra = double (Given)
-*        RA of observation in radians
-*     dec = double (Given)
-*        Dec of observation in radians
-*     add_atm = int (Given)
-*        Flag for adding atmospheric emission 
-*     add_fnoise = int (Given)
-*        Flag for adding 1/f noise 
-*     add_pns = int (Given)
-*        Flag for adding photon noise 
-*     flux2cur = int (Given)
-*        Flag for converting flux to current
-*     amstart = double (Given)
-*        Airmass at beginning 
-*     amend = double (Given)
-*        Airmass at end 
+*     inx = dxml_struct* (Given)
+*        Pointer to struct with observation parameters
+*     sinx = dxml_sim_struct* (Given)
+*        Pointer to struct with simulation parameters
 *     meanwvm = double (Given)
 *        225 GHz tau
-*     obslam = double (Given)
-*        Wavelength 
 *     file_name = char[] (Given)
 *        Output file name 
-*     ncol = int (Given)
-*        Number of bolometers in column 
-*     nrow = int (Given)
-*        Number of bolometers in row 
-*     sample_t = double (Given)
-*        Sample interval in msec 
-*     subarray = char[] (Given)
-*        Name of the subarray
 *     numsamples = int (Given)
 *        Number of samples 
 *     nflat = int (Given)
 *        Number of flat coeffs per bol
 *     flatname = char*
 *        Name of flatfield algorithm 
-*     head = sc2head* (Given)
+*     head = JCMTState* (Given)
 *        Header data for each frame 
 *     dbuf = int* (Given)
 *        Simulated data
@@ -72,14 +48,12 @@
 *        Flat-field parameters
 *     filter = char[] (Given)
 *        String representing filter (e.g. "850") 
-*     atstart = double (Given)
-*        Ambient temperature at start (Celsius) 
-*     atend = double (Given)
-*        Ambient temperature at end (Celsius) 
 *     posptr = double* (Given)
 *        Pointing offsets from map centre
-*     obsmode = char* (Given)
-*        Observing mode
+*     jigsamples = int (Given)
+*        Number of jiggle samples in DREAM pattern
+*     jigptr[][2] = double (Given)
+*        Array of jiggle X and Y positions
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
@@ -90,7 +64,8 @@
 
 *  Authors:
 *     E.Chapin (UBC)
-*     A.Gibb (UBC)
+*     A.G. Gibb (UBC)
+*     J. Balfour (UBC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -104,6 +79,10 @@
 *        Changed sc2head to JCMTState
 *     2006-08-08 (EC):
 *        Added INSTRUME FITS keyword
+*     2006-08-18 (AGG):
+*        Update API to take:
+*        - pointers to inx and sinx structs
+*        - DREAM jiggle position parameters
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -130,6 +109,9 @@
 *-
 */
 
+/* Standard includes */
+#include <string.h>
+
 /* Starlink includes */
 #include "fitsio.h"
 #include "ndf.h"
@@ -142,21 +124,10 @@
 
 void sc2sim_ndfwrdata
 ( 
-double ra,        /* RA of observation in radians (given) */
-double dec,       /* Dec of observation in radians (given) */
-int add_atm,      /* flag for adding atmospheric emission (given) */
-int add_fnoise,   /* flag for adding 1/f noise (given) */
-int add_pns,      /* flag for adding photon noise (given) */
-int flux2cur,     /* flag for converting flux to current (given) */
-double amstart,   /* Airmass at beginning (given) */
-double amend,     /* Airmass at end (given) */
+struct dxml_struct *inx,      /* structure for values from XML (given) */
+struct dxml_sim_struct *sinx, /* structure for sim values from XML (given)*/
 double meanwvm,   /* 225 GHz tau */
-double obslam,    /* Wavelength */
 char file_name[], /* output file name (given) */
-int ncol,         /* number of bolometers in column (given) */
-int nrow,         /* number of bolometers in row (given) */
-double sample_t,  /* sample interval in msec (given) */
-char subarray[],  /* name of the subarray */
 int numsamples,   /* number of samples (given) */
 int nflat,        /* number of flat coeffs per bol (given) */
 char *flatname,   /* name of flatfield algorithm (given) */
@@ -166,10 +137,9 @@ int *dksquid,     /* dark SQUID time stream data (given) */
 double *fcal,     /* flatfield calibration (given) */
 double *fpar,     /* flat-field parameters (given) */
 char filter[],    /* String representing filter (e.g. "850") (given) */
-double atstart,   /* Ambient temperature at start (Celsius) (given) */
-double atend,     /* Ambient temperature at end (Celsius) (given) */
-double *posptr,   /* Pointing offsets from map centre */
-char *obsmode,    /* Observing mode */
+double *posptr,   /* Pointing offsets from map centre (given) */
+int jigsamples,   /* Number of jiggle samples (given) */
+double jigptr[][2], /* Array of X, Y jiggle positions (given) */
 int *status       /* global status (given and returned) */
 )
 
@@ -201,48 +171,48 @@ int *status       /* global status (given and returned) */
 		   "DATE-OBS", "YYYY-MM-DDThh:mm:ss",
 		   "observation date", status );
   
-   rad = ra * AST__DR2D;
+   rad = inx->ra * AST__DR2D;
   
    fhead_putfits ( TDOUBLE,
 		   "RA", &rad,
 		   "Right Ascension of observation", status );
   
-   decd = dec * AST__DR2D;
+   decd = inx->dec * AST__DR2D;
   
    fhead_putfits ( TDOUBLE,
 		   "DEC", &decd,
 		   "Declination of observation", status );
   
    fhead_putfits ( TINT,
-		   "ADD_ATM", &add_atm,
+		   "ADD_ATM", &sinx->add_atm,
 		   "flag for adding atmospheric emission", status );
   
    fhead_putfits ( TINT,
-		   "ADDFNOIS", &add_fnoise,
+		   "ADDFNOIS", &sinx->add_fnoise,
 		   "flag for adding 1/f noise", status );
   
    fhead_putfits ( TINT,
-		   "ADD_PNS", &add_pns,
+		   "ADD_PNS", &sinx->add_pns,
 		   "flag for adding photon noise", status );
   
    fhead_putfits ( TINT,
-		   "FLUX2CUR", &flux2cur,
+		   "FLUX2CUR", &sinx->flux2cur,
 		   "flag for converting flux to current", status );
   
    fhead_putfits ( TINT,
-		   "NBOLX", &ncol,
+		   "NBOLX", &inx->nbolx,
 		   "number of bolometers in X direction", status );
 
    fhead_putfits ( TINT,
-		   "NBOLY", &nrow,
+		   "NBOLY", &inx->nboly,
 		   "number of bolometers in Y direction", status );
   
    fhead_putfits ( TDOUBLE,
-		   "SAMPLE_T", &sample_t,
+		   "SAMPLE_T", &inx->sample_t,
 		   "The sample interval in msec", status );
   
    fhead_putfits ( TSTRING,
-		   "SUBARRAY", subarray,
+		   "SUBARRAY", sinx->subname,
 		   "subarray name", status );
   
    fhead_putfits ( TINT,
@@ -250,11 +220,11 @@ int *status       /* global status (given and returned) */
 		   "number of samples", status );
   
    fhead_putfits ( TDOUBLE,
-		   "AMSTART", &amstart,
+		   "AMSTART", &sinx->airmass,
 		   "Air mass at start", status );
   
    fhead_putfits ( TDOUBLE,
-		   "AMEND", &amend,
+		   "AMEND", &sinx->airmass,
 		   "Air mass at end", status );
   
    fhead_putfits ( TDOUBLE,
@@ -266,21 +236,33 @@ int *status       /* global status (given and returned) */
 		   "filter used", status );
   
    fhead_putfits ( TDOUBLE,
-		   "ATSTART", &atstart,
+		   "ATSTART", &sinx->atstart,
 		   "Ambient temperature at start (C)", status );
   
    fhead_putfits ( TDOUBLE,
-		   "ATEND", &atend,
+		   "ATEND", &sinx->atend,
 		   "Ambient temperature at end (C)", status );
 
    fhead_putfits ( TSTRING,
-		   "OBSMODE", obsmode,
+		   "OBSMODE", inx->obsmode,
 		   "Observing mode", status );
 
    fhead_putfits ( TSTRING,
 		   "INSTRUME", "SCUBA-2",
 		   "Instrument type", status );
    
+  if ( strncmp( inx->obsmode, "DREAM", 5) == 0 ) {
+    fhead_putfits ( TINT,
+		    "JIGL_CNT", &inx->nvert,
+		    "Number of positions in DREAM pattern", status );
+    fhead_putfits ( TINT,
+		    "NJIGLCYC", &sinx->ncycle,
+		    "Number of times around DREAM pattern", status );
+    fhead_putfits ( TDOUBLE,
+		    "JIGSTEP", &inx->jig_step_x,
+		    "Size of jiggle step (arcsec)", status );
+  }
+
    /* Determine extent of the map from posptr + known size of the arrays */
    for( i=0; i<numsamples; i++ ) {
     
@@ -324,9 +306,10 @@ int *status       /* global status (given and returned) */
    fhead_getfits ( &nrec, fitsrec, status );
   
    /* Store the timestream data */
-   sc2store_wrtstream ( file_name, nrec, fitsrec, ncol, nrow, numsamples, 
-		        nflat, flatname, head, dbuf, dksquid, fcal, fpar, 
-		        status );
+   sc2store_wrtstream ( file_name, nrec, fitsrec, inx->nbolx, inx->nboly, 
+			numsamples, nflat, flatname, head, dbuf, dksquid, 
+			fcal, fpar, inx->obsmode, inx->jig_vert, inx->nvert, 
+			jigptr, jigsamples, status );
  
    /* Close the file */
    sc2store_free ( status );

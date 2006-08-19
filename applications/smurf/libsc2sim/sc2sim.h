@@ -20,11 +20,14 @@
 
 *  Authors:
 *     J.Balfour (UBC)
+*     A.G. Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-07-21 (JB):
 *        Original
+*     2006-08-19 (AGG)
+*        Updated APIs to sc2sim_ndfwrheat, sc2sim_ndfwrdata
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -441,21 +444,10 @@ void sc2sim_lissajousscan( struct dxml_struct *inx, struct dxml_sim_struct *sinx
 
 void sc2sim_ndfwrdata
 ( 
-double ra,        /* RA of observation in radians (given) */
-double dec,       /* Dec of observation in radians (given) */
-int add_atm,      /* flag for adding atmospheric emission (given) */
-int add_fnoise,   /* flag for adding 1/f noise (given) */
-int add_pns,      /* flag for adding photon noise (given) */
-int flux2cur,     /* flag for converting flux to current (given) */
-double amstart,   /* Airmass at beginning (given) */
-double amend,     /* Airmass at end (given) */
+struct dxml_struct *inx,      /* structure for values from XML (given) */
+struct dxml_sim_struct *sinx, /* structure for sim values from XML (given)*/
 double meanwvm,   /* 225 GHz tau */
-double obslam,    /* Wavelength */
 char file_name[], /* output file name (given) */
-int ncol,         /* number of bolometers in column (given) */
-int nrow,         /* number of bolometers in row (given) */
-double sample_t,  /* sample interval in msec (given) */
-char subarray[],  /* name of the subarray */
 int numsamples,   /* number of samples (given) */
 int nflat,        /* number of flat coeffs per bol (given) */
 char *flatname,   /* name of flatfield algorithm (given) */
@@ -465,25 +457,17 @@ int *dksquid,     /* dark SQUID time stream data (given) */
 double *fcal,     /* flatfield calibration (given) */
 double *fpar,     /* flat-field parameters (given) */
 char filter[],    /* String representing filter (e.g. "850") (given) */
-double atstart,   /* Ambient temperature at start (Celsius) (given) */
-double atend,     /* Ambient temperature at end (Celsius) (given) */
 double *posptr,   /* Pointing offsets from map centre */
-char *obsmode,    /* Observing mode */
+int jigsamples,   /* Number of jiggle samples (given) */
+double jigptr[][2], /* Array of X, Y jiggle positions (given) */
 int *status       /* global status (given and returned) */
 );
 
 void sc2sim_ndfwrheat
 ( 
-int add_atm,       /* flag for adding atmospheric emission (given) */
-int add_fnoise,    /* flag for adding 1/f noise (given) */
-int add_pns,       /* flag for adding photon noise (given) */
-double heatstart,  /* initial heater setting in pW (given) */
-double heatstep,   /* increment of heater setting in pW (given) */
+struct dxml_struct *inx,      /* structure for values from XML (given) */
+struct dxml_sim_struct *sinx, /* structure for sim values from XML (given)*/
 char file_name[],  /* output file name (given) */
-int ncol,          /* number of bolometers in column (given) */
-int nrow,          /* number of bolometers in row (given) */
-double sample_t,   /* sample interval in msec (given) */
-char subarray[],   /* name of the subarray */
 int numsamples,    /* number of samples (given) */
 int nflat,         /* number of flat coeffs per bol (given) */
 char *flatname,    /* name of flatfield algorithm (given) */
@@ -493,8 +477,6 @@ int *dksquid,      /* dark SQUID time stream data (given) */
 double *fcal,      /* flat-field calibration (given) */
 double *fpar,      /* flat-field parameters (given) */
 char filter[],     /* String representing filter (e.g. "850") (given) */
-double atstart,    /* Ambient temperature at start (Celsius) (given) */
-double atend,      /* Ambient temperature at end (Celsius) (given) */
 int *status        /* global status (given and returned) */
 );
 

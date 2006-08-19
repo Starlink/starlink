@@ -13,42 +13,25 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_ndfwrheat ( int add_atm, int add_fnoise, int add_pns, double heatstart,
-                         double heatstep, char file_name[], 
-*                        int ncol, int nrow, double sample_t, char subarray[],
-*                        int numsamples, int nflat, char *flatname, 
-*                        struct sc2head *head, int *dbuf, int *dksquid, 
-*                        double *fcal, double *fpar, char filter[], 
-*                        double atstart, double atend, int *status )
+*     sc2sim_ndfwrheat ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
+*                        char file_name[], int numsamples, int nflat, char *flatname, 
+*                        JCMTState *head, int *dbuf, int *dksquid, 
+*                        double *fcal, double *fpar, char filter[], int *status )
 
 *  Arguments:
-*     add_atm = int (Given)
-*        Flag for adding atmospheric emission 
-*     add_fnoise = int (Given)
-*        Flag for adding 1/f noise 
-*     add_pns = int (Given)
-*        Flag for adding photon noise 
-*     heatstart = double (Given)
-*        Initial heater setting in pW
-*     heatstep = double (Given)
-*        Increment of heater setting in pW
+*     inx = dxml_struct* (Given)
+*        Pointer to struct with observation parameters
+*     sinx = dxml_sim_struct* (Given)
+*        Pointer to struct with simulation parameters
 *     file_name = char[] (Given)
 *        Output file name 
-*     ncol = int (Given)
-*        Number of bolometers in column 
-*     nrow = int (Given)
-*        Number of bolometers in row 
-*     sample_t = double (Given)
-*        Sample interval in msec 
-*     subarray = char[] (Given)
-*        Name of the subarray
 *     numsamples = int (Given)
 *        Number of samples 
 *     nflat = int (Given)
 *        Number of flat coeffs per bol
 *     flatname = char*
 *        Name of flatfield algorithm 
-*     head = sc2head* (Given)
+*     head = JCMTState* (Given)
 *        Header data for each frame 
 *     dbuf = int* (Given)
 *        Simulated data
@@ -60,10 +43,6 @@
 *        Flat-field parameters
 *     filter = char[] (Given)
 *        String representing filter (e.g. "850") 
-*     atstart = double (Given)
-*        Ambient temperature at start (Celsius) 
-*     atend = double (Given)
-*        Ambient temperature at end (Celsius) 
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
@@ -74,6 +53,8 @@
 
 *  Authors:
 *     B.D.Kelly (UKATC)
+*     A.G. Gibb (UBC)
+*     J. Balfour (UBC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -92,6 +73,8 @@
 *        Split from dsim.c
 *     2006-07-28 (JB):
 *        Changed sc2head to JCMTState
+*     2006-08-18 (AGG):
+*        Update API to take pointers to inx and sinx structs
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -118,6 +101,9 @@
 *-
 */
 
+/* Standard includes */
+#include <string.h>
+
 /* Starlink includes */
 #include "fitsio.h"
 #include "ndf.h"
@@ -130,16 +116,9 @@
 
 void sc2sim_ndfwrheat
 ( 
-int add_atm,       /* flag for adding atmospheric emission (given) */
-int add_fnoise,    /* flag for adding 1/f noise (given) */
-int add_pns,       /* flag for adding photon noise (given) */
-double heatstart,  /* initial heater setting in pW (given) */
-double heatstep,   /* increment of heater setting in pW (given) */
+struct dxml_struct *inx,      /* structure for values from XML (given) */
+struct dxml_sim_struct *sinx, /* structure for sim values from XML (given)*/
 char file_name[],  /* output file name (given) */
-int ncol,          /* number of bolometers in column (given) */
-int nrow,          /* number of bolometers in row (given) */
-double sample_t,   /* sample interval in msec (given) */
-char subarray[],   /* name of the subarray */
 int numsamples,    /* number of samples (given) */
 int nflat,         /* number of flat coeffs per bol (given) */
 char *flatname,    /* name of flatfield algorithm (given) */
@@ -149,16 +128,14 @@ int *dksquid,      /* dark SQUID time stream data (given) */
 double *fcal,      /* flat-field calibration (given) */
 double *fpar,      /* flat-field parameters (given) */
 char filter[],     /* String representing filter (e.g. "850") (given) */
-double atstart,    /* Ambient temperature at start (Celsius) (given) */
-double atend,      /* Ambient temperature at end (Celsius) (given) */
 int *status        /* global status (given and returned) */
 )
 
 {
    /* Local variables */
-   static char fitsrec[FHEAD__MXREC][81];  /* store for FITS records */
-   double fpos;                     /* RA or Dec in degrees */
-   int nrec;                        /* number of FITS header records */
+   static char fitsrec[FHEAD__MXREC][81]; /* store for FITS records */
+   double fpos = 0;                       /* RA or Dec in degrees */
+   int nrec;                              /* number of FITS header records */
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
@@ -168,72 +145,77 @@ int *status        /* global status (given and returned) */
    fhead_init ( status );
 
    fhead_putfits ( TSTRING,
-     "DATE-OBS", "YYYY-MM-DDThh:mm:ss",
-     "observation date", status );
+		   "DATE-OBS", "YYYY-MM-DDThh:mm:ss",
+		   "observation date", status );
 
    fhead_putfits ( TDOUBLE,
-     "RA", &fpos,
-     "Right Ascension of observation", status );
+		   "RA", &fpos,
+		   "Right Ascension of observation", status );
 
    fhead_putfits ( TDOUBLE,
-     "DEC", &fpos,
-     "Declination of observation", status );
+		   "DEC", &fpos,
+		   "Declination of observation", status );
 
    fhead_putfits ( TINT,
-     "ADD_ATM", &add_atm,
-     "flag for adding atmospheric emission", status );
+		   "ADD_ATM", &(sinx->add_atm),
+		   "flag for adding atmospheric emission", status );
 
    fhead_putfits ( TINT,
-     "ADDFNOIS", &add_fnoise,
-     "flag for adding 1/f noise", status );
+		   "ADDFNOIS", &(sinx->add_fnoise),
+		   "flag for adding 1/f noise", status );
 
    fhead_putfits ( TINT,
-     "ADD_PNS", &add_pns,
-     "flag for adding photon noise", status );
+		   "ADD_PNS", &(sinx->add_pns),
+		   "flag for adding photon noise", status );
 
    fhead_putfits ( TDOUBLE,
-     "HEATVAL", &heatstart,
-     "heater setting in pW", status );
+		   "HEATVAL", &(inx->heatstart),
+		   "heater setting in pW", status );
 
    fhead_putfits ( TINT,
-     "NBOLX", &ncol,
-     "number of bolometers in X direction", status );
+		   "NBOLX", &(inx->nbolx),
+		   "number of bolometers in X direction", status );
 
    fhead_putfits ( TINT,
-     "NBOLY", &nrow,
-     "number of bolometers in Y direction", status );
+		   "NBOLY", &(inx->nboly),
+		   "number of bolometers in Y direction", status );
 
    fhead_putfits ( TDOUBLE,
-     "SAMPLE_T", &sample_t,
-     "The sample interval in msec", status );
+		   "SAMPLE_T", &(inx->sample_t),
+		   "The sample interval in msec", status );
 
    fhead_putfits ( TSTRING,
-     "SUBARRAY", subarray,
-     "subarray name", status );
+		   "SUBARRAY", sinx->subname,
+		   "subarray name", status );
 
    fhead_putfits ( TINT,
-     "NUMSAMP", &numsamples,
-     "number of samples", status );
+		   "NUMSAMP", &numsamples,
+		   "number of samples", status );
 
    fhead_putfits ( TSTRING,
-     "FILTER", filter,
-     "filter used", status );
+		   "FILTER", filter,
+		   "filter used", status );
 
    fhead_putfits ( TDOUBLE,
-     "ATSTART", &atstart,
-     "Ambient temperature at start (C)", status );
+		   "ATSTART", &(sinx->atstart),
+		   "Ambient temperature at start (C)", status );
 
    fhead_putfits ( TDOUBLE,
-     "ATEND", &atend,
-     "Ambient temperature at end (C)", status );
+		   "ATEND", &(sinx->atend),
+		   "Ambient temperature at end (C)", status );
 
    /* Get the accumulated FITS headers */
    fhead_getfits ( &nrec, fitsrec, status );
 
    /* Store the timestream data */
 
-   sc2store_wrtstream ( file_name, nrec, fitsrec, ncol, nrow, numsamples, 
-                        nflat, flatname, head, dbuf, dksquid, fcal, fpar, status );
+   /*   sc2store_wrtstream ( file_name, nrec, fitsrec, ncol, nrow, numsamples, 
+	nflat, flatname, head, dbuf, dksquid, fcal, fpar, status );*/
+   sc2store_wrtstream ( file_name, nrec, fitsrec, inx->nbolx, inx->nboly, 
+			numsamples, nflat, flatname, head, dbuf, dksquid, 
+			fcal, fpar, inx->obsmode, inx->jig_vert, inx->nvert, 
+			NULL, 0, status );
+
 
    /* Close the file */
    sc2store_free ( status );
