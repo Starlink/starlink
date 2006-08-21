@@ -1128,7 +1128,7 @@ int *status         /* global status (given and returned) */
 
    sc2store_rdtstream ( filename, access, flatlen, 81, SC2STORE__MAXFITS, &nfits,
      fitsrec, &colsize, &rowsize, nframes, nflat, flatname, &frhead,
-			&tmptr, &dksquid, &fcal, &fpar, &jigvert, &jigpath, status );
+			&tmptr, &dksquid, &fcal, &fpar, jigvert, jigpath, status );
 
 /* Map space for the data to be copied */
 
@@ -1760,6 +1760,8 @@ int *status              /* global status (given and returned) */
      jigvert = NULL;
      jigpath = NULL;
    }
+   /* Reset the isthere flag */
+   isthere = 0;
 
 /* storage for Header values for each frame - to import old frames we fallback
    to FRAMEDATA if JCMT__EXTNAME is not present.
