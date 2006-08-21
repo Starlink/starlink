@@ -64,7 +64,7 @@ itcl::class gaia::PlasticSender {
 
    #  Sends an image to one or more listening PLASTIC applications.
    #  The image_ctrl argument gives a GaiaImageCtrl object.
-   #  If the recipients_list is non-empty it gives a list of application
+   #  If recipients is non-empty it gives a list of application
    #  IDs for the applications to send to.  If empty, the message is
    #  broadcast to all.
    public method send_image {image_ctrl recipients} {
@@ -108,6 +108,54 @@ itcl::class gaia::PlasticSender {
             ::file delete -force $tmpfile
             error "error in image send: $::errorInfo"
          }
+      }
+   }
+
+   #  Identify a particular sky position as of interest and transmit it
+   #  to other PLASTIC applications.  ra and dec are J2000 in either 
+   #  degrees or sexagesimal.
+   #  If recipients is non-empty it gives a list of application
+   #  IDs for the applications to send to.  If empty, the message is
+   #  broadcast to all.
+   public method send_radec {ra dec recipients} {
+      check_app_
+      set msg_id "ivo://votech.org/sky/pointAtCoords"
+      catch {
+         if {[catch {expr $ra + $dec}]} {
+            lassign [::skycat::.wcs hmstod $ra $dec] ra dec
+         }
+         set send_args [list [rpcvar double $ra] [rpcvar double $dec]]
+         $plastic_app send_message_async $msg_id $send_args $recipients
+      }
+   }
+
+   #  Identify a single row index within a PLASTIC-acquired table as of
+   #  interest, and invite other applications to highlight it.
+   #  If recipients is non-empty it gives a list of application
+   #  IDs for the applications to send to.  If empty, the message is
+   #  broadcast to all.
+   public method send_row {table_id idx recipients} {
+      check_app_
+      set msg_id "ivo://votech.org/votable/highlightObject"
+      set send_args [list $table_id [rpcvar int $idx]]
+      catch {
+         $plastic_app send_message_async $msg_id $send_args $recipients
+      }
+   }
+
+   #  Identify a list of row indices within a PLASTIC-acquired table as of
+   #  interest, and invite other applications to highlight this list.
+   #  idx_list is a list of integer values giving 0-based indices of the
+   #  rows to select, in terms of the table as originally qcquired.
+   #  If recipients is non-empty it gives a list of application
+   #  IDs for the applications to send to.  If empty, the message is
+   #  broadcast to all.
+   public method send_selection {table_id idx_list recipients} {
+      check_app_
+      set msg_id "ivo://votech.org/votable/showObjects"
+      if {[llength $idx_list] > 0} {
+         set send_args [list $table_id [rpcvar array $idx_list]]
+         $plastic_app send_message_async $msg_id $send_args $recipients
       }
    }
 

@@ -42,16 +42,20 @@
 
 #  Authors:
 #     MBT: Mark Taylor
+#     PWD: Peter W. Draper
 #     {enter_new_authors_here}
 
 #  History:
-#     13-JUL-2006 (MBT)
+#     13-JUL-2006 (MBT):
 #        Original version.
+#     18-AUG-2006 (PWD):
+#        Modified to run the stilts process in the background.
 #     {enter_further_changes_here}
 
 #-
 
 package require rpcvar
+package require md5 1.4.4
 namespace import -force rpcvar::*
 
 itcl::class gaia::GaiaPlastic {
@@ -85,8 +89,8 @@ itcl::class gaia::GaiaPlastic {
    }
 
    #  Load a FITS file specified as a URL into the display.
-   public method  ivo://votech.org/fits/image/loadFromURL {sender_id img_url
-                                                           args} {
+   public method ivo://votech.org/fits/image/loadFromURL {sender_id img_url
+                                                          args} {
       set basegaia [get_gaia_]
       if { $basegaia != {} } {
          set fname [get_file_ $img_url]
@@ -106,7 +110,7 @@ itcl::class gaia::GaiaPlastic {
 
    #  Point at a coordinate by drawing an identifier graphic, ra and dec
    #  are both in decimal degrees.
-   public method  ivo://votech.org/sky/pointAtCoords {sender_id ra dec args} {
+   public method ivo://votech.org/sky/pointAtCoords {sender_id ra dec args} {
       set basegaia [get_gaia_]
       if { $basegaia != {} } {
          if { ![catch {$basegaia position_of_interest $ra $dec "deg J2000"}]} {
@@ -115,6 +119,129 @@ itcl::class gaia::GaiaPlastic {
       }
       return $FALSE
    }
+
+   #  Execute a GAIA command.
+   #  The script argument contains the executable Tcl.
+   #  The checksum argument contains the hexadecimal md5 hash of the
+   #  content of ~/.gaia-cookie followed by the content of the script
+   #  argument.  As a convenience, the cookie may be present either
+   #  with or without a trailing newline.
+   public method ivo://plastic.starlink.ac.uk/gaia/executeMd5 {sender_id script
+                                                               checksum args} {
+      set cookie [[gaia::GaiaCookie::get_instance] cget -cookie]
+      set hash [string toupper $checksum]
+      set hash1 [string toupper [md5::md5 "$cookie$script"]]
+      set hash2 [string toupper [md5::md5 "$cookie\n$script"]]
+      if {$hash == $hash1 || $hash == $hash2} {
+         return [eval $script]
+      } else {
+         return "Request rejected - bad MD5 checksum"
+      }
+   }
+
+   #  Load a VOTable as a catalogue.
+   public method ivo://votech.org/votable/loadFromURL {sender_id url args} {
+
+      #  Second argument, if present, is a tag for the table.  If not
+      #  present, use the URL.
+      if {$args == ""} {
+         set table_id_ $url
+      } else {
+         set table_id_ [lindex $args 0]
+      }
+
+      #  Convert the VOTable to TST format and display it when the
+      #  conversion is completed.
+      set failure [catch {
+         set tst_file_ [get_temp_file_ .TAB]
+         [get_stilts_] execute tpipe \
+                       ifmt=votable ofmt=tst in=$url out=$tst_file_ \
+                       "cmd=setparam symbol '[next_symbol_spec_]'"
+
+         #  Wait for long running conversion to complete as we need the status
+         #  return. 
+         if { $tst_file_ != {} } {
+            tkwait variable [scope tst_file_]
+         }
+      } msg]
+
+      #  Return as appropriate.
+      if { ! $failure } {
+         return $TRUE
+      } else {
+         error_dialog "Failed to load catalogue from PLASTIC:\n$msg"
+         return $FALSE
+      }
+   }
+
+   #  Called when the STILTS command completes. Only job is to display
+   #  the table, if conversion was successful.
+   protected method stilts_completed_ {} {
+      if { $tst_file_ != {}  && [file exists $tst_file_] } {
+         set window [display_table_ $tst_file_ $table_id_]
+         set cat_windows_($table_id_) $window
+      } else {
+         error "Failed to load catalogue from PLASTIC message"
+      }
+      set tst_file_ {}
+   }
+
+   #  Display only a selection of the rows from a previously loaded catalogue.
+   public method ivo://votech.org/votable/showObjects {sender_id table_id
+                                                       idx_list args} {
+      if {[info exists cat_windows_($table_id)]} {
+         $cat_windows_($table_id) select_indices $idx_list
+         return $TRUE
+      } else {
+         return $FALSE
+      }
+   }
+
+   #  Highlight a single row from a previously loaded catalaogue.
+   public method ivo://votech.org/votable/highlightObject {sender_id table_id
+                                                           idx args} {
+      if {[info exists cat_windows_($table_id)]} {
+         $cat_windows_($table_id) highlight_index $idx
+         return $TRUE
+      } else {
+         return $FALSE
+      }
+   }
+
+   #  Protected methods:
+   #  ------------------
+
+   #  Download and display a file.
+   protected method display_file_ {filename type} {
+      set basegaia [get_gaia_]
+      if { $basegaia != {} } {
+         $basegaia open $filename
+      }
+      delete object $urlget_
+      set urlget_ {}
+   }
+
+   #  Displays a catalogue in TST format.
+   #  Returns the GaiaSearch widget which displays the catalogue.
+   protected method display_table_ {filename table_id} {
+      set images [skycat::SkyCat::get_skycat_images]
+      set ctrlwidget [lindex $images 0]
+      set gaia [winfo parent $ctrlwidget]
+      set window [::cat::AstroCat::open_catalog_window \
+                    $filename $ctrlwidget ::gaia::PlasticSearch 0 $gaia]
+      $window configure -table_id $table_id
+      return $window
+   }
+
+   #  Return a Stilts instance belonging to this object.
+   protected method get_stilts_ {} {
+      if {$stilts_ == ""} {
+         set stilts_ [gaia::Stilts \#auto -debug 0 \
+                         -notify_cmd [code $this stilts_completed_]]
+      }
+      return $stilts_
+   }
+
 
    #  Utility procs:
    #  --------------
@@ -125,16 +252,6 @@ itcl::class gaia::GaiaPlastic {
          return [winfo parent $image]
       }
       return ""
-   }
-
-   #  Download and display a file.
-   protected method display_file_ {filename type} {
-      set basegaia [get_gaia_]
-      if { $basegaia != {} } {
-         $basegaia open $filename
-      }
-      delete object $urlget_
-      set urlget_ {}
    }
 
    #  Tries to turn a URL into a file name.  If the URL uses the file:
@@ -151,9 +268,73 @@ itcl::class gaia::GaiaPlastic {
       }
    }
 
+   #  Get the name of a file it's OK to use for scratch space.
+   #  The exten argument gives a file extension (e.g. ".fits").
+   protected proc get_temp_file_ {exten} {
+      set tmpdir ""
+      foreach trydir {/tmp /usr/tmp .} {
+         if {[file isdirectory $trydir] && [file writable $trydir]} {
+            set tmpdir $trydir
+            break
+         }
+      }
+      if { $tmpdir == "" } {
+         error "No temporary directory"
+      }
+
+      set basefile "${tmpdir}/gaia_temp_"
+      for { set ix 1 } { $ix < 100 } { incr ix } {
+         set tryfile "$tmpdir/gaia_temp_$ix$exten"
+         if {! [file exists $tryfile] } {
+            return $tryfile
+         }
+      }
+      error "No free files with name like $tryfile"
+   }
+
+   #  Provides a suitable value for the "symbol_id" column in a TST table.
+   #  This is what determines how plotted symbols will appear on the
+   #  image (unless changed).  This function endeavours to return a
+   #  different symbol each time it is called (though may repeat eventually).
+   protected proc next_symbol_spec_ {} {
+      set shapes {circle square plus cross diamond}
+      set colors {cyan yellow blue red grey50 green magenta}
+      set shape [lindex $shapes [expr $symbol_idx_ % [llength $shapes]]]
+      set color [lindex $colors [expr $symbol_idx_ % [llength $colors]]]
+      set size 6
+      incr symbol_idx_
+      return [list {} \
+                   [list $shape $color {} {} {} {}] \
+                   [list $size {}]]
+   }
+
+
+   #  Instance variables:
+   #  -------------------
 
    #  Name of the active instance of GaiaUrlGet.
    protected variable urlget_ {}
-   private common TRUE [rpcvar boolean 1]
-   private common FALSE [rpcvar boolean 0]
+
+   #  Stilts object for executing STILTS commands.
+   protected variable stilts_ {}
+
+   #  Name of the TST we're generating.
+   protected variable tst_file_ {}
+
+   #  Table identifier of the TST we're generating.
+   protected variable table_id_ {}
+
+   #  Class variables:
+   #  ----------------
+
+   #  Array of GaiaSearch windows which have been opened to display
+   #  PLASTIC-acquired tables.  The array is indexed by table_id.
+   protected common cat_windows_
+
+   #  Constants for returning from boolean-declared XML-RPC methods.
+   protected common FALSE [rpcvar boolean 0]
+   protected common TRUE [rpcvar boolean 1]
+
+   #  Index of the last new symbol type used.
+   protected common symbol_idx_ 0
 }

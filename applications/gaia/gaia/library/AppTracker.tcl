@@ -20,12 +20,6 @@
 #        is running.  This is just used so that this ID can be excluded
 #        from returned lists of external applications which support some
 #        functionality.
-#     -apps_variable
-#        Gives the name of a variable which will be kept updated with the
-#        number of applications currently registered in the hub.
-#        If applications register or unregister, this variable will be
-#        written to, so it can be used as a trace target to get
-#        notification when external applications register or unregister.
 
 #  Copyright:
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
@@ -69,7 +63,8 @@ itcl::class plastic::AppTracker {
                                                                    args} {
       check_hub_
       add_app_ $id
-      update_apps_variable_
+      inform_plastic_apps_
+      return $VOID
    }
 
    #  Invoked when an application unregisters from the hub.
@@ -77,7 +72,8 @@ itcl::class plastic::AppTracker {
                                                                      args} {
       check_hub_
       unset apps_($id)
-      update_apps_variable_
+      inform_plastic_apps_
+      return $VOID
    }
 
    #  Returns a list of external plastic::ApplicationItem objects
@@ -137,16 +133,21 @@ itcl::class plastic::AppTracker {
       foreach id [$hub execute getRegisteredIds] {
          add_app_ $id
       }
-      update_apps_variable_
+      inform_plastic_apps_
    }
 
-   #  Called when apps_ might have changed to keep the apps_variable
-   #  up to date.
-   private method update_apps_variable_ {} {
-      if {[array exists apps_]} {
-         set $apps_variable [array size apps_]
-      } else {
-         set $apps_variable 0
+   #  Adds a callback command to be executed when the list of registered
+   #  applications changes.  An attempt will be made to execute the given
+   #  command when other applications register or unregister with the hub.
+   public method plastic_apps_command {cmd} {
+      lappend plastic_apps_commands_ $cmd
+   }
+
+   #  Perform the requested callbacks when the list of registered 
+   #  applications has, or may have, changed.
+   protected method inform_plastic_apps_ {} {
+      foreach cmd $plastic_apps_commands_ {
+         catch {eval $cmd}
       }
    }
 
@@ -154,9 +155,14 @@ itcl::class plastic::AppTracker {
    #  ==========
 
    public variable self {}
-   public variable apps_variable {apps_count}
 
    #  Internal array used to store the currently registered applications.
    #  It is a clientId->ApplicationItem mapping.
    protected variable apps_
+
+   #  Callback commands to execute when apps list changes.
+   protected variable plastic_apps_commands_ {}
+
+   #  Return value for XML-RPC methods declared void.
+   protected common VOID [list]
 }
