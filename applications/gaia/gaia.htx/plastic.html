@@ -54,18 +54,19 @@ you can select "Unregister" from the same menu.
 <p>In most cases, sending a PLASTIC message from GAIA is controlled 
 using one of its "Interop" menus.  For a given action these often have
 two ways to transmit a given message: "Broadcast ..." and "Send to ...".
-For broadcast, all registered applications which understand it are
-invited to do something with the message.  For "Send to ..." there is
+For "Broadcast", all registered applications which understand it are
+invited to do something with the message.  For "Send to" there is
 a submenu which allows you to choose which single application to 
 direct the message to.  Only applications which claim to understand
 the particular message will appear on such submenus (which means that
-this submenu may be empty, depending on what you've got running).
+this submenu may be empty, depending on what other PLASTIC-aware tools
+you've got running).
 </p>
 
 <h3>What PLASTIC facilities does GAIA support?</h3>
 
 <p>GAIA can both send and respond to messages in two general 
-application areas: image-related, and catalogue-related
+application areas: image-related and catalogue-related
 (a third category of housekeeping messages is not discussed here).
 The messages and how to use them are listed below; the
 <i>message ids</i> (strings starting "<code>ivo://</code>") are 
@@ -103,8 +104,9 @@ programmer you can ignore these.
     (<code>ivo://votech.org/votable/loadFromURL</code>)</dt>
 <dd>If a table is received from another application, it will appear as
     a new <a href="query.html">catalogue query window</a> associated
-    with GAIA's base image window.  Any of its points which are within
-    the bounds of the current image will be overplotted.
+    with GAIA's base image window.  Any positions it contains
+    which are within the bounds of the current image will be 
+    plotted as symbols over the image as symbols.
     This window will have an "Interop" menu which can be used for
     communicating information about one or more selected rows within 
     the table between GAIA and other PLASTIC applications which 
@@ -113,10 +115,12 @@ programmer you can ignore these.
 
 <dt><b>Highlight Selection</b>
     (<code>ivo://votech.org/votable/showObjects</code>)</dt>
-<dd>If another application sends this message, the selection visible in 
-    the catalogue will change, both in the query window and the symbols
-    plotted on the image.  You can send a selection of points from the
-    to other applications from the GAIA query window using its Interop
+<dd>If another application sends this message concerning a catalogue
+    which has already been sent over PLASTIC, the current selection for
+    that catalogue will change, both the rows visible in the query window 
+    and the symbols plotted on the image.  
+    You can send a selection of points from the catalogue window to 
+    other applications displaying the same catalogue using its "Interop"
     menu: the "Broadcast/Send current search" options send all the
     visible rows, and "Broadcast/Send current selection" send only 
     the currently selected ones (rows highlighted in blue in the query
@@ -142,7 +146,7 @@ programmer you can ignore these.
     single row is selected.  They may respond by highlighting that
     position on their own sky images.  Note that unlike the other
     catalogue-related messages, this may have an effect for applications
-    other than the one which sent the catalogue in the first place.
+    which don't have the same catalogue loaded.
     </dd>
 </dl>
 
