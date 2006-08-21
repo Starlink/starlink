@@ -14,6 +14,8 @@
   also work on cube slices. Spectral analysis features are provided by
   communication with SPLAT-VO, which works outside of GAIA.
 
+  GAIA can now also interoperate with some PLASTIC enabled applications.
+
   Other major changes in this release are that the version of Skycat has been
   updated (after a long pause of five years) to 2.4.7, along with an update to
   using Tcl/Tk 8.4.11.
