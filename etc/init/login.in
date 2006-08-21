@@ -528,6 +528,12 @@ endif
  endif
 
 #
+#  STILTS
+ if ( -x @starjavadir@/bin/stilts ) then
+    setenv STILTS_DIR @starjavadir@/bin
+ endif
+
+#
 #  JSKY
  if ( -e @starjavadir@/bin/jsky ) then
     setenv JSKY_DIR @starjavadir@/bin/jsky
