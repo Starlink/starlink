@@ -1753,7 +1753,7 @@ int *status              /* global status (given and returned) */
      ndfMap ( jigvndf, "DATA", "_INTEGER", access, (void *)jigvert, &el,
 	      status );
      ndfOpen ( drmloc, "JIGPATH", access, "OLD", &jigpndf, &place, status );
-     ndfMap ( jigvndf, "DATA", "_DOUBLE", access, (void *)jigpath, &el,
+     ndfMap ( jigpndf, "DATA", "_DOUBLE", access, (void *)jigpath, &el,
 	      status );
    } else {
      /* Return NULL pointers if we don't have DREAM data */
