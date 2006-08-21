@@ -328,6 +328,12 @@ void smf_open_mapcoord( smfData *data, int *status );
 void smf_open_ndf( const int newndf, char *accmode, char *filename, 
 		   smf_dtype dtype, smfData **ndata, int *status);
 
+void smf_open_ndfname( const HDSLoc *loc, char *accmode, char *filename, 
+                       const char *extname,
+		       const char *state, const char *dattype, const int ndims, 
+		       const int *lbnd, const int *ubnd, smfData **ndfdata, 
+                       int *status);
+
 void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, int ndims, 
 		       const dim_t dims[], int flags, smfData ** data, 
 		       int *status);
@@ -350,6 +356,8 @@ void smf_scanfit( smfData *data, int order, int *status );
 void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize, 
 			 int flags, double *map, double *mapweight, 
 			 double *mapvar, int msize, int *status );
+
+void smf_string_to_dtype ( const char * datatype, smf_dtype *dtype, int * status );
 
 void smf_subtract_plane( smfData *data, const char *fittype, int *status);
 
