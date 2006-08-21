@@ -1084,6 +1084,8 @@ int *nflat,         /* number of flatfield coeffs per pixel (returned) */
 char *flatname,     /* name of flatfield algorithm (returned) */
 double **flatcal,   /* flatfield calibration (returned) */
 double **flatpar,   /* flatfield parameters (returned) */
+int **jigvert,      /* pointer to DREAM jiggle vertices (returned) */
+double **jigpath,   /* pointer to path of SMU over jiggle pattern (returned) */
 int *status         /* global status (given and returned) */
 )
 
@@ -1104,6 +1106,7 @@ int *status         /* global status (given and returned) */
     26Jan2006 : pass-in access argument to sc2store_rdtstream (bdk)
     13Mar2006 : copied over from map.c (agg)
     14Mar2006 : change FHEAD__MXREC to SC2STORE__MAXFITS (agg)
+    21Aug2006 : update API to reflect change to rststream (agg)
 */
 
 {
@@ -1125,7 +1128,7 @@ int *status         /* global status (given and returned) */
 
    sc2store_rdtstream ( filename, access, flatlen, 81, SC2STORE__MAXFITS, &nfits,
      fitsrec, &colsize, &rowsize, nframes, nflat, flatname, &frhead,
-     &tmptr, &dksquid, &fcal, &fpar, status );
+			&tmptr, &dksquid, &fcal, &fpar, &jigvert, &jigpath, status );
 
 /* Map space for the data to be copied */
 
@@ -1578,6 +1581,8 @@ int *status              /* global status (given and returned) */
    int nbol;                  /* number of bolometers */
    int nframes;               /* number of data frames */
    int *stackz;               /* pointer to stackzero frame */
+   int *jigvert = NULL;       /* pointer to DREAM jiggle vertices */
+   double *jigpath = NULL;    /* pointer to path of SMU over jiggle pattern */
 
    if ( !StatusOkP(status) ) return;
 
@@ -1594,7 +1599,8 @@ int *status              /* global status (given and returned) */
 /* Map all the data arrays */
 
    sc2store_rdmap ( filename, "READ", flatlen, colsize, rowsize, &nframes, 
-     nflat, flatname, &bzero, &data, &dksquid, &stackz, &fcal, &fpar, status );
+		    nflat, flatname, &bzero, &data, &dksquid, &stackz, &fcal, &fpar,
+		    &jigvert, &jigpath, status );
 
    if ( !StatusOkP(status) ) 
    {
@@ -1642,6 +1648,8 @@ int **dksquid,           /* pointer to dark SQUID values (returned) */
 int **stackz,            /* pointer to subtracted frame (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
+int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
+double **jigpath,        /* pointer to path of SMU over jiggle pattern (returned) */
 int *status              /* global status (given and returned) */
 )
 /*
@@ -1656,6 +1664,7 @@ int *status              /* global status (given and returned) */
                 flatpar (bdk)
     25Jan2006 : add access argument (bdk)
     27Jul2006 : use JCMTSTATE extension (timj)
+    21Aug2006 : open and read DREAM parameters if present (agg)
 */
 {
    int dim[3];             /* dimensions */
@@ -1736,6 +1745,21 @@ int *status              /* global status (given and returned) */
    datMap ( fparloc, "_DOUBLE", "READ", 1, nflat, (void**)flatpar, 
      status );
 
+   /* DREAM jiggle parameters */
+   ndfXloc( indf, "DREAM", "READ", &drmloc, status );
+   if ( drmloc != NULL ) {
+     ndfOpen ( drmloc, "JIGVERT", access, "OLD", &jigvndf, &place, status );
+     ndfMap ( jigvndf, "DATA", "_INTEGER", access, (void *)jigvert, &el,
+	      status );
+     ndfOpen ( drmloc, "JIGPATH", access, "OLD", &jigpndf, &place, status );
+     ndfMap ( jigvndf, "DATA", "_DOUBLE", access, (void *)jigpath, &el,
+	      status );
+   } else {
+     /* Return NULL pointers if we don't have DREAM data */
+     jigvert = NULL;
+     jigpath = NULL;
+   }
+
 /* storage for Header values for each frame - to import old frames we fallback
    to FRAMEDATA if JCMT__EXTNAME is not present.
  */
@@ -1778,6 +1802,8 @@ int **outdata,           /* pointer to data array (returned) */
 int **dksquid,           /* pointer to dark SQUID values (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
+int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
+double **jigpath,        /* pointer to path of SMU over jiggle pattern (returned) */
 int *status              /* global status (given and returned) */
 )
 
@@ -1794,6 +1820,7 @@ int *status              /* global status (given and returned) */
     04Oct2005 : check if sc2store already has an open file (bdk)
     08Dec2005 : map space AFTER checking status (bdk)
     25Jan2006 : add access argument (bdk)
+    21Aug2006 : update API to return DREAM parameters (agg)
 */
 
 {
@@ -1832,7 +1859,7 @@ int *status              /* global status (given and returned) */
 
    sc2store_rdmap ( filename, access, flatlen, colsize, rowsize, nframes, 
     nflat, flatname, &bzero, &data, dksquid, &stackz, flatcal, flatpar, 
-    status );
+		    jigvert, jigpath, status );
 
    if ( !StatusOkP(status) ) 
    {

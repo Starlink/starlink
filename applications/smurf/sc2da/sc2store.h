@@ -157,6 +157,8 @@ int *nflat,         /* number of flatfield coeffs per pixel (returned) */
 char *flatname,     /* name of flatfield algorithm (returned) */
 double **flatcal,   /* flatfield calibration (returned) */
 double **flatpar,   /* flatfield parameters (returned) */
+int **jigvert,      /* pointer to DREAM jiggle vertices (returned) */
+double **jigpath,   /* pointer to path of SMU over jiggle pattern (returned) */
 int *status         /* global status (given and returned) */
 );
 
@@ -245,6 +247,8 @@ int **dksquid,           /* pointer to dark SQUID values (returned) */
 int **stackz,            /* pointer to subtracted frame (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
+int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
+double **jigpath,        /* pointer to path of SMU over jiggle pattern (returned) */
 int *status              /* global status (given and returned) */
 );
 
@@ -269,6 +273,8 @@ int **outdata,           /* pointer to data array (returned) */
 int **dksquid,           /* pointer to dark SQUID values (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
+int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
+double **jigpath,        /* pointer to path of SMU over jiggle pattern (returned) */
 int *status              /* global status (given and returned) */
 );
 
