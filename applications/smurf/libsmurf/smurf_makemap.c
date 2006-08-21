@@ -72,6 +72,8 @@
 *        Iterative map-maker parameters given in CONFIG file
 *     2006-08-07 (TIMJ):
 *        GRP__NOID is not a Fortran concept.
+*     2006-08-21 (JB):
+*        Write data, variance, and weights using smfData structures
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -125,6 +127,7 @@
 #include "smurf_par.h"
 #include "smurflib.h"
 #include "libsmf/smf.h"
+#include "smurf_typ.h"
 
 #include "sc2da/sc2store_par.h"
 #include "sc2da/sc2math.h"
@@ -138,29 +141,33 @@
 void smurf_makemap( int *status ) {
 
   /* Local Variables */
-  Grp *confgrp = NULL;  /* Group containing configuration file */
+  Grp *confgrp = NULL;       /* Group containing configuration file */
   void *data_index[1];       /* Array of pointers to mapped arrays in ndf */
-  smfData *data=NULL;        /* pointer to  SCUBA2 data struct */
+  smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
+  dim_t dims[2];             /* Dimensions of image */
+  smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int flag;                  /* Flag */
   dim_t i;                   /* Loop counter */
-  Grp *igrp = NULL;     /* Group of input files */
+  Grp *igrp = NULL;          /* Group of input files */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int ksize=0;               /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   void *map=NULL;            /* Pointer to the rebinned map data */
   char method[LEN__METHOD];  /* String for map-making method */
-  int n;                     /* # elements in the output map */
-  Grp *ogrp = NULL;     /* Group containing output file */
+  Grp *ogrp = NULL;          /* Group containing output file */
   int ondf;                  /* output NDF identifier */
+  int outsize;               /* Number of files in output group */
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   int parstate;              /* State of ADAM parameters */
   float pixsize=3;           /* Size of an output map pixel in arcsec */
   int size;                  /* Number of files in input group */
+  int smfflags=0;            /* Flags for smfData */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance=NULL;       /* Pointer to the variance map */
+  smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct */
   void *weights=NULL;        /* Pointer to the weights map */
   HDSLoc *weightsloc=NULL;   /* HDS locator of weights array */
-  int wndf;                  /* weights NDF identifier */
+
 
   /* Main routine */
   ndfBegin();
@@ -190,29 +197,28 @@ void smurf_makemap( int *status ) {
     errRep(FUNC_NAME, "Unable to determine map bounds", status);
   }
 
-  /* Create the output NDF for the image and map arrays */
-  ndfCreat( "OUT", "_DOUBLE", 2, lbnd_out, ubnd_out, &ondf, status );
-  ndfMap( ondf, "DATA", "_DOUBLE", "WRITE", data_index, &n, status);
-  map = data_index[0];
-  ndfMap( ondf, "VARIANCE", "_DOUBLE", "WRITE", data_index, &n, status);
-  variance = data_index[0];
+  /* Create an output smfData */
+  ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
+  smfflags = 0;
+  smfflags |= SMF__MAP_VAR;
 
-  /* Allocate memory for weights and initialise to zero */
-  /*  weights = smf_malloc( (ubnd_out[0]-lbnd_out[0]+1) *
-			(ubnd_out[1]-lbnd_out[1]+1), sizeof(double),
-			1, status );
-  if ( weights == NULL ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Unable to allocate memory for the weights array", 
-	   status);
-	   }*/
-                                    
-  /* Create an extension for the weights array */
-  ndfXnew ( ondf, "SCU2RED", "SCUBA2_WT_ARR", 0, 0, &weightsloc, status );
-  wndf = smf_get_ndfid ( weightsloc, "WEIGHTS", "WRITE", "NEW", 
-                         "_DOUBLE", 2, lbnd_out, ubnd_out, status );
-  ndfMap ( wndf, "DATA", "_DOUBLE", "WRITE", data_index, &n, status );
-  weights = data_index[0];  
+  dims[0] = (dim_t)ubnd_out[0];
+  dims[1] = (dim_t)ubnd_out[1];
+
+  smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, dims, smfflags, &data, status );
+
+  file = data->file;
+  ondf = file->ndfid;
+
+  /* Map the data, variance, and weights arrays */
+  map = (data->pntr)[0];
+  variance = (data->pntr)[1];
+  
+  weightsloc = smf_get_xloc ( data, "SCU2RED", "SCUBA2_WT_ARR", "WRITE", 
+                              0, 0, status );
+  smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
+                     2, lbnd_out, ubnd_out, &wdata, status );
+  weights = (wdata->pntr)[0];
 
   /* Create the map using the chosen METHOD */
   if( strncmp( method, "REBIN", 5 ) == 0 ) {
@@ -326,13 +332,8 @@ void smurf_makemap( int *status ) {
     outfset = NULL;
   }
   
-  ndfUnmap( ondf, "DATA", status);
-  ndfUnmap( ondf, "VARIANCE", status);
-  ndfUnmap( wndf, "DATA", status );
-  ndfAnnul ( &wndf, status );
-  ndfAnnul( &ondf, status );
+  smf_close_file ( &wdata, status );
 
-  //  smf_free( weights, status );
   if( igrp != NULL ) grpDelet( &igrp, status);
 
   ndfEnd( status );
