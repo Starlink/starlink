@@ -185,6 +185,10 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   int * dksquid = NULL;
   JCMTState *tmpState = NULL;
 
+  /* DREAM parameters */
+  int *jigvert = NULL;
+  double *jigpath = NULL;
+
   /* Pasted from readsc2ndf */
   int colsize;               /* number of pixels in column */
   char headrec[SC2STORE__MAXFITS][81];      /* FITS headers read from sc2store */
@@ -415,7 +419,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 			  &nfits, headrec, &colsize, &rowsize, 
 			  &nframes, &(da->nflat), da->flatname,
 			  &tmpState, &tdata, &dksquid, 
-			  &flatcal, &flatpar, 
+			  &flatcal, &flatpar, &jigvert, &jigpath,
 			  status);
 
       if (*status == SAI__OK) {
