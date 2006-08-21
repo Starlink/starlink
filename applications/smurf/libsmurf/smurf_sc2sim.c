@@ -74,6 +74,7 @@
 *     2006-01-24:  write filter/atstart/atend (elc)
 *     2006-06-09:  added to smurf_sim (jb)
 *     2006-08-18:  fixed memory leak (elc)
+*     2006-08-21:  removed unused variables (jb)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -170,8 +171,6 @@ void smurf_sc2sim( int *status ) {
    double *pzero=NULL;             /* bolometer power offsets */
    int rseed;                      /* seed for random number generator */
    double samptime;                /* sample time in sec */
-   double scanangle;               /* angle of scan (radians) */
-   double scanspacing;             /* spacing of scans (arcsec) */
    char seedchar[LEN__METHOD];     /* string representation of rseed */
    char simtype[LEN__METHOD];      /* String for simulation type */
    char simxmlfile[LEN__METHOD];   /* Simulation XML file */
