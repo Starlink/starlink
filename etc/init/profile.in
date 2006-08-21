@@ -171,6 +171,12 @@ if test -f @bindir@/sst/sst.sh; then
    export SST_HELP=@starhelpdir@/sst/sst
 fi
 
+#  STILTS
+
+if test -x @starjavadir@/bin/stilts; then
+   export STILTS_DIR=@starjavadir@/bin/stilts
+fi
+
 #  SURF
 
 if test -f @bindir@/surf/surf.sh; then
