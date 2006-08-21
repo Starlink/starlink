@@ -25,7 +25,13 @@ AC_PATH_PROG(PERL, perl)
 STAR_CHECK_PROGS(prolat, sst)
 
 dnl    Ideally only code produced by flex should be distributed.
-AM_PROG_LEX
+dnl    Not having a lex is serious, so stop (don't use AM_PROG_LEX test
+dnl    that uses the missing script when lex isn't found).
+AC_PROG_LEX
+if test "$LEX" = ":"; then
+  AC_MSG_ERROR([Failed to locate lex or flex])
+fi
+
 if test "$LEX" != flex; then
    AC_MSG_WARN([Do NOT distribute source code created by the '$LEX' command.])
    AC_MSG_WARN([Only code produced by the flex command is recommended])

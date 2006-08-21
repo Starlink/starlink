@@ -23,8 +23,12 @@ AC_PATH_PROG(PERL, perl)
 
 dnl    If you write AC_PROG_YACC here, autoconf may try to use bison -y.
 dnl    This doesn't seem to work for some reason, but yacc does, so get
-dnl    it by hand. SCB also prefers byacc on Cygwin.
-AC_PATH_PROGS(YACC, [byacc yacc])
+dnl    it by hand. SCB also prefers byacc on Cygwin. Failure to locate
+dnl    one of these stops the configure.
+AC_PATH_PROGS(YACC, [byacc yacc], :)
+if test "$YACC" = ":"; then
+  AC_MSG_ERROR([Failed to locate yacc or byacc])
+fi
 
 dnl    Locate lex, and customise it to use a local skel flag if it's flex.
 dnl    Check that we can in fact use the local skel file (this doesn't
@@ -34,8 +38,14 @@ dnl    performance.
 dnl
 dnl    If flex is not available, and we have to use plain lex instead,
 dnl    warn against distributing any generates source code, since
-dnl    lex-generated C may not be portable.
-AM_PROG_LEX
+dnl    lex-generated C may not be portable. 
+dnl    Not having a lex is serious, so stop (don't use AM_PROG_LEX test
+dnl    that uses the missing script when lex isn't found).
+AC_PROG_LEX
+if test "$LEX" = ":"; then
+  AC_MSG_ERROR([Failed to locate lex or flex])
+fi
+
 if test $LEX = "flex"
 then
    for cmd in "$LEX -Sflex.skl" "$LEX" lex FAIL

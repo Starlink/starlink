@@ -19,12 +19,24 @@ STAR_DEFAULTS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_CC
-AC_PROG_YACC
+
+dnl    Replace AC_PROG_YACC, with following so we can fail if a yacc
+dnl    is not found (AC_PROG_YACC sets $YACC to yacc on failure).
+AC_CHECK_PROGS(YACC, 'bison -y' byacc yacc, :)
+if test "$YACC" = ":"; then
+  AC_MSG_ERROR([Failed to locate yacc, bison or byacc])
+fi
 
 dnl    It seems that ICL simply refuses to work correctly unless we
 dnl    use the -l flag for maximum compatibility with the original lex.
 dnl    Also ideally only code produced by flex should be distributed.
-AM_PROG_LEX
+dnl    Not having a lex is serious, so stop (don't use AM_PROG_LEX test
+dnl    that uses the missing script when lex isn't found).
+AC_PROG_LEX
+
+if test "$LEX" = ":"; then
+  AC_MSG_ERROR([Failed to locate lex or flex])
+fi
 
 if test "$LEX" = flex; then
    icl_AM_LFLAGS="-l"
