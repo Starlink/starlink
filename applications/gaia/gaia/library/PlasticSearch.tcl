@@ -209,7 +209,7 @@ itcl::class gaia::PlasticSearch {
    public method activate_selected_row {} {
 
       #  Send the row index to PLASTIC if required.
-      if {$send_rows} {
+      if {$is_reg_ && $send_rows} {
          if {[catch {
             set sender [gaia::Gaia::get_plastic_sender]
             if {$sender != "" && $table_id != ""} {
@@ -227,7 +227,7 @@ itcl::class gaia::PlasticSearch {
       }
 
       #  Send the row sky position to PLASTIC if required.
-      if {$send_radecs} {
+      if {$is_reg_ && $send_radecs} {
          if {[catch {
             set sender [gaia::Gaia::get_plastic_sender]
             set ra_col [$w_.cat ra_col]
@@ -254,11 +254,11 @@ itcl::class gaia::PlasticSearch {
       #  Configure the menu items all enabled/disabled according to whether
       #  there is a PLASTIC connection.
       if {$plastic_app_ != ""} {
-         set is_reg [$plastic_app_ is_registered]
+         set is_reg_ [$plastic_app_ is_registered]
       } else {
-         set is_reg 0
+         set is_reg_ 0
       }
-      set when_reg [expr {$is_reg ? "normal" : "disabled"}]
+      set when_reg [expr {$is_reg_ ? "normal" : "disabled"}]
       set nitem [$interopmenu_ index last]
       for {set item 0} {$item <= $nitem} {incr item} {
          catch {$interopmenu_ entryconfigure $item -state $when_reg}
@@ -310,6 +310,9 @@ itcl::class gaia::PlasticSearch {
 
    #  PlasticApp object used for PLASTIC connections.
    protected variable plastic_app_
+
+   #  Whether we are currently registered with the PLASTIC hub.
+   protected variable is_reg_ 0
 
    #  Interoperability menu.
    protected variable interopmenu_

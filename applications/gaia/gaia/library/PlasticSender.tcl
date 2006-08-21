@@ -164,6 +164,8 @@ itcl::class gaia::PlasticSender {
    private method check_app_ {} {
       if {$plastic_app == ""} {
          error "No PlasticApp"
+      } elseif {! [$plastic_app is_registered]} {
+         error "Not registered"
       }
    }
 
