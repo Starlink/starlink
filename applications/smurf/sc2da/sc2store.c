@@ -1746,8 +1746,9 @@ int *status              /* global status (given and returned) */
      status );
 
    /* DREAM jiggle parameters */
-   ndfXloc( indf, "DREAM", "READ", &drmloc, status );
-   if ( drmloc != NULL ) {
+   ndfXstat( indf, "DREAM", &isthere, status );
+   if ( isthere ) {
+     ndfXloc( indf, "DREAM", "READ", &drmloc, status );
      ndfOpen ( drmloc, "JIGVERT", access, "OLD", &jigvndf, &place, status );
      ndfMap ( jigvndf, "DATA", "_INTEGER", access, (void *)jigvert, &el,
 	      status );
