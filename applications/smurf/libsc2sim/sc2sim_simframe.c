@@ -31,13 +31,13 @@
 *     astnaxes = int[2] (Given)
 *        Dimensions of simulated image
 *     astscale = double (Given)
-*        Pixel size in simulated image
+*        Pixel size in simulated image (arcsec/pixel)
 *     astsim= = double* (Given)
 *        Astronomical sky
 *     atmnaxes = int[2] (Given)
 *        Dimensions of simulated atm background
-*     atmscale = double (Given)
-*        Pixel size in simulated atm background
+*     atmscale = double (Given) 
+*        Pixel size in simulated atm background (arcsec/pixel)
 *     atmsim = double* (Given)
 *        Atmospheric emission
 *     coeffs = double[] (Given)
@@ -67,15 +67,15 @@
 *     sky2map = AstMapping* (Given)
 *        Mapping celestial->map coordinates
 *     xbolo = double* (Given)
-*        Native X offsets of bolometers
+*        Native X offsets of bolometers (GRID coordinates)
 *     ybolo = double* (Given)
-*        Native Y offsets of bolometers
+*        Native Y offsets of bolometers (GRID coordinates)
 *     xbc = double* (Given)
-*        Nasmyth X offsets of bolometers
+*        Nasmyth X offsets of bolometers (arcsec)
 *     ybc = double* (Given)
-*        Nasmyth Y offsets of bolometers
+*        Nasmyth Y offsets of bolometers (arcsec)
 *     position = double* (Given)
-*        Nasmyth positions of bolometers
+*        Nasmyth positions of bolometers (arcsec)
 *     dbuf = double* (Returned)
 *        Generated frame
 *     status = int* (Given and Returned)
@@ -107,6 +107,8 @@
 *     2006-08-18 (EC):
 *        Don't annul fset at the end
 *        Improved status handing
+*     2006-08-21 (EC):
+*        Fixed memory leak: freeing skycoord
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -178,7 +180,7 @@ double *xbolo,               /* native X offsets of bolometers */
 double *ybolo,               /* native Y offsets of bolometers */
 double *xbc,                 /* nasmyth X offsets of bolometers */
 double *ybc,                 /* nasmyth Y offsets of bolometers */
-double *position,            /* nasmyth positions of bolometers */
+double *position,            /* nasmyth positions of bolometers (arcsec) */
 double *dbuf,                /* generated frame (returned) */
 int *status                  /* global status (given and returned) */
 )
@@ -205,7 +207,7 @@ int *status                  /* global status (given and returned) */
    double xsky;                    /* X position on sky screen */
    double ypos;                    /* Y measurement position */
    double ysky;                    /* Y position on sky screen */
-   double *skycoord;               /* az & el coordinates */
+   double *skycoord=NULL;          /* az & el coordinates */
    int lbnd_in[2];                 /* Pixel bounds for astTranGrid */
    int ubnd_in[2];
   
@@ -406,9 +408,12 @@ int *status                  /* global status (given and returned) */
        }
      }
    }
- 
+
+   /* Free resources */
+
    if( bolo2sky) bolo2sky = astAnnul(bolo2sky);
    if( bolo2map ) bolo2map = astAnnul(bolo2map);
+   smf_free( skycoord, status );
    
 }
 

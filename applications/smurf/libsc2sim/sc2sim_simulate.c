@@ -110,6 +110,8 @@
 *        Improved status handling, constants from smurf_par
 *        Fixed large number of memory leaks
 *        Removed unnecessary fopen/ndfGtwcs calls
+*     2006-08-21 (EC)
+*        Annul sc2 frameset at each time slice after calling simframe
 
 *     {enter_further_changes_here}
 
@@ -259,7 +261,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   int nwrite=0;                   /* number of frames to write */
   int outscan=0;                  /* count of scans completed */
   double phi;                     /* latitude (radians) */
-  double *posptr=NULL;            /* pointing: nasmyth offsets from cen. */ 
+  double *posptr=NULL;            /* pointing: nasmyth offsets (arcsec) */ 
   double pwvlos;                  /* mm precip. wat. vapor. line of site */
   double pwvzen = 0;              /* zenith precipital water vapour (mm) */
   int rowsize;                    /* row size for flatfield */
@@ -683,10 +685,9 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
         sky_el = fmod(temp2+2.*AST__DPI,2.*AST__DPI);
       }
       
-      /* Free AST resources */
+      /* Free AST resources required for boresite pointing calculation */
       if( fs ) fs = astAnnul(fs);
       if( fc ) fc = astAnnul(fc);
-
 
       if( !astOK ) {
         *status = SAI__ERROR;
@@ -725,11 +726,12 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 			pzero, samptime, start_time, sinx->telemission, 
 			weights, sky2map, xbolo, ybolo, xbc, ybc, 
 			&(posptr[frame*2]), &(dbuf[nbol*nwrite]), status );
-      nwrite++;
-      
-      /* Annul AST objects associated with this time slice */
+
+      /* Annul sc2 frameset for this time slice */
       if( fs ) fs = astAnnul( fs );
 
+      nwrite++;
+      
       if ( (*status == SAI__OK) &&
            (( nwrite == maxwrite ) || frame == count-1) ) {
 	/* Digitise the numbers */
@@ -893,7 +895,6 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 
   smf_free( head, status );
   smf_free( posptr, status );
-
   smf_free( dbuf, status );
   smf_free( digits, status );
   smf_free( dksquid, status );

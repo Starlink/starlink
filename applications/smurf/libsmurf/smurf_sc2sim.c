@@ -61,6 +61,7 @@
 *     2006-06-06  (AGG/EC/JB): Clone from smurf_makemap
 *     2006-06-09  Added heatrun task (JB)
 *     2006-07-31  Split into subroutines and added simhits capability (JB)
+*     2006-08-21  Free resources allocated in sc2sim_instrinit (EC)
 *     {enter_further_changes_here}
 
 *    History (HEATRUN task):
@@ -291,5 +292,12 @@ void smurf_sc2sim( int *status ) {
    smf_free( pars[1], status );
    smf_free( pars[2], status );
    smf_free( pars[3], status );
+
+   smf_free( heater, status );
+   smf_free( pzero, status );
+   smf_free( xbc, status );
+   smf_free( ybc, status );
+   smf_free( xbolo, status );
+   smf_free( ybolo, status );
 
 }
