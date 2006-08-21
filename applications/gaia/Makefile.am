@@ -52,7 +52,7 @@ GAIA_TASKS = ardstat autocrop cat2tab tab2cat asc2tab tab2asc
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun214fig.ps
 
 ##  On-line help.
-#starhelp_DATA = gaia.htx/*.html gaia.htx/*.gif
+starhelp_DATA = gaia.htx/*.html gaia.htx/*.gif
 
 ##  Root of the local Tcl installation. This must be the Starlink tclsys,
 ##  as that contains some minor changes that support the creation of the
