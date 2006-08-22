@@ -681,7 +681,7 @@ itcl::class rtd::RtdImageCtrl {
     # reopen file and update HDU's
 
     public method reopen {} {
-        RtdImage::reopen
+        rtd::RtdImage::reopen
         update_fits_hdus
    }
     
@@ -742,7 +742,7 @@ itcl::class rtd::RtdImageCtrl {
     # 'autoscale' is set
 
     public method maybe_center {} {
-        RtdImage::maybe_center
+        rtd::RtdImage::maybe_center
         maybe_autoscale
     }
     
@@ -750,7 +750,7 @@ itcl::class rtd::RtdImageCtrl {
     # 'autoscale' is set
 
     public method rotate {bool} {
-        RtdImage::rotate $bool
+        rtd::RtdImage::rotate $bool
         maybe_autoscale
     }
 

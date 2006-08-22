@@ -32,7 +32,7 @@ itcl::class rtd::RtdImagePickView {
 	eval itk_initialize $args
 
 	itk_component add image {
-	    RtdImage $w_.image \
+	    rtd::RtdImage $w_.image \
 		    -name           ZoomWin \
 		    -scrollbars     0 \
 		    -graphics       0 \
