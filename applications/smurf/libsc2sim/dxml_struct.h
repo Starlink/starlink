@@ -24,9 +24,13 @@
     15Jun2006 : replace pwvzen with tauzen (jb)
     29Jun2006 : removed dataname (jb)
     04Aug2006 : added bous & singlescan parameters (jb)
+    21Aug2006 : Put in ifndef to avoid including multiple times (EC)
 */
 
 #include "libsc2sim/dream_par.h"
+
+#ifndef DXML_STRUCT_DEFINED
+#define DXML_STRUCT_DEFINED
 
 struct dxml_struct {
   double bol_distx;           /* average bolometer distance */
@@ -135,3 +139,4 @@ struct dxml_sim_struct
   double ypoint;              /* Y pointing offset on sky (arcsec) */
   };
 
+#endif
