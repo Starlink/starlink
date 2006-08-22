@@ -74,6 +74,8 @@
 *        GRP__NOID is not a Fortran concept.
 *     2006-08-21 (JB):
 *        Write data, variance, and weights using smfData structures
+*     2006-08-22 (JB):
+*        Add odata for output, add smf_close_file for odata.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -142,7 +144,6 @@ void smurf_makemap( int *status ) {
 
   /* Local Variables */
   Grp *confgrp = NULL;       /* Group containing configuration file */
-  void *data_index[1];       /* Array of pointers to mapped arrays in ndf */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
   dim_t dims[2];             /* Dimensions of image */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
@@ -154,6 +155,7 @@ void smurf_makemap( int *status ) {
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   void *map=NULL;            /* Pointer to the rebinned map data */
   char method[LEN__METHOD];  /* String for map-making method */
+  smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
   int ondf;                  /* output NDF identifier */
   int outsize;               /* Number of files in output group */
@@ -205,16 +207,16 @@ void smurf_makemap( int *status ) {
   dims[0] = (dim_t)ubnd_out[0];
   dims[1] = (dim_t)ubnd_out[1];
 
-  smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, dims, smfflags, &data, status );
+  smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, dims, smfflags, &odata, status );
 
-  file = data->file;
+  file = odata->file;
   ondf = file->ndfid;
 
   /* Map the data, variance, and weights arrays */
-  map = (data->pntr)[0];
-  variance = (data->pntr)[1];
+  map = (odata->pntr)[0];
+  variance = (odata->pntr)[1];
   
-  weightsloc = smf_get_xloc ( data, "SCU2RED", "SCUBA2_WT_ARR", "WRITE", 
+  weightsloc = smf_get_xloc ( odata, "SCU2RED", "SCUBA2_WT_ARR", "WRITE", 
                               0, 0, status );
   smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
                      2, lbnd_out, ubnd_out, &wdata, status );
@@ -333,6 +335,7 @@ void smurf_makemap( int *status ) {
   }
   
   smf_close_file ( &wdata, status );
+  smf_close_file ( &odata, status );
 
   if( igrp != NULL ) grpDelet( &igrp, status);
 
