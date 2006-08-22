@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MLPFS( INDF, IWCS, DIST, IAXIS, DIM, YLOG, MCOMP, DUNIT, 
-*                      FSET, STATUS )
+*     CALL KPS1_MLPFS( LUTMAP, INDF, CFRM, IAXIS, YLOG, MCOMP, DUNIT, FSET, 
+*                      STATUS )
 
 *  Description:
 *     This routine returns a FrameSet containing 2 Frames. Each Frame has 
@@ -86,6 +86,9 @@
 *        Original version.
 *     15-APR-2005 (PWD):
 *        Parameterize use of backslashes to improve portability.
+*     22-AUG-2006 (DSB):
+*        Bring up to date with respect to KPS1_LPLFS (e.g. in support for
+*        SpecFrames and FluxFrames).
 *     {enter_further_changes_here}
 
 *-
@@ -96,6 +99,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_ERR'          ! AST error constants 
 
 *  Local Constants:
       CHARACTER BCKSLH*1         ! A single backslash
@@ -127,6 +131,8 @@
       CHARACTER LAB*80           ! Label text string
       CHARACTER TEXT*120         ! General text string
       INTEGER AXES( 2 )          ! Axes to pick from an existing Frame 
+      INTEGER FR1                ! Frame 1 in compound frame
+      INTEGER FR2                ! Frame 2 in compound frame
       INTEGER IAT                ! No. of characters in a string
       INTEGER MAP1               ! Map pointer
       INTEGER TMAP               ! Unused Mapping
@@ -154,32 +160,83 @@
 *  Now create the "What we've got" Frame. It is a simple 2D Frame.
       WWGOT = AST_FRAME( 2, ' ', STATUS )
 
-*  Now create the "What we want" Frame. The first axis is copied from 
-*  the specified axis in the Current Frame of the supplied FrameSet. 
-*  The second (data) axis is a default Axis.
+*  Now create the "What we want" Frame. Extract a copy of the specified axis 
+*  from the Current Frame.
       AXES( 1 ) = IAXIS
-      AXES( 2 ) = 0
-      WWWANT = AST_PICKAXES( CFRM, 2, AXES, TMAP, STATUS ) 
+      FR1 = AST_PICKAXES( CFRM, 1, AXES, TMAP, STATUS ) 
 
 *  When a SkyAxis is extracted from a SkyFrame, its Format and Digits 
 *  attributes are set, even if they were not set in the SkyFrame. This means 
 *  that Plot does not remove trailing zeros from the formatted axis values.
 *  To avoid this, explicitly clear the Format and Digits attributes for the
-*  first axis of the "what we want" Frame, unless values have been set
-*  for them in the original Current Frame.
+*  extracted axis unless values have been set for them in the original 
+*  Current Frame.
       ATTR = 'FORMAT('
       IAT = 7
       CALL CHR_PUTI( IAXIS, ATTR, IAT )
       CALL CHR_APPND( ')', ATTR, IAT )
 
       IF( .NOT. AST_TEST( CFRM, ATTR( : IAT ), STATUS ) ) THEN
-         CALL AST_CLEAR( WWWANT, 'FORMAT(1)', STATUS )
+         CALL AST_CLEAR( FR1, 'FORMAT(1)', STATUS )
       END IF
 
       ATTR( : 6 ) = 'DIGITS'
       IF( .NOT. AST_TEST( CFRM, ATTR( : IAT ), STATUS ) ) THEN
-         CALL AST_CLEAR( WWWANT, 'DIGITS(1)', STATUS )
+         CALL AST_CLEAR( FR1, 'DIGITS(1)', STATUS )
       END IF
+
+*  The second (data) axis will be a FluxFrame is possible. Otherwise it
+*  will be a default 1-D Axis. We can use a FluxFrame if the units of the
+*  NDF data array can be used to describe any of the flux systems
+*  supported by the AST FluxFrame class. To test this create a new
+*  FluxFrame and set its units to the supplied data units. Note, the call 
+*  to AST_SETC may generate an AST__BADUN error, so check the STATUS
+*  before invoking  AST_SETC.
+      FR2 = AST_FLUXFRAME( AST__BAD, AST__NULL, ' ', STATUS )
+
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+      CALL AST_SETC( FR2, 'Unit(1)', DUNIT, STATUS )
+
+*  Get the default System value from the FluxFrame. This will depend on
+*  the units. If the units do not correspond to any of the supported flux
+*  systems, then an error (AST__BADUN) will be reported. Check for this
+*  error and annul it if it occurs, create a default simple Frame to
+*  use instead of the FluxFrame, and combine it with the X axis Frame
+*  into a CmpFrame. 
+      TEXT = AST_GETC( FR2, 'System', STATUS )
+      IF( STATUS .EQ. AST__BADUN ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CALL AST_ANNUL( FR2, STATUS )
+         FR2 = AST_FRAME( 1, ' ', STATUS ) 
+         WWWANT = AST_CMPFRAME( FR1, FR2, ' ', STATUS )
+
+*  If the data units can be used with one of the flux systems supported by 
+*  the AST FluxFrame class...
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+
+*  Fix the System value explicit to the value determined by the supplied
+*  data units, and then clear the units (they are re-instated below). 
+         CALL AST_SETC( FR2, 'System', AST_GETC( FR2, 'System', 
+     :                                           STATUS ), STATUS )
+         CALL AST_CLEAR( FR2, 'Unit(1)', STATUS )
+
+*  If the X axis Frame is a SpecFrame, create a SpecFluxFrame rather than
+*  a CmpFrame to describe the combination of flux and spectral position.
+*  This has the advantage that it supports automatic scaling of the Y
+*  axis into other flux systems.
+         IF( AST_ISASPECFRAME( FR1, STATUS ) ) THEN
+            WWWANT = AST_SPECFLUXFRAME( FR1, FR2, ' ', STATUS )
+
+*  If the X axis Frame is not a SpecFrame, create a CmpFrame combining
+*  the axes.
+         ELSE
+            WWWANT = AST_CMPFRAME( FR1, FR2, ' ', STATUS )
+         END IF
+
+      END IF
+
+      CALL AST_ANNUL( FR1, STATUS )
+      CALL AST_ANNUL( FR2, STATUS )
 
 *  Get the Label component from the NDF, use a default equal to 
 *  "<MCOMP> value" where MCOMP is the name of the NDF component.
@@ -201,9 +258,14 @@
          END IF
 
          CALL AST_SETC( WWWANT, 'LABEL(2)', TEXT( : IAT ), STATUS )
-         IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWWANT, 'UNIT(2)', 
-     :                                      DUNIT( : CHR_LEN( DUNIT ) ), 
-     :                                      STATUS )
+         IF( DUNIT .NE. ' ' ) THEN
+            TEXT = ' '
+            IAT = 0
+            CALL CHR_APPND( 'Log(', TEXT, IAT )
+            CALL CHR_APPND( DUNIT, TEXT, IAT )
+            CALL CHR_APPND( ')', TEXT, IAT )
+            CALL AST_SETC( WWWANT, 'UNIT(2)', TEXT( : IAT ), STATUS )
+         END IF
 
       ELSE
          TEXT = ' '
@@ -235,6 +297,9 @@
 *  Add the "what we want" Frame. This is Frame 2, and becomes the new Current
 *  Frame.
       CALL AST_ADDFRAME( FSET, AST__BASE, MAP1, WWWANT, STATUS ) 
+
+*  Tidy up:
+ 999  CONTINUE
 
 *  Export the returned FrameSet pointer.
       CALL AST_EXPORT( FSET, STATUS )
