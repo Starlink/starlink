@@ -67,6 +67,8 @@
 *        Add dreamsolve
 *     2006-07-28 (TIMJ):
 *        Add MAKECUBE
+*     2006-08-21 (EC):
+*        Add IMPAZTEC
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -184,6 +186,8 @@ void smurf_mon( int * status ) {
     smurf_sc2sim( status );
   } else if (strcmp( taskname, "DREAMSOLVE" ) == 0 ) {
     smurf_dreamsolve( status );
+  } else if (strcmp( taskname, "IMPAZTEC" ) == 0 ) {
+    smurf_impaztec( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

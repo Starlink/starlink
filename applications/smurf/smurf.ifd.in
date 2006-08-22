@@ -569,6 +569,37 @@ package @PACKAGE@ {
 
      }
 
+     action impaztec {
+
+         parameter in {
+            position 1
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            prompt {Input AzTEC NETCDF File}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type _CHAR
+            access WRITE
+            vpath {PROMPT }
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output NDF file}
+            helpkey *
+          }
+
+          parameter msg_filter {
+            type _CHAR
+            prompt {Message level}
+            default NORM
+            vpath DEFAULT
+            helpkey *
+          }
+     }
+
+
    }
 
    icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
