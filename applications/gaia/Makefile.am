@@ -160,6 +160,9 @@ install-exec-local:
 	   $(LN_S) gaiaMon $$t; \
 	   $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(bindir)/$$t" || : ;\
 	done
+	if test ! -d $(starhelpdir); then \
+	    mkdir -p $(starhelpdir) ;\
+	fi
 	cd $(starhelpdir)/..; \
 	pwd=`pwd`; \
 	echo "pwd = $${pwd} ($(starhelpdir))"; \
