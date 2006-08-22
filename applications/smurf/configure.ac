@@ -67,6 +67,28 @@ if test -n "$epextrapath"; then
 	fi
 fi
 
+dnl Use --with-netcdf=/opt/local to append /opt/local to lib and include paths
+dnl Allow --with-netcdf=path to work
+AC_ARG_WITH(netcdf,
+	[ --with-netcdf=path    Path to use for Netcdf libraries and include files ],
+	if test "$withval" = "yes"; then
+	  ncextrapath=default
+	elif test "$withval" = "no"; then
+	  ncextrapath=
+	else
+	  ncextrapath=$withval
+	fi,
+	ncextrapath=default)
+
+if test -n "$ncextrapath"; then
+	if test "$ncextrapath" != default; then
+	   CPPFLAGS="$CPPFLAGS -I$ncextrapath/include"
+	   LIBS="$LIBS -L$ncextrapath/lib"
+	fi
+fi
+
+
+
 dnl    External libraries
 LIBS="$LIBS -L/usr/lib64"
 AC_CHECK_LIB( [gslcblas], [cblas_dsdot], [], [
@@ -81,6 +103,13 @@ AC_CHECK_LIB( [expat], [XML_SetUserData], [], [
 	echo "Error! Couldn't find libexpat. Retry with --with-expat option?"
 	exit -1
 	] )
+
+dnl    netcdf is optional - only needed for importing AzTEC data files
+AC_CHECK_LIB( [netcdf], [free_NC_attr], [], [
+        echo "Warning! Couldn't find libnetcdf. impaztec task won't be available."
+        ] )
+
+
 
 AC_CHECK_HEADERS(math.h)
 AC_CHECK_HEADERS(gsl/gsl_math.h)
