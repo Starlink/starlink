@@ -270,7 +270,7 @@ itcl::class rtd::RtdImagePick {
         # This component displays the section of the image that will be used for
 	# the centroid algorithm and statistics.
         itk_component add zoomView {
-            RtdImageZoomView $rf.zoomView \
+            rtd::RtdImageZoomView $rf.zoomView \
 		-target_image $itk_option(-target_image) \
 		-verbose $itk_option(-verbose) \
 		-width $itk_option(-maxsize) \

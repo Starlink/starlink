@@ -100,7 +100,7 @@ itcl::class rtd::RtdImagePopup {
 	# The "measure band" is displayed while the right mouse button 
 	# is pressed to show the distance between points.
 	itk_component add mband {
-	    RtdImageMBand $w_.mband -image $itk_component(image)
+	    rtd::RtdImageMBand $w_.mband -image $itk_component(image)
 	} 
 	
 	bind $w_ <Configure> [code $itk_component(image) center]
@@ -184,7 +184,7 @@ itcl::class rtd::RtdImagePopup {
     protected method make_panel {} {
 	# RtdImagePanel(n) widget, control panel
 	itk_component add info {
-	    RtdImagePanel $w_.info \
+	    rtd::RtdImagePanel $w_.info \
 		-image $itk_component(image) \
 		-showobject 0 \
 		-showxy 0 \

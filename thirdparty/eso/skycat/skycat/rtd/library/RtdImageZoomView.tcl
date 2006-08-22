@@ -44,7 +44,7 @@ itcl::class rtd::RtdImageZoomView {
 
 	# RtdImage(n) widget for zoom
 	itk_component add image {
-	    RtdImage $w_.image \
+            rtd::RtdImage $w_.image \
 		-name "ZoomWin" \
 		-verbose $itk_option(-verbose) \
 		-displaymode 1 \

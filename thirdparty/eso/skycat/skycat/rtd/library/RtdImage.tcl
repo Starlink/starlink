@@ -706,7 +706,7 @@ itcl::class rtd::RtdImage {
 	set app [lindex [winfo name .] 0]
 	set date [clock format [clock seconds] -format {%b %d, %Y at %H:%M:%S}]
 	
-	utilReUseWidget RtdImagePrint $w_.print \
+	utilReUseWidget rtd::RtdImagePrint $w_.print \
 	    -image $this \
 	    -show_footer 1 \
 	    -whole_canvas 0 \
@@ -879,7 +879,7 @@ itcl::class rtd::RtdImage {
 	    error_dialog $msg
 	    return
 	}
-        utilReUseWidget RtdImagePerf $w_.perf \
+        utilReUseWidget rtd::RtdImagePerf $w_.perf \
             -target_image $this \
             -shorthelpwin $itk_option(-shorthelpwin)
     }
