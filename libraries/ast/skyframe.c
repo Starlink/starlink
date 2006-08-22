@@ -160,6 +160,9 @@ f     The SkyFrame class does not define any new routines beyond those
 *     22-FEB-2006 (DSB):
 *        Store the Local Apparent Sidereal Time in the SkyFrame structure
 *        in order to avoid expensive re-computations.
+*     22-AUG-2006 (DSB):
+*        Ensure the cached Local Apparent Siderial Time is initialised
+*        when initialising or loading a SkyFrame.
 *class--
 */
 
@@ -9551,6 +9554,9 @@ AstSkyFrame *astInitSkyFrame_( void *mem, size_t size, int init,
          ax = astAnnul( ax );
       }
 
+/* Initialise the local apparent siderial time stored in the SkyFrame. */
+      SetLast( new );
+
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
    }
@@ -9790,6 +9796,9 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 /* ------------ */
       new->last = AST__BAD;
       new->eplast = AST__BAD;
+
+/* Initialise the local apparent siderial time */
+      SetLast( new );
 
 /* If an error occurred, clean up by deleting the new SkyFrame. */
       if ( !astOK ) new = astDelete( new );
