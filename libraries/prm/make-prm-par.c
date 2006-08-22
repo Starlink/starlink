@@ -65,6 +65,7 @@
 *     02111-1307, USA
 
  *  Authors:
+ *     BC: Brad Cavanagh (JAC, Hawaii)
  *     NXG: Norman Gray (Starlink, Glasgow)
  *     PWD: Peter Draper (University of Durham)
  *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -75,7 +76,8 @@
  *        Original version, regenerating files with longer histories.
  *     11-Aug-2005 (TIMJ):
  *        Fix compiler warnings.
-
+ *     21-Aug-2006 (BC):
+ *        Replace C++-style comments with C-style.
  *  Copyright 2004, 2005, Council for the Central Laboratory of the Research Councils
 
  *-
@@ -1101,8 +1103,8 @@ const char* tohex(Number* p)
 
     bp = (unsigned char*)&p->v.i8;
 #if WORDS_BIGENDIAN
-    // In being assigned to p->i or p->i8, a 1 or 2-byte integer will
-    // start after the MSB.
+    /* In being assigned to p->i or p->i8, a 1 or 2-byte integer will
+     * start after the MSB. */
     switch (size) {
       case 1:
         bp += 3;
