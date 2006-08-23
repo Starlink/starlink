@@ -110,8 +110,8 @@ int	main(int argc, char *argv[])
             {
             char *base = NULL;
             int extension = 0;
-            // PWD: Allow the FITS extension number to be appended to the file
-            // names. 
+            /* PWD: Allow the FITS extension number to be appended to the file
+             * names. */ 
             base = strdup( str );
             if ( sscanf( str,"%[^[][%d]", base, &extension ) == 2 ) 
               {
