@@ -144,6 +144,9 @@
 *        original current picture rather than the new DATA picture.
 *     10-AUG-2000 (DSB):
 *        Modified to allow negative margins.
+*     23-AUG-2006 (DSB):
+*        When checking foir zero-sized boxes, include effects of truncation 
+*        from double to single precision.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -542,8 +545,8 @@
          END IF
 
          CALL PGVSIZ( DXL, DXR, DYB, DYT )
-         IF( BOX( 1 ) .NE. BOX( 3 ) .AND.
-     :       BOX( 2 ) .NE. BOX( 4 ) ) THEN
+         IF( REAL( BOX( 1 ) ) .NE. REAL( BOX( 3 ) ) .AND.
+     :       REAL( BOX( 2 ) ) .NE. REAL( BOX( 4 ) ) ) THEN
             CALL PGSWIN( REAL( BOX( 1 ) ), REAL( BOX( 3 ) ), 
      :                      REAL( BOX( 2 ) ), REAL( BOX( 4 ) ) )
          ELSE
