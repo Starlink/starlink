@@ -78,6 +78,8 @@ f     The PcdMap class does not define any new routines beyond those
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitPcdMapVtab
 *        method.
+*     23-AUG-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -146,6 +148,7 @@ static double GetDisco( AstPcdMap * );
 static double GetPcdCen( AstPcdMap *, int );
 static int CanMerge( AstMapping *, AstMapping *, int, int );
 static int CanSwap( AstMapping *, AstMapping *, int, int );
+static int Equal( AstObject *, AstObject * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
 static int TestDisco( AstPcdMap * );
@@ -869,6 +872,82 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    }
 }
 
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two PcdMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "pcdmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     PcdMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two PcdMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a PcdMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the PcdMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPcdMap *that;        
+   AstPcdMap *this;        
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two PcdMap structures. */
+   this = (AstPcdMap *) this_object;
+   that = (AstPcdMap *) that_object;
+
+/* Check the second object is a PcdMap. We know the first is a
+   PcdMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsAPcdMap( that ) ) {
+
+/* Check the Invert flags for the two PcdMaps are equal. */
+      if( astGetInvert( this ) == astGetInvert( that ) ) {
+
+/* Check all the attributes are equal. */
+         if( astEQUAL( this->pcdcen[0], that->pcdcen[0] ) &&
+             astEQUAL( this->pcdcen[1], that->pcdcen[1] ) &&
+             astEQUAL( this->disco, that->disco ) ) {
+            result = 1;
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -1067,6 +1146,7 @@ void astInitPcdMapVtab_(  AstPcdMapVtab *vtab, const char *name ) {
    object->SetAttrib = SetAttrib;
    parent_testattrib = object->TestAttrib;
    object->TestAttrib = TestAttrib;
+   object->Equal = Equal;
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
