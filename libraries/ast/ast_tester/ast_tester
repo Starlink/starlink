@@ -73,6 +73,7 @@ endif
 f95 -fno-second-underscore -o regression regression.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link`
 f95 -fno-second-underscore -o plotter plotter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -pgp -ems` `pgplot_link`
 f95 -fno-second-underscore -o wcsconverter wcsconverter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
+f95 -fno-second-underscore -o simplify simplify.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
 
 # Run the main regression tester
 regression >& regression.out
@@ -204,7 +205,37 @@ end
 if( $ok == 1 ) then
    echo "   All WCS conversion tests passed"
    echo ""
+endif
+
+
+echo ""
+echo "Doing Simplification tests..."
+echo ""
+
+set ok = 1
+foreach n ( *.map )
+   set a = `basename $n .map`
+   simplify $n $a.out
+   diff -c $a.simp $a.out > $a.diff
+
+   if( $status == 0 ) then
+      rm -f $a.out $a.diff  
+   else
+      echo "   $a.simp and $a.out differ\!\! (see $a.diff)"
+      set ok = 0
+   endif
+
+end
+
+if( $ok == 1 ) then
+   echo "   All simplification tests passed"
+   echo ""
    echo ""
 endif
 
-# rm -f regression plotter wcsconverter testxmlchan 
+
+
+
+
+
+rm -f regression plotter wcsconverter simplify testxmlchan 

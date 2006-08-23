@@ -151,7 +151,7 @@
                                         Invert = 0 	# Mapping not inverted
                                      IsA Mapping 	# Mapping between coordinate systems
                                         M0 = 0.291480364581799 	# Forward matrix value
-                                        M1 = 0.506505471460186 	# AST version  4.2- 1
+                                        M1 = 0.506505471460186 	# AST version  4.3- 0
 PutCards Ncards =  7
 PutCards Card =  1
 PutCards Card =  8
