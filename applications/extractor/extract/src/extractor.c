@@ -102,6 +102,7 @@
 
  *  Authors:
  *     AJC: Alan Chipperfield (STARLINK, RAL)
+ *     BC: Brad Cavanagh (JAC, Hawaii)
  *     PWD: Peter Draper (STARLINK - Durham University)
  *     {enter_new_authors_here}
 
@@ -116,6 +117,8 @@
  *     25-JAN-2006 (PWD):
  *        Change NDF slice handling so that it works for higher dimensions. 
  *        Previously only worked for 2D images (by chance).
+ *     23-AUG-2006 (BC):
+ *        Replace C++-style comments with C-style.
  *     {enter_changes_here}
  
  *  Bugs:
@@ -223,7 +226,7 @@ void real_extractor( int *status ) {
 
         if ( *status == SAI__OK ) {
 
-            //  Only pick first two images, if more are given.
+            /*  Only pick first two images, if more are given. */
             nim = ( size > 1 ) ? 2: 1;
             argval[0] = argstr;
             grpGet( igrp, 1, nim, argval, VALUELEN, status );
