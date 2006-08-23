@@ -213,6 +213,13 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Change -CHAR_MAX value (used as a "not set" value for boolean
 *        attributes) to +CHAR_MAX, since some compilers do not allow
 *        chars to have negative values.
+*     23-AUG-2006 (DSB):
+*        Change the Equal function so that it reports an error when
+*        called, rather than using astSimplify to determine if two Mappings 
+*        are equal. All concrete Mapping classes should now provide
+*        their own implementation of astEqual, avoiding the use of
+*        astSimplify. This is so that astSimplify can use astEqual safely
+*        (i.e. without danger of entering an infinite loop).
 *class--
 */
 
@@ -912,6 +919,16 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *  Description:
 *     This function returns a boolean result (0 or 1) to indicate whether
 *     two Mappings are equivalent.
+*
+*     The implementation provided by this class (the base Mapping class)
+*     simply reports an error when called, since all concrete Mapping
+*     subclasses should provide their own implementation. 
+*
+*     Note, sub-class implementations should not use astSimplify (e.g.
+*     combining the two Mapping and then simplifying it), since the 
+*     astSimplify method for certain classes (e.g. CmpMap) may use 
+*     astEqual. Consequently, if astEqual called astSimplify, there would 
+*     be possibilities for infinite loops.
 
 *  Parameters:
 *     this
@@ -931,10 +948,6 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 */
 
 /* Local Variables: */
-   AstCmpMap *cmpmap;         /* Pointer to the compound Mapping */
-   AstMapping *smap;          /* Pointer to the simplified Mapping */
-   AstMapping *that;          /* Pointer to the second Mapping structure */
-   AstMapping *this;          /* Pointer to the first Mapping structure */
    int result;                /* Result value to return */
 
 /* Initialise. */
@@ -947,26 +960,12 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    that the Objects are both of the same class (amongst other things). */
    if( (*parent_equal)( this_object, that_object ) ) {
 
-/* Obtain pointers to the two Mapping structures. */
-      this = (AstMapping *) this_object;
-      that = (AstMapping *) that_object;
-
-/* Temporarily invert the second, and create a CmpMap containing the
-   first in series with the inverse of the second. */
-      astInvert( that );
-      cmpmap = astCmpMap( this, that, 1, "" );
-      astInvert( that );
-
-/* Simplify the CmpMap. */
-      smap = astSimplify( cmpmap );
-
-/* The two Mappings are equivalent if the simplified CmpMap is a UnitMap. */
-      result = astIsAUnitMap( smap );
-
-/* Free resources. */
-      smap = astAnnul( smap );
-      cmpmap = astAnnul( cmpmap );
-
+/* Report an error since the concrete sub-class should have over-riden
+   this method. */
+      astError( AST__INTER, "astEqual(Mapping): The %s class does "
+                "not override the abstract astEqual method inherited "
+                "from the base Mapping class (internal AST programming "
+                "error).", astGetClass( this_object ) );
    }
 
 /* If an error occurred, clear the result value. */
