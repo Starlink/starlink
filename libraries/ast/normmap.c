@@ -65,6 +65,8 @@ f     The NormMap class does not define any new routines beyond those
 *  History:
 *     11-JUL-2005 (DSB):
 *        Original version.
+*     23-AUG-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -127,10 +129,85 @@ static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
+static int Equal( AstObject *, AstObject * );
 static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 
 /* Member functions. */
 /* ================= */
+
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two NormMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "normmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     NormMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two NormMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a NormMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the NormMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstNormMap *that;        
+   AstNormMap *this;        
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two NormMap structures. */
+   this = (AstNormMap *) this_object;
+   that = (AstNormMap *) that_object;
+
+/* Check the second object is a NormMap. We know the first is a
+   NormMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsANormMap( that ) ) {
+
+/* Check the Invert flags for the two NormMaps are equal. */
+      if( astGetInvert( this ) == astGetInvert( that ) ) {
+
+/* Check the two Frames are equal. */
+         if( astEqual( this->frame, that->frame ) ) {
+            result = 1;
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
 
 void astInitNormMapVtab_(  AstNormMapVtab *vtab, const char *name ) {
 /*
@@ -203,6 +280,7 @@ void astInitNormMapVtab_(  AstNormMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
    mapping->MapSplit = MapSplit;
    mapping->Rate = Rate;
