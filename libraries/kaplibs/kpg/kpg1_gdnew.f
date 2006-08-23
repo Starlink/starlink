@@ -216,6 +216,10 @@
       REAL PYB                   ! Y at bottom of ancillary picture in inches
       REAL PYI                   ! Height of ancillary picture in inches
       REAL PYT                   ! Y at top of ancillary picture in inches
+      REAL RBOX1                 ! Single precision version of BOX(1)
+      REAL RBOX2                 ! Single precision version of BOX(2)
+      REAL RBOX3                 ! Single precision version of BOX(3)
+      REAL RBOX4                 ! Single precision version of BOX(4)
       REAL SASP                  ! Aspect ratio of available space
       REAL SHIFT                 ! Shift required to centralise the area
       REAL SXL                   ! X at left of ancillary pictures in inches
@@ -537,7 +541,7 @@
      :       BOX( 2 ) .EQ. AST__BAD .OR.
      :       BOX( 3 ) .EQ. AST__BAD .OR.
      :       BOX( 4 ) .EQ. AST__BAD ) THEN
-            STATUS = SAI__OK
+            STATUS = SAI__ERROR
             CALL ERR_REP( 'KPG1_GDNEW_4', 'The bounds of the new '//
      :                    'DATA picture are undefined in AGI world '//
      :                    'co-ordinates.', STATUS )
@@ -545,11 +549,27 @@
          END IF
 
          CALL PGVSIZ( DXL, DXR, DYB, DYT )
-         IF( REAL( BOX( 1 ) ) .NE. REAL( BOX( 3 ) ) .AND.
-     :       REAL( BOX( 2 ) ) .NE. REAL( BOX( 4 ) ) ) THEN
-            CALL PGSWIN( REAL( BOX( 1 ) ), REAL( BOX( 3 ) ), 
-     :                      REAL( BOX( 2 ) ), REAL( BOX( 4 ) ) )
-         ELSE
+
+         RBOX1 = REAL( BOX( 1 ) )
+         RBOX2 = REAL( BOX( 2 ) )
+         RBOX3 = REAL( BOX( 3 ) )
+         RBOX4 = REAL( BOX( 4 ) )
+
+         IF( RBOX1 .NE. RBOX3 .AND. 
+     :       RBOX2 .NE. RBOX4 ) THEN
+            CALL PGSWIN( RBOX1, RBOX3, RBOX2, RBOX4 )
+
+*  Report an error if the zero box size was a consequence of the 
+*  truncation from double to single precision.
+         ELSE IF( BOX( 1 ) .NE. BOX( 3 ) .AND. 
+     :            BOX( 2 ) .NE. BOX( 4 ) ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'KPG1_GDNEW_5', 'The dynamic range spanned '//
+     :                    'by one or both of the axes of the new '//
+     :                    'DATA picture is too small.', STATUS )
+            GO TO 999
+
+         ELSE 
             CALL PGSWIN( 0.0, ( DXR - DXL )*ITOCM, 0.0, 
      :                   ( DYT - DYB )*ITOCM )
          END IF
