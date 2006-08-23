@@ -5086,7 +5086,17 @@ M Makefile.dependencies
               <p>I'm not sure what this is supposed to mean
                 <em>exactly</em>, but what it seems to mean in
                 practice is that libtool has become terribly confused
-                about your compiler.  Very probably, you forced
+                about your compiler and hasn't been configured 
+                to recognise it. The most common reason for this 
+                is that libtool uses a different set of default compilers
+                to those of autoconf, and in particular is not
+                as bright about Fortran 95 compilers. The simplest
+                way to resolve this is to define <code>F77</code>
+                to match the compiler determined by autoconf (or
+                indeed define <code>FC</code> and <code>F77</code>
+                to be your preferred compiler). </p>
+
+                <p>Other reasons this may happen are when you force
                 <code>./configure</code> to use a particular compiler
                 by specifying one of the <code>F77</code>,
                 <code>FC</code> or <code>CC</code> environment
