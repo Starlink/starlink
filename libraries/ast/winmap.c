@@ -102,6 +102,8 @@ f     The WinMap class does not define any new routines beyond those
 *        Override astGetObjSize.
 *     15-MAR-2006 (DSB):
 *        Override astEqual.
+*     23-AUG-2006 (DSB):
+*        Correct initialisation of "result" in the Equal function.
 *class--
 */
 
@@ -532,6 +534,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    test is not as reliable as the above direct comparison of terms. */
             astWinTerms( this, &a_this, &b_this );
             astWinTerms( that, &a_that, &b_that );
+            result = 1;
 
             for( i = 0; i < nin; i++ ) {
                if( !EQUAL( a_this[ i ], a_that[ i ] ) ||
