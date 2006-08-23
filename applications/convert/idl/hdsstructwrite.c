@@ -62,6 +62,7 @@
 
 *  Authors:
 *     AJC: A.J.Chipperfield (Starlink, RAL)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -69,6 +70,9 @@
 *        Original version.
 *      25-FEB-2000 (AJC):
 *        Extend long, integer or byte named LOGICAL_X -> _LOGICAL
+*      23-AUG-2006 (DSB):
+*        Cast (void *) pointers to (char *) before doing pointer
+*        arithmetic.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -126,7 +130,7 @@ int cmpelt_len;
 /*    Get the tag info */
             offset = IDL_StructTagInfoByIndex( 
                sdef, tagno, IDL_MSG_LONGJMP, &cmpvar );
-            cmpdata = data + offset;
+            cmpdata = (char *) data + offset;
 
             cmptaglist = tagstrip( tagname, taglist );
 
