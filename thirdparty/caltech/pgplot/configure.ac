@@ -60,7 +60,7 @@ AC_PATH_XTRA
 dnl    Stuff required for xathena
 AC_ARG_WITH([athena], 
              AC_HELP_STRING([--with-athena[=path]],
-             [use Xaw (or Xaw3d) (default location /usr/X11R6/)]),
+             [use Xaw3d and Xaw (default location /usr/X11R6/)]),
   [if test "$withval" = "yes"; then
     # Default place
     LIBS="$LIBS $X_LIBS"
@@ -88,8 +88,8 @@ AC_CHECK_LIB(Xaw, XawInitializeWidgetSet, have_xalib=yes )
 
 
 AM_CONDITIONAL( HAVE_XATHENA, \
-    [(test "$have_xa3dheader" = "yes" || test "$have_xaheader" = "yes") && \
-     (test "$have_xa3dlib" = "yes" || test "$have_xadlib" = "yes")])
+    [(test "$have_xa3dheader" = "yes" && test "$have_xaheader" = "yes") && \
+     (test "$have_xa3dlib" = "yes" && test "$have_xalib" = "yes")])
 
 dnl    xtk
 AC_ARG_WITH([tk], 
