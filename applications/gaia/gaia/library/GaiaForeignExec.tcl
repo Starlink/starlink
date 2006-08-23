@@ -194,7 +194,7 @@ itcl::class gaia::GaiaForeignExec {
       if { $args != {}  } {
 
          #  Run the jobs with the current arguments. PWD: note that
-         #  gbexec used to use "--" to stop any further arguments from
+         #  bgexec used to use "--" to stop any further arguments from
          #  being interpreted as options, seems to have broken, so take care.
          set forret_($this) {}
          set forerr_($this) {}
