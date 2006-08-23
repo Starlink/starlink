@@ -58,15 +58,17 @@ AC_SUBST(STAR_BUILT_DRIVERS)
 AC_PATH_XTRA
 
 dnl    Stuff required for xathena
+have_athena="yes"
 AC_ARG_WITH([athena], 
              AC_HELP_STRING([--with-athena[=path]],
-             [use Xaw (or Xaw3d) (default location /usr/X11R6/)]),
+             [use Xaw3d (default location /usr/X11R6/)]),
   [if test "$withval" = "yes"; then
     # Default place
     LIBS="$LIBS $X_LIBS"
     CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   elif test "$withval" = "no"; then
-    : # We do nothing
+    # We do nothing
+    have_athena="no"
   else
     XALIBDIR=$withval/lib
     XAINCDIR=$withval/include
@@ -79,19 +81,19 @@ dnl    non-Mac builds in the case where whoever did their filesystem
 dnl    have done something as wierd as Apple.
 LIBS="$LIBS $X_LIBS"
 CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-
-AC_CHECK_HEADER([X11/Xaw3d/Simple.h], have_xa3dheader=yes ) 
-AC_CHECK_HEADER([X11/Xaw/Simple.h], have_xaheader=yes ) 
-
-AC_CHECK_LIB(Xaw3d, XawInitializeWidgetSet, have_xa3dlib=yes )
-AC_CHECK_LIB(Xaw, XawInitializeWidgetSet, have_xalib=yes )
-
+if test "$have_athena" = "yes"; then
+  AC_CHECK_HEADER([X11/Xaw3d/Simple.h], have_xa3dheader=yes ) 
+  AC_CHECK_LIB(Xaw3d, XawInitializeWidgetSet, have_xa3dlib=yes )
+else
+  have_xa3dheader="no"
+  have_xa3dlib="no"
+fi
 
 AM_CONDITIONAL( HAVE_XATHENA, \
-    [(test "$have_xa3dheader" = "yes" || test "$have_xaheader" = "yes") && \
-     (test "$have_xa3dlib" = "yes" || test "$have_xadlib" = "yes")])
+    [test "$have_xa3dheader" = "yes" && test "$have_xa3dlib" = "yes" ])
 
 dnl    xtk
+have_tk="yes"
 AC_ARG_WITH([tk], 
              AC_HELP_STRING([--with-tk[=path]],
              [use Tk (default location /usr)]),
@@ -100,7 +102,8 @@ AC_ARG_WITH([tk],
     LIBS="$LIBS -L/usr/lib"
     CPPFLAGS="$CPPFLAGS -I/usr/include"
   elif test "$withval" = "no"; then
-    : # We do nothing
+    # We do nothing
+    have_tk="no"
   else
     TKLIBDIR=$withval/lib
     TKINCDIR=$withval/include
@@ -108,12 +111,18 @@ AC_ARG_WITH([tk],
     CPPFLAGS="$CPPFLAGS -I$TKINCDIR"
   fi])
 
-AC_CHECK_HEADER([tk.h], have_tkheader=yes ) 
-AC_CHECK_LIB(tk, Tk_DisplayName, have_tklib=yes )
+if test "$have_tk" = "yes"; then
+   AC_CHECK_HEADER([tk.h], have_tkheader=yes ) 
+   AC_CHECK_LIB(tk, Tk_DisplayName, have_tklib=yes )
+else
+   have_tkheader="no"
+   have_tklib="no"
+fi
 AM_CONDITIONAL( HAVE_TK, \
     [test "$have_tkheader" = "yes" && test "$have_tklib" = "yes"] )
 
 dnl    xmotif
+have_motif="yes"
 AC_ARG_WITH([motif],
              AC_HELP_STRING([--with-motif[=path]],
              [use XMotif (default location /usr/X11R6)]),
@@ -122,7 +131,8 @@ AC_ARG_WITH([motif],
     LIBS="$LIBS $X_LIBS"
     CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   elif test "$withval" = "no"; then
-    : # We do nothing
+    # We do nothing
+    have_motif="no"
   else
     XMLIBDIR=$withval/lib
     XMINCDIR=$withval/include
@@ -130,8 +140,13 @@ AC_ARG_WITH([motif],
     CPPFLAGS="$CPPFLAGS -I$XMINCDIR"
   fi])
 
-AC_CHECK_HEADER([Xm/XmP.h], have_xmheader=yes ) 
-AC_CHECK_LIB(Xm, XmScrolledWindowSetAreas, have_xmlib=yes )
+if test "$have_motif" = "yes"; then
+   AC_CHECK_HEADER([Xm/XmP.h], have_xmheader=yes ) 
+   AC_CHECK_LIB(Xm, XmScrolledWindowSetAreas, have_xmlib=yes )
+else
+   have_xmheader="no"
+   have_xmlib="no"
+fi
 
 AM_CONDITIONAL( HAVE_XMOTIF, \
    [test "$have_xmheader" = "yes" && test "$have_xmlib" = "yes"] )
