@@ -118,6 +118,9 @@ f     The CmpMap class does not define any new routines beyond those
 *     9-MAY-2006 (DSB):
 *        - In Simplify, remove checks for patterns in the number of atomic
 *        mappings when calling astSimplify recursively.
+*     23-AUG-2006 (DSB):
+*        - In Simplify, add checks for re-appearance of a Mapping that is
+*        already being simplified at a higher levelin the call stack.
 
 *class--
 */
@@ -2305,11 +2308,44 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    int wlen1;                    /* Pattern wavelength for "modified" values */
    int wlen2;                    /* Pattern wavelength for "nmap" values */
 
+   static int depth = 0;         /* Depth of recursion */
+   static AstMapping **stackmaps = NULL;/* Mappings being simplified higher up */
+
 /* Initialise. */
    result = NULL;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* It is possible for the astSimplify method to be called recursively from
+   within astSimplify. It is also possible that the Mapping being
+   simplified by the current invocation is the same as the Mapping being
+   simplified by some recursive invocation higher up the call stack. If
+   this happens we will get into an infinite loop, since we already know
+   that simplifying the supplied Mapping will involve (eventually) a 
+   recursive call to astSimplify with the same Mapping. To avoid this
+   looping, we note the Mappings supplied at each depth and first compare
+   the supplied Mapping with the Mappings which are currently being 
+   simplified higher up the call stack. If the supplied Mapping is
+   already being simplified at a higher level, then we return immediately
+   without doing any simplification. Otherwise, we record the supplied
+   Mapping pointer in a static list so that it is available to subsequent
+   recursive invocations of this function. First compare the supplied
+   Mapping with the Mappingsbeing simpliied higher up. Return without
+   action if a match is found. */
+   for( i = 0; i < depth; i++ ) {
+      if( astEqual( this_mapping, stackmaps[ i ] ) ) {
+         return astClone( this_mapping );
+      }
+   }
+
+/* We have further work to do, so increment the recursion depth, extend
+   the stackmaps array, and store the new Mapping in it for future use. */
+   depth++;
+   stackmaps = astGrow( stackmaps, depth, sizeof( AstMapping * ) );
+   if( astOK ) {
+      stackmaps[ depth - 1 ] = astClone( this_mapping );
+   }   
 
 /* Obtain a pointer to the CmpMap structure. */
    this = (AstCmpMap *) this_mapping;
@@ -2508,6 +2544,16 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 /* Free the dynamic arrays. */
    map_list = astFree( map_list );
    invert_list = astFree( invert_list );
+
+/* Decrement the recursion depth and free the pointer to the supplied 
+   Mapping currently stored at the end of the stackmaps array. */
+   depth--;
+   if( astOK ) {
+      stackmaps[ depth ] = astAnnul( stackmaps[ depth ] );
+   }   
+
+/* If we are now at depth zero, free the stackmaps array. */
+   if( depth == 0 ) stackmaps = astFree( stackmaps );
 
 /* If an error occurred, annul the returned Mapping. */
    if ( !astOK ) result = astAnnul( result );
