@@ -1076,7 +1076,6 @@ c         IMODE = 4
          CALL KPG1_ASPSY( '(OFF*SET)', '(NUMLAB)', STATUS )
          CALL KPG1_ASPSY( '(TEXT)', '(TITLE)', STATUS )
 
-*  Set the style for plotting in the key picture.  
          CALL KPG1_ASSET( 'KAPPA_MLINPLOT', 'KEYSTYLE', IPLOTK, STATUS )
 
 *  Draw the key to the right of the plot and aligned with the top axis.
@@ -1089,14 +1088,14 @@ c         IMODE = 4
      :                    'plotting the key.', STATUS )
          END IF
 
-*  Free resources.
-         CALL KPG1_ASPSY( ' ', ' ', STATUS )
-
       END IF
 
 *  Shutdown procedure.
 *  ===================
  999  CONTINUE
+
+*  Free resources.
+      CALL KPG1_ASPSY( ' ', ' ', STATUS )
 
 *  Free any memory used.
       IF ( IPW1 .NE. 0 ) CALL PSX_FREE( IPW1, STATUS )
