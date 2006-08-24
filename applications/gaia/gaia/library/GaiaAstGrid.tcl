@@ -564,7 +564,11 @@ itcl::class gaia::GaiaAstGrid {
       set system_(epoch) [$itk_component(Epoch) get]
       if { $system_(epoch) != "default" } {
          lappend options "epoch=$system_(epoch)"
+      } elseif { $system_(system) == "azel" && $system_(epoch) == "default" } {
+         #  For azel the default epoch needs to be the existing one.
+         lappend options "epoch=$system_defaults_(default,epoch)"
       }
+
       set system_(equinox) [$itk_component(Equinox) get]
       if { $system_(equinox) != "default" } {
          lappend options "equinox=$system_(equinox)"
@@ -1916,19 +1920,20 @@ itcl::class gaia::GaiaAstGrid {
    protected variable systemannounce_ {Grid celestial coordinate system:}
    protected variable systemattrib_ \
       {default 1 1 fk5 0 1 fk4 1 1 fk4-no-e 1 1 gappt 1 0 ecliptic 0 1
-         galactic 0 0 supergalactic 0 0 pixels 0 0}
+         galactic 0 0 supergalactic 0 0 azel 1 0 pixels 0 0}
 
-   #  Array of the various system names and their default
-   #  epochs and equinoxes and the initialising list.
+   #  Array of the various system names and their default epochs and equinoxes
+   #  and the initialising list. The azel epoch is set to current which means
+   #  use the same value as the displayed image.
    protected variable systemmap_ \
       {fk5 {} J2000 fk4 B1950 B1950 fk4-no-e B1950 B1950
          gappt J2000 {} ecliptic {} J2000 galactic {} {}
-         supergalactic {} {} pixels {} {}}
+         supergalactic {} {} azel current {} pixels {} {}}
    protected variable system_defaults_
 
    #  Names of sensible epochs.
    protected variable epochmap_ \
-      "default J2000.0 B1950.0 [clock format [clock seconds] -format {%Y-%b-%d}]"
+      "default J2000.0 B1950.0 [clock format [clock seconds] -format {%Y-%b-%dT%H:%M:%S}]"
 
    #  Names of sensible equinoxes.
    protected variable equinoxmap_ {default J2000.0 B1950.0}
