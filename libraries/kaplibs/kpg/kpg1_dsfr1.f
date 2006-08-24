@@ -76,6 +76,8 @@
 *        Allow SideBand to be LO offset.
 *     20-JUL-2006 (TIMJ):
 *        Add some defensive programming to the SideBand string
+*     24-AUG-2006 (DSB):
+*        Display TimeOrigin to full precision.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -90,6 +92,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       INTEGER FRM
@@ -551,8 +554,11 @@
 *  TimeOrigin
             IF( AST_TEST( FRM, 'TimeOrigin', STATUS ) ) THEN
                TIMEOR = AST_GETD( FRM, 'TIMEORIGIN', STATUS )
+
+               FRM2 = AST_COPY( FRM, STATUS )
+               CALL AST_SETI( FRM2, 'Digits', VAL__SZD, STATUS )
                CALL MSG_SETC( 'TIMEOR',
-     :              AST_FORMAT( FRM, 1, TIMEOR, STATUS ) )
+     :              AST_FORMAT( FRM2, 1, TIMEOR, STATUS ) )
             ELSE
                CALL MSG_SETC( 'TIMEOR', '<not defined>' )
             END IF
