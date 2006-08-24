@@ -161,6 +161,8 @@
 *        Original version.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     24-AUG-2006 (DSB):
+*        Avoid zero sized gaps between lines.
 *     {enter_further_changes_here}
 
 *-
@@ -207,10 +209,13 @@
       CHARACTER SPACE*8          ! Offset selection method 
       DOUBLE PRECISION GAP       ! Nominal data value gap 
       DOUBLE PRECISION MARGIN    ! Margin for default YTOP and YBOT values
+      DOUBLE PRECISION MAXRNG    ! Data range covered by all lines
       DOUBLE PRECISION MEAN( MXLIN ) ! Mean value in each line
       DOUBLE PRECISION MEAN1     ! Mean of data in first usable line
       DOUBLE PRECISION MN( MXLIN ) ! Min. value in each line
+      DOUBLE PRECISION MNTOT     ! Min value in all lines
       DOUBLE PRECISION MX( MXLIN ) ! Max. value in each line
+      DOUBLE PRECISION MXTOT     ! Max value in all lines
       DOUBLE PRECISION Y1        ! Nominal data value
       DOUBLE PRECISION YMAX      ! Maximum displayed nominal data value
       DOUBLE PRECISION YMIN      ! Minimum displayed nominal data value
@@ -264,6 +269,8 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Copy the data to be used for each displayed line into a dynamic array.
+      MXTOT = VAL__MIND
+      MNTOT = VAL__MAXD
       DO I = 1, NDISP
 
 *  Get the index of this line within the data array. This is a grid index
@@ -303,12 +310,19 @@
 
             END IF
 
+*  Note the overall max and min data values.
+            MXTOT = MAX( MXTOT, MX( I ) )
+            MNTOT = MIN( MNTOT, MN( I ) )
+
          END IF
 
 *  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
       END DO
+
+*  Calculate the total range
+      MAXRNG = MXTOT - MNTOT
 
 *  Report an error if no data could be displayed.
       NUSE = NDISP - NBAD
@@ -361,6 +375,14 @@
             END IF
          END DO
 
+         IF( GAP .EQ. 0.0 ) THEN
+            IF( MAXRNG .GT. 0.0 ) THEN 
+               GAP = MAXRNG/( NUSE -1 )
+            ELSE
+               GAP = 1.0
+            END IF
+         END IF
+
          IUSE = 1
          DO I = 1, NDISP
             IF( USE( I ) ) THEN
@@ -380,6 +402,14 @@
                Y1 = MX( I ) - MEAN( I )
              END IF
          END DO
+
+         IF( GAP .EQ. 0.0 ) THEN
+            IF( MAXRNG .GT. 0.0 ) THEN 
+               GAP = MAXRNG/( NUSE -1 )
+            ELSE
+               GAP = 1.0
+            END IF
+         END IF
 
          IUSE = 1
          DO I = 1, NDISP
