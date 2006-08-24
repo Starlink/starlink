@@ -99,7 +99,7 @@ itcl::class gaia::GaiaSpectralPlotLine {
             -valuewidth $itk_option(-valuewidth) \
             -from $itk_option(-from) \
             -to $itk_option(-to) \
-            -increment 1 \
+            -increment $itk_option(-increment) \
             -resolution 1 \
             -show_arrows 1 \
             -anchor w \
@@ -132,6 +132,27 @@ itcl::class gaia::GaiaSpectralPlotLine {
                -labelwidth $itk_option(-labelwidth)
          }
          pack $itk_component(indextype) -side top -fill x
+      }
+
+      #  Increment of arrows.
+      if { $itk_option(-show_increment) } {
+         itk_component add increment {
+            LabelEntryScale $w_.increment \
+               -text {Increment:} \
+               -value 1 \
+               -labelwidth $itk_option(-labelwidth) \
+               -valuewidth $itk_option(-valuewidth) \
+               -from 1 \
+               -to 100 \
+               -increment 5 \
+               -resolution 1 \
+               -show_arrows 1 \
+               -anchor w \
+               -delay 25 \
+               -command [code $this configure -increment]
+         }
+         pack $itk_component(increment) -side top -fill x
+         add_short_help $itk_component(increment) {Increment used by arrows}
       }
    }
 
@@ -243,6 +264,16 @@ itcl::class gaia::GaiaSpectralPlotLine {
 
    #  Whether to show updates to the reference line.
    itk_option define -show_ref_line show_ref_line Show_Ref_Line 0
+
+   #  Whether to show the control for setting the increment.
+   itk_option define -show_increment show_increment Show_Increment 0
+
+   #  The increment of the slider. Used to skip more quickly.
+   itk_option define -increment increment Increment 1 {
+      if { [info exists itk_component(index)] } {
+         $itk_component(index) configure -increment $itk_option(-increment)
+      }
+   }
 
    #  Protected variables: (available to instance)
    #  --------------------

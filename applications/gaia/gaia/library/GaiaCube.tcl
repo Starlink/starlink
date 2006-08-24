@@ -198,6 +198,7 @@ itcl::class gaia::GaiaCube {
             -value $plane_ \
             -show_type 1 \
             -show_ref_line 1 \
+            -show_increment 1 \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
             -coord_update_cmd [code $this set_display_plane] \
