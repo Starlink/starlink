@@ -460,7 +460,7 @@ itcl::class gaia::GaiaStartup {
             -text {Minimum zoom:} \
             -labelwidth $lwidth \
             -valuewidth 4 \
-            -from -30 \
+            -from -50 \
             -to 1 \
             -increment 1 \
             -show_arrows 1 \
@@ -480,7 +480,7 @@ itcl::class gaia::GaiaStartup {
             -labelwidth $lwidth \
             -valuewidth 4 \
             -from 1 \
-            -to 30 \
+            -to 50 \
             -increment 1 \
             -show_arrows 1 \
             -resolution 1 \
