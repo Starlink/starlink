@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include "config.h"         /* From Skycat util */
+#include "gaiaconfig.h"     /* Local config.h */
 
 /* Byte swap defines. On little Endian machines we use the network-to-host
  * routines since they are faster (implemented in assembler code). */
