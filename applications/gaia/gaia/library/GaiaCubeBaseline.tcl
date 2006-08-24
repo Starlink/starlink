@@ -142,7 +142,7 @@ itcl::class gaia::GaiaCubeBaseline {
       itk_component add order {
          LabelEntryScale $w_.order \
             -text "Order of fits:" \
-            -value 2 \
+            -value 1 \
             -labelwidth $itk_option(-labelwidth) \
             -valuewidth $itk_option(-valuewidth) \
             -from 0 \
@@ -151,7 +151,7 @@ itcl::class gaia::GaiaCubeBaseline {
             -resolution 1 \
             -show_arrows 1 \
             -anchor w \
-            -delay 25 \
+            -delay 100 \
             -command [code $this set_order_]
       }
       pack $itk_component(order) -side top -fill x -ipadx 1m -ipady 2m
