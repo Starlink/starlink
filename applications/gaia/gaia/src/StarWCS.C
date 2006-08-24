@@ -580,7 +580,8 @@ char* StarWCS::pix2wcs( double x, double y, int notbound, char* buf,
                         int bufsz, int hms_flag ) const
 {
     buf[0] = '\0';
-    int onimage = x > 0 && y > 0 && x < nxpix_ && y < nypix_;
+    int onimage = ( x >= 0 && y >= 0 && 
+                    x <= (nxpix_ + 1 ) && y <= (nypix_ + 1) );
     if ( isWcs() && ( onimage || notbound ) ) {
         double newx[1], newy[1], oldx[1], oldy[1];
         double point[2];
