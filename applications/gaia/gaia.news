@@ -1,3 +1,8 @@
+  Latest changes:
+
+    The grid overlay and celestial coordinate system toolboxes now
+    support Horizon (azel) coordinates.
+
 
   Release 3.2-0: 28th July 2006.
   ==============================

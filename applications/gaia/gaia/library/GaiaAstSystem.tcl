@@ -14,8 +14,8 @@
 #     the celestial coodinate system of an image. This may be done
 #     temporarily or permanently and the image saved with the new
 #     coordinate system. Current systems are FK5, FK4 (with and
-#     without e-terms), Galactic, SuperGalactic and Ecliptic. These
-#     may be qualified with equinoxes and epochs as required.
+#     without e-terms), Galactic, SuperGalactic, Ecliptic ans AzEl. 
+#     These may be qualified with equinoxes and epochs as required.
 
 #  Invocations:
 #
@@ -94,6 +94,9 @@ itcl::class gaia::GaiaAstSystem {
       #  Evaluate any options
       eval itk_initialize $args
 
+      set lwidth 12
+      set vwidth 20
+
       #  Set the top-level window title.
       wm title $w_ "GAIA: Image celestial coordinate system ($itk_option(-number))"
 
@@ -142,8 +145,8 @@ itcl::class gaia::GaiaAstSystem {
          LabelMenu $w_.system \
 	       -text "System:" \
 	       -relief raised \
-	       -labelwidth 8 \
-               -valuewidth 18
+	       -labelwidth $lwidth \
+               -valuewidth $vwidth
       }
       add_short_help $itk_component(System) \
 	    {New celestial coordinate system}
@@ -159,7 +162,7 @@ itcl::class gaia::GaiaAstSystem {
       itk_component add Epoch {
          LabelEntryMenu $w_.epoch \
 	       -text "Epoch:" \
-	       -labelwidth 8
+	       -labelwidth $lwidth
       }
       add_short_help $itk_component(Epoch) \
 	    {Epoch of coordinates ((B/J)decimal years)}
@@ -174,7 +177,7 @@ itcl::class gaia::GaiaAstSystem {
       itk_component add Equinox {
          LabelEntryMenu $w_.equinox \
 	       -text "Equinox:" \
-	       -labelwidth 8
+	       -labelwidth $lwidth
       }
       add_short_help $itk_component(Equinox) \
 	    {Equinox of coordinates ((B/J)decimal years)}
@@ -190,8 +193,8 @@ itcl::class gaia::GaiaAstSystem {
          LabelMenu $w_.skyrefis \
 	       -text "Ref point:" \
 	       -relief raised \
-	       -labelwidth 8 \
-               -valuewidth 18
+	       -labelwidth $lwidth \
+               -valuewidth $vwidth
       }
       add_short_help $itk_component(SkyRefIs) \
          {Select the type of offset coordinate system}
@@ -202,6 +205,54 @@ itcl::class gaia::GaiaAstSystem {
 	       -value $sys
       }
       set skyrefis_ [lindex $skyrefismap_ 0]
+
+      #  Observers latitude and longitude. Use sla::obs to get known
+      #  observatories.
+      itk_component add ObsLon {
+         LabelEntryMenu $w_.obslon \
+            -text "Obs Longitude:" \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -textvariable [scope obslon_]
+      }
+      add_short_help $itk_component(ObsLon) \
+         {The geodetic longitude of the observer, degrees, measured positive eastwards}
+
+      #  Extract the names of all known telescopes. Break the menu into parts
+      #  so that we can see the whole thing.
+      set more 1
+      set n 0
+      set ccount 0
+      while { $more } {
+         incr n
+         if { $ccount > 35 } {
+            set cbreak 1
+            set ccount 0
+         } else {
+            set cbreak 0
+            incr ccount
+         }
+         lassign [sla::obs $n] name description long lat height
+         if { "$description" != "?" } {
+            $itk_component(ObsLon) add \
+               -label "$description" \
+               -value "$long" \
+               -columnbreak $cbreak \
+               -command [code $this set_lonlat_ $long $lat]
+         } else {
+            set more 0
+         }
+      }
+         
+      itk_component add ObsLat {
+         LabelEntry $w_.obslat \
+            -text "Obs Latitude:" \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -textvariable [scope obslat_]
+      }
+      add_short_help $itk_component(ObsLat) \
+         {The geodetic latitude of the observer, degrees}
 
       #  Set the defaults for all the known systems (these are used to
       #  set the labels for the default identifiers).
@@ -260,6 +311,8 @@ itcl::class gaia::GaiaAstSystem {
       pack $itk_component(Epoch) -side top -ipadx 1m -ipady 1m -anchor w
       pack $itk_component(Equinox) -side top -ipadx 1m -ipady 1m -anchor w
       pack $itk_component(SkyRefIs) -side top -ipadx 1m -ipady 1m -anchor w
+      pack $itk_component(ObsLon) -side top -ipadx 1m -ipady 1m -anchor w
+      pack $itk_component(ObsLat) -side top -ipadx 1m -ipady 1m -anchor w
 
       pack $itk_component(actionframe) -side bottom -fill x -pady 3 -padx 3
       pack $itk_component(accept) -side right -expand 1 -pady 1 -padx 1
@@ -326,12 +379,23 @@ itcl::class gaia::GaiaAstSystem {
 	 set system_(epoch) [$itk_component(Epoch) get]
 	 if { $system_(epoch) != "default" } {
 	    append options "epoch=$system_(epoch),"
-	 }
+         } elseif { $system_(system) == "azel" && $system_(epoch) == "default" } {
+            #  For azel the default epoch needs to be the existing one.
+            append options "epoch=$system_defaults_(default,epoch),"
+         }
+
 	 set system_(equinox) [$itk_component(Equinox) get]
 	 if { $system_(equinox) != "default" } {
-	    append options "equinox=$system_(equinox)"
+	    append options "equinox=$system_(equinox),"
 	 }
          append options "skyrefis=$skyrefis_"
+
+         if { $obslat_ != {} && $obslat_ != "N0:00:00" } {
+            append options ",obslat=$obslat_"
+         }
+         if { $obslon_ != {} && $obslon_ != "E0:00:00" } {
+            append options ",obslon=$obslon_"
+         }
 
 	 if { $options != {} } {
 	    $itk_option(-rtdimage) astsystem image $options
@@ -409,6 +473,9 @@ itcl::class gaia::GaiaAstSystem {
       set system_defaults_(default,equinox) \
 	    [$itk_option(-rtdimage) astget equinox]
 
+      set obslat_ [$itk_option(-rtdimage) astget ObsLat]
+      set obslon_ [$itk_option(-rtdimage) astget ObsLon]
+
       #  Update the default labels to reflect the current system (which
       #  may not be the default one).
       if { $modsys } {
@@ -420,6 +487,15 @@ itcl::class gaia::GaiaAstSystem {
       $itk_component(Equinox).mb.m entryconfigure 0 -label \
 	    "default ($system_defaults_($system_(system),equinox))"
    }
+   
+   #  Set observer longitude and latitude. Values in radians 
+   #  west (slaObs convention, opposite to AST) and north.
+   protected method set_lonlat_ {long lat} {
+      set obslon_ [expr -1.0*$long*$rad_to_deg_]
+      set obslat_ [expr $lat*$rad_to_deg_]
+   }
+
+   #  Update after the image is changed.
    public method image_changed {} {
       set_system_defaults_
       reset_
@@ -456,19 +532,19 @@ itcl::class gaia::GaiaAstSystem {
    #  need for epoch and equinox qualifiers.
    protected variable systemattrib_ \
 	 {default 1 1 fk5 0 1 fk4 1 1 fk4-no-e 1 1 gappt 1 0 ecliptic 0 1 \
-	 galactic 0 0 supergalactic 0 0}
+	 galactic 0 0 supergalactic 0 0 azel 1 0}
 
    #  Array of the various system names and their default
    #  epochs and equinoxes and the initialising list.
    protected variable systemmap_ \
       {fk5 {} J2000 fk4 B1950 B1950 fk4-no-e B1950 B1950 \
           gappt J2000 {} ecliptic {} J2000 galactic {} {} \
-          supergalactic {} {}}
+          supergalactic {} {} azel current {} }
    protected variable system_defaults_
 
    #  Names of sensible epochs.
    protected variable epochmap_ \
-	 "default J2000.0 B1950.0 [clock format [clock seconds] -format {%Y-%b-%d}]"
+      "default J2000.0 B1950.0 [clock format [clock seconds] -format {%Y-%b-%dT%H:%M:%S}]"
 
    #  Names of sensible equinoxes.
    protected variable equinoxmap_ \
@@ -486,8 +562,14 @@ itcl::class gaia::GaiaAstSystem {
    #  The values of SkyRefIs. First is default.
    protected variable skyrefismap_ "ignored origin pole"
 
+   #  Observers longitude and latitude.
+   protected variable obslat_ {}
+   protected variable obslon_ {}
+
    #  Common variables: (shared by all instances)
    #  -----------------
+
+   common rad_to_deg_ 57.295779450887607
 
 
 #  End of class definition.

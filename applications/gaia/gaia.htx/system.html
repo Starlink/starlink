@@ -9,10 +9,10 @@
 <h2 align=center><font color=red>Celestial Coordinates Toolbox</font></h2>
 <p>This window is designed to allow you to modify your image's
 celestial coordinate system. The choices available cover: FK5, FK4,
-FK4 with no E terms, Ecliptic, Galactic and SuperGalactic coordinates,
-just choose the system that you are after using the "System:" menu
-button and qualify it with an appropriate equinox and epoch, if
-necessary.
+FK4 with no E terms, Ecliptic, Galactic, SuperGalactic
+and Horizon coordinates (AzEl), just choose the system that you are after
+using the "System:" menu button and qualify it with an appropriate equinox and
+epoch, if necessary.
 
 <p>To apply the new system to the image press the "Test" button. This
 will make the sky coordinate position readouts change, and any grid
@@ -29,6 +29,14 @@ celestial coordinates must already be available).
 <p>The "Ref point:" value is a specialist option and controls how a offset
 coordinate system is interpreted. See the descriptions of the attributes
 "SkyRefIs", "SkyRef" and "SkyRefP" in SUN/211.
+
+<p>The observer longitude and latitude are only used for Horizon coordinates.
+Both values are in degrees, with the longitude measured positive eastwards.
+In addition to decimal degrees the value may be formatted as in the following
+examples: "155:19:23.2", "155 19 23.2", "155:19.387", "155.32311",
+"E155.32311", "-204.67689", "W204.67689". As indicated, the sign of the
+longitude can optionally be indicated using characters "E" and "W" in place of
+the usual "+" and "-".
 
 </body>
 </html>
