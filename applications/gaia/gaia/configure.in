@@ -65,10 +65,10 @@ AC_ARG_WITH(cc,  [--with-cc          use cc compiler], CC=cc; CXX=CC)
 if test -z "$CC" ; then
   CC=gcc
 fi
-compiler=`basename $CC`
-if test "$compiler" = "gcc" ; then
-  CC="$CC -fwritable-strings"
-fi
+
+#  Pre-C99 compilers do not support inline, check for that.
+AC_C_INLINE
+
 AC_SUBST(CC)
 
 # c++ is a  link to g++ that does not link in -lg++, which we need
@@ -78,6 +78,7 @@ fi
 AC_SUBST(CXX)
 
 AC_CHECK_PROGS(LIBTOOL,libtool)
+AC_CONFIG_HEADERS(include/gaiaconfig.h)
 
 # -----------------------------------------------------------------------
 #
