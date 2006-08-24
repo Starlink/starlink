@@ -57,8 +57,6 @@
 #-
 global ::env ::tcl_version ::gaia_library ::gaia_dir
 
-blt::bltdebug 100
-
 #.
 
 #  Withdraw the . window as this cannot be controlled as a metawidget.
