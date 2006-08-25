@@ -45,7 +45,7 @@
 #include <tcl.h>
 #include <fitshead.h>
 #include "gaiaArray.h"
-#include "slasubs.h"
+#include "star/slalib.h"
 
 /* Local prototypes */
 static int gaiaSlaObs( ClientData clientData, Tcl_Interp *interp,

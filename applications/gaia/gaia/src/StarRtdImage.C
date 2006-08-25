@@ -220,7 +220,7 @@
 #include <float.h>
 #include <tcl.h>
 #include <tk.h>
-#include "blt.h"
+#include <blt.h>
 #include <netinet/in.h>
 
 #include "define.h"
@@ -233,14 +233,14 @@
 #include "Contour.h"
 #include "XYProfile.h"
 #include "RegionStats.h"
-#include "ast.h"
+#include <ast.h>
 #include "grf_tkcan.h"
 #include "tcl_err.h"
 #include "rtdDtrn.h"
 #include "GaiaRtdRemote.h"
 #include "gaiaNDF.h"
 #include "gaiaUtils.h"
-#include "slasubs.h"
+#include <star/slalib.h>
 
 // Include any foreign commands. These are processed by the "foreign"
 // member function when requested.
