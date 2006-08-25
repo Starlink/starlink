@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_getbous ( double angle, double pathlength, int scancount, 
+*     sc2sim_getbous ( double angle, double bouswidth, double bousheight,  
 *                      double spacing, double accel[2], double vmax[2], 
 *                      double samptime, int *bouscount, double **posptr, 
 *                      int *status )
@@ -22,10 +22,10 @@
 *     angle = double (Given)
 *        Angle of pattern relative to the telescope axes in radians
 *        anticlockwise
-*     pathlength = double (Given)
-*        Length of scan path in arcsec
-*     scancount = int (Given)
-*        Total number of scans across sky
+*     bouswidth = double (Given)
+*        Width of boustrophedon pattern in arcsec
+*     bousheight = double (Given)
+*        Height of boustrophedon pattern in arcsec
 *     spacing = double (Given)
 *        Distance between scans across sky (arcsec)
 *     accel = double[2] (Given)
@@ -43,8 +43,8 @@
 
 *  Description:
 *     This routine determines the scanning positions for a scan in 
-*     a boustrophedon pattern, given an angle, pathlength, spacing
-*     between scans, and number of scans.
+*     a boustrophedon pattern, given an angle, width and height,
+*     and number of scans.
 *
 *     Effects of "jerk" - ie time for change in acceleration, or other
 *     telescope inertia effects are ignored.
@@ -96,8 +96,8 @@ void sc2sim_getbous
 (
 double angle,        /* angle of pattern relative to telescope
                         axes in radians anticlockwise (given) */
-double pathlength,   /* length of scanpath (arcsec) (given) */
-int scancount,       /* total number of scans (given) */
+double bouswidth,    /* width of bous pattern (arcsec) */
+double bousheight,   /* height of bous pattern (arcsec) */
 double spacing,      /* distance between scans (arcsec) (given) */
 double accel[2],     /* telescope accelerations (arcsec) (given) */
 double vmax[2],      /* telescope maximum velocities (arcsec) (given) */
@@ -109,6 +109,7 @@ int *status          /* global status (given and returned) */
 
 {
    /* Local variables */
+   int scancount;           /* number of scan paths across sky */ 
    double cend[2];          /* ending coordinates in arcsec */
    double cstart[2];        /* starting coordinates in arcsec */
    int curroff;             /* index of next free slot in position list */
@@ -117,6 +118,9 @@ int *status          /* global status (given and returned) */
    
    /* Check status */
    if ( !StatusOkP(status) ) return;
+
+   /* Determine the number of scan paths */
+   scancount = bousheight / spacing;
 
    /* Set up the beginning of the scan */
    cend[0] = 0.0;
@@ -129,8 +133,8 @@ int *status          /* global status (given and returned) */
       /* Do a scan across the sky */   
       cstart[0] = cend[0];
       cstart[1] = cend[1];
-      cend[0] = cend[0] + ( direction * ( pathlength * cos ( angle ) ) );
-      cend[1] = cend[1] + ( direction * ( pathlength * sin ( angle ) ) );
+      cend[0] = cend[0] + ( direction * ( bouswidth * cos ( angle ) ) );
+      cend[1] = cend[1] + ( direction * ( bouswidth * sin ( angle ) ) );
 
       /* Increment the number of positions */
       sc2sim_getscansegsize ( samptime, cstart, cend, accel, vmax, &curroff,
@@ -171,8 +175,8 @@ int *status          /* global status (given and returned) */
       /* Do a scan across the sky */   
       cstart[0] = cend[0];
       cstart[1] = cend[1];
-      cend[0] = cend[0] + ( direction * ( pathlength * cos ( angle ) ) );
-      cend[1] = cend[1] + ( direction * ( pathlength * sin ( angle ) ) );
+      cend[0] = cend[0] + ( direction * ( bouswidth * cos ( angle ) ) );
+      cend[1] = cend[1] + ( direction * ( bouswidth * sin ( angle ) ) );
 
       /* Get positions for this scan */
       sc2sim_getscanseg ( samptime, cstart, cend, accel, vmax, *bouscount, 

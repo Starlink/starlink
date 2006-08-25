@@ -54,8 +54,8 @@ static char XML_bolfile[DREAM__FLEN];  /* name of file for bolometer
                                           details */
 static double XML_bous_angle;          /* angle of pattern relative to tel. 
 					  axes in rad. anticlockwise */
-static double XML_bous_pathlength;     /* length of scan path across sky (arcsec) */
-static int XML_bous_scancount;         /* number of scan lines */
+static double XML_bous_width;          /* width of bous pattern (arcsec) */
+static double XML_bous_height;         /* height of bous pattern (arcsec) */
 static double XML_bous_spacing;        /* scan line spacing in arcsec */
 static double XML_bous_vmax;           /* Telescope max vel. (arcsec/sec) */
 static double XML_cassang;             /* polarisation angle of Cass optics (deg) */
@@ -353,8 +353,8 @@ int *status                /* global status (given and returned) */
    XML_bol_disty = 6.28;
    strcpy ( XML_bolfile, "" );
    XML_bous_angle = 0.4636476;
-   XML_bous_pathlength = 2000.0;
-   XML_bous_scancount = 7;
+   XML_bous_width = 2000.0;
+   XML_bous_height = 2000.0;
    XML_bous_spacing = 240.0;
    XML_bous_vmax = 200.0;
    XML_cassang = 135.0;
@@ -805,8 +805,8 @@ int *status                /* global status (given and retuned) */
    inx->bol_disty = XML_bol_disty;
    strcpy ( inx->bolfile, XML_bolfile );
    inx->bous_angle=XML_bous_angle;
-   inx->bous_pathlength=XML_bous_pathlength;
-   inx->bous_scancount=XML_bous_scancount;
+   inx->bous_width=XML_bous_width;
+   inx->bous_height=XML_bous_height;
    inx->bous_spacing=XML_bous_spacing;
    inx->bous_vmax=XML_bous_vmax;
    inx->conv_shape = XML_conv_shape;
@@ -1444,13 +1444,13 @@ const char **atts              /* array of name-value pairs (given) */
    {
       dxml_cvtdouble ( name, atts[1], &XML_bous_angle, &status );
    }
-   else if ( strcmp ( name, "bous_pathlength" ) == 0 )
+   else if ( strcmp ( name, "bous_width" ) == 0 )
    {
-      dxml_cvtdouble ( name, atts[1], &XML_bous_pathlength, &status );
+      dxml_cvtdouble ( name, atts[1], &XML_bous_width, &status );
    }
-   else if ( strcmp ( name, "bous_scancount" ) == 0 )
+   else if ( strcmp ( name, "bous_height" ) == 0 )
    {
-      dxml_cvtint ( name, atts[1], &XML_bous_scancount, &status );
+      dxml_cvtdouble ( name, atts[1], &XML_bous_height, &status );
    }
    else if ( strcmp ( name, "bous_spacing" ) == 0 )
    {

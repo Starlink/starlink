@@ -38,8 +38,8 @@ struct dxml_struct {
   char bolfile[DREAM__FLEN];  /* name of file for bolometer details */
   double bous_angle;          /* angle of pattern relative to telescope
 				 axes in radians anticlockwise  */
-  double bous_pathlength;     /* length of path across sky (arcsec) */
-  int bous_scancount;         /* number of scan lines  */
+  double bous_width;          /* width of bous pattern (arcsec) */
+  double bous_height;         /* height of bous pattern (arcsec) */
   double bous_spacing;        /* scan line spacing in arcsec  */
   double bous_vmax;           /* Telescope max velocities */
   int conv_shape;             /* Possible convolution functions are

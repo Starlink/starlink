@@ -226,8 +226,8 @@ void sc2sim_getbous
 (
 double angle,        /* angle of pattern relative to telescope
                         axes in radians anticlockwise (given) */
-double pathlength,   /* length of scanpath (arcsec) (given) */
-int scancount,       /* total number of scans (given) */
+double bouswidth,    /* width of bous pattern (arcsec) (given) */
+double bousheight,   /* height of bous pattern (arcsec) (given) */
 double spacing,      /* distance between scans (arcsec) (given) */
 double accel[2],     /* telescope accelerations (arcsec) (given) */
 double vmax[2],      /* telescope maximum velocities (arcsec) (given) */

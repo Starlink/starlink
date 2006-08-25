@@ -483,8 +483,8 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
       vmax[0] = inx->bous_vmax;        /*200.0;*/
       vmax[1] = inx->bous_vmax;        /*200.0;*/
       
-      sc2sim_getbous ( inx->bous_angle, inx->bous_pathlength,
-                       inx->bous_scancount, inx->bous_spacing,  
+      sc2sim_getbous ( inx->bous_angle, inx->bous_width,
+                       inx->bous_height, inx->bous_spacing,  
                        accel, vmax, samptime, &count, &posptr, status );  
       
       break;
