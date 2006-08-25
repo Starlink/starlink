@@ -1567,7 +1567,7 @@ C  The system time in seconds
       RJDATE = RJDATE + FDUTC
 
 *     Correct to TT [older than 1960 we need to guess]
-      IF (RJDATE > 36934.0D0) THEN
+      IF (RJDATE .GT. 36934.0D0) THEN
          RJDATE = RJDATE + (SLA_DTT(RJDATE) / 86400.D0)
       ELSE
          RJDATE = RJDATE + (SLA_DT(SLA_EPJ(RJDATE)) / 86400.D0)
@@ -2056,7 +2056,7 @@ C  The system time in seconds
      :     SLA_EQEQX, SLA_DRANRM
 
 *     Need UT for GMST calculation. Note the break at epoch 1960.0
-      IF (DATE > 36934.0) THEN
+      IF (DATE .GT. 36934.0) THEN
          UTDATE = DATE - (SLA_DTT( DATE ) / 86400.D0)
       ELSE
          UTDATE = DATE - (SLA_DT(SLA_EPJ(DATE)) / 86400.D0)
