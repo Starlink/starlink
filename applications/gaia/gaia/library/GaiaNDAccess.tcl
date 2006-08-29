@@ -330,7 +330,7 @@ itcl::class gaia::GaiaNDAccess {
 
       #  And create the NDF.
       set newhandle \
-         [ndf::create $name $lbnd1 $ubnd1 $lbnd2 $ubnd2 $fulltype $imagewcs]
+         [ndf::create $name "$lbnd1 $lbnd2" "$ubnd1 $ubnd2" $fulltype $imagewcs]
 
       #  Create a new instance to manage the new NDF.
       set accessor [uplevel \#0 GaiaNDAccess \#auto]

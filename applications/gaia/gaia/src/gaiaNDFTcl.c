@@ -1,13 +1,13 @@
 /*+
  *   Name:
  *      gaiaNDFTcl
- 
+
  *   Purpose:
  *      Simple, that's without 2D bias, access to NDFs from Tcl scripts.
- 
+
  *   Language:
  *      C
- 
+
  *   Authors:
  *      PWD: Peter W. Draper, JAC - University of Durham
 
@@ -30,7 +30,7 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *   History:
  *      2-MAR-2006 (PWD):
  *         Original version.
@@ -80,8 +80,8 @@ static int gaiaNDFTclUnMap( ClientData clientData, Tcl_Interp *interp,
 
 static int importNdfHandle( Tcl_Interp *interp, Tcl_Obj *obj, NDFinfo **info );
 static long exportNdfHandle( int ndfid, AstFrameSet *wcs );
-static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords, 
-                          int trailed, int formatted, int ncoords, 
+static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
+                          int trailed, int formatted, int ncoords,
                           char **coord, char **error_mess );
 
 /**
@@ -200,26 +200,33 @@ static int gaiaNDFTclOpen( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Create a 2D NDF. The result is a handle to an NDF opened for write
+ * Create an NDF. The result is a handle to an NDF opened for write
  * access. Requires the data type, upper and lower bounds (two sets) and an
  * optional WCS (pointer to an ASTFrameSet, set to 0 for default WCS).
+ * The dimensionality is determined by the number of lower bounds, which
+ * should match the number of upper bounds and that of the base frame of the
+ * given WCS.
  */
 static int gaiaNDFTclCreate( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] )
 {
     AstFrameSet *wcs;
+    Tcl_Obj **listObjv;
     Tcl_Obj *resultObj;
     char *error_mess;
     char *name;
     char *type;
+    int i;
     int indf;
-    int lbnd[2];
-    int ubnd[2];
+    int lbnd[NDF__MXDIM];
+    int n;
+    int ndims;
+    int ubnd[NDF__MXDIM];
     long adr;
 
-    /* Check arguments, need the filename, width, height and data type. */
-    if ( objc != 7 && objc != 8 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "ndf_name lbnd1 ubnd1 lbnd2 ubnd2 "
+    /* Check arguments, need the filename bounds and data type. */
+    if ( objc != 5 && objc != 6 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_name lbnd_list ubnd_list "
                           "hds_type [frameset]" );
         return TCL_ERROR;
     }
@@ -227,21 +234,41 @@ static int gaiaNDFTclCreate( ClientData clientData, Tcl_Interp *interp,
     /* Get name of NDF */
     name = Tcl_GetString( objv[1] );
 
-    /* Bounds */
-    if ( Tcl_GetIntFromObj( interp, objv[2], &lbnd[0] ) != TCL_OK ||
-         Tcl_GetIntFromObj( interp, objv[3], &ubnd[0] ) != TCL_OK ||
-         Tcl_GetIntFromObj( interp, objv[4], &lbnd[1] ) != TCL_OK ||
-         Tcl_GetIntFromObj( interp, objv[5], &ubnd[1] ) != TCL_OK ) {
+    /* Lower bounds, also dimensionality */
+    if ( Tcl_ListObjGetElements( interp, objv[2], &ndims, &listObjv )
+         != TCL_OK ) {
         return TCL_ERROR;
+    }
+    for ( i = 0; i < ndims; i++ ) {
+        if ( Tcl_GetIntFromObj( interp, listObjv[i], &lbnd[i] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+    }
+
+    /* Upper bounds. */
+    if ( Tcl_ListObjGetElements( interp, objv[3], &n, &listObjv )
+         != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    if ( n != ndims ) {
+        Tcl_SetResult( interp,
+                       "Lower and upper bounds of requested NDF do not match",
+                       TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+    for ( i = 0; i < ndims; i++ ) {
+        if ( Tcl_GetIntFromObj( interp, listObjv[i], &ubnd[i] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
     }
 
     /* HDS data type */
-    type = Tcl_GetString( objv[6] );
+    type = Tcl_GetString( objv[4] );
 
     /* Check for the WCS */
     wcs = NULL;
-    if ( objc == 8 ) {
-        if ( Tcl_GetLongFromObj( interp, objv[7], &adr ) != TCL_OK ) {
+    if ( objc == 6 ) {
+        if ( Tcl_GetLongFromObj( interp, objv[5], &adr ) != TCL_OK ) {
             return TCL_ERROR;
         }
         wcs = (AstFrameSet *) adr;
@@ -249,7 +276,8 @@ static int gaiaNDFTclCreate( ClientData clientData, Tcl_Interp *interp,
 
     /* And create it and return the NDF identifier. */
     resultObj = Tcl_GetObjResult( interp );
-    if ( gaiaCreateNDF( name, 2, lbnd, ubnd, type, wcs, &indf, &error_mess) ) {
+    if ( gaiaCreateNDF( name, ndims, lbnd, ubnd, type, wcs, &indf,
+                        &error_mess ) ) {
         Tcl_SetLongObj( resultObj, exportNdfHandle( indf, wcs ) );
         return TCL_OK;
     }
@@ -278,7 +306,7 @@ static int gaiaNDFTclClose( ClientData clientData, Tcl_Interp *interp,
     if ( result == TCL_OK ) {
         /* Close NDF */
         result = gaiaNDFClose( &info->ndfid );
-        
+
         /* Free the handle */
         free( info );
     }
@@ -336,7 +364,7 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
 
                 /* Map data */
                 access = Tcl_GetString( objv[3] );
-                result = gaiaNDFMap( ndfInfo->ndfid, ctype, access, 
+                result = gaiaNDFMap( ndfInfo->ndfid, ctype, access,
                                      "DATA", &dataPtr, &el, &error_mess );
 
                 /* Restore default MAP mode */
@@ -492,7 +520,7 @@ static int gaiaNDFTclDims( ClientData clientData, Tcl_Interp *interp,
     int ndim;
     int result;
     int trunc;
-    
+
     /* Check arguments, need the ndf handle and whether to trim redundant
      * axes. */
     if ( objc != 2 && objc != 3 ) {
@@ -566,7 +594,7 @@ static int gaiaNDFTclBounds( ClientData clientData, Tcl_Interp *interp,
     result = importNdfHandle( interp, objv[1], &info );
     if ( result == TCL_OK ) {
         resultObj = Tcl_GetObjResult( interp );
-        result = gaiaNDFQueryBounds( info->ndfid, NDF__MXDIM, lbnd, ubnd, 
+        result = gaiaNDFQueryBounds( info->ndfid, NDF__MXDIM, lbnd, ubnd,
                                      &ndim, &error_mess );
         if ( result == TCL_OK ) {
 
@@ -673,7 +701,7 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
                 resultObj = Tcl_GetObjResult( interp );
                 if ( result != TCL_ERROR ) {
                     if ( info->wcs == NULL ) {
-                        result = gaiaNDFGtWcs( info->ndfid, &info->wcs, 
+                        result = gaiaNDFGtWcs( info->ndfid, &info->wcs,
                                                &error_mess );
                     }
 
@@ -707,8 +735,8 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
  * axis. Selects the PIXEL domain from the frameSet (which must therefore be
  * from an NDF) and works with that as the BASE domain.
  */
-static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords, 
-                          int trailed, int formatted, int ncoords, 
+static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
+                          int trailed, int formatted, int ncoords,
                           char **coord, char **error_mess )
 {
     char *domain;
