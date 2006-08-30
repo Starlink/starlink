@@ -190,6 +190,12 @@ if test -f @bindir@/tsp/tsp.sh; then
    export TSP_DIR=@bindir@/tsp
 fi
 
+# STARJAVA
+
+if test -d @starjavadir@/bin; then
+   export PATH=@starjavadir@/bin:$PATH
+fi
+
 # Aliases
 # Use sh functions rather than bash aliases for improved
 # portability. Use 'declare -F' in bash to list all the functions.
