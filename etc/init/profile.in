@@ -164,6 +164,12 @@ if test -f @datadir@/specx/specxstart.sh; then
    export SPECX_HELP=@starhelpdir@/specx
 fi
 
+#  SPLAT
+
+if test -f @starjavadir@/bin/splat/splat.csh; then
+   export SPLAT_DIR=@starjavadir@/bin/splat
+fi
+
 #  SST
 
 if test -f @bindir@/sst/sst.sh; then
@@ -375,6 +381,14 @@ else
   specx () { @staretcdir@/notinst specx; }
   specxsetup () { @staretcdir@/notinst specxsetup; }
   specxstart () { @staretcdir@/notinst specxstart; }
+fi
+
+# SPLAT
+
+if test -f @starjavadir@/bin/splat/splat.csh; then
+  splat () { . $SPLAT_DIR/splat.csh; }
+else
+  splat () { @staretcdir@/notinst splat; }
 fi
 
 # SST
