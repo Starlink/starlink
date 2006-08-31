@@ -74,7 +74,8 @@ AC_CONFIG_FILES([Makefile component.xml figaro.csh figaro.icl
     dta/Makefile     figaro5/Makefile  ich/Makefile    twoutil/Makefile
     fda/Makefile     fighelp/Makefile  jty/Makefile    unix/Makefile
     fibre/Makefile   fit/Makefile      main/Makefile   util/Makefile
-    fig/Makefile     fitres/Makefile   opt/Makefile    work/Makefile])
+    fig/Makefile     fitres/Makefile   opt/Makefile    work/Makefile
+    figaro.sh])
 
 AC_CONFIG_HEADERS(config.h)
 
