@@ -141,6 +141,9 @@
 *        Installed support for scaled arrays.
 *     17-JUL-2006 (DSB):
 *        Guard against null DCB_DLOC locators.
+*     31-AUG-2006 (DSB):
+*        Do not call ARY1_REBND if there is no HDS array to reshape (i.e.
+*        if the creation of the HDS array has been deferred).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -201,6 +204,9 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  External References:
+      LOGICAL ARY1_DEFR
 
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) LOC ! Origin component locator
@@ -263,21 +269,28 @@
                   CALL DAT_PAREN( DCB_LOC( IDCB ), LOCP, STATUS )
                   CALL DAT_NAME( DCB_LOC( IDCB ), NAME, STATUS )
 
+*  If the creation of the actual HDS array has been deferred, we do not
+*  attempt to change its bounds. 
+                  IF( .NOT. ARY1_DEFR( IDCB, STATUS ) ) THEN 
+
 *  Change the array bounds, possibly obtaining a new data object locator
 *  as a result.
-                  CALL ARY1_REBND( LOCP, NAME, DCB_TYP( IDCB ),
-     :                             DCB_STA( IDCB ), DCB_NDIM( IDCB ),
-     :                             DCB_LBND( 1, IDCB ),
-     :                             DCB_UBND( 1, IDCB ),
-     :                             NDIM, LBND, UBND, DCB_LOC( IDCB ),
-     :                             SAME, DRX, LX, UX, STATUS )
+                     CALL ARY1_REBND( LOCP, NAME, DCB_TYP( IDCB ),
+     :                                DCB_STA( IDCB ), DCB_NDIM( IDCB ),
+     :                                DCB_LBND( 1, IDCB ),
+     :                                DCB_UBND( 1, IDCB ),
+     :                                NDIM, LBND, UBND, DCB_LOC( IDCB ),
+     :                                SAME, DRX, LX, UX, STATUS )
 
-*  Annul the parent locator and derive a new non-imaginary component
-*  locator by cloning the data object locator.
+*  Derive a new non-imaginary component locator by cloning the data object 
+*  locator.
+                     CALL DAT_CLONE( DCB_LOC( IDCB ), DCB_DLOC( IDCB ),
+     :                               STATUS )
+                  END IF
+
+*  Annul the parent locator.
                   CALL DAT_ANNUL( LOCP, STATUS )
                   LOCP = ARY__NOLOC
-                  CALL DAT_CLONE( DCB_LOC( IDCB ), DCB_DLOC( IDCB ),
-     :                            STATUS )
 
 *  If conversion from primitive to simple storage form is needed, then
 *  perform the conversion.
@@ -293,15 +306,18 @@
                   ELSE
 
 *  Otherwise, change the bounds of the non-imaginary data component in
-*  what is now a simple array.
-                     CALL ARY1_REBND( DCB_LOC( IDCB ), 'DATA',
-     :                                DCB_TYP( IDCB ), DCB_STA( IDCB ),
-     :                                DCB_NDIM( IDCB ),
-     :                                DCB_LBND( 1, IDCB ),
-     :                                DCB_UBND( 1, IDCB ),
-     :                                NDIM, LBND, UBND,
-     :                                DCB_DLOC( IDCB ), SAME, DRX,
-     :                                LX, UX, STATUS )
+*  what is now a simple array, but only if the creation of the actual HDS 
+*  array has not been deferred.
+                     IF( .NOT. ARY1_DEFR( IDCB, STATUS ) ) THEN 
+                        CALL ARY1_REBND( DCB_LOC( IDCB ), 'DATA',
+     :                                 DCB_TYP( IDCB ), DCB_STA( IDCB ),
+     :                                 DCB_NDIM( IDCB ),
+     :                                 DCB_LBND( 1, IDCB ),
+     :                                 DCB_UBND( 1, IDCB ),
+     :                                 NDIM, LBND, UBND,
+     :                                 DCB_DLOC( IDCB ), SAME, DRX,
+     :                                 LX, UX, STATUS )
+                     END IF
 
 *  Create an ORIGIN component in the data object and enter the new
 *  origin values.
@@ -325,21 +341,26 @@
             CALL ARY1_DBND( IDCB, STATUS )
 
 *  Change the bounds of the non-imaginary data component.
-            CALL ARY1_REBND( DCB_LOC( IDCB ), 'DATA', DCB_TYP( IDCB ),
-     :                       DCB_STA( IDCB ), DCB_NDIM( IDCB ),
-     :                       DCB_LBND( 1, IDCB ), DCB_UBND( 1, IDCB ),
-     :                       NDIM, LBND, UBND, DCB_DLOC( IDCB ), SAME,
-     :                       DRX, LX, UX, STATUS )
+            IF( .NOT. ARY1_DEFR( IDCB, STATUS ) ) THEN 
+               CALL ARY1_REBND( DCB_LOC( IDCB ), 'DATA', 
+     :                          DCB_TYP( IDCB ), DCB_STA( IDCB ), 
+     :                          DCB_NDIM( IDCB ), DCB_LBND( 1, IDCB ), 
+     :                          DCB_UBND( 1, IDCB ), NDIM, LBND, UBND, 
+     :                          DCB_DLOC( IDCB ), SAME, DRX, LX, UX, 
+     :                          STATUS )
+            END IF
 
 *  If the array holds complex data, then change the bounds of the
 *  imaginary data component.
             IF ( DCB_CPX( IDCB ) ) THEN
-               CALL ARY1_REBND( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
-     :                          DCB_TYP( IDCB ), DCB_STA( IDCB ),
-     :                          DCB_NDIM( IDCB ), DCB_LBND( 1, IDCB ),
-     :                          DCB_UBND( 1, IDCB ), NDIM, LBND, UBND,
-     :                          DCB_ILOC( IDCB ), SAME, DRX, LX, UX,
-     :                          STATUS )
+               IF( .NOT. ARY1_DEFR( IDCB, STATUS ) ) THEN 
+                  CALL ARY1_REBND( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
+     :                            DCB_TYP( IDCB ), DCB_STA( IDCB ),
+     :                            DCB_NDIM( IDCB ), DCB_LBND( 1, IDCB ),
+     :                            DCB_UBND( 1, IDCB ), NDIM, LBND, UBND,
+     :                            DCB_ILOC( IDCB ), SAME, DRX, LX, UX,
+     :                            STATUS )
+               END IF
             END IF
 
 *  See if the array origin has changed. It will have done if the number
