@@ -51,7 +51,8 @@ STAR_LATEX_DOCUMENTATION(sun237/ sc16/)
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml datacube.csh datacube.icl
-    help/Makefile sun237/Makefile sc16/Makefile demo/Makefile])
+    help/Makefile sun237/Makefile sc16/Makefile demo/Makefile
+    datacube.sh])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

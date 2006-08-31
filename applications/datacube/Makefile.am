@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = datacube.csh datacube.icl
+bin_SCRIPTS = datacube.csh datacube.icl datacube.sh
 
 dist_bin_SCRIPTS = compare.csh compare_x.csh gridspec.csh \
                    multistack.csh passband.csh peakmap.csh \
