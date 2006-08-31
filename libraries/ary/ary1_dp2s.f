@@ -83,6 +83,11 @@
 *     17-JUL-2006 (DSB):
 *        Cater for arrays in which the creation of the data arrays has
 *        been deferred.
+*     31-AUG-2006 (DSB):
+*        DAT_RENAM seems not to work if the object being renamed is an
+*        empty structure. Therefore this routine has been restructured to
+*        rename the original primitive data component rather than the new 
+*        simple data component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -146,24 +151,27 @@
          DEFER = .TRUE.
       END IF
 
+*  Obtain the data object name within this structure.
+      CALL DAT_NAME( DCB_LOC( IDCB ), NAME, STATUS )
+
 *  Obtain a locator to the parent structure which contains the data
 *  object.
       LOCP = ARY__NOLOC
       CALL DAT_PAREN( DCB_LOC( IDCB ), LOCP, STATUS )
 
-*  Obtain the data object name within this structure.
-      CALL DAT_NAME( DCB_LOC( IDCB ), NAME, STATUS )
-
 *  Generate a temporary component name which will not clash with any
-*  existing components in the parent structure and create an empty
-*  ARRAY component with this name.
+*  existing components in the parent structure and rename the primitive
+*  data object.
       CALL ARY1_TCNAM( LOCP, TNAME, STATUS )
+      CALL DAT_RENAM( DCB_LOC( IDCB ), TNAME, STATUS )
+
+*  Create an empty ARRAY component with the original name.
       DUMMY( 1 ) = 0
-      CALL DAT_NEW( LOCP, TNAME, 'ARRAY', 0, DUMMY, STATUS )
+      CALL DAT_NEW( LOCP, NAME, 'ARRAY', 0, DUMMY, STATUS )
 
 *  Obtain a locator to the new component.
       LOC = ARY__NOLOC
-      CALL DAT_FIND( LOCP, TNAME, LOC, STATUS )
+      CALL DAT_FIND( LOCP, NAME, LOC, STATUS )
 
 *  Annul the parent structure locator.
       CALL DAT_ANNUL( LOCP, STATUS )
@@ -178,9 +186,6 @@
          CALL DAT_MOVE( DCB_LOC( IDCB ), LOC, 'DATA', STATUS )
       END IF
       DCB_LOC( IDCB ) = LOC
-
-*  Rename the new object, back to its original name.
-      CALL DAT_RENAM( DCB_LOC( IDCB ), NAME, STATUS )
 
 *  Obtain a locator to the non-imaginary data component and store it in
 *  the DCB.
