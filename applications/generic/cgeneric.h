@@ -18,10 +18,12 @@
 *     here:
 *
 *        - Create your generic code routines in an include file with extension
-*          ".cgen". There are three macros defined for use when defining
+*          ".cgen". There are several macros defined for use when defining
 *          generic functions.
 *
 *          -- CGEN_BAD
+*          -- CGEN_MAX
+*          -- CGEN_MIN
 *          -- CGEN_FUNCTION
 *          -- CGEN_HDS_TYPE
 *          -- CGEN_TYPE
@@ -48,6 +50,10 @@
 *          The value of CGEN_TYPE will be set to the C type, that is
 *          double, float, int, short int, unsigned short int, char
 *          and unsigned char, as appropriate.
+*
+*          The value of CGEN_BAD will be set to one of the PRM constants
+*          VAL__BADD, VAL__BADR etc. as appropriate. Likewise, CGEN_MAX
+*          and CGEN_MIN will be set to the corresponding PRM constants.
 *
 *          The value of CGEN_BAD will be set to one of the PRM constants
 *          VAL__BADD, VAL__BADR etc. as appropriate.
@@ -116,11 +122,14 @@
 
 *  Authors:
 *     PWD: Peter W. Draper (JAC, Durham University)
+*     DSB: David S. Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-OCT-2005 (PWD):
 *        Original version.
+*     31-AUG-2006 (DSB):
+*        Add CGEN_MAX and CGEN_MIN.
 *     {enter_further_changes_here}
 
 *-
@@ -143,6 +152,14 @@
 /* The CGEN_BAD value for the current data type, which is the PRM
  * type specified by CGEN_PRM_TYPE (VAL__BADD, VAL__BADR etc.). */
 #define CGEN_BAD CGEN_JOIN_STRINGS(VAL__BAD,CGEN_PRM_TYPE)
+
+/* The CGEN_MAX value for the current data type, which is the PRM
+ * type specified by CGEN_PRM_TYPE (VAL__MAXD, VAL__MAXR etc.). */
+#define CGEN_MAX CGEN_JOIN_STRINGS(VAL__MAX,CGEN_PRM_TYPE)
+
+/* The CGEN_MIN value for the current data type, which is the PRM
+ * type specified by CGEN_PRM_TYPE (VAL__MIND, VAL__MINR etc.). */
+#define CGEN_MIN CGEN_JOIN_STRINGS(VAL__MIN,CGEN_PRM_TYPE)
 
 /* Enumeration of the known types, define CGEN_CODE_TYPE to one of these and
  * include cgeneric_defs.h, note these have to be defines, not enums, for
