@@ -160,6 +160,7 @@ init_hdsfile(void)
 
     if (status == DAT__FILNF) {	/* Need to create a new file */
         emsAnnul(&status);
+        hds_tloc = NULL;
 	hdsNew(file, "ICLVARS", "ICLVARS", ndims, dims, &hds_tloc, &status );
     }
     emsRlse();
@@ -797,6 +798,7 @@ void openglobal( char *mode, HDSLoc **loc, int *status )
     /* Need to create a new file */
         emsAnnul(status);
 	ndims = 0;
+        *loc = NULL;
 	hdsNew( filename, "GLOBAL", "STRUC", ndims, dims, loc, status );
     }
     free(filename);
