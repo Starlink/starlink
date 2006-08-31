@@ -1,9 +1,10 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = figaro.csh figaro.icl
+bin_SCRIPTS = figaro.csh figaro.icl figaro.sh
 
 dist_bin_SCRIPTS = specdre.csh specdre.icl twodspec.csh twodspec.icl \
-                   demo_specdre.icl demo_twodspec.icl demo.icl
+                   demo_specdre.icl demo_twodspec.icl demo.icl \
+                   specdre.sh twodspec.sh
 
 ## Should really call this FIG_DYNAMIC_MEMORY
 include_HEADERS = include/DYNAMIC_MEMORY 
