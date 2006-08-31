@@ -1,0 +1,554 @@
+#+
+#   Name:
+#      figaro.sh
+#
+#   Purpose:
+#      Start the Figaro package from the sh shell.
+#
+#   Type of Module:
+#      sh shell command list
+#
+#   Invocation:
+#      source $FIG_DIR/figaro.sh
+#
+#   Description:
+#      This procedure starts the Figaro package for use from the sh
+#      shell by defining the aliases needed to execute each application.
+#
+#   Authors:
+#      BC: Brad Cavanagh (JAC, Hawaii)
+#      {enter_new_authors_here}
+#
+#   History:
+#      30 AUG 2006 (BC):
+#         Original version, adapted from figaro.csh.
+#      {enter_changes_here}
+#-
+#.
+#  Make ${1+"$@"} portability feature work on zsh, too.
+test "${ZSH_VERSION+set}" = set && alias -g '${1+"$@"}'='"$@"'
+
+#  Announce name now, version etc. below.
+#
+echo " "
+echo " ----------- Initialising for  Figaro ------------"
+#
+#  Define aliases for each application.
+#
+
+abconv () {    $FIG_DIR/abconv ${1+"$@"}; }
+fig_abconv () {    $FIG_DIR/abconv ${1+"$@"}; }
+abline () {    $FIG_DIR/abline ${1+"$@"}; }
+fig_abline () {    $FIG_DIR/abline ${1+"$@"}; }
+adjoin () {    $FIG_DIR/adjoin ${1+"$@"}; }
+fig_adjoin () {    $FIG_DIR/adjoin ${1+"$@"}; }
+alasin () {    $FIG_DIR/alasin ${1+"$@"}; }
+fig_alasin () {    $FIG_DIR/alasin ${1+"$@"}; }
+alasout () {   $FIG_DIR/alasout ${1+"$@"}; }
+fig_alasout () {   $FIG_DIR/alasout ${1+"$@"}; }
+aperture () {  $FIG_DIR/aperture ${1+"$@"}; }
+fig_aperture () {  $FIG_DIR/aperture ${1+"$@"}; }
+arc () {       $FIG_DIR/arc ${1+"$@"}; }
+fig_arc () {       $FIG_DIR/arc ${1+"$@"}; }
+arc2d () {     $FIG_DIR/arc2d ${1+"$@"}; }
+two_arc2d () {     $FIG_DIR/arc2d ${1+"$@"}; }
+arcdisp () {   $FIG_DIR/arcdisp ${1+"$@"}; }
+spe_arcdisp () {   $FIG_DIR/arcdisp ${1+"$@"}; }
+arcgendb () {  $FIG_DIR/arcgendb ${1+"$@"}; }
+spe_arcgendb () {  $FIG_DIR/arcgendb ${1+"$@"}; }
+arcident () {  $FIG_DIR/arcident ${1+"$@"}; }
+spe_arcident () {  $FIG_DIR/arcident ${1+"$@"}; }
+arclocat () {  $FIG_DIR/arclocat ${1+"$@"}; }
+spe_arclocat () {  $FIG_DIR/arclocat ${1+"$@"}; }
+arcsdi () {    $FIG_DIR/arcsdi ${1+"$@"}; }
+two_arcsdi () {    $FIG_DIR/arcsdi ${1+"$@"}; }
+ascin () {     $FIG_DIR/ascin ${1+"$@"}; }
+spe_ascin () {     $FIG_DIR/ascin ${1+"$@"}; }
+ascout () {    $FIG_DIR/ascout ${1+"$@"}; }
+spe_ascout () {    $FIG_DIR/ascout ${1+"$@"}; }
+bbody () {     $FIG_DIR/bbody ${1+"$@"}; }
+spe_bbody () {     $FIG_DIR/bbody ${1+"$@"}; }
+bclean () {    $FIG_DIR/bclean ${1+"$@"}; }
+fig_bclean () {    $FIG_DIR/bclean ${1+"$@"}; }
+bfft () {      $FIG_DIR/bfft ${1+"$@"}; }
+fig_bfft () {      $FIG_DIR/bfft ${1+"$@"}; }
+bsmult () {    $FIG_DIR/bsmult ${1+"$@"}; }
+fig_bsmult () {    $FIG_DIR/bsmult ${1+"$@"}; }
+cadd () {      $FIG_DIR/cadd ${1+"$@"}; }
+two_cadd () {      $FIG_DIR/cadd ${1+"$@"}; }
+caldiv () {    $FIG_DIR/caldiv ${1+"$@"}; }
+fig_caldiv () {    $FIG_DIR/caldiv ${1+"$@"}; }
+ccdlin () {    $FIG_DIR/ccdlin ${1+"$@"}; }
+fig_ccdlin () {    $FIG_DIR/ccdlin ${1+"$@"}; }
+ccur () {      $FIG_DIR/ccur ${1+"$@"}; }
+fig_ccur () {      $FIG_DIR/ccur ${1+"$@"}; }
+cdist () {     $FIG_DIR/cdist ${1+"$@"}; }
+fig_cdist () {     $FIG_DIR/cdist ${1+"$@"}; }
+centers () {   $FIG_DIR/centers ${1+"$@"}; }
+fig_centers () {   $FIG_DIR/centers ${1+"$@"}; }
+cfit () {      $FIG_DIR/cfit ${1+"$@"}; }
+fig_cfit () {      $FIG_DIR/cfit ${1+"$@"}; }
+changed () {   $FIG_DIR/changed ${1+"$@"}; }
+two_changed () {   $FIG_DIR/changed ${1+"$@"}; }
+clean () {     $FIG_DIR/clean ${1+"$@"}; }
+fig_clean () {     $FIG_DIR/clean ${1+"$@"}; }
+clip () {      $FIG_DIR/clip ${1+"$@"}; }
+fig_clip () {      $FIG_DIR/clip ${1+"$@"}; }
+cmplx2i () {   $FIG_DIR/cmplx2i ${1+"$@"}; }
+fig_cmplx2i () {   $FIG_DIR/cmplx2i ${1+"$@"}; }
+cmplx2m () {   $FIG_DIR/cmplx2m ${1+"$@"}; }
+fig_cmplx2m () {   $FIG_DIR/cmplx2m ${1+"$@"}; }
+cmplx2r () {   $FIG_DIR/cmplx2r ${1+"$@"}; }
+fig_cmplx2r () {   $FIG_DIR/cmplx2r ${1+"$@"}; }
+cmplxadd () {  $FIG_DIR/cmplxadd ${1+"$@"}; }
+fig_cmplxadd () {  $FIG_DIR/cmplxadd ${1+"$@"}; }
+cmplxconj () { $FIG_DIR/cmplxconj ${1+"$@"}; }
+fig_cmplxconj () { $FIG_DIR/cmplxconj ${1+"$@"}; }
+cmplxdiv () {  $FIG_DIR/cmplxdiv ${1+"$@"}; }
+fig_cmplxdiv () {  $FIG_DIR/cmplxdiv ${1+"$@"}; }
+cmplxfilt () { $FIG_DIR/cmplxfilt ${1+"$@"}; }
+fig_cmplxfilt () { $FIG_DIR/cmplxfilt ${1+"$@"}; }
+cmplxmult () { $FIG_DIR/cmplxmult ${1+"$@"}; }
+fig_cmplxmult () { $FIG_DIR/cmplxmult ${1+"$@"}; }
+cmplxsub () {  $FIG_DIR/cmplxsub ${1+"$@"}; }
+fig_cmplxsub () {  $FIG_DIR/cmplxsub ${1+"$@"}; }
+coadd () {     $FIG_DIR/coadd ${1+"$@"}; }
+fig_coadd () {     $FIG_DIR/coadd ${1+"$@"}; }
+colour () {    $FIG_DIR/colour ${1+"$@"}; }
+fig_colour () {    $FIG_DIR/colour ${1+"$@"}; }
+comb () {      $FIG_DIR/comb ${1+"$@"}; }
+two_comb () {      $FIG_DIR/comb ${1+"$@"}; }
+combine () {   $FIG_DIR/combine ${1+"$@"}; }
+fig_combine () {   $FIG_DIR/combine ${1+"$@"}; }
+copobj () {    $FIG_DIR/copobj ${1+"$@"}; }
+fig_copobj () {    $FIG_DIR/copobj ${1+"$@"}; }
+correl () {    $FIG_DIR/correl ${1+"$@"}; }
+spe_correl () {    $FIG_DIR/correl ${1+"$@"}; }
+cosbell () {   $FIG_DIR/cosbell ${1+"$@"}; }
+fig_cosbell () {   $FIG_DIR/cosbell ${1+"$@"}; }
+cosrej () {    $FIG_DIR/cosrej ${1+"$@"}; }
+fig_cosrej () {    $FIG_DIR/cosrej ${1+"$@"}; }
+creobj () {    $FIG_DIR/creobj ${1+"$@"}; }
+fig_creobj () {    $FIG_DIR/creobj ${1+"$@"}; }
+criguass () {  $FIG_DIR/criguass ${1+"$@"}; }
+two_criguass () {  $FIG_DIR/crigauss ${1+"$@"}; }
+cset () {      $FIG_DIR/cset ${1+"$@"}; }
+fig_cset () {      $FIG_DIR/cset ${1+"$@"}; }
+cspike () {    $FIG_DIR/cspike ${1+"$@"}; }
+fig_cspike () {    $FIG_DIR/cspike ${1+"$@"}; }
+cscan () {     $FIG_DIR/cscan ${1+"$@"}; }
+two_cscan () {     $FIG_DIR/cscan ${1+"$@"}; }
+csub () {      $FIG_DIR/csub ${1+"$@"}; }
+two_csub () {      $FIG_DIR/csub ${1+"$@"}; }
+cube2long () { $FIG_DIR/cube2long ${1+"$@"}; }
+two_cube2long () { $FIG_DIR/cube2long ${1+"$@"}; }
+delobj () {    $FIG_DIR/delobj ${1+"$@"}; }
+fig_delobj () {    $FIG_DIR/delobj ${1+"$@"}; }
+dvdplot () {   $FIG_DIR/dvdplot ${1+"$@"}; }
+fig_dvdplot () {   $FIG_DIR/dvdplot ${1+"$@"}; }
+echarc () {    $FIG_DIR/echarc ${1+"$@"}; }
+fig_echarc () {    $FIG_DIR/echarc ${1+"$@"}; }
+echfind () {   $FIG_DIR/echfind ${1+"$@"}; }
+fig_echfind () {   $FIG_DIR/echfind ${1+"$@"}; }
+echmask () {   $FIG_DIR/echmask ${1+"$@"}; }
+fig_echmask () {   $FIG_DIR/echmask ${1+"$@"}; }
+echmerge () {  $FIG_DIR/echmerge ${1+"$@"}; }
+fig_echmerge () {  $FIG_DIR/echmerge ${1+"$@"}; }
+echselect () { $FIG_DIR/echselect ${1+"$@"}; }
+fig_echselect () { $FIG_DIR/echselect ${1+"$@"}; }
+editext () {   $FIG_DIR/editext ${1+"$@"}; }
+spe_editext () {   $FIG_DIR/editext ${1+"$@"}; }
+elsplot () {   $FIG_DIR/elsplot ${1+"$@"}; }
+fig_elsplot () {   $FIG_DIR/elsplot ${1+"$@"}; }
+emlt () {      $FIG_DIR/emlt ${1+"$@"}; }
+fig_emlt () {      $FIG_DIR/emlt ${1+"$@"}; }
+errcon () {    $FIG_DIR/errcon ${1+"$@"}; }
+fig_errcon () {    $FIG_DIR/errcon ${1+"$@"}; }
+esplot () {    $FIG_DIR/esplot ${1+"$@"}; }
+fig_esplot () {    $FIG_DIR/esplot ${1+"$@"}; }
+evalfit () {   $FIG_DIR/evalfit ${1+"$@"}; }
+spe_evalfit () {   $FIG_DIR/evalfit ${1+"$@"}; }
+extin () {     $FIG_DIR/extin ${1+"$@"}; }
+fig_extin () {     $FIG_DIR/extin ${1+"$@"}; }
+extlist () {   $FIG_DIR/extlist ${1+"$@"}; }
+fig_extlist () {   $FIG_DIR/extlist ${1+"$@"}; }
+extract () {   $FIG_DIR/extract ${1+"$@"}; }
+fig_extract () {   $FIG_DIR/extract ${1+"$@"}; }
+fet321 () {    $FIG_DIR/fet321 ${1+"$@"}; }
+fig_fet321 () {    $FIG_DIR/fet321 ${1+"$@"}; }
+ff () {        $FIG_DIR/ff ${1+"$@"}; }
+fig_ff () {        $FIG_DIR/ff ${1+"$@"}; }
+ffcross () {   $FIG_DIR/ffcross ${1+"$@"}; }
+fig_ffcross () {   $FIG_DIR/ffcross ${1+"$@"}; }
+fft () {       $FIG_DIR/fft ${1+"$@"}; }
+fig_fft () {       $FIG_DIR/fft ${1+"$@"}; }
+fib2cube () {  $FIG_DIR/fib2cube ${1+"$@"}; }
+two_fib2cube () {  $FIG_DIR/fib2cube ${1+"$@"}; }
+fibdisp () {   $FIG_DIR/fibdisp ${1+"$@"}; }
+two_fibdisp () {   $FIG_DIR/fibdisp ${1+"$@"}; }
+fibsep () {    $FIG_DIR/fibsep ${1+"$@"}; }
+two_fibsep () {    $FIG_DIR/fibsep ${1+"$@"}; }
+figinfo () {   $FIG_DIR/figinfo ${1+"$@"}; }
+fig_figinfo () {   $FIG_DIR/figinfo ${1+"$@"}; }
+figs321 () {   $FIG_DIR/figs321 ${1+"$@"}; }
+fig_figs321 () {   $FIG_DIR/figs321 ${1+"$@"}; }
+figs322 () {   $FIG_DIR/figs322 ${1+"$@"}; }
+fig_figs322 () {   $FIG_DIR/figs322 ${1+"$@"}; }
+figs422 () {   $FIG_DIR/figs422 ${1+"$@"}; }
+fig_figs422 () {   $FIG_DIR/figs422 ${1+"$@"}; }
+figs423 () {   $FIG_DIR/figs423 ${1+"$@"}; }
+fig_figs423 () {   $FIG_DIR/figs423 ${1+"$@"}; }
+figs424 () {   $FIG_DIR/figs424 ${1+"$@"}; }
+fig_figs424 () {   $FIG_DIR/figs424 ${1+"$@"}; }
+figsee () {    $FIG_DIR/figsee ${1+"$@"}; }
+fig_figsee () {    $FIG_DIR/figsee ${1+"$@"}; }
+figsflux () {  $FIG_DIR/figsflux ${1+"$@"}; }
+fig_figsflux () {  $FIG_DIR/figsflux ${1+"$@"}; }
+fillcube () {  $FIG_DIR/fillcube ${1+"$@"}; }
+spe_fillcube () {  $FIG_DIR/fillcube ${1+"$@"}; }
+findsp () {    $FIG_DIR/findsp ${1+"$@"}; }
+fig_findsp () {    $FIG_DIR/findsp ${1+"$@"}; }
+fitbb () {     $FIG_DIR/fitbb ${1+"$@"}; }
+spe_fitbb () {     $FIG_DIR/fitbb ${1+"$@"}; }
+fitcont () {   $FIG_DIR/fitcont ${1+"$@"}; }
+two_fitcont () {   $FIG_DIR/fitcont ${1+"$@"}; }
+fitgauss () {  $FIG_DIR/fitgauss ${1+"$@"}; }
+spe_fitgauss () {  $FIG_DIR/fitgauss ${1+"$@"}; }
+fitpoly () {   $FIG_DIR/fitpoly ${1+"$@"}; }
+spe_fitpoly () {   $FIG_DIR/fitpoly ${1+"$@"}; }
+fitset () {    $FIG_DIR/fitset ${1+"$@"}; }
+fig_fitset () {    $FIG_DIR/fitset ${1+"$@"}; }
+fitskeys () {  $FIG_DIR/fitskeys ${1+"$@"}; }
+fig_fitskeys () {  $FIG_DIR/fitskeys ${1+"$@"}; }
+fittri () {    $FIG_DIR/fittri ${1+"$@"}; }
+spe_fittri () {    $FIG_DIR/fittri ${1+"$@"}; }
+flaircomp () { $FIG_DIR/flaircomp ${1+"$@"}; }
+fig_flaircomp () { $FIG_DIR/flaircomp ${1+"$@"}; }
+flairext () {  $FIG_DIR/flairext ${1+"$@"}; }
+fig_flairext () {  $FIG_DIR/flairext ${1+"$@"}; }
+flag2qual () { $FIG_DIR/flag2qual ${1+"$@"}; }
+fig_flag2qual () { $FIG_DIR/flag2qual ${1+"$@"}; }
+flconv () {    $FIG_DIR/flconv ${1+"$@"}; }
+fig_flconv () {    $FIG_DIR/flconv ${1+"$@"}; }
+foto () {      $FIG_DIR/foto ${1+"$@"}; }
+fig_foto () {      $FIG_DIR/foto ${1+"$@"}; }
+fscrunch () {  $FIG_DIR/fscrunch ${1+"$@"}; }
+fig_fscrunch () {  $FIG_DIR/fscrunch ${1+"$@"}; }
+fwconv () {    $FIG_DIR/fwconv ${1+"$@"}; }
+fig_fwconv () {    $FIG_DIR/fwconv ${1+"$@"}; }
+gauss () {     $FIG_DIR/gauss ${1+"$@"}; }
+fig_gauss () {     $FIG_DIR/gauss ${1+"$@"}; }
+goodvar () {   $FIG_DIR/goodvar ${1+"$@"}; }
+fig_goodvar () {   $FIG_DIR/goodvar ${1+"$@"}; }
+grow () {      $FIG_DIR/grow ${1+"$@"}; }
+spe_grow () {      $FIG_DIR/grow ${1+"$@"}; }
+growx () {     $FIG_DIR/growx ${1+"$@"}; }
+fig_growx () {     $FIG_DIR/growx ${1+"$@"}; }
+growxt () {    $FIG_DIR/growxt ${1+"$@"}; }
+fig_growxt () {    $FIG_DIR/growxt ${1+"$@"}; }
+growxy () {    $FIG_DIR/growxy ${1+"$@"}; }
+fig_growxy () {    $FIG_DIR/growxy ${1+"$@"}; }
+growy () {     $FIG_DIR/growy ${1+"$@"}; }
+fig_growy () {     $FIG_DIR/growy ${1+"$@"}; }
+growyt () {    $FIG_DIR/growyt ${1+"$@"}; }
+fig_growyt () {    $FIG_DIR/growyt ${1+"$@"}; }
+gspike () {    $FIG_DIR/gspike ${1+"$@"}; }
+fig_gspike () {    $FIG_DIR/gspike ${1+"$@"}; }
+hard () {      $FIG_DIR/hard ${1+"$@"}; }
+fig_hard () {      $FIG_DIR/hard ${1+"$@"}; }
+hcross () {    $FIG_DIR/hcross ${1+"$@"}; }
+fig_hcross () {    $FIG_DIR/hcross ${1+"$@"}; }
+himage () {    $FIG_DIR/himage ${1+"$@"}; }
+two_himage () {    $FIG_DIR/himage ${1+"$@"}; }
+hist () {      $FIG_DIR/hist ${1+"$@"}; }
+fig_hist () {      $FIG_DIR/hist ${1+"$@"}; }
+hopt () {      $FIG_DIR/hopt ${1+"$@"}; }
+fig_hopt () {      $FIG_DIR/hopt ${1+"$@"}; }
+i2cmplx () {   $FIG_DIR/i2cmplx ${1+"$@"}; }
+fig_i2cmplx () {   $FIG_DIR/i2cmplx ${1+"$@"}; }
+iadd () {      $FIG_DIR/iadd ${1+"$@"}; }
+fig_iadd () {      $FIG_DIR/iadd ${1+"$@"}; }
+iarc () {      $FIG_DIR/iarc ${1+"$@"}; }
+fig_iarc () {      $FIG_DIR/iarc ${1+"$@"}; }
+icadd () {     $FIG_DIR/icadd ${1+"$@"}; }
+fig_icadd () {     $FIG_DIR/icadd ${1+"$@"}; }
+icdiv () {     $FIG_DIR/icdiv ${1+"$@"}; }
+fig_icdiv () {     $FIG_DIR/icdiv ${1+"$@"}; }
+icmult () {    $FIG_DIR/icmult ${1+"$@"}; }
+fig_icmult () {    $FIG_DIR/icmult ${1+"$@"}; }
+icont () {     $FIG_DIR/icont ${1+"$@"}; }
+fig_icont () {     $FIG_DIR/icont ${1+"$@"}; }
+iconv3 () {    $FIG_DIR/iconv3 ${1+"$@"}; }
+fig_iconv3 () {    $FIG_DIR/iconv3 ${1+"$@"}; }
+icor16 () {    $FIG_DIR/icor16 ${1+"$@"}; }
+fig_icor16 () {    $FIG_DIR/icor16 ${1+"$@"}; }
+icset () {     $FIG_DIR/icset ${1+"$@"}; }
+fig_icset () {     $FIG_DIR/icset ${1+"$@"}; }
+icsub () {     $FIG_DIR/icsub ${1+"$@"}; }
+fig_icsub () {     $FIG_DIR/icsub ${1+"$@"}; }
+icur () {      $FIG_DIR/icur ${1+"$@"}; }
+fig_icur () {      $FIG_DIR/icur ${1+"$@"}; }
+idev () {      $FIG_DIR/idev ${1+"$@"}; }
+fig_idev () {      $FIG_DIR/idev ${1+"$@"}; }
+idiff () {     $FIG_DIR/idiff ${1+"$@"}; }
+fig_idiff () {     $FIG_DIR/idiff ${1+"$@"}; }
+idiv () {      $FIG_DIR/idiv ${1+"$@"}; }
+fig_idiv () {      $FIG_DIR/idiv ${1+"$@"}; }
+igconv () {    $FIG_DIR/igconv ${1+"$@"}; }
+fig_igconv () {    $FIG_DIR/igconv ${1+"$@"}; }
+igcur () {     $FIG_DIR/igcur ${1+"$@"}; }
+fig_igcur () {     $FIG_DIR/igcur ${1+"$@"}; }
+igrey () {     $FIG_DIR/igrey ${1+"$@"}; }
+fig_igrey () {     $FIG_DIR/igrey ${1+"$@"}; }
+ilist () {     $FIG_DIR/ilist ${1+"$@"}; }
+fig_ilist () {     $FIG_DIR/ilist ${1+"$@"}; }
+ilog () {      $FIG_DIR/ilog ${1+"$@"}; }
+fig_ilog () {      $FIG_DIR/ilog ${1+"$@"}; }
+image () {     $FIG_DIR/image ${1+"$@"}; }
+fig_image () {     $FIG_DIR/image ${1+"$@"}; }
+impos () {     $FIG_DIR/impos ${1+"$@"}; }
+fig_impos () {     $FIG_DIR/impos ${1+"$@"}; }
+imult () {     $FIG_DIR/imult ${1+"$@"}; }
+fig_imult () {     $FIG_DIR/imult ${1+"$@"}; }
+interp () {    $FIG_DIR/interp ${1+"$@"}; }
+fig_interp () {    $FIG_DIR/interp ${1+"$@"}; }
+iplots () {    $FIG_DIR/iplots ${1+"$@"}; }
+fig_iplots () {    $FIG_DIR/iplots ${1+"$@"}; }
+ipower () {    $FIG_DIR/ipower ${1+"$@"}; }
+fig_ipower () {    $FIG_DIR/ipower ${1+"$@"}; }
+irconv () {    $FIG_DIR/irconv ${1+"$@"}; }
+fig_irconv () {    $FIG_DIR/irconv ${1+"$@"}; }
+irevx () {     $FIG_DIR/irevx ${1+"$@"}; }
+fig_irevx () {     $FIG_DIR/irevx ${1+"$@"}; }
+irevy () {     $FIG_DIR/irevy ${1+"$@"}; }
+fig_irevy () {     $FIG_DIR/irevy ${1+"$@"}; }
+irflat () {    $FIG_DIR/irflat ${1+"$@"}; }
+fig_irflat () {    $FIG_DIR/irflat ${1+"$@"}; }
+irflux () {    $FIG_DIR/irflux ${1+"$@"}; }
+fig_irflux () {    $FIG_DIR/irflux ${1+"$@"}; }
+irot90 () {    $FIG_DIR/irot90 ${1+"$@"}; }
+fig_irot90 () {    $FIG_DIR/irot90 ${1+"$@"}; }
+iscan () {     $FIG_DIR/iscan ${1+"$@"}; }
+two_iscan () {     $FIG_DIR/iscan ${1+"$@"}; }
+iscrunch () {  $FIG_DIR/iscrunch ${1+"$@"}; }
+fig_iscrunch () {  $FIG_DIR/iscrunch ${1+"$@"}; }
+iscruni () {   $FIG_DIR/iscruni ${1+"$@"}; }
+fig_iscruni () {   $FIG_DIR/iscruni ${1+"$@"}; }
+isedit () {    $FIG_DIR/isedit ${1+"$@"}; }
+fig_isedit () {    $FIG_DIR/isedit ${1+"$@"}; }
+ishift () {    $FIG_DIR/ishift ${1+"$@"}; }
+fig_ishift () {    $FIG_DIR/ishift ${1+"$@"}; }
+ismooth () {   $FIG_DIR/ismooth ${1+"$@"}; }
+fig_ismooth () {   $FIG_DIR/ismooth ${1+"$@"}; }
+isplot () {    $FIG_DIR/isplot ${1+"$@"}; }
+fig_isplot () {    $FIG_DIR/isplot ${1+"$@"}; }
+istat () {     $FIG_DIR/istat ${1+"$@"}; }
+fig_istat () {     $FIG_DIR/istat ${1+"$@"}; }
+istretch () {  $FIG_DIR/istretch ${1+"$@"}; }
+fig_istretch () {  $FIG_DIR/istretch ${1+"$@"}; }
+isub () {      $FIG_DIR/isub ${1+"$@"}; }
+fig_isub () {      $FIG_DIR/isub ${1+"$@"}; }
+isubset () {   $FIG_DIR/isubset ${1+"$@"}; }
+fig_isubset () {   $FIG_DIR/isubset ${1+"$@"}; }
+isuper () {    $FIG_DIR/isuper ${1+"$@"}; }
+fig_isuper () {    $FIG_DIR/isuper ${1+"$@"}; }
+isxadd () {    $FIG_DIR/isxadd ${1+"$@"}; }
+fig_isxadd () {    $FIG_DIR/isxadd ${1+"$@"}; }
+isxdiv () {    $FIG_DIR/isxdiv ${1+"$@"}; }
+fig_isxdiv () {    $FIG_DIR/isxdiv ${1+"$@"}; }
+isxmul () {    $FIG_DIR/isxmul ${1+"$@"}; }
+fig_isxmul () {    $FIG_DIR/isxmul ${1+"$@"}; }
+isxsub () {    $FIG_DIR/isxsub ${1+"$@"}; }
+fig_isxsub () {    $FIG_DIR/isxsub ${1+"$@"}; }
+isyadd () {    $FIG_DIR/isyadd ${1+"$@"}; }
+fig_isyadd () {    $FIG_DIR/isyadd ${1+"$@"}; }
+isydiv () {    $FIG_DIR/isydiv ${1+"$@"}; }
+fig_isydiv () {    $FIG_DIR/isydiv ${1+"$@"}; }
+isymul () {    $FIG_DIR/isymul ${1+"$@"}; }
+fig_isymul () {    $FIG_DIR/isymul ${1+"$@"}; }
+isysub () {    $FIG_DIR/isysub ${1+"$@"}; }
+fig_isysub () {    $FIG_DIR/isysub ${1+"$@"}; }
+ixsmooth () {  $FIG_DIR/ixsmooth ${1+"$@"}; }
+fig_ixsmooth () {  $FIG_DIR/ixsmooth ${1+"$@"}; }
+linterp () {   $FIG_DIR/linterp ${1+"$@"}; }
+fig_linterp () {   $FIG_DIR/linterp ${1+"$@"}; }
+longslit () {  $FIG_DIR/longslit ${1+"$@"}; }
+two_longslit () {  $FIG_DIR/longslit ${1+"$@"}; }
+lsplot () {    $FIG_DIR/lsplot ${1+"$@"}; }
+fig_lsplot () {    $FIG_DIR/lsplot ${1+"$@"}; }
+lxset () {     $FIG_DIR/lxset ${1+"$@"}; }
+fig_lxset () {     $FIG_DIR/lxset ${1+"$@"}; }
+lyset () {     $FIG_DIR/lyset ${1+"$@"}; }
+fig_lyset () {     $FIG_DIR/lyset ${1+"$@"}; }
+mask () {      $FIG_DIR/mask ${1+"$@"}; }
+fig_mask () {      $FIG_DIR/mask ${1+"$@"}; }
+maskext () {   $FIG_DIR/maskext ${1+"$@"}; }
+fig_maskext () {   $FIG_DIR/maskext ${1+"$@"}; }
+mcfit () {     $FIG_DIR/mcfit ${1+"$@"}; }
+fig_mcfit () {     $FIG_DIR/mcfit ${1+"$@"}; }
+medfilt () {   $FIG_DIR/medfilt ${1+"$@"}; }
+fig_medfilt () {   $FIG_DIR/medfilt ${1+"$@"}; }
+medfiltr () {  $FIG_DIR/medfiltr ${1+"$@"}; }
+fig_medfiltr () {  $FIG_DIR/medfiltr ${1+"$@"}; }
+medsky () {    $FIG_DIR/medsky ${1+"$@"}; }
+fig_medsky () {    $FIG_DIR/medsky ${1+"$@"}; }
+moments () {   $FIG_DIR/moments ${1+"$@"}; }
+spe_moments () {   $FIG_DIR/moments ${1+"$@"}; }
+movie () {     $FIG_DIR/movie ${1+"$@"}; }
+spe_movie () {     $FIG_DIR/movie ${1+"$@"}; }
+msplot () {    $FIG_DIR/msplot ${1+"$@"}; }
+fig_msplot () {    $FIG_DIR/msplot ${1+"$@"}; }
+ncset () {     $FIG_DIR/ncset ${1+"$@"}; }
+fig_ncset () {     $FIG_DIR/ncset ${1+"$@"}; }
+offdist () {   $FIG_DIR/offdist ${1+"$@"}; }
+fig_offdist () {   $FIG_DIR/offdist ${1+"$@"}; }
+optextract () { $FIG_DIR/optextract ${1+"$@"}; }
+fig_optextract () { $FIG_DIR/optextract ${1+"$@"}; }
+overpf () {    $FIG_DIR/overpf ${1+"$@"}; }
+fig_overpf () {    $FIG_DIR/overpf ${1+"$@"}; }
+peak () {      $FIG_DIR/peak ${1+"$@"}; }
+fig_peak () {      $FIG_DIR/peak ${1+"$@"}; }
+polext () {    $FIG_DIR/polext ${1+"$@"}; }
+fig_polext () {    $FIG_DIR/polext ${1+"$@"}; }
+polysky () {   $FIG_DIR/polysky ${1+"$@"}; }
+fig_polysky () {   $FIG_DIR/polysky ${1+"$@"}; }
+profile () {   $FIG_DIR/profile ${1+"$@"}; }
+fig_profile () {   $FIG_DIR/profile ${1+"$@"}; }
+q2bad () {     $FIG_DIR/q2bad ${1+"$@"}; }
+fig_q2bad () {     $FIG_DIR/q2bad ${1+"$@"}; }
+qual2flag () { $FIG_DIR/qual2flag ${1+"$@"}; }
+fig_qual2flag () { $FIG_DIR/qual2flag ${1+"$@"}; }
+r2cmplx () {   $FIG_DIR/r2cmplx ${1+"$@"}; }
+fig_r2cmplx () {   $FIG_DIR/r2cmplx ${1+"$@"}; }
+rcgs2 () {     $FIG_DIR/rcgs2 ${1+"$@"}; }
+fig_rcgs2 () {     $FIG_DIR/rcgs2 ${1+"$@"}; }
+rdfits () {    $FIG_DIR/rdfits ${1+"$@"}; }
+fig_rdfits () {    $FIG_DIR/rdfits ${1+"$@"}; }
+rdipso () {    $FIG_DIR/rdipso ${1+"$@"}; }
+fig_rdipso () {    $FIG_DIR/rdipso ${1+"$@"}; }
+rembad () {    $FIG_DIR/rembad ${1+"$@"}; }
+fig_rembad () {    $FIG_DIR/rembad ${1+"$@"}; }
+renobj () {    $FIG_DIR/renobj ${1+"$@"}; }
+fig_renobj () {    $FIG_DIR/renobj ${1+"$@"}; }
+resamp () {    $FIG_DIR/resamp ${1+"$@"}; }
+spe_resample () {  $FIG_DIR/resamp ${1+"$@"}; }
+resample () {  $FIG_DIR/resample ${1+"$@"}; }
+fig_resample () {  $FIG_DIR/resample ${1+"$@"}; }
+rescale () {   $FIG_DIR/rescale ${1+"$@"}; }
+fig_rescale () {   $FIG_DIR/rescale ${1+"$@"}; }
+retype () {    $FIG_DIR/retype ${1+"$@"}; }
+fig_retype () {    $FIG_DIR/retype ${1+"$@"}; }
+rotx () {      $FIG_DIR/rotx ${1+"$@"}; }
+fig_rotx () {      $FIG_DIR/rotx ${1+"$@"}; }
+sclean () {    $FIG_DIR/sclean ${1+"$@"}; }
+fig_sclean () {    $FIG_DIR/sclean ${1+"$@"}; }
+scnsky () {    $FIG_DIR/scnsky ${1+"$@"}; }
+fig_scnsky () {    $FIG_DIR/scnsky ${1+"$@"}; }
+scross () {    $FIG_DIR/scross ${1+"$@"}; }
+fig_scross () {    $FIG_DIR/scross ${1+"$@"}; }
+scrunch () {   $FIG_DIR/scrunch ${1+"$@"}; }
+fig_scrunch () {   $FIG_DIR/scrunch ${1+"$@"}; }
+sdist () {     $FIG_DIR/sdist ${1+"$@"}; }
+fig_sdist () {     $FIG_DIR/sdist ${1+"$@"}; }
+setobj () {    $FIG_DIR/setobj ${1+"$@"}; }
+fig_setobj () {    $FIG_DIR/setobj ${1+"$@"}; }
+sfit () {      $FIG_DIR/sfit ${1+"$@"}; }
+fig_sfit () {      $FIG_DIR/sfit ${1+"$@"}; }
+skyliner () {  $FIG_DIR/skyliner ${1+"$@"}; }
+fig_skyliner () {  $FIG_DIR/skyliner ${1+"$@"}; }
+slice () {     $FIG_DIR/slice ${1+"$@"}; }
+fig_slice () {     $FIG_DIR/slice ${1+"$@"}; }
+soft () {      $FIG_DIR/soft ${1+"$@"}; }
+fig_soft () {      $FIG_DIR/soft ${1+"$@"}; }
+speccont () {  $FIG_DIR/speccont ${1+"$@"}; }
+spe_speccont () {  $FIG_DIR/speccont ${1+"$@"}; }
+specgrid () {  $FIG_DIR/specgrid ${1+"$@"}; }
+spe_specgrid () {  $FIG_DIR/specgrid ${1+"$@"}; }
+specplot () {  $FIG_DIR/specplot ${1+"$@"}; }
+spe_specplot () {  $FIG_DIR/specplot ${1+"$@"}; }
+spflux () {    $FIG_DIR/spflux ${1+"$@"}; }
+fig_spflux () {    $FIG_DIR/spflux ${1+"$@"}; }
+spied () {     $FIG_DIR/spied ${1+"$@"}; }
+fig_spied () {     $FIG_DIR/spied ${1+"$@"}; }
+spifit () {    $FIG_DIR/spifit ${1+"$@"}; }
+fig_spifit () {    $FIG_DIR/spifit ${1+"$@"}; }
+splot () {     $FIG_DIR/splot ${1+"$@"}; }
+fig_splot () {     $FIG_DIR/splot ${1+"$@"}; }
+sqrterr () {   $FIG_DIR/sqrterr ${1+"$@"}; }
+fig_sqrterr () {   $FIG_DIR/sqrterr ${1+"$@"}; }
+subset () {    $FIG_DIR/subset ${1+"$@"}; }
+spe_subset () {    $FIG_DIR/subset ${1+"$@"}; }
+table () {     $FIG_DIR/table ${1+"$@"}; }
+fig_table () {     $FIG_DIR/table ${1+"$@"}; }
+tippex () {    $FIG_DIR/tippex ${1+"$@"}; }
+fig_tippex () {    $FIG_DIR/tippex ${1+"$@"}; }
+trimfile () {  $FIG_DIR/trimfile ${1+"$@"}; }
+fig_trimfile () {  $FIG_DIR/trimfile ${1+"$@"}; }
+vachel () {    $FIG_DIR/vachel ${1+"$@"}; }
+fig_vachel () {    $FIG_DIR/vachel ${1+"$@"}; }
+vig () {       $FIG_DIR/vig ${1+"$@"}; }
+two_vig () {       $FIG_DIR/vig ${1+"$@"}; }
+wdfits () {    $FIG_DIR/wdfits ${1+"$@"}; }
+fig_wdfits () {    $FIG_DIR/wdfits ${1+"$@"}; }
+wdipso () {    $FIG_DIR/wdipso ${1+"$@"}; }
+fig_wdipso () {    $FIG_DIR/wdipso ${1+"$@"}; }
+xcadd () {     $FIG_DIR/xcadd ${1+"$@"}; }
+fig_xcadd () {     $FIG_DIR/xcadd ${1+"$@"}; }
+xcdiv () {     $FIG_DIR/xcdiv ${1+"$@"}; }
+fig_xcdiv () {     $FIG_DIR/xcdiv ${1+"$@"}; }
+xcmult () {    $FIG_DIR/xcmult ${1+"$@"}; }
+fig_xcmult () {    $FIG_DIR/xcmult ${1+"$@"}; }
+xcsub () {     $FIG_DIR/xcsub ${1+"$@"}; }
+fig_xcsub () {     $FIG_DIR/xcsub ${1+"$@"}; }
+xtract () {    $FIG_DIR/xtract ${1+"$@"}; }
+spe_xtract () {    $FIG_DIR/xtract ${1+"$@"}; }
+ycadd () {     $FIG_DIR/ycadd ${1+"$@"}; }
+fig_ycadd () {     $FIG_DIR/ycadd ${1+"$@"}; }
+ycdiv () {     $FIG_DIR/ycdiv ${1+"$@"}; }
+fig_ycdiv () {     $FIG_DIR/ycdiv ${1+"$@"}; }
+ycmult () {    $FIG_DIR/ycmult ${1+"$@"}; }
+fig_ycmult () {    $FIG_DIR/ycmult ${1+"$@"}; }
+ycsub () {     $FIG_DIR/ycsub ${1+"$@"}; }
+fig_ycsub () {     $FIG_DIR/ycsub ${1+"$@"}; }
+xcopi () {     $FIG_DIR/xcopi ${1+"$@"}; }
+fig_xcopi () {     $FIG_DIR/xcopi ${1+"$@"}; }
+xcopy () {     $FIG_DIR/xcopy ${1+"$@"}; }
+fig_xcopy () {     $FIG_DIR/xcopy ${1+"$@"}; }
+xcur () {      $FIG_DIR/xcur ${1+"$@"}; }
+fig_xcur () {      $FIG_DIR/xcur ${1+"$@"}; }
+xtplane () {   $FIG_DIR/xtplane ${1+"$@"}; }
+fig_xtplane () {   $FIG_DIR/xtplane ${1+"$@"}; }
+xyplane () {   $FIG_DIR/xyplane ${1+"$@"}; }
+fig_xyplane () {   $FIG_DIR/xyplane ${1+"$@"}; }
+ystract () {   $FIG_DIR/ystract ${1+"$@"}; }
+fig_ystract () {   $FIG_DIR/ystract ${1+"$@"}; }
+ytplane () {   $FIG_DIR/ytplane ${1+"$@"}; }
+fig_ytplane () {   $FIG_DIR/ytplane ${1+"$@"}; }
+fighelp () {   $FIG_DIR/fighelp ${1+"$@"}; }
+fig_fighelp () {   $FIG_DIR/fighelp ${1+"$@"}; }
+spe_help () {      $FIG_DIR/fighelp ${1+"$@"}; }
+#
+fig_exam () { echo 'The EXAM command has been removed.  Please use HDSTRACE instead.' ${1+"$@"}; }
+exam () { echo 'The EXAM command has been removed.  Please use HDSTRACE instead.' ${1+"$@"}; }
+#
+#  Turn parameter name abbreviation on
+#
+abbrev () { "setenv ADAM_ABBRV" ${1+"$@"}; }
+noabbrev () { "unsetenv ADAM_ABBRV" ${1+"$@"}; }
+#
+# Show that the Figaro commands are now available.
+#
+echo "              General data reduction"
+echo "                  Version @VERSION@"
+echo " "
+echo "          Type" \"fighelp figaro\" for help
+echo "      or" \"fighelp news\" for news on changes
+echo " "
+echo " Type" \"showme sun86\" to browse HTML documentation
+echo " "
+echo " Use" \"abbrev\" and \"noabbrev\" to turn parameter name
+echo " abbreviation on and off."
+echo " "
+#
+# end
+#
