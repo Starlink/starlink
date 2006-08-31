@@ -1,0 +1,171 @@
+#!/bin/sh
+#+
+#  Name:
+#     datacube.sh
+#
+#  Purpose:
+#     Start the DATACUBE system from sh shell.
+#
+#  Type of Module:
+#     sh shell script.
+#
+#  Usage:
+#     source datacube.sh
+#
+#  Description:
+#     This procedure defines the aliases needed to run 
+#     each application monolith.
+#
+#
+#  Authors:
+#     BLY: M.J.Bly (Starlink, RAL)
+#     PDRAPER: Peter W. Draper (Starlink, Durham University)
+#     AALLAN: Alasdair Allan (Starlink, Keele University)
+#     MJC: Malcolm J. Currie (Starlink, RAL)
+#     BC: Brad Cavanagh (JAC, Hawaii)
+#     {enter_new_authors_here}
+#
+#  History:
+#     13-OCT-1994 (BLY);
+#        Original for PHOTOM.
+#     06-NOV-1996 (PDRAPER):
+#        Added AUTOPHOTOM application.
+#     09-FEB-1999 (AALLAN):
+#        Added optional -quiet parameter.
+#     15-NOV-1999 (AALLAN):
+#        Removed the -quiet parameter that broke some scripts.
+#     05-JUN-2000 (AALLAN):
+#        Modified for use by DATACUBE.
+#     19-SEP-2000 (AALLAN):
+#        Tweaked
+#     09-NOV-2000 (AALLAN):
+#        Added links to KAPPA, FIGARO and CONVERT external applications.
+#     20-NOV-2000 (AALLAN):
+#        Incorporated changes made to source at ADASS.
+#     29-DEC-2000 (AALLAN):
+#        Added test script.
+#     08-JAN-2001 (AALLAN):
+#       Added XDialog scripts.
+#     2005 September 6 (MJC):
+#        Added definition for setaxis and wcsattrib.  Sorted KAPPA and
+#        script definitions into alphabetical order.  Removed
+#        duplicates.
+#     2005 October 11 (MJC):
+#        Added wcsframe and wcstran definitions.
+#     2005 October 19 (MJC):
+#        Removed DATACUBE applications, having been replaced by KAPPA
+#        equivalents.
+#     2005 October 31 (MJC):
+#        Add wcsadd definition.
+#     2005 October 31 (MJC):
+#        Add wcsadd definition.
+#     2006 March 2 (MJC):
+#        Add clinplot, compave, gridspec, and velmoment definitions.
+#     2006 March 9 (MJC):
+#        Add lutspec definition.
+#     2006 March 22 (MJC):
+#        Add maths and setunits definitions.
+#     2006 August 30 (BC):
+#        Adapted from datacube.csh.in.
+#     {enter_further_changes_here}
+#
+#  Copyright:
+#     Copyright (C) 2000-2006 Central Laboratory of the Research Councils
+#-
+#
+
+#  Define aliases for the scripts.
+compare () {         csh ${DATACUBE_DIR}/compare.csh ${1+"$@"}; }
+dat_compare () {     csh ${DATACUBE_DIR}/compare.csh ${1+"$@"}; }
+gridspec () {        csh ${DATACUBE_DIR}/gridspec.csh ${1+"$@"}; }
+dat_gridspec () {    csh ${DATACUBE_DIR}/gridspec.csh ${1+"$@"}; }
+multistack () {      csh ${DATACUBE_DIR}/multistack.csh ${1+"$@"}; }
+dat_multistack () {  csh ${DATACUBE_DIR}/multistack.csh ${1+"$@"}; }
+passband () {        csh ${DATACUBE_DIR}/passband.csh ${1+"$@"}; }
+dat_passband () {    csh ${DATACUBE_DIR}/passband.csh ${1+"$@"}; }
+peakmap () {         csh ${DATACUBE_DIR}/peakmap.csh ${1+"$@"}; }
+dat_peakmap () {     csh ${DATACUBE_DIR}/peakmap.csh ${1+"$@"}; }
+ripper () {          csh ${DATACUBE_DIR}/ripper.csh ${1+"$@"}; }
+dat_ripper () {      csh ${DATACUBE_DIR}/ripper.csh ${1+"$@"}; }
+squash () {          csh ${DATACUBE_DIR}/squash.csh ${1+"$@"}; }
+dat_squash () {      csh ${DATACUBE_DIR}/squash.csh ${1+"$@"}; }
+stacker () {         csh ${DATACUBE_DIR}/stacker.csh ${1+"$@"}; }
+dat_stacker () {     csh ${DATACUBE_DIR}/stacker.csh ${1+"$@"}; }
+step () {            csh ${DATACUBE_DIR}/step.csh ${1+"$@"}; }
+dat_step () {        csh ${DATACUBE_DIR}/step.csh ${1+"$@"}; }
+velmap () {          csh ${DATACUBE_DIR}/velmap.csh ${1+"$@"}; }
+dat_velmap () {      csh ${DATACUBE_DIR}/velmap.csh ${1+"$@"}; }
+velmoment () {       csh ${DATACUBE_DIR}/velmoment.csh ${1+"$@"}; }
+dat_velmoment () {   csh ${DATACUBE_DIR}/velmoment.csh ${1+"$@"}; }
+
+#  Define aliases for scripts dependant on XDialog an GTK+
+xcompare () {        csh ${DATACUBE_DIR}/compare_x.csh ${1+"$@"}; }
+
+#  Define alias for the DATACUBE test script.
+datacube_demo () {   csh ${DATACUBE_DIR}/datacube_demo.csh ${1+"$@"}; }
+datacube_test () {   csh ${DATACUBE_DIR}/datacube_demo.csh ${1+"$@"}; }
+
+#  Define aliases for external applications used by the scripts.
+add () {             ${KAPPA_DIR}/add ${1+"$@"}; }
+calc () {            ${KAPPA_DIR}/calc ${1+"$@"}; }
+cadd () {            ${KAPPA_DIR}/cadd ${1+"$@"}; }
+cdiv () {            ${KAPPA_DIR}/cdiv  ${1+"$@"}; }
+chpix () {           ${KAPPA_DIR}/chpix ${1+"$@"}; }
+collapse () {        ${KAPPA_DIR}/collapse ${1+"$@"}; }
+clinplot () {        ${KAPPA_DIR}/clinplot ${1+"$@"}; }
+compave () {         ${KAPPA_DIR}/compave ${1+"$@"}; }
+contour () {         ${KAPPA_DIR}/contour ${1+"$@"}; }
+cursor () {          ${KAPPA_DIR}/cursor ${1+"$@"}; }
+display () {         ${KAPPA_DIR}/display  ${1+"$@"}; }
+gdclear () {         ${KAPPA_DIR}/gdclear ${1+"$@"}; }
+linplot () {         ${KAPPA_DIR}/linplot  ${1+"$@"}; }
+lutcol () {          ${KAPPA_DIR}/lutable mapping=linear coltab=colour ${1+"$@"}; }
+lutgrey () {         ${KAPPA_DIR}/lutable mapping=linear coltab=grey ${1+"$@"}; }
+lutspec () {         ${KAPPA_DIR}/lutable mapping=linear coltab=external lut=$KAPPA_DIR/spectrum_lut ${1+"$@"}; }
+maths () {         ${KAPPA_DIR}/maths ${1+"$@"}; }
+ndfcopy () {         ${KAPPA_DIR}/ndfcopy ${1+"$@"}; }
+ndftrace () {        ${KAPPA_DIR}/ndftrace ${1+"$@"}; }
+paldef () {          ${KAPPA_DIR}/paldef ${1+"$@"}; }
+parget () {          ${KAPPA_DIR}/parget ${1+"$@"}; }
+picbase () {         ${KAPPA_DIR}/piclist picnum=1 ${1+"$@"}; }
+picdef () {          ${KAPPA_DIR}/picdef ${1+"$@"}; }
+piclabel () {        ${KAPPA_DIR}/piclabel ${1+"$@"}; }
+picsel () {          ${KAPPA_DIR}/picsel ${1+"$@"}; }
+setaxis () {         ${KAPPA_DIR}/setaxis ${1+"$@"}; }
+setorigin () {       ${KAPPA_DIR}/setorigin ${1+"$@"}; }
+setmagic () {        ${KAPPA_DIR}/setmagic ${1+"$@"}; }
+settitle () {        ${KAPPA_DIR}/settitle ${1+"$@"}; }
+setunits () {        ${KAPPA_DIR}/settitle ${1+"$@"}; }
+stats () {           ${KAPPA_DIR}/stats ${1+"$@"}; }
+wcsadd () {          ${KAPPA_DIR}/wcsadd ${1+"$@"}; }
+wcsattrib () {       ${KAPPA_DIR}/wcsattrib ${1+"$@"}; }
+wcscopy () {         ${KAPPA_DIR}/wcscopy ${1+"$@"}; }
+wcsframe () {        ${KAPPA_DIR}/wcsframe ${1+"$@"}; }
+wcstran () {         ${KAPPA_DIR}/wcstran ${1+"$@"}; }
+
+fitgauss () {        ${FIG_DIR}/fitgauss ${1+"$@"}; }
+specplot () {        ${FIG_DIR}/specplot ${1+"$@"}; }
+
+ascii2ndf () {       ${CONVERT_DIR}/ascii2ndf ${1+"$@"}; }
+
+#  Define alias for help application.
+cubehelp () {        ${DATACUBE_DIR}/datacube_help ${1+"$@"}; }
+
+#  Set DATACUBE_HELP.
+setenv DATACUBE_HELP   ${DATACUBE_DIR}/../../help/datacube/datacube
+
+#if ($#argv == 0 || $1 != "-quiet") then  
+      echo " "
+      echo "   DATACUBE applications are now available -- (Version @PACKAGE_VERSION@)"
+      echo "    Support is available by emailing datacube@star.rl.ac.uk"
+      echo " "
+      echo "        Type cubehelp for help on DATACUBE commands."
+      echo "   Type 'showme sun237' to browse the hypertext documentation"
+      echo "   or 'showme sc16' to consult the IFU data product cookbook."
+      echo " "
+#endif
+
+#
+# end
+#
+
