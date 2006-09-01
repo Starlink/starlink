@@ -29,7 +29,7 @@
 *     2006-08-19 (AGG)
 *        Updated APIs to sc2sim_ndfwrheat, sc2sim_ndfwrdata
 *     2006-09-01 (EC)
-*        Removed sc2sim_hor2eq
+*        Removed sc2sim_hor2eq / sc2sim_telpos / extraneous slalib #defines
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -81,25 +81,6 @@
 
 #define BOLCOL 32                      /* number of columns in a subarray */
 #define BOLROW 40                      /* number of rows in a subarray */
-
-/* -----------------------------------------------------------------------*/
-/* Extra defines required for slalib routines */
-
-#ifndef dmod
-#define dmod(A,B) ((B)!=0.0?((A)*(B)>0.0?(A)-(B)*floor((A)/(B))\
-                                        :(A)+(B)*floor(-(A)/(B))):(A))
-#endif
-
-#ifndef DS2R
-#define DS2R 7.2722052166430399038487115353692196393452995355905e-5
-#endif
-
-#ifndef D2PI
-#define D2PI 6.2831853071795864769252867665590057683943387987502
-#endif
-
-
-/* -----------------------------------------------------------------------*/
 
 void sc2sim_addpnoise 
 (
@@ -545,16 +526,5 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
                        obsMode mode, int nbol, double *pzero, int rseed, 
                        double samptime, double weights[], double *xbc, double *xbolo,
                        double *ybc, double *ybolo, int *status );
-
-void sc2sim_telpos
-( 
-double ra,           /* Right Ascension in radians (given) */
-double dec,          /* Declination in radians (given) */
-double lst,          /* local sidereal time in radians (given) */
-double *az,          /* Azimuth in radians (returned) */
-double *el,          /* Elevation in radians (returned) */
-double *p,           /* Parallactic angle in radians (returned) */
-int *status          /* global status (given and returned) */
-);
 
 #endif /* SC2SIM_DEFINED */
