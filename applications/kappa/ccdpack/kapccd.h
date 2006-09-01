@@ -48,7 +48,7 @@
 
 /* Prototypes for public functions */
 
-void ccg1_cm3dd( double *stack, int npix, int nlines, double *vars, 
+void ccg1Cm3dd( double *stack, int npix, int nlines, double *vars, 
                  double *coords, double *widths, int imeth, int minpix, 
                  int niter, float nsigma, float alpha, float rmin, float rmax, 
                  double *result, int *coind, double *wrk1, double *wrk2, 
