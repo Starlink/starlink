@@ -349,7 +349,7 @@ void kpgStatd( int bad, int el, const double data[], int nclip, const float clip
   DECLARE_DOUBLE(STDEVC);
   DECLARE_INTEGER(STATUS);
 
-  F77_CREATE_DOUBLE_ARRAY( DATA, data );
+  F77_CREATE_DOUBLE_ARRAY( DATA, el );
   F77_CREATE_REAL_ARRAY( CLIP, nclip );
 
   F77_EXPORT_LOGICAL( bad, BAD );
