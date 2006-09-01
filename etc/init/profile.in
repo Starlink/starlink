@@ -52,6 +52,13 @@ if test -f @bindir@/cupid/cupid.sh; then
    export CUPID_HELP=@starhelpdir@/cupid/cupid
 fi
 
+#  DATACUBE
+
+if test -f @bindir@/datacube/datacube.csh; then
+   export DATACUBE_DIR=@bindir@/datacube
+   export DATACUBE_HELP=@starhelpdir@/datacube/datacube
+fi
+
 #
 #  EXTRACTOR
 
@@ -60,9 +67,20 @@ if test -f @bindir@/extractor/extractor.sh; then
    export EXTRACTOR_HELP=@starhelpdir@/extractor/extractor
 fi
 
+#  FIGARO
+
+if test -f @bindir@/figaro/figaro.csh; then
+   export FIG_DIR=@bindir/figaro
+   export FIG_HELP=@starhelpdir@/figaro/figaro
+   export FIG_HTML=@exec_prefix@/docs/sun86.htx
+   export FIGARO_FORMATS="ndf,dst"
+   export FIGARO_PROG_S=@staretcdir@/figaro
+   export FIGARO_PROG_N=@bindir@/figaro
+fi
+
 #  Fluxes
 
-if test -f @bindir@/fluxes/fluxes.csh; then
+if test -f @bindir@/fluxes/fluxes.sh; then
    export FLUXES_DIR=@bindir@/fluxes
 fi
 
@@ -70,6 +88,33 @@ fi
 
 if test -f @bindir@/gaia/gaia.csh; then
    export GAIA_DIR=@bindir@/gaia
+fi
+
+#  HDSTOOLS
+
+if test -f @bindir@/hdstools/hdstools.sh; then
+   export HDSTOOLS_DIR=@bindir@/hdstools
+   export HDSTOOLS_HELP=@starhelpdir@/hdstools/hdstools
+fi
+
+#  HDSTRACE
+
+if test -f @bindir@/hdstrace; then
+   export HDSTRACE_DIR=@bindir@
+   export HDSTRACE_HELP=@starhelpdir@/hdstrace
+fi
+
+# ICL
+
+if test -f @bindir@/icl; then
+   export ADAM_PACKAGES=@starhelpdir@/adam_packages.shl
+   export ICL_LOGIN_SYS=@staretcdir@/icl_login_sys.icl
+fi
+
+#  JPL
+
+if test -f @staretcdir@/jpleph.dat; then
+   export JPL_DIR=@staretcdir@
 fi
 
 #  Kappa
@@ -86,34 +131,12 @@ if test -f @bindir@/kaprh/kaprh.sh; then
    export KAPRH_HELP=@starhelpdir@/kaprh/kaprh
 fi
 
-#  HDSTOOLS
+#  ORAC-DR
 
-if test -f @bindir@/hdstools/hdstools.sh; then
-   export HDSTOOLS_DIR=@bindir@/hdstools
-   export HDSTOOLS_HELP=@starhelpdir@/hdstools/hdstools
-fi
-
-#  HDSTRACE
-
-if test -f @bindir@/hdstrace; then
-   export HDSTRACE_DIR=@bindir@/
-   export HDSTRACE_HELP=@starhelpdir@/hdstrace
-fi
-
-#
-#  ICL
-#
-
-if test -x @bindir@/icl; then
-   export ADAM_PACKAGES=@starhelpdir@/adam_packages.shl
-   export ICL_LOGIN_SYS=@staretcdir@/icl_login_sys.icl
-fi
- 
-
-#  JPL
-
-if test -f @staretcdir@/jpleph.dat; then
-   export JPL_DIR=@staretcdir@
+if test -f @bindir@/oracdr/etc/oracdr_start.sh; then
+   export ORAC_DIR=@bindir@/oracdr
+   export ORAC_PERL5LIB=${ORAC_DIR}/lib/perl5
+   export ORAC_CAL_ROOT=${ORAC_DIR}/cal
 fi
 
 #  PERIOD
@@ -121,6 +144,13 @@ fi
 if test -f @bindir@/period/period; then
    export PERIOD_DIR=@bindir@/period
    export PERIOD_HELP=@starhelpdir@/period
+fi
+
+#  PHOTOM
+
+if test -f @bindir@/photom/photom.sh; then
+   export PHOTOM_DIR=@bindir@/photom
+   export PHOTOM_HELP=@starhelpdir@/photom/photomhelp
 fi
 
 #  Polpack
@@ -246,6 +276,18 @@ else
   cupidsetup () { @staretcdir@/notinst cupid; }
 fi
 
+#  DATACUBE
+
+if test -f @bindir@/datacube/datacube.sh; then
+   datacube () { . @bindir@/datacube/datacube.sh; }
+   datacubestart () { . @bindir@/datacube/datacube.sh; }
+   datacubesetup () { . @bindir@/datacube/datacube.sh; }
+else
+   datacube () { @staretcdir@/notinst datacube; }
+   datacubestart () { @staretcdir@/notinst datacubestart; }
+   datacubesetup () { @staretcdir@/notinst datacubesetup; }
+fi
+
 # DIPSO
 
 if test -f @bindir@/dipso/dipsosetup.sh; then
@@ -271,6 +313,24 @@ else
    extractsetup () { @staretcdir@/notinst extractsetup; }
    extractor () { @staretcdir@/notinst extractor; }
    extract () { @staretcdir@/notinst extract; }
+fi
+
+#  FIGARO
+
+if test -f @bindir@/figaro/figaro.sh; then
+   figaro () { . @bindir@/figaro/figaro.sh; }
+   figarosetup () { . @bindir@/figaro/figaro.sh; }
+   specdre () { . @bindir@/figaro/specdre.sh; }
+   specdresetup () { . @bindir@/figaro/specdre.sh; }
+   twodspec () { . @bindir@/figaro/twodspec.sh; }
+   twodspecsetup () { . @bindir@/figaro/twodspec.sh; }
+else
+   figaro () { @staretcdir@/notinst figaro; }
+   figarosetup () { @staretcdir@/notinst figarosetup; }
+   specdre () { @staretcdir@/notinst specdre; }
+   specdresetup () { @staretcdir@/notinst specdresetup; }
+   twodspec () { @staretcdir@/notinst twodspec; }
+   twodspecsetup () { @staretcdir@/notinst twodspecsetup; }
 fi
 
 # Fluxes
@@ -324,6 +384,36 @@ else
   hdstools () { @staretcdir@/notinst hdstools; }
   hdstoolssetup () { @staretcdir@/notinst hdstools; }
 fi
+
+# ORAC-DR
+
+if test -f @bindir@/oracdr/etc/profile; then
+  source @bindir@/oracdr/etc/profile
+else
+  oracdr_cgs4 () { @staretcdir@/notinst oracdr_cgs4; }
+  oracdr_classiccam () { @staretcdir@/notinst oracdr_classiccam; }
+  oracdr_gmos () { @staretcdir@/notinst oracdr_gmos; }
+  oracdr_ingrid () { @staretcdir@/notinst oracdr_ingrid; }
+  oracdr_ircam () { @staretcdir@/notinst oracdr_ircam; }
+  oracdr_ircam_old () { @staretcdir@/notinst oracdr_ircam_old; }
+  oracdr_iris2 () { @staretcdir@/notinst oracdr_iris2; }
+  oracdr_isaac () { @staretcdir@/notinst oracdr_isaac; }
+  oracdr_michelle () { @staretcdir@/notinst oracdr_michelle; }
+  oracdr_naco () { @staretcdir@/notinst oracdr_naco; }
+  oracdr_niri () { @staretcdir@/notinst oracdr_niri; }
+  oracdr_scuba () { @staretcdir@/notinst oracdr_scuba; }
+  oracdr_sofi () { @staretcdir@/notinst oracdr_sofi; }
+  oracdr_spex () { @staretcdir@/notinst oracdr_spex; }
+  oracdr_swfcam () { @staretcdir@/notinst oracdr_swfcam; }
+  oracdr_swfcam1 () { @staretcdir@/notinst oracdr_swfcam1; }
+  oracdr_swfcam2 () { @staretcdir@/notinst oracdr_swfcam2; }
+  oracdr_swfcam3 () { @staretcdir@/notinst oracdr_swfcam3; }
+  oracdr_swfcam4 () { @staretcdir@/notinst oracdr_swfcam4; }
+  oracdr_ufti () { @staretcdir@/notinst oracdr_ufti; }
+  oracdr_ufti_old () { @staretcdir@/notinst oracdr_ufti_old; }
+  oracdr_uist () { @staretcdir@/notinst oracdr_uist; }
+  xoracdr () { @staretcdir@/notinst xoracdr; }
+endif
 
 # Polpack
 
