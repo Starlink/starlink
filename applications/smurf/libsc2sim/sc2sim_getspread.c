@@ -93,11 +93,11 @@ int *status              /* global status (given and returned) */
    /* Produce some power offsets, zero mean, sigma = 1pW */
    for (bol=0; bol<numbols; bol++ ) {
       pzero[bol] = sc2sim_drand ( 1.0 );
-   }//for
+   }
 
    /* Produce some heater input ratios, mean=1.0, sigma=0.05 */
    for (bol=0; bol<numbols; bol++ ) {
       heater[bol] = 1.0 + sc2sim_drand ( 0.05 );
-   }//for
+   }
 
-}//sc2sim_getspread
+}

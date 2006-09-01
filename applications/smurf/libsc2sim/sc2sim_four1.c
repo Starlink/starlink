@@ -105,7 +105,7 @@ double data[]      /* complex signal transformed in-place - even indices
          data[j+1] = data[i+1];
          data[i] = tempr;
          data[i+1] = tempi;
-      }//if
+      }
 
       m = n / 2;
 
@@ -113,11 +113,11 @@ double data[]      /* complex signal transformed in-place - even indices
          if ( j < m ) break;
          j = j - m;
          m = m / 2;
-      }//while
+      }
 
       j = j + m;
 
-   }//for
+   }
 
    mmax = 2;
 
@@ -139,15 +139,15 @@ double data[]      /* complex signal transformed in-place - even indices
             data[j+1] = data[i+1] - tempi;
             data[i] = data[i] + tempr;
             data[i+1] = data[i+1] + tempi;
-         }//for
+         }
 
          tempr = wr;
          wr = wr * wstpr - wi * wstpi + wr;
          wi = wi * wstpr + tempr * wstpi + wi;
-      }//for
+      }
 
       mmax = istep;
 
-   }//while
+   }
 
-}//sc2sim_four1
+}

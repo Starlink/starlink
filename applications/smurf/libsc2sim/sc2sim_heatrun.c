@@ -208,7 +208,7 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 
    for ( sample=0; sample<numsamples; sample++ ) {
       heatptr[sample] = inx->heatstart + (double)sample * inx->heatstep;
-   }//for
+   }
 
    /*  Generate a full time sequence for one bolometer at a time */
 
@@ -224,7 +224,7 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 	 sigma = 1.0e-9;
 	 corner = 0.01;
 	 sc2sim_invf ( sigma, corner, samptime, DREAM__MXSIM, fnoise, status );
-      }//if
+      }
 
       /* Generate a measurement sequence for each bolometer. */
 
@@ -234,7 +234,7 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 	    flux = heatptr[sample] * heater[bol];
 	 } else {
 	    flux = heatptr[sample];
-	 }//if-else
+	 }
 
 	 /* Convert to current with bolometer power offset.
 	    The bolometer offset in PZERO(BOL) is added to the FLUX, and then
@@ -248,7 +248,7 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 
 	 output[sample] = current;
 
-      }//for
+      }
 
       /* Now output[] contains the values current for all samples in 
 	 the cycles for this bolometer. */
@@ -259,15 +259,15 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 
 	 for ( sample=0; sample<numsamples; sample++ ) {
 	    output[sample] += fnoise[sample];
-	 }//for
+	 }
 
-      }//if
+      }
 
       for ( sample=0; sample<numsamples; sample++ ) {
 	 dbuf[sample*nbol+bol] = output[sample];
-      }//for
+      }
 
-   }//for
+   }
 
    /* Digitise the numbers */
 
@@ -278,7 +278,7 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 
    for ( sample=0; sample<numsamples*nbol; sample++ ) {
       dbuf[sample] = (double)digits[sample];
-   }//for
+   }
 
    /* Perform the fit */
 
@@ -292,7 +292,7 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
       
       for ( j=0; j<nflat; j++ ) {
 	 flatpar[j] = j - 2;
-      }//for
+      }
 
    } else {
 
@@ -303,13 +303,13 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 
       for ( j=0; j<nflat; j++ ) {
 	 flatpar[j] = heatptr[j];
-      }//for
+      }
 
       for ( j=0; j<nflat*nbol; j++ ) {
 	 flatcal[j] = dbuf[j];
-      }//for
+      }
 
-   }//if-else
+   }
 
    /* Get the name of this flatfield solution */
    sprintf ( filename, "%sheat%04i%02i%02i_00001", sinx->subname, date_yr, 
@@ -333,4 +333,4 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 
    msgOutif( MSG__VERB, FUNC_NAME, "Heatrun successful.", status ); 
 
-}//sc2sim_heatrun  
+} 

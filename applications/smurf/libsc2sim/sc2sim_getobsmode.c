@@ -89,4 +89,4 @@ int *status         /* global status (given and returned) */
    else if( strcmp( name, "SINGLESCAN" ) == 0 ) return singlescan;
    else return none;
 
-}//sc2sim_getobsmode
+}

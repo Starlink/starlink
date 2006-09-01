@@ -106,7 +106,7 @@ int *status           /* global status (given and returned) */
       digits[j] = (int) ( 0.5 + ( current[j] - digcurrent ) * digscale +
         digmean );
       if ( digits[j] < 0 ) digits[j] = 0;
-   }//for
+   }
 
-}//sc2sim_digitise
+}
 

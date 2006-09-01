@@ -197,4 +197,4 @@ void smf_open_ndfname( const HDSLoc *loc, char *accmode, char *filename,
   *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, dtype, datarr, 
 				    dimens, ndims, 0, 0, NULL, NULL, status );
 
-}//smf_open_ndfname
+}

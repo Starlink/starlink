@@ -220,4 +220,4 @@ int *status        /* global status (given and returned) */
    /* Close the file */
    sc2store_free ( status );
 
-}//sc2sim_ndfwrheat
+}

@@ -109,6 +109,6 @@ int *status        /* global status (given and returned) */
    } else {
       *status = DITS__APP_ERROR;
       printf ( "sc2sim_ptoi: flux value outside bolometer range\n" );
-   }//if-else
+   }
 
-}//sc2sim_ptoi
+}

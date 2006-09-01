@@ -111,7 +111,7 @@ int *status       /* global status (given and returned) */
    for ( j=0; j<2048; j++ ) {
       spectrum[2*j] = sc2sim_drand ( 1.0 );
       spectrum[1+2*j] = 0.0;
-   }//for
+   }
 
    /* Fourier transform */
    sc2sim_four1 ( +1, 2048, spectrum );
@@ -127,7 +127,7 @@ int *status       /* global status (given and returned) */
          y = (double) ( 2048 - j );
       } else {
          y = (double) j;
-      }//if-else
+      }
 
       nu = counttonu * y;
 
@@ -137,9 +137,9 @@ int *status       /* global status (given and returned) */
       } else {
          spectrum[j*2] = spectrum[j*2] * fscale;
          spectrum[j*2+1] = spectrum[j*2+1] * fscale;
-      }//if-else
+      }
 
-   }//for
+   }
 
   /* Reverse Fourier transform */
    sc2sim_four1 ( -1, 2048, spectrum );
@@ -149,13 +149,13 @@ int *status       /* global status (given and returned) */
 
    for ( j=0; j<nsamples; j++ ) {
       fnoise[j] = fourfact * spectrum[2*j];
-   }//for
+   }
 
    /* Generate a set of random numbers with a bell-shaped distribution
       and add onto the 1/f noise */
    for ( j=0; j<nsamples; j++ ) {
       fnoise[j] = fnoise[j] + sc2sim_drand ( sigma );
-   }//for
+   }
  
 
-}//sc2sim_invf
+}

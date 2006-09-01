@@ -152,7 +152,7 @@ int *status          /* global status (given and returned) */
       if ( rmaxvel > fabs ( vmax[1] / sin(theta) ) ) 
          rmaxvel = fabs ( vmax[1] / sin(theta) );
 
-   }//if-else
+   }
 
   /* Determine whether the maximum velocity is reached before mid-way */
    c0 = cend[0] - cstart[0];
@@ -185,7 +185,7 @@ int *status          /* global status (given and returned) */
 	                0.5 * raccel * tsq * cos(theta);
             pattern[((*curroff)+j)*2+1] = cstart[1] + 
 	                0.5 * raccel * tsq * sin(theta);
-         }//for
+         }
 
          /* Constant velocity past mid way to deceleration zone */
          for ( j=jmax+1; j<=jdec; j++ ) {
@@ -195,7 +195,7 @@ int *status          /* global status (given and returned) */
                         ( rmax + rmaxvel * dtime ) * cos(theta);
             pattern[((*curroff)+j)*2+1] = cstart[1] + 
                         ( rmax + rmaxvel * dtime ) * sin(theta);
-         }//for
+         }
 
          /* Deceleration */
          for ( j=jdec+1; j<=jend; j++ ) {
@@ -205,13 +205,13 @@ int *status          /* global status (given and returned) */
 	                0.5 * raccel * tsq * cos(theta);
             pattern[((*curroff)+j)*2+1] = cend[1] - 
 	                0.5 * raccel * tsq * sin(theta);
-         }//for
+         }
 
          (*curroff) += jend + 1;
 
       } else  {
          *status = DITS__APP_ERROR;
-      }//if-else
+      }
 
    } else  {
 
@@ -227,7 +227,7 @@ int *status          /* global status (given and returned) */
 	                0.5 * raccel * tsq * cos(theta);
             pattern[((*curroff)+j)*2+1] = cstart[1] + 
 	                0.5 * raccel * tsq * sin(theta);
-         }//for
+         }
 
          for ( j=jmid+1; j<=jend; j++ ) {
             tsq = 2.0 * tmidway - (double)j * samptime;
@@ -236,14 +236,14 @@ int *status          /* global status (given and returned) */
 	                0.5 * raccel * tsq * cos(theta);
 	    pattern[((*curroff)+j)*2+1] = cend[1] -
 	                0.5 * raccel * tsq * sin(theta);
-         }//for
+         }
 
          (*curroff) += jend + 1;
 
       } else {
          *status = DITS__APP_ERROR;
-      }//if-else
+      }
 
-   }//if-else
+   }
 
-}//sc2sim_getscanseg
+}

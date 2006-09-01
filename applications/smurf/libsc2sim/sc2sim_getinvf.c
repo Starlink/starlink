@@ -107,8 +107,8 @@ int *status          /* global status (given and returned) */
       noisecoeffs[3*j] = 1.0 / nu;
       noisecoeffs[3*j+1] = sc2sim_drand ( noise );
       noisecoeffs[3*j+2] = sc2sim_drand ( noise );
-   }//for
+   }
 
-}//sc2sim_getinvf
+}
 
 

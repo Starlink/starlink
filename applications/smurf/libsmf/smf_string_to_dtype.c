@@ -93,7 +93,7 @@ void smf_string_to_dtype ( const char * datatype, smf_dtype *dtype, int * status
 	      "Supplied string is not a valid data type.   Possible programming error.",
 	      status);
       return;
-   }//if-else
+   }
 
 }
       

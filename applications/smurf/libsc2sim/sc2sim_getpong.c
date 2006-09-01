@@ -153,7 +153,7 @@ int *status          /* global status (given and returned) */
       ty = grid[j][0] * sin(angle) + grid[j][1] * cos(angle);
       grid[j][0] = tx;
       grid[j][1] = ty;
-   }//for
+   }
 
    (*pongcount) = 0;
 
@@ -165,7 +165,7 @@ int *status          /* global status (given and returned) */
       sc2sim_getscansegsize ( samptime, cstart, cend, accel, vmax, &curroff,
                               status );
       (*pongcount) += curroff;
-   }//for
+   }
 
    *posptr = smf_malloc ( (*pongcount)*2, sizeof(**posptr), 1, status );
 
@@ -178,6 +178,6 @@ int *status          /* global status (given and returned) */
       cend[1] = grid[j+1][1];
       sc2sim_getscanseg ( samptime, cstart, cend, accel, vmax, *pongcount,
                           &curroff, *posptr, status );
-   }//for
+   }
 
-}//sc2sim_getpong
+}

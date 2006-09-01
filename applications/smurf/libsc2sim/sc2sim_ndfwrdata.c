@@ -271,14 +271,14 @@ int *status       /* global status (given and returned) */
          x_max = posptr[0];
          y_min = posptr[1];
          y_max = posptr[1];
-      }//if
+      }
     
       if( posptr[i*2] < x_min ) x_min = posptr[i*2];
       if( posptr[i*2] > x_max ) x_max = posptr[i*2];
       if( posptr[i*2+1] < y_min ) y_min = posptr[i*2+1];
       if( posptr[i*2+1] > y_max ) y_max = posptr[i*2+1];
 
-   }//for
+   }
  
    map_wdth = (x_max - x_min) + 1000; /* 1000 arcsec for array FOV */
    map_hght = (y_max - y_min) + 1000; /* 1000 arcsec for array FOV */
@@ -314,4 +314,4 @@ int *status       /* global status (given and returned) */
    /* Close the file */
    sc2store_free ( status );
 
-}//sc2sim_ndfwrdata
+}

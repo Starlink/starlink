@@ -128,8 +128,8 @@ int *status              /* global status (given and returned) */
       if ( ( strcmp ( "t", argv[5] ) == 0 ) ||
            ( strcmp ( "T", argv[5] ) == 0 ) ) {
          *savebols = 1;
-      }//if
-   }//if
+      }
+   }
 
    /*  Read all parameters from the scuba_definition file */
 
@@ -140,4 +140,4 @@ int *status              /* global status (given and returned) */
 
    dream_timenow( dlength, tlength, 0, cur_day, cur_time, NULL, NULL, status );
 
-}//sc2sim_getpar
+}

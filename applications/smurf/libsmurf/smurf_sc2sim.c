@@ -284,7 +284,7 @@ void smurf_sc2sim( int *status ) {
      msgSetc( "MODE", inx.obsmode );
      errRep("", "^MODE is not a supported observation mode", status);
 
-  }//else
+   }
  
    /* Free resources */
 

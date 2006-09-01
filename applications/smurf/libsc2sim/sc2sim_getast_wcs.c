@@ -139,11 +139,11 @@ int *status                  /* global status (given and returned) */
          dbuf[i] = astsim[xnear + astnaxes[0]*ynear];
     
       else dbuf[i] = 0;
-   }//for
+   }
 
    smf_free(skycoord, status);
 
-}//sc2sim_getast_wcs
+}
 
 
 

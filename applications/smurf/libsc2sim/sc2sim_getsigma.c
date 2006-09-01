@@ -93,4 +93,4 @@ int *status            /* global status (given and returned) */
    *sigma = 1.0e12 * sqrt ( 2.0 * flux * 1.0e-12 * H * C / lambda 
         + flux * flux * 1.0e-24 * coherence / ( bandGHz * 1.0e9 ) );
 
-}//sc2sim_getsigma
+}

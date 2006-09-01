@@ -121,6 +121,6 @@ int *status        /* global status (given and returned) */
       coeffs[4] =   7.09562826E-14;
       coeffs[5] =  -7.57326701E-17;
 
-   }//if-else
+   }
 
-}//sc2sim_response
+}

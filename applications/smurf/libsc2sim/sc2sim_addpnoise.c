@@ -113,4 +113,4 @@ int *status          /* global status (given and returned) */
       Hz */
    *flux = *flux + err / sqrt(2.0*integ_time);
 
-}//sc2sim_addpnoise
+}

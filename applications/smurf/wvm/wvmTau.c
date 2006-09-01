@@ -13,6 +13,9 @@
   History:
 
 	$Log$
+	Revision 0.4  2006/09/01 18:19:22  jbalfour
+	Fixed commenting style
+	
 	Revision 0.3  2006/07/04 17:09:50  jbalfour
 	Commenting on tau2pwv lookup table
 	
@@ -150,11 +153,11 @@ double tau2pwv(double tau) {
 
   while ( tau_table[i] <= tau ) {
     i++;
-  }//while
+  }
 
   return ( double ) i / 10.0;
 
-}//tau2pwv
+}
   
   
 

@@ -145,12 +145,12 @@ int *status           /* global status (given and returned) */
          *status = DITS__APP_ERROR;
          printf ( "GETPAT: cycle_samples too large, increase DREAM__MXSIM\n" );
          return;
-      }//if
+      }
       
       for ( j=0; j<*cycle_samples; j++ ) {
          pattern[j][0] = COUNTTOSEC * 1.25 * cos ( frac * (double)(j-1) );
 	 pattern[j][1] = COUNTTOSEC * 1.25 * sin ( frac * (double)(j-1) );
-      }//for
+      }
 
    } else {
 
@@ -161,21 +161,21 @@ int *status           /* global status (given and returned) */
          *status = DITS__APP_ERROR;
          printf ( "GETPAT: cycle_samples too large, increase DREAM__MXSIM\n" );
          return;
-      }//if
+      }
 
       vertex_t = sample_t * smu_samples;
       dream_smupath ( nvert, vertex_t, jig_vert, jig_stepx, jig_stepy, 
                       move_code, smu_samples, sample_t, smu_offset,
                       *cycle_samples, pattern, status );
 
-   }//if-else
+   }
 
    if ( dream_trace(1) ) {
       printf ( "DSIM_GETPAT : %d Sample positions established\n", 
                *cycle_samples );
-   }//if
+   }
 
-}//sc2sim_getpat    
+}   
 
 
 

@@ -112,4 +112,4 @@ int *status          /* global status (given and returned) */
 
    *p = slaPa( ha, dec, phi );
 
-}//sc2sim_telpos
+}

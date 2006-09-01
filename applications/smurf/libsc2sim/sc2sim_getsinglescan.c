@@ -126,4 +126,4 @@ int *status          /* global status (given and returned) */
    sc2sim_getscanseg ( samptime, cstart, cend, accel, vmax, *scancount,
                        &offset, *posptr, status );
 
-}//sc2sim_getsinglescan
+}

@@ -237,7 +237,7 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
       strcpy( subarrays[narray], curtok );
       narray++;
       curtok = strtok (NULL, ", ");
-   }//while
+   }
 
    /*  Re-initialise random number generator to give a different sequence
        each time by using the given seed. */
@@ -247,8 +247,8 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
    for( i=0; i<DREAM__MXSIM; i++ ) {
      for( j=0; j<2; j++ ) {
        jigptr[i][j] = 0;
-     }//for
-   }//for
+     }
+   }
 
    switch( mode ) {
 
@@ -298,7 +298,7 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
      errRep("", "^MODE is not a supported observation mode", status);
      break;
 
-   }//switch
+   }
     
    msgSeti( "COUNT", count );
    msgOutif( MSG__VERB, FUNC_NAME, 
@@ -489,7 +489,7 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 	       head[j].smu_az_jig_x = jig_x_hor[firstframe+j];
 	       head[j].smu_az_jig_y = jig_y_hor[firstframe+j];
 
-	    }//for
+	    }
 
 	    /* Free pointers */
 	    /*	    sc2sim_ndfwrdata( inx->ra, inx->dec, sinx->add_atm, sinx->add_fnoise,
@@ -511,12 +511,12 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 	    start_time = (double)firstframe * samptime;
 	    outscan++;
 
-	 }//if
+	 }
 
-      }// for each frame
+      }
 
-   }//for each subarray
+   }
 
    msgOutif( MSG__VERB, FUNC_NAME, "Hits simulation successful.", status ); 
 
-}//sc2sim_simhits
+}

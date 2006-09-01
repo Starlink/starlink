@@ -98,10 +98,10 @@ int *status        /* global status (given and returned) */
       pos = ( samptime * (double) ( nweights - j - 1 ) ) / decay;
       weights[j] = 1.0 / exp(pos);
       sum = sum + weights[j];
-   }//for
+   }
 
    for ( j=0; j<nweights; j++ ) {
       weights[j] = weights[j] / sum;
-   }//for
+   }
 
-}//sc2sim_getweights
+}

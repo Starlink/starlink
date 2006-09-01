@@ -160,7 +160,7 @@ int *status          /* global status (given and returned) */
       else
          direction = 1;  
 
-   }//for  
+   }
 
    /* Allocate memory for the list of positions */
    *posptr = smf_malloc ( (*bouscount)*2, sizeof(**posptr), 1, status );
@@ -199,6 +199,12 @@ int *status          /* global status (given and returned) */
       else
          direction = 1;  
 
-   }//for
+   }
 
-}//sc2sim_getbous
+   /* Print out pointer positions */
+   for ( j = 0; j < *bouscount; j++ ) {
+      printf( "%f     %f\n", (*posptr)[j*2], (*posptr)[j*2 + 1] );
+     }
+    
+
+}

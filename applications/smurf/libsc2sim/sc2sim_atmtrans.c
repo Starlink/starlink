@@ -106,7 +106,7 @@ int *status          /* global status (given and returned) */
      zero = 102.0;
      slope = -5.0;
      /*     slope = -0.0465;*/
-   }//if-else
+   }
 
    /*   zero = 1.0;*/
    maxflux = -zero/slope;
@@ -115,13 +115,13 @@ int *status          /* global status (given and returned) */
      printf("Error: assumed sky flux, %g pW, is greater ", flux);
      printf("than maximum value, %g pW\n", maxflux);
      exit(-1);
-   }//if
+   }
 
    /* agg's version */
    /*   *trans = 100.0*(zero + slope * flux);*/ 
    *trans = zero + slope * flux;
 
-}//sc2sim_atmtrans
+}
 
 
 

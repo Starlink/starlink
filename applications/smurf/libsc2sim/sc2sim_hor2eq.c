@@ -103,4 +103,4 @@ int *status         /* global status (given and returned) */
 
    *ra = lst - ha;
 
-}//sc2sim_hor2eq
+}

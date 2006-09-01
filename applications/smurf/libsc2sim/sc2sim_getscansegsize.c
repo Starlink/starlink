@@ -140,7 +140,7 @@ int *status          /* global status (given and returned) */
       if ( rmaxvel > fabs ( vmax[1] / sin(theta) ) ) 
          rmaxvel = fabs ( vmax[1] / sin(theta) );
 
-   }//if-else
+   }
 
    /* Determine whether the maximum velocity is reached before mid-way */
    c0 = cend[0] - cstart[0];
@@ -164,8 +164,8 @@ int *status          /* global status (given and returned) */
       /* Accelerate all the way to the midway point then decelerate to the end */
       jend = (int) ( 2.0 * tmidway / samptime );
 
-   }//if-else
+   }
 
    *size = jend + 1;
 
-}//sc2sim_getscansegsize
+}

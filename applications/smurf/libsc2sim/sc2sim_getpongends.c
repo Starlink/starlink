@@ -115,10 +115,9 @@ int *status              /* global status (given and returned) */
       grid[(gridcount-1)*2-(2*j+1)][0] = -gridpos;
       grid[(gridcount-1)*2-2*j][0] = -gridpos;
       k *= -1;
-   }//for
+   }
 
    grid[gridcount*2-2][1] = -grid[gridcount*2-3][1];
    grid[0][0] = -grid[1][0];
 
-}//sc2sim_getpongends
-
+}

@@ -89,7 +89,7 @@ double sigma          /* sigma of distribution (given) */
 
    return value;
 
-}//sc2sim_drand
+}
 
 
 

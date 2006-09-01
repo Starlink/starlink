@@ -114,8 +114,8 @@ int *status            /* global status (given and returned) */
    for ( j=0; j<nboll; j++ ) {
       for ( i=0; i<ncoeff; i++ ) {
          coptr[j+i*nboll] = 0.0;
-      }//for
-   }//for
+      }
+   }
 
    if ( nframes > 10 ) {
       scan = smf_malloc ( nframes, sizeof(*scan), 1, status );
@@ -123,21 +123,21 @@ int *status            /* global status (given and returned) */
 
       for ( i=0; i<nframes; i++ ) {
          ht[i] = heat[i] - heat[nframes/2];
-      }//for
+      }
 
       for ( j=0; j<nboll; j++ ) {
 
          /* extract the values for one bolometer */
          for ( i=0; i<nframes; i++ ) {
             scan[i] = inptr[nboll*i+j] - inptr[nboll*(nframes/2)+j];
-         }//for
+         }
 
          /* fit a cubic */
          sc2math_cubfit ( nframes, scan, ht, coeff, var, status );
          
          for ( i=0; i<4; i++ ) {
             coptr[(i+2)*nboll+j] = coeff[i];
-         }//for
+         }
          coptr[j] = heat[nframes/2];
          coptr[nboll+j] = inptr[nboll*(nframes/2)+j];
 
@@ -151,13 +151,13 @@ int *status            /* global status (given and returned) */
                  + coptr[4*nboll+j] * scan[i] * scan[i]
                  + coptr[5*nboll+j] * scan[i] * scan[i] * scan[i];
                fprintf ( fd, "%e %e %e\n", inptr[nboll*i+j], heat[i], t );
-            }//fpr
+            }
             fclose ( fd );
-         }//if
-      }//for
+         }
+      }
 
       smf_free ( scan, status );
 
-   }//if
+   }
 
-}//sc2sim_fitheat
+}

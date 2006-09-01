@@ -92,7 +92,7 @@ int *status           /* global status (given and returned) */
       *trans = 100 / exp ( 26.2 * ( tauCSO - 0.014 ) );
    } else {
       *trans = 100 / exp ( 4.02 * ( tauCSO - 0.001 ) );
-   }//if-else
+   }
 
-}//sc2sim_calctrans
+}
 

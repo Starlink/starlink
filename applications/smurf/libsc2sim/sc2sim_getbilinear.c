@@ -133,6 +133,6 @@ int *status          /* global status (given and returned) */
       msgSetc("XPIX", ixpix);
       msgSetc("YPIX", iypix);
       errRep( FUNC_NAME, "data point outside image ^IPIX ^YPIX", status);
-   }//if-else
+   }
 
-}//sc2sim_getbilinear
+}

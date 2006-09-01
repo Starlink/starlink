@@ -131,5 +131,5 @@ int *status           /* global status (given and returned) */
 
    *digscale = 4.655870e+11;
 
-}//sc2sim_getscaling
+}
 

@@ -120,7 +120,7 @@ int *status          /* global status (given and returned) */
 
       /* Calculate LST from GMST using telescope longitude */
       lst[i] = fmod(gst - lon + D2PI, D2PI);
-   }//for
+   }
 
-}//sc2sim_calctime
+}
 
