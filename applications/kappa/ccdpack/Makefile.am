@@ -2,8 +2,9 @@
 
 noinst_LTLIBRARIES = libccdpack.la
 
-libccdpack_la_SOURCES = $(F_ROUTINES) $(GEN_F_ROUTINES)
+libccdpack_la_SOURCES = $(F_ROUTINES) $(GEN_F_ROUTINES) $(C_ROUTINES)
 
+C_ROUTINES = kapccd.c
 
 F_ROUTINES = ccd1_orvar.f ccg1_bmd1d.f ccg1_bmd3d.f ccg1_bmr1r.f \
 ccg1_bmr3r.f ccg1_clipd.f ccg1_clipr.f ccg1_cm1dd.f ccg1_cm1rr.f \
@@ -47,7 +48,7 @@ SUFFIXES = .gen .gn .gdr .f
 .gdr.f:
 	$(FGENERIC)  -t dr $<
 
-PRIVATE_INCLUDES = CCD1_PAR
+PRIVATE_INCLUDES = CCD1_PAR kapccd.h
 
 
 EXTRA_DIST = CCD1_PAR
