@@ -112,7 +112,8 @@
 *        Removed unnecessary fopen/ndfGtwcs calls
 *     2006-08-21 (EC)
 *        Annul sc2 frameset at each time slice after calling simframe
-
+*     2006-09-01 (JB)
+*        Removed dependence on sc2sim_telpos
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -618,10 +619,13 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
     firstframe = 0;
     
     for ( frame=0; frame<count; frame++ ) {
-      
+
+      /* JCMT is 19:49:33 N */
+      phi = ( 19.0 + (49.0/60.0) + (33.0/3600.0) ) / AST__DR2D;
+
       /* calculate the az/el corresponding to the map centre (base) */
-      sc2sim_telpos( inx->ra, inx->dec, lst[frame], 
-		     &temp1, &temp2, &temp3, status );
+      slaDe2h ( lst[frame] - inx->ra, inx->dec, phi, &temp1, &temp2 );
+      temp3 = slaPa ( lst[frame] - inx->ra, inx->dec, phi );
       
       if( *status == SAI__OK ) {
         base_az[frame] = temp1;
@@ -702,9 +706,6 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
         else airmass[frame] = 1000.;
         
         /* Calculate equatorial from horizontal */
-        
-        /* JCMT is 19:49:33 N */
-        phi = ( 19.0 + (49.0/60.0) + (33.0/3600.0) ) / AST__DR2D;
         slaDh2e( bor_az[frame], bor_el[frame], phi, &temp1, &temp2 );
         temp1 = lst[frame] - temp1;
         
