@@ -82,10 +82,10 @@ F77_SUBROUTINE(ccg1_cm3dd)( DOUBLE_ARRAY(STACK),
                             INTEGER(STATUS) );
 
 void ccg1Cm3dd( double *stack, int npix, int nlines, double *vars, 
-                 double *coords, double *widths, int imeth, int minpix, 
-                 int niter, float nsigma, float alpha, float rmin, float rmax, 
-                 double *result, int *coind, double *wrk1, double *wrk2, 
-                 double *ncon, int *point, int *used, int *status ){
+                double *coords, double *widths, int imeth, int minpix, 
+                int niter, float nsigma, float alpha, float rmin, float rmax, 
+                double *result, int *coind, double *wrk1, double *wrk2, 
+                double *ncon, int *point, int *used, int *status ){
 
    DECLARE_DOUBLE_ARRAY_DYN(STACK); 
    DECLARE_INTEGER(NPIX); 
@@ -137,13 +137,13 @@ void ccg1Cm3dd( double *stack, int npix, int nlines, double *vars,
    F77_EXPORT_REAL(alpha, ALPHA); 
    F77_EXPORT_REAL(rmin, RMIN);
    F77_EXPORT_REAL(rmax, RMAX); 
-   F77_ASSOC_DOUBLE_ARRAY(result, RESULT ); 
-   F77_ASSOC_INTEGER_ARRAY(coind, COIND ); 
-   F77_ASSOC_DOUBLE_ARRAY(wrk1, WRK1 ); 
-   F77_ASSOC_DOUBLE_ARRAY(wrk2, WRK2 ); 
-   F77_ASSOC_DOUBLE_ARRAY(ncon, NCON );
-   F77_ASSOC_INTEGER_ARRAY(point, POINT ); 
-   F77_ASSOC_LOGICAL_ARRAY(used, USED ); 
+   F77_ASSOC_DOUBLE_ARRAY(RESULT, result ); 
+   F77_ASSOC_INTEGER_ARRAY(COIND, coind ); 
+   F77_ASSOC_DOUBLE_ARRAY(WRK1, wrk1 ); 
+   F77_ASSOC_DOUBLE_ARRAY(WRK2, wrk2 ); 
+   F77_ASSOC_DOUBLE_ARRAY(NCON, ncon );
+   F77_ASSOC_INTEGER_ARRAY(POINT, point ); 
+   F77_ASSOC_LOGICAL_ARRAY(USED, used ); 
    F77_EXPORT_INTEGER(*status, STATUS);
 
    F77_CALL(ccg1_cm3dd)( DOUBLE_ARRAY_ARG(STACK), 
