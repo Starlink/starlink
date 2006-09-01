@@ -201,10 +201,4 @@ int *status          /* global status (given and returned) */
 
    }
 
-   /* Print out pointer positions */
-   for ( j = 0; j < *bouscount; j++ ) {
-      printf( "%f     %f\n", (*posptr)[j*2], (*posptr)[j*2 + 1] );
-     }
-    
-
 }
