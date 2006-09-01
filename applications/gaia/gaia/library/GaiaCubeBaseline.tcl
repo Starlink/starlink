@@ -202,7 +202,12 @@ itcl::class gaia::GaiaCubeBaseline {
       #  doesn't match the disk-file anymore.
       lassign [$itk_option(-spec_coords) get_system] system units
       if { $system != "default" && $system != {} } {
+         set keep_system_ "$system"
+         set keep_units_ "$units"
          $itk_option(-spec_coords) set_system "default" "default" 1
+      } else {
+         set keep_system_ {}
+         set keep_units_ {}
       }
       set ranges ""
       for {set i 0} {$i < $itk_option(-nranges)} {incr i} {
@@ -243,6 +248,12 @@ itcl::class gaia::GaiaCubeBaseline {
       }
       if { $file != {} } {
          $itk_option(-gaiacube) configure -cube $file
+
+         #  The original cube may have used a different coordinate system,
+         #  switch to that if we can.
+         if { $keep_system_ != {} } {
+            $itk_option(-spec_coords) set_system $keep_system_ $keep_units_ 0
+         }
       }
       blt::busy release $w_
    }
@@ -321,6 +332,10 @@ itcl::class gaia::GaiaCubeBaseline {
 
    #  The childsite of scrolledframe.
    protected variable childsite_ {}
+
+   #  The system and units of the original data.
+   protected variable keep_system_ {}
+   protected variable keep_units_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
