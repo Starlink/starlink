@@ -885,7 +885,7 @@ int *status                /* global status (given and retuned) */
    strcpy ( inx->wt0_name, XML_wt0_name );
    strcpy ( inx->wt1_name, XML_wt1_name );
 
-}//returnXML
+}
 
 
 /*+ dxml_sextod - convert a sexagesimal string into a double */

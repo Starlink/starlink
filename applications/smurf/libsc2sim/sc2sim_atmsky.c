@@ -110,8 +110,8 @@ int *status          /* global status (given and returned) */
      printf (" Error: derived sky flux, %g pW, is greater \n", *flux );
      printf ( "than maximum value, %g pW\n", maxflux);
      exit(-1);
-   }//if
+   }
 
-}//sc2sim_atmsky
+}
 
 
