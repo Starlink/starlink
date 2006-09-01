@@ -548,10 +548,8 @@ itcl::class gaia::GaiaPhotomList {
                   }
                }
                \#ANN* {
-                  if { $update } {
-                     set rest [lassign $line comment index]
-                     eval $objects_($index) setsky ANN $rest
-                  }
+                  set rest [lassign $line comment index]
+                  eval $objects_($index) setsky ANN $rest
                }
                \#* { ;#  Do nothing for comments
                }
