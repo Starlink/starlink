@@ -28,6 +28,8 @@
 *        Original
 *     2006-08-19 (AGG)
 *        Updated APIs to sc2sim_ndfwrheat, sc2sim_ndfwrdata
+*     2006-09-01 (EC)
+*        Removed sc2sim_hor2eq
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -394,16 +396,6 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
                       double coeffs[], double digcurrent, double digmean, 
                       double digscale, char filter[], double *heater, int nbol,
                       double *pzero, double samptime, int *status );
-
-void sc2sim_hor2eq
-( 
-double az,          /* Azimuth in radians (given) */
-double el,          /* Elevation in radians (given) */
-double lst,         /* local sidereal time in radians (given) */
-double *ra,         /* Right Ascension in radians (returned) */
-double *dec,        /* Declination in radians (returned) */
-int *status         /* global status (given and returned) */
-);
 
 void sc2sim_instrinit
 ( 
