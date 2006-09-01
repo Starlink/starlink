@@ -1,6 +1,6 @@
-      SUBROUTINE ARY1_REBND( PAREN, NAME, TYPE, STATE, NDIM, LBND, UBND,
-     :                       NNDIM, NLBND, NUBND, LOC, SAME, DRX, LX,
-     :                       UX, STATUS )
+      SUBROUTINE ARY1_REBND( DEFER, PAREN, NAME, TYPE, STATE, NDIM, 
+     :                       LBND, UBND, NNDIM, NLBND, NUBND, LOC, SAME, 
+     :                       DRX, LX, UX, STATUS )
 *+
 *  Name:
 *     ARY1_REBND
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARY1_REBND( PAREN, NAME, TYPE, STATE, NDIM, LBND, UBND,
-*                      NNDIM, NLBND, NUBND, LOC, SAME, DRX, LX, 
+*     CALL ARY1_REBND( DEFER, PAREN, NAME, TYPE, STATE, NDIM, LBND, 
+*                      UBND, NNDIM, NLBND, NUBND, LOC, SAME, DRX, LX, 
 *                      UX, STATUS )
 
 *  Description:
@@ -28,6 +28,10 @@
 *     bounds do not intersect.
 
 *  Arguments:
+*     DEFER = LOGICAL (Given)
+*        If .TRUE., then the array being resized has not yet been created.
+*        In this case, this routine behaves as normal except that no
+*        attempt is made to actually resize the HDS object.
 *     PAREN = CHARACTER * ( * ) (Given)
 *        HDS locator to the object's parent structure.
 *     NAME = CHARACTER * ( * ) (Given)
@@ -59,6 +63,8 @@
 *        HDS locator to the object whose bounds are to be changed. Note
 *        that changing its bounds may involve erasing the original
 *        object and creating a new one, so this locator may be changed.
+*        If DEFER is .TRUE., the supplied value is ignored, and is
+*        unchanged on exit.
 *     SAME = LOGICAL (Returned)
 *        Returns the value .TRUE. if the new array bounds are the same
 *        as the old array bounds, so that the routine had nothing to do.
@@ -66,7 +72,8 @@
 *        This argument returns a value of .TRUE. if the data regions of
 *        the old and new arrays intersect, so that at least some of the
 *        original data has been retained in the new array. A value of
-*        .FALSE. is returned if STATE is set to .FALSE..
+*        .FALSE. is returned if STATE is set to .FALSE. or if DEFER is
+*        set to .TRUE.
 *     LX( ARY__MXDIM ) = INTEGER (Returned)
 *        If DRX is returned with a value of .TRUE., then this argument
 *        returns the lower bounds of the region in the new array which
@@ -174,6 +181,8 @@
 *     18-JUL-2006 (DSB):
 *        Check for null LOC values (e.g. supplied if creation of the HDS
 *        arrays has been deferred - as is done by ARY_DUPE).
+*     1-SEP-2006 (DSB):
+*        Add an explicit DEFER argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -191,6 +200,7 @@
       INCLUDE 'ARY_CONST'        ! ARY_ private constants
 
 *  Arguments Given:
+      LOGICAL DEFER
       CHARACTER * ( * ) PAREN
       CHARACTER * ( * ) NAME
       CHARACTER * ( * ) TYPE
@@ -268,7 +278,7 @@
 
 *  Ensure that the data object is in the expected state by resetting it
 *  if appropriate.
-         IF ( .NOT. STATE .AND. LOC .NE. ARY__NOLOC ) THEN
+         IF ( .NOT. STATE .AND. .NOT. DEFER ) THEN
             CALL DAT_RESET( LOC, STATUS )
          END IF
 
@@ -298,7 +308,7 @@
 *  Now decide whether it will be necessary to make a temporary copy of
 *  the array's data while its bounds are altered. This will not be
 *  necessary if the data values are currently undefined.
-         IF ( .NOT. STATE ) THEN
+         IF ( .NOT. STATE .OR. DEFER ) THEN
             CPYDAT = .FALSE.
             DRX = .FALSE.
 
@@ -368,112 +378,117 @@
                DIM( I ) = NUBND( I ) - NLBND( I ) + 1
 10          CONTINUE
 
+*  Do not change the HDS object if the creation of the HDS data array
+*  has been deferred.
+            IF( .NOT. DEFER ) THEN 
+
 *  If a new data object is required, then annul the locator to the
 *  original object and erase it.
-            IF ( NEWOBJ ) THEN
-               IF( LOC .NE. ARY__NOLOC ) THEN
+               IF ( NEWOBJ ) THEN
                   CALL DAT_ANNUL( LOC, STATUS )
                   LOC = ARY__NOLOC
-               END IF
 
-               CALL DAT_THERE( PAREN, NAME, THERE, STATUS )
-               IF( THERE ) CALL DAT_ERASE( PAREN, NAME, STATUS )
+                  CALL DAT_THERE( PAREN, NAME, THERE, STATUS )
+                  IF( THERE ) CALL DAT_ERASE( PAREN, NAME, STATUS )
 
 *  Create the new object and obtain a locator to it.
-               CALL DAT_NEW( PAREN, NAME, TYPE, NNDIM, DIM, STATUS )
-               CALL DAT_FIND( PAREN, NAME, LOC, STATUS )
+                  CALL DAT_NEW( PAREN, NAME, TYPE, NNDIM, DIM, STATUS )
+                  CALL DAT_FIND( PAREN, NAME, LOC, STATUS )
 
 *  If the same data object is being re-used, then alter its shape.
-            ELSE IF( LOC .NE. ARY__NOLOC ) THEN 
-               CALL DAT_ALTER( LOC, NNDIM, DIM, STATUS )
+               ELSE 
+                  CALL DAT_ALTER( LOC, NNDIM, DIM, STATUS )
 
 *  Ensure that the object is in the expected state by resetting it if
 *  appropriate.
-               IF ( .NOT. STATE ) THEN
-                  CALL DAT_RESET( LOC, STATUS )
+                  IF ( .NOT. STATE ) THEN
+                     CALL DAT_RESET( LOC, STATUS )
+                  END IF
                END IF
-            END IF
 
 *  If the array's data values are defined, and a new data object has
 *  been created and/or a temporary data copy was made, then the (new)
 *  object may require initialisation before the data are returned if
 *  these will not fill it entirely.
-            IF( STATE ) THEN
-               IF ( NEWOBJ .OR. CPYDAT ) THEN
+               IF( STATE ) THEN
+                  IF ( NEWOBJ .OR. CPYDAT ) THEN
 
 *  Check to see if the temporary data copy will completely fill the
 *  object so that there is no need to initialise.
-                  FULL = CPYDAT
-                  IF ( FULL ) THEN
-                     DO 11 I = 1, NNDIM
-                        IF ( ( LX( I ) .GT. NLBND( I ) ) .OR.
-     :                       ( UX( I ) .LT. NUBND( I ) ) ) THEN
-                           FULL = .FALSE.
-                           GO TO 12
-                        END IF
-11                   CONTINUE
-12                   CONTINUE
-                  END IF
+                     FULL = CPYDAT
+                     IF ( FULL ) THEN
+                        DO 11 I = 1, NNDIM
+                           IF ( ( LX( I ) .GT. NLBND( I ) ) .OR.
+     :                          ( UX( I ) .LT. NUBND( I ) ) ) THEN
+                              FULL = .FALSE.
+                              GO TO 12
+                           END IF
+11                      CONTINUE
+12                      CONTINUE
+                     END IF
 
 *  If the object will not be filled by the returned data, then map it
 *  and initialise it to "bad" values, then unmap it.
-                  IF ( .NOT. FULL ) THEN
-                     CALL DAT_MAPV( LOC, TYPE, 'WRITE', PNTR, EL,
-     :                              STATUS )
-                     CALL ARY1_VBAD( TYPE, EL, PNTR, STATUS )
-                     CALL ARY1_HUNMP( LOC, STATUS )
-                  END IF
+                     IF ( .NOT. FULL ) THEN
+                        CALL DAT_MAPV( LOC, TYPE, 'WRITE', PNTR, EL,
+     :                                 STATUS )
+                        CALL ARY1_VBAD( TYPE, EL, PNTR, STATUS )
+                        CALL ARY1_HUNMP( LOC, STATUS )
+                     END IF
 
 *  If the same data object has been re-used and the data have remained
-*  in their original locations (i.e. no tempoary copy was necessary)
+*  in their original locations (i.e. no temporary copy was necessary)
 *  but the final dimension has been increased, then there will be a
 *  region at the end of the object to be initialised.
-               ELSE IF ( NUBND( NNDIM ) .GT. UBND( NNDIM ) ) THEN
+                  ELSE IF ( NUBND( NNDIM ) .GT. UBND( NNDIM ) ) THEN
 
 *  Calculate the stride for the object's final dimension (the amount by
 *  which the vectorised array index increases when the index of the
 *  final dimension increases by 1).
-                  STRIDE = 1
-                  DO 13 I = 1, NNDIM - 1
-                     STRIDE = STRIDE * ( NUBND( I ) - NLBND( I ) + 1 )
-13                CONTINUE
+                     STRIDE = 1
+                     DO 13 I = 1, NNDIM - 1
+                        STRIDE = STRIDE * ( NUBND( I ) - NLBND( I ) 
+     :                                                           + 1 )
+13                   CONTINUE
 
 *  Calculate the first and last elements of the region to be initialised
 *  in the vectorised data object.
-                  LSLICE( 1 ) = STRIDE *
-     :                          ( UBND( NNDIM ) - NLBND( NNDIM ) + 1 )
-     :                          + 1
-                  USLICE( 1 ) = STRIDE *
-     :                          ( NUBND( NNDIM ) - NLBND( NNDIM ) + 1 )
+                     LSLICE( 1 ) = STRIDE *
+     :                            ( UBND( NNDIM ) - NLBND( NNDIM ) + 1 )
+     :                            + 1
+                     USLICE( 1 ) = STRIDE *
+     :                           ( NUBND( NNDIM ) - NLBND( NNDIM ) + 1 )
 
 *  Vectorise the data object.
-                  LOCV = ARY__NOLOC
-                  CALL DAT_VEC( LOC, LOCV, STATUS )
+                     LOCV = ARY__NOLOC
+                     CALL DAT_VEC( LOC, LOCV, STATUS )
 
 *  Locate a slice from this vector containing the region to be
 *  initialised.
-                  LOCS = ARY__NOLOC
-                  CALL DAT_SLICE( LOCV, 1, LSLICE, USLICE, LOCS,
-     :                            STATUS )
+                     LOCS = ARY__NOLOC
+                     CALL DAT_SLICE( LOCV, 1, LSLICE, USLICE, LOCS,
+     :                               STATUS )
 
 *  Map the slice and set it to "bad" values.
-                  CALL DAT_MAPV( LOCS, TYPE, 'WRITE', PNTR, EL, STATUS )
-                  CALL ARY1_VBAD( TYPE, EL, PNTR, STATUS )
+                     CALL DAT_MAPV( LOCS, TYPE, 'WRITE', PNTR, EL, 
+     :                              STATUS )
+                     CALL ARY1_VBAD( TYPE, EL, PNTR, STATUS )
 
 *  Annul the slice and vector locators.
-                  CALL DAT_ANNUL( LOCS, STATUS )
-                  LOCS = ARY__NOLOC
-                  CALL DAT_ANNUL( LOCV, STATUS )
-                  LOCV = ARY__NOLOC
-               END IF
+                     CALL DAT_ANNUL( LOCS, STATUS )
+                     LOCS = ARY__NOLOC
+                     CALL DAT_ANNUL( LOCV, STATUS )
+                     LOCV = ARY__NOLOC
+                  END IF
 
 *  If a temporary copy of data is being held, then write it back into
 *  the appropriate region of the new object. Then erase the workspace.
-               IF ( CPYDAT ) THEN
-                  CALL ARY1_PTN( .FALSE., NNDIM, LX, UX, TYPE, TPNTR,
-     :                           LX, UX, NLBND, NUBND, TYPE, LOC,
-     :                           DCE, STATUS )
-                  CALL ARY1_ANTMP( TLOC, STATUS )
+                  IF ( CPYDAT ) THEN
+                     CALL ARY1_PTN( .FALSE., NNDIM, LX, UX, TYPE, TPNTR,
+     :                              LX, UX, NLBND, NUBND, TYPE, LOC,
+     :                              DCE, STATUS )
+                     CALL ARY1_ANTMP( TLOC, STATUS )
+                  END IF
                END IF
             END IF
          END IF
