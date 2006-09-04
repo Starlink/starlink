@@ -704,6 +704,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     17-AUG-2006 (DSB):
 *        Fix bugs so that the value of the Clean attribute is honoured
 *        even if an error has occurred.
+*     4-SEP-2006 (DSB):
+*        Modify GetClean so that it ignores the inherited status.
 *class--
 */
 
@@ -9656,6 +9658,47 @@ static void Geod( double pos[3], double *phi, double *h, double *lambda ){
 
       }
    }
+}
+
+static int GetClean( AstFitsChan *this ) {
+/*
+*  Name:
+*     GetClean
+
+*  Purpose:
+*     Return the value of the Clean attribute.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     int GetClean( AstFitsChan *this ) 
+
+*  Class Membership:
+*     FitsChan member function.
+
+*  Description:
+*     This function returns the value of the Clean attribute. Since this
+*     attribute controls the behaviour of the FitsChan in the event of an 
+*     error condition, it is is necessary to ignore any inherited error 
+*     condition when getting the attribute value. This is why the 
+*     astMAKE_GET macro is not used.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+
+*  Returned Value:
+*     The Clean value to use.
+
+*/
+
+/* Return if no FitsChan pointer was supplied. */
+   if ( !this ) return 0;
+
+/* Return the attribute value, supplying a default value of 0 (false). */
+   return ( this->clean == -1 ) ? 0 : (this->clean ? 1 : 0 );
 }
 
 static int GetObjSize( AstObject *this_object ) {
@@ -32172,7 +32215,6 @@ f     AST_READ.
 *att--
 */
 astMAKE_CLEAR(FitsChan,Clean,clean,-1)
-astMAKE_GET(FitsChan,Clean,int,0,(this->clean == -1 ? 0 : this->clean))
 astMAKE_SET(FitsChan,Clean,int,clean,( value ? 1 : 0 ))
 astMAKE_TEST(FitsChan,Clean,( this->clean != -1 ))
 
@@ -33937,6 +33979,11 @@ int astGetCard_( AstFitsChan *this ){
 int astGetNcard_( AstFitsChan *this ){
    if( !this ) return 0;
    return (**astMEMBER(this,FitsChan,GetNcard))( this );
+}
+
+int astGetClean_( AstFitsChan *this ){
+   if( !this ) return 0;
+   return (**astMEMBER(this,FitsChan,GetClean))( this );
 }
 
 const char *astGetAllWarnings_( AstFitsChan *this ){
