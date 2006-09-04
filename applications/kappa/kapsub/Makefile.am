@@ -48,7 +48,7 @@ kps1_prfmk.f kps1_prfsm.f kps1_psdim.f kps1_psevl.f kps1_psplt.f \
 kps1_pswcs.f kps1_putb.f kps1_putc.f kps1_putd.f kps1_puti.f \
 kps1_putl.f kps1_putr.f kps1_puts.f kps1_putub.f kps1_putuw.f \
 kps1_putvl.f kps1_putw.f kps1_pxdpm.f kps1_robld.f kps1_robli.f \
-kps1_roblr.f kps1_robos.f kps1_rofwd.f kps1_rolid.f kps1_rolir.f \
+kps1_roblr.f kps1_robos.f kps1_rofwd.f \
 kps1_ronnb.f kps1_ronnd.f kps1_ronni.f kps1_ronnr.f kps1_ronnub.f \
 kps1_ronnuw.f kps1_ronnw.f kps1_rorab.f kps1_rorad.f kps1_rorai.f \
 kps1_rorar.f kps1_roraub.f kps1_rorauw.f kps1_roraw.f kps1_rorbd.f \
@@ -66,7 +66,6 @@ kps1_wieou.f kps1_wiepw.f kps1_wmos0.f kps1_zpdec.f kps1_zprep.f \
 kps1_zprgb.f kps1_zprgd.f kps1_zprgi.f kps1_zprgr.f kps1_zprgub.f \
 kps1_zprguw.f kps1_zprgw.f linplt.f listsb.f lsfun1.f med3d.f medwts.f \
 medwv.f shifts.f shiftx.f shifty.f statv.f thrsr.f kps1_lmkgd.f
-
 
 
 C_ROUTINES = kps1_luted.c
@@ -89,7 +88,7 @@ KPG_N_GEN = kps1_apad.gen kps1_ardm.gen kps1_lapl.gen kps1_prmx.gen \
             kps1_cpb.gen
 
 KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr kps1_subi.gdr \
-             kps1_cnse.gdr kps1_mfed.gdr kps1_mffr.gdr
+             kps1_cnse.gdr kps1_mfed.gdr kps1_mffr.gdr kps1_roli.gdr
 
 KPG_BDIRW_GEN = kps1_dscl.gbdirw
 
