@@ -12,12 +12,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.31}
-\newcommand{\stardocnumber}    {95.31}
+\newcommand{\stardocsource}    {sun95.32}
+\newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2006 July 22}
+\newcommand{\stardocdate}      {2006 August 21}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.5}
+\newcommand{\stardocversion}   {1.6}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -15988,7 +15988,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
       The range and nature of the vertical and horizontal axes in each
       line plot can be displayed in a key to the right of the main
       plot (see parameter KEY).  Also, an option exists to add
-      numerical labels to the first ({\emph i.e.} bottom-left) line plot, see
+      numerical labels to the first (\emph{i.e.} bottom-left) line plot, see
       parameter REFLABEL.  However, due to the nature of the plot, the
       text used may often be too small to read.
    }
@@ -16015,9 +16015,9 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          This can avoid existing tick marks being over-written when
          drawing a grid of spectra over the top of a picture that
          includes annotated axes.  The dynamic default is {\tt TRUE} if and
-         only if the graphics device is not being cleared ({\emph i.e.}
+         only if the graphics device is not being cleared (\emph{i.e.}
          parameter CLEAR is {\tt FALSE}) and no spatial axes are being drawn
-         ({\emph i.e.} parameter AXES is {\tt FALSE}).  {\tt []}
+         (\emph{i.e.} parameter AXES is {\tt FALSE}).  {\tt []}
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -16192,7 +16192,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          NDF = NDF (Read)
       }{
          The input NDF structure containing the data to be displayed.
-         It should have three significant axes, {\emph i.e.} whose dimensions
+         It should have three significant axes, \emph{i.e.} whose dimensions
          are greater than 1.
       }
       \sstsubsection{
@@ -16218,7 +16218,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
       \sstsubsection{
          REFLABEL = \_LOGICAL (Read)
       }{
-         If {\tt TRUE} then the first line plot ({\emph i.e.} the lower-left
+         If {\tt TRUE} then the first line plot (\emph{i.e.} the lower-left
          spectrum) will be annotated with numerical and textual labels
          describing the two axes.  Note, due to the small size of the
          line plot, such text may be too small to read on some
@@ -38451,7 +38451,7 @@ KAPPA: \htmlref{CADD}{CADD},
    Rotates a two-dimensional NDF about its centre through any angle
 }{
    \sstdescription{
-      This routine rotates a two-dimensional array stored in an \NDFref{NDF} data
+      This routine rotates an array stored in an \NDFref{NDF} data
       structure by an arbitrary angle.  The rotation angle can be chosen
       automatically to make north vertical in the output NDF (see parameter
       ANGLE).  The origin of the rotation is around the point (0,~0) in pixel
@@ -38460,6 +38460,13 @@ KAPPA: \htmlref{CADD}{CADD},
       two methods: nearest-neighbour substitution or by bi-linear interpolation.
       The latter is slower, but gives better results.  Output pixels not
       corresponding to input pixels take the \htmlref{bad value}{se:masking}.
+
+      The NDF may have two or three dimensions.  If it has three
+      dimensions, then the rotation is applied in turn to each plane in
+      the cube and the result written to the corresponding plane in the 
+      output cube.  The orientation of the rotation plane can be
+      specified using the AXES parameter.
+
    }
    \sstusage{
       rotate in out angle
@@ -38477,9 +38484,25 @@ KAPPA: \htmlref{CADD}{CADD},
          of the current Frame vertical.
       }
       \sstsubsection{
+         AXES(2) = \_INTEGER (Read)
+      }{
+         This parameter is only accessed if the NDF has exactly three 
+         significant pixel axes.  It should be set to the indices of the
+         NDF pixel axes which span the plane in which rotation is to
+         be applied.  All pixel planes parallel to the specified plane 
+         will be rotated independently of each other.  The dynamic 
+         default comprises the indices of the first two significant 
+         axes in the NDF.  Note that excluding the first significant
+         axis may be very inefficient for large cubes; a prior 
+         reconfiguration with application PERMAXES that is compatible
+         with the dynamic default for AXES, will often prove beneficial.
+         {\tt []}
+      }
+      \sstsubsection{
          IN = NDF (Read)
       }{
-         NDF structure containing the two-dimensional array to be rotated.
+         NDF structure containing the two- or three-dimensional array to
+         be rotated.
       }
       \sstsubsection{
          NNMETH = \_LOGICAL (Read)
@@ -38579,6 +38602,21 @@ KAPPA: \htmlref{CADD}{CADD},
          is lost.  The resultant array components, all of which are
          propagated, are calculated by the nearest-neighbour method.  The
          title of the output NDF is {\tt "Reoriented features map"}.
+      }
+      \sstexamplesubsection{
+         rotate velmap rotvelmap 70
+      }{
+         This rotates the array components in the three-dimensional NDF
+         called velmap by 70 degrees clockwise around the pixel 
+         co-ordinates [0,0], and stores the result in the NDF called 
+         rotvelmap.  The rotation is applied to the first two pixel axes
+         repeated for all the planes in the cube's third pixel axis.
+      }
+      \sstexamplesubsection{
+         rotate velmap rotvelmap 70 axes=[1,3]
+      }{
+         This as the previous example except that the rotation is
+         applied in the plane given by the first and third pixel axes.
       }
    }
    \sstnotes{
@@ -50774,7 +50812,7 @@ parallel to any face of the cube.
 
 \end{itemize}
 
-\section{\xlabel{se_changes}Release Notes---V1.5\label{se:changes}}
+\section{Release Notes---V1.5}
 
 \subsection{New Attributes}
 The following new attributes have been added to the list of attributes
@@ -50983,7 +51021,25 @@ The following applications have been modified:
          bad axis centre with an extrapolated value derived from the
          increment between the next good interior pair of AXIS centres.
       \end{itemize}
-   
+
+\end{description}
+
+\section{\xlabel{se_changes}Release Notes---V1.6\label{se:changes}}
+\subsection{Modified Commands}
+The following applications have been modified:
+
+\begin{description}
+
+   \item [\htmlref{ROTATE}{ROTATE}] \mbox{}
+      \begin{itemize}
+         \item This task can now reorient three-dimensional NDFs,
+         in the sense that it will rotate all the two-dimensional 
+         planes within a three-dimensional NDF independently, applying 
+         the same rotation angle to each plane.  The rotation plane can 
+         be  parallel to any face of the cube, and is defined by a new 
+         parameter AXES.
+      \end{itemize}
+
 \end{description}
 
 \begin{latexonly}

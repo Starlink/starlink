@@ -1,3 +1,17 @@
+1 KAPPA_Version_1.6
+
+   A new release of KAPPA (v1.6) is under development.  The main 
+   changes are thus far listed below.  For complete details of all 
+   changes, see the "Release Notes" appendix in SUN/95.
+
+2 Modified_applications
+   o  ROTATE can now reorient three-dimensional NDFs, in the sense that 
+   it will rotate all the two-dimensional planes within a 
+   three-dimensional NDF independently, applying the same rotation 
+   angle to each plane.  The rotation plane can be parallel to any 
+   face of the cube, and is defined by a new parameter AXES.
+
+
 1 KAPPA_Version_1.5
 
    A new release of KAPPA (v1.5) has been made.  The main changes are
