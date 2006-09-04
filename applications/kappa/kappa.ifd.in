@@ -14148,6 +14148,16 @@ iraf! {
             helpkey *
           }
 
+         parameter axes {
+            type _INTEGER
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
+            default !
+            prompt {Indices of pixel axes spanning the rotation plane}
+            helpkey *
+            size *
+          }
+
          parameter in {
             position 1
             type NDF
