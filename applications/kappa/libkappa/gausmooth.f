@@ -279,10 +279,10 @@
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF pixel axes
       INTEGER JBOX               ! Smoothing box half-size in y
                                  ! direction
-      INTEGER NDF1               ! Identifier for input NDF
-      INTEGER NDF1B              ! Section of input NDF to be smoothed
-      INTEGER NDF2               ! Identifier for output NDF
-      INTEGER NDF2B              ! Section of output NDF to be filled
+      INTEGER NDFI               ! Identifier for input NDF
+      INTEGER NDFIB              ! Section of input NDF to be smoothed
+      INTEGER NDFO               ! Identifier for output NDF
+      INTEGER NDFOB              ! Section of output NDF to be filled
       INTEGER NERR               ! Number of type-conversion errors
       INTEGER NOFWHM             ! Number of FWHM values
       INTEGER NVAL               ! Number of BOX values
@@ -340,7 +340,7 @@
 *  possesses three significant dimensions, obtain an iteration axis
 *  through parameter AXES, so that planes along that axis can be 
 *  processed in sequence.
-      CALL KPG1_GNDFP( 'IN', 'AXES', NDIM, 'READ', NDF1, SDIM, LBND,
+      CALL KPG1_GNDFP( 'IN', 'AXES', NDIM, 'READ', NDFI, SDIM, LBND,
      :                 UBND, PERPAX, STATUS )
 
 *  Exit if an error occurred.  This is needed because the significant
@@ -489,7 +489,7 @@
 
 *  Determine if a variance component is present and derive a list of
 *  the components to be processed.
-      CALL NDF_STATE( NDF1, 'Variance', VAR, STATUS )
+      CALL NDF_STATE( NDFI, 'Variance', VAR, STATUS )
       IF ( VAR ) THEN
          COMP = 'Data,Variance'
       ELSE
@@ -499,17 +499,17 @@
 *  Determine the numeric type to be used for processing the input
 *  arrays.  This application supports single- and double-precision
 *  floating point processing.
-      CALL NDF_MTYPE( '_REAL,_DOUBLE', NDF1, NDF1, COMP, ITYPE, DTYPE,
+      CALL NDF_MTYPE( '_REAL,_DOUBLE', NDFI, NDFI, COMP, ITYPE, DTYPE,
      :                STATUS )
 
 *  Create an output NDF based on the input one.  Set an appropriate
 *  numeric type for the output arrays.
-      CALL LPG_PROP( NDF1, 'WCS,Axis,Quality,Units', 'OUT', NDF2, 
+      CALL LPG_PROP( NDFI, 'WCS,Axis,Quality,Units', 'OUT', NDFO, 
      :               STATUS )
-      CALL NDF_STYPE( DTYPE, NDF2, COMP, STATUS )
+      CALL NDF_STYPE( DTYPE, NDFO, COMP, STATUS )
 
 *  See if it is necessary to check for bad pixels in the input arrays.
-      CALL NDF_MBAD( .TRUE., NDF1, NDF1, COMP, .FALSE., BAD, STATUS )
+      CALL NDF_MBAD( .TRUE., NDFI, NDFI, COMP, .FALSE., BAD, STATUS )
 
 *  Do the steps that can be performed outside the loop.
 *  ====================================================
@@ -566,12 +566,12 @@
 *  Get identifiers for the required slices of the input and output NDF.
          LBND( PERPAX ) = PAXVAL
          UBND( PERPAX ) = PAXVAL
-         CALL NDF_SECT( NDF1, NDF__MXDIM, LBND, UBND, NDF1B, STATUS )
-         CALL NDF_SECT( NDF2, NDF__MXDIM, LBND, UBND, NDF2B, STATUS )
+         CALL NDF_SECT( NDFI, NDF__MXDIM, LBND, UBND, NDFIB, STATUS )
+         CALL NDF_SECT( NDFO, NDF__MXDIM, LBND, UBND, NDFOB, STATUS )
 
 *  Map these input and output arrays.
-         CALL KPG1_MAP( NDF1B, COMP, ITYPE, 'READ', PNTR1, EL, STATUS )
-         CALL KPG1_MAP( NDF2B, COMP, ITYPE, 'WRITE', PNTR2, EL, STATUS )
+         CALL KPG1_MAP( NDFIB, COMP, ITYPE, 'READ', PNTR1, EL, STATUS )
+         CALL KPG1_MAP( NDFOB, COMP, ITYPE, 'WRITE', PNTR2, EL, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Perform smoothing using a circular Gaussian PSF.
@@ -682,16 +682,16 @@
          END IF
 
 *  Free the section identifiers.
-         CALL NDF_ANNUL( NDF1B, STATUS )
-         CALL NDF_ANNUL( NDF2B, STATUS )
+         CALL NDF_ANNUL( NDFIB, STATUS )
+         CALL NDF_ANNUL( NDFOB, STATUS )
 
       END DO
 
 *  Set the output bad-pixel flag of the data array.
-      CALL NDF_SBAD( BADDAT, NDF2, 'Data', STATUS )
+      CALL NDF_SBAD( BADDAT, NDFO, 'Data', STATUS )
 
 *  Set the output bad-pixel flag of the variance array.
-      IF ( VAR ) CALL NDF_SBAD( BADVAR, NDF2, 'Variance', STATUS )
+      IF ( VAR ) CALL NDF_SBAD( BADVAR, NDFO, 'Variance', STATUS )
 
 *  Tidy up.
 *  ========
@@ -708,7 +708,7 @@
 *  Obtain a new title for the output NDF.  The input NDF's title was
 *  already propagated by the LPG_PROP call and so a null value will
 *  leave it unaltered.
-      CALL NDF_CINP( 'TITLE', NDF2, 'Title', STATUS )
+      CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
 
 *  End the NDF context.
    99 CONTINUE
