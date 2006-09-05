@@ -2371,7 +2371,7 @@ void astMemoryUse_( void *ptr, const char *verb ){
 *        A verb indicating what is being done to the pointer.
 *-
 */
-   if( ptr && (((Memory *)(ptr-SIZEOF_MEMORY))->id == Watched_ID ) {
+   if( ptr && ((Memory *)(ptr-SIZEOF_MEMORY))->id == Watched_ID ) {
       if( !Quiet_Use || !strcmp( verb, ISSUED ) || 
                         !strcmp( verb, FREED ) ) {
          astMemoryAlarm( verb );
