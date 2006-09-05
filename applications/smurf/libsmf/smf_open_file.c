@@ -103,6 +103,8 @@
 *     2006-07-31 (TIMJ):
 *        Use SC2STORE__MAXFITS.
 *        Calculate "instrument".
+*     2006-09-05 (JB):
+*        Check to make sure file exists
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -210,6 +212,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
   if ( *status != SAI__OK ) return;
 
+
   /* Return a null pointer to the smfData if the input grp is null */
   if ( igrp == NULL ) {
     *data = NULL;
@@ -218,6 +221,13 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
   /* Return the NDF identifier */
   ndgNdfas( igrp, index, mode, &indf, status );
+ 
+  if ( indf == NDF__NOID ) {
+     *status = SAI__ERROR;
+     errRep(FUNC_NAME, "Could not locate file", status);
+     return;
+  }
+  
   /* Determine the dimensions of the DATA component */
   ndfDim( indf, NDF__MXDIM, ndfdims, &ndims, status );
 
