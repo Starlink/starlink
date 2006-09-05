@@ -114,6 +114,8 @@
 *        Annul sc2 frameset at each time slice after calling simframe
 *     2006-09-01 (JB)
 *        Removed dependence on sc2sim_telpos
+*     2006-09-05 (JB)
+*        Check for ast & atm files.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -315,26 +317,6 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
       curtok = strtok (NULL, ", ");
     }
     
-    /* Check to ensure that the astronomical and atmospheric images exist. */
-    /* Not required
-    if ( ( f = fopen ( sinx->astname, "r" ) ) ) {
-      fclose ( f );
-    } else {
-      msgSetc ( "FILENAME", sinx->astname );          
-      msgOut(FUNC_NAME, "Cannot find astronomical file ^FILENAME", status); 
-      *status = DITS__APP_ERROR;
-      return;
-    }
-
-    if ( ( f = fopen ( sinx->atmname, "r" ) ) ) {
-      fclose ( f );
-    } else {
-      msgSetc ( "FILENAME", sinx->atmname );          
-      msgOut(FUNC_NAME, "Cannot find atmospheric file ^FILENAME", status); 
-      *status = DITS__APP_ERROR;
-      return;
-    }
-    */
   }
 
   /* Get simulation of astronomical and atmospheric images. */
@@ -347,8 +329,20 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   grpPut1 ( skygrp, sinx->atmname, 2, status );
 
   smf_open_file( skygrp, 1, "READ", 1, &astdata, status);
+
+  if ( *status != SAI__OK ) {
+    msgSetc ( "FILENAME", sinx->astname );
+    msgOut(FUNC_NAME, "Cannot find astronomical file ^FILENAME", status);
+    return;
+  }
+
   smf_open_file( skygrp, 2, "READ", 1, &atmdata, status);
-   
+
+  if ( *status != SAI__OK ) {
+    msgSetc ( "FILENAME", sinx->atmname );
+    msgOut(FUNC_NAME, "Cannot find atmospheric file ^FILENAME", status);
+    return;
+  }   
 
   /* Retrieve the astscale and atmscale from the FITS headers. */
   if( *status == SAI__OK ) {
@@ -366,22 +360,6 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   if( *status == SAI__OK ) {
     fitswcs = astdata->hdr->wcs;
   }    
-
-  /* Not Necessary
-  if( *status == SAI__OK ) {
-    astfile = astdata->file;
-    indf = astfile->ndfid;     
-    ndfGtwcs( indf, &fitswcs, status );        
-    
-    if( (fitswcs == NULL) && (*status == SAI__OK) ) { 
-      msgSetc ( "FILENAME", sinx->astname );          
-      msgOut(FUNC_NAME, "Could not retrieve wcs information from ^FILENAME.", 
-             status);
-      *status = DITS__APP_ERROR;
-      return;
-    }
-  }
-  */
 
   /* Check the dimensions of the ast and atm data. */
   if( *status == SAI__OK ) {
