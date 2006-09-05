@@ -528,9 +528,6 @@
       CALL KPG1_ASGET( INDFI, NDIM, .TRUE., .TRUE., .TRUE., SDIM, 
      :                 LBND, UBND, IWCS, STATUS )
 
-*  Get the WCS FrameSet from the NDF.
-      CALL KPG1_GTWCS( INDFI, IWCS, STATUS )
-
 *  Extract the current and base Frames, and get the number of axes in 
 *  the current Frame, and its title.
       CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
