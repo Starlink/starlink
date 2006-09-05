@@ -54,6 +54,8 @@
 *        Remove DREAM-specific checks
 *     2006-07-20 (JB):
 *        Split from dsim.c
+*     2006-09-05 (JB):
+*        Check for obsXML and simXML files
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -86,9 +88,18 @@
 
 /* SC2SIM includes */
 #include "sc2sim.h"
-
 #include "dream.h"
 #include "dxml.h"
+
+#include "ast.h"
+#include "fitsio.h"
+#include "mers.h"
+#include "par.h"
+#include "par_par.h"
+#include "prm_par.h"
+#include "sae_par.h"
+
+#define FUNC_NAME "sc2sim_getpar"
 
 void sc2sim_getpar
 ( 
@@ -134,8 +145,23 @@ int *status              /* global status (given and returned) */
    /*  Read all parameters from the scuba_definition file */
 
    dxml_readXML ( obs_name, status );
+
+   if ( *status != SAI__OK ) {
+     msgSetc ( "FILENAME", obs_name );
+     msgOut(FUNC_NAME, "Cannot find file ^FILENAME", status);
+     return;
+   }  
+    
    dxml_returnXML ( inx, status );
+
    dxml_readsimXML ( sim_name, status );
+
+   if ( *status != SAI__OK ) {
+     msgSetc ( "FILENAME", obs_name );
+     msgOut(FUNC_NAME, "Cannot find file ^FILENAME", status);
+     return;
+   } 
+
    dxml_returnsimXML ( sinx, status );
 
    dream_timenow( dlength, tlength, 0, cur_day, cur_time, NULL, NULL, status );
