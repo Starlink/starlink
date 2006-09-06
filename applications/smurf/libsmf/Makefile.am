@@ -30,7 +30,8 @@ smf_create_smfArray.c smf_addto_smfArray.c \
 smf_calc_mapcoord.c smf_simplerebinmap.c smf_iteratemap.c \
 smf_open_mapcoord.c smf_close_mapcoord.c smf_get_gridcoords.c \
 smf_model_create.c smf_model_getname.c smf_open_newfile.c smf_open_ndf.c \
-smf_open_ndfname.c smf_string_to_dtype.c smf_create_lutwcs.c
+smf_open_ndfname.c smf_string_to_dtype.c smf_create_lutwcs.c \
+smf_calc_telpos.c smf_telpos_get.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 

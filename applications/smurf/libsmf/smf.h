@@ -108,6 +108,8 @@
 *        smf_open_newfile should take dim_t
 *     2006-08-16 (EC):
 *        changed interface for smf_model_getname
+*     2006-09-06 (EC):
+*        added smf_calc_telpos, smf_create_lutwcs and smf_telpos_get
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -158,6 +160,9 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
 
 void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int *lbnd_out,
                         int *ubnd_out, int *status );
+
+void smf_calc_telpos( double obsgeo[3], char telName[], double telpos[3],
+		      int *status );
 
 double smf_calc_wvm( const smfHead *hdr, int *status );
 
@@ -368,6 +373,8 @@ void smf_string_to_dtype ( const char * datatype, smf_dtype *dtype, int * status
 void smf_subtract_plane( smfData *data, const char *fittype, int *status);
 
 void smf_subtract_poly( smfData *data, int *status );
+
+void smf_telpos_get( const smfHead * hdr, int * status );
 
 void smf_tslice ( const smfData *idata, smfData **tdata, int index, 
                   int *status );

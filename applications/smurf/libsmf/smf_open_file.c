@@ -106,7 +106,7 @@
 *     2006-09-05 (JB):
 *        Check to make sure file exists
 *     2006-09-05 (EC):
-*        Call aztec_fill_smfHead
+*        Call aztec_fill_smfHead, smf_telpos_get
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -344,6 +344,9 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	  errRep(FUNC_NAME, "File has no FITS header - continuing but this may cause problems later", status );
 	  errAnnul( status );
 	}
+
+	/* Determine and store the telescope location in hdr->telpos */
+	smf_telpos_get( hdr, status );
 
 	/* Determine the instrument */
 	hdr->instrument = smf_inst_get( hdr, status );
