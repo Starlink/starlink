@@ -213,6 +213,12 @@ smfGroup *
 smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups, 
 			const int nrelated, int *status );
 
+void smf_create_lutwcs( int clearcache, const double *fplane_x, 
+			const double *fplane_y, const int n_pix, 
+			const JCMTState *state, const double fplane_off[2], 
+                        const double telpos[3], AstFrameSet **fset, 
+			int *status );
+
 smfArray *smf_create_smfArray( const size_t size, int *status );
 
 smfDA * smf_create_smfDA( int * status );

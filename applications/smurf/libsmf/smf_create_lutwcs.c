@@ -14,9 +14,11 @@
 *     Library routine
 
 *  Invocation:
-*     smf_create_lutwcs( int clearcache, double *fplane_x, double *fplane_y, 
-*                        int n_pix, JCMTState *state, double fplane_off[2], 
-*                         AstFrameSet **fset, int *status )
+*     smf_create_lutwcs( int clearcache, const double *fplane_x, 
+*                        const double *fplane_y, const int n_pix, 
+*        		 const JCMTState *state, const double fplane_off[2], 
+*                   	 const double telpos[3], AstFrameSet **fset, 
+*                         int *status )
 
 *  Arguments:
 *     clearcache = int (Given)
@@ -34,6 +36,8 @@
 *        Current JCMT state (time, pointing etc.)
 *     fplane_off = double[2] (Given)
 *        Additional focal plane offsets that may be applied.
+*     telpos = double[3] (Given)
+*        LON / Lat / altitude of the telscope (deg/deg/metres)
 *     fset = AstFrameSet** (Returned)
 *        Constructed frameset.
 *     status = int* (Given and Returned)
@@ -121,9 +125,11 @@
 #define JCMT_LON "W155:28:37.20"       /* Longitude of JCMT */
 #define JCMT_LAT "N19:49:22.11"        /* Geodetic latitude of JCMT */
 
-void smf_create_lutwcs( int clearcache, double *fplane_x, double *fplane_y, 
-                        int n_pix, JCMTState *state, double fplane_off[2], 
-                        AstFrameSet **fset, int *status ) {
+void smf_create_lutwcs( int clearcache, const double *fplane_x, 
+			const double *fplane_y, const int n_pix, 
+			const JCMTState *state, const double fplane_off[2], 
+                        const double telpos[3], AstFrameSet **fset, 
+			int *status ) {
 
   /* Local Variables */
   double a;                       /* rotation angle */
