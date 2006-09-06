@@ -2,7 +2,7 @@
 
 # Build libsmf before the applications
 
-SUBDIRS = libsmf libsmurf libsc2sim libacsis
+SUBDIRS = libsmf libsmurf libsc2sim libacsis libaztec
 
 # can not use surf_mon_FCFLAGS yet
 AM_FCFLAGS = -Isrc -Isc2da
@@ -31,8 +31,9 @@ WVM_FILES = wvm/wvmOpt.c wvm/wvmTau.c wvm/wvmCal.c
 
 # Linking
 
-smurf_mon_LDADD = libsmurf/libsmurf.la libsc2sim/libsc2sim.la libsmf/libsmf.la \
-                  libacsis/libacsis.la  `$(srcdir)/smurf_link_adam`
+smurf_mon_LDADD = libsmurf/libsmurf.la libsc2sim/libsc2sim.la \
+                  libsmf/libsmf.la libacsis/libacsis.la libaztec/libaztec.la \
+                  `$(srcdir)/smurf_link_adam`
 
 # Dynamically generated scripts
 DYNSCRIPTS = smurf.sh smurf.csh smurf.icl

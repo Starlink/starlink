@@ -105,6 +105,8 @@
 *        Calculate "instrument".
 *     2006-09-05 (JB):
 *        Check to make sure file exists
+*     2006-09-05 (EC):
+*        Call aztec_fill_smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -148,6 +150,7 @@
 #include "star/kaplibs.h"
 #include "kpg_err.h"
 #include "libacsis/acsis.h"
+#include "libaztec/aztec.h"
 
 #define FUNC_NAME "smf_open_file"
 
@@ -356,7 +359,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	  acs_fill_smfHead( hdr, indf, status );
 	  break;
 	case INST__AZTEC:
-	  /* aztec_fill_smfHead( hdr, NDF__NOID, status ); */
+	  aztec_fill_smfHead( hdr, NDF__NOID, status );
 	  break;
 	default:
 	  break;

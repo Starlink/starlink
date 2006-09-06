@@ -129,7 +129,8 @@ dnl Ask for a config.h so that we can retain control of when to define
 dnl parameters. And also to simplify the build line
 AC_CONFIG_HEADERS(config.h)
 
-AC_CONFIG_FILES(Makefile smurf.ifd component.xml libsmurf/Makefile libsmf/Makefile \
-                libsc2sim/Makefile libacsis/Makefile)
+AC_CONFIG_FILES(Makefile smurf.ifd component.xml libsmurf/Makefile \
+                libsmf/Makefile libsc2sim/Makefile libacsis/Makefile \
+                libaztec/Makefile)
 
 AC_OUTPUT
