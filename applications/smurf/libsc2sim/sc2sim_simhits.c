@@ -77,6 +77,8 @@
 *        Replaced call to sc2sim_hor2eq with call to slaDh2e
 *     2006-09-01 (JB)
 *        Removed dependence on sc2sim_telpos
+*     2006-09-06 (EC)
+*        Modified ndfwrdata call to include INSTRUME keyword
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -503,7 +505,8 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 			      posptr, inx->obsmode, status );*/
 	    sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, nwrite, nflat, 
 			      flatname, head, digits, dksquid, flatcal, 
-			      flatpar, filter, posptr, jigsamples, jigptr, status);
+			      flatpar, "SCUBA-2", filter, posptr, jigsamples, 
+			      jigptr, status);
 
 	    msgSetc( "FILENAME", filename );
 	    msgOut( FUNC_NAME, "Done ^FILENAME", status ); 

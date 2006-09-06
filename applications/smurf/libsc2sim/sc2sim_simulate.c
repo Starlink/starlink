@@ -116,6 +116,8 @@
 *        Removed dependence on sc2sim_telpos
 *     2006-09-05 (JB)
 *        Check for ast & atm files.
+*     2006-09-06 (EC)
+*        Modified ndfwrdata call to include INSTRUME keyword
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -834,8 +836,8 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 			  &(posptr[firstframe*2]), inx->obsmode, status );*/
 	sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, nwrite, nflat, 
 			  flatname, head, digits, dksquid, flatcal, 
-			  flatpar, filter, &(posptr[firstframe*2]), jigsamples, 
-			  jigptr, status);
+			  flatpar, "SCUBA-2", filter, 
+			  &(posptr[firstframe*2]), jigsamples, jigptr, status);
 
 	msgSetc( "FILENAME", filename );
 	msgOut( FUNC_NAME, "Done ^FILENAME", status ); 

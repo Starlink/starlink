@@ -83,6 +83,8 @@
 *        Update API to take:
 *        - pointers to inx and sinx structs
 *        - DREAM jiggle position parameters
+*     2006-09-06 (EC):
+*        INSTRUME keyword now taken as argument (to accomodate AzTEC)
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -136,6 +138,7 @@ int *dbuf,        /* simulated data (given) */
 int *dksquid,     /* dark SQUID time stream data (given) */
 double *fcal,     /* flatfield calibration (given) */
 double *fpar,     /* flat-field parameters (given) */
+char instrume[],  /* String representing instrument (e.g. "SCUBA-2") (given) */
 char filter[],    /* String representing filter (e.g. "850") (given) */
 double *posptr,   /* Pointing offsets from map centre (given) */
 int jigsamples,   /* Number of jiggle samples (given) */
@@ -248,8 +251,12 @@ int *status       /* global status (given and returned) */
 		   "Observing mode", status );
 
    fhead_putfits ( TSTRING,
-		   "INSTRUME", "SCUBA-2",
-		   "Instrument type", status );
+		   "INSTRUME", instrume,
+		   "Instrument name", status );
+
+   fhead_putfits ( TSTRING,
+		   "TELESCOP", "JCMT",
+		   "Name of telescope", status );
    
   if ( strncmp( inx->obsmode, "DREAM", 5) == 0 ) {
     fhead_putfits ( TINT,

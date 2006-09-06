@@ -410,7 +410,8 @@ void smurf_impaztec( int *status ) {
 
   /* write the ndf file */
   sc2sim_ndfwrdata( &inx, &sinx, meanwvm, ndffile, numsamples, nflat, 
-		    "POLYNOMIAL", head, dbuf, dksquid, fcal, fpar, "1100",
+		    "POLYNOMIAL", head, dbuf, dksquid, fcal, fpar, 
+		    "AZTEC", "1100",
 		    posptr, 0, NULL, status ); 
 		   
   /* call using the old ndfwrdata interface

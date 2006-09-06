@@ -30,6 +30,8 @@
 *        Updated APIs to sc2sim_ndfwrheat, sc2sim_ndfwrdata
 *     2006-09-01 (EC)
 *        Removed sc2sim_hor2eq / sc2sim_telpos / extraneous slalib #defines
+*     2006-09-06 (EC)
+*        Modified interface to ndfwrdata to take INSTRUME as parameter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -429,6 +431,7 @@ int *dbuf,        /* simulated data (given) */
 int *dksquid,     /* dark SQUID time stream data (given) */
 double *fcal,     /* flatfield calibration (given) */
 double *fpar,     /* flat-field parameters (given) */
+char instrume[],  /* String representing instrument (e.g. "SCUBA-2") (given) */
 char filter[],    /* String representing filter (e.g. "850") (given) */
 double *posptr,   /* Pointing offsets from map centre */
 int jigsamples,   /* Number of jiggle samples (given) */
