@@ -46,7 +46,7 @@
 *     2006-07-08 (EC)
 *        Replace cut-and-pasted slaGmst with library call 
 *     2006-09-05 (JB)
-*        Replace D2PI with 2.0 * AST__DPI
+*        Included smurf_par.h
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -82,6 +82,7 @@
 
 /* SC2SIM includes */
 #include "sc2sim.h"
+#include "smurf_par.h"
 
 void sc2sim_calctime
 ( 
@@ -121,7 +122,7 @@ int *status          /* global status (given and returned) */
       gst = slaGmst( ut[i] );
 
       /* Calculate LST from GMST using telescope longitude */
-      lst[i] = fmod(gst - lon + ( 2.0 * AST__DPI ), ( 2.0 * AST__DPI ) );
+      lst[i] = fmod(gst - lon + D2PI, D2PI );
    }
 
 }
