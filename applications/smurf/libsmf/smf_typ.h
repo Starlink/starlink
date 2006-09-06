@@ -24,7 +24,7 @@
 *     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
-*  History:
+*  History:n
 *     2005-11-02 (AGG):
 *        Initial test version
 *     2005-11-07 (TIMJ):
@@ -62,6 +62,8 @@
 *        Add time series wcs (tswcs) to distinguish from 2d wcs in smfHead
 *     2006-08-01 (AGG):
 *        Add SMF__MAP_VAR and SMF__MAP_QUAL flags
+*     2006-09-01 (EC):
+*        Added telpos to smfHead 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -153,7 +155,7 @@ typedef struct smfHead {
   const JCMTState *state;   /* Pointer to current STATE */
   inst_t     instrument;    /* Instrument code */
   AstFrameSet * wcs;        /* Frameset for a particular time slice (frame) */
-  AstFrameSet * tswcs;      /* Frameset for full time series (if time series) */
+  AstFrameSet * tswcs;      /* Frameset for full time series (if tseries) */
   AstFitsChan * fitshdr;    /* FITS header from the file */
   dim_t curframe;           /* Index corresponding to current frame */
   dim_t nframes;            /* Number of frames in smfData */
@@ -163,6 +165,7 @@ typedef struct smfHead {
   unsigned int ndet;        /* Number of focal plane detectors */
   const double * fplanex;   /* X coords (radians) of focal plane detectors */
   const double * fplaney;   /* Y coords (radians) of focal plane detectors */
+  const double telpos[3];   /* Lon/LAT/Alt of telescope (deg/deg/m) */
 } smfHead;
 
 /* This structure contains ancilliary information obtained from a raw
