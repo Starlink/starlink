@@ -124,7 +124,7 @@ fi
 #  FIGARO
 
 if test -f @bindir@/figaro/figaro.csh; then
-   export FIG_DIR=@bindir/figaro
+   export FIG_DIR=@bindir@/figaro
    export FIG_HELP=@starhelpdir@/figaro/figaro
    export FIG_HTML=@exec_prefix@/docs/sun86.htx
    export FIGARO_FORMATS="ndf,dst"
