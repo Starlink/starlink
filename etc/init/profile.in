@@ -23,39 +23,39 @@ test "${ZSH_VERSION+set}" = set && alias -g '${1+"$@"}'='"$@"'
 
 # Add Starlink directories to relevant paths.
 tmppath="${PATH}"
-if( `echo ${tmppath} | grep -c ':@bindir@/startcl:'` != 0); then
+if((`echo ${tmppath} | grep -c ':@bindir@/startcl:'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#:@bindir@/startcl:#:#g'`
 fi
 
-if(`echo ${tmppath} | grep -c ':@bindir@/startcl$'` != 0); then
+if((`echo ${tmppath} | grep -c ':@bindir@/startcl$'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#:@bindir@/startcl##g'`
 fi
 
-if(`echo ${tmppath} | grep -c '^@bindir@/startcl'` != 0); then
+if((`echo ${tmppath} | grep -c '^@bindir@/startcl'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#@bindir@/startcl:##g'`
 fi
 
-if(`echo ${tmppath} | grep -c ':@bindir@:'` != 0); then
+if((`echo ${tmppath} | grep -c ':@bindir@:'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#:@bindir@:#:#g'`
 fi
 
-if(`echo ${tmppath} | grep -c ':@bindir@$'` != 0); then
+if((`echo ${tmppath} | grep -c ':@bindir@$'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#:@bindir@##g'`
 fi
 
-if(`echo ${tmppath} | grep -c '^@bindir@'` != 0); then
+if((`echo ${tmppath} | grep -c '^@bindir@'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#@bindir@:##g'`
 fi
 
-if(`echo ${tmppath} | grep -c ':@starjavadir@/bin:'` != 0); then
+if((`echo ${tmppath} | grep -c ':@starjavadir@/bin:'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#:@starjavadir@/bin:#:#g'`
 fi
 
-if(`echo ${tmppath} | grep -c ':@starjavadir@/bin$'` != 0); then
+if((`echo ${tmppath} | grep -c ':@starjavadir@/bin$'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#:@starjavadir@/bin##g'`
 fi
 
-if(`echo ${tmppath} | grep -c '^@starjavadir@/bin'` != 0); then
+if((`echo ${tmppath} | grep -c '^@starjavadir@/bin'`)); then
     tmppath=`echo ${tmppath} | sed -e 's#@starjavadir@:##g'`
 fi
 
@@ -461,7 +461,7 @@ else
   oracdr_ufti_old () { @staretcdir@/notinst oracdr_ufti_old; }
   oracdr_uist () { @staretcdir@/notinst oracdr_uist; }
   xoracdr () { @staretcdir@/notinst xoracdr; }
-endif
+fi
 
 # Polpack
 
