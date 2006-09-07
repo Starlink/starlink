@@ -200,6 +200,12 @@ if test -f @bindir@/period/period; then
    export PERIOD_HELP=@starhelpdir@/period
 fi
 
+#  PGPLOT
+
+if test -z "${PGPLOT_DIR}"; then
+   export PGPLOT_DIR=@bindir@/
+fi
+
 #  PHOTOM
 
 if test -f @bindir@/photom/photom.sh; then
@@ -212,14 +218,6 @@ fi
 if test -f @bindir@/polpack/polpack.sh; then
    export POLPACK_DIR=@bindir@/polpack
    export POLPACK_HELP=@starhelpdir@/polpack/polpack
-fi
-
-#
-#  PHOTOM
-
-if test -f @bindir@/photom/photom.sh; then
-   export PHOTOM_DIR=@bindir@/photom
-   export PHOTOM_HELP=@starhelpdir@/photom/photomhelp
 fi
 
 #
