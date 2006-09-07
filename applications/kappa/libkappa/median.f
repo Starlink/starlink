@@ -320,6 +320,9 @@
 *        by ",WCS".
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     7-SEP-2006 (DSB):
+*        Initialise NSTEP before getting parameter STEP, in order to avoid 
+*        seg faults in the event of an earlier error.
 *     {enter_further_changes_here}
 
 *-
@@ -472,6 +475,7 @@
 
 *  There must be between 1 and MAXSTP step values, and each one must be
 *  in the range 1 to MXSTEP.
+      NSTEP = 0
       CALL PAR_GDRVI( 'STEP', MAXSTP, 1, MAXSTP, STEP, NSTEP, STATUS )
 
 *  Determine the largest step size specified.
