@@ -21,6 +21,60 @@
 # Make ${1+"$@"} portability feature work on zsh, too.
 test "${ZSH_VERSION+set}" = set && alias -g '${1+"$@"}'='"$@"'
 
+# Add Starlink directories to relevant paths.
+tmppath="${PATH}"
+if( `echo ${tmppath} | grep -c ':@bindir@/startcl:'` != 0); then
+    tmppath=`echo ${tmppath} | sed -e 's#:@bindir@/startcl:#:#g'`
+fi
+
+if(`echo ${tmppath} | grep -c ':@bindir@/startcl$'` != 0); then
+    tmppath=`echo ${tmppath} | sed -e 's#:@bindir@/startcl##g'`
+fi
+
+if(`echo ${tmppath} | grep -c '^@bindir@/startcl'` != 0); then
+    tmppath=`echo ${tmppath} | sed -e 's#@bindir@/startcl:##g'`
+fi
+
+if(`echo ${tmppath} | grep -c ':@bindir@:'` != 0); then
+    tmppath=`echo ${tmppath} | sed -e 's#:@bindir@:#:#g'`
+fi
+
+if(`echo ${tmppath} | grep -c ':@bindir@$'` != 0); then
+    tmppath=`echo ${tmppath} | sed -e 's#:@bindir@##g'`
+fi
+
+if(`echo ${tmppath} | grep -c '^@bindir@'` != 0); then
+    tmppath=`echo ${tmppath} | sed -e 's#@bindir@:##g'`
+fi
+
+if(`echo ${tmppath} | grep -c ':@starjavadir@/bin:'` != 0); then
+    tmppath=`echo ${tmppath} | sed -e 's#:@starjavadir@/bin:#:#g'`
+fi
+
+if(`echo ${tmppath} | grep -c ':@starjavadir@/bin$'` != 0); then
+    tmppath=`echo ${tmppath} | sed -e 's#:@starjavadir@/bin##g'`
+fi
+
+if(`echo ${tmppath} | grep -c '^@starjavadir@/bin'` != 0); then
+    tmppath=`echo ${tmppath} | sed -e 's#@starjavadir@:##g'`
+fi
+
+export PATH="${tmppath}:@bindir@/startcl:@bindir@:@starjavadir@/bin"
+
+#
+#     Prepend Starlink JRE (and JDK) paths to PATH.
+#     Do JRE after JDK so that the JRE takes precidence.
+
+JREHOME=@exec_prefix@/java/jrehome
+JDKHOME=@exec_prefix@/java/jdkhome
+
+if test -f ${JDKHOME}; then
+    export PATH="`cat ${JDKHOME}`/bin:${PATH}"
+fi
+if test -f ${JREHOME}; then
+    export PATH="`cat ${JREHOME}`/bin:${PATH}"
+fi
+unset JREHOME JDKHOME
 
 # Define the Starlink environment first
 
@@ -224,12 +278,6 @@ fi
 
 if test -f @bindir@/tsp/tsp.sh; then
    export TSP_DIR=@bindir@/tsp
-fi
-
-# STARJAVA
-
-if test -d @starjavadir@/bin; then
-   export PATH=@starjavadir@/bin:$PATH
 fi
 
 # Aliases
