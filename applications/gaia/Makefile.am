@@ -54,6 +54,9 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun214fig.ps
 ##  On-line help.
 starhelp_DATA = gaia.htx/*.html gaia.htx/*.gif
 
+##  News file.
+dist_starnews_DATA = gaia.news
+
 ##  Root of the local Tcl installation. This must be the Starlink tclsys,
 ##  as that contains some minor changes that support the creation of the
 ##  single binary.
