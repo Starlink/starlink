@@ -4,7 +4,7 @@
 *     smf_calc_telpos
 
 *  Purpose:
-*     Low-level routine that calculates the geodetic lon/lat/altitude
+*     Low-level routine that calculates the geodetic W lon/lat/altitude
 *     of a telescope given its name, or geocentric (x,y,z)
 *     coordinates.
 
@@ -25,7 +25,7 @@
 *     telName = char[] (Given)
 *        Name of the telescope (ignored if obsgeo non-NULL)
 *     telpos = double[3] (Returned)
-*        The geodetic longitude/latitude/altitude (deg/deg/m)
+*        The geodetic West longitude/latitude/altitude (deg/deg/m)
 *     status = int* (Given & Returned)
 *        Inherited status.
 
