@@ -48,6 +48,8 @@
 *        - modified calls to ndfwrdata to reflect new interface
 *     2006-08-31 (JB)
 *        Added modified julian date conversion
+*     2006-09-06 (EC)
+*        Modified ndfwrdata call to include INSTRUME keyword
 *     {enter_further_changes_here}
 
 *  Copyright:
