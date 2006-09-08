@@ -45,6 +45,8 @@
 *        Remove unused sc2 includes.
 *     2006-08-07 (EC)
 *        Replaced sc2ast_createwcs_compat call with sc2ast_createwcs placeholder
+*     2006-09-07 (EC)
+*        Commented out sc2ast_createwcs placeholder due to interface change
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -512,8 +514,11 @@ void smurf_dreamsolve ( int *status ) {
 
           /* This call is a placeholder. Probably this should be replaced
              with a call to smf_tslice_ast at each time step. EC */
-          sc2ast_createwcs( subnum, azimuth, elevation, 0, 0, 0, &fset, 
-                            status );
+
+	  /*
+	    sc2ast_createwcs( subnum, azimuth, elevation, 0, 0, 0, &fset, 
+	    status );
+	  */
 
 	  /* Shift the coordinate system to allow for the DREAM map
 	     being larger than the subarray */
