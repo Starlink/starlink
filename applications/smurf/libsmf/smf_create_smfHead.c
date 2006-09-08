@@ -49,6 +49,8 @@
 *        Add tswcs.
 *     2006-07-31 (TIMJ):
 *        Add instrument code. Add fplanex, fplaney.
+*     2006-09-07 (EC):
+*        Add instap and telpos.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -120,5 +122,11 @@ smf_create_smfHead( int * status ) {
   hdr->fplanex = NULL;
   hdr->fplaney = NULL;
   hdr->isCloned = 0;
+  hdr->telpos[0] = 0;
+  hdr->telpos[1] = 0;
+  hdr->telpos[2] = 0;
+  hdr->instap[0] = 0;
+  hdr->instap[1] = 0;
+
   return hdr;
 }
