@@ -118,6 +118,8 @@
 *        Check for ast & atm files.
 *     2006-09-06 (EC)
 *        Modified ndfwrdata call to include INSTRUME keyword
+*     2006-09-07 (EC):
+*        Modified sc2ast_createwcs calls to use new interface.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -183,7 +185,7 @@
 #include "smurf_par.h"
 #include "libsmurf/smurflib.h"
 #include "libsmf/smf.h"
-
+#include "jcmt/state.h"
 #include "wvm/wvmCal.h" /* Water Vapor Monitor routines */
 #include "f77.h"
 
@@ -251,6 +253,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   JCMTState *head;                /* per-frame headers */
   char heatname[DREAM__FLEN];     /* name of flatfield cal file */
   int i;                          /* loop counter */
+  double instap[2];               /* Focal plane instrument offsets */
   int j;                          /* loop counter */
   double jigptr[DREAM__MXSIM][2]; /* pointing: nas jiggle offsets from cen. */
   int jigsamples=1;               /* number of samples in jiggle pattern */
@@ -277,11 +280,13 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   double sky_el=0;                /* effective el on sky (bor+jig) */
   double sky_x_hor=0;             /* effective x hor. off. on sky (bor+jig) */
   double sky_y_hor=0;             /* effective y hor. off. on sky (bor+jig) */
+  JCMTState state;                /* Telescope state at one time slice */
   double start_time=0;            /* time of start of current scan */
   char subarrays[4][80];          /* list of parsed subarray names */
   int subnum;                     /* Subarray number */
   double tauCSO=0;                /* CSO zenith optical depth */
   float tbri[3];                  /* simulated wvm measurements */
+  double telpos[3];               /* Geodetic location of the telescope */
   float teff[3];                  /* output of wvmOpt */
   double temp1;                   /* store temporary values */
   double temp2;                   /* store temporary values */
@@ -294,6 +299,11 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 
   /* Main routine */
   ndfBegin();
+
+  /* Setup instap and telpos */
+  smf_calc_telpos( NULL, "JCMT", &telpos, status );
+  instap[0] = 0;
+  instap[1] = 0;
 
   /* Allocate space for the JCMTState array */
   head = smf_malloc( maxwrite, sizeof( *head ), 1, status );
@@ -695,10 +705,16 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 
       /* Create an sc2 frameset for this time slice and extract 
 	 bolo->sky mapping */ 
-      sc2ast_createwcs( subnum, 
-			bor_az[frame], bor_el[frame],
-			jig_x_hor[frame], jig_y_hor[frame],
-			mjuldate[frame], &fs, status);
+      
+      state.tcs_az_ac1 = bor_az[frame];
+      state.tcs_az_ac2 = bor_el[frame];
+      state.smu_az_jig_x = jig_x_hor[frame];
+      state.smu_az_jig_y = jig_y_hor[frame];
+      state.smu_az_chop_x = 0;
+      state.smu_az_chop_y = 0;
+      state.rts_end = mjuldate[frame];
+
+      sc2ast_createwcs(subnum, &state, instap, telpos, &fs, status);
       
       /* simulate one frame of data */
       sc2sim_simframe ( *inx, *sinx, astnaxes, astscale, astdata->pntr[0], 

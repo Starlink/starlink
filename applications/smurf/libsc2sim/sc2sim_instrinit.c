@@ -89,6 +89,8 @@
 *        Fixed mis-handling of bad error status
 *     2006-08-16 (EC)
 *        Call smf_get_gridcoords instead of sc2ast_get_gridcoords
+*     2006-09-07 (EC):
+*        Modified sc2ast_createwcs calls to use new interface.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -127,6 +129,7 @@
 #include "libsmf/smf.h"
 #include "sc2da/sc2ast.h"
 #include "smurf_par.h"
+#include "jcmt/state.h"
 
 /* Starlink Includes */
 #include "ast.h"
@@ -144,6 +147,7 @@ void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
   double azimuth;                /* Azimuth in radians */
   double decay;                  /* bolometer time constant (msec) */
   AstFrameSet *fset=NULL;        /* Frameset to calculate xbc + ybc */
+  double instap[2];              /* Focal plane instrument offsets */
   int j;                         /* loop counter */
   double lst;                    /* local sidereal time in radians */
   double meanatm;                /* mean expected atmospheric signal (pW) */
@@ -152,7 +156,9 @@ void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
   double photonsigma;            /* typical photon noise level in pW */
   double samptime;               /* sample time in sec */
   int savebols;                  /* flag for bol details (unused here) */
+  JCMTState state;               /* Telescope state at one time slice */
   int subnum;                    /* subarray number */
+  double telpos[3];              /* Geodetic location of the telescope */
   double trans;                  /* average transmission */
 
 
@@ -178,7 +184,7 @@ void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
   sc2sim_getpar ( argc, argv, inx, sinx, rseed, &savebols, status );
 
   samptime = inx->sample_t / 1000.0;
-   
+
   /* Initialise bolometer characteristics */
   dream_bolinit ( 1, inx->nbolx, inx->nboly, status );
    
@@ -236,7 +242,18 @@ void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
      calculate xbc and ybc on-the-fly as the telescope points at different
      regions of the sky. */
 
-  sc2ast_createwcs( subnum, 0, 0, 0, 0, 53795.0, &fset, status ); 
+  /* Check to make sure that all the relevant elements of JCMTState are set! */
+  state.tcs_az_ac1 = 0;
+  state.tcs_az_ac2 = 0;
+  state.smu_az_jig_x = 0;
+  state.smu_az_jig_y = 0;
+  state.smu_az_chop_x = 0;
+  state.smu_az_chop_y = 0;
+  state.rts_end = 53795.0;
+  smf_calc_telpos( NULL, "JCMT", &telpos, status );
+  instap[0] = 0;
+  instap[1] = 0;
+  sc2ast_createwcs( subnum, &state, instap, telpos, &fset, status ); 
 
   /* If we do an AzEl projection for each bolometer it is very nearly
      a tangent plane projection because we chose El=0 */

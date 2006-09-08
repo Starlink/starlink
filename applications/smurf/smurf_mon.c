@@ -69,6 +69,8 @@
 *        Add MAKECUBE
 *     2006-08-21 (EC):
 *        Add IMPAZTEC
+*     2006-09-07 (EC):
+*        Modified sc2ast_createwcs calls to use new interface.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -115,6 +117,7 @@
 #include "sc2da/sc2ast.h"
 
 #include "libsmurf/smurflib.h"
+#include "jcmt/state.h"
 
 /* internal protoypes */
 F77_SUBROUTINE(task_get_name)(char *, int*, int);
@@ -195,7 +198,7 @@ void smurf_mon( int * status ) {
   }
 
   /* Clear the sc2ast cache */
-  sc2ast_createwcs(-1, 0.0, 0.0, 0.0, 0.0, 0.0, NULL,status);
+  sc2ast_createwcs(-1, NULL, NULL, NULL, NULL,status);
 
   /* Free AST resources */
   astEnd;
