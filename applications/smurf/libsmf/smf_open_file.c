@@ -107,6 +107,8 @@
 *        Check to make sure file exists
 *     2006-09-05 (EC):
 *        Call aztec_fill_smfHead, smf_telpos_get
+*     2006-09-07 (EC):
+*        Added code to isNDF=0 case to handle compressed AzTEC data
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -157,7 +159,7 @@
 void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 		    smfData ** data, int *status) {
 
-  char dtype[NDF__SZTYP+1];    /* String for DATA type */
+  char dtype[NDF__SZTYP+1];  /* String for DATA type */
   int indf;                  /* NDF identified for input file */
   int ndfdims[NDF__MXDIM];   /* Array containing size of each axis of array */
   int ndims;                 /* Number of dimensions in data */
@@ -225,12 +227,12 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   /* Return the NDF identifier */
   ndgNdfas( igrp, index, mode, &indf, status );
  
-  if ( indf == NDF__NOID ) {
+   if ( indf == NDF__NOID ) {
      *status = SAI__ERROR;
      errRep(FUNC_NAME, "Could not locate file", status);
      return;
   }
-  
+ 
   /* Determine the dimensions of the DATA component */
   ndfDim( indf, NDF__MXDIM, ndfdims, &ndims, status );
 
@@ -472,8 +474,43 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	/* Create a FitsChan from the FITS headers */
 	if (withHdr) {
 	  smf_fits_crchan( nfits, phead, &(hdr->fitshdr), status); 
+
 	  /* Instrument must be SCUBA-2 */
-	  hdr->instrument = INST__SCUBA2;
+	  /* hdr->instrument = INST__SCUBA2; */
+
+	  /* ---------------------------------------------------------------*/
+	  /* WARNING: This has been duplicated from the "isNDF" case to
+	     accomodate AzTEC data that was written using sc2sim_ndfwrdata.
+	     In principle AzTEC data should not be compressed, in which case
+	     the above assertion "Instrument must be SCUBA-2" would be 
+	     correct, and the following code is unnecessary. */
+
+	  /* Determine and store the telescope location in hdr->telpos */
+	  smf_telpos_get( hdr, status );
+
+	  /* Determine the instrument */
+	  hdr->instrument = smf_inst_get( hdr, status );
+	  
+	  /* On the basis of the instrument, we know need to fill in some
+	     additional header parameters. Some of these may be constants,
+	     whereas others may involve more file access. Currently we use
+	     a simple switch statement. We could modify this step to use
+	     vtables of function pointers.
+	  */
+	  switch ( hdr->instrument ) {
+	  case INST__ACSIS:
+	    acs_fill_smfHead( hdr, indf, status );
+	    break;
+	  case INST__AZTEC:
+	    aztec_fill_smfHead( hdr, NDF__NOID, status );
+	    break;
+	  default:
+	    break;
+	    /* SCUBA-2 has nothing special here because the focal plane
+	       coordinates are derived using an AST polyMap */
+	  }
+
+	  /* ---------------------------------------------------------------*/
 	}
 
 	/* Raw data type is integer */
