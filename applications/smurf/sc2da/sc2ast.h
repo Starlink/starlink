@@ -30,6 +30,8 @@
 *        Placed comments at top of header, added SC2AST_BOLCOL/BOLROW
 *     2006-08-17 (EC):
 *        Removed SC2AST_BOLCOL/BOLROW,sc2ast_get_gridcoords->smf_get_gridcoords
+*     2006-09-07 (EC)
+*        Modified interface for sc2ast_createwcs
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -61,17 +63,18 @@
 #ifndef HEADGEN___src_sc2ast_sc2ast_h
 #define HEADGEN___src_sc2ast_sc2ast_h 
  
+/* Following include is for JCMTState definition */
+#include "jcmt/state.h"
+
 /*+ sc2ast_createwcs - create WCS description */
 
 void sc2ast_createwcs
 (
 int subnum,             /* subarray number, 0-7 (given). If -1 is
                            supplied the cached AST objects will be freed. */
-double az,              /* Boresight azimuth in radians (given) */
-double el,              /* Boresight elevation in radians (given) */
-double az_jig_x,        /* SMU azimuth jiggle offset radians (given) */ 
-double az_jig_y,        /* SMU elevation jiggle offset radians (given) */ 
-double tai,             /* TAI (supplied as a Modified Julian Date) */
+const JCMTState *state, /* Current telescope state (time, pointing etc.) */
+const double fplane_off[2], /* Offset of subarray in the focal plane */ 
+const double telpos[3], /* Geodetic Lon/Lat/Alt of telescope (deg/deg/ign.) */
 AstFrameSet **fset,     /* constructed frameset (returned) */
 int *status             /* global status (given and returned) */
 );

@@ -9,6 +9,9 @@
 #include "sc2ast.h"
 #include "Ers.h"
 
+/* Following include is for JCMTState definition */
+#include "jcmt/state.h"
+
 static char errmess[132];              /* For DRAMA error messages */
 
 #define MM2RAD 2.4945e-5               /* scale at array in radians */
@@ -26,11 +29,9 @@ void sc2ast_createwcs
 (
 int subnum,             /* subarray number, 0-7 (given). If -1 is
                            supplied the cached AST objects will be freed. */
-double az,              /* Boresight azimuth in radians (given) */
-double el,              /* Boresight elevation in radians (given) */
-double az_jig_x,        /* SMU azimuth jiggle offset radians (given) */ 
-double az_jig_y,        /* SMU elevation jiggle offset radians (given) */ 
-double tai,             /* TAI (supplied as a Modified Julian Date) */
+const JCMTState *state, /* Current telescope state (time, pointing etc.) */
+const double instap[2], /* Offset of subarray in the focal plane */ 
+const double telpos[3], /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
 AstFrameSet **fset,     /* constructed frameset (returned) */
 int *status             /* global status (given and returned) */
 )
@@ -45,6 +46,13 @@ int *status             /* global status (given and returned) */
      "subnum" set to -1. In this is done, the cached resources are freed
      and this function returns without further action, returning a NULL 
      pointer in "*fset".
+
+   Notes :
+     After the first call the cached part of the frameset contains information
+     specific to the SCUBA-2 instrument, observatory location etc. If you
+     wish to subsequently calculate framesets for a different instrument
+     or observatory location ensure that you first clear the cache by
+     setting subnum=-1.
 
    Authors :
      B.D.Kelly (bdk@roe.ac.uk)
@@ -89,6 +97,8 @@ int *status             /* global status (given and returned) */
      7Aug2006  : Removed sc2ast_createwcs_compat + related kludges (ec)
      10Aug2006 : More corrections to the rotation matrix in sc2ast_maketanmap (dsb)
      10Aug2006 : Added "rot" parameter to sc2ast_maketanmap (dsb)
+     07Sep2006 : Added "telpos" and "instap" arguments 
+                 JCMTState now used for time/pointing (EC)
 */
 
 {
@@ -102,8 +112,8 @@ int *status             /* global status (given and returned) */
    AstZoomMap *radmap;
    AstZoomMap *zoommap;
    AstShiftMap *zshiftmap;
-
    double shifts[ 2 ];
+   AstShiftMap *instapmap;     
    AstShiftMap *jigglemap;
 
 
@@ -348,6 +358,11 @@ int *status             /* global status (given and returned) */
       map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
                                                       radmap, 1, "" );
 
+/* Apply focal plane offsets */
+      instapmap = astShiftMap( 2, instap, "" );
+      map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
+                                                      instapmap, 1, "" );
+
 /* Simplify the Cached Mapping. */
       map_cache[ subnum ] = astSimplify( map_cache[ subnum ] );
 
@@ -362,27 +377,32 @@ int *status             /* global status (given and returned) */
 
 /* Create a Mapping from these Cartesian Nasmyth coords (in rads) to spherical 
    AzEl coords (in rads). */
-   azelmap = sc2ast_maketanmap( az, el, azel_cache, el, status );
+
+   azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
+				azel_cache, state->tcs_az_ac2, status );
 
 /* Calculate final mapping with SMU position correction only if needed */
-   if( (!az_jig_x) && (!az_jig_y) ) {
+   if( (!state->smu_az_jig_x)  && (!state->smu_az_jig_y) &&
+       (!state->smu_az_chop_x) && (!state->smu_az_chop_y) ) {
+    
+/* Combine these with the cached Mapping (from GRID coords for subarray 
+   to Tanplane Nasmyth coords in rads), to get total Mapping from GRID 
+   coords to spherical AzEl in rads. */
 
-     /* Combine these with the cached Mapping (from GRID coords for subarray 
-	to Cartesian Nasmyth coords in rads), to get total Mapping from GRID 
-	coords to spherical AzEl in rads. */
-     mapping = (AstMapping *) astCmpMap( map_cache[ subnum ], azelmap, 1, "" );
+      mapping = (AstMapping *) astCmpMap( map_cache[ subnum ], azelmap, 1, 
+					  "" );
 
    } else {
+/* Create a ShiftMap which moves the origin of projection plane (X,Y)
+   coords to take account of the small offsets of SMU jiggle pattern. */
+      shifts[ 0 ] = state->smu_az_jig_x + state->smu_az_chop_x;
+      shifts[ 1 ] = state->smu_az_jig_y + state->smu_az_chop_y;
+      jigglemap = astShiftMap( 2, shifts, "" );
 
-     /* Create a ShiftMap which moves the origin of projection plane (X,Y)
-	coords to take account of the small offsets of SMU jiggle pattern. */
-     shifts[ 0 ] = az_jig_x;
-     shifts[ 1 ] = az_jig_y;
-     jigglemap = astShiftMap( 2, shifts, "" );
 
-     mapping = (AstMapping *) astCmpMap( map_cache[ subnum ], 
-                                         astCmpMap( jigglemap, azelmap, 1, 
-						    "" ), 1, "" );
+      mapping = (AstMapping *) astCmpMap( map_cache[ subnum ], 
+					  astCmpMap( jigglemap, azelmap, 1, 
+						     "" ), 1, "" );
    }
 
 /* If not already created, create a SkyFrame describing (Az,El). Hard-wire 
@@ -393,11 +413,21 @@ int *status             /* global status (given and returned) */
    is set every time though since this will vary from call to call. */
    if( !skyframe ) {
       skyframe = astSkyFrame ( "system=AzEl" );
-      astSetC( skyframe, "ObsLon", JCMT_LON );
-      astSetC( skyframe, "ObsLat", JCMT_LAT );   
+      /*
+	astSetC( skyframe, "ObsLon", JCMT_LON );
+	astSetC( skyframe, "ObsLat", JCMT_LAT );   
+      */
+      
+      /* Ast assumes longitude increases eastward, so change sign to
+	 be consistent with smf_calc_telpos here */
+      astSetD( skyframe, "ObsLon", -telpos[0] );
+      astSetD( skyframe, "ObsLat", telpos[1] );
+
+      printf("telpos: %lf %lf\n", telpos[0], telpos[1] );
+
       astExempt( skyframe );
    }
-   astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, tai + 32.184/SPD );
+   astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->rts_end + 32.184/SPD );
 
 /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
    First remove the existing current Frame and then add in the new one.
