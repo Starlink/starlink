@@ -64,6 +64,8 @@
 *        Add SMF__MAP_VAR and SMF__MAP_QUAL flags
 *     2006-09-01 (EC):
 *        Added telpos to smfHead 
+*     2006-09-07 (EC)
+*        Added instap to smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -165,7 +167,8 @@ typedef struct smfHead {
   unsigned int ndet;        /* Number of focal plane detectors */
   const double * fplanex;   /* X coords (radians) of focal plane detectors */
   const double * fplaney;   /* Y coords (radians) of focal plane detectors */
-  const double telpos[3];   /* Lon/LAT/Alt of telescope (deg/deg/m) */
+  double instap[2];         /* instrument aperture (focal plane offsets)  */
+  double telpos[3];         /* West LON/LAT/Alt of telescope (deg/deg/m) */
 } smfHead;
 
 /* This structure contains ancilliary information obtained from a raw
