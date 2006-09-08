@@ -16,7 +16,7 @@
 *  Invocation:
 *     smf_create_lutwcs( int clearcache, const double *fplane_x, 
 *                        const double *fplane_y, const int n_pix, 
-*        		 const JCMTState *state, const double fplane_off[2], 
+*        		 const JCMTState *state, const double instap[2], 
 *                   	 const double telpos[3], AstFrameSet **fset, 
 *                         int *status )
 
@@ -34,7 +34,7 @@
 *        call exists.
 *     state = JCMTState* (Given)
 *        Current JCMT state (time, pointing etc.)
-*     fplane_off = double[2] (Given)
+*     instap = double[2] (Given)
 *        Additional focal plane offsets that may be applied.
 *     telpos = double[3] (Given)
 *        LON / Lat / altitude of the telscope (deg/deg/metres)
@@ -71,7 +71,9 @@
 *        - Renamed to smf_create_lutwcs, generic routine for JCMT instruments
 *        - Change API to take JCMTState
 *        - Provide focal plane pixel offsets with LUTs
-*        - Add SMU chop offsets + fplane_off
+*        - Add SMU chop offsets + instap
+*     2006-09-07 (EC):
+*        - Added telpos argument
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -122,12 +124,10 @@
 #define FUNC_NAME "smf_create_lutwcs"
 
 #define SPD 86400.0                    /* Seconds per day */
-#define JCMT_LON "W155:28:37.20"       /* Longitude of JCMT */
-#define JCMT_LAT "N19:49:22.11"        /* Geodetic latitude of JCMT */
 
 void smf_create_lutwcs( int clearcache, const double *fplane_x, 
 			const double *fplane_y, const int n_pix, 
-			const JCMTState *state, const double fplane_off[2], 
+			const JCMTState *state, const double instap[2], 
                         const double telpos[3], AstFrameSet **fset, 
 			int *status ) {
 
@@ -136,7 +136,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
   AstMapping *azelmap;            /* tangent plane to spherical azel mapping */
   double fplanerot[4];            /* Elements of fplane rotation matrix */
   AstMatrixMap *fplanerotmap;     /* Rotate fplane to align with AzEl*/
-  AstShiftMap *fplane_offmap;     /* Mapping for focal plane shift */
+  AstShiftMap *instapmap;         /* Mapping for focal plane shift */
   int haveLUT;                    /* Set if LUTs given */
   AstShiftMap *jigglemap;         /* account for offsets in tangent plane */
   AstMapping *mapping;            /* total pixel -> azel mapping */
@@ -257,8 +257,8 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
       /* End LUT-specific code */
     
       /* Apply focal plane offsets */
-      fplane_offmap = astShiftMap( 2, fplane_off, "" );
-      map_cache = (AstMapping *) astCmpMap( map_cache, fplane_offmap, 1, "" );
+      instapmap = astShiftMap( 2, instap, "" );
+      map_cache = (AstMapping *) astCmpMap( map_cache, instapmap, 1, "" );
 
       /* Simplify the Cached Mapping. */
       map_cache = astSimplify( map_cache );
@@ -328,8 +328,10 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
        is set every time though since this will vary from call to call. */
     if( !skyframe ) {
       skyframe = astSkyFrame ( "system=AzEl" );
-      astSetC( skyframe, "ObsLon", JCMT_LON );
-      astSetC( skyframe, "ObsLat", JCMT_LAT );   
+      /* astSetC( skyframe, "ObsLon", JCMT_LON );
+         astSetC( skyframe, "ObsLat", JCMT_LAT ); */ 
+      astSetD( skyframe, "ObsLon", telpos[0] );
+      astSetD( skyframe, "ObsLat", telpos[1] ); 
       astExempt( skyframe );
     }
     astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->rts_end + 32.184/SPD );
