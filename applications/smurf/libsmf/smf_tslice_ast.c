@@ -76,6 +76,8 @@
 *        Added jig_az_x/y to createwcs call
 *     2006-07-26 (TIMJ):
 *        sc2head no longer used. Use JCMTState instead.
+*     2006-09-07 (EC):
+*        Modified sc2ast_createwcs calls to use new interface.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -202,16 +204,29 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
     /* See if we have a WCS or not */
     if (hdr->wcs == NULL ) {
       /* Must create one */
+
+      /*
       sc2ast_createwcs( subsysnum, tmpState->tcs_az_ac1, tmpState->tcs_az_ac2,
 			tmpState->smu_az_jig_x, tmpState->smu_az_jig_y, 
 			tmpState->rts_end, &(hdr->wcs), status );
+      */
+
+      sc2ast_createwcs( subsysnum, tmpState, hdr->instap, hdr->telpos,
+			&(hdr->wcs), status );
+
     } else {
       /* Ideally we want to modify in place to reduce malloc/free */
       /* For now take the inefficient and simpler approach */
       astAnnul( hdr->wcs );
+
+      /*
       sc2ast_createwcs( subsysnum, tmpState->tcs_az_ac1, tmpState->tcs_az_ac2,
 			tmpState->smu_az_jig_x, tmpState->smu_az_jig_y, 
 			tmpState->rts_end, &(hdr->wcs), status );
+      */
+
+      sc2ast_createwcs( subsysnum, tmpState, hdr->instap, hdr->telpos,
+			&(hdr->wcs), status );
     }
 
     /* astShow( hdr->wcs ); */
