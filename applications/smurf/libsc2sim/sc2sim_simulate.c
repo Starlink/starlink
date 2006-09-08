@@ -120,6 +120,8 @@
 *        Modified ndfwrdata call to include INSTRUME keyword
 *     2006-09-07 (EC):
 *        Modified sc2ast_createwcs calls to use new interface.
+*     2006-09-08 (EC):
+*        Modified call to sc2sim_calctime to use new interface.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -541,7 +543,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 
   /* calculate UT/LST at each tick of the simulator clock */  
   if( *status == SAI__OK ) {
-    sc2sim_calctime( inx->mjdaystart, samptime, count,
+    sc2sim_calctime( telpos[0]*DD2R, inx->mjdaystart, samptime, count,
                      mjuldate, lst, status );
     
     sigma = 1.0e-9;

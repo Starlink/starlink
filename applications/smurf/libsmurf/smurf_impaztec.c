@@ -49,7 +49,9 @@
 *     2006-08-31 (JB)
 *        Added modified julian date conversion
 *     2006-09-06 (EC)
-*        Modified ndfwrdata call to include INSTRUME keyword
+*        - Modified ndfwrdata call to include INSTRUME keyword
+*        - Pass telescope coordinates to sc2sim_calctime
+
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -196,6 +198,7 @@ void smurf_impaztec( int *status ) {
   size_t seconds;              /* seconds in observation */
   double startmidtime;         /* seconds since midnight */
   double startnoontime;        /* seconds since noon */
+  double telpos[3];            /* Geodetic location of the telescope */
   double *tempbuff = NULL;     /* throwaway buffer for using calctime */
   double *time = NULL;         /* arrays for storing per-frame header data */
   double *trackactc1 = NULL;
@@ -213,6 +216,9 @@ void smurf_impaztec( int *status ) {
   /* Main routine */
 
 #ifdef HAVE_LIBNETCDF
+
+  /* Get the LON/LAT of JCMT */
+  smf_calc_telpos( NULL, "JCMT", &telpos, status );
 
   /* Get the user defined input and output file names */
   parGet0c( "IN", ncfile, MAXSTRING, status);
@@ -328,7 +334,7 @@ void smurf_impaztec( int *status ) {
        djm = djm + startnoontime / 86400;
     }
 
-    sc2sim_calctime( djm, sample_t, nframes,
+    sc2sim_calctime( telpos[0]*DD2R, djm, sample_t, nframes,
                      mjuldate, tempbuff, status );       
     
     nc_getSignal ( ncid, "jcmt_airmass", airmass, status );

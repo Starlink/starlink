@@ -79,6 +79,8 @@
 *        Removed dependence on sc2sim_telpos
 *     2006-09-06 (EC)
 *        Modified ndfwrdata call to include INSTRUME keyword
+*     2006-09-08 (EC):
+*        Modified call to sc2sim_calctime to use new interface.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -220,12 +222,16 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
    char subarrays[4][80];          /* list of parsed subarray names */
    int subnum;                     /* Subarray number */
    double tauCSO=0;                /* CSO zenith optical depth */
+   double telpos[3];               /* Geodetic location of the telescope */
    double temp1;                   /* store temporary values */
    double temp2;                   /* store temporary values */
    double temp3;                   /* store temporary values */
    double vmax[2];                 /* telescope maximum velocities (arcsec) */
 
    if ( *status != SAI__OK) return;
+
+  /* Setup telpos */
+  smf_calc_telpos( NULL, "JCMT", &telpos, status );
 
    /* Allocate space for the JCMTState array */
    head = smf_malloc( maxwrite, sizeof( JCMTState ), 1, status );
@@ -326,7 +332,7 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
    airmass = smf_malloc ( count, sizeof(*airmass), 1, status );
 
    /* calculate UT/LST at each tick of the simulator clock */  
-   sc2sim_calctime( inx->mjdaystart, samptime, count,
+   sc2sim_calctime( telpos[0]*DD2R, inx->mjdaystart, samptime, count,
 		    mjuldate, lst, status );
 
    msgSeti( "DSTART", inx->mjdaystart );

@@ -32,6 +32,8 @@
 *        Removed sc2sim_hor2eq / sc2sim_telpos / extraneous slalib #defines
 *     2006-09-06 (EC)
 *        Modified interface to ndfwrdata to take INSTRUME as parameter
+*     2006-09-08 (EC):
+*        Modified sc2sim_calctime to take Longitude as a parameter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -134,6 +136,7 @@ void sc2sim_bousscan ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
                        double *ybc, double *ybolo,int *status);
 void sc2sim_calctime
 ( 
+double lon,          /* Geodetic W Lon (radians) */
 double mjdaystart,   /* start time as modified juldate */
 double samptime,     /* length of a sample in seconds */
 int nsamp,           /* number of samples */

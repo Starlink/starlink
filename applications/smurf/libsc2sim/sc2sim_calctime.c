@@ -47,6 +47,8 @@
 *        Replace cut-and-pasted slaGmst with library call 
 *     2006-09-05 (JB)
 *        Included smurf_par.h
+*     2006-09-08 (EC)
+*        Made Longitude and argument
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -80,12 +82,13 @@
 #include "ast.h"
 #include "star/slalib.h"
 
-/* SC2SIM includes */
+/* SMURF includes */
 #include "sc2sim.h"
 #include "smurf_par.h"
 
 void sc2sim_calctime
 ( 
+double lon,          /* Geodetic W Lon (radians) */
 double mjdaystart,   /* start time as modified juldate */
 double samptime,     /* length of a sample in seconds */
 int nsamp,           /* number of samples */
@@ -99,16 +102,12 @@ int *status          /* global status (given and returned) */
    /* Local variables */
    double gst;
    int i;
-   double lon;
    double tu;
    double sampday;
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
   
-   /* JCMT longitude in radians */
-   lon = ( 155.0 + (28.0/60.0) + (0.0/3600.0) ) / AST__DR2D;
-
    /* Length of a single sample in days */
    sampday = samptime/(3600. * 24.);
  
