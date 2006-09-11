@@ -1,5 +1,10 @@
 1 HLP - Portable help system 
 
+HLP version 4.0-2
+
+*  Bug fix so that the user supplied name translation routine
+   is used. Previously the built-in version always got used.
+
 HLP version 4.0-1
 
 *  This is now the C version of HLP donated by Pat Wallace.
