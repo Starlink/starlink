@@ -88,7 +88,7 @@ int hlpHopenr ( int ( * nametr ) ( int, char*, int, char* ) )
    if ( jhelp != -1 && jhelp != 2 ) return hlp_ILLEGAL_STATE;
  
 /* Open (or re-open) the HELP library file. */
-   if ( hlpFopr ( hlpNametr, hlnext, &fphl ) )
+   if ( hlpFopr ( nametr, hlnext, &fphl ) )
       return hlp_OPEN_ERROR;
 
 /* Note its name and logical level. */
