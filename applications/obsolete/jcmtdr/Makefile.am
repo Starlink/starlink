@@ -17,13 +17,7 @@ pkgdata_DATA = jcmtdr.news JCMTDR_CONDITIONS
 # libira comes from kaplibs but we do not want all of kaplibs
 # Figaro libraries are required: -lfig -ldsa -ldta -lgen -lpar -lich
 
-FIG_LIBS = \
-/home/timj/data/tmp/star/cvs/applications/figaro/dsa/libdsa.la \
-/home/timj/data/tmp/star/cvs/applications/figaro/dta/libdta.la \
-/home/timj/data/tmp/star/cvs/applications/figaro/par/libfigpar.la \
-/home/timj/data/tmp/star/cvs/applications/figaro/ich/libich.la \
-/home/timj/data/tmp/star/cvs/applications/figaro/gen/libgen.la \
-/home/timj/data/tmp/star/cvs/applications/figaro/fig/libfig.la 
+FIG_LIBS = -ldsa -ldta -lfigpar -lfigich -lfiggen -lfig
 
 jcmtdr_LDADD = applic/libjcmtapplic.la subs/libjcmtsubs.la -lira \
 $(FIG_LIBS) \
