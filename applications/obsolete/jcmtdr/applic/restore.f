@@ -60,7 +60,7 @@
       INCLUDE 'ASTRO_PAR'        ! astronomical parameters
                                  
 *  Dynamic memory include file - defines DYNAMIC_MEM
-      INCLUDE 'DYN_MEMORY'
+      INCLUDE 'DYNAMIC_MEMORY'
 
 *  Data structure error codes
       INCLUDE 'DTA_CODES'

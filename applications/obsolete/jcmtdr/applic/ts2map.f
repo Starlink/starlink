@@ -43,7 +43,7 @@
 
 *  Dynamic memory include file - defines DYNAMIC_MEM
 
-      INCLUDE 'DYN_MEMORY'
+      INCLUDE 'DYNAMIC_MEMORY'
 
 *  SAE flags
       INCLUDE 'SAE_PAR'

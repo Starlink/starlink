@@ -52,7 +52,7 @@
 
 *  Dynamic memory include file - defines DYNAMIC_MEM
 
-      INCLUDE 'DYN_MEMORY'
+      INCLUDE 'DYNAMIC_MEMORY'
 
 *  GSD variables
 
