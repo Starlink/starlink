@@ -74,6 +74,10 @@
 *        - Add SMU chop offsets + instap
 *     2006-09-07 (EC):
 *        - Added telpos argument
+*     2006-09-08 (EC):
+*        - Fixed Longitude sign error
+*     2006-09-11 (EC):
+*        - map_cache was not getting pre-pended properly to transformation
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -116,10 +120,12 @@
 #include "sae_par.h"
 
 /* Data Acquisition Includes */
-#include "jcmt/state.h"
+#include "sc2da/sc2ast.h"
+
 
 /* SMURF includes */
 #include "smf.h"
+#include "jcmt/state.h"
 
 #define FUNC_NAME "smf_create_lutwcs"
 
@@ -241,7 +247,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
       /* The first coordinate is the pixel number, and the second is a
          dummy dimension. Use a permMap to duplicate the first
          dimension and throw away the second. */
-      inperm[0] = 1;
+      inperm[0] = 0;  /* Inverse transformation not defined */
       inperm[1] = 0;
       outperm[0] = 1;
       outperm[1] = 1;
@@ -250,19 +256,20 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
     
       /* LUTs give the focal plane Tanplane offsets based on pixel number.
          Connect two LUTs in parallel with a cmpMap to add after the permmap.*/
-      azlutmap = astLutMap( n_pix, fplane_x, 0, 1, "" );
-      ellutmap = astLutMap( n_pix, fplane_y, 0, 1, "" );
+      azlutmap = astLutMap( n_pix, fplane_x, 1, 1, "" );
+      ellutmap = astLutMap( n_pix, fplane_y, 1, 1, "" );
       azellutmap = astCmpMap( azlutmap, ellutmap, 0, "" );
       map_cache = (AstMapping *) astCmpMap( map_cache, azellutmap, 1, "" );
+
       /* End LUT-specific code */
-    
-      /* Apply focal plane offsets */
+
+      /* Apply focal plane ("instrument aperture") offsets */
       instapmap = astShiftMap( 2, instap, "" );
       map_cache = (AstMapping *) astCmpMap( map_cache, instapmap, 1, "" );
 
       /* Simplify the Cached Mapping. */
       map_cache = astSimplify( map_cache );
-    
+      
       /* Exempt the cached AST objects from AST context handling. This means
          that the pointers will not be annulled as a result of calling astEnd. 
          Therefore the objects need to be annulled explicitly when no longer
@@ -281,22 +288,11 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
 
   if( *status == SAI__OK ) {
 
-    /* Apply the rotation from cached boresight focal plane coordinates to AzEl
-       Tanplane coordinates */
-  
-    a = state->tcs_az_ang;
-    fplanerot[ 0 ] = cos( a );
-    fplanerot[ 1 ] = -sin( a );
-    fplanerot[ 2 ] = sin( a );
-    fplanerot[ 3 ] = cos( a );
-    fplanerotmap = astMatrixMap ( 2, 2, 0, fplanerot, "" );
-    mapping = (AstMapping *) astCmpMap( map_cache, 
-                                        fplanerotmap, 1, "" );
-    
     /* Create a Mapping from tanplane AzEl coords (in rads) to spherical
        AzEl coords (in rads). */
-    azelmap = smf_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2, 
-                              azel_cache, status );
+
+    azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
+				 azel_cache, 0, status );
   
     /* Calculate final mapping with SMU position correction only if needed */
     if( (!state->smu_az_jig_x)  && (!state->smu_az_jig_y) &&
@@ -306,7 +302,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
          to Tanplane Nasmyth coords in rads), to get total Mapping from GRID 
          coords to spherical AzEl in rads. */
 
-      mapping = (AstMapping *) astCmpMap( mapping, azelmap, 1, "" );    
+      mapping = (AstMapping *) astCmpMap( map_cache, azelmap, 1, "" );    
 
     } else {
       /* Create a ShiftMap which moves the origin of projection plane (X,Y)
@@ -328,10 +324,12 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
        is set every time though since this will vary from call to call. */
     if( !skyframe ) {
       skyframe = astSkyFrame ( "system=AzEl" );
-      /* astSetC( skyframe, "ObsLon", JCMT_LON );
-         astSetC( skyframe, "ObsLat", JCMT_LAT ); */ 
-      astSetD( skyframe, "ObsLon", telpos[0] );
-      astSetD( skyframe, "ObsLat", telpos[1] ); 
+
+      /* Ast assumes longitude increases eastward, so change sign to
+	 be consistent with smf_calc_telpos here */
+      astSetD( skyframe, "ObsLon", -telpos[0] );
+      astSetD( skyframe, "ObsLat", telpos[1] );
+
       astExempt( skyframe );
     }
     astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->rts_end + 32.184/SPD );
