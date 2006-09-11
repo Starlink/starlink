@@ -91,6 +91,8 @@
 *        Call smf_get_gridcoords instead of sc2ast_get_gridcoords
 *     2006-09-07 (EC):
 *        Modified sc2ast_createwcs calls to use new interface.
+*     2006-09-11 (EC):
+*        Fixed pointer problem with callc to smf_calc_telpos
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -250,7 +252,7 @@ void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
   state.smu_az_chop_x = 0;
   state.smu_az_chop_y = 0;
   state.rts_end = 53795.0;
-  smf_calc_telpos( NULL, "JCMT", &telpos, status );
+  smf_calc_telpos( NULL, "JCMT", telpos, status );
   instap[0] = 0;
   instap[1] = 0;
   sc2ast_createwcs( subnum, &state, instap, telpos, &fset, status ); 

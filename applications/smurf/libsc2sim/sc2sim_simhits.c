@@ -81,6 +81,8 @@
 *        Modified ndfwrdata call to include INSTRUME keyword
 *     2006-09-08 (EC):
 *        Modified call to sc2sim_calctime to use new interface.
+*     2006-09-11 (EC):
+*        Fixed pointer problem with callc to smf_calc_telpos
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -229,10 +231,10 @@ void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
    double vmax[2];                 /* telescope maximum velocities (arcsec) */
 
    if ( *status != SAI__OK) return;
-
-  /* Setup telpos */
-  smf_calc_telpos( NULL, "JCMT", &telpos, status );
-
+   
+   /* Setup telpos */
+   smf_calc_telpos( NULL, "JCMT", telpos, status );
+   
    /* Allocate space for the JCMTState array */
    head = smf_malloc( maxwrite, sizeof( JCMTState ), 1, status );
 

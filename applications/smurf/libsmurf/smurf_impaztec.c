@@ -51,6 +51,8 @@
 *     2006-09-06 (EC)
 *        - Modified ndfwrdata call to include INSTRUME keyword
 *        - Pass telescope coordinates to sc2sim_calctime
+*     2006-09-11 (EC):
+*        Fixed pointer problem with callc to smf_calc_telpos
 
 *     {enter_further_changes_here}
 
@@ -218,7 +220,7 @@ void smurf_impaztec( int *status ) {
 #ifdef HAVE_LIBNETCDF
 
   /* Get the LON/LAT of JCMT */
-  smf_calc_telpos( NULL, "JCMT", &telpos, status );
+  smf_calc_telpos( NULL, "JCMT", telpos, status );
 
   /* Get the user defined input and output file names */
   parGet0c( "IN", ncfile, MAXSTRING, status);
@@ -465,6 +467,10 @@ void smurf_impaztec( int *status ) {
   smf_free ( azelbasec1, status );
   smf_free ( azelbasec2, status );
 
+  if ( *status == SAI__OK ) {
+    msgOutif(MSG__VERB, FUNC_NAME, 
+	   "Impaztec complete, NDF file written", status); 
+
 #else
 
   *status = SAI__ERROR;
@@ -473,10 +479,6 @@ void smurf_impaztec( int *status ) {
 	 status);
 
 #endif
-
-  if ( *status == SAI__OK ) {
-    msgOutif(MSG__VERB, FUNC_NAME, 
-	   "Impaztec complete, NDF file written", status); 
   }
 
 }

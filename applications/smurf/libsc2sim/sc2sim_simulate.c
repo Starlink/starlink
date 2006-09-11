@@ -122,6 +122,8 @@
 *        Modified sc2ast_createwcs calls to use new interface.
 *     2006-09-08 (EC):
 *        Modified call to sc2sim_calctime to use new interface.
+*     2006-09-11 (EC):
+*        Fixed pointer problem with callc to smf_calc_telpos
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -303,7 +305,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   ndfBegin();
 
   /* Setup instap and telpos */
-  smf_calc_telpos( NULL, "JCMT", &telpos, status );
+  smf_calc_telpos( NULL, "JCMT", telpos, status );
   instap[0] = 0;
   instap[1] = 0;
 
