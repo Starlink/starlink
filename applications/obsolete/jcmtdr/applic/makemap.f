@@ -84,6 +84,7 @@
 *     12-JAN-1995 (hme@roe)     On failure to open GSD file, abort
 *                               _with_ an error message.
 *     27-MAR-2003 (timj@jach)   Must initialize FAULT variable on Linux
+*     10-SEP-2006 (timj@jach)   Fixes for g95
 *     {enter_changes_here}
 
 *  Bugs:
@@ -94,7 +95,7 @@
 
 *  Dynamic memory include file - defines DYNAMIC_MEM
 
-      INCLUDE 'DYN_MEMORY'
+      INCLUDE 'DYNAMIC_MEMORY'
 
 *  SAE constants
 
@@ -129,7 +130,7 @@
       REAL VERSION
       CHARACTER*30 LABEL
       INTEGER NITEM
-      INTEGER NUMBER/0/
+      INTEGER NUMBER
       CHARACTER*(GSD__SZNAME) NAME
       CHARACTER*(GSD__SZUNIT) UNIT
       CHARACTER TYPE
@@ -137,7 +138,7 @@
       LOGICAL ARRAY
       INTEGER GSDINDEX(GSD__SZINDEX) ! 5
       INTEGER SIZE
-      INTEGER MAXDIMS/GSD__MXDIM/    ! GSD__MXDIM=5
+      INTEGER MAXDIMS
       CHARACTER*(GSD__SZNAME) DIMNAMES(GSD__MXDIM)
       CHARACTER*(GSD__SZUNIT) DIMUNITS(GSD__MXDIM)
       INTEGER DIMVALS(GSD__MXDIM),DIMNUMBERS(GSD__MXDIM),
@@ -229,6 +230,9 @@
       CHARACTER*128 DTA_NAME           ! "      "    general item
       CHARACTER*(2*GSD__SZCHAR+1) STRING ! 
 
+*  Initialisations
+      DATA NUMBER / 0 /
+      DATA MAXDIMS/GSD__MXDIM/
 
 *.
 
