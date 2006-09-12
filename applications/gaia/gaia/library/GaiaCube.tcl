@@ -302,7 +302,7 @@ itcl::class gaia::GaiaCube {
          LabelRule $chanmapTab.chanmapruler -text "Channel map controls:"
       }
       pack $itk_component(chanmapruler) -side top -fill x
-
+      
       incr ref_ids
       itk_component add chanmap {
          GaiaCubeChanmap $chanmapTab.chanmap \
@@ -587,6 +587,9 @@ itcl::class gaia::GaiaCube {
                   "WARNING: Failed to delete old image section: $msg"
             }
          }
+
+         #  Enable any bindings etc. in the spectral extraction tool.
+         $itk_component(spectrum) open
       }
 
       #  Now copy this plane from the cube and update the image.
