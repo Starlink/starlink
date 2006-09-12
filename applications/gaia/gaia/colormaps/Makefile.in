@@ -21,7 +21,7 @@ all: $(TARGET)
 # generate a C file inclulding static versions of all of the colormap files
 # in this directory
 $(TARGET): $(FILES) colormaps.tcl
-	tcl colormaps.tcl > $(TARGET)
+	../bin/gaia_tcl colormaps.tcl > $(TARGET)
 
 All: 
 	cd ..; $(MAKE)
