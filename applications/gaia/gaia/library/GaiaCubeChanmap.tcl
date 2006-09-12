@@ -143,6 +143,17 @@ itcl::class gaia::GaiaCubeChanmap {
       pack $itk_component(shape) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(shape) \
          {Number of channels along the X-axis of the output image}
+
+      #  Value of the selected channel panel.
+      itk_component add selected {
+         LabelValue $w_.selected \
+            -text "Selected coord:" \
+            -labelwidth $itk_option(-labelwidth) \
+            -valuewidth $itk_option(-valuewidth)
+      }
+      pack $itk_component(selected) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(selected) \
+         {Coordinate of selected image panel, click to update}
    }
 
    #  Run the CHANMAP application.
@@ -184,6 +195,54 @@ itcl::class gaia::GaiaCubeChanmap {
       if { $file != {} } {
          $itk_option(-gaiacube) display $file 1
       }
+
+      #  Set bindings to report the spectral coordinate of the current pane,
+      #  when clicked on.
+      set cubespectrum [$itk_option(-gaiacube) component spectrum]
+      $cubespectrum close
+      add_bindings_
+   }
+
+   #  Grab the clicks on the image so that we can update the spectral
+   #  readout.
+   protected method add_bindings_ {} {
+      set canvas [$itk_option(-gaiacube) cget -canvas]
+      set rtdimage [$itk_option(-gaiacube) cget -rtdimage]
+      $canvas bind $rtdimage <1> [code $this display_coord_ %x %y]
+   }
+
+   #  Determine the spectral coordinate associated with a canvas position
+   #  and update the readout. The target coordinate system should have an
+   #  Ident of "ORIGSKY" and the coordinate we require is the third.
+   protected method display_coord_ {cx cy} {
+
+      #  Get the current base domain frame index.
+      set rtdimage [$itk_option(-gaiacube) cget -rtdimage]
+      set current [$rtdimage astget current]
+
+      set canvas [$itk_option(-gaiacube) cget -canvas]
+      set ccx [$canvas canvasx $cx]
+      set ccy [$canvas canvasy $cy]
+      $rtdimage convert coords $ccx $ccy canvas ix iy image
+
+      #  Visit all domains and check for the "ORIGSKY" Ident.
+      set domains [$rtdimage astdomains 0]
+      set i 0
+      foreach {domain} $domains {
+         catch {
+            incr i
+            $rtdimage astset current $i
+            set ident [$rtdimage astget "Ident"]
+            if { $ident == "ORIGSKY" } {
+               set xylist [$rtdimage astpix2cur $ix $iy]
+               $itk_component(selected) configure -value [lindex $xylist 2]
+               break
+            }
+         }
+      }
+
+      #  Restore default domain.
+      $rtdimage astset current $current
    }
 
    #  Set a new nchan value.
