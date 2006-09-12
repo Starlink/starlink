@@ -84,9 +84,6 @@
 *        temporary NDF when reading WCS from a FITS extension.
 *     4-MAY-2006 (DSB):
 *        Guard against NULL IWCS values.
-*     12-SEP-2006 (DSB):
-*        If the current Frame is AXIS and the AXIS structures are
-*        non-monotonic, reset the current Frame to PIXEL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -124,16 +121,12 @@
 
 *  Local Variables:
       CHARACTER ASNAME*(DAT__SZNAM)! Name of IRA structure
-      CHARACTER DOM*30           ! Current Frame Domain name
       CHARACTER ENCODS( MAXCOD )*( CODLEN )! Preferred AST encodings
       CHARACTER ENV*255          ! Value of KAPPA_ENCODINGS env. variable
       CHARACTER LOC*(DAT__SZLOC) ! Locator to FITS entension or IRA structure
       CHARACTER XLOC*(DAT__SZLOC) ! Locator to IRAS90 extension
       CHARACTER XNAME*(DAT__SZNAM)! Name of extension containing IRA structure
-      DOUBLE PRECISION OFFSET    ! Axis offset scale factor
-      DOUBLE PRECISION SCALE     ! Axis scale factor
       INTEGER ADDED              ! No. of elements added to the group
-      INTEGER AX( NDF__MXDIM )   ! Axis indices to check for monotonicity
       INTEGER AXFRM              ! AXIS Frame in supplied NDF
       INTEGER AXMAP              ! Mapping from GRID to AXIS in supplied NDF
       INTEGER I                  ! Axis count
@@ -154,7 +147,6 @@
       INTEGER PNTR               ! Pointer to mapped array of FITS headers
       INTEGER UBND( NDF__MXDIM ) ! Upper pixel bounds
       LOGICAL FLAG               ! Was group expression flagged? (NO)
-      LOGICAL MONO               ! Are all axes monotonic?
       LOGICAL THERE              ! Does object exist?
       LOGICAL VERB               ! Give verbose warnings about bad IRAS90/FITS?
       LOGICAL WRACC              ! Can the supplied NDF be modified?
@@ -476,29 +468,6 @@
 *  If we still have no WCS FrameSet, get the default WCS FrameSet from the 
 *  NDF.
       IF( IWCS .EQ. AST__NULL ) CALL NDF_GTWCS( INDF, IWCS, STATUS )
-
-*  If the current Frame is AXIS, check that the AXIS structures are
-*  monotonic. If not, reset the current Frame to PIXEL.
-      DOM = AST_GETC( IWCS, 'Domain', STATUS )
-      IF( DOM .EQ. 'AXIS' ) THEN      
-
-         CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
-         DO I = 1, NDIM
-            AX( I ) = I
-         END DO
-
-         CALL KPG1_CHAXD( INDF, NDIM, AX, MONO, SCALE, OFFSET,
-     :                    STATUS )
-
-         IF( .NOT. MONO ) THEN
-            CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
-            CALL AST_SETI( IWCS, 'Current', IPIX, STATUS )
-            CALL MSG_OUT( 'KPG1_GTWCS_MSG4', 'PIXEL co-ordinates will'//
-     :                    ' be used instead of AXIS co-ordinates.', 
-     :                    STATUS )
-         END IF
-
-      END IF
 
 *  Export the returned FrameSet from the current AST context so that it is 
 *  not annulled by the following call to AST_END.
