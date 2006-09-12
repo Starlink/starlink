@@ -1272,6 +1272,12 @@ int StarWCS::make2D()
         skyframe = (AstFrame *) astAnnul( skyframe );
         return 1;
     }
+
+    // Add idents to the base and current frames, so we know which ones they
+    // where.
+    astSet( skyframe, "Ident=ORIGSKY" );
+    astSet( baseframe, "Ident=ORIGBASE" );
+
     if ( nsky < 2 ) {
 
         // Current frame has too few axes. Add in a dummy one to make it 2D.
