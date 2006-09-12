@@ -53,6 +53,8 @@
 *        Added the definitions of additional keywords relevent to the
 *        "FIBRES_IFU" table to be included in the fibres-table 
 *        conversion.
+*     2006 September 10 (MNB):
+*        Added additional keyword WLNSUSD.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -283,6 +285,16 @@
          CALL DAT_NEW0C( LOC, 'FILENAME', 500, STATUS )
          CALL DAT_FIND( LOC, 'FILENAME', CLOC, STATUS )
          CALL DAT_PUT0C( CLOC, CVALUE, STATUS )
+         CALL DAT_ANNUL( CLOC, STATUS )
+      END IF
+
+*   WLNSUSD
+      CALL COF_GKEYI( FUNIT, 'WLNSUSD', THERE, IVALUE, COMENT, STATUS )
+      IF ( THERE ) THEN
+         CALL DAT_NEW( LOC, 'WLNSUSD', '_WORD', 0, 0, STATUS )
+         CALL DAT_FIND( LOC, 'WLNSUSD', CLOC, STATUS )
+         WVALUE = IVALUE
+         CALL DAT_PUT( CLOC, '_WORD', 0, 0, WVALUE, STATUS )
          CALL DAT_ANNUL( CLOC, STATUS )
       END IF
 
