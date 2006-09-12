@@ -243,6 +243,10 @@ itcl::class gaia::GaiaCubeSpectrum {
       remove_position_markers_
       remove_bindings_
       remove_regions_
+
+      #  No extraction is now current.
+      set last_cxcy_ {}
+      set last_region_ {}
    }
 
    #  Open, undo some of the actions of close.
