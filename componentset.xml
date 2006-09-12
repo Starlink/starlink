@@ -2861,7 +2861,7 @@ No longer under active control.
 </component>
 
 <component id="hlp" support="S">
-  <version>4.0-1</version>
+  <version>4.0-2</version>
   <path>libraries/hlp</path>
   <description>HLP -- interactive help system</description>
   <abstract><p>The Starlink HLP system allows an application program
