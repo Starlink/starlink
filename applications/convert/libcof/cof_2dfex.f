@@ -83,6 +83,9 @@
 *        table column definitions.
 *     2006 August 1 (MJC):
 *        Modified some units strings to conform to the FITS standard.
+*     2006 September 10 (MNB):
+*        Added WLEN column and additional keyword WLNSUSD for standard 
+*        FIBRE table.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -117,7 +120,7 @@
       INTEGER MXCSTD             ! Maximum number of components in the
                                  ! OBJECT structure or fields in the
                                  ! binary table in standard mode
-      PARAMETER ( MXCSTD = 16 )
+      PARAMETER ( MXCSTD = 17 )
 
       INTEGER MXCIFU             ! Maximum number of components in the
                                  ! OBJECT structure or fields in the
@@ -181,18 +184,20 @@
      :             'Pivot number', 'Object magnitude',
      :             'Programme identification', 'Comments',
      :             'Retractor name', 'A or B if beam switching',
-     :             'Beam-switch partner fibre' /
+     :             'Beam-switch partner fibre',
+     :             'Configured wavelength'  /
 
       DATA TFORM / '80A', '1D', '1D', '1J', '1J', '1I', '1I', '1D',
-     :             '1A', '1I', '1D', '1J', '80A', '10A', '1A', '1I' /
+     :             '1A', '1I', '1D', '1J', '80A', '10A', '1A', '1I',
+     :             '1D' /
 
       DATA TTYPE / 'NAME', 'RA', 'DEC', 'X', 'Y', 'XERR', 'YERR',
      :             'THETA', 'TYPE', 'PIVOT', 'MAGNITUDE', 'PID',
      :             'COMMENT', 'RETRACTOR', 'SWITCHFIELD',
-     :             'SWITCHPARTNER' /
+     :             'SWITCHPARTNER', 'WLEN' /
 
       DATA TUNIT / ' ', 'rad', 'rad', 'um', 'um', 'um', 'um', 'rad', 
-     :             ' ', ' ', 'mag', ' ', ' ', ' ', ' ', 'bin' /
+     :             ' ', ' ', 'mag', ' ', ' ', ' ', ' ', 'bin', 'A' /
 
       DATA TDEIFU / 'Spectrum Identifier',
      :              'Selection flag',
@@ -532,6 +537,12 @@
             CALL DAT_GET0I( CLOC, IVALUE, STATUS )
             CALL FTPKYJ( FUNIT, KEYWRD, IVALUE, 
      :                   'Beam switch offset Y (um)', FSTAT )
+
+*  WLNSUSD
+         ELSE IF ( KEYWRD .EQ. 'WLNSUSD' ) THEN
+            CALL DAT_GET0I( CLOC, IVALUE, STATUS )
+            CALL FTPKYJ( FUNIT, KEYWRD, IVALUE, 
+     :         'No of Fibres using the specific wavelength', FSTAT )
 
 * -------------------------------
 * AAOMEGA-IFU Non STRING KEYWORDS
