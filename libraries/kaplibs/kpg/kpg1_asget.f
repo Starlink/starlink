@@ -149,6 +149,9 @@
 *        Ensure INPRM is initialised even if NDIM is equal to NBAX. Lack
 *        of initialisation caused KPG1_ASTRM to crash in the case where 
 *        NDIM and NBAX are equal.
+*     12-SEP-2006 (DSB):
+*        If the current Frame is AXIS and the AXIS structures are
+*        non-monotonic, reset the current Frame to PIXEL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -192,10 +195,14 @@
 *  Local Variables:
       CHARACTER COSTR*( NDF__MXDIM * ( SZFMT + 1 ) + 1 ) 
                                    ! Formatted coordinate string
+      CHARACTER DOM*30             ! Current Frame domain
       CHARACTER PAXIS*( VAL__SZI ) ! Buffer for new axis number
       CHARACTER QAXIS*( VAL__SZI ) ! Buffer for original axis number
       CHARACTER TTL*80             ! NDF title
-      DOUBLE PRECISION CONST( NDF__MXDIM )! Constant values for unassigned axes
+      DOUBLE PRECISION CONST( NDF__MXDIM )! Constants for unassigned axes
+      DOUBLE PRECISION OFFSET      ! Axis offset scale factor
+      DOUBLE PRECISION SCALE       ! Axis scale factor
+      INTEGER AX( NDF__MXDIM )     ! Axis indices to check for monotonicity
       INTEGER DIM                  ! Pixel dimension
       INTEGER FRM                  ! Pointer to a Frame in IWCS
       INTEGER I                    ! Axis index
@@ -218,6 +225,7 @@
       INTEGER OUTPRM( NDF__MXDIM ) ! Output axis permutation array
       INTEGER PMAP                 ! AST pointer to a PermMap
       INTEGER UBND( NDF__MXDIM )   ! Original NDF bounds
+      LOGICAL MONO                 ! Are all axes monotonic?
 *.
 
 *  Initialise.
@@ -535,6 +543,29 @@
      :                 'this problem by changing the current '//
      :                 'co-ordinate Frame in ^NDF using WCSFRAME.', 
      :                  STATUS )
+
+      END IF
+
+*  If the current Frame is AXIS, check that the AXIS structures are
+*  monotonic. If not, reset the current Frame to PIXEL.
+      DOM = AST_GETC( IWCS, 'Domain', STATUS )
+      IF( DOM .EQ. 'AXIS' ) THEN      
+
+         CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+         DO I = 1, NDIM
+            AX( I ) = I
+         END DO
+
+         CALL KPG1_CHAXD( INDF, NDIM, AX, MONO, SCALE, OFFSET,
+     :                    STATUS )
+
+         IF( .NOT. MONO ) THEN
+            CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
+            CALL AST_SETI( IWCS, 'Current', IPIX, STATUS )
+            CALL MSG_OUT( 'KPG1_GTWCS_MSG4', 'PIXEL co-ordinates will'//
+     :                    ' be used instead of AXIS co-ordinates.', 
+     :                    STATUS )
+         END IF
 
       END IF
 
