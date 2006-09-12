@@ -100,6 +100,9 @@
 *        Use CNF_PVAL.
 *     2004 September 30 (PWD):
 *        Move CNF_PAR include into declarations.
+*     12-SEP-2006 (DSB):
+*        Update non-monotoinc wanring message since AST can handle
+*        non-monotonic LutMaps.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -186,8 +189,7 @@
                   CALL NDF_MSG( 'NDF', INDF )
                   CALL MSG_OUT( 'KPG1_CHAXx_NOTMONO', 'Axis ^AX of '/
      :              /'^NDF is not monotonic and therefore cannot be '/
-     :              /'used for annotation or stored in the graphics '/
-     :              /'database.', STATUS )
+     :              /'used for annotation.', STATUS )
 
 *  Flag that the axis co-ordinates cannot be used.
                   DATAVL = .FALSE.
