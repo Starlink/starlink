@@ -108,7 +108,7 @@
 #     27-JUL-2006 (TIMJ):
 #        Add initial MAKECUBE parameters.
 #     13-SEP-2006 (JB):
-#        Add BADBOLOS
+#        Add BADBOLOS & made SC2SIM seed optional
 #     {enter_changes_here}
 
 #  Bugs:
@@ -494,9 +494,8 @@ package @PACKAGE@ {
           parameter seed {
             position 3
             type _INTEGER
-            prompt {Value for random number generator}
-            vpath {PROMPT}
-            ppath GLOBAL CURRENT
+            vpath DEFAULT
+            default !
             helpkey *
           }
 
