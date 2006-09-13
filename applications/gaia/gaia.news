@@ -2,6 +2,9 @@
 
     The grid overlay and celestial coordinate system toolboxes now
     support Horizon (azel) coordinates.
+   
+    The coordinate system of a channel map is now matched to that
+    of the current cube.
 
 
   Release 3.2-0: 28th July 2006.
