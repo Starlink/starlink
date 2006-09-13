@@ -78,6 +78,7 @@
 *        - Fixed Longitude sign error
 *     2006-09-11 (EC):
 *        - map_cache was not getting pre-pended properly to transformation
+*        - Only apply intrument aperture offset if non-null
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -264,8 +265,10 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
       /* End LUT-specific code */
 
       /* Apply focal plane ("instrument aperture") offsets */
-      instapmap = astShiftMap( 2, instap, "" );
-      map_cache = (AstMapping *) astCmpMap( map_cache, instapmap, 1, "" );
+      if( instapmap ) {
+	instapmap = astShiftMap( 2, instap, "" );
+	map_cache = (AstMapping *) astCmpMap( map_cache, instapmap, 1, "" );
+      }
 
       /* Simplify the Cached Mapping. */
       map_cache = astSimplify( map_cache );
