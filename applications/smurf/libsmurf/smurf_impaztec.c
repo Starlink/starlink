@@ -53,6 +53,8 @@
 *        - Pass telescope coordinates to sc2sim_calctime
 *     2006-09-11 (EC):
 *        Fixed pointer problem with callc to smf_calc_telpos
+*     2006-09-12 (EC):
+*        Use direct sc2store and ndf calls instead of sc2sim_ndfwrdata
 
 *     {enter_further_changes_here}
 
@@ -90,6 +92,7 @@
 #include <stdio.h>
 
 /* STARLINK includes */
+#include "fitsio.h"
 #include "mers.h"
 #include "par.h"
 #include "par_par.h"
@@ -144,10 +147,6 @@ void slaCaldj ( int iy, int im, int id, double *djm, int *j );
 void smurf_impaztec( int *status ) {
  
   /* Local Variables */
-
-  int add_atm;                 /* flag for adding atmospheric emission  */
-  int add_fnoise;              /* flag for adding 1/f noise  */
-  int add_pns;                 /* flag for adding photon noise  */
   double *airmass = NULL;      /* airmass of each frame */
   double amend;                /* airmass at end  */
   double amstart;              /* airmass at beginning  */
@@ -165,20 +164,17 @@ void smurf_impaztec( int *status ) {
   char date_str[MAXSTRING];    /* string rep. of date (MM/DD/YYYY) */
   int day;                     /* day of beginning of observation */
   int *dbuf=NULL;              /* simulated data  */
-  double dec;                  /* dec of observation in radians  */
+  double dec=0;                /* dec of observation in radians  */
   char dec_str[MAXSTRING];     /* string rep. of dec */
-  double digcurrent;           /* digitisation mean current */
-  double digmean;              /* digitisation mean value */
-  double digscale;             /* digitisation scale factore */
   double djm;                  /* modified julian start date */
   int *dksquid=NULL;           /* dark SQUID time stream data  */
   double *fcal=NULL;           /* flatfield calibration  */
-  int flux2cur;                /* flag for converting flux to current  */
   double *fpar=NULL;           /* flat-field parameters  */
   size_t framespersecond;      /* frames per second */
   double *full_bolosig=NULL;   /* all bolo signals [NBOLOSxNFRAMES] */
-  struct JCMTState *head;      /* header data for each frame  */
+  struct JCMTState *head=NULL; /* header data for each frame  */
   dim_t i,j;                   /* loop counters */
+  int k;
   double meanwvm;              /* 225 GHz tau */
   double *mjuldate=NULL;       /* modified Julian date each sample */
   int month;                   /* month of beginning of observation */
@@ -188,13 +184,12 @@ void smurf_impaztec( int *status ) {
   int ncol;                    /* number of bolometers in column  */
   char ndffile[MAXSTRING];     /* output NDF file name */
   int nflat;                   /* number of flat coeffs per bol  */
-  size_t nframes;              /* number of time steps in netCDF data format */
+  int nframes;                 /* number of time steps in netCDF data format */
   int nrow;                    /* number of bolometers in row */
   int numsamples;              /* number of samples  */
   double obslam;               /* wavelength */
-  char *obsmode=NULL;          /* observing mode */
   double *posptr=NULL;         /* pointing offsets from map centre */
-  double ra;                   /* ra of observation in radians  */
+  double ra=0;                 /* ra of observation in radians  */
   char ra_str[MAXSTRING];      /* string rep. of ra */
   double sample_t;             /* sample interval in msec  */
   size_t seconds;              /* seconds in observation */
@@ -211,10 +206,36 @@ void smurf_impaztec( int *status ) {
   double *trackdemandc2 = NULL;
   int varid_h1b1;              /* netCDF variable id of bolo h1b1 signal */
   int yr;                      /* year of beginning of observation */
- 
-  struct dxml_struct inx;      /* structures required for ndfwrdata calls */ 
-  struct dxml_sim_struct sinx; /* structures required for ndfwrdata calls */ 
 
+
+  double decd;                     /* Dec of observation in degrees */
+  static char fitsrec[FHEAD__MXREC][81];  /* store for FITS records */
+  int nrec;                        /* number of FITS header records */
+  double rad;                      /* RA of observation in degrees */
+  double map_hght;                 /* Map height in arcsec */
+  double map_wdth;                 /* Map width in arcsec  */
+  double map_pa;                   /* Map PA in degrees  */
+  double map_x = 0;                /* Map X offset in arcsec */
+  double map_y = 0;                /* Map Y offset in arcsec */
+  double x_min = 0;                /* Maximum extent of pointing offsets */
+  double x_max = 0;
+  double y_min = 0;
+  double y_max = 0;
+
+  int lbnd[3];                     /* Dimensions of the DATA component */
+  int ubnd[3];                     /*   "               "       "      */
+  int framesize=0;                 /* # data points per timeslice (nbolos) */
+  int place=0;                     /* NDF placeholder */
+  int indf=0;                      /* NDF id for the file */
+  int nmap=0;                      /* Number of elements mapped */
+  HDSLoc *jcmtstateloc = NULL;     /* HDS locator to JCMTSTATE structure */
+  void *pntr=NULL;                 /* Temporary pointer */
+
+  HDSLoc *fitsloc = NULL;    /* HDS locator to FITS headers */
+  HDSLoc *loc2 = NULL;       /* HDS locator */
+  
+
+ 
   /* Main routine */
 
 #ifdef HAVE_LIBNETCDF
@@ -225,7 +246,7 @@ void smurf_impaztec( int *status ) {
   /* Get the user defined input and output file names */
   parGet0c( "IN", ncfile, MAXSTRING, status);
   parGet0c( "OUT", ndffile, MAXSTRING, status);
-  
+
   if( *status == SAI__OK ) {
     /* Open the netCDF file and check for errors */
     nc_error( nc_open(ncfile,NC_NOWRITE,&ncid), status );
@@ -234,10 +255,6 @@ void smurf_impaztec( int *status ) {
   if( *status == SAI__OK ) {
 
     /* Preset some required values */
-    add_atm    = 0;
-    add_fnoise = 0;
-    add_pns    = 0;
-    flux2cur   = 0;
     meanwvm    = 0; /* fix */
     obslam     = 0;
     nrow       = 1;
@@ -245,12 +262,6 @@ void smurf_impaztec( int *status ) {
     nflat      = 1;
     atstart    = 0;
     atend      = 0;
-    obsmode = "";		   /* fix */
-
-    /* Kludge for now - assign values for digitisation */
-    digmean = ((double)pow(2,24))/2;
-    digscale = 1000000;	
-    digcurrent = 1.2;
 
     msgOutif(MSG__VERB, FUNC_NAME, 
 	     "Reading netcdf file", status); 
@@ -261,20 +272,8 @@ void smurf_impaztec( int *status ) {
     nc_inq_dimlen(ncid,4,&seconds);
     nframes = framespersecond*seconds; 
 
-    /* Allocate memory for the bolometer signals */
+    /* Allocate temporary memory for the bolometer signals */
     bolosig = smf_malloc( nframes, sizeof( *bolosig ), 0, status );
-    full_bolosig = smf_malloc( nbolos*nframes, sizeof( *full_bolosig ), 0, 
-			       status );
-
-    /* Get the bolometer signals */
-    nc_inq_varid(ncid, "h1b1",&varid_h1b1);
-
-    for(i=0; i<nbolos ; i++){
-      nc_error( nc_get_var_double(ncid,varid_h1b1+i,bolosig), status );
-      for(j=0;j<nframes;j++){
-	full_bolosig[j*nbolos + i] = bolosig[j];
-      }
-    }
 
     /* create and fill the header with rts/tcs data */
     head = smf_malloc( nframes, sizeof(*head), 1, status );
@@ -336,9 +335,20 @@ void smurf_impaztec( int *status ) {
        djm = djm + startnoontime / 86400;
     }
 
+    /* Use simulator routine to calculate array of UT for each timeslice */
     sc2sim_calctime( telpos[0]*DD2R, djm, sample_t, nframes,
                      mjuldate, tempbuff, status );       
+
+    /* RA + Dec at centre of map */
+    nc_get_att_text ( ncid, NC_GLOBAL, "jcmt_header_C1", ra_str );
+    ra = strtod ( ra_str, NULL );
+    nc_get_att_text ( ncid, NC_GLOBAL, "jcmt_header_C2", dec_str );
+    dec = strtod ( dec_str, NULL );
+
     
+
+    /* Calculate the JCMTState at each timeslice */
+
     nc_getSignal ( ncid, "jcmt_airmass", airmass, status );
     nc_getSignal ( ncid, "jcmt_trackActC1", trackactc1, status );
     nc_getSignal ( ncid, "jcmt_trackActC2", trackactc2, status );
@@ -353,85 +363,224 @@ void smurf_impaztec( int *status ) {
     nc_getSignal ( ncid, "jcmt_azElBaseC1", azelbasec1, status );
     nc_getSignal ( ncid, "jcmt_azElBaseC2", azelbasec2, status );
 
-    for ( i = 0; i < nframes; i++ ) {
+    for ( i = 0; i < nframes; i++ ) {      
+      head[i].rts_num = i;   
+      head[i].rts_end = mjuldate[i];
+      head[i].tcs_airmass = airmass[i];
+      head[i].tcs_tr_ac1 = trackactc1[i];
+      head[i].tcs_tr_ac2 = trackactc2[i];
+      head[i].tcs_tr_dc1 = trackdemandc1[i];
+      head[i].tcs_tr_dc2 = trackdemandc2[i];
+      head[i].tcs_tr_bc1 = trackactc1[0]; /* trackbasec1[i]; strange values? */
+      head[i].tcs_tr_bc2 = trackactc2[0]; /* trackbasec2[i]; strange values? */
+      head[i].tcs_az_ac1 = azelactc1[i];
+      head[i].tcs_az_ac2 = azelactc2[i];  
+      head[i].tcs_az_dc1 = azeldemandc1[i];
+      head[i].tcs_az_dc2 = azeldemandc2[i];
+      head[i].tcs_az_bc1 = azelbasec1[i];
+      head[i].tcs_az_bc2 = azelbasec2[i]; 
       
-       head[i].rts_num = i;   
-       head[i].rts_end = mjuldate[i];
-       head[i].tcs_airmass = airmass[i];
-       head[i].tcs_tr_ac1 = trackactc1[i];
-       head[i].tcs_tr_ac2 = trackactc2[i];
-       head[i].tcs_tr_dc1 = trackdemandc1[i];
-       head[i].tcs_tr_dc2 = trackdemandc2[i];
-       head[i].tcs_tr_bc1 = trackbasec1[i];
-       head[i].tcs_tr_bc2 = trackbasec2[i];
-       head[i].tcs_az_ac1 = azelactc1[i];
-       head[i].tcs_az_ac2 = azelactc2[i];  
-       head[i].tcs_az_dc1 = azeldemandc1[i];
-       head[i].tcs_az_dc2 = azeldemandc2[i];
-       head[i].tcs_az_bc1 = azelbasec1[i];
-       head[i].tcs_az_bc2 = azelbasec2[i]; 
-
-       dksquid[i] = 0; 
-
-       posptr[2*i +0] = azelactc1[i];
-       posptr[2*i +1] = azelactc2[i];
-
+      posptr[2*i +0] = azelactc1[i];
+      posptr[2*i +1] = azelactc2[i];
+      
     } 
+
+    /* Additional FITS header information */
 
     amstart = head[0].tcs_airmass;
     amend = head[nframes-1].tcs_airmass;
     numsamples = nframes;
     ncol = nbolos;
 
-    for(i=0;i<nbolos;i++) fcal[i] = 1;
-    for(i=0;i<nflat;i++) fpar[i] = 1; 
-
-    /* fill ndf data */
-    nc_get_att_text ( ncid, NC_GLOBAL, "jcmt_header_C1", ra_str );
-    ra = strtod ( ra_str, NULL );
-    nc_get_att_text ( ncid, NC_GLOBAL, "jcmt_header_C2", dec_str );
-    dec = strtod ( dec_str, NULL );
-
-    sc2sim_digitise ( nframes*nbolos, full_bolosig, digmean, digscale, 
-		      digcurrent, dbuf, status );
-
-
-    /* Fill the inx and sinx arrays */
-    inx.ra = ra;
-    inx.dec = dec;
-    inx.nbolx = ncol;
-    inx.nboly = nrow;
-    inx.sample_t = sample_t; 
-    strncpy( inx.obsmode, obsmode, sizeof(inx.obsmode)-1 );
-    
-    sinx.add_atm = 0;
-    sinx.add_fnoise = 0;
-    sinx.add_pns = 0;
-    sinx.flux2cur = 0;
-    strncpy( sinx.subname, "AZTEC", sizeof(sinx.subname)-1 );
-    sinx.airmass = (amstart + amend)/2.;
-    sinx.atstart = atstart;
-    sinx.atend = atend;
-    
   }
 
   msgOutif(MSG__VERB, FUNC_NAME, 
 	   "Writing NDF file", status); 
 
-  /* write the ndf file */
-  sc2sim_ndfwrdata( &inx, &sinx, meanwvm, ndffile, numsamples, nflat, 
-		    "POLYNOMIAL", head, dbuf, dksquid, fcal, fpar, 
-		    "AZTEC", "1100",
-		    posptr, 0, NULL, status ); 
-		   
-  /* call using the old ndfwrdata interface
+  ndfBegin();
 
-    ra, dec, add_atm, add_fnoise, add_pns, flux2cur, amstart,
-    amend, meanwvm, obslam, ndffile, ncol, nrow, sample_t, 
-    "AZTEC", numsamples, nflat, "POLYNOMIAL", head, dbuf, 
-    dksquid, fcal, fpar, "1100", atstart, atend, posptr, 
-    obsmode, status);
+  /* Create HDS container file */
+  ndfPlace ( NULL, ndffile, &place, status );
+
+  /* Create an NDF inside the container */
+  framesize = ncol * nrow;
+  ubnd[0] = ncol;
+  lbnd[0] = 1;
+  ubnd[1] = nrow;
+  lbnd[1] = 1;
+  ubnd[2] = nframes;
+  lbnd[2] = 1;
+  
+  ndfNew ( "_DOUBLE", 3, lbnd, ubnd, &place, &indf, status );
+  ndfHcre ( indf, status );
+
+  /* Map the data array */  
+  ndfMap( indf, "DATA", "_DOUBLE", "WRITE", &pntr, &nmap, 
+	   status );
+
+  full_bolosig = pntr;
+
+  /* Re-order the bolometer signals */
+  nc_inq_varid(ncid, "h1b1",&varid_h1b1);
+  
+  for(i=0; i<nbolos ; i++){
+    nc_error( nc_get_var_double(ncid,varid_h1b1+i,bolosig), status );
+    
+    if( *status == SAI__OK ) {
+      for(j=0;j<nframes;j++) {
+	full_bolosig[j*nbolos + i] = bolosig[j];
+      }
+    } else {
+      /* Exit if bad status was set */
+      i = nbolos;
+    }
+  }
+
+  /* Format the FITS headers */
+  
+  fhead_init ( status );
+  
+  fhead_putfits ( TSTRING,
+		  "DATE-OBS", "YYYY-MM-DDThh:mm:ss",
+		  "observation date", status );
+  
+  rad = ra * DR2D;
+  
+  fhead_putfits ( TDOUBLE,
+		  "RA", &rad,
+		  "Right Ascension of observation", status );
+  
+  decd = dec * DR2D;
+  
+  fhead_putfits ( TDOUBLE,
+		  "DEC", &decd,
+		  "Declination of observation", status );
+  
+  fhead_putfits ( TINT,
+		  "NBOLX", &ncol,
+		  "number of bolometers in X direction", status );
+
+  fhead_putfits ( TINT,
+		  "NBOLY", &nrow,
+		  "number of bolometers in Y direction", status );
+  
+  fhead_putfits ( TDOUBLE,
+		  "SAMPLE_T", &sample_t,
+		  "The sample interval in msec", status );
+  
+  fhead_putfits ( TSTRING,
+		  "SUBARRAY", "AZTEC",
+		  "subarray name", status );
+  
+  fhead_putfits ( TINT,
+		  "NUMSAMP", &numsamples,
+		  "number of samples", status );
+
+  /* Currently meaningless
+  fhead_putfits ( TDOUBLE,
+		  "AMSTART", &amstart,
+		  "Air mass at start", status );
+  fhead_putfits ( TDOUBLE,
+		  "AMEND", &amend,
+		  "Air mass at end", status );
+  
+  fhead_putfits ( TDOUBLE,
+		  "MEANWVM", &meanwvm,
+		  "Mean zenith tau at 225 GHz from WVM", status );
   */
+  
+  fhead_putfits ( TSTRING,
+		  "FILTER", "1100",
+		  "filter used", status );
+  
+  /* Currently meaningless
+  fhead_putfits ( TDOUBLE,
+		  "ATSTART", &atstart,
+		  "Ambient temperature at start (C)", status );
+  
+  fhead_putfits ( TDOUBLE,
+		  "ATEND", &atend,
+		  "Ambient temperature at end (C)", status );
+  */
+
+  fhead_putfits ( TSTRING,
+		  "INSTRUME", "AZTEC",
+		  "Instrument name", status );
+
+  fhead_putfits ( TSTRING,
+		  "TELESCOP", "JCMT",
+		  "Name of telescope", status );
+   
+  /* Determine extent of the map from posptr + known size of the arrays */
+  for( i=0; i<numsamples; i++ ) {
+    
+    if( i == 0 ) {
+      x_min = posptr[0];
+      x_max = posptr[0];
+      y_min = posptr[1];
+      y_max = posptr[1];
+    }
+    
+    if( posptr[i*2] < x_min ) x_min = posptr[i*2];
+    if( posptr[i*2] > x_max ) x_max = posptr[i*2];
+    if( posptr[i*2+1] < y_min ) y_min = posptr[i*2+1];
+    if( posptr[i*2+1] > y_max ) y_max = posptr[i*2+1];
+    
+  }
+  
+  map_wdth = (x_max - x_min) + 1000; /* 1000 arcsec for array FOV */
+  map_hght = (y_max - y_min) + 1000; /* 1000 arcsec for array FOV */
+  map_pa = 0; /* kludge */
+  map_x = (x_max + x_min)/2.;
+  map_y = (y_max + y_min)/2.;
+  
+  fhead_putfits ( TDOUBLE,
+		  "MAP_HGHT", &map_hght,
+		  "Map height (arcsec)", status );
+  fhead_putfits ( TDOUBLE,
+		  "MAP_WDTH", &map_wdth,
+		  "Map height (arcsec)", status );
+  fhead_putfits ( TDOUBLE,
+		  "MAP_PA", &map_pa,
+		  "Map PA (degrees)", status );
+  fhead_putfits ( TDOUBLE,
+		  "MAP_X", &map_x,
+		  "Map X offset (arcsec)", status );
+  fhead_putfits ( TDOUBLE,
+		  "MAP_Y", &map_y,
+		  "Map Y offset (arcsec)", status );
+  
+  /* Get the accumulated FITS headers */ 
+  fhead_getfits ( &nrec, fitsrec, status );
+
+  /* Create storage for Header values for each frame - store in JCMTSTATE */
+  ndfXnew( indf, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0, &jcmtstateloc, status );
+
+  sc2store_headcremap ( jcmtstateloc, nframes, INST__SCUBA2, status );
+
+  /* Store the JCMState one frame at a time */
+  for( j=0; j<numsamples; j++ ) {
+    sc2store_headput ( j, head[j], status );
+  }
+
+  /* Store the FITS header */
+
+  ndfXnew ( indf, "FITS", "_CHAR*80", 1, &(nrec), &fitsloc, status );
+  
+  for ( k=1; k<=nrec; k++ ) {
+    datCell ( fitsloc, 1, &k, &loc2, status );
+    datPut0C ( loc2, fitsrec[k-1], status );
+    datAnnul ( &loc2, status );
+  }
+  datAnnul ( &fitsloc, status );
+
+  /* Close the NDF */
+
+  sc2store_headunmap( status );
+
+  ndfAnnul ( &indf, status );
+
+  ndfEnd ( status );
 
   /* close the netCDF file and check for errors */
   
@@ -442,7 +591,6 @@ void smurf_impaztec( int *status ) {
   /* Free memory */
   
   smf_free ( bolosig, status );
-  smf_free ( full_bolosig, status ); 
   smf_free ( head, status );
   smf_free ( dbuf, status );
   smf_free ( dksquid, status );
