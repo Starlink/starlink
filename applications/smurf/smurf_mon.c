@@ -73,6 +73,8 @@
 *        Modified sc2ast_createwcs calls to use new interface.
 *     2006-09-11 (EC):
 *        Added call to smf_create_lutwcs to clear cache
+*     2006-09-13 (JB):
+*        Added BADBOLOS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -193,6 +195,8 @@ void smurf_mon( int * status ) {
     smurf_dreamsolve( status );
   } else if (strcmp( taskname, "IMPAZTEC" ) == 0 ) {
     smurf_impaztec( status );
+  } else if (strcmp( taskname, "BADBOLOS" ) == 0 ) {
+    smurf_badbolos( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

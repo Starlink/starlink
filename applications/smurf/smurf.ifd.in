@@ -107,6 +107,8 @@
 #        Rename SIM to SC2SIM.
 #     27-JUL-2006 (TIMJ):
 #        Add initial MAKECUBE parameters.
+#     13-SEP-2006 (JB):
+#        Add BADBOLOS
 #     {enter_changes_here}
 
 #  Bugs:
@@ -258,8 +260,8 @@ package @PACKAGE@ {
 	  parameter msg_filter {
 	    type _CHAR
 	    prompt {Message level}
-	    default NORM
-	    vpath DEFAULT	
+	    vpath DEFAULT
+            default NORM
 	    helpkey *
 	  }
 
@@ -519,8 +521,8 @@ package @PACKAGE@ {
           parameter msg_filter {
 	    type _CHAR
 	    prompt {Message level}
+	    vpath DEFAULT
 	    default NORM
-	    vpath DEFAULT	
 	    helpkey *
 	  }
 
@@ -577,6 +579,7 @@ package @PACKAGE@ {
             access READ
             vpath {PROMPT }
             prompt {Input AzTEC NETCDF File}
+            ppath GLOBAL CURRENT
             helpkey *
           }
 
@@ -587,14 +590,87 @@ package @PACKAGE@ {
             vpath {PROMPT }
             association ->GLOBAL.DATA_ARRAY
             prompt {Output NDF file}
+            ppath GLOBAL CURRENT
             helpkey *
           }
 
           parameter msg_filter {
             type _CHAR
             prompt {Message level}
-            default NORM
             vpath DEFAULT
+	    default NORM
+            helpkey *
+          }
+     }
+
+     action badbolos {
+
+         parameter in {
+            position 1
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            prompt {Input Simulated NDF File}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+	  parameter method {
+            type _CHAR
+            prompt {Bad bolometer generation method}
+	    default RANDOM
+            helpkey *
+	  }
+
+         parameter ard {
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            prompt {Input ARD Description File}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }          
+
+          parameter bad_columns {
+            position 2
+            type _INTEGER
+            prompt {Number of bad columns of bolometers}
+            vpath {PROMPT}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+          parameter bad_rows {
+            position 3
+            type _INTEGER
+            prompt {Number of bad rows of bolometers}
+            vpath {PROMPT}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+          parameter bad_bolos {
+            position 4
+            type _INTEGER
+            prompt {Number of additional bad individual bolometers}
+            vpath {PROMPT}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+          parameter seed {
+            position 5
+            type _INTEGER
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+          parameter msg_filter {
+            type _CHAR
+            prompt {Message level}
+            vpath DEFAULT
+	    default NORM
             helpkey *
           }
      }

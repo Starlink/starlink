@@ -38,6 +38,8 @@
 *        Add smurf_dreamsolve
 *     2006-07-27 (TIMJ):
 *        Add MAKECUBE
+*     2006-09-13 (JB):
+*        Add BADBOLOS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -76,5 +78,6 @@ void smurf_remsky( int * );
 void smurf_scanfit( int * );
 void smurf_sc2sim( int * );
 void smurf_dreamsolve( int * );
+void smurf_badbolos( int * );
 
 #endif /* SMURF_LIB_DEFINED */
