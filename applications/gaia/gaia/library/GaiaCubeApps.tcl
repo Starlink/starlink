@@ -127,15 +127,19 @@ itcl::class gaia::GaiaCubeApps {
       }
 
       #  Release wcsframe task.
-      if { $wcsframetask_ != {} } {
-         catch {$wcsframetask_ delete_sometime}
-         set wcsframetask_ {}
-      }
-
-      #  Release wcsattrib task.
-      if { $wcsattribtask_ != {} } {
+      if { $wcsframe_ != {} } {
          catch {$wcsframe_ delete_sometime}
          set wcsframe_ {}
+      }
+
+      #  Release wcsattrib tasks.
+      if { $getwcsattrib_ != {} } {
+         catch {$getwcsattrib_ delete_sometime}
+         set getwcsattrib_ {}
+      }
+      if { $setwcsattrib_ != {} } {
+         catch {$setwcsattrib_ delete_sometime}
+         set setwcsattrib_ {}
       }
    }
 
@@ -171,7 +175,7 @@ itcl::class gaia::GaiaCubeApps {
          pack $itk_component(combination) -side top -fill x -ipadx 1m -ipady 1m
          add_short_help $itk_component(combination) \
             {Method to use when combining data, use median with care}
-         
+
          set top [winfo toplevel $w_]
          foreach {sname descr} $estimators_ {
             if { $descr != "" } {
@@ -230,14 +234,14 @@ itcl::class gaia::GaiaCubeApps {
    protected method doit_ {} {
 
       #  Convert pixel bounds to world coordinates of the cube's default
-      #  system. If this fails then we need to attempt the current domain of
-      #  the cube to PIXEL before processing.
+      #  system. If this fails then we need to attempt to set the current
+      #  domain of the cube to PIXEL before processing.
       set lbp [expr min($itk_option(-lower_limit),$itk_option(-upper_limit))]
       set ubp [expr max($itk_option(-lower_limit),$itk_option(-upper_limit))]
 
       #  One twist is that the coordinate system should match that of the
       #  disk-resident cube, so check that the coordinate system hasn't been
-      #  changed, if so switch back to the default system (temporily).
+      #  changed, if so switch back to the default system (temporarily).
       lassign [$itk_option(-spec_coords) get_system] system units
       if { $system != "default" && $system != {} } {
          $itk_option(-spec_coords) set_system "default" "default" 1
@@ -249,31 +253,33 @@ itcl::class gaia::GaiaCubeApps {
       }
 
       set set_current_domain_ 0
+
       if { $lb == {} && $ub == {} } {
-         #  Conversion failed, will work with pixel coordinates.
+
+         #  Conversion failed, will work with PIXEL coordinates.
          set set_current_domain_ 1
          set lb [expr $lbp - 0.5]
          set ub [expr $ubp - 0.5]
          if { $wcsframe_ == {} } {
             global env
-            set wcsframetask_ [GaiaApp \#auto -application \
-                                  $env(KAPPA_DIR)/wcsframe \
-                                  -notify [code $this wcsframe_completed_]]
+            set wcsframe_ [GaiaApp \#auto -application \
+                              $env(KAPPA_DIR)/wcsframe \
+                              -notify [code $this wcsframe_completed_]]
          }
-         if { $wcsattrib_ == {} } {
+         if { $getwcsattrib_ == {} } {
             global env
-            set wcsattribtask_ [GaiaApp \#auto -application \
-                                   $env(KAPPA_DIR)/wcsattrib \
-                                   -notify [code $this wcsattrib_completed_] \
-                                   -parnotify [code $this wcsattrib_gotparam_]]
+            set getwcsattrib_ [GaiaApp \#auto -application \
+                                  $env(KAPPA_DIR)/wcsattrib \
+                                  -notify [code $this wcsattrib_completed_] \
+                                  -parnotify [code $this wcsattrib_gotparam_]]
          }
       }
 
       #  Convert cube to PIXEL domain, if needed.
       blt::busy hold $w_
-
+      set ndfname [$itk_option(-gaiacube) get_ndfname]
       if { $set_current_domain_ } {
-         $wcsattrib_ runwiths "ndf=$ndfname mode=get name=DOMAIN accept"
+         $getwcsattrib_ runwiths "ndf=$ndfname mode=get name=DOMAIN accept"
          ::tkwait variable [scope current_domain_]
 
          $wcsframe_ runwiths "ndf=$ndfname frame=PIXEL accept"
@@ -281,7 +287,6 @@ itcl::class gaia::GaiaCubeApps {
       }
 
       #  Now start and run the main application, if not done already.
-      set ndfname [$itk_option(-gaiacube) get_ndfname]
       set axis [$itk_option(-gaiacube) get_axis]
       run_main_app_ $ndfname $axis $lb $ub
 
@@ -303,7 +308,7 @@ itcl::class gaia::GaiaCubeApps {
    #  Do the presentation of the result now the application has completed.
    #  To handle this implement a app_present_ method.
    protected method app_completed_ {} {
-      
+
       #  Get the sub-class to do the work.
       app_do_present_
 
@@ -329,7 +334,7 @@ itcl::class gaia::GaiaCubeApps {
 
       #  Get the value, but note we need to wait for this command to complete
       #  too (behaviour defined by the -parnotify option).
-      $wcsattrib_ getparam "VALUE"
+      $getwcsattrib_ getparam "VALUE"
       ::tkwait variable [scope parvalue_]
       set current_domain_ $parvalue_
    }
@@ -355,6 +360,37 @@ itcl::class gaia::GaiaCubeApps {
       } else {
          $itk_option(-gaiacube) remove_ref_range $itk_option(-ref_id)
       }
+   }
+
+   #  Set the SYSTEM and UNIT values for the current coordinate system of an
+   #  NDF. Use when the underlying coordinate system needs to match that in
+   #  use. Note this designed to not return until the task is complete.
+   protected method set_coordinate_system_ {file system units} {
+      if { $setwcsattrib_ == {} } {
+         global env
+         set setwcsattrib_ [GaiaApp \#auto -application \
+                               $env(KAPPA_DIR)/wcsattrib \
+                               -notify [code $this wcsattrib_set_]]
+      }
+      set wcsattrib_done_ 0
+      $setwcsattrib_ runwiths "ndf=$file mode=set name=system newval=$system"
+      if { ! $wcsattrib_done_ } {
+         ::tkwait variable [scope wcsattrib_done_]
+      }
+
+      if { $units != {} } {
+         set wcsattrib_done_ 0
+         $setwcsattrib_ runwiths "ndf=$file mode=set name=unit newval=$units"
+         if { ! $wcsattrib_done_ } {
+            ::tkwait variable [scope wcsattrib_done_]
+         }
+      }
+   }
+
+   #  Called when setwcsattrib_ completes. Sets wcsattrib_done_ to trigger any
+   #  tkwaits on that variable.
+   protected method wcsattrib_set_ {} {
+      set wcsattrib_done_ 1
    }
 
    #  Configuration options: (public variables)
@@ -401,10 +437,13 @@ itcl::class gaia::GaiaCubeApps {
    protected variable maintask_ {}
 
    #  The WCSFRAME task.
-   protected variable wcsframetask_ {}
+   protected variable wcsframe_ {}
 
-   #  The WCSATTRIB task.
-   protected variable wcsattribtask_ {}
+   #  The get WCSATTRIB task.
+   protected variable getwcsattrib_ {}
+
+   #  The set WCSATTRIB task.
+   protected variable setwcsattrib_ {}
 
    #  Combination method, if used/
    protected variable combination_type_ "Mean"
@@ -420,6 +459,9 @@ itcl::class gaia::GaiaCubeApps {
 
    #  Value of a getparam request.
    protected variable parvalue_ {}
+
+   #  Variable for determining when wcsattrib has completed.
+   protected variable wcsattrib_done_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

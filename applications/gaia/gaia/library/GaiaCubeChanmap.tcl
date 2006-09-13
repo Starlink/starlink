@@ -193,14 +193,22 @@ itcl::class gaia::GaiaCubeChanmap {
          set file $tmpimage_
       }
       if { $file != {} } {
-         $itk_option(-gaiacube) display $file 1
-      }
 
-      #  Set bindings to report the spectral coordinate of the current pane,
-      #  when clicked on.
-      set cubespectrum [$itk_option(-gaiacube) component spectrum]
-      $cubespectrum close
-      add_bindings_
+         #  If the coordinate system of doesn't match this (coordinate system
+         #  != default), then change to this.
+         lassign [$itk_option(-spec_coords) get_system] system units
+         if { $system != "default" && $system != {} } {
+            set_coordinate_system_ $file $system $units
+         }
+
+         $itk_option(-gaiacube) display $file 1
+
+         #  Set bindings to report the spectral coordinate of the current pane,
+         #  when clicked on.
+         set cubespectrum [$itk_option(-gaiacube) component spectrum]
+         $cubespectrum close
+         add_bindings_
+      }
    }
 
    #  Grab the clicks on the image so that we can update the spectral
