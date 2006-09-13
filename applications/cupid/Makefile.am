@@ -20,7 +20,7 @@ cupid_mon_SOURCES = \
 
 cupid_mon_LDADD = $(LDADD) cupidsub/libcupidsub.la `$(srcdir)/cupid_link_adam`
 ## cupid_mon_LDFLAGS = -static
-cupid_mon_TASKS = extractclumps findclumps cupidhelp makeclumps
+cupid_mon_TASKS = extractclumps findback findclumps cupidhelp makeclumps
 
 CSRC = 
 
@@ -90,7 +90,7 @@ dist_pkgdata_DATA = LICENCE
 MISC_FILES = dtask_applic.lo cupid.shl history.help \
 cupid_mon version.dat cupid.csh cupid.icl cupid.sh
 
-IFC_FILES = extractclumps.ifc findclumps.ifc makeclumps.ifc cupidhelp.ifc cupid_mon.ifc
+IFC_FILES = extractclumps.ifc findback.ifc findclumps.ifc makeclumps.ifc cupidhelp.ifc cupid_mon.ifc
 
 IFL_FILES = $(IFC_FILES:.ifc=.ifl) 
 

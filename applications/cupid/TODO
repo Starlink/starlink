@@ -22,6 +22,6 @@
 
 (22/6/06): Have a second output NDF that contains a copy of the input
    data with a quality mask. Provide an additional quality bit to represent
-   "on boundary".
+   "on boundary". [done]
 
 

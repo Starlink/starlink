@@ -1,0 +1,95 @@
+#include "sae_par.h"
+#include "cupid.h"
+#include <stdio.h>
+
+void CGEN_FUNCTION(cupidFindback2)( int dim[3], CGEN_TYPE *din, int *status ){
+/*
+*+
+*  Name:
+*     cupidFindback2<X>
+
+*  Purpose:
+*     Reject values larger than 3 times the noise level form the supplied
+*     data array.
+
+*  Language:
+*     Starlink C
+
+*  Synopsis:
+*     void cupidFindback2<X>( int dim[3], CGEN_TYPE *din, int *status )
+
+*  Description:
+*     This function sets all elements of the supplied array bad that are
+*     greater than 3 times the RMS noise in the data.
+
+*  Parameters:
+*     dim
+*        The dimensions of the supplied array.
+*     din
+*        Pointer to the start of the supplied data array. 
+*     status
+*        Pointer to the inherited status value.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     13-SEP-2006 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+
+/* Local Variables: */
+   CGEN_TYPE *ap; 
+   double rms; 
+   double thresh; 
+   int i;
+   int nel;
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return;
+
+/* Get the number of elements in the array. */
+   nel = dim[ 0 ]*dim[ 1 ]*dim[ 2 ];
+
+/* Find an estimate of the RMS noise in the data */
+   rms = CGEN_FUNCTION(cupidRms)( din, nel, dim[ 0 ], status );
+
+/* Reject data points greater than 3 times the RMS noise. */
+   thresh = 3*rms;
+   ap =din;
+   for( i = 0; i < nel; i++ ) {
+      if( *ap != CGEN_BAD && *ap > thresh ) {
+         *(ap++) = CGEN_BAD;
+      } else {
+         ap++;
+      }
+   }
+
+}

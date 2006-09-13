@@ -1,0 +1,242 @@
+#include "sae_par.h"
+#include "cupid.h"
+#include "mers.h"
+#include "ndf.h"
+#include <math.h>
+
+void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], CGEN_TYPE *din, 
+                                    CGEN_TYPE *dout, CGEN_TYPE *wa, 
+                                    CGEN_TYPE *wb, int ilevel, int *status ){
+/*
+*+
+*  Name:
+*     cupidFindback1<X>
+
+*  Purpose:
+*     Apply spatial filtering to a 3D array in order to estimate the
+*     background.
+
+*  Language:
+*     Starlink C
+
+*  Synopsis:
+*     void cupidFindback1<X>( int dim[3], int box[3], CGEN_TYPE *din, 
+*                             CGEN_TYPE *dout, CGEN_TYPE *wa, 
+*                             CGEN_TYPE *wb, int ilevel, int *status )
+
+*  Description:
+*     This function uses spatial filtering to remove features with a
+*     scale size less than a specified size from a 3 dimensional array,
+*     thus producing an estimate of the local background within the array.
+*
+*     The algorithm proceeds as follows. A filtered form of the input data 
+*     is first produced by replacing every input pixel by the minimum of
+*     the input values within a rectangular box centred on the pixel.
+*     This filtered data is then filtered again, using a filter that
+*     replaces every pixel value by the maximum value in a box centred on 
+*     the pixel. This produces an estimate of the lower envelope of the data,
+*     but usually contains unacceptable sharp edges. In addition, this 
+*     filtered data has a tendency to hug the lower envelope of the
+*     noise, thus under-estimating the true background of the noise-free 
+*     data. The first problem is minimised by smoothing the background
+*     estimate using a filter that replaces every pixel value by the mean
+*     of the values in a box centred on the pixel. The second problem 
+*     is minimised by estimating the difference between the input data
+*     and the background estimate within regions well removed from any
+*     bright areas. This difference is then extrapolated into the bright
+*     source regions and used as a correction to the background estimate.
+*     Specifically, the residuals between the input data and the initial
+*     background estimate are first formed, and residuals which are more
+*     than three times the RMS noise are set bad. The remaining residuals
+*     are smoothed with a mean filter. This smoothing will replace a lot
+*     of the bad values rejected above, but may not remove them all. Any
+*     remaining bad values are estimated by linear interpolation between
+*     the nearest good values along the first axis. The interpolated
+*     residuals are then smoothed again using amean filter, to get a
+*     surface representing the bias in the initial background estimate.
+*     This surface is finally added onto the initial background estimate
+*     to obtain the output array.
+
+*  Parameters:
+*     dim
+*        The length of each pixel axis in the supplied array.
+*     box
+*        The dimensions of the each of the filters, in pixels.
+*     din
+*        Pointer to the start of the supplied data array. 
+*     dout
+*        Pointer to the start of the array to contain the fitted lower
+*        envelope.
+*     wa
+*        Pointer to workspace with the same size as "din".
+*     wb
+*        Pointer to workspace with the same size as "din".
+*     ilevel
+*        Intformation level.
+*     status
+*        Pointer to the inherited status value.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     13-SEP-2006 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+
+/* Local Variables: */
+   CGEN_TYPE *p1;       /* Pointer to next array element */
+   CGEN_TYPE *p2;       /* Pointer to next array element */
+   CGEN_TYPE *p3;       /* Pointer to next array element */
+   CGEN_TYPE vl;        /* Previous good value */
+   double k1;           /* Value gradient */
+   int i;               /* Index of next array element */
+   int il;              /* 1D vector index of previous good value */
+   int irow;            /* Index of row */
+   int iv;              /* 1D vector index into array */
+   int ix;              /* x grid index */
+   int j;               /* 1D vector index */
+   int lbad;            /* Was previous pixel value bad? */
+   int nel;             /* Number of elements in input array */
+   int nrow;            /* Number of rows of data */
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return;
+
+/* Get the number of pixels in the input array. */
+   nel = dim[ 0 ]*dim[ 1 ]*dim[ 2 ];
+
+/* Filter the input data by replacing each input value by the minimum
+   value in a box centred on the input pixel. The filtered data goes in
+   "wa". */
+   if( ilevel > 0 ) msgOut( "", "      Applying minimum filter", status );
+   CGEN_FUNCTION(cupidFindback3)( dim, box, din, wa, status );
+
+/* Apply a second filter which replaces each pixel value in "wa" by the 
+   maximum value in a box centred on the pixel. The filtered data goes
+   (temporarily) in the output array. */
+   if( ilevel > 0 ) msgOut( "", "      Applying maximum filter", status );
+   CGEN_FUNCTION(cupidFindback10)( dim, box, wa, dout, status );
+
+/* Apply a third filter which replaces each pixel value in "dout" by the 
+   mean value in a box centred on the pixel. The filtered data goes
+   back into "wa". */
+   if( ilevel > 0 ) msgOut( "", "      Applying mean filter", status );
+   CGEN_FUNCTION(cupidFindback4)( dim, box, dout, wa, status );
+
+/* The background estimate in "wa" should now be a close fit to the lower 
+   envelope of the input data, but will be biassed by the noise. That is, 
+   it will tend to hug the lower envelope of the noise rather than the 
+   lower envelope of the noise-free data. To correct for this bias, we look
+   at the mean residuals between the background estimate and the input
+   data in background areas. First form the residuals between the input
+   data and the background estimate, storing them in the output array. */
+   if( ilevel > 0 ) msgOut( "", "      Forming residuals", status );
+   p1 = din;
+   p2 = wa;
+   p3 = dout;
+   for( i = 0; i < nel; i++ ) {
+      if( *p1 != CGEN_BAD && *p2 != CGEN_BAD ) {
+         *(p3++) = *(p1++) - *(p2++);         
+      } else {
+         *(p3++) = CGEN_BAD;
+         p1++;
+         p2++;
+      }
+   }
+
+/* Identify background pixels and set all other pixel bad. */
+   if( ilevel > 0 ) msgOut( "", "      Removing source residuals", status );
+   CGEN_FUNCTION(cupidFindback2)( dim, dout, status );
+
+/* Smooth the remaining residuals with a mean filter, putting the results 
+   in "wb". */
+   if( ilevel > 0 ) msgOut( "", "      Smoothing background residuals", status );
+   CGEN_FUNCTION(cupidFindback4)( dim, box, dout, wb, status );
+
+/* Fill in rejected pixel values by interpolation between the good pixels on
+   either side. For simplicity and speed, this is done independently for 
+   each row. */
+   if( ilevel > 0 ) msgOut( "", "      Filling in missing residuals", status );
+   nrow = dim[ 1 ]*dim[ 2 ];
+   vl = CGEN_BAD;
+   iv = 0;
+   for( irow = 0; irow < nrow; irow++ ) {
+      il = iv - 1;
+      lbad = 0;
+      for( ix = 1; ix <= dim[ 0 ]; ix++, iv++ ) {
+         if( wb[ iv ] != CGEN_BAD ) {
+            if( lbad ) {
+               if( vl != CGEN_BAD ){
+                  k1 = ( wb[ iv ] - vl )/( iv - il );
+                  for( j = il + 1; j < iv; j++ ) wb[ j ] = k1*( j - il ) + vl;
+               } else {
+                  k1 = wb[ iv ];
+                  for( j = il + 1; j < iv; j++ ) wb[ j ] = k1;
+               }
+               lbad = 0;
+            }
+            vl = wb[ iv ];
+            il = iv;
+         } else {
+            lbad = 1;
+         }
+      }
+
+      if( lbad && vl != CGEN_BAD ) {
+         for( j = il + 1; j < iv; j++ ) wb[ j ] = vl;
+      }
+
+   }
+
+/* Smooth the residuals again, putting the results in the output array. */
+   if( ilevel > 0 ) msgOut( "", "      Smoothing filled residuals", status );
+   CGEN_FUNCTION(cupidFindback4)( dim, box, wb, dout, status );
+
+/* The values in the output array now represent the bias between the input 
+   data and the background estimate formed above. It will be extended into 
+   the source regions by virture of the double smoothing and filling just 
+   performed. Add this correction onto the background estimate and store in 
+   the output. */
+   if( ilevel > 0 ) msgOut( "", "      Correcting background estimate", status );
+   p1 = wa;
+   p2 = din;
+   p3 = dout;
+   for( i = 0; i < nel; i++, p2++ ) {
+      if( *p1 != CGEN_BAD && *p2 != CGEN_BAD && *p3 != CGEN_BAD ) {
+         *(p3++) += *(p1++);
+      } else {
+         *(p3++) = CGEN_BAD;
+         p1++;
+      }
+   }
+
+}
+

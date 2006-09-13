@@ -1,0 +1,480 @@
+#include "sae_par.h"
+#include "ast.h"
+#include "cupid.h"
+#include <string.h>
+
+/* A structure used to describe a filter box. The "slabs" refered to are
+   the single pixel thick slabs forming the 6 faces of the 3D filter box. */
+typedef struct CGEN_FUNCTION(MinFilterBox) {
+   int lbndxu[ 3 ];    /* Lower grid index bounds of upper x slab */
+   int ubndxu[ 3 ];    /* Upper grid index bounds of upper x slab */
+   int lbndyu[ 3 ];    /* Lower grid index bounds of upper y slab */
+   int ubndyu[ 3 ];    /* Upper grid index bounds of upper y slab */
+   int lbndzu[ 3 ];    /* Lower grid index bounds of upper z slab */
+   int ubndzu[ 3 ];    /* Upper grid index bounds of upper z slab */
+   int lbndxl[ 3 ];    /* Lower grid index bounds of lower x slab */
+   int ubndxl[ 3 ];    /* Upper grid index bounds of lower x slab */
+   int lbndyl[ 3 ];    /* Lower grid index bounds of lower y slab */
+   int ubndyl[ 3 ];    /* Upper grid index bounds of lower y slab */
+   int lbndzl[ 3 ];    /* Lower grid index bounds of lower z slab */
+   int ubndzl[ 3 ];    /* Upper grid index bounds of lower z slab */
+   CGEN_TYPE minval;   /* Minimum data value in the box */
+   int minpos[ 3 ];    /* Grid indices of the minimum value in the box */
+} CGEN_FUNCTION(MinFilterBox);
+
+
+CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
+                                          CGEN_TYPE *din, CGEN_TYPE *dout, 
+                                          int *status ){
+/*
+*+
+*  Name:
+*     cupidFindback3<X>
+
+*  Purpose:
+*     Apply a minimum box filter to a supplied array.
+
+*  Language:
+*     Starlink C
+
+*  Synopsis:
+*     CGEN_TYPE *cupidFindback3<X>( int dim[3], int box[3],
+*                                   CGEN_TYPE *din, CGEN_TYPE *dout, 
+*                                   int *status )
+
+*  Description:
+*     This function smooths the supplied array with a filter that
+*     replaces every input pixel with the minimum of the good input pixels 
+*     within a box of specified size centred on the pixel being replaced.
+
+*  Parameters:
+*     dim
+*        The length of each pixel axis in the supplied array.
+*     box
+*        The dimensions of the the box filter, in pixels.
+*     din
+*        Pointer to the start of the supplied data array. 
+*     dout
+*        Pointer to the start of the output data array. May be NULL, in
+*        which case a new array will be allocated, and a pointer returned
+*        as the function value. Note, the "din" value should not be
+*        supplied for "dout" (i.e. the input array cannot also be used as
+*        the output array).
+*     status
+*        Pointer to the inherited status value.
+
+*  Returned Value:
+*     A pointer to a (possibly new) array holding the smoothed output
+*     values.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     13-SEP-2006 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+
+/* Local Variables: */
+   CGEN_FUNCTION(MinFilterBox) *ybox; /* Structure describing y axis filter box */
+   CGEN_FUNCTION(MinFilterBox) *zbox; /* Structure describing z axis filter box */
+   CGEN_FUNCTION(MinFilterBox) *xbox; /* Structure describing x axis filter box */
+   CGEN_TYPE *p;               /* Pointer to next returned pixel */
+   CGEN_TYPE *result;          /* Returned array */
+   CGEN_TYPE val;              /* Input pixel value */
+   CupidBoxIter *iter;         /* Structure for iterating round pixels */
+   int bk1;                    /* Half the x box width */
+   int bk2;                    /* Half the y box width */
+   int bk3;                    /* Half the z box width */
+   int full_check;             /* Check entire box for a new minimum value? */
+   int iv;                     /* 1D vector index of current pixel */
+   int ix;                     /* X axis grid index for current output pixel */
+   int iy;                     /* Y axis grid index for current output pixel */
+   int iz;                     /* Z axis grid index for current output pixel */
+   int lbnd[ 3 ];              /* Lower bounds of box centred on (0,0,0) */
+   int nel;                    /* Number of pixel in supplied array */
+   int ubnd[ 3 ];              /* Upper bounds of box centred on (0,0,0) */
+   int xx[ 3 ];                /* Grid indices of current pixel */
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return NULL;
+
+/* Form useful constants. */
+   bk1 = box[ 0 ]/2;
+   bk2 = box[ 1 ]/2;
+   bk3 = box[ 2 ]/2;
+
+/* Indicate we do not yet have a CupidBoxIter structure. */
+   iter = NULL;
+
+/* Allocate the memory for the output array if needed. */
+   if( !dout ) {
+      nel = dim[ 0 ]*dim[ 1 ]*dim[ 2 ];
+      result = astMalloc( sizeof( CGEN_TYPE )*nel );
+   } else {
+      result = dout;
+   }
+
+/* Create a MinFilterBox structure to describe a filter box that progress
+   up the Z axis at (x=0,y=0). */
+   zbox = astMalloc( sizeof( CGEN_FUNCTION(MinFilterBox) ) );
+
+/* Create a MinFilterBox structure to describe a filter box that progress
+   up the Y axis at (x=0). */
+   ybox = astMalloc( sizeof( CGEN_FUNCTION(MinFilterBox) ) );
+
+/* Create a MinFilterBox structure to describe a filter box that progress
+   up the X axis. */
+   xbox = astMalloc( sizeof( CGEN_FUNCTION(MinFilterBox) ) );
+
+/* Check the pointers can be used safely. */
+   if( xbox ) {
+
+/* We first initialise the zbox to describe the contents of a filter box
+   centred on pixel (0,0,0). First set up the bounds of the box centred
+   on pixel (0,0,0). */
+      lbnd[ 0 ] = -bk1;
+      ubnd[ 0 ] = bk1;
+      lbnd[ 1 ] = -bk2;
+      ubnd[ 1 ] = bk2;
+      lbnd[ 2 ] = -bk3;
+      ubnd[ 2 ] = bk3;
+
+/* Now form the bounds of the slab of pixels forming the ZY face at the
+   upper bound on the X axis. */
+      zbox->lbndxu[ 0 ] = ubnd[ 0 ];
+      zbox->lbndxu[ 1 ] = lbnd[ 1 ];
+      zbox->lbndxu[ 2 ] = lbnd[ 2 ];
+      zbox->ubndxu[ 0 ] = ubnd[ 0 ];
+      zbox->ubndxu[ 1 ] = ubnd[ 1 ];
+      zbox->ubndxu[ 2 ] = ubnd[ 2 ];
+
+/* Now form the bounds of the slab of pixels forming the ZY face at the
+   lower bound on the X axis. */
+      zbox->lbndxl[ 0 ] = lbnd[ 0 ];
+      zbox->lbndxl[ 1 ] = lbnd[ 1 ];
+      zbox->lbndxl[ 2 ] = lbnd[ 2 ];
+      zbox->ubndxl[ 0 ] = lbnd[ 0 ];
+      zbox->ubndxl[ 1 ] = ubnd[ 1 ];
+      zbox->ubndxl[ 2 ] = ubnd[ 2 ];
+
+/* Now form the bounds of the slab of pixels forming the XZ face at the
+   upper bound on the Y axis. */
+      zbox->lbndyu[ 0 ] = lbnd[ 0 ];
+      zbox->lbndyu[ 1 ] = ubnd[ 1 ];
+      zbox->lbndyu[ 2 ] = lbnd[ 2 ];
+      zbox->ubndyu[ 0 ] = ubnd[ 0 ];
+      zbox->ubndyu[ 1 ] = ubnd[ 1 ];
+      zbox->ubndyu[ 2 ] = ubnd[ 2 ];
+
+/* Now form the bounds of the slab of pixels forming the XZ face at the
+   lower bound on the Y axis. */
+      zbox->lbndyl[ 0 ] = lbnd[ 0 ];
+      zbox->lbndyl[ 1 ] = lbnd[ 1 ];
+      zbox->lbndyl[ 2 ] = lbnd[ 2 ];
+      zbox->ubndyl[ 0 ] = ubnd[ 0 ];
+      zbox->ubndyl[ 1 ] = lbnd[ 1 ];
+      zbox->ubndyl[ 2 ] = ubnd[ 2 ];
+
+/* Now form the bounds of the slab of pixels forming the ZY face at the
+   upper bound on the Z axis. */
+      zbox->lbndzu[ 0 ] = lbnd[ 0 ];
+      zbox->lbndzu[ 1 ] = lbnd[ 1 ];
+      zbox->lbndzu[ 2 ] = ubnd[ 2 ];
+      zbox->ubndzu[ 0 ] = ubnd[ 0 ];
+      zbox->ubndzu[ 1 ] = ubnd[ 1 ];
+      zbox->ubndzu[ 2 ] = ubnd[ 2 ];
+
+/* Now form the bounds of the slab of pixels forming the XY face at the
+   lower bound on the Z axis. */
+      zbox->lbndzl[ 0 ] = lbnd[ 0 ];
+      zbox->lbndzl[ 1 ] = lbnd[ 1 ];
+      zbox->lbndzl[ 2 ] = lbnd[ 2 ];
+      zbox->ubndzl[ 0 ] = ubnd[ 0 ];
+      zbox->ubndzl[ 1 ] = ubnd[ 1 ];
+      zbox->ubndzl[ 2 ] = lbnd[ 2 ];
+
+/* Loop round all the pixels in this initial box, finding the minimum
+   good pixel value in the filter box. */
+      zbox->minval = CGEN_MAX;
+
+      iter = cupidBoxIterator( iter, dim, lbnd, ubnd, 1, status );
+      while( cupidNextIt( iter, xx, &iv, status ) ) {
+         val = din[ iv ];
+         if( val != CGEN_BAD && val < zbox->minval ) {
+            zbox->minval = val;
+            zbox->minpos[ 0 ] = xx[ 0 ];
+            zbox->minpos[ 1 ] = xx[ 1 ];
+            zbox->minpos[ 2 ] = xx[ 2 ];
+         }
+      }
+
+/* Store a pointer to the next output pixel to be assigned a value. */
+      p = result;
+
+/* Now loop through all the xy planes in the cube. */
+      for( iz = 1; iz <= dim[ 2 ]; iz++ ) {
+
+/* Set a flag indicating if the pixel with the minimum value in the box 
+   will pass out of the filter box as a consequence of updating the box to 
+   the new "iz" value. We also do a full check if the minimum value is
+   currently undefined. */
+         full_check = ( zbox->minpos[ 2 ] == zbox->lbndzl[ 2 ] ||
+                        zbox->minval == CGEN_MIN );
+
+/* Increment the Z axis bounds of the volume containing the new pixels to be 
+   added to the filter box. This volume is a slab of pixels in the xy plane, 
+   one pixel thick in the z direction. It forms the slab of pixels just
+   above the upper face of the current z box volume. */
+         zbox->lbndzu[ 2 ]++;
+         zbox->ubndzu[ 2 ]++;
+
+/* Increment the Z axis bounds of the volume containing the old pixels to be 
+   removed from the filter box. This volume is a slab of pixels in the xy plane, 
+   one pixel thick in the z direction. It forms the slab of pixels that make up
+   the lower face of the current z box volume. */
+         zbox->lbndzl[ 2 ]++;
+         zbox->ubndzl[ 2 ]++;
+
+/* First deal with cases where the pixel with the minimum value in the box 
+   will pass out of the filter box as a consequence of updating the box to 
+   the new "iz" value. */
+         if( full_check ){
+
+/* Since the old minimum value has passed out of the box, we need to search
+   all pixels within the new updated box for a minimum value. */
+            zbox->minval = CGEN_MAX;
+            iter = cupidBoxIterator( iter, dim, zbox->lbndzl, zbox->ubndzu, 1, 
+                                 status );
+            while( cupidNextIt( iter, xx, &iv, status ) ) {
+               val = din[ iv ];
+               if( val != CGEN_BAD && val < zbox->minval ) {
+                  zbox->minval = val;
+                  zbox->minpos[ 0 ] = xx[ 0 ];
+                  zbox->minpos[ 1 ] = xx[ 1 ];
+                  zbox->minpos[ 2 ] = xx[ 2 ];
+               }
+            }
+
+/* Now deal with cases where the pixel with the minimum value in the box 
+   will not pass out of the filter box as a consequence of updating the box to 
+   the new "iz" value. */
+         } else {
+
+/* Since the old minimum value is still in the box, we need only to search
+   the new pixels being added to the updated box for a minimum value. */
+            iter = cupidBoxIterator( iter, dim, zbox->lbndzu, zbox->ubndzu, 1, 
+                                 status );
+            while( cupidNextIt( iter, xx, &iv, status ) ) {
+               val = din[ iv ];
+               if( val != CGEN_BAD && val < zbox->minval ) {
+                  zbox->minval = val;
+                  zbox->minpos[ 0 ] = xx[ 0 ];
+                  zbox->minpos[ 1 ] = xx[ 1 ];
+                  zbox->minpos[ 2 ] = xx[ 2 ];
+               }
+            }
+         }
+
+/* Modify the z value of the other bounds (not used above but used
+   below). */
+         zbox->lbndxu[ 2 ]++;
+         zbox->ubndxu[ 2 ]++;
+         zbox->lbndyu[ 2 ]++;
+         zbox->ubndyu[ 2 ]++;
+
+         zbox->lbndxl[ 2 ]++;
+         zbox->ubndxl[ 2 ]++;
+         zbox->lbndyl[ 2 ]++;
+         zbox->ubndyl[ 2 ]++;
+
+/* Initialise the Y filter box for this xy plane to be a copy of the z
+   filter box. */
+         memcpy( ybox, zbox, sizeof( CGEN_FUNCTION(MinFilterBox) ) );
+
+/* Now loop through the rows in this xy plane. */
+         for( iy = 1; iy <= dim[ 1 ]; iy++ ) {
+
+/* Set a flag indicating if the pixel with the minimum value in the box 
+   will pass out of the filter box as a consequence of updating the box to 
+   the new "iy" value. We also do a full check if the minimum value is
+   currently undefined. */
+            full_check = ( ybox->minpos[ 1 ] == ybox->lbndyl[ 1 ] ||
+                           ybox->minval == CGEN_MIN );
+
+/* Increment the Y axis bounds of the volume containing the new pixels to be 
+   added to the filter box. This volume is a slab of pixels in the xz plane, 
+   one pixel thick in the y direction. It forms the slab of pixels just
+   above the upper face of the current y box volume. */
+            ybox->lbndyu[ 1 ]++;
+            ybox->ubndyu[ 1 ]++;
+
+/* Increment the Y axis bounds of the volume containing the old pixels to be 
+   removed from the filter box. This volume is a slab of pixels in the xz plane, 
+   one pixel thick in the y direction. It forms the slab of pixels that make up
+   the lower face of the current y box volume. */
+            ybox->lbndyl[ 1 ]++;
+            ybox->ubndyl[ 1 ]++;
+
+/* First deal with cases where the pixel with the minimum value in the box 
+   will pass out of the filter box as a consequence of updating the box to 
+   the new "iy" value. */
+            if( full_check ){
+
+/* Since the old minimum value has passed out of the box, we need to search
+   all pixels within the new updated box for a minimum value. */
+               ybox->minval = CGEN_MAX;
+               iter = cupidBoxIterator( iter, dim, ybox->lbndyl, ybox->ubndyu, 1, 
+                                    status );
+               while( cupidNextIt( iter, xx, &iv, status ) ) {
+                  val = din[ iv ];
+                  if( val != CGEN_BAD && val < ybox->minval ) {
+                     ybox->minval = val;
+                     ybox->minpos[ 0 ] = xx[ 0 ];
+                     ybox->minpos[ 1 ] = xx[ 1 ];
+                     ybox->minpos[ 2 ] = xx[ 2 ];
+                  }
+               }
+
+/* Now deal with cases where the pixel with the minimum value in the box 
+   will not pass out of the filter box as a consequence of updating the box to 
+   the new "iy" value. */
+            } else {
+
+/* Since the old minimum value is still in the box, we need only to search
+   the new pixels being added to the updated box for a minimum value. */
+               iter = cupidBoxIterator( iter, dim, ybox->lbndyu, ybox->ubndyu, 1, 
+                                    status );
+               while( cupidNextIt( iter, xx, &iv, status ) ) {
+                  val = din[ iv ];
+                  if( val != CGEN_BAD && val < ybox->minval ) {
+                     ybox->minval = val;
+                     ybox->minpos[ 0 ] = xx[ 0 ];
+                     ybox->minpos[ 1 ] = xx[ 1 ];
+                     ybox->minpos[ 2 ] = xx[ 2 ];
+                  }
+               }
+            }
+
+/* Modify the y value of the other bounds (not used above but used
+   below). */
+            ybox->lbndxu[ 1 ]++;
+            ybox->ubndxu[ 1 ]++;
+            ybox->lbndxl[ 1 ]++;
+            ybox->ubndxl[ 1 ]++;
+
+/* Initialise the x box  to be a copy of the modified y box. */
+            memcpy( xbox, ybox, sizeof( CGEN_FUNCTION(MinFilterBox) ) );
+
+/* Now loop through the pixels in this new x row. */
+            for( ix = 1; ix <= dim[ 0 ]; ix++ ) {
+
+/* Set a flag indicating if the pixel with the minimum value in the box 
+   will pass out of the filter box as a consequence of updating the box to 
+   the new "ix" value. We also do a full check if the minimum value is
+   currently undefined. */
+               full_check = ( xbox->minpos[ 0 ] == xbox->lbndxl[ 0 ] ||
+                              xbox->minval == CGEN_MIN );
+
+/* Increment the X axis bounds of the volume containing the new pixels to be 
+   added to the filter box. This volume is a slab of pixels in the yz plane, 
+   one pixel thick in the x direction. It forms the slab of pixels just
+   above the upper face of the current x box volume. */
+               xbox->lbndxu[ 0 ]++;
+               xbox->ubndxu[ 0 ]++;
+
+/* Increment the X axis bounds of the volume containing the old pixels to be 
+   removed from the filter box. This volume is a slab of pixels in the yz plane, 
+   one pixel thick in the x direction. It forms the slab of pixels that make up
+   the lower face of the current x box volume. */
+               xbox->lbndxl[ 0 ]++;
+               xbox->ubndxl[ 0 ]++;
+
+/* First deal with cases where the pixel with the minimum value in the box 
+   will pass out of the filter box as a consequence of updating the box to 
+   the new "ix" value. */
+               if( full_check ){
+
+/* Since the old minimum value has passed out of the box, we need to search
+   all pixels within the new updated box for a minimum value. */
+                  xbox->minval = CGEN_MAX;
+                  iter = cupidBoxIterator( iter, dim, xbox->lbndxl, xbox->ubndxu, 1, 
+                                       status );
+                  while( cupidNextIt( iter, xx, &iv, status ) ) {
+                     val = din[ iv ];
+                     if( val != CGEN_BAD && val < xbox->minval ) {
+                        xbox->minval = val;
+                        xbox->minpos[ 0 ] = xx[ 0 ];
+                        xbox->minpos[ 1 ] = xx[ 1 ];
+                        xbox->minpos[ 2 ] = xx[ 2 ];
+                     }
+                  }
+
+/* Now deal with cases where the pixel with the minimum value in the box 
+   will not pass out of the filter box as a consequence of updating the box to 
+   the new "ix" value. */
+               } else {
+
+/* Since the old minimum value is still in the box, we need only to search
+   the new pixels being added to the updated box for a minimum value. */
+                  iter = cupidBoxIterator( iter, dim, xbox->lbndxu, xbox->ubndxu, 1, 
+                                       status );
+                  while( cupidNextIt( iter, xx, &iv, status ) ) {
+                     val = din[ iv ];
+                     if( val != CGEN_BAD && val < xbox->minval ) {
+                        xbox->minval = val;
+                        xbox->minpos[ 0 ] = xx[ 0 ];
+                        xbox->minpos[ 1 ] = xx[ 1 ];
+                        xbox->minpos[ 2 ] = xx[ 2 ];
+                     }
+                  }
+               }
+
+/* Store the output value. */
+               if( xbox->minval != CGEN_MAX ) {
+                  *(p++) = xbox->minval;
+               } else {
+                  *(p++) = CGEN_BAD;
+               }
+            }
+         }
+      }
+   }
+
+/* Free resources. */
+   xbox = astFree( xbox );
+   ybox = astFree( ybox );
+   zbox = astFree( zbox );
+   iter = astFree( iter );
+
+/* Return the result. */
+   return result;
+
+}

@@ -7,6 +7,12 @@
  data arrays.
 
 
+Changes introduced at V0.0-20:
+
+ - Introduction of a new command calledFINDBACK, which uses spatial 
+   filtering to remove small-scale structure from the input NDF, thus 
+   producing an estimate of the background within the NDF.
+
 Changes introduced at V0.0-19:
 
  - FINDCLUMPS has a new parameter, QOUT, which specifies the name of a

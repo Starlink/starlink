@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {255.1}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {26th April 2006}
+\newcommand{\stardocdate}      {13th September 2006}
 \newcommand{\stardoctitle}     {CUPID}
 \newcommand{\stardoconeline}   {A Clump Identification and Analysis Package}
-\newcommand{\stardocversion}   {Version 0.0-12}
+\newcommand{\stardocversion}   {Version 0.0-13}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {CUPID is a package of the identification
 and analysis of clumps of emission within 2- and 3- dimensional 
@@ -666,6 +666,10 @@ commands.
 the clumps within a 1, 2 or 3D data array, given a mask array that identifies 
 the pixels within each clump.
  
+\item[\htmlref{FINDBACK}{FINDBACK}] - applies spatial filtering to a 1, 2 
+or 3D array in order to remove features smaller than a specified size and
+thus produce an estimate of the background within the NDF.
+
 \item[\htmlref{FINDCLUMPS}{FINDCLUMPS}] - finds clumps within a 1, 2 or 3D 
 array and produces a mask identifying the pixels included in each clump.
 Also produces a catalogue of clump parameters. Various clump

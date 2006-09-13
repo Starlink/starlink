@@ -108,8 +108,12 @@ void cupid_mon( int *status ) {
 /* Check the string against valid A-task names---if matched then call
    the relevant A-task. */
 
+/* Finds a low frequency background surface. */
+   if( !strcmp( name, "FINDBACK" ) ) {
+      findback( status );
+
 /* Identifies emission clumps within a 2- or 3D NDF. */
-   if( !strcmp( name, "FINDCLUMPS" ) ) {
+   } else if( !strcmp( name, "FINDCLUMPS" ) ) {
       findclumps( status );
 
 /* Give help on CUPID commands. */
@@ -123,13 +127,6 @@ void cupid_mon( int *status ) {
 /* Extract clump parameters from another image */
    } else if( !strcmp( name, "EXTRACTCLUMPS" ) ) {
       extractclumps( status );
-
-
-
-/* Add new commands here... */
-
-
-
 
 /* Report an error if the command name is not recognised. */
    } else if( *status == SAI__OK ) {

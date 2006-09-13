@@ -68,6 +68,29 @@
 
 /* Type Definitions */
 /* ---------------- */
+
+/* A structure used to describe an iterator that iterates round the
+   pixels in a rectangular subsection of a 3D array. */
+typedef struct CupidBoxIter {
+   int done;          /* Have all required pixels been visited? */
+   int xx0;           /* X grid index of current array element */
+   int xx1;           /* Y grid index of current array element */
+   int xx2;           /* Z grid index of current array element */
+   int i;             /* Index of current array element in overlap */
+   int i2;            /* Index of current xy plane in overlap */
+   int i3;            /* Index of current x row in overlap */
+   int lbnd0;         /* Lower X bounds of rectangle being processed */
+   int lbnd1;         /* Lower Y bounds of rectangle being processed */
+   int lbnd2;         /* Lower Z bounds of rectangle being processed */
+   int ubnd0;         /* Upper X bounds of rectangle being processed */
+   int ubnd1;         /* Upper Y bounds of rectangle being processed */
+   int ubnd2;         /* Upper Z bounds of rectangle being processed */
+   int xsize;         /* The X dimension of the array */
+   int xysize;        /* No. of pixels in an XY plane of the array */
+   int gap;           /* Gap between visited pixels */
+} CupidBoxIter;
+
+
 /* A structure holding the global parameters of the GaussClump algorithm 
    needed by service functions. */
 typedef struct CupidGC  {
@@ -233,7 +256,11 @@ void cupidStoreClumps( const char *, HDSLoc *, HDSLoc *, int, double[3], const c
 void cupidStoreConfig( HDSLoc *, AstKeyMap *, int * );
 void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel, int *, int, double, float *, void *, char *, int * );
 AstKeyMap *cupidRetrieveConfig( HDSLoc *, int * );
+CupidBoxIter *cupidBoxIterator( CupidBoxIter *, int[3], int[3], int[3], int, int * );
+int cupidNextIt( CupidBoxIter *, int[3], int *, int * );
 
+
+void findback( int * );
 void findclumps( int * );
 void cupidhelp( int * );
 void makeclumps( int * );
