@@ -69,6 +69,8 @@
 *        Do not use bare constant for rad to deg conversion.
 *     2006-08-15 (EC):
 *        Fixed off-by-one errors in GRID coordinates
+*     2006-09-12 (EC):
+*        Added ability to calculate mapbounds for AzTEC
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -111,6 +113,8 @@
 #include "smurf_par.h"
 #include "libsmf/smf.h"
 #include "sc2da/sc2ast.h"
+
+#define FUNC_NAME "smf_mapbounds"
 
 void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0, 
 		    double lat_0, int flag, double pixsize, int *lbnd_out, 
@@ -167,7 +171,46 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 
     /* Check that the data dimensions are 3 (for time ordered data) */
     if( *status == SAI__OK ) {
-      if( data->ndims != 3 ) {
+      if( data->ndims == 3 ) {
+	
+	/* If OK Decide which detectors (GRID coord)to use for checking bounds 
+	   depending on the instrument in use. */
+
+	hdr = data->hdr;  
+	switch( hdr->instrument ) {
+	  
+	case INST__SCUBA2:
+	  /* 4 corner bolometers of the subarray */
+	  x_array_corners[0] = 1;
+	  x_array_corners[1] = 1;
+	  x_array_corners[2] = (data->dims)[0];
+	  x_array_corners[3] = (data->dims)[0];
+	  
+	  y_array_corners[0] = 1;
+	  y_array_corners[1] = (data->dims)[1];
+	  y_array_corners[2] = 1;
+	  y_array_corners[3] = (data->dims)[1];
+	  break;
+	  
+	case INST__AZTEC:
+	  /* Rough guess for extreme bolometers around the edge */
+	  x_array_corners[0] = 22;
+	  x_array_corners[1] = 65;
+	  x_array_corners[2] = 73;
+	  x_array_corners[3] = 98;
+	  
+	  y_array_corners[0] = 1; /* Always 1 for AzTEC */
+	  y_array_corners[1] = 1;
+	  y_array_corners[2] = 1;
+	  y_array_corners[3] = 1;
+	  break;
+	  
+	default:
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, "Don't know how to calculate mapbounds for data created with this instrument", status);	  
+	}
+      } else {
+	/* Otherwise report error */
 	msgSetc("FILE", pname);
 	msgSeti("THEDIMS", data->ndims);
 	*status = SAI__ERROR;
@@ -178,23 +221,12 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
     }
 
     if( *status == SAI__OK) {
-      /* Get the bolo GRID coordinates for each corner of the array */
-      x_array_corners[0] = 1;
-      x_array_corners[1] = 1;
-      x_array_corners[2] = (data->dims)[0];
-      x_array_corners[3] = (data->dims)[0];
-      
-      y_array_corners[0] = 1;
-      y_array_corners[1] = (data->dims)[1];
-      y_array_corners[2] = 1;
-      y_array_corners[3] = (data->dims)[1];
-            
+
       /* Get the astrometry for all the time slices in this data file */
       for( j=0; j<(data->dims)[2]; j++ ) {	
 	smf_tslice_ast( data, j, 1, status);
 	
 	if( *status == SAI__OK ) {
-	  hdr = data->hdr;
 	  state = hdr->state;
 	  
 	  /* Get bolo -> sky mapping 
