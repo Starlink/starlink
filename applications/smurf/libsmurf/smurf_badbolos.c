@@ -79,12 +79,8 @@
 *     MA 02111-1307, USA
 
 *  Bugs:
-*     Bolos array needs to be set to 0 to erase previous values 
-*     (if any).  smf_malloc should do this - but doesn't propogate
-*     to NDF mapped data??
 *
-*     Error reported by smurf_mon about corrupted memory due to 
-*     AST__PTRIN call.
+*     (Report bugs here).
 *-
 */
 
@@ -185,9 +181,6 @@ void smurf_badbolos( int *status ) {
    ubnd[0] = dims[0];
    ubnd[1] = dims[1];
 
-   /* Allocate memory for the bad bolometer mask */
-   bolos = smf_malloc ( dims[0] * dims[1], sizeof ( *bolos ), 1, status );
-
    /* Check to see if a bad bolo mask already exists for this NDF.  If 
       if does, open it for updating, otherwise create a new extension */
    ndfXloc ( indf, "BPM", "WRITE", &bpmloc, status );
@@ -258,13 +251,6 @@ void smurf_badbolos( int *status ) {
 	          "Number of bad individual bolometers exceeds total number of bolometers",
                   status );
          return;
-      }
-
-      /* KLUDGE - set all bolos to zero - smfmalloc SHOULD be doing this */
-      for ( i = 0; i < dims[1]; i++ ) {
-         for ( j = 0; j < dims[0]; j++ ) {
-	    bolos[(i * dims[0]) + j] = 0;
-         }
       }
 
       parGet0i ( "SEED", &seed, status );
@@ -372,7 +358,5 @@ void smurf_badbolos( int *status ) {
    } else {
       msgOutif(MSG__VERB," ","BADBOLOS failed.", status);
    }   
-
-   smf_free ( bolos, status );
 
 }
