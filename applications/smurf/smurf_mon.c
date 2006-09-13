@@ -71,6 +71,8 @@
 *        Add IMPAZTEC
 *     2006-09-07 (EC):
 *        Modified sc2ast_createwcs calls to use new interface.
+*     2006-09-11 (EC):
+*        Added call to smf_create_lutwcs to clear cache
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -197,8 +199,9 @@ void smurf_mon( int * status ) {
     errRep( "smurf_mon", "Unrecognized taskname: ^TASK", status);
   }
 
-  /* Clear the sc2ast cache */
-  sc2ast_createwcs(-1, NULL, NULL, NULL, NULL,status);
+  /* Clear all possible cached info from the different createwcs routines */
+  sc2ast_createwcs(-1, NULL, NULL, NULL, NULL, status);
+  smf_create_lutwcs(1, NULL, NULL, 0, NULL, NULL, NULL, NULL, status );
 
   /* Free AST resources */
   astEnd;
