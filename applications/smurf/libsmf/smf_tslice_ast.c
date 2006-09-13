@@ -78,6 +78,8 @@
 *        sc2head no longer used. Use JCMTState instead.
 *     2006-09-07 (EC):
 *        Modified sc2ast_createwcs calls to use new interface.
+*     2006-09-11 (EC):
+*        Call different createwcs depending on the instrument
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -195,40 +197,41 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
   /* Create and store FrameSet only if the WCS info is wanted */
   if (needwcs) {
 
-    /* Need to get the subarray name */
-    smf_fits_getS( hdr, "SUBARRAY", subarray, 81, status );
-
-    /* Convert to a number */
-    sc2ast_name2num( subarray, &subsysnum, status);
-
-    /* See if we have a WCS or not */
-    if (hdr->wcs == NULL ) {
-      /* Must create one */
-
-      /*
-      sc2ast_createwcs( subsysnum, tmpState->tcs_az_ac1, tmpState->tcs_az_ac2,
-			tmpState->smu_az_jig_x, tmpState->smu_az_jig_y, 
-			tmpState->rts_end, &(hdr->wcs), status );
-      */
-
-      sc2ast_createwcs( subsysnum, tmpState, hdr->instap, hdr->telpos,
-			&(hdr->wcs), status );
-
-    } else {
-      /* Ideally we want to modify in place to reduce malloc/free */
-      /* For now take the inefficient and simpler approach */
+    /* Ideally we want to modify in place to reduce malloc/free */
+    /* For now take the inefficient and simpler approach and annul
+       the previous calculation of the wcs before creating a new one */
+    if( hdr->wcs ) {
       astAnnul( hdr->wcs );
-
-      /*
-      sc2ast_createwcs( subsysnum, tmpState->tcs_az_ac1, tmpState->tcs_az_ac2,
-			tmpState->smu_az_jig_x, tmpState->smu_az_jig_y, 
-			tmpState->rts_end, &(hdr->wcs), status );
-      */
-
-      sc2ast_createwcs( subsysnum, tmpState, hdr->instap, hdr->telpos,
-			&(hdr->wcs), status );
     }
 
+    /* Decide which createwcs routine to call based on the instrument */
+
+    switch( hdr->instrument ) {
+
+    case INST__SCUBA2:
+      /* Need to get the subarray name */
+      smf_fits_getS( hdr, "SUBARRAY", subarray, 81, status );
+
+      /* Convert to a number */
+      sc2ast_name2num( subarray, &subsysnum, status);
+
+      sc2ast_createwcs( subsysnum, tmpState, hdr->instap, hdr->telpos,
+			&(hdr->wcs), status );
+      break;
+      
+    case INST__AZTEC:
+      smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet, 
+			 tmpState, hdr->instap, hdr->telpos, 
+			 &(hdr->wcs), status );
+      break;
+      
+
+    default:
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Don't know how to calculate WCS for data created with this instrument", status);
+
+    }
+    
     /* astShow( hdr->wcs ); */
   }
   return;
