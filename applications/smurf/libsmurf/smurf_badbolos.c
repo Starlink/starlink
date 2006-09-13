@@ -184,9 +184,15 @@ void smurf_badbolos( int *status ) {
    /* Check to see if a bad bolo mask already exists for this NDF.  If 
       if does, open it for updating, otherwise create a new extension */
    ndfXloc ( indf, "BPM", "WRITE", &bpmloc, status );
-   if ( *status != SAI__OK ) {
-     *status = SAI__OK;
+   if ( *status == NDF__NOEXT ) {
+      errAnnul ( status );
+      *status = SAI__OK;
+      msgOutif(MSG__VERB," ",
+                  "No bad bolo extension exists, creating new extension.", status);
       ndfXnew ( indf, "BPM", "NDF", 0, 0, &bpmloc, status );
+   } else {
+      msgOutif(MSG__VERB," ",
+                  "Bad bolo extension already exists, overwriting.", status);
    }
 
    bndf = smf_get_ndfid ( bpmloc, "", "WRITE", "NEW", 
@@ -194,13 +200,15 @@ void smurf_badbolos( int *status ) {
 
    ndfMap ( bndf, "DATA", "_INTEGER", "WRITE", &bolos, &n, status );
 
+   memset ( bolos, 0, n*sizeof(*bolos) );
+
    /* Get METHOD.  Determines whether to use a user-supplied ARD description
       or a randomly generated mask of bad bolometers */
    parChoic( "METHOD", "RANDOM", 
-	     "RANDOM, ARD_DESC", 1,
+	     "RANDOM, ARD", 1,
 	     method, LEN__METHOD, status);
 
-   if ( strncmp( method, "ARD_DESC", 8 ) == 0 ) {
+   if ( strncmp( method, "ARD", 3 ) == 0 ) {
 
       /* Get the ARD description and store it in the bad bolos array */
       parGet0c("ARD", ard, LEN__METHOD, status);
@@ -258,6 +266,7 @@ void smurf_badbolos( int *status ) {
       /* Seed random number generator, either with the time in 
          milliseconds, or from user-supplied seed */
       if ( *status == PAR__NULL ) {
+	 errAnnul ( status );
          *status = SAI__OK;
          gettimeofday ( &time, NULL );
          seed = ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 );
