@@ -111,6 +111,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <sys/time.h>
 #include <time.h>
 
 /* STARLINK includes */
@@ -176,6 +177,7 @@ void smurf_sc2sim( int *status ) {
    char simtype[LEN__METHOD];      /* String for simulation type */
    char simxmlfile[LEN__METHOD];   /* Simulation XML file */
    char testtype[LEN__METHOD];     /* String for scantest type */
+   struct timeval time;            /* Structure for system time */
    static double weights[DREAM__MXIRF]; /* impulse response */
    double *xbc=NULL;               /* projected NAS X offsets of bolometers 
 				      in arcsec */
@@ -187,7 +189,24 @@ void smurf_sc2sim( int *status ) {
    /* Get input parameters */
    parGet0c("OBSXMLFILE", obsxmlfile, LEN__METHOD, status);
    parGet0c("SIMXMLFILE", simxmlfile, LEN__METHOD, status);
-   parGet0c("SEED", seedchar, LEN__METHOD, status);
+   parGet0i("SEED", &rseed, status);
+
+   /* Seed random number generator, either with the time in 
+      milliseconds, or from user-supplied seed */
+   if ( *status == PAR__NULL ) {
+      errAnnul ( status );
+      *status = SAI__OK;
+      gettimeofday ( &time, NULL );
+      rseed = ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 );
+      msgOutif(MSG__VERB," ",
+               "Seeding random numbers with clock time", status);
+   } else {
+      msgSeti( "SEED", rseed );
+      msgOutif(MSG__VERB," ","Seeding random numbers with ^SEED", status);
+   } 
+
+   /* Convert the integer seed to a string */
+   sprintf ( seedchar, "%i", rseed );
 
    /* Allocate memory and fill the parameter array */
    pars[0] = smf_malloc ( LEN__METHOD, sizeof(**pars), 1, status );
@@ -198,9 +217,6 @@ void smurf_sc2sim( int *status ) {
    strcpy ( pars[1], obsxmlfile );
    strcpy ( pars[2], simxmlfile );
    strcpy ( pars[3], seedchar ); 
-
-   /* Get integer value of rseed */
-   rseed = atoi ( seedchar );
 
    /* Initialise random number generator to give same sequence every time,
       leading to the same series of pzero and heater offsets */
