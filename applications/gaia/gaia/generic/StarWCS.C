@@ -890,7 +890,7 @@ double StarWCS::width() const
     }
     dist1 = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
-    if ( dist == AST__BAD ) {
+    if ( dist1 == AST__BAD ) {
         return 0.0;
     }
 
@@ -911,7 +911,7 @@ double StarWCS::width() const
     }
     dist2 = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
-    if ( dist == AST__BAD ) {
+    if ( dist2 == AST__BAD ) {
         return 0.0;
     }
     
@@ -964,7 +964,7 @@ double StarWCS::height() const
     }
     dist1 = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
-    if ( dist == AST__BAD ) {
+    if ( dist1 == AST__BAD ) {
         return 0.0;
     }
 
