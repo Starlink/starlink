@@ -395,6 +395,9 @@ itcl::class gaia::GaiaCube {
 
       #  Halt any animations.
       $itk_component(animation) stop
+
+      #  If displaying a channel map remove the markers.
+      $itk_component(chanmap) close
    }
 
    #  Undo some of the effects of close. Do not reopen cube, that would 
@@ -590,6 +593,9 @@ itcl::class gaia::GaiaCube {
 
          #  Enable any bindings etc. in the spectral extraction tool.
          $itk_component(spectrum) open
+
+         #  Remove any channel map markers.
+         $itk_component(chanmap) close
       }
 
       #  Now copy this plane from the cube and update the image.

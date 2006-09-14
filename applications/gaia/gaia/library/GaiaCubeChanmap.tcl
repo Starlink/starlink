@@ -93,11 +93,18 @@ itcl::class gaia::GaiaCubeChanmap {
    #  Destructor:
    #  -----------
    destructor  {
-      #  Nothing to do.
+      close
    }
 
    #  Methods:
    #  --------
+
+   #  Take any actions necessary when the cube window is closed.
+   public method close {} {
+      catch {
+         $canvas_ delete "channel_map"
+      }
+   }
 
    protected method add_controls_ {} {
 
@@ -214,9 +221,7 @@ itcl::class gaia::GaiaCubeChanmap {
    #  Grab the clicks on the image so that we can update the spectral
    #  readout.
    protected method add_bindings_ {} {
-      set canvas [$itk_option(-gaiacube) cget -canvas]
-      set rtdimage [$itk_option(-gaiacube) cget -rtdimage]
-      $canvas bind $rtdimage <1> [code $this display_coord_ %x %y]
+      $canvas_ bind $rtdimage_ <1> [code $this display_coord_ %x %y]
    }
 
    #  Determine the spectral coordinate associated with a canvas position
@@ -225,32 +230,49 @@ itcl::class gaia::GaiaCubeChanmap {
    protected method display_coord_ {cx cy} {
 
       #  Get the current base domain frame index.
-      set rtdimage [$itk_option(-gaiacube) cget -rtdimage]
-      set current [$rtdimage astget current]
+      set current [$rtdimage_ astget current]
 
-      set canvas [$itk_option(-gaiacube) cget -canvas]
-      set ccx [$canvas canvasx $cx]
-      set ccy [$canvas canvasy $cy]
-      $rtdimage convert coords $ccx $ccy canvas ix iy image
+      set ccx [$canvas_ canvasx $cx]
+      set ccy [$canvas_ canvasy $cy]
+      $rtdimage_ convert coords $ccx $ccy canvas ix iy image
 
-      #  Visit all domains and check for the "ORIGSKY" Ident.
-      set domains [$rtdimage astdomains 0]
-      set i 0
-      foreach {domain} $domains {
-         catch {
-            incr i
-            $rtdimage astset current $i
-            set ident [$rtdimage astget "Ident"]
-            if { $ident == "ORIGSKY" } {
-               set xylist [$rtdimage astpix2cur $ix $iy]
+      #  Get the current "sky" coordinates.
+      lassign [$rtdimage_ astpix2wcs $ix $iy] ra dec
+
+      #  Visit all frames in the image frameset and check for the "ORIGSKY"
+      #  Ident.
+      set nframes [$rtdimage_ astget "nframe"]
+      for { set i 1 } { $i <= $nframes } { incr i } {
+         $rtdimage_ astset current $i
+         set ident [$rtdimage_ astget "Ident"]
+         if { $ident == "ORIGSKY" } {
+            catch {
+               set xylist [$rtdimage_ astpix2cur $ix $iy]
                $itk_component(selected) configure -value [lindex $xylist 2]
-               break
+            }
+            break
+         }
+      }
+      if { [info exists ra] && [info exists dec] } {
+
+         #  Draw markers on all maps, one for each ROI<n> domain we have.
+         $canvas_ delete "channel_map"
+         for { set i 1 } { $i <= $nframes } { incr i } {
+            $rtdimage_ astset current $i
+            set ident [$rtdimage_ astget "Ident"]
+            if { [string match "ROI*" $ident] } {
+               catch {
+                  lassign [$rtdimage_ astcur2pix $ra $dec] ix iy
+                  $rtdimage_ convert coords $ix $iy image cx cy canvas
+                  $canvas_ create rtd_mark $cx $cy \
+                     -type cross -outline blue -tag "channel_map"
+               }
             }
          }
       }
 
       #  Restore default domain.
-      $rtdimage astset current $current
+      $rtdimage_ astset current $current
    }
 
    #  Set a new nchan value.

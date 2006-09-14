@@ -6,6 +6,14 @@
     The coordinate system of a channel map is now matched to that
     of the current cube.
 
+    Fix bug causing a double free core dump when saving modified
+    world coordinate systems for NDF data.
+
+    Channel maps now have a marker drawn to display the same position
+    in each tile. The average spectral coordinate is also displayed
+    and the channel map is given the same coordinate system as the
+    used by the cube.
+
 
   Release 3.2-0: 28th July 2006.
   ==============================

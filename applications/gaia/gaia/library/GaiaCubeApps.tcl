@@ -397,7 +397,12 @@ itcl::class gaia::GaiaCubeApps {
    #  ----------------------
 
    #  The related GaiaCube instance.
-   itk_option define -gaiacube gaiacube GaiaCube {}
+   itk_option define -gaiacube gaiacube GaiaCube {} {
+      if { $itk_option(-gaiacube) != {} } {
+         set canvas_ [$itk_option(-gaiacube) cget -canvas]
+         set rtdimage_ [$itk_option(-gaiacube) cget -rtdimage]
+      }
+   }
 
    #  The spectral coordinates instance.
    itk_option define -spec_coords spec_coords Spec_Coords {}
@@ -462,6 +467,12 @@ itcl::class gaia::GaiaCubeApps {
 
    #  Variable for determining when wcsattrib has completed.
    protected variable wcsattrib_done_ 0
+
+   #  The rtdimage instance being used to display the main image.
+   protected variable rtdimage_ {}
+
+   #  The canvas being used to display the main image.
+   protected variable canvas_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
