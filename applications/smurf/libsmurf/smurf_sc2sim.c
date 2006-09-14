@@ -62,6 +62,7 @@
 *     2006-06-09  Added heatrun task (JB)
 *     2006-07-31  Split into subroutines and added simhits capability (JB)
 *     2006-08-21  Free resources allocated in sc2sim_instrinit (EC)
+*     2006-09-14  Seed optional
 *     {enter_further_changes_here}
 
 *    History (HEATRUN task):
@@ -195,7 +196,6 @@ void smurf_sc2sim( int *status ) {
       milliseconds, or from user-supplied seed */
    if ( *status == PAR__NULL ) {
       errAnnul ( status );
-      *status = SAI__OK;
       gettimeofday ( &time, NULL );
       rseed = ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 );
       msgOutif(MSG__VERB," ",
