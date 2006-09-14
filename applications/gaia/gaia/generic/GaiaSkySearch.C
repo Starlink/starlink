@@ -594,7 +594,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
     if (colNames)
 	free(colNames);
     if (colIndexes)
-	delete colIndexes;
+	delete[] colIndexes;
     if (symb)
 	free(symb);
     if (exprList)
