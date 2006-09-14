@@ -51,12 +51,11 @@
 *     {enter_new_authors_here}
 
 *  History :
-*     2006-09-07: Original version (JB)
-*     {enter_further_changes_here}
-
-*    History :
-*     2005-09-07:  original (jb)
-*     {enter_further_changes_here}
+*     2006-09-07 (JB): 
+*        Original version
+*     2006-09-14 (JB): 
+*        Remove unused variables and replace GRP__NOID with NULL
+*     
 
 *  Copyright:
 *     Copyright (C) 2006 University of British Columbia. All Rights
@@ -139,7 +138,6 @@ void smurf_badbolos( int *status ) {
    int ardFlag=0;                 /* Flag for ARD description */
    Grp *ardGrp = NULL;           /* Group containing ARD description */
    int curbad;                    /* The current bad object */
-   int extexists=0;               /* Whether extension already exists */
    int i;                         /* Loop counter */
    int j;                         /* Loop counter */
    int indf;                      /* NDF identifier of input file */
@@ -155,7 +153,6 @@ void smurf_badbolos( int *status ) {
    int nbadcols;                  /* Number of bad columns */
    int nbadrows;                  /* Number of bad rows */
    int ndims;                     /* Number of dimensions in input file */
-   int place;                     /* NDF placeholder */
    int regval=0;                  /* First keyword in ARD description */
    int seed;                      /* Seed for random number generator */
    struct timeval time;           /* Structure for system time */
@@ -186,7 +183,6 @@ void smurf_badbolos( int *status ) {
    ndfXloc ( indf, "BPM", "WRITE", &bpmloc, status );
    if ( *status == NDF__NOEXT ) {
       errAnnul ( status );
-      *status = SAI__OK;
       msgOutif(MSG__VERB," ",
                   "No bad bolo extension exists, creating new extension.", status);
       ndfXnew ( indf, "BPM", "NDF", 0, 0, &bpmloc, status );
@@ -213,7 +209,7 @@ void smurf_badbolos( int *status ) {
       /* Get the ARD description and store it in the bad bolos array */
       parGet0c("ARD", ard, LEN__METHOD, status);
     
-      ardGrpex ( ard, GRP__NOID, &ardGrp, &ardFlag, status );
+      ardGrpex ( ard, NULL, &ardGrp, &ardFlag, status );
 
       trcoeff = VAL__BADR;
 
@@ -267,7 +263,6 @@ void smurf_badbolos( int *status ) {
          milliseconds, or from user-supplied seed */
       if ( *status == PAR__NULL ) {
 	 errAnnul ( status );
-         *status = SAI__OK;
          gettimeofday ( &time, NULL );
          seed = ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 );
          msgOutif(MSG__VERB," ",
