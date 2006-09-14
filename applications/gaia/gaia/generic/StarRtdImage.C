@@ -997,8 +997,19 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                 //  Write the FITS channel out to a Mem object and use
                 //  it to replace the existing headers.
                 ncard = astGetI( chan, "Ncard" );
-                Mem newhead = Mem( FITSCARD * ( ncard + 1 ), 0 );
+
+                //  Allocate header. Need to use CNF when an NDF.
+                Mem newhead;
+                if ( isfits() ) {
+                    newhead = Mem( FITSCARD * ( ncard + 1 ), 0 );
+                }
+                else {
+                    size_t hsize = (size_t) FITSCARD * ( ncard + 1 );
+                    void *hdata = cnfMalloc( hsize );
+                    newhead = Mem( hdata, hsize, 0 );
+                }
                 char *newptr = (char *) newhead.ptr();
+
                 astClear( chan, "Card" );
                 int i;
                 for ( i = 0; i < ncard; i++, newptr += FITSCARD ) {
