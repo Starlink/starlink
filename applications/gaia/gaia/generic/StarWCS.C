@@ -985,7 +985,7 @@ double StarWCS::height() const
     }
     dist2 = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
-    if ( dist == AST__BAD ) {
+    if ( dist2 == AST__BAD ) {
         return 0.0;
     }
     
