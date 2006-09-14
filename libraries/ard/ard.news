@@ -1,17 +1,25 @@
-1 ARD_library
-                                             Expires: ???
+     Recent changes
+     --------------
 
-A major upgrade to the ARD library has been made. The current release
-(V2.0) introduces new features which enable positions within ARD
-expressions to be supplied in a much wider range of coordinate systems
-than prevously. For instance, if there is an RA/DEC calibration 
-associated with the pixel array, then the ARD description can contain
-positions in any of the common celestial coordinate systems. 
+ 2.0-8 (September 2006)
+ -----
 
-A new routine ARD_PLOT has been added which will draw a curve on a
-graphics device around the boundary of a supplied 2-dimensional ARD 
-description.
+    C wrappers for the ARD_WORK and ARD_GRPEX routines have been introduced.
 
-ARD is now released under the GPL.
+ 2.0
+ ---
 
-Full details are available in SUN/183.
+    A major upgrade to the ARD library has been made. The current release
+    (V2.0) introduces new features which enable positions within ARD
+    expressions to be supplied in a much wider range of coordinate systems
+    than prevously. For instance, if there is an RA/DEC calibration 
+    associated with the pixel array, then the ARD description can contain
+    positions in any of the common celestial coordinate systems. 
+
+    A new routine ARD_PLOT has been added which will draw a curve on a
+    graphics device around the boundary of a supplied 2-dimensional ARD 
+    description.
+
+    ARD is now released under the GPL.
+
+    Full details are available in SUN/183.
