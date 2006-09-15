@@ -66,6 +66,8 @@
 *        Added telpos to smfHead 
 *     2006-09-07 (EC)
 *        Added instap to smfHead
+*     2006-09-15 (AGG):
+*        Add new smfDream struct
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -99,6 +101,7 @@
 #include "star/hds_types.h"
 #include "jcmt/state.h"
 #include "sc2da/sc2store_par.h"
+#include "sc2da/dream_par.h"
 #include "ast.h"
 #include "ndf.h"
 #include "star/grp.h"
@@ -182,6 +185,24 @@ typedef struct smfDA {
   int nflat;                 /* number of flat coeffs per bol */
 } smfDA;
 
+/* This struct stores DREAM parameters */
+
+typedef struct smfDream {
+  size_t nvert;              /* Number of jiggle vertices */
+  double jigstep;            /* Size of jiggle step size in arcsec */
+  int jigvert[DREAM__MXVERT][2];   /* Jiggle vertex positions in DREAM
+				      pattern */
+  double jigpath[DREAM__MXSAM][2]; /* X, Y SMU positions during a cycle, in
+				      arcsec */
+  size_t ncycles;            /* Number of DREAM cycles in the input file */
+  size_t nsampcycle;         /* Number of data samples per cycle */
+  size_t ngrid;              /* Number of grid points in reconstruction */
+  int gridpts[DREAM__MXGRID][2];   /* X, Y positions for reconstruction grid */
+  double gridstep;           /* Spacing of grid in arcsec */
+  double *gridwts;           /* Pointer to grid weights array */
+  double *invmatx;           /* Pointer to inverse matrix */
+} smfDream;
+
 /* This struct is used to contain all information related to a particular
    data file (where possible since sc2store does not return a handle).
 */
@@ -190,6 +211,7 @@ typedef struct smfData {
   smfFile * file;            /* File information */
   smfHead * hdr;             /* Header information */
   smfDA * da;                /* If sc2store, associated data arrays */
+  smfDream *dream;           /* DREAM parameters */
   smf_dtype dtype;           /* Data type of DATA and VARIANCE arrays */
   void * pntr[3];            /* Array of pointers to DATA/VARIANCE/QUALITY */
   dim_t dims[NDF__MXDIM];    /* Dimensions of data array */
@@ -220,4 +242,3 @@ typedef struct smfGroup {
 } smfGroup;
 
 #endif /* SMF_TYP_DEFINED */
-
