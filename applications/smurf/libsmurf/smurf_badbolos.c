@@ -108,6 +108,7 @@
 #include "star/grp.h"
 #include "star/ard.h"
 
+/* SC2DA includes */
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
 #include "sc2da/sc2store_par.h"
@@ -119,11 +120,11 @@
 #include "smurflib.h"
 #include "libsmf/smf.h"
 
+/* Simulator includes */
 #include "libsc2sim/sc2sim.h"
 
 #define FUNC_NAME "smurf_badbolos"
 #define TASK_NAME "BADBOLOS"
-#define LEN__METHOD 20
 
 void smurf_badbolos( int *status ) {
 
@@ -219,8 +220,8 @@ void smurf_badbolos( int *status ) {
    } else {
 
       /* Allocate memory for the arrays */
-      badcols = smf_malloc ( dims[0], sizeof ( *badcols ), 1, status );
-      badrows = smf_malloc ( dims[1], sizeof ( *badrows ), 1, status );
+     badcols = smf_malloc ( (size_t)dims[0], sizeof ( *badcols ), 1, status );
+     badrows = smf_malloc ( (size_t)dims[1], sizeof ( *badrows ), 1, status );
 
       /* Get number of bad columns and make sure it isn't greater 
          than the max */
