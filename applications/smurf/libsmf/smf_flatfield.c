@@ -121,24 +121,19 @@
 
 void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, int *status ) {
 
-  int checkflatstatus = 0;    /* Local variable for storing status */
-
   if ( *status != SAI__OK ) return;
 
-  /*  if ( smf_history_check( data, FUNC_NAME, status) ) return;*/
-
+  /* See if data are flatfielded */
   smf_check_flat( idata, status );
-  /* Store status and annul for messaging system */
-  checkflatstatus = *status;
 
   /* Data are flatfielded if status set to SMF__FLATN */
-  /*  if ( checkflatstatus == SMF__FLATN ) {*/
   if ( *status == SMF__FLATN ) {
     errAnnul(status);
     /* check *odata */
     if ( *odata == NULL) {
       msgOutif(MSG__VERB, FUNC_NAME, 
-	       "OK, data are flatfielded and output struct is NULL: cloning input", status);
+	       "OK, data are flatfielded and output struct is NULL: cloning input", 
+	       status);
       /* If NULL then we need to clone idata to odata i.e. copy the
 	 pointer ONLY */
       smf_clone_data( idata, odata, status );
@@ -152,51 +147,32 @@ void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, int
 
     /* OK data are not flatfielded: create smfData based on input and
        apply flatfield */
-
     /* Check if *odata exists */
     if ( *odata == NULL) {
-
       msgOutif(MSG__VERB, FUNC_NAME,"Data not FF, no odata", status);
       /* If NULL then we need create odata not associated with a file
 	 (i.e. leave smfFile NULL) */
       /* Allocate space for *odata and all necessary cpts */
       /* Set the rawconvert flag to return doubles in the DATA array */
       *odata = smf_deepcopy_smfData( idata, 1, flags, status );
-
-      /* Apply flatfield calibration */
-      smf_flatten( *odata, status);
-
-      /* Write history entry to file */
-      if ( *status == SAI__OK ) {
-	smf_history_add( *odata, FUNC_NAME, "Flatfield successful", status);
-      } else {
-	errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
-	       status);
-      }
     } else {
-
       /* OK, *odata exists */
       msgOutif(MSG__VERB, FUNC_NAME,"Data not FF, odata exists", status);
-
       /* Check and set */
       smf_check_smfData( idata, *odata, flags, status );
-
-      /* Apply flatfield calibration */
-      smf_flatten( *odata, status);
-
-      /* Write history entry to file */
-      if ( *status == SAI__OK ) {
-	smf_history_add( *odata, FUNC_NAME, "Flatfield successful", status);
-      } else {
-	errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
-	       status);
-      }
+    }
+    /* OK now apply flatfield calibration */
+    smf_flatten( *odata, status);
+    /* Write history entry to file */
+    if ( *status == SAI__OK ) {
+      smf_history_add( *odata, FUNC_NAME, "Flatfield successful", status);
+    } else {
+      errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
+	     status);
     }
   } else {
     msgOut(FUNC_NAME, 
 	   "Hmm status is something other than it should be....", status);
   }
-
-  /*  *status = checkflatstatus;*/
 }
 
