@@ -150,7 +150,7 @@ void smurf_flatfield( int *status ) {
     } else {
       /* Tell the user which file it was... */
       /* Would be user-friendly to trap 1st etc... */
-      errFlush( status );
+      /*errFlush( status );*/
       msgSeti("I",i);
       msgSeti("N",size);
       errRep(FUNC_NAME,	"Unable to flatfield data from file ^I of ^N", status);
