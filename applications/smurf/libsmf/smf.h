@@ -114,6 +114,8 @@
 *        Added smf_dreamsolve, smf_create_smfDream,
 *        smf_construct_smfDream, smf_close_smfDream, smd_dream_setjig,
 *        smf_store_image
+*     2006-09-15 (AGG):
+*        Add smf_dream_getgrid
 
 *     {enter_further_changes_here}
 
@@ -255,6 +257,9 @@ smfData * smf_deepcopy_smfData ( const smfData *old, const int rawconvert,
 smfDA * smf_deepcopy_smfDA ( const smfData *old, int * status);
 
 smfFile * smf_deepcopy_smfFile ( const smfFile *old, int * status );
+
+void smf_dream_getgrid( const AstKeyMap *keymap, double *gridstep, int *ngrid, 
+			int **gridminmax, int gridpts[][2], int *status);
 
 void smf_dream_setjig( char subarray[], int npath, double gridstep, 
 		       double jigpath[][2], int *status);

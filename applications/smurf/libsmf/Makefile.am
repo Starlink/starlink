@@ -33,7 +33,7 @@ smf_model_create.c smf_model_getname.c smf_open_newfile.c smf_open_ndf.c \
 smf_create_smfDream.c smf_construct_smfDream.c smf_close_smfDream.c \
 smf_dream_setjig.c smf_dreamsolve.c smf_store_image.c\
 smf_open_ndfname.c smf_string_to_dtype.c smf_create_lutwcs.c \
-smf_calc_telpos.c smf_telpos_get.c
+smf_calc_telpos.c smf_telpos_get.c smf_dream_getgrid.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 
