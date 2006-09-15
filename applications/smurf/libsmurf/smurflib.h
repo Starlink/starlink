@@ -40,6 +40,8 @@
 *        Add MAKECUBE
 *     2006-09-13 (JB):
 *        Add BADBOLOS
+*     2006-09-15 (AGG):
+*        Add DREAMWEIGHTS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -78,6 +80,8 @@ void smurf_remsky( int * );
 void smurf_scanfit( int * );
 void smurf_sc2sim( int * );
 void smurf_dreamsolve( int * );
+void smurf_dreamweights( int * );
 void smurf_badbolos( int * );
+void smurf_impaztec( int * );
 
 #endif /* SMURF_LIB_DEFINED */
