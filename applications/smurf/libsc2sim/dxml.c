@@ -63,6 +63,7 @@ static double XML_casspol;             /* polarisation of Cass optics (%) */
 static double XML_casstrans;           /* transmission of Cass optics (%) */
 static int XML_conv_shape;             /* Possible convolution functions are Gaussian (=0) */
 static double XML_conv_sig;            /* convolution function parameter */
+static char XML_coordframe[80];        /* Map coordinate frame */
 static double XML_dec;                 /* declination in radians */
 static double XML_distfac;             /* distortion factor (0=no distortion) */
 static char XML_flatname[DREAM__FLEN]; /* name of flatfield algorithm */
@@ -362,6 +363,7 @@ int *status                /* global status (given and returned) */
    XML_casstrans = 98.0;   
    XML_conv_shape = 1;
    XML_conv_sig = 1.0;
+   strcpy ( XML_coordframe, "" );
    XML_dec = 0.0;
    XML_distfac = 0.0;
    strcpy ( XML_flatname, "POLYNOMIAL" );
@@ -653,6 +655,7 @@ int *status                /* global status (given and returned) */
    fprintf ( fd, " bolfile = %s\n", inx.bolfile );
    fprintf ( fd, " conv_shape = %d\n", inx.conv_shape );
    fprintf ( fd, " conv_sig = %e\n", inx.conv_sig );
+   fprintf ( fd, " coordframe = %s\n", inx.coordframe );
    fprintf ( fd, " dec = %e\n", inx.dec );
    fprintf ( fd, " distfac = %e\n", inx.distfac );
    fprintf ( fd, " flatname = %s\n", inx.flatname );
@@ -799,7 +802,8 @@ int *status                /* global status (given and retuned) */
    int ix;                 /* grid offset */
    int iy;                 /* grid offset */
    int j;
-   char *obsmode_upcase=NULL; /* upper case string for obsmode */
+   char *obsmode_upcase=NULL;    /* upper case string for obsmode */
+   char *coordframe_upcase=NULL; /* upper case string for coordinate frame */
 
    inx->bol_distx = XML_bol_distx;
    inx->bol_disty = XML_bol_disty;
@@ -811,6 +815,13 @@ int *status                /* global status (given and retuned) */
    inx->bous_vmax=XML_bous_vmax;
    inx->conv_shape = XML_conv_shape;
    inx->conv_sig = XML_conv_sig;
+
+   /* Convert coordframe to uppercase */
+   coordframe_upcase = dxml_makeupper(XML_coordframe, status );
+   strcpy ( XML_coordframe, coordframe_upcase );
+   free( coordframe_upcase );
+   strcpy( inx->coordframe, XML_coordframe );
+
    inx->dec = XML_dec;
    inx->distfac = XML_distfac;
    strcpy ( inx->flatname, XML_flatname );
@@ -860,12 +871,12 @@ int *status                /* global status (given and retuned) */
    inx->numsamples = XML_numsamples;
    inx->nvert = XML_nvert;
 
-/* Convert obsmode to uppercase */
+   /* Convert obsmode to uppercase */
    obsmode_upcase = dxml_makeupper(XML_obsmode, status );
    strcpy ( XML_obsmode, obsmode_upcase );
    free( obsmode_upcase );
-
    strcpy( inx->obsmode, XML_obsmode );
+
    inx->platenum = XML_platenum;
    inx->platerev = XML_platerev;
    inx->pong_angle=XML_pong_angle;
@@ -1293,6 +1304,10 @@ const char **atts              /* array of name-value pairs (given) */
    else if ( strcmp ( name, "conv_sig" ) == 0 )
    {
       dxml_cvtdouble ( name, atts[1], &XML_conv_sig, &status );
+   }
+   else if ( strcmp ( name, "coordframe" ) == 0 )
+   {
+     strcpy ( XML_coordframe, atts[1] );
    }
    else if ( strcmp ( name, "dec" ) == 0 )
    {

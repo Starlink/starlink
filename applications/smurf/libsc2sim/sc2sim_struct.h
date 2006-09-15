@@ -13,4 +13,8 @@ struct bolpix             /* pixel location of bolometer */
 /* Enumerated type for observing modes */
 typedef enum {stare, dstare, dream, pong, polspin, heatrun, 
               bous, singlescan, none} obsMode;
+
+/* Enumerated type for map coordinate frame */
+typedef enum {nasmyth, azel, radec, nocoord} mapCoordframe;
+
 #endif /* SC2SIM_STRUCT_DEFINED */

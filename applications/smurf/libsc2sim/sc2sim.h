@@ -225,6 +225,12 @@ double **posptr,     /* list of positions (returned) */
 int *status          /* global status (given and returned) */
 );
 
+mapCoordframe sc2sim_getcoordframe
+( 
+char *name,         /* string containing name of coordinate frame */
+int *status         /* global status (given and returned) */
+);
+
 void sc2sim_getinvf 
 ( 
 double sigma,        /* dispersion of broad-band noise (given) */ 
@@ -527,10 +533,11 @@ void sc2sim_simplescan ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
                          double *ybc, double *ybolo,int *status );
 
 void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
-                       double coeffs[], double digcurrent, double digmean, 
-                       double digscale, char filter[], double *heater, int maxwrite,
-                       obsMode mode, int nbol, double *pzero, int rseed, 
-                       double samptime, double weights[], double *xbc, double *xbolo,
-                       double *ybc, double *ybolo, int *status );
+		       double coeffs[], double digcurrent, double digmean, 
+		       double digscale, char filter[], double *heater, 
+		       int maxwrite, obsMode mode, mapCoordframe coordframe,
+		       int nbol, double *pzero, int rseed, double samptime, 
+		       double weights[], double *xbc, double *xbolo, 
+		       double *ybc, double *ybolo, int *status );
 
 #endif /* SC2SIM_DEFINED */

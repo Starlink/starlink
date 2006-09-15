@@ -63,6 +63,7 @@
 *     2006-07-31  Split into subroutines and added simhits capability (JB)
 *     2006-08-21  Free resources allocated in sc2sim_instrinit (EC)
 *     2006-09-14  Seed optional
+*     2006-09-14  Ability to scan in AzEl and RADec coordinates (EC)
 *     {enter_further_changes_here}
 
 *    History (HEATRUN task):
@@ -157,6 +158,7 @@ void smurf_sc2sim( int *status ) {
    /* Local variables */
    struct dxml_struct inx;         /* structure for values from XML */
    struct dxml_sim_struct sinx;    /* structure for sim values from XML */
+   mapCoordframe coordframe;       /* Coordinate frame for simulated map */
    double coeffs[NCOEFFS];         /* bolometer response coeffs */
    double digcurrent;              /* digitisation mean current */
    double digmean;                 /* digitisation mean value */
@@ -243,6 +245,7 @@ void smurf_sc2sim( int *status ) {
       a heatrun*/
 
    mode = sc2sim_getobsmode( inx.obsmode, status );
+   coordframe = sc2sim_getcoordframe( inx.coordframe, status );
 
    if ( mode == heatrun ) {
 
@@ -259,8 +262,9 @@ void smurf_sc2sim( int *status ) {
       parGet0i("MAXWRITE", &maxwrite, status);
 
       sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
-                        filter, heater, maxwrite, mode, nbol, pzero, rseed, 
-                        samptime, weights, xbc, xbolo, ybc, ybolo, status);
+                        filter, heater, maxwrite, mode, coordframe, nbol, 
+			pzero, rseed, samptime, weights, xbc, xbolo, ybc, 
+			ybolo, status);
 
    }  else if ( mode == pong || mode == singlescan || mode == bous ) {
 
@@ -284,8 +288,9 @@ void smurf_sc2sim( int *status ) {
       if( strncmp( simtype, "FULL", 4 ) == 0 ) {
 
          sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
-                           filter, heater, maxwrite, mode, nbol, pzero, rseed, 
-                           samptime, weights, xbc, xbolo, ybc, ybolo, status );
+                           filter, heater, maxwrite, mode, coordframe, nbol, 
+			   pzero, rseed, samptime, weights, xbc, xbolo, ybc, 
+			   ybolo, status );
 
       } else if ( strncmp( simtype, "WEIGHTS", 4 ) == 0 ) {
 

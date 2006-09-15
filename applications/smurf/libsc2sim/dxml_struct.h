@@ -25,6 +25,7 @@
     29Jun2006 : removed dataname (jb)
     04Aug2006 : added bous & singlescan parameters (jb)
     21Aug2006 : Put in ifndef to avoid including multiple times (EC)
+    14Sep2006 : Added coordframe (EC)
 */
 
 #include "libsc2sim/dream_par.h"
@@ -42,6 +43,7 @@ struct dxml_struct {
   double bous_height;         /* height of bous pattern (arcsec) */
   double bous_spacing;        /* scan line spacing in arcsec  */
   double bous_vmax;           /* Telescope max velocities */
+  char coordframe[80];        /* Map coord. frame (nas/azel/radec) */
   int conv_shape;             /* Possible convolution functions are
 				 0 - Gaussian
 				 1 - sinc(dx).sinc(dy)

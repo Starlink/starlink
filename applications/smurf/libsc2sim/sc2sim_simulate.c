@@ -16,10 +16,10 @@
 *     sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
 *                       double coeffs[], double digcurrent, double digmean, 
 *                       double digscale, char filter[], double *heater, 
-*                       int maxwrite, obsMode mode, int nbol, double *pzero, 
-*                       int rseed, double samptime, double weights[], 
-*                       double *xbc, double *xbolo, double *ybc, double *ybolo,
-*                       int *status);
+*                       int maxwrite, obsMode mode, mapCoordframe coordframe,
+*                       int nbol, double *pzero, int rseed, double samptime, 
+*                       double weights[], double *xbc, double *xbolo, 
+*                       double *ybc, double *ybolo, int *status);
 
 *  Arguments:
 *     inx = dxml_struct* (Given)
@@ -42,6 +42,8 @@
 *        File close time
 *     mode = obsMode (Given)
 *        Observation mode
+*     coordframe = mapCoordframe (Given)
+*        Coordinate frame for the map
 *     nbol = int (Given)
 *        Total number of bolometers
 *     pzero = double* (Given)
@@ -124,6 +126,10 @@
 *        Modified call to sc2sim_calctime to use new interface.
 *     2006-09-11 (EC):
 *        Fixed pointer problem with callc to smf_calc_telpos
+*     2006-09-13 (EC):
+*        Removed another instance of hard-wired telescope coordinates
+*     2006-09-14 (EC)
+*        Added the ability to define scans in AzEl and RaDec coord. frames
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -200,12 +206,12 @@ void slaDjcl(double djm, int *iy, int *im, int *id, double *fd, int *j);
 #define LEN__METHOD 20
 
 void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
-                       double coeffs[], double digcurrent, double digmean, 
-                       double digscale, char filter[], double *heater, 
-		       int maxwrite, obsMode mode, int nbol, double *pzero, 
-		       int rseed, double samptime, double weights[], 
-		       double *xbc, double *xbolo, double *ybc, 
-		       double *ybolo, int *status ) {
+		       double coeffs[], double digcurrent, double digmean, 
+		       double digscale, char filter[], double *heater, 
+		       int maxwrite, obsMode mode, mapCoordframe coordframe,
+		       int nbol, double *pzero, int rseed, double samptime, 
+		       double weights[], double *xbc, double *xbolo, 
+		       double *ybc, double *ybolo, int *status ) {
 
   double accel[2];                /* telescope accelerations (arcsec) */
   float aeff[3];                  /* output of wvmOpt */
@@ -227,8 +233,10 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   double *bor_dec=NULL;           /* telescope dec. spherical coordinates */
   double *bor_el=NULL;            /* El of telescope in spherical coord. */
   double *bor_ra=NULL;            /* telescope r.a. spherical coordinates */
+  double bor_y_cel=0;             /* boresight y-celestial tanplane offset */
   double bor_y_hor=0;             /* boresight y-horizontal tanplane offset */
   double bor_y_nas=0;             /* boresight y-nasmyth tanplane offset */
+  double bor_x_cel=0;             /* boresight y-celestial tanplane offset */
   double bor_x_hor=0;             /* boresight x-horizontal tanplane offset */
   double bor_x_nas=0;             /* boresight x-nasmyth tanplane offset */
   int colsize;                    /* column size for flatfield */
@@ -614,8 +622,8 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
     
     for ( frame=0; frame<count; frame++ ) {
 
-      /* JCMT is 19:49:33 N */
-      phi = ( 19.0 + (49.0/60.0) + (33.0/3600.0) ) / AST__DR2D;
+      /* Telescope latitude */
+      phi = telpos[1]*DD2R;
 
       /* calculate the az/el corresponding to the map centre (base) */
       slaDe2h ( lst[frame] - inx->ra, inx->dec, phi, &temp1, &temp2 );
@@ -626,25 +634,69 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
         base_el[frame] = temp2;
         base_p[frame] = temp3;
         
-        /* Get boresight tanplate offsets in Nasmyth coordinates (radians) */
-        bor_x_nas = (posptr[frame*2])*DAS2R;
-        bor_y_nas = (posptr[frame*2+1])*DAS2R;
-        
-        /* Calculate boresight offsets in horizontal coord. */
-        bor_x_hor =  bor_x_nas*cos(base_el[frame]) - 
-          bor_y_nas*sin(base_el[frame]);
-        bor_y_hor = bor_x_nas*sin(base_el[frame]) + 
-          bor_y_nas*cos(base_el[frame]);
-        
-        /* Calculate jiggle offsets in horizontal coord. */
-        jig_x_hor[frame] =  (jigptr[frame%jigsamples][0]*cos(base_el[frame]) -
-                             jigptr[frame%jigsamples][1]*sin(base_el[frame]))*
-          DR2AS;
-        
-        jig_y_hor[frame] = (jigptr[frame%jigsamples][0]*sin(base_el[frame]) + 
-                            jigptr[frame%jigsamples][1]*cos(base_el[frame]))/
-          DR2AS;
-      
+        /* The scan pattern (posptr) is defined as a series of offsets in
+           the map coordinate frame. Depending on the frame chosen, project
+           the pattern into AzEl and RADec so that it can be written to the
+           JCMTState structure */
+
+
+	switch( coordframe ) {
+	  
+	case nasmyth:
+	  /* Get boresight tanplate offsets in Nasmyth coordinates (radians) */
+	  bor_x_nas = (posptr[frame*2])*DAS2R;
+	  bor_y_nas = (posptr[frame*2+1])*DAS2R;
+	  
+	  /* Calculate boresight offsets in horizontal coord. */
+	  bor_x_hor =  bor_x_nas*cos(base_el[frame]) - 
+	    bor_y_nas*sin(base_el[frame]);
+	  bor_y_hor = bor_x_nas*sin(base_el[frame]) + 
+	    bor_y_nas*cos(base_el[frame]);
+	  
+	  /* Calculate jiggle offsets in horizontal coord. */
+	  jig_x_hor[frame] = (jigptr[frame%jigsamples][0]*cos(base_el[frame]) -
+			      jigptr[frame%jigsamples][1]*sin(base_el[frame]))*
+	    DR2AS;
+	  
+	  jig_y_hor[frame] = (jigptr[frame%jigsamples][0]*sin(base_el[frame]) +
+			      jigptr[frame%jigsamples][1]*cos(base_el[frame]))/
+	    DR2AS;
+	  break;
+	  
+	case azel:
+	  /* posptr and jigptr already give the azel tanplane offsets */
+	  bor_x_hor = (posptr[frame*2])*DAS2R;
+	  bor_y_hor = (posptr[frame*2+1])*DAS2R;
+
+	  jig_x_hor[frame] = jigptr[frame%jigsamples][0]*DR2AS;
+	  jig_y_hor[frame] = jigptr[frame%jigsamples][1]*DR2AS;
+	  break;
+	  
+	case radec:
+	  /* posptr and jigptr give the RADec tanplane offsets */
+	  bor_x_cel = (posptr[frame*2])*DAS2R;
+	  bor_y_cel = (posptr[frame*2+1])*DAS2R;
+	  
+	  /* Rotate by the parallactic angle to get offsets in AzEl */
+	  bor_x_hor =  bor_x_cel*cos(base_p[frame]) - 
+	    bor_y_cel*sin(base_p[frame]);
+	  bor_y_hor = bor_x_cel*sin(base_p[frame]) + 
+	    bor_y_cel*cos(base_p[frame]);
+	  
+	  jig_x_hor[frame] = (jigptr[frame%jigsamples][0]*cos(base_p[frame]) -
+			      jigptr[frame%jigsamples][1]*sin(base_p[frame]))*
+	    DR2AS;
+	  
+	  jig_y_hor[frame] = (jigptr[frame%jigsamples][0]*sin(base_p[frame]) +
+			      jigptr[frame%jigsamples][1]*cos(base_p[frame]))/
+	    DR2AS;
+	  break;
+
+	default: /* should never be reached...*/
+	  errRep("", "Un-recongnized map coordinate frame", status);
+	  break;
+	}
+
       }
       
       /* Calculate boresight spherical horizontal coordinates */
@@ -666,8 +718,6 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 		 status);
 	}
       }
-
-
       
       if( *status == SAI__OK ) {
         bor_az[frame] = fmod(temp1+2.*AST__DPI,2.*AST__DPI);
@@ -846,14 +896,6 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
         }
 
 	/* Write the data out to a file */
-	/*	sc2sim_ndfwrdata( inx->ra, inx->dec, sinx->add_atm, 
-			  sinx->add_fnoise, sinx->add_pns, sinx->flux2cur,
-			  sinx->airmass, sinx->airmass, tauCSO, 
-			  inx->lambda, filename, inx->nbolx, inx->nboly, 
-			  inx->sample_t, sinx->subname, nwrite, nflat, 
-			  flatname, head, digits, dksquid, flatcal, 
-			  flatpar, filter, sinx->atstart, sinx->atend, 
-			  &(posptr[firstframe*2]), inx->obsmode, status );*/
 	sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, nwrite, nflat, 
 			  flatname, head, digits, dksquid, flatcal, 
 			  flatpar, "SCUBA-2", filter, 

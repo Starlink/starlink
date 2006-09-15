@@ -15,7 +15,7 @@ sc2sim_getspread.c \ sc2sim_getweights.c sc2sim_heatrun.c \
 sc2sim_instrinit.c sc2sim_invf.c sc2sim_ndfwrdata.c sc2sim_ndfwrheat.c \
 sc2sim_ptoi.c sc2sim_response.c sc2sim_simframe.c sc2sim_simhits.c \
 sc2sim_simulate.c sc2sim_getbous.c sc2sim_getsinglescan.c \
-dxml.c dream.c fhead.c
+dxml.c dream.c fhead.c sc2sim_getcoordframe.c
 
 noinst_INCLUDES = sc2sim.h dream.h dream_par.h fhead.h dxml_struct.h \
                   dxml_struct.h dxml.h sc2sim_par.h fhead_par.h \
