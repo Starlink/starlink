@@ -66,18 +66,21 @@
 #include <config.h>
 #endif
 
+/* Standard includes */
 #include <string.h>
 #include <stdio.h>
 
+/* Starlink includes */
 #include "mers.h"
 #include "prm_par.h"
 #include "sae_par.h"
 #include "msg_par.h"
 
-#include "smurf_par.h"
+/* SMURF includes */
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
+/* SC2DA includes */
 #include "sc2da/sc2math.h"
 
 void smf_flatten ( smfData *data, int *status ) {
