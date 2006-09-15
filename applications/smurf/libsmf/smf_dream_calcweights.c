@@ -93,7 +93,7 @@
 void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index, 
 			    const double gridstep, 
 			    const int ngrid,
-			    const int *gridminmax, const int gridpts[][2],
+			    const int *gridminmax, int gridpts[][2],
 			    int *status) {
 
   /* Local Variables */
@@ -223,7 +223,7 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
 	/* Put in pout all the sky grid weights for all measurements
 	   with a single bolometer */
 	sc2math_interpwt ( nsampcycle, ngrid, conv_shape, conv_sig, 
-			   tsamp, tbol, dream->jigpath, gridpts, pout, 
+			   tsamp, tbol, dream->jigpath, &(gridpts[0]), pout, 
 			   status );
 
 	/* Calculate the size of the sky map which includes all the
@@ -231,7 +231,7 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
 	nbolx = (data->dims)[0];
 	nboly = (data->dims)[1];
 	nbol = nbolx * nboly;
-	sc2math_gridext ( ngrid, gridpts, &xmin, &xmax, &ymin, &ymax,
+	sc2math_gridext ( ngrid, &(gridpts[0]), &xmin, &xmax, &ymin, &ymax,
 			  status );
 	skywid = nbolx + xmax - xmin;
 	skyheight = nboly + ymax - ymin;

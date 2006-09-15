@@ -261,7 +261,7 @@ smfFile * smf_deepcopy_smfFile ( const smfFile *old, int * status );
 void smf_dream_calcweights ( smfData *data, const Grp *ogrp, const int index, 
 			     const double gridstep, 
 			     const int ngrid,
-			     const int *gridminmax, const int gridpts[][2],
+			     const int *gridminmax, int gridpts[][2],
 			     int *status );
 
 void smf_dream_getgrid( const AstKeyMap *keymap, double *gridstep, int *ngrid, 
@@ -374,7 +374,7 @@ void smf_open_ndfname( const HDSLoc *loc, char *accmode, char *filename,
 		       const int *lbnd, const int *ubnd, smfData **ndfdata, 
                        int *status);
 
-void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, int ndims, 
+void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, int ndims, 
 		       const dim_t dims[], int flags, smfData ** data, 
 		       int *status);
 

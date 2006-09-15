@@ -155,7 +155,6 @@ void smurf_dreamweights ( int *status ) {
   }
 
   /* Retrieve grid parameters */
-  printf("keymap = %p\n",keymap);
   smf_dream_getgrid( keymap, &gridstep, &ngrid, &gridminmax, gridpts, status);
 
   /* Loop over number of files */
@@ -163,8 +162,8 @@ void smurf_dreamweights ( int *status ) {
     /* Open file */
     smf_open_file( igrp, i, "READ", 1, &data, status );
 
-    smf_dream_calcweights( data, ogrp, i, gridstep, ngrid, gridminmax, gridpts, 
-			   status);
+    smf_dream_calcweights( data, ogrp, i, gridstep, ngrid, gridminmax, 
+			   &(gridpts[0]), status);
 
     if ( *status != SAI__OK ) {
       msgSeti("I",i);
@@ -177,9 +176,6 @@ void smurf_dreamweights ( int *status ) {
   }
 
   /* Free up resources */
-  if ( keymap != NULL ) {
-    smf_free( &keymap, status );
-  }
   if ( gridminmax != NULL ) {
     smf_free( gridminmax, status);
   }
