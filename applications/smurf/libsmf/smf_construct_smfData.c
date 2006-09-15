@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     pntr = smf_construct_smfData( smfData * tofill, smfFile * file, 
-*                      smfHead * hdr, 
-*		       smfDA * da, smf_dtype dtype, void * pntr[3], 
+*                      smfHead * hdr, smfDA * da, 
+*		       smf_dtype dtype, void * pntr[3], 
 *		       const dim_t dims[], int ndims,
 *		       int virtual, int ncoeff, double *poly, int * status );
 
@@ -68,6 +68,8 @@
 *     - Free this memory using smf_close_file
 *     - Data arrays are not populated by this routine. The pointers
 *       are set to NULL.
+*     - The associated smfDream is currently left NULL (as returned 
+*       from the call to smf_create_smfData)
 
 *  Authors:
 *     Tim Jenness (TIMJ)
@@ -128,8 +130,8 @@
 
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
-		       smfDA * da, smf_dtype dtype, void * pntr[3], 
-		       const dim_t dims[], int ndims,
+		       smfDA * da, smf_dtype dtype, 
+		       void * pntr[3], const dim_t dims[], int ndims,
 		       int virtual, int ncoeff, double *poly, 
 		       AstKeyMap *history, int * status ) {
 
@@ -177,8 +179,8 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
 
       /* Do not overwrite existing contents if these are NULL */
       if (file != NULL) data->file = file;
-      if (hdr  != NULL) data->hdr  = hdr;
-      if (da  != NULL)  data->da   = da;
+      if (hdr != NULL) data->hdr = hdr;
+      if (da != NULL) data->da = da;
 
       /* Fill in other bits */
       data->dtype = dtype; 
