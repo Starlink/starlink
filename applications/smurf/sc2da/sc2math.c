@@ -2864,6 +2864,9 @@ int value       /* trace level (given) */
       ans = 0;
    }
 
+   /* Force zero for now (agg) */
+   ans = 0;
+
    return ans;
 }
 
