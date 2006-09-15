@@ -110,6 +110,11 @@
 *        changed interface for smf_model_getname
 *     2006-09-06 (EC):
 *        added smf_calc_telpos, smf_create_lutwcs and smf_telpos_get
+*     2006-09-15 (AGG):
+*        Added smf_dreamsolve, smf_create_smfDream,
+*        smf_construct_smfDream, smf_close_smfDream, smd_dream_setjig,
+*        smf_store_image
+
 *     {enter_further_changes_here}
 
 *  Copyright:
