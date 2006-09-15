@@ -52,19 +52,19 @@
 *     2006-02-17 (DSB):
 *        Switch on AST object caching.
 *     2006-02-17 (AGG):
-*        Add remsky
+*        Add REMSKY
 *     2006-02-24 (DSB):
 *        Switch on AST memory caching (instead of Object caching).
 *     2006-03-02 (TIMJ):
 *        Clear out sc2ast cache
 *     2006-03-16 (AGG):
-*        Add qlmakemap
+*        Add QLMAKEMAP
 *     2006-04-12 (EC):
 *        Modified call to createwcs for new interface
 *     2006-06-06 (AGG):
-*        Add simulator task, sim
+*        Add simulator task, SIM (renamed SC2SIM)
 *     2006-06-13 (AGG):
-*        Add dreamsolve
+*        Add DREAMSOLVE
 *     2006-07-28 (TIMJ):
 *        Add MAKECUBE
 *     2006-08-21 (EC):
@@ -75,6 +75,8 @@
 *        Added call to smf_create_lutwcs to clear cache
 *     2006-09-13 (JB):
 *        Added BADBOLOS
+*     2006-09-15 (AGG):
+*        Add DREAMWEIGHTS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -122,6 +124,7 @@
 
 #include "libsmurf/smurflib.h"
 #include "jcmt/state.h"
+#include "libsmf/smf.h"
 
 /* internal protoypes */
 F77_SUBROUTINE(task_get_name)(char *, int*, int);
@@ -193,6 +196,8 @@ void smurf_mon( int * status ) {
     smurf_sc2sim( status );
   } else if (strcmp( taskname, "DREAMSOLVE" ) == 0 ) {
     smurf_dreamsolve( status );
+  } else if (strcmp( taskname, "DREAMWEIGHTS" ) == 0 ) {
+    smurf_dreamweights( status );
   } else if (strcmp( taskname, "IMPAZTEC" ) == 0 ) {
     smurf_impaztec( status );
   } else if (strcmp( taskname, "BADBOLOS" ) == 0 ) {
