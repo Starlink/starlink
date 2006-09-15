@@ -37,7 +37,7 @@
 *     {enter_new_authors_here}
 
 *  Notes:
-*     - Attemps to free resources even if status is bad on entry.
+*     - Attempts to free resources even if status is bad on entry.
 
 *  History:
 *     2005-11-28 (TIMJ):
@@ -66,6 +66,8 @@
 *     2006-08-08 (TIMJ):
 *        Do not return immediately if status is bad.
 *        Annul tswcs.
+*     2006-08-24 (AGG):
+*        Free smfDream if present
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,6 +113,7 @@ void smf_close_file( smfData ** data, int * status ) {
   smfFile * file;         /* pointer to smfFile in smfData */
   int       freedata = 0; /* should the data arrays be freed? */
   int       isSc2store = 0; /* is this sc2Store data */
+  smfDream *dream = NULL; /* Pointer to smfDream in smfData */
 
   /* we need to be able to clean up even if input status is bad -
      this requires some defensive programming. */
@@ -168,7 +171,7 @@ void smf_close_file( smfData ** data, int * status ) {
     if (hdr->tswcs != NULL) astAnnul( hdr->tswcs );
     if (hdr->fitshdr != NULL) astAnnul( hdr->fitshdr );
     if (!hdr->isCloned) {
-      /* we are responsible for this memory - although what happens
+      /* We are responsible for this memory - although what happens
 	 when we are cloned and the original is freed first? Need
 	 to think carefully about memory management. */
       if (hdr->allState != NULL) {
@@ -191,6 +194,16 @@ void smf_close_file( smfData ** data, int * status ) {
     smf_free( da->flatcal, status );
     smf_free( da->flatpar, status );
     smf_free( da, status );
+  }
+
+  /* Free smfDream */
+  if ( (*data)->dream != NULL ) {
+    dream = (*data)->dream;
+    if ( dream->gridwts != NULL) 
+      smf_free( dream->gridwts, status );
+    if ( dream->invmatx != NULL) 
+      smf_free( dream->invmatx, status );
+    smf_free( dream, status );
   }
 
   /* Free the data arrays if they are non-null (they should have been

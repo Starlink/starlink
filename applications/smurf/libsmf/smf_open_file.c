@@ -36,8 +36,8 @@
 *     This is the main routine to open data files. The routine finds
 *     the filename from the input Grp and index, and opens the
 *     file. The smfData struct is populated, along with the associated
-*     smfFile, smfHead and smfDA (if necessary). The history is read
-*     and stored for future reference.
+*     smfFile, smfHead and smfDA & smfDream (if necessary). The
+*     history is read and stored for future reference.
 
 *  Notes:
 *     - If a file has no FITS header then a warning is issued
@@ -103,12 +103,16 @@
 *     2006-07-31 (TIMJ):
 *        Use SC2STORE__MAXFITS.
 *        Calculate "instrument".
+*    2006-08-24 (AGG):
+*        Read and store DREAM parameters (from RAW data only at present)
 *     2006-09-05 (JB):
 *        Check to make sure file exists
 *     2006-09-05 (EC):
 *        Call aztec_fill_smfHead, smf_telpos_get
 *     2006-09-07 (EC):
 *        Added code to isNDF=0 case to handle compressed AzTEC data
+*     2006-09-15 (AGG):
+*        Insert code for opening and storing DREAM parameters
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -165,7 +169,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   int ndims;                 /* Number of dimensions in data */
   int qexists;               /* Boolean for presence of QUALITY component */
   int vexists;               /* Boolean for presence of VARIANCE component */
-  int pexists;               /* Boolean for presence of SCU2RED component */
+  int itexists;              /* Boolean for presence of other components */
   char filename[GRP__SZNAM+1]; /* Input filename, derived from GRP */
   char *pname;               /* Pointer to input filename */
   void *outdata[] = { NULL, NULL, NULL }; /* Array of pointers to
@@ -184,7 +188,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   smfHead *hdr = NULL;       /* pointer to smfHead struct */
   smfDA *da = NULL;          /* pointer to smfDA struct, initialize to NULL */
 
-  HDSLoc * xloc = NULL;      /* Locator to time series headers */
+  HDSLoc *xloc = NULL;       /* Locator to time series headers,
+				SCANFIT coeffs and DREAM parameters*/
 
   /* Flatfield parameters */
   double * flatcal = NULL;
@@ -193,8 +198,15 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   JCMTState *tmpState = NULL;
 
   /* DREAM parameters */
-  int *jigvert = NULL;
-  double *jigpath = NULL;
+  int *jigvert = NULL;       /* Pointer to jiggle vertices in DREAM pattern */
+  double *jigpath = NULL;    /* Pointer to jiggle path */
+  smfDream *dream = NULL;    /* Pointer to DREAM parameters */
+  int npath;                 /* Number of positions in jiggle path */
+  int nvert;                 /* Number of vertices in DREAM pattern */
+  int jigvndf;               /* NDF identifier for jiggle vertices */
+  int jigpndf;               /* NDF identifier for SMU path */
+  smfData *jigvdata = NULL;  /* Jiggle vertex data */
+  smfData *jigpdata = NULL;  /* SMU path data */
 
   /* Pasted from readsc2ndf */
   int colsize;               /* number of pixels in column */
@@ -206,9 +218,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   char *phead = NULL;        /* Pointer to FITS headers */
   int flags = 0;             /* Flags for smf_create_smfData */
 
-  HDSLoc *ploc = NULL;       /* Locator for SCANFIT coeffs */
-  int pndf;                  /* NDF identifier for SCU2RED */
-  int place;                 /* NDf placeholder for SCANFIT extension */
+  int gndf;                  /* General purpose NDF identifier (SCU2RED & DREAM) */
+  int place;                 /* NDF placeholder for SCANFIT extension */
   int npoly;                 /* Number points in polynomial coeff array */
   double *poly;              /* Pointer to array of polynomial coefficients */
   double *opoly;             /* Pointer to store in output struct */
@@ -216,7 +227,6 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   int pdims[NDF__MXDIM];     /* Size of each dimension */
 
   if ( *status != SAI__OK ) return;
-
 
   /* Return a null pointer to the smfData if the input grp is null */
   if ( igrp == NULL ) {
@@ -226,11 +236,10 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
   /* Return the NDF identifier */
   ndgNdfas( igrp, index, mode, &indf, status );
- 
-   if ( indf == NDF__NOID ) {
-     *status = SAI__ERROR;
-     errRep(FUNC_NAME, "Could not locate file", status);
-     return;
+  if ( indf == NDF__NOID ) {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "Could not locate file", status);
+    return;
   }
  
   /* Determine the dimensions of the DATA component */
@@ -241,8 +250,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   grpGet( igrp, index, 1, &pname, SMF_PATH_MAX, status);
 
   /* Check type of DATA and VARIANCE arrays */
-  ndfType( indf, "DATA,VARIANCE", dtype, NDF__SZTYP, status);
-  /* printf("Status after ndfType: %d\n",*status);*/
+  ndfType( indf, "DATA,VARIANCE", dtype, NDF__SZTYP+1, status);
+
   /* Check dimensionality: 2D is a .In image, 3D is a time series */
   if (ndims == 2) {
     isNDF = 1;     /* Data have been flat-fielded */
@@ -279,28 +288,28 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
     hdr = (*data)->hdr;
 
     /* If we have timeseries data then look for and read polynomial
-       scan fit coefficients. */
+       scan fit coefficients */
     if ( isTseries ) {
-      ndfXstat( indf, "SCU2RED", &pexists, status );
-      if ( pexists) {
-	ndfXloc( indf, "SCU2RED", "READ", &ploc, status );
-	if ( ploc == NULL ) {
+      ndfXstat( indf, "SCU2RED", &itexists, status );
+      if ( itexists) {
+	ndfXloc( indf, "SCU2RED", "READ", &xloc, status );
+	if ( xloc == NULL ) {
 	  if ( *status == SAI__OK) {
 	    *status = SAI__ERROR;
 	    errRep(FUNC_NAME, "Unable to obtain an HDS locator to the SCU2RED extension, despite its existence", status);
 	  }
 	}
-	ndfOpen( ploc, "SCANFIT", "READ", "OLD", &pndf, &place, status );
+	ndfOpen( xloc, "SCANFIT", "READ", "OLD", &gndf, &place, status );
 	/* Check status here in case not able to open NDF */
 	if ( *status == SAI__OK ) {
-	  if ( pndf == NDF__NOID ) {
+	  if ( gndf == NDF__NOID ) {
 	    *status = SAI__ERROR;
 	    errRep(FUNC_NAME, "Unable to obtain an NDF identifier for the SCANFIT coefficients", status);
 	  }
 
 	  /* Read and store the polynomial coefficients */
-	  ndfMap( pndf, "DATA", "_DOUBLE", "READ", &poly, &npoly, status );
-	  ndfDim( pndf, NDF__MXDIM, pdims, &npdims, status );
+	  ndfMap( gndf, "DATA", "_DOUBLE", "READ", &poly, &npoly, status );
+	  ndfDim( gndf, NDF__MXDIM, pdims, &npdims, status );
 	  (*data)->ncoeff = pdims[2];
 	  /* Allocate memory for poly coeffs & copy over */
 	  opoly = smf_malloc( npoly, sizeof( double ), 0, status);
@@ -308,8 +317,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	  (*data)->poly = opoly;
 
 	  /* Release these resources immediately as they're not needed */
-	  ndfAnnul( &pndf, status );
-	  datAnnul( &ploc, status );
+	  ndfAnnul( &gndf, status );
+	  datAnnul( &xloc, status );
 	} else {
 	  errAnnul(status);
 	  msgOutif(MSG__VERB, FUNC_NAME, 
@@ -317,7 +326,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	}
       } else {
 	msgOutif(MSG__VERB, FUNC_NAME, 
-		 "File has no SCU2RED extension. Thought you'd like to know...", status);
+		 "File has no SCU2RED extension. ", status);
       }
     }
 
@@ -334,8 +343,6 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
       if (vexists) {
 	ndfMap( indf, "VARIANCE", dtype, mode, &outdata[1], &nout, status );
       }
-
-      /*      printf("after ndfMap: %d\n",*status);*/
 
       if (withHdr) {
 
@@ -404,9 +411,6 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	  datAnnul( &xloc, status );
 	}
       }
-
-      /*      printf("Status from open : %d\n",*status);*/
-
       /* Establish the data type */
       itype = smf_dtype_fromstring( dtype, status );
 
@@ -425,7 +429,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
       da = (*data)->da;
       if (*status == SAI__OK && da == NULL) {
 	*status = SAI__ERROR;
-	errRep(FUNC_NAME,"Internal programming error. Status good but no DA struct allocated", status);
+	errRep(FUNC_NAME, "Internal programming error. Status good but no DA struct allocated", status);
       }
 
       /* decide if we are storing header information */
@@ -437,11 +441,10 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 			  &nfits, headrec, &colsize, &rowsize, 
 			  &nframes, &(da->nflat), da->flatname,
 			  &tmpState, &tdata, &dksquid, 
-			  &flatcal, &flatpar, &jigvert, &jigpath,
+			  &flatcal, &flatpar, &jigvert, &nvert, &jigpath, &npath,
 			  status);
 
       if (*status == SAI__OK) {
-
 	/* Free header info if no longer needed */
 	if (!withHdr && tmpState != NULL) {
 	  /* can not use smf_free */
@@ -453,7 +456,6 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
 	/* Tdata is malloced by rdtstream for our use */
 	outdata[0] = tdata;
-	/*	printf("headrec = %s \n",&(headrec[2][0]));*/
 	phead = &(headrec[0][0]);
 
 	/* Malloc local copies of the flatfield information.
@@ -544,6 +546,11 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
 	/* and it is a time series */
 	file->isTstream = 1;
+
+	/* Store DREAM parameters */
+	dream = smf_construct_smfDream( *data, nvert, npath, jigvert, jigpath, 
+					status );
+	(*data)->dream = dream;
       }
 
       /* Close the file */
@@ -563,6 +570,65 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
       (*data)->ndims = ndims;
       for (i=0; i<ndims; i++) {
 	((*data)->dims)[i] = (dim_t)ndfdims[i];
+      }
+    }
+    /* Store DREAM parameters for flatfielded data. This has to be
+       done here as these methods rely on information in the main
+       smfData struct. First retrieve jigvert and jigpath from file */ 
+    if ( isTseries && isNDF ) {
+      /* Obtain locator to DREAM extension */
+      xloc = smf_get_xloc( *data, "DREAM", "", "READ", 0, 0, status );
+      jigvndf = smf_get_ndfid( xloc, "JIGVERT", "READ", "OLD", "", 0, NULL, 
+			       NULL, status);
+      if ( jigvndf == NDF__NOID) {
+	if (*status == SAI__OK ) {
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, "Unable to obtain NDF ID for JIGVERT", status);
+	}
+      } else {
+	smf_open_ndf( jigvndf, "READ", filename, SMF__INTEGER, &jigvdata, status);
+      }
+      jigpndf = smf_get_ndfid( xloc, "JIGPATH", "READ", "OLD", "", 0, NULL, 
+			       NULL, status);
+      if ( jigpndf == NDF__NOID) {
+	if (*status == SAI__OK ) {
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, "Unable to obtain NDF ID for JIGPATH", status);
+	}
+      } else {
+	smf_open_ndf( jigpndf, "READ", filename, SMF__DOUBLE, &jigpdata, status);
+      }
+      if ( jigvdata != NULL ) {
+	jigvert = (jigvdata->pntr)[0];
+	nvert = (int)(jigvdata->dims)[0];
+      } else {
+	if (*status == SAI__OK ) {
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, "smfData for jiggle vertices is NULL", status);
+	}
+      }
+      if ( jigpdata != NULL ) {
+	jigpath = (jigpdata->pntr)[0];
+	npath = (int)(jigpdata->dims)[0];
+      } else {
+	if (*status == SAI__OK ) {
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, "smfData for SMU path is NULL", status);
+	}
+      }
+      dream = smf_construct_smfDream( *data, nvert, npath, jigvert, jigpath, 
+				      status );
+      (*data)->dream = dream;
+    
+      /* Free up the smfDatas for jigvert and jigpath */
+      if ( jigvert != NULL ) {
+	smf_close_file( &jigvdata, status );
+      }
+      if ( jigpath != NULL ) {
+	smf_close_file( &jigpdata, status );
+      }
+      if ( xloc != NULL ) {
+	datAnnul( &xloc, status );
       }
     }
   }
