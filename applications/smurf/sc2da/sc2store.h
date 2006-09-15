@@ -21,10 +21,8 @@ int *status             /* global status (given and returned) */
 
 void sc2store_credream
 (
-int jig_vert[][2],       /* Array containing jiggle vertices (given) */
 int nvert,               /* Number of vertices in DREAM pattern (given)  */
 int **jigvert,           /* Pointer to stored jiggle vertices (returned) */
-double jig_path[][2],    /* Array containing SMU path (given) */
 int npath,               /* Number of points along SMU path in DREAM pattern 
 			    (given) */
 double **jigpath,        /* Pointer to stored jiggle path (returned) */
@@ -158,7 +156,9 @@ char *flatname,     /* name of flatfield algorithm (returned) */
 double **flatcal,   /* flatfield calibration (returned) */
 double **flatpar,   /* flatfield parameters (returned) */
 int **jigvert,      /* pointer to DREAM jiggle vertices (returned) */
+int *nvert,         /* Number of vertices in jiggle pattern (returned) */
 double **jigpath,   /* pointer to path of SMU over jiggle pattern (returned) */
+int *npath,         /* Number of points in SMU path (returned) */
 int *status         /* global status (given and returned) */
 );
 
@@ -248,7 +248,9 @@ int **stackz,            /* pointer to subtracted frame (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
 int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
+int *nvert,              /* Number of vertices in jiggle pattern (returned) */
 double **jigpath,        /* pointer to path of SMU over jiggle pattern (returned) */
+int *npath,              /* Number of points in SMU path (returned) */
 int *status              /* global status (given and returned) */
 );
 
@@ -274,7 +276,9 @@ int **dksquid,           /* pointer to dark SQUID values (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
 int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
+int *nvert,              /* Number of vertices in jiggle pattern (returned) */
 double **jigpath,        /* pointer to path of SMU over jiggle pattern (returned) */
+int *npath,              /* Number of points in SMU path (returned) */
 int *status              /* global status (given and returned) */
 );
 

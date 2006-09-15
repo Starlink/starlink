@@ -124,10 +124,8 @@ int *status             /* global status (given and returned) */
 
 void sc2store_credream
 (
-int jig_vert[][2],       /* Array containing jiggle vertices (given) */
 int nvert,               /* Number of vertices in DREAM pattern (given)  */
 int **jigvert,           /* Pointer to stored jiggle vertices (returned) */
-double jig_path[][2],    /* Array containing SMU path (given) */
 int npath,               /* Number of points along SMU path in DREAM pattern 
 			    (given) */
 double **jigpath,        /* Pointer to stored jiggle path (returned) */
@@ -1085,7 +1083,9 @@ char *flatname,     /* name of flatfield algorithm (returned) */
 double **flatcal,   /* flatfield calibration (returned) */
 double **flatpar,   /* flatfield parameters (returned) */
 int **jigvert,      /* pointer to DREAM jiggle vertices (returned) */
+int *nvert,         /* Number of vertices in jiggle pattern (returned) */
 double **jigpath,   /* pointer to path of SMU over jiggle pattern (returned) */
+int *npath,         /* Number of points in SMU path (returned) */
 int *status         /* global status (given and returned) */
 )
 
@@ -1128,7 +1128,7 @@ int *status         /* global status (given and returned) */
 
    sc2store_rdtstream ( filename, access, flatlen, 81, SC2STORE__MAXFITS, &nfits,
      fitsrec, &colsize, &rowsize, nframes, nflat, flatname, &frhead,
-			&tmptr, &dksquid, &fcal, &fpar, jigvert, jigpath, status );
+			&tmptr, &dksquid, &fcal, &fpar, jigvert, nvert, jigpath, npath, status );
 
 /* Map space for the data to be copied */
 
@@ -1570,6 +1570,7 @@ int *status              /* global status (given and returned) */
     01Oct2005 : original (bdk)
     07Dec2005 : set sc2open flag when open is successful (bdk)
     25Jan2006 : add access argument to sc2store_rdmap (bdk)
+    08Aug2006 : update call to sc2store_rdmap (agg)
 */
 
 {
@@ -1583,6 +1584,8 @@ int *status              /* global status (given and returned) */
    int *stackz;               /* pointer to stackzero frame */
    int *jigvert = NULL;       /* pointer to DREAM jiggle vertices */
    double *jigpath = NULL;    /* pointer to path of SMU over jiggle pattern */
+   int nvert;                 /* Number of vertices in jiggle pattern */
+   int npath;                 /* Number of samples over jiggle pattern */
 
    if ( !StatusOkP(status) ) return;
 
@@ -1600,7 +1603,7 @@ int *status              /* global status (given and returned) */
 
    sc2store_rdmap ( filename, "READ", flatlen, colsize, rowsize, &nframes, 
 		    nflat, flatname, &bzero, &data, &dksquid, &stackz, &fcal, &fpar,
-		    &jigvert, &jigpath, status );
+		    &jigvert, &nvert, &jigpath, &npath, status );
 
    if ( !StatusOkP(status) ) 
    {
@@ -1649,7 +1652,9 @@ int **stackz,            /* pointer to subtracted frame (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
 int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
+int *nvert,              /* Number of vertices in jiggle pattern (returned) */
 double **jigpath,        /* pointer to path of SMU over jiggle pattern (returned) */
+int *npath,              /* Number of points in SMU path (returned) */
 int *status              /* global status (given and returned) */
 )
 /*
@@ -1752,13 +1757,18 @@ int *status              /* global status (given and returned) */
      ndfOpen ( drmloc, "JIGVERT", access, "OLD", &jigvndf, &place, status );
      ndfMap ( jigvndf, "DATA", "_INTEGER", access, (void *)jigvert, &el,
 	      status );
+     *nvert = el/2;
      ndfOpen ( drmloc, "JIGPATH", access, "OLD", &jigpndf, &place, status );
      ndfMap ( jigpndf, "DATA", "_DOUBLE", access, (void *)jigpath, &el,
 	      status );
+     /* Remember npath = nsampcycle in SMURF = cycle_samples in other places */
+     *npath = el/2;
    } else {
      /* Return NULL pointers if we don't have DREAM data */
      jigvert = NULL;
      jigpath = NULL;
+     nvert = NULL;
+     npath = NULL; 
    }
    /* Reset the isthere flag */
    isthere = 0;
@@ -1806,7 +1816,9 @@ int **dksquid,           /* pointer to dark SQUID values (returned) */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
 int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
+int *nvert,              /* Number of vertices in jiggle pattern (returned) */
 double **jigpath,        /* pointer to path of SMU over jiggle pattern (returned) */
+int *npath,              /* Number of points in SMU path (returned) */
 int *status              /* global status (given and returned) */
 )
 
@@ -1861,8 +1873,8 @@ int *status              /* global status (given and returned) */
 /* Map all the data arrays */
 
    sc2store_rdmap ( filename, access, flatlen, colsize, rowsize, nframes, 
-    nflat, flatname, &bzero, &data, dksquid, &stackz, flatcal, flatpar, 
-		    jigvert, jigpath, status );
+		    nflat, flatname, &bzero, &data, dksquid, &stackz, 
+		    flatcal, flatpar, jigvert, nvert, jigpath, npath, status );
 
    if ( !StatusOkP(status) ) 
    {
@@ -2070,8 +2082,7 @@ int *status        /* global status (given and returned) */
 
    /* Create DREAM extension ONLY if we have DREAM data */
    if ( strncmp( obsmode, "DREAM", 5 ) == 0 ) {
-     sc2store_credream( jig_vert, nvert, &jigvert, jig_path, npath, &jigpath, 
-			status );
+     sc2store_credream( nvert, &jigvert, npath, &jigpath, status );
      /* Copy the DREAM data into the array: Fortran order */
      if ( *status == SAI__OK ) {
        /* First jigvert */
