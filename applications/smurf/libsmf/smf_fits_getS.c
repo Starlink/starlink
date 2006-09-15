@@ -144,7 +144,7 @@ void smf_fits_getS (const smfHead *hdr, const char * name, char * result,
       msgSeti("LN", len - 1 );
       msgSeti("SZ", strlen(astres));
       errRep(FUNC_NAME, "String buffer too small to receive FITS item ^FITS"
-	     "(^LN < ^SZ)", status);
+	     " (^LN < ^SZ)", status);
     } else {
       /* AST does not seem to trim trailing spaces from FITS cards */
       for (i=strlen(astres); i >= 0; i--) {
