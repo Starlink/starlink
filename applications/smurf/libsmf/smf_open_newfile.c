@@ -124,7 +124,7 @@
 
 #define FUNC_NAME "smf_open_newfile"
 
-void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, int ndims, 
+void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, int ndims, 
 		       const dim_t dims[], int flags, smfData ** data, 
 		       int *status) {
 
