@@ -35,6 +35,8 @@
 *        Initial test version
 *     2006-07-27 (TIMJ):
 *        Add slamac.h constants
+*     2006-09-14 (AGG):
+*        Add LEN__METHOD & SZFITSCARD
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -158,5 +160,12 @@ error can not determine PI
 
 /* Arcsec to Degrees  (1/3600) */
 #define DAS2D 0.00027777777777777777777777777777777777777777777778
+
+/* Other miscellaneous SMURF definitions */
+
+/* Length of string for various `methods' */
+#define LEN__METHOD 20
+/* Length of a FITS record, includes trailing nul */
+#define SZFITSCARD 81
 
 #endif /* SMURF_PAR_DEFINED */
