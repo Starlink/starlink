@@ -185,6 +185,8 @@ void smf_close_mapcoord( smfData *data, int *status );
 
 void smf_close_related( smfArray **relfiles, int *status );
 
+void smf_close_smfDream( smfDream **dream, int * status );
+
 void smf_close_smfGroup( smfGroup **group, int *status );
 
 void smf_correct_extinction( smfData *data, const char *method, 
@@ -196,10 +198,14 @@ smf_construct_smfDA( smfDA * tofill, double * flatcal,
 		     int * status );
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
-		       smfDA * da, smf_dtype dtype, void * pntr[3], 
-		       const dim_t dims[], int ndims,
+		       smfDA * da, smf_dtype dtype, 
+		       void * pntr[3], const dim_t dims[], int ndims,
 		       int virtual, int ncoeff, double *poly, 
 		       AstKeyMap *history, int * status );
+
+smfDream *
+smf_construct_smfDream( smfData *data, int nvert, int npath, int *jigvert, 
+			double *jigpath, int * status );
 
 smfFile *
 smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
@@ -230,6 +236,8 @@ smfDA * smf_create_smfDA( int * status );
 
 smfData* smf_create_smfData( int flags, int * status );
 
+smfDream *smf_create_smfDream( int * status );
+
 smfFile* smf_create_smfFile( int * status );
 
 smfHead* smf_create_smfHead( int * status );
@@ -242,6 +250,11 @@ smfData * smf_deepcopy_smfData ( const smfData *old, const int rawconvert,
 smfDA * smf_deepcopy_smfDA ( const smfData *old, int * status);
 
 smfFile * smf_deepcopy_smfFile ( const smfFile *old, int * status );
+
+void smf_dream_setjig( char subarray[], int npath, double gridstep, 
+		       double jigpath[][2], int *status);
+
+void smf_dreamsolve( smfData *data, int *status );
 
 int smf_dtype_check( const smfData* data, const char * type, smf_dtype itype,
 		     int *status );
@@ -353,7 +366,7 @@ void smf_open_related( const smfGroup *group, const int subindex, smfArray **rel
 		       int *status );
 
 void * smf_realloc( void * pntr, size_t nelem, size_t bytes_per_elem,
-                   int * status );
+		    int * status );
 
 void smf_rebinmap( smfData *data, int index, int size, 
                    AstFrameSet *outframeset, int *lbnd_out, int *ubnd_out,
@@ -367,6 +380,10 @@ void smf_scanfit( smfData *data, int order, int *status );
 void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize, 
 			 int flags, double *map, double *mapweight, 
 			 double *mapvar, int msize, int *status );
+
+void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim, 
+		      int dims[], int seqstart, int seqend, double *image, 
+		      double *zero, int *status);
 
 void smf_string_to_dtype ( const char * datatype, smf_dtype *dtype, int * status );
 
