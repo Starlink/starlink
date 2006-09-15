@@ -42,6 +42,8 @@
 *     - Free this memory using smf_close_file
 *     - Data arrays are not populated by this routine. The pointers
 *       are set to NULL.
+*     - The smfDream is initialized to NULL; it must be created and 
+*       attached separately.
 
 *  Authors:
 *     Tim Jenness (TIMJ)
@@ -130,6 +132,8 @@ smf_create_smfData( int flags, int * status ) {
   data->file = file;
   data->hdr  = hdr;
   data->da   = da;
+  /* Set the DREAM to NULL as we only create it later */
+  data->dream = NULL;
 
   /* Initialise remainder of smfData */
   data->dtype = SMF__NULL; 
