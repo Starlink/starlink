@@ -40,7 +40,7 @@
 *     the file is not open for write access if a new extension has to
 *     be created.
 *
-*     For returning locators to existing extensions the extype, ndims
+*     For returning locators to existing extensions the accmode, ndims
 *     and dims can all be left blank (i.e. "", 0, 0 respectively).
 
 *  Authors:

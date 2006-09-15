@@ -94,26 +94,23 @@
 #include <config.h>
 #endif
 
+/* Standard includes */
 #include <string.h>
 #include <stdio.h>
 
+/* Starlink includes */
 #include "sae_par.h"
 #include "star/ndg.h"
 #include "ndf.h"
 #include "ast.h"
-#include "smf.h"
-#include "smf_typ.h"
-#include "smf_err.h"
 #include "mers.h"
 #include "star/kaplibs.h"
 #include "kpg_err.h"
 
+/* SMURF includes */
 #include "smf.h"
-#include "smurf_par.h"
-#include "libsmurf/smurflib.h"
+#include "smf_typ.h"
 #include "smf_err.h"
-#include "sc2da/sc2store.h"
-#include "sc2da/sc2math.h"
 
 #define FUNC_NAME "smf_get_ndfid"
 
@@ -121,6 +118,7 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
 		    const char *state, const char *dattype, const int ndims, 
 		    const int *lbnd, const int *ubnd, int *status ) {
 
+  /* Local variables */
   int ndfid;                /* NDF identifier for named component */
   int place;                /* Placeholder for NDF */
 
