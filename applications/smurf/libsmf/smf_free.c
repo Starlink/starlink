@@ -69,6 +69,7 @@
 #include "ast.h"
 #include "sae_par.h"
 
+/* SMURF includes */
 #include "smf.h"
 
 #define FUNC_NAME "smf_free"
