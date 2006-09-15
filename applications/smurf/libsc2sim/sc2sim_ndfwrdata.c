@@ -85,6 +85,8 @@
 *        - DREAM jiggle position parameters
 *     2006-09-06 (EC):
 *        INSTRUME keyword now taken as argument (to accomodate AzTEC)
+*     2006-09-15 (AGG):
+*        Write out name of DREAM weights file into FITS header
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -162,6 +164,9 @@ int *status       /* global status (given and returned) */
    double x_max = 0;
    double y_min = 0;
    double y_max = 0;
+
+   char weightsname[81];             /* Name of weights file for DREAM 
+					reconstruction */
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
@@ -268,6 +273,14 @@ int *status       /* global status (given and returned) */
     fhead_putfits ( TDOUBLE,
 		    "JIGSTEP", &inx->jig_step_x,
 		    "Size of jiggle step (arcsec)", status );
+
+    /* Construct weights name from subarray */
+    strncat( weightsname, "dreamweights_", 13);
+    strncat( weightsname, sinx->subname, 3);
+    strncat( weightsname, ".sdf", 4);
+    fhead_putfits( TSTRING, 
+		   "DRMWGHTS", weightsname, 
+		   "Name of DREAM weights file", status);
   }
 
    /* Determine extent of the map from posptr + known size of the arrays */
