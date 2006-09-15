@@ -44,6 +44,9 @@
 *  History:
 *     2006-08-22 (AGG):
 *        Initial version, copied from calcmapwts written by BDK
+*     2006-09-15 (AGG):
+*        Factor out determining the grid parameters into
+*        smf_dream_getgrid
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -115,8 +118,6 @@ void smurf_dreamweights ( int *status ) {
   int i;                      /* Loop counter */
   int j;                      /* Loop counter */
   int k;                      /* Loop counter */
-  int ix;                     /* X position in reconstruction grid */
-  int jy;                     /* Y position in reconstruction grid */
   int flag;                   /* Flag for Grp handling */
   Grp *igrp = NULL;           /* Input group of NDFs */
   int isize;                  /* Size of input Grp of files */
@@ -132,14 +133,10 @@ void smurf_dreamweights ( int *status ) {
   int parstate;              /* State of ADAM parameters */
   int ksize=0;               /* Size of group containing CONFIG file */
   double gridstep;           /* Size of reconstruction grid in arcsec */
-  int gridxmin = 0;          /* Minimum X extent of reconstruction grid */
-  int gridxmax = 1;          /* Maximum X extent of reconstruction grid */
-  int gridymin = 0;          /* Minimum Y extent of reconstruction grid */
-  int gridymax = 1;          /* Maximum Y extent of reconstruction grid */
+  int *gridminmax = NULL;    /* Array to store grid extent */
   int nbolx;                 /* Number of bolometers in X direction */
   int nboly;                 /* Number of bolometers in Y direction */
   int nbol;                  /* Total number of bolometers */
-  int tmp;                   /* General purpose temporary variable */
   int gridpts[DREAM__MXGRID][2]; /* Array of points for reconstruction grid */
   smfHead *hdr = NULL;       /* Header for input data */
   double tsamp;              /* Sample time */
@@ -176,11 +173,12 @@ void smurf_dreamweights ( int *status ) {
   double dmin;               /* Minimum found during inversion */
   int l;                     /* Loop counter */
   char obsmode[LEN__METHOD+1]; /* Observing mode */
-  int conv_shape = 2;        /* Code for convolution function */
+  int conv_shape = CONV__SINCTAP; /* Code for convolution function */
   double conv_sig = 1.0;     /* Convolution function parameter */
   int *tmpptr = NULL;        /* Temporary pointer */
   int gridndf;               /* NDF identifier for grid parameters */
   int *gridext;              /* Min/max extent of reconstruction grid */
+  int nelem;
 
   /* Main routine */
   ndfBegin();
@@ -211,56 +209,9 @@ void smurf_dreamweights ( int *status ) {
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "CONFIG unspecified", status);      
   }
-  /* Retrieve relevant settings from config file */
-  if( *status == SAI__OK ) {
-    if( !astMapGet0D( keymap, "GRIDSTEP", &gridstep ) ) {
-      gridstep = 6.28; /* Define default value */
-    }
-    if( !astMapGet0I( keymap, "GRIDXMIN", &gridxmin ) ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "GRIDXMIN unspecified", status);      
-    }
-    if( !astMapGet0I( keymap, "GRIDXMAX", &gridxmax ) ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "GRIDXMAX unspecified", status);      
-    }
-    if( !astMapGet0I( keymap, "GRIDYMIN", &gridymin ) ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "GRIDYMIN unspecified", status);      
-    }
-    if( !astMapGet0I( keymap, "GRIDYMAX", &gridymax ) ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "GRIDYMAX unspecified", status);      
-    }
-  } else {
-    errRep(FUNC_NAME, "Unable to read config file", status);      
-  }  
 
-  /* Check gridxmax > gridxmin etc: swap them round by default? */
-  if ( gridxmin > gridxmax ) {
-    msgOutif(MSG__VERB, FUNC_NAME, "Xmin > Xmax: swapping them round", status );
-    tmp = gridxmin;
-    gridxmin = gridxmax;
-    gridxmax = tmp;
-  }
-  if ( gridymin > gridymax ) {
-    msgOutif(MSG__VERB, FUNC_NAME, "Ymin > Ymax: swapping them round", status );
-    tmp = gridymin;
-    gridymin = gridymax;
-    gridymax = tmp;
-  }
+  smf_dream_getgrid( keymap, &gridstep, &ngrid, &gridminmax, gridpts, status);
 
-  /* Create gridpts array from min/max extent */
-  ngrid = (gridxmax - gridxmin + 1) * (gridymax - gridymin + 1);
-  k = 0;
-  for ( jy=gridymin; jy<=gridymax; jy++ ) {
-    for ( ix=gridxmin; ix<=gridxmax; ix++ ) {
-      gridpts[k][0] = ix;
-      gridpts[k][1] = jy;
-      k++;
-    }
-  }
- 
   /* Loop over number of files */
   for ( i=1; i<= isize; i++) {
     /* Open file */
@@ -316,7 +267,7 @@ void smurf_dreamweights ( int *status ) {
 	    }
 	  } else {
 	    msgSeti("I",i);
-	    msgOutif(MSG__VERB, FUNC_NAME, "Beginning weights calculation for file ^I: this will take some time (~10 mins)", status);
+	    msgOutif(MSG__VERB, FUNC_NAME, "Beginning weights calculation for file ^I: this will take some time (~5-10 mins)", status);
 	    ofile = odata->file;
 	    weightsloc = smf_get_xloc( odata, "DREAM", "DREAM_WEIGHTS", "WRITE",
 				       0, NULL, status );
@@ -437,12 +388,13 @@ void smurf_dreamweights ( int *status ) {
 	    ubnd[0] = 4;
 	    gridndf = smf_get_ndfid( weightsloc, "GRIDEXT", "WRITE", "NEW", 
 				     "_INTEGER", 1, lbnd, ubnd, status);
-	    ndfMap( gridndf, "DATA", "_INTEGER", "WRITE", &gridext, &ngrid, 
+	    ndfMap( gridndf, "DATA", "_INTEGER", "WRITE", &gridext, &nelem, 
 		    status);
-	    gridext[0] = gridxmin;
-	    gridext[1] = gridxmax;
-	    gridext[2] = gridymin;
-	    gridext[3] = gridymax;
+	    /* Copy gridminmax into gridext */
+	    for (j=0; j<nelem; j++) {
+	      gridext[j] = gridminmax[j];
+	    }
+	    /*	    memcpy( gridext, gridminmax, (size_t)nelem);*/
 	    ndfAnnul( &gridndf, status );
 
 	    /*	    datNew0D ( weightsloc, "GRIDSTEP", status );
@@ -465,13 +417,17 @@ void smurf_dreamweights ( int *status ) {
 		   "Input file ^I is not a DREAM observation - ignoring", status);
 	}
       } else {
-	
+	if ( *status == SAI__OK ) {
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, "Data are not in timeseries format", status);
+	}
       }
     }
     smf_close_file( &data, status );
   }
 
   /* Free up resources */
+  smf_free( gridminmax, status);
   if ( igrp != NULL ) {
     grpDelet( &igrp, status);
   }
