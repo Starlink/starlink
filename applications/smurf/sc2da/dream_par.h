@@ -10,6 +10,7 @@
     20Jun2003 : revise all names and definitions (bdk)
     26Jun2003 : add DREAM__FLEN (bdk)
     02Aug2006 : protect against multiple includes (agg)
+    02Sep2006 : add enum types for the conv_shape parameter (agg)
 */
 
 #ifndef DREAM_PAR_DEFINED
@@ -26,5 +27,14 @@
 #define DREAM__MXSIM 1024  /* Maximum number of values simulated */
 #define DREAM__MXSAM 512   /* Maximum number of samples in a path */
 #define DREAM__OVER 50     /* Computational oversampling factor */
+
+/* Flags specifying the convolution pattern to use for the DREAM
+   reconstruction grid */
+typedef enum {
+  CONV__GAUS = 0,     /* Gaussian */
+  CONV__SINC = 1,     /* sinc(x) * sinc(y) */
+  CONV__SINCTAP = 2,  /* sinc(x) * sinc(y) tapered */
+  CONV__SINCDEL = 3   /* sinc(x) * sinc(y) delay tapered */
+} conv_shape;
 
 #endif /* DREAM_PAR_DEFINED */
