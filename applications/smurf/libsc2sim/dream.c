@@ -1,5 +1,6 @@
 /* dream - routines for supporting DREAM data */
 
+/* Standard includes */
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -8,15 +9,19 @@
 #include <math.h>
 #include <time.h>
 
-#include "fitsio.h"
-
-#include "sc2da/Dits_Err.h"
-#include "sc2da/Ers.h"
-
+/* SMURF includes */
 #include "smurf_par.h"
 
-#include "libsc2sim/dream_par.h"
+/* SC2DA includes */
+#include "sc2da/Dits_Err.h"
+#include "sc2da/Ers.h"
+#include "sc2da/dream_par.h"
+
+/* Simulator includes */
 #include "libsc2sim/dream.h"
+
+/* Other includes */
+#include "fitsio.h"
 
 static int sub;                  /* Subsystem nr */
 static int nbolx;                /* number of bolometers in X direction */
