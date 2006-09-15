@@ -76,24 +76,26 @@
 #include <config.h>
 #endif
 
+/* Standard includes */
 #include <string.h>
 #include <stdio.h>
 
+/* Starlink includes */
 #include "sae_par.h"
 #include "star/ndg.h"
 #include "ndf.h"
 #include "ast.h"
-#include "smf.h"
-#include "smf_typ.h"
-#include "smf_err.h"
 #include "mers.h"
 #include "star/kaplibs.h"
 #include "kpg_err.h"
 
+/* SMURF includes */
 #include "smf.h"
 #include "smurf_par.h"
-#include "libsmurf/smurflib.h"
 #include "smf_err.h"
+#include "smf_typ.h"
+
+/* SC2DA includes */
 #include "sc2da/sc2store.h"
 #include "sc2da/sc2math.h"
 
