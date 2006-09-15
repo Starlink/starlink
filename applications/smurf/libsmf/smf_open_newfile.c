@@ -73,6 +73,8 @@
 *        Now map VARIANCE and QUALITY if desired
 *     2006-08-08 (TIMJ):
 *        Use dim_t as much as possible.
+*     2006-09-15 (AGG):
+*        Add status checking
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -234,15 +236,21 @@ void smf_open_newfile( Grp * igrp, int index, smf_dtype dtype, int ndims,
 
   file = smf_construct_smfFile( NULL, newndf, 0, isTstream, pname, 
 				status );
-  if ( *status != SAI__OK ) {
-    errRep(FUNC_NAME, "Unable to construct smfFile for new file", status);
+  if ( file == NULL ) {
+    if ( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Unable to construct smfFile for new file", status);
+    }
   }
 
   *data = smf_construct_smfData( *data, file, NULL, NULL, dtype, pntr, dims, ndims, 
 				 0, 0, NULL, NULL, status);
 
-  if ( *status != SAI__OK ) {
-    errRep(FUNC_NAME, "Unable to construct smfData for new file", status);
+  if ( *data == NULL ) {
+    if ( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Unable to construct smfData for new file", status);
+    }
   }
 
 }
