@@ -75,6 +75,7 @@
 /* Authors:								    */
 /*    RFWS: R.F. Warren-Smith (STARLINK)				    */
 /*    BKM:  B.K. McIlwrath    (STARLINK)                                    */
+/*    DSB:  David S Berry (JAC)
 /*    {@enter_new_authors_here@}					    */
 
 /* History:								    */
@@ -112,6 +113,10 @@
 /*       Revised for 64-bit HDS files.                                      */
 /*    06-MAY-2004 (BKM):                                                    */
 /*       Cope with both 32-bit and 64-bit files                             */
+/*    18-SEP-2006 (DSB):                                                    */
+/*       Close the file if its Header Control Block information could not   */
+/*       be read (when reading an existing file).                           */
+
 /*    {@enter_further_changes_here@}					    */
 
 /* Bugs:								    */
@@ -233,6 +238,12 @@ file.",
                          rec_ga_fcv[ slot ].hds_version = hcb->version;
                          hds_gl_64bit = ( hcb->version > REC__VERSION3 );
                      }
+                 }
+
+/* Close the file if its Header Control Block information could not be read. */
+                 else
+                 {
+                    rec_close_file( han );
                  }
              } 
              else        /* !newslot */
