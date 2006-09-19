@@ -79,6 +79,8 @@
 *     2006-09-11 (EC):
 *        - map_cache was not getting pre-pended properly to transformation
 *        - Only apply intrument aperture offset if non-null
+*     2006-09-19 (DSB):
+*        - Test "instap" rather than "instapmap" before creating instapmap.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -265,7 +267,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
       /* End LUT-specific code */
 
       /* Apply focal plane ("instrument aperture") offsets */
-      if( instapmap ) {
+      if( instap ) {
 	instapmap = astShiftMap( 2, instap, "" );
 	map_cache = (AstMapping *) astCmpMap( map_cache, instapmap, 1, "" );
       }
