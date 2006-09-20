@@ -238,21 +238,25 @@ itcl::class gaia::GaiaSpecWriter {
          set specaccessor [$cubeaccessor createspectrum "NDF" $filename \
                               $shortname]
 
-         #  Check for other data components and copy them too.
-         if { [$cubeaccessor exists "VARIANCE"] } {
-            $cubeaccessor map "READ" "VARIANCE"
-            set specdatacomp [$specaccessor map "WRITE/BAD" "VARIANCE"]
-            set cubespecdatacomp [$cubeaccessor getlastspectrum "VARIANCE"]
-            array::copy $cubespecdatacomp $specdatacomp
-            $cubeaccessor unmap "VARIANCE"
-         }
-         
-         if { [$cubeaccessor exists "QUALITY"] } {
-            $cubeaccessor map "READ" "QUALITY"
-            set specdatacomp [$specaccessor map "WRITE/BAD" "QUALITY"]
-            set cubespecdatacomp [$cubeaccessor getlastspectrum "QUALITY"]
-            array::copy $cubespecdatacomp $specdatacomp
-            $cubeaccessor unmap "QUALITY"
+         #  Check for other data components and copy them too, but only
+         #  if this is a point spectrum. When averaged over some region
+         #  a simple extraction would be incorrect.
+         if { [$cubespectrum last_extracted_type] == "point" } {
+            if { [$cubeaccessor exists "VARIANCE"] } {
+               $cubeaccessor map "READ" "VARIANCE"
+               set specdatacomp [$specaccessor map "WRITE/BAD" "VARIANCE"]
+               set cubespecdatacomp [$cubeaccessor getlastspectrum "VARIANCE"]
+               array::copy $cubespecdatacomp $specdatacomp
+               $cubeaccessor unmap "VARIANCE"
+            }
+            
+            if { [$cubeaccessor exists "QUALITY"] } {
+               $cubeaccessor map "READ" "QUALITY"
+               set specdatacomp [$specaccessor map "WRITE/BAD" "QUALITY"]
+               set cubespecdatacomp [$cubeaccessor getlastspectrum "QUALITY"]
+               array::copy $cubespecdatacomp $specdatacomp
+               $cubeaccessor unmap "QUALITY"
+            }
          }
          $specaccessor close
 
