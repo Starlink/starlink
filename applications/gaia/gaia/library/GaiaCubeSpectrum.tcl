@@ -455,11 +455,12 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  Create an NDF section-like name to use to identify the current spectrum.
    public method sectioned_name {} {
-      if { $spectrum_ == {} || ( $last_cxcy_ == {} && $last_region_ == {} ) } {
+      if { $spectrum_ == {} || [last_extracted_type] == "none" } {
          return ""
       }
       set ndfname [$itk_option(-gaiacube) get_ndfname]
-      if { $last_cxcy_ != {} } {
+      set spectype [last_extracted_type]
+      if { $spectype == "point" } {
          lassign $last_cxcy_ cx cy
 
          #  Convert click coordinates from canvas coords to grid coords.
@@ -493,19 +494,32 @@ itcl::class gaia::GaiaCubeSpectrum {
          set cr [string range [string trim $last_region_] 0 80]
          regsub -all {\n} $cr { } section
       }
-      if { $last_cxcy_ != {} && [$itk_option(-gaiacube) get_type] == ".sdf" } {
+
+      #  Return proper section name for possible NDFs.
+      if { $spectype == "point" 
+           && [$itk_option(-gaiacube) get_type] == ".sdf" } {
          return "${ndfname}${section}"
       } else {
          return "${ndfname}:${section}"
       }
    }
    
+   #  Return the type of the spectrum currently extracted. Result is
+   #  one of "point", "region" or "none".
+   public method last_extracted_type {} {
+      if { $last_cxcy_ != {} } {
+         return "point"
+      }
+      if { $last_region_ != {} } {
+         return "region"
+      }
+      return "none"
+   }
 
-   #  Send an NDF section to SPLAT for display, otherwise a temporary text
-   #  file is used. The coordinates used are those from the last position
-   #  click or selected region.
+   #  Send the currently extracted spectrum to SPLAT for display. 
+   #  Use an NDF so that the maximum information is retained.
    protected method send_to_splat_ {} {
-      if { $spectrum_ == {} || ( $last_cxcy_ == {} && $last_region_ == {} ) } {
+      if { $spectrum_ == {} || [last_extracted_type] == "none" } {
          info_dialog "No spectrum has been extracted" $w_
          return
       }
@@ -517,18 +531,10 @@ itcl::class gaia::GaiaCubeSpectrum {
                              -show_output 0]
       }
 
-      if { $last_cxcy_ != {} && [$itk_option(-gaiacube) get_type] == ".sdf" } {
-
-         #  NDF point spectrum, just send the section to SPLAT.
-         $splat_disp_ runwith [sectioned_name] 0
-
-      } else {
-         #  Not an NDF, send a text file to SPLAT.
-         set filename "GaiaTempSpectrum[incr count_].txt"
-         $spec_writer_ write_as_text $filename
-         $splat_disp_ runwith $filename 0
-         lappend temp_files_ $filename
-      }
+      set filename "GaiaTempSpectrum[incr count_].sdf"
+      $spec_writer_ write_as_ndf $filename
+      $splat_disp_ runwith $filename 0
+      lappend temp_files_ $filename
    }
 
    #  Extract and display a position as a reference spectrum. The
@@ -606,14 +612,10 @@ itcl::class gaia::GaiaCubeSpectrum {
    #  reference spectrum.
    public method set_reference {} {
       if { $spectrum_ != {} } {
-         if { $last_cxcy_ != {} } {
-
-            #  Point spectrum.
+         set spectype [last_extracted_type]
+         if { $spectype == "point" } {
             eval display_point_reference_spectrum $last_cxcy_
-
-         } elseif { $last_region_ != {} } {
-
-            #  Region spectrum.
+         } elseif { $spectype == "region" } {
             display_region_reference_spectrum $last_region_
          }
       }
@@ -868,9 +870,10 @@ itcl::class gaia::GaiaCubeSpectrum {
    #  Re-extracts the last spectrum.
    public method coord_system_changed {} {
       if { $spectrum_ != {} } {
-         if { $last_cxcy_ != {} } {
+         set spectype [last_extracted_type]
+         if { $spectype == "point"  } {
             eval display_point_spectrum_ localstart $last_cxcy_
-         } elseif { $last_region_ != {} } {
+         } elseif { $spectype == "region" } {
             display_region_spectrum_ localstart $last_region_
          }
       }
