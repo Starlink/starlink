@@ -117,13 +117,13 @@ itcl::class gaia::GaiaSpectralPlot {
       #  Add window help.
       add_help_button spectralplot "On Window..."
 
-      #  Add save to text file option.
-      $File add command -label {Save as text} \
-         -command [code $this save_as_text] \
-         -accelerator {Control-s}
-      bind $w_ <Control-s> [code $this save_as_text]
-      $short_help_win_ add_menu_short_help $File \
-         {Save as text} {Save current spectrum to a simple text file}
+      #  If we have a GaiaSpecWriter instance then use that to add the
+      #  various save as options to this menu. The GaiaSpecWriter has 
+      #  access to the original data, important to preserve as much
+      #  information as possible.
+      if { $itk_option(-spec_writer) != {} } {
+         $itk_option(-spec_writer) set_menu $File
+      }
 
       #  Add print option.
       $File add command -label Print -command [code $this print] \
@@ -368,72 +368,6 @@ itcl::class gaia::GaiaSpectralPlot {
             $itk_component(canvas) delete $label_
             set label_ {}
          }
-      }
-   }
-
-   #  Save the current spectrum to a text file.
-   public method save_as_text {} {
-      if { $spectrum_ != {} } {
-         set w [FileSelect .\#auto -title "Save spectrum to text file"]
-         if { [$w activate] } {
-            if { [catch {write_as_text [$w get]} msg] } {
-               error_dialog "Failed to write spectrum: $msg"
-            }
-         }
-         destroy $w
-      }
-   }
-
-   #  Write the current spectrum to a text file. Use SPLAT style.
-   public method write_as_text { filename {shortname ""} } {
-      if { $filename != {} && $spectrum_ != {} } {
-         busy {
-            set frameset [$itk_component(canvas) itemcget $spectrum_ -frameset]
-
-            #  Open the output file.
-            set fid [::open $filename w]
-
-            #  Write the header section.
-            puts $fid "#BEGIN"
-            puts $fid "# File created by GAIA"
-
-            #  Set name of the spectrum.
-            if { $shortname == {} } {
-               puts $fid "# name $filename"
-            } else {
-               puts $fid "# name $shortname"
-            }
-
-            #  Write all known SpecFrame attributes.
-            foreach att $specframe_atts_ {
-               write_ast_att_ $fid $frameset $att
-            }
-            
-            #  And units for future FluxFrames.
-            set units [$itk_component(canvas) itemcget $spectrum_ -dataunits]
-            if { $units != {} } {
-               puts $fid "# DataUnits $units"
-            }
-            set label [$itk_component(canvas) itemcget $spectrum_ -datalabel]
-            if { $label != {} } {
-               puts $fid "# DataLabel $label"
-            }
-            puts $fid "#END"
-
-            #  Now write the values.
-            foreach {x y} [$itk_component(canvas) coords $spectrum_] {
-               puts $fid "$x $y"
-            }
-
-            #  Finally close the file.
-            ::close $fid
-         }
-      }
-   }
-   protected method write_ast_att_ {fid frameset att} {
-      catch {
-         set value [gaiautils::astget $frameset $att]
-         puts $fid "# $att $value"
       }
    }
 
@@ -1039,6 +973,11 @@ itcl::class gaia::GaiaSpectralPlot {
       set background_ $colour
    }
 
+   #  Return the canvas id of the spectral plot.
+   public method get_spectrum {} {
+      return $spectrum_
+   }
+
    #  "rtdimage" emulation.
    #
    #  Needed to support some actions of the StarCanvasDraw instance
@@ -1088,6 +1027,11 @@ itcl::class gaia::GaiaSpectralPlot {
    #  A GaiaSpecCoords object for controlling the coordinate systems.
    #  Actual control is handled by the GaiaCube instance.
    itk_option define -spec_coords spec_coords Spec_Coords {}
+
+   #  A GaiaSpecWriter object for controlling saving spectra to disk.
+   #  This is done by re-visiting the cube, which we do not keep locally, 
+   #  but this menu naturally belongs here.
+   itk_option define -spec_writer spec_writer Spec_Writer {}
 
    #  A command to invoke when a reference line is moved (by interaction by
    #  the user). The command will be trailed by the reference line id and
@@ -1190,33 +1134,6 @@ itcl::class gaia::GaiaSpectralPlot {
       14 "-adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
       15 "-adobe-courier-bold-o-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
       17 "-adobe-helvetica-bold-r-*-*-20-120-*-*-*-*-*-*"      "large screen"
-   }
-
-   #  Attributes that a DSBSpecFrame may have. Need to save these in the text 
-   #  format.
-   protected variable specframe_atts_ {
-      System 
-      Unit 
-      AlignSystem
-      Domain
-      Epoch
-      Format
-      Label
-      ObsLat
-      ObsLon
-      Symbol
-      Title
-      AlignStdOfRest 
-      RefDec
-      RefRA 
-      RestFreq
-      SourceVRF 
-      SourceVel 
-      StdOfRest 
-      DSBCentre
-      IF
-      SideBand
-      ImageFreq
    }
 
    #  Common variables: (shared by all instances)
