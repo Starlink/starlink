@@ -54,6 +54,9 @@ extern "C" {
     /* Convert FITS bitpix into one of the enums */
     int gaiaArrayFITSType( int bitpix );
 
+    /* Convert local enum into a FITS bitpix */
+    int gaiaArrayFITSBitpix( int type );
+
     /* Convert local type into HDS type string */
     char const *gaiaArrayTypeToHDS( int type );
 
@@ -61,6 +64,9 @@ extern "C" {
      * HDS string */
     char const *gaiaArrayFullTypeToHDS( int intype, double bscale, 
                                         double bzero );
+
+    /* Size in bytes of a local type */
+    size_t gaiaArraySizeOf( int type );
 
     /* Return the type that will be used to return an image or spectrum */
     int gaiaArrayScaledType( int intype, double bscale, double bzero );
