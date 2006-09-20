@@ -107,7 +107,7 @@ extern "C" {
                      int value_length, char **error_mess );
 
     /* Set the value of a character component */
-    int gaiaNDFCPut( int ndfid, const const char* component, const char *value,
+    int gaiaNDFCPut( int ndfid, const char* component, const char *value,
                      char **error_mess );
 
     /* Query the dimensions of an opened NDF */
