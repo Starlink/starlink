@@ -30,8 +30,8 @@ extern "C" {
    int gaiaFreeNDF( int ndfid );
 
    /*  Copy NDF data component */
-   int gaiaCopyNDF( int ndfid, void **data, const char *component,
-                    char **error_message );
+   int gaiaCopyComponent( int ndfid, void **data, const char* component,
+                          char **error_mess );
 
    /*  Map an NDF data component */
    int gaiaMapNDF( int ndfid, void **data, const char *component,
@@ -42,6 +42,10 @@ extern "C" {
                       const char *type, AstFrameSet *wcs, int *indf, 
                       char **error_mess );
 
+   /*  Create a new NDF by selective copying of an existing NDF */
+    int gaiaCopyNDF( const char *filename, int indf, const char *clist, 
+                     int ndim, int lbndf[], int ubnd[], const char *type,
+                     AstFrameSet *wcs, int *ondf, char **error_mess );
 
 /*  Multiple NDFs per container interface */
 /*  ===================================== */
@@ -102,6 +106,10 @@ extern "C" {
     int gaiaNDFCGet( int ndfid, const char* component, char *value, 
                      int value_length, char **error_mess );
 
+    /* Set the value of a character component */
+    int gaiaNDFCPut( int ndfid, const const char* component, const char *value,
+                     char **error_mess );
+
     /* Query the dimensions of an opened NDF */
     int gaiaNDFQueryDims( int ndfid, int ndimx, int dims[], int *ndim, 
                           char **error_mess );
@@ -115,8 +123,8 @@ extern "C" {
                     const char* component, void **data, int *el, 
                     char **error_mess );
 
-   /*  Unmap an NDF data component */
-   int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess );
+    /*  Unmap an NDF data component */
+    int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess );
 
 
     /* Get the NDF WCS component as an AST frameset */
@@ -125,6 +133,10 @@ extern "C" {
     /* Get a frameset for a specified axis */
     int gaiaNDFGtAxisWcs( int ndfid, int axis, AstFrameSet **iwcs, 
                           char **error_mess );
+
+    /* Check if an NDF component exists */
+    int gaiaNDFExists( int ndfid, const char *component, int *exists, 
+                       char **error_mess );
 
 #ifdef __cplusplus
 }
