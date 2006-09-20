@@ -32,4 +32,10 @@ int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, char *value,
 int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, int *value );
 int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, double *value );
 
+/* Create a FITS file from a data array and a WCS */
+int GaiaFITSCreate( const char* filename, void *data, 
+                    AstFrameSet *wcs, int bitpix, double bscale,
+                    double bzero, long blank, const char *object,
+                    const char *units, int naxis, long naxes[] );
+
 #endif
