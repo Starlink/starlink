@@ -469,6 +469,58 @@ int gaiaCreateNDF( const char *filename, int ndim, int lbnd[], int ubnd[],
     return 1;
 }
 
+/**
+ *  Name:
+ *     gaiaCopyNDF.
+ *
+ *  Purpose:
+ *     Create a new NDF by selective copying of parts of an existing NDF.
+ *
+ *  Description:
+ *     Create a new NDF and populate it with some of the content of an
+ *     existing NDF using the ndfScopy() routine. The filename is for the new
+ *     NDF. The dimensionality and data type of the array components can be
+ *     set, and a new (matching) wcs established.
+ */
+int gaiaCopyNDF( const char *filename, int indf, const char *clist, 
+                 int ndim, int lbnd[], int ubnd[], const char *type,
+                 AstFrameSet *wcs, int *ondf, char **error_mess )
+{
+    int place;
+    int status = SAI__OK;
+
+    emsMark();
+
+    /* Open NDF, overwrites an existing NDF and returns a place holder */
+    ndfOpen( NULL, filename, "WRITE", "NEW", ondf, &place, &status );
+
+    /* Create the NDF by copy the components */
+    ndfScopy( indf, clist, &place, ondf, &status );
+
+    /* If new dimensionalities are given, set those */
+    if ( ndim > 0 ) {
+        ndfSbnd( ndim, lbnd, ubnd, *ondf, &status );
+    }
+
+    /* And the data type */
+    if ( type != NULL ) {
+        ndfStype( type, *ondf, "DATA,VARIANCE", &status );
+    }
+
+    /* Insert the WCS, if given */
+    if ( wcs != NULL ) {
+        ndfPtwcs( wcs, *ondf, &status );
+    }
+
+    /* If an error occurred construct the message */
+    if ( status != SAI__OK ) {
+        *error_mess = gaiaUtilsErrMessage();
+        emsRlse();
+        return 0;
+    }
+    emsRlse();
+    return 1;
+}
 
 
 /**
@@ -1241,6 +1293,27 @@ int gaiaNDFCGet( int ndfid, const char* component, char *value,
 }
 
 /**
+ * Set the value of a character component (label, units, title).
+ */
+int gaiaNDFCPut( int ndfid, const const char* component, const char *value,
+                 char **error_mess )
+{
+    int status = SAI__OK;
+
+    emsMark();
+    ndfCput( value, ndfid, component, &status );
+
+    /* If an error occurred return an error message */
+    if ( status != SAI__OK ) {
+        *error_mess = gaiaUtilsErrMessage();
+        emsRlse();
+        return TCL_ERROR;
+    }
+    emsRlse();
+    return TCL_OK;
+}
+
+/**
  * Map an NDF component with a given data type. Returns data and number of
  * elements.
  */
@@ -1389,7 +1462,7 @@ int gaiaNDFGtWcs( int ndfid, AstFrameSet **iwcs, char **error_mess )
  * Get an AST frameset that describes the coordinates of a given axis.
  * Axes are in the AST sense, i.e. start at 1.
  */
-int gaiaNDFGtAxisWcs( int ndfid, int axis, AstFrameSet **iwcs, 
+int gaiaNDFGtAxisWcs( int ndfid, int axis, AstFrameSet **iwcs,
                       char **error_mess )
 {
    AstFrameSet *fullwcs;
@@ -1440,3 +1513,24 @@ int gaiaNDFQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
     emsRlse();
     return TCL_OK;
 }
+
+/**
+ * Determine whether an NDF component exists.
+ */
+int gaiaNDFExists( int ndfid, const char *component, int *exists, 
+                   char **error_mess )
+{
+    int status = SAI__OK;
+
+    emsMark();
+    ndfState( ndfid, component, exists, &status );
+    if ( status != SAI__OK ) {
+        *error_mess = gaiaUtilsErrMessage();
+        exists = 0;
+        emsRlse();
+        return TCL_ERROR;
+    }
+    emsRlse();
+    return TCL_OK;
+}
+
