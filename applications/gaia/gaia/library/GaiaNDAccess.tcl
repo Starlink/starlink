@@ -90,6 +90,11 @@ itcl::class gaia::GaiaNDAccess {
       #  Create object for parsing image names.
       set namer_ [GaiaImageName \#auto]
 
+      #  No data components are mapped.
+      set addr_(DATA) 0
+      set addr_(VARIANCE) 0
+      set addr_(QUALITY) 0
+
       #  Evaluate any options, should be the dataset name usually.
       eval configure $args
    }
@@ -134,7 +139,10 @@ itcl::class gaia::GaiaNDAccess {
       if { $handle_ != {} } {
          ${type_}::close $handle_
          set handle_ {}
-         set addr_ 0
+         unset addr_
+         set addr_(DATA) 0
+         set addr_(VARIANCE) 0
+         set addr_(QUALITY) 0
          set cnfmap_ 0
          set dims_ {}
          set bounds_ {}
@@ -148,6 +156,11 @@ itcl::class gaia::GaiaNDAccess {
       set dataset $name
       set type_ "ndf"
       set cnfmap_ 1
+   }
+
+   #  Determine if a named component exists.
+   public method exists {component} {
+      return [${type_}::exists $handle_ $component]
    }
 
    #  Get the dimensions of the full data. Returns a list of integers.
@@ -180,24 +193,34 @@ itcl::class gaia::GaiaNDAccess {
       return [${type_}::getcoord $handle_ $axis $indices $formatted $trail]
    }
 
-   #  Map in the dataset "data component". Returns a structure that can be
+   #  Map in a component of the dataset. Returns a structure that can be
    #  queried using the getinfo method. The mapping uses mmap, if possible and
    #  currently the default, and the given access mode,  one of "READ",
    #  "UPDATE" or "WRITE". Clearly this must match what access the file
-   #  supports.
-   public method map { {access "READ"} } {
-      if { $addr_ != 0 } {
-         unmap
+   #  supports. The only component available for FITS is "DATA"
+   public method map { {access "READ"} {component "DATA"} } {
+      if { $addr_($component) != 0 } {
+         unmap $component
       }
-      set addr_ [${type_}::map $handle_ $usemmap $access]
-      return $addr_
+      set addr_($component) \
+         [${type_}::map $handle_ $usemmap $access $component]
+      return $addr_($component)
    }
 
-   #  Unmap the dataset "data component", if mapped.
-   public method unmap {} {
-      if { $addr_ != 0 } {
-         ${type_}::unmap $handle_ $addr_
-         set addr_ 0
+   #  Unmap a component of the dataset, all are unmapped if component == "*".
+   public method unmap {{component "DATA"}} {
+      if { $component == "*" } {
+         foreach component [array names $addr_] {
+            if { $addr_($component) != 0 } {
+               ${type_}::unmap $handle_ $component $addr_($component)
+               set addr_($component) 0
+            }
+         }
+      } else {
+         if { $addr_($component) != 0 } {
+            ${type_}::unmap $handle_ $component $addr_($component)
+            set addr_($component) 0
+         }
       }
    }
 
@@ -210,7 +233,7 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Return a WCS describing the coordinates of a given WCS axis. Note axes
    #  may or may not be fixed to a given dataset axis, that isn't worried
-   #  about here. 
+   #  about here.
    public method getaxiswcs {axis} {
       set wcs [${type_}::getwcs $handle_]
       return [gaiautils::getaxiswcs $wcs $axis]
@@ -225,14 +248,25 @@ itcl::class gaia::GaiaNDAccess {
    #  dimension order). The trunc argument provides for the removal of any
    #  trailing redundant axes (that axes of size 1, the first three must be
    #  significant).
-   public method getspectrum {axis alow ahigh p1 p2 trunc} {
-      if { $addr_ != 0 } {
+   public method getspectrum {axis alow ahigh p1 p2 trunc {component "DATA"}} {
+      set last_spectrum_args_ "$axis $alow $ahigh $p1 $p2 $trunc"
+      if { $addr_($component) != 0 } {
          set dims [getdims $trunc]
-         lassign [eval "array::getspectrum $addr_ $dims $axis $alow $ahigh \
-                                           $p1 $p2 $cnfmap_"] adr
+         set adr [eval "array::getspectrum $addr_($component) \
+                           $dims $axis $alow $ahigh $p1 $p2 $cnfmap_"]
          return $adr
       }
       return 0
+   }
+
+   #  Re-extract an component array that matches the last extracted spectrum.
+   #  Must be preceeded by a call to getspectrum.
+   public method getlastspectrum {{component "DATA"}} {
+      if { $last_spectrum_args_ == {} } {
+         error "getlastspectrum called before getspectrum"
+      }
+      lassign $last_spectrum_args_ axis alow ahigh p1 p2 trunc
+      return [getspectrum $axis $alow $ahigh $p1 $p2 $trunc $component]
    }
 
    #  Return the address of a spectral line of data extracted from an image
@@ -244,15 +278,15 @@ itcl::class gaia::GaiaNDAccess {
    #  extract, and method the data combination technique (each spectral
    #  position is the combination of data from the ARD region of an image
    #  plane), only "mean" is supported at present. All coordinates should be be
-   #  in the GRID domain.  The trunc argument provides for the removal of any 
-   #  trailing redundant axes (that axes of size 1, the first three must be 
+   #  in the GRID domain.  The trunc argument provides for the removal of any
+   #  trailing redundant axes (that axes of size 1, the first three must be
    #  significant). Note desc may contain newlines etc.
-   public method getregionspectrum {axis alow ahigh desc method trunc} {
-      if { $addr_ != 0 } {
+   public method getregionspectrum {axis alow ahigh desc method trunc
+                                    {component "DATA"}} {
+      if { $addr_($component) != 0 } {
          set dims [getdims $trunc]
-         lassign [eval "array::getregionspectrum \
-                           $addr_ $dims $axis $alow $ahigh \$desc $method \
-                           $cnfmap_"] adr
+         set adr [eval "array::getregionspectrum $addr_($component) \
+                           $dims $axis $alow $ahigh \$desc $method $cnfmap_"]
          return $adr
       }
       return 0
@@ -265,10 +299,11 @@ itcl::class gaia::GaiaNDAccess {
    #  the removal of any trailing redundant axes (that axes of size 1, the
    #  first three must be significant). The address of an array info structure
    #  is returned (query using getinfo).
-   public method getimage {axis index trunc} {
-      if { $addr_ != 0 } {
+   public method getimage {axis index trunc {component "DATA"}} {
+      if { $addr_($component) != 0 } {
          set dims [getdims $trunc]
-         return [eval "array::getimage $addr_ $dims $axis $index $cnfmap_"]
+         return [eval "array::getimage $addr_($component) \
+                          $dims $axis $index $cnfmap_"]
       }
       return 0
    }
@@ -291,15 +326,15 @@ itcl::class gaia::GaiaNDAccess {
    #  the attached dataset. The bare bones are an NDF of the correct
    #  dimensions and bounds, with an appropriate WCS. No data components are
    #  copied. Returns a new instance of this class wrapping the new NDF.
-   public method createimage {name axis} {
-      if { $addr_ == 0 } {
+   public method createimage {name axis {component "DATA"}} {
+      if { $addr_($component) == 0 } {
          error "Must map in cube data before creating an image"
       }
 
       #  Get the underlying info. Note the cube type may not be the image type
       #  (because of scaling of variants) so we must check what getimage will
       #  return.
-      lassign [getinfo $addr_] adr nel hdstype fulltype
+      lassign [getinfo $addr_($component)] adr nel hdstype fulltype
 
       #  Select the image axes, these are not axis.
       if { $axis == 1 } {
@@ -344,8 +379,8 @@ itcl::class gaia::GaiaNDAccess {
    #  image and index is an index along this axis (its coordinates is used to
    #  replace all coordinates along that axis when it is removed, so should
    #  normally be the image plane index).
-   public method getimagewcs {axis index} {
-      if { $addr_ != 0 } {
+   public method getimagewcs {axis index {component "DATA"}} {
+      if { $addr_($component) != 0 } {
 
          #  Select the image axes, these are not axis.
          if { $axis == 1 } {
@@ -369,6 +404,73 @@ itcl::class gaia::GaiaNDAccess {
          return $imagewcs
       }
       return 0
+   }
+
+   #  Create an NDF or FITS file that represents the bare bones of the last
+   #  spectrum extracted from the attached dataset. The bare bones are
+   #  the spectral data, in the original data type, plus a WCS that describes
+   #  the spectrum. In the case of an NDF further data components may be added
+   #  as the returned instance of GaiaNDAccess is opened for write access.
+   #
+   #  The title should be a meaningful string that identifies this spectrum in
+   #  the original cube.
+   public method createspectrum {format name title} {
+      if { $addr_(DATA) == 0 } {
+         error "Must map in cube data before creating a spectrum"
+      }
+      if { $last_spectrum_args_ == {} } {
+         error "Must extract a spectrum before creating a copy"
+      }
+
+      #  Recover information about the last extracted spectrum.
+      lassign $last_spectrum_args_ axis alow ahigh p1 p2 trunc
+
+      #  Get the underlying info. Note the cube type may not be the spectrum
+      #  type (because of scaling of variants), we use the expanded type.
+      lassign [getinfo $addr_(DATA)] adr nel hdstype fulltype
+
+      #  Get a 1D WCS for our chosen axes.
+      set spectralwcs [getaxiswcs $axis]
+
+      #  Extract the spectral data values and copy into place.
+      set specdata [getlastspectrum "DATA"]
+
+      if { $format == "NDF" } {
+         if { $type_ == "ndf" } {
+            #  Create the NDF as a copy of this NDF without the array
+            #  components, but set the pixel origins and data type of these.
+            set newhandle [ndf::copy $name $handle_ "UNITS" \
+                              $alow $ahigh $fulltype $spectralwcs]
+         } else {
+            #  Create a simple NDF.
+            set newhandle [ndf::create $name $alow $ahigh \
+                              $fulltype $spectralwcs]
+
+            #  Set the UNITS obtained from the FITS cube.
+            ndf::putc $newhandle "UNITS" [fits::getc $handle_ "UNITS"]
+         }
+         ndf::putc $newhandle "TITLE" $title
+
+         #  Create a new instance to manage the new NDF.
+         set accessor [uplevel \#0 GaiaNDAccess \#auto]
+         $accessor acquire $name $newhandle
+
+         #  And copy the spectral data into place.
+         set specdatacomp [$accessor map "WRITE/BAD" "DATA"]
+         array::copy $specdata $specdatacomp
+
+      } else {
+         #  Create simple FITS format spectrum, in same type as extracted
+         #  spectrum.
+         set newhandle [fits::create $name $specdata [expr $ahigh-$alow+1] \
+                           $spectralwcs $title \
+                           [${type_}::getc $handle_ "UNITS"]]
+
+         #  Create a new instance to manage the new FITS file.
+         set accessor [uplevel \#0 GaiaNDAccess \#auto]
+         $accessor acquire $name $newhandle
+      }
+      return $accessor
    }
 
    #  Apply a strings of AST attributes to the WCS component of the dataset.
@@ -430,12 +532,17 @@ itcl::class gaia::GaiaNDAccess {
    #  The handle to the opened dataset. NDF or FITS identifier.
    protected variable handle_ {}
 
-   #  The memory address of the dataset data component.
-   protected variable addr_ 0
+   #  The memory addresses of the dataset data components. Usually
+   #  only "DATA" is available.
+   protected variable addr_
 
    #  Whether mapped data should be registered with CNF, currently this
    #  is always true.
    protected variable cnfmap_ 0
+
+   #  All the arguments used to extract the last spectrum. Can be used with
+   #  getlastspectrum to retrieve this.
+   protected variable last_spectrum_args_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
