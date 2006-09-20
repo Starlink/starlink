@@ -26233,7 +26233,6 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
    AstMapping *map2;         /* Pointer to a Mapping */
    AstMapping *map3;         /* Pointer to a Mapping */
    AstMapping *map4;         /* Pointer to a Mapping */
-   AstMapping *map;          /* Pointer to a Mapping */
    AstMapping *ret;          /* Pointer to the returned Mapping */
    AstMapping *newmap;       /* Modified PIXEL->IWC Mapping */
    AstMapping *shiftmap;     /* ShiftMap from IWC to PPC */
@@ -26710,7 +26709,7 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 
 /* Otherwise pick the other axes from the supplied Frame */               
             } else {
-               ofrm = astPickAxes( *frm, j, axes, &map );
+               ofrm = astPickAxes( *frm, j, axes, NULL );
 
 /* Replace the supplied Frame with a CmpFrame made up of this Frame and 
    the SkyFrame. */
