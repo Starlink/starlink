@@ -75,8 +75,12 @@ static int GaiaFITSTclClose( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclCoord( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
+static int GaiaFITSTclCreate( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclDims( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
+static int GaiaFITSTclExists( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclGtWcs( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
@@ -98,6 +102,14 @@ static long exportFITSHandle( StarFitsIO *handle );
 int Fits_Init( Tcl_Interp *interp )
 {
     Tcl_CreateObjCommand( interp, "fits::close", GaiaFITSTclClose,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "fits::create", GaiaFITSTclCreate,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "fits::exists", GaiaFITSTclExists,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -255,10 +267,11 @@ static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
     size_t el;
 
     /* Check arguments, allow three, the FITS identifier, whether to use file
-     * mapping and the access mode. */
-    if ( objc != 4 ) {
+     * mapping and the access mode, the optional component value is ignored
+     * and "DATA" is always used. */
+    if ( objc != 4 && objc != 5 ) {
         Tcl_WrongNumArgs( interp, 1, objv,
-                          "fits_identifier ?usemmap? access" );
+                          "fits_identifier ?usemmap? access [\"DATA\"]" );
         return TCL_ERROR;
     }
 
@@ -449,6 +462,40 @@ static int GaiaFITSTclCGet( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
+ * Return if a "component" exists. FITS only supports "DATA" and
+ * "EXTENSION", which are always present.
+ */
+static int GaiaFITSTclExists( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] )
+{
+    FITSinfo *info;
+    const char *component;
+    int result;
+    
+    /* Check arguments, need 2 the fits identifier and the component */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier component" );
+        return TCL_ERROR;
+    }
+
+    /* Import the identifier */
+    result = importFITSIdentifier( interp, objv[1], &info );
+    if ( result == TCL_OK ) {
+        component = Tcl_GetString( objv[2] );
+
+        /* Check for known extensions */
+        if ( strcasecmp( "DATA", component )      == 0 ||
+             strcasecmp( "EXTENSION", component ) == 0 ) {
+            Tcl_SetObjResult( interp, Tcl_NewBooleanObj( 1 ) );
+        }
+        else {
+            Tcl_SetObjResult( interp, Tcl_NewBooleanObj( 0 ) );
+        }
+    }
+    return result;
+}
+
+/**
  * Get the dimensions of the FITS data. Returns a list of values, one for
  * each dimension.
  */
@@ -632,4 +679,76 @@ static int GaiaFITSTclCoord( ClientData clientData, Tcl_Interp *interp,
         }
     }
     return result;
+}
+
+
+/**
+ * Create a FITS file and write to the primary extension. The result is a FITS
+ * file. 
+ * 
+ * Requires the name of the FITS file, a pointer to an ARRAYinfo data struct,
+ * the dimensions (a list) of the array, a WCS, a name (OBJECT) and units for
+ * the data (can be blank).
+ */
+static int GaiaFITSTclCreate( ClientData clientData, Tcl_Interp *interp,
+                              int objc, Tcl_Obj *CONST objv[] )
+{
+    ARRAYinfo *info;
+    AstFrameSet *wcs;
+    Tcl_Obj **listObjv;
+    char *name;
+    const char *object;
+    const char *units;
+    int bitpix;
+    int i;
+    int ndims;
+    long adr;
+    long dims[MAX_DIMS];
+
+    /* Check arguments. */
+    if ( objc != 7 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "fitsfile data_array dims "
+                          "frameset object_name units" );
+        return TCL_ERROR;
+    }
+
+    /* Get name */
+    name = Tcl_GetString( objv[1] );
+
+    /* Get the data, this is an ARRAYinfo struct */
+    if ( Tcl_GetLongFromObj( interp, objv[2], &adr ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read data pointer",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+    info = (ARRAYinfo *) adr;
+
+    /* Convert type into a bitpix. */
+    bitpix = gaiaArrayFITSBitpix( info->type );
+
+    /* Dimensionality */
+    if ( Tcl_ListObjGetElements( interp, objv[3], &ndims, &listObjv )
+         != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    for ( i = 0; i < ndims; i++ ) {
+        if ( Tcl_GetLongFromObj( interp, listObjv[i], &dims[i] ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+    }
+
+    /* Get the WCS */
+    wcs = NULL;
+    if ( Tcl_GetLongFromObj( interp, objv[4], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    wcs = (AstFrameSet *) adr;
+
+    /* Object name and units */
+    object = Tcl_GetString( objv[5] );
+    units = Tcl_GetString( objv[6] );
+
+    return GaiaFITSCreate( name, info->ptr, wcs, bitpix, info->bscale, 
+                           info->bzero, info->blank, object, units, 
+                           ndims, dims );
 }

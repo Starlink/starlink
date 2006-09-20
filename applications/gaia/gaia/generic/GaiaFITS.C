@@ -235,3 +235,116 @@ int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, double *value )
     return TCL_ERROR;
 }
 
+/**
+ * Create a FITS file and write a data array, plus WCS, to its primary
+ * extension. 
+ */
+int GaiaFITSCreate( const char* filename, void *data, 
+                    AstFrameSet *wcs, int bitpix, double bscale,
+                    double bzero, long blank, const char *object,
+                    const char *units, int naxis, long naxes[] )
+{
+    /* Delete old file if it already exists */
+    unlink( filename );
+
+    int status = 0;
+    fitsfile *fptr;
+    if ( fits_create_file( &fptr, filename, &status ) != 0 ) {
+        return TCL_ERROR;
+    }
+
+    /* Create the primary image extension */
+    if ( fits_create_img( fptr, bitpix, naxis, naxes, &status ) != 0 ) {
+        return TCL_ERROR;
+    }
+
+    /* Convert bitpix into a datatype */
+    int needbscale = 0;
+    int datatype = TBYTE;
+    switch (bitpix) {
+    case 8:
+    case -8:
+        datatype = TBYTE;
+        needbscale = 1;
+        break;
+    case 16:
+        datatype = TSHORT;
+        needbscale = 1;
+        break;
+    case -16:
+        datatype = TUSHORT;
+        needbscale = 1;
+        break;
+    case 32:
+        datatype = TINT;
+        needbscale = 1;
+        break;
+    case -32:
+        datatype = TFLOAT;
+        break;
+    case 64:
+        datatype = TLONG;
+        needbscale = 1;
+        break;
+    case -64:
+        datatype = TDOUBLE;
+        break;
+    }
+
+    /*  Set the OBJECT and BUNIT values */
+    if ( object != NULL && object[0] != '\0' ) {
+        fits_write_key_str( fptr, "OBJECT", (char *) object, "Data object", 
+                            &status );
+    }
+    if ( units != NULL && units[0] != '\0' ) {
+        fits_write_key_str( fptr, "BUNIT", (char *) units, "Data units", 
+                            &status );
+    }
+
+    /*  Add any BSCALE, BZERO and BLANK values */
+    if ( needbscale ) {
+        fits_write_key( fptr, TDOUBLE, "BSCALE", &bscale, "Data scale", 
+                        &status );
+        fits_write_key( fptr, TDOUBLE, "BZERO", &bzero, "Data zero point", 
+                        &status );
+        fits_write_key( fptr, TLONG, "BLANK", &blank, "Blank value", 
+                        &status );
+        
+        /* Do not apply these when writing data as these are implicit. */
+        fits_set_bscale( fptr, 1.0, 0.0, &status );
+    }
+
+    /* Write WCS into a FITS channel. Attempt to write headers using a
+     * FITS-WCS encoding, if that fails we use a Native encoding */ 
+    AstFitsChan *chan = astFitsChan( NULL, NULL, "" );
+    astSet( chan, "Encoding=FITS-WCS" );
+    int nwrite = astWrite( chan, wcs );
+    if ( !astOK || nwrite == 0 ) {
+        astClearStatus;
+        astSet( chan, "Encoding=Native" );
+        nwrite = astWrite( chan, wcs );
+    }
+
+    /* Now read the channel and write cards to the FITS file. */
+    char card[FITSCARD+1];
+    astClear( chan, "Card" );
+    int ncard = astGetI( chan, "Ncard" );
+    for ( int i = 0; i < ncard; i++ ) {
+        astFindFits( chan, "%f", card, 1 );
+        fits_write_record( fptr, card, &status );
+    }
+    astAnnul( chan );
+    
+    /*  Finally write the data array to the file. */
+    long nel = 1L;
+    for ( int i = 0; i < naxis; i++ ) {
+        nel *= naxes[i];
+    }
+    if ( fits_write_img( fptr, datatype, 1L, nel, data, &status ) != 0 ) {
+        return TCL_ERROR;
+    }
+
+    fits_close_file( fptr, &status );
+
+    return TCL_OK;
+}
