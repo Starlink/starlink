@@ -56,13 +56,15 @@ static int gaiaArrayRelease( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int gaiaArrayInfo( ClientData clientData, Tcl_Interp *interp,
                           int objc, Tcl_Obj *CONST objv[] );
+static int gaiaArrayCopy( ClientData clientData, Tcl_Interp *interp,
+                          int objc, Tcl_Obj *CONST objv[] );
 
 /**
  * Register all the array commands.
  */
 int Array_Init( Tcl_Interp *interp )
 {
-    Tcl_CreateObjCommand( interp, "array::release", gaiaArrayRelease,
+    Tcl_CreateObjCommand( interp, "array::copy", gaiaArrayCopy,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -80,6 +82,10 @@ int Array_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "array::getinfo", gaiaArrayInfo,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "array::release", gaiaArrayRelease,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -504,3 +510,56 @@ static int gaiaArrayInfo( ClientData clientData, Tcl_Interp *interp,
 
     return TCL_OK;
 }
+
+/**
+ * Copy the data of an ARRAYinfo struct to another ARRAYinfo struct.
+ *
+ * The data types and sizes must match.
+ */
+static int gaiaArrayCopy( ClientData clientData, Tcl_Interp *interp,
+                          int objc, Tcl_Obj *CONST objv[] )
+{
+    ARRAYinfo *fromInfo;
+    ARRAYinfo *toInfo;
+    long adr;
+    size_t nel;
+
+    /* Check arguments */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "from_array to_array" );
+        return TCL_ERROR;
+    }
+
+    /* Get memory addresses */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read data pointer",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+    fromInfo = (ARRAYinfo *) adr;
+
+    if ( Tcl_GetLongFromObj( interp, objv[2], &adr ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read data pointer",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+    toInfo = (ARRAYinfo *) adr;
+
+    /* Basic check of dimensionality and type */
+    if ( fromInfo->type != toInfo->type ) {
+        Tcl_SetResult( interp, "Cannot copy arrays when types are different",
+                       TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+    if ( fromInfo->el != toInfo->el ) {
+        Tcl_SetResult( interp, "Cannot copy arrays with differing sizes",
+                       TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+
+    /* Do the copy */
+    nel = gaiaArraySizeOf( fromInfo->type );
+    memcpy( toInfo->ptr, fromInfo->ptr, nel * fromInfo->el );
+    return TCL_OK;
+}
+

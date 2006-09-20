@@ -198,6 +198,40 @@ int gaiaArrayFITSType( int bitpix )
 }
 
 /**
+ * Convert a local enum into a FITS bitpix.
+ */
+int gaiaArrayFITSBitpix( int type )
+{
+    int bitpix = 8;
+
+    switch ( type )
+    {
+    case HDS_BYTE:
+        bitpix = -8;
+        break;
+    case HDS_UBYTE:
+        bitpix = 8;
+        break;
+    case HDS_UWORD:
+        bitpix = -16;
+        break;
+    case HDS_WORD:
+        bitpix = 16;
+        break;
+    case HDS_REAL:
+        bitpix = -32;
+        break;
+    case HDS_INTEGER:
+        bitpix = 32;
+        break;
+    case HDS_DOUBLE:
+        bitpix = -64;
+        break;
+    }
+    return bitpix;
+}
+
+/**
  * Convert a local enum type into an HDS string type. Returns _UBYTE if type
  * is not known.
  */
@@ -247,7 +281,7 @@ int gaiaArrayScaledType( int intype, double bscale, double bzero )
 /**
  *  Return the sizeof() of a known type.
  */
-static size_t gaiaArraySizeOf( int type )
+size_t gaiaArraySizeOf( int type )
 {
     switch ( type )
     {
