@@ -164,6 +164,8 @@
 *        Added argument VERB.
 *     15-SEP-2005 (TIMJ):
 *        Check that return variables from CHR_FANDL are non-zero
+*     20-SEP-2006 (DSB):
+*        Remove erroneous "%" signs from error messages.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -410,7 +412,7 @@
             STATUS = PAR__NULL
             CALL MSG_SETC( 'P', PARAM )
             CALL ERR_REP( 'NDG_ASSOC_ERR3', 'A null group of NDFs was'//
-     :                    ' given for parameter %^P.', STATUS )
+     :                    ' given for parameter ^P.', STATUS )
          END IF         
 
 *  If the parameter request was aborted, annul the error and re-report
@@ -420,14 +422,14 @@
          STATUS = PAR__ABORT
          CALL MSG_SETC( 'P', PARAM )
          CALL ERR_REP( 'NDG_ASSOC_ERR4', 'Aborted attempt to '//
-     :                 'associate a group of NDFs with parameter %^P.',
+     :                 'associate a group of NDFs with parameter ^P.',
      :                 STATUS )
 
 *  If any other error occurred, add a context message.
       ELSE IF( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'P', PARAM )
          CALL ERR_REP( 'NDG_ASSOC_ERR5', 'Unable to associate a group'//
-     :                 ' of NDFs with parameter %^P.', STATUS )
+     :                 ' of NDFs with parameter ^P.', STATUS )
       END IF
 
 *  Release the error stack.
