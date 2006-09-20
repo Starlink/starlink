@@ -706,6 +706,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        even if an error has occurred.
 *     4-SEP-2006 (DSB):
 *        Modify GetClean so that it ignores the inherited status.
+*     20-SEP-2006 (DSB):
+*        Fix memory leak in WcsSpectral.
 *class--
 */
 
@@ -29649,7 +29651,6 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
    AstFrame *ofrm;        /* Pointer to a Frame */
    AstMapping *map1;      /* Pointer to Mapping */
    AstMapping *map2;      /* Pointer to Mapping */
-   AstMapping *map;       /* Pointer to a Mapping */
    AstMapping *ret;       /* Pointer to the returned Mapping */
    AstSpecFrame *specfrm; /* Pointer to a SpecFrame */
    char algcode[ 5 ];     /* Displayed spectral type string */
@@ -29837,7 +29838,7 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
 
 /* Otherwise pick the other axes from the supplied Frame */               
             } else {
-               ofrm = astPickAxes( *frm, j, axes, &map );
+               ofrm = astPickAxes( *frm, j, axes, NULL );
 
 /* Replace the supplied Frame with a CmpFrame made up of this Frame and 
    the SpecFrame. */
