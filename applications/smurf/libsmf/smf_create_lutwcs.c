@@ -81,6 +81,10 @@
 *        - Only apply intrument aperture offset if non-null
 *     2006-09-19 (DSB):
 *        - Test "instap" rather than "instapmap" before creating instapmap.
+*     2006-09-20 (EC):
+*        - In jigglemap case mapping was not being appended to mapcache
+*        - Check for VAL__BADD SMU offsets before using in jigglemap
+*        - Convert SMU offsets to radians from arcsec before using
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -121,12 +125,14 @@
 #include "mers.h"
 #include "ndf.h"
 #include "sae_par.h"
+#include "prm_par.h"
 
 /* Data Acquisition Includes */
 #include "sc2da/sc2ast.h"
 
 
 /* SMURF includes */
+#include "smurf_par.h"
 #include "smf.h"
 #include "jcmt/state.h"
 
@@ -150,6 +156,11 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
   AstShiftMap *jigglemap;         /* account for offsets in tangent plane */
   AstMapping *mapping;            /* total pixel -> azel mapping */
   double shifts[ 2 ];             /* size of shifts for jigglemap */ 
+
+  double temp_jig_x=0;            /* SMU x-offset */
+  double temp_jig_y=0;            /* SMU y-offset */
+  double temp_chop_x=0;           /* SMU chop x-offset */
+  double temp_chop_y=0;           /* SMU chopy x-offset */
 
   /* Required only for LUTs */
   AstPermMap *permmap;
@@ -299,9 +310,26 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
     azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
 				 azel_cache, 0, status );
   
+
+    /* Get the SMU positional values. Any "bad" value gets set to 0 before
+     using it to calculate the jigglemap. If the values are good, convert
+    them to radians from arcsec */
+
+    if( state->smu_az_jig_x == VAL__BADD ) temp_jig_x = 0;
+    else temp_jig_x = state->smu_az_jig_x*DR2AS;
+
+    if( state->smu_az_jig_y == VAL__BADD ) temp_jig_y = 0;
+    else temp_jig_y = state->smu_az_jig_y*DR2AS;
+
+    if( state->smu_az_chop_x == VAL__BADD ) temp_chop_x = 0;
+    else temp_chop_x = state->smu_az_chop_x*DR2AS;
+
+    if( state->smu_az_chop_y == VAL__BADD ) temp_chop_y = 0;
+    else temp_chop_y = state->smu_az_chop_y*DR2AS;
+
+
     /* Calculate final mapping with SMU position correction only if needed */
-    if( (!state->smu_az_jig_x)  && (!state->smu_az_jig_y) &&
-        (!state->smu_az_chop_x) && (!state->smu_az_chop_y) ) {
+    if( (!temp_jig_x) && (!temp_jig_y) && (!temp_chop_x) && (!temp_chop_y) ) {
     
       /* Combine these with the cached Mapping (from GRID coords for subarray 
          to Tanplane Nasmyth coords in rads), to get total Mapping from GRID 
@@ -311,12 +339,14 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
 
     } else {
       /* Create a ShiftMap which moves the origin of projection plane (X,Y)
-         coords to take account of the small offsets of SMU jiggle pattern. */
-      shifts[ 0 ] = state->smu_az_jig_x + state->smu_az_chop_x;
-      shifts[ 1 ] = state->smu_az_jig_y + state->smu_az_chop_y;
+         coords to take account of the small offsets of SMU jiggle pattern. 
+         Add this shifted map to the static cached mapping x*/
+
+      shifts[ 0 ] = temp_jig_x + temp_chop_x;
+      shifts[ 1 ] = temp_jig_y + temp_chop_y;
       jigglemap = astShiftMap( 2, shifts, "" );
     
-      mapping = (AstMapping *) astCmpMap( mapping, 
+      mapping = (AstMapping *) astCmpMap( map_cache, 
                                           astCmpMap( jigglemap, azelmap, 1, 
                                                      "" ), 1, "" );
     }
