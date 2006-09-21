@@ -43,6 +43,7 @@
  */
 
 #include <cstdio>
+#include <unistd.h>
 #include <cstring>
 #include "StarFitsIO.h"
 extern "C" {

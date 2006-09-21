@@ -1295,7 +1295,7 @@ int gaiaNDFCGet( int ndfid, const char* component, char *value,
 /**
  * Set the value of a character component (label, units, title).
  */
-int gaiaNDFCPut( int ndfid, const const char* component, const char *value,
+int gaiaNDFCPut( int ndfid, const char* component, const char *value,
                  char **error_mess )
 {
     int status = SAI__OK;
