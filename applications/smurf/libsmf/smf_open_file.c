@@ -113,6 +113,8 @@
 *        Added code to isNDF=0 case to handle compressed AzTEC data
 *     2006-09-15 (AGG):
 *        Insert code for opening and storing DREAM parameters
+*     2006-09-21 (AGG):
+*        Check that we have a DREAM extension before attempting to access it
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -572,62 +574,64 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	((*data)->dims)[i] = (dim_t)ndfdims[i];
       }
     }
-    /* Store DREAM parameters for flatfielded data. This has to be
-       done here as these methods rely on information in the main
-       smfData struct. First retrieve jigvert and jigpath from file */ 
+    /* Store DREAM parameters for flatfielded data if they exist. This
+       has to be done here as these methods rely on information in the
+       main smfData struct. First retrieve jigvert and jigpath from
+       file */ 
     if ( isTseries && isNDF ) {
-      /* Obtain locator to DREAM extension */
-      xloc = smf_get_xloc( *data, "DREAM", "", "READ", 0, 0, status );
-      jigvndf = smf_get_ndfid( xloc, "JIGVERT", "READ", "OLD", "", 0, NULL, 
-			       NULL, status);
-      if ( jigvndf == NDF__NOID) {
-	if (*status == SAI__OK ) {
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "Unable to obtain NDF ID for JIGVERT", status);
-	}
-      } else {
-	smf_open_ndf( jigvndf, "READ", filename, SMF__INTEGER, &jigvdata, status);
-      }
-      jigpndf = smf_get_ndfid( xloc, "JIGPATH", "READ", "OLD", "", 0, NULL, 
-			       NULL, status);
-      if ( jigpndf == NDF__NOID) {
-	if (*status == SAI__OK ) {
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "Unable to obtain NDF ID for JIGPATH", status);
-	}
-      } else {
-	smf_open_ndf( jigpndf, "READ", filename, SMF__DOUBLE, &jigpdata, status);
-      }
-      if ( jigvdata != NULL ) {
-	jigvert = (jigvdata->pntr)[0];
-	nvert = (int)(jigvdata->dims)[0];
-      } else {
-	if (*status == SAI__OK ) {
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "smfData for jiggle vertices is NULL", status);
-	}
-      }
-      if ( jigpdata != NULL ) {
-	jigpath = (jigpdata->pntr)[0];
-	npath = (int)(jigpdata->dims)[0];
-      } else {
-	if (*status == SAI__OK ) {
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "smfData for SMU path is NULL", status);
-	}
-      }
-      dream = smf_construct_smfDream( *data, nvert, npath, jigvert, jigpath, 
-				      status );
-      (*data)->dream = dream;
-    
-      /* Free up the smfDatas for jigvert and jigpath */
-      if ( jigvert != NULL ) {
-	smf_close_file( &jigvdata, status );
-      }
-      if ( jigpath != NULL ) {
-	smf_close_file( &jigpdata, status );
-      }
+      /* Obtain locator to DREAM extension if we have DREAM data */
+      xloc = smf_get_xloc( *data, "DREAM", "DREAM_PAR", "READ", 0, 0, status );
+      /* If it's NULL then we don't have dream data */
       if ( xloc != NULL ) {
+	jigvndf = smf_get_ndfid( xloc, "JIGVERT", "READ", "OLD", "", 0, NULL, 
+				 NULL, status);
+	if ( jigvndf == NDF__NOID) {
+	  if (*status == SAI__OK ) {
+	    *status = SAI__ERROR;
+	    errRep(FUNC_NAME, "Unable to obtain NDF ID for JIGVERT", status);
+	  }
+	} else {
+	  smf_open_ndf( jigvndf, "READ", filename, SMF__INTEGER, &jigvdata, status);
+	}
+	jigpndf = smf_get_ndfid( xloc, "JIGPATH", "READ", "OLD", "", 0, NULL, 
+				 NULL, status);
+	if ( jigpndf == NDF__NOID) {
+	  if (*status == SAI__OK ) {
+	    *status = SAI__ERROR;
+	    errRep(FUNC_NAME, "Unable to obtain NDF ID for JIGPATH", status);
+	  }
+	} else {
+	  smf_open_ndf( jigpndf, "READ", filename, SMF__DOUBLE, &jigpdata, status);
+	}
+	if ( jigvdata != NULL ) {
+	  jigvert = (jigvdata->pntr)[0];
+	  nvert = (int)(jigvdata->dims)[0];
+	} else {
+	  if (*status == SAI__OK ) {
+	    *status = SAI__ERROR;
+	    errRep(FUNC_NAME, "smfData for jiggle vertices is NULL", status);
+	  }
+	}
+	if ( jigpdata != NULL ) {
+	  jigpath = (jigpdata->pntr)[0];
+	  npath = (int)(jigpdata->dims)[0];
+	} else {
+	  if (*status == SAI__OK ) {
+	    *status = SAI__ERROR;
+	    errRep(FUNC_NAME, "smfData for SMU path is NULL", status);
+	  }
+	}
+	dream = smf_construct_smfDream( *data, nvert, npath, jigvert, jigpath, 
+					status );
+	(*data)->dream = dream;
+    
+	/* Free up the smfDatas for jigvert and jigpath */
+	if ( jigvert != NULL ) {
+	  smf_close_file( &jigvdata, status );
+	}
+	if ( jigpath != NULL ) {
+	  smf_close_file( &jigpdata, status );
+	}
 	datAnnul( &xloc, status );
       }
     }
