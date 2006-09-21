@@ -46,6 +46,9 @@
 *     can be left blank as well but it's probably a good idea to
 *     specify it.
 
+*  Notes:
+*     - It is up to the caller to define the context of the return value
+
 *  Authors:
 *     Andy Gibb (UBC)
 *     {enter_new_authors_here}
@@ -177,6 +180,7 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
     msgSetc("E", extname);
     msgOutif(MSG__VERB, FUNC_NAME, 
 	     "Warning: no extension named ^E", status);
+    /* Extension doesn't exist - do we want to create a new one? */
     if ( strncmp ( accmode, "WRITE", 5) == 0 || 
 	 strncmp ( accmode, "UPDATE", 6) == 0) {
       /* If we want to create new extension we first have to check
@@ -206,6 +210,9 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
 	  }
 	}
       }
+    } else {
+      msgOutif(MSG__VERB, FUNC_NAME, 
+	       "That's OK: we don't to create a new one", status);
     }
   }
 
