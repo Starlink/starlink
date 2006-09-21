@@ -34,14 +34,17 @@
 *        Pointer to global status.
 
 *  Description:
-*     Check the existence of the specified HDS locator, creating it if
-*     it does not exist. Returns a pointer to an HDS locator. If an
-*     error occurs a NULL pointer is returned, including the case that
-*     the file is not open for write access if a new extension has to
-*     be created.
+*     Check the existence of the specified HDS locator. A new locator
+*     will be created if it does not exist provided the file is open
+*     for WRITE (or UPDATE) access. Returns a pointer to an HDS
+*     locator. If an error occurs a NULL pointer is returned,
+*     including the case that the file is not open for write access if
+*     a new extension has to be created.
 *
-*     For returning locators to existing extensions the accmode, ndims
-*     and dims can all be left blank (i.e. "", 0, 0 respectively).
+*     For returning locators to existing extensions the ndims and dims
+*     can all be left blank (i.e. 0, 0 or NULL respectively). Accmode
+*     can be left blank as well but it's probably a good idea to
+*     specify it.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -57,6 +60,9 @@
 *        Update prologue for dealing with existing extensions
 *     2006-08-02 (AGG):
 *        Minor changes to user feedback from msgOutif
+*     2006-09-21 (AGG):
+*        Check that the caller has requested WRITE or UPDATE access
+*        before attempting to create a new extension
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -89,9 +95,11 @@
 #include <config.h>
 #endif
 
+/* Standard includs */
 #include <string.h>
 #include <stdio.h>
 
+/* Starlink includes */
 #include "sae_par.h"
 #include "star/ndg.h"
 #include "ndf.h"
@@ -103,10 +111,13 @@
 #include "star/kaplibs.h"
 #include "kpg_err.h"
 
+/* SMURF includes */
 #include "smf.h"
 #include "smurf_par.h"
 #include "libsmurf/smurflib.h"
 #include "smf_err.h"
+
+/* SC2DA includes */
 #include "sc2da/sc2store.h"
 #include "sc2da/sc2math.h"
 
@@ -166,20 +177,34 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
     msgSetc("E", extname);
     msgOutif(MSG__VERB, FUNC_NAME, 
 	     "Warning: no extension named ^E", status);
-    /* Create new extension but first check that the NDF is open for
-       WRITE access */
-    ndfIsacc( indf, "WRITE", &isacc, status );
-    if (isacc) {
-      msgSetc("E", extname);
-      msgOutif(MSG__VERB, FUNC_NAME, "Creating new extension, ^E", status );
-      ndfXnew( indf, extname, extype, ndims, dims, &loc, status );
-    } else {
-      if ( *status == SAI__OK ) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, 
-	       "Unable to create new extension: file is not open for write access", 
-	       status);
-	return NULL;
+    if ( strncmp ( accmode, "WRITE", 5) == 0 || 
+	 strncmp ( accmode, "UPDATE", 6) == 0) {
+      /* If we want to create new extension we first have to check
+	 that the NDF is open for WRITE or UPDATE access */
+      ndfIsacc( indf, "WRITE", &isacc, status );
+      if (isacc) {
+	msgSetc("E", extname);
+	msgOutif(MSG__VERB, FUNC_NAME, "Creating new extension, ^E", status );
+	ndfXnew( indf, extname, extype, ndims, dims, &loc, status );
+      } else {
+	/* OK not open for WRITE access, try UPDATE */
+	ndfIsacc( indf, "UPDATE", &isacc, status );
+	if (isacc) {
+	  msgSetc("E", extname);
+	  msgOutif(MSG__VERB, FUNC_NAME, "Creating new extension, ^E", status );
+	  ndfXnew( indf, extname, extype, ndims, dims, &loc, status );
+	} else {
+	  /* OK file cannot be written to despite the fact we want a
+	     new extension - time to let the user know */
+	  if ( *status == SAI__OK ) {
+	    *status = SAI__ERROR;
+	    msgSetc("A", accmode );
+	    errRep(FUNC_NAME, 
+		   "Unable to create new extension: file is not open for ^A access", 
+		   status);
+	    loc = NULL;
+	  }
+	}
       }
     }
   }
