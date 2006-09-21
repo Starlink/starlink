@@ -87,6 +87,8 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     PWD: Peter Draper (Durham)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -94,6 +96,10 @@
 *        Original version.
 *     5-OCT-1998 (RFWS):
 *        Use global variables to obtain argument information if available.
+*     29-JUL-2005 (PWD):
+*        Fix for g95 when calling G95 intrinsic.
+*     21-SEP-2006 (TIMJ):
+*        Check length before checking content.
 *     <{enter_further_changes_here}>
 
 *  Bugs:
@@ -181,7 +187,7 @@
          }
 
 /* Copy the string to the caller's buffer. */
-         for ( len = 0; result[ len ] && ( len < ARG_length ); len++ ) {
+         for ( len = 0; (len < ARG_length) && result[ len ]; len++ ) {
             ARG[ len ] = (F77_CHARACTER_TYPE) result[ len ];
          }
 
