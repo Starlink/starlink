@@ -64,6 +64,7 @@
 *     2006-08-21  Free resources allocated in sc2sim_instrinit (EC)
 *     2006-09-14  Seed optional
 *     2006-09-14  Ability to scan in AzEl and RADec coordinates (EC)
+*     2006-09-22  Convert to using AstKeyMaps for input parameters (JB)
 *     {enter_further_changes_here}
 
 *    History (HEATRUN task):
@@ -128,6 +129,7 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/kaplibs.h"
 
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
@@ -156,10 +158,10 @@ void slaDjcl(double djm, int *iy, int *im, int *id, double *fd, int *j);
 void smurf_sc2sim( int *status ) {
 
    /* Local variables */
-   struct dxml_struct inx;         /* structure for values from XML */
-   struct dxml_sim_struct sinx;    /* structure for sim values from XML */
+   struct sc2sim_obs_struct inx;   /* structure for values from XML */
+   struct sc2sim_sim_struct sinx;  /* structure for sim values from XML */
    mapCoordframe coordframe;       /* Coordinate frame for simulated map */
-   double coeffs[NCOEFFS];         /* bolometer response coeffs */
+   double coeffs[SC2SIM__NCOEFFS]; /* bolometer response coeffs */
    double digcurrent;              /* digitisation mean current */
    double digmean;                 /* digitisation mean value */
    double digscale;                /* digitisation scale factore */
@@ -170,18 +172,21 @@ void smurf_sc2sim( int *status ) {
    obsMode mode;                   /* what type of observation are we doing? */
    int nbol;                       /* total number of bolometers */
    int numscans;                   /* number of scans across sky */
-   char obsxmlfile[LEN__METHOD];   /* Observation XML file */
+   Grp *obsGrp = NULL;             /* Group containing obs parameter file */
+   AstKeyMap *obskeymap=NULL;      /* AstKeyMap for obs parameters */
+   int osize = 0;                  /* Size of obsGrp */
    char *pars[4];                  /* parameter list */
    double pathlength;              /* length of scan path (arcsec) */
    double *pzero=NULL;             /* bolometer power offsets */
    int rseed;                      /* seed for random number generator */
    double samptime;                /* sample time in sec */
-   char seedchar[LEN__METHOD];     /* string representation of rseed */
+   Grp *simGrp = NULL;             /* Group containing sim parameter file */
+   AstKeyMap *simkeymap=NULL;      /* AstKeyMap for sim parameters */
    char simtype[LEN__METHOD];      /* String for simulation type */
-   char simxmlfile[LEN__METHOD];   /* Simulation XML file */
+   int ssize = 0;                  /* Size of simGrp */
    char testtype[LEN__METHOD];     /* String for scantest type */
    struct timeval time;            /* Structure for system time */
-   static double weights[DREAM__MXIRF]; /* impulse response */
+   static double weights[SC2SIM__MXIRF]; /* impulse response */
    double *xbc=NULL;               /* projected NAS X offsets of bolometers 
 				      in arcsec */
    double *xbolo=NULL;             /* Native bolo x-offsets */
@@ -190,8 +195,10 @@ void smurf_sc2sim( int *status ) {
    double *ybolo=NULL;             /* Native bolo y-offsets */
 
    /* Get input parameters */
-   parGet0c("OBSXMLFILE", obsxmlfile, LEN__METHOD, status);
-   parGet0c("SIMXMLFILE", simxmlfile, LEN__METHOD, status);
+   kpg1Gtgrp ("OBSFILE", &obsGrp, &osize, status );
+   kpg1Kymap ( obsGrp, &obskeymap, status );
+   kpg1Gtgrp ("SIMFILE", &simGrp, &ssize, status );
+   kpg1Kymap ( simGrp, &simkeymap, status );
    parGet0i("SEED", &rseed, status);
 
    /* Seed random number generator, either with the time in 
@@ -207,28 +214,15 @@ void smurf_sc2sim( int *status ) {
       msgOutif(MSG__VERB," ","Seeding random numbers with ^SEED", status);
    } 
 
-   /* Convert the integer seed to a string */
-   sprintf ( seedchar, "%i", rseed );
-
-   /* Allocate memory and fill the parameter array */
-   pars[0] = smf_malloc ( LEN__METHOD, sizeof(**pars), 1, status );
-   pars[1] = smf_malloc ( LEN__METHOD, sizeof(**pars), 1, status );
-   pars[2] = smf_malloc ( LEN__METHOD, sizeof(**pars), 1, status );
-   pars[3] = smf_malloc ( LEN__METHOD, sizeof(**pars), 1, status );
-   strcpy ( pars[0], "sim" );
-   strcpy ( pars[1], obsxmlfile );
-   strcpy ( pars[2], simxmlfile );
-   strcpy ( pars[3], seedchar ); 
-
    /* Initialise random number generator to give same sequence every time,
       leading to the same series of pzero and heater offsets */
    srand(53);
 
    msgOutif(MSG__VERB, FUNC_NAME, "Initialise instrument.", status);
 
-   sc2sim_instrinit ( 4, pars, &inx, &sinx, &rseed, coeffs, &digcurrent,
+   sc2sim_instrinit ( &inx, &sinx, obskeymap, simkeymap, coeffs, &digcurrent,
 		    &digmean, &digscale, &elevation, weights, &heater, 
-		    &pzero, &xbc, &ybc, &xbolo, &ybolo, status );
+		      &pzero, &xbc, &ybc, &xbolo, &ybolo, status );
 
    nbol = inx.nbolx * inx.nboly;
    samptime = inx.sample_t / 1000.0;
@@ -309,16 +303,14 @@ void smurf_sc2sim( int *status ) {
  
    /* Free resources */
 
-   smf_free( pars[0], status );
-   smf_free( pars[1], status );
-   smf_free( pars[2], status );
-   smf_free( pars[3], status );
-
    smf_free( heater, status );
    smf_free( pzero, status );
    smf_free( xbc, status );
    smf_free( ybc, status );
    smf_free( xbolo, status );
    smf_free( ybolo, status );
+
+   if ( simGrp ) grpDelet ( &simGrp, status ); 
+   if ( obsGrp ) grpDelet ( &obsGrp, status ); 
 
 }

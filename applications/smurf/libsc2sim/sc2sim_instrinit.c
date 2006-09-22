@@ -13,25 +13,25 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_instrinit ( int argc, char **argv, struct dxml_struct *inx,
-*                        struct dxml_sim_struct *sinx, int *rseed, 
-*                        double coeffs[NCOEFFS], double *digcurrent, 
-*                        double *digmean, double *digscale, double *elevation,
-*                        double weights[], double **heater, double **pzero,
-*                        double **xbc, double **ybc, double **xbolo, 
-*                        double **ybolo, int *status )
+*     sc2sim_instrinit( struct sc2sim_obs_struct *inx, 
+*                       struct sc2sim_sim_struct *sinx, 
+*                       AstKeyMap *obskeymap, AstKeyMap *simkeymap,
+*                       double coeffs[SC2SIM__NCOEFFS], double *digcurrent,
+*                       double *digmean, double *digscale, double *elevation,
+*                       double weights[], double **heater, double **pzero,
+*                       double **xbc, double **ybc, double **xbolo,
+*                       double **ybolo, int *status )
+
 
 *  Arguments:
-*     argc = int (Given)
-*        Argument count
-*     argv = char** (Given)
-*        Argument list
-*     inx = dxml_struct* (Returned)
+*     inx = sc2sim_obs_struct* (Returned)
 *        Structure for values from XML file
-*     sinx = dxml_sim_struct* (Returned)
+*     sinx = sc2sim_sim_struct* (Returned)
 *        Structure for values from XML file
-*     rseed = int* (Returned)
-*        Seed for random number generator
+*     obskeymap = AstKeyMap* (Given)
+*        Keymap for obs parameters
+*     simkeymap = AstKeyMap* (Given)
+*        Keymap for sim parameters
 *     coeffs = double[] (Returned)
 *        Bolometer respose coeffs
 *     digcurrent = double* (Returned)
@@ -93,6 +93,8 @@
 *        Modified sc2ast_createwcs calls to use new interface.
 *     2006-09-11 (EC):
 *        Fixed pointer problem with callc to smf_calc_telpos
+*     2006-09-22 (JB):
+*        Changed from using XML files to AstKeyMaps
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -125,7 +127,6 @@
 /* SC2SIM includes */
 #include "sc2sim.h"
 #include "sc2sim_par.h"
-#include "dream.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -137,9 +138,10 @@
 #include "ast.h"
 #include "sae_par.h"
 
-void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
-                       struct dxml_sim_struct *sinx, int *rseed,
-                       double coeffs[NCOEFFS], double *digcurrent,
+void sc2sim_instrinit( struct sc2sim_obs_struct *inx, 
+                       struct sc2sim_sim_struct *sinx, 
+                       AstKeyMap *obskeymap, AstKeyMap *simkeymap,
+                       double coeffs[SC2SIM__NCOEFFS], double *digcurrent,
                        double *digmean, double *digscale, double *elevation,
                        double weights[], double **heater, double **pzero,
                        double **xbc, double **ybc, double **xbolo,
@@ -157,42 +159,22 @@ void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
   double p;                      /* parallactic angle (radians) */
   double photonsigma;            /* typical photon noise level in pW */
   double samptime;               /* sample time in sec */
-  int savebols;                  /* flag for bol details (unused here) */
   JCMTState state;               /* Telescope state at one time slice */
   int subnum;                    /* subarray number */
   double telpos[3];              /* Geodetic location of the telescope */
   double trans;                  /* average transmission */
 
-
-  /*
-    double junk[1000];
-    void *junkpointer=NULL;
-    smf_free( junkpointer, status );
-    smf_boxcar1( junk, 1000, 3, status );
-  */
-
-
   /* Check status */
   if ( !StatusOkP(status) ) return;
 
-  /* Initialise tracing */
-  dream_traceinit();
-   
-  /* Get control parameters */
-  if ( dream_trace ( 1 ) ) {
-    printf ( "staresim : Start of the program\n" );
-  }
-
-  sc2sim_getpar ( argc, argv, inx, sinx, rseed, &savebols, status );
+  sc2sim_getobspar ( obskeymap, inx, status );
+  sc2sim_getsimpar ( simkeymap, sinx, status );
 
   samptime = inx->sample_t / 1000.0;
 
-  /* Initialise bolometer characteristics */
-  dream_bolinit ( 1, inx->nbolx, inx->nboly, status );
-   
   /* Get the bolometer information */
   if( *status == SAI__OK ) {
-    nbol = inx->nbolx * inx->nboly;
+     nbol = inx->nbolx * inx->nboly;
   }     
 
   decay = 5.0;
@@ -207,7 +189,7 @@ void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
   /*  Initialise the standard bolometer response function.
       The routine sets the values for 6 polynomial coefficients which
       translate input power in pico Watts to output current in Amp. */
-  sc2sim_response ( inx->lambda, NCOEFFS, coeffs, status );
+  sc2sim_response ( inx->lambda, SC2SIM__NCOEFFS, coeffs, status );
 
   /*  Calculate the parameters for simulating digitisation */
   sc2sim_calctrans ( inx->lambda, &trans, sinx->tauzen, status );
@@ -215,7 +197,7 @@ void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
   sc2sim_getsigma ( inx->lambda, sinx->bandGHz, sinx->aomega,
                     (sinx->telemission+meanatm), &photonsigma, status );
    
-  sc2sim_getscaling ( NCOEFFS, coeffs, inx->targetpow, photonsigma,
+  sc2sim_getscaling ( SC2SIM__NCOEFFS, coeffs, inx->targetpow, photonsigma,
                       digmean, digscale, digcurrent, status );
   
    
@@ -224,10 +206,9 @@ void sc2sim_instrinit( int argc, char **argv, struct dxml_struct *inx,
       exp(-ti/DECAY) divided by the sum of all 16 values.
       This is practically identical to the fb.exp(-t1.fb) formula
       used in the DREAM software with fb=1/DECAY. */
-  sc2sim_getweights ( decay, inx->sample_t, DREAM__MXIRF, weights, status );
+  sc2sim_getweights ( decay, inx->sample_t, SC2SIM__MXIRF, weights, status );
  
   /* Get the subsystem number */ 
-   
   sc2ast_name2num( sinx->subname, &subnum, status );
 
   /* Get the native x- and y- (GRID) coordinates of each bolometer */
