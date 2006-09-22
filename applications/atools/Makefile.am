@@ -27,7 +27,7 @@ atools_mon_TASKS = astcopy astaddframe astclear astget astset asttest \
 FSRC = \
  atl1_gtfrm.f \
  atl1_ptobj.f atl1_setop.f atl1_gtofl.f \
- atl1_cpcol.f atl1_prnt2.f atl1_prnt1.f 
+ atl1_cpcol.f atl1_prnt2.f atl1_prnt1.f atl1_prntn.f 
 
 
 ##  The on-line help.

@@ -956,6 +956,24 @@ iraf! {
             size *
          }
 
+         parameter posin {
+            type LITERAL
+            prompt {Group of numerical input axis values}
+            ppath CURRENT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter posout {
+            type LITERAL
+            prompt {Name of output text file to hold axis values}
+            ppath CURRENT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
          parameter this {
             position 1
             type LITERAL

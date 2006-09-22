@@ -9,6 +9,11 @@
  high-level interface to the AST library. 
 
 
+  Changes in V1.9-2
+
+  - Input positions can now be supplied to asttrann in the form of a
+    group of formatted axis values (e.g. in a text file).
+
   Changes in V1.9-1
 
   - New command asttimeframe. Creates a TimeFrame.
