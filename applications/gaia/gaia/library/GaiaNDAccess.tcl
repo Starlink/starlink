@@ -250,6 +250,7 @@ itcl::class gaia::GaiaNDAccess {
    #  significant).
    public method getspectrum {axis alow ahigh p1 p2 trunc {component "DATA"}} {
       set last_spectrum_args_ "$axis $alow $ahigh $p1 $p2 $trunc"
+      set last_spectrum_type_ point
       if { $addr_($component) != 0 } {
          set dims [getdims $trunc]
          set adr [eval "array::getspectrum $addr_($component) \
@@ -263,10 +264,15 @@ itcl::class gaia::GaiaNDAccess {
    #  Must be preceeded by a call to getspectrum.
    public method getlastspectrum {{component "DATA"}} {
       if { $last_spectrum_args_ == {} } {
-         error "getlastspectrum called before getspectrum"
+         error "getlastspectrum called before getspectrum or getregionspectrum"
       }
-      lassign $last_spectrum_args_ axis alow ahigh p1 p2 trunc
-      return [getspectrum $axis $alow $ahigh $p1 $p2 $trunc $component]
+      if { $last_spectrum_type_ == "point" } {
+         lassign $last_spectrum_args_ axis alow ahigh p1 p2 trunc
+         return [getspectrum $axis $alow $ahigh $p1 $p2 $trunc $component]
+      }
+      lassign $last_spectrum_args_ axis alow ahigh desc meth trunc
+      return \
+         [getregionspectrum $axis $alow $ahigh $desc $meth $trunc $component]
    }
 
    #  Return the address of a spectral line of data extracted from an image
@@ -283,6 +289,8 @@ itcl::class gaia::GaiaNDAccess {
    #  significant). Note desc may contain newlines etc.
    public method getregionspectrum {axis alow ahigh desc method trunc
                                     {component "DATA"}} {
+      set last_spectrum_args_ "$axis $alow $ahigh $desc $method $trunc"
+      set last_spectrum_type_ "region"
       if { $addr_($component) != 0 } {
          set dims [getdims $trunc]
          set adr [eval "array::getregionspectrum $addr_($component) \
@@ -540,9 +548,10 @@ itcl::class gaia::GaiaNDAccess {
    #  is always true.
    protected variable cnfmap_ 0
 
-   #  All the arguments used to extract the last spectrum. Can be used with
-   #  getlastspectrum to retrieve this.
+   #  All the arguments used to extract the last spectrum. Can be used
+   #  with getlastspectrum to retrieve this.
    protected variable last_spectrum_args_ {}
+   protected variable last_spectrum_type_ point
 
    #  Common variables: (shared by all instances)
    #  -----------------
