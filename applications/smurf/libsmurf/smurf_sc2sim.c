@@ -295,7 +295,7 @@ void smurf_sc2sim( int *status ) {
       } else if ( strncmp( simtype, "WEIGHTS", 4 ) == 0 ) {
 
          sc2sim_simhits ( &inx, &sinx, digcurrent, digmean, digscale, 
-                          filter, maxwrite, mode, nbol, rseed, 
+                          filter, maxwrite, mode, coordframe, nbol, rseed, 
                           samptime, status );
 
       } 

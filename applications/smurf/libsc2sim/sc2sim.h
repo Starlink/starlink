@@ -520,7 +520,8 @@ int *status                  /* global status (given and returned) */
 
 void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
                       double digcurrent, double digmean, double digscale, 
-                      char filter[], int maxwrite, obsMode mode, int nbol, 
+                      char filter[], int maxwrite, obsMode mode, 
+		      mapCoordframe coordframe, int nbol, 
                       int rseed, double samptime, int *status);
 
 void sc2sim_simplescan ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
