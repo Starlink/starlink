@@ -111,6 +111,27 @@ itcl::class gaia::PlasticSender {
       }
    }
 
+   #  Sends a spectrum image to one or more listening PLASTIC applications.
+   #  If recipients is non-empty it gives a list of application
+   #  IDs for the applications to send to.  If empty, the message is
+   #  broadcast to all. The spectrum must be in FITS format and exist.
+   public method send_spectrum {spectrum recipients} {
+      check_app_
+      set msg_id "ivo://votech.org/spectrum/loadFromURL"
+
+      #  Create a URL of the local filename given.
+      if { [catch {
+         set url [get_file_url_ $spectrum]
+         set map(Access.Reference) $url
+         set send_args [list [rpcvar string $url] \
+                             [rpcvar string $url] \
+                             [rpcvar struct map]]
+         $plastic_app send_message_async $msg_id $send_args $recipients
+      } msg] } {
+         error "error in FITS send: $::errorInfo"
+      }
+   }
+
    #  Identify a particular sky position as of interest and transmit it
    #  to other PLASTIC applications.  ra and dec are J2000 in either 
    #  degrees or sexagesimal.
