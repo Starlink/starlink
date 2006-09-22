@@ -16,6 +16,9 @@
 
     Extracted spectra can now be saved to NDF and FITS files.
 
+    Spectral can now be sent to PLASTIC-enabled applications using
+    the Interop menu in the spectral plot window. Only SPLAT supports
+    this at present.
 
   Release 3.2-0: 28th July 2006.
   ==============================
