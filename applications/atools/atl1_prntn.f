@@ -100,7 +100,7 @@
       DO I = 1, NP
          IAT = 2   
          DO J = 1, NAX
-            CALL CHR_PUTD( BUF, AXVAL( I, J ), IAT )
+            CALL CHR_PUTD( AXVAL( I, J ), BUF, IAT )
             IAT = IAT + 1
          END DO
          CALL MSG_OUT( ' ', BUF( :IAT ), STATUS )
