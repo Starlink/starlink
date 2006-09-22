@@ -68,8 +68,8 @@
 #include "sc2da/Ers.h"
 #include "jcmt/state.h"
 
-#include "sc2sim_struct.h"
-#include "dxml_struct.h"
+#include "libsc2sim/sc2sim_struct.h"
+#include "libsc2sim/sc2sim_par.h"
 
 #ifndef SC2SIM_DEFINED
 #define SC2SIM_DEFINED
@@ -126,7 +126,8 @@ double ybc[],        /* projected Y coords of bolometers (returned) */
 int *status          /* global status (given and returned) */
 );
 
-void sc2sim_bousscan ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
+void sc2sim_bousscan ( struct sc2sim_obs_struct *inx, 
+                       struct sc2sim_sim_struct *sinx, 
                        double digcurrent, double digmean, 
                        double digscale, char filter[], 
                        int maxwrite, obsMode mode, int nbol, int numscans,  
@@ -247,16 +248,8 @@ char *name,         /* string containing name of observing mode */
 int *status         /* global status (given and returned) */
 );
 
-void sc2sim_getpar
-( 
-int argc,                /* argument count (given) */
-char **argv,             /* argument list (given) */
-struct dxml_struct *inx, /* structure for values from XML file (returned) */
-struct dxml_sim_struct *sinx, /* structure for values from XML file (returned) */
-int *rseed,              /* seed for random number generator (returned)*/
-int *savebols,           /* flag for writing bolometer details (returned) */
-int *status              /* global status (given and returned) */
-);
+void sc2sim_getobspar ( AstKeyMap *keymap,struct  sc2sim_obs_struct *inx, 
+                        int *status );
 
 void sc2sim_getpat
 (
@@ -352,6 +345,9 @@ double *sigma,         /* photon noise in pW (returned) */
 int *status            /* global status (given and returned) */
 );
 
+void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *inx, 
+                        int *status );
+
 void sc2sim_getsinglescan
 (
 double angle,        /* angle of pattern relative to telescope
@@ -384,19 +380,19 @@ double weights[],  /* array to hold returned values (returned) */
 int *status        /* global status (given and returned) */
 );
 
-void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
+void sc2sim_heatrun ( struct sc2sim_obs_struct *inx, 
+                      struct sc2sim_sim_struct *sinx, 
                       double coeffs[], double digcurrent, double digmean, 
                       double digscale, char filter[], double *heater, int nbol,
                       double *pzero, double samptime, int *status );
 
 void sc2sim_instrinit
 ( 
-int argc,                /* argument count (given) */
-char **argv,             /* argument list (given) */
-struct dxml_struct *inx, /* structure for values from XML file (returned) */
-struct dxml_sim_struct *sinx, /* structure for values from XML file(returned) */
-int *rseed,              /* seed for random number generator (returned)*/
-double coeffs[NCOEFFS],  /* bolometer response coeffs (returned) */
+struct sc2sim_obs_struct *inx, /* structure for values from XML file (returned) */
+struct sc2sim_sim_struct *sinx, /* structure for values from XML file(returned) */
+AstKeyMap *obskeymap,    /* keymap for obs parameters */
+AstKeyMap *simkeymap,    /* keymap for sim parameters */
+double coeffs[SC2SIM__NCOEFFS],  /* bolometer response coeffs (returned) */
 double *digcurrent,      /* digitisation mean current (returned) */
 double *digmean,         /* digitisation mean value (returned) */
 double *digscale,        /* digitisation scale factore (returned) */
@@ -421,15 +417,10 @@ double *fnoise,   /* array to hold noise sequence (returned) */
 int *status       /* global status (given and returned) * */
 );
 
-void sc2sim_lissajousscan( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
-                      double digcurrent, double digmean, double digscale, 
-                      char filter[], int maxwrite, obsMode mode, int nbol, 
-			   int rseed, double samptime, int *status );
-
 void sc2sim_ndfwrdata
 ( 
-struct dxml_struct *inx,      /* structure for values from XML (given) */
-struct dxml_sim_struct *sinx, /* structure for sim values from XML (given)*/
+struct sc2sim_obs_struct *inx,      /* structure for values from XML (given) */
+struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
 double meanwvm,   /* 225 GHz tau */
 char file_name[], /* output file name (given) */
 int numsamples,   /* number of samples (given) */
@@ -450,8 +441,8 @@ int *status       /* global status (given and returned) */
 
 void sc2sim_ndfwrheat
 ( 
-struct dxml_struct *inx,      /* structure for values from XML (given) */
-struct dxml_sim_struct *sinx, /* structure for sim values from XML (given)*/
+struct sc2sim_obs_struct *inx,      /* structure for values from XML (given) */
+struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
 char file_name[],  /* output file name (given) */
 int numsamples,    /* number of samples (given) */
 int nflat,         /* number of flat coeffs per bol (given) */
@@ -462,6 +453,13 @@ int *dksquid,      /* dark SQUID time stream data (given) */
 double *fcal,      /* flat-field calibration (given) */
 double *fpar,      /* flat-field parameters (given) */
 char filter[],     /* String representing filter (e.g. "850") (given) */
+int *status        /* global status (given and returned) */
+);
+
+void sc2sim_parcheck
+( 
+struct sc2sim_obs_struct *inx,      /* structure for values from XML (given) */
+struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
 int *status        /* global status (given and returned) */
 );
 
@@ -484,10 +482,12 @@ double coeffs[],   /* array to hold returned coefficients (returned) */
 int *status        /* global status (given and returned) */
 );
 
+void sc2sim_sex2double ( char *string, double *value, int *status );
+
 void sc2sim_simframe
 ( 
-struct dxml_struct inx,      /* structure for values from XML (given) */
-struct dxml_sim_struct sinx, /* structure for sim values from XML (given)*/
+struct sc2sim_obs_struct inx,      /* structure for values from XML (given) */
+struct sc2sim_sim_struct sinx, /* structure for sim values from XML (given)*/
 int astnaxes[2],             /* dimensions of simulated image (given) */
 double astscale,             /* pixel size in simulated image (given) */
 double *astsim,              /* astronomical sky (given) */
@@ -518,13 +518,15 @@ double *dbuf,                /* generated frame (returned) */
 int *status                  /* global status (given and returned) */
 );
 
-void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
+void sc2sim_simhits ( struct sc2sim_obs_struct *inx, 
+                      struct sc2sim_sim_struct *sinx, 
                       double digcurrent, double digmean, double digscale, 
                       char filter[], int maxwrite, obsMode mode, 
 		      mapCoordframe coordframe, int nbol, 
                       int rseed, double samptime, int *status);
 
-void sc2sim_simplescan ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
+void sc2sim_simplescan ( struct sc2sim_obs_struct *inx, 
+                         struct sc2sim_sim_struct *sinx, 
                          double digcurrent, double digmean, 
                          double digscale, char filter[], 
                          int maxwrite, obsMode mode, int nbol,  
@@ -533,12 +535,22 @@ void sc2sim_simplescan ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
                          double weights[], double *xbc, double *xbolo, 
                          double *ybc, double *ybolo,int *status );
 
-void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
+void sc2sim_simulate ( struct sc2sim_obs_struct *inx, 
+                       struct sc2sim_sim_struct *sinx, 
 		       double coeffs[], double digcurrent, double digmean, 
 		       double digscale, char filter[], double *heater, 
 		       int maxwrite, obsMode mode, mapCoordframe coordframe,
 		       int nbol, double *pzero, int rseed, double samptime, 
 		       double weights[], double *xbc, double *xbolo, 
 		       double *ybc, double *ybolo, int *status );
+
+void sc2sim_smupath ( int nvert, double vertex_t, int jig_ver[][2],
+                      double jig_stepx, double jig_stepy, int movecode,
+                      int nppp, double sample_t, double smu_offset,
+                      int pathsz, double jigpath[][2], int *status );
+
+void sc2sim_smupos ( double t, double vertex_t, int movecode, 
+                     int nvert, double vertxy[][2], double *x, 
+                     double *y, int *status );
 
 #endif /* SC2SIM_DEFINED */
