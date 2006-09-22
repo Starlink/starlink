@@ -288,7 +288,7 @@ itcl::class gaia::GaiaSpecWriter {
          set cubeaccessor [$gaiacube get_cubeaccessor]
 
          #  Set name of the spectrum.
-         set shortname [$cubespectrum sectioned_name]
+         set shortname [get_shortname]
          if { $shortname == {} } {
             set shortname "$filename"
          }
@@ -301,6 +301,11 @@ itcl::class gaia::GaiaSpecWriter {
 
          blt::busy release $w_
       }
+   }
+
+   #  Return a suitable shortname.
+   public method get_shortname {} {
+      return [$cubespectrum sectioned_name]
    }
 
    #  Configuration options: (public variables)
