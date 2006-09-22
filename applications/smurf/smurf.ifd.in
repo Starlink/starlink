@@ -111,6 +111,8 @@
 #        Add BADBOLOS & made SC2SIM seed optional
 #     15-SEP-2006 (AGG):
 #        Rename DREAMWEIGHTS
+#     22-SEP-200 (JB):
+#        Changed OBSXMLFILE & SIMXMLFILE to OBSFILE & SIMFILE
 #     {enter_changes_here}
 
 #  Bugs:
@@ -498,19 +500,19 @@ package @PACKAGE@ {
 
      action sc2sim {
 
-          parameter obsxmlfile {
+          parameter obsfile {
             position 1
             type _CHAR
-            prompt {Observation XML file}
+            prompt {Observation file}
             vpath {PROMPT}
             ppath GLOBAL CURRENT
             helpkey *
           }
 
-          parameter simxmlfile {
+          parameter simfile {
             position 2
             type _CHAR
-            prompt {Simulation XML file}
+            prompt {Simulation file}
             vpath {PROMPT}
             ppath GLOBAL CURRENT
             helpkey *
