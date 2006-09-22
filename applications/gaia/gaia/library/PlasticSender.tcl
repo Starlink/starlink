@@ -49,6 +49,8 @@
 #        Original version.
 #     26-JUL-2006 (PWD):
 #        Fixed up support for non-FITS images.
+#     22-SEP-2006 (PWD):
+#        Added method to send a spectrum.
 #     {enter_further_changes_here}
 
 #-
@@ -75,7 +77,7 @@ itcl::class gaia::PlasticSender {
       #  methods.
       set image [$image_ctrl get_image]
 
-      #  If the image is FITS and has a filename which exists, 
+      #  If the image is FITS and has a filename which exists,
       #  we can just send a file: URL based on it.
       set file [$image cget -file]
       if { [$image isfits] && $file != {} && [::file exists $file] } {
@@ -86,7 +88,7 @@ itcl::class gaia::PlasticSender {
             error "error in FITS send: $::errorInfo"
          }
 
-      #  Otherwise life is more complicated.  We have to write the 
+      #  Otherwise life is more complicated.  We have to write the
       #  image to a temporary FITS file, send the load message
       #  synchronously, and then tidy up the file.
       } else {
@@ -112,28 +114,38 @@ itcl::class gaia::PlasticSender {
    }
 
    #  Sends a spectrum image to one or more listening PLASTIC applications.
-   #  If recipients is non-empty it gives a list of application
-   #  IDs for the applications to send to.  If empty, the message is
-   #  broadcast to all. The spectrum must be in FITS format and exist.
-   public method send_spectrum {spectrum recipients} {
+   #  If recipients is non-empty it gives a list of application IDs for the
+   #  applications to send to.  If empty, the message is broadcast to all. The
+   #  spectrum must be in FITS format and exist.  "shortname" is just some
+   #  simple value (usually OBJECT), and "coordunit" and "dataunit" the units
+   #  (SSAP/FITS standard).
+   public method send_spectrum {spectrum shortname coordunit dataunit
+                                recipients} {
       check_app_
       set msg_id "ivo://votech.org/spectrum/loadFromURL"
 
       #  Create a URL of the local filename given.
       if { [catch {
          set url [get_file_url_ $spectrum]
+
          set map(Access.Reference) $url
+         set map(Access.Format) "application/fits"
+         set map(Target.Name) $shortname
+         if { $dataunit != {} && $coordunit != {} } {
+            set map(vox:spectrum_units) "$coordunit $dataunit"
+         }
+
          set send_args [list [rpcvar string $url] \
                              [rpcvar string $url] \
                              [rpcvar struct map]]
          $plastic_app send_message_async $msg_id $send_args $recipients
       } msg] } {
-         error "error in FITS send: $::errorInfo"
+         error "error in spectrum send: $::errorInfo"
       }
    }
 
    #  Identify a particular sky position as of interest and transmit it
-   #  to other PLASTIC applications.  ra and dec are J2000 in either 
+   #  to other PLASTIC applications.  ra and dec are J2000 in either
    #  degrees or sexagesimal.
    #  If recipients is non-empty it gives a list of application
    #  IDs for the applications to send to.  If empty, the message is

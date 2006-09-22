@@ -1036,10 +1036,22 @@ itcl::class gaia::GaiaSpectralPlot {
       if { [catch {
          set sender [gaia::Gaia::get_plastic_sender]
          if { $sender != {} && $itk_option(-spec_writer) != {} } {
+
             set filename "GaiaTempPlasticSpectrum[incr count_].fits"
             $itk_option(-spec_writer) write_as_fits $filename
+
+            set shortname [$itk_option(-spec_writer) get_shortname]
+            if { $shortname == {} } {
+               set shortname "$filename"
+            }
+            set dataunit [$itk_component(canvas) itemcget $spectrum_ -dataunit]
+            set frameset [$itk_component(canvas) itemcget $spectrum_ -frameset]
+            set coordunit [gaiautils::astget $frameset "unit(1)"]
+
+            $sender send_spectrum $filename $shortname \
+               $coordunit $dataunit $recipients
+
             lappend temp_files_ $filename
-            $sender send_spectrum $filename $recipients
          }
       } msg]} {
          puts "selection send error: $msg"
