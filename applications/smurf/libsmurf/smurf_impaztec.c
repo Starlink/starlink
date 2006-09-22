@@ -55,6 +55,8 @@
 *        Fixed pointer problem with callc to smf_calc_telpos
 *     2006-09-12 (EC):
 *        Use direct sc2store and ndf calls instead of sc2sim_ndfwrdata
+*     2006-09-22 (JB):
+*        Removed dream & dxml includes
 
 *     {enter_further_changes_here}
 
@@ -117,9 +119,6 @@
 
 #include "libsc2sim/fhead.h"
 #include "libsc2sim/fhead_par.h"
-#include "libsc2sim/dream_par.h"
-#include "libsc2sim/dream.h"
-#include "libsc2sim/dxml_struct.h"
 #include "libsc2sim/sc2sim_par.h"
 #include "libsc2sim/sc2sim_struct.h"
 #include "libsc2sim/sc2sim.h"
