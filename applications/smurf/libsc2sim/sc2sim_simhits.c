@@ -13,16 +13,18 @@
 *     SC2SIM subroutine
 
 *  Invocation:
-*     sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
+*     sc2sim_simhits ( struct sc2sim_obs_struct *inx, 
+*                      struct sc2sim_sim_struct *sinx, 
 *                      double digcurrent, double digmean, double digscale, 
-*                      char filter[], int maxwrite, obsMode mode, int nbol, 
-*                      int rseed, double samptime, int *status);
+*                      char filter[], int maxwrite, obsMode mode, 
+*   		       mapCoordframe coordframe, int nbol, 
+*                      int rseed, double samptime, int *status)
 
 *  Arguments:
-*     inx = dxml_struct* (Given)
-*        Structure for values from XML
-*     sinx = dxml_sim_struct* (Given)
-*        Structure for sim values from XML
+*     inx = sc2sim_obs_struct* (Given)
+*        Structure for values from obsfile
+*     sinx = sc2sim_sim_struct* (Given)
+*        Structure for sim values from simfile
 *     digcurrent - double (Given)
 *        Digitisation mean current
 *     digmean = double (Given)
@@ -57,7 +59,7 @@
 *        Pointer to global status.
 
 *  Description:
-*     This runs a PONG simulation, generating only the weights map
+*     This runs a simulation, generating only the weights map
 
 *  Notes:
 
@@ -85,9 +87,11 @@
 *        Modified call to sc2sim_calctime to use new interface.
 *     2006-09-11 (EC):
 *        Fixed pointer problem with callc to smf_calc_telpos
-*     2006-09-22 (EC)
+*     2006-09-22 (EC):
 *        Added the ability to define scans in AzEl and RaDec coord. frames
 *        Removed another instance of hard-wired telescope coordinates
+*     2006-09-22 (JB):
+*        Use sc2sim_structs instead of dxml_structs
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -163,7 +167,8 @@ void slaDjcl(double djm, int *iy, int *im, int *id, double *fd, int *j);
 #define FUNC_NAME "sc2sim_simhits"
 #define LEN__METHOD 20
 
-void sc2sim_simhits ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
+void sc2sim_simhits ( struct sc2sim_obs_struct *inx, 
+                      struct sc2sim_sim_struct *sinx, 
                       double digcurrent, double digmean, double digscale, 
                       char filter[], int maxwrite, obsMode mode, 
 		      mapCoordframe coordframe, int nbol, 

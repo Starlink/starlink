@@ -13,15 +13,16 @@
 *     SC2SIM subroutine
 
 *  Invocation:
-*     sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
+*     sc2sim_heatrun ( struct sc2sim_obs_struct *inx, 
+*                      struct sc2sim_sim_struct *sinx, 
 *                      double coeffs[], double digcurrent, double digmean, 
 *                      double digscale, char filter[], double *heater, int nbol,
 *                      double *pzero, double samptime, int *status);
 
 *  Arguments:
-*     inx = dxml_struct* (Given)
+*     inx = sc2sim_obs_struct* (Given)
 *        Structure for values from XML
-*     sinx = dxml_sim_struct* (Given)
+*     sinx = sc2sim_sim_struct* (Given)
 *        Structure for sim values from XML
 *     coeffs = double[] (Given)
 *        Bolometer response coeffs
@@ -84,6 +85,9 @@
 *        Changed sc2head to JCMTState
 *     2006-08-08 (EC):
 *        Removed slaDjcl prototype and instead include star/slalib.h
+*     2006-09-22 (JB):
+*        Replaced dxml_structs with sc2sim_structs and removed
+*        DREAM-specific code.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -153,7 +157,8 @@
 #define FUNC_NAME "sc2sim_heatrun"
 #define LEN__METHOD 20
 
-void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
+void sc2sim_heatrun ( struct sc2sim_obs_struct *inx, 
+                      struct sc2sim_sim_struct *sinx, 
                       double coeffs[], double digcurrent, double digmean, 
                       double digscale, char filter[], double *heater, int nbol,
                       double *pzero, double samptime, int *status)
@@ -170,12 +175,12 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
    double *dbuf=NULL;              /* simulated data buffer */
    int *digits=NULL;               /* output data buffer */
    int *dksquid=NULL;              /* dark squid values */
-   char filename[DREAM__FLEN];     /* name of output file */
+   char filename[SC2SIM__FLEN];    /* name of output file */
    double *flatcal=NULL;           /* flatfield calibration */
    char flatname[SC2STORE_FLATLEN];/* flatfield algorithm name */
    double *flatpar=NULL;           /* flatfield parameters */
    double flux;                    /* flux at bolometer in pW */
-   static double fnoise[DREAM__MXSIM];    /* instr. noise for 1 bolometer */
+   static double fnoise[SC2SIM__MXSIM];    /* instr. noise for 1 bolometer */
    JCMTState *head;                /* per-frame headers */
    double *heatptr;                /* pointer to list of heater settings */ 
    int j;                          /* loop counter */
@@ -223,7 +228,7 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
       if ( sinx->add_fnoise == 1 ) {
 	 sigma = 1.0e-9;
 	 corner = 0.01;
-	 sc2sim_invf ( sigma, corner, samptime, DREAM__MXSIM, fnoise, status );
+	 sc2sim_invf ( sigma, corner, samptime, SC2SIM__MXSIM, fnoise, status );
       }
 
       /* Generate a measurement sequence for each bolometer. */
@@ -241,7 +246,7 @@ void sc2sim_heatrun ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 	    the power in FLUX is converted to a current in scalar CURRENT with 
 	    help of the polynomial expression with coefficients in COEFFS(*) */
 
-	 sc2sim_ptoi ( flux, NCOEFFS, coeffs, pzero[bol], 
+	 sc2sim_ptoi ( flux, SC2SIM__NCOEFFS, coeffs, pzero[bol], 
 	               &current, status);
 
 	 /* Store the value. */

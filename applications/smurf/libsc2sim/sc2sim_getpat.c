@@ -63,6 +63,8 @@
 *        C version
 *     2006-07-20 (JB):
 *        Split from dsim.c
+*     2006-09-22 (JB):
+*        Removed DREAM specific code.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -94,8 +96,6 @@
 
 /* SC2SIM includes */
 #include "sc2sim.h"
-
-#include "dream.h"
 
 void sc2sim_getpat
 (
@@ -141,7 +141,7 @@ int *status           /* global status (given and returned) */
       frac = 2.0 * AST__DPI / 256.0;
       *cycle_samples = 256;
 
-      if ( *cycle_samples > DREAM__MXSIM ) {
+      if ( *cycle_samples > SC2SIM__MXSIM ) {
          *status = DITS__APP_ERROR;
          printf ( "GETPAT: cycle_samples too large, increase DREAM__MXSIM\n" );
          return;
@@ -157,22 +157,17 @@ int *status           /* global status (given and returned) */
       /* Calculate positions corresponding to data samples */
       *cycle_samples = nvert * smu_samples;
 
-      if ( *cycle_samples > DREAM__MXSIM ) {
+      if ( *cycle_samples > SC2SIM__MXSIM ) {
          *status = DITS__APP_ERROR;
-         printf ( "GETPAT: cycle_samples too large, increase DREAM__MXSIM\n" );
+         printf ( "GETPAT: cycle_samples too large, increase SC2SIM__MXSIM\n" );
          return;
       }
 
       vertex_t = sample_t * smu_samples;
-      dream_smupath ( nvert, vertex_t, jig_vert, jig_stepx, jig_stepy, 
+      sc2sim_smupath ( nvert, vertex_t, jig_vert, jig_stepx, jig_stepy, 
                       move_code, smu_samples, sample_t, smu_offset,
                       *cycle_samples, pattern, status );
 
-   }
-
-   if ( dream_trace(1) ) {
-      printf ( "DSIM_GETPAT : %d Sample positions established\n", 
-               *cycle_samples );
    }
 
 }   

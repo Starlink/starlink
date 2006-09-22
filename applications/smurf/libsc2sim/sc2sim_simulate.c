@@ -13,7 +13,8 @@
 *     SC2SIM subroutine
 
 *  Invocation:
-*     sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
+*     sc2sim_simulate ( struct sc2sim_obs_struct *inx, 
+*                       struct sc2sim_sim_struct *sinx, 
 *                       double coeffs[], double digcurrent, double digmean, 
 *                       double digscale, char filter[], double *heater, 
 *                       int maxwrite, obsMode mode, mapCoordframe coordframe,
@@ -22,9 +23,9 @@
 *                       double *ybc, double *ybolo, int *status);
 
 *  Arguments:
-*     inx = dxml_struct* (Given)
+*     inx = sc2sim_obs_struct* (Given)
 *        Structure for values from XML
-*     sinx = dxml_sim_struct* (Given)
+*     sinx = sc2sim_sim_struct* (Given)
 *        Structure for sim values from XML
 *     coeffs = double[] (Given)
 *        Bolometer response coeffs
@@ -128,8 +129,10 @@
 *        Fixed pointer problem with callc to smf_calc_telpos
 *     2006-09-13 (EC):
 *        Removed another instance of hard-wired telescope coordinates
-*     2006-09-14 (EC)
+*     2006-09-14 (EC):
 *        Added the ability to define scans in AzEl and RaDec coord. frames
+*     2006-09-22 (JB):
+*        Replaced dxml_structs with sc2sim_structs
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -205,7 +208,8 @@ void slaDjcl(double djm, int *iy, int *im, int *id, double *fd, int *j);
 #define FUNC_NAME "sc2sim_simulate"
 #define LEN__METHOD 20
 
-void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx, 
+void sc2sim_simulate ( struct sc2sim_obs_struct *inx, 
+                       struct sc2sim_sim_struct *sinx, 
 		       double coeffs[], double digcurrent, double digmean, 
 		       double digscale, char filter[], double *heater, 
 		       int maxwrite, obsMode mode, mapCoordframe coordframe,
@@ -253,7 +257,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   int *dksquid=NULL;              /* dark squid values */
   double drytau183;               /* Broadband 183 GHz zenith optical depth */
   AstFitsChan *fc=NULL;           /* FITS channels for tanplane projection */
-  char filename[DREAM__FLEN];     /* name of output file */
+  char filename[SC2SIM__FLEN];    /* name of output file */
   int firstframe=0;               /* first frame in an output set */
   AstFrameSet *fitswcs=NULL;      /* Frameset for input image WCS */
   double *flatcal=NULL;           /* flatfield calibration */
@@ -263,11 +267,11 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   AstFrameSet *fs=NULL;           /* frameset for tanplane projection */
   double grid[64][2];             /* PONG grid coordinates */
   JCMTState *head;                /* per-frame headers */
-  char heatname[DREAM__FLEN];     /* name of flatfield cal file */
+  char heatname[SC2SIM__FLEN];    /* name of flatfield cal file */
   int i;                          /* loop counter */
   double instap[2];               /* Focal plane instrument offsets */
   int j;                          /* loop counter */
-  double jigptr[DREAM__MXSIM][2]; /* pointing: nas jiggle offsets from cen. */
+  double jigptr[SC2SIM__MXSIM][2]; /* pointing: nas jiggle offsets from cen. */
   int jigsamples=1;               /* number of samples in jiggle pattern */
   double *jig_y_hor=NULL;         /* jiggle y-horizontal tanplane offset */
   double *jig_x_hor=NULL;         /* jiggle x-horizontal tanplane offset */
@@ -276,7 +280,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   double *mjuldate=NULL;          /* modified Julian date each sample */
   int narray = 0;                 /* number of subarrays to generate */
   int nflat;                      /* number of flat coeffs per bol */
-  static double noisecoeffs[DREAM__MXBOL*3*60]; /* noise coefficients */
+  static double noisecoeffs[SC2SIM__MXBOL*3*60]; /* noise coefficients */
   int nterms=0;                   /* number of 1/f noise frequencies */
   int nwrite=0;                   /* number of frames to write */
   int outscan=0;                  /* count of scans completed */
@@ -334,11 +338,11 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
   if( *status == SAI__OK ) {
     /* Parse the list of subnames, find out how many subarrays to generate. */
     strcpy( arraynames, sinx->subname );
-    curtok = strtok ( arraynames, ", ");
+    curtok = strtok ( arraynames, ";");
     while ( curtok != NULL && narray < 4 ) {
       strcpy( subarrays[narray], curtok );
       narray++;
-      curtok = strtok (NULL, ", ");
+      curtok = strtok (NULL, ";");
     }
     
   }
@@ -427,7 +431,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
       srand ( rseed );
       
       /* Initialize SMU nasmyth jiggle offsets to 0 */
-      for( i=0; i<DREAM__MXSIM; i++ ) {
+      for( i=0; i<SC2SIM__MXSIM; i++ ) {
 	for( j=0; j<2; j++ ) {
 	  jigptr[i][j] = 0;
 	}
@@ -693,7 +697,7 @@ void sc2sim_simulate ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
 	  break;
 
 	default: /* should never be reached...*/
-	  errRep("", "Un-recongnized map coordinate frame", status);
+	  errRep("", "Un-recognized map coordinate frame", status);
 	  break;
 	}
 

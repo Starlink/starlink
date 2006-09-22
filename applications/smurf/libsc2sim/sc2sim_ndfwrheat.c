@@ -13,15 +13,16 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_ndfwrheat ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
+*     sc2sim_ndfwrheat ( struct sc2sim_obs_struct *inx, 
+*                        struct sc2sim_sim_struct *sinx,
 *                        char file_name[], int numsamples, int nflat, char *flatname, 
 *                        JCMTState *head, int *dbuf, int *dksquid, 
 *                        double *fcal, double *fpar, char filter[], int *status )
 
 *  Arguments:
-*     inx = dxml_struct* (Given)
+*     inx = sc2sim_obs_struct* (Given)
 *        Pointer to struct with observation parameters
-*     sinx = dxml_sim_struct* (Given)
+*     sinx = sc2sim_sim_struct* (Given)
 *        Pointer to struct with simulation parameters
 *     file_name = char[] (Given)
 *        Output file name 
@@ -75,6 +76,8 @@
 *        Changed sc2head to JCMTState
 *     2006-08-18 (AGG):
 *        Update API to take pointers to inx and sinx structs
+*     2006-09-22 (JB):
+*        Change dxml_structs to sc2sim_structs
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -116,8 +119,8 @@
 
 void sc2sim_ndfwrheat
 ( 
-struct dxml_struct *inx,      /* structure for values from XML (given) */
-struct dxml_sim_struct *sinx, /* structure for sim values from XML (given)*/
+struct sc2sim_obs_struct *inx,  /* structure for values from XML (given) */
+struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
 char file_name[],  /* output file name (given) */
 int numsamples,    /* number of samples (given) */
 int nflat,         /* number of flat coeffs per bol (given) */

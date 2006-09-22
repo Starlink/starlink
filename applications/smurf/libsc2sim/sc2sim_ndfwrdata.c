@@ -13,7 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_ndfwrdata ( struct dxml_struct *inx, struct dxml_sim_struct *sinx,
+*     sc2sim_ndfwrdata ( struct sc2sim_obs_struct *inx, 
+*                        struct sc2sim_sim_struct *sinx,
 *                        double meanwvm, char file_name[], 
 *                        int numsamples, int nflat, char *flatname, 
 *                        JCMTState *head, int *dbuf, int *dksquid, 
@@ -22,9 +23,9 @@
 *                        int *status )
 
 *  Arguments:
-*     inx = dxml_struct* (Given)
+*     inx = sc2sim_obs_struct* (Given)
 *        Pointer to struct with observation parameters
-*     sinx = dxml_sim_struct* (Given)
+*     sinx = sc2sim_sim_struct* (Given)
 *        Pointer to struct with simulation parameters
 *     meanwvm = double (Given)
 *        225 GHz tau
@@ -87,6 +88,8 @@
 *        INSTRUME keyword now taken as argument (to accomodate AzTEC)
 *     2006-09-15 (AGG):
 *        Write out name of DREAM weights file into FITS header
+*     2006-09-22 (JB):
+*        Replace dxml_structs with sc2sim_structs
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -128,8 +131,8 @@
 
 void sc2sim_ndfwrdata
 ( 
-struct dxml_struct *inx,      /* structure for values from XML (given) */
-struct dxml_sim_struct *sinx, /* structure for sim values from XML (given)*/
+struct sc2sim_obs_struct *inx,  /* structure for values from XML (given) */
+struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
 double meanwvm,   /* 225 GHz tau */
 char file_name[], /* output file name (given) */
 int numsamples,   /* number of samples (given) */

@@ -13,7 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_simframe ( struct dxml_struct inx, struct, dxml_sim_struct sinx, 
+*     sc2sim_simframe ( struct sc2sim_obs_struct inx, 
+*                       struct sc2sim_sim_struct sinx, 
 *                       int astnaxes[2], double astscale, double *astsim, 
 *                       int atmnaxes[2], double atmscale, double *atmsim, 
 *                       double coeffs[], AstFrameSet *fset, double heater[],
@@ -24,9 +25,9 @@
 *                       double *position, double *dbuf, int *status )
 
 *  Arguments:
-*     inx = dxml_struct (Given)
+*     inx = sc2sim_obs_struct (Given)
 *        Structure for values from XML
-*     sinx = dxml_sim_struct (Given)
+*     sinx = sc2sim_sim_struct (Given)
 *        Structure for sim values from XML
 *     astnaxes = int[2] (Given)
 *        Dimensions of simulated image
@@ -109,6 +110,9 @@
 *        Improved status handing
 *     2006-08-21 (EC):
 *        Fixed memory leak: freeing skycoord
+*     2006-09-22 (JB):
+*        Removed DREAM-specific code and replaced dxml_structs
+*        with sc2sim_structs
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -140,7 +144,6 @@
 
 /* SC2SIM includes */
 #include "sc2sim.h"
-#include "dream.h"
 
 /* Starlink includes */
 #include "ast.h"
@@ -153,8 +156,8 @@
 
 void sc2sim_simframe
 ( 
-struct dxml_struct inx,      /* structure for values from XML (given) */
-struct dxml_sim_struct sinx, /* structure for sim values from XML (given)*/
+struct sc2sim_obs_struct inx,  /* structure for values from XML (given) */
+struct sc2sim_sim_struct sinx, /* structure for sim values from XML (given)*/
 int astnaxes[2],             /* dimensions of simulated image (given) */
 double astscale,             /* pixel size in simulated image (given) */
 double *astsim,              /* astronomical sky (given) */
@@ -317,11 +320,6 @@ int *status                  /* global status (given and returned) */
 	   break;
          }
 	 
-         if ( dream_trace ( 4 ) ) { 
-	   printf ( "sc2sim : atm emission interpolated\n" );
-	   printf ( "status = %d\n", *status );
-         }
-	 
        } else {
          /* Otherwise, calculate the atmvalue from the tau */
          atmvalue = meanatm;
@@ -347,11 +345,6 @@ int *status                  /* global status (given and returned) */
          sc2sim_addpnoise ( inx.lambda, sinx.bandGHz, sinx.aomega, 
 		            samptime, &flux, status );
 	 
-         if ( dream_trace ( 4 ) ) { 
-	   printf ( "sc2sim : photon noise added\n" );
-	   printf ( "status = %d\n", *status );
-         }
-	 
        }
        
        /* Add heater, assuming mean heater level is set to add onto meanatm and
@@ -372,12 +365,8 @@ int *status                  /* global status (given and returned) */
 	  help of the polynomial expression with coefficients in COEFFS(*) */
        if ( sinx.flux2cur == 1 ) {
 	 
-         sc2sim_ptoi ( flux, NCOEFFS, coeffs, pzero[bol], &current, status );
-	 
-         if ( dream_trace ( 4 ) ) { 
-	   printf ( "sc2sim : converted to current\n" );
-	   printf ( "status = %d\n", *status );
-         }
+         sc2sim_ptoi ( flux, SC2SIM__NCOEFFS, coeffs, 
+                       pzero[bol], &current, status );
 	 
        } else {
          current = flux;
