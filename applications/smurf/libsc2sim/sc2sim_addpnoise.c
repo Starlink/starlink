@@ -50,6 +50,8 @@
 *        Use dsim_getsigma 
 *     2006-07-19 (JB):
 *        Split from dsim.c
+*     2006-09-22 (JB):
+*        Removed dream.h requirements
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -81,8 +83,6 @@
 
 /* SC2SIM includes */
 #include "sc2sim.h"
-#include "dream.h"
-#include "dream_par.h"
 
 void sc2sim_addpnoise 
 (
