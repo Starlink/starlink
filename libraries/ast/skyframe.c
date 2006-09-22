@@ -163,6 +163,9 @@ f     The SkyFrame class does not define any new routines beyond those
 *     22-AUG-2006 (DSB):
 *        Ensure the cached Local Apparent Siderial Time is initialised
 *        when initialising or loading a SkyFrame.
+*     22-SEP-2006 (DSB):
+*        Report an error in SetSystem if it is not possible to convert
+*        from old to new systems.
 *class--
 */
 
@@ -7281,24 +7284,32 @@ static void SetSystem( AstFrame *this_frame, AstSystemType system ) {
    to be careful to ensure that SkyRef is cleared above - doing so ensure 
    we do not end up with infinite recursion. */
       fs = astConvert( sfrm, this, "" );
+      if( !fs ) {
+         if( astOK ) {         
+            astError( AST__INTER, "astSetSystem(SkyFrame): Cannot convert " 
+                      "SkyRef positions from %s to %s.", 
+                      astGetC( sfrm, "System" ), astGetC( this, "System" ) );
+         }
 
 /* Use the Mapping to find the SkyRef and SkyRefP positions in the new 
    coordinate system. */
-      astTran2( fs, 2, xin, yin, 1, xout, yout );
+      } else {
+         astTran2( fs, 2, xin, yin, 1, xout, yout );
 
 /* Store the values as required. */
-      if( skyref_set ) {
-         astSetSkyRef( this, 0, xout[ 0 ] );
-         astSetSkyRef( this, 1, yout[ 0 ] );
-      }
-
-      if( skyrefp_set ) {
-         astSetSkyRefP( this, 0, xout[ 1 ] );
-         astSetSkyRefP( this, 1, yout[ 1 ] );
-      }
+         if( skyref_set ) {
+            astSetSkyRef( this, 0, xout[ 0 ] );
+            astSetSkyRef( this, 1, yout[ 0 ] );
+         }
+   
+         if( skyrefp_set ) {
+            astSetSkyRefP( this, 0, xout[ 1 ] );
+            astSetSkyRefP( this, 1, yout[ 1 ] );
+         }
 
 /* Free resources. */
-      fs = astAnnul( fs );
+         fs = astAnnul( fs );
+      }
       sfrm = astAnnul( sfrm );
    }
 }
