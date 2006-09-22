@@ -118,7 +118,7 @@ itcl::class gaia::GaiaSpectralPlot {
       add_help_button spectralplot "On Window..."
 
       #  If we have a GaiaSpecWriter instance then use that to add the
-      #  various save as options to this menu. The GaiaSpecWriter has 
+      #  various save as options to this menu. The GaiaSpecWriter has
       #  access to the original data, important to preserve as much
       #  information as possible.
       if { $itk_option(-spec_writer) != {} } {
@@ -288,6 +288,34 @@ itcl::class gaia::GaiaSpectralPlot {
          $itk_option(-spec_coords) add_menu $SpectralCoords
       }
 
+      #  Interoperability. Send spectrum to other PLASTIC enabled
+      #  applications, such as SPLAT.
+      set plastic_app_ [gaia::Gaia::get_plastic_app]
+      if { $plastic_app_ != {} } {
+
+         #  Add a new menu for PLASTIC-related activities.
+         set interopmenu_ [add_menubutton Interop]
+         set m $interopmenu_
+         add_short_help $itk_component(menubar).interop \
+            {Tool interoperability using PLASTIC}
+
+         set send_spectrum_menu [menu $m.send_spectrum]
+         add_menuitem $m command "Broadcast spectrum" \
+            {Send spectrum to all registered PLASTIC-enabled applications} \
+            -command [code $this send_spectrum {}]
+         add_menuitem $m cascade "Send spectrum" \
+            {Send spectrum to a specific PLASTIC-enabled application} \
+            -menu $send_spectrum_menu
+
+         #  Arrange for the menu to be kept up to date with the current state
+         #  of the PLASTIC connection.
+         $plastic_app_ plastic_reg_command [code $this plastic_reg_changed_]
+         plastic_reg_changed_
+         set tracker [$plastic_app_ cget -app_tracker]
+         $tracker plastic_apps_command [code $this plastic_apps_changed_]
+         plastic_apps_changed_
+      }
+
       #  Create the canvas. Pack inside a frame so that we can get the resize
       #  events and the new geometry to get the apparent size of canvas right.
       itk_component add canvasframe {
@@ -315,6 +343,15 @@ itcl::class gaia::GaiaSpectralPlot {
       #  No need to fail now, application is exiting.
       catch {
          reset
+      }
+
+      #  Delete any temporary files.
+      if { $temp_files_ != {} } {
+         foreach filename $temp_files_ {
+            if { [file exists $filename] } {
+               catch {::file delete $filename}
+            }
+         }
       }
    }
 
@@ -992,6 +1029,61 @@ itcl::class gaia::GaiaSpectralPlot {
       return [winfo height $itk_component(canvasframe)]
    }
 
+   #  PLASTIC support.
+
+   #  Send spectrum to be displayed in another application.
+   public method send_spectrum {recipients} {
+      if { [catch {
+         set sender [gaia::Gaia::get_plastic_sender]
+         if { $sender != {} && $itk_option(-spec_writer) != {} } {
+            set filename "GaiaTempPlasticSpectrum[incr count_].fits"
+            $itk_option(-spec_writer) write_as_fits $filename
+            lappend temp_files_ $filename
+            $sender send_spectrum $filename $recipients
+         }
+      } msg]} {
+         puts "selection send error: $msg"
+      }
+   }
+
+   #  Called when the PLASTIC connection goes up or down.
+   protected method plastic_reg_changed_ {} {
+
+      #  Configure the menu items all enabled/disabled according to whether
+      #  there is a PLASTIC connection.
+      set state disabled
+      if { $plastic_app_ != {} && [$plastic_app_ is_registered] } {
+         set state normal
+      }
+      set nitem [$interopmenu_ index last]
+      for { set item 0 } { $item < $nitem } { incr item } {
+         $interopmenu_ entryconfigure $item -state $state
+      }
+   }
+
+   #  Called when external applications register or unregister with PLASTIC.
+   protected method plastic_apps_changed_ {} {
+
+      #  Configure specific application menu so that it has one entry for
+      #  each of the currently registered PLASTIC applications capable of
+      #  receiving spectra.
+      set specific_menu $interopmenu_.send_spectrum
+      $specific_menu delete 0 last
+      if { [$plastic_app_ is_registered] } {
+         set tracker [$plastic_app_ cget -app_tracker]
+         set msg_id "ivo://votech.org/spectrum/loadFromURL"
+         set msg_apps [$tracker get_supporting_apps $msg_id]
+         foreach app $msg_apps {
+            set appname [$app cget -name]
+            set appid [$app cget -id]
+            add_menuitem $specific_menu command "Send to $appname" \
+               "Send spectrum to $appname" \
+               -command [code $this send_spectrum $appid]
+         }
+      }
+   }
+
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -1029,7 +1121,7 @@ itcl::class gaia::GaiaSpectralPlot {
    itk_option define -spec_coords spec_coords Spec_Coords {}
 
    #  A GaiaSpecWriter object for controlling saving spectra to disk.
-   #  This is done by re-visiting the cube, which we do not keep locally, 
+   #  This is done by re-visiting the cube, which we do not keep locally,
    #  but this menu naturally belongs here.
    itk_option define -spec_writer spec_writer Spec_Writer {}
 
@@ -1136,9 +1228,21 @@ itcl::class gaia::GaiaSpectralPlot {
       17 "-adobe-helvetica-bold-r-*-*-20-120-*-*-*-*-*-*"      "large screen"
    }
 
+   #  PlasticApp object used for PLASTIC connections.
+   protected variable plastic_app_
+
+   #  Interoperability menu.
+   protected variable interopmenu_
+
+   #  A list of the temporary files we create. These are deleted on object
+   #  destruction.
+   protected variable temp_files_ {}
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
+   #  Counter for creating unique names.
+   common count_ 0
 
 #  End of class definition.
 }
