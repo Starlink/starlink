@@ -20,6 +20,10 @@
     the Interop menu in the spectral plot window. Only SPLAT supports
     this at present.
 
+    Collapsed cubes now keep the result image in the same coordinates
+    as selected in the cube toolbox (gives correct units for integrated 
+    intensity).
+
   Release 3.2-0: 28th July 2006.
   ==============================
 
