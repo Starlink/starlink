@@ -114,10 +114,31 @@ itcl::class gaia::GaiaCubeCollapse {
       set tmpimage_ "GaiaTempCollapse${count_}"
       incr count_
 
+      #  If the coordinate system isn't default then we need to inform
+      #  COLLAPSE to use the correct values (for integrated intensities etc).
+      #  Since we can do that directly, ignore the values already available
+      #  as "lb" and "ub" and regenerate those (except if set_current_domain_
+      #  is true, as that means conversions are failing).
+      set wcsatts "!"
+      if { ! $set_current_domain_ } {
+         lassign [$itk_option(-spec_coords) get_system] system units
+         if { $system != "default" && $system != {} } {
+            set lb [expr min($itk_option(-lower_limit),$itk_option(-upper_limit))]
+            set ub [expr max($itk_option(-lower_limit),$itk_option(-upper_limit))]
+            set lb [$itk_option(-gaiacube) get_coord $lb 1 0]
+            set ub [$itk_option(-gaiacube) get_coord $ub 1 0]
+            if { $units != "default" && $units != {} } {
+               set wcsatts "system=$system,unit=$units"
+            } else {
+               set wcsatts "system=$system"
+            }
+         }
+      }
+
       $maintask_ runwiths "in=$ndfname out=$tmpimage_ axis=$axis \
                            low=$lb high=$ub estimator=$combination_type_ \
-                           accept"
-
+                           wcsatts=\"$wcsatts\" accept"
+      
       #  Tell cube to use these limits for spectral extraction.
       $itk_option(-gaiacube) set_extraction_range \
          $itk_option(-lower_limit) $itk_option(-upper_limit)
