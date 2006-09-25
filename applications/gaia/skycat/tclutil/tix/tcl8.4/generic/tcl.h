@@ -68,7 +68,7 @@ extern "C" {
  */
 
 #ifndef __WIN32__
-#   if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
+#   if defined(_WIN32) || defined(WIN32) || defined(__MINGW32__) || defined(__BORLANDC__)
 #	define __WIN32__
 #	ifndef WIN32
 #	    define WIN32
