@@ -364,7 +364,7 @@ itcl::class gaia::GaiaCubeApps {
 
    #  Set the SYSTEM and UNIT values for the current coordinate system of an
    #  NDF. Use when the underlying coordinate system needs to match that in
-   #  use. Note this designed to not return until the task is complete.
+   #  use. Note this is designed to not return until the task is complete.
    protected method set_coordinate_system_ {file system units} {
       if { $setwcsattrib_ == {} } {
          global env
