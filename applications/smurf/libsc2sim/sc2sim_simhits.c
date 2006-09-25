@@ -257,11 +257,11 @@ void sc2sim_simhits ( struct sc2sim_obs_struct *inx,
 
   /* Parse the list of subnames, find out how many subarrays to generate. */
   strcpy( arraynames, sinx->subname );
-  curtok = strtok ( arraynames, ", ");
+  curtok = strtok ( arraynames, ";");
   while ( curtok != NULL && narray < 4 ) {
     strcpy( subarrays[narray], curtok );
     narray++;
-    curtok = strtok (NULL, ", ");
+    curtok = strtok (NULL, ";");
   }
 
   /*  Re-initialise random number generator to give a different sequence
