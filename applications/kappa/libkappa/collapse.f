@@ -114,6 +114,33 @@
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
 *        propagates the title from the input NDF to the output NDF. [!]
+*     WCSATTS = GROUP (Read)
+*        A group of attribute settings which will be used to temporarily 
+*        modify the properties of the current co-ordinate Frame in the WCS 
+*        FrameSet before it is used. Supplying a list of attribute values for 
+*        this parameter is equivalent to invoking WCSATTRIB on the input NDF 
+*        prior to running this command, except that no permanent change
+*        is made to the NDF (however the changes are propagated through
+*        to the output NDF).
+*
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text 
+*        file preceded by an up-arrow character "^".  Such text files 
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are 
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the 
+*        same attribute.
+*
+*        Each individual attribute setting should be of the form:
+*
+*           <name>=<value>
+*
+*        where <name> is the name of a Frame attribute, and <value>
+*        is the value to assign to the attribute. Any unspecified attributes
+*        will retain the value they have in the supplied NDF.  No attribute
+*        values will be changed if a null value (!) is supplied.  Any 
+*        unrecognised attributes are ignored  (no error is reported). [!]
 *     WLIM = _REAL (Read)
 *        If the input NDF contains bad pixels, then this parameter
 *        may be used to determine the number of good pixels which must
@@ -287,6 +314,8 @@
 *        previous modification.  The revised NDF_PROP enables the
 *        file-size compression, and thus the temporary NDF is no longer
 *        required.
+*     25-SEP-2006 (DSB):
+*        Added WCSATTS parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -445,6 +474,9 @@
 
 *  Get the WCS FrameSet from the NDF.
       CALL KPG1_GTWCS( INDFI, IWCS, STATUS )
+
+*  Allow the user to modify the current Frame attributes.
+      CALL KPG1_ASSET( 'COLLAPSE', 'WCSATTS', IWCS, STATUS )
 
 *  Extract the current and base Frames, and get the number of axes in 
 *  the current Frame, and its title.

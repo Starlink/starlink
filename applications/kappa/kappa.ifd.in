@@ -8566,6 +8566,14 @@ package kappa {
             default !
             helpkey *
           }
+         parameter wcsatts {
+            type LITERAL
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {WCS attributes for input NDF}
+            helpkey *
+            default !
+          }
          parameter wlim {
             position 7
             type _REAL
@@ -12482,6 +12490,51 @@ iraf! {
             vpath DEFAULT
             default !
             prompt {Output title}
+            helpkey *
+          }
+
+      }
+
+      action meshfit {
+         alias {mesh(fit)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter box {
+            size *
+            type _INTEGER
+            ppath CURRENT DEFAULT
+            default 5
+            prompt {Cell dimensions, in pixels}
+            helpkey *
+          }
+
+         parameter ilevel {
+            type _INTEGER
+            ppath CURRENT DEFAULT
+            default 0
+            prompt {Information level}
+            helpkey *
+          }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {NDF to be fitted}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output NDF}
             helpkey *
           }
 

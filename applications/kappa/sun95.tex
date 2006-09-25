@@ -16939,6 +16939,37 @@ XV; PBMPLUS; NETPBM.
          \htmlref{Title}{apndf:title} for the output NDF structure.  A null value ({\tt{!}})
          propagates the title from the input NDF to the output NDF. {\tt [!]} }
       \sstsubsection{
+         WCSATTS = GROUP (Read)
+      }{
+         A group of attribute settings which will be used to temporarily
+	 modify the properties of the current co-ordinate Frame in the
+	 WCS FrameSet before it is used. Supplying a list of attribute
+	 values for this parameter is equivalent to invoking WCSATTRIB on
+	 the input NDF prior to running this command, except that no
+	 permanent change is made to the NDF (however the changes are
+	 propagated through to the output NDF).
+
+         A comma-separated list of strings should be given in which each
+	 string is either an attribute setting, or the name of a text
+	 file preceded by an up-arrow character {\tt "$\wedge$"}.  Such
+	 text files should contain further comma-separated lists which
+	 will be read and interpreted in the same manner.  Attribute
+	 settings are applied in the order in which they occur within the
+	 list, with later settings overriding any earlier settings given
+	 for the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and
+	 $<$value$>$ is the value to assign to the attribute. Any
+	 unspecified attributes will retain the value they have in the
+	 supplied NDF.  No attribute values will be changed if a null
+	 value ({\tt{!}}) is supplied.  Any unrecognised attributes are
+	 ignored (no error is reported).  {\tt [!]}
+      }
+      \sstsubsection{
          WLIM = \_REAL (Read)
       }{
          If the input NDF contains bad pixels, then this parameter
@@ -51029,6 +51060,13 @@ The following applications have been modified:
 The following applications have been modified:
 
 \begin{description}
+
+   \item [\htmlref{COLLAPSE}{COLLAPSE}] \mbox{}
+      \begin{itemize}
+         \item A new parameter called WCSATTS has been added which allows
+         changes to be made to the properties of the current WCS coordinate 
+         system read from the input NDF.
+      \end{itemize}
 
    \item [\htmlref{ROTATE}{ROTATE}] \mbox{}
       \begin{itemize}
