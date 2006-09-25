@@ -102,14 +102,17 @@ void findclumps( int *status ) {
 *        or a null (!) value is supplied, a set of default configuration 
 *        parameter values will be used.
 *
-*        A comma-separated list of strings should be given in which each
+*        The supplied value should be either a comma-separated list of strings 
+*        or the name of a text file preceded by an up-arrow character
+*        "^", containing one or more comma-separated list of strings. Each
 *        string is either a "keyword=value" setting, or the name of a text 
 *        file preceded by an up-arrow character "^". Such text files should
 *        contain further comma-separated lists which will be read and 
 *        interpreted in the same manner (any blank lines or lines beginning 
-*        with "#"). Settings are applied in the order in which they occur 
-*        within the list, with later settings over-riding any earlier 
-*        settings given for the same keyword.
+*        with "#" are ignored). Within a text file, newlines can be used
+*        as delimiters as well as commas. Settings are applied in the order 
+*        in which they occur within the list, with later settings over-riding 
+*        any earlier settings given for the same keyword.
 *
 *        Each individual setting should be of the form:
 *
