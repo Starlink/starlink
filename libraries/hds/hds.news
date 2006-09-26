@@ -1,6 +1,14 @@
 HDS Library
 -----------
 
+   Version 5.0-3
+   =============
+
+   The hds_link script now correctly links against Fortran EMS.
+
+   A bug which stopped the repeated opening of some files has been
+   fixed.
+
    Version 5.0
    ===========
 
