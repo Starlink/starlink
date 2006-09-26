@@ -203,6 +203,9 @@
 *        Changed to use a different return type for REAL functions. This
 *        effects g77 under 64-bit, when the f2c bindings expect the return
 *        value of a REAL function to be a double, not a float.
+*      25-SEP-2006 (PWD):
+*        Introduced F77_CREATE_IMPORT_CHARACTER. Match length of 
+*        F77_CREATE_CHARACTER to result from cnfCref.
 *     {enter_further_changes_here}
 *        
 
@@ -216,6 +219,7 @@
 #define CNF_MACROS
 
 #include <stdlib.h>
+#include <string.h>
 #include "star/mem.h"
 /*  This initial sections defines values for all macros. These are the	    */
 /*  values that are generally appropriate to an ANSI C compiler on Unix.    */
@@ -478,7 +482,7 @@
 #define DECLARE_CHARACTER_DYN(X)   F77_CHARACTER_TYPE *X;\
    int X##_length
 #define F77_CREATE_CHARACTER(X,L)  X=cnfCref(L);\
-   X##_length = L
+   X##_length = (L>0?L:1)
 
 /* Declare Dynamic Fortran arrays */
 #define DECLARE_INTEGER_ARRAY_DYN(X) F77_INTEGER_TYPE *X
@@ -555,6 +559,17 @@
 #define F77_EXPORT_UWORD(C,F) F=C
 #define F77_EXPORT_POINTER(C,F) F=cnfFptr(C)
 #define F77_EXPORT_LOCATOR(C,F) cnfExpch(C,F,DAT__SZLOC)
+
+/* Allow for character strings to be NULL, protects strlen. Note this 
+ * does not allow lengths to differ. */
+#define F77_CREATE_EXPORT_CHARACTER(C,F) \
+     if (C) { \
+        F77_CREATE_CHARACTER(F,strlen(C)); \
+        F77_EXPORT_CHARACTER(C,F,F##_length); \
+     } else { \
+        F77_CREATE_CHARACTER(F,1); \
+        F77_EXPORT_CHARACTER(" ",F,F##_length); \
+     }
 
 /* Export C arrays to Fortran */
 /* Arrays are assumed to be 1-d so just the number of elements is given  */

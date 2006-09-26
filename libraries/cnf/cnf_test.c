@@ -13,7 +13,7 @@ int main()
 {
    /* include trailing spaces */
    char input[] = "Twenty six characters long     ";
-   char *string, *string2;
+   char *string, *string2, nullstring, nullstring2;
    int clength,flength;
    void * dummy;
 
@@ -35,6 +35,16 @@ int main()
    /* Export/Import to itself */
    cnfExprt( string, string, strlen(input) );
    cnfImprt( string, strlen(input), string );
+
+   /* NULL input string test */
+   nullstring = NULL;
+   cnfExprt( nullstring, string2, strlen(input) );
+   cnfImprt( string2, strlen(input), string );
+   if ( string[0] == '\0' ) {
+       printf("Passed NULL handling test\n");
+   } else {
+       printf("FAIL: NULL handling test\n");
+   }
 
    cnfFree( string );
    cnfFree( string2 );

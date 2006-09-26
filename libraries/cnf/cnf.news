@@ -1,10 +1,27 @@
 1 CNF_update
 
+ CNF Version 4.2-2 is released.
+
+ o New macro F77_CREATE_EXPORT_CHARACTER to combine F77_CREATE_CHARACTER
+   and F77_EXPORT_CHARACTER into one operation that also checks for NULL
+   C strings. Using this macro treats NULL C strings as a blank Fortran
+   character string of size 1.
+
+ o cnfCref now handles a request for a negative number of bytes in the 
+   same fashion as zero bytes. That is a string of size 1 is created.
+
+ o cnfExprt now handles NULL input C strings by filling the output Fortran
+   string with blanks.
+
+ o cnfImprt now ignores NULL C output strings.
+
  CNF Version 4.2 is released.
 
  o Now uses the starmem library for memory allocation.
+
  o Add cnfRealloc routine (like realloc but guarantees the pointer
    is registered)
+
  o Officially released under the GNU Public Licence.
 
  CNF Version 4.1 is released.

@@ -62,6 +62,7 @@ void cnfImprt( const char *source_f, int source_len, char *dest_c )
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -73,6 +74,8 @@ void cnfImprt( const char *source_f, int source_len, char *dest_c )
 *        Specify const char * for input strings
 *     25-NOV-2005 (TIMJ):
 *        Allow the strings to be identical
+*     26-SEP-2006 (PWD):
+*        Ignore NULL output pointer. Previously just crashed.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -94,14 +97,15 @@ void cnfImprt( const char *source_f, int source_len, char *dest_c )
       ;
 
 /* Put a null character at the end of the output C string.		    */
-
-   dest_c[i+1] = '\0';
+   if ( dest_c ) {
+      dest_c[i+1] = '\0';
 
 /* Copy the characters from the input FORTRAN string to the output C	    */
 /* string if the strings are different.				      	    */
 
-   if (dest_c != source_f ) {
-     memmove( dest_c, source_f, i+1 );
+      if ( dest_c != source_f ) {
+         memmove( dest_c, source_f, i+1 );
+      }
    }
 }
 

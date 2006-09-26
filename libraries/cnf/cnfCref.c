@@ -42,6 +42,7 @@ F77_CHARACTER_ARG_TYPE *cnfCref( int length )
 
 *  Copyright:
 *     Copyright (C) 1996 CCLRC
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -61,11 +62,18 @@ F77_CHARACTER_ARG_TYPE *cnfCref( int length )
 
 *  Authors:
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
 *     12-JAN-1996 (AJC):
 *        Original version.
+*     20-SEP-2005 (TIMJ):
+*        Use starmem.
+*     26-SEP-2006 (PWD):
+*        Deal with negative length requests as if zero, and return 
+*        a string of size one.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -77,19 +85,17 @@ F77_CHARACTER_ARG_TYPE *cnfCref( int length )
 
 {
 /* Local Variables:							    */
-
-   F77_CHARACTER_ARG_TYPE *ptr;			 /* A pointer to the string allocated       */
-
+   F77_CHARACTER_ARG_TYPE *ptr;	 /* A pointer to the string allocated       */
 
 /* Allocate the space.							    */
-
-   ptr = (F77_CHARACTER_ARG_TYPE *)starMallocAtomic( (size_t)( length?length:1 ) );
+   ptr = (F77_CHARACTER_ARG_TYPE *)
+       starMallocAtomic( (size_t)( ( length > 0 ) ? length : 1 ) );
 
 /* Check for malloc returning a null value. If it does not, set the string  */
 /* to the null character.						    */
-
-   if( ptr != 0 )
-      ptr[0] = '\0';
+   if ( ptr != 0 ) {
+       ptr[0] = '\0';
+   }
 
    return( ptr );
 }
