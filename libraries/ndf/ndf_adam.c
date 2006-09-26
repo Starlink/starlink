@@ -17,6 +17,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006 Particle Physics and Astronomy Reseach Council
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -37,6 +38,7 @@
 *  Authors:
 *     AJC: Alan Chipperfield (STARLINK, RAL)
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     <{enter_new_authors_here}>
 
 *  History:
@@ -44,16 +46,17 @@
 *        Original version.
 *     1-OCT-1998 (RFWS):
 *        Incorporated into the NDF_ library.
+*     26-SEP-2006 (PWD):
+*        Removed CNF workarounds. Change to use F77_CREATE_EXPORT_CHARACTER
+*        macro for input arguments.  This checks for NULL strings and passes
+*        on a blank Fortran string instead of crashing during a
+*        strlen(NULL). 
 *     <{enter_further_changes_here}>
 *-
 */
 
 /* Macro definitions for this module. */
 /* ================================== */
-/* These are work-arounds for problems with "const" handling by
-   CNF. They should be removed when these problems are fixed. */
-#define fix_F77_EXPORT_CHARACTER(a,b,c) F77_EXPORT_CHARACTER(((char *)(a)),(b),(c));
-#define fix_F77_EXPORT_INTEGER_ARRAY(a,b,c) F77_EXPORT_INTEGER_ARRAY(((int *)(a)),(b),(c));
 
 /* Header files. */
 /* ============= */
@@ -86,10 +89,8 @@ DECLARE_CHARACTER_DYN(fmode);
 DECLARE_INTEGER(findf);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( fparam, strlen( param ) );
-   fix_F77_EXPORT_CHARACTER( param, fparam, fparam_length );
-   F77_CREATE_CHARACTER( fmode, strlen( mode ) );
-   fix_F77_EXPORT_CHARACTER( mode, fmode, fmode_length );
+   F77_CREATE_EXPORT_CHARACTER( param, fparam );
+   F77_CREATE_EXPORT_CHARACTER( mode, fmode );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_assoc)( CHARACTER_ARG(fparam),
@@ -124,11 +125,9 @@ DECLARE_INTEGER(findf);
 DECLARE_CHARACTER_DYN(fcomp);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( fparam, strlen( param ) );
-   fix_F77_EXPORT_CHARACTER( param, fparam, fparam_length );
+   F77_CREATE_EXPORT_CHARACTER( param, fparam );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   fix_F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_cinp)( CHARACTER_ARG(fparam),
@@ -171,15 +170,13 @@ DECLARE_INTEGER_ARRAY_DYN(fubnd);
 DECLARE_INTEGER(findf);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( fparam, strlen( param ) );
-   fix_F77_EXPORT_CHARACTER( param, fparam, fparam_length );
-   F77_CREATE_CHARACTER( fftype, strlen( ftype ) );
-   fix_F77_EXPORT_CHARACTER( ftype, fftype, fftype_length );
+   F77_CREATE_EXPORT_CHARACTER( param, fparam );
+   F77_CREATE_EXPORT_CHARACTER( ftype, fftype );
    F77_EXPORT_INTEGER( ndim, fndim );
    F77_CREATE_INTEGER_ARRAY( flbnd, ndim );
-   fix_F77_EXPORT_INTEGER_ARRAY( lbnd, flbnd, ndim );
+   F77_EXPORT_INTEGER_ARRAY( lbnd, flbnd, ndim );
    F77_CREATE_INTEGER_ARRAY( fubnd, ndim );
-   fix_F77_EXPORT_INTEGER_ARRAY( ubnd, fubnd, ndim );
+   F77_EXPORT_INTEGER_ARRAY( ubnd, fubnd, ndim );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_creat)( CHARACTER_ARG(fparam),
@@ -225,13 +222,11 @@ DECLARE_INTEGER_ARRAY_DYN(fubnd);
 DECLARE_INTEGER(findf);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( fparam, strlen( param ) );
-   fix_F77_EXPORT_CHARACTER( param, fparam, fparam_length );
-   F77_CREATE_CHARACTER( fftype, strlen( ftype ) );
-   fix_F77_EXPORT_CHARACTER( ftype, fftype, fftype_length );
+   F77_CREATE_EXPORT_CHARACTER( param, fparam );
+   F77_CREATE_EXPORT_CHARACTER( ftype, fftype );
    F77_EXPORT_INTEGER( ndim, fndim );
    F77_CREATE_INTEGER_ARRAY( fubnd, ndim );
-   fix_F77_EXPORT_INTEGER_ARRAY( ubnd, fubnd, ndim );
+   F77_EXPORT_INTEGER_ARRAY( ubnd, fubnd, ndim );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_crep)( CHARACTER_ARG(fparam),
@@ -269,10 +264,8 @@ DECLARE_CHARACTER_DYN(fmode);
 DECLARE_INTEGER(findf);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( fparam, strlen( param ) );
-   fix_F77_EXPORT_CHARACTER( param, fparam, fparam_length );
-   F77_CREATE_CHARACTER( fmode, strlen( mode ) );
-   fix_F77_EXPORT_CHARACTER( mode, fmode, fmode_length );
+   F77_CREATE_EXPORT_CHARACTER( param, fparam );
+   F77_CREATE_EXPORT_CHARACTER( mode, fmode );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_exist)( CHARACTER_ARG(fparam),
@@ -311,10 +304,8 @@ DECLARE_INTEGER(findf2);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf1, findf1 );
-   F77_CREATE_CHARACTER( fclist, strlen( clist ) );
-   fix_F77_EXPORT_CHARACTER( clist, fclist, fclist_length );
-   F77_CREATE_CHARACTER( fparam, strlen( param ) );
-   fix_F77_EXPORT_CHARACTER( param, fparam, fparam_length );
+   F77_CREATE_EXPORT_CHARACTER( clist, fclist );
+   F77_CREATE_EXPORT_CHARACTER( param, fparam );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_prop)( INTEGER_ARG(&findf1),

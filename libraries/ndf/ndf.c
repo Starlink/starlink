@@ -16,6 +16,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -36,6 +37,7 @@
 *  Authors:
 *     AJC: A.J. Chipperfield (STARLINK, RAL)
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     <{enter_new_authors_here}>
 
 *  History:
@@ -49,6 +51,12 @@
 *        HDS Locators should be HDSLoc* not char [DAT__SZLOC]
 *     06-DEC-2005 (TIMJ):
 *        Add descriptive error message when locator import/export error
+*     26-SEP-2006 (PWD):
+*        Change to use F77_CREATE_EXPORT_CHARACTER macro for input arguments.
+*        This checks for NULL strings and passes on a blank Fortran string
+*        instead of crashing during a strlen(NULL). Other changes to CNF
+*        should protect against "given and returned" strings being NULL
+*        or having zero or negative length.
 *     <{enter_further_changes_here}>
 *-
 */
@@ -169,8 +177,7 @@ DECLARE_CHARACTER_DYN(fvalue);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_CREATE_CHARACTER( fvalue, value_length-1 );
    F77_EXPORT_CHARACTER( value, fvalue, fvalue_length );
@@ -212,8 +219,7 @@ DECLARE_INTEGER(flength);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -251,11 +257,9 @@ DECLARE_CHARACTER_DYN(fcomp);
 DECLARE_INTEGER(fiaxis);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( ftoken, strlen( token ) );
-   F77_EXPORT_CHARACTER( token, ftoken, ftoken_length );
+   F77_CREATE_EXPORT_CHARACTER( token, ftoken );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -294,11 +298,9 @@ DECLARE_CHARACTER_DYN(fcomp);
 DECLARE_INTEGER(fiaxis);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( fvalue, strlen( value ) );
-   F77_EXPORT_CHARACTER( value, fvalue, fvalue_length );
+   F77_CREATE_EXPORT_CHARACTER( value, fvalue );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -359,8 +361,7 @@ DECLARE_CHARACTER_DYN(fform);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_CREATE_CHARACTER( fform, form_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
@@ -413,14 +414,11 @@ DECLARE_INTEGER(fstatus);
 int nfield;
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    nfield = CountFields( comp );
    F77_EXPORT_INTEGER( iaxis, fiaxis );
-   F77_CREATE_CHARACTER( ftype, strlen( type ) );
-   F77_EXPORT_CHARACTER( type, ftype, ftype_length );
-   F77_CREATE_CHARACTER( fmmod, strlen( mmod ) );
-   F77_EXPORT_CHARACTER( mmod, fmmod, fmmod_length );
+   F77_CREATE_EXPORT_CHARACTER( type, ftype );
+   F77_CREATE_EXPORT_CHARACTER( mmod, fmmod );
    F77_CREATE_POINTER_ARRAY( fpntr, nfield );
    F77_ASSOC_POINTER_ARRAY( fpntr, pntr );
    F77_EXPORT_INTEGER( *status, fstatus );
@@ -516,8 +514,7 @@ DECLARE_INTEGER(fiaxis);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -583,8 +580,7 @@ DECLARE_LOGICAL(fstate);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -622,11 +618,9 @@ DECLARE_CHARACTER_DYN(fcomp);
 DECLARE_INTEGER(fiaxis);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( ftype, strlen( type ) );
-   F77_EXPORT_CHARACTER( type, ftype, ftype_length );
+   F77_CREATE_EXPORT_CHARACTER( type, ftype );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -667,8 +661,7 @@ DECLARE_CHARACTER_DYN(ftype);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_CREATE_CHARACTER( ftype, type_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
@@ -706,8 +699,7 @@ DECLARE_INTEGER(fiaxis);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -743,8 +735,7 @@ DECLARE_LOGICAL(fbad);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_LOGICAL( check, fcheck );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -928,8 +919,7 @@ DECLARE_CHARACTER_DYN(fvalue);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_CREATE_CHARACTER( fvalue, value_length-1 );
    F77_EXPORT_CHARACTER( value, fvalue, fvalue_length );
    F77_EXPORT_INTEGER( *status, fstatus );
@@ -1001,8 +991,7 @@ DECLARE_INTEGER(flength);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_clen)( INTEGER_ARG(&findf),
@@ -1060,8 +1049,7 @@ DECLARE_LOGICAL(fcmplx);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_cmplx)( INTEGER_ARG(&findf),
@@ -1094,11 +1082,9 @@ DECLARE_INTEGER(findf);
 DECLARE_CHARACTER_DYN(fcomp);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( ftoken, strlen( token ) );
-   F77_EXPORT_CHARACTER( token, ftoken, ftoken_length );
+   F77_CREATE_EXPORT_CHARACTER( token, ftoken );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_cmsg)( CHARACTER_ARG(ftoken),
@@ -1163,11 +1149,9 @@ DECLARE_INTEGER(findf);
 DECLARE_CHARACTER_DYN(fcomp);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( fvalue, strlen( value ) );
-   F77_EXPORT_CHARACTER( value, fvalue, fvalue_length );
+   F77_CREATE_EXPORT_CHARACTER( value, fvalue );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_cput)( CHARACTER_ARG(fvalue),
@@ -1287,8 +1271,7 @@ DECLARE_INTEGER(fstatus);
 	}
       }
    }
-   F77_CREATE_CHARACTER( fname, strlen( name ) );
-   F77_EXPORT_CHARACTER( name, fname, fname_length );
+   F77_CREATE_EXPORT_CHARACTER( name, fname );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_find)( CHARACTER_ARG(floc),
@@ -1324,8 +1307,7 @@ DECLARE_CHARACTER_DYN(fform);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_CREATE_CHARACTER( fform, form_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -1363,8 +1345,7 @@ DECLARE_CHARACTER_DYN(fftype);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_CREATE_CHARACTER( fftype, ftype_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -1396,8 +1377,7 @@ DECLARE_CHARACTER_DYN(ftpar);
 DECLARE_INTEGER(fvalue);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( ftpar, strlen( tpar ) );
-   F77_EXPORT_CHARACTER( tpar, ftpar, ftpar_length );
+   F77_CREATE_EXPORT_CHARACTER( tpar, ftpar );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_gtune)( CHARACTER_ARG(ftpar),
@@ -1451,8 +1431,7 @@ void ndfHappn( const char *appn,
 DECLARE_CHARACTER_DYN(fappn);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( fappn, strlen( appn ) );
-   F77_EXPORT_CHARACTER( appn, fappn, fappn_length );
+   F77_CREATE_EXPORT_CHARACTER( appn, fappn );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_happn)( CHARACTER_ARG(fappn),
@@ -1499,8 +1478,7 @@ DECLARE_CHARACTER_DYN(fappn);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fappn, strlen( appn ) );
-   F77_EXPORT_CHARACTER( appn, fappn, fappn_length );
+   F77_CREATE_EXPORT_CHARACTER( appn, fappn );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_hdef)( INTEGER_ARG(&findf),
@@ -1629,8 +1607,7 @@ DECLARE_CHARACTER_DYN(fvalue);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fitem, strlen( item ) );
-   F77_EXPORT_CHARACTER( item, fitem, fitem_length );
+   F77_CREATE_EXPORT_CHARACTER( item, fitem );
    F77_EXPORT_INTEGER( irec, firec );
    F77_CREATE_CHARACTER( fvalue, value_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
@@ -1808,10 +1785,8 @@ int l;
 int len;
 
 
-   F77_CREATE_CHARACTER( fhmode, strlen( hmode ) );
-   F77_EXPORT_CHARACTER( hmode, fhmode, fhmode_length );
-   F77_CREATE_CHARACTER( fappn, strlen( appn ) );
-   F77_EXPORT_CHARACTER( appn, fappn, fappn_length );
+   F77_CREATE_EXPORT_CHARACTER( hmode, fhmode );
+   F77_CREATE_EXPORT_CHARACTER( appn, fappn );
    F77_EXPORT_LOGICAL( repl, frepl );
    F77_EXPORT_INTEGER( nlines, fnlines );
    for ( len = 1, i = 0; i < nlines; i++ ) {
@@ -1861,8 +1836,7 @@ DECLARE_CHARACTER_DYN(fhmode);
 DECLARE_INTEGER(findf);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( fhmode, strlen( hmode ) );
-   F77_EXPORT_CHARACTER( hmode, fhmode, fhmode_length );
+   F77_CREATE_EXPORT_CHARACTER( hmode, fhmode );
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -1894,8 +1868,7 @@ DECLARE_LOGICAL(fisacc);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( faccess, strlen( access ) );
-   F77_EXPORT_CHARACTER( access, faccess, faccess_length );
+   F77_CREATE_EXPORT_CHARACTER( access, faccess );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_isacc)( INTEGER_ARG(&findf),
@@ -1979,8 +1952,7 @@ DECLARE_CHARACTER(floc,DAT__SZLOC);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fmode, strlen( mode ) );
-   F77_EXPORT_CHARACTER( mode, fmode, fmode_length );
+   F77_CREATE_EXPORT_CHARACTER( mode, fmode );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_loc)( INTEGER_ARG(&findf),
@@ -2036,13 +2008,10 @@ DECLARE_INTEGER(fstatus);
 int nfield;
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    nfield = CountFields( comp );
-   F77_CREATE_CHARACTER( ftype, strlen( type ) );
-   F77_EXPORT_CHARACTER( type, ftype, ftype_length );
-   F77_CREATE_CHARACTER( fmmod, strlen( mmod ) );
-   F77_EXPORT_CHARACTER( mmod, fmmod, fmmod_length );
+   F77_CREATE_EXPORT_CHARACTER( type, ftype );
+   F77_CREATE_EXPORT_CHARACTER( mmod, fmmod );
    F77_CREATE_POINTER_ARRAY( fpntr, nfield );
    F77_ASSOC_POINTER_ARRAY( fpntr, pntr );
    F77_EXPORT_INTEGER( *status, fstatus );
@@ -2136,13 +2105,10 @@ DECLARE_INTEGER(fstatus);
 int nfield;
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    nfield = CountFields( comp );
-   F77_CREATE_CHARACTER( ftype, strlen( type ) );
-   F77_EXPORT_CHARACTER( type, ftype, ftype_length );
-   F77_CREATE_CHARACTER( fmmod, strlen( mmod ) );
-   F77_EXPORT_CHARACTER( mmod, fmmod, fmmod_length );
+   F77_CREATE_EXPORT_CHARACTER( type, ftype );
+   F77_CREATE_EXPORT_CHARACTER( mmod, fmmod );
    F77_CREATE_POINTER_ARRAY( frpntr, nfield );
    F77_ASSOC_POINTER_ARRAY( frpntr, rpntr );
    F77_CREATE_POINTER_ARRAY( fipntr, nfield );
@@ -2202,8 +2168,7 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL( badok, fbadok );
    F77_EXPORT_INTEGER( indf1, findf1 );
    F77_EXPORT_INTEGER( indf2, findf2 );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_LOGICAL( check, fcheck );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -2252,8 +2217,7 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( n, fn );
    F77_CREATE_INTEGER_ARRAY( fndfs, n );
    F77_EXPORT_INTEGER_ARRAY( ndfs, fndfs, n );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_LOGICAL( check, fcheck );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -2290,8 +2254,7 @@ DECLARE_INTEGER(findf1);
 DECLARE_INTEGER(findf2);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( foption, strlen( option ) );
-   F77_EXPORT_CHARACTER( option, foption, foption_length );
+   F77_CREATE_EXPORT_CHARACTER( option, foption );
    F77_EXPORT_INTEGER( *indf1, findf1 );
    F77_EXPORT_INTEGER( *indf2, findf2 );
    F77_EXPORT_INTEGER( *status, fstatus );
@@ -2326,8 +2289,7 @@ DECLARE_INTEGER(fn);
 DECLARE_INTEGER_ARRAY_DYN(fndfs);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( foption, strlen( option ) );
-   F77_EXPORT_CHARACTER( option, foption, foption_length );
+   F77_CREATE_EXPORT_CHARACTER( option, foption );
    F77_EXPORT_INTEGER( n, fn );
    F77_CREATE_INTEGER_ARRAY( fndfs, n );
    F77_EXPORT_INTEGER_ARRAY( ndfs, fndfs, n );
@@ -2357,8 +2319,7 @@ void ndfMsg( const char *token,
 DECLARE_CHARACTER_DYN(ftoken);
 DECLARE_INTEGER(findf);
 
-   F77_CREATE_CHARACTER( ftoken, strlen( token ) );
-   F77_EXPORT_CHARACTER( token, ftoken, ftoken_length );
+   F77_CREATE_EXPORT_CHARACTER( token, ftoken );
    F77_EXPORT_INTEGER( indf, findf );
 
    F77_CALL(ndf_msg)( CHARACTER_ARG(ftoken),
@@ -2400,12 +2361,10 @@ DECLARE_CHARACTER_DYN(fitype);
 DECLARE_CHARACTER_DYN(fdtype);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( ftyplst, strlen( typlst ) );
-   F77_EXPORT_CHARACTER( typlst, ftyplst, ftyplst_length );
+   F77_CREATE_EXPORT_CHARACTER( typlst, ftyplst );
    F77_EXPORT_INTEGER( indf1, findf1 );
    F77_EXPORT_INTEGER( indf2, findf2 );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_CREATE_CHARACTER( fitype, itype_length-1 );
    F77_CREATE_CHARACTER( fdtype, dtype_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
@@ -2463,13 +2422,11 @@ DECLARE_CHARACTER_DYN(fitype);
 DECLARE_CHARACTER_DYN(fdtype);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( ftyplst, strlen( typlst ) );
-   F77_EXPORT_CHARACTER( typlst, ftyplst, ftyplst_length );
+   F77_CREATE_EXPORT_CHARACTER( typlst, ftyplst );
    F77_EXPORT_INTEGER( n, fn );
    F77_CREATE_INTEGER_ARRAY( fndfs, n );
    F77_EXPORT_INTEGER_ARRAY( ndfs, fndfs, n );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_CREATE_CHARACTER( fitype, itype_length-1 );
    F77_CREATE_CHARACTER( fdtype, dtype_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
@@ -2590,8 +2547,7 @@ DECLARE_INTEGER(fplace);
 DECLARE_INTEGER(findf);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( fftype, strlen( ftype ) );
-   F77_EXPORT_CHARACTER( ftype, fftype, fftype_length );
+   F77_CREATE_EXPORT_CHARACTER( ftype, fftype );
    F77_EXPORT_INTEGER( ndim, fndim );
    F77_CREATE_INTEGER_ARRAY( flbnd, ndim );
    F77_EXPORT_INTEGER_ARRAY( lbnd, flbnd, ndim );
@@ -2641,8 +2597,7 @@ DECLARE_INTEGER(fplace);
 DECLARE_INTEGER(findf);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( fftype, strlen( ftype ) );
-   F77_EXPORT_CHARACTER( ftype, fftype, fftype_length );
+   F77_CREATE_EXPORT_CHARACTER( ftype, fftype );
    F77_EXPORT_INTEGER( ndim, fndim );
    F77_CREATE_INTEGER_ARRAY( fubnd, ndim );
    F77_EXPORT_INTEGER_ARRAY( ubnd, fubnd, ndim );
@@ -2679,8 +2634,7 @@ DECLARE_CHARACTER_DYN(faccess);
 DECLARE_INTEGER(findf);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( faccess, strlen( access ) );
-   F77_EXPORT_CHARACTER( access, faccess, faccess_length );
+   F77_CREATE_EXPORT_CHARACTER( access, faccess );
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -2736,12 +2690,9 @@ DECLARE_INTEGER(fstatus);
       }
    }
 
-   F77_CREATE_CHARACTER( fname, strlen( name ) );
-   F77_EXPORT_CHARACTER( name, fname, fname_length );
-   F77_CREATE_CHARACTER( fmode, strlen( mode ) );
-   F77_EXPORT_CHARACTER( mode, fmode, fmode_length );
-   F77_CREATE_CHARACTER( fstat, strlen( stat ) );
-   F77_EXPORT_CHARACTER( stat, fstat, fstat_length );
+   F77_CREATE_EXPORT_CHARACTER( name, fname );
+   F77_CREATE_EXPORT_CHARACTER( mode, fmode );
+   F77_CREATE_EXPORT_CHARACTER( stat, fstat );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_open)( CHARACTER_ARG(floc),
@@ -2795,8 +2746,7 @@ DECLARE_INTEGER(fstatus);
        }
      }
    }
-   F77_CREATE_CHARACTER( fname, strlen( name ) );
-   F77_EXPORT_CHARACTER( name, fname, fname_length );
+   F77_CREATE_EXPORT_CHARACTER( name, fname );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_place)( CHARACTER_ARG(floc),
@@ -2877,8 +2827,7 @@ DECLARE_CHARACTER_DYN(fcomp);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_reset)( INTEGER_ARG(&findf),
@@ -2945,8 +2894,7 @@ DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_LOGICAL( bad, fbad );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_sbad)( LOGICAL_ARG(&fbad),
@@ -3045,8 +2993,7 @@ DECLARE_INTEGER(findf2);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf1, findf1 );
-   F77_CREATE_CHARACTER( fclist, strlen( clist ) );
-   F77_EXPORT_CHARACTER( clist, fclist, fclist_length );
+   F77_CREATE_EXPORT_CHARACTER( clist, fclist );
    F77_EXPORT_INTEGER( *place, fplace );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -3238,8 +3185,7 @@ DECLARE_LOGICAL(fstate);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_state)( INTEGER_ARG(&findf),
@@ -3272,11 +3218,9 @@ DECLARE_INTEGER(findf);
 DECLARE_CHARACTER_DYN(fcomp);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( fftype, strlen( ftype ) );
-   F77_EXPORT_CHARACTER( ftype, fftype, fftype_length );
+   F77_CREATE_EXPORT_CHARACTER( ftype, fftype );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_stype)( CHARACTER_ARG(fftype),
@@ -3327,8 +3271,7 @@ DECLARE_CHARACTER_DYN(ftpar);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( value, fvalue );
-   F77_CREATE_CHARACTER( ftpar, strlen( tpar ) );
-   F77_EXPORT_CHARACTER( tpar, ftpar, ftpar_length );
+   F77_CREATE_EXPORT_CHARACTER( tpar, ftpar );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_tune)( INTEGER_ARG(&fvalue),
@@ -3361,8 +3304,7 @@ DECLARE_CHARACTER_DYN(ftype);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_CREATE_CHARACTER( ftype, type_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -3400,8 +3342,7 @@ DECLARE_CHARACTER_DYN(ftype);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_CREATE_CHARACTER( ftype, type_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -3434,8 +3375,7 @@ DECLARE_CHARACTER_DYN(fcomp);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_unmap)( INTEGER_ARG(&findf),
@@ -3488,8 +3428,7 @@ DECLARE_CHARACTER_DYN(fxname);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_xdel)( INTEGER_ARG(&findf),
@@ -3526,10 +3465,8 @@ DECLARE_CHARACTER_DYN(fvalue);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
-   F77_CREATE_CHARACTER( fcmpt, strlen( cmpt ) );
-   F77_EXPORT_CHARACTER( cmpt, fcmpt, fcmpt_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
+   F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_CREATE_CHARACTER( fvalue, value_length-1 );
    F77_EXPORT_CHARACTER( value, fvalue, fvalue_length );
    F77_EXPORT_INTEGER( *status, fstatus );
@@ -3573,10 +3510,8 @@ DECLARE_DOUBLE(fvalue);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
-   F77_CREATE_CHARACTER( fcmpt, strlen( cmpt ) );
-   F77_EXPORT_CHARACTER( cmpt, fcmpt, fcmpt_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
+   F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_EXPORT_DOUBLE( *value, fvalue );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -3617,10 +3552,8 @@ DECLARE_INTEGER(fvalue);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
-   F77_CREATE_CHARACTER( fcmpt, strlen( cmpt ) );
-   F77_EXPORT_CHARACTER( cmpt, fcmpt, fcmpt_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
+   F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_EXPORT_INTEGER( *value, fvalue );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -3661,10 +3594,8 @@ DECLARE_LOGICAL(fvalue);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
-   F77_CREATE_CHARACTER( fcmpt, strlen( cmpt ) );
-   F77_EXPORT_CHARACTER( cmpt, fcmpt, fcmpt_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
+   F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_EXPORT_LOGICAL( *value, fvalue );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -3705,10 +3636,8 @@ DECLARE_REAL(fvalue);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
-   F77_CREATE_CHARACTER( fcmpt, strlen( cmpt ) );
-   F77_EXPORT_CHARACTER( cmpt, fcmpt, fcmpt_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
+   F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_EXPORT_REAL( *value, fvalue );
    F77_EXPORT_INTEGER( *status, fstatus );
 
@@ -3753,12 +3682,9 @@ DECLARE_INTEGER(fiary);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
-   F77_CREATE_CHARACTER( fcmpt, strlen( cmpt ) );
-   F77_EXPORT_CHARACTER( cmpt, fcmpt, fcmpt_length );
-   F77_CREATE_CHARACTER( fmode, strlen( mode ) );
-   F77_EXPORT_CHARACTER( mode, fmode, fmode_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
+   F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
+   F77_CREATE_EXPORT_CHARACTER( mode, fmode );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_xiary)( INTEGER_ARG(&findf),
@@ -3802,10 +3728,8 @@ DECLARE_CHARACTER(floc,DAT__SZLOC);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
-   F77_CREATE_CHARACTER( fmode, strlen( mode ) );
-   F77_EXPORT_CHARACTER( mode, fmode, fmode_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
+   F77_CREATE_EXPORT_CHARACTER( mode, fmode );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_xloc)( INTEGER_ARG(&findf),
@@ -3900,10 +3824,8 @@ DECLARE_CHARACTER(floc,DAT__SZLOC);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
-   F77_CREATE_CHARACTER( ftype, strlen( type ) );
-   F77_EXPORT_CHARACTER( type, ftype, ftype_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
+   F77_CREATE_EXPORT_CHARACTER( type, ftype );
    F77_EXPORT_INTEGER( ndim, fndim );
    F77_CREATE_INTEGER_ARRAY( fdim, ndim );
    F77_EXPORT_INTEGER_ARRAY( dim, fdim, ndim );
@@ -3987,13 +3909,10 @@ DECLARE_CHARACTER_DYN(fxname);
 DECLARE_CHARACTER_DYN(fcmpt);
 DECLARE_INTEGER(fstatus);
 
-   F77_CREATE_CHARACTER( fvalue, strlen( value ) );
-   F77_EXPORT_CHARACTER( value, fvalue, fvalue_length );
+   F77_CREATE_EXPORT_CHARACTER( value, fvalue );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
-   F77_CREATE_CHARACTER( fcmpt, strlen( cmpt ) );
-   F77_EXPORT_CHARACTER( cmpt, fcmpt, fcmpt_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
+   F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_xpt0c)( CHARACTER_ARG(fvalue),
@@ -4035,10 +3954,8 @@ DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_DOUBLE( value, fvalue );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
-   F77_CREATE_CHARACTER( fcmpt, strlen( cmpt ) );
-   F77_EXPORT_CHARACTER( cmpt, fcmpt, fcmpt_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
+   F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_xpt0d)( DOUBLE_ARG(&fvalue),
@@ -4078,10 +3995,8 @@ DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( value, fvalue );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
-   F77_CREATE_CHARACTER( fcmpt, strlen( cmpt ) );
-   F77_EXPORT_CHARACTER( cmpt, fcmpt, fcmpt_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
+   F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_xpt0i)( INTEGER_ARG(&fvalue),
@@ -4121,10 +4036,8 @@ DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_LOGICAL( value, fvalue );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
-   F77_CREATE_CHARACTER( fcmpt, strlen( cmpt ) );
-   F77_EXPORT_CHARACTER( cmpt, fcmpt, fcmpt_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
+   F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_xpt0l)( LOGICAL_ARG(&fvalue),
@@ -4164,10 +4077,8 @@ DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_REAL( value, fvalue );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
-   F77_CREATE_CHARACTER( fcmpt, strlen( cmpt ) );
-   F77_EXPORT_CHARACTER( cmpt, fcmpt, fcmpt_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
+   F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_xpt0r)( REAL_ARG(&fvalue),
@@ -4202,8 +4113,7 @@ DECLARE_LOGICAL(fthere);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fxname, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, fxname, fxname_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, fxname );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_xstat)( INTEGER_ARG(&findf),
@@ -4242,8 +4152,7 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( scale, fscale );
    F77_EXPORT_INTEGER( zero, fzero );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_ptszi)( INTEGER_ARG(&fscale),
@@ -4281,8 +4190,7 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_REAL( scale, fscale );
    F77_EXPORT_REAL( zero, fzero );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_ptszr)( REAL_ARG(&fscale),
@@ -4320,8 +4228,7 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_DOUBLE( scale, fscale );
    F77_EXPORT_DOUBLE( zero, fzero );
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_ptszd)( DOUBLE_ARG(&fscale),
@@ -4358,8 +4265,7 @@ DECLARE_INTEGER(fzero);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_gtszi)( INTEGER_ARG(&findf),
@@ -4397,8 +4303,7 @@ DECLARE_DOUBLE(fzero);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_gtszd)( INTEGER_ARG(&findf),
@@ -4436,8 +4341,7 @@ DECLARE_REAL(fzero);
 DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( indf, findf );
-   F77_CREATE_CHARACTER( fcomp, strlen( comp ) );
-   F77_EXPORT_CHARACTER( comp, fcomp, fcomp_length );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
    F77_CALL(ndf_gtszr)( INTEGER_ARG(&findf),

@@ -141,15 +141,17 @@ BUILT_SOURCES = $(include_MESSAGES)
 
 # Testing
 
-TESTS = ndf_ctest ndf_ftest
-check_PROGRAMS = ndf_ctest ndf_ftest
+TESTS = ndf_ctest ndf_ftest ndf_cnulltest
+check_PROGRAMS = ndf_ctest ndf_ftest ndf_cnulltest
 
 ndf_ctest_SOURCES = ndf_ctest.c
 ndf_ftest_SOURCES = ndf_ftest.f
+ndf_cnulltest_SOURCES = ndf_cnulltest.c
 
 # LDADD is the expansion of ref_link, with -lref replaced by libref.la
 ndf_ctest_LDADD = libndf.la `$(srcdir)/ndf_link` `cnfrtl_link`  @FCLIBS@
 ndf_ftest_LDADD = libndf.la `$(srcdir)/ndf_link`
+ndf_cnulltest_LDADD = libndf.la `$(srcdir)/ndf_link` `cnfrtl_link`  @FCLIBS@
 
 dist_starnews_DATA = ndf.news
 dist_pkgdata_DATA = LICENCE
