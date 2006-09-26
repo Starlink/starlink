@@ -220,7 +220,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
       /* Parse the string and retrieve the values */
       strcpy ( convert, temp );
-      curtok = strtok ( convert, ", " );
+      curtok = strtok ( convert, ";" );
       while ( curtok != NULL ){
          nvert_x++;
          if ( nvert_x > SC2SIM__MXVERT ) {
@@ -230,7 +230,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
             return;
          }
          vert_x[nvert_x] = atoi ( curtok );
-         curtok = strtok ( NULL, ", " );
+         curtok = strtok ( NULL, ";" );
       }
    }
 
@@ -250,7 +250,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
       /* Parse the string and retrieve the values */
       strcpy ( convert, temp );
-      curtok = strtok ( convert, ", " );
+      curtok = strtok ( convert, ";" );
       while ( curtok != NULL ){
          nvert_y++;
          if ( nvert_y > SC2SIM__MXVERT ) {
@@ -260,7 +260,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
             return;
          }
          vert_y[nvert_y] = atoi ( curtok );
-         curtok = strtok ( NULL, ", " );
+         curtok = strtok ( NULL, ";" );
       }
    }
 
