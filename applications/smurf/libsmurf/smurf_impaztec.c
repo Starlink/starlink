@@ -55,6 +55,8 @@
 *        Fixed pointer problem with callc to smf_calc_telpos
 *     2006-09-12 (EC):
 *        Use direct sc2store and ndf calls instead of sc2sim_ndfwrdata
+*     2006-09-21 (EC):
+*        Minor bug prevented compile when netcdf not available.
 *     2006-09-22 (JB):
 *        Removed dream & dxml includes
 
@@ -618,15 +620,16 @@ void smurf_impaztec( int *status ) {
     msgOutif(MSG__VERB, FUNC_NAME, 
 	   "Impaztec complete, NDF file written", status); 
 
+  }
+
 #else
 
   *status = SAI__ERROR;
   errRep(FUNC_NAME, 
 	 "SMURF built without libnetcdf. IMPAZTEC task not supported.", 
 	 status);
-
 #endif
-  }
+
 
 }
 
