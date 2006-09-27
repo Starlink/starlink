@@ -2524,7 +2524,7 @@ No longer under active control.
 </component>
 
 <component id="cnf" support="S">
-  <version>4.2-1</version>
+  <version>4.2-2</version>
   <path>libraries/cnf</path>
   <description>Mixed Language Programming -- FORTRAN and C</description>
   <abstract><p>The CNF package comprises two sets of software which
@@ -3095,7 +3095,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="ndf" support="S">
-  <version>1.6-2</version>
+  <version>1.6-3</version>
   <path>libraries/ndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
   <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
