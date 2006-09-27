@@ -199,7 +199,7 @@ void smurf_skynoise ( int *status ) {
 
    /* Add the mean value */
    for ( j=0; j<size*size; j++ ) {
-      atmsim[j] += 7/*meanatm*/;   
+      atmsim[j] += meanatm;   
    }
 
    /* Add the FITS data to the output file */
