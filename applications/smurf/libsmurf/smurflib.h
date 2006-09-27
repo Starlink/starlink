@@ -83,5 +83,6 @@ void smurf_dreamsolve( int * );
 void smurf_dreamweights( int * );
 void smurf_badbolos( int * );
 void smurf_impaztec( int * );
+void smurf_skynoise( int * );
 
 #endif /* SMURF_LIB_DEFINED */
