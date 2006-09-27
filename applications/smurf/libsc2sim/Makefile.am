@@ -17,7 +17,7 @@ sc2sim_ptoi.c sc2sim_response.c sc2sim_simframe.c sc2sim_simhits.c \
 sc2sim_simulate.c sc2sim_getbous.c sc2sim_getsinglescan.c \
 fhead.c sc2sim_getcoordframe.c sc2sim_getobspar.c \
 sc2sim_getsimpar.c sc2sim_smupath.c sc2sim_smupos.c \
-sc2sim_sex2double.c
+sc2sim_sex2double.c sc2sim_fft2d.c sc2sim_invf2d.c
 
 noinst_INCLUDES = sc2sim.h fhead.h \
                   sc2sim_par.h fhead_par.h \

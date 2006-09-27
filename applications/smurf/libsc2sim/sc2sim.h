@@ -170,6 +170,14 @@ double sc2sim_drand
 double sigma          /* sigma of distribution (given) */
 );
 
+void sc2sim_fft2d 
+(
+int direction,       /* transform specification +1 or -1 (given) */
+int size,            /* square dimension of complex image array (given) */
+double *array,       /* image array size*2 by size (given and returned) */
+int *status          /* global status (given and returned) */
+);
+
 void sc2sim_fitheat 
 (
 int nboll,             /* number of bolometers (given) */
@@ -415,6 +423,18 @@ double samptime,  /* time in sec between samples (given) */
 int nsamples,     /* number of positions in sequence (given) */
 double *fnoise,   /* array to hold noise sequence (returned) */
 int *status       /* global status (given and returned) * */
+);
+
+void sc2sim_invf2d 
+( 
+double sigma,     /* white noise level (given) */
+double corner,    /* corner frequency in per arcsec (given) */
+double p,         /* power law to be used (given) */
+double pixsize,   /* pixel size in arcsec (given) */
+int size,         /* size of square image array (given) */
+double *fnoise,   /* array to hold noise image (returned) */
+double *spectrum, /* array to hold complex 2-D spectrum (returned) */
+int *status       /* global status (given and returned) */
 );
 
 void sc2sim_ndfwrdata
