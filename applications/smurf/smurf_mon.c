@@ -202,6 +202,8 @@ void smurf_mon( int * status ) {
     smurf_impaztec( status );
   } else if (strcmp( taskname, "BADBOLOS" ) == 0 ) {
     smurf_badbolos( status );
+  } else if (strcmp( taskname, "SKYNOISE" ) == 0 ) {
+    smurf_skynoise( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

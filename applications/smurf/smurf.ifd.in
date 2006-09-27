@@ -701,6 +701,60 @@ package @PACKAGE@ {
           }
      }
 
+     action skynoise {
+
+          parameter obsfile {
+            position 1
+            type _CHAR
+            prompt {Observation file}
+            vpath {PROMPT}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+          parameter simfile {
+            position 2
+            type _CHAR
+            prompt {Simulation file}
+            vpath {PROMPT}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+          parameter seed {
+            position 3
+            type _INTEGER
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+          parameter exponent {
+            position 4
+            type _DOUBLE
+            prompt {Power-Law Exponent}
+            vpath {PROMPT}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+          parameter filename {
+            type _CHAR
+            vpath DEFAULT
+            default atm
+            helpkey *
+          }
+
+          parameter msg_filter {
+	    type _CHAR
+	    prompt {Message level}
+	    vpath DEFAULT
+	    default NORM
+	    helpkey *
+	  }
+
+     }
+
 
    }
 
