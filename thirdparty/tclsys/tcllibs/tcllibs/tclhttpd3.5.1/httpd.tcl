@@ -2054,7 +2054,7 @@ proc Httpd_RequestComplete {sock} {
 
 # server specific version of bgerror - indent to hide from indexer
 
-    proc bgerror {msg} {
+    proc Httpd_bgerror {msg} {
 	global errorInfo
 
 	set msg "[clock format [clock seconds]]\n$errorInfo"
