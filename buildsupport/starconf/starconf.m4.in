@@ -980,7 +980,7 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
 # application within the sst component.
 #
 # Calls AC_SUBST and AC_ARG_VAR on the generated variable name.  This
-# macro does _not_ automatically declares a configure dependency on any
+# macro does _not_ automatically declare a configure dependency on any
 # component specified in the second argument.  These dependencies should
 # be kept to an absolute minimum, and therefore any such dependencies
 # must be declared obviously and explicitly, with rationale.
@@ -1036,11 +1036,11 @@ AC_DEFUN([STAR_CHECK_PROGS],
                       AC_PATH_PROG(star_prog,
                                    ProgramName,
                                    ProgramName,
-                                   [$STARLINK/bin:]m4_ifval([$2],
-                                                              [$STARLINK/bin/$2:],
-                                   )[$default_bindir:]m4_ifval([$2],
-                                                              [$default_bindir/$2:],
-                                   )[$PATH])
+[$STARLINK/Perl/bin:]dnl
+[$STARLINK/starjava/bin:]dnl
+[$STARLINK/bin:]m4_ifval([$2],[$STARLINK/bin/$2:],)dnl
+[$default_bindir:]m4_ifval([$2],[$default_bindir/$2:],)dnl
+[$PATH])
 ##                      if test -z "$star_prog"; then
 ##                          if test -x $STARLINK/bin/starconf-finder; then
 ##                              star_prog="$STARLINK/bin/starconf-finder ProgramName"
