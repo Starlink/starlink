@@ -21,7 +21,7 @@ STAR_DECLARE_DEPENDENCIES(sourceset, sst)
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
-AC_PATH_PROG(PERL, perl)
+STAR_CHECK_PROGS(perl)
 STAR_CHECK_PROGS(prolat, sst)
 
 dnl    Ideally only code produced by flex should be distributed.

@@ -17,7 +17,7 @@ dnl    Include defaults for Starlink configurations
 AC_PROG_MAKE_SET
 STAR_DEFAULTS
 
-STAR_CHECK_PROGS( perl )
+STAR_CHECK_PROGS([perl])
 
 dnl    This package has no dependencies
 

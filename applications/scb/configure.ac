@@ -19,7 +19,7 @@ STAR_DEFAULTS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_RANLIB
-AC_PATH_PROG(PERL, perl)
+STAR_CHECK_PROGS([perl])
 
 dnl    If you write AC_PROG_YACC here, autoconf may try to use bison -y.
 dnl    This doesn't seem to work for some reason, but yacc does, so get
