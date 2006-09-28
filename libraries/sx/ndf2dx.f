@@ -74,6 +74,8 @@
 *        the NDF is copied to the DX dataset.
 *     29-AUG-2004 (TIMJ)
 *        Do not directly compare logicals with TRUE/FALSE
+*     28-SEP-2006 (DSB)
+*        Store correct value (1) for unused 2nd or 3rd axis dimensions.
 *-
 
 *  Type Definitions:                  ! No implicit typing
@@ -182,7 +184,7 @@
       END IF
 
 *   Store the size (in pixels) of the image dimensions.
-      DO 10 I=1,NDIM
+      DO 10 I=1,3
          PRANGE(I)=UBND(I)-LBND(I)+1
  10   CONTINUE
                                        
@@ -1775,7 +1777,9 @@
  
 *  History:
 *     12-OCT-1995 (GJP)
-*     (Original version)
+*        Original version.
+*     28-SEP-2006 (DSB)
+*        Store correct values (1) for unused 2nd or 3rd axis lengths.
  
 *  Bugs:
 *     None known.
@@ -1810,6 +1814,11 @@
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN
+
+*   Initialise.
+      SZX = 1
+      SZY = 1
+      SZZ = 1
 
 *   One dimensional.
       IF (NDIM.EQ.1) THEN 
