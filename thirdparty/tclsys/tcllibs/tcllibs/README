@@ -1,0 +1,29 @@
+
+These directories contains various thirdparty Tcl libraries used mainly by
+GAIA for its webservices. They are in an installed condition, so they can be
+just recursively copied into a suitable tree. They have had all of their
+non-Tcl parts removed, so are pure Tcl. This is all intentional to keep things
+simple. If you want to update a package find the original sources, install it
+and then import those into the tree (remembering to keep the local patches up
+to date, see below).
+
+The documentation is minimal consisting of the licensing and READMEs etc. 
+Full documentation should be located in the support web sites (which are
+mentioned in the documentation).
+
+Local Patches:
+--------------
+
+   tcllibs/tclhttpd3.5.1/httpd.tcl:
+
+      The bgerror proc was renamed to avoid overridding the global version.
+      Clearly if you want to run httpd in some standalone mode you'll need
+      to create a bgerror proc in your application.
+
+   tcllibs/tclsoap1.6.8/SOAP-domain.tcl
+
+      Modified because the XML-RPC behaviour was violating the
+      XML-RPC spec (http://www.xmlrpc.com/spec).  It was giving an HTTP
+      response code of 500 (error) with a correctly-formed XML-RPC fault
+      packet, when it should have been giving a 200 (OK) response code.
+

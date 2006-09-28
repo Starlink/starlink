@@ -4,7 +4,10 @@
 
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
-GAIA_LIBRARY = @GAIA_LIBRARY@
+prefix       = @prefix@
+exec_prefix  = @exec_prefix@
+libdir       = @libdir@
+installdir   = $(DESTDIR)/$(libdir)
 RM           = rm -f
 SHELL        = /bin/sh
 CP_RECURSIVE = @CP_RECURSIVE@
@@ -12,18 +15,18 @@ CP_RECURSIVE = @CP_RECURSIVE@
 all:
 
 install-top:
-	test -d $(GAIA_LIBRARY)/tcldom3.0 || mkdir -p $(GAIA_LIBRARY)/tcldom3.0
-	test -d $(GAIA_LIBRARY)/tclhttpd3.5.1 || mkdir -p $(GAIA_LIBRARY)/tclhttpd3.5.1
-	test -d $(GAIA_LIBRARY)/tcllib1.8 || mkdir -p $(GAIA_LIBRARY)/tcllib1.8
-	test -d $(GAIA_LIBRARY)/tclsoap1.6.8 || mkdir -p $(GAIA_LIBRARY)/tclsoap1.6.8
-	test -d $(GAIA_LIBRARY)/Tclxml3.1 || mkdir -p $(GAIA_LIBRARY)/Tclxml3.1
+	test -d $(installdir)/tcldom3.0 || mkdir -p $(installdir)/tcldom3.0
+	test -d $(installdir)/tclhttpd3.5.1 || mkdir -p $(installdir)/tclhttpd3.5.1
+	test -d $(installdir)/tcllib1.8 || mkdir -p $(installdir)/tcllib1.8
+	test -d $(installdir)/tclsoap1.6.8 || mkdir -p $(installdir)/tclsoap1.6.8
+	test -d $(installdir)/Tclxml3.1 || mkdir -p $(installdir)/Tclxml3.1
 
 install-files: install-top
-	$(CP_RECURSIVE) tcldom3.0 $(GAIA_LIBRARY)
-	$(CP_RECURSIVE) tclhttpd3.5.1 $(GAIA_LIBRARY)
-	$(CP_RECURSIVE) tcllib1.8 $(GAIA_LIBRARY)
-	$(CP_RECURSIVE) tclsoap1.6.8 $(GAIA_LIBRARY)
-	$(CP_RECURSIVE) Tclxml3.1 $(GAIA_LIBRARY)
+	$(CP_RECURSIVE) tcldom3.0 $(installdir)
+	$(CP_RECURSIVE) tclhttpd3.5.1 $(installdir)
+	$(CP_RECURSIVE) tcllib1.8 $(installdir)
+	$(CP_RECURSIVE) tclsoap1.6.8 $(installdir)
+	$(CP_RECURSIVE) Tclxml3.1 $(installdir)
 
 install: install-files
 
