@@ -4631,8 +4631,9 @@ int StarRtdImage::ndfHduCmd( const ImageIO &imio, int argc, char *argv[] )
     }
 
     // <path> hdu fits ?$number?
-    if (strcmp(argv[0], "fits") == 0)
+    if (strcmp(argv[0], "fits") == 0) {
         return ndfCmdFits( argc, argv, ndf );
+    }
 
     // <path> hdu list
     if ( strcmp(argv[0], "list" ) == 0 ) {
@@ -4736,23 +4737,31 @@ int StarRtdImage::ndfCmdFits( int argc, char** argv, NDFIO* ndf )
                 return fmt_error( "HDU number %d out of range (max %d)",
                                   hdu, numNDFs );
             }
-            // Switch to the given HDU, but restore the original before
-            // returning.
-            if ( ndf->setDisplayable( hdu, "data" ) != 0 ) {
-                return TCL_ERROR;
+            else {
+                // Switch to the given HDU, but restore the original before
+                // returning, so use status to fall through...
+                if ( ! ndf->setDisplayable( hdu, "data" ) ) {
+                    set_result( "Failed to set displayable" );
+                    status = TCL_ERROR;
+                }
             }
         }
     }
 
     // Get the FITS header and return it as the result.
-    ostringstream os;
-    ndf->getFitsHeader( os );
-    set_result( os.str().c_str() );
+    if ( status == TCL_OK ) {
+        ostringstream os;
+        ndf->getFitsHeader( os );
+        set_result( os.str().c_str() );
+    }
 
-    // Restore the original HDU before returning
+    // Restore the original HDU before returning.
     if ( hdu != saved_hdu &&
-         ndf->setDisplayable( saved_hdu, component ) != 0 ) {
-        status = TCL_ERROR;
+         ! ndf->setDisplayable( saved_hdu, component ) ) {
+        if ( status != TCL_ERROR ) {
+            status = TCL_ERROR;
+            set_result( "Failed to set displayable" );
+        }
     }
     return status;
 }
