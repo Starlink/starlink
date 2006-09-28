@@ -6251,7 +6251,11 @@ file.f: file.$(FPP_SRC_EXT)
             (not ideal, since this may in principle change when the
             component being configured is installed, but it's the best
             we can do at configure time); and by the
-            <code>$STARLINK/bin</code> directory.</p>
+            <code>$STARLINK/bin</code>,
+            <code>$STARLINK/Perl/bin</code> and
+            <code>$STARLINK/starjava/bin</code> 
+            directories (so this is a suitable macro to use to locate the
+            distributed Perl binary).</p>
 
           <p>If the program in question cannot be found, the the
             substitution variable is set to be the name of the program
