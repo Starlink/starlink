@@ -24,6 +24,9 @@
     as selected in the cube toolbox (gives correct units for integrated 
     intensity).
 
+    A fatal bug when reading FITS headers from multiple NDFs in a container
+    has been fixed.  
+
   Release 3.2-0: 28th July 2006.
   ==============================
 
