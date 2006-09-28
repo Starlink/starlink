@@ -378,8 +378,8 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, int ndims,
 		       const dim_t dims[], int flags, smfData ** data, 
 		       int *status);
 
-void smf_open_related( const smfGroup *group, const int subindex, smfArray **relfiles, 
-		       int *status );
+void smf_open_related( const smfGroup *group, const int subindex, const char *accmode,
+		       smfArray **relfiles, int *status );
 
 void * smf_realloc( void * pntr, size_t nelem, size_t bytes_per_elem,
 		    int * status );
@@ -409,8 +409,8 @@ void smf_subtract_poly( smfData *data, int *status );
 
 void smf_telpos_get( const smfHead * hdr, int * status );
 
-void smf_tslice ( const smfData *idata, smfData **tdata, int index, 
-                  int *status );
+/*void smf_tslice ( const smfData *idata, smfData **tdata, int index, 
+  int *status );*/
 
 void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
 
