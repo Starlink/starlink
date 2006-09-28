@@ -13,14 +13,17 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_open_related( const smfGroup *group, const int subindex, smfArray **relfiles,
-*                        int *status );
+*     smf_open_related( const smfGroup *group, const int subindex, 
+*                       const char *accmodesmfArray **relfiles,
+*                       int *status );
 
 *  Arguments:
 *     group = const smfGroup* (Given)
 *        Input smfGroup
 *     subindex = const int (Given)
 *        Subgroup index
+*     accmode = const char* (Given)
+*        Access mode for opened files
 *     relfiles = smfArray** (Returned)
 *        smfArray containing opened files
 *     status = int* (Given and Returned)
@@ -41,6 +44,8 @@
 *  History:
 *     2006-06-25 (AGG):
 *        Initial version
+*     2006-09-28 (AGG):
+*        Add file access mode to API
 
 *  Copyright:
 *     Copyright (C) 2006 University of British Columbia.  All Rights
@@ -91,17 +96,17 @@
 
 #define FUNC_NAME "smf_open_related"
 
-void smf_open_related ( const smfGroup *group, const int subindex, smfArray **relfiles, 
-			int *status ) {
+void smf_open_related ( const smfGroup *group, const int subindex, const char *accmode, 
+			smfArray **relfiles, int *status ) {
 
   /* Local variables */
+  smfData *data = NULL;     /* Data struct for file */
+  Grp *grp = NULL;          /* Grp stored within smfGroup */
   int i;                    /* Loop counter */
-  Grp *grp;                 /* Grp stored within smfGroup */
-  int **subgroups;          /* Pointer to array of subgroups */
-  int *indices;             /* Array of indices */
-  int nrelated;
-  smfData *data;
-  int index;
+  int *indices = NULL;      /* Array of indices */
+  int nrelated;             /* Number of related files */
+  int index;                /* Index into the subgroups within the group */
+  int **subgroups = NULL;   /* Pointer to array of subgroups */
 
   if ( *status != SAI__OK ) return;
 
@@ -121,7 +126,7 @@ void smf_open_related ( const smfGroup *group, const int subindex, smfArray **re
     index = indices[i];
     /* Open file with this index and add to smfArray */
     if ( index != 0 ) {
-      smf_open_file( grp, index, "READ", 1, &data, status );
+      smf_open_file( grp, index, accmode, 1, &data, status );
       smf_addto_smfArray( *relfiles, data, status );
     }
   }
