@@ -68,13 +68,13 @@ fi
 
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [ard atl ast blt cat cfitsio generic dnl
-fio img itcl pcs pda sae startcl sla tcl tclx tk], link)
+fio img itcl pcs pda sae startcl sla tcl tclx tk tcllibs], link)
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 STAR_DECLARE_DEPENDENCIES(configure, [tcl tk blt itcl])
 
 dnl    Need to add AUTOASTROM to this when available.
-STAR_DECLARE_DEPENDENCIES(use, 
-      [convert esp extractor kappa photom polpack startcl])
+STAR_DECLARE_DEPENDENCIES(use, [convert esp extractor kappa photom dnl
+polpack startcl tcl tk blt tclx tcllibs])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
