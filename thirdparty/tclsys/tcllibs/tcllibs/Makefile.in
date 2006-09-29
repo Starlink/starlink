@@ -21,6 +21,8 @@ install-top:
 	test -d $(installdir)/tclsoap1.6.8 || mkdir -p $(installdir)/tclsoap1.6.8
 	test -d $(installdir)/Tclxml3.1 || mkdir -p $(installdir)/Tclxml3.1
 
+##  Need to exclude the CVS directories....
+
 install-files: install-top
 	$(CP_RECURSIVE) tcldom3.0 $(installdir)
 	$(CP_RECURSIVE) tclhttpd3.5.1 $(installdir)

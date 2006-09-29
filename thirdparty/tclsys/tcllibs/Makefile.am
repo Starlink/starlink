@@ -2,7 +2,7 @@
 
 @SET_MAKE@
 
-RECURSIVE_TARGETS = all clean install
+RECURSIVE_TARGETS = all clean
 
 $(RECURSIVE_TARGETS):
 	( cd tcllibs; $(MAKE) $@; )
