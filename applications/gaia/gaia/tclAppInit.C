@@ -122,11 +122,5 @@ Tcl_AppInit(Tcl_Interp *interp)
       return TCL_ERROR;
   }
 
-  //  Temporary xmlbits.
-  sprintf(cmd, "set auto_path [linsert $auto_path 0 %s/xmlbits]", libDir );
-  if (Tcl_Eval(interp, cmd) != TCL_OK) {
-      return TCL_ERROR;
-  }
-  
   return TCL_OK;
 }

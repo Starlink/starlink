@@ -83,31 +83,6 @@ proc main {} {
       puts $fd "-dont-strip-tcl \"$gaia_library/$file\""
    }
    puts $fd "-dont-strip-tcl \"$gaia_library/tclIndex\""
-
-   #  Temporary stuff.
-   set tcldom_library   $gaia_library/xmlbits/tcldom3.0
-   set tclhttpd_library $gaia_library/xmlbits/tclhttpd3.5.1
-   set tcllib_library   $gaia_library/xmlbits/tcllib1.8
-   set tclsoap_library  $gaia_library/xmlbits/tclsoap1.6.8
-   set tclxml_library   $gaia_library/xmlbits/Tclxml3.1
-
-   set srcdirs [list \
-                   $tcldom_library \
-                   $tclhttpd_library \
-                   $tcllib_library \
-                   $tclsoap_library \
-                   $tclxml_library]
-
-   foreach dir $srcdirs {
-      if {[file exists $dir/tclIndex]} {
-         puts $fd "-dont-strip-tcl \"$dir/tclIndex\""
-      }
-      set tclfiles [glob -nocomplain $dir/*.tcl $dir/*/*.tcl]
-      foreach file "$tclfiles" {
-         puts $fd "-dont-strip-tcl \"$file\""
-      }
-   }
-
 }
 main
 exit

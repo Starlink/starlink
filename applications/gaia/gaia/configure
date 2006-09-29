@@ -272,7 +272,7 @@ PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
 ac_unique_file="src/StarRtdImage.C"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS GAIA_VERSION INSTALL_TARGET SRC_ROOT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX LIBTOOL TCLUTIL_DEFS LD_VARNAME LIB_RUNTIME_DIR TCLTK_ROOT TCLUTIL_VERSION ASTROTCL_VERSION RTD_VERSION CAT_VERSION TCL_VERSION TK_VERSION ITCL_VERSION ITK_VERSION TCLX_VERSION BLT_VERSION CXX_INCLUDE CXX_DEPEND_FLAGS OSVERSION DEPEND_TARGET CDEBUGFLAGS CXXDEBUGFLAGS SHARED SHLIB_CFLAGS SHLIB_LD SHLIB_SUFFIX SHLIB_LD_LIBS DL_LIBS LD_FLAGS LD_SEARCH_FLAGS XINCSW XLIBSW TCL_LIB_SPEC TK_LIB_SPEC TCLX_LIB_SPEC ITCL_LIB_SPEC ITK_LIB_SPEC BLT_LIB_SPEC TCLUTIL_TCL_BUILD_LIB_PATH TCLUTIL_TK_BUILD_LIB_PATH TCLINCSW TKINCSW XLIBSW_STATIC TCL_LIB_SPEC_STATIC TK_LIB_SPEC_STATIC TCLX_LIB_SPEC_STATIC ITCL_LIB_SPEC_STATIC ITK_LIB_SPEC_STATIC BLT_LIB_SPEC_STATIC TIX_LIB_SPEC TIX_LIB_SPEC_STATIC TCL_LIBRARY TK_LIBRARY BLT_LIBRARY TCLUTIL_LIBRARY ASTROTCL_LIBRARY RTD_LIBRARY CAT_LIBRARY SKYCAT_LIBRARY ITCL_LIBRARY ITK_LIBRARY TCLX_LIBRARY IWIDGETS_VERSION IWIDGETS_LIBRARY TCLUTIL_LIB TCLUTIL_LIB_SPEC TCLUTIL_LIB_STATIC TCLUTIL_BUILD_LIBRARY ASTROTCL_LIB ASTROTCL_LIB_SPEC ASTROTCL_LIB_STATIC ASTROTCL_BUILD_LIBRARY RTD_LIB RTD_LIB_SPEC RTD_LIB_STATIC RTD_BUILD_LIBRARY CAT_LIB CAT_LIB_SPEC CAT_LIB_STATIC CAT_BUILD_LIBRARY SKYCAT_LIB SKYCAT_LIB_SPEC SKYCAT_LIB_STATIC SKYCAT_BUILD_LIBRARY STARLINK FC FCFLAGS STAR_FCFLAGS LN_S LINK ALINK ac_ct_FC FCLIBS CP PAX CP_RECURSIVE DESTDIR BINDIR LIBDIR GAIA_DIR GAIA_LIBRARY GAIA_BUILD_LIBRARY STARTCL_LIBRARY LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS GAIA_VERSION INSTALL_TARGET SRC_ROOT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX LIBTOOL TCLUTIL_DEFS LD_VARNAME LIB_RUNTIME_DIR TCLTK_ROOT TCLUTIL_VERSION ASTROTCL_VERSION RTD_VERSION CAT_VERSION TCL_VERSION TK_VERSION ITCL_VERSION ITK_VERSION TCLX_VERSION BLT_VERSION CXX_INCLUDE CXX_DEPEND_FLAGS OSVERSION DEPEND_TARGET CDEBUGFLAGS CXXDEBUGFLAGS SHARED SHLIB_CFLAGS SHLIB_LD SHLIB_SUFFIX SHLIB_LD_LIBS DL_LIBS LD_FLAGS LD_SEARCH_FLAGS XINCSW XLIBSW TCL_LIB_SPEC TK_LIB_SPEC TCLX_LIB_SPEC ITCL_LIB_SPEC ITK_LIB_SPEC BLT_LIB_SPEC TCLUTIL_TCL_BUILD_LIB_PATH TCLUTIL_TK_BUILD_LIB_PATH TCLINCSW TKINCSW XLIBSW_STATIC TCL_LIB_SPEC_STATIC TK_LIB_SPEC_STATIC TCLX_LIB_SPEC_STATIC ITCL_LIB_SPEC_STATIC ITK_LIB_SPEC_STATIC BLT_LIB_SPEC_STATIC TIX_LIB_SPEC TIX_LIB_SPEC_STATIC TCL_LIBRARY TK_LIBRARY BLT_LIBRARY TCLUTIL_LIBRARY ASTROTCL_LIBRARY RTD_LIBRARY CAT_LIBRARY SKYCAT_LIBRARY ITCL_LIBRARY ITK_LIBRARY TCLX_LIBRARY IWIDGETS_VERSION IWIDGETS_LIBRARY TCLUTIL_LIB TCLUTIL_LIB_SPEC TCLUTIL_LIB_STATIC TCLUTIL_BUILD_LIBRARY ASTROTCL_LIB ASTROTCL_LIB_SPEC ASTROTCL_LIB_STATIC ASTROTCL_BUILD_LIBRARY RTD_LIB RTD_LIB_SPEC RTD_LIB_STATIC RTD_BUILD_LIBRARY CAT_LIB CAT_LIB_SPEC CAT_LIB_STATIC CAT_BUILD_LIBRARY SKYCAT_LIB SKYCAT_LIB_SPEC SKYCAT_LIB_STATIC SKYCAT_BUILD_LIBRARY STARLINK FC FCFLAGS STAR_FCFLAGS LN_S LINK ALINK ac_ct_FC FCLIBS DESTDIR BINDIR LIBDIR GAIA_DIR GAIA_LIBRARY GAIA_BUILD_LIBRARY STARTCL_LIBRARY LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -4394,126 +4394,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 LIBS=$old_LIBS
 
 #--------------------------------------------------------------------
-#  Determine how to do a recursive copy, cut-and-paste from starconf
-#  as a temporary measure until decide how to handle xmlbits.
-#--------------------------------------------------------------------
-# Extract the first word of "cp", so it can be a program name with args.
-set dummy cp; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_CP+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $CP in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_CP="$CP" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_CP="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  ;;
-esac
-fi
-CP=$ac_cv_path_CP
-
-if test -n "$CP"; then
-  echo "$as_me:$LINENO: result: $CP" >&5
-echo "${ECHO_T}$CP" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-# Extract the first word of "pax", so it can be a program name with args.
-set dummy pax; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_PAX+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $PAX in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_PAX="$PAX" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_PAX="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  ;;
-esac
-fi
-PAX=$ac_cv_path_PAX
-
-if test -n "$PAX"; then
-  echo "$as_me:$LINENO: result: $PAX" >&5
-echo "${ECHO_T}$PAX" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-echo "$as_me:$LINENO: checking how to do a recursive directory copy" >&5
-echo $ECHO_N "checking how to do a recursive directory copy... $ECHO_C" >&6
-if test "${star_cv_cp_r+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  rm -Rf conftest*
-                mkdir conftest-d1 conftest-d2
-                mkdir conftest-d1/d
-                date >conftest-d1/d/f
-                (cd conftest-d1/d; $LN_S f l; $LN_S x broken)
-                if test ! -h conftest-d1/d/l; then
-                    # We don't have links!  So plain cp -R will do
-                    star_cv_cp_r="$CP -R"
-                else
-                    star_cv_cp_r=
-                    for try in "$CP -R --no-dereference -p -f" "$CP -R -P -p -f" "$CP -R -P -p" "$CP -R -p" "${PAX-false} -r -w -p p"
-                    do
-                       rm -Rf conftest-d2/*
-                       if (cd conftest-d1; $try . ../conftest-d2 2>/dev/null); then
-                           if test -h conftest-d2/d/l -a -h conftest-d2/d/broken; then
-                               star_cv_cp_r="$try"
-                               break
-                           fi
-                       fi
-                    done
-                 fi
-                 rm -Rf conftest*
-fi
-echo "$as_me:$LINENO: result: $star_cv_cp_r" >&5
-echo "${ECHO_T}$star_cv_cp_r" >&6
-if test -z "$star_cv_cp_r"; then
-   { { echo "$as_me:$LINENO: error: unable to find working cp or pax" >&5
-echo "$as_me: error: unable to find working cp or pax" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-CP_RECURSIVE=$star_cv_cp_r
-
-
-#--------------------------------------------------------------------
 #	Propagate prefix argument as installation directory.
 #--------------------------------------------------------------------
 DESTDIR="$prefix"
@@ -4548,7 +4428,7 @@ Iwidgets library files  => $IWIDGETS_LIBRARY
 #--------------------------------------------------------------------
 #	Generate the Makefiles etc...
 #--------------------------------------------------------------------
-                                                                                                              ac_config_files="$ac_config_files Makefile library/Makefile library/xmlbits/Makefile library/gaia_version.tcl src/Makefile tkhtml/Makefile mktclapp/Makefile mktclapp/library/gaia_swish.tcl mktclapp/library/gaia_stcl.tcl colormaps/Makefile bitmaps/Makefile"
+                                                                                                    ac_config_files="$ac_config_files Makefile library/Makefile library/gaia_version.tcl src/Makefile tkhtml/Makefile mktclapp/Makefile mktclapp/library/gaia_swish.tcl mktclapp/library/gaia_stcl.tcl colormaps/Makefile bitmaps/Makefile"
           ac_config_commands="$ac_config_commands default"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -5080,7 +4960,6 @@ do
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "library/Makefile" ) CONFIG_FILES="$CONFIG_FILES library/Makefile" ;;
-  "library/xmlbits/Makefile" ) CONFIG_FILES="$CONFIG_FILES library/xmlbits/Makefile" ;;
   "library/gaia_version.tcl" ) CONFIG_FILES="$CONFIG_FILES library/gaia_version.tcl" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
   "tkhtml/Makefile" ) CONFIG_FILES="$CONFIG_FILES tkhtml/Makefile" ;;
@@ -5287,9 +5166,6 @@ s,@LINK@,$LINK,;t t
 s,@ALINK@,$ALINK,;t t
 s,@ac_ct_FC@,$ac_ct_FC,;t t
 s,@FCLIBS@,$FCLIBS,;t t
-s,@CP@,$CP,;t t
-s,@PAX@,$PAX,;t t
-s,@CP_RECURSIVE@,$CP_RECURSIVE,;t t
 s,@DESTDIR@,$DESTDIR,;t t
 s,@BINDIR@,$BINDIR,;t t
 s,@LIBDIR@,$LIBDIR,;t t

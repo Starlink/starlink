@@ -193,27 +193,6 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     }
     Tcl_SetVar2(interp, "env", "GAIA_VERSION", GAIA_VERSION, TCL_GLOBAL_ONLY);
 
-
-    //  Temporary xmlbits.
-    //  Note we need to add each directory containing a required pkgIndex.tcl
-    //  explicitly here.  It seems that under mktclapp, Tcl will not recurse
-    //  into subdirectories looking for pckIndex.tcl files.  This is probably
-    //  to do with glob not working.
-    sprintf(cmd, "foreach subdir {%s} "
-                 "{lappend auto_path %s/xmlbits/$subdir}",
-            "tcldom3.0 tclhttpd3.5.1 tcllib1.8 tclsoap1.6.8 Tclxml3.1 ",
-            libDir );
-    if (Tcl_Eval(interp, cmd) != TCL_OK) {
-        return TCL_ERROR;
-    }
-    sprintf(cmd, "foreach subdir {%s} "
-                 "{lappend auto_path %s/xmlbits/tcllib1.8/$subdir}",
-            "base64 cmdline counter fileutil log md5 mime ncgi uri ",
-            libDir );
-    if (Tcl_Eval(interp, cmd) != TCL_OK) {
-        return TCL_ERROR;
-    }
-
     //  Do the Iwidgets initialisation, needed for single binary as
     //  Iwidgets doesn't have a builtin C init function (so the script
     //  method for doing the init gets confused).
