@@ -648,7 +648,7 @@ and its coordinates are displayed.
 </component>
 
 <component id="gaia" support="S">
-  <version>3.2-7</version>
+  <version>3.2-8</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -4070,6 +4070,24 @@ and some distortion.
       <name>Mark Taylor</name>
       <uname>mbt</uname>
       <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="tcllibs" support="U">
+  <version>1.0.0</version>
+  <path>thirdparty/tclsys/tcllibs</path>
+  <description>Tcllibs</description>
+  <dependencies >
+    <build>tcl</build>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
       <role>owner</role>
     </person>
   </developers>
