@@ -2,14 +2,11 @@
 # 	Makefile for tcllibs
 # ------------------------------------------------------------------------
 
-INSTALL      = @INSTALL@
-INSTALL_DATA = @INSTALL_DATA@
 prefix       = @prefix@
 exec_prefix  = @exec_prefix@
 libdir       = @libdir@
 installdir   = $(DESTDIR)/$(libdir)
-RM           = rm -f
-SHELL        = /bin/sh
+RM           = rm -rf
 CP_RECURSIVE = @CP_RECURSIVE@
 
 subdirs = tcldom3.0 tclhttpd3.5.1 tcllib1.8 tclsoap1.6.8 Tclxml3.1
@@ -26,7 +23,7 @@ install-top:
 install-files: install-top
 	for i in $(subdirs); do \
 	   $(CP_RECURSIVE) $$i $(installdir) ;\
-	   rm -rf `find $(installdir)/$$i -type d -name CVS` ;\
+	   $(RM) `find $(installdir)/$$i -type d -name CVS` ;\
 	done
 
 install: install-files
