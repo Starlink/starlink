@@ -26,8 +26,8 @@
 #  of the supported messages.  This should contain a list of zero or
 #  more objects with methods whose names are the actual message IDs
 #  (usually beginning ivo://...) for messages which are supported.
-#  The first argument of such methods is the sender_id URL and 
-#  subsequent arguments are the message parameters.  The return value 
+#  The first argument of such methods is the sender_id URL and
+#  subsequent arguments are the message parameters.  The return value
 #  is the message return.  For example an agent which implements only
 #  the ivo://votech.org/test/echo message would look like this:
 #
@@ -86,6 +86,9 @@
 #  History:
 #     11-JUL-2006 (MBT)
 #        Original version (server parts cribbed from GaiaXMLRPC).
+#     02-OCT-2006 (PWD):
+#        Move AuthDefaultFile to user's directory. Cannot be shared
+#        between users.
 #     {enter_further_changes_here}
 
 #-
@@ -101,6 +104,10 @@ package require httpd::version
 package require httpd::counter
 package require httpd::doc
 package require httpd::log
+
+#  Server files should be private to user.
+global Config
+set Config(AuthDefaultFile) [utilGetConfigFilename .skycat tclhttpd.default]
 package require httpd::auth
 package require httpd::mtype
 
@@ -187,11 +194,11 @@ itcl::class plastic::PlasticApp {
    }
 
    #  This method is called when the hub sends a perform call which should
-   #  be handled by this instance of the class.  Requests are handled 
+   #  be handled by this instance of the class.  Requests are handled
    #  by handing them off to an appropriate method of one of the agents.
    public method app_perform {sender_id msg_id msg_args} {
 
-      #  Check each agent to see if it has a method with a name that 
+      #  Check each agent to see if it has a method with a name that
       #  matches the message ID, and if so execute that with
       #  appropriate arguments.  The message may get passed to more than
       #  one agent if more than one wants to receive it.
@@ -231,10 +238,10 @@ itcl::class plastic::PlasticApp {
       return $slist
    }
 
-   #  Sends a message asynchronously to other registered applications 
-   #  using PLASTIC.  
-   #  If the recipients_list is non-empty it gives a list of application 
-   #  IDs for the applications to send to.  If empty, the message is 
+   #  Sends a message asynchronously to other registered applications
+   #  using PLASTIC.
+   #  If the recipients_list is non-empty it gives a list of application
+   #  IDs for the applications to send to.  If empty, the message is
    #  broadcast to all.
    public method send_message_async {msg_id arg_list recipient_list} {
       if {[llength $recipient_list] == 0} {
@@ -247,8 +254,8 @@ itcl::class plastic::PlasticApp {
 
    #  Sends a message synchronoously to other registered applications
    #  using PLASTIC.
-   #  If the recipients_list is non-empty it gives a list of application 
-   #  IDs for the applications to send to.  If empty, the message is 
+   #  If the recipients_list is non-empty it gives a list of application
+   #  IDs for the applications to send to.  If empty, the message is
    #  broadcast to all.
    public method send_message_sync {msg_id arg_list recipient_list} {
       if {[llength $recipient_list] == 0} {
@@ -265,21 +272,21 @@ itcl::class plastic::PlasticApp {
       set_client_id_ ""
    }
 
-   #  Returns a boolean value indicating whether the application is 
+   #  Returns a boolean value indicating whether the application is
    #  currently [believed to be] registered with a live hub.
    public method is_registered {} {
       return [expr {$client_id_ != ""}]
    }
 
    #  Adds a callback command to be executed when the PLASTIC registration
-   #  status changes.  An attempt will be made to execute the given command 
-   #  when this application registers or unregisters with a hub 
+   #  status changes.  An attempt will be made to execute the given command
+   #  when this application registers or unregisters with a hub
    #  (or when that may have happened).
    public method plastic_reg_command {cmd} {
       lappend plastic_reg_commands_ $cmd
    }
 
-   #  Performs the requested callbacks when the registration status 
+   #  Performs the requested callbacks when the registration status
    #  may have changed.
    protected method inform_plastic_reg_ {} {
       foreach cmd $plastic_reg_commands_ {
@@ -317,7 +324,7 @@ itcl::class plastic::PlasticApp {
       return $server_url_
    }
 
-   #  Starts the HTTPD server.  Will fail if this object's server is 
+   #  Starts the HTTPD server.  Will fail if this object's server is
    #  already running.
    public proc start_server {} {
       if {[info exists server_url_]} {
