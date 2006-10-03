@@ -236,21 +236,26 @@ itcl::class gaia::GaiaCubeSpectrum {
    #  Methods:
    #  --------
 
-   #  Handle a close. This disables any interactions and graphics.
+   #  Handle a close. This disables any interactions and graphics and closes
+   #  the plot.
    public method close {} {
 
       #  Close the plot.
+      close_plot
+
+      #  Also remove bindings.
+      remove_bindings_
+   }
+
+   #  Close the plot. Do this when the display becomes invalid (cube changes).
+   public method close_plot {} {
       if { $spectrum_ != {} && [winfo exists $spectrum_] } {
          $spectrum_ close
       }
 
-      #  Remove any graphics displayed on the main image and remove
-      #  bindings.
+      #  Remove all markers and forget previous extractions.
       remove_position_markers_
-      remove_bindings_
       remove_regions_
-
-      #  No extraction is now current.
       set last_cxcy_ {}
       set last_region_ {}
    }

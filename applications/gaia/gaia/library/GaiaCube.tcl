@@ -454,6 +454,10 @@ itcl::class gaia::GaiaCube {
 
          #  Set up object to control units.
          $spec_coords_ configure -axis 3 -accessor $cubeaccessor_
+
+         #  If the spectral plot is open, then close it. It will be
+         #  re-created on next image click.
+         $itk_component(spectrum) close_plot
       }
    }
 
