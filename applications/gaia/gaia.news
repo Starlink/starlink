@@ -27,6 +27,11 @@
     A fatal bug when reading FITS headers from multiple NDFs in a container
     has been fixed.  
 
+    The behaviour of the spectral plot window can now be changed so that
+    it no longer remains above the main window. To enable this option 
+    either start GAIA with -transient_spectralplot 1, or set this option
+    in the "File->Startup options..." dialog (this makes the change permanent).
+
   Release 3.2-0: 28th July 2006.
   ==============================
 

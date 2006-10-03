@@ -248,7 +248,9 @@ itcl::class gaia::GaiaCube {
             -show_ref_range 0 \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -spec_coords [code $spec_coords_]
+            -spec_coords [code $spec_coords_] \
+            -transient_spectralplot $itk_option(-transient_spectralplot)
+         
       }
       set ref_range_controls_($ref_ids) $itk_component(spectrum)
       pack $itk_component(spectrum) -side top -fill both -ipadx 1m -ipady 2m
@@ -902,6 +904,10 @@ itcl::class gaia::GaiaCube {
    #  Whether to use file mapping (quick startup), or direct io (fast
    #  spectral display).
    itk_option define -usemmap usemmap UseMmap 1
+
+   #  Whether spectral plot window should be a transient, or not.
+   itk_option define -transient_spectralplot transient_spectralplot \
+      Transient_Spectralplot 1
 
    #  Protected variables: (available to instance)
    #  --------------------

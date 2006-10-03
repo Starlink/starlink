@@ -184,6 +184,8 @@ Options:
  -scrollbars <bool>       - display scrollbars (not displayed by default).
  -shm_data <bool>         - put image data in sysV shared memory.
  -shm_header <bool>       - put image header in sysV shared memory.
+ -transient_tools <bool>  - toolboxes are transient windows. (default: 0)
+ -transient_spectralplot <bool>  - spectral plot is a transient window. (default: 1)
  -ukirt_ql <bool>         - show UKIRT Quick Look Facilities (default: 0).
  -use_zoom_view <bool>    - use a "view" of the image for the zoom window (default).
  -usexshm <bool>          - use X shared mem, if available (default).
@@ -1252,6 +1254,8 @@ itcl::class gaia::Gaia {
                   -canvas [$image_ get_canvas] \
                   -rtdimage [$image_ get_image] \
                   -transient $itk_option(-transient_tools) \
+                  -transient_spectralplot \
+                     $itk_option(-transient_spectralplot) \
                   -number $clone_ \
                   -filter_types $itk_option(-file_types)
             }
@@ -2081,6 +2085,10 @@ window gives you access to this."
 
    #  Whether toolboxes are transient (iconize with main window).
    itk_option define -transient_tools transient_tools Transient_Tools 0
+
+   #  Whether the spectral plot is transient (iconize with main window).
+   itk_option define -transient_spectralplot transient_spectralplot \
+              Transient_SpectralPlot 1
 
    #  The known file types.
    itk_option define -file_types file_types File_Types {{any *}}

@@ -314,10 +314,13 @@ itcl::class gaia::GaiaCubeSpectrum {
                 -ref_line_changed_cmd [code $cube ref_line_moved_] \
                 -ref_range_changed_cmd [code $cube ref_range_moved_] \
                 -colour_changed_cmd [code $this spec_colour_changed_] \
-                -shorthelpwin $itk_option(-gaia)]
+                -shorthelpwin $itk_option(-gaia) \
+                -transient $itk_option(-transient_spectralplot) ]
 
          #  Make this a transient of main window, not this one.
-         wm transient $spectrum_ $itk_option(-gaia)
+         if { $itk_option(-transient_spectralplot) } {
+            wm transient $spectrum_ $itk_option(-gaia)
+         }
       } else {
          #  Already have a plot, re-display if withdrawn.
          if { [wm state $spectrum_] == "withdrawn" } {
@@ -496,14 +499,14 @@ itcl::class gaia::GaiaCubeSpectrum {
       }
 
       #  Return proper section name for possible NDFs.
-      if { $spectype == "point" 
+      if { $spectype == "point"
            && [$itk_option(-gaiacube) get_type] == ".sdf" } {
          return "${ndfname}${section}"
       } else {
          return "${ndfname}:${section}"
       }
    }
-   
+
    #  Return the type of the spectrum currently extracted. Result is
    #  one of "point", "region" or "none".
    public method last_extracted_type {} {
@@ -516,7 +519,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       return "none"
    }
 
-   #  Send the currently extracted spectrum to SPLAT for display. 
+   #  Send the currently extracted spectrum to SPLAT for display.
    #  Use an NDF so that the maximum information is retained.
    protected method send_to_splat_ {} {
       if { $spectrum_ == {} || [last_extracted_type] == "none" } {
@@ -919,6 +922,10 @@ itcl::class gaia::GaiaCubeSpectrum {
          set canvas_ [$image_ get_canvas]
       }
    }
+
+   #  Whether window is transient, or not.
+   itk_option define -transient_spectralplot transient_spectralplot \
+      Transient_Spectralplot 1
 
    #  The identifier of the reference range.
    itk_option define -ref_id ref_id Ref_Id 1

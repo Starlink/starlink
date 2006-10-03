@@ -217,6 +217,7 @@ itcl::class gaia::GaiaStartup {
       set values_($this,scrollbars) 1
       set values_($this,show_hdu_chooser) 1
       set values_($this,transient_tools) 0
+      set values_($this,transient_spectralplot) 1
       set values_($this,with_colorramp) 1
       set values_($this,with_pan_window) 1
       set values_($this,with_zoom_window) 1
@@ -229,9 +230,9 @@ itcl::class gaia::GaiaStartup {
       foreach key "extended_precision show_hdu_chooser float_panel \
                    panel_orient with_zoom_window with_pan_window \
                    with_colorramp focus_follows_mouse interop_menu scrollbars \
-                   transient_tools quiet_exit min_scale max_scale \
-                   zoom_factor default_cut default_cmap default_itt \
-                   linear_cartesian always_merge check_for_cubes" {
+                   transient_tools transient_spectralplot quiet_exit \
+                   min_scale max_scale zoom_factor default_cut default_cmap \
+                   default_itt linear_cartesian always_merge check_for_cubes" {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
       $props_ save_properties
@@ -255,6 +256,8 @@ itcl::class gaia::GaiaStartup {
       if { $itk_option(-gaia) != {} } {
          $itk_option(-gaia) configure -transient_tools \
             $values_($this,transient_tools)
+         $itk_option(-gaia) configure -transient_spectralplot \
+            $values_($this,transient_spectralplot)
          $itk_option(-gaia) configure -quiet_exit \
             $values_($this,quiet_exit)
          $itk_option(-gaia) configure -check_for_cubes \
@@ -369,6 +372,18 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(transienttools) \
          {Make toolboxes remain above main window (requires restart)}
       pack $itk_component(transienttools) -side top -fill x
+
+      # Transient spectral plot.
+      itk_component add transientplot {
+         StarLabelCheck $w_.transientplot \
+            -text "Make spectral plot transient:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope values_($this,transient_spectralplot)]
+      }
+      add_short_help $itk_component(transientplot) \
+         {Make spectral plot window remain above main window (requires restart)}
+      pack $itk_component(transientplot) -side top -fill x
 
       # Exit without asking.
       itk_component add quietexit {
