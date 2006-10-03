@@ -95,6 +95,8 @@
 *        Added System "J2000"
 *     22-FEB-2006 (DSB):
 *        Added Local Apparent Sidereal Time to the SkyFrame structure.
+*     3-OCT-2006 (DSB):
+*        Added Equation of Equinoxes to the SkyFrame structure.
 *-
 */
 
@@ -147,6 +149,7 @@ typedef struct AstSkyFrame {
    double skyref[ 2 ];           /* Origin or pole of offset coord system */
    double skyrefp[ 2 ];          /* Point on primary meridian of offset coord system */
    double last;                  /* Local Apparent Sidereal Time */
+   double eqeq;                  /* Equation of equinoxes */
    double eplast;                /* Epoch used to calculate "last" */
 } AstSkyFrame;
 

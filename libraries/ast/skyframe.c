@@ -166,6 +166,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *     22-SEP-2006 (DSB):
 *        Report an error in SetSystem if it is not possible to convert
 *        from old to new systems.
+*     3-OCT-2006 (DSB):
+*        Added Equation of Equinoxes to the SkyFrame structure.
 *class--
 */
 
@@ -1094,11 +1096,10 @@ static void ClearEpoch( AstFrame *this_frame ) {
 /* Invoke the parent method to clear the Frame epoch. */
    (*parent_clearepoch)( this_frame );
 
-/* Recalculate the Local Apparent Sidereal Time value if necessary (if the 
-   default Epoch differs from the epoch used to calculate the LAST by more
-   than about 8 seconds). */
+/* Recalculate the Local Apparent Sidereal Time value if the epoch has
+   changed significantly. */
    this = (AstSkyFrame *) this_frame;
-   if( fabs( this->eplast - astGetEpoch( this ) ) > 0.0001 ) SetLast( this );
+   if( fabs( this->eplast - astGetEpoch( this ) ) > 0.000001 ) SetLast( this );
 }
 
 static void ClearObsLon( AstFrame *this ) {
@@ -7007,11 +7008,10 @@ static void SetEpoch( AstFrame *this_frame, double val ) {
    the epoch used to calculate the stored "last" value, reset the stored
    "last" value value and then re-calculate it. */
 
-/* Recalculate the Local Apparent Sidereal Time value if necessary (if the 
-   new Epoch differs from the epoch used to calculate the LAST by more 
-   than about 8 seconds). */
+/* Recalculate the Local Apparent Sidereal Time value if the epoch has
+   changed significantly. */
    this = (AstSkyFrame *) this_frame;
-   if( fabs( this->eplast - val ) > 0.0001 ) SetLast( this );
+   if( fabs( this->eplast - val ) > 0.000001 ) SetLast( this );
 }
 
 static void SetLast( AstSkyFrame *this ) {
@@ -7068,9 +7068,16 @@ static void SetLast( AstSkyFrame *this ) {
    having an attribute to specify the DUT value). */
    gmst = palSlaGmst( utc );
 
-/* Add on the east longitude and the equation of equinoxes (no correction
-   is done for polar motion), and return the answer. */
-   this->last = gmst + astGetObsLon( this ) + palSlaEqeqx( epoch );
+/* Add on the east longitude (no correction is done for polar motion). */
+   this->last = gmst + astGetObsLon( this );
+
+/* Add on the equation of equinoxes. This is an expensive calculation and
+   the result does not change significantly over a period of several
+   seconds, so only calculate a new value if the epoch value has changed
+   by more than about 8 seconds since the last time the equation of equinoxes
+   was calculated. */
+   if( fabs( this->eplast - epoch ) > 0.0001 ) this->eqeq = palSlaEqeqx( epoch );
+   this->last += this->eqeq;   
 
 /* Store the value in the SkyFrame structure for future use. */
    this->eplast = epoch;
@@ -9553,6 +9560,7 @@ AstSkyFrame *astInitSkyFrame_( void *mem, size_t size, int init,
       new->skyrefp[ 1 ] = AST__BAD;
       new->last = AST__BAD;
       new->eplast = AST__BAD;
+      new->eqeq = AST__BAD;
 
 /* Loop to replace the Axis object associated with each SkyFrame axis with
    a SkyAxis object instead. */
@@ -9806,6 +9814,7 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 /* Other values */
 /* ------------ */
       new->last = AST__BAD;
+      new->eqeq = AST__BAD;
       new->eplast = AST__BAD;
 
 /* Initialise the local apparent siderial time */
