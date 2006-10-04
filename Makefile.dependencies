@@ -840,6 +840,7 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/startcl \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tcllibs \
 		$(MANIFESTS)/tclx \
 		$(MANIFESTS)/tk
 	cd applications/gaia \
