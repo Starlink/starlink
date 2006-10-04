@@ -349,9 +349,17 @@
 /* the operating system. To be sure of writing we must call fsync() when the */
 /* file is closed.                                                           */
 /*	    printf("Unmapping %ld bytes from address %p (actually %p)\n", len, addr, *pntr );*/
+
+/* Note: under Cygwin/Mingw the msync calls always returns bad, shouldn't    */
+/* be critical, so we ignore that.                                           */
+#if __MINGW32__ || __CYGWIN__
+            msync( addr, len, MS_ASYNC );
+            if ( munmap( addr, len ) != 0 )
+#else
             if ( ( msync( addr, len, MS_ASYNC ) != 0 ) ||
                  ( munmap( addr, len ) != 0 ) )
-	    {
+#endif
+            {
 	       hds_gl_status = DAT__FILMP;
 	       emsSyser( "MESSAGE", errno );
 	       rec1_fmsg( "FILE", slot );
