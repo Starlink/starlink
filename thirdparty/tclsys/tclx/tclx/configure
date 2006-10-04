@@ -1344,7 +1344,7 @@ echo "${ECHO_T}warning: requested TEA version \"3.3\", have \"${TEA_VERSION}\"" 
 echo "${ECHO_T}ok (TEA ${TEA_VERSION})" >&6
     fi
     case "`uname -s`" in
-	*win32*|*WIN32*|*CYGWIN_NT*|*CYGWIN_9*|*CYGWIN_ME*|*MINGW32_*)
+	*win32*|*WIN32*|*MINGW32_*)
 	    # Extract the first word of "cygpath", so it can be a program name with args.
 set dummy cygpath; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -1384,6 +1384,11 @@ fi
 	    EXEEXT=".exe"
 	    TEA_PLATFORM="windows"
 	    ;;
+        *CYGWIN_NT*|*CYGWIN_9*|*CYGWIN_ME*)
+            CYGPATH=echo
+            EXEEXT=".exe"
+            TEA_PLATFORM="unix"
+            ;;
 	*)
 	    CYGPATH=echo
 	    EXEEXT=""
