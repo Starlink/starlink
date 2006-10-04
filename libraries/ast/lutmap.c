@@ -88,7 +88,8 @@ f     The LutMap class does not define any new routines beyond those
 *     10-MAY-2006 (DSB):
 *        Override astEqual.
 *     4-OCT-2006 (DSB):
-*        Correct "mintick" to "lutinterp" in SetAttrib.
+*        - Correct "mintick" to "lutinterp" in SetAttrib.
+*        - Do not include bad values in the dumped LUT array.
 *class--
 */
 
@@ -1497,9 +1498,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Lookup table contents. */
    for ( ilut = 0; ilut < this->nlut; ilut++ ) {
-      (void) sprintf( buff, "L%d", ilut + 1 );
-      astWriteDouble( channel, buff, 1, 1, this->lut[ ilut ], 
-                      ilut ? "" : "Lookup table elements..." );
+      if( this->lut[ ilut ] != AST__BAD ) {
+         (void) sprintf( buff, "L%d", ilut + 1 );
+         astWriteDouble( channel, buff, 1, 1, this->lut[ ilut ], 
+                         ilut ? "" : "Lookup table elements..." );
+      }
    }
 
 /* Undefine macros local to this function. */
@@ -2045,7 +2048,7 @@ AstLutMap *astLoadLutMap_( void *mem, size_t size,
       if ( astOK ) {
          for ( ilut = 0; ilut < new->nlut; ilut++ ) {
             (void) sprintf( buff, "l%d", ilut + 1 );
-            new->lut[ ilut ] = astReadDouble( channel, buff, 0.0 );
+            new->lut[ ilut ] = astReadDouble( channel, buff, AST__BAD );
          }
 
 /* Initialise the retained input and output coordinate values. */
