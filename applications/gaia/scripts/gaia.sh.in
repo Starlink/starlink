@@ -50,6 +50,10 @@
 #        Now starts up single binary version of GAIA.
 #     23-SEP-2004 (PWD):
 #        Added CYGWIN environment variable.
+#     04-OCT-2006 (PWD):
+#        Make sure installation lib directories are first on the library
+#        path. Now that we have shareable libraries for Tcl/Tk this is 
+#        safer.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -65,8 +69,7 @@ if test "$GAIA_DIR" = ""; then
 fi
 
 #  Notes:
-#     The ${1+"$@"} passes on any command line arguments? Perhaps $0
-#     is also required?
+#     The ${1+"$@"} passes on any command line arguments.
 
 #  Check that GAIA is installed.
 if test -x $GAIA_DIR/gaia_swish; then
@@ -97,6 +100,24 @@ if test -x $GAIA_DIR/gaia_swish; then
      CYGWIN="$CYGWIN server"
   fi
   export CYGWIN
+
+#  Set LD_LIBRARY_PATH or DYLD_LIBRARY_PATH to include the installation
+#  directories. Makes sure we pick up the right Tcl/Tk shareable libraries.
+  if test "$DYLD_LIBRARY_PATH" = ""; then
+     export LD_LIBRARY_PATH
+     if test "$LD_LIBRARY_PATH" = ""; then
+        LD_LIBRARY_PATH="@sharelibdir@"
+     else
+        LD_LIBRARY_PATH="@sharelibdir@:$LD_LIBRARY_PATH"
+     fi
+  else 
+     export DYLD_LIBRARY_PATH
+     if test "$DYLD_LIBRARY_PATH" = ""; then
+        DYLD_LIBRARY_PATH="@sharelibdir@"
+     else
+        DYLD_LIBRARY_PATH="@sharelibdir@:$LD_LIBRARY_PATH"
+     fi
+  fi  
 
 #  And run up the interface.
   $GAIA_DIR/gaia_swish ${1+"$@"}

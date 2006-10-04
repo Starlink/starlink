@@ -2,10 +2,10 @@
 #  N.B. the previous line should be blank.
 #+
 #  Name:
-#     tabbedgaia
+#     GAIA
 
 #  Purpose:
-#     Starts the tabbed version of GAIA.
+#     Starts the GAIA image display & analysis tool.
 
 #  Type of Module:
 #     Bourne shell script
@@ -14,16 +14,16 @@
 #     gaia
 
 #  Description:
-#     This command starts the tabbed version of GAIA. This manages
-#     clone windows by including them in a single pane, rather
-#     that different windows. It's a choice.
+#     This command starts the GAIA image display & analysis tool.
+#
+#     GAIA stands for Graphical Astronomy and Image Analysis tool.
 
 #  Authors:
 #     PWD: P.W. Draper (STARLINK, Durham University)
 #     {enter_new_authors_here}
 
 #  Copyright:
-#     Copyright (C) 2003-2005 Central Laboratory of the Research Councils.
+#     Copyright (C) 1996-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 #     All Rights Reserved.
 
@@ -44,8 +44,16 @@
 #     02111-1307, USA
 
 #  History:
-#     10-OCT-2003 (PWD):
+#     21-NOV-1996 (PWD):
 #        Original version.
+#     17-MAY-1999 (PWD):
+#        Now starts up single binary version of GAIA.
+#     23-SEP-2004 (PWD):
+#        Added CYGWIN environment variable.
+#     04-OCT-2006 (PWD):
+#        Make sure installation lib directories are first on the library
+#        path. Now that we have shareable libraries for Tcl/Tk this is 
+#        safer.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -59,6 +67,9 @@ if test "$GAIA_DIR" = ""; then
   echo "!! Cannot start gaia; the GAIA_DIR environment variable is not set."
   exit 1
 fi
+
+#  Notes:
+#     The ${1+"$@"} passes on any command line arguments.
 
 #  Check that GAIA is installed.
 if test -x $GAIA_DIR/gaia_swish; then
@@ -82,8 +93,34 @@ if test -x $GAIA_DIR/gaia_swish; then
   BLT_LIBRARY=$GAIA_DIR
   export BLT_LIBRARY
 
+#  Cywgin setup. Need "server" in CYGWIN for cygserver to work.
+  if test "$CYGWIN" = ""; then
+     CYGWIN="server"
+  else
+     CYGWIN="$CYGWIN server"
+  fi
+  export CYGWIN
+
+#  Set LD_LIBRARY_PATH or DYLD_LIBRARY_PATH to include the installation
+#  directories. Makes sure we pick up the right Tcl/Tk shareable libraries.
+  if test "$DYLD_LIBRARY_PATH" = ""; then
+     export LD_LIBRARY_PATH
+     if test "$LD_LIBRARY_PATH" = ""; then
+        LD_LIBRARY_PATH="@sharelibdir@"
+     else
+        LD_LIBRARY_PATH="@sharelibdir@:$LD_LIBRARY_PATH"
+     fi
+  else 
+     export DYLD_LIBRARY_PATH
+     if test "$DYLD_LIBRARY_PATH" = ""; then
+        DYLD_LIBRARY_PATH="@sharelibdir@"
+     else
+        DYLD_LIBRARY_PATH="@sharelibdir@:$LD_LIBRARY_PATH"
+     fi
+  fi  
+
 #  And run up the interface.
-  $GAIA_DIR/gaia_swish ${1+"$@"} -tabbedgaia 1
+  $GAIA_DIR/gaia_swish ${1+"$@"}
 
 else
   echo "!! Cannot start gaia; failed to locate $GAIA_DIR/gaia_swish."

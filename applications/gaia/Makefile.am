@@ -14,8 +14,8 @@ dist_bin_SCRIPTS = $(SCRIPTS_GAIA) $(GAIA_LIB_FILES) $(GAIA_IFC_FILES)
 bin_SCRIPTS = $(SKYCAT_BIN_FILES) $(GAIA_BIN_FILES)
 
 ##  GAIA top-level scripts.
-SCRIPTS_GAIA = gaia.csh gaiadisp.csh tabbedgaia.csh .gaFilters
-
+SCRIPTS_GAIA = gaia.csh gaiadisp.csh tabbedgaia.csh .gaFilters \
+	gaia.sh tabbedgaia.sh
 
 ## Things we need to create from the various sub-components.
 
@@ -31,8 +31,8 @@ SKYCAT_TEST_FILES = built/lib/skycatConfig.sh
 
 ## Files needed from gaia/library.
 GAIA_LIB_FILES =  \
- skycat2.0.cfg gaiawcs2tab pix2wcs wcs2pix gaia.sh gaiadisp.sh \
- gaiaremote.sh displaycat displaypolcat gaiacut zoomcutandflip tabbedgaia.sh
+ skycat2.0.cfg gaiawcs2tab pix2wcs wcs2pix gaiadisp.sh \
+ gaiaremote.sh displaycat displaypolcat gaiacut zoomcutandflip
 
 ## Files needed from gaia/bin.
 GAIA_BIN_FILES = \
@@ -122,6 +122,20 @@ distclean-local:
 	- (cd skycat; make distclean )
 	- (cd gaia; make distclean )
 
+##  Edit the main startup scripts so that they set the LD_LIBRARY_PATH
+##  to include the installation libdir.
+edit = sed -e 's%@sharelibdir\@%$(libdir)%g'
+
+gaia.sh: $(srcdir)/gaia.sh.in
+	rm -f gaia.sh gaia.sh.tmp
+	$(edit) $(srcdir)/gaia.sh.in > gaia.sh.tmp
+	mv gaia.sh.tmp gaia.sh
+
+tabbedgaia.sh: $(srcdir)/tabbedgaia.sh.in
+	rm -f tabbedgaia.sh tabbedgaia.sh.tmp
+	$(edit) $(srcdir)/tabbedgaia.sh.in > tabbedgaia.sh.tmp
+	mv tabbedgaia.sh.tmp tabbedgaia.sh
+
 ## Clean up extra generated files (ones in built should be already gone).
 MAINTAINERCLEANFILES = $(SKYCAT_FILES) $(GAIA_FILES)
 
@@ -152,7 +166,7 @@ dist-hook:
 
 ##  Post-installation tasks. We need to set up the softlinks for the various
 ##  tasks in the monolith. Don't use the usually mechanisms as the gaiaMon
-##  monolith is created elsewhere. Also the on-line help ends up in 
+##  monolith is created elsewhere. Also the on-line help ends up in
 ##  $(starhelpdir), that should be $(starhelpdir).htx for showme etc.
 ##  to work.
 install-exec-local:
