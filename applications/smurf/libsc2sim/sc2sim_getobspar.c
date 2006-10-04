@@ -35,6 +35,9 @@
 
 *  History :
 *     2006-09-15 (JB):
+*        Original
+*     2006-10-04 (JB):
+*        Replace strcpy with strncpy
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -113,9 +116,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->bol_disty = 6.28; 
 
    if ( !astMapGet0C ( keymap, "BOLFILE", &temp ) )
-      strcpy ( inx->bolfile, "" ); 
+      strncpy ( inx->bolfile, "", SC2SIM__FLEN ); 
    else
-      strcpy ( inx->bolfile, temp );
+      strncpy ( inx->bolfile, temp, SC2SIM__FLEN);
 
    if ( !astMapGet0D ( keymap, "BOUS_ANGLE", &(inx->bous_angle) ) )
       inx->bous_angle = 0.4636476; 
@@ -139,9 +142,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->conv_sig = 1.0;
 
    if ( !astMapGet0C ( keymap, "COORDFRAME", &temp ) )
-      strcpy ( inx->coordframe, "NASMYTH" ); 
+      strncpy ( inx->coordframe, "NASMYTH", 80 ); 
    else {
-      strcpy ( convert, temp );
+      strncpy ( convert, temp, 80 );
       /* Convert to uppercase */
       i = 0;
       while ( *convert != '\0' ) {
@@ -150,7 +153,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
          i++;
       }
       convert = convert - i;
-      strcpy ( inx->coordframe, convert );
+      strncpy ( inx->coordframe, convert, 80 );
    }
 
    if ( !astMapGet0C ( keymap, "DEC", &temp ) )
@@ -158,7 +161,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    else {
       /* Get the double representation of the sexagesimal string and
          convert from hours to radians */
-      strcpy ( convert, temp );
+      strncpy ( convert, temp, 80 );
       sc2sim_sex2double ( convert, &dec, status );
       dec *= DH2R;
    }
@@ -167,9 +170,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->distfac = 0.0;
 
    if ( !astMapGet0C ( keymap, "FLATNAME", &temp ) )
-      strcpy ( inx->flatname, "" );
+      strncpy ( inx->flatname, "", SC2SIM__FLEN );
    else
-      strcpy ( inx->flatname, temp ); 
+      strncpy ( inx->flatname, temp, SC2SIM__FLEN ); 
 
    if ( !astMapGet0I ( keymap, "GRID_MAX_X", &grid_max_x ) )
       grid_max_x = 1;
@@ -219,7 +222,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    } else {
 
       /* Parse the string and retrieve the values */
-      strcpy ( convert, temp );
+      strncpy ( convert, temp, 80 );
       curtok = strtok ( convert, ";" );
       while ( curtok != NULL ){
          nvert_x++;
@@ -249,7 +252,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    } else {
 
       /* Parse the string and retrieve the values */
-      strcpy ( convert, temp );
+      strncpy ( convert, temp, 80 );
       curtok = strtok ( convert, ";" );
       while ( curtok != NULL ){
          nvert_y++;
@@ -328,10 +331,10 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    astMapGet0C ( keymap, "OBSMODE", &temp );
 
    if ( !astMapGet0C ( keymap, "OBSMODE", &temp ) )
-      strcpy ( inx->obsmode, "" ); 
+      strncpy ( inx->obsmode, "", 80 ); 
    else {
       /* Convert to uppercase */
-      strcpy ( convert, temp );
+      strncpy ( convert, temp, 80 );
       i = 0;
       while ( *convert != '\0' ) {
          *convert = toupper (*convert);
@@ -340,7 +343,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       }
       
       convert = convert - i;
-      strcpy ( inx->obsmode, convert );
+      strncpy ( inx->obsmode, convert, 80 );
 
    }
 
@@ -352,9 +355,15 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
    if ( !astMapGet0D ( keymap, "PONG_ANGLE", &(inx->pong_angle) ) )
       inx->pong_angle = 0.4636476;
-
+ 
    if ( !astMapGet0I ( keymap, "PONG_GRIDCOUNT", &(inx->pong_gridcount) ) )
-      inx->pong_gridcount = 7;
+     inx->pong_gridcount = 7;
+
+   /*if ( !astMapGet0D ( keymap, "PONG_HEIGHT", &(inx->pong_height) ) )
+      inx->pong_height = 2000.0;
+
+   if ( !astMapGet0D ( keymap, "PONG_WIDTH", &(inx->pong_width) ) )
+   inx->pong_width = 2000.0;*/
 
    if ( !astMapGet0D ( keymap, "PONG_SPACING", &(inx->pong_spacing) ) )
       inx->pong_spacing = 240.0;
@@ -367,7 +376,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    else {
       /* Get the double representation of the sexagesimal string and
          convert from hours to radians */
-      strcpy ( convert, temp );
+      strncpy ( convert, temp, 80 );
       sc2sim_sex2double ( convert, &ra, status );
       ra *= DH2R;
    }
@@ -400,18 +409,17 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->targetpow = 25.0;
 
    if ( !astMapGet0C ( keymap, "WT0_NAME", &temp ) )
-      strcpy ( inx->wt0_name, "" ); 
+      strncpy ( inx->wt0_name, "", 80 ); 
    else
-      strcpy ( inx->wt0_name, temp );
+      strncpy ( inx->wt0_name, temp, 80 );
 
    if ( !astMapGet0C ( keymap, "WT1_NAME", &temp ) )
-      strcpy ( inx->wt1_name, "" ); 
+      strncpy ( inx->wt1_name, "", 80 ); 
    else
-      strcpy ( inx->wt1_name, temp );
+      strncpy ( inx->wt1_name, temp, 80 );
 
    smf_free ( temp, status );
- 
-   //smf_free ( convert, status );
+   smf_free ( convert, status );
 
 }
 

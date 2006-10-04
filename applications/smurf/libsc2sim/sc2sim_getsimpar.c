@@ -35,6 +35,9 @@
 
 *  History :
 *     2006-09-15 (JB):
+*        Original
+*     2006-10-04 (JB):
+*        Replace strcpy with strncpy
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -113,9 +116,9 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
       sinx->aomega = 0.179;
 
    if ( !astMapGet0C ( keymap, "ASTNAME", &temp ) )
-      strcpy ( sinx->astname, "" );
+      strncpy ( sinx->astname, "", SC2SIM__FLEN );
    else 
-      strcpy  ( sinx->astname, temp );
+      strncpy ( sinx->astname, temp, SC2SIM__FLEN );
 
    if ( !astMapGet0D ( keymap, "ASTPOL", &(sinx->astpol) ) )
       sinx->astpol = 10.0;
@@ -124,9 +127,9 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
       sinx->atend = 5.0; 
 
    if ( !astMapGet0C ( keymap, "ATMNAME", &temp ) )
-      strcpy ( sinx->atmname, "" );
+      strncpy ( sinx->atmname, "", SC2SIM__FLEN );
    else 
-      strcpy  ( sinx->atmname, temp );
+      strncpy ( sinx->atmname, temp, SC2SIM__FLEN );
 
    if ( !astMapGet0D ( keymap, "ATMREFNU", &(sinx->atmrefnu) ) )
       sinx->atmrefnu = 0.5;  
@@ -192,9 +195,9 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
       sinx->smu_terr = 0.0;
 
    if ( !astMapGet0C ( keymap, "SUBNAME", &temp ) ) 
-      strcpy ( sinx->subname, "s8a" );
+      strncpy ( sinx->subname, "s8a", SC2SIM__FLEN );
    else
-      strcpy ( sinx->subname, temp );
+      strncpy ( sinx->subname, temp, SC2SIM__FLEN );
 
    if ( !astMapGet0D ( keymap, "TELEMISSION", &(sinx->telemission) ) )
       sinx->telemission = 4.0;
