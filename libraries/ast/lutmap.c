@@ -87,6 +87,8 @@ f     The LutMap class does not define any new routines beyond those
 *        - Added attribute LutInterp
 *     10-MAY-2006 (DSB):
 *        Override astEqual.
+*     4-OCT-2006 (DSB):
+*        Correct "mintick" to "lutinterp" in SetAttrib.
 *class--
 */
 
@@ -945,7 +947,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* LutInterp. */
 /* ---------- */
    if ( nc = 0,
-        ( 1 == astSscanf( setting, "mintick= %d %n", &lutinterp, &nc ) )
+        ( 1 == astSscanf( setting, "lutinterp= %d %n", &lutinterp, &nc ) )
         && ( nc >= len ) ) {
       astSetLutInterp( this, lutinterp );
 
