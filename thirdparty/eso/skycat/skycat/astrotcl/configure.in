@@ -516,7 +516,7 @@ case $CC in
 	gcc)
 		GCCVERSION="`gcc -v 2>&1 | grep version`"
 		echo "cfitsio: == Using $GCCVERSION"
-		AC_SUBST(GCCVERSION)
+		#AC_SUBST(GCCVERSION)
 		;;
 	cc)
 		echo "cfitsio: Old CXXDEBUGFLAGS is $CXXDEBUGFLAGS"
