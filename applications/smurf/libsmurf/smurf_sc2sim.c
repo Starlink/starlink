@@ -65,6 +65,7 @@
 *     2006-09-14  Seed optional
 *     2006-09-14  Ability to scan in AzEl and RADec coordinates (EC)
 *     2006-09-22  Convert to using AstKeyMaps for input parameters (JB)
+*     2006-10-03  Remove unused variables (JB)
 *     {enter_further_changes_here}
 
 *    History (HEATRUN task):
@@ -130,6 +131,7 @@
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "star/kaplibs.h"
+#include "star/slalib.h"
 
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
@@ -171,12 +173,9 @@ void smurf_sc2sim( int *status ) {
    int maxwrite;                   /* file close time */
    obsMode mode;                   /* what type of observation are we doing? */
    int nbol;                       /* total number of bolometers */
-   int numscans;                   /* number of scans across sky */
    Grp *obsGrp = NULL;             /* Group containing obs parameter file */
    AstKeyMap *obskeymap=NULL;      /* AstKeyMap for obs parameters */
    int osize = 0;                  /* Size of obsGrp */
-   char *pars[4];                  /* parameter list */
-   double pathlength;              /* length of scan path (arcsec) */
    double *pzero=NULL;             /* bolometer power offsets */
    int rseed;                      /* seed for random number generator */
    double samptime;                /* sample time in sec */
@@ -184,7 +183,6 @@ void smurf_sc2sim( int *status ) {
    AstKeyMap *simkeymap=NULL;      /* AstKeyMap for sim parameters */
    char simtype[LEN__METHOD];      /* String for simulation type */
    int ssize = 0;                  /* Size of simGrp */
-   char testtype[LEN__METHOD];     /* String for scantest type */
    struct timeval time;            /* Structure for system time */
    static double weights[SC2SIM__MXIRF]; /* impulse response */
    double *xbc=NULL;               /* projected NAS X offsets of bolometers 
@@ -221,7 +219,7 @@ void smurf_sc2sim( int *status ) {
    msgOutif(MSG__VERB, FUNC_NAME, "Initialise instrument.", status);
 
    sc2sim_instrinit ( &inx, &sinx, obskeymap, simkeymap, coeffs, &digcurrent,
-		    &digmean, &digscale, &elevation, weights, &heater, 
+		      &digmean, &digscale, &elevation, weights, &heater, 
 		      &pzero, &xbc, &ybc, &xbolo, &ybolo, status );
 
    nbol = inx.nbolx * inx.nboly;
