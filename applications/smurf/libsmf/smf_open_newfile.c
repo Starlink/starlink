@@ -99,6 +99,8 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
+*     lbnd needs to be set to 0 instead of 1 or else maps end
+*     up offset - unresolved.  (JB)
 *-
 */
 
@@ -194,7 +196,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, int ndims,
 
   /* Fill ubnd and lbnd arrays */
   for ( i=0; i<ndims; i++) {
-    lbnd[i] = 1;
+    lbnd[i] = 0;
     /* should check for overflow */
     ubnd[i] = (int)dims[i];
   }
