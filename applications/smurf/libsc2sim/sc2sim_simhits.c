@@ -92,6 +92,8 @@
 *        Removed another instance of hard-wired telescope coordinates
 *     2006-09-22 (JB):
 *        Use sc2sim_structs instead of dxml_structs
+*     2006-10-03 (JB):
+*        Use width & height instead of gridcount in PONG
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -210,7 +212,6 @@ void sc2sim_simhits ( struct sc2sim_obs_struct *inx,
   double *flatpar=NULL;           /* flatfield parameters */
   int frame;                      /* frame counter */
   AstFrameSet *fs=NULL;           /* frameset for tanplane projection */
-  double grid[64][2];             /* PONG grid coordinates */
   JCMTState *head;                /* per-frame headers */
   char heatname[DREAM__FLEN];     /* name of flatfield cal file */
   int i;                          /* loop counter */
@@ -280,14 +281,14 @@ void sc2sim_simhits ( struct sc2sim_obs_struct *inx,
   case pong:
     /* Call sc2sim_getpong to get pong pointing solution */
     msgOut( FUNC_NAME, "Do a PONG observation", status ); 
-    accel[0] = 432.0;
-    accel[1] = 540.0;
+    /*accel[0] = 432.0;
+      accel[1] = 540.0;*/
     vmax[0] = inx->pong_vmax;        /*200.0;*/
     vmax[1] = inx->pong_vmax;        /*200.0;*/
 
-    sc2sim_getpong ( inx->pong_angle, inx->pong_gridcount, 
-		     inx->pong_spacing, accel, vmax, samptime, grid,
-		     &count, &posptr, status );
+    sc2sim_getpong ( inx->pong_angle, inx->pong_width, inx->pong_height, 
+                     inx->pong_spacing, vmax, samptime, 
+                     &count, &posptr, status );
     
     break;
 

@@ -37,7 +37,8 @@
 *     2006-09-15 (JB):
 *        Original
 *     2006-10-04 (JB):
-*        Replace strcpy with strncpy
+*        Replace strcpy with strncpy, replace pong_gridcount with
+*        pong_width and pong_height
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -356,14 +357,11 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0D ( keymap, "PONG_ANGLE", &(inx->pong_angle) ) )
       inx->pong_angle = 0.4636476;
  
-   if ( !astMapGet0I ( keymap, "PONG_GRIDCOUNT", &(inx->pong_gridcount) ) )
-     inx->pong_gridcount = 7;
-
-   /*if ( !astMapGet0D ( keymap, "PONG_HEIGHT", &(inx->pong_height) ) )
+   if ( !astMapGet0D ( keymap, "PONG_HEIGHT", &(inx->pong_height) ) )
       inx->pong_height = 2000.0;
 
    if ( !astMapGet0D ( keymap, "PONG_WIDTH", &(inx->pong_width) ) )
-   inx->pong_width = 2000.0;*/
+   inx->pong_width = 2000.0;
 
    if ( !astMapGet0D ( keymap, "PONG_SPACING", &(inx->pong_spacing) ) )
       inx->pong_spacing = 240.0;

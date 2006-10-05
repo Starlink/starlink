@@ -34,6 +34,10 @@
 *        Modified interface to ndfwrdata to take INSTRUME as parameter
 *     2006-09-08 (EC):
 *        Modified sc2sim_calctime to take Longitude as a parameter
+*     2006-10-03 (JB):
+*        Modified sc2sim_getpong to use width/height and removed 
+*        sc2sim_getpongends
+
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -287,23 +291,14 @@ void sc2sim_getpong
 (
 double angle,        /* angle of pattern relative to telescope
                         axes in radians anticlockwise (given) */
-int gridcount,       /* number of grid lines (odd) (given) */
+double width,        /* minimum width of PONG pattern in arcsec (given) */
+double height,       /* minimum height of PONG pattern in arcsec (given) */
 double spacing,      /* grid spacing in arcsec (given) */
-double accel[2],     /* telescope accelerations (arcsec) (given) */
 double vmax[2],      /* telescope maximum velocities (arcsec) (given) */
 double samptime,     /* sample interval in sec (given) */
-double grid[][2],    /* pong grid coordinates (returned) */
 int *pongcount,      /* number of positions in pattern (returned) */
 double **posptr,     /* list of positions (returned) */
 int *status          /* global status (given and returned) */
-);
-
-void sc2sim_getpongends
-( 
-int gridcount,           /* number of grid lines (odd) (given) */
-double spacing,          /* grid spacing in arcsec (given) */
-double grid[][2],        /* coordinates of pong vertices (returned) */
-int *status              /* global status (given and returned) */
 );
 
 void sc2sim_getscaling

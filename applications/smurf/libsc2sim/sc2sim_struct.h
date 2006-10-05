@@ -26,6 +26,7 @@
     04Aug2006 : added bous & singlescan parameters (jb)
     21Aug2006 : Put in ifndef to avoid including multiple times (ec)
     22Sep2006 : Merge with dxml_struct.h (jb)
+    05Oct2006 : Replace pong_gridcount with pong_height and pong_width (jb)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -93,7 +94,8 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   double platerev;            /* waveplate rotation rev/sec */
   double pong_angle;          /* angle of pattern relative to telescope
 				 axes in radians anticlockwise */
-  int pong_gridcount;         /* number of grid lines (odd) */
+  double pong_width;          /* min width of pong pattern (arcsec) */
+  double pong_height;         /* min height of pong pattern (arcsec) */
   double pong_spacing;        /* grid spacing in arcsec */
   double pong_vmax;           /* Telescope max velocities (arcsec/sec) */
   double ra;                  /* right ascension in radians */
