@@ -4300,9 +4300,6 @@ L1:
             astEndPM;
          }
 
-/* Temporarily make the SkyFrame use degrees for longitude axis. */
-         astSetAsTime( skyframe, 0, 0 );
-
 /* Display absolute value preceeded by "E" or "W" as appropriate. */
          if( dval < 0 ) {         
             (void) sprintf( buff, "W%s",  astFormat( skyframe, 1, -dval ) );
@@ -4310,9 +4307,6 @@ L1:
             (void) sprintf( buff, "E%s",  astFormat( skyframe, 1, dval ) );
          }
          result = buff;
-
-/* Make the SkyFrame use hours for longitude axis again. */
-         astSetAsTime( skyframe, 0, 1 );
 
       }
 
@@ -8175,7 +8169,7 @@ L1:
    for formatting and unformatting ObsLon and ObsLat values. */
       if( !skyframe ) {
          astBeginPM;
-         skyframe = astSkyFrame( "system=FK5,equinox=J2000" );
+         skyframe = astSkyFrame( "system=FK5,equinox=J2000,format(2)=dms.2" );
          astEndPM;
       }
 
@@ -8215,15 +8209,12 @@ L1:
    for formatting and unformatting ObsLon and ObsLat values. */
       if( !skyframe ) {
          astBeginPM;
-         skyframe = astSkyFrame( "system=FK5,equinox=J2000" );
+         skyframe = astSkyFrame( "system=FK5,equinox=J2000,format(2)=dms.2" );
          astEndPM;
       }
 
-/* Convert the string to a radians value before use (temporarily make the 
-   SkyFrame use degrees for longitude axis). */
-      astSetAsTime( skyframe, 0, 0 );
-      ival = astUnformat( skyframe, 0, setting + off2, &dval );
-      astSetAsTime( skyframe, 0, 1 );
+/* Convert the string to a radians value before use. */
+      ival = astUnformat( skyframe, 1, setting + off2, &dval );
       if ( ival == astChrLen( setting ) - off2  ) {
          astSetObsLon( this, dval*sign );
 
