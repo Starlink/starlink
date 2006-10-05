@@ -4270,7 +4270,7 @@ L1:
    for formatting and unformatting ObsLon and ObsLat values. */
          if( !skyframe ) {
             astBeginPM;
-            skyframe = astSkyFrame("system=FK5,equinox=J2000,format(1)=dms.2" );
+            skyframe = astSkyFrame("system=FK5,equinox=J2000,format(2)=dms.2" );
             astEndPM;
          }
 
@@ -4296,7 +4296,7 @@ L1:
    for formatting and unformatting ObsLon and ObsLat values. */
          if( !skyframe ) {
             astBeginPM;
-            skyframe = astSkyFrame( "system=FK5,equinox=J2000,format(1)=dms.2" );
+            skyframe = astSkyFrame( "system=FK5,equinox=J2000,format(2)=dms.2" );
             astEndPM;
          }
 
