@@ -130,7 +130,18 @@ void findclumps( int *status ) {
 *        Controls the amount of diagnostic information reported. It
 *        should be in the range 0 to 6. A value of zero will suppress all 
 *        screen output. Larger values give more information (the precise 
-*        information displayed depends on the algorithm being used). [1]
+*        information displayed depends on the algorithm being used).
+*        Note, this screen output describes the progress of the specific clump
+*        finding algorithm selected using the METHOD parameter, and therefore 
+*        clump parameters such as clump size, etc, will be displayed
+*        using the definition most natural to the chosen algorithm. These
+*        definitions may not be the same as those used to create the output
+*        catalogue, since the output catalogue contains standardised columns 
+*        chosen to allow comparison between different algorithms. For
+*        instance, the clump sizes displayed on the screen by the GaussClumps
+*        algorithm will be FWHM in pixels, but the clump sizes stored in the 
+*        output catalogue are the RMS deviation of each pixel centre from the 
+*        clump centroid, weighted by the corresponding pixel data value. [1]
 *     IN = NDF (Read)
 *        The 1, 2 or 3 dimensional NDF to be analysed. 
 *     METHOD = LITERAL (Read)
