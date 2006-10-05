@@ -225,6 +225,9 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Allow astAbbrev to have a null "str1" value.
 *     16-AUG-2006 (DSB):
 *        Correct "Class Applicability" to "Applicability".
+*     5-OCT-2006 (DSB):
+*        Increase the number of digits used when formating a ObsLon or 
+*        ObsLat value in GetAttrib.
 *class--
 */
 
@@ -4267,7 +4270,7 @@ L1:
    for formatting and unformatting ObsLon and ObsLat values. */
          if( !skyframe ) {
             astBeginPM;
-            skyframe = astSkyFrame("system=FK5,equinox=J2000" );
+            skyframe = astSkyFrame("system=FK5,equinox=J2000,format(1)=dms.1" );
             astEndPM;
          }
 
@@ -4293,7 +4296,7 @@ L1:
    for formatting and unformatting ObsLon and ObsLat values. */
          if( !skyframe ) {
             astBeginPM;
-            skyframe = astSkyFrame( "system=FK5,equinox=J2000" );
+            skyframe = astSkyFrame( "system=FK5,equinox=J2000,format(1)=dms.1" );
             astEndPM;
          }
 
@@ -11308,7 +11311,7 @@ astMAKE_TEST(Frame,Title,( this->title != NULL ))
 *     "-45.6", "S45.6". As indicated, the sign of the latitude can 
 *     optionally be indicated using characters "N" and "S" in place of the 
 *     usual "+" and "-". When converting the stored value to a string, the 
-*     format "[s]dd:mm:ss" is used, when "[s]" is "N" or "S".
+*     format "[s]dd:mm:ss.s" is used, when "[s]" is "N" or "S".
 
 *  Applicability:
 *     Frame
@@ -11363,7 +11366,7 @@ astMAKE_TEST(Frame,ObsLat,(this->obslat!=AST__BAD))
 *     "-204.67689", "W204.67689". As indicated, the sign of the longitude can 
 *     optionally be indicated using characters "E" and "W" in place of the 
 *     usual "+" and "-". When converting the stored value to a string, the 
-*     format "[s]ddd:mm:ss" is used, when "[s]" is "E" or "W" and the 
+*     format "[s]ddd:mm:ss.s" is used, when "[s]" is "E" or "W" and the 
 *     numerical value is chosen to be less than 180 degrees.
 
 *  Applicability:
