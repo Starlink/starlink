@@ -17,11 +17,11 @@
 \newcommand{\stardocauthors}   {D.S. Berry}
 \newcommand{\stardocdate}      {13th September 2006}
 \newcommand{\stardoctitle}     {CUPID}
-\newcommand{\stardoconeline}   {A Clump Identification and Analysis Package}
+\newcommand{\stardoconeline}   {A 3D Clump Identification and Analysis Package}
 \newcommand{\stardocversion}   {Version 0.0-13}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {CUPID is a package of the identification
-and analysis of clumps of emission within 2- and 3- dimensional 
+and analysis of clumps of emission within 1-, 2- and 3- dimensional 
 data arrays.}
 
 % ? End of document identification
@@ -616,16 +616,13 @@ clumps of emission within 1, 2 or 3D data arrays. Specifically, it currently
 provides the following facilities:
 
 \begin{itemize}
+\item background estimation (uses spatial filtering to remove features with 
+      scale size less than a given value).
 \item identification of clumps of emission using a variety of different
       algorithms (\emph{e.g.} GaussClumps, ClumpFind, \emph{etc}).
 \item creation of catalogues of clump parameters
 \item creation of cut-out images containing the emission from individual clumps.
 \end{itemize}
-
-\begin{center}
-\emph{Note, it is currently assumed that any background extended emission has
-been removed from the data before using CUPID.}
-\end{center}
 
 CUPID processes data in \emph{NDF} format. This is the standard data
 format used by most Starlink software, and is described fully in
@@ -685,6 +682,12 @@ containing a collection of random Gaussian clumps, with added noise.
 This section lists and describes the clump identification algorithms
 which are implemented within the CUPID \htmlref{FINDCLUMPS}{FINDCLUMPS}
 command.
+
+\begin{center}
+\emph{Note, it is assumed that any background extended emission has
+been removed from the data before using FINDCLUMPS. This can be done
+using the \htmlref{FINDBACK}{FINDBACK} command.}
+\end{center}
 
 \subsection{\xlabel{gaussclumps}GaussClumps}
 

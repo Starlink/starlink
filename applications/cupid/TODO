@@ -1,3 +1,9 @@
+25/9/06:
+   - Provide an option to re-apply the beam width smoothing to the results 
+   returned in the catalogue.
+
+   - Option to include extra method-specific columns in the output catalogue.
+
 19/5/06:
 
    - Provide spatial filtering to remove all spatial structure with scale
