@@ -128,7 +128,13 @@ EOF
             if( $names ) {
                $pars .= ",$names";
             }
-            
+
+            if( $ftype =~ /\*/ ) {
+               $null = "NULL";
+            } else {
+               $null = "0";
+            }
+   
             print OUTFILE <<EOF;
 #define $base($pars) \\
    ( ( type == CUPID__DOUBLE ) ? \\
@@ -139,7 +145,7 @@ EOF
       *status = SAI__ERROR, \\
       msgSeti( "TYPE", type ), \\
       errRep( "CUPID_BADTYPE", "Bad data type (^TYPE) used when invoking " \\
-              "name (internal CUPID programming error).", status ),0:0 ) ) )
+              "name (internal CUPID programming error).", status),$null:$null ) ) )
 
 EOF
 
