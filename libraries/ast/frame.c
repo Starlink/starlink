@@ -4305,9 +4305,9 @@ L1:
 
 /* Display absolute value preceeded by "E" or "W" as appropriate. */
          if( dval < 0 ) {         
-            (void) sprintf( buff, "W%s",  astFormat( skyframe, 0, -dval ) );
+            (void) sprintf( buff, "W%s",  astFormat( skyframe, 1, -dval ) );
          } else {
-            (void) sprintf( buff, "E%s",  astFormat( skyframe, 0, dval ) );
+            (void) sprintf( buff, "E%s",  astFormat( skyframe, 1, dval ) );
          }
          result = buff;
 
