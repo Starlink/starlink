@@ -78,6 +78,10 @@
 *        Add some defensive programming to the SideBand string
 *     24-AUG-2006 (DSB):
 *        Display TimeOrigin to full precision.
+*     5-OCT-2006 (DSB):
+*        Clear TimeOrigin in the TimeFrame used to format the TimeOrigin
+*        value so that the TimeOrigin value is formatted as an absolute
+*        time.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -556,6 +560,7 @@
                TIMEOR = AST_GETD( FRM, 'TIMEORIGIN', STATUS )
 
                FRM2 = AST_COPY( FRM, STATUS )
+               CALL AST_CLEAR( FRM2, 'TIMEORIGIN', STATUS )
                CALL AST_SETI( FRM2, 'Digits', VAL__SZD, STATUS )
                CALL MSG_SETC( 'TIMEOR',
      :              AST_FORMAT( FRM2, 1, TIMEOR, STATUS ) )
