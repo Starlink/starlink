@@ -1163,7 +1163,7 @@ double astDat_( double in, int forward ){
 *     - This function is based on SLA_DAT by P.T.Wallace.
 *     - This routine must be updated on each occasion that a leap second is
 *     announced
-*     - Latest leap second:  1999 January 1
+*     - Latest leap second:  2006 January 1
 
 *-
 */
