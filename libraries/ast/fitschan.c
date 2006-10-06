@@ -708,6 +708,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        Modify GetClean so that it ignores the inherited status.
 *     20-SEP-2006 (DSB):
 *        Fix memory leak in WcsSpectral.
+*     6-OCT-2006 (DSB):
+*        Modify IsSpectral to allow for CTYPE values that are shorter than 
+*        eight characters.
 *class--
 */
 
@@ -15580,6 +15583,7 @@ static const char *IsSpectral( const char *ctype, char stype[5], char algcode[5]
 
 /* Local Variables: */
    static const char *ret;
+   int ctype_len;
    
 /* Initialise */
    ret = NULL;
@@ -15589,56 +15593,72 @@ static const char *IsSpectral( const char *ctype, char stype[5], char algcode[5]
 /* Check the inherited status. */
    if( !astOK ) return ret;
 
+/* If the length of the string is less than 4, then it is not a spectral
+   axis. */
+   ctype_len = strlen( ctype );
+   if( ctype_len >= 4 ) {
+
 /* Copy the first 4 characters (the coordinate system described by the
    axis) into a null-terminated buffer. */
-   strncpy( stype, ctype, 4 );
-   stype[ 4 ] = 0;
-   stype[ astChrLen( stype ) ] = 0;
+      strncpy( stype, ctype, 4 );
+      stype[ 4 ] = 0;
+      stype[ astChrLen( stype ) ] = 0;
 
-/* Copy the next 4 characters in the CTYPE value (the algorithm code) into a 
-   null-terminated buffer. */
-   strncpy( algcode, ctype + 4, 4 );
-   algcode[ 4 ] = 0;
-   algcode[ astChrLen( algcode ) ] = 0;
+/* Copy any remaining characters (the algorithm code) into a null-terminated 
+   buffer. Only copy a maximum of 4 characters. */
+      if( ctype_len > 4 ) {
+         if( ctype_len <= 8 ) {
+            strcpy( algcode, ctype + 4 );
+         } else {
+            strncpy( algcode, ctype + 4, 4 );
+            algcode[ 4 ] = 0;
+         }
+         algcode[ astChrLen( algcode ) ] = 0;
+
+      } else {
+         algcode[ 0 ] = 0;
+      }
 
 /* See if the first 4 characters of the CTYPE value form one of the legal
    spectral coordinate type codes listed in FITS-WCS Paper III. Also note
    the default units associated with the system. */
-   if( !strcmp( stype, "FREQ" ) ) {
-      ret = "Hz";
-
-   } else if( !strcmp( stype, "ENER" ) ) {
-      ret = "J";
-
-   } else if( !strcmp( stype, "WAVN" ) ) {
-      ret = "/m";
-
-   } else if( !strcmp( stype, "VRAD" ) ) {
-      ret = "m/s";
-
-   } else if( !strcmp( stype, "WAVE" ) ) {
-      ret = "m";
-
-   } else if( !strcmp( stype, "VOPT" ) ) {
-      ret = "m/s";
-
-   } else if( !strcmp( stype, "ZOPT" ) ) {
-      ret = "";
-
-   } else if( !strcmp( stype, "AWAV" ) ) {
-      ret = "m";
-
-   } else if( !strcmp( stype, "VELO" ) ) {
-      ret = "m/s";
-
-   } else if( !strcmp( stype, "BETA" ) ) {
-      ret = "";
-   }
+      if( !strcmp( stype, "FREQ" ) ) {
+         ret = "Hz";
+   
+      } else if( !strcmp( stype, "ENER" ) ) {
+         ret = "J";
+   
+      } else if( !strcmp( stype, "WAVN" ) ) {
+         ret = "/m";
+   
+      } else if( !strcmp( stype, "VRAD" ) ) {
+         ret = "m/s";
+   
+      } else if( !strcmp( stype, "WAVE" ) ) {
+         ret = "m";
+   
+      } else if( !strcmp( stype, "VOPT" ) ) {
+         ret = "m/s";
+   
+      } else if( !strcmp( stype, "ZOPT" ) ) {
+         ret = "";
+   
+      } else if( !strcmp( stype, "AWAV" ) ) {
+         ret = "m";
+   
+      } else if( !strcmp( stype, "VELO" ) ) {
+         ret = "m/s";
+   
+      } else if( !strcmp( stype, "BETA" ) ) {
+         ret = "";
+      }
 
 /* Also check that the remaining part of CTYPE (the algorithm code) begins 
    with a minus sign or is blank. */
-   if( algcode[ 0 ] != '-' && strlen( algcode ) > 0 ) ret = NULL;
+      if( algcode[ 0 ] != '-' && strlen( algcode ) > 0 ) ret = NULL;
    
+   }
+
 /* Return null strings if the axis is not a spectral axis. */
    if( ! ret ) {
       stype[ 0 ] = 0;
