@@ -709,8 +709,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     20-SEP-2006 (DSB):
 *        Fix memory leak in WcsSpectral.
 *     6-OCT-2006 (DSB):
-*        Modify IsSpectral to allow for CTYPE values that are shorter than 
-*        eight characters.
+*        Modify IsSpectral and IsAIPSSpectral to allow for CTYPE values that 
+*        are shorter than eight characters.
 *class--
 */
 
@@ -15486,41 +15486,45 @@ static int IsAIPSSpectral( const char *ctype, char **wctype, char **wspecsys ){
 /* Check the inherited status. */
    if( !astOK ) return ret;
 
+/* If the length of the string is not 8, then it is not an AIPS spectral axis. */
+   if( strlen( ctype ) == 8 ) {
+
 /* Translate AIPS spectral CTYPE values to FITS-WCS paper III equivalents. 
    These are of the form AAAA-BBB, where "AAAA" can be "FREQ", "VELO" (=VRAD!) 
    or "FELO" (=VOPT-F2W), and BBB can be "LSR", "LSD", "HEL" (=*Bary*centric!) 
    or "GEO". */
-   if( !strncmp( ctype, "FREQ", 4 ) ){
-      *wctype = "FREQ    ";
-   } else if( !strncmp( ctype, "VELO", 4 ) ){
-      *wctype = "VRAD    ";
-   } else if( !strncmp( ctype, "FELO", 4 ) ){
-      *wctype = "VOPT-F2W";
-   } else if( !strncmp( ctype, "WAVELENG", 8 ) ){
-      *wctype = "WAVE    ";
-   }
-
-   if( !strcmp( ctype + 4, "-LSR" ) ){
-      *wspecsys = "LSRK";
-   } else if( !strcmp( ctype + 4, "LSRK" ) ){
-      *wspecsys = "LSRK";
-   } else if( !strcmp( ctype + 4, "-LSRK" ) ){
-      *wspecsys = "LSRK";
-   } else if( !strcmp( ctype + 4, "-LSD" ) ){
-      *wspecsys = "LSRD";
-   } else if( !strcmp( ctype + 4, "-HEL" ) ){
-      *wspecsys = "BARYCENT";
-   } else if( !strcmp( ctype + 4, "-EAR" ) || !strcmp( ctype + 4, "-GEO" ) ){
-      *wspecsys = "GEOCENTR";
-   } else if( !strcmp( ctype + 4, "-OBS" ) || !strcmp( ctype + 4, "-TOP" ) ){
-      *wspecsys = "TOPOCENT";
-   }
-
-   if( *wctype && *wspecsys ) {
-      ret = 1;
-   } else {
-      *wctype = NULL;
-      *wspecsys = NULL;
+      if( !strncmp( ctype, "FREQ", 4 ) ){
+         *wctype = "FREQ    ";
+      } else if( !strncmp( ctype, "VELO", 4 ) ){
+         *wctype = "VRAD    ";
+      } else if( !strncmp( ctype, "FELO", 4 ) ){
+         *wctype = "VOPT-F2W";
+      } else if( !strncmp( ctype, "WAVELENG", 8 ) ){
+         *wctype = "WAVE    ";
+      }
+   
+      if( !strcmp( ctype + 4, "-LSR" ) ){
+         *wspecsys = "LSRK";
+      } else if( !strcmp( ctype + 4, "LSRK" ) ){
+         *wspecsys = "LSRK";
+      } else if( !strcmp( ctype + 4, "-LSRK" ) ){
+         *wspecsys = "LSRK";
+      } else if( !strcmp( ctype + 4, "-LSD" ) ){
+         *wspecsys = "LSRD";
+      } else if( !strcmp( ctype + 4, "-HEL" ) ){
+         *wspecsys = "BARYCENT";
+      } else if( !strcmp( ctype + 4, "-EAR" ) || !strcmp( ctype + 4, "-GEO" ) ){
+         *wspecsys = "GEOCENTR";
+      } else if( !strcmp( ctype + 4, "-OBS" ) || !strcmp( ctype + 4, "-TOP" ) ){
+         *wspecsys = "TOPOCENT";
+      }
+   
+      if( *wctype && *wspecsys ) {
+         ret = 1;
+      } else {
+         *wctype = NULL;
+         *wspecsys = NULL;
+      }
    }
 
 /* Return the result. */
