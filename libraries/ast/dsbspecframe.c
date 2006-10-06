@@ -92,6 +92,8 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *        Change default Domain from SPECTRUM to DSBSPECTRUM 
 *     3-APR-2006 (DSB):
 *        Fix memory leak in astLoadDSBSpecFrame.
+*     6-OCT-2006 (DSB):
+*        Guard against annulling null pointers in subFrame.
 *class--
 
 *  Implementation Deficiencies:
@@ -1414,8 +1416,8 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 /* If an error occurred or no match was found, annul the returned
    objects and reset the returned result. */
    if ( !astOK || !match ) {
-      *map = astAnnul( *map );
-      *result = astAnnul( *result );
+      if( *map ) *map = astAnnul( *map );
+      if( *result ) *result = astAnnul( *result );
       match = 0;
    }
 

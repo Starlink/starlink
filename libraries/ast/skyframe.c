@@ -168,6 +168,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        from old to new systems.
 *     3-OCT-2006 (DSB):
 *        Added Equation of Equinoxes to the SkyFrame structure.
+*     6-OCT-2006 (DSB):
+*        Guard against annulling null pointers in subFrame.
 *class--
 */
 
@@ -7811,8 +7813,8 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 /* If an error occurred or no match was found, annul the returned
    objects and reset the returned result. */
    if ( !astOK || !match ) {
-      *map = astAnnul( *map );
-      *result = astAnnul( *result );
+      if( *map ) *map = astAnnul( *map );
+      if( *result ) *result = astAnnul( *result );
       match = 0;
    }
 
