@@ -48,9 +48,11 @@
 *     axis-zenith angle.
 
 *  Notes: 
-*     There is a lot of duplicated code between this routine and
-*     smf_correct_extinction as they both work in the AzEl coordinate
-*     system
+*     - There is a lot of duplicated code between this routine 
+*       and smf_correct_extinction as they both work in the AzEl
+*       coordinate system
+*     - The comments need some work to explain EXACTLY what this subroutine 
+*       is doing
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -74,6 +76,14 @@
 *        Add history check, and update history if routine successful
 *     2006-07-26 (TIMJ):
 *        sc2head no longer used. Use JCMTState instead.
+*     2006-09-27 (AGG):
+*        Use separate calls to smf_tslice_ast depending on whether or
+*        not we need the header
+*     2006-10-06 (AGG):
+*        Bug fixes to get the projected equivalent elevation
+*        correct. Also refactored memory allocation/freeing outside of
+*        loop so it's not done every frame.
+
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -176,10 +186,16 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
   double c[2];             /* Coordinates for point C (zenith) */
   double alpha = 0;        /* Angle ABC (radians) */
   double dalpha;           /* Change in focal plane angle (radians) */
+  double angle0 = 0;       /* Initial angle */
+  double delta;            /* Change in angle */
+  double cosalpha;         /* Cosine alpha */
+  double sinalpha;         /* Sine alpha */
 
   /* Check status */
   if (*status != SAI__OK) return;
 
+  /* Have we already removed a plane from the data? If so we're not
+     doing it again. */
   if ( smf_history_check( data, FUNC_NAME, status) ) {
     msgSetc("F", FUNC_NAME);
     msgOutif( MSG__VERB, FUNC_NAME, 
@@ -191,7 +207,7 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
   if ( strncmp( fittype, "MEAN", 4 ) == 0 ) {
     needast = 0;
     fitmean = 1;
-    ncoeff = 1; /* Not needed :-) */
+    ncoeff = 1; /* Not really necessary I guess :-) */
   } else if ( strncmp( fittype, "SLOP", 4 ) == 0 )  {
     needast = 1;
     fitslope = 1;
@@ -238,52 +254,68 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 
   /* It is more efficient to call astTran2 with all the points
      rather than one point at a time */
+
+  /* Allocate space for base pixel coordinates */
   xin = smf_malloc( npts, sizeof(double), 0, status );
   yin = smf_malloc( npts, sizeof(double), 0, status );
+  /* For fits that need the astrometry, also allocate space for the
+     sky coordinates corresponding to the pixel coords */
   if ( needast ) {
-    /*    xout = smf_malloc( npts, sizeof(double), 0, status );
-	  yout = smf_malloc( npts, sizeof(double), 0, status );*/
     xout = smf_malloc( 2, sizeof(double), 0, status );
     yout = smf_malloc( 2, sizeof(double), 0, status );
     x0 = smf_malloc( 2, sizeof(double), 0, status );
     y0 = smf_malloc( 2, sizeof(double), 0, status );
     ynew = smf_malloc( npts, sizeof(double), 0, status );
   }
+  /* Bolometer indices */
   indices = smf_malloc( npts, sizeof(size_t), 0, status );
 
   /* Jump to the cleanup section if status is bad by this point
      since we need to free memory */
   if (*status != SAI__OK) goto CLEANUP;
 
-  /* Prefill with coordinates */
+  /* Prefill pixel coordinates */
   z = 0;
   for (j = 0; j < (data->dims)[1]; j++) {
     base = j *(data->dims)[0];
     for (i = 0; i < (data->dims)[0]; i++) {
       xin[z] = (double)i + 1.0;
       yin[z] = (double)j + 1.0;
-      indices[z] = base + i; /* index into data array */
+      indices[z] = base + i; /* Index into data array */
       z++;
     }
   }
 
+  /* Allocate GSL workspace */
+  work = gsl_multifit_linear_alloc( npts, ncoeff );
+  azel = gsl_matrix_alloc( npts, ncoeff );
+  psky = gsl_vector_alloc( npts );
+  weight = gsl_vector_alloc( npts );
+  skyfit = gsl_vector_alloc( ncoeff );
+  mcov = gsl_matrix_alloc( ncoeff, ncoeff );
+
   /* Loop over timeslice index */
   for ( k=0; k<nframes; k++) {
-    /* Call tslice_ast to update the header for the particular
-       timeslice */
-    smf_tslice_ast( data, k, 1, status ); /* We're never in quick mode here */
-
-    /* If we need the astrometry... */
+    /* If we need the astrometry... i.e. for a 1-D fit in elevation only */
     if ( needast ) {
+      /* Update the header for the current timeslice */
+      smf_tslice_ast( data, k, 1, status ); /* We're never in quick mode here */
       /* Retrieve header info */
       hdr = data->hdr;
-      /* Set coordinate frame to AzEl */
+      /* Set coordinate frame to AzEl: first check current frame and store it */
       wcs = hdr->wcs;
-      /* Check current frame and store it */
       origsystem = astGetC( wcs, "SYSTEM");
-      /* Select the AZEL system : what if wcs == NULL? */
-      if (wcs != NULL) 
+      /* Then select the AZEL system */
+      if (wcs != NULL) {
 	astSetC( wcs, "SYSTEM", "AZEL" );
+      } else {
+	if ( *status == SAI__OK ) {
+	  *status = SAI__ERROR;
+	  errRep( FUNC_NAME, "Plane removal method requires WCS but input is NULL", 
+		  status);
+	}
+      }
+      /* Check if AST thinks all is well */
       if (!astOK) {
 	if (*status == SAI__OK) {
 	  *status = SAI__ERROR;
@@ -291,14 +323,16 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 	}
       }
       /* Transfrom from pixels to AZEL */
-      /*      astTran2(wcs, npts, xin, yin, 1, xout, yout );*/
+      /* This is done by picking the first two x,y pixel positions in
+	 the first frame and transforming them to AzEl */
       if (k == 0) {
 	x0[0] = xin[0];
 	x0[1] = xin[1];
 	y0[0] = yin[0];
 	y0[1] = yin[1];
-
 	astTran2(wcs, 2, x0, y0, 1, xout, yout );
+	/* Now we need to calculate the angle between the subarray
+	   long axis and the zenith */
 	a[0] = xout[0];
 	a[1] = yout[0];
 	b[0] = xout[1];
@@ -306,17 +340,25 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 	c[0] = xout[1];
 	c[1] = M_PI_2;
 	alpha = astAngle( wcs, a, b, c);
-
-	/*	printf("alpha = %g\n",alpha);*/
+	angle0 = hdr->state->tcs_az_ang;
       }
-      dalpha = hdr->state->tcs_az_ang - alpha;
+      /* Retrieve current angle and calculate how much it's changed */
+      dalpha = hdr->state->tcs_az_ang - angle0;
+      angle0 = hdr->state->tcs_az_ang;
       alpha += dalpha;
+      delta = (alpha - hdr->state->tcs_az_ang) *180/M_PI;
+      /* Calculate new `effective' elevation values. Factor sin/cos
+	 calculation outside loop */
+      cosalpha = cos( alpha );
+      sinalpha = sin( alpha );
       for (i=0; i< npts; i++) {
-	ynew[i] = yin[i] * cos( alpha );
+	ynew[i] = (xin[i] - 0.5) * cosalpha - (yin[i] - 0.5) * sinalpha;
       }
+    } else {
+      smf_tslice_ast( data, k, 0, status ); 
     }
 
-    /* Offset into 3d data array */
+    /* Offset into current data array */
     base = npts * k; 
     /* Check fit type */
     if ( fitmean ) {
@@ -332,21 +374,15 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
       dskyaz = 0.0;
       dskyel = 0.0;
     } else {
-      /* Allocate workspace */
-      work = gsl_multifit_linear_alloc( npts, ncoeff );
-      azel = gsl_matrix_alloc( npts, ncoeff );
-      psky = gsl_vector_alloc( npts );
-      weight = gsl_vector_alloc( npts );
-      skyfit = gsl_vector_alloc( ncoeff );
-      mcov = gsl_matrix_alloc( ncoeff, ncoeff );
-
       /* Fill the matrix, vectors and weights arrays */
       for ( i=0; i<npts; i++) {
 	index = indices[i] + base;
 	gsl_matrix_set( azel, i, 0, 1.0 );
 	if ( fitslope ) {
-	  /*	  gsl_matrix_set( azel, i, 1, yout[indices[i]] );*/
+	  /* For the 1-D elevation fit, the X axis is the elevation =
+	     ynew */
 	  gsl_matrix_set( azel, i, 1, ynew[indices[i]] );
+	  /* For the 2-D fit, we don't need sky coordinates so the */
 	} else  if ( fitplane ) {
 	  gsl_matrix_set( azel, i, 1, yin[indices[i]] );
 	  gsl_matrix_set( azel, i, 2, xin[indices[i]] );
@@ -362,22 +398,16 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
       /* Carry out fit */
       gsl_multifit_wlinear( azel, weight, psky, skyfit, mcov, &chisq, work);
 
-      /* Retrieve solution */
+      /* Retrieve solution: first sky offset */
       sky0 = gsl_vector_get(skyfit, 0);
+      /* Slope in elevation (or Y if 2-D) */
       dskyel = gsl_vector_get(skyfit, 1);
       if ( ncoeff == 3 ) {
+	/* Slope in Az if 2-D fit */
 	dskyaz = gsl_vector_get(skyfit, 2);
       } else {
 	dskyaz = 0.0;
       }
-
-      /* Free up workspace */
-      gsl_multifit_linear_free( work );
-      gsl_matrix_free( azel );
-      gsl_vector_free( psky );
-      gsl_vector_free( weight );
-      gsl_vector_free( skyfit );
-      gsl_matrix_free( mcov );
 
     }
 
@@ -385,10 +415,8 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
     for (i=0; i < npts; i++ ) {
       index = indices[i] + base;
       if (indata[index] != VAL__BADD) {
-
 	/* Calculate sky value as a function of position */
 	if (fitslope) {
-	  /*	  sky = sky0 + dskyel * yout[indices[i]] + dskyaz * xout[indices[i]];*/
 	  sky = sky0 + dskyel * ynew[indices[i]];
 	} else {
 	  sky = sky0 + dskyel * yin[indices[i]] + dskyaz * xin[indices[i]];
@@ -397,7 +425,24 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 	indata[index] -= sky;
       }
     }
-
+      /* Debugging info */
+      msgSeti("K",k+1);
+      msgSetc("F",fittype);
+      msgOutif( MSG__VERB, FUNC_NAME, 
+		" Fit results for timeslice ^K (fit type = ^F)", status );
+      msgSetd("DS",sky0);
+      msgOutif( MSG__VERB, FUNC_NAME, 
+		"              Sky0   = ^DS, ", status );
+      msgSetd("DE",dskyel);
+      msgOutif( MSG__VERB, FUNC_NAME, 
+		"              Dskyel = ^DE, ", status );
+      msgSetd("DA",dskyaz);
+      msgOutif( MSG__VERB, FUNC_NAME, 
+		"              Dskyaz = ^DA", status );
+      msgSetd("X",chisq);
+      msgOutif( MSG__VERB, FUNC_NAME, 
+		"              X^2 = ^X", status );
+ 
     /* Reset coordinate frame to that on entry if necessary */
     if (needast) {
       if ( *status == SAI__OK) {
@@ -414,6 +459,14 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 
   } /* End of loop over timeslice frame */
 
+  /* Free up GSL workspace */
+  gsl_multifit_linear_free( work );
+  gsl_matrix_free( azel );
+  gsl_vector_free( psky );
+  gsl_vector_free( weight );
+  gsl_vector_free( skyfit );
+  gsl_matrix_free( mcov );
+
   /* Write history entry */
   if ( *status == SAI__OK ) {
     smf_history_add( data, FUNC_NAME, 
@@ -423,6 +476,7 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 	   status);
   }
 
+  /* Free all resources in use */
   CLEANUP:
   smf_free(xin,status);
   smf_free(yin,status);
