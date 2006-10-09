@@ -25,6 +25,9 @@
 **    16-AUG-2005 (DSB):
 **       Added palSlaDh2e and palSlaDe2h by translating the corresponding
 **       fortran routines into C (by hand).
+**    6-OCT-2006 (DSB):
+**       Added palSlaGmsta by translating the corresponding fortran routines 
+**       into C (by hand).
 */
 
 #include "pal.h"
@@ -1038,5 +1041,12 @@ double sh,ch,sd,cd,sp,cp,x,y,z,r,a; sh=sin(ha); ch=cos(ha); sd=sin(dec);
 cd=cos(dec); sp=sin(phi); cp=cos(phi); x=-ch*cd*sp+sd*cp; y=-sh*cd;
 z=ch*cd*cp+sd*sp; r=sqrt(x*x+y*y); if( r == 0.0 ) { a=0.0; } else {
 a=atan2(y,x); } if(a<0.0) a=a+D2PI; *az=a; *el=atan2(z,r); }
+
+double palSlaGmsta( double Dt, double uQ){ static double
+s2r=7.272205216643039903848712E-5; double r,d1,d2,t; if(Dt<uQ) { d1=Dt;
+d2=uQ; } else { d1=uQ; d2=Dt; } t=(d1+(d2-51544.5))/36525.0;
+r=palSlaDranrm(s2r*(24110.54841+ (8640184.812866+ (0.093104
+-6.2E-6*t)*t)*t +86400.0*(fmod(d1,1.0)+fmod(d2,1.0)))); return r; }
+
 
 
