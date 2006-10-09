@@ -319,13 +319,11 @@ static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
         /* Similarly for BSCALE and BZERO */
         bscale = 1.0;
         bzero = 0.0;
-        if ( type < HDS_REAL ) {
-            if ( GaiaFITSHGet( info->handle, "BSCALE", &bscale ) != TCL_OK ) {
-                bscale = 1.0;
-            }
-            if ( GaiaFITSHGet( info->handle, "BZERO", &bzero ) != TCL_OK ) {
-                bzero = 0.0;
-            }
+        if ( GaiaFITSHGet( info->handle, "BSCALE", &bscale ) != TCL_OK ) {
+            bscale = 1.0;
+        }
+        if ( GaiaFITSHGet( info->handle, "BZERO", &bzero ) != TCL_OK ) {
+            bzero = 0.0;
         }
 
         /* Construct result */

@@ -41,6 +41,7 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
+#include <float.h>
 #include <math.h>
 
 #include <gaiaArray.h>
@@ -66,6 +67,9 @@
 static char *hdstypes[] = {
     "_UBYTE", "_BYTE", "_UWORD", "_WORD", "_INTEGER", "_REAL", "_DOUBLE"
 };
+
+/* A double precistion number just greater than another */
+static double EPSILON = 10.0 * DBL_EPSILON;
 
 /* Prototypes for local functions */
 static void DataNormalise( void *inPtr, int intype, int nel,
@@ -1319,6 +1323,7 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
 {
     int i;
     int scaled;
+    int fscaled;
     long length;
 
     /*  Only applies to FITS data */
@@ -1396,15 +1401,42 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
     else {
         *outPtr = inPtr;
     }
+    
+    /* Scaling can also occur for floating point types, when BSCALE or BZERO
+     * are non-trivial */
+    fscaled = 0;
+    if ( ( intype == HDS_DOUBLE || intype == HDS_REAL ) && 
+         ( bscale != 1.0 || bzero != 0.0 ) ) {
+
+        /* Make sure these values are significantly non-trivial */
+        if ( fabs( bscale - 1.0 ) > EPSILON ) {
+            fscaled = 1;
+        }
+        else if ( fabs( bzero - 1.0 ) > EPSILON ) {
+            fscaled = 1;
+        }
+    }
 
     /* BAD value transformation and variant scaling for integer types */
     switch ( intype )
     {
         case HDS_DOUBLE: {
             double *ptr = (double *)inPtr;
-            for ( i = 0; i < nel; i++ ) {
-                if ( isnan( ptr[i] ) ) {
-                    ptr[i] = VAL__BADD;
+            if ( fscaled ) {
+                for ( i = 0; i < nel; i++ ) {
+                    if ( isnan( ptr[i] ) ) {
+                        ptr[i] = VAL__BADD;
+                    }
+                    else {
+                        ptr[i] = ptr[i] * bscale + bzero;
+                    }
+                }
+            }
+            else {
+                for ( i = 0; i < nel; i++ ) {
+                    if ( isnan( ptr[i] ) ) {
+                        ptr[i] = VAL__BADD;
+                    }
                 }
             }
         }
@@ -1412,9 +1444,21 @@ static void DataNormalise( void *inPtr, int intype, int nel, int isfits,
 
         case HDS_REAL: {
             float *ptr = (float *)inPtr;
-            for ( i = 0; i < nel; i++ ) {
-                if ( isnan( ptr[i] ) ) {
-                    ptr[i] = VAL__BADR;
+            if ( fscaled ) {
+                for ( i = 0; i < nel; i++ ) {
+                    if ( isnan( ptr[i] ) ) {
+                        ptr[i] = VAL__BADR;
+                    }
+                }
+            }
+            else {
+                for ( i = 0; i < nel; i++ ) {
+                    if ( isnan( ptr[i] ) ) {
+                        ptr[i] = VAL__BADR;
+                    }
+                    else {
+                        ptr[i] = ptr[i] * bscale + bzero;
+                    }
                 }
             }
         }
