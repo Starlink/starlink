@@ -39,6 +39,7 @@ f     display by using AST_FORMAT.
 *
 *     - AlignOffset: Align SkyFrames using the offset coordinate system? 
 *     - AsTime(axis): Format celestial coordinates as times?
+*     - Dut1: Difference between the UT1 and UTC timescale
 *     - Equinox: Epoch of the mean equinox
 *     - LatAxis: Index of the latitude axis
 *     - LonAxis: Index of the longitude axis
@@ -169,7 +170,11 @@ f     The SkyFrame class does not define any new routines beyond those
 *     3-OCT-2006 (DSB):
 *        Added Equation of Equinoxes to the SkyFrame structure.
 *     6-OCT-2006 (DSB):
-*        Guard against annulling null pointers in subFrame.
+*        - Guard against annulling null pointers in subFrame.
+*        - Add Dut1 attribute
+*        - Use linear approximation for LAST over short periods (less
+*          than 0.001 of a day)
+*        - Remove Equation of Equinoxes from the SkyFrame structure.
 *class--
 */
 
@@ -638,12 +643,10 @@ static int (* parent_testattrib)( AstObject *, const char * );
 static int (* parent_testformat)( AstFrame *, int );
 static int (* parent_unformat)( AstFrame *, int, const char *, double * );
 static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_clearepoch)( AstFrame * );
 static void (* parent_clearformat)( AstFrame *, int );
 static void (* parent_clearsystem)( AstFrame * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame * );
 static void (* parent_setattrib)( AstObject *, const char * );
-static void (* parent_setepoch)( AstFrame *, double );
 static void (* parent_setformat)( AstFrame *, int, const char * );
 static void (* parent_setmaxaxes)( AstFrame *, int );
 static void (* parent_setminaxes)( AstFrame *, int );
@@ -681,10 +684,12 @@ static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
 static double GetBottom( AstFrame *, int );
 static double GetEpoch( AstFrame * );
+static double GetDut1( AstSkyFrame * );
 static double GetEquinox( AstSkyFrame * );
 static void SetLast( AstSkyFrame * );
 static double GetTop( AstFrame *, int );
 static double Offset2( AstFrame *, const double[2], double, double, double[2] );
+static double GetLAST( AstSkyFrame * );
 static int GetActiveUnit( AstFrame * );
 static int GetAsTime( AstSkyFrame *, int );
 static int GetDirection( AstFrame *, int );
@@ -702,13 +707,14 @@ static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstM
 static int TestActiveUnit( AstFrame * );
 static int TestAsTime( AstSkyFrame *, int );
 static int TestAttrib( AstObject *, const char * );
+static int TestDut1( AstSkyFrame * );
 static int TestEquinox( AstSkyFrame * );
 static int TestNegLon( AstSkyFrame * );
 static int TestProjection( AstSkyFrame * );
 static int Unformat( AstFrame *, int, const char *, double * );
 static void ClearAsTime( AstSkyFrame *, int );
 static void ClearAttrib( AstObject *, const char * );
-static void ClearEpoch( AstFrame * );
+static void ClearDut1( AstSkyFrame * );
 static void ClearEquinox( AstSkyFrame * );
 static void ClearNegLon( AstSkyFrame * );
 static void ClearObsLon( AstFrame * );
@@ -725,7 +731,7 @@ static void Overlay( AstFrame *, const int *, AstFrame * );
 static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
 static void SetAsTime( AstSkyFrame *, int, int );
 static void SetAttrib( AstObject *, const char * );
-static void SetEpoch( AstFrame *, double );
+static void SetDut1( AstSkyFrame *, double );
 static void SetEquinox( AstSkyFrame *, double );
 static void SetMaxAxes( AstFrame *, int );
 static void SetMinAxes( AstFrame *, int );
@@ -999,6 +1005,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "equinox" ) ) {
       astClearEquinox( this );
 
+/* Dut1 */
+/* --- */
+   } else if ( !strcmp( attrib, "dut1" ) ) {
+      astClearDut1( this );
+
 /* NegLon. */
 /* ------- */
    } else if ( !strcmp( attrib, "neglon" ) ) {
@@ -1061,49 +1072,6 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    }
 }
 
-static void ClearEpoch( AstFrame *this_frame ) {
-/*
-*  Name:
-*     ClearEpoch
-
-*  Purpose:
-*     Clear the value of the Epoch attribute for a SkyFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "skyframe.h"
-*     void ClearEpoch( AstFrame *this )
-
-*  Class Membership:
-*     SkyFrame member function (over-rides the astClearEpoch method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function clears the Epoch value.
-
-*  Parameters:
-*     this
-*        Pointer to the Frame.
-
-*/
-
-/* Local Variables: */
-   AstSkyFrame *this;
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* Invoke the parent method to clear the Frame epoch. */
-   (*parent_clearepoch)( this_frame );
-
-/* Recalculate the Local Apparent Sidereal Time value if the epoch has
-   changed significantly. */
-   this = (AstSkyFrame *) this_frame;
-   if( fabs( this->eplast - astGetEpoch( this ) ) > 0.000001 ) SetLast( this );
-}
-
 static void ClearObsLon( AstFrame *this ) {
 /*
 *  Name:
@@ -1144,7 +1112,8 @@ static void ClearObsLon( AstFrame *this ) {
 /* Invoke the parent method to clear the Frame ObsLon. */
    (*parent_clearobslon)( this );
 
-/* Recalculate the Local Apparent Sidereal Time value, if required. */
+/* Recalculate the Local Apparent Sidereal Time value, if the ObsLon
+   value has changed. */
    if( orig != astGetObsLon( this ) ) SetLast( (AstSkyFrame *) this );
 }
 
@@ -1786,6 +1755,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          result = astFmtDecimalYr( ( equinox < palSlaEpj2d( 1984.0 ) ) ?
                                    palSlaEpb( equinox ) : palSlaEpj( equinox ),
                                    DBL_DIG );
+      }
+
+/* Dut1. */
+/* ---- */
+   } else if ( !strcmp( attrib, "dut1" ) ) {
+      dval = astGetDut1( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
+         result = buff;
       }
 
 /* LatAxis */
@@ -2629,6 +2607,76 @@ static const char *GetLabel( AstFrame *this, int axis ) {
    }
 
 /* Return the result. */
+   return result;
+}
+
+static double GetLAST( AstSkyFrame *this ) {
+/*
+*  Name:
+*     GetLAST
+
+*  Purpose:
+*     Return the Local Apparent Sidereal Time for the SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     double GetLAST( AstSkyFrame *this )
+
+*  Class Membership:
+*     SkyFrame member function 
+
+*  Description:
+*     This function returns the Local Apparent Sidereal Time (LAST)
+*     at the moment intime given by the Epoch attribute of the SkyFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+
+*  Returned Value:
+*     The LAST value.
+
+*/
+
+/* Local Variables: */
+   double result;                /* Result value to return */
+   double delta_epoch;           /* Change in Epoch */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* The "last" component of the SkyFrame structure holds the accurate 
+   LAST at the moment in time given by the "eplast" (a TDB MJD) component 
+   of the SkyFrame structure. If the current value of hte SkyFrame's
+   Epoch attribute is not much different to "eplast" (within 0.001 of a
+   day , or 87 seconds), then the returned LAST value is the "last" value 
+   plus the difference between Epoch and "eplast", converted from solar to 
+   sidereal time, then converted to radians. If this approximation cannot
+   be used, invoke SetLast to recalculate the accurate LAST and update
+   the "eplast" and "last" values. */
+   if( this->eplast != AST__BAD ) {
+      delta_epoch = astGetEpoch( this ) - this->eplast;
+
+      if( fabs( delta_epoch ) < 0.001 ) {
+         result = this->last + 2*AST__DPI*0.997269566*delta_epoch;
+
+      } else {
+         SetLast( this );
+         result = this->last;
+      }
+
+   } else {
+      SetLast( this );
+      result = this->last;
+   }
+
+/* Return the result, */
    return result;
 }
 
@@ -3483,20 +3531,24 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
    vtab->ClearAsTime = ClearAsTime;
+   vtab->ClearDut1 = ClearDut1;
    vtab->ClearEquinox = ClearEquinox;
    vtab->ClearNegLon = ClearNegLon;
    vtab->ClearProjection = ClearProjection;
    vtab->GetAsTime = GetAsTime;
+   vtab->GetDut1 = GetDut1;
    vtab->GetEquinox = GetEquinox;
    vtab->GetNegLon = GetNegLon;
    vtab->GetLatAxis = GetLatAxis;
    vtab->GetLonAxis = GetLonAxis;
    vtab->GetProjection = GetProjection;
    vtab->SetAsTime = SetAsTime;
+   vtab->SetDut1 = SetDut1;
    vtab->SetEquinox = SetEquinox;
    vtab->SetNegLon = SetNegLon;
    vtab->SetProjection = SetProjection;
    vtab->TestAsTime = TestAsTime;
+   vtab->TestDut1 = TestDut1;
    vtab->TestEquinox = TestEquinox;
    vtab->TestNegLon = TestNegLon;
    vtab->TestProjection = TestProjection;
@@ -3539,12 +3591,6 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
 
    parent_gettop = frame->GetTop;
    frame->GetTop = GetTop;
-
-   parent_setepoch = frame->SetEpoch;
-   frame->SetEpoch = SetEpoch;
-
-   parent_clearepoch = frame->ClearEpoch;
-   frame->ClearEpoch = ClearEpoch;
 
    parent_setobslon = frame->SetObsLon;
    frame->SetObsLon = SetObsLon;
@@ -4447,7 +4493,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    system = target_system;
    equinox = target_equinox;
    epoch = target_epoch;
-   last = target->last;
+   last = GetLAST( target );
    lat = astGetObsLat( target );
    if( astOK && step1 ) {
 
@@ -4684,7 +4730,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    system = result_system;
    equinox = result_equinox;
    epoch = result_epoch;
-   last = result->last;
+   last = GetLAST( result );
    lat = astGetObsLat( result );
 
 /* Convert the equinox and epoch values (stored as Modified Julian
@@ -6167,6 +6213,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
    }         
 
 /* Use the macro to transfer each SkyFrame attribute in turn. */
+      OVERLAY(Dut1);
       OVERLAY(Equinox);
       OVERLAY(Projection);
       OVERLAY(NegLon);
@@ -6819,6 +6866,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         && ( nc >= len ) ) {
       astSetAsTime( this, axis - 1, astime );
 
+/* Dut1. */
+/* ---- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "dut1= %lg %n", &dval, &nc ) )
+        && ( nc >= len ) ) {
+      astSetDut1( this, dval );
+
 /* Equinox. */
 /* -------- */
    } else if ( nc = 0,
@@ -6967,55 +7021,6 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    }
 }
 
-static void SetEpoch( AstFrame *this_frame, double val ) {
-/*
-*  Name:
-*     SetEpoch
-
-*  Purpose:
-*     Set the value of the Epoch attribute for a SkyFrame.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "skyframe.h"
-*     void SetEpoch( AstFrame *this, double val )
-
-*  Class Membership:
-*     SkyFrame member function (over-rides the astSetEpoch method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function sets the Epoch value.
-
-*  Parameters:
-*     this
-*        Pointer to the SkyFrame.
-*     val
-*        New Epoch value.
-
-*/
-
-/* Local Variables: */
-   AstSkyFrame *this;
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* Invoke the parent method to set the CmpFrame epoch. */
-   (*parent_setepoch)( this_frame, val );
-
-/* If there is a significant difference between the new Epoch value and
-   the epoch used to calculate the stored "last" value, reset the stored
-   "last" value value and then re-calculate it. */
-
-/* Recalculate the Local Apparent Sidereal Time value if the epoch has
-   changed significantly. */
-   this = (AstSkyFrame *) this_frame;
-   if( fabs( this->eplast - val ) > 0.000001 ) SetLast( this );
-}
-
 static void SetLast( AstSkyFrame *this ) {
 /*
 *  Name:
@@ -7049,39 +7054,34 @@ static void SetLast( AstSkyFrame *this ) {
 */
 
 /* Local Variables: */
-   double epoch;
-   double gmst;
-   double tai;  
-   double utc;
+   double day;        /* The MJD day number */
+   double epoch;      /* Epoch as a TDB MJD */
+   double tai;        /* The time of day as a TAI fractional day */
+   double tdb;        /* The time of day as a TDB fractional day */
+   double ut1;        /* The time of day as a UT1 fractional day */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* We assume that TDB is a close approximation to TT. Convert TT to TAI. */
+/* Get the Epoch as a TDB MJD. Split it up into whole days and fractional
+   day parts for greater accuracy in the following conversions. */
    epoch = astGetEpoch( this );
-   tai = epoch - 32.184/86400.0;
+   day = (int) epoch;
+   tdb = epoch - day;
 
-/* Convert TAI to UTC (i.e. include leap seconds). */
-   utc = tai + astDat( tai, 0 )/86400.0;
+/* We assume that TDB is a close approximation to TT. So convert to TAI
+   by subtracting 32.184 seconds. */
+   tai = tdb - 32.184/86400.0;
 
-/* Compute the Greenwich mean sidereal time. Currently, we ignore the 
-   difference between UT1 and UTC. This can be up to a second, corresponding 
-   to 15 arc-seconds. We may need to do something about this later (like 
-   having an attribute to specify the DUT value). */
-   gmst = palSlaGmst( utc );
+/* Convert TAI to UT1 (i.e. include leap seconds and the UT1-UTC correction). */
+   ut1 = tai + ( astDat( day + tai, 0 ) + astGetDut1( this ) )/86400.0;
 
-/* Add on the east longitude (no correction is done for polar motion). */
-   this->last = gmst + astGetObsLon( this );
-
-/* Add on the equation of equinoxes. This is an expensive calculation and
-   the result does not change significantly over a period of several
-   seconds, so only calculate a new value if the epoch value has changed
-   by more than about 8 seconds since the last time the equation of equinoxes
-   was calculated. */
-   if( fabs( this->eplast - epoch ) > 0.0001 ) this->eqeq = palSlaEqeqx( epoch );
-   this->last += this->eqeq;   
-
-/* Store the value in the SkyFrame structure for future use. */
+/* Compute the Greenwich mean sidereal time, and add on the east longitude 
+   and the equation of equinoxes (no correction is done for polar motion). 
+   Store the resulting lAST value in the SkyFrame structure, together
+   with the TDB epoch. */
+   this->last = palSlaGmsta( day, ut1 ) + astGetObsLon( this ) 
+                + palSlaEqeqx( epoch );
    this->eplast = epoch;
 }
 
@@ -7207,7 +7207,8 @@ static void SetObsLon( AstFrame *this, double val ) {
 /* Invoke the parent method to set the Frame ObsLon. */
    (*parent_setobslon)( this, val );
 
-/* Recalculate the Local Apparent Sidereal Time value if necessary. */
+/* Recalculate the Local Apparent Sidereal Time value if the ObsLon value
+   has changed. */
    if( val != orig ) SetLast( (AstSkyFrame *) this );
 
 }
@@ -8199,6 +8200,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
         && ( nc >= len ) ) {
       result = astTestAsTime( this, axis - 1 );
 
+/* Dut1. */
+/* ---- */
+   } else if ( !strcmp( attrib, "dut1" ) ) {
+      result = astTestDut1( this );
+
 /* Equinox. */
 /* -------- */
    } else if ( !strcmp( attrib, "equinox" ) ) {
@@ -8552,6 +8558,11 @@ static void VerifyMSMAttrs( AstSkyFrame *target, AstSkyFrame *result,
                      set2 = astTestEquinox( result );
                      desc = "reference equinox";
 
+                  } else if( !strncmp( "Dut1", a, len ) ) {
+                     set1 = astTestDut1( target );
+                     set2 = astTestDut1( result );
+                     desc = "UT1-UTC correction";
+
                   } else if( !strncmp( "Epoch", a, len ) ) {
                      set1 = astTestEpoch( target );
                      set2 = astTestEpoch( result );
@@ -8788,6 +8799,53 @@ astMAKE_SET(SkyFrame,Equinox,double,equinox,((astGetSystem(this)!=AST__HELIOECLI
 /* An Equinox value is set if it is not equal to AST__BAD. */
 astMAKE_TEST(SkyFrame,Equinox,( this->equinox != AST__BAD ))
 
+
+/*
+*att++
+*  Name:
+*     Dut1
+
+*  Purpose:
+*     The UT1-UTC correction.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Floating point.
+
+*  Description:
+*     This attribute is used when calculating the Local Apparent Sidereal
+*     Time corresponding to SkyFrame's Epoch value (used when converting
+*     positions to or from the "AzEl" system). It should be set to the 
+*     difference, in seconds, between the UT1 and UTC timescales at the 
+*     moment in time represented by the SkyFrame's Epoch attribute. The 
+*     value to use is unpredictable and depends on changes in the earth's 
+*     rotation speed. Values for UT1-UTC can be obtained from the 
+*     International Earth Rotation and Reference Systems Service 
+*     (IERS) at http://www.iers.org/.
+*
+*     Currently, the correction is always less than 1 second. This is
+*     ensured by the occasional introduction of leap seconds into the UTC
+*     timescale. Therefore no great error will usually result if no value
+*     is assigned to this attribute (in which case a default value of
+*     zero is used). However, it is possible that a decision may be taken
+*     at some time in the future to abandon the introduction of leap
+*     seconds, in which case the DUT correction could grow to significant 
+*     sizes.
+
+*  Applicability:
+*     SkyFrame
+*        All SkyFrames have this attribute.
+
+*att--
+*/
+/* The UT1-UTC correction, in seconds. Has a value of AST__BAD when not set 
+   yielding a default value of 0.0. */
+astMAKE_CLEAR(SkyFrame,Dut1,dut1,AST__BAD)
+astMAKE_GET(SkyFrame,Dut1,double,0.0,(this->dut1 == AST__BAD ? 0.0 : this->dut1))
+astMAKE_SET(SkyFrame,Dut1,double,dut1,value)
+astMAKE_TEST(SkyFrame,Dut1,( this->dut1 != AST__BAD ))
 
 /*
 *att++
@@ -9307,6 +9365,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
                 ival ? "Display negative longitude values" :
                        "Display positive longitude values" );
 
+/* Dut1*/
+/* ---- */
+   set = TestDut1( this );
+   dval = set ? GetDut1( this ) : astGetDut1( this );
+   astWriteDouble( channel, "Dut1", set, 0, dval, "UT1-UTC in seconds" );
+
 /* Equinox. */
 /* -------- */
    set = TestEquinox( this );
@@ -9551,6 +9615,7 @@ AstSkyFrame *astInitSkyFrame_( void *mem, size_t size, int init,
 /* Initialise the SkyFrame data. */
 /* ----------------------------- */
 /* Initialise all attributes to their "undefined" values. */
+      new->dut1 = AST__BAD;
       new->equinox = AST__BAD;
       new->projection = NULL;
       new->neglon = -INT_MAX;
@@ -9562,7 +9627,6 @@ AstSkyFrame *astInitSkyFrame_( void *mem, size_t size, int init,
       new->skyrefp[ 1 ] = AST__BAD;
       new->last = AST__BAD;
       new->eplast = AST__BAD;
-      new->eqeq = AST__BAD;
 
 /* Loop to replace the Axis object associated with each SkyFrame axis with
    a SkyAxis object instead. */
@@ -9574,9 +9638,6 @@ AstSkyFrame *astInitSkyFrame_( void *mem, size_t size, int init,
          astSetAxis( new, axis, ax );
          ax = astAnnul( ax );
       }
-
-/* Initialise the local apparent siderial time stored in the SkyFrame. */
-      SetLast( new );
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
@@ -9799,6 +9860,11 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 /* ----------- */
       new->projection = astReadString( channel, "proj", NULL );
 
+/* Dut1. */
+/* ---- */
+      new->dut1 = astReadDouble( channel, "dut1", AST__BAD );
+      if ( TestDut1( new ) ) SetDut1( new, new->dut1 );
+
 /* Equinox. */
 /* -------- */
 /* Interpret this as Besselian or Julian depending on its value. */
@@ -9816,11 +9882,7 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 /* Other values */
 /* ------------ */
       new->last = AST__BAD;
-      new->eqeq = AST__BAD;
       new->eplast = AST__BAD;
-
-/* Initialise the local apparent siderial time */
-      SetLast( new );
 
 /* If an error occurred, clean up by deleting the new SkyFrame. */
       if ( !astOK ) new = astDelete( new );
