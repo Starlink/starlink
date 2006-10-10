@@ -346,10 +346,13 @@ static int GaiaFITSTclUnMap( ClientData clientData, Tcl_Interp *interp,
     FITSinfo *info;
     long adr;
 
-    /* Check arguments, need two , the FITS identifier and ARRAYinfo memory
-     * address */
-    if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier address" );
+    /* Check arguments, need, the FITS identifier, the "component" and 
+     * ARRAYinfo memory address, for FITS data the component is always DATA,
+     * so any actual value is ignored (like this to match the API of the
+     * equivalent NDF functions). */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, 
+                          "fits_identifier component address" );
         return TCL_ERROR;
     }
 
@@ -370,7 +373,7 @@ static int GaiaFITSTclUnMap( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Free the ARRAYinfo struct */
-    if ( Tcl_GetLongFromObj( interp, objv[2], &adr ) == TCL_OK ) {
+    if ( Tcl_GetLongFromObj( interp, objv[3], &adr ) == TCL_OK ) {
         gaiaArrayFreeInfo( (ARRAYinfo *)adr );
     }
 
