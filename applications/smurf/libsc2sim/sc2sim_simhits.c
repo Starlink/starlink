@@ -163,9 +163,6 @@
 #include "wvm/wvmCal.h" /* Water Vapor Monitor routines */
 #include "f77.h"
 
-/* prototype for slalib routine that calculates mjd -> calendar date */
-void slaDjcl(double djm, int *iy, int *im, int *id, double *fd, int *j);
-
 #define FUNC_NAME "sc2sim_simhits"
 #define LEN__METHOD 20
 

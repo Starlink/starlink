@@ -204,9 +204,6 @@
 #include "wvm/wvmCal.h" /* Water Vapor Monitor routines */
 #include "f77.h"
 
-/* prototype for slalib routine that calculates mjd -> calendar date */
-void slaDjcl(double djm, int *iy, int *im, int *id, double *fd, int *j);
-
 #define FUNC_NAME "sc2sim_simulate"
 #define LEN__METHOD 20
 
@@ -395,7 +392,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   if( *status == SAI__OK ) {
     if ( ( astdata->ndims ) != 2 ) {
       msgSetc ( "FILENAME", sinx->astname );          
-      msgOut(FUNC_NAME, "^FILENAME should have 2 dimensions, but it does not.",
+      errRep(FUNC_NAME, "^FILENAME should have 2 dimensions, but it does not.",
              status);
       *status = DITS__APP_ERROR;
       return;
@@ -403,7 +400,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
     if ( ( atmdata->ndims ) != 2 ) {
       msgSetc ( "FILENAME", sinx->atmname );          
-      msgOut(FUNC_NAME, "^FILENAME should have 2 dimensions, but it does not.",
+      errRep(FUNC_NAME, "^FILENAME should have 2 dimensions, but it does not.",
              status);
       *status = DITS__APP_ERROR;
       return;

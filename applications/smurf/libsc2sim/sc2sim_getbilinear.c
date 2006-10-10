@@ -79,9 +79,10 @@
 
 
 /* SC2SIM includes */
+#include "mers.h"
 #include "sc2sim.h"
 
-#define FUNC_NAME sc2sim_getbilinear
+#define FUNC_NAME "sc2sim_getbilinear"
 
 void sc2sim_getbilinear 
 ( 
@@ -130,8 +131,8 @@ int *status          /* global status (given and returned) */
              + d * dy * dx;
    } else {
       *status = DITS__APP_ERROR;
-      msgSetc("XPIX", ixpix);
-      msgSetc("YPIX", iypix);
+      msgSeti("XPIX", ixpix);
+      msgSeti("YPIX", iypix);
       errRep( FUNC_NAME, "data point outside image ^IPIX ^YPIX", status);
    }
 
