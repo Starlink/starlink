@@ -137,6 +137,10 @@ itcl::class gaia::GaiaNDAccess {
    #  Close the dataset, if open.
    public method close {} {
       if { $handle_ != {} } {
+         if { $type_ == "fits" } {
+            # FITS data needs unmapping, NDF happens automatically.
+            unmap "*"
+         }
          ${type_}::close $handle_
          set handle_ {}
          unset addr_
@@ -210,7 +214,7 @@ itcl::class gaia::GaiaNDAccess {
    #  Unmap a component of the dataset, all are unmapped if component == "*".
    public method unmap {{component "DATA"}} {
       if { $component == "*" } {
-         foreach component [array names $addr_] {
+         foreach component [array names addr_] {
             if { $addr_($component) != 0 } {
                ${type_}::unmap $handle_ $component $addr_($component)
                set addr_($component) 0
