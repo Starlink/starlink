@@ -725,6 +725,7 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( smu_tr_chop_x, SMU_TR_CHOP_X, double, VAL__BADD );
    RETRIEVE_STATE( smu_tr_chop_y, SMU_TR_CHOP_Y, double, VAL__BADD );
 
+   RETRIEVE_STATE( tcs_tai, TCS_TAI, double, VAL__BADD );
    RETRIEVE_STATE( tcs_airmass, TCS_AIRMASS, double, VAL__BADD );
    RETRIEVE_STATE( tcs_az_ang, TCS_AZ_ANG, double, VAL__BADD );
    RETRIEVE_STATE( tcs_az_ac1, TCS_AZ_AC1, double, VAL__BADD );
@@ -916,6 +917,7 @@ int *status                   /* global status (given and returned) */
    STORE_STATE( smu_tr_chop_y, SMU_TR_CHOP_Y, double );
 
    /* Telescope Control System */
+   STORE_STATE( tcs_tai, TCS_TAI, double );
    STORE_STATE( tcs_airmass, TCS_AIRMASS, double );
    STORE_STATE( tcs_az_ang, TCS_AZ_ANG, double );
    STORE_STATE( tcs_az_ac1, TCS_AZ_AC1, double );
@@ -1020,10 +1022,13 @@ int *status                   /* global status (given and returned) */
      } else {
        /* if missing and is a mandatory component then we need
 	  to complain somehow. Old files will be a problem if we set
-	  status to bad or we can just warn.  Alternatively, we need
-	  to add a .mandatory component to hdsRecords for really need
-	  this for SCUBA2 as opposed to would like it for scuba2. */
-       if ( hdsRecords[j].instrument & instrument ) {
+	  status to bad or we can just warn.  It is possible to flag a component
+	  as optional in which case we do not warn. This is mainly useful for components
+	  that have been added after data release and so we need to work around backwards
+	  compatibility. Mandatory is therefore defined as understood by the instrument but
+	  not optional. */
+       if ( ((hdsRecords[j].instrument & instrument) != 0) &&  /* field is understood by instrument */
+	     ((hdsRecords[j].optional & instrument) == 0)) { /* but is not optional */
 	 if (*status == SAI__OK) {
 	   *status = DITS__APP_ERROR;
 	   sprintf( errmess, "Mandatory component not present in file. Can't find '%s'",
