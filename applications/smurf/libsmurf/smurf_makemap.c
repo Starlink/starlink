@@ -209,18 +209,24 @@ void smurf_makemap( int *status ) {
 
   smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, dims, smfflags, &odata, status );
 
-  file = odata->file;
-  ondf = file->ndfid;
+  if ( *status == SAI__OK ) {
 
-  /* Map the data, variance, and weights arrays */
-  map = (odata->pntr)[0];
-  variance = (odata->pntr)[1];
+    file = odata->file;
+    ondf = file->ndfid;
+
+    /* Map the data, variance, and weights arrays */
+    map = (odata->pntr)[0];
+    variance = (odata->pntr)[1];
+
+  }
   
   weightsloc = smf_get_xloc ( odata, "SCU2RED", "SCUBA2_WT_ARR", "WRITE", 
                               0, 0, status );
   smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
                      2, lbnd_out, ubnd_out, &wdata, status );
-  weights = (wdata->pntr)[0];
+
+  if ( *status == SAI__OK ) 
+    weights = (wdata->pntr)[0];
 
   /* Create the map using the chosen METHOD */
   if( strncmp( method, "REBIN", 5 ) == 0 ) {
@@ -232,7 +238,7 @@ void smurf_makemap( int *status ) {
 
       /* Read data from the ith input file in the group */      
       smf_open_and_flatfield( igrp, NULL, i, &data, status );
-;      
+      
       /* Remove sky - assume MEAN is good enough for now */
       smf_subtract_plane(data, "MEAN", status);
 
