@@ -94,6 +94,8 @@
 *        Use sc2sim_structs instead of dxml_structs
 *     2006-10-03 (JB):
 *        Use width & height instead of gridcount in PONG
+*     2006-10-10 (JB) :
+*        Fill tcs_tai component.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -515,6 +517,9 @@ void sc2sim_simhits ( struct sc2sim_obs_struct *inx,
 	  /* RTS -----------------------------------------------------------*/
 	  head[j].rts_num = firstframe+j;           /* sequence number?    */
 	  head[j].rts_end = mjuldate[firstframe+j]; /* end of integration  */ 
+
+          /* Use rts_end as tcs_tai */
+          head[j].tcs_tai = head[j].rts_end;
 	   
 	  /* TCS - Telescope tracking structure --------------------------- */
 	  sprintf(head[j].tcs_tr_sys,"J2000");   /* coord. system  */
