@@ -90,6 +90,8 @@
 *        Write out name of DREAM weights file into FITS header
 *     2006-09-22 (JB):
 *        Replace dxml_structs with sc2sim_structs
+*     2006-10-06 (AGG):
+*        Add WAVELEN FITS keyword
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -246,6 +248,10 @@ int *status       /* global status (given and returned) */
 		   "FILTER", filter,
 		   "filter used", status );
   
+   fhead_putfits ( TDOUBLE,
+		   "WAVELEN", &(inx->lambda),
+		   "Wavelength (m)", status );
+
    fhead_putfits ( TDOUBLE,
 		   "ATSTART", &sinx->atstart,
 		   "Ambient temperature at start (C)", status );
