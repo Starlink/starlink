@@ -127,11 +127,11 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
 /*Allocate memory for buffers */
   stacksize = w+1;
   QMALLOC(info, infostruct, stacksize);
-  QMALLOC(store, infostruct, stacksize);
+  QCALLOC(store, infostruct, stacksize);
   QMALLOC(marker, char, stacksize);
   QMALLOC(dumscan, PIXTYPE, stacksize);
   QMALLOC(psstack, status, stacksize);
-  QMALLOC(start, int, stacksize);
+  QCALLOC(start, int, stacksize);
   QMALLOC(end, int, stacksize);
   blankpad = bpt = NULL;
   lutzalloc(w,h);
