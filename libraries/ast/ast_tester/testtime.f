@@ -28,12 +28,12 @@ c
          call stopit( status, 'error 2' )
       endif
 
-      if( ast_getc( tf, 'ObsLon', status ) .ne. 'E0:00:00' ) then
+      if( ast_getc( tf, 'ObsLon', status ) .ne. 'E0:00:00.00' ) then
          write(*,*)  ast_getc( tf, 'ObsLon', status )
          call stopit( status, 'error 3' )
       endif
 
-      if( ast_getc( tf, 'ObsLat', status ) .ne. 'N0:00:00' ) then
+      if( ast_getc( tf, 'ObsLat', status ) .ne. 'N0:00:00.00' ) then
          write(*,*)  ast_getc( tf, 'ObsLat', status )
          call stopit( status, 'error 4' )
       endif
@@ -105,12 +105,12 @@ c
          call stopit( status, 'error 2b' )
       endif
 
-      if( ast_getc( tf, 'ObsLon', status ) .ne. 'E0:00:00' ) then
+      if( ast_getc( tf, 'ObsLon', status ) .ne. 'E0:00:00.00' ) then
          write(*,*)  ast_getc( tf, 'ObsLon', status )
          call stopit( status, 'error 3b' )
       endif
 
-      if( ast_getc( tf, 'ObsLat', status ) .ne. 'N0:00:00' ) then
+      if( ast_getc( tf, 'ObsLat', status ) .ne. 'N0:00:00.00' ) then
          write(*,*)  ast_getc( tf, 'ObsLat', status )
          call stopit( status, 'error 4b' )
       endif
@@ -181,12 +181,12 @@ c
          call stopit( status, 'error 2c' )
       endif
 
-      if( ast_getc( tf, 'ObsLon', status ) .ne. 'E0:00:00' ) then
+      if( ast_getc( tf, 'ObsLon', status ) .ne. 'E0:00:00.00' ) then
          write(*,*)  ast_getc( tf, 'ObsLon', status )
          call stopit( status, 'error 3c' )
       endif
 
-      if( ast_getc( tf, 'ObsLat', status ) .ne. 'N0:00:00' ) then
+      if( ast_getc( tf, 'ObsLat', status ) .ne. 'N0:00:00.00' ) then
          write(*,*)  ast_getc( tf, 'ObsLat', status )
          call stopit( status, 'error 4c' )
       endif
@@ -256,12 +256,12 @@ c
          call stopit( status, 'error 2d' )
       endif
 
-      if( ast_getc( tf, 'ObsLon', status ) .ne. 'E0:00:00' ) then
+      if( ast_getc( tf, 'ObsLon', status ) .ne. 'E0:00:00.00' ) then
          write(*,*)  ast_getc( tf, 'ObsLon', status )
          call stopit( status, 'error 3d' )
       endif
 
-      if( ast_getc( tf, 'ObsLat', status ) .ne. 'N0:00:00' ) then
+      if( ast_getc( tf, 'ObsLat', status ) .ne. 'N0:00:00.00' ) then
          write(*,*)  ast_getc( tf, 'ObsLat', status )
          call stopit( status, 'error 4d' )
       endif
