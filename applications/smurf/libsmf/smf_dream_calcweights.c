@@ -13,14 +13,40 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_dream_calcweights ( int *status ) 
+*     smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index, 
+*			     const double gridstep, const int ngrid,
+*			     const int *gridminmax, int gridpts[][2],
+*			     int *status);
 
 *  Arguments:
+*     data = smfData * (Given and Returned)
+*        Input data
+*     ogrp = const Grp * (Given)
+*        NDG group identifier
+*     index = const int (Given)
+*        Index corresponding to required file in group
+*     gridstep = const double (Given)
+*        Size of DREAM grid step in arcsec
+*     ngrid = const int (Given)
+*        Number of points in the reconstruction grid
+*     gridminmax = const int * (Given)
+*        Pointer to array containing extent of reconstruction grid 
+*     gridpts[][2] = int (Returned)
+*        Array of X, Y positions in reconstruction grid
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
+*     This routine is responsible for calculating the weights arrays
+*     for DREAM observations with SCUBA-2. A new NDF file is created
+*     which contains the weights arrays as extensions under the
+*     .MORE.DREAM hierarchy. The grid weights array is stored as
+*     .GRIDWTS and the inverse matrix as .INVMATX. Other relevant grid
+*     parameters are also stored in the file.
 *
+*     The routine currently returns with good status if the data are
+*     not from a DREAM observation, but returns with an error if the
+*     data are not in time series format.
 
 *  Notes: 
 
@@ -30,7 +56,10 @@
 
 *  History:
 *     2006-09-15 (AGG):
-*        Initial version
+*        Initial version, based on calcmapwt.c
+*     2006-10-11 (AGG):
+*        - Bring prologue up to date
+*        - Update call to smf_open_newfile due to API change
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -91,63 +120,59 @@
 #define SUB__MAXNAM 8 /* Maximum length for subarray name string */
 
 void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index, 
-			    const double gridstep, 
-			    const int ngrid,
+			    const double gridstep, const int ngrid,
 			    const int *gridminmax, int gridpts[][2],
 			    int *status) {
 
   /* Local Variables */
-  int i;                      /* Loop counter */
-  int j;                      /* Loop counter */
-  int k;                      /* Loop counter */
-  char subarray[SUB__MAXNAM+1]; /* Name of subarray */
-
-  smfDream *dream = NULL;    /* DREAM parameters obtained from input data file */
-
-  int nbolx;                 /* Number of bolometers in X direction */
-  int nboly;                 /* Number of bolometers in Y direction */
-  int nbol;                  /* Total number of bolometers */
-  smfHead *hdr = NULL;       /* Header for input data */
-  double tsamp;              /* Sample time */
-  int numsamples;            /* Number of time samples in input data */
-  int nsampcycle;            /* Number of samples in a jiggle cycle */
-  dim_t dims[2];             /* Dimensions of output NDFs */
-  smfData *odata = NULL;     /* Output data */
-  smfData *gwtdata = NULL;   /* Grid weights */
-  smfData *invdata = NULL;   /* Inverse matrix */
-  HDSLoc *weightsloc = NULL; /* Locator for writing out weights */
-  smfFile *ofile = NULL;     /* File information for output file */
-  int lbnd[2];               /* Lower bounds */
-  int ubnd[2];               /* Upper bounds */
-  int gwtndf;                /* NDF identifier for grid weights */
-  int invndf;                /* NDF identifier for inverse matrix */
-  double tbol;               /* Bolometer time constant */
-  int xmin;                  /* Minimum X extent of array */
-  int xmax;                  /* Maximum X extent of array */
-  int ymin;                  /* Minimum Y extent of array */
-  int ymax;                  /* Maximum Y extent of array */
-  int skywid;                /* Width of DREAM footprint on sky */
-  int skyheight;             /* Height of DREAM footprint on sky */
-  int nunkno;                /* Number of unknowns to sovle for */
-  double *pout = NULL;       /* Pointer to grid weights array */
-  double *par = NULL;        /* Pointer to array for problem equations */
-  double *pswt = NULL;       /* Pointer to array for normal equations */
-  int nframes;               /* Number of timeslices in input data */
-  int ipos;                  /* Position in reconstructed map */
-  int jpos;                  /* Position in reconstructed map */
-  int jgrid;                 /* Counter through reconstructed map */
-  int err;                   /* Error in reducing */
-  int loc;                   /* Matrix location */
-  double dmin;               /* Minimum found during inversion */
-  int l;                     /* Loop counter */
-  char obsmode[LEN__METHOD+1]; /* Observing mode */
   int conv_shape = CONV__SINCTAP; /* Code for convolution function */
-  double conv_sig = 1.0;     /* Convolution function parameter */
-  int *tmpptr = NULL;        /* Temporary pointer */
-  int gridndf;               /* NDF identifier for grid parameters */
-  int nelem;
-  int *gridext;              /* Min/max extent of reconstruction grid */
-
+  double conv_sig = 1.0;      /* Convolution function parameter */
+  dim_t dims[2];              /* Dimensions of output NDFs */
+  double dmin;                /* Minimum found during inversion */
+  smfDream *dream = NULL;     /* DREAM parameters obtained from input data file */
+  int err;                    /* Error in reducing */
+  int *gridext;               /* Min/max extent of reconstruction grid */
+  int gridndf;                /* NDF identifier for grid parameters */
+  smfData *gwtdata = NULL;    /* Grid weights */
+  int gwtndf;                 /* NDF identifier for grid weights */
+  smfHead *hdr = NULL;        /* Header for input data */
+  int i;                      /* Loop counter */
+  smfData *invdata = NULL;    /* Inverse matrix */
+  int invndf;                 /* NDF identifier for inverse matrix */
+  int ipos;                   /* Position in reconstructed map */
+  int j;                      /* Loop counter */
+  int jgrid;                  /* Counter through reconstructed map */
+  int jpos;                   /* Position in reconstructed map */
+  int k;                      /* Loop counter */
+  int l;                      /* Loop counter */
+  int lbnd[2];                /* Lower bounds */
+  int loc;                    /* Matrix location */
+  int nbol;                   /* Total number of bolometers */
+  int nbolx;                  /* Number of bolometers in X direction */
+  int nboly;                  /* Number of bolometers in Y direction */
+  int nelem;                  /* Number of elements in mapped array */
+  int nframes;                /* Number of timeslices in input data */
+  int nsampcycle;             /* Number of samples in a jiggle cycle */
+  int numsamples;             /* Number of time samples in input data */
+  int nunkno;                 /* Number of unknowns to sovle for */
+  char obsmode[LEN__METHOD+1]; /* Observing mode */
+  smfData *odata = NULL;      /* Output data */
+  smfFile *ofile = NULL;      /* File information for output file */
+  double *par = NULL;         /* Pointer to array for problem equations */
+  double *pout = NULL;        /* Pointer to grid weights array */
+  double *pswt = NULL;        /* Pointer to array for normal equations */
+  int skyheight;              /* Height of DREAM footprint on sky */
+  int skywid;                 /* Width of DREAM footprint on sky */
+  char subarray[SUB__MAXNAM+1]; /* Name of subarray */
+  double tbol;                /* Bolometer time constant */
+  int *tmpptr = NULL;         /* Temporary pointer */
+  double tsamp;               /* Sample time */
+  int ubnd[2];                /* Upper bounds */
+  HDSLoc *weightsloc = NULL;  /* Locator for writing out weights */
+  int xmax;                   /* Maximum X extent of array */
+  int xmin;                   /* Minimum X extent of array */
+  int ymax;                   /* Maximum Y extent of array */
+  int ymin;                   /* Minimum Y extent of array */
 
   if ( *status != SAI__OK) return;
 
@@ -188,9 +213,11 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
       smf_dream_setjig( subarray, nsampcycle, gridstep, dream->jigpath, status );
 	  
       /* Open the output file and map arrays */
-      dims[0] = 1;
-      dims[1] = 1;
-      smf_open_newfile( ogrp, index, SMF__INTEGER, 2, dims, 0, &odata, status);
+      lbnd[0] = 0;
+      lbnd[1] = 1;
+      ubnd[0] = 0;
+      ubnd[1] = 1;
+      smf_open_newfile( ogrp, index, SMF__INTEGER, 2, lbnd, ubnd, 0, &odata, status);
       tmpptr = smf_malloc( 1, sizeof(int), 0, status );
       (odata->pntr)[0] = tmpptr;
       memset( tmpptr, 1, sizeof(int));
