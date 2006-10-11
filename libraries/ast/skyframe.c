@@ -175,6 +175,10 @@ f     The SkyFrame class does not define any new routines beyond those
 *        - Use linear approximation for LAST over short periods (less
 *          than 0.001 of a day)
 *        - Remove Equation of Equinoxes from the SkyFrame structure.
+*     10-OCT-2006 (DSB):
+*        Use "AlOff" instead of "AlignOffset" as the external channel name
+*        for the AlignOffset attribute. The longer form exceeded the
+*        limit that can be used by the Channel class.
 *class--
 */
 
@@ -9436,7 +9440,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ------------ */
    set = TestAlignOffset( this );
    ival = set ? GetAlignOffset( this ) : astGetAlignOffset( this );
-   astWriteInt( channel, "AlignOffset", set, 0, ival,
+   astWriteInt( channel, "AlOff", set, 0, ival,
                 ival ? "Align in offset coords" :
                        "Align in system coords" );
 }
@@ -9772,7 +9776,7 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 
 /* AlignOffset */
 /* ----------- */
-      new->alignoffset = astReadInt( channel, "alignoffset", -INT_MAX );
+      new->alignoffset = astReadInt( channel, "aloff", -INT_MAX );
       if ( TestAlignOffset( new ) ) SetAlignOffset( new, new->alignoffset );
 
 /* SkyRefIs. */
