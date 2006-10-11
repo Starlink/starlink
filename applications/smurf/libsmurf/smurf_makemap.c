@@ -76,6 +76,9 @@
 *        Write data, variance, and weights using smfData structures
 *     2006-08-22 (JB):
 *        Add odata for output, add smf_close_file for odata.
+*     2006-10-11 (AGG):
+*        - Update to new API for smf_open_newfile, remove need for dims array
+*        - Remove calls to subtract sky and correct for extinction
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -145,7 +148,6 @@ void smurf_makemap( int *status ) {
   /* Local Variables */
   Grp *confgrp = NULL;       /* Group containing configuration file */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
-  dim_t dims[2];             /* Dimensions of image */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int flag;                  /* Flag */
   dim_t i;                   /* Loop counter */
@@ -204,10 +206,8 @@ void smurf_makemap( int *status ) {
   smfflags = 0;
   smfflags |= SMF__MAP_VAR;
 
-  dims[0] = (dim_t)ubnd_out[0];
-  dims[1] = (dim_t)ubnd_out[1];
-
-  smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, dims, smfflags, &odata, status );
+  smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags, &odata, 
+		     status );
 
   if ( *status == SAI__OK ) {
 
@@ -235,15 +235,16 @@ void smurf_makemap( int *status ) {
 	     status);
 
     for(i=1; i<=size; i++ ) {
-
       /* Read data from the ith input file in the group */      
       smf_open_and_flatfield( igrp, NULL, i, &data, status );
-      
+      /* ****** 
+	 These calls are not needed - we should probably check that we
+	 have sky-subtracted and extinction-corrected data 
+	 ****** */
       /* Remove sky - assume MEAN is good enough for now */
-      smf_subtract_plane(data, "MEAN", status);
-
+      /*      smf_subtract_plane(data, "MEAN", status);*/
       /* Use raw WVM data to make the extinction correction */
-      smf_correct_extinction(data, "WVMR", 0, 0, status);
+      /*      smf_correct_extinction(data, "WVMR", 0, 0, status);*/
       
       /* Check that the data dimensions are 3 (for time ordered data) */
       if( *status == SAI__OK ) {
