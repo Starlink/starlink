@@ -3743,7 +3743,7 @@ int main(int argc, char **argv) { return 0; }
 EOF
 
             if test "$GCC" = "yes"; then
-        prog_cc_optim_flags="-O3 -funroll-loops -fomit-frame-pointer -Wall"
+        prog_cc_optim_flags="-O -funroll-loops -fomit-frame-pointer -Wall -g"
 
 
             elif $CC -V 2>&1 | grep -i "WorkShop" > /dev/null 2>&1 &&

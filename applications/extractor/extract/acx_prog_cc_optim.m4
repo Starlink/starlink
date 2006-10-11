@@ -21,7 +21,7 @@ EOF
 
       dnl GCC
       if test "$GCC" = "yes"; then
-        prog_cc_optim_flags="-O3 -funroll-loops -fomit-frame-pointer -Wall"
+        prog_cc_optim_flags="-O -funroll-loops -fomit-frame-pointer -Wall -g"
 
       dnl Most compilers print some kind of a version string with some command
       dnl line options (often "-V").  The version string should be checked

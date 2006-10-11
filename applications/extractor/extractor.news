@@ -2,6 +2,11 @@
 
  Changes in release 2.4.5
 
+    Image coordinates should now be reported correctly when compiled
+    with gcc version 4.1.
+
+ Changes in release 2.4.5
+
     EXTRACTOR has been changed so that it now works on NDFs with higher
     number of dimensions, provided that only two dimensions are significant.
     This means it's now possible to run EXTRACTOR on a plane of a cube:

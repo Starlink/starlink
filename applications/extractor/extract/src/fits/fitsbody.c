@@ -9,7 +9,7 @@
 *
 *	Contents:       Handle memory allocation for FITS bodies.
 *
-*	Last modify:	06/11/2003
+*	Last modify:	29/06/2006
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -463,11 +463,12 @@ INPUT	A pointer to the tab structure,
 OUTPUT	-.
 NOTES	.
 AUTHOR	E. Bertin (IAP)
-VERSION	28/02/2000
+VERSION	29/06/2006
  ***/
 void	write_body(tabstruct *tab, PIXTYPE *ptr, size_t size)
   {
   catstruct	*cat;
+  char		*cbufdata0;
   size_t	i, bowl, spoonful;
   PIXTYPE	bs,bz;
 
@@ -478,6 +479,8 @@ void	write_body(tabstruct *tab, PIXTYPE *ptr, size_t size)
     error(EXIT_FAILURE, "*Internal Error*: no parent cat structure for table ",
 		tab->extname);
 
+  cbufdata0 = (char *)bufdata0;	/* A trick to remove gcc aliasing warnings */
+ 
   switch(tab->compress_type)
     {
 /*-- Uncompressed image */
@@ -493,13 +496,13 @@ void	write_body(tabstruct *tab, PIXTYPE *ptr, size_t size)
           case BP_BYTE:
             if (tab->bitsgn)
               {
-               char	*bufdata = (char *)bufdata0;
+               char	*bufdata = (char *)cbufdata0;
               for (i=spoonful; i--;)
                 *(bufdata++) = (char)((*(ptr++)-bz)/bs+0.49999);
               }
             else
               {
-               unsigned char	*bufdata = (unsigned char *)bufdata0;
+               unsigned char	*bufdata = (unsigned char *)cbufdata0;
               for (i=spoonful; i--;)
                 *(bufdata++) = (unsigned char)((*(ptr++)-bz)/bs+0.49999);;
               }
@@ -508,54 +511,54 @@ void	write_body(tabstruct *tab, PIXTYPE *ptr, size_t size)
           case BP_SHORT:
             if (tab->bitsgn)
               {
-               short	*bufdata = (short *)bufdata0;
+               short	*bufdata = (short *)cbufdata0;
               for (i=spoonful; i--;)
                 *(bufdata++) = (short)((*(ptr++)-bz)/bs+0.49999);
               }
             else
               {
-               unsigned short	*bufdata = (unsigned short *)bufdata0;
+               unsigned short	*bufdata = (unsigned short *)cbufdata0;
               for (i=spoonful; i--;)
                 *(bufdata++) = (unsigned short)((*(ptr++)-bz)/bs+0.49999);
               }
             if (bswapflag)
-              swapbytes(bufdata0, 2, spoonful);
+              swapbytes(cbufdata0, 2, spoonful);
             break;
 
           case BP_LONG:
            if (tab->bitsgn)
               {
-               int	*bufdata = (int *)bufdata0;
+               int	*bufdata = (int *)cbufdata0;
               for (i=spoonful; i--;)
                 *(bufdata++) = (int)((*(ptr++)-bz)/bs+0.49999);
               }
             else
               {
-               unsigned int	*bufdata = (unsigned int *)bufdata0;
+               unsigned int	*bufdata = (unsigned int *)cbufdata0;
               for (i=spoonful; i--;)
                 *(bufdata++) = (unsigned int)((*(ptr++)-bz)/bs+0.49999);
               }
             if (bswapflag)
-              swapbytes(bufdata0, 4, spoonful);
+              swapbytes(cbufdata0, 4, spoonful);
             break;
 
           case BP_FLOAT:
             {
-             float	*bufdata = (float *)bufdata0;
+             float	*bufdata = (float *)cbufdata0;
             for (i=spoonful; i--;)
               *(bufdata++) = (*(ptr++)-bz)/bs;
             if (bswapflag)
-              swapbytes(bufdata0, 4, spoonful);
+              swapbytes(cbufdata0, 4, spoonful);
             }
             break;
 
           case BP_DOUBLE:
             {
-             double	*bufdata = (double *)bufdata0;
+             double	*bufdata = (double *)cbufdata0;
             for (i=spoonful; i--;)
               *(bufdata++) = (double)(*(ptr++)-bz)/bs;
             if (bswapflag)
-              swapbytes(bufdata0, 8, spoonful);
+              swapbytes(cbufdata0, 8, spoonful);
             }
             break;
 
@@ -564,7 +567,7 @@ void	write_body(tabstruct *tab, PIXTYPE *ptr, size_t size)
                                 "read_body()");
             break;
           }
-        QFWRITE(bufdata0, spoonful*tab->bytepix, cat->file, cat->filename);
+        QFWRITE(cbufdata0, spoonful*tab->bytepix, cat->file, cat->filename);
         }
       break;
 
