@@ -116,7 +116,8 @@
 *        smf_store_image
 *     2006-09-15 (AGG):
 *        Add smf_dream_getgrid, smf_dream_calcweights
-
+*     2006-10-11 (AGG):
+*        Update API for smf_open_newfile
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -156,7 +157,7 @@
 
 void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status );
 
-void smf_boxcar1 ( double *series, const int ninpts, int window, int *status);
+void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, int *status);
 
 void smf_calc_stats( const smfData *data, const char *mode, const int index,
                      int lo, int hi, double *mean, double *sigma, 
@@ -374,9 +375,9 @@ void smf_open_ndfname( const HDSLoc *loc, char *accmode, char *filename,
 		       const int *lbnd, const int *ubnd, smfData **ndfdata, 
                        int *status);
 
-void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, int ndims, 
-		       const dim_t dims[], int flags, smfData ** data, 
-		       int *status);
+void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, 
+		       const int ndims, const int *lbnd, const int *ubnd, 
+		       int flags, smfData ** data, int *status);
 
 void smf_open_related( const smfGroup *group, const int subindex, const char *accmode,
 		       smfArray **relfiles, int *status );
@@ -404,6 +405,7 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
 void smf_string_to_dtype ( const char * datatype, smf_dtype *dtype, int * status );
 
 void smf_subtract_plane( smfData *data, const char *fittype, int *status);
+
 
 void smf_subtract_poly( smfData *data, int *status );
 
