@@ -51,6 +51,9 @@
 *        Initial version
 *     2006-07-26 (TIMJ):
 *        sc2head no longer used. Use JCMTState instead.
+*     2006-10-11 (AGG):
+*        Additional checks for relatedness: wavelength and dimensions
+*        of data array
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -122,10 +125,18 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
   double *ends = NULL;        /* Array of ending RTS_END values */
   int nelem;                  /* Number of elements in index array */
 
-  smfData *data;
+  smfData *data = NULL;       /* Current smfData */
+  double *lambda = NULL;      /* Wavelength - only used if grpbywave is true */
+  dim_t *nbolx = NULL;        /* Number of bolometers in X direction */
+  dim_t *nboly = NULL;        /* Number of bolometers in Y direction */
+  dim_t nx;                   /* (data->dims)[0] */
+  dim_t ny;                   /* (data->dims)[1] */
+  size_t allOK = 1;           /* Flag to determine whether to continue */
+  double obslam;              /* Observed wavelength from FITS header (m) */
 
   if ( *status != SAI__OK ) return;
 
+  /* Check that the Grp size is reasonable */
   if ( grpsize < 1 || grpsize > GRP__MAXG ) {
     if ( *status == SAI__OK ) {
       msgSeti("SZ",grpsize);
@@ -140,11 +151,17 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
   subgroups = smf_malloc( grpsize, sizeof(int*), 1, status );
   starts = smf_malloc( grpsize, sizeof(double), 1, status );
   ends = smf_malloc( grpsize, sizeof(double), 1, status );
+  nbolx = smf_malloc( grpsize, sizeof(dim_t), 1, status );
+  nboly = smf_malloc( grpsize, sizeof(dim_t), 1, status );
   
+  if ( *status != SAI__OK ) goto CLEANUP;
+
   /* Do we want to group by wavelength? */
-  if ( grpbywave == 0 ) {
+  if ( grpbywave == 1 ) {
     /* If yes, then we only need to allocate space for 4 elements */
     nelem = SMF__MXSMF;
+    /* And define the wavelength array */
+    lambda = smf_malloc( grpsize, sizeof(double), 1, status );
   } else {
     /* OK we might have data from up to 8 subarrays so allocate
        twice as much space */
@@ -156,6 +173,7 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
     /* First step: open file and read start/end RTS_END values */
     smf_open_file( igrp, i, "READ", 1, &data, status );
     hdr = data->hdr;
+    /* Set header for first time slice */
     frame = 0;
     smf_tslice_ast( data, frame, 0, status );
     if ( *status != SAI__OK ) {
@@ -171,28 +189,49 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
       return;
     }
     writetime = hdr->state->rts_end;
-    /* NEED TO CHECK WAVELENGTHS ARE THE SAME */
-
+    /* Retrieve wavelength if necessary */
+    if ( grpbywave ) {
+      smf_fits_getD(hdr, "WAVELEN", &obslam, status );
+    }
+    /* Now get data dimensions */
+    nx = (data->dims)[0];
+    ny = (data->dims)[1];
     /* Now to check if it's a related file... */
     for ( j=0; j<grpsize; j++ ) {
       /* Does the subgroup exist? */
       if ( subgroups[j] != 0 ) {
-	/* If yes, see if the RTS_END values match */
-	indices = subgroups[j];
-	if ( opentime == starts[j] && writetime == ends[j] ) {
-	  /* Store in first available slot in current subgroup */
-	  /* No point starting at 0 because it WILL be occupied */
-	  for ( k=1; k<nelem; k++) {
-	    if (indices[k] == 0) {
-	      indices[k] = i;
-	      goto CLOSE;
-	    }
+	/* If yes, are we grouping by wavelength? */
+	if ( grpbywave ) {
+	  if ( obslam != lambda[j] ) {
+	    allOK = 0;
 	  }
 	}
+	if ( allOK ) {
+	  /* Then check if the RTS_END values match */
+	  indices = subgroups[j];
+	  if ( opentime == starts[j] && writetime == ends[j] ) {
+	    if ( nx == nbolx[j] && ny == nboly[j]) {
+	      /* Store in first available slot in current subgroup.
+		 No point starting at 0 because it WILL be occupied if
+		 we've reached this point */
+	      for ( k=1; k<nelem; k++) {
+		if (indices[k] == 0) {
+		  indices[k] = i;
+		  goto CLOSE;
+		}
+	      }
+	    } else {
+	      msgOutif(MSG__VERB, FUNC_NAME, 
+		       "Start and end times match but data arrays are of different size", 
+		       status);
+	    }
+	  }
+	} /* Close if allOK */
       } else {
 	/* If not, there's nothing to match so create it and add the
 	 current index */
 	indices = smf_malloc( nelem, sizeof(int), 1, status);
+	/* Initialize the pointers to NULL */
 	if ( *status != SAI__OK ) {
 	  errRep(FUNC_NAME, "Unable to allocate memory to store index array", status);
 	  return;
@@ -202,6 +241,11 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
 	/* Add new open/end times to arrays */
 	starts[j] = opentime;
 	ends[j] = writetime;
+	nbolx[j] = nx;
+	nboly[j] = ny;
+	if ( grpbywave ) {
+	  lambda[j] = obslam;
+	}
 	ngroups++;
 	goto CLOSE;
       }
@@ -209,8 +253,6 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
   CLOSE:
     smf_close_file( &data, status );
   }
-  smf_free( starts, status );
-  smf_free( ends, status );
   /* Sanity check - make sure that the number of groups is less than
      the grpsize */
   if ( ngroups > grpsize ) {
@@ -224,9 +266,17 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
     }
   }
 
-
   /* Create the smfGroup */
   *group = smf_construct_smfGroup( igrp, subgroups, ngroups, nelem, status );
-  /*  smf_free( subgroups, status);*/
+
+ CLEANUP:
+  smf_free( starts, status );
+  smf_free( ends, status );
+  smf_free( nbolx, status );
+  smf_free( nboly, status );
+  if ( *status != SAI__OK ) {
+    smf_free( indices, status );
+    smf_free( subgroups, status );
+  }
 
 }
