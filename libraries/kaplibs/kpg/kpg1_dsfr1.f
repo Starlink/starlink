@@ -82,6 +82,8 @@
 *        Clear TimeOrigin in the TimeFrame used to format the TimeOrigin
 *        value so that the TimeOrigin value is formatted as an absolute
 *        time.
+*     11-OCT-2006 *DSB):
+*        Ensure no units are displayed for redshift values.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -127,6 +129,7 @@
       CHARACTER SREFIS*10        ! Value of SkyFrame SkyRefIs attribute
       CHARACTER SYS*30           ! Sky coordinate system
       CHARACTER TSC*30           ! Time Scale of TimeFrame
+      CHARACTER UNIT*20          ! Units string
       DOUBLE PRECISION EP        ! Epoch of observation
       DOUBLE PRECISION EQ        ! Epoch of reference equinox
       DOUBLE PRECISION FD        ! Fraction of day (+ve)
@@ -336,9 +339,12 @@
             END IF
    
             CALL MSG_SETC( 'SYS', LABEL )
-            CALL MSG_SETC( 'SYS', ' (' )
-            CALL MSG_SETC( 'SYS', AST_GETC( FRM, 'UNIT(1)', STATUS ) ) 
-            CALL MSG_SETC( 'SYS', ')' )
+            UNIT = AST_GETC( FRM, 'UNIT(1)', STATUS )
+            IF( UNIT .NE. ' ' ) THEN
+               CALL MSG_SETC( 'SYS', ' (' )
+               CALL MSG_SETC( 'SYS', UNIT )
+               CALL MSG_SETC( 'SYS', ')' )
+            END IF            
             CALL MSG_OUT( 'WCS_SYS', 
      :                 IND( : NIND )//'System              : ^SYS', 
      :                 STATUS )
@@ -410,6 +416,14 @@
 *  Display the value
                CALL MSG_SETR( 'V', REAL( SRCVEL ) )
 
+               IF( SYS .NE. 'ZOPT' ) THEN
+                  CALL MSG_SETC( 'UNIT', 'Km/s' )
+                  CALL MSG_SETC( 'TTL', 'velocity' )
+               ELSE
+                  CALL MSG_SETC( 'UNIT', ' ' )
+                  CALL MSG_SETC( 'TTL', 'redshift' )
+               END IF
+
                SOR = AST_GETC( FRM, 'SOURCEVRF', STATUS )
                IF( CHR_SIMLR( SOR, 'NONE' ) ) THEN
                   CALL MSG_SETC( 'SOR', '<not defined>' )
@@ -430,7 +444,7 @@
                END IF
 	       
                CALL MSG_OUT( 'WCS_VELSOR', 
-     :            IND( : NIND )//'Source velocity     : ^V km/s '//
+     :            IND( : NIND )//'Source ^TTL     : ^V ^UNIT '//
      :            '(^SOR ^LABEL)', STATUS )
             END IF
 
