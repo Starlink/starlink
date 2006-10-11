@@ -13,7 +13,6 @@
 *     Library routine
 
 *  Invocation:
-
 *     smf_open_newfile( Grp * ingrp, int index, smf_dtype dtype, int ndims, 
 *                       const dim_t dims[], int flags, smfData ** data, 
 *                       int *status);
@@ -75,6 +74,8 @@
 *        Use dim_t as much as possible.
 *     2006-09-15 (AGG):
 *        Add status checking
+*     2006-10-11 (AGG):
+*        Change API to take lbnd, ubnd from caller
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -99,8 +100,6 @@
 
 *  Bugs:
 *     {note_any_bugs_here}
-*     lbnd needs to be set to 0 instead of 1 or else maps end
-*     up offset - unresolved.  (JB)
 *-
 */
 
@@ -126,24 +125,24 @@
 
 #define FUNC_NAME "smf_open_newfile"
 
-void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, int ndims, 
-		       const dim_t dims[], int flags, smfData ** data, 
+void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int ndims,
+		       const int *lbnd, const int *ubnd, int flags, smfData ** data,
 		       int *status) {
 
   /* Local variables */
-  int newndf;                   /* NDF identified for new file */
-  char *pname = NULL;           /* Pointer to filename */
-  int i;                        /* Loop counter */
-  char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
   char *datatype;               /* String for data type */
-  int nel;                      /* Number of mapped elements */
+  dim_t dims[NDF__MXDIM];       /* Dimensions of NDf to be created */
   smfFile *file = NULL;         /* Pointer to smfFile struct */
-
-  int lbnd[3];                  /* Array of lower bounds */
-  int ubnd[3];                  /* Array of upper bounds */
+  char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
+  int i;                        /* Loop counter */
   int isNDF = 1;                /* Flag to denote whether data are 1 or 2-D */
   int isTstream = 0;            /* Flag to denote time series (3-D) data */
+  int lbnd[3];                  /* Array of lower bounds */
+  int nel;                      /* Number of mapped elements */
+  int newndf;                   /* NDF identified for new file */
+  char *pname = NULL;           /* Pointer to filename */
   void *pntr[3] = { NULL, NULL, NULL }; /* Array of pointers for smfData */
+  int ubnd[3];                  /* Array of upper bounds */
 
   if ( *status != SAI__OK ) return;
 
@@ -194,13 +193,6 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, int ndims,
     }
   }
 
-  /* Fill ubnd and lbnd arrays */
-  for ( i=0; i<ndims; i++) {
-    lbnd[i] = 0;
-    /* should check for overflow */
-    ubnd[i] = (int)dims[i];
-  }
-
   /* Create new simple NDF */
   ndgNdfcr( igrp, index, datatype, ndims, lbnd, ubnd, &newndf, status );
   if ( *status != SAI__OK ) {
@@ -245,6 +237,12 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, int ndims,
     }
   }
 
+  /* Set the dimensions of the new smfData */
+  for ( i=0; i<ndims; i++) {
+    dims[i] = ubnd[i] - lbnd[i] + 1;
+  }
+
+  /* Fill the smfData */
   *data = smf_construct_smfData( *data, file, NULL, NULL, dtype, pntr, dims, ndims, 
 				 0, 0, NULL, NULL, status);
 
