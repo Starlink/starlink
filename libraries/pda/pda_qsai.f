@@ -10,7 +10,7 @@
 *     Fortran 77
 
 *  Invocation:
-*     CALL CCD1_QSAI( EL, X )
+*     CALL PDA_QSAI( EL, X )
 
 *  Description:
 *     The routine uses the QUICKSORT algorithm to sort an array of values 

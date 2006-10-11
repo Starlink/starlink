@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_QSAR( EL, X )
+*     CALL PDA_QSAR( EL, X )
 
 *  Description:
 *     The routine uses the QUICKSORT algorithm to sort an array of values 

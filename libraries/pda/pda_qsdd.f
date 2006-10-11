@@ -10,7 +10,7 @@
 *     Fortran 77
 
 *  Invocation:
-*     CALL CCD1_QSDD( EL, X )
+*     CALL PDA_QSDD( EL, X )
 
 *  Description:
 *     The routine uses the QUICKSORT algorithm to sort an array of

@@ -11,7 +11,7 @@
 *     Fortran 77
 
 *  Invocation:
-*     CALL CCD1_QSIAD( EL, X, IP )
+*     CALL PDA_QSIAD( EL, X, IP )
 
 *  Description:
 *     The routine uses the QUICKSORT algorithm to permute an array of
