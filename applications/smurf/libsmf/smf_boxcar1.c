@@ -13,14 +13,15 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_boxcar1 ( double *series, const int ninpts, int window, int *status )
+*     smf_boxcar1 ( double *series, const size_t ninpts, size_t window, 
+*                   int *status )
 
 *  Arguments:
 *     series = double* (Given)
 *        Pointer to data array
-*     ninpts = int (Given)
+*     ninpts = const size_t (Given)
 *        Number of points in input series
-*     window = int (Given)
+*     window = size_t (Given)
 *        Size of boxcar filter window (in array elements)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -42,6 +43,8 @@
 *  History:
 *     2006-05-26 (AGG):
 *        Initial test version
+*     2006-10-11 (AGG):
+*        Change int arguments to size_t
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -88,7 +91,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_boxcar1"
 
-void smf_boxcar1 ( double *series, const int ninpts, int window, int *status) {
+void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, int *status) {
 
   /* Local variables */
   size_t i;                   /* Loop counter */
@@ -104,8 +107,8 @@ void smf_boxcar1 ( double *series, const int ninpts, int window, int *status) {
 
   /* Sanity check: is window smaller than size of input array? */
   if ( window > ninpts ) {
-    msgSeti("B",window);
-    msgSeti("N",ninpts);
+    msgSeti("B",(int)window);
+    msgSeti("N",(int)ninpts);
     msgOut(FUNC_NAME, "Size of window exceeds extent of data array: will return average for whole array", status);
     window = ninpts;
   }
