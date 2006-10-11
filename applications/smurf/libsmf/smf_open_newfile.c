@@ -137,12 +137,10 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   int i;                        /* Loop counter */
   int isNDF = 1;                /* Flag to denote whether data are 1 or 2-D */
   int isTstream = 0;            /* Flag to denote time series (3-D) data */
-  int lbnd[3];                  /* Array of lower bounds */
   int nel;                      /* Number of mapped elements */
   int newndf;                   /* NDF identified for new file */
   char *pname = NULL;           /* Pointer to filename */
   void *pntr[3] = { NULL, NULL, NULL }; /* Array of pointers for smfData */
-  int ubnd[3];                  /* Array of upper bounds */
 
   if ( *status != SAI__OK ) return;
 
