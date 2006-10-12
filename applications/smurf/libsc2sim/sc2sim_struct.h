@@ -27,6 +27,7 @@
     21Aug2006 : Put in ifndef to avoid including multiple times (ec)
     22Sep2006 : Merge with dxml_struct.h (jb)
     05Oct2006 : Replace pong_gridcount with pong_height and pong_width (jb)
+    12Oct2006 : Delete wt0_name and wt1_name as they are deprecated (agg)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -109,8 +110,6 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   int smu_samples;            /* Nr of samples per jiggle vertex */
   int subsysnr;               /* subsystem number */
   double targetpow;           /* target bolometer power input pW */
-  char wt0_name[SC2SIM__FLEN]; /* name of file for pixel weights */
-  char wt1_name[SC2SIM__FLEN]; /* name of file for piston weights */
 };
 
 struct sc2sim_sim_struct      /* parameters read from sim input file */

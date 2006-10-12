@@ -31,6 +31,7 @@
 
 *  Authors:
 *     J. Balfour (UBC)
+*     A.G. Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -39,6 +40,9 @@
 *     2006-10-04 (JB):
 *        Replace strcpy with strncpy, replace pong_gridcount with
 *        pong_width and pong_height
+*     2006-10-12 (AGG):
+*        - RA and Dec were not being stored in the inx struct
+*        - Delete wt0_name and wt1_name
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -165,6 +169,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       strncpy ( convert, temp, 80 );
       sc2sim_sex2double ( convert, &dec, status );
       dec *= DH2R;
+      inx->dec = dec;
    }
 
    if ( !astMapGet0D ( keymap, "DISTFAC", &(inx->distfac) ) )
@@ -377,6 +382,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       strncpy ( convert, temp, 80 );
       sc2sim_sex2double ( convert, &ra, status );
       ra *= DH2R;
+      inx->ra = ra;
    }
 
    if ( !astMapGet0D ( keymap, "SAMPLE_T", &(inx->sample_t) ) )
@@ -405,16 +411,6 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
    if ( !astMapGet0D ( keymap, "TARGETPOW", &(inx->targetpow) ) )
       inx->targetpow = 25.0;
-
-   if ( !astMapGet0C ( keymap, "WT0_NAME", &temp ) )
-      strncpy ( inx->wt0_name, "", 80 ); 
-   else
-      strncpy ( inx->wt0_name, temp, 80 );
-
-   if ( !astMapGet0C ( keymap, "WT1_NAME", &temp ) )
-      strncpy ( inx->wt1_name, "", 80 ); 
-   else
-      strncpy ( inx->wt1_name, temp, 80 );
 
    smf_free ( temp, status );
    smf_free ( convert, status );
