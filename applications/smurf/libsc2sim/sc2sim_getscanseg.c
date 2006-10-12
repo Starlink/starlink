@@ -208,8 +208,7 @@ int *status          /* global status (given and returned) */
                pattern[((*curroff)+j)*2] = cstart[0] + 
 	                 0.5 * raccel * tsq * cos(theta);
                pattern[((*curroff)+j)*2+1] = cstart[1] + 
-	         *     2006-10-12 (JB):
-*        Correct divide-by-zero error on zero accelerations        0.5 * raccel * tsq * sin(theta);
+	                 0.5 * raccel * tsq * sin(theta);
             }
  
             /* Constant velocity past mid way to deceleration zone */
