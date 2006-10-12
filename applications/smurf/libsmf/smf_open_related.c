@@ -36,6 +36,7 @@
 
 *  Notes:
 *     - See also smf_close_related.c
+*     - The data should be flatfielded before trying to open them here. 
 
 *  Authors:
 *     Andy Gibb (UBC)
