@@ -80,6 +80,10 @@
 *        Modified sc2ast_createwcs calls to use new interface.
 *     2006-09-11 (EC):
 *        Call different createwcs depending on the instrument
+*     2006-09-19 (DSB):
+*        Add ACSIS as a recognised instrument.
+*     2006-10-2 (DSB):
+*        Allow ACSIS WCS to be based either on FPLANEX/Y or RECEPPOS.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -225,6 +229,20 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
 			 &(hdr->wcs), status );
       break;
       
+/* For ACSIS data, use the .MORE.ACSIS.RECEPPOS values if they are
+   still available in the smfHead. Otherwise, use the FPLANEX/Y values. */
+    case INST__ACSIS:
+
+      if( hdr->receppos ) {
+         smf_receppos_wcs( hdr, index, hdr->telpos, &(hdr->wcs), status );
+
+      } else {
+         smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet, 
+     			    tmpState, hdr->instap, hdr->telpos, 
+			    &(hdr->wcs), status );
+      }
+
+      break;
 
     default:
       *status = SAI__ERROR;

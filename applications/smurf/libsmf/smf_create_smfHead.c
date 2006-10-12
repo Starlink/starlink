@@ -33,6 +33,7 @@
 
 *  Authors:
 *     Tim Jenness (TIMJ)
+*     David Berry (DSB)
 *     {enter_new_authors_here}
 
 *  History:
@@ -51,6 +52,8 @@
 *        Add instrument code. Add fplanex, fplaney.
 *     2006-09-07 (EC):
 *        Add instap and telpos.
+*     2006-10-2 (DSB):
+*        Add receppos.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -121,12 +124,13 @@ smf_create_smfHead( int * status ) {
   hdr->ndet = 0;
   hdr->fplanex = NULL;
   hdr->fplaney = NULL;
+  hdr->receppos = NULL;
+  hdr->rpazel = 0;
   hdr->isCloned = 0;
   hdr->telpos[0] = 0;
   hdr->telpos[1] = 0;
   hdr->telpos[2] = 0;
   hdr->instap[0] = 0;
   hdr->instap[1] = 0;
-
   return hdr;
 }

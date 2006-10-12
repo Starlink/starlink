@@ -226,7 +226,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       const JCMTState * allState,
 		       dim_t curframe, dim_t nframes, unsigned int ndet,
 		       const double fplanex[], const double fplaney[],
-		       int * status );
+		       const double receppos[], int rpazel, int * status );
 
 smfGroup * 
 smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups, 
@@ -415,5 +415,23 @@ void smf_telpos_get( const smfHead * hdr, int * status );
   int *status );*/
 
 void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
+
+void smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0, 
+ 		     double lat_0, int flag, double pixsize, int userecpos,
+                     int *moving, int lbnd[ 3 ], int ubnd[ 3 ], 
+                     AstFrameSet **wcsout, int *status );
+
+void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
+                    AstFrame *ospecfrm, AstMapping *ospecmap, int moving,
+                    int lbnd_out[ 3 ], int ubnd_out[ 3 ], float *data_array, 
+                    float *var_array, double *wgt_array, int *status );
+
+const char *smf_convert_system( const char *label, int *status );
+
+void smf_makefitschan( const char *system, double pixsize, 
+                       double lon_0, double lat_0, AstFitsChan *fc, 
+                       int *status );
+
+void smf_receppos_wcs( smfHead *hdr, int index, const double telpos[3], AstFrameSet **fset, int *status );
 
 #endif /* SMF_DEFINED */

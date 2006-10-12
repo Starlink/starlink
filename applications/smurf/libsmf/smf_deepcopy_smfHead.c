@@ -37,6 +37,7 @@
 *  Authors:
 *     Tim Jenness (TIMJ)
 *     Andy Gibb (UBC)
+*     David Berry (DSB)
 *     {enter_new_authors_here}
 
 *  History:
@@ -53,6 +54,8 @@
 *        make sure memcpy is protected. Some tidy up.
 *     2006-08-02 (TIMJ):
 *        The new smfHead is not a clone.
+*     2006-10-02 (DSB):
+*        Add receppos.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,6 +114,7 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   unsigned int ndet = 0;
   double *fplanex = NULL;
   double *fplaney = NULL;
+  double *receppos = NULL;
 
   if (*status != SAI__OK) return NULL;
 
@@ -148,10 +152,20 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
     if (fplaney) memcpy( fplaney, old->fplaney, ndet*sizeof(*fplaney) );
   } 
 
+  /* need to allocate receptor positions */
+  if (old->ndet > 0 && old->nframes > 0 && old->receppos) {
+    ndet = old->ndet;
+    nframes = old->nframes;
+    receppos = smf_malloc( 2*ndet*nframes, sizeof(*receppos), 0, status );
+    if (receppos) memcpy( receppos, old->receppos, 
+                          2*ndet*nframes*sizeof(*receppos) );
+  } 
+
   /* Insert elements into new smfHead */
   new = smf_construct_smfHead( new, instrument, wcs, tswcs, fitshdr,
 			       allState, curframe,
-			       nframes, ndet, fplanex, fplaney, status );
+			       nframes, ndet, fplanex, fplaney, receppos,
+                               old->rpazel, status );
 
   /* see isCloned to 0 since we have allocated this memory */
   if (new) new->isCloned = 0;

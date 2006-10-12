@@ -34,6 +34,7 @@
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 *     Edward Chapin (UBC)
+*     David Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -68,6 +69,8 @@
 *        Annul tswcs.
 *     2006-08-24 (AGG):
 *        Free smfDream if present
+*     2006-10-02 (DSB):
+*        Free receppos coordinates.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -184,6 +187,7 @@ void smf_close_file( smfData ** data, int * status ) {
       }
       if (hdr->fplanex) smf_free( hdr->fplanex, status );
       if (hdr->fplaney) smf_free( hdr->fplaney, status );
+      if (hdr->receppos) smf_free( hdr->receppos, status );
     }
     smf_free( hdr, status );
   }

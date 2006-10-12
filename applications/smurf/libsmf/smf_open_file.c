@@ -115,6 +115,9 @@
 *        Insert code for opening and storing DREAM parameters
 *     2006-09-21 (AGG):
 *        Check that we have a DREAM extension before attempting to access it
+*     2006-09-21 (AGG):
+*        Move the instrument-specific stuff until after hdr->nframes has
+*        been assigned (nframes is needed by acs_fill_smfHead).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -359,28 +362,6 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	/* Determine and store the telescope location in hdr->telpos */
 	smf_telpos_get( hdr, status );
 
-	/* Determine the instrument */
-	hdr->instrument = smf_inst_get( hdr, status );
-
-	/* On the basis of the instrument, we know need to fill in some
-	   additional header parameters. Some of these may be constants,
-	   whereas others may involve more file access. Currently we use
-	   a simple switch statement. We could modify this step to use
-	   vtables of function pointers.
-	*/
-	switch ( hdr->instrument ) {
-	case INST__ACSIS:
-	  acs_fill_smfHead( hdr, indf, status );
-	  break;
-	case INST__AZTEC:
-	  aztec_fill_smfHead( hdr, NDF__NOID, status );
-	  break;
-	default:
-	  break;
-	  /* SCUBA-2 has nothing special here because the focal plane
-	     coordinates are derived using an AST polyMap */
-	}
-	   
 
 	/* If not time series, then we can retrieve the stored WCS info */
 	if ( !isTseries ) {
@@ -412,6 +393,29 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	  /* Annul the locator */
 	  datAnnul( &xloc, status );
 	}
+
+	/* Determine the instrument */
+	hdr->instrument = smf_inst_get( hdr, status );
+
+	/* On the basis of the instrument, we know need to fill in some
+	   additional header parameters. Some of these may be constants,
+	   whereas others may involve more file access. Currently we use
+	   a simple switch statement. We could modify this step to use
+	   vtables of function pointers.
+	*/
+	switch ( hdr->instrument ) {
+	case INST__ACSIS:
+	  acs_fill_smfHead( hdr, indf, status );
+	  break;
+	case INST__AZTEC:
+	  aztec_fill_smfHead( hdr, NDF__NOID, status );
+	  break;
+	default:
+	  break;
+	  /* SCUBA-2 has nothing special here because the focal plane
+	     coordinates are derived using an AST polyMap */
+	}
+
       }
       /* Establish the data type */
       itype = smf_dtype_fromstring( dtype, status );

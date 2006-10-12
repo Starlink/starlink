@@ -22,7 +22,7 @@ smf_create_smfDA.c smf_boxcar1.c \
 smf_construct_smfFile.c smf_construct_smfHead.c smf_construct_smfDA.c \
 smf_construct_smfData.c smf_deepcopy_smfFile.c \
 smf_deepcopy_smfHead.c smf_deepcopy_smfData.c smf_deepcopy_smfDA.c \
-smf_mapbounds.c smf_mapbounds_approx.c smf_rebinmap.c \
+smf_mapbounds.c smf_mapbounds_approx.c smf_rebinmap.c smf_rebincube.c \
 smf_check_smfData.c smf_check_smfDA.c smf_check_smfFile.c smf_check_smfHead.c \
 smf_calc_wvm.c smf_subtract_poly.c smf_subtract_plane.c smf_fit_poly.c \
 smf_calc_stats.c smf_calc_covar.c \
@@ -33,7 +33,8 @@ smf_model_create.c smf_model_getname.c smf_open_newfile.c smf_open_ndf.c \
 smf_create_smfDream.c smf_construct_smfDream.c smf_close_smfDream.c \
 smf_dream_setjig.c smf_dreamsolve.c smf_store_image.c\
 smf_open_ndfname.c smf_string_to_dtype.c smf_create_lutwcs.c \
-smf_calc_telpos.c smf_telpos_get.c smf_dream_getgrid.c smf_dream_calcweights.c
+smf_calc_telpos.c smf_telpos_get.c smf_dream_getgrid.c smf_dream_calcweights.c \
+smf_cubebounds.c smf_convert_system.c smf_makefitschan.c smf_receppos_wcs.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 

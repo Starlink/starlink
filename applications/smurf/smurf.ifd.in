@@ -595,6 +595,26 @@ package @PACKAGE@ {
 	    helpkey *
 	  }
 
+	  parameter system {
+	    position 4
+            type LITERAL
+            access READ
+            vpath DEFAULT 
+            ppath CURRENT DEFAULT
+            prompt {Celestial coord system for output cube}
+            default TRACKING
+            helpkey *
+	  }
+
+ 	  parameter userecep {
+	    type _LOGICAL
+	    vpath DEFAULT
+	    ppath CURRENT
+	    prompt {Read receptor positions from the RECEPPOS array?}
+	    default TRUE
+	    helpkey *
+	  }
+
      }
 
      action impaztec {

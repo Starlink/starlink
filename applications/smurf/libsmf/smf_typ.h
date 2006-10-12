@@ -22,6 +22,7 @@
 *     Andy Gibb (UBC)
 *     Tim Jenness (JAC)
 *     Ed Chapin (UBC)
+*     David Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:n
@@ -68,6 +69,8 @@
 *        Added instap to smfHead
 *     2006-09-15 (AGG):
 *        Add new smfDream struct
+*     2006-10-2 (DSB):
+*        Add receppos to smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -170,6 +173,8 @@ typedef struct smfHead {
   unsigned int ndet;        /* Number of focal plane detectors */
   const double * fplanex;   /* X coords (radians) of focal plane detectors */
   const double * fplaney;   /* Y coords (radians) of focal plane detectors */
+  const double * receppos;  /* Tracking coords (radians) of detectors */
+  int rpazel;               /* Flag: does "receppos" hold AZEL values? */
   double instap[2];         /* instrument aperture (focal plane offsets)  */
   double telpos[3];         /* West LON/LAT/Alt of telescope (deg/deg/m) */
 } smfHead;

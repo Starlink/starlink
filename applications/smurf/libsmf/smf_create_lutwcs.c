@@ -85,6 +85,14 @@
 *        - In jigglemap case mapping was not being appended to mapcache
 *        - Check for VAL__BADD SMU offsets before using in jigglemap
 *        - Convert SMU offsets to radians from arcsec before using
+*     2006-09-21 (DSB):
+*        - Modified to use a PermMap instead of a pair of LutMaps if
+*          there is only 1 detector.
+*        - The returned FrameSet pointer is now exempted completely from 
+*          AST context handling rather than being exported to the parent 
+*          context. This is because the pointer may need to be referenced 
+*          in higher level contexts.
+*        - Correct SMU offsets arcsec->rad conversion.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -147,10 +155,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
 			int *status ) {
 
   /* Local Variables */
-  double a;                       /* rotation angle */
   AstMapping *azelmap;            /* tangent plane to spherical azel mapping */
-  double fplanerot[4];            /* Elements of fplane rotation matrix */
-  AstMatrixMap *fplanerotmap;     /* Rotate fplane to align with AzEl*/
   AstShiftMap *instapmap;         /* Mapping for focal plane shift */
   int haveLUT;                    /* Set if LUTs given */
   AstShiftMap *jigglemap;         /* account for offsets in tangent plane */
@@ -163,12 +168,15 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
   double temp_chop_y=0;           /* SMU chopy x-offset */
 
   /* Required only for LUTs */
-  AstPermMap *permmap;
-  int inperm[2];
-  int outperm[2];
   AstLutMap *azlutmap;
   AstLutMap *ellutmap;
-  AstCmpMap *azellutmap;
+  AstMapping *azellutmap;
+  AstMatrixMap *rmap;
+  AstPermMap *permmap;
+  double constants[ 2 ];
+  double rmat[ 4 ];
+  int inperm[2];
+  int outperm[2];
 
   /* A cache containing a FrameSet and a Mapping. The 
      FrameSet will contain a single Frame representing BOLO # in the 
@@ -269,10 +277,22 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
       map_cache = (AstMapping *) permmap;
     
       /* LUTs give the focal plane Tanplane offsets based on pixel number.
-         Connect two LUTs in parallel with a cmpMap to add after the permmap.*/
-      azlutmap = astLutMap( n_pix, fplane_x, 1, 1, "" );
-      ellutmap = astLutMap( n_pix, fplane_y, 1, 1, "" );
-      azellutmap = astCmpMap( azlutmap, ellutmap, 0, "" );
+         Connect two LUTs in parallel with a cmpMap to add after the permmap.
+         If the supplied tables contain only 1 entry, then use a PermMap
+         that assigns constant values to its outputs, instead of two LutMaps, 
+         since a LutMap must have at least 2 table entries. */
+      if( n_pix > 1 ) {
+         azlutmap = astLutMap( n_pix, fplane_x, 1, 1, "" );
+         ellutmap = astLutMap( n_pix, fplane_y, 1, 1, "" );
+         azellutmap = (AstMapping *) astCmpMap( azlutmap, ellutmap, 0, "" );
+      } else {
+         outperm[ 0 ] = -1;
+         outperm[ 1 ] = -2;
+         constants[ 0 ] = fplane_x[ 0 ];
+         constants[ 1 ] = fplane_y[ 0 ];
+         azellutmap = (AstMapping *) astPermMap( 2, NULL, 2, outperm, 
+                                                 constants, "" );
+      }
       map_cache = (AstMapping *) astCmpMap( map_cache, azellutmap, 1, "" );
 
       /* End LUT-specific code */
@@ -304,6 +324,16 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
 
   if( *status == SAI__OK ) {
 
+    /* Create a Mapping that rotates focal plane coords so that the Y
+       axis is parallel to the projection of the elevation axis. */
+
+    rmat[ 0 ] =  cos( state->tcs_az_ang );
+    rmat[ 1 ] =  sin( state->tcs_az_ang );
+    rmat[ 2 ] = -rmat[ 1 ];
+    rmat[ 3 ] = rmat[ 0 ];
+    rmap = astMatrixMap( 2, 2, 0, rmat, "" );
+
+
     /* Create a Mapping from tanplane AzEl coords (in rads) to spherical
        AzEl coords (in rads). */
 
@@ -316,16 +346,16 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
     them to radians from arcsec */
 
     if( state->smu_az_jig_x == VAL__BADD ) temp_jig_x = 0;
-    else temp_jig_x = state->smu_az_jig_x*DR2AS;
+    else temp_jig_x = state->smu_az_jig_x/DR2AS;
 
     if( state->smu_az_jig_y == VAL__BADD ) temp_jig_y = 0;
-    else temp_jig_y = state->smu_az_jig_y*DR2AS;
+    else temp_jig_y = state->smu_az_jig_y/DR2AS;
 
     if( state->smu_az_chop_x == VAL__BADD ) temp_chop_x = 0;
-    else temp_chop_x = state->smu_az_chop_x*DR2AS;
+    else temp_chop_x = state->smu_az_chop_x/DR2AS;
 
     if( state->smu_az_chop_y == VAL__BADD ) temp_chop_y = 0;
-    else temp_chop_y = state->smu_az_chop_y*DR2AS;
+    else temp_chop_y = state->smu_az_chop_y/DR2AS;
 
 
     /* Calculate final mapping with SMU position correction only if needed */
@@ -335,7 +365,9 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
          to Tanplane Nasmyth coords in rads), to get total Mapping from GRID 
          coords to spherical AzEl in rads. */
 
-      mapping = (AstMapping *) astCmpMap( map_cache, azelmap, 1, "" );    
+      mapping = (AstMapping *) astCmpMap( map_cache, 
+                                          astCmpMap( rmap, azelmap, 1, "" ),
+                                          1, "" );    
 
     } else {
       /* Create a ShiftMap which moves the origin of projection plane (X,Y)
@@ -347,8 +379,11 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
       jigglemap = astShiftMap( 2, shifts, "" );
     
       mapping = (AstMapping *) astCmpMap( map_cache, 
-                                          astCmpMap( jigglemap, azelmap, 1, 
-                                                     "" ), 1, "" );
+                                          astCmpMap( rmap,
+                                                     astCmpMap( jigglemap, azelmap, 
+                                                                1, "" ), 
+                                                     1, "" ),
+                                          1, "" );
     }
   
     /* If not already created, create a SkyFrame describing (Az,El). Hard-wire 
@@ -367,7 +402,11 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
 
       astExempt( skyframe );
     }
-    astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->rts_end + 32.184/SPD );
+
+    /* Note TCS values refer to the middle of the time step,so subtact
+       half the exposure time from the end time. */
+    astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->rts_end +
+            ( 32.184 - 0.5*state->acs_exposure)/SPD ); 
 
     /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
        First remove the existing current Frame and then add in the new one.
@@ -382,14 +421,17 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
     *fset = astClone( frameset_cache );
   }
 
-  /* Export the returned FrameSet pointer, and then end the AST context. This
+  /* Exempt the returned FrameSet pointer, and then end the AST context. This
      will annul all AST objects created since the matching call to astBegin,
      except for those which have been exported using astExport or exempted
      using astExempt. The use of AST contexts requires that the function
      does not exit prematurely before reaching the astEnd call. Therefore 
      there should usually no "return" statements within the body of the AST
-     context. */
-  astExport( *fset );
+     context. Note, we exempt this pointer from the AST context system rather 
+     than exporting it to the parent context because we do not know
+     when, or in which context, it will be used. It will be annulled
+     either in smf_tslice_ast or in smf_close_file. */
+  astExempt( *fset );
   astEnd;
 
 }
