@@ -48,6 +48,8 @@
 *        Original
 *     2006-07-20 (JB):
 *        Split from dsim.c
+*     2006-10-12 (JB):
+*        Correct divide-by-zero error on zero accelerations
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -95,6 +97,7 @@ int *status          /* global status (given and returned) */
    /* Local variables */
    double c0;          /* distance in coordinate 0 */
    double c1;          /* distance in coordinate 1 */
+   double dtotal;      /* total distance along path */
    double eps;         /* small number to trap angles */
    int jend;           /* count at end of scan */
    int jmax;           /* count at maximum velocity */
@@ -105,6 +108,7 @@ int *status          /* global status (given and returned) */
    double rmaxvel;     /* max velocity along path */
    double tmaxvel;     /* max velocity along path */
    double tmidway;     /* time at mid way */
+   double ttotal;      /* total time along path */
    double vmidway;     /* velocity at mid way */
 
    /* Check status */
@@ -145,27 +149,43 @@ int *status          /* global status (given and returned) */
    /* Determine whether the maximum velocity is reached before mid-way */
    c0 = cend[0] - cstart[0];
    c1 = cend[1] - cstart[1];
-   midway = 0.5 * sqrt ( c0 * c0 + c1 * c1 );
 
-   tmidway = sqrt ( fabs ( 2.0 * midway / raccel ) );
-   vmidway = fabs(raccel) * tmidway;
+   dtotal = sqrt ( c0 * c0 + c1 * c1 );
+   midway = 0.5 * dtotal;
+
+   /* If acceleration is 0, simply calculate the size of the scan from 
+      the length of the path */
    
-   if ( vmidway > fabs(rmaxvel) ) {
+   if ( raccel == 0 ) {
 
-      /* Need to accelerate, coast, then decelerate */
-      tmaxvel = fabs ( rmaxvel / raccel );
-      jmax = (int) ( tmaxvel / samptime );
-      rmax  = 0.5 * raccel * tmaxvel * tmaxvel;
-      tmidway = tmaxvel + fabs ( ( midway - rmax ) / rmaxvel );
-      jend = (int) ( 2.0 * tmidway / samptime );
+      ttotal = dtotal / rmaxvel;
+      *size = ttotal / samptime;
 
    } else {
 
-      /* Accelerate all the way to the midway point then decelerate to the end */
-      jend = (int) ( 2.0 * tmidway / samptime );
 
-   }
+      tmidway = sqrt ( fabs ( 2.0 * midway / raccel ) );
+      vmidway = fabs(raccel) * tmidway;
+   
+      if ( vmidway > fabs(rmaxvel) ) {
+
+         /* Need to accelerate, coast, then decelerate */
+         tmaxvel = fabs ( rmaxvel / raccel );
+         jmax = (int) ( tmaxvel / samptime );
+         rmax  = 0.5 * raccel * tmaxvel * tmaxvel;
+         tmidway = tmaxvel + fabs ( ( midway - rmax ) / rmaxvel );
+         jend = (int) ( 2.0 * tmidway / samptime );
+
+      } else {
+
+         /* Accelerate all the way to the midway point 
+            then decelerate to the end */
+         jend = (int) ( 2.0 * tmidway / samptime );
+
+      }
 
    *size = jend + 1;
+
+   }
 
 }

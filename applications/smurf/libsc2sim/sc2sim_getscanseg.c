@@ -52,6 +52,8 @@
 *        Original
 *     2006-07-20 (JB):
 *        Split from dsim.c
+*     2006-10-12 (JB):
+*        Correct divide-by-zero error on zero accelerations
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -101,7 +103,9 @@ int *status          /* global status (given and returned) */
    /* Local variables */
    double c0;          /* distance in coordinate 0 */
    double c1;          /* distance in coordinate 1 */
+   double dstep;       /* distance along path for no acceleration */
    double dtime;       /* time at start of deceleration */
+   double dtotal;      /* total distance of scan */
    double eps;         /* small number to trap angles */
    int j;              /* loop counter */
    int jdec;           /* count at start of deceleration */
@@ -113,6 +117,7 @@ int *status          /* global status (given and returned) */
    double raccel;      /* acceleration along path */
    double rmax;        /* distance along path when max velocity reached */
    double rmaxvel;     /* max velocity along path */
+   double tcurrent;    /* current time for no acceleration scans */
    double tdec;        /* time at start of deceleration */
    double tmaxvel;     /* max velocity along path */
    double tmidway;     /* time at mid way */
@@ -154,96 +159,117 @@ int *status          /* global status (given and returned) */
 
    }
 
-  /* Determine whether the maximum velocity is reached before mid-way */
    c0 = cend[0] - cstart[0];
    c1 = cend[1] - cstart[1];
-   midway = 0.5 * sqrt ( c0 * c0 + c1 * c1 );
 
-   tmidway = sqrt ( fabs ( 2.0 * midway / raccel ) );
-   vmidway = fabs(raccel) * tmidway;
-   jmid = (int) ( tmidway / samptime );
+   dtotal = sqrt ( c0 * c0 + c1 * c1 );
+   midway = 0.5 * dtotal;
+
+   /* If acceleration is 0, simply calculate the positions using
+      a constant velocity */
+
+   if ( raccel == 0 ) {
+  
+      for ( j=0; j < maxoff; j++ ) {
+	 tcurrent = j * samptime;
+         dstep = rmaxvel * tcurrent;
+         pattern[((*curroff)+j)*2] = cstart[0] + 
+                              ( dstep * cos ( theta ) );
+         pattern[((*curroff)+j)*2+1] = cstart[1] + 
+                              ( dstep * sin ( theta ) );   
+      }      
+         
+
+   } else {
+
+      /* Determine whether the maximum velocity is reached before mid-way */
+      tmidway = sqrt ( fabs ( 2.0 * midway / raccel ) );
+      vmidway = fabs(raccel) * tmidway;
+      jmid = (int) ( tmidway / samptime );
    
-   if ( vmidway > fabs(rmaxvel) ) {
+      if ( vmidway > fabs(rmaxvel) ) {
 
-      /* Need to accelerate, coast, then decelerate */
-      tmaxvel = fabs ( rmaxvel / raccel );
-      jmax = (int) ( tmaxvel / samptime );
-      rmax  = 0.5 * raccel * tmaxvel * tmaxvel;
-      tmidway = tmaxvel + fabs ( ( midway - rmax ) / rmaxvel );
-      tdec = 2.0 * tmidway - tmaxvel;
-      jdec = (int) ( tdec / samptime );
-      jend = (int) ( 2.0 * tmidway / samptime );
+         /* Need to accelerate, coast, then decelerate */
+         tmaxvel = fabs ( rmaxvel / raccel );
+         jmax = (int) ( tmaxvel / samptime );
+         rmax  = 0.5 * raccel * tmaxvel * tmaxvel;
+         tmidway = tmaxvel + fabs ( ( midway - rmax ) / rmaxvel );
+         tdec = 2.0 * tmidway - tmaxvel;
+         jdec = (int) ( tdec / samptime );
+         jend = (int) ( 2.0 * tmidway / samptime );
 
-      if ( ( (*curroff) + jend ) < maxoff ) {
+         if ( ( (*curroff) + jend ) < maxoff ) {
 
-         /* Accelerate to the maximum velocity */
-         for ( j=0; j<=jmax; j++ ) {
+            /* Accelerate to the maximum velocity */
+            for ( j=0; j<=jmax; j++ ) {
             
-            tsq = (double)j * samptime;
-            tsq = tsq * tsq;
-            pattern[((*curroff)+j)*2] = cstart[0] + 
-	                0.5 * raccel * tsq * cos(theta);
-            pattern[((*curroff)+j)*2+1] = cstart[1] + 
-	                0.5 * raccel * tsq * sin(theta);
+               tsq = (double)j * samptime;
+               tsq = tsq * tsq;
+               pattern[((*curroff)+j)*2] = cstart[0] + 
+	                 0.5 * raccel * tsq * cos(theta);
+               pattern[((*curroff)+j)*2+1] = cstart[1] + 
+	         *     2006-10-12 (JB):
+*        Correct divide-by-zero error on zero accelerations        0.5 * raccel * tsq * sin(theta);
+            }
+ 
+            /* Constant velocity past mid way to deceleration zone */
+            for ( j=jmax+1; j<=jdec; j++ ) {
+
+               dtime = (double) ( j-jmax-1) * samptime;
+               pattern[((*curroff)+j)*2] = cstart[0] + 
+                         ( rmax + rmaxvel * dtime ) * cos(theta);
+               pattern[((*curroff)+j)*2+1] = cstart[1] + 
+                         ( rmax + rmaxvel * dtime ) * sin(theta);
+            }
+
+            /* Deceleration */
+            for ( j=jdec+1; j<=jend; j++ ) {
+               tsq = 2.0 * tmidway - (double)j * samptime;
+	       tsq = tsq * tsq;
+               pattern[((*curroff)+j)*2] = cend[0] - 
+	                  0.5 * raccel * tsq * cos(theta);
+               pattern[((*curroff)+j)*2+1] = cend[1] - 
+	                  0.5 * raccel * tsq * sin(theta);
+            }
+
+            (*curroff) += jend + 1;
+
+         } else  {
+            *status = DITS__APP_ERROR;
          }
-
-         /* Constant velocity past mid way to deceleration zone */
-         for ( j=jmax+1; j<=jdec; j++ ) {
-
-            dtime = (double) ( j-jmax-1) * samptime;
-            pattern[((*curroff)+j)*2] = cstart[0] + 
-                        ( rmax + rmaxvel * dtime ) * cos(theta);
-            pattern[((*curroff)+j)*2+1] = cstart[1] + 
-                        ( rmax + rmaxvel * dtime ) * sin(theta);
-         }
-
-         /* Deceleration */
-         for ( j=jdec+1; j<=jend; j++ ) {
-            tsq = 2.0 * tmidway - (double)j * samptime;
-	    tsq = tsq * tsq;
-            pattern[((*curroff)+j)*2] = cend[0] - 
-	                0.5 * raccel * tsq * cos(theta);
-            pattern[((*curroff)+j)*2+1] = cend[1] - 
-	                0.5 * raccel * tsq * sin(theta);
-         }
-
-         (*curroff) += jend + 1;
 
       } else  {
-         *status = DITS__APP_ERROR;
-      }
 
-   } else  {
+         /* Accelerate all the way to the midway point */
+         jend = (int) ( 2.0 * tmidway / samptime );
 
-      /* Accelerate all the way to the midway point */
-      jend = (int) ( 2.0 * tmidway / samptime );
+         if ( ( (*curroff) + jend ) < maxoff ) {
 
-      if ( ( (*curroff) + jend ) < maxoff ) {
+            for ( j=0; j<=jmid; j++ ) {
+               tsq = (double)j * samptime;
+               tsq = tsq * tsq;
+               pattern[((*curroff)+j)*2] = cstart[0] + 
+	                   0.5 * raccel * tsq * cos(theta);
+               pattern[((*curroff)+j)*2+1] = cstart[1] + 
+	                   0.5 * raccel * tsq * sin(theta);
+            }
 
-         for ( j=0; j<=jmid; j++ ) {
-            tsq = (double)j * samptime;
-            tsq = tsq * tsq;
-            pattern[((*curroff)+j)*2] = cstart[0] + 
-	                0.5 * raccel * tsq * cos(theta);
-            pattern[((*curroff)+j)*2+1] = cstart[1] + 
-	                0.5 * raccel * tsq * sin(theta);
+            for ( j=jmid+1; j<=jend; j++ ) {
+               tsq = 2.0 * tmidway - (double)j * samptime;
+	       tsq = tsq * tsq;
+	       pattern[((*curroff)+j)*2] = cend[0] -
+	                   0.5 * raccel * tsq * cos(theta);
+	       pattern[((*curroff)+j)*2+1] = cend[1] -
+	                   0.5 * raccel * tsq * sin(theta);
+            }
+
+            (*curroff) += jend + 1;
+
+         } else {
+            *status = DITS__APP_ERROR;
          }
 
-         for ( j=jmid+1; j<=jend; j++ ) {
-            tsq = 2.0 * tmidway - (double)j * samptime;
-	    tsq = tsq * tsq;
-	    pattern[((*curroff)+j)*2] = cend[0] -
-	                0.5 * raccel * tsq * cos(theta);
-	    pattern[((*curroff)+j)*2+1] = cend[1] -
-	                0.5 * raccel * tsq * sin(theta);
-         }
-
-         (*curroff) += jend + 1;
-
-      } else {
-         *status = DITS__APP_ERROR;
       }
-
    }
 
 }
