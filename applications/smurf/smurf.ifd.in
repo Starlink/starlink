@@ -111,8 +111,10 @@
 #        Add BADBOLOS & made SC2SIM seed optional
 #     15-SEP-2006 (AGG):
 #        Rename DREAMWEIGHTS
-#     22-SEP-200 (JB):
+#     22-SEP-2006 (JB):
 #        Changed OBSXMLFILE & SIMXMLFILE to OBSFILE & SIMFILE
+#     12-OCT-2006 (AGG):
+#         Add GROUP keyword for REMSKY
 #     {enter_changes_here}
 
 #  Bugs:
@@ -410,6 +412,15 @@ package @PACKAGE@ {
             prompt {Sky-subtracted timeseries}
             helpkey *
           }
+
+         parameter group {
+            position 4
+            type _LOGICAL
+            prompt {Group related files?}
+            ppath DEFAULT CURRENT
+            default FALSE
+            helpkey *
+         }
 
 	 parameter fit {
 	    type _CHAR

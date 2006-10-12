@@ -27,6 +27,13 @@
 *          Input file(s)
 *     METHOD = CHAR (Read)
 *          Sky removal method, either POLY or PLANE
+*     GROUP = LOGICAL (Read)
+*          If true, group related files together for processing as a
+*          single data set, else process each file independently
+*     FIT = CHAR (Read)
+*          Type of fit to be carried out for the PLANE sky removal
+*          method. Choices are Mean, Slope (to fit in elevation only)
+*          or Plane
 *     OUT = NDF (Write)
 *          Output file(s)
 
@@ -110,6 +117,16 @@ void smurf_remsky( int * status ) {
   char method[LEN__METHOD];  /* String for sky subtraction method */
   char fittype[LEN__METHOD]; /* String for PLANE method fit type */
 
+  smfArray *relfiles = NULL; /* Array of related files */
+  int group = 0;             /* Parameter to determine whether or not
+				to group related files */
+  smfGroup *ogroup = NULL;   /* Group storing related files */
+
+  int indf;
+  int outndf;
+  void *outdata[1];         /* Pointer to array of output mapped pointers*/
+  int nout;
+
   /* Main routine */
   ndfBegin();
 
@@ -120,41 +137,75 @@ void smurf_remsky( int * status ) {
      and output files */
   ndgCreat( "OUT", igrp, &ogrp, &outsize, &flag, status );
 
-  /* Get METHOD */
+  /* Check the Grp sizes are the same */
+  if ( outsize != size ) {
+    msgSeti("S",size);
+    msgSeti("O",outsize);
+    *status = SAI__ERROR;
+    errRep( FUNC_NAME, "Size of output group, ^O != size of input group, ^S", status);
+  }
+
+  /* Get sky subtraction METHOD */
   parChoic( "METHOD", "PLANE", "Plane, Polynomial", 1,  method, 
 	    LEN__METHOD, status);
 
-  for (i=1; i<=size; i++) {
-    /* Flatfield - if necessary */
-    smf_open_and_flatfield( igrp, ogrp, i, &odata, status );
+  /* Do we want to group related files? */
+  parGet0l( "GROUP", &group, status);
 
-    if (*status == SMF__FLATN) {
-      errAnnul( status );
-      msgOutif(MSG__VERB, "",
-	     TASK_NAME ": Data are already flatfielded", status);
-    } else if ( *status == SAI__OK) {
-      msgOutif(MSG__VERB," ","Flatfield applied", status);
-    } else {
-      /* Tell the user which file it was... */
-      /* Would be user-friendly to trap 1st etc... */
-      msgSeti("I",i);
-      errRep(TASK_NAME, "Unable to flatfield data from the ^I th file", status);
+  /* Get desired plane-fitting method */
+  if ( strncmp( method, "PL", 2 ) == 0 ) {
+    /* Timeslice-based sky removal */
+    parChoic( "FIT", "SLOPE", "Mean, Slope, Plane", 
+	      1, fittype, LEN__METHOD, status);
+  }
+
+  if ( group ) {
+    /* Propagate input files to output */
+    for (i=1; i<=size; i++) {
+      /* This seems inefficient but it works */
+      smf_open_and_flatfield( igrp, ogrp, i, &odata, status );
+      smf_close_file( &odata, status);
     }
-
+    /* Group output files together now that they exist */
+    smf_grp_related( ogrp, outsize, 1, &ogroup, status );
     if ( *status == SAI__OK ) {
-      if ( strncmp( method, "POLY", 4 ) == 0 ) {
-	/* Bolometer-based sky removal */
-	smf_subtract_poly( odata, status );
-	/* Check status */
-      } else if ( strncmp( method, "PLAN", 4 ) == 0 ) {
-	/* Timeslice-based sky removal */
-	parChoic( "FIT", "SLOPE", "Mean, Slope, Plane", 
-		  1, fittype, LEN__METHOD, status);
-	smf_subtract_plane( odata, fittype, status );
+      /* Open and process related files */
+      for (i=0; i<ogroup->ngroups; i++) {
+	smf_open_related( ogroup, i, "WRITE", &relfiles, status );
+	smf_subtract_plane( NULL, relfiles, fittype, status );
+	smf_close_related( &relfiles, status );
+      }
+    }
+    smf_close_smfGroup( &ogroup, status );
+  } else {
+    for (i=1; i<=size; i++) {
+      /* Flatfield - if necessary */
+      smf_open_and_flatfield( igrp, ogrp, i, &odata, status );
+
+      if (*status == SMF__FLATN) {
+	errAnnul( status );
+	msgOutif(MSG__VERB, "",
+		 TASK_NAME ": Data are already flatfielded", status);
+      } else if ( *status == SAI__OK) {
+	msgOutif(MSG__VERB," ","Flatfield applied", status);
       } else {
-	*status = SAI__ERROR;
-	msgSetc("M", method);
-	errRep("", "Unsupported method, ^M. Possible programming error.", status);
+	/* Tell the user which file it was... */
+	msgSeti("I",i);
+	errRep(TASK_NAME, "Unable to flatfield data from the ^I th file", status);
+      }
+      if ( *status == SAI__OK ) {
+	if ( strncmp( method, "POLY", 4 ) == 0 ) {
+	  /* Bolometer-based sky removal */
+	  smf_subtract_poly( odata, status );
+	  /* Check status */
+	} else if ( strncmp( method, "PLAN", 4 ) == 0 ) {
+	  /* Timeslice-based sky removal */
+	  smf_subtract_plane( odata, NULL, fittype, status );
+	} else {
+	  *status = SAI__ERROR;
+	  msgSetc("M", method);
+	  errRep(TASK_NAME, "Unsupported method, ^M. Possible programming error.", status);
+	}
       }
     }
   }
