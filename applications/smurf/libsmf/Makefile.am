@@ -12,8 +12,7 @@ smf_dtype_check.c smf_dtype_string.c smf_dtype_size.c smf_dtype_check_fatal.c \
 smf_dtype_fromstring.c \
 smf_fits_getI.c smf_fits_getD.c smf_fits_getF.c smf_fits_getS.c \
 smf_history_check.c smf_history_write.c smf_history_read.c smf_history_add.c\
-smf_inst_get.c \
-smf_tslice_ast.c smf_tslice.c \
+smf_inst_get.c smf_tslice_ast.c \
 smf_open_and_flatfield.c \
 smf_flatfield.c smf_check_flat.c smf_flatten.c \
 smf_clone_data.c smf_scanfit.c smf_get_xloc.c smf_get_ndfid.c \
@@ -33,8 +32,11 @@ smf_model_create.c smf_model_getname.c smf_open_newfile.c smf_open_ndf.c \
 smf_create_smfDream.c smf_construct_smfDream.c smf_close_smfDream.c \
 smf_dream_setjig.c smf_dreamsolve.c smf_store_image.c\
 smf_open_ndfname.c smf_string_to_dtype.c smf_create_lutwcs.c \
-smf_calc_telpos.c smf_telpos_get.c smf_dream_getgrid.c smf_dream_calcweights.c \
-smf_cubebounds.c smf_convert_system.c smf_makefitschan.c smf_receppos_wcs.c
+smf_calc_telpos.c smf_telpos_get.c smf_dream_getgrid.c smf_dream_calcweights.c\
+smf_cubebounds.c smf_convert_system.c smf_makefitschan.c smf_receppos_wcs.c\
+smf_subtract_plane1.c smf_subtract_plane2.c
+
+#smf_tslice.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 

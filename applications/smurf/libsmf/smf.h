@@ -404,8 +404,12 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
 
 void smf_string_to_dtype ( const char * datatype, smf_dtype *dtype, int * status );
 
-void smf_subtract_plane( smfData *data, const char *fittype, int *status);
+void smf_subtract_plane( smfData *data, smfArray *array, const char *fittype, 
+			 int *status);
 
+void smf_subtract_plane1( smfData *data, const char *fittype, int *status);
+
+void smf_subtract_plane2( smfArray *array, const char *fittype, int *status);
 
 void smf_subtract_poly( smfData *data, int *status );
 
