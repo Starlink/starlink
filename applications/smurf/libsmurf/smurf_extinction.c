@@ -195,7 +195,7 @@ void smurf_extinction( int * status ) {
     /* What next if status is bad? */
 
     /* Remove sky */
-    smf_subtract_plane( odata, "MEAN", status);
+    smf_subtract_plane( odata, NULL, "MEAN", status);
 
     /* Tell user if polynomials have already been removed */
 

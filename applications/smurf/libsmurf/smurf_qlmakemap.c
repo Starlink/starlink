@@ -172,7 +172,7 @@ void smurf_qlmakemap( int *status ) {
     /* Remove bolometer drifts */
     smf_subtract_poly( data, status );
     /* Remove sky */
-    smf_subtract_plane( data, "MEAN", status );
+    smf_subtract_plane( data, NULL, "MEAN", status );
     /* Correct extinction */
     smf_fits_getD( data->hdr, "MEANWVM", &tau, status);
     smf_correct_extinction( data, "CSOTAU", 1, tau, status);
