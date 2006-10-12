@@ -193,6 +193,8 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
     if ( grpbywave ) {
       smf_fits_getD(hdr, "WAVELEN", &obslam, status );
     }
+    if ( *status != SAI__OK ) return;
+
     /* Now get data dimensions */
     nx = (data->dims)[0];
     ny = (data->dims)[1];
