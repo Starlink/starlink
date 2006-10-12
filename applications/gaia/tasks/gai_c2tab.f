@@ -297,11 +297,13 @@
          IF ( UNITS( :7 ) .EQ. 'radians' .OR. 
      :        UNITS( :6 ) .EQ. 'degree' ) THEN
 
-*  Not degrees?
-            IF ( UNITS( :7 ) .EQ. 'radians' ) THEN 
-               AREDEG = .FALSE.
-            ELSE
-               AREDEG = .TRUE.
+*  Not degrees? Only change when still searching for any RA and DEC.
+            IF ( RACOL .EQ. -1 .AND. DECCOL .EQ. -1 ) THEN
+               IF ( UNITS( :7 ) .EQ. 'radians' ) THEN 
+                  AREDEG = .FALSE.
+               ELSE
+                  AREDEG = .TRUE.
+               END IF
             END IF
 
 *  Assuming this is a column with angle data. This is either an RA or
