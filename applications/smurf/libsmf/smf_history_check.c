@@ -47,6 +47,8 @@
 *        Initial version.
 *     2006-04-20 (AGG):
 *        Use history AstKeyMap instead of file history
+*     2006-10-12 (AGG):
+*        Remove refappl variable
 
 *  Notes:
 *     - Applications names are compared case sensitively. Uppercase
@@ -103,7 +105,6 @@ int smf_history_check( const smfData* data, const char * appl, int *status) {
   size_t applen;       /* Length of supplied appl string */
   int i = 0;           /* Loop counter */
   int nrec = 0;        /* Number of history records */
-  char refappl[NDF__SZAPP+1]; /* Name of application from header record */
   int retval = 0;      /* Return value */
   
   /* Check entry status */
