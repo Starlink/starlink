@@ -79,6 +79,8 @@
 *     2006-10-11 (AGG):
 *        - Update to new API for smf_open_newfile, remove need for dims array
 *        - Remove calls to subtract sky and correct for extinction
+*     2006-10-12 (JB):
+*        Use bad bolometer mask if supplied; add usebad flag
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -152,6 +154,7 @@ void smurf_makemap( int *status ) {
   int flag;                  /* Flag */
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
+  int *indf;                 /* NDF identifier of output file */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int ksize=0;               /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
@@ -167,6 +170,7 @@ void smurf_makemap( int *status ) {
   int size;                  /* Number of files in input group */
   int smfflags=0;            /* Flags for smfData */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
+  int usebad;                /* Flag for whether to use bad bolos mask */
   void *variance=NULL;       /* Pointer to the variance map */
   smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct */
   void *weights=NULL;        /* Pointer to the weights map */
@@ -187,6 +191,14 @@ void smurf_makemap( int *status ) {
     errRep(FUNC_NAME, 
 	   "Pixel size ^PIXSIZE is < 0.", status);
   }
+
+  /* Determine whether or not to use the bad bolos mask.  If 
+     unspecified, use the mask */
+  parGtd0l ("USEBAD", 1, 1, &usebad, status);\
+
+  if ( ! ( usebad == 1 || usebad == 0 ) ) 
+    printf ("Weirdness...\n");
+  printf ( "usebad is %i\n", usebad );
 
   /* Get METHOD */
   parChoic( "METHOD", "REBIN", 
@@ -259,7 +271,7 @@ void smurf_makemap( int *status ) {
       }
       
       /* Check that the input data type is double precision */
-      if( *status == SAI__OK ) 
+      if( *status == SAI__OK ) {
 	if( data->dtype != SMF__DOUBLE) {
 	  msgSeti("I",i);
 	  msgSetc("DTYPE", smf_dtype_string( data, status ));
@@ -268,11 +280,26 @@ void smurf_makemap( int *status ) {
 		 "File ^I has ^DTYPE data type, should be DOUBLE.",
 		 status);
 	}
+      }
+  
+      if ( usebad ) {
+
+         /* Retrieve the NDF identifier for this input file */   
+	 ndgNdfas ( igrp, i, "READ", &indf, status );
+
+         /* Rebin the data onto the output grid with bad bolometer mask */ 
+         smf_bbrebinmap(data, indf, i, size, outfset, lbnd_out, ubnd_out, 
+	                map, variance, weights, status );
+
+      } else {
      
-      /* Rebin the data onto the output grid */
-      smf_rebinmap(data, i, size, outfset, lbnd_out, ubnd_out, 
-		   map, variance, weights, status );
+         /* Rebin the data onto the output grid without bad bolometer mask */
+         smf_rebinmap(data, i, size, outfset, lbnd_out, ubnd_out, 
+		      map, variance, weights, status );
+
+      }
    
+  
       /* Close the data file */
       if( data != NULL ) {
 	smf_close_file( &data, status);
