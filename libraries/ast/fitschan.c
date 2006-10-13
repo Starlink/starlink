@@ -711,6 +711,15 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     6-OCT-2006 (DSB):
 *        Modify IsSpectral and IsAIPSSpectral to allow for CTYPE values that 
 *        are shorter than eight characters.
+*     13-OCT-2006 (DSB):
+*        - Ensure SpecFrames and SkyFrames created from a foreign FITS header
+*        are consistent in their choice of Epoch.
+*        - Convert MJD-OBS and MJD-AVG values from TIMESYS timescale to
+*        TDB before using as the Epoch value in an AstFrame. Use UTC if
+*        TIMESYS is absent.
+*        - Convert Epoch values from TDB to UTC before storing as the
+*        value of an MJD-OBS or MJD-AVG keyword (no TIMESYS keyword is
+*        written).
 *class--
 */
 
@@ -892,6 +901,7 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 #include "pointset.h" 
 #include "shiftmap.h" 
 #include "skyframe.h" 
+#include "timeframe.h" 
 #include "pal.h" 
 #include "slamap.h"
 #include "specframe.h"
@@ -979,6 +989,7 @@ typedef struct FitsStore {
    double ***bpsip;
    double ***imagfreq;
    int naxis;
+   AstTimeScaleType timesys;
 } FitsStore;
 
 
@@ -1022,6 +1033,11 @@ static const char *xencod[8] = { NATIVE_STRING, FITSPC_STRING,
                                  DSS_STRING, FITSWCS_STRING, 
                                  FITSIRAF_STRING, FITSAIPS_STRING,
                                  FITSAIPSPP_STRING, FITSCLASS_STRING };
+
+/* Define two variables to hold TimeFrames which will be used for converting 
+   MJD values between time scales. */
+static AstTimeFrame *tdbframe = NULL;      
+static AstTimeFrame *timeframe = NULL;      
 
 /* IgnoreUsed: If 2, then cards which have been marked as either "definitely 
    used" or "provisionally used" (see the USED flag above) will be ignored 
@@ -1125,6 +1141,7 @@ static AstMatrixMap *WcsPCMatrix( FitsStore *, char, int, const char *, const ch
 static AstObject *FsetFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static AstObject *Read( AstChannel * );
 static AstSkyFrame *WcsSkyFrame( AstFitsChan *, FitsStore *, char, int, char *, int, int, const char *, const char *);
+static AstTimeScaleType TimeSysToAst( AstFitsChan *, const char *, const char *, const char * );
 static AstWinMap *WcsShift( FitsStore *, char, int, const char *, const char * );
 static FitsCard *GetLink( FitsCard *, int, const char *, const char * );
 static FitsStore *FitsToStore( AstFitsChan *, int, const char *, const char * );
@@ -1144,13 +1161,15 @@ static double **OrthVectorSet( int, int, double ** );
 static double *FitLine( AstMapping *, double *, double *, double *, double );
 static double *OrthVector( int, int, double ** );
 static double *ReadCrval( AstFitsChan *, AstFrame *, char, const char *, const char * );
+static double ChooseEpoch( FitsStore *, char, const char *, const char * );
 static double DateObs( const char * );
 static double GetItem( double ****, int, int, char, char *, const char *method, const char *class );
 static double NearestPix( AstMapping *, double, int );
+static double TDBConv( double, int, int, const char *, const char * );
 static int *CardFlags( AstFitsChan * );
-static int AddEncodingFrame( AstFitsChan *, AstFrameSet *, int, const char *, const char * );
 static int AIPSFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static int AIPSPPFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
+static int AddEncodingFrame( AstFitsChan *, AstFrameSet *, int, const char *, const char * );
 static int AddVersion( AstFitsChan *, AstFrameSet *, int, int, FitsStore *, double *, char, const char *, const char * );
 static int CLASSFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static int CardType( AstFitsChan * );
@@ -1160,8 +1179,8 @@ static int CnvType( int, void *, size_t, int, void *, const char *, const char *
 static int CnvValue( AstFitsChan *, int , void *, const char *);
 static int ComBlock( AstFitsChan *, int, const char *, const char * );
 static int CountFields( const char *, char, const char *, const char * );
-static int DataDefined( int, void * );
 static int DSSFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
+static int DataDefined( int, void * );
 static int EncodeFloat( char *, int, int, int, double );
 static int EncodeValue( AstFitsChan *, char *, int, int, const char * );
 static int FindBasisVectors( AstMapping *, int, int, double *, AstPointSet *, AstPointSet * );
@@ -1171,18 +1190,17 @@ static int FindString( int, const char *[], const char *, const char *, const ch
 static int FitOK( int, double *, double * );
 static int FitsEof( AstFitsChan * );
 static int FitsFromStore( AstFitsChan *, FitsStore *, int, const char *, const char * );
+static int FitsGetCom( AstFitsChan *, const char *, char ** );
+static int FullForm( const char *, const char *, int );
+static int GetFiducialWCS( AstWcsMap *, AstMapping *, int, int, double *, double * );
 static int GetFitsCF( AstFitsChan *, const char *, double * );
 static int GetFitsCI( AstFitsChan *, const char *, int * );
 static int GetFitsCN( AstFitsChan *, const char *, char ** );
-static int FitsGetCom( AstFitsChan *, const char *, char ** );
 static int GetFitsF( AstFitsChan *, const char *, double * );
 static int GetFitsI( AstFitsChan *, const char *, int * );
 static int GetFitsL( AstFitsChan *, const char *, int * );
-static int GetFitsU( AstFitsChan *, const char *, int * );
 static int GetFitsS( AstFitsChan *, const char *, char ** );
-static int SetFits( AstFitsChan *, const char *, void *, int, const char *, int );
-static int FullForm( const char *, const char *, int );
-static int GetFiducialWCS( AstWcsMap *, AstMapping *, int, int, double *, double * );
+static int GetFitsU( AstFitsChan *, const char *, int * );
 static int GetFull( AstChannel * );
 static int GetMaxI( double ****item, char );
 static int GetMaxJM( double ****item, char );
@@ -1204,6 +1222,7 @@ static int MatchFront( const char *, const char *, char *, int *, int *, int *, 
 static int MoveCard( AstFitsChan *, int, const char *, const char * );
 static int PCFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static int SearchCard( AstFitsChan *, const char *, const char *, const char *);
+static int SetFits( AstFitsChan *, const char *, void *, int, const char *, int );
 static int Similar( const char *, const char * );
 static int SkySys( AstSkyFrame *, int, FitsStore *, int, int, char c, const char *, const char * );
 static int SplitMap( AstMapping *, int, int, int, AstMapping **, AstWcsMap **, AstMapping ** );
@@ -1233,16 +1252,6 @@ static void DistortMaps( AstFitsChan *, FitsStore *, char, int , AstMapping **, 
 static void Dump( AstObject *, AstChannel * );
 static void Empty( AstFitsChan * );
 static void FindWcs( AstFitsChan *, int, const char *, const char * );
-static void RetainFits( AstFitsChan * );
-static void SetFitsCF( AstFitsChan *, const char *, double *, const char *, int );
-static void SetFitsCI( AstFitsChan *, const char *, int *, const char *, int );
-static void SetFitsCN( AstFitsChan *, const char *, const char *, const char *, int );
-static void SetFitsCom( AstFitsChan *, const char *, const char *, int );
-static void SetFitsF( AstFitsChan *, const char *, double, const char *, int );
-static void SetFitsI( AstFitsChan *, const char *, int, const char *, int );
-static void SetFitsL( AstFitsChan *, const char *, int, const char *, int );
-static void SetFitsU( AstFitsChan *, const char *, int, const char *, int );
-static void SetFitsS( AstFitsChan *, const char *, const char *, const char *, int );
 static void FixNew( AstFitsChan *, int, int, const char *, const char * );
 static void FixUsed( AstFitsChan *, int, int, int, const char *, const char * );
 static void FormatCard( AstFitsChan *, char *, const char * );
@@ -1262,8 +1271,18 @@ static void PreQuote( const char *, char [ FITSCARDLEN - FITSNAMLEN - 3 ] );
 static void PutCards( AstFitsChan *, const char * );
 static void PutFits( AstFitsChan *, const char [ FITSCARDLEN + 1 ], int );
 static void ReadFromSource( AstFitsChan * );
+static void RetainFits( AstFitsChan * );
 static void RoundFString( char *, int );
 static void SetAttrib( AstObject *, const char * );
+static void SetFitsCF( AstFitsChan *, const char *, double *, const char *, int );
+static void SetFitsCI( AstFitsChan *, const char *, int *, const char *, int );
+static void SetFitsCN( AstFitsChan *, const char *, const char *, const char *, int );
+static void SetFitsCom( AstFitsChan *, const char *, const char *, int );
+static void SetFitsF( AstFitsChan *, const char *, double, const char *, int );
+static void SetFitsI( AstFitsChan *, const char *, int, const char *, int );
+static void SetFitsL( AstFitsChan *, const char *, int, const char *, int );
+static void SetFitsS( AstFitsChan *, const char *, const char *, const char *, int );
+static void SetFitsU( AstFitsChan *, const char *, int, const char *, int );
 static void SetItem( double ****, int, int, char, double );
 static void SetItemC( char ****, int, char, const char * );
 static void SetValue( AstFitsChan *, const char *, void *, int, char * );
@@ -3987,6 +4006,87 @@ static void CheckZero( char *text, double value, int width ){
    } else {
       RoundFString( text, width );
    }
+}
+
+static double ChooseEpoch( FitsStore *store, char s, const char *method, 
+                           const char *class ){
+/*
+*  Name:
+*     ChooseEpoch
+
+*  Purpose:
+*     Choose a FITS keyword value to use for the AST Epoch attribute.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     double ChooseEpoch( FitsStore *store, char s, const char *method, 
+*                         const char *class )
+
+*  Class Membership:
+*     FitsChan
+
+*  Description:
+*     This function returns an MJD value in the TDB timescale, which can 
+*     be used as the Epoch value in an AST Frame. It uses the following 
+*     preference order: secondary MJD-OBS, primary MJD-OBS, secondary MJD-AVG, 
+*     primary MJD-AVG. Note, DATE-OBS keywords are converted into MJD-OBS 
+*     keywords by the SpecTrans function before this function is called.
+
+*  Parameters:
+*     store
+*        A structure containing values for FITS keywords relating to 
+*        the World Coordinate System.
+*     s
+*        A character identifying the co-ordinate version to use. A space 
+*        means use primary axis descriptions. Otherwise, it must be an 
+*        upper-case alphabetical characters ('A' to 'Z').
+*     method
+*        The calling method. Used only in error messages.
+*     class 
+*        The object class. Used only in error messages.
+
+*  Returned Value:
+*     The MJD value.
+
+*  Notes:
+*     -  A value of AST__BAD is returned if an error occurs, or if none
+
+*     of the required keywords can be found in the FitsChan.
+
+*/
+
+/* Local Variables: */
+   double mjd;         /* The returned MJD */
+
+/* Initialise the returned value. */
+   mjd = AST__BAD;
+
+/* Check the global status. */
+   if( !astOK ) return mjd;
+
+/* If the secondary MJD-OBS keyword is present in the FitsChan, gets its
+   value. */
+   mjd = GetItem( &(store->mjdobs), 0, 0, s, NULL, method, class );
+
+/* Otherwise, try to get the primary MJD-OBS value. */
+   if( mjd == AST__BAD ) mjd = GetItem( &(store->mjdobs), 0, 0, ' ', NULL, 
+                                        method, class );
+
+/* Otherwise, try to get the secondary MJD-AVG value. */
+   if( mjd == AST__BAD ) mjd = GetItem( &(store->mjdavg), 0, 0, s, NULL, 
+                                        method, class );
+
+/* Otherwise, try to get the primary MJD-AVG value. */
+   if( mjd == AST__BAD ) mjd = GetItem( &(store->mjdavg), 0, 0, ' ', NULL, 
+                                        method, class );
+
+/* Now convert the MJD value to the TDB timescale. */
+   mjd = TDBConv( mjd, store->timesys, 0, method, class );
+
+/* Return the answer. */
+   return mjd;
 }
 
 static int ChrLen( const char *string ){
@@ -8821,6 +8921,7 @@ static FitsStore *FitsToStore( AstFitsChan *this, int encoding,
       ret->bpsip = NULL;
       ret->imagfreq = NULL;
       ret->naxis = 0;
+      ret->timesys = AST__UTC;
    }
 
 /* Call the routine apropriate to the encoding. */
@@ -9452,6 +9553,7 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
       ret->bpsip = NULL;
       ret->imagfreq = NULL;
       ret->naxis = naxis;
+      ret->timesys = AST__UTC;
 
 /* Obtain the index of the Base Frame (i.e. the pixel frame ). */
       ibase = astGetBase( fset );
@@ -16341,7 +16443,9 @@ static AstFrameSet *MakeFitsFrameSet( AstFrameSet *fset, int ipix, int iwcs ) {
                         AST__DR2D*astGetRefDec( specfrm ) );
                astPutFits( fc, card, 0 );
    
-               sprintf( card, "MJD-OBS = %.*g", DBL_DIG, astGetEpoch( specfrm ) );
+               sprintf( card, "MJD-OBS = %.*g", DBL_DIG, 
+                        TDBConv( astGetEpoch( specfrm ), AST__UTC, 1, 
+                                 "astWrite", "FitsChan"  ) );
                astPutFits( fc, card, 0 );
 
                astClearCard( fc );
@@ -22043,7 +22147,11 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
 
 /* Get the equinox, epoch of observation, and system of the SkyFrame. */
    eq = astGetEquinox( skyfrm );               
-   ep = astTestEpoch( skyfrm ) ? astGetEpoch( skyfrm ) : AST__BAD;
+   if( astTestEpoch( skyfrm ) ) {
+      ep = TDBConv( astGetEpoch( skyfrm ), AST__UTC, 1, method, class );
+   } else {
+      ep = AST__BAD;
+   }
    sys = astGetC( skyfrm, "system" );
 
 /* The MJD-OBS and DATE-OBS keywords default to the epoch of the
@@ -25416,6 +25524,91 @@ static int SplitMat( int naxis, double *matrix, double *cdelt ){
  
 }
 
+static double TDBConv( double mjd, int timescale, int fromTDB, 
+                       const char *method, const char *class ){
+/*
+*  Name:
+*     TDBConv
+
+*  Purpose:
+*     Convert an MJD between the TDB time scale and another timescale.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     double TDBConv( double mjd, int timescale, int fromTDB, 
+*                     const char *method, const char *class )
+
+*  Class Membership:
+*     FitsChan
+
+*  Description:
+*     This function converts the supplied mjd value to or from the TDB 
+*     timescale.
+
+*  Parameters:
+*     mjd
+*        The input MJD value. 
+*     timescale
+*        The other timescale.
+*     fromTDB
+*        Indicates the direction of the required conversion. If non-zero, 
+*        the supplied "mjd" value should be in the TDB timescale, and the
+*        returned value will be in the timescale specified by "timescale".
+*        Indicates the direction of the required conversion. If zero, 
+*        the supplied "mjd" value should be in the timescale specified by
+*        "timescale", and the returned value will be in the TDB timescale.
+*     method
+*        The calling method. Used only in error messages.
+*     class 
+*        The object class. Used only in error messages.
+
+*  Returned Value:
+*     The converted MJD value, or AST__BAD if an error occurs.
+
+*/
+
+/* Local Variables: */
+   AstFrameSet *fs;    /* Mapping from supplied timescale to TDB */
+   double ret;         /* The returned value */
+
+/* Initialise */
+   ret = AST__BAD;
+
+/* Check inherited status */
+   if( !astOK ) return ret;
+
+/* Return the supplied value if no conversion is needed. */
+   if( timescale == AST__TDB ) {
+      ret = mjd;
+
+/* Otherwise, do the conversion. */
+   } else {
+
+/* If not already done so, create a pair of MJD TimeFrames which will be used 
+   for converting to and from TDB. */
+      if( !timeframe ) {
+         astBeginPM;
+         tdbframe = astTimeFrame( "system=MJD,timescale=TDB" );
+         timeframe = astTimeFrame( "system=MJD" );
+         astEndPM;
+      }
+
+/* Set the required timescale. */
+      astSetTimeScale( timeframe, timescale );
+
+/* Get the Mapping between the two timescales, and use it to convert the 
+   suipplied value. */
+      fs = astConvert( tdbframe, timeframe, "" );
+      astTran1( fs, 1, &mjd, fromTDB, &ret );
+      fs = astAnnul( fs );
+   }
+
+/* Return the result */
+   return ret;
+}
+
 static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -25591,6 +25784,110 @@ static int TestCard( AstFitsChan *this ){
 /* Return the flag. */
    return ret;
 
+}
+
+static AstTimeScaleType TimeSysToAst( AstFitsChan *this, const char *timesys, 
+                                      const char *method, const char *class ){
+/*
+*  Name:
+*     TimeSysToAst
+
+*  Purpose:
+*     Convert a FITS TIMESYS value to an AST TimeFrame timescale value.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     AstTimeScaleType TimeSysToAst( AstFitsChan *this, const char *timesys, 
+*                                    const char *method, const char *class )
+
+*  Class Membership:
+*     FitsChan
+
+*  Description:
+*     This function returns the value used by the AST TimeFrame class to
+*     represent the timescale specified by the "timesys" parameter, which
+*     should hold the value of a FITS TIMESYS keyword. The TIMESYS
+*     convention was introduced as part of the Y2K DATE-OBS changes, and
+*     is not currently part of the published FITS-WCS conventions.
+*
+*     If the requested timescale is not supported by AST, then a warning is 
+*     added to the FitsChan and a value of AST__UTC is returned (but no
+*     error is reported).
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+*     timesys
+*        Pointer to the string holding the TIMESYS value.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*  Returned Value:
+*     The equivalent AstTimeScaleType value.
+
+*/
+
+/* Local Variables: */
+   AstTimeScaleType result;  /* The returned timescale */
+   char buf[ 200 ];          /* Buffer for warning message */
+
+/* Initialise */
+   result = AST__UTC;
+
+/* Check the inherited status. */
+   if( !astOK ) return result;
+
+   if( !strcmp( timesys, "UTC" ) ) {
+      result = AST__UTC;
+
+   } else if( !strcmp( timesys, "UT" ) ) {
+      result = AST__UTC;
+      Warn( this, "badval", "The original FITS header contained a value of UT "
+            "for keyword TIMESYS which is being interpreted as UTC.", method, 
+            class );
+
+   } else if( !strcmp( timesys, "TAI" ) ) {
+      result = AST__TAI;
+
+   } else if( !strcmp( timesys, "IAT" ) ) {
+      result = AST__TAI;
+
+   } else if( !strcmp( timesys, "ET" ) ) {
+      result = AST__TT;
+      Warn( this, "badval", "The original FITS header contained a value of ET "
+            "for keyword TIMESYS. TT will be used instead.", method, class );
+
+   } else if( !strcmp( timesys, "TT" ) ) {
+      result = AST__TT;
+
+   } else if( !strcmp( timesys, "TDT" ) ) {
+      result = AST__TT;
+
+   } else if( !strcmp( timesys, "TDB" ) ) {
+      result = AST__TDB;
+
+   } else if( !strcmp( timesys, "TCG" ) ) {
+      result = AST__TCG;
+
+   } else if( !strcmp( timesys, "TCB" ) ) {
+      result = AST__TCB;
+
+   } else {
+      result = AST__UTC;
+      sprintf( buf, "The original FITS header contained a value of %s for "
+               "keyword TIMESYS. AST does not support this timescale so "
+               "UTC will be used instead.", timesys );
+      Warn( this, "badval", buf, method, class );
+   }
+
+/* Return the result */
+   return result;
 }
 
 static char *UnPreQuote( const char *string ) {
@@ -27228,6 +27525,20 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
          i = 0;
          jm = 0;
          s = ' ';
+
+/* Is this a TIMESYS keyword? */
+      } else if( Match( keynam, "TIMESYS", 0, fld, &nfld, method, class ) ){
+         item = NULL;
+         if( CnvValue( fc, AST__STRING, &cval, method ) ) {
+            store->timesys = TimeSysToAst( fc, cval, method, class );
+            MarkCard( fc );
+
+         } else {
+            sprintf( buf, "The original FITS header contained a value for "
+                     "keyword TIMESYS which could not be converted to a "
+                     "character string." );
+            Warn( fc, "badval", buf, method, class );
+         }
 
 /* Following keywords are used to describe "-SIP" distortion as used by
    the SIRTF project... */
@@ -29471,19 +29782,16 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
       eqmjd = AST__BAD;
    }
 
-/* Get the MJD-OBS value. If it is missing, use the primary value. If
-   that is also missing, use the equinox, and issue a warning. */    
-   mjdobs = GetItem( &(store->mjdobs), 0, 0, s, NULL, method, class );
+/* Get a value for the Epoch attribute. If no value is available, use
+   EQUINOX and issue a warning. */
+   mjdobs = ChooseEpoch( store, s, method, class );
    if( mjdobs == AST__BAD ) {
-      mjdobs = GetItem( &(store->mjdobs), 0, 0, ' ', NULL, method, class );
-      if( mjdobs == AST__BAD ) {
-         mjdobs = eqmjd;
-         if( mjdobs != AST__BAD ) {
-            sprintf( buf, "The original FITS header did not specify the "
-                     "date of observation. A default value of %c%.8g was "
-                     "assumed.", bj, equinox );
-            Warn( this, "nomjd-obs", buf, method, class );
-         }
+      mjdobs = eqmjd;
+      if( mjdobs != AST__BAD ) {
+         sprintf( buf, "The original FITS header did not specify the "
+                  "date of observation. A default value of %c%.8g was "
+                  "assumed.", bj, equinox );
+         Warn( this, "nomjd-obs", buf, method, class );
       }
    }
 
@@ -29752,10 +30060,8 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
 /* Set the axis unit in the IWC Frame. */
             astSetUnit( iwcfrm, i, cunit );
 
-/* Date of observation (from primary axis descriptions). */
-            mjd = GetItem( &(store->mjdavg), 0, 0, ' ', NULL, method, class );
-            if( mjd == AST__BAD ) mjd = GetItem( &(store->mjdobs), 0, 0, ' ', 
-                                                 NULL, method, class );
+/* Get a value for the Epoch attribute (the date of observation). */
+            mjd = ChooseEpoch( store, s, method, class );
             if( mjd != AST__BAD ) astSetEpoch( specfrm, mjd );
 
 /* Set the rest frequency. Use the RESTFRQ keyword (assumed to be in Hz),
