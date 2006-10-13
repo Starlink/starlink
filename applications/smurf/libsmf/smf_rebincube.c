@@ -73,6 +73,9 @@
 *  History:
 *     20-SEP-2006 (DSB):
 *        Initial version.
+*     13-OCT-2006 (DSB):
+*        Changed to get the input spectral WCS from the WCS FrameSet rather 
+*        than the FITS header.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -165,24 +168,39 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    dim[ 1 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
    dim[ 2 ] = ubnd_out[ 2 ] - lbnd_out[ 2 ] + 1;
 
-/* Use the FITS-WCS headers in the FITS extension of the input NDF to
-   create a SpecFrame describing the spectral WCS axis, and a Mapping
-   from the corresponding GRID axis to the SpecFrame. Take a copy of the 
-   FITS header (so that the contents of the header are not changed), and 
-   then read a FrameSet out of it. NOTE, if we knew that all the input
-   NDFs would have the same spectral axis calibration, then the spectral
-   WCS need only be obtained from the first NDF. However, in the general
-   case, I presume that data files may be combined that use different
-   spectral axis calibrations, and so these differences need to be taken
-   into account. */
-   fc = astCopy( hdr->fitshdr );
-   astClear( fc, "Card" );
-   fs = astRead( fc );
+/* We want a description of the spectral WCS axis in the input file. If 
+   the input file has a WCS FrameSet containing a SpecFrame, use it,
+   otherwise we will obtain it from the FITS header later. NOTE, if we knew 
+   that all the input NDFs would have the same spectral axis calibration, 
+   then the spectral WCS need only be obtained from the first NDF. However, 
+   in the general case, I presume that data files may be combined that use 
+   different spectral axis calibrations, and so these differences need to 
+   be taken into account. */
+   if( hdr->tswcs ) {   
+      fs = astClone( hdr->tswcs );
+   
+/* The first axis should be a SpecFrame. See if this is so. If not annul
+   the specframe pointer. */
+      specax = 1;
+      specframe = astPickAxes( fs, 1, &specax, NULL );
+      if( !astIsASpecFrame( specframe ) ) specframe = astAnnul( specframe );
+   } 
+
+/* If the above did not yield a SpecFrame, use the FITS-WCS headers in the 
+   FITS extension of the input NDF. Take a copy of the FITS header (so that 
+   the contents of the header are not changed), and then read a FrameSet 
+   out of it. */
+   if( !specframe ) {
+      fc = astCopy( hdr->fitshdr );
+      astClear( fc, "Card" );
+      fs = astRead( fc );
 
 /* Extract the SpecFrame that describes the spectral axis from the current 
-   Frame of this FrameSet. This is assumed to be the third WCS axis. */
-   specax = 3;
-   specframe = astPickAxes( fs, 1, &specax, NULL );
+   Frame of this FrameSet. This is assumed to be the third WCS axis (NB
+   the different axis number). */
+      specax = 3;
+      specframe = astPickAxes( fs, 1, &specax, NULL );
+   }
 
 /* Split off the 1D Mapping for this single axis from the 3D Mapping for
    the whole WCS. This results in "specmap" holding the Mapping from 
