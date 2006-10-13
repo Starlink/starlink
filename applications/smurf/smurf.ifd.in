@@ -115,6 +115,8 @@
 #        Changed OBSXMLFILE & SIMXMLFILE to OBSFILE & SIMFILE
 #     12-OCT-2006 (AGG):
 #         Add GROUP keyword for REMSKY
+#     13-OCT-2006 (JB):
+#         Add USEBAD to MAKEMAP
 #     {enter_changes_here}
 
 #  Bugs:
@@ -263,10 +265,17 @@ package @PACKAGE@ {
             helpkey *
           }
 
+          parameter usebad {
+            type _LOGICAL
+            vpath DEFAULT
+            default 1
+            helpkey *
+          }
+
 	  parameter msg_filter {
 	    type _CHAR
 	    prompt {Message level}
-	    vpath DEFAULT
+ 	    vpath DEFAULT
             default NORM
 	    helpkey *
 	  }
