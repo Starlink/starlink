@@ -118,6 +118,8 @@
 *        Add smf_dream_getgrid, smf_dream_calcweights
 *     2006-10-11 (AGG):
 *        Update API for smf_open_newfile
+*     2006-10-13 (JB):
+*        Add smf_bbrebinmap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -156,6 +158,11 @@
 #include "smf_typ.h"
 
 void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status );
+
+void smf_bbrebinmap( smfData *data,  int indf, int index, int size, 
+                     AstFrameSet *outfset, int *lbnd_out, int *ubnd_out, 
+                     double *map, double *variance, double *weights, 
+                     int *status );
 
 void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, int *status);
 
