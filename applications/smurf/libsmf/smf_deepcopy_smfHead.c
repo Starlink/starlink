@@ -55,7 +55,7 @@
 *     2006-08-02 (TIMJ):
 *        The new smfHead is not a clone.
 *     2006-10-02 (DSB):
-*        Add receppos.
+*        Add detpos.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -114,7 +114,7 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   unsigned int ndet = 0;
   double *fplanex = NULL;
   double *fplaney = NULL;
-  double *receppos = NULL;
+  double *detpos = NULL;
 
   if (*status != SAI__OK) return NULL;
 
@@ -152,20 +152,19 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
     if (fplaney) memcpy( fplaney, old->fplaney, ndet*sizeof(*fplaney) );
   } 
 
-  /* need to allocate receptor positions */
-  if (old->ndet > 0 && old->nframes > 0 && old->receppos) {
+  /* need to allocate detector positions */
+  if (old->ndet > 0 && old->nframes > 0 && old->detpos) {
     ndet = old->ndet;
     nframes = old->nframes;
-    receppos = smf_malloc( 2*ndet*nframes, sizeof(*receppos), 0, status );
-    if (receppos) memcpy( receppos, old->receppos, 
-                          2*ndet*nframes*sizeof(*receppos) );
+    detpos = smf_malloc( 2*ndet*nframes, sizeof(*detpos), 0, status );
+    if (detpos) memcpy( detpos, old->detpos, 2*ndet*nframes*sizeof(*detpos) );
   } 
 
   /* Insert elements into new smfHead */
   new = smf_construct_smfHead( new, instrument, wcs, tswcs, fitshdr,
 			       allState, curframe,
-			       nframes, ndet, fplanex, fplaney, receppos,
-                               old->rpazel, status );
+			       nframes, ndet, fplanex, fplaney, detpos,
+                               old->dpazel, status );
 
   /* see isCloned to 0 since we have allocated this memory */
   if (new) new->isCloned = 0;

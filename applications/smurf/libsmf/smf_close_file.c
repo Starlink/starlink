@@ -70,7 +70,7 @@
 *     2006-08-24 (AGG):
 *        Free smfDream if present
 *     2006-10-02 (DSB):
-*        Free receppos coordinates.
+*        Free detpos coordinates.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -187,7 +187,7 @@ void smf_close_file( smfData ** data, int * status ) {
       }
       if (hdr->fplanex) smf_free( hdr->fplanex, status );
       if (hdr->fplaney) smf_free( hdr->fplaney, status );
-      if (hdr->receppos) smf_free( hdr->receppos, status );
+      if (hdr->detpos) smf_free( hdr->detpos, status );
     }
     smf_free( hdr, status );
   }

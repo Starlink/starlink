@@ -18,7 +18,7 @@
 *              AstFitsChan * fitshdr, const JCMTState * allState,
 *              dim_t curframe, unsigned int ndet,
 *              const double fplanex[], const double fplaney[],
-*              const double receppos[], int rpazel, int * status );
+*              const double detpos[], int dpazel, int * status );
 
 *  Arguments:
 *     tofill = smfHead* (Given)
@@ -48,11 +48,11 @@
 *        X Coordinates of bolometers/receptors in the focal plane (radians)
 *     fplanex = const double[] (Given)
 *        Y Coordinates of bolometers/receptors in the focal plane (radians)
-*     receppos = const double[] (Given)
+*     detpos = const double[] (Given)
 *        The position of the bolometers/receptors in tracking coordinates, 
 *        in radians. This array should have a length of 2*ndet*nframes.
-*     rpazel = int (Given)
-*        If non-zero, then the values in "receppos" are AZEL
+*     dpazel = int (Given)
+*        If non-zero, then the values in "detpos" are AZEL
 *        positions. Otherwise they are TRACKING positions.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -98,7 +98,7 @@
 *     2006-07-31 (TIMJ):
 *        Add instrument code. Add fplanex and fplaney.
 *     2006-10-2 (DSB):
-*        Add receppos.
+*        Add detpos.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -150,7 +150,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       const JCMTState * allState,
 		       dim_t curframe, dim_t nframes, unsigned int ndet,
 		       const double fplanex[], const double fplaney[],
-		       const double receppos[], int rpazel, int * status ) {
+		       const double detpos[], int dpazel, int * status ) {
 
   smfHead * hdr = NULL;   /* Header components */
 
@@ -173,8 +173,8 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
     hdr->ndet = ndet;
     hdr->fplanex = fplanex;
     hdr->fplaney = fplaney;
-    hdr->receppos = receppos;
-    hdr->rpazel = rpazel;
+    hdr->detpos = detpos;
+    hdr->dpazel = dpazel;
     hdr->isCloned = 1;
   }
 

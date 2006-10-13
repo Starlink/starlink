@@ -135,16 +135,16 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    dim_t nel;                  /* No. of pixels in output */
    dim_t nxy;                  /* Number of pixels in one output xy plane */
    double *spectab = NULL;     /* Workspace for spectral output grid positions */
-   double *xin = NULL;         /* Workspace for receptor input grid positions */
-   double *xout = NULL;        /* Workspace for receptor output grid positions */
-   double *yin = NULL;         /* Workspace for receptor input grid positions */
-   double *yout = NULL;        /* Workspace for receptor output grid positions */
+   double *xin = NULL;         /* Workspace for detector input grid positions */
+   double *xout = NULL;        /* Workspace for detector output grid positions */
+   double *yin = NULL;         /* Workspace for detector input grid positions */
+   double *yout = NULL;        /* Workspace for detector output grid positions */
    float *pdata = NULL;        /* Pointer to next input data value */
    float dval;                 /* Output data value */
    int dim[ 3 ];               /* Output array dimensions */
    int ibasein;                /* Index of base Frame in input WCS FrameSet */
    int ichan;                  /* Index of current channel */
-   int irec;                   /* Receptor index */
+   int irec;                   /* detector index */
    int itime;                  /* Index of current time slice */
    int ix;                     /* Output grid index on axis 1 */
    int iy;                     /* Output grid index on axis 2 */
@@ -262,13 +262,13 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    }
 
 /* Allocate work arrays big enough to hold the coords of all the
-   receptors in the current input file.*/
+   detectors in the current input file.*/
    xin = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
    yin = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
    xout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
    yout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
 
-/* Store the input GRID coords of the receptors. */
+/* Store the input GRID coords of the detectors. */
    for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
       xin[ irec ] = irec + 1.0;
       yin[ irec ] = 1.0;
@@ -282,7 +282,7 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
 
 /* Get a FrameSet describing the spatial coordinate systems associated with 
    the current time slice of the current input data file. The base frame in 
-   the FrameSet will be a 2D Frame in which axis 1 is receptor number and 
+   the FrameSet will be a 2D Frame in which axis 1 is detector number and 
    axis 2 is unused. The current Frame will be a SkyFrame (the SkyFrame 
    System may be any of the JCMT supported systems). The Epoch will be
    set to the epoch of the time slice. */
@@ -290,7 +290,7 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
       swcsin = hdr->wcs;
 
 /* Ensure the ObsLat and ObsLon values in the SpecFrame are used in
-   preference to the hard-wired values stored in "swcsin" by smf_receppos_wcs 
+   preference to the hard-wired values stored in "swcsin" by smf_detpos_wcs 
    and smf_create_lutwcs. The ObsLat and ObsLon values in the SpecFrame are
    derived from the OBSGEO-X/Y/Z keywords stored in the input data FITS
    header. We use a pointer to the SkyFrame (rather than the swcsin
@@ -337,8 +337,8 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
 
 /* Modify swcsin so that its SkyFrame represents offsets from the current
    telescope base position. We use the FrameSet pointer (swcsin) in this 
-   call, so the Mapping from receptor number to SkyFrame will be modified
-   so that each receptor retains its original position on the sky (but
+   call, so the Mapping from detector number to SkyFrame will be modified
+   so that each detector retains its original position on the sky (but
    transformed to the offset coordinate system). Also indicate that the
    position should be used as the origin of the offset coordinate system, 
    and that alignment should be performed in the offset coordinate system. */
@@ -377,7 +377,7 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    state. */
       astInvert( swcsin );
 
-/* Transform the positions of the receptors from input GRID to output GRID
+/* Transform the positions of the detectors from input GRID to output GRID
    coords. */
       astTran2( fs, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
 

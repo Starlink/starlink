@@ -14,12 +14,12 @@
 
  *  Description:
  *     This function opens the ACSIS extension and retrieves the
- *     receptor positions.
+ *     deteector positions.
 
  *  Notes:
  *     - Focal plane coordinates are read (in arcsec) from .MORE.ACSIS.FPLANEX
  *     and .MORE.ACSIS.FPLANEY.
- *     - Receptor positions in tracking coordinates are read (in radians) from 
+ *     - Detector positions in tracking coordinates are read (in radians) from 
  *     .MORE.ACSIS.RECEPPOS.
 
  *  Authors:
@@ -162,7 +162,7 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
     /* now store in the header */
     hdr->fplanex = fplanex;
     hdr->fplaney = fplaney;
-    hdr->receppos = receppos;
+    hdr->detpos = receppos;
 
     /* The receppos values may be either in tracking coords or in azel
        coords. We determine which by seeing if the receppos values are 
@@ -200,7 +200,7 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
        set a flag indicating that the receppos values should be treated
        as TRACKING values. Otherwise, set the flag to indicate that the
        receppos values should be treated as AZEL values. */
-                hdr->rpazel = ( fabs( trd ) > fabs( azd ) );
+                hdr->dpazel = ( fabs( trd ) > fabs( azd ) );
                 goto L10;
              }
           }

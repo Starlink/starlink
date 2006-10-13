@@ -41,7 +41,7 @@
 *     2006-07-31 (TIMJ):
 *        Check fplanex/y and instrument
 *     2006-10-2 (DSB):
-*        Check receppos 
+*        Check detpos 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -230,17 +230,17 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
       ohdr->ndet = ihdr->ndet;
     }
 
-  /* receptor positions */
-    if (ohdr->receppos == NULL ){
-      ohdr->receppos = smf_malloc( 2*ihdr->ndet*ihdr->nframes, 
-                                   sizeof(*(ohdr->receppos)), 0,
+  /* Detector positions */
+    if (ohdr->detpos == NULL ){
+      ohdr->detpos = smf_malloc( 2*ihdr->ndet*ihdr->nframes, 
+                                   sizeof(*(ohdr->detpos)), 0,
 				   status );
-      if (ohdr->receppos) {
-	memcpy( ohdr->receppos, ihdr->receppos, 
-		2*ihdr->ndet*ihdr->nframes * sizeof(*(ohdr->receppos)));
+      if (ohdr->detpos) {
+	memcpy( ohdr->detpos, ihdr->detpos, 
+		2*ihdr->ndet*ihdr->nframes * sizeof(*(ohdr->detpos)));
       }
     }
-    ohdr->rpazel = ihdr->rpazel;
+    ohdr->dpazel = ihdr->dpazel;
 
   }
 

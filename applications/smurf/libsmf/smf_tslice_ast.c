@@ -233,8 +233,8 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
    still available in the smfHead. Otherwise, use the FPLANEX/Y values. */
     case INST__ACSIS:
 
-      if( hdr->receppos ) {
-         smf_receppos_wcs( hdr, index, hdr->telpos, &(hdr->wcs), status );
+      if( hdr->detpos ) {
+         smf_detpos_wcs( hdr, index, hdr->telpos, &(hdr->wcs), status );
 
       } else {
          smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet, 

@@ -32,12 +32,12 @@
 *     SYSTEM = LITERAL (Read)
 *          The celestial coordinate system for the output cube. One of
 *          ICRS, FK5, AZEL, GALACTIC or TRACKING.
-*     USERECPOS = _LOGICAL (Read)
-*          If a true value is supplied, then the receptor positions are
-*          read from the .MORE.ACSIS.RECEPPOS arrays in each input NDF.
-*          Otherwise, the receptor positions are calculated on the basis
-*          of the .MORE.ACSIS.FPLANEX/Y arrays. Both methods should (in
-*          (the absence of bugs) result in identical cubes. [TRUE]
+*     USEDETPOS = _LOGICAL (Read)
+*          If a true value is supplied, then the detector positions are
+*          read from the detector position arrays in each input NDF.
+*          Otherwise, the detector positions are calculated on the basis
+*          of the FPLANEX/Y arrays. Both methods should (in the absence 
+*          of bugs) result in identical cubes. [TRUE]
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -136,7 +136,7 @@ void smurf_makecube( int *status ) {
    int size;                  /* Number of files in input group */
    int smfflags;              /* Flags for smfData */
    int ubnd_out[ 3 ];         /* Upper pixel bounds for output map */
-   int userecpos;             /* Should the RECEPPOS array be used? */
+   int usedetpos;             /* Should the detpos array be used? */
    smfData *data = NULL;      /* Pointer to data struct */
    smfData *odata = NULL;     /* Pointer to output SCUBA2 data struct */
    smfData *wdata = NULL;     /* Pointer to SCUBA2 data struct */
@@ -168,14 +168,13 @@ void smurf_makecube( int *status ) {
    parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC",
               1, system, 10, status );
 
-/* See of the receptor positions are to be read from the .MORE.ACSIS.RECEPPOS
-   array. Otherwise, they are calculated on the basis of the
-   .MORE.ACSIS.FPLANEX/Y arrays. */
-   parGet0l( "USERECEP", &userecpos, status );
+/* See of the detector positions are to be read from the RECEPPOS array. 
+   Otherwise, they are calculated on the basis of the FPLANEX/Y arrays. */
+   parGet0l( "USEDETPOS", &usedetpos, status );
   
 /* Validate the input files, create the WCS FrameSet to store in the
    output cube, and get the pixel index bounds of the output cube. */
-   smf_cubebounds( igrp, size, system, 0.0, 0.0, 1, pixsize, userecpos,
+   smf_cubebounds( igrp, size, system, 0.0, 0.0, 1, pixsize, usedetpos,
                    &moving, lbnd_out, ubnd_out, &wcsout, status );
 
 /* Get the base->current Mapping from the output WCS FrameSet, and split it 
@@ -275,12 +274,12 @@ void smurf_makecube( int *status ) {
          break;
       }     
 
-/* If the receptor positions are to calculated on the basis of FPLANEX/Y
-   rather than RECEPPOS, then free the receppos array in the smfHead
+/* If the detector positions are to calculated on the basis of FPLANEX/Y
+   rather than detpos, then free the detpos array in the smfHead
    structure. This will cause smf_tslice_ast to use the fplanex/y values. */
-      if( !userecpos && data->hdr->receppos ) {
-         smf_free( (double *) data->hdr->receppos, status );      
-         data->hdr->receppos = NULL;
+      if( !usedetpos && data->hdr->detpos ) {
+         smf_free( (double *) data->hdr->detpos, status );      
+         data->hdr->detpos = NULL;
       }
 
 /* Rebin the data into the output grid. */

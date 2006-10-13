@@ -40,11 +40,11 @@
 *     pixsize = double (Given)
 *        Spatial pixel size for the output cube at the tangent point, in 
 *        arcsec.
-*     userecpos = int (Given)
-*        If a non-zero value is supplied, then the receptor positions are
-*        obtained from the MORE.ACSIS.RECEPPOS array in each input NDF.
-*        Otherwise the receptor positions are calculated on the basis of
-*        the MORE.ACSIS.FPLANEX/Y arrays.
+*     usedetpos = int (Given)
+*        If a non-zero value is supplied, then the detector positions for
+*        a given time slice are read directly from the input NDF. Otherwise 
+*        the detector positions are calculated on the basis of the focal
+*        plane detector positions and the telescope pointing information.
 *     moving = int * (Returned)
 *        Address of an int in which to return a flag indicating if the 
 *        telescope is tracking a moving object. If so, each time slice is 
@@ -162,10 +162,10 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0,
    char *pname = NULL;   /* Name of currently opened data file */
    const char *trsys = NULL; /* AST tracking system */
    const char *usesys = NULL;/* AST system for output cube */
-   double *xin = NULL;   /* Workspace for receptor input grid positions */
-   double *xout = NULL;  /* Workspace for receptor output pixel positions */
-   double *yin = NULL;   /* Workspace for receptor input grid positions */
-   double *yout = NULL;  /* Workspace for receptor output pixel positions */
+   double *xin = NULL;   /* Workspace for detector input grid positions */
+   double *xout = NULL;  /* Workspace for detector output pixel positions */
+   double *yin = NULL;   /* Workspace for detector input grid positions */
+   double *yout = NULL;  /* Workspace for detector output pixel positions */
    double a;             /* Longitude value */
    double b;             /* Latitude value */
    double dlbnd[ 3 ];    /* Floating point lower bounds for output cube */
@@ -176,7 +176,7 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0,
    double specout[ 2];   /* Transformed spectral values */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ifile;            /* Index of current input file */
-   int irec;             /* Index of current input receptor */
+   int irec;             /* Index of current input detector */
    int ishift;           /* Shift to put pixel origin at centre */
    int itime;            /* Index of current time slice */
    int iwcsfrm;          /* Index of original output WCS Frame */
@@ -273,12 +273,12 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0,
          break;
       }
 
-/* If the receptor positions are to calculated on the basis of FPLANEX/Y
-   rather than RECEPPOS, then free the receppos array in the smfHead
+/* If the detector positions are to calculated on the basis of FPLANEX/Y
+   rather than RECEPPOS, then free the detpos array in the smfHead
    structure. This will cause smf_tslice_ast to use the fplanex/y values. */
-      if( !userecpos && hdr->receppos ) {
-         smf_free( (double *) hdr->receppos, status );      
-         hdr->receppos = NULL;
+      if( !userecpos && hdr->detpos ) {
+         smf_free( (double *) hdr->detpos, status );      
+         hdr->detpos = NULL;
       }
 
 /* We want a description of the spectral WCS axis in the input file. If 
@@ -406,13 +406,13 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0,
       }
 
 /* Allocate work arrays big enough to hold the coords of all the
-   receptors in the current input file.*/
+   detectors in the current input file.*/
       xin = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
       yin = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
       xout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
       yout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
 
-/* Store the input GRID coords of the receptors. */
+/* Store the input GRID coords of the detectors. */
       for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
          xin[ irec ] = irec + 1.0;
          yin[ irec ] = 1.0;
@@ -426,32 +426,12 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0,
 
 /* Get a FrameSet describing the spatial coordinate systems associated with 
    the current time slice of the current input data file. The base frame in 
-   the FrameSet will be a 2D Frame in which axis 1 is receptor number and 
+   the FrameSet will be a 2D Frame in which axis 1 is detector number and 
    axis 2 is unused. The current Frame will be a SkyFrame (the SkyFrame 
    System may be any of the JCMT supported systems). The Epoch will be
    set to the epoch of the time slice. */
          smf_tslice_ast( data, itime, 1, status );
          swcsin = hdr->wcs;
-
-/* Ensure the ObsLat and ObsLon values in the SpecFrame are used in
-   preference to the hard-wired values stored in "swcsin" by smf_receppos_wcs 
-   and smf_create_lutwcs. The ObsLat and ObsLon values in the SpecFrame are
-   derived from the OBSGEO-X/Y/Z keywords stored in the input data FITS
-   header. We use a pointer to the SkyFrame (rather than the swcsin
-   FrameSet pointer) in order to avoid the Mappings in swcsin being
-   modified. */
-
-
-/*
-         skyframe = astGetFrame( swcsin, AST__CURRENT );
-         if( astTest( specframe, "ObsLon" ) ) {
-            astSetC( skyframe, "ObsLon", astGetC( specframe, "ObsLon" ) );
-         }           
-         if( astTest( specframe, "ObsLat" ) ) {
-            astSetC( skyframe, "ObsLat", astGetC( specframe, "ObsLat" ) );
-         }           
-         skyframe = astAnnul( skyframe );
-*/
 
 /* If we have not yet chosen the celestial coordinate system for the
    output cube, do so now. */
@@ -615,8 +595,8 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0,
 
 /* Modify swcsin so that its SkyFrame represents offsets from the current
    telescope base position. We use the FrameSet pointer (swcsin) in this 
-   call, so the Mapping from receptor number to SkyFrame will be modified
-   so that each receptor retains its original position on the sky (but
+   call, so the Mapping from detector number to SkyFrame will be modified
+   so that each detector retains its original position on the sky (but
    transformed to the offset coordinate system). Also indiucate that the
    position should be used as the origin of the offset coordinate system, 
    and that alignment should be performed in the offset coordinate system. */
@@ -665,7 +645,7 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0,
    state. */
          astInvert( swcsin );
 
-/* Transform the positions of the receptors from input GRID to output PIXEL
+/* Transform the positions of the detectors from input GRID to output PIXEL
    coords. Then extend the bounds of the output cube on the spatial axes to 
    accomodate the new positions. */
          astTran2( fs, (data->dims)[ 1 ], xin, yin, 1, xout, yout );

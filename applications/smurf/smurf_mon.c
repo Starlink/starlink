@@ -78,7 +78,7 @@
 *     2006-09-15 (AGG):
 *        Add DREAMWEIGHTS
 *     2006-10-12 (DSB):
-*        Added call to smf_receppos_wcs to clear cache.
+*        Added call to smf_detpos_wcs to clear cache.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -215,7 +215,7 @@ void smurf_mon( int * status ) {
   /* Clear all possible cached info from the different createwcs routines */
   sc2ast_createwcs(-1, NULL, NULL, NULL, NULL, status);
   smf_create_lutwcs(1, NULL, NULL, 0, NULL, NULL, NULL, NULL, status );
-  smf_receppos_wcs( NULL, -1, NULL, NULL, status );
+  smf_detpos_wcs( NULL, -1, NULL, NULL, status );
 
   /* Free AST resources */
   astEnd;

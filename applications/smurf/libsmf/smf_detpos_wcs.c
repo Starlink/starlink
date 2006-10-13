@@ -1,11 +1,11 @@
 /*
 *+
 *  Name:
-*     smf_receppos_wcs
+*     smf_detpos_wcs
 
 *  Purpose:
 *     Create an AST FrameSet describing a specified time slice based on
-*     RECEPPOS values.
+*     the detector position stored in a smfHead.
 
 *  Language:
 *     Starlink ANSI C
@@ -14,12 +14,12 @@
 *     C function
 
 *  Invocation:
-*     smf_receppos_wcs( smfHead *hdr, int index, const double telpos[3], 
-*                       AstFrameSet **fset, int *status );
+*     smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3], 
+*                     AstFrameSet **fset, int *status );
 
 *  Arguments:
 *     hdr = smfHead * (Given & Returned)
-*        The smfHead structure containing the RECEPPOS values.
+*        The smfHead structure containing the detector positions.
 *     index = int (Given)
 *        Index into the time series data (the 3rd dimension). Call with a
 *        negative index value to free cached resources.
@@ -33,12 +33,12 @@
 
 *  Description:
 *     This function is used to create an AST FrameSet for the
-*     specified time slice from the RECEPPOS values in the supplied
+*     specified time slice from the "detpos" values in the supplied
 *     smfHead structure. 
 *
 *     The returned FrameSet has a 2D GRID Frame as the base Frame, and a
 *     SkyFrame describing tracking coordinates as the current Frame. The
-*     first GRID axis is receptor index, and the second is un-used.
+*     first GRID axis is detector index, and the second is un-used.
 
 *  Authors:
 *     David Berry (JAC, UCLan)
@@ -84,16 +84,16 @@
 #include "smf_typ.h"
 
 /* Simple default string for errRep */
-#define FUNC_NAME "smf_receppos_wcs"
+#define FUNC_NAME "smf_detpos_wcs"
 
-void smf_receppos_wcs( smfHead *hdr, int index, const double telpos[3], 
+void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3], 
                        AstFrameSet **fset, int *status ) {
 
    const double *p1;           /* Pointer to next lon or lat value to copy */
    double *p2;                 /* Pointer to next lon value */
    double *p3;                 /* Pointer to next lat value */
-   int nrec;                   /* Number of receptors */
-   int i;                      /* Index of current receptor */
+   int nrec;                   /* Number of detectors */
+   int i;                      /* Index of current detector */
    AstLutMap *lonmap = NULL;   /* LutMap holding longitude values */
    AstLutMap *latmap = NULL;   /* LutMap holding latitude values */
    AstCmpMap *cmap1 = NULL;    /* Parallel CmpMap holding both LutMaps */
@@ -121,14 +121,14 @@ void smf_receppos_wcs( smfHead *hdr, int index, const double telpos[3],
 /* Check inherited status */
    if( *status != SAI__OK) return;
 
-/* Get the number of receptors. */
+/* Get the number of detectors. */
    nrec = hdr->ndet;
 
-/* Get a pointer to the start of the receppos values for the requested
+/* Get a pointer to the start of the detpos values for the requested
    time slice. */
-   p1 = hdr->receppos + 2*nrec*index;
+   p1 = hdr->detpos + 2*nrec*index;
 
-/* Check there is more than 1 receptor. */
+/* Check there is more than 1 detector. */
    if( nrec > 1 ) {
 
 /* If required, allocate memory to hold the individual look up tables for
@@ -149,7 +149,7 @@ void smf_receppos_wcs( smfHead *hdr, int index, const double telpos[3],
          }
 
 /* Create the Mapping from GRID to SKY positions. This is a PermMap to
-   duplicate the receptor index, followed by 2 LutMaps in parallel to
+   duplicate the detector index, followed by 2 LutMaps in parallel to
    generate the lon and lat values. Set the LutInterpattribute in these
    LutMaps so that they use nearest neighbour interpolation. */
          lonmap = astLutMap( nrec, lonlut, 1.0, 1.0, "LutInterp=1" );
@@ -171,7 +171,7 @@ void smf_receppos_wcs( smfHead *hdr, int index, const double telpos[3],
          cmap1 = astAnnul( cmap1 );
       }
 
-/* If thre is only one receptor, use a PermMap to describe this one
+/* If thre is only one detector, use a PermMap to describe this one
    position. rather than a LutMap (LutMaps cannot describe a single
    position). */
    } else {
@@ -192,9 +192,9 @@ void smf_receppos_wcs( smfHead *hdr, int index, const double telpos[3],
       astSetD( sky, "ObsLat", telpos[ 1 ] );
       astExempt( sky );
 
-/* If the receppos positions are referred to the TRACKING frame, change
+/* If the detpos positions are referred to the TRACKING frame, change
    the SkyFrame from AZEL to the AST equivalent of the TRACKING Frame. */
-      if( !hdr->rpazel ) {
+      if( !hdr->dpazel ) {
          astSetC( sky, "System", smf_convert_system( hdr->state->tcs_tr_sys,
                                                      status ) ); 
       }

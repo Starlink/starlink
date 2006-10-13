@@ -53,7 +53,7 @@
 *     2006-09-07 (EC):
 *        Add instap and telpos.
 *     2006-10-2 (DSB):
-*        Add receppos.
+*        Add detpos.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -124,8 +124,8 @@ smf_create_smfHead( int * status ) {
   hdr->ndet = 0;
   hdr->fplanex = NULL;
   hdr->fplaney = NULL;
-  hdr->receppos = NULL;
-  hdr->rpazel = 0;
+  hdr->detpos = NULL;
+  hdr->dpazel = 0;
   hdr->isCloned = 0;
   hdr->telpos[0] = 0;
   hdr->telpos[1] = 0;

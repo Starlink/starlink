@@ -617,11 +617,11 @@ package @PACKAGE@ {
             helpkey *
 	  }
 
- 	  parameter userecep {
+ 	  parameter usedetpos {
 	    type _LOGICAL
 	    vpath DEFAULT
 	    ppath CURRENT
-	    prompt {Read receptor positions from the RECEPPOS array?}
+	    prompt {Read detector positions from the input NDF?}
 	    default TRUE
 	    helpkey *
 	  }

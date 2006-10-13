@@ -70,7 +70,7 @@
 *     2006-09-15 (AGG):
 *        Add new smfDream struct
 *     2006-10-2 (DSB):
-*        Add receppos to smfHead
+*        Add detpos to smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -173,8 +173,8 @@ typedef struct smfHead {
   unsigned int ndet;        /* Number of focal plane detectors */
   const double * fplanex;   /* X coords (radians) of focal plane detectors */
   const double * fplaney;   /* Y coords (radians) of focal plane detectors */
-  const double * receppos;  /* Tracking coords (radians) of detectors */
-  int rpazel;               /* Flag: does "receppos" hold AZEL values? */
+  const double * detpos;    /* Tracking coords (radians) of detectors */
+  int dpazel;               /* Flag: does "detpos" hold AZEL values? */
   double instap[2];         /* instrument aperture (focal plane offsets)  */
   double telpos[3];         /* West LON/LAT/Alt of telescope (deg/deg/m) */
 } smfHead;
