@@ -43,6 +43,8 @@
 *     2006-10-12 (AGG):
 *        - RA and Dec were not being stored in the inx struct
 *        - Delete wt0_name and wt1_name
+*     2006-10-13 (AGG):
+*        inx.nvert now set to a sensible (i.e non-zero) default value
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -332,7 +334,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->numsamples = 128; 
 
    if ( !astMapGet0I ( keymap, "NVERT", &(inx->nvert) ) )
-      inx->nvert = 0;
+      inx->nvert = nvert_x;
 
    astMapGet0C ( keymap, "OBSMODE", &temp );
 
