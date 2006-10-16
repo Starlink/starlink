@@ -45,6 +45,8 @@
 *        - Delete wt0_name and wt1_name
 *     2006-10-13 (AGG):
 *        inx.nvert now set to a sensible (i.e non-zero) default value
+*     2006-10-16 (AGG):
+*        inx.jigvert[][] now stored correctly.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -290,8 +292,8 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    }
 
    for ( i = 0; i < nvert_x; i++ ) {
-      (inx->jig_vert)[nvert_x][0] = vert_x[i];
-      (inx->jig_vert)[nvert_x][1] = vert_y[i];
+      (inx->jig_vert)[i][0] = vert_x[i];
+      (inx->jig_vert)[i][1] = vert_y[i];
    }
 
    if ( !astMapGet0D ( keymap, "LAMBDA", &(inx->lambda) ) )
