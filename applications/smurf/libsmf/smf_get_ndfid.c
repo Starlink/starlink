@@ -62,6 +62,8 @@
 *        Add status checking, check if placeholder returned from ndfOpen
 *     2006-07-24 (AGG):
 *        Update prologue for dealing with existing NDFs
+*     2006-10-16 (AGG):
+*        Rejig checking and feedback to user
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -134,8 +136,18 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
   }
 
   /* Note: write access clears the contents of the NDF */
-  if ( strncmp( accmode, "WRITE", 5 ) == 0 ) {
-    msgOutif( MSG__VERB, FUNC_NAME, "Opening NDF with WRITE access: this will clear the current contents if the NDF exists.", status);
+  if ( strncmp( accmode, "WRITE", 5 ) == 0  
+       || strncmp( accmode, "UPDATE", 6 ) == 0 ) {
+    /* Does the NDF already exist? If so tell the user that it's going
+       to be overwritten. */
+    msgSetc("N",name);
+    msgSetc("A",accmode);
+    if ( strncmp( state, "NEW", 3 ) == 0 ) {
+      msgOutif( MSG__VERB, FUNC_NAME, "Opening new NDF ^N with ^A access", status);
+    } else {
+      msgOutif( MSG__VERB, FUNC_NAME, "Opening NDF ^N with ^A access"
+		"NDF ^N may already exist: opening this NDF will clear the current contents.", status);
+    }
   }
   ndfOpen( loc, name, accmode, state, &ndfid, &place, status );
   if ( *status != SAI__OK ) {
