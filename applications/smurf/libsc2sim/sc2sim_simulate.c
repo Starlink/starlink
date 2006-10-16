@@ -137,6 +137,8 @@
 *        Use width & height instead of gridcount in PONG
 *     2006-10-10 (JB) :
 *        Fill tcs_tai component.
+*     2006-10-16 (EC):
+*        Fixed a sign error in the rotation of the map coordinate frame. 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -313,6 +315,14 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double vmax[2];                 /* telescope maximum velocities (arcsec) */
 
   if ( *status != SAI__OK) return;
+
+  /* KLUDGE */
+  /*
+  FILE *junk;
+  double x_junk, y_junk, x_out, y_out;
+  junk = fopen( "junk.txt", "w" );
+  */
+  /* ------ */
 
   /* Main routine */
   ndfBegin();
@@ -644,7 +654,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
            the pattern into AzEl and RADec so that it can be written to the
            JCMTState structure */
 
-
 	switch( coordframe ) {
 	  
 	case nasmyth:
@@ -683,10 +692,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  bor_y_cel = (posptr[frame*2+1])*DAS2R;
 	  
 	  /* Rotate by the parallactic angle to get offsets in AzEl */
-	  bor_x_hor =  bor_x_cel*cos(base_p[frame]) - 
-	    bor_y_cel*sin(base_p[frame]);
-	  bor_y_hor = bor_x_cel*sin(base_p[frame]) + 
-	    bor_y_cel*cos(base_p[frame]);
+	  
+	  bor_x_hor =  bor_x_cel*cos(-base_p[frame]) - 
+	    bor_y_cel*sin(-base_p[frame]);
+
+	  bor_y_hor = bor_x_cel*sin(-base_p[frame]) + 
+	    bor_y_cel*cos(-base_p[frame]);
 	  
 	  jig_x_hor[frame] = (jigptr[frame%jigsamples][0]*cos(base_p[frame]) -
 			      jigptr[frame%jigsamples][1]*sin(base_p[frame]))*
@@ -697,8 +708,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	    DR2AS;
 	  break;
 
-	default: /* should never be reached...*/
-	  errRep("", "Un-recognized map coordinate frame", status);
+	default: 
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, "Un-recognised map coordinate frame", status);
 	  break;
 	}
 
@@ -775,6 +787,17 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       sc2ast_createwcs(subnum, &state, instap, telpos, &fs, status);
       
+      /* KLUDGE -------------- */
+      /*
+      x_junk = 1;
+      y_junk = 1;
+      astSetC( fs, "SYSTEM", "J2000" );
+      astTran2( fs, 1, &x_junk, &y_junk, 1, &x_out, &y_out );
+      fprintf( junk, "%.*g %lf %lf\n", DBL_DIG, state.rts_end, x_out, y_out );
+      */
+      /* KLUDGE -------------- */
+
+
       /* simulate one frame of data */
       sc2sim_simframe ( *inx, *sinx, astnaxes, astscale, astdata->pntr[0], 
 			atmnaxes, atmscale, atmdata->pntr[0], coeffs, 
@@ -831,7 +854,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             /* Base coordinates (e.g. tangent point for nominal map) */
             head[j].tcs_tr_bc1 = inx->ra; 
             head[j].tcs_tr_bc2 = inx->dec;
-            
+
+	    /*
+	    fprintf( junk, "%lf %lf %lf\n", 
+		     head[j].tcs_tr_ac1, head[j].tcs_tr_ac2, 
+		     base_p[firstframe+j] );
+	    */
+
             /* TCS - Telescope tracking in horizontal coordinates ------- */
             
             /* Angle between "up" in Nasmyth coordinates, and "up" in 
@@ -972,5 +1001,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   msgOutif( MSG__VERB, FUNC_NAME, "Simulation successful.", status ); 
 
   ndfEnd( status );
+
+  /* ------ */
+  /* fclose(junk); */
+  /* ------ */
+
+
 
 }
