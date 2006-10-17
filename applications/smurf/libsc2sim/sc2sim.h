@@ -37,6 +37,10 @@
 *     2006-10-03 (JB):
 *        Modified sc2sim_getpong to use width/height and removed 
 *        sc2sim_getpongends
+*     2006-10-17 (JB):
+*        Removed sc2sim_getpong, replaced with sc2sim_getpongvert,
+*        sc2sim_getpongends, sc2sim_getstraightpong, and
+*        sc2sim_getcurvepong
 
 *     {enter_further_changes_here}
 
@@ -244,6 +248,20 @@ char *name,         /* string containing name of coordinate frame */
 int *status         /* global status (given and returned) */
 );
 
+void sc2sim_getcurvepong
+(
+double angle,        /* angle of pattern relative to telescope
+                        axes in radians anticlockwise (given) */
+double width,        /* minimum width of PONG pattern in arcsec (given) */
+double height,       /* minimum height of PONG pattern in arcsec (given) */
+double spacing,      /* grid spacing in arcsec (given) */
+double vmax[2],      /* telescope maximum velocities (arcsec/sec) (given) */
+double samptime,     /* sample interval in sec (given) */
+int *pongcount,      /* number of positions in pattern (returned) */
+double **posptr,     /* list of positions (returned) */
+int *status          /* global status (given and returned) */
+);
+
 void sc2sim_getinvf 
 ( 
 double sigma,        /* dispersion of broad-band noise (given) */ 
@@ -260,8 +278,13 @@ char *name,         /* string containing name of observing mode */
 int *status         /* global status (given and returned) */
 );
 
-void sc2sim_getobspar ( AstKeyMap *keymap,struct  sc2sim_obs_struct *inx, 
-                        int *status );
+void sc2sim_getobspar 
+( 
+AstKeyMap *keymap,   /* Keymap containing obs parameters (given) */
+struct  sc2sim_obs_struct *inx, /* Structure for values from obs
+				   keymap file (given and returned */
+int *status          /* global status (given and returned) */
+);
 
 void sc2sim_getpat
 (
@@ -287,18 +310,40 @@ double pattern[][2],  /* The array to hold the coordinates of the jiggle
 int *status           /* global status (given and returned) */
 );
 
-void sc2sim_getpong
-(
-double angle,        /* angle of pattern relative to telescope
-                        axes in radians anticlockwise (given) */
-double width,        /* minimum width of PONG pattern in arcsec (given) */
-double height,       /* minimum height of PONG pattern in arcsec (given) */
-double spacing,      /* grid spacing in arcsec (given) */
-double vmax[2],      /* telescope maximum velocities (arcsec) (given) */
-double samptime,     /* sample interval in sec (given) */
-int *pongcount,      /* number of positions in pattern (returned) */
-double **posptr,     /* list of positions (returned) */
-int *status          /* global status (given and returned) */
+void sc2sim_getpongends
+( 
+double width,          /* minimum width of scan (arcsec) */
+double height,         /* minimum height of scan (arcsec) */
+double spacing,        /* spacing of grid pattern (arcsec) */
+double grid[][2],     /* array of vertex coordinates */
+int *numvertices,      /* total number of vertices */
+int *status            /* pointer to global status */
+);
+
+void sc2sim_getpongvert
+( 
+double width,          /* minimum width of scan (arcsec) */
+double height,         /* minimum height of scan (arcsec) */
+double spacing,        /* spacing of grid pattern (arcsec) */
+double *vert_spacing,  /* spacing of vertices along axes (arcsec) */
+int *x_numvert,        /* number of vertices in x direction */
+int *y_numvert,         /* number of vertices in y direction */
+int *status            /* pointer to global status */
+);
+
+void sc2sim_getstraightpong 
+( 
+double angle,         /* angle of pattern relative to the telescope
+			 axes in radians (given) */
+double width,         /* minimum width of PONG pattern in arcsec (given) */
+double height,        /* minimum height of PONG pattern in arcsec (given) */
+double spacing,       /* grid spacing in arcsec (given) */
+double accel[2],      /* telescope accelerations in arcsec/sec (given) */
+double vmax[2],       /* telescope maximum velocities in arcsec/sec (given) */
+double samptime,      /* sample interval in sec (given) */ 
+int *pongcount,       /* number of positions in pattern (returned) */
+double **posptr,      /* list of positions (returned) */
+int *status           /* pointer to global status (given and returned) */
 );
 
 void sc2sim_getscaling
@@ -348,8 +393,13 @@ double *sigma,         /* photon noise in pW (returned) */
 int *status            /* global status (given and returned) */
 );
 
-void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *inx, 
-                        int *status );
+void sc2sim_getsimpar 
+( 
+AstKeyMap *keymap,   /* Keymap containing sim parameters (given) */
+struct  sc2sim_sim_struct *inx, /* Structure for values from sim
+				   keymap file (given and returned */
+int *status          /* global status (given and returned) */
+);
 
 void sc2sim_getsinglescan
 (
