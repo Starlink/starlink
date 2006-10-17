@@ -103,7 +103,7 @@ int *status          /* global status (given and returned) */
    /* Local variables */
    double c0;          /* distance in coordinate 0 */
    double c1;          /* distance in coordinate 1 */
-   double dstep;       /* distance along path for no acceleration */
+   double dstep;       /* distance of this step (no accel) */
    double dtime;       /* time at start of deceleration */
    double dtotal;      /* total distance of scan */
    double eps;         /* small number to trap angles */
@@ -113,11 +113,11 @@ int *status          /* global status (given and returned) */
    int jmax;           /* count at maximum velocity */
    int jmid;           /* count near midway */
    double midway;      /* midway position along scan */
+   int nsteps;         /* number of steps (no accel) */
    double theta;       /* angle of path relative to coordinate [0] */
    double raccel;      /* acceleration along path */
    double rmax;        /* distance along path when max velocity reached */
    double rmaxvel;     /* max velocity along path */
-   double tcurrent;    /* current time for no acceleration scans */
    double tdec;        /* time at start of deceleration */
    double tmaxvel;     /* max velocity along path */
    double tmidway;     /* time at mid way */
@@ -169,16 +169,20 @@ int *status          /* global status (given and returned) */
       a constant velocity */
 
    if ( raccel == 0 ) {
+
+      /* Round down to get the number of steps in this line */
+      nsteps = (int) ( dtotal / ( rmaxvel * samptime ) );  
   
-      for ( j=0; j < maxoff; j++ ) {
-	 tcurrent = j * samptime;
-         dstep = rmaxvel * tcurrent;
+      for ( j=0; j < nsteps; j++ ) {
+         dstep = j * samptime * rmaxvel;
          pattern[((*curroff)+j)*2] = cstart[0] + 
                               ( dstep * cos ( theta ) );
          pattern[((*curroff)+j)*2+1] = cstart[1] + 
-                              ( dstep * sin ( theta ) );   
-      }      
-         
+	                      ( dstep * sin ( theta ) );
+ 
+      } 
+
+      (*curroff) += nsteps;      
 
    } else {
 
