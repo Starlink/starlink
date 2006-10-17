@@ -47,6 +47,8 @@
 *        inx.nvert now set to a sensible (i.e non-zero) default value
 *     2006-10-16 (AGG):
 *        inx.jigvert[][] now stored correctly.
+*     2006-10-16 (JB):
+*        Add pong_type
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -374,6 +376,21 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
    if ( !astMapGet0D ( keymap, "PONG_SPACING", &(inx->pong_spacing) ) )
       inx->pong_spacing = 240.0;
+
+   if ( !astMapGet0C ( keymap, "PONG_TYPE", &temp ) )
+      strncpy ( inx->pong_type, "STRAIGHT", 80 ); 
+   else {
+      strncpy ( convert, temp, 80 );
+      /* Convert to uppercase */
+      i = 0;
+      while ( *convert != '\0' ) {
+         *convert = toupper (*convert);
+         convert++;
+         i++;
+      }
+      convert = convert - i;
+      strncpy ( inx->pong_type, convert, 80 );
+   }
 
    if ( !astMapGet0D ( keymap, "PONG_VMAX", &(inx->pong_vmax) ) )
       inx->pong_vmax = 200.0;
