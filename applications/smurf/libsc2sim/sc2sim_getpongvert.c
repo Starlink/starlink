@@ -119,7 +119,7 @@ int *status            /* pointer to global status */
    if ( !StatusOkP(status) ) return;
 
    /* Find out how far apart the vertices are along the axes */
-   *vert_spacing = spacing / sqrt ( 2.0 );
+   *vert_spacing = ( 2.0 * spacing ) / sqrt ( 2.0 );
 
    /* Determine how many vertices (minimum) there must be along
       each axis to cover the required area */
