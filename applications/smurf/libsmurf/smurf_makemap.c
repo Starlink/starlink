@@ -196,10 +196,6 @@ void smurf_makemap( int *status ) {
      unspecified, use the mask */
   parGtd0l ("USEBAD", 1, 1, &usebad, status);\
 
-  if ( ! ( usebad == 1 || usebad == 0 ) ) 
-    printf ("Weirdness...\n");
-  printf ( "usebad is %i\n", usebad );
-
   /* Get METHOD */
   parChoic( "METHOD", "REBIN", 
 	    "REBIN, ITERATE.", 1,
