@@ -139,6 +139,9 @@
 *        Fill tcs_tai component.
 *     2006-10-16 (EC):
 *        Fixed a sign error in the rotation of the map coordinate frame. 
+*     2006-10-17 (JB):
+*        Check for pong_type        
+*
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -467,16 +470,36 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     break;
     
     case pong:
-      /* Call sc2sim_getpong to get pong pointing solution */
-      msgOut( FUNC_NAME, "Do a PONG observation", status ); 
-      /*accel[0] = 432.0;
-	accel[1] = 540.0;*/
+      /* Get pong pointing solution */
+
       vmax[0] = inx->pong_vmax;        /*200.0;*/
       vmax[1] = inx->pong_vmax;        /*200.0;*/
 
-      sc2sim_getpong ( inx->pong_angle, inx->pong_width, inx->pong_height, 
-                       inx->pong_spacing, vmax, samptime, 
-                       &count, &posptr, status );
+      if ( strncmp ( inx->pong_type, "STRAIGHT", 8 ) == 0 ) {
+
+         msgOut( FUNC_NAME, "Do a STRAIGHT PONG observation", status );
+
+         accel[0] = 0.0;
+	 accel[1] = 0.0;
+
+	 sc2sim_getstraightpong ( inx->pong_angle, inx->pong_width,
+				  inx->pong_height, inx->pong_spacing,
+                                  accel, vmax, samptime, &count, 
+                                  &posptr, status );
+
+      }	else if ( strncmp ( inx->pong_type, "CURVE", 5 ) == 0 ) { 
+
+         msgOut( FUNC_NAME, "Do a CURVE PONG observation", status ); 
+
+         sc2sim_getcurvepong ( inx->pong_angle, inx->pong_width, 
+                               inx->pong_height, 
+                               inx->pong_spacing, vmax, samptime, 
+                               &count, &posptr, status );
+      } else {
+         *status = SAI__ERROR;
+         msgSetc( "PONGTYPE", inx->pong_type );
+         msgOut( FUNC_NAME, "^PONGTYPE is not a valid PONG type", status );
+      }
 
       break;
     

@@ -96,6 +96,8 @@
 *        Use width & height instead of gridcount in PONG
 *     2006-10-10 (JB) :
 *        Fill tcs_tai component.
+*     2006-10-16 (JB):
+*        Check for straight or curve PONG
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -277,25 +279,45 @@ void sc2sim_simhits ( struct sc2sim_obs_struct *inx,
 
   switch( mode ) {
 
-  case pong:
-    /* Call sc2sim_getpong to get pong pointing solution */
-    msgOut( FUNC_NAME, "Do a PONG observation", status ); 
-    /*accel[0] = 432.0;
-      accel[1] = 540.0;*/
-    vmax[0] = inx->pong_vmax;        /*200.0;*/
-    vmax[1] = inx->pong_vmax;        /*200.0;*/
+    case pong:
+      /* Get pong pointing solution */
 
-    sc2sim_getpong ( inx->pong_angle, inx->pong_width, inx->pong_height, 
-                     inx->pong_spacing, vmax, samptime, 
-                     &count, &posptr, status );
-    
-    break;
+      vmax[0] = inx->pong_vmax;        /*200.0;*/
+      vmax[1] = inx->pong_vmax;        /*200.0;*/
+
+      if ( strncmp ( inx->pong_type, "STRAIGHT", 8 ) == 0 ) {
+
+         msgOut( FUNC_NAME, "Do a STRAIGHT PONG observation", status );
+
+         accel[0] = 0.0;
+	 accel[1] = 0.0;
+
+	 sc2sim_getstraightpong ( inx->pong_angle, inx->pong_width,
+				  inx->pong_height, inx->pong_spacing,
+                                  accel, vmax, samptime, &count, 
+                                  &posptr, status );
+
+      }	else if ( strncmp ( inx->pong_type, "CURVE", 5 ) == 0 ) { 
+
+         msgOut( FUNC_NAME, "Do a CURVE PONG observation", status ); 
+
+         sc2sim_getcurvepong ( inx->pong_angle, inx->pong_width, 
+                               inx->pong_height, 
+                               inx->pong_spacing, vmax, samptime, 
+                               &count, &posptr, status );
+      } else {
+         *status = SAI__ERROR;
+         msgSetc( "PONGTYPE", inx->pong_type );
+         msgOut( FUNC_NAME, "^PONGTYPE is not a valid PONG type", status );
+      }
+
+      break;
 
   case singlescan:
     /* Call sc2sim_getsinglescan to get scan pointing solution */
     msgOut( FUNC_NAME, "Do a SINGLESCAN observation", status );
-    accel[0] = 432.0;
-    accel[1] = 540.0;
+    accel[0] = 0.0;
+    accel[1] = 0.0;
     vmax[0] = inx->scan_vmax;        /*200.0;*/
     vmax[1] = inx->scan_vmax;        /*200.0;*/
 
@@ -324,7 +346,14 @@ void sc2sim_simhits ( struct sc2sim_obs_struct *inx,
     break;
 
   }
-    
+
+  /* KLUDGE TO REMOVE!!!!!! 
+  int pp;
+  for ( pp = 0; pp < count*2; pp++ ) {
+    printf ( "%f     ", posptr[pp++] );
+    printf ( "%F\n", posptr[pp] );
+    }*/
+   
   msgSeti( "COUNT", count );
   msgOutif( MSG__VERB, FUNC_NAME, 
 	    "Count = ^COUNT", status );
