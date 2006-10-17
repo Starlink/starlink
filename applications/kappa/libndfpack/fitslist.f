@@ -53,6 +53,7 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -81,6 +82,9 @@
 *        Original version.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     2006 October 17 (TIMJ):
+*        Enable STREAM mode when dumping FITS contents. We do not want
+*        to word wrap at 79 characters.
 *     {enter_further_changes_here}
 
 *-
@@ -152,6 +156,13 @@
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 
+*     Tell MSG that it should not wrap at 79 characters since we know
+*     we are in blocks of 80. Given that we can not query MSG for the
+*     current values it is difficult to ensure that we reset to the
+*     correct value. We make a guess that we are not in STREAM
+*     mode and simply re-enable formatted mode afterwards.
+         CALL MSG_TUNE( 'STREAM', 1, STATUS )
+
 *       Write the headers to the log file or report them directly.
 *       Note that the length of the character-array elements is passed
 *       by value after the last genuine argument.  This is for UNIX and
@@ -160,6 +171,10 @@
 
          CALL KPG1_LISTC( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                    LOGF, STATUS, %VAL( LENGTH ) )
+
+*     Reset the MSG tuning parameter
+         CALL MSG_TUNE( 'STREAM', 0, STATUS )
+
       END IF
 
 *    Close the log file if one has been opened.
