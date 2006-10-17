@@ -11,6 +11,11 @@
    angle to each plane.  The rotation plane can be parallel to any 
    face of the cube, and is defined by a new parameter AXES.
 
+   o Add WCSATTS parameter to COLLAPSE to allow control of the frameset
+   before collapsing occurs. This is important for estimators whose
+   values depend on the WCS.
+
+   o FITSLIST no longer wraps its output at 79 characters
 
 1 KAPPA_Version_1.5
 
