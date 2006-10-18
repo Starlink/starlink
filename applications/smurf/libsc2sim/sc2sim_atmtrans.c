@@ -46,6 +46,8 @@
 *        Corrected 850 constants
 *     2006-07-19 (JB):
 *        Split from dsim.c
+*     2006-10-18 (AGG):
+*        Use global status for reporting errors, improve smurfification
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -76,8 +78,15 @@
 #include <stdlib.h>
 #include <math.h>
 
+/* Starlink includes */
+#include "sae_par.h"
+#include "mers.h"
+#include "prm_par.h"
+
 /* SC2SIM includes */
 #include "sc2sim.h"
+
+#define FUNC_NAME "sc2sim_atmtrans"
 
 void sc2sim_atmtrans
 (
@@ -111,15 +120,19 @@ int *status          /* global status (given and returned) */
    /*   zero = 1.0;*/
    maxflux = -zero/slope;
 
-   if (flux > maxflux) {
-     printf("Error: assumed sky flux, %g pW, is greater ", flux);
-     printf("than maximum value, %g pW\n", maxflux);
-     exit(-1);
+   if ( flux > maxflux ) {
+     if ( *status == SAI__OK) {
+       *status = SAI__ERROR;
+       msgSetd("F", flux);
+       msgSetd("M",maxflux);
+       errRep(FUNC_NAME, "Assumed sky flux, ^F pW, is greater than maximum value ^M pW", status);
+     }
+     *trans = 0;
+   } else {
+     /* agg's version */
+     /*   *trans = 100.0*(zero + slope * flux);*/ 
+     *trans = zero + slope * flux;
    }
-
-   /* agg's version */
-   /*   *trans = 100.0*(zero + slope * flux);*/ 
-   *trans = zero + slope * flux;
 
 }
 

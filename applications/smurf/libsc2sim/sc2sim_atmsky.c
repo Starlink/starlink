@@ -39,6 +39,8 @@
 *        Original 
 *     2006-07-19 (JB):
 *        Split from dsim.c
+*     2006-10-18 (AGG):
+*        Use global status to report errors, update prologue
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -70,8 +72,15 @@
 #include <stdlib.h>
 #include <math.h>
 
+/* Starlink includes */
+#include "sae_par.h"
+#include "mers.h"
+#include "prm_par.h"
+
 /* SC2SIM includes */
 #include "sc2sim.h"
+
+#define FUNC_NAME "sc2sim_atmsky"
 
 void sc2sim_atmsky 
 (
@@ -107,9 +116,12 @@ int *status          /* global status (given and returned) */
    *flux = ( trans - zero ) / slope;
 
    if ( *flux > maxflux ) {
-     printf (" Error: derived sky flux, %g pW, is greater \n", *flux );
-     printf ( "than maximum value, %g pW\n", maxflux);
-     exit(-1);
+     if ( *status == SAI__OK) {
+       *status = SAI__ERROR;
+       msgSetd("F", *flux);
+       msgSetd("M",maxflux);
+       errRep(FUNC_NAME, "Derived sky flux, ^F pW, is greater than maximum value ^M pW", status);
+     }
    }
 
 }
