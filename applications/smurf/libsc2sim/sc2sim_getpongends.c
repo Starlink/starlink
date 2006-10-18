@@ -202,7 +202,7 @@ int *status            /* pointer to global status */
 	 x_count = x_dir * x_numvert;
          y_count += y_dir * 2 * x_numvert;
 
-         /* Check to see if we hit a side of the "box" instead */
+         /* Check to see if we hit the top/bottom of the "box" instead */
          if ( y_dir * y_count > y_numvert ) {
 
             /* We hit the top/bottom, so we need to calculate an 
