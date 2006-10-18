@@ -4,7 +4,7 @@
 *     sc2sim_calctime
 
 *  Purpose:
-*     Calculte UT + LST arrays given a start time
+*     Calculate UT + LST arrays given a start time
 
 *  Language:
 *     Starlink ANSI C
@@ -102,7 +102,6 @@ int *status          /* global status (given and returned) */
    /* Local variables */
    double gst;
    int i;
-   double tu;
    double sampday;
 
    /* Check status */
