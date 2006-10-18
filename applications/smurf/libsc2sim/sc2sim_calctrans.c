@@ -70,9 +70,6 @@
 /* Standard includes */
 #include <math.h>
 
-/* Starlink includes */
-#include "ast.h"
-
 /* SC2SIM includes */
 #include "sc2sim.h"
 
