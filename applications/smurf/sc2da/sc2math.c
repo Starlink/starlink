@@ -252,12 +252,12 @@ int *status         /* global status (given and returned) */
 
    if ( !StatusOkP(status) ) return 0.0;
 
-   if ( conv_shape == 0 )               /* Gaussian */
+   if ( conv_shape == CONV__GAUS )               /* Gaussian */
    {
       s = 1.0 / ( 2.0 * conv_sig * conv_sig );
       w = exp( -s*(dx*dx + dy*dy) );
    }
-   else if ( conv_shape == 1 )          /* sinc(dx).sinc(dy) */
+   else if ( conv_shape == CONV__SINC )          /* sinc(dx).sinc(dy) */
    {
       if ( fabs(dx) > 1.0e-9 )
       {
@@ -279,7 +279,7 @@ int *status         /* global status (given and returned) */
       }
       w = s1 * s2;
    }
-   else if ( conv_shape == 2 )          /* sinc(dx).sinc(dy) tapered */
+   else if ( conv_shape == CONV__SINCTAP )          /* sinc(dx).sinc(dy) tapered */
    {
       if ( fabs(dx) > 3.0 )
       {
@@ -309,7 +309,7 @@ int *status         /* global status (given and returned) */
       }
       w = s1 * s2;
    }
-   else if ( conv_shape == 3 )          /* sinc(dx).sinc(dy) delay tapered */
+   else if ( conv_shape == CONV__SINCDEL )   /* sinc(dx).sinc(dy) delay tapered */
    {
       if ( fabs(dx) > 3.0 )
       {
