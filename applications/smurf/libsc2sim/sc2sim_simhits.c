@@ -347,13 +347,6 @@ void sc2sim_simhits ( struct sc2sim_obs_struct *inx,
 
   }
 
-  /* KLUDGE TO REMOVE!!!!!! 
-  int pp;
-  for ( pp = 0; pp < count*2; pp++ ) {
-    printf ( "%f     ", posptr[pp++] );
-    printf ( "%F\n", posptr[pp] );
-    }*/
-   
   msgSeti( "COUNT", count );
   msgOutif( MSG__VERB, FUNC_NAME, 
 	    "Count = ^COUNT", status );
