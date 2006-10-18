@@ -141,6 +141,8 @@
 *        Fixed a sign error in the rotation of the map coordinate frame. 
 *     2006-10-17 (JB):
 *        Check for pong_type        
+*     2006-10-18 (AGG):
+*        Ensure jig_x/y coordinates are in the correct units (radians)
 *
 *     {enter_further_changes_here}
 
@@ -173,6 +175,7 @@
 #include <config.h>
 #endif
 
+/* Standard includes */
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -192,8 +195,13 @@
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "star/slalib.h"
+#include "f77.h"
 
+/* JCMT includes */
 #include "jcmt/state.h"
+#include "wvm/wvmCal.h" /* Water Vapor Monitor routines */
+
+/* SC2DA includes */
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
 #include "sc2da/sc2store.h"
@@ -201,15 +209,13 @@
 #include "sc2da/sc2math.h"
 #include "sc2da/sc2ast.h"
 
+/* Simulator includes */
 #include "sc2sim.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
 #include "libsmurf/smurflib.h"
 #include "libsmf/smf.h"
-#include "jcmt/state.h"
-#include "wvm/wvmCal.h" /* Water Vapor Monitor routines */
-#include "f77.h"
 
 #define FUNC_NAME "sc2sim_simulate"
 #define LEN__METHOD 20
@@ -277,10 +283,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int i;                          /* loop counter */
   double instap[2];               /* Focal plane instrument offsets */
   int j;                          /* loop counter */
-  double jigptr[SC2SIM__MXSIM][2]; /* pointing: nas jiggle offsets from cen. */
+  double jigptr[SC2SIM__MXSIM][2]; /* pointing: nas jiggle offsets from cen. 
+				      in ARCSEC */
   int jigsamples=1;               /* number of samples in jiggle pattern */
-  double *jig_y_hor=NULL;         /* jiggle y-horizontal tanplane offset */
-  double *jig_x_hor=NULL;         /* jiggle x-horizontal tanplane offset */
+  double *jig_y_hor=NULL;         /* jiggle y-horizontal tanplane offset (radians) */
+  double *jig_x_hor=NULL;         /* jiggle x-horizontal tanplane offset (radians) */
   int k;                          /* loop counter */
   double *lst=NULL;               /* local sidereal time at time step */
   double *mjuldate=NULL;          /* modified Julian date each sample */
@@ -671,7 +678,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         base_az[frame] = temp1;
         base_el[frame] = temp2;
         base_p[frame] = temp3;
-        
+
         /* The scan pattern (posptr) is defined as a series of offsets in
            the map coordinate frame. Depending on the frame chosen, project
            the pattern into AzEl and RADec so that it can be written to the
@@ -691,13 +698,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	    bor_y_nas*cos(base_el[frame]);
 	  
 	  /* Calculate jiggle offsets in horizontal coord. */
-	  jig_x_hor[frame] = (jigptr[frame%jigsamples][0]*cos(base_el[frame]) -
-			      jigptr[frame%jigsamples][1]*sin(base_el[frame]))*
-	    DR2AS;
+	  /* jigptr is in ARCSEC: jig_x/y_hor must be in RADIANS */
+	  jig_x_hor[frame] = DAS2R*(jigptr[frame%jigsamples][0]*cos(base_el[frame]) -
+			      jigptr[frame%jigsamples][1]*sin(base_el[frame]));
 	  
-	  jig_y_hor[frame] = (jigptr[frame%jigsamples][0]*sin(base_el[frame]) +
-			      jigptr[frame%jigsamples][1]*cos(base_el[frame]))/
-	    DR2AS;
+	  jig_y_hor[frame] = DAS2R*(jigptr[frame%jigsamples][0]*sin(base_el[frame]) +
+			      jigptr[frame%jigsamples][1]*cos(base_el[frame]));
+
 	  break;
 	  
 	case azel:
@@ -705,8 +712,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  bor_x_hor = (posptr[frame*2])*DAS2R;
 	  bor_y_hor = (posptr[frame*2+1])*DAS2R;
 
-	  jig_x_hor[frame] = jigptr[frame%jigsamples][0]*DR2AS;
-	  jig_y_hor[frame] = jigptr[frame%jigsamples][1]*DR2AS;
+	  /* jigptr is in ARCSEC: jig_x/y_hor must be in RADIANS */
+	  jig_x_hor[frame] = DAS2R*jigptr[frame%jigsamples][0];
+	  jig_y_hor[frame] = DAS2R*jigptr[frame%jigsamples][1];
 	  break;
 	  
 	case radec:
@@ -722,13 +730,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  bor_y_hor = bor_x_cel*sin(-base_p[frame]) + 
 	    bor_y_cel*cos(-base_p[frame]);
 	  
-	  jig_x_hor[frame] = (jigptr[frame%jigsamples][0]*cos(base_p[frame]) -
-			      jigptr[frame%jigsamples][1]*sin(base_p[frame]))*
-	    DR2AS;
+	  /* jigptr is in ARCSEC: jig_x/y_hor must be in RADIANS */
+	  jig_x_hor[frame] = DAS2R*(jigptr[frame%jigsamples][0]*cos(base_p[frame]) -
+			      jigptr[frame%jigsamples][1]*sin(base_p[frame]));
 	  
-	  jig_y_hor[frame] = (jigptr[frame%jigsamples][0]*sin(base_p[frame]) +
-			      jigptr[frame%jigsamples][1]*cos(base_p[frame]))/
-	    DR2AS;
+	  jig_y_hor[frame] = DAS2R*(jigptr[frame%jigsamples][0]*sin(base_p[frame]) +
+			      jigptr[frame%jigsamples][1]*cos(base_p[frame]));
 	  break;
 
 	default: 
@@ -788,7 +795,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         if( sky_el >= 1. * AST__DPI/180. )
           airmass[frame] = 1/sin(sky_el);
         else airmass[frame] = 1000.;
-        
         /* Calculate equatorial from horizontal */
         slaDh2e( bor_az[frame], bor_el[frame], phi, &temp1, &temp2 );
         temp1 = lst[frame] - temp1;
@@ -945,8 +951,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             head[j].wvm_t12 = tbri[0];
             head[j].wvm_t42 = tbri[1];
             head[j].wvm_t78 = tbri[2];
-            
-          }
+	  }
           
           /* For now just set to the last airmass calculated */
           sinx->airmass = airmass[firstframe+nwrite-1];
