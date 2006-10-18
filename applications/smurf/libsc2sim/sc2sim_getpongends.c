@@ -39,11 +39,14 @@
 
 *  Authors:
 *     J.Balfour (UBC)
+*     E.Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History :
 *     2006-09-29 (JB):
 *        Original
+*     2006-10-18 (EC):
+*        Re-written to use more concise algorithm
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -84,15 +87,12 @@
 
 #define FUNC_NAME "sc2sim_getpongends"
 
-/* Enumerated type for border */
-typedef enum {top, bot, left, right} bordertype;
-
 void sc2sim_getpongends
 ( 
 double width,          /* minimum width of scan (arcsec) */
 double height,         /* minimum height of scan (arcsec) */
 double spacing,        /* spacing of grid pattern (arcsec) */
-double grid[][2],     /* array of vertex coordinates */
+double grid[][2],      /* array of vertex coordinates */
 int *numvertices,      /* total number of vertices */
 int *status            /* pointer to global status */
 )
@@ -101,139 +101,126 @@ int *status            /* pointer to global status */
    /* Local variables */
 
    int i;                   /* loop counter */
+   double grid_space;       /* Spacing of grid points in tanplane coords. */
+   int n_seg;               /* Number of straight linesegs in pattern */
+   int steps;               /* total number of grid steps taken in pattern */
    double vert_spacing;     /* spacing along the vertices (arcsec) */
-   int x_count;             /* counter for x axis */
-   int x_dir;               /* flag for x direction */
+   double *xgrid=NULL;      /* LUT for x-tanplane coord. of grid points */
+   int x_init;              /* Starting x-grid coordinate in pattern */
+   int x_ngridseg;          /* Len. of box in x-dirn. measured in grid segs */ 
    int x_numvert;           /* number of vertices along x axis */
-   int x_temp;              /* temporary x value for "extra" bounces */
-   int y_count;             /* counter for y axis */
-   int y_dir;               /* flag for y direction */
+   int x_off;               /* current x-grid offset */ 
+   int x_refl;              /* number of reflections in x-direction */
+   double *ygrid=NULL;      /* LUT for y-tanplane coord. of grid points */
+   int y_init;              /* Starting y-grid coordinate in pattern */
+   int y_ngridseg;          /* Len. of box in y-dirn. measured in grid segs */ 
    int y_numvert;           /* number of vertices along y axis */
-   int y_temp;              /* temporary y value for "extra" bounces */
+   int y_off;               /* current y-grid offset */ 
+   int y_refl;              /* number of reflections in x-direction */
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
 
-   /* Calculate how many vertices there must be in each direction,
-      and how far apart they are */
+   /* Calculate how many vertices (reflection points) there must be in each 
+      direction,and how far apart they are */
+
    sc2sim_getpongvert ( width, height, spacing, &vert_spacing,
                         &x_numvert, &y_numvert, status );
 
+   /* The entire pattern is defined on a grid with points spaced half the
+      distance between adjacent vertices as calculated above along the same
+      side. Calculate spacing between these grid points and the length along
+      each side in units of grid_space sized segment. */
+
+   grid_space = vert_spacing / 2.;
+   x_ngridseg = x_numvert*2;
+   y_ngridseg = y_numvert*2;
+
+   /* The total number of straight line segments in the pattern */
+
+   n_seg = x_ngridseg + y_ngridseg;  
+
    /* Calculate the total number of vertices (count both the start
       and end points, which should be the same) */
-   *numvertices = ( 2 * x_numvert ) + ( 2 * y_numvert ) + 1;
 
-   /* The algorithm described below is dependent on which of the 
-      two dimensions is larger.  In the case of scan which is
-      wider than it is tall, the pattern determines the vertices
-      along the top and bottom of the "box" and adds extra 
-      vertices as needed for bounces of the sides of the box.
-      Similarly if the box is taller than it is wide, the 
-      vertices along the sides are added with extra vertices
-      added when the top or bottom is reached instead. */
+   *numvertices = n_seg+1;
 
-   if ( y_numvert < x_numvert ) {
+   /* Create arrays of x & y coords. of grid points along each dimension 
+    centered over (0,0) */
 
-     /* Box is wider than it is tall.  Start at the lower left
-         hand corner, on the bottom edge, moving up and to the 
-         right */
-      x_count = 1 - x_numvert;
-      y_count = 0 - y_numvert;
-      x_dir = 1;
-      y_dir = 1;
+   xgrid = smf_malloc( x_ngridseg, sizeof(*xgrid), 0, status );
+   ygrid = smf_malloc( y_ngridseg, sizeof(*ygrid), 0, status );
 
-      grid[0][0] = x_count * vert_spacing / 2;
-      grid[0][1] = y_count * vert_spacing / 2; 
+   if( *status == SAI__OK ) {
 
-      for ( i = 1; i < *numvertices; i++ ) {
-       
-         /* Assume we hit the top/bottom of the "box" */
-         x_count += x_dir * 2 * y_numvert;
-         y_count = y_dir * y_numvert;
+     for( i=0; i<x_ngridseg+1; i++ ) 
+       xgrid[i] = ((double) i - x_ngridseg/2.)*grid_space;
      
-         /* Check to see if we hit a side of the "box" instead */
-         if ( x_dir * x_count > x_numvert ) {
+     for( i=0; i<y_ngridseg+1; i++ ) 
+       ygrid[i] = ((double) i - y_ngridseg/2.)*grid_space;
+          
+     /* Initialization */
+     
+     x_init = 0;     /* starting grid coordinates for the pattern */
+     y_init = 1;
 
-            /* We hit a side wall, so we need to calculate an 
-               "extra" vertex for the bounce before finding
-	       the next top/bottom vertex */
-            x_temp = x_dir * x_numvert;
-            y_temp = y_count - ( y_dir * x_dir * ( x_count - x_temp ) );
+     x_off = x_init; /* current grid offsets */
+     y_off = y_init;
 
-            /* Record these vertices */
-            grid[i][0] = x_temp * vert_spacing / 2;
-            grid[i][1] = y_temp * vert_spacing / 2;
+     grid[0][0] = xgrid[x_init]; /* starting tplane offsets for the pattern */ 
+     grid[0][1] = ygrid[y_init];
 
-            i++;
+     steps = 0;   /* number of steps along the grid covered at start */
 
-            /* Get the next "top" or "bottom" vertex and change
-               x direction */
-            x_count = 2 * x_temp - x_count;
+     /* Loop over line segments in pattern and calculate list of endpoints
+	for each reflection in order */
 
-            x_dir *= -1; 
+     for( i=1; i<=n_seg; i++ ) {
 
-         }
+       /* increment steps to the next boundary reflection (whichever comes
+	  first - along the sides or top/bottom of the rectangle) */
+     
+       if( (x_ngridseg - x_off) <= (y_ngridseg - y_off) ) {       
+	 steps += x_ngridseg - x_off;   /* side reflection next */
+       } else {
+	 steps += y_ngridseg - y_off;   /* top/bottom reflection next */
+       }
 
-         /* Record these vertices */
-         grid[i][0] = x_count * vert_spacing / 2;
-         grid[i][1] = y_count * vert_spacing / 2;
+       /* Number of steps divided by number of grid segments along each side
+	  tells us how many reflections we've been through. */
 
-         /* Change y direction */
-         y_dir *= -1;
-   
-      }
+       x_refl = (steps+x_init) / x_ngridseg;
+       y_refl = (steps+y_init) / y_ngridseg;
 
-   } else {
+       /* The remainder is the grid offset */
 
-      /* Box is taller than it is wide.  Start at the lower left
-         hand corner, on the left edge, moving up and to the 
-         right */
-      x_count = 0 - x_numvert;
-      y_count = 1 - y_numvert;
-      x_dir = 1;
-      y_dir = 1;
+       x_off = (steps+x_init) % x_ngridseg;
+       y_off = (steps+y_init) % y_ngridseg;
 
-      grid[0][0] = x_count * vert_spacing / 2;
-      grid[0][1] = y_count * vert_spacing / 2; 
+       /* If the number of reflections is even, the offset is in the positive
+	  direction from the start of the lookup table. If it is odd, the 
+	  offset is in the negative direction from the end of the lookup 
+	  table. */
 
-      for ( i = 1; i < *numvertices; i++ ) {
+       if( !(x_refl % 2) ) {
+	 grid[i][0] = xgrid[x_off];             /* even reflections */
+       } else {
+	 grid[i][0] = xgrid[x_ngridseg-x_off];  /* odd reflections */
+       }
 
-         /* Assume we hit the side of the "box" */
-	 x_count = x_dir * x_numvert;
-         y_count += y_dir * 2 * x_numvert;
+       if( !(y_refl % 2) ) {
+	 grid[i][1] = ygrid[y_off];             /* even reflections */
+       } else {
+	 grid[i][1] = ygrid[y_ngridseg-y_off];  /* odd reflections */
+       }
 
-         /* Check to see if we hit the top/bottom of the "box" instead */
-         if ( y_dir * y_count > y_numvert ) {
+     }
 
-            /* We hit the top/bottom, so we need to calculate an 
-               "extra" vertex for the bounce before finding
-	       the next side vertex */
-	    y_temp = y_dir * y_numvert;
-	    x_temp = x_count - ( x_dir * y_dir * ( y_count - y_temp ) );
 
-            /* Record these vertices */
-            grid[i][0] = x_temp * vert_spacing / 2;
-            grid[i][1] = y_temp * vert_spacing / 2;
-
-            i++;
-
-            /* Get the next "side" vertex and change
-               y direction */
-            y_count = 2 * y_temp - y_count;
-
-            y_dir *= -1; 
-
-         }
-
-         /* Record these vertices */
-         grid[i][0] = x_count * vert_spacing / 2;
-         grid[i][1] = y_count * vert_spacing / 2;
-
-         /* Change x direction */
-         x_dir *= -1;
-   
-      }
+     /* Clean up */
+     
+     smf_free( xgrid );
+     smf_free( ygrid );
 
    }
-
 }
