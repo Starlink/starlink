@@ -113,6 +113,8 @@
 *     2006-09-22 (JB):
 *        Removed DREAM-specific code and replaced dxml_structs
 *        with sc2sim_structs
+*     2006-10-18 (AGG):
+*        Correct errors in airmass correction of sky flux
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -290,7 +292,6 @@ int *status                  /* global status (given and returned) */
 
        /* Calculate the elevation correction. */
        airmass = 1.0 / sin ( skycoord[nbol + bol] );
-
        xpos = position[0] + xbc[bol] + 0.5 * (double)astnaxes[0] * astscale;
        ypos = position[1] + ybc[bol] + 0.5 * (double)astnaxes[1] * astscale;
        
@@ -327,21 +328,18 @@ int *status                  /* global status (given and returned) */
        }
        
        /* Apply the elevation correction */
-       atmvalue = atmvalue * airmass;
+       atmvalue = atmvalue * ( 1.0 - exp(sinx.tauzen * airmass) );
        
        /* Calculate atmospheric transmission for this bolometer */
        sc2sim_atmtrans ( inx.lambda, atmvalue, &skytrans, status );
        
        if( *status == SAI__OK ) {
-	 atmvalue = atmvalue / airmass;
-	 
 	 /*  Add atmospheric and telescope emission.
 	     TELEMISSION is a constant value for all bolometers. */
 	 flux = 0.01 * skytrans * astvalue + atmvalue + telemission;
-       
-	 /*  Add offset due to photon noise */
        }	 
 
+       /*  Add offset due to photon noise */
        if ( sinx.add_pns == 1 ) {
          sc2sim_addpnoise ( inx.lambda, sinx.bandGHz, sinx.aomega, 
 		            samptime, &flux, status );
