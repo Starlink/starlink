@@ -154,19 +154,10 @@ int *status            /* pointer to global status */
       common factors */
    for ( i = 3; i < *least; i++ ) {
 
-     if ( ( ( *least % i ) == 0 ) && ( ( *most % i ) == 0 ) ) {
+      if ( ( ( *least % i ) == 0 ) && ( ( *most % i ) == 0 ) ) {
          /* Found a common factor, increment most and start over */
 	 (*most)++;
          i = 3;
-      }
-
-      /* Update which is least */ 
-      if ( *x_numvert >= *y_numvert ) {
-         most = x_numvert;
-         least = y_numvert;
-      } else {
-         most = y_numvert;
-         least = x_numvert;
       }
 
    }
