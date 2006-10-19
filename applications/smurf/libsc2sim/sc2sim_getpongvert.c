@@ -54,6 +54,9 @@
 *  History :
 *     2006-10-17 (JB):
 *        Original
+*     2006-10-19 (JB):
+*        Add error check, fix off-by-one error in checking 
+*        common factors
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -118,6 +121,13 @@ int *status            /* pointer to global status */
    /* Check status */
    if ( !StatusOkP(status) ) return;
 
+   if ( width == 0.0 || height == 0.0 || spacing == 0.0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Invalid PONG input parameters", 
+	     status);
+      return;
+   }
+
    /* Find out how far apart the vertices are along the axes */
    *vert_spacing = ( 2.0 * spacing ) / sqrt ( 2.0 );
 
@@ -152,11 +162,11 @@ int *status            /* pointer to global status */
    /* Check for common factors between the two, and adjust as 
       necessary until x_numvert and y_numvert do not share any
       common factors */
-   for ( i = 3; i < *least; i++ ) {
+   for ( i = 3; i <= *least; i++ ) {
 
       if ( ( ( *least % i ) == 0 ) && ( ( *most % i ) == 0 ) ) {
          /* Found a common factor, increment most and start over */
-	 (*most)++;
+         (*most) += 2;
          i = 3;
       }
 
