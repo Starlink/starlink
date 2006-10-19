@@ -47,6 +47,8 @@
 *        Original
 *     2006-10-18 (EC):
 *        Re-written to use more concise algorithm
+*     2006-10-19 (JB):
+*        Add status check after getpongvert
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -127,29 +129,33 @@ int *status            /* pointer to global status */
    sc2sim_getpongvert ( width, height, spacing, &vert_spacing,
                         &x_numvert, &y_numvert, status );
 
-   /* The entire pattern is defined on a grid with points spaced half the
-      distance between adjacent vertices as calculated above along the same
-      side. Calculate spacing between these grid points and the length along
-      each side in units of grid_space sized segment. */
+   if( *status == SAI__OK ) {
 
-   grid_space = vert_spacing / 2.;
-   x_ngridseg = x_numvert*2;
-   y_ngridseg = y_numvert*2;
+      /* The entire pattern is defined on a grid with points spaced half the
+         distance between adjacent vertices as calculated above along the same
+         side. Calculate spacing between these grid points and the length along
+         each side in units of grid_space sized segment. */
 
-   /* The total number of straight line segments in the pattern */
+      grid_space = vert_spacing / 2.;
+      x_ngridseg = x_numvert*2;
+      y_ngridseg = y_numvert*2;
 
-   n_seg = x_ngridseg + y_ngridseg;  
+      /* The total number of straight line segments in the pattern */
 
-   /* Calculate the total number of vertices (count both the start
-      and end points, which should be the same) */
+      n_seg = x_ngridseg + y_ngridseg;  
 
-   *numvertices = n_seg+1;
+      /* Calculate the total number of vertices (count both the start
+         and end points, which should be the same) */
 
-   /* Create arrays of x & y coords. of grid points along each dimension 
-    centered over (0,0) */
+      *numvertices = n_seg+1;
 
-   xgrid = smf_malloc( x_ngridseg, sizeof(*xgrid), 0, status );
-   ygrid = smf_malloc( y_ngridseg, sizeof(*ygrid), 0, status );
+      /* Create arrays of x & y coords. of grid points along each dimension 
+         centered over (0,0) */
+
+      xgrid = smf_malloc( x_ngridseg, sizeof(*xgrid), 0, status );
+      ygrid = smf_malloc( y_ngridseg, sizeof(*ygrid), 0, status );
+
+   }
 
    if( *status == SAI__OK ) {
 
