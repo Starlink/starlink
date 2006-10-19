@@ -1,5 +1,8 @@
   Latest changes:
 
+    Bug fix: order of baseline subtraction fixed to show the actual
+    default. 
+
     The grid overlay and celestial coordinate system toolboxes now
     support Horizon (azel) coordinates.
    
