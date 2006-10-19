@@ -315,7 +315,7 @@ itcl::class gaia::GaiaCubeBaseline {
    #  ----------------------
 
    #  Order of the polynomials.
-   itk_option define -order order Order 2
+   itk_option define -order order Order 1
 
    #  Number of ranges.
    itk_option define -nranges nranges Nranges 4
