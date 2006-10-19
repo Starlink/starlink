@@ -131,7 +131,7 @@
       INTEGER RANGES( NRANGE )
       LOGICAL USEVAR
       INTEGER DIMS( NDF__MXDIM )
-      <TYPE> VARS
+      <TYPE> VARS( * )
 
 *  Arguments Given and Returned:
       <TYPE> DATS( * )
