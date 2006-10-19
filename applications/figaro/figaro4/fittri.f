@@ -261,6 +261,7 @@
 *     ajlf: Amadeu Fernandes (UoE)
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -280,6 +281,8 @@
 *        Change ASCII file to type LIST instead of FORTRAN.
 *     2005 June 1 (MJC):
 *        Use CNF_PVAL for pointers to mapped data.
+*     2006 Oct 19 (TIMJ):
+*        Fix CNF_PVAL pointer offsetting
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -533,7 +536,7 @@
 *     Get residuals as difference of masked data minus guess data. Also
 *     need the range of residuals for plotting purposes.
          CALL VEC_SUBR( .FALSE., MSKELM,
-     :                  %VAL( CNF_PVAL(PNTR(4)+REALSZ*MSKELM) ),
+     :                  %VAL( CNF_PVAL(PNTR(4))+REALSZ*MSKELM ),
      :                  %VAL( CNF_PVAL(PNTR(8)) ),
      :                  %VAL( CNF_PVAL(PNTR(7)) ), I, J, STATUS )
          CALL SPD_UAAAR( .FALSE., MSKELM, %VAL( CNF_PVAL(PNTR(7)) ),
@@ -541,7 +544,7 @@
 
 *     Get masked 1/error as square root of weights. Can skip guess data.
          CALL VEC_SQRTR( .FALSE., MSKELM,
-     :                   %VAL( CNF_PVAL(PNTR(4)+2*REALSZ*MSKELM) ),
+     :                   %VAL( CNF_PVAL(PNTR(4))+2*REALSZ*MSKELM ),
      :                   %VAL( CNF_PVAL(PNTR(8)) ), I, J, STATUS )
 
 *     Multiply residuals with 1/error.

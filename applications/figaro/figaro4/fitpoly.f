@@ -190,6 +190,7 @@
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -207,6 +208,8 @@
 *        Open ASCII file as type LIST instead of FORTRAN.
 *     2005 June 1 (MJC):
 *        Use CNF_PVAL for pointers to mapped data.
+*     2006 Oct 19 (TIMJ):
+*        Fix CNF_PVAL pointer offsetting
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -438,11 +441,11 @@
          IFAIL2 = 0
          EPS = 0D0
          CALL PDA_DPOLFT( MSKELM,  %VAL( CNF_PVAL(PNTR(4)) ),
-     :                    %VAL( CNF_PVAL(PNTR(4)+DBLSIZ*MSKELM) ),
-     :                    %VAL( CNF_PVAL(PNTR(4)+2*DBLSIZ*MSKELM) ),
+     :                    %VAL( CNF_PVAL(PNTR(4))+DBLSIZ*MSKELM ),
+     :                    %VAL( CNF_PVAL(PNTR(4))+2*DBLSIZ*MSKELM ),
      :                    ORDER, NDEG, EPS, %VAL( CNF_PVAL(PNTR(5)) ),
      :                    IFAIL1, 
-     :                    %VAL( CNF_PVAL(PNTR(5)+DBLSIZ*NELM) ),
+     :                    %VAL( CNF_PVAL(PNTR(5))+DBLSIZ*NELM ),
      :                    IFAIL2 )
          STATUS = IFAIL2
          IF ( STATUS .NE. 0 ) THEN
@@ -464,7 +467,7 @@
          IF ( STATUS .NE. SAI__OK ) GO TO 500
          CALL ERR_MARK
          CALL PDA_DPCOEF( NDEG, 0D0, COEFF, 
-     :                    %VAL( CNF_PVAL(PNTR(5)+DBLSIZ*NELM) ),
+     :                    %VAL( CNF_PVAL(PNTR(5))+DBLSIZ*NELM ),
      :                    STATUS )
          IF ( STATUS .NE. 0 ) THEN
             CALL ERR_FLUSH( STATUS )
@@ -516,7 +519,7 @@
 
 *        Get single precision copy of masked data.
             CALL VEC_DTOR( .FALSE., MSKELM,
-     :                      %VAL( CNF_PVAL(PNTR(4)+DBLSIZ*MSKELM) ),
+     :                      %VAL( CNF_PVAL(PNTR(4))+DBLSIZ*MSKELM ),
      :                      %VAL( CNF_PVAL(PNTR(9)) ), I, J, STATUS )
 
 *        Get residuals as difference of masked data minus fit data. Also
@@ -529,7 +532,7 @@
 
 *        Get single precision copy of masked weights. Can skip fit data.
             CALL VEC_DTOR( .FALSE., MSKELM,
-     :                     %VAL( CNF_PVAL(PNTR(4)+2*DBLSIZ*MSKELM) ),
+     :                     %VAL( CNF_PVAL(PNTR(4))+2*DBLSIZ*MSKELM ),
      :                     %VAL( CNF_PVAL(PNTR(8)) ), I, J, STATUS )
 
 *        Multiply residuals with weights. Can skip masked data.
@@ -558,8 +561,8 @@
                CALL ERR_MARK
                DO 4 I = 1, PLTRES
                   CALL PDA_DP1VLU( NDEG, 0, DBLE(FITX(I)), DTEMP1,
-     :                             DTEMP2, %VAL( CNF_PVAL(PNTR(5)+
-     :                             DBLSIZ*NELM) ), STATUS )
+     :                             DTEMP2, %VAL( CNF_PVAL(PNTR(5))+
+     :                             DBLSIZ*NELM ), STATUS )
                   IF ( STATUS .NE. 0 ) THEN
                      CALL ERR_FLUSH( STATUS )
                      CALL ERR_ANNUL( STATUS )
