@@ -66,6 +66,7 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     timj: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -93,6 +94,9 @@
 *        longer fits polynomials. Remove ITER, Disable polynomials.
 *     27 Jan 1995 (hme):
 *        Rename from SPFSET.
+*     19 Oct 2006 (timj):
+*        Fix valgrind warning by only using NCOMP rather than MAXGAU
+*        when looping.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -188,7 +192,7 @@
       CALL PAR_DEF1R(   'FWHM', MAXGAU,  SIGMA, STATUS )
 
 *  Convert FWHM to dispersion.
-      DO 2 I = 1, MAXGAU
+      DO 2 I = 1, NCOMP
          SIGMA(I) = SIGMA(I) / RT8LN2
  2    CONTINUE
 
