@@ -60,7 +60,8 @@
 
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
-*     {enter_new_authors_here}
+*     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -68,6 +69,8 @@
 *        Original version.
 *     2005 May 31 (MJC):
 *        Use CNF_PVAL for pointers to mapped data.
+*     2006 Oct 19 (TIMJ):
+*        Fix CNF_PVAL pointer offsetting
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -314,14 +317,14 @@
      :           .EQ. 0 ) THEN
                CALL SPD_CZBE( NDF, AXIS, I, BADVAL, IMIN, IMAX,
      :                        OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
-     :                        WPTR+(J-1)*SNELM*INTESZ ) ), STATUS )
+     :                        WPTR)+(J-1)*SNELM*INTESZ ), STATUS )
             END IF
 
 *        Flag it as converted.
             CALL SPD_UAAFI( J, J, %VAL( CNF_PVAL( FPTR ) ), 1, STATUS )
 
 *        Display it.
-            CALL PGPIXL( %VAL( CNF_PVAL( WPTR+(J-1)*SNELM*INTESZ ) ),
+            CALL PGPIXL( %VAL( CNF_PVAL( WPTR ) +(J-1)*SNELM*INTESZ ),
      :                   IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
      :                   IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
 
@@ -359,14 +362,14 @@
      :           .EQ. 0 ) THEN
                CALL SPD_CZBE( NDF, AXIS, I, BADVAL, IMIN, IMAX,
      :                       OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
-     :                       WPTR+(J-1)*SNELM*INTESZ ) ), STATUS )
+     :                       WPTR ) +(J-1)*SNELM*INTESZ ), STATUS )
             END IF
 
 *        Flag it as converted.
             CALL SPD_UAAFI( J, J, %VAL( CNF_PVAL( FPTR ) ), 1, STATUS )
 
 *        Display it.
-            CALL PGPIXL( %VAL( CNF_PVAL( WPTR+(J-1)*SNELM*INTESZ ) ),
+            CALL PGPIXL( %VAL( CNF_PVAL( WPTR )+(J-1)*SNELM*INTESZ ),
      :                   IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
      :                   IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
 
@@ -411,14 +414,14 @@
      :        .EQ. 0 ) THEN
             CALL SPD_CZBE( NDF, AXIS, FRAME, BADVAL, IMIN, IMAX,
      :                     OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
-     :                     WPTR+(J-1)*SNELM*INTESZ ) ), STATUS )
+     :                     WPTR ) +(J-1)*SNELM*INTESZ ), STATUS )
          END IF
 
 *     Flag it as converted.
          CALL SPD_UAAFI( J, J, %VAL( CNF_PVAL( FPTR ) ), 1, STATUS )
 
 *     Display it.
-         CALL PGPIXL( %VAL( CNF_PVAL( WPTR+(J-1)*SNELM*INTESZ ) ),
+         CALL PGPIXL( %VAL( CNF_PVAL( WPTR )+(J-1)*SNELM*INTESZ ),
      :                IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
      :                IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
 
@@ -453,14 +456,14 @@
      :        .EQ. 0 ) THEN
             CALL SPD_CZBE( NDF, AXIS, FRAME, BADVAL, IMIN, IMAX,
      :                     OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
-     :                     WPTR+(J-1)*SNELM*INTESZ ) ), STATUS )
+     :                     WPTR ) +(J-1)*SNELM*INTESZ ), STATUS )
          END IF
 
 *     Flag it as converted.
          CALL SPD_UAAFI( J, J, %VAL( CNF_PVAL( FPTR ) ), 1, STATUS )
 
 *     Display it.
-         CALL PGPIXL( %VAL( CNF_PVAL( WPTR+(J-1)*SNELM*INTESZ ) ),
+         CALL PGPIXL( %VAL( CNF_PVAL( WPTR )+(J-1)*SNELM*INTESZ ),
      :               IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
      :               IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
 
@@ -479,7 +482,7 @@
      :           .EQ. 0 ) THEN
                CALL SPD_CZBE( NDF, AXIS, FRAME-1, BADVAL, IMIN, IMAX,
      :                        OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
-     :                        WPTR+(J-1)*SNELM*INTESZ ) ), STATUS )
+     :                        WPTR)+(J-1)*SNELM*INTESZ ), STATUS )
             END IF
             CALL SPD_UAAFI( J, J, %VAL( CNF_PVAL( FPTR ) ), 1, STATUS )
          END IF
@@ -508,14 +511,14 @@
      :        .EQ. 0 ) THEN
             CALL SPD_CZBE( NDF, AXIS, FRAME, BADVAL, IMIN, IMAX,
      :                     OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
-     :                     WPTR+(J-1)*SNELM*INTESZ ) ), STATUS )
+     :                     WPTR)+(J-1)*SNELM*INTESZ ), STATUS )
          END IF
 
 *     Flag it as converted.
          CALL SPD_UAAFI( J, J, %VAL( CNF_PVAL( FPTR ) ), 1, STATUS )
 
 *     Display it.
-         CALL PGPIXL( %VAL( CNF_PVAL( WPTR+(J-1)*SNELM*INTESZ ) ),
+         CALL PGPIXL( %VAL( CNF_PVAL( WPTR)+(J-1)*SNELM*INTESZ ),
      :                IMDIM(1), IMDIM(2), 1, IMDIM(1), 1, IMDIM(2),
      :                IMWIN(1), IMWIN(2), IMWIN(3), IMWIN(4) )
 
@@ -534,7 +537,7 @@
      :           .EQ. 0 ) THEN
                CALL SPD_CZBE( NDF, AXIS, FRAME+1, BADVAL, IMIN, IMAX,
      :                        OMIN, OMAX, SNELM, %VAL( CNF_PVAL(
-     :                        WPTR+(J-1)*SNELM*INTESZ ) ), STATUS )
+     :                        WPTR)+(J-1)*SNELM*INTESZ ), STATUS )
             END IF
             CALL SPD_UAAFI( J, J, %VAL( CNF_PVAL( FPTR ) ), 1, STATUS )
          END IF
