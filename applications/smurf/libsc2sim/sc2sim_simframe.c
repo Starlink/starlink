@@ -113,8 +113,8 @@
 *     2006-09-22 (JB):
 *        Removed DREAM-specific code and replaced dxml_structs
 *        with sc2sim_structs
-*     2006-10-18 (AGG):
-*        Correct errors in airmass correction of sky flux
+*     2006-10-19 (AGG):
+*        Correct error in airmass correction of sky flux (take 2)
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -328,7 +328,8 @@ int *status                  /* global status (given and returned) */
        }
        
        /* Apply the elevation correction */
-       atmvalue = atmvalue * ( 1.0 - exp(sinx.tauzen * airmass) );
+       atmvalue = atmvalue * ( 1.0 - exp(-sinx.tauzen * airmass) ) 
+	                   / ( 1.0 - exp(-sinx.tauzen) );
        
        /* Calculate atmospheric transmission for this bolometer */
        sc2sim_atmtrans ( inx.lambda, atmvalue, &skytrans, status );
