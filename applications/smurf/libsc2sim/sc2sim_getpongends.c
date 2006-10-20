@@ -49,6 +49,8 @@
 *        Re-written to use more concise algorithm
 *     2006-10-19 (JB):
 *        Add status check after getpongvert
+*     2006-10-20 (AGG):
+*        Include smf.h
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -80,9 +82,11 @@
 
 /* Starlink includes */
 #include "sae_par.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
+#include "libsmf/smf.h"
 
 /* SC2SIM includes */
 #include "sc2sim.h"
@@ -225,8 +229,8 @@ int *status            /* pointer to global status */
 
      /* Clean up */
      
-     smf_free( xgrid );
-     smf_free( ygrid );
+     smf_free( xgrid, status );
+     smf_free( ygrid, status );
 
    }
 }
