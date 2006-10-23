@@ -32,6 +32,7 @@
 *  Authors:
 *     J. Balfour (UBC)
 *     A.G. Gibb (UBC)
+*     E. Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -49,6 +50,8 @@
 *        inx.jigvert[][] now stored correctly.
 *     2006-10-16 (JB):
 *        Add pong_type
+*     2006-10-23 (EC):
+*        Don't free constant memory used by AST
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -110,14 +113,14 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    int nvert_x=0;         /* Number of jig_x vertices */
    int nvert_y=0;         /* Number of jig_Y vertices */
    double ra;             /* Double representation of RA */
-   const char *temp;      /* Temporary string for retrieving string values */
+   const char *temp=NULL; /* Pointer to static strings created by ast */
    int vert_x[SC2SIM__MXVERT]; /* Temporary array for x-vertices */
    int vert_y[SC2SIM__MXVERT]; /* Temporary array for y-vertices */
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
  
-   temp = smf_malloc ( SC2SIM__FLEN, sizeof (*temp), 1, status );
+   /*temp = smf_malloc ( SC2SIM__FLEN, sizeof (*temp), 1, status );*/
    convert = smf_malloc ( SC2SIM__FLEN, sizeof (*convert), 1, status );
 
    if ( !astMapGet0D ( keymap, "BOL_DISTX", &(inx->bol_distx) ) )
@@ -433,8 +436,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0D ( keymap, "TARGETPOW", &(inx->targetpow) ) )
       inx->targetpow = 25.0;
 
-   smf_free ( temp, status );
-   smf_free ( convert, status );
+   /* smf_free ( temp, status ); */
 
+   smf_free ( convert, status );
+   
 }
 

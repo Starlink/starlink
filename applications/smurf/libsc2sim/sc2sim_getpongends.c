@@ -51,6 +51,8 @@
 *        Add status check after getpongvert
 *     2006-10-20 (AGG):
 *        Include smf.h
+*     2006-10-23 (EC):
+*        Fixed off-by-one memory allocation error
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -128,7 +130,7 @@ int *status            /* pointer to global status */
    if ( !StatusOkP(status) ) return;
 
    /* Calculate how many vertices (reflection points) there must be in each 
-      direction,and how far apart they are */
+      direction, and how far apart they are */
 
    sc2sim_getpongvert ( width, height, spacing, &vert_spacing,
                         &x_numvert, &y_numvert, status );
@@ -138,7 +140,7 @@ int *status            /* pointer to global status */
       /* The entire pattern is defined on a grid with points spaced half the
          distance between adjacent vertices as calculated above along the same
          side. Calculate spacing between these grid points and the length along
-         each side in units of grid_space sized segment. */
+         each side in units of grid_space sized segments. */
 
       grid_space = vert_spacing / 2.;
       x_ngridseg = x_numvert*2;
@@ -154,10 +156,11 @@ int *status            /* pointer to global status */
       *numvertices = n_seg+1;
 
       /* Create arrays of x & y coords. of grid points along each dimension 
-         centered over (0,0) */
+         centered over (0,0) - note that this is 1 greater than the number
+         of grid segments along each side. */
 
-      xgrid = smf_malloc( x_ngridseg, sizeof(*xgrid), 0, status );
-      ygrid = smf_malloc( y_ngridseg, sizeof(*ygrid), 0, status );
+      xgrid = smf_malloc( x_ngridseg+1, sizeof(*xgrid), 0, status );
+      ygrid = smf_malloc( y_ngridseg+1, sizeof(*ygrid), 0, status );
 
    }
 
