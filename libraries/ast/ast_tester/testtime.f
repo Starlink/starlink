@@ -702,6 +702,26 @@ c
       end if
 
 
+*  Test use of DUT1
+      tf1 = ast_timeframe( 'system=mjd,timescale=tdb,dut1=0.1', status )
+      tf2 = ast_timeframe( 'system=mjd,timescale=last,dut1=0.1', 
+     :                      status )
+      fs = ast_convert( tf1, tf2, ' ', status )
+      if( fs .eq. AST__NULL ) then
+         call stopit( status, 'error 49' )
+      else 
+         xin = 53991.675D0
+         call ast_tran1( fs, 1, xin, .true., xout, status )
+         if( abs(xout - 53998.6534462938D0) .gt. 1.0D-8 ) then
+            write(*,*) xout 
+            call stopit( status, 'error 50' )
+         end if
+         call ast_tran1( fs, 1, xout, .false., xin, status )
+         if( abs( xin - 53991.675D0 ) .gt. 1.0D-8 ) then
+            write(*,*) xin
+            call stopit( status, 'error 51' )
+         end if
+      end if
 
 
 
