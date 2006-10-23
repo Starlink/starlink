@@ -45,6 +45,8 @@
 *  History:
 *     12-NOV-2002 (DSB):
 *        Original version.
+*     18-OCT-2006 (DSB):
+*        Added SpecOrigin.
 *-
 */
 
@@ -111,6 +113,8 @@ typedef struct AstSpecFrame {
    AstStdOfRestType sourcevrf;   /* Code identifying source vel. StdOfRest */
    int nuunits;                  /* Size of usedunits array */
    char **usedunits;             /* Last used units for each system */
+   double specorigin;            /* Origin for sectral values */ 
+   int alignspecoffset;          /* Align SpecFrame in offset coords? */
 } AstSpecFrame;
 
 /* Virtual function table. */
@@ -164,6 +168,17 @@ typedef struct AstSpecFrameVtab {
    int (* TestSourceVel)( AstSpecFrame * );
    void (* ClearSourceVel)( AstSpecFrame * );
    void (* SetSourceVel)( AstSpecFrame *, double );
+
+   double (* GetSpecOrigin)( AstSpecFrame * );
+   int (* TestSpecOrigin)( AstSpecFrame * );
+   void (* ClearSpecOrigin)( AstSpecFrame * );
+   void (* SetSpecOrigin)( AstSpecFrame *, double );
+
+   int (* GetAlignSpecOffset)( AstSpecFrame * );
+   int (* TestAlignSpecOffset)( AstSpecFrame * );
+   void (* ClearAlignSpecOffset)( AstSpecFrame * );
+   void (* SetAlignSpecOffset)( AstSpecFrame *, int );
+
 
 } AstSpecFrameVtab;
 #endif
@@ -239,6 +254,16 @@ double astGetSourceVel_( AstSpecFrame * );
 int astTestSourceVel_( AstSpecFrame * );
 void astClearSourceVel_( AstSpecFrame * );
 void astSetSourceVel_( AstSpecFrame *, double );
+
+double astGetSpecOrigin_( AstSpecFrame * );
+int astTestSpecOrigin_( AstSpecFrame * );
+void astClearSpecOrigin_( AstSpecFrame * );
+void astSetSpecOrigin_( AstSpecFrame *, double );
+
+int astGetAlignSpecOffset_( AstSpecFrame * );
+int astTestAlignSpecOffset_( AstSpecFrame * );
+void astClearAlignSpecOffset_( AstSpecFrame * );
+void astSetAlignSpecOffset_( AstSpecFrame *, int );
 
 #endif
 
@@ -332,6 +357,18 @@ astINVOKE(O,astLoadSpecFrame_(mem,size,vtab,name,astCheckChannel(channel)))
 #define astTestSourceVel(this) astINVOKE(V,astTestSourceVel_(astCheckSpecFrame(this)))
 #define astClearSourceVel(this) astINVOKE(V,astClearSourceVel_(astCheckSpecFrame(this)))
 #define astSetSourceVel(this,value) astINVOKE(V,astSetSourceVel_(astCheckSpecFrame(this),value))
+
+#define astGetSpecOrigin(this) astINVOKE(V,astGetSpecOrigin_(astCheckSpecFrame(this)))
+#define astTestSpecOrigin(this) astINVOKE(V,astTestSpecOrigin_(astCheckSpecFrame(this)))
+#define astClearSpecOrigin(this) astINVOKE(V,astClearSpecOrigin_(astCheckSpecFrame(this)))
+#define astSetSpecOrigin(this,value) astINVOKE(V,astSetSpecOrigin_(astCheckSpecFrame(this),value))
+
+#define astClearAlignSpecOffset(this) astINVOKE(V,astClearAlignSpecOffset_(astCheckSpecFrame(this)))
+#define astGetAlignSpecOffset(this) astINVOKE(V,astGetAlignSpecOffset_(astCheckSpecFrame(this)))
+#define astSetAlignSpecOffset(this,value) astINVOKE(V,astSetAlignSpecOffset_(astCheckSpecFrame(this),value))
+#define astTestAlignSpecOffset(this) astINVOKE(V,astTestAlignSpecOffset_(astCheckSpecFrame(this)))
+
+
 
 #endif
 #endif
