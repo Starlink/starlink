@@ -31,6 +31,7 @@
 
 *  Authors:
 *     J. Balfour (UBC)
+*     E. Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -38,6 +39,8 @@
 *        Original
 *     2006-10-04 (JB):
 *        Replace strcpy with strncpy
+*     2006-10-23 (EC):
+*        Don't free constant memory used by AST
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -81,12 +84,13 @@
 void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx, 
                         int *status ) {
 
-   const char *temp;       /* Temporary string for retrieving string values */
+  const char *temp=NULL; /* Pointer to static strings created by ast */
  
    /* Check status */
    if ( !StatusOkP(status) ) return;
 
-   temp = smf_malloc ( SC2SIM__FLEN, sizeof (*temp), 1, status );
+   
+   /* temp = smf_malloc ( SC2SIM__FLEN, sizeof (*temp), 1, status ); */
  
    if ( !astMapGet0I ( keymap, "ADD_ATM", &(sinx->add_atm) ) )
       sinx->add_atm = 0;
@@ -211,7 +215,7 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
    if ( !astMapGet0D ( keymap, "YPOINT", &(sinx->ypoint) ) )
       sinx->ypoint = 20.0;
 
-   smf_free ( temp, status );
+   /*smf_free ( temp, status );*/
 
 }
 
