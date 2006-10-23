@@ -101,6 +101,8 @@
 *        Removed Equation of Equinoxes from the SkyFrame structure.
 *        Added dut1 to the SkyFrame structure.
 *        Added Dut1 accessor methods.
+*     14-OCT-2006 (DSB):
+*        Moved dut1 to the Frame class.
 *-
 */
 
@@ -146,7 +148,6 @@ typedef struct AstSkyFrame {
 
 /* Attributes specific to objects in this class. */
    char *projection;             /* Description of sky projection */
-   double dut1;                  /* UT1-UTC in seconds */
    double equinox;               /* Modified Julian Date of mean equinox */
    int neglon;                   /* Display negative longitude values? */
    int alignoffset;              /* Align SkyFrame in offset coords? */
@@ -172,24 +173,20 @@ typedef struct AstSkyFrameVtab {
 
 /* Properties (e.g. methods) specific to this class. */
    const char *(* GetProjection)( AstSkyFrame * );
-   double (* GetDut1)( AstSkyFrame * );
    double (* GetEquinox)( AstSkyFrame * );
    int (* GetNegLon)( AstSkyFrame * );
    int (* GetAsTime)( AstSkyFrame *, int );
    int (* GetLatAxis)( AstSkyFrame * );
    int (* GetLonAxis)( AstSkyFrame * );
    int (* TestAsTime)( AstSkyFrame *, int );
-   int (* TestDut1)( AstSkyFrame * );
    int (* TestEquinox)( AstSkyFrame * );
    int (* TestNegLon)( AstSkyFrame * );
    int (* TestProjection)( AstSkyFrame * );
    void (* ClearAsTime)( AstSkyFrame *, int );
-   void (* ClearDut1)( AstSkyFrame * );
    void (* ClearEquinox)( AstSkyFrame * );
    void (* ClearNegLon)( AstSkyFrame * );
    void (* ClearProjection)( AstSkyFrame * );
    void (* SetAsTime)( AstSkyFrame *, int, int );
-   void (* SetDut1)( AstSkyFrame *, double );
    void (* SetEquinox)( AstSkyFrame *, double );
    void (* SetNegLon)( AstSkyFrame *, int );
    void (* SetProjection)( AstSkyFrame *, const char * );
@@ -288,10 +285,6 @@ int astTestSkyRefP_( AstSkyFrame *, int );
 void astClearSkyRefP_( AstSkyFrame *, int );
 void astSetSkyRefP_( AstSkyFrame *, int, double );
 
-double astGetDut1_( AstSkyFrame * );
-int astTestDut1_( AstSkyFrame * );
-void astClearDut1_( AstSkyFrame * );
-void astSetDut1_( AstSkyFrame *, double );
 
 #endif
 
@@ -403,11 +396,6 @@ astINVOKE(V,astTestProjection_(astCheckSkyFrame(this)))
 #define astGetSkyRefP(this,axis) astINVOKE(V,astGetSkyRefP_(astCheckSkyFrame(this),axis))
 #define astSetSkyRefP(this,axis,value) astINVOKE(V,astSetSkyRefP_(astCheckSkyFrame(this),axis,value))
 #define astTestSkyRefP(this,axis) astINVOKE(V,astTestSkyRefP_(astCheckSkyFrame(this),axis))
-
-#define astClearDut1(this) astINVOKE(V,astClearDut1_(astCheckSkyFrame(this)))
-#define astGetDut1(this) astINVOKE(V,astGetDut1_(astCheckSkyFrame(this)))
-#define astSetDut1(this,value) astINVOKE(V,astSetDut1_(astCheckSkyFrame(this),value))
-#define astTestDut1(this) astINVOKE(V,astTestDut1_(astCheckSkyFrame(this)))
 
 #endif
 #endif

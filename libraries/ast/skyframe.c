@@ -39,7 +39,6 @@ f     display by using AST_FORMAT.
 *
 *     - AlignOffset: Align SkyFrames using the offset coordinate system? 
 *     - AsTime(axis): Format celestial coordinates as times?
-*     - Dut1: Difference between the UT1 and UTC timescale
 *     - Equinox: Epoch of the mean equinox
 *     - LatAxis: Index of the latitude axis
 *     - LonAxis: Index of the longitude axis
@@ -179,6 +178,9 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Use "AlOff" instead of "AlignOffset" as the external channel name
 *        for the AlignOffset attribute. The longer form exceeded the
 *        limit that can be used by the Channel class.
+*     14-OCT-2006 (DSB):
+*        - Move Dut1 attribute to the Frame class.
+*        - Use the TimeFrame class to do the TDB->LAST conversions.
 *class--
 */
 
@@ -578,8 +580,9 @@ int astTest##attr##_( AstSkyFrame *this, int axis ) { \
 #include "matrixmap.h"           /* Matrix multiplication */
 #include "sphmap.h"              /* Cartesian<->Spherical transformations */
 #include "skyframe.h"            /* Interface definition for this class */
-#include "pal.h"              /* SLALIB library interface */
+#include "pal.h"                 /* SLALIB library interface */
 #include "wcsmap.h"              /* Factors of PI */
+#include "timeframe.h"           /* Time system transformations */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -664,6 +667,11 @@ static double deg2rad;
 static double pi;
 static double piby2;
 
+/* TimeFrames for doing TDB<->LAST conversions. */
+static AstTimeFrame *tdbframe = NULL;
+static AstTimeFrame *lastframe = NULL;
+
+
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstLineDef *LineDef( AstFrame *, const double[2], const double[2] );
@@ -688,7 +696,6 @@ static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
 static double GetBottom( AstFrame *, int );
 static double GetEpoch( AstFrame * );
-static double GetDut1( AstSkyFrame * );
 static double GetEquinox( AstSkyFrame * );
 static void SetLast( AstSkyFrame * );
 static double GetTop( AstFrame *, int );
@@ -711,14 +718,12 @@ static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstM
 static int TestActiveUnit( AstFrame * );
 static int TestAsTime( AstSkyFrame *, int );
 static int TestAttrib( AstObject *, const char * );
-static int TestDut1( AstSkyFrame * );
 static int TestEquinox( AstSkyFrame * );
 static int TestNegLon( AstSkyFrame * );
 static int TestProjection( AstSkyFrame * );
 static int Unformat( AstFrame *, int, const char *, double * );
 static void ClearAsTime( AstSkyFrame *, int );
 static void ClearAttrib( AstObject *, const char * );
-static void ClearDut1( AstSkyFrame * );
 static void ClearEquinox( AstSkyFrame * );
 static void ClearNegLon( AstSkyFrame * );
 static void ClearObsLon( AstFrame * );
@@ -735,7 +740,6 @@ static void Overlay( AstFrame *, const int *, AstFrame * );
 static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
 static void SetAsTime( AstSkyFrame *, int, int );
 static void SetAttrib( AstObject *, const char * );
-static void SetDut1( AstSkyFrame *, double );
 static void SetEquinox( AstSkyFrame *, double );
 static void SetMaxAxes( AstFrame *, int );
 static void SetMinAxes( AstFrame *, int );
@@ -1008,11 +1012,6 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* -------- */
    } else if ( !strcmp( attrib, "equinox" ) ) {
       astClearEquinox( this );
-
-/* Dut1 */
-/* --- */
-   } else if ( !strcmp( attrib, "dut1" ) ) {
-      astClearDut1( this );
 
 /* NegLon. */
 /* ------- */
@@ -1759,15 +1758,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          result = astFmtDecimalYr( ( equinox < palSlaEpj2d( 1984.0 ) ) ?
                                    palSlaEpb( equinox ) : palSlaEpj( equinox ),
                                    DBL_DIG );
-      }
-
-/* Dut1. */
-/* ---- */
-   } else if ( !strcmp( attrib, "dut1" ) ) {
-      dval = astGetDut1( this );
-      if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
       }
 
 /* LatAxis */
@@ -3535,24 +3525,20 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
    vtab->ClearAsTime = ClearAsTime;
-   vtab->ClearDut1 = ClearDut1;
    vtab->ClearEquinox = ClearEquinox;
    vtab->ClearNegLon = ClearNegLon;
    vtab->ClearProjection = ClearProjection;
    vtab->GetAsTime = GetAsTime;
-   vtab->GetDut1 = GetDut1;
    vtab->GetEquinox = GetEquinox;
    vtab->GetNegLon = GetNegLon;
    vtab->GetLatAxis = GetLatAxis;
    vtab->GetLonAxis = GetLonAxis;
    vtab->GetProjection = GetProjection;
    vtab->SetAsTime = SetAsTime;
-   vtab->SetDut1 = SetDut1;
    vtab->SetEquinox = SetEquinox;
    vtab->SetNegLon = SetNegLon;
    vtab->SetProjection = SetProjection;
    vtab->TestAsTime = TestAsTime;
-   vtab->TestDut1 = TestDut1;
    vtab->TestEquinox = TestEquinox;
    vtab->TestNegLon = TestNegLon;
    vtab->TestProjection = TestProjection;
@@ -6217,7 +6203,6 @@ static void Overlay( AstFrame *template, const int *template_axes,
    }         
 
 /* Use the macro to transfer each SkyFrame attribute in turn. */
-      OVERLAY(Dut1);
       OVERLAY(Equinox);
       OVERLAY(Projection);
       OVERLAY(NegLon);
@@ -6870,13 +6855,6 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         && ( nc >= len ) ) {
       astSetAsTime( this, axis - 1, astime );
 
-/* Dut1. */
-/* ---- */
-   } else if ( nc = 0,
-        ( 1 == astSscanf( setting, "dut1= %lg %n", &dval, &nc ) )
-        && ( nc >= len ) ) {
-      astSetDut1( this, dval );
-
 /* Equinox. */
 /* -------- */
    } else if ( nc = 0,
@@ -7058,35 +7036,49 @@ static void SetLast( AstSkyFrame *this ) {
 */
 
 /* Local Variables: */
-   double day;        /* The MJD day number */
+   AstFrameSet *fs;   /* Mapping from TDB offset to LAST offset */
    double epoch;      /* Epoch as a TDB MJD */
-   double tai;        /* The time of day as a TAI fractional day */
-   double tdb;        /* The time of day as a TDB fractional day */
-   double ut1;        /* The time of day as a UT1 fractional day */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Get the Epoch as a TDB MJD. Split it up into whole days and fractional
-   day parts for greater accuracy in the following conversions. */
+/* Create two TimeFrames if this has not already been done. */
+   if( ! tdbframe ) {
+      astBeginPM;
+      tdbframe = astTimeFrame( "system=mjd,timescale=tdb" );
+      lastframe = astTimeFrame( "system=mjd,timescale=last" );
+      astEndPM;
+   }
+
+/* Get the SkyFrame Epoch as a TDB MJD. */
    epoch = astGetEpoch( this );
-   day = (int) epoch;
-   tdb = epoch - day;
 
-/* We assume that TDB is a close approximation to TT. So convert to TAI
-   by subtracting 32.184 seconds. */
-   tai = tdb - 32.184/86400.0;
+/* For better accuracy, use this integer part of the epoch as the origin of the two         TimeFrames. */
+   astSetTimeOrigin( tdbframe, (int) epoch );
+   astSetTimeOrigin( lastframe, (int) epoch );
 
-/* Convert TAI to UT1 (i.e. include leap seconds and the UT1-UTC correction). */
-   ut1 = tai + ( astDat( day + tai, 0 ) + astGetDut1( this ) )/86400.0;
+/* Convert the absolute Epoch value to an offset from the above origin. */
+   epoch -= (int) epoch;
 
-/* Compute the Greenwich mean sidereal time, and add on the east longitude 
-   and the equation of equinoxes (no correction is done for polar motion). 
-   Store the resulting lAST value in the SkyFrame structure, together
-   with the TDB epoch. */
-   this->last = palSlaGmsta( day, ut1 ) + astGetObsLon( this ) 
-                + palSlaEqeqx( epoch );
-   this->eplast = epoch;
+/* Store the observers position in the two TimeFrames. */
+   astSetObsLon( tdbframe, astGetObsLon( this ) );
+   astSetObsLon( lastframe, astGetObsLon( this ) );
+
+   astSetObsLat( tdbframe, astGetObsLat( this ) );
+   astSetObsLat( lastframe, astGetObsLat( this ) );
+
+/* Get the conversion from tdb mjd offset to last mjd offset. */
+   fs = astConvert( tdbframe, lastframe, "" );
+
+/* Use it to transform the SkyFrame Epoch from TDB offset to LAST offset. */
+   astTran1( fs, 1, &epoch, 1, &epoch );
+   fs = astAnnul( fs );
+
+/* Convert the LAST offset from days to radians. */
+   this->last = ( epoch - (int) epoch )*2*AST__DPI;
+
+/* Save the TDB MJD to which this LAST corresponds. */
+   this->eplast = astGetEpoch( this );
 }
 
 static void SetMaxAxes( AstFrame *this_frame, int maxaxes ) {
@@ -8204,11 +8196,6 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
         && ( nc >= len ) ) {
       result = astTestAsTime( this, axis - 1 );
 
-/* Dut1. */
-/* ---- */
-   } else if ( !strcmp( attrib, "dut1" ) ) {
-      result = astTestDut1( this );
-
 /* Equinox. */
 /* -------- */
    } else if ( !strcmp( attrib, "equinox" ) ) {
@@ -8807,53 +8794,6 @@ astMAKE_TEST(SkyFrame,Equinox,( this->equinox != AST__BAD ))
 /*
 *att++
 *  Name:
-*     Dut1
-
-*  Purpose:
-*     The UT1-UTC correction.
-
-*  Type:
-*     Public attribute.
-
-*  Synopsis:
-*     Floating point.
-
-*  Description:
-*     This attribute is used when calculating the Local Apparent Sidereal
-*     Time corresponding to SkyFrame's Epoch value (used when converting
-*     positions to or from the "AzEl" system). It should be set to the 
-*     difference, in seconds, between the UT1 and UTC timescales at the 
-*     moment in time represented by the SkyFrame's Epoch attribute. The 
-*     value to use is unpredictable and depends on changes in the earth's 
-*     rotation speed. Values for UT1-UTC can be obtained from the 
-*     International Earth Rotation and Reference Systems Service 
-*     (IERS) at http://www.iers.org/.
-*
-*     Currently, the correction is always less than 1 second. This is
-*     ensured by the occasional introduction of leap seconds into the UTC
-*     timescale. Therefore no great error will usually result if no value
-*     is assigned to this attribute (in which case a default value of
-*     zero is used). However, it is possible that a decision may be taken
-*     at some time in the future to abandon the introduction of leap
-*     seconds, in which case the DUT correction could grow to significant 
-*     sizes.
-
-*  Applicability:
-*     SkyFrame
-*        All SkyFrames have this attribute.
-
-*att--
-*/
-/* The UT1-UTC correction, in seconds. Has a value of AST__BAD when not set 
-   yielding a default value of 0.0. */
-astMAKE_CLEAR(SkyFrame,Dut1,dut1,AST__BAD)
-astMAKE_GET(SkyFrame,Dut1,double,0.0,(this->dut1 == AST__BAD ? 0.0 : this->dut1))
-astMAKE_SET(SkyFrame,Dut1,double,dut1,value)
-astMAKE_TEST(SkyFrame,Dut1,( this->dut1 != AST__BAD ))
-
-/*
-*att++
-*  Name:
 *     LatAxis
 
 *  Purpose:
@@ -9369,12 +9309,6 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
                 ival ? "Display negative longitude values" :
                        "Display positive longitude values" );
 
-/* Dut1*/
-/* ---- */
-   set = TestDut1( this );
-   dval = set ? GetDut1( this ) : astGetDut1( this );
-   astWriteDouble( channel, "Dut1", set, 0, dval, "UT1-UTC in seconds" );
-
 /* Equinox. */
 /* -------- */
    set = TestEquinox( this );
@@ -9619,7 +9553,6 @@ AstSkyFrame *astInitSkyFrame_( void *mem, size_t size, int init,
 /* Initialise the SkyFrame data. */
 /* ----------------------------- */
 /* Initialise all attributes to their "undefined" values. */
-      new->dut1 = AST__BAD;
       new->equinox = AST__BAD;
       new->projection = NULL;
       new->neglon = -INT_MAX;
@@ -9863,11 +9796,6 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 /* Projection. */
 /* ----------- */
       new->projection = astReadString( channel, "proj", NULL );
-
-/* Dut1. */
-/* ---- */
-      new->dut1 = astReadDouble( channel, "dut1", AST__BAD );
-      if ( TestDut1( new ) ) SetDut1( new, new->dut1 );
 
 /* Equinox. */
 /* -------- */
