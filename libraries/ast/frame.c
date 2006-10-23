@@ -41,6 +41,7 @@ f     AST_FRAME
 *     - Digits/Digits(axis): Number of digits of precision
 *     - Direction(axis): Display axis in conventional direction?
 *     - Domain: Coordinate system domain
+*     - Dut1: Difference between the UT1 and UTC timescale
 *     - Epoch: Epoch of observation
 *     - Format(axis): Format specification for axis values
 *     - Label(axis): Axis label
@@ -228,6 +229,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     5-OCT-2006 (DSB):
 *        Increase the number of digits used when formating a ObsLon or 
 *        ObsLat value in GetAttrib.
+*     14-OCT-2006 (DSB):
+*        - Add Dut1 attribute
 *class--
 */
 
@@ -748,6 +751,11 @@ static double GetObsLon( AstFrame * );
 static int TestObsLon( AstFrame * );
 static void ClearObsLon( AstFrame * );
 static void SetObsLon( AstFrame *, double );
+
+static double GetDut1( AstFrame * );
+static int TestDut1( AstFrame * );
+static void ClearDut1( AstFrame * );
+static void SetDut1( AstFrame *, double );
 
 static int GetActiveUnit( AstFrame * );
 static int TestActiveUnit( AstFrame * );
@@ -1898,6 +1906,11 @@ L1:
 /* ------- */
    } else if ( !strcmp( attrib, "obslon" ) ) {
       astClearObsLon( this );
+
+/* Dut1 */
+/* --- */
+   } else if ( !strcmp( attrib, "dut1" ) ) {
+      astClearDut1( this );
 
 /* Read-only attributes. */
 /* --------------------- */
@@ -4310,6 +4323,15 @@ L1:
 
       }
 
+/* Dut1. */
+/* ---- */
+   } else if ( !strcmp( attrib, "dut1" ) ) {
+      dval = astGetDut1( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
+         result = buff;
+      }
+
 /* Other axis attributes. */
 /* ---------------------- */
 /* If the attribute was not identified above, but appears to refer to
@@ -4960,6 +4982,11 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    vtab->TestObsLon = TestObsLon;
    vtab->GetObsLon = GetObsLon;
    vtab->SetObsLon = SetObsLon;
+
+   vtab->ClearDut1 = ClearDut1;
+   vtab->GetDut1 = GetDut1;
+   vtab->SetDut1 = SetDut1;
+   vtab->TestDut1 = TestDut1;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -6391,6 +6418,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
    }
 
 /* Use the macro to transfer each Frame attribute in turn. */
+   OVERLAY(Dut1);
    OVERLAY(Digits);
    OVERLAY(Domain);
    OVERLAY(Epoch);
@@ -8225,6 +8253,14 @@ L1:
                    setting + off );
       }
 
+/* Dut1. */
+/* ---- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "dut1= %lg %n", &dval, &nc ) )
+        && ( nc >= len ) ) {
+      astSetDut1( this, dval );
+
+
 /* Read-only attributes. */
 /* --------------------- */
 /* Define a macro to see if the setting string matches any of the
@@ -9220,6 +9256,11 @@ L1:
    } else if ( !strcmp( attrib, "obslon" ) ) {
       result = astTestObsLon( this );
 
+/* Dut1. */
+/* ---- */
+   } else if ( !strcmp( attrib, "dut1" ) ) {
+      result = astTestDut1( this );
+
 /* Read-only attributes. */
 /* --------------------- */
 /* Test if the attribute name matches any of the read-only attributes
@@ -9895,6 +9936,55 @@ MAKE_CLEAR(Direction)
 MAKE_GET(Direction,int,0,0,0)
 MAKE_SET(Direction,int)
 MAKE_TEST(Direction)
+
+/*
+*att++
+*  Name:
+*     Dut1
+
+*  Purpose:
+*     The UT1-UTC correction.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Floating point.
+
+*  Description:
+*     This attribute is used when calculating the Local Apparent Sidereal
+*     Time corresponding to SkyFrame's Epoch value (used when converting
+*     positions to or from the "AzEl" system). It should be set to the 
+*     difference, in seconds, between the UT1 and UTC timescales at the 
+*     moment in time represented by the SkyFrame's Epoch attribute. The 
+*     value to use is unpredictable and depends on changes in the earth's 
+*     rotation speed. Values for UT1-UTC can be obtained from the 
+*     International Earth Rotation and Reference Systems Service 
+*     (IERS) at http://www.iers.org/.
+*
+*     Currently, the correction is always less than 1 second. This is
+*     ensured by the occasional introduction of leap seconds into the UTC
+*     timescale. Therefore no great error will usually result if no value
+*     is assigned to this attribute (in which case a default value of
+*     zero is used). However, it is possible that a decision may be taken
+*     at some time in the future to abandon the introduction of leap
+*     seconds, in which case the DUT correction could grow to significant 
+*     sizes.
+
+*  Applicability:
+*     Frame
+*        All Frames have this attribute.
+
+*att--
+*/
+/* The UT1-UTC correction, in seconds. Has a value of AST__BAD when not set 
+   yielding a default value of 0.0. */
+astMAKE_CLEAR(Frame,Dut1,dut1,AST__BAD)
+astMAKE_GET(Frame,Dut1,double,0.0,(this->dut1 == AST__BAD ? 0.0 : this->dut1))
+astMAKE_SET(Frame,Dut1,double,dut1,value)
+astMAKE_TEST(Frame,Dut1,( this->dut1 != AST__BAD ))
+
+
 
 /*
 *att++
@@ -11928,6 +12018,13 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    dval = set ? GetObsLon( this ) : astGetObsLon( this );
    astWriteDouble( channel, "ObsLon", set, 0, dval, "Observers geodetic longitude (rads)" );
 
+/* Dut1*/
+/* ---- */
+   set = TestDut1( this );
+   dval = set ? GetDut1( this ) : astGetDut1( this );
+   astWriteDouble( channel, "Dut1", set, 0, dval, "UT1-UTC in seconds" );
+
+
 /* ActiveUnit. */
 /* ----------- */
       if( astTestActiveUnit( this ) ) {
@@ -12208,6 +12305,7 @@ AstFrame *astInitFrame_( void *mem, size_t size, int init,
          new->active_unit = -INT_MAX;
          new->obslat = AST__BAD;
          new->obslon = AST__BAD;
+         new->dut1 = AST__BAD;
 
 /* Allocate memory to store pointers to the Frame's Axis objects and to store
    its axis permutation array. */
@@ -12542,13 +12640,18 @@ AstFrame *astLoadFrame_( void *mem, size_t size,
 
 /* ObsLat. */
 /* ------- */
-      new->obslat = astReadDouble( channel, "obslat", AST__BAD );
-      if ( TestObsLat( new ) ) SetObsLat( new, new->obslat );
+         new->obslat = astReadDouble( channel, "obslat", AST__BAD );
+         if ( TestObsLat( new ) ) SetObsLat( new, new->obslat );
 
 /* ObsLon. */
 /* ------- */
-      new->obslon = astReadDouble( channel, "obslon", AST__BAD );
-      if ( TestObsLon( new ) ) SetObsLon( new, new->obslon );
+         new->obslon = astReadDouble( channel, "obslon", AST__BAD );
+         if ( TestObsLon( new ) ) SetObsLon( new, new->obslon );
+
+/* Dut1. */
+/* ---- */
+         new->dut1 = astReadDouble( channel, "dut1", AST__BAD );
+         if ( TestDut1( new ) ) SetDut1( new, new->dut1 );
 
 /* ActiveUnit. */
 /* ----------- */

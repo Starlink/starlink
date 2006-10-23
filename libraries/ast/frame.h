@@ -525,6 +525,9 @@
 *        Added protected astIsAUnitFrame method.
 *     12-AUG-2005 (DSB):
 *        Added ObsLat and ObsLon attributes.
+*     14-OCT-2006 (DSB):
+*        Added dut1 to the Frame structure.
+*        Added Dut1 accessor methods.
 *-
 */
 
@@ -577,6 +580,7 @@ typedef struct AstFrame {
    double epoch;                 /* Epoch as Modified Julian Date */
    double obslat;                /* Geodetic latitude of observer */
    double obslon;                /* Geodetic longitude of observer */
+   double dut1;                  /* UT1-UTC in seconds */
    int *perm;                    /* Pointer to axis permutation array */
    int digits;                   /* Default digits of precision */
    int match_end;                /* Match final axes of target? */
@@ -758,6 +762,11 @@ typedef struct AstFrameVtab {
    int (* TestObsLat)( AstFrame * );
    void (* ClearObsLat)( AstFrame * );
    void (* SetObsLat)( AstFrame *, double );
+
+   double (* GetDut1)( AstFrame * );
+   int (* TestDut1)( AstFrame * );
+   void (* ClearDut1)( AstFrame * );
+   void (* SetDut1)( AstFrame *, double );
 
 } AstFrameVtab;
 
@@ -948,6 +957,11 @@ double astGetObsLat_( AstFrame * );
 int astTestObsLat_( AstFrame * );
 void astClearObsLat_( AstFrame * );
 void astSetObsLat_( AstFrame *, double );
+
+double astGetDut1_( AstFrame * );
+int astTestDut1_( AstFrame * );
+void astClearDut1_( AstFrame * );
+void astSetDut1_( AstFrame *, double );
 
 int astTestActiveUnit_( AstFrame * );
 #endif
@@ -1266,6 +1280,16 @@ astINVOKE(V,astTestObsLat_(astCheckFrame(this)))
 astINVOKE(V,astClearObsLat_(astCheckFrame(this)))
 #define astSetObsLat(this,value) \
 astINVOKE(V,astSetObsLat_(astCheckFrame(this),value))
+
+
+#define astClearDut1(this) \
+astINVOKE(V,astClearDut1_(astCheckFrame(this)))
+#define astGetDut1(this) \
+astINVOKE(V,astGetDut1_(astCheckFrame(this)))
+#define astSetDut1(this,value) \
+astINVOKE(V,astSetDut1_(astCheckFrame(this),value))
+#define astTestDut1(this) \
+astINVOKE(V,astTestDut1_(astCheckFrame(this)))
 
 #define astTestActiveUnit(this) \
 astINVOKE(V,astTestActiveUnit_(astCheckFrame(this)))
