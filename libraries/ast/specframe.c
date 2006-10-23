@@ -109,6 +109,9 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *        Guard against annulling null pointers in subFrame.
 *     18-OCT-2006 (DSB):
 *        Added SpecOrigin and AlignSpecOffset attributes.
+*     23-OCT-2006 (DSB):
+*        Fix memory leak caused by addition of SpecOrigin and AlignSpecOffset 
+*        attributes.
 *class--
 */
 
@@ -2604,7 +2607,6 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
       }
    }
 
-
 /* The SpecMap created above class assumes that the axis values supplied to 
    its Transform method are in units which correspond to the default units 
    for its class (the returned values also use these units). However,
@@ -2691,6 +2693,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 
 /* Annul remaining resources. */
    map2 = astAnnul( map2 );
+   specmap = astAnnul( specmap );
    if( umap1 ) umap1 = astAnnul( umap1 );
    if( umap2 ) umap2 = astAnnul( umap2 );
 
