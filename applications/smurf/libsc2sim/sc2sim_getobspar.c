@@ -52,6 +52,8 @@
 *        Add pong_type
 *     2006-10-23 (EC):
 *        Don't free constant memory used by AST
+*     2006-10-23 (AGG):
+*        Fix bug in Dec conversion to radians
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -99,7 +101,7 @@
 void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx, 
                         int *status ) {
 
-   char *convert;         /* String for converting values */
+   char *convert = NULL;         /* String for converting values */
    char *curtok=NULL;     /* current jig vertex being parsed */
    double dec;            /* Double representation of Dec */
    int grid_max_x;        /* The reconstruction grid max X */
@@ -120,7 +122,6 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    /* Check status */
    if ( !StatusOkP(status) ) return;
  
-   /*temp = smf_malloc ( SC2SIM__FLEN, sizeof (*temp), 1, status );*/
    convert = smf_malloc ( SC2SIM__FLEN, sizeof (*convert), 1, status );
 
    if ( !astMapGet0D ( keymap, "BOL_DISTX", &(inx->bol_distx) ) )
@@ -130,9 +131,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->bol_disty = 6.28; 
 
    if ( !astMapGet0C ( keymap, "BOLFILE", &temp ) )
-      strncpy ( inx->bolfile, "", SC2SIM__FLEN ); 
+      strncpy ( inx->bolfile, "", 80 ); 
    else
-      strncpy ( inx->bolfile, temp, SC2SIM__FLEN);
+      strncpy ( inx->bolfile, temp, 80);
 
    if ( !astMapGet0D ( keymap, "BOUS_ANGLE", &(inx->bous_angle) ) )
       inx->bous_angle = 0.4636476; 
@@ -156,11 +157,11 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->conv_sig = 1.0;
 
    if ( !astMapGet0C ( keymap, "COORDFRAME", &temp ) )
-      strncpy ( inx->coordframe, "NASMYTH", 80 ); 
+      strncpy ( inx->coordframe, "RADEC", 80 ); 
    else {
-      strncpy ( convert, temp, 80 );
+     strncpy ( convert, temp, 80 );
       /* Convert to uppercase */
-      i = 0;
+     i = 0;
       while ( *convert != '\0' ) {
          *convert = toupper (*convert);
          convert++;
@@ -174,10 +175,10 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->dec = 0.0;
    else {
       /* Get the double representation of the sexagesimal string and
-         convert from hours to radians */
+         convert from degrees to radians */
       strncpy ( convert, temp, 80 );
       sc2sim_sex2double ( convert, &dec, status );
-      dec *= DH2R;
+      dec *= DD2R;
       inx->dec = dec;
    }
 
@@ -185,9 +186,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->distfac = 0.0;
 
    if ( !astMapGet0C ( keymap, "FLATNAME", &temp ) )
-      strncpy ( inx->flatname, "", SC2SIM__FLEN );
+      strncpy ( inx->flatname, "", 80 );
    else
-      strncpy ( inx->flatname, temp, SC2SIM__FLEN ); 
+      strncpy ( inx->flatname, temp, 80 ); 
 
    if ( !astMapGet0I ( keymap, "GRID_MAX_X", &grid_max_x ) )
       grid_max_x = 1;
@@ -294,11 +295,11 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       msgOut(FUNC_NAME, 
              "Error parsing jig vertices", status); 
       return;
-   }
-
-   for ( i = 0; i < nvert_x; i++ ) {
-      (inx->jig_vert)[i][0] = vert_x[i];
-      (inx->jig_vert)[i][1] = vert_y[i];
+   } else {
+     for ( i = 0; i < nvert_x; i++ ) {
+       (inx->jig_vert)[i][0] = vert_x[i];
+       (inx->jig_vert)[i][1] = vert_y[i];
+     }
    }
 
    if ( !astMapGet0D ( keymap, "LAMBDA", &(inx->lambda) ) )
@@ -346,46 +347,44 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    astMapGet0C ( keymap, "OBSMODE", &temp );
 
    if ( !astMapGet0C ( keymap, "OBSMODE", &temp ) )
-      strncpy ( inx->obsmode, "", 80 ); 
+      strncpy ( inx->obsmode, "PONG", 80 ); 
    else {
       /* Convert to uppercase */
-      strncpy ( convert, temp, 80 );
-      i = 0;
-      while ( *convert != '\0' ) {
-         *convert = toupper (*convert);
-         convert++;
-         i++;
-      }
-      
-      convert = convert - i;
-      strncpy ( inx->obsmode, convert, 80 );
-
+     strncpy ( convert, temp, 80 );
+     i = 0;
+     while ( *convert != '\0' ) {
+       *convert = toupper (*convert);
+       convert++;
+       i++;
+     }
+     convert = convert - i;
+     strncpy ( inx->obsmode, convert, 80 );
    }
 
    if ( !astMapGet0I ( keymap, "PLATENUM", &(inx->platenum) ) )
-      inx->platenum = 1;
+     inx->platenum = 1;
 
    if ( !astMapGet0D ( keymap, "PLATEREV", &(inx->platerev) ) )
-      inx->platerev = 2.0;
+     inx->platerev = 2.0;
 
    if ( !astMapGet0D ( keymap, "PONG_ANGLE", &(inx->pong_angle) ) )
-      inx->pong_angle = 0.4636476;
+     inx->pong_angle = 0.4636476;
  
    if ( !astMapGet0D ( keymap, "PONG_HEIGHT", &(inx->pong_height) ) )
-      inx->pong_height = 2000.0;
+     inx->pong_height = 2000.0;
 
    if ( !astMapGet0D ( keymap, "PONG_WIDTH", &(inx->pong_width) ) )
-   inx->pong_width = 2000.0;
+     inx->pong_width = 2000.0;
 
    if ( !astMapGet0D ( keymap, "PONG_SPACING", &(inx->pong_spacing) ) )
-      inx->pong_spacing = 240.0;
+     inx->pong_spacing = 240.0;
 
    if ( !astMapGet0C ( keymap, "PONG_TYPE", &temp ) )
-      strncpy ( inx->pong_type, "STRAIGHT", 80 ); 
+     strncpy ( inx->pong_type, "STRAIGHT", 80 ); 
    else {
-      strncpy ( convert, temp, 80 );
+     strncpy ( convert, temp, 80 );
       /* Convert to uppercase */
-      i = 0;
+     i = 0;
       while ( *convert != '\0' ) {
          *convert = toupper (*convert);
          convert++;
@@ -396,10 +395,10 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    }
 
    if ( !astMapGet0D ( keymap, "PONG_VMAX", &(inx->pong_vmax) ) )
-      inx->pong_vmax = 200.0;
+     inx->pong_vmax = 200.0;
 
    if ( !astMapGet0C ( keymap, "RA", &temp ) )
-      inx->ra = 0.0;
+     inx->ra = 0.0;
    else {
       /* Get the double representation of the sexagesimal string and
          convert from hours to radians */
@@ -416,7 +415,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->scan_angle = 0.4636476;
 
    if ( !astMapGet0D ( keymap, "SCAN_PATHLENGTH", &(inx->scan_pathlength) ) )
-      inx->scan_angle = 2000.0;
+      inx->scan_pathlength = 2000.0;
   
    if ( !astMapGet0D ( keymap, "SCAN_VMAX", &(inx->scan_vmax) ) )
       inx->scan_vmax = 200.0;
@@ -436,9 +435,6 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0D ( keymap, "TARGETPOW", &(inx->targetpow) ) )
       inx->targetpow = 25.0;
 
-   /* smf_free ( temp, status ); */
-
    smf_free ( convert, status );
-   
 }
 
