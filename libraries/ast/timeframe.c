@@ -29,7 +29,7 @@ f     AST_TIMEFRAME
 *     are always represented in units of (tropical) years.
 *
 *     The TimeScale attribute allows the time scale to be specified (that
-*     is, the physical proces used to define the rate of flow of time).
+*     is, the physical process used to define the rate of flow of time).
 *     MJD, JD and Julian epoch can be used to represent a time in any
 *     supported time scale. However, Besselian epoch may only be used with the 
 *     "TT" (Terrestrial Time) time scale. The list of supported time scales
@@ -117,7 +117,9 @@ f     - AST_CURRENTTIME: Return the current system time
 *        to include a decimal point.
 *     30-JUN-2006 (DSB):
 *        Allow astAbbrev to have a null "str1" value.
-
+*     16-OCT-2006 (DSB):
+*        Allow conversions between UTC and UT1 (using the new Frame attribute 
+*        DUT1).
 *class--
 */
 
@@ -156,6 +158,15 @@ f     - AST_CURRENTTIME: Return the current system time
           ts == AST__LAST || \
           ts == AST__TDB || \
           ts == AST__TCB ) ? 1 : 0 )
+
+
+/* Define a macro which tests if a given timescale requires a Dut1 value 
+   in order to convert from the timescale to UTC. */
+#define DUT1_SCALE(ts) \
+      ( ( ts == AST__LMST || \
+          ts == AST__LAST || \
+          ts == AST__GMST || \
+          ts == AST__UT1 ) ? 1 : 0 )
 
 /* Header files. */
 /* ============= */
@@ -2773,18 +2784,14 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
    AstMapping *umap1;
    AstMapping *umap2;
    AstTimeMap *timemap;
-   AstTimeScaleType cmn;
    const char *du;
    double args[ 3 ];
+   double args_ut[ 1 ];
    double shift;
-   int ok;           
 
 /* Check the global error status. */
    result = NULL;
    if ( !astOK ) return result;
-
-/* Avoid compiler warnings */
-   cmn = -1;
 
 /* If the timescales are equal... */
    if( ts1 == ts2 ) {
@@ -2863,125 +2870,107 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
          astTimeAdd( timemap, "BEPTOMJD", args );
       }
 
-/* All timescale conversions require the input (MJD) offset as the first 
-   argument. In general, the clock longitude and latitude are also
-   needed. */
+/* All timescale conversions except UTTOUTC and UTCTOUT require the input (MJD)
+   offset as the first argument. In general, the clock longitude and latitude 
+   are also needed. */
       args[ 0 ] = args[ 1 ];
       args[ 1 ] = astGetObsLon( this );
       args[ 2 ] = astGetObsLat( this );
 
+/* The UTTOUTC and UTCTOUT conversions required just he DUT1 value. */
+      args_ut[ 0 ] = astGetDut1( this );
+
 /* If the input and output timescales differ, now add a conversion from the 
-   input timescale to TAI or UT1 (note which is used). */
-      ok = 1;
+   input timescale to TAI. */
       if( ts1 != ts2 ) {
          if( ts1 == AST__TAI ) {
-            cmn = AST__TAI;
        
          } else if( ts1 == AST__UTC ) {
-            cmn = AST__TAI;
             astTimeAdd( timemap, "UTCTOTAI", args );
        
          } else if( ts1 == AST__TT ) {
-            cmn = AST__TAI;
             astTimeAdd( timemap, "TTTOTAI", args );
        
          } else if( ts1 == AST__TDB ) {
-            cmn = AST__TAI;
             astTimeAdd( timemap, "TDBTOTT", args );
             astTimeAdd( timemap, "TTTOTAI", args );
        
          } else if( ts1 == AST__TCG ) {
-            cmn = AST__TAI;
             astTimeAdd( timemap, "TCGTOTT", args );
             astTimeAdd( timemap, "TTTOTAI", args );
        
          } else if( ts1 == AST__TCB ) {
-            cmn = AST__TAI;
             astTimeAdd( timemap, "TCBTOTDB", args );
             astTimeAdd( timemap, "TDBTOTT", args );
             astTimeAdd( timemap, "TTTOTAI", args );
        
          } else if( ts1 == AST__UT1 ) {
-            cmn = AST__UT1;
+            astTimeAdd( timemap, "UTTOUTC", args_ut );
+            astTimeAdd( timemap, "UTCTOTAI", args );
        
          } else if( ts1 == AST__GMST ) {
-            cmn = AST__UT1;
             astTimeAdd( timemap, "GMSTTOUT", args );
+            astTimeAdd( timemap, "UTTOUTC", args_ut );
+            astTimeAdd( timemap, "UTCTOTAI", args );
        
          } else if( ts1 == AST__LAST ) {
-            cmn = AST__UT1;
             astTimeAdd( timemap, "LASTTOLMST", args );
             astTimeAdd( timemap, "LMSTTOGMST", args );
             astTimeAdd( timemap, "GMSTTOUT", args );
+            astTimeAdd( timemap, "UTTOUTC", args_ut );
+            astTimeAdd( timemap, "UTCTOTAI", args );
       
          } else if( ts1 == AST__LMST ) {
-            cmn = AST__UT1;
             astTimeAdd( timemap, "LMSTTOGMST", args );
             astTimeAdd( timemap, "GMSTTOUT", args );
+            astTimeAdd( timemap, "UTTOUTC", args_ut );
+            astTimeAdd( timemap, "UTCTOTAI", args );
          }
 
-/* Now add a conversion to the output timescale (if possible). */
-         ok = 0;
+/* Now add a conversion from TAI to the output timescale. */
          if( ts2 == AST__TAI ) {
-            if( cmn == AST__TAI ) ok = 1;
-      
+
          } else if( ts2 == AST__UTC ) {
-            if( cmn == AST__TAI ){
-               ok = 1;
-               astTimeAdd( timemap, "TAITOUTC", args );
-            }
-      
+            astTimeAdd( timemap, "TAITOUTC", args );
+
          } else if( ts2 == AST__TT ) {
-            if( cmn == AST__TAI ){
-               ok = 1;
-               astTimeAdd( timemap, "TAITOTT", args );
-            }
-      
+            astTimeAdd( timemap, "TAITOTT", args );
+
          } else if( ts2 == AST__TDB ) {
-            if( cmn == AST__TAI ){
-               ok = 1;
-               astTimeAdd( timemap, "TAITOTT", args );
-               astTimeAdd( timemap, "TTTOTDB", args );
-            }
-      
+            astTimeAdd( timemap, "TAITOTT", args );
+            astTimeAdd( timemap, "TTTOTDB", args );
+
          } else if( ts2 == AST__TCG ) {
-            if( cmn == AST__TAI ){
-               ok = 1;
-               astTimeAdd( timemap, "TAITOTT", args );
-               astTimeAdd( timemap, "TTTOTCG", args );
-            }
-      
+            astTimeAdd( timemap, "TAITOTT", args );
+            astTimeAdd( timemap, "TTTOTCG", args );
+
          } else if( ts2 == AST__TCB ) {
-            if( cmn == AST__TAI ){
-               ok = 1;
-               astTimeAdd( timemap, "TAITOTT", args );
-               astTimeAdd( timemap, "TTTOTDB", args );
-               astTimeAdd( timemap, "TDBTOTCB", args );
-            }
-      
+            astTimeAdd( timemap, "TAITOTT", args );
+            astTimeAdd( timemap, "TTTOTDB", args );
+            astTimeAdd( timemap, "TDBTOTCB", args );
+
          } else if( ts2 == AST__UT1 ) {
-            if( cmn == AST__UT1 ) ok = 1;
-      
+            astTimeAdd( timemap, "TAITOUTC", args );
+            astTimeAdd( timemap, "UTCTOUT", args_ut );
+
          } else if( ts2 == AST__GMST ) {
-            if( cmn == AST__UT1 ){
-               ok = 1;
-               astTimeAdd( timemap, "UTTOGMST", args );
-            }
-      
+            astTimeAdd( timemap, "TAITOUTC", args );
+            astTimeAdd( timemap, "UTCTOUT", args_ut );
+            astTimeAdd( timemap, "UTTOGMST", args );
+
          } else if( ts2 == AST__LAST ) {
-            if( cmn == AST__UT1 ){
-               ok = 1;
-               astTimeAdd( timemap, "UTTOGMST", args );
-               astTimeAdd( timemap, "GMSTTOLMST", args );
-               astTimeAdd( timemap, "LMSTTOLAST", args );
-            }
-      
+            astTimeAdd( timemap, "TAITOUTC", args );
+            astTimeAdd( timemap, "UTCTOUT", args_ut );
+            astTimeAdd( timemap, "UTTOGMST", args );
+            astTimeAdd( timemap, "GMSTTOLMST", args );
+            astTimeAdd( timemap, "LMSTTOLAST", args );
+
          } else if( ts2 == AST__LMST ) {
-            if( cmn == AST__UT1 ){
-               ok = 1;
-               astTimeAdd( timemap, "UTTOGMST", args );
-               astTimeAdd( timemap, "GMSTTOLMST", args );
-            }
+            astTimeAdd( timemap, "TAITOUTC", args );
+            astTimeAdd( timemap, "UTCTOUT", args_ut );
+            astTimeAdd( timemap, "UTTOGMST", args );
+            astTimeAdd( timemap, "GMSTTOLMST", args );
+
          }
       } 
 
@@ -3009,14 +2998,12 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
 /* If OK, combine the Mappings in series. Note, umap1 and umap2 should
    always be non-NULL because the suitablity of units strings is checked 
    within OriginSystem - called from within SetSystem. */
-      if( umap1 && umap2 && ok ) {
+      if( umap1 && umap2 ) {
          tmap = (AstMapping *) astCmpMap( umap1, timemap, 1, "" );      
          tmap2 = (AstMapping *) astCmpMap( tmap, umap2, 1, "" );      
          tmap = astAnnul( tmap );
          result = astSimplify( tmap2 );
          tmap2 = astAnnul( tmap2 );
-      } else {
-         result = NULL;
       }
    
 /* Free remaining resources */
@@ -3106,9 +3093,12 @@ static int MakeTimeMapping( AstTimeFrame *target, AstTimeFrame *result,
    double off1;                  /* Input axis offset */
    double off2;                  /* Output axis offset */
    int arclk;                    /* Align->result depends on clock position? */
+   int ardut;                    /* Align->result depends on Dut1? */
    int clkdiff;                  /* Do target and result clock positions differ? */
+   int dut1diff;                 /* Do target and result Dut1 values differ? */
    int match;                    /* Mapping can be generated? */
    int taclk;                    /* Target->align depends on clock position? */
+   int tadut;                    /* Target->align depends on Dut1? */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
@@ -3154,16 +3144,24 @@ static int MakeTimeMapping( AstTimeFrame *target, AstTimeFrame *result,
    position. */
    arclk = CLOCK_SCALE( align_ts ) || CLOCK_SCALE( ts2 );
 
+/* In addition, the alignment frame is significant if either of the Mappings 
+   depends on DUT1 and the values of the DUT1 attribute are different for the
+   two TimeFrames. */
+   dut1diff = ( astGetDut1( target ) != astGetDut1( result ) );
+   tadut = DUT1_SCALE( ts1 ) != DUT1_SCALE( align_ts );
+   ardut = DUT1_SCALE( align_ts ) != DUT1_SCALE( ts2 );
+
 /* If the alignment frame can be ignored, use MakeMap */
-   if( !clkdiff || !( taclk || arclk ) ) {
+   if( ( !clkdiff || !( taclk || arclk ) ) &&
+       ( !dut1diff || !( tadut || ardut ) ) ) {
       *map = MakeMap( target, sys1, sys2, ts1, ts2, off1, off2, u1, u2, 
                       "astSubFrame" );
       if( *map ) match = 1;
 
 /* Otherwise, we create the Mapping in two parts; first a Mapping from
-   the target Frame to the alignment Frame (using the target clock
-   position), then a Mapping from the alignment Frame to the results
-   Frame (using the result clock position). */
+   the target Frame to the alignment Frame (using the target clock and dut1),
+   then a Mapping from the alignment Frame to the results Frame (using the 
+   result clock and dut1). */
    } else {
 
 /* Create a Mapping from target units/system/timescale/offset to MJD in 
@@ -3186,7 +3184,7 @@ static int MakeTimeMapping( AstTimeFrame *target, AstTimeFrame *result,
          }
       }   
 
-/* We now create a Mapping converts from the alignment System (MJD), 
+/* We now create a Mapping that converts from the alignment System (MJD), 
    TimeScale and offset to the result coordinate system. */
       map2 = MakeMap( result, AST__MJD, sys2, align_ts, ts2, align_off, off2, 
                       align_unit, u2, "MakeTimeMap" );
@@ -5589,6 +5587,10 @@ static void VerifyAttrs( AstTimeFrame *this, const char *purp,
                      set = astTestObsLon( this );
                      desc = "clock longitude";
 
+                  } else if( !strncmp( "Dut1", a, len ) ) {
+                     set = astTestDut1( this );
+                     desc = "UT1-UTC correction";
+
                   } else if( !strncmp( "TimeOrigin", a, len ) ) {
                      set = astTestTimeOrigin( this );
                      desc = "time offset";
@@ -5786,12 +5788,7 @@ astMAKE_SET(TimeFrame,AlignTimeScale,AstTimeScaleType,aligntimescale,(
 *  Description:
 *     This attribute identifies the time scale to which the time axis values 
 *     of a TimeFrame refer, and may take any of the values listed in the 
-*     "Time Scales" section (below). Note, conversions which require 
-*     knowledge of DUT1 (the difference between UT1 and UTC) are not currently
-*     supported. This means that UT1 can only be converted to the other 
-*     angle-based scales such as GMST, LMST and LAST. An error will be reported
-*     about "incompatible timescales" if an attempt is made to convert
-*     between an angle-based timescale and any of the other time scales.
+*     "Time Scales" section (below).
 *
 *     The default TimeScale value depends on the current System value; if
 *     the current TimeFrame system is "Besselian epoch" the default is
@@ -5799,6 +5796,17 @@ astMAKE_SET(TimeFrame,AlignTimeScale,AstTimeScaleType,aligntimescale,(
 *     so that the TimeFrame represents Besselian Epoch, then an error
 *     will be reported if an attempt is made to set the TimeScale to 
 *     anything other than TT.
+* 
+*     Note, the supported time scales fall into two groups. The first group 
+*     containing  UT1, GMST, LAST and LMST define time in terms of the 
+*     orientation of the earth. The second group (containing all the remaining
+*     time scales) define time in terms of an atomic process. Since the rate of 
+*     rotation of the earth varies in an unpredictable way, conversion between 
+*     two timescales in different groups relies on a value being supplied for 
+*     the Dut1 attribute (defined by the parent Frame class). This attribute 
+*     specifies the difference between the UT1 and UTC time scales, in seconds,
+*     and defaults to zero. See the documentation for the Dut1 attribute for 
+*     further details. 
 
 *  Applicability:
 *     TimeFrame
