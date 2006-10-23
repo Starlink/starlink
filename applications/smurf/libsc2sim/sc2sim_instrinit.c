@@ -84,7 +84,7 @@
 *     2006-08-08 (EC)
 *        Include sc2ast.h
 *     2006-08-15 (EC)
-*        Use sc2ast_get_gridcoords instead of sc2sim_bolnatcoords
+*        Use sc2ast_get_gridcoords320 instead of sc2sim_bolnatcoords
 *     2006-08-16 (EC)
 *        Fixed mis-handling of bad error status
 *     2006-08-16 (EC)
@@ -95,6 +95,8 @@
 *        Fixed pointer problem with callc to smf_calc_telpos
 *     2006-09-22 (JB):
 *        Changed from using XML files to AstKeyMaps
+*     2006-10-18 (EC):
+*        Extra status checking
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -137,6 +139,8 @@
 /* Starlink Includes */
 #include "ast.h"
 #include "sae_par.h"
+
+#define FUNC_NAME "sc2sim_instrinit"
 
 void sc2sim_instrinit( struct sc2sim_obs_struct *inx, 
                        struct sc2sim_sim_struct *sinx, 
@@ -243,8 +247,20 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
 
   if( *status == SAI__OK ) {
 
+    printf("NBOL = %li\n", nbol);
+
     astSetC( fset, "SYSTEM", "AzEl" );
     astTran2( fset, nbol, *ybolo, *xbolo, 1, *xbc, *ybc );
+
+    if( !astOK ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "AST error calculating projected bolometer coords.", 
+	     status);
+    }
+    
+  }
+
+  if( *status == SAI__OK ) {
      
     /* xbc and ybc are in radians at this point. Convert to arcsec */
     for ( j=0; j<nbol; j++ ) {
