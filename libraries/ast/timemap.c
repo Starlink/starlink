@@ -53,12 +53,12 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 *     modify it under the terms of the GNU General Public Licence as
 *     published by the Free Software Foundation; either version 2 of
 *     the Licence, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public Licence for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public Licence
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -79,6 +79,8 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 *        Override astGetObjSize.
 *     10-MAY-2006 (DSB):
 *        Override astEqual.
+*     15-OCT-2006 (DSB):
+*        Add conversions between UT1 and UTC (UTTOUTC and UTCTOUT).
 *class--
 */
 
@@ -109,11 +111,13 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 #define AST__TCBTOTDB   16       /* TCB to TDB */
 #define AST__TDBTOTCB   17       /* TDB to TCB */
 #define AST__UTTOGMST   18       /* UT to GMST */
-#define AST__GMSTTOUT   19       /* GMST to UT */
+#define AST__GMSTTOUT   19       /* GMST to UT1 */
 #define AST__GMSTTOLMST 20       /* GMST to LMST */
 #define AST__LMSTTOGMST 21       /* LMST to GMST */
 #define AST__LASTTOLMST 22       /* LAST to LMST */
 #define AST__LMSTTOLAST 23       /* LMST to LAST */
+#define AST__UTTOUTC    24       /* UT1 to UTC */
+#define AST__UTCTOUT    25       /* UTC to UT1 */
 
 /* Maximum number of arguments required by a conversion. */
 #define MAX_ARGS 5
@@ -595,6 +599,10 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args ) {
 *           Convert a LAST MJD to a LMST MJD.
 *        AST__LMSTTOLAST( MJDOFF, CLOCKLON, CLOCKLAT )
 *           Convert a LMST MJD to a LAST MJD.
+*        AST__UTTOUTC( DUT1 )
+*           Convert a UT1 MJD to a UTC MJD.
+*        AST__UTCTOUT( DUT1 )
+*           Convert a UTC MJD to a UT1 MJD.
 *
 *     The units for the values processed by the above conversions are as
 *     follows: 
@@ -611,6 +619,7 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args ) {
 *     - BEPOFF: Offset to be added to each Besselian epoch value
 *     - CLOCKLON: Clock longitude in radians (+ve westwards)
 *     - CLOCKLAT: Clock geodetic latitude in radians (+ve northwards)
+*     - DUT1: The value of UT1-UTC
 
 *  Notes:
 *     - The specified conversion is appended only if the TimeMap's
@@ -798,6 +807,12 @@ static int CvtCode( const char *cvt_string ) {
 
    } else if ( astChrMatch( cvt_string, "LMSTTOLAST" ) ) { 
       result = AST__LMSTTOLAST; 
+
+   } else if ( astChrMatch( cvt_string, "UTTOUTC" ) ) { 
+      result = AST__UTTOUTC;    
+
+   } else if ( astChrMatch( cvt_string, "UTCTOUT" ) ) { 
+      result = AST__UTCTOUT;    
    }
 
 /* Return the result. */
@@ -1103,6 +1118,21 @@ static const char *CvtString( int cvt_code, const char **comment,
       arg[ 2 ] = "Clock latitude";
       break;
 
+   case AST__UTTOUTC:
+      *comment = "Convert UT1 to UTC";
+      result = "UTTOUTC";
+      *nargs = 1;
+      *szargs = 1;
+      arg[ 0 ] = "DUT1";
+      break;
+
+   case AST__UTCTOUT:
+      *comment = "Convert UTC to UT1";
+      result = "UTCTOUT";
+      *nargs = 1;
+      *szargs = 1;
+      arg[ 0 ] = "DUT1";
+      break;
    }
 
 /* Return the result. */
@@ -1975,6 +2005,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                SWAP_CODES( AST__UTTOGMST, AST__GMSTTOUT ) 
                SWAP_CODES( AST__GMSTTOLMST, AST__LMSTTOGMST ) 
                SWAP_CODES( AST__LASTTOLMST, AST__LMSTTOLAST ) 
+               SWAP_CODES( AST__UTTOUTC, AST__UTCTOUT ) 
 
 /* Exchange transformation codes for their inverses, and swap the offset
    values. */
@@ -2037,7 +2068,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                if( ( PAIR_CVT2( AST__TAITOUTC, AST__UTCTOTAI ) ||
                      PAIR_CVT2( AST__TAITOTT, AST__TTTOTAI ) ||
                      PAIR_CVT2( AST__UTTOGMST, AST__GMSTTOUT ) ||
-                     PAIR_CVT2( AST__TTTOTCG, AST__TCGTOTT ) ) &&
+                     PAIR_CVT2( AST__TTTOTCG, AST__TCGTOTT ) || 
+                     PAIR_CVT2( AST__UTTOUTC, AST__UTCTOUT ) ) &&
                           EQUAL( cvtargs[ istep ][ 0 ], 
                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
@@ -3445,6 +3477,8 @@ f     these arguments should be given, via the ARGS array, in the
 *     - "LMSTTOGMST" (MJDOFF, CLOCKLON, CLOCKLAT): Convert a LMST MJD to a GMST MJD.
 *     - "LASTTOLMST" (MJDOFF, CLOCKLON, CLOCKLAT): Convert a GMST MJD to a LMST MJD.
 *     - "LMSTTOLAST" (MJDOFF, CLOCKLON, CLOCKLAT): Convert a LMST MJD to a GMST MJD.
+*     - "UTTOUTC" (DUT1): Convert a UT1 MJD to a UTC MJD.
+*     - "UTCTOUT" (DUT1): Convert a UTC MJD to a UT1 MJD.
 *
 *     The units for the values processed by the above conversions are as
 *     follows: 
@@ -3469,6 +3503,7 @@ f     AST_TRANSFORM
 *     - JEPOFF: The zero-point being used with Julian epoch values.
 *     - CLOCKLON: Clock longitude in radians (+ve westwards).
 *     - CLOCKLAT: Clock geodetic latitude in radians (+ve northwards).
+*     - DUT1: The UT1-UTC value to use. 
 *--
 */
 
@@ -4030,6 +4065,43 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                      }
                   }
                }
+
+/* UT1 to UTC. */
+/* ------------- */
+            case AST__UTTOUTC:
+               if ( forward ) {
+                  for ( point = 0; point < npoint; point++ ) { 
+                     if ( time[ point ] != AST__BAD ) {
+                        time[ point ] -= args[ 0 ]/86400.0;
+                     }
+                  }
+               } else {
+                  for ( point = 0; point < npoint; point++ ) { 
+                     if ( time[ point ] != AST__BAD ) {
+                        time[ point ] += args[ 0 ]/86400.0;
+                     }
+                  }
+               }
+               break;
+
+
+/* UTC to UT1. */
+/* ------------- */
+            case AST__UTCTOUT:
+               if ( forward ) {
+                  for ( point = 0; point < npoint; point++ ) { 
+                     if ( time[ point ] != AST__BAD ) {
+                        time[ point ] += args[ 0 ]/86400.0;
+                     }
+                  }
+               } else {
+                  for ( point = 0; point < npoint; point++ ) { 
+                     if ( time[ point ] != AST__BAD ) {
+                        time[ point ] -= args[ 0 ]/86400.0;
+                     }
+                  }
+               }
+               break;
             
 /* LMST to LAST. */
 /* ------------- */
