@@ -1,0 +1,207 @@
+#!/local/perl/bin/perl
+
+use strict;
+
+use Starlink::Autoastrom;
+use Getopt::Long;
+
+my $VERSION = '0.6-0';
+my $RCSInfo = '$Revision$ $Date$ ';
+
+my $Usage = "Usage: $0 [OPTIONS] NDF\n       $0 --help\n";
+my $progpath;
+( $progpath = $0 ) =~ s+/[^/]*$++;
+my $progname;
+( $progname = $0 ) =~ s+^.*/++;
+
+# Log who we are.
+print "--I $progname, v$VERSION\n";
+
+# Hash to hold command-line arguments.
+my %optionset = ();
+
+# Set up defaults.
+$optionset{defects} = 0;
+$optionset{insert} = 1;
+$optionset{keeptemps} = 0;
+$optionset{match} = 'FINDOFF';
+$optionset{maxfit} = 9;
+$optionset{maxiter} = 10;
+$optionset{maxobj_corr} = 500;
+$optionset{maxobj_image} = 500;
+$optionset{maxobj_query} = 500;
+$optionset{messages} = 0;
+$optionset{timeout} = 60;
+$optionset{verbose} = 0;
+
+# Deal with command-line arguments.
+GetOptions( \%optionset,
+            "bestfitlog=s",
+            "catalogue=s",
+            "ccdcatalogue=s",
+            "defects=s",
+            "detectedcatalogue=s",
+            "help!",
+            "insert!",
+            "iterrms_abs=f",
+            "iterrms_diff=f",
+            "keepfits=s",
+            "keeptemps!",
+            "match=s",
+            "matchcatalogue=s",
+            "maxfit=i",
+            "maxiter=i",
+            "maxobj_corr=i",
+            "maxobj_image=i",
+            "maxobj_query=i",
+            "messages!",
+            "obsdata=s",
+            "skycatconfig=s",
+            "skycatcatalogue_in=s",
+            "skycatcatalogue_out=s",
+            "temp=s",
+            "timeout=i",
+            "verbose!",
+            "version!",
+          );
+
+# Print help and exit if requested.
+if( defined( $optionset{help} ) && $optionset{help} ) {
+  print <<END_HELP_PRINT;
+Usage: $0 [options] NDF
+Options: [and defaults; if no default, value is generated]
+  bestfitlog           Name of log file for best fit parameters
+  catalogue            SkyCat name of online catalogue to use
+  ccdcatalogue         Name of an EXTRACTOR catalogue to read
+  defects              Filter out defects? [false]
+  detectedcatalogue    Name of file to hold catalogue of detected objects
+  help                 Print this help
+  insert               Insert WCS info into NDF at end? [true]
+  iterrms_abs          Absolute RMS level to reach
+  iterrms_diff         RMS difference in sequential fits to reach
+  keepfits             Retain WCS in specified file (default is empty) ['']
+  keeptemps            Keep temporary files? [false]
+  match                Name of plugin to do matching [FINDOFF]
+  matchcatalogue       Name of a file to receive list of matches
+  maxfit               Maximum number of fit parameters (4, 6, 7, 9) [9]
+  maxiter              Maximum number of iterations to perform [10]
+  maxobj_corr          Maximum number of objects to correlate [500]
+  maxobj_image         Maximum number of objects to use from image [500]
+  maxobj_query         Maximum number of objects to use from SkyCat query [500]
+  messaages            Show messages from monoliths? [false]
+  obsdata              WCS info=AST/FITS/[kwd-list] ['']
+  skycatconfig         SkyCat configuration file ['']
+  skycatcatalogue_in   Name of a SkyCat catalogue to read
+  skycatcatalogue_out  Name of file to hold retrieved SkyCat catalogue
+  temp                 Name of temporary directory
+  timeout              Monolith timeout [60]
+  verbose              Verbose output? [false]
+END_HELP_PRINT
+  exit 0;
+}
+
+# Print version and exit if requested.
+if( defined( $optionset{version} ) && $optionset{version} ) {
+  print "$progname v$VERSION ($RCSInfo)\n";
+  exit 0;
+}
+
+# Get the NDF;
+if( $#ARGV != 0 ) {
+  print $Usage;
+  exit -1;
+}
+my $NDF = $ARGV[0];
+$NDF =~ s/\.sdf$//;
+
+# Handle parameters.
+my %autoastrom_params = ();
+
+$autoastrom_params{aperture} = 5.0;
+$autoastrom_params{ndf} = $NDF;
+$autoastrom_params{starlink_output} = 1;
+
+if( defined( $optionset{bestfitlog} ) ) {
+  $autoastrom_params{bestfitlog} = $optionset{bestfitlog};
+}
+if( defined( $optionset{catalogue} ) ) {
+  $autoastrom_params{catalogue} = $optionset{catalogue};
+}
+if( defined( $optionset{ccdcatalogue} ) ) {
+  $autoastrom_params{ccdcatalogue} = $optionset{ccdcatalogue};
+}
+if( defined( $optionset{defects} ) ) {
+  $autoastrom_params{defects} = $optionset{defects};
+}
+if( defined( $optionset{detectedcatalogue} ) ) {
+  $autoastrom_params{detected_catalogue} = $optionset{detectedcatalogue};
+}
+if( defined( $optionset{insert} ) ) {
+  $autoastrom_params{insert} = $optionset{insert};
+}
+if( defined( $optionset{iterrms_abs} ) ) {
+  $autoastrom_params{iterrms_abs} = $optionset{iterrms_abs};
+}
+if( defined( $optionset{iterrms_diff} ) ) {
+  $autoastrom_params{iterrms_diff} = $optionset{iterrms_diff};
+}
+if( defined( $optionset{keepfits} ) ) {
+  $autoastrom_params{keepfits} = $optionset{keepfits};
+}
+if( defined( $optionset{keeptemps} ) ) {
+  $autoastrom_params{keeptemps} = $optionset{keeptemps};
+}
+if( defined( $optionset{match} ) ) {
+  if( lc( $optionset{match} ) eq 'match' ) {
+    $optionset{match} = 'RITMatch';
+  }
+  $autoastrom_params{match} = $optionset{match};
+}
+if( defined( $optionset{matchcatalogue} ) ) {
+  $autoastrom_params{matchcatalogue} = $optionset{matchcatalogue};
+}
+if( defined( $optionset{maxfit} ) ) {
+  $autoastrom_params{maxfit} = $optionset{maxfit};
+}
+if( defined( $optionset{maxiter} ) ) {
+  $autoastrom_params{maxiter} = $optionset{maxiter};
+}
+if( defined( $optionset{maxobj_corr} ) ) {
+  $autoastrom_params{maxobj_corr} = $optionset{maxobj_corr};
+}
+if( defined( $optionset{maxobj_image} ) ) {
+  $autoastrom_params{maxobj_image} = $optionset{maxobj_image};
+}
+if( defined( $optionset{maxobj_query} ) ) {
+  $autoastrom_params{maxobj_query} = $optionset{maxobj_query};
+}
+if( defined( $optionset{messages} ) ) {
+  $autoastrom_params{messages} = $optionset{messages};
+}
+if( defined( $optionset{obsdata} ) ) {
+  $autoastrom_params{obsdata} = $optionset{obsdata};
+}
+if( defined( $optionset{skycatconfig} ) ) {
+  $autoastrom_params{skycatconfig} = $optionset{skycatconfig};
+}
+if( defined( $optionset{skycatcatalogue_in} ) ) {
+  $autoastrom_params{skycatcatalogue_in} = $optionset{skycatcatalogue_in};
+}
+if( defined( $optionset{skycatcatalogue_out} ) ) {
+  $autoastrom_params{skycatcatalogue_out} = $optionset{skycatcatalogue_out};
+}
+if( defined( $optionset{temp} ) ) {
+  $autoastrom_params{temp} = $optionset{temp};
+}
+if( defined( $optionset{timeout} ) ) {
+  $autoastrom_params{timeout} = $optionset{timeout};
+}
+if( defined( $optionset{verbose} ) ) {
+  $autoastrom_params{verbose} = $optionset{verbose};
+}
+
+# Set up Starlink::Autoastrom object.
+my $auto = new Starlink::Autoastrom( %autoastrom_params );
+
+# And run AUTOASTROM.
+$auto->solve;
