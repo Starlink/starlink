@@ -84,7 +84,7 @@
 *     2006-08-08 (EC)
 *        Include sc2ast.h
 *     2006-08-15 (EC)
-*        Use sc2ast_get_gridcoords320 instead of sc2sim_bolnatcoords
+*        Use sc2ast_get_gridcoords instead of sc2sim_bolnatcoords
 *     2006-08-16 (EC)
 *        Fixed mis-handling of bad error status
 *     2006-08-16 (EC)
