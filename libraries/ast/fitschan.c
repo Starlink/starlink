@@ -720,6 +720,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        - Convert Epoch values from TDB to UTC before storing as the
 *        value of an MJD-OBS or MJD-AVG keyword (no TIMESYS keyword is
 *        written).
+*     23-OCT-2006 (DSB):
+*        Prefer MJD-AVG over MJD-OBS.
 *class--
 */
 
@@ -4030,8 +4032,8 @@ static double ChooseEpoch( FitsStore *store, char s, const char *method,
 *  Description:
 *     This function returns an MJD value in the TDB timescale, which can 
 *     be used as the Epoch value in an AST Frame. It uses the following 
-*     preference order: secondary MJD-OBS, primary MJD-OBS, secondary MJD-AVG, 
-*     primary MJD-AVG. Note, DATE-OBS keywords are converted into MJD-OBS 
+*     preference order: secondary MJD-AVG, primary MJD-AVG, secondary MJD-OBS, 
+*     primary MJD-OBS. Note, DATE-OBS keywords are converted into MJD-OBS 
 *     keywords by the SpecTrans function before this function is called.
 
 *  Parameters:
@@ -4066,20 +4068,20 @@ static double ChooseEpoch( FitsStore *store, char s, const char *method,
 /* Check the global status. */
    if( !astOK ) return mjd;
 
-/* If the secondary MJD-OBS keyword is present in the FitsChan, gets its
-   value. */
-   mjd = GetItem( &(store->mjdobs), 0, 0, s, NULL, method, class );
-
-/* Otherwise, try to get the primary MJD-OBS value. */
-   if( mjd == AST__BAD ) mjd = GetItem( &(store->mjdobs), 0, 0, ' ', NULL, 
-                                        method, class );
-
 /* Otherwise, try to get the secondary MJD-AVG value. */
-   if( mjd == AST__BAD ) mjd = GetItem( &(store->mjdavg), 0, 0, s, NULL, 
-                                        method, class );
+   mjd = GetItem( &(store->mjdavg), 0, 0, s, NULL, method, class );
 
 /* Otherwise, try to get the primary MJD-AVG value. */
    if( mjd == AST__BAD ) mjd = GetItem( &(store->mjdavg), 0, 0, ' ', NULL, 
+                                        method, class );
+
+/* If the secondary MJD-OBS keyword is present in the FitsChan, gets its
+   value. */
+   if( mjd == AST__BAD ) mjd = GetItem( &(store->mjdobs), 0, 0, s, NULL, 
+                                        method, class );
+
+/* Otherwise, try to get the primary MJD-OBS value. */
+   if( mjd == AST__BAD ) mjd = GetItem( &(store->mjdobs), 0, 0, ' ', NULL, 
                                         method, class );
 
 /* Now convert the MJD value to the TDB timescale. */
