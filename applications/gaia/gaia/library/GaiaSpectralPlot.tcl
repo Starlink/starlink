@@ -209,6 +209,19 @@ itcl::class gaia::GaiaSpectralPlot {
       add_menu_short_help $Options {Line color} \
          {Change the colour of the spectral line}
 
+      #  Choose a width for the spectral line.
+      $Options add cascade -label "Line width" \
+         -menu [menu $Options.width]
+      foreach width {1 2 3 4 } {
+         $Options.width add radiobutton \
+             -variable [scope linewidth_] \
+             -value $width \
+             -bitmap width$width \
+             -command [code $this set_linewidth $width]
+      }
+      add_menu_short_help $Options {Line width} \
+         {Change the width of the spectral line}
+
       #  Choose a colour for the all the axis and labels.
       $Options add cascade -label "Axes color" \
          -menu [menu $Options.axes]
@@ -489,7 +502,7 @@ itcl::class gaia::GaiaSpectralPlot {
          set spectrum_ [$itk_component(canvas) create spectral_plot \
                            pointer $adr \
                            -x 25 -y 5 -width 650 -height 200 \
-                           -linecolour $linecolour_ -linewidth 1 \
+                           -linecolour $linecolour_ -linewidth $linewidth_ \
                            -gridoptions $gridoptions_ \
                            -showaxes 1 -xminmax $itk_option(-xminmax)\
                            -reflinecolour $refspeccolour_]
@@ -986,6 +999,15 @@ itcl::class gaia::GaiaSpectralPlot {
       }
    }
 
+   #  Set the width of the spectral line.
+   public method set_linewidth {width} {
+      set linewidth_ $width
+      if { $spectrum_ != {} } {
+         $itk_component(canvas) itemconfigure $spectrum_ \
+            -linewidth $linewidth_
+      }
+   }
+
    #  Set the colour of the axes.
    public method set_axescolour {colour} {
       set axescolour_ $colour
@@ -1204,6 +1226,9 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Current colour of the line.
    protected variable linecolour_ "blue"
+
+   #  Current width of the line.
+   protected variable linewidth_ 1
 
    #  Current background colour.
    protected variable background_ "black"
