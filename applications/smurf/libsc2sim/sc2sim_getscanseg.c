@@ -122,6 +122,7 @@ int *status          /* global status (given and returned) */
    double tmaxvel;     /* max velocity along path */
    double tmidway;     /* time at mid way */
    double tsq;         /* time squared */
+   double ttotal;      /* total time along path */
    double vmidway;     /* velocity at mid way */
 
    /* Check status */
@@ -170,15 +171,17 @@ int *status          /* global status (given and returned) */
 
    if ( raccel == 0 ) {
 
-      /* Round down to get the number of steps in this line */
-      nsteps = (int) ( dtotal / ( rmaxvel * samptime ) );  
-  
+      ttotal = dtotal / rmaxvel;
+      nsteps = ttotal / samptime;
+
       for ( j=0; j < nsteps; j++ ) {
+
          dstep = j * samptime * rmaxvel;
+
          pattern[((*curroff)+j)*2] = cstart[0] + 
                               ( dstep * cos ( theta ) );
          pattern[((*curroff)+j)*2+1] = cstart[1] + 
-	                      ( dstep * sin ( theta ) );
+                              ( dstep * sin ( theta ) );
  
       } 
 
