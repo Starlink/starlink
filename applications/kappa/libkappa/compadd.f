@@ -136,7 +136,7 @@
 *        galaxy.  Thus if cosmos is two-dimensional, this command
 *        would result in a sixteen-fold reduction in the array
 *        components.
-*     compave cosmos profile [10000,1] wlim=0 align=first trim=no
+*     compadd cosmos profile [10000,1] wlim=0 align=first trim=no
 *        This compresses the 2-dimensional NDF called cosmos to produce a 
 *        1-dimensional NDF called profile. This is done using a
 *        compression box which is 1 pixel high, but which is wider than
