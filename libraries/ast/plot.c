@@ -602,6 +602,12 @@ f     - Title: The Plot title drawn using AST_GRID
 *     7-AUG-2006 (DSB)
 *        Increase the number of attempts to find a new gap size from 5 to
 *        25 in GetTicks.
+*     24-OCT-2006 (DSB)
+*        Add the ForceExterior attribute so that SPLAT can have external
+*        axes even if there are no usable horizontal axis ticks (as requested 
+*        by PWD). Currently this attribute is not included in the public
+*        documentation, as it may cause problems. If it seems to work OK
+*        then it can be made public.
 *class--
 */
 
@@ -1568,6 +1574,11 @@ static int TestTickAll( AstPlot * );
 static void ClearTickAll( AstPlot * );
 static void SetTickAll( AstPlot *, int );
 
+static int GetForceExterior( AstPlot * );
+static int TestForceExterior( AstPlot * );
+static void ClearForceExterior( AstPlot * );
+static void SetForceExterior( AstPlot *, int );
+
 static int GetBorder( AstPlot * );
 static int TestBorder( AstPlot * );
 static void ClearBorder( AstPlot * );
@@ -1783,7 +1794,7 @@ static int CountGood( int, double * );
 static int Cross( float, float, float, float, float, float, float, float );
 static int CvBrk( AstPlot *, int, double *, double *, double * );
 static int EdgeCrossings( AstPlot *, int, int, double, double *, double **, const char *, const char * );
-static int EdgeLabels( AstPlot *, int, TickInfo **, CurveData **, const char *, const char * );
+static int EdgeLabels( AstPlot *, int, TickInfo **, CurveData **, int, const char *, const char * );
 static int FindDPTZ( AstFrame *, int, const char *, const char *, int *, int * );
 static int FindMajTicks( AstMapping *, AstFrame *, int, double, double, double , double *, int, double *, double ** );
 static int FindMajTicks2( int, double, double, int, double *, double ** );
@@ -2051,6 +2062,54 @@ astMAKE_CLEAR(Plot,TickAll,tickall,-1)
 astMAKE_GET(Plot,TickAll,int,1,(this->tickall == -1 ? 1 : this->tickall))
 astMAKE_SET(Plot,TickAll,int,tickall,( value ? 1 : 0 ))
 astMAKE_TEST(Plot,TickAll,( this->tickall != -1 ))
+
+/* ForceExterior */
+/* ------------- */
+/*
+*att+
+*  Name:
+*     ForceExterior
+
+*  Purpose:
+*     Force the use of exterior labelling?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute controls the appearance of an annotated
+c     coordinate grid (drawn with the astGrid function) by forcing
+f     coordinate grid (drawn with the AST_GRID routine) by forcing
+*     labels and tick marks to be drawn round the edges of the plot 
+*     (rather than across the middle of the plot), even if there appear
+*     to be insufficient edge crossings to justify the use of exterior
+*     labelling. 
+*
+*     The default value of zero results in the decision about whether to
+*     use interior or exterior labelling being made purely on the basis
+*     of the value of the Labelling attribute. If ForceExterior is set to
+*     a non-zero value, then the Labelling attribute is ignored and exterior
+*     labelling will always be attempted, even if there appear to be
+*     insufficient edge labels to justify their use.
+
+*  Applicability:
+*     Plot
+*        All Plots have this attribute.
+
+*  Notes:
+*     - The value of this attribute is currently under investigation, and
+*     so this attribute prologue is currently marked as protected rather 
+*     than public (in order to prevent it being included in the public
+*     documentation).
+*att-
+*/
+astMAKE_CLEAR(Plot,ForceExterior,forceexterior,-1)
+astMAKE_GET(Plot,ForceExterior,int,0,(this->forceexterior == -1 ? 0 : this->forceexterior))
+astMAKE_SET(Plot,ForceExterior,int,forceexterior,( value ? 1 : 0 ))
+astMAKE_TEST(Plot,ForceExterior,( this->forceexterior != -1 ))
 
 /*
 *att++
@@ -6339,6 +6398,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "tickall" ) ) {
       astClearTickAll( this );
 
+/* ForceExterior */
+/* ------------- */
+   } else if ( !strcmp( attrib, "forceexterior" ) ) {
+      astClearForceExterior( this );
+
 /* Invisible. */
 /* ---------- */
    } else if ( !strcmp( attrib, "invisible" ) ) {
@@ -9942,7 +10006,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 }
 
 static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid, 
-                       CurveData **cdata, const char *method, 
+                       CurveData **cdata, int force, const char *method, 
                        const char *class ){
 /*
 *
@@ -9959,7 +10023,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 *  Synopsis:
 *     #include "plot.h"
 *     int EdgeLabels( AstPlot *this, int ink, TickInfo **grid, 
-*                     CurveData **cdata, const char *method, 
+*                     CurveData **cdata, int force, const char *method, 
 *                     const char *class )
 
 *  Class Membership:
@@ -9969,7 +10033,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 *     This function determines how many major tick value labels could be 
 *     placed on the specified edges of the plotting area, and then if
 *     requested, and if sufficient such labels are found (more than 3 on 
-*     each axis), they are drawn . To place a label on an edge, the curve 
+*     each axis), they are drawn. To place a label on an edge, the curve 
 *     defining the major tick value must cross the edge at a reasonably 
 *     angle (at least 3 degrees). Labels are not drawn which would overlap 
 *     other, previously drawn, labels. A flag is returned indicating if 
@@ -9992,6 +10056,9 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 *        major tick value on the axis), holding information about breaks
 *        in the curves drawn to mark the major tick values. See function 
 *        DrawGrid. 
+*     force
+*        If non-zero, then an attempt is made to draw edge labels even if
+*        it looks like insufficient edge labels can be produced.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -10328,10 +10395,11 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
    whether there are enough of these labels to make edge labelling
    feasable. If so, we carry on and draw the labels. There need to be 
    at least 3 labels on each axis for linear tick spacing and 2 for log 
-   tick spacing...
+   tick spacing (or a non-zero value supplied for "force")...
    ================================================================= */   
-   if( astOK && medge[ 0 ] > ( astGetLogTicks( this, 0 ) ? 1 : 2 )
-             && medge[ 1 ] > ( astGetLogTicks( this, 1 ) ? 1 : 2 ) ){
+   if( astOK && ( ( medge[ 0 ] > ( astGetLogTicks( this, 0 ) ? 1 : 2 ) &&
+                    medge[ 1 ] > ( astGetLogTicks( this, 1 ) ? 1 : 2 ) ) 
+       || force ) ) {                  
 
 /* Set the returned flag to indicate that edge labelling is being used. */
       edgelabs = 1;
@@ -13476,6 +13544,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          result = buff;
       }
 
+/* ForceExterior. */
+/* -------------- */
+   } else if ( !strcmp( attrib, "forceexterior" ) ) {
+      ival = astGetForceExterior( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
 /* Invisible. */
 /* ---------- */
    } else if ( !strcmp( attrib, "invisible" ) ) {
@@ -15951,7 +16028,7 @@ f        The global status.
    if( astGetLabelling( this ) ){
       edgeticks = 0;
    } else {
-      edgeticks = EdgeLabels( this, 0, grid, cdata, method, class );
+      edgeticks = EdgeLabels( this, 0, grid, cdata, 0, method, class );
 
 /* If the external labelling was requested, but could not be produced... */
       if( !edgeticks ) {
@@ -15967,13 +16044,14 @@ f        The global status.
             astSetEdge( this, 1, oldedge0 );
 
 /* See if exterior labels could be drawn with these new edges. */
-            edgeticks = EdgeLabels( this, 0, grid, cdata, method, class );
+            edgeticks = EdgeLabels( this, 0, grid, cdata, 0, method, class );
 
 /* If this would allow us to use the requested labelling scheme, retain
    the new Edge values, setting a flag to indicate that they will need to be
    cleared before returning. Otherwise, clear them. */
             if( edgeticks ) {
                clredge = 1;
+
             } else {
                astClearEdge( this, 0 );
                astClearEdge( this, 1 );
@@ -15982,7 +16060,14 @@ f        The global status.
       }
    }
 
-/* We also may need to swap edge values when usintg interior labelling in
+/* If edge ticks can still not be produced, but the ForceExterior attribute 
+   has a non-zero value, attempt to create exterior labels even though it 
+   looks like there may be insufficient of them to justify their use. */
+   if( !edgeticks && astGetForceExterior( this ) ) {
+      edgeticks = EdgeLabels( this, 0, grid, cdata, 1, method, class );
+   }
+
+/* We may also need to swap edge values when using interior labelling in
    order to ensure that the text labels are placed on appropriate edges of
    the plotting box. */
    if( !edgeticks && !astTestEdge( this, 0 ) && !astTestEdge( this, 1 ) ) {
@@ -17186,10 +17271,17 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
    vtab->SetGrid = SetGrid;
    vtab->GetGrid = GetGrid;
    vtab->TestGrid = TestGrid;
+
    vtab->ClearTickAll = ClearTickAll;
    vtab->SetTickAll = SetTickAll;
    vtab->GetTickAll = GetTickAll;
    vtab->TestTickAll = TestTickAll;
+
+   vtab->ClearForceExterior = ClearForceExterior;
+   vtab->SetForceExterior = SetForceExterior;
+   vtab->GetForceExterior = GetForceExterior;
+   vtab->TestForceExterior = TestForceExterior;
+
    vtab->ClearInvisible = ClearInvisible;
    vtab->SetInvisible = SetInvisible;
    vtab->GetInvisible = GetInvisible;
@@ -18375,7 +18467,8 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
 
 /* If required, draw the labels around the edges of the plotting area. */
    if( labelat[ 0 ] == AST__BAD || labelat[ 1 ] == AST__BAD ){
-      (void) EdgeLabels( this, 1, grid, cdata, method, class );
+      (void) EdgeLabels( this, 1, grid, cdata, astGetForceExterior( this ), 
+                         method, class );
 
 /* Otherwise, draw labels within the interior of the plotting area. */
    } else {
@@ -21584,6 +21677,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         && ( nc >= len ) ) {
       astSetTickAll( this, ival );
 
+/* ForceExterior */
+/* ------------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "forceexterior= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetForceExterior( this, ival );
+
 /* Invisible. */
 /* ---------- */
    } else if ( nc = 0,
@@ -22641,6 +22741,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* -------- */
    } else if ( !strcmp( attrib, "tickall" ) ) {
       result = astTestTickAll( this );
+
+/* ForceExterior */
+/* ------------- */
+   } else if ( !strcmp( attrib, "forceexterior" ) ) {
+      result = astTestForceExterior( this );
 
 /* Invisible. */
 /* ---------- */
@@ -26438,6 +26543,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    ival = set ? GetTickAll( this ) : astGetTickAll( this );
    astWriteInt( channel, "TckAll", set, 1, ival, "Put ticks on all edges?" );
 
+/* ForceExterior. */
+/* -------------- */
+   set = TestForceExterior( this );
+   ival = set ? GetForceExterior( this ) : astGetForceExterior( this );
+   astWriteInt( channel, "FrcExt", set, 1, ival, "Force exterior labelling?" );
+
 /* Invisible. */
 /* ---------- */
    set = TestInvisible( this );
@@ -27278,6 +27389,9 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    cause a default value of 1 (yes) to be used. */
       new->tickall = -1;
 
+/* Force exterior labelling, even if they appear to be unjustified? */
+      new->forceexterior = -1;
+
 /* Shoudl ast Grid draw a boundary round the regions of valid coordinates? 
    Store a value of -1 to indicate that no value has yet been set. This will 
    cause a default value of 1 (yes) to be used. */
@@ -27620,6 +27734,11 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 /* -------- */
       new->tickall = astReadInt( channel, "tckall", -1 );
       if ( TestTickAll( new ) ) SetTickAll( new, new->tickall );
+
+/* ForceExterior. */
+/* -------- */
+      new->forceexterior = astReadInt( channel, "frcext", -1 );
+      if ( TestForceExterior( new ) ) SetForceExterior( new, new->forceexterior );
 
 /* Invisible. */
 /* ---------- */
