@@ -234,8 +234,14 @@
 *     6-JUN-2006 (DSB):
 *        Guard against CHR_FIND not finding a dot.
 *     2006 June 15 (MNB):
-*        Added that AAO fibre-table conversion to occur for NDF extension with
-*        name "FIBRES_IFU" as well as "FIBRES".
+*        Added that AAO fibre-table conversion to occur for NDF 
+*        extension with name "FIBRES_IFU" as well as "FIBRES".
+*     2006 October 24 (MJC):
+*        Moved code for HDSNAME and HDSTYPE for multi-NDF containers
+*        to COF_WHEAD where any existing keywords in the airlock with 
+*        those names are filtered.  Corrected the logic for computing
+*        BPOUTU when the supplied BITPIX argument is -1 and the airlock
+*        value thus accessed is negative.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -301,7 +307,6 @@
       CHARACTER * ( 48 ) COMENT  ! Comment from FITS-extension header
       DOUBLE PRECISION DELTA     ! Machine precision for scaling
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
-      INTEGER DOTPOS             ! Position of HDS component separator
       LOGICAL E2DF               ! Extension is from 2dF?
       INTEGER EL                 ! Number of elements in array
       LOGICAL FEXIST             ! FITS already exists?
@@ -319,12 +324,12 @@
       INTEGER IPNTR              ! Pointer to input array
       DOUBLE PRECISION MAXV      ! Max. value to appear in scaled array
       DOUBLE PRECISION MINV      ! Min. value to appear in scaled array
+      LOGICAL MULTIN             ! Multi-NDF container?
       INTEGER NBYTES             ! Number of bytes per array value
       INTEGER NC                 ! Number of character in string
       INTEGER NCF                ! Number of characters in filename
       INTEGER NDECIM             ! Number of decimal places in header
                                  ! value
-      CHARACTER * ( MSG__SZMSG ) NDFNAM ! NDF name for multi-NDF
       INTEGER NDIM               ! Number of dimensions
       INTEGER NEXTN              ! Number of extensions
       INTEGER NEX2PR             ! Number of extensions to process
@@ -467,6 +472,8 @@
                BPOUT = 8
                BPOUTU = BPOUT
 
+*  Use the BITPIX from the airlock.
+*  ---------------------------------
 *  Search the FITS extension for the first BITPIX keyword, and return
 *  its value.
             ELSE IF ( BITPIX .EQ. -1 ) THEN
@@ -482,26 +489,25 @@
                   BPOUTU = BPINU
                END IF
 
-*  Just use the input array's values.
+*  Just use the input array's BITPIX.
+*  ----------------------------------
             ELSE IF ( BITPIX .EQ. 0 ) THEN
                BPOUT = BPIN
                BPOUTU = BPINU
 
             ELSE
                BPOUT = BITPIX
-
-*  Allow for the sign of floating-point BITPIX values.
-               IF ( BITPIX .EQ. -32 .OR. BITPIX .EQ. -64 ) THEN
-                  BPOUTU = 1 - BPOUT
-               ELSE
-                  BPOUTU = BPOUT
-               END IF
+               BPOUTU = BPOUT
             END IF
 
 *  This is arbitrary.
          ELSE
             BPOUT = 8
          END IF
+
+*  Allow for the sign of floating-point BITPIX values to form the
+*  unsigned BITPIX.
+         IF ( BPOUTU .EQ. -32 .OR. BPOUTU .EQ. -64 ) BPOUTU = 1 - BPOUTU
 
 *  Open a new header and data unit for extensions.
 *  ===============================================
@@ -530,49 +536,14 @@
 *  only appear in the primary array's header, if requested.
          PROPEX = ( PROFIT .AND. ICOMP .EQ. 1 ) .OR. HDONLY
 
+*  Is this a multi-NDF container?
+         MULTIN = .NOT. ( HDONLY .AND. FOPEN )
+
 *  First write the standard headers, and merge in the FITS extension
 *  when requested to do so.
          CALL COF_WHEAD( NDF, ARRNAM( ICOMP ), FUNIT, BPOUT, PROPEX,
-     :                   ORIGIN, ENCOD, NATIVE, STATUS )
+     :                   ORIGIN, ENCOD, NATIVE, MULTIN, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
-
-*  Write additional header cards for the multi-NDF component.
-*  ==========================================================
-         IF ( .NOT. ( HDONLY .AND. FOPEN ) ) THEN
-
-*  Obtain the NDF name.
-            CALL NDF_MSG( 'NDF', NDF )
-            CALL MSG_LOAD( 'NDFNAME', '^NDF', NDFNAM, NC, STATUS )
-            DOTPOS = 1
-            CALL CHR_FIND( NDFNAM, '.', .TRUE., DOTPOS )
-
-*  Set the component name.
-            IF ( DOTPOS .LT. NC ) THEN
-               CALL FTPKYS( FUNIT, 'HDSNAME', NDFNAM( DOTPOS+1: ), 
-     :                      'Component name hierarchical structure',
-     :                      FSTAT )
-            END IF
-
-*  Handle a bad status.  Negative values are reserved for non-fatal
-*  warnings.
-            IF ( FSTAT .GT. FITSOK ) THEN
-               CALL COF_FIOER( FSTAT, 'COF_NDF2F_ERR1', 'FTPKYJ',
-     :           'Error writing extension level in header.', STATUS )
-               GOTO 999
-            END IF
-
-*  Set the component type.
-            CALL FTPKYS( FUNIT, 'HDSTYPE', 'NDF', 'HDS data '/
-     :                   /'type of the component', FSTAT )
-
-*  Handle a bad status.  Negative values are reserved for non-fatal
-*  warnings.
-            IF ( FSTAT .GT. FITSOK ) THEN
-               CALL COF_FIOER( FSTAT, 'COF_NDF2F_ERR2', 'FTPKYS',
-     :           'Error writing extension type in header.', STATUS )
-               GOTO 999
-            END IF
-         END IF
 
 *  Determine whether or not there are history records in the NDF.
 *  Append the history records for the first array.
