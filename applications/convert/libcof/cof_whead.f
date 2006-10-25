@@ -1,5 +1,5 @@
       SUBROUTINE COF_WHEAD( NDF, COMP, FUNIT, BITPIX, PROPEX, ORIGIN,
-     :                      ENCOD, NATIVE, STATUS )
+     :                      ENCOD, NATIVE, MULTI, STATUS )
 *+
 *  Name:
 *     COF_WHEAD
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL COF_WHEAD( NDF, COMP, FUNIT, BITPIX, PROPEX, ORIGIN,
-*                     ENCOD, NATIVE, STATUS )
+*                     ENCOD, NATIVE, MULTI, STATUS )
 
 *  Description:
 *     This routine creates the header section of the primary array or
@@ -51,6 +51,8 @@
 *        'DSS', 'FITS-WCS', 'NATIVE', etc (or a blank string).
 *     NATIVE = LOGICAL (Given)
 *        Include a NATIVE encoding of the WCS info in the header?
+*     MULTI = LOGICAL (Given)
+*        The input NDF is part of a multi-NDF container file?
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -97,6 +99,10 @@
 *          for efficiency and they can always be deleted later.  The
 *          END card is written by FITSIO automatically once the header
 *          is closed.
+*        HDSNAME is the NDF name for a component NDF in a multi-NDF
+*          container file, for example I2.
+*        HDSTYPE is set to "NDF" for a component NDF in a multi-NDF
+*          container file.
 
 *  [optional_subroutine_items]...
 *  Authors:
@@ -144,6 +150,10 @@
 *        argument is not default or blank.
 *     2006 April 5 (MJC):
 *        Allow for COMP='HEADER'.
+*     2006 October 24 (MJC):
+*        Added MULTI argument.  Moved code for HDSNAME and HDSTYPE from
+*        COF_NDF2F and filtered any existing keywords with those names
+*        in the FITS airlock.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -170,6 +180,7 @@
       CHARACTER * ( * ) ORIGIN   ! The ORIGIN card value
       CHARACTER * ( * ) ENCOD    ! The AST encoding to use for WCS info
       LOGICAL   NATIVE           ! Include NATIVE encoding of WCS info?
+      LOGICAL   MULTI            ! Multi-NDF container file?
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -208,6 +219,7 @@
       CHARACTER CRPIX * ( SZKEY ) ! Keyword name of CRPIXn
       CHARACTER CRVAL * ( SZKEY ) ! Keyword name of CRVALn
       INTEGER   DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
+      INTEGER   DOTPOS           ! Position of HDS component separator
       LOGICAL   FITSPR           ! FITS extension is present?
       CHARACTER FITSTR * ( SZFITS ) ! FITS header
       INTEGER   FSTAT            ! FITSIO status
@@ -222,11 +234,12 @@
       LOGICAL   MANDAT           ! Not a mandatory header?
       INTEGER   NCHAR            ! Length of a character string
       INTEGER   NCOMP            ! Number of components
+      CHARACTER * ( MSG__SZMSG ) NDFNAM ! NDF name for multi-NDF
       INTEGER   NDIM             ! Number of dimensions
       CHARACTER NULL * ( 1 )     ! ASCII null character
       LOGICAL   PRORIG           ! Use supplied ORIGIN argument
       LOGICAL   ROTAX( DAT__MXDIM ) ! An axis is rotated in the FITS
-                                 !FITS extension
+                                 ! extension?
       LOGICAL   TITFND           ! NDF TITLE found?
       LOGICAL   UNTFND           ! NDF UNITS found?
       CHARACTER VALUE * ( SZVAL ) ! Accommodates keyword value
@@ -307,6 +320,47 @@
          GOTO 999
       END IF
 
+*  Write additional header cards for the multi-NDF component.
+*  ==========================================================
+
+*    HDSNAME, HDSTYPE --- used when the input file is a multi-NDF 
+*      container file and specify the NDF component name and type.
+      IF ( MULTI ) THEN
+
+*  Obtain the NDF name.
+         CALL NDF_MSG( 'NDF', NDF )
+         CALL MSG_LOAD( 'NDFNAME', '^NDF', NDFNAM, NCHAR, STATUS )
+         DOTPOS = 1
+         CALL CHR_FIND( NDFNAM, '.', .TRUE., DOTPOS )
+
+*  Set the component name.
+         IF ( DOTPOS .LT. NCHAR ) THEN
+            CALL FTPKYS( FUNIT, 'HDSNAME', NDFNAM( DOTPOS+1: ), 
+     :                   'Component name hierarchical structure', 
+     :                   FSTAT )
+         END IF
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.
+         IF ( FSTAT .GT. FITSOK ) THEN
+            CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR2', 'FTPKYJ',
+     :        'Error writing extension level in header.', STATUS )
+            GOTO 999
+         END IF
+
+*  Set the component type.
+         CALL FTPKYS( FUNIT, 'HDSTYPE', 'NDF', 'HDS data '/
+     :                /'type of the component', FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.
+         IF ( FSTAT .GT. FITSOK ) THEN
+            CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR3', 'FTPKYS',
+     :        'Error writing extension type in header.', STATUS )
+            GOTO 999
+         END IF
+      END IF
+
 *  Deal with the FITS extension that is present.
 *  =============================================
 
@@ -365,10 +419,10 @@
 *  --------------------
 *  Leave out SIMPLE, XTENSION, BITPIX, EXTEND, PCOUNT, GCOUNT, NAXIS,
 *  NAXISn, and possibly LBOUNDn, CDELTn, CRVALn, CRPIXn, CRTYPEn,
-*  CTYPEn, CUNITn, OBJECT, LABEL, BUNIT, DATE, BLANK, HDUCLASn, and END
-*  as described above.  Note CROTAn are also excluded.  To avoid
-*  duplicate FITSIO banners these are also omitted, as they are written
-*  when FITSIO creates the primary headers.
+*  CTYPEn, CUNITn, OBJECT, LABEL, BUNIT, DATE, BLANK, HDUCLASn, HDSNAME,
+*  HDSTYPE, and END as described above.  Note CROTAn are also excluded. 
+*  To  avoid duplicate FITSIO banners these are also omitted, as they 
+*  are written when FITSIO creates the primary headers.
 *
 *  Use an intermediate variable to reduce the number of continuation
 *  lines in the test.  This combines tests for the mandatory headers.
@@ -412,6 +466,8 @@
      :        ( KEYWRD .NE. 'EXTNAME' ) .AND.
      :        ( KEYWRD( 1:6 ) .NE. 'LBOUND' ) .AND.
      :        ( KEYWRD( 1:7 ) .NE. 'HDUCLAS' ) .AND.
+     :        ( KEYWRD( 1:7 ) .NE. 'HDSNAME' ) .AND.
+     :        ( KEYWRD( 1:7 ) .NE. 'HDSTYPE' ) .AND.
      :        ( KEYWRD( 1:5 ) .NE. 'CDELT' .OR. .NOT. AXIFND ) .AND.
      :        ( KEYWRD( 1:5 ) .NE. 'CRVAL' .OR. .NOT. AXIFND ) .AND.
      :        ( KEYWRD( 1:5 ) .NE. 'CRPIX' .OR. .NOT. AXIFND ) .AND.
@@ -488,7 +544,7 @@
 *  We should aim to have header-validation software.
                IF ( FSTAT .GT. FITSOK ) THEN
                   CALL ERR_MARK
-                  CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR3', 'FTPREC',
+                  CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR4', 'FTPREC',
      :              'Warning: error unable to propagate a header from '/
      :              /'NDF''s FITS airlock.', STATUS )
 
@@ -543,7 +599,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
                      IF ( FSTAT .GT. FITSOK ) THEN
-                        CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR2',
+                        CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR5',
      :                    'FTPREC', 'Error copying FITS axis-rotation '/
      :                    /'header card to the FITS file.', STATUS )
                         GOTO 999
