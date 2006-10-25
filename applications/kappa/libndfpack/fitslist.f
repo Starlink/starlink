@@ -81,10 +81,12 @@
 *     1991 February 28 (MJC):
 *        Original version.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     2006 October 17 (TIMJ):
-*        Enable STREAM mode when dumping FITS contents. We do not want
+*        Enable STREAM mode when dumping FITS contents.  We do not want
 *        to word wrap at 79 characters.
+*     2006 October 24 (MJC):
+*        Use modern commenting style.
 *     {enter_further_changes_here}
 
 *-
@@ -102,45 +104,34 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER
-     :  EL,                      ! Number of cards in the header
-     :  FD,                      ! Logfile descriptor
-     :  LENGTH,                  ! Length of a character being mapped
-     :  NDF,                     ! NDF identifier
-     :  PNTR( 1 )                ! Pointer to the card images
-
-      LOGICAL                    ! True if:
-     :  LOGF                     ! The log file is open
-
-      CHARACTER * ( DAT__SZLOC )
-     :  LOC                      ! Locator to the FITS extension.
+      INTEGER EL                 ! Number of cards in the header
+      INTEGER FD                 ! Logfile descriptor
+      INTEGER LENGTH             ! Length of a character being mapped
+      CHARACTER * ( DAT__SZLOC ) LOC ! Locator to the FITS extension
+      LOGICAL LOGF               ! The log file is open?
+      INTEGER NDF                ! NDF identifier
+      INTEGER PNTR( 1 )          ! Pointer to the card images
 
 *.
 
-*    Check the inherited global status.
-
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Begin an NDF context.
-
+*  Begin an NDF context.
       CALL NDF_BEGIN
 
-*    Obtain an identifier for the input NDF.
-
+*  Obtain an identifier for the input NDF.
       CALL LPG_ASSOC( 'IN', 'READ', NDF, STATUS )
 
-*    Obtain a locator to the FITS extension.
-
+*  Obtain a locator to the FITS extension.
       CALL NDF_XLOC( NDF, 'FITS', 'READ', LOC, STATUS )
 
-*    Map the 80-character FITS card images stored within the extension.
-
+*  Map the 80-character FITS card images stored within the extension.
       CALL DAT_MAPV( LOC, '_CHAR*80', 'READ', PNTR( 1 ), EL, STATUS )
       LENGTH = 80
 
-*    Open the log file.  If null is returned from the parameter system,
-*    the list of FITS headers are reported to the user directly.
-
+*  Open the log file.  If null is returned from the parameter system,
+*  the list of FITS headers are reported to the user directly.
       CALL ERR_MARK
       LOGF = .FALSE.
       CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 80, FD, STATUS )
@@ -152,49 +143,42 @@
       END IF
       CALL ERR_RLSE
 
-*    Check the status before accessing EL.
-
+*  Check the status before accessing EL.
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*     Tell MSG that it should not wrap at 79 characters since we know
-*     we are in blocks of 80. Given that we can not query MSG for the
-*     current values it is difficult to ensure that we reset to the
-*     correct value. We make a guess that we are not in STREAM
-*     mode and simply re-enable formatted mode afterwards.
+*  Tell MSG that it should not wrap at 79 characters since we know we
+*  are in blocks of 80.  Given that we can not query MSG for the current
+*  values it is difficult to ensure that we reset to the correct value.
+*  value.  We make a guess that we are not in STREAM mode and simply 
+*  re-enable formatted mode afterwards.
          CALL MSG_TUNE( 'STREAM', 1, STATUS )
 
-*       Write the headers to the log file or report them directly.
-*       Note that the length of the character-array elements is passed
-*       by value after the last genuine argument.  This is for UNIX and
-*       does not harm on VMS.  The second character argument is no
-*       problem since it is not passed by pointer.
-
+*  Write the headers to the log file or report them directly.  Note that
+*  the length of the character-array elements is passed by value after
+*  the last genuine argument.  This is for UNIX and does no harm on VMS.
+*  The second character argument is no problem since it is not passed by
+*   pointer.
          CALL KPG1_LISTC( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                    LOGF, STATUS, %VAL( LENGTH ) )
 
-*     Reset the MSG tuning parameter
+*  Reset the MSG tuning parameter
          CALL MSG_TUNE( 'STREAM', 0, STATUS )
 
       END IF
 
-*    Close the log file if one has been opened.
-
+*  Close the log file if one has been opened.
       IF ( LOGF ) CALL FIO_ANNUL( FD, STATUS )
 
-*    Tidy the locator to the FITS extension.
-
+*  Tidy the locator to the FITS extension.
       CALL DAT_ANNUL( LOC, STATUS )
 
-*    End the NDF context.
-
+*  End the NDF context.
       CALL NDF_END( STATUS )
 
-*    If an error occurred, then report a contextual message.
-
+*  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'FITSLIST_ERR',
-     :   'FITSLIST: Error listing a FITS extension.',
-     :   STATUS )
+     :     'FITSLIST: Error listing a FITS extension.', STATUS )
       END IF
 
       END
