@@ -54,6 +54,8 @@
 *        Don't free constant memory used by AST
 *     2006-10-23 (AGG):
 *        Fix bug in Dec conversion to radians
+*     2006-10-25 (EC):
+*        Statically allocate memory for convert
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -101,7 +103,7 @@
 void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx, 
                         int *status ) {
 
-   char *convert = NULL;         /* String for converting values */
+   char convert[SC2SIM__FLEN]; /* String for converting values */
    char *curtok=NULL;     /* current jig vertex being parsed */
    double dec;            /* Double representation of Dec */
    int grid_max_x;        /* The reconstruction grid max X */
@@ -116,14 +118,13 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    int nvert_y=0;         /* Number of jig_Y vertices */
    double ra;             /* Double representation of RA */
    const char *temp=NULL; /* Pointer to static strings created by ast */
+   char *thischar=NULL;   /* Pointer to current character being upcased */
    int vert_x[SC2SIM__MXVERT]; /* Temporary array for x-vertices */
    int vert_y[SC2SIM__MXVERT]; /* Temporary array for y-vertices */
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
  
-   convert = smf_malloc ( SC2SIM__FLEN, sizeof (*convert), 1, status );
-
    if ( !astMapGet0D ( keymap, "BOL_DISTX", &(inx->bol_distx) ) )
       inx->bol_distx = 6.28;
 
@@ -159,15 +160,13 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0C ( keymap, "COORDFRAME", &temp ) )
       strncpy ( inx->coordframe, "RADEC", 80 ); 
    else {
-     strncpy ( convert, temp, 80 );
+      strncpy ( convert, temp, 80 );
       /* Convert to uppercase */
-     i = 0;
-      while ( *convert != '\0' ) {
-         *convert = toupper (*convert);
-         convert++;
-         i++;
+      thischar = convert;
+      while ( *thischar != '\0' ) {
+         *thischar = toupper (*thischar);
+         thischar++;
       }
-      convert = convert - i;
       strncpy ( inx->coordframe, convert, 80 );
    }
 
@@ -350,15 +349,13 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       strncpy ( inx->obsmode, "PONG", 80 ); 
    else {
       /* Convert to uppercase */
-     strncpy ( convert, temp, 80 );
-     i = 0;
-     while ( *convert != '\0' ) {
-       *convert = toupper (*convert);
-       convert++;
-       i++;
-     }
-     convert = convert - i;
-     strncpy ( inx->obsmode, convert, 80 );
+      strncpy ( convert, temp, 80 );
+      thischar = convert;
+      while ( *thischar != '\0' ) {
+       *thischar = toupper (*thischar);
+       thischar++;
+      }
+      strncpy ( inx->obsmode, convert, 80 );
    }
 
    if ( !astMapGet0I ( keymap, "PLATENUM", &(inx->platenum) ) )
@@ -384,13 +381,11 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    else {
      strncpy ( convert, temp, 80 );
       /* Convert to uppercase */
-     i = 0;
-      while ( *convert != '\0' ) {
-         *convert = toupper (*convert);
-         convert++;
-         i++;
+      thischar = convert;
+      while ( *thischar != '\0' ) {
+         *thischar = toupper (*thischar);
+         thischar++;
       }
-      convert = convert - i;
       strncpy ( inx->pong_type, convert, 80 );
    }
 
@@ -435,6 +430,5 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0D ( keymap, "TARGETPOW", &(inx->targetpow) ) )
       inx->targetpow = 25.0;
 
-   smf_free ( convert, status );
 }
 
