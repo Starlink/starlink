@@ -89,9 +89,6 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
    /* Check status */
    if ( !StatusOkP(status) ) return;
 
-   
-   /* temp = smf_malloc ( SC2SIM__FLEN, sizeof (*temp), 1, status ); */
- 
    if ( !astMapGet0I ( keymap, "ADD_ATM", &(sinx->add_atm) ) )
       sinx->add_atm = 0;
   
@@ -214,8 +211,6 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
 
    if ( !astMapGet0D ( keymap, "YPOINT", &(sinx->ypoint) ) )
       sinx->ypoint = 20.0;
-
-   /*smf_free ( temp, status );*/
 
 }
 
