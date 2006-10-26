@@ -2110,3 +2110,155 @@ int *status        /* global status (given and returned) */
    sc2open = 1; 
 }
 
+/*+ sc2store_wrtstream_fitschan - store SCUBA-2 time stream data as
+    an NDF.  This routine is a modification of sc2store_wrtstream
+    using and AstFitsChan for the FITS headers. */
+
+void sc2store_wrtstream_fitschan
+(
+char file_name[],  /* output file name (given) */
+AstFitsChan *fitschan, /* FITS headers */
+int colsize,       /* number of bolometers in column (given) */
+int rowsize,       /* number of bolometers in row (given) */
+int numsamples,    /* number of samples (given) */
+int nflat,         /* number of flat coeffs per bol (given) */
+char *flatname,    /* name of flatfield algorithm (given) */
+JCMTState head[],  /* header data for each frame (given) */
+int *dbuf,         /* time stream data (given) */
+int *darksquid,    /* dark SQUID time stream data (given) */
+double *fcal,      /* flat-field calibration (given) */
+double *fpar,      /* flat-field parameters (given) */
+char *obsmode,    /* Observing mode (given) */
+int jig_vert[][2], /* Array of jiggle vertices (given) */
+int nvert,         /* Number of jiggle vertices (given) */
+double jig_path[][2], /* Path of SMU during jiggle cycle (given) */
+int npath,         /* Number of positions in jiggle path (given) */
+int *status        /* global status (given and returned) */
+)
+
+/*  Description :
+     Create and map a SCUBA-2 NDF file. Store a compressed version of the time
+     stream, the per-frame header items, the current flatfield calibration
+     and the FITS headers.
+
+    Authors :
+     B.D.Kelly (UKATC)
+     A.G.Gibb (UBC)
+     J.Balfour (UBC)
+
+    History :
+     26Sep2006 : Clone sc2store_wrtstream and replace fitsrec 
+                 with AstFitsChan (jb)
+*/
+
+{
+   int *bzero;                      /* pointer to subtracted offset values */
+   unsigned short *data;            /* pointer to data array */
+   static int digits[2*DREAM__MXBOL]; /* copy of each frame */
+   int *dksquid;                    /* pointer to dark SQUID values */
+   double *flatcal;                 /* pointer to flatfield calibration */
+   double *flatpar;                 /* pointer to flatfield parameters */
+   int framesize;                   /* number of pixels in a frame */
+   int i;                           /* loop counter */
+   int j;                           /* loop counter */
+   double *jigpath;                 /* Pointer to SMU jiggle path */
+   int *jigvert;                    /* Pointer to SMU jiggle vertices */
+   int npix;                        /* number of incompressible pixels */
+   static int pixnum[DREAM__MXBOL]; /* indices of incompressible pixels */
+   static int pixval[DREAM__MXBOL]; /* values of incompressible pixels */
+   int *stackz;                     /* pointer to stackzero frame */
+
+   if ( !StatusOkP(status) ) return;
+
+   if ( sc2open != 0 )
+   {
+      *status = DITS__APP_ERROR;
+      sprintf ( errmess, 
+        "one SCUBA-2 data file already open, can't open %s", file_name );
+      ErsRep ( 0, status, errmess );
+      return;
+   }
+
+   sc2store_cremap ( file_name, colsize, rowsize, numsamples, nflat, flatname,
+		     &bzero, &data, &dksquid, &stackz, &flatcal, &flatpar,
+		     status );
+
+   framesize = colsize * rowsize;
+
+
+/* Use the first frame as the stackzero frame */
+
+   if ( StatusOkP(status) )
+   {
+
+      for ( j=0; j<framesize; j++ )
+      {
+         stackz[j] = dbuf[j];
+      }
+
+/* Compress one frame at a time */
+
+      for ( j=0; j<numsamples; j++ )
+      {
+         for ( i=0; i<framesize; i++ )
+         {
+            digits[i] = dbuf[j*framesize+i];
+         }
+
+         sc2store_compress ( framesize, stackz, digits, &(bzero[j]),
+           &(data[j*framesize]), &npix, pixnum, pixval, status );
+
+         if ( npix > 0 )
+         {
+            sc2store_putincomp ( j, npix, pixnum, pixval, status );
+         }
+
+/* Insert per-frame headers */
+
+         sc2store_headput ( j, head[j], status );
+      }
+
+/* Copy the dark SQUID values */
+
+      for ( j=0; j<numsamples*rowsize; j++ )
+      {
+         dksquid[j] = darksquid[j];
+      }
+
+/* Copy the flatfield calibration */
+
+      for ( j=0; j<framesize*nflat; j++ )
+      {
+         flatcal[j] = fcal[j];
+      }
+
+      for ( j=0; j<nflat; j++ )
+      {
+         flatpar[j] = fpar[j];
+      }
+
+   }
+
+   /* Create DREAM extension ONLY if we have DREAM data */
+   if ( strncmp( obsmode, "DREAM", 5 ) == 0 ) {
+     sc2store_credream( nvert, &jigvert, npath, &jigpath, status );
+     /* Copy the DREAM data into the array: Fortran order */
+     if ( *status == SAI__OK ) {
+       /* First jigvert */
+       for ( j=0; j<nvert; j++ ) {
+	 jigvert[j] = jig_vert[j][0];
+	 jigvert[j+nvert] = jig_vert[j][1];
+       }
+       /* Then jigpath */
+       for ( j=0; j<npath; j++ ) {
+	 jigpath[j] = jig_path[j][0];
+	 jigpath[j+npath] = jig_path[j][1];
+       }
+     }
+   }
+
+   /* Store the FITS headers */
+   kpgPtfts ( indf, fitschan, status );
+
+   sc2open = 1; 
+}
