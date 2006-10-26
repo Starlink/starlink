@@ -78,6 +78,8 @@
 *        Update API to take pointers to inx and sinx structs
 *     2006-09-22 (JB):
 *        Change dxml_structs to sc2sim_structs
+*     2006-10-26 (JB):
+*        Convert to using AstFitsChans
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -108,13 +110,10 @@
 #include <string.h>
 
 /* Starlink includes */
-#include "fitsio.h"
 #include "ndf.h"
 
 /* SC2SIM includes */
 #include "sc2sim.h"
-#include "fhead.h"
-#include "fhead_par.h"
 #include "sc2da/sc2store.h"
 
 void sc2sim_ndfwrheat
@@ -136,89 +135,46 @@ int *status        /* global status (given and returned) */
 
 {
    /* Local variables */
-   static char fitsrec[FHEAD__MXREC][81]; /* store for FITS records */
-   double fpos = 0;                       /* RA or Dec in degrees */
-   int nrec;                              /* number of FITS header records */
+   AstFitsChan *fitschan;           /* FITS headers */
+   double fpos = 0;                 /* RA or Dec in degrees */
+
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
 
-   /* Format the FITS headers */
+   /* Add the FITS data to the output file */
+   fitschan = astFitsChan ( NULL, NULL, "" );
+   /* Kludged to write generic date */ 
+   astSetFitsS ( fitschan, "DATE-OBS", "YYYY-MM-DDThh:mm:ss", "observation date", 0 );
+   astSetFitsF ( fitschan, "RA", fpos, "Right Ascension of observation", 0 );
+   astSetFitsF ( fitschan, "DEC", fpos, "Declination of observation", 0 );
+   astSetFitsI ( fitschan, "ADD_ATM", sinx->add_atm, 
+                 "flag for adding atmospheric emission", 0 );
+   astSetFitsI ( fitschan, "ADDFNOIS", sinx->add_fnoise, 
+                 "flag for adding 1/f noise", 0 );
+   astSetFitsI ( fitschan, "ADD_PNS", sinx->add_pns, 
+                 "flag for adding photon noise", 0 );
+   astSetFitsF ( fitschan, "HEATVAL", inx->heatstart, "heater setting in pW", 0 );
+   astSetFitsI ( fitschan, "NBOLX", inx->nbolx,
+                 "number of bolometers in X direction", 0 );
+   astSetFitsI ( fitschan, "NBOLY", inx->nboly, 
+                 "number of bolometers in Y direction", 0 );
+   astSetFitsF ( fitschan, "SAMPLE_T", inx->sample_t, "The sample interval in msec", 0 );
+   astSetFitsS ( fitschan, "SUBARRAY", sinx->subname, "subarray name", 0 );
+   astSetFitsI ( fitschan, "NUMSAMP", numsamples, "number of samples", 0 );
+   astSetFitsS ( fitschan, "FILTER", filter, "filter used", 0 );
+   astSetFitsF ( fitschan, "ATSTART", sinx->atstart, 
+                 "Ambient temperature at start (C)", 0 ); 
+   astSetFitsF ( fitschan, "ATEND", sinx->atend, 
+                 "Ambient temperature at end (C)", 0 );
 
-   fhead_init ( status );
+   /* Store the timestream data -- KLUDGED FOR NOW TO REMOVE DEPENDENCE ON
+      FITSREC */
 
-   fhead_putfits ( TSTRING,
-		   "DATE-OBS", "YYYY-MM-DDThh:mm:ss",
-		   "observation date", status );
-
-   fhead_putfits ( TDOUBLE,
-		   "RA", &fpos,
-		   "Right Ascension of observation", status );
-
-   fhead_putfits ( TDOUBLE,
-		   "DEC", &fpos,
-		   "Declination of observation", status );
-
-   fhead_putfits ( TINT,
-		   "ADD_ATM", &(sinx->add_atm),
-		   "flag for adding atmospheric emission", status );
-
-   fhead_putfits ( TINT,
-		   "ADDFNOIS", &(sinx->add_fnoise),
-		   "flag for adding 1/f noise", status );
-
-   fhead_putfits ( TINT,
-		   "ADD_PNS", &(sinx->add_pns),
-		   "flag for adding photon noise", status );
-
-   fhead_putfits ( TDOUBLE,
-		   "HEATVAL", &(inx->heatstart),
-		   "heater setting in pW", status );
-
-   fhead_putfits ( TINT,
-		   "NBOLX", &(inx->nbolx),
-		   "number of bolometers in X direction", status );
-
-   fhead_putfits ( TINT,
-		   "NBOLY", &(inx->nboly),
-		   "number of bolometers in Y direction", status );
-
-   fhead_putfits ( TDOUBLE,
-		   "SAMPLE_T", &(inx->sample_t),
-		   "The sample interval in msec", status );
-
-   fhead_putfits ( TSTRING,
-		   "SUBARRAY", sinx->subname,
-		   "subarray name", status );
-
-   fhead_putfits ( TINT,
-		   "NUMSAMP", &numsamples,
-		   "number of samples", status );
-
-   fhead_putfits ( TSTRING,
-		   "FILTER", filter,
-		   "filter used", status );
-
-   fhead_putfits ( TDOUBLE,
-		   "ATSTART", &(sinx->atstart),
-		   "Ambient temperature at start (C)", status );
-
-   fhead_putfits ( TDOUBLE,
-		   "ATEND", &(sinx->atend),
-		   "Ambient temperature at end (C)", status );
-
-   /* Get the accumulated FITS headers */
-   fhead_getfits ( &nrec, fitsrec, status );
-
-   /* Store the timestream data */
-
-   /*   sc2store_wrtstream ( file_name, nrec, fitsrec, ncol, nrow, numsamples, 
-	nflat, flatname, head, dbuf, dksquid, fcal, fpar, status );*/
-   sc2store_wrtstream ( file_name, nrec, fitsrec, inx->nbolx, inx->nboly, 
+   sc2store_wrtstream_fitschan ( file_name, fitschan, inx->nbolx, inx->nboly, 
 			numsamples, nflat, flatname, head, dbuf, dksquid, 
 			fcal, fpar, inx->obsmode, inx->jig_vert, inx->nvert, 
 			NULL, 0, status );
-
 
    /* Close the file */
    sc2store_free ( status );

@@ -92,6 +92,8 @@
 *        Replace dxml_structs with sc2sim_structs
 *     2006-10-06 (AGG):
 *        Add WAVELEN FITS keyword
+*     2006-10-26 (JB):
+*        Convert to using AstFitsChans
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -122,13 +124,12 @@
 #include <string.h>
 
 /* Starlink includes */
-#include "fitsio.h"
+#include "ast.h"
 #include "ndf.h"
+#include "star/kaplibs.h"
 
 /* SC2SIM includes */
 #include "sc2sim.h"
-#include "fhead.h"
-#include "fhead_par.h"
 #include "sc2da/sc2store.h"
 
 void sc2sim_ndfwrdata
@@ -156,7 +157,7 @@ int *status       /* global status (given and returned) */
 {
    /* Local variables */
    double decd;                     /* Dec of observation in degrees */
-   static char fitsrec[FHEAD__MXREC][81];  /* store for FITS records */
+   AstFitsChan *fitschan;           /* FITS headers */
    int i;                           /* Loop counter */
    int nrec;                        /* number of FITS header records */
    double rad;                      /* RA of observation in degrees */
@@ -176,120 +177,56 @@ int *status       /* global status (given and returned) */
    /* Check status */
    if ( !StatusOkP(status) ) return;
 
-   /* Format the FITS headers */
-
-   fhead_init ( status );
-  
-   fhead_putfits ( TSTRING,
-		   "DATE-OBS", "YYYY-MM-DDThh:mm:ss",
-		   "observation date", status );
-  
+   /* Add the FITS data to the output file */
+   fitschan = astFitsChan ( NULL, NULL, "" );
+   /* Kludged to write generic date */ 
+   astSetFitsS ( fitschan, "DATE-OBS", "YYYY-MM-DDThh:mm:ss", "observation date", 0 );
    rad = inx->ra * AST__DR2D;
-  
-   fhead_putfits ( TDOUBLE,
-		   "RA", &rad,
-		   "Right Ascension of observation", status );
-  
+   astSetFitsF ( fitschan, "RA", rad, "Right Ascension of observation", 0 );
    decd = inx->dec * AST__DR2D;
-  
-   fhead_putfits ( TDOUBLE,
-		   "DEC", &decd,
-		   "Declination of observation", status );
-  
-   fhead_putfits ( TINT,
-		   "ADD_ATM", &sinx->add_atm,
-		   "flag for adding atmospheric emission", status );
-  
-   fhead_putfits ( TINT,
-		   "ADDFNOIS", &sinx->add_fnoise,
-		   "flag for adding 1/f noise", status );
-  
-   fhead_putfits ( TINT,
-		   "ADD_PNS", &sinx->add_pns,
-		   "flag for adding photon noise", status );
-  
-   fhead_putfits ( TINT,
-		   "FLUX2CUR", &sinx->flux2cur,
-		   "flag for converting flux to current", status );
-  
-   fhead_putfits ( TINT,
-		   "NBOLX", &inx->nbolx,
-		   "number of bolometers in X direction", status );
-
-   fhead_putfits ( TINT,
-		   "NBOLY", &inx->nboly,
-		   "number of bolometers in Y direction", status );
-  
-   fhead_putfits ( TDOUBLE,
-		   "SAMPLE_T", &inx->sample_t,
-		   "The sample interval in msec", status );
-  
-   fhead_putfits ( TSTRING,
-		   "SUBARRAY", sinx->subname,
-		   "subarray name", status );
-  
-   fhead_putfits ( TINT,
-		   "NUMSAMP", &numsamples,
-		   "number of samples", status );
-  
-   fhead_putfits ( TDOUBLE,
-		   "AMSTART", &sinx->airmass,
-		   "Air mass at start", status );
-  
-   fhead_putfits ( TDOUBLE,
-		   "AMEND", &sinx->airmass,
-		   "Air mass at end", status );
-  
-   fhead_putfits ( TDOUBLE,
-		   "MEANWVM", &meanwvm,
-		   "Mean zenith tau at 225 GHz from WVM", status );
-  
-   fhead_putfits ( TSTRING,
-		   "FILTER", filter,
-		   "filter used", status );
-  
-   fhead_putfits ( TDOUBLE,
-		   "WAVELEN", &(inx->lambda),
-		   "Wavelength (m)", status );
-
-   fhead_putfits ( TDOUBLE,
-		   "ATSTART", &sinx->atstart,
-		   "Ambient temperature at start (C)", status );
-  
-   fhead_putfits ( TDOUBLE,
-		   "ATEND", &sinx->atend,
-		   "Ambient temperature at end (C)", status );
-
-   fhead_putfits ( TSTRING,
-		   "OBSMODE", inx->obsmode,
-		   "Observing mode", status );
-
-   fhead_putfits ( TSTRING,
-		   "INSTRUME", instrume,
-		   "Instrument name", status );
-
-   fhead_putfits ( TSTRING,
-		   "TELESCOP", "JCMT",
-		   "Name of telescope", status );
+   astSetFitsF ( fitschan, "DEC", decd, "Declination of observation", 0 );
+   astSetFitsI ( fitschan, "ADD_ATM", sinx->add_atm, 
+                 "flag for adding atmospheric emission", 0 );
+   astSetFitsI ( fitschan, "ADDFNOIS", sinx->add_fnoise, "flag for adding 1/f noise", 0 );
+   astSetFitsI ( fitschan, "ADD_PNS", sinx->add_pns, "flag for adding photon noise", 0 );
+   astSetFitsI ( fitschan, "FLUX2CUR", sinx->flux2cur, 
+                 "flag for converting flux to current", 0 );
+   astSetFitsI ( fitschan, "NBOLX", inx->nbolx, "number of bolometers in X direction", 0 );
+   astSetFitsI ( fitschan, "NBOLY", inx->nboly, "number of bolometers in Y direction", 0 );
+   astSetFitsF ( fitschan, "SAMPLE_T", inx->sample_t, "sample interval in msec", 0 );
+   astSetFitsS ( fitschan, "SUBARRAY", sinx->subname, "subarray name", 0 );
+   astSetFitsI ( fitschan, "NUMSAMP", numsamples, "number of samples", 0 );
+   astSetFitsF ( fitschan, "AMSTART", sinx->airmass, "Air mass at start", 0 );
+   astSetFitsF ( fitschan, "AMEND", sinx->airmass, "Air mass at end", 0 );
+   astSetFitsF ( fitschan, "MEANWVM", meanwvm, 
+                 "Mean zenith tau at 225 GHz from WVM", 0 );
+   astSetFitsS ( fitschan, "FILTER", filter, "filter used", 0 );
+   astSetFitsF ( fitschan, "WAVELEN", inx->lambda, "Wavelength (m)", 0 );
+   astSetFitsF ( fitschan, "ATSTART", sinx->atstart, 
+                 "Ambient temperature at start (C)", 0 );
+   astSetFitsF ( fitschan, "ATEND", sinx->atend, "Ambient temperature at end (C)", 0 );
+   astSetFitsS ( fitschan, "OBSMODE", inx->obsmode, "Observing mode", 0 );
+   astSetFitsS ( fitschan, "INSTRUME", instrume, "Instrument name", 0 );
+   astSetFitsS ( fitschan, "TELESCOP", "JCMT", "Name of telescope", 0 );
    
-  if ( strncmp( inx->obsmode, "DREAM", 5) == 0 ) {
-    fhead_putfits ( TINT,
-		    "JIGL_CNT", &inx->nvert,
-		    "Number of positions in DREAM pattern", status );
-    fhead_putfits ( TINT,
-		    "NJIGLCYC", &sinx->ncycle,
-		    "Number of times around DREAM pattern", status );
-    fhead_putfits ( TDOUBLE,
-		    "JIGSTEP", &inx->jig_step_x,
-		    "Size of jiggle step (arcsec)", status );
+   if ( strncmp( inx->obsmode, "DREAM", 5) == 0 ) {
 
-    /* Construct weights name from subarray */
-    strncat( weightsname, "dreamweights_", 13);
-    strncat( weightsname, sinx->subname, 3);
-    strncat( weightsname, ".sdf", 4);
-    fhead_putfits( TSTRING, 
-		   "DRMWGHTS", weightsname, 
-		   "Name of DREAM weights file", status);
+      astSetFitsI ( fitschan, "JIGL_CNT", inx->nvert, 
+                    "Number of positions in DREAM pattern", 0 );
+      astSetFitsI ( fitschan, "NJIGLCYC", sinx->ncycle, 
+                    "Number of times around DREAM pattern", 0 );
+      astSetFitsF ( fitschan, "JIGSTEP", inx->jig_step_x, 
+                    "Size of jiggle step (arcsec)", 0 );
+
+
+     /* Construct weights name from subarray */
+     strncat( weightsname, "dreamweights_", 13);
+     strncat( weightsname, sinx->subname, 3);
+     strncat( weightsname, ".sdf", 4);
+
+     astSetFitsS ( fitschan, "DRMWGHTS", weightsname, 
+                   "Name of DREAM weights file", 0 );
+
   }
 
    /* Determine extent of the map from posptr + known size of the arrays */
@@ -315,27 +252,16 @@ int *status       /* global status (given and returned) */
    map_x = (x_max + x_min)/2.;
    map_y = (y_max + y_min)/2.;
   
-   fhead_putfits ( TDOUBLE,
-		   "MAP_HGHT", &map_hght,
-		   "Map height (arcsec)", status );
-   fhead_putfits ( TDOUBLE,
-		   "MAP_WDTH", &map_wdth,
-		   "Map height (arcsec)", status );
-   fhead_putfits ( TDOUBLE,
-		   "MAP_PA", &map_pa,
-		   "Map PA (degrees)", status );
-   fhead_putfits ( TDOUBLE,
-		   "MAP_X", &map_x,
-		   "Map X offset (arcsec)", status );
-   fhead_putfits ( TDOUBLE,
-		   "MAP_Y", &map_y,
-		   "Map Y offset (arcsec)", status );
-  
-   /* Get the accumulated FITS headers */ 
-   fhead_getfits ( &nrec, fitsrec, status );
-  
-   /* Store the timestream data */
-   sc2store_wrtstream ( file_name, nrec, fitsrec, inx->nbolx, inx->nboly, 
+   astSetFitsF ( fitschan, "MAP_HGHT", map_hght, "Map height (arcsec)", 0 );
+   astSetFitsF ( fitschan, "MAP_WDTH", map_wdth, "Map width (arcsec)", 0 );
+   astSetFitsF ( fitschan, "MAP_PA", map_pa, "Map PA (degrees)", 0 );
+   astSetFitsF ( fitschan, "MAP_X", map_x, "Map X offset (arcsec)", 0 );
+   astSetFitsF ( fitschan, "MAP_Y", map_y, "Map Y offset (arcsec)", 0 );
+
+ 
+   /* Store the timestream data -- KLUDGED FOR NOW TO REMOVE DEPENDENCE ON
+      FITSREC */
+   sc2store_wrtstream_fitschan ( file_name, fitschan, inx->nbolx, inx->nboly, 
 			numsamples, nflat, flatname, head, dbuf, dksquid, 
 			fcal, fpar, inx->obsmode, inx->jig_vert, inx->nvert, 
 			jigptr, jigsamples, status );
