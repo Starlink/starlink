@@ -40,6 +40,9 @@
 *  History:
 *     2006-06-14 (AGG):
 *        Initial test version, copied from mapsolve written by BDK
+*     2006-10-26 (AGG):
+*        Streamline some of the image writing code, move into
+*        smf_store_image.c
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -105,6 +108,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
   int cycle;                       /* Cycle counter */
   int dims[2];                     /* Dimensions of output image */
   smfDream *dream = NULL;          /* DREAM parameters */
+  char drmwghts[LEN__METHOD+1];    /* Name of DREAM weights file */
   smfHead *hdr = NULL;             /* Header information for input data */
   int i;                           /* Loop counter */
   double *interpwt = NULL;         /* Interpolation weights */
@@ -129,7 +133,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
   int nsampcycle;                  /* Number of samples per DREAM cycle */
   int nunkno;                      /* Number of unknowns in solution */
   int nvert;                       /* Number of vertices in DREAM pattern */
-  char obsmode[LEN__METHOD];       /* Observing mode */
+  char obsmode[LEN__METHOD+1];     /* Observing mode */
   int outhgt;                      /* Height of output map */
   int outwid;                      /* Width of output map */
   double *par = NULL;              /* Parameters of problem eqn */
@@ -159,7 +163,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
   int ymin;                        /* Minimum Y extent of grid */
   int zx;                          /* X offset of output map in solution */
   int zy;                          /* Y offset of output map in solution */
-
+  int naver;
   if ( *status != SAI__OK ) return;
 
   /* Check we have time-series data */
@@ -184,7 +188,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
      processed images will just be added onto the end of the current
      stack of images. */
   hdr = data->hdr;
-  smf_fits_getS( hdr, "OBSMODE", obsmode, LEN__METHOD, status );
+  smf_fits_getS( hdr, "OBSMODE", obsmode, LEN__METHOD+1, status );
   if ( strncmp( obsmode, "DREAM", 5) == 0 ) {
     msgOutif(MSG__VERB, FUNC_NAME, "Processing DREAM data", status);
 
@@ -206,14 +210,22 @@ void smf_dreamsolve( smfData *data, int *status ) {
     nsampcycle = dream->nsampcycle;
     smf_fits_getI( data->hdr, "NJIGLCYC", &ncycles, status );
 
-    /* Pointers to the weights arrays */
+    /* Pointers to the weights arrays. If either of these are NULL
+     then it means we were not able to find the weights file */
     interpwt = dream->gridwts;
     invmat = dream->invmatx;
+    
+    if ( interpwt == NULL || invmat == NULL ) {
+      if ( *status == SAI__OK ) {
+	smf_fits_getS( data->hdr, "DRMWGHTS", drmwghts, SZFITSCARD+1, status );
+	msgSetc("W",drmwghts);
+	*status = SAI__ERROR;
+	errRep(FUNC_NAME, "Unable to read WEIGHTS file, ^W", status);
+      }
+    }
 
-    /* Retrieve input time series data */
-    tstream = (data->pntr)[0];
 
-    /* Create SCU2RED extension */
+    /* Create SCU2RED extension to hold reconstructed images */
     scu2redloc = smf_get_xloc(data, "SCU2RED", "SCUBA2_MAP_ARR", "WRITE", 
 			      0, NULL, status);
 
@@ -263,7 +275,14 @@ void smf_dreamsolve( smfData *data, int *status ) {
 
     /* Loop over the number of DREAM cycles */
     if ( *status == SAI__OK ) {
-      for ( cycle=0; cycle<ncycles; cycle++ ) {
+      naver = 1;
+      /* Retrieve time stream data - averaged if necessary */
+      if ( naver == 1 ) {
+	tstream = (data->pntr)[0];
+      } else {
+	smf_average_data( data, 0, naver, nsampcycle, &tstream, &nelem, status );
+      }
+      for ( cycle=0; cycle<ncycles/naver; cycle++ ) {
 	/* Extract the raw data of a cycle. */
 	sc2math_get_cycle ( cycle, nsampcycle, ncycles, nbol,
 			    tstream, psbuf, status );
@@ -327,9 +346,17 @@ void smf_dreamsolve( smfData *data, int *status ) {
 	zy = vymin - ymin;
 	/* Extract the intensities - sint and sme contain both the
 	   solved intensity data and the bolometer offsets  */
-	nelem = (size_t)outwid*outhgt;
+	nelem = (size_t)(outwid*outhgt);
 	solint = smf_malloc( nelem, sizeof(double), 1, status);
+	if ( solint == NULL ) {
+	  errRep(FUNC_NAME, "Unable to obtain memory for solint", status);
+	  return;
+	}
 	solme = smf_malloc( nelem, sizeof(double), 1, status);
+	if ( solme == NULL ) {
+	  errRep(FUNC_NAME, "Unable to obtain memory for solme", status);
+	  return;
+	}
 	for ( j=0; j<outhgt; j++ ) {
 	  for ( l=0; l<outwid; l++ ) {
 	    solint[j*outwid+l] = sint[nbol+(j+zy)*skywid+zx+l];
@@ -339,35 +366,24 @@ void smf_dreamsolve( smfData *data, int *status ) {
 	for ( i=0; i<nbol; i++ ) {
 	  pbolzero[i] = sint[i];
 	}
-	/* ******Define additional FITS headers****** */
-
-	/* INSERT FITS HEADER CODE HERE */
 
 	/* Write the solved intensities and zero offsets */
-	seqstart = cycle * nsampcycle;
-	seqend = seqstart + nsampcycle - 1;
-	
-	slice = (int)( (seqstart + seqend ) /2);
-	smf_tslice_ast( data, slice, 1, status);
-
-	astBegin;
-
-	/* Shift the coordinate system to allow for the DREAM map
-	   being larger than the subarray */
-	sc2ast_moveframe ( -(double)vxmin, -(double)vymin, hdr->wcs, status );
 	dims[0] = outwid;
 	dims[1] = outhgt;
 	
-	smf_store_image( data, scu2redloc, cycle, 2, dims, seqstart, seqend, 
+	smf_store_image( data, scu2redloc, cycle, 2, dims, nsampcycle, vxmin, vymin,
 			 solint, pbolzero, status );
 
 	/* Free memory allocated for output solution pointers */
-	astEnd;
+	smf_free( solint, status );
+	smf_free( solme, status );
       } /* End loop over cycle */
     }
     /* Add a history entry if everything's OK */
     smf_history_write(data, "smf_dreamsolve", "DREAM reconstruction successful", 
 		      status);
+    /* Release SCU2RED locator */
+    datAnnul( &scu2redloc, status );
   } else {
     msgOutif(MSG__VERB, FUNC_NAME, 
 	     "Input file is not a DREAM observation - ignoring", status);
