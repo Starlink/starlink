@@ -117,6 +117,8 @@
 #         Add GROUP keyword for REMSKY
 #     13-OCT-2006 (JB):
 #         Add USEBAD to MAKEMAP
+#     26-OCT-2006 (AGG):
+#         Add STARECALC
 #     {enter_changes_here}
 
 #  Bugs:
@@ -518,6 +520,33 @@ package @PACKAGE@ {
 	  }
      }
 
+     action starecalc {
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input data file(s)}
+         }
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            ppath GLOBAL CURRENT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output data file(s)}
+         }
+         parameter msg_filter {
+	    type _CHAR
+	    prompt {Message level}
+	    default NORM
+	    vpath DEFAULT	
+	    helpkey *
+	 }
+     }
      action sc2sim {
 
           parameter obsfile {
