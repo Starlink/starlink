@@ -19,7 +19,8 @@ jcmtinclude_HEADERS = jcmt/state.h
 
 # Tasks
 smurf_mon_TASKS = extinction flatfield makemap remsky qlmakemap scanfit sc2sim \
-                  dreamsolve makecube impaztec dreamweights badbolos skynoise
+                  dreamsolve makecube impaztec dreamweights badbolos skynoise \
+                  starecalc
 
 # These files are not built inside a subdir because they are in CVS
 # under an alternate build system that SMURF can not modify.
