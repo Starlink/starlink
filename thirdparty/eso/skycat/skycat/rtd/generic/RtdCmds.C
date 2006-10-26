@@ -15,6 +15,8 @@
 *                        and is also faster.
 * pbiereic     19/03/03  The previous change was undone (on request)
 * Peter W. Draper 14/11/05 Merge my RtdImage changes.
+* Peter W. Draper 26/10/06 Change mbandCmd so that clipping happens in 
+*                          centre of last pixel, not previous pixel.
 */
 
 /************************************************************************
@@ -1584,8 +1586,8 @@ int RtdImage::mbandCmd(int argc, char* argv[])
     // clip to image bounds
     double ix0 = 1, 
 	iy0 = 1, 
-	ix1 = image_->width()-1, 
-	iy1 = image_->height()-1;
+	ix1 = image_->width(), 
+	iy1 = image_->height();
     if (imageToCanvasCoords(ix0, iy0, 0) != TCL_OK
 	|| imageToCanvasCoords(ix1, iy1, 0) != TCL_OK)
 	return TCL_OK;
