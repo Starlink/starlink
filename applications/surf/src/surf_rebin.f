@@ -249,6 +249,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.83  2006/10/26 22:06:21  timj
+*     improve OUT_COORDS error message
+*
 *     Revision 1.82  2005/03/23 19:45:44  timj
 *     initialise ABOL_*_PTR first time through for intrebin
 *
@@ -984,15 +987,16 @@ c
       ELSE IF (OUT_COORDS .EQ. 'PL') THEN
          CALL MSG_SETC('PKG', PACKAGE)
          CALL MSG_OUTIF(MSG__NORM, ' ', 
-     :        '^PKG: output coordinates are offsets from moving centre', 
+     :        '^PKG: output coordinates are offsets from moving centre',
      :        STATUS)
          HOURS = .FALSE.
       ELSE
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
+            CALL MSG_SETC('C', OUT_COORDS )
             CALL MSG_SETC('TASK', TSKNAME)
             CALL ERR_REP (' ', '^TASK: invalid output '//
-     :        'coordinate system', STATUS)
+     :        'coordinate system (^C)', STATUS)
          END IF
       END IF
 
@@ -1298,7 +1302,7 @@ c
 
 *     Request the new apparent ra/dec centre
             CALL SURF_REQUEST_OUTPUT_COORDS( TSKNAME, 'LONG_OUT',
-     :           'LAT_OUT', OUT_COORDS, LAT_OBS, OUT_RA_CEN,OUT_DEC_CEN, 
+     :           'LAT_OUT', OUT_COORDS, LAT_OBS, OUT_RA_CEN,OUT_DEC_CEN,
      :           MJD_STANDARD, HOURS, OUT_RA_CEN, OUT_DEC_CEN, 
      :           OUT_ROTATION, OUT_LONG, OUT_LAT, STATUS)
 
@@ -2248,7 +2252,7 @@ c
 *     system
 
                         IF (STATUS .EQ. SAI__OK) THEN
-                           CALL NDF_CREAT ('OUT', '_REAL', 2, LBND,UBND, 
+                           CALL NDF_CREAT ('OUT', '_REAL', 2, LBND,UBND,
      :                          OUT_NDF, STATUS)
                            IF (STATUS .EQ. PAR__NULL) DOREBIN = .FALSE.
                         END IF
@@ -2377,7 +2381,7 @@ c
                      IF (STATUS .EQ. SAI__OK) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETC('TASK', TSKNAME)
-                        CALL ERR_REP(' ','^TASK: Unknown regrid method', 
+                        CALL ERR_REP(' ','^TASK: Unknown regrid method',
      :                       STATUS)
 
                      END IF
@@ -2474,8 +2478,8 @@ c
 *     Now write the axis and FITS header
 
                   CALL SURF_WRITE_MAP_INFO (OUT_NDF, OUT_COORDS, 
-     :                 OUT_TITLE,OUT_UNITS,MJD_STANDARD, FILE, FILENAME, 
-     :                 OUT_LONG, OUT_LAT, OUT_PIXEL, I_CENTRE, J_CENTRE, 
+     :                 OUT_TITLE,OUT_UNITS,MJD_STANDARD, FILE, FILENAME,
+     :                 OUT_LONG, OUT_LAT, OUT_PIXEL, I_CENTRE, J_CENTRE,
      :                 MAP_SIZE(1), MAP_SIZE(2), WAVELENGTH, STEMP,
      :                 OKAY, CHOP_CRD, CHOP_PA, CHOP_THROW, 
      :                 WPLATE, ANGROT, TELESCOPE, INSTRUMENT,
