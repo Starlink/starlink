@@ -120,6 +120,9 @@
 *        Update API for smf_open_newfile
 *     2006-10-13 (JB):
 *        Add smf_bbrebinmap
+*     2006-10-26 (AGG):
+*        Add smf_average_data, smf_calc_stareimage, update API to
+*        smf_store_image
 *     {enter_further_changes_here}
 
 *  Copyright:
