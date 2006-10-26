@@ -3,7 +3,7 @@ noinst_LTLIBRARIES = libsc2sim.la
 
 libsc2sim_la_SOURCES = $(C_ROUTINES)
 
-C_ROUTINES = fhead.c \
+C_ROUTINES =  \
 sc2sim_addpnoise.c sc2sim_atmsky.c sc2sim_atmtrans.c \
 sc2sim_calctime.c sc2sim_calctrans.c sc2sim_digitise.c sc2sim_drand.c \
 sc2sim_fft2d.c sc2sim_fitheat.c sc2sim_four1.c sc2sim_getast_wcs.c \
@@ -19,7 +19,7 @@ sc2sim_sex2double.c sc2sim_simframe.c sc2sim_simhits.c sc2sim_simulate.c \
 sc2sim_smupath.c sc2sim_smupos.c \
 sc2sim_getpongvert.c
 
-noinst_INCLUDES = sc2sim.h fhead.h \
-                  sc2sim_par.h fhead_par.h \
+noinst_INCLUDES = sc2sim.h  \
+                  sc2sim_par.h \
                   sc2sim_struct.h
 
