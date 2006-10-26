@@ -22,13 +22,13 @@
 *        Pointer to global status.
 
 *  Description:
-*     This routines stores a 2-D image inside the SCU2RED extension.
+*     This routine stores a 2-D image inside the SCU2RED extension.
 
 *  Notes:
 *     - Replacement for the sc2da routine sc2store_putimage
 *     - This routine is necessary because the above relies on a global 
 *       variable for the locator to the SCU2RED extension
-
+*     - Variable names are rather DREAM specific at the moment
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -37,6 +37,9 @@
 *  History:
 *     2006-08-21 (AGG):
 *        Initial version, copied from sc2store_putimage
+*     2006-10-26 (AGG):
+*        Move some code from smf_dreamsolve here, update API
+*        accordingly, store FITS headers and WCS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -78,44 +81,66 @@
 #include "prm_par.h"
 #include "dat_par.h"
 #include "star/hds.h"
+#include "star/kaplibs.h"
 
 /* SMURF includes */
 #include "smf.h"
 #include "smf_typ.h"
 #include "smf_err.h"
+#include "smurf_par.h"
+
+/* SC2DA includes */
+#include "sc2da/sc2store_par.h"
+#include "sc2da/sc2math.h"
+#include "sc2da/sc2store.h"
+#include "sc2da/sc2ast.h"
+#include "sc2da/dream_par.h"
 
 
-#define FUNC_NAME "smf_putimage"
+#define FUNC_NAME "smf_store_image"
 
 void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim, 
-		      int dims[], int seqstart, int seqend, double *image, 
-		      double *zero, int *status) {
+		      int dims[], int nsampcycle, int vxmin, int vymin, 
+		      double *image, double *zero, int *status) {
 
-  smfHead *hdr;             /* Pointer to header struct */
-  int nfits = 0;            /* Number of FITS headers */
-  char fitshd[81][SC2STORE__MAXFITS]; /* Array of FITS headers */
+  smfHead *hdr = NULL;             /* Pointer to header struct */
   HDSLoc *bz_imloc = NULL;  /* HDS locator */
   int bzindf;               /* NDF identifier */
   double *bzptr = NULL;     /* Pointer to mapped space for zero points */
   int el;                   /* Number of elements mapped */
+  int frame;
+  AstFitsChan *imfits=NULL; /* FITS header for each reconstructed image */
   char imname[DAT__SZNAM];  /* Name of structure for image */
   double *imptr = NULL;     /* Pointer to mapped space for image */
   int j;                    /* Loop counter */
-  int lbnd[7];              /* Lower dimension bounds */
+  int lbnd[2];              /* Lower dimension bounds */
   int nbolx;                /* Number of bolometers in the X direction */
   int nboly;                /* Number of bolometers in the Y direction */
   int ntot;                 /* Total number of elements */
   int place;                /* NDF placeholder */
   HDSLoc *seq_loc = NULL;   /* HDS locator */
+  int seqend;
+  int seqstart;
+  int slice;
   int strnum;               /* Structure element number */
+  char subname[SZFITSCARD+1];
+  int subnum;
+  int subscan;
+  int ubnd[2];              /* Upper dimension bounds */
   int uindf;                /* NDF identifier */
-  int ubnd[7];              /* Upper dimension bounds */
-  HDSLoc *fitsloc = NULL;   /* HDS locator to FITS headers */
-  HDSLoc *loc2 = NULL;      /* HDS locator for FITS */
+  AstFrameSet *wcs = NULL;
 
   if ( *status != SAI__OK ) return;
 
-  hdr = data->hdr;
+  seqstart = cycle * nsampcycle;
+  seqend = seqstart + nsampcycle - 1;
+	
+  slice = (int)( (seqstart + seqend ) /2);
+  smf_tslice_ast( data, slice, 1, status);
+
+  astBegin;
+
+  /* Old beginning */
   nbolx = (data->dims)[0];
   nboly = (data->dims)[1];
 
@@ -144,8 +169,24 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
     }
   }
 
+  /* Derive WCS */
+  hdr = data->hdr;
+  smf_fits_getS( hdr, "SUBARRAY", subname, SZFITSCARD+1, status );
+  sc2ast_name2num ( subname, &subnum, status );
+
+  sc2ast_createwcs( subnum, hdr->state, hdr->instap, hdr->telpos, &wcs, status );
+
+  /* Shift the coord frame is either vxmin or vymin is non-zero */
+  if ( vxmin != 0 || vymin != 0 ) {
+    sc2ast_moveframe ( -(double)vxmin, -(double)vymin, wcs, status );
+  }
+
+  /* This should probably be a user-option but ICRS is probably a safe
+     assumption */
+  astSetC( wcs, "SYSTEM", "ICRS" );
+
   /* Store world coordinate transformations */
-  ndfPtwcs ( hdr->wcs, uindf, status );
+  ndfPtwcs ( wcs, uindf, status );
 
   /* Store start and end sequence numbers in the extension */
   ndfXnew ( uindf, "MAPDATA", "SEQUENCE_RANGE", 0, 0, &seq_loc, status );
@@ -177,15 +218,14 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   }
 
   /* Store the FITS headers */
-  if ( nfits > 0 ) {
-    ndfXnew ( uindf, "FITS", "_CHAR*80", 1, &(nfits), &fitsloc, status );
-    for ( j=1; j<=nfits; j++ ) {
-      datCell ( fitsloc, 1, &j, &loc2, status );
-      datPut0C ( loc2, fitshd[j-1], status );
-      datAnnul ( &loc2, status );
-    }
-    datAnnul ( &fitsloc, status );
-  }
+  frame = (int)( (seqstart + seqend ) /2);
+  /* Quick and dirty method - just copy the full FITS header */
+  imfits = astCopy( hdr->fitshdr );
+  astSetFitsI( imfits, "SUBSCAN", strnum, 
+	       "Subscan number of reconstructed image", 0);
+  
+  kpgPtfts( uindf, imfits, status );
+
 
   /* Unmap the data array */
   ndfUnmap ( bzindf, "DATA", status );
@@ -198,6 +238,8 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   /* Free the locators for the frame */
   datAnnul ( &seq_loc, status );
   datAnnul ( &bz_imloc, status );
+
+  astEnd;
 
 }
 
