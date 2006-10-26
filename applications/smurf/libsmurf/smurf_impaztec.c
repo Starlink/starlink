@@ -96,16 +96,15 @@
 #include <stdio.h>
 
 /* STARLINK includes */
-#include "fitsio.h"
+#include "ast.h"
 #include "mers.h"
 #include "par.h"
 #include "par_par.h"
 #include "prm_par.h"
 #include "ndf.h"
 #include "sae_par.h"
-#include "star/hds.h"
-#include "star/ndg.h"
 #include "star/slalib.h"
+#include "star/kaplibs.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -119,8 +118,6 @@
 #include "sc2da/sc2store.h"
 #include "sc2da/sc2ast.h"
 
-#include "libsc2sim/fhead.h"
-#include "libsc2sim/fhead_par.h"
 #include "libsc2sim/sc2sim_par.h"
 #include "libsc2sim/sc2sim_struct.h"
 #include "libsc2sim/sc2sim.h"
@@ -170,6 +167,7 @@ void smurf_impaztec( int *status ) {
   double djm;                  /* modified julian start date */
   int *dksquid=NULL;           /* dark SQUID time stream data  */
   double *fcal=NULL;           /* flatfield calibration  */
+  AstFitsChan *fitschan;       /* FITS headers */
   double *fpar=NULL;           /* flat-field parameters  */
   size_t framespersecond;      /* frames per second */
   double *full_bolosig=NULL;   /* all bolo signals [NBOLOSxNFRAMES] */
@@ -210,8 +208,6 @@ void smurf_impaztec( int *status ) {
 
 
   double decd;                     /* Dec of observation in degrees */
-  static char fitsrec[FHEAD__MXREC][81];  /* store for FITS records */
-  int nrec;                        /* number of FITS header records */
   double rad;                      /* RA of observation in degrees */
   double map_hght;                 /* Map height in arcsec */
   double map_wdth;                 /* Map width in arcsec  */
@@ -438,79 +434,22 @@ void smurf_impaztec( int *status ) {
   }
 
   /* Format the FITS headers */
-  
-  fhead_init ( status );
-  
-  fhead_putfits ( TSTRING,
-		  "DATE-OBS", "YYYY-MM-DDThh:mm:ss",
-		  "observation date", status );
-  
-  rad = ra * DR2D;
-  
-  fhead_putfits ( TDOUBLE,
-		  "RA", &rad,
-		  "Right Ascension of observation", status );
-  
-  decd = dec * DR2D;
-  
-  fhead_putfits ( TDOUBLE,
-		  "DEC", &decd,
-		  "Declination of observation", status );
-  
-  fhead_putfits ( TINT,
-		  "NBOLX", &ncol,
-		  "number of bolometers in X direction", status );
-
-  fhead_putfits ( TINT,
-		  "NBOLY", &nrow,
-		  "number of bolometers in Y direction", status );
-  
-  fhead_putfits ( TDOUBLE,
-		  "SAMPLE_T", &sample_t,
-		  "The sample interval in msec", status );
-  
-  fhead_putfits ( TSTRING,
-		  "SUBARRAY", "AZTEC",
-		  "subarray name", status );
-  
-  fhead_putfits ( TINT,
-		  "NUMSAMP", &numsamples,
-		  "number of samples", status );
-
-  /* Currently meaningless
-  fhead_putfits ( TDOUBLE,
-		  "AMSTART", &amstart,
-		  "Air mass at start", status );
-  fhead_putfits ( TDOUBLE,
-		  "AMEND", &amend,
-		  "Air mass at end", status );
-  
-  fhead_putfits ( TDOUBLE,
-		  "MEANWVM", &meanwvm,
-		  "Mean zenith tau at 225 GHz from WVM", status );
-  */
-  
-  fhead_putfits ( TSTRING,
-		  "FILTER", "1100",
-		  "filter used", status );
-  
-  /* Currently meaningless
-  fhead_putfits ( TDOUBLE,
-		  "ATSTART", &atstart,
-		  "Ambient temperature at start (C)", status );
-  
-  fhead_putfits ( TDOUBLE,
-		  "ATEND", &atend,
-		  "Ambient temperature at end (C)", status );
-  */
-
-  fhead_putfits ( TSTRING,
-		  "INSTRUME", "AZTEC",
-		  "Instrument name", status );
-
-  fhead_putfits ( TSTRING,
-		  "TELESCOP", "JCMT",
-		  "Name of telescope", status );
+  /* Add the FITS data to the output file */
+  fitschan = astFitsChan ( NULL, NULL, "" );
+  /* Kludged to write generic date */ 
+  astSetFitsS ( fitschan, "DATE-OBS", "YYYY-MM-DDThh:mm:ss", "observation date", 0 );
+  rad = ra * AST__DR2D;
+  astSetFitsF ( fitschan, "RA", rad, "Right Ascension of observation", 0 );
+  decd = dec * AST__DR2D;
+  astSetFitsF ( fitschan, "DEC", decd, "Declination of observation", 0 );
+  astSetFitsI ( fitschan, "NBOLX", ncol, "number of bolometers in X direction", 0 );
+  astSetFitsI ( fitschan, "NBOLY", nrow, "number of bolometers in Y direction", 0 );
+  astSetFitsF ( fitschan, "SAMPLE_T", sample_t, "sample interval in msec", 0 );
+  astSetFitsS ( fitschan, "SUBARRAY", "AZTEC", "subarray name", 0 );
+  astSetFitsI ( fitschan, "NUMSAMP", numsamples, "number of samples", 0 );
+  astSetFitsS ( fitschan, "FILTER", "1100", "filter used", 0 );
+  astSetFitsS ( fitschan, "INSTRUME", "AZTEC", "Instrument name", 0 );
+  astSetFitsS ( fitschan, "TELESCOP", "JCMT", "Name of telescope", 0 );
    
   /* Determine extent of the map from posptr + known size of the arrays */
   for( i=0; i<numsamples; i++ ) {
@@ -535,24 +474,14 @@ void smurf_impaztec( int *status ) {
   map_x = (x_max + x_min)/2.;
   map_y = (y_max + y_min)/2.;
   
-  fhead_putfits ( TDOUBLE,
-		  "MAP_HGHT", &map_hght,
-		  "Map height (arcsec)", status );
-  fhead_putfits ( TDOUBLE,
-		  "MAP_WDTH", &map_wdth,
-		  "Map height (arcsec)", status );
-  fhead_putfits ( TDOUBLE,
-		  "MAP_PA", &map_pa,
-		  "Map PA (degrees)", status );
-  fhead_putfits ( TDOUBLE,
-		  "MAP_X", &map_x,
-		  "Map X offset (arcsec)", status );
-  fhead_putfits ( TDOUBLE,
-		  "MAP_Y", &map_y,
-		  "Map Y offset (arcsec)", status );
-  
-  /* Get the accumulated FITS headers */ 
-  fhead_getfits ( &nrec, fitsrec, status );
+  astSetFitsF ( fitschan, "MAP_HGHT", map_hght, "Map height (arcsec)", 0 );
+  astSetFitsF ( fitschan, "MAP_WDTH", map_wdth, "Map width (arcsec)", 0 );
+  astSetFitsF ( fitschan, "MAP_PA", map_pa, "Map PA (degrees)", 0 );
+  astSetFitsF ( fitschan, "MAP_X", map_x, "Map X offset (arcsec)", 0 );
+  astSetFitsF ( fitschan, "MAP_Y", map_y, "Map Y offset (arcsec)", 0 );
+
+  /* Add the FITS headers as an extension on the NDF */
+  kpgPtfts ( indf, fitschan, status ); 
 
   /* Create storage for Header values for each frame - store in JCMTSTATE */
   ndfXnew( indf, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0, &jcmtstateloc, status );
@@ -563,17 +492,6 @@ void smurf_impaztec( int *status ) {
   for( j=0; j<numsamples; j++ ) {
     sc2store_headput ( j, head[j], status );
   }
-
-  /* Store the FITS header */
-
-  ndfXnew ( indf, "FITS", "_CHAR*80", 1, &(nrec), &fitsloc, status );
-  
-  for ( k=1; k<=nrec; k++ ) {
-    datCell ( fitsloc, 1, &k, &loc2, status );
-    datPut0C ( loc2, fitsrec[k-1], status );
-    datAnnul ( &loc2, status );
-  }
-  datAnnul ( &fitsloc, status );
 
   /* Close the NDF */
 
