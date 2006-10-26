@@ -60,6 +60,8 @@
 *     2006-10-11 (AGG):
 *        - Bring prologue up to date
 *        - Update call to smf_open_newfile due to API change
+*     2006-10-26 (AGG):
+*        Add GRIDSTEP keyword
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -341,9 +343,7 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
 		    "matrix element ^D is replaced by ^E. This is too unreliable to continue", status);
 	  }
 	}
-	
-	/* Write out relevent parameters into output file */
-	
+		
 	/* Create new extension to store grid parameters */
 	lbnd[0] = 1;
 	ubnd[0] = 4;
@@ -355,14 +355,10 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
 	for (j=0; j<nelem; j++) {
 	  gridext[j] = gridminmax[j];
 	}
-	/*	    memcpy( gridext, gridminmax, (size_t)nelem);*/
+	/* Write grid size into output file */
+	ndfXpt0d( gridstep, ofile->ndfid, "DREAM", "GRID_SIZE", status);
 	ndfAnnul( &gridndf, status );
-	
-	/*	    datNew0D ( weightsloc, "GRIDSTEP", status );
-	  datFind ( weightsloc, "GRIDSTEP", &gridloc, status );
-	  datPut0D ( gridloc, gridstep, status );
-	  datAnnul( &gridloc, status );*/
-	
+
 	smf_free( par, status );
 	smf_close_file( &gwtdata, status );
 	smf_close_file( &invdata, status );
