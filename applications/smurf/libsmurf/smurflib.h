@@ -42,6 +42,8 @@
 *        Add BADBOLOS
 *     2006-09-15 (AGG):
 *        Add DREAMWEIGHTS
+*     2006-10-26 (AGG):
+*        Add STARECALC
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -84,5 +86,6 @@ void smurf_dreamweights( int * );
 void smurf_badbolos( int * );
 void smurf_impaztec( int * );
 void smurf_skynoise( int * );
+void smurf_starecalc( int * );
 
 #endif /* SMURF_LIB_DEFINED */

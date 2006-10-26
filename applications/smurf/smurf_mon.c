@@ -79,6 +79,8 @@
 *        Add DREAMWEIGHTS
 *     2006-10-12 (DSB):
 *        Added call to smf_detpos_wcs to clear cache.
+*     2006-10-26 (AGG):
+*        Add STARECALC
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -206,6 +208,8 @@ void smurf_mon( int * status ) {
     smurf_badbolos( status );
   } else if (strcmp( taskname, "SKYNOISE" ) == 0 ) {
     smurf_skynoise( status );
+  } else if (strcmp( taskname, "STARECALC" ) == 0 ) {
+    smurf_starecalc( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );
