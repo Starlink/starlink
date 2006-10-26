@@ -122,8 +122,13 @@ int *status          /* global status (given and returned) */
        msgSetd("M",maxflux);
        errRep(FUNC_NAME, "Derived sky flux, ^F pW, is greater than maximum value ^M pW", status);
      }
+   } else if ( *flux < 0 ) {
+     if ( *status == SAI__OK) {
+       *status = SAI__ERROR;
+       msgSetd("F", *flux);
+       errRep(FUNC_NAME, "Derived sky flux, ^F pW, is negative", status);
+     }
    }
-
 }
 
 
