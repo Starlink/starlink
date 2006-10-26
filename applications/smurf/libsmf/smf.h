@@ -159,6 +159,9 @@
 
 void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status );
 
+void smf_average_data( const smfData *data, const int start, int nslice, 
+		       const int interval, double **avdata, size_t *nelem, int *status);
+
 void smf_bbrebinmap( smfData *data,  int indf, int index, int size, 
                      AstFrameSet *outfset, int *lbnd_out, int *ubnd_out, 
                      double *map, double *variance, double *weights, 
@@ -175,6 +178,8 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
 
 void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int *lbnd_out,
                         int *ubnd_out, int *status );
+
+void smf_calc_stareimage( smfData *data, const int naver, int *status);
 
 void smf_calc_telpos( double obsgeo[3], char telName[], double telpos[3],
 		      int *status );
@@ -406,8 +411,8 @@ void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize,
 			 double *mapvar, int msize, int *status );
 
 void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim, 
-		      int dims[], int seqstart, int seqend, double *image, 
-		      double *zero, int *status);
+		      int dims[], int nsampcycle, int vxmin, int vymin, 
+		      double *image, double *zero, int *status);
 
 void smf_string_to_dtype ( const char * datatype, smf_dtype *dtype, int * status );
 
