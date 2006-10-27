@@ -249,6 +249,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.84  2006/10/27 07:47:07  timj
+*     fix OUT_COORDS initialisation broken in v1.78
+*
 *     Revision 1.83  2006/10/26 22:06:21  timj
 *     improve OUT_COORDS error message
 *
@@ -828,6 +831,7 @@ c
       DOREBIN  = .TRUE.
       HAVE_MODEL = .FALSE.
       SOBJECT = ' '
+      OUT_COORDS = ' '
       OUT_REDSX_LOC = DAT__NOLOC
 
       ISNEWPD = .FALSE.
@@ -949,7 +953,6 @@ c
 *     It does not need to be done if we've already read the coords from
 *     a source model in CALCSKY.
 
-      OUT_COORDS = ' '
       IF (.NOT. CALCSKY .OR. .NOT. HAVE_MODEL) THEN 
          CALL PAR_CHOIC('OUT_COORDS','RJ','AZ,NA,RB,RJ,GA,RD,PL',
      :     .TRUE., OUT_COORDS, STATUS)
