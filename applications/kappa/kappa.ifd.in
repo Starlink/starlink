@@ -4636,6 +4636,15 @@ package kappa {
             size *
           }
 
+         parameter sqrpix {
+            type _LOGICAL
+            prompt {Should all pixels be displayed as squares?}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            helpkey *
+          }
+
          parameter style {
             type LITERAL
             ppath CURRENT DEFAULT
