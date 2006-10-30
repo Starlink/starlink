@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.32}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2006 August 21}
+\newcommand{\stardocdate}      {2006 October 30}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.6}
+\newcommand{\stardocversion}   {1.6-2}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -19758,6 +19758,15 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          deviations.  {\tt [3,-2]} would give the negative of that.
       }
       \sstsubsection{
+         SQRPIX = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, then the default value for YMAGN equals the value
+         supplied for XMAGN, resulting in all pixels being displayed as
+         squares on the display surface.  If a {\tt FALSE} value is supplied for
+         SQRPIX, then the default value for YMAGN is chosen to retain the 
+         pixels original aspect ratio.  {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
          STYLE = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of attribute settings describing the plotting style to use
@@ -19807,19 +19816,35 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          A value larger than 1.0 makes each data pixel wider.  If this
          results in the image being wider than the available space then
          the the image will be clipped to display fewer pixels.  See also
-         parameters YMAGN, CENTRE, and FILL. [1.0]
+         parameters YMAGN, CENTRE, SQRPIX, and FILL. [1.0]
       }
       \sstsubsection{
          YMAGN = \_REAL (Read)
       }{
+         The vertical magnification for the image.  A value of {\tt 1.0} 
+         corresponds to 'normal' magnification in which the image fills 
+         the available space in at least one dimension.  A value larger than 
+         1.0 makes each data pixel taller.  If this results in the image 
+         being taller than the available space then the image will be 
+         clipped to display fewer pixels.  See also parameters XMAGN, 
+         CENTRE, and FILL.  If a null (({\tt{!}}) value is supplied, the 
+         default  value used depends on parameter SQRPIX.  If SQRPIX is 
+         {\tt TRUE}, the default YMAGN value used is the value supplied 
+         for XMAGN.  This  will result in each pixel occupying a square 
+         area on the screen.  If SQRPIX is {\tt FALSE}, then the default 
+         value for YMAGN is chosen so that each pixel occupies a rectangular 
+         area on the screen matching the pixel aspect ratio at the centre of 
+         the image, determined  within the current WCS Frame.  {\tt[!]}
+
+
          The vertical magnification for the image.  The default
          value of 1.0 corresponds to 'normal' magnification in which the
          the image fills the available space in at least one dimension.
          A value larger than 1.0 makes each data pixel taller.  If this
          results in the image being taller than the available space then
          the image will be clipped to display fewer pixels.  See also
-         parameters XMAGN, CENTRE, and FILL.  If a null ({\tt{!}}) value is supplied,
-         the value used is the value supplied for XMAGN.  {\tt[!]}
+         parameters XMAGN, CENTRE, and FILL.  If a null ({\tt{!}}) value is 
+         supplied, the value used is the value supplied for XMAGN.  {\tt[!]}
       }
    }
    \sstresparameters{ 
@@ -50882,7 +50907,8 @@ The following new applications have been added:
        Fits independent trends to data lines that are parallel to an
        axis using polynomials up to order 15.  Regions containing
        features such as spectral lines or stars may be masked.  It has
-       an option to subtract the trend fits from the supplied NDF.
+       an option to subtract the trend fits from the supplied NDF.  The
+       fitting regions may be located automatically.
    \item [\htmlref{NDFCOMPRESS}{NDFCOMPRESS}] \mbox{}
        Compresses an NDF so that it occupies less disk space.  The
        initial version has only one compression method, which scales
@@ -51053,6 +51079,12 @@ The following applications have been modified:
          increment between the next good interior pair of AXIS centres.
       \end{itemize}
 
+   \item [\htmlref{WCSATTRIB}{WCSATTRIB}] \mbox{}
+      \begin{itemize}
+         \item This now only demands read-access to the NDF for
+         MODE={\tt 'Get'}.
+      \end{itemize}
+    
 \end{description}
 
 \section{\xlabel{se_changes}Release Notes---V1.6\label{se:changes}}
@@ -51068,9 +51100,21 @@ The following applications have been modified:
          system read from the input NDF.
       \end{itemize}
 
+   \item [\htmlref{DISPLAY}{DISPLAY}] \mbox{}
+      \begin{itemize} 
+         \item A new parameter SQRPIX controls whether rectangular
+         pixels are displayed as squares, or in their original
+         aspect ratio.
+      \end{itemize}
+
    \item [\htmlref{FITSLIST}{FITSLIST}] \mbox{}
       \begin{itemize} 
-         \item FITSLIST no longer wraps its output at 79 characters.
+         \item It no longer wraps its output at 79 characters.
+      \end{itemize}
+
+   \item [\htmlref{MLINPLOT}{MLINPLOT}] \mbox{}
+      \begin{itemize} 
+         \item This now understands SpecFrames and FluxFrames.
       \end{itemize}
 
    \item [\htmlref{ROTATE}{ROTATE}] \mbox{}
@@ -51079,7 +51123,7 @@ The following applications have been modified:
          in the sense that it will rotate all the two-dimensional 
          planes within a three-dimensional NDF independently, applying 
          the same rotation angle to each plane.  The rotation plane can 
-         be  parallel to any face of the cube, and is defined by a new 
+         be parallel to any face of the cube, and is defined by a new 
          parameter AXES.
       \end{itemize}
 
