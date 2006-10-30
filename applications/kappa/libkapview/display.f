@@ -380,22 +380,22 @@
 *        A value larger than 1.0 makes each data pixel wider.  If this
 *        results in the image being wider than the available space then
 *        the the image will be clipped to display fewer pixels.  See
-*        also parameters YMAGN, CENTRE, SQRPIX and FILL.  [1.0]
+*        also parameters YMAGN, CENTRE, SQRPIX, and FILL.  [1.0]
 *     YMAGN = _REAL (Read)
 *        The vertical magnification for the image.  A value of 1.0 
 *        corresponds to 'normal' magnification in which the image fills 
-*        the available space in at least one dimension. A value larger than 
-*        1.0 makes each data pixel taller.  If this results in the image 
-*        being taller than the available space then the image will be 
-*        clipped to display fewer pixels.  See also parameters XMAGN, 
+*        the available space in at least one dimension.  A value larger 
+*        than 1.0 makes each data pixel taller.  If this results in the
+*        image being taller than the available space then the image will 
+*        be clipped to display fewer pixels.  See also parameters XMAGN, 
 *        CENTRE, and FILL.  If a null (!) value is supplied, the default 
-*        value used depends on parameter SQRPIX. If SQRPIX is TRUE, the 
-*        default YMAGN value used is the value supplied for XMAGN. This 
-*        will result in each pixel occupying a square area on the screen. 
-*        If SQRPIX is FALSE, the the default value for YMAGN is chosen so 
-*        that each pixel occupies a rectangular area on the screen matching 
-*        the pixel aspect ratio at the centre of the image, determined 
-*        within the current WCS Frame. [!]
+*        value used depends on parameter SQRPIX.  If SQRPIX is TRUE,
+*        the default YMAGN value used is the value supplied for XMAGN. 
+*        This will result in each pixel occupying a square area on the 
+*        screen.  If SQRPIX is FALSE, then the default value for YMAGN
+*        is chosen so that each pixel occupies a rectangular area on
+*        the screen matching the pixel aspect ratio at the centre of the
+*        image, determined within the current WCS Frame.  [!]
 
 *  Examples:
 *     display ngc6872 mode=p percentiles=[10,90] noaxes
@@ -597,8 +597,8 @@
 *        variable comments so that each fits entirely on one line.
 *     18-MAY-2006 (DSB):
 *        Handled base->current Mappings that have both transformations
-*        defined but which do not form a true inverse pair (as created by
-*        CHANMAP).
+*        defined but which do not form a true inverse pair (as created 
+*        by CHANMAP).
 *     26-MAY-2006 (DSB):
 *        Handled WCS FrameSets that define specific regions ("Regions Of
 *        Interest") around which annotated grids should be drawn.
@@ -681,7 +681,7 @@
       INTEGER IPICF            ! AGI id. for new FRAME picture
       INTEGER IPICK            ! AGI identifier for KEY picture
       INTEGER IPLOT            ! Pointer to AST Plot for DATA picture
-      INTEGER IPLOTR           ! Pointer to AST Plot for a Region of interest
+      INTEGER IPLOTR           ! Pointer to AST Plot, Region of Interest
       INTEGER IPWORK           ! Pointer to work array for key
       INTEGER IREG             ! Region index
       INTEGER IWCS             ! Pointer to WCS FrameSet from the NDF
@@ -801,7 +801,8 @@
 *  See if non-square pixels are to be displayed square on the screen.
       CALL PAR_GET0L( 'SQRPIX', SQRPIX, STATUS )
 
-*  If not, find the aspect ratio of a pixel neat the centre of the image.  
+*  If not, find the aspect ratio of a pixel neat the centre of the 
+*  image.  
       IF( .NOT. SQRPIX ) THEN
 
 *  Store three GRID positions; one at  the centre of the image, one a 
@@ -844,8 +845,8 @@
             PIXRAT = 1.0D0
          END IF
 
-*  Use a default pixel aspect ration of 1.0 if all pixels are to be displayed
-*  square.
+*  Use a default pixel aspect ration of 1.0 if all pixels are to be 
+*  displayed square.
       ELSE
          PIXRAT = 1.0D0
       END IF
@@ -1001,10 +1002,10 @@
       END IF
 
 *  Get the positive magnifications required for both axes.  Use a 
-*  dynamic default for YMAGN equal to PIXRAT times the value supplied for 
-*  XMAGN. A magnification of 1.0 results in the whole image being displayed 
-*  within the current picture so that it fills the available space in
-*  at least one dimension.
+*  dynamic default for YMAGN equal to PIXRAT times the value supplied 
+*  for XMAGN.  A magnification of 1.0 results in the whole image being 
+*  displayed within the current picture so that it fills the available
+*  space in at least one dimension.
       CALL PAR_GDR0R( 'XMAGN', 0.0, 1.0E-6, 1.0E6, .FALSE., XMAGN, 
      :                STATUS )
       CALL PAR_GDR0R( 'YMAGN', PIXRAT*XMAGN, 1.0E-6, 1.0E6, .TRUE., 
@@ -1088,10 +1089,10 @@
 *  Indicate that we may need to clip annotated axes.
          CLIPAX = .TRUE.
 
-*  If the centre pixel of the supplied NDF has no defined position, or if
-*  tranforming the position back into GRID coords resulted in a very
-*  different GRID position, then we only access the CENTRE parameter if a 
-*  value was supplied on the command line.  
+*  If the centre pixel of the supplied NDF has no defined position, or 
+*  if tranforming the position back into GRID coords resulted in a very
+*  different GRID position, then we only access the CENTRE parameter if
+*  a value was supplied on the command line.  
       ELSE IF( ( CC( 1 ) .NE. AST__BAD .AND. CC( 2 ) .NE. AST__BAD .AND.
      :           ABS( GC( 1 ) - GX ) .LT. 10 .AND.
      :           ABS( GC( 2 ) - GY ) .LT. 10 ) .OR. 
@@ -1110,8 +1111,9 @@
 *  do not need to clip annotated axes.
          CLIPAX = .FALSE.
 
-*  Otherwise, just use the centre of the GRID frame as the centre for the 
-*  displayed image. Also indicate that we may need to clip annotated axes.
+*  Otherwise, just use the centre of the GRID frame as the centre for 
+*  the displayed image. Also indicate that we may need to clip 
+*  annotated axes.
       ELSE
          GC( 1 ) = GX
          GC( 2 ) = GY
