@@ -722,6 +722,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        written).
 *     23-OCT-2006 (DSB):
 *        Prefer MJD-AVG over MJD-OBS.
+*     30-OCT-2006 (DSB):
+*        In FitOK: Changed lower limit on acceptbale correlation from
+*        0.999999 to 0.99999.
 *class--
 */
 
@@ -8686,7 +8689,7 @@ static int FitOK( int n, double *act, double *est ) {
    px = act;
    py = est;
    for( i = 0; i < n; i++, px++, py++ ){
-      if( *px!= AST__BAD && *py != AST__BAD ) {
+      if( *px != AST__BAD && *py != AST__BAD ) {
          s1 += *px;
          s2 += *py;
          s3 += (*px)*(*py);
@@ -8718,7 +8721,7 @@ static int FitOK( int n, double *act, double *est ) {
    estimates values is sufficiently high. */
       } else if( denom > 0.0 ) {
          r = ( s3 - s1*s2 )/sqrt( denom );
-         ret = ( fabs( r ) > 0.999999 );
+         ret = ( fabs( r ) > 0.99999 );
       }
    } 
 
