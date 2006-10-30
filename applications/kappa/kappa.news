@@ -5,20 +5,23 @@
    changes, see the "Release Notes" appendix in SUN/95.
 
 2 Modified_applications
+   o  Add WCSATTS parameter to COLLAPSE to allow control of the frameset
+   before collapsing occurs. This is important for estimators whose
+   values depend on the WCS.
+
+   o  DISPLAY has a new parameter SQRPIX to control whether rectangular
+   pixels are displayed as squares or rectangles.
+
+   o  FITSLIST no longer wraps its output at 79 characters.
+
+   o  MLINPLOT now understands SpecFrames and Fluxframes.
+
    o  ROTATE can now reorient three-dimensional NDFs, in the sense that 
    it will rotate all the two-dimensional planes within a 
    three-dimensional NDF independently, applying the same rotation 
    angle to each plane.  The rotation plane can be parallel to any 
    face of the cube, and is defined by a new parameter AXES.
 
-   o Add WCSATTS parameter to COLLAPSE to allow control of the frameset
-   before collapsing occurs. This is important for estimators whose
-   values depend on the WCS.
-
-   o FITSLIST no longer wraps its output at 79 characters
-
-   o New parameter SQRPIX added to DISPLAY to control whether rectangular
-   pixels are displayed as squares or rectangles.
 
 1 KAPPA_Version_1.5
 
@@ -45,7 +48,7 @@
    o  MAKESNR creates a signal-to-noise array from an NDF with 
    defined VARIANCE component, rejecting unusably small variances.
 
-   o  MFITTREND ofers multiple fitting of trends to individual data 
+   o  MFITTREND offers multiple fitting of trends to individual data 
    lines of multi-dimensional NDFs has been added.  The trends are 
    actually polynomials, which can be restricted to selected 
    co-ordinate ranges, making this a useful tool for fitting the 
@@ -125,6 +128,8 @@
    2*J1(x)/x, where J1(x) is the first-order Bessel function of the 
    first kind.
 
+   o  WCSATTRIB permits read only access to the NDF for MODE=Get.
+   
    o  The default values for the TOL parameter for REGRID, and the ACC
    parameter for WCSALIGN, have been reduced to 0.05, in order to
    reduce artefacts when transforming large images with flux 
