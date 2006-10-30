@@ -332,6 +332,12 @@
 *        a positive value are required.  Thus [-2,3] would scale
 *        between the mean minus two and the mean plus three standard
 *        deviations.  [3,-2] would give the negative of that.
+*     SQRPIX = _LOGICAL (Read)
+*        If TRUE then the default value for YMAGN equals the value
+*        supplied for XMAGN, resulting in all pixels being displayed as
+*        squares on the display surface. If a FALSE value is supplied for
+*        SQRPIX, then the default value for YMAGN is chosen to retain the 
+*        pixels original aspect ratio. [current value]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
 *        use for the annotated axes (see parameter AXES). 
@@ -374,16 +380,22 @@
 *        A value larger than 1.0 makes each data pixel wider.  If this
 *        results in the image being wider than the available space then
 *        the the image will be clipped to display fewer pixels.  See
-*        also parameters YMAGN, CENTRE, and FILL.  [1.0]
+*        also parameters YMAGN, CENTRE, SQRPIX and FILL.  [1.0]
 *     YMAGN = _REAL (Read)
-*        The vertical magnification for the image.  The default
-*        value of 1.0 corresponds to 'normal' magnification in which the
-*        the image fills the available space in at least one dimension.
-*        A value larger than 1.0 makes each data pixel taller.  If this
-*        results in the image being taller than the available space then
-*        the image will be clipped to display fewer pixels.  See also
-*        parameters XMAGN, CENTRE, and FILL.  If a null (!) value is
-*        supplied, the value used is the value supplied for XMAGN. [!]
+*        The vertical magnification for the image.  A value of 1.0 
+*        corresponds to 'normal' magnification in which the image fills 
+*        the available space in at least one dimension. A value larger than 
+*        1.0 makes each data pixel taller.  If this results in the image 
+*        being taller than the available space then the image will be 
+*        clipped to display fewer pixels.  See also parameters XMAGN, 
+*        CENTRE, and FILL.  If a null (!) value is supplied, the default 
+*        value used depends on parameter SQRPIX. If SQRPIX is TRUE, the 
+*        default YMAGN value used is the value supplied for XMAGN. This 
+*        will result in each pixel occupying a square area on the screen. 
+*        If SQRPIX is FALSE, the the default value for YMAGN is chosen so 
+*        that each pixel occupies a rectangular area on the screen matching 
+*        the pixel aspect ratio at the centre of the image, determined 
+*        within the current WCS Frame. [!]
 
 *  Examples:
 *     display ngc6872 mode=p percentiles=[10,90] noaxes
@@ -592,6 +604,8 @@
 *        Interest") around which annotated grids should be drawn.
 *     2-JUN-2006 (DSB):
 *        Modified to use ATL_PLROI.
+*     30-OCT-2006 (DSB):
+*        Added SQRPIX parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -640,9 +654,16 @@
       CHARACTER OTYPE*( NDF__SZTYP )! Processing type of output image
       DOUBLE PRECISION BOX( 4 )! Bounds of image in pixel co-ordinates
       DOUBLE PRECISION CC( NDF__MXDIM ) ! CurFrm coords at image centre
+      DOUBLE PRECISION CCT( 2 )! A WCS position
+      DOUBLE PRECISION CRATX( 3 )! WCS pos'ns used to determine PIXRAT
+      DOUBLE PRECISION CRATY( 3 )! WCS pos'ns used to determine PIXRAT
       DOUBLE PRECISION DHI     ! Upper displayed data value limit
       DOUBLE PRECISION DLO     ! Lower displayed data value limit
+      DOUBLE PRECISION DX      ! X pixel size
+      DOUBLE PRECISION DY      ! Y pixel size
       DOUBLE PRECISION GC( 2 ) ! GRID co-ords at image centre
+      DOUBLE PRECISION GRATX( 3 )! GRID pos'ns used to determine PIXRAT
+      DOUBLE PRECISION GRATY( 3 )! GRID pos'ns used to determine PIXRAT
       DOUBLE PRECISION GX      ! X GRID co-ord at image centre
       DOUBLE PRECISION GY      ! Y GRID co-ord at image centre
       INTEGER BPCI             ! Bad-pixel colour index
@@ -662,6 +683,7 @@
       INTEGER IPLOT            ! Pointer to AST Plot for DATA picture
       INTEGER IPLOTR           ! Pointer to AST Plot for a Region of interest
       INTEGER IPWORK           ! Pointer to work array for key
+      INTEGER IREG             ! Region index
       INTEGER IWCS             ! Pointer to WCS FrameSet from the NDF
       INTEGER LBND( NDF__MXDIM )! Lower pixel-index bounds of the image
       INTEGER LDIMS( NDIM )    ! Dimensions of LUT arrays
@@ -674,7 +696,6 @@
       INTEGER NERR             ! Number of conversion errors
       INTEGER NFRM             ! Number of Frames in Plot
       INTEGER NMARG            ! No. of margin values given
-      INTEGER IREG             ! Region index
       INTEGER NX               ! First dimension of colour index array
       INTEGER NY               ! Second dimension of colour index array
       INTEGER OPNTR( 1 )       ! Pointer to output array data
@@ -697,6 +718,7 @@
       LOGICAL KEY              ! Produce a colour ramp as a key?
       LOGICAL NN               ! Map the LUT via nearest-neighbour?
       LOGICAL SCALE            ! Does the input array need to be scaled?
+      LOGICAL SQRPIX           ! Display rectangular pixels as squares?
       REAL ASP0                ! Aspect ratio of the available space
       REAL ASPD                ! Aspect ratio of the data array
       REAL ASPECT              ! Aspect ratio of the DATA picture
@@ -711,6 +733,7 @@
       REAL OPUBND( NDIM )      ! High pixel co-ord bounds of NDF overlap
       REAL PCLBND( NDIM )      ! Lo pixel co-ord bounds of PGPLOT window
       REAL PCUBND( NDIM )      ! Hi pixel co-ord bounds of PGPLOT window
+      REAL PIXRAT              ! Pixel aspect ratio
       REAL WPLBND( NDIM )      ! Low pixel co-ord bounds of NDF section
       REAL WPUBND( NDIM )      ! High pixel co-ord bounds of NDFsection
       REAL X1, X2, Y1, Y2      ! Bounds of current pic viewport in mm
@@ -771,6 +794,61 @@
 *  database.
       CALL NDF_MSG( 'NDF', INDF1 )
       CALL MSG_LOAD( ' ', '^NDF', NDFNAM, NC, STATUS )
+
+*  Get the default pixel aspect ratio to use.
+*  ==========================================
+
+*  See if non-square pixels are to be displayed square on the screen.
+      CALL PAR_GET0L( 'SQRPIX', SQRPIX, STATUS )
+
+*  If not, find the aspect ratio of a pixel neat the centre of the image.  
+      IF( .NOT. SQRPIX ) THEN
+
+*  Store three GRID positions; one at  the centre of the image, one a 
+*  single pixel removed form the centre along the X axis, and one a
+*  single pixel removed form the centre along the Y axis.
+         GRATX( 1 ) = DIMS( 1 )/2
+         GRATY( 1 ) = DIMS( 2 )/2
+
+         GRATX( 2 ) = GRATX( 1 ) + 1.0D0
+         GRATY( 2 ) = GRATY( 1 )
+
+         GRATX( 3 ) = GRATX( 1 ) 
+         GRATY( 3 ) = GRATY( 1 ) + 1.0D0
+
+*  Convert them to the current WCS Frame.
+         CALL AST_TRAN2( IWCS, 3, GRATX, GRATY, .TRUE., CRATX, CRATY, 
+     :                   STATUS )
+
+*  Find the geodesic distance from point 1 to point 2 (the X pixel size)
+         CC( 1 ) = CRATX( 1 )
+         CC( 2 ) = CRATY( 1 )
+         CCT( 1 ) = CRATX( 2 )
+         CCT( 2 ) = CRATY( 2 )
+         DX = AST_DISTANCE( IWCS, CC, CCT, STATUS )
+         
+*  Find the geodesic distance from point 1 to point 3 (the Y pixel size)
+         CC( 1 ) = CRATX( 1 )
+         CC( 2 ) = CRATY( 1 )
+         CCT( 1 ) = CRATX( 3 )
+         CCT( 2 ) = CRATY( 3 )
+         DY = AST_DISTANCE( IWCS, CC, CCT, STATUS )
+         
+*  If the distances were calculated succesfully, use them to determine
+*  the pixel aspect ratio. Otherwise, use a ratio of 1.0
+         IF( DX .NE. AST__BAD .AND. DX .NE. 0.0 .AND.
+     :       DY .NE. AST__BAD .AND. DY .NE. 0.0 ) THEN
+            PIXRAT = DY/DX
+
+         ELSE
+            PIXRAT = 1.0D0
+         END IF
+
+*  Use a default pixel aspect ration of 1.0 if all pixels are to be displayed
+*  square.
+      ELSE
+         PIXRAT = 1.0D0
+      END IF
 
 *  Determine the width of the margins to leave around the DATA picture.
 *  ====================================================================
@@ -902,7 +980,8 @@
       ASP0 = ( ( Y2 - Y1 )*( 1.0 - MARGIN( 1 ) - MARGIN( 3 ) ) ) /
      :       ( ( X2 - X1 )*( 1.0 - MARGIN( 2 ) - MARGIN( 4 ) - KWID ) ) 
 
-*  Get the aspect ratio of the supplied data array.
+*  Get the aspect ratio of the supplied data array, taking into account
+*  the pixel aspect ratio
       ASPD = REAL( DIMS( 2 ) )/ REAL( DIMS( 1 ) )
 
 *  If there would be space at left and right when the array fills the
@@ -922,14 +1001,14 @@
       END IF
 
 *  Get the positive magnifications required for both axes.  Use a 
-*  dynamic default for YMAGN equal to the value supplied for XMAGN.  A 
-*  magnification of 1.0 results in the whole image being displayed 
+*  dynamic default for YMAGN equal to PIXRAT times the value supplied for 
+*  XMAGN. A magnification of 1.0 results in the whole image being displayed 
 *  within the current picture so that it fills the available space in
 *  at least one dimension.
       CALL PAR_GDR0R( 'XMAGN', 0.0, 1.0E-6, 1.0E6, .FALSE., XMAGN, 
      :                STATUS )
-      CALL PAR_GDR0R( 'YMAGN', XMAGN, 1.0E-6, 1.0E6, .TRUE., YMAGN, 
-     :                STATUS )
+      CALL PAR_GDR0R( 'YMAGN', PIXRAT*XMAGN, 1.0E-6, 1.0E6, .TRUE., 
+     :                YMAGN, STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999

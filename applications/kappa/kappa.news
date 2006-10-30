@@ -17,6 +17,9 @@
 
    o FITSLIST no longer wraps its output at 79 characters
 
+   o New parameter SQRPIX added to DISPLAY to control whether rectangular
+   pixels are displayed as squares or rectangles.
+
 1 KAPPA_Version_1.5
 
    A new release of KAPPA (v1.5) has been made.  The main changes are
