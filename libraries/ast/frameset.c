@@ -6814,6 +6814,7 @@ static void RestoreIntegrity( AstFrameSet *this ) {
    AstFrame *current;            /* Pointer to current Frame */
    AstFrameSet *cvt;             /* Pointer to conversion FrameSet */
    AstMapping *map;              /* Pointer to conversion Mapping */
+   int flags;                    /* Flags associated with current frame */
 
 /* Check that a previous record of the FrameSet's integrity state has
    been made. Do not modify the FrameSet if it appears that the
@@ -6836,9 +6837,19 @@ static void RestoreIntegrity( AstFrameSet *this ) {
          astClearDomain( integrity_frame );
       }
 
-/* Obtain the required conversion FrameSet and annul the current Frame
-   pointer. */
+/* Temporarily set both Frames AST__INTFLAG flag to indicate that the
+   following call to astConvert is part of the process of restoring a
+   FrameSet's integrity. Some classes of Frame (e.g. DSBSpecFrames) may
+   choose to return a different Mapping in this case. */
+      astSetFrameFlags( integrity_frame, astGetFrameFlags( integrity_frame ) 
+                                         | AST__INTFLAG );
+      flags = astGetFrameFlags( current );
+      astSetFrameFlags( current, flags | AST__INTFLAG );
+
+/* Obtain the required conversion FrameSet, restore the original frame
+   flags and annul the current Frame pointer. */
       cvt = astConvert( integrity_frame, current, "" );
+      astSetFrameFlags( current, flags );
       current = astAnnul( current );
 
 /* If no conversion could be found, then the FrameSet's integrity
