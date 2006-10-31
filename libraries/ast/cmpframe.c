@@ -148,6 +148,8 @@ f     The CmpFrame class does not define any new routines beyond those
 *     3-MAY-2006 (DSB):
 *        Fix bug in Match that could cause segvio when matching a target
 *        against the second component of a CmpFrame.
+*     31-OCT-2006 (DSB):
+*        Over-ride the SetFrameFlags method.
 *class--
 */
 
@@ -558,6 +560,7 @@ static void (* parent_clearobslat)( AstFrame * );
 static void (* parent_clearobslon)( AstFrame * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame * );
 static void (* parent_setactiveunit)( AstFrame *, int );
+static void (* parent_setframeflags)( AstFrame *, int );
 static void (* parent_setattrib)( AstObject *, const char * );
 static void (* parent_setepoch)( AstFrame *, double );
 static void (* parent_setobslat)( AstFrame *, double );
@@ -644,6 +647,7 @@ static void Resolve( AstFrame *, const double [], const double [], const double 
 static void SetAxis( AstFrame *, int, AstAxis * );
 static int GetActiveUnit( AstFrame * );
 static void SetActiveUnit( AstFrame *, int );
+static void SetFrameFlags( AstFrame *, int );
 static void SetDirection( AstFrame *, int, int );
 static void SetFormat( AstFrame *, int, const char * );
 static void SetLabel( AstFrame *, int, const char * );
@@ -3474,6 +3478,9 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
 
    parent_getactiveunit = frame->GetActiveUnit;
    frame->GetActiveUnit = GetActiveUnit;
+
+   parent_setframeflags = frame->SetFrameFlags;
+   frame->SetFrameFlags = SetFrameFlags;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -6506,6 +6513,47 @@ static void SetActiveUnit( AstFrame *this_frame, int value ){
    (*parent_setactiveunit)( this_frame, value );
    astSetActiveUnit( ((AstCmpFrame *)this_frame)->frame1, value );
    astSetActiveUnit( ((AstCmpFrame *)this_frame)->frame2, value );
+}
+
+static void SetFrameFlags( AstFrame *this_frame, int value ){
+/*
+*  Name:
+*     SetFrameFlags
+
+*  Purpose:
+*     Set flags that control current Frame behaviour.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void SetFrameFlags( AstFrame *this, int value )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astSetFrameFlags method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function sets values for the bit mask of flags that control
+*     how the CmpFrame behaves. It ensures that both component Frames use
+*     the the same bitmask as the parent CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     value
+*        The new value to use.
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Invoke the parent method to set the FrameFlags for the CmpFrame,
+   then set the same value for the component Frames. */
+   (*parent_setframeflags)( this_frame, value );
+   astSetFrameFlags( ((AstCmpFrame *)this_frame)->frame1, value );
+   astSetFrameFlags( ((AstCmpFrame *)this_frame)->frame2, value );
 }
 
 static int GetActiveUnit( AstFrame *this_frame ){
