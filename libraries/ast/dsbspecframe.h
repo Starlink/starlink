@@ -48,6 +48,8 @@
 *  History:
 *     5-AUG-2004 (DSB):
 *        Original version.
+*     27-OCT-2006 (DSB):
+*        Added AlignSideBand.
 *-
 */
 
@@ -75,6 +77,7 @@ typedef struct AstDSBSpecFrame {
    double dsbcentre;            /* Centre frequency */
    double ifr;                  /* Intermediate frequency */
    int sideband;                /* Current sideband */
+   int alignsideband;           /* Aligns sidebands? */
 
 } AstDSBSpecFrame;
 
@@ -106,6 +109,11 @@ typedef struct AstDSBSpecFrameVtab {
    int (* TestSideBand)( AstDSBSpecFrame * );
    void (* ClearSideBand)( AstDSBSpecFrame * );
    void (* SetSideBand)( AstDSBSpecFrame *, int );
+
+   int (* GetAlignSideBand)( AstDSBSpecFrame * );
+   int (* TestAlignSideBand)( AstDSBSpecFrame * );
+   void (* ClearAlignSideBand)( AstDSBSpecFrame * );
+   void (* SetAlignSideBand)( AstDSBSpecFrame *, int );
 
    double (* GetImagFreq)( AstDSBSpecFrame * );
 
@@ -157,6 +165,11 @@ AstDSBSpecFrame *astLoadDSBSpecFrame_( void *, size_t, AstDSBSpecFrameVtab *,
    int astTestSideBand_( AstDSBSpecFrame * );
    void astClearSideBand_( AstDSBSpecFrame * );
    void astSetSideBand_( AstDSBSpecFrame *, int );
+
+   int astGetAlignSideBand_( AstDSBSpecFrame * );
+   int astTestAlignSideBand_( AstDSBSpecFrame * );
+   void astClearAlignSideBand_( AstDSBSpecFrame * );
+   void astSetAlignSideBand_( AstDSBSpecFrame *, int );
 
    double astGetImagFreq_( AstDSBSpecFrame * );
 #endif
@@ -235,6 +248,15 @@ astINVOKE(V,astTestSideBand_(astCheckDSBSpecFrame(this)))
 astINVOKE(V,astClearSideBand_(astCheckDSBSpecFrame(this)))
 #define astSetSideBand(this,val) \
 astINVOKE(V,astSetSideBand_(astCheckDSBSpecFrame(this),val))
+
+#define astGetAlignSideBand(this) \
+astINVOKE(V,astGetAlignSideBand_(astCheckDSBSpecFrame(this)))
+#define astTestAlignSideBand(this) \
+astINVOKE(V,astTestAlignSideBand_(astCheckDSBSpecFrame(this)))
+#define astClearAlignSideBand(this) \
+astINVOKE(V,astClearAlignSideBand_(astCheckDSBSpecFrame(this)))
+#define astSetAlignSideBand(this,val) \
+astINVOKE(V,astSetAlignSideBand_(astCheckDSBSpecFrame(this),val))
 
 #define astGetImagFreq(this) \
 astINVOKE(V,astGetImagFreq_(astCheckDSBSpecFrame(this)))

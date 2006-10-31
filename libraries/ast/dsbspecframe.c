@@ -42,10 +42,11 @@ f     AST_DSBSPECFRAME
 *     In addition to those attributes common to all SpecFrames, every
 *     DSBSpecFrame also has the following attributes:
 *
+*     - AlignSideBand: Should alignment occur between sidebands?
 *     - DSBCentre: The central position of interest.
 *     - IF: The intermediate frequency used to define the LO frequency.
-*     - SideBand: Indicates which sideband the DSBSpecFrame represents.
 *     - ImagFreq: The image sideband equivalent of the rest frequency.
+*     - SideBand: Indicates which sideband the DSBSpecFrame represents.
 
 *  Functions:
 c     The DSBSpecFrame class does not define any new functions beyond those
@@ -94,6 +95,8 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *        Fix memory leak in astLoadDSBSpecFrame.
 *     6-OCT-2006 (DSB):
 *        Guard against annulling null pointers in subFrame.
+*     27-OCT-2006 (DSB):
+*        Added AlignSideBand attribute.
 *class--
 
 *  Implementation Deficiencies:
@@ -124,9 +127,12 @@ f     The DSBSpecFrame class does not define any new routines beyond those
    "protected" symbols available. */
 #define astCLASS DSBSpecFrame
 
+#define BADSB -9999
+#define FIRST_SB -1
 #define LSB -1
 #define LO  0
 #define USB 1
+#define LAST_SB 1
 
 /* Include files. */
 /* ============== */
@@ -215,6 +221,11 @@ static int TestSideBand( AstDSBSpecFrame * );
 static void ClearSideBand( AstDSBSpecFrame * );
 static void SetSideBand( AstDSBSpecFrame *, int );
 
+static int GetAlignSideBand( AstDSBSpecFrame * );
+static int TestAlignSideBand( AstDSBSpecFrame * );
+static void ClearAlignSideBand( AstDSBSpecFrame * );
+static void SetAlignSideBand( AstDSBSpecFrame *, int );
+
 
 /* Member functions. */
 /* ================= */
@@ -275,6 +286,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* -------- */
    } else if ( !strcmp( attrib, "sideband" ) ) {
       astClearSideBand( this );
+
+/* AlignSideBand */
+/* ------------- */
+   } else if ( !strcmp( attrib, "alignsideband" ) ) {
+      astClearAlignSideBand( this );
 
 /* Read-only attributes. */
 /* --------------------- */
@@ -418,6 +434,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
       ival = astGetSideBand( this );
       if ( astOK ) {
          result = ( ival == USB ) ? "USB" : (( ival == LO ) ? "LO" : "LSB" );
+      }
+
+/* AlignSideBand */
+/* ------------- */
+   } else if ( !strcmp( attrib, "alignsideband" ) ) {
+      ival = astGetAlignSideBand( this ) ? 1 : 0;
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
@@ -735,6 +760,11 @@ void astInitDSBSpecFrameVtab_(  AstDSBSpecFrameVtab *vtab, const char *name ) {
    vtab->GetSideBand = GetSideBand;
    vtab->SetSideBand = SetSideBand;
 
+   vtab->ClearAlignSideBand = ClearAlignSideBand;
+   vtab->TestAlignSideBand = TestAlignSideBand;
+   vtab->GetAlignSideBand = GetAlignSideBand;
+   vtab->SetAlignSideBand = SetAlignSideBand;
+
    vtab->GetImagFreq = GetImagFreq;
 
 /* Save the inherited pointers to methods that will be extended, and
@@ -1024,6 +1054,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
       OVERLAY(DSBCentre)
       OVERLAY(IF)
       OVERLAY(SideBand)
+      OVERLAY(AlignSideBand)
    }
 
 /* Undefine macros local to this function. */
@@ -1218,6 +1249,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                    astGetClass( this ) );
       }
 
+/* AlignSideBand */
+/* ------------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "alignsideband= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetAlignSideBand( this, ival );
+
 /* Read-only attributes. */
 /* --------------------- */
 /* Define a macro to see if the setting string matches any of the
@@ -1356,6 +1394,8 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    AstMapping *map1;          /* Intermediate Mapping */
    AstMapping *map2;          /* Intermediate Mapping */
    AstMapping *map3;          /* Intermediate Mapping */
+   int alignsb_result;        /* The result sideband to be aligned */
+   int alignsb_target;        /* The target sideband to be aligned */
    int match;                 /* Coordinate conversion is possible? */
 
 /* Initialise the returned values. */
@@ -1383,23 +1423,39 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
       dsbtarget = (AstDSBSpecFrame *) target_frame;      
       dsbresult = (AstDSBSpecFrame *) *result;
 
+/* See whether alignment occurs between sidebands. */
+      alignsb_target = astGetAlignSideBand( dsbtarget );
+      alignsb_result = astGetAlignSideBand( dsbresult );
+
 /* Create a Mapping which transforms positions from the target to an exact 
-   copy of the target in which the SideBand attribute is set to USB. This
-   will be a UnitMap if the target already represents the USB. */
-      map1 = ToUSBMapping( dsbtarget, "astSubFrame" );
+   copy of the target in which the SideBand attribute is set to the
+   USB sideband. This will be a UnitMap if the target already represents
+   the USB sideband. If the DSBSpecFrame is to be aligned like a SpecFrme
+   (i.e. ignoring its SideBand attribute) then create a UnitMap instead. */
+      if( alignsb_target ) {
+         map1 = ToUSBMapping( dsbtarget, "astSubFrame" );
+      } else {
+         map1 = (AstMapping *) astUnitMap( 1, "" );
+      }
 
 /* Create a Mapping which transforms positions from the result to an exact 
-   copy of the target in which the SideBand attribute is set to USB. This
-   will be a UnitMap if the target already represents the USB. Invert
-   this Mapping to get a Mapping which goes from USB to the SideBand
-   represented by the result. */
-      map2 = ToUSBMapping( dsbresult, "astSubFrame" );
+   copy of the result in which the SideBand attribute is set to the
+   USB sideband. This will be a UnitMap if the target already represents
+   the USB sideband. If the DSBSpecFrame is to be aligned like a SpecFrme
+   (i.e. ignoring its SideBand attribute) then create a UnitMap instead. */
+      if( alignsb_result ) {
+         map2 = ToUSBMapping( dsbresult, "astSubFrame" );
+      } else {
+         map2 = (AstMapping *) astUnitMap( 1, "" );
+      }
+
+/* Invert it to get the mapping from the USB to the result. */
       astInvert( map2 );
 
-/* Form a Mapping which first maps target values to USB, then applies the
-   Mapping returned by the parent SubFrame method in order to convert
-   between spectral systems, and then converts from USB to the SideBand of
-   the result. */
+/* Form a Mapping which first maps target values to the USB, then applies the 
+   Mapping returned by the parent SubFrame method in order to convert between 
+   spectral systems, and then converts from the USB to the SideBand of the 
+   result. */
       map3 = (AstMapping *) astCmpMap( map1, *map, 1, "" );
       map1 = astAnnul( map1 );
       *map = astAnnul( *map );
@@ -1410,7 +1466,6 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 /* Returned the simplified Mapping. */
       *map = astSimplify( map1 );
       map1 = astAnnul( map1 );
-
    }
 
 /* If an error occurred or no match was found, annul the returned
@@ -1494,6 +1549,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* -------- */
    } else if ( !strcmp( attrib, "sideband" ) ) {
       result = astTestSideBand( this );
+
+/* AlignSideBand */
+/* ------------- */
+   } else if ( !strcmp( attrib, "alignsideband" ) ) {
+      result = astTestAlignSideBand( this );
 
 /* Read-only attributes. */
 /* --------------------- */
@@ -2274,13 +2334,82 @@ astMAKE_TEST(DSBSpecFrame,IF,( this->ifr != AST__BAD ))
 
 *att--
 */
-/* Protected access to the SideBand attribute uses -9999 to indicate
+/* Protected access to the SideBand attribute uses BADSB to indicate
    "unset". Other negative values mean "LSB", zero means "LO" and
    positive values mean "USB". */
-astMAKE_CLEAR(DSBSpecFrame,SideBand,sideband,-9999)
+astMAKE_CLEAR(DSBSpecFrame,SideBand,sideband,BADSB)
 astMAKE_SET(DSBSpecFrame,SideBand,int,sideband,((value<0)?LSB:((value==0)?LO:USB)))
-astMAKE_TEST(DSBSpecFrame,SideBand,( this->sideband != -9999 ))
-astMAKE_GET(DSBSpecFrame,SideBand,int,USB,(this->sideband == -9999 ? ((astGetIF( this )>0)?LSB:USB):this->sideband))
+astMAKE_TEST(DSBSpecFrame,SideBand,( this->sideband != BADSB ))
+astMAKE_GET(DSBSpecFrame,SideBand,int,USB,(this->sideband == BADSB ? ((astGetIF( this )>0)?LSB:USB):this->sideband))
+
+/*
+*att++
+*  Name:
+*     AlignSideBand
+
+*  Purpose:
+*     Should the SideBand attribute be taken into account when aligning
+*     this DSBSpecFrame with another DSBSpecFrame?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute controls how a DSBSpecFrame behaves when it is used (by
+c     astFindFrame or astConvert) as a template to match another (target)
+f     AST_FINDFRAME or AST_CONVERT) as a template to match another (target)
+*     DSBSpecFrame. If non-zero (the default), the value of the SideBand 
+*     attribute is used so that alignment occurs between sidebands. That
+*     is, if one DSBSpecFrame represents USB and the other represents LSB
+*     then using 
+c     astFindFrame or astConvert
+f     AST_FINDFRAME or AST_CONVERT
+*     to align them will result in a USB frequency in the first being mapped 
+*     onto the corresponding USB frequency in the second. If AlignSideBand is 
+*     set to zero, then the value fo the SideBand attribute is ignored. In 
+*     the above example, this would result in a USB frequency in the
+*     first being mapped onto the same LSB frequency in the second. In
+*     other words, if AlignSideBand is zero, the DSBSpecFrame aligns just
+*     like a basic SpecFrame.
+*
+c     When astFindFrame or astConvert 
+f     When AST_FINDFRAME or AST_CONVERT 
+*     is used on two DSBSpecFrames (potentially describing different spectral 
+*     coordinate systems and/or sidebands), it returns a Mapping which can be 
+*     used to transform a position in one DSBSpecFrame into the corresponding 
+*     position in the other. The Mapping is made up of the following steps in 
+*     the indicated order:
+*
+*     - If the target's AlignSideBand value is non-zero, map values from the 
+*     target's current sideband (given by its SideBand attribute) to the
+*     USB. If the target's AlignSideBand value is zero (or if the target
+*     already represents the USB), this step is skipped, leaving the values 
+*     unchanged.
+*
+*     - Map the values from the spectral system of the target to the spectral 
+*     system of the template. This Mapping takes into account all the
+*     inherited SpecFrame attributes such as System, StdOfRest, Unit, etc.
+*
+*     - If the results's AlignSideBand value is non-zero, map values from the 
+*     USB to the result's current sideband (given by its SideBand attribute).
+*     If the result's AlignSideBand value is zero (or if the result already 
+*     represents the USB), this step is skipped, leaving the values unchanged.
+
+*  Applicability:
+*     DSBSpecFrame
+*        All DSBSpecFrames have this attribute.
+
+*att--
+*/
+/* The AlignSideBand value has a value of -1 when not set yielding a 
+   default of 1. */
+astMAKE_TEST(DSBSpecFrame,AlignSideBand,( this->alignsideband != -1 ))
+astMAKE_CLEAR(DSBSpecFrame,AlignSideBand,alignsideband,-1)
+astMAKE_GET(DSBSpecFrame,AlignSideBand,int,-1,((this->alignsideband==-1)?1:this->alignsideband) )
+astMAKE_SET(DSBSpecFrame,AlignSideBand,int,alignsideband,(value?1:0))
 
 /* Copy constructor. */
 /* ----------------- */
@@ -2372,6 +2501,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       comm = "Represents upper sideband";
    }
    astWriteString( channel, "SideBn", set, 1, cval, comm );
+
+/* AlignSideBand */
+/* ------------- */
+   set = TestAlignSideBand( this );
+   ival = set ? GetAlignSideBand( this ) : astGetAlignSideBand( this );
+   astWriteInt( channel, "AlSdBn", set, 1, ival, "Align sidebands?" );
 }
 
 /* Standard class functions. */
@@ -2653,7 +2788,8 @@ AstDSBSpecFrame *astInitDSBSpecFrame_( void *mem, size_t size, int init,
 /* --------------------------------- */
       new->dsbcentre = AST__BAD;
       new->ifr = AST__BAD;
-      new->sideband = -9999;
+      new->sideband = BADSB;
+      new->alignsideband = BADSB;
 
 /* If an error occurred, clean up by deleting the new DSBSpecFrame. */
       if ( !astOK ) new = astDelete( new );
@@ -2804,7 +2940,7 @@ AstDSBSpecFrame *astLoadDSBSpecFrame_( void *mem, size_t size,
       text = astReadString( channel, "sidebn", " " );
       if( astOK ) {
          if( !strcmp( text, " " ) ) {
-            new->sideband = -9999;
+            new->sideband = BADSB;
          } else if( !strcmp( text, "USB" ) ) {
             new->sideband = USB;
          } else if( !strcmp( text, "LSB" ) ) {
@@ -2818,6 +2954,11 @@ AstDSBSpecFrame *astLoadDSBSpecFrame_( void *mem, size_t size,
          if ( TestSideBand( new ) ) SetSideBand( new, new->sideband );
          text = astFree( text );
       }
+
+/* AlignSideBand */
+/* ------------- */
+      new->alignsideband = astReadInt( channel, "alsdbn", -1 );
+      if( TestAlignSideBand( new ) ) SetAlignSideBand( new, new->alignsideband );
 
 /* If an error occurred, clean up by deleting the new DSBSpecFrame. */
       if ( !astOK ) new = astDelete( new );
