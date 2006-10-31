@@ -761,6 +761,7 @@ static int GetActiveUnit( AstFrame * );
 static int TestActiveUnit( AstFrame * );
 static void SetActiveUnit( AstFrame *, int );
 
+static int GetFrameFlags( AstFrame * );
 static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 static int GetMatchEnd( AstFrame * );
 static int GetMaxAxes( AstFrame * );
@@ -825,6 +826,7 @@ static void SetDigits( AstFrame *, int );
 static void SetDirection( AstFrame *, int, int );
 static void SetDomain( AstFrame *, const char * );
 static void SetFormat( AstFrame *, int, const char * );
+static void SetFrameFlags( AstFrame *, int );
 static void SetLabel( AstFrame *, int, const char * );
 static void SetMatchEnd( AstFrame *, int );
 static void SetMaxAxes( AstFrame *, int );
@@ -4512,37 +4514,49 @@ static AstAxis *GetAxis( AstFrame *this, int axis ) {
    return result;
 }
 
+static int GetFrameFlags( AstFrame *this ){
 /*
-*att++
+*+
 *  Name:
-*     Naxes
+*     astGetFrameFlags
 
 *  Purpose:
-*     Number of Frame axes.
+*     Return the bit mask of flags associated with a Frame.
 
 *  Type:
-*     Public attribute.
+*     Protected function.
 
 *  Synopsis:
-*     Integer, read-only.
+*     #include "frame.h"
+*     int *astGetFrameFlags( astFrame *this )
+
+*  Class Membership:
+*     Frame virtual function.
 
 *  Description:
-*     This is a read-only attribute giving the number of axes in a
-*     Frame (i.e. the number of dimensions of the coordinate space
-*     which the Frame describes). This value is determined when the
-*     Frame is created.
+*     This function returns a bit mask holding the current set of flags
+*     associated with a Frame. See astSetFrameFlags for details of these
+*     flags.
 
-*  Applicability:
-*     Frame
-*        All Frames have this attribute.
-*     FrameSet
-*        The Naxes attribute of a FrameSet is the same as that of its
-*        current Frame (as specified by the Current attribute).
-*     CmpFrame
-*        The Naxes attribute of a CmpFrame is equal to the sum of the
-*        Naxes values of its two component Frames.
-*att--
+*  Parameters:
+*     this
+*        The Frame.
+
+*  Returned Value:
+*     The bit mask.
+
+*  Notes:
+*     - Zero is returned if this function is invoked with
+*     the global error status set or if it should fail for any reason.
+*-
 */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Return the result. */
+   return this->flags;
+}
 
 static int GetIsSimple( AstMapping *this_mapping ){
 /*
@@ -4943,6 +4957,9 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    vtab->ValidateSystem = ValidateSystem;
    vtab->SystemString = SystemString;
    vtab->SystemCode = SystemCode;
+
+   vtab->GetFrameFlags = GetFrameFlags;
+   vtab->SetFrameFlags = SetFrameFlags;
 
    vtab->TestActiveUnit = TestActiveUnit;
    vtab->GetActiveUnit = GetActiveUnit;
@@ -8454,6 +8471,50 @@ static void SetAxis( AstFrame *this, int axis, AstAxis *newaxis ) {
    }
 }
 
+static void SetFrameFlags( AstFrame *this, int flags ){
+/*
+*+
+*  Name:
+*     astSetFrameFlags
+
+*  Purpose:
+*     Store a new bit mask of flags in a Frame.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     void astSetFrameFlags( astFrame *this, int flags )
+
+*  Class Membership:
+*     Frame member function.
+
+*  Description:
+*     This function stores a new set of flags in a Frame. The flags can
+*     be retrieved using astGetFrameFlags.
+
+*  Parameters:
+*     this
+*        The Frame.
+*     flags
+*        A bit mask holding the flags. Currently, the following bits are
+*        used:
+*
+*        0 - Used to indicate if the Frame is currently involved in an 
+*        attempt to restore the integrity of a FrameSet following 
+*        changes to the attribute values of the Frame.
+
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Assign the new bit mask. */
+   this->flags = flags;
+}
+
 static void SetUnit( AstFrame *this, int axis, const char *unit ) {
 /*
 *  Name:
@@ -9877,6 +9938,40 @@ static int ValidateSystem( AstFrame *this, AstSystemType system, const char *met
 /* Implement member functions to access the attributes associated with
    the axes of a Frame using the private macros defined for this
    purpose at the start of this file. */
+
+/*
+*att++
+*  Name:
+*     Naxes
+
+*  Purpose:
+*     Number of Frame axes.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer, read-only.
+
+*  Description:
+*     This is a read-only attribute giving the number of axes in a
+*     Frame (i.e. the number of dimensions of the coordinate space
+*     which the Frame describes). This value is determined when the
+*     Frame is created.
+
+*  Applicability:
+*     Frame
+*        All Frames have this attribute.
+*     FrameSet
+*        The Naxes attribute of a FrameSet is the same as that of its
+*        current Frame (as specified by the Current attribute).
+*     CmpFrame
+*        The Naxes attribute of a CmpFrame is equal to the sum of the
+*        Naxes values of its two component Frames.
+*att--
+*/
+
+
 /*
 *att++
 *  Name:
@@ -12306,6 +12401,7 @@ AstFrame *astInitFrame_( void *mem, size_t size, int init,
          new->obslat = AST__BAD;
          new->obslon = AST__BAD;
          new->dut1 = AST__BAD;
+         new->flags = 0;
 
 /* Allocate memory to store pointers to the Frame's Axis objects and to store
    its axis permutation array. */
@@ -12455,6 +12551,10 @@ AstFrame *astLoadFrame_( void *mem, size_t size,
                          channel );
 
    if ( astOK ) {
+
+/* Assign values for transient components that are not included in the
+   Frame dump */
+   new->flags = 0;
 
 /* Read input data. */
 /* ================ */
@@ -12945,6 +13045,15 @@ int astAxIn_( AstFrame *this, int axis, double lo, double hi, double val,
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Frame,AxIn))( this, axis, lo, hi, val, closed );
 }
+int astGetFrameFlags_( AstFrame *this ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Frame,GetFrameFlags))( this );
+}
+void astSetFrameFlags_( AstFrame *this, int value ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Frame,SetFrameFlags))( this, value );
+}
+
 
 /* Special public interface functions. */
 /* =================================== */

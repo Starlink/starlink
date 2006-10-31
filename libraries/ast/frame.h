@@ -557,6 +557,9 @@
 /* The legal System values recognized by this class of Frame. */
 #define AST__CART 0
 
+/* Flag bitmasks for use with astSetFrameFlags. */
+# define AST__INTFLAG 1  /* FrameSet integrity is currently being restored */
+
 #endif
 
 /* Type Definitions. */
@@ -592,6 +595,7 @@ typedef struct AstFrame {
    int preserve_axes;            /* Preserve target axes? */
    AstSystemType system;         /* Code identifying coordinate system */
    AstSystemType alignsystem;    /* Code for Alignment coordinate system */
+   int flags;                    /* Bit mask containing various protected flags */
 } AstFrame;
 
 /* Cached Line structure. */
@@ -767,6 +771,9 @@ typedef struct AstFrameVtab {
    int (* TestDut1)( AstFrame * );
    void (* ClearDut1)( AstFrame * );
    void (* SetDut1)( AstFrame *, double );
+
+   void (* SetFrameFlags)( AstFrame *, int );
+   int (* GetFrameFlags)( AstFrame * );
 
 } AstFrameVtab;
 
@@ -964,6 +971,10 @@ void astClearDut1_( AstFrame * );
 void astSetDut1_( AstFrame *, double );
 
 int astTestActiveUnit_( AstFrame * );
+
+void astSetFrameFlags_( AstFrame *, int );
+int astGetFrameFlags_( AstFrame * );
+
 #endif
 
 /* Function interfaces. */
@@ -1293,6 +1304,11 @@ astINVOKE(V,astTestDut1_(astCheckFrame(this)))
 
 #define astTestActiveUnit(this) \
 astINVOKE(V,astTestActiveUnit_(astCheckFrame(this)))
+
+#define astSetFrameFlags(this,flags) \
+astINVOKE(V,astSetFrameFlags_(astCheckFrame(this),flags))
+#define astGetFrameFlags(this) \
+astINVOKE(V,astGetFrameFlags_(astCheckFrame(this)))
 
 #endif
 #endif
