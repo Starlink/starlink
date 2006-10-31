@@ -606,6 +606,8 @@
 *        Modified to use ATL_PLROI.
 *     30-OCT-2006 (DSB):
 *        Added SQRPIX parameter.
+*     31-OCT-2006 (DSB):
+*        Do not use pixel aspect ratios which are unusably large or small.
 *     {enter_further_changes_here}
 
 *-
@@ -841,7 +843,23 @@
      :       DY .NE. AST__BAD .AND. DY .NE. 0.0 ) THEN
             PIXRAT = DY/DX
 
+*  Some images will have unrelated axes (e.g. longslit spectra which have a
+*  spatial axis and a spectral axis). For such images, the pixel aspect
+*  ratio means nothing, and will in general have unusable values. Trap
+*  such values now and replace them with 1.0.
+            IF( PIXRAT .LT. 0.01 .OR. PIXRAT .GT. 100.0 ) THEN
+               CALL MSG_OUT( 'DISPLAY_NSQ', 'Pixels will be displayed'//
+     :                       ' square since the pixel aspect ratio '//
+     :                       'cannot be determined.', STATUS )
+               PIXRAT = 1.0
+            END IF
+
+*  Warn the user if non-square pixels were requested but cannot be
+*  produced.
          ELSE
+            CALL MSG_OUT( 'DISPLAY_NSQ', 'Pixels will be displayed'//
+     :                    ' square since the pixel aspect ratio '//
+     :                    'cannot be determined.', STATUS )
             PIXRAT = 1.0D0
          END IF
 
