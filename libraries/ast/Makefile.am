@@ -44,7 +44,6 @@ GRP_C_ROUTINES = \
     fpcdmap.c \
     fpermmap.c \
     fplot.c \
-    fplot3d.c \
     fpointlist.c \
     fpolygon.c \
     fpolymap.c \
@@ -86,7 +85,6 @@ GRP_C_ROUTINES = \
     pcdmap.c \
     permmap.c \
     plot.c \
-    plot3d.c \
     pointlist.c \
     pointset.c \
     polygon.c \
@@ -173,7 +171,6 @@ AST_H_FILES = \
              fluxframe.h \
              frameset.h \
                 plot.h \
-                   plot3d.h \
              skyframe.h \
              specframe.h \
                 dsbspecframe.h \
