@@ -725,6 +725,12 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     30-OCT-2006 (DSB):
 *        In FitOK: Changed lower limit on acceptbale correlation from
 *        0.999999 to 0.99999.
+*     1-NOV-2006 (DSB):
+*        When reading a foreign header that contains a DUT1 keyword,
+*        use it to set the Dut1 attribute in the SkyFrame. Note, JACH
+*        store DUT1 in units of days. This may clash with the FITS-WCS
+*        standard (when its produced). Also note that DUT1 is not written
+*        out as yet when writing a FrameSet to a foreign FITS header.
 *class--
 */
 
@@ -833,6 +839,7 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 #define MXCTYPELEN        81
 #define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype "
 #define NPFIT             10
+#define SPD               86400.0
 
 #define FL  1.0/298.257  /*  Reference spheroid flattening factor */
 #define A0  6378140.0    /*  Earth equatorial radius (metres) */
@@ -978,6 +985,7 @@ typedef struct FitsStore {
    double ***latpole;
    double ***lonpole;
    double ***mjdobs;
+   double ***dut1;
    double ***mjdavg;
    double ***pv;
    double ***wcsaxes;
@@ -3589,7 +3597,7 @@ static AstMapping *CelestialAxes( AstFrameSet *fs, double *dim, int *wperm,
                ppcfid[ ilat ] *= AST__DR2D;
             }
 
-/* Store the CTYPE, CNAME, EQUINOX, MJDOBS, and RADESYS values. */
+/* Store the CTYPE, CNAME, EQUINOX, DUT1, MJDOBS, and RADESYS values. */
             SkySys( skyfrm, astGetWcsType( map2 ), store, fits_ilon, 
                     fits_ilat, s, method, class );
 
@@ -8910,6 +8918,7 @@ static FitsStore *FitsToStore( AstFitsChan *this, int encoding,
       ret->lonpole = NULL;
       ret->mjdobs = NULL;
       ret->mjdavg = NULL;
+      ret->dut1 = NULL;
       ret->pv = NULL;
       ret->specsys = NULL;
       ret->ssyssrc = NULL;
@@ -9161,6 +9170,7 @@ static FitsStore *FreeStore( FitsStore *store ){
    FreeItem( &(store->latpole) );
    FreeItem( &(store->lonpole) );
    FreeItem( &(store->mjdobs) );
+   FreeItem( &(store->dut1) );
    FreeItem( &(store->mjdavg) );
    FreeItem( &(store->pv) );
    FreeItem( &(store->wcsaxes) );
@@ -9540,6 +9550,7 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
       ret->equinox = NULL;
       ret->latpole = NULL;
       ret->lonpole = NULL;
+      ret->dut1 = NULL;
       ret->mjdobs = NULL;
       ret->mjdavg = NULL;
       ret->pv = NULL;
@@ -22088,7 +22099,7 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
 *  Description:
 *     This function sets values for the following FITS-WCS keywords
 *     within the supplied FitsStore structure: CTYPE, CNAME, RADECSYS, EQUINOX,
-*     MJDOBS, CUNIT, OBSGEO-X/Y/Z. The values are derived from the supplied 
+*     MJDOBS, DUT1, CUNIT, OBSGEO-X/Y/Z. The values are derived from the supplied 
 *     SkyFrame and WcsMap.
 
 *  Parameters:
@@ -22334,6 +22345,12 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
          SetItem( &(store->obsgeoy), 0, 0, ' ', r*sin( geolon ) );
          SetItem( &(store->obsgeoz), 0, 0, ' ', z*AST__AU );
       }
+   }
+
+/* Store the UT1-UTC correction, if set, converting from seconds to days
+   (as used by JACH). */
+   if( astTestDut1( skyfrm ) && s == ' ' ) {
+      SetItem( &(store->dut1), 0, 0, ' ', astGetDut1( skyfrm )/SPD );
    }
 
    if( !astOK ) ret = 0;
@@ -27371,6 +27388,14 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
          jm = 0;
          s = keynam[ strlen( keynam ) - 1 ];
 
+/* Is this a primary DUT1 keyword? */
+      } else if( Match( keynam, "DUT1", 0, fld, &nfld, method, class ) ){
+         item = &(store->dut1);
+         type = AST__FLOAT;
+         i = 0;
+         jm = 0;
+         s = ' ';
+
 /* Is this a primary MJD-OBS keyword? */
       } else if( Match( keynam, "MJD-OBS", 0, fld, &nfld, method, class ) ){
          item = &(store->mjdobs);
@@ -29651,6 +29676,7 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
    char bj;                       /* Besselian/Julian selector */
    char buf[300];                 /* Text buffer */
    char sym[10];                  /* Axis symbol */
+   double dut1;                   /* UT1-UTC correction */
    double eqmjd;                  /* MJD equivalent of equinox */
    double equinox;                /* EQUINOX value */
    double geolat;                 /* Observers geodetic latitude */
@@ -29904,7 +29930,14 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
          astSetObsLat( ret, geolat );
          astSetObsLon( ret, geolon );
       }         
-   }   
+
+/* Set the DUT1 value. Note, the JACH store DUT1 in units of days in their
+   FITS headers, so convert from days to seconds. May need to do somthing
+   about this if the forthcoming FITS-WCS paper 5 (time axes) defines DUT1 
+   to be in seconds. */
+      dut1 = GetItem( &(store->dut1), 0, 0, s, NULL, method, class );
+      if( dut1 != AST__BAD ) astSetDut1( ret, dut1*SPD );
+   }
 
 /* If an error has occurred, annul the Frame. */
    if( !astOK ) ret = astAnnul( ret );
