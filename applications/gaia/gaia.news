@@ -1,5 +1,9 @@
   Latest changes:
 
+    Cubes with trivial dimensions are now loaded into the cube toolbox
+    when -check_for_cubes is set. Previously these were considered as
+    images.
+
     Bug fix: the distance ruler now measures to the middle of the 
     final pixel to the top and right of the display. Previously
     this stopped one pixel further in.
