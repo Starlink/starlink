@@ -250,8 +250,8 @@ smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups,
 void smf_create_lutwcs( int clearcache, const double *fplane_x, 
 			const double *fplane_y, const int n_pix, 
 			const JCMTState *state, const double instap[2], 
-                        const double telpos[3], AstFrameSet **fset, 
-			int *status );
+                        const double telpos[3], double steptime, 
+                        AstFrameSet **fset, int *status );
 
 smfArray *smf_create_smfArray( const size_t size, int *status );
 
@@ -451,6 +451,7 @@ void smf_makefitschan( const char *system, double pixsize,
                        double lon_0, double lat_0, AstFitsChan *fc, 
                        int *status );
 
-void smf_receppos_wcs( smfHead *hdr, int index, const double telpos[3], AstFrameSet **fset, int *status );
+void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
+                     double steptime, AstFrameSet **fset, int *status );
 
 #endif /* SMF_DEFINED */

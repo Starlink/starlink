@@ -17,8 +17,8 @@
 *     smf_create_lutwcs( int clearcache, const double *fplane_x, 
 *                        const double *fplane_y, const int n_pix, 
 *        		 const JCMTState *state, const double instap[2], 
-*                   	 const double telpos[3], AstFrameSet **fset, 
-*                         int *status )
+*                   	 const double telpos[3], double steptime,
+*                        AstFrameSet **fset, int *status )
 
 *  Arguments:
 *     clearcache = int (Given)
@@ -38,6 +38,9 @@
 *        Additional focal plane offsets that may be applied.
 *     telpos = double[3] (Given)
 *        LON / Lat / altitude of the telscope (deg/deg/metres)
+*     steptime = double (Given)
+*        The value of the STEPTIME FITS header holding the exposure time,
+*        in seconds.
 *     fset = AstFrameSet** (Returned)
 *        Constructed frameset.
 *     status = int* (Given and Returned)
@@ -93,6 +96,8 @@
 *          context. This is because the pointer may need to be referenced 
 *          in higher level contexts.
 *        - Correct SMU offsets arcsec->rad conversion.
+*     2006-11-01 (DSB):
+*        Added steptime.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -151,8 +156,8 @@
 void smf_create_lutwcs( int clearcache, const double *fplane_x, 
 			const double *fplane_y, const int n_pix, 
 			const JCMTState *state, const double instap[2], 
-                        const double telpos[3], AstFrameSet **fset, 
-			int *status ) {
+                        const double telpos[3], double steptime, 
+                        AstFrameSet **fset, int *status ) {
 
   /* Local Variables */
   AstMapping *azelmap;            /* tangent plane to spherical azel mapping */
@@ -356,7 +361,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
 
     if( state->smu_az_chop_y == VAL__BADD ) temp_chop_y = 0;
     else temp_chop_y = state->smu_az_chop_y/DR2AS;
-
+    
 
     /* Calculate final mapping with SMU position correction only if needed */
     if( (!temp_jig_x) && (!temp_jig_y) && (!temp_chop_x) && (!temp_chop_y) ) {
@@ -403,10 +408,18 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
       astExempt( skyframe );
     }
 
-    /* Note TCS values refer to the middle of the time step,so subtact
-       half the exposure time from the end time. */
-    astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->rts_end +
-            ( 32.184 - 0.5*state->acs_exposure)/SPD ); 
+    /* Set the date and time at the middle of the observation. Use TCS_TAI 
+       values if available, otherwise use RTS_END. Note RTS_END values
+       refer to the end of the observation, so subtact half the exposure 
+       time from the end time. Remember to convert from TAI to TDB (as
+       required by the Epoch attribute). */
+    if( state->tcs_tai != VAL__BADD ) {
+       astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->tcs_tai + 
+                                               32.184/SPD ); 
+    } else {
+       astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->rts_end +
+                                               ( 32.184 - 0.5*steptime)/SPD ); 
+    }
 
     /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
        First remove the existing current Frame and then add in the new one.

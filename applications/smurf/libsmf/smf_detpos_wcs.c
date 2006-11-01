@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3], 
-*                     AstFrameSet **fset, int *status );
+*                     double steptime, AstFrameSet **fset, int *status );
 
 *  Arguments:
 *     hdr = smfHead * (Given & Returned)
@@ -25,6 +25,9 @@
 *        negative index value to free cached resources.
 *     telpos = double[ 3 ] (Given)
 *        Geodetic lon / lat / altitude of the telscope (deg/deg/metres)
+*     steptime = double (Given)
+*        The value of the STEPTIME FITS header holding the exposure time,
+*        in seconds.
 *     fset = AstFrameSet ** (Given)
 *        Address of a location at which to put the returned FrameSet
 *        pointer. Ignored if "index" is negative.
@@ -47,6 +50,8 @@
 *  History:
 *     2-OCT-2006 (DSB):
 *        Initial version.
+*     2006-11-01 (DSB):
+*        Added steptime.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -77,6 +82,7 @@
 /* Starlink includes */
 #include "ast.h"
 #include "sae_par.h"
+#include "prm_par.h"
 #include "mers.h"
 
 /* SMURF includes */
@@ -86,8 +92,11 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_detpos_wcs"
 
+/* Seconds per day */
+#define SPD 86400.0                    
+
 void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3], 
-                       AstFrameSet **fset, int *status ) {
+                     double steptime, AstFrameSet **fset, int *status ) {
 
    const double *p1;           /* Pointer to next lon or lat value to copy */
    double *p2;                 /* Pointer to next lon value */
@@ -203,11 +212,18 @@ void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
 /* Take a copy of the skyframe, and then modify its Epoch attribute. We take a
    copy since otherwise all FrameSets returned by this function would share 
    the same current Frame, and so the attribute change would affect them all.
-   Note TCS values refer to the middle of the time step, so subtact half the 
-   exposure time from the end time. */
+   Use TCS_TAI values if available, otherwise use RTS_END. Note RTS_END values
+   refer to the end of the observation, so subtact half the exposure time 
+   from the end time. Remember to convert from TAI to TDB (as required by 
+   the Epoch attribute). */
    csky = astCopy( sky );
-   astSet( csky, "Epoch=MJD %.*g", DBL_DIG, hdr->state->rts_end +
-            ( 32.184 - 0.5*hdr->state->acs_exposure)/86400.0 ); 
+   if( hdr->state->tcs_tai != VAL__BADD ) {
+      astSet( csky, "Epoch=MJD %.*g", DBL_DIG, hdr->state->tcs_tai + 
+                                               32.184/SPD ); 
+   } else {
+      astSet( csky, "Epoch=MJD %.*g", DBL_DIG, hdr->state->rts_end +
+                                              ( 32.184 - 0.5*steptime)/SPD ); 
+   }
 
 /* Create the FrameSet */
    *fset = astFrameSet( grid, "" );
