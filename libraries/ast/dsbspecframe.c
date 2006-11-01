@@ -97,6 +97,9 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *        Guard against annulling null pointers in subFrame.
 *     27-OCT-2006 (DSB):
 *        Added AlignSideBand attribute.
+*     31-OCT-2006 (DSB):
+*        Use AlignSideBand attribute in SubFrame only if we are not
+*        currently restoring a FrameSet's integrity.
 *class--
 
 *  Implementation Deficiencies:
@@ -1423,9 +1426,22 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
       dsbtarget = (AstDSBSpecFrame *) target_frame;      
       dsbresult = (AstDSBSpecFrame *) *result;
 
-/* See whether alignment occurs between sidebands. */
-      alignsb_target = astGetAlignSideBand( dsbtarget );
-      alignsb_result = astGetAlignSideBand( dsbresult );
+/* See whether alignment occurs between sidebands. If the current call to 
+   this function is part of the process of restoring a FrameSet's integrity 
+   following changes to the FrameSet's current Frame, then we ignore the 
+   setting of the AlignSideBand attributes and use 1. This ensures that
+   when the SideBand attribute (for instance) is changed via a FrameSet
+   pointer, the Mappings within the FrameSet are modified to produce
+   frequencies in the new SideBand. In most other cases, astronomers
+   usually want to align the DSBSpecFrames as if they were basic SpecFrames
+   (that is, ignoring the setting of the SideBand attribute). */
+      if( astGetFrameFlags( target_frame ) & AST__INTFLAG ) {
+         alignsb_target = 1;
+         alignsb_result = 1;
+      } else {
+         alignsb_target = astGetAlignSideBand( dsbtarget );
+         alignsb_result = astGetAlignSideBand( dsbresult );
+      }         
 
 /* Create a Mapping which transforms positions from the target to an exact 
    copy of the target in which the SideBand attribute is set to the
@@ -2364,16 +2380,18 @@ f     AST_FINDFRAME or AST_CONVERT) as a template to match another (target)
 *     DSBSpecFrame. If non-zero (the default), the value of the SideBand 
 *     attribute is used so that alignment occurs between sidebands. That
 *     is, if one DSBSpecFrame represents USB and the other represents LSB
-*     then using 
-c     astFindFrame or astConvert
-f     AST_FINDFRAME or AST_CONVERT
-*     to align them will result in a USB frequency in the first being mapped 
-*     onto the corresponding USB frequency in the second. If AlignSideBand is 
-*     set to zero, then the value fo the SideBand attribute is ignored. In 
-*     the above example, this would result in a USB frequency in the
-*     first being mapped onto the same LSB frequency in the second. In
-*     other words, if AlignSideBand is zero, the DSBSpecFrame aligns just
-*     like a basic SpecFrame.
+*     then 
+c     astFindFrame and astConvert
+f     AST_FINDFRAME and AST_CONVERT
+*     will recognise that the DSBSpecFrames represent different sidebands
+*     and will take this into account when constructing the Mapping that
+*     maps positions in one DSBSpecFrame into the other. If AlignSideBand is 
+*     set to zero, then the value of the SideBand attribute is ignored. In 
+*     the above example, this would result in a frequency in the first
+*     DSBSpecFrame being mapped onto the same frequency in the second
+*     DSBSpecFrame, even though those frequencies refer to different
+*     sidebands. In other words, if AlignSideBand is zero, the DSBSpecFrame 
+*     aligns like a basic SpecFrame.
 *
 c     When astFindFrame or astConvert 
 f     When AST_FINDFRAME or AST_CONVERT 
