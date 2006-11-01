@@ -690,7 +690,7 @@ c
       else 
          xin = 1.0D0
          call ast_tran1( fs, 1, xin, .true., xout, status )
-         if( xout .ne. 0.75D0 ) then
+         if( xout .ne. 1.25D0 ) then
             write(*,*) xout 
             call stopit( status, 'error 48' )
          end if
