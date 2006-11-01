@@ -726,11 +726,13 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        In FitOK: Changed lower limit on acceptbale correlation from
 *        0.999999 to 0.99999.
 *     1-NOV-2006 (DSB):
-*        When reading a foreign header that contains a DUT1 keyword,
+*        - When reading a foreign header that contains a DUT1 keyword,
 *        use it to set the Dut1 attribute in the SkyFrame. Note, JACH
 *        store DUT1 in units of days. This may clash with the FITS-WCS
 *        standard (when its produced). Also note that DUT1 is not written
 *        out as yet when writing a FrameSet to a foreign FITS header.
+*        - Correct bug that prevented ZSOURCE keyword being added to the
+*        output header if the source velocity was negative.
 *class--
 */
 
@@ -23048,8 +23050,7 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
 
                if( astTestSourceVel( specfrm ) ) {
                   vsource = astGetSourceVel( specfrm );
-                  if( vsource != AST__BAD && vsource >= 0.0 &&
-                      vsource < AST__C ) {
+                  if( vsource != AST__BAD && fabs( vsource ) < AST__C ) {
                      zsource = sqrt( (AST__C + vsource)/
                                      (AST__C - vsource) ) - 1.0;
                      SetItem( &(store->zsource), 0, 0, s, zsource );
