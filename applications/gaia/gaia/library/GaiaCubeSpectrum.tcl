@@ -183,13 +183,21 @@ itcl::class gaia::GaiaCubeSpectrum {
          label $itk_component(sframe).splatlabel -text "SPLAT-VO:" \
             -width $itk_option(-labelwidth)
       }
-      itk_component add sendtosplat {
-         button $itk_component(sframe).sendtosplat -text "Send" \
-            -command [code $this send_to_splat_]
+
+      itk_component add splatcompare {
+         button $itk_component(sframe).splatcompare -text "Send compare" \
+            -command [code $this send_to_splat_ 1]
       }
+      itk_component add splatreplace {
+         button $itk_component(sframe).splatreplace -text "Send replace" \
+            -command [code $this send_to_splat_ 0]
+      }
+
       pack $itk_component(sframe) -side top -fill x -ipadx 1m -ipady 2m
       pack $itk_component(splatlabel) -side left -expand 0 -ipadx 1m
-      pack $itk_component(sendtosplat) -side left -expand 0 -anchor w \
+      pack $itk_component(splatcompare) -side left -expand 0 -anchor w \
+         -ipadx 1m -padx 1m
+      pack $itk_component(splatreplace) -side left -expand 0 -anchor w \
          -ipadx 1m -padx 1m
 
       #  If SPLAT isn't available this is greyed out.
@@ -197,11 +205,14 @@ itcl::class gaia::GaiaCubeSpectrum {
       if { [info exists env(SPLAT_DIR)] } {
          set splat_dir_ $env(SPLAT_DIR)
       } else {
-         $itk_component(sendtosplat) configure -state disabled
+         $itk_component(splatcompare) configure -state disabled
+         $itk_component(splatreplace) configure -state disabled
       }
 
-      add_short_help $itk_component(sendtosplat) \
-         {Send extracted spectrum to SPLAT-VO}
+      add_short_help $itk_component(splatcompare) \
+         {Send extracted spectrum to SPLAT-VO and add to plot}
+      add_short_help $itk_component(splatreplace) \
+         {Send extracted spectrum to SPLAT-VO and remove existing spectra}
 
       #  Set initial bindings.
       toggle_extraction_
@@ -526,7 +537,9 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  Send the currently extracted spectrum to SPLAT for display.
    #  Use an NDF so that the maximum information is retained.
-   protected method send_to_splat_ {} {
+   #  If compare is 1 then just add the spectrum, otherwise remove
+   #  any previously sent spectra from our plot.
+   protected method send_to_splat_ { compare } {
       if { $spectrum_ == {} || [last_extracted_type] == "none" } {
          info_dialog "No spectrum has been extracted" $w_
          return
@@ -541,7 +554,11 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       set filename "GaiaTempSpectrum[incr count_].sdf"
       $spec_writer_ write_as_ndf $filename
-      $splat_disp_ runwith $filename 0
+      if { $compare } {
+         $splat_disp_ runwith $filename 0 false
+      } else {
+         $splat_disp_ runwith $filename 0 true
+      }
       lappend temp_files_ $filename
    }
 
