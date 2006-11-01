@@ -157,6 +157,7 @@
 #include "ast.h"
 #include "jcmt/state.h"  /* for inst_t */
 #include "smurf_typ.h"
+#include "smurf_par.h"
 #include "star/grp.h"
 #include "smf_typ.h"
 
@@ -305,6 +306,10 @@ void smf_fit_poly(const smfData *data, const int order, double *poly,
 
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, 
                       int *status);
+
+void smf_fits_export2DA ( AstFitsChan *fitschan, int *ncards, 
+                          char fitsrec[SC2STORE__MAXFITS][SZFITSCARD], 
+                          int *status );
 
 /* Do not return result since we want the interface to remain the same when a
    string is required. If we return a string we must know who should free it */
