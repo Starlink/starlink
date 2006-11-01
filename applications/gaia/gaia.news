@@ -1,5 +1,9 @@
   Latest changes:
 
+    Bug fix: the distance ruler now measures to the middle of the 
+    final pixel to the top and right of the display. Previously
+    this stopped one pixel further in.
+
     Bug fix: order of baseline subtraction fixed to show the actual
     default. 
 
