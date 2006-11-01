@@ -1,8 +1,15 @@
   Latest changes:
 
-    Cubes with trivial dimensions are now loaded into the cube toolbox
-    when -check_for_cubes is set. Previously these were considered as
-    images.
+    The send to SPLAT options in the cube toolbox have been extended
+    to allow the spectrum to be compared to any existing ones (the old
+    behaviour) and to replace any spectra already plotted.
+ 
+    Bug fix: images that have one dimension of size 1 are now correctly
+    autoranged and oriented.    
+
+    Cubes with trivial first and second dimensions are now loaded into
+    the cube toolbox when -check_for_cubes is set. Previously these were 
+    considered as special form of images.
 
     Bug fix: the distance ruler now measures to the middle of the 
     final pixel to the top and right of the display. Previously
