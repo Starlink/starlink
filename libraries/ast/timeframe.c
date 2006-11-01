@@ -119,7 +119,9 @@ f     - AST_CURRENTTIME: Return the current system time
 *        Allow astAbbrev to have a null "str1" value.
 *     16-OCT-2006 (DSB):
 *        Allow conversions between UTC and UT1 (using the new Frame attribute 
-*        DUT1).
+*     1-NOV-2006 (DSB):
+*        Correct sign of longitude passed to TimeMap contrutcorss in
+*        function MakeMap.
 *class--
 */
 
@@ -2872,9 +2874,11 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
 
 /* All timescale conversions except UTTOUTC and UTCTOUT require the input (MJD)
    offset as the first argument. In general, the clock longitude and latitude 
-   are also needed. */
+   are also needed. The Frame class stores longitude values in a +ve
+   eastwards sense, but the TimeMap class needs +ve westwards, so negate 
+   the longitude. */
       args[ 0 ] = args[ 1 ];
-      args[ 1 ] = astGetObsLon( this );
+      args[ 1 ] = -astGetObsLon( this );
       args[ 2 ] = astGetObsLat( this );
 
 /* The UTTOUTC and UTCTOUT conversions required just he DUT1 value. */
