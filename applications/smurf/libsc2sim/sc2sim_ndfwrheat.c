@@ -114,7 +114,11 @@
 
 /* SC2SIM includes */
 #include "sc2sim.h"
+
+/* SMURF includes */
+#include "smurf_par.h"
 #include "sc2da/sc2store.h"
+#include "sc2da/sc2store_par.h"
 
 void sc2sim_ndfwrheat
 ( 
@@ -136,8 +140,9 @@ int *status        /* global status (given and returned) */
 {
    /* Local variables */
    AstFitsChan *fitschan;           /* FITS headers */
+   char fitsrec[SC2STORE__MAXFITS][SZFITSCARD]; /* Store for FITS records */  
    double fpos = 0;                 /* RA or Dec in degrees */
-
+   int nrec;                        /* number of FITS header records */
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
@@ -168,13 +173,15 @@ int *status        /* global status (given and returned) */
    astSetFitsF ( fitschan, "ATEND", sinx->atend, 
                  "Ambient temperature at end (C)", 0 );
 
-   /* Store the timestream data -- KLUDGED FOR NOW TO REMOVE DEPENDENCE ON
-      FITSREC */
+   /* Convert the AstFitsChan data to a char array */
+   smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
 
-   sc2store_wrtstream_fitschan ( file_name, fitschan, inx->nbolx, inx->nboly, 
-			numsamples, nflat, flatname, head, dbuf, dksquid, 
-			fcal, fpar, inx->obsmode, inx->jig_vert, inx->nvert, 
-			NULL, 0, status );
+   /* Store the timestream data */
+   sc2store_wrtstream ( file_name, nrec, fitsrec, inx->nbolx, 
+                        inx->nboly, numsamples, nflat, flatname, head, 
+                        dbuf, dksquid, fcal, fpar, inx->obsmode, 
+                        inx->jig_vert, inx->nvert, NULL, 0,
+                        status );
 
    /* Close the file */
    sc2store_free ( status );

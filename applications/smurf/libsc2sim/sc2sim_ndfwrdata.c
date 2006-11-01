@@ -130,7 +130,12 @@
 
 /* SC2SIM includes */
 #include "sc2sim.h"
+
+/* SMURF includes */
+#include "smurf_par.h"
 #include "sc2da/sc2store.h"
+#include "sc2da/sc2store_par.h"
+
 
 void sc2sim_ndfwrdata
 ( 
@@ -158,6 +163,7 @@ int *status       /* global status (given and returned) */
    /* Local variables */
    double decd;                     /* Dec of observation in degrees */
    AstFitsChan *fitschan;           /* FITS headers */
+   char fitsrec[SC2STORE__MAXFITS][SZFITSCARD]; /* Store for FITS records */
    int i;                           /* Loop counter */
    int nrec;                        /* number of FITS header records */
    double rad;                      /* RA of observation in degrees */
@@ -223,7 +229,6 @@ int *status       /* global status (given and returned) */
      strncat( weightsname, "dreamweights_", 13);
      strncat( weightsname, sinx->subname, 3);
      strncat( weightsname, ".sdf", 4);
-
      astSetFitsS ( fitschan, "DRMWGHTS", weightsname, 
                    "Name of DREAM weights file", 0 );
 
@@ -258,14 +263,16 @@ int *status       /* global status (given and returned) */
    astSetFitsF ( fitschan, "MAP_X", map_x, "Map X offset (arcsec)", 0 );
    astSetFitsF ( fitschan, "MAP_Y", map_y, "Map Y offset (arcsec)", 0 );
 
- 
-   /* Store the timestream data -- KLUDGED FOR NOW TO REMOVE DEPENDENCE ON
-      FITSREC */
-   sc2store_wrtstream_fitschan ( file_name, fitschan, inx->nbolx, inx->nboly, 
-			numsamples, nflat, flatname, head, dbuf, dksquid, 
-			fcal, fpar, inx->obsmode, inx->jig_vert, inx->nvert, 
-			jigptr, jigsamples, status );
- 
+   /* Convert the AstFitsChan data to a char array */
+   smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
+
+   /* Store the timestream data */
+   sc2store_wrtstream ( file_name, nrec, fitsrec, inx->nbolx, 
+                        inx->nboly, numsamples, nflat, flatname, head, 
+                        dbuf, dksquid, fcal, fpar, inx->obsmode, 
+                        inx->jig_vert, inx->nvert, jigptr, jigsamples, 
+                        status );
+
    /* Close the file */
    sc2store_free ( status );
 
