@@ -539,7 +539,7 @@ itcl::class gaia::GaiaCube {
    public method set_display_plane { newvalue {regen 0} } {
 
       #  Do nothing, if the plane remains the same.
-      if { $newvalue == $plane_ || $ndfname_ == {} } {
+      if { ( $newvalue == $plane_ && ! $regen ) || $ndfname_ == {} } {
          return
       }
 
