@@ -23,12 +23,28 @@
 *     This is the main routine implementing the MAKECUBE task.
 
 *  ADAM Parameters:
+*     CROTA = REAL (Read)
+*          The angle, in degrees, from north through east to the second
+*          pixel axis in the output cube. [0.0]
 *     IN = NDF (Read)
 *          Input file(s)
-*     PIXSIZE = REAL (Read)
-*          Pixel size in output image, in arcsec
 *     OUT = NDF (Write)
 *          Output file
+*     PIXSIZE( 2 ) = REAL (Read)
+*          Pixel dimensions in the output image, in arcsec. If only one value 
+*          is supplied, the same value will be used for both axes.
+*     REFLAT = LITERAL (Read)
+*          The formatted celestial latitude value at the tangent point of 
+*          the spatial projection in the output cube. This should be provided 
+*          in the system specified by parameter SYSTEM. If a null (!) value is
+*          supplied for REFLAT or REFLON, then the first point BASE position 
+*          will be used as the tangent point. [!]
+*     REFLON = LITERAL (Read)
+*          The formatted celestial longitude value at the tangent point of 
+*          the spatial projection in the output cube. This should be provided 
+*          in the system specified by parameter SYSTEM. If a null (!) value is
+*          supplied for REFLAT or REFLON, then the first point BASE position 
+*          will be used as the tangent point. [!]
 *     SYSTEM = LITERAL (Read)
 *          The celestial coordinate system for the output cube. One of
 *          ICRS, FK5, AZEL, GALACTIC or TRACKING.
@@ -119,17 +135,23 @@ void smurf_makecube( int *status ) {
    AstMapping *oskymap = NULL; /* GRID->SkyFrame Mapping from output WCS */
    AstMapping *ospecmap = NULL;/* GRID->SpecFrame Mapping from output WCS */
    AstMapping *tmap = NULL;   /* Base->current Mapping from output WCS */
+   AstSkyFrame *tsky = NULL;  /* Temporary SkyFrame */
    Grp *igrp = NULL;          /* Group of input files */
    Grp *ogrp = NULL;          /* Group containing output file */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
    char *pname = NULL;        /* Name of currently opened data file */
    char system[ 10 ];         /* Celestial coord system for output cube */
-   float pixsize;             /* Spatial size of an output pixel in arcsec */
+   char reflat[ 41 ];         /* Reference latitude string */
+   char reflon[ 41 ];         /* Reference longitude string */
+   double cdelt[ 2 ];         /* Pixel sizes in output projection */
+   double crota;              /* Position angle of output Y axis */
+   double crval[ 2 ];         /* Reference point for output projection */
    int axes[ 2 ];             /* Indices of selected axes */
    int flag;                  /* Is group expression to be continued? */
    int ifile;                 /* Input file index */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for output map */
    int moving;                /* Is the telescope base position changing? */
+   int nval;                  /* Number of supplied positions */
    int ondf;                  /* output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
    int outsize;               /* Number of files in output group */
@@ -157,16 +179,55 @@ void smurf_makecube( int *status ) {
 
 /* Get the user defined spatial pixel size (the calibration for the spectral 
    axis is fixed by the first input data file - see smf_cubebounds.c). */
-   parGet0r( "PIXSIZE", &pixsize, status );
-   if( *status == SAI__OK && pixsize <= 0 ) {
-       msgSetr( "PIXSIZE", pixsize );
+   parGet1d( "PIXSIZE", 2, cdelt, &nval, status );
+
+/* Duplicate the first value if only one value was supplied. */
+   if( nval < 2 ) cdelt[ 1 ] = cdelt[ 0 ];
+
+/* Check the values are OK. */
+   if( *status == SAI__OK && ( cdelt[ 0 ] <= 0 || cdelt[ 1 ] <= 0 ) ) {
+       msgSetd( "P1", cdelt[ 0 ] );
+       msgSetd( "P2", cdelt[ 1 ] );
        *status = SAI__ERROR;
-       errRep( FUNC_NAME, "Pixel size ^PIXSIZE is < 0.", status);
+       errRep( FUNC_NAME, "Invalid pixel sizes (^P1,^P2).", status);
    }
 
 /* Get the celestial coordinate system for the output cube. */
    parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC",
               1, system, 10, status );
+
+/* Get the reference position strings. Use a temprary SkyFrame to
+   unformat them. */
+   if( *status == SAI__OK ) {
+      parGet0c( "REFLON", reflon, 40, status );
+      parGet0c( "REFLAT", reflat, 40, status );
+
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+         crval[ 0 ] = VAL__BADD;
+         crval[ 1 ] = VAL__BADD;
+
+      } else {
+         if( !strcmp( system, "TRACKING" ) ){
+            tsky = astSkyFrame( "System=UNKNOWN" );
+         } else {
+            tsky = astSkyFrame( "System=%s", system );
+         } 
+      
+         if( astUnformat( tsky, 1, reflon, crval ) == 0 && *status == SAI__OK ) {
+            msgSetc( "REFLON", reflon );
+            errRep( "", "Bad value supplied for REFLON: '^REFLON'", status );
+         }
+      
+         if( astUnformat( tsky, 2, reflat, crval + 1 ) == 0 && *status == SAI__OK ) {
+            msgSetc( "REFLAT", reflat );
+            errRep( "", "Bad value supplied for REFLAT: '^REFLAT'", status );
+         }  
+      }
+   }
+
+/* Get the position angle of the output Y axis, in degrees. */
+   parGet0d( "CROTA", &crota, status );
 
 /* See of the detector positions are to be read from the RECEPPOS array. 
    Otherwise, they are calculated on the basis of the FPLANEX/Y arrays. */
@@ -174,7 +235,7 @@ void smurf_makecube( int *status ) {
   
 /* Validate the input files, create the WCS FrameSet to store in the
    output cube, and get the pixel index bounds of the output cube. */
-   smf_cubebounds( igrp, size, system, 0.0, 0.0, 1, pixsize, usedetpos,
+   smf_cubebounds( igrp, size, system, crval, cdelt, crota, usedetpos,
                    &moving, lbnd_out, ubnd_out, &wcsout, status );
 
 /* Get the base->current Mapping from the output WCS FrameSet, and split it 

@@ -13,8 +13,8 @@
 *     C function
 
 *  Invocation:
-*     smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0, 
-*                     double lat_0, int flag, double pixsize, int userecpos, 
+*     smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2], 
+*                     double cdelt[2], double crota2, int userecpos, 
 *                     int *moving, int lbnd[ 3 ], int ubnd[ 3 ], 
 *                     AstFrameSet **wcsout, int *status );
 
@@ -28,18 +28,16 @@
 *        describe the spatial axes of the output cube. It should be a 
 *        valid value for the System attribute of an AST SkyFrame, or
 *        "TRACKING".
-*     lon_0 = double (Given)
-*        The longitude to use as the tangent point in the output cube, 
-*        in radians in the system specified by "system".
-*     lat_0 = double (Given)
-*        The latitude to use as the tangent point in the output cube, 
-*        in radians in the system specified by "system".
-*     flag = int (Given)
-*        If non-zero, use BASE coordinates for the tangent point instead
-*        of "lon_0" and "lat_0".
-*     pixsize = double (Given)
-*        Spatial pixel size for the output cube at the tangent point, in 
+*     crval = double[ 2 ] (Given)
+*        The longitude and latitude to use as the tangent point in the output 
+*        cube, in radians in the system specified by "system". Bad values
+*        are replaced by the BASE coordinates for the tangent point.
+*     cdelt = double[ 2 ] (Given)
+*        Spatial pixel sizes for the output cube at the tangent point, in 
 *        arcsec.
+*     crota2 = double (Given)
+*        The angle from north through east to the second pixel axis, in
+*        degrees.
 *     usedetpos = int (Given)
 *        If a non-zero value is supplied, then the detector positions for
 *        a given time slice are read directly from the input NDF. Otherwise 
@@ -68,10 +66,9 @@
 *     GRID coords in the cube, and the current Frame is a CmpFrame holding
 *     (lon,lat,freq) axes, where "lon,lat" are (if "moving" is zero) celestial 
 *     longitude and latitude in the system specified by "system". The spatial
-*     projection in the cube is a tangent plane projection with tangent
-*     point at the sky position given by "lon_0", "lat_0" and "flag". The
-*     spectral axis system and projection are inherited from the first
-*     supplied input data file.
+*     projection in the cube is a tangent plane projection defined by 
+*     "crval", "cdelt" and "crota". The spectral axis system and projection 
+*     are inherited from the first supplied input data file.
 *
 *     If "moving" is non-zero, the spatial axes represent (lon,lat) offsets 
 *     in the tracking frame from the base telescope position associated
@@ -87,6 +84,8 @@
 *     13-OCT-2006 (DSB):
 *        Changed to get the input spectral WCS from the WCS FrameSet rather 
 *        than the FITS header.
+*     1-NOV-2006 (DSB):
+*        Use new smf_makefitschan interface.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -135,10 +134,10 @@
 /* Returns nearest integer to "x" */
 #define NINT(x) ( ( x > 0 ) ? (int)( x + 0.5 ) : (int)( x - 0.5 ) )
 
-void smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0, 
- 		     double lat_0, int flag, double pixsize, int userecpos,
+void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2], 
+                     double cdelt[2], double crota2, int userecpos, 
                      int *moving, int lbnd[ 3 ], int ubnd[ 3 ], 
-                     AstFrameSet **wcsout, int *status ) {
+                     AstFrameSet **wcsout, int *status ){
 
 /* Local Variables */
    AstCmpFrame *cmpfrm = NULL;  /* Current Frame for output FrameSet */
@@ -454,16 +453,16 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0,
             ospecmap = astClone( specmap );
 
 /* The tangent point of the output tan plane projection is set to the 
-   supplied lon_0/lat_0 position. If no position has been supplied, use
+   supplied crval position. If no position has been supplied, use
    the first pointing BASE position, converted to the required coordinate
    system. */
-	    if( flag != 0 ) {
+	    if( crval[ 0 ] == VAL__BADD || crval[ 1 ] == VAL__BADD ) {
 
 /* Get the pointing BASE position in AZ/EL. */
-               lon_0 = hdr->state->tcs_az_bc1;
-               lat_0 = hdr->state->tcs_az_bc2;
+               crval[ 0 ] = hdr->state->tcs_az_bc1;
+               crval[ 1 ] = hdr->state->tcs_az_bc2;
 
-/* If the required system is not AZ/EL, we need to convert the lon_0/lat_0
+/* If the required system is not AZ/EL, we need to convert the 
    axis values to the required system. */
                if( strcmp( "AZEL", usesys ) ) {
 
@@ -478,10 +477,10 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0,
 
 /* Get a Mapping from AZEL to the requested system, and use it to convert 
    the lon_0/lat_0 values to the requested system. */
-                  astTran2( astConvert( sf1, sf2, "" ), 1, &lon_0,
-                            &lat_0, 1, &a, &b );
-                  lon_0 = a;
-                  lat_0 = b;
+                  astTran2( astConvert( sf1, sf2, "" ), 1, crval,
+                            crval + 1, 1, &a, &b );
+                  crval[ 0 ] = a;
+                  crval[ 1 ] = b;
                }
             }
 
@@ -489,7 +488,7 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0,
    tan plane projection. The longitude and latitude axis types are defined 
    by "usesys", and north in this system will be parallel to the second pixel
    axis. The tangent point is placed at pixel (0,0). */
-            smf_makefitschan( usesys, pixsize, lon_0, lat_0, fct, status );
+            smf_makefitschan( usesys, crval, cdelt, crota2, fct, status );
 
 /* Read a FrameSet from this FitsChan. */
 	    astClear( fct, "Card" );
@@ -566,7 +565,7 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0,
                         (hdr->allState)[ hdr->nframes - 1 ].tcs_tr_bc1,
                         (hdr->allState)[ hdr->nframes - 1 ].tcs_tr_bc2 );
 
-                *moving = ( sep > ( pixsize/3600.0 )*AST__DD2R );
+                *moving = ( sep > ( cdelt[ 0 ]/3600.0 )*AST__DD2R );
 
             } else {
                *moving = 0;

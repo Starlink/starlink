@@ -13,23 +13,23 @@
 *     C function
 
 *  Invocation:
-*     smf_makefitschan( const char *system, double pixsize, 
-*                       double lon_0, double lat_0, AstFitsChan *fc, 
+*     smf_makefitschan( const char *system, double crval[2], 
+*                       double cdelt[2], double crota2, AstFitsChan *fc, 
 *                       int *status );
 
 *  Arguments:
 *     system = char * (Given)
 *        Specifies the celestial coordinate system. It should be a 
 *        valid value for the System attribute of an AST SkyFrame.
-*     pixsize = double (Given)
-*        Spatial pixel size for the output cube at the tangent point, in 
+*     crval = double[ 2 ] (Given)
+*        The longitude and latitude to use as the tangent point in the output 
+*        cube, in radians in the system specified by "system". 
+*     cdelt = double[ 2 ] (Given)
+*        Spatial pixel sizes for the output cube at the tangent point, in 
 *        arcsec.
-*     lon_0 = double (Given)
-*        The longitude to use as the tangent point in the output cube, 
-*        in radians in the system specified by "system".
-*     lat_0 = double (Given)
-*        The latitude to use as the tangent point in the output cube, 
-*        in radians in the system specified by "system".
+*     crota2 = double (Given)
+*        The angle from north through east to the second pixel axis, in
+*        degrees.
 *     fc = AstFitsChan * (Given)
 *        A pointer to a FitsCHan in which to put the FITS-WCS cards
 *        describing the tan plane projection.
@@ -39,7 +39,7 @@
 *  Description:
 *     This function creates a set of FITS-WCS header cards describing a
 *     tan plane projection and puts them into a supplied AST FitsChan.
-*     Celestial north is parallel to the second pixel axis, and the
+*     Celestial north is at the position angle specified by "crota", and the
 *     tangent point is placed at grid cords (0,0). Note, the observatory
 *     position is not recorded in the FitsChan.
 
@@ -50,6 +50,8 @@
 *  History:
 *     25-SEP-2006 (DSB):
 *        Initial version.
+*     1-NOV-2006 (DSB):
+*        New interface to allow more control of the projection parameters.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -79,6 +81,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 /* Starlink includes */
 #include "ast.h"
@@ -90,9 +93,9 @@
 
 #define FUNC_NAME "smf_makefitschan"
 
-void smf_makefitschan( const char *system, double pixsize, 
-                       double lon_0, double lat_0, AstFitsChan *fc, 
-                       int *status ){
+void smf_makefitschan( const char *system, double crval[2], double cdelt[2], 
+                       double crota2, AstFitsChan *fc, int *status ){
+
 
 /* Local Variables */
    int i;
@@ -111,16 +114,19 @@ void smf_makefitschan( const char *system, double pixsize,
    astSetFitsF( fc, "CRPIX2", 0.0, NULL, 0 );
 
 /* World coords of reference point. */
-   astSetFitsF( fc, "CRVAL1", lon_0*AST__DR2D, NULL, 0 );
-   astSetFitsF( fc, "CRVAL2", lat_0*AST__DR2D, NULL, 0 );
+   astSetFitsF( fc, "CRVAL1", crval[ 0 ]*AST__DR2D, NULL, 0 );
+   astSetFitsF( fc, "CRVAL2", crval[ 1 ]*AST__DR2D, NULL, 0 );
+
+/* Axis rotation. */
+   astSetFitsF( fc, "CROTA2", crota2, NULL, 0 );
 
 /* Pixel size. AZEL is right-handed. */
    if( !strcmp( system, "AZEL" ) ) {
-      astSetFitsF( fc, "CDELT1", pixsize/3600.0, NULL, 0 );
+      astSetFitsF( fc, "CDELT1", fabs(cdelt[ 0 ])/3600.0, NULL, 0 );
    } else {
-      astSetFitsF( fc, "CDELT1", -pixsize/3600.0, NULL, 0 );
+      astSetFitsF( fc, "CDELT1", -fabs(cdelt[ 0 ])/3600.0, NULL, 0 );
    }
-   astSetFitsF( fc, "CDELT2", pixsize/3600.0, NULL, 0 );
+   astSetFitsF( fc, "CDELT2", fabs(cdelt[ 1 ])/3600.0, NULL, 0 );
 
 /* Axis types and reference frame. */
    if( !strcmp( system, "ICRS" ) ||

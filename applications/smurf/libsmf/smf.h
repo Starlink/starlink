@@ -435,8 +435,8 @@ void smf_telpos_get( const smfHead * hdr, int * status );
 
 void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
 
-void smf_cubebounds( Grp *igrp,  int size, char *system, double lon_0, 
- 		     double lat_0, int flag, double pixsize, int userecpos,
+void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2], 
+                     double cdelt[2], double crota2, int userecpos, 
                      int *moving, int lbnd[ 3 ], int ubnd[ 3 ], 
                      AstFrameSet **wcsout, int *status );
 
@@ -447,9 +447,8 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
 
 const char *smf_convert_system( const char *label, int *status );
 
-void smf_makefitschan( const char *system, double pixsize, 
-                       double lon_0, double lat_0, AstFitsChan *fc, 
-                       int *status );
+void smf_makefitschan( const char *system, double crval[2], double cdelt[2], 
+                       double crota2, AstFitsChan *fc, int *status );
 
 void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
                      double steptime, AstFrameSet **fset, int *status );

@@ -605,6 +605,15 @@ package @PACKAGE@ {
   
      action makecube {
 
+	 parameter crota {
+	    type _REAL
+	    prompt {Position angle of second pixel axis in output (degs)}
+	    ppath DEFAULT
+	    vpath DEFAULT
+	    default 0.0
+	    helpkey *
+	  }
+
          parameter in {
             position 1
             type NDF
@@ -629,9 +638,8 @@ package @PACKAGE@ {
 	 parameter pixsize {
 	    position 3
 	    type _REAL
-	    vpath {PROMPT }
-	    prompt {Output pixel size for spatial part of map (arcsec)}
-	    ppath GLOBAL CURRENT
+	    prompt {Output pixel size(s) for spatial part of map (arcsec)}
+	    ppath CURRENT
 	    default 3.0
 	    helpkey *
 	  }
@@ -642,6 +650,26 @@ package @PACKAGE@ {
 	    default NORM
 	    vpath DEFAULT	
 	    helpkey *
+	  }
+
+	  parameter reflat {
+            type LITERAL
+            access READ
+            vpath DEFAULT 
+            ppath CURRENT DEFAULT
+            prompt {Celestial latitude at output reference point}
+            default !
+            helpkey *
+	  }
+
+	  parameter reflon {
+            type LITERAL
+            access READ
+            vpath DEFAULT 
+            ppath CURRENT DEFAULT
+            prompt {Celestial longitude at output reference point}
+            default !
+            helpkey *
 	  }
 
 	  parameter system {
