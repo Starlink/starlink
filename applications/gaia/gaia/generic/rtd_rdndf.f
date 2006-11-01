@@ -195,17 +195,22 @@
 
 *  Set NX and NY (note these are the first significant dimension,
 *  followed by the product of the others.
-            NX = 1
-            NY = 1
-            FIRST = .TRUE.
-            DO 2 I = 1, NDIM
-               IF ( DIM( I ) .GT. 1 .AND. FIRST ) THEN 
-                  NX = DIM( I )
-                  FIRST = .FALSE.
-               ELSE
-                  NY = NY * DIM( I )
-               END IF
- 2          CONTINUE
+            IF ( NDIM .EQ. 2 ) THEN
+               NX = DIM( 1 )
+               NY = DIM( 2 )
+            ELSE 
+               NX = 1
+               NY = 1
+               FIRST = .TRUE.
+               DO 2 I = 1, NDIM
+                  IF ( DIM( I ) .GT. 1 .AND. FIRST ) THEN 
+                     NX = DIM( I )
+                     FIRST = .FALSE.
+                  ELSE
+                     NY = NY * DIM( I )
+                  END IF
+ 2             CONTINUE
+            END IF
 
 *  Success. Now get the data type of the NDF.
             CALL NDF_TYPE( ID, 'DATA', DTYPE, STATUS )
