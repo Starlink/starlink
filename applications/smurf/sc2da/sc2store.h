@@ -315,27 +315,5 @@ double jig_path[][2], /* Path of SMU during jiggle cycle (given) */
 int npath,         /* Number of positions in jiggle path (given) */
 int *status        /* global status (given and returned) */
 ); 
-
-void sc2store_wrtstream_fitschan
-(
-char file_name[],  /* output file name (given) */
-AstFitsChan *fitschan, /* FITS headers */
-int colsize,       /* number of bolometers in column (given) */
-int rowsize,       /* number of bolometers in row (given) */
-int numsamples,    /* number of samples (given) */
-int nflat,         /* number of flat coeffs per bol (given) */
-char *flatname,    /* name of flatfield algorithm (given) */
-JCMTState head[],  /* header data for each frame (given) */
-int *dbuf,         /* time stream data (given) */
-int *darksquid,    /* dark SQUID time stream data (given) */
-double *fcal,      /* flat-field calibration (given) */
-double *fpar,      /* flat-field parameters (given) */
-char *obsmode,    /* Observing mode (given) */
-int jig_vert[][2], /* Array of jiggle vertices (given) */
-int nvert,         /* Number of jiggle vertices (given) */
-double jig_path[][2], /* Path of SMU during jiggle cycle (given) */
-int npath,         /* Number of positions in jiggle path (given) */
-int *status        /* global status (given and returned) */
-);
  
 #endif
