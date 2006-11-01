@@ -150,6 +150,8 @@ f     The CmpFrame class does not define any new routines beyond those
 *        against the second component of a CmpFrame.
 *     31-OCT-2006 (DSB):
 *        Over-ride the SetFrameFlags method.
+*     1-NOV-2005 (DSB):
+*        Override astSetDut1, astGetDut1 and astClearDut1.
 *class--
 */
 
@@ -565,6 +567,9 @@ static void (* parent_setattrib)( AstObject *, const char * );
 static void (* parent_setepoch)( AstFrame *, double );
 static void (* parent_setobslat)( AstFrame *, double );
 static void (* parent_setobslon)( AstFrame *, double );
+static void (* parent_setdut1)( AstFrame *, double );
+static void (* parent_cleardut1)( AstFrame * );
+static double (* parent_getdut1)( AstFrame * );
 
 /* Pointer to axis index array accessed by "qsort". */
 static int *qsort_axes;
@@ -666,6 +671,10 @@ static void SetAttrib( AstObject *, const char * );
 static double GetEpoch( AstFrame * );
 static void ClearEpoch( AstFrame * );
 static void SetEpoch( AstFrame *, double );
+
+static double GetDut1( AstFrame * );
+static void ClearDut1( AstFrame * );
+static void SetDut1( AstFrame *, double );
 
 static double GetObsLon( AstFrame * );
 static void ClearObsLon( AstFrame * );
@@ -1272,6 +1281,52 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                 "called \"%s\".", astGetClass( this ), attrib );
    }
 
+}
+
+static void ClearDut1( AstFrame *this_frame ) {
+/*
+*  Name:
+*     ClearDut1
+
+*  Purpose:
+*     Clear the value of the Dut1 attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void ClearDut1( AstFrame *this )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astClearDut1 method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function clears the Dut1 value in the component Frames as
+*     well as this CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Invoke the parent method to clear the CmpFrame Dut1 value. */
+   (*parent_cleardut1)( this_frame );
+
+/* Now clear the Dut1 attribute in the two component Frames. */
+   astClearDut1( this->frame1 );
+   astClearDut1( this->frame2 );
 }
 
 static void ClearEpoch( AstFrame *this_frame ) {
@@ -2700,6 +2755,80 @@ static int GetMinAxes( AstFrame *this_frame ) {
    return result;
 }
 
+static double GetDut1( AstFrame *this_frame ) {
+/*
+*  Name:
+*     GetDut1
+
+*  Purpose:
+*     Get a value for the Dut1 attribute of a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     double GetDut1( AstFrame *this )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astGetDut1 method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function returns a value for the Dut1 attribute of a
+*     CmpFrame.  
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+
+*  Returned Value:
+*     The Dut1 attribute value.
+
+*  Notes:
+*     - A value of AST__BAD will be returned if this function is invoked
+*     with the global error status set or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   double result;                /* Result value to return */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* If an Dut1 attribute value has been set, invoke the parent method
+   to obtain it. */
+   if ( astTestDut1( this ) ) {
+      result = (*parent_getdut1)( this_frame );
+
+/* Otherwise, if the Dut1 value is set in the first component Frame,
+   return it. */
+   } else if( astTestDut1( this->frame1 ) ){
+      result = astGetDut1( this->frame1 );
+
+/* Otherwise, if the Dut1 value is set in the second component Frame,
+   return it. */
+   } else if( astTestDut1( this->frame2 ) ){
+      result = astGetDut1( this->frame2 );
+
+/* Otherwise, return the default Dut1 value from the first component
+   Frame. */
+   } else {
+      result = astGetDut1( this->frame1 );
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static double GetEpoch( AstFrame *this_frame ) {
 /*
 *  Name:
@@ -3442,6 +3571,15 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
 
    parent_clearepoch = frame->ClearEpoch;
    frame->ClearEpoch = ClearEpoch;
+
+   parent_getdut1 = frame->GetDut1;
+   frame->GetDut1 = GetDut1;
+
+   parent_setdut1 = frame->SetDut1;
+   frame->SetDut1 = SetDut1;
+
+   parent_cleardut1 = frame->ClearDut1;
+   frame->ClearDut1 = ClearDut1;
 
    parent_getobslon = frame->GetObsLon;
    frame->GetObsLon = GetObsLon;
@@ -6852,6 +6990,54 @@ static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis ) {
          astSetAxis( this->frame2, axis - naxes1, newaxis );
       }
    }
+}
+
+static void SetDut1( AstFrame *this_frame, double val ) {
+/*
+*  Name:
+*     SetDut1
+
+*  Purpose:
+*     Set the value of the Dut1 attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void SetDut1( AstFrame *this, double val )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astSetDut1 method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function sets the Dut1 value in the component Frames as
+*     well as this CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     val
+*        New Dut1 value.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Invoke the parent method to set the CmpFrame Dut1 value. */
+   (*parent_setdut1)( this_frame, val );
+
+/* Now set the Dut1 attribute in the two component Frames. */
+   astSetDut1( this->frame1, val );
+   astSetDut1( this->frame2, val );
 }
 
 static void SetEpoch( AstFrame *this_frame, double val ) {
