@@ -84,6 +84,9 @@
 *        Add ACSIS as a recognised instrument.
 *     2006-10-2 (DSB):
 *        Allow ACSIS WCS to be based either on FPLANEX/Y or RECEPPOS.
+*     2006-11-1 (DSB):
+*        - Pass STEPTIME to smf_detpos_wcs and smf_create_lutwcs.
+*        - Set the DUT1 value in the returned current Frame.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -134,11 +137,17 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_tslice_ast"
 
+/* Seconds per day */
+#define SPD 86400.0
+
 void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
 
-  smfHead *       hdr;       /* Local copy of the header structure */
-  const JCMTState * tmpState;  /* Local pointer to STATE */
-  int             subsysnum; /* Subsystem numeric id. 0 - 8 */
+  AstFrame *cfrm = NULL;     /* Pointer to current Frame */
+  smfHead *hdr;              /* Local copy of the header structure */
+  const JCMTState *tmpState; /* Local pointer to STATE */
+  double dut1;               /* UT1-UTC correction, in days */ 
+  double steptime;           /* Exposure time */ 
+  int subsysnum;             /* Subsystem numeric id. 0 - 8 */
   char subarray[81];         /* Subarray name */
 
   if (*status != SAI__OK) return;
@@ -224,21 +233,27 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
       break;
       
     case INST__AZTEC:
+
+      /* Need to get the exposure time. */
+      smf_fits_getD( hdr, "STEPTIME", &steptime, status );
+
       smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet, 
-			 tmpState, hdr->instap, hdr->telpos, 
+			 tmpState, hdr->instap, hdr->telpos, steptime,
 			 &(hdr->wcs), status );
       break;
       
 /* For ACSIS data, use the .MORE.ACSIS.RECEPPOS values if they are
    still available in the smfHead. Otherwise, use the FPLANEX/Y values. */
     case INST__ACSIS:
+      smf_fits_getD( hdr, "STEPTIME", &steptime, status );
 
       if( hdr->detpos ) {
-         smf_detpos_wcs( hdr, index, hdr->telpos, &(hdr->wcs), status );
+         smf_detpos_wcs( hdr, index, hdr->telpos, steptime, &(hdr->wcs), 
+                         status );
 
       } else {
          smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet, 
-     			    tmpState, hdr->instap, hdr->telpos, 
+     			    tmpState, hdr->instap, hdr->telpos, steptime,
 			    &(hdr->wcs), status );
       }
 
@@ -250,6 +265,16 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
 
     }
     
+/* Set the current Frame's DUT1 value, converting from days to seconds. Use 
+   the current Frame pointer rather than the FrameSet pointer in order to 
+   prevent the current Frame from being re-mapped to take account of the 
+   change in DUT1 value. */
+    if( hdr->wcs && astGetFitsF( hdr->fitshdr, "DUT1", &dut1 ) ) {
+       cfrm = astGetFrame( hdr->wcs, AST__CURRENT );
+       astSetD( cfrm, "DUT1", SPD*dut1 );
+       cfrm = astAnnul( cfrm );
+    }
+
     /* astShow( hdr->wcs ); */
   }
   return;
