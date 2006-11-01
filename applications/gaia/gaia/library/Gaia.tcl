@@ -1286,18 +1286,16 @@ itcl::class gaia::Gaia {
          set naxis1 [$rtdimage fits get NAXIS1]
          set naxis2 [$rtdimage fits get NAXIS2]
 
-         #  No trivial cubes?
-         if { $naxis1 != 1 && $naxis2 != 1 && $naxis3 != 1 } {
-            #  Load it into cube browser.
-            make_opencube_toolbox
-            set msg {}
-            set result [catch {$itk_component(opencube) configure \
-                                  -cube $itk_option(-file)} msg]
-            if { $result != 0 } {
-               $itk_component(opencube) close
-               if { $msg != {} } {
-                  info_dialog "$msg" $w_
-               }
+         #  Load it into cube browser. Note allow trivial cubes with 
+         #  redundant dimensions 1, 2, or 3.
+         make_opencube_toolbox
+         set msg {}
+         set result [catch {$itk_component(opencube) configure \
+                               -cube $itk_option(-file)} msg]
+         if { $result != 0 } {
+            $itk_component(opencube) close
+            if { $msg != {} } {
+               info_dialog "$msg" $w_
             }
          }
       } else {
