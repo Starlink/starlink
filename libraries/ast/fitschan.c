@@ -1792,6 +1792,12 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
          SetItemC( &(store->wcsname), 0, s, (char *) astGetDomain( wcsfrm ) );
       }
 
+/* Store the UT1-UTC correction, if set, converting from seconds to days
+   (as used by JACH). */
+      if( astTestDut1( wcsfrm ) && s == ' ' ) {
+         SetItem( &(store->dut1), 0, 0, ' ', astGetDut1( wcsfrm )/SPD );
+      }
+
 /* Set CRVAL values which are very small compared to the pixel size to
    zero. */
       for( iax = 0; iax < nwcs; iax++ ) {
@@ -3597,7 +3603,7 @@ static AstMapping *CelestialAxes( AstFrameSet *fs, double *dim, int *wperm,
                ppcfid[ ilat ] *= AST__DR2D;
             }
 
-/* Store the CTYPE, CNAME, EQUINOX, DUT1, MJDOBS, and RADESYS values. */
+/* Store the CTYPE, CNAME, EQUINOX, MJDOBS, and RADESYS values. */
             SkySys( skyfrm, astGetWcsType( map2 ), store, fits_ilon, 
                     fits_ilat, s, method, class );
 
@@ -22099,7 +22105,7 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
 *  Description:
 *     This function sets values for the following FITS-WCS keywords
 *     within the supplied FitsStore structure: CTYPE, CNAME, RADECSYS, EQUINOX,
-*     MJDOBS, DUT1, CUNIT, OBSGEO-X/Y/Z. The values are derived from the supplied 
+*     MJDOBS, CUNIT, OBSGEO-X/Y/Z. The values are derived from the supplied 
 *     SkyFrame and WcsMap.
 
 *  Parameters:
@@ -22345,12 +22351,6 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
          SetItem( &(store->obsgeoy), 0, 0, ' ', r*sin( geolon ) );
          SetItem( &(store->obsgeoz), 0, 0, ' ', z*AST__AU );
       }
-   }
-
-/* Store the UT1-UTC correction, if set, converting from seconds to days
-   (as used by JACH). */
-   if( astTestDut1( skyfrm ) && s == ' ' ) {
-      SetItem( &(store->dut1), 0, 0, ' ', astGetDut1( skyfrm )/SPD );
    }
 
    if( !astOK ) ret = 0;
@@ -28335,6 +28335,7 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
    char iwc[5];              /* Domain name for IWC Frame */
    char id[2];               /* ID string for returned Frame */
    const char *cc;           /* Pointer to Domain */
+   double dut1;              /* UT1-UTC correction in days */
    double dval;              /* Temporary double value */
    double reflat;            /* Reference celestial latitude */
    double reflon;            /* Reference celestial longitude */
@@ -28430,6 +28431,13 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
 /* Ensure that the coordinate version character is stored as the Ident 
    attribute for the returned Frame (the above calls may have changed it). */
    astSetIdent( *frm, id );
+
+/* Set the DUT1 value. Note, the JACH store DUT1 in units of days in their
+   FITS headers, so convert from days to seconds. May need to do somthing
+   about this if the forthcoming FITS-WCS paper 5 (time axes) defines DUT1 
+   to be in seconds. */
+   dut1 = GetItem( &(store->dut1), 0, 0, s, NULL, method, class );
+   if( dut1 != AST__BAD ) astSetDut1( *frm, dut1*SPD );
 
 /* The returned Frame is actually a FrameSet in which the current Frame
    is the required WCS Frame. The FrameSet contains one other Frame,
@@ -29676,7 +29684,6 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
    char bj;                       /* Besselian/Julian selector */
    char buf[300];                 /* Text buffer */
    char sym[10];                  /* Axis symbol */
-   double dut1;                   /* UT1-UTC correction */
    double eqmjd;                  /* MJD equivalent of equinox */
    double equinox;                /* EQUINOX value */
    double geolat;                 /* Observers geodetic latitude */
@@ -29930,13 +29937,6 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
          astSetObsLat( ret, geolat );
          astSetObsLon( ret, geolon );
       }         
-
-/* Set the DUT1 value. Note, the JACH store DUT1 in units of days in their
-   FITS headers, so convert from days to seconds. May need to do somthing
-   about this if the forthcoming FITS-WCS paper 5 (time axes) defines DUT1 
-   to be in seconds. */
-      dut1 = GetItem( &(store->dut1), 0, 0, s, NULL, method, class );
-      if( dut1 != AST__BAD ) astSetDut1( ret, dut1*SPD );
    }
 
 /* If an error has occurred, annul the Frame. */
