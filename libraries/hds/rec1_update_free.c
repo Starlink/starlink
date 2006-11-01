@@ -42,6 +42,7 @@
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -55,6 +56,8 @@
 /*       the flag for the same block in another file to be cleared,         */
 /*       resulting in failure to flush the block at closedown and a corrupt */
 /*       container file.                                                    */
+/*    31-OCT-2006 (TIMJ):                                                   */
+/*       Sanity check stack overflow.                                       */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -65,7 +68,7 @@
 /* Local Variables:                                                         */
       int chip;                  /* Free chip number                        */
       int empty;                 /* Empty free chip stack entry number      */
-      int entno;                 /* Free space stack entry number           */
+      int entno = 0;             /* Free space stack entry number           */
       int full;                  /* Free space stack is full?               */
       int i;                     /* Loop counter for free space stack       */
       int spare;                 /* Largest free space chip number          */
@@ -103,6 +106,15 @@
          empty = REC__MXSTK - 1;
          for ( i = 0; ; i++ )
          {
+            if (i== REC__MXSTK) {
+              /* something has gone horribly wrong */
+              if (_ok(hds_gl_status) ) {
+                 hds_gl_status = DAT__WEIRD;
+                 emsRep("REC1_UPDATE_FREE","Search of free chip stack for a frame match exceeded stack size",
+                         &hds_gl_status);
+                 break;
+              }
+            }
             if ( stk[ i ].bloc == -1 )
             {
                entno = _min( i, empty );
