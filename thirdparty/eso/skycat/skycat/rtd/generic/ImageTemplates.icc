@@ -1,7 +1,7 @@
 /*
- * E.S.O. - VLT project 
+ * E.S.O. - VLT project
  *
- * "@(#) $Id: ImageTemplates.C,v 1.4 2005/02/02 01:43:02 brighton Exp $" 
+ * "@(#) $Id: ImageTemplates.C,v 1.4 2005/02/02 01:43:02 brighton Exp $"
  *
  * ImageTemplates.C - template member functions for classes derived from
  *                    class ImageData (not C++ templates, uses cpp macros)
@@ -12,7 +12,7 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
- * Peter W. Draper 29/01/97  Added FITS_LONG changes (for alpha 64 longs) 
+ * Peter W. Draper 29/01/97  Added FITS_LONG changes (for alpha 64 longs)
  * P.Biereichel    30/06/97  Changed parameters in getValues() for pixel table
  * Peter W. Draper 23/02/98  Changed min/max calculations to use more
  *                           pixels (too many occurences of "strange" limits).
@@ -29,6 +29,8 @@
  * pbiereic        17/02/03  Native byte order routines revised
  * Peter W. Draper 30/05/03  Skip runs of blank pixels in median estimate
  * pbiereic        18/06/04  Added experimental sampling methods
+ * Peter W. Draper 01/11/06  Changed getMinMax to deal with images that
+ *                           have a dimension of 1 (but not both).
  *
  * This file is included in the .C files for classes derived from class
  * ImageData. The file defines a number of member functions that are
@@ -62,7 +64,7 @@
 #ifndef ISNAN
 #define ISNAN(x) 0
 #endif
- 
+
 /*
  * getVal() is an inline function which subtracts on-the-fly a
  * bias pixel if a bias frame is selected.
@@ -74,18 +76,18 @@
 inline DATA_TYPE CLASS_NAME::getVal(DATA_TYPE* p, int idx)
 {
     // return pixel value if bias subtraction is off
-    if (! ImageData::biasInfo_->on) 
+    if (! ImageData::biasInfo_->on)
         return (DATA_TYPE)NTOH(*(p + idx));
 
     if ( ! bias_swap_bytes_) {
 
 	// return faster if image dimensions and types are the same
 	if (ImageData::biasInfo_->sameTypeAndDims)
-	    return ((DATA_TYPE)NTOH(*(p + idx)) - 
+	    return ((DATA_TYPE)NTOH(*(p + idx)) -
 		    (DATA_TYPE)((DATA_TYPE)(*((DATA_TYPE*)ImageData::biasInfo_->ptr + idx))));
 
 	register biasINFO* bias = ImageData::biasInfo_;
-	register int x = idx % width_ + startX_; 
+	register int x = idx % width_ + startX_;
 	register int y = idx / width_ + startY_;
 
 	// if pixel is not within the boundary of the bias image return pixel value
@@ -93,7 +95,7 @@ inline DATA_TYPE CLASS_NAME::getVal(DATA_TYPE* p, int idx)
 	    return NTOH(*(p + idx));
 
 	register int biasIdx = y * bias->width + x;
-    
+
 	switch (bias->type) {
 	case BYTE_IMAGE:
 	case X_IMAGE:
@@ -116,7 +118,7 @@ inline DATA_TYPE CLASS_NAME::getVal(DATA_TYPE* p, int idx)
     else {
 
 	register biasINFO* bias = ImageData::biasInfo_;
-	register int x = idx % width_ + startX_; 
+	register int x = idx % width_ + startX_;
 	register int y = idx / width_ + startY_;
 
 	// if pixel is not within the boundary of the bias image return pixel value
@@ -124,7 +126,7 @@ inline DATA_TYPE CLASS_NAME::getVal(DATA_TYPE* p, int idx)
 	    return NTOH(*(p + idx));
 
 	register int biasIdx = y * bias->width + x;
-    
+
 	switch (bias->type) {
 	case BYTE_IMAGE:
 	case X_IMAGE:
@@ -150,9 +152,9 @@ inline DATA_TYPE CLASS_NAME::getVal(DATA_TYPE* p, int idx)
  * variables accordingly.  To save time, only the visible area of the
  * image is examined (x0_, y0_, x1_ and y1_ are set each time the
  * image is updated, however they are initially set to the entire
- * image).  
- * The result is that the member variables minValue_ and maxValue_ 
- * are set.  
+ * image).
+ * The result is that the member variables minValue_ and maxValue_
+ * are set.
  */
 void CLASS_NAME::getMinMax()
 {
@@ -161,7 +163,7 @@ void CLASS_NAME::getMinMax()
     register DATA_TYPE  value;
 
     initGetVal();  // init flag for speeding up bias subtraction
-    
+
     // use area of image that is visible.
     // if we are looking at the whole image, ignore the margin
     int w = x1_ - x0_ + 1, h = y1_ - y0_ + 1;
@@ -178,11 +180,12 @@ void CLASS_NAME::getMinMax()
     w = x1 - x0 + 1;
     h = y1 - y0 + 1;
 
-    if (w <= 1 || h <= 1) {
-	if (area_ > 0)
+    if (w < 1 || h < 1) {
+	if (area_ > 0) {
 	    minValue_ = maxValue_ = getVal(rawImage, 0);
-	else 
+        } else {
 	    minValue_ = maxValue_ = 0;
+        }
 	return;
     }
 
@@ -195,12 +198,19 @@ void CLASS_NAME::getMinMax()
     if (yincr == 0)
 	yincr++;
 
-    if (x1 >= x1_ - xincr)
+    if (x1 >= x1_ - xincr) {
 	x1 = x1_ - xincr;
+        if ( x1 < 0 ) {
+            x1 = 1;
+        }
+   }
 
-    if (y1 >= y1_ - yincr)
+    if (y1 >= y1_ - yincr) {
 	y1 = y1_ - yincr;
-
+        if ( y1 < 0 ) {
+            y1 = 1;
+        }
+    }
 
     // try to speed things up a bit on large images:
     // don't examine every pixel, just look at a few sample lines
@@ -221,15 +231,15 @@ void CLASS_NAME::getMinMax()
 	    value = 0;
 	minValue_ = maxValue_ = value;
 	for (int y = y0; y <= y1; y+=yincr) {
-            p = y*width_+x0; 
+            p = y*width_+x0;
 	    if (p >= end)
 		break;
 	    for (int x = x0; x <= x1; x+=xincr, p+=xincr) {
                 if ((value = getVal(rawImage, p)) == blank_ || ISNAN(value))
 		    continue;
-		if (value < minValue_) 
+		if (value < minValue_)
 		    minValue_ = value;
-		else if (value > maxValue_) 
+		else if (value > maxValue_)
 		    maxValue_ = value;
 	    }
 	}
@@ -246,16 +256,16 @@ void CLASS_NAME::getMinMax()
 	    value = 0;
 	minValue_ = maxValue_ = value;
 	for (int y = y0; y <= y1; y+=yincr) {
-            p = y*width_+x0; 
+            p = y*width_+x0;
 	    if (p >= end)
 		break;
 	    for (int x = x0; x <= x1; x+=xincr, p+=xincr) {
                 value = getVal(rawImage, p);
 		if (ISNAN(value))
 		    continue;
-		if (value < minValue_) 
+		if (value < minValue_)
 		    minValue_ = value;
-		else if (value > maxValue_) 
+		else if (value > maxValue_)
 		    maxValue_ = value;
 	    }
 	}
@@ -304,7 +314,7 @@ double CLASS_NAME::getValue(double x, double y)
 
     initGetVal();  // init flag for bias subtraction
 
-    if (getIndex(x, y, ix, iy) != 0) 
+    if (getIndex(x, y, ix, iy) != 0)
 	return 0.0;
     return scaleValue(getVal(rawImage, iy*width_+ix));
 }
@@ -312,7 +322,7 @@ double CLASS_NAME::getValue(double x, double y)
 
 /*
  * print the X, Y coordinates, raw data value and World Coordinates
- * at the given x,y image coords to the given buffers. 
+ * at the given x,y image coords to the given buffers.
  *
  * rx and ry are the image coordinates to use to access the pixel value. This might
  * be different than x,y, since x,y are the logical image coordinates, assuming the
@@ -323,7 +333,7 @@ double CLASS_NAME::getValue(double x, double y)
  * note: x, y and rx,ry are expected in image coords, while in the result,
  * xStr and yStr are in "chip" coords, since they should  be displayed.
  */
-void CLASS_NAME::getValues(double x, double y, double rx, double ry, 
+void CLASS_NAME::getValues(double x, double y, double rx, double ry,
 			   char* xStr, char* yStr, char* valueStr,
 			   char* raStr, char* decStr, char* equinoxStr)
 {
@@ -340,7 +350,7 @@ void CLASS_NAME::getValues(double x, double y, double rx, double ry,
     *equinoxStr = '\0';
     if (wcs().isWcs()) {
 	char buf[80];
-	wcs().pix2wcs(x, y, buf, sizeof(buf), 1);  
+	wcs().pix2wcs(x, y, buf, sizeof(buf), 1);
 	sscanf(buf, "%s %s %s", raStr, decStr, equinoxStr);
     }
 
@@ -351,7 +361,7 @@ void CLASS_NAME::getValues(double x, double y, double rx, double ry,
 	DATA_TYPE* rawImage = (DATA_TYPE*)image_.dataPtr();
 	DATA_TYPE value = getVal(rawImage, iy*width_+ix);
 
-	if (haveBlank_ && value == blank_) 
+	if (haveBlank_ && value == blank_)
 	    strcpy(valueStr, "blank");
 	else
 	    sprintf(valueStr, "%g", scaleValue(value));
@@ -363,10 +373,10 @@ void CLASS_NAME::getValues(double x, double y, double rx, double ry,
  * Fill the given array with the pixel values surrounding the given point.
  * nrows and ncols give the dimensions of the array. Any values that are outside
  * of the image or are blank (BLANK keyword) are set to -HUGE_VAL (If "flag"
- * is non-zero, values outside the image are not changed). 
+ * is non-zero, values outside the image are not changed).
  *
  * Note: it is assumed that nrows and ncols are odd numbers and that the array
- * is one row and column larger (nrows+1 x ncols+1), so that it can hold the 
+ * is one row and column larger (nrows+1 x ncols+1), so that it can hold the
  * X and Y index headings.
  *
  * rx and ry are the image coordinates to use to access the pixel value. This might
@@ -377,7 +387,7 @@ void CLASS_NAME::getValues(double x, double y, double rx, double ry,
  * result are "chip" coords, since they should  be displayed.
  *
  */
-void CLASS_NAME::getValues(double x, double y, double rx, double ry, double* ar, 
+void CLASS_NAME::getValues(double x, double y, double rx, double ry, double* ar,
 			   int nrows, int ncols, int flag)
 {
     DATA_TYPE* rawImage = (DATA_TYPE*)image_.dataPtr();
@@ -388,7 +398,7 @@ void CLASS_NAME::getValues(double x, double y, double rx, double ry, double* ar,
     int n = nrows/2;
     int w = ncols+1;
     int i, j;
-    
+
     // get pixel index
     int ix, iy;
 
@@ -396,9 +406,9 @@ void CLASS_NAME::getValues(double x, double y, double rx, double ry, double* ar,
     for (i = 0; i < ncols; i++) {
 	double cx = x+(i-m);
 	imageToChipCoords(cx);
-	ar[i+1] = cx;	// X coord top heading  
+	ar[i+1] = cx;	// X coord top heading
     }
-  
+
     for (j = 0; j < nrows; j++) {
 	double cy = y+(j-n);
 	imageToChipCoords(cy);
@@ -426,8 +436,8 @@ void CLASS_NAME::getValues(double x, double y, double rx, double ry, double* ar,
  * The array should be large enough for at least (w x h) floats.
  *
  * Any values that are outside of the image are set to blank or 0, if there
- * is no blank pixel value defined (If "flag" is non-zero, values outside 
- * the image are not changed). 
+ * is no blank pixel value defined (If "flag" is non-zero, values outside
+ * the image are not changed).
  *
  * Note: x and y are expected in image coordinates
  */
@@ -442,7 +452,7 @@ void CLASS_NAME::getValues(double x, double y, int w, int h, float* ar, int flag
     initGetVal();  // init flag for speeding up bias subtraction
 
     getIndex(x, y, ix, iy);
-    
+
     for (j = 0; j < h; j++) {
 	for (i = 0; i < w; i++) {
 	    int rx = ix+i, ry = iy+j;
@@ -466,7 +476,7 @@ void CLASS_NAME::getValues(double x, double y, int w, int h, float* ar, int flag
 
 /*
  * Copy raw image data from this image to the given image data area,
- * starting at the image coordinates (x, y) and with the dimentions (w,h) 
+ * starting at the image coordinates (x, y) and with the dimentions (w,h)
  * in pixels.  Since this is a copy from one raw image to another, no
  * data conversion is done.
  */
@@ -479,7 +489,7 @@ void CLASS_NAME::copyImageArea(void* data, double x, double y, int w, int h)
     int ix, iy;
 
     getIndex(x, y, ix, iy);
-    
+
     for (j = 0; j < h; j++) {
 	for (i = 0; i < w; i++) {
 	    int rx = ix+i, ry = iy+j;
@@ -503,11 +513,11 @@ void CLASS_NAME::copyImageArea(void* data, double x, double y, int w, int h)
  * dest_x and dest_y give the coordinates in the XImage where copying
  * should start. These are normally either (x0,y0) or (0,0).
  */
-void CLASS_NAME::rawToXImage(int x0, int y0, int x1, int y1, 
+void CLASS_NAME::rawToXImage(int x0, int y0, int x1, int y1,
 			     int dest_x, int dest_y)
 {
     // if (verbose_)
-    //	printf("%s: rawToXImage: %d,%d  %d,%d +(%d,%d), flip: %d,%d, rotate: %d\n", 
+    //	printf("%s: rawToXImage: %d,%d  %d,%d +(%d,%d), flip: %d,%d, rotate: %d\n",
     //	       name_, x0, y0, x1, y1, dest_x, dest_y, flipX_, flipY_, rotate_);
 
     register int i, j;
@@ -559,7 +569,7 @@ void CLASS_NAME::rawToXImage(int x0, int y0, int x1, int y1,
 	    dest_x_inc = xImageBytesPerLine_;
 	    dest_y_inc = -(w * xImageBytesPerLine_ - 1);
 	    dest += xImageBytesPerLine_ * dest_x  + dest_y;
-	} 
+	}
 	else {
 	    dest_x_inc = 1;
 	    dest_y_inc = xImageBytesPerLine_ - w;
@@ -586,7 +596,7 @@ void CLASS_NAME::rawToXImage(int x0, int y0, int x1, int y1,
 	    for (j=x0; j<=x1; j++) {
 		if ( rotate_ ) {
 		    xImage_->putpixel( l, k, llookup(getVal(rawImage, src)));
-		} 
+		}
 		else {
 		    xImage_->putpixel( k, l, llookup(getVal(rawImage, src)));
 		}
@@ -609,7 +619,7 @@ void CLASS_NAME::rawToXImage(int x0, int y0, int x1, int y1,
  * dest_x and dest_y give the coordinates in the XImage where copying
  * should start. These are normally either (x0,y0) or (0,0).
  */
-void CLASS_NAME::grow(int x0, int y0, int x1, int y1, 
+void CLASS_NAME::grow(int x0, int y0, int x1, int y1,
 		      int dest_x, int dest_y)
 {
     register byte *p, *q;
@@ -665,18 +675,18 @@ void CLASS_NAME::grow(int x0, int y0, int x1, int y1,
 	    dest_x_inc = xImageBytesPerLine_ * xs;
 	    dest_y_inc = -(w * xs * xImageBytesPerLine_ - ys);
 	    dest += xImageBytesPerLine_ * xs * dest_x + dest_y * ys;
-	} 
+	}
 	else {
 	    dest_x_inc = xs;
 	    dest_y_inc = xImageBytesPerLine_ * ys  -  w * xs;
 	    dest += xImageBytesPerLine_ * ys * dest_y + dest_x * xs;
-        
+
 	}
-      
+
 	// copy the raw data to the X image...
 	for (i=y0; i<=y1; i++) {
 	    for (j=x0; j<=x1; j++) {
-		c = lookup(getVal(rawImage, src)); 
+		c = lookup(getVal(rawImage, src));
 		q = p = dest;
 		src += src_x_inc;
 		dest += dest_x_inc;
@@ -695,7 +705,7 @@ void CLASS_NAME::grow(int x0, int y0, int x1, int y1,
 	    dest += dest_y_inc;
 	}
 	return;
-    } 
+    }
 
 
     //  XImage has depth greater than a byte. Need to take care with
@@ -709,7 +719,7 @@ void CLASS_NAME::grow(int x0, int y0, int x1, int y1,
     if ( rotate_ ) {
 	height = xImage_->width();
 	width = xImage_->height();
-    } 
+    }
     else {
 	width = xImage_->width();
 	height = xImage_->height();
@@ -723,7 +733,7 @@ void CLASS_NAME::grow(int x0, int y0, int x1, int y1,
 		for ( m = k; m < maxM; m++ ) {
 		    if ( rotate_ ) {
 			xImage_->putpixel( n, m, cl );
-		    } 
+		    }
 		    else {
 			xImage_->putpixel( m, n, cl );
 		    }
@@ -750,7 +760,7 @@ void CLASS_NAME::grow(int x0, int y0, int x1, int y1,
 inline int CLASS_NAME::getBsamples(DATA_TYPE *rawImage, int idx, int wbox, DATA_TYPE *samples)
 {
     int i, k, src;
-    
+
     for (k = 0; k < wbox; k++) {
 	src = idx + k * width_;
 	for (i = 0; i < wbox; i++) {
@@ -772,7 +782,7 @@ inline int CLASS_NAME::getBsamples(DATA_TYPE *rawImage, int idx, int wbox, DATA_
 inline int CLASS_NAME::getCsamples(DATA_TYPE *rawImage, int idx, int wbox, DATA_TYPE *samples)
 {
     int i, k, src;
-    
+
     for (k = 0; k < wbox; k++) {
 	src = idx + k * width_ + k%2;
 	for (i = 0; i < wbox; i += 2) {
@@ -802,7 +812,7 @@ inline int CLASS_NAME::getXsamples(DATA_TYPE *rawImage, int idx, int wbox, DATA_
 	n++;
 	*samples++ = getVal(rawImage, idx + width_ * m + m); /* center pixel of cross */
     }
-    
+
     for (i = 0; i < m; i++) {
 	*samples++ = getVal(rawImage, idx);
 	*samples++ = getVal(rawImage, idxo);
@@ -827,7 +837,7 @@ inline DATA_TYPE CLASS_NAME::getMedian(DATA_TYPE *samples, int n)
 {
     int i, k;
     DATA_TYPE *pi, *pk = samples, tmp;
-    
+
     for (k = 0; k < n; k++, pk++) {
 	pi = samples + k+1;
 	for (i = k+1; i < n; i++, pi++) {
@@ -853,7 +863,7 @@ inline DATA_TYPE CLASS_NAME::getRMS(DATA_TYPE *samples, int n)
     int i, cnt = 0;
     double sum = 0.0, sumsq = 0.0;
     DATA_TYPE value;
-    
+
     for (i = 0; i < n; i++) {
         value = *samples++;
         cnt++;
@@ -892,18 +902,18 @@ inline DATA_TYPE CLASS_NAME::getBoxVal(DATA_TYPE *rawImage, int idx, int wbox, D
                 value = *psamples;
         }
         return (value);
-        
+
     case SAMP_METHOD_MEAN:
         m = getBsamples(rawImage, idx, wbox, samples);
         for (n = 0, sum = 0.0; n < m; n++) {
             sum += *psamples++;
         }
         return ((DATA_TYPE) (sum / m));
-        
+
     case SAMP_METHOD_MEDIAN:
         m = getBsamples(rawImage, idx, wbox, samples);
         return (getMedian(samples, m));
-        
+
     case SAMP_METHOD_RMS:
         m = getBsamples(rawImage, idx, wbox, samples);
         return ((DATA_TYPE)getRMS(samples, m));
@@ -923,27 +933,27 @@ inline DATA_TYPE CLASS_NAME::getBoxVal(DATA_TYPE *rawImage, int idx, int wbox, D
                 value = *psamples;
         }
         return (value);
-        
+
     case SAMP_METHOD_MEAN_CROSS:
         m = getXsamples(rawImage, idx, wbox, samples);
         for (n = 0, sum = 0.0; n < m; n++) {
             sum += *psamples++;
         }
         return ((DATA_TYPE) (sum / m));
-        
+
     case SAMP_METHOD_MEDIAN_CROSS:
         m = getXsamples(rawImage, idx, wbox, samples);
         return (getMedian(samples, m));
-        
+
     case SAMP_METHOD_MEDIAN_CHESS:
         m = getCsamples(rawImage, idx, wbox, samples);
         return (getMedian(samples, m));
-        
+
     case SAMP_METHOD_MEDIAN_9:
         wbox = (xs < 3) ? 1 : 3;
         m = getBsamples(rawImage, idx, wbox, samples);
         return (getMedian(samples, m));
-        
+
     default:   /* SAMP_METHOD_MAX */
         m = getBsamples(rawImage, idx, wbox, samples);
         for (n = 1, value = *psamples++; n < m; n++, psamples++) {
@@ -995,11 +1005,11 @@ void CLASS_NAME::shrink(int x0, int y0, int x1, int y1, int dest_x, int dest_y)
     byte* end = xImageData_ + xImageSize_ - 1;
 
     DATA_TYPE maxval = 0;
-   
+
     // set loop increments based on current transformations
     switch (flipX_<<1|flipY_) {
     case 0: // none
-	src =  (height_ - ys - y0) * width_ + x0; 
+	src =  (height_ - ys - y0) * width_ + x0;
 	src_x_inc = xs;
 	src_y_inc = -width_ * ys - w;
 	break;
@@ -1009,7 +1019,7 @@ void CLASS_NAME::shrink(int x0, int y0, int x1, int y1, int dest_x, int dest_y)
 	src_y_inc = width_ * ys - w;
 	break;
     case 2: // flipX
-	src =  (height_ - ys - y0) * width_ + (width_ - xs - x0); 
+	src =  (height_ - ys - y0) * width_ + (width_ - xs - x0);
 	src_x_inc = -xs;
 	src_y_inc = -(width_ * ys - w);
 	break;
@@ -1028,13 +1038,13 @@ void CLASS_NAME::shrink(int x0, int y0, int x1, int y1, int dest_x, int dest_y)
 	    dest_x_inc = xImageBytesPerLine_;
 	    dest_y_inc = -(w/xs * xImageBytesPerLine_ - 1);
 	    dest += xImageBytesPerLine_ * (dest_x/xs) + (dest_y/ys);
-	} 
+	}
 	else {
 	    dest_x_inc = 1;
 	    dest_y_inc = xImageBytesPerLine_ - w/xs;
 	    dest += xImageBytesPerLine_ * (dest_y/ys) + (dest_x/xs);
 	}
-      
+
 	// copy the raw data to the X image...
 	if (subsample_) {
 	    // use faster "subsample" algorithm
@@ -1076,10 +1086,10 @@ void CLASS_NAME::shrink(int x0, int y0, int x1, int y1, int dest_x, int dest_y)
 	    }
 	}
 	return;
-    } 
+    }
 
 
-    //  XImage depth greater than a byte. Use careful methods to 
+    //  XImage depth greater than a byte. Use careful methods to
     //  keep byte order etc. correct for server.
     int k = dest_x / xs;
     int l = dest_y / ys;
@@ -1094,7 +1104,7 @@ void CLASS_NAME::shrink(int x0, int y0, int x1, int y1, int dest_x, int dest_y)
 		else {
 		    xImage_->putpixel( k, l, llookup(getVal(rawImage, src)));
 		}
-		k++; 
+		k++;
 		src += src_x_inc;
 	    }
 	    src += src_y_inc;
@@ -1133,7 +1143,7 @@ void CLASS_NAME::medianFilter()
     getMinMax();		// get min/max pixel estimate for visible area
     DATA_TYPE *rawImage = (DATA_TYPE*)image_.dataPtr(); // image data
     const int nmed = 7;		   // length of median filter
-    int xskip = nmed*3, yskip = 3; // skip pixels for speed 
+    int xskip = nmed*3, yskip = 3; // skip pixels for speed
     int x0 = x0_ + 10;		   // ignore outside areas
     int y0 = y0_ + 10;
     int x1 = x1_ - 10;
@@ -1142,14 +1152,14 @@ void CLASS_NAME::medianFilter()
     int p=0;
     DATA_TYPE tmp;
     DATA_TYPE val, lcut, hcut, medary[nmed];
-    
+
     // use this value as a default in place of bad pixels (blank, NAN)
     DATA_TYPE mval = (DATA_TYPE)((minValue_ + maxValue_)/2);
 
     initGetVal();  // init flag for speeding up bias subtraction
 
     if (x1-x0 <= nmed || y1-y0 <= nmed)
-	return;	
+	return;
     for (i=y0; i<=y1; i+=yskip) {
 	for (j=x0; j<=x1; j+=xskip) {
 	    p = i*width_ + j;
@@ -1159,11 +1169,11 @@ void CLASS_NAME::medianFilter()
 		medary[k] = getVal(rawImage, p++);
 		// ignore blank pixels and NANs
 		if (ISNAN(medary[k]) || (haveBlank_ && medary[k] == blank_)) {
-		    medary[k] = mval;  
+		    medary[k] = mval;
 		}
 	    }
 
-	    // get median value 
+	    // get median value
 	    for (k=0; k < nmed; k++) {
 		for (l=k; l < nmed; l++) {
 		    if (medary[k] < medary[l]) {
@@ -1182,19 +1192,19 @@ void CLASS_NAME::medianFilter()
                 continue; // PWD: Skip runs of blank pixels.
             }
 
-	    if (i == y0) 
+	    if (i == y0)
 		// set initial low and high cut values
 		lcut = hcut = val;
 	    else {
 		// compare meadian with lcut, hcut
-		if (val < lcut) 
+		if (val < lcut)
 		    lcut = val;
 		if (val > hcut)
 		    hcut = val;
 	    }
 	}
     }
-    
+
     setCutLevels(lcut, hcut, 0);
 }
 
@@ -1204,7 +1214,7 @@ void CLASS_NAME::medianFilter()
  * of pixels in the visible image area (given by x0_, y0_, x1_, y1_).
  * xyvalues[n*2+1] is set to the number of pixels with value at or near n.
  * The factor is used to fit the information in the given size aray.
- */	
+ */
 void CLASS_NAME::getPixDist(int numValues, double* xyvalues, double factor)
 {
     DATA_TYPE* rawImage = (DATA_TYPE*)image_.dataPtr();
@@ -1214,7 +1224,7 @@ void CLASS_NAME::getPixDist(int numValues, double* xyvalues, double factor)
     initGetVal();  // init flag for speeding up bias subtraction
 
     // the Y values are the number of pixels in a given range
-    // note: to save time, don't check all the pixels, just a 
+    // note: to save time, don't check all the pixels, just a
     // number of sample lines in the visible area of the image.
     if (x1_ <= x0_ || y1_ <= y0_)
 	return;
@@ -1241,7 +1251,7 @@ void CLASS_NAME::getPixDist(int numValues, double* xyvalues, double factor)
  * visible image area (given by x0_, y0_, x1_, y1_).  h.histogram[n] is
  * set to the number of pixels with a value of n (after conversion to
  * short if needed).
- */	
+ */
 void CLASS_NAME::getHistogram(ImageDataHistogram& hist)
 {
     DATA_TYPE* rawImage = (DATA_TYPE*)image_.dataPtr();
@@ -1263,7 +1273,7 @@ void CLASS_NAME::getHistogram(ImageDataHistogram& hist)
     int y1 = y1_ - ymargin;
 
     // the array values are the number of pixels in a given range
-    // note: to save time, don't check all the pixels, just a 
+    // note: to save time, don't check all the pixels, just a
     // number of sample lines in the visible area of the image.
     if (x1 <= x0 || y1 <= y0) {
 	hist.area = 0;
@@ -1274,8 +1284,8 @@ void CLASS_NAME::getHistogram(ImageDataHistogram& hist)
     for (int i=y0; i<y1; i++) {
 	for (int j=x0; j<x1; j++) {
 	    // the code below converts an image pixel value to short and then
-	    // uses it to index in the histogram array, so that we can increment the 
-	    // count for that pixel value. 
+	    // uses it to index in the histogram array, so that we can increment the
+	    // count for that pixel value.
 	    value = getVal(rawImage, i*width_+j);
 	    if (ISNAN(value) || (haveBlank_ && value == blank_))
 		continue;
