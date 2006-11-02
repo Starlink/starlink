@@ -3,6 +3,9 @@
 *  Name:
 *     MAKECUBE
 
+*  Purpose:
+*     Regrid ACSIS spectra into a data cube.
+
 *  Language:
 *     Starlink ANSI C
 
