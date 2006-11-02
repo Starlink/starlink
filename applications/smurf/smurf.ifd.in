@@ -121,6 +121,7 @@
 #         Add STARECALC
 #     01-NOV-2006 (TIMJ):
 #         Add SMURFHELP
+#         Add help location
 #     {enter_changes_here}
 
 #  Bugs:
@@ -190,6 +191,9 @@ package @PACKAGE@ {
 
      action extinction {
 
+         helplib {$SMURF_HELP}
+
+
          parameter in {
             position 1
             type NDF
@@ -254,6 +258,8 @@ package @PACKAGE@ {
      }
 
      action makemap {
+
+         helplib {$SMURF_HELP}
 
          parameter in {
             position 1
@@ -343,6 +349,8 @@ package @PACKAGE@ {
 
      action qlmakemap {
 
+         helplib {$SMURF_HELP}
+
          parameter in {
             position 1
             type NDF
@@ -386,6 +394,8 @@ package @PACKAGE@ {
 
      action flatfield {
 
+         helplib {$SMURF_HELP}
+
          parameter in {
             position 1
             type NDF
@@ -416,6 +426,8 @@ package @PACKAGE@ {
      }
 
      action scanfit {
+
+         helplib {$SMURF_HELP}
 
          parameter ndf {
             position 1
@@ -453,6 +465,8 @@ package @PACKAGE@ {
      }
 
      action remsky {
+
+         helplib {$SMURF_HELP}
 
          parameter in {
             position 1
@@ -509,6 +523,8 @@ package @PACKAGE@ {
 
      action dreamweights {
 
+         helplib {$SMURF_HELP}
+
           parameter ndf {
             position 1
             type NDF
@@ -550,6 +566,8 @@ package @PACKAGE@ {
 
      action dreamsolve {
 
+         helplib {$SMURF_HELP}
+
           parameter in {
             position 1
             type NDF
@@ -578,6 +596,9 @@ package @PACKAGE@ {
      }
 
      action starecalc {
+
+         helplib {$SMURF_HELP}
+
          parameter in {
             position 1
             type NDF
@@ -605,6 +626,8 @@ package @PACKAGE@ {
 	 }
      }
      action sc2sim {
+
+         helplib {$SMURF_HELP}
 
           parameter obsfile {
             position 1
@@ -661,6 +684,8 @@ package @PACKAGE@ {
      }
   
      action makecube {
+
+         helplib {$SMURF_HELP}
 
 	 parameter crota {
 	    type _REAL
@@ -753,6 +778,8 @@ package @PACKAGE@ {
 
      action impaztec {
 
+         helplib {$SMURF_HELP}
+
          parameter in {
             position 1
             type _CHAR
@@ -784,6 +811,8 @@ package @PACKAGE@ {
      }
 
      action badbolos {
+
+         helplib {$SMURF_HELP}
 
          parameter in {
             position 1
@@ -856,6 +885,8 @@ package @PACKAGE@ {
      }
 
      action skynoise {
+
+         helplib {$SMURF_HELP}
 
           parameter obsfile {
             position 1
