@@ -461,8 +461,8 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
 
          wmean /= (double)npix;
          wsigma = (sig = wsigma/npix - wmean*wmean)>0.0? sqrt(sig):0.0;
-         wlcut = wbm->lcut = (PIXTYPE)(wmean - 2.0*sigma);
-         whcut = wbm->hcut = (PIXTYPE)(wmean + 2.0*sigma);
+         wlcut = wbm->lcut = (PIXTYPE)(wmean - 2.0*wsigma);
+         whcut = wbm->hcut = (PIXTYPE)(wmean + 2.0*wsigma);
       }
 
       if ( mean != 0.0 && sigma != 0.0 ) {
