@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_makecube
+*     MAKECUBE
 
 *  Language:
 *     Starlink ANSI C
