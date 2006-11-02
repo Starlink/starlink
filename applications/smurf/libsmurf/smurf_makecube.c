@@ -3,9 +3,6 @@
 *  Name:
 *     smurf_makecube
 
-*  Purpose:
-*     Top-level MAKECUBE implementation
-
 *  Language:
 *     Starlink ANSI C
 
@@ -20,7 +17,11 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine implementing the MAKECUBE task.
+*     This routine converts one or more raw data cubes, spanned by
+*     (frequency, detector number, time) axes, into a single output cube
+*     spanned by (celestial longitude, celestial latitude, frequency) axes.
+*     Nearest neighbour rebinning is used (that is, each input data sample 
+*     is placed into the nearest output pixel). 
 
 *  ADAM Parameters:
 *     CROTA = REAL (Read)
