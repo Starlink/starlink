@@ -9716,7 +9716,7 @@ static void Geod( double pos[3], double *phi, double *h, double *lambda ){
 *        reference spheroid (geodetic, metres).
 *     lambda
 *        Pointer at a location at which to return the geodetic longitude,
-*        in radians.
+*        in radians, positive east.
 */
 
 /* Local Variables... */
