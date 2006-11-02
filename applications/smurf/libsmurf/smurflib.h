@@ -44,6 +44,8 @@
 *        Add DREAMWEIGHTS
 *     2006-10-26 (AGG):
 *        Add STARECALC
+*     2006-11-01 (TIMJ):
+*        Add SMURFHELP
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -87,5 +89,6 @@ void smurf_badbolos( int * );
 void smurf_impaztec( int * );
 void smurf_skynoise( int * );
 void smurf_starecalc( int * );
+void smurf_help( int * );
 
 #endif /* SMURF_LIB_DEFINED */

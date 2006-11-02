@@ -24,6 +24,8 @@ AC_PROG_LIBTOOL
 STAR_MONOLITHS
 STAR_CHECK_PROGS( ifd2star )
 STAR_CHECK_PROGS( hlib )
+STAR_CHECK_PROGS(prohlp,sst)
+
 
 STAR_MESSGEN( [ libsmf/smf_err.msg ] )
 
@@ -118,8 +120,11 @@ AC_CHECK_HEADERS(slamac.h)
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [ast sae pcs mers ndf])
-STAR_DECLARE_DEPENDENCIES([link], [ndf ast hlp ndg])
+STAR_DECLARE_DEPENDENCIES([build], [ast sae pcs mers ndf shl])
+STAR_DECLARE_DEPENDENCIES([link], [ndf ast hlp ndg shl])
+dnl We use the sst package to build documentation (prohlp)
+STAR_DECLARE_DEPENDENCIES([sourceset], [sst])
+
 dnl    No use dependencies
 
 dnl Documentation

@@ -84,6 +84,8 @@
 *     2006-11-01 (DSB):
 *        Added value for new steptime parameter in calls to
 *        smf_create_lutwcs and smf_detpos_wcs. 
+*     2006-11-01 (TIMJ):
+*        Add SMURFHELP
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -213,6 +215,8 @@ void smurf_mon( int * status ) {
     smurf_skynoise( status );
   } else if (strcmp( taskname, "STARECALC" ) == 0 ) {
     smurf_starecalc( status );
+  } else if (strcmp( taskname, "SMURFHELP" ) == 0 ) {
+    smurf_help( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

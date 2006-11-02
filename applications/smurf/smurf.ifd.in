@@ -119,6 +119,8 @@
 #         Add USEBAD to MAKEMAP
 #     26-OCT-2006 (AGG):
 #         Add STARECALC
+#     01-NOV-2006 (TIMJ):
+#         Add SMURFHELP
 #     {enter_changes_here}
 
 #  Bugs:
@@ -130,6 +132,61 @@ package @PACKAGE@ {
    prefix @PACKAGE@
 
    executable @PACKAGE@_mon {
+
+      action smurfhelp {
+         alias {smurfh(elp)}
+
+         helplib {$SMURF_HELP}
+
+         parameter topic {
+            position 1
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help topic}
+            default {         }
+            helpkey *
+          }
+
+         parameter subtopic {
+            position 2
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subtopic}
+            default {         }
+            helpkey *
+          }
+
+         parameter subsubtopic {
+            position 3
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubtopic}
+            default {         }
+            helpkey *
+          }
+        parameter subsubsubtopic {
+            position 4
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubsubtopic}
+            default {         }
+            helpkey *
+          }
+
+         parameter msg_filter {
+            type _CHAR
+            prompt {Message level}
+            default NORM
+            vpath DEFAULT
+            helpkey *
+          }
+
+      }
+
 
      action extinction {
 
