@@ -1,4 +1,7 @@
   Latest changes:
+    
+    The direction compass is now always a fixed size, not one that
+    depends on the image scale.
 
     The send to SPLAT options in the cube toolbox have been extended
     to allow the spectrum to be compared to any existing ones (the old

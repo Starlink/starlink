@@ -17,6 +17,9 @@
 #                            panning changes are always seen for new images 
 #                            and images with orientation changes (pan with 
 #                            changed=1)
+#                 02 Nov 06  Make the compass a fixed size of the width, not
+#                            some size that depends on the image scale. More
+#                            consistent.
 
 itk::usual RtdImagePan {}
 
@@ -229,7 +232,7 @@ itcl::class rtd::RtdImagePan {
 	set wcsw [expr {[$image_ wcswidth]*60}]
 	set wcsh [expr {[$image_ wcsheight]*60}]
 
-	# set size of compass to percent of the image size in arcsecs
+	# set initial size of compass to percent of the image size in arcsecs
 	set size_ [expr {[min $wcsw $wcsh]/4}]
 	
 	# size in deg
@@ -248,7 +251,7 @@ itcl::class rtd::RtdImagePan {
 	    return
 	} 
 
-	# get end points of compass
+	# get end points of compass so we can determine the directions
 	set ra1 [expr {$ra0+$size_deg/cos(($dec0/180.)*$pi_)}]
 	if {$ra1 < 0} {
 	    set ra1 [expr {360+$ra1}]
@@ -257,12 +260,24 @@ itcl::class rtd::RtdImagePan {
 	set dec1 [expr {$dec0+$size_deg}]
 	if {$dec1 >= 90} {
 	    set dec1 [expr {180-$dec1}]
-	} 
+	}
 
-	# draw the compass
+	# end points in canvas coords
 	$image_ convert coords $ra0 $dec0 $deg_eq cx0 cy0 canvas
 	$image_ convert coords $ra1 $dec0 $deg_eq cx1 cy1 canvas
 	$image_ convert coords $ra0 $dec1 $deg_eq cx2 cy2 canvas
+       
+        # directions
+        set t1 [expr atan2($cy1-$cy0,$cx1-$cx0)]
+        set t2 [expr atan2($cy2-$cy0,$cx2-$cx0)]
+
+        # make sure lengths are 0.25 of the width pixels
+        set w [expr 0.25*$itk_option(-width)]
+        set cx1 [expr $cx0+$w*cos($t1)]
+        set cy1 [expr $cy0+$w*sin($t1)]
+
+        set cx2 [expr $cx0+$w*cos($t2)]
+        set cy2 [expr $cy0+$w*sin($t2)]
 
 	# East line
 	$canvas_ create line $cx0 $cy0 $cx1 $cy1 \
