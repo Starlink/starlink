@@ -184,20 +184,20 @@ itcl::class gaia::GaiaCubeSpectrum {
             -width $itk_option(-labelwidth)
       }
 
-      itk_component add splatcompare {
-         button $itk_component(sframe).splatcompare -text "Send compare" \
-            -command [code $this send_to_splat_ 1]
-      }
       itk_component add splatreplace {
-         button $itk_component(sframe).splatreplace -text "Send replace" \
+         button $itk_component(sframe).splatreplace -text "Send: replace" \
             -command [code $this send_to_splat_ 0]
+      }
+      itk_component add splatcompare {
+         button $itk_component(sframe).splatcompare -text "Send: add" \
+            -command [code $this send_to_splat_ 1]
       }
 
       pack $itk_component(sframe) -side top -fill x -ipadx 1m -ipady 2m
       pack $itk_component(splatlabel) -side left -expand 0 -ipadx 1m
-      pack $itk_component(splatcompare) -side left -expand 0 -anchor w \
-         -ipadx 1m -padx 1m
       pack $itk_component(splatreplace) -side left -expand 0 -anchor w \
+         -ipadx 1m -padx 1m
+      pack $itk_component(splatcompare) -side left -expand 0 -anchor w \
          -ipadx 1m -padx 1m
 
       #  If SPLAT isn't available this is greyed out.
