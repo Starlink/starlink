@@ -1,6 +1,6 @@
 1 ATOOLS
 
- Version 1.8 of ATOOLS is now available. It is fully documented in SUN/???.
+ Version 1.9-2 of ATOOLS is now available. It is fully documented in SUN/???.
 
  ATOOLS is a package of applications which manipulate descriptions
  of coordinate frames, mappings, etc, in the form of AST Objects (see
@@ -13,6 +13,9 @@
 
   - Input positions can now be supplied to asttrann in the form of a
     group of formatted axis values (e.g. in a text file).
+
+  - New command astunformat. Reads a numerical value from a formatted axis
+    value.
 
   Changes in V1.9-1
 

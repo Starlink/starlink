@@ -1587,6 +1587,41 @@ iraf! {
           }
       }
 
+      action astunformat {
+         helplib {$ATOOLS_HELP}
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The Frame}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter axis {
+            position 2
+            type _INTEGER
+            prompt {Index of Frame axis to use}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter value {
+            position 3
+            type LITERAL
+            prompt {Group of formatted axis values}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {Name of output text file to hold unformatted values}
+            ppath CURRENT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+      }
+
       action asttran1 {
          helplib {$ATOOLS_HELP}
          parameter forward {
