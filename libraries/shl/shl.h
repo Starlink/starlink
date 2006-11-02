@@ -22,5 +22,21 @@
  *
  */
 
+/* size_t */
+#include <stddef.h>
+
+/* Pure C interfaces */
+
 int shl_standalone( char * hlp_library, int isenv, int argc, char ** argv );
 
+/* Non-adam interfaces */
+
+void shlTrnvar( const char libnam[], int isenv, char libray[],
+		size_t libraylen, int * status);
+
+void shlGethlp( const char helplb[], const char keywrd[],
+		int inter, int * status );
+
+/* ADAM interfaces */ 
+
+void shlAdam( const char libnam[], int isenv, int * status );

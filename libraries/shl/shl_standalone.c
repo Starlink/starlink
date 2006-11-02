@@ -123,6 +123,7 @@
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1998, 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -158,6 +159,8 @@
  *    28 Jul 2004 (timj):
  *       Add isenv. Now call fortran SHL code rather than duplicate loads
  *       of that code in C. Now have return status.
+ *    01 Nov 2006 (TIMJ):
+ *       Use C interface to Fortran routines.
 
  * Bugs: 
  *    {Enter_new_bugs_here}
@@ -172,19 +175,7 @@
 #include <string.h>
 #include "ems.h"
 #include "sae_par.h"
-#include "cnf.h"
 #include "shl.h"
-
-/* SHL fortran interface prototype */
-extern F77_SUBROUTINE(shl_trnvar)
-     ( CHARACTER(envvar), LOGICAL(isenv), CHARACTER(libray),
-       INTEGER(status) TRAIL(envvar) TRAIL(libray)
-       );
-
-extern F77_SUBROUTINE(shl_gethlp)
-     ( CHARACTER(libray), CHARACTER(topic), LOGICAL(inter), INTEGER(status)
-       TRAIL(libray) TRAIL(topic)
-);
 
 /* Macros.
  */
@@ -197,17 +188,13 @@ extern F77_SUBROUTINE(shl_gethlp)
 
 int shl_standalone( char * help_library, int isenv, int argc, char **argv )
 {
-   DECLARE_INTEGER(status);            /* Starlink status             */
-   DECLARE_CHARACTER(f77envvar,LENSTR);/* env var name as f77 string */
-   DECLARE_CHARACTER(f77libra,LENSTR);  /* Library as f77 string       */
-   DECLARE_CHARACTER(f77topic,LENSTR); /* Topic as f77 string         */
-   DECLARE_LOGICAL(f77isenv);          /* F77 is this an env var? */
-   DECLARE_LOGICAL(f77inter);          /* Interative ? */
 
+   int status;             /* global status */
    int     retval;          /* Return status 0=good 1=bad */
    char    topic[LENSTR];   /* Topic as C string    */
    int     i;               /* Parameter counter    */
    size_t  nleft;           /* Space left in string */
+   char    libra[LENSTR];   /* Expanded Library */
 
 /*.
  */
@@ -224,17 +211,7 @@ int shl_standalone( char * help_library, int isenv, int argc, char **argv )
    if ( argv[1] && !strcmp( "-l", argv[1] ) )      /* library is in argv[2] */
    {  
 
-     /* Export the supplied string to fortran */
-     cnf_expn( argv[2], LENSTR, f77envvar, f77envvar_length );
-
-     /* Need to generate the environment variable name from the supplied
-	argument and store the resulting file name in an f77 string
-	suitable for the HLP library. */
-     f77isenv = F77_FALSE;
-     F77_CALL( shl_trnvar )(CHARACTER_ARG(f77envvar), LOGICAL_ARG(&f77isenv), 
-			    CHARACTER_ARG(f77libra), INTEGER_ARG(&status)
-			    TRAIL_ARG(f77envvar) TRAIL_ARG(f77libra) );
-
+     shlTrnvar( argv[2], isenv, libra, LENSTR, &status );
      i = 3;
    }
    else                               /* library is in environment variable */
@@ -247,24 +224,9 @@ int shl_standalone( char * help_library, int isenv, int argc, char **argv )
        goto abort;
      }
 
-     /* Export the supplied string to fortran */
-     cnf_expn( help_library, LENSTR, f77envvar, f77envvar_length );
-
-     /* Copy isenv status */
-     if (isenv) {
-       f77isenv = F77_TRUE;
-     } else {
-       f77isenv = F77_FALSE;
-     }
-
-     /* Need to generate the environment variable name from the supplied
-	argument and store the resulting file name in an f77 string
-	suitable for the HLP library. */
-     F77_CALL( shl_trnvar )(CHARACTER_ARG(f77envvar), LOGICAL_ARG(&f77isenv), 
-			    CHARACTER_ARG(f77libra), INTEGER_ARG(&status)
-			    TRAIL_ARG(f77envvar) TRAIL_ARG(f77libra) );
-
-      i = 1;
+     /* Get help file from argument */
+     shlTrnvar( help_library, isenv, libra, LENSTR, &status );
+     i = 1;
    }
 
 
@@ -275,15 +237,10 @@ int shl_standalone( char * help_library, int isenv, int argc, char **argv )
    {  (void) strncat( topic, argv[i], nleft ); nleft -= strlen(argv[i]);
       (void) strncat( topic, " ",     nleft ); nleft--;
    }
-   (void) cnf_expn( topic, LENSTR, f77topic, f77topic_length );
 
-
-   /* Call the SHL fortran interface for the actual help 
-      functionality */
-   f77inter = F77_TRUE;
-   F77_CALL(shl_gethlp)(CHARACTER_ARG(f77libra),CHARACTER_ARG(f77topic),
-			LOGICAL_ARG(&f77inter), INTEGER_ARG(&status)
-			TRAIL_ARG(f77libra) TRAIL_ARG(f77topic));
+   /* Call the SHL routine for the actual help functionality 
+      (force interactive) */
+   shlGethlp(libra, topic, 1, &status );
 
 abort:
 

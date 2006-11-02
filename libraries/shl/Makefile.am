@@ -20,7 +20,7 @@ libshl_la_SOURCES = \
 
 libshl_la_DEPENDENCIES = $(PRIVATE_INCLUDES)
 
-libshl_adam_la_SOURCES = $(ADAM_F_ROUTINES)
+libshl_adam_la_SOURCES = $(ADAM_F_ROUTINES) $(ADAM_C_ROUTINES)
 
 PRIVATE_INCLUDES = SHL_HLPCMD
 
@@ -34,12 +34,14 @@ F_ROUTINES = shl_gethlp.f shl_gthlpi.f shl_pthlpo.f shl_sread.f \
 # variable name. It makes calls to PAR etc so is kept separate.
 ADAM_F_ROUTINES = shl_adam.f
 
+ADAM_C_ROUTINES = cwrapper_adam.c
+
 # This is the standard Figaro C browser. Does not require the 
 # fortran routines but does require the HLP library. Included
 # in the standard libshl library since there is no gain
 # in having it separate (since F77 libraries are still required for
 # the link).
-C_ROUTINES = shl_standalone.c
+C_ROUTINES = shl_standalone.c cwrapper.c
 
 # Testing
 TESTS = testhelp ctesthelp test_pager
