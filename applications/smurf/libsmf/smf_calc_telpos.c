@@ -34,10 +34,13 @@
 
 *  Authors:
 *     EC: Edward Chapin (UBC)
+*     DSB: David Berry (JAC, UCLan)
 
 *  History:
 *     6-SEPT-2006 (EC):
 *        Original version.
+*     2-NOV-2006 (DSB):
+*        Added support for calculation based on supplied obsgeo values.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -90,13 +93,21 @@ void smf_calc_telpos( double obsgeo[3], char telName[], double telpos[3],
 
   if (*status != SAI__OK) return;
 
-  /* Calculate telpos from obsgeo if given */
-  if( obsgeo != NULL ) {
-    msgOutif( MSG__VERB, FUNC_NAME, "Calculation of telescope position from OBSGEO keywords not implemented.", status );
-  }
+  /* Calculate telpos from obsgeo if given. We could have used a 
+     FitsChan to do this conversion (this keeping all the geocentric-geodetic 
+     conversion code in one place), if it were not for the fact that 
+     the observatory altitude is required in addition to the longitude 
+     and latitude (FitsChan does not generate an altitude value). */
+  if( obsgeo != NULL && obsgeo[ 0 ] != AST__BAD && 
+                        obsgeo[ 1 ] != AST__BAD && 
+                        obsgeo[ 2 ] != AST__BAD ) {
+     smf_geod( obsgeo, &lat, &height, &lon );
 
-  /* Calculate telpos from telName */
-  if( telName != NULL ) {
+  /* smf_geod returns longitude +ve east, so negate it to get +ve west. */
+     lon = -lon;
+
+  /* Otherwise, calculate telpos from telName */
+  } else if( telName != NULL ) {
     slaObs( 0, telName, retname, &lon, &lat, &height );
 
     if( retname[0] == '?' ) {
@@ -104,6 +115,7 @@ void smf_calc_telpos( double obsgeo[3], char telName[], double telpos[3],
       errRep( FUNC_NAME, "Telescope name was not recognized.", status );
     }
     
+  /* Otherwise, report an error. */
   } else {
     *status = SAI__ERROR;
     errRep( FUNC_NAME, "Telescope name not given, can't calculate telpos.",

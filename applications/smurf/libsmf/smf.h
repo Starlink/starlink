@@ -123,6 +123,8 @@
 *     2006-10-26 (AGG):
 *        Add smf_average_data, smf_calc_stareimage, update API to
 *        smf_store_image
+*     2006-11-2 (DSB):
+*        Add smf_geod.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -457,5 +459,7 @@ void smf_makefitschan( const char *system, double crval[2], double cdelt[2],
 
 void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
                      double steptime, AstFrameSet **fset, int *status );
+
+void smf_geod( double pos[3], double *phi, double *h, double *lambda );
 
 #endif /* SMF_DEFINED */
