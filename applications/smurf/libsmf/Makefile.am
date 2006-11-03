@@ -35,7 +35,7 @@ smf_open_ndfname.c smf_string_to_dtype.c smf_create_lutwcs.c \
 smf_calc_telpos.c smf_telpos_get.c smf_dream_getgrid.c smf_dream_calcweights.c\
 smf_cubebounds.c smf_convert_system.c smf_makefitschan.c smf_detpos_wcs.c\
 smf_subtract_plane1.c smf_subtract_plane2.c smf_bbrebinmap.c smf_average_data.c \
-smf_calc_stareimage.c smf_fits_export2DA.c smf_geod.c
+smf_calc_stareimage.c smf_fits_export2DA.c smf_geod.c smf_instap_get.c
 
 #smf_tslice.c
 

@@ -35,7 +35,7 @@
 *     state = JCMTState* (Given)
 *        Current JCMT state (time, pointing etc.)
 *     instap = double[2] (Given)
-*        Additional focal plane offsets that may be applied.
+*        Additional focal plane offsets that may be applied (arc-seconds).
 *     telpos = double[3] (Given)
 *        LON / Lat / altitude of the telscope (deg/deg/metres)
 *     steptime = double (Given)
@@ -305,6 +305,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
       /* Apply focal plane ("instrument aperture") offsets */
       if( instap ) {
 	instapmap = astShiftMap( 2, instap, "" );
+        astInvert( instapmap );
 	map_cache = (AstMapping *) astCmpMap( map_cache, instapmap, 1, "" );
       }
 

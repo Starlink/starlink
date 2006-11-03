@@ -125,6 +125,8 @@
 *        smf_store_image
 *     2006-11-2 (DSB):
 *        Add smf_geod.
+*     2006-11-3 (DSB):
+*        Add smf_instap_get.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -461,5 +463,7 @@ void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
                      double steptime, AstFrameSet **fset, int *status );
 
 void smf_geod( double pos[3], double *phi, double *h, double *lambda );
+
+void smf_instap_get( smfHead * hdr, int * status );
 
 #endif /* SMF_DEFINED */

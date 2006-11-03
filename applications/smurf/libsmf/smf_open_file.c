@@ -362,6 +362,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	/* Determine and store the telescope location in hdr->telpos */
 	smf_telpos_get( hdr, status );
 
+	/* Store the INSTAP values */
+	smf_instap_get( hdr, status );
 
 	/* If not time series, then we can retrieve the stored WCS info */
 	if ( !isTseries ) {
@@ -495,6 +497,9 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
 	  /* Determine and store the telescope location in hdr->telpos */
 	  smf_telpos_get( hdr, status );
+
+   	  /* Store the INSTAP values */
+ 	  smf_instap_get( hdr, status );
 
 	  /* Determine the instrument */
 	  hdr->instrument = smf_inst_get( hdr, status );
