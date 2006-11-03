@@ -24,3 +24,8 @@ cupidfwmain.c
 cupidrcheckface.c
 cupidrcopyline.c
 cupidrinitedges.c
+cupidfindback1.c
+cupidfindback2.c
+cupidfindback3.c
+cupidfindback4.c
+cupidfindback10.c
