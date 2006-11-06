@@ -1,0 +1,376 @@
+%ADASS_PROCEEDINGS_FORM%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% SAMPLE1.TEX -- ADASS XII (2002) ASP Conference Proceedings sample
+% paper with minimal markup. Based on the sample from ADASS XI (01).
+%
+% This is a simple example.  If you want to see a more comprehensive
+% sample paper,  take a look at sample2.tex.
+%
+% Much of the input will be enclosed by braces (i.e., { }).  The
+% percent sign, "%", denotes the start of a comment; text after it
+% will be ignored by LaTeX.  You might also notice in some of the
+% examples below the use of "\ " after a period; this prevents LaTeX
+% from interpreting the period as the end of a sentence and putting
+% extra space after it.
+%
+% You should check your paper by processing it with LaTeX.  For
+% details about how to run LaTeX as well as how to print out the User
+% Guide, consult the README file.
+%
+% If you do not have access to the LaTeX software or a laser printer
+% at your site, you can still prepare your paper following the
+% instructions in the User Guide.  In such cases, the editors will
+% process the file and make any necessary editorial adjustments.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\documentclass[11pt,twoside]{article}  % Leave intact
+\usepackage{adassconf}
+
+% If you have the old LaTeX 2.09, and not the current LaTeX2e, comment
+% out the \documentclass and \usepackage lines above and uncomment
+% the following:
+
+%\documentstyle[11pt,twoside,adassconf]{article}
+
+\begin{document}   % Leave intact
+
+%-----------------------------------------------------------------------
+%			    Paper ID Code
+%-----------------------------------------------------------------------
+% Enter the proper paper identification code.  The ID code for your
+% paper is the session number associated with your presentation as
+% published in the official conference proceedings.  You can
+% find this number locating your abstract in the printed proceedings
+% that you received at the meeting or on-line at the conference web
+% site; the ID code is the letter/number sequence proceeding the title
+% of your presentation.
+%
+% This will not appear in your paper; however, it allows different
+% papers in the proceedings to cross-reference each other.  Note that
+% you should only have one \paperID, and it should not include a
+% trailing period.
+%
+
+\paperID{D1.1}
+
+%-----------------------------------------------------------------------
+%		            Paper Title
+%-----------------------------------------------------------------------
+% Enter the title of the paper.
+%
+% EXAMPLE: \title{A Breakthrough in Astronomical Software Development}
+%
+% If your title is so long as to fill the page header when you print it,
+% then please supply a short form as a \titlemark.
+%
+% EXAMPLE:
+%  \title{Rapid Development for Distributed Computing, with Implications
+%         for the Virtual Observatory}
+%  \titlemark{Rapid Development for Distributed Computing}
+%
+
+\title{GAIA 3D: Visualising Data Cubes}
+%\titlemark{ }
+
+%-----------------------------------------------------------------------
+%		          Authors of Paper
+%-----------------------------------------------------------------------
+% Enter the authors followed by their affiliations.  The \author and
+% \affil commands may appear multiple times as necessary.  List each
+% author by giving the first name or initials first followed by the
+% last name.  Authors with the same affiliations should grouped
+% together.
+%
+% Try to limit the front matter to no more than three \author
+% commands.  Group authors with the same affiliations.  Too many
+% \author commands fills the first page of the paper with little
+% actual text.
+
+\author{Peter W.\ Draper}
+\affil{Department of Physics, Durham University, South Road, 
+       Durham DH1 3LE, UK}
+
+\author{Malcolm J.\ Currie}
+\affil{CCLRC Rutherford Appleton Laboratory, Chilton, Didcot,
+       Oxfordshire, OX11 0QX, UK}
+
+\author{Tim Jenness, Jamie Leech \& Frossie Economou}
+\affil{Joint Astronomy Centre, 660 North A'ohoku Place, University Park,
+       Hilo, HI 96720, USA}
+
+\author{David S.\ Berry}
+\affil{Centre for Astrophysics, University of Central Lancashire, Preston, 
+       Lancashire, PR1 2HE, UK}
+
+\author{Mark B.\ Taylor}
+\affil{H H Wills Physics Laboratory, Bristol University, Tyndall Avenue, 
+       Bristol, BS8 1TL, UK}
+
+%-----------------------------------------------------------------------
+%			 Contact Information
+%-----------------------------------------------------------------------
+% This information will not appear in the paper but will be used by
+% the editors in case you need to be contacted concerning your
+% submission.  Enter your name as the contact along with your email
+% address.
+
+\contact{Peter W. Draper}
+\email{p.w.draper@durham.ac.uk}
+
+%-----------------------------------------------------------------------
+%		      Author Index Specification
+%-----------------------------------------------------------------------
+% Specify how each author name should appear in the author index.  The
+% \paindex{ } should be used to indicate the primary author, and the
+% \aindex for all other co-authors.  You MUST use the following
+% syntax:
+%
+% SYNTAX:  \aindex{LASTNAME, F. M.}
+%
+% where F is the first initial and M is the second initial (if
+% used).  This guarantees that authors that appear in multiple papers
+% will appear only once in the author index.
+%
+% EXAMPLE: \paindex{Crabtree, D.}
+%          \aindex{Manset, N.}
+%          \aindex{Veillet, C.}
+%
+% NOTE: this information is also used to build the author list that
+% appears in the table of contents.  Authors will be listed in the order
+% of the \paindex and \aindex commmands.
+%
+
+\paindex{Draper, P. W.}
+\aindex{Currie, M. J.}
+\aindex{Jenness, T.}
+\aindex{Leech, J.}
+\aindex{Economou, F.}
+\aindex{Berry, D. S.}
+\aindex{Taylor, M. B.}
+
+%-----------------------------------------------------------------------
+%                     Author list for page header
+%-----------------------------------------------------------------------
+% Please supply a list of author last names for the page header. in
+% one of these formats:
+%
+% EXAMPLES:
+% \authormark{LASTNAME}
+% \authormark{LASTNAME1 \& LASTNAME2}
+% \authormark{LASTNAME1, LASTNAME2, ... \& LASTNAMEn}
+% \authormark{LASTNAME et al.}
+%
+% Use the "et al." form in the case of seven or more authors, or if
+% the preferred form is too long to fit in the header.
+
+\authormark{Draper, Currie, Jenness, Leech, Economou, Berry \& Taylor}
+
+%-----------------------------------------------------------------------
+%			Subject Index keywords
+%-----------------------------------------------------------------------
+% Enter up to 6 keywords describing your paper.  These will NOT be
+% printed as part of your paper; however, they will be used to
+% generate the subject index for the proceedings.  There is no
+% standard list; however, you can consult the indices for past ADASS
+% proceedings (http://adass.org/adass/proceedings/).
+
+\keywords{Visualization: GAIA, JCMT, Spectra, Applications Software, 
+          Data Cubes, PLASTIC}
+
+%-----------------------------------------------------------------------
+%			       Abstract
+%-----------------------------------------------------------------------
+% Type abstract in the space below.  Consult the User Guide and Latex
+% Information file for a list of supported macros (e.g. for typesetting
+% special symbols). Do not leave a blank line between \begin{abstract}
+% and the start of your text.
+
+\begin{abstract}          % Leave intact
+The GAIA application has been a popular choice for examining and analysing
+astronomical images for several years. As data volumes have increased and
+spectral and time data cubes have become more prevalent there has been a
+strong demand for cube visualization. This paper will briefly describe the
+major enhancements that have been made to GAIA to support data cubes including
+real-time spectral extraction (single spectrum or area), calculation of
+moments, creation of channel maps and movie displays. It will also describe
+how PLASTIC interoperability can be used to send extracted spectra to
+VO-enabled applications and receive catalogue information.
+\end{abstract}
+
+%-----------------------------------------------------------------------
+%			      Main Body
+%-----------------------------------------------------------------------
+% Place the text for the main body of the paper here.  You should use
+% the \section command to label the various sections; use of
+% \subsection is optional.  Significant words in section titles should
+% be capitalized.  Sections and subsections will be numbered
+% automatically.
+
+\section{Introduction}
+
+The JAC has recently started producing data cubes using the HARP focal plane
+array receiver and its digital autocorrelation spectrometer ACSIS. These
+instruments will be used by astronomers of various levels of experience, so
+require a straight-forward data visualisation system, but which is also
+astronomically focused, that is has full support for celestial and spectral
+coordinates, and can read astronomy data formats (FITS and NDF). A review of
+what software is currently available was undertaken by Leech and Jenness, and
+with those conclusions in mind work has been undertaken to enhance the GAIA
+image display tool to work with data cubes from many different sources and
+extreme sizes (4Gb+ on 64bit systems).
+
+Interoperating within other environments, like the VO is clearly desirable for
+such a tool, so we have extended GAIA to broadcast spectra, images and tables
+and accept images and tables using the PLASTIC protocol (Taylor 2006 et al.).
+This allows the sophisticated selections of a tool like TOPCAT, (Taylor, 2005)
+to be used, without the need to extend GAIA's table handling.
+
+\section{Displaying Image Slices from Cubes}
+
+The most basic operation when handling cubes is displaying image slices. This
+shown in Figure~\ref{D1.1-fig1}. Care has been taken to make sure moving
+between slices is a very fast operation.
+
+\begin{figure}
+\epsscale{0.8}\plotone{D1.1_1.eps}
+\caption{GAIA display a cube and the toolbox with controls for manipulating
+the image slice, note that the slice is no.\ 131 along the third axis, which
+has a frequency of $2.223439E+10$ Hz. You change the slice by dragging the
+slider control}
+\label{D1.1-fig1}
+\end{figure}
+
+\section{Spectral Extraction}
+
+Extracting a spectrum from a cube is very simple, just clicking on an image
+position. The results of doing that are shown in Figure~/ref{D1.1-fig2}.
+
+\begin{figure}
+\epsscale{0.8}\plotone{D1.1_2.eps}
+\caption{GAIA extracting a spectrum for a single point}
+\label{D1.1-fig2}
+\end{figure}
+
+In addition to single point extraction you can also extract spectra which are
+averaged over regions, circles, rectangles, ellipses, polygons and lines of
+various kinds. You can also mark an extracted spectrum as the reference
+spectrum for simple point-to-point and region-to-region comparisons.
+
+\section{Coordinate Systems}
+
+The \textbf{Coords} menu offers the chance to switch between a preset list of
+common coordinate systems. So you can see you extractions in wavelength,
+frequency and (if a rest frequency is defined) velocity. Most of the spectral
+systems defined in FITS paper III are supported (using the AST library).
+
+\section{Other operations}
+
+Other operations that are supported on cubes are animating through a range,
+collapsing to various integrated measurements, creating channel map images
+(where each sub-panel is itself a collapsed range), and interactive baseline
+subtraction. Each extracted image can also be operated on by the image
+analysis tools of GAIA, so you can get region statistics, aperture photometry,
+object detection, contouring, grid overlays etc.
+
+\section{Spectral analysis}
+
+GAIA does not offer any spectral analysis features, concentrating mainly on
+visualisation, so you can `send' the extracted spectrum to the SPLAT-VO
+(Draper \& Taylor 2006) tool, or any other PLASTIC enabled spectral tool, as
+they become available. You can also save spectra to several formats for more
+traditional processing.
+
+%\section{Command-line Support}
+%
+%Many of the GAIA cube facilities (and also its image ones) are available to be
+%used from the command-line in the KAPPA (Currie \& Berry, 2006)
+%package. Script support is available in the DATACUBE package (Allan \& Currie,
+%2006).
+
+\section{Future Developments}
+
+The most obvious missing feature to support datacube visualisation is some
+kind of 3D rendering. Clearly there are many sophisticated packages already
+available in this field, but they tend to have a steep learning curve and to
+not support astronomy concepts very well. With that in mind we expect to
+produce a simple interface, that renders isosurfaces and volumes (to an
+existing library) and that deals with coordinates and astronomy data formats.
+
+Support for visualisation of CUPID results (HARP and SCUBA-2 data products,
+Berry 2006) are also a priority.
+
+\subsection{Obtaining the software}
+
+GAIA is available under the GPL and is part of the `Keoe' JAC binary releases
+described at:
+\begin{quote}
+\makeURL{http://www.jach.hawaii.edu/software/starlink/}
+\end{quote}
+Currently they are 32/64 bit Linux \& Mac OS X 10.4 builds.
+
+The GAIA source code can be obtained from:
+\begin{quote}
+\makeURL{http://cvsweb.starlink.ac.uk} \\
+\makeURL{http://dev.starlink.ac.uk}
+\end{quote}
+This known to build under Solaris, Tru64 UNIX, Cygwin
+
+% You can also add an acknowledgments section as indicated below.
+\acknowledgments
+
+This work has been funded by the Particle Physics and Astronomy Research
+Council (PPARC) for the Joint Astronomy Centre, Hawaii (JAC), with the support
+of the Central Laboratories for the Research Councils (CLRC). GAIA is based on
+the Skycat tool, which was developed at ESO.
+
+%-----------------------------------------------------------------------
+%			      References
+%-----------------------------------------------------------------------
+% List your references below within the reference environment
+% (i.e. between the \begin{references} and \end{references} tags).
+% Each new reference should begin with a \reference command which sets
+% up the proper indentation.  Observe the following order when listing
+% bibliographical information for each reference:  author name(s),
+% publication year, journal name, volume, and page number for
+% articles.  Note that many journal names are available as macros; see
+% the User Guide for a listing "macro-ized" journals.
+%
+% Note the following are some of the tricks that can be used:
+%
+%   o  \& is used to format an ampersand symbol (&).
+%   o  \'e puts an accent grave over the letter e.  See the User Guide
+%      for details on formatting special characters.
+%   o  "\ " after a period prevents LaTeX from interpreting the period
+%      as an end of a sentence.
+%   o  \aj is a macro that expands to "Astron. J."  See the User Guide
+%      for a full list of journal macros
+%   o  \adassvii is a macro that expands to the full title, editor,
+%      and publishing information for the ADASS VII conference
+%      proceedings.  Such macros are defined for ADASS conferences I
+%      through IX.
+%   o  When referencing a paper in the current volume, use the
+%      \adassix and \paperref macros.  The argument to \paperref is
+%      the paper ID code for the paper you are referencing.  See the
+%      note in the "Paper ID Code" section above for details on how to
+%      determine the paper ID code for the paper you reference.
+%
+\begin{references}
+\reference Berry, D. S., Reinhold, K., Jenness, T., Economou, F. 
+           \ 2006, \adassxvi, \paperref{P2.12}
+
+\reference Draper, P. W., Taylor, M. B.\  2006, SPLAT-VO, 
+           A Spectral Analysis Tool, Starlink User Note 214
+
+\reference Leech, J., \& Jenness, T. \ 2004 \adassxiv
+
+\reference Taylor, J., Boch, T., Comparato, M., Taylor, M., 
+           Winstanely, N., Mann, R. \ 2006 \adassxvi, \paperref{O7.4}
+
+\reference Taylor, M. B.\ 2005, \adassxiv
+
+\end{references}
+
+% Do not place any material after the references section
+
+\end{document}  % Leave intact
