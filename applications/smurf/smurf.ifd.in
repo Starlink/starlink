@@ -696,6 +696,16 @@ package @PACKAGE@ {
 	    helpkey *
 	  }
 
+	  parameter detectors {
+            type LITERAL
+            access READ
+            vpath DEFAULT 
+            ppath CURRENT DEFAULT
+            prompt {Names of detectors to be included}
+            default !
+            helpkey *
+	  }
+
          parameter in {
             position 1
             type NDF

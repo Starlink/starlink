@@ -56,6 +56,8 @@
 *        The new smfHead is not a clone.
 *     2006-10-02 (DSB):
 *        Add detpos.
+*     2006-11-06 (DSB):
+*        Add detname.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -115,6 +117,7 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   double *fplanex = NULL;
   double *fplaney = NULL;
   double *detpos = NULL;
+  char *detname = NULL;
 
   if (*status != SAI__OK) return NULL;
 
@@ -160,11 +163,19 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
     if (detpos) memcpy( detpos, old->detpos, 2*ndet*nframes*sizeof(*detpos) );
   } 
 
+  /* need to allocate detector name array */
+  if (old->ndet > 0 && old->detname) {
+    ndet = old->ndet;
+    detname = smf_malloc( ndet, strlen( old->detname ) + 1, 0, status );
+    if( detname ) memcpy( detname, old->detname, 
+                          ndet*( strlen( old->detname ) + 1 ) );
+  } 
+
   /* Insert elements into new smfHead */
   new = smf_construct_smfHead( new, instrument, wcs, tswcs, fitshdr,
 			       allState, curframe,
 			       nframes, ndet, fplanex, fplaney, detpos,
-                               old->dpazel, status );
+                               detname, old->dpazel, status );
 
   /* see isCloned to 0 since we have allocated this memory */
   if (new) new->isCloned = 0;

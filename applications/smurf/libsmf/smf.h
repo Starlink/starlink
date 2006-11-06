@@ -246,7 +246,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       const JCMTState * allState,
 		       dim_t curframe, dim_t nframes, unsigned int ndet,
 		       const double fplanex[], const double fplaney[],
-		       const double receppos[], int rpazel, int * status );
+		       const double detpos[], const char *detname, int rpazel, int * status );
 
 smfGroup * 
 smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups, 
@@ -450,7 +450,8 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
                      AstFrameSet **wcsout, int *status );
 
 void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
-                    AstFrame *ospecfrm, AstMapping *ospecmap, int moving,
+                    AstFrame *ospecfrm, AstMapping *ospecmap, Grp *detgrp, 
+                    int moving,
                     int lbnd_out[ 3 ], int ubnd_out[ 3 ], float *data_array, 
                     float *var_array, double *wgt_array, int *status );
 

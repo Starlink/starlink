@@ -54,6 +54,8 @@
 *        Add instap and telpos.
 *     2006-10-2 (DSB):
 *        Add detpos.
+*     2006-11-6 (DSB):
+*        Add detname.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -125,6 +127,7 @@ smf_create_smfHead( int * status ) {
   hdr->fplanex = NULL;
   hdr->fplaney = NULL;
   hdr->detpos = NULL;
+  hdr->detname = NULL;
   hdr->dpazel = 0;
   hdr->isCloned = 0;
   hdr->telpos[0] = 0;

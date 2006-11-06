@@ -71,6 +71,8 @@
 *        Add new smfDream struct
 *     2006-10-2 (DSB):
 *        Add detpos to smfHead
+*     2006-10-2 (DSB):
+*        Add detname to smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -174,6 +176,7 @@ typedef struct smfHead {
   const double * fplanex;   /* X coords (radians) of focal plane detectors */
   const double * fplaney;   /* Y coords (radians) of focal plane detectors */
   const double * detpos;    /* Tracking coords (radians) of detectors */
+  const char * detname;     /* Concatentated list of null-terminated detector names */
   int dpazel;               /* Flag: does "detpos" hold AZEL values? */
   double instap[2];         /* instrument aperture (focal plane offsets)  */
   double telpos[3];         /* West LON/LAT/Alt of telescope (deg/deg/m) */

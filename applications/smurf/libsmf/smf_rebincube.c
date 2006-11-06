@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout, 
-*                    AstFrame *ospecfrm, AstMapping *ospecmap, int moving,
-*                    dim_t lbnd_out[ 3 ], dim_t ubnd_out[ 3 ], 
+*                    AstFrame *ospecfrm, AstMapping *ospecmap, Grp *detgrp,
+*                    int moving, dim_t lbnd_out[ 3 ], dim_t ubnd_out[ 3 ], 
 *                    float *data_array, float *var_array, double *wgt_array, 
 *                    int *status );
 
@@ -37,6 +37,9 @@
 *     ospecmap = AstMapping * (Given)
 *        Pointer to the Mapping from the SpecFrame to the third GRID axis 
 *        within the current Frame of the output WCS Frameset.
+*     detgrp = Grp * (Given)
+*        A Group containing the names of the detectors to be used. All
+*        detectors will be used if this group is empty.
 *     moving = int (Given)
 *        If non-zero, the telescope is assumed to be tracking a moving
 *        object. In this case, each time slice is shifted to the position
@@ -76,6 +79,8 @@
 *     13-OCT-2006 (DSB):
 *        Changed to get the input spectral WCS from the WCS FrameSet rather 
 *        than the FITS header.
+*     6-NOV-2006 (DSB):
+*        Added "detgrp" parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,9 +122,10 @@
 #include "libsmf/smf.h"
 
 void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
-                    AstFrame *ospecfrm, AstMapping *ospecmap, int moving, 
-                    int lbnd_out[ 3 ], int ubnd_out[ 3 ], float *data_array, 
-                    float *var_array, double *wgt_array, int *status ) {
+                    AstFrame *ospecfrm, AstMapping *ospecmap, Grp *detgrp, 
+                    int moving, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
+                    float *data_array, float *var_array, double *wgt_array, 
+                    int *status ) {
 
 /* Local Variables */
    AstCmpMap *ssmap = NULL;    /* Input GRID->output GRID Mapping for spectral axis */
@@ -130,6 +136,7 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    AstFrameSet *swcsin = NULL; /* Spatial WCS FrameSet for current time slice */
    AstMapping *fsmap = NULL;   /* WCS->GRID Mapping from input WCS FrameSet */
    AstMapping *specmap = NULL; /* GRID->Spectral Mapping for current input file */
+   const char *name;           /* Pointer to current detector name */
    const char *trsys = NULL;   /* AST tracking system */
    dim_t iv;                   /* Vector index into output array */
    dim_t nel;                  /* No. of pixels in output */
@@ -142,14 +149,16 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    float *pdata = NULL;        /* Pointer to next input data value */
    float dval;                 /* Output data value */
    int dim[ 3 ];               /* Output array dimensions */
+   int found;                  /* Was current detector name found in detgrp? */
    int ibasein;                /* Index of base Frame in input WCS FrameSet */
    int ichan;                  /* Index of current channel */
-   int irec;                   /* detector index */
+   int idet;                   /* detector index */
    int itime;                  /* Index of current time slice */
    int ix;                     /* Output grid index on axis 1 */
    int iy;                     /* Output grid index on axis 2 */
    int iz;                     /* Output grid index on axis 3 */
    int nchan;                  /* Number of spectral channels */
+   int ndet;                   /* Number of detectors in "detgrp" group */
    int pixax[ 3 ];             /* Pixel axis indices */
    int specax;                 /* The index of the input spectral axis */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
@@ -268,10 +277,39 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    xout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
    yout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
 
-/* Store the input GRID coords of the detectors. */
-   for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
-      xin[ irec ] = irec + 1.0;
-      yin[ irec ] = 1.0;
+/* Store the input GRID coords of the detectors to be used. If a non-empty
+   group of detectors was supplied, set the GRID coords to AST__BAD for all 
+   detectors not included in this group. First see if a non-empty group
+   of detectors was supplied. */
+   if( detgrp ) {
+      grpGrpsz( detgrp, &ndet, status );
+   } else {
+      ndet = 0;
+   }
+
+/* Initialise a string to point to the name of the first detector for which 
+   data is available */
+   name = hdr->detname;
+
+/* Loop round all detectors for which data is available. */
+   for( idet = 0; idet < (data->dims)[ 1 ]; idet++ ) {
+
+/* Store the GRID coord of this detectors. */
+      xin[ idet ] = idet + 1.0;
+      yin[ idet ] = 1.0;
+
+/* If a group of detectors to be used was supplied, search the group for
+   the name of hte current detector. If not found, set the GRID coords bad. */
+      if( ndet ) {    
+         grpIndex( name, detgrp, 1, &found, status );
+         if( !found ) {
+            xin[ idet ] = AST__BAD;
+            yin[ idet ] = AST__BAD;
+         }
+      }
+
+/* Move on to the next available detector name. */
+      name += strlen( name ) + 1;
    }
 
 /* Store a pointer to the next input data value to use. */
@@ -288,25 +326,6 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    set to the epoch of the time slice. */
       smf_tslice_ast( data, itime, 1, status );
       swcsin = hdr->wcs;
-
-/* Ensure the ObsLat and ObsLon values in the SpecFrame are used in
-   preference to the hard-wired values stored in "swcsin" by smf_detpos_wcs 
-   and smf_create_lutwcs. The ObsLat and ObsLon values in the SpecFrame are
-   derived from the OBSGEO-X/Y/Z keywords stored in the input data FITS
-   header. We use a pointer to the SkyFrame (rather than the swcsin
-   FrameSet pointer) in order to avoid the Mappings in swcsin being
-   modified. */
-
-/*
-         skyframe = astGetFrame( swcsin, AST__CURRENT );
-         if( astTest( ospecfrm, "ObsLon" ) ) {
-            astSetC( skyframe, "ObsLon", astGetC( ospecfrm, "ObsLon" ) );
-         }           
-         if( astTest( ospecfrm, "ObsLat" ) ) {
-            astSetC( skyframe, "ObsLat", astGetC( ospecfrm, "ObsLat" ) );
-         }           
-         skyframe = astAnnul( skyframe );
-*/
 
 /* If we are dealing with a moving target, adjust the SkyFrames in the
    input and output FrameSets so that they represent offsets from the
@@ -384,11 +403,11 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
 /* For each good position, place the input data values for a whole spectrum
    into the nearest pixel of the output array and increment the weight 
    array. */
-      for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
+      for( idet = 0; idet < (data->dims)[ 1 ]; idet++ ) {
 
-         if( xout[ irec ] != AST__BAD && yout[ irec ] != AST__BAD ) {
-            ix = floor( xout[ irec ] + 0.5 ) - 1;
-            iy = floor( yout[ irec ] + 0.5 ) - 1;
+         if( xout[ idet ] != AST__BAD && yout[ idet ] != AST__BAD ) {
+            ix = floor( xout[ idet ] + 0.5 ) - 1;
+            iy = floor( yout[ idet ] + 0.5 ) - 1;
 
             if( ix >= 0 && ix < dim[ 0 ] && 
                 iy >= 0 && iy < dim[ 1 ] ) {

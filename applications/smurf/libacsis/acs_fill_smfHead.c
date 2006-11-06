@@ -21,6 +21,7 @@
  *     and .MORE.ACSIS.FPLANEY.
  *     - Detector positions in tracking coordinates are read (in radians) from 
  *     .MORE.ACSIS.RECEPPOS.
+ *     - Detector names are read from .MORE.ACSIS.RECEPPOS.RECEPTORS
 
  *  Authors:
  *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -31,6 +32,8 @@
  *        Original version.
  *     2-OCT-2006 (DSB):
  *        Added RECEPPOS.
+ *     4-NOV-2006 (DSB):
+ *        Added RECEPTORS.
 
  *  Copyright:
  *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -79,10 +82,15 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
 
   HDSLoc * fxloc = NULL;  /* locator of FPLANEX */
   HDSLoc * fyloc = NULL;  /* locator of FPLANEY */
+  HDSLoc * nloc = NULL;   /* locator of RECEPTORS */
   HDSLoc * rloc = NULL;   /* locator of RECEPPOS */
   HDSLoc * xloc = NULL;   /* locator of required extension */
-  double * fplanex = NULL; /* X coordinates in radians */
-  double * fplaney = NULL; /* Y coordinates in radians */
+  char *cout;             /* Pointer to next output character */
+  char *receptor;         /* String holding receptor names */
+  const char *cin;        /* Pointer to next input character */
+  const char *fpntrn = NULL; /* mapped RECEPTOR */
+  double * fplanex = NULL;/* X coordinates in radians */
+  double * fplaney = NULL;/* Y coordinates in radians */
   double * fpntrr = NULL; /* mapped RECEPPOS */
   double * fpntrx = NULL; /* mapped FPLANEX */
   double * fpntry = NULL; /* mapped FPLANEY */
@@ -97,14 +105,15 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   double trd;             /* Distance from receptor to TCS_TR_AC1/2 */
   int iframe;             /* Frame index */
   int irec;               /* Receptor index */
+  int j;                  /* Character count */
   int ri;                 /* Index into receppos array */
+  size_t clen;            /* Character length */
+  size_t sizen;           /* Number of RECEPTOR list */
   size_t sizer;           /* Number of RECEPPOS coordinates */
   size_t sizex;           /* Number of FPLANEX coordinates */
   size_t sizey;           /* Number of FPLANEY coordinates */
   unsigned int i;         /* loop counter */
   void * tpntr;           /* temporary pointer */
-
-
 
   if (*status != SAI__OK) return;
 
@@ -115,19 +124,25 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
     return;
   }
 
-  /* Get the extension and find FPLANEX, FPLANEY and RECEPPOS */
+  /* Get the extension and find the required components. */
   ndfXloc( indf, EXTENSION, "READ", &xloc, status );
   datFind( xloc, "FPLANEX", &fxloc, status );
   datFind( xloc, "FPLANEY", &fyloc, status );
   datFind( xloc, "RECEPPOS", &rloc, status );
+  datFind( xloc, "RECEPTORS", &nloc, status );
 
-  /* map them as a vectorized _DOUBLE */
+  /* map numericals them as vectorized _DOUBLEs */
   datMapV( fxloc, "_DOUBLE", "READ", &tpntr, &sizex, status );
   fpntrx = tpntr;
   datMapV( fyloc, "_DOUBLE", "READ", &tpntr, &sizey, status );
   fpntry = tpntr;
   datMapV( rloc, "_DOUBLE", "READ", &tpntr, &sizer, status );
   fpntrr = tpntr;
+
+  /* map strings and get the length of each one */
+  datMapV( nloc, "_CHAR", "READ", &tpntr, &sizen, status );
+  fpntrn = tpntr;
+  datLen( nloc, &clen, status );
 
   /* sanity check */
   if (sizex != sizey && *status == SAI__OK) {
@@ -144,6 +159,7 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
     fplanex = smf_malloc( sizex, sizeof(*fplanex), 0, status );
     fplaney = smf_malloc( sizex, sizeof(*fplaney), 0, status );
     receppos = smf_malloc( sizer, sizeof(*receppos), 0, status );
+    receptor = smf_malloc( sizen, clen + 1, 0, status );
 
     /* need to convert fplane values from arcsec to radians since they are 
        stored in arcsec in the ACSIS data files. */
@@ -159,10 +175,23 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
       memcpy( receppos, fpntrr, sizer*sizeof(*receppos) );
     }
 
+    /* copy the receptor names, null terminating them. */
+    if (receptor) {
+      cin = fpntrn;
+      cout = receptor;
+      for( i = 0; i < sizen; i++ ) {
+         for( j = 0; j < clen; j++ ) *(cout++) = *(cin++);
+         *(cout++) = 0;
+      }         
+    }
+
+
+
     /* now store in the header */
     hdr->fplanex = fplanex;
     hdr->fplaney = fplaney;
     hdr->detpos = receppos;
+    hdr->detname = receptor;
 
     /* The receppos values may be either in tracking coords or in azel
        coords. We determine which by seeing if the receppos values are 
@@ -216,5 +245,6 @@ L10:;
   datAnnul( &fxloc, status );
   datAnnul( &rloc, status );
   datAnnul( &xloc, status );
+  datAnnul( &nloc, status );
 
 }

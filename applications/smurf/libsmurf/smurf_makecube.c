@@ -30,6 +30,10 @@
 *     CROTA = REAL (Read)
 *          The angle, in degrees, from north through east to the second
 *          pixel axis in the output cube. [0.0]
+*     DETECTORS = LITERAL (Read)
+*          A group of detector names. Only data form the named detectors
+*          will be included in the output cube. If a null (!) value is 
+*          supplied, data from all detectors will be used. [!]
 *     IN = NDF (Read)
 *          Input file(s)
 *     OUT = NDF (Write)
@@ -69,6 +73,8 @@
 *        Clone from smurf_makemap
 *     18-SEP-2006 (DSB):
 *        MAKECUBE code added.
+*     6-NOV-2006 (DSB):
+*        Added parameter DETECTORS.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -140,6 +146,7 @@ void smurf_makecube( int *status ) {
    AstMapping *ospecmap = NULL;/* GRID->SpecFrame Mapping from output WCS */
    AstMapping *tmap = NULL;   /* Base->current Mapping from output WCS */
    AstSkyFrame *tsky = NULL;  /* Temporary SkyFrame */
+   Grp *detgrp = NULL;        /* Group of detector names */
    Grp *igrp = NULL;          /* Group of input files */
    Grp *ogrp = NULL;          /* Group containing output file */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
@@ -155,6 +162,7 @@ void smurf_makecube( int *status ) {
    int ifile;                 /* Input file index */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for output map */
    int moving;                /* Is the telescope base position changing? */
+   int ndet;                  /* Number of detectors supplied for "DETECTORS" */
    int nval;                  /* Number of supplied positions */
    int ondf;                  /* output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
@@ -177,8 +185,8 @@ void smurf_makecube( int *status ) {
 /* Begin an NDF context (we do not begin an AST context since this is
    done within the calling monolith routine). */
    ndfBegin();
-  
-/* Get a group of input files */
+
+/* Get a group of input files */ 
    ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
 
 /* Get the user defined spatial pixel size (the calibration for the spectral 
@@ -236,6 +244,14 @@ void smurf_makecube( int *status ) {
 /* See of the detector positions are to be read from the RECEPPOS array. 
    Otherwise, they are calculated on the basis of the FPLANEX/Y arrays. */
    parGet0l( "USEDETPOS", &usedetpos, status );
+
+/* Get the detectors to use. If a null value is supplied, annul the
+   error. */
+   detgrp = NULL;
+   if( *status == SAI__OK ) {
+      kpg1Gtgrp( "DETECTORS", &detgrp, &ndet, status );
+      if( *status == PAR__NULL ) errAnnul( status );
+   }
   
 /* Validate the input files, create the WCS FrameSet to store in the
    output cube, and get the pixel index bounds of the output cube. */
@@ -348,9 +364,9 @@ void smurf_makecube( int *status ) {
       }
 
 /* Rebin the data into the output grid. */
-      smf_rebincube( data, ifile, size, swcsout, ospecfrm, ospecmap, moving,
-                     lbnd_out, ubnd_out, data_array, var_array, wgt_array, 
-                     status );
+      smf_rebincube( data, ifile, size, swcsout, ospecfrm, ospecmap, detgrp, 
+                     moving, lbnd_out, ubnd_out, data_array, var_array, 
+                     wgt_array, status );
    
 /* Close the input data file. */
       if( data != NULL ) {
@@ -376,6 +392,7 @@ L999:;
    if( odata ) smf_close_file( &odata, status );
 
 /* Free resources. */  
+   if( detgrp != NULL) grpDelet( &detgrp, status);
    if( igrp != NULL) grpDelet( &igrp, status);
    if( ogrp != NULL) grpDelet( &ogrp, status);
 

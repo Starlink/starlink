@@ -42,6 +42,8 @@
 *        Check fplanex/y and instrument
 *     2006-10-2 (DSB):
 *        Check detpos 
+*     2006-11-6 (DSB):
+*        Check detname. 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -240,6 +242,18 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
 		2*ihdr->ndet*ihdr->nframes * sizeof(*(ohdr->detpos)));
       }
     }
+
+  /* Detector names */
+    if (ohdr->detname == NULL ){
+      ohdr->detname = smf_malloc( ihdr->ndet, 
+                                  ( strlen( ohdr->detname ) + 1 ), 0,
+				  status );
+      if( ohdr->detname ) {
+         memcpy( ohdr->detname, ihdr->detname, 
+		ihdr->ndet*( strlen( ohdr->detname ) + 1 ) );
+      }
+    }
+
     ohdr->dpazel = ihdr->dpazel;
 
   }

@@ -18,7 +18,8 @@
 *              AstFitsChan * fitshdr, const JCMTState * allState,
 *              dim_t curframe, unsigned int ndet,
 *              const double fplanex[], const double fplaney[],
-*              const double detpos[], int dpazel, int * status );
+*              const double detpos[], const char *detname, int dpazel, 
+*              int * status );
 
 *  Arguments:
 *     tofill = smfHead* (Given)
@@ -51,6 +52,8 @@
 *     detpos = const double[] (Given)
 *        The position of the bolometers/receptors in tracking coordinates, 
 *        in radians. This array should have a length of 2*ndet*nframes.
+*     detname = const char * (Given)
+*        A concatenated list of null-terminated detector names.
 *     dpazel = int (Given)
 *        If non-zero, then the values in "detpos" are AZEL
 *        positions. Otherwise they are TRACKING positions.
@@ -99,6 +102,8 @@
 *        Add instrument code. Add fplanex and fplaney.
 *     2006-10-2 (DSB):
 *        Add detpos.
+*     2006-11-6 (DSB):
+*        Add detname.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -150,7 +155,8 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       const JCMTState * allState,
 		       dim_t curframe, dim_t nframes, unsigned int ndet,
 		       const double fplanex[], const double fplaney[],
-		       const double detpos[], int dpazel, int * status ) {
+		       const double detpos[], const char *detname, 
+                       int dpazel, int * status ) {
 
   smfHead * hdr = NULL;   /* Header components */
 
@@ -174,6 +180,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
     hdr->fplanex = fplanex;
     hdr->fplaney = fplaney;
     hdr->detpos = detpos;
+    hdr->detname = detname;
     hdr->dpazel = dpazel;
     hdr->isCloned = 1;
   }
