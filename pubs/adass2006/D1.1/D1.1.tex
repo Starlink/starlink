@@ -243,19 +243,22 @@ slider control}
 
 \section{Spectral Extraction}
 
-Extracting a spectrum from a cube is very simple, just clicking on an image
-position. The results of doing that are shown in Figure~/ref{D1.1-fig2}.
-
-\begin{figure}
-\epsscale{0.8}\plotone{D1.1_2.eps}
-\caption{GAIA extracting a spectrum for a single point}
-\label{D1.1-fig2}
-\end{figure}
+Extracting a spectrum from a cube is very simple, just click on an image
+position and drag around. The spectrum will be interactively updated.
 
 In addition to single point extraction you can also extract spectra which are
 averaged over regions, circles, rectangles, ellipses, polygons and lines of
 various kinds. You can also mark an extracted spectrum as the reference
 spectrum for simple point-to-point and region-to-region comparisons.
+The results of doing these operations are shown in Figure~\ref{D1.1-fig2}.
+
+\begin{figure}
+\epsscale{0.8}\plotone{D1.1_2.eps}
+\caption{GAIA extracting region spectra. The two regions shown have been
+averaged and extracted from the cube.}
+\label{D1.1-fig2}
+\end{figure}
+
 
 \section{Coordinate Systems}
 
@@ -264,7 +267,7 @@ common coordinate systems. So you can see you extractions in wavelength,
 frequency and (if a rest frequency is defined) velocity. Most of the spectral
 systems defined in FITS paper III are supported (using the AST library).
 
-\section{Other operations}
+\section{Other Operations}
 
 Other operations that are supported on cubes are animating through a range,
 collapsing to various integrated measurements, creating channel map images
@@ -368,6 +371,8 @@ the Skycat tool, which was developed at ESO.
            Winstanely, N., Mann, R. \ 2006 \adassxvi, \paperref{O7.4}
 
 \reference Taylor, M. B.\ 2005, \adassxiv
+
+%\reference Warren-Smith, R. F. \& Berry D. B. \ 2004 \adassxvi
 
 \end{references}
 
