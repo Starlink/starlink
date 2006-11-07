@@ -70,7 +70,7 @@
 *        (Indeed only one value is permitted for a one-dimensional
 *        array.)  If two values are supplied, this parameter becomes the
 *        full-width at half-maximum of the major and minor axes of an
-*        elliptical Gaussian PSF.  Values between 0.1 and 100.0 pixels
+*        elliptical Gaussian PSF.  Values between 0.1 and 10000.0 pixels
 *        should be given.  Note that unless a non-default value is
 *        specified for the BOX parameter, the time taken to perform the
 *        smoothing will increase in approximate proportion to the
@@ -177,8 +177,7 @@
 *     a variance array is present in the input NDF.
 
 *  Copyright:
-*     Copyright (C) 1000, 1990, 1992 Science & Engineering Research
-*         Council. 
+*     Copyright (C) 1990, 1992 Science & Engineering Research Council. 
 *     Copyright (C) 1995, 1998, 2000, 2004 Central Laboratory
 *         of the Research Councils. All Rights Reserved.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
