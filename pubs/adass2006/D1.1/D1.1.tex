@@ -193,9 +193,8 @@ spectral and time data cubes have become more prevalent there has been a
 strong demand for cube visualization. This paper will briefly describe the
 major enhancements that have been made to GAIA to support data cubes including
 real-time spectral extraction (single spectrum or area), calculation of
-moments, creation of channel maps and movie displays. It will also describe
-how PLASTIC interoperability can be used to send extracted spectra to
-VO-enabled applications and receive catalogue information.
+moments, creation of channel maps and movie displays. It will also say how the
+PLASTIC protocol has been used to interoperate with VO-enabled applications.
 \end{abstract}
 
 %-----------------------------------------------------------------------
@@ -215,16 +214,17 @@ instruments will be used by astronomers of various levels of experience, so
 require a straight-forward data visualisation system, but which is also
 astronomically focused, that is has full support for celestial and spectral
 coordinates, and can read astronomy data formats (FITS and NDF). A review of
-what software is currently available was undertaken by Leech and Jenness, and
-with those conclusions in mind work has been undertaken to enhance the GAIA
-image display tool to work with data cubes from many different sources and
-extreme sizes (4Gb+ on 64bit systems).
+what software is currently available was undertaken by Leech and Jenness
+(2004), and with those conclusions in mind work has been undertaken to enhance
+the GAIA image display tool to work with data cubes from many different
+sources and extreme sizes (4Gb+ on 64bit systems).
 
-Interoperating within other environments, like the VO is clearly desirable for
-such a tool, so we have extended GAIA to broadcast spectra, images and tables
-and accept images and tables using the PLASTIC protocol (Taylor 2006 et al.).
-This allows the sophisticated selections of a tool like TOPCAT, (Taylor, 2005)
-to be used, without the need to extend GAIA's table handling.
+Interoperating with other environments, like the VO, and co-operating with
+specialised tools is clearly desirable, so we have extended GAIA to broadcast
+spectra, images and tables and accept images and tables using the PLASTIC
+protocol (Taylor et al. 2006).  This allows the sophisticated selections of a
+tool like TOPCAT (Taylor, 2005) to be used, without the need to extend GAIA's
+table handling.
 
 \section{Displaying Image Slices from Cubes}
 
@@ -306,18 +306,18 @@ Berry 2006) are also a priority.
 \subsection{Obtaining the software}
 
 GAIA is available under the GPL and is part of the `Keoe' JAC binary releases
-described at:
+described at (note this release does not include PLASTIC spectrum support):
 \begin{quote}
 \makeURL{http://www.jach.hawaii.edu/software/starlink/}
 \end{quote}
 Currently they are 32/64 bit Linux \& Mac OS X 10.4 builds.
 
-The GAIA source code can be obtained from:
+The GAIA source code can be obtained from (with latest developments):
 \begin{quote}
 \makeURL{http://cvsweb.starlink.ac.uk} \\
 \makeURL{http://dev.starlink.ac.uk}
 \end{quote}
-This known to build under Solaris, Tru64 UNIX, Cygwin
+This known to build under Solaris, Tru64 UNIX and Cygwin, as well.
 
 % You can also add an acknowledgments section as indicated below.
 \acknowledgments
