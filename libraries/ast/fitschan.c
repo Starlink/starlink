@@ -733,6 +733,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        out as yet when writing a FrameSet to a foreign FITS header.
 *        - Correct bug that prevented ZSOURCE keyword being added to the
 *        output header if the source velocity was negative.
+*     9-NOV-2006 (DSB):
+*        Add STATUS argument to docs for F77 AST_SETx.
 *class--
 */
 
@@ -12643,7 +12645,7 @@ f     AST_SETFITS<X>
 c     #include "fitschan.h"
 c     void astSetFits<X>( AstFitsChan *this, const char *name, <X>type value, 
 c                         const char *comment, int overwrite )
-f     CALL AST_SETFITS<X>( THIS, NAME, VALUE, COMMENT, OVERWRITE )
+f     CALL AST_SETFITS<X>( THIS, NAME, VALUE, COMMENT, OVERWRITE, STATUS )
 
 *  Class Membership:
 *     FitsChan method.
@@ -12736,6 +12738,8 @@ f        .FALSE.,
 *        card is left unchanged. In either case, if the current card on entry 
 *        points to the "end-of-file", the new card is appended to the end of 
 *        the list. 
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
 
 *  Notes:
 *     -  To assign a new value for an existing keyword within a FitsChan,
