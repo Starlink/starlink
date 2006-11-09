@@ -96,8 +96,8 @@
        Oxfordshire, OX11 0QX, UK}
 
 \author{Tim Jenness, Jamie Leech \& Frossie Economou}
-\affil{Joint Astronomy Centre, 660 North A'ohoku Place, University Park,
-       Hilo, HI 96720, USA}
+\affil{Joint Astronomy Centre, 660 N. A`oh\={o}k\={u} Place, University Park,
+       Hilo, Hawaii, 96720, USA}
 
 \author{David S.\ Berry}
 \affil{Centre for Astrophysics, University of Central Lancashire, Preston, 
@@ -187,14 +187,15 @@
 % and the start of your text.
 
 \begin{abstract}          % Leave intact
-The GAIA application has been a popular choice for examining and analysing
+The \htmladdnormallinkfoot{GAIA}{http://www.starlink.ac.uk/gaia} 
+application has been a popular choice for examining and analysing
 astronomical images for several years. As data volumes have increased and
 spectral and time data cubes have become more prevalent there has been a
 strong demand for cube visualization. This paper will briefly describe the
 major enhancements that have been made to GAIA to support data cubes including
 real-time spectral extraction (single spectrum or area), calculation of
 moments, creation of channel maps and movie displays. It will also say how the
-PLASTIC protocol has been used to interoperate with VO-enabled applications.
+PLASTIC protocol has been used to inter-operate with VO-enabled applications.
 \end{abstract}
 
 %-----------------------------------------------------------------------
@@ -208,22 +209,29 @@ PLASTIC protocol has been used to interoperate with VO-enabled applications.
 
 \section{Introduction}
 
-The JAC has recently started producing data cubes using the HARP focal plane
-array receiver and its digital autocorrelation spectrometer ACSIS. These
-instruments will be used by astronomers of various levels of experience, so
-require a straight-forward data visualisation system, but which is also
-astronomically focused, that is has full support for celestial and spectral
-coordinates, and can read astronomy data formats (FITS and NDF). A review of
-what software is currently available was undertaken by Leech and Jenness
-(2004), and with those conclusions in mind work has been undertaken to enhance
-the GAIA image display tool to work with data cubes from many different
-sources and extreme sizes (4Gb+ on 64bit systems).
+The \htmladdnormallink{JAC}{http://www.jach.hawaii.edu}, has started
+producing data cubes using the HARP focal plane array receiver and its digital
+autocorrelation spectrometer ACSIS. These instruments will be used by
+astronomers of various levels of experience, so require a straight-forward
+data visualisation system, but which is also astronomically focused, that is
+has full support for celestial and spectral coordinates, and can read
+astronomy data formats (FITS and NDF). A review of what software is currently
+available was undertaken by Leech and Jenness (2004), and with those
+conclusions in mind work has been undertaken to enhance the 
+\htmladdnormallink{GAIA}{http://www.starlink.ac.uk/gaia} 
+image display tool to work with data cubes from many different sources and
+extreme sizes (4Gb+).
+% (4Gb+ on 64bit systems).
 
-Interoperating with other environments, like the VO, and co-operating with
-specialised tools is clearly desirable, so we have extended GAIA to broadcast
-spectra, images and tables and accept images and tables using the PLASTIC
-protocol (Taylor et al. 2006).  This allows the sophisticated selections of a
-tool like TOPCAT (Taylor, 2005) to be used, without the need to extend GAIA's
+Inter-operating with other environments, like the VO, and co-operating with
+specialised tools is clearly desirable, so we have extended 
+\htmladdnormallink{GAIA}{http://www.starlink.ac.uk/gaia} 
+to broadcast spectra, images and tables and accept images and tables using the
+\htmladdnormallink{PLASTIC}{http://plastic.sourceforge.net}
+protocol (Taylor et al. 2006). This allows the sophisticated selections of a
+tool like
+\htmladdnormallink{TOPCAT}{http://www.starlink.ac.uk/topcat}
+(Taylor, 2005) to be used, without the need to extend GAIA's
 table handling.
 
 \section{Displaying Image Slices from Cubes}
@@ -234,20 +242,20 @@ between slices is a very fast operation.
 
 \begin{figure}
 \epsscale{0.8}\plotone{D1.1_1.eps}
-\caption{GAIA display a cube and the toolbox with controls for manipulating
-the image slice, note that the slice is no.\ 131 along the third axis, which
-has a frequency of $2.223439E+10$ Hz. You change the slice by dragging the
-slider control}
+\caption{GAIA toolbox displaying a cube. Note the image slice is no.\ 114
+along the 3rd axis, which has a velocity of $12.94929$ $km/s$.
+%You change the slice by dragging the slider control
+}
 \label{D1.1-fig1}
 \end{figure}
 
 \section{Spectral Extraction}
 
-Extracting a spectrum from a cube is very simple, just click on an image
-position and drag around. The spectrum will be interactively updated.
+Extracting and displaying a spectrum from a cube is very simple, just click on
+an image position and drag around. The spectrum will be interactively updated.
 
 In addition to single point extraction you can also extract spectra which are
-averaged over regions, circles, rectangles, ellipses, polygons and lines of
+averaged over regions -- circles, rectangles, ellipses, polygons and lines of
 various kinds. You can also mark an extracted spectrum as the reference
 spectrum for simple point-to-point and region-to-region comparisons.
 The results of doing these operations are shown in Figure~\ref{D1.1-fig2}.
@@ -262,10 +270,12 @@ averaged and extracted from the cube.}
 
 \section{Coordinate Systems}
 
-The \textbf{Coords} menu offers the chance to switch between a preset list of
-common coordinate systems. So you can see you extractions in wavelength,
-frequency and (if a rest frequency is defined) velocity. Most of the spectral
-systems defined in FITS paper III are supported (using the AST library).
+\htmladdnormallink{GAIA}{http://www.starlink.ac.uk/gaia}
+allows you to switch between a preset list of common coordinate systems. So
+you can see spectra in wavelength, frequency and, if a rest-frequency is
+defined, velocity. Most of the spectral systems defined in FITS paper III are
+supported (using the
+\htmladdnormallink{AST}{http://www.starlink.ac.uk/ast} library).
 
 \section{Other Operations}
 
@@ -278,11 +288,14 @@ object detection, contouring, grid overlays etc.
 
 \section{Spectral analysis}
 
-GAIA does not offer any spectral analysis features, concentrating mainly on
-visualisation, so you can `send' the extracted spectrum to the SPLAT-VO
-(Draper \& Taylor 2006) tool, or any other PLASTIC enabled spectral tool, as
-they become available. You can also save spectra to several formats for more
-traditional processing.
+\htmladdnormallink{GAIA}{http://www.starlink.ac.uk/gaia}
+does not offer any spectral analysis features, concentrating mainly on
+visualisation, so you can `send' the extracted spectrum to the
+\htmladdnormallinkfoot{SPLAT-VO}{http://www.starlink.ac.uk/splat}
+tool, or any other
+\htmladdnormallink{PLASTIC}{http://plastic.sourceforge.net}
+enabled spectral tool, as they become available. You can also save spectra to
+several formats (FITS, NDF \& text) for more traditional processing.
 
 %\section{Command-line Support}
 %
@@ -293,11 +306,11 @@ traditional processing.
 
 \section{Future Developments}
 
-The most obvious missing feature to support datacube visualisation is some
+The most obvious missing feature, to support data cube visualisation, is some
 kind of 3D rendering. Clearly there are many sophisticated packages already
 available in this field, but they tend to have a steep learning curve and to
 not support astronomy concepts very well. With that in mind we expect to
-produce a simple interface, that renders isosurfaces and volumes (to an
+produce a simple interface, that renders iso-surfaces and volumes (using an
 existing library) and that deals with coordinates and astronomy data formats.
 
 Support for visualisation of CUPID results (HARP and SCUBA-2 data products,
@@ -305,17 +318,17 @@ Berry 2006) are also a priority.
 
 \subsection{Obtaining the software}
 
-GAIA is available under the GPL and is part of the `Keoe' JAC binary releases
-described at (note this release does not include PLASTIC spectrum support):
+\htmladdnormallink{GAIA}{http://www.starlink.ac.uk/gaia}
+is available under the GPL and is part of the `Keoe' JAC binary releases
+described at (this release does not include PLASTIC spectrum support):
 \begin{quote}
-\makeURL{http://www.jach.hawaii.edu/software/starlink/}
+\htmladdURL{http://www.jach.hawaii.edu/software/starlink/}
 \end{quote}
 Currently they are 32/64 bit Linux \& Mac OS X 10.4 builds.
-
 The GAIA source code can be obtained from (with latest developments):
 \begin{quote}
-\makeURL{http://cvsweb.starlink.ac.uk} \\
-\makeURL{http://dev.starlink.ac.uk}
+\htmladdURL{http://cvsweb.starlink.ac.uk} \\
+\htmladdURL{http://dev.starlink.ac.uk}
 \end{quote}
 This known to build under Solaris, Tru64 UNIX and Cygwin, as well.
 
@@ -323,9 +336,17 @@ This known to build under Solaris, Tru64 UNIX and Cygwin, as well.
 \acknowledgments
 
 This work has been funded by the Particle Physics and Astronomy Research
-Council (PPARC) for the Joint Astronomy Centre, Hawaii (JAC), with the support
-of the Central Laboratories for the Research Councils (CLRC). GAIA is based on
-the Skycat tool, which was developed at ESO.
+Council 
+\htmladdnormallink{(PPARC)}{http://www.pparc.ac.uk}
+for the Joint Astronomy Centre, Hawaii 
+\htmladdnormallink{(JAC)}{http://www.jach.hawaii.edu}, 
+with the support
+of the Central Laboratories for the Research Councils 
+\htmladdnormallink{(CLRC)}{http://www.clrc.ac.uk}. 
+GAIA is based on the 
+\htmladdnormallink{Skycat}{http://archive.eso.org/skycat}
+tool, developed at 
+\htmladdnormallink{ESO}{http://www.eso.org}.
 
 %-----------------------------------------------------------------------
 %			      References
@@ -362,8 +383,8 @@ the Skycat tool, which was developed at ESO.
 \reference Berry, D. S., Reinhold, K., Jenness, T., Economou, F. 
            \ 2006, \adassxvi, \paperref{P2.12}
 
-\reference Draper, P. W., Taylor, M. B.\  2006, SPLAT-VO, 
-           A Spectral Analysis Tool, Starlink User Note 214
+%\reference Draper, P. W., Taylor, M. B.\  2006, SPLAT-VO, 
+%           A Spectral Analysis Tool, Starlink User Note 214
 
 \reference Leech, J., \& Jenness, T. \ 2004 \adassxiv
 
