@@ -167,7 +167,7 @@
 
 void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status );
 
-void smf_average_data( const smfData *data, const int start, int nslice, 
+void smf_average_data( const smfData *data, int start, int nslice, 
 		       const int interval, double **avdata, size_t *nelem, int *status);
 
 void smf_bbrebinmap( smfData *data,  int indf, int index, int size, 
@@ -232,8 +232,8 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
 		       AstKeyMap *history, int * status );
 
 smfDream *
-smf_construct_smfDream( smfData *data, int nvert, int npath, int *jigvert, 
-			double *jigpath, int * status );
+smf_construct_smfDream( smfData *data, const int nvert, const int npath, 
+			const int *jigvert, const double *jigpath, int * status );
 
 smfFile *
 smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
