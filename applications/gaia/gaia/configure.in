@@ -605,7 +605,7 @@ LINK=${LN_S}
 AC_SUBST(LINK)
 
 #  ALINK script location.
-AC_CHECK_PROG(ALINK,alink,alink,${STARLINK}/bin/alink)
+AC_CHECK_PROG(ALINK,${STARLINK}/bin/alink,alink)
 
 #--------------------------------------------------------------------
 #  Try to determine the extra libraries required to link a

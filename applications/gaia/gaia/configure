@@ -3752,8 +3752,8 @@ LINK=${LN_S}
 
 
 #  ALINK script location.
-# Extract the first word of "alink", so it can be a program name with args.
-set dummy alink; ac_word=$2
+# Extract the first word of "${STARLINK}/bin/alink", so it can be a program name with args.
+set dummy ${STARLINK}/bin/alink; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_prog_ALINK+set}" = set; then
@@ -3776,7 +3776,6 @@ do
 done
 done
 
-  test -z "$ac_cv_prog_ALINK" && ac_cv_prog_ALINK="${STARLINK}/bin/alink"
 fi
 fi
 ALINK=$ac_cv_prog_ALINK
@@ -3890,7 +3889,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:3893:" \
+echo "$as_me:3892:" \
      "checking for Fortran compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -4141,7 +4140,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FCFLAGS
 FCFLAGS="$FCFLAGS $ac_verb"
-(eval echo $as_me:4144: \"$ac_link\") >&5
+(eval echo $as_me:4143: \"$ac_link\") >&5
 ac_fc_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_fc_v_output" >&5
 FCFLAGS=$ac_save_FFLAGS
@@ -4219,7 +4218,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FCFLAGS
 FCFLAGS="$FCFLAGS $ac_cv_prog_fc_v"
-(eval echo $as_me:4222: \"$ac_link\") >&5
+(eval echo $as_me:4221: \"$ac_link\") >&5
 ac_fc_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_fc_v_output" >&5
 FCFLAGS=$ac_save_FFLAGS
