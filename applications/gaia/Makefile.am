@@ -102,6 +102,7 @@ $(GAIA_FILES): $(SKYCAT_FILES) $(SKYCAT_TEST_FILES)
 	STAR_FCFLAGS="$(STAR_FCFLAGS)"; export STAR_FCFLAGS;\
 	FC="$(FC)"; export FC;\
 	DEC_CXX="@DEC_CXX@"; export DEC_CXX;\
+	ALINK=$(ALINK); export ALINK; \
 	./configure --prefix=$${pwd}/built || exit 1;\
 	make -e all install || exit 1 )
 	for f in $(GAIA_BIN_FILES) $(GAIA_IFC_FILES); do \
