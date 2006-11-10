@@ -75,6 +75,8 @@
 *        MAKECUBE code added.
 *     6-NOV-2006 (DSB):
 *        Added parameter DETECTORS.
+*     10-NOV-2006 (DSB):
+*        Added HISTORY component to output NDF.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,6 +103,13 @@
 *  Bugs:
 *     {note_any_bugs_here}
 *-
+
+*  To Do:
+*     - Add extra options to the SYSTEM parameter (e.g. GAPPT).
+*     - Add support to use astRebin (with warnings about slow speed)
+*     - Add auto-grid determinatiom option
+*     - Add history to output NDF
+
 */
 
 
@@ -297,6 +306,9 @@ void smurf_makecube( int *status ) {
 /* Save some useful pointers. */
    file = odata->file;
    ondf = file->ndfid;
+
+/* Create a history component in the output NDF. */
+   ndfHcre( ondf, status );
 
 /* Get pointers to the mapped output data, variance, and weights arrays. */
    data_array = (odata->pntr)[ 0 ];
