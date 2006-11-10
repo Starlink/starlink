@@ -119,10 +119,12 @@
 /* Starlink includes */
 #include "ast.h"
 #include "mers.h"
+#include "par.h"
 #include "sae_par.h"
 #include "prm_par.h"
 #include "star/ndg.h"
 #include "star/slalib.h"
+#include "star/kaplibs.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -161,10 +163,18 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
    char *pname = NULL;   /* Name of currently opened data file */
    const char *trsys = NULL; /* AST tracking system */
    const char *usesys = NULL;/* AST system for output cube */
+   char outcatnam[ 41 ]; /* Output catalogue name */
+   double *outpos = NULL;/* Array of sample positions */
+   double *outpos2 = NULL;/* Array of sample positions */
+   double *p;            /* Pointer to next value */
+   double *px;           /* Pointer to next value */
+   double *py;           /* Pointer to next value */
    double *xin = NULL;   /* Workspace for detector input grid positions */
    double *xout = NULL;  /* Workspace for detector output pixel positions */
+   double *xout2 = NULL; /* Workspace for detector output pixel positions */
    double *yin = NULL;   /* Workspace for detector input grid positions */
    double *yout = NULL;  /* Workspace for detector output pixel positions */
+   double *yout2 = NULL; /* Workspace for detector output pixel positions */
    double a;             /* Longitude value */
    double b;             /* Latitude value */
    double dlbnd[ 3 ];    /* Floating point lower bounds for output cube */
@@ -175,11 +185,14 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
    double specout[ 2];   /* Transformed spectral values */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ifile;            /* Index of current input file */
+   int ipos;             /* Position index */
    int irec;             /* Index of current input detector */
    int ishift;           /* Shift to put pixel origin at centre */
    int itime;            /* Index of current time slice */
    int iwcsfrm;          /* Index of original output WCS Frame */
+   int noutpos;          /* Number of positions to store in output catalogue */
    int npix;             /* Number of pixels along axis */
+   int outcat;           /* Produce an output catalogue holding sample positions? */
    int pixax[ 3 ];       /* The output fed by each selected mapping input */
    int specax;           /* Index of spectral axis in input FrameSet */
    smfData *data = NULL; /* Pointer to data struct for current input file */
@@ -194,6 +207,18 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
 
 /* Begin an AST context. */
    astBegin;
+
+/* See if an output catalogue holding the sky positions at every receptor
+   sample is to be produced. */
+   parGet0c( "OUTCAT", outcatnam, 40, status );
+   if( *status == PAR__NULL ) {
+      errAnnul( status );
+      outcat = 0;
+   } else {
+      outcat = 1;
+   }
+   outpos = NULL;
+   noutpos = 0;
 
 /* Initialise the bounds of the output cube in floating point PIXEL coords. */
    dlbnd[ 0 ] = VAL__MAXD;
@@ -411,11 +436,23 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
       xout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
       yout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
 
+      if( outcat ) {
+         xout2 = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
+         yout2 = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
+      }
+
 /* Store the input GRID coords of the detectors. */
       for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
          xin[ irec ] = irec + 1.0;
          yin[ irec ] = 1.0;
       }
+
+/* If required, extend the memory use to hold the list of receptor positions 
+   for the output catalogue. */
+      if( outcat ) {
+         outpos = astGrow( outpos, noutpos + 2*(data->dims)[ 2 ]*(data->dims)[ 1 ],
+                           sizeof( double ) );
+      }                           
 
 /* We now need to determine the spatial extent of the input file, and
    then modify the spatial bounds of the output cube to accomodate it. 
@@ -657,6 +694,19 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
             }
          }
 
+/* If required, transform the receptor positions (in output grid coords) into 
+   the output sky frame and copy to the array destined for the output 
+   catalogue. */
+         if( outcat ) {
+            astTran2( swcsout, (data->dims)[ 1 ], xout, yout, 0, xout2, yout2 );
+            p = outpos + 2*noutpos;
+            for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
+               *(p++) = xout2[ irec ];
+               *(p++) = yout2[ irec ];
+            }
+            noutpos += (data->dims)[ 1 ];
+         }
+
 /* For efficiency, explicitly annul the AST Objects created in this tight
    loop. */
          fs = astAnnul( fs );
@@ -768,6 +818,33 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
                 status );
       
       msgOutif( MSG__NORM, " ", " ", status );
+   }
+
+/* Produce the output catalogue if required. */
+   if( outcat ) {
+
+/* Re-order the array containing the positions so that all the longitude
+   values come at the start of hte array, followed by all the latitude
+   values. */
+      outpos2 = astMalloc( sizeof( double )*2*noutpos );
+      px = outpos2;
+      py = outpos2 + noutpos;
+      p = outpos;
+      for( ipos = 0;ipos < noutpos; ipos++ ) {
+         *(px++) = *(p++);
+         *(py++) = *(p++);
+      } 
+
+/* Create the catalogue. */
+      kpg1Wrlst( "OUTCAT", noutpos, noutpos, 2, outpos2, AST__CURRENT, 
+                 astFrameSet( astGetFrame( swcsout, AST__BASE ), "" ),
+                 "Detector positions", 1, NULL, 1, status );
+
+/* Free resources. */
+      outpos = astFree( outpos );
+      outpos2 = astFree( outpos2 );
+      xout2 = astFree( xout2 );
+      yout2 = astFree( yout2 );
    }
 
 /* End the AST context. This will annul all AST objects created within the

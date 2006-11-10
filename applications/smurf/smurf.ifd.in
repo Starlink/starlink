@@ -687,6 +687,22 @@ package @PACKAGE@ {
 
          helplib {$SMURF_HELP}
 
+         parameter catframe {
+            type LITERAL
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {Output catalogue coordinate Frame}
+            helpkey *
+            default !
+         }
+
+         parameter catepoch {
+            type _DOUBLE
+            ppath DYNAMIC CURRENT
+            prompt {Output catalogue epoch}
+            helpkey *
+         }
+
 	 parameter crota {
 	    type _REAL
 	    prompt {Position angle of second pixel axis in output (degs)}
@@ -724,6 +740,17 @@ package @PACKAGE@ {
             vpath {PROMPT }
             association ->GLOBAL.DATA_ARRAY
             prompt {Output NDF data structure}
+            helpkey *
+          }
+
+         parameter outcat {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            association ->GLOBAL.CATALOGUE
+            prompt {Output positions list}
+            default !
             helpkey *
           }
 

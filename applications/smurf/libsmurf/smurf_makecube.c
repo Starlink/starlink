@@ -27,6 +27,29 @@
 *     is placed into the nearest output pixel). 
 
 *  ADAM Parameters:
+*     CATFRAME = LITERAL (Read)
+*          A string determining the co-ordinate Frame in which positions are 
+*          to be stored in the output catalogue associated with parameter
+*          OUTCAT. The string supplied for CATFRAME can be one of the 
+*          following:
+*	   
+*          - A Domain name such as SKY, AXIS, PIXEL, etc. 
+*	   
+*          - An integer value giving the index of the required Frame.
+*	   
+*          - An IRAS90 Sky Co-ordinate System (SCS) values such as 
+*          EQUAT(J2000) (see SUN/163).
+*	   
+*          If a null (!) value is supplied, the positions will be stored 
+*          in the current Frame of the output NDF. [!]
+*     CATEPOCH = DOUBLE PRECISION (Read)
+*          The epoch at which the sky positions stored in the output
+*          catalogue were determined. It will only be accessed if an epoch
+*          value is needed to qualify the co-ordinate Frame specified by 
+*          COLFRAME. If required, it should be given as a decimal years 
+*          value, with or without decimal places ("1996.8" for example). 
+*          Such values are interpreted as a Besselian epoch if less than 
+*          1984.0 and as a Julian epoch otherwise. 
 *     CROTA = REAL (Read)
 *          The angle, in degrees, from north through east to the second
 *          pixel axis in the output cube. [0.0]
@@ -38,6 +61,12 @@
 *          Input file(s)
 *     OUT = NDF (Write)
 *          Output file
+*     OUTCAT = FILENAME (Write)
+*          An output catalogue in which to store all the detector positions 
+*          used to make the output cube. These are in the same sky coordinate
+*          system as the current Frame in the output NDF. If a null value (!) 
+*          is supplied, no output catalogue is produced. See also parameter 
+*          CATFRAME. [!]
 *     PIXSIZE( 2 ) = REAL (Read)
 *          Pixel dimensions in the output image, in arcsec. If only one value 
 *          is supplied, the same value will be used for both axes.
