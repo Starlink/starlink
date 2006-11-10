@@ -13,11 +13,21 @@
 *     Subroutine
 
 *  Invocation:
-*     pntr = smf_construct_smfDream( smfData *data, int * status );
+*     dream = smf_construct_smfDream( smfData *data, const int nvert, 
+*                                     const int npath, const int *jigvert, 
+*                                     const double *jigpath, int * status );
 
 *  Arguments:
 *     data = smfData* (Given)
 *        smfData struct for the input raw DREAM data
+*     nvert = const int (Given)
+*        Number of vertices in the DREAM jiggle pattern
+*     npath = const int (Given)
+*        Number of data samples in a single DREAM cycle
+*     jigvert = const int * (Given)
+*        Array of positions in the DREAM jiggle pattern
+*     jigpath = const double * (Given)
+*        Array of interpolated SMU positions over a single DREAM cycle
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -28,10 +38,16 @@
 *  Description:
 *     This function allocates memory for a smfDream structure and
 *     copies in the supplied values. All of the necessary information
-*     must be in the header of the supplied file.
+*     must be in the header of the supplied data file. This routine is
+*     responsible for opening the weights file and retrieving all the
+*     necessary information from it.
 
 *  Notes:
 *     - Free this memory using smf_close_smfDream
+*     - This routine will not issue an error if the DREAM weights file
+*       does not exist. Currently the caller should check that the
+*       smfDream contains information from the weights file and issue
+*       its own error.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -40,6 +56,8 @@
 *  History:
 *     2006-07-26 (AGG):
 *        Initial version
+*     2006-11-10 (AGG):
+*        Update prologue, read GRID_SIZE from weights file
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -89,37 +107,35 @@
 
 #define FUNC_NAME "smf_construct_smfDream"
 
-#define SZFITSCARD 81
-
-smfDream *smf_construct_smfDream( smfData *data, int nvert, int npath, 
-				  int *jigvert, double *jigpath, 
+smfDream *smf_construct_smfDream( smfData *data, const int nvert, const int npath, 
+				  const int *jigvert, const double *jigpath, 
 				  int * status ) {
 
   /* Local variables */
-  int i;                     /* Loop counter */
-  smfHead *hdr = NULL;       /* Header info */
   smfDream *dream = NULL;    /* DREAM struct to be filled */
-  char obsmode[SZFITSCARD];  /* Observing mode */
+  HDSLoc *drmloc;            /* Locator to DREAM extension in weights file */
   int genint;                /* Generic interger used multiple times */
-
-  char wtfile[SZFITSCARD];   /* Name of weights file */
-  smfData *griddata = NULL;
-  double *invmatx = NULL;
-  double *gridwts = NULL;
-  size_t nelem;
-  int ix;
-  int jy;
-  size_t k;
-  int ndfid;
-  double *gridptr = NULL;
-  int *gridiptr = NULL;
-  Grp *wtgrp = NULL;
-  smfData *wtdata = NULL;
-  HDSLoc *drmloc;
-  int gridxmin;
-  int gridxmax;
-  int gridymin;
-  int gridymax;
+  smfData *griddata = NULL;  /* smfData for storing components in weights file */
+  int *gridiptr = NULL;      /* Pointer to integer griddata data array */
+  double *gridptr = NULL;    /* Pointer to double griddata data array  */
+  double *gridwts = NULL;    /* Pointer to grid weights */
+  int gridxmax;              /* Maximum pixel value in X for reconstruction grid */
+  int gridxmin;              /* Minimum pixel value in X for reconstruction grid */
+  int gridymax;              /* Maximum pixel value in Y for reconstruction grid */
+  int gridymin;              /* Minimum pixel value in Y for reconstruction grid */
+  smfHead *hdr = NULL;       /* Header info */
+  double *invmatx = NULL;    /* Pointer to the inverse matrix */
+  int i;                     /* Loop counter */
+  int ix;                    /* X pixel counter */
+  int jy;                    /* Y pixel counter */
+  size_t k;                  /* Index into gridpts array */
+  int ndfid;                 /* NDf identifier for current component */
+  size_t nelem;              /* Size of data array to be allocated */
+  char obsmode[SZFITSCARD];  /* Observing mode */
+  char weightsfile[SZFITSCARD]; /* Name of weights file */
+  smfData *wtdata = NULL;    /* smfData for weights file */
+  smfFile *wtfile = NULL;    /* smfFile for weights file */
+  Grp *wtgrp = NULL;         /* Grp containing name of weights file */
 
   if (*status != SAI__OK) return NULL;
 
@@ -127,7 +143,8 @@ smfDream *smf_construct_smfDream( smfData *data, int nvert, int npath,
   if ( !(data->file->isTstream) ) {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Input data not time series unable to construct smfDream", status);
+      errRep( FUNC_NAME, 
+	      "Input data not time series unable to construct smfDream", status);
       return NULL;
     }
   }
@@ -142,18 +159,24 @@ smfDream *smf_construct_smfDream( smfData *data, int nvert, int npath,
       if ( dream != NULL ) {
 	dream->nvert = (size_t)nvert;
 	dream->nsampcycle = (size_t)npath;
+	/* Retrieve jiggle positions */
 	for (i=0; i<nvert; i++) {
 	  (dream->jigvert)[i][0] = jigvert[i];
 	  (dream->jigvert)[i][1] = jigvert[i+nvert];
 	}
+	/* Store SMU path over DREAM cycle */
 	for (i=0; i<npath; i++) {
 	  (dream->jigpath)[i][0] = jigpath[i];
 	  (dream->jigpath)[i][1] = jigpath[i+npath];
 	}
+	/* Retrieve other parameters from the FITS header */
 	smf_fits_getD( hdr, "JIGSTEP", &(dream->jigstep), status );
 	smf_fits_getI( hdr, "NJIGLCYC", &genint, status );
 	dream->ncycles = (size_t)genint;
 	smf_fits_getI( hdr, "JIGL_CNT", &genint, status );
+	/* Now for a sanity check: the number of vertices stored in
+	   the FITS header must be equal to the value of nvert passed
+	   in to this routine */
 	if ( genint != nvert ) {
 	  if ( *status == SAI__OK ) {
 	    *status = SAI__ERROR;
@@ -168,12 +191,16 @@ smfDream *smf_construct_smfDream( smfData *data, int nvert, int npath,
 
 	/* Now read reconstruction grid parameters */
 	/* Get weights file name from hdr */
-	smf_fits_getS( hdr, "DRMWGHTS", wtfile, SZFITSCARD, status );
+	smf_fits_getS( hdr, "DRMWGHTS", weightsfile, SZFITSCARD, status );
 	if ( *status == SAI__OK ) {
 	  /* Open file: place it in a Grp */
 	  wtgrp = grpNew("DREAM weights", status);
 	  if ( wtgrp != NULL ) {
-	    grpPut1( wtgrp, wtfile, 0, status );
+	    grpPut1( wtgrp, weightsfile, 0, status );
+	    /* Note that this call to smf_open_file should not result
+	       in a circular loop because the weights data do not
+	       satisfy the condition for reading and storing them in a
+	       smfDream. */
 	    smf_open_file( wtgrp, 1, "READ", 0, &wtdata, status );
 	    if ( *status == SAI__OK ) {
 	      /* Get locator to DREAM parameters */
@@ -184,7 +211,7 @@ smfDream *smf_construct_smfDream( smfData *data, int nvert, int npath,
 		/* First, the grid weights array */
 		ndfid = smf_get_ndfid(drmloc, "GRIDWTS", "READ", "OLD", "", 0, 
 				      NULL, NULL, status);
-		smf_open_ndf( ndfid, "READ", wtfile, SMF__DOUBLE, &griddata, status);
+		smf_open_ndf( ndfid, "READ", weightsfile, SMF__DOUBLE, &griddata, status);
 		if ( griddata != NULL ) {
 		  nelem = (size_t)((griddata->dims)[0] * (griddata->dims)[1]);
 		  gridwts = smf_malloc( nelem, sizeof(double), 1, status );
@@ -199,7 +226,7 @@ smfDream *smf_construct_smfDream( smfData *data, int nvert, int npath,
 		/* Then the inverse matrix */
 		ndfid = smf_get_ndfid(drmloc, "INVMATX", "READ", "OLD", "", 0, 
 				      NULL, NULL, status);
-		smf_open_ndf( ndfid, "READ", wtfile, SMF__DOUBLE, &griddata, status);
+		smf_open_ndf( ndfid, "READ", weightsfile, SMF__DOUBLE, &griddata, status);
 		if ( griddata != NULL ) {
 		  nelem = (size_t)((griddata->dims)[0]);
 		  invmatx = smf_malloc( nelem, sizeof(double), 1, status );
@@ -214,7 +241,7 @@ smfDream *smf_construct_smfDream( smfData *data, int nvert, int npath,
 		/* Now for the gridpts array */
 		ndfid = smf_get_ndfid(drmloc, "GRIDEXT", "READ", "OLD", "", 0, 
 				      NULL, NULL, status);
-		smf_open_ndf( ndfid, "READ", wtfile, SMF__INTEGER, &griddata, status);
+		smf_open_ndf( ndfid, "READ", weightsfile, SMF__INTEGER, &griddata, status);
 		if ( griddata != NULL ) {
 		  gridiptr = (griddata->pntr)[0];
 		  gridxmin = gridiptr[0];
@@ -233,6 +260,10 @@ smfDream *smf_construct_smfDream( smfData *data, int nvert, int npath,
 		  }
 		  smf_close_file( &griddata, status);
 		}
+		/* And finally, read the size of the grid step */
+		wtfile = wtdata->file;
+		ndfXgt0d( wtfile->ndfid, "DREAM", "GRID_SIZE", &dream->gridstep, 
+			  status );
 		/* Annul locator, close file */
 		datAnnul( &drmloc, status );
 	      } else {
@@ -244,6 +275,13 @@ smfDream *smf_construct_smfDream( smfData *data, int nvert, int npath,
 		}
 	      }
 	      smf_close_file( &wtdata, status );
+	    } else {
+	      /* If we fail to open the file, can we assume we're trying
+		 to create it? */
+	      msgOutif(MSG__VERB, FUNC_NAME, 
+		       "Could not open the weights file - maybe we're creating it?",
+		       status);
+	      errAnnul( status );
 	    }
 	  }
 	  if ( wtgrp != NULL ) {
