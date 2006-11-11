@@ -43,6 +43,8 @@
 *     2006-10-26 (AGG):
 *        Streamline some of the image writing code, move into
 *        smf_store_image.c
+*     2006-11-10 (AGG):
+*        Store GRIDEXT and GRID_SIZE parameters in file
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -108,7 +110,10 @@ void smf_dreamsolve( smfData *data, int *status ) {
   int cycle;                       /* Cycle counter */
   int dims[2];                     /* Dimensions of output image */
   smfDream *dream = NULL;          /* DREAM parameters */
+  HDSLoc *drmloc;                  /* Locator to DEAM extension */
   char drmwghts[LEN__METHOD+1];    /* Name of DREAM weights file */
+  int *gridext = NULL;             /* Pointer to grid min/max X/Y extent */
+  int gridndf;                     /* NDF identifier for GRID parameters */
   smfHead *hdr = NULL;             /* Header information for input data */
   int i;                           /* Loop counter */
   double *interpwt = NULL;         /* Interpolation weights */
@@ -121,6 +126,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
   int k;                           /* Loop counter */
   double *kvec = NULL;             /* Reduced vector of values */
   int l;                           /* Loop counter */
+  int lbnd[2];                     /* Lower bounds */
   double lme;                      /* Quality of solution */
   double lssum;                    /* Sum of square of known values */
   int nbol;                        /* Total number of bolometers */
@@ -134,25 +140,22 @@ void smf_dreamsolve( smfData *data, int *status ) {
   int nunkno;                      /* Number of unknowns in solution */
   int nvert;                       /* Number of vertices in DREAM pattern */
   char obsmode[LEN__METHOD+1];     /* Observing mode */
+  smfFile *ofile;                  /* Output file information */
   int outhgt;                      /* Height of output map */
   int outwid;                      /* Width of output map */
   double *par = NULL;              /* Parameters of problem eqn */
   double *pbolzero = NULL;         /* Bolometer zero points */
   double *psbuf = NULL;            /* */
   HDSLoc *scu2redloc = NULL;       /* Locator to SCU2RED extension */
-  int seqend;                      /* Last sequence number in current
-				      reconstruction */
-  int seqstart;                    /* First sequence number in current
-				      reconstruction */
   double *sint = NULL;             /* Solved parameters */
   int skyhgt;                      /* Height of reconstructed map */
   int skywid;                      /* Width of reconstructed map */
-  int slice;                       /* Current time slice (frame) */
   double *sme = NULL;              /* RMS errors in solutions */
   double *solint = NULL;           /* Solved intensity buffer */
   double *solme = NULL;            /* RMS solved intensities */
   double *tstream = NULL;          /* Pointer to time series data */
   double tv;                       /* Temporary flat-fielded value */
+  int ubnd[2];                     /* Upper bounds */
   int vxmax;                       /* Maximum X SMU offset */
   int vxmin;                       /* Minimum X SMU offset */
   int vymax;                       /* Maximum Y SMU offset */
@@ -163,7 +166,8 @@ void smf_dreamsolve( smfData *data, int *status ) {
   int ymin;                        /* Minimum Y extent of grid */
   int zx;                          /* X offset of output map in solution */
   int zy;                          /* Y offset of output map in solution */
-  int naver;
+  int naver;                       /* Temporary value... */
+
   if ( *status != SAI__OK ) return;
 
   /* Check we have time-series data */
@@ -184,14 +188,14 @@ void smf_dreamsolve( smfData *data, int *status ) {
     }
   }
 
-  /* Check we have a DREAM observation. If we do it's not fatal as new
-     processed images will just be added onto the end of the current
-     stack of images. */
+  /* Check we have a DREAM observation. */
   hdr = data->hdr;
   smf_fits_getS( hdr, "OBSMODE", obsmode, LEN__METHOD+1, status );
   if ( strncmp( obsmode, "DREAM", 5) == 0 ) {
     msgOutif(MSG__VERB, FUNC_NAME, "Processing DREAM data", status);
-
+    /* Have we done this before? If so it's not fatal as new processed
+     images will just be added onto the end of the current stack of
+     images. */
     if (smf_history_check( data, "smf_dreamsolve", status) ) {
       msgOut(FUNC_NAME, "File contains DREAM data which has already been processed: proceeding but this will NOT overwrite any DREAM images already written into the SCU2RED extension", 
 	     status);
@@ -224,6 +228,42 @@ void smf_dreamsolve( smfData *data, int *status ) {
       }
     }
 
+    /* Write grid parameters into the output file: note use UPDATE to
+       preserve the current contents of the DREAM extension (JIGVERT
+       and JIGPATH)  */
+    drmloc = smf_get_xloc( data, "DREAM", "DREAM_PAR", "UPDATE", 0, NULL, status );
+    /* Create new extension to store grid parameters */
+    lbnd[0] = 1;
+    ubnd[0] = 4;
+    gridndf = smf_get_ndfid( drmloc, "GRIDEXT", "WRITE", "NEW", 
+			     "_INTEGER", 1, lbnd, ubnd, status);
+    ndfMap( gridndf, "DATA", "_INTEGER", "WRITE", &gridext, &nelem, 
+	    status);
+    if ( *status == SAI__OK ) {
+      /* Initialize min/max values - remember the grid may not
+	 necessarily be symmetric about 0 */
+      gridext[0] = VAL__MAXI;
+      gridext[1] = VAL__MINI;
+      gridext[2] = VAL__MAXI;
+      gridext[3] = VAL__MINI;
+      /* Find gridminmax from gridpts array */
+      for ( i=0; i<DREAM__MXGRID-1; i++) {
+	if ( (dream->gridpts)[i][0] < gridext[0] ) 
+	  gridext[0] = (dream->gridpts)[i][0];
+	if ( (dream->gridpts)[i][0] > gridext[1] ) 
+	  gridext[1] = (dream->gridpts)[i][0];
+	if ( (dream->gridpts)[i][1] < gridext[2] ) 
+	  gridext[2] = (dream->gridpts)[i][1];
+	if ( (dream->gridpts)[i][1] > gridext[3] ) 
+	  gridext[3] = (dream->gridpts)[i][1];
+      }
+    }
+    /* Write grid size into output file */
+    ofile = data->file;
+    ndfXpt0d( dream->gridstep, ofile->ndfid, "DREAM", "GRID_SIZE", status);
+    /* Free up these resources */
+    ndfAnnul( &gridndf, status );
+    datAnnul( &drmloc, status );
 
     /* Create SCU2RED extension to hold reconstructed images */
     scu2redloc = smf_get_xloc(data, "SCU2RED", "SCUBA2_MAP_ARR", "WRITE", 
@@ -370,7 +410,6 @@ void smf_dreamsolve( smfData *data, int *status ) {
 	/* Write the solved intensities and zero offsets */
 	dims[0] = outwid;
 	dims[1] = outhgt;
-	
 	smf_store_image( data, scu2redloc, cycle, 2, dims, nsampcycle, vxmin, vymin,
 			 solint, pbolzero, status );
 
