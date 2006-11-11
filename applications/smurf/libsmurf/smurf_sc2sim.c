@@ -35,9 +35,9 @@
 *     from simulated data for each of a range of heater settings.
 
 *  ADAM Parameters:
-*     OBSXMLFILE = CHAR (Read)
+*     OBSFILE = CHAR (Read)
 *          Input observation XML file
-*     SIMXMLFILE = CHAR (Read)
+*     SIMFILE = CHAR (Read)
 *          Input simulation XML file
 *     SEED = INTEGER (Read)
 *          Seed for random number generator
@@ -150,7 +150,7 @@
 #include "f77.h"
 
 /* prototype for slalib routine that calculates mjd -> calendar date */
-void slaDjcl(double djm, int *iy, int *im, int *id, double *fd, int *j);
+/*void slaDjcl(double djm, int *iy, int *im, int *id, double *fd, int *j);*/
 
 
 #define FUNC_NAME "smurf_sc2sim"
@@ -294,8 +294,11 @@ void smurf_sc2sim( int *status ) {
 
    } else {
 
-     msgSetc( "MODE", inx.obsmode );
-     errRep("", "^MODE is not a supported observation mode", status);
+     if ( *status == SAI__OK ) {
+       *status = SAI__ERROR;
+       msgSetc( "MODE", inx.obsmode );
+       errRep("", "^MODE is not a supported observation mode", status);
+     }
 
    }
  
