@@ -13,11 +13,31 @@
 *     Library routine
 
 *  Invocation:
-*     smf_store_image( smfData *data, int *status);
+*     smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim, 
+*		       int dims[], int nsampcycle, int vxmin, int vymin, 
+*		       double *image, double *zero, int *status);
 
 *  Arguments:
 *     data = smfData * (Given)
 *        Input data
+*     scu2redloc = HDSLoc * (Given)
+*        Locator to SCU2RED extension
+*     cycle = int (Given)
+*        DREAM cycle number
+*     ndim = int (Given)
+*        Number of dimensions in output image
+*     dims[] = int (Given)
+*        Array of maximum dimensions for each axis
+*     nsampcycle = int (Given)
+*        Number of time slices per DREAM cycle
+*     vxmin = int (Given)
+*        Minimum X SMU offset
+*     vymin = int (Given)
+*        Minimum Y SMU offset
+*     image = double * (Given)
+*        Data to be stored
+*     zero = double (Given)
+*        Bolometer zero points to be stored (if relevant)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -26,8 +46,9 @@
 
 *  Notes:
 *     - Replacement for the sc2da routine sc2store_putimage
-*     - This routine is necessary because the above relies on a global 
-*       variable for the locator to the SCU2RED extension
+*     - This routine is necessary because the above relies on global
+*       variables for the locator to the SCU2RED extension and the NDF
+*       identifier for the output file
 *     - Variable names are rather DREAM specific at the moment
 
 *  Authors:
@@ -104,31 +125,30 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
 		      double *image, double *zero, int *status) {
 
   smfHead *hdr = NULL;             /* Pointer to header struct */
-  HDSLoc *bz_imloc = NULL;  /* HDS locator */
-  int bzindf;               /* NDF identifier */
-  double *bzptr = NULL;     /* Pointer to mapped space for zero points */
-  int el;                   /* Number of elements mapped */
-  int frame;
-  AstFitsChan *imfits=NULL; /* FITS header for each reconstructed image */
-  char imname[DAT__SZNAM];  /* Name of structure for image */
-  double *imptr = NULL;     /* Pointer to mapped space for image */
-  int j;                    /* Loop counter */
-  int lbnd[2];              /* Lower dimension bounds */
-  int nbolx;                /* Number of bolometers in the X direction */
-  int nboly;                /* Number of bolometers in the Y direction */
-  int ntot;                 /* Total number of elements */
-  int place;                /* NDF placeholder */
-  HDSLoc *seq_loc = NULL;   /* HDS locator */
-  int seqend;
-  int seqstart;
-  int slice;
-  int strnum;               /* Structure element number */
-  char subname[SZFITSCARD+1];
-  int subnum;
-  int subscan;
-  int ubnd[2];              /* Upper dimension bounds */
-  int uindf;                /* NDF identifier */
-  AstFrameSet *wcs = NULL;
+  HDSLoc *bz_imloc = NULL;         /* HDS locator */
+  int bzindf;                      /* NDF identifier for bolometer zero points */
+  double *bzptr = NULL;            /* Pointer to mapped space for zero points */
+  int el;                          /* Number of elements mapped */
+  int frame;                       /* Mean timeslice index for image */
+  AstFitsChan *imfits=NULL;        /* FITS header for each reconstructed image */
+  char imname[DAT__SZNAM];         /* Name of structure for image */
+  double *imptr = NULL;            /* Pointer to mapped space for image */
+  int j;                           /* Loop counter */
+  int lbnd[2];                     /* Lower dimension bounds */
+  int nbolx;                       /* Number of bolometers in the X direction */
+  int nboly;                       /* Number of bolometers in the Y direction */
+  int ntot;                        /* Total number of elements */
+  int place;                       /* NDF placeholder */
+  HDSLoc *seq_loc = NULL;          /* HDS locator */
+  int seqend;                      /* End index */
+  int seqstart;                    /* Starting index */
+  int slice;                       /* Index of current time slice */
+  int strnum;                      /* Structure element number */
+  char subname[SZFITSCARD+1];      /* Subarray name */
+  int subnum;                      /* Subarray index number */
+  int ubnd[2];                     /* Upper dimension bounds */
+  int uindf;                       /* NDF identifier */
+  AstFrameSet *wcs = NULL;         /* WCS info */
 
   if ( *status != SAI__OK ) return;
 
