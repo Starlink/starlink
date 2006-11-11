@@ -48,6 +48,8 @@
 *        smf_dream_getgrid
 *     2006-09-15 (AGG):
 *        Factor out remaining code into smf_dream_calcweights
+*     2006-11-10 (AGG):
+*        Set some default values if a config file is not specified
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -150,8 +152,17 @@ void smurf_dreamweights ( int *status ) {
     kpg1Kymap( confgrp, &keymap, status );
     if( confgrp ) grpDelet( &confgrp, status );      
   } else {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "CONFIG unspecified", status);      
+    /* Should we assume some defaults on behalf of the user, or just
+       throw an error? */
+    /* 2006-10-11: assuming some defaults for convenience... */
+    keymap = astKeyMap("");
+    astMapPut0I( keymap, "GRIDXMIN", -4, "" );
+    astMapPut0I( keymap, "GRIDXMAX", 4, "" );
+    astMapPut0I( keymap, "GRIDYMIN", -4, "" );
+    astMapPut0I( keymap, "GRIDYMAX", 4, "" );
+    astMapPut0D( keymap, "GRIDSTEP", 6.28, "" );
+    /*    *status = SAI__ERROR;
+	  errRep(FUNC_NAME, "CONFIG unspecified", status);      */
   }
 
   /* Retrieve grid parameters */
