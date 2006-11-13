@@ -115,6 +115,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 /* Starlink includes */
 #include "ast.h"
@@ -161,9 +162,10 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
    AstMapping *ospecmap = NULL; /* Spec <> PIXEL mapping in output FrameSet */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
    char *pname = NULL;   /* Name of currently opened data file */
+   char outcatnam[ 41 ]; /* Output catalogue name */
+   const char *name;     /* Pointer to current detector name */
    const char *trsys = NULL; /* AST tracking system */
    const char *usesys = NULL;/* AST system for output cube */
-   char outcatnam[ 41 ]; /* Output catalogue name */
    double *outpos = NULL;/* Array of sample positions */
    double *outpos2 = NULL;/* Array of sample positions */
    double *p;            /* Pointer to next value */
@@ -183,6 +185,9 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
    double shift[ 3 ];    /* Shifts from PIXEL to GRID coords */
    double specin[ 2];    /* Spectral values to be transformed */
    double specout[ 2];   /* Transformed spectral values */
+   int *idin = NULL;     /* Workspace for detector identifiers */
+   int *outposID = NULL; /* Array of receptor identifiers */
+   int *pid = NULL;      /* Pointer to next identifier value */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ifile;            /* Index of current input file */
    int ipos;             /* Position index */
@@ -195,6 +200,7 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
    int outcat;           /* Produce an output catalogue holding sample positions? */
    int pixax[ 3 ];       /* The output fed by each selected mapping input */
    int specax;           /* Index of spectral axis in input FrameSet */
+   int useIDs;           /* Are the detector IDs in outposID usable? */
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
@@ -218,6 +224,7 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
       outcat = 1;
    }
    outpos = NULL;
+   outposID = NULL;
    noutpos = 0;
 
 /* Initialise the bounds of the output cube in floating point PIXEL coords. */
@@ -436,15 +443,37 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
       xout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
       yout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
 
+
       if( outcat ) {
+         idin = astMalloc( (data->dims)[ 1 ] * sizeof( int ) );
          xout2 = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
          yout2 = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
+         useIDs = 1;
+         name = hdr->detname;
+      } else {
+         useIDs = 0;
       }
 
-/* Store the input GRID coords of the detectors. */
+/* Store the input GRID coords of the detectors, and the detector numbers. 
+   The detector names are assumed to be a decimal integer index, possibly 
+   preceeded by a non-numeric prefix. */
       for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
          xin[ irec ] = irec + 1.0;
          yin[ irec ] = 1.0;
+
+         if( useIDs ) {
+            idin[ irec ] = -1;
+            while( *name ) {
+               if( isdigit( *name ) ) {
+                  idin[ irec ] = atoi( name );
+                  break;
+               } else {
+                  name++;
+               }
+            }
+            name += strlen( name ) + 1;
+            if( idin[ irec ] < 0 ) useIDs = 0;
+         }
       }
 
 /* If required, extend the memory use to hold the list of receptor positions 
@@ -452,6 +481,8 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
       if( outcat ) {
          outpos = astGrow( outpos, noutpos + 2*(data->dims)[ 2 ]*(data->dims)[ 1 ],
                            sizeof( double ) );
+         outposID = astGrow( outposID, noutpos + (data->dims)[ 2 ]*(data->dims)[ 1 ],
+                           sizeof( int ) );
       }                           
 
 /* We now need to determine the spatial extent of the input file, and
@@ -698,11 +729,16 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
    the output sky frame and copy to the array destined for the output 
    catalogue. */
          if( outcat ) {
+
+            name = hdr->detname;
+
             astTran2( swcsout, (data->dims)[ 1 ], xout, yout, 0, xout2, yout2 );
             p = outpos + 2*noutpos;
+            pid = outposID + noutpos;
             for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
                *(p++) = xout2[ irec ];
                *(p++) = yout2[ irec ];
+               *(pid++) = idin[ irec ];
             }
             noutpos += (data->dims)[ 1 ];
          }
@@ -830,7 +866,7 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
       px = outpos2;
       py = outpos2 + noutpos;
       p = outpos;
-      for( ipos = 0;ipos < noutpos; ipos++ ) {
+      for( ipos = 0; ipos < noutpos; ipos++ ) {
          *(px++) = *(p++);
          *(py++) = *(p++);
       } 
@@ -838,9 +874,10 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
 /* Create the catalogue. */
       kpg1Wrlst( "OUTCAT", noutpos, noutpos, 2, outpos2, AST__CURRENT, 
                  astFrameSet( astGetFrame( swcsout, AST__BASE ), "" ),
-                 "Detector positions", 1, NULL, 1, status );
+                 "Detector positions", useIDs?0:1, outposID, 1, status );
 
 /* Free resources. */
+      outposID = astFree( outposID );
       outpos = astFree( outpos );
       outpos2 = astFree( outpos2 );
       xout2 = astFree( xout2 );

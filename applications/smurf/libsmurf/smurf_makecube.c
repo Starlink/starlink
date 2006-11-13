@@ -63,9 +63,13 @@
 *          Output file
 *     OUTCAT = FILENAME (Write)
 *          An output catalogue in which to store all the detector positions 
-*          used to make the output cube. These are in the same sky coordinate
-*          system as the current Frame in the output NDF. If a null value (!) 
-*          is supplied, no output catalogue is produced. See also parameter 
+*          used to make the output cube. By default, these are in the same 
+*          sky coordinate system as the current Frame in the output NDF
+*          (but see parameter CATFRAME). The integer identifier
+*          associated with each row in the catalogue is the trailing
+*          integer value in the detector name (e.g. all samples from detector 
+*          "H14" are given the identifier "14"). If a null value (!) is 
+*          supplied, no output catalogue is produced. See also parameter 
 *          CATFRAME. [!]
 *     PIXSIZE( 2 ) = REAL (Read)
 *          Pixel dimensions in the output image, in arcsec. If only one value 
