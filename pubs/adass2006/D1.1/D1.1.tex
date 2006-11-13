@@ -187,15 +187,15 @@
 % and the start of your text.
 
 \begin{abstract}          % Leave intact
-The \htmladdnormallinkfoot{GAIA}{http://www.starlink.ac.uk/gaia} 
-application has been a popular choice for examining and analysing
-astronomical images for several years. As data volumes have increased and
-spectral and time data cubes have become more prevalent there has been a
-strong demand for cube visualization. This paper will briefly describe the
-major enhancements that have been made to GAIA to support data cubes including
-real-time spectral extraction (single spectrum or area), calculation of
-moments, creation of channel maps and movie displays. It will also say how the
-PLASTIC protocol has been used to inter-operate with VO-enabled applications.
+The \htmladdnormallinkfoot{GAIA}{http://www.starlink.ac.uk/gaia} application
+is a popular choice for examining and analysing astronomical images. As data
+volumes have increased and spectral and time data cubes have become more
+prevalent there has been a strong demand for cube visualization. This paper
+will briefly describe the major enhancements that have been made to GAIA to
+support data cubes including real-time spectral extraction (single spectrum or
+area), calculation of moments, creation of channel maps and movie displays. It
+will also say how the PLASTIC protocol has been used to inter-operate with
+Virtual Observatory (VO) enabled applications.
 \end{abstract}
 
 %-----------------------------------------------------------------------
@@ -209,11 +209,11 @@ PLASTIC protocol has been used to inter-operate with VO-enabled applications.
 
 \section{Introduction}
 
-The \htmladdnormallink{JAC}{http://www.jach.hawaii.edu}, has started
+The \htmladdnormallink{JAC}{http://www.jach.hawaii.edu} has started
 producing data cubes using the HARP focal plane array receiver and its digital
 autocorrelation spectrometer ACSIS. These instruments will be used by
 astronomers of various levels of experience, so require a straight-forward
-data visualisation system, but which is also astronomically focused, that is
+data visualisation system, but which is also astronomically focused, that is,
 has full support for celestial and spectral coordinates, and can read
 astronomy data formats (FITS and NDF). A review of what software is currently
 available was undertaken by Leech and Jenness (2004), and with those
@@ -221,7 +221,6 @@ conclusions in mind work has been undertaken to enhance the
 \htmladdnormallink{GAIA}{http://www.starlink.ac.uk/gaia} 
 image display tool to work with data cubes from many different sources and
 extreme sizes (4Gb+).
-% (4Gb+ on 64bit systems).
 
 Inter-operating with other environments, like the VO, and co-operating with
 specialised tools is clearly desirable, so we have extended 
@@ -275,7 +274,7 @@ allows you to switch between a preset list of common coordinate systems. So
 you can see spectra in wavelength, frequency and, if a rest-frequency is
 defined, velocity. Most of the spectral systems defined in FITS paper III are
 supported (using the
-\htmladdnormallink{AST}{http://www.starlink.ac.uk/ast} library).
+AST library, see: \htmladdURL{http://www.starlink.ac.uk/ast}).
 
 \section{Other Operations}
 
@@ -290,9 +289,8 @@ object detection, contouring, grid overlays etc.
 
 \htmladdnormallink{GAIA}{http://www.starlink.ac.uk/gaia}
 does not offer any spectral analysis features, concentrating mainly on
-visualisation, so you can `send' the extracted spectrum to the
-\htmladdnormallinkfoot{SPLAT-VO}{http://www.starlink.ac.uk/splat}
-tool, or any other
+visualisation, so you can `send' the extracted spectrum to the SPLAT-VO tool
+(see: \htmladdURL{http://www.starlink.ac.uk/splat}), or any other
 \htmladdnormallink{PLASTIC}{http://plastic.sourceforge.net}
 enabled spectral tool, as they become available. You can also save spectra to
 several formats (FITS, NDF \& text) for more traditional processing.
@@ -383,17 +381,12 @@ tool, developed at
 \reference Berry, D. S., Reinhold, K., Jenness, T., Economou, F. 
            \ 2006, \adassxvi, \paperref{P2.12}
 
-%\reference Draper, P. W., Taylor, M. B.\  2006, SPLAT-VO, 
-%           A Spectral Analysis Tool, Starlink User Note 214
-
 \reference Leech, J., \& Jenness, T. \ 2004 \adassxiv
 
 \reference Taylor, J., Boch, T., Comparato, M., Taylor, M., 
            Winstanely, N., Mann, R. \ 2006 \adassxvi, \paperref{O7.4}
 
 \reference Taylor, M. B.\ 2005, \adassxiv
-
-%\reference Warren-Smith, R. F. \& Berry D. B. \ 2004 \adassxvi
 
 \end{references}
 
