@@ -86,6 +86,8 @@
 *        than the FITS header.
 *     1-NOV-2006 (DSB):
 *        Use new smf_makefitschan interface.
+*     14-NOV-2006 (DSB):
+*        Exclude bad data values from the bounding box. 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -185,14 +187,17 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
    double shift[ 3 ];    /* Shifts from PIXEL to GRID coords */
    double specin[ 2];    /* Spectral values to be transformed */
    double specout[ 2];   /* Transformed spectral values */
+   float *pdata;         /* Pointer to next data sample */
    int *idin = NULL;     /* Workspace for detector identifiers */
    int *outposID = NULL; /* Array of receptor identifiers */
    int *pid = NULL;      /* Pointer to next identifier value */
+   int good;             /* Are there any good detector samples? */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ifile;            /* Index of current input file */
    int ipos;             /* Position index */
    int irec;             /* Index of current input detector */
    int ishift;           /* Shift to put pixel origin at centre */
+   int ispec;            /* Index of current spectral sample */
    int itime;            /* Index of current time slice */
    int iwcsfrm;          /* Index of original output WCS Frame */
    int noutpos;          /* Number of positions to store in output catalogue */
@@ -485,6 +490,9 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
                            sizeof( int ) );
       }                           
 
+/* Store a pointer to the next input data value */
+      pdata = ( data->pntr )[ 0 ];
+
 /* We now need to determine the spatial extent of the input file, and
    then modify the spatial bounds of the output cube to accomodate it. 
    This involves finding the spatial extent of each time slice in the 
@@ -717,11 +725,31 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
    accomodate the new positions. */
          astTran2( fs, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
          for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
+
+/* If the detector has a valid position, see if it produced any good
+   data values. */
             if( xout[ irec ] != AST__BAD && yout[ irec ] != AST__BAD ) {
-               if( xout[ irec ] > dubnd[ 0 ] ) dubnd[ 0 ] = xout[ irec ];
-               if( xout[ irec ] < dlbnd[ 0 ] ) dlbnd[ 0 ] = xout[ irec ];
-               if( yout[ irec ] > dubnd[ 1 ] ) dubnd[ 1 ] = yout[ irec ];
-               if( yout[ irec ] < dlbnd[ 1 ] ) dlbnd[ 1 ] = yout[ irec ];
+               good = 0;
+               for( ispec = 0; ispec < (data->dims)[ 0 ]; ispec++ ){
+                  if( *(pdata++) != VAL__BADR ) {
+                     good = 1;
+                     pdata += (data->dims)[ 0 ] - ispec - 1;
+                     break;
+                  }
+               }         
+
+/* If it did, extend the boundsing box to include the detector. */
+               if( good ) {
+                  if( xout[ irec ] > dubnd[ 0 ] ) dubnd[ 0 ] = xout[ irec ];
+                  if( xout[ irec ] < dlbnd[ 0 ] ) dlbnd[ 0 ] = xout[ irec ];
+                  if( yout[ irec ] > dubnd[ 1 ] ) dubnd[ 1 ] = yout[ irec ];
+                  if( yout[ irec ] < dlbnd[ 1 ] ) dlbnd[ 1 ] = yout[ irec ];
+               }
+
+/* If this detector does not have a valid position, increment the data
+   pointer to point at the first sameple for the next detector. */
+            } else {
+               pdata += (data->dims)[ 0 ];
             }
          }
 
