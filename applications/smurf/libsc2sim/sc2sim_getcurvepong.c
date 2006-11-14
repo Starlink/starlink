@@ -77,6 +77,8 @@
 *     2006-10-03 (JB):
 *        Use triangle wave functions to create box scan of required
 *        height, width, and angle.
+*     2006-11-14 (JB):
+*        Round up number of positions to correct for very small scans.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -162,7 +164,7 @@ int *status          /* global status (given and returned) */
 
    /* Determine the number of positions required for the pattern
       and allocate memory */
-   (*pongcount) = period / samptime;
+   (*pongcount) = ceil ( period / samptime );
    *posptr = smf_malloc ( (*pongcount)*2, sizeof(**posptr), 1, status );
 
    /* Calculate the amplitudes of x(t) and y(t) */
