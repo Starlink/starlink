@@ -87,7 +87,8 @@
 *     1-NOV-2006 (DSB):
 *        Use new smf_makefitschan interface.
 *     14-NOV-2006 (DSB):
-*        Exclude bad data values from the bounding box. 
+*        - Exclude bad data values from the bounding box. 
+*        - Use detector index as the identifier in the output catalogue.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -188,7 +189,6 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
    double specin[ 2];    /* Spectral values to be transformed */
    double specout[ 2];   /* Transformed spectral values */
    float *pdata;         /* Pointer to next data sample */
-   int *idin = NULL;     /* Workspace for detector identifiers */
    int *outposID = NULL; /* Array of receptor identifiers */
    int *pid = NULL;      /* Pointer to next identifier value */
    int good;             /* Are there any good detector samples? */
@@ -205,7 +205,6 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
    int outcat;           /* Produce an output catalogue holding sample positions? */
    int pixax[ 3 ];       /* The output fed by each selected mapping input */
    int specax;           /* Index of spectral axis in input FrameSet */
-   int useIDs;           /* Are the detector IDs in outposID usable? */
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
@@ -450,38 +449,18 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
 
 
       if( outcat ) {
-         idin = astMalloc( (data->dims)[ 1 ] * sizeof( int ) );
          xout2 = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
          yout2 = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
-         useIDs = 1;
          name = hdr->detname;
-      } else {
-         useIDs = 0;
       }
 
-/* Store the input GRID coords of the detectors, and the detector numbers. 
-   The detector names are assumed to be a decimal integer index, possibly 
-   preceeded by a non-numeric prefix. */
+/* Store the input GRID coords of the detectors. */
       for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
          xin[ irec ] = irec + 1.0;
          yin[ irec ] = 1.0;
-
-         if( useIDs ) {
-            idin[ irec ] = -1;
-            while( *name ) {
-               if( isdigit( *name ) ) {
-                  idin[ irec ] = atoi( name );
-                  break;
-               } else {
-                  name++;
-               }
-            }
-            name += strlen( name ) + 1;
-            if( idin[ irec ] < 0 ) useIDs = 0;
-         }
       }
 
-/* If required, extend the memory use to hold the list of receptor positions 
+/* If required, extend the memory used to hold the list of receptor positions 
    for the output catalogue. */
       if( outcat ) {
          outpos = astGrow( outpos, noutpos + 2*(data->dims)[ 2 ]*(data->dims)[ 1 ],
@@ -753,21 +732,21 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
             }
          }
 
-/* If required, transform the receptor positions (in output grid coords) into 
-   the output sky frame and copy to the array destined for the output 
+/* If required, transform the receptor positions (in output grid coords) 
+   into the output sky frame and copy to the array destined for the output 
    catalogue. */
          if( outcat ) {
-
             name = hdr->detname;
-
             astTran2( swcsout, (data->dims)[ 1 ], xout, yout, 0, xout2, yout2 );
             p = outpos + 2*noutpos;
+
             pid = outposID + noutpos;
             for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
                *(p++) = xout2[ irec ];
                *(p++) = yout2[ irec ];
-               *(pid++) = idin[ irec ];
+               *(pid++) = irec + 1;
             }
+
             noutpos += (data->dims)[ 1 ];
          }
 
@@ -902,7 +881,7 @@ void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2],
 /* Create the catalogue. */
       kpg1Wrlst( "OUTCAT", noutpos, noutpos, 2, outpos2, AST__CURRENT, 
                  astFrameSet( astGetFrame( swcsout, AST__BASE ), "" ),
-                 "Detector positions", useIDs?0:1, outposID, 1, status );
+                 "Detector positions", 0, outposID, 1, status );
 
 /* Free resources. */
       outposID = astFree( outposID );
