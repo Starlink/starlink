@@ -112,6 +112,8 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *     23-OCT-2006 (DSB):
 *        Fix memory leak caused by addition of SpecOrigin and AlignSpecOffset 
 *        attributes.
+*     15-NOV-2006 (DSB):
+*        Only write out SpecOrigin if it is not bad.
 *class--
 */
 
@@ -6234,7 +6236,9 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ----------- */
    set = TestSpecOrigin( this );
    dval = set ? GetSpecOrigin( this ) : astGetSpecOrigin( this );
-   astWriteDouble( channel, "SpOrg", set, 0, dval, "Spec offset" );
+   if( dval != AST__BAD ) {
+      astWriteDouble( channel, "SpOrg", set, 0, dval, "Spec offset" );
+   }
 
 }
 
