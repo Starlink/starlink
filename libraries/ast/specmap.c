@@ -94,6 +94,9 @@ f     - AST_SPECADD: Add a spectral coordinate conversion to an SpecMap
 *        Override astGetObjSize.
 *     10-MAY-2006 (DSB):
 *        Override astEqual.
+*     15-NOV-2006 (DSB):
+*        Guard against division by zero when converting freq to wave in
+*        SystemChange.
 *class--
 */
 
@@ -3097,7 +3100,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
          pv = values - 1;
          for( i = 0; i < np; i++ ) {
             pv++;
-            if( *pv != AST__BAD ) {
+            if( *pv != AST__BAD && *pv != 0.0 ) {
                *pv = AST__C/( *pv );
                if( astISNAN( *pv ) ) *pv = AST__BAD;
             } else {
