@@ -99,6 +99,10 @@ KPG_R_GEN = kps1_pgft.gr
 
 SUFFIXES = .gen .gdr .gr .gbdirw .gn .f
 
+# Need to make sure that a maintainer clean really removes the
+# output of generic
+MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
+
 #  Run generic to get numeric types.
 .gen.f:
 	$(FGENERIC)  -t n $<

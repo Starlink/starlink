@@ -6,6 +6,10 @@ libccdpack_gen_la_SOURCES = $(GENSRC:.gen=.f) \
                             $(GENLNSRC:.gln=.f) \
                             $(DGENSRC:.dgen=.f)
 
+# Need to make sure that a maintainer clean really removes the
+# output of generic.
+MAINTAINERCLEANFILES = $(libccdpack_gen_la_SOURCES)
+
 #  Define the known suffixes in this subsystem.  Automake will infer
 #  this list from the suffix rules without us having to write it
 #  explicitly, but it gets it in the wrong order, which can cause

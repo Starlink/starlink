@@ -38,6 +38,10 @@ ccg1_iwd1.gdr ccg1_iwd3.gdr ccg1_i2wc.gdr ccg1_wcwi.gdr
 
 SUFFIXES = .gen .gn .gdr .f
 
+# Need to make sure that a maintainer clean really removes the
+# output of generic.
+MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
+
 #  Run generic to get numeric types.
 .gen.f:
 	$(FGENERIC)  -t n $<
