@@ -77,8 +77,8 @@
 *     2006-10-03 (JB):
 *        Use triangle wave functions to create box scan of required
 *        height, width, and angle.
-*     2006-11-14 (JB):
-*        Round up number of positions to correct for very small scans.
+*     2006-11-16 (JB):
+*        Use Straight PONG solution to approximate period.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -121,6 +121,7 @@ double angle,        /* angle of pattern relative to telescope
 double width,        /* minimum width of PONG pattern in arcsec (given) */
 double height,       /* minimum height of PONG pattern in arcsec (given) */
 double spacing,      /* grid spacing in arcsec (given) */
+double accel[2],     /* telescope accelerations (arcsec) (given) */
 double vmax[2],      /* telescope maximum velocities (arcsec/sec) (given) */
 double samptime,     /* sample interval in sec (given) */
 int *pongcount,      /* number of positions in pattern (returned) */
@@ -132,7 +133,13 @@ int *status          /* global status (given and returned) */
    /* Local variables */
    double amp_x;            /* amplitude of x(t) (arcsec) */
    double amp_y;            /* amplitude of y(t) (arcsec) */
+   double cend[2];          /* ending coordinates in arcsec */
+   double cstart[2];        /* starting coordinates in arcsec */
+   int curroff;             /* index of next free slot in position list */
+   double grid[1024][2];    /* array of vertex coordinates */
    int i;                   /* loop counter */
+   int numvertices;         /* number of vertices (including start & end,  
+                               which are the same) */
    double period;           /* total time of scan (seconds) */
    double peri_x;           /* period of x(t) (seconds) */
    double peri_y;           /* period of y(t) (seconds) */
@@ -140,7 +147,6 @@ int *status          /* global status (given and returned) */
    double tx;               /* temporary x value (arcsec) */
    double ty;               /* temporary y value (arcsec) */
    double vert_spacing;     /* spacing along the vertices (arcsec) */
-   double vavg;             /* lower of max velocities (arcsec/sec) */
    int x_numvert;           /* number of vertices along x axis */
    int y_numvert;           /* number of vertices along y axis */
 
@@ -153,18 +159,37 @@ int *status          /* global status (given and returned) */
                         &x_numvert, &y_numvert, status );  
 
    /* KLUDGE : Calculate the approximate periods (assuming a PONG scan with
-      no "rounding" at the corners.  To do this, average the velocities
-      in order to determine the period in each direction, and the 
-      total time required for the scan. */
-   vavg = ( vmax[0] + vmax[1] ) / 2.0;
-   
-   peri_x = x_numvert * vert_spacing * 2.0 / vavg;
-   peri_y = y_numvert * vert_spacing * 2.0 / vavg;
-   period = x_numvert * y_numvert * vert_spacing * 2.0 / vavg;
+      no "rounding" at the corners.  Use the code from the Straight PONG
+      solution to determine the periods */
+
+   sc2sim_getpongends ( width, height, spacing, grid, &numvertices, status );
+
+   /* Rotate the grid coordinates */
+   for ( i=0; i< numvertices; i++ ) {
+      tx = grid[i][0] * cos(angle) - grid[i][1] * sin(angle);
+      ty = grid[i][0] * sin(angle) + grid[i][1] * cos(angle);
+      grid[i][0] = tx;
+      grid[i][1] = ty;
+   }
+
+   (*pongcount) = 0;
+
+   for ( i=0; i<numvertices - 1; i++ ) {
+      cstart[0] = grid[i][0];
+      cstart[1] = grid[i][1];
+      cend[0] = grid[i+1][0];
+      cend[1] = grid[i+1][1];
+      sc2sim_getscansegsize ( samptime, cstart, cend, accel, vmax, &curroff,
+                              status );
+      (*pongcount) += curroff;
+   }
+
+   period = (*pongcount) * samptime;
+   peri_x = period / y_numvert;
+   peri_y = period / x_numvert;
 
    /* Determine the number of positions required for the pattern
       and allocate memory */
-   (*pongcount) = ceil ( period / samptime );
    *posptr = smf_malloc ( (*pongcount)*2, sizeof(**posptr), 1, status );
 
    /* Calculate the amplitudes of x(t) and y(t) */
