@@ -557,6 +557,9 @@ else
   tspsetup () { @staretcdir@/notinst tsp; }
 fi
 
+# 64-bit mode for HDS
+export HDS_64BIT=1
+
 # Done
 
 export STAR_LOGIN=''
