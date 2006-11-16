@@ -32,6 +32,8 @@
 *  History:
 *     06-SEPT-2006 (EC):
 *        Original version.
+*     11-NOV-2006 (EC):
+*        Modified by DB, but small error fixed in case where OBSGEO undefined
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -100,7 +102,12 @@ void smf_telpos_get( const smfHead * hdr, int * status ) {
   smf_fits_getF( hdr, "OBSGEO-Z", &obsgeoz, status );
 
   /* annul error due to OBSGEO keywords not being specified */
-  if( *status == SMF__NOKWRD ) errAnnul( status );
+  if( *status == SMF__NOKWRD ) {
+    obsgeo[0] = AST__BAD;
+    obsgeo[1] = AST__BAD;
+    obsgeo[2] = AST__BAD;
+    errAnnul( status );
+  }
   else {
     obsgeo[0] = obsgeox;
     obsgeo[1] = obsgeoy;
@@ -109,8 +116,6 @@ void smf_telpos_get( const smfHead * hdr, int * status ) {
 
   /* Try getting TELESCOP */
   smf_fits_getS( hdr, "TELESCOP", telescop, SZFITSCARD, status );
-
-
 
   /* annul error due to TELESCOP keyword not being specified */
   if( *status == SMF__NOKWRD ) errAnnul( status );
