@@ -72,6 +72,7 @@
 *     Jen Balfour (UBC)
 *     {enter_new_authors_here}
 
+
 *  History:
 *     2006-07-26 (JB):
 *        Cloned from sc2sim_simulate
@@ -98,6 +99,8 @@
 *        Fill tcs_tai component.
 *     2006-10-16 (JB):
 *        Check for straight or curve PONG
+*     2006-11-16 (JB):
+*        Pass accel to curve PONG
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -301,10 +304,14 @@ void sc2sim_simhits ( struct sc2sim_obs_struct *inx,
 
          msgOut( FUNC_NAME, "Do a CURVE PONG observation", status ); 
 
-         sc2sim_getcurvepong ( inx->pong_angle, inx->pong_width, 
-                               inx->pong_height, 
-                               inx->pong_spacing, vmax, samptime, 
-                               &count, &posptr, status );
+         accel[0] = 0.0;
+	 accel[1] = 0.0;
+
+	 sc2sim_getcurvepong ( inx->pong_angle, inx->pong_width,
+			       inx->pong_height, inx->pong_spacing,
+                               accel, vmax, samptime, &count, 
+                               &posptr, status );
+
       } else {
          *status = SAI__ERROR;
          msgSetc( "PONGTYPE", inx->pong_type );

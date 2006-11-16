@@ -41,6 +41,8 @@
 *        Removed sc2sim_getpong, replaced with sc2sim_getpongvert,
 *        sc2sim_getpongends, sc2sim_getstraightpong, and
 *        sc2sim_getcurvepong
+*     2006-11-16 (JB):
+*        Pass accel to sc2sim_getcurvepong
 
 *     {enter_further_changes_here}
 
@@ -255,6 +257,7 @@ double angle,        /* angle of pattern relative to telescope
 double width,        /* minimum width of PONG pattern in arcsec (given) */
 double height,       /* minimum height of PONG pattern in arcsec (given) */
 double spacing,      /* grid spacing in arcsec (given) */
+double accel[2],     /* telescope accelerations (arcsec) (given) */
 double vmax[2],      /* telescope maximum velocities (arcsec/sec) (given) */
 double samptime,     /* sample interval in sec (given) */
 int *pongcount,      /* number of positions in pattern (returned) */
@@ -329,21 +332,6 @@ double *vert_spacing,  /* spacing of vertices along axes (arcsec) */
 int *x_numvert,        /* number of vertices in x direction */
 int *y_numvert,         /* number of vertices in y direction */
 int *status            /* pointer to global status */
-);
-
-void sc2sim_getstraightpong 
-( 
-double angle,         /* angle of pattern relative to the telescope
-			 axes in radians (given) */
-double width,         /* minimum width of PONG pattern in arcsec (given) */
-double height,        /* minimum height of PONG pattern in arcsec (given) */
-double spacing,       /* grid spacing in arcsec (given) */
-double accel[2],      /* telescope accelerations in arcsec/sec (given) */
-double vmax[2],       /* telescope maximum velocities in arcsec/sec (given) */
-double samptime,      /* sample interval in sec (given) */ 
-int *pongcount,       /* number of positions in pattern (returned) */
-double **posptr,      /* list of positions (returned) */
-int *status           /* pointer to global status (given and returned) */
 );
 
 void sc2sim_getscaling
@@ -422,6 +410,21 @@ double pzero[],          /* Array to hold response curve offsets
 double heater[],         /* Array to hold heater factors of bolometers
                             (returned) */
 int *status              /* global status (given and returned) */
+);
+
+void sc2sim_getstraightpong 
+( 
+double angle,         /* angle of pattern relative to the telescope
+			 axes in radians (given) */
+double width,         /* minimum width of PONG pattern in arcsec (given) */
+double height,        /* minimum height of PONG pattern in arcsec (given) */
+double spacing,       /* grid spacing in arcsec (given) */
+double accel[2],      /* telescope accelerations in arcsec/sec (given) */
+double vmax[2],       /* telescope maximum velocities in arcsec/sec (given) */
+double samptime,      /* sample interval in sec (given) */ 
+int *pongcount,       /* number of positions in pattern (returned) */
+double **posptr,      /* list of positions (returned) */
+int *status           /* pointer to global status (given and returned) */
 );
 
 void sc2sim_getweights

@@ -143,6 +143,8 @@
 *        Check for pong_type        
 *     2006-10-18 (AGG):
 *        Ensure jig_x/y coordinates are in the correct units (radians)
+*     2006-11-16 (JB):
+*        Pass accel to curve PONG
 *
 *     {enter_further_changes_here}
 
@@ -498,10 +500,14 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
          msgOut( FUNC_NAME, "Do a CURVE PONG observation", status ); 
 
-         sc2sim_getcurvepong ( inx->pong_angle, inx->pong_width, 
-                               inx->pong_height, 
-                               inx->pong_spacing, vmax, samptime, 
-                               &count, &posptr, status );
+         accel[0] = 0.0;
+	 accel[1] = 0.0;
+
+	 sc2sim_getcurvepong ( inx->pong_angle, inx->pong_width,
+			       inx->pong_height, inx->pong_spacing,
+                               accel, vmax, samptime, &count, 
+                               &posptr, status );
+
       } else {
          *status = SAI__ERROR;
          msgSetc( "PONGTYPE", inx->pong_type );
