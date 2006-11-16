@@ -129,6 +129,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -152,6 +153,8 @@
 *     12-SEP-2006 (DSB):
 *        If the current Frame is AXIS and the AXIS structures are
 *        non-monotonic, reset the current Frame to PIXEL.
+*     16-NOV-2006 (PWD):
+*        Stop modfication of NDIM given argument in call to NDF_BOUND.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -551,12 +554,12 @@
       DOM = AST_GETC( IWCS, 'Domain', STATUS )
       IF( DOM .EQ. 'AXIS' ) THEN      
 
-         CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
-         DO I = 1, NDIM
+         CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
+         DO I = 1, NDIMS
             AX( I ) = I
          END DO
 
-         CALL KPG1_CHAXD( INDF, NDIM, AX, MONO, SCALE, OFFSET,
+         CALL KPG1_CHAXD( INDF, NDIMS, AX, MONO, SCALE, OFFSET,
      :                    STATUS )
 
          IF( .NOT. MONO ) THEN
