@@ -50,7 +50,7 @@
 *        Split from dsim.c
 *     2006-10-12 (JB):
 *        Correct divide-by-zero error on zero accelerations
-*     2006-11-14 (JB):
+*     2006-11-16 (JB):
 *        Round up size to correct for very small scans
 
 *  Copyright:
@@ -161,7 +161,12 @@ int *status          /* global status (given and returned) */
    if ( raccel == 0 ) {
 
       ttotal = dtotal / rmaxvel;
-      *size = ceil ( ttotal / samptime );
+
+      if ( ttotal < samptime ) {
+        *size = 1;
+      } else {
+        *size = ttotal / samptime;
+      }
 
    } else {
 
