@@ -47,6 +47,8 @@
 *        Use a NULL pointer instead.
 *     8-AUG-2006 (DSB):
 *        Add grpIndex
+*     20-NOV-2006 (DSB):
+*        Add grpSetcs
 
 
 *  Copyright:
@@ -123,6 +125,7 @@ Grp *grpNew( const char *, int * );
 void grpPut1( Grp *, const char *, int, int * );
 void grpValid( Grp *, int *, int * );
 void grpIndex( const char *, const Grp *, int, int *, int * );
+void grpSetcs( Grp *, int, int * );
 
 /* Semi-Public function prototypes: For Fortran interface wrappers only */
 /* -------------------------------------------------------------------- */

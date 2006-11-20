@@ -54,6 +54,8 @@
 *        Add grpCopy.
 *     8-AUG-2006 (DSB):
 *        Add grpIndex
+*     20-NOV-2006 (DSB):
+*        Add grpSetcs
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -565,3 +567,28 @@ Grp * grpCopy( const Grp* grp1, int indxlo, int indxhi, int reject,
   ret = grpF2C( IGRP2, status );
   return ret;
 }
+
+
+F77_SUBROUTINE(grp_setcs)( INTEGER(IGRP), LOGICAL(SENSIT), INTEGER(STATUS) );
+
+void grpSetcs( Grp *grp, int sensit, int *status ){
+   DECLARE_INTEGER(IGRP);
+   DECLARE_LOGICAL(SENSIT);
+   DECLARE_INTEGER(STATUS);
+
+   IGRP = grpC2F( grp, status );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+   F77_EXPORT_LOGICAL( sensit, SENSIT );
+
+   F77_CALL(grp_setcs)( INTEGER_ARG(&IGRP),
+                        LOGICAL_ARG(&SENSIT),
+                        INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
+
+
