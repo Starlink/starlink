@@ -127,6 +127,8 @@
 *        Add smf_geod.
 *     2006-11-3 (DSB):
 *        Add smf_instap_get.
+*     2006-11-20 (DSB):
+*        Add smf_cubegrid and change smf_cubebounds.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -444,9 +446,9 @@ void smf_telpos_get( const smfHead * hdr, int * status );
 
 void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
 
-void smf_cubebounds( Grp *igrp,  int size, char *system, double crval[2], 
-                     double cdelt[2], double crota2, int userecpos, 
-                     int *moving, int lbnd[ 3 ], int ubnd[ 3 ], 
+void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
+                     int autogrid, int usedetpos, double par[ 7 ], 
+                     int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
                      AstFrameSet **wcsout, int *status );
 
 void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
@@ -454,6 +456,10 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
                     int moving,
                     int lbnd_out[ 3 ], int ubnd_out[ 3 ], float *data_array, 
                     float *var_array, double *wgt_array, int *status );
+
+void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
+                   int autogrid, double par[ 7 ], int *moving, 
+                   AstSkyFrame **skyframe, int *status );
 
 const char *smf_convert_system( const char *label, int *status );
 

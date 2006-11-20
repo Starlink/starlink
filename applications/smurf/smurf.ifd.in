@@ -122,6 +122,8 @@
 #     01-NOV-2006 (TIMJ):
 #         Add SMURFHELP
 #         Add help location
+#     20-NOV-2006 (DSB):
+#         Added AUTOGRID parameter for MAKECUBE
 #     {enter_changes_here}
 
 #  Bugs:
@@ -687,6 +689,14 @@ package @PACKAGE@ {
 
          helplib {$SMURF_HELP}
 
+ 	  parameter autogrid {
+	    type _LOGICAL
+	    vpath DEFAULT
+	    ppath CURRENT
+	    prompt {Determine projection parameters automatically?}
+	    default FALSE
+	    helpkey *
+	  }
          parameter catframe {
             type LITERAL
             ppath DEFAULT
@@ -706,9 +716,9 @@ package @PACKAGE@ {
 	 parameter crota {
 	    type _REAL
 	    prompt {Position angle of second pixel axis in output (degs)}
-	    ppath DEFAULT
+	    ppath CURRENT DEFAULT
 	    vpath DEFAULT
-	    default 0.0
+	    default !
 	    helpkey *
 	  }
 
@@ -758,8 +768,9 @@ package @PACKAGE@ {
 	    position 3
 	    type _REAL
 	    prompt {Output pixel size(s) for spatial part of map (arcsec)}
-	    ppath CURRENT
-	    default 3.0
+	    vpath DEFAULT
+	    ppath CURRENT DEFAULT
+	    default !
 	    helpkey *
 	  }
 

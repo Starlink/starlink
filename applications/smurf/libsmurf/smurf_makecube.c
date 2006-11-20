@@ -25,8 +25,26 @@
 *     spanned by (celestial longitude, celestial latitude, frequency) axes.
 *     Nearest neighbour rebinning is used (that is, each input data sample 
 *     is placed into the nearest output pixel). 
+*
+*     The parameters of the projection from sky to pixel grid coordinates
+*     can be specified using parameters CROTA, PIXSIZE, REFLAT, REFLON.
+*     Alternatively, parameter AUTOGRID can be set true, in which case 
+*     projection parameters are determined automatically in a manner that
+*     favours projections that place samples centrally within pixels.
 
 *  ADAM Parameters:
+*     AUTOGRID = _LOGICAL (Read)
+*          Determines how values should be determined for any projection
+*          parameters that are not supplied via parameters CROTA, PIXSIZE,
+*          REFLAT and REFLON. If TRUE, then projection parameters are 
+*          determined by adjusting the grid until as many data samples as 
+*          possible fall close to the centre of pixels in the output cube. 
+*          If FALSE, REFLON/REFLAT are set to the first pointing BASE 
+*          position, CROTA is set to zero, and PIXSIZE is are set to 6 
+*          arc-seconds. In addition, if AUTOGRID is TRUE the precise
+*          placement of the tangent point is adjusted by up to 1 pixel 
+*          along each spatial pixel axis in order to optimise the grid. 
+*          [FALSE]
 *     CATFRAME = LITERAL (Read)
 *          A string determining the co-ordinate Frame in which positions are 
 *          to be stored in the output catalogue associated with parameter
@@ -52,7 +70,9 @@
 *          1984.0 and as a Julian epoch otherwise. 
 *     CROTA = REAL (Read)
 *          The angle, in degrees, from north through east to the second
-*          pixel axis in the output cube. [0.0]
+*          pixel axis in the output cube. If a null (!) value is
+*          supplied, then a default value determined by the AUTOGRID 
+*          parameter is used. [!]
 *     DETECTORS = LITERAL (Read)
 *          A group of detector names. Only data form the named detectors
 *          will be included in the output cube. If a null (!) value is 
@@ -73,19 +93,21 @@
 *          CATFRAME. [!]
 *     PIXSIZE( 2 ) = REAL (Read)
 *          Pixel dimensions in the output image, in arcsec. If only one value 
-*          is supplied, the same value will be used for both axes.
+*          is supplied, the same value will be used for both axes. If a null 
+*          (!) value is supplied, then a default value determined by the 
+*          AUTOGRID parameter is used. [!]
 *     REFLAT = LITERAL (Read)
 *          The formatted celestial latitude value at the tangent point of 
 *          the spatial projection in the output cube. This should be provided 
-*          in the system specified by parameter SYSTEM. If a null (!) value is
-*          supplied for REFLAT or REFLON, then the first point BASE position 
-*          will be used as the tangent point. [!]
+*          in the system specified by parameter SYSTEM. If a null (!) value 
+*          is supplied, then a default value determined by the AUTOGRID 
+*          parameter is used. [!]
 *     REFLON = LITERAL (Read)
 *          The formatted celestial longitude value at the tangent point of 
 *          the spatial projection in the output cube. This should be provided 
-*          in the system specified by parameter SYSTEM. If a null (!) value is
-*          supplied for REFLAT or REFLON, then the first point BASE position 
-*          will be used as the tangent point. [!]
+*          in the system specified by parameter SYSTEM. If a null (!) value 
+*          is supplied, then a default value determined by the AUTOGRID 
+*          parameter is used. [!]
 *     SYSTEM = LITERAL (Read)
 *          The celestial coordinate system for the output cube. One of
 *          ICRS, FK5, AZEL, GALACTIC or TRACKING.
@@ -110,6 +132,8 @@
 *        Added parameter DETECTORS.
 *     10-NOV-2006 (DSB):
 *        Added HISTORY component to output NDF.
+*     14-NOV-2006 (DSB):
+*        Added AUTOGRID parameter.
 *     20-NOV-2006 (DSB):
 *        Make the DETECTORS parameter case insensitive.
 *     {enter_further_changes_here}
@@ -143,6 +167,7 @@
 *     - Add extra options to the SYSTEM parameter (e.g. GAPPT).
 *     - Add support to use astRebin (with warnings about slow speed)
 *     - Add auto-grid determinatiom option
+*     - Add history to output NDF
 
 */
 
@@ -180,7 +205,7 @@
 void smurf_makecube( int *status ) {
 
 /* Local Variables */
-   AstFrame *oskyfrm = NULL;   /* SkyFrame from the output WCS Frameset */
+   AstSkyFrame *oskyfrm = NULL;/* SkyFrame from the output WCS Frameset */
    AstFrame *ospecfrm = NULL;  /* SpecFrame from the output WCS Frameset */
    AstFrame *tfrm = NULL;      /* Current Frame from output WCS */
    AstFrameSet *swcsout = NULL;/* Spatial WCS FrameSet for output cube */
@@ -197,10 +222,9 @@ void smurf_makecube( int *status ) {
    char system[ 10 ];         /* Celestial coord system for output cube */
    char reflat[ 41 ];         /* Reference latitude string */
    char reflon[ 41 ];         /* Reference longitude string */
-   double cdelt[ 2 ];         /* Pixel sizes in output projection */
-   double crota;              /* Position angle of output Y axis */
-   double crval[ 2 ];         /* Reference point for output projection */
+   double par[ 7 ];           /* Projection parameter */
    int axes[ 2 ];             /* Indices of selected axes */
+   int autogrid;              /* Determine projection parameters automatically? */
    int flag;                  /* Is group expression to be continued? */
    int ifile;                 /* Input file index */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for output map */
@@ -232,57 +256,9 @@ void smurf_makecube( int *status ) {
 /* Get a group of input files */ 
    ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
 
-/* Get the user defined spatial pixel size (the calibration for the spectral 
-   axis is fixed by the first input data file - see smf_cubebounds.c). */
-   parGet1d( "PIXSIZE", 2, cdelt, &nval, status );
-
-/* Duplicate the first value if only one value was supplied. */
-   if( nval < 2 ) cdelt[ 1 ] = cdelt[ 0 ];
-
-/* Check the values are OK. */
-   if( *status == SAI__OK && ( cdelt[ 0 ] <= 0 || cdelt[ 1 ] <= 0 ) ) {
-       msgSetd( "P1", cdelt[ 0 ] );
-       msgSetd( "P2", cdelt[ 1 ] );
-       *status = SAI__ERROR;
-       errRep( FUNC_NAME, "Invalid pixel sizes (^P1,^P2).", status);
-   }
-
 /* Get the celestial coordinate system for the output cube. */
    parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC",
               1, system, 10, status );
-
-/* Get the reference position strings. Use a temprary SkyFrame to
-   unformat them. */
-   if( *status == SAI__OK ) {
-      parGet0c( "REFLON", reflon, 40, status );
-      parGet0c( "REFLAT", reflat, 40, status );
-
-      if( *status == PAR__NULL ) {
-         errAnnul( status );
-         crval[ 0 ] = VAL__BADD;
-         crval[ 1 ] = VAL__BADD;
-
-      } else {
-         if( !strcmp( system, "TRACKING" ) ){
-            tsky = astSkyFrame( "System=UNKNOWN" );
-         } else {
-            tsky = astSkyFrame( "System=%s", system );
-         } 
-      
-         if( astUnformat( tsky, 1, reflon, crval ) == 0 && *status == SAI__OK ) {
-            msgSetc( "REFLON", reflon );
-            errRep( "", "Bad value supplied for REFLON: '^REFLON'", status );
-         }
-      
-         if( astUnformat( tsky, 2, reflat, crval + 1 ) == 0 && *status == SAI__OK ) {
-            msgSetc( "REFLAT", reflat );
-            errRep( "", "Bad value supplied for REFLAT: '^REFLAT'", status );
-         }  
-      }
-   }
-
-/* Get the position angle of the output Y axis, in degrees. */
-   parGet0d( "CROTA", &crota, status );
 
 /* See of the detector positions are to be read from the RECEPPOS array. 
    Otherwise, they are calculated on the basis of the FPLANEX/Y arrays. */
@@ -300,10 +276,94 @@ void smurf_makecube( int *status ) {
       }
    }
   
+/* Indicate we have no projection parameters as yet. */
+   par[ 0 ] = AST__BAD;
+   par[ 1 ] = AST__BAD;
+   par[ 2 ] = AST__BAD;
+   par[ 3 ] = AST__BAD;
+   par[ 4 ] = AST__BAD;
+   par[ 5 ] = AST__BAD;
+   par[ 6 ] = AST__BAD;
+
+/* Get the reference position strings. Use a temprary SkyFrame to
+   unformat them into radians. */
+   if( *status == SAI__OK ) {
+      parGet0c( "REFLON", reflon, 40, status );
+      parGet0c( "REFLAT", reflat, 40, status );
+
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+
+      } else {
+         if( !strcmp( system, "TRACKING" ) ){
+            tsky = astSkyFrame( "System=UNKNOWN" );
+         } else {
+            tsky = astSkyFrame( "System=%s", system );
+         } 
+      
+         if( astUnformat( tsky, 1, reflon, par + 2 ) == 0 && *status == SAI__OK ) {
+            msgSetc( "REFLON", reflon );
+            errRep( "", "Bad value supplied for REFLON: '^REFLON'", status );
+         }
+      
+         if( astUnformat( tsky, 2, reflat, par + 3 ) == 0 && *status == SAI__OK ) {
+            msgSetc( "REFLAT", reflat );
+            errRep( "", "Bad value supplied for REFLAT: '^REFLAT'", status );
+         }  
+      }
+   }
+   
+/* Get the user defined spatial pixel size in arcsec (the calibration for 
+   the spectral axis is fixed by the first input data file - see 
+   smf_cubebounds.c). Annul the error if a null value is supplied. */
+   parGet1d( "PIXSIZE", 2, par + 4, &nval, status );
+   if( *status == PAR__NULL ) {
+      errAnnul( status );
+      par[ 4 ] = AST__BAD;
+      par[ 5 ] = AST__BAD;
+
+/* Otherwise, duplicate the first value if only one value was supplied. */
+   } else {
+      if( nval < 2 ) par[ 5 ] = par[ 4 ];
+   
+/* Check the values are OK. */
+      if( par[ 4 ] <= 0 || par[ 5 ] <= 0 ) {
+         msgSetd( "P1", par[ 4 ] );
+         msgSetd( "P2", par[ 5 ] );
+         *status = SAI__ERROR;
+         errRep( FUNC_NAME, "Invalid pixel sizes (^P1,^P2).", status);
+      }
+
+/* Convert to rads. */
+      par[ 4 ] *= AST__DD2R/3600.0;
+      par[ 5 ] *= AST__DD2R/3600.0;
+
+   }
+   
+/* Get the position angle of the output Y axis, in degrees. Convert to
+   rads. Annul the error if a null value is supplied. */
+   parGet0d( "CROTA", par + 6, status );
+   if( *status == PAR__NULL ) {
+      errAnnul( status );
+      par[ 6 ] = AST__BAD;
+   } else {
+      par[ 6 ] *= AST__DD2R;
+   }
+
+/* See if any unspecified projection parameters are to be determined using
+   an optimal fitting process. */
+   parGet0l( "AUTOGRID", &autogrid, status );
+
+/* Calculate the grid parameters. */
+   smf_cubegrid( igrp,  size, system, usedetpos, autogrid, par, &moving, 
+                 &oskyfrm, status );
+
 /* Validate the input files, create the WCS FrameSet to store in the
-   output cube, and get the pixel index bounds of the output cube. */
-   smf_cubebounds( igrp, size, system, crval, cdelt, crota, usedetpos,
-                   &moving, lbnd_out, ubnd_out, &wcsout, status );
+   output cube, and get the pixel index bounds of the output cube. If
+   projection parameters are being determined automatically, the relevant
+   variables are returned holding the optimal projection parameter values. */
+   smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos, par, moving, 
+                   lbnd_out, ubnd_out, &wcsout, status );
 
 /* Get the base->current Mapping from the output WCS FrameSet, and split it 
    into two Mappings; one (oskymap) that maps the first 2 GRID axes into 
