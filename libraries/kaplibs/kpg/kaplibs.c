@@ -854,3 +854,83 @@ void kpg1Mxmnd( int bad, int el, double *array, int *ninval, double *maxmum,
 }
 
 
+
+
+
+
+F77_SUBROUTINE(kpg1_medud)( LOGICAL(BAD),  
+                            INTEGER(EL), 
+                            DOUBLE_ARRAY(ARRAY),
+                            DOUBLE(MEDIAN), 
+                            INTEGER(NELUSE),
+                            INTEGER(STATUS) );
+
+void kpg1Medud( int bad, int el, double *array, double *median, 
+                int *neluse, int *status ){
+   DECLARE_LOGICAL(BAD);
+   DECLARE_INTEGER(EL);
+   DECLARE_DOUBLE_ARRAY_DYN(ARRAY);
+   DECLARE_DOUBLE(MEDIAN);
+   DECLARE_INTEGER(NELUSE);
+   DECLARE_INTEGER(STATUS);
+
+   F77_CREATE_DOUBLE_ARRAY( ARRAY, el );
+
+   F77_EXPORT_LOGICAL( bad, BAD );
+   F77_EXPORT_INTEGER( el, EL );
+   F77_ASSOC_DOUBLE_ARRAY( ARRAY, array );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_medud)( LOGICAL_ARG(&BAD), 
+                         INTEGER_ARG(&EL), 
+                         DOUBLE_ARRAY_ARG(ARRAY),
+                         DOUBLE_ARG(&MEDIAN), 
+                         INTEGER_ARG(&NELUSE), 
+                         INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_DOUBLE( MEDIAN, *median );
+   F77_IMPORT_INTEGER( NELUSE, *neluse );
+
+   F77_FREE_REAL( ARRAY );
+}
+
+F77_SUBROUTINE(kpg1_opgrd)( INTEGER(NPOS), 
+                            DOUBLE_ARRAY(POS), 
+                            LOGICAL(WEST), 
+                            DOUBLE_ARRAY(PAR), 
+                            INTEGER(STATUS) );
+
+
+void kpg1Opgrd( int npos, double *pos, int west, double *par, int *status ){
+   DECLARE_INTEGER(NPOS);
+   DECLARE_DOUBLE_ARRAY_DYN(POS);
+   DECLARE_LOGICAL(WEST);
+   DECLARE_DOUBLE_ARRAY_DYN(PAR);
+   DECLARE_INTEGER(STATUS);
+
+   F77_CREATE_DOUBLE_ARRAY( POS, npos );
+   F77_CREATE_DOUBLE_ARRAY( PAR, 7 );
+
+   F77_EXPORT_INTEGER( npos, NPOS );
+   F77_EXPORT_DOUBLE_ARRAY( pos, POS, npos );
+   F77_EXPORT_LOGICAL( west, WEST );
+   F77_ASSOC_DOUBLE_ARRAY( PAR, par );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_opgrd)( INTEGER_ARG(&NPOS), 
+                         DOUBLE_ARRAY_ARG(POS),
+                         LOGICAL_ARG(&WEST), 
+                         DOUBLE_ARRAY_ARG(PAR), 
+                         INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_DOUBLE_ARRAY( PAR, par, 7 );
+
+   F77_FREE_DOUBLE( POS );
+   F77_FREE_DOUBLE( PAR );
+}
+
+
+
+
