@@ -561,12 +561,24 @@
 
 *  Report an error if the zero box size was a consequence of the 
 *  truncation from double to single precision.
-         ELSE IF( BOX( 1 ) .NE. BOX( 3 ) .AND. 
+         ELSE IF( RBOX1 .EQ. RBOX3 .AND.
+     :            BOX( 1 ) .NE. BOX( 3 ) ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETD( 'L', BOX( 1 ) )
+            CALL MSG_SETD( 'H', BOX( 3 ) )
+            CALL ERR_REP( 'KPG1_GDNEW_5', 'The dynamic range spanned '//
+     :                    'by the horizontal axis (^L to ^H) is '//
+     :                    'too small.', STATUS )
+            GO TO 999
+
+         ELSE IF( RBOX2 .EQ. RBOX4 .AND.
      :            BOX( 2 ) .NE. BOX( 4 ) ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'KPG1_GDNEW_5', 'The dynamic range spanned '//
-     :                    'by one or both of the axes of the new '//
-     :                    'DATA picture is too small.', STATUS )
+            CALL MSG_SETD( 'L', BOX( 2 ) )
+            CALL MSG_SETD( 'H', BOX( 4 ) )
+            CALL ERR_REP( 'KPG1_GDNEW_6', 'The dynamic range spanned '//
+     :                    'by the vertical axis (^L to ^H) is '//
+     :                    'too small.', STATUS )
             GO TO 999
 
          ELSE 
