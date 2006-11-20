@@ -81,6 +81,8 @@ f     The MathMap class does not define any new routines beyond those
 *     14-MAR-2006 (DSB):
 *        - Add QIF function.
 *        - Override astEqual method.
+*     20-NOV-2006 (DSB):
+*        Re-implement the Equal method to avoid use of astSimplify.
 *class--
 */
 
@@ -1498,7 +1500,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the second Object.
 
 *  Returned Value:
-*     One if the Frames are equivalent, zero otherwise.
+*     One if the MathMaps are equivalent, zero otherwise.
 
 *  Notes:
 *     - The two MathMaps are considered equivalent if the combination of
@@ -1509,17 +1511,24 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 */
 
 /* Local Variables: */
-   AstCmpMap *cmpmap;         /* Pointer to the compound MathMap */
-   AstMathMap *smap;          /* Pointer to the simplified MathMap */
    AstMathMap *that;          /* Pointer to the second MathMap structure */
    AstMathMap *this;          /* Pointer to the first MathMap structure */
+   double **that_con;         /* Lists of constants from "that" */
+   double **this_con;         /* Lists of constants from "this" */
+   int **that_code;           /* Lists of opcodes from "that" */
+   int **this_code;           /* Lists of opcodes from "this" */
+   int code;                  /* Opcode value */
+   int icode;                 /* Opcode index */
+   int icon;                  /* Constant index */
+   int ifun;                  /* Function index */
+   int ncode;                 /* No. of opcodes for current "this" function */
+   int ncode_that;            /* No. of opcodes for current "that" function */
    int nin;                   /* Number of inputs */
    int nout;                  /* Number of outputs */
+   int pass;                  /* Check fwd or inv */
    int result;                /* Result value to return */
-   int simpfi1;               /* Original value of this->simpfi */
-   int simpfi2;               /* Original value of that->simpfi */
-   int simpif1;               /* Original value of this->simpif */
-   int simpif2;               /* Original value of that->simpif */
+   int that_nfun;             /* Number of functions from "that" */
+   int this_nfun;             /* Number of functions from "this" */
 
 /* Initialise. */
    result = 0;
@@ -1541,36 +1550,99 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
       nout = astGetNout( this );
       if( astGetNout( that ) == nout && astGetNin( that ) == nin ) {
 
-/* Temporarily set the SimpIF and SIMFI attributes to 1 in both MathMaps. */
-         simpif1 = astGetSimpIF( this );
-         simpfi1 = astGetSimpFI( this );
-         simpif2 = astGetSimpIF( that );
-         simpfi2 = astGetSimpFI( that );
-         astSetSimpIF( this, 1 );
-         astSetSimpFI( this, 1 );
-         astSetSimpIF( that, 1 );
-         astSetSimpFI( that, 1 );
+/* Assume equality. */ 
+         result = 1;
 
-/* Temporarily invert the second MathMap and combine then in series. */
-         astInvert( that );
-         cmpmap = astCmpMap( this, that, 1, "" );
-         astInvert( that );
+/* The first pass through this next loop compares forward functions, and
+   the second pass compares inverse functions. */
+         for( pass = 0; pass < 2 && result; pass++ ) {
 
-/* Simplify the CmpMap. */
-         smap = astSimplify( cmpmap );
+/* On the first pass, get pointers to the lists of opcodes and constants for 
+   the effective forward transformations (taking into account the value
+   of the Invert attribute), together with the number of such functions. */
+            if( pass == 0 ) {
+               if( !astGetInvert( this ) ) {
+                  this_code = this->fwdcode;
+                  this_con = this->fwdcon;
+                  this_nfun = this->nfwd;
+               } else {
+                  this_code = this->invcode;
+                  this_con = this->invcon;
+                  this_nfun = this->ninv;
+               } 
 
-/* The two MathMaps are equivalent if the simplified CmpMap is a UnitMap. */
-         result = astIsAUnitMap( smap );
+               if( !astGetInvert( that ) ) {
+                  that_code = that->fwdcode;
+                  that_con = that->fwdcon;
+                  that_nfun = that->nfwd;
+               } else {
+                  that_code = that->invcode;
+                  that_con = that->invcon;
+                  that_nfun = that->ninv;
+               } 
 
-/* Free resources. */
-         smap = astAnnul( smap );
-         cmpmap = astAnnul( cmpmap );
+/* On the second pass, get pointers to the lists of opcodes and constants for 
+   the effective inverse transformations, together with the number of such 
+   functions. */
+            } else {
 
-/* Reinstate the original values of the SimpIF and SIMFI attributes. */
-         astSetSimpIF( this, simpif1 );
-         astSetSimpFI( this, simpfi1 );
-         astSetSimpIF( that, simpif2 );
-         astSetSimpFI( that, simpfi2 );
+               if( astGetInvert( this ) ) {
+                  this_code = this->fwdcode;
+                  this_con = this->fwdcon;
+                  this_nfun = this->nfwd;
+               } else {
+                  this_code = this->invcode;
+                  this_con = this->invcon;
+                  this_nfun = this->ninv;
+               } 
+
+               if( astGetInvert( that ) ) {
+                  that_code = that->fwdcode;
+                  that_con = that->fwdcon;
+                  that_nfun = that->nfwd;
+               } else {
+                  that_code = that->invcode;
+                  that_con = that->invcon;
+                  that_nfun = that->ninv;
+               } 
+            }
+
+/* Check that "this" and "that" have the same number of functions */
+            if( that_nfun != this_nfun ) result = 0;
+
+/* Loop round each function. */
+            for( ifun = 0; ifun < this_nfun && result; ifun++ ) {
+
+/* The first element in the opcode array is the number of subsequent
+   opcodes. Obtain and compare these counts. */
+               ncode = this_code ? this_code[ ifun ][ 0 ] : 0;
+               ncode_that = that_code ? that_code[ ifun ][ 0 ] : 0;
+               if( ncode != ncode_that ) result = 0;
+
+/* Compare the following opcodes. Some opcodes consume constants from the 
+   list of constants associated with the MathMap. Compare the constants
+   for such opcodes. */
+               icon = 0;
+               for( icode = 0; icode < ncode && result; icode++ ){     
+                  code = this_code[ ifun ][ icode ];
+                  if( that_code[ ifun ][ icode ] != code ) {
+                     result = 0;
+
+                  } else if( code == OP_LDCON ||
+                             code == OP_LDVAR ||
+                             code == OP_MAX ||
+                             code == OP_MIN ) {
+
+                     if( this_con[ ifun ][ icon ] != 
+                         that_con[ ifun ][ icon ] ) {
+                        result = 0;
+                     } else {
+                        icon++;
+                     }
+                  }
+               }
+            }
+         }
       }
    }
 
