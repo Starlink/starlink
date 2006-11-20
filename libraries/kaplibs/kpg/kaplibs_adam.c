@@ -234,6 +234,75 @@ void kpg1Wrlst( const char *param, int arrdim, int npos, int nax, double *pos,
    return;
 }
 
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_wrtab)( CHARACTER(PARAM), INTEGER(ARRDIM), INTEGER(NPOS),
+                            INTEGER(NAX), DOUBLE_ARRAY(POS), INTEGER(IFRM),
+                            INTEGER(IWCS), CHARACTER(TITLE), INTEGER(ID0),
+                            INTEGER_ARRAY(IDENTS), INTEGER(LABS), LOGICAL(PNULL),
+                            INTEGER(STATUS) TRAIL(PARAM) TRAIL(TITLE) );
+
+void kpg1Wrtab( const char *param, int arrdim, int npos, int nax, double *pos,
+                int ifrm, AstFrameSet *iwcs, const char *title, int id0,
+                int *idents, Grp *labs, int pnull, int *status ){
+
+   DECLARE_CHARACTER_DYN(PARAM);
+   DECLARE_INTEGER(ARRDIM);
+   DECLARE_INTEGER(NPOS);
+   DECLARE_INTEGER(NAX);
+   DECLARE_DOUBLE_ARRAY_DYN(POS);
+   DECLARE_INTEGER(IFRM);
+   DECLARE_INTEGER(IWCS);
+   DECLARE_CHARACTER_DYN(TITLE);
+   DECLARE_INTEGER(ID0);
+   DECLARE_INTEGER_ARRAY_DYN(IDENTS);
+   DECLARE_INTEGER(LABS);
+   DECLARE_LOGICAL(PNULL);
+   DECLARE_INTEGER(STATUS);
+
+   F77_CREATE_CHARACTER(PARAM,strlen( param ));
+   F77_EXPORT_CHARACTER(param,PARAM,PARAM_length);
+   F77_EXPORT_INTEGER(arrdim,ARRDIM);
+   F77_EXPORT_INTEGER(npos,NPOS);
+   F77_EXPORT_INTEGER(nax,NAX);
+   F77_CREATE_DOUBLE_ARRAY( POS, arrdim*nax );
+   F77_EXPORT_DOUBLE_ARRAY( pos, POS, arrdim*nax );
+   F77_EXPORT_INTEGER(ifrm,IFRM);
+   F77_EXPORT_INTEGER( astP2I( iwcs ), IWCS );
+   F77_CREATE_CHARACTER(TITLE,strlen( title ));
+   F77_EXPORT_CHARACTER(title,TITLE,TITLE_length);
+   F77_EXPORT_INTEGER(id0,ID0);
+   F77_CREATE_INTEGER_ARRAY( IDENTS, npos );
+   F77_EXPORT_INTEGER_ARRAY( idents, IDENTS, npos );
+   F77_EXPORT_INTEGER( grpC2F( labs, status ), LABS );
+   F77_EXPORT_LOGICAL(pnull,PNULL);
+   F77_EXPORT_INTEGER(*status,STATUS);
+
+   F77_CALL(kpg1_wrtab)( CHARACTER_ARG(PARAM),
+                         INTEGER_ARG(&ARRDIM),
+                         INTEGER_ARG(&NPOS),
+                         INTEGER_ARG(&NAX),
+                         DOUBLE_ARRAY_ARG(POS),
+                         INTEGER_ARG(&IFRM),
+                         INTEGER_ARG(&IWCS),
+                         CHARACTER_ARG(TITLE),
+                         INTEGER_ARG(&ID0),
+                         INTEGER_ARRAY_ARG(IDENTS),
+                         INTEGER_ARG(&LABS),
+                         LOGICAL_ARG(&PNULL),
+                         INTEGER_ARG(&STATUS)
+                         TRAIL_ARG(PARAM)
+                         TRAIL_ARG(TITLE) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_FREE_CHARACTER(PARAM);
+   F77_FREE_CHARACTER(TITLE);
+   F77_FREE_DOUBLE(POS);
+   F77_FREE_INTEGER(IDENTS);
+
+   return;
+}
+
 /* ----------------------------------------------- */
 
 F77_SUBROUTINE(kpg1_rgndf)( CHARACTER(PARAM), INTEGER(MAXSIZ), INTEGER(MINSIZ),
