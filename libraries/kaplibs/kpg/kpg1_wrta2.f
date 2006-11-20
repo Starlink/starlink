@@ -1,8 +1,8 @@
-      SUBROUTINE KPG1_WRLS2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS,
-     :                       TITLE, ID0, IDENTS, STATUS )
+      SUBROUTINE KPG1_WRTA2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS,
+     :                       TITLE, ID0, IDENTS, LABS, STATUS )
 *+
 *  Name:
-*     KPG1_WRLS2
+*     KPG1_WRTA2
 
 *  Purpose:
 *     Puts a set of positions into a text file as a CAT catalogue.
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_WRLS2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS, TITLE, 
-*                      ID0, IDENTS, STATUS )
+*     CALL KPG1_WRTA2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS, TITLE, 
+*                      ID0, IDENTS, LABS, STATUS )
 
 *  Description:
 *     This routine writes the supplied positions to a CAT catalogue
@@ -51,6 +51,11 @@
 *     IDENTS( NPOS ) = INTEGER (Given)
 *        The individual integer identifiers to associate with each
 *        position. Only accessed if ID0 is less than or equal to zero.
+*     LABS = INTEGER (Given)
+*        A GRP group identifier containing the labels to be associated
+*        with the positions. The number of elements in this group should
+*        be equal to NPOS. If GRP__NOID is supplied, no label column will
+*        be created.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -83,6 +88,9 @@
 *        Original version.
 *     7-AUG-2003 (DSB):
 *        Normalise axis values before appending to the output catalogue.
+*     20-NOV-2006 (DSB):
+*        Renamed from kpg1_wrls2.f to kpg1_wrta2.f, and added argument
+*        LABS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,6 +105,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CAT_PAR'          ! CAT constants
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Arguments Given:
@@ -109,6 +118,7 @@
       CHARACTER TITLE*(*)
       INTEGER ID0
       INTEGER IDENTS( NPOS )
+      INTEGER LABS
  
 *  Status:
       INTEGER STATUS             ! Global status
@@ -124,18 +134,21 @@
       CHARACTER ATTR*10          ! AST attribute name
       CHARACTER BUFFER*80        ! Text buffer
       CHARACTER LAB*50           ! Axis label
+      CHARACTER LABEL*100        ! Position label
       CHARACTER SYM*20           ! Axis symbol
       CHARACTER UNT*20           ! Axis units
       DOUBLE PRECISION C( MXDIM) ! Buffer for a single position
       INTEGER CI                 ! CAT identifier for catalogue
-      INTEGER COLID( 0:MXDIM )   ! CAT identifiers for columns
+      INTEGER COLID( -1:MXDIM )  ! CAT identifiers for columns
       INTEGER FRM                ! Pointer to Frame
       INTEGER I                  ! Position index
       INTEGER IAT                ! No. of characters in string
       INTEGER J                  ! Axis index
+      INTEGER LABLEN             ! Length of longest label
       INTEGER LWCS               ! Pointer to the FrameSet to be stored
-      INTEGER TI                 ! CAT identifier for TITLE parameter
+      INTEGER NLAB               ! Number of labels supplied
       INTEGER QI                 ! CAT identifier for another parameter
+      INTEGER TI                 ! CAT identifier for TITLE parameter
       LOGICAL COPIED             ! Has a copy of the Frameet been taken?
       LOGICAL ISSKY              ! Is the Base Frame a SkyFrame?
 *.
@@ -233,6 +246,20 @@
          CALL CAT_TATTI( QI, 'CSIZE', 12, STATUS ) 
       END IF
 
+*  Create a column to hold labels, if required.
+      IF( LABS .NE. GRP__NOID ) THEN
+         CALL GRP_GRPSZ( LABS, NLAB, STATUS )
+
+         LABLEN = 0
+         DO I = 1, NLAB
+            CALL GRP_GET( LABS, I, 1, LABEL, STATUS )        
+            LABLEN = MAX( LABLEN, CHR_LEN( LABEL ) )
+         END DO
+
+         CALL CAT_CNEWS( CI, 'LABEL', CAT__TYPEC, LABLEN, ' ', ' ', 
+     :                   'Position label', COLID( -1 ), STATUS )
+      END IF
+
 *  Loop round each supplied position.
       DO I = 1, NPOS
 
@@ -243,6 +270,17 @@
             CALL CAT_PUT0I( COLID( 0 ), ID0 + I - 1, .FALSE., STATUS )
          ELSE
             CALL CAT_PUT0I( COLID( 0 ), IDENTS( I ), .FALSE., STATUS )
+         END IF
+
+*  The label.
+         IF( LABS .NE. GRP__NOID ) THEN
+            IF( I .LE. NLAB ) THEN
+               CALL GRP_GET( LABS, I, 1, LABEL, STATUS )        
+            ELSE
+               LABEL = ' '
+            END IF
+            CALL CAT_PUT0C( COLID( -1 ), LABEL, 
+     :                      ( CHR_LEN( LABEL ) .EQ. 0 ), STATUS )
          END IF
 
 *  Normalise the position.

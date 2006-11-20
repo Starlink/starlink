@@ -298,8 +298,9 @@ kpg1_rgndf.f \
 kpg1_satkc.f \
 kpg1_satkd.f \
 kpg1_wgndf.f \
+kpg1_wrtab.f \
 kpg1_wrlst.f \
-kpg1_wrls2.f
+kpg1_wrta2.f
 
 KPG_ADAM_DR_GEN = kpg1_mixv.gdr kpg1_inco.gdr kpg1_flco.gdr 
 
