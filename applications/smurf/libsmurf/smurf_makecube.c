@@ -110,6 +110,8 @@
 *        Added parameter DETECTORS.
 *     10-NOV-2006 (DSB):
 *        Added HISTORY component to output NDF.
+*     20-NOV-2006 (DSB):
+*        Make the DETECTORS parameter case insensitive.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -141,7 +143,6 @@
 *     - Add extra options to the SYSTEM parameter (e.g. GAPPT).
 *     - Add support to use astRebin (with warnings about slow speed)
 *     - Add auto-grid determinatiom option
-*     - Add history to output NDF
 
 */
 
@@ -288,11 +289,15 @@ void smurf_makecube( int *status ) {
    parGet0l( "USEDETPOS", &usedetpos, status );
 
 /* Get the detectors to use. If a null value is supplied, annul the
-   error. */
+   error. Otherwise, make the group case insensitive. */
    detgrp = NULL;
    if( *status == SAI__OK ) {
       kpg1Gtgrp( "DETECTORS", &detgrp, &ndet, status );
-      if( *status == PAR__NULL ) errAnnul( status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+      } else {
+         grpSetcs( detgrp, 0, status );
+      }
    }
   
 /* Validate the input files, create the WCS FrameSet to store in the
