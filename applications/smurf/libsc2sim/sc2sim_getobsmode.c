@@ -37,6 +37,8 @@
 *        Original
 *     2006-07-20 (JB):
 *        Split from dsim.c
+*     2006-11-21 (JB):
+*        Add liss mode
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -87,6 +89,7 @@ int *status         /* global status (given and returned) */
    else if( strcmp( name, "HEATRUN" ) == 0 ) return heatrun;
    else if( strcmp( name, "BOUS" ) == 0 ) return bous;
    else if( strcmp( name, "SINGLESCAN" ) == 0 ) return singlescan;
+   else if( strcmp( name, "LISS" ) == 0 ) return liss;
    else return none;
 
 }

@@ -43,6 +43,8 @@
 *        sc2sim_getcurvepong
 *     2006-11-16 (JB):
 *        Pass accel to sc2sim_getcurvepong
+*     2006-11-21 (JB):
+*        Added sc2sim_getliss
 
 *     {enter_further_changes_here}
 
@@ -136,15 +138,6 @@ double ybc[],        /* projected Y coords of bolometers (returned) */
 int *status          /* global status (given and returned) */
 );
 
-void sc2sim_bousscan ( struct sc2sim_obs_struct *inx, 
-                       struct sc2sim_sim_struct *sinx, 
-                       double digcurrent, double digmean, 
-                       double digscale, char filter[], 
-                       int maxwrite, obsMode mode, int nbol, int numscans,  
-                       double pathlength, double *pzero, int rseed, 
-		       double samptime, double scanangle, double scanspacing, 
-                       double weights[], double *xbc, double *xbolo, 
-                       double *ybc, double *ybolo,int *status);
 void sc2sim_calctime
 ( 
 double lon,          /* Geodetic W Lon (radians) */
@@ -272,6 +265,21 @@ double corner,       /* corner frequency, where 1/f dispersion=sigma (given)*/
 double samptime,     /* time per data sample (given) */
 double nterms,       /* number of frequencies calculated (given) */
 double *noisecoeffs, /* 1/f spectrum (returned) */
+int *status          /* global status (given and returned) */
+);
+
+void sc2sim_getliss
+(
+double angle,        /* angle of pattern relative to telescope
+                        axes in radians anticlockwise (given) */
+double width,        /* minimum width of Liss pattern in arcsec (given) */
+double height,       /* minimum height of Liss pattern in arcsec (given) */
+double spacing,      /* grid spacing in arcsec (given) */
+double accel[2],     /* telescope accelerations (arcsec) (given) */
+double vmax[2],      /* telescope maximum velocities (arcsec/sec) (given) */
+double samptime,     /* sample interval in sec (given) */
+int *lisscount,      /* number of positions in pattern (returned) */
+double **posptr,     /* list of positions (returned) */
 int *status          /* global status (given and returned) */
 );
 

@@ -145,6 +145,8 @@
 *        Ensure jig_x/y coordinates are in the correct units (radians)
 *     2006-11-16 (JB):
 *        Pass accel to curve PONG
+*     2006-11-21 (JB):
+*        Add liss mode
 *
 *     {enter_further_changes_here}
 
@@ -570,6 +572,22 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       }
       
       break;
+
+  case liss:
+    /* Call sc2sim_getliss to get lissjous pointing solution */
+    msgOut( FUNC_NAME, "Do a LISSAJOUS observation", status ); 
+
+    accel[0] = 0.0;
+    accel[1] = 0.0;
+
+    vmax[0] = inx->liss_vmax;        /*200.0;*/
+    vmax[1] = inx->liss_vmax;        /*200.0;*/
+
+    sc2sim_getliss ( inx->liss_angle, inx->liss_width,
+		     inx->liss_height, inx->liss_spacing,
+                     accel, vmax, samptime, &count, 
+                     &posptr, status ); 
+    break; 
       
     default: /* should never be reached...*/
       msgSetc( "MODE", inx->obsmode );
@@ -675,7 +693,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       /* Telescope latitude */
       phi = telpos[1]*DD2R;
-
       /* calculate the az/el corresponding to the map centre (base) */
       slaDe2h ( lst[frame] - inx->ra, inx->dec, phi, &temp1, &temp2 );
       temp3 = slaPa ( lst[frame] - inx->ra, inx->dec, phi );
