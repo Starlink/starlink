@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_LSHPL( IPLOT, NPOS, NAX, POS, PLOT, GEO, IMARK, 
-     :                       CLOSE, LABEL, IGRP, JUST, IDS, WORK, 
-     :                       STATUS )
+     :                       CLOSE, LABTYP, IGRP, IGRP2, JUST, IDS,
+     :                       WORK, STATUS )
 *+
 *  Name:
 *     KPS1_LSHFM
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL KPS1_LSHPL( IPLOT, NPOS, NAX, POS, PLOT, GEO, IMARK, CLOSE, 
-*                      LABEL, IGRP, JUST, IDS, WORK, STATUS )
+*                      LABTYP, IGRP, IGRP2, JUST, IDS, WORK, STATUS )
 
 *  Description:
 *     This routine plots the supplied positions on the currently
@@ -36,10 +36,12 @@
 *        PGPLOT marker type.
 *     CLOSE = LOGICAL (Given)
 *        Should polygons be closed?
-*     LABEL = LOGICAL (Given)
-*        Should positions be labelled?
+*     LABTYP = CHARACTER * ( * ) (Given)
+*        Type of labels to be produced: 'ID', 'LABEL' or 'NONE'
 *     IGRP = INTEGER (Given)
 *        A GRP group holding the strings to use if PLOT=TEXT.
+*     IGRP2 = INTEGER (Given)
+*        A GRP group holding the strings to use if LABTYP=LABEL.
 *     JUST = CHARACTER * ( * ) (Given)
 *        A string specifying the justification to be used when displaying 
 *        the text supplied in IGRP (ignored if PLOT is not "Text"). This
@@ -49,7 +51,7 @@
 *        displayed so that the position supplied in POS is at the
 *        specified point within the displayed text string.
 *     IDS( NPOS ) = INTEGER (Given)
-*        Array of position identifiers.
+*        Array of position identifiers. Only used if LABTYP is 'ID'.
 *     WORK( NPOS, 2 ) = DOUBLE PRECISION (Given and Returned)
 *        Work space.
 *     STATUS = INTEGER (Given and Returned)
@@ -87,6 +89,8 @@
 *        Allow up to 50 axes (this allows tables such as those produced by 
 *        CUPID:CLUMPS which have more than NDF__MXDIM columns to be
 *        displayed).
+*     21-NOV-2006 (DSB):
+*        Added LABTYP and IGRP2 arguments.
 *     {enter_further_changes_here}
 
 *-
@@ -109,8 +113,9 @@
       LOGICAL GEO
       INTEGER IMARK
       LOGICAL CLOSE
-      LOGICAL LABEL
+      CHARACTER LABTYP*(*)
       INTEGER IGRP
+      INTEGER IGRP2
       CHARACTER JUST*(*)
       INTEGER IDS( NPOS )
 
@@ -120,13 +125,15 @@
 *  Status:
       INTEGER STATUS               ! Global status
 
+*  External References:
+      INTEGER CHR_LEN
+
 *  Local Constants:
       INTEGER MXDIM
       PARAMETER (MXDIM = 50)
 
 *  Local Variables:
-      CHARACTER ID*6               ! Formatted identifier
-      CHARACTER TEXT*80            ! Marker text
+      CHARACTER TEXT*(GRP__SZNAM)  ! Marker or label text
       DOUBLE PRECISION DX          ! X position offset to label centre
       DOUBLE PRECISION DY          ! Y position offset to label centre
       DOUBLE PRECISION LPOS( MXDIM )! Local copy of a position
@@ -165,46 +172,8 @@
 *  Save the index of the new Current Frame.
       ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
 
-*  Get the number of strings supplied in IGRP group.
-      IF( IGRP .NE. GRP__NOID ) THEN
-         CALL GRP_GRPSZ( IGRP, NSTR, STATUS )
-      ELSE
-         NSTR = 0
-      END IF
-
-*  Loop round each position.
-      DO I = 1, NPOS
-
-*  Extract the position from the supplied array.
-         DO J = 1, NAX
-            LPOS( J ) = POS( I, J )
-         END DO
-
-*  If text is being used to mark each position, extract the string for
-*  this position from the GRP group. If no group was supplied, or if the
-*  group has been exhausted, format the position index.
-         IF( PLOT .EQ. 'TEXT' ) THEN
-            IF( I .LE. NSTR ) THEN
-               CALL GRP_GET( IGRP, I, 1, TEXT, STATUS )
-            ELSE
-               TEXT = ' '
-               IAT = 0
-               CALL CHR_PUTI( I, TEXT, IAT )
-            END IF
-         END IF                        
-
-*  Draw the position.
-         CALL KPG1_MKPOS( NAX, LPOS, IPLOT, .TRUE., PLOT, IMARK, GEO, 
-     :                    .FALSE., CLOSE, TEXT, JUST, STATUS )
-
-      END DO
-
-*  Complete any polygons.
-      CALL KPG1_MKPOS( NAX, LPOS, IPLOT, .TRUE., PLOT, IMARK, GEO, 
-     :                 .TRUE., CLOSE, TEXT, JUST, STATUS )
-
-*  If required, add labels.
-      IF( LABEL .AND. STATUS .EQ. SAI__OK ) THEN
+*  Draw labels first so that they do not obscure the marks.
+      IF( LABTYP .NE. 'NONE' .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Map the supplied positions into the GRAPHICS Frame.
          CALL AST_TRANN( IPLOT, NPOS, NAX, NPOS, POS, .FALSE., 2,
@@ -270,17 +239,22 @@
             IF( START( 1 ) .NE. AST__BAD .AND. 
      :          START( 2 ) .NE. AST__BAD ) THEN         
 
-*  Format the position identifier.
-               ID = ' '
-               IAT = 0
-               CALL CHR_PUTI( IDS( J ), ID, IAT )
+*  Format the position identifier or get the label text.
+               IF( LABTYP .EQ. 'ID' ) THEN
+                  TEXT = ' '
+                  IAT = 0
+                  CALL CHR_PUTI( IDS( J ), TEXT, IAT )
+               ELSE
+                  CALL GRP_GET( IGRP2, J, 1, TEXT, STATUS )
+                  IAT = CHR_LEN( TEXT )
+               END IF
 
-*  Detwermine the position for the centre of the label.
+*  Determine the position for the centre of the label.
                START( 1 ) = START( 1 ) - DX
                START( 2 ) = START( 2 ) - DY
 
 *  Draw the text.
-               CALL AST_TEXT( IPLOT, ID( : IAT ), START, UP, 'CC', 
+               CALL AST_TEXT( IPLOT, TEXT( : IAT ), START, UP, 'CC', 
      :                        STATUS ) 
 
             END IF
@@ -298,6 +272,45 @@
          CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 
       END IF
+
+
+*  Get the number of strings supplied in IGRP group.
+      IF( IGRP .NE. GRP__NOID ) THEN
+         CALL GRP_GRPSZ( IGRP, NSTR, STATUS )
+      ELSE
+         NSTR = 0
+      END IF
+
+*  Loop round each position.
+      DO I = 1, NPOS
+
+*  Extract the position from the supplied array.
+         DO J = 1, NAX
+            LPOS( J ) = POS( I, J )
+         END DO
+
+*  If text is being used to mark each position, extract the string for
+*  this position from the GRP group. If no group was supplied, or if the
+*  group has been exhausted, format the position index.
+         IF( PLOT .EQ. 'TEXT' ) THEN
+            IF( I .LE. NSTR ) THEN
+               CALL GRP_GET( IGRP, I, 1, TEXT, STATUS )
+            ELSE
+               TEXT = ' '
+               IAT = 0
+               CALL CHR_PUTI( I, TEXT, IAT )
+            END IF
+         END IF                        
+
+*  Draw the position.
+         CALL KPG1_MKPOS( NAX, LPOS, IPLOT, .TRUE., PLOT, IMARK, GEO, 
+     :                    .FALSE., CLOSE, TEXT, JUST, STATUS )
+
+      END DO
+
+*  Complete any polygons.
+      CALL KPG1_MKPOS( NAX, LPOS, IPLOT, .TRUE., PLOT, IMARK, GEO, 
+     :                 .TRUE., CLOSE, TEXT, JUST, STATUS )
 
 *  Remove the Current Frame added by KPG1_ASSIM and re-instate the original 
 *  Current Frame.

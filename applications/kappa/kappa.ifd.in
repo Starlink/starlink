@@ -16218,6 +16218,15 @@ iraf! {
             helpkey *
           }
 
+         parameter labtype {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            prompt {Type of label to display}
+            helpkey *
+            default !
+          }
+
          parameter last {
             position 4
             type _INTEGER

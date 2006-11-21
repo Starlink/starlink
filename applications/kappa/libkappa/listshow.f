@@ -145,14 +145,28 @@
 *        that the supplied position is at the specified point within 
 *        the displayed text string.  ["CC"]
 *     LABEL = LOGICAL (Read)
-*        If TRUE the positions are labelled with the corresponding
-*        integer identifiers on the graphics device specified by 
-*        parameter DEVICE.  The offset of each position from the centre
-*        of the corresponding label is controlled using the
+*        If TRUE the positions are labelled on the graphics device specified 
+*        by parameter DEVICE.  The offset of the centre of the each 
+*        label from the corresponding position is controlled using the
 *        "NumLabGap(1)" and "NumLabGap(2)" plotting attributes, and the
 *        appearance of the labels is controlled using attributes
 *        "Colour(NumLab)", "Size(NumLab)", etc.  These attributes may be
-*        specified using parameter STYLE.  [FALSE]
+*        specified using parameter STYLE. The content of the label is
+*        determined by parameter LABTYPE. [FALSE]
+*     LABTYPE = LITERAL (Read)
+*        Determines what sort of labels are drawn if the LABEL parameter
+*        is set TRUE. It can be any of:
+*
+*        - "ID": causes the integer identifier associated with each row
+*        to be used as the label for the row
+*
+*        - "LABEL": causes the textual label associated with each row
+*        to be used as the label for the row. These strings are read from
+*        the "LABEL" column of the supplied catalogue.
+*
+*        If a null (!) value is supplied, a default of "LABEL" will be used 
+*        if the input catalogue contains a "LABEL" column. Otherwise, a 
+*        default of "ID" wil be used. [!]
 *     LAST = INTEGER (Read)
 *        The identifier for the last position to be displayed.
 *        Positions are only displayed which have identifiers in the
@@ -265,10 +279,9 @@
 *        then the extra positions will be marked with an integer value 
 *        indicating the index within the list of supplied positions. 
 *        (Note, these integers may be different from the position
-*        identifiers in the supplied positions list; if you want to see
-*        the position identifiers, use parameter LABEL.)  If a null
-*        value (!) is given for the parameter, then all positions will
-*        be marked with integer indices, starting at 1.
+*        identifiers in the supplied positions list). If a null value (!)
+*        is given for the parameter, then all positions will be marked with
+*        the integer indices, starting at 1.
 *
 *        A comma-separated list should be given in which each element is
 *        either a marker string, or the name of a text file preceded by
@@ -397,6 +410,8 @@
 *     2006 April 12 (MJC):
 *        Remove unused variables, corrected typo's and punctuation, and
 *        wrapped long lines.
+*     20-NOV-2006 (DSB):
+*        Added parameter LABTYPE. Modified use of parameter LABEL.
 *     {enter_further_changes_here}
 
 *-
@@ -418,6 +433,7 @@
 
 *  Local Variables:
       CHARACTER JUST*2           ! Justification for text strings
+      CHARACTER LABTYP*5         ! Type of labels to display
       CHARACTER PICNAM*15        ! AGI picture name.
       CHARACTER PLOT*15          ! Nature of required graphics
       CHARACTER TEXT*(GRP__SZNAM)! Text buffer
@@ -428,31 +444,25 @@
       INTEGER FIRST              ! Lowest position identifier to display
       INTEGER FSTPOS             ! Position of lowest identifier
       INTEGER I                  ! Loop count
-      INTEGER IGRP1              ! GRP identifier for formatted 
-                                 ! co-ordinate values
-      INTEGER IGRP2              ! GRP identifier for marker strings
-                                 ! group
+      INTEGER IGRP1              ! GRP id for formatted co-ord values
+      INTEGER IGRP2              ! GRP id for marker strings group
+      INTEGER IGRP3              ! GRP group containing all labels
+      INTEGER IGRP4              ! GRP group containing selected labels
       INTEGER IMARK              ! PGPLOT marker type
       INTEGER IPIC               ! AGI id for selected picture
       INTEGER IPIC0              ! Current (input) picture identifier
       INTEGER IPID               ! Pointer to original identifiers
       INTEGER IPLOT              ! AST pointer to Plot 
-      INTEGER IPPOS              ! Pointer to original positions
-      INTEGER IPW0               ! Pointer to array holding selected
-                                 ! identifiers 
-      INTEGER IPW1               ! Pointer to array holding selected
-                                 ! positions
-      INTEGER IPW2               ! Pointer to array holding selected
-                                 ! positions
-      INTEGER IPW3               ! Pointer to array holding GRAPHICS
-                                 ! positions
+      INTEGER IPPOS              ! P'nter to original positions
+      INTEGER IPW0               ! P'nter to array of selected id's
+      INTEGER IPW1               ! P'nter to array of selected positions
+      INTEGER IPW2               ! P'nter to array of selected positions
+      INTEGER IPW3               ! P'nter to array of GRAPHICS positions
       INTEGER IWCS               ! AST pointer to FrameSet
       INTEGER L                  ! Length of a string
-      INTEGER LAST               ! Highest position identifier to
-                                 ! display
+      INTEGER LAST               ! Highest position id to display
       INTEGER LSTPOS             ! Position of highest identifier
-      INTEGER MAP                ! AST pointer to original -> requested
-                                 ! mapping
+      INTEGER MAP                ! AST Mapping original -> requested
       INTEGER NBAX               ! No. of axes in original Frame
       INTEGER NFRM               ! Number of Frames in Plot
       INTEGER NDISP              ! Number of selected positions
@@ -539,11 +549,13 @@
       IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
 *  Get the input positions list.  A pointer to a FrameSet is returned,
-*  together with pointers to positions and identifiers, and a title.
-*  The positions are returned in the Base Frame of this FrameSet.
+*  together with pointers to positions, identifiers, a group of labels, 
+*  and a title. The positions are returned in the Base Frame of this 
+*  FrameSet.
+      IGRP3 = GRP__NOID
       IWCS = AST__NULL
-      CALL KPG1_RDLST( 'INCAT', .FALSE., IWCS, NPOS, NBAX, IPPOS, IPID,
-     :                 TITLE, ' ', STATUS )
+      CALL KPG1_RDTAB( 'INCAT', .FALSE., IGRP3, IWCS, NPOS, NBAX, 
+     :                 IPPOS, IPID, TITLE, ' ', STATUS )
 
 *  Give a suitable message, store zero for NUMBER, and abort if the 
 *  file was empty.
@@ -559,6 +571,34 @@
          CALL PAR_PUT0I( 'NUMBER', 0, STATUS )
          GO TO 999
 
+      END IF
+
+*  If positions are to be labelled, see what type of label is to be used.
+*  If a null value is supplied for the parameter, annul the error and use
+*  'LABEL' if the catalogue contains a LABEL column, and 'ID' otherwise.
+*  Issue a warning if LABEL is requested but no labels are available.
+      IF( LABEL .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL PAR_CHOIC( 'LABTYPE', 'ID', 'ID,LABEL', .FALSE., LABTYP, 
+     :                   STATUS )
+
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            IF( IGRP3 .NE. GRP__NOID ) THEN
+               LABTYP = 'LABEL'
+            ELSE
+               LABTYP = 'ID'
+            END IF
+
+         ELSE IF( LABTYP .EQ. 'LABEL' .AND. IGRP3 .EQ. GRP__NOID ) THEN
+            CALL MSG_OUT( 'LISTSHOW_MSG5', '  Positions cannot be '//
+     :                    'labelled as the catalogue contains no '//
+     :                    'LABEL column.', STATUS )
+            LABEL = .FALSE.
+            LABTYP = 'NONE'
+         END IF      
+
+      ELSE
+         LABTYP = 'NONE'
       END IF
 
 *  Take a copy of the Base Frame in which the positions are defined. 
@@ -720,12 +760,13 @@
 *  Abort if an error occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Copy the selected positions and identifiers into the work arrays.
-      CALL KPS1_LSHCP( FIRST, LAST, NPOS, NBAX, 
+*  Copy the selected positions and identifiers into the work arrays and
+*  erase the unused elements in the labels group.
+      CALL KPS1_LSHCP( FIRST, LAST, NPOS, NBAX, IGRP3,
      :                 %VAL( CNF_PVAL( IPPOS ) ),
      :                 %VAL( CNF_PVAL( IPID ) ), NDISP, 
      :                 %VAL( CNF_PVAL( IPW0 ) ), 
-     :                 %VAL( CNF_PVAL( IPW1 ) ),
+     :                 %VAL( CNF_PVAL( IPW1 ) ), IGRP4,
      :                 STATUS )
 
 *  Map the positions from the original Frame into the requested Frame.
@@ -735,15 +776,17 @@
 
 *  Create an output positions list if required.
       IF( TITLE .EQ. ' ' ) THEN
-         CALL KPG1_WRLST( 'OUTCAT', NDISP, NDISP, NBAX, 
+         CALL KPG1_WRTAB( 'OUTCAT', NDISP, NDISP, NBAX, 
      :                    %VAL( CNF_PVAL( IPW1 ) ),
      :                    BINDEX, IWCS, 'Output from LISTSHOW', 
-     :                    0, %VAL( CNF_PVAL( IPW0 ) ), .TRUE., STATUS )
+     :                    0, %VAL( CNF_PVAL( IPW0 ) ), IGRP4, .TRUE., 
+     :                    STATUS )
       ELSE
-         CALL KPG1_WRLST( 'OUTCAT', NDISP, NDISP, NBAX, 
+         CALL KPG1_WRTAB( 'OUTCAT', NDISP, NDISP, NBAX, 
      :                    %VAL( CNF_PVAL( IPW1 ) ),
      :                    BINDEX, IWCS, TITLE, 
-     :                    0, %VAL( CNF_PVAL( IPW0 ) ), .TRUE., STATUS )
+     :                    0, %VAL( CNF_PVAL( IPW0 ) ), IGRP4, .TRUE., 
+     :                    STATUS )
       END IF
 
 *  Write the mapped values to the output parameter.
@@ -765,10 +808,11 @@
 *  Create a GRP Group to hold the formatted positions.
       CALL GRP_NEW( 'Formatted positions', IGRP1, STATUS )
 
-*  Format the positions and identifiers, and store them in the group.
+*  Format the positions, identifiers and labels, and store them in the 
+*  group.
       CALL KPS1_LSHFM( AST_GETFRAME( IWCS, AST__CURRENT, STATUS ), 
      :                 NDISP, NRAX, %VAL( CNF_PVAL( IPW0 ) ), 
-     :                 %VAL( CNF_PVAL( IPW2 ) ), IGRP1,
+     :                 %VAL( CNF_PVAL( IPW2 ) ), IGRP4, IGRP1,
      :                 STATUS )
 
 *  Save the number of positions in the list.
@@ -819,7 +863,7 @@
 *  Produce the graphics.
          CALL KPS1_LSHPL( IWCS, NDISP, NRAX, %VAL( CNF_PVAL( IPW2 ) ), 
      :                    PLOT,
-     :                    GEO, IMARK, CLOSE, LABEL, IGRP2, JUST, 
+     :                    GEO, IMARK, CLOSE, LABTYP, IGRP2, IGRP4, JUST, 
      :                    %VAL( CNF_PVAL( IPID ) ), 
      :                    %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
@@ -875,6 +919,8 @@
 *  Delete the GRP groups.
       IF( IGRP1 .NE. GRP__NOID ) CALL GRP_DELET( IGRP1, STATUS )
       IF( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, STATUS )
+      IF( IGRP3 .NE. GRP__NOID ) CALL GRP_DELET( IGRP3, STATUS )
+      IF( IGRP4 .NE. GRP__NOID ) CALL GRP_DELET( IGRP4, STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )

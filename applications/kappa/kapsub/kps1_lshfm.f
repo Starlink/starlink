@@ -1,4 +1,5 @@
-      SUBROUTINE KPS1_LSHFM( FRM, NPOS, NAX, ID, POS, IGRP, STATUS )
+      SUBROUTINE KPS1_LSHFM( FRM, NPOS, NAX, ID, POS, IGRP1, IGRP2, 
+     :                       STATUS )
 
 *+
 *  Name:
@@ -11,11 +12,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LSHFM( FRM, NPOS, NAX, ID, POS, IGRP, STATUS )
+*     CALL KPS1_LSHFM( FRM, NPOS, NAX, ID, POS, IGRP1, IGRP2, STATUS )
 
 *  Description:
-*     This routine formats the supplied positions and identifiers and
-*     stores the resulting strings in the supplied GRP group.
+*     This routine formats the supplied positions, identifiers and labels, 
+*     and stores the resulting strings in the supplied GRP group.
 
 *  Arguments:
 *     FRM = INTEGER (Given)
@@ -29,7 +30,10 @@
 *     POS( NPOS, NAX ) = DOUBLE PRECISION (Given and Returned)
 *        The supplied positions. These are normalised using AST_NORM on
 *        return.
-*     IGRP = INTEGER (Given)
+*     IGRP1 = INTEGER (Given)
+*        A GRP identifier for the group containing position labels. Set
+*        to GRP__NOID if there are no labels.
+*     IGRP2 = INTEGER (Given)
 *        A GRP identifier for the group to receive the formatted positions.
 *     STATUS = INTEGER (Given)
 *        Global status value.
@@ -68,6 +72,8 @@
 *        Allow up to 50 axes (this allows tables such as those produced by 
 *        CUPID:CLUMPS which have more than NDF__MXDIM columns to be
 *        displayed).
+*     21-NOV-2006 (DSB):
+*        Added IGRP1 argument.
 *     {enter_further_changes_here}
 
 *-
@@ -86,7 +92,8 @@
       INTEGER NPOS
       INTEGER NAX
       INTEGER ID( NPOS )
-      INTEGER IGRP
+      INTEGER IGRP1
+      INTEGER IGRP2
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION POS( NPOS, NAX )
@@ -106,6 +113,7 @@
 
 *  Local Variables:
       CHARACTER ATTRIB*15          ! AST attribute name
+      CHARACTER LABEL*( GRP__SZNAM )! Label text
       CHARACTER LINE*( GRP__SZNAM )! Buffer for text
       CHARACTER TEXT*40            ! AST attribute value
       DOUBLE PRECISION C( MXDIM )  ! Buffer for a single position
@@ -113,8 +121,8 @@
       INTEGER I                    ! Axis index
       INTEGER IAT                  ! No. of characters in a string
       INTEGER K                    ! Position index
-      INTEGER MXWID( 0 : MXDIM )   ! Field widths
-      INTEGER TAB( 0 : MXDIM + 1 ) ! Field starting positions
+      INTEGER MXWID( -1 : MXDIM )   ! Field widths
+      INTEGER TAB( -1 : MXDIM + 1 ) ! Field starting positions
 *.
 
 *  Check the global inherited status.
@@ -124,7 +132,7 @@
 *  ==========================================
 
 *  Initialise the maximum field widths.
-      DO I = 1, NAX
+      DO I = -1, NAX
          MXWID( I ) = 0
       END DO
 
@@ -148,6 +156,12 @@
      :                     AST_FORMAT( FRM, I, POS( K, I ), STATUS ) ) )
 
          END DO
+
+*  Extend the label field width.
+         IF( IGRP1 .NE. GRP__NOID ) THEN
+            CALL GRP_GET( IGRP1, K, 1, LABEL, STATUS )
+            MXWID( 0 ) = MAX( MXWID( 0 ), CHR_LEN( LABEL ) )
+         END IF
 
       END DO
 
@@ -174,10 +188,17 @@
 
       END DO
 
-*  Set the tab positions for each column. Zero is for identifiers. Allow
-*  NSP spaces after each column.
-      TAB( 0 ) = 1
-      MXWID( 0 ) = 10
+*  Set the tab positions for each column. -1 is for identifiers, 0 for
+*  labels. Allow NSP spaces after each column.
+      TAB( -1 ) = 1
+      MXWID( -1 ) = 10
+
+      IF( IGRP1 .NE. GRP__NOID ) THEN
+         TAB( 0 ) = TAB( - 1 ) + MXWID( - 1 ) + NSP
+      ELSE
+         TAB( 0 ) = TAB( - 1 )
+         MXWID( 0 ) = MXWID( -1 )
+      END IF
 
       DO I = 1, NAX + 1
          TAB( I ) = TAB( I - 1 ) + MXWID( I - 1 ) + NSP
@@ -191,10 +212,20 @@
 *  field...
 *  =======================================================================
 
-*  First line: "Position" and axis symbols
+*  First line: "Position", "Label" (if needed) and axis symbols
       LINE = ' ' 
-      IAT = ( TAB( 1 ) + TAB( 0 ) - NSP - 8 )/2
+      IF( IGRP1. NE. GRP__NOID ) THEN
+         IAT = ( TAB( 0 ) + TAB( -1 ) - NSP - 8 )/2
+      ELSE
+         IAT = ( TAB( 1 ) + TAB( -1 ) - NSP - 8 )/2
+      END IF
+
       LINE( IAT : ) = 'Position'
+
+      IF( IGRP1. NE. GRP__NOID ) THEN
+         IAT = ( TAB( 1 ) + TAB( 0 ) - NSP - 5 )/2
+         LINE( IAT : ) = 'Label'
+      END IF
 
       DO I = 1, NAX
          ATTRIB = 'Symbol('
@@ -207,11 +238,17 @@
          LINE( IAT : ) = TEXT
       END DO
 
-      CALL GRP_PUT( IGRP, 1, LINE( : BLEN ), 0, STATUS ) 
+      CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS ) 
 
 *  Second line: "identifier" and axis units (if any).
       LINE = ' ' 
-      IAT = ( TAB( 1 ) + TAB( 0 ) - NSP - 10 )/2
+
+      IF( IGRP1. NE. GRP__NOID ) THEN
+         IAT = ( TAB( 0 ) + TAB( -1 ) - NSP - 10 )/2
+      ELSE
+         IAT = ( TAB( 1 ) + TAB( -1 ) - NSP - 10 )/2
+      END IF
+
       LINE( IAT : ) = 'identifier'
 
       DO I = 1, NAX
@@ -225,27 +262,34 @@
          LINE( IAT : ) = TEXT
       END DO
 
-      CALL GRP_PUT( IGRP, 1, LINE( : BLEN ), 0, STATUS ) 
+      CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS ) 
 
 *  Separator lines.
       DO I = 1, BLEN
          LINE( I : I ) = '-'
       END DO
-      CALL GRP_PUT( IGRP, 1, LINE( : BLEN ), 0, STATUS ) 
-      CALL GRP_PUT( IGRP, 1, ' ', 0, STATUS ) 
+      CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS ) 
+      CALL GRP_PUT( IGRP2, 1, ' ', 0, STATUS ) 
 
-*  Format the identifiers and positions in columns
-*  ===============================================
+*  Format the identifiers, labels and positions in columns
+*  =======================================================
 
 *  Loop round each position.
       DO K = 1, NPOS
          LINE = ' '
 
 *  Put the position identifier into the buffer.
-         IAT = TAB( 0 ) + 2
+         IAT = TAB( -1 ) + 2
          LINE( IAT : ) = '#'
          CALL CHR_PUTI( ID( K ), LINE, IAT )
    
+*  Put any label into the buffer.
+         IF( IGRP1 .NE. GRP__NOID ) THEN
+            CALL GRP_GET( IGRP1, K, 1, LABEL, STATUS )
+            IAT = TAB( 0 )
+            LINE( IAT : ) = LABEL( : MXWID( 0 ) )
+         END IF
+
 *  Format the results on each axis. Start each axis value at the tab
 *  positions found above. 
          DO I = 1, NAX
@@ -254,7 +298,7 @@
          END DO
 
 *  Store the buffer in the group.
-         CALL GRP_PUT( IGRP, 1, LINE( : BLEN ), 0, STATUS ) 
+         CALL GRP_PUT( IGRP2, 1, LINE( : BLEN ), 0, STATUS ) 
 
       END DO
 
