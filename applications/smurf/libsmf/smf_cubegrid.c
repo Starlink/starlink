@@ -85,6 +85,9 @@
 *     20-NOV-2006 (DSB):
 *        In OUTCAT, use monotonically increasing integer identifiers, and 
 *        store detector names as labels in the output catalogue.
+*     21-NOV-2006 (DSB):
+*        Set the SkyRef attribute in the returned SkyFrame to be the
+*        tangent point.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -407,6 +410,10 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                astSetC( *skyframe, "system", trsys );
                usesys = trsys;
             }
+
+/* Set the SKyFrame SkyRef position to the tangent point. */
+            astSetD( *skyframe, "SkyRef(1)", par[ 2 ] );
+            astSetD( *skyframe, "SkyRef(2)", par[ 3 ] );
 
 /* If we do not need to look at any other time slices, we can leave the loop
    early. */
