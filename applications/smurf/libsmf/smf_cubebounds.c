@@ -90,6 +90,9 @@
 *        - Exclude bad data values from the bounding box. 
 *        - Move catalogue creation to smf_cubegrid.
 *        - New interface.
+*     21-NOV-2006 (DSB):
+*        Correct inversion of ospecmap so that it combines correctly with
+*        specmap.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -391,6 +394,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                                                          AST__CURRENT ),
                                           1, "" ), 
                                ospecmap, 1, "" );
+
          }
 
 /* Use this Mapping to transform the first and last spectral GRID values
@@ -501,6 +505,10 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* For later convenience, we invert it so that the base Frame is the 
    SkyFrame and the current Frame is the PIXEL Frame. */
             astInvert( swcsout );
+
+/* Invert the output spectral Mapping so that it goes from output
+   spectral WCS value to output spectral grid value. */
+            astInvert( ospecmap );
          }
 
 /* If we are dealing with a moving target, adjust the SkyFrames in the
