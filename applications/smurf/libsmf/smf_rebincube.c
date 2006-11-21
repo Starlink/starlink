@@ -81,6 +81,9 @@
 *        than the FITS header.
 *     6-NOV-2006 (DSB):
 *        Added "detgrp" parameter.
+*     21-NOV-2006 (DSB):
+*        Only create variance values if the output pixel value is formed
+*        from more than 1 detector sample.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -444,8 +447,16 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
          if( wgt_array[ iv ] > 0.0 ) {
             dval = data_array[ iv ]/wgt_array[ iv ];
             data_array[ iv ] = dval;
-            var_array[ iv ] /=  wgt_array[ iv ];
-            var_array[ iv ] -=  dval*dval;
+
+/* Variance cannot be created if only 1 point contributed to the output
+   pixel. */
+            if( wgt_array[ iv ] > 1.0 ) {
+               var_array[ iv ] /=  wgt_array[ iv ];
+               var_array[ iv ] -=  dval*dval;
+            } else {
+               var_array[ iv ] = VAL__BADR;
+            }
+
          } else {
             data_array[ iv ] = VAL__BADR;
             var_array[ iv ] = VAL__BADR;
