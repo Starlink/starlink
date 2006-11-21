@@ -296,6 +296,10 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialise
+      PWAVE = 0.0D0
+      PANG = 0.0D0
+
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
