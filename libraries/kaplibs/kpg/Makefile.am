@@ -173,6 +173,7 @@ kpg1_cnlim.f \
 kpg1_colnm.f \
 kpg1_copy.f \
 kpg1_cpsty.f \
+kpg1_ctcpc.f \
 kpg1_cshft.f \
 kpg1_danot.f \
 kpg1_dauni.f \
@@ -294,6 +295,7 @@ kpg1_gtpos.f \
 kpg1_lstar.f \
 kpg1_mklut.f \
 kpg1_rdlst.f \
+kpg1_rdtab.f \
 kpg1_rgndf.f \
 kpg1_satkc.f \
 kpg1_satkd.f \
