@@ -716,9 +716,8 @@ package @PACKAGE@ {
 	 parameter crota {
 	    type _REAL
 	    prompt {Position angle of second pixel axis in output (degs)}
-	    ppath CURRENT DEFAULT
-	    vpath DEFAULT
-	    default !
+	    ppath DYNAMIC
+	    vpath DYNAMIC
 	    helpkey *
 	  }
 
@@ -768,9 +767,8 @@ package @PACKAGE@ {
 	    position 3
 	    type _REAL
 	    prompt {Output pixel size(s) for spatial part of map (arcsec)}
-	    vpath DEFAULT
-	    ppath CURRENT DEFAULT
-	    default !
+	    ppath DYNAMIC
+	    vpath DYNAMIC
 	    helpkey *
 	  }
 
@@ -785,20 +783,18 @@ package @PACKAGE@ {
 	  parameter reflat {
             type LITERAL
             access READ
-            vpath DEFAULT 
-            ppath CURRENT DEFAULT
+	    ppath DYNAMIC
+	    vpath DYNAMIC
             prompt {Celestial latitude at output reference point}
-            default !
             helpkey *
 	  }
 
 	  parameter reflon {
             type LITERAL
             access READ
-            vpath DEFAULT 
-            ppath CURRENT DEFAULT
+	    ppath DYNAMIC
+	    vpath DYNAMIC
             prompt {Celestial longitude at output reference point}
-            default !
             helpkey *
 	  }
 

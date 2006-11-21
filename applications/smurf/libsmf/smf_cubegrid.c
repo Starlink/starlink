@@ -82,6 +82,9 @@
 *  History:
 *     14-NOV-2006 (DSB):
 *        Initial version.
+*     20-NOV-2006 (DSB):
+*        In OUTCAT, use monotonically increasing integer identifiers, and 
+*        store detector names as labels in the output catalogue.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -131,9 +134,6 @@
 
 #define FUNC_NAME "smf_cubegrid"
 
-/* Returns nearest integer to "x" */
-#define NINT(x) ( ( (x) > 0 ) ? (int)( (x) + 0.5 ) : (int)( (x) - 0.5 ) )
-
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
                    int autogrid, double par[ 7 ], int *moving, 
                    AstSkyFrame **skyframe, int *status ){
@@ -147,6 +147,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    AstFrameSet *swcsin = NULL;/* FrameSet describing spatial input WCS */
    char *pname = NULL;        /* Name of currently opened data file */
    char outcatnam[ 41 ];      /* Output catalogue name */
+   const char *lab = NULL;    /* Pointer to start of next detector name */
    const char *trsys = NULL;  /* AST tracking system */
    const char *usesys = NULL; /* AST system for output cube */
    double *allpos = NULL;/* Array of all sample positions */
@@ -163,8 +164,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    double oppar[ 7 ];    /* Optimal parameter values */
    double sep;           /* Separation between first and last base positions */
    float *pdata;         /* Pointer to next data sample */
-   int *catID = NULL;    /* Array of receptor identifiers */
-   int *pid = NULL;      /* Pointer to next identifier value */
+   Grp *labgrp;          /* GRP group holding detector labels */
    int good;             /* Are there any good detector samples? */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ifile;            /* Index of current input file */
@@ -200,8 +200,15 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* Initialise. */
    allpos = NULL;
-   catID = NULL;
    nallpos = 0;
+
+/* If we are creating an output catalogue, create a GRP group to hold the
+   labels to bne associated with each position. */
+   if( outcat ) {
+      labgrp = grpNew( "Detector labels", status );
+   } else {
+      labgrp = NULL;
+   }
 
 /* Loop round all the input NDFs. */
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
@@ -292,10 +299,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* Extend the memory used to hold the list of all receptor positions. */
       allpos = astGrow( allpos, nallpos + 2*(data->dims)[ 2 ]*(data->dims)[ 1 ],
                         sizeof( double ) );
-      if( outcat ) {
-         catID = astGrow( catID, nallpos + (data->dims)[ 2 ]*(data->dims)[ 1 ],
-                          sizeof( int ) );
-      }
 
 /* Store a pointer to the next input data value */
       pdata = ( data->pntr )[ 0 ];
@@ -466,7 +469,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* Copy usable sky positions into the array holding all positions. */
          p = allpos + 2*nallpos;
-         if( outcat ) pid = catID + nallpos;
+         lab = hdr->detname;
          for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
 
 /* If the detector has a valid position, see if it produced any good
@@ -485,7 +488,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                if( good ) {
                   *(p++) = xout[ irec ];
                   *(p++) = yout[ irec ];
-                  if( outcat ) *(pid++) = irec;
+                  if( labgrp ) grpPut1( labgrp, lab, 0, status );
                   nallpos++;
                }
 
@@ -494,6 +497,10 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
             } else {
                pdata += (data->dims)[ 0 ];
             }
+
+/* Move on to the start of the next detector name. */
+            lab += strlen( lab ) + 1;
+
          }
 
 /* For efficiency, explicitly annul the AST Objects created in this tight
@@ -541,30 +548,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    }
    par[ 5 ] = fabs( par[ 5 ] );
 
-/* Display the projection parameters being used. */
-   msgBlank( status );
-   msgOutif( MSG__NORM, " ", "   Projection parameters used:", status );
-   msgSetd( "V", par[ 0 ] );
-   msgOutif( MSG__NORM, " ", "      CRPIX1 = ^V", status );
-   msgSetd( "V", par[ 1 ] );
-   msgOutif( MSG__NORM, " ", "      CRPIX2 = ^V", status );
-   msgSetd( "V", par[ 2 ]*AST__DR2D );
-   msgSetc( "V2", astFormat( *skyframe, 1, par[ 2 ] ) );
-   msgSetc( "S", astGetC( *skyframe, "Symbol(1)" ) );
-   msgOutif( MSG__NORM, " ", "      CRVAL1 = ^V ( ^S = ^V2 )", status );
-   msgSetd( "V", par[ 3 ]*AST__DR2D );
-   msgSetc( "V2", astFormat( *skyframe, 2, par[ 3 ] ) );
-   msgSetc( "S", astGetC( *skyframe, "Symbol(2)" ) );
-   msgOutif( MSG__NORM, " ", "      CRVAL2 = ^V ( ^S = ^V2 )", status );
-   msgSetd( "V", par[ 4 ]*AST__DR2D );
-   msgSetd( "V2", 0.1*NINT(par[ 4 ]*AST__DR2D*36000.0) );
-   msgOutif( MSG__NORM, " ", "      CDELT1 = ^V ( ^V2 arcsec )", status );
-   msgSetd( "V", par[ 5 ]*AST__DR2D );
-   msgSetd( "V2", 0.1*NINT(par[ 5 ]*AST__DR2D*36000.0) );
-   msgOutif( MSG__NORM, " ", "      CDELT2 = ^V ( ^V2 arcsec )", status );
-   msgSetd( "V", par[ 6 ]*AST__DR2D );
-   msgOutif( MSG__NORM, " ", "      CROTA2 = ^V", status );
-
 /* If creating an output catalogue, re-order the array containing the 
    positions so that all the longitude values come at the start of the 
    array, followed by all the latitude values. */
@@ -579,12 +562,11 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
       } 
 
 /* Create the catalogue. */
-      kpg1Wrlst( "OUTCAT", nallpos, nallpos, 2, allpos2, AST__CURRENT, 
-                 astFrameSet( *skyframe, "" ), "Detector positions", 0, 
-                 catID, 1, status );
+      kpg1Wrtab( "OUTCAT", nallpos, nallpos, 2, allpos2, AST__CURRENT, 
+                 astFrameSet( *skyframe, "" ), "Detector positions", 1, 
+                 NULL, labgrp, 1, status );
 
 /* Free resources. */
-      catID = astFree( catID );
       allpos2 = astFree( allpos2 );
    } 
 
@@ -594,6 +576,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    yin = astFree( yin );
    xout = astFree( xout );
    yout = astFree( yout );
+   if( labgrp ) grpDelet( &labgrp, status );
 
 /* If no error has occurred, export the returned SkyFrame pointer from the 
    current AST context so that it will not be annulled when the AST
