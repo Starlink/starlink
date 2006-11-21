@@ -42,8 +42,9 @@
 *     MAXTRY times.
 
 *  Copyright:
-*     Copyright (C) 1984, 1985, 1987, 1988, 1991, 1992, 1993, 1994 Science & Engineering Research Council.
+*     Copyright (C) 1984, 1985, 1987, 1988, 1991-1994 Science & Engineering Research Council.
 *     Copyright (C) 1995, 2002 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -66,6 +67,7 @@
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -107,6 +109,8 @@
 *        Don't use intermediate VALUE_STRING
 *     26-FEB-2002 (AJC):
 *        Trap truncation in the DAT_GET0C to improve error message.
+*     21-NOV-2006 (TIMJ):
+*        Initialise return value even if status is bad. Fixes valgrind warning.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -182,6 +186,9 @@
       INTEGER LENST                           ! length of string
 
 *.
+
+*  Initialise the return value
+      CVALUE = ' '
 
 *  Check the inherited status.
       IF (STATUS .NE. SAI__OK) RETURN
