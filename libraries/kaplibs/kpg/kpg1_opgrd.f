@@ -601,6 +601,25 @@
       CALL AST_TRAN2( MAP, 1, NPAR1, NPAR2, .TRUE., PAR( 3 ), PAR( 4 ), 
      :                STATUS )
 
+*  Normalise them into range (0->2PI, -PI/2->PI/2)
+      IF( PAR( 4 ) .GT. AST__DPIBY2 ) THEN
+         PAR( 4 ) = AST__DPI - PAR( 4 ) 
+         PAR( 3 ) = AST__DPI + PAR( 3 )
+
+      ELSE IF( PAR( 4 ) .LT. -AST__DPIBY2 ) THEN
+         PAR( 4 ) = -AST__DPI - PAR( 4 ) 
+         PAR( 3 ) = AST__DPI + PAR( 3 )
+
+      END IF
+
+      IF( PAR( 3 ) .LT. 0.0 ) THEN
+         PAR( 3 ) = PAR( 3 ) + 2*AST__DPI 
+
+      ELSE IF( PAR( 3 ) .GT. 2*AST__DPI ) THEN
+         PAR( 3 ) = PAR( 3 ) - 2*AST__DPI 
+
+      END IF
+
 *  Find the pixel bounds of the new bounding box.
       XHI = VAL__MIND
       YHI = VAL__MIND
