@@ -56,6 +56,8 @@
 *        Fix bug in Dec conversion to radians
 *     2006-10-25 (EC):
 *        Statically allocate memory for convert
+*     2006-11-21 (JB):
+*        Add lissajous parameters and remove bolfile (deprecated)
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -131,13 +133,8 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0D ( keymap, "BOL_DISTY", &(inx->bol_disty) ) )
       inx->bol_disty = 6.28; 
 
-   if ( !astMapGet0C ( keymap, "BOLFILE", &temp ) )
-      strncpy ( inx->bolfile, "", 80 ); 
-   else
-      strncpy ( inx->bolfile, temp, 80);
-
    if ( !astMapGet0D ( keymap, "BOUS_ANGLE", &(inx->bous_angle) ) )
-      inx->bous_angle = 0.4636476; 
+      inx->bous_angle = 0.0; 
 
    if ( !astMapGet0D ( keymap, "BOUS_WIDTH", &(inx->bous_width) ) )
       inx->bous_width = 2000.0;
@@ -304,6 +301,21 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0D ( keymap, "LAMBDA", &(inx->lambda) ) )
       inx->lambda = 0.85e-3;
 
+   if ( !astMapGet0D ( keymap, "LISS_ANGLE", &(inx->liss_angle) ) )
+     inx->liss_angle = 0.0;
+ 
+   if ( !astMapGet0D ( keymap, "LISS_HEIGHT", &(inx->liss_height) ) )
+     inx->liss_height = 2000.0;
+
+   if ( !astMapGet0D ( keymap, "LISS_WIDTH", &(inx->liss_width) ) )
+     inx->liss_width = 2000.0;
+
+   if ( !astMapGet0D ( keymap, "LISS_SPACING", &(inx->liss_spacing) ) )
+     inx->liss_spacing = 240.0;
+
+   if ( !astMapGet0D ( keymap, "LISS_VMAX", &(inx->liss_vmax) ) )
+     inx->liss_vmax = 200.0;
+
    if ( !astMapGet0D ( keymap, "MJDAYSTART", &(inx->mjdaystart) ) )
       inx->mjdaystart = 53795.0;
 
@@ -365,7 +377,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
      inx->platerev = 2.0;
 
    if ( !astMapGet0D ( keymap, "PONG_ANGLE", &(inx->pong_angle) ) )
-     inx->pong_angle = 0.4636476;
+     inx->pong_angle = 0.0;
  
    if ( !astMapGet0D ( keymap, "PONG_HEIGHT", &(inx->pong_height) ) )
      inx->pong_height = 2000.0;
@@ -407,7 +419,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->sample_t = 5.0;
 
    if ( !astMapGet0D ( keymap, "SCAN_ANGLE", &(inx->scan_angle) ) )
-      inx->scan_angle = 0.4636476;
+      inx->scan_angle = 0.0;
 
    if ( !astMapGet0D ( keymap, "SCAN_PATHLENGTH", &(inx->scan_pathlength) ) )
       inx->scan_pathlength = 2000.0;
@@ -422,7 +434,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       inx->smu_offset = 0.0;
 
    if ( !astMapGet0I ( keymap, "SMU_SAMPLES", &(inx->smu_samples) ) )
-      inx->smu_samples = 0;
+      inx->smu_samples = 1;
 
    if ( !astMapGet0I ( keymap, "SUBSYSNR", &(inx->subsysnr) ) )
       inx->subsysnr = 1;

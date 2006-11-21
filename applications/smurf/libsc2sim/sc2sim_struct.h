@@ -29,6 +29,7 @@
     05Oct2006 : Replace pong_gridcount with pong_height and pong_width (jb)
     12Oct2006 : Delete wt0_name and wt1_name as they are deprecated (agg)
     16Oct2006 : Add pong_type (jb)
+    21Nov2006 : Add liss parameters and remove bolfile (deprecated) (jb)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -44,7 +45,7 @@ struct bolpix             /* pixel location of bolometer */
 
 /* Enumerated type for observing modes */
 typedef enum {stare, dstare, dream, pong, polspin, heatrun, 
-              bous, singlescan, none} obsMode;
+              bous, singlescan, liss, none} obsMode;
 
 /* Enumerated type for map coordinate frame */
 typedef enum {nasmyth, azel, radec, nocoord} mapCoordframe;
@@ -53,7 +54,6 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
 {
   double bol_distx;           /* average bolometer distance */
   double bol_disty;           /* average bolometer distance */
-  char bolfile[SC2SIM__FLEN];  /* name of file for bolometer details */
   double bous_angle;          /* angle of pattern relative to telescope
 				 axes in radians anticlockwise  */
   double bous_width;          /* width of bous pattern (arcsec) */
@@ -84,6 +84,12 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   int jig_vert[SC2SIM__MXVERT][2];/* Array with relative vertex coordinates in
 				    units of pixel distance */
   double lambda;              /* wavelength in metres */
+  double liss_angle;          /* angle of pattern relative to telescope
+				 axes in radians anticlockwise */
+  double liss_width;          /* min width of liss pattern (arcsec) */
+  double liss_height;         /* min height of liss pattern (arcsec) */
+  double liss_spacing;        /* grid spacing in arcsec */
+  double liss_vmax;           /* Telescope max velocities (arcsec/sec) */
   double mjdaystart;          /* Modified julian date at start */      
   int nbolx;                  /* number of bolometers in X */
   int nboly;                  /* number of bolometers in Y */
@@ -125,7 +131,6 @@ struct sc2sim_sim_struct      /* parameters read from sim input file */
   double anpol;               /* polarisation of analyser (%) */
   double antrans;             /* transmission of analyser (%) */
   double aomega;              /* coupling factor 0.179(850) 0.721(450) */
-  double astang;              /* polarisation angle of source (deg) */
   char astname[SC2SIM__FLEN];  /* name of file for ast simulation */
   double astpol;              /* polarisation of source (%) */
   char atmname[SC2SIM__FLEN];  /* name of file for atm simulation */
