@@ -5847,12 +5847,12 @@ normalised co-ordinate system in which the shorter dimension of the
 screen or paper has a length of 1.0 (the scales on both axes are equal).
 
 \item [NDC] -- similar to BASEPIC but specifies positions in a
-normalised co-ordinate system in which the bottom left corner has
+normalised co-ordinate system in which the bottom-left corner has
 co-ordinates (0,~0) and the top-right corner has co-ordinates (1,~1).
 Thus, for a non-square device the scales on the two axes will be different.
 
 \item [CURPIC] -- similar to BASEPIC except that it covers only the
-specified picture.  Thus, the bottom left corner of the each picture is 
+specified picture.  Thus, the bottom-left corner of each picture is 
 at $(0,~0)$ and the shorter dimension of each picture has length 1.0.
 
 \end{description}
@@ -6371,7 +6371,7 @@ system spanning the BASE picture (\emph{i.e.} the entire graphics device).  The
 units on both axes are set so that either the width or the
 height of the graphics device, which-ever is smaller, is set to 1.0
 (put another way, a unit square would fit in the picture and span the
-shorter axis).  The bottom left corner of the graphics device is (0,~0).
+shorter axis).  The bottom-left corner of the graphics device is (0,~0).
 
 \item [NDC] --- Normalised Device Co-ordinates, which are similar to BASEPIC
 but specifies positions in a normalised co-ordinate system in which
@@ -6380,7 +6380,7 @@ has co-ordinates (1,~1). Thus, for a non-square device the scales on
 the two axes will be different.
 
 \item [CURPIC] --- similar to BASEPIC except that it covers only the
-specified picture.  Thus, the bottom left corner of the each picture is 
+specified picture.  Thus, the bottom-left corner of each picture is 
 at (0,~0) and the shorter dimension of each picture has length 1.0.
 
 \end{description}
@@ -27977,14 +27977,37 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
       \sstsubsection{
          LABEL = \_LOGICAL (Read)
       }{
-         If {\tt TRUE} the positions are labelled with the corresponding integer
-         identifiers on the graphics device specified by parameter DEVICE.
-         The offset of each position from the centre of the corresponding
-         label is controlled using the \htmlattref{NumLabGap(1)}{NumLabGap(axis)}~
-         and {\att NumLabGap(2)} plotting attributes, and the appearance of the 
-         labels is controlled using attributes \htmlattref{Colour(NumLab)}{Colour(element)}, 
-         \htmlattref{Size(NumLab)}{Size(element)}, \emph{etc}.  These attributes
-         may be specified using parameter STYLE. {\tt [FALSE]}
+         If {\tt TRUE} the positions are labelled on the graphics device 
+         specified by parameter DEVICE.  The offset of the centre of each 
+         label from the corresponding position is controlled using the
+         \htmlattref{NumLabGap(1)}{NumLabGap(axis)}~ and {\att NumLabGap(2)} 
+         plotting attributes, and the appearance of the labels is controlled 
+         using attributes \htmlattref{Colour(NumLab)}{Colour(element)}, 
+         \htmlattref{Size(NumLab)}{Size(element)}, \emph{etc}.  These 
+         attributes may be specified using parameter STYLE.  The content of 
+         the label is determined by parameter LABTYPE.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         LABTYPE = LITERAL (Read)
+      }{
+         Determines what sort of labels are drawn if the LABEL parameter
+         is set {\tt TRUE}.  It can be either of the following.
+ 
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "ID"} --- causes the integer identifier associated with 
+            each row to be used as the label for the row.
+
+            \sstitem
+            {\tt "LABEL"} --- causes the textual label associated with each row
+            to be used as the label for the row.  These strings are read from
+            the "LABEL" column of the supplied catalogue.
+         }
+
+         If a null ({\tt{!}}) value is supplied, a default of {\tt "LABEL"} 
+         will be used if the input catalogue contains a {\tt "LABEL"} column.  
+         Otherwise, a default of "ID" will be used.  {\tt [!]}
       }
       \sstsubsection{
          LAST = \_INTEGER (Read)
@@ -28129,10 +28152,9 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          are strings in the group, then the extra positions will be marked
          with an integer value indicating the index within the list of
          supplied positions. (Note, these integers may be different from the
-         position identifiers in the supplied positions list; if you want to
-         see the position identifiers, use parameter LABEL.)  If a null value
-         ({\tt{!}}) is given for the parameter, then all positions will be marked
-         with integer indices, starting at 1.
+         identifiers in the supplied positions list).  If a null value ({\tt{!}})
+         is given for the parameter, then all positions will be marked with
+         the integer indices, starting at 1.
 
          A comma-separated list should be given in which each element is
          either a marker string, or the name of a text file preceded by an
@@ -49051,11 +49073,11 @@ Styles and Attributes''}{se:style}} relates the use of graphical style parameter
 
    \item [\htmlref{LISTSHOW}{LISTSHOW}] -- Shows a sub-set of the positions
          contained within a \emph{positions list} catalogue, in any 
-         of the \htmlref{co-ordinate Frame}{se:domains}~ s described within the catalogue.  It can also
-         write the selected positions to a new
+         of the \htmlref{co-ordinate Frame}{se:domains}~ s described within the 
+         catalogue.  It can also write the selected positions to a new
          positions list.  The positions are displayed on the screen, and
-         can also be marked on the \htmlref{current graphics device}{se:devglobal} in a variety
-         of ways.
+         can also be marked on the \htmlref{current graphics device}{se:devglobal}
+         in a variety of ways.
 
    \item [\htmlref{PROFILE}{PROFILE}] -- Produces a one-dimensional NDF
          containing a profile through an \textit{n}-dimensional NDF, retaining the
@@ -51110,6 +51132,13 @@ The following applications have been modified:
    \item [\htmlref{FITSLIST}{FITSLIST}] \mbox{}
       \begin{itemize} 
          \item It no longer wraps its output at 79 characters.
+      \end{itemize}
+
+   \item [\htmlref{LISTSHOW}{LISTSHOW}] \mbox{} 
+      \begin{itemize} 
+         \item There is a new parameter LABTYPE to control the sort of
+               labels created---numerical or textual---when parameter LABEL
+               is {\tt TRUE}.
       \end{itemize}
 
    \item [\htmlref{MLINPLOT}{MLINPLOT}] \mbox{}
