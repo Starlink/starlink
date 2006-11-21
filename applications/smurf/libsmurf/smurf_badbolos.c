@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_badbolos.c
+*     badbolos
 
 *  Purpose:
 *     Generate a map of random dead bolometers and add it as an NDF
@@ -26,25 +26,40 @@
 *     bolometers are defined by bad rows, bad columns, and bad 
 *     individual bolometers.  "Bad individual bolometers" are in 
 *     EXCESS of any bolometers already consider bad as part of a 
-*     bad row or column.
+*     bad row or column.  Alternately the user can supply an ARD
+*     description for the bad bolometer mask.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
-*          Input file(s)
-*     METHOD = String (Read)
+*          Input NDF file.  If the supplied file already has a bad
+*          bolometer mask, it will be overwritten by this routine.
+*     METHOD = STRING (Read)
 *          Bad Bolo Generation Method (either random, or from an 
 *          ARD description)
 *     ARD = ARD Description (Read)
-*          ARD Description of bad bolometer mask
-*     BAD_COLUMNS = int (Read)
-*          Number of bad columns of bolometers
-*     BAD_ROWS = int (Read)
-*          Number of bad rows of bolometers
-*     BAD_BOLOS = int (Read)
-*          Number of bad individual bolometers in excess of those from
-*          bad rows & columns
-*     SEED = int (Read)
-*          Seed for random number generator
+*          ARD Description of bad bolometer mask.  In the case that
+*          the user selects the ARD method of bad bolometer 
+*          masking, a correctly formatted ARD description will need
+*          to be supplied.  The ARD description is treated as a 
+*          one-to-one correspondence between its values and the 
+*          rows/columns of bolometers in a subarray.
+*     BAD_COLUMNS = INTEGER (Read)
+*          If the user selects the random generation of bad
+*          bolometers, this value indicates the desired number of 
+*          dead columns of bolometers to be randomly generated.
+*     BAD_ROWS = INTEGER (Read)
+*          If the user selects the random generation of bad
+*          bolometers, this value indicates the desired number of 
+*          dead rows of bolometers to be randomly generated.
+*     BAD_BOLOS = INTEGER (Read)
+*          If the user selects the random generation of bad
+*          bolometers, this value indicates the desired number of 
+*          dead bolometers IN EXCESS of those flagged as bad 
+*          as part of the BAD_ROWS and BAD_COLUMNS.
+*     SEED = INTEGER (Read)
+*          Seed for random number generator.  If a seed
+*          is not specified, the clock time in milliseconds
+*          is used.
 
 *  Authors:
 *     Jen Balfour (UBC)
@@ -280,8 +295,10 @@ void smurf_badbolos( int *status ) {
 
       for ( i = 0; i < nbadcols; i++ ) {
          /* Randomly choose a column, if this column has already
-            been flagged as bad move on and try the next one 
-            (NOT an ideal solution) */
+            been flagged as bad move on and try the next one.  Note
+            that this is NOT an ideal solution, it leads to 
+            clumping, and with a larger percentage of bad bolometers
+            this technique becomes less random. */
          if ( curbad >= dims[0] )
             curbad = 0;
          if ( badcols[curbad] == 1 ) {
@@ -300,8 +317,10 @@ void smurf_badbolos( int *status ) {
       curbad = rand() % dims[1];
       for ( i = 0; i < nbadrows; i++ ) {
          /* Randomly choose a row, if this row has already
-            been flagged as bad move on and try the next one 
-            (NOT an ideal solution) */
+            been flagged as bad move on and try the next one. 
+            Note that this is NOT an ideal solution, it leads to 
+            clumping, and with a larger percentage of bad bolometers
+            this technique becomes less random. */
          if ( curbad >= dims[1] )
             curbad = 0;
          if ( badrows[curbad] == 1 ) {
@@ -320,8 +339,10 @@ void smurf_badbolos( int *status ) {
       curbad = rand() % dims[0] * dims[1];
       for ( i = 0; i < nbadbolos; i++ ) {
          /* Randomly choose a bolo, if this bolo has already
-            been flagged as bad move on and try the next one 
-            (NOT an ideal solution) */
+            been flagged as bad move on and try the next one.
+            Note that this is NOT an ideal solution, it leads to 
+            clumping, and with a larger percentage of bad bolometers
+            this technique becomes less random. */ 
          if ( curbad >= dims[0] * dims[1] )
 	    curbad = 0;
          if ( bolos[curbad] == 1 ) {

@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_skynoise
+*     skynoise
 
 *  Purpose:
 *     Generate a simulated sky background with spatial noise
@@ -24,12 +24,67 @@
 *     gollowing a power law spectrum.
 
 *  ADAM Parameters:
-*     OBSXMLFILE = CHAR (Read)
-*          Input observation XML file
-*     SIMXMLFILE = CHAR (Read)
-*          Input simulation XML file
+*     OBSFILE = GROUP (Read)
+*          Specifies values for the observation parameters used by 
+*          skynoise generation. 
+*
+*          The supplied value should be either a 
+*          comma-separated list of strings or the name of a text 
+*          file preceded by an up-arrow character "^", containing 
+*          one or more comma-separated (or line-break separated) 
+*          list of strings. Each string is either a "keyword=value" 
+*          setting, or the name of a text file preceded by an up-arrow 
+*          character "^". Such text files should contain further 
+*          comma-separated lists which will be read and interpreted 
+*          in the same manner (any blank lines or lines beginning 
+*          with "#" are ignored). Within a text file, newlines can 
+*          be used as delimiters as well as commas. Settings are 
+*          applied in the order in which they occur within the list, 
+*          with later settings over-riding any earlier settings given 
+*          for the same keyword.
+*
+*          Each individual setting should be of the form:
+*
+*             <keyword>=<value>
+*
+*          The parameter names and their default values are listed
+*          below.  The default values will be used for any unspecified
+*          parameters.  Unregnized parameters are ignored (i.e. no
+*          error is reported).
+*
+*          lambda (double) : 0.85e-3 (metres)
+*            Wavelength of observation.
+*
+*     SIMFILE = GROUP (Read)
+*          Specifies values for the simulation parameters.  See 
+*          the description for OBSFILE for the file format.
+*
+*          The parameter names and their default values are listed
+*          below.  The default values will be used for any unspecified
+*          parameters.  Unregnized parameters are ignored (i.e. no
+*          error is reported).
+*
+*          aomega (double) : 0,179
+*            Coupling factor (0.179 for 850 microns,
+*            0.721 for 450 microns).
+*          atmname (char[]) : ""
+*            Name of the file containing atmospheric
+*            sky image.
+*          atmrefnu (double) : 0.5 (Hz)
+*            Atm reference corner frequency.
+*          atmrefvel (double) : 15.0 (m/sec)
+*            Atm reference velocity.
+*          bandGHz (double) : 35.0 (GHz)
+*            Bandwidth in GHz.
+*          meanatm (double) : 7.0 (pW)
+*            Mean expeected atmospheric signal.
+*          tauzen (double) : 0.052583
+*            Optical depth at 225 GHz at the zenith.
+*
 *     SEED = INTEGER (Read)
-*          Seed for random number generator
+*          Seed for random number generator.  If a seed
+*          is not specified, the clock time in milliseconds
+*          is used.
 
 *  Authors:
 *     B.D.Kelly (ROE)
