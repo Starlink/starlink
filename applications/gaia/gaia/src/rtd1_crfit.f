@@ -242,9 +242,17 @@
          CALL ERR_RLSE
       END IF
       IF ( EXISTS ) THEN
+         CALL ERR_MARK
          CALL NDF_GTWCS( NDF, IWCS, STATUS )
          CALL RTD1_ENWCS( IWCS, IPHEAD, NHEAD, AVAIL, STATUS )
          CALL AST_ANNUL( IWCS, STATUS )
+
+*  Error in the AST description (-INF values, or formatting).
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+            EXISTS = .FALSE.
+         END IF
+         CALL ERR_RLSE
       END IF
 
 *  Deal with the FITS extension that is present.
@@ -366,8 +374,17 @@
 *  Fall-back to basic NDF WCS. Simplify for AXIS structures that are
 *  really just WinMaps.
          IF ( IWCS .EQ. AST__NULL ) THEN
+            CALL ERR_MARK
             CALL NDF_GTWCS( NDF, IWCS, STATUS )
             CALL RTD1_ENWCS( IWCS, IPHEAD, NHEAD, AVAIL, STATUS )
+
+*  Trap errors reading the NDF WCS. Happens reading incompatible AST
+*  versions. In this case we have no WCS.
+            IF ( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_ANNUL( STATUS )
+               EXISTS = .FALSE.
+            END IF
+            CALL ERR_RLSE
          END IF
          CALL AST_ANNUL( IWCS, STATUS )
       END IF
