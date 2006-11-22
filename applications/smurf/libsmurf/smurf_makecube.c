@@ -350,6 +350,9 @@ void smurf_makecube( int *status ) {
    parGet0d( "CROTA", par + 6, status );
    par[ 6 ] *= AST__DD2R;
 
+/* Abort if an error has occurred. */
+   if( *status != SAI__OK ) goto L999;
+
 /* Display the projection parameters being used. */
    msgBlank( status );
    msgOutif( MSG__NORM, " ", "   Projection parameters used:", status );
