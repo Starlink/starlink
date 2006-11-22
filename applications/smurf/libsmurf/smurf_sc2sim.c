@@ -386,7 +386,7 @@
 *          Seed for random number generator.  If a seed
 *          is not specified, the clock time in milliseconds
 *          is used.
-*     MAXWRITE - INTEGER (Read)
+*     MAXWRITE = INTEGER (Read)
 *          Number of samples to write in output file.
 *     SIMTYPE = CHAR (Read)
 *          Simulation type : In a 'full' simulation the flux
