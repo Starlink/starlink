@@ -34,14 +34,14 @@
 *        the detector positions are calculated on the basis of the focal
 *        plane detector positions and the telescope pointing information.
 *     autogrid = int (Given)
-*        Determines how any bad values in "par" are replaced. If autogrid
-*        is non-zero, then new projection parameters are determined by
+*        Determines how the values returned in "par" are found. If autogrid
+*        is non-zero, then projection parameters are determined by
 *        adjusting the grid until as many data samples as possible fall
 *        close to the centre of pixels in the output cube. If autogrid is
 *        zero, CRPIX1/2 are set to zero, CRVAL1/2 are set to the first 
 *        pointing BASE position, CROTA2 is set to zero, CDELT1/2 are set to 
 *        6 arc-seconds.
-*     par = double[ 7 ] (Given and Returned)
+*     par = double[ 7 ] (Returned)
 *        An array holding the parameters describing the spatial projection
 *        between celestial (longitude,latitude) in the system specified
 *        by "system", and GRID coordinates in the output cube. These are
@@ -50,9 +50,7 @@
 *        all other values are in units of radians. The values refer to the 
 *        celestial coodinate represented by the returned SkyFrame.
 *     
-*        Any bad values in the supplied list are replaced on exit by the 
-*        actual values to be used (determined by "aitogrid"). Non-bad values 
-*        in the supplied array are left unchanged on exit. 
+*        Returned holding the values determined by "autogrid". 
 *     moving = int * (Returned)
 *        Address of an int in which to return a flag indicating if the 
 *        telescope is tracking a moving object. If so, each time slice is 
@@ -181,6 +179,12 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
+
+
+
+/* Initialise the returned array to hold vad values. */
+   for( ipar = 0; ipar < 7; ipar++ ) par[ ipar ] = AST__BAD;
+   *skyframe = NULL;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -351,35 +355,31 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                astSetC( *skyframe, "Dut1", astGetC( skyin, "Dut1" ) );
             }           
 
-/* If autogrid is not being used, the tangent point of the output tan plane 
-   projection is set to the first pointing BASE position, converted to the 
-   required coordinate system. */
-	    if( !autogrid && ( par[ 2 ] == AST__BAD || par[ 3 ] == AST__BAD ) ) {
-
-/* Get the pointing BASE position in AZ/EL. */
-               par[ 2 ] = hdr->state->tcs_az_bc1;
-               par[ 3 ] = hdr->state->tcs_az_bc2;
+/* Set the sky position of the tangent point to the first pointing BASE 
+   position, converted to the required coordinate system. First get the 
+   pointing BASE position in AZ/EL. */
+            par[ 2 ] = hdr->state->tcs_az_bc1;
+            par[ 3 ] = hdr->state->tcs_az_bc2;
 
 /* If the required system is not AZ/EL, we need to convert the 
    axis values to the required system. */
-               if( strcmp( "AZEL", usesys ) ) {
+            if( strcmp( "AZEL", usesys ) ) {
 
 /* Create two copies of the SkyFrame in the input WCS FrameSet, and set
    their Systems to AZEL and the requested output system. */
-                  skyframein = astGetFrame( swcsin, AST__CURRENT );     
-                  sf1 = astCopy( skyframein );
-                  sf2 = astCopy( skyframein );
+               skyframein = astGetFrame( swcsin, AST__CURRENT );     
+               sf1 = astCopy( skyframein );
+               sf2 = astCopy( skyframein );
 
-                  astSetC( sf1, "System", "AZEL" );
-                  astSetC( sf2, "System", usesys );
+               astSetC( sf1, "System", "AZEL" );
+               astSetC( sf2, "System", usesys );
 
 /* Get a Mapping from AZEL to the requested system, and use it to convert 
    the lon_0/lat_0 values to the requested system. */
-                  astTran2( astConvert( sf1, sf2, "" ), 1, par + 2,
-                            par + 3, 1, &a, &b );
-                  par[ 2 ] = a;
-                  par[ 3 ] = b;
-               }
+               astTran2( astConvert( sf1, sf2, "" ), 1, par + 2,
+                         par + 3, 1, &a, &b );
+               par[ 2 ] = a;
+               par[ 3 ] = b;
             }
 
 /* Determine if the telescope is following a moving target such as a
@@ -410,10 +410,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                astSetC( *skyframe, "system", trsys );
                usesys = trsys;
             }
-
-/* Set the SKyFrame SkyRef position to the tangent point. */
-            astSetD( *skyframe, "SkyRef(1)", par[ 2 ] );
-            astSetD( *skyframe, "SkyRef(2)", par[ 3 ] );
 
 /* If we do not need to look at any other time slices, we can leave the loop
    early. */
@@ -530,21 +526,15 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* If required, calculate the optimal projection parameters. */
    if( autogrid && usesys ) {
-      kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), oppar, status );
+      kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par, status );
 
-/* Replace any supplied bad projection parameters with the optimal values
-   calculated above. */
-     for( ipar = 0; ipar < 7; ipar++ ) {
-        if( par[ ipar ] == AST__BAD ) par[ ipar ] = oppar[ ipar ];
-     }        
-
-/* Otherwise replace any remaining bad values with fixed values. */
+/* Otherwise use fixed values. */
    } else {
-      if( par[ 0 ] == AST__BAD ) par[ 0 ] = 0.0;
-      if( par[ 1 ] == AST__BAD ) par[ 1 ] = 0.0;
-      if( par[ 4 ] == AST__BAD ) par[ 4 ] = (6.0/3600.0)*AST__DD2R;
-      if( par[ 5 ] == AST__BAD ) par[ 5 ] = (6.0/3600.0)*AST__DD2R;
-      if( par[ 6 ] == AST__BAD ) par[ 6 ] = 0.0;
+      par[ 0 ] = 0.0;
+      par[ 1 ] = 0.0;
+      par[ 4 ] = (6.0/3600.0)*AST__DD2R;
+      par[ 5 ] = (6.0/3600.0)*AST__DD2R;
+      par[ 6 ] = 0.0;
    }
 
 /* Ensure the pixel sizes have the correct signs. */
@@ -554,6 +544,10 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
       par[ 4 ] = -fabs( par[ 4 ] );
    }
    par[ 5 ] = fabs( par[ 5 ] );
+
+/* Set the SkyFrame SkyRef position to the tangent point. */
+   astSetD( *skyframe, "SkyRef(1)", par[ 2 ] );
+   astSetD( *skyframe, "SkyRef(2)", par[ 3 ] );
 
 /* If creating an output catalogue, re-order the array containing the 
    positions so that all the longitude values come at the start of the 
