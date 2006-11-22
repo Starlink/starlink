@@ -145,28 +145,28 @@
 *        that the supplied position is at the specified point within 
 *        the displayed text string.  ["CC"]
 *     LABEL = LOGICAL (Read)
-*        If TRUE the positions are labelled on the graphics device specified 
-*        by parameter DEVICE.  The offset of the centre of the each 
-*        label from the corresponding position is controlled using the
-*        "NumLabGap(1)" and "NumLabGap(2)" plotting attributes, and the
-*        appearance of the labels is controlled using attributes
+*        If TRUE the positions are labelled on the graphics device 
+*        specified by parameter DEVICE.  The offset of the centre of 
+*        each label from the corresponding position is controlled using
+*        the "NumLabGap(1)" and "NumLabGap(2)" plotting attributes, and 
+*        the appearance of the labels is controlled using attributes
 *        "Colour(NumLab)", "Size(NumLab)", etc.  These attributes may be
-*        specified using parameter STYLE. The content of the label is
-*        determined by parameter LABTYPE. [FALSE]
+*        specified using parameter STYLE.  The content of the label is
+*        determined by parameter LABTYPE.  [FALSE]
 *     LABTYPE = LITERAL (Read)
 *        Determines what sort of labels are drawn if the LABEL parameter
-*        is set TRUE. It can be any of:
+*        is set TRUE. It can be either of the following.
 *
-*        - "ID": causes the integer identifier associated with each row
-*        to be used as the label for the row
+*        - "ID" -- causes the integer identifier associated with each 
+*        row to be used as the label for the row.
 *
-*        - "LABEL": causes the textual label associated with each row
-*        to be used as the label for the row. These strings are read from
-*        the "LABEL" column of the supplied catalogue.
+*        - "LABEL" -- causes the textual label associated with each row
+*        to be used as the label for the row.  These strings are read
+*        from the "LABEL" column of the supplied catalogue.
 *
-*        If a null (!) value is supplied, a default of "LABEL" will be used 
-*        if the input catalogue contains a "LABEL" column. Otherwise, a 
-*        default of "ID" wil be used. [!]
+*        If a null (!) value is supplied, a default of "LABEL" will be 
+*        used if the input catalogue contains a "LABEL" column. 
+*        Otherwise, a default of "ID" will be used.  [!]
 *     LAST = INTEGER (Read)
 *        The identifier for the last position to be displayed.
 *        Positions are only displayed which have identifiers in the
@@ -279,9 +279,9 @@
 *        then the extra positions will be marked with an integer value 
 *        indicating the index within the list of supplied positions. 
 *        (Note, these integers may be different from the position
-*        identifiers in the supplied positions list). If a null value (!)
-*        is given for the parameter, then all positions will be marked with
-*        the integer indices, starting at 1.
+*        identifiers in the supplied positions list).  If a null value 
+*        (!) is given for the parameter, then all positions will be 
+*        marked with the integer indices, starting at 1.
 *
 *        A comma-separated list should be given in which each element is
 *        either a marker string, or the name of a text file preceded by
@@ -573,10 +573,11 @@
 
       END IF
 
-*  If positions are to be labelled, see what type of label is to be used.
-*  If a null value is supplied for the parameter, annul the error and use
-*  'LABEL' if the catalogue contains a LABEL column, and 'ID' otherwise.
-*  Issue a warning if LABEL is requested but no labels are available.
+*  If positions are to be labelled, see what type of label is to be
+*  used.  If a null value is supplied for the parameter, annul the error
+*  and use 'LABEL' if the catalogue contains a LABEL column, and 'ID' 
+*  otherwise.  Issue a warning if LABEL is requested but no labels are 
+*  available.
       IF( LABEL .AND. STATUS .EQ. SAI__OK ) THEN
          CALL PAR_CHOIC( 'LABTYPE', 'ID', 'ID,LABEL', .FALSE., LABTYP, 
      :                   STATUS )
@@ -863,7 +864,7 @@
 *  Produce the graphics.
          CALL KPS1_LSHPL( IWCS, NDISP, NRAX, %VAL( CNF_PVAL( IPW2 ) ), 
      :                    PLOT,
-     :                    GEO, IMARK, CLOSE, LABTYP, IGRP2, IGRP4, JUST, 
+     :                    GEO, IMARK, CLOSE, LABTYP, IGRP2, IGRP4, JUST,
      :                    %VAL( CNF_PVAL( IPID ) ), 
      :                    %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
@@ -879,7 +880,7 @@
 
 *  Create a a logfile containing formatted values if required.  We first
 *  put a "#" at the start of all comment lines and remove the "#" from 
-* the position identifiers.  Also add some leading spaces.
+*  the position identifiers.  Also add some leading spaces.
       DO I = 1, SIZE
          CALL GRP_GET( IGRP1, I, 1, TEXT, STATUS ) 
 
