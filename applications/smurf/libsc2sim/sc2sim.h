@@ -45,6 +45,8 @@
 *        Pass accel to sc2sim_getcurvepong
 *     2006-11-21 (JB):
 *        Added sc2sim_getliss
+*     2006-11-22 (JB):
+*        Added nmaps to getcurvepong, getstraightpong, and getliss.
 
 *     {enter_further_changes_here}
 
@@ -253,6 +255,7 @@ double spacing,      /* grid spacing in arcsec (given) */
 double accel[2],     /* telescope accelerations (arcsec) (given) */
 double vmax[2],      /* telescope maximum velocities (arcsec/sec) (given) */
 double samptime,     /* sample interval in sec (given) */
+int nmaps,           /* number of cycles of the pattern */
 int *pongcount,      /* number of positions in pattern (returned) */
 double **posptr,     /* list of positions (returned) */
 int *status          /* global status (given and returned) */
@@ -278,6 +281,7 @@ double spacing,      /* grid spacing in arcsec (given) */
 double accel[2],     /* telescope accelerations (arcsec) (given) */
 double vmax[2],      /* telescope maximum velocities (arcsec/sec) (given) */
 double samptime,     /* sample interval in sec (given) */
+int nmaps,           /* number of cycles of the pattern */
 int *lisscount,      /* number of positions in pattern (returned) */
 double **posptr,     /* list of positions (returned) */
 int *status          /* global status (given and returned) */
@@ -430,6 +434,7 @@ double spacing,       /* grid spacing in arcsec (given) */
 double accel[2],      /* telescope accelerations in arcsec/sec (given) */
 double vmax[2],       /* telescope maximum velocities in arcsec/sec (given) */
 double samptime,      /* sample interval in sec (given) */ 
+int nmaps,           /* number of cycles of the pattern */
 int *pongcount,       /* number of positions in pattern (returned) */
 double **posptr,      /* list of positions (returned) */
 int *status           /* pointer to global status (given and returned) */

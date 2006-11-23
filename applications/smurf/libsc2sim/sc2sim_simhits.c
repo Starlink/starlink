@@ -103,6 +103,8 @@
 *        Pass accel to curve PONG
 *     2006-11-21 (JB):
 *        Add liss mode.
+*     2006-11-22 (JB):
+*        Add multiple map cycle capabilites to liss/pong.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -299,8 +301,8 @@ void sc2sim_simhits ( struct sc2sim_obs_struct *inx,
 
 	 sc2sim_getstraightpong ( inx->pong_angle, inx->pong_width,
 				  inx->pong_height, inx->pong_spacing,
-                                  accel, vmax, samptime, &count, 
-                                  &posptr, status );
+                                  accel, vmax, samptime, inx->pong_nmaps, 
+                                  &count, &posptr, status );
 
       }	else if ( strncmp ( inx->pong_type, "CURVE", 5 ) == 0 ) { 
 
@@ -311,8 +313,8 @@ void sc2sim_simhits ( struct sc2sim_obs_struct *inx,
 
 	 sc2sim_getcurvepong ( inx->pong_angle, inx->pong_width,
 			       inx->pong_height, inx->pong_spacing,
-                               accel, vmax, samptime, &count, 
-                               &posptr, status );
+                               accel, vmax, samptime, inx->pong_nmaps, 
+                               &count, &posptr, status );
 
       } else {
          *status = SAI__ERROR;
@@ -361,8 +363,8 @@ void sc2sim_simhits ( struct sc2sim_obs_struct *inx,
 
     sc2sim_getliss ( inx->liss_angle, inx->liss_width,
 		     inx->liss_height, inx->liss_spacing,
-                     accel, vmax, samptime, &count, 
-                     &posptr, status ); 
+                     accel, vmax, samptime, inx->liss_nmaps, 
+                     &count, &posptr, status ); 
     break; 
 
   default: /* should never be reached...*/

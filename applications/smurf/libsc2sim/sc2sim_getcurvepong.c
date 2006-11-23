@@ -15,8 +15,9 @@
 *  Invocation:
 *     sc2sim_getcurvepong ( double angle, double width, double height, 
 *                           double spacing, double vmax[2], 
-*                           double samptime, int *pongcount, 
-*                           double **posptr, int *status )
+*                           double samptime, int nmaps, 
+*                           int *pongcount, double **posptr, 
+*                           int *status )
 
 *  Arguments:
 *     angle = double (Given)
@@ -34,6 +35,8 @@
 *        Telescope maximum velocities (arcsec)
 *     samptime = double (Given)
 *        Sample interval in sec
+*     nmaps = int (Given)
+*        Number of cycles of the Pong pattern
 *     pongcount = int* (Returned)
 *        Number of positions in pattern
 *     posptr = double** (Returned)
@@ -79,6 +82,8 @@
 *        height, width, and angle.
 *     2006-11-16 (JB):
 *        Use Straight PONG solution to approximate period.
+*     2006-11-22 (JB):
+*        Added multiple map cycle capabilities.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -124,6 +129,7 @@ double spacing,      /* grid spacing in arcsec (given) */
 double accel[2],     /* telescope accelerations (arcsec) (given) */
 double vmax[2],      /* telescope maximum velocities (arcsec/sec) (given) */
 double samptime,     /* sample interval in sec (given) */
+int nmaps,           /* number of cycles of the pattern */
 int *pongcount,      /* number of positions in pattern (returned) */
 double **posptr,     /* list of positions (returned) */
 int *status          /* global status (given and returned) */
@@ -138,6 +144,8 @@ int *status          /* global status (given and returned) */
    int curroff;             /* index of next free slot in position list */
    double grid[1024][2];    /* array of vertex coordinates */
    int i;                   /* loop counter */
+   double *mapptr;          /* list of positions for one map */
+   int mcount;              /* number of positions in one map */
    int numvertices;         /* number of vertices (including start & end,  
                                which are the same) */
    double period;           /* total time of scan (seconds) */
@@ -172,7 +180,7 @@ int *status          /* global status (given and returned) */
       grid[i][1] = ty;
    }
 
-   (*pongcount) = 0;
+   mcount = 0;
 
    for ( i=0; i<numvertices - 1; i++ ) {
       cstart[0] = grid[i][0];
@@ -181,16 +189,16 @@ int *status          /* global status (given and returned) */
       cend[1] = grid[i+1][1];
       sc2sim_getscansegsize ( samptime, cstart, cend, accel, vmax, &curroff,
                               status );
-      (*pongcount) += curroff;
+      mcount += curroff;
    }
 
-   period = (*pongcount) * samptime;
+   period = mcount * samptime;
    peri_x = period / y_numvert;
    peri_y = period / x_numvert;
 
    /* Determine the number of positions required for the pattern
       and allocate memory */
-   *posptr = smf_malloc ( (*pongcount)*2, sizeof(**posptr), 1, status );
+   mapptr = smf_malloc ( mcount*2, sizeof(*mapptr), 1, status );
 
    /* Calculate the amplitudes of x(t) and y(t) */
    amp_x = ((double)(x_numvert) * vert_spacing) / 2.0;
@@ -201,7 +209,7 @@ int *status          /* global status (given and returned) */
       terms (1, 3, 5, 7, 9) so as to "round off" the corners */
    t_count = 0.0;
 
-   for ( i = 0; ( i < (*pongcount) * 2 ); i++ ) {
+   for ( i = 0; ( i < mcount * 2 ); i++ ) {
      
       tx = ( ( 8.0 * amp_x ) / ( M_PI * M_PI ) ) * 
            ( sin ( 2.0 * M_PI * t_count / peri_x ) -
@@ -218,12 +226,22 @@ int *status          /* global status (given and returned) */
 	   ( 1.0/81.0 * sin ( 18.0 * M_PI * t_count / peri_y ) ) );
 
       /* Apply the rotation angle and record the coordinates */
-      (*posptr)[i] = tx * cos ( angle ) - ty * sin ( angle );
+      mapptr[i] = tx * cos ( angle ) - ty * sin ( angle );
       i++;
-      (*posptr)[i] = tx * sin ( angle ) + ty * cos ( angle );
+      mapptr[i] = tx * sin ( angle ) + ty * cos ( angle );
 
       t_count += samptime;
 
    }
+
+   /* Allocate memory for all n cycles of the pattern */
+   *pongcount = mcount * nmaps;
+   *posptr = smf_malloc ( (*pongcount) * 2, sizeof(**posptr), 1, status );
+
+   /* Copy the required number of cycles into the 
+      list of positions */
+   for ( i = 0; i < *pongcount * 2; i++ ) {
+     (*posptr)[i] = mapptr[i % (mcount * 2)];
+   } 
 
 }

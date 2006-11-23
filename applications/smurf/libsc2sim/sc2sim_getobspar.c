@@ -58,6 +58,8 @@
 *        Statically allocate memory for convert
 *     2006-11-21 (JB):
 *        Add lissajous parameters and remove bolfile (deprecated)
+*     2006-11-22 (JB):
+*        Add pong_nmaps and liss_nmaps.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -316,6 +318,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0D ( keymap, "LISS_VMAX", &(inx->liss_vmax) ) )
      inx->liss_vmax = 200.0;
 
+   if ( !astMapGet0D ( keymap, "LISS_NMAPS", &(inx->liss_nmaps) ) )
+     inx->liss_nmaps = 1;
+
    if ( !astMapGet0D ( keymap, "MJDAYSTART", &(inx->mjdaystart) ) )
       inx->mjdaystart = 53795.0;
 
@@ -403,6 +408,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
    if ( !astMapGet0D ( keymap, "PONG_VMAX", &(inx->pong_vmax) ) )
      inx->pong_vmax = 200.0;
+
+   if ( !astMapGet0D ( keymap, "PONG_NMAPS", &(inx->pong_nmaps) ) )
+     inx->pong_nmaps = 1;
 
    if ( !astMapGet0C ( keymap, "RA", &temp ) )
      inx->ra = 0.0;

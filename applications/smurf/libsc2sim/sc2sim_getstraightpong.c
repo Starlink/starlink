@@ -16,8 +16,9 @@
 *     sc2sim_getstraightpong ( double angle, double width, 
 *                              double height, double spacing, 
 *                              double accel[2], double vmax[2], 
-*                              double samptime, int *pongcount, 
-*                              double **posptr, int *status )
+*                              double samptime, int nmaps, 
+*                              int *pongcount, double **posptr,
+*                              int *status )
 
 *  Arguments:
 *     angle = double (Given)
@@ -35,6 +36,8 @@
 *        Telescope maximum velocities (arcsec)
 *     samptime = double (Given)
 *        Sample interval in sec
+*     nmaps = int (Given)
+*        Number of cycles of the Pong pattern
 *     pongcount = int* (Returned)
 *        Number of positions in pattern
 *     posptr = double** (Returned)
@@ -76,6 +79,8 @@
 *     2006-10-03 (JB):
 *        Allow non-square PONG patterns, change to user-friendly
 *        parameters.
+*     2006-11-22 (JB):
+*        Added multiple map cycle capabilities.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -121,6 +126,7 @@ double spacing,      /* grid spacing in arcsec (given) */
 double accel[2],     /* telescope accelerations (arcsec) (given) */
 double vmax[2],      /* telescope maximum velocities (arcsec) (given) */
 double samptime,     /* sample interval in sec (given) */
+int nmaps,           /* number of cycles of the pattern */
 int *pongcount,      /* number of positions in pattern (returned) */
 double **posptr,     /* list of positions (returned) */
 int *status          /* global status (given and returned) */
@@ -133,6 +139,8 @@ int *status          /* global status (given and returned) */
    int curroff;             /* index of next free slot in position list */
    double grid[1024][2];    /* array of vertex coordinates */
    int j;                   /* loop counter */
+   double *mapptr;          /* list of positions for one map */
+   int mcount;              /* number of positions in one map */
    int numvertices;         /* number of vertices (including start & end,  
                                which are the same) */
    double tx;               /* temporary X coordinate */
@@ -151,7 +159,9 @@ int *status          /* global status (given and returned) */
       grid[j][1] = ty;
    }
 
-   (*pongcount) = 0;
+
+   /* Get the size of the each scan segment */
+   mcount = 0;
 
    for ( j=0; j<numvertices - 1; j++ ) {
       cstart[0] = grid[j][0];
@@ -160,11 +170,13 @@ int *status          /* global status (given and returned) */
       cend[1] = grid[j+1][1];
       sc2sim_getscansegsize ( samptime, cstart, cend, accel, vmax, &curroff,
                               status );
-      (*pongcount) += curroff;
+      mcount += curroff;
    }
 
-   *posptr = smf_malloc ( (*pongcount)*2, sizeof(**posptr), 1, status );
+   /* Allocate memory for a single cycle of the pattern */
+   mapptr = smf_malloc ( mcount*2, sizeof(*mapptr), 1, status );
 
+   /* Get the positions for each scan segment */
    curroff = 0;
 
    for ( j=0; j<numvertices - 1; j++ ) {
@@ -172,8 +184,18 @@ int *status          /* global status (given and returned) */
       cstart[1] = grid[j][1];
       cend[0] = grid[j+1][0];
       cend[1] = grid[j+1][1];
-      sc2sim_getscanseg ( samptime, cstart, cend, accel, vmax, *pongcount,
-                          &curroff, *posptr, status );
+      sc2sim_getscanseg ( samptime, cstart, cend, accel, vmax, mcount,
+                          &curroff, mapptr, status );
    }
+
+   /* Allocate memory for all n cycles of the pattern */
+   *pongcount = mcount * nmaps;
+   *posptr = smf_malloc ( (*pongcount) * 2, sizeof(**posptr), 1, status );
+
+   /* Copy the required number of cycles into the 
+      list of positions */
+   for ( j = 0; j < (*pongcount) * 2; j++ ) {
+     (*posptr)[j] = mapptr[j % (mcount * 2)];
+   } 
 
 }

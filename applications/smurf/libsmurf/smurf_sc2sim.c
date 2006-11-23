@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     sc2sim
+*     SC2SIM
 
 *  Purpose:
 *     Top-level SIMULATE implementation
@@ -177,6 +177,9 @@
 *          liss_vmax (double) : 200.0 (arcseconds/second)
 *            For the LISS obsmode, this parameter specifies
 *            the maximum telescope velocity.
+*          liss_nmaps (integer) : 1 
+*            The number of times the Lissajous pattern should
+*            repeat.
 *          mjdaystart (double) : 53795.0
 *            Modified julian date at start of observation.
 *          nbolx (integer) : 40
@@ -248,6 +251,9 @@
 *          pong_vmax (double) : 200.0 (arcseconds/second)
 *            For the PONG obsmode, this parameter specifies
 *            the maximum telescope velocity.
+*          pong_nmaps (integer) : 1 
+*            The number of times the Pong pattern should
+*            repeat.
 *          ra (char[]) : 0:0:0.0 O (hours:minutes:seconds)
 *            Sexagesimal string representation of the Right 
 *            ascension of the observation.
@@ -421,6 +427,7 @@
 *     2006-10-03  Remove unused variables (JB)
 *     2006-11-21  Expanded comments section for use with 
 *                 smurf_help task and added Lissajous mode.(JB)
+*     2006-11-22  Added multiple map cycle capabilities to liss/pong (JB)
 *     {enter_further_changes_here}
 
 *    History (HEATRUN task):
@@ -613,7 +620,8 @@ void smurf_sc2sim( int *status ) {
 			pzero, rseed, samptime, weights, xbc, xbolo, ybc, 
 			ybolo, status);
 
-   }  else if ( mode == pong || mode == singlescan || mode == bous ) {
+   }  else if ( mode == pong || mode == singlescan || mode == bous || 
+                mode == liss ) {
 
       /* Do a simulation */
 

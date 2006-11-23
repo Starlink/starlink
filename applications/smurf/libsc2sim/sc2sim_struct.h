@@ -29,7 +29,8 @@
     05Oct2006 : Replace pong_gridcount with pong_height and pong_width (jb)
     12Oct2006 : Delete wt0_name and wt1_name as they are deprecated (agg)
     16Oct2006 : Add pong_type (jb)
-    21Nov2006 : Add liss parameters and remove bolfile (deprecated) (jb)
+    21Nov2006 : Add liss parameters and remove bolfile (deprecated)(jb)
+    22Nov2006 : Add pong_nmaps and liss_nmaps (jb)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -90,6 +91,8 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   double liss_height;         /* min height of liss pattern (arcsec) */
   double liss_spacing;        /* grid spacing in arcsec */
   double liss_vmax;           /* Telescope max velocities (arcsec/sec) */
+  double liss_nmaps;          /* Number of times to repeat Lissajous 
+			         pattern */
   double mjdaystart;          /* Modified julian date at start */      
   int nbolx;                  /* number of bolometers in X */
   int nboly;                  /* number of bolometers in Y */
@@ -107,6 +110,8 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   double pong_spacing;        /* grid spacing in arcsec */
   char pong_type[80];         /* Type of PONG scan (straight or curve) */
   double pong_vmax;           /* Telescope max velocities (arcsec/sec) */
+  double pong_nmaps;          /* Number of times to repeat Pong
+				 pattern */
   double ra;                  /* right ascension in radians */
   double sample_t;            /* sample time in msec */
   double scan_angle;          /* angle of pattern relative to telescope
