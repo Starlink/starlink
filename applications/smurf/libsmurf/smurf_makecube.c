@@ -135,7 +135,9 @@
 *        AUTOGRID now supplies the dynamic defaults for the projection
 *        parametersm which are now acquired after AUTOGRID.
 *     23-NOV-2006 (DSB):
-*        SYSTEM can now accept any AST celestial System name.
+*        - SYSTEM can now accept any AST celestial System name.
+*        - Fix incorrect indices for "pixsize" array when checking pixel
+*        sizes.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -332,9 +334,9 @@ void smurf_makecube( int *status ) {
       if( nval < 2 ) pixsize[ 1 ] = pixsize[ 0 ];
    
 /* Check the values are OK. */
-      if( pixsize[ 4 ] <= 0 || pixsize[ 5 ] <= 0 ) {
-         msgSetd( "P1", pixsize[ 4 ] );
-         msgSetd( "P2", pixsize[ 5 ] );
+      if( pixsize[ 0 ] <= 0 || pixsize[ 1 ] <= 0 ) {
+         msgSetd( "P1", pixsize[ 0 ] );
+         msgSetd( "P2", pixsize[ 1 ] );
          *status = SAI__ERROR;
          errRep( FUNC_NAME, "Invalid pixel sizes (^P1,^P2).", status);
       }
