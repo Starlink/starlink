@@ -103,7 +103,8 @@
 *          value is determined by the AUTOGRID parameter. []
 *     SYSTEM = LITERAL (Read)
 *          The celestial coordinate system for the output cube. One of
-*          ICRS, FK5, AZEL, GALACTIC or TRACKING.
+*          ICRS, GAPPT, FK5, FK4, FK4-NO-E, AZEL, GALACTIC, ECLIPTIC or 
+*          TRACKING.
 *     USEDETPOS = _LOGICAL (Read)
 *          If a true value is supplied, then the detector positions are
 *          read from the detector position arrays in each input NDF.
@@ -131,8 +132,10 @@
 *        - Make the DETECTORS parameter case insensitive.
 *        - Document label column in OUTCAT.
 *     21-NOV-2006 (DSB):
-*        AUTOGRID now supplies the dynamci defaults for the projection
+*        AUTOGRID now supplies the dynamic defaults for the projection
 *        parametersm which are now acquired after AUTOGRID.
+*     23-NOV-2006 (DSB):
+*        SYSTEM can now accept any AST celestial System name.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -163,8 +166,6 @@
 *  To Do:
 *     - Add extra options to the SYSTEM parameter (e.g. GAPPT).
 *     - Add support to use astRebin (with warnings about slow speed)
-*     - Add auto-grid determinatiom option
-*     - Add history to output NDF
 
 */
 
@@ -257,8 +258,8 @@ void smurf_makecube( int *status ) {
    ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
 
 /* Get the celestial coordinate system for the output cube. */
-   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC",
-              1, system, 10, status );
+   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC"
+             "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
 
 /* See of the detector positions are to be read from the RECEPPOS array. 
    Otherwise, they are calculated on the basis of the FPLANEX/Y arrays. */
