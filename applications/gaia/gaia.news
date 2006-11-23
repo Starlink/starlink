@@ -1,4 +1,8 @@
   Latest changes:
+
+    The handling of broken WCS components in NDFs should now 
+    result in the display of an image/cube, without a WCS rather
+    than an unrelated error report about a missing data component.
     
     The direction compass is now always a fixed size, not one that
     depends on the image scale.
