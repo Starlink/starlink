@@ -93,6 +93,8 @@
 *     21-NOV-2006 (DSB):
 *        Correct inversion of ospecmap so that it combines correctly with
 *        specmap.
+*     23-NOV-2006 (DSB):
+*        Correct indexing of "specin" array.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -401,7 +403,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    in the input into the corresponding values on the output spectral PIXEL
    axis. */
          specin[ 0 ] = 1.0;
-         specin[ 0 ] = (data->dims)[ 0 ];
+         specin[ 1 ] = (data->dims)[ 0 ];
          astTran1( ssmap, 2, specin, 1, specout );
 
 /* Update the bounds of the output cube on the spectral PIXEL axis. */

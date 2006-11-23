@@ -86,6 +86,8 @@
 *     21-NOV-2006 (DSB):
 *        Set the SkyRef attribute in the returned SkyFrame to be the
 *        tangent point.
+*     22-NOV-2006 (DSB):
+*        Correct the amount of memory allocated for "allpos".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -146,6 +148,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    AstFrame *skyin = NULL;    /* Sky Frame in input FrameSet */
    AstFrameSet *fs = NULL;    /* A general purpose FrameSet pointer */
    AstFrameSet *swcsin = NULL;/* FrameSet describing spatial input WCS */
+   Grp *labgrp;          /* GRP group holding detector labels */
    char *pname = NULL;        /* Name of currently opened data file */
    char outcatnam[ 41 ];      /* Output catalogue name */
    const char *lab = NULL;    /* Pointer to start of next detector name */
@@ -162,10 +165,8 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    double *yout = NULL;  /* Workspace for detector output pixel positions */
    double a;             /* Longitude value */
    double b;             /* Latitude value */
-   double oppar[ 7 ];    /* Optimal parameter values */
    double sep;           /* Separation between first and last base positions */
    float *pdata;         /* Pointer to next data sample */
-   Grp *labgrp;          /* GRP group holding detector labels */
    int good;             /* Are there any good detector samples? */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ifile;            /* Index of current input file */
@@ -179,8 +180,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
-
-
 
 /* Initialise the returned array to hold vad values. */
    for( ipar = 0; ipar < 7; ipar++ ) par[ ipar ] = AST__BAD;
@@ -303,8 +302,12 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
          yin[ irec ] = 1.0;
       }
 
-/* Extend the memory used to hold the list of all receptor positions. */
-      allpos = astGrow( allpos, nallpos + 2*(data->dims)[ 2 ]*(data->dims)[ 1 ],
+/* Extend the memory used to hold the list of all receptor positions.
+   Make it the maximum size that could be needed - less will be used if
+   some of the receptors are bad. Each position needs 2 doubles (one for
+   X and one for Y). */
+      allpos = astGrow( allpos, 2*( nallpos + (data->dims)[ 2 ]*
+                                              (data->dims)[ 1 ] ),
                         sizeof( double ) );
 
 /* Store a pointer to the next input data value */
