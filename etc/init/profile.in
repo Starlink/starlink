@@ -248,7 +248,7 @@ fi
 
 #  SPLAT
 
-if test -f @starjavadir@/bin/splat/splat.sh; then
+if test -f @starjavadir@/bin/splat/splat; then
    export SPLAT_DIR=@starjavadir@/bin/splat
 fi
 
@@ -521,10 +521,14 @@ fi
 
 # SPLAT
 
-if test -f @starjavadir@/bin/splat/splat.sh; then
-  splat () { . $SPLAT_DIR/splat.sh; }
+if test -f @starjavadir@/bin/splat/splat; then
+  splat () { $SPLAT_DIR/splat ${1+"$@"}; }
+  splatdisp () { $SPLAT_DIR/splatdisp ${1+"$@"}; }
+  splatdispmany () { $SPLAT_DIR/splatdispmany ${1+"$@"}; }
 else
   splat () { @staretcdir@/notinst splat; }
+  splatdisp () { @staretcdir@/notinst splat; }
+  splatdispmany () { @staretcdir@/notinst splat; }
 fi
 
 # SST
