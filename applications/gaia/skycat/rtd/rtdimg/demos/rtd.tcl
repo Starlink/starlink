@@ -168,5 +168,5 @@ set optlist [list \
 	-zoom_width \
 	]
 
-util::TopLevelWidget::start Rtd "-file" "$rtd_usage" "" 1 $optlist
+util::TopLevelWidget::start rtd::Rtd "-file" "$rtd_usage" "" 1 $optlist
 
