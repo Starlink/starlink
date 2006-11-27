@@ -222,6 +222,8 @@
 *  History:
 *     8-NOV-2006 (DSB):
 *        Original version.
+*     27-NOV-2006 (DSB):
+*        Round the returned CROTA value to 0.1 degree.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -568,6 +570,10 @@
          PAR0( 5 ) = -PAR0( 5 )
          PAR0( 7 ) = -PAR0( 7 )
       END IF
+
+*  Round to the nearest 10th of a degree. 
+      PAR0( 7 ) = NINT( PAR0( 7 )*AST__DR2D*10.0 )/
+     :                   (10.0*AST__DR2D)
 
 *  Ensure CROTA is in the range 0 -> 2*PI
       DO WHILE( PAR0( 7 ) .LT. 0.0 ) 
