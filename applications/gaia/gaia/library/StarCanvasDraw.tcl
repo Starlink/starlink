@@ -306,6 +306,17 @@ itcl::class gaia::StarCanvasDraw {
       }
    }
 
+   #  Called when creation is done. Override to test if a value for obj_id_
+   #  has been set yet. This may not be true when the button release is seen
+   #  before the button press. This seems to unexpectable happen when the
+   #  canvas objects have a binding to <1>.
+   public method create_done {x y} {
+      if { $obj_id_ == "" } {
+         return
+      }
+      CanvasDraw::create_done $x $y
+   }
+
    #  Select the given object by drawing little grips on it.
    method select_object {id {any 0}} {
       if {$drawing_} {
@@ -796,7 +807,6 @@ itcl::class gaia::StarCanvasDraw {
    #  types_ array to access obj_id_).
 
    method create_object {x y} {
-
       mark $x $y
       set obj_coords_ "$x $y"
       set obj_id_ [create_$drawing_mode_ $x $y]
