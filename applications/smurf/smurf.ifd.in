@@ -763,6 +763,15 @@ package @PACKAGE@ {
             helpkey *
           }
 
+         parameter params {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Auxiliary rebinning parameters}
+            helpkey *
+         }
+
 	 parameter pixsize {
 	    position 3
 	    type _REAL
@@ -797,6 +806,15 @@ package @PACKAGE@ {
             prompt {Celestial longitude at output reference point}
             helpkey *
 	  }
+
+         parameter spread {
+            type LITERAL
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Pixel spreading method}
+            helpkey *
+            default {Nearest}
+         }
 
 	  parameter system {
 	    position 4

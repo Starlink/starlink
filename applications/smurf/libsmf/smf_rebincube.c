@@ -16,8 +16,8 @@
 *     smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout, 
 *                    AstFrame *ospecfrm, AstMapping *ospecmap, Grp *detgrp,
 *                    int moving, dim_t lbnd_out[ 3 ], dim_t ubnd_out[ 3 ], 
-*                    float *data_array, float *var_array, double *wgt_array, 
-*                    int *status );
+*                    int spread, const double params[], float *data_array, 
+*                    float *var_array, double *wgt_array, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -49,6 +49,16 @@
 *        The lower pixel index bounds of the output cube.
 *     ubnd_out = dim_t [ 3 ] (Given)
 *        The upper pixel index bounds of the output cube.
+*     spread = int (Given)
+*        Specifies the scheme to be used for dividing each input data value 
+*        up amongst the corresponding output pixels. See docs for astRebinSeq
+*        (SUN/211) for the allowed values.
+*     params = const double[] (Given)
+*        An optional pointer to an array of double which should contain any
+*        additional parameter values required by the pixel spreading scheme. 
+*        See docs for astRebinSeq (SUN/211) for further information. If no 
+*        additional parameters are required, this array is not used and a
+*        NULL pointer may be given. 
 *     data_array = float * (Given and Returned)
 *        The data array for the output cube. This is updated on exit to
 *        include the data from the supplied input NDF.
@@ -56,7 +66,10 @@
 *        The variance array for the output cube. This is updated on exit to
 *        include the data from the supplied input NDF.
 *     wgt_array = double * (Given and Returned)
-*        Relative weighting for each pixel in the output cube.
+*        Relative weighting for each pixel in the output cube. This array
+*        should be the same length as "data_array" if "spread" is 
+*        AST__NEAREST, but should be twice the length of "data_array" for
+*        all other values of "spread".
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -84,6 +97,9 @@
 *     21-NOV-2006 (DSB):
 *        Only create variance values if the output pixel value is formed
 *        from more than 1 detector sample.
+*     23-NOV-2006 (DSB):
+*        - Allow astRebinSeq to be used with any pixel spreading method.
+*        - Take account of 1/sqrt(N) reduction in output standard deviations.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -118,17 +134,20 @@
 #include "ast.h"
 #include "mers.h"
 #include "sae_par.h"
-#include "star/ndg.h"
 #include "prm_par.h"
+#include "star/ndg.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
 
+/* Returns nearest integer to "x" */
+#define NINT(x) ( ( x > 0 ) ? (int)( x + 0.5 ) : (int)( x - 0.5 ) )
+
 void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
                     AstFrame *ospecfrm, AstMapping *ospecmap, Grp *detgrp, 
                     int moving, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
-                    float *data_array, float *var_array, double *wgt_array, 
-                    int *status ) {
+                    int spread, const double params[], float *data_array, 
+                    float *var_array, double *wgt_array, int *status ){
 
 /* Local Variables */
    AstCmpMap *ssmap = NULL;    /* Input GRID->output GRID Mapping for spectral axis */
@@ -149,9 +168,11 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    double *xout = NULL;        /* Workspace for detector output grid positions */
    double *yin = NULL;         /* Workspace for detector input grid positions */
    double *yout = NULL;        /* Workspace for detector output grid positions */
+   float *detwork = NULL;      /* Work array holding data samples for 1 slice/channel */
    float *pdata = NULL;        /* Pointer to next input data value */
    float dval;                 /* Output data value */
    int dim[ 3 ];               /* Output array dimensions */
+   int ldim[ 3 ];              /* Output array lower GRID bounds */
    int found;                  /* Was current detector name found in detgrp? */
    int ibasein;                /* Index of base Frame in input WCS FrameSet */
    int ichan;                  /* Index of current channel */
@@ -160,6 +181,9 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    int ix;                     /* Output grid index on axis 1 */
    int iy;                     /* Output grid index on axis 2 */
    int iz;                     /* Output grid index on axis 3 */
+   int use_ast;                /* Use astRebinSeq to do the rebinning? */
+   int lbnd_in[ 2 ];           /* Lower input bounds on receptor axis */
+   int ubnd_in[ 2 ];           /* Upper input bounds on receptor axis */
    int nchan;                  /* Number of spectral channels */
    int ndet;                   /* Number of detectors in "detgrp" group */
    int pixax[ 3 ];             /* Pixel axis indices */
@@ -172,6 +196,10 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
 /* Begin an AST context.*/
    astBegin;
 
+/* Set a flag indicating if hard-wired code is to used instead of the 
+   astRebinSeq function. */
+   use_ast = ( spread != AST__NEAREST );
+
 /* Store a pointer to the input NDFs smfHead structure. */
    hdr = data->hdr;
 
@@ -179,6 +207,11 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    dim[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
    dim[ 1 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
    dim[ 2 ] = ubnd_out[ 2 ] - lbnd_out[ 2 ] + 1;
+
+/* Fill an array with the lower grid index bounds of the output. */
+   ldim[ 0 ] = 1;
+   ldim[ 1 ] = 1;
+   ldim[ 2 ] = 1;
 
 /* We want a description of the spectral WCS axis in the input file. If 
    the input file has a WCS FrameSet containing a SpecFrame, use it,
@@ -266,11 +299,20 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
 
 /* If this is the first pass through this file, initialise the arrays. */
    if( index == 1 ){
+
       for( iv = 0; iv < nel; iv++ ) {
          data_array[ iv ] = 0.0;
          wgt_array[ iv ] = 0.0;
          var_array[ iv ] = 0.0;
       }
+
+/* If we are using astRebinSeq to do the rebinning, the weights array will
+   be longer, so initialise the rest of it now. */
+      if( use_ast ) {
+         for( iv = 0; iv < nel; iv++ ) {
+            wgt_array[ iv + nel ] = 0.0;
+         }
+      }         
    }
 
 /* Allocate work arrays big enough to hold the coords of all the
@@ -279,6 +321,10 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    yin = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
    xout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
    yout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
+
+/* Allocate a work array to hold all the detector values for a single
+   time slice of a single spectral channel. */
+   if( use_ast ) detwork = astMalloc( (data->dims)[ 1 ] * sizeof( float ) );
 
 /* Store the input GRID coords of the detectors to be used. If a non-empty
    group of detectors was supplied, set the GRID coords to AST__BAD for all 
@@ -302,7 +348,7 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
       yin[ idet ] = 1.0;
 
 /* If a group of detectors to be used was supplied, search the group for
-   the name of hte current detector. If not found, set the GRID coords bad. */
+   the name of the current detector. If not found, set the GRID coords bad. */
       if( ndet ) {    
          grpIndex( name, detgrp, 1, &found, status );
          if( !found ) {
@@ -393,73 +439,158 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    it to indicate the alignment Frame).*/
       ibasein = astGetI( swcsin, "Base" );
       fs = astConvert( swcsin, swcsout, "SKY" );
+      fsmap = astGetMapping( fs, AST__BASE, AST__CURRENT );         
       astSetI( swcsin, "Base", ibasein );
 
 /* Invert the input WCS FrameSet again to bring it back into its original
    state. */
       astInvert( swcsin );
 
+/* First deal with nearest neighbour pixel spreading. This can be done
+   with specialist code that is faster than astRebinSeq. */
+      if( !use_ast ) {
+
 /* Transform the positions of the detectors from input GRID to output GRID
    coords. */
-      astTran2( fs, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
+         astTran2( fsmap, (data->dims)[ 1 ], xin, yin, 1, xout, yout );
 
 /* For each good position, place the input data values for a whole spectrum
    into the nearest pixel of the output array and increment the weight 
    array. */
-      for( idet = 0; idet < (data->dims)[ 1 ]; idet++ ) {
-
-         if( xout[ idet ] != AST__BAD && yout[ idet ] != AST__BAD ) {
-            ix = floor( xout[ idet ] + 0.5 ) - 1;
-            iy = floor( yout[ idet ] + 0.5 ) - 1;
-
-            if( ix >= 0 && ix < dim[ 0 ] && 
-                iy >= 0 && iy < dim[ 1 ] ) {
-
-               for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {
-                  iz = spectab[ ichan ] - 1;
-                  if( iz >= 0 && iz < dim[ 2 ] && *pdata != VAL__BADR ) { 
-                     iv = ix + dim[ 0 ]*iy + nxy*iz;
-                     data_array[ iv ] += *pdata;
-                     wgt_array[ iv ] += 1.0;
-                     var_array[ iv ] += ( *pdata )*( *pdata );
-
+         for( idet = 0; idet < (data->dims)[ 1 ]; idet++ ) {
+   
+            if( xout[ idet ] != AST__BAD && yout[ idet ] != AST__BAD ) {
+               ix = floor( xout[ idet ] + 0.5 ) - 1;
+               iy = floor( yout[ idet ] + 0.5 ) - 1;
+   
+               if( ix >= 0 && ix < dim[ 0 ] && 
+                   iy >= 0 && iy < dim[ 1 ] ) {
+   
+                  for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {
+                     iz = spectab[ ichan ] - 1;
+                     if( iz >= 0 && iz < dim[ 2 ] && *pdata != VAL__BADR ) { 
+                        iv = ix + dim[ 0 ]*iy + nxy*iz;
+                        data_array[ iv ] += *pdata;
+                        wgt_array[ iv ] += 1.0;
+                        var_array[ iv ] += ( *pdata )*( *pdata );
+   
+                     }
                   }
+   
+               } else {
+                  pdata += nchan;
                }
-
+   
             } else {
                pdata += nchan;
             }
-
-         } else {
-            pdata += nchan;
          }
+
+/* Now deal with cases where we are using astRebinSeq. */
+      } else {
+
+/* Store the bounds of the detector grid (the second axis is a dummy axis
+   that always has the value 1). */
+         lbnd_in[ 0 ] = 1;
+         ubnd_in[ 0 ] = (data->dims)[ 1 ];
+         lbnd_in[ 1 ] = 1;
+         ubnd_in[ 1 ] = 1;
+
+/* Process each spectral channel in turn. */
+         for( ichan = 0; ichan < nchan; ichan++, pdata++ ) {
+
+/* Get the offset to the first pixel in the output arrays that correspond
+   to the current input spectral channel. Skip this point if it is
+   outside the bounds of the output array. */
+            iz = spectab[ ichan ] - 1;
+            if( iz >= 0 && iz < dim[ 2 ] ) { 
+               iv = nxy*iz;
+
+/* Copy the detector values for this spectral channel and time slice into
+   a new array. */
+               for( idet = 0; idet < (data->dims)[ 1 ]; idet++ ) {
+                  detwork[ idet ] = pdata[ idet*nchan ];
+               }
+
+/* Paste this array into the plane of the output cube corresponding to
+   the current spectral channel. */
+               astRebinSeqF( fsmap, 0.0, 2, lbnd_in, ubnd_in, detwork, NULL, 
+                             spread, params, AST__GENVAR, 0.0, 50, VAL__BADR, 
+                             2, ldim, dim, lbnd_in, ubnd_in, data_array + iv, 
+                             var_array + iv, wgt_array + 2*iv );
+            }
+         }
+
+/* Move "pdata" on to point at the first input element in the next
+   spectral channel. */
+         pdata += nchan*( (data->dims)[ 1 ] - 1 );
       }
 
 /* For efficiency, explicitly annul the AST Objects created in this tight
    loop. */
+      fsmap = astAnnul( fsmap );
       fs = astAnnul( fs );
    }
 
 /* If this is the final pass through this function, normalise the returned
    data and variance values. */
    if( index == size ) {
-      for( iv = 0; iv < nel; iv++ ) {
-         if( wgt_array[ iv ] > 0.0 ) {
-            dval = data_array[ iv ]/wgt_array[ iv ];
-            data_array[ iv ] = dval;
+
+/* If we have been using astRebinSeq to do the rebinning, also use
+   astRebinSeq to do the normalisation. */
+      if( use_ast ) {
+
+/* Create a dummy mapping that can be used with astRebinSeq (it is not
+   actually used for anything since we are not adding any more data into the
+   output arrays). */
+         fsmap = astUnitMap( 2, "" );
+
+/* Process each spectral channel in turn. */
+         for( ichan = 0; ichan < nchan; ichan++ ) {
+
+/* Get the offset to the first pixel in the output arrays that correspond
+   to the current input spectral channel. Skip this point if it is
+   outside the bounds of the output array. */
+            iz = spectab[ ichan ] - 1;
+            if( iz >= 0 && iz < dim[ 2 ] ) { 
+               iv = nxy*iz;
+
+/* Normalise the data values and We make a separate call to astRebinSeq in order to paste each
+   individual datum into the output cube. */
+               astRebinSeqF( fsmap, 0.0, 2, lbnd_in, ubnd_in, NULL, NULL, 
+                             spread, params, AST__REBINEND | AST__GENVAR,
+                             0.0, 50, VAL__BADR, 2, ldim, dim, lbnd_in, 
+                             ubnd_in, data_array + iv, var_array + iv, 
+                             wgt_array + 2*iv );
+            }
+         }
+
+/* Free the dummy mapping. */
+         fsmap = astAnnul( fsmap );
+
+/* If we have not been using astRebinSeq to do the rebinning, do the 
+   normalisation using hard-wired code. */
+      } else {
+
+         for( iv = 0; iv < nel; iv++ ) {
+            if( wgt_array[ iv ] > 0.0 ) {
+               dval = data_array[ iv ]/wgt_array[ iv ];
+               data_array[ iv ] = dval;
 
 /* Variance cannot be created if only 1 point contributed to the output
    pixel. */
-            if( wgt_array[ iv ] > 1.0 ) {
-               var_array[ iv ] /=  wgt_array[ iv ];
-               var_array[ iv ] -=  dval*dval;
+               if( wgt_array[ iv ] > 1.0 ) {
+                  var_array[ iv ] /=  wgt_array[ iv ];
+                  var_array[ iv ] -=  dval*dval;
+                  var_array[ iv ] /=  wgt_array[ iv ];
+               } else {
+                  var_array[ iv ] = VAL__BADR;
+               }
+   
             } else {
+               data_array[ iv ] = VAL__BADR;
                var_array[ iv ] = VAL__BADR;
             }
-
-         } else {
-            data_array[ iv ] = VAL__BADR;
-            var_array[ iv ] = VAL__BADR;
          }
       }
    }
@@ -470,6 +601,7 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    yin = astFree( yin );
    xout = astFree( xout );
    yout = astFree( yout );
+   if( use_ast ) detwork = astFree( detwork );
 
 /* End the AST context. This will annul all the AST objects created
    within the context. */

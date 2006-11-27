@@ -87,6 +87,31 @@
 *          in the catalogue is the detector name. If a null value (!) is 
 *          supplied, no output catalogue is produced. See also parameter 
 *          CATFRAME. [!]
+*     PARAMS( 2 ) = _DOUBLE (Read)
+*          An optional array which consists of additional parameters
+*          required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
+*          SombCos, and Gauss spreading methods (see parameter SPREAD).
+*	   
+*          PARAMS( 1 ) is required by all the above schemes. It is used to 
+*          specify how many pixels on either side of the output position
+*          (that is, the output position corresponding to the centre of the 
+*          input pixel) are to receive contributions from the input pixel.
+*          Typically, a value of 2 is appropriate and the minimum allowed 
+*          value is 1 (i.e. one pixel on each side). A value of zero or 
+*          fewer indicates that a suitable number of pixels should be 
+*          calculated automatically. [0]
+*	   
+*          PARAMS( 2 ) is required only by the SombCos, Gauss, SincSinc, 
+*          SincCos, and SincGauss schemes.  For the SombCos, SincSinc, and
+*          SincCos schemes, it specifies the number of pixels at which the
+*          envelope of the function goes to zero.  The minimum value is
+*          1.0, and the run-time default value is 2.0.  For the Gauss and
+*          SincGauss scheme, it specifies the full-width at half-maximum
+*          (FWHM) of the Gaussian envelope.  The minimum value is 0.1, and
+*          the run-time default is 1.0.  On astronomical images and 
+*          spectra, good results are often obtained by approximately 
+*          matching the FWHM of the envelope function, given by PARAMS(2),
+*          to the point-spread function of the input data.  []
 *     PIXSIZE( 2 ) = REAL (Read)
 *          Pixel dimensions in the output image, in arcsec. If only one value 
 *          is supplied, the same value will be used for both axes. The 
@@ -101,6 +126,51 @@
 *          the spatial projection in the output cube. This should be provided 
 *          in the system specified by parameter SYSTEM. The dynamic default 
 *          value is determined by the AUTOGRID parameter. []
+*     SPREAD = LITERAL (Read)
+*          The method to use when spreading each input pixel value out
+*          between a group of neighbouring output pixels. SPREAD can take 
+*          the following values:
+*	   
+*          - "Linear" -- The input pixel value is divided bi-linearly between 
+*          the four nearest output pixels.  Produces smoother output NDFs than 
+*          the nearest-neighbour scheme.
+*	   
+*          - "Nearest" -- The input pixel value is assigned completely to the
+*          single nearest output pixel. This scheme is much faster than any
+*          of the others.
+*	   
+*          - "Sinc" -- Uses the sinc(pi*x) kernel, where x is the pixel
+*          offset from the interpolation point (resampling) or transformed
+*          input pixel centre (rebinning), and sinc(z)=sin(z)/z.  Use of 
+*          this scheme is not recommended.
+*	   
+*          - "SincSinc" -- Uses the sinc(pi*x)sinc(k*pi*x) kernel. A
+*          valuable general-purpose scheme, intermediate in its visual
+*          effect on NDFs between the bi-linear and nearest-neighbour
+*          schemes. 
+*	   
+*          - "SincCos" -- Uses the sinc(pi*x)cos(k*pi*x) kernel.  Gives
+*          similar results to the "Sincsinc" scheme.
+*	   
+*          - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel.  Good 
+*          results can be obtained by matching the FWHM of the
+*          envelope function to the point-spread function of the
+*          input data (see parameter PARAMS).
+*	   
+*          - "Somb" -- Uses the somb(pi*x) kernel, where x is the pixel
+*          offset from the transformed input pixel centre, and 
+*          somb(z)=2*J1(z)/z (J1 is the first-order Bessel function of the 
+*          first kind.  This scheme is similar to the "Sinc" scheme.
+*	   
+*          - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel.  This
+*          scheme is similar to the "SincCos" scheme.
+*	   
+*          - "Gauss" -- Uses the exp(-k*x*x) kernel. The FWHM of the Gaussian 
+*          is given by parameter PARAMS(2), and the point at which to truncate 
+*          the Gaussian to zero is given by parameter PARAMS(1).
+*	   
+*          For further details of these schemes, see the descriptions of 
+*          routine AST_REBINx in SUN/211. ["Nearest"]
 *     SYSTEM = LITERAL (Read)
 *          The celestial coordinate system for the output cube. One of
 *          ICRS, GAPPT, FK5, FK4, FK4-NO-E, AZEL, GALACTIC, ECLIPTIC or 
@@ -138,6 +208,8 @@
 *        - SYSTEM can now accept any AST celestial System name.
 *        - Fix incorrect indices for "pixsize" array when checking pixel
 *        sizes.
+*     24-NOV-2006 (DSB):
+*        Added PARAMS and SPREAD parameters.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -166,7 +238,6 @@
 *-
 
 *  To Do:
-*     - Add extra options to the SYSTEM parameter (e.g. GAPPT).
 *     - Add support to use astRebin (with warnings about slow speed)
 
 */
@@ -221,25 +292,31 @@ void smurf_makecube( int *status ) {
    Grp *ogrp = NULL;          /* Group containing output file */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
    char *pname = NULL;        /* Name of currently opened data file */
+   char spbuf[ 10 ];          /* Text buffer for SPREAD parameter value */
    char system[ 10 ];         /* Celestial coord system for output cube */
    char reflat[ 41 ];         /* Reference latitude string */
    char reflon[ 41 ];         /* Reference longitude string */
    double par[ 7 ];           /* Projection parameter */
+   double params[ 4 ];        /* astRebinSeq parameters */
    double pixsize[ 2 ];       /* Pixel sizes in arc-seconds */
    int axes[ 2 ];             /* Indices of selected axes */
    int autogrid;              /* Determine projection parameters automatically? */
    int flag;                  /* Is group expression to be continued? */
    int ifile;                 /* Input file index */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for output map */
+   int lbnd_wgt[ 3 ];         /* Lower pixel bounds for wight array */
    int moving;                /* Is the telescope base position changing? */
    int ndet;                  /* Number of detectors supplied for "DETECTORS" */
+   int nparam;                /* No. of parameters required for spreading scheme */
    int nval;                  /* Number of supplied positions */
    int ondf;                  /* output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
    int outsize;               /* Number of files in output group */
    int size;                  /* Number of files in input group */
    int smfflags;              /* Flags for smfData */
+   int spread;                /* Pixel spreading method */
    int ubnd_out[ 3 ];         /* Upper pixel bounds for output map */
+   int ubnd_wgt[ 3 ];         /* Upper pixel bounds for wight array */
    int usedetpos;             /* Should the detpos array be used? */
    smfData *data = NULL;      /* Pointer to data struct */
    smfData *odata = NULL;     /* Pointer to output SCUBA2 data struct */
@@ -262,6 +339,57 @@ void smurf_makecube( int *status ) {
 /* Get the celestial coordinate system for the output cube. */
    parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC"
              "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
+
+/* Get the pixel spreading scheme to use. */
+   parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,SINCSINC,SINCCOS"
+             "SINCGAUSS,SOMB,SOMBCOS,GAUSS", 1, spbuf, 10, status );
+
+   if( !strcmp( spbuf, "NEAREST" ) ) {
+      spread = AST__NEAREST;
+      nparam = 0;
+
+   } else if( !strcmp( spbuf, "LINEAR" ) ) {
+      spread = AST__LINEAR;
+      nparam = 0;
+
+   } else if( !strcmp( spbuf, "SINC" ) ) {      
+      spread = AST__SINC;
+      nparam = 1;
+
+   } else if( !strcmp( spbuf, "SINCSINC" ) ) {      
+      spread = AST__SINCSINC;
+      nparam = 2;
+
+   } else if( !strcmp( spbuf, "SINCCOS" ) ) {      
+      spread = AST__SINCCOS;
+      nparam = 2;
+
+   } else if( !strcmp( spbuf, "SINCGAUSS" ) ) {      
+      spread = AST__SINCGAUSS;
+      nparam = 2;
+
+   } else if( !strcmp( spbuf, "SOMB" ) ) {      
+      spread = AST__SOMB;
+      nparam = 1;
+
+   } else if( !strcmp( spbuf, "SOMBCOS" ) ) {      
+      spread = AST__SOMBCOS;
+      nparam = 2;
+
+   } else if( !strcmp( spbuf, "GAUSS" ) ) {      
+      spread = AST__GAUSS;
+      nparam = 2;
+
+   } else if( *status == SAI__OK ) {
+      nparam = 0;
+      *status = SAI__ERROR;
+      msgSetc( "V", spbuf );
+      errRep( "", "Support not available for SPREAD = ^V (programming "
+              "error)", status );
+   }
+
+/* Get an additional parameter vector if required. */
+   if( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
 
 /* See of the detector positions are to be read from the RECEPPOS array. 
    Otherwise, they are calculated on the basis of the FPLANEX/Y arrays. */
@@ -430,13 +558,25 @@ void smurf_makecube( int *status ) {
 /* Create a history component in the output NDF. */
    ndfHcre( ondf, status );
 
-/* Get pointers to the mapped output data, variance, and weights arrays. */
+/* Get pointers to the mapped output data and variance. */
    data_array = (odata->pntr)[ 0 ];
    var_array = (odata->pntr)[ 1 ];
+
+/* Allocate a work array for the weights. This has to be twice the size
+   of the output cube if astRebinSeq is being used within smf_rebincube. */
    weightsloc = smf_get_xloc ( odata, "ACSISRED", "WT_ARR", "WRITE", 
                                0, 0, status );
+   lbnd_wgt[ 0 ] = 1;
+   lbnd_wgt[ 1 ] = 1;
+   lbnd_wgt[ 2 ] = 1;
+   ubnd_wgt[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
+   ubnd_wgt[ 1 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
+   ubnd_wgt[ 2 ] = ubnd_out[ 2 ] - lbnd_out[ 2 ] + 1;
+
+   if( 1 || spread != AST__NEAREST ) ubnd_wgt[ 0 ] *= 2;
+
    smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
-                      3, (int *) lbnd_out, (int *) ubnd_out, &wdata, status );
+                      3, (int *) lbnd_wgt, (int *) ubnd_wgt, &wdata, status );
    if( wdata ) wgt_array = (wdata->pntr)[ 0 ];
 
 /* Loop round all the input files, pasting each one into the output NDF. */
@@ -497,8 +637,8 @@ void smurf_makecube( int *status ) {
 
 /* Rebin the data into the output grid. */
       smf_rebincube( data, ifile, size, swcsout, ospecfrm, ospecmap, detgrp, 
-                     moving, lbnd_out, ubnd_out, data_array, var_array, 
-                     wgt_array, status );
+                     moving, lbnd_out, ubnd_out, spread, params, data_array, 
+                     var_array, wgt_array, status );
    
 /* Close the input data file. */
       if( data != NULL ) {
