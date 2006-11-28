@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_impaztec
+*     IMPAZTEC
 
 *  Purpose:
 *     Import AzTEC NETCDF files and produce SCUBA2 ICD-compliant files
@@ -26,9 +26,10 @@
 
 *  ADAM Parameters:
 *     IN = CHAR (Read)
-*          Input NETCDF file
+*          Name of the input NetCDF file to be converted.  This name
+*          should include the .nc extension.
 *     OUT = CHAR (Read)
-*          Output NDF file
+*          Output NDF file.
 
 *  Authors:
 *     Mitch Crowe (UBC)
@@ -59,6 +60,8 @@
 *        Minor bug prevented compile when netcdf not available.
 *     2006-09-22 (JB):
 *        Removed dream & dxml includes
+*     2006-11-28 (JB):
+*        Corrected calculation for modified julian date.
 
 *     {enter_further_changes_here}
 
@@ -163,18 +166,30 @@ void smurf_impaztec( int *status ) {
   int day;                     /* day of beginning of observation */
   int *dbuf=NULL;              /* simulated data  */
   double dec=0;                /* dec of observation in radians  */
+  double decd;                 /* Dec of observation in degrees */
   char dec_str[MAXSTRING];     /* string rep. of dec */
   double djm;                  /* modified julian start date */
   int *dksquid=NULL;           /* dark SQUID time stream data  */
   double *fcal=NULL;           /* flatfield calibration  */
   AstFitsChan *fitschan;       /* FITS headers */
   double *fpar=NULL;           /* flat-field parameters  */
+  int framesize=0;             /* # data points per timeslice (nbolos) */
   size_t framespersecond;      /* frames per second */
   double *full_bolosig=NULL;   /* all bolo signals [NBOLOSxNFRAMES] */
   struct JCMTState *head=NULL; /* header data for each frame  */
-  dim_t i,j;                   /* loop counters */
-  int k;
+  int hour;                    /* hour of beginning of observation */
+  dim_t i;                     /* loop counter */
+  int indf=0;                  /* NDF id for the file */
+  dim_t j;                     /* loop counter */
+  HDSLoc *jcmtstateloc = NULL; /* HDS locator to JCMTSTATE structure */
+  int lbnd[3];                 /* Dimensions of the DATA component */
+  double map_hght;             /* Map height in arcsec */
+  double map_wdth;             /* Map width in arcsec  */
+  double map_pa;               /* Map PA in degrees  */
+  double map_x = 0;            /* Map X offset in arcsec */
+  double map_y = 0;            /* Map Y offset in arcsec */
   double meanwvm;              /* 225 GHz tau */
+  int min;                     /* minute of beginning of observation */
   double *mjuldate=NULL;       /* modified Julian date each sample */
   int month;                   /* month of beginning of observation */
   size_t nbolos;               /* number of bolometers in netCDF data format */
@@ -184,53 +199,37 @@ void smurf_impaztec( int *status ) {
   char ndffile[MAXSTRING];     /* output NDF file name */
   int nflat;                   /* number of flat coeffs per bol  */
   int nframes;                 /* number of time steps in netCDF data format */
+  int nmap=0;                  /* Number of elements mapped */
   int nrow;                    /* number of bolometers in row */
   int numsamples;              /* number of samples  */
   double obslam;               /* wavelength */
+  int place=0;                 /* NDF placeholder */
+  void *pntr=NULL;             /* Temporary pointer */
   double *posptr=NULL;         /* pointing offsets from map centre */
   double ra=0;                 /* ra of observation in radians  */
+  double rad;                  /* RA of observation in degrees */
   char ra_str[MAXSTRING];      /* string rep. of ra */
   double sample_t;             /* sample interval in msec  */
+  int sec;                     /* second of beginning of observation */
   size_t seconds;              /* seconds in observation */
-  double startmidtime;         /* seconds since midnight */
-  double startnoontime;        /* seconds since noon */
+  int starttime;               /* seconds since noon, UT */
   double telpos[3];            /* Geodetic location of the telescope */
   double *tempbuff = NULL;     /* throwaway buffer for using calctime */
   double *time = NULL;         /* arrays for storing per-frame header data */
+  char time_str[MAXSTRING];
   double *trackactc1 = NULL;
   double *trackactc2 = NULL;
   double *trackbasec1 = NULL;
   double *trackbasec2 = NULL;
   double *trackdemandc1 = NULL;
   double *trackdemandc2 = NULL;
+  int ubnd[3];                 /* Dimensions of the DATA component */
   int varid_h1b1;              /* netCDF variable id of bolo h1b1 signal */
-  int yr;                      /* year of beginning of observation */
-
-
-  double decd;                     /* Dec of observation in degrees */
-  double rad;                      /* RA of observation in degrees */
-  double map_hght;                 /* Map height in arcsec */
-  double map_wdth;                 /* Map width in arcsec  */
-  double map_pa;                   /* Map PA in degrees  */
-  double map_x = 0;                /* Map X offset in arcsec */
-  double map_y = 0;                /* Map Y offset in arcsec */
-  double x_min = 0;                /* Maximum extent of pointing offsets */
+  double x_min = 0;            /* Maximum extent of pointing offsets */
   double x_max = 0;
   double y_min = 0;
   double y_max = 0;
-
-  int lbnd[3];                     /* Dimensions of the DATA component */
-  int ubnd[3];                     /*   "               "       "      */
-  int framesize=0;                 /* # data points per timeslice (nbolos) */
-  int place=0;                     /* NDF placeholder */
-  int indf=0;                      /* NDF id for the file */
-  int nmap=0;                      /* Number of elements mapped */
-  HDSLoc *jcmtstateloc = NULL;     /* HDS locator to JCMTSTATE structure */
-  void *pntr=NULL;                 /* Temporary pointer */
-
-  HDSLoc *fitsloc = NULL;    /* HDS locator to FITS headers */
-  HDSLoc *loc2 = NULL;       /* HDS locator */
-  
+  int yr;                      /* year of beginning of observation */
 
  
   /* Main routine */
@@ -318,19 +317,18 @@ void smurf_impaztec( int *status ) {
     /* Calculate the base modified julian date */
     slaCaldj ( yr, month, day, &djm, &date_status );
 
-    /* Retrieve the time for each frame */
-    nc_getSignal ( ncid, "time", time, status );
+    /* Get the hours, minutes, and seconds */
+    nc_get_att_text ( ncid, NC_GLOBAL, "start_time", time_str );  
+    curtok = strtok ( time_str, ":");
+    hour = atoi ( curtok );
+    curtok = strtok ( NULL, ":" );
+    min = atoi ( curtok );
+    curtok = strtok ( NULL, ":" );
+    sec = atoi ( curtok ); 
 
-    /* Adjust the mjd for the time */
-    startmidtime = time[0];
-    if ( startmidtime < 43200 ) {
-       djm = djm - 1;
-       startnoontime = 42300 + startmidtime;
-       djm = djm + startnoontime / 86400;
-    } else {
-       startnoontime = startmidtime - 43200;
-       djm = djm + startnoontime / 86400;
-    }
+    starttime = (hour * 3600) + (min * 60) + sec;
+
+    djm += (double)starttime / 86400;
 
     /* Use simulator routine to calculate array of UT for each timeslice */
     sc2sim_calctime( telpos[0]*DD2R, djm, sample_t, nframes,
@@ -341,8 +339,6 @@ void smurf_impaztec( int *status ) {
     ra = strtod ( ra_str, NULL );
     nc_get_att_text ( ncid, NC_GLOBAL, "jcmt_header_C2", dec_str );
     dec = strtod ( dec_str, NULL );
-
-    
 
     /* Calculate the JCMTState at each timeslice */
 
@@ -359,6 +355,42 @@ void smurf_impaztec( int *status ) {
     nc_getSignal ( ncid, "jcmt_azElDemandC2", azeldemandc2, status);
     nc_getSignal ( ncid, "jcmt_azElBaseC1", azelbasec1, status );
     nc_getSignal ( ncid, "jcmt_azElBaseC2", azelbasec2, status );
+
+
+    /* KLUDGE : Print out some of the pointing info */
+    int azdeg, eldeg, azmin, elmin;
+    double az, el, azsec, elsec;
+    int rahr = ra * 24 / ( 2 * 3.1415926536 );
+    int ramin = ra * 1440 / ( 2 * 3.1415926536 ) - ( rahr * 60 );
+    double rasec = ra * 86400 / ( 2 * 3.1415926536 ) - ( rahr * 3600 )
+                 - ( ramin * 60 ); 
+    int decdeg = dec * 360 / ( 2 * 3.1415926536 );
+    int decmin = dec * 21600 / ( 2 * 3.1415926536 ) - ( decdeg * 60 );
+    double decsec = dec * 1296000 / ( 2 * 3.1415926536 ) - ( decdeg * 3600 )
+                  - ( decmin * 60 );
+
+    printf ( "ra : %i:%i:%f\n", rahr, ramin, rasec );
+    printf ( "dec : %i:%i:%f\n", decdeg, decmin, decsec );
+
+    for ( i = 0; i < nframes; i++ ) {
+      az = azelactc1[i];
+      el = azelactc2[i];
+      azdeg = az * 360 / ( 2 * 3.1415926536 );
+      azmin = az * 21600 / ( 2 * 3.1415926536 ) - ( azdeg * 60 );
+      azsec = az * 1296000 / ( 2 * 3.1415926536 ) - ( azdeg * 3600 )
+                  - ( azmin * 60 );
+      eldeg = el * 360 / ( 2 * 3.1415926536 );
+      elmin = el * 21600 / ( 2 * 3.1415926536 ) - ( eldeg * 60 );
+      elsec = el * 1296000 / ( 2 * 3.1415926536 ) - ( eldeg * 3600 )
+                  - ( elmin * 60 );
+
+      printf ( "JD : %f   Az : %i:%i:%f   El : %i:%i:%f\n",
+	       mjuldate[i] + 2400000.5, azdeg, azmin, azsec, 
+               eldeg, elmin, elsec ); 
+
+      i += 999;
+
+    }
 
     for ( i = 0; i < nframes; i++ ) {      
       head[i].rts_num = i;   
@@ -444,7 +476,7 @@ void smurf_impaztec( int *status ) {
   astSetFitsF ( fitschan, "DEC", decd, "Declination of observation", 0 );
   astSetFitsI ( fitschan, "NBOLX", ncol, "number of bolometers in X direction", 0 );
   astSetFitsI ( fitschan, "NBOLY", nrow, "number of bolometers in Y direction", 0 );
-  astSetFitsF ( fitschan, "SAMPLE_T", sample_t, "sample interval in msec", 0 );
+  astSetFitsF ( fitschan, "STEPTIME", sample_t, "sample interval in msec", 0 );
   astSetFitsS ( fitschan, "SUBARRAY", "AZTEC", "subarray name", 0 );
   astSetFitsI ( fitschan, "NUMSAMP", numsamples, "number of samples", 0 );
   astSetFitsS ( fitschan, "FILTER", "1100", "filter used", 0 );
