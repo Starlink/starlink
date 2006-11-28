@@ -69,6 +69,8 @@
 /*       Revised method of traversing working locator queue.                */
 /*    01-FEB-2006 (TIMJ):                                                   */
 /*       Call hdsStop rather than duplicating code                          */
+/*    28-NOV-2006 (BC):                                                     */
+/*       Replace hdsStop with hds1_cleanup.                                 */
 /*    {@enter_changes_here@}                                                */
 
 /* Bugs:                                                                    */
@@ -82,7 +84,7 @@
 /*.                                                                         */
 
 /* Close down everything                                                    */
-      hdsStop( &status );
+      hds1_cleanup( &status );
 
 /* Exit the routine.                                                        */
       return;
