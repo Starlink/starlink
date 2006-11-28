@@ -554,6 +554,15 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       set filename "GaiaTempSpectrum[incr count_].sdf"
       $spec_writer_ write_as_ndf $filename
+
+      # If in CYGWIN environment convert filename to windows format.
+      # SPLAT is a windows application.
+      puts "platform = $::tcl_platform(os)"
+      if { [string match {CYGWIN*} $::tcl_platform(os)] } { 
+         set filename [exec cygpath -wa $filename]
+         puts "filename = $filename"
+      }
+
       if { $compare } {
          $splat_disp_ runwith $filename 0 false
       } else {
