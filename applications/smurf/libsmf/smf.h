@@ -473,4 +473,6 @@ void smf_geod( double pos[3], double *phi, double *h, double *lambda );
 
 void smf_instap_get( smfHead * hdr, int * status );
 
+void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status );
+
 #endif /* SMF_DEFINED */
