@@ -358,6 +358,7 @@ if (!_ok(*status))\
       int dau_scatter_data( int bad, struct LCP_DATA *data, int *nbad );
 
       int hds1_check_group( struct DSC *group, char *buf );
+      int hds1_cleanup( int *status );
       int hds1_encode_subs( int nlim, int nsub, HDS_PTYPE *subs, char *buf,
 			    int *nchar );
       void hds1_exit( void );
