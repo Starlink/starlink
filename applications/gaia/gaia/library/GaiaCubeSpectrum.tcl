@@ -557,10 +557,8 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       # If in CYGWIN environment convert filename to windows format.
       # SPLAT is a windows application.
-      puts "platform = $::tcl_platform(os)"
       if { [string match {CYGWIN*} $::tcl_platform(os)] } { 
          set filename [exec cygpath -wa $filename]
-         puts "filename = $filename"
       }
 
       if { $compare } {
