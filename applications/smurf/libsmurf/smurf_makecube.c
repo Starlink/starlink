@@ -210,6 +210,9 @@
 *        sizes.
 *     24-NOV-2006 (DSB):
 *        Added PARAMS and SPREAD parameters.
+*     28-NOV-2006 (DSB):
+*        Propagate Label and Unit components from first input NDF to the
+*        output NDF.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -236,10 +239,6 @@
 *  Bugs:
 *     {note_any_bugs_here}
 *-
-
-*  To Do:
-*     - Add support to use astRebin (with warnings about slow speed)
-
 */
 
 
@@ -557,6 +556,10 @@ void smurf_makecube( int *status ) {
 
 /* Create a history component in the output NDF. */
    ndfHcre( ondf, status );
+
+/* Copy the Label and Unit strings from the first input NDF, and check
+   that all input NDFs have the same Label and Unit strings. */
+   smf_labelunit( igrp, size, odata, status );
 
 /* Get pointers to the mapped output data and variance. */
    data_array = (odata->pntr)[ 0 ];
