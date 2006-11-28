@@ -75,6 +75,14 @@
 *          A group of detector names. Only data form the named detectors
 *          will be included in the output cube. If a null (!) value is 
 *          supplied, data from all detectors will be used. [!]
+*     GENVAR = _LOGICAL (Read)
+*          If TRUE, then Variance values are stored in the output NDF based 
+*          on the spread of input data values contributing to each output 
+*          pixel. Note, if only one pixel contribues to an output pixel,
+*          then the associated Variance value will be bad. The dynamic
+*          default for this parameter is TRUE if the mean density of 
+*          detector samples in the output NDF is more than 1 per pixel.
+*          It is FALSE otherwise. []
 *     IN = NDF (Read)
 *          Input file(s)
 *     OUT = NDF (Write)
@@ -220,6 +228,7 @@
 *        - Propagate Label and Unit components from first input NDF to the
 *        output NDF.
 *        - Added SAVEWEIGHTS parameter.
+*        - Added GENVAR parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -285,7 +294,6 @@
 void smurf_makecube( int *status ) {
 
 /* Local Variables */
-   AstSkyFrame *oskyfrm = NULL;/* SkyFrame from the output WCS Frameset */
    AstFrame *ospecfrm = NULL;  /* SpecFrame from the output WCS Frameset */
    AstFrame *tfrm = NULL;      /* Current Frame from output WCS */
    AstFrameSet *swcsout = NULL;/* Spatial WCS FrameSet for output cube */
@@ -293,27 +301,31 @@ void smurf_makecube( int *status ) {
    AstMapping *oskymap = NULL; /* GRID->SkyFrame Mapping from output WCS */
    AstMapping *ospecmap = NULL;/* GRID->SpecFrame Mapping from output WCS */
    AstMapping *tmap = NULL;   /* Base->current Mapping from output WCS */
+   AstSkyFrame *oskyfrm = NULL;/* SkyFrame from the output WCS Frameset */
    Grp *detgrp = NULL;        /* Group of detector names */
    Grp *igrp = NULL;          /* Group of input files */
    Grp *ogrp = NULL;          /* Group containing output file */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
    char *pname = NULL;        /* Name of currently opened data file */
-   char spbuf[ 10 ];          /* Text buffer for SPREAD parameter value */
-   char system[ 10 ];         /* Celestial coord system for output cube */
    char reflat[ 41 ];         /* Reference latitude string */
    char reflon[ 41 ];         /* Reference longitude string */
+   char spbuf[ 10 ];          /* Text buffer for SPREAD parameter value */
+   char system[ 10 ];         /* Celestial coord system for output cube */
    double par[ 7 ];           /* Projection parameter */
    double params[ 4 ];        /* astRebinSeq parameters */
    double pixsize[ 2 ];       /* Pixel sizes in arc-seconds */
-   int axes[ 2 ];             /* Indices of selected axes */
    int autogrid;              /* Determine projection parameters automatically? */
+   int axes[ 2 ];             /* Indices of selected axes */
    int flag;                  /* Is group expression to be continued? */
+   int genvar;                /* Create output Variances based on input data values/ */
    int ifile;                 /* Input file index */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for output map */
    int lbnd_wgt[ 3 ];         /* Lower pixel bounds for wight array */
    int moving;                /* Is the telescope base position changing? */
    int ndet;                  /* Number of detectors supplied for "DETECTORS" */
+   int nposout;               /* Number of spatial elements in output NDF */
    int nparam;                /* No. of parameters required for spreading scheme */
+   int npos;                  /* Number of samples included in output NDF */
    int nval;                  /* Number of supplied positions */
    int ondf;                  /* output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
@@ -520,7 +532,18 @@ void smurf_makecube( int *status ) {
    projection parameters are being determined automatically, the relevant
    variables are returned holding the optimal projection parameter values. */
    smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos, par, moving, 
-                   lbnd_out, ubnd_out, &wcsout, status );
+                   lbnd_out, ubnd_out, &wcsout, &npos, status );
+
+/* See if the mean spatial density of points in the output is more than 1
+   per pixel, and set up a suitable dynamic default for the GENVAR
+   parameter. */
+   nposout = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
+   nposout *= ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
+   parDef0l( "GENVAR", ( npos > nposout ), status );
+
+/* See if output Variances based on the spread of input Data values are
+   to be created. */
+   parGet0l( "GENVAR", &genvar, status );
 
 /* Get the base->current Mapping from the output WCS FrameSet, and split it 
    into two Mappings; one (oskymap) that maps the first 2 GRID axes into 
@@ -551,7 +574,7 @@ void smurf_makecube( int *status ) {
 /* Create the output NDF. */
    ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
    smfflags = 0;
-   smfflags |= SMF__MAP_VAR;
+   if( genvar ) smfflags |= SMF__MAP_VAR;
    smf_open_newfile( ogrp, 1, SMF__FLOAT, 3, lbnd_out, ubnd_out, smfflags, 
                      &odata, status );
 

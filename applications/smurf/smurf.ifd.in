@@ -731,6 +731,15 @@ package @PACKAGE@ {
             helpkey *
 	  }
 
+ 	  parameter genvar {
+	    type _LOGICAL
+	    vpath DYNAMIC DEFAULT
+	    ppath CURRENT DYNAMIC DEFAULT
+	    prompt {Generate output variances?}
+	    default TRUE
+	    helpkey *
+	  }
+
          parameter in {
             position 1
             type NDF

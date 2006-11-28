@@ -16,7 +16,7 @@
 *     smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
 *                     int autogrid, int usedetpos, double par[ 7 ], 
 *                     int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
-*                     AstFrameSet **wcsout, int *status );
+*                     AstFrameSet **wcsout, int *npos, int *status );
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -55,6 +55,9 @@
 *     wcsout = AstFrameSet ** (Returned)
 *        A pointer to a location at which to return a pointer to an AST 
 *        Frameset describing the WCS to be associated with the output cube.
+*     npos = int * (Returned)
+*        Address of an int in which to return the number of good spatial data
+*        positions that will be used in the output cube.
 *     status = int * (Given and Returned)
 *        Pointer to inherited status.
 
@@ -149,7 +152,7 @@
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                      int autogrid, int usedetpos, double par[ 7 ], 
                      int moving, int lbnd[ 3 ], int ubnd[ 3 ], 
-                     AstFrameSet **wcsout, int *status ){
+                     AstFrameSet **wcsout, int *npos, int *status ){
 
 /* Local Variables */
    AstCmpFrame *cmpfrm = NULL;  /* Current Frame for output FrameSet */
@@ -193,6 +196,9 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
+
+/* Initialise the number of data samples */
+   *npos = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -601,6 +607,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                   if( xout[ irec ] < dlbnd[ 0 ] ) dlbnd[ 0 ] = xout[ irec ];
                   if( yout[ irec ] > dubnd[ 1 ] ) dubnd[ 1 ] = yout[ irec ];
                   if( yout[ irec ] < dlbnd[ 1 ] ) dlbnd[ 1 ] = yout[ irec ];
+                  npos++;
                }
 
 /* If this detector does not have a valid position, increment the data
