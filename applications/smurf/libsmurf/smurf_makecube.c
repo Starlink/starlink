@@ -126,6 +126,12 @@
 *          the spatial projection in the output cube. This should be provided 
 *          in the system specified by parameter SYSTEM. The dynamic default 
 *          value is determined by the AUTOGRID parameter. []
+*     SAVEWEIGHTS = _LOGICAL (Read)
+*          If TRUE, then the weights associated with the array of output
+*          pixels is stored in an extension named ACSISRED, within the output 
+*          NDF. If FALSE the weights are discarded once they have been
+*          used. These weights record thre relative weight of the input
+*          data associated with each output pixel. [FALSE]
 *     SPREAD = LITERAL (Read)
 *          The method to use when spreading each input pixel value out
 *          between a group of neighbouring output pixels. SPREAD can take 
@@ -211,8 +217,9 @@
 *     24-NOV-2006 (DSB):
 *        Added PARAMS and SPREAD parameters.
 *     28-NOV-2006 (DSB):
-*        Propagate Label and Unit components from first input NDF to the
+*        - Propagate Label and Unit components from first input NDF to the
 *        output NDF.
+*        - Added SAVEWEIGHTS parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -311,6 +318,7 @@ void smurf_makecube( int *status ) {
    int ondf;                  /* output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
    int outsize;               /* Number of files in output group */
+   int savewgt;               /* Should weights be saved in the output NDF? */
    int size;                  /* Number of files in input group */
    int smfflags;              /* Flags for smfData */
    int spread;                /* Pixel spreading method */
@@ -565,22 +573,34 @@ void smurf_makecube( int *status ) {
    data_array = (odata->pntr)[ 0 ];
    var_array = (odata->pntr)[ 1 ];
 
-/* Allocate a work array for the weights. This has to be twice the size
-   of the output cube if astRebinSeq is being used within smf_rebincube. */
-   weightsloc = smf_get_xloc ( odata, "ACSISRED", "WT_ARR", "WRITE", 
-                               0, 0, status );
+/* Create an array to hold the weights. This has to be twice the size
+   of the output cube if astRebinSeq is being used within smf_rebincube. 
+   First set up the bounds of the array (a larger array is needed if AST
+   is being used to do the rebinning), and then see if the array should 
+   be held in temporary work space, or in an extension of the output NDF. */
+   
    lbnd_wgt[ 0 ] = 1;
    lbnd_wgt[ 1 ] = 1;
    lbnd_wgt[ 2 ] = 1;
    ubnd_wgt[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
    ubnd_wgt[ 1 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
    ubnd_wgt[ 2 ] = ubnd_out[ 2 ] - lbnd_out[ 2 ] + 1;
+   if( spread != AST__NEAREST ) ubnd_wgt[ 0 ] *= 2;
 
-   if( 1 || spread != AST__NEAREST ) ubnd_wgt[ 0 ] *= 2;
+   parGet0l( "SAVEWEIGHTS", &savewgt, status );
 
-   smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
+/* Create the extension, or allocate the work space, as required. */
+   if( savewgt ) {
+      weightsloc = smf_get_xloc ( odata, "ACSISRED", "WT_ARR", "WRITE", 
+                                  0, 0, status );
+      smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
                       3, (int *) lbnd_wgt, (int *) ubnd_wgt, &wdata, status );
-   if( wdata ) wgt_array = (wdata->pntr)[ 0 ];
+      if( wdata ) wgt_array = (wdata->pntr)[ 0 ];
+
+   } else {
+      wgt_array = astMalloc( sizeof( double )*
+                          (size_t)ubnd_wgt[ 0 ]*ubnd_wgt[ 1 ]*ubnd_wgt[ 2 ] );
+   }
 
 /* Loop round all the input files, pasting each one into the output NDF. */
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
@@ -670,6 +690,7 @@ L999:;
    if( detgrp != NULL) grpDelet( &detgrp, status);
    if( igrp != NULL) grpDelet( &igrp, status);
    if( ogrp != NULL) grpDelet( &ogrp, status);
+   if( !savewgt ) wgt_array = astFree( wgt_array );
 
 /* End the NDF context. */
    ndfEnd( status );

@@ -807,6 +807,14 @@ package @PACKAGE@ {
             helpkey *
 	  }
 
+ 	  parameter saveweights {
+	    type _LOGICAL
+	    vpath DEFAULT
+	    ppath CURRENT
+	    prompt {Save pixel weights in the output NDF?}
+	    default FALSE
+	    helpkey *
+	  }
          parameter spread {
             type LITERAL
             vpath DEFAULT
