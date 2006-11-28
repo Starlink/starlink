@@ -117,8 +117,11 @@ if test "${@LD_LIB_PATH@}" != ""; then
          *-sun*)
             export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/sparc"
          ;;
-         *-darwin*)
+         *pc-apple-darwin*)
             export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/ppc"
+         ;;
+         *86*-apple-darwin*)
+            export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/i386"
          ;;
       esac
    fi
@@ -145,8 +148,11 @@ else
      *-sun*)
         export @LD_LIB_PATH@="${@LD_LIB_PATH@}:/usr/openwin/lib:@starjavadir@/lib/sparc"
      ;;
-     *-darwin*)
+     *pc-apple-darwin*)
         export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/ppc"
+     ;;         
+     *86*-apple-darwin*)
+        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:@starjavadir@/lib/i386"
      ;;         
    esac
 fi

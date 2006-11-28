@@ -108,8 +108,11 @@ if ( ${?@LD_LIB_PATH@} ) then
          case *-sun*:
             setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/sparc"
          breaksw
-         case *-darwin*:
+         case *pc-apple-darwin*:
             setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/ppc"
+         breaksw
+         case *86*-apple-darwin*:
+            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/i386"
          breaksw
       endsw
 
@@ -138,8 +141,11 @@ else
      case *-sun*:
         setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:/usr/openwin/lib:@starjavadir@/lib/sparc"
      breaksw
-     case *-darwin*:
+     case *pc-apple-darwin*:
         setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/ppc"
+     breaksw         
+     case *86*-apple-darwin*:
+        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/i386"
      breaksw         
    endsw
 
