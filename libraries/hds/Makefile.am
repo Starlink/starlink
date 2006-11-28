@@ -109,7 +109,7 @@ C_ROUTINES = \
 	datput.c datput0x.c dattemp.c daucheck.c daucnv.c daucopy.c \
 	dauflush.c \
 	dauloc.c daumove.c dauscatgath.c daushape.c dautypes.c \
-	datExportFloc.c	datImportFloc.c hdsdim.c \
+	datExportFloc.c	datImportFloc.c hdsdim.c hds1_cleanup.c \
 	hds1_exit.c hdsCopy.c hdsEwild.c hds_globals.c hdsGtune.c \
 	hdsState.c hdsStop.c hdsTune.c \
 	hdsWild.c hdserase.c hdsgroup.c hdslock.c hdsnew.c hdsnull.c \
