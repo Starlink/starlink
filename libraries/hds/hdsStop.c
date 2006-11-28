@@ -65,6 +65,7 @@ hdsStop( int *status)
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     BKM:  B.K. McIlwrath    (STARLINK, RAL)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     BC:   Brad Cavanagh (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -74,6 +75,8 @@ hdsStop( int *status)
 *        Convert to a C function with FORTRAN wrapper.
 *     01-FEB-2005 (TIMJ):
 *        Free memory associated with the locator control queue
+*     28-NOV-2006 (BC):
+*        Replace non-EMS code with call to hds1_cleanup.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -95,21 +98,8 @@ hdsStop( int *status)
    if ( hds_gl_active )
    {
 
-/* Defuse all Locator Control Packets.                                      */
-      while ( dat_ga_wlq != NULL )
-      {
-         lcp = dat_ga_wlq;
-         dau_defuse_lcp( &lcp );
-      }
-
-/* Free memory associated with Locator Control Queue                        */
-      dau_free_flq( );
-
-/* Close down the rec_ facility.                                            */
-      rec_stop( );
-
-/* Note that HDS is no longer active.                                       */
-      hds_gl_active = 0;
+/* Clean up HDS.                                                            */
+      hds1_cleanup( status );
 
 /* If an error occurred, then report contextual information.                */
       if ( !_ok( hds_gl_status ) )
