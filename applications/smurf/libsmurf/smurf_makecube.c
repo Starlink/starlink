@@ -134,7 +134,7 @@
 *          the spatial projection in the output cube. This should be provided 
 *          in the system specified by parameter SYSTEM. The dynamic default 
 *          value is determined by the AUTOGRID parameter. []
-*     SAVEWEIGHTS = _LOGICAL (Read)
+*     WEIGHTS = _LOGICAL (Read)
 *          If TRUE, then the weights associated with the array of output
 *          pixels is stored in an extension named ACSISRED, within the output 
 *          NDF. If FALSE the weights are discarded once they have been
@@ -227,7 +227,7 @@
 *     28-NOV-2006 (DSB):
 *        - Propagate Label and Unit components from first input NDF to the
 *        output NDF.
-*        - Added SAVEWEIGHTS parameter.
+*        - Added WEIGHTS parameter.
 *        - Added GENVAR parameter.
 *     {enter_further_changes_here}
 
@@ -610,7 +610,7 @@ void smurf_makecube( int *status ) {
    ubnd_wgt[ 2 ] = ubnd_out[ 2 ] - lbnd_out[ 2 ] + 1;
    if( spread != AST__NEAREST ) ubnd_wgt[ 0 ] *= 2;
 
-   parGet0l( "SAVEWEIGHTS", &savewgt, status );
+   parGet0l( "WEIGHTS", &savewgt, status );
 
 /* Create the extension, or allocate the work space, as required. */
    if( savewgt ) {

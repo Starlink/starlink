@@ -816,7 +816,7 @@ package @PACKAGE@ {
             helpkey *
 	  }
 
- 	  parameter saveweights {
+ 	  parameter weights {
 	    type _LOGICAL
 	    vpath DEFAULT
 	    ppath CURRENT
