@@ -229,6 +229,8 @@
 *        output NDF.
 *        - Added WEIGHTS parameter.
 *        - Added GENVAR parameter.
+*     29-NOV-2006 (DSB):
+*        We do not need a double size weights array if GENVAR is FALSE.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -597,7 +599,8 @@ void smurf_makecube( int *status ) {
    var_array = (odata->pntr)[ 1 ];
 
 /* Create an array to hold the weights. This has to be twice the size
-   of the output cube if astRebinSeq is being used within smf_rebincube. 
+   of the output cube if astRebinSeq is being used within smf_rebincube,
+   and output variances are being generated from the input data spread.
    First set up the bounds of the array (a larger array is needed if AST
    is being used to do the rebinning), and then see if the array should 
    be held in temporary work space, or in an extension of the output NDF. */
@@ -608,7 +611,7 @@ void smurf_makecube( int *status ) {
    ubnd_wgt[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
    ubnd_wgt[ 1 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
    ubnd_wgt[ 2 ] = ubnd_out[ 2 ] - lbnd_out[ 2 ] + 1;
-   if( spread != AST__NEAREST ) ubnd_wgt[ 0 ] *= 2;
+   if( spread != AST__NEAREST && genvar ) ubnd_wgt[ 0 ] *= 2;
 
    parGet0l( "WEIGHTS", &savewgt, status );
 
