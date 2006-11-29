@@ -103,6 +103,8 @@
 *        - Take account of 1/sqrt(N) reduction in output standard deviations.
 *     28-NOV-2006 (DSB):
 *        Allow "var_array" to be NULL.
+*     29-NOV-2006 (DSB):
+*        Correct use of "wgt_array" if "var_array" is NULL.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -173,6 +175,8 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    double *yout = NULL;        /* Workspace for detector output grid positions */
    float *detwork = NULL;      /* Work array holding data samples for 1 slice/channel */
    float *pdata = NULL;        /* Pointer to next input data value */
+   float *ipv = NULL;          /* Pointer to input variances values */
+   double *ipw = NULL;         /* Pointer to weights arrays */
    float dval;                 /* Output data value */
    int ast_flags;              /* Flags to use with astRebinSeq */
    int dim[ 3 ];               /* Output array dimensions */
@@ -522,6 +526,15 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
             if( iz >= 0 && iz < dim[ 2 ] ) { 
                iv = nxy*iz;
 
+/* Store pointers to the variance and work arrays be used */
+               if( var_array ) {
+                  ipv = var_array + iv;
+                  ipw = wgt_array + 2*iv;
+               } else {
+                  ipv = NULL;
+                  ipw = wgt_array + iv;
+               }
+
 /* Copy the detector values for this spectral channel and time slice into
    a new array. */
                for( idet = 0; idet < (data->dims)[ 1 ]; idet++ ) {
@@ -533,7 +546,7 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
                astRebinSeqF( fsmap, 0.0, 2, lbnd_in, ubnd_in, detwork, NULL, 
                              spread, params, ast_flags, 0.0, 50, VAL__BADR, 
                              2, ldim, dim, lbnd_in, ubnd_in, data_array + iv, 
-                             var_array + iv, wgt_array + 2*iv );
+                             ipv, ipw );
             }
          }
 
@@ -571,13 +584,21 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
             if( iz >= 0 && iz < dim[ 2 ] ) { 
                iv = nxy*iz;
 
+/* Store pointers to the variance and work arrays be used */
+               if( var_array ) {
+                  ipv = var_array + iv;
+                  ipw = wgt_array + 2*iv;
+               } else {
+                  ipv = NULL;
+                  ipw = wgt_array + iv;
+               }
+
 /* Normalise the data values and We make a separate call to astRebinSeq in order to paste each
    individual datum into the output cube. */
                astRebinSeqF( fsmap, 0.0, 2, lbnd_in, ubnd_in, NULL, NULL, 
                              spread, params, AST__REBINEND | ast_flags,
                              0.0, 50, VAL__BADR, 2, ldim, dim, lbnd_in, 
-                             ubnd_in, data_array + iv, var_array + iv, 
-                             wgt_array + 2*iv );
+                             ubnd_in, data_array + iv, ipv, ipw );
             }
          }
 
