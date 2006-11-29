@@ -124,6 +124,8 @@
 #         Add help location
 #     20-NOV-2006 (DSB):
 #         Added AUTOGRID parameter for MAKECUBE
+#     290-NOV-2006 (DSB):
+#         Added SPECBOUNDS parameter for MAKECUBE
 #     {enter_changes_here}
 
 #  Bugs:
@@ -815,6 +817,14 @@ package @PACKAGE@ {
             prompt {Celestial longitude at output reference point}
             helpkey *
 	  }
+
+         parameter specbounds {
+            type LITERAL
+            ppath DYNAMIC
+            vpath DYNAMIC
+            prompt {Low and high bounds for output spectral axis}
+            helpkey *
+         }
 
  	  parameter weights {
 	    type _LOGICAL

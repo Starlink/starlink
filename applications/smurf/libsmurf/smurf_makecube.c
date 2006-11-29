@@ -140,6 +140,21 @@
 *          NDF. If FALSE the weights are discarded once they have been
 *          used. These weights record thre relative weight of the input
 *          data associated with each output pixel. [FALSE]
+*     SPECBOUNDS = LITERAL (Read)
+*          The bounds of the output cube on the spectral axis. Input data
+*          that falls outside the supplied range will not be included in
+*          the output cube. The supplied parameter value should be a
+*          string containing a pair of axis values separated by white space 
+*          or commas. The first should be the spectral value corresponding to 
+*          lower pixel bound in the output cube, and the second should be 
+*          the spectral value corresponding to upper pixel bounds in the 
+*          output cube. The supplied values should refer to the spectral
+*          system described by the WCS FrameSet of the first input NDF. To
+*          see what this is, supply a single colon (":") for the parameter 
+*          value. This will display a description of the required spectral 
+*          coordinate system, and then re-prompt for a new parameter value.
+*          The dynamic defaultis the entire spectral range covered by the
+*          input data. []
 *     SPREAD = LITERAL (Read)
 *          The method to use when spreading each input pixel value out
 *          between a group of neighbouring output pixels. SPREAD can take 
@@ -325,9 +340,9 @@ void smurf_makecube( int *status ) {
    int lbnd_wgt[ 3 ];         /* Lower pixel bounds for wight array */
    int moving;                /* Is the telescope base position changing? */
    int ndet;                  /* Number of detectors supplied for "DETECTORS" */
-   int nposout;               /* Number of spatial elements in output NDF */
    int nparam;                /* No. of parameters required for spreading scheme */
    int npos;                  /* Number of samples included in output NDF */
+   int nposout;               /* Number of spatial elements in output NDF */
    int nval;                  /* Number of supplied positions */
    int ondf;                  /* output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */

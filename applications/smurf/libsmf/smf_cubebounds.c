@@ -98,6 +98,9 @@
 *        specmap.
 *     23-NOV-2006 (DSB):
 *        Correct indexing of "specin" array.
+*     29-NOV-2006 (DSB):
+*        Allow user to restrict the spectral range of the output cube
+*        using parameter SPECBOUNDS.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -160,8 +163,8 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    AstCmpMap *ssmap = NULL;     /* I/p GRID-> o/p PIXEL Mapping for spectral axis */
    AstFitsChan *fc = NULL;      /* FitsChan used to construct spectral WCS */
    AstFitsChan *fct = NULL;     /* FitsChan used to construct time slice WCS */
-   AstFrame *ospecframe = NULL; /* Spectral Frame in output FrameSet */
    AstFrame *oskyframe2 = NULL; /* Copy of output skyframe */
+   AstFrame *ospecframe = NULL; /* Spectral Frame in output FrameSet */
    AstFrame *specframe = NULL;  /* Spectral Frame in input FrameSet */
    AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
    AstFrameSet *swcsin = NULL;  /* FrameSet describing spatial input WCS */
@@ -178,7 +181,9 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    double *yout = NULL;  /* Workspace for detector output pixel positions */
    double dlbnd[ 3 ];    /* Floating point lower bounds for output cube */
    double dubnd[ 3 ];    /* Floating point upper bounds for output cube */
+   double ispecbounds[ 2 ];   /* Bounds of spectral axis in grid pixels */
    double shift[ 3 ];    /* Shifts from PIXEL to GRID coords */
+   double specbounds[ 2 ];      /* Bounds of spectral axis in spectral WCS units */
    double specin[ 2];    /* Spectral values to be transformed */
    double specout[ 2];   /* Transformed spectral values */
    float *pdata;         /* Pointer to next data sample */
@@ -191,6 +196,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    int itime;            /* Index of current time slice */
    int iwcsfrm;          /* Index of original output WCS Frame */
    int npix;             /* Number of pixels along axis */
+   int nval;             /* Number of values supplied */
    int pixax[ 3 ];       /* The output fed by each selected mapping input */
    int specax;           /* Index of spectral axis in input FrameSet */
    smfData *data = NULL; /* Pointer to data struct for current input file */
@@ -647,6 +653,23 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       }
    }
 
+/* See if the user wants to restrict the spectral range of the output cube.
+   First get the bounds of the full frequency axis. */
+   ispecbounds[ 0 ] = dlbnd[ 2 ];
+   ispecbounds[ 1 ] = dubnd[ 2 ];
+   astTran1( ospecmap, 2, ispecbounds, 0, specbounds );
+
+/* Now allow the user to provide alternative values. The above values are
+   used as dynamic defaults for the SPECBOUNDS parameter. */
+   kpg1Gtaxv( "SPECBOUNDS", 2, 1, ospecframe, 1, specbounds, &nval, status );
+
+/* Convert the supplied spectral values back to pixel coords. */
+   astTran1( ospecmap, 2, specbounds, 1, ispecbounds );
+
+/* Update the output bounds. */
+   dlbnd[ 2 ] = ispecbounds[ 0 ] ;
+   dubnd[ 2 ] = ispecbounds[ 1 ] ;
+
 /* We now add a GRID Frame in the output WCS FrameSet and calculates the
    bounds of the cube in this frame. If an optimal grid is being used, we 
    want to retain the fractional pixel offset supplied in par[0]. */
@@ -736,15 +759,6 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* We now erase the original PIXEL Frame since it is no longer needed. */
    astRemoveFrame( *wcsout, 1 );
 
-/* If no error has occurred, export the returned FrameSet pointer from the 
-   current AST context so that it will not be annulled when the AST
-   context is ended. Otherwise, ensure a null pointer is returned. */
-   if( *status == SAI__OK ) {
-      astExport( *wcsout );
-   } else {
-      *wcsout = astAnnul( *wcsout );
-   }
-
 /* Report the coordinate systems in use in the output cube, and the pixel
    bounds of the cube. */
    if( *status == SAI__OK ) {
@@ -766,6 +780,15 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                 status );
       
       msgOutif( MSG__NORM, " ", " ", status );
+   }
+
+/* If no error has occurred, export the returned FrameSet pointer from the 
+   current AST context so that it will not be annulled when the AST
+   context is ended. Otherwise, ensure a null pointer is returned. */
+   if( *status == SAI__OK ) {
+      astExport( *wcsout );
+   } else {
+      *wcsout = astAnnul( *wcsout );
    }
 
 /* End the AST context. This will annul all AST objects created within the
