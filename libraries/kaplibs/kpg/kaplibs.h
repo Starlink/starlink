@@ -59,7 +59,8 @@
 *        Add kpg1_wwrt and kpg1_wread.
 *     14-AUG-2006 (DSB):
 *        Added kpg1_mxmnd, kpg1_mxmnr and kpg1_mxmni.
-
+*     29-NOV-2006 (DSB):
+*        Added kpg1Gtaxv.
 *-
 */
 
@@ -108,13 +109,11 @@ void kpgStatd( int, int, const double[], int, const float[], int *, int *,
 
 void kpg1Wwrt( AstObject *, const char *, const HDSLoc *, int * );
 void kpg1Wread( const HDSLoc *, const char *, AstObject **, int * );
-
 void kpg1Mxmnr( int, int, float *, int *, float *, float *, int *, int *, int * );
 void kpg1Mxmnd( int, int, double *, int *, double *, double *, int *, int *, int * );
 void kpg1Mxmni( int, int, int *, int *, int *, int *, int *, int *, int * );
-
 void kpg1Medud( int, int, double *, double *, int *, int * );
-
 void kpg1Opgrd( int, double *, int, double *, int * );
+void kpg1Gtaxv( const char *, int, int, AstFrame *, int, double *, int *, int * );
 
 #endif
