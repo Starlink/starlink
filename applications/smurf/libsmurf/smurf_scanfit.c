@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_scanfit
+*     SCANFIT
 
 *  Purpose:
 *     Top-level SCANFIT implementation

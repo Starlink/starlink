@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_dreamsolve
+*     DREAMSOLVE
 
 *  Purpose:
 *     Top-level DREAM solver

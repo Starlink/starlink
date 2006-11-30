@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     badbolos
+*     BADBOLOS
 
 *  Purpose:
 *     Generate a map of random dead bolometers and add it as an NDF

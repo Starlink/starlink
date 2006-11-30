@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_extinction
+*     EXTINCTION
 
 *  Purpose:
 *     Top-level EXTINCTION implementation

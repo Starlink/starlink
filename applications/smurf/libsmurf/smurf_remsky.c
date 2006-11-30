@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_remsky
+*     REMSKY
 
 *  Purpose:
 *     Top-level SKY removal implementation

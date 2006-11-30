@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_makemap
+*     QLMAKEMAP
 
 *  Purpose:
 *     Top-level QUICK-LOOK MAKEMAP implementation

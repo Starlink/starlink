@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_makemap
+*     MAKEMAP
 
 *  Purpose:
 *     Top-level MAKEMAP implementation

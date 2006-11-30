@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_dreamweights
+*     DREAMWEIGHTS
 
 *  Purpose:
 *     Top-level DREAM weight matrix generation

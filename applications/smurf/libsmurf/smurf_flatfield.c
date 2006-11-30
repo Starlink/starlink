@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_flatfield
+*     FLATFIELD
 
 *  Purpose:
 *     Top-level FLATFIELD implementation

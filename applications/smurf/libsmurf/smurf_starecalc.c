@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_starecalc
+*     STARECALC
 
 *  Purpose:
 *     Top-level STARE image generator
