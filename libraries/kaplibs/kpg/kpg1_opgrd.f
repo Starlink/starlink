@@ -1051,19 +1051,6 @@
 *  total squared value (over the entire area of the pixel) than the old 
 *  angle.
             IF( NEWAMP*NEWWAV*NEWWAV .GT. MXAMP*MXWAVE*MXWAVE ) THEN
-
-
-
-
-         write(*,*) ast__dr2d*ang,sum2,mxamp,
-     :              NEWAMP*NEWWAV*NEWWAV,
-     :              MXAMP*MXWAVE*MXWAVE,newwav,mxwave
-      call opgrd_autodump( ang, histsz, hist, status )
-
-
-
-
-
                MXANG = ANG
                MXAMP = NEWAMP
                MXWAVE = NEWWAV
