@@ -784,6 +784,8 @@ itcl::class gaia::Gaia {
       add_menuitem $m command "Mean X & Y profiles...  " \
          {Show X and Y averaged profiles of a rectangular region} \
          -command [code $this make_toolbox xyprofile 0 1] \
+	 -accelerator {Control-e}
+      bind $w_ <Control-e> [code $this make_xyprofile_toolbox 0 0 0]
 
       add_menuitem $m command "Polarimetry toolbox... " \
          {Display and manipulate POLPACK vector maps} \
@@ -1157,13 +1159,21 @@ itcl::class gaia::Gaia {
 
    #  Make XY profiles toolbox. Slightly different as need to get
    #  rectangle on canvas first. Note don't need a backing image.
-   public method make_xyprofile_toolbox {name {cloned 0}} {
+   public method make_xyprofile_toolbox {name {cloned 0} {prompt 1}} {
       if {[$image_ isclear]} {
          warning_dialog "No image is currently loaded" $w_
          return
       }
-      if {[action_dialog "Press OK and then drag out a \
-                          rectangle over the image with button 1" $w_]} {
+      set proceed 0
+      if { $prompt } {
+         if {[action_dialog "Press OK and then drag out a \
+                             rectangle over the image with button 1" $w_]} {
+            set proceed 1
+         }
+      } else {
+         set proceed 1
+      }
+      if { $proceed } {
          [$image_ component draw] set_drawing_mode rectangle \
             [code $this make_xyprofile_ $name $cloned]
       }

@@ -1,5 +1,9 @@
   Latest changes:
 
+    The XY profile toolbox can now be activated using control-e.
+    This also avoids the prompt dialog reminding you to draw a
+    rectangle.
+
     The handling of broken WCS components in NDFs should now 
     result in the display of an image/cube, without a WCS rather
     than an unrelated error report about a missing data component.
