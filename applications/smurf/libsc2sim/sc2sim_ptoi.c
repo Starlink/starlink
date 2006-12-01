@@ -108,7 +108,7 @@ int *status        /* global status (given and returned) */
         coeffs[3] * p*p*p + coeffs[4] * p*p*p*p + coeffs[5] * p*p*p*p*p;
    } else {
       *status = DITS__APP_ERROR;
-      printf ( "sc2sim_ptoi: flux value outside bolometer range\n" );
+      printf ( "sc2sim_ptoi: flux value, %g, outside bolometer range (0-200)\n", p );
    }
 
 }
