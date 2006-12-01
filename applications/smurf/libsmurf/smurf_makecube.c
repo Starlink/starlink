@@ -26,11 +26,14 @@
 *     Nearest neighbour rebinning is used (that is, each input data sample 
 *     is placed into the nearest output pixel). 
 *
-*     The parameters of the projection from sky to pixel grid coordinates
-*     can be specified using parameters CROTA, PIXSIZE, REFLAT, REFLON.
-*     Alternatively, parameter AUTOGRID can be set true, in which case 
-*     projection parameters are determined automatically in a manner that
-*     favours projections that place samples centrally within pixels.
+*     The output can be either a regularly gridded tangent plane
+*     projection of the sky, or a sparse array (see parameter SPARSE).
+*     If a tangent plane projection is selected, the parameters of the 
+*     projection from sky to pixel grid coordinates can be specified using 
+*     parameters CROTA, PIXSIZE, REFLAT, REFLON. Alternatively, parameter 
+*     AUTOGRID can be set true, in which case projection parameters are 
+*     determined automatically in a manner that favours projections that 
+*     place samples centrally within pixels.
 
 *  ADAM Parameters:
 *     AUTOGRID = _LOGICAL (Read)
@@ -82,7 +85,8 @@
 *          then the associated Variance value will be bad. The dynamic
 *          default for this parameter is TRUE if the mean density of 
 *          detector samples in the output NDF is more than 1 per pixel.
-*          It is FALSE otherwise. []
+*          It is FALSE otherwise. If SPARSE is set TRUE, then GENVAR is
+*          not accessed and a FALSE value is always assumed. []
 *     IN = NDF (Read)
 *          Input file(s)
 *     OUT = NDF (Write)
@@ -134,12 +138,42 @@
 *          the spatial projection in the output cube. This should be provided 
 *          in the system specified by parameter SYSTEM. The dynamic default 
 *          value is determined by the AUTOGRID parameter. []
-*     WEIGHTS = _LOGICAL (Read)
-*          If TRUE, then the weights associated with the array of output
-*          pixels is stored in an extension named ACSISRED, within the output 
-*          NDF. If FALSE the weights are discarded once they have been
-*          used. These weights record thre relative weight of the input
-*          data associated with each output pixel. [FALSE]
+*     SPARSE = _LOGICAL (Read)
+*          Indicates if the spectra in the output cube should be stored
+*          as a sparse array, or as a regularly gridded array. If FALSE,
+*          pixel axes 1 and 2 of the output cube represent a regularly
+*          gridded tangent plane projection of the sky, with parameters
+*          determined by CROTA, PIXSIZE, REFLON and REFLAT. Each input
+*          spectrum is placed at the appropropriate pixel position in this 
+*          3D projection, as given by the celestial coordinates associated
+*          with the spectrum. If SPARSE is TRUE, then each input spectrum
+*          is given an associated index, starting from 1, and the spectrum
+*          with index "I" is stored at pixel position (I,1) in the output 
+*          cube (pixel axis 2 will always have the value 1 - that is, axis 
+*          2 is a degenerate axis that spans only a single pixel).
+*
+*          In both cases, the third pixel axis in the output cube
+*          corresponds to spectral position (frequency, velocity, etc).
+*
+*          Whatever the setting of SPARSE, the output NDF's WCS component 
+*          can be used to transform pixel position into the corresponding 
+*          (celestial longitude, celestial latitude, spectral position) 
+*          values. However, if SPARSE is TRUE, then the inverse transformation
+*          (i.e. from (long,lat,spec) to pixel coordinates) will not be 
+*          defined. This means, for instance, that if a sparse array is
+*          displayed as a 2D image, then it will not be possible to
+*          annotated the axes with WCS values. Also, whilst KAPPA:WCSMOSAIC 
+*          will succesfully align the data in a sparse array with a
+*          regularly gridded cube, KAPPA:WCSALIGN will not, since WCSALIGN 
+*          needs the inverse transformation to be defined.
+*
+*          The dynamic default value for SPARSE depends on the value
+*          supplied for parameter AUTOGRID. If AUTOGRID is set FALSE,
+*          then SPARSE defaults to FALSE. If AUTOGRID is set TRUE, then
+*          the default for SPARSE will be TRUE if the algorithm described 
+*          under the AUTOGRID parameter fails to find useful default grid 
+*          parameters. If the AUTOGRID algorithm succeeds, the default
+*          for SPARSE will be FALSE. []
 *     SPECBOUNDS = LITERAL (Read)
 *          The bounds of the output cube on the spectral axis. Input data
 *          that falls outside the supplied range will not be included in
@@ -157,8 +191,9 @@
 *          input data. []
 *     SPREAD = LITERAL (Read)
 *          The method to use when spreading each input pixel value out
-*          between a group of neighbouring output pixels. SPREAD can take 
-*          the following values:
+*          between a group of neighbouring output pixels. If SPARSE is set 
+*          TRUE, then SPREAD is not accessed and a value of "Nearest" is
+*          always assumed. SPREAD can take the following values:
 *	   
 *          - "Linear" -- The input pixel value is divided bi-linearly between 
 *          the four nearest output pixels.  Produces smoother output NDFs than 
@@ -210,6 +245,13 @@
 *          Otherwise, the detector positions are calculated on the basis
 *          of the FPLANEX/Y arrays. Both methods should (in the absence 
 *          of bugs) result in identical cubes. [TRUE]
+*     WEIGHTS = _LOGICAL (Read)
+*          If TRUE, then the weights associated with the array of output
+*          pixels is stored in an extension named ACSISRED, within the output 
+*          NDF. If FALSE the weights are discarded once they have been
+*          used. These weights record thre relative weight of the input
+*          data associated with each output pixel. If SPARSE is set TRUE,
+*          then WEIGHTS is not accessed and a FALSE value is assumed. [FALSE]
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -246,6 +288,8 @@
 *        - Added GENVAR parameter.
 *     29-NOV-2006 (DSB):
 *        We do not need a double size weights array if GENVAR is FALSE.
+*     30-NOV-2006 (DSB):
+*        Added parameter SPARSE.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -336,6 +380,7 @@ void smurf_makecube( int *status ) {
    int flag;                  /* Is group expression to be continued? */
    int genvar;                /* Create output Variances based on input data values/ */
    int ifile;                 /* Input file index */
+   int ispec;                 /* Index of next spectrum within output NDF */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for output map */
    int lbnd_wgt[ 3 ];         /* Lower pixel bounds for wight array */
    int moving;                /* Is the telescope base position changing? */
@@ -350,6 +395,7 @@ void smurf_makecube( int *status ) {
    int savewgt;               /* Should weights be saved in the output NDF? */
    int size;                  /* Number of files in input group */
    int smfflags;              /* Flags for smfData */
+   int sparse;                /* Create a sparse output array? */
    int spread;                /* Pixel spreading method */
    int ubnd_out[ 3 ];         /* Upper pixel bounds for output map */
    int ubnd_wgt[ 3 ];         /* Upper pixel bounds for wight array */
@@ -375,57 +421,6 @@ void smurf_makecube( int *status ) {
 /* Get the celestial coordinate system for the output cube. */
    parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC"
              "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
-
-/* Get the pixel spreading scheme to use. */
-   parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,SINCSINC,SINCCOS"
-             "SINCGAUSS,SOMB,SOMBCOS,GAUSS", 1, spbuf, 10, status );
-
-   if( !strcmp( spbuf, "NEAREST" ) ) {
-      spread = AST__NEAREST;
-      nparam = 0;
-
-   } else if( !strcmp( spbuf, "LINEAR" ) ) {
-      spread = AST__LINEAR;
-      nparam = 0;
-
-   } else if( !strcmp( spbuf, "SINC" ) ) {      
-      spread = AST__SINC;
-      nparam = 1;
-
-   } else if( !strcmp( spbuf, "SINCSINC" ) ) {      
-      spread = AST__SINCSINC;
-      nparam = 2;
-
-   } else if( !strcmp( spbuf, "SINCCOS" ) ) {      
-      spread = AST__SINCCOS;
-      nparam = 2;
-
-   } else if( !strcmp( spbuf, "SINCGAUSS" ) ) {      
-      spread = AST__SINCGAUSS;
-      nparam = 2;
-
-   } else if( !strcmp( spbuf, "SOMB" ) ) {      
-      spread = AST__SOMB;
-      nparam = 1;
-
-   } else if( !strcmp( spbuf, "SOMBCOS" ) ) {      
-      spread = AST__SOMBCOS;
-      nparam = 2;
-
-   } else if( !strcmp( spbuf, "GAUSS" ) ) {      
-      spread = AST__GAUSS;
-      nparam = 2;
-
-   } else if( *status == SAI__OK ) {
-      nparam = 0;
-      *status = SAI__ERROR;
-      msgSetc( "V", spbuf );
-      errRep( "", "Support not available for SPREAD = ^V (programming "
-              "error)", status );
-   }
-
-/* Get an additional parameter vector if required. */
-   if( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
 
 /* See of the detector positions are to be read from the RECEPPOS array. 
    Otherwise, they are calculated on the basis of the FPLANEX/Y arrays. */
@@ -460,16 +455,31 @@ void smurf_makecube( int *status ) {
    smf_cubegrid( igrp,  size, system, usedetpos, autogrid, par, &moving, 
                  &oskyfrm, status );
 
+/* See if the output cube is to include a spatial projection, or a sparse
+   list of spectra. */
+   parDef0l( "SPARSE", ( par[ 0 ] == AST__BAD ), status );
+   parGet0l( "SPARSE",  &sparse, status );
+
+/* If we are producing an output cube with the XY plane being a spatial
+   projection, then get the parameters describing the projection, using the
+   defaults calculated above. */
+   if( !sparse && *status == SAI__OK ) {
+
+/* Ensure we have usable XRPIX1/2 values */
+      if( par[ 0 ] == AST__BAD ) par[ 0 ] = 1.0;
+      if( par[ 1 ] == AST__BAD ) par[ 1 ] = 1.0;
+
 /* Get the reference position strings. Use a temprary SkyFrame to
    unformat them into radians. */
-   if( *status == SAI__OK ) {
-      parDef0c( "REFLON", astFormat( oskyfrm, 1, par[ 2 ] ), status );
-      parDef0c( "REFLAT", astFormat( oskyfrm, 2, par[ 2 ] ), status );
+      if( par[ 2 ] != AST__BAD ) parDef0c( "REFLON", astFormat( oskyfrm, 1, 
+                                                     par[ 2 ] ), status );
+      if( par[ 3 ] != AST__BAD ) parDef0c( "REFLAT", astFormat( oskyfrm, 2, 
+                                                     par[ 3 ] ), status );
 
       parGet0c( "REFLON", reflon, 40, status );
       parGet0c( "REFLAT", reflat, 40, status );
 
-      if( *status = SAI__OK ) {
+      if( *status == SAI__OK ) {
          if( astUnformat( oskyfrm, 1, reflon, par + 2 ) == 0 && *status == SAI__OK ) {
             msgSetc( "REFLON", reflon );
             errRep( "", "Bad value supplied for REFLON: '^REFLON'", status );
@@ -480,87 +490,114 @@ void smurf_makecube( int *status ) {
             errRep( "", "Bad value supplied for REFLAT: '^REFLAT'", status );
          }  
       }
-   }
    
 /* Get the user defined spatial pixel size in arcsec (the calibration for 
    the spectral axis is fixed by the first input data file - see 
    smf_cubebounds.c). First convert the autogrid values form rads to arcsec
    and establish them as the dynamic default for "PIXSIZE". */
-   pixsize[ 0 ] = 0.1*NINT( fabs( par[ 4 ] )*AST__DR2D*36000.0 );
-   pixsize[ 1 ] = 0.1*NINT( fabs( par[ 5 ] )*AST__DR2D*36000.0 );
-
-   parDef1d( "PIXSIZE", ( pixsize[ 0 ] == pixsize[ 1 ] ) ? 1 : 2, pixsize,
-             status );
-   parGet1d( "PIXSIZE", 2, pixsize, &nval, status );
+      if( par[ 4 ] != AST__BAD && par[ 5 ] != AST__BAD ) {
+         pixsize[ 0 ] = 0.1*NINT( fabs( par[ 4 ] )*AST__DR2D*36000.0 );
+         pixsize[ 1 ] = 0.1*NINT( fabs( par[ 5 ] )*AST__DR2D*36000.0 );
+         parDef1d( "PIXSIZE", ( pixsize[ 0 ] == pixsize[ 1 ] ) ? 1 : 2, 
+                   pixsize, status );
+      }
+      parGet1d( "PIXSIZE", 2, pixsize, &nval, status );
 
 /* If OK, duplicate the first value if only one value was supplied. */
-   if( *status == SAI__OK ) {
-      if( nval < 2 ) pixsize[ 1 ] = pixsize[ 0 ];
+      if( *status == SAI__OK ) {
+         if( nval < 2 ) pixsize[ 1 ] = pixsize[ 0 ];
    
 /* Check the values are OK. */
-      if( pixsize[ 0 ] <= 0 || pixsize[ 1 ] <= 0 ) {
-         msgSetd( "P1", pixsize[ 0 ] );
-         msgSetd( "P2", pixsize[ 1 ] );
-         *status = SAI__ERROR;
-         errRep( FUNC_NAME, "Invalid pixel sizes (^P1,^P2).", status);
-      }
+         if( pixsize[ 0 ] <= 0 || pixsize[ 1 ] <= 0 ) {
+            msgSetd( "P1", pixsize[ 0 ] );
+            msgSetd( "P2", pixsize[ 1 ] );
+            *status = SAI__ERROR;
+            errRep( FUNC_NAME, "Invalid pixel sizes (^P1,^P2).", status);
+         }
 
 /* Convert to rads, and set the correct signs. */
-      par[ 4 ] = ( ( par[ 4 ] < 0.0 ) ? -1.0 : 1.0 )*pixsize[ 0 ]*AST__DD2R/3600.0;
-      par[ 5 ] = ( ( par[ 5 ] < 0.0 ) ? -1.0 : 1.0 )*pixsize[ 1 ]*AST__DD2R/3600.0;
-   }
+         if( par[ 4 ] == AST__BAD || par[ 4 ] < 0.0 ) {
+            par[ 4 ] = -pixsize[ 0 ]*AST__DD2R/3600.0;
+         } else {
+            par[ 4 ] = pixsize[ 0 ]*AST__DD2R/3600.0;
+         }
+
+         if( par[ 5 ] == AST__BAD || par[ 5 ] < 0.0 ) {
+            par[ 5 ] = -pixsize[ 1 ]*AST__DD2R/3600.0;
+         } else {
+            par[ 5 ] = pixsize[ 1 ]*AST__DD2R/3600.0;
+         }
+         
+      }
    
 /* Convert the autogrid CROTA value from rads to degs and set as the
    dynamic default for parameter CROTA (the position angle of the output 
    Y axis, in degrees). The get the CROTA value and convert to rads. */
-   parDef0d( "CROTA", par[ 6 ]*AST__DR2D, status );
-   parGet0d( "CROTA", par + 6, status );
-   par[ 6 ] *= AST__DD2R;
+      if( par[ 6 ] != AST__BAD ) parDef0d( "CROTA", par[ 6 ]*AST__DR2D, 
+                                           status );
+      parGet0d( "CROTA", par + 6, status );
+      par[ 6 ] *= AST__DD2R;
 
 /* Abort if an error has occurred. */
-   if( *status != SAI__OK ) goto L999;
+      if( *status != SAI__OK ) goto L999;
 
 /* Display the projection parameters being used. */
-   msgBlank( status );
-   msgOutif( MSG__NORM, " ", "   Projection parameters used:", status );
-   msgSetd( "V", par[ 0 ] );
-   msgOutif( MSG__NORM, " ", "      CRPIX1 = ^V", status );
-   msgSetd( "V", par[ 1 ] );
-   msgOutif( MSG__NORM, " ", "      CRPIX2 = ^V", status );
-   msgSetd( "V", par[ 2 ]*AST__DR2D );
-   msgSetc( "V2", astFormat( oskyfrm, 1, par[ 2 ] ) );
-   msgSetc( "S", astGetC( oskyfrm, "Symbol(1)" ) );
-   msgOutif( MSG__NORM, " ", "      CRVAL1 = ^V ( ^S = ^V2 )", status );
-   msgSetd( "V", par[ 3 ]*AST__DR2D );
-   msgSetc( "V2", astFormat( oskyfrm, 2, par[ 3 ] ) );
-   msgSetc( "S", astGetC( oskyfrm, "Symbol(2)" ) );
-   msgOutif( MSG__NORM, " ", "      CRVAL2 = ^V ( ^S = ^V2 )", status );
-   msgSetd( "V", par[ 4 ]*AST__DR2D );
-   msgSetd( "V2", 0.1*NINT(par[ 4 ]*AST__DR2D*36000.0) );
-   msgOutif( MSG__NORM, " ", "      CDELT1 = ^V ( ^V2 arcsec )", status );
-   msgSetd( "V", par[ 5 ]*AST__DR2D );
-   msgSetd( "V2", 0.1*NINT(par[ 5 ]*AST__DR2D*36000.0) );
-   msgOutif( MSG__NORM, " ", "      CDELT2 = ^V ( ^V2 arcsec )", status );
-   msgSetd( "V", par[ 6 ]*AST__DR2D );
-   msgOutif( MSG__NORM, " ", "      CROTA2 = ^V", status );
+      msgBlank( status );
+      msgOutif( MSG__NORM, " ", "   Projection parameters used:", status );
+      msgSetd( "V", par[ 0 ] );
+      msgOutif( MSG__NORM, " ", "      CRPIX1 = ^V", status );
+      msgSetd( "V", par[ 1 ] );
+      msgOutif( MSG__NORM, " ", "      CRPIX2 = ^V", status );
+      msgSetd( "V", par[ 2 ]*AST__DR2D );
+      msgSetc( "V2", astFormat( oskyfrm, 1, par[ 2 ] ) );
+      msgSetc( "S", astGetC( oskyfrm, "Symbol(1)" ) );
+      msgOutif( MSG__NORM, " ", "      CRVAL1 = ^V ( ^S = ^V2 )", status );
+      msgSetd( "V", par[ 3 ]*AST__DR2D );
+      msgSetc( "V2", astFormat( oskyfrm, 2, par[ 3 ] ) );
+      msgSetc( "S", astGetC( oskyfrm, "Symbol(2)" ) );
+      msgOutif( MSG__NORM, " ", "      CRVAL2 = ^V ( ^S = ^V2 )", status );
+      msgSetd( "V", par[ 4 ]*AST__DR2D );
+      msgSetd( "V2", 0.1*NINT(par[ 4 ]*AST__DR2D*36000.0) );
+      msgOutif( MSG__NORM, " ", "      CDELT1 = ^V ( ^V2 arcsec )", status );
+      msgSetd( "V", par[ 5 ]*AST__DR2D );
+      msgSetd( "V2", 0.1*NINT(par[ 5 ]*AST__DR2D*36000.0) );
+      msgOutif( MSG__NORM, " ", "      CDELT2 = ^V ( ^V2 arcsec )", status );
+      msgSetd( "V", par[ 6 ]*AST__DR2D );
+      msgOutif( MSG__NORM, " ", "      CROTA2 = ^V", status );
 
 /* Validate the input files, create the WCS FrameSet to store in the
-   output cube, and get the pixel index bounds of the output cube. If
-   projection parameters are being determined automatically, the relevant
-   variables are returned holding the optimal projection parameter values. */
-   smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos, par, moving, 
-                   lbnd_out, ubnd_out, &wcsout, &npos, status );
+   output cube, and get the pixel index bounds of the output cube. */
+      smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos, par, moving, 
+                      lbnd_out, ubnd_out, &wcsout, &npos, status );
 
 /* See if the mean spatial density of points in the output is more than 1
    per pixel, and set up a suitable dynamic default for the GENVAR
    parameter. */
-   nposout = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
-   nposout *= ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
-   parDef0l( "GENVAR", ( npos > nposout ), status );
+      nposout = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
+      nposout *= ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
+      parDef0l( "GENVAR", ( npos > nposout ), status );
 
 /* See if output Variances based on the spread of input Data values are
    to be created. */
-   parGet0l( "GENVAR", &genvar, status );
+      parGet0l( "GENVAR", &genvar, status );
+
+/* Now deal with sparse output cubes. */
+   } else {
+
+/* Indicate that no spatial projection will be used. */
+      msgBlank( status );
+      msgOutif( MSG__NORM, " ", "   The output will be a sparse array "
+                "containing a list of spectra.", status );
+
+/* Validate the input files, create the WCS FrameSet to store in the
+   output cube, and get the pixel index bounds of the output cube. */
+      smf_sparsebounds( igrp, size, oskyfrm, usedetpos, detgrp, lbnd_out, 
+                        ubnd_out, &wcsout, status );
+
+/* Output Variances based on the spread of input Data values cannot be
+   created if the output cube is sparse. */
+      genvar = 0;
+   }
 
 /* Get the base->current Mapping from the output WCS FrameSet, and split it 
    into two Mappings; one (oskymap) that maps the first 2 GRID axes into 
@@ -613,37 +650,98 @@ void smurf_makecube( int *status ) {
    data_array = (odata->pntr)[ 0 ];
    var_array = (odata->pntr)[ 1 ];
 
-/* Create an array to hold the weights. This has to be twice the size
-   of the output cube if astRebinSeq is being used within smf_rebincube,
-   and output variances are being generated from the input data spread.
-   First set up the bounds of the array (a larger array is needed if AST
-   is being used to do the rebinning), and then see if the array should 
-   be held in temporary work space, or in an extension of the output NDF. */
+/* Get the pixel spreading scheme to use. */
+   if( !sparse ) {
+      parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
+                "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
+                1, spbuf, 10, status );
+
+      if( !strcmp( spbuf, "NEAREST" ) ) {
+         spread = AST__NEAREST;
+         nparam = 0;
    
-   lbnd_wgt[ 0 ] = 1;
-   lbnd_wgt[ 1 ] = 1;
-   lbnd_wgt[ 2 ] = 1;
-   ubnd_wgt[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
-   ubnd_wgt[ 1 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
-   ubnd_wgt[ 2 ] = ubnd_out[ 2 ] - lbnd_out[ 2 ] + 1;
-   if( spread != AST__NEAREST && genvar ) ubnd_wgt[ 0 ] *= 2;
-
-   parGet0l( "WEIGHTS", &savewgt, status );
-
-/* Create the extension, or allocate the work space, as required. */
-   if( savewgt ) {
-      weightsloc = smf_get_xloc ( odata, "ACSISRED", "WT_ARR", "WRITE", 
-                                  0, 0, status );
-      smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
-                      3, (int *) lbnd_wgt, (int *) ubnd_wgt, &wdata, status );
-      if( wdata ) wgt_array = (wdata->pntr)[ 0 ];
+      } else if( !strcmp( spbuf, "LINEAR" ) ) {
+         spread = AST__LINEAR;
+         nparam = 0;
+   
+      } else if( !strcmp( spbuf, "SINC" ) ) {      
+         spread = AST__SINC;
+         nparam = 1;
+   
+      } else if( !strcmp( spbuf, "SINCSINC" ) ) {      
+         spread = AST__SINCSINC;
+         nparam = 2;
+   
+      } else if( !strcmp( spbuf, "SINCCOS" ) ) {      
+         spread = AST__SINCCOS;
+         nparam = 2;
+   
+      } else if( !strcmp( spbuf, "SINCGAUSS" ) ) {      
+         spread = AST__SINCGAUSS;
+         nparam = 2;
+   
+      } else if( !strcmp( spbuf, "SOMB" ) ) {      
+         spread = AST__SOMB;
+         nparam = 1;
+   
+      } else if( !strcmp( spbuf, "SOMBCOS" ) ) {      
+         spread = AST__SOMBCOS;
+         nparam = 2;
+   
+      } else if( !strcmp( spbuf, "GAUSS" ) ) {      
+         spread = AST__GAUSS;
+         nparam = 2;
+   
+      } else if( *status == SAI__OK ) {
+         nparam = 0;
+         *status = SAI__ERROR;
+         msgSetc( "V", spbuf );
+         errRep( "", "Support not available for SPREAD = ^V (programming "
+                 "error)", status );
+      }
 
    } else {
-      wgt_array = astMalloc( sizeof( double )*
-                          (size_t)ubnd_wgt[ 0 ]*ubnd_wgt[ 1 ]*ubnd_wgt[ 2 ] );
+      spread = AST__NEAREST;
+      nparam = 0;
+   }
+
+/* Get an additional parameter vector if required. */
+   if( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
+
+/* If required, create an array to hold the weights. This has to be twice 
+   the size of the output cube if astRebinSeq is being used within 
+   smf_rebincube, and output variances are being generated from the input 
+   data spread. First set up the bounds of the array (a larger array is 
+   needed if AST is being used to do the rebinning), and then see if the 
+   array should be held in temporary work space, or in an extension of 
+   the output NDF. */
+   if( !sparse ) {   
+      lbnd_wgt[ 0 ] = 1;
+      lbnd_wgt[ 1 ] = 1;
+      lbnd_wgt[ 2 ] = 1;
+      ubnd_wgt[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
+      ubnd_wgt[ 1 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
+      ubnd_wgt[ 2 ] = ubnd_out[ 2 ] - lbnd_out[ 2 ] + 1;
+      if( spread != AST__NEAREST && genvar ) ubnd_wgt[ 0 ] *= 2;
+   
+      parGet0l( "WEIGHTS", &savewgt, status );
+
+/* Create the extension, or allocate the work space, as required. */
+      if( savewgt ) {
+         weightsloc = smf_get_xloc ( odata, "ACSISRED", "WT_ARR", "WRITE", 
+                                     0, 0, status );
+         smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
+                         3, (int *) lbnd_wgt, (int *) ubnd_wgt, &wdata, status );
+         if( wdata ) wgt_array = (wdata->pntr)[ 0 ];
+   
+      } else {
+         wgt_array = astMalloc( sizeof( double )*
+                             (size_t)ubnd_wgt[ 0 ]*ubnd_wgt[ 1 ]*ubnd_wgt[ 2 ] );
+      }
    }
 
 /* Loop round all the input files, pasting each one into the output NDF. */
+   ispec = 0;
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
 
 /* Obtain information about the current input NDF. */
@@ -700,9 +798,15 @@ void smurf_makecube( int *status ) {
       }
 
 /* Rebin the data into the output grid. */
-      smf_rebincube( data, ifile, size, swcsout, ospecfrm, ospecmap, detgrp, 
-                     moving, lbnd_out, ubnd_out, spread, params, data_array, 
-                     var_array, wgt_array, status );
+      if( !sparse ) {
+         smf_rebincube( data, ifile, size, swcsout, ospecfrm, ospecmap, detgrp,
+                        moving, lbnd_out, ubnd_out, spread, params, data_array,
+                        var_array, wgt_array, status );
+      } else {
+         smf_rebinsparse( data, ospecfrm, ospecmap, oskyfrm, detgrp, 
+                          lbnd_out, ubnd_out, data_array, var_array, &ispec, 
+                          status );
+      }
    
 /* Close the input data file. */
       if( data != NULL ) {

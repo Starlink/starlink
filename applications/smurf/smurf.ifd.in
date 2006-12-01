@@ -818,6 +818,15 @@ package @PACKAGE@ {
             helpkey *
 	  }
 
+ 	  parameter sparse {
+	    type _LOGICAL
+	    vpath DYNAMIC DEFAULT
+	    ppath DYNAMIC DEFAULT
+	    prompt {Create a sparse output array?}
+	    default FALSE
+	    helpkey *
+	  }
+
          parameter specbounds {
             type LITERAL
             ppath DYNAMIC
