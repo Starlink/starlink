@@ -1,6 +1,7 @@
    Manipulate GIF streams in pure Tcl
 
   Copyright (c) 2006 Michael Thomas Greer
+  Copyright (c) 2006 Particle Physics and Astronomy Research Council
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -378,3 +379,14 @@ gif.set varName ?type? index element ?value? ...
   Index an element of a block the same way as gif.get and set one or more
   element values. If no value is specified, the named element is removed.
 
+------------------------------------------------------------------------------
+gif.add varName block
+------------------------------------------------------------------------------
+  Add a new block by copying an existing one. Obtain the block
+  using gif.get.
+
+------------------------------------------------------------------------------
+gif.createGC varName ?delay?
+------------------------------------------------------------------------------
+  Create a Graphic Control block and append to the GIF. 
+  Delay in 1/100 of second.

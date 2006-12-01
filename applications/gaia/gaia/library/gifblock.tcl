@@ -3,6 +3,7 @@
 #   Manipulate GIF streams in pure Tcl
 #
 # Copyright (c) 2006 Michael Thomas Greer
+# Copyright (c) 2006 Particle Physics and Astronomy Research Council
 #
 #   This library is free software; you can redistribute it and/or
 #   modify it under the terms of the GNU Lesser General Public
@@ -759,8 +760,6 @@ proc ::gifblock::gif.WriteSubBlocks {f data mode} {                 # gif.save
    }
  }
 
-
-
 #-----------------------------------------------------------------------------
 #  Add a new block by cloning an existing one. Obtain the block
 #  using gif.get.
@@ -787,4 +786,3 @@ proc ::gifblock::gif.createGC {varName {delay 50}} {
                ]
    lappend result $temp
 }
-
