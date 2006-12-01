@@ -1,0 +1,380 @@
+   Manipulate GIF streams in pure Tcl
+
+  Copyright (c) 2006 Michael Thomas Greer
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+//////////////////////////////////////////////////////////////////////////////
+  gifblock documentation
+//////////////////////////////////////////////////////////////////////////////
+
+  A GIF file (or 'stream') is an ordered list of 'blocks'. This library
+  decomposes a GIF file into a list of blocks, composes a list of blocks
+  into a GIF file, and gives a couple of useful functions for inspecting
+  and modifying a list of blocks.
+
+  Each block listed is stored as a record of key-value pairs
+  (see the tcl proc 'array get' and 'array set' for more information).
+
+  A sample block:
+    {
+      type                     {Logical Screen Descriptor}
+      width                    800
+      height                   600
+      {color resolution}       3
+      {background color index} 255
+    }
+
+  The best way to become familiar with the block structure is to play with a
+  few GIFs and dump the structure. For example:
+
+    # List the blocks, in order, found in 'my_image.gif'
+    gif.load sunset sunset.gif
+    set cntr -1
+    foreach name [gif.blocknames sunset] {puts "[incr cntr]: $name"}
+
+  For those of you familiar with the GIF specification, please pay attention
+  to the way the Color Table block is handled -- it is more conveniently
+  coupled to the LSD and Image Descriptor blocks than in the GIF spec.
+
+  The ORDER of blocks in the list is important. The relative order of elements
+  in any given block is not.
+
+  Each block must always have a 'type' element naming the type of the block.
+  Block types and data are as follows.
+
+------------------------------------------------------------------------------
+  type {GIF Header}
+    Required. This must always be the first block in the list.
+    Only one of these may appear in a list.
+
+  version
+    Optional. One of "87a" or "89a". If not given, gif.save will choose
+    the appropriate version when writing the GIF file.
+
+------------------------------------------------------------------------------
+  type {Logical Screen Descriptor}
+    Required. Only one of these may appear in a list. It must always be the
+    second or third block in the list, and may only be preceeded by the GIF
+    Header block and an optional Color Table block.
+
+  width
+  height
+    Required. The size of the GIF image. Unsigned 16-bit integers.
+
+  color resolution
+    Optional. The number of bits per primary color available
+    to the original image. Defaults to 4.
+
+  background color index
+    Optional. Unsigned 8-bit integer. Defaults to 0.
+
+  pixel aspect ratio
+    Optional. The quotient of a pixel's width over its height.
+    Defaults to 0 (meaning that the aspect ratio is not defined).
+
+------------------------------------------------------------------------------
+  type {Color Table}
+    Optional. A GIF file will generally have one of these, positioned
+    immediately following the GIF Header block and immediately before the
+    Logical Screen Descriptor block (making it the Global Color Table).
+
+    Color Table blocks can also be located anywhere in the list preceeding an
+    Image Descriptor block, indicating that the image data refers to this
+    Local Color Table and not the Global Color Table (if any).
+
+  sorted?
+    Optional. Must be true or false (any valid Tcl boolean string will do).
+    If true, indicates that the Color Table lists colors with the most
+    frequently used color first and the least frequently used last.
+    Defaults to false.
+
+  colors
+    Required. A list of triplets of the form
+      {red green blue}
+    where red, green, and blue are unsigned 8-bit integers. That is, it is a
+    list of colors. The length of the color table may not exceed 256.
+
+------------------------------------------------------------------------------
+  type {Image Descriptor}
+    Optional. Image data.
+
+  left
+  top
+    Optional. The location of the upper-left edge of the image in the
+    Logical Screen. The upper-left corner of the Logical Screen is (0, 0).
+    Unsigned 16-bit integers. Default to 0.
+
+  width
+  height
+    Required. The image dimentions. Unsigned 16-bit integers.
+
+  interlaced?
+    Optional. Must be true or false (any valid Tcl boolean string will do).
+    If true, the GIF Image Data is interlaced. See the GIF specification for
+    more. Defaults to false.
+
+  reserved
+    Optional. Unsigned 2-bit integer. Should be 0.
+
+  lzw minimum code size
+    Required. The GIF LZW Minimum Code Size unsigned 8-bit integer value.
+
+  data
+    Required. The GIF Variable-Length-Code LZW Compressed binary image data.
+
+  The {lzw minimum code size} and data are not modified or utilized by this
+  library.
+
+------------------------------------------------------------------------------
+  type {Graphic Control}
+    Optional. This is everyone's favorite extension block, because it is the
+    one that gives GIFs a transparent color and enables GIF animations.
+    See the GIF 89a specification for more information.
+
+    This block modifies the way the next 'graphic rendering block'
+    (Image Descriptor block or Plain Text block) it is to be displayed.
+
+  reserved
+    Optional. Unsigned 3-bit integer. Should be 0.
+
+  disposal method
+    Optional. Unsigned 3-bit integer. One of:
+      0    No disposal method specified (default).
+      1    Leave the graphic block in place after drawing it.
+      2    After drawing the graphic but before drawing the next, fill the
+           area used with the background color (see the Logical Screen
+           Descriptor block).
+      3    After drawing the graphic but before drawing the next,
+           restore the area used to its prior state
+           (as if the graphic had never been drawn).
+      4-7  Undefined. Do not use.
+
+  user input?
+    Optional. Must be true or false (any valid Tcl boolean string will do).
+    If true, the user must do something (like click a button or press a key)
+    before the decoder displays the next graphic rendering block.
+    Defaults to false.
+
+    If true and a delay time is given, the decoder continues processing when
+    the user gives input or the delay time times-out --whichever comes first.
+
+  delay time
+    Optional. Unsigned 16-bit integer. If non-zero, indicates the number of
+    1/100 seconds to pause before drawing the next graphic rendering block.
+    Defaults to 0.
+
+  transparent color index
+    Optional. If present, indicates that the specified unsigned 8-bit color
+    index is to be treated as transparent. Defaults to 'not present',
+    i.e. no transparency.
+
+------------------------------------------------------------------------------
+  type Comment
+    Optional. Non-displayable textual data (stuff like "this image is
+    copyright (c) 2027 Spiff Industries", etc.)
+
+  text
+    Required. A string containing the textual data.
+    The GIF specification does not give any clear recommendations on what
+    character codes may or may not appear in a GIF Comment string, but in
+    real life it is not uncommon to have newline and carriage return codes
+    embedded.
+
+------------------------------------------------------------------------------
+  type {Plain Text}
+    Optional. Textual information to display.
+
+    Be aware that not many GIF decoders properly recognize this block. For
+    example, the famous Irfanview complains that the GIF is invalid when it
+    is in fact properly formed. You should generally use an image block
+    instead.
+
+  left
+  top
+    Required. The location of the upper-left edge of the image in the
+    Logical Screen. The upper-left corner of the Logical Screen is (0, 0).
+    Unsigned 16-bit integers.
+
+  width
+  height
+    Required. The text grid dimentions. Unsigned 16-bit integers.
+    Should be a multiple of cell width and cell height, respectively.
+
+  cell width
+  cell height
+    Required. The cell grid dimentions. Unsigned 8-bit integers.
+
+  foreground color index
+  background color index
+    Required. Always references the Global Color Table.
+    Also, a Graphic Control block may modify this block,
+    so the specified index might be a transparent color index...
+
+  text
+    Required. Plain ASCII text in the range 20h..F7h (out of range characters
+    are recommended to be displayed as spaces [ASCII 20h]). The text should be
+    pre-formatted (with spaces) to fit the grid appropriately. For example:
+
+      +-+-+-+-+-+-+
+      |W|h|a|t|'|s|
+      +-+-+-+-+-+-+  -->   "What's  up?"
+      | | |u|p|?| |
+      +-+-+-+-+-+-+        Notice the two spaces between words, so that the
+                           6 by 2 grid is filled with the "up?" centered.
+      +-+-+-+-+-+-+
+      |W|h|a|t|'|s|
+      +-+-+-+-+-+-+  -->   "What'sup?"
+      |u|p|?| | | |
+      +-+-+-+-+-+-+        Notice the lack of spaces between words, so that
+                           the text is left-justified in the 6 by 2 grid.
+
+------------------------------------------------------------------------------
+  type Application
+    Optional. Application-specific data.
+
+  identifier
+    Required. An 8-character string identifying the data.
+
+  authentication code
+    Required. A list of three unsigned 8-bit integer values.
+
+  datablocks
+    Optional. A list of binary application data sub-blocks.
+
+------------------------------------------------------------------------------
+  type {Extension 12}
+    Optional. Any number (except 1, 249, 254, and 255).
+    This is an unknown extension block.
+
+    You can specify those other numbers if you like, but they represent the
+    Plain Text, Graphic Control, Comment, and Application extension blocks,
+    which are treated specially.
+
+    The number used identifies the type of block:
+        0..127  Graphic Rendering blocks (like the Plain Text and Image)
+      128..249  Control blocks (like the Graphic Control)
+      250..255  Special Purpose (like the Comment)
+
+    See the GIF specification for more information.
+
+  datablocks
+    Required. A list of binary data sub-blocks.
+
+//////////////////////////////////////////////////////////////////////////////
+  function reference
+//////////////////////////////////////////////////////////////////////////////
+
+------------------------------------------------------------------------------
+gif.blocknames varName
+------------------------------------------------------------------------------
+  Return an ordered list of block types belonging to a named list of blocks.
+  Most GIF files will look something like this:
+    GIF Header
+    Color Table
+    Logical Screen Descriptor
+    Graphic Control
+    Image Descriptor
+
+  See the top of this file for an example of use.
+
+------------------------------------------------------------------------------
+gif.get varName ?type? index ?element ...?
+------------------------------------------------------------------------------
+  Find an indexed block and return one or more elements.
+
+  arguments
+    varName      The name of the variable holding the list of blocks.
+    type         The type of block to index.
+                 If omitted, all block types are indexed.
+    index        Find the (n-1)th block (of the specified type).
+    element ...  One or more element names to find.
+
+  returns
+    The value of the specified element. Or
+    A list of the values of the specified elements, in same order. Or
+    The entire block, if no elements are specified.
+
+  examples
+    What is the width and height of the 4th image block?
+      gif.get blocks {Image Descriptor} 3 width height
+    --> a list, e.g.:
+      320 240
+
+    What is the type of the 3rd block (in a GIF with a Global Color Table)?
+      gif.get blocks 2 type
+    --> Logical Screen Descriptor
+
+    Get the LSD screen dimentions (GIF image size):
+      gif.get blocks {Logical Screen Descriptor} 0 width height
+    --> a list, e.g.:
+      800 600
+
+    Get the entire 4th block, regardless of type:
+      gif.get blocks 3
+    Use it as an array:
+      array set block [gif.get blocks 3]
+
+------------------------------------------------------------------------------
+gif.index varName ?type? index
+------------------------------------------------------------------------------
+  Return the absolute index of a GIF block. For example, given the blocks:
+    0: GIF Header
+    1: Color Table
+    2: Logical Screen Descriptor
+    3: Graphic Control
+    4: Image Descriptor
+    5: Graphic Control
+    6: Image Descriptor
+  then:       gif.index blocks {Logical Screen Descriptor} 0
+  returns:    2
+  and:        gif.index blocks {Image Descriptor} 1
+  returns:    6
+
+  See also gif.get
+
+------------------------------------------------------------------------------
+gif.save varName filename
+------------------------------------------------------------------------------
+  Compile the blocks listed with the named variable and write them to a GIF
+  file named as given by filename. Always overwrites.
+
+  Be aware that
+    gif.load blocks one.gif
+    gif.save blocks two.gif
+
+  may produce a GIF file (two.gif) that is binary distinct from the original
+  GIF file (one.gif). This is because image data (and some other sub-blocks)
+  are unpacked by gif.load and re-packed by gif.save. Gif.make always packs
+  sub-blocks optimally, whereas some encoders may not. The resultant GIF file
+  (two.gif) is valid and produces identically to the source GIF file
+  (one.gif).
+
+  All this means is that if you unpack and repack a GIF file using this
+  library you might end-up with a smaller GIF than you began with.
+
+------------------------------------------------------------------------------
+gif.load varName filename
+------------------------------------------------------------------------------
+  Read the named GIF file and set the named variable to the list of blocks.
+
+  See the top of this file for an example of use.
+
+------------------------------------------------------------------------------
+gif.set varName ?type? index element ?value? ...
+------------------------------------------------------------------------------
+  Index an element of a block the same way as gif.get and set one or more
+  element values. If no value is specified, the named element is removed.
+
