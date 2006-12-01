@@ -75,6 +75,9 @@
 *        pixel corners.
 *     9-MAY-2006 (DSB):
 *        Correct number of axes in input NDF.
+*     1-DEC-2006 (DSB):
+*        Correct the rouding of floating point pixel bounds to integer
+*        pixel bounds (used to use floor/ceil, now uses nint).
 *     {enter_further_changes_here}
 
 *-
@@ -237,8 +240,8 @@
      :                       ALBND, AUBND, XL, XU, STATUS )
             RLBND = REAL( ALBND )
             RUBND = REAL( AUBND )
-            IU = KPG1_FLOOR( RUBND )
-            IL = KPG1_CEIL( RLBND )
+            IU = NINT( RUBND )
+            IL = NINT( RLBND )
             IF( IU .GT. UBND( J ) ) UBND( J ) = IU
             IF( IL .LT. LBND( J ) ) LBND( J ) = IL
          END DO
