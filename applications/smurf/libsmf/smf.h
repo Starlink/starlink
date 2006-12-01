@@ -129,6 +129,8 @@
 *        Add smf_instap_get.
 *     2006-11-20 (DSB):
 *        Add smf_cubegrid and change smf_cubebounds.
+*     2006-11-30 (DSB):
+*        Add smf_sparsebounds.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -474,5 +476,14 @@ void smf_geod( double pos[3], double *phi, double *h, double *lambda );
 void smf_instap_get( smfHead * hdr, int * status );
 
 void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status );
+
+void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
+                       int usedetpos, Grp *detgrp, int lbnd[ 3 ], int ubnd[ 3 ],
+                       AstFrameSet **wcsout, int *status );
+
+void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap, 
+                      AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 
+                      int ubnd_out[ 3 ], float *data_array, 
+                      float *var_array, int *ispec, int *status );
 
 #endif /* SMF_DEFINED */

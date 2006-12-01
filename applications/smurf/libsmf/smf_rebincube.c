@@ -193,7 +193,6 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    int lbnd_in[ 2 ];           /* Lower input bounds on receptor axis */
    int ubnd_in[ 2 ];           /* Upper input bounds on receptor axis */
    int nchan;                  /* Number of spectral channels */
-   int ndet;                   /* Number of detectors in "detgrp" group */
    int pixax[ 3 ];             /* Pixel axis indices */
    int specax;                 /* The index of the input spectral axis */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
@@ -346,16 +345,6 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    time slice of a single spectral channel. */
    if( use_ast ) detwork = astMalloc( (data->dims)[ 1 ] * sizeof( float ) );
 
-/* Store the input GRID coords of the detectors to be used. If a non-empty
-   group of detectors was supplied, set the GRID coords to AST__BAD for all 
-   detectors not included in this group. First see if a non-empty group
-   of detectors was supplied. */
-   if( detgrp ) {
-      grpGrpsz( detgrp, &ndet, status );
-   } else {
-      ndet = 0;
-   }
-
 /* Initialise a string to point to the name of the first detector for which 
    data is available */
    name = hdr->detname;
@@ -369,7 +358,7 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
 
 /* If a group of detectors to be used was supplied, search the group for
    the name of the current detector. If not found, set the GRID coords bad. */
-      if( ndet ) {    
+      if( detgrp ) {    
          grpIndex( name, detgrp, 1, &found, status );
          if( !found ) {
             xin[ idet ] = AST__BAD;

@@ -37,10 +37,11 @@
 *        Determines how the values returned in "par" are found. If autogrid
 *        is non-zero, then projection parameters are determined by
 *        adjusting the grid until as many data samples as possible fall
-*        close to the centre of pixels in the output cube. If autogrid is
-*        zero, CRPIX1/2 are set to zero, CRVAL1/2 are set to the first 
-*        pointing BASE position, CROTA2 is set to zero, CDELT1/2 are set to 
-*        6 arc-seconds.
+*        close to the centre of pixels in the output cube. If this automatic 
+*        determination fails, then the par[0] is returned holding AST__BAD.
+*        If autogrid is zero, CRPIX1/2 are set to zero, CRVAL1/2 are set to 
+*        the first pointing BASE position, CROTA2 is set to zero, CDELT1/2 
+*        are set to 6 arc-seconds.
 *     par = double[ 7 ] (Returned)
 *        An array holding the parameters describing the spatial projection
 *        between celestial (longitude,latitude) in the system specified
@@ -48,9 +49,8 @@
 *        stored in the order CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, 
 *        CROTA2. The CRPIX1 and CRPIX2 values are in units of pixels, and 
 *        all other values are in units of radians. The values refer to the 
-*        celestial coodinate represented by the returned SkyFrame.
-*     
-*        Returned holding the values determined by "autogrid". 
+*        celestial coodinate represented by the returned SkyFrame. Returned 
+*        holding the values indicated by the "autogrid" argument. 
 *     moving = int * (Returned)
 *        Address of an int in which to return a flag indicating if the 
 *        telescope is tracking a moving object. If so, each time slice is 
@@ -88,6 +88,9 @@
 *        tangent point.
 *     22-NOV-2006 (DSB):
 *        Correct the amount of memory allocated for "allpos".
+*     30-NOV-2006 (DSB):
+*        Returned AST__BAD values if the grid parameters cannot be
+*        determined.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -531,6 +534,11 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    if( autogrid && usesys ) {
       kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par, status );
 
+      if( par[ 0 ] == AST__BAD ) {
+         msgOutif( MSG__NORM, " ", "   Automatic grid determination failed: "
+                   "the detector samples do not form a regular grid.", status );
+      }
+
 /* Otherwise use fixed values. */
    } else {
       par[ 0 ] = 0.0;
@@ -541,16 +549,20 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    }
 
 /* Ensure the pixel sizes have the correct signs. */
-   if( usesys && !strcmp( usesys, "AZEL" ) ) {
-      par[ 4 ] = fabs( par[ 4 ] );
-   } else {
-      par[ 4 ] = -fabs( par[ 4 ] );
+   if( par[ 4 ] != AST__BAD ) {
+      if( usesys && !strcmp( usesys, "AZEL" ) ) {
+         par[ 4 ] = fabs( par[ 4 ] );
+      } else {
+         par[ 4 ] = -fabs( par[ 4 ] );
+      }
+      par[ 5 ] = fabs( par[ 5 ] );
    }
-   par[ 5 ] = fabs( par[ 5 ] );
 
 /* Set the SkyFrame SkyRef position to the tangent point. */
-   astSetD( *skyframe, "SkyRef(1)", par[ 2 ] );
-   astSetD( *skyframe, "SkyRef(2)", par[ 3 ] );
+   if( par[ 2 ] != AST__BAD || par[ 2 ] != AST__BAD ) {
+      astSetD( *skyframe, "SkyRef(1)", par[ 2 ] );
+      astSetD( *skyframe, "SkyRef(2)", par[ 3 ] );
+   }
 
 /* If creating an output catalogue, re-order the array containing the 
    positions so that all the longitude values come at the start of the 
