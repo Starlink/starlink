@@ -735,8 +735,11 @@ void smurf_makecube( int *status ) {
          if( wdata ) wgt_array = (wdata->pntr)[ 0 ];
    
       } else {
-         wgt_array = astMalloc( sizeof( double )*
-                             (size_t)ubnd_wgt[ 0 ]*ubnd_wgt[ 1 ]*ubnd_wgt[ 2 ] );
+	if (*status == SAI__OK) {
+	  wgt_array = astMalloc( sizeof( double )*
+				 (size_t)ubnd_wgt[ 0 ]*ubnd_wgt[ 1 ]*ubnd_wgt[ 2 ] );
+	  if (*status != SAI__OK) wgt_array = NULL;
+	}
       }
    }
 
