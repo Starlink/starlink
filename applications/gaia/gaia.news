@@ -1,5 +1,9 @@
   Latest changes:
 
+    The "send to SPLAT" option in the cube toolbox now sends the
+    absolute name of the spectrum to be displayed. This means SPLAT
+    may be started from another directory.
+
     The XY profile toolbox can now be activated using control-e.
     This also avoids the prompt dialog reminding you to draw a
     rectangle.
