@@ -26,9 +26,9 @@
 *  History:
 *     2006-07-21 (JB):
 *        Original
-*     2006-08-19 (AGG)
+*     2006-08-19 (AGG):
 *        Updated APIs to sc2sim_ndfwrheat, sc2sim_ndfwrdata
-*     2006-09-01 (EC)
+*     2006-09-01 (EC):
 *        Removed sc2sim_hor2eq / sc2sim_telpos / extraneous slalib #defines
 *     2006-09-06 (EC)
 *        Modified interface to ndfwrdata to take INSTRUME as parameter
@@ -93,7 +93,7 @@
 #define COUNTTOSEC 6.28                /* arcsec per pixel */
 #define RIZERO 40.0                    /* distortion pattern centre */
 #define RJZERO -10.0                   /* distortion pattern centre */
-#define PIBY2 (AST__DPI/2.0)           /* math constant */
+#define PIBY2 (AST__DPI/2.0)           /* Math constant */
 #define DIAMETER 15.0                  /* Diameter JCMT in metres */
 #define MM2SEC 5.144                   /* plate scale at Nasmyth */
 
@@ -514,6 +514,7 @@ double *fcal,     /* flatfield calibration (given) */
 double *fpar,     /* flat-field parameters (given) */
 char instrume[],  /* String representing instrument (e.g. "SCUBA-2") (given) */
 char filter[],    /* String representing filter (e.g. "850") (given) */
+char *dateobs,    /* DateObs string for FITS header */
 double *posptr,   /* Pointing offsets from map centre */
 int jigsamples,   /* Number of jiggle samples (given) */
 double jigptr[][2], /* Array of X, Y jiggle positions (given) */
@@ -633,5 +634,9 @@ void sc2sim_smupath ( int nvert, double vertex_t, int jig_ver[][2],
 void sc2sim_smupos ( double t, double vertex_t, int movecode, 
                      int nvert, double vertxy[][2], double *x, 
                      double *y, int *status );
+
+
+void sc2sim_dateobs ( double mjdaystart, int maxwrite, double sample_t, 
+		      int outscan, char *dateobs, int *status );
 
 #endif /* SC2SIM_DEFINED */
