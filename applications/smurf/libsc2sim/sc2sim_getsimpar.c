@@ -32,6 +32,7 @@
 *  Authors:
 *     J. Balfour (UBC)
 *     E. Chapin (UBC)
+*     A.G. Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -41,6 +42,8 @@
 *        Replace strcpy with strncpy
 *     2006-10-23 (EC):
 *        Don't free constant memory used by AST
+*     2006-11-01 (AGG):
+*        Put reasonable default values for ast/atm names
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -117,7 +120,7 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
       sinx->aomega = 0.179;
 
    if ( !astMapGet0C ( keymap, "ASTNAME", &temp ) )
-      strncpy ( sinx->astname, "", SC2SIM__FLEN );
+      strncpy ( sinx->astname, "ast.sdf", SC2SIM__FLEN );
    else 
       strncpy ( sinx->astname, temp, SC2SIM__FLEN );
 
@@ -128,7 +131,7 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
       sinx->atend = 5.0; 
 
    if ( !astMapGet0C ( keymap, "ATMNAME", &temp ) )
-      strncpy ( sinx->atmname, "", SC2SIM__FLEN );
+      strncpy ( sinx->atmname, "atm.sdf", SC2SIM__FLEN );
    else 
       strncpy ( sinx->atmname, temp, SC2SIM__FLEN );
 
