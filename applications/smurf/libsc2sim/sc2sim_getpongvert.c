@@ -88,6 +88,7 @@
 
 /* Starlink includes */
 #include "sae_par.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -123,7 +124,7 @@ int *status            /* pointer to global status */
 
    if ( width == 0.0 || height == 0.0 || spacing == 0.0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Invalid PONG input parameters", 
+      errRep(FUNC_NAME, "Invalid PONG input parameters: must have non-zero width/height/spacing", 
 	     status);
       return;
    }
