@@ -149,6 +149,8 @@
 *        Add liss mode
 *     2006-11-22 (JB):
 *        Add multiple map cycle capabilites to liss/pong
+*     2006-12-01 (AGG):
+*        Add DATE-OBS calculation
 *
 *     {enter_further_changes_here}
 
@@ -265,6 +267,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double corner;                  /* corner frequency in Hz */
   int count;                      /* number of samples in full pattern */
   char *curtok=NULL;              /* current subarray name being parsed */
+  char dateobs[21];               /* DATE-OBS string for observation */
   int date_da;                    /* day corresponding to MJD */
   double date_df;                 /* day fraction corresponding to MJD */
   int date_mo;                    /* month corresponding to MJD */
@@ -329,6 +332,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   float ttau[3];                  /* output of wvmOpt */
   double twater;                  /* water line temp. for WVM simulation */
   double vmax[2];                 /* telescope maximum velocities (arcsec) */
+
 
   if ( *status != SAI__OK) return;
 
@@ -705,6 +709,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         base_p[frame] = temp3;
 
         /* The scan pattern (posptr) is defined as a series of offsets in
+	   ARCSEC in
            the map coordinate frame. Depending on the frame chosen, project
            the pattern into AzEl and RADec so that it can be written to the
            JCMTState structure */
@@ -718,17 +723,17 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  
 	  /* Calculate boresight offsets in horizontal coord. */
 	  bor_x_hor =  bor_x_nas*cos(base_el[frame]) - 
-	    bor_y_nas*sin(base_el[frame]);
+	               bor_y_nas*sin(base_el[frame]);
 	  bor_y_hor = bor_x_nas*sin(base_el[frame]) + 
-	    bor_y_nas*cos(base_el[frame]);
+	              bor_y_nas*cos(base_el[frame]);
 	  
 	  /* Calculate jiggle offsets in horizontal coord. */
 	  /* jigptr is in ARCSEC: jig_x/y_hor must be in RADIANS */
 	  jig_x_hor[frame] = DAS2R*(jigptr[frame%jigsamples][0]*cos(base_el[frame]) -
-			      jigptr[frame%jigsamples][1]*sin(base_el[frame]));
+				    jigptr[frame%jigsamples][1]*sin(base_el[frame]));
 	  
 	  jig_y_hor[frame] = DAS2R*(jigptr[frame%jigsamples][0]*sin(base_el[frame]) +
-			      jigptr[frame%jigsamples][1]*cos(base_el[frame]));
+				    jigptr[frame%jigsamples][1]*cos(base_el[frame]));
 
 	  break;
 	  
@@ -828,11 +833,19 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         bor_dec[frame] = temp2;
       }
 
+      /*      printf("Boresight RA = %g, Dec = %g\n",bor_ra[frame],bor_dec[frame]);*/
+
       /* Create an sc2 frameset for this time slice and extract 
 	 bolo->sky mapping */ 
       
       state.tcs_az_ac1 = bor_az[frame];
       state.tcs_az_ac2 = bor_el[frame];
+      state.tcs_tr_dc1 = bor_ra[frame];
+      state.tcs_tr_dc2 = bor_dec[frame]; 
+      state.tcs_tr_ac1 = bor_ra[frame];
+      state.tcs_tr_ac2 = bor_dec[frame]; 
+      state.tcs_tr_bc1 = inx->ra; 
+      state.tcs_tr_bc2 = inx->dec;
       state.smu_az_jig_x = jig_x_hor[frame];
       state.smu_az_jig_y = jig_y_hor[frame];
       state.smu_az_chop_x = 0;
@@ -985,10 +998,14 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           tauCSO = pwv2tau(airmass[firstframe+nwrite-1],pwvzen);
         }
 
+	dateobs[0] = '\0'; /* Initialize the dateobs string to NULL */
+	sc2sim_dateobs( inx->mjdaystart, maxwrite, inx->sample_t, outscan, 
+			dateobs, status );
+
 	/* Write the data out to a file */
 	sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, nwrite, nflat, 
 			  flatname, head, digits, dksquid, flatcal, 
-			  flatpar, "SCUBA-2", filter, 
+			  flatpar, "SCUBA-2", filter, dateobs,
 			  &(posptr[firstframe*2]), jigsamples, jigptr, status);
 
 	msgSetc( "FILENAME", filename );

@@ -204,6 +204,7 @@ void sc2sim_simhits ( struct sc2sim_obs_struct *inx,
   int colsize;                    /* column size for flatfield */
   int count;                      /* number of samples in full pattern */
   char *curtok=NULL;              /* current subarray name being parsed */
+  char dateobs[21];               /* DATE-OBS string for FITS header */
   int date_da;                    /* day corresponding to MJD */
   double date_df;                 /* day fraction corresponding to MJD */
   int date_mo;                    /* month corresponding to MJD */
@@ -617,10 +618,14 @@ void sc2sim_simhits ( struct sc2sim_obs_struct *inx,
 	   
 	}
 	 
+	dateobs[0] = '\0'; /* Initialize the dateobs string to NULL */
+	sc2sim_dateobs( inx->mjdaystart, maxwrite, inx->sample_t, outscan, 
+			dateobs, status );
+
 	/* Free pointers */
 	sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, nwrite, nflat, 
 			  flatname, head, digits, dksquid, flatcal, 
-			  flatpar, "SCUBA-2", filter, posptr, jigsamples, 
+			  flatpar, "SCUBA-2", filter, dateobs, posptr, jigsamples, 
 			  jigptr, status);
 	 
 	msgSetc( "FILENAME", filename );
