@@ -203,6 +203,31 @@ itcl::class gaia::GaiaCubeAnimation {
 
       pack $itk_component(loopframe) -side top -fill x -ipadx 1m -ipady 2m
 
+      #  Capture to animated GIF, exclusive with looping so shares
+      #  same radiobutton state.
+      itk_component add captureframe {
+         frame $w_.capture
+      }
+      itk_component add capturelabel {
+         label $itk_component(captureframe).label \
+            -text "Capture:" \
+            -width 21 \
+            -anchor w
+      }
+      pack $itk_component(capturelabel) -side left -fill none
+
+      itk_component add captureon {
+         radiobutton $itk_component(captureframe).captureon \
+            -text "On" \
+            -variable [scope loop_] \
+            -value "capture"
+      }
+      pack $itk_component(captureon) -side left -fill none
+      add_short_help $itk_component(captureon) \
+         {Capture to an animated gif (GaiaAnimation.gif)}
+
+      pack $itk_component(captureframe) -side top -fill x -ipadx 1m -ipady 2m
+
       #  Animation stop and start.
       itk_component add animation {
          frame $w_.animation
@@ -247,12 +272,12 @@ itcl::class gaia::GaiaCubeAnimation {
    public method ref_range_moved {id coord1 coord2 action} {
 
       #  Inhibit feedback to graphics reference range, before applying the new
-      #  bounds. 
+      #  bounds.
       if { $action == "move" } {
          set oldvalue [$itk_component(bounds) cget -show_ref_range]
          $itk_component(bounds) configure -show_ref_range 0
       }
-      
+
       #  Update the bounds.
       $itk_component(bounds) configure -value1 $coord1 -value2 $coord2
       set_animate_bounds_ $coord1 $coord2
@@ -269,6 +294,7 @@ itcl::class gaia::GaiaCubeAnimation {
 
    #  Start the animation.
    protected method start_ {} {
+      set capframes_ {}
       set initial_seconds_ [clock clicks -milliseconds]
       if { $afterId_ == {} } {
          if { $itk_option(-lower_limit) > $itk_option(-upper_limit) } {
@@ -294,6 +320,11 @@ itcl::class gaia::GaiaCubeAnimation {
 
          #  Update the WCS so that the spectral axis coordinate is correct.
          $itk_option(-gaiacube) update_wcs
+
+         #  Create the animated GIF, if required.
+         if { $loop_ == "capture" && $capframes_ != {} } {
+            create_animated_gif_
+         }
       }
    }
 
@@ -313,11 +344,14 @@ itcl::class gaia::GaiaCubeAnimation {
 
    #  Increment the displayed section by one.
    protected method increment_ {} {
-      if { $plane_ >= $itk_option(-lower_limit) && 
+      if { $plane_ >= $itk_option(-lower_limit) &&
            $plane_ < $itk_option(-upper_limit) } {
          set plane_ [expr ${plane_}+$step_]
          $itk_option(-gaiacube) set_display_plane $plane_ 0
 
+         if { $loop_ == "capture" } {
+            capture_
+         }
          if { $plane_ == $itk_option(-lower_limit) } {
             #  At lower edge, running backwards, need to let it step below.
             set plane_ [expr ${plane_}+$step_]
@@ -327,8 +361,9 @@ itcl::class gaia::GaiaCubeAnimation {
          #  Off end so stop, or loop back to beginning, or go into reverse
          #  with rock 'n roll option.
          #  Check that we have a range, otherwise this will call increment_
-         #  causing an eval depth exception.
-         if { $itk_option(-lower_limit) == $itk_option(-upper_limit) } {
+         #  causing an eval depth exception. We also stop when capturing.
+         if { $itk_option(-lower_limit) == $itk_option(-upper_limit) ||
+              $loop_ == "capture" } {
             stop
          } else {
             #  Force temporary halt as visual clue that end has arrived.
@@ -358,6 +393,48 @@ itcl::class gaia::GaiaCubeAnimation {
       }
    }
 
+   #  Capture the current image to a GIF.
+   protected method capture_ {} {
+      set image [::image create photo]
+      set canvas [$itk_option(-gaiacube) cget -canvas]
+      blt::winop snap $canvas $image
+      set gif "GaiaTempAnimation[incr capcount_].gif"
+      lappend capframes_ $gif
+      $image write $gif -format gif
+      ::image delete $image
+   }
+
+   #  Create an animated GIF from the captured frames.
+   protected method create_animated_gif_ {} {
+      set nfrm [llength $capframes_]
+      if { $nfrm > 1 } {
+         busy {
+
+            ::gifblock::gif.load gif(0) [lindex $capframes_ 0]
+
+            for {set i 1} {$i < $nfrm} {incr i} {
+               ::gifblock::gif.load gif($i) [lindex $capframes_ $i]
+
+               ::gifblock::gif.createGC gif(0) \
+                  [expr int($itk_option(-delay)/10)]
+
+               set data [::gifblock::gif.get gif($i) {Color Table} 0]
+               ::gifblock::gif.add gif(0) $data
+
+               set data [::gifblock::gif.get gif($i) {Image Descriptor} 0]
+               ::gifblock::gif.add gif(0) $data
+
+               set gif($i) {}
+               ::file delete -force [lindex $capframes_ $i]
+            }
+            ::gifblock::gif.save gif(0) "GaiaAnimation.gif"
+            set gif(0) {}
+            ::file delete -force [lindex $capframes_ 0]
+         }
+      }
+      set capframes_ {}
+   }
+
    #  Toggle the display of the animation reference range.
    protected method toggle_show_ref_range_ {} {
       $itk_component(bounds) configure \
@@ -378,7 +455,7 @@ itcl::class gaia::GaiaCubeAnimation {
 
    #  The related GaiaCube instance.
    itk_option define -gaiacube gaiacube GaiaCube {}
-   
+
    #  The animation delay (ms).
    itk_option define -delay delay Delay 100
 
@@ -422,8 +499,14 @@ itcl::class gaia::GaiaCubeAnimation {
    #  The current value of step during an animation.
    protected variable step_ 1
 
+   #  Index for captured frames.
+   protected variable capframes_ {}
+
    #  Common variables: (shared by all instances)
    #  -----------------
+
+   #  Count of captured GIFs.
+   common capcount_ 0
 
 #  End of class definition.
 }
