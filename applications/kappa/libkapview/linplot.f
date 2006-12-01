@@ -294,7 +294,11 @@
 *     STYLE = LITERAL (Read)
 *        A group of attribute settings describing the plotting style to 
 *        use when drawing the annotated axes, data values, and error
-*        markers.
+*        markers. The default for this parameter is its current value, and 
+*        so any value supplied for this parameter persists for all future
+*        invocations of this application until a new value is supplied.
+*        If you want to make temporary changes to the plotting style that
+*        do not persist then use the TEMPSTYLE parameter.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text 
@@ -326,6 +330,17 @@
 *        appearance of the error symbols is controlled using
 *        Colour(ErrBars), Width(ErrBars), etc. (see parameter SHAPE). 
 *        [current value]
+*     TEMPSTYLE = LITERAL (Read)
+*        A group of extra attribute settings which modify the plotting 
+*        style specified by the STYLE parameter. The default for this 
+*        parameter is a null (!) value, which causes the plotting style
+*        specified by STYLE to be used without any changes. Style changes
+*        specified using TEMPSTYLE do not persist between invocations of 
+*        this application. If you want to make permanent changes to the 
+*        default plotting style then use the STYLE parameter.
+*
+*        See the description of the STYLE parameter for more information
+*        about values that can be assigned to this parameter. [!]
 *     USEAXIS = LITERAL (Read)
 *        Specifies the quantity to be used to annotate the horizontal
 *        axis of the plot.  The index or label of an axis within the
@@ -480,7 +495,14 @@
 *        error bars to be drawn in pink, the points to be drawn in red, 
 *        tick marks to be restricted to the labelled edges of the plot,
 *        and the vertical axis (axis 2) to be annotated on the 
-*        right-hand edge of the plot.
+*        right-hand edge of the plot. The plotting style specified in
+*        file my_sty becomes the default plotting style for future 
+*        invocations of LINPLOT.
+*     linplot xspec mode=p errbar xsigma=3 ysigma=3 shape=d 
+*             tempstyle=^my_sty 
+*        This is the same as the previous example, except that the style
+*        specified in file my_sty does not become the default style for future
+*        invocations of LINPLOT.
 *     linplot ndf=spectrum noclear align
 *        Plots data values versus pixel co-ordinate for the whole of
 *        the one-dimensional NDF called spectrum on the current graphics
@@ -1619,6 +1641,7 @@
 
 *  Set the attributes of the Plot to give the required Plotting style.
       CALL KPG1_ASSET( 'KAPPA_LINPLOT', 'STYLE', IPLOT, STATUS )
+      CALL KPG1_ASSET( 'KAPPA_LINPLOT', 'TEMPSTYLE', IPLOT, STATUS )
 
 *  Generate a reference for the NDF to be stored in the graphics
 *  database.
