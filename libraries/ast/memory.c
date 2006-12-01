@@ -961,8 +961,8 @@ void *astMalloc_( size_t size ) {
    if it is. */
    if ( size < (size_t) 0 ) {
       astError( AST__MEMIN,
-                "Invalid attempt to allocate %ld bytes of memory.",
-                (long) size );
+                "Invalid attempt to allocate %lu bytes of memory.",
+                (unsigned long) size );
 
 /* Otherwise, if the size is greater than zero, either get a previously
    allocated memory block from the cache, or attempt to use malloc
@@ -983,8 +983,8 @@ void *astMalloc_( size_t size ) {
 /* Report an error if malloc failed. */
          if ( !mem ) {
             astError( AST__NOMEM, "malloc: %s", strerror( errno ) );
-            astError( AST__NOMEM, "Failed to allocate %ld bytes of memory.",
-                      (long) size );
+            astError( AST__NOMEM, "Failed to allocate %lu bytes of memory.",
+                      (unsigned long) size );
 
 /* If successful, set the "magic number" in the header and also store
    the size. */
@@ -1090,8 +1090,8 @@ int astMemCaching_( int newval ){
 
             id_list = MALLOC( sizeof(int)*id_list_size );
             if( !id_list ) {
-               astError( AST__INTER, "astMemCaching: Cannot allocate %d "
-                         "bytes of memory", sizeof(int)*id_list_size );
+               astError( AST__INTER, "astMemCaching: Cannot allocate %lu "
+                         "bytes of memory", (unsigned long)(sizeof(int)*id_list_size) );
             }            
 
             id_list_size = 0;
