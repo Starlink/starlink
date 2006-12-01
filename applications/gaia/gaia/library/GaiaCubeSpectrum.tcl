@@ -556,9 +556,12 @@ itcl::class gaia::GaiaCubeSpectrum {
       $spec_writer_ write_as_ndf $filename
 
       # If in CYGWIN environment convert filename to windows format.
-      # SPLAT is a windows application.
+      # SPLAT is a windows application. Otherwise get absolute name
+      # for SPLAT to locate.
       if { [string match {CYGWIN*} $::tcl_platform(os)] } { 
          set filename [exec cygpath -wa $filename]
+      } else {
+         set filename "[pwd]/$filename"
       }
 
       if { $compare } {
