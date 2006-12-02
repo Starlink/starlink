@@ -94,6 +94,8 @@
 *        Add WAVELEN FITS keyword
 *     2006-10-26 (JB):
 *        Convert to using AstFitsChans
+*     2006-12-01 (AGG):
+*        Now takes dateobs string, writes TIMESYS FITS header
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -133,6 +135,7 @@
 
 /* SMURF includes */
 #include "smurf_par.h"
+#include "libsmf/smf.h"
 #include "sc2da/sc2store.h"
 #include "sc2da/sc2store_par.h"
 
@@ -189,6 +192,9 @@ int *status       /* global status (given and returned) */
    /* Kludged to write generic date */ 
    /* Now write a real date */
    astSetFitsS ( fitschan, "DATE-OBS", dateobs, "observation date", 0 );
+   /* We need to write this - the simulator effectively assumes all
+      times are TAI */
+   astSetFitsS ( fitschan, "TIMESYS", "TAI", "Time scale for DATE-OBS", 0 );
 
    rad = inx->ra * AST__DR2D;
    astSetFitsF ( fitschan, "RA", rad, "Right Ascension of observation", 0 );
