@@ -18,7 +18,7 @@
 
 *  Arguments:
 *     mjdaystart = double (Given)
-*        MJD corresponding to first sample in file
+*        MJD corresponding to first sample in file (TAI)
 *     maxwrite = int (Given)
 *        Maximum number of samples to write per output file
 *     sample_t = double (Given)
@@ -31,12 +31,14 @@
 *        Pointer to global status.
 
 *  Description:
-*      This routine calculates the DATE-OBS string for the FITS header
+*      This routine constructs the DATE-OBS string for the FITS header
 *      in the output files. The necessary inputs are the MJD at the
 *      start of the file, the integration time per sample and the
-*      sequence number of the current file.
+*      sequence number of the current file. Note that the MJD is on
+*      the TAI time scale.
 
 *  Notes:
+*      - MJD is a TAI time, not UT
 *      - It's likely that this routine has re-invented the wheel so it may
 *        not be here forever.
 
@@ -47,6 +49,8 @@
 *  History:
 *     2006-12-01 (AGG): 
 *        Original version 
+*     2006-12-01 (AGG):
+*        String written with a single sprintf
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -107,8 +111,7 @@ void sc2sim_dateobs ( double mjdaystart, int maxwrite, double sample_t,
   double df;                  /* Day fraction for output file start time */
   int ihmsf[4];               /* Array containing H, M, S and .SS */
   char sign[2];               /* Sign of day fraction */
-  char str1[5];               /* Temp string */
-  int date_status;                /* status of mjd->calendar date conversion*/
+  int date_status;            /* status of mjd->calendar date conversion*/
 
   if ( *status != SAI__OK) return;
 
@@ -122,57 +125,12 @@ void sc2sim_dateobs ( double mjdaystart, int maxwrite, double sample_t,
   slaDjcl( filestarttime, &yy, &mm, &dd, &df, &date_status );
 
   /* Convert day fraction to hh:mm:ss */
-  slaDd2tf( 0, df, sign, ihmsf );
+  slaDd2tf( 3, df, sign, ihmsf );
 
-  /* Convert numbers to strings */
+  /* Store this in dateobs as YYYY-MM-DDThh:mm:ss.sss */
+  sprintf( dateobs, "%d-%02d-%02dT%02d:%02d:%02d.%03d", 
+	   yy, mm, dd, ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
 
-  /* Four digit year */
-  sprintf ( str1 ,"%d-", yy );
-  strncat ( dateobs, str1, 5 ); 
 
-  /* 1 or 2 digit month */
-  sprintf ( str1 ,"%d-", mm );
-  if ( mm < 10 ) {
-    strncat( dateobs, "0", 1);
-    strncat ( dateobs, str1, 2 ); 
-  } else {
-    strncat ( dateobs, str1, 3 );
-  }
-
-  /* 1 or 2 digit day */
-  sprintf ( str1 ,"%dT", dd );
-  if ( dd < 10 ) {
-    strncat( dateobs, "0", 1);
-    strncat ( dateobs, str1, 2 ); 
-  } else {
-    strncat ( dateobs, str1, 3 );
-  }
-
-  /* 1 or 2 digit hours */
-  sprintf ( str1 ,"%d:", ihmsf[0] );
-  if ( ihmsf[0] < 10 ) {
-    strncat( dateobs, "0", 1);
-    strncat ( dateobs, str1, 2 ); 
-  } else {
-    strncat ( dateobs, str1, 3 );
-  }
-
-  /* 1 or 2 digit minutes */
-  sprintf ( str1 ,"%d:", ihmsf[1] );
-  if ( ihmsf[1] < 10 ) {
-    strncat( dateobs, "0", 1);
-    strncat ( dateobs, str1, 2 ); 
-  } else {
-    strncat ( dateobs, str1, 3 );
-  }
-
-  /* 1 or 2 digit seconds */
-  sprintf ( str1 ,"%d", ihmsf[2] );
-  if ( ihmsf[2] < 10 ) {
-    strncat( dateobs, "0", 1);
-    strncat ( dateobs, str1, 1 ); 
-  } else {
-    strncat ( dateobs, str1, 2 );
-  }
 
 }
