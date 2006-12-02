@@ -47,7 +47,9 @@
 *        Added sc2sim_getliss
 *     2006-11-22 (JB):
 *        Added nmaps to getcurvepong, getstraightpong, and getliss.
-
+*     2006-12-01 (AGG):
+*        - add new routine sc2sim_dateobs
+*        - update API for sc2sim_ndfwrdata to accept dateobs string
 *     {enter_further_changes_here}
 
 *  Copyright:
