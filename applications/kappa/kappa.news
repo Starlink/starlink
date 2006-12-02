@@ -14,7 +14,15 @@
 
    o  FITSLIST no longer wraps its output at 79 characters.
 
-   o  MLINPLOT now understands SpecFrames and Fluxframes.
+   o  LINPLOT  has a new parameter TEMPSTYLE.  Like STYLE it
+   controls the plotting style, however, its assignments only apply
+   to the current invocation.
+
+   o  LISTSHOW haa new parameter LABTYPE to control the sort of
+   labels created---numerical or textual---when parameter LABEL
+   is TRUE.
+
+   o  MLINPLOT now understands SpecFrames and FluxFrames.
 
    o  ROTATE can now reorient three-dimensional NDFs, in the sense that 
    it will rotate all the two-dimensional planes within a 
