@@ -433,11 +433,14 @@ void smurf_makecube( int *status ) {
       kpg1Gtgrp( "DETECTORS", &detgrp, &ndet, status );
       if( *status == PAR__NULL ) {
          errAnnul( status );
+	 if (detgrp) {
+	   grpDelet( &detgrp, status );
+	 }
       } else {
          grpSetcs( detgrp, 0, status );
       }
    }
-  
+
 /* Indicate we have no projection parameters as yet. */
    par[ 0 ] = AST__BAD;
    par[ 1 ] = AST__BAD;
