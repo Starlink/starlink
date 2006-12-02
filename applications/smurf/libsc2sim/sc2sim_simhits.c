@@ -204,7 +204,7 @@ void sc2sim_simhits ( struct sc2sim_obs_struct *inx,
   int colsize;                    /* column size for flatfield */
   int count;                      /* number of samples in full pattern */
   char *curtok=NULL;              /* current subarray name being parsed */
-  char dateobs[21];               /* DATE-OBS string for FITS header */
+  char dateobs[SZFITSCARD];       /* DATE-OBS string for FITS header */
   int date_da;                    /* day corresponding to MJD */
   double date_df;                 /* day fraction corresponding to MJD */
   int date_mo;                    /* month corresponding to MJD */

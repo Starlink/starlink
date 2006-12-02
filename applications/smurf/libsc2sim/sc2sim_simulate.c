@@ -267,7 +267,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double corner;                  /* corner frequency in Hz */
   int count;                      /* number of samples in full pattern */
   char *curtok=NULL;              /* current subarray name being parsed */
-  char dateobs[21];               /* DATE-OBS string for observation */
+  char dateobs[SZFITSCARD];       /* DATE-OBS string for observation */
   int date_da;                    /* day corresponding to MJD */
   double date_df;                 /* day fraction corresponding to MJD */
   int date_mo;                    /* month corresponding to MJD */
