@@ -51,6 +51,8 @@
 *        Update GRP interface
 *     7-MAR-2006 (DSB):
 *        Added KPG1_RGNDF and KPG1_WGNDF.
+*     29-NOV-2006 (DSB):
+*        Added kpg1Gtaxv.
 *     {enter_further_changes_here}
 
 *-
@@ -405,5 +407,45 @@ void kpg1Wgndf( const char *param, Grp *grp0, int maxsiz, int minsiz,
 
 }
 
+
+void kpg1Gtaxv( const char *param, int mxval, int exact, AstFrame *frame,
+                int iaxis, double *axval, int *nval, int *status ){
+   DECLARE_CHARACTER_DYN(PARAM);
+   DECLARE_INTEGER(MXVAL);
+   DECLARE_LOGICAL(EXACT);
+   DECLARE_INTEGER(FRAME);
+   DECLARE_INTEGER(IAXIS);
+   DECLARE_DOUBLE_ARRAY_DYN(AXVAL);
+   DECLARE_INTEGER(NVAL);
+   DECLARE_INTEGER(STATUS);
+
+   F77_CREATE_CHARACTER( PARAM, strlen( param ) );
+   F77_EXPORT_CHARACTER( param, PARAM, PARAM_length );
+   F77_EXPORT_INTEGER( mxval, MXVAL );
+   F77_EXPORT_LOGICAL( exact, EXACT );
+   F77_EXPORT_INTEGER( astP2I( frame ), FRAME );
+   F77_EXPORT_INTEGER( iaxis, IAXIS );
+   F77_CREATE_DOUBLE_ARRAY( AXVAL, mxval );
+   F77_ASSOC_DOUBLE_ARRAY( AXVAL, axval );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_gtaxv)( CHARACTER_ARG(PARAM),
+                         INTEGER_ARG(&MXVAL),
+                         LOGICAL_ARG(&EXACT),
+                         INTEGER_ARG(&FRAME),
+                         INTEGER_ARG(&IAXIS),
+                         DOUBLE_ARRAY_ARG(AXVAL),
+                         INTEGER_ARG(&NVAL),
+                         INTEGER_ARG(&STATUS)
+                         TRAIL_ARG(PARAM) );
+
+   F77_FREE_CHARACTER( PARAM );
+
+   F77_IMPORT_INTEGER( NVAL, *nval );
+   F77_IMPORT_DOUBLE_ARRAY( AXVAL, axval, *nval );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
 
 
