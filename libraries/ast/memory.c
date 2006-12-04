@@ -87,6 +87,9 @@
 *     26-MAY-2006 (DSB):
 *        Cast (void *) pointers to (char *) before doing arithmetic on
 *        them (changes supplied by Micah Johnson).
+*     4-DEC-2006 (DSB):
+*        Fix bug in astMalloc that caused a non-null pointer to be
+*        returned on error.
 */
 
 /* Include files. */
@@ -1000,14 +1003,18 @@ void *astMalloc_( size_t size ) {
          }
       }
 
+/* Do nothing more if no memory is being returned. */
+      if( mem ) {
+
 #ifdef MEM_DEBUG
       Issue( mem );
 #endif
 
 /* Increment the memory pointer to the start of the region of
    allocated memory to be used by the caller.*/
-      result = mem;
-      result = (char *) result + SIZEOF_MEMORY;
+         result = mem;
+         result = (char *) result + SIZEOF_MEMORY;
+      }
    }
 
 /* Return the result. */
