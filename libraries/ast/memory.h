@@ -159,9 +159,10 @@ void astEndPM_( void );
 /* ==================== */
 /* These wrap up the functions defined by this module. */
 
-#if defined(astCLASS) || 1       /* Nominally protected, but available for */
-                                 /* use in developing (e.g.) foreign */
-                                 /* language or graphics interfaces. */
+/* Private interface */
+
+#if defined(astCLASS) 
+
 #define astChrMatch(str1,str2) astChrMatch_(str1,str2)
 #define astChrMatchN(str1,str2,n) astChrMatchN_(str1,str2,n)
 #define astFree(ptr) astFree_(ptr)
@@ -182,6 +183,31 @@ void astEndPM_( void );
 #define astSscanf sscanf
 #endif
 #define astChrSplit(str,n) astChrSplit_(str,n)
+
+/* Public interface */
+#else
+
+#define astChrMatch(str1,str2) astINVOKE(V,astChrMatch_(str1,str2))
+#define astChrMatchN(str1,str2,n) astINVOKE(V,astChrMatchN_(str1,str2,n))
+#define astFree(ptr) astINVOKE(V,astFree_(ptr))
+#define astGrow(ptr,n,size) astINVOKE(V,astGrow_(ptr,n,size))
+#define astMalloc(size) astINVOKE(V,astMalloc_(size))
+#define astMemCaching(flag) astINVOKE(V,astMemCaching_(flag))
+#define astRealloc(ptr,size) astINVOKE(V,astRealloc_(ptr,size))
+#define astSizeOf(ptr) astINVOKE(V,astSizeOf_(ptr))
+#define astTSizeOf(ptr) astINVOKE(V,astTSizeOf_(ptr))
+#define astStore(ptr,data,size) astINVOKE(V,astStore_(ptr,data,size))
+#define astAppendString(ptr,len,text) astINVOKE(V,astAppendString_(ptr,len,text))
+#define astString(chars,nchars) astINVOKE(V,astString_(chars,nchars))
+#define astStringArray(chars,nel,len) astINVOKE(V,astStringArray_(chars,nel,len))
+#define astChrLen(string) astINVOKE(V,astChrLen_(string))
+#ifdef HAVE_NONANSI_SSCANF
+#define astSscanf astINVOKE(V,astSscanf_)
+#else
+#define astSscanf astINVOKE(V,sscanf)
+#endif
+#define astChrSplit(str,n) astINVOKE(V,astChrSplit_(str,n))
+
 #endif
 
 /* Functions used for debugging memory leaks, etc */
