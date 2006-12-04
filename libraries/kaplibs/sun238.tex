@@ -12099,8 +12099,8 @@ from one graphical element to another.
       {\tt "}defaults{\tt "} text file. This file is found using the following search
       path:
 
-      1) If the environment variable $<$APP$>$\_$<$PAR$>$ is defined ($<$APP$>$ and
-      $<$PAR$>$ in upper case), its value is taken to be the full path to
+      1) If the environment variable $<$APP$>$\_$<$PARAM$>$ is defined ($<$APP$>$ and
+      $<$PARAM$>$ in upper case), its value is taken to be the full path to
       the defaults file.
 
       2) If $<$APP$>$\_$<$PARAM$>$ is not defined, the file \$HOME/$<$app$>$\_$<$param$>$.def
@@ -12132,7 +12132,7 @@ from one graphical element to another.
       corresponding PGPLOT colour indices.
    }
    \sstinvocation{
-      CALL KPG1\_ASSET( APP, PAR, IOBJ, STATUS )
+      CALL KPG1\_ASSET( APP, PARAM, IOBJ, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -12142,13 +12142,9 @@ from one graphical element to another.
          $<$package$>$\_$<$application$>$ (eg {\tt "}KAPPA\_DISPLAY{\tt "}), for use in messages.
       }
       \sstsubsection{
-         PAR = CHARACTER $*$ ( $*$ ) (Given)
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The name of the parameter to use for getting the group expression.
-         The string {\tt "}(NOSTORE){\tt "} may be appended to the end of the
-         parameter name, in which case the CURRENT value of the parameter
-         on entry to this routine will be re-instated as the current value
-         upon exit.
       }
       \sstsubsection{
          IOBJ = INTEGER (Given and Returned)
@@ -16620,21 +16616,20 @@ from one graphical element to another.
       should ne be given an access mode of READ in the interface file.
 
       If a null value is supplied the first time the parameter value is
-      obtained, then the PAR\_\_NULL status is returned. If a null value is
-      supplied on a subsequent access to the parameter, then the PAR\_\_NULL
-      status is annulled.
+      obtained, then the PAR\_\_NULL status is returned, and SIZE is returned
+      as zero (a valid GRP identifier is still returned however). If a null
+      value is supplied on a subsequent access to the parameter, then the
+      PAR\_\_NULL status is annulled, and the group is returned containing
+      any values obtained earlier.
    }
    \sstinvocation{
-      CALL KPG1\_GTGRP( PAR, IGRP, SIZE, STATUS )
+      CALL KPG1\_GTGRP( PARAM, IGRP, SIZE, STATUS )
    }
    \sstarguments{
       \sstsubsection{
-         PAR = CHARACTER $*$ ( $*$ ) (Given)
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The name of the parameter to use. The string {\tt "}(NOSTORE){\tt "} may be
-         appended to the end of the parameter name, in which case the
-         CURRENT value of the parameter on entry to this routine will be
-         re-instated as the current value upon exit.
+         The name of the parameter to use.
       }
       \sstsubsection{
          IGRP = INTEGER (Given and Returned)
@@ -18831,16 +18826,20 @@ from one graphical element to another.
          (longitude,latitude).
       }
       \sstsubsection{
-         PAR( 7 ) = DOUBLE PRECISION (Returned)
+         PAR( 7 ) = DOUBLE PRECISION (Given and Returned)
       }{
-         The optimal projection parameters, in the order CRPIX1, CRPIX2,
-         CRVAL1, CRVAL2, CDELT1, CDELT2, CROTA2. CRPIX1 and CRPIX2 are
-         in units of pixels. All the other projection parameters will be
-         in units of radians, and refer to the celestial coodinate
-         system in which the POS values are supplied. CROTA2 is the angle
-         from celestial north to the Y axis, measured through west if
-         WEST is .FALSE., and through east otherwise. Returned pixel
-         sizes are rounded to the nearest tenth of an arc-second.
+         The projection parameters. Each parameter that is supplied with
+         a value of AST\_\_BAD on entry will be replaced on exit with the
+         optimal value. Non-bad supplied values will be left unchanged on
+         exit. The supplied values will also be left unchanged if no
+         periodicity is visible in the supplied positions. They are stored
+         in the order CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, CROTA2.
+         CRPIX1 and CRPIX2 are in units of pixels. All the other projection
+         parameters will be in units of radians, and refer to the celestial
+         coodinate system in which the POS values are supplied. CROTA2 is
+         the angle from celestial north to the Y axis, measured through west
+         if WEST is .FALSE., and through east otherwise. Returned pixel sizes
+         are rounded to the nearest tenth of an arc-second.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)

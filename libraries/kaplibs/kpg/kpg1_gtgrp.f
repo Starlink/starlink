@@ -34,9 +34,11 @@
 *     should ne be given an access mode of READ in the interface file.
 *
 *     If a null value is supplied the first time the parameter value is
-*     obtained, then the PAR__NULL status is returned. If a null value is
-*     supplied on a subsequent access to the parameter, then the PAR__NULL
-*     status is annulled.
+*     obtained, then the PAR__NULL status is returned, and SIZE is returned 
+*     as zero (a valid GRP identifier is still returned however). If a null 
+*     value is supplied on a subsequent access to the parameter, then the 
+*     PAR__NULL status is annulled, and the group is returned containing
+*     any values obtained earlier.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
