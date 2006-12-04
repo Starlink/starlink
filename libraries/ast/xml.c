@@ -60,6 +60,18 @@
 */
 
 
+/* Module Constants. */
+/* ----------------- */
+/* Set the name of the module we are implementing. This indicates to
+   the header files that define class interfaces that they should make
+   "protected" symbols available. NB, this module is not a proper AST 
+   class, but it defines this macro sanyway in order to get the protected
+   symbols defined in memory.h */
+#define astCLASS Xml
+
+#define IND_INC 3
+
+
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
@@ -78,11 +90,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-
-/* Module Constants. */
-/* ----------------- */
-#define IND_INC 3
-
 
 
 /*
