@@ -220,6 +220,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        their own implementation of astEqual, avoiding the use of
 *        astSimplify. This is so that astSimplify can use astEqual safely
 *        (i.e. without danger of entering an infinite loop).
+*     24-NOV-2006 (DSB):
+*        Allow astRebinSeq to be called with a NULL pointer for the input
+*        data array.
 *class--
 */
 
@@ -10382,6 +10385,9 @@ f        should be REAL).
 *        rapidly and that of the final dimension least rapidly
 c        (i.e. Fortran array indexing is used).
 f        (i.e. normal Fortran array storage order).
+c        If a NULL pointer is supplied for "in", then no data is added to
+c        the output arrays, but any initialisation or normalisation
+c        requested by "flags" is still performed.
 c     in_var
 f     IN_VAR( * ) = <Xtype> (Given)
 c        An optional pointer to a second array with the same size and
@@ -10933,14 +10939,16 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    having to replicate functions unnecessarily for each data \
    type. However, we also pass an argument that identifies the data \
    type we have obscured. */ \
-   RebinAdaptively( simple, ndim_in, lbnd_in, ubnd_in, \
-                    (const void *) in, (const void *) in_var, \
-                    TYPE_##X, spread, \
-                    params, flags, tol, maxpix, \
-                    (const void *) &badval, \
-                    ndim_out, lbnd_out, ubnd_out, \
-                    lbnd, ubnd, npix_out, \
-                    (void *) out, (void *) out_var, weights ); \
+   if( in ) { \
+      RebinAdaptively( simple, ndim_in, lbnd_in, ubnd_in, \
+                       (const void *) in, (const void *) in_var, \
+                       TYPE_##X, spread, \
+                       params, flags, tol, maxpix, \
+                       (const void *) &badval, \
+                       ndim_out, lbnd_out, ubnd_out, \
+                       lbnd, ubnd, npix_out, \
+                       (void *) out, (void *) out_var, weights ); \
+   } \
 \
 /* If required, finalise the sequence. */ \
    if( flags & AST__REBINEND ) { \
