@@ -23,6 +23,7 @@
 # pbiereic        16/08/01   Added method 'reopen' to update FITS HDU's
 #                            Adapted for new widget RtdImageFitsHeader for viewing
 #                            FITS HDU headers.
+# P.W.Draper      05/12/06   Allow autoscale of image whose dimensions are 1.
 
 itk::usual RtdImageCtrl {}
 
@@ -801,9 +802,6 @@ itcl::class rtd::RtdImageCtrl {
     protected method fill_to_fit {cw ch} {
 	set w [$image_ width]
 	set h [$image_ height]
-	if {$w <= 2 || $h <=2} {
-	    return
-	}
 	set factor [expr {min($cw/$w, $ch/$h)}]
 	if {$factor == 0} {
 	    set factor [expr {-max(($w-1)/$cw+1, ($h-1)/$ch+1)}]
