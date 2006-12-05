@@ -853,10 +853,18 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 #endif
 
         astTran2( spPtr->framesets[1], 2, xin, yin, 0, xout, yout );
-        basebox[0] = xout[0];
-        basebox[1] = yout[0];
-        basebox[2] = xout[1];
-        basebox[3] = yout[1];
+        if ( ! astOK ) {
+           basebox[0] = AST__BAD;
+           basebox[1] = AST__BAD;
+           basebox[2] = AST__BAD;
+           basebox[3] = AST__BAD;
+        } 
+        else {
+           basebox[0] = xout[0];
+           basebox[1] = yout[0];
+           basebox[2] = xout[1];
+           basebox[3] = yout[1];
+        }
 
         /* If the transformation fails, take a stab at some useful values. */
         if ( basebox[0] == AST__BAD ) basebox[0] = spPtr->xright;
@@ -888,6 +896,9 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
             astTk_SetCanvas( Tk_PathName( Tk_CanvasTkwin( canvas ) ) );
             astTk_Tag( spPtr->tagPtr );      /* Includes unique tag */
             ClearSubItems( canvas, spPtr );  /* Remove last grid */
+
+            /* Axes should always be shown on the exterior */
+            astSet( spPtr->plot, "Labelling=exterior,ForceExterior=1" );
 
             /* If the spectral axis is a DSBSpecFrame then we need to arrange
              * to show the lower and upper sidebands, this involves drawing
