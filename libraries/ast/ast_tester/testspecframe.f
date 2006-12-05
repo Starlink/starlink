@@ -76,7 +76,28 @@
          call stopit( status, 'Error 9' )
       end if
 
+      sf = ast_specframe( 'system=freq,unit=Hz', status )
+      call ast_setc( sf, 'SourceVRF', 'LSRK', status )
+      call ast_setd( sf, 'SourceVel', 1000.0D0, status )
 
+      call ast_setc( sf, 'SourceVRF', 'BARY', status )
+      call ast_setc( sf, 'SourceSys', 'ZOPT', status )
+
+      if( abs( ast_getd(  sf, 'SourceVel', status ) - 
+     :         0.00334028336870307D0 ) .gt. 1.0D-10 ) then
+         write(*,*) ast_getd(  sf, 'SourceVel', status )
+         call stopit( status, 'Error 11' )
+      end if
+
+      call checkdump( sf, 'Error 10', status )
+      call ast_setc( sf, 'SourceVRF', 'LSRK', status )
+      call ast_setc( sf, 'SourceSys', 'VREL', status )
+
+      if( abs( ast_getd(  sf, 'SourceVel', status ) - 
+     :         1000.0D0 ) .gt. 1.0D-6 ) then
+         write(*,*) ast_getd(  sf, 'SourceVel', status )
+         call stopit( status, 'Error 12' )
+      end if
 
       if( status .eq. sai__ok ) then
          write(*,*) 'All SpecFrame tests passed'

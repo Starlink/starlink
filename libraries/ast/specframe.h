@@ -111,6 +111,7 @@ typedef struct AstSpecFrame {
    double restfreq;              /* Rest frequency (Hz)*/
    double sourcevel;             /* Source velocity (heliocentric, m/s) */
    AstStdOfRestType sourcevrf;   /* Code identifying source vel. StdOfRest */
+   AstSystemType sourcesys;      /* Code identifying source vel. system */
    int nuunits;                  /* Size of usedunits array */
    char **usedunits;             /* Last used units for each system */
    double specorigin;            /* Origin for sectral values */ 
@@ -148,6 +149,11 @@ typedef struct AstSpecFrameVtab {
    int (* TestSourceVRF)( AstSpecFrame * );
    void (* ClearSourceVRF)( AstSpecFrame * );
    void (* SetSourceVRF)( AstSpecFrame *, AstStdOfRestType );
+
+   AstSystemType (* GetSourceSys)( AstSpecFrame * );
+   int (* TestSourceSys)( AstSpecFrame * );
+   void (* ClearSourceSys)( AstSpecFrame * );
+   void (* SetSourceSys)( AstSpecFrame *, AstSystemType );
 
    double (* GetRestFreq)( AstSpecFrame * );
    int (* TestRestFreq)( AstSpecFrame * );
@@ -234,6 +240,11 @@ AstStdOfRestType astGetSourceVRF_( AstSpecFrame * );
 int astTestSourceVRF_( AstSpecFrame * );
 void astClearSourceVRF_( AstSpecFrame * );
 void astSetSourceVRF_( AstSpecFrame *, AstStdOfRestType );
+
+AstSystemType astGetSourceSys_( AstSpecFrame * );
+int astTestSourceSys_( AstSpecFrame * );
+void astClearSourceSys_( AstSpecFrame * );
+void astSetSourceSys_( AstSpecFrame *, AstSystemType );
 
 double astGetRestFreq_( AstSpecFrame * );
 int astTestRestFreq_( AstSpecFrame * );
@@ -337,6 +348,11 @@ astINVOKE(O,astLoadSpecFrame_(mem,size,vtab,name,astCheckChannel(channel)))
 #define astTestSourceVRF(this) astINVOKE(V,astTestSourceVRF_(astCheckSpecFrame(this)))
 #define astClearSourceVRF(this) astINVOKE(V,astClearSourceVRF_(astCheckSpecFrame(this)))
 #define astSetSourceVRF(this,value) astINVOKE(V,astSetSourceVRF_(astCheckSpecFrame(this),value))
+
+#define astGetSourceSys(this) astINVOKE(V,astGetSourceSys_(astCheckSpecFrame(this)))
+#define astTestSourceSys(this) astINVOKE(V,astTestSourceSys_(astCheckSpecFrame(this)))
+#define astClearSourceSys(this) astINVOKE(V,astClearSourceSys_(astCheckSpecFrame(this)))
+#define astSetSourceSys(this,value) astINVOKE(V,astSetSourceSys_(astCheckSpecFrame(this),value))
 
 #define astGetRestFreq(this) astINVOKE(V,astGetRestFreq_(astCheckSpecFrame(this)))
 #define astTestRestFreq(this) astINVOKE(V,astTestRestFreq_(astCheckSpecFrame(this)))
