@@ -802,7 +802,7 @@ itcl::class rtd::RtdImageCtrl {
     protected method fill_to_fit {cw ch} {
 	set w [$image_ width]
 	set h [$image_ height]
-	set factor [expr {min($cw/$w, $ch/$h)}]
+        set factor [expr {min(150,min($cw/$w, $ch/$h))}]
 	if {$factor == 0} {
 	    set factor [expr {-max(($w-1)/$cw+1, ($h-1)/$ch+1)}]
 	    if {$factor >= -1} {
