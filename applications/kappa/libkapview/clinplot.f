@@ -406,6 +406,8 @@
 *     22-JUN-2006 (DSB):
 *        Key position changed to take account of horizontal expansion of
 *        the spatial axes.
+*     5-DEC-2006 (DSB):
+*        Allow input NDFs to have degenerate pixel axes.
 *     {enter_further_changes_here}
 
 *-
@@ -624,7 +626,7 @@
 *  Base, PIXEL and Current frames all have three dimensions.  The NDF 
 *  must have exactly three significant dimensions (i.e. axes spanning 
 *  more than one pixel).
-      CALL KPG1_ASGET( INDF, NDIM, .TRUE., .TRUE., .TRUE., SDIM, SLBND, 
+      CALL KPG1_ASGET( INDF, NDIM, .FALSE., .TRUE., .TRUE., SDIM, SLBND, 
      :                 SUBND, IWCS, STATUS )
 
 *  Get pointers for the base Frame, the currrent Frame, and the Mapping
