@@ -113,6 +113,7 @@
 /* C header files. */
 /* --------------- */
 #include <stddef.h>
+#include "error.h"    
 
 /* Macros. */
 /* ======= */
@@ -159,70 +160,41 @@ void astEndPM_( void );
 /* ==================== */
 /* These wrap up the functions defined by this module. */
 
-/* Private interface */
-
-#if defined(astCLASS) 
-
-#define astChrMatch(str1,str2) astChrMatch_(str1,str2)
-#define astChrMatchN(str1,str2,n) astChrMatchN_(str1,str2,n)
-#define astFree(ptr) astFree_(ptr)
-#define astGrow(ptr,n,size) astGrow_(ptr,n,size)
-#define astMalloc(size) astMalloc_(size)
-#define astMemCaching(flag) astMemCaching_(flag)
-#define astRealloc(ptr,size) astRealloc_(ptr,size)
-#define astSizeOf(ptr) astSizeOf_(ptr)
-#define astTSizeOf(ptr) astTSizeOf_(ptr)
-#define astStore(ptr,data,size) astStore_(ptr,data,size)
-#define astAppendString(ptr,len,text) astAppendString_(ptr,len,text)
-#define astString(chars,nchars) astString_(chars,nchars)
-#define astStringArray(chars,nel,len) astStringArray_(chars,nel,len)
-#define astChrLen(string) astChrLen_(string)
+#define astChrMatch(str1,str2) astERROR_INVOKE(astChrMatch_(str1,str2))
+#define astChrMatchN(str1,str2,n) astERROR_INVOKE(astChrMatchN_(str1,str2,n))
+#define astFree(ptr) astERROR_INVOKE(astFree_(ptr))
+#define astGrow(ptr,n,size) astERROR_INVOKE(astGrow_(ptr,n,size))
+#define astMalloc(size) astERROR_INVOKE(astMalloc_(size))
+#define astMemCaching(flag) astERROR_INVOKE(astMemCaching_(flag))
+#define astRealloc(ptr,size) astERROR_INVOKE(astRealloc_(ptr,size))
+#define astSizeOf(ptr) astERROR_INVOKE(astSizeOf_(ptr))
+#define astTSizeOf(ptr) astERROR_INVOKE(astTSizeOf_(ptr))
+#define astStore(ptr,data,size) astERROR_INVOKE(astStore_(ptr,data,size))
+#define astAppendString(ptr,len,text) astERROR_INVOKE(astAppendString_(ptr,len,text))
+#define astString(chars,nchars) astERROR_INVOKE(astString_(chars,nchars))
+#define astStringArray(chars,nel,len) astERROR_INVOKE(astStringArray_(chars,nel,len))
+#define astChrLen(string) astERROR_INVOKE(astChrLen_(string))
 #ifdef HAVE_NONANSI_SSCANF
-#define astSscanf astSscanf_
+#define astSscanf astERROR_INVOKE(astSscanf_)
 #else
-#define astSscanf sscanf
+#define astSscanf astERROR_INVOKE(sscanf)
 #endif
-#define astChrSplit(str,n) astChrSplit_(str,n)
+#define astChrSplit(str,n) astERROR_INVOKE(astChrSplit_(str,n))
 
-/* Public interface */
-#else
-
-#define astChrMatch(str1,str2) astINVOKE(V,astChrMatch_(str1,str2))
-#define astChrMatchN(str1,str2,n) astINVOKE(V,astChrMatchN_(str1,str2,n))
-#define astFree(ptr) astINVOKE(V,astFree_(ptr))
-#define astGrow(ptr,n,size) astINVOKE(V,astGrow_(ptr,n,size))
-#define astMalloc(size) astINVOKE(V,astMalloc_(size))
-#define astMemCaching(flag) astINVOKE(V,astMemCaching_(flag))
-#define astRealloc(ptr,size) astINVOKE(V,astRealloc_(ptr,size))
-#define astSizeOf(ptr) astINVOKE(V,astSizeOf_(ptr))
-#define astTSizeOf(ptr) astINVOKE(V,astTSizeOf_(ptr))
-#define astStore(ptr,data,size) astINVOKE(V,astStore_(ptr,data,size))
-#define astAppendString(ptr,len,text) astINVOKE(V,astAppendString_(ptr,len,text))
-#define astString(chars,nchars) astINVOKE(V,astString_(chars,nchars))
-#define astStringArray(chars,nel,len) astINVOKE(V,astStringArray_(chars,nel,len))
-#define astChrLen(string) astINVOKE(V,astChrLen_(string))
-#ifdef HAVE_NONANSI_SSCANF
-#define astSscanf astINVOKE(V,astSscanf_)
-#else
-#define astSscanf astINVOKE(V,sscanf)
-#endif
-#define astChrSplit(str,n) astINVOKE(V,astChrSplit_(str,n))
-
-#endif
 
 /* Functions used for debugging memory leaks, etc */
 #ifdef MEM_DEBUG
 
-#define astActiveMemory(label) astActiveMemory_(label)
-#define astMemoryTune(name,value) astMemoryTune_(name,value)
-#define astWatchMemory(id) astWatchMemory_(id)
-#define astFlushMemory(leak) astFlushMemory_(leak)
-#define astBeginPM astBeginPM_()
-#define astEndPM astEndPM_()
-#define astMemoryID(ptr) astMemoryID_(ptr)
-#define astMemoryPtr(id) astMemoryPtr_(id)
-#define astMemoryAlarm(text) astMemoryAlarm_(text)
-#define astMemoryUse(ptr,text) astMemoryUse_(ptr,text)
+#define astActiveMemory(label) astERROR_INVOKE(astActiveMemory_(label)
+#define astMemoryTune(name,value) astERROR_INVOKE(astMemoryTune_(name,value)
+#define astWatchMemory(id) astERROR_INVOKE(astWatchMemory_(id)
+#define astFlushMemory(leak) astERROR_INVOKE(astFlushMemory_(leak)
+#define astBeginPM astERROR_INVOKE(astBeginPM_())
+#define astEndPM astERROR_INVOKE(astEndPM_())
+#define astMemoryID(ptr) astERROR_INVOKE(astMemoryID_(ptr)
+#define astMemoryPtr(id) astERROR_INVOKE(astMemoryPtr_(id)
+#define astMemoryAlarm(text) astERROR_INVOKE(astMemoryAlarm_(text)
+#define astMemoryUse(ptr,text) astERROR_INVOKE(astMemoryUse_(ptr,text)
 
 #else
 
@@ -238,4 +210,5 @@ void astEndPM_( void );
 #define astMemoryUse(ptr,text) 
 
 #endif
+
 #endif

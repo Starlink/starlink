@@ -114,6 +114,16 @@
 #define AST__FAC (1521)
 #endif
 
+/* This macro expands to an invocation of a specified function, together
+   with a call to astAt to record the file and line number at which the
+   invocation occurs. These are included in public error reports. This is
+   only done for invocations from outside of AST (i.e. public invocations).*/
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define astERROR_INVOKE(function) (function)
+#else
+#define astERROR_INVOKE(function) (astAt_(NULL,__FILE__,__LINE__,0),(function))
+#endif
+
 /* Externally declared variables */
 /* ============================= */
 /* This is the variable which holds a pointer to the status value. It is

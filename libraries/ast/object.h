@@ -417,7 +417,7 @@
 #define astINVOKE(rettype,function) astRet##rettype##_(function)
 #else
 #define astINVOKE(rettype,function) \
-(astAt_(NULL,__FILE__,__LINE__,0),astRet##rettype##_(function))
+astERROR_INVOKE(astRet##rettype##_(function))
 #endif
 
 /* astRetF_ and astRetV_ currently do nothing. */
