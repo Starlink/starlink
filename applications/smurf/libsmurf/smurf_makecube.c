@@ -738,11 +738,8 @@ void smurf_makecube( int *status ) {
          if( wdata ) wgt_array = (wdata->pntr)[ 0 ];
    
       } else {
-	if (*status == SAI__OK) {
-	  wgt_array = astMalloc( sizeof( double )*
-				 (size_t)ubnd_wgt[ 0 ]*ubnd_wgt[ 1 ]*ubnd_wgt[ 2 ] );
-	  if (*status != SAI__OK) wgt_array = NULL;
-	}
+         wgt_array = astMalloc( sizeof( double )*
+	                   (size_t)ubnd_wgt[ 0 ]*ubnd_wgt[ 1 ]*ubnd_wgt[ 2 ] );
       }
    }
 
@@ -841,7 +838,7 @@ L999:;
    if( detgrp != NULL) grpDelet( &detgrp, status);
    if( igrp != NULL) grpDelet( &igrp, status);
    if( ogrp != NULL) grpDelet( &ogrp, status);
-   if( !savewgt ) wgt_array = astFree( wgt_array );
+   if( wgt_array ) wgt_array = astFree( wgt_array );
 
 /* End the NDF context. */
    ndfEnd( status );
