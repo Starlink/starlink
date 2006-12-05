@@ -63,6 +63,7 @@
 /* --------------- */
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 /* Static variables. */
 /* ----------------- */
@@ -229,7 +230,7 @@ void astPutErr_( int status, const char *message )
 
     /* Keep references to the status and message */
     if ( lastError != NULL ) {
-        free( lastError );
+        free( (void *) lastError );
     }
     lastError = strdup( message );
     lastStatus = status;

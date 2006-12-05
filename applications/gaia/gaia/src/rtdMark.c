@@ -835,7 +835,6 @@ static void ScaleMark( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
                        double originY, double scaleX, double scaleY )
 {
     MarkItem *markPtr = (MarkItem *) itemPtr;
-    double scale;
 
     /* Scale all coordinates and set their related values */
 
