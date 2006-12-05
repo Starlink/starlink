@@ -19,6 +19,10 @@ Main Changes in this Version
 - The SpecFrame class has a new attribute called SourceSys that specified
 whether the SourceVel attribute (which specifies the rest frame of the 
 source) should be accessed as an apparent radial velocity or a redshift.
+Note, any existing software that assumes that SourceVel always represents
+a velocity in km/s should be changed to allow for the possibility of
+SourceVel representing a redshift value.
+
 
 -  The astGetFitsS (AST_GETFITSS) function now strips trailing white space
 from the returned string, if the original string contains 8 or fewer
