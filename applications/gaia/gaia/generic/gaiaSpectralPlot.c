@@ -364,7 +364,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->xborder = 0.07;
     spPtr->xminmax = 1;
     spPtr->y = 0.0;
-    spPtr->yborder = 0.17;
+    spPtr->yborder = 0.25;
 
     /* Create a unique tag for AST graphic elements */
     sprintf( spPtr->utag, "gaiaSpectralPlot%d", tagCounter++ );
@@ -1552,6 +1552,7 @@ static void MakeSpectral( SPItem *spPtr )
     AstFrame *frm2;
     AstMapping *map;
     AstUnitMap *umap;
+    char buffer[20];
     char const *system;
     double *coords;
     double *grid;
@@ -1705,13 +1706,12 @@ static void MakeSpectral( SPItem *spPtr )
     }
 
     /* Clear digits and format, unless set in the input frameset. */
-    if ( ! astTest( cfrm, "Format(1)" ) ) {
+    sprintf( buffer, "Format(%d)", spPtr->axis );
+    if ( ! astTest( cfrm, buffer ) ) {
         astClear( frm2, "Format(1)" );
     }
-    if ( ! astTest( cfrm, "Format(1)" ) ) {
-        astClear( frm2, "Format(1)" );
-    }
-    if ( ! astTest( cfrm, "Digits(1)" ) ) {
+    sprintf( buffer, "Digits(%d)", spPtr->axis );
+    if ( ! astTest( cfrm, buffer ) ) {
         astClear( frm2, "digits(1)" );
     }
 
