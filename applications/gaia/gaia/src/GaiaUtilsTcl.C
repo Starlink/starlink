@@ -351,7 +351,8 @@ static int GaiaUtilsAstTest( ClientData clientData, Tcl_Interp *interp,
  * Check if a given AST FrameSet has an axis of a given frame type.
  *
  * Note we only support a pre-defined set of comparison frame types,
- * at present these are "specframe" and "fluxframe".
+ * at present these are "specframe", "dsbspecframe", "fluxframe"
+ * and "timeframe".
  */
 static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] )
@@ -394,6 +395,9 @@ static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
     }
     else if ( strcmp( type, "fluxframe" ) == 0 ) {
         isa = astIsAFluxFrame( picked );
+    }
+    else if ( strcmp( type, "timeframe" ) == 0 ) {
+        isa = astIsATimeFrame( picked );
     }
     else {
         char *buf = ckalloc( 1024 );
