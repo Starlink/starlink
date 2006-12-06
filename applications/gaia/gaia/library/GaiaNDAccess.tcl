@@ -235,6 +235,11 @@ itcl::class gaia::GaiaNDAccess {
       return [${type_}::getc $handle_ $what]
    }
 
+   #  Return a WCS describing the coordinates of the dataset.
+   public method getwcs {} {
+      return [${type_}::getwcs $handle_]
+   }
+
    #  Return a WCS describing the coordinates of a given WCS axis. Note axes
    #  may or may not be fixed to a given dataset axis, that isn't worried
    #  about here.
