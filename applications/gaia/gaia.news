@@ -1,5 +1,8 @@
   Latest changes:
 
+    The cube spectral extraction now handles dependent axes (like RA and Dec),
+    differently so that more extractions along one of these axes will succeed.
+
     The "send to SPLAT" option in the cube toolbox now sends the
     absolute name of the spectrum to be displayed. This means SPLAT
     may be started from another directory.
