@@ -151,8 +151,13 @@ itcl::class gaia::GaiaSpecWriter {
 
             blt::busy hold $w_
 
+            #  Get spectral axis of dataset WCS.
             set canvas [$gaiaspectrum component canvas]
-            set frameset [$canvas itemcget $spectrum -frameset]
+            set axis [$canvas itemcget $spectrum -axis]
+
+            #  Get spectral WCS (need to pick out 1D from full WCS).
+            set cubeaccessor [$gaiacube get_cubeaccessor]
+            set frameset [$cubeaccessor getaxiswcs $axis]
 
             #  Open the output file.
             set fid [::open $filename w]
