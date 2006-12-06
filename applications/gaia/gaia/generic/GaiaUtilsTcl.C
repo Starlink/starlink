@@ -487,34 +487,35 @@ static int GaiaUtilsGt2DWcs( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Convert a 1D coordinate using a 1D frameset.
+ * Convert a 1D coordinate using a 1D frameset or mapping.
  *
- * There are three arguments, the address of the AST FrameSet, the coordinate
- * to transform and whether to transform using the forward or inverse
- * transform.
+ * There are three arguments, the address of the AST FrameSet or mapping, the
+ * coordinate to transform and whether to transform using the forward or
+ * inverse transform.
  */
 static int GaiaUtilsGtAxisCoord( ClientData clientData, Tcl_Interp *interp,
                                  int objc, Tcl_Obj *CONST objv[] )
 {
-    AstFrameSet *axiswcs;
+    AstMapping *mapping;
     double xin[1];
     double xout[1];
     int forward;
     long adr;
 
-    /* Check arguments, only allow three, the frameset, the coordinate and
-     * whether to transform forward or backwards.
+    /* Check arguments, only allow three, the frameset or mapping, the
+     * coordinate and whether to transform forward or backwards.
      */
     if ( objc != 4 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "frameset coordinate ?forward?" );
+        Tcl_WrongNumArgs( interp, 1, objv, 
+                          "frameset!mapping coordinate ?forward?" );
         return TCL_ERROR;
     }
 
-    /* Get the frameset */
+    /* Get the frameset or mapping */
     if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    axiswcs = (AstFrameSet *) adr;
+    mapping = (AstMapping *) adr;
 
     /* Get the coordinate */
     if ( Tcl_GetDoubleFromObj( interp, objv[2], &xin[0] ) != TCL_OK ) {
@@ -527,7 +528,7 @@ static int GaiaUtilsGtAxisCoord( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Do the transformation. */
-    astTran1( axiswcs, 1, xin, forward, xout );
+    astTran1( mapping, 1, xin, forward, xout );
     if ( ! astOK ) {
         Tcl_SetResult( interp, "Failed to transform axis coordinate",
                        TCL_VOLATILE );
@@ -598,7 +599,6 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
 static int GaiaUtilsGtROIPlots( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] )
 {
-    AstFrameSet *axiswcs;
     AstKeyMap *rplots;
     AstPlot *roiPlot;
     AstPlot *plot;
@@ -606,7 +606,6 @@ static int GaiaUtilsGtROIPlots( ClientData clientData, Tcl_Interp *interp,
     char *error_mess;
     const char *key;
     int i;
-    int result;
     int size;
     long adr;
 
