@@ -695,9 +695,9 @@ static double ConvertSourceVel( AstSpecFrame *this, AstStdOfRestType newsor,
 /* Check the global error status. */
    if ( !astOK ) return ret;
 
-/* Get the value of the SourceVel attribute. This will be relativistic
-   velocity in m/s, or unitless redshift, depending on the current value
-   of SourceSys. */
+/* Get the value of the SourceVel attribute. This will be a velocity in m/s
+   (relativistic, radio or optical), or unitless redshift or beta factor, 
+   depending on the current value of SourceSys. */
    ret = astGetSourceVel( this );
 
 /* Check it can be used (depends on whether a value has been set and
@@ -729,8 +729,20 @@ static double ConvertSourceVel( AstSpecFrame *this, AstStdOfRestType newsor,
    initially represents a UnitMap. */
       specmap = astSpecMap( 1, 0, "" );
 
-/* Add a conversion from redshift to relativistic velocity if needed. */
-      if( sys != AST__VREL ) astSpecAdd( specmap, "ZOTOVL", NULL );
+/* Add a conversion from the spectral system in which the SourceVEl value
+   is stored, to relativistic velocity. */
+      if( sys == AST__VRADIO ) {
+         astSpecAdd( specmap, "VRTOVL", NULL );
+
+      } else if( sys == AST__VOPTICAL ) {
+         astSpecAdd( specmap, "VOTOVL", NULL );
+
+      } else if( sys == AST__REDSHIFT ) {
+         astSpecAdd( specmap, "ZOTOVL", NULL );
+
+      } else if( sys == AST__BETA ) {
+         astSpecAdd( specmap, "BTTOVL", NULL );
+      } 
 
 /* Add a conversion from velocity to frequency since SorConvert converts
    frequencies. */
@@ -745,8 +757,20 @@ static double ConvertSourceVel( AstSpecFrame *this, AstStdOfRestType newsor,
    rest frequency does not affect the overall conversion. */
       astSpecAdd( specmap, "FRTOVL", &rf );
 
-/* Add a conversion from relativistic velocity to redshift if needed. */
-      if( newsys != AST__VREL ) astSpecAdd( specmap, "VLTOZO", NULL );
+/* Add a conversion from relativistic velocity to the required spectral
+   system, if needed. */
+      if( newsys == AST__VRADIO ) {
+         astSpecAdd( specmap, "VLTOVR", NULL );
+
+      } else if( newsys == AST__VOPTICAL ) {
+         astSpecAdd( specmap, "VLTOVO", NULL );
+
+      } else if( newsys == AST__REDSHIFT ) {
+         astSpecAdd( specmap, "VLTOZO", NULL );
+
+      } else if( newsys == AST__BETA ) {
+         astSpecAdd( specmap, "VLTOBT", NULL );
+      } 
 
 /* Use the SpecMap to convert the source velocity in the SourceVRF
    standard of rest and SourceSys spectral system to the required rest 
@@ -1219,7 +1243,9 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
       if ( astOK ) {
 
 /* Convert from m/s to km/s if the SourceVel value is a velocity. . */
-         if( astGetSourceSys( this ) == AST__VREL ) dval *= 1.0E-3;
+         if( astGetSourceSys( this ) == AST__VREL ||
+             astGetSourceSys( this ) == AST__VRADIO ||
+             astGetSourceSys( this ) == AST__VOPTICAL ) dval *= 1.0E-3;
 
 /* Format */
          (void) sprintf( buff, "%.*g", DBL_DIG, dval );
@@ -3543,8 +3569,10 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         ( 1 == astSscanf( setting, "sourcevel= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
 
-/* Convert from km/s to m/s if the SourceVel value is a velocity. . */
-      if( astGetSourceSys( this ) == AST__VREL ) dval *= 1.0E3;
+/* Convert from km/s to m/s if the SourceVel value is a velocity. */
+         if( astGetSourceSys( this ) == AST__VREL ||
+             astGetSourceSys( this ) == AST__VRADIO ||
+             astGetSourceSys( this ) == AST__VOPTICAL ) dval *= 1.0E3;
 
 /* Store the value */
       astSetSourceVel( this, dval );
@@ -5777,16 +5805,21 @@ astMAKE_TEST(SpecFrame,RestFreq,( this->restfreq != AST__BAD ))
 *     This attribute (together with SourceSys, SourceVRF, RefRA and RefDec) 
 *     defines the "Source" standard of rest (see attribute StdOfRest). This is 
 *     a rest frame which is moving towards the position given by RefRA and 
-*     RefDec at a  velocity given by SourceVel. The value assigned to the 
-*     SourceVel attribute can be either the apparent radial ("relativistic")
-*     source velocity (in km/s), or the source redshift. The SourceSys
-*     attribute should be set to an appropriate value to indicate which 
-*     of these two spectral systems is being used.
+*     RefDec at a  velocity given by SourceVel. When a new value is
+*     assigned to this attribute, the supplied value is assumed to refer
+*     to the spectral system specified by the SourceSys attribute. For
+*     instance, the SourceVel value may be supplied as a radio velocity, a
+*     redshift, a beta factor, etc. Similarly, when the current value of
+*     the SourceVel attribute is obtained, the returned value will refer 
+*     to the spectral system specified by the SourceSys value. If the
+*     SourceSys value is changed, any value previously stored for the SourceVel
+*     attribute will be changed automatically from the old spectral system 
+*     to the new spectral system.
 *
-*     When setting a value for SourceVel, the velocity or redshift should be 
-*     supplied in the rest frame specified by the SourceVRF attribute. 
-*     Likewise, when getting the value of SourceVel, it will be returned in 
-*     the rest frame specified by the SourceVRF attribute.
+*     When setting a value for SourceVel, the value should be supplied in the 
+*     rest frame specified by the SourceVRF attribute. Likewise, when getting 
+*     the value of SourceVel, it will be returned in the rest frame specified 
+*     by the SourceVRF attribute.
 *
 *     The default SourceVel value is zero.
 
@@ -5803,9 +5836,9 @@ astMAKE_TEST(SpecFrame,RestFreq,( this->restfreq != AST__BAD ))
 
 *att--
 */
-/* The source velocity (stored internally as an apparent radial velocity in 
-   m/s). Clear it by setting it to AST__BAD, which returns a default value 
-   of zero. Any value is acceptable. */
+/* The source velocity (velocities are stored internally in m/s). Clear it 
+   by setting it to AST__BAD, which returns a default value of zero. Any 
+   value is acceptable. */
 astMAKE_CLEAR(SpecFrame,SourceVel,sourcevel,AST__BAD)
 astMAKE_SET(SpecFrame,SourceVel,double,sourcevel,value)
 astMAKE_TEST(SpecFrame,SourceVel,( this->sourcevel != AST__BAD ))
@@ -5889,9 +5922,13 @@ astMAKE_SET(SpecFrame,SourceVRF,AstStdOfRestType,sourcevrf,(
 *  Description:
 *     This attribute identifies the spectral system in which the
 *     SourceVel attribute value (the source velocity) is supplied and 
-*     returned. It can be either apparent radial velocity in "km/s" 
-*     (specified by the value "VELO" or "VREL"), or redshift (specified 
-*     by the value "REDSHIFT" or "ZOPT").
+*     returned. It can be one of the following:
+*
+*        - "VRAD" or "VRADIO": Radio velocity (km/s)
+*        - "VOPT" or "VOPTICAL": Optical velocity (km/s)
+*        - "ZOPT" or "REDSHIFT": Redshift (dimensionless)
+*        - "BETA": Beta factor (dimensionless)
+*        - "VELO" or "VREL": Apparent radial ("relativistic") velocity (km/s)
 *
 *     When setting a new value for the SourceVel attribute, the source 
 *     velocity should be supplied in the spectral system indicated
@@ -5925,7 +5962,9 @@ astSetSourceVel( this, ConvertSourceVel( this, astGetSourceVRF( this ),
    If OK, convert the stored SourceVel value into the new rest frame (but
    only if set)*/
 astMAKE_SET(SpecFrame,SourceSys,AstSystemType,sourcesys,(
-            ( ( value == AST__VREL ) || ( value == AST__REDSHIFT ) ) ?
+            ( ( value == AST__VREL ) || ( value == AST__BETA ) ||
+              ( value == AST__VRADIO ) || ( value == AST__REDSHIFT ) ||
+              ( value == AST__VOPTICAL ) ) ?
               (astTestSourceVel( this )?
                astSetSourceVel( this, ConvertSourceVel( this, astGetSourceVRF( this ), 
                                                         value )),NULL:NULL), 
