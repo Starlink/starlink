@@ -82,8 +82,10 @@
 *        Clear TimeOrigin in the TimeFrame used to format the TimeOrigin
 *        value so that the TimeOrigin value is formatted as an absolute
 *        time.
-*     11-OCT-2006 *DSB):
+*     11-OCT-2006 (DSB):
 *        Ensure no units are displayed for redshift values.
+*     5-DEC-2006 (DSB):
+*        Ensure SourceVel is accessed as an apparent velocity.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -392,38 +394,45 @@
             IF( SOR .EQ. 'SOURCE' .OR.
      :          AST_TEST( FRM, 'SourceVel', STATUS ) ) THEN
 
-*  Get the source velocity as an apparent radial velocity (also known as
-*  a "relativistic velocity").
+*  See what spectral system the SourceVel value is stored in.
+               SYS = AST_GETC( FRM, 'SourceSys', STATUS )
+
+*  Get the source velocity in the above system.
                SRCVEL = AST_GETD( FRM, 'SourceVel', STATUS ) 
 
-*  If the SpecFrame's System is a velocity we transform the source
-*  velocity to that system. If not, we display it as as.
-               IF( SYS .EQ. 'VOPT' .OR. SYS .EQ. 'VRAD' .OR.
-     :             SYS .EQ. 'ZOPT' ) THEN
-
-                  FRM2 = AST_COPY( FRM, STATUS )
-                  CALL AST_SETC( FRM2, 'System', 'VELO', STATUS )
-                  FS = AST_CONVERT( FRM2, FRM, ' ', STATUS )
-                  CALL AST_TRAN1( FS, 1, SRCVEL, .TRUE., TMP, STATUS )
-                  SRCVEL = TMP
-
-                  CALL CHR_LCASE( LABEL )
-               ELSE
-                  LABEL = 'apparent radial velocity'
-               END IF
-               CALL MSG_SETC( 'LABEL', LABEL )
-
-*  Display the value
-               CALL MSG_SETR( 'V', REAL( SRCVEL ) )
-
-               IF( SYS .NE. 'ZOPT' ) THEN
-                  CALL MSG_SETC( 'UNIT', 'Km/s' )
+*  Set suitable label, title and unit strings.
+               IF( SYS .EQ. 'VRAD' ) THEN
+                  CALL MSG_SETC( 'LABEL', 'Radio velocity' )
                   CALL MSG_SETC( 'TTL', 'velocity' )
-               ELSE
-                  CALL MSG_SETC( 'UNIT', ' ' )
+                  CALL MSG_SETC( 'UNIT', 'km/s' )
+
+               ELSE IF( SYS .EQ. 'VOPT' ) THEN
+                  CALL MSG_SETC( 'LABEL', 'Optical velocity' )
+                  CALL MSG_SETC( 'TTL', 'velocity' )
+                  CALL MSG_SETC( 'UNIT', 'km/s' )
+
+               ELSE IF( SYS .EQ. 'ZOPT' ) THEN
+                  CALL MSG_SETC( 'LABEL', 'Redshift' )
                   CALL MSG_SETC( 'TTL', 'redshift' )
+                  CALL MSG_SETC( 'UNIT', ' ' )
+
+               ELSE IF( SYS .EQ. 'BETA' ) THEN
+                  CALL MSG_SETC( 'LABEL', 'Beta factor' )
+                  CALL MSG_SETC( 'TTL', 'velocity' )
+                  CALL MSG_SETC( 'UNIT', ' ' )
+
+               ELSE IF( SYS .EQ. 'VELO' ) THEN
+                  CALL MSG_SETC( 'LABEL', 'Apparent radial velocity' )
+                  CALL MSG_SETC( 'TTL', 'velocity' )
+                  CALL MSG_SETC( 'UNIT', 'km/s' )
+
+               ELSE
+                  CALL MSG_SETC( 'LABEL', SYS )
+                  CALL MSG_SETC( 'UNIT', ' ' )
+                  CALL MSG_SETC( 'TTL', 'velocity' )
                END IF
 
+*  Set a suitable standard of rest string.
                SOR = AST_GETC( FRM, 'SOURCEVRF', STATUS )
                IF( CHR_SIMLR( SOR, 'NONE' ) ) THEN
                   CALL MSG_SETC( 'SOR', '<not defined>' )
@@ -443,6 +452,9 @@
                   CALL MSG_SETC( 'SOR', SOR )
                END IF
 	       
+*  Display the value
+               CALL MSG_SETR( 'V', REAL( SRCVEL ) )
+
                CALL MSG_OUT( 'WCS_VELSOR', 
      :            IND( : NIND )//'Source ^TTL     : ^V ^UNIT '//
      :            '(^SOR ^LABEL)', STATUS )
