@@ -81,6 +81,7 @@ sub new {
 
 # Set up default options.
   $auto->aperture( 5.0 ) if ( ! defined( $auto->aperture ) );
+  $auto->autocrowded( 0 ) if ( ! defined( $auto->autocrowded ) );
   $auto->catalogue( 'USNO@ESO' ) if( ! defined( $auto->catalogue ) );
   $auto->crowded( 0 ) if ( ! defined( $auto->crowded ) );
   $auto->defects( 'warn' ) if ( ! defined( $auto->defects ) );
@@ -127,6 +128,37 @@ sub aperture {
     $self->{APERTURE} = $aperture;
   }
   return $self->{APERTURE};
+}
+
+=item B<autocrowded>
+
+Whether or not to automatically detect whether or not the frame is a crowded field, and then act accordingly.
+
+  my $autocrowded = $auto->autocrowded;
+  $auto->autocrowded( 1 );
+
+If set to true, then the automated astrometry step will automatically
+detect whether or not the field is considered crowded. If the number
+of objects extracted from the central 25% of the frame is greater than
+the value returned by the crowded_threshold() accessor, then the field
+is considered to be crowded, in which case only the central region of
+the image will be used.
+
+If the crowded() accessor is set to 1, then that will override any
+value that this accessor is set to. If the crowded() accessor is set
+to false, then the value of this accessor takes priority.
+
+The value defaults to 0, or false.
+
+=cut
+
+sub autocrowded {
+  my $self = shift;
+  if( @_ ) {
+    my $autocrowded = shift;
+    $self->{AUTOCROWDED} = $autocrowded;
+  }
+  return $self->{AUTOCROWDED};
 }
 
 =item B<bestfitlog>
@@ -229,6 +261,27 @@ sub crowded {
     $self->{CROWDED} = $crowded;
   }
   return $self->{CROWDED};
+}
+
+=item B<crowded_threshold>
+
+The lower limit of extracted objects before which a field is
+considered crowded.
+
+  my $thresh = $auto->crowded_threshold;
+  $auto->crowded_threshold( 500 );
+
+See the C<autocrowded> method for more information.
+
+=cut
+
+sub crowded_threshold {
+  my $self = shift;
+  if( @_ ) {
+    my $thresh = shift;
+    $self->{CROWDED_THRESHOLD} = $thresh;
+  }
+  return $self->{CROWDED_THRESHOLD};
 }
 
 =item B<defects>
@@ -1351,6 +1404,7 @@ sub solve {
     $ndfcat = new Astro::Catalog( Format => 'SExtractor',
                                   File => $self->ccdcatalogue );
   } else {
+
     $self->printstd( "--I Calling EXTRACTOR.\n" ) if $self->starlink_output;
     $self->printerr( "Calling EXTRACTOR.\n" ) if $self->verbose;
     my $ext = new Starlink::Extractor;
@@ -1359,14 +1413,45 @@ sub solve {
     $ext->phot_apertures( $self->aperture );
     $ext->messages( $self->messages );
     $ext->timeout( $self->timeout );
-    $ext->crowded( $self->crowded );
+    if( $self->autocrowded ) {
+      $ext->crowded( 1 );
+    } else {
+      $ext->crowded( $self->crowded );
+    }
 
-    $ndfcat = $ext->extract( frame => $self->ndf,
-                             filter => $self->filter,
-                             quality => 0,
-                           );
-    $self->printstd( sprintf( "--I Extracted %d objects from NDF.\n", $ndfcat->sizeof ) )
+    my $tmpcat = $ext->extract( frame => $self->ndf,
+                                filter => $self->filter,
+                                quality => 0,
+                              );
+    $self->printstd( sprintf( "--I Extracted %d objects from NDF.\n", $tmpcat->sizeof ) )
       if $self->starlink_output;
+
+    if( $self->autocrowded && ! $self->crowded ) {
+
+      # Check to see if the field is crowded or not.
+      if( $tmpcat->sizeof > $self->crowded_threshold ) {
+        # Crowded field. Go with this catalogue.
+        $ndfcat = $tmpcat;
+
+      } else {
+        $self->printstd( "--I Sparse field. Redoing extraction.\n" ) if $self->starlink_output;
+
+        # Sparse field. Redo the extraction with a non-crowded field.
+        $ext->crowded( 0 );
+
+        $ndfcat = $ext->extract( frame => $self->ndf,
+                                 filter => $self->filter,
+                                 quality => 0,
+                               );
+
+        $self->printstd( sprintf( "--I Extracted %d objects from NDF.\n", $ndfcat->sizeof ) )
+          if $self->starlink_output;
+
+      }
+    } else {
+      $ndfcat = $tmpcat;
+    }
+
     $self->rawcatalogue( $ndfcat );
   }
 
