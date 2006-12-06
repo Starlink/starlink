@@ -69,6 +69,9 @@
 
 #define LONG_LENGTH 25
 
+/*  Maximum number of dimensions that a WCS frame can have (AST/NDF). */
+#define MAXDIM 7
+
 /*
  * Define a structure for containing all the necessary information
  * to describe an item.
@@ -76,6 +79,7 @@
 typedef struct SPItem  {
     Tk_Item header;             /* Mandatory Tk header information */
     AstFrameSet *framesets[2];  /* The FrameSets associated with item */
+    AstMapping *mapping;        /* 1D mapping used */
     AstPlot *plot;              /* The AstPlot for drawing regions */
     Tcl_Interp *interp;         /* The Tcl interpreter */
     Tk_Anchor tkanchor;         /* Where to anchor relative to (x,y). */
@@ -102,6 +106,7 @@ typedef struct SPItem  {
     double yborder;             /* Fractional border for Y plot axes, only used when autoscaling using scale command */
     double ybot;                /* Physical Y coordinate for plot top */
     double ytop;                /* Physical Y coordinate for plot bottom */
+    int axis;                   /* Axis of supplied WCS that is spectral */
     int fixedscale;             /* If set do not scale item with canvas */
     int isDSB;                  /* Spectral coordinates are dual sideband */
     int linewidth;              /* Width of polyline */
@@ -133,11 +138,24 @@ static Tk_CustomOption framesetOption = {
     FrameSetParseProc, FrameSetPrintProc, (ClientData) NULL
 };
 
+static int MappingParseProc( ClientData clientData, Tcl_Interp *interp,
+                             Tk_Window tkwin, CONST char *value,
+                             char *widgRec, int offset );
+static char *MappingPrintProc( ClientData clientData, Tk_Window tkwin,
+                               char *widgRec, int offset,
+                               Tcl_FreeProc **freeProcPtr );
+static Tk_CustomOption mappingOption = {
+    MappingParseProc, MappingPrintProc, (ClientData) NULL
+};
+
 /* Configuration options */
 static Tk_ConfigSpec configSpecs[] = {
 
     {TK_CONFIG_ANCHOR, "-anchor", (char *) NULL, (char *) NULL,
      "nw", Tk_Offset(SPItem, tkanchor), TK_CONFIG_DONT_SET_DEFAULT, NULL},
+
+    {TK_CONFIG_INT, "-axis", (char *) NULL, (char *) NULL,
+     "1.0", Tk_Offset(SPItem, axis), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_DOUBLE, "-badvalue", (char *) NULL, (char *) NULL,
      "0.0", Tk_Offset(SPItem, badvalue), TK_CONFIG_DONT_SET_DEFAULT, NULL},
@@ -166,6 +184,10 @@ static Tk_ConfigSpec configSpecs[] = {
 
     {TK_CONFIG_PIXELS, "-linewidth", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(SPItem, linewidth), TK_CONFIG_DONT_SET_DEFAULT, NULL},
+
+    {TK_CONFIG_CUSTOM, "-mapping", (char *) NULL, (char *) NULL,
+     (char *) NULL, Tk_Offset(SPItem, mapping), TK_CONFIG_NULL_OK,
+     &mappingOption},
 
     {TK_CONFIG_INT, "-offset", (char *) NULL, (char *) NULL,
      "0.0", Tk_Offset(SPItem, offset), TK_CONFIG_DONT_SET_DEFAULT, NULL},
@@ -318,6 +340,8 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->fixedscale = 0;
     spPtr->framesets[0] = NULL;
     spPtr->framesets[1] = NULL;
+    spPtr->mapping = NULL;
+    spPtr->axis = 1;
     spPtr->height = 100.0;
     spPtr->interp = interp;
     spPtr->isDSB = 0;
@@ -371,15 +395,19 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     /* Use default unit frameset when no other available */
     if ( spPtr->framesets[0] == NULL ) {
         AstFrame *f1, *f2;
-        AstUnitMap *map;
         astBegin;
         f1 = astFrame( 1, "" );
         f2 = astFrame( 1, "" );
-        map = astUnitMap( 1, "" );
+        spPtr->mapping = (AstMapping *) astUnitMap( 1, "" );
         spPtr->framesets[0] = astFrameSet( f1, "" );
-        astAddFrame( spPtr->framesets[0], AST__BASE, map, f2 );
+        astAddFrame( spPtr->framesets[0], AST__BASE, spPtr->mapping, f2 );
+
         astExport( spPtr->framesets[0] );
+        astExport( spPtr->mapping );
+
         spPtr->isDSB = 0;
+        spPtr->axis = 1;
+
         astEnd;
     }
 
@@ -756,6 +784,10 @@ static void SPDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
        astAnnul( spPtr->framesets[0] );
     }
 
+    if ( spPtr->mapping != NULL ) {
+       astAnnul( spPtr->mapping );
+    }
+
     if ( spPtr->polyline != NULL ) {
         RtdLineDelete( canvas, spPtr->polyline, display );
     }
@@ -796,6 +828,8 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
     double yin[2];
     double yout[2];
     float graphbox[4];
+    int base;
+    int current;
     int i;
     int xborder;
     int yborder;
@@ -840,38 +874,11 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
             graphbox[3] = spPtr->header.y1;           /* No room for title */
         }
 
-        /* Set the limits of the drawing region in physical coordinates. Note
-         * these are in the BASE frame of the frameset, not CURRENT
-         * coordinates */
-        xin[0] = spPtr->xleft;
-        xin[1] = spPtr->xright;
-        yin[0] = spPtr->ybot;
-        yin[1] = spPtr->ytop;
-#if DEBUG
-        fprintf( stderr, "xleft etc: %f,%f,%f,%f\n", spPtr->xleft, spPtr->ybot,
-                 spPtr->xright, spPtr->ytop );
-#endif
-
-        astTran2( spPtr->framesets[1], 2, xin, yin, 0, xout, yout );
-        if ( ! astOK ) {
-           basebox[0] = AST__BAD;
-           basebox[1] = AST__BAD;
-           basebox[2] = AST__BAD;
-           basebox[3] = AST__BAD;
-        } 
-        else {
-           basebox[0] = xout[0];
-           basebox[1] = yout[0];
-           basebox[2] = xout[1];
-           basebox[3] = yout[1];
-        }
-
-        /* If the transformation fails, take a stab at some useful values. */
-        if ( basebox[0] == AST__BAD ) basebox[0] = spPtr->xright;
-        if ( basebox[1] == AST__BAD ) basebox[1] = spPtr->ybot;
-        if ( basebox[2] == AST__BAD ) basebox[2] = spPtr->xleft;
-        if ( basebox[3] == AST__BAD ) basebox[3] = spPtr->ytop;
-        if ( ! astOK ) astClearStatus;
+        /* Physical limits */
+        basebox[0] = spPtr->xleft;
+        basebox[2] = spPtr->xright;
+        basebox[1] = spPtr->ybot;
+        basebox[3] = spPtr->ytop;
 
 #if DEBUG
         fprintf( stderr, "basebox: %f,%f,%f,%f\n", basebox[0], basebox[1],
@@ -879,8 +886,17 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         fprintf( stderr, "graphbox: %f,%f,%f,%f\n", graphbox[0], graphbox[1],
                  graphbox[2], graphbox[3] );
 #endif
+        
+        /* Create the Plot. So that we get linear axis 1 coordinates we must
+         * choose the current frame as the base frame (so that the mapping
+         * from graphics to physical is linear)
+         */
+        base = astGetI( spPtr->framesets[1], "Base" );
+        current = astGetI( spPtr->framesets[1], "Current" );
+        astSetI( spPtr->framesets[1], "Base", current );
         spPtr->plot = astPlot( spPtr->framesets[1], graphbox, basebox,
                                (spPtr->options == NULL ? "" : spPtr->options));
+        astSetI( spPtr->framesets[1], "Base", base );
 
         if ( spPtr->plot == NULL ) {
             if ( !astOK ) {
@@ -905,7 +921,8 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
              * the grid twice, with different wavelength coordinates on the
              * bottom and top of grid. */
             if ( spPtr->isDSB ) {
-                const char *sideband = astGetC(spPtr->framesets[0],"SideBand");
+                const char *sideband = astGetC( spPtr->framesets[0],
+                                                "SideBand" );
 
                 /* Stop plot showing Y axes for the first grid and draw X
                  * coordinates on bottom */
@@ -1343,14 +1360,18 @@ static int FrameSetParseProc( ClientData clientData, Tcl_Interp *interp,
     /* Release old frameset, before accepting new */
     if ( spPtr->framesets[0] != NULL ) {
         astAnnul( spPtr->framesets[0] );
+        if ( spPtr->mapping != NULL ) {
+            astAnnul( spPtr->mapping );
+        }
     }
 
     /* Make a clone of the frameset so that the original can be released */
     spPtr->framesets[0] = (AstFrameSet *) astClone((AstFrameSet *)longResult);
     spPtr->framesets[1] = (AstFrameSet *) NULL;
+    spPtr->mapping = (AstMapping *) NULL;
 
     /* If this has a DSBSpecFrame the plotting is different, so find out.*/
-    iaxes[0] = 1;
+    iaxes[0] = spPtr->axis;
     picked = astPickAxes( spPtr->framesets[0], 1, iaxes, NULL );
     spPtr->isDSB = astIsADSBSpecFrame( picked );
     if ( spPtr->isDSB ) {
@@ -1382,6 +1403,53 @@ static char *FrameSetPrintProc( ClientData clientData, Tk_Window tkwin,
     char *p = (char *) ckalloc( LONG_LENGTH );
 
     sprintf( p, "%lu", (long) spPtr->framesets[0] );
+
+    *freeProcPtr = TCL_DYNAMIC;
+    return p;
+}
+
+/**
+ * MappingParseProc --
+ *
+ *      Provide parsing for -mapping option, in fact this isn't 
+ *      really allowed as the mapping is a generated value. Allow
+ *      only for debugging purposes.
+ */
+static int MappingParseProc( ClientData clientData, Tcl_Interp *interp,
+                             Tk_Window tkwin, CONST char *value,
+                             char *widgRec, int offset )
+{
+    SPItem *spPtr = (SPItem *) widgRec;
+    long longResult;
+
+    if ( Tcl_ExprLong( interp, value, &longResult ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Release old mapping, before accepting new */
+    if ( spPtr->mapping != NULL ) {
+        astAnnul( spPtr->mapping );
+    }
+
+    spPtr->mapping = (AstMapping *) astClone((AstMapping *)longResult);
+
+    return TCL_OK;
+}
+
+
+/**
+ * MappingPrintProc --
+ *
+ *      Return -mapping option as string.
+ */
+static char *MappingPrintProc( ClientData clientData, Tk_Window tkwin,
+                               char *widgRec, int offset,
+                               Tcl_FreeProc **freeProcPtr )
+{
+    SPItem *spPtr = (SPItem *) widgRec;
+    char *p = (char *) ckalloc( LONG_LENGTH );
+
+    sprintf( p, "%lu", (long) spPtr->mapping );
 
     *freeProcPtr = TCL_DYNAMIC;
     return p;
@@ -1426,7 +1494,7 @@ static void GeneratePlotFrameSet( SPItem *spPtr )
     for ( i = 0; i < spPtr->numPoints; i++ ) {
         tmpPtr[i] = (double) ( i + 1 + spPtr->offset );
     }
-    astTran1( spPtr->framesets[0], spPtr->numPoints, tmpPtr, 1,
+    astTran1( spPtr->mapping, spPtr->numPoints, tmpPtr, 1,
               spPtr->coordPtr );
 
     /* Set the axis range, pick first non-BAD values from ends (spectrum must
@@ -1473,8 +1541,7 @@ static void GeneratePlotFrameSet( SPItem *spPtr )
 /**
  * MakeSpectral --
  *
- *     Generate a FrameSet suitable for drawing a 2D data plot using our data
- *     values and 1D frameset.
+ *     Generate a FrameSet suitable for drawing a 2D data plot.
  */
 static void MakeSpectral( SPItem *spPtr )
 {
@@ -1484,12 +1551,19 @@ static void MakeSpectral( SPItem *spPtr )
     AstFrame *frm1;
     AstFrame *frm2;
     AstMapping *map;
-    AstMapping *smap;
     AstUnitMap *umap;
     char const *system;
-    int havespecframe;
+    double *coords;
+    double *grid;
+    double *lutcoords;
+    double work[MAXDIM];
     int havefluxframe;
-    int iaxes[2];
+    int havespecframe;
+    int i;
+    int iaxes[MAXDIM];
+    int j;
+    int nin;
+    int nout;
 
     astBegin;
 
@@ -1499,23 +1573,68 @@ static void MakeSpectral( SPItem *spPtr )
      * -------------------------------------------------------------
      */
 
-    /* Get a simplified mapping from the base to current frames. This will
-     * be used to transform from GRID coordinates to spectral
-     * coordinates. */
+    /* Get a simplified mapping from the base to current frames. This will be
+     * used to transform from GRID coordinates to spectral coordinates. 
+     */
     map = astGetMapping( spPtr->framesets[0], AST__BASE, AST__CURRENT );
-    smap = astSimplify( map );
+    spPtr->mapping = astSimplify( map );
 
     /* Save a pointer to the current frame. */
     cfrm = astGetFrame( spPtr->framesets[0], AST__CURRENT );
+
+    /* Get number of input and output coordinates, these may not be 1. In that
+     * case the relevant axis is spPtr->axis, which should be set before
+     * defining the frameset. */
+    nin = astGetI( spPtr->framesets[0], "Nin" );
+    nout = astGetI( spPtr->framesets[0], "Nout" );
+
+    /* When picking the current frame from a nD WCS we need to be careful to
+     * handle dependent axes so that they do not introduce an non-invertable
+     * mapping. Do this by creating a Lutmap based on the forward
+     * transformation, which can then be inverted.
+     */
+    if ( nout != 1 ) {
+        grid = malloc( sizeof(double) * spPtr->numPoints * nin );
+        coords = malloc( sizeof(double) * spPtr->numPoints * nout );
+        lutcoords = malloc( sizeof(double) * spPtr->numPoints );
+
+        /* Generate dim positions stepped along the GRID axis pixels */
+        for ( i = 0; i < spPtr->numPoints; i++ ) {
+            for ( j = 0; j < nin; j++ ) {
+                grid[spPtr->numPoints*j+i] = i + 1;
+            }
+        }
+        
+        /* Transform these GRID positions into the current frame. */
+        astTranN( spPtr->framesets[0], spPtr->numPoints, nin, 
+                  spPtr->numPoints, grid, 1, nout, spPtr->numPoints, coords );
+
+        /* Normalise the coordinates */
+        for ( i = 0; i < spPtr->numPoints; i++ ) {
+            for ( j = 0; j < nout; j++ ) {
+                work[j] = coords[spPtr->numPoints*j+i];
+            }
+            astNorm( cfrm, work );
+            
+            /*  Store the selected coordinate */
+            lutcoords[i] = work[spPtr->axis - 1];
+        }
+        spPtr->mapping = (AstMapping *) astLutMap( spPtr->numPoints, 
+                                                   lutcoords, 1.0, 1.0, "" );
+
+        free( grid );
+        free( coords );
+        free( lutcoords );
+    }
 
     /* The data units map onto themselves directly so use a unitmap. */
     umap = astUnitMap( 1, "" );
 
     /*  Create a compound of these two mappings. */
-    map = (AstMapping *) astCmpMap( smap, umap, 0, "" );
+    map = (AstMapping *) astCmpMap( spPtr->mapping, umap, 0, "" );
 
     /* Get a Frame representing the input coordinates, uses a GRID axis of
-     * the base frame and a default axis. */
+     * the base frame (any old one) and a default axis. */
     iaxes[0] = 1;
     iaxes[1] = 0;
     frm1 = astGetFrame( spPtr->framesets[0], AST__BASE );
@@ -1542,8 +1661,8 @@ static void MakeSpectral( SPItem *spPtr )
      * ---------------------------------
      */
 
-    /* Use first axis from the current frame as the spectral axis. */
-    iaxes[0] = 1;
+    /* Use selected axis from the current frame as the spectral axis. */
+    iaxes[0] = spPtr->axis;
     f1 = astPickAxes( spPtr->framesets[0], 1, iaxes, NULL );
     havespecframe = astIsASpecFrame( f1 );
 
@@ -1618,8 +1737,10 @@ static void MakeSpectral( SPItem *spPtr )
     spPtr->framesets[1] = astFrameSet( frm1, "" );
     astAddFrame( spPtr->framesets[1], AST__BASE, map, frm2 );
 
-    /* Export the FrameSet and make sure everything else is released. */
+    /* Export the FrameSet and 1D mapping, and make sure everything else is
+     * released. */
     astExport( spPtr->framesets[1] );
+    astExport( spPtr->mapping );
     if ( !astOK ) {
         astClearStatus;
     }
