@@ -6,20 +6,20 @@
 #     [incr Tk] class
 
 #  Purpose:
-#     Control the spectral coordinates of an AST FrameSet.
+#     Control the spectral or timescale coordinates of an AST FrameSet.
 
 #  Description:
 
 #     This class populates menus with preset selections for the various
-#     coordinates systems that the spectral axis of a AST FrameSet might take
-#     (assuming the FrameSet contains an axis with has a SpecFrame). The
-#     FrameSet is accessed using an GaiaNDAccess instance.
+#     coordinates systems that the spectral or time axis of a AST FrameSet
+#     might take (assuming the FrameSet contains an axis with has a
+#     SpecFrame). The FrameSet is accessed using an GaiaNDAccess instance.
 #
 #     The disposition of the menu items can be changed to match those of
-#     a new GaiaNDAccess instance (these will be greyed by setting to
-#     disabled when the axis of the FrameSet is not a SpecFrame and
-#     the velocity items with be greyed if a rest frequency has not been
-#     defined).
+#     a new GaiaNDAccess instance, these will be greyed by setting to
+#     disabled when the axis of the FrameSet is not a SpecFrame or 
+#     TimeFrame. When a SpecFrame is available that doesn't have a
+#     rest frequency then the velocity items with be greyed.
 
 #  Invocations:
 #
@@ -125,6 +125,10 @@ itcl::class gaia::GaiaSpecCoords {
             $menu add command -label "$descr" \
                -command [code $this set_system "$system" "$unit" 0]
          }
+         foreach {descr timescale} $timescales_ {
+            $menu add command -label "$descr" \
+               -command [code $this set_timescale "$timescale" 0]
+         }
       }
    }
 
@@ -137,6 +141,7 @@ itcl::class gaia::GaiaSpecCoords {
 
          #  Check if WCS a SpecFrame and has a rest frequency
          set isaspecframe [$accessor isaxisframetype $axis "specframe"]
+         set isatimeframe [$accessor isaxisframetype $axis "timeframe"]
          if { $isaspecframe } {
             set haverestfreq [$accessor asttest "RestFreq($axis)"]
          } else {
@@ -163,6 +168,18 @@ itcl::class gaia::GaiaSpecCoords {
                   $menu entryconfigure "$descr" -state disabled
                }
             }
+
+            if { $isatimeframe } {
+               $menu entryconfigure "Default" -state normal
+               foreach {descr timescale} $timescales_ {
+                  $menu entryconfigure "$descr" -state normal
+               }
+            } else {
+               foreach {descr timescale} $timescales_ {
+                  $menu entryconfigure "$descr" -state disabled
+               }
+            }
+
          }
       }
    }
@@ -173,8 +190,8 @@ itcl::class gaia::GaiaSpecCoords {
       if { $accessor != {} } {
          if { $system == "default" } {
             
-            #  If this isn't set then no specframe, so at default already
-            #  and nothing to do.
+            #  If this isn't set then no specframe (or timeframe), so at
+            #  default already and nothing to do.
             if { [info exists default_system_($axis)] } {
                $accessor astset $default_system_($axis)
             }
@@ -187,6 +204,17 @@ itcl::class gaia::GaiaSpecCoords {
             }
          }
 
+         if { ! $quiet && $change_cmd != {} } {
+            eval $change_cmd
+         }
+      }
+   }
+
+   #  Set the timescale of the AST FrameSet. Also eval the change_cmd if
+   #  we have one and it is requested (quiet false).
+   public method set_timescale {timescale {quiet 0} } {
+      if { $accessor != {} } {
+         $accessor astset "TimeScale($axis)=$timescale"
          if { ! $quiet && $change_cmd != {} } {
             eval $change_cmd
          }
@@ -220,6 +248,9 @@ itcl::class gaia::GaiaSpecCoords {
             set units [$accessor astget "Unit($axis)"]
             set default_system_($axis) \
                "System($axis)=$system,Unit($axis)=$units"
+         } elseif { [$accessor isaxisframetype $axis "timeframe"] } {
+            set timescale [$accessor astget "TimeScale($axis)"]
+            set default_system_($axis) "TimeScale($axis)=$timescale"
          } else {
             catch {unset default_system_(axis)}
          }
@@ -289,5 +320,19 @@ itcl::class gaia::GaiaSpecCoords {
       "Metres-per-sec (radio)" "m/s" "VRAD"
       "Kilometres-per-sec (radio)" "km/s" "VRAD"
       "Redshift" "" "ZOPT"
+   }
+
+   #  List of possible time scales.
+   common timescales_ {
+      "International Atomic Time (TAI)" "TAI"
+      "Coordinated Universal Time (UTC)" "UTC"
+      "Universal Time (UT1)" "UT1"
+      "Greenwich Mean Sidereal Time (GMST)" "GMST" 
+      "Local Apparent Sidereal Time (LAST)" "LAST" 
+      "Local Mean Sidereal Time (LMST)" "LMST" 
+      "Terrestrial Time (TT)" "TT" 
+      "Barycentric Dynamical Time (TDB)" "TDB" 
+      "Barycentric Coordinate Time (TCB)" "TCB" 
+      "Geocentric Coordinate Time (TCG)" "TCG" 
    }
 }
