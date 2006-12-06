@@ -84,6 +84,7 @@ sub new {
   $auto->autocrowded( 0 ) if ( ! defined( $auto->autocrowded ) );
   $auto->catalogue( 'USNO@ESO' ) if( ! defined( $auto->catalogue ) );
   $auto->crowded( 0 ) if ( ! defined( $auto->crowded ) );
+  $auto->crowded_threshold( 250 ) if ( ! defined( $auto->crowded_threshold ) );
   $auto->defects( 'warn' ) if ( ! defined( $auto->defects ) );
   $auto->detection_threshold( 5.0 ) if ( ! defined( $auto->detection_threshold ) );
   $auto->insert( 1 ) if ( ! defined( $auto->insert ) );
@@ -272,6 +273,8 @@ considered crowded.
   $auto->crowded_threshold( 500 );
 
 See the C<autocrowded> method for more information.
+
+Defaults to 250.
 
 =cut
 
