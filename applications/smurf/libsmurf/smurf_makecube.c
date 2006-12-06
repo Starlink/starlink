@@ -75,9 +75,9 @@
 *          pixel axis in the output cube. The dynamic default value is
 *          determined by the AUTOGRID parameter. []
 *     DETECTORS = LITERAL (Read)
-*          A group of detector names. Only data form the named detectors
-*          will be included in the output cube. If a null (!) value is 
-*          supplied, data from all detectors will be used. [!]
+*          A group of detector names. Only data from the named detectors
+*          will be included in the output cube and catalogue. If a null (!) 
+*          value is supplied, data from all detectors will be used. [!]
 *     GENVAR = _LOGICAL (Read)
 *          If TRUE, then Variance values are stored in the output NDF based 
 *          on the spread of input data values contributing to each output 
@@ -93,8 +93,9 @@
 *          Output file
 *     OUTCAT = FILENAME (Write)
 *          An output catalogue in which to store all the detector positions 
-*          used to make the output cube. By default, these are in the same 
-*          sky coordinate system as the current Frame in the output NDF
+*          used to make the output cube (i.e. those selected using the
+*          DETECTORS parameter). By default, the stored positions are in the 
+*          same sky coordinate system as the current Frame in the output NDF
 *          (but see parameter CATFRAME). The label associated with each row 
 *          in the catalogue is the detector name. If a null value (!) is 
 *          supplied, no output catalogue is produced. See also parameter 
@@ -290,6 +291,8 @@
 *        We do not need a double size weights array if GENVAR is FALSE.
 *     30-NOV-2006 (DSB):
 *        Added parameter SPARSE.
+*     6-DEC-2006 (DSB):
+*        Add detgrp to the smf_cubegrid argument list.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -349,9 +352,6 @@
 #define TASK_NAME "MAKECUBE"
 #define LEN__METHOD 20
 
-/* Returns nearest integer to "x" */
-#define NINT(x) ( ( (x) > 0 ) ? (int)( (x) + 0.5 ) : (int)( (x) - 0.5 ) )
-
 void smurf_makecube( int *status ) {
 
 /* Local Variables */
@@ -368,13 +368,10 @@ void smurf_makecube( int *status ) {
    Grp *ogrp = NULL;          /* Group containing output file */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
    char *pname = NULL;        /* Name of currently opened data file */
-   char reflat[ 41 ];         /* Reference latitude string */
-   char reflon[ 41 ];         /* Reference longitude string */
    char spbuf[ 10 ];          /* Text buffer for SPREAD parameter value */
    char system[ 10 ];         /* Celestial coord system for output cube */
    double par[ 7 ];           /* Projection parameter */
    double params[ 4 ];        /* astRebinSeq parameters */
-   double pixsize[ 2 ];       /* Pixel sizes in arc-seconds */
    int autogrid;              /* Determine projection parameters automatically? */
    int axes[ 2 ];             /* Indices of selected axes */
    int flag;                  /* Is group expression to be continued? */
@@ -388,7 +385,6 @@ void smurf_makecube( int *status ) {
    int nparam;                /* No. of parameters required for spreading scheme */
    int npos;                  /* Number of samples included in output NDF */
    int nposout;               /* Number of spatial elements in output NDF */
-   int nval;                  /* Number of supplied positions */
    int ondf;                  /* output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
    int outsize;               /* Number of files in output group */
@@ -455,118 +451,12 @@ void smurf_makecube( int *status ) {
    parGet0l( "AUTOGRID", &autogrid, status );
 
 /* Calculate the default grid parameters. */
-   smf_cubegrid( igrp,  size, system, usedetpos, autogrid, par, &moving, 
-                 &oskyfrm, status );
-
-/* See if the output cube is to include a spatial projection, or a sparse
-   list of spectra. */
-   parDef0l( "SPARSE", ( par[ 0 ] == AST__BAD ), status );
-   parGet0l( "SPARSE",  &sparse, status );
+   smf_cubegrid( igrp,  size, system, usedetpos, autogrid, detgrp, 
+                 par, &moving, &oskyfrm, &sparse, status );
 
 /* If we are producing an output cube with the XY plane being a spatial
-   projection, then get the parameters describing the projection, using the
-   defaults calculated above. */
+   projection... */
    if( !sparse && *status == SAI__OK ) {
-
-/* Ensure we have usable XRPIX1/2 values */
-      if( par[ 0 ] == AST__BAD ) par[ 0 ] = 1.0;
-      if( par[ 1 ] == AST__BAD ) par[ 1 ] = 1.0;
-
-/* Get the reference position strings. Use a temprary SkyFrame to
-   unformat them into radians. */
-      if( par[ 2 ] != AST__BAD ) parDef0c( "REFLON", astFormat( oskyfrm, 1, 
-                                                     par[ 2 ] ), status );
-      if( par[ 3 ] != AST__BAD ) parDef0c( "REFLAT", astFormat( oskyfrm, 2, 
-                                                     par[ 3 ] ), status );
-
-      parGet0c( "REFLON", reflon, 40, status );
-      parGet0c( "REFLAT", reflat, 40, status );
-
-      if( *status == SAI__OK ) {
-         if( astUnformat( oskyfrm, 1, reflon, par + 2 ) == 0 && *status == SAI__OK ) {
-            msgSetc( "REFLON", reflon );
-            errRep( "", "Bad value supplied for REFLON: '^REFLON'", status );
-         }
-      
-         if( astUnformat( oskyfrm, 2, reflat, par + 3 ) == 0 && *status == SAI__OK ) {
-            msgSetc( "REFLAT", reflat );
-            errRep( "", "Bad value supplied for REFLAT: '^REFLAT'", status );
-         }  
-      }
-   
-/* Get the user defined spatial pixel size in arcsec (the calibration for 
-   the spectral axis is fixed by the first input data file - see 
-   smf_cubebounds.c). First convert the autogrid values form rads to arcsec
-   and establish them as the dynamic default for "PIXSIZE". */
-      if( par[ 4 ] != AST__BAD && par[ 5 ] != AST__BAD ) {
-         pixsize[ 0 ] = 0.1*NINT( fabs( par[ 4 ] )*AST__DR2D*36000.0 );
-         pixsize[ 1 ] = 0.1*NINT( fabs( par[ 5 ] )*AST__DR2D*36000.0 );
-         parDef1d( "PIXSIZE", ( pixsize[ 0 ] == pixsize[ 1 ] ) ? 1 : 2, 
-                   pixsize, status );
-      }
-      parGet1d( "PIXSIZE", 2, pixsize, &nval, status );
-
-/* If OK, duplicate the first value if only one value was supplied. */
-      if( *status == SAI__OK ) {
-         if( nval < 2 ) pixsize[ 1 ] = pixsize[ 0 ];
-   
-/* Check the values are OK. */
-         if( pixsize[ 0 ] <= 0 || pixsize[ 1 ] <= 0 ) {
-            msgSetd( "P1", pixsize[ 0 ] );
-            msgSetd( "P2", pixsize[ 1 ] );
-            *status = SAI__ERROR;
-            errRep( FUNC_NAME, "Invalid pixel sizes (^P1,^P2).", status);
-         }
-
-/* Convert to rads, and set the correct signs. */
-         if( par[ 4 ] == AST__BAD || par[ 4 ] < 0.0 ) {
-            par[ 4 ] = -pixsize[ 0 ]*AST__DD2R/3600.0;
-         } else {
-            par[ 4 ] = pixsize[ 0 ]*AST__DD2R/3600.0;
-         }
-
-         if( par[ 5 ] == AST__BAD || par[ 5 ] < 0.0 ) {
-            par[ 5 ] = -pixsize[ 1 ]*AST__DD2R/3600.0;
-         } else {
-            par[ 5 ] = pixsize[ 1 ]*AST__DD2R/3600.0;
-         }
-         
-      }
-   
-/* Convert the autogrid CROTA value from rads to degs and set as the
-   dynamic default for parameter CROTA (the position angle of the output 
-   Y axis, in degrees). The get the CROTA value and convert to rads. */
-      if( par[ 6 ] != AST__BAD ) parDef0d( "CROTA", par[ 6 ]*AST__DR2D, 
-                                           status );
-      parGet0d( "CROTA", par + 6, status );
-      par[ 6 ] *= AST__DD2R;
-
-/* Abort if an error has occurred. */
-      if( *status != SAI__OK ) goto L999;
-
-/* Display the projection parameters being used. */
-      msgBlank( status );
-      msgOutif( MSG__NORM, " ", "   Projection parameters used:", status );
-      msgSetd( "V", par[ 0 ] );
-      msgOutif( MSG__NORM, " ", "      CRPIX1 = ^V", status );
-      msgSetd( "V", par[ 1 ] );
-      msgOutif( MSG__NORM, " ", "      CRPIX2 = ^V", status );
-      msgSetd( "V", par[ 2 ]*AST__DR2D );
-      msgSetc( "V2", astFormat( oskyfrm, 1, par[ 2 ] ) );
-      msgSetc( "S", astGetC( oskyfrm, "Symbol(1)" ) );
-      msgOutif( MSG__NORM, " ", "      CRVAL1 = ^V ( ^S = ^V2 )", status );
-      msgSetd( "V", par[ 3 ]*AST__DR2D );
-      msgSetc( "V2", astFormat( oskyfrm, 2, par[ 3 ] ) );
-      msgSetc( "S", astGetC( oskyfrm, "Symbol(2)" ) );
-      msgOutif( MSG__NORM, " ", "      CRVAL2 = ^V ( ^S = ^V2 )", status );
-      msgSetd( "V", par[ 4 ]*AST__DR2D );
-      msgSetd( "V2", 0.1*NINT(par[ 4 ]*AST__DR2D*36000.0) );
-      msgOutif( MSG__NORM, " ", "      CDELT1 = ^V ( ^V2 arcsec )", status );
-      msgSetd( "V", par[ 5 ]*AST__DR2D );
-      msgSetd( "V2", 0.1*NINT(par[ 5 ]*AST__DR2D*36000.0) );
-      msgOutif( MSG__NORM, " ", "      CDELT2 = ^V ( ^V2 arcsec )", status );
-      msgSetd( "V", par[ 6 ]*AST__DR2D );
-      msgOutif( MSG__NORM, " ", "      CROTA2 = ^V", status );
 
 /* Validate the input files, create the WCS FrameSet to store in the
    output cube, and get the pixel index bounds of the output cube. */
@@ -586,11 +476,6 @@ void smurf_makecube( int *status ) {
 
 /* Now deal with sparse output cubes. */
    } else {
-
-/* Indicate that no spatial projection will be used. */
-      msgBlank( status );
-      msgOutif( MSG__NORM, " ", "   The output will be a sparse array "
-                "containing a list of spectra.", status );
 
 /* Validate the input files, create the WCS FrameSet to store in the
    output cube, and get the pixel index bounds of the output cube. */

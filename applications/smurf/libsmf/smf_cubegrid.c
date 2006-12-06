@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
-*                   int autogrid, double par[ 7 ], int *moving, 
-*                   AstSkyFrame **skyframe, int *status );
+*                   int autogrid, Grp *detgrp, double par[ 7 ], int *moving, 
+*                   AstSkyFrame **skyframe, int *sparse, int *status );
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -42,6 +42,9 @@
 *        If autogrid is zero, CRPIX1/2 are set to zero, CRVAL1/2 are set to 
 *        the first pointing BASE position, CROTA2 is set to zero, CDELT1/2 
 *        are set to 6 arc-seconds.
+*     detgrp = Grp * (Given)
+*        A Group containing the names of the detectors to be stored in the 
+*        output catalogue. All detectors will be used if this group is empty.
 *     par = double[ 7 ] (Returned)
 *        An array holding the parameters describing the spatial projection
 *        between celestial (longitude,latitude) in the system specified
@@ -62,6 +65,8 @@
 *        If "moving" is non-zero, the spatial axes represent (lon,lat) 
 *        offsets in the tracking frame from the base telescope position 
 *        associated with the last time slice.
+*     sparse = int * (Returned)
+*        Should a sparse output cube be created?
 *     status = int * (Given and Returned)
 *        Pointer to inherited status.
 
@@ -91,6 +96,8 @@
 *     30-NOV-2006 (DSB):
 *        Returned AST__BAD values if the grid parameters cannot be
 *        determined.
+*     6-DEC-2006 (DSB):
+*        Added "detgrp" parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -140,9 +147,13 @@
 
 #define FUNC_NAME "smf_cubegrid"
 
+
+/* Returns nearest integer to "x" */
+#define NINT(x) ( ( (x) > 0 ) ? (int)( (x) + 0.5 ) : (int)( (x) - 0.5 ) )
+
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
-                   int autogrid, double par[ 7 ], int *moving, 
-                   AstSkyFrame **skyframe, int *status ){
+                   int autogrid, Grp *detgrp, double par[ 7 ], int *moving, 
+                   AstSkyFrame **skyframe, int *sparse, int *status ){
 
 /* Local Variables */
    AstFrame *sf1 = NULL;      /* Spatial Frame representing AZEL system */
@@ -150,8 +161,12 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    AstFrame *skyframein = NULL; /* SkyFrame from input WCS FrameSet */
    AstFrame *skyin = NULL;    /* Sky Frame in input FrameSet */
    AstFrameSet *fs = NULL;    /* A general purpose FrameSet pointer */
+   char reflat[ 41 ];         /* Reference latitude string */
+   char reflon[ 41 ];         /* Reference longitude string */
+   const char *deflon;        /* Default for REFLON */
+   const char *deflat;        /* Default for REFLAT */
    AstFrameSet *swcsin = NULL;/* FrameSet describing spatial input WCS */
-   Grp *labgrp;          /* GRP group holding detector labels */
+   Grp *labgrp;               /* GRP group holding detector labels */
    char *pname = NULL;        /* Name of currently opened data file */
    char outcatnam[ 41 ];      /* Output catalogue name */
    const char *lab = NULL;    /* Pointer to start of next detector name */
@@ -163,6 +178,9 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    double *px;           /* Pointer to next value */
    double *py;           /* Pointer to next value */
    double *xin = NULL;   /* Workspace for detector input grid positions */
+   double defrot;        /* Default for CROTA parameter */
+   double defsize[ 2 ];  /* Default pixel sizes in arc-seconds */
+   double pixsize[ 2 ];  /* Pixel sizes in arc-seconds */
    double *xout = NULL;  /* Workspace for detector output pixel positions */
    double *yin = NULL;   /* Workspace for detector input grid positions */
    double *yout = NULL;  /* Workspace for detector output pixel positions */
@@ -170,6 +188,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    double b;             /* Latitude value */
    double sep;           /* Separation between first and last base positions */
    float *pdata;         /* Pointer to next data sample */
+   int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ifile;            /* Index of current input file */
@@ -177,8 +196,10 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    int ipos;             /* Position index */
    int irec;             /* Index of current input detector */
    int ispec;            /* Index of current spectral sample */
+   int nval;             /* Number of values supplied */
+   int usedefs;          /* Are default projection parameters being used? */
    int itime;            /* Index of current time slice */
-   int nallpos;          /* Number of positions to store in output catalogue */
+   int nallpos;          /* Number of positions */
    int outcat;           /* Produce an output catalogue holding sample positions? */
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */
@@ -212,7 +233,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    nallpos = 0;
 
 /* If we are creating an output catalogue, create a GRP group to hold the
-   labels to bne associated with each position. */
+   labels to be associated with each position. */
    if( outcat ) {
       labgrp = grpNew( "Detector labels", status );
    } else {
@@ -481,9 +502,17 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
          lab = hdr->detname;
          for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
 
-/* If the detector has a valid position, see if it produced any good
-   data values. */
-            if( xout[ irec ] != AST__BAD && yout[ irec ] != AST__BAD ) {
+/* See if this detector is included in the group of detectors to be used. */
+            if( detgrp ) {    
+               grpIndex( lab, detgrp, 1, &found, status );
+            } else {
+               found = 1;
+            }
+
+/* If it is, and if the detector has a valid position, see if it produced 
+   any good data values. */
+            if( found && xout[ irec ] != AST__BAD && 
+                         yout[ irec ] != AST__BAD ) {
                good = 0;
                for( ispec = 0; ispec < (data->dims)[ 0 ]; ispec++ ){
                   if( *(pdata++) != VAL__BADR ) {
@@ -564,6 +593,158 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
       astSetD( *skyframe, "SkyRef(2)", par[ 3 ] );
    }
 
+/* See if the output cube is to include a spatial projection, or a sparse
+   list of spectra. */
+   parDef0l( "SPARSE", ( par[ 0 ] == AST__BAD ), status );
+   parGet0l( "SPARSE",  sparse, status );
+
+/* If we are producing an output cube with the XY plane being a spatial
+   projection, then get the parameters describing the projection, using the
+   defaults calculated above. */
+   if( !*sparse && *status == SAI__OK ) {
+
+/* Set up a flag indicating that the default values calculated above are
+   being used. */
+      usedefs = 1;
+
+/* Ensure we have usable XRPIX1/2 values */
+      if( par[ 0 ] == AST__BAD ) par[ 0 ] = 1.0;
+      if( par[ 1 ] == AST__BAD ) par[ 1 ] = 1.0;
+
+/* Get the reference position strings. Use a temprary SkyFrame to
+   unformat them into radians. */
+      if( par[ 2 ] != AST__BAD ) {
+         deflon = astFormat( *skyframe, 1, par[ 2 ] );
+         parDef0c( "REFLON", deflon, status );
+      } else {
+         deflon = NULL;
+      }
+
+      if( par[ 3 ] != AST__BAD ) {
+         deflat = astFormat( *skyframe, 2, par[ 3 ] );
+         parDef0c( "REFLAT", deflat, status );
+      } else {
+         deflat = NULL;
+      }
+
+      parGet0c( "REFLON", reflon, 40, status );
+      parGet0c( "REFLAT", reflat, 40, status );
+
+      if( *status == SAI__OK ) {
+
+         if( ( deflat && strcmp( deflat, reflat ) ) ||
+             ( deflon && strcmp( deflon, reflon ) ) ) usedefs = 0;
+         
+         if( astUnformat( *skyframe, 1, reflon, par + 2 ) == 0 && *status == SAI__OK ) {
+            msgSetc( "REFLON", reflon );
+            errRep( "", "Bad value supplied for REFLON: '^REFLON'", status );
+         }
+      
+         if( astUnformat( *skyframe, 2, reflat, par + 3 ) == 0 && *status == SAI__OK ) {
+            msgSetc( "REFLAT", reflat );
+            errRep( "", "Bad value supplied for REFLAT: '^REFLAT'", status );
+         }  
+      }
+   
+/* Get the user defined spatial pixel size in arcsec (the calibration for 
+   the spectral axis is fixed by the first input data file - see 
+   smf_cubebounds.c). First convert the autogrid values form rads to arcsec
+   and establish them as the dynamic default for "PIXSIZE". */
+      if( par[ 4 ] != AST__BAD && par[ 5 ] != AST__BAD ) {
+         defsize[ 0 ] = 0.1*NINT( fabs( par[ 4 ] )*AST__DR2D*36000.0 );
+         defsize[ 1 ] = 0.1*NINT( fabs( par[ 5 ] )*AST__DR2D*36000.0 );
+         parDef1d( "PIXSIZE", ( defsize[ 0 ] == defsize[ 1 ] ) ? 1 : 2, 
+                   defsize, status );
+      }
+      parGet1d( "PIXSIZE", 2, pixsize, &nval, status );
+
+/* If OK, duplicate the first value if only one value was supplied. */
+      if( *status == SAI__OK ) {
+         if( nval < 2 ) pixsize[ 1 ] = pixsize[ 0 ];
+
+         if( defsize[ 0 ] != pixsize[ 0 ] ||
+             defsize[ 1 ] != pixsize[ 1 ] ) usedefs = 0;
+   
+/* Check the values are OK. */
+         if( pixsize[ 0 ] <= 0 || pixsize[ 1 ] <= 0 ) {
+            msgSetd( "P1", pixsize[ 0 ] );
+            msgSetd( "P2", pixsize[ 1 ] );
+            *status = SAI__ERROR;
+            errRep( FUNC_NAME, "Invalid pixel sizes (^P1,^P2).", status);
+         }
+
+/* Convert to rads, and set the correct signs. */
+         if( par[ 4 ] == AST__BAD || par[ 4 ] < 0.0 ) {
+            par[ 4 ] = -pixsize[ 0 ]*AST__DD2R/3600.0;
+         } else {
+            par[ 4 ] = pixsize[ 0 ]*AST__DD2R/3600.0;
+         }
+
+         if( par[ 5 ] == AST__BAD || par[ 5 ] < 0.0 ) {
+            par[ 5 ] = -pixsize[ 1 ]*AST__DD2R/3600.0;
+         } else {
+            par[ 5 ] = pixsize[ 1 ]*AST__DD2R/3600.0;
+         }
+         
+      }
+   
+/* Convert the autogrid CROTA value from rads to degs and set as the
+   dynamic default for parameter CROTA (the position angle of the output 
+   Y axis, in degrees). The get the CROTA value and convert to rads. */
+      if( par[ 6 ] != AST__BAD ) {
+         defrot = par[ 6 ]*AST__DR2D;
+         parDef0d( "CROTA", defrot, status );
+      } else {
+         defrot = AST__BAD;
+      }
+
+      parGet0d( "CROTA", par + 6, status );
+      if( par[ 6 ] != defrot ) usedefs = 0;
+      par[ 6 ] *= AST__DD2R;
+
+/* If any parameter were given explicit values which differ from the
+   default values, then we need to re-calculate the optimal CRPIX1/2 
+   values. */
+      if( !usedefs && autogrid && usesys ) {
+         par[ 0 ] = AST__BAD;
+         par[ 1 ] = AST__BAD;
+         kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par, status );
+      }
+
+/* Abort if an error has occurred. */
+      if( *status != SAI__OK ) goto L999;
+
+/* Display the projection parameters being used. */
+      msgBlank( status );
+      msgOutif( MSG__NORM, " ", "   Projection parameters used:", status );
+      msgSetd( "V", par[ 0 ] );
+      msgOutif( MSG__NORM, " ", "      CRPIX1 = ^V", status );
+      msgSetd( "V", par[ 1 ] );
+      msgOutif( MSG__NORM, " ", "      CRPIX2 = ^V", status );
+      msgSetd( "V", par[ 2 ]*AST__DR2D );
+      msgSetc( "V2", astFormat( *skyframe, 1, par[ 2 ] ) );
+      msgSetc( "S", astGetC( *skyframe, "Symbol(1)" ) );
+      msgOutif( MSG__NORM, " ", "      CRVAL1 = ^V ( ^S = ^V2 )", status );
+      msgSetd( "V", par[ 3 ]*AST__DR2D );
+      msgSetc( "V2", astFormat( *skyframe, 2, par[ 3 ] ) );
+      msgSetc( "S", astGetC( *skyframe, "Symbol(2)" ) );
+      msgOutif( MSG__NORM, " ", "      CRVAL2 = ^V ( ^S = ^V2 )", status );
+      msgSetd( "V", par[ 4 ]*AST__DR2D );
+      msgSetd( "V2", 0.1*NINT(par[ 4 ]*AST__DR2D*36000.0) );
+      msgOutif( MSG__NORM, " ", "      CDELT1 = ^V ( ^V2 arcsec )", status );
+      msgSetd( "V", par[ 5 ]*AST__DR2D );
+      msgSetd( "V2", 0.1*NINT(par[ 5 ]*AST__DR2D*36000.0) );
+      msgOutif( MSG__NORM, " ", "      CDELT2 = ^V ( ^V2 arcsec )", status );
+      msgSetd( "V", par[ 6 ]*AST__DR2D );
+      msgOutif( MSG__NORM, " ", "      CROTA2 = ^V", status );
+
+/* If no grid was found, indicate that no spatial projection will be used. */
+   } else {
+      msgBlank( status );
+      msgOutif( MSG__NORM, " ", "   The output will be a sparse array "
+                "containing a list of spectra.", status );
+   }
+
 /* If creating an output catalogue, re-order the array containing the 
    positions so that all the longitude values come at the start of the 
    array, followed by all the latitude values. */
@@ -572,6 +753,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
       px = allpos2;
       py = allpos2 + nallpos;
       p = allpos;
+
       for( ipos = 0; ipos < nallpos; ipos++ ) {
          *(px++) = *(p++);
          *(py++) = *(p++);
@@ -585,6 +767,8 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* Free resources. */
       allpos2 = astFree( allpos2 );
    } 
+
+L999:;
 
 /* Free work space. */
    allpos = astFree( allpos );

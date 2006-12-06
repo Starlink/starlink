@@ -460,8 +460,9 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
                     float *var_array, double *wgt_array, int *status );
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
-                   int autogrid, double par[ 7 ], int *moving, 
-                   AstSkyFrame **skyframe, int *status );
+                   int autogrid, Grp *detgrp, double par[ 7 ], 
+                   int *moving, AstSkyFrame **skyframe, int *sparse, 
+                   int *status );
 
 const char *smf_convert_system( const char *label, int *status );
 
