@@ -86,6 +86,10 @@
 *        Ensure no units are displayed for redshift values.
 *     5-DEC-2006 (DSB):
 *        Ensure SourceVel is accessed as an apparent velocity.
+*     6-DEC-2006 (DSB):
+*        Display SourceVel in system specified by SourceSys unless
+*        SourceSys is not set, in which case use main SpecFrame System if
+*        possible.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -129,7 +133,8 @@
       CHARACTER SIGN*1           ! Sign of day value
       CHARACTER SOR*30           ! Spectral standard of rest 
       CHARACTER SREFIS*10        ! Value of SkyFrame SkyRefIs attribute
-      CHARACTER SYS*30           ! Sky coordinate system
+      CHARACTER SYS*30           ! Coordinate system
+      CHARACTER SSYS*30          ! SourceSys value
       CHARACTER TSC*30           ! Time Scale of TimeFrame
       CHARACTER UNIT*20          ! Units string
       DOUBLE PRECISION EP        ! Epoch of observation
@@ -149,6 +154,7 @@
       INTEGER IY                 ! Year
       INTEGER J                  ! SLALIB status
       LOGICAL SHOWEP             ! Display the Epoch value?
+      LOGICAL SSSET              ! SourceSys assigned a value?
       LOGICAL SHOWOB             ! Display the Observers position?
 
       DATA MONTH/ 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 
@@ -394,40 +400,51 @@
             IF( SOR .EQ. 'SOURCE' .OR.
      :          AST_TEST( FRM, 'SourceVel', STATUS ) ) THEN
 
+*  If SourceSys is not set, temporarily set it to the same value as the
+*  main SpecFrame, so long as it is a System supported by SourceSys.
+               SSSET = AST_TEST( FRM, 'SourceSys', STATUS )
+               IF( .NOT. SSSET .AND. ( SYS .EQ. 'VRAD' .OR. 
+     :                                 SYS .EQ. 'VOPT' .OR.
+     :                                 SYS .EQ. 'ZOPT' .OR. 
+     :                                 SYS .EQ. 'BETA' .OR.
+     :                                 SYS .EQ. 'VELO' ) ) THEN
+                  CALL AST_SETC( FRM, 'SourceSys', SYS, STATUS )
+               END IF
+
 *  See what spectral system the SourceVel value is stored in.
-               SYS = AST_GETC( FRM, 'SourceSys', STATUS )
+               SSYS = AST_GETC( FRM, 'SourceSys', STATUS )
 
 *  Get the source velocity in the above system.
                SRCVEL = AST_GETD( FRM, 'SourceVel', STATUS ) 
 
 *  Set suitable label, title and unit strings.
-               IF( SYS .EQ. 'VRAD' ) THEN
+               IF( SSYS .EQ. 'VRAD' ) THEN
                   CALL MSG_SETC( 'LABEL', 'Radio velocity' )
                   CALL MSG_SETC( 'TTL', 'velocity' )
                   CALL MSG_SETC( 'UNIT', 'km/s' )
 
-               ELSE IF( SYS .EQ. 'VOPT' ) THEN
+               ELSE IF( SSYS .EQ. 'VOPT' ) THEN
                   CALL MSG_SETC( 'LABEL', 'Optical velocity' )
                   CALL MSG_SETC( 'TTL', 'velocity' )
                   CALL MSG_SETC( 'UNIT', 'km/s' )
 
-               ELSE IF( SYS .EQ. 'ZOPT' ) THEN
+               ELSE IF( SSYS .EQ. 'ZOPT' ) THEN
                   CALL MSG_SETC( 'LABEL', 'Redshift' )
                   CALL MSG_SETC( 'TTL', 'redshift' )
                   CALL MSG_SETC( 'UNIT', ' ' )
 
-               ELSE IF( SYS .EQ. 'BETA' ) THEN
+               ELSE IF( SSYS .EQ. 'BETA' ) THEN
                   CALL MSG_SETC( 'LABEL', 'Beta factor' )
                   CALL MSG_SETC( 'TTL', 'velocity' )
                   CALL MSG_SETC( 'UNIT', ' ' )
 
-               ELSE IF( SYS .EQ. 'VELO' ) THEN
+               ELSE IF( SSYS .EQ. 'VELO' ) THEN
                   CALL MSG_SETC( 'LABEL', 'Apparent radial velocity' )
                   CALL MSG_SETC( 'TTL', 'velocity' )
                   CALL MSG_SETC( 'UNIT', 'km/s' )
 
                ELSE
-                  CALL MSG_SETC( 'LABEL', SYS )
+                  CALL MSG_SETC( 'LABEL', SSYS )
                   CALL MSG_SETC( 'UNIT', ' ' )
                   CALL MSG_SETC( 'TTL', 'velocity' )
                END IF
@@ -458,6 +475,11 @@
                CALL MSG_OUT( 'WCS_VELSOR', 
      :            IND( : NIND )//'Source ^TTL     : ^V ^UNIT '//
      :            '(^SOR ^LABEL)', STATUS )
+            END IF
+
+*  If SourceSys was not set originally, clear it now.
+            IF( .NOT. SSSET ) THEN
+               CALL AST_CLEAR( FRM, 'SourceSys', STATUS )
             END IF
 
 * Reference position...
