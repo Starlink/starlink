@@ -1,7 +1,19 @@
 use strict;
 use ExtUtils::MakeMaker;
+use vars qw/ %StarConfig /;
+
+# For location of Starlink libraries and incs
+eval "use Starlink::Config qw/ :override :verbose /;";
+if ( $@ ) {
+  print "Could not find Starlink::Config - using /star\n";
+  %StarConfig = (
+                 Star_Bin => '/star/bin',
+                );
+}
 
 WriteMakefile(
+              'EXE_FILES' => [ 'autoastrom' ],
+              'INSTALLSCRIPT' => "$StarConfig{Star_Bin}/autoastrom",
               'NAME' => 'Starlink::Autoastrom',
               'VERSION_FROM' => 'Autoastrom.pm',
               'PREREQ_PM' => {
