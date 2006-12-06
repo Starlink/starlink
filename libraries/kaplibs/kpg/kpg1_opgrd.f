@@ -81,6 +81,8 @@
 *     30-NOV-2006 (DSB):
 *        Return supplied parameter values unchanged if no periodicity can
 *        be found in the supplied positions.
+*     6-DEC-2006 (DSB):
+*        Fix bug that gave erroneous CRPIX1/2 values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -604,6 +606,11 @@
             PAR0( 6 ) = NINT( PAR0( 6 )*AST__DR2D*36000.0 )/
      :                         (36000.0*AST__DR2D)
 
+*  Copy any supplied values into the projection parameters array.
+            DO I = 1, 7
+               IF( PAR( I ) .NE. AST__BAD ) PAR0( I ) = PAR( I )
+            END DO
+
 *  We now find a small (less than one pixel) change to PAR0(1) and
 *  PAR0(2) that causes more samples to be projected to the centre of the
 *  corresponding pixel. First create a Mapping from the above projection
@@ -651,9 +658,10 @@
 *  If the reference point sky coords were supplied, modify the CRPIX1/2
 *  values to put the refence point at the right place, leaving CRVAL1/2 
 *  unchanged.
-            IF( PAR( 3 ) .NE. AST__BAD .OR.PAR( 4 ) .NE. AST__BAD ) THEN
+            IF( PAR( 3 ) .NE. AST__BAD .OR. 
+     :          PAR( 4 ) .NE. AST__BAD ) THEN
                PAR0( 1 ) = PAR0( 1 ) + DX
-               PAR0( 2 ) = PAR0( 2 ) + DX
+               PAR0( 2 ) = PAR0( 2 ) + DY
 
 *  If the reference point sky coords were not supplied, modify the CRVAL1/2
 *  values so that CRPIX1/2 can retain the existing nice integer values.
@@ -978,6 +986,8 @@
          SUM2 = SUM2 + HIST( I )**2
       END DO
 
+c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' mxamp: ',mxamp
+
 *  If it looks like the new angle may be better than the supplied MXANG
 *  angle, then we continue to evaluate the wavelength of the periodicity.
       IF( SUM2 .GT. MXAMP ) THEN
@@ -1036,16 +1046,22 @@
          END DO
 
 *  Fit a quadratic to the AMP valuies at the highest point (SHIFT) and its
-*  two neighbours, and hten find the peak of the quadratic in order to get 
+*  two neighbours, and then find the peak of the quadratic in order to get 
 *  a more accurate estimate of the peak position.
          XSHIFT = SHIFT + 0.5*( LLSUM2 - SUM2 )/
      :                        ( LLSUM2 + SUM2 - 2*LSUM2 )
+
+c         call opgrd_dump( histsz, hist, .false., ang, status )
+c         call opgrd_autodump( ang, histsz, hist, status )
 
 *  SHIFT is left holding the shift at the first significant peak in the
 *  auto-correlation function. Check a peak was found, and convert the
 *  shift value to a wavelength in grid pixels.
          IF( SHIFT .LT. HISTSZ ) THEN
             NEWWAV = XSHIFT*SPC
+
+c      write(*,*) '   new total: ',NEWAMP*NEWWAV*NEWWAV,
+c     :           ' old total: ',MXAMP*MXWAVE*MXWAVE
 
 *  We use the new angle if the auto-correlation peak produces a greater
 *  total squared value (over the entire area of the pixel) than the old 
@@ -1055,6 +1071,8 @@
                MXAMP = NEWAMP
                MXWAVE = NEWWAV
             END IF
+c         else
+c            write(*,*) 'No peak found'
          END IF
       END IF
 
@@ -1297,7 +1315,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Set up the size (as a fraction of a grid pixel) of each cell in the
-*  test grid. The intial test grid covers a little more than one grid pixel.
+*  test grid. The initial test grid covers a little more than one grid pixel.
       PSTEP = 1.1/( 2*HSIZE + 1 )
 
 *  Set up the offset values at the centre of the test grid.
@@ -1314,7 +1332,7 @@
 *  current test grid.
          SMIN = VAL__MAXR
 
-*  Loop round every cellin the current test grid, finding the pixel offsets 
+*  Loop round every cell in the current test grid, finding the pixel offsets 
 *  corresponding to the centre of the cell.
          DO J = -HSIZE, HSIZE
             BT = PCENB + PSTEP*J
@@ -1324,7 +1342,7 @@
    
 *  Find the error function (always positive) at these pixel offsets.
                S = KPG1_OPGR3( N, X, Y, AT, BT, STATUS )
-   
+
 *  Note if this error function value is smaller than any other found so
 *  far.
                IF( S .LT. SMIN ) THEN
@@ -1366,11 +1384,13 @@
       include 'SAE_PAR'
       include 'DAT_PAR'
       include 'CNF_PAR'
+      include 'AST_PAR'
 
       logical dumpit
       common /fred/ dumpit
 
-      integer n, ang, status, place, indf, el, iat, pntr
+      double precision ang
+      integer n, status, place, indf, el, iat, pntr
       real dat( n )
       logical fft
       character name*30
@@ -1387,7 +1407,7 @@
          iat = 4
       end if
 
-      call chr_puti( ang, name, iat )
+      call chr_puti( nint(AST__DR2D*ang), name, iat )
       call ndf_place( DAT__ROOT, name( : iat ), place, status )
       call ndf_newp( '_REAL', 1, n, place, indf, status )
       call ndf_map( indf, 'data', '_REAL', 'WRITE', pntr, el, status )
@@ -1450,7 +1470,7 @@
          hist( i1 ) = 0
       end do
 
-      call opgrd_dump( n, hist, .true., nint(AST__DR2D*ang), status )
+      call opgrd_dump( n, hist, .true., ang, status )
 
       end
 
