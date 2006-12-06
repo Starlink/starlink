@@ -519,9 +519,11 @@ itcl::class gaia::GaiaSpectralPlot {
       #  When autoscaling (or just created one of the plots), set the frameset
       #  and the NDF data units, and the offset to the start of the spectrum.
       if { $autoscale || $itk_option(-autoscale) } {
-         set frameset [$accessor getaxiswcs $axis]
+         set frameset [$accessor getwcs]
 
-         $itk_component(canvas) itemconfigure $spectrum_ -frameset $frameset
+         $itk_component(canvas) itemconfigure $spectrum_ \
+            -axis $axis \
+            -frameset $frameset
          $itk_component(canvas) itemconfigure $spectrum_ \
             -dataunits [$accessor getc units] \
             -datalabel [$accessor getc label] \
@@ -690,8 +692,8 @@ itcl::class gaia::GaiaSpectralPlot {
             set ref_lines_coord_($id) $x0
 
             #  World to grid.
-            set frameset [$itk_component(canvas) itemcget $spectrum_ -frameset]
-            set ind [gaiautils::getaxiscoord $frameset $x0 0]
+            set mapping [$itk_component(canvas) itemcget $spectrum_ -mapping]
+            set ind [gaiautils::getaxiscoord $mapping $x0 0]
 
             eval $itk_option(-ref_line_changed_cmd) $id $ind $mode
          }
@@ -812,9 +814,9 @@ itcl::class gaia::GaiaSpectralPlot {
             set ref_ranges_coord_($id) "$x0 $x1"
 
             #  World to grid.
-            set frameset [$itk_component(canvas) itemcget $spectrum_ -frameset]
-            set ind0 [gaiautils::getaxiscoord $frameset $x0 0]
-            set ind1 [gaiautils::getaxiscoord $frameset $x1 0]
+            set mapping [$itk_component(canvas) itemcget $spectrum_ -mapping]
+            set ind0 [gaiautils::getaxiscoord $mapping $x0 0]
+            set ind1 [gaiautils::getaxiscoord $mapping $x1 0]
 
             eval $itk_option(-ref_range_changed_cmd) $id $ind1 $ind0 $mode
          }
@@ -1068,7 +1070,8 @@ itcl::class gaia::GaiaSpectralPlot {
             }
             set dataunit [$itk_component(canvas) itemcget $spectrum_ -dataunit]
             set frameset [$itk_component(canvas) itemcget $spectrum_ -frameset]
-            set coordunit [gaiautils::astget $frameset "unit(1)"]
+            set axis [$itk_component(canvas) itemcget $spectrum_ -axis]
+            set coordunit [gaiautils::astget $frameset "unit($axis)"]
 
             $sender send_spectrum $filename $shortname \
                $coordunit $dataunit $recipients
