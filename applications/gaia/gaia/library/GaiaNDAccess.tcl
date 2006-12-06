@@ -509,7 +509,7 @@ itcl::class gaia::GaiaNDAccess {
    }
 
    #  See if the axes of the dataset frameset is a known frametype. These
-   #  can be "specframe", "fluxframe" and "dsbspecframe".
+   #  can be "specframe", "fluxframe", "dsbspecframe" and "timeframe".
    public method isaxisframetype {axis type} {
       set wcs [${type_}::getwcs $handle_]
       return [gaiautils::frameisa $wcs $axis $type]

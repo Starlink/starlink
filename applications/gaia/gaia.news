@@ -1,5 +1,7 @@
   Latest changes:
 
+    Timeseries cubes can now be switched between different time scales.
+
     The cube spectral extraction now handles dependent axes (like RA and Dec),
     differently so that more extractions along one of these axes will succeed.
 
