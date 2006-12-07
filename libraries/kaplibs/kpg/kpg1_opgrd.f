@@ -83,6 +83,8 @@
 *        be found in the supplied positions.
 *     6-DEC-2006 (DSB):
 *        Fix bug that gave erroneous CRPIX1/2 values.
+*     7-DEC-2006 (DSB):
+*        Fix bug that could swap order of CDELT1 and CDELT2.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -572,11 +574,11 @@
 
 *  Store the CDELT1/2 parameters of the optimal grid. 
             IF( OPTY ) THEN
-               PAR0( 5 ) = -MXWAVE*PIXSCL
-               PAR0( 6 ) = PWAVE*PIXSCL
-            ELSE
                PAR0( 5 ) = -PWAVE*PIXSCL
                PAR0( 6 ) = MXWAVE*PIXSCL
+            ELSE
+               PAR0( 5 ) = -MXWAVE*PIXSCL
+               PAR0( 6 ) = PWAVE*PIXSCL
             END IF
 
 *  Store the CROTA2 parameter.
