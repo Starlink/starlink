@@ -1,7 +1,14 @@
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #define _POSIX_SOURCE 1		 /* Declare POSIX source		    */
 
 #if !defined( vms )		 /* Portable version include files:	    */
 #include <time.h>		 /* Date and time definitions		    */
+#  if HAVE_SYS_TIME_H
+#    include <sys/time.h>        /* gettimeofday                            */
+#  endif
 #endif
 
 #include "sae_par.h"		 /* Standard SAE constants		    */
@@ -79,6 +86,8 @@
 *        Original version.
 *     15-FEB-2006 (TIMJ):
 *        Use correct tm_year logic.
+*     07-DEC-2006 (TIMJ):
+*        Add sub-second accuracy for unix (gettimeofday) (was in VMS)
 *     {enter_changes_here}
 
 *  Bugs:
@@ -108,6 +117,13 @@
 #else				 /* Portable version local variables:	    */
       struct tm *local;		 /* Pointer to local time		    */
       time_t timer;		 /* Calendar time			    */
+#  if HAVE_GETTIMEOFDAY
+      struct timeval tv;         /* Calendar time and microseconds          */
+      suseconds_t usec = 0;      /* Microseconds                            */
+#  else
+      long usec = 0;             /* Microseconds                            */
+#  endif
+      int systat = 0;            /* System status                           */
 #endif
 
 /*.									    */
@@ -140,13 +156,27 @@
       
 /* Obtain the calendar time, checking that it is available. Report an error */
 /* if it is not.							    */
-      if ( time( &timer ) == (time_t) -1 )
+#if HAVE_GETTIMEOFDAY
+      systat = gettimeofday( &tv, NULL );
+      if (systat == 0) {
+	timer = tv.tv_sec;
+	usec = tv.tv_usec;
+      }
+#else
+      timer = time( NULL );
+      if (timer == (time_t)-1) {
+	systat = -1;
+      }	else {
+	systat = 0;
+      }
+#endif
+
+      if ( systat == -1 )
       {
 	 *STATUS = NDF__FATIN;
-	 ems_rep_c( "NDF1_GTIME_NONE",
-	 "This machine does not allow the current date/time to be determined \
-via the ANSI C run time library; some re-coding of the NDF_ library may be \
-necessary (in routine NDF1_GTIME).", STATUS );
+	 emsSyser( "ERRNO", errno );
+	 emsRep( "NDF1_GTIME_NONE",
+		 "Error determining current date/time: ^ERRNO", STATUS );
       }
 
 /* Convert calendar time into local time.				    */
@@ -162,7 +192,7 @@ necessary (in routine NDF1_GTIME).", STATUS );
 	 YMDHM[ 4 ] = (F77_INTEGER_TYPE) ( local->tm_min );
 	 
 /* Return the seconds value.						    */
-         *SEC = (F77_REAL_TYPE) local->tm_sec;
+         *SEC = (F77_REAL_TYPE) ((float)local->tm_sec + ((float)usec/1.0E6));
       }
 #endif
 
