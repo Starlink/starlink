@@ -128,8 +128,8 @@ int main( int argc, char *argv[] ) {
    ndfForm( indf, "Data", form, 30, &status );
    if( strcmp( form,"SCALED" ) && status == SAI__OK ) {
       status = SAI__ERROR;
-      msgSetc( "F", form );
-      ems_rep_c( "NDF_TEST_ERR0", "Incorrect array form \"^F\".", &status );
+      emsSetc( "F", form );
+      emsRep( "NDF_TEST_ERR0", "Incorrect array form \"^F\".", &status );
    }      
 
 /* Check the data type is now _DOUBLE (this is because we stored _DOUBLE
@@ -138,7 +138,7 @@ int main( int argc, char *argv[] ) {
    if( status == SAI__OK ) {
       if( strcmp( type, "_DOUBLE" ) ) {
          status = SAI__ERROR;
-         ems_rep_c( "NDF_TEST_ERR1", "Scaled array is not of type _DOUBLE.", 
+         emsRep( "NDF_TEST_ERR1", "Scaled array is not of type _DOUBLE.", 
                     &status );
       }
    }
@@ -152,21 +152,21 @@ int main( int argc, char *argv[] ) {
 /* Map its data array for update access. This should cause an error since
    the array is stored in scaled form.                                      */
    if( status == SAI__OK ) {
-      errMark();
+      emsMark();
       ndfMap( indf, "Data", "_integer", "update", &pntr, &el, &status );
       if( status == ARY__ACDEN ) {  
-         errAnnul( &status );   
+         emsAnnul( &status );   
 
       } else if( status == SAI__OK ) {
          status = SAI__ERROR;
-         ems_rep_c( "NDF_TEST_ERR1", "No error reported when mapping a "
+         emsRep( "NDF_TEST_ERR1", "No error reported when mapping a "
                     "scaled array for update access.", &status );
       } else {
-         msgSeti( "S", status );
-         ems_rep_c( "NDF_TEST_ERR1", "An incorrect error (^S) reported when mapping a "
+         emsSeti( "S", status );
+         emsRep( "NDF_TEST_ERR1", "An incorrect error (^S) reported when mapping a "
                     "scaled array for update access.", &status );
       }
-      errRlse();
+      emsRlse();
    }
 
 /* Map its data array again, this time for read access.                     */
@@ -200,7 +200,7 @@ int main( int argc, char *argv[] ) {
 /* Otherwise, report an error.                                              */
    } else {
       if ( status == SAI__OK ) status = SAI__ERROR;
-      ems_rep_c( "NDF_TEST_ERR",
+      emsRep( "NDF_TEST_ERR",
                  "NDF_TEST_C: NDF C installation test failed.", &status );
    }
 
