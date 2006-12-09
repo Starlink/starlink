@@ -428,6 +428,8 @@
 *     2006-11-21  Expanded comments section for use with 
 *                 smurf_help task and added Lissajous mode.(JB)
 *     2006-11-22  Added multiple map cycle capabilities to liss/pong (JB)
+*     2006-12-08  Removed sc2sim_simhits and replaced with 
+*                 hits-only flag (JB)
 *     {enter_further_changes_here}
 
 *    History (HEATRUN task):
@@ -532,6 +534,7 @@ void smurf_sc2sim( int *status ) {
    double elevation;               /* telescope elevation (radians) */
    char filter[8];                 /* string to hold filter name */
    double *heater=NULL;            /* bolometer heater ratios */
+   int hitsonly=0;                 /* flag to indicate hits-only simulation */
    int maxwrite;                   /* file close time */
    obsMode mode;                   /* what type of observation are we doing? */
    int nbol;                       /* total number of bolometers */
@@ -615,10 +618,12 @@ void smurf_sc2sim( int *status ) {
       /* Get the file close time */
       parGet0i("MAXWRITE", &maxwrite, status);
 
+      hitsonly = 0;
+
       sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
                         filter, heater, maxwrite, mode, coordframe, nbol, 
 			pzero, rseed, samptime, weights, xbc, xbolo, ybc, 
-			ybolo, status);
+			ybolo, hitsonly, status);
 
    }  else if ( mode == pong || mode == singlescan || mode == bous || 
                 mode == liss ) {
@@ -637,23 +642,33 @@ void smurf_sc2sim( int *status ) {
             final version.  JB  ***/
 
       /* Check if this is a full of weights-only simulation */
-      parChoic( "SIMTYPE", "FULL", "FULL, WEIGHTS", 1, simtype, LEN__METHOD, status);
+      parChoic( "SIMTYPE", "FULL", "FULL, WEIGHTS", 1, 
+                simtype, LEN__METHOD, status);
 
-      /* Run either a FULL or WEIGHTS simulation */
+      /* Set the flag for hits-only */
       if( strncmp( simtype, "FULL", 4 ) == 0 ) {
 
-         sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
-                           filter, heater, maxwrite, mode, coordframe, nbol, 
-			   pzero, rseed, samptime, weights, xbc, xbolo, ybc, 
-			   ybolo, status );
+        hitsonly = 0; 
 
       } else if ( strncmp( simtype, "WEIGHTS", 4 ) == 0 ) {
 
-         sc2sim_simhits ( &inx, &sinx, digcurrent, digmean, digscale, 
-                          filter, maxwrite, mode, coordframe, nbol, rseed, 
-                          samptime, status );
+        hitsonly = 1;
 
-      } 
+      } else {
+
+        if ( *status == SAI__OK ) {
+          *status = SAI__ERROR;
+          msgSetc( "MODE", inx.obsmode );
+          errRep("", "^MODE is not a supported observation mode", status);
+        }
+
+      }
+
+      /* Run either a FULL or WEIGHTS simulation */
+      sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
+                        filter, heater, maxwrite, mode, coordframe, nbol, 
+		        pzero, rseed, samptime, weights, xbc, xbolo, ybc, 
+			ybolo, hitsonly, status );
 
    } else {
 
