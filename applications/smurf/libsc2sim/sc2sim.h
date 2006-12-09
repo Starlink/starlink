@@ -50,6 +50,9 @@
 *     2006-12-01 (AGG):
 *        - add new routine sc2sim_dateobs
 *        - update API for sc2sim_ndfwrdata to accept dateobs string
+*     2006-12-08 (JB):
+*        - removed sc2sim_simhits and added hitsonly flag to simulate.
+*        - modified dateobs to take per-chunk time 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -158,6 +161,13 @@ void sc2sim_calctrans
 double lambda,        /* wavelength in metres (given) */
 double *trans,        /* % atmospheric transmission (returned) */
 double tauCSO,        /* CSO optical depth (given) */
+int *status           /* global status (given and returned) */
+);
+
+void sc2sim_dateobs 
+( 
+double mjdaystart,    /* MJD corresponding to first sample in file */
+char *dateobs,        /* dateobs string */
 int *status           /* global status (given and returned) */
 );
 
@@ -602,13 +612,6 @@ double *dbuf,                /* generated frame (returned) */
 int *status                  /* global status (given and returned) */
 );
 
-void sc2sim_simhits ( struct sc2sim_obs_struct *inx, 
-                      struct sc2sim_sim_struct *sinx, 
-                      double digcurrent, double digmean, double digscale, 
-                      char filter[], int maxwrite, obsMode mode, 
-		      mapCoordframe coordframe, int nbol, 
-                      int rseed, double samptime, int *status);
-
 void sc2sim_simplescan ( struct sc2sim_obs_struct *inx, 
                          struct sc2sim_sim_struct *sinx, 
                          double digcurrent, double digmean, 
@@ -626,7 +629,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 		       int maxwrite, obsMode mode, mapCoordframe coordframe,
 		       int nbol, double *pzero, int rseed, double samptime, 
 		       double weights[], double *xbc, double *xbolo, 
-		       double *ybc, double *ybolo, int *status );
+		       double *ybc, double *ybolo, int hitsonly, 
+                       int *status );
 
 void sc2sim_smupath ( int nvert, double vertex_t, int jig_ver[][2],
                       double jig_stepx, double jig_stepy, int movecode,
@@ -638,7 +642,7 @@ void sc2sim_smupos ( double t, double vertex_t, int movecode,
                      double *y, int *status );
 
 
-void sc2sim_dateobs ( double mjdaystart, int maxwrite, double sample_t, 
-		      int outscan, char *dateobs, int *status );
+void sc2sim_dateobs ( double mjdaystart, char *dateobs, int *status);
+
 
 #endif /* SC2SIM_DEFINED */
