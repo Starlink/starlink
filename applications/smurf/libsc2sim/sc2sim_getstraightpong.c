@@ -81,6 +81,8 @@
 *        parameters.
 *     2006-11-22 (JB):
 *        Added multiple map cycle capabilities.
+*     2006-12-08 (JB):
+*        smf_free mapptr.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -197,5 +199,7 @@ int *status          /* global status (given and returned) */
    for ( j = 0; j < (*pongcount) * 2; j++ ) {
      (*posptr)[j] = mapptr[j % (mcount * 2)];
    } 
+
+   smf_free ( mapptr, status );
 
 }
