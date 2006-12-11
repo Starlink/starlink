@@ -4,9 +4,9 @@
 #include "prm_par.h"
 #include <math.h>
 
-double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars, 
-                        const char ***names, int *ncpar, int *ok,
-                        int *status ){
+double *cupidClumpDesc( int indf, int deconv, double beamcorr[ 3 ], 
+                        double *cpars, const char ***names, int *ncpar, 
+                        int *ok, int *status ){
 /*
 *+
 *  Name:
@@ -19,9 +19,9 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
 *     Starlink C
 
 *  Synopsis:
-*     double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars, 
-*                             const char ***names, int *ncpar, int *ok,
-*                             int *status )
+*     double *cupidClumpDesc( int indf, int deconv, double beamcorr[ 3 ], 
+*                             double *cpars, const char ***names, int *ncpar, 
+*                             int *ok, int *status )
 
 *  Description:
 *     This function calculates the parameters describing a single clump,
@@ -35,12 +35,14 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
 *                     the standard deviation of the pixel axis value about the 
 *                     centroid position, weighted by the pixel values, then 
 *                     corrected to remove the effect of the instrumental 
-*                     smoothing specified in "beamcorr".
+*                     smoothing specified in "beamcorr" (but only if
+*                     "deconv" is non-zero).
 *        3n         : The total data value in the clump
-*        3n + 1     : The peak value in the clump. This will be larger than 
-*                     the peak data value by a factor determined by the
-*                     "beamcorr" values, to take account of the lowering
-*                     of the peak value caused by the instrumental smoothing.
+*        3n + 1     : The peak value in the clump. If "deconv" is non-zero, 
+*                     this will be larger than the peak data value by a factor 
+*                     determined by the "beamcorr" values, to take account 
+*                     of the lowering of the peak value caused by the 
+*                     instrumental smoothing.
 *        3n + 2     : The total number of pixels within the clump.
 
 *  Parameters:
@@ -48,10 +50,18 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
 *        Identifier for an NDF holding the data values associated with
 *        the clump. Any pixels which are not part of the clump should be
 *        set bad. 
+*     deconv
+*        If non-zero then the clump proprties values stored in the
+*        catalogue and NDF are modified to remove the smoothing effect 
+*        introduced by the beam width. If zero, the undeconvolved values
+*        are stored in the output catalogue and NDF. Note, the filter to 
+*        remove clumps smaller than the beam width is still applied, even
+*        if "deconv" is zero.
 *     beamcorr
 *        An array holding the FWHM (in pixels) describing the instrumental 
-*        smoothing along each pixel axis. The clump widths stored in the 
-*        output catalogue are reduced to correct for this smoothing.
+*        smoothing along each pixel axis. If "deconv" is non-zero, the clump 
+*        widths and peak values stored in the output catalogue are modified
+*        to correct for this smoothing.
 *     cpars
 *        Pointer to an array in which to store the clump parameters. If
 *        this is NULL, a new dynamic array is allocated and a pointer to
@@ -105,6 +115,8 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
 *  History:
 *     5-DEC-2005 (DSB):
 *        Original version.
+*     11-DEC-2006 (DSB):
+*        Added parameter "deconv".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -271,8 +283,13 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
          if( v0 <= 0.0 ) v0 = 0.25;
 
          v = v0 - beamcorr[ 0 ]*beamcorr[ 0 ]/5.5451774;
-         peakfactor = v0/v;
          *ok = ( v > 0 );
+         if( !deconv ) {
+            v = v0;
+            peakfactor = 1;
+         } else {
+            peakfactor = v0/v;
+         }
          ret[ 2*ndim ] = ( *ok ) ? sqrt( v ) : 0.0;
 
          if( ndim > 1 ) {
@@ -283,8 +300,12 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
             if( v0 <= 0.0 ) v0 = 0.25;
 
             v = v0 - beamcorr[ 1 ]*beamcorr[ 1 ]/5.5451774;
-            peakfactor *= v0/v;
             if( v > 0 ) {
+               if( !deconv ) {
+                  v = v0;
+               } else {
+                  peakfactor *= v0/v;
+               }
                ret[ 1 + 2*ndim ] = sqrt( v );
             } else {
                ret[ 1 + 2*ndim ] = 0.0;
@@ -299,10 +320,15 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
                if( v0 <= 0.0 ) v0 = 0.25;
 
                v = v0 - beamcorr[ 2 ]*beamcorr[ 2 ]/5.5451774;
-               peakfactor *= v0/v;
 
                if( v > 0 ) {
+                  if( !deconv ) {
+                     v = v0;
+                  } else {
+                     peakfactor *= v0/v;
+                  }
                   ret[ 2 + 2*ndim ] = sqrt( v );
+
                } else {
                   ret[ 2 + 2*ndim ] = 0.0;
                   *ok = 0;

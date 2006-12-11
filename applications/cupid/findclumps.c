@@ -126,6 +126,16 @@ void findclumps( int *status ) {
 *        Parameters" sections below. Default values will be used for any 
 *        unspecified parameters. Unrecognised options are ignored (that is, 
 *        no error is reported). [current value]
+*     DECONV = _LOGICAL (Read)
+*        Determines if the clump properties stored in the output catalogue 
+*        and NDF extension should be corrected to remove the effect of the 
+*        instrumental beam width specified by the FwhmBeam and VeloRes 
+*        configuration parameters. If TRUE, the clump sizes will be
+*        reduced and the peak values increased to take account of the 
+*        smoothing introduced by the beam width. If FALSE, the undeconvolved 
+*        values are stored in the output catalogue and NDF. Note, the filter 
+*        to remove clumps smaller than the beam width is still applied, even
+*        if DECONV is FALSE. [TRUE]
 *     ILEVEL = _INTEGER (Read)
 *        Controls the amount of diagnostic information reported. It
 *        should be in the range 0 to 6. A value of zero will suppress all 
@@ -195,13 +205,14 @@ void findclumps( int *status ) {
 *
 *        The catalogue inherits any WCS information from the input NDF.
 *
-*        The "size" of the clump on an axis is the beam-corrected RMS 
-*        deviation of each pixel centre from the clump centroid, where each 
-*        pixel is weighted by the corresponding pixel data value. The 
-*        beam-correction reduces the measured widths to take account of
-*        the smoothing introduced by the instrumental beam. The peak
-*        value is also beam-corrected. Beam sizes are specified by
-*        configuration parameters FWHMBeam and VeloRes.
+*        The "size" of the clump on an axis is the RMS deviation of each 
+*        pixel centre from the clump centroid, where each pixel is weighted 
+*        by the corresponding pixel data value. If parameter DECONV is set
+*        TRUE, the values stored for "Size..." and "Peak" are corrected 
+*        to take account of the smoothing introduced by the instrumental 
+*        beam. These corrections reduced the "size..." values and
+*        increase the peak value. Beam sizes are specified by configuration 
+*        parameters FWHMBeam and VeloRes.
 *
 *        For the GaussClump algorithm, the Sum and Area values refer 
 *        to the part of the Gaussian within the level defined by the
@@ -406,11 +417,11 @@ void findclumps( int *status ) {
 *     The default value of two times the RMS noise level is usually considered 
 *     to be optimal, although this obviously depends on the RMS noise level 
 *     being correct. [2*RMS]
-*     - ClumpFind.FwhmBeam: The FWHM of the instrument beam, in pixels. The 
-*     clump widths written to the output catalogue are reduced (in
-*     quadrature) by this amount. If a direct comparison with other 
-*     implementations of the ClumpFind algorithm is required, a value of zero
-*     should be used. [2.0]
+*     - ClumpFind.FwhmBeam: The FWHM of the instrument beam, in pixels. If 
+*     application paremeter DECONV is set TRUE, the clump widths written to 
+*     the output catalogue are reduced (in quadrature) by this amount. If a 
+*     direct comparison with other implementations of the ClumpFind algorithm 
+*     is required, DECONV should be set to FALSE. [2.0]
 *     - ClumpFind.IDLAlg: If a non-zero value is supplied, then FINDCLUMPS 
 *     emulates the ClumpFind algorithm as implemented by the IDL package
 *     available from Jonathan Williams WWW site on 28th April 2006. The
@@ -483,9 +494,9 @@ void findclumps( int *status ) {
 *     Values for these parameters can be specified using the CONFIG parameter. 
 *     Default values are shown in square brackets:
 *
-*     - Reinhold.FwhmBeam: The FWHM of the instrument beam, in pixels. The 
-*     clump widths written to the output catalogue are reduced (in
-*     quadrature) by this amount. [2.0]
+*     - Reinhold.FwhmBeam: The FWHM of the instrument beam, in pixels. If 
+*     application paremeter DECONV is set TRUE, the clump widths written to 
+*     the output catalogue are reduced (in quadrature) by this amount. [2.0]
 *     - ReinholdClumps.MaxBad: The maximum number of pixels in a clump that
 *     are allowed to be adjacent to a bad pixel. If the number fo clump
 *     pixels adjacent to a bad pixel exceeds this value, the clump is 
@@ -545,9 +556,9 @@ void findclumps( int *status ) {
 *     - FellWalker.FlatSlope: Any initial section to a walk which has an
 *     average gradient (measured over 4 steps) less than this value will not 
 *     be included in the clump. [1.0*RMS]
-*     - FellWalker.FwhmBeam: The FWHM of the instrument beam, in pixels. The 
-*     clump widths written to the output catalogue are reduced (in
-*     quadrature) by this amount. [2.0]
+*     - FellWalker.FwhmBeam: The FWHM of the instrument beam, in pixels. If 
+*     application paremeter DECONV is set TRUE, the clump widths written to 
+*     the output catalogue are reduced (in quadrature) by this amount. [2.0]
 *     - FellWalker.MaxBad: The maximum number of pixels in a clump that
 *     are allowed to be adjacent to a bad pixel. If the number fo clump
 *     pixels adjacent to a bad pixel exceeds this value, the clump is 
@@ -605,6 +616,8 @@ void findclumps( int *status ) {
 *  History:
 *     28-SEP-2005 (DSB):
 *        Original version.
+*     11-DEC-2006 (DSB):
+*        Added parameter DECONV.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -643,6 +656,7 @@ void findclumps( int *status ) {
    double rms;                  /* Global rms error in data */
    double sum;                  /* Sum of variances */
    float *rmask;                /* Pointer to cump mask array */
+   int deconv;                  /* Should clump parameters be deconvolved? */
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
    int dims[3];                 /* Pointer to array of array dimensions */
    int el;                      /* Number of array elements mapped */
@@ -809,6 +823,9 @@ void findclumps( int *status ) {
    parGdr0i( "ILEVEL", 1, 0, 6, 1, &ilevel, status );
    if( ilevel > 0 ) msgBlank( status );
 
+/* See if clump parameters should be deconvolved. */
+   parGet0l( "DECONV", &deconv, status );
+
 /* Calculate the default RMS value. If the NDF has a Variance component
    it is the square root of the mean Variance value. Otherwise, it is found
    by looking at differences between adjacent pixel values in the Data 
@@ -941,7 +958,7 @@ void findclumps( int *status ) {
    (if needed). This may reject further clumps (such clumps will have the
    "Unit" component set to "BAD"). */
       ndfState( indf, "WCS", &gotwcs, status );
-      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, beamcorr, 
+      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, beamcorr, 
                         "Output from CUPID:FINDCLUMPS", gotwcs ? iwcs : NULL,
                         ilevel, status );
 

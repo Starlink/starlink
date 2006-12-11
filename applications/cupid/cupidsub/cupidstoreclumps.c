@@ -15,8 +15,9 @@
 #define MAXCAT   50   /* Max length of catalogue name */
 
 void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
-                       int ndim, double beamcorr[ 3 ], const char *ttl,
-                       AstFrameSet *iwcs, int ilevel, int *status ){
+                       int ndim, int deconv, double beamcorr[ 3 ], 
+                       const char *ttl,AstFrameSet *iwcs, int ilevel, 
+                       int *status ){
 /*
 *+
 *  Name:
@@ -30,8 +31,9 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 
 *  Synopsis:
 *     void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
-*                            int ndim, double beamcorr[ 3 ], const char *ttl, 
-*                            AstFrameSet *iwcs, int ilevel, int *status )
+*                            int ndim, int deconv, double beamcorr[ 3 ], 
+*                            const char *ttl, AstFrameSet *iwcs, int ilevel, 
+*                            int *status )
 
 *  Description:
 *     This function optionally saves the clump properties in an output
@@ -48,10 +50,18 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        A locator for an HDS array the clump NDF structures.
 *     ndim
 *        The number of pixel axes in the data.
+*     deconv
+*        If non-zero then the clump proprties values stored in the
+*        catalogue and NDF are modified to remove the smoothing effect 
+*        introduced by the beam width. If zero, the undeconvolved values
+*        are stored in the output catalogue and NDF. Note, the filter to 
+*        remove clumps smaller than the beam width is still applied, even
+*        if "deconv" is zero.
 *     beamcorr
 *        An array holding the FWHM (in pixels) describing the instrumental 
-*        smoothing along each pixel axis. The clump widths stored in the 
-*        output catalogue are reduced to correct for this smoothing.
+*        smoothing along each pixel axis. If "deconv" is non-zero, the clump 
+*        widths and peak values stored in the output catalogue are modified
+*        to correct for this smoothing.
 *     ttl
 *        The title for the output catalogue (if any).
 *     iwcs
@@ -88,6 +98,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *  History:
 *     10-NOV-2005 (DSB):
 *        Original version.
+*     11-DEC-2006 (DSB):
+*        Added parameter "deconv".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -199,7 +211,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    information which is the same for every clump (the parameter names, the 
    indices of the parameters holding the clump central position, and the 
    number of parameters). */
-         cpars = cupidClumpDesc( indf, beamcorr, cpars, &names, &ncpar, &ok, status );
+         cpars = cupidClumpDesc( indf, deconv, beamcorr, cpars, &names, 
+                                 &ncpar, &ok, status );
 
 /* If we have not yet done so, allocate memory to hold a table of clump 
    parameters. In this table, all the values for column 1 come first, 

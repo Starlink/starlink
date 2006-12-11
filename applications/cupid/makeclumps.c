@@ -62,6 +62,10 @@ void makeclumps( int *status ) {
 *        in pixels. The generated clumps are smoothed with a Gaussian beam
 *        of this FWHM, before noise is added. No spatial smoothing is 
 *        performed if BEAMFWHM is zero. [current value]
+*     DECONV = _LOGICAL (Read)
+*        If TRUE, the clump properties stored in the output catalogue
+*        will be modified to take account of the smoothing caused by the
+*        instrumental beam width. [TRUE]
 *     FWHM1( 2 ) = _REAL (Read)
 *        Defines the distribution from which the FWHM (Full Width at Half
 *        Max) for pixel axis 1 of each clump is chosen. Values should be
@@ -195,6 +199,8 @@ void makeclumps( int *status ) {
 *  History:
 *     31-OCT-2005 (DSB):
 *        Original version.
+*     11-DEC-2006 (DSB):
+*        Added parameter DECONV.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -229,6 +235,7 @@ void makeclumps( int *status ) {
    float vgrad2[ 2 ];            /* Values for VGRAD2 parameter */
    int addnoise;                 /* Add Gaussian noise to output array? */
    int area;                     /* Clump area */
+   int deconv;                   /* Store deconvolved clump properties */
    int dims[ 3 ];                /* Dimensions before axis permutation */
    int i;                        /* Loop count */
    int indf2;                    /* Identifier for output NDF without noise */
@@ -426,11 +433,14 @@ void makeclumps( int *status ) {
 /* Create a CUPID extension in the output model NDF.*/
    ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
 
+/* See if deconvolved values are to be stored in the output catalogue. */
+   parGet0l( "DECONV", &deconv, status );
+
 /* Store the clump properties in the output catalogue. */
    beamcorr[ 0 ] = beamfwhm;
    beamcorr[ 1 ] = beamfwhm;
    beamcorr[ 3 ] = velfwhm;
-   cupidStoreClumps( "OUTCAT", xloc, obj, ndim, beamcorr,
+   cupidStoreClumps( "OUTCAT", xloc, obj, ndim, deconv, beamcorr,
                      "Output from CUPID:MAKECLUMPS", NULL, 2, status );
 
 /* Relase the extension locator.*/

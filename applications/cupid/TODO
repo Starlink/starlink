@@ -31,3 +31,6 @@
    "on boundary". [done]
 
 
+24/11/06: Copy AXIS arrays to clump cut-outs stored in output array CUPID
+   extension.
+

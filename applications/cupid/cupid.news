@@ -7,6 +7,12 @@
  data arrays.
 
 
+Changes introduced at V0.0-21:
+
+ - Added new program parameter DECONV which can be set FALSE in order to
+   prevent the reported clump sizes and peak values being modified to
+   take account of the instrumenytal beam smoothing.
+
 Changes introduced at V0.0-20:
 
  - Introduction of a new command calledFINDBACK, which uses spatial 

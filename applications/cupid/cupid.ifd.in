@@ -18,6 +18,16 @@ package cupid {
             helpkey *
           }
 
+         parameter deconv {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Correct clump parameters for beam smoothing?}
+            default TRUE
+            helpkey *
+          }
+
          parameter fwhmbeam {
             type _DOUBLE
             access READ
@@ -129,6 +139,16 @@ package cupid {
             helpkey *
             default !
          }
+
+         parameter deconv {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Correct clump parameters for beam smoothing?}
+            default TRUE
+            helpkey *
+          }
 
          parameter ilevel {
             type _INTEGER
@@ -282,6 +302,16 @@ package cupid {
             ppath CURRENT,DEFAULT
             prompt {Spatial FWHM of instrument beam in pixels}
             default 2.0 
+            helpkey *
+          }
+
+         parameter deconv {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Correct clump parameters for beam smoothing?}
+            default TRUE
             helpkey *
           }
 

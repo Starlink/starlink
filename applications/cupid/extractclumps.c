@@ -52,13 +52,22 @@ void extractclumps( int *status ) {
 
 *  ADAM Parameters:
 *     FWHMBEAM = _REAL (Read)
-*        The FWHM of the instrument beam, in pixels. The clump widths written 
-*        to the output catalogue are reduced (in quadrature) by this amount. 
-*        The default value is the value stored in the CONFIG component 
-*        of the CUPID extension in the mask NDF, or 2.0 if the CUPID
-*        extension does not contain a CONFIG component. []
+*        The FWHM of the instrument beam, in pixels. If DECONV is TRUE, the 
+*        clump widths written to the output catalogue are reduced (in 
+*        quadrature) by this amount. The default value is the value stored 
+*        in the CONFIG component of the CUPID extension in the mask NDF, or 
+*        2.0 if the CUPID extension does not contain a CONFIG component. []
 *     DATA = NDF (Read)
 *        The input NDF containing the physical data values.
+*     DECONV = _LOGICAL (Read)
+*        Determines if the clump properties stored in the output catalogue 
+*        and NDF extension should be corrected to remove the effect of the 
+*        instrumental beam width specified by the FWHMBEAM and VELORES
+*        parameters. If TRUE, the clump sizes will be reduced and the peak 
+*        values increased to take account of the smoothing introduced by the 
+*        beam width. If FALSE, the undeconvolved values are stored in the 
+*        output catalogue and NDF. Note, the filter to remove clumps smaller 
+*        than the beam width is still applied, even if DECONV is FALSE. [TRUE]
 *     MASK = NDF (Read)
 *        The input NDF containing the pixel assignments. This will
 *        usually have been created by the FINDCLUMPS command.
@@ -69,11 +78,12 @@ void extractclumps( int *status ) {
 *        See the description of the OUTCAT parameter for the FINDCLUMPS 
 *        command for further information.
 *     VELORES = _REAL (Read)
-*        The velocity resolution of the instrument, in channels. The velocity 
-*        width of each clump written to the output catalogue is reduced (in 
-*        quadrature) by this amount. The default value is the value stored in 
-*        the CONFIG component of the CUPID extension in the mask NDF, or 2.0 
-*        if the CUPID extension does not contain a CONFIG component. []
+*        The velocity resolution of the instrument, in channels. If DECONV is 
+*        TRUE, the velocity width of each clump written to the output 
+*        catalogue is reduced (in quadrature) by this amount. The default 
+*        value is the value stored in the CONFIG component of the CUPID 
+*        extension in the mask NDF, or 2.0 if the CUPID extension does not 
+*        contain a CONFIG component. []
 
 *  Synopsis:
 *     void extractclumps( int *status );
@@ -105,6 +115,8 @@ void extractclumps( int *status ) {
 *  History:
 *     6-APR-2006 (DSB):
 *        Original version.
+*     11-DEC-2006 (DSB):
+*        Added parameter DECONV.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -133,6 +145,7 @@ void extractclumps( int *status ) {
    int *ipa;                    /* Pointer to pixel assignment array */
    int *pa;                     /* Pointer to next pixel assignment value */
    int *pid;                    /* Pointer to next clump ID */
+   int deconv;                  /* Should clump parameters be deconvolved? */
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
    int dims[ 3 ];               /* Significant pixel axis dimensions */
    int el;                      /* Number of array elements mapped */
@@ -380,11 +393,14 @@ void extractclumps( int *status ) {
          beamcorr[ 2 ] = vr;
       }
 
+/* See if clump parameters should be deconvolved. */
+      parGet0l( "DECONV", &deconv, status );
+ 
 /* Store the clump properties in the CUPID extension and output catalogue
    (if needed). */
       ndfState( indf1, "WCS", &gotwcs, status );
       msgBlank( status );
-      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, beamcorr, 
+      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, beamcorr, 
                         "Output from CUPID:EXTRACTCLUMPS", 
                         gotwcs ? iwcs : NULL, 1, status );
 
