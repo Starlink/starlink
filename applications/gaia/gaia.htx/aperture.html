@@ -134,7 +134,8 @@ documentation) to understand these parameters.
 
 <p><b>WARNING:</b> the error estimates in the measurements will be
 wrong unless you set the image bias and data units to photons
-conversion factor correctly.
+conversion factor correctly, this includes when measuring errors
+using sky variance.
 
 <h3>Understand the results for an aperture</h3>
 <p>The results shown for an aperture have the following meanings:
@@ -152,14 +153,15 @@ using the photons per data unit and exposure factors
 <dt>Magnitude error 
 <dd>error in the magnitude, the error is derived using either the sky
 variance, photon statistics, or the data variance, if you are using
-photon statistics then a good knowledge of the bias level and photons
-per data unit are required
+photon statistics or sky variance then a good knowledge of the photons
+per data unit is required, photon statistics also requires that you know
+the bias level
 <dt>Sky value       
 <dd>the estimated sky, either derived from the annulus, or detached
 sky regions, or a constant, scaled by photons per data unit factor
 <dt>Sum in aperture
 <dd>sum of object data counts in aperture, scaled by the photon per
-data unit value and the exposure factors
+data unit value and the exposure factors (excludes any sky contribution)
 <dt>Error code      
 <dd>status of measurement:
 <dl> 
