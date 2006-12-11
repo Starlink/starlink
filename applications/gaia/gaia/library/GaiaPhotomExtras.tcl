@@ -64,7 +64,7 @@
 #
 #     The method to use when calculating errors in the
 #     measurements. "method" should be "photon statistics",
-#     "sky variance" or "data variance".
+#     "sky variance", "data variance", "gaussian sky"
 #
 #        -positive_objects adam_boolean
 #
@@ -283,6 +283,8 @@ itcl::class gaia::GaiaPhotomExtras {
          -command [code $this configure -photon_errors {sky variance}]
       $itk_component(Photonerr) add -label {data variance} \
          -command [code $this configure -photon_errors {data variance}]
+      $itk_component(Photonerr) add -label {gaussian sky} \
+         -command [code $this configure -photon_errors {gaussian sky}]
       add_short_help $itk_component(Photonerr) \
          {How to calculate measurement errors}
 
@@ -411,6 +413,9 @@ itcl::class gaia::GaiaPhotomExtras {
          {sky variance} {
             append state "PHOTON=2 "
          }
+         {gaussian sky} {
+            append state "PHOTON=4 "
+         }
          default {
             append state "PHOTON=1 "
          }
@@ -484,6 +489,9 @@ itcl::class gaia::GaiaPhotomExtras {
                   }
                   PHOTON {
                      switch $value {
+                        4 {
+                           configure -photon_errors {gaussian sky}
+                        }
                         3 {
                            configure -photon_errors {data variance}
                         }
@@ -572,6 +580,9 @@ itcl::class gaia::GaiaPhotomExtras {
          }
          sky* {
             $itk_component(Photonerr) configure -value {sky variance}
+         }
+         gaussian* {
+            $itk_component(Photonerr) configure -value {gaussian sky}
          }
          default {
             $itk_component(Photonerr) configure -value {photon statistics}
