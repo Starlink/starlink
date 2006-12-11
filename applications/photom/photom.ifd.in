@@ -150,11 +150,11 @@ package photom {
          parameter photon {
             position 15
             type _INTEGER
-            range 1 3
+            range 1 2
             vpath CURRENT DEFAULT PROMPT
             ppath DYNAMIC DEFAULT
             default 2
-            prompt {Error estimator ( 1=photons, 2=sky, 3=variance )}
+            prompt {Error estimator (1=photons, 2=sky, 3=variance, 4=gaussian)}
             helpkey *
           }
 
@@ -437,11 +437,11 @@ package photom {
 
          parameter photon {
             type _INTEGER
-            range 1 3
+            range 1 4
             vpath CURRENT DEFAULT PROMPT
             ppath DYNAMIC DEFAULT
             default 2
-            prompt {Error estimator ( 1=photons, 2=sky, 3=variance )}
+            prompt {Error estimator (1=photons, 2=sky, 3=variance, 4=gaussian)}
             helpkey *
           }
 
