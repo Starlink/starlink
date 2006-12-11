@@ -135,13 +135,13 @@
 *        object somewhere in the image (this presumes that the image is
 *        an NDF and corresponds to the original behaviour of PHOTOM,
 *        prior to the introduction of this parameter).
-* 
+*
 *        CONSTANT: indicates that a simple floating point value will be
 *        supplied for the image exposure time.
 *
 *        HEADER: indicates that the value to be used is stored in the
 *        image header (i.e. FITS headers).
-*     
+*
 *        [HDS]
 *
 *     ETIME = LITERAL (Read)
@@ -155,7 +155,7 @@
 *        item ETIME then a suitable return would be:
 *
 *           - more.ccdpack.etime
-*    
+*
 *        The HDS structure of an NDF can be viewed using the HDSTRACE
 *        utility (see SUN/102).
 *
@@ -211,7 +211,7 @@
 *
 *     PHOTON = _INTEGER (Read)
 *        Select the method for calculating the measurement errors.
-*        There are three possible choices selected by the integers 1 to 3
+*        There are three possible choices selected by the integers 1 to 4
 *        which have the following bindings:-
 *        1 --- The errors are estimated from the photon statistics in the
 *              sky and object apertures. The parameters PADU and BIASLE
@@ -225,6 +225,12 @@
 *              photon numbers.
 *        3 --- The errors are estimated from the variance component of the
 *              data array.
+*        4 --- The errors are estimated from the measured variance in the
+*              sky aperture. This method assumes that the errors are
+*              Gaussian (same value per object and sky pixel), and thus
+*              requires no knowledge of the values of PADU and BIASLE,
+*              but can only be considered an upper limit on the error in
+*              a measurement.
 *
 *     POSFILE = FILENAME (Read)
 *        Name of the file containing a list of positions for
@@ -293,10 +299,10 @@
 *
 *     USEMAGS = _LOGICAL (Read)
 *        If TRUE then the output values are converted into magnitudes.
-*        If FALSE the output values MAG and MAGERR are modified to be 
+*        If FALSE the output values MAG and MAGERR are modified to be
 *        a mean photon count and the error in this count, the other
 *        values remain the same, i.e. the sum of sky corrected photons
-*        and the mean sky value. Note the SKYMAG value is not used 
+*        and the mean sky value. Note the SKYMAG value is not used
 *        when this is FALSE. Note also that this value may only be
 *        set once when PHOTOM is started and must be set either on the
 *        command line (USEMAGS=TRUE or USEMAGS=FALSE) or in response to
@@ -309,7 +315,7 @@
 *        the centres of circles used to block regions from the sky
 *        aperture. Contaminating objects, such as bright stars, can thus
 *        be removed from the background estimate.
-* 
+*
 *     OPTIMA = _LOGICAL (Read)
 *        Do optimal or aperture extraction
 *
@@ -376,6 +382,8 @@
 *        CLIP and SEE parameters changed to _REAL from _INT
 *     07-SEP-2004 (PWD):
 *        Change to use CNF pointers.
+*     11-DEC-2006 (PWD):
+*        Introduce  Gaussian error analysis.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -449,7 +457,7 @@
       CALL PAR_CHOIC( 'EXSOURCE', 'HDS', 'HDS,CONSTANT,HEADER', .FALSE.,
      :                EXSRC, STATUS )
 
-*   Get the value that qualifies the exposure time (i.e. a FITS keyword, 
+*   Get the value that qualifies the exposure time (i.e. a FITS keyword,
 *   HDS path name or a simple floating point number).
       CALL PAR_GET0C( 'ETIME', CETIME, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -478,11 +486,11 @@
 
 *   Call the main routine
       IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL APTOP ( IDIMS( 1 ), IDIMS( 2 ), LBND, 
-     :                %VAL( CNF_PVAL( IDATA ) ), ISVAR, 
-     :                %VAL( CNF_PVAL( IVAR ) ), USEMSK, 
-     :                %VAL( CNF_PVAL( IMASK ) ), ETIME, NE, ELLIPS, 
-     :                L, R, YLIST, LYLIST, RYLIST, INSL, INSR, POLY, 
+         CALL APTOP ( IDIMS( 1 ), IDIMS( 2 ), LBND,
+     :                %VAL( CNF_PVAL( IDATA ) ), ISVAR,
+     :                %VAL( CNF_PVAL( IVAR ) ), USEMSK,
+     :                %VAL( CNF_PVAL( IMASK ) ), ETIME, NE, ELLIPS,
+     :                L, R, YLIST, LYLIST, RYLIST, INSL, INSR, POLY,
      :                STATUS )
       ENDIF
 

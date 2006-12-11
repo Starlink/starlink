@@ -197,6 +197,10 @@
 *   Or error from data variance
          ELSEIF ( PHOTON .EQ. 3 ) THEN
             ERR2 = PADU ** 2 * ( VSTAR + VSKY * AREA ** 2 / SKYARE )
+
+*   Or error from sky variance as a gaussian estimate.
+         ELSEIF ( PHOTON .EQ. 4 ) THEN
+            ERR2 = ( PADU * SIGMA * AREA ) ** 2
          ENDIF
 
       ELSE

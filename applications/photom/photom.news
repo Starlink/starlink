@@ -6,6 +6,13 @@
 
   Major Changes
   -------------
+   v 1.10
+    A new aperture photometry error estimator has been added. This
+    uses the variance in the sky regions to estimate a gaussian noise
+    for the object measurement. This does not require that the PADU and 
+    BIASLE values are known (which can be difficult to estimate for combined
+    data that do not have data variances), but is not a proper value and can 
+    only give guidance for an upper limit on the error.
    
     v 1.9
     PSF algorithim changes, algorithim should be more robust.

@@ -83,7 +83,7 @@
 *        If SKYEST is 4 then this is the sigma of the global sky value.
 *     PHOTON = INTEGER (Given)
 *        Method to use when calculating errors. This is an integer in
-*        the range 1 to 3.
+*        the range 1 to 4.
 *     BIASLE = REAL (Given)
 *        Offset used to correct for any unsubtracted bias.
 *     SATURE = REAL (Given)

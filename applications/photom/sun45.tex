@@ -15,11 +15,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {45.13}
+\newcommand{\stardocnumber}    {45.14}
 \newcommand{\stardocauthors}   {Nicholas Eaton, Peter W.\ Draper \& Alasdair Allan}
-\newcommand{\stardocdate}      {20th August 2002}
+\newcommand{\stardocdate}      {11th December 2006}
 \newcommand{\stardoctitle}     {PHOTOM --- A Photometry Package }
-\newcommand{\stardocversion}   {version 1.9-0}
+\newcommand{\stardocversion}   {version 1.10-0}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
   \begin{center}
@@ -973,11 +973,12 @@ command is issued.
 
 This is used to choose between the different ways in which the errors
 are calculated. There are three possible choices selected by the integers
-1 to 3 which have the following meanings :
+1 to 4 which have the following meanings :
 \begin{enumerate}
 \item Errors from photon statistics.
 \item Errors from variations in the sky aperture.
 \item Errors from data variance.
+\item Gaussian errors from variations in the sky aperture.
 \end{enumerate}
 The first works out the errors from photon statistics in the sky and
 signal apertures. This requires you to know and set-up the parameters
@@ -1008,6 +1009,16 @@ if you are storing your images in NDFs, see
 and if this is the case then PHOTOM
 will issue the warning \st{Data does not have a variance component} if this
 method is selected.
+
+The fourth method of calculating the errors is like the second and uses the
+measured variance in the sky aperture. This method assumes that the measured
+variance is due to some gaussian source and doesn't require any knowledge of 
+the PADU and BIASLE values (which are unknown when dealing with data that has
+been combined using a mean, say from a CCD Mosiac dithered on the sky), but
+clearly this can only measure an upper limit as the actual noise in the
+object will be (fractionally) less than in the sky. The best way to avoid 
+such uncertainty is by propagating data variances through all the stages that
+produced the combined data and using method three.
 
 \begin{latexonly}
 Appendix \ref{errors} gives a full discussion of the calculation of
@@ -1499,7 +1510,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
          PHOTON = \_INTEGER (Read)
       }{
          Select the method for calculating the measurement errors.
-         There are three possible choices selected by the integers 1 to 3
+         There are three possible choices selected by the integers 1 to 4
          which have the following bindings:
          \begin{enumerate}
          \item The errors are estimated from the photon statistics in the
@@ -1514,6 +1525,12 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
              photon numbers.
          \item The errors are estimated from the variance component of the
               data array.
+         \item The errors are estimated from the measured variance in the
+               sky aperture. This method assumes that the errors are Gaussian
+               (same value per object and sky pixel), and thus requires no
+               knowledge of the values of PADU and BIASLE, but can only be
+               considered an upper limit on the error in a measurement.
+
          \end{enumerate}
       }
       \sstsubsection{
@@ -2058,7 +2075,7 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
          PHOTON = \_INTEGER (Read)
       }{
          Select the method for calculating the measurement errors.
-         There are three possible choices selected by the integers 1 to 3
+         There are three possible choices selected by the integers 1 to 4
          which have the following bindings:
          \begin{enumerate}
          \item The errors are estimated from the photon statistics in the
@@ -2073,6 +2090,11 @@ addition, the following Starlink packages have been used: PHOTOM,} ...
                photon numbers.
          \item The errors are estimated from the variance component of the
                data array.
+         \item The errors are estimated from the measured variance in the
+               sky aperture. This method assumes that the errors are Gaussian
+               (same value per object and sky pixel), and thus requires no
+               knowledge of the values of PADU and BIASLE, but can only be
+               considered an upper limit on the error in a measurement.
          \end{enumerate}
       }
       \sstsubsection{
@@ -2458,7 +2480,7 @@ A full treatment of optimal extarction can be found in Tim Naylor's MNRAS paper
 
 \section{\xlabel{calculation_of_the_errors}Calculation \xlabel{errors}of \label{errors}the errors}
 
-The errors are calculated in one of three ways, as discussed in the section
+The errors are calculated in one of four ways, as discussed in the section
 on command P. The first method assumes true photon statistics and the
 error is calculated from the following definitions:
 
@@ -2558,6 +2580,20 @@ The magnitude error is calculated from differentiating the magnitude equation:
 
 thus:
 \[\underline{dm=\frac{-2.5}{\ln10}*\frac{\varepsilon(S_o)}{S_o}}\]
+
+The fourth method is like method two, but the sky variations are
+interpreted by a gaussian error source, so PADU and BIASLE are not
+required. With guassian errors the source signal is effectively zero
+(since it has the same noise per pixel as the sky), so 
+\begin{equation}\underline{
+\varepsilon( S_o ) = PADU * \sigma_s * a_o
+}\end{equation}
+and
+\begin{equation}\underline{
+S_o = PADU * ( D_o - D_s * ( a_o / a_s ) )
+}\end{equation}
+so the PADUs cancel out in the $dm$ calculation.
+
 
 \section{PHOTOPT \xlabel{PHOTOPT}- examining PHOTOM's performance}
 
@@ -2774,7 +2810,11 @@ Increased robustness of centroiding algorithim for extreme cases.
 
 Bug in handling position files with PHOTOM under optimal extraction resolved.
 
-Fixed some GIRD/PIXEL co-ordianate inconsistences when reporting the
+Fixed some GRID/PIXEL co-ordianate inconsistences when reporting the
 final fitted $X,Y$ co-ordinatles.
+
+\subsection{Release 1.10}
+
+Added gaussian noise estimator for apertures.
 
 \end{document}

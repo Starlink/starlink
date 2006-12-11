@@ -53,7 +53,7 @@
 *     LSKYMAG = REAL (Given)
 *        Magnitude of sky
 *     PHOTON = INTEGER (Given)
-*        Errors from photon noise, sky or data variance
+*        Errors from photon noise, sky or data variance, or gaussian sky
 *     LBIASLE = REAL (Given)
 *        Zero point for photon noise calculation per pixel
 *     MAJOR = REAL (Given)
@@ -188,6 +188,11 @@
 *   Or error from data variance
          ELSEIF ( PHOTON .EQ. 3 ) THEN
             ERR2 = PADU ** 2 * ( VSTAR + VSKY * AREA ** 2 / SKYARE )
+
+*   Or error from sky variance as a gaussian estimate.
+         ELSEIF ( PHOTON .EQ. 4 ) THEN
+            ERR2 = ( PADU * SIGMA * AREA ) ** 2
+
          ENDIF
       ELSE
          ERR2 = 0.0D0
@@ -255,7 +260,7 @@
 
 *   If there is no signal or an error has occured, give it a nominal value
       IF ( MAGS ) THEN 
-         IF ( ( FACTOR .GT. 1.0D0 ) .OR. ERFLAG ) THEN
+         IF ( ( FACTOR .GT. 5.0D0 ) .OR. ERFLAG ) THEN
             MAG = SKYMAG
             ERRMAG = 99.999D0
             CODE = '?'

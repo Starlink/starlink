@@ -117,6 +117,8 @@
 *        Added SEE (approx seeing in pixels) parameter and associated changes
 *     07-SEP-2004 (PWD):
 *        Changed to use CNF pointers.
+*     11-DEC-2006 (PWD):
+*        Allow Gaussian errors from sky variance.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -568,7 +570,8 @@
      :             'parameters'')' )
             CALL MSG_OUT( ' ', TEXT, STATUS )
             WRITE( TEXT, '(''Photons   - Select error estimate - '//
-     :             'photon statistics, sky or data variance'')' )
+     :             'photon statistics, sky or data variance, '//
+     :             'gaussian sky'')' )
             CALL MSG_OUT( ' ', TEXT, STATUS )
             WRITE( TEXT, '(''Sky       - Sky estimator - mean, '//
      :             'mean within 2 sigma, mode or user given'')' )
@@ -784,6 +787,9 @@
                   CALL MSG_OUT( ' ', TEXT, STATUS )
                   GOTO 40
                ENDIF
+            ELSEIF ( PHOTON .EQ. 4 ) THEN
+               WRITE( TEXT, '(''Gaussian errors from sky variance'')' )
+               CALL MSG_OUT( ' ', TEXT, STATUS )
             ENDIF
 
 ***************

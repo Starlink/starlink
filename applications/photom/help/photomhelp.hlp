@@ -3,20 +3,6 @@
  PHOTOM is a package for measuring the magnitudes or counts
  of astronomical objects.
 
-1  Changes_this_release
-
- v1.8-7
- Fixed a bug which meant that the error in the flux was not corrected
- for the exposure time, although the flux itself had been.
- 
- v1.8-6
- A bug which meant that the error return code for a PSF star was not 
- correctly reported was fixed.
-
- Modified the optimal extraction algorithim to handle bad pixels 
- inside the PSF mask without termination. Note that photometry obtained 
- using such a PSF is dubious to say the least.
- 
 1 AUTOPHOTOM
 Do photometry of a list of objects.
 
@@ -171,6 +157,11 @@ PHOTON = _INTEGER (Read)
        photon numbers.
    3 - The errors are estimated from the variance component of the
        data array.
+   4 - The errors are estimated from the measured variance in the
+       sky aperture. This method assumes that the errors are Gaussian
+       (same value per object and sky pixel), and thus requires no
+       knowledge of the values of PADU and BIASLE, but can only be
+       considered an upper limit on the error in a measurement.
 3 POSITIVE
 POSITIVE = _LOGICAL (Read)
    Find the object centroid for image features which are positive
@@ -636,6 +627,11 @@ PHOTON = _INTEGER (Read)
          photon numbers.
    3 --- The errors are estimated from the variance component of the
          data array.
+   4 --- The errors are estimated from the measured variance in the
+         sky aperture. This method assumes that the errors are Gaussian
+         (same value per object and sky pixel), and thus requires no
+         knowledge of the values of PADU and BIASLE, but can only be
+         considered an upper limit on the error in a measurement.
 3 POSFILE
 POSFILE = FILENAME (Read)
    Name of the file containing a list of positions for

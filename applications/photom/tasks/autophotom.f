@@ -161,6 +161,11 @@
 *            photon numbers.
 *        3 - The errors are estimated from the variance component of the
 *            data array.
+*        4 - The errors are estimated from the measured variance in the
+*            sky aperture. This method assumes that the errors are Gaussian
+*            (same value per object and sky pixel), and thus requires no
+*            knowledge of the values of PADU and BIASLE, but can only be
+*            considered an upper limit on the error in a measurement.
 *
 *     POSITIVE = _LOGICAL (Read)
 *        Find the object centroid for image features which are positive
@@ -391,6 +396,8 @@
 *        (these did not match documented values).
 *     07-SEP-2004 (PWD):
 *        Changed to use CNF pointers.
+*     11-DEC-2006 (PWD):
+*        Added Gaussian sky errors.
 *     {enter_further_changes_here}
 
 *  Bugs:

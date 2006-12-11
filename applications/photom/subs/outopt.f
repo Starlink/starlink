@@ -56,7 +56,7 @@
 *     LSKYMAG = REAL (Given)
 *        Magnitude of sky
 *     PHOTON = INTEGER (Given)
-*        Errors from photon noise, sky or data variance
+*        Errors from photon noise, sky or data variance, gaussian sky
 *     LBIASLE = REAL (Given)
 *        Zero point for photon noise calculation per pixel
 *     CODE = CHARACTER (Given)

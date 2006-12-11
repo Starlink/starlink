@@ -105,7 +105,8 @@
 *     SKYSIG = REAL (Given)
 *        Value of sky sigma supplied by user
 *     PHOTON = INTEGER (Given)
-*        Type of error estimator, photon noise, sky or data variance
+*        Type of error estimator, photon noise, sky or data variance,
+*        gaussian sky
 *     BIASLE = REAL (Given)
 *        Zero point for photon noise calculation per pixel
 *     SATURE = REAL (Given)
