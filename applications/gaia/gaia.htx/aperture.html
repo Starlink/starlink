@@ -135,7 +135,9 @@ documentation) to understand these parameters.
 <p><b>WARNING:</b> the error estimates in the measurements will be
 wrong unless you set the image bias and data units to photons
 conversion factor correctly, this includes when measuring errors
-using sky variance.
+using sky variance. When you have no information about these values
+select "gaussian sky", which should give an upper error limit based on 
+the variation in sky values.
 
 <h3>Understand the results for an aperture</h3>
 <p>The results shown for an aperture have the following meanings:
@@ -155,7 +157,9 @@ using the photons per data unit and exposure factors
 variance, photon statistics, or the data variance, if you are using
 photon statistics or sky variance then a good knowledge of the photons
 per data unit is required, photon statistics also requires that you know
-the bias level
+the bias level, use a gaussian estimate if you don't know any
+conversion factors (or they don't make sense and you don't have 
+a data variance component)
 <dt>Sky value       
 <dd>the estimated sky, either derived from the annulus, or detached
 sky regions, or a constant, scaled by photons per data unit factor
