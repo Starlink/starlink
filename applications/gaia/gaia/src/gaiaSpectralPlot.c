@@ -823,10 +823,6 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
     XColor *linecolour;
     double basebox[4];
     double *dataPtr;
-    double xin[2];
-    double xout[2];
-    double yin[2];
-    double yout[2];
     float graphbox[4];
     int base;
     int current;

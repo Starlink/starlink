@@ -57,6 +57,7 @@
  *     {enter_changes_here}
  *-
  */
+#include <tcl.h>
 
 /* Function prototypes. */
 /* ==================== */
@@ -68,7 +69,7 @@ void astPutErr_( int, const char * );
 #define astPutErr(status,message) astPutErr_(status,message)
 #endif
 
-void errTcl_Init( Tcl_Interp *newinterp);
+void errTcl_Init( Tcl_Interp *newinterp );
 void errTcl_LastError( int *status, const char **message );
 
 #endif
