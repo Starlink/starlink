@@ -138,6 +138,17 @@ extern "C" {
     int gaiaNDFExists( int ndfid, const char *component, int *exists, 
                        char **error_mess );
 
+    /* Get a FITS channel for the NDF. */
+    int gaiaNDFGetFitsChan( int ndfid, AstFitsChan **fitschan, 
+                         char **error_mess );
+
+    /* Write a FITS extension using a FITS channel. */
+    int gaiaNDFWriteFitsChan( int ndfid, AstFitsChan *fitschan, 
+                              char **error_mess );
+    
+    /* Check if an NDF is opened with write access */
+    int gaiaNDFCanWrite( int ndfid );
+
 #ifdef __cplusplus
 }
 #endif

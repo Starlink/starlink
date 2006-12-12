@@ -53,6 +53,9 @@
 struct NDFinfo {
     int ndfid;             /* The NDF identifier */
     AstFrameSet *wcs;      /* Full AST frameset for WCS */
+    AstFitsChan *fitschan; /* All FITS headers in a channel, if used */
+    int fitschanmod;       /* Set true then fitschan has been modified 
+                            * (will require saving) */
 };
 typedef struct NDFinfo NDFinfo;
 
@@ -63,6 +66,10 @@ static int gaiaNDFTclCGet( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclCPut( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclFitsRead( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
+                                int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclClose( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
@@ -89,6 +96,9 @@ static long exportNdfHandle( int ndfid, AstFrameSet *wcs );
 static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
                           int trailed, int formatted, int ncoords,
                           char **coord, char **error_mess );
+static void storeCard( AstFitsChan *channel, const char *keyword,
+                       const char *value, const char *comment, 
+                       int overwrite );
 
 /**
  * Register all the NDF access commands.
@@ -108,6 +118,14 @@ int Ndf_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "ndf::exists", gaiaNDFTclExists,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "ndf::fitswrite", gaiaNDFTclFitsWrite,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "ndf::fitsread", gaiaNDFTclFitsRead,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -182,6 +200,8 @@ static long exportNdfHandle( int ndfid, AstFrameSet *wcs )
 
     info->ndfid = ndfid;
     info->wcs = wcs;
+    info->fitschan = NULL;
+    info->fitschanmod = 0;
 
     return (long) info;
 }
@@ -401,13 +421,15 @@ static int gaiaNDFTclCopy( ClientData clientData, Tcl_Interp *interp,
 
 
 /**
- * Close an NDF. Also frees the associated handle.
+ * Close an NDF. Also frees the associated handle and writes modified FITS
+ * headers, if possible.
  */
 static int gaiaNDFTclClose( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] )
 {
     NDFinfo *info;
     int result;
+    char *error_mess;
 
     /* Check arguments, only allow one, the NDF handle*/
     if ( objc != 2 ) {
@@ -418,17 +440,38 @@ static int gaiaNDFTclClose( ClientData clientData, Tcl_Interp *interp,
     /* Get the NDF */
     result = importNdfHandle( interp, objv[1], &info );
     if ( result == TCL_OK ) {
+
+        /* Check for FITS headers */
+        if ( info->fitschan != NULL ) {
+            if ( info->fitschanmod ) {
+                if ( gaiaNDFCanWrite( info->ndfid ) ) {
+                    result = gaiaNDFWriteFitsChan( info->ndfid, info->fitschan,
+                                                   &error_mess );
+                    if ( result != TCL_OK ) {
+                        Tcl_SetResult( interp, error_mess, TCL_VOLATILE );
+                        free( error_mess );
+                    }
+                }
+            }
+
+            /* Free the channel */
+            astAnnul( info->fitschan );
+            info->fitschan = NULL;
+            info->fitschanmod = 0;
+        }
+
         /* Close NDF */
         result = gaiaNDFClose( &info->ndfid );
 
         /* Free the handle */
         free( info );
+        info = NULL;
     }
     return result;
 }
 
 /**
- * Map an array component of the NDF in the its native data type, using file
+ * Map an array component of the NDF in its native data type, using file
  * mapping as requested. The result is a memory address (long int) of an
  * ARRAYinfo structure.
  */
@@ -972,4 +1015,142 @@ static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
         astClearStatus;
     }
     return result;
+}
+
+/**
+ * Return the value of a FITS keyword.
+ */
+static int gaiaNDFTclFitsRead( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] )
+{
+    NDFinfo *info;
+    Tcl_Obj *resultObj;
+    char *error_mess;
+    char *start;
+    char card[81];
+    char value[81];
+    char *ptr;
+    const char *keyword;
+    int result;
+
+    /* Check arguments, need the ndf handle and the keyword */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle keyword" );
+        return TCL_ERROR;
+    }
+
+    /* Get the NDF */
+    result = importNdfHandle( interp, objv[1], &info );
+    if ( result == TCL_OK ) {
+
+        /* Get the FITS headers as an AST FITS channel */
+        if ( info->fitschan == NULL ) {
+            result = gaiaNDFGetFitsChan( info->ndfid, &info->fitschan, 
+                                         &error_mess );
+        }
+        resultObj = Tcl_GetObjResult( interp );
+        if ( result != TCL_OK ) {
+            Tcl_SetStringObj( resultObj, error_mess, -1 );
+            free( error_mess );
+        }
+        else {
+            keyword = Tcl_GetString( objv[2] );
+
+            /* Look for existing card */
+            astClear( info->fitschan, "Card" );
+            if ( astFindFits( info->fitschan, keyword, card, 0 ) != 0 ) {
+                card[80] = '\0';
+
+                /* Extract value */
+                start = strstr( card, "=" );
+                if ( start != NULL ) {
+                    ptr = value;
+                    while ( *start && *start != '/' ) {
+                        *ptr++ = *start++;
+                    }
+                    *ptr = '\0';
+                    ptr = value;
+                }
+                else {
+                    ptr = card;
+                }
+                Tcl_SetStringObj( resultObj, ptr, -1);
+            }
+            else {
+                Tcl_SetStringObj( resultObj, "Failed to locate FITS card", -1);
+                result = TCL_ERROR;
+            }
+        }
+    }
+    return result;
+}
+
+/**
+ * Write a FITS keyword, value and comment to the FITS extension of the NDF.
+ * The type must currently be a string.
+ */
+static int gaiaNDFTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
+                                int objc, Tcl_Obj *CONST objv[] )
+{
+    NDFinfo *info;
+    Tcl_Obj *resultObj;
+    char *error_mess;
+    const char *comment;
+    const char *keyword;
+    const char *value;
+    int result;
+
+    /* Check arguments, need the ndf handle, the keyword, value and comment */
+    if ( objc != 5 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, 
+                          "ndf_handle keyword value comment" );
+        return TCL_ERROR;
+    }
+
+    /* Get the NDF */
+    result = importNdfHandle( interp, objv[1], &info );
+    if ( result == TCL_OK ) {
+
+        /* Get the FITS headers as an AST FITS channel */
+        if ( info->fitschan == NULL ) {
+            result = gaiaNDFGetFitsChan( info->ndfid, &info->fitschan, 
+                                         &error_mess );
+        }
+        resultObj = Tcl_GetObjResult( interp );
+        if ( result != TCL_OK ) {
+            Tcl_SetStringObj( resultObj, error_mess, -1 );
+            free( error_mess );
+        }
+        else {
+            keyword = Tcl_GetString( objv[2] );
+            value = Tcl_GetString( objv[3] );
+            comment = Tcl_GetString( objv[4] );
+
+            /* Look for existing card */
+            astClear( info->fitschan, "Card" );
+            astFindFits( info->fitschan, keyword, NULL, 0 );
+
+            /* And store value */
+            storeCard( info->fitschan, keyword, value, comment, 1 );
+            info->fitschanmod = 1;
+        }
+    }
+    return result;
+}
+
+/**
+ * Write a character string value into a FITS channel.
+ */
+static void storeCard( AstFitsChan *fitschan, const char *keyword,
+                       const char *value, const char *comment, 
+                       int overwrite )
+{
+    char card[81];
+    if ( strlen( value ) > 21 ) {
+        sprintf( card, "%-8.8s=%s /%s", keyword, value, comment );
+    } 
+    else {
+        sprintf( card, "%-8.8s=%21.21s /%s", keyword, value, comment );
+    }
+    astPutFits( fitschan, card, overwrite );
 }

@@ -482,7 +482,7 @@ int gaiaCreateNDF( const char *filename, int ndim, int lbnd[], int ubnd[],
  *     NDF. The dimensionality and data type of the array components can be
  *     set, and a new (matching) wcs established.
  */
-int gaiaCopyNDF( const char *filename, int indf, const char *clist, 
+int gaiaCopyNDF( const char *filename, int indf, const char *clist,
                  int ndim, int lbnd[], int ubnd[], const char *type,
                  AstFrameSet *wcs, int *ondf, char **error_mess )
 {
@@ -1517,7 +1517,7 @@ int gaiaNDFQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
 /**
  * Determine whether an NDF component exists.
  */
-int gaiaNDFExists( int ndfid, const char *component, int *exists, 
+int gaiaNDFExists( int ndfid, const char *component, int *exists,
                    char **error_mess )
 {
     int status = SAI__OK;
@@ -1534,3 +1534,109 @@ int gaiaNDFExists( int ndfid, const char *component, int *exists,
     return TCL_OK;
 }
 
+/**
+ * Return an existing FITS extension of an NDF as an AST FITS channel.
+ * Returns an empty channel if the extension doesn't exist.
+ */
+int gaiaNDFGetFitsChan( int ndfid, AstFitsChan **fitschan, char **error_mess )
+{
+    int status = SAI__OK;
+    int exists;
+    void *fitsptr = NULL;
+    size_t ncards;
+    HDSLoc *fitsloc = NULL;
+
+    emsMark();
+    ndfXstat( ndfid, "FITS", &exists, &status );
+    if ( exists ) {
+        ndfXloc( ndfid, "FITS", "READ", &fitsloc, &status );
+        datMapV( fitsloc, "_CHAR*80", "READ", &fitsptr, &ncards, &status );
+        if ( ! gaiaUtilsGtFitsChan( fitsptr, ncards, fitschan ) ) {
+            if ( status == SAI__OK ) {
+                *error_mess = strdup( "Failed to read NDF FITS headers" );
+            }
+        }
+        datAnnul( &fitsloc, &status );
+    }
+    else {
+        *fitschan = astFitsChan( NULL, NULL, "" );
+    }
+    if ( status != SAI__OK ) {
+        *error_mess = gaiaUtilsErrMessage();
+        emsRlse();
+        return TCL_ERROR;
+    }
+    emsRlse();
+    return TCL_OK;
+}
+
+/**
+ * Write a new FITS extension to an NDF using the contents of a FITS channel.
+ */
+int gaiaNDFWriteFitsChan( int ndfid, AstFitsChan *fitschan, char **error_mess )
+{
+    HDSLoc *fitsloc = NULL;
+    char card[81];
+    int i;
+    int ncard[1];
+    int status = SAI__OK;
+    size_t ncards;
+    void *fitsptr = NULL;
+
+    emsMark();
+
+    /*  How many cards */
+    ncard[0] = astGetI( fitschan, "Ncard" );
+    if ( ncard == 0 ) {
+        /* Nothing to do */
+        return TCL_OK;
+    }
+
+    /*  Erase the current extension, if it exists. */
+    ndfXdel( ndfid, "FITS", &status );
+
+    /*  Create a new with the correct size */
+    ndfXnew( ndfid, "FITS", "_CHAR*80", 1, ncard, &fitsloc, &status );
+
+    /*  And map it in */
+    datMapV( fitsloc, "_CHAR*80", "WRITE", &fitsptr, &ncards, &status );
+
+    /*  Write the FITS channel to it */
+    if ( status == SAI__OK ) {
+        astClear( fitschan, "Card" );
+        for ( i = 0; i < ncards; i++ ) {
+            astFindFits( fitschan, "%f", card, 1 );
+            memcpy( fitsptr, card, 80 );
+            fitsptr += 80;
+        }
+        
+    }
+
+    /*  Free locator (and flush to disk). */
+    datAnnul( &fitsloc, &status );
+
+    if ( status != SAI__OK ) {
+        *error_mess = gaiaUtilsErrMessage();
+        emsRlse();
+        return TCL_ERROR;
+    }
+    emsRlse();
+    return TCL_OK;
+}
+
+/**
+ * Return whether an NDF has been opened with write access.
+ */
+int gaiaNDFCanWrite( int ndfid )
+{
+    int status = SAI__OK;
+    int writable = 0;
+
+    emsMark();
+    ndfIsacc( ndfid, "WRITE", &writable, &status );
+    if ( status != SAI__OK ) {
+        emsRlse();
+    }
+    emsRlse();
+    return writable;
+}
