@@ -79,6 +79,10 @@ static int GaiaFITSTclCreate( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclDims( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
+static int GaiaFITSTclFitsRead( ClientData clientData, Tcl_Interp *interp,
+                                int objc, Tcl_Obj *CONST objv[] );
+static int GaiaFITSTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
+                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclExists( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclGtWcs( ClientData clientData, Tcl_Interp *interp,
@@ -110,6 +114,14 @@ int Fits_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "fits::exists", GaiaFITSTclExists,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "fits::fitsread", GaiaFITSTclFitsRead,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "fits::fitswrite", GaiaFITSTclFitsWrite,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -346,12 +358,12 @@ static int GaiaFITSTclUnMap( ClientData clientData, Tcl_Interp *interp,
     FITSinfo *info;
     long adr;
 
-    /* Check arguments, need, the FITS identifier, the "component" and 
+    /* Check arguments, need, the FITS identifier, the "component" and
      * ARRAYinfo memory address, for FITS data the component is always DATA,
      * so any actual value is ignored (like this to match the API of the
      * equivalent NDF functions). */
     if ( objc != 4 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, 
+        Tcl_WrongNumArgs( interp, 1, objv,
                           "fits_identifier component address" );
         return TCL_ERROR;
     }
@@ -472,7 +484,7 @@ static int GaiaFITSTclExists( ClientData clientData, Tcl_Interp *interp,
     FITSinfo *info;
     const char *component;
     int result;
-    
+
     /* Check arguments, need 2 the fits identifier and the component */
     if ( objc != 3 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier component" );
@@ -685,8 +697,8 @@ static int GaiaFITSTclCoord( ClientData clientData, Tcl_Interp *interp,
 
 /**
  * Create a FITS file and write to the primary extension. The result is a FITS
- * file. 
- * 
+ * file.
+ *
  * Requires the name of the FITS file, a pointer to an ARRAYinfo data struct,
  * the dimensions (a list) of the array, a WCS, a name (OBJECT) and units for
  * the data (can be blank).
@@ -749,7 +761,71 @@ static int GaiaFITSTclCreate( ClientData clientData, Tcl_Interp *interp,
     object = Tcl_GetString( objv[5] );
     units = Tcl_GetString( objv[6] );
 
-    return GaiaFITSCreate( name, info->ptr, wcs, bitpix, info->bscale, 
-                           info->bzero, info->blank, object, units, 
+    return GaiaFITSCreate( name, info->ptr, wcs, bitpix, info->bscale,
+                           info->bzero, info->blank, object, units,
                            ndims, dims );
+}
+
+/**
+ * Return the value of a FITS keyword.
+ */
+static int GaiaFITSTclFitsRead( ClientData clientData, Tcl_Interp *interp,
+                                int objc, Tcl_Obj *CONST objv[] )
+{
+    FITSinfo *info;
+    const char *keyword;
+    char value[81];
+    int result;
+
+    /* Check arguments, need the fits handle and the keyword */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier keyword" );
+        return TCL_ERROR;
+    }
+
+    /* Import FITS identifier */
+    result = importFITSIdentifier( interp, objv[1], &info );
+    if ( result == TCL_OK ) {
+        keyword = Tcl_GetString( objv[2] );
+        result = GaiaFITSHGet( info->handle, keyword, value, 80 );
+        value[80] = '\0';
+        if ( result == TCL_OK ) {
+            Tcl_SetResult( interp, value, TCL_VOLATILE );
+        }
+        else {
+            Tcl_AppendResult( interp, "Failed to read FITS card",
+                              (char *) NULL );
+        }
+    }
+    return result;
+}
+
+/**
+ * Set the value of a FITS keyword.
+ */
+static int GaiaFITSTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
+                                 int objc, Tcl_Obj *CONST objv[] )
+{
+    FITSinfo *info;
+    const char *comment;
+    const char *keyword;
+    const char *value;
+    int result;
+
+    /* Check arguments, need the fits handle, keyword, value and comment */
+    if ( objc != 5 ) {
+        Tcl_WrongNumArgs( interp, 1, objv,
+                          "fits_identifier keyword value comment" );
+        return TCL_ERROR;
+    }
+
+    /* Import FITS identifier */
+    result = importFITSIdentifier( interp, objv[1], &info );
+    if ( result == TCL_OK ) {
+        keyword = Tcl_GetString( objv[2] );
+        value = Tcl_GetString( objv[3] );
+        comment = Tcl_GetString( objv[4] );
+        result = GaiaFITSHPut( info->handle, keyword, value, comment );
+    }
+    return result;
 }

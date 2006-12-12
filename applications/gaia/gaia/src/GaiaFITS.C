@@ -204,39 +204,6 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
 }
 
 /**
- * Get the value of a FITS keyword. Returns the empty string if not found.
- */
-int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, char *value,
-                  int value_length )
-{
-    fitsio->get( keyword, value, value_length );
-    return TCL_OK;
-}
-
-/**
- * Get the integer value of a FITS keyword. Returns TCL_ERROR if not found.
- */
-int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, int *value )
-{
-    if ( fitsio->get( keyword, *value ) == 0 ) {
-        return TCL_OK;
-    }
-    return TCL_ERROR;
-}
-
-/**
- * Get the double precision value of a FITS keyword. Returns TCL_ERROR if not
- * found.
- */
-int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, double *value )
-{
-    if ( fitsio->get( keyword, *value ) == 0 ) {
-        return TCL_OK;
-    }
-    return TCL_ERROR;
-}
-
-/**
  * Create a FITS file and write a data array, plus WCS, to its primary
  * extension. 
  */
@@ -317,24 +284,26 @@ int GaiaFITSCreate( const char* filename, void *data,
 
     /* Write WCS into a FITS channel. Attempt to write headers using a
      * FITS-WCS encoding, if that fails we use a Native encoding */ 
-    AstFitsChan *chan = astFitsChan( NULL, NULL, "" );
-    astSet( chan, "Encoding=FITS-WCS" );
-    int nwrite = astWrite( chan, wcs );
-    if ( !astOK || nwrite == 0 ) {
-        astClearStatus;
-        astSet( chan, "Encoding=Native" );
-        nwrite = astWrite( chan, wcs );
+    if ( wcs != NULL ) {
+        AstFitsChan *chan = astFitsChan( NULL, NULL, "" );
+        astSet( chan, "Encoding=FITS-WCS" );
+        int nwrite = astWrite( chan, wcs );
+        if ( !astOK || nwrite == 0 ) {
+            astClearStatus;
+            astSet( chan, "Encoding=Native" );
+            nwrite = astWrite( chan, wcs );
+        }
+        
+        /* Now read the channel and write cards to the FITS file. */
+        char card[FITSCARD+1];
+        astClear( chan, "Card" );
+        int ncard = astGetI( chan, "Ncard" );
+        for ( int i = 0; i < ncard; i++ ) {
+            astFindFits( chan, "%f", card, 1 );
+            fits_write_record( fptr, card, &status );
+        }
+        astAnnul( chan );
     }
-
-    /* Now read the channel and write cards to the FITS file. */
-    char card[FITSCARD+1];
-    astClear( chan, "Card" );
-    int ncard = astGetI( chan, "Ncard" );
-    for ( int i = 0; i < ncard; i++ ) {
-        astFindFits( chan, "%f", card, 1 );
-        fits_write_record( fptr, card, &status );
-    }
-    astAnnul( chan );
     
     /*  Finally write the data array to the file. */
     long nel = 1L;
@@ -347,5 +316,48 @@ int GaiaFITSCreate( const char* filename, void *data,
 
     fits_close_file( fptr, &status );
 
+    return TCL_OK;
+}
+
+/**
+ * Get the value of a FITS keyword. Returns the empty string if not found.
+ */
+int GaiaFITSHGet( StarFitsIO *fitsio, const char *keyword, char *value,
+                  int value_length )
+{
+    fitsio->get( keyword, value, value_length );
+    return TCL_OK;
+}
+
+/**
+ * Get the integer value of a FITS keyword. Returns TCL_ERROR if not found.
+ */
+int GaiaFITSHGet( StarFitsIO *fitsio, const char *keyword, int *value )
+{
+    if ( fitsio->get( keyword, *value ) == 0 ) {
+        return TCL_OK;
+    }
+    return TCL_ERROR;
+}
+
+/**
+ * Get the double precision value of a FITS keyword. Returns TCL_ERROR if not
+ * found.
+ */
+int GaiaFITSHGet( StarFitsIO *fitsio, const char *keyword, double *value )
+{
+    if ( fitsio->get( keyword, *value ) == 0 ) {
+        return TCL_OK;
+    }
+    return TCL_ERROR;
+}
+
+/**
+ * Write a FITS card.
+ */
+int GaiaFITSHPut( StarFitsIO *fitsio, const char *keyword, const char *value,
+                  const char *comment )
+{
+    fitsio->put( keyword, value, comment );
     return TCL_OK;
 }

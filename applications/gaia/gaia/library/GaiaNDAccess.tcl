@@ -430,7 +430,7 @@ itcl::class gaia::GaiaNDAccess {
    #  as the returned instance of GaiaNDAccess is opened for write access.
    #
    #  The title should be a meaningful string that identifies this spectrum in
-   #  the original cube.
+   #  the original cube. 
    public method createspectrum {format name title} {
       if { $addr_(DATA) == 0 } {
          error "Must map in cube data before creating a spectrum"
@@ -513,6 +513,17 @@ itcl::class gaia::GaiaNDAccess {
    public method isaxisframetype {axis type} {
       set wcs [${type_}::getwcs $handle_]
       return [gaiautils::frameisa $wcs $axis $type]
+   }
+
+   #  Get the value of a FITS card.
+   public method fitsread {keyword} {
+      return [${type_}::fitsread $keyword]
+   }
+
+   #  Set the value of a FITS card. Will be saved, if the dataset is opened
+   #  for write access.
+   public method fitswrite {keyword value comment} {
+      ${type_}::fitswrite $keyword $value $comment
    }
 
    #  Configuration options: (public variables)

@@ -27,10 +27,14 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
                    int dims[], int *ndims );
 
 /* Get a FITS card value */
-int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, char *value,
+int GaiaFITSHGet( StarFitsIO *fitsio, const char *keyword, char *value,
                   int value_length );
-int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, int *value );
-int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, double *value );
+int GaiaFITSHGet( StarFitsIO *fitsio, const char *keyword, int *value );
+int GaiaFITSHGet( StarFitsIO *fitsio, const char *keyword, double *value );
+
+/* Write a FITS card */
+int GaiaFITSHPut( StarFitsIO *fitsio, const char *keyword, const char *value,
+                  const char *comment );
 
 /* Create a FITS file from a data array and a WCS */
 int GaiaFITSCreate( const char* filename, void *data, 
