@@ -176,7 +176,7 @@ Starlink applications, and a number of other common data formats.
 </component>
 
 <component id="cupid" support="S">
-  <version>0.0-20</version>
+  <version>0.0-21</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
@@ -1164,7 +1164,7 @@ A software package designed to search for periodicities in data.
 </component>
 
 <component id="photom" support="S">
-  <version>1.9-1</version>
+  <version>1.10-0</version>
   <path>applications/photom</path>
   <description>PHOTOM - A Photometry Package</description>
   <abstract><p>PHOTOM is a package for measuring the sky corrected
