@@ -43,13 +43,14 @@
 #include <math.h>
 #include <float.h>
 
-#include <gaiaUtils.h>
+#include "gaiaUtils.h"
 #include <sae_par.h>
 #include <ems.h>
 #include <ems_par.h>
 #include <star/ard.h>
 #include <star/grp.h>
 #include <prm_par.h>
+#include "ast_tclerr.h"
 
 #define TCL_OK 0
 #define TCL_ERROR 1
@@ -515,7 +516,7 @@ int gaiaUtilsAtlPlROI( AstPlot *plot, AstKeyMap **rplots, char **error_mess )
 {
     int status = SAI__OK;
     int status_check;
-    char *ptr;
+    const char *ptr;
 
     emsMark();
     atlPlroi( plot, rplots, &status );
