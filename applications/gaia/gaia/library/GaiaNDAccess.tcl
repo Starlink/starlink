@@ -153,13 +153,18 @@ itcl::class gaia::GaiaNDAccess {
       }
    }
 
-   #  Acquire an already opened NDF by name and "handle" (NDF identifier).
+   #  Acquire an already opened dataset by name and "handle".
    public method acquire {name handle} {
       set handle_ $handle
       $namer_ configure -imagename $name
       set dataset $name
-      set type_ "ndf"
-      set cnfmap_ 1
+      if { "[$namer_ type]" == ".sdf" } {
+         set type_ "ndf"
+         set cnfmap_ 1
+      } else {
+         set type_ "fits"
+         set cnfmap_ 1
+      }
    }
 
    #  Determine if a named component exists.
@@ -485,7 +490,7 @@ itcl::class gaia::GaiaNDAccess {
 
          #  Create a new instance to manage the new FITS file.
          set accessor [uplevel \#0 GaiaNDAccess \#auto]
-         $accessor acquire $name $newhandle
+         $accessor configure -dataset $name
       }
       return $accessor
    }
@@ -517,13 +522,13 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Get the value of a FITS card.
    public method fitsread {keyword} {
-      return [${type_}::fitsread $keyword]
+      return [${type_}::fitsread $handle_ $keyword]
    }
 
    #  Set the value of a FITS card. Will be saved, if the dataset is opened
    #  for write access.
    public method fitswrite {keyword value comment} {
-      ${type_}::fitswrite $keyword $value $comment
+      ${type_}::fitswrite $handle_ $keyword $value $comment
    }
 
    #  Configuration options: (public variables)
