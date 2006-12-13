@@ -734,11 +734,11 @@ package @PACKAGE@ {
 	  }
 
  	  parameter genvar {
-	    type _LOGICAL
-	    vpath DYNAMIC DEFAULT
-	    ppath CURRENT DYNAMIC DEFAULT
-	    prompt {Generate output variances?}
-	    default TRUE
+	    type LITERAL
+	    vpath DEFAULT
+	    ppath CURRENT DEFAULT
+	    prompt {Method for calculating output variances}
+	    default {TSYS}
 	    helpkey *
 	  }
 

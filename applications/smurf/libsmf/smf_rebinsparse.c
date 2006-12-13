@@ -15,8 +15,8 @@
 *  Invocation:
 *     smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap,
 *                      AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 
-*                      int ubnd_out[ 3 ], float *data_array, float *var_array, 
-*                      int *ispec, int *status );
+*                      int ubnd_out[ 3 ], int genvar, float *data_array,
+*                      float *var_array, int *ispec, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -36,13 +36,18 @@
 *        The lower pixel index bounds of the output cube.
 *     ubnd_out = dim_t [ 3 ] (Given)
 *        The upper pixel index bounds of the output cube.
+*     genvar = int (Given)
+*        Indicates how the output variances should be calculated. If a
+*        value of 2 is supplied, then output variances are calculated on
+*        the basis of the input system noise temperatures. Any other value
+*        causes no output variances to be created.
 *     data_array = float * (Given and Returned)
 *        The data array for the output cube. This is updated on exit to
 *        include the data from the supplied input NDF.
 *     var_array = float * (Given and Returned)
-*        The variance array for the output cube. This is updated on exit to
-*        include the data from the supplied input NDF. May be supplied
-*        NULL, in which case no variances are generated.
+*        The variance array for the output cube. This is updated on exit
+*        to include the data from the supplied input NDF. Ignored if
+*        "genvar" is not 2.
 *     ispec = int * (Given and Returned)
 *        Index of the next spectrum to be stored in the output NDF.
 *     status = int * (Given and Returned)
@@ -63,6 +68,8 @@
 *  History:
 *     30-NOV-2006 (DSB):
 *        Initial version.
+*     13-DEC-2006 (DSB):
+*        Added "genvar" argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -110,7 +117,7 @@
 
 void smf_rebinsparse( smfData *data, AstFrame *ospecfrm, AstMapping *ospecmap, 
                       AstSkyFrame *oskyframe, Grp *detgrp, int lbnd_out[ 3 ], 
-                      int ubnd_out[ 3 ], float *data_array, 
+                      int ubnd_out[ 3 ], int genvar, float *data_array, 
                       float *var_array, int *ispec, int *status ){
 
 /* Local Variables */

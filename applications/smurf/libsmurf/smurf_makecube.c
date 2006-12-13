@@ -34,6 +34,11 @@
 *     AUTOGRID can be set true, in which case projection parameters are 
 *     determined automatically in a manner that favours projections that 
 *     place samples centrally within pixels.
+*
+*     Variance values in the output can be calculated wither on the basis
+*     of the spread of input dat avalues contributing to each output pixel,
+*     or on the basis of the system noise temperature values supplied in the 
+*     input NDFs (see parameter GENVAR).
 
 *  ADAM Parameters:
 *     AUTOGRID = _LOGICAL (Read)
@@ -78,15 +83,23 @@
 *          A group of detector names. Only data from the named detectors
 *          will be included in the output cube and catalogue. If a null (!) 
 *          value is supplied, data from all detectors will be used. [!]
-*     GENVAR = _LOGICAL (Read)
-*          If TRUE, then Variance values are stored in the output NDF based 
-*          on the spread of input data values contributing to each output 
-*          pixel. Note, if only one pixel contribues to an output pixel,
-*          then the associated Variance value will be bad. The dynamic
-*          default for this parameter is TRUE if the mean density of 
-*          detector samples in the output NDF is more than 1 per pixel.
-*          It is FALSE otherwise. If SPARSE is set TRUE, then GENVAR is
-*          not accessed and a FALSE value is always assumed. []
+*     GENVAR = LITERAL (Read)
+*          Indicates how the Variance values in the output NDF are to be
+*          calculated. It can take any of the following values:
+*
+*          - "Spread" -- the output Variance values are based on the spread 
+*          of input data values contributing to each output pixel. Note, if 
+*          only one pixel contributes to an output pixel, then the associated 
+*          Variance value will be bad. This option is not available if
+*          parameter SPARSE is set TRUE. 
+*
+*          - "Tsys" -- the output Variance values are based on the system 
+*          noise temperature values supplied in the input NDFs. 
+*
+*          - "None" -- no output Variance values are created.
+*
+*          ["Tsys"]
+*
 *     IN = NDF (Read)
 *          Input file(s)
 *     OUT = NDF (Write)
@@ -293,6 +306,9 @@
 *        Added parameter SPARSE.
 *     6-DEC-2006 (DSB):
 *        Add detgrp to the smf_cubegrid argument list.
+*     13-DEC-2006 (DSB):
+*        Allow output variances to be caclulated on the basis of the system 
+*        noise temperature values in the input NDFs.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -368,14 +384,14 @@ void smurf_makecube( int *status ) {
    Grp *ogrp = NULL;          /* Group containing output file */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
    char *pname = NULL;        /* Name of currently opened data file */
-   char spbuf[ 10 ];          /* Text buffer for SPREAD parameter value */
+   char pabuf[ 10 ];          /* Text buffer for parameter value */
    char system[ 10 ];         /* Celestial coord system for output cube */
    double par[ 7 ];           /* Projection parameter */
    double params[ 4 ];        /* astRebinSeq parameters */
    int autogrid;              /* Determine projection parameters automatically? */
    int axes[ 2 ];             /* Indices of selected axes */
    int flag;                  /* Is group expression to be continued? */
-   int genvar;                /* Create output Variances based on input data values/ */
+   int genvar;                /* How to create output Variances */
    int ifile;                 /* Input file index */
    int ispec;                 /* Index of next spectrum within output NDF */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for output map */
@@ -384,7 +400,6 @@ void smurf_makecube( int *status ) {
    int ndet;                  /* Number of detectors supplied for "DETECTORS" */
    int nparam;                /* No. of parameters required for spreading scheme */
    int npos;                  /* Number of samples included in output NDF */
-   int nposout;               /* Number of spatial elements in output NDF */
    int ondf;                  /* output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
    int outsize;               /* Number of files in output group */
@@ -463,16 +478,19 @@ void smurf_makecube( int *status ) {
       smf_cubebounds( igrp, size, oskyfrm, autogrid, usedetpos, par, moving, 
                       lbnd_out, ubnd_out, &wcsout, &npos, status );
 
-/* See if the mean spatial density of points in the output is more than 1
-   per pixel, and set up a suitable dynamic default for the GENVAR
-   parameter. */
-      nposout = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
-      nposout *= ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
-      parDef0l( "GENVAR", ( npos > nposout ), status );
+/* See how the output Variances are to be created. */
+      parChoic( "GENVAR", "TSYS", "SPREAD,TSYS,NONE", 1, pabuf, 10, status );
 
-/* See if output Variances based on the spread of input Data values are
-   to be created. */
-      parGet0l( "GENVAR", &genvar, status );
+      if( !strcmp( pabuf, "SPREAD" ) ) {
+         genvar = 1;
+   
+      } else if( !strcmp( pabuf, "TSYS" ) ) {
+         genvar = 2;
+   
+      } else {
+         genvar = 0;
+
+      }
 
 /* Now deal with sparse output cubes. */
    } else {
@@ -482,9 +500,18 @@ void smurf_makecube( int *status ) {
       smf_sparsebounds( igrp, size, oskyfrm, usedetpos, detgrp, lbnd_out, 
                         ubnd_out, &wcsout, status );
 
-/* Output Variances based on the spread of input Data values cannot be
-   created if the output cube is sparse. */
-      genvar = 0;
+/* See how the output Variances are to be created (the "Spread" option is
+   not available in sparse mode). */
+      parChoic( "GENVAR", "TSYS", "TSYS,NONE", 1, pabuf, 10, status );
+
+      if( !strcmp( pabuf, "TSYS" ) ) {
+         genvar = 2;
+   
+      } else {
+         genvar = 0;
+
+      }
+
    }
 
 /* Get the base->current Mapping from the output WCS FrameSet, and split it 
@@ -542,48 +569,48 @@ void smurf_makecube( int *status ) {
    if( !sparse ) {
       parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
                 "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
-                1, spbuf, 10, status );
+                1, pabuf, 10, status );
 
-      if( !strcmp( spbuf, "NEAREST" ) ) {
+      if( !strcmp( pabuf, "NEAREST" ) ) {
          spread = AST__NEAREST;
          nparam = 0;
    
-      } else if( !strcmp( spbuf, "LINEAR" ) ) {
+      } else if( !strcmp( pabuf, "LINEAR" ) ) {
          spread = AST__LINEAR;
          nparam = 0;
    
-      } else if( !strcmp( spbuf, "SINC" ) ) {      
+      } else if( !strcmp( pabuf, "SINC" ) ) {      
          spread = AST__SINC;
          nparam = 1;
    
-      } else if( !strcmp( spbuf, "SINCSINC" ) ) {      
+      } else if( !strcmp( pabuf, "SINCSINC" ) ) {      
          spread = AST__SINCSINC;
          nparam = 2;
    
-      } else if( !strcmp( spbuf, "SINCCOS" ) ) {      
+      } else if( !strcmp( pabuf, "SINCCOS" ) ) {      
          spread = AST__SINCCOS;
          nparam = 2;
    
-      } else if( !strcmp( spbuf, "SINCGAUSS" ) ) {      
+      } else if( !strcmp( pabuf, "SINCGAUSS" ) ) {      
          spread = AST__SINCGAUSS;
          nparam = 2;
    
-      } else if( !strcmp( spbuf, "SOMB" ) ) {      
+      } else if( !strcmp( pabuf, "SOMB" ) ) {      
          spread = AST__SOMB;
          nparam = 1;
    
-      } else if( !strcmp( spbuf, "SOMBCOS" ) ) {      
+      } else if( !strcmp( pabuf, "SOMBCOS" ) ) {      
          spread = AST__SOMBCOS;
          nparam = 2;
    
-      } else if( !strcmp( spbuf, "GAUSS" ) ) {      
+      } else if( !strcmp( pabuf, "GAUSS" ) ) {      
          spread = AST__GAUSS;
          nparam = 2;
    
       } else if( *status == SAI__OK ) {
          nparam = 0;
          *status = SAI__ERROR;
-         msgSetc( "V", spbuf );
+         msgSetc( "V", pabuf );
          errRep( "", "Support not available for SPREAD = ^V (programming "
                  "error)", status );
       }
@@ -610,7 +637,7 @@ void smurf_makecube( int *status ) {
       ubnd_wgt[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
       ubnd_wgt[ 1 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
       ubnd_wgt[ 2 ] = ubnd_out[ 2 ] - lbnd_out[ 2 ] + 1;
-      if( spread != AST__NEAREST && genvar ) ubnd_wgt[ 0 ] *= 2;
+      if( spread != AST__NEAREST && genvar == 1 ) ubnd_wgt[ 0 ] *= 2;
    
       parGet0l( "WEIGHTS", &savewgt, status );
 
@@ -688,12 +715,12 @@ void smurf_makecube( int *status ) {
 /* Rebin the data into the output grid. */
       if( !sparse ) {
          smf_rebincube( data, ifile, size, swcsout, ospecfrm, ospecmap, detgrp,
-                        moving, lbnd_out, ubnd_out, spread, params, data_array,
-                        var_array, wgt_array, status );
+                        moving, lbnd_out, ubnd_out, spread, params, genvar,
+                        data_array, var_array, wgt_array, status );
       } else {
          smf_rebinsparse( data, ospecfrm, ospecmap, oskyfrm, detgrp, 
-                          lbnd_out, ubnd_out, data_array, var_array, &ispec, 
-                          status );
+                          lbnd_out, ubnd_out, genvar, data_array, var_array, 
+                          &ispec, status );
       }
    
 /* Close the input data file. */
