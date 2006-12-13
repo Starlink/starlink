@@ -558,7 +558,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       # If in CYGWIN environment convert filename to windows format.
       # SPLAT is a windows application. Otherwise get absolute name
       # for SPLAT to locate.
-      if { [string match {CYGWIN*} $::tcl_platform(os)] } { 
+      if { [string match {CYGWIN*} $::tcl_platform(os)] } {
          set filename [exec cygpath -wa $filename]
       } else {
          set filename "[pwd]/$filename"
@@ -934,6 +934,45 @@ itcl::class gaia::GaiaCubeSpectrum {
          return [code $spectrum_]
       }
       return {}
+   }
+
+   #  Return various useful coordinates. The centre of image, the coordinates
+   #  of the extraction and the offset of the extraction from the image
+   #  centre, all in world coordinates (usually RA and Dec).
+   public method get_last_coords {} {
+      set xra ""
+      set xdec ""
+      set dra ""
+      set ddec ""
+      set ra ""
+      set dec ""
+      if { $last_cxcy_ != {} } {
+
+         #  Convert click coordinates from canvas coords to grid coords.
+         lassign $last_cxcy_ cx cy
+         set ccx [$canvas_ canvasx $cx]
+         set ccy [$canvas_ canvasy $cy]
+         $rtdimage_ convert coords $ccx $ccy canvas iix iiy image
+
+         #  Centre of image.
+         set icx [expr 0.5*[$rtdimage_ width]]
+         set icy [expr 0.5*[$rtdimage_ height]]
+
+         #  Distances from centre, degrees.
+         $rtdimage_ convert dist [expr $iix-$icx] [expr $iiy-$icy] \
+            image dra ddec deg
+
+         #  Distance from centre, arcsecs.
+         set dra [format "%f" [expr $dra*3600]]
+         set ddec [format "%f" [expr $ddec*3600]]
+
+         #  Image centre in world coordinates.
+         lassign [$rtdimage_ astpix2cur $icx $icy] ra dec
+
+         #  World coordinates of extraction point.
+         lassign [$rtdimage_ astpix2cur $iix $iiy] xra xdec
+      }
+      return [list $ra $dec $xra $xdec $dra $ddec]
    }
 
    #  Configuration options: (public variables)
