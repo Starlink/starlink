@@ -67,6 +67,8 @@
 *        Add SLA_OBS
 *     08-AUG-2006 (TIMJ):
 *        Add SLA_PA
+*     12-DEC-2006 (TIMJ):
+*        Add SLA_DTT and SLA_DAT
 *-
 */
 
@@ -1585,3 +1587,34 @@ slaPa ( double ha, double dec, double phi ) {
   F77_IMPORT_DOUBLE( RETVAL, retval );
   return retval;
 }
+
+F77_DOUBLE_FUNCTION(sla_dtt)( DOUBLE(UTC) );
+
+double
+slaDtt( double utc ) {
+  DECLARE_DOUBLE(UTC);
+  DECLARE_DOUBLE(RETVAL);
+  double retval;
+
+  F77_EXPORT_DOUBLE( utc, UTC );
+  RETVAL = F77_CALL(sla_dtt)( DOUBLE_ARG(&UTC) );
+
+  F77_IMPORT_DOUBLE( RETVAL, retval );
+  return retval;
+}
+
+F77_DOUBLE_FUNCTION(sla_dat)( DOUBLE(UTC) );
+
+double
+slaDat( double utc ) {
+  DECLARE_DOUBLE(UTC);
+  DECLARE_DOUBLE(RETVAL);
+  double retval;
+
+  F77_EXPORT_DOUBLE( utc, UTC );
+  RETVAL = F77_CALL(sla_dat)( DOUBLE_ARG(&UTC) );
+
+  F77_IMPORT_DOUBLE( RETVAL, retval );
+  return retval;
+}
+
