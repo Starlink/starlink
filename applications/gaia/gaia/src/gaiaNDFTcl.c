@@ -1146,11 +1146,11 @@ static void storeCard( AstFitsChan *fitschan, const char *keyword,
                        int overwrite )
 {
     char card[81];
-    if ( strlen( value ) > 21 ) {
-        sprintf( card, "%-8.8s=%s /%s", keyword, value, comment );
+    if ( strlen( value ) > 18 ) {
+        sprintf( card, "%-8.8s='%s' /%s", keyword, value, comment );
     } 
     else {
-        sprintf( card, "%-8.8s=%21.21s /%s", keyword, value, comment );
+        sprintf( card, "%-8.8s='%18.18s'/%s", keyword, value, comment );
     }
     astPutFits( fitschan, card, overwrite );
 }
