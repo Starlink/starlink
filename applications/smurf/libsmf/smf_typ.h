@@ -73,6 +73,8 @@
 *        Add detpos to smfHead
 *     2006-10-2 (DSB):
 *        Add detname to smfHead
+*     2006-12-13 (DSB):
+*        Add tsys to smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -176,6 +178,7 @@ typedef struct smfHead {
   const double * fplanex;   /* X coords (radians) of focal plane detectors */
   const double * fplaney;   /* Y coords (radians) of focal plane detectors */
   const double * detpos;    /* Tracking coords (radians) of detectors */
+  const double * tsys;      /* System Noise temperatures */
   const char * detname;     /* Concatentated list of null-terminated detector names */
   int dpazel;               /* Flag: does "detpos" hold AZEL values? */
   double instap[2];         /* instrument aperture (focal plane offsets)  */

@@ -34,6 +34,8 @@
  *        Added RECEPPOS.
  *     4-NOV-2006 (DSB):
  *        Added RECEPTORS.
+ *     13-DEC-2006 (DSB):
+ *        Added TSYS.
 
  *  Copyright:
  *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -84,6 +86,7 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   HDSLoc * fyloc = NULL;  /* locator of FPLANEY */
   HDSLoc * nloc = NULL;   /* locator of RECEPTORS */
   HDSLoc * rloc = NULL;   /* locator of RECEPPOS */
+  HDSLoc * tloc = NULL;   /* locator of TSYS */
   HDSLoc * xloc = NULL;   /* locator of required extension */
   char *cout;             /* Pointer to next output character */
   char *receptor;         /* String holding receptor names */
@@ -92,9 +95,11 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   double * fplanex = NULL;/* X coordinates in radians */
   double * fplaney = NULL;/* Y coordinates in radians */
   double * fpntrr = NULL; /* mapped RECEPPOS */
+  double * fpntrt = NULL; /* mapped TSYS */
   double * fpntrx = NULL; /* mapped FPLANEX */
   double * fpntry = NULL; /* mapped FPLANEY */
   double * receppos = NULL;/* RECEPPOS coordinates in radians */
+  double * tsys = NULL;   /* TSYS values */
   double azac1;           /* Frame TCS_AZ_AC1 value */
   double azac2;           /* Frame TCS_AZ_AC2 value */
   double azd;             /* Distance from receptor to TCS_AZ_AC1/2 */
@@ -106,10 +111,11 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   int iframe;             /* Frame index */
   int irec;               /* Receptor index */
   int j;                  /* Character count */
-  int ri;                 /* Index into receppos array */
+  int ri;                 /* Index into receppos or TSYS array */
   size_t clen;            /* Character length */
   size_t sizen;           /* Number of RECEPTOR list */
   size_t sizer;           /* Number of RECEPPOS coordinates */
+  size_t sizet;           /* Number of TSYS coordinates */
   size_t sizex;           /* Number of FPLANEX coordinates */
   size_t sizey;           /* Number of FPLANEY coordinates */
   unsigned int i;         /* loop counter */
@@ -130,6 +136,7 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   datFind( xloc, "FPLANEY", &fyloc, status );
   datFind( xloc, "RECEPPOS", &rloc, status );
   datFind( xloc, "RECEPTORS", &nloc, status );
+  datFind( xloc, "TSYS", &tloc, status );
 
   /* map numericals them as vectorized _DOUBLEs */
   datMapV( fxloc, "_DOUBLE", "READ", &tpntr, &sizex, status );
@@ -138,6 +145,8 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   fpntry = tpntr;
   datMapV( rloc, "_DOUBLE", "READ", &tpntr, &sizer, status );
   fpntrr = tpntr;
+  datMapV( tloc, "_DOUBLE", "READ", &tpntr, &sizet, status );
+  fpntrt = tpntr;
 
   /* map strings and get the length of each one */
   datMapV( nloc, "_CHAR", "READ", &tpntr, &sizen, status );
@@ -159,6 +168,7 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
     fplanex = smf_malloc( sizex, sizeof(*fplanex), 0, status );
     fplaney = smf_malloc( sizex, sizeof(*fplaney), 0, status );
     receppos = smf_malloc( sizer, sizeof(*receppos), 0, status );
+    tsys = smf_malloc( sizet, sizeof(*tsys), 0, status );
     receptor = smf_malloc( sizen, clen + 1, 0, status );
 
     /* need to convert fplane values from arcsec to radians since they are 
@@ -173,6 +183,11 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
     /* just copy the receppos values since they are already in radians */
     if (receppos) {
       memcpy( receppos, fpntrr, sizer*sizeof(*receppos) );
+    }
+
+    /* copy the Tsys values */
+    if (tsys) {
+      memcpy( tsys, fpntrt, sizet*sizeof(*tsys) );
     }
 
     /* copy the receptor names, null terminating them. */
@@ -191,6 +206,7 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
     hdr->fplanex = fplanex;
     hdr->fplaney = fplaney;
     hdr->detpos = receppos;
+    hdr->tsys = tsys;
     hdr->detname = receptor;
 
     /* The receppos values may be either in tracking coords or in azel
@@ -246,5 +262,6 @@ L10:;
   datAnnul( &rloc, status );
   datAnnul( &xloc, status );
   datAnnul( &nloc, status );
+  datAnnul( &tloc, status );
 
 }
