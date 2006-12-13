@@ -262,13 +262,17 @@ itcl::class gaia::GaiaSpecWriter {
                array::copy $cubespecdatacomp $specdatacomp
                $cubeaccessor unmap "QUALITY"
             }
+
+            #  Record the world coordinates of this position. These 
+            #  document the extraction for other applications.
+            add_fits_coords_ $specaccessor
          }
          $specaccessor close
-
+         
          blt::busy release $w_
       }
    }
-
+   
    #  FITS format
    #  -----------
 
@@ -302,6 +306,12 @@ itcl::class gaia::GaiaSpecWriter {
          #  spectrum that was extracted.
          set specaccessor [$cubeaccessor createspectrum "FITS" $filename \
                               $shortname]
+
+         
+         #  Record the world coordinates of this position. These 
+         #  document the extraction for other applications.
+         add_fits_coords_ $specaccessor
+
          $specaccessor close
 
          blt::busy release $w_
@@ -311,6 +321,28 @@ itcl::class gaia::GaiaSpecWriter {
    #  Return a suitable shortname.
    public method get_shortname {} {
       return [$cubespectrum sectioned_name]
+   }
+
+   #  Add world coordinates and offsets that describe a point extracted
+   #  spectrum as various FITS cards. Note all in same world coordinate
+   #  system.
+   protected method add_fits_coords_ {specaccessor} {
+
+      lassign [$cubespectrum get_last_coords] ra dec xra xdec dra ddec
+      if { $ra != "" } {
+         $specaccessor fitswrite EXRA  $ra \
+            "RA centre for spectral extraction"
+         $specaccessor fitswrite EXDEC $dec \
+            "DEC centre for spectral extraction"
+         $specaccessor fitswrite EXRAX $xra \
+            "RA of spectral extraction"
+         $specaccessor fitswrite EXDECX $xdec \
+            "Dec of spectral extraction"
+         $specaccessor fitswrite EXRAOF  $dra \
+            "Offset from centre of spectral extraction (arcsec)"
+         $specaccessor fitswrite EXDECOF $ddec \
+            "Offset from centre of spectral extraction (arcsec)"
+      }
    }
 
    #  Configuration options: (public variables)
