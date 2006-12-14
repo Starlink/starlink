@@ -148,7 +148,7 @@ int *status              /* global status (given and returned) */
 
    if ( *status != SAI__OK ) {
      msgSetc ( "FILENAME", obs_name );
-     msgOut(' ', "Cannot find file ^FILENAME", status);
+     msgOut(" ", "Cannot find file ^FILENAME", status);
      return;
    }  
     
@@ -158,7 +158,7 @@ int *status              /* global status (given and returned) */
 
    if ( *status != SAI__OK ) {
      msgSetc ( "FILENAME", obs_name );
-     msgOut(' ', "Cannot find file ^FILENAME", status);
+     msgOut(" ", "Cannot find file ^FILENAME", status);
      return;
    } 
 

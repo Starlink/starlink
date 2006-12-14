@@ -321,7 +321,7 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
              date_mo, date_da );
 
    msgSetc( "FILENAME", filename );
-   msgOut(' ', "Writing ^FILENAME", status ); 
+   msgOut(" ", "Writing ^FILENAME", status ); 
 
    /* Store the data in output file file_name */
    /*   sc2sim_ndfwrheat ( sinx->add_atm, sinx->add_fnoise, sinx->add_pns,
@@ -334,8 +334,8 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
 		     digits, dksquid, flatcal, flatpar, filter, status );
 
    msgSetc( "FILENAME", filename );
-   msgOut(' ', "Done ^FILENAME", status ); 
+   msgOut(" ", "Done ^FILENAME", status ); 
 
-   msgOutif(MSG__VERB,' ', "Heatrun successful.", status ); 
+   msgOutif(MSG__VERB," ", "Heatrun successful.", status ); 
 
 } 

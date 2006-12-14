@@ -141,7 +141,7 @@ void smurf_dreamsolve ( int *status ) {
       errRep(FUNC_NAME, 
 	     "Unable to apply DREAM solution to data from file ^I of ^N", status);
     } else {
-      msgOutif(MSG__VERB,' ', "DREAM solution applied", status);
+      msgOutif(MSG__VERB," ", "DREAM solution applied", status);
     }
     /* Free resources for output data */
     smf_close_file( &data, status );

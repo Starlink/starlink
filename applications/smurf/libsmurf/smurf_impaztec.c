@@ -259,7 +259,7 @@ void smurf_impaztec( int *status ) {
     atstart    = 0;
     atend      = 0;
 
-    msgOutif(MSG__VERB,' ', 
+    msgOutif(MSG__VERB," ", 
 	     "Reading netcdf file", status); 
 
     /* Get the data dimensionality */
@@ -423,7 +423,7 @@ void smurf_impaztec( int *status ) {
 
   }
 
-  msgOutif(MSG__VERB,' ', 
+  msgOutif(MSG__VERB," ", 
 	   "Writing NDF file", status); 
 
   ndfBegin();
@@ -567,7 +567,7 @@ void smurf_impaztec( int *status ) {
   smf_free ( azelbasec2, status );
 
   if ( *status == SAI__OK ) {
-    msgOutif(MSG__VERB,' ', 
+    msgOutif(MSG__VERB," ", 
 	   "Impaztec complete, NDF file written", status); 
 
   }

@@ -140,7 +140,7 @@ void smurf_starecalc ( int *status ) {
 	     "Unable to produce STARE images for data from file ^I of ^N", status);
     } else {
       msgSeti("N",naver);
-      msgOutif(MSG__VERB,' ', 
+      msgOutif(MSG__VERB," ", 
 	       "STARE images written, averaged over ^N frames", status);
     }
     /* Free resources for output data */

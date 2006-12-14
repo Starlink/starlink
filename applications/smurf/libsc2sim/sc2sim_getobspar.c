@@ -242,7 +242,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
          nvert_x++;
          if ( nvert_x > SC2SIM__MXVERT ) {
             *status = SAI__ERROR;
-            msgOut(' ', 
+            msgOut(" ", 
                    "Number of x vertices exceeds maximum", status); 
             return;
          }
@@ -272,7 +272,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
          nvert_y++;
          if ( nvert_y > SC2SIM__MXVERT ) {
             *status = SAI__ERROR;
-            msgOut(' ', 
+            msgOut(" ", 
                    "Number of y vertices exceeds maximum", status); 
             return;
          }
@@ -285,12 +285,12 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       store them in the inx structure */
    if ( nvert_x != nvert_y ) {
       *status = SAI__ERROR;
-      msgOut(' ', 
+      msgOut(" ", 
              "Number of vertices is not equal", status); 
       return;
    } else  if ( nvert_x == 0 || nvert_y == 0 ) {
       *status = SAI__ERROR;
-      msgOut(' ', 
+      msgOut(" ", 
              "Error parsing jig vertices", status); 
       return;
    } else {
@@ -349,7 +349,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    else
    {   
       *status = SAI__ERROR;
-      msgOut(' ', 
+      msgOut(" ", 
              "Too many reconstruction grid points requested", status); 
       return;
    }      
