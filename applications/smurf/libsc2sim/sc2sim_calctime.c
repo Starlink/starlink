@@ -4,7 +4,7 @@
 *     sc2sim_calctime
 
 *  Purpose:
-*     Calculate UT + LST arrays given a start time
+*     Calculate UT1 + LAST arrays given a start time
 
 *  Language:
 *     Starlink ANSI C
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     sc2sim_calctime ( double mjdaystart, double samptime, int nsamp, 
-                        double *ut, double *lst, int *status )
+                        double *ut, double *last, int *status )
 
 *  Arguments:
 *     mjdaystart = double (Given)
@@ -25,17 +25,26 @@
 *        Number of samples
 *     ut = double* (Returned)
 *        UT at each sample (mod. juldate)
-*     lst = double* (Returned)
-*        LST at each sample (radians)
+*     last = double* (Returned)
+*        LAST at each sample (radians)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     Given a start time and number of samples, calculate the UT and LST at
-*     each sample.
+*     Given a start time and number of samples, calculate the UT (UT1)
+*     and local apparent sidereal time (LAST) at each sample.
+
+*  Notes:
+*     - The ut & last pointers must be allocated externally to this routine
+*     - The input time is a UTC MJD
+*     - Expressing the UTC as MJD means that there cannot be any leap seconds 
+*       during the simulation
+*     - At the moment, DUT1 is set to 0, and TAI-UTC is hard-wired to 33s
 
 *  Authors:
-*     E.Chapin (UBC)
+*     E. Chapin (UBC)
+*     J. Balfour (UBC)
+*     A.G. Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -48,7 +57,11 @@
 *     2006-09-05 (JB)
 *        Included smurf_par.h
 *     2006-09-08 (EC)
-*        Made Longitude and argument
+*        Made Longitude an argument
+*     2006-12-12 (AGG):
+*        - Update to return local apparent sidereal time (see SUN/67)
+*        - Calculate equation of equinoxes
+*        - Check input pointers are not NULL
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -81,47 +94,86 @@
 /* Starlink includes */
 #include "ast.h"
 #include "star/slalib.h"
+#include "mers.h"
+#include "sae_par.h"
 
 /* SMURF includes */
 #include "sc2sim.h"
 #include "smurf_par.h"
 
+#define FUNC_NAME "sc2sim_calctime"
+
 void sc2sim_calctime
 ( 
 double lon,          /* Geodetic W Lon (radians) */
-double mjdaystart,   /* start time as modified juldate */
+double mjdaystart,   /* start time as modified juldate (UTC) */
 double samptime,     /* length of a sample in seconds */
 int nsamp,           /* number of samples */
 double *ut,          /* returned UT at each sample (mod. juldate) */
-double *lst,         /* returned LST at each sample (radians) */
+double *last,        /* returned LAST at each sample (radians) */
 int *status          /* global status (given and returned) */
 )
 
 {
 
-   /* Local variables */
-   double gst;
-   int i;
-   double sampday;
+  /* Local variables */
+  double dttd;                   /* TT-UTC in days */
+  double dut1d = 0.1556/SPD;     /* DUT1 in days: this value is for 20060917 */
+  double eqeqx;                  /* Equation of the equinoxes in radians */
+  double gmst;                   /* Greenwich Mean Sidereal Time (radians) */
+  int i;                         /* Loop counter */
+  double sampday;                /* Sample time in days */
+  double start_ut1;              /* UT1 (MJD) corresponding to start of scan */
 
-   /* Check status */
-   if ( !StatusOkP(status) ) return;
+  /* Check status */
+  if ( *status != SAI__OK ) return;
+
+  /* Check input pointers are not NULL */
+  if ( ut == NULL || last == NULL ) {
+    if ( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Input pointers to sc2sim_calctime are NULL", status);
+    }
+  }
+
+  if ( *status == SAI__OK ) {
   
-   /* Length of a single sample in days */
-   sampday = samptime/(3600. * 24.);
+    dut1d = 0.0; /* KLUDGE */
+
+    /* Length of a single sample in days */
+    sampday = samptime / SPD;
  
-   /* Loop over each time step, calculate UT and then calculate 
-      Greenwich sidereal time using slalib routine slaGmst and convert
-      to local sidereal time */
-  
-   for(i=0; i<nsamp; i++) {
-      ut[i] = mjdaystart + ((double) i)*sampday;
+    /* Convert start time from UTC to UT1 */
+    start_ut1 = mjdaystart + dut1d;
 
-      gst = slaGmst( ut[i] );
+    /* Calculate the TT-UTC difference in days, assume TT is equivalent
+       to TDB (needed below). Assume it doesn't change significantly
+       over an observation. */ 
+    /* KLUDGE: TAI-UTC is hard-wired to 33s, appropriate for the
+       2006. dttd should be obtained from slaDtt once that routine is
+       implemented. */
+    dttd = (32.184 - 33.0) / SPD;
 
-      /* Calculate LST from GMST using telescope longitude */
-      lst[i] = fmod(gst - lon + D2PI, D2PI );
-   }
+    /* Calculate the equation of the equinoxes: input time must be TDB
+       (= TT above). This only needs to be done once per simulation as
+       the change over a minute is of order microarcsec. 
+       TDB = TT = START_TIME (UTC) + (TT-UTC) */
+    eqeqx = slaEqeqx( mjdaystart + dttd );
 
+    /* Loop over each time step, calculate UT1 and then calculate
+       Greenwich mean sidereal time using slalib routine slaGmst and
+       convert to local apparent sidereal time */
+    for(i=0; i<nsamp; i++) {
+      /* The following is OK because we assume dut1 does not change
+	 significantly over the course of a simulation */
+      ut[i] = start_ut1 + ((double) i)*sampday; 
+
+      gmst = slaGmst( ut[i] );
+
+      /* Calculate LAST from GMST using telescope longitude and equation
+	 of equinoxes */
+      last[i] = eqeqx + fmod(gmst - lon + D2PI, D2PI );
+    }
+  }
 }
 
