@@ -165,7 +165,7 @@ void smf_history_read( smfData* data,int *status) {
     }
   } else {
     /* Inform user if no history */
-    msgOutif(MSG__VERB, FUNC_NAME, "No history component present. Continuing but this may cause problems later.", status);
+    msgOutif(MSG__VERB," ", "No history component present. Continuing but this may cause problems later.", status);
   }
 
   /* Store history in smfData */

@@ -278,7 +278,7 @@ smfDream *smf_construct_smfDream( smfData *data, const int nvert, const int npat
 	    } else {
 	      /* If we fail to open the file, can we assume we're trying
 		 to create it? */
-	      msgOutif(MSG__VERB, FUNC_NAME, 
+	      msgOutif(MSG__VERB," ", 
 		       "Could not open the weights file - maybe we're creating it?",
 		       status);
 	      errAnnul( status );

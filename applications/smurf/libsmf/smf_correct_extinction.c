@@ -160,7 +160,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
 
   if ( smf_history_check( data, FUNC_NAME, status) ) {
     msgSetc("F", FUNC_NAME);
-    msgOutif( MSG__VERB, FUNC_NAME, 
+    msgOutif(MSG__VERB," ", 
 	      "^F has already been run on these data, returning to caller", status);
     return;
   }
@@ -183,7 +183,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
 
   /* Tell user we're correcting for extinction */
   msgSetc("M", method);
-  msgOutif(MSG__VERB, FUNC_NAME, 
+  msgOutif(MSG__VERB," ", 
 	   "Correcting for extinction with method ^M", status);
 
   /* Should check data type for double */

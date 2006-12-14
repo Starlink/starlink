@@ -326,11 +326,11 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	  datAnnul( &xloc, status );
 	} else {
 	  errAnnul(status);
-	  msgOutif(MSG__VERB, FUNC_NAME, 
+	  msgOutif(MSG__VERB," ", 
 		   "SCU2RED exists, but not SCANFIT: we probably have STARE or DREAM data", status);
 	}
       } else {
-	msgOutif(MSG__VERB, FUNC_NAME, 
+	msgOutif(MSG__VERB," ", 
 		 "File has no SCU2RED extension. ", status);
       }
     }

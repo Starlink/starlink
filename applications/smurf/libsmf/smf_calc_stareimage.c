@@ -116,10 +116,10 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
   hdr = data->hdr;
   smf_fits_getS( hdr, "OBSMODE", obsmode, LEN__METHOD+1, status );
   if ( strncmp( obsmode, "STARE", 5) == 0 ) {
-    msgOutif(MSG__VERB, FUNC_NAME, "Processing STARE data", status);
+    msgOutif(MSG__VERB," ", "Processing STARE data", status);
 
     if (smf_history_check( data, "smf_calc_stareimage", status) ) {
-      msgOut(FUNC_NAME, "File contains STARE data which has already been processed: proceeding but this WILL OVERWRITE any STARE images already written into the SCU2RED extension", 
+      msgOut(" ", "File contains STARE data which has already been processed: proceeding but this WILL OVERWRITE any STARE images already written into the SCU2RED extension", 
 	     status);
     }
 
@@ -153,7 +153,7 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
     /* Release SCU2RED locator */
     datAnnul( &scu2redloc, status );
   } else {
-    msgOutif(MSG__VERB, FUNC_NAME, 
+    msgOutif(MSG__VERB," ", 
 	     "Input file is not a STARE observation - ignoring", status);
   }
 

@@ -121,7 +121,7 @@ void smf_fit_poly( const smfData *data, const int order, double *poly, int *stat
 
   if ( smf_history_check( data, FUNC_NAME, status) ) {
     msgSetc("F", FUNC_NAME);
-    msgOutif( MSG__VERB, FUNC_NAME, 
+    msgOutif(MSG__VERB," ", 
 	      "^F has already been run on these data, returning to caller", status);
     return;
   }

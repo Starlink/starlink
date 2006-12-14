@@ -109,7 +109,7 @@ void smf_subtract_poly(smfData *data, int *status) {
 
   /* Check they're non NULL */
   if ( (ncoeff == 0)  || (poly == NULL) ) {
-    msgOutif(MSG__VERB, FUNC_NAME, "No polynomial coefficients present", status);
+    msgOutif(MSG__VERB," ", "No polynomial coefficients present", status);
     return;
   }
 

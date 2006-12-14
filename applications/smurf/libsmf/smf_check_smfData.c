@@ -228,7 +228,7 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
       }
     }
   } else {
-    msgOutif(MSG__VERB, FUNC_NAME, "No polynomial fits in input data", status);
+    msgOutif(MSG__VERB," ", "No polynomial fits in input data", status);
   }
 
 

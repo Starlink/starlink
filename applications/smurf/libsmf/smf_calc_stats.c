@@ -183,13 +183,13 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
 
   /* Check mode */
   if ( strncmp( mode, "b", 1 ) == 0 ) {
-    /*msgOutif(MSG__VERB, FUNC_NAME, "Calculating stats for a fixed bolometer", status);*/
+    /*msgOutif(MSG__VERB," ", "Calculating stats for a fixed bolometer", status);*/
 
     nmax = (data->dims)[0] * (data->dims)[1];
     nsamp = (data->dims)[2];
     nbol = nmax;
   } else if ( strncmp( mode, "t", 1 ) == 0 ) {
-    /*msgOutif(MSG__VERB, FUNC_NAME, "Calculating stats for a fixed timeslice", status);*/
+    /*msgOutif(MSG__VERB," ", "Calculating stats for a fixed timeslice", status);*/
 
     nmax = (data->dims)[2];
     nsamp = (data->dims)[0] * (data->dims)[1];
@@ -242,7 +242,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
     temp = lo;
     lo = hi;
     hi = temp;
-    msgOutif(MSG__VERB, FUNC_NAME, "Oops - lo > hi. Swapping them round.", 
+    msgOutif(MSG__VERB," ", "Oops - lo > hi. Swapping them round.", 
 	     status);
   }  
 

@@ -179,7 +179,7 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
     temp = lo;
     lo = hi;
     hi = temp;
-    msgOutif(MSG__VERB, FUNC_NAME, "Oops - lo > hi. Swapping them round.", status);
+    msgOutif(MSG__VERB," ", "Oops - lo > hi. Swapping them round.", status);
   }
 
   /* If lo and hi are both zero then the whole range is assumed */

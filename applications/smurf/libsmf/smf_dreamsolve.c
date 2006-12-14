@@ -192,12 +192,12 @@ void smf_dreamsolve( smfData *data, int *status ) {
   hdr = data->hdr;
   smf_fits_getS( hdr, "OBSMODE", obsmode, LEN__METHOD+1, status );
   if ( strncmp( obsmode, "DREAM", 5) == 0 ) {
-    msgOutif(MSG__VERB, FUNC_NAME, "Processing DREAM data", status);
+    msgOutif(MSG__VERB," ", "Processing DREAM data", status);
     /* Have we done this before? If so it's not fatal as new processed
      images will just be added onto the end of the current stack of
      images. */
     if (smf_history_check( data, "smf_dreamsolve", status) ) {
-      msgOut(FUNC_NAME, "File contains DREAM data which has already been processed: proceeding but this will NOT overwrite any DREAM images already written into the SCU2RED extension", 
+      msgOut(" ", "File contains DREAM data which has already been processed: proceeding but this will NOT overwrite any DREAM images already written into the SCU2RED extension", 
 	     status);
     }
 
@@ -424,7 +424,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
     /* Release SCU2RED locator */
     datAnnul( &scu2redloc, status );
   } else {
-    msgOutif(MSG__VERB, FUNC_NAME, 
+    msgOutif(MSG__VERB," ", 
 	     "Input file is not a DREAM observation - ignoring", status);
   }
 }

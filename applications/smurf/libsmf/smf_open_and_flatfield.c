@@ -200,7 +200,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
     errAnnul( status );
 
     /* What if ffdata is NULL? */
-    msgOutif(MSG__VERB, FUNC_NAME, "Data FF: Copying to output file ", status);
+    msgOutif(MSG__VERB," ", "Data FF: Copying to output file ", status);
     if ( *ffdata == NULL ) {
       /* Don't need the smfFile or smfDA components */
       flags |= SMF__NOCREATE_FILE;

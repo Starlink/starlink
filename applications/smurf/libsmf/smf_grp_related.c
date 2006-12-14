@@ -223,7 +223,7 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
 		}
 	      }
 	    } else {
-	      msgOutif(MSG__VERB, FUNC_NAME, 
+	      msgOutif(MSG__VERB," ", 
 		       "Start and end times match but data arrays are of different size", 
 		       status);
 	    }

@@ -109,7 +109,7 @@ void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, int *stat
   if ( window > ninpts ) {
     msgSeti("B",(int)window);
     msgSeti("N",(int)ninpts);
-    msgOut(FUNC_NAME, "Size of window exceeds extent of data array: will return average for whole array", status);
+    msgOut(" ", "Size of window exceeds extent of data array: will return average for whole array", status);
     window = ninpts;
   }
 

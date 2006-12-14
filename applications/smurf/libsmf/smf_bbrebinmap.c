@@ -146,7 +146,7 @@ void smf_bbrebinmap( smfData *data,  int indf, int index, int size, AstFrameSet 
   if ( *status == NDF__NOEXT ) {
      errAnnul ( status );
      *status = SAI__OK;
-     msgOut(FUNC_NAME, "No bad bolo data available, ignoring bad values", status);
+     msgOut(" ", "No bad bolo data available, ignoring bad values", status);
   } else {
 
      badflag = 1;
@@ -159,7 +159,7 @@ void smf_bbrebinmap( smfData *data,  int indf, int index, int size, AstFrameSet 
 
      if ( baddims != 2 || bdims[0] != (data->dims)[0] || 
           bdims[1] != (data->dims)[1] ) {
-        msgOut ( FUNC_NAME, 
+        msgOut(" ", 
                  "Dimensions of data do not match bad pixel mask", 
                  status );
         ndfAnnul ( &bndf, status );

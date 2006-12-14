@@ -197,7 +197,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, int *status ) {
      doing it again. */
   if ( smf_history_check( data, FUNC_NAME, status) ) {
     msgSetc("F", FUNC_NAME);
-    msgOutif( MSG__VERB, FUNC_NAME, 
+    msgOutif(MSG__VERB," ", 
 	      "^F has already been run on these data, returning to caller", status);
     return;
   }
@@ -223,7 +223,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, int *status ) {
 
   /* Tell user we're removing the sky */
   msgSetc("F", fittype);
-  msgOutif(MSG__VERB, FUNC_NAME, "Removing sky with method ^F", status);
+  msgOutif(MSG__VERB," ", "Removing sky with method ^F", status);
 
   /* Do we have 2-D image or 3-D timeseries data? */
   if (data->ndims == 2) {
@@ -426,19 +426,19 @@ void smf_subtract_plane1( smfData *data, const char *fittype, int *status ) {
       /* Debugging info */
       msgSeti("K",k+1);
       msgSetc("F",fittype);
-      msgOutif( MSG__VERB, FUNC_NAME, 
+      msgOutif(MSG__VERB," ", 
 		" Fit results for timeslice ^K (fit type = ^F)", status );
       msgSetd("DS",sky0);
-      msgOutif( MSG__VERB, FUNC_NAME, 
+      msgOutif(MSG__VERB," ", 
 		"              Sky0   = ^DS, ", status );
       msgSetd("DE",dskyel);
-      msgOutif( MSG__VERB, FUNC_NAME, 
+      msgOutif(MSG__VERB," ", 
 		"              Dskyel = ^DE, ", status );
       msgSetd("DA",dskyaz);
-      msgOutif( MSG__VERB, FUNC_NAME, 
+      msgOutif(MSG__VERB," ", 
 		"              Dskyaz = ^DA", status );
       msgSetd("X",chisq);
-      msgOutif( MSG__VERB, FUNC_NAME, 
+      msgOutif(MSG__VERB," ", 
 		"              X^2 = ^X", status );
  
     /* Reset coordinate frame to that on entry if necessary */

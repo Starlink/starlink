@@ -230,7 +230,7 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
 	}
       } else {
 	msgSeti("I",index);
-	msgOutif(MSG__VERB, FUNC_NAME, "Beginning weights calculation for file ^I: this will take some time (~5-10 mins)", status);
+	msgOutif(MSG__VERB," ", "Beginning weights calculation for file ^I: this will take some time (~5-10 mins)", status);
 	ofile = odata->file;
 	weightsloc = smf_get_xloc( odata, "DREAM", "DREAM_WEIGHTS", "WRITE",
 				   0, NULL, status );
@@ -370,7 +370,7 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
       /* END processing */
     } else {
       msgSeti("I", index);
-      msgOutif(MSG__VERB, FUNC_NAME, 
+      msgOutif(MSG__VERB," ", 
 	       "Input file ^I is not a DREAM observation - ignoring", status);
     }
   } else {

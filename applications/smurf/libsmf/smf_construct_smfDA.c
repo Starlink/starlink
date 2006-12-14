@@ -132,7 +132,7 @@ smf_construct_smfDA( smfDA * tofill, double * flatcal,
       (da->flatname)[0] = '\0';
     }
   } else {
-    msgOutif(MSG__VERB, FUNC_NAME, 
+    msgOutif(MSG__VERB," ", 
 	     "Unable to allocate memory for new smfDA", status);
     return NULL;
   }

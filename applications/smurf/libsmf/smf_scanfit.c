@@ -122,18 +122,18 @@ void smf_scanfit ( smfData *data, int order, int *status) {
 
   /* Check history for scanfit */
   if ( smf_history_check( data, FUNC_NAME, status ) ) {
-    msgOutif( MSG__VERB, FUNC_NAME, "Data have been fitted already: assuming that a recalculation is desired", status );
+    msgOutif(MSG__VERB," ", "Data have been fitted already: assuming that a recalculation is desired", status );
   }
 
   /* Also check for sky removal and extinction correction since it
      makes no sense to carry out a fit to these data */
   if ( smf_history_check( data, "smf_subtract_poly", status) ||
        smf_history_check( data, "smf_subtract_plane", status) ) {
-    msgOutif( MSG__VERB, FUNC_NAME, "Data have been sky-subtracted already, will not perform fit", status );
+    msgOutif(MSG__VERB," ", "Data have been sky-subtracted already, will not perform fit", status );
     return;
   }
   if ( smf_history_check( data, "smf_correct_extinction", status) ) {
-    msgOutif( MSG__VERB, FUNC_NAME, "Data have been extinction corrected already, will not perform fit", status);
+    msgOutif(MSG__VERB," ", "Data have been extinction corrected already, will not perform fit", status);
     return;
   }
 

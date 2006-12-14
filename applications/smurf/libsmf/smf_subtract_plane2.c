@@ -174,7 +174,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, int *status ) {
 
   /* Tell user we're removing the sky */
   msgSetc("F", fittype);
-  msgOutif(MSG__VERB, FUNC_NAME, "Removing sky with method ^F", status);
+  msgOutif(MSG__VERB," ", "Removing sky with method ^F", status);
 
   /* Calculate the total number of data points and the number of data
      files in the smfArray */
@@ -187,7 +187,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, int *status ) {
 	   to continue to next set of related data files */
 	if ( smf_history_check( data, FUNC_NAME, status) ) {
 	  msgSetc("F", FUNC_NAME);
-	  msgOutif( MSG__VERB, FUNC_NAME, 
+	  msgOutif(MSG__VERB," ", 
 		    "^F has already been run on these data, returning to caller", 
 		    status);
 	  return;
@@ -240,10 +240,10 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, int *status ) {
       /* Debugging info */
       msgSeti("K",k+1);
       msgSetc("F",fittype);
-      msgOutif( MSG__VERB, FUNC_NAME, 
+      msgOutif(MSG__VERB," ", 
 		" Fit results for timeslice ^K (fit type = ^F)", status );
       msgSetd("DS",sky0);
-      msgOutif( MSG__VERB, FUNC_NAME, 
+      msgOutif(MSG__VERB," ", 
 		"              Sky0   = ^DS, ", status );
     }
   } else if ( needast ) {
@@ -372,21 +372,21 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, int *status ) {
       /* Debugging info */
       msgSeti("K",k+1);
       msgSetc("F",fittype);
-      msgOutif( MSG__VERB, FUNC_NAME, 
+      msgOutif(MSG__VERB," ", 
 		" Fit results for timeslice ^K (fit type = ^F)", status );
       msgSetd("DS",sky0);
-      msgOutif( MSG__VERB, FUNC_NAME, 
+      msgOutif(MSG__VERB," ", 
 		"              Sky0   = ^DS, ", status );
       msgSetd("DE",dskyel);
-      msgOutif( MSG__VERB, FUNC_NAME, 
+      msgOutif(MSG__VERB," ", 
 		"              Dskyel = ^DE, ", status );
       if ( dskyaz != 0 ) {
 	msgSetd("DA",dskyaz);
-	msgOutif( MSG__VERB, FUNC_NAME, 
+	msgOutif(MSG__VERB," ", 
 		  "              Dskyaz = ^DA", status );
       }
       msgSetd("X",chisq);
-      msgOutif( MSG__VERB, FUNC_NAME, 
+      msgOutif(MSG__VERB," ", 
 		"              X^2 = ^X", status );
       
     } /* End of loop over timeslice frame */

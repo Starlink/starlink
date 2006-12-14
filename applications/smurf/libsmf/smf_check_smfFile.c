@@ -99,7 +99,7 @@ void smf_check_smfFile( const smfData *idata, smfData *odata, int * status ) {
   /* If both exist then we have to assume that everything's OK */
   if ( ofile->ndfid == 0 ) {
     if ( ofile->name == NULL) {
-      msgOutif(MSG__VERB, FUNC_NAME, "NDF ID is zero, and filename is NULL. Assuming that is correct...", status);
+      msgOutif(MSG__VERB," ", "NDF ID is zero, and filename is NULL. Assuming that is correct...", status);
     } else {
       if ( *status == SAI__OK ) {
 	*status = SAI__ERROR;
@@ -122,7 +122,7 @@ void smf_check_smfFile( const smfData *idata, smfData *odata, int * status ) {
     }
   } else {
     if ( odata->ndims != 3 ) {
-      msgOutif(MSG__VERB, FUNC_NAME, "2D data has isTstream = 1: overriding and setting to zero", status);
+      msgOutif(MSG__VERB," ", "2D data has isTstream = 1: overriding and setting to zero", status);
       ofile->isTstream = 0;
     }
   }

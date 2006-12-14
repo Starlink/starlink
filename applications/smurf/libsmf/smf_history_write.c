@@ -158,7 +158,7 @@ void smf_history_write( const smfData* data, const char * appl,
     ndfHend( status ); 
   } else {
     /* Inform user if no history */
-    msgOutif(MSG__VERB, FUNC_NAME, "No history component present to write to. Continuing but this may cause problems later.", status);
+    msgOutif(MSG__VERB," ", "No history component present to write to. Continuing but this may cause problems later.", status);
 
   }
 

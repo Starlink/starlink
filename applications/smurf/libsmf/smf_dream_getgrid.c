@@ -128,13 +128,13 @@ void smf_dream_getgrid( const AstKeyMap *keymap, double *gridstep, int *ngrid,
   if ( *status == SAI__OK ) {
     /* Check gridxmax > gridxmin etc: swap them round by default? */
     if ( gridxmin > gridxmax ) {
-      msgOutif(MSG__VERB, FUNC_NAME, "Xmin > Xmax: swapping them round", status );
+      msgOutif(MSG__VERB," ", "Xmin > Xmax: swapping them round", status );
       tmp = gridxmin;
       gridxmin = gridxmax;
       gridxmax = tmp;
     }
     if ( gridymin > gridymax ) {
-      msgOutif(MSG__VERB, FUNC_NAME, "Ymin > Ymax: swapping them round", status );
+      msgOutif(MSG__VERB," ", "Ymin > Ymax: swapping them round", status );
       tmp = gridymin;
       gridymin = gridymax;
       gridymax = tmp;

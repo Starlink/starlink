@@ -126,7 +126,7 @@ void smf_telpos_get( const smfHead * hdr, int * status ) {
 
     /* Continue even if the call generated an error */
     if( *status != SAI__OK ) {
-      msgOutif( MSG__VERB, FUNC_NAME, "smf_calc_telpos failed. Continuing anyways.", status );
+      msgOutif(MSG__VERB," ", "smf_calc_telpos failed. Continuing anyways.", status );
       errAnnul( status );
     }
   }
