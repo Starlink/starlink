@@ -37,6 +37,8 @@
 *        Add slamac.h constants
 *     2006-09-14 (AGG):
 *        Add LEN__METHOD & SZFITSCARD
+*     2006-12-12 (AGG):
+*        Add SPD
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -160,6 +162,9 @@ error can not determine PI
 
 /* Arcsec to Degrees  (1/3600) */
 #define DAS2D 0.00027777777777777777777777777777777777777777777778
+
+/* Days to seconds */
+#define SPD 86400.0
 
 /* Other miscellaneous SMURF definitions */
 
