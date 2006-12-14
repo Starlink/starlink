@@ -30,7 +30,7 @@
 *        Structure for sim values from XML
 *     coeffs = double[] (Given)
 *        Bolometer response coeffs
-*     digcurrent - double (Given)
+*     digcurrent = double (Given)
 *        Digitisation mean current
 *     digmean = double (Given)
 *        Digitisation mean value
@@ -38,9 +38,9 @@
 *        Digitisation scale factor
 *     filter = char[] (Given)
 *        String to hold filter name
-*     heater - double* (Given)
+*     heater = double* (Given)
 *        Bolometer heater ratios
-*     maxwrite - int (Given)
+*     maxwrite = int (Given)
 *        File close time
 *     mode = obsMode (Given)
 *        Observation mode
@@ -160,6 +160,9 @@
 *        Corrected check for missing heatrun files.
 *     2006-12-14 (TIMJ):
 *        Put AST effective position error check in correct place
+*     2006-12-14 (AGG):
+*        Corrections to coordinate/time processing to makes things
+*        consistent. RTS_END is now written as a TAI time.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -199,6 +202,7 @@
 #include <time.h>
 
 /* STARLINK includes */
+#include "star/slalib.h"
 #include "ast.h"
 #include "fitsio.h"
 #include "mers.h"
@@ -210,7 +214,6 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 #include "star/grp.h"
-#include "star/slalib.h"
 #include "f77.h"
 
 /* JCMT includes */
@@ -338,6 +341,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double start_time=0;            /* time of start of current scan */
   char subarrays[8][80];          /* list of parsed subarray names */
   int subnum;                     /* Subarray number */
+  double taiutc = 33.0;           /* Difference between TAI and UTC time scales (s) */
   double tauCSO=0;                /* CSO zenith optical depth */
   float tbri[3];                  /* simulated wvm measurements */
   double telpos[3];               /* Geodetic location of the telescope */
@@ -349,6 +353,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double twater;                  /* water line temp. for WVM simulation */
   double vmax[2];                 /* telescope maximum velocities (arcsec) */
 
+  double raapp;                   /* Apparent RA */
+  double decapp;                  /* Apparent Dec */
+  double raapp1;                  /* Recalculated apparent RA */
+  double decapp1;                 /* Recalculated apparent Dec */
+  double hourangle;               /* Current hour angle */
+  double amprms[21];              /* AMPRMS parameters for SLALIB routines */
+  double dut1 = 0.1556;           /* UT1-UTC in sec */
 
   if ( *status != SAI__OK) return;
 
@@ -744,7 +755,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   }/* for all subarrays */
 
 
-  msgSeti( "DSTART", inx->mjdaystart );
+  msgSetd( "DSTART", inx->mjdaystart );
   msgSeti( "YR", date_yr );
   msgSeti( "MO", date_mo );
   msgSeti( "DAY", date_da );
@@ -770,14 +781,20 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       lastframe = count % maxwrite;
     }   
 
-    /* Increment mjdaystart to the beginning of this chunk, then
-       calculate the UT/LST at each tick of the simulator clock */
+    /* Increment mjdaystart (UTC) to the beginning of this chunk, then
+       calculate the UT1/LMST at each timestep */
     start_time = inx->mjdaystart + 
-                 ( (double)(curchunk * maxwrite * samptime) /
-                 86400.0 ); 
+      ((double)(curchunk * maxwrite) * samptime / SPD); 
 
     sc2sim_calctime( telpos[0]*DD2R, start_time, samptime, lastframe,
                      mjuldate, lst, status ); 
+
+    /* Convert BASE RA, Dec to apparent RA, Dec for current epoch */
+    /* The time parameter here should be a TDB but UTC should be good
+       enough, according to SUN/67 */
+    slaMappa( 2000.0, start_time, amprms );
+    /* Use quick conversion - should be more than good enough */
+    slaMapqkz( inx->ra, inx->dec, amprms, &raapp, &decapp ); 
 
     /* Retrieve the values for this chunk */
     for ( frame = 0; frame < lastframe; frame++ ) {
@@ -787,10 +804,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       /* Telescope latitude */
       phi = telpos[1]*DD2R;
 
-      /* calculate the az/el corresponding to the map centre (base) */
-      slaDe2h ( lst[frame] - inx->ra, inx->dec, phi, &temp1, &temp2 );
+      /* Calculate hour angle */
+      hourangle = lst[frame] - raapp;
 
-      temp3 = slaPa ( lst[frame] - inx->ra, inx->dec, phi );
+      /* calculate the az/el corresponding to the map centre (base) */
+      slaDe2h ( hourangle, decapp, phi, &temp1, &temp2 );
+
+      temp3 = slaPa ( hourangle, decapp, phi );
       
       if( *status == SAI__OK ) {
         base_az[frame] = temp1;
@@ -931,8 +951,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           airmass[frame] = 1/sin(sky_el);
         else airmass[frame] = 1000.;
         /* Calculate equatorial from horizontal */
-        slaDh2e( bor_az[frame], bor_el[frame], phi, &temp1, &temp2 );
-        temp1 = lst[frame] - temp1;
+        slaDh2e( bor_az[frame], bor_el[frame], phi, &raapp1, &decapp1 );
+	raapp1 = fmod(lst[frame] - raapp1 + D2PI, D2PI );
+
+	slaAmpqk( raapp1, decapp1, amprms, &temp1, &temp2 );
         
         bor_ra[frame] = temp1;
         bor_dec[frame] = temp2;
@@ -940,8 +962,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       if ( !hitsonly ) {
 
-        /*      printf("Boresight RA = %g, Dec = %g\n",
-                       bor_ra[frame],bor_dec[frame]);*/
+	/*	printf("Boresight RA = %10.8f, Dec = %g; BASE RA = %10.8f, Dec = %g\n",
+	  bor_ra[frame],bor_dec[frame],inx->ra,inx->dec);*/
 
         /* Create an sc2 frameset for this time slice and extract 
 	   bolo->sky mapping */ 
@@ -958,7 +980,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         state.smu_az_jig_y = jig_y_hor[frame];
         state.smu_az_chop_x = 0;
         state.smu_az_chop_y = 0;
-        state.rts_end = mjuldate[frame];
+        state.rts_end = mjuldate[frame] + (taiutc - dut1)/SPD;
 
         /* For each subarray, retrieve the wcs frameset, then generate
            the frame of data */
@@ -1007,14 +1029,17 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         for ( j = 0; j < lastframe; j++ ) { 
 
           /* RTS -------------------------------------------------------*/
-          head[j].rts_num = ( curchunk * maxwrite ) + j;           /* sequence number? */
-          head[j].rts_end = mjuldate[j]; /* end of int.      */
+	  /* Sequence number */
+          head[j].rts_num = ( curchunk * maxwrite ) + j;           
+	  /* RTS_END is a TAI time */
+          head[j].rts_end = mjuldate[j] + (taiutc - dut1)/SPD;
 
-          /* Use rts_end as tcs_tai */
-          head[j].tcs_tai = head[j].rts_end;
+	  /* Calculate TAI and store */
+	  head[j].tcs_tai = head[j].rts_end;
 
           /* TCS - Telescope tracking structure ----------------------- */
-          sprintf(head[j].tcs_tr_sys,"J2000");   /* coord. system  */
+	  /* Coord. system  */
+	  snprintf(head[j].tcs_tr_sys,6,"J2000");  
 
           /* Angle between "up" in Nasmyth coordinates, and "up"
              in tracking coordinates at the base telescope
