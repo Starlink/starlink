@@ -472,6 +472,7 @@ int *status
 /*
    History :
     12Aug2004 : original (bdk)
+    14Dec2006 : Do not call ErsRep with good status (timj)
 */
 {
    char param[17];           /* parameter name */
@@ -495,7 +496,7 @@ int *status
    {
       errLoad ( param, param_length, &parlen, opstr, opstr_length,
         &oplen, &tstatus );
-      ErsRep ( 0, &tstatus, opstr );
+      if (tstatus != SAI__OK) ErsRep ( 0, &tstatus, opstr );
    }
    errRlse();
 }
