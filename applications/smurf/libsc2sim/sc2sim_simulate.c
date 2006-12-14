@@ -158,7 +158,8 @@
 *        Merged with sc2sim_simhits and streamlined memory usage.
 *     2006-12-14 (JB):
 *        Corrected check for missing heatrun files.
-*
+*     2006-12-14 (TIMJ):
+*        Put AST effective position error check in correct place
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -907,17 +908,22 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
         sky_az = fmod(temp1+2.*AST__DPI,2.*AST__DPI);
         sky_el = fmod(temp2+2.*AST__DPI,2.*AST__DPI);
+
+	if( !astOK ) {
+	  *status = SAI__ERROR;
+	  errRep(FUNC_NAME, "AST error calculating effective position", 
+		 status);
+	}      if( !astOK ) {
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "AST error calculating effective position", 
+               status);
+	}
+
       }
       
       /* Free AST resources required for boresite pointing calculation */
       if( fs ) fs = astAnnul(fs);
       if( fc ) fc = astAnnul(fc);
-
-      if( !astOK ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "AST error calculating effective position", 
-               status);
-      }
 
       if( *status == SAI__OK ) {
         /* Calculate the airmass */
