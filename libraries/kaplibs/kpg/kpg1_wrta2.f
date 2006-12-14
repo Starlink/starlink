@@ -91,6 +91,9 @@
 *     20-NOV-2006 (DSB):
 *        Renamed from kpg1_wrls2.f to kpg1_wrta2.f, and added argument
 *        LABS.
+*     14-DEC-2006 (DSB):
+*        Mark columns of celestial longitude or latitude values as such even 
+*        if the supplied Frame also contains one or more non-celestial axes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -138,6 +141,8 @@
       CHARACTER SYM*20           ! Axis symbol
       CHARACTER UNT*20           ! Axis units
       DOUBLE PRECISION C( MXDIM) ! Buffer for a single position
+      INTEGER AXFRM              ! 1D Frame holding current axis
+      INTEGER AXMAP              ! Mapping from full Frame to 1D Frame
       INTEGER CI                 ! CAT identifier for catalogue
       INTEGER COLID( -1:MXDIM )  ! CAT identifiers for columns
       INTEGER FRM                ! Pointer to Frame
@@ -150,7 +155,8 @@
       INTEGER QI                 ! CAT identifier for another parameter
       INTEGER TI                 ! CAT identifier for TITLE parameter
       LOGICAL COPIED             ! Has a copy of the Frameet been taken?
-      LOGICAL ISSKY              ! Is the Base Frame a SkyFrame?
+      LOGICAL HASSKY             ! Does the Frame contain a SkyFrame?
+      LOGICAL SKYAX              ! Is the Axis a SkyAxis?
 *.
 
 *  Check the inherited global status.
@@ -164,9 +170,8 @@
       LWCS = AST_CLONE( IWCS, STATUS )
       COPIED = .FALSE.
 
-*  Get a pointer to the Base Frame, and note if it is a SkyFrame.
+*  Get a pointer to the Base Frame.
       FRM = AST_GETFRAME( LWCS, AST__BASE, STATUS )
-      ISSKY = AST_ISASKYFRAME( FRM, STATUS )
 
 *  Create the output catalogue.
       CALL LPG_CATCREAT( PARAM, CI, STATUS )
@@ -179,6 +184,10 @@
 *  Create a column to hold integer identifiers for each position.
       CALL CAT_CNEWS( CI, 'PIDENT', CAT__TYPEI, 0, ' ', ' ', 
      :                'Position identifier', COLID( 0 ), STATUS )
+
+*  Initialise a flag to indicate we have not yet found any columns holding
+*  celestial longitude or latitude values.
+      HASSKY = .FALSE.
 
 *  Loop round creating columns for each axis.
       DO I = 1, NAX
@@ -215,9 +224,15 @@
 
          END IF
 
-*  If the Base Frame is a SkyFrame, use special Units strings which
-*  indicate to the CAT_ library that the column represents a angle.
-         IF( ISSKY ) THEN
+*  See if this axis is a SkyAxis (assumed to be the case if the
+*  associated Domain is "SKY")..
+         AXFRM = AST_PICKAXES( FRM, 1, I, AXMAP, STATUS )
+         SKYAX = ( AST_GETC( AXFRM, 'Domain', STATUS ) .EQ. 'SKY' )
+
+*  If this axis is a SkyAxis, use special Units strings which indicate to 
+*  the CAT_ library that the column represents a angle.
+         IF( SKYAX ) THEN
+            HASSKY = .TRUE.
             ATTR = 'FORMAT('
             IAT = 7
             CALL CHR_PUTI( I, ATTR, IAT )
@@ -234,9 +249,9 @@
 
       END DO
 
-*  If the Frame is a SkyFrame store the epoch and equinox as catalogue
-*  parameters.
-      IF( ISSKY ) THEN
+*  If a SkyAxis was found in the Frame, store the epoch and equinox as 
+*  catalogue parameters.
+      IF( HASSKY ) THEN
          CALL CAT_PPTSC( CI, 'EPOCH', AST_GETC( FRM, 'EPOCH', STATUS ),
      :                   ' ', QI, STATUS ) 
          CALL CAT_TATTI( QI, 'CSIZE', 12, STATUS ) 
