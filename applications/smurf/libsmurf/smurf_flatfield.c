@@ -143,10 +143,10 @@ void smurf_flatfield( int *status ) {
     /* Check status to see if data are already flatfielded */
     if (*status == SMF__FLATN) {
       errAnnul( status );
-      msgOutif(MSG__VERB, FUNC_NAME,
+      msgOutif(MSG__VERB,' ',
 	     "Data are already flatfielded", status);
     } else if ( *status == SAI__OK) {
-      msgOutif(MSG__VERB, FUNC_NAME, "Flat field applied", status);
+      msgOutif(MSG__VERB,' ', "Flat field applied", status);
     } else {
       /* Tell the user which file it was... */
       /* Would be user-friendly to trap 1st etc... */

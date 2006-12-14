@@ -141,7 +141,7 @@ void sc2sim_smupath ( int nvert, double vertex_t, int jig_vert[][2],
       *status = DITS__APP_ERROR;
       msgSeti ( "NP", np );
       msgSeti ( "PATHSZ", pathsz );
-      msgOut(FUNC_NAME, 
+      msgOut(' ', 
              "^NP points in the Jiggle path requested, but only ^PATHSZ points allowed",
              status );
       return;

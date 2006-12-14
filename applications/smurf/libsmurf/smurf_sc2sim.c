@@ -581,7 +581,7 @@ void smurf_sc2sim( int *status ) {
       leading to the same series of pzero and heater offsets */
    srand(53);
 
-   msgOutif(MSG__VERB, FUNC_NAME, "Initialise instrument.", status);
+   msgOutif(MSG__VERB,' ', "Initialise instrument.", status);
 
    sc2sim_instrinit ( &inx, &sinx, obskeymap, simkeymap, coeffs, &digcurrent,
 		      &digmean, &digscale, &elevation, weights, &heater, 

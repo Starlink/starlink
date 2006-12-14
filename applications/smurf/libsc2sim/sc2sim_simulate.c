@@ -394,7 +394,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   if ( !hitsonly && ( *status == SAI__OK ) ) {
 
     /* Get simulation of astronomical and atmospheric images. */
-    msgOutif(MSG__VERB, FUNC_NAME, 
+    msgOutif(MSG__VERB,' ', 
 	     "Get astronomical and atmospheric images", status); 
 
     /* Create a group to store the sky images, and open them. */
@@ -406,7 +406,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
     if ( *status != SAI__OK ) {
       msgSetc ( "FILENAME", sinx->astname );
-      msgOut(FUNC_NAME, "Cannot find astronomical file ^FILENAME", status);
+      msgOut(' ', "Cannot find astronomical file ^FILENAME", status);
       return;
     }
 
@@ -414,7 +414,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
     if ( *status != SAI__OK ) {
       msgSetc ( "FILENAME", sinx->atmname );
-      msgOut(FUNC_NAME, "Cannot find atmospheric file ^FILENAME", status);
+      msgOut(' ', "Cannot find atmospheric file ^FILENAME", status);
       return;
     }   
 
@@ -490,7 +490,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
     /* Get the relevant pointing solution for the telescope based on the
        observation type */
-    msgOutif( MSG__VERB, FUNC_NAME, 
+    msgOutif(MSG__VERB,' ', 
               "Get pointing solution", status );
 
     /* The three primary observing modes are STARE, DREAM, and SCAN.
@@ -522,7 +522,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       
       case stare:
         /* Stare just points at a nasmyth offset of 0 from the map centre */
-        msgOut( FUNC_NAME, "Do a STARE observation", status ); 
+        msgOut(' ', "Do a STARE observation", status ); 
         count = inx->numsamples;
         posptr = smf_malloc ( count*2, sizeof(*posptr), 1, status );
         if( *status == SAI__OK ) {
@@ -533,7 +533,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       case dream:
         /* Call sc2sim_getpat to get the dream pointing solution */
-        msgOut( FUNC_NAME, "Do a DREAM observation", status );
+        msgOut(' ', "Do a DREAM observation", status );
 
        
         /*  Get jiggle pattern.
@@ -562,7 +562,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       case singlescan:
         /* Call sc2sim_getsinglescan to get scan pointing solution */
-        msgOut( FUNC_NAME, "Do a SINGLESCAN observation", status );
+        msgOut(' ', "Do a SINGLESCAN observation", status );
         accel[0] = 432.0;
         accel[1] = 540.0;
         vmax[0] = inx->scan_vmax;        /*200.0;*/
@@ -575,7 +575,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       case bous:
         /* Call sc2sim_getbous to get boustrophedon pointing solution */
-        msgOut( FUNC_NAME, "Do a BOUS observation", status );
+        msgOut(' ', "Do a BOUS observation", status );
         accel[0] = 432.0;
         accel[1] = 540.0;
         vmax[0] = inx->bous_vmax;        /*200.0;*/
@@ -589,7 +589,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       case liss:
         /* Call sc2sim_getliss to get lissjous pointing solution */
-        msgOut( FUNC_NAME, "Do a LISSAJOUS observation", status ); 
+        msgOut(' ', "Do a LISSAJOUS observation", status ); 
 
         accel[0] = 0.0;
         accel[1] = 0.0;
@@ -613,7 +613,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
         if ( strncmp ( inx->pong_type, "STRAIGHT", 8 ) == 0 ) {
 
-          msgOut( FUNC_NAME, "Do a STRAIGHT PONG observation", status );
+          msgOut(' ', "Do a STRAIGHT PONG observation", status );
 
           accel[0] = 0.0;
 	  accel[1] = 0.0;
@@ -625,7 +625,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
         } else if ( strncmp ( inx->pong_type, "CURVE", 5 ) == 0 ) { 
 
-          msgOut( FUNC_NAME, "Do a CURVE PONG observation", status ); 
+          msgOut(' ', "Do a CURVE PONG observation", status ); 
 
           accel[0] = 0.0;
 	  accel[1] = 0.0;
@@ -638,7 +638,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
           *status = SAI__ERROR;
           msgSetc( "PONGTYPE", inx->pong_type );
-          msgOut( FUNC_NAME, "^PONGTYPE is not a valid PONG type", status );
+          msgOut(' ', "^PONGTYPE is not a valid PONG type", status );
 
         }
 
@@ -652,7 +652,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     }/* switch */
 
     msgSeti( "COUNT", count );
-    msgOutif( MSG__VERB, FUNC_NAME, 
+    msgOutif(MSG__VERB,' ', 
               "Count = ^COUNT", status );
 
   }/* if status OK */
@@ -699,19 +699,19 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
     if ( sinx->add_fnoise == 1 ) {
       
-      msgOutif( MSG__VERB, FUNC_NAME, 
+      msgOutif(MSG__VERB,' ', 
                 "Create 1/f coefficients", status );     
       
       for ( bol=0; bol<nbol; bol++ ) {
         
         msgSeti( "BOL", bol );
-        msgOutif(MSG__VERB, FUNC_NAME, 
+        msgOutif(MSG__VERB,' ', 
                  "1/f for bolometer number ^BOL", status);  
         
         sc2sim_getinvf ( sigma, corner, samptime, nterms, 
                          &(noisecoeffs[bol*3*nterms]), status );
         
-        msgOutif(MSG__VERB, FUNC_NAME, 
+        msgOutif(MSG__VERB,' ', 
                  "1/f noise array made", status);
       }/* for all bolometers */
       
@@ -719,7 +719,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   }/* if not hits-only */
 
-  msgOutif( MSG__VERB, FUNC_NAME, 
+  msgOutif(MSG__VERB,' ', 
             "Get flatfield calibrations", status );
 
   /* Retrieve the flatfield calibrations for each subarray */
@@ -748,7 +748,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   msgSeti( "YR", date_yr );
   msgSeti( "MO", date_mo );
   msgSeti( "DAY", date_da );
-  msgOutif(MSG__VERB, FUNC_NAME, 
+  msgOutif(MSG__VERB,' ', 
            "Start observing at MJD ^DSTART, ^YR-^MO-^DAY", status);
 
   /* Determine how many chunks of size maxwrite are required to 
@@ -1144,7 +1144,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                      subarrays[k], date_yr, date_mo, date_da, curchunk + 1 );
 
             msgSetc( "FILENAME", filename );
-            msgOut( FUNC_NAME, "Writing ^FILENAME", status ); 
+            msgOut(' ', "Writing ^FILENAME", status ); 
 
             /* Set the subarray name */
             strcpy ( sinx->subname, subarrays[k] );
@@ -1158,7 +1158,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
 
  	    msgSetc( "FILENAME", filename );
-	    msgOut( FUNC_NAME, "Done ^FILENAME", status );
+	    msgOut(' ', "Done ^FILENAME", status );
 
 	  }/* if status OK */
 
@@ -1224,7 +1224,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   ndfEnd ( status );
 
-  msgOutif( MSG__VERB, FUNC_NAME, "Simulation successful.", status ); 
+  msgOutif(MSG__VERB,' ', "Simulation successful.", status ); 
 
   /* ------ */
   /* fclose(junk); */

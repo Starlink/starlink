@@ -157,7 +157,7 @@ void smurf_extinction( int * status ) {
 
   ndfBegin();
 
-  /*  msgOut( FUNC_NAME, "Inside EXTINCTION", status );*/
+  /*  msgOut( " ", "Inside EXTINCTION", status );*/
 
   /* Read the input file */
   ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
@@ -227,7 +227,7 @@ void smurf_extinction( int * status ) {
 	/*	*status = SAI__ERROR;
 	msgSetc("METHOD", "WVMR");
 	errRep("", "Sorry, method, ^METHOD, not supported yet", status);*/
-	msgOutif(MSG__VERB, TASK_NAME, "Using Raw WVM data", status);
+	msgOutif(MSG__VERB,' ', "Using Raw WVM data", status);
       } else if ( strncmp( method, "WVMS", 4) == 0 ) {
 	*status = SAI__ERROR;
 	msgSetc("METHOD", "WVMS");

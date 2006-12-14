@@ -198,5 +198,5 @@ void smurf_dreamweights ( int *status ) {
   }
   ndfEnd( status );
   
-  msgOutif(MSG__VERB, FUNC_NAME, "DONE", status);
+  msgOutif(MSG__VERB,' ', "DONE", status);
 }

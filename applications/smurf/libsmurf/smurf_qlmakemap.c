@@ -145,7 +145,7 @@ void smurf_qlmakemap( int *status ) {
   }
 
   /* Calculate the map bounds */
-  msgOutif(MSG__VERB, TASK_NAME, 
+  msgOutif(MSG__VERB,' ', 
 	   "SMURF_QLMAKEMAP: Determine approx map bounds", status);
   smf_mapbounds_approx( igrp, size, "icrs", 0, 0, 1, pixsize, lbnd_out, ubnd_out, 
 			&outframeset, status );
@@ -164,7 +164,7 @@ void smurf_qlmakemap( int *status ) {
 			1, status );
 
   /* Regrid the data */
-  msgOutif(MSG__VERB, TASK_NAME, "SMURF_QLMAKEMAP: Regrid data", status);
+  msgOutif(MSG__VERB,' ', "SMURF_QLMAKEMAP: Regrid data", status);
   for(i=1; i<=size; i++ ) {
     /* Read data from the ith input file in the group */
     smf_open_and_flatfield( igrp, NULL, i, &data, status );
@@ -208,5 +208,5 @@ void smurf_qlmakemap( int *status ) {
   
   ndfEnd( status );
   
-  msgOutif(MSG__VERB, TASK_NAME, "Map written.", status);
+  msgOutif(MSG__VERB,' ', "Map written.", status);
 }
