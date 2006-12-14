@@ -156,6 +156,8 @@
 *        Add DATE-OBS calculation
 *     2006-12-07 (JB):
 *        Merged with sc2sim_simhits and streamlined memory usage.
+*     2006-12-14 (JB):
+*        Corrected check for missing heatrun files.
 *
 *     {enter_further_changes_here}
 
@@ -296,8 +298,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   char flatname[8][SC2STORE_FLATLEN];/* flatfield algorithm names for
 					all subarrays */
   double *flatpar[8];             /* flatfield parameters for all subarrays */
-  FILE *fp;                       /* file pointer for checking if
-				     files exist */
   int frame;                      /* frame counter */
   AstFrameSet *fs=NULL;           /* frameset for tanplane projection */
   double grid[64][2];             /* PONG grid coordinates */
@@ -338,8 +338,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   char subarrays[8][80];          /* list of parsed subarray names */
   int subnum;                     /* Subarray number */
   double tauCSO=0;                /* CSO zenith optical depth */
-  char tempname[SC2STORE_FLATLEN];/* temporary name for checking if
-				     files exist */
   float tbri[3];                  /* simulated wvm measurements */
   double telpos[3];               /* Geodetic location of the telescope */
   float teff[3];                  /* output of wvmOpt */
@@ -735,21 +733,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       sprintf ( heatname, "%sheat%04i%02i%02i_00001", 
                 subarrays[k], date_yr, date_mo, date_da );
-
-      sprintf ( tempname, "%s.sdf", heatname );
-
-      /* KLUDGE - sc2store_rdflatcal calls sc2store_rdmap which
-         opens the flatfile file with ndfOpen, but does not 
-         check for the presence of the file being opened.  Therefore,
-         check to make sure the file exists before calling
-         sc2store_rdflatcal. */
-      fp = fopen ( tempname, "r" );
-      if ( fp == NULL ) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "Cannot find flatfield file", status);
-      } else {
-        fclose ( fp );
-      }
 
       sc2store_rdflatcal ( heatname, SC2STORE_FLATLEN, &colsize, 
                            &rowsize, &(nflat[k]), flatname[k], &(flatcal[k]), 
