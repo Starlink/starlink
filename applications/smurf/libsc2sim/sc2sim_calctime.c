@@ -138,7 +138,7 @@ int *status          /* global status (given and returned) */
 
   if ( *status == SAI__OK ) {
   
-    dut1d = 0.0; /* KLUDGE */
+    /*    dut1d = 0.0;*/ /* KLUDGE */
 
     /* Length of a single sample in days */
     sampday = samptime / SPD;
@@ -152,7 +152,7 @@ int *status          /* global status (given and returned) */
     /* KLUDGE: TAI-UTC is hard-wired to 33s, appropriate for the
        2006. dttd should be obtained from slaDtt once that routine is
        implemented. */
-    dttd = (32.184 - 33.0) / SPD;
+    dttd = (32.184 + 33.0) / SPD;
 
     /* Calculate the equation of the equinoxes: input time must be TDB
        (= TT above). This only needs to be done once per simulation as
