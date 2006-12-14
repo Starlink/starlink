@@ -245,7 +245,7 @@ void smurf_mon( int * status ) {
     msgSetc( "NAME", taskname );
     msgSeti( "NGRP0", ngrp0 );
     msgSeti( "NGRP1", ngrp1 );
-    msgOut( "SMURF_NGRP", "WARNING: The number of active "
+    msgOut( " ", "WARNING: The number of active "
 	    "GRP identifiers increased from ^NGRP0 to ^NGRP1 "
 	    "during execution of ^NAME (" PACKAGE_UPCASE " programming "
 	    " error).", status);
@@ -266,7 +266,7 @@ void smurf_mon( int * status ) {
     msgSetc( "NAME", taskname );
     msgSeti( "NLOC0", nloc0 );
     msgSeti( "NLOC1", nloc1 );
-    msgOut( "SMURF_NLOC", "WARNING: The number of active "
+    msgOut( " ", "WARNING: The number of active "
 	    "HDS Locators increased from ^NLOC0 to ^NLOC1 "
 	    "during execution of ^NAME (" PACKAGE_UPCASE " programming "
 	    " error).", status);
@@ -289,7 +289,7 @@ void smurf_mon( int * status ) {
     msgSetc( "NAME", taskname );
     msgSeti( "NFIL0", nfil0 );
     msgSeti( "NFIL1", nfil1 );
-    msgOut( "SMURF_NFIL", "WARNING: The number of active "
+    msgOut( " ", "WARNING: The number of active "
 	    "HDS container files increased from ^NFIL0 to ^NFIL1 "
 	    "during execution of ^NAME (" PACKAGE_UPCASE " programming "
 	    " error).", status);
