@@ -409,8 +409,10 @@ itcl::class gaia::GaiaCubeSpectrum {
       }
 
       #  Display the current coordinate for reference.
-      lassign [$rtdimage_ astpix2cur $iix $iiy] ra dec
-      $spectrum_ update_label "$ra, $dec"
+      catch {
+         lassign [$rtdimage_ astpix2cur $iix $iiy] ra dec
+         $spectrum_ update_label "$ra, $dec"
+      }
 
       #  Record extraction bounds, these are checked.
       set llb_ $lb
@@ -958,13 +960,16 @@ itcl::class gaia::GaiaCubeSpectrum {
          set icx [expr 0.5*[$rtdimage_ width]]
          set icy [expr 0.5*[$rtdimage_ height]]
 
-         #  Distances from centre, degrees.
-         $rtdimage_ convert dist [expr $iix-$icx] [expr $iiy-$icy] \
-            image dra ddec deg
+         #  Distances from centre, in degrees, if a celestial coordinate
+         #  system. Fails for non-celestial coords.
+         catch {
+            $rtdimage_ convert dist [expr $iix-$icx] [expr $iiy-$icy] \
+               image dra ddec deg
 
-         #  Distance from centre, arcsecs.
-         set dra [format "%f" [expr $dra*3600]]
-         set ddec [format "%f" [expr $ddec*3600]]
+            #  Distance from centre, arcsecs.
+            set dra [format "%f" [expr $dra*3600]]
+            set ddec [format "%f" [expr $ddec*3600]]
+         }
 
          #  Image centre in world coordinates.
          lassign [$rtdimage_ astpix2cur $icx $icy] ra dec
