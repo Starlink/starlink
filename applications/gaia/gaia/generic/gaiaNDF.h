@@ -149,6 +149,13 @@ extern "C" {
     /* Check if an NDF is opened with write access */
     int gaiaNDFCanWrite( int ndfid );
 
+    /* Check if an extension exists */
+    int gaiaNDFExtensionExists( int ndfid, const char *name );
+
+    /* Get value of a property in a named extension */
+    int gaiaNDFGetProperty( int ndfid, const char *extension, 
+                            const char *name, char *value, 
+                            int value_length, char **error_mess );
 #ifdef __cplusplus
 }
 #endif

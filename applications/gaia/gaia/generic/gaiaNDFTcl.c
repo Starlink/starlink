@@ -82,6 +82,8 @@ static int gaiaNDFTclDims( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclExists( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclGetProperty( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
@@ -134,6 +136,10 @@ int Ndf_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "ndf::getc", gaiaNDFTclCGet,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "ndf::getproperty", gaiaNDFTclGetProperty,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -724,8 +730,6 @@ static int gaiaNDFTclExists( ClientData clientData, Tcl_Interp *interp,
     /* Get the NDF */
     result = importNdfHandle( interp, objv[1], &info );
     if ( result == TCL_OK ) {
-        result = gaiaNDFExists( info->ndfid, Tcl_GetString( objv[2] ),
-                                &exists, &error_mess );
         resultObj = Tcl_GetObjResult( interp );
         if ( result != TCL_OK ) {
             Tcl_SetStringObj( resultObj, error_mess, -1 );
@@ -1153,4 +1157,66 @@ static void storeCard( AstFitsChan *fitschan, const char *keyword,
         sprintf( card, "%-8.8s='%18.18s'/%s", keyword, value, comment );
     }
     astPutFits( fitschan, card, overwrite );
+}
+
+/**
+ * Return the value of a property. This is a primitive in an extension of the
+ * NDF. So for instance "ACSIS" "TSYS(10,10)" will return the value of the 
+ * primitive in the ACSIS extension, if it exists. Calls to the "FITS"
+ * extension will be passed to the ::fitsread procedure.
+ */
+static int gaiaNDFTclGetProperty( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] )
+{
+    NDFinfo *info;
+    char *error_mess;
+    char value[132];
+    const char *extension;
+    const char *name;
+    int result;
+
+    /* Check arguments, need the ndf handle, extension and the property name */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle extension name" );
+        return TCL_ERROR;
+    }
+
+    /* Name of extension */
+    extension = Tcl_GetString( objv[2] );
+
+    /* If the extension is "FITS", just pass this request on */
+    if ( strcmp( "FITS", extension ) == 0 ) {
+        Tcl_Obj *newobjv[2];
+        newobjv[0] = objv[0];
+        newobjv[1] = objv[2];
+        return gaiaNDFTclFitsRead( clientData, interp, 2, newobjv );
+    }
+
+    /* Get the NDF */
+    result = importNdfHandle( interp, objv[1], &info );
+    if ( result == TCL_OK ) {
+
+        /* Check we have an extension */
+        if ( gaiaNDFExtensionExists( info->ndfid, extension ) ) {
+
+            /* Name of the component */
+            name = Tcl_GetString( objv[3] );
+
+            /* Value */
+            result = gaiaNDFGetProperty( info->ndfid, extension, name, value,
+                                         132, &error_mess );
+            if ( result == TCL_OK ) {
+                Tcl_SetResult( interp, value, TCL_VOLATILE );
+            }
+            else {
+                Tcl_SetResult( interp, error_mess, TCL_VOLATILE );
+                free( error_mess );
+            }
+        }
+        else {
+            /* No extension, so no value */
+            Tcl_SetResult( interp, "", TCL_VOLATILE );
+        }
+    }
+    return result;
 }

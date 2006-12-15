@@ -1640,3 +1640,52 @@ int gaiaNDFCanWrite( int ndfid )
     emsRlse();
     return writable;
 }
+
+/**
+ * Return whether an extension exists.
+ */
+int gaiaNDFExtensionExists( int ndfid, const char *name )
+{
+    int status = SAI__OK;
+    int exists;
+
+    emsMark();
+    ndfXstat( ndfid, name, &exists, &status );
+    if ( status != SAI__OK ) {
+        emsRlse();
+    }
+    emsRlse();
+    return exists;
+}
+
+/**
+ * Get the value of a primitive stored in an extension.
+ */
+int gaiaNDFGetProperty( int ndfid, const char *extension, const char *name, 
+                        char *value, int value_length, char **error_mess )
+{
+    int status = SAI__OK;
+    int exists;
+
+    emsMark();
+
+    /* If the value doesn't exist, return a blank */
+    value[0] = ' ';
+    value[1] = '\0';
+
+    /* Get value */
+    ndfXstat( ndfid, extension, &exists, &status );
+    if ( exists ) {
+        ndfXgt0c( ndfid, extension, name, value, value_length, &status );
+    }
+
+    /* If an error occurred return an error message */
+    if ( status != SAI__OK ) {
+        *error_mess = gaiaUtilsErrMessage();
+        emsRlse();
+        return TCL_ERROR;
+    }
+    emsRlse();
+    return TCL_OK;
+}
+
