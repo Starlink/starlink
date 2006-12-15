@@ -266,6 +266,29 @@ itcl::class gaia::GaiaSpecWriter {
             #  Record the world coordinates of this position. These 
             #  document the extraction for other applications.
             add_fits_coords_ $specaccessor
+
+            #  If this is a raw ACSIS cube we will try to extract and record
+            #  the TSYS and TRX values.
+            if { [$cubeaccessor extensionexists "ACSIS"] &&
+                 [$cubeaccessor extensionexists "JCMTSTATE"] } {
+
+               #  Must be extracting spectra. These are axis 1. The image
+               #  positions are time and receptor index, these index the 
+               #  TSYS and TRX arrays.
+               lassign [$cubeaccessor getlastspectruminfo] \
+                  type axis alow ahigh p1 p2
+               if { $axis == 1 } {
+                  set tsys [$cubeaccessor getproperty ACSIS "TSYS\($p1,$p2\)"]
+                  if { $tsys != "" && $tsys != "-3.40282E+38" } {
+                     $specaccessor fitswrite TSYS $tsys "Median system temp"
+                  }
+
+                  set trx [$cubeaccessor getproperty ACSIS "TRX\($p1,$p2\)"]
+                  if { $trx != "" && $trx != "-3.40282E+38" } {
+                     $specaccessor fitswrite TRX $trx "Receiver temp"
+                  }
+               }
+            }
          }
          $specaccessor close
          
