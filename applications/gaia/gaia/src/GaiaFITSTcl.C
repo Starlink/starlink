@@ -85,6 +85,9 @@ static int GaiaFITSTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
                                  int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclExists( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
+static int GaiaFITSTclExtensionExists( ClientData clientData, 
+                                       Tcl_Interp *interp,
+                                       int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclGetProperty( ClientData clientData, Tcl_Interp *interp,
                                    int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclGtWcs( ClientData clientData, Tcl_Interp *interp,
@@ -116,6 +119,11 @@ int Fits_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "fits::exists", GaiaFITSTclExists,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "fits::extensionexists", 
+                          GaiaFITSTclExtensionExists,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -832,6 +840,40 @@ static int GaiaFITSTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
         value = Tcl_GetString( objv[3] );
         comment = Tcl_GetString( objv[4] );
         result = GaiaFITSHPut( info->handle, keyword, value, comment );
+    }
+    return result;
+}
+
+/**
+ * Return if a named extension exists. FITS only supports "FITS",
+ * which is always present.
+ */
+static int GaiaFITSTclExtensionExists( ClientData clientData, 
+                                       Tcl_Interp *interp,
+                                       int objc, Tcl_Obj *CONST objv[] )
+{
+    FITSinfo *info;
+    const char *component;
+    int result;
+
+    /* Check arguments, need 2 the fits identifier and the extension */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier FITS" );
+        return TCL_ERROR;
+    }
+
+    /* Import the identifier */
+    result = importFITSIdentifier( interp, objv[1], &info );
+    if ( result == TCL_OK ) {
+        component = Tcl_GetString( objv[2] );
+
+        /* Check for known extensions */
+        if ( strcasecmp( "FITS", component )      == 0 ) {
+            Tcl_SetObjResult( interp, Tcl_NewBooleanObj( 1 ) );
+        }
+        else {
+            Tcl_SetObjResult( interp, Tcl_NewBooleanObj( 0 ) );
+        }
     }
     return result;
 }

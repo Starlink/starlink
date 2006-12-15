@@ -82,6 +82,9 @@ static int gaiaNDFTclDims( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclExists( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclExtensionExists( ClientData clientData, 
+                                      Tcl_Interp *interp,
+                                      int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclGetProperty( ClientData clientData, Tcl_Interp *interp,
                                   int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
@@ -120,6 +123,11 @@ int Ndf_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "ndf::exists", gaiaNDFTclExists,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "ndf::extensionexists", 
+                          gaiaNDFTclExtensionExists,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -1157,6 +1165,33 @@ static void storeCard( AstFitsChan *fitschan, const char *keyword,
         sprintf( card, "%-8.8s='%18.18s'/%s", keyword, value, comment );
     }
     astPutFits( fitschan, card, overwrite );
+}
+
+/**
+ * Return if a named extension exists.
+ */
+static int gaiaNDFTclExtensionExists( ClientData clientData, 
+                                      Tcl_Interp *interp,
+                                      int objc, Tcl_Obj *CONST objv[] )
+{
+    NDFinfo *info;
+    int exists;
+    int result;
+
+    /* Check arguments, need the ndf handle and extension */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle extension" );
+        return TCL_ERROR;
+    }
+
+    result = importNdfHandle( interp, objv[1], &info );
+    if ( result == TCL_OK ) {
+        exists = gaiaNDFExtensionExists( info->ndfid, 
+                                         Tcl_GetString( objv[2] ) );
+        Tcl_SetObjResult( interp, Tcl_NewBooleanObj( exists ) );
+
+    }
+    return result;
 }
 
 /**
