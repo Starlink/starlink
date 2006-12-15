@@ -102,6 +102,20 @@
 *        Specify explicit axis numbers when using Digits attribute, and
 *        protect against infinite looping when finding required
 *        formatting accuracy.
+*     15-DEC-2006 (DSB):
+*        The 25-JUN-1999 changes were intended to ensure that formatting
+*        and then unformatting the default values did not result in any 
+*        significant difference between the default values and the values
+*        returned, for cases where the dynamic default is accepted. However,
+*        the Format attribute not only controls the accuracy but may also
+*        control the units (e.g. setting "d" or "s" for a sky axis), so
+*        clearing the pre-existing Formats can result in the returned values 
+*        not being in the same units as the supplied default values. To
+*        avoid this, I have changed things so that the original Format
+*        attributes are retained, and a check is made on the user-supplied 
+*        strings to compare them to the default strings. If they are the
+*        same then the default values are used directly, rather than the
+*        unformatted user-supplied strings.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -136,7 +150,6 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
-      LOGICAL CHR_SIMLR          ! Strings equal apart from case?
 
 *  Local Variables:
       CHARACTER ATT*10           ! AST attribute name
@@ -145,13 +158,10 @@
       CHARACTER FMT*100          ! List of axis format strings
       CHARACTER LAB( NDF__MXDIM )*30 ! Axis labels
       CHARACTER NEXT*1           ! Next character to be read
-      CHARACTER OLDFMT( NDF__MXDIM )*100 ! Original Format strings
       CHARACTER POS*255          ! Position string
       CHARACTER SYM( NDF__MXDIM )*10 ! Axis symbols
-      DOUBLE PRECISION TEST      ! Result of unformatting default string
       INTEGER BASFRM             ! Pointer to the Base Frame
       INTEGER CURFRM             ! Pointer to the Current Frame
-      INTEGER DIGS               ! Frame Digits value to be used
       INTEGER F                  ! Index of first non-blank character
       INTEGER FIAT               ! No. of characters in string FMT
       INTEGER I                  ! Axis index
@@ -163,11 +173,9 @@
       INTEGER NBAXES             ! No. of axes in base Frame
       INTEGER NC                 ! No. of characters read from string
       INTEGER NCAXES             ! No. of axes in current Frame
-      INTEGER OLDDIG( NDF__MXDIM )! Original Frame Digits value
       LOGICAL GOOD               ! Is position good?
       LOGICAL GOTFS              ! Was a FrameSet supplied?
       LOGICAL LOOP               ! Get a new parameter value?
-      LOGICAL SYMOK              ! Are all axis symbols non-blank?
 *.
 
 *  Check the inherited global status.
@@ -201,7 +209,6 @@
 *  save the axis labels and symbols for use in messages. Also, form a comma
 *  separated list of the format strings for each axis.
       GOOD = .TRUE.
-      SYMOK = .TRUE.
 
       FMT = ' '
       FIAT = 0
@@ -223,7 +230,6 @@
          CALL CHR_APPND( ')', ATT, IAT )
          SYM( I ) = AST_GETC( CURFRM, ATT( : IAT ), STATUS )
          CALL KPG1_PGESC( SYM( I ), STATUS )
-         IF( SYM( I ) .EQ. ' ' ) SYMOK = .FALSE.
 
          IF( I .GT. 1 ) CALL CHR_APPND( ',', FMT, FIAT )
 
@@ -243,80 +249,8 @@
 *  Normalize it.
          CALL AST_NORM( CURFRM, CC, STATUS )
 
-*  Temporarily clear any Format and DIGITS attributes for the Axes within 
-*  the current Frame. Save any set values so that they can be re-instated 
-*  later.
-         DO I = 1, NCAXES
-
-            ATT = 'FORMAT('
-            IAT = 7
-            CALL CHR_PUTI( I, ATT, IAT )
-            CALL CHR_APPND( ')', ATT, IAT )
-
-            IF( AST_TEST( CURFRM, ATT, STATUS ) ) THEN
-               OLDFMT( I ) = AST_GETC( CURFRM, ATT, STATUS )
-               CALL AST_CLEAR( CURFRM, ATT, STATUS )
-            ELSE
-               OLDFMT( I ) = ' '
-            END IF
-
-            ATT = 'DIGITS('
-            IAT = 7
-            CALL CHR_PUTI( I, ATT, IAT )
-            CALL CHR_APPND( ')', ATT, IAT )
-
-            IF( AST_TEST( CURFRM, ATT, STATUS ) ) THEN
-               OLDDIG( I ) = AST_GETI( CURFRM, ATT, STATUS )
-               CALL AST_CLEAR( CURFRM, ATT, STATUS )
-            ELSE
-               OLDDIG( I ) = -1
-            END IF
-
-         END DO
-
-*  Loop round increasing Digits until the supplied default values can
-*  be formatted and unformatted with no significant change in value.
-         DIGS = 4
-         LOOP = .TRUE.
-         DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )
-
-*  Assume the current Digits value is OK.
-            LOOP = .FALSE.
-
-*  Check each axis.
-            DO I = 1, NCAXES
-
-*  Set the current Digits value for all axes.
-               ATT = 'DIGITS('
-               IAT = 7
-               CALL CHR_PUTI( I, ATT, IAT )
-               CALL CHR_APPND( ')', ATT, IAT )
-
-               CALL AST_SETI( CURFRM, ATT, DIGS, STATUS )
-
-*  Format this axis value.
-               POS = AST_FORMAT( CURFRM, I, CC( I ), STATUS )
-
-*  Unformat it.
-               NC = AST_UNFORMAT( CURFRM, I, POS, TEST, STATUS ) 
-
-*  If the recovered value is significantly different to the supplied value,
-*  increase Digits and break out of the loop to try again.
-               IF( ABS( CC( I ) - TEST ) .GT. 
-     :             ABS( 10000.0*VAL__EPSD*CC( I ) ) ) THEN
-                  DIGS = DIGS + 1
-                  IF( DIGS .LE. 30 ) LOOP = .TRUE.             
-                  GO TO 10                                 
-               END IF
-
-            END DO
-
- 10         CONTINUE
-
-         END DO
-
 *  Construct a string holding the default position (a comma separated
-*  list of formatted axis values) using the Digits value set above.
+*  list of formatted axis values).
          DPOS = AST_FORMAT( CURFRM, 1, CC( 1 ), STATUS )
          IAT = CHR_LEN( DPOS )
          DO I = 2, NCAXES
@@ -331,39 +265,11 @@
 *  Clear the Digits value.
          CALL AST_CLEAR( CURFRM, 'DIGITS', STATUS )
 
-*  Remove the temporary Format and Digits values set up above, and re-instate 
-*  any previous Format and Digits values. Do each axis in turn.
-         DO I = 1, NCAXES
-            ATT = 'FORMAT('
-            IAT = 7
-            CALL CHR_PUTI( I, ATT, IAT )
-            CALL CHR_APPND( ')', ATT, IAT )
-
-            IF( OLDFMT( I ) .NE. ' ' ) THEN
-               CALL AST_SETC( CURFRM, ATT, 
-     :                        OLDFMT( I )( : CHR_LEN( OLDFMT( I ) ) ), 
-     :                        STATUS )
-            ELSE
-               CALL AST_CLEAR( CURFRM, ATT, STATUS )
-            END IF
-
-            ATT = 'DIGITS('
-            IAT = 7
-            CALL CHR_PUTI( I, ATT, IAT )
-            CALL CHR_APPND( ')', ATT, IAT )
-
-            IF( OLDDIG( I ) .NE. -1 ) THEN
-               CALL AST_SETI( CURFRM, ATT, OLDDIG( I ), STATUS )
-            ELSE
-               CALL AST_CLEAR( CURFRM, ATT, STATUS )
-            END IF
-
-         END DO
-
 *  Otherwise, use PAR_UNSET to ensure any previous dynamic default is 
 *  cancelled.
       ELSE
          CALL PAR_UNSET( PARAM, 'DEFAULT', STATUS )
+         DPOS = ' '
       END IF
 
 *  Note the Domain of the Current Frame for use in messages.
@@ -405,6 +311,42 @@
             CALL MSG_OUT( 'KPG1_GTPOS_M1', '      Suggested format: '//
      :                    '^FMT', STATUS )
             CALL MSG_BLANK( STATUS )
+
+*  If the supplied string is identical to the default string, use the
+*  default axis values directly rather than unformatting the default
+*  string, since the current Frame Format and Digits values may not
+*  give sufficient accuracy to unformat the strings accurately.
+         ELSE IF( DPOS( F : L ) .EQ. POS( F : L ) ) THEN
+
+*  Assume that the supplied value was acceptable.
+            LOOP = .FALSE.
+            GOOD = .TRUE.
+
+*  If we have a FrameSet, get the base Frame position corresponding to 
+*  the default position.
+            IF( GOTFS ) THEN
+               CALL AST_TRANN( MAP, 1, NCAXES, 1, CC, .FALSE., NBAXES,
+     :                         1, BC, STATUS ) 
+
+*  See if this gave a good Base Frame position.
+               DO I = 1, NBAXES
+                  IF( BC( I ) .EQ. AST__BAD ) GOOD = .FALSE.
+               END DO
+
+*  If not, report an error.
+               IF( .NOT. GOOD .AND. STATUS .EQ. SAI__OK ) THEN
+                  LOOP = .TRUE.
+                  STATUS = SAI__ERROR
+
+                  CALL MSG_SETC( 'PAR', PARAM )
+                  CALL MSG_SETC( 'POS', POS( F: L ) )
+                  CALL ERR_REP( 'KPG1_GTPOS_7A', 'The default '//
+     :                          'position was accepted for parameter '//
+     :                          '%^PAR (''^POS'') but cannot be used!', 
+     :                          STATUS )
+               END IF
+
+            END IF
 
 *  Otherwise, attempt to read a position from the supplied string.
          ELSE
