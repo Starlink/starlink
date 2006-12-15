@@ -447,13 +447,26 @@ itcl::class gaia::GaiaCube {
          #  Retain the object value for creating new ones.
          set object_ [$itk_option(-rtdimage) object]
 
-         #  Set axis and display the plane for first time.
-         set axis_ 2
-         $itk_component(axis) configure -value 3
-         set_step_axis_ 3
+         #  Set axis and display the plane for first time. Try to pick
+         #  out a spectral axis.
+         if { [$cubeaccessor_ isaxisframetype 3 "specframe"] } {
+            set axis_ 2
+            set axis 3
+         } elseif { [$cubeaccessor_ isaxisframetype 2 "specframe"] } {
+            set axis_ 1
+            set axis 2
+         } elseif { [$cubeaccessor_ isaxisframetype 1 "specframe"] } {
+            set axis_ 2
+            set axis 1
+         } else {
+            set axis_ 2
+            set axis 3
+         }
+         $itk_component(axis) configure -value $axis
+         set_step_axis_ $axis
 
          #  Set up object to control units.
-         $spec_coords_ configure -axis 3 -accessor $cubeaccessor_
+         $spec_coords_ configure -axis $axis -accessor $cubeaccessor_
 
          #  If the spectral plot is open, then close it. It will be
          #  re-created on next image click.
