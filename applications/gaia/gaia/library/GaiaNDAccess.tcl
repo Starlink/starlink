@@ -289,6 +289,17 @@ itcl::class gaia::GaiaNDAccess {
          [getregionspectrum $axis $alow $ahigh $desc $meth $trunc $component]
    }
 
+   #  Return the info held about the last spectrum that was extracted.
+   #  Returns type (point||region), axis, alow, ahigh, p1, p2 and trunc.
+   public method getlastspectruminfo {} {
+      if { $last_spectrum_args_ == {} } {
+         error "getlastspectruminfo called before \
+                getspectrum or getregionspectrum"
+      }
+      lassign $last_spectrum_args_ axis alow ahigh p1 p2 trunc
+      return "$last_spectrum_type_ $axis $alow $ahigh $p1 $p2 $trunc"
+   }
+
    #  Return the address of a spectral line of data extracted from an image
    #  region projected along the spectral axis. This will only work for cubes
    #  and requires that the complete data are mapped first.  The axis is the
@@ -532,7 +543,7 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Check if a named extension exists.
    public method extensionexists {extension} {
-      return [${type_}::extensionexists $handle $extension]
+      return [${type_}::extensionexists $handle_ $extension]
    }
 
    #  Get the value of a FITS card.
