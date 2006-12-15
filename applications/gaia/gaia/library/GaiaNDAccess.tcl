@@ -435,7 +435,7 @@ itcl::class gaia::GaiaNDAccess {
    #  as the returned instance of GaiaNDAccess is opened for write access.
    #
    #  The title should be a meaningful string that identifies this spectrum in
-   #  the original cube. 
+   #  the original cube.
    public method createspectrum {format name title} {
       if { $addr_(DATA) == 0 } {
          error "Must map in cube data before creating a spectrum"
@@ -518,6 +518,21 @@ itcl::class gaia::GaiaNDAccess {
    public method isaxisframetype {axis type} {
       set wcs [${type_}::getwcs $handle_]
       return [gaiautils::frameisa $wcs $axis $type]
+   }
+
+   #  Get the value of a property. A property is a primitive value stored
+   #  in a named extension. Normally an extension follows the NDF concept and
+   #  the name is the HDS component within the extension, for other formats
+   #  support will be limited (for FITS this call is equivalent to looking
+   #  for a value in the header cards, with extension "FITS" and name
+   #  the keyword).
+   public method getproperty {extension name} {
+      return [${type_}::getproperty $handle_ $extension $name]
+   }
+
+   #  Check if a named extension exists.
+   public method extensionexists {extension} {
+      return [${type_}::extensionexists $handle $extension]
    }
 
    #  Get the value of a FITS card.
