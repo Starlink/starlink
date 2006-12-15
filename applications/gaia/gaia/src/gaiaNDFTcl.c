@@ -1186,10 +1186,11 @@ static int gaiaNDFTclGetProperty( ClientData clientData, Tcl_Interp *interp,
 
     /* If the extension is "FITS", just pass this request on */
     if ( strcmp( "FITS", extension ) == 0 ) {
-        Tcl_Obj *newobjv[2];
+        Tcl_Obj *newobjv[3];
         newobjv[0] = objv[0];
-        newobjv[1] = objv[2];
-        return gaiaNDFTclFitsRead( clientData, interp, 2, newobjv );
+        newobjv[1] = objv[1];
+        newobjv[2] = objv[3];
+        return gaiaNDFTclFitsRead( clientData, interp, 3, newobjv );
     }
 
     /* Get the NDF */

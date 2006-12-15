@@ -85,6 +85,8 @@ static int GaiaFITSTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
                                  int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclExists( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
+static int GaiaFITSTclGetProperty( ClientData clientData, Tcl_Interp *interp,
+                                   int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclGtWcs( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
@@ -138,6 +140,10 @@ int Fits_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "fits::getdims", GaiaFITSTclDims,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "fits::getproperty", GaiaFITSTclGetProperty,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -828,4 +834,33 @@ static int GaiaFITSTclFitsWrite( ClientData clientData, Tcl_Interp *interp,
         result = GaiaFITSHPut( info->handle, keyword, value, comment );
     }
     return result;
+}
+
+/**
+ * Return the value of a named property in an extension. For a FITS file
+ * the only supported extension is "FITS", so this call is equivalent to 
+ * ::fitsread.
+ */
+static int GaiaFITSTclGetProperty( ClientData clientData, Tcl_Interp *interp,
+                                   int objc, Tcl_Obj *CONST objv[] )
+{
+    Tcl_Obj *newobjv[3];
+
+    /* Check arguments, need the fits handle, extension and property name */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, 
+                          "fits_identifier \"FITS\" keyword" );
+        return TCL_ERROR;
+    }
+
+    if ( strcmp( "FITS", Tcl_GetString( objv[2] ) ) == 0 ) {
+        newobjv[0] = objv[0];
+        newobjv[1] = objv[1];
+        newobjv[2] = objv[3];
+        return GaiaFITSTclFitsRead( clientData, interp, 3, newobjv );
+    }
+
+    /* Unknown, so return a blank string */
+    Tcl_SetResult( interp, " ", TCL_VOLATILE );
+    return TCL_OK;
 }
