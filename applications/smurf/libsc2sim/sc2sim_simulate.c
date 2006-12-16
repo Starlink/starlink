@@ -163,6 +163,8 @@
 *     2006-12-14 (AGG):
 *        Corrections to coordinate/time processing to makes things
 *        consistent. RTS_END is now written as a TAI time.
+*     2006-12-15 (AGG):
+*        TAI-UTC obtained from slaDat, assume DUT1 is zero
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -341,7 +343,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double start_time=0;            /* time of start of current scan */
   char subarrays[8][80];          /* list of parsed subarray names */
   int subnum;                     /* Subarray number */
-  double taiutc = 33.0;           /* Difference between TAI and UTC time scales (s) */
+  double taiutc;                  /* Difference between TAI and UTC time (s) */
   double tauCSO=0;                /* CSO zenith optical depth */
   float tbri[3];                  /* simulated wvm measurements */
   double telpos[3];               /* Geodetic location of the telescope */
@@ -359,7 +361,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double decapp1;                 /* Recalculated apparent Dec */
   double hourangle;               /* Current hour angle */
   double amprms[21];              /* AMPRMS parameters for SLALIB routines */
-  double dut1 = 0.1556;           /* UT1-UTC in sec */
+  double dut1 = 0;                /* UT1-UTC in sec */
 
   if ( *status != SAI__OK) return;
 
@@ -785,6 +787,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
        calculate the UT1/LMST at each timestep */
     start_time = inx->mjdaystart + 
       ((double)(curchunk * maxwrite) * samptime / SPD); 
+
+    taiutc = slaDat( start_time );
 
     sc2sim_calctime( telpos[0]*DD2R, start_time, samptime, lastframe,
                      mjuldate, lst, status ); 
