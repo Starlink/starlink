@@ -62,6 +62,8 @@
 *        - Update to return local apparent sidereal time (see SUN/67)
 *        - Calculate equation of equinoxes
 *        - Check input pointers are not NULL
+*     2006-12-15 (AGG):
+*        Fix bug in calculating LAST due to misplaced eqeqx.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -118,12 +120,13 @@ int *status          /* global status (given and returned) */
 
   /* Local variables */
   double dttd;                   /* TT-UTC in days */
-  double dut1d = 0.1556/SPD;     /* DUT1 in days: this value is for 20060917 */
+  double dut1d = 0.0;            /* DUT1 in days, set to zero for now */
   double eqeqx;                  /* Equation of the equinoxes in radians */
   double gmst;                   /* Greenwich Mean Sidereal Time (radians) */
   int i;                         /* Loop counter */
   double sampday;                /* Sample time in days */
   double start_ut1;              /* UT1 (MJD) corresponding to start of scan */
+  double taiutc;                 /* TAI-UTC in seconds */
 
   /* Check status */
   if ( *status != SAI__OK ) return;
@@ -137,8 +140,6 @@ int *status          /* global status (given and returned) */
   }
 
   if ( *status == SAI__OK ) {
-  
-    /*    dut1d = 0.0;*/ /* KLUDGE */
 
     /* Length of a single sample in days */
     sampday = samptime / SPD;
@@ -146,13 +147,15 @@ int *status          /* global status (given and returned) */
     /* Convert start time from UTC to UT1 */
     start_ut1 = mjdaystart + dut1d;
 
+    /* Retrieve TAI-UTC in sec */
+    taiutc = slaDat( mjdaystart );
+
     /* Calculate the TT-UTC difference in days, assume TT is equivalent
        to TDB (needed below). Assume it doesn't change significantly
        over an observation. */ 
-    /* KLUDGE: TAI-UTC is hard-wired to 33s, appropriate for the
-       2006. dttd should be obtained from slaDtt once that routine is
-       implemented. */
-    dttd = (32.184 + 33.0) / SPD;
+    /* KLUDGE: dttd should be obtained from slaDtt once that routine
+       is implemented. */
+    dttd = (32.184 + taiutc) / SPD;
 
     /* Calculate the equation of the equinoxes: input time must be TDB
        (= TT above). This only needs to be done once per simulation as
@@ -172,7 +175,7 @@ int *status          /* global status (given and returned) */
 
       /* Calculate LAST from GMST using telescope longitude and equation
 	 of equinoxes */
-      last[i] = eqeqx + fmod(gmst - lon + D2PI, D2PI );
+      last[i] = fmod( gmst - lon + eqeqx + D2PI, D2PI );
     }
   }
 }
