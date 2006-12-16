@@ -96,6 +96,8 @@
 *        Convert to using AstFitsChans
 *     2006-12-01 (AGG):
 *        Now takes dateobs string, writes TIMESYS FITS header
+*     2006-12-15 (AGG):
+*        Write out DUT1 FITS header
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -194,7 +196,8 @@ int *status       /* global status (given and returned) */
    astSetFitsS ( fitschan, "DATE-OBS", dateobs, "observation date", 0 );
    /* We need to write this - the simulator effectively assumes all
       times are TAI */
-   astSetFitsS ( fitschan, "TIMESYS", "TAI", "Time scale for DATE-OBS", 0 );
+   astSetFitsS ( fitschan, "TIMESYS", "UTC", "Time scale for DATE-OBS", 0 );
+   astSetFitsF ( fitschan, "DUT1", 0.0, "UT1 - UTC correction (days)", 0 );
 
    rad = inx->ra * AST__DR2D;
    astSetFitsF ( fitschan, "RA", rad, "Right Ascension of observation", 0 );
