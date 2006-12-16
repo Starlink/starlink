@@ -21,6 +21,11 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
+dnl    Need these for determining the time to subsecond accuracy
+AC_CHECK_HEADERS( sys/time.h )
+AC_CHECK_FUNCS(gettimeofday)
+
+
 dnl   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
