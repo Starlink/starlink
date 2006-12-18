@@ -165,6 +165,8 @@
 *        consistent. RTS_END is now written as a TAI time.
 *     2006-12-15 (AGG):
 *        TAI-UTC obtained from slaDat, assume DUT1 is zero
+*     2006-12-18 (AGG):
+*        DUT1 now obtained from input struct
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -254,6 +256,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double accel[2];                /* telescope accelerations (arcsec) */
   float aeff[3];                  /* output of wvmOpt */
   double *airmass=NULL;           /* mean airmass of observation */
+  double amprms[21];              /* AMPRMS parameters for SLALIB routines */
   char arraynames[80];            /* list of unparsed subarray names */
   smfData *astdata=NULL;          /* pointer to SCUBA2 data struct */
   smfHead *asthdr=NULL;           /* pointer to header in data */
@@ -293,6 +296,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int date_yr;                    /* year corresponding to MJD */
   int date_status;                /* status of mjd->calendar date conversion*/
   double *dbuf=NULL;              /* simulated data buffer */
+  double decapp;                  /* Apparent Dec */
+  double decapp1;                 /* Recalculated apparent Dec */
   int *digits=NULL;               /* output data buffer */
   int *dksquid=NULL;              /* dark squid values */
   double drytau183;               /* Broadband 183 GHz zenith optical depth */
@@ -309,6 +314,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double grid[64][2];             /* PONG grid coordinates */
   JCMTState *head;                /* per-frame headers */
   char heatname[SC2SIM__FLEN];    /* name of flatfield cal file */
+  double hourangle;               /* Current hour angle */
   int i;                          /* loop counter */
   double instap[2];               /* Focal plane instrument offsets */
   int j;                          /* loop counter */
@@ -331,6 +337,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double *posptr=NULL;            /* pointing: nasmyth offsets (arcsec) */ 
   double pwvlos;                  /* mm precip. wat. vapor. line of site */
   double pwvzen = 0;              /* zenith precipital water vapour (mm) */
+  double raapp;                   /* Apparent RA */
+  double raapp1;                  /* Recalculated apparent RA */
   int rowsize;                    /* row size for flatfield */
   double sigma;                   /* instrumental white noise */
   Grp *skygrp = NULL;             /* Group of input files */
@@ -354,14 +362,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   float ttau[3];                  /* output of wvmOpt */
   double twater;                  /* water line temp. for WVM simulation */
   double vmax[2];                 /* telescope maximum velocities (arcsec) */
-
-  double raapp;                   /* Apparent RA */
-  double decapp;                  /* Apparent Dec */
-  double raapp1;                  /* Recalculated apparent RA */
-  double decapp1;                 /* Recalculated apparent Dec */
-  double hourangle;               /* Current hour angle */
-  double amprms[21];              /* AMPRMS parameters for SLALIB routines */
-  double dut1 = 0;                /* UT1-UTC in sec */
 
   if ( *status != SAI__OK) return;
 
@@ -790,7 +790,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
     taiutc = slaDat( start_time );
 
-    sc2sim_calctime( telpos[0]*DD2R, start_time, samptime, lastframe,
+    sc2sim_calctime( telpos[0]*DD2R, start_time, inx->dut1, samptime, lastframe,
                      mjuldate, lst, status ); 
 
     /* Convert BASE RA, Dec to apparent RA, Dec for current epoch */
@@ -984,7 +984,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         state.smu_az_jig_y = jig_y_hor[frame];
         state.smu_az_chop_x = 0;
         state.smu_az_chop_y = 0;
-        state.rts_end = mjuldate[frame] + (taiutc - dut1)/SPD;
+        state.rts_end = mjuldate[frame] + (taiutc - inx->dut1)/SPD;
 
         /* For each subarray, retrieve the wcs frameset, then generate
            the frame of data */
@@ -1036,7 +1036,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  /* Sequence number */
           head[j].rts_num = ( curchunk * maxwrite ) + j;           
 	  /* RTS_END is a TAI time */
-          head[j].rts_end = mjuldate[j] + (taiutc - dut1)/SPD;
+          head[j].rts_end = mjuldate[j] + (taiutc - inx->dut1)/SPD;
 
 	  /* Calculate TAI and store */
 	  head[j].tcs_tai = head[j].rts_end;

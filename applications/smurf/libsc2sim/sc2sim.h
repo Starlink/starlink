@@ -148,7 +148,8 @@ int *status          /* global status (given and returned) */
 void sc2sim_calctime
 ( 
 double lon,          /* Geodetic W Lon (radians) */
-double mjdaystart,   /* start time as modified juldate */
+double mjdaystart,   /* UTC start time as modified juldate */
+double dut1,         /* DUT1 in seconds */
 double samptime,     /* length of a sample in seconds */
 int nsamp,           /* number of samples */
 double *ut,          /* returned UT at each sample (mod. juldate) */

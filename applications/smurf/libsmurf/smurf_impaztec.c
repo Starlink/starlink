@@ -330,8 +330,10 @@ void smurf_impaztec( int *status ) {
 
     djm += (double)starttime / 86400;
 
-    /* Use simulator routine to calculate array of UT for each timeslice */
-    sc2sim_calctime( telpos[0]*DD2R, djm, sample_t, nframes,
+    /* Use simulator routine to calculate array of UT for each
+       timeslice. NOTE: this is UT1, not UTC. Also DUT1 passed in as 0
+       since we don't have any way of inputting it. */
+    sc2sim_calctime( telpos[0]*DD2R, djm, 0.0, sample_t, nframes,
                      mjuldate, tempbuff, status );       
 
     /* RA + Dec at centre of map */
