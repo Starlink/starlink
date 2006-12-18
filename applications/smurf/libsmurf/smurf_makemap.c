@@ -81,6 +81,8 @@
 *        - Remove calls to subtract sky and correct for extinction
 *     2006-10-12 (JB):
 *        Use bad bolometer mask if supplied; add usebad flag
+*     2006-12-18 (AGG):
+*        Fix incorrect indf declaration, delete ogrp if it exists
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -154,7 +156,7 @@ void smurf_makemap( int *status ) {
   int flag;                  /* Flag */
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
-  int *indf;                 /* NDF identifier of output file */
+  int indf;                  /* NDF identifier of output file */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int ksize=0;               /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
@@ -368,6 +370,7 @@ void smurf_makemap( int *status ) {
   smf_close_file ( &odata, status );
 
   if( igrp != NULL ) grpDelet( &igrp, status);
+  if( ogrp != NULL ) grpDelet( &ogrp, status);
 
   ndfEnd( status );
   
