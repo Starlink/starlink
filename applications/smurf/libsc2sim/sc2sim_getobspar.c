@@ -60,6 +60,8 @@
 *        Add lissajous parameters and remove bolfile (deprecated)
 *     2006-11-22 (JB):
 *        Add pong_nmaps and liss_nmaps.
+*     2006-12-18 (AGG):
+*        Add DUT1.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -182,6 +184,11 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
    if ( !astMapGet0D ( keymap, "DISTFAC", &(inx->distfac) ) )
       inx->distfac = 0.0;
+
+   /* Ideally the user should look this up and supply it. If it's
+      absent we have no choice but to assume a value of 0. */
+   if ( !astMapGet0D ( keymap, "DUT1", &(inx->dut1) ) )
+      inx->dut1 = 0.0;
 
    if ( !astMapGet0C ( keymap, "FLATNAME", &temp ) )
       strncpy ( inx->flatname, "", 80 );

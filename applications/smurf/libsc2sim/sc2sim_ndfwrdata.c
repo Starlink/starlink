@@ -158,7 +158,7 @@ double *fcal,     /* flatfield calibration (given) */
 double *fpar,     /* flat-field parameters (given) */
 char instrume[],  /* String representing instrument (e.g. "SCUBA-2") (given) */
 char filter[],    /* String representing filter (e.g. "850") (given) */
-char *dateobs,
+char *dateobs,    /* String representing UTC DATE-OBS */
 double *posptr,   /* Pointing offsets from map centre (given) */
 int jigsamples,   /* Number of jiggle samples (given) */
 double jigptr[][2], /* Array of X, Y jiggle positions (given) */
@@ -191,13 +191,11 @@ int *status       /* global status (given and returned) */
 
    /* Add the FITS data to the output file */
    fitschan = astFitsChan ( NULL, NULL, "" );
-   /* Kludged to write generic date */ 
-   /* Now write a real date */
    astSetFitsS ( fitschan, "DATE-OBS", dateobs, "observation date", 0 );
    /* We need to write this - the simulator effectively assumes all
       times are TAI */
    astSetFitsS ( fitschan, "TIMESYS", "UTC", "Time scale for DATE-OBS", 0 );
-   astSetFitsF ( fitschan, "DUT1", 0.0, "UT1 - UTC correction (days)", 0 );
+   astSetFitsF ( fitschan, "DUT1", inx->dut1, "UT1 - UTC correction (days)", 0 );
 
    rad = inx->ra * AST__DR2D;
    astSetFitsF ( fitschan, "RA", rad, "Right Ascension of observation", 0 );

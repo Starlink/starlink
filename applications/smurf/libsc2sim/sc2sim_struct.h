@@ -31,6 +31,7 @@
     16Oct2006 : Add pong_type (jb)
     21Nov2006 : Add liss parameters and remove bolfile (deprecated)(jb)
     22Nov2006 : Add pong_nmaps and liss_nmaps (jb)
+    18Dec2006 : Add DUT1 parameter (agg)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -71,6 +72,7 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   char coordframe[80];        /* Map coord. frame (nas/azel/radec) */
   double dec;                 /* declination in radians */
   double distfac;             /* distortion factor (0=no distortion) */
+  double dut1;                /* Value of UT1 - UTC for current date */
   char flatname[SC2SIM__FLEN]; /* name of flatfield algorithm */
   double grid_step_x;         /* Grid step in X direction */
   double grid_step_y;         /* Grid step in Y direction */
