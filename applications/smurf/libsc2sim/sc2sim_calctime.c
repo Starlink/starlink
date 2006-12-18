@@ -13,12 +13,17 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_calctime ( double mjdaystart, double samptime, int nsamp, 
-                        double *ut, double *last, int *status )
+*     sc2sim_calctime ( double lon, double mjdaystart, double dut1, 
+*                       double samptime, int nsamp, 
+*                       double *ut, double *last, int *status )
 
 *  Arguments:
+*     lon = double (Given)
+*        Geodetic longitude of observer in radians (+ve E)
 *     mjdaystart = double (Given)
-*        Start time as amodified juldate 
+*        UTC start time as a modified juldate 
+*     dut1 = double (Given)
+*        DUT1 value in seconds
 *     samptime = double (Given)
 *        Length of sample in seconds 
 *     nsamp = int (Given)
@@ -39,7 +44,6 @@
 *     - The input time is a UTC MJD
 *     - Expressing the UTC as MJD means that there cannot be any leap seconds 
 *       during the simulation
-*     - At the moment, DUT1 is set to 0, and TAI-UTC is hard-wired to 33s
 
 *  Authors:
 *     E. Chapin (UBC)
@@ -64,6 +68,8 @@
 *        - Check input pointers are not NULL
 *     2006-12-15 (AGG):
 *        Fix bug in calculating LAST due to misplaced eqeqx.
+*     2006-12-18 (AGG):
+*        Add DUT1 as argument, call slaDtt, update prologue
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -109,6 +115,7 @@ void sc2sim_calctime
 ( 
 double lon,          /* Geodetic W Lon (radians) */
 double mjdaystart,   /* start time as modified juldate (UTC) */
+double dut1,         /* DUT1 in seconds */
 double samptime,     /* length of a sample in seconds */
 int nsamp,           /* number of samples */
 double *ut,          /* returned UT at each sample (mod. juldate) */
@@ -120,13 +127,11 @@ int *status          /* global status (given and returned) */
 
   /* Local variables */
   double dttd;                   /* TT-UTC in days */
-  double dut1d = 0.0;            /* DUT1 in days, set to zero for now */
   double eqeqx;                  /* Equation of the equinoxes in radians */
   double gmst;                   /* Greenwich Mean Sidereal Time (radians) */
   int i;                         /* Loop counter */
   double sampday;                /* Sample time in days */
   double start_ut1;              /* UT1 (MJD) corresponding to start of scan */
-  double taiutc;                 /* TAI-UTC in seconds */
 
   /* Check status */
   if ( *status != SAI__OK ) return;
@@ -145,17 +150,12 @@ int *status          /* global status (given and returned) */
     sampday = samptime / SPD;
  
     /* Convert start time from UTC to UT1 */
-    start_ut1 = mjdaystart + dut1d;
-
-    /* Retrieve TAI-UTC in sec */
-    taiutc = slaDat( mjdaystart );
+    start_ut1 = mjdaystart + dut1/SPD;
 
     /* Calculate the TT-UTC difference in days, assume TT is equivalent
        to TDB (needed below). Assume it doesn't change significantly
        over an observation. */ 
-    /* KLUDGE: dttd should be obtained from slaDtt once that routine
-       is implemented. */
-    dttd = (32.184 + taiutc) / SPD;
+    dttd = slaDtt( mjdaystart ) / SPD;
 
     /* Calculate the equation of the equinoxes: input time must be TDB
        (= TT above). This only needs to be done once per simulation as
