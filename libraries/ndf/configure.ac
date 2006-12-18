@@ -21,10 +21,31 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
-dnl    Need these for determining the time to subsecond accuracy
-AC_CHECK_HEADERS( sys/time.h )
-AC_CHECK_FUNCS(gettimeofday)
-
+dnl    Need these for determining the time to subsecond accuracy, the
+dnl    gettimeofday function is often available but requires special
+dnl    handling, so make sure we can compile it, otherwise do without
+dnl    (Solaris requires that _POSIX_C_SOURCE is not defined, amongst others, 
+dnl    Tru64 that _XOPEN_SOURCE=500, Mac OS X doesn't seem to define
+dnl    suseconds_t...) 
+AC_CHECK_HEADERS(sys/time.h)
+AC_CACHE_CHECK([gettimeofday compiles],
+   [ac_cv_gettimeofday],
+   [AC_COMPILE_IFELSE(AC_LANG_SOURCE([], [
+#define _POSIX_SOURCE 1
+#include <stdio.h>
+#include <sys/time.h>
+void check() {
+   struct timeval tv;
+   suseconds_t usec = 0;
+   int result;
+   result = gettimeofday( &tv, NULL );
+}]),
+        ac_cv_gettimeofday=yes,
+        ac_cv_gettimeofday=no)])
+if test $ac_cv_gettimeofday = yes; then
+    AC_DEFINE([HAVE_GETTIMEOFDAY], 1, 
+       [Define to 1 when gettimeofday can be compiled with <sys/time.h>])
+fi
 
 dnl   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
