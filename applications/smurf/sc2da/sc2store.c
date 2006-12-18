@@ -473,6 +473,7 @@ int *status
    History :
     12Aug2004 : original (bdk)
     14Dec2006 : Do not call ErsRep with good status (timj)
+    18Dec2006 : Do not call errRlse (timj)
 */
 {
    char param[17];           /* parameter name */
@@ -498,7 +499,6 @@ int *status
         &oplen, &tstatus );
       if (tstatus != SAI__OK) ErsRep ( 0, &tstatus, opstr );
    }
-   errRlse();
 }
 
 
@@ -514,6 +514,7 @@ int *status          /* global status (given and returned) */
     04Oct2005 : check sc2open flag (bdk)
     23Jan2006 : annul scu2redloc (bdk)
     20Jul2006 : annul DREAM extension (agg)
+    18Dec2006 : release error context (timj)
 */
 
 {
@@ -584,6 +585,7 @@ int *status          /* global status (given and returned) */
 /* Close the NDF context */
 
    ndfEnd ( &tstatus );
+   errRlse();
 
    sc2open = 0;
 
@@ -1354,6 +1356,7 @@ int *status        /* global status (given and returned) */
     12Aug2004 : original (bdk)
     19Jun2005 : use ndfHcre to create history component on all NDFs (bdk)
     23Nov2005 : Use Official C HDS interface (TIMJ)
+    18Dec2006 : Remove some error checks (TIMJ)
 */
 {
 
@@ -1375,41 +1378,37 @@ int *status        /* global status (given and returned) */
    strnum = frame + 1;
    datCell ( sc2loc, 1, &strnum, &loc2, status );
 
-   if ( *status == SAI__OK )
-   {
-      ubnd[0] = 2;
-      lbnd[0] = 1;
-      ubnd[1] = npix;
-      lbnd[1] = 1;
-      ndfPlace ( loc2, "INCOMP", &place, status );
-      ndfNew ( "_INTEGER", 2, lbnd, ubnd, &place, &uindf, status );
-      ndfHcre ( uindf, status );
+   ubnd[0] = 2;
+   lbnd[0] = 1;
+   ubnd[1] = npix;
+   lbnd[1] = 1;
+   ndfPlace ( loc2, "INCOMP", &place, status );
+   ndfNew ( "_INTEGER", 2, lbnd, ubnd, &place, &uindf, status );
+   ndfHcre ( uindf, status );
 
 /* Map the data array */
 
-      ndfMap ( uindf, "DATA", "_INTEGER", "WRITE", (void *)&incomp, &el, 
-        status );
+   ndfMap ( uindf, "DATA", "_INTEGER", "WRITE", (void *)&incomp, &el, 
+	    status );
 
 /* Copy each pixel index and value */
 
-      if ( *status == SAI__OK )
-      {
-         for ( j=0; j<npix; j++ )
+   if ( *status == SAI__OK )
+     {
+       for ( j=0; j<npix; j++ )
          {
-            incomp[2*j] = pixnum[j];
-            incomp[2*j+1] = pixval[j];
+	   incomp[2*j] = pixnum[j];
+	   incomp[2*j+1] = pixval[j];
          }
-      }
+     }
 
 /* Unmap the data array */
 
-      ndfUnmap ( uindf, "DATA", status );
-      ndfAnnul ( &uindf, status );
+   ndfUnmap ( uindf, "DATA", status );
+   ndfAnnul ( &uindf, status );
 
 /* Free the locator for the frame */
-
-      datAnnul ( &loc2, status );
-   }
+   datAnnul ( &loc2, status );
 
    sc2store_errconv ( status );
 
