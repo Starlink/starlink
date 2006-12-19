@@ -167,6 +167,9 @@
 *        TAI-UTC obtained from slaDat, assume DUT1 is zero
 *     2006-12-18 (AGG):
 *        DUT1 now obtained from input struct
+*     2006-12-18 (JB):
+*        Replace pattern-specific parameters with general 
+*        parameters.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -578,11 +581,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         msgOut(" ", "Do a SINGLESCAN observation", status );
         accel[0] = 432.0;
         accel[1] = 540.0;
-        vmax[0] = inx->scan_vmax;        /*200.0;*/
-        vmax[1] = inx->scan_vmax;        /*200.0;*/
+        vmax[0] = inx->vmax;        /*200.0;*/
+        vmax[1] = inx->vmax;        /*200.0;*/
       
-        sc2sim_getsinglescan ( inx->scan_angle, inx->scan_pathlength, 
-                               accel, vmax, samptime, &count, &posptr, status );
+        sc2sim_getsinglescan ( inx->scan_angle, inx->width, accel, vmax, 
+                               samptime, &count, &posptr, status );
       
         break;
 
@@ -591,12 +594,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         msgOut(" ", "Do a BOUS observation", status );
         accel[0] = 432.0;
         accel[1] = 540.0;
-        vmax[0] = inx->bous_vmax;        /*200.0;*/
-        vmax[1] = inx->bous_vmax;        /*200.0;*/
+        vmax[0] = inx->vmax;        /*200.0;*/
+        vmax[1] = inx->vmax;        /*200.0;*/
       
-        sc2sim_getbous ( inx->bous_angle, inx->bous_width,
-                       inx->bous_height, inx->bous_spacing,  
-                       accel, vmax, samptime, &count, &posptr, status );  
+        sc2sim_getbous ( inx->bous_angle, inx->width, inx->height, 
+                         inx->spacing, accel, vmax, samptime, &count, 
+                         &posptr, status );  
       
         break;
 
@@ -607,12 +610,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         accel[0] = 0.0;
         accel[1] = 0.0;
 
-        vmax[0] = inx->liss_vmax;        /*200.0;*/
-        vmax[1] = inx->liss_vmax;        /*200.0;*/
+        vmax[0] = inx->vmax;        /*200.0;*/
+        vmax[1] = inx->vmax;        /*200.0;*/
 
-        sc2sim_getliss ( inx->liss_angle, inx->liss_width,
-		         inx->liss_height, inx->liss_spacing,
-                         accel, vmax, samptime, inx->liss_nmaps, 
+        sc2sim_getliss ( inx->liss_angle, inx->width, inx->height, 
+                         inx->spacing, accel, vmax, samptime, inx->nmaps, 
                          &count, &posptr, status ); 
 
         break; 
@@ -621,32 +623,27 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       case pong:
         /* Get pong pointing solution */
 
-        vmax[0] = inx->pong_vmax;        /*200.0;*/
-        vmax[1] = inx->pong_vmax;        /*200.0;*/
+        vmax[0] = inx->vmax;        /*200.0;*/
+        vmax[1] = inx->vmax;        /*200.0;*/
+
+        accel[0] = 0.0;
+	accel[1] = 0.0;
 
         if ( strncmp ( inx->pong_type, "STRAIGHT", 8 ) == 0 ) {
 
           msgOut(" ", "Do a STRAIGHT PONG observation", status );
 
-          accel[0] = 0.0;
-	  accel[1] = 0.0;
-
-	  sc2sim_getstraightpong ( inx->pong_angle, inx->pong_width,
-				   inx->pong_height, inx->pong_spacing,
-                                   accel, vmax, samptime, inx->pong_nmaps, 
-                                   &count, &posptr, status );
+	  sc2sim_getstraightpong ( inx->pong_angle, inx->width, inx->height, 
+                                   inx->spacing, accel, vmax, samptime, 
+                                   inx->nmaps, &count, &posptr, status );
 
         } else if ( strncmp ( inx->pong_type, "CURVE", 5 ) == 0 ) { 
 
           msgOut(" ", "Do a CURVE PONG observation", status ); 
 
-          accel[0] = 0.0;
-	  accel[1] = 0.0;
-
-	  sc2sim_getcurvepong ( inx->pong_angle, inx->pong_width,
-			        inx->pong_height, inx->pong_spacing,
-                                accel, vmax, samptime, inx->pong_nmaps, 
-                                &count, &posptr, status );
+	  sc2sim_getcurvepong ( inx->pong_angle, inx->width, inx->height, 
+                                inx->spacing, accel, vmax, samptime,
+                                inx->nmaps, &count, &posptr, status );
         } else {
 
           *status = SAI__ERROR;

@@ -62,6 +62,8 @@
 *        Add pong_nmaps and liss_nmaps.
 *     2006-12-18 (AGG):
 *        Add DUT1.
+*     2006-12-18 (JB):
+*        Replace pattern-specific parameters with general values.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -104,8 +106,6 @@
 #include "sae_par.h"
 #include "mers.h"
 
-#define FUNC_NAME "sc2sim_getobspar"
-
 void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx, 
                         int *status ) {
 
@@ -139,18 +139,6 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
    if ( !astMapGet0D ( keymap, "BOUS_ANGLE", &(inx->bous_angle) ) )
       inx->bous_angle = 0.0; 
-
-   if ( !astMapGet0D ( keymap, "BOUS_WIDTH", &(inx->bous_width) ) )
-      inx->bous_width = 2000.0;
-
-   if ( !astMapGet0D ( keymap, "BOUS_HEIGHT", &(inx->bous_height) ) )
-      inx->bous_height = 2000.0;
-
-   if ( !astMapGet0D ( keymap, "BOUS_SPACING", &(inx->bous_spacing) ) )
-      inx->bous_spacing = 240.0;
-
-   if ( !astMapGet0D ( keymap, "BOUS_VMAX", &(inx->bous_vmax) ) )
-      inx->bous_vmax = 200.0;
 
    if ( !astMapGet0I ( keymap, "CONV_SHAPE", &(inx->conv_shape) ) )
       inx->conv_shape = 1;
@@ -221,6 +209,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
    if ( !astMapGet0D ( keymap, "HEATSTEP", &(inx->heatstep) ) )
       inx->heatstep = 0.0;
+
+   if ( !astMapGet0D ( keymap, "HEIGHT", &(inx->height) ) )
+     inx->height = 2000.0;
 
    if ( !astMapGet0D ( keymap, "JIG_STEP_X", &(inx->jig_step_x) ) )
       inx->jig_step_x = 6.28;
@@ -313,21 +304,6 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0D ( keymap, "LISS_ANGLE", &(inx->liss_angle) ) )
      inx->liss_angle = 0.0;
  
-   if ( !astMapGet0D ( keymap, "LISS_HEIGHT", &(inx->liss_height) ) )
-     inx->liss_height = 2000.0;
-
-   if ( !astMapGet0D ( keymap, "LISS_WIDTH", &(inx->liss_width) ) )
-     inx->liss_width = 2000.0;
-
-   if ( !astMapGet0D ( keymap, "LISS_SPACING", &(inx->liss_spacing) ) )
-     inx->liss_spacing = 240.0;
-
-   if ( !astMapGet0D ( keymap, "LISS_VMAX", &(inx->liss_vmax) ) )
-     inx->liss_vmax = 200.0;
-
-   if ( !astMapGet0D ( keymap, "LISS_NMAPS", &(inx->liss_nmaps) ) )
-     inx->liss_nmaps = 1;
-
    if ( !astMapGet0D ( keymap, "MJDAYSTART", &(inx->mjdaystart) ) )
       inx->mjdaystart = 53795.0;
 
@@ -336,6 +312,9 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
    if ( !astMapGet0I ( keymap, "NBOLY", &(inx->nboly) ) )
       inx->nboly = 32;   
+
+   if ( !astMapGet0D ( keymap, "NMAPS", &(inx->nmaps) ) )
+     inx->nmaps = 1;
 
    /* Calculate the relative grid coordinates */
    inx->ngrid = 
@@ -390,15 +369,6 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
    if ( !astMapGet0D ( keymap, "PONG_ANGLE", &(inx->pong_angle) ) )
      inx->pong_angle = 0.0;
- 
-   if ( !astMapGet0D ( keymap, "PONG_HEIGHT", &(inx->pong_height) ) )
-     inx->pong_height = 2000.0;
-
-   if ( !astMapGet0D ( keymap, "PONG_WIDTH", &(inx->pong_width) ) )
-     inx->pong_width = 2000.0;
-
-   if ( !astMapGet0D ( keymap, "PONG_SPACING", &(inx->pong_spacing) ) )
-     inx->pong_spacing = 240.0;
 
    if ( !astMapGet0C ( keymap, "PONG_TYPE", &temp ) )
      strncpy ( inx->pong_type, "STRAIGHT", 80 ); 
@@ -412,12 +382,6 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
       }
       strncpy ( inx->pong_type, convert, 80 );
    }
-
-   if ( !astMapGet0D ( keymap, "PONG_VMAX", &(inx->pong_vmax) ) )
-     inx->pong_vmax = 200.0;
-
-   if ( !astMapGet0D ( keymap, "PONG_NMAPS", &(inx->pong_nmaps) ) )
-     inx->pong_nmaps = 1;
 
    if ( !astMapGet0C ( keymap, "RA", &temp ) )
      inx->ra = 0.0;
@@ -436,12 +400,6 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0D ( keymap, "SCAN_ANGLE", &(inx->scan_angle) ) )
       inx->scan_angle = 0.0;
 
-   if ( !astMapGet0D ( keymap, "SCAN_PATHLENGTH", &(inx->scan_pathlength) ) )
-      inx->scan_pathlength = 2000.0;
-  
-   if ( !astMapGet0D ( keymap, "SCAN_VMAX", &(inx->scan_vmax) ) )
-      inx->scan_vmax = 200.0;
-
    if ( !astMapGet0I ( keymap, "SMU_MOVE", &(inx->smu_move) ) )
       inx->smu_move = 8;
 
@@ -451,11 +409,20 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0I ( keymap, "SMU_SAMPLES", &(inx->smu_samples) ) )
       inx->smu_samples = 1;
 
+   if ( !astMapGet0D ( keymap, "SPACING", &(inx->spacing) ) )
+     inx->spacing = 240.0;
+
    if ( !astMapGet0I ( keymap, "SUBSYSNR", &(inx->subsysnr) ) )
       inx->subsysnr = 1;
 
    if ( !astMapGet0D ( keymap, "TARGETPOW", &(inx->targetpow) ) )
       inx->targetpow = 25.0;
+
+   if ( !astMapGet0D ( keymap, "VMAX", &(inx->vmax) ) )
+     inx->vmax = 200.0;
+
+   if ( !astMapGet0D ( keymap, "WIDTH", &(inx->width) ) )
+     inx->width = 2000.0;
 
 }
 

@@ -32,6 +32,8 @@
     21Nov2006 : Add liss parameters and remove bolfile (deprecated)(jb)
     22Nov2006 : Add pong_nmaps and liss_nmaps (jb)
     18Dec2006 : Add DUT1 parameter (agg)
+    18Dec2006 : Replace pattern-specific parameters with general 
+                parameters (jb)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -58,10 +60,6 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   double bol_disty;           /* average bolometer distance */
   double bous_angle;          /* angle of pattern relative to telescope
 				 axes in radians anticlockwise  */
-  double bous_width;          /* width of bous pattern (arcsec) */
-  double bous_height;         /* height of bous pattern (arcsec) */
-  double bous_spacing;        /* scan line spacing in arcsec  */
-  double bous_vmax;           /* Telescope max velocities */
   int conv_shape;             /* Possible convolution functions are
 				 0 - Gaussian
 				 1 - sinc(dx).sinc(dy)
@@ -80,6 +78,7 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   double heatnum;             /* number of heater settings */
   double heatstart;           /* initial heater setting (pW) */
   double heatstep;            /* increment of heater setting (pW) */
+  double height;              /* min height of pattern (arcsec) */
   double jig_step_x;          /* The step size in -X- direction between
 				 Jiggle positions in arcsec */
   double jig_step_y;          /* The step size in -Y- direction between
@@ -89,17 +88,12 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   double lambda;              /* wavelength in metres */
   double liss_angle;          /* angle of pattern relative to telescope
 				 axes in radians anticlockwise */
-  double liss_width;          /* min width of liss pattern (arcsec) */
-  double liss_height;         /* min height of liss pattern (arcsec) */
-  double liss_spacing;        /* grid spacing in arcsec */
-  double liss_vmax;           /* Telescope max velocities (arcsec/sec) */
-  double liss_nmaps;          /* Number of times to repeat Lissajous 
-			         pattern */
   double mjdaystart;          /* Modified julian date at start */      
   int nbolx;                  /* number of bolometers in X */
   int nboly;                  /* number of bolometers in Y */
   int ngrid;                  /* Nr of reconstruction points for single
 				 bolometer */
+  double nmaps;               /* Number of times to repeat pattern */
   int numsamples;             /* number of samples in STARE */
   int nvert;                  /* Nr of vertices in the Jiggle pattern */
   char obsmode[80];           /* Type of observation */
@@ -107,24 +101,21 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   double platerev;            /* waveplate rotation rev/sec */
   double pong_angle;          /* angle of pattern relative to telescope
 				 axes in radians anticlockwise */
-  double pong_width;          /* min width of pong pattern (arcsec) */
-  double pong_height;         /* min height of pong pattern (arcsec) */
-  double pong_spacing;        /* grid spacing in arcsec */
   char pong_type[80];         /* Type of PONG scan (straight or curve) */
   double pong_vmax;           /* Telescope max velocities (arcsec/sec) */
-  double pong_nmaps;          /* Number of times to repeat Pong
-				 pattern */
   double ra;                  /* right ascension in radians */
   double sample_t;            /* sample time in msec */
   double scan_angle;          /* angle of pattern relative to telescope
 				 axes in radians anticlockwise  */
-  double scan_pathlength;     /* length of path across sky (arcsec) */
-  double scan_vmax;           /* Telescope max velocities */
   int smu_move;               /* Code for the SMU move algorithm */
   double smu_offset;          /* SMU phase shift */
   int smu_samples;            /* Nr of samples per jiggle vertex */
+  double spacing;             /* grid spacing in arcsec */
   int subsysnr;               /* subsystem number */
   double targetpow;           /* target bolometer power input pW */
+  double vmax;                /* Telescope max velocities (arcsec/sec) */
+  double width;               /* min width of pattern (arcsec) */
+
 };
 
 struct sc2sim_sim_struct      /* parameters read from sim input file */
