@@ -56,6 +56,7 @@
 *     B.D.Kelly (UKATC)
 *     A.G. Gibb (UBC)
 *     J. Balfour (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History :
@@ -80,6 +81,8 @@
 *        Change dxml_structs to sc2sim_structs
 *     2006-10-26 (JB):
 *        Convert to using AstFitsChans
+*     2006-12-19 (TIMJ):
+*        sc2store_wrtstream has additional subnum argument
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -117,8 +120,10 @@
 
 /* SMURF includes */
 #include "smurf_par.h"
+#include "libsmf/smf.h"
 #include "sc2da/sc2store.h"
 #include "sc2da/sc2store_par.h"
+#include "sc2da/sc2ast.h"
 
 void sc2sim_ndfwrheat
 ( 
@@ -143,6 +148,7 @@ int *status        /* global status (given and returned) */
    char fitsrec[SC2STORE__MAXFITS][SZFITSCARD]; /* Store for FITS records */  
    double fpos = 0;                 /* RA or Dec in degrees */
    int nrec;                        /* number of FITS header records */
+   int subnum;                      /* subarray index */
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
@@ -176,8 +182,11 @@ int *status        /* global status (given and returned) */
    /* Convert the AstFitsChan data to a char array */
    smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
 
+   /* Calculate the sub array index */
+   sc2ast_name2num( sinx->subname, &subnum, status );
+
    /* Store the timestream data */
-   sc2store_wrtstream ( file_name, nrec, fitsrec, inx->nbolx, 
+   sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->nbolx, 
                         inx->nboly, numsamples, nflat, flatname, head, 
                         dbuf, dksquid, fcal, fpar, inx->obsmode, 
                         inx->jig_vert, inx->nvert, NULL, 0,

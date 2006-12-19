@@ -67,6 +67,7 @@
 *     E.Chapin (UBC)
 *     A.G. Gibb (UBC)
 *     J. Balfour (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History :
@@ -98,6 +99,8 @@
 *        Now takes dateobs string, writes TIMESYS FITS header
 *     2006-12-15 (AGG):
 *        Write out DUT1 FITS header
+*     2006-12-19 (TIMJ):
+*        sc2store_wrtstream has additional subnum argument
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -140,7 +143,7 @@
 #include "libsmf/smf.h"
 #include "sc2da/sc2store.h"
 #include "sc2da/sc2store_par.h"
-
+#include "sc2da/sc2ast.h"
 
 void sc2sim_ndfwrdata
 ( 
@@ -172,6 +175,7 @@ int *status       /* global status (given and returned) */
    char fitsrec[SC2STORE__MAXFITS][SZFITSCARD]; /* Store for FITS records */
    int i;                           /* Loop counter */
    int nrec;                        /* number of FITS header records */
+   int subnum;                      /* sub array index */
    double rad;                      /* RA of observation in degrees */
    double map_hght;   /* Map height in arcsec */
    double map_wdth;   /* Map width in arcsec  */
@@ -276,8 +280,11 @@ int *status       /* global status (given and returned) */
    /* Convert the AstFitsChan data to a char array */
    smf_fits_export2DA ( fitschan, &nrec, fitsrec, status );
 
+   /* Calculate the sub array index */
+   sc2ast_name2num( sinx->subname, &subnum, status );
+
    /* Store the timestream data */
-   sc2store_wrtstream ( file_name, nrec, fitsrec, inx->nbolx, 
+   sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->nbolx, 
                         inx->nboly, numsamples, nflat, flatname, head, 
                         dbuf, dksquid, fcal, fpar, inx->obsmode, 
                         inx->jig_vert, inx->nvert, jigptr, jigsamples, 
