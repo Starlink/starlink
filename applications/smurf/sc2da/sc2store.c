@@ -11,6 +11,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "sae_par.h"
 #include "prm_par.h"
@@ -28,9 +29,15 @@
 #include "dream_par.h"
 
 #include "jcmt/state.h"
+#include "sc2ast.h"
 #include "sc2store_par.h"
 #include "sc2store_sys.h"
 #include "sc2store.h"
+
+/* Private functions */
+static AstFrameSet *timeWcs( int subnum, int ntime, const double times[], int * status );
+
+/* Private globals */
 
 static int sc2open = 0;            /* flag for file open */
 
@@ -1962,6 +1969,7 @@ int *status           /* global status (given and returned) */
 void sc2store_wrtstream
 (
 char file_name[],  /* output file name (given) */
+int subnum,        /* Sub-array number (given) */
 int nrec,          /* number of FITS header records (given) */
 char fitsrec[][81],/* FITS records (given) */
 int colsize,       /* number of bolometers in column (given) */
@@ -1995,6 +2003,7 @@ int *status        /* global status (given and returned) */
      04Oct2005 : check if sc2store already has an open file (bdk)
      08Dec2005 : check status after sc2store_cremap (bdk)
      08Aug2006 : add call to credream if we have a DREAM obs (agg)
+     19Dec2006 : add WCS to output file (timj)
 */
 
 {
@@ -2013,6 +2022,7 @@ int *status        /* global status (given and returned) */
    static int pixnum[DREAM__MXBOL]; /* indices of incompressible pixels */
    static int pixval[DREAM__MXBOL]; /* values of incompressible pixels */
    int *stackz;                     /* pointer to stackzero frame */
+   AstFrameSet * wcs;               /* World Coordinates frame set */
 
    if ( !StatusOkP(status) ) return;
 
@@ -2107,5 +2117,174 @@ int *status        /* global status (given and returned) */
 
    sc2store_wrfitshead ( nrec, fitsrec, status );
 
+/* And create a convenience frameset for focal plane and time coordinates */
+
+   wcs = timeWcs( subnum, numsamples, ((double*)sc2store_ptr[TCS_TAI]),status);
+   ndfPtwcs(wcs, indf, status);
+   wcs = astAnnul( wcs );
+
+/* The file is open */
    sc2open = 1; 
+}
+
+
+AstFrameSet *timeWcs( int subnum, int ntime, const double times[], int * status ){
+
+/*
+*+
+*  Name:
+*     timeWcs
+
+*  Purpose:
+*     Calculate frameset for time series.
+
+*  Prototype:
+*     AstFrameSet *timeWcs( int subnum, int ntime, const double times[],
+*                int * status );
+
+*  Description:
+*     Returns a FrameSet in which the base Frame is a 3D GRID Frame, and
+*     the current Frame has 3 axes in the order (fplanex,fplaney,time).
+*     The time axis is described using a MJD(TAI) TimeFrame, and its relationship
+*     to GRID coords is specified by the supplied look-up table of time
+*     values. The spatial axis is described by a 2D Frame with
+*     Domain "FPLANE" and is connected to the GRID coords via a
+*     mapping created by sc2ast and containing the mapping from pixel to focal plane
+*     arcsecond offsets.
+
+*  Parameters:
+*     subnum = int (Given)
+*        Subarray index
+*     ntime = int (Given)
+*        The number of time values supplied in "times".
+*     times = const double [] (Given)
+*        An array of "ntime" MJD values (in the TAI timescale), one for
+*        each pixel along the time axis.
+*     status = int * (Given & Returned)
+*        Inherited status.
+
+*  Returned Value:
+*     timeWcs = AstFrameSet *
+*        3-D frameset.
+
+*  Notes:
+
+*  Authors:
+*     DSB: David Berry (UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+
+*  History:
+*     10-MAR-2006 (DSB):
+*        Initial version (untested)
+*     01-JUN-2006 (TIMJ):
+*        Integrated into specwriter.
+*     19-DEC-2006 (TIMJ):
+*        Integrated into SCUBA-2 software as variant of ACSIS DA version
+
+*-
+*/
+
+/* Local Variables: */
+   AstCmpFrame *totfrm;
+   AstCmpMap *totmap;
+   AstFrame *gridfrm;
+   AstFrameSet *result, *spacefset;
+   AstLutMap *timemap;
+   AstTimeFrame *timefrm;
+   double tcopy[2];  /* local copy of time lut for when only 1 number present */
+   double *ltimes;  /* pointer to a time array */
+   int malloced = 0; /* did we malloc a ltimes array */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if( *status != SAI__OK ) return result;
+
+/* Start an AST context so we do not need to annul AST pointers explicitly. */
+   astBegin;
+
+   /* Create a frame covering the focal plane coordinates */
+   sc2ast_createwcs( subnum, NULL, NULL, NULL, &spacefset, status );
+
+/*
+   Now create a TimeFrame to describe MJD in the TAI timescale, and
+   a LutMap which transforms grid coord into MJD (in days). The default
+   TimeFrame attribute values give us what we want. 
+   Work out the duration of the observation to decide on formatting.
+   To give AST some help with formatting axes we use a TimeOrigin.
+*/
+   timefrm = astTimeFrame( "" );
+   malloced = 0;
+   if (ntime == 1) {
+     /* a LutMap needs two numbers in its mapping so double up the
+	first time if we only have one value. */
+     tcopy[0] = times[0];
+     tcopy[1] = times[1];
+     ltimes = tcopy;
+     ntime = 2;
+   } else {
+     double origin = 0.0; /* reference time */
+     int i;
+     /* copy values and remove integer part of day */
+     ltimes = malloc( sizeof(*ltimes) * ntime );
+     if (ltimes) malloced = 1;
+     origin = floor( times[0] );
+     for (i = 0; i < ntime; i++ ) {
+       ltimes[i] = times[i] - origin;
+     }
+     astSetD(timefrm, "TimeOrigin", origin);
+
+     /* We would like to use iso.0 for anything that is longer than 10 seconds (say)
+       else use iso.3 because can not take spectra faster than 0.005 second. */
+     if ( (ltimes[ntime-1] - ltimes[0]) < (10.0 / SC2AST_SPD) ) {
+       astSet(timefrm, "format=iso.3");
+     } else {
+       astSet(timefrm, "format=iso.0");
+     }
+
+   }
+   timemap = astLutMap( ntime, ltimes, 1.0, 1.0, "" );
+
+   if (malloced) free( ltimes );
+
+/* We now have the Frames and Mappings describing all the individual
+   axes. Join all the Frames together into a CmpFrame (in the order spectral,
+   spatial, time), and join all the Mappings together into a parallel
+   CmpMap. */
+   totfrm = astCmpFrame( spacefset, timefrm, "" );
+   totmap = astCmpMap( spacefset, timemap, 0, "" );
+
+/* Create a 3D GRID Frame. */
+   gridfrm = astFrame( 3, "Domain=GRID,Title=FITS pixel coordinates" );
+   astSet( gridfrm, "Unit(1)=pixel,Label(1)=FITS pixel axis 1" );
+   astSet( gridfrm, "Unit(2)=pixel,Label(2)=FITS pixel axis 2" );
+   astSet( gridfrm, "Unit(3)=pixel,Label(2)=FITS pixel axis 3" );
+
+/* Create the FrameSet to return, initially containing just the above
+   GRID Frame. */
+   result = astFrameSet( gridfrm, "" );
+
+/* Add the total Frame into the FrameSet using the total Mapping to
+   connect it to the base (i.e. GRID) Frame. */
+   astAddFrame( result, AST__BASE, totmap, totfrm );
+
+/* If no error has occurred, export the resulting FrameSet pointer
+   from the current AST context so that it will not be annulled by the
+   following call to astEnd. If an error has occurred, annul it explicitly,
+   in order to ensure we are returning a NULL pointer. */
+   if( *status == SAI__OK ) {
+      astExport( result );
+   } else {
+      result = astAnnul( result );
+   }
+
+/* End the AST context. This annuls all AST Objects pointers created since
+   the matching call to astBegin, except for any which have been exempted
+   or exported. */
+   astEnd;
+
+/* Return the resulting FrameSet. */
+   return result;
+
 }
