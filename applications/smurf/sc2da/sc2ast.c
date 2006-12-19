@@ -18,9 +18,6 @@ static char errmess[132];              /* For DRAMA error messages */
 #define PIBY2 1.57079632679
 #define PI 2*PIBY2 
 #define PIX2MM 1.135                   /* pixel interval in mm */
-#define SPD 86400.0                    /* Seconds per day */
-#define JCMT_LON "W155:28:37.20"       /* Longitude of JCMT */
-#define JCMT_LAT "N19:49:22.11"        /* Geodetic latitude of JCMT */
 const double RAD2DEG = 90.0 / PIBY2;   /* Convert Radians to degrees */
 
 /*+ sc2ast_createwcs - create WCS description */
@@ -46,6 +43,8 @@ int *status             /* global status (given and returned) */
      "subnum" set to -1. In this is done, the cached resources are freed
      and this function returns without further action, returning a NULL 
      pointer in "*fset".
+
+     If telescope state is NULL, a focal plane frameset will be returned.
 
    Notes :
      After the first call the cached part of the frameset contains information
@@ -99,6 +98,7 @@ int *status             /* global status (given and returned) */
      10Aug2006 : Added "rot" parameter to sc2ast_maketanmap (dsb)
      07Sep2006 : Added "telpos" and "instap" arguments 
                  JCMTState now used for time/pointing (EC)
+     19Dec2006 : If "state" is NULL return the focal plane frameset (TJ)
 */
 
 {
@@ -358,10 +358,12 @@ int *status             /* global status (given and returned) */
       map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
                                                       radmap, 1, "" );
 
-/* Apply focal plane offsets */
-      instapmap = astShiftMap( 2, instap, "" );
-      map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
-                                                      instapmap, 1, "" );
+/* Apply focal plane offsets - if supplied */
+      if (instap) {
+	instapmap = astShiftMap( 2, instap, "" );
+	map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
+							instapmap, 1, "" );
+      }
 
 /* Simplify the Cached Mapping. */
       map_cache[ subnum ] = astSimplify( map_cache[ subnum ] );
@@ -372,6 +374,21 @@ int *status             /* global status (given and returned) */
    needed. this is done by calling this function with "subnum" set to -1. */
       astExempt( map_cache[ subnum ] );
       astExempt( frameset_cache[ subnum ] );
+   }
+
+
+   /* If state is NULL we are simply returning the focal plane coordinate
+      frames */
+   if (!state) {
+     *fset = astClone( frameset_cache[ subnum ] );
+     astRemoveFrame( *fset, AST__CURRENT );
+     astAddFrame( *fset, AST__BASE, map_cache[ subnum ],
+		  astFrame(2, "Domain=FPLANE") );
+     /* Return early rather than embed the subsequent code in a big else.
+	A bit dangerous if more is added at the end */
+     astExport( *fset );
+     astEnd;
+     return;
    }
 
 
@@ -413,10 +430,6 @@ int *status             /* global status (given and returned) */
    is set every time though since this will vary from call to call. */
    if( !skyframe ) {
       skyframe = astSkyFrame ( "system=AzEl" );
-      /*
-	astSetC( skyframe, "ObsLon", JCMT_LON );
-	astSetC( skyframe, "ObsLat", JCMT_LAT );   
-      */
       
       /* Ast assumes longitude increases eastward, so change sign to
 	 be consistent with smf_calc_telpos here */
@@ -427,7 +440,7 @@ int *status             /* global status (given and returned) */
 
       astExempt( skyframe );
    }
-   astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->rts_end + 32.184/SPD );
+   astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->rts_end + 32.184/SC2AST_SPD );
 
 /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
    First remove the existing current Frame and then add in the new one.
