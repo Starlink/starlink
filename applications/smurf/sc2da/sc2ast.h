@@ -62,6 +62,8 @@
 
 #ifndef HEADGEN___src_sc2ast_sc2ast_h
 #define HEADGEN___src_sc2ast_sc2ast_h 
+
+#define SC2AST_SPD 86400.0  /* Seconds per day */
  
 /* Following include is for JCMTState definition */
 #include "jcmt/state.h"
