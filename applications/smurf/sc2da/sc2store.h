@@ -296,6 +296,7 @@ int *status           /* global status (given and returned) */
 void sc2store_wrtstream
 (
 char file_name[],  /* output file name (given) */
+int subnum,        /* Sub-array number (given) */
 int nrec,          /* number of FITS header records (given) */
 char fitsrec[][81],/* FITS records (given) */
 int colsize,       /* number of bolometers in column (given) */
