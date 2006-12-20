@@ -115,6 +115,8 @@
 *     13-DEC-2006 (DSB):
 *        Added "genvar" argument and allow output variances to be
 *        calculated on the basis of Tsys.
+*     19-DEC-2006 (TIMJ):
+*        In some broken data FFT_WIN is undef. Assume truncate.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -439,7 +441,8 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
          dnew = astRate( fmap, &at, 1, 1 );
 
 /* Modify the channel width to take account of the effect of the FFT windowing 
-   function. */
+   function. Allow undef value because FFT_WIN for old data had a broken value 
+   in hybrid subband modes. */
          if( dnew != AST__BAD ) {
             dnew = fabs( dnew );
 
@@ -448,7 +451,11 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
 
             } else if( !strcmp( fftwin, "hanning" ) ) {
                dnew *= 1.5;
-   
+
+	    } else if( !strcmp( fftwin, "<undefined>" ) ) {
+	      /* Deal with broken data - make an assumption */
+ 	       dnew *= 1.0;
+
             } else if( *status == SAI__OK ) {
                *status = SAI__ERROR;
                msgSetc( "W", fftwin );
