@@ -380,10 +380,16 @@ int *status             /* global status (given and returned) */
    /* If state is NULL we are simply returning the focal plane coordinate
       frames */
    if (!state) {
+     AstFrame * fp_pos_frame;
      *fset = astClone( frameset_cache[ subnum ] );
      astRemoveFrame( *fset, AST__CURRENT );
+     fp_pos_frame = astFrame( 2, 
+			      "Unit(1)=rad,Unit(2)=rad,Domain=FPLANE"
+			      ",label(1)=FplaneX,label(2)=FplaneY" );
+     astSetActiveUnit( fp_pos_frame, 1 );
      astAddFrame( *fset, AST__BASE, map_cache[ subnum ],
-		  astFrame(2, "Domain=FPLANE") );
+		  fp_pos_frame );
+     astSet( *fset, "unit(1)=arcsec,unit(2)=arcsec" );
      /* Return early rather than embed the subsequent code in a big else.
 	A bit dangerous if more is added at the end */
      astExport( *fset );
