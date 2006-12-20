@@ -39,11 +39,14 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-02-16 (AGG):
 *        Initial test version
+*     2006-12-20 (TIMJ):
+*        Open related files in UPDATE mode to prevent overwrite of propogated components
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -51,8 +54,8 @@
 *     correction has already been applied.
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006 University of British Columbia and the Particle Physics
+*     and Astronomy Research Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -171,7 +174,7 @@ void smurf_remsky( int * status ) {
     if ( *status == SAI__OK ) {
       /* Open and process related files */
       for (i=0; i<ogroup->ngroups; i++) {
-	smf_open_related( ogroup, i, "WRITE", &relfiles, status );
+	smf_open_related( ogroup, i, "UPDATE", &relfiles, status );
 	smf_subtract_plane( NULL, relfiles, fittype, status );
 	smf_close_related( &relfiles, status );
       }
