@@ -65,14 +65,14 @@ export PATH="${tmppath}:@bindir@/startcl:@bindir@:@starjavadir@/bin"
 #     Prepend Starlink JRE (and JDK) paths to PATH.
 #     Do JRE after JDK so that the JRE takes precidence.
 
-JREHOME=@exec_prefix@/java/jrehome
-JDKHOME=@exec_prefix@/java/jdkhome
+JREHOME=@exec_prefix@/java/jre/bin
+JDKHOME=@exec_prefix@/java/bin
 
-if test -f ${JDKHOME}; then
-    export PATH="`cat ${JDKHOME}`/bin:${PATH}"
+if test -d ${JDKHOME}; then
+    export PATH="${JDKHOME}:${PATH}"
 fi
-if test -f ${JREHOME}; then
-    export PATH="`cat ${JREHOME}`/bin:${PATH}"
+if test -d ${JREHOME}; then
+    export PATH="${JREHOME}:${PATH}"
 fi
 unset JREHOME JDKHOME
 

@@ -49,11 +49,11 @@ setenv PATH "${tmppath}:@bindir@/startcl:@bindir@:@starjavadir@/bin"
 #     Prepend Starlink JRE (and JDK) paths to PATH.
 #     Do JRE after JDK so that the JRE takes precidence.
 
-set JREHOME = @exec_prefix@/java/jrehome
-set JDKHOME = @exec_prefix@/java/jdkhome
+set JREHOME = @exec_prefix@/java/jre/bin
+set JDKHOME = @exec_prefix@/java/bin
 
-if ( -f ${JDKHOME} ) setenv PATH "`cat ${JDKHOME}`/bin:${PATH}"
-if ( -f ${JREHOME} ) setenv PATH "`cat ${JREHOME}`/bin:${PATH}"
+if ( -d ${JDKHOME} ) setenv PATH "${JDKHOME}:${PATH}"
+if ( -d ${JREHOME} ) setenv PATH "${JREHOME}:${PATH}"
 unset JREHOME JDKHOME
 
 #     Check if @LD_LIB_PATH@ is set, needed on all platforms
