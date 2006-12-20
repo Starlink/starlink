@@ -66,6 +66,8 @@
 *     2006-05-02 (AGG):
 *        Set SMF_NOCREATE_FILE & SMF__NOCREATE_DA flags for
 *        NULL ffdata when input data are flatfielded
+*     2006-12-20 (TIMJ):
+*        Open related files in UPDATE mode to prevent overwrite of propogated components
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -134,7 +136,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   if ( ogrp != NULL ) {
     /* Open the input file solely to propagate it to the output file */
     ndgNdfas( igrp, index, "READ", &indf, status );
-    ndgNdfpr( indf, " ", ogrp, index, &outndf, status );
+    ndgNdfpr( indf, "WCS", ogrp, index, &outndf, status );
     ndfAnnul( &indf, status);
 
     /* Set parameters of the DATA array in the output file */
@@ -149,22 +151,28 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   /* Open the input without header information. This is required
      because sc2store can not open two files at once 
      22-Mar-2006: no longer true? hdr needed anyway */
-  smf_open_file( igrp, index, "READ", 1, &data, status);
-  if ( *status != SAI__OK) {
-    errRep("", "Unable to open input file", status);
+  if (*status == SAI__OK) {
+    smf_open_file( igrp, index, "READ", 1, &data, status);
+    if ( *status != SAI__OK) {
+      errRep("", "Unable to open input file(s)", status);
+    }
   }
-  /* Open the output file for write. If the output grp is NULL then
-     ffdata is returned NULL */
-  smf_open_file( ogrp, index, "WRITE", 1, ffdata, status);
 
-  if ( *status == SAI__ERROR) {
-    errRep("", "Unable to open output file", status);
+  /* Open the output file for write. If the output grp is NULL then
+     ffdata is returned NULL. Use UPDATE mode to retain components such as WCS */
+  if (*status == SAI__OK) {
+    smf_open_file( ogrp, index, "UPDATE", 1, ffdata, status);
+    if ( *status == SAI__ERROR) {
+      errRep("", "Unable to open output flatfielded file(s)", status);
+    }
   }
 
   /* how many elements in the data array? */
-  npts = (data->dims)[0] * (data->dims)[1];
-  if ( data->ndims == 3) {
-    npts *= (data->dims)[2];
+  if (*status == SAI__OK) {
+    npts = (data->dims)[0] * (data->dims)[1];
+    if ( data->ndims == 3) {
+      npts *= (data->dims)[2];
+    }
   }
 
   /* Check whether the input data are flatfielded */
