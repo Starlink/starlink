@@ -118,6 +118,8 @@
 *     2006-09-21 (AGG):
 *        Move the instrument-specific stuff until after hdr->nframes has
 *        been assigned (nframes is needed by acs_fill_smfHead).
+*     2006-12-20 (TIMJ):
+*        Clean up some error handling.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -239,20 +241,23 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
     return;
   }
 
-  /* Return the NDF identifier */
-  ndgNdfas( igrp, index, mode, &indf, status );
-  if ( indf == NDF__NOID ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Could not locate file", status);
-    return;
-  }
- 
-  /* Determine the dimensions of the DATA component */
-  ndfDim( indf, NDF__MXDIM, ndfdims, &ndims, status );
-
   /* Get filename from the group */
   pname = filename;
   grpGet( igrp, index, 1, &pname, SMF_PATH_MAX, status);
+
+  /* Return the NDF identifier */
+  if (*status == SAI__OK) {
+    ndgNdfas( igrp, index, mode, &indf, status );
+    if ( indf == NDF__NOID ) {
+      if (*status == SAI__OK) *status = SAI__ERROR;
+      msgSetc( "FILE", filename );
+      errRep(FUNC_NAME, "Could not locate file ^FILE", status);
+      return;
+    }
+  }
+
+  /* Determine the dimensions of the DATA component */
+  ndfDim( indf, NDF__MXDIM, ndfdims, &ndims, status );
 
   /* Check type of DATA and VARIANCE arrays */
   ndfType( indf, "DATA,VARIANCE", dtype, NDF__SZTYP+1, status);
