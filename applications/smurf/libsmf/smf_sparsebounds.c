@@ -62,6 +62,8 @@
 *  History:
 *     30-NOV-2006 (DSB):
 *        Initial version, based on smf_cubebounds.
+*     20-DEC-2006 (DSB):
+*        Correct calculation of pixel bounds for spectral axis.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -572,7 +574,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    ubnd[ 1 ] = 1;
 
 /* Find the number of pixels needed to span the third pixel axis range. */
-   npix = 1 + (int)( subnd - slbnd );
+   npix = 1 + NINT( subnd - slbnd );
 
 /* Find a fractional pixel shift which puts the mid point of the axis
    range at the mid point of a span of "npix" pixels. */
