@@ -85,6 +85,9 @@
 *        Fix bug that gave erroneous CRPIX1/2 values.
 *     7-DEC-2006 (DSB):
 *        Fix bug that could swap order of CDELT1 and CDELT2.
+*     20-DEC-2006 (DSB):
+*        Retain the supplied parameter values if the optimal pixel size
+*        is zero.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -721,11 +724,16 @@
             PAR0( 2 ) = PAR0( 2 ) + NINT( ( YHI - YLO )/2 ) + 1 
      :                  - NINT( PAR0( 2 ) )
 
-*  Copy the projection parameters to the suppled array.
-            DO I = 1, 7
-               IF( PAR( I ) .EQ. AST__BAD ) PAR( I ) = PAR0( I )
-            END DO
+*  Check pixel sizes are not zero.
+            IF( PAR0( 5 ) .GT. 0.0 .AND.
+     :          PAR0( 6 ) .GT. 0.0 ) THEN
+               
+*  Copy the projection parameters to the supplIed array.
+               DO I = 1, 7
+                  IF( PAR( I ) .EQ. AST__BAD ) PAR( I ) = PAR0( I )
+               END DO
 
+            END IF
          END IF
       END IF
 
