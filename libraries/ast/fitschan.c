@@ -735,6 +735,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        output header if the source velocity was negative.
 *     9-NOV-2006 (DSB):
 *        Add STATUS argument to docs for F77 AST_SETx.
+*     20-DEC-2006 (DSB):
+*        Correct FK5 to ICRS in error message issued if no RADESYS or
+*        EQUINOX is found.
 *class--
 */
 
@@ -29798,7 +29801,7 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
          if( !strcmp( sys, "EQU" ) ){
             sprintf( buf, "The original FITS header did not specify the "
                      "RA/DEC reference frame. A default value of %s was "
-                     "assumed.", ( radesys == FK4 ) ? "FK4" : "FK5" );
+                     "assumed.", ( radesys == FK4 ) ? "FK4" : "ICRS" );
             Warn( this, "noradesys", buf, method, class );
          }
       }
