@@ -38,6 +38,11 @@
 *        An array in which to store AST identifiers for the pixel_in to
 *        pixel_out Mapping for each input NDF. The array should have the
 *        same number of elements as the supplied group of input NDFs (IGRP).
+*        The "pixel coordinates" used as input and output by these Mappings
+*        have integral values at the centre of each pixel. Note, this is 
+*        different to the usual Starlink convention for pixel coordinates 
+*        which has integral values at the edges of each pixel, but it is the 
+*        convention required by AST_REBINSEQ.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -78,6 +83,11 @@
 *     1-DEC-2006 (DSB):
 *        Correct the rouding of floating point pixel bounds to integer
 *        pixel bounds (used to use floor/ceil, now uses nint).
+*     20-DEC-2006 (DSB):
+*        Back out of the 1-DEC-2006 changes since the floor/ceil approach
+*        was right after all, since the pixel coordinate system used by 
+*        "maps" has integer values at the *centre* of each pixel (not the
+*        edges as normal in Starlink sw).
 *     {enter_further_changes_here}
 
 *-
@@ -197,7 +207,7 @@
 *  output) pixel Frame.
          MAPS( I ) = AST_GETMAPPING( IWCS1, IPIX1, 
      :                               IPIXR + NFRM, STATUS ) 
-         
+
 *  Create a ShiftMap which shifts pixel coords by 0.5 of a pixel in order
 *  to put integer values at the centre of the pixel (as required by AST_REBINSEQ).
          NDIM1 = AST_GETI( MAPS( I ), 'Nin', STATUS )
@@ -240,8 +250,8 @@
      :                       ALBND, AUBND, XL, XU, STATUS )
             RLBND = REAL( ALBND )
             RUBND = REAL( AUBND )
-            IU = NINT( RUBND )
-            IL = NINT( RLBND )
+            IU = KPG1_FLOOR( RUBND )
+            IL = KPG1_CEIL( RLBND )
             IF( IU .GT. UBND( J ) ) UBND( J ) = IU
             IF( IL .LT. LBND( J ) ) LBND( J ) = IL
          END DO
