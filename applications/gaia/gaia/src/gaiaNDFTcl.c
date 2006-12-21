@@ -738,6 +738,8 @@ static int gaiaNDFTclExists( ClientData clientData, Tcl_Interp *interp,
     /* Get the NDF */
     result = importNdfHandle( interp, objv[1], &info );
     if ( result == TCL_OK ) {
+        result = gaiaNDFExists( info->ndfid, Tcl_GetString( objv[2] ),
+                                &exists, &error_mess );
         resultObj = Tcl_GetObjResult( interp );
         if ( result != TCL_OK ) {
             Tcl_SetStringObj( resultObj, error_mess, -1 );
