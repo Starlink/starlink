@@ -1,4 +1,7 @@
   Latest changes:
+   
+    The default cube axis is now selected to be the spectral one. Previously
+    the third axis was always chosen.
 
     Timeseries cubes can now be switched between different time scales.
 
