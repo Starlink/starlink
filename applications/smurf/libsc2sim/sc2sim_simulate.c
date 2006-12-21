@@ -170,6 +170,9 @@
 *     2006-12-18 (JB):
 *        Replace pattern-specific parameters with general 
 *        parameters.
+*     2006-12-21 (AGG):
+*        Set TAI to midpoint of sample, RTS to end. Use instap_x/y
+*        from inx struct
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -328,7 +331,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double *jig_x_hor=NULL;         /* jiggle x-horizontal tanplane offset (radians) */
   int k;                          /* loop counter */
   int lastframe;                  /* number of frames in the last chunk */
-  double *lst=NULL;               /* local sidereal time at time step */
+  double *lst=NULL;               /* local apparent sidereal time at time step */
   double *mjuldate=NULL;          /* modified Julian date each sample */
   int narray = 0;                 /* number of subarrays to generate */
   int nflat[8];                   /* number of flat coeffs per bol */
@@ -381,8 +384,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   /* Setup instap and telpos */
   smf_calc_telpos( NULL, "JCMT", telpos, status );
-  instap[0] = 0;
-  instap[1] = 0;
+  instap[0] = inx->instap_x;
+  instap[1] = inx->instap_y;
 
   if( *status == SAI__OK ) {
     /* Calculate year/month/day corresponding to MJD at start */
@@ -781,7 +784,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     }   
 
     /* Increment mjdaystart (UTC) to the beginning of this chunk, then
-       calculate the UT1/LMST at each timestep */
+       calculate the UT1/LAST at each timestep */
     start_time = inx->mjdaystart + 
       ((double)(curchunk * maxwrite) * samptime / SPD); 
 
@@ -830,7 +833,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	  /* Get boresight tanplate offsets in Nasmyth coordinates (radians) */
 	  bor_x_nas = (posptr[curframe*2])*DAS2R;
 	  bor_y_nas = (posptr[curframe*2+1])*DAS2R;
-	  
+
 	  /* Calculate boresight offsets in horizontal coord. */
 	  bor_x_hor =  bor_x_nas*cos(base_el[frame]) - 
 	               bor_y_nas*sin(base_el[frame]);
@@ -981,7 +984,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         state.smu_az_jig_y = jig_y_hor[frame];
         state.smu_az_chop_x = 0;
         state.smu_az_chop_y = 0;
-        state.rts_end = mjuldate[frame] + (taiutc - inx->dut1)/SPD;
+        state.tcs_tai = mjuldate[frame] + (taiutc - inx->dut1  + 0.5*samptime)/SPD;
+        state.rts_end = state.tcs_tai + 0.5*samptime/SPD;
 
         /* For each subarray, retrieve the wcs frameset, then generate
            the frame of data */
@@ -1032,11 +1036,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           /* RTS -------------------------------------------------------*/
 	  /* Sequence number */
           head[j].rts_num = ( curchunk * maxwrite ) + j;           
-	  /* RTS_END is a TAI time */
-          head[j].rts_end = mjuldate[j] + (taiutc - inx->dut1)/SPD;
+	  /* Calculate TAI corresponding to MID-TIME of sample and store */
+	  head[j].tcs_tai = mjuldate[j] + (taiutc - inx->dut1 + 0.5*samptime)/SPD;
 
-	  /* Calculate TAI and store */
-	  head[j].tcs_tai = head[j].rts_end;
+	  /* RTS_END is a TAI time, corresponding to END time of sample */
+          head[j].rts_end = head[j].tcs_tai +0.5*samptime/SPD;
+
 
           /* TCS - Telescope tracking structure ----------------------- */
 	  /* Coord. system  */
