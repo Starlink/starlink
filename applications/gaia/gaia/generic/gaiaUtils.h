@@ -15,8 +15,8 @@ extern "C" {
     char *gaiaUtilsErrMessage();
 
     /* Extract a FrameSet for an axis */
-    int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, AstFrameSet **iwcs,
-                            char **error_mess );
+    int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset, 
+                            AstFrameSet **iwcs, char **error_mess );
 
     /* Extract a FrameSet for an image */
     int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2,

@@ -157,7 +157,7 @@ itcl::class gaia::GaiaSpecWriter {
 
             #  Get spectral WCS (need to pick out 1D from full WCS).
             set cubeaccessor [$gaiacube get_cubeaccessor]
-            set frameset [$cubeaccessor getaxiswcs $axis]
+            set frameset [$cubeaccessor getaxiswcs $axis 0]
 
             #  Open the output file.
             set fid [::open $filename w]

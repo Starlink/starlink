@@ -247,10 +247,11 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Return a WCS describing the coordinates of a given WCS axis. Note axes
    #  may or may not be fixed to a given dataset axis, that isn't worried
-   #  about here.
-   public method getaxiswcs {axis} {
+   #  about here. If only part of the axis is being extracted then shift
+   #  should be set to the pixel index of the lower bound.
+   public method getaxiswcs {axis {shift 0} } {
       set wcs [${type_}::getwcs $handle_]
-      return [gaiautils::getaxiswcs $wcs $axis]
+      return [gaiautils::getaxiswcs $wcs $axis $shift]
    }
 
    #  Return the address of a spectral line of data. This will only
@@ -463,7 +464,7 @@ itcl::class gaia::GaiaNDAccess {
       lassign [getinfo $addr_(DATA)] adr nel hdstype fulltype
 
       #  Get a 1D WCS for our chosen axes.
-      set spectralwcs [getaxiswcs $axis]
+      set spectralwcs [getaxiswcs $axis $alow]
 
       #  Extract the spectral data values and copy into place.
       set specdata [getlastspectrum "DATA"]

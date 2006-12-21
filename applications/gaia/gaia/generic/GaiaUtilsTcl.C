@@ -511,7 +511,7 @@ static int GaiaUtilsGtAxisCoord( ClientData clientData, Tcl_Interp *interp,
      */
     if ( objc != 4 ) {
         Tcl_WrongNumArgs( interp, 1, objv, 
-                          "frameset!mapping coordinate ?forward?" );
+                          "frameset|mapping coordinate ?forward?" );
         return TCL_ERROR;
     }
 
@@ -552,8 +552,9 @@ static int GaiaUtilsGtAxisCoord( ClientData clientData, Tcl_Interp *interp,
  * Extract a WCS for a specific axis from a full WCS. The result is
  * the address of an AST FrameSet.
  *
- * There are two arguments, the address of the AST FrameSet and the axis to
- * extract.
+ * There are three arguments, the address of the AST FrameSet, the axis to
+ * extract and an offset along the axis to adjust for (NDF origin when
+ * extracting a section, 0 to ignore).
  */
 static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] )
@@ -562,12 +563,13 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
     AstFrameSet *axiswcs;
     char *error_mess;
     int axis;
+    int offset;
     int result;
     long adr;
 
-    /* Check arguments, only allow two, the frameset and an axis number. */
-    if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "frameset axis" );
+    /* Check arguments, the frameset, axis number and offset. */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset axis offset" );
         return TCL_ERROR;
     }
 
@@ -582,7 +584,14 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
     if ( Tcl_GetIntFromObj( interp, objv[2], &axis ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    result= gaiaUtilsGtAxisWcs( fullwcs, axis, &axiswcs, &error_mess );
+
+    /* Get the offset  */
+    offset =01;
+    if ( Tcl_GetIntFromObj( interp, objv[3], &offset ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    result= gaiaUtilsGtAxisWcs( fullwcs, axis, offset, &axiswcs, &error_mess );
 
     /* Export the new WCS as a long containing the address */
     if ( result == TCL_OK ) {

@@ -129,12 +129,16 @@ char *gaiaUtilsErrMessage()
     return result_message;
 }
 
+
 /**
  * Get an AST frameset that describes the coordinates of a given axis.
- * Axes are in the AST sense, i.e. start at 1.
+ * Axes are in the AST sense, i.e. start at 1. The offset value is a shift
+ * that should be applied to the GRID coordinates (useful when an NDF data
+ * component has been sectioned outside of the NDF library, this is the
+ * origin).
  */
-int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, AstFrameSet **iwcs,
-                        char **error_mess )
+int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset,
+                        AstFrameSet **iwcs, char **error_mess )
 {
    AstFrame *tmpframe;
    AstMapping *joined;
@@ -186,6 +190,16 @@ int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, AstFrameSet **iwcs,
        /* Add in the new frame */
        astAddFrame( *iwcs, AST__CURRENT, joined, tmpframe );
        astInvert( *iwcs );
+
+       /* If we have an offset to apply to the GRID coordinates (these will be
+        * the base frame). Then add in a ShiftMap. */
+       if ( offset != 0 ) {
+           double shift[1];
+           AstShiftMap *map;
+           shift[0] = (double) -offset;
+           map = astShiftMap( 1, shift, "" );
+           astRemapFrame( *iwcs, AST__BASE, map );
+       }
    }
 
    /* Select an axis in the current frame and tack this onto the
