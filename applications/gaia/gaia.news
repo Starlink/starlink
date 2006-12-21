@@ -1,4 +1,7 @@
   Latest changes:
+
+    Ranges used to extract spectra and control other operations are
+    now preserved, except when the size of the underlying cube changes.
    
     The default cube axis is now selected to be the spectral one. Previously
     the third axis was always chosen.
