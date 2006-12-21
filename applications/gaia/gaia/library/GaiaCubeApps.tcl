@@ -194,9 +194,22 @@ itcl::class gaia::GaiaCubeApps {
    #  Set the minimum and maximum possible bounds, applies to default single
    #  range, override for different behaviour.
    public method set_bounds {plane_min plane_max} {
+
+      set from [$itk_component(bounds1) cget -from]
+      set to [$itk_component(bounds1) cget -to]
       $itk_component(bounds1) configure -from $plane_min -to $plane_max
-      $itk_component(bounds1) configure -value1 $plane_min -value2 $plane_max
-      set_limits_ $plane_min $plane_max
+
+      #  If the min/max have changed, reset the range (different axis or
+      #  unrelated cube).
+      if { $plane_min != $from || $plane_max != $to } {
+         $itk_component(bounds1) configure -value1 $plane_min \
+                                           -value2 $plane_max
+         set_limits_ $plane_min $plane_max
+      } else {
+         #  Make sure displayed world coordinates match the limits.
+         $itk_component(bounds1) configure \
+            -value1 $itk_option(-lower_limit) -value2 $itk_option(-upper_limit)
+      }
    }
 
    #  Handle the change in the spectral reference range (user interaction by

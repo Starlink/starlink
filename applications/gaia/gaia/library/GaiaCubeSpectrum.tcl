@@ -834,9 +834,21 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  Set the minimum and maximum possible bounds of the extraction.
    public method set_bounds {plane_min plane_max} {
+
+      set from [$itk_component(bounds) cget -from]
+      set to [$itk_component(bounds) cget -to]
       $itk_component(bounds) configure -from $plane_min -to $plane_max
-      $itk_component(bounds) configure -value1 $plane_min -value2 $plane_max
-      set_extraction_bounds_ $plane_min $plane_max
+
+      #  If the min/max have changed, reset the extraction range (different
+      #  axis or unrelated cube).
+      if { $plane_min != $from || $plane_max != $to } {
+         $itk_component(bounds) configure -value1 $plane_min -value2 $plane_max
+         set_extraction_bounds_ $plane_min $plane_max
+      } else {
+         #  Make sure displayed world coordinates match the limits.
+         $itk_component(bounds) configure \
+            -value1 $itk_option(-lower_limit) -value2 $itk_option(-upper_limit)
+      }
    }
 
    #  Handle the change in the extraction reference range (user interaction by
