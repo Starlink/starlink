@@ -32,7 +32,9 @@
 *        A FrameSet in which the current Frame respresents 2D spatial GRID 
 *        coords in the output, and the base Frame represents 2D sky
 *        coords in the output. Note the unusual order of base and current 
-*        Frame.
+*        Frame. If "Moving" is non-zero, the sky coords should be offsets
+*        from the first base pointing position (which should be stored in 
+*        SkyRef attribute of the SkyFrame).
 *     ospecfrm = AstFrame * (Given)
 *        Pointer to the SpecFrame within the current Frame of the output WCS 
 *        Frameset.
@@ -43,10 +45,10 @@
 *        A Group containing the names of the detectors to be used. All
 *        detectors will be used if this group is empty.
 *     moving = int (Given)
-*        If non-zero, the telescope is assumed to be tracking a moving
-*        object. In this case, each time slice is shifted to the position
-*        specified by TCS_AZ_BC1/2 before extending the output cube bouds
-*        to include it.
+*        A flag indicating if the telescope is tracking a moving object. If 
+*        so, each time slice is shifted so that the position specified by 
+*        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
+*        output cube.
 *     lbnd_out = dim_t [ 3 ] (Given)
 *        The lower pixel index bounds of the output cube.
 *     ubnd_out = dim_t [ 3 ] (Given)
@@ -117,6 +119,8 @@
 *        calculated on the basis of Tsys.
 *     19-DEC-2006 (TIMJ):
 *        In some broken data FFT_WIN is undef. Assume truncate.
+*     21-DEC-2006 (DSB):
+*        Restructured ot make moving targets work correctly.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -173,7 +177,6 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    AstCmpMap *fmap = NULL;     /* Mapping from spectral grid to topo freq Hz */
    AstCmpMap *ssmap = NULL;    /* Input GRID->output GRID Mapping for spectral axis */
    AstFitsChan *fc = NULL;     /* FitsChan used to get spectral WCS from input */           
-   AstFrame *oskyframe = NULL; /* SkyFrame in output WCS */
    AstFrame *specframe = NULL; /* SpecFrame in input WCS */
    AstFrame *specframe2 = NULL;/* Temporary copy of SpecFrame in input WCS */
    AstFrameSet *fs = NULL;     /* WCS FramesSet from input */           
@@ -182,7 +185,6 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
    AstMapping *specmap = NULL; /* GRID->Spectral Mapping for current input file */
    char *fftwin = NULL;        /* Name of FFT windowing function */
    const char *name;           /* Pointer to current detector name */
-   const char *trsys = NULL;   /* AST tracking system */
    const double *tsys;         /* Pointer to Tsys value for first detector */
    dim_t iv;                   /* Vector index into output array */
    dim_t nel;                  /* No. of pixels in output */
@@ -505,54 +507,14 @@ void smf_rebincube( smfData *data, int index, int size, AstFrameSet *swcsout,
          }
       }
 
-/* If we are dealing with a moving target, adjust the SkyFrames in the
-   input and output FrameSets so that they represent offsets from the
-   current telescope base position. */
+/* If the target is moving, set the input WCS FrameSet to represent Az,El
+   offsets from the base pointing position for the current time slice. */
       if( moving ) {
-
-/* The telescope base position is given in tracking coords, so if we have 
-   not yet done so, note the AST equivalent of the TCS tracking system, 
-   and ensure the output FrameSet uses the same system. Note that the 
-   SkyFrame is the base Frame in the swcsout FrameSet, and so the FrameSet 
-   needs to be inverted (in order to make the SkyFrame the current Frame) 
-   before setting the system value. The Mappings in the FrameSet will be 
-   adjusted automatically to ensure that the new sky position of each 
-   pixel is the tracking system equivalent of the old pixel position. Also 
-   get a pointer to the SkyFrame in the output FrameSet. */
-         if( !trsys ) {
-            trsys = smf_convert_system( hdr->state->tcs_tr_sys, status );
-            astInvert( swcsout );
-            astSetC( swcsout, "system", trsys );
-            oskyframe = astGetFrame( swcsout, AST__CURRENT );
-            astInvert( swcsout );
-         }
-
-/* Also ensure that the SkyFrame in swcsin refers to the tracking system. The 
-   Mapping to the corresponding GRID coordinate system is modified 
-   appropriately. */
-         astSetC( swcsin, "system", trsys );
-
-/* Modify swcsin so that its SkyFrame represents offsets from the current
-   telescope base position. We use the FrameSet pointer (swcsin) in this 
-   call, so the Mapping from detector number to SkyFrame will be modified
-   so that each detector retains its original position on the sky (but
-   transformed to the offset coordinate system). Also indicate that the
-   position should be used as the origin of the offset coordinate system, 
-   and that alignment should be performed in the offset coordinate system. */
-         astSetD( swcsin, "SkyRef(1)", hdr->state->tcs_tr_bc1 );
-         astSetD( swcsin, "SkyRef(2)", hdr->state->tcs_tr_bc2 );
+         astSet( swcsin, "System=AZEL" );
+         astSetD( swcsin, "SkyRef(1)", hdr->state->tcs_az_bc1 );
+         astSetD( swcsin, "SkyRef(2)", hdr->state->tcs_az_bc2 );
          astSetC( swcsin, "SkyRefIs", "Origin" );
          astSetI( swcsin, "AlignOffset", 1 );
-
-/* Modify swcsout so that its SkyFrame represents offsets from the current
-   telescope base position. We use the SkyFrame pointer (oskyframe) here 
-   rather than the FrameSet pointer (swcsout) so the Mapping from output 
-   grid index to SkyFrame will not be modified. This means the each output 
-   pixel will move on the sky to follow the new telescope base position. */
-         astSetD( oskyframe, "SkyRef(1)", hdr->state->tcs_tr_bc1 );
-         astSetD( oskyframe, "SkyRef(2)", hdr->state->tcs_tr_bc2 );
-         astSetC( oskyframe, "SkyRefIs", "Origin" );
-         astSetI( oskyframe, "AlignOffset", 1 );
       }
 
 /* We now align the input and output WCS FrameSets. astConvert finds the

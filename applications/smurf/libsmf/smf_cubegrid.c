@@ -26,8 +26,7 @@
 *        Specifies the celestial coordinate system which will be used to
 *        describe the spatial axes of the output cube. It should be a 
 *        valid value for the System attribute of an AST SkyFrame, or
-*        "TRACKING". This is ignored if a moving target is being tracked
-*        (see "moving").
+*        "TRACKING". 
 *     usedetpos = int (Given)
 *        If a non-zero value is supplied, then the detector positions for
 *        a given time slice are read directly from the input NDF. Otherwise 
@@ -56,9 +55,9 @@
 *        holding the values indicated by the "autogrid" argument. 
 *     moving = int * (Returned)
 *        Address of an int in which to return a flag indicating if the 
-*        telescope is tracking a moving object. If so, each time slice is 
-*        shifted to the position specified by TCS_AZ_BC1/2 before extending 
-*        the output cube bouds to include it.
+*        telescope is tracking a moving object. If so, the returned
+*        SkyFrame will describe offsets (in the system specified by "system")
+*        from the base pointing position for the first time slice.
 *     skyframe = AstFrameSet ** (Returned)
 *        A pointer to a location at which to return a pointer to an AST 
 *        SkyFrame describing the spatial axes of the output WCS FrameSet.
@@ -98,6 +97,9 @@
 *        determined.
 *     6-DEC-2006 (DSB):
 *        Added "detgrp" parameter.
+*     21-DEC-2006 (DSB):
+*        - Normalise the sky coords at the ref position.
+*        - Re-structure to handle moving targets correctly.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -208,6 +210,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* Initialise the returned array to hold vad values. */
    for( ipar = 0; ipar < 7; ipar++ ) par[ ipar ] = AST__BAD;
    *skyframe = NULL;
+   *moving = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -352,7 +355,8 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* If we have not yet created the output SkyFrame, do so now. */
          if( ! *skyframe ) {
 
-/* Choose the celestial coordinate system for the output cube. */
+/* Determine the tracking system, and choose the celestial coordinate system 
+   for the output cube. */
             trsys = smf_convert_system( hdr->state->tcs_tr_sys, status );
             if( !strcmp( system, "TRACKING" ) ) {
                usesys = trsys;
@@ -382,18 +386,18 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                astSetC( *skyframe, "Dut1", astGetC( skyin, "Dut1" ) );
             }           
 
-/* Set the sky position of the tangent point to the first pointing BASE 
-   position, converted to the required coordinate system. First get the 
-   pointing BASE position in AZ/EL. */
-            par[ 2 ] = hdr->state->tcs_az_bc1;
-            par[ 3 ] = hdr->state->tcs_az_bc2;
+/* The telescope base pointing position is stored in (az,el). If the output
+   system is AZ/EL, just get the stored values. */
+            if( !strcmp( "AZEL", usesys ) ) {
+               a = hdr->state->tcs_az_bc1;
+               b = hdr->state->tcs_az_bc2;
 
-/* If the required system is not AZ/EL, we need to convert the 
-   axis values to the required system. */
-            if( strcmp( "AZEL", usesys ) ) {
+/* Otherwise, we need to convert the axis values to the output system. */
+            } else {
 
-/* Create two copies of the SkyFrame in the input WCS FrameSet, and set
-   their Systems to AZEL and the requested output system. */
+/* Create a Mapping from (az,el) to usesys. Create two copies of the SkyFrame 
+   in the input WCS FrameSet, and set their Systems to AZEL and the requested 
+   output system. */
                skyframein = astGetFrame( swcsin, AST__CURRENT );     
                sf1 = astCopy( skyframein );
                sf2 = astCopy( skyframein );
@@ -401,13 +405,24 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                astSetC( sf1, "System", "AZEL" );
                astSetC( sf2, "System", usesys );
 
-/* Get a Mapping from AZEL to the requested system, and use it to convert 
-   the lon_0/lat_0 values to the requested system. */
-               astTran2( astConvert( sf1, sf2, "" ), 1, par + 2,
-                         par + 3, 1, &a, &b );
-               par[ 2 ] = a;
-               par[ 3 ] = b;
+/* Use this Mapping to convert the telescope base pointing position from
+   (az,el) to the requested system. */
+               astTran2( astConvert( sf1, sf2, "" ), 1, 
+                         &(hdr->state->tcs_az_bc1),
+                         &(hdr->state->tcs_az_bc2), 1, &a, &b );
             }
+
+/* Set the sky position of the tangent point to the first pointing BASE 
+   position, converted to the required coordinate system. */
+            par[ 2 ] = a;
+            par[ 3 ] = b;
+
+/* Normalise the coords at the tangent point. */
+            astNorm( *skyframe, par + 2 );
+
+/* Set the output SkyFrame SkyRef position to the tangent point. */
+            astSetD( *skyframe, "SkyRef(1)", par[ 2 ] );
+            astSetD( *skyframe, "SkyRef(2)", par[ 3 ] );
 
 /* Determine if the telescope is following a moving target such as a
    planet or asteroid. This is indicated by significant changes in the
@@ -429,49 +444,26 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                *moving = 0;
             }
 
-/* If we are dealing with a moving target, we ignore the supplied
-   "system" value and instead set the returned SkyFrame so that it 
-   represents the tracking system. This is because the base telescope 
-   position is specified in the tracking system. */
+/* If we are dealing with a moving target, adjust the SkyFrame so that it
+   represents offsets from the tangent point. */
             if( *moving ) {
-               astSetC( *skyframe, "system", trsys );
-               usesys = trsys;
+               astSetC( *skyframe, "SkyRefIs", "Origin" );
+               astSetI( *skyframe, "AlignOffset", 1 );
             }
 
 /* If we do not need to look at any other time slices, we can leave the loop
    early. */
             if( !autogrid && !outcat ) break;
-
          }
 
-/* If we are dealing with a moving target, adjust the SkyFrames in the
-   input and output FrameSets so that they represent offsets from the
-   current telescope base position. */
+/* If the target is moving, set the input WCS FrameSet to represent Az,El
+   offsets from the base pointing position for the current time slice. */
          if( *moving ) {
-
-/* The telescope base position is given in tracking coords, so ensure
-   that the SkyFrame in swcsin refers to the tracking system. The Mapping
-   to the corresponding GRID coordinate system is modified appropriately. */
-            astSetC( swcsin, "system", trsys );
-
-/* Modify swcsin so that its SkyFrame represents offsets from the current
-   telescope base position. We use the FrameSet pointer (swcsin) in this 
-   call, so the Mapping from detector number to SkyFrame will be modified
-   so that each detector retains its original position on the sky (but
-   transformed to the offset coordinate system). Also indicate that the
-   position should be used as the origin of the offset coordinate system, 
-   and that alignment should be performed in the offset coordinate system. */
-            astSetD( swcsin, "SkyRef(1)", hdr->state->tcs_tr_bc1 );
-            astSetD( swcsin, "SkyRef(2)", hdr->state->tcs_tr_bc2 );
+            astSet( swcsin, "System=AZEL" );
+            astSetD( swcsin, "SkyRef(1)", hdr->state->tcs_az_bc1 );
+            astSetD( swcsin, "SkyRef(2)", hdr->state->tcs_az_bc2 );
             astSetC( swcsin, "SkyRefIs", "Origin" );
             astSetI( swcsin, "AlignOffset", 1 );
-
-/* Modify the returned skyframe so that it represents offsets from the 
-   current telescope base position. */
-            astSetD( *skyframe, "SkyRef(1)", hdr->state->tcs_tr_bc1 );
-            astSetD( *skyframe, "SkyRef(2)", hdr->state->tcs_tr_bc2 );
-            astSetC( *skyframe, "SkyRefIs", "Origin" );
-            astSetI( *skyframe, "AlignOffset", 1 );
          }
 
 /* Get the Mapping from the base Frame in the input WCS FrameSet (GRID
@@ -587,11 +579,10 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
       par[ 5 ] = fabs( par[ 5 ] );
    }
 
-/* Set the SkyFrame SkyRef position to the tangent point. */
-   if( par[ 2 ] != AST__BAD || par[ 2 ] != AST__BAD ) {
-      astSetD( *skyframe, "SkyRef(1)", par[ 2 ] );
-      astSetD( *skyframe, "SkyRef(2)", par[ 3 ] );
-   }
+/* Temporarily ensure that the returned SkyFrame represents absolute
+   coords rather than offsets. */
+   astClear( *skyframe, "SkyRefIs" );
+   astClear( *skyframe, "AlignOffset" );
 
 /* See if the output cube is to include a spatial projection, or a sparse
    list of spectra. */
@@ -607,7 +598,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    being used. */
       usedefs = 1;
 
-/* Ensure we have usable XRPIX1/2 values */
+/* Ensure we have usable CRPIX1/2 values */
       if( par[ 0 ] == AST__BAD ) par[ 0 ] = 1.0;
       if( par[ 1 ] == AST__BAD ) par[ 1 ] = 1.0;
 
@@ -767,6 +758,10 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* Free resources. */
       allpos2 = astFree( allpos2 );
    } 
+
+/* If the target is moving, ensure the returned SkyFrame represents 
+   offsets rather than absolute coords. */
+   if( *moving ) astSet( *skyframe, "SkyRefIs=Origin,AlignOffset=1" );
 
 L999:;
 

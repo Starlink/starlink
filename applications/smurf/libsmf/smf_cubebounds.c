@@ -46,8 +46,9 @@
 *        and CRPIX1/2 are in units of pixels. 
 *     moving = int (Given)
 *        A flag indicating if the telescope is tracking a moving object. If 
-*        so, each time slice is shifted to the position specified by 
-*        TCS_AZ_BC1/2 before extending the output cube bouds to include it.
+*        so, each time slice is shifted so that the position specified by 
+*        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
+*        output cube.
 *     lbnd = int [ 3 ] (Returned)
 *        The lower pixel index bounds of the output cube.
 *     ubnd = int [ 3 ] (Returned)
@@ -74,8 +75,8 @@
 *     first supplied input data file.
 *
 *     If "moving" is non-zero, the spatial axes represent (lon,lat) offsets 
-*     in the tracking frame from the base telescope position associated
-*     with the last time slice.
+*     in the requested output frame from the base telescope position associated
+*     with the first time slice.
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
@@ -176,7 +177,6 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    AstMapping *ospecmap = NULL; /* Spec <> PIXEL mapping in output FrameSet */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
    char *pname = NULL;   /* Name of currently opened data file */
-   const char *trsys = NULL; /* AST tracking system */
    double *xin = NULL;   /* Workspace for detector input grid positions */
    double *xout = NULL;  /* Workspace for detector output pixel positions */
    double *yin = NULL;   /* Workspace for detector input grid positions */
@@ -493,6 +493,11 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Extract the output PIXEL->SKY Mapping. */
             oskymap = astGetMapping( fs, AST__BASE, AST__CURRENT );
 
+/* Ensure that the returned SkyFrame represents absolute coords rather than 
+   offsets. */
+            astClear( oskyframe, "SkyRefIs" );
+            astClear( oskyframe, "AlignOffset" );
+
 /* Construct the CmpFrame that will be used as the current Frame in the 
    output cube WCS FrameSet. */
             cmpfrm = astCmpFrame( oskyframe, ospecframe, "" );
@@ -518,6 +523,14 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
             oskyframe2 = astCopy( oskyframe );
             astAddFrame( swcsout, AST__BASE, oskymap, oskyframe2 );
 
+/* If the target is moving make the spatial FrameSet describe offsets
+   from the first base pointing position (this position has previously
+   been stored in the SkyRef attribute of the SkyFrame). */
+            if( moving ) {
+               astSet( swcsout, "SkyRefIs=Origin" );
+               astSet( swcsout, "AlignOffset=1" );
+            }
+
 /* For later convenience, we invert it so that the base Frame is the 
    SkyFrame and the current Frame is the PIXEL Frame. */
             astInvert( swcsout );
@@ -527,39 +540,14 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
             astInvert( ospecmap );
          }
 
-/* If we are dealing with a moving target, adjust the SkyFrames in the
-   input and output FrameSets so that they represent offsets from the
-   current telescope base position. */
+/* If the target is moving, set the input WCS FrameSet to represent Az,El
+   offsets from the base pointing position for the current time slice. */
          if( moving ) {
-
-/* The telescope base position is given in tracking coords, so ensure
-   that the SkyFrame in swcsin refers to the tracking system. The Mapping
-   to the corresponding GRID coordinate system is modified appropriately. */
-            if( !trsys ) trsys = smf_convert_system( hdr->state->tcs_tr_sys, 
-                                                     status );
-            astSetC( swcsin, "system", trsys );
-
-/* Modify swcsin so that its SkyFrame represents offsets from the current
-   telescope base position. We use the FrameSet pointer (swcsin) in this 
-   call, so the Mapping from detector number to SkyFrame will be modified
-   so that each detector retains its original position on the sky (but
-   transformed to the offset coordinate system). Also indiucate that the
-   position should be used as the origin of the offset coordinate system, 
-   and that alignment should be performed in the offset coordinate system. */
-            astSetD( swcsin, "SkyRef(1)", hdr->state->tcs_tr_bc1 );
-            astSetD( swcsin, "SkyRef(2)", hdr->state->tcs_tr_bc2 );
+            astSet( swcsin, "System=AZEL" );
+            astSetD( swcsin, "SkyRef(1)", hdr->state->tcs_az_bc1 );
+            astSetD( swcsin, "SkyRef(2)", hdr->state->tcs_az_bc2 );
             astSetC( swcsin, "SkyRefIs", "Origin" );
             astSetI( swcsin, "AlignOffset", 1 );
-
-/* Modify swcsout so that its SkyFrame represents offsets from the current
-   telescope base position. We use the SkyFrame pointer (oskyframe2) here 
-   rather than the FrameSet pointer (swcsout) so the Mapping from output 
-   grid index to SkyFrame will not be modified. This means the each output 
-   pixel will move on the sky to follow the new telescope base position. */
-            astSetD( oskyframe2, "SkyRef(1)", hdr->state->tcs_tr_bc1 );
-            astSetD( oskyframe2, "SkyRef(2)", hdr->state->tcs_tr_bc2 );
-            astSetC( oskyframe2, "SkyRefIs", "Origin" );
-            astSetI( oskyframe2, "AlignOffset", 1 );
          }
 
 /* We now align the input and output WCS FrameSets. astConvert finds the

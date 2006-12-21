@@ -309,6 +309,9 @@
 *     13-DEC-2006 (DSB):
 *        Allow output variances to be caclulated on the basis of the system 
 *        noise temperature values in the input NDFs.
+*     21-DEC-2006 (DSB):
+*        Set the spatial output FrameSet to represent offsets from first
+*        base pointing position if the target is moving.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -532,12 +535,22 @@ void smurf_makecube( int *status ) {
    ospecfrm = astPickAxes( tfrm, 1, outax, NULL );
 
 /* Invert the spectral Mapping (for the convenience of smf_rebincube), so that
-   it goes go from current Frame to output grid axis. */
+   it goes from current Frame to output grid axis. */
    astInvert( ospecmap );
 
-/* Create a FrameSet describing the spatial axes, and invert it. */
+/* Create a FrameSet describing the spatial axes. */
    swcsout = astFrameSet( astFrame( 2, "Domain=GRID", "" ), "" );
    astAddFrame( swcsout, AST__BASE, oskymap, oskyfrm );
+
+/* If the target is moving, ensure the FrameSet describes offset from the
+   first base pointing position (stored in the SkyRef attribute of hte
+   SkyFrame). */
+   if( moving ) {
+      astSet( swcsout, "SkyRefIs=Origin" );
+      astSet( swcsout, "AlignOffset=1" );
+   }
+
+/* Invert the FrameSet. */
    astInvert( swcsout );
 
 /* Create the output NDF. */
