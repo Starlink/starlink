@@ -64,6 +64,8 @@
 *        Add DUT1.
 *     2006-12-18 (JB):
 *        Replace pattern-specific parameters with general values.
+*     2006-12-21 (AGG):
+*        Add instap_x/y
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -212,6 +214,12 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
    if ( !astMapGet0D ( keymap, "HEIGHT", &(inx->height) ) )
      inx->height = 2000.0;
+
+   if ( !astMapGet0D ( keymap, "INSTAP_X", &(inx->instap_x) ) )
+      inx->instap_x = 0.0;
+
+   if ( !astMapGet0D ( keymap, "INSTAP_Y", &(inx->instap_y) ) )
+      inx->instap_y = 0.0;
 
    if ( !astMapGet0D ( keymap, "JIG_STEP_X", &(inx->jig_step_x) ) )
       inx->jig_step_x = 6.28;
