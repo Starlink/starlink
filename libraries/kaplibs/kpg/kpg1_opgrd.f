@@ -88,6 +88,8 @@
 *     20-DEC-2006 (DSB):
 *        Retain the supplied parameter values if the optimal pixel size
 *        is zero.
+*     21-DEC-2006 (DSB):
+*        Allow negative pixel sizes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -725,8 +727,8 @@
      :                  - NINT( PAR0( 2 ) )
 
 *  Check pixel sizes are not zero.
-            IF( PAR0( 5 ) .GT. 0.0 .AND.
-     :          PAR0( 6 ) .GT. 0.0 ) THEN
+            IF( PAR0( 5 ) .NE. 0.0 .AND.
+     :          PAR0( 6 ) .NE. 0.0 ) THEN
                
 *  Copy the projection parameters to the supplIed array.
                DO I = 1, 7
