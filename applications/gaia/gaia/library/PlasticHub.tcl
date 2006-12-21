@@ -23,7 +23,6 @@
 #     protocol.
 
 #  Copyright:
-#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 #     All Rights Reserved.
 
@@ -116,6 +115,13 @@ itcl::class plastic::PlasticHub {
    #  Returns the location of the .plastic file which contains information
    #  concerning a currently-running hub.
    public proc rendezvous_file {} {
+
+      # If in CYGWIN environment look for contact file in the Windows home
+      # directory.  Most plastic applications (like SPLAT) will be native
+      # windows ones.
+      if { [string match {CYGWIN*} $::tcl_platform(os)] } {
+         return "[exec cygpath -D]/../.plastic"
+      }
       return $::env(HOME)/.plastic
    }
 
