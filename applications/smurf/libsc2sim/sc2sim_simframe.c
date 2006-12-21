@@ -115,6 +115,8 @@
 *        with sc2sim_structs
 *     2006-10-19 (AGG):
 *        Correct error in airmass correction of sky flux (take 2)
+*     2006-12-21 (AGG):
+*        Only calculate sky gradient if atmosphere is to be added
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -321,16 +323,15 @@ int *status                  /* global status (given and returned) */
 		    bol, xpos, ypos );
 	   break;
          }
-	 
+	 /* Apply the elevation correction */
+	 atmvalue = atmvalue * ( 1.0 - exp(-sinx.tauzen * airmass) ) 
+ 	            / ( 1.0 - exp(-sinx.tauzen) );
+       
        } else {
-         /* Otherwise, calculate the atmvalue from the tau */
+         /* Otherwise, set atmvalue to a fake mean level */
          atmvalue = meanatm;
        }
-       
-       /* Apply the elevation correction */
-       atmvalue = atmvalue * ( 1.0 - exp(-sinx.tauzen * airmass) ) 
-	                   / ( 1.0 - exp(-sinx.tauzen) );
-       
+
        /* Calculate atmospheric transmission for this bolometer */
        sc2sim_atmtrans ( inx.lambda, atmvalue, &skytrans, status );
        
