@@ -1471,7 +1471,7 @@ int gaiaNDFGtAxisWcs( int ndfid, int axis, AstFrameSet **iwcs,
    if ( gaiaNDFGtWcs( ndfid, &fullwcs, error_mess ) == 1 ) {
        return TCL_ERROR;
    }
-   result = gaiaUtilsGtAxisWcs( fullwcs, axis, iwcs, error_mess );
+   result = gaiaUtilsGtAxisWcs( fullwcs, axis, 0, iwcs, error_mess );
    fullwcs = (AstFrameSet *) astAnnul( fullwcs );
    return result;
 }
