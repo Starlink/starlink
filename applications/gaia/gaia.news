@@ -1,5 +1,9 @@
   Latest changes:
 
+    A bug when extracting a spectrum over a restricted range meant that the
+    coordinates of an NDF or FITS were incorrect (by an offset). This has
+    been fixed.
+
     Ranges used to extract spectra and control other operations are
     now preserved, except when the size of the underlying cube changes.
    
