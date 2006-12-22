@@ -69,6 +69,8 @@
 *        Add SLA_PA
 *     12-DEC-2006 (TIMJ):
 *        Add SLA_DTT and SLA_DAT
+*     21-DEC-2006 (TIMJ):
+*        Add SLA_RDPLAN
 *-
 */
 
@@ -1618,3 +1620,34 @@ slaDat( double utc ) {
   return retval;
 }
 
+F77_SUBROUTINE(sla_rdplan)(DOUBLE(DATE), INTEGER(I), DOUBLE(ELONG), DOUBLE(PHI),
+			   DOUBLE(RA), DOUBLE(DEC), DOUBLE(DIAM) );
+
+void
+slaRdplan( double date, int i, double elong, double phi,
+	   double * ra, double * dec, double * diam ) {
+  DECLARE_DOUBLE(DATE);
+  DECLARE_INTEGER(I);
+  DECLARE_DOUBLE(ELONG);
+  DECLARE_DOUBLE(PHI);
+  DECLARE_DOUBLE(RA);
+  DECLARE_DOUBLE(DEC);
+  DECLARE_DOUBLE(DIAM);
+
+  F77_EXPORT_DOUBLE( date, DATE );
+  F77_EXPORT_INTEGER( i, I );
+  F77_EXPORT_DOUBLE( elong, ELONG );
+  F77_EXPORT_DOUBLE( phi, PHI );
+
+  F77_CALL(sla_rdplan)( DOUBLE_ARG(&DATE),
+			INTEGER_ARG(&I),
+			DOUBLE_ARG(&ELONG),
+			DOUBLE_ARG(&PHI),
+			DOUBLE_ARG(&RA),
+			DOUBLE_ARG(&DEC),
+			DOUBLE_ARG(&DIAM));
+
+  F77_IMPORT_DOUBLE( RA, *ra );
+  F77_IMPORT_DOUBLE( DEC, *dec );
+  F77_IMPORT_DOUBLE( DIAM, *diam );
+}
