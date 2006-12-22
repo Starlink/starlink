@@ -183,6 +183,10 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    double *px;           /* Pointer to next value */
    double *py;           /* Pointer to next value */
    double *xin = NULL;   /* Workspace for detector input grid positions */
+   double az[ 2 ];       /* Azimuth values */
+   double el[ 2 ];       /* Elevation values */
+   double ra[ 2 ];       /* RA values */
+   double dec[ 2 ];      /* Dec values */
    double defrot;        /* Default for CROTA parameter */
    double defsize[ 2 ];  /* Default pixel sizes in arc-seconds */
    double pixsize[ 2 ];  /* Pixel sizes in arc-seconds */
@@ -428,21 +432,33 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
             astSetD( *skyframe, "SkyRef(1)", par[ 2 ] );
             astSetD( *skyframe, "SkyRef(2)", par[ 3 ] );
 
-/* Determine if the telescope is following a moving target such as a
-   planet or asteroid. This is indicated by significant changes in the
-   values of TCS_TR_BC1/2 (the telescope base position in tracking
-   coordinates). Here, "significant" means more than 1 arc-second. Some 
-   tracking systems such as AZEL will always indicate movement whether 
-   or not the target is moving , so for these system we assume that the 
-   target is not moving. */
-            if( strcmp( trsys, "AZEL" ) ) {
+/* Determine if we should behave as if the telescope is following a moving 
+   target such as a planet or asteroid. This is indicated by significant 
+   changes of the telescope base pointing position within the ICRS
+   coordinate system. Here, "significant" means more than 1 arc-second. 
+   Apparently users will only want to track moving objects if the output
+   cube is in AZEL or GAPPT, so we ignoring a moving base pointing
+   position unless the output system is AZEL or GAPPT. */
+            if( !strcmp( usesys, "AZEL" ) ||
+                !strcmp( usesys, "GAPPT" ) ) {
 
-                sep = slaDsep( (hdr->allState)[ 0 ].tcs_tr_bc1,
-                        (hdr->allState)[ 0 ].tcs_tr_bc2,
-                        (hdr->allState)[ hdr->nframes - 1 ].tcs_tr_bc1,
-                        (hdr->allState)[ hdr->nframes - 1 ].tcs_tr_bc2 );
+/* Set the "sf2" SkyFrame to represent ICRS coords ("sf1" already
+   represents AZEL coords). */
+               astSetC( sf2, "System", "ICRS" );
 
-                *moving = ( sep > AST__DD2R/3600.0 );
+/* Use this Mapping to convert the telescope base pointing position for
+   the first and last slices from (az,el) to ICRS. */
+               az[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc1;
+               el[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc2;
+               az[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc1;
+               el[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc2;
+
+               astTran2( astConvert( sf1, sf2, "" ), 2, az, el, 1, ra, dec );
+
+/* Get the arc distance between the two positions and see if it is
+   greater than 1 arc-sec. */
+               sep = slaDsep( ra[ 0 ], dec[ 0 ], ra[ 1 ], dec[ 1 ] );
+               *moving = ( sep > AST__DD2R/3600.0 );
 
             } else {
                *moving = 0;
