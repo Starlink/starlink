@@ -113,7 +113,7 @@ void kpg1Mxmnr( int, int, float *, int *, float *, float *, int *, int *, int * 
 void kpg1Mxmnd( int, int, double *, int *, double *, double *, int *, int *, int * );
 void kpg1Mxmni( int, int, int *, int *, int *, int *, int *, int *, int * );
 void kpg1Medud( int, int, double *, double *, int *, int * );
-void kpg1Opgrd( int, double *, int, double *, int * );
+void kpg1Opgrd( int, double *, int, double *, double *, int * );
 void kpg1Gtaxv( const char *, int, int, AstFrame *, int, double *, int *, int * );
 
 #endif

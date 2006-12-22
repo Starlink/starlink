@@ -899,14 +899,16 @@ F77_SUBROUTINE(kpg1_opgrd)( INTEGER(NPOS),
                             DOUBLE_ARRAY(POS), 
                             LOGICAL(WEST), 
                             DOUBLE_ARRAY(PAR), 
+                            DOUBLE(RDIAM),
                             INTEGER(STATUS) );
 
 
-void kpg1Opgrd( int npos, double *pos, int west, double *par, int *status ){
+void kpg1Opgrd( int npos, double *pos, int west, double *par, double *rdiam, int *status ){
    DECLARE_INTEGER(NPOS);
    DECLARE_DOUBLE_ARRAY_DYN(POS);
    DECLARE_LOGICAL(WEST);
    DECLARE_DOUBLE_ARRAY_DYN(PAR);
+   DECLARE_DOUBLE(RDIAM);
    DECLARE_INTEGER(STATUS);
 
    F77_CREATE_DOUBLE_ARRAY( POS, npos );
@@ -922,10 +924,12 @@ void kpg1Opgrd( int npos, double *pos, int west, double *par, int *status ){
                          DOUBLE_ARRAY_ARG(POS),
                          LOGICAL_ARG(&WEST), 
                          DOUBLE_ARRAY_ARG(PAR), 
+                         DOUBLE_ARG(&RDIAM),
                          INTEGER_ARG(&STATUS) );
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_DOUBLE_ARRAY( PAR, par, 7 );
+   F77_IMPORT_DOUBLE( RDIAM, *rdiam );
 
    F77_FREE_DOUBLE( POS );
    F77_FREE_DOUBLE( PAR );
