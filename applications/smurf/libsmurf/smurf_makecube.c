@@ -76,7 +76,8 @@
 *          Such values are interpreted as a Besselian epoch if less than 
 *          1984.0 and as a Julian epoch otherwise. 
 *     CROTA = REAL (Read)
-*          The angle, in degrees, from north through east to the second
+*          The angle, in degrees, from north through east (in the
+*          coordinate system specified by the SYSTEM parameter) to the second
 *          pixel axis in the output cube. The dynamic default value is
 *          determined by the AUTOGRID parameter. []
 *     DETECTORS = LITERAL (Read)
@@ -251,8 +252,22 @@
 *          routine AST_REBINx in SUN/211. ["Nearest"]
 *     SYSTEM = LITERAL (Read)
 *          The celestial coordinate system for the output cube. One of
-*          ICRS, GAPPT, FK5, FK4, FK4-NO-E, AZEL, GALACTIC, ECLIPTIC or 
-*          TRACKING.
+*          ICRS, GAPPT, FK5, FK4, FK4-NO-E, AZEL, GALACTIC, ECLIPTIC. It
+*          can also be given the value "TRACKING", in which case the
+*          system used will be which ever system was used as the tracking
+*          system during in the observation. The value supplied for the
+*          CROTA parameter should refer to the coordinate system specified 
+*          by this parameter.
+*
+*          The choice of system also determines if the telescope is 
+*          considered to be tracking a moving object such as a planet or 
+*          asteroid. If system is GAPPT or AZEL, then each time slice in
+*          the input data will be shifted in order to put the base
+*          telescope position (given by TCS_AZ_BC1/2 in the JCMTSTATE
+*          extension of the input NDF) at the same pixel position that it
+*          had for the first time slice. For any other system, no such 
+*          shifts are applied, even if the base telescope position is
+*          changing through the observation. [TRACKING]
 *     USEDETPOS = _LOGICAL (Read)
 *          If a true value is supplied, then the detector positions are
 *          read from the detector position arrays in each input NDF.
