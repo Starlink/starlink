@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_OPGRD( NPOS, POS, WEST, PAR, STATUS )
+      SUBROUTINE KPG1_OPGRD( NPOS, POS, WEST, PAR, RDIAM, STATUS )
 *+
 *  Name:
 *     KPG1_OPGRD
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_OPGRD( NPOS, POS, WEST, PAR, STATUS )
+*     CALL KPG1_OPGRD( NPOS, POS, WEST, PAR, RDIAM, STATUS )
 
 *  Description:
 *     This routine calculates the parameters of a tangent plane projection
@@ -48,6 +48,9 @@
 *        the angle from celestial north to the Y axis, measured through west 
 *        if WEST is .FALSE., and through east otherwise. Returned pixel sizes 
 *        are rounded to the nearest tenth of an arc-second.
+*     RDIAM = DOUBLE PRECISION (Returned)
+*        The diameter of the circle that just encloses all the supplied sky
+*        positions, in radians.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -90,6 +93,8 @@
 *        is zero.
 *     21-DEC-2006 (DSB):
 *        Allow negative pixel sizes.
+*     22-DEC-2006 (DSB):
+*        Add argument RDIAM.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -111,6 +116,9 @@
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION PAR( 7 )
+
+*  Arguments Returned:
+      DOUBLE PRECISION RDIAM
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -135,7 +143,7 @@
       CALL KPG1_OPGR1( NPOS, POS, WEST, PAR, %VAL( CNF_PVAL( IPAIN ) ),
      :                 %VAL( CNF_PVAL( IPBIN ) ), 
      :                 %VAL( CNF_PVAL( IPXOUT ) ),
-     :                 %VAL( CNF_PVAL( IPYOUT ) ), STATUS )
+     :                 %VAL( CNF_PVAL( IPYOUT ) ), RDIAM, STATUS )
 
 *  Free work arrays.
       CALL PSX_FREE( IPAIN, STATUS )
@@ -149,7 +157,7 @@
 
 
       SUBROUTINE KPG1_OPGR1( NPOS, POS, WEST, PAR, AIN, BIN, XOUT, YOUT, 
-     :                       STATUS )
+     :                       RDIAM, STATUS )
 *+
 *  Name:
 *     KPG1_OPGR1
@@ -161,7 +169,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_OPGR1( NPOS, POS, WEST, PAR, AIN, BIN, XOUT, YOUT, STATUS )
+*     CALL KPG1_OPGR1( NPOS, POS, WEST, PAR, AIN, BIN, XOUT, YOUT, RDIAM, 
+*                      STATUS )
 
 *  Description:
 *     This routine calculates the parameters of a tangent plane projection
@@ -206,6 +215,9 @@
 *        Work space.
 *     YOUT( NPOS ) = DOUBLE PRECISION (Given and Returned)
 *        Work space.
+*     RDIAM = DOUBLE PRECISION (Returned)
+*        The diameter of the circle that just encloses all the supplied sky
+*        positions, in radians.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -265,6 +277,9 @@
       DOUBLE PRECISION BIN( NPOS )
       DOUBLE PRECISION XOUT( NPOS )
       DOUBLE PRECISION YOUT( NPOS )
+
+*  Arguments Returned:
+      DOUBLE PRECISION RDIAM
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -440,6 +455,9 @@
 *  Find the diameter of the circle enclosing the bounding box, in units of 
 *  initial grid pixels.
       DIAM = SQRT( ( XHI - XLO )**2 + ( YHI - YLO )**2 )
+
+*  Convert this to radians.
+      RDIAM = DIAM*PIXSCL
 
 *  Calculate what the grid spacing would be (in units of initial grid
 *  pixels) if the supplied positions were distributed on a regularly 
