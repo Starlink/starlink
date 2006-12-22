@@ -577,11 +577,11 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                  status );
 
 /* If the automatic grid determination algorithm failed, see if all the
-   points are effectively co-incident (i.e. within a radius of 0.25
+   points are effectively co-incident (i.e. within a radius of 0.4
    arcsec). If so, we use default grid parameters that result in a grid
    of 1x1 spatial pixels. */
       if( par[ 0 ] == AST__BAD ) {
-         if( rdiam < 0.25*AST__DD2R/3600.0 ) {
+         if( rdiam < 0.4*AST__DD2R/3600.0 ) {
             if( rdiam < 0.01*AST__DD2R/3600.0 ) rdiam = 0.01*AST__DD2R/3600.0;
             par[ 0 ] = 0.0;
             par[ 1 ] = 0.0;
