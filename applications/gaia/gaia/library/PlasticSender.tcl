@@ -211,6 +211,13 @@ itcl::class gaia::PlasticSender {
       if {[string index $file 0] != "/"} {
          set file "[pwd]/$file"
       }
+
+      # If in CYGWIN environment make the URL a Windows file path.
+      if { [string match {CYGWIN*} $::tcl_platform(os)] } {
+         set file "file://localhost/[exec cygpath -wa $file]"
+         regsub -all {\\} $file {/} file
+         return "$file"
+      }
       return "file://localhost$file"
    }
 
