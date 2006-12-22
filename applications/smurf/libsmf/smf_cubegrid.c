@@ -100,6 +100,9 @@
 *     21-DEC-2006 (DSB):
 *        - Normalise the sky coords at the ref position.
 *        - Re-structure to handle moving targets correctly.
+*     22-DEC-2006 (DSB):
+*        Use a "regular grid" of size 1x1 if all the spectra are spatially
+*        co-incident.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -188,6 +191,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    double *yout = NULL;  /* Workspace for detector output pixel positions */
    double a;             /* Longitude value */
    double b;             /* Latitude value */
+   double rdiam;         /* Diameter of bounding circle, in rads */
    double sep;           /* Separation between first and last base positions */
    float *pdata;         /* Pointer to next data sample */
    int found;            /* Was current detector name found in detgrp? */
@@ -553,11 +557,29 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* If required, calculate the optimal projection parameters. */
    if( autogrid && usesys ) {
-      kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par, status );
+      kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par, &rdiam, 
+                 status );
 
+/* If the automatic grid determination algorithm failed, see if all the
+   points are effectively co-incident (i.e. within a radius of 0.25
+   arcsec). If so, we use default grid parameters that result in a grid
+   of 1x1 spatial pixels. */
       if( par[ 0 ] == AST__BAD ) {
-         msgOutif( MSG__NORM, " ", "   Automatic grid determination failed: "
-                   "the detector samples do not form a regular grid.", status );
+         if( rdiam < 0.25*AST__DD2R/3600.0 ) {
+            if( rdiam < 0.01*AST__DD2R/3600.0 ) rdiam = 0.01*AST__DD2R/3600.0;
+            par[ 0 ] = 0.0;
+            par[ 1 ] = 0.0;
+            par[ 4 ] = -rdiam;
+            par[ 5 ] = rdiam;
+            par[ 6 ] = 0.0;
+
+/* If the sky positions are not co-incident, we cannot use a grid, so
+   warn the user. */
+         } else {
+            msgOutif( MSG__NORM, " ", "   Automatic grid determination "
+                      "failed: the detector samples do not form a "
+                      "regular grid.", status );
+         }
       }
 
 /* Otherwise use fixed values. */
@@ -699,7 +721,8 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
       if( !usedefs && autogrid && usesys ) {
          par[ 0 ] = AST__BAD;
          par[ 1 ] = AST__BAD;
-         kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par, status );
+         kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par,
+                    &rdiam, status );
       }
 
 /* Abort if an error has occurred. */
