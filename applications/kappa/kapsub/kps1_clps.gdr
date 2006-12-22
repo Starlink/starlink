@@ -164,6 +164,8 @@
 *     2006 April 11 (MJC):
 *        Make USEWRK an argument for efficiency when higher dimensions
 *        are degenerate.
+*     22-DEC-2006 (DSB):
+*        Avoid allocating a covariance array if it is not needed.
 *     {enter_further_changes_here}
 
 *-
@@ -438,7 +440,7 @@
 *  Allocate memory.
          CALL PSX_CALLOC( NLIN, '_DOUBLE', IPPP, STATUS )
          NMAT = NLIN * ( NLIN + 1 ) / 2 
-         IF( IMETH .NE. 1 .AND. IMETH .NE. 2 .AND. IMETH .NE. 300 ) THEN
+         IF( IMETH .GE. 3 .AND. IMETH .LE. 11 ) THEN
             CALL PSX_CALLOC( NLIN * NMAT, '_DOUBLE', IPCOV, STATUS )
          ELSE
             IPCOV = IPPP
