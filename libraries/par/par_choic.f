@@ -93,6 +93,7 @@
 *  Copyright:
 *     Copyright (C) 1990, 1991, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -114,6 +115,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     AJC: Alan J. Chipperfield   (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -131,6 +133,8 @@
 *     1999 September 16 (AJC):
 *        Warn in MSG__VERB mode if NULL operates to adopt default.
 *        Prologue add Warn in MSG__NORM mode if nearest match adopted.
+*     2006 December 26 (TIMJ):
+*        Initialise return value regardless of status
 *     {enter_changes_here}
 
 *  Bugs:
@@ -181,6 +185,9 @@
      :  OPTION * ( 132 )       ! The selected option from the menu
 
 *.
+
+*  Initialise return value regardless of status
+      VALUE = ' '
 
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
