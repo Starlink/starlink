@@ -79,6 +79,7 @@
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -103,6 +104,8 @@
 *     22-DEC-2006 (DSB):
 *        Use a "regular grid" of size 1x1 if all the spectra are spatially
 *        co-incident.
+*     28-DEC-2006 (TIMJ):
+*        Needed sf1 and sf2 even if output system was AZEL
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -394,6 +397,17 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                astSetC( *skyframe, "Dut1", astGetC( skyin, "Dut1" ) );
             }           
 
+/* Create a Mapping from (az,el) to usesys. Create two copies of the SkyFrame 
+   in the input WCS FrameSet, and set their Systems to AZEL and the requested 
+   output system. Additionally we will use this later to calculate how
+   far the BASE frame has moved. */
+	    skyframein = astGetFrame( swcsin, AST__CURRENT );     
+	    sf1 = astCopy( skyframein );
+	    sf2 = astCopy( skyframein );
+
+	    astSetC( sf1, "System", "AZEL" );
+	    astSetC( sf2, "System", usesys );
+
 /* The telescope base pointing position is stored in (az,el). If the output
    system is AZ/EL, just get the stored values. */
             if( !strcmp( "AZEL", usesys ) ) {
@@ -403,17 +417,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* Otherwise, we need to convert the axis values to the output system. */
             } else {
 
-/* Create a Mapping from (az,el) to usesys. Create two copies of the SkyFrame 
-   in the input WCS FrameSet, and set their Systems to AZEL and the requested 
-   output system. */
-               skyframein = astGetFrame( swcsin, AST__CURRENT );     
-               sf1 = astCopy( skyframein );
-               sf2 = astCopy( skyframein );
-
-               astSetC( sf1, "System", "AZEL" );
-               astSetC( sf2, "System", usesys );
-
-/* Use this Mapping to convert the telescope base pointing position from
+/* Use the AZEL->usesys Mapping to convert the telescope base pointing position from
    (az,el) to the requested system. */
                astTran2( astConvert( sf1, sf2, "" ), 1, 
                          &(hdr->state->tcs_az_bc1),
