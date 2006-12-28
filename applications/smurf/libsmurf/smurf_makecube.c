@@ -448,7 +448,7 @@ void smurf_makecube( int *status ) {
    ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
 
 /* Get the celestial coordinate system for the output cube. */
-   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC"
+   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
              "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
 
 /* See of the detector positions are to be read from the RECEPPOS array. 
