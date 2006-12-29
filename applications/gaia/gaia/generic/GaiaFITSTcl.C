@@ -572,6 +572,7 @@ static int GetFITSDimsOrBounds( Tcl_Interp *interp, int objc,
                                     &info->ndims );
         }
         if ( result == TCL_OK ) {
+            Tcl_ResetResult( interp );
 
             /* Need to truncate? */
             int trunc = 0;
