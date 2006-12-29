@@ -214,18 +214,19 @@ void astPutErr_( int status, const char *message )
         Tcl_AppendResult( Interp, (char *) message, "\n", (char *)NULL );
         
 #ifdef DEBUG 
-        (void) fprintf( stderr, "DEBUG: %s%s\n", astOK ? "!! " : "!  ", message);
-        (void) fflush(stderr);
+        (void) fprintf( stderr, "DEBUG: %s%s\n", astOK ? "!! " : "!  ", 
+                        message );
+        (void) fflush( stderr );
 #else 
         if ( strstr( message, "FITS" ) != NULL ||
              strstr( message, "Fits" ) != NULL ) {
             (void) fprintf( stderr, "%s%s\n", astOK ? "!! " : "!  ", message );
-            (void) fflush(stderr);
+            (void) fflush( stderr );
         }
 #endif
     } else {
         (void) fprintf( stderr, "%s%s\n", astOK ? "!! " : "!  ", message );
-        (void) fflush(stderr);
+        (void) fflush( stderr );
     }
 
     /* Keep references to the status and message */
