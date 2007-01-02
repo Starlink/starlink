@@ -657,15 +657,15 @@ Currently, the following commands are available within CUPID:
 \begin{description}
 
 \item[\htmlref{CUPIDHELP}{CUPIDHELP}] - gives on-line help for all CUPID
-commands.
+commands;
 
 \item[\htmlref{EXTRACTCLUMPS}{EXTRACTCLUMPS}] - calculates parameters for
 the clumps within a 1, 2 or 3D data array, given a mask array that identifies 
-the pixels within each clump.
+the pixels within each clump;
  
 \item[\htmlref{FINDBACK}{FINDBACK}] - applies spatial filtering to a 1, 2 
 or 3D array in order to remove features smaller than a specified size and
-thus produce an estimate of the background within the NDF.
+thus produce an estimate of the background within the NDF;
 
 \item[\htmlref{FINDCLUMPS}{FINDCLUMPS}] - finds clumps within a 1, 2 or 3D 
 array and produces a mask identifying the pixels included in each clump.
@@ -701,49 +701,51 @@ fitted ellipse is taken to be a single clump and is added to the output
 catalogue. In this algorithm, clumps may overlap. Any input variance
 component is used to scale the weight associated with each pixel value
 when performing the Gaussian fit. The most significant configuration
-parameters for this algorithm are: GaussClumps.FwhmBeam and
-GaussClumps.VeloRes which determine the minimum clump size, and
-GaussClumps.Thresh which (together with the ADAM parameter RMS) determine
-the termination criterion.
+parameters for this algorithm are: {\tt GaussClumps.FwhmBeam} and
+{\tt GaussClumps.VeloRes} which determine the minimum clump size, and
+{\tt GaussClumps.Thresh} which (together with the ADAM parameter RMS) 
+determine the termination criterion.
 
 Note, this implementation of the GaussClumps algorithm is a completely
 independent re-write, and includes some differences from other
-GaussClumps implementations. Specifically, these include:
+GaussClumps implementations. Specifically, these include the following
+modifications.
 
 \begin{itemize}
 
 \item The Gaussian fitting is based on the SUMSL module (algorithm 611)
 from the TOMS library available from 
-\htmladdnormallink{http://www.netlib.org/}{http://www.netlib.org/}.
+\htmladdnormallink{http://www.netlib.org/}{{\tt http://www.netlib.org/}}.
 
 \item Any available variance information is used to weight the pixels
 when doing the Gaussian fit. This is in addition to the Gaussian
-weighting function implied by configuration parameters GaussClumps.Wwidth
-and GaussClumps.Wmin.
+weighting function implied by configuration parameters 
+{\tt GaussClumps.Wwidth} and {\tt GaussClumps.Wmin}. 
 
 \item The termination criteria are different. FINDCLUMPS stops finding 
-further clumps if any one of the following criteria is met:
+further clumps if any one of the following criteria is met.
 
 \begin{enumerate}
 
 \item The number of clumps already found equals the value of
-configuration parameter GaussClumps.MaxClumps
+configuration parameter {\tt GaussClumps.MaxClumps}.
 
 \item The number of consecutive fitted peaks with peak value below the 
-value of configuration parameter GaussClumps.Thresh reaches the value of
-configuration parameter GaussClumps.NPad (the final group of NPad clumps
+value of configuration parameter {\tt GaussClumps.Thresh} reaches the value of
+configuration parameter {\tt GaussClumps.NPad} (the final group of NPad clumps
 are not included in the returned list of usable clumps).
 
 \item The number of failed attempts to fit consecutive clumps reaches
-the value of configuration parameter GaussClumps.MaxSkip.
+the value of configuration parameter {\tt GaussClumps.MaxSkip}.
 
 \end{enumerate}
 
 \item A clump will be ignored if its fitted peak value is a long way above or
 below the peak value of the previously fitted clump. The definition of
-``a long way'' is more than GaussClumps.NSigma times the standard
-deviation of the previous GaussClumps.NPeak fitted peaks. This
-restriction is only imposed once GaussClumps.NPeak peaks have been fitted.
+``a long way'' is more than {\tt GaussClumps.NSigma} times the standard
+deviation of the previous {\tt GaussClumps.NPeak} fitted peaks. This
+restriction is only imposed once {\tt GaussClumps.NPeak} peaks have been 
+fitted.
 
 \item In certain situations the chi-squared value that is minimised when
 fitting a Gaussian clump to a peak in the data array may be dominated by
@@ -790,7 +792,7 @@ and total re-write, based on the description of the algorithm in the 1994
 Williams, de Geus \& Blitz paper. Consequently, it differs slightly from 
 other implementations such as the IDL implementation available from
 Williams own web page at \htmladdnormallink{http://www.ifa.hawaii.edu/~jpw/}
-{http://www.ifa.hawaii.edu/~jpw/}). In particularly, several extra
+{{\tt http://www.ifa.hawaii.edu/~jpw/}}). In particularly, several extra
 configuration parameters have been added by CUPID to provide more
 detailed control of the algorithm. If you want to do a direct comparison
 between the CUPID implementation of the ClumpFind algorithm and another
@@ -798,11 +800,11 @@ implementation, then you should set these extra parameters to the
 following values:
 
 \begin{itemize}
-\item ClumpFind.FwhmBeam = 0
-\item ClumpFind.MaxBad = 100000  (or some other very large number)
-\item ClumpFind.MinPix = 5 (for 3D data - use 20 for 2D data)
-\item ClumpFind.VeloRes = 0
-\item ClumpFind.IDLAlg = 1
+\item {\tt ClumpFind.FwhmBeam} = 0
+\item {\tt ClumpFind.MaxBad} = 100000  (or some other very large number)
+\item {\tt ClumpFind.MinPix} = 5 (for 3D data - use 20 for 2D data)
+\item {\tt ClumpFind.VeloRes} = 0
+\item {\tt ClumpFind.IDLAlg} = 1
 \end{itemize}
 
 You should also note that the pixel co-ordinate system used by the two
@@ -838,17 +840,17 @@ clump is sometimes varied in value
 CUPID provides an option to use either the published algorithm, or the
 algorithm implemented by the IDL package available from Jonathan Williams
 WWW site (as available at 28th April 2006). Setting the configuration
-parameter ClumpFind.IDLAlg to a non-zero value will cause the IDL
+parameter {\tt ClumpFind.IDLAlg} to a non-zero value will cause the IDL
 implementation to be used. The default value of zero causes the published
 algorithm to be used.
 
 
 \subsection{\xlabel{reinhold}Reinhold}
 This algorithm was developed by Kim Reinhold whilst working at the Joint
-Astronomy Centre in Hilo, Hawaii. It's overall strategy is first to
+Astronomy Centre in Hilo, Hawaii. Its overall strategy is first to
 identify pixels within the data array which mark the edges of clumps of
 emission. This typically produces a set of rings (in 2D), or shells (in 3D),
-outlining the clumps. However, these structure can be badly affected by
+outlining the clumps. However, these structures can be badly affected by
 noise in the data and so need to be cleaned up. This is done using a
 sequence of cellular automata which first dilate the rings or shells, and
 the erodes them. After cleaning, all pixels within each ring or shell
@@ -858,7 +860,7 @@ are assumed to belong to a single clump.
 The initial identification of the edges is done by considering a set of
 1-dimensional profiles through the data array. Each such profile can be
 represented by a plot of data value against distance (in pixels) along the 
-profile. For each such profile, the algorithm proceeds as follows:
+profile. For each such profile, the algorithm proceeds as follows.
 
 \begin{enumerate}
 
@@ -918,19 +920,19 @@ the visible clumps, but will often be badly affected by noise in the
 data. For instance, there may be holes in the edges surrounding a peak,
 or spurious pixels may be have been marked as edge pixels. Before
 continuing, it is necessary to reduce the effect of this noise. This is
-done in two steps:
+done in two steps described below.
 
 \begin{enumerate}
 \item The edge regions were ``dilated'' (\emph{i.e.} thickened) using a
 cellular automata algorithm which proceeds as follows: if a pixel is
 marked as an edge pixel, then all immediate neighbours of the pixel are
 also marked as edge pixels. Each pixel is considered to be the central
-pixel in a square of 3x3 neighbouring pixels for 2D data, or the central
-pixel in a cube of 3x3x3 neighbouring pixels for 3D data.
+pixel in a square of 3$\times$3 neighbouring pixels for 2D data, or the central
+pixel in a cube of 3$\times$3$\times$3 neighbouring pixels for 3D data.
 
 \item The thickened edge regions were then ``eroded'' (\emph{i.e.} made
-thinner) using another cellular automata algorithm which proceeds as follows: 
-if the number of neighbouring edge pixels surrounding a central pixel was
+thinner) using another cellular automata algorithm which proceeds as follows. 
+Iif the number of neighbouring edge pixels surrounding a central pixel was
 greater than a specified threshold value (given by the configuration
 parameter {\tt Reinhold.CAThresh}), the central pixel would be marked as
 an edge pixel. If the number of neighbouring edge pixels was equal to or
@@ -945,7 +947,7 @@ erosion by setting a value greater than one for the configuration parameter
 \subsubsection{Filling the Clump Edges}
 Once the edges have been cleaned up, the volume contained within the
 edges can be filled with an integer which identifies the associated peak.
-This algorithm proceeds as follows:
+This algorithm proceeds as follows.
 
 \begin{enumerate}
 
@@ -1008,10 +1010,11 @@ pixel is assigned to the clump associated with the nearest peak.
 Another cellular automata is used once the filling process has been
 completed to reduce the artifacts created by these leaks. This cellular
 automata replaces each clump identifier by the most commonly occurring
-clump identifier within a 3x3x3 cube (or 3x3 square for 2D data) of
+clump identifier within a 3$\times$3$\times$3 cube (or 3$\times$3 square 
+for 2D data) of
 neighbours. This process can be repeated to increase the degree of
 cleaning, by assigning a value greater than one to the configuration
-parameter Reinhold.FixClumpsIterations.
+parameter {\tt Reinhold.FixClumpsIterations}.
 
 The results of this cleaning process are the final clump allocations for
 every data pixel, from which the catalogue of clump parameters is produced.
@@ -1019,7 +1022,7 @@ every data pixel, from which the catalogue of clump parameters is produced.
 \subsection{\xlabel{fellwalker}FellWalker}
 This algorithm is most simply described assuming the data array is
 2-dimensional, although it applies in a similar manner to 3-dimensional
-data. It's name was chosen to suggest a parallel between a contour map of
+data. Its name was chosen to suggest a parallel between a contour map of
 a 2D astronomical data array, and the height contours seen in a geographical
 map of a hilly area, such as used by most fell-walkers. The algorithm
 used to assign a data pixel to a clump of emission can be compared to
@@ -1030,14 +1033,14 @@ but one which lends some verisimilitude to the present algorithm!).
 The algorithm considers every data pixel in the supplied array in turn as
 a potential start for a ``walk'' to a neighbouring peak. Pixels which are
 below a nominated background level (specified by configuration parameter
-FellWalker.Noise) are ignored and are flagged as not belonging to any
+{\tt FellWalker.Noise}) are ignored and are flagged as not belonging to any
 emission clump. These are skipped over, as are pixels which have already
 been assigned to a clump. Once a pixel is found that has not yet been
 assigned to a clump and is above the background level, the algorithm
 proceeds to trace out a route from this pixel to a neighbouring peak. It
 does this in a series of steps (comparable to the steps of a
-fell-walker). At each step the algorithm looks at the 3x3 square of
-neighbouring pixels (a 3x3x3 cube for 3D data ), and selects the
+fell-walker). At each step the algorithm looks at the 3$\times$3 square of
+neighbouring pixels (a 3$\times$3$\times$3 cube for 3D data), and selects the
 neighbour which would produce the highest gradient for the next step. The
 algorithm then moves to that pixel and proceeds with the next step.
 
@@ -1046,7 +1049,7 @@ all routes go down-hill. But this may be merely a noise spike, rather
 than a significant peak, and so a check is made over a more extended
 neighbourhood to see if a pixel with a higher data value than the current
 pixel can be found (the extent of this extended neighbourhood is
-specified by the configuration parameter FellWalker.MaxJump). If so, the
+specified by the configuration parameter {\tt FellWalker.MaxJump}). If so, the
 algorithm ``jumps'' to the pixel with the highest value in the extended
 neighbourhood, and then proceeds as before to walk up-hill. If no pixel
 with a higher value is found within the extended neighbourhood, the pixel
@@ -1062,7 +1065,7 @@ point and all the pixels so far visited are assigned to the same clump.
 In some cases, the initial part of a walk may be over very flat
 ``terrain''. The significant part of a walk is considered to start when
 the average gradient (taken over a 4 step length) first reaches the value
-of configuration parameter FlatSlope. Any pixels visited prior to this point
+of configuration parameter {\tt FlatSlope}. Any pixels visited prior to this point
 are deemed not to be in any clump. However, this only applies if the
 walk starts at or close to ``sea level''. For walks which start from a 
 higher level (\emph{i.e.} from a pixel which has a data value greater than 
@@ -1074,9 +1077,10 @@ starts for such a walk, an array will have been created which holds an
 integer clump identifier for every data pixel. To reduce the effect of
 noise on the boundaries between clumps, a cellular automata can be used
 to smooth the boundaries. This replaces each clump identifier by the most
-commonly occurring value within a 3x3 square (or 3x3x3 cube for 3D data)
+commonly occurring value within a 3$\times$3 square (or 3$\times$3$\times$3 
+cube for 3D data)
 of neighbours. The number of times which this cleaning process should be
-applied is specified by configuration parameter CleanIter. 
+applied is specified by configuration parameter {\tt CleanIter}. 
 
 If the high data values in a clump form a plateau with slight
 undulations, then the above algorithm may create a separate clump for
@@ -1084,14 +1088,14 @@ each undulation. This is probably inappropriate, especially if the dips
 between the undulations are less than or are comparable to the noise
 level in the data. This situation can arise for instance if the
 pixel-to-pixel noise is correlated on a scale equal to or larger than the
-value of the MaxJump configuration parameter. To avoid this, adjoining
+value of the {\tt MaxJump} configuration parameter. To avoid this, adjoining
 clumps are merged together if the dip between them is less than a
-specified value. Specifically, if two clumps with peak values PEAK1 and
-PEAK2, where PEAK1 is less than PEAK2, are adjacent to each other, and if
-the pixels along the interface between the two clumps all have data
-values which are larger than ``PEAK1 - MinDip'' (where MinDip is the
-value of the MinDip configuration parameter), then the two clumps are
-merged together.
+specified value. Specifically, if two clumps with peak values \emph{PEAK1} 
+and  \emph{PEAK2}, where \emph{PEAK1} is less than \emph{PEAK2}, are 
+adjacent to each other, and if the pixels along the interface between the
+two clumps all have data values which are larger than ``\emph{PEAK1 - MinDip}''
+(where \emph{MinDip} is the value of the {\tt MinDip} configuration 
+parameter), then the two clumps are merged together.
 
 The results of this merging process are the final clump allocations for
 every data pixel, from which the catalogue of clump parameters is
@@ -1134,7 +1138,7 @@ copy of the original data with all non-clump pixels set bad:
 \end{verbatim}
 \normalsize
 
-This will copy the file \verb+data.sdf+ into the file \verb+data2.sdf+,
+will copy the file \verb+data.sdf+ into the file \verb+data2.sdf+,
 setting pixels bad in \verb+data2.sdf+ if the corresponding pixels
 are bad in  \verb+clumps.sdf+.
 
@@ -1175,7 +1179,7 @@ the entire data array, do:
 
 \subsection{3D Data}
 
-Visualising clumps in 3D is much harder. Options include:
+Visualising clumps in 3D is much harder. Options include the following.
 
 \begin{enumerate}
 
@@ -1192,14 +1196,12 @@ display the intersection of the tenth pixel plane with clump number 12, do:
 accessed through the \verb+Open cube+ entry in the \verb+File+ menu.
 
 \item Use a complete 3D visualisation such as OpenDX (see 
-\htmladdnormallink{http://www.opendx.org/}{http://www.opendx.org/}). The
+\htmladdnormallink{http://www.opendx.org/}{{\tt http://www.opendx.org/}}). The
 facilities of the Starlink DX extension package (known as ``SX'' 
 \xref{SX}{sun203}{} \latexonly{(SUN/203)}) may be useful as it provides
 a means of converting NDF data files to the DX native format, and also
 provides some demonstration DX ``networks'' that can be used to do simple
 visualisations of a 3D data cube.
-
-
 
 \end{enumerate}
 
@@ -1226,10 +1228,10 @@ highest data value in the clump.
 \item[Area]: The total number of pixels falling within the clump.
 \end{description}
 
-The $(X,Y,Z)$ co-ordinates are specified with the NDF's PIXEL co-ordinate
-system. The centroid position is the weighted mean of the X, Y and Z values
-at the centre of all the pixels in the clump, with the pixel values being
-used as the weights.
+The $(X,Y,Z)$ co-ordinates are specified with the NDF's PIXEL co-ordinate 
+system. The centroid position is the weighted mean of the $X$, $Y$ and $Z$ 
+values at the centre of all the pixels in the clump,
+with the pixel values being used as the weights.
 
 \begin{myquote}
 \begin{eqnarray*}
@@ -1239,10 +1241,10 @@ used as the weights.
 \end{eqnarray*}
 \end{myquote}
 
-The clump sizes are the standard deviation of the X, Y and Z values about the 
+The clump sizes are the standard deviation of the $X$, $Y$ and $Z$ values about the 
 centroid position, weighted by the pixel values, then corrected to remove the 
-effect of the instrumental smoothing specified by the FwhmBeam and VeloRes
-configuration parameters:
+effect of the instrumental smoothing specified by the {\tt FwhmBeam} and 
+{\tt VeloRes} configuration parameters:
 
 \begin{myquote}
 \begin{eqnarray*}
@@ -1253,7 +1255,7 @@ configuration parameters:
 \end{myquote}
 
 where $b_{x}$, $b_{y}$ and $b_{z}$ are the beam widths implied by
-configuration parameters FwhmBeam and VeloRes. Clumps are excluded from
+configuration parameters {\tt FwhmBeam} and {\tt VeloRes}. Clumps are excluded from
 the returned list if the clump size before correction is smaller than the
 specified beam width.
 
@@ -1277,7 +1279,7 @@ the instrumental beam width.
 The recommended way to explore and examine the output catalogue is to use
 the Starlink catalogue browser, TOPCAT (see 
 \htmladdnormallink{http://www.starlink.ac.uk/topcat/}
-{http://www.starlink.ac.uk/topcat/}). 
+{{\tt http://www.starlink.ac.uk/topcat/}}). 
 
 \section{Taking Account of Varying Noise Levels}
 
@@ -1305,7 +1307,7 @@ Therefore, the \htmlref{EXTRACTCLUMPS}{EXTRACTCLUMPS} command should then
 be used to transfer the clumps outlines found within the SNR array into
 the original data array and extract the corresponding clump parameters.
 
-So the procedure is:
+So the procedure is as follows.
 \begin{enumerate}
 
 \item If you have a single NDF containing both DATA and VARIANCE
