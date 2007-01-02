@@ -324,6 +324,9 @@
 *     2006 April 10 (MJC):
 *        Added warning message when the chosen data type has less 
 *        precision and dynamic range than expected from the file.
+*     2006 December 28 (MJC):
+*        Fixed bug by initialising TYPE and not passing a null TYPE to
+*        COF_TYPSZ.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -408,8 +411,7 @@
       CHARACTER * ( 48 ) COMENT  ! FITS header comment
       CHARACTER * ( 8 ) COMP     ! NDF array component name
       CHARACTER * ( DAT__SZTYP ) CTYPE ! Type of component
-      LOGICAL DARRAY             ! True if the current HDU contains a
-                                 ! data array
+      LOGICAL DARRAY             ! Current HDU contains a data array?
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
       INTEGER EL                 ! Number of elements in array
       CHARACTER * ( DAT__SZLOC ) ELOC ! Locator to NDF extension (MORE)
@@ -423,7 +425,7 @@
                                  ! (Also used in flushing errors.)
       INTEGER FSTAT              ! FITSIO error status
       INTEGER FSTATC             ! FITSIO error status for file closure
-      INTEGER FUNITH             ! FITS unit for the (merged?) FITS header
+      INTEGER FUNITH             ! FITS unit for (merged?) FITS header
       INTEGER FUNITD             ! FITS unit for the FITS file
       INTEGER GCMIN              ! Minimum group number (0|1)
       INTEGER GCOUNT             ! Value of FITS GCOUNT keyword
@@ -710,7 +712,8 @@
 *  Check that the HDU has a data array---otherwise setting the scaling
 *  fails.  COF_DOSCL sets the scale factors from the BSCALE and BZERO
 *  keywords, and returns the data type based upon the precision of the
-*  keywords, or a null value if either BSCALE or BZERO is absent.
+*  keywords, or a null value if either BSCALE or BZERO is absent, or
+*  there is no format conversion.
                IF ( DARRAY ) THEN
                   CALL COF_DOSCL( FUNITH, FUNITD, FMTCNV, TYPE, STATUS )
                   IF ( STATUS .NE. SAI__OK ) THEN
@@ -719,23 +722,28 @@
      :                 'for FITS file ^FILE.', STATUS )
                      GO TO 999
                   END IF
+               ELSE
+                  TYPE = ' '
                END IF
 
 *  Override the type, but retain scaling.  This might be a problem if
-*  a one- or two-byte integer type is selected.  Oh the other hand the
+*  a one- or two-byte integer type is selected.  On the other hand the
 *  precision of BSCALE and BZERO may be spurious _DOUBLE.  Warn the user
 *  if there is a potential loss of precision or dynamic range.
                IF ( USETYP .NE. ' ' ) THEN
-                  CALL COF_TYPSZ( TYPE, NBFTYP, STATUS )
-                  CALL COF_TYPSZ( USETYP, NBUTYP, STATUS )
-                  IF ( NBUTYP .LT. NBFTYP .OR. ( TYPE .EQ. '_REAL' .AND.
-     :                 USETYP .EQ. '_INTEGER' ) ) THEN
-                     CALL MSG_SETC( 'UT', USETYP )
-                     CALL MSG_SETC( 'FT', TYPE )
-                     CALL MSG_OUTIF( MSG__NORM, 'COF_F2NDF_PREC',
-     :                 'The chosen data ^UT type may result in a '/
-     :                 /'loss of precision and dynamic range.  The '/
-     :                 /'FITS file suggests type ^FT.', STATUS )
+                  IF ( TYPE .NE. ' ' ) THEN
+                     CALL COF_TYPSZ( TYPE, NBFTYP, STATUS )
+                     CALL COF_TYPSZ( USETYP, NBUTYP, STATUS )
+                     IF ( NBUTYP .LT. NBFTYP .OR. 
+     :                    ( TYPE .EQ. '_REAL' .AND.
+     :                      USETYP .EQ. '_INTEGER' ) ) THEN
+                        CALL MSG_SETC( 'UT', USETYP )
+                        CALL MSG_SETC( 'FT', TYPE )
+                        CALL MSG_OUTIF( MSG__NORM, 'COF_F2NDF_PREC',
+     :                    'The chosen data ^UT type may result in a '/
+     :                    /'loss of precision and dynamic range.  The '/
+     :                    /'FITS file suggests type ^FT.', STATUS )
+                     END IF
                   END IF
 
                   TYPE = USETYP
