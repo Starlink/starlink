@@ -1,27 +1,33 @@
-      SUBROUTINE KPS1_CPWD<T>( EL, IN, THRESH, OUT, NMOD, STATUS )
+      SUBROUTINE KPS1_CPWD<T>( EL, IN, VAR, INVAR, THRESH, OUT, OUTVAR,
+     :                         STATUS )
 *+
 *  Name:
 *     KPS1_CPWD<T>
 
 *  Purpose:
-*     Averages adjacent pairs of pixels in an array.
+*     Forms cumulative sum of pixels in an array.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CPWD<T>( EL, IN, THRESH, OUT, NMOD, STATUS )
+*     CALL KPS1_CPWD<T>( EL, IN, VAR, INVAR, THRESH, OUT, OUTVAR,
+*                        STATUS )
 
 *  Description:
-*     This routine adjusts the values of pairs of adjacent pixels by 
-*     averaging, provided both pixels are good and their absolute 
-*     difference is less than a supplied threshold.
+*     This routine forms cumulative pixel values.  To be added each 
+*     new value must be good and the absolute difference from
+*     the current pixel is less than a supplied threshold.
 
 *  Arguments:
 *     EL = INTEGER (Given)
 *        The number of elements in the arrays.
 *     IN( EL ) = <TYPE> (Given)
 *        The input array.
+*     VAR = LOGICAL (Given)
+*        Whether or not to use variance information.
+*     INVAR( EL ) = ? (Given)
+*        The input variance array, only accessed if VAR is .TRUE..
 *     THRESH = <TYPE> (Given)
 *        The threshold.  The absolute value of IN(i)-IN(i+1) where
 *        i is odd, must be less than this threshold for the input 
@@ -29,16 +35,17 @@
 *        to the output.
 *     OUT( EL ) = <TYPE> (Given)
 *        The output array.
-*     NMOD = INTTEGER (Returned)
-*        The number of elements modified by this routine.
+*     OUTVAR( EL ) = ? (Given)
+*        The variance array corresponding to the output array, if VAR 
+*        is .TRUE..
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     -  There is a routine for double-precision and single-precision
 *     floating-point data types: replace "x" in the routine name by D
-*     or R as appropriate.  The IN, THRESH, and OUT arguments must 
-*     have the data type specified.
+*     or R as appropriate.  The IN, INVAR, THRESH, OUT, and OUTVAR
+*     arguments must have the data type specified.
 
 *  Copyright:
 *     Copyright (C) 2006 Central Laboratory of the Research Councils.
@@ -67,6 +74,9 @@
 *  History:
 *     2006 October 4 (MJC):
 *        Original version.
+*     2006 December 18 (MJC):
+*        Added support for VARIANCE; hence added new arguments VAR,
+*        INVAR, and OUTVAR.
 *     {enter_further_changes_here}
 
 *-
@@ -81,11 +91,13 @@
 *  Arguments Given:
       INTEGER EL
       <TYPE> IN( EL )
+      LOGICAL VAR
+      <TYPE> INVAR( EL )
       <TYPE> THRESH
  
 *  Arguments Returned:
       <TYPE> OUT( EL )
-      INTEGER NMOD
+      <TYPE> OUTVAR( EL )
  
 *  Status:
       INTEGER STATUS             ! Global status
@@ -94,31 +106,73 @@
       <LTYPE> DIFF               ! Difference between adjacent elements
       INTEGER J                  ! Loop counter
       <LTYPE> SUM                ! Cumulative differences
+      <LTYPE> SUMV               ! Cumulative variance
 
 *.
  
 *  Check inherited global status.
-      NMOD = 0
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Copy the input array to the output array.
-*  Do each output value.
-      DO J = 1, EL
-         OUT( J ) = IN( J )
-      END DO
-
+*  Need to set the first value independently as there's no difference
+*  to compare with the threshold.
       SUM = 0<CONST>
-      DO J = 1, EL
+      IF ( IN( 1 ) .NE. VAL__BAD<T> ) THEN
+         SUM = IN( 1 )
+         OUT( 1 ) = SUM
+         IF ( VAR ) OUTVAR( 1 ) = INVAR( 1 )
+      END IF
 
-*  Must have good values within the threshold.
-         IF ( IN( J ) .NE. VAL__BAD<T> THEN
-            IF ( ABS( IN( J ) ) .LT. THRESH ) THEN
+*  Variance
+*  ========
+      IF ( VAR ) THEN
+
+         SUMV = 0<CONST>
+         IF ( INVAR( 1 ) .NE. VAL__BAD<T> ) THEN
+            SUMV = INVAR( 1 )
+            OUTVAR( 1 ) = SUMV
+         END IF
+
+* Now do the rest.
+         DO J = 2, EL
+            OUT( J ) = VAL__BAD<T>
+            OUTVAR( J ) = VAL__BAD<T>
+
+*  Must have good values and increments within the threshold.
+            IF ( IN( J ) .NE. VAL__BAD<T> .AND. 
+     :           IN( J - 1 ) .NE. VAL__BAD<T> ) THEN
+               IF ( ABS( IN( J ) - IN( J - 1 ) ) .LT. THRESH ) THEN
 
 * Apply the corrections.
-               SUM = SUM + IN( J )
-               OUT( J ) = SUM
+                  SUM = SUM + IN( J )
+                  OUT( J ) = SUM
+                  IF ( INVAR( J ) .NE. VAL__BAD<T> .AND. 
+     :                 INVAR( J - 1 ) .NE. VAL__BAD<T> ) THEN
+                      SUMV = SUMV + INVAR( J )
+                      OUTVAR( J ) = SUMV
+                  END IF
+               END IF
             END IF
-         END IF
-      END DO
+         END DO
+
+*  No variance
+*  ===========
+      ELSE
+
+* Now do the rest.
+         DO J = 2, EL
+            OUT( J ) = VAL__BAD<T>
+
+*  Must have good values and increments within the threshold.
+            IF ( IN( J ) .NE. VAL__BAD<T> .AND. 
+     :           IN( J - 1 ) .NE. VAL__BAD<T>) THEN
+               IF ( ABS( IN( J ) - IN( J - 1 ) ) .LT. THRESH ) THEN
+
+* Apply the corrections.
+                  SUM = SUM + IN( J )
+                  OUT( J ) = SUM
+               END IF
+            END IF
+         END DO
+      END IF
 
       END
