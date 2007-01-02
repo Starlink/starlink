@@ -55,7 +55,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an
+*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an 
 *     NDF data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.  Bad pixels are progpagated and excluded from the 
@@ -71,7 +71,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either Version 2 of
+*     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -91,7 +91,9 @@
 *  History:
 *     2006 October 6 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2006 December 18 (MJC):
+*        Added support for VARIANCE.
+*     {enter_further_changes_here}
 
 *-
       
@@ -126,13 +128,14 @@
       INTEGER NDIMS              ! Actual number of the dimension of
                                  ! the image
       INTEGER NEL                ! Number of mapped elements
-      INTEGER PNTIN( 1 )         ! Pointer to the inpyut mapped data
-      INTEGER PNTOUT( 1 )        ! Pointer to output mapped data
+      INTEGER PNTIN( 2 )         ! Pointer to the inpyut mapped data
+      INTEGER PNTOUT( 2 )        ! Pointer to output mapped data
       INTEGER SDIM( NDF__MXDIM ) ! Significant NDF dimensions
       REAL THRDEF                ! Suggested default threshold for
                                  ! cleaning a single-precision array
       REAL THRESH                ! Threshold for cleaning a
                                  ! single-precision array
+      LOGICAL VAR                ! NDF contains a variance array?
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -159,8 +162,15 @@
       CALL NDF_DIM( NDFI, SDIM( NDIM ), DIM, NDIMS, STATUS )
       DIM( 1 ) = DIM( SDIM( 1 ) )
 
-*  Set the component string.
-      COMP = 'Data'
+*  See if the input NDF has a Variance component.
+      CALL NDF_STATE( NDFI, 'VARIANCE', VAR, STATUS )
+
+*  Store a list of components to be accessed.
+      IF ( VAR ) THEN
+         COMP = 'DATA,VARIANCE'
+      ELSE
+         COMP = 'DATA'
+      END IF
 
 *  Determine the numeric type to be used for processing the input
 *  arrays.  This application supports single- and double-precision
@@ -184,6 +194,13 @@
 
 *  Exit if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+*  If variance is absent, ensure that there a valid pointer for the main
+*  processing subroutine.
+      IF ( .NOT. VAR ) THEN
+         PNTIN( 2 ) = PNTIN( 1 )
+         PNTOUT( 2 ) = PNTOUT( 1 )
+      END IF
 
 *  Obtain parameters to control the filtering.
 *  ===========================================
@@ -219,14 +236,16 @@
 *  from by more than the threshold, calling the routine of the 
 *  appropriate data type.
       IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_CPWDR( NEL, %VAL( CNF_PVAL( PNTIN( 1 ) ) ),
-     :                   THRESH, %VAL( CNF_PVAL( PNTOUT( 1 ) ) ), 
-     :                   STATUS )
+         CALL KPS1_CPWDR( NEL, %VAL( CNF_PVAL( PNTIN( 1 ) ) ), VAR,
+     :                    %VAL( CNF_PVAL( PNTIN( 2 ) ) ),
+     :                    THRESH, %VAL( CNF_PVAL( PNTOUT( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( PNTOUT( 2 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_CPWDD( NEL, %VAL( CNF_PVAL( PNTIN( 1 ) ) ),
-     :                   DTHRES, %VAL( CNF_PVAL( PNTOUT( 1 ) ) ), 
-     :                   STATUS )
+         CALL KPS1_CPWDD( NEL, %VAL( CNF_PVAL( PNTIN( 1 ) ) ), VAR,
+     :                    %VAL( CNF_PVAL( PNTIN( 2 ) ) ),
+     :                    DTHRES, %VAL( CNF_PVAL( PNTOUT( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( PNTOUT( 2 ) ) ), STATUS )
 
       END IF
 
