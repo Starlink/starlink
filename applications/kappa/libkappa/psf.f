@@ -45,8 +45,9 @@
 *     `star' is a poor fit to model or it could not be located.
 *
 *     An optional plot of the mean profile and the fitted function may
-*     be produced.  The 2-dimensional point-spread function may be stored 
-*     in an NDF for later use, as may the 1-dimensional fitted profile.
+*     be produced.  The two-dimensional point-spread function may be 
+*     stored in an NDF for later use, as may the one-dimensional fitted 
+*     profile.
 
 *  Usage:
 *     psf in incat [device] [out] [cut] [range] [isize] [poscols]
@@ -58,7 +59,7 @@
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        plot. The width of the margins left for the annotation may be 
-*        controlled using parameter MARGIN. The appearance of the axes 
+*        controlled using parameter MARGIN.  The appearance of the axes 
 *        (colours, fonts, etc) can be controlled using the parameter
 *        STYLE. [TRUE]
 *     AXISR = _REAL (Write)
@@ -66,20 +67,21 @@
 *        axis length to that of the minor axis.
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is 
-*        drawn. If CLEAR is FALSE not only is the existing plot retained, 
-*        but also an attempt is made to align the new picture with the
-*        existing picture. Thus you can generate a composite plot within 
-*        a single set of axes, say using different colours or modes to 
-*        distinguish data from different datasets. [TRUE]
+*        drawn.  If CLEAR is FALSE not only is the existing plot 
+*        retained, but also an attempt is made to align the new picture 
+*        with the existing picture.  Thus you can generate a composite 
+*        plot within a single set of axes, say using different colours 
+*        or modes to distinguish data from different datasets.  [TRUE]
 *     COFILE = FILENAME (Read)
 *        Name of a text file containing the co-ordinates of the stars
-*        to be used. Only accessed if parameter INCAT is given a null (!)
-*        value. Each line should contain the formatted axis values for a 
-*        single position, in the current Frame of the NDF. Columns can be 
-*        separated by spaces, tabs or commas. The file may contain 
-*        comment lines with the first character # or !. Other columns may
-*        be included in the file, in which case the columns holding the 
-*        required co-ordinates should be specified using parameter POSCOLS.
+*        to be used.  It is only accessed if parameter INCAT is given a
+*        null (!) value.  Each line should contain the formatted axis 
+*        values for a single position, in the current Frame of the NDF. 
+*        Columns can be separated by spaces, tabs or commas.  The file 
+*        may contain comment lines with the first character # or !. 
+*        Other columns may be included in the file, in which case the 
+*        columns holding the required co-ordinates should be specified 
+*        using parameter POSCOLS.
 *     CUT = _REAL (Read)
 *        This parameter controls the size of the output NDF.  If it is
 *        null, !, the dimension of the square NDF will be the size of
@@ -90,7 +92,7 @@
 *        amplitude of the PSF.  For example, if CUT=0.5 the NDF would
 *        contain the point-spread function to half maximum.  CUT must
 *        be greater than 0 and less than 1.  The suggested default is
-*        0.0001 [!]
+*        0.0001.  [!]
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation on which to produce a plot of the
 *        mean radial profile of the stars and the fitted function.  A
@@ -98,10 +100,10 @@
 *        [current graphics device]
 *     FWHM = _REAL (Write)
 *        The seeing-disc size: the full width at half maximum across the
-*        minor axis of the stars.  It is in units defined by the current 
+*        minor axis of the stars.  It is in units defined by the current
 *        Frame of the NDF. For instance, a value in arc-seconds will be
-*        reported if the current Frame is a SKY Frame, but pixels will be
-*        used if it is a PIXEL Frame.
+*        reported if the current Frame is a SKY Frame, but pixels will
+*        be used if it is a PIXEL Frame.
 *     GAMMA = _REAL (Write)
 *        The radial fall-off parameter of the star images. See the 
 *        description for more details.  A gamma of two would be a
@@ -110,146 +112,154 @@
 *        If TRUE, the gamma coefficient is fixed to be 2; in other words
 *        the best-fitting two-dimensional Gaussian is evaluated.  If
 *        FALSE, gamma is a free parameter of the fit, and the derived
-*        value is returned in parameter GAMMA. [FALSE]
+*        value is returned in parameter GAMMA.  [FALSE]
 *     IN = NDF (Read)
 *        The NDF containing the star images to be fitted.
 *     INCAT = FILENAME (Read)
 *        A catalogue containing a positions list (such as produced by
 *        applications CURSOR, LISTMAKE, etc.) giving the star positions
-*        to use. If a null (!) value is supplied parameter COFILE will be
-*        used to get the star positions from a simple text file.
+*        to use.  If a null (!) value is supplied parameter COFILE will 
+*        be used to get the star positions from a simple text file.
 *     ISIZE = _INTEGER (Read)
-*        The side of the square area to be used when forming the marginal 
-*        profiles for a star image, given as a number of pixels.  It should 
-*        be sufficiently large to contain the entire star image.  It should 
-*        be an odd number and must lie in the range from 3 to 101.  [15]
+*        The side of the square area to be used when forming the 
+*        marginal profiles for a star image, given as a number of 
+*        pixels.  It should be sufficiently large to contain the entire 
+*        star image.  It should be an odd number and must lie in the 
+*        range from 3 to 101.  [15]
 *     LOGFILE = FILENAME (Read)
 *        Text file to contain the table of parameters for each star.  A
-*        null (!) name indicates that no log file is required. [!]
+*        null (!) name indicates that no log file is required.  [!]
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given 
-*        as fractions of the corresponding dimension of the current  picture. 
-*        Four values may be given, in the order - bottom, right, top, left. 
-*        If less than four values are given, extra values are used equal to 
-*        the first supplied value. If these margins are too narrow any axis 
-*        annotation may be clipped. If a null (!) value is supplied, the
-*        value used is 0.15 (for all edges) if either annotated axes or a 
-*        key are produced, and zero otherwise. [current value]
+*        as fractions of the corresponding dimension of the current 
+*        picture.  Four values may be given, in the order: bottom, 
+*        right, top, left.  If fewer than four values are given, extra 
+*        values are used equal to the first supplied value.  If these 
+*        margins are too narrow, any axis annotation may be clipped.  If
+*        a null (!) value is supplied, the value used is 0.15 (for all 
+*        edges) if either annotated axes or a key are produced, and zero
+*        otherwise.  [current value]
 *     MARKER = INTEGER (Read)
 *        The PGPLOT marker type to use for the data values in the plot. 
 *        [current value]
 *     MINOR = _LOGICAL (Read)
 *        If MINOR is TRUE the horizontal axis of the plot is annotated
-*        with distance along the minor axis from the centre of the PSF. If 
-*        MINOR is FALSE, the distance along the major axis is used.  [TRUE]
+*        with distance along the minor axis from the centre of the PSF.
+*        If MINOR is FALSE, the distance along the major axis is used.  
+*        [TRUE]
 *     NORM = _LOGICAL (Read)
-*        If TRUE, the model PSF is normalized so that it has a peak value
-*        of unity. Otherwise, its peak value is equal to the peak
+*        If TRUE, the model PSF is normalized so that it has a peak
+*        value of unity.  Otherwise, its peak value is equal to the peak
 *        value of the first usable star, in the data units of the input
-*        NDF. [TRUE]
+*        NDF.  [TRUE]
 *     ORIENT = _REAL (Write)
-*        The orientation of the major axis of the star images, in degrees. 
-*        If the current Frame of the NDF is a SKY Frame, this will be a 
-*        position angle (measured from north through east). Otherwise, it
-*        will be measured from the positive direction of the first
-*        current Frame axis ("X") towards the second current Frame axis
-*        ("Y").
+*        The orientation of the major axis of the star images, in 
+*        degrees.  If the current Frame of the NDF is a SKY Frame, this 
+*        will be a position angle (measured from north through east).  
+*        Otherwise, it will be measured from the positive direction of 
+*        the first current Frame axis ("X") towards the second current 
+*        Frame axis ("Y").
 *     OUT = NDF (Write)
 *        The NDF containing the fitted point-spread function evaluated
-*        at each pixel. If null, !, is entered no output NDF will be 
-*        created. The dimensions of the array are controlled by parameter 
-*        CUT. The pixel origin is chosen to align the model PSF with the 
-*        fitted star in pixel co-ordinates, thus allowing the NDF 
-*        holding the model PSF to be compared directly with the input NDF. 
-*        A WCS component is stored in the output NDF holding a copy of the 
-*        input WCS component. An additional Frame with Domain name OFFSET 
-*        is added, and is made the current Frame. This Frame measures the 
-*        distance from the PSF centre in the units in which the FWHM is 
-*        reported. [!]
+*        at each pixel.  If null, !, is entered no output NDF will be 
+*        created.  The dimensions of the array are controlled by 
+*        parameter CUT.  The pixel origin is chosen to align the model 
+*        PSF with the fitted star in pixel co-ordinates, thus allowing 
+*        the NDF holding the model PSF to be compared directly with the 
+*        input NDF.  A WCS component is stored in the output NDF holding
+*        a copy of the input WCS component.  An additional Frame with 
+*        Domain name OFFSET is added, and is made the current Frame. 
+*        This Frame measures the distance from the PSF centre in the 
+*        units in which the FWHM is reported.  [!]
 *     POSCOLS = _INTEGER (Read)
-*        Column positions of the co-ordinates (x then y) in an input record 
-*        of the file specified by parameter COFILE.  The columns must be 
-*        different amongst themselves. If there is duplication new values 
-*        will be requested.  Only accessed if INCAT is given a null (!)
-*        value. If a null (!) value is supplied for POSCOLS, the values
-*        [1,2] will be used. [!] 
+*        Column positions of the co-ordinates (x then y) in an input 
+*        record of the file specified by parameter COFILE.  The columns
+*        must be different amongst themselves.  If there is duplication
+*        new values will be requested.  Only accessed if INCAT is given
+*        a null (!) value.  If a null (!) value is supplied for POSCOLS,
+*        the values [1,2] will be used.  [!] 
 *     PROFOUT = NDF (Write)
-*        The NDF containing the 1-dimensional fitted profile as displayed
-*        in the plot. If null, !, is entered no output NDF will be created. 
-*        The DATA component of this NDF holds the fitted PSF value at each 
-*        radial bin. The VARIANCE component holds the square of the residuals 
-*        between the fitted values and the binned values derived from the 
-*        input NDF. An AXIS component is included in the NDF containing the 
-*        radial distance as displayed in the plot. [!]
+*        The NDF containing the one-dimensional fitted profile as 
+*        displayed in the plot.  If null, !, is entered no output NDF 
+*        will be created.  The DATA component of this NDF holds the 
+*        fitted PSF value at each radial bin.  The VARIANCE component 
+*        holds the square of the residuals between the fitted values and
+*        the binned values derived from the input NDF.  An AXIS 
+*        component is included in the NDF containing the radial distance
+*        as displayed in the plot.  [!]
 *     RANGE = _REAL (Read)
 *        The number of image profile widths out to which the radial
 *        star profile is to be fitted.  (There is an upper limit of 100
-*        pixels to the radius at which data are actually used.) [4.0]
+*        pixels to the radius at which data are actually used.)  [4.0]
 *     STYLE = GROUP (Read)
-*        A group of attribute settings describing the plotting style to use 
-*        when drawing the annotated axes, data values, and the model profile.
+*        A group of attribute settings describing the plotting style to
+*        use when drawing the annotated axes, data values, and the model
+*        profile.
 *
 *        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text file
-*        preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and 
-*        interpreted in the same manner. Attribute settings are applied in 
-*        the order in which they occur within the list, with later settings
-*        over-riding any earlier settings given for the same attribute.
+*        string is either an attribute setting, or the name of a text
+*        file preceded by an up-arrow character "^".  Such text files 
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are 
+*        applied in the order in which they occur within the list, with 
+*        later settings overriding any earlier settings given for the 
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
 *
-*        where <name> is the name of a plotting attribute, and <value> is
-*        the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes. All attributes will be
-*        defaulted if a null value (!) is supplied. See section "Plotting
-*        Attributes" in SUN/95 for a description of the available
-*        attributes. Any unrecognised attributes are ignored (no error is
-*        reported). 
+*        where <name> is the name of a plotting attribute, and <value>
+*        is the value to assign to the attribute.  Default values will
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!) is supplied.  See section 
+*        "Plotting Attributes" in SUN/95 for a description of the 
+*        available attributes.  Any unrecognised attributes are ignored 
+*        (no error is reported). 
 *
-*        The appearance of the model curve is controlled by the attributes 
-*        Colour(Curves), Width(Curves), etc (the synonym Line may be used 
-*        in place of Curves). The appearance of the markers representing
-*        the real data is controlled by Colour(Markers), Width(Markers), 
-*        etc. (the synonym Symbols may be used in place of Markers). 
-*        [current value]
+*        The appearance of the model curve is controlled by the 
+*        attributes Colour(Curves), Width(Curves), etc. (the synonym 
+*        Line may be used in place of Curves).  The appearance of the 
+*        markers representing the real data is controlled by 
+*        Colour(Markers), Width(Markers), etc. (the synonym Symbols may 
+*        be used in place of Markers).  [current value]
 *     TITLE = LITERAL (Read)
 *        The title for the NDF to contain the fitted point-spread
 *        function.  If null (!) is entered the NDF will not contain a
 *        title.  ["KAPPA - PSF"]
 *     USEAXIS = GROUP (Read)
-*        USEAXIS is only accessed if the current co-ordinate Frame of the 
-*        NDF has more than 2 axes. A group of two strings should be
-*        supplied specifying the 2 axes which are to be used when
-*        determining distances, reporting positions, etc. Each axis can be 
-*        specified either by its integer index within the current Frame (in 
-*        the range 1 to the number of axes in the current Frame), or by its 
-*        Symbol attribute. A list of acceptable values is displayed if an 
-*        illegal value is supplied. If a null (!) value is supplied, the 
-*        axes with the same indices as the 2 significant NDF pixel axes are 
-*        used. [!]
+*        USEAXIS is only accessed if the current co-ordinate Frame of 
+*        the NDF has more than two axes.  A group of two strings should 
+*        be supplied specifying the two axes which are to be used when
+*        determining distances, reporting positions, etc.  Each axis can
+*        be specified either by its integer index within the current 
+*        Frame (in the range 1 to the number of axes in the current 
+*        Frame), or by its Symbol attribute.  A list of acceptable 
+*        values is displayed if an illegal value is supplied.  If a null
+*        (!) value is supplied, the axes with the same indices as the 
+*        two significant NDF pixel axes are used.  [!]
 *     XLEFT = _REAL (Read)
 *        The axis value to place at the left hand end of the horizontal
-*        axis of the plot. If a null (!) value is supplied, a suitable
-*        default value will be found and used. The value supplied may be 
-*        greater than or less than the value supplied for XRIGHT. [!]
+*        axis of the plot.  If a null (!) value is supplied, a suitable
+*        default value will be found and used.  The value supplied may
+*        be greater than or less than the value supplied for XRIGHT.
+*        [!]
 *     XRIGHT = _REAL (Read)
 *        The axis value to place at the right hand end of the horizontal
-*        axis of the plot. If a null (!) value is supplied, a suitable
-*        default value will be found and used. The value supplied may be 
-*        greater than or less than the value supplied for XLEFT. [!]
+*        axis of the plot.  If a null (!) value is supplied, a suitable
+*        default value will be found and used.  The value supplied may
+*        be greater than or less than the value supplied for XLEFT. 
+*        [!]
 *     YBOT = _REAL (Read)
-*        The axis value to place at the bottom end of the vertical axis of 
-*        the plot. If a null (!) value is supplied, a suitable default
-*        value will be found and used. The value supplied may be greater 
-*        than or less than the value supplied for YTOP. [!]
+*        The axis value to place at the bottom end of the vertical axis
+*        of the plot.  If a null (!) value is supplied, a suitable 
+*        default value will be found and used.  The value supplied may 
+*        be greater than or less than the value supplied for YTOP.  [!]
 *     YTOP = _REAL (Read)
 *        The axis value to place at the top end of the vertical axis of 
-*        the plot. If a null (!) value is supplied, a suitable default
-*        value will be found and used. The value supplied may be greater 
-*        than or less than the value supplied for YBOT. [!]
+*        the plot.  If a null (!) value is supplied, a suitable default
+*        value will be found and used.  The value supplied may be 
+*        greater than or less than the value supplied for YBOT.  [!]
 
 *  Examples:
 *     psf ngc6405i starlist.FIT \
@@ -262,8 +272,8 @@
 *        the input positions list is defaulted.
 *     psf ngc6405i cofile=starlist.dat gauss \
 *        As the first example, except the psf is fitted to a
-*        two-dimensional Gaussian,and the positions are given in a simple
-*        text file instead of a positions list.
+*        two-dimensional Gaussian, and the positions are given in a
+*        simple text file instead of a positions list.
 *     psf incat=starlist.FIT in=ngc6405i logfile=fit.log fwhm=(seeing) \
 *        As the first example, but the results, including the fits to
 *        each star, are written to the text file fit.log.  The
@@ -272,7 +282,7 @@
 *     psf ngc6405i starlist isize=31 style="'title=Point spread function'"
 *        As the first example, but the area including a star image is
 *        31 pixels square, say because the seeing is poor or the pixels
-*        are smaller than normal. The graph is titled "Point spread 
+*        are smaller than normal.  The graph is titled "Point spread 
 *        function".
 
 *  Notes:
@@ -285,29 +295,45 @@
 *     made.
 *     -  It is assumed that the image scale does not vary significantly
 *     across the image.
-*     -  The method to calculate the fit is as follows:
-*
+*     -  The iterative method to calculate the fit is as follows.
 *        -  Marginal profiles of each star image are formed in four
-*        directions, inclined at 45-degree intervals.  A Gaussian curve
-*        and background is fitted to each profile.  Using the resulting
-*        four Gaussian centres, a mean centre is found for each star.
-*        - The four Gaussian widths of all the stars are combined,
-*        using a weighted average with rejection of erroneous data, and
-*        from the four average widths the seeing-disc size, axis ratio
-*        and axis inclination are calculated.
-*        - The data surrounding each star is then binned into
-*        isophotal zones which are elliptical annuli centred on the
-*        star---the ellipse parameters being those just calculated.
-*        The data in each zone is processed to remove erroneous points
-*        and to find an average value.  A Gaussian profile is fitted to
-*        these average values and the derived amplitude is used to
-*        normalise the values to an amplitude of unity.  The normalised
-*        values are put into bins together with the corresponding data
-*        from all other stars and this binned data represents a
-*        weighted average radial profile for the set of stars, with the
-*        image ellipticity removed.  Finally a radial profile is fitted
-*        to these data, giving the radial profile parameter gamma and a
-*        final re-estimate of the seeing-disc size.
+*        directions: at 0, 45, 90 and 135 degrees to the x axis.  The 
+*        profiles are cleaned via an iterative modal filter that 
+*        removes contamination such as neighbouring stars; moving from 
+*        the centre of the star, the filter prevents each data point 
+*        from exceeding the maximum of the two previous data values.
+*        -  A Gaussian curve and background is fitted to each profile
+*        iteratively refining the parameters until parameters differ
+*        by less than 0.1 per cent from the previous iteration.  If
+*        convergence is not met after fifteen iterations, each fit
+*        parameter is approximately the average of its last pair of
+*        values.  The initial background is the lower quartile.
+*        Using the resulting four Gaussian centres, a mean centre is 
+*        found for each star.  Iterations cease when the mean centroid 
+*        position shifts by less 0.001 from the previous iteration, or
+*        after three iterations if the nominal tolerance is not
+*        achieved.
+*        -  The four Gaussian widths of all the stars are combined
+*        modally, using an amplitude-weighted average with rejection of 
+*        erroneous data (using a maximum-likelihood function for a
+*        statistical model in which any of the centres has a constant
+*        probability of being corrupt).  From the average widths along
+*        the four profiles, the seeing-disc size, axis ratio and axis 
+*        inclination are calculated.
+*        -  The data surrounding each star is then binned into isophotal
+*        zones which are elliptical annuli centred on the star---the 
+*        ellipse parameters being those just calculated.  The data in 
+*        each zone is processed to remove erroneous points (using the 
+*        aforementioned maximum-likelihood function) and to find an 
+*        average value.  A Gaussian profile is fitted to these average
+*        values and the derived amplitude is used to normalise the
+*        values to an amplitude of unity.  The normalised values are put
+*        into bins together with the corresponding data from all other 
+*        stars and these binned data represent a weighted average radial
+*        profile for the set of stars, with the image ellipticity
+*        removed.  Finally a radial profile is fitted to these data,
+*        giving the radial profile parameter gamma and a final 
+*        re-estimate of the seeing-disc size.
 
 *  Related Applications:
 *     PHOTOM; Starman.
@@ -322,13 +348,13 @@
 
 *  Copyright:
 *     Copyright (C) 1990-1993 Science & Engineering Research Council.
-*     Copyright (C) 1998-2001, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Copyright (C) 1998-2001, 2004, 2006 Particle Physics & Astronomy
+*     Research Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -338,8 +364,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -405,7 +431,9 @@
 *        Corrected size of work arrays IPW3 and IPW4 so that no segvio
 *        occurs if the OUT image is not square.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 December 30 (MJC):
+*        Expanded the description of the fitting algorithm.
 *     {enter_further_changes_here}
 
 *-
@@ -428,8 +456,8 @@
       INTEGER NDIM             ! 2-d data arrays only
       PARAMETER ( NDIM = 2 )
 
-      INTEGER NCHLIN           ! Max, no. of characters in an input record
-      PARAMETER ( NCHLIN = 132 )
+      INTEGER NCHLIN           ! Maximum number of characters in an 
+      PARAMETER ( NCHLIN = 132 ) ! input record
  
 *  Local Variables:
       CHARACTER BUFFER*( NCHLIN )! Buffer to store output string
@@ -441,7 +469,8 @@
       CHARACTER UNITS*100       ! Data units for the input NDF
       INTEGER CFRM              ! Pointer to the Current Frame of the NDF
       INTEGER DIMS( NDIM )      ! Dimensions of the NDF
-      INTEGER EL                ! Number of elements in the input array and output array
+      INTEGER EL                ! Number of elements in the input array
+                                ! and output array
       INTEGER FDL               ! File description for log file
       INTEGER I                 ! Loop count
       INTEGER INDF1             ! Identifier for input NDF
@@ -452,11 +481,12 @@
       INTEGER IPIN              ! Pointer to array of supplied positions
       INTEGER IPIX              ! Index of PIXEL Frame in IWCS
       INTEGER IPPSF             ! Pointer to output PSF data array
-      INTEGER IPW1              ! Pointer to work array for pixel positions
+      INTEGER IPW1              ! Pointer work array for pixel positions
       INTEGER IPW2              ! Pointer to work array for width data 
       INTEGER IPW3              ! Pointer to work array for WCS creation
       INTEGER IPW4              ! Pointer to work array for WCS creation
-      INTEGER ISIZE             ! Pixel size of square about a star used to form marginal profiles
+      INTEGER ISIZE             ! Pixel size of square about a star used
+                                ! to form marginal profiles
       INTEGER IWCS              ! WCS FrameSet from input NDF
       INTEGER IWCSG             ! FrameSet read from input catalogue
       INTEGER LBND( NDIM )      ! Lower bounds of the output image
@@ -486,17 +516,20 @@
       LOGICAL NM                ! Normalize PSF to amplitude of unity?
       REAL AMP                  ! Peak amplitude of the fitted PSF
       REAL AXISR                ! Axis ratio o fthe star images
-      REAL CUT                  ! The threshold to which the output PSF must extend
+      REAL CUT                  ! Threshold to which the output PSF must
+                                ! extend
       REAL FWHM                 ! FWHM of the star images
       REAL GAMMA                ! Radial fall-off parameter
       REAL PX                   ! X pixel co-ord at first fitted star
       REAL PY                   ! Y pixel co-ord at first fitted star
-      REAL RANGE                ! Number of image profile widths to which radial profile is to be fitted
+      REAL RANGE                ! Number of image profile widths to
+                                ! which radial profile is to be fitted
       REAL THETA                ! Orientation of the star images
+
 *.
 
 *  Check inherited global status.
-      IF( STATUS .NE. SAI__OK ) RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
@@ -509,21 +542,21 @@
 
 *  Annul the error if a null value was given, and indicate that a log
 *  file is not to be created.
-      IF( STATUS .EQ. PAR__NULL ) THEN
+      IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          LOGPOS = .FALSE.
 
-      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
          LOGPOS = .TRUE.
 
       END IF
 
 *  Remind the user about the log file, if required.
-      IF( LOGPOS ) CALL MSG_OUT( 'LOG', '  Logging to $LOGFILE', 
+      IF ( LOGPOS ) CALL MSG_OUT( 'LOG', '  Logging to $LOGFILE', 
      :                           STATUS )
 
 *  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Obtain the identifier of the NDF to be displayed.
       CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
@@ -553,7 +586,7 @@
       MAP1 = AST_SIMPLIFY( AST_GETMAPPING( IWCS, IPIX, AST__CURRENT, 
      :                                     STATUS ), STATUS )
 
-*  This application can only process non-complex types. Therefore for
+*  This application can only process non-complex types.  Therefore for
 *  the given type of the image find in which type it should be
 *  processed.
       CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
@@ -564,7 +597,7 @@
       CALL NDF_MAP( INDF1, 'Data', ITYPE, 'READ', IPDIN, EL, STATUS )
 
 *  Store the name of the NDF in the log file.
-      IF( LOGPOS ) THEN
+      IF ( LOGPOS ) THEN
 
          CALL NDF_MSG( 'NDF', INDF1 )
          CALL MSG_LOAD( ' ', '^NDF', NDFNAM, NCF, STATUS )
@@ -580,24 +613,24 @@
       END IF
 
 *  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Attempt to open a positions list catalogue and read its contents. A 
-*  pointer to a FrameSet is returned, together with pointers to positions 
-*  and identifiers, and a title. The positions are returned in the Base 
-*  Frame of this FrameSet.
+*  Attempt to open a positions list catalogue and read its contents.  A 
+*  pointer to a FrameSet is returned, together with pointers to 
+*  positions and identifiers, and a title.  The positions are returned 
+*  in the Base Frame of this FrameSet.
       IWCSG = AST__NULL
       CALL KPG1_RDLST( 'INCAT', .FALSE., IWCSG, NPOS, NAXIN, IPIN, 
      :                 IPID, TITLE, NAME, STATUS )
 
-*  If succesful, get the AST Mapping from the Frame in which the positions are
-*  supplied to the Current Frame of the NDF.
-      IF( STATUS .EQ. SAI__OK ) THEN
+*  If successful, get the AST Mapping from the Frame in which the 
+*  positions are supplied to the Current Frame of the NDF.
+      IF ( STATUS .EQ. SAI__OK ) THEN
          GOTID = .TRUE.
 
-*  The positions are supplied in the Base Frame of the FrameSet stored in 
-*  the catalogue. Merge this FrameSet with the FrameSet read from the NDF 
-*  aligning them in some suitable Frame. 
+*  The positions are supplied in the Base Frame of the FrameSet stored 
+*  in  the catalogue.  Merge this FrameSet with the FrameSet read from
+*  the NDF aligning them in some suitable Frame. 
          CALL KPG1_ASMRG( IWCSG, IWCS, ' ', .FALSE., 0, STATUS )
 
 *  Get the Mapping.
@@ -605,30 +638,30 @@
      :                                        AST__CURRENT, STATUS ),
      :                        STATUS )
 
-*  If a null value was supplied for INCAT, annul the error and try to get 
-*  a list of star positions using parameter COFILE.
-      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
+*  If a null value was supplied for INCAT, annul the error and try to 
+*  get a list of star positions using parameter COFILE.
+      ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          GOTID = .FALSE.
 
-*  Obtain the file and read the positions, interpreting them as positions 
-*  within the Current Frame of the NDF. A pointer to memory holding the 
-*  positions is returned. Store a safe value for the IPID pointer. 
-*  Identifiers are generated automatically instead of being read from the 
-*  file, and so we do not have a pointer to an array of identifiers at this 
-*  point.
+*  Obtain the file and read the positions, interpreting them as
+*  positions within the Current Frame of the NDF.  A pointer to memory 
+*  holding the positions is returned.  Store a safe value for the IPID
+*  pointer.  Identifiers are generated automatically instead of being 
+*  read from the file, and so we do not have a pointer to an array of
+*  identifiers at this point.
          CALL KPG1_ASFIL( 'COFILE', 'POSCOLS', CFRM, NPOS, IPIN, 
      :                    NAME, STATUS )
          IPID = IPIN
 
-*  The positions are supplied in the Current Frame, so use a unit mapping
-*  for MAP2.
+*  The positions are supplied in the Current Frame, so use a unit 
+*  mapping for MAP2.
          MAP2 = AST_UNITMAP( NAXC, ' ', STATUS )
 
       END IF
 
 *  Store the name of the coordinate file or catalogue in the log file.
-      IF( LOGPOS .AND. NAME .NE. ' ' ) THEN
+      IF ( LOGPOS .AND. NAME .NE. ' ' ) THEN
          NC = 3
          BUFFER = ' '
          CALL CHR_APPND( 'Input co-ordinate list is', BUFFER, NC )
@@ -644,7 +677,7 @@
       NAXIN = AST_GETI( MAP2, 'NIN', STATUS )
 
 *  We need the Mapping from the Frame in which the positions are
-*  supplied, to the PIXEL Frame of the NDF. We get this Mapping by
+*  supplied, to the PIXEL Frame of the NDF.  We get this Mapping by
 *  concatenating the Mapping from input Frame to Current Frame, with 
 *  the Mapping from Current Frame to PIXEL Frame (obtained by 
 *  inverting the Mapping from PIXEL to Current Frame). 
@@ -654,7 +687,7 @@
      :                                 STATUS ), STATUS )
 
 *  Check the Mapping has the required transformations.
-      IF( .NOT. AST_GETL( MAP3, 'TRANFORWARD', STATUS ) .AND.
+      IF ( .NOT. AST_GETL( MAP3, 'TRANFORWARD', STATUS ) .AND.
      :    STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'PSF_ERR1','The Mapping required '//
@@ -664,12 +697,13 @@
          GO TO 999
       END IF
 
-*  Allocate work space to hold the PIXEL co-ordinates of the star positions.
-      CALL PSX_CALLOC( NPOS*NDIM, '_DOUBLE', IPW1, STATUS )
+*  Allocate work space to hold the PIXEL co-ordinates of the star
+*  positions.
+      CALL PSX_CALLOC( NPOS * NDIM, '_DOUBLE', IPW1, STATUS )
 
 *  Transform the supplied positions to the PIXEL Frame of the NDF. Store
 *  them in the above work space.
-      CALL AST_TRANN( MAP3, NPOS, NAXIN, NPOS, %VAL( CNF_PVAL( IPIN ) ), 
+      CALL AST_TRANN( MAP3, NPOS, NAXIN, NPOS, %VAL( CNF_PVAL( IPIN ) ),
      :                .TRUE.,
      :                NDIM, NPOS, %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
@@ -681,23 +715,22 @@
 
 *  Determine whether or not gamma is a free parameter.
       CALL PAR_GET0L( 'GAUSS', GAUSS, STATUS )
-      IF( STATUS .NE. SAI__OK ) GO TO 999
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Determine whether or not the PSF is to be normalized to an amplitude of 
-*  unity.
+*  Determine whether or not the PSF is to be normalized to an amplitude
+*  of unity.
       CALL PAR_GET0L( 'NORM', NM, STATUS )
-      IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Annul the error if a null value was supplied.
-      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
 *  Find the mean star profile.
 *  ===========================
 *  Allocate work space 
-      CALL PSX_CALLOC( NPOS*5, '_REAL', IPW2, STATUS )
+      CALL PSX_CALLOC( NPOS * 5, '_REAL', IPW2, STATUS )
 
 *  Get the input NDF data units.
       UNITS = ' '
@@ -705,95 +738,81 @@
 
 *  Find the mean star profile parameters calling the routine of the
 *  appropriate data type.  Plot the results as required.
-      IF( ITYPE .EQ. '_REAL' ) THEN
+      IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL KPS1_SPARR( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( CNF_PVAL( IPDIN ) ), 
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
-     :                    GOTID, NM,
-     :                    UNITS, AXISR, 
-     :                    THETA, FWHM, GAMMA, PSFSIZ, 
-     :                    %VAL( CNF_PVAL( IPW2 ) ),
+     :                    GOTID, NM, UNITS, AXISR, THETA, FWHM, 
+     :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
 
-      ELSE IF( ITYPE .EQ. '_BYTE' ) THEN
+      ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
          CALL KPS1_SPARB( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( CNF_PVAL( IPDIN ) ), 
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
-     :                    GOTID, NM,
-     :                    UNITS, AXISR, 
-     :                    THETA, FWHM, GAMMA, PSFSIZ, 
-     :                    %VAL( CNF_PVAL( IPW2 ) ),
+     :                    GOTID, NM, UNITS, AXISR, THETA, FWHM, 
+     :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
 
-      ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
+      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPS1_SPARD( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( CNF_PVAL( IPDIN ) ), 
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
-     :                    GOTID, NM,
-     :                    UNITS, AXISR, 
-     :                    THETA, FWHM, GAMMA, PSFSIZ, 
-     :                    %VAL( CNF_PVAL( IPW2 ) ),
+     :                    GOTID, NM, UNITS, AXISR, THETA, FWHM, 
+     :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
 
-      ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
+      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPS1_SPARI( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( CNF_PVAL( IPDIN ) ), 
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
-     :                    GOTID, NM,
-     :                    UNITS, AXISR, 
-     :                    THETA, FWHM, GAMMA, PSFSIZ, 
-     :                    %VAL( CNF_PVAL( IPW2 ) ),
+     :                    GOTID, NM, UNITS, AXISR, THETA, FWHM, 
+     :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
 
-      ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
+      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
          CALL KPS1_SPARUW( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( CNF_PVAL( IPDIN ) ), 
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
-     :                    GOTID, NM,
-     :                    UNITS, AXISR, 
-     :                    THETA, FWHM, GAMMA, PSFSIZ, 
-     :                    %VAL( CNF_PVAL( IPW2 ) ),
+     :                    GOTID, NM, UNITS, AXISR, THETA, FWHM, 
+     :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
 
-      ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
+      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
          CALL KPS1_SPARUB( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( CNF_PVAL( IPDIN ) ), 
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
-     :                    GOTID, NM,
-     :                    UNITS, AXISR, 
-     :                    THETA, FWHM, GAMMA, PSFSIZ, 
-     :                    %VAL( CNF_PVAL( IPW2 ) ),
+     :                    GOTID, NM, UNITS, AXISR, THETA, FWHM, 
+     :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
 
-      ELSE IF( ITYPE .EQ. '_WORD' ) THEN
+      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          CALL KPS1_SPARW( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
      :                    %VAL( CNF_PVAL( IPDIN ) ), 
      :                    SLBND, ISIZE, RANGE, GAUSS,
      :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
      :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
-     :                    GOTID, NM,
-     :                    UNITS, AXISR, 
-     :                    THETA, FWHM, GAMMA, PSFSIZ, 
-     :                    %VAL( CNF_PVAL( IPW2 ) ),
+     :                    GOTID, NM, UNITS, AXISR, THETA, FWHM, 
+     :                    GAMMA, PSFSIZ, %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
 
       END IF
@@ -810,7 +829,7 @@
 
 *  A null value means just use the same dimensions as was used to
 *  calculate the mean profile.
-      IF( STATUS .EQ. PAR__NULL ) THEN
+      IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          PSFDIM( 1 ) = PSFSIZ
          PSFDIM( 2 ) = PSFSIZ
@@ -834,8 +853,8 @@
       UBND( 2 ) = INT( PY ) + 1 + PSFDIM( 2 ) / 2
       LBND( 2 ) = INT( PY ) + 1 - PSFDIM( 2 ) / 2
 
-*  Find the complete bounds of this section of the input NDF, remembering to
-*  leave bounds of any insignificant axes unchanged.
+*  Find the complete bounds of this section of the input NDF, 
+*  remembering to leave bounds of any insignificant axes unchanged.
       CALL NDF_BOUND( INDF1, NDF__MXDIM, LBNDS, UBNDS, NDIMS, STATUS )
       DO I = 1, NDIM
          UBNDS( SDIM( I ) ) = UBND( I )
@@ -859,7 +878,7 @@
       CALL PSX_CALLOC( NW, '_DOUBLE', IPW4, STATUS )
 
 *  Fill the data array with the evaluated point-spread function.
-      IF( STATUS .EQ. SAI__OK ) THEN
+      IF ( STATUS .EQ. SAI__OK ) THEN
          CALL KPS1_PSEVL( AMP, AXISR, THETA, FWHM, GAMMA, LBND( 1 ), 
      :                    UBND( 1 ), LBND( 2 ), UBND( 2 ), PX, PY,
      :                    %VAL( CNF_PVAL( IPPSF ) ), STATUS )
@@ -883,7 +902,7 @@
 
 *  A null status can be ignored.  This means that no output NDF was
 *  required.
-      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
@@ -895,13 +914,13 @@
   999 CONTINUE
 
 *  Close the log file.
-      IF( LOGPOS ) CALL FIO_ANNUL( FDL, STATUS )
+      IF ( LOGPOS ) CALL FIO_ANNUL( FDL, STATUS )
 
 *  Tidy the workspace, etc.
       CALL PSX_FREE( IPW1, STATUS )
       CALL PSX_FREE( IPW2, STATUS )
       CALL PSX_FREE( IPIN, STATUS )
-      IF( GOTID ) CALL PSX_FREE( IPID, STATUS )
+      IF ( GOTID ) CALL PSX_FREE( IPID, STATUS )
 
 *  Close down the NDF system, unmapping the NDF.
       CALL NDF_END( STATUS )
@@ -910,9 +929,9 @@
       CALL AST_END( STATUS )
 
 *  If an error occurred, then report a contextual message.
-      IF( STATUS .NE. SAI__OK ) THEN
+      IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'PSF_ERR', 'PSF: Error finding a model star '//
-     :                 'profile for a 2-dimensional NDF.', STATUS )
+     :                 'profile for a two-dimensional NDF.', STATUS )
       END IF
 
       END
