@@ -1,7 +1,7 @@
       SUBROUTINE KPS1_CLPS<T>( AXIS, LO, HI, VAR, METH, WLIM, NEL2, 
      :                       NDIM1, LBND1, UBND1, DIN, VIN, CIN, WIN,
      :                       NDIM2, LBND2, UBND2, USEWRK, DOUT, VOUT, 
-     *                       WORK1, WORK2, WORK3, STATUS )
+     :                       WORK1, WORK2, WORK3, STATUS )
 *+
 *  Name:
 *     KPS1_CLPS<T>
@@ -109,8 +109,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -166,6 +166,9 @@
 *        are degenerate.
 *     22-DEC-2006 (DSB):
 *        Avoid allocating a covariance array if it is not needed.
+*     2006 December 22 (MJC):
+*        Revise the test for the methods that use covariance, following
+*        the addition of the many new methods.
 *     {enter_further_changes_here}
 
 *-
@@ -236,6 +239,7 @@
       INTEGER START              ! The first input element to use
       INTEGER STEP1              ! Vector step between collapsed pixels
       LOGICAL USECO              ! Method uses the co-ordinate array?
+      LOGICAL USECV              ! Method uses a covariance array?
       LOGICAL USEIND             ! Method uses the pixel-index array?
       LOGICAL USEWID             ! Method uses the width array?
 
@@ -299,10 +303,12 @@
          GO TO 999
       END IF
 
-*  Decide whether indices, co-ordinates, and widths array is used.
+*  Decide whether indices, co-ordinates, covariances, and widths array 
+*  is used.
       USEIND = IMETH .GE. 31 .AND. IMETH .LE. 34
       USECO = IMETH .EQ. 22 .OR. IMETH .EQ. 23 .OR. IMETH .EQ. 33 .OR.
      :        IMETH .EQ. 34
+      USECV = IMETH .GE. 3 .AND. IMETH .LE. 11
       USEWID = IMETH .EQ. 21
      
 *  Find the size of each dimension in the output array. Also initialize 
@@ -440,7 +446,7 @@
 *  Allocate memory.
          CALL PSX_CALLOC( NLIN, '_DOUBLE', IPPP, STATUS )
          NMAT = NLIN * ( NLIN + 1 ) / 2 
-         IF( IMETH .GE. 3 .AND. IMETH .LE. 11 ) THEN
+         IF ( USECV ) THEN
             CALL PSX_CALLOC( NLIN * NMAT, '_DOUBLE', IPCOV, STATUS )
          ELSE
             IPCOV = IPPP
@@ -479,8 +485,7 @@
          END IF
 
          CALL PSX_FREE( IPPP, STATUS )
-         IF ( IMETH .NE. 1 .AND. IMETH .NE. 2 .AND. IMETH .NE. 300 ) 
-     :     CALL PSX_FREE( IPCOV, STATUS )
+         IF ( USECV ) CALL PSX_FREE( IPCOV, STATUS )
 
 *  Now deal with cases where input variances are not available.  No
 *  output variances will be created.
