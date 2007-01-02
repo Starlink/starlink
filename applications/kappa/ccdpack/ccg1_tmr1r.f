@@ -26,7 +26,7 @@
 *  Arguments:
 *     ALPHA = REAL (Given)
 *        The fraction of data to trim from upper and lower orders.
-*        (MUST BE GREATER THAN 0.0 AND LESS 0.5)
+*        It must be greater than 0.0 and less than 0.5.
 *     STACK( NPIX, NLINES ) = REAL (Given)
 *        The array of lines which are to be combined into a single line.
 *     NPIX = INTEGER (Given)
