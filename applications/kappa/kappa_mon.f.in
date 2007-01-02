@@ -40,7 +40,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -50,8 +50,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -97,6 +97,10 @@
 *        Enable AST Memory Cache.
 *     2006 April 13 (MJC):
 *        Added CHANMAP.
+*     2006 October 10 (MJC):
+*        Added ODDEVEN.
+*     2006 October 10 (MJC):
+*        Added CUMULVEC.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -287,6 +291,10 @@
          ELSE IF ( NAME .EQ. 'CSUB' ) THEN
             CALL CSUB ( STATUS )
 
+*  Form cumyulative vector.
+         ELSE IF ( NAME .EQ. 'CUMULVEC' ) THEN
+            CALL CUMULVEC ( STATUS )
+
 *  Divides one NDF data structure by another.
          ELSE IF ( NAME .EQ. 'DIV' ) THEN
             CALL KAP_DIV( STATUS )
@@ -440,6 +448,10 @@
 *  greater than a specified value.
          ELSE IF ( NAME .EQ. 'NUMB' ) THEN
             CALL NUMB ( STATUS )
+
+*  Averages alternate pixels in a vector.
+         ELSE IF ( NAME .EQ. 'ODDEVEN' ) THEN
+            CALL ODDEVEN ( STATUS )
 
 *  Sets pixels outside a specified circle in a 2-d data array
 *  to a specified value.
