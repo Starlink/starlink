@@ -117,7 +117,7 @@ maths median mstats mult noglobals nomagic normalize numb outset parget \
 paste permaxes pixdupe psf rift regrid rotate segment setmagic shadow \
 slide sqorst stats sub substitute surfit thresh trandat trig wiener   \
 zaplin listmake listshow profile wcsalign wcsmosaic wcstran kapversion \
-kaphelp mfittrend makesnr
+kaphelp mfittrend makesnr oddeven cumulvec
 
 KAPVIEW_TASKS = ardplot clinplot colcomp contour cursor drawsig \
 drawnorth display elprof gdclear gdnames gdset gdstate linplot lutable \
@@ -256,29 +256,29 @@ globals.ifc histat.ifc histeq.ifc histogram.ifc \
 kstest.ifc laplace.ifc logar.ifc look.ifc \
 lucy.ifc makesnr.ifc makesurface.ifc manic.ifc maths.ifc \
 median.ifc mstats.ifc mult.ifc noglobals.ifc \
-nomagic.ifc normalize.ifc numb.ifc outset.ifc \
+nomagic.ifc normalize.ifc numb.ifc oddeven.ifc outset.ifc \
 parget.ifc paste.ifc permaxes.ifc pixdupe.ifc \
 psf.ifc regrid.ifc rift.ifc add.ifc aperadd.ifc \
 ardgen.ifc ardmask.ifc block.ifc cadd.ifc calc.ifc \
 calpol.ifc cdiv.ifc centroid.ifc chanmap.ifc chpix.ifc \
 cmult.ifc collapse.ifc compadd.ifc compave.ifc compick.ifc \
-convolve.ifc copybad.ifc creframe.ifc csub.ifc div.ifc \
+convolve.ifc copybad.ifc creframe.ifc csub.ifc cumulvec.ifc div.ifc \
 pow.ifc ndfpack_mon.ifc kapview_mon.ifc kappa_mon.ifc
 
 
 BUILT_IFL_FILES = kappa_mon.ifl chanmap.ifl \
 chpix.ifl cmult.ifl collapse.ifl \
 compadd.ifl compave.ifl compick.ifl convolve.ifl \
-copybad.ifl creframe.ifl csub.ifl div.ifl errclip.ifl \
+copybad.ifl creframe.ifl csub.ifl cumulvec.ifl div.ifl errclip.ifl \
 expon.ifl ffclean.ifl fillbad.ifl fitsurface.ifl \
 flip.ifl fourier.ifl gausmooth.ifl glitch.ifl \
 globals.ifl histat.ifl histeq.ifl histogram.ifl \
-kaphelp.ifl kapversion.ifl kstest.ifl \
-laplace.ifl listmake.ifl listshow.ifl logar.ifl \
+kaphelp.ifl kapversion.ifl kstest.ifl laplace.ifl \
+listmake.ifl listshow.ifl logar.ifl \
 look.ifl lucy.ifl makesnr.ifl makesurface.ifl manic.ifl \
 maths.ifl median.ifl mstats.ifl mult.ifl \
 noglobals.ifl nomagic.ifl normalize.ifl numb.ifl \
-outset.ifl parget.ifl paste.ifl permaxes.ifl \
+oddeven.ifl outset.ifl parget.ifl paste.ifl permaxes.ifl \
 pixdupe.ifl pow.ifl profile.ifl psf.ifl regrid.ifl \
 rift.ifl rotate.ifl segment.ifl setmagic.ifl \
 shadow.ifl slide.ifl sqorst.ifl stats.ifl sub.ifl \
