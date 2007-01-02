@@ -88,7 +88,8 @@ KPG_N_GEN = kps1_apad.gen kps1_ardm.gen kps1_lapl.gen kps1_prmx.gen \
             kps1_cpb.gen
 
 KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr kps1_subi.gdr \
-             kps1_cnse.gdr kps1_mfed.gdr kps1_mffr.gdr kps1_roli.gdr
+             kps1_cnse.gdr kps1_mfed.gdr kps1_mffr.gdr kps1_roli.gdr \
+             kps1_oea.gdr kps1_cpwd.gdr
 
 KPG_BDIRW_GEN = kps1_dscl.gbdirw
 
