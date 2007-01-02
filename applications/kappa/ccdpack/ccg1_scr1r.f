@@ -212,7 +212,7 @@
             VAR = 1.0D0 / SUM1
 
 *  Sort data prior to rejection -- this is necessary as clip may be
-*  non-central for (noisy) skew distributions, so the order statitics
+*  non-central for (noisy) skew distributions, so the order statistics
 *  summation will be incorrect if we procede assuming that the mean is
 *  central also for the covariances.
             CALL CCG1_IS3R( WRK1, WRK2, POINT, NGOOD, STATUS )
