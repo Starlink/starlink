@@ -8584,6 +8584,15 @@ package kappa {
             default !
             helpkey *
           }
+         parameter variance {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Process the variance array?}
+            helpkey *
+          }
          parameter wcsatts {
             type LITERAL
             ppath DEFAULT
@@ -9278,6 +9287,48 @@ package kappa {
             helpkey *
           }
 
+      }
+
+      action cumulvec {
+         alias {cum(ulvec)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            prompt {NDF to be summed}
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            help "*"
+          }
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            prompt {Summed NDF}
+            association ->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+         parameter thresh {
+            position 3
+            type _DOUBLE
+            prompt {Maximum difference of adjacent array values}
+            ppath CURRENT
+            default !
+            helpkey *
+          }
+         parameter title {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Title for output NDF}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
       }
 
       action div {
@@ -10666,47 +10717,6 @@ iraf! {
       }
 }
 
-      action laplace {
-         alias {lapl(ace)}
-
-         helplib {$KAPPA_HELP}
-
-         parameter in {
-            position 1
-            type NDF
-            access READ
-            vpath PROMPT
-            prompt {Input NDF}
-            ppath GLOBAL CURRENT
-            association <-GLOBAL.DATA_ARRAY
-            helpkey *
-          }
-         parameter number {
-            type _INTEGER
-            vpath DEFAULT
-            prompt {Number of Laplacians to remove}
-            ppath CURRENT DEFAULT
-            default 1
-            helpkey *
-          }
-         parameter out {
-            position 2
-            type NDF
-            access WRITE
-            vpath PROMPT
-            prompt {Output NDF}
-            association ->GLOBAL.DATA_ARRAY
-            helpkey *
-          }
-         parameter title {
-            type LITERAL
-            vpath DEFAULT
-            prompt {Output title}
-            default !
-            helpkey *
-          }
-      }
-
       action kstest {
          alias {kste(st)}
 
@@ -10821,6 +10831,47 @@ iraf! {
             helpkey *
           }
  
+      }
+
+      action laplace {
+         alias {lapl(ace)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            prompt {Input NDF}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+         parameter number {
+            type _INTEGER
+            vpath DEFAULT
+            prompt {Number of Laplacians to remove}
+            ppath CURRENT DEFAULT
+            default 1
+            helpkey *
+          }
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            prompt {Output NDF}
+            association ->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+         parameter title {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Output title}
+            default !
+            helpkey *
+          }
       }
 
       action logar {
@@ -13132,6 +13183,48 @@ iraf! {
             helpkey *
           }
 
+      }
+
+      action oddeven {
+         alias {od(deven)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            prompt {NDF to be smoothed}
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            help "*"
+          }
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            prompt {Smoothed NDF}
+            association ->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+         parameter thresh {
+            position 3
+            type _DOUBLE
+            prompt {Maximum difference of adjacent array values}
+            ppath CURRENT
+            default !
+            helpkey *
+          }
+         parameter title {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Title for output NDF}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
       }
 
       action outset {
