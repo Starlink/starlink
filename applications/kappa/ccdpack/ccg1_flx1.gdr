@@ -20,7 +20,7 @@
 *     multiplied by its pixel width lines are then summed, i.e a flux. 
 *     The output integrated values are returned in the array RESULT.  
 *     The output variances are estimated from the VARS values and are
-*      returned in RESVAR; this assumes no errors in the widths.
+*     returned in RESVAR; this assumes no errors in the widths.
 
 *  Arguments:
 *     NPIX = INTEGER (Given)
@@ -63,6 +63,8 @@
 *        Added a dimension to WIDTHS to provide a width for each pixel.
 *        This avoids the assumption of a constant AXIS-like array
 *        applicable to output pixels.
+*     2006 December 23 (MJC):
+*        Separate the variance summations from the data summations.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -105,6 +107,7 @@
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Loop variable
       INTEGER NGOOD              ! Number of good pixels
+      INTEGER NGOODV             ! Number of good variances
       DOUBLE PRECISION SUM1      ! Sum of variance-width product
       DOUBLE PRECISION SUM2      ! Sum of value-width product
       DOUBLE PRECISION WIDTH     ! A pixel width
@@ -127,47 +130,65 @@
          SUM1 = 0.0D0
          SUM2 = 0.0D0
          NGOOD = 0
+         NGOODV = 0
          CALL NUM_CLEARERR()
 
 *  Loop over all possible contributing pixels forming the required 
 *  sums.
          DO 5 J = 1, NLINES
-            IF (  STACK( I, J ) .NE. VAL__BAD<T> .AND.
-     :             VARS( I, J ) .NE. VAL__BAD<T> .AND.
-     :           WIDTHS( I, J ) .NE. VAL__BAD<T> ) THEN
-
-*  Conversion increment good value counter.
-               NGOOD = NGOOD + 1
-
+            IF ( WIDTHS( I, J ) .NE. VAL__BAD<T> ) THEN
                WIDTH = NUM_<T>TOD( WIDTHS( I, J ) )
 
-*  Sum the varaince-width product forming the variance of the flux
-*  for the line.
-               SUM1 = SUM1 + NUM_<T>TOD( VARS( I, J ) ) * WIDTH
+               IF ( STACK( I, J ) .NE. VAL__BAD<T> ) THEN
 
-*  Sum the data value-width product forming a flux for the line.
-               SUM2 = SUM2 + NUM_<T>TOD( STACK( I, J ) ) * WIDTH
+*  Conversion increment good value counter.
+                  NGOOD = NGOOD + 1
+
+*  Sum the variance-width product forming the variance of the flux
+*  for the line.
+                  SUM1 = SUM1 + NUM_<T>TOD( VARS( I, J ) ) * WIDTH
 
 *  Update the contribution buffer; all values contribute when forming
 *  the flux.
-               NCON( J ) = NCON( J ) + 1.0D0
+                  NCON( J ) = NCON( J ) + 1.0D0
+               END IF
+
+               IF ( VARS( I, J ) .NE. VAL__BAD<T> ) THEN
+
+*  Sum the data value-width product forming a flux for the line.
+                  NGOODV = NGOODV + 1
+                  SUM2 = SUM2 + NUM_<T>TOD( STACK( I, J ) ) * WIDTH
+               END IF
             END IF
     5    CONTINUE
 
-*  If there are sufficient good pixels, output the result.
+*  If there are sufficient good pixels, output the resulting value.
          IF ( NGOOD .GE. MINPIX ) THEN
             RESULT( I ) = NUM_DTO<T>( SUM2 )
-            RESVAR( I ) = NUM_DTO<T>( SUM1 )
 
 *  Trap numeric errors.
             IF ( .NOT. NUM_WASOK() ) THEN
                RESULT( I ) = VAL__BAD<T>
-               RESVAR( I ) = VAL__BAD<T>
             END IF
          ELSE
 
 *  Not enough contributing pixels, set output invalid.
             RESULT( I ) = VAL__BAD<T>
+         END IF
+
+*  If there are sufficient good variances, form the output variance
+*  normalised to the data value in case the releative numbers of good
+*  values and variances are disparate.
+         IF ( NGOODV .GE. MINPIX ) THEN
+            RESVAR( I ) = NUM_DTO<T>( SUM1 * DBLE( NGOOD / NGOODV ) )
+
+*  Trap numeric errors.
+            IF ( .NOT. NUM_WASOK() ) THEN
+               RESVAR( I ) = VAL__BAD<T>
+            END IF
+         ELSE
+
+*  Not enough contributing pixels, set output invalid.
             RESVAR( I ) = VAL__BAD<T>
          END IF
 

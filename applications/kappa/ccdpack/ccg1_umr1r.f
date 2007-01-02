@@ -40,7 +40,7 @@
 *        The data variances.
 *     MINPIX = INTEGER (Given)
 *        The minimum number of pixels required to contribute to an
-*        output pixel.
+*        output pixel or variance.
 *     RESULT( NPIX ) = REAL (Returned)
 *        The output line of data.
 *     RESVAR( NPIX ) = REAL (Returned)
@@ -64,6 +64,8 @@
 *        No longer use NUM_CMN.
 *     2005 December 27 (MJC):
 *        Remove unused variables.
+*     2006 December 15 (MJC):
+*        Check for valid variance and data value independently.
 *    {enter_changes_here}
 
 *  Bugs:
@@ -108,8 +110,9 @@
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Loop variable
       INTEGER NGOOD              ! Number of good pixels
-      DOUBLE PRECISION SUM1      ! Sum of weights
-      DOUBLE PRECISION SUM2      ! Sum of weighted values
+      INTEGER NGOODV             ! Number of good variances
+      DOUBLE PRECISION SUMD      ! Sum of data values
+      DOUBLE PRECISION SUMV      ! Sum of variances
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
@@ -127,46 +130,61 @@
       DO 1 I = 1, NPIX
 
 *  Loop over for all possible output pixels.
-         SUM1 = 0.0D0
-         SUM2 = 0.0D0
+         SUMV = 0.0D0
+         SUMD = 0.0D0
          NGOOD = 0
+         NGOODV = 0
          CALL NUM_CLEARERR()
 
 *  Loop over all possible contributing pixels forming the required 
 *  sums.
          DO 5 J = 1, NLINES
-            IF( STACK( I, J ) .NE. VAL__BADR .AND.
-     :           VARS( I, J ) .NE. VAL__BADR ) THEN
+            IF ( STACK( I, J ) .NE. VAL__BADR ) THEN
 
 *  Conversion increment good value counter.
                NGOOD = NGOOD + 1
 
-*  Sum the variances.
-               SUM1 = SUM1 + NUM_RTOD( VARS( I, J ) )
-
 *  Sum the data values.
-               SUM2 = SUM2 + NUM_RTOD( STACK( I, J ) )
+               SUMD = SUMD + NUM_RTOD( STACK( I, J ) )
 
-*  Update the contribution buffer - all values contribute when forming
-*  mean.
+*  Update the contribution buffer; all values contribute when forming
+*  the mean.
                NCON( J ) = NCON( J ) + 1.0D0
             END IF
+
+*  Count the good variances and sum them.
+            IF ( VARS( I, J ) .NE. VAL__BADR ) THEN
+               NGOODV = NGOODV + 1
+               SUMV = SUMV + NUM_RTOD( VARS( I, J ) )
+            END IF
+
  5       CONTINUE
 
 *  If there are sufficient good pixels output the result.
          IF ( NGOOD .GE. MINPIX ) THEN
-            RESULT( I ) = REAL( SUM2 / NGOOD )
-            RESVAR( I ) = REAL( SUM1 / (NGOOD*NGOOD) )
+            RESULT( I ) = REAL( SUMD / NGOOD )
 
 *  Trap numeric errors.
             IF ( .NOT. NUM_WASOK() ) THEN
                RESULT( I ) = VAL__BADR
-               RESVAR( I ) = VAL__BADR
             END IF
          ELSE
 
 *  Not enough contributing pixels, set output invalid.
             RESULT( I ) = VAL__BADR
+         END IF
+
+*  If there are sufficient good variances, form the output variance.
+         IF ( NGOODV .GE. MINPIX ) THEN
+            RESVAR( I ) = NUM_DTOR( SUMV / NUM_ITOD( NGOODV * NGOODV ) )
+
+*  Trap numeric errors.
+            IF ( .NOT. NUM_WASOK() ) THEN
+               RESVAR( I ) = VAL__BADR
+            END IF
+         ELSE
+
+*  Not enough contributing pixels, set output invalid.
             RESVAR( I ) = VAL__BADR
          END IF
 
