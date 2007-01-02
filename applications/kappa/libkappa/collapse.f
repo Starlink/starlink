@@ -114,6 +114,13 @@
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
 *        propagates the title from the input NDF to the output NDF. [!]
+*     VARIANCE = _LOGICAL (Read)
+*        A flag indicating whether a variance array present in the
+*        NDF is used to weight data values while forming the estimator's
+*        statistic, and to derive output variance.  If VARIANCE is TRUE 
+*        and the NDF contains a variance array, this array will be
+*        used to define the weights, otherwise all the weights will be
+*        set equal.  [TRUE]
 *     WCSATTS = GROUP (Read)
 *        A group of attribute settings which will be used to temporarily 
 *        modify the properties of the current co-ordinate Frame in the WCS 
@@ -227,7 +234,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -237,8 +244,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -316,6 +323,8 @@
 *        required.
 *     25-SEP-2006 (DSB):
 *        Added WCSATTS parameter.
+*     2006 December 13 (MJC):
+*        Added VARIANCE parameter.
 *     21-DEC-2006 (DSB):
 *        Manage without an inverse WCS transformation, when possible.
 *     {enter_further_changes_here}
@@ -456,7 +465,10 @@
                                  ! section of the input NDF
       LOGICAL GOTAX              ! Does the NDF have an AXIS component?
       LOGICAL LOOP               ! Continue to loop through dimensions?
+      LOGICAL NDFVAR             ! NDF contains a variance array?
       LOGICAL USEALL             ! Use the entire collapse pixel axis?
+      LOGICAL USEVAR             ! Allow weights to be derived from the
+                                 ! NDF's variance array (if present)
       LOGICAL VAR                ! Process variances?
       REAL WLIM                  ! Value of WLIM parameter
 *.
@@ -759,7 +771,16 @@
 *  ==============================================
 
 *  See if the input NDF has a Variance component.
-      CALL NDF_STATE( INDFI, 'VARIANCE', VAR, STATUS )
+      CALL NDF_STATE( INDFI, 'VARIANCE', NDFVAR, STATUS )
+
+*  Find out whether variances are to be used to define the weights, if
+*  the NDF contains any.
+      USEVAR = .FALSE.
+      IF ( NDFVAR ) CALL PAR_GET0L( 'VARIANCE', USEVAR, STATUS )
+
+*  Weights will be derived from variances only if allowed by USEVAR and
+*  if the NDF contains a variance array.
+      VAR = ( USEVAR .AND. NDFVAR )
 
 *  Store a list of components to be accessed.
       IF ( VAR ) THEN
@@ -1043,7 +1064,7 @@
 *  which case no work space is needed).
          IF ( HIGHER ) THEN
             CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW1, STATUS )
-            IF( VAR ) THEN
+            IF ( VAR ) THEN
                CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW2, STATUS )
             ELSE
                IPW2 = IPW1
@@ -1052,7 +1073,7 @@
 *  Store safe pointer values if no work space is needed.
          ELSE
             IPW1 = IPIN( 1 )
-           IPW2 = IPIN( 1 )
+            IPW2 = IPIN( 1 )
          END IF
 
 *  Associate co-ordinate information.
@@ -1107,7 +1128,7 @@
 *  methods.
          IF ( ESTIM .EQ. 'INTEG' ) THEN
          
-*  Allocate work space for thw widths to be derived from the
+*  Allocate work space for the widths to be derived from the
 *  co-ordinates.  This assumes full filling of pixels.
             CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPWID, STATUS )
 
@@ -1158,7 +1179,7 @@
 *  Free the work space.
          IF ( HIGHER ) THEN
             CALL PSX_FREE( IPW1, STATUS )
-            IF( VAR ) CALL PSX_FREE( IPW2, STATUS )
+            IF ( VAR ) CALL PSX_FREE( IPW2, STATUS )
          END IF
 
          IF ( ESTIM .EQ. 'COMAX' .OR. ESTIM .EQ. 'COMIN' .OR.
