@@ -1,0 +1,128 @@
+      SUBROUTINE KPS1_OEA<T>( EL, IN, THRESH, OUT, NMOD, STATUS )
+*+
+*  Name:
+*     KPS1_OEA<T>
+
+*  Purpose:
+*     Averages adjacent pairs of pixels in an array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_OEA<T>( EL, IN, THRESH, OUT, NMOD, STATUS )
+
+*  Description:
+*     This routine adjusts the values of pairs of adjacent pixels by 
+*     averaging, provided both pixels are good and their absolute 
+*     difference is less than a supplied threshold.
+
+*  Arguments:
+*     EL = INTEGER (Given)
+*        The number of elements in the arrays.
+*     IN( EL ) = <TYPE> (Given)
+*        The input array.
+*     THRESH = <TYPE> (Given)
+*        The threshold.  The absolute value of IN(i)-IN(i+1) where
+*        i is odd, must be less than this threshold for the input 
+*        values to be modified, otherwise the input values are copied
+*        to the output.
+*     OUT( EL ) = <TYPE> (Given)
+*        The output array.
+*     NMOD = INTEGER (Returned)
+*        The number of elements modified by this routine.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for double-precision and single-precision
+*     floating-point data types: replace "x" in the routine name by D
+*     or R as appropriate.  The IN, THRESH, and OUT arguments must 
+*     have the data type specified.
+
+*  Copyright:
+*     Copyright (C) 2006 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2006 October 4 (MJC):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Bad-value constants
+ 
+*  Arguments Given:
+      INTEGER EL
+      <TYPE> IN( EL )
+      <TYPE> THRESH
+ 
+*  Arguments Returned:
+      <TYPE> OUT( EL )
+      INTEGER NMOD
+ 
+*  Status:
+      INTEGER STATUS             ! Global status
+ 
+*  Local Variables:
+      <LTYPE> DIFF               ! Difference between adjacent elements
+      INTEGER J                  ! Loop counter
+      INTEGER NEL                ! Even number of elements
+
+*.
+ 
+*  Check inherited global status.
+      NMOD = 0
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Copy the input array to the output array.
+*  Do each output value.
+      DO J = 1, EL
+         OUT( J ) = IN( J )
+      END DO
+
+      NEL = ( EL / 2 ) * 2
+      DO J = 1, NEL, 2
+
+*  Must have good values within the threshold.
+         IF ( IN( J ) .NE. VAL__BAD<T> .AND.
+     :        IN( J + 1 ) .NE. VAL__BAD<T> ) THEN
+            DIFF = IN( J ) - IN( J + 1 )
+            IF ( ABS( DIFF ) .LT. THRESH ) THEN
+
+* Apply the corrections.
+               OUT( J ) = IN( J ) - DIFF / 2<CONST>
+               OUT( J + 1 ) = IN( J + 1 ) + DIFF / 2<CONST>
+               NMOD = NMOD + 2
+            END IF
+         END IF
+            
+      END DO
+
+      END
