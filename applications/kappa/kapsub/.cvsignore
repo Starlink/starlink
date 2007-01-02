@@ -2,6 +2,7 @@ kps1_apad.f
 kps1_ardm.f
 kps1_cpb.f
 kps1_clps.f
+kps1_cpwd.f
 kps1_cnse.f
 kps1_dscl.f
 kps1_inle.f
@@ -17,6 +18,7 @@ kps1_mffr.f
 kps1_mmv.f
 kps1_pgft.f
 kps1_prmx.f
+kps1_oea.f
 kps1_roli.f
 kps1_rs1.f
 kps1_spar.f
