@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.32}
 \newcommand{\stardocnumber}    {95.32}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2006 October 30}
+\newcommand{\stardocdate}      {2006 December 30}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.6-3}
+\newcommand{\stardocversion}   {1.6-4}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -16937,7 +16937,18 @@ XV; PBMPLUS; NETPBM.
          TITLE = LITERAL (Read)
       }{
          \htmlref{Title}{apndf:title} for the output NDF structure.  A null value ({\tt{!}})
-         propagates the title from the input NDF to the output NDF. {\tt [!]} }
+         propagates the title from the input NDF to the output NDF. {\tt [!]}
+      }
+      \sstsubsection{
+         VARIANCE = \_LOGICAL (Read)
+      }{
+         A flag indicating whether a variance array present in the
+         NDF is used to weight data values while forming the estimator's
+         statistic, and to derive output variance.  If VARIANCE is {\tt TRUE}
+         and the NDF contains a variance array, this array will be
+         used to define the weights, otherwise all the weights will be
+         set equal.  {\tt [TRUE]}
+      }
       \sstsubsection{
          WCSATTS = GROUP (Read)
       }{
@@ -37311,7 +37322,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          plot.  The width of the margins left for the annotation may be
          controlled using parameter MARGIN.  The appearance of the axes
          (colours, fonts, \emph{etc.}) can be controlled using the parameter
-         STYLE. {\tt [TRUE]}
+         STYLE.  {\tt [TRUE]}
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -37321,13 +37332,13 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          but also an attempt is made to align the new picture with the
          existing picture.  Thus you can generate a composite plot within
          a single set of axes, say using different colours or modes to
-         distinguish data from different datasets. {\tt [TRUE]}
+         distinguish data from different datasets.  {\tt [TRUE]}
       }
       \sstsubsection{
          COFILE = FILENAME (Read)
       }{
          Name of a text file containing the co-ordinates of the stars
-         to be used.  Only accessed if parameter INCAT is given a null ({\tt{!}})
+         to be used.  It is only accessed if parameter INCAT is given a null ({\tt{!}})
          value.  Each line should contain the formatted axis values for a
          single position, in the current Frame of the NDF.  Columns can be
          separated by spaces, tabs or commas.  The file may contain
@@ -37347,7 +37358,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          amplitude of the PSF.  For example, if CUT={\tt{0.5}} the NDF would
          contain the point-spread function to half maximum.  CUT must
          be greater than 0 and less than 1.  The suggested default is
-         0.0001 {\tt [!]}
+         0.0001.  {\tt [!]}
       }
       \sstsubsection{
          DEVICE = \htmlref{DEVICE}{se:selgradev} (Read)
@@ -37397,9 +37408,9 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       }{
          The widths of the margins to leave for axis annotation, given
          as fractions of the corresponding dimension of the current picture.
-         Four values may be given, in the order - bottom, right, top, left.
-         If less than four values are given, extra values are used equal to
-         the first supplied value.  If these margins are too narrow any axis
+         Four values may be given, in the order: bottom, right, top, left.
+         If fewer than four values are given, extra values are used equal to
+         the first supplied value.  If these margins are too narrow, any axis
          annotation may be clipped.  If a null ({\tt{!}}) value is supplied, the
          value used is {\tt 0.15} (for all edges) if either annotated axes or a
          key are produced, and zero otherwise. {\tt [}current value{\tt{]}}
@@ -37618,7 +37629,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          psf ngc6405i cofile=starlist.dat gauss $\backslash$
       }{
          As the first example, except the psf is fitted to a
-         two-dimensional Gaussian,and the positions are given in a simple
+         two-dimensional Gaussian, and the positions are given in a simple
          text file ({\tt starlist.dat}) instead of a positions list.
       }
       \sstexamplesubsection{
@@ -37657,37 +37668,56 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          across the image.
 
          \sstitem
-         The method to calculate the fit is as follows:
+         The method to calculate the fit is as follows.
 
          \ssthitemlist{
 
             \sstitem
                Marginal profiles of each star image are formed in four
-               directions, inclined at 45-degree intervals.  A Gaussian curve
-               and background is fitted to each profile.  Using the resulting
-               four Gaussian centres, a mean centre is found for each star.
-   
-            \sstitem
-               The four Gaussian widths of all the stars are combined,
-               using a weighted average with rejection of erroneous data, and
-               from the four average widths the seeing-disc size, axis ratio
-               and axis inclination are calculated.
-   
-            \sstitem
-               The data surrounding each star is then binned into
-               isophotal zones which are elliptical annuli centred on the
-               star---the ellipse parameters being those just calculated.
-               The data in each zone is processed to remove erroneous points
-               and to find an average value.  A Gaussian profile is fitted to
-               these average values and the derived amplitude is used to
-               normalise the values to an amplitude of unity.  The normalised
-               values are put into bins together with the corresponding data
-               from all other stars and this binned data represents a
-               weighted average radial profile for the set of stars, with the
-               image ellipticity removed.  Finally a radial profile is fitted
-               to these data, giving the radial profile parameter gamma and a
-               final re-estimate of the seeing-disc size.
+               directions: at 0, 45, 90 and 135 degrees to the $x$ axis.  The 
+               profiles are cleaned via an iterative modal filter that 
+               removes contamination such as neighbouring stars; moving from 
+               the centre of the star, the filter prevents each data point 
+               from exceeding the maximum of the two previous data values.
 
+            \sstitem
+               A Gaussian curve and background is fitted to each profile
+               iteratively refining the parameters until parameters differ
+               by less than 0.1 per cent from the previous iteration.  If
+               convergence is not met after fifteen iterations, each fit
+               parameter is approximately the average of its last pair of
+               values.  The initial background is the lower quartile.
+
+               Using the resulting four Gaussian centres, a mean centre is 
+               found for each star.  Iterations cease when the mean centroid 
+               position shifts by less 0.001 from the previous iteration, or
+               after three iterations if the nominal tolerance is not
+               achieved.
+
+           \sstitem
+               The four Gaussian widths of all the stars are combined
+               modally, using an amplitude-weighted average with rejection of 
+               erroneous data (using a maximum-likelihood function for a
+               statistical model in which any of the centres has a constant
+               probability of being corrupt).  From the average widths along
+               the four profiles, the seeing-disc size, axis ratio and axis 
+               inclination are calculated.
+
+           \sstitem
+               The data surrounding each star is then binned into isophotal
+               zones which are elliptical annuli centred on the star---the 
+               ellipse parameters being those just calculated.  The data in 
+               each zone is processed to remove erroneous points (using the 
+               aforementioned maximum-likelihood function) and to find an 
+               average value.  A Gaussian profile is fitted to these average
+               values and the derived amplitude is used to normalise the
+               values to an amplitude of unity.  The normalised values are put
+               into bins together with the corresponding data from all other 
+               stars and these binned data represent a weighted average radial
+               profile for the set of stars, with the image ellipticity
+               removed.  Finally a radial profile is fitted to these data,
+               giving the radial profile parameter gamma and a final 
+               re-estimate of the seeing-disc size.
          }
          
          \sstitem
@@ -51150,6 +51180,8 @@ The following applications have been modified:
          \item A new parameter called WCSATTS has been added which allows
          changes to be made to the properties of the current WCS co-ordinate 
          system read from the input NDF.
+         \item A new parameter VARIANCE controls whether or not
+         variance information present in the input NDF is actually used.
       \end{itemize}
 
    \item [\htmlref{DISPLAY}{DISPLAY}] \mbox{}
