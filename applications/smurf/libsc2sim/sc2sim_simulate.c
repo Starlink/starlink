@@ -382,10 +382,14 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   /* Main routine */
   ndfBegin ();
 
-  /* Setup instap and telpos */
+  /* Setup instap (converted from arcsec to radians) and telpos */
   smf_calc_telpos( NULL, "JCMT", telpos, status );
-  instap[0] = inx->instap_x;
-  instap[1] = inx->instap_y;
+  if ( strncmp( inx->instap, " ", 1 ) != 0 ) {
+    sc2sim_instap_calc( inx, instap, status );
+  } else {
+    instap[0] = DAS2R * inx->instap_x;
+    instap[1] = DAS2R * inx->instap_y;
+  }
 
   if( *status == SAI__OK ) {
     /* Calculate year/month/day corresponding to MJD at start */
@@ -821,12 +825,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         base_el[frame] = temp2;
         base_p[frame] = temp3;
 
-        /* The scan pattern (posptr) is defined as a series of offsets in
-	   ARCSEC in
-           the map coordinate frame. Depending on the frame chosen, project
-           the pattern into AzEl and RADec so that it can be written to the
-           JCMTState structure */
-
+        /* The scan pattern (posptr) is defined as a series of offsets
+	   in ARCSEC in the map coordinate frame. Depending on the
+	   frame chosen, project the pattern into AzEl and RADec so
+	   that it can be written to the JCMTState structure */
 	switch( coordframe ) {
 	  
 	case nasmyth:
