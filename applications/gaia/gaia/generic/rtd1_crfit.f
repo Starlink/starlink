@@ -386,7 +386,15 @@
             END IF
             CALL ERR_RLSE
          END IF
+
+*  Free the WCS. May be in a poor state after all the above, so trap any
+*  errors. 
+         CALL ERR_MARK
          CALL AST_ANNUL( IWCS, STATUS )
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+         END IF
+         CALL ERR_RLSE
       END IF
 
 *  If no FITS headers or no existing ORIGIN card then add the Starlink
