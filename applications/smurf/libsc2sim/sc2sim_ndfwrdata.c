@@ -102,7 +102,7 @@
 *     2006-12-19 (TIMJ):
 *        sc2store_wrtstream has additional subnum argument
 *     2006-12-21 (AGG):
-*        Add instap_x/y FITS headers
+*        Add instap & instap_x/y FITS headers
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -231,6 +231,7 @@ int *status       /* global status (given and returned) */
    astSetFitsS ( fitschan, "INSTRUME", instrume, "Instrument name", 0 );
    astSetFitsS ( fitschan, "TELESCOP", "JCMT", "Name of telescope", 0 );
 
+   astSetFitsS ( fitschan, "INSTAP", inx->instap, "Instrument aperture", 0 );
    astSetFitsF ( fitschan, "INSTAP_X", inx->instap_x, "X focal plane offset (arcsec)", 0 );
    astSetFitsF ( fitschan, "INSTAP_Y", inx->instap_y, "Y focal plane offset (arcsec)", 0 );
    
