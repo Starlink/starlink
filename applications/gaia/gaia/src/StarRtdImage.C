@@ -1799,9 +1799,9 @@ int StarRtdImage::astsetCmd( int argc, char *argv[] )
     }
     if ( wcsp->astSetAttrib( argv[0], argv[1] ) ) {
         return TCL_OK;
-    } else {
-        return error( "Failed to set:" , argv[0] );
-    }
+    } 
+
+    return error( "Failed to set:" , argv[0] );
 }
 
 //+
@@ -1829,7 +1829,8 @@ int StarRtdImage::astaddcolourCmd( int argc, char *argv[] )
     int index = 0;
     if ( Tcl_GetInt( interp_, argv[0], &index ) != TCL_OK ) {
         return error( argv[0], " is not an integer");
-    } else {
+    } 
+    else {
         // Make sure that default colours are established and add new
         // one.
         astTk_Init( interp_, canvasName_ );
@@ -3307,8 +3308,8 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
 
         //  Ok now create a new SkyFrame with the options we have been given.
         newfrm = (AstFrame *) astSkyFrame( argv[1] );
-    } else {
-
+    } 
+    else {
         //  Want a pixel coordinate system (only sensible for NDFs when
         //  pixel coordinates are different from grid coordinates).
         newfrm = (AstFrame *) makeGridWCS( );
@@ -3317,8 +3318,8 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
 
         //  If any of the above failed, then report the error.
         return error ( "failed to establish new system coordinates system");
-    } else {
-
+    } 
+    else {
         //  Get a mapping to convert to the new system and add this
         //  to the current frameset. Note we convert from BASE frame to
         //  the new skyframe to force AST to retain all the current
@@ -3332,7 +3333,8 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
         if ( astOK ) {
             newset_ = (AstFrameSet *) astAnnul( newset_ );
             newset_ = cvt;
-        } else {
+        } 
+        else {
             cvt = (AstFrameSet *) astAnnul( cvt );
             return error ( "failed to convert from existing system "
                            "to new system");
