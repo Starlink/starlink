@@ -65,7 +65,7 @@
 *     2006-12-18 (JB):
 *        Replace pattern-specific parameters with general values.
 *     2006-12-21 (AGG):
-*        Add instap_x/y
+*        Add instap & instap_x/y
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -214,6 +214,12 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
 
    if ( !astMapGet0D ( keymap, "HEIGHT", &(inx->height) ) )
      inx->height = 2000.0;
+
+   if ( !astMapGet0C ( keymap, "INSTAP", &temp ) ) {
+     strncpy ( inx->instap, "", SC2SIM__FLEN );
+   } else {
+     strncpy ( inx->instap, temp, SC2SIM__FLEN );
+   }
 
    if ( !astMapGet0D ( keymap, "INSTAP_X", &(inx->instap_x) ) )
       inx->instap_x = 0.0;

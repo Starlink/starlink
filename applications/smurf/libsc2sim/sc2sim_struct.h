@@ -34,7 +34,7 @@
     18Dec2006 : Add DUT1 parameter (agg)
     18Dec2006 : Replace pattern-specific parameters with general 
                 parameters (jb)
-    21Dec2006 : Add instap_x/y (agg)
+    21Dec2006 : Add instap & instap_x/y (agg)
 */
 #include "libsc2sim/sc2sim_par.h"
 
@@ -80,6 +80,7 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   double heatstart;           /* initial heater setting (pW) */
   double heatstep;            /* increment of heater setting (pW) */
   double height;              /* min height of pattern (arcsec) */
+  char instap[SC2SIM__FLEN];  /* Name of instrument aperture */
   double instap_x;            /* X Focal plane offset (arcsec) */
   double instap_y;            /* Y Focal plane offset (arcsec) */
   double jig_step_x;          /* The step size in -X- direction between
