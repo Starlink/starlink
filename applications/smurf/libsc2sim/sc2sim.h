@@ -53,6 +53,8 @@
 *     2006-12-08 (JB):
 *        - removed sc2sim_simhits and added hitsonly flag to simulate.
 *        - modified dateobs to take per-chunk time 
+*     2007-01-03 (AGG):
+*        Add sc2sim_instap_calc
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -467,6 +469,12 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
                       double coeffs[], double digcurrent, double digmean, 
                       double digscale, char filter[], double *heater, int nbol,
                       double *pzero, double samptime, int *status );
+
+void sc2sim_instap_calc ( 
+struct sc2sim_obs_struct *inx, 
+double instap[2],        /* Returned focal plane offsets (radians) */
+int *status            /* global status (given and returned) */
+);
 
 void sc2sim_instrinit
 ( 
