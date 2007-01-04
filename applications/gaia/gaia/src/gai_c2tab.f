@@ -31,7 +31,7 @@
 *        .
 *
 *     The tab table returned by this routine may have the special
-*     parameters, x_col, y_col, id_col, ra_col and dec_col, set 
+*     parameters, x_col, y_col, id_col, ra_col and dec_col, set
 *     depending on what heuristics apply (there's a lot of guess work).
 
 *  Arguments:
@@ -237,7 +237,7 @@
          ELSE
 
 *  Check for known parameters, which can be case folded and truncated by
-*  conversion into CAT (esp CAT/FITS). SKIP positional parameters that 
+*  conversion into CAT (esp CAT/FITS). SKIP positional parameters that
 *  cannot be correct (CAT has no strict column order).
             SKIP = .FALSE.
             IF ( NAME .EQ. 'SHORT_NA' ) THEN
@@ -259,7 +259,7 @@
             ELSE IF ( NAME .EQ. 'COPYRIGH' ) THEN
                NAME = 'copyright'
             ELSE IF ( NAME .EQ. 'ID_COL' ) THEN
-               SKIP = .TRUE. 
+               SKIP = .TRUE.
             ELSE IF ( NAME .EQ. 'RA_COL' ) THEN
                SKIP = .TRUE.
             ELSE IF ( NAME .EQ. 'DEC_COL' ) THEN
@@ -294,12 +294,12 @@
 *  to be possible sky coordinates. WFCAM has Radians, so make case insensitive.
          CALL CHR_LCASE( UNITS )
          CALL CHR_LDBLK( UNITS )
-         IF ( UNITS( :7 ) .EQ. 'radians' .OR. 
+         IF ( UNITS( :7 ) .EQ. 'radians' .OR.
      :        UNITS( :6 ) .EQ. 'degree' ) THEN
 
 *  Not degrees? Only change when still searching for any RA and DEC.
-            IF ( RACOL .EQ. -1 .AND. DECCOL .EQ. -1 ) THEN
-               IF ( UNITS( :7 ) .EQ. 'radians' ) THEN 
+            IF ( RACOL .EQ. -1 .OR. DECCOL .EQ. -1 ) THEN
+               IF ( UNITS( :7 ) .EQ. 'radians' ) THEN
                   AREDEG = .FALSE.
                ELSE
                   AREDEG = .TRUE.
@@ -323,8 +323,12 @@
                   IF ( RACOL .EQ. -1 ) RACOL = I - 1
                ELSE
 
-*  Assume this is declination.
-                  IF ( DECCOL .EQ. -1 ) DECCOL = I - 1
+*  Assume this is declination, unless name starts with "pos", which is
+*  most likely a position angle (for an ellipse).
+                  IF ( DECCOL .EQ. -1 .AND.
+     :                 LNAME( :3 ) .NE. 'pos' ) THEN
+                     DECCOL = I - 1
+                  END IF
                END IF
             END IF
 
@@ -346,7 +350,7 @@
             IF ( YCOL .EQ. -1 ) YCOL = I - 1
 
 *  Look for incoming IDCOL (as a column, seems odd?).
-         ELSE IF ( NAME .EQ. 'ID_COL' ) THEN 
+         ELSE IF ( NAME .EQ. 'ID_COL' ) THEN
             IF ( IDCOL .EQ. -1 ) IDCOL = I - 1
          END IF
 
@@ -490,7 +494,7 @@
             ELSE
                CALL CAT_EGT0C( COL( J ), VALUE, NULFLG, STATUS )
             END IF
-            
+
 *  The NULL value is '\0', don't want that in a TST so convert to <NULL>.
             IF ( NULFLG ) THEN
                VALUE = '<NULL>'
