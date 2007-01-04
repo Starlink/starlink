@@ -55,9 +55,11 @@
 *        Add AZTEC instrument
 *     09-OCT-2006 (TIMJ):
 *        Add TCS_TAI field to state structure.
+*     04-JAN-2007 (TIMJ):
+*        Add ACS_OFF_EXPOSURE field to state structure. Add FE_DOPPLER and FE_LOFREQ.
 
 *  Copyright:
-*     Copyright (C) 2004, 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2004, 2006, 2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -85,6 +87,7 @@
 #define JCMT__EXTTYPE  "RTS_ARR"
 
 /* Some sizes used for dimensioning the string arrays */
+#define JCMT__SZRTS_TASKS      80
 #define JCMT__SZTCS_SOURCE     32
 #define JCMT__SZTCS_TR_SYS     16
 #define JCMT__SZACS_RECEPTOR    5
@@ -112,6 +115,7 @@ typedef enum {
 typedef struct JCMTState {
   unsigned int rts_num;
   double rts_end;    /* MJD TAI of end of sequence step */
+  char   rts_tasks[JCMT__SZRTS_TASKS+1];
   double smu_x;
   double smu_y;
   double smu_z;
@@ -158,12 +162,15 @@ typedef struct JCMTState {
   float  wvm_time;
   double sc2_heat;
   float  acs_exposure;
+  float  acs_offexposure;
   int    acs_no_prev_ref;
   int    acs_no_next_ref;
   int    acs_no_ons;
   char   acs_source_ro[JCMT__SZACS_SOURCE_RO+1];
   double pol_ang;
   float  fts_pos;
+  double fe_lofreq;
+  double fe_doppler;
 } JCMTState;
 
 /* Generate indices to allow the programmer to access individual elements
@@ -176,6 +183,7 @@ typedef enum
 {
    RTS_NUM,
    RTS_END,
+   RTS_TASKS,
    SMU_X,
    SMU_Y,
    SMU_Z,
@@ -222,12 +230,15 @@ typedef enum
    WVM_TIME,
    SC2_HEAT,
    ACS_EXPOSURE,
+   ACS_OFFEXPOSURE,
    ACS_NO_PREV_REF,
    ACS_NO_NEXT_REF,
    ACS_NO_ONS,
    ACS_SOURCE_RO,
    POL_ANG,
    FTS_POS,
+   FE_LOFREQ,
+   FE_DOPPLER,
    JCMT_COMP_NUM     /* Tells us the total number of available components */
 } JCMT_HEADLIST;
 
@@ -253,6 +264,7 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
   {
     { RTS_NUM, "_INTEGER", "RTS_NUM", INST__ACSIS | INST__SCUBA2, 0 },
     { RTS_END, "_DOUBLE", "RTS_END", INST__ACSIS | INST__SCUBA2, 0 },
+    { RTS_TASKS, CHARTYP(JCMT__SZRTS_TASKS), "RTS_TASKS", INST__ACSIS, 0 },
     { SMU_X, "_DOUBLE", "SMU_X", INST__ACSIS | INST__SCUBA2, 0 },
     { SMU_Y, "_DOUBLE", "SMU_Y", INST__ACSIS | INST__SCUBA2, 0 },
     { SMU_Z, "_DOUBLE", "SMU_Z", INST__ACSIS | INST__SCUBA2, 0 },
@@ -303,8 +315,11 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { ACS_NO_NEXT_REF, "_INTEGER", "ACS_NO_NEXT_REF", INST__ACSIS, 0 },
     { ACS_NO_ONS, "_INTEGER", "ACS_NO_ONS", INST__ACSIS, 0 },
     { ACS_EXPOSURE, "_REAL", "ACS_EXPOSURE", INST__ACSIS, 0 },
+    { ACS_OFFEXPOSURE, "_REAL", "ACS_OFFEXPOSURE", INST__ACSIS, 0 },
     { POL_ANG, "_DOUBLE", "POL_ANG", INST__ACSIS | INST__SCUBA2, 0 },
-    { FTS_POS, "_REAL", "FTS_POS", INST__SCUBA2, 0 }
+    { FTS_POS, "_REAL", "FTS_POS", INST__SCUBA2, 0 },
+    { FE_LOFREQ, "_DOUBLE", "FE_LOFREQ", INST__ACSIS, INST__ACSIS },
+    { FE_DOPPLER, "_DOUBLE", "FE_DOPPLER", INST__ACSIS, INST__ACSIS },
   };
 
 
