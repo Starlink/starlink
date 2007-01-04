@@ -90,42 +90,17 @@
 *     4-DEC-2006 (DSB):
 *        Fix bug in astMalloc that caused a non-null pointer to be
 *        returned on error.
+*     4-JAN-2007 (DSB):
+*        Move definition of astCLASS macro so that it comes before the
+*        inclusion of the AST include files (which test for astCLASS).
 */
-
-/* Include files. */
-/* ============== */
-/* Interface definitions. */
-/* ---------------------- */
-#include "error.h"               /* Error reporting facilities */
-#include "memory.h"              /* Interface to this module */
-
-#ifdef MEM_DEBUG
-#include "object.h"              /* For astMakePointer */
-#endif
-
-/* Error code definitions. */
-/* ----------------------- */
-#include "ast_err.h"             /* AST error codes */
-
-/* C header files. */
-/* --------------- */
-#include <ctype.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
-
-/* Configuration results. */
-/* ---------------------- */
-#include <config.h>
 
 /* Module Macros. */
 /* ============== */
 /* Define the astCLASS macro (even although this is not a class
    implementation) to obtain access to the protected error handling
    functions. */
-#define astCLASS
+#define astCLASS memory
 
 /* The maximum number of fields within a format string allowed by astSscanf. */
 #define VMAXFLD 20
@@ -159,6 +134,34 @@
 #define ISSUED "issued"
 #define FREED "freed"
 #endif
+
+/* Include files. */
+/* ============== */
+/* Interface definitions. */
+/* ---------------------- */
+#include "error.h"               /* Error reporting facilities */
+#include "memory.h"              /* Interface to this module */
+
+#ifdef MEM_DEBUG
+#include "object.h"              /* For astMakePointer */
+#endif
+
+/* Error code definitions. */
+/* ----------------------- */
+#include "ast_err.h"             /* AST error codes */
+
+/* C header files. */
+/* --------------- */
+#include <ctype.h>
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdio.h>
+
+/* Configuration results. */
+/* ---------------------- */
+#include <config.h>
 
 /* Function Macros. */
 /* =============== */
