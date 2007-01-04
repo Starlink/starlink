@@ -9,48 +9,80 @@
 #  to your .login file.
 #-
 
+# To simplify relocation use local variables rather than using the @bindir@
+# everywhere
+set relocate = 0
+if ($?STAR_RELOC) then
+    if (-e $STAR_RELOC) then
+      if (-e ${STAR_RELOC}/bin) set relocate = 1
+    endif
+endif
+
+if (${relocate}) then
+    set exec_prefix = ${STAR_RELOC}
+    set bindir = ${exec_prefix}/bin
+    set staretcdir = ${exec_prefix}/etc
+    set starhelpdir = ${exec_prefix}/help
+    set libdir = ${exec_prefix}/lib
+    set sharelibdir = ${exec_prefix}/lib
+    set datadir = ${exec_prefix}/share
+    set mandir = ${exec_prefix}/man
+    set starjavadir = ${exec_prefix}/starjava
+else
+    set exec_prefix = @exec_prefix@
+    set bindir = @bindir@
+    set staretcdir = @staretcdir@
+    set starhelpdir = @starhelpdir@
+    set libdir = @libdir@
+    set sharelibdir = @sharelibdir@
+    set datadir = @datadir@
+    set mandir = @mandir@
+    set starjavadir = @starjavadir@
+endif
+unset relocate
+
 #  Add Starlink directories to relevant paths 
 
-#     Append @bindir@, @bindir@/startcl and @starjavadir@/bin
+#     Append ${bindir}, ${bindir}/startcl and ${starjavadir}/bin
 #     to PATH, clear path first.
 
 set tmppath = "${PATH}"
-if (`echo ${tmppath} | grep -c ':@bindir@/startcl:'` != 0) \
-    set tmppath = `echo ${tmppath} | sed -e 's#:@bindir@/startcl:#:#g'`
+if (`echo ${tmppath} | grep -c ':${bindir}/startcl:'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#:${bindir}/startcl:#:#g'`
 
-if (`echo ${tmppath} | grep -c ':@bindir@/startcl$'` != 0) \
-    set tmppath = `echo ${tmppath} | sed -e 's#:@bindir@/startcl##g'`
+if (`echo ${tmppath} | grep -c ':${bindir}/startcl$'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#:${bindir}/startcl##g'`
 
-if (`echo ${tmppath} | grep -c '^@bindir@/startcl'` != 0) \
-    set tmppath = `echo ${tmppath} | sed -e 's#@bindir@/startcl:##g'`
+if (`echo ${tmppath} | grep -c '^${bindir}/startcl'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#${bindir}/startcl:##g'`
 
-if (`echo ${tmppath} | grep -c ':@bindir@:'` != 0) \
-    set tmppath = `echo ${tmppath} | sed -e 's#:@bindir@:#:#g'`
+if (`echo ${tmppath} | grep -c ':${bindir}:'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#:${bindir}:#:#g'`
 
-if (`echo ${tmppath} | grep -c ':@bindir@$'` != 0) \
-    set tmppath = `echo ${tmppath} | sed -e 's#:@bindir@##g'`
+if (`echo ${tmppath} | grep -c ':${bindir}$'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#:${bindir}##g'`
 
-if (`echo ${tmppath} | grep -c '^@bindir@'` != 0) \
-    set tmppath = `echo ${tmppath} | sed -e 's#@bindir@:##g'`
+if (`echo ${tmppath} | grep -c '^${bindir}'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#${bindir}:##g'`
 
-if (`echo ${tmppath} | grep -c ':@starjavadir@/bin:'` != 0) \
-    set tmppath = `echo ${tmppath} | sed -e 's#:@starjavadir@/bin:#:#g'`
+if (`echo ${tmppath} | grep -c ':${starjavadir}/bin:'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#:${starjavadir}/bin:#:#g'`
 
-if (`echo ${tmppath} | grep -c ':@starjavadir@/bin$'` != 0) \
-    set tmppath = `echo ${tmppath} | sed -e 's#:@starjavadir@/bin##g'`
+if (`echo ${tmppath} | grep -c ':${starjavadir}/bin$'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#:${starjavadir}/bin##g'`
 
-if (`echo ${tmppath} | grep -c '^@starjavadir@/bin'` != 0) \
-    set tmppath = `echo ${tmppath} | sed -e 's#@starjavadir@:##g'`
+if (`echo ${tmppath} | grep -c '^${starjavadir}/bin'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#${starjavadir}:##g'`
 
-setenv PATH "${tmppath}:@bindir@/startcl:@bindir@:@starjavadir@/bin"
+setenv PATH "${tmppath}:${bindir}/startcl:${bindir}:${starjavadir}/bin"
 
 
 #
 #     Prepend Starlink JRE (and JDK) paths to PATH.
 #     Do JRE after JDK so that the JRE takes precidence.
 
-set JREHOME = @exec_prefix@/java/jre/bin
-set JDKHOME = @exec_prefix@/java/bin
+set JREHOME = ${exec_prefix}/java/jre/bin
+set JDKHOME = ${exec_prefix}/java/bin
 
 if ( -d ${JDKHOME} ) setenv PATH "${JDKHOME}:${PATH}"
 if ( -d ${JREHOME} ) setenv PATH "${JREHOME}:${PATH}"
@@ -75,8 +107,8 @@ if ( ${?@LD_LIB_PATH@} ) then
    if (`echo ${@LD_LIB_PATH@} | grep -c '^/usr/openwin/lib'` != 0 ) set found_openwin = "yes"
 
    set found_sharelib = "no"
-   if (`echo ${@LD_LIB_PATH@} | grep -c ':@sharelibdir@'` != 0 ) set found_sharelib = "yes"
-   if (`echo ${@LD_LIB_PATH@} | grep -c '^@sharelibdir@'` != 0 ) set found_sharelib = "yes"
+   if (`echo ${@LD_LIB_PATH@} | grep -c ':${sharelibdir}'` != 0 ) set found_sharelib = "yes"
+   if (`echo ${@LD_LIB_PATH@} | grep -c '^${sharelibdir}'` != 0 ) set found_sharelib = "yes"
 
 #  Add required components to end of @LD_LIB_PATH@ if flag variables
 #  indicate they are not present.
@@ -90,29 +122,29 @@ if ( ${?@LD_LIB_PATH@} ) then
    endif
 
    if ( $found_sharelib == "no" ) then
-      setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@sharelibdir@"
+      setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${sharelibdir}"
 
       switch (@build@)
          case *-osf*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/alpha"
+            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/alpha"
          breaksw
          case x86_64*-linux*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/amd64"
+            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/amd64"
          breaksw
          case *-linux*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/i386"
+            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
          breaksw
          case *-cygwin*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/x86"
+            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/x86"
          breaksw
          case *-sun*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/sparc"
+            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/sparc"
          breaksw
          case *pc-apple-darwin*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/ppc"
+            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/ppc"
          breaksw
          case *86*-apple-darwin*:
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/i386"
+            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
          breaksw
       endsw
 
@@ -123,29 +155,29 @@ else
 
 #  @LD_LIB_PATH@ is not set.  Add required components.
 
-   setenv @LD_LIB_PATH@ @sharelibdir@
+   setenv @LD_LIB_PATH@ ${sharelibdir}
 
    switch (@build@)
      case *-osf*:
-        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/alpha"
+        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/alpha"
      breaksw
      case x86_64*-linux*:
-        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/amd64"
+        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/amd64"
      breaksw
      case *-linux*:
-        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/i386"
+        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
      breaksw
      case *-cygwin*:
-        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/x86"
+        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/x86"
      breaksw
      case *-sun*:
-        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:/usr/openwin/lib:@starjavadir@/lib/sparc"
+        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:/usr/openwin/lib:${starjavadir}/lib/sparc"
      breaksw
      case *pc-apple-darwin*:
-        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/ppc"
+        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/ppc"
      breaksw         
      case *86*-apple-darwin*:
-        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:@starjavadir@/lib/i386"
+        setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
      breaksw         
    endsw
 
@@ -154,17 +186,17 @@ endif
 #
 #  PGPLOT  (native version)
 if ( ! ${?PGPLOT_DIR} ) then
-   setenv PGPLOT_DIR @bindir@/
+   setenv PGPLOT_DIR ${bindir}/
 endif
 
 #
 #  TCLSYS
-if ( -e @exec_prefix@/manifests/tcl ) then
-   set tclsh_names=`grep 'bin/tclsh' @exec_prefix@/manifests/tcl`
+if ( -e ${exec_prefix}/manifests/tcl ) then
+   set tclsh_names=`grep 'bin/tclsh' ${exec_prefix}/manifests/tcl`
    set tclsys_install=`echo $tclsh_names[1]:h:h`
-   if ( "@exec_prefix@" != ${tclsys_install} ) then
-      setenv TCL_LIBRARY @libdir@
-      setenv TK_LIBRARY @libdir@
+   if ( "${exec_prefix}" != ${tclsys_install} ) then
+      setenv TCL_LIBRARY ${libdir}
+      setenv TK_LIBRARY ${libdir}
    endif
    unset tclsys_install tclsh_names
 endif
@@ -177,254 +209,254 @@ if ( ! ${?WWW_HOME} ) setenv WWW_HOME http://www.starlink.rl.ac.uk/
 #
 #  MAN pages.  If none defined, create a default, then add to it.
 if ( ! ${?MANPATH} ) setenv MANPATH /usr/share/man:/usr/man:/usr/local/man:/usr/openwin/man
-setenv MANPATH @exec_prefix@/local/man:@exec_prefix@/man:${MANPATH} # Starlink
+setenv MANPATH ${exec_prefix}/local/man:${exec_prefix}/man:${MANPATH} # Starlink
 if ( -d /usr/local/teTeX/man ) setenv MANPATH /usr/local/teTeX/man:${MANPATH} # LaTeX2e
-if ( -d @exec_prefix@/Perl/man ) setenv MANPATH @exec_prefix@/Perl/man:${MANPATH} # Perl
+if ( -d ${exec_prefix}/Perl/man ) setenv MANPATH ${exec_prefix}/Perl/man:${MANPATH} # Perl
 
 #
 #  Optional package definitions
 
 #
 #  ASTERIX
-if ( -e @bindir@/asterix/startup.icl ) then
-   setenv AST_ROOT @bindir@/asterix
+if ( -e ${bindir}/asterix/startup.icl ) then
+   setenv AST_ROOT ${bindir}/asterix
 endif
 
 #
 #  ATOOLS
-if ( -e @bindir@/atools/atools.csh ) then
-   setenv ATOOLS_DIR @bindir@/atools
-   setenv ATOOLS_HELP @starhelpdir@/atools/atools
+if ( -e ${bindir}/atools/atools.csh ) then
+   setenv ATOOLS_DIR ${bindir}/atools
+   setenv ATOOLS_HELP ${starhelpdir}/atools/atools
 endif
 
 #
 #  AUTOASTROM
-if ( -e @bindir@/autoastrom/autoastrom ) then
-   setenv AUTOASTROM_DIR @bindir@/autoastrom
+if ( -e ${bindir}/autoastrom/autoastrom ) then
+   setenv AUTOASTROM_DIR ${bindir}/autoastrom
 endif
 
 #
 #  CATPAC
-if ( -e @bindir@/catpac/catpac ) then
-   setenv CATPAC_DIR @bindir@/catpac
-   setenv CATPAC_HELP @bindir@/catpac/catpac
-   setenv CATPAC_DEMO @bindir@/catpac
+if ( -e ${bindir}/catpac/catpac ) then
+   setenv CATPAC_DIR ${bindir}/catpac
+   setenv CATPAC_HELP ${bindir}/catpac/catpac
+   setenv CATPAC_DEMO ${bindir}/catpac
 endif
 
 #
 #  CCDPACK
-if ( -e @bindir@/ccdpack/ccdpack.csh ) then
-   setenv CCDPACK_DIR @bindir@/ccdpack
-   setenv CCDPACK_HELP @starhelpdir@/ccdpack/ccdpack
+if ( -e ${bindir}/ccdpack/ccdpack.csh ) then
+   setenv CCDPACK_DIR ${bindir}/ccdpack
+   setenv CCDPACK_HELP ${starhelpdir}/ccdpack/ccdpack
 endif
 
 #
 #  CHART
-if ( -e @bindir@/chart/chart.csh ) then
-   setenv CHART_DIR @bindir@/chart
+if ( -e ${bindir}/chart/chart.csh ) then
+   setenv CHART_DIR ${bindir}/chart
 endif
 
 #
 #  CGS4DR
-if ( -e @bindir@/cgs4dr/cgs4dr ) then
-   setenv CGS4DR_ROOT @bindir@/cgs4dr
+if ( -e ${bindir}/cgs4dr/cgs4dr ) then
+   setenv CGS4DR_ROOT ${bindir}/cgs4dr
 endif
 
 #
 #  CONVERT
-if ( -e @bindir@/convert/convert.csh ) then
-   setenv CONVERT_DIR @bindir@/convert
-   setenv CONVERT_HELP @starhelpdir@/convert/convert
+if ( -e ${bindir}/convert/convert.csh ) then
+   setenv CONVERT_DIR ${bindir}/convert
+   setenv CONVERT_HELP ${starhelpdir}/convert/convert
 endif
 
 #
 #  CUPID
-if ( -e @bindir@/cupid/cupid.csh ) then
-   setenv CUPID_DIR @bindir@/cupid
-   setenv CUPID_HELP @starhelpdir@/cupid/cupid
+if ( -e ${bindir}/cupid/cupid.csh ) then
+   setenv CUPID_DIR ${bindir}/cupid
+   setenv CUPID_HELP ${starhelpdir}/cupid/cupid
 endif
 
 #
 #  CURSA
-if ( -e @bindir@/cursa/cursa.csh ) then
-   setenv CURSA_DIR @bindir@/cursa
+if ( -e ${bindir}/cursa/cursa.csh ) then
+   setenv CURSA_DIR ${bindir}/cursa
 endif
 
 #
 #  DAOPHOT
-if ( -e @bindir@/daophot/daophot ) then
-   setenv DAOPHOT_DIR @bindir@/daophot
+if ( -e ${bindir}/daophot/daophot ) then
+   setenv DAOPHOT_DIR ${bindir}/daophot
 endif
 
 #
 #  DATACUBE
-if ( -e @bindir@/datacube/datacube.csh ) then
-   setenv DATACUBE_DIR @bindir@/datacube
-   setenv DATACUBE_HELP @starhelpdir@/datacube/datacube
+if ( -e ${bindir}/datacube/datacube.csh ) then
+   setenv DATACUBE_DIR ${bindir}/datacube
+   setenv DATACUBE_HELP ${starhelpdir}/datacube/datacube
 endif
 
 #
 #  ESP
-if ( -e @bindir@/esp/esp.csh) then
-   setenv ESP_DIR @bindir@/esp
-   setenv ESP_HELP @starhelpdir@/esp/esp
+if ( -e ${bindir}/esp/esp.csh) then
+   setenv ESP_DIR ${bindir}/esp
+   setenv ESP_HELP ${starhelpdir}/esp/esp
 endif
 
 #
 #  EXTRACTOR
-if ( -e @bindir@/extractor/extractor.csh) then
-   setenv EXTRACTOR_DIR @bindir@/extractor
-   setenv EXTRACTOR_HELP @starhelpdir@/extractor/extractor
+if ( -e ${bindir}/extractor/extractor.csh) then
+   setenv EXTRACTOR_DIR ${bindir}/extractor
+   setenv EXTRACTOR_HELP ${starhelpdir}/extractor/extractor
 endif
 
 #
 #  EXTREME
-if ( -e @bindir@/extreme/extreme.csh) then
-   setenv EXTREME_DIR @bindir@/extreme
+if ( -e ${bindir}/extreme/extreme.csh) then
+   setenv EXTREME_DIR ${bindir}/extreme
 endif
 
 #
 #  FIGARO
-if ( -e @bindir@/figaro/figaro.csh ) then
-   setenv FIG_DIR @bindir@/figaro
-   setenv FIG_HELP @starhelpdir@/figaro/figaro
-   setenv FIG_HTML @exec_prefix@/docs/sun86.htx
+if ( -e ${bindir}/figaro/figaro.csh ) then
+   setenv FIG_DIR ${bindir}/figaro
+   setenv FIG_HELP ${starhelpdir}/figaro/figaro
+   setenv FIG_HTML ${exec_prefix}/docs/sun86.htx
    setenv FIGARO_FORMATS ndf,dst
-   setenv FIGARO_PROG_S @staretcdir@/figaro
-   setenv FIGARO_PROG_N @bindir@/figaro
+   setenv FIGARO_PROG_S ${staretcdir}/figaro
+   setenv FIGARO_PROG_N ${bindir}/figaro
 endif
 
 #
 #  FLUXES
-if ( -e @bindir@/fluxes/fluxes.csh ) then
-setenv FLUXES_DIR @bindir@/fluxes
+if ( -e ${bindir}/fluxes/fluxes.csh ) then
+setenv FLUXES_DIR ${bindir}/fluxes
 endif
 
 #
 #  FORMLOAD
-if ( -e @bindir@/formload ) then
-setenv FORMLOAD_DIR @staretcdir@/formload
+if ( -e ${bindir}/formload ) then
+setenv FORMLOAD_DIR ${staretcdir}/formload
 endif
 
 #
 #  GAIA
-if ( -e @bindir@/gaia/gaia.csh ) then
-   setenv GAIA_DIR @bindir@/gaia
+if ( -e ${bindir}/gaia/gaia.csh ) then
+   setenv GAIA_DIR ${bindir}/gaia
 endif
 
 #
 #  HDSTOOLS
-if ( -e @bindir@/hdstools/hdstools.csh ) then
-   setenv HDSTOOLS_DIR @bindir@/hdstools
-   setenv HDSTOOLS_HELP @starhelpdir@/hdstools/hdstools
+if ( -e ${bindir}/hdstools/hdstools.csh ) then
+   setenv HDSTOOLS_DIR ${bindir}/hdstools
+   setenv HDSTOOLS_HELP ${starhelpdir}/hdstools/hdstools
 endif
 
 #
 #  HDSTRACE
-if ( -e @bindir@/hdstrace ) then
-   setenv HDSTRACE_DIR @bindir@
-   setenv HDSTRACE_HELP @starhelpdir@/hdstrace
+if ( -e ${bindir}/hdstrace ) then
+   setenv HDSTRACE_DIR ${bindir}
+   setenv HDSTRACE_HELP ${starhelpdir}/hdstrace
 endif
 
 #
 #  ICL
-if ( -e @bindir@/icl ) then
-   setenv ADAM_PACKAGES @starhelpdir@/adam_packages.shl
-   setenv ICL_LOGIN_SYS @staretcdir@/icl_login_sys.icl
+if ( -e ${bindir}/icl ) then
+   setenv ADAM_PACKAGES ${starhelpdir}/adam_packages.shl
+   setenv ICL_LOGIN_SYS ${staretcdir}/icl_login_sys.icl
 endif
  
 #
 #  IRAS90
-if ( -e @bindir@/iras90/iras90.csh ) then
-   setenv IRAS90_DIR @bindir@/iras90
-   setenv IRAS90_HELP @starhelpdir@/iras90/iras90_help
+if ( -e ${bindir}/iras90/iras90.csh ) then
+   setenv IRAS90_DIR ${bindir}/iras90
+   setenv IRAS90_HELP ${starhelpdir}/iras90/iras90_help
 endif  
-if ( -e @exec_prefix@/iras90/iras90 ) then
-   setenv IRAS90_SOURCE @exec_prefix@/iras90/
+if ( -e ${exec_prefix}/iras90/iras90 ) then
+   setenv IRAS90_SOURCE ${exec_prefix}/iras90/
 endif
 
 #
 #  IRCAMDR
-if ( -e @bindir@/ircamdr/ircamdr ) then
-   setenv LIRCAMDIR @bindir@/ircamdr
+if ( -e ${bindir}/ircamdr/ircamdr ) then
+   setenv LIRCAMDIR ${bindir}/ircamdr
 endif
 
 #
 #  IRCAMPACK
-if ( -e @bindir@/ircampack/ircampack.csh ) then
-   setenv IRCAMPACK_DIR @bindir@/ircampack
-   setenv IRCAMPACK_HELP @starhelpdir@/ircampack/ircampack
+if ( -e ${bindir}/ircampack/ircampack.csh ) then
+   setenv IRCAMPACK_DIR ${bindir}/ircampack
+   setenv IRCAMPACK_HELP ${starhelpdir}/ircampack/ircampack
 endif
 
 #
 #  JCMTDR
-if ( -e @bindir@/jcmtdr/jcmtdr.csh ) then
-   setenv JCMTDR_DIR @bindir@/jcmtdr
-   setenv JCMTDR_HELP @starhelpdir@/jcmtdr/jcmtdr
-   setenv JCMTDR_HTML @starhelpdir@/jcmtdr/html
+if ( -e ${bindir}/jcmtdr/jcmtdr.csh ) then
+   setenv JCMTDR_DIR ${bindir}/jcmtdr
+   setenv JCMTDR_HELP ${starhelpdir}/jcmtdr/jcmtdr
+   setenv JCMTDR_HTML ${starhelpdir}/jcmtdr/html
 endif
 
 #
 #  JPL
-if ( -e @staretcdir@/jpleph.dat ) then
-   setenv JPL_DIR @staretcdir@/
+if ( -e ${staretcdir}/jpleph.dat ) then
+   setenv JPL_DIR ${staretcdir}/
 endif
 
 #
 #  KAPPA
-if ( -e @bindir@/kappa/kappa.csh ) then
-   setenv KAPPA_DIR @bindir@/kappa
-   setenv KAPPA_HELP @starhelpdir@/kappa/kappa
+if ( -e ${bindir}/kappa/kappa.csh ) then
+   setenv KAPPA_DIR ${bindir}/kappa
+   setenv KAPPA_HELP ${starhelpdir}/kappa/kappa
 endif
 
 #
 #  KAPRH
-if ( -e @bindir@/kaprh/kaprh.csh ) then
-   setenv KAPRH_DIR @bindir@/kaprh
-   setenv KAPRH_HELP @starhelpdir@/kaprh/kaprh
+if ( -e ${bindir}/kaprh/kaprh.csh ) then
+   setenv KAPRH_DIR ${bindir}/kaprh
+   setenv KAPRH_HELP ${starhelpdir}/kaprh/kaprh
 endif
 
 #
 #  NDPROGS
-if ( -e @bindir@/ndprogs/ndprogs.csh ) then
-   setenv NDPROGS_DIR @bindir@/ndprogs
-   setenv NDPROGS_HELP @starhelpdir@/ndprogs/ndprogshelp
+if ( -e ${bindir}/ndprogs/ndprogs.csh ) then
+   setenv NDPROGS_DIR ${bindir}/ndprogs
+   setenv NDPROGS_HELP ${starhelpdir}/ndprogs/ndprogshelp
 endif
 
 #
 #  ORAC-DR
-if ( -e @bindir@/oracdr/etc/oracdr_start.csh ) then
-   setenv ORAC_DIR @bindir@/oracdr
+if ( -e ${bindir}/oracdr/etc/oracdr_start.csh ) then
+   setenv ORAC_DIR ${bindir}/oracdr
    setenv ORAC_PERL5LIB ${ORAC_DIR}/lib/perl5
    setenv ORAC_CAL_ROOT ${ORAC_DIR}/cal
 endif
 
 #
 #  PERIOD
-if ( -e @bindir@/period ) then
-   setenv PERIOD_DIR @bindir@/period
-   setenv PERIOD_HELP @starhelpdir@/period
+if ( -e ${bindir}/period ) then
+   setenv PERIOD_DIR ${bindir}/period
+   setenv PERIOD_HELP ${starhelpdir}/period
 endif
 
-#set perl_version = `@exec_prefix@/Perl/bin/perl -e 'use Config;' -e 'print $Config{'version'};'`
+#set perl_version = `${exec_prefix}/Perl/bin/perl -e 'use Config;' -e 'print $Config{'version'};'`
 #echo PERL version is ${perl_version}
 #
 #  PERL
-#if ( -e @exec_prefix@/dates/perl_datestamp ) then
-#   set perl_install=`grep INSTALL @exec_prefix@/dates/perl_datestamp | awk -F: '{print $2}' - `
-#   if ( "@exec_prefix@" != ${perl_install} ) then
-#      set perl_version = `@exec_prefix@/Perl/bin/perl -e 'use Config;' -e 'print $Config{'version'};'`
-#      if ( -e @exec_prefix@/Perl/perl_sys ) then
-#         set perl_sys=`cat @exec_prefix@/Perl/perl_sys`
+#if ( -e ${exec_prefix}/dates/perl_datestamp ) then
+#   set perl_install=`grep INSTALL ${exec_prefix}/dates/perl_datestamp | awk -F: '{print $2}' - `
+#   if ( "${exec_prefix}" != ${perl_install} ) then
+#      set perl_version = `${exec_prefix}/Perl/bin/perl -e 'use Config;' -e 'print $Config{'version'};'`
+#      if ( -e ${exec_prefix}/Perl/perl_sys ) then
+#         set perl_sys=`cat ${exec_prefix}/Perl/perl_sys`
 #         if ( ! ${?PERL5LIB} ) then
-#            setenv PERL5LIB @exec_prefix@/Perl/lib/perl5/${perl_version}/${perl_sys}
+#            setenv PERL5LIB ${exec_prefix}/Perl/lib/perl5/${perl_version}/${perl_sys}
 #         else
-#            setenv PERL5LIB ${PERL5LIB}:@exec_prefix@/Perl/lib/perl5/${perl_version}/${perl_sys}
+#            setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/${perl_version}/${perl_sys}
 #         endif
-#         setenv PERL5LIB ${PERL5LIB}:@exec_prefix@/Perl/lib/perl5/${perl_version}
-#         setenv PERL5LIB ${PERL5LIB}:@exec_prefix@/Perl/lib/perl5/site_perl/${perl_version}/${perl_sys}
-#         setenv PERL5LIB ${PERL5LIB}:@exec_prefix@/Perl/lib/perl5/site_perl/${perl_version}
-#         setenv PERL5LIB ${PERL5LIB}:@exec_prefix@/Perl/lib/perl5/site_perl
+#         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/${perl_version}
+#         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/site_perl/${perl_version}/${perl_sys}
+#         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/site_perl/${perl_version}
+#         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/site_perl
 #      endif
 #   endif
 #   unset perl_install perl_version
@@ -433,22 +465,22 @@ endif
 
 #
 #  PERL -- note this isn't a third party package at present.
-if ( -e @exec_prefix@/manifests/perl ) then
-   set perl_names=`grep 'bin/perl' @exec_prefix@/manifests/perl`
+if ( -e ${exec_prefix}/manifests/perl ) then
+   set perl_names=`grep 'bin/perl' ${exec_prefix}/manifests/perl`
    set perl_install=`echo $perl_names[1]:h:h`
-   if ( "@exec_prefix@" != ${perl_install} ) then
+   if ( "${exec_prefix}" != ${perl_install} ) then
       set perl_version = 5.8.0
-      if ( -e @exec_prefix@/Perl/perl_sys ) then
-         set perl_sys=`cat @exec_prefix@/Perl/perl_sys`
+      if ( -e ${exec_prefix}/Perl/perl_sys ) then
+         set perl_sys=`cat ${exec_prefix}/Perl/perl_sys`
          if ( ! ${?PERL5LIB} ) then
-            setenv PERL5LIB @exec_prefix@/Perl/lib/perl5/${perl_version}/${perl_sys}
+            setenv PERL5LIB ${exec_prefix}/Perl/lib/perl5/${perl_version}/${perl_sys}
          else
-            setenv PERL5LIB ${PERL5LIB}:@exec_prefix@/Perl/lib/perl5/${perl_version}/${perl_sys}
+            setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/${perl_version}/${perl_sys}
          endif
-         setenv PERL5LIB ${PERL5LIB}:@exec_prefix@/Perl/lib/perl5/${perl_version}
-         setenv PERL5LIB ${PERL5LIB}:@exec_prefix@/Perl/lib/perl5/site_perl/${perl_version}/${perl_sys}
-         setenv PERL5LIB ${PERL5LIB}:@exec_prefix@/Perl/lib/perl5/site_perl/${perl_version}
-         setenv PERL5LIB ${PERL5LIB}:@exec_prefix@/Perl/lib/perl5/site_perl
+         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/${perl_version}
+         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/site_perl/${perl_version}/${perl_sys}
+         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/site_perl/${perl_version}
+         setenv PERL5LIB ${PERL5LIB}:${exec_prefix}/Perl/lib/perl5/site_perl
       endif
    endif
    unset perl_install perl_version perl_names
@@ -457,45 +489,45 @@ endif
 
 #
 #  PHOTOM
-if ( -e @bindir@/photom/photom.csh ) then
-   setenv PHOTOM_DIR @bindir@/photom
-   setenv PHOTOM_HELP @starhelpdir@/photom/photomhelp
+if ( -e ${bindir}/photom/photom.csh ) then
+   setenv PHOTOM_DIR ${bindir}/photom
+   setenv PHOTOM_HELP ${starhelpdir}/photom/photomhelp
 endif
 
 #
 #  PISA
-if ( -e @bindir@/pisa/start ) then
-   setenv PISA_DIR @bindir@/pisa
-   setenv PISA_HELP @starhelpdir@/pisa/pisahelp
+if ( -e ${bindir}/pisa/start ) then
+   setenv PISA_DIR ${bindir}/pisa
+   setenv PISA_HELP ${starhelpdir}/pisa/pisahelp
 endif
 
 #
 #  POLMAP
-if ( -e @bindir@/polmap/polmap.csh ) then
-   setenv POLMAP_DIR @bindir@/polmap
+if ( -e ${bindir}/polmap/polmap.csh ) then
+   setenv POLMAP_DIR ${bindir}/polmap
 endif
 
 #
 #  POLPACK
-if ( -e @bindir@/polpack/polpack.csh ) then
-   setenv POLPACK_DIR @bindir@/polpack
+if ( -e ${bindir}/polpack/polpack.csh ) then
+   setenv POLPACK_DIR ${bindir}/polpack
 endif
 
 #
 #  PONGO
-if ( -e @bindir@/pongo/pongo.icl ) then
-   setenv PONGO_BIN @bindir@/pongo
-   setenv PONGO_HELP @starhelpdir@/pongo/pongohelp
-   setenv PONGO_EXAMPLES @datadir@/pongo
+if ( -e ${bindir}/pongo/pongo.icl ) then
+   setenv PONGO_BIN ${bindir}/pongo
+   setenv PONGO_HELP ${starhelpdir}/pongo/pongohelp
+   setenv PONGO_EXAMPLES ${datadir}/pongo
 endif
 
 #
 #  REPACK
-if ( -e @bindir@/repack/repack.csh ) then
-   setenv REBIN @bindir@/repack
-   setenv RECAL @staretcdir@/repack
-   setenv REDOCS @bindir@/repack
-   setenv REHELP @starhelpdir@/repack
+if ( -e ${bindir}/repack/repack.csh ) then
+   setenv REBIN ${bindir}/repack
+   setenv RECAL ${staretcdir}/repack
+   setenv REDOCS ${bindir}/repack
+   setenv REHELP ${starhelpdir}/repack
 endif
 
 #
@@ -504,104 +536,104 @@ endif
 
 #
 #  SPECX
-if ( -e @datadir@/specx/specxstart ) then
-   setenv SYS_SPECX @datadir@/specx
-   setenv SPECX_HELP @starhelpdir@/specx
+if ( -e ${datadir}/specx/specxstart ) then
+   setenv SYS_SPECX ${datadir}/specx
+   setenv SPECX_HELP ${starhelpdir}/specx
 endif
 
 #
 #  SPLAT
- if ( -e @starjavadir@/bin/splat/splat ) then
-    setenv SPLAT_DIR @starjavadir@/bin/splat
+ if ( -e ${starjavadir}/bin/splat/splat ) then
+    setenv SPLAT_DIR ${starjavadir}/bin/splat
  endif
 
 #
 #  SST
- if (-e @bindir@/sst/sst.csh) then
-    setenv SST_DIR @bindir@/sst
+ if (-e ${bindir}/sst/sst.csh) then
+    setenv SST_DIR ${bindir}/sst
  endif
 
 #
 #  FROG
- if ( -e @starjavadir@/bin/frog ) then
-    setenv FROG_DIR @starjavadir@/bin/frog
+ if ( -e ${starjavadir}/bin/frog ) then
+    setenv FROG_DIR ${starjavadir}/bin/frog
  endif
 
 #
 #  SOG
- if ( -e @starjavadir@/bin/sog ) then
-    setenv SOG_DIR @starjavadir@/bin/sog
+ if ( -e ${starjavadir}/bin/sog ) then
+    setenv SOG_DIR ${starjavadir}/bin/sog
  endif
 
 #
 #  STILTS
- if ( -x @starjavadir@/bin/stilts ) then
-    setenv STILTS_DIR @starjavadir@/bin
+ if ( -x ${starjavadir}/bin/stilts ) then
+    setenv STILTS_DIR ${starjavadir}/bin
  endif
 
 #
 #  JSKY
- if ( -e @starjavadir@/bin/jsky ) then
-    setenv JSKY_DIR @starjavadir@/bin/jsky
+ if ( -e ${starjavadir}/bin/jsky ) then
+    setenv JSKY_DIR ${starjavadir}/bin/jsky
  endif
 
 #
 #  NDTOOLS
- if ( -e @starjavadir@/bin/ndtools ) then
-    setenv NDTOOLS_DIR @starjavadir@/bin/ndtools
+ if ( -e ${starjavadir}/bin/ndtools ) then
+    setenv NDTOOLS_DIR ${starjavadir}/bin/ndtools
  endif
 
 #
 #  SOAPSERVER
- if ( -e @starjavadir@/bin/soapserver ) then
-    setenv SOAPSERVER_DIR @starjavadir@/bin/soapserver
+ if ( -e ${starjavadir}/bin/soapserver ) then
+    setenv SOAPSERVER_DIR ${starjavadir}/bin/soapserver
  endif
 
 #
 #  SMURF
-if ( -e @bindir@/smurf/smurf.csh ) then
-   setenv SMURF_DIR @bindir@/smurf
-   setenv SMURF_HELP @starhelpdir@/smurf/smurf
+if ( -e ${bindir}/smurf/smurf.csh ) then
+   setenv SMURF_DIR ${bindir}/smurf
+   setenv SMURF_HELP ${starhelpdir}/smurf/smurf
 endif
 
 #
 #  SURF
-if ( -e @bindir@/surf/surf.csh ) then
-   setenv SURF_DIR @bindir@/surf
-   setenv SURF_HELP @starhelpdir@/surf/surf
+if ( -e ${bindir}/surf/surf.csh ) then
+   setenv SURF_DIR ${bindir}/surf
+   setenv SURF_HELP ${starhelpdir}/surf/surf
 endif
 
 #
 #  SX
-if ( -e @bindir@/sx/dx.csh ) then
-   setenv SX_DIR @bindir@/sx
+if ( -e ${bindir}/sx/dx.csh ) then
+   setenv SX_DIR ${bindir}/sx
 endif
 
 #
 #  TSP
-if ( -e @bindir@/tsp/tsp.csh ) then
-   setenv TSP_DIR @bindir@/tsp
+if ( -e ${bindir}/tsp/tsp.csh ) then
+   setenv TSP_DIR ${bindir}/tsp
 endif
 
 #
 #  TWODSPEC
-# if ( -e @bindir@/twodspec/twodspec.csh ) then
-#    setenv TWODSPEC_DIR @bindir@/twodspec
+# if ( -e ${bindir}/twodspec/twodspec.csh ) then
+#    setenv TWODSPEC_DIR ${bindir}/twodspec
 # endif
 
 #
 #  WFCPACK
-if ( -e @bindir@/wfcpack/wfcpack.csh ) then
-   setenv WFCBIN @bindir@/wfcpack
-   setenv WFCCAL @staretcdir@/wfcpack
-   setenv WFCDOCS @bindir@/wfcpack
-   setenv WFCHELP @starhelpdir@/wfcpack
+if ( -e ${bindir}/wfcpack/wfcpack.csh ) then
+   setenv WFCBIN ${bindir}/wfcpack
+   setenv WFCCAL ${staretcdir}/wfcpack
+   setenv WFCDOCS ${bindir}/wfcpack
+   setenv WFCHELP ${starhelpdir}/wfcpack
 endif
 
 #
 #  XRT
-if ( -f @bindir@/xrt/xrt.csh ) then
-   setenv XRT_ROOT @exec_prefix@
+if ( -f ${bindir}/xrt/xrt.csh ) then
+   setenv XRT_ROOT ${exec_prefix}
 endif
 
 #
@@ -614,9 +646,21 @@ setenv HDS_64BIT 1
 
 #
 #  Run local Starlink login script if it exists
-if ( -e @exec_prefix@/local/etc/login ) then
-   source @exec_prefix@/local/etc/login
+if ( -e ${exec_prefix}/local/etc/login ) then
+   source ${exec_prefix}/local/etc/login
 endif
+
+#
+#  Prevent local variables from leaking into user shell
+unset bindir
+unset staretcdir
+unset starhelpdir
+unset libdir
+unset sharelibdir
+unset datadir
+unset mandir
+unset starjavadir
+unset exec_prefix
 
 #
 #  Set the flag to indicate this has been sourced
