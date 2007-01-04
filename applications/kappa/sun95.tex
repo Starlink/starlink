@@ -11866,6 +11866,8 @@ picture.}
  Generates a test two-dimensional NDF from a  selection of several types.}
 \menuitem{CSUB}{
  Subtracts a scalar from an NDF data structure.}
+\menuitem{CUMULVEC}{
+ Sums the values cumulatively in a one-dimensional NDF.}
 \menuitem{CURSOR}{
  Reports the co-ordinates of points selected using the cursor.}
 \menuitem{DISPLAY}{
@@ -12044,6 +12046,8 @@ picture.}
  Normalises one NDF to a similar NDF by calculating a scale factor and zero-point difference.}
 \menuitem{NUMB}{
  Counts the number of elements of an NDF with values or absolute values above or below a threshold.}
+\menuitem{ODDEVEN}{
+ Removes odd-even defects from a one-dimensional NDF.}
 \menuitem{OUTLINE}{
  Draws the outline of a two-dimensional NDF.}
 \menuitem{OUTSET}{
@@ -12445,6 +12449,8 @@ functions as follows.
  Multiplies an NDF by a scalar.
 \classitem{CSUB}
  Subtracts a scalar from an NDF data structure.
+\classitem{CUMULVEC}
+ Sums the values cumulatively in a one-dimensional NDF.
 \classitem{DIV}
  Divides one NDF data structure by another.
 \classitem{EXP10}
@@ -12566,6 +12572,8 @@ functions as follows.
  Smooths a two-dimensional data array using a weighted median filter.
 \classitem{MEM2D}
  Performs a Maximum-Entropy deconvolution of a two-dimensional NDF.
+\classitem{ODDEVEN}
+ Removes odd-even defects from a one-dimensional NDF.
 \classitem{WIENER}
  Applies a Wiener filter to a one- or two-dimensional array.
 \end{description}
@@ -18850,6 +18858,89 @@ KAPPA: \htmlref{ADD}{ADD},
          \sstitem
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.
 
+      }
+   }
+}
+\sstroutine{
+   CUMULVEC
+}{
+   Sums the values cumulatively in a one-dimensional NDF
+}{
+   \sstdescription{
+      This application forms the cumulative sum of the values of a
+      one-dimensional NDF starting from the first to the last element.
+      thus the first output pixel will be unchanged but the second will
+      be the sum of the first two input pixels, third output pixel is the
+      sum of the first three input pixels and so on.  Anomalous values
+      may be excluded from the summation by setting a threshold.
+   }
+   \sstusage{
+      cumulvec in out [thresh]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The one-dimensional NDF containing the vector to be summed.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The NDF to contain the summed image.
+      }
+      \sstsubsection{
+         THRESH = \_DOUBLE (Read)
+      }{
+         The maximum difference between adjacent elements for the
+         summation to ocur.  For increments outside the allowed
+         range, the increment becomes zero.  If null, {\tt{!}}, is 
+         given, then there is no limit.  {\tt [!]}
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         The title of the output NDF.  A null ({\tt{!}}) value means using the
+         title of the input NDF.  {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         cumulvec gradient profile
+      }{
+         The one-dimensional NDF called gradient is summed cumulatively to
+         form NDF profile.
+      }
+      \sstexamplesubsection{
+         cumulvec in=gradient out=profile thresh=20
+      }{
+         As above but only adjacent values separated by less than 20
+         are included in the summation.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM}.
+   }
+   \sstimplementationstatus{
+      \ssthitemlist{
+
+         \sstitem
+         This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, 
+         \htmlref{QUALITY}{apndf:quality}, \htmlref{VARIANCE}{apndf:variance}, 
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units},
+         \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history} components of an NDF
+         data structure and propagates all \htmlref{extensions}{apndf:extensions}.
+
+         \sstitem
+         Processing of \htmlref{bad pixels}{se:masking} and automatic 
+         \htmlref{quality masking}{se:qualitymask} are supported.  Bad pixels 
+         are propagated and excluded from the summation.
+
+         \sstitem
+         All \htmlref{non-complex numeric data types}{ap:HDStypes} can be 
+         handled.  Arithmetic is performed using single- or double-precision 
+         floating point as appropriate.
       }
    }
 }
@@ -34385,6 +34476,107 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 
          \sstitem
          Any number of NDF dimensions is supported.
+      }
+   }
+}
+\sstroutine{
+   ODDEVEN
+}{
+   Removes odd-even defects from a one-dimensional NDF
+}{
+   \sstdescription{
+      This application forms a smoothed signal for a one-dimensional NDF
+      whose elements have oscillating biases.  It averages the signal
+      levels of alternating pixels.  Both elements must be good and not
+      deviate from each other by more than a threshold for the averaging
+      to take place.
+
+      This application is intended for images exhibiting alternating
+      patterns in columns or rows, the so called odd-even noise, arising
+      from electronic interference or readout through different
+      channels.  However, you must supply a vector collapsed along the
+      unaffected axis, such that the vector exhibits the pattern.  See
+      task \htmlref{COLLAPSE}{COLLAPSE} using the Mode or Median 
+      estimators.  The smoothed image is then subtracted from the supplied 
+      vector to yield the odd-even pattern.
+   }
+   \sstusage{
+      oddeven in out [thresh]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The one-dimensional NDF containing the input array to be
+         filtered.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The NDF to contain the filtered image.
+      }
+      \sstsubsection{
+         THRESH = \_DOUBLE (Read)
+      }{
+         The maximum difference between adjacent elements for the
+         averaging filter to be applied.  This allows anomalous pixels
+         to be excluded.  If null, {\tt{!}}, is given, then there is no limit.
+         {\tt [!]}
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         The title of the output NDF.  A null ({\tt{!}}) value means using the
+         title of the input NDF.  {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         oddeven raw clean
+      }{
+         The one-dimensional NDF called raw is filtered such that
+         adjacent pixels are averaged to form the output NDF call clean.
+      }
+      \sstexamplesubsection{
+         oddeven out=clean in=raw thresh=20
+      }{
+         As above except only those adjacent pixels whose values differ
+         by no more than 20 are averaged.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+KAPPA: \htmlref{BLOCK}{BLOCK},
+\htmlref{CHPIX}{CHPIX},
+\htmlref{FFCLEAN}{FFCLEAN},
+\htmlref{GLITCH}{GLITCH},
+\htmlref{ZAPLIN}{ZAPLIN};
+\xref{FIGARO}{sun86}{}: \xref{BCLEAN}{sun86}{BCLEAN},
+\xref{CLEAN}{sun86}{CLEAN},
+\xref{ISEDIT}{sun86}{ISEDIT},
+\xref{TIPPEX}{sun86}{TIPPEX}.
+   }
+   \sstimplementationstatus{
+      \ssthitemlist{
+
+         \sstitem
+         This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units},
+         \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history} components of an NDF
+         data structure and propagates all \htmlref{extensions}{apndf:extensions}.
+
+         \sstitem
+         \htmlref{VARIANCE}{apndf:variance} is merely propagated.
+
+         \sstitem
+         Processing of \htmlref{bad pixels}{se:masking} and automatic 
+         \htmlref{quality masking}{se:qualitymask} are supported.
+
+         \sstitem
+         All \htmlref{non-complex numeric data types}{ap:HDStypes} can be 
+         handled.  Arithmetic is performed using single- or double-precision 
+         floating point as appropriate.
       }
    }
 }
@@ -51170,6 +51362,20 @@ The following applications have been modified:
 \end{description}
 
 \section{\xlabel{se_changes}Release Notes---V1.6\label{se:changes}}
+
+\subsection{New Commands}
+The following new applications have been added:
+
+\begin{description}
+   \item [\htmlref{CUMULVEC}{CUMULVEC}] \mbox{}
+   Sums the values cumulatively in a one-dimensional NDF.
+
+   \item [\htmlref{ODDEVEN}{ODDEVEN}] \mbox{}
+   Removes odd-even defects from a one-dimensional NDF.
+   To correct a two dimensional NDF of odd-even patterning in its
+   columns or rows, first use \htmlref{COLLAPSE}{COLLAPSE}.
+\end{description}
+
 \subsection{Modified Commands}
 The following applications have been modified:
 
@@ -51474,6 +51680,8 @@ functions as follows.
  Multiplies an NDF by a scalar.
 \classitem{CSUB}
  Subtracts a scalar from an NDF data structure.
+\classitem{CUMULVEC}
+ Sums the values cumulatively in a one-dimensional NDF.
 \classitem{DIV}
  Divides one NDF data structure by another.
 \classitem{EXP10}
@@ -51594,6 +51802,8 @@ functions as follows.
  Smooths a two-dimensional data array using a weighted median filter.
 \classitem{MEM2D}
  Performs a Maximum-Entropy deconvolution of a two-dimensional NDF.
+\classitem{ODDEVEN}
+ Removes odd-even defects from a one-dimensional NDF.
 \classitem{WIENER}
  Applies a Wiener filter to a one- or two-dimensional array.
 \end{description}
