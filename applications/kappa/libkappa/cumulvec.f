@@ -4,7 +4,7 @@
 *     CUMULVEC
 
 *  Purpose:
-*     Sums the values cumulatively in one-dimensional NDF.
+*     Sums the values cumulatively in a one-dimensional NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -29,8 +29,7 @@
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
-*        The one-dimensional NDF containing the vector to be summed,
-*        cleaned.
+*        The one-dimensional NDF containing the vector to be summed.
 *     OUT = NDF (Write)
 *        The NDF to contain the summed image.
 *     THRESH = _DOUBLE (Read)
@@ -40,7 +39,7 @@
 *        there is no limit.  [!]
 *     TITLE = LITERAL (Read)
 *        The title of the output NDF.  A null (!) value means using the
-*        title of the input NDF. [!]
+*        title of the input NDF.  [!]
 
 *  Examples:
 *     cumulvec gradient profile
@@ -55,10 +54,10 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an 
+*     VARIANCE, LABEL, TITLE, UNITS, WCS, and HISTORY components of an 
 *     NDF data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
-*     supported.  Bad pixels are progpagated and excluded from the 
+*     supported.  Bad pixels are propagated and excluded from the 
 *     summation.  
 *     -  All non-complex numeric data types can be handled.  Arithmetic
 *     is performed using single- or double-precision floating point as

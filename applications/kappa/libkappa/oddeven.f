@@ -48,23 +48,23 @@
 *        [!]
 *     TITLE = LITERAL (Read)
 *        The title of the output NDF.  A null (!) value means using the
-*        title of the input NDF. [!]
+*        title of the input NDF.  [!]
 
 *  Examples:
 *     oddeven raw clean
 *       The one-dimensional NDF called raw is filtered such that
 *       adjacent pixels are averaged to form the output NDF call clean.
-*     oddeven out=clean in=dirty thresh=20
+*     oddeven out=clean in=raw thresh=20
 *       As above except only those adjacent pixels whose values differ
 *       by no more than 20 are averaged.
 
 *  Related Applications:
-*     KAPPA: BLOCK, CHPIX, GLITCH, ZAPLIN;
+*     KAPPA: BLOCK, CHPIX, FFCLEAN, GLITCH, ZAPLIN;
 *     Figaro: BCLEAN, CLEAN, ISEDIT, TIPPEX.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
+*     LABEL, TITLE, UNITS, WCS, and HISTORY components of an NDF
 *     data structure and propagates all extensions.
 *     -  VARIANCE is merely propagated.
 *     -  Processing of bad pixels and automatic quality masking are
