@@ -162,6 +162,7 @@
 
 *  Copyright:
 *     Copyright (C) 1983, 1989, 1991 Science & Engineering Research
+*     Council. Copyright (C) 2007 Particle Physics and Astronomy Research
 *     Council. All Rights Reserved.
 
 *  Licence:
@@ -183,6 +184,7 @@
 *  Authors:
 *     JRG: Jack Giddings (UCL)
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -196,6 +198,8 @@
 *        version; added ONEPLN, LOGEXM, FD and STATUS arguments.
 *     1991 January 30 (MJC):
 *        Converted to the SST prologue.
+*     2007 January 4 (TIMJ):
+*        Prevent FVALUE going to 0 in VALUES(FVALUE) loop
 *     {enter_further_changes_here}
 
 *-
@@ -285,6 +289,9 @@
       LOGICAL FULL             ! Text line is full
 
 *.
+
+      NCHAR = 0
+      IVALUE = 0
 
 *    Check global status for an error.
 
@@ -867,7 +874,8 @@
             FULL = .FALSE.
             FVALUE = NVALUE
             CPOS = MXLENG
-            DO WHILE ( FVALUE .GT. IVALUE .AND. .NOT. FULL )
+            DO WHILE ( FVALUE .GT. IVALUE .AND. .NOT. FULL
+     :                 .AND. FVALUE .GT.0 )
 
 *             Copy the value to the string.
 
