@@ -868,11 +868,12 @@ int *status                   /* global status (given and returned) */
 	  will always be filled later on. */
        if (strncmp( "_CHAR", hdsRecords[j].type, 5) == 0) {
 	 datLen( sc2store_loc[pos], &len, status );
-	 memset( sc2store_ptr[pos], ' ', dim[0] * len );
+	 if (*status == SAI__OK) memset( sc2store_ptr[pos], ' ', dim[0] * len );
        }
      }
 
       if ( *status != SAI__OK ) break;
+
    }
 
 }
@@ -904,7 +905,7 @@ int *status                   /* global status (given and returned) */
    if (sc2store_ptr[index]) ((type *)sc2store_ptr[index])[frame] = head.state
 
 #define STORE_CHAR( state, index, len ) \
-   if (sc2store_ptr[index]) cnfExprt( (char *)sc2store_ptr[index]+len*frame, head.state, len )
+   if (sc2store_ptr[index]) cnfExprt( head.state, (char *)sc2store_ptr[index]+len*frame, len )
 
    /* Real Time Sequencer */
    STORE_STATE( rts_num, RTS_NUM, int );
