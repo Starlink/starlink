@@ -191,6 +191,9 @@ f     The WcsMap class does not define any new routines beyond those
 *     10-AUG-2006 (DSB):
 *        Correct astLoadWcsMap to take acount of the different number of
 *        PVi_m values that can be associated with each axis.
+*     4-JAN-2007 (DSB):
+*        Correct astLoadWcsMap to load the projection parameter with
+*        highest index correctly.
 *class--
 */
 
@@ -615,8 +618,8 @@ int astTest##attr##_( AstWcsMap *this, int axis ) { \
    projection. */
 typedef struct PrjData {
    int prj;                     /* WCSLIB projection identifier value */
-   int mxpar;                   /* Max no. of lat axis projection parameters */
-   int mxpar2;                  /* Max no. of lon axis projection parameters */
+   int mxpar;                   /* Max index for a lat axis projection param */
+   int mxpar2;                  /* Max index for a lon axis projection param */
    char desc[60];               /* Long projection description */
    char ctype[5];               /* FITS CTYPE identifying string */
    int (* WcsFwd)(double, double, struct AstPrjPrm *, double *, double *);
@@ -5469,7 +5472,7 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size,
             mxpar = 0;
          } 
 
-         for( m = 0; m < mxpar; m++ ){
+         for( m = 0; m <= mxpar; m++ ){
             (void) sprintf( buff, "pv%d_%d", i + 1, m );
             pv = astReadDouble( channel, buff, AST__BAD );
             if( pv != AST__BAD ) SetPV( new, i, m, pv );
