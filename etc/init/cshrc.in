@@ -415,7 +415,7 @@ endif
 #
 
 if ( -e ${bindir}/kappa/kappa.csh ) then
-   alias kappa source '${KAPPA_DIR/kappa.csh'
+   alias kappa source '${KAPPA_DIR}/kappa.csh'
    alias kappasetup source '${KAPPA_DIR}/kappa.csh'
 else
    alias kappa ${staretcdir}/notinst kappa
