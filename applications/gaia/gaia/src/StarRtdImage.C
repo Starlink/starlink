@@ -296,7 +296,7 @@ public:
     { "astrestore",      &StarRtdImage::astrestoreCmd,      0, 1 },
     { "astset",          &StarRtdImage::astsetCmd,          2, 2 },
     { "aststore",        &StarRtdImage::aststoreCmd,        2, 4 },
-    { "astsystem",       &StarRtdImage::astsystemCmd,       2, 3 },
+    { "astsystem",       &StarRtdImage::astsystemCmd,       2, 4 },
     { "asttran2",        &StarRtdImage::asttran2Cmd,        2, 2 },
     { "astwarnings",     &StarRtdImage::astwarningsCmd,     0, 0 },
     { "astwcs2pix",      &StarRtdImage::astwcs2pixCmd,      2, 2 },
@@ -3243,10 +3243,10 @@ int StarRtdImage::astbootstatsCmd( int argc, char *argv[] )
 //   StarRtdImage::astsystemCmd
 //
 //   Purpose:
-//       Creates a WCS system with new celestial/pixel coordinates.
+//      Modifies the WCS system with new celestial/pixel coordinates.
 //
 //    Notes:
-//       The system attributes are passed in the argv[1] element in a
+//       The system attributes are passed in as the second element in a
 //       pre-formatted manner (such as can be used by as astSet
 //       routine, i.e. system=newsystem epoch=epoch equinox=equinox).
 //       The first value is the source of the WCS to modify and should
@@ -3257,7 +3257,14 @@ int StarRtdImage::astbootstatsCmd( int argc, char *argv[] )
 //       frame to this new system, or from the current current
 //       frame. The default is to transform from the base frame (thus
 //       retaining a connection with the image pixels) and is
-//       indicated by the value 0.
+//       indicated by the value 0. This option only applies when
+//       the fourth option is set to 1.
+//
+//       The fourth (optional) argument determines if the new system 
+//       should be clean, that is a new skyframe, or be just a modified copy
+//       of the existing one. This latter option keeps all related metadata,
+//       like skyref etc., but has the side-effect of usually having the
+//       wrong equinox and epochs (when say changing from FK5 to FK4).
 //
 //       If system is set to "pixel" then a pixel coordinate system is
 //       used, rather than sky coordinates.
@@ -3303,11 +3310,22 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
        }
     }
 
-    AstFrame *newfrm;
+    AstFrame *newfrm = NULL;
     if ( strstr( argv[1], "pixel" ) == NULL ) {
 
         //  Ok now create a new SkyFrame with the options we have been given.
-        newfrm = (AstFrame *) astSkyFrame( argv[1] );
+        if ( argc <= 3 || ( argc == 4 && *argv[3] == '1' ) ) {
+            newfrm = (AstFrame *) astSkyFrame( argv[1] );
+        }
+        else {
+            //  Just apply attributes to the FrameSet copy.
+            astSet( newset_, argv[1] );
+            if ( !astOK ) {
+                astClearStatus;
+                return error( "failed to modify coordinate system" );
+            }
+            return TCL_OK;
+        }
     } 
     else {
         //  Want a pixel coordinate system (only sensible for NDFs when
@@ -3317,6 +3335,7 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
     if ( !astOK ) {
 
         //  If any of the above failed, then report the error.
+        astClearStatus;
         return error ( "failed to establish new system coordinates system");
     } 
     else {
@@ -3325,7 +3344,7 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
         //  the new skyframe to force AST to retain all the current
         //  frameset mappings or just get the current-current mapping
         //  (useful for converting between celestial coordinates).
-        if ( argc == 2 || ( argc == 3 && *argv[2] == '0' ) ) {
+        if ( argc == 2 || ( argc >= 3 && *argv[2] == '0' ) ) {
             astSetI( newset_, "Current", AST__BASE );
         }
         AstFrameSet *cvt = (AstFrameSet *) astConvert( newset_, newfrm, "" );
@@ -3336,6 +3355,7 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
         } 
         else {
             cvt = (AstFrameSet *) astAnnul( cvt );
+            astClearStatus;
             return error ( "failed to convert from existing system "
                            "to new system");
         }
@@ -6024,7 +6044,8 @@ int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
     astSetI( wcs, "Current", base );
     astSetI( wcs, "Base", current );
     double point[2];
-    for (i = 0; i < npoints; i++) {
+    reset_result();
+    for ( i = 0; i < npoints; i++ ) {
 
         //  Normalize and format the ra,dec position arguments using the
         //  base frame default formatting.
@@ -6033,7 +6054,7 @@ int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
         astNorm( wcs, point );
         const char *ra_buf = astFormat( wcs, 1, point[0] );
         const char *dec_buf = astFormat( wcs, 2, point[1] );
-        set_result( ra_buf );
+        append_element( ra_buf );
         append_element( dec_buf );
     }
     astSetI( wcs, "Current", current );
