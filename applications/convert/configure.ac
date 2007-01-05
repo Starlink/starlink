@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(convert, 1.5-7, ussc@star.rl.ac.uk)
+AC_INIT(convert, 1.5-8, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -51,6 +51,7 @@ dnl AC_PROG_RANLIB
 dnl    so commented out.   
 
 dnl    Documentation.
+LATEX2DVI='$$LATEX $$1; bibtex $$1; $$LATEX $$1; $$LATEX $$1'
 STAR_LATEX_DOCUMENTATION([sun55])
 
 dnl    Library/component sub-directories. IDL requires special handling.
