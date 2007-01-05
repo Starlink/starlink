@@ -6,6 +6,7 @@
 % ? End of specify used packages
 
 \pagestyle{myheadings}
+\bibliography{mud}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
@@ -26,7 +27,7 @@
 \newcommand{\stardocdate}      {2006 April 10}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.5-7}
+\newcommand{\stardocversion}   {Version 1.5-8}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -2287,13 +2288,25 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          array.  If BSCALE and BZERO are not given in the FITS header,
          they are taken to be 1.0 and 0.0 respectively.
 
-         If FMTCNV=\texttt{FALSE}, the HDS type of the data array in the NDF
+         If FMTCNV=\texttt{"FALSE"}, the HDS type of the data array in the NDF
          will be the equivalent of the FITS data format on tape
-         ({\em{e.g.}}\ BITPIX = 16 creates a \_WORD array).  If \texttt{TRUE},
+         ({\em{e.g.}}\ BITPIX = 16 creates a \_WORD array).  If \texttt{"TRUE"},
          the data array in the NDF will be converted from the FITS data
-         type on tape to \_REAL or \_DOUBLE in the NDF.  The choice of
-         floating-point data type depends on the number of significant
-         digits in the BSCALE and BZERO keywords.
+         type to \_REAL or \_DOUBLE in the NDF.
+
+         The special value FMTCNV=\texttt{"Native"} is a variant of \texttt{"FALSE"}, 
+         that in addition creates a scaled form of NDF array, provided
+         the array values are scaled through BSCALE and/or BZERO 
+         keywords (\emph{i.e.} the keywords' values are not the null 1.0 
+         and 0.0 respectively).  This NDF scaled array contains the 
+         unscaled data values, and the scale and offset.
+
+         The actual NDF data type for FMTCNV=\texttt{"TRUE"}, and the data 
+         type after applying the scale and offset for FMTCNV=\texttt{"NATIVE"}
+         are both specified by parameter TYPE.  However, if TYPE is a
+         blank string or null ({\tt{!}}), then the choice of floating-point
+         data type depends on the number of significant digits
+         in the BSCALE and BZERO keywords.
 
          FMTCNV may be a list of comma-separated values, enclosed in
 	 double quotes, to be applied to each conversion in turn. An
@@ -2394,7 +2407,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          TYPE = LITERAL (Read)
       }{
          The data type of the output NDF's data and variance arrays.
-	 It must be one of the following HDS types: \texttt{"\_BYTE"},
+	 It is normally one of the following HDS types: \texttt{"\_BYTE"},
 	 \texttt{"\_WORD"}, \texttt{"\_REAL"}, \texttt{"\_INTEGER"},
 	 \texttt{"\_DOUBLE"}, \texttt{"\_UBYTE"}, \texttt{"\_UWORD"}
 	 corresponding to signed byte, signed word, real, integer,
@@ -2409,7 +2422,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
          A null value (\texttt{!}) or blank requests that the type be
 	 propagated from the FITS (using the BITPIX keyword); or if
-	 FMTCNV is \texttt{TRUE}, the type is either \_REAL or \_DOUBLE
+	 FMTCNV is \texttt{"TRUE"}, the type is either \_REAL or \_DOUBLE
 	 depending on the precision of the BSCALE and BZERO keywords.
 
          TYPE may be a list of comma-separated values enclosed in 
@@ -2446,6 +2459,20 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          f256.  The data type of the NDF's data array matches that of
          the FITS primary data array.  A FITS extension is created in
          f256, and FITS sub-files are propagated to NDF extensions.
+      }
+      \sstexamplesubsection{
+         fits2ndf 256.fit f256 fmtcnv=native type=\_real
+      }{
+         As above but now a \_REAL type scaled data array is created,
+         assuming that {\tt 256.fit} contains scaled integer data with 
+         BITPIX=8 or 16 and non-default BSCALE and BZERO keywords.
+      }
+      \sstexamplesubsection{
+         fits2ndf 256.fit f256 fmtcnv=t type=\_real
+      }{
+         As the first example, but now a \_REAL type data array is 
+         created by applying the scale and offset from BSCALE and 
+         BZERO keywords to the integer values stored in {\tt 256.fit}.
       }
       \sstexamplesubsection{
          fits2ndf 256.fit f256 noprofits noproexts
@@ -3064,7 +3091,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    \sstdiytopic{
       References
    }{
-      GASP documentation (MUD/66).
+      GASP documentation (\cite{mud66}).
    }
 }
 
@@ -7058,5 +7085,13 @@ BITPIX, or BSCALE and BZERO precision when FMTCNV is \texttt{TRUE}.
 
 \htmlref{NDF2FITS}{NDF2FITS} now supports multi-NDFs HDS container files
 through the new CONTAINER and MERGE parameters.
+
+\section{Release Notes -- V1.5-8}
+
+\htmlref{FITS2NDF}{FITS2NDF} parameter FMTCNV has a new allowed value
+of \texttt{"Native"} requesting that there is no format conversion, and
+the array of numbers stored in the FITS file are copied to a scaled array
+within the NDF.  This preserves the data compression.  Parameter TYPE
+continues to control the data type of the true unscaled values.
 
 \end{document}
