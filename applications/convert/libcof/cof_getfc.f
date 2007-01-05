@@ -21,9 +21,10 @@
 *     can come via indirection from files, and repeated prompting if the
 *     previous values entered ended with the "-" continuation character.
 *
-*     The values are validated.  An error report is made should an
-*     invalid value be supplied and the group cleared.  A null value (!)
-*     equates to a TRUE value.
+*     The values are validated.  The values should be boolean or
+*     "Native" (the latter can be abbrevated to "Na").  An error report 
+*     is made should an invalid value be supplied and the group cleared.
+*     A null value (!) equates to a TRUE value.
 *
 *     If fewer than MAXVAL values are supplied, the missing values take
 *     the value of the last supplied flag.  If more than MAXVAL values 
@@ -54,6 +55,8 @@
 *  History:
 *     2006 April 7 (MJC):
 *        Original version.
+*     2007 January 3 (MJC):
+*        Allow for Native value.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -87,7 +90,7 @@
       INTEGER ADDED              ! Number of items added to a group
       LOGICAL CFLAG              ! A group requires further input via
                                  ! continuation lines?
-      CHARACTER * ( 5 ) FMTCON   ! Character form of a FMTCNV value
+      CHARACTER * ( 6 ) FMTCON   ! Character form of a FMTCNV value
       LOGICAL FMTCNV             ! Apply scale and zero?
       LOGICAL GOOD               ! All group values are valid?
       INTEGER I                  ! Loop counter
@@ -145,6 +148,8 @@
                FMTCON = 'TRUE'
             ELSE IF ( FMTCON .EQ. 'NO'//PARNAM( 1:3 ) ) THEN
                FMTCON = 'FALSE'
+            ELSE IF ( FMTCON( 1:2 ) .EQ. 'NA' ) THEN
+               FMTCON = 'NATIVE'
             END IF
             CALL ERR_MARK
             CALL GRP_PUT( GRPID, 1, FMTCON, I, STATUS )
@@ -156,28 +161,30 @@
 
 *  Convert the group value to a logical and then test that the 
 *  conversion was successful.
-            CALL CHR_CTOL( FMTCON, FMTCNV, STATUS )
-            IF ( STATUS .NE. SAI__OK ) THEN
+            IF ( FMTCON .NE. 'NATIVE' ) THEN
+               CALL CHR_CTOL( FMTCON, FMTCNV, STATUS )
+               IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Annul the error status.
-               CALL ERR_ANNUL( STATUS )
+                  CALL ERR_ANNUL( STATUS )
 
 *  Display an informational message, including the incorrect string.
-               CALL MSG_SETI( 'I', I )
-               CALL MSG_SETC( 'TH', CHR_NTH( I ) )
-               CALL MSG_SETC( 'GM', FMTCON )
-	       CALL MSG_SETC( 'PARNAM', PARNAM )
-               CALL MSG_OUT( 'FMTCNV_ERR',
-     :           'The ^I^TH value "^GM" is not one of the acceptable '/
-     :           /'logical values for ^PARNAM .', STATUS )
+                  CALL MSG_SETI( 'I', I )
+                  CALL MSG_SETC( 'TH', CHR_NTH( I ) )
+                  CALL MSG_SETC( 'GM', FMTCON )
+                  CALL MSG_SETC( 'PARNAM', PARNAM )
+                  CALL MSG_OUT( 'FMTCNV_ERR',
+     :             'The ^I^TH value "^GM" is not one of the '/
+     :             /'acceptable logical values for ^PARNAM .', STATUS )
 
 *  Let the user have another go.  So cancel the parameter value and
 *  Delete the group.
-               CALL PAR_CANCL( PARNAM, STATUS )
-               CALL GRP_DELET( GRPID, STATUS )
-               GOOD = .FALSE.
-               GOTO 100
-	    END IF
+                  CALL PAR_CANCL( PARNAM, STATUS )
+                  CALL GRP_DELET( GRPID, STATUS )
+                  GOOD = .FALSE.
+                  GOTO 100
+	       END IF
+            END IF
          END DO
       END IF
 
