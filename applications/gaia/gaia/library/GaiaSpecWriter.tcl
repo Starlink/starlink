@@ -350,21 +350,24 @@ itcl::class gaia::GaiaSpecWriter {
    #  spectrum as various FITS cards. Note all in same world coordinate
    #  system.
    protected method add_fits_coords_ {specaccessor} {
-
-      lassign [$cubespectrum get_last_coords] ra dec xra xdec dra ddec
-      if { $ra != "" } {
-         $specaccessor fitswrite EXRA  $ra \
-            "RA centre for spectral extraction"
-         $specaccessor fitswrite EXDEC $dec \
-            "DEC centre for spectral extraction"
-         $specaccessor fitswrite EXRAX $xra \
-            "RA of spectral extraction"
-         $specaccessor fitswrite EXDECX $xdec \
-            "Dec of spectral extraction"
-         $specaccessor fitswrite EXRAOF  $dra \
-            "Offset from centre of spectral extraction (arcsec)"
-         $specaccessor fitswrite EXDECOF $ddec \
-            "Offset from centre of spectral extraction (arcsec)"
+      
+      #  Not fatal if this fails.
+      catch {
+         lassign [$cubespectrum get_last_coords] ra dec xra xdec dra ddec
+         if { $ra != "" } {
+            $specaccessor fitswrite EXRA  $ra \
+               "RA centre for spectral extraction"
+            $specaccessor fitswrite EXDEC $dec \
+               "DEC centre for spectral extraction"
+            $specaccessor fitswrite EXRAX $xra \
+               "RA of spectral extraction"
+            $specaccessor fitswrite EXDECX $xdec \
+               "Dec of spectral extraction"
+            $specaccessor fitswrite EXRAOF  $dra \
+               "Offset from centre of spectral extraction (arcsec)"
+            $specaccessor fitswrite EXDECOF $ddec \
+               "Offset from centre of spectral extraction (arcsec)"
+         }
       }
    }
 
