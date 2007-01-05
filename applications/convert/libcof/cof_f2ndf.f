@@ -47,7 +47,7 @@
 *        LOGHDR is .FALSE..  The file should be formatted and have
 *        a record length of at least 80 characters.  There is no
 *        validation because the record length is machine dependent.
-*     FMTCNV = LOGICAL (Given)
+*     FMTCNV = CHARACTER * ( * )(Given)
 *        This specifies whether or not format conversion will occur.
 *        The conversion applies the values of the FITS keywords BSCALE
 *        and BZERO to the FITS data to generate the "true" data values.
@@ -55,21 +55,40 @@
 *        array.  If BSCALE and BZERO are not given in the FITS header,
 *        they are taken to be 1.0 and 0.0 respectively.
 *
-*        If FMTCNV=.FALSE., the HDS type of the data array in the NDF
+*        If FMTCNV="FALSE", the HDS type of the data array in the NDF
 *        will be the equivalent of the FITS data format on tape (e.g.
-*        BITPIX = 16 creates a _WORD array).  If FMTCNV=.TRUE., the
+*        BITPIX = 16 creates a _WORD array).  If FMTCNV="TRUE", the
 *        data array in the NDF will be converted from the FITS data
-*        type on tape to _REAL or _DOUBLE in the NDF.  The choice of
-*        floating-point data type depends on the number of significant
-*        digits in the BSCALE and BZERO keywords.
+*        type to _REAL or _DOUBLE in the NDF.
+*
+*        The special value FMTCNV="NATIVE" is a variant of "FALSE", 
+*        that in addition creates a scaled form of NDF array, provided
+*        the array values are scaled through BSCALE and/or BZERO 
+*        keywords (i.e. the keywords' values are not the null 1.0 
+*        and 0.0 respectively).  This NDF scaled array contains the 
+*        unscaled data values, and the scale and offset.
+*
+*        The actual NDF data type for FMTCNV="TRUE", and the data type
+*        after applying the scale and offset for FMTCNV="NATIVE" are 
+*        both specified by parameter USETYP.  However, if USETYP is a
+*        blank string or null (!), then the choice of floating-point
+*        data type depends on the number of significant digits
+*        in the BSCALE and BZERO keywords.
 *     USETYP = LOGICAL (Given)
 *        Specifies the HDS primitive data type of the NDF data and 
-*        variance arrays.  It should be one of the HDS primitive types.
+*        variance arrays.  It should be one of the HDS primitive types
+*        or " ".
+
+*        A blank value requests that the type be propagated from the 
+*        FITS (using the BITPIX keyword); or if FMTCNV is "TRUE", the 
+*        type is either _REAL or _DOUBLE depending on the precision 
+*        of the BSCALE and BZERO keywords.
+*
 *        This data type overrides the data type of rescaled data (see
 *        argument FMTCNV) given by the precision of the BSCALE and BZERO
 *        keywords.  Care should be exercised that the chosen type
 *        supports the dynamic range of the data, especially if 
-*        FMTCNV=.TRUE.
+*        FMTCNV="TRUE".
 *     PROFIT = LOGICAL (Given)
 *        If .TRUE., the FITS headers are written to the NDF's FITS
 *        extension. 
@@ -327,6 +346,9 @@
 *     2006 December 28 (MJC):
 *        Fixed bug by initialising TYPE and not passing a null TYPE to
 *        COF_TYPSZ.
+*     2007 January 3 (MJC):
+*        Make argument FMTCNV character to allow for FMTCNV=Native, and
+*        create a scaled NDF array for that case.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -350,7 +372,7 @@
       CHARACTER * ( * ) FILNAM
       LOGICAL LOGHDR
       INTEGER FDL
-      LOGICAL FMTCNV
+      CHARACTER * ( * ) FMTCNV
       CHARACTER * ( * ) USETYP
       LOGICAL PROFIT
       LOGICAL PROXTI
@@ -423,6 +445,7 @@
       LOGICAL EXNDF              ! FITS file originated from an NDF?
       LOGICAL FIRST              ! Processing the first HDU
                                  ! (Also used in flushing errors.)
+      LOGICAL FMTCVT             ! Local, possibly modified, FMTCNV
       INTEGER FSTAT              ! FITSIO error status
       INTEGER FSTATC             ! FITSIO error status for file closure
       INTEGER FUNITH             ! FITS unit for (merged?) FITS header
@@ -442,7 +465,8 @@
       LOGICAL ISNDF              ! If a genuine NDF is created
       CHARACTER * ( NDF__SZTYP ) ITYPE ! NDF implementation data type
       LOGICAL LOOP               ! Loop for another FITS extension?
-      LOGICAL MERGED             ! If headers have been merged
+      LOGICAL MERGED             ! Headers have been merged?
+      LOGICAL NATIVE             ! Propagate values, scale, and offset?
       LOGICAL MULTIP             ! More than one data array?
       INTEGER NBFTYP             ! Number of bytes in FITS-implied type
       INTEGER NBUTYP             ! Number of bytes in user-selected type
@@ -468,8 +492,10 @@
       INTEGER REPNTR             ! Pointer to header-propagation flags
       LOGICAL SIMPLE             ! True if the FITS file is simple
       CHARACTER * ( 6 ) SPENAM   ! Name of special type of FITS file
+      CHARACTER * ( NDF__SZTYP ) STYPE ! NDF scaled array's data type
       LOGICAL THERE              ! NDF already created?
       CHARACTER * ( NDF__SZTYP ) TYPE ! NDF array's data type
+      CHARACTER * ( NDF__SZTYP ) UTYPE ! Use data type
       LOGICAL VALID              ! True if the NDF identifier is valid
       LOGICAL WRTEXT             ! True if write NDF FITS extension
       CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to an NDF extension
@@ -489,6 +515,22 @@
 *  Initialise the merged header flag.
       MERGED = .FALSE.
 
+*  Native propagation affects the format-conversion flag.  Once the 
+*  Native special case is extracted from FMTCNV, FMTCNV can become 
+*  LOGICAL type again.  Meanwhile the requested type applies to the
+*  scaled data type, not the actual storage type of the HDS array. 
+*  Hence we need a another type variable to store a modified USETYP 
+*  that requests the HDS data type.
+      NATIVE = FMTCNV .EQ. 'NATIVE'
+      IF ( NATIVE ) THEN
+         FMTCVT = .FALSE.
+         STYPE = USETYP
+         UTYPE = ' '
+      ELSE
+         CALL CHR_CTOL( FMTCNV, FMTCVT, STATUS )
+         UTYPE = USETYP
+      END IF
+         
 *  Initialise variables that would otherwise not be initialised by
 *  some compilers
       XTENS = ' '
@@ -585,15 +627,15 @@
 
       ELSE IF ( SPENAM .EQ. 'AAO2DF') THEN
          CALL COF_2DFIM( FUNITH, FILNAM, NDF, PROFIT, LOGHDR, FDL,
-     :                   FMTCNV, STATUS )
+     :                   FMTCVT, STATUS )
 
       ELSE IF ( SPENAM .EQ. 'CAMAA' ) THEN
          CALL COF_CAMAA( FUNITH, FILNAM, NDF, PROFIT, LOGHDR, FDL,
-     :                   FMTCNV, STATUS )
+     :                   FMTCVT, STATUS )
 
       ELSE IF ( SPENAM .EQ. 'IUESI' .OR. SPENAM .EQ. 'IUELI' ) THEN
          CALL COF_IUESI( FUNITH, FILNAM, NDF, PROFIT, LOGHDR, FDL,
-     :                   FMTCNV, STATUS )
+     :                   FMTCVT, STATUS )
 
       ELSE IF ( SPENAM .EQ. 'IUEMX') THEN
          CALL COF_IUEMX( FUNITH, FILNAM, NDF, PROFIT, LOGHDR, FDL,
@@ -715,7 +757,7 @@
 *  keywords, or a null value if either BSCALE or BZERO is absent, or
 *  there is no format conversion.
                IF ( DARRAY ) THEN
-                  CALL COF_DOSCL( FUNITH, FUNITD, FMTCNV, TYPE, STATUS )
+                  CALL COF_DOSCL( FUNITH, FUNITD, FMTCVT, TYPE, STATUS )
                   IF ( STATUS .NE. SAI__OK ) THEN
                      CALL MSG_SETC( 'FILE', FILNAM(1:NCF) )
                      CALL ERR_REP( 'COF_F2NDF_SCL',
@@ -730,14 +772,14 @@
 *  a one- or two-byte integer type is selected.  On the other hand the
 *  precision of BSCALE and BZERO may be spurious _DOUBLE.  Warn the user
 *  if there is a potential loss of precision or dynamic range.
-               IF ( USETYP .NE. ' ' ) THEN
+               IF ( UTYPE .NE. ' ' ) THEN
                   IF ( TYPE .NE. ' ' ) THEN
                      CALL COF_TYPSZ( TYPE, NBFTYP, STATUS )
-                     CALL COF_TYPSZ( USETYP, NBUTYP, STATUS )
+                     CALL COF_TYPSZ( UTYPE, NBUTYP, STATUS )
                      IF ( NBUTYP .LT. NBFTYP .OR. 
      :                    ( TYPE .EQ. '_REAL' .AND.
-     :                      USETYP .EQ. '_INTEGER' ) ) THEN
-                        CALL MSG_SETC( 'UT', USETYP )
+     :                      UTYPE .EQ. '_INTEGER' ) ) THEN
+                        CALL MSG_SETC( 'UT', UTYPE )
                         CALL MSG_SETC( 'FT', TYPE )
                         CALL MSG_OUTIF( MSG__NORM, 'COF_F2NDF_PREC',
      :                    'The chosen data ^UT type may result in a '/
@@ -746,7 +788,7 @@
                      END IF
                   END IF
 
-                  TYPE = USETYP
+                  TYPE = UTYPE
                END IF
 
 *  Former NDF?
@@ -1109,7 +1151,7 @@
 *  this.
                   IF ( DARRAY .AND. ( IGROUP .GT. 0 .OR.
      :                 ( IGROUP .EQ. 0 .AND. .NOT. NONSDA ) ) ) THEN
-                     CALL COF_STYPE( NDFE, COMP, TYPE, BITPIX, FMTCNV, 
+                     CALL COF_STYPE( NDFE, COMP, TYPE, BITPIX, FMTCVT, 
      :                               ITYPE, STATUS )
 
 *  Specify the bounds of the NDF array component unless it has already
@@ -1198,6 +1240,11 @@
 *  Unmap the array.
                   CALL NDF_UNMAP( NDFE, COMP, STATUS )
 
+*  Store scale factors in the NDF array's native form.
+                  IF ( NATIVE ) THEN
+                     CALL COF_STSCL( FUNITH, NDFE, COMP, STYPE, STATUS )
+                  END IF
+                  
 *  If we are creating a MULTIP other than a Random Groups file, a header
 *  without data becomes an HDS structure of type FITS_HEADER, containing
 *  the FITS header as a _CHARACTER array.  Copy the FITS airlock to the
