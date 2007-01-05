@@ -7,7 +7,7 @@
 
 #  Purpose:
 #     Transforms a set of RA/Dec positions from a specified celestial
-#     coordinate system to that of a displayed rtdimage. 
+#     coordinate system to that of a displayed rtdimage.
 
 #  Description:
 #     This toolbox provides the ability to transform a set of sky
@@ -338,16 +338,25 @@ itcl::class gaia::GaiaAstTransform {
       if { $itk_option(-rtdimage) != {} } {
 	 set options {}
 	 if { $system_(system) != "default" } {
-	    append options "system=$system_(system),"
+	    append options "system=$system_(system)"
 	 }
-	 set system_(epoch) [$itk_component(Epoch) get]
-	 if { $system_(epoch) != "default" } {
-	    append options "epoch=$system_(epoch),"
-	 }
+         set system_(epoch) [$itk_component(Epoch) get]
+         if { $system_(epoch) != "default" } {
+            if { $options == "" } {
+               append options "epoch=$system_(epoch)"
+            } else {
+               append options ",epoch=$system_(epoch)"
+            }
+         }
 	 set system_(equinox) [$itk_component(Equinox) get]
 	 if { $system_(equinox) != "default" } {
-	    append options "equinox=$system_(equinox)"
+            if { $options == "" } {
+               append options "equinox=$system_(equinox)"
+            } else {
+               append options ",equinox=$system_(equinox)"
+            }
 	 }
+
 	 if { $options != {} } {
 
             #  Create AstFrameSet that describes the mapping from this
@@ -373,6 +382,7 @@ itcl::class gaia::GaiaAstTransform {
                   lappend newcon [list $id $ra $dec 0 0]
                   incr i
                }
+
                eval $itk_component(trantable) set_contents $newcon
                $itk_component(trantable) update_x_and_y
             }
