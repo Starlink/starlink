@@ -1,42 +1,57 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html>
-<head>
-<title>Celestial Coordinates Toolbox</title>
-</head>
+  <head>
+    <title>Celestial Coordinates Toolbox</title>
+  </head>
+  
+  <body>
+    <a name="xref_system"></a>
+    <h2 align=center><font color=red>Celestial Coordinates Toolbox</font></h2>
+    
+    <p>This window is designed to allow you to modify your image's celestial
+      coordinate system. The choices available cover: FK5, FK4, FK4 with no E
+      terms, Ecliptic, Galactic, SuperGalactic and Horizon coordinates (AzEl),
+      just choose the system that you are after using the "System:" menu button
+      and qualify it with an appropriate equinox and epoch, if necessary.
+    </p>
+      
+    <p>To apply the new system to the image press the "Test" button. This will
+      make the sky coordinate position readouts change, and any grid overlay
+      (although you can modify the coordinates that a grid is plotted in using
+      methods in the grid plotting window). To make the change permanent press
+      the "Accept" button and save the image to disk.
+    </p>
 
-<body>
-<a name="xref_system"></a>
-<h2 align=center><font color=red>Celestial Coordinates Toolbox</font></h2>
-<p>This window is designed to allow you to modify your image's
-celestial coordinate system. The choices available cover: FK5, FK4,
-FK4 with no E terms, Ecliptic, Galactic, SuperGalactic
-and Horizon coordinates (AzEl), just choose the system that you are after
-using the "System:" menu button and qualify it with an appropriate equinox and
-epoch, if necessary.
+    <p>Note this window's effects are not related to those of "Built-in
+      coordinates..." window. That selects from the systems already associated
+      with your image, this window adds a new system by transforming from any
+      existing celestial coordinates (so some celestial coordinates must
+      already be available).
+    </p>
 
-<p>To apply the new system to the image press the "Test" button. This
-will make the sky coordinate position readouts change, and any grid
-overlay (although you can modify the coordinates that a grid is
-plotted in using methods in the grid plotting window). To make the
-change permanent press the "Accept" button and save the image to disk.
+    <p>The "Ref point:" value is a specialist option and controls how a offset
+      coordinate system is interpreted. See the descriptions of the attributes
+      "SkyRefIs", "SkyRef" and "SkyRefP" in SUN/211.
+    </p>
 
-<p>Note this window's effects are not related to those of "Built-in
-coordinates..." window. That selects from the systems already
-associated with your image, this window adds a new system by
-transforming from any existing celestial coordinates (so some
-celestial coordinates must already be available).
+    <p>The observer longitude and latitude are only used for Horizon
+      coordinates.  Both values are in degrees, with the longitude measured
+      positive eastwards.  In addition to decimal degrees the value may be
+      formatted as in the following examples: "155:19:23.2", "155 19 23.2",
+      "155:19.387", "155.32311", "E155.32311", "-204.67689", "W204.67689". As
+      indicated, the sign of the longitude can optionally be indicated using
+      characters "E" and "W" in place of the usual "+" and "-".
+    </p>
 
-<p>The "Ref point:" value is a specialist option and controls how a offset
-coordinate system is interpreted. See the descriptions of the attributes
-"SkyRefIs", "SkyRef" and "SkyRefP" in SUN/211.
+    <p>
+      If you suspect that some of the meta-information which is used
+      as part of the current celestial coordinate system is invalid, or
+      may be causing some unintended side-effects, then you can opt to use a
+      "New system", which creates a coordinate system that only has the 
+      values shown in this interface. Note that selecting this option 
+      will lose the sky reference position, so the "Ref point:" values
+      will be ignored.
+    </p>
 
-<p>The observer longitude and latitude are only used for Horizon coordinates.
-Both values are in degrees, with the longitude measured positive eastwards.
-In addition to decimal degrees the value may be formatted as in the following
-examples: "155:19:23.2", "155 19 23.2", "155:19.387", "155.32311",
-"E155.32311", "-204.67689", "W204.67689". As indicated, the sign of the
-longitude can optionally be indicated using characters "E" and "W" in place of
-the usual "+" and "-".
-
-</body>
+  </body>
 </html>

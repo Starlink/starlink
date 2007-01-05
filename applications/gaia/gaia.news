@@ -1,5 +1,12 @@
   Latest changes:
 
+    The precession facility of the positions toolbox should now correctly
+    transform the current list of coordinates, rather than a single position.
+
+    The celestial coordinates toolbox will now corrrectly use the 
+    sky reference position as an origin or pole. Previously this setting
+    has no effect.
+
     A bug when extracting a spectrum over a restricted range meant that the
     coordinates of an NDF or FITS were incorrect (by an offset). This has
     been fixed.
