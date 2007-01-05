@@ -298,13 +298,25 @@
 *        array.  If BSCALE and BZERO are not given in the FITS header,
 *        they are taken to be 1.0 and 0.0 respectively.
 *
-*        If FMTCNV=FALSE, the HDS type of the data array in the NDF
+*        If FMTCNV="FALSE", the HDS type of the data array in the NDF
 *        will be the equivalent of the FITS data format on tape (e.g.
-*        BITPIX = 16 creates a _WORD array).  If TRUE, the data array
-*        in the NDF will be converted from the FITS data type on tape
-*        to _REAL or _DOUBLE in the NDF.  The choice of floating-point
-*        data type depends on the number of significant digits in the
-*        BSCALE and BZERO keywords.
+*        BITPIX = 16 creates a _WORD array).  If FMTCNV="TRUE", the data 
+*        array in the NDF will be converted from the FITS data type
+*        to _REAL or _DOUBLE in the NDF.
+*
+*        The special value FMTCNV="Native" is a variant of "FALSE", 
+*        that in addition creates a scaled form of NDF array, provided
+*        the array values are scaled through BSCALE and/or BZERO 
+*        keywords (i.e. the keywords' values are not the null 1.0 
+*        and 0.0 respectively).  This NDF scaled array contains the 
+*        unscaled data values, and the scale and offset.
+*
+*        The actual NDF data type for FMTCNV="TRUE", and the data type
+*        after applying the scale and offset for FMTCNV="NATIVE" are 
+*        both specified by parameter TYPE.  However, if TYPE is a
+*        blank string or null (!), then the choice of floating-point
+*        data type depends on the number of significant digits
+*        in the BSCALE and BZERO keywords.
 *
 *        FMTCNV may be a list of comma-separated values, enclosed in
 *        double quotes, to be applied to each conversion in turn.  An
@@ -383,7 +395,7 @@
 *        is written verbatim.  [TRUE]
 *     TYPE = LITERAL (Read)
 *        The data type of the output NDF's data and variance arrays.  It
-*        must be one of the following HDS types: "_BYTE", "_WORD", 
+*        is normally one of the following HDS types: "_BYTE", "_WORD", 
 *        "_REAL", "_INTEGER", "_DOUBLE", "_UBYTE", "_UWORD" 
 *        corresponding to signed byte, signed word, real, integer, 
 *        double precision, unsigned byte, and unsigned word.  See SUN/92
@@ -395,9 +407,9 @@
 *        of precision, and should be used with care.
 *
 *        A null value (!) or blank requests that the type be propagated 
-*        from the FITS (using the BITPIX keyword); or if FMTCNV is TRUE,
-*        the type is either _REAL or _DOUBLE depending on the precision 
-*        of the BSCALE and BZERO keywords. 
+*        from the FITS (using the BITPIX keyword); or if FMTCNV is
+*        "TRUE", the type is either _REAL or _DOUBLE depending on the 
+*        precision of the BSCALE and BZERO keywords. 
 *
 *        TYPE may be a list of comma-separated values enclosed in 
 *        double quotes, that are applied to each conversion in turn.  An
@@ -427,6 +439,14 @@
 *        f256.  The data type of the NDF's data array matches that of
 *        the FITS primary data array.  A FITS extension is created in
 *        f256, and FITS sub-files are propagated to NDF extensions.
+*     fits2ndf 256.fit f256 fmtcnv=native type=_real
+*        As above but now a _REAL type scaled data array is created,
+*        assuming that 256.fit contains scaled integer data with 
+*        BITPIX=8 or 16 and non-default BSCALE and BZERO keywords.
+*     fits2ndf 256.fit f256 fmtcnv=t type=_real
+*        As the first example, but now a _REAL type data array is 
+*        created by applying the scale and offset from BSCALE and 
+*        BZERO keywords to the integer values stored in 256.fit.
 *     fits2ndf 256.fit f256 noprofits noproexts
 *        As the previous example except there will be a format
 *        conversion from a FITS integer data type to floating point in
@@ -894,6 +914,8 @@
 *     2006 April 7 (MJC):
 *        Added TYPE parameter.  Move obtaining FMTCNV group to a
 *        subroutine.  Wrap long lines.
+*     2007 January 3 (MJC):
+*        Allow for FMTCNV=Native.  Add examples using the TYPE parameter.       
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -943,8 +965,7 @@
       INTEGER FDL                ! FIle descriptor for logfile
       LOGICAL FILEXS             ! FITS file exists
       CHARACTER * ( 255 ) FILNAM ! Name of FITS file
-      LOGICAL FMTCNV             ! Apply scale and zero?
-      CHARACTER * ( 5 ) FMTCON   ! Character form of a FMTCNV value
+      CHARACTER * ( 6 ) FMTCON   ! Character form of a FMTCNV value
       CHARACTER * ( 255 ) FSPEC  ! File specification
       INTEGER FLEN               ! Length of filename part of FSPEC
       LOGICAL FOUND              ! Found a wildcarded file?
@@ -1343,9 +1364,8 @@
 *  Find the output NDF name.
          CALL GRP_GET( OGROUP, IFILE, 1, NDFNAM, STATUS )
 
-*  Find the FMTCNV and convert it to a logical value.
+*  Find the FMTCNV.
          CALL GRP_GET( FCGRP, IFILE, 1, FMTCON, STATUS )
-         CALL CHR_CTOL( FMTCON, FMTCNV, STATUS )
 
 *  Find the output data type.
          CALL GRP_GET( TGROUP, IFILE, 1, TYPE, STATUS )
@@ -1370,7 +1390,7 @@
 *  ======================
 
 *  Convert the FITS file into an NDF as best we can.
-         CALL COF_F2NDF( FILNAM, NDF, LOGHDR, FDL, FMTCNV, TYPE, PROFIT,
+         CALL COF_F2NDF( FILNAM, NDF, LOGHDR, FDL, FMTCON, TYPE, PROFIT,
      :                   PROEXT, CONTNR, NENCOD, ENCODS, WCSATT,
      :                   STATUS )
 
