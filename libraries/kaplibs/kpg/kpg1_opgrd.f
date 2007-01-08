@@ -39,15 +39,15 @@
 *        The projection parameters. Each parameter that is supplied with
 *        a value of AST__BAD on entry will be replaced on exit with the
 *        optimal value. Non-bad supplied values will be left unchanged on 
-*        exit. The supplied values will also be left unchanged if no
-*        periodicity is visible in the supplied positions. They are stored 
-*        in the order CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, CROTA2. 
-*        CRPIX1 and CRPIX2 are in units of pixels. All the other projection 
-*        parameters will be in units of radians, and refer to the celestial 
-*        coodinate system in which the POS values are supplied. CROTA2 is 
-*        the angle from celestial north to the Y axis, measured through west 
-*        if WEST is .FALSE., and through east otherwise. Returned pixel sizes 
-*        are rounded to the nearest tenth of an arc-second.
+*        exit. The supplied values will also be left unchanged if optimal
+*        values cannot be determined. They are stored in the order CRPIX1, 
+*        CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, CROTA2. CRPIX1 and CRPIX2 
+*        are in units of pixels. All the other projection parameters will 
+*        be in units of radians, and refer to the celestial coodinate 
+*        system in which the POS values are supplied. CROTA2 is the angle 
+*        from celestial north to the Y axis, measured through west if WEST 
+*        is .FALSE., and through east otherwise. Returned pixel sizes are 
+*        rounded to the nearest tenth of an arc-second.
 *     RDIAM = DOUBLE PRECISION (Returned)
 *        The diameter of the circle that just encloses all the supplied sky
 *        positions, in radians.
@@ -250,6 +250,10 @@
 *        Original version.
 *     27-NOV-2006 (DSB):
 *        Round the returned CROTA value to 0.1 degree.
+*     8-JAN-2006 (DSB):
+*        Allow the referene poition to be optimised in cases where the
+*        optimal pixel sizes and orientation cannot be determined, but
+*        dont need to be because values were supplied by the caller.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -324,6 +328,7 @@
       INTEGER MAP
       INTEGER ND
       LOGICAL MORE
+      LOGICAL OK
       LOGICAL OPTY          
       REAL DX
       REAL DY
@@ -335,6 +340,8 @@
 *  Initialise
       PWAVE = 0.0D0
       PANG = 0.0D0
+      IPHIST = 0
+      OK = .TRUE.
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
@@ -469,25 +476,32 @@
       XC = 0.5*( XHI + XLO )
       YC = 0.5*( YHI + YLO )
 
+*  The next bit is to do with determining the optimal pixel sizes and
+*  orientation, so we can skip it if these were supplied by the caller.
+      IF( PAR( 5 ) .EQ. AST__BAD .OR.
+     :    PAR( 6 ) .EQ. AST__BAD .OR.
+     :    PAR( 7 ) .EQ. AST__BAD ) THEN
+         OK = .FALSE.
+
 *  Allocate a 1D work array which spans the circle enclosing the bounding box
 *  but using smaller pixels (10 pixels to each regular grid space).
-      SPC = 0.1D0*SPC
-      HISTSZ = DIAM/SPC
-      CALL PSX_CALLOC( HISTSZ, '_REAL', IPHIST, STATUS )
+         SPC = 0.1D0*SPC
+         HISTSZ = DIAM/SPC
+         CALL PSX_CALLOC( HISTSZ, '_REAL', IPHIST, STATUS )
 
 *  Store the grid coordinate within this work array that will correspond to
 *  the central position (XC,YC).
-      SPC0 = DBLE( ( HISTSZ + 1 )/2 )
+         SPC0 = DBLE( ( HISTSZ + 1 )/2 )
 
 *  Imagine a line passing through the centre position (XC,YC). We step 
 *  through all orientations of this line in units of 3 degrees. Zero angle
 *  corresponds to the second axis in the initial projection (i.e. celestial 
 *  north), and the first axis of the initial projection (either east or west) 
 *  is at angle of +90 degrees.
-      MXAMP = -1.0
-      MXWAVE = 0.0
-      DO IANG = 0, 177, 3
-         ANG = IANG*AST__DD2R
+         MXAMP = -1.0
+         MXWAVE = 0.0
+         DO IANG = 0, 177, 3
+            ANG = IANG*AST__DD2R
 
 *  For the current line orientation, project every initial grid position onto 
 *  the line, and record where about the projected point falls on the line.
@@ -498,43 +512,45 @@
 *  with the wavelength of the periodicity (in units of initial grid pixels).
 *  The details of the orientation with the strongest periodicity are
 *  retained in MXAMP, MXANG and MXWAVE.
-         CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC, SPC0,
-     :                    .TRUE., HISTSZ, %VAL( CNF_PVAL( IPHIST ) ),
-     :                    MXAMP, MXWAVE, MXANG, STATUS )
+            CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC, SPC0,
+     :                       .TRUE., HISTSZ, %VAL( CNF_PVAL( IPHIST ) ),
+     :                       MXAMP, MXWAVE, MXANG, STATUS )
 
 *  Next orientation.
-      END DO
+         END DO
 
 *  Check a direction was found that shows some periodicity.
-      IF( MXWAVE .GT. 0.0 ) THEN      
+         IF( MXWAVE .GT. 0.0 ) THEN      
 
 *  Now do a finer search through a cone of angles centred on the rough angle
 *  found above. The cone is 3 degrees wide and we use 0.1 degree intervals. 
 *  In this loop the IANG variable is angular offset from ANG0 in units of 
 *  0.1 degree. This time, we use linear interpolation to create the 
 *  histogram, to get a more accurate result.
-         ANG0 = MXANG
-         MXAMP = -1.0
-         MXWAVE = 0.0
-         	    
-         DO IANG = -15, 15
-            ANG = ANG0 + 0.1*DBLE( IANG )*AST__DD2R
-            CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC, SPC0, 
-     :                       .TRUE., HISTSZ, %VAL( CNF_PVAL( IPHIST ) ),
-     :                       MXAMP, MXWAVE, MXANG, STATUS )
-         END DO
+            ANG0 = MXANG
+            MXAMP = -1.0
+            MXWAVE = 0.0
+            	    
+            DO IANG = -15, 15
+               ANG = ANG0 + 0.1*DBLE( IANG )*AST__DD2R
+               CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC, 
+     :                          SPC0, .TRUE., HISTSZ, 
+     :                          %VAL( CNF_PVAL( IPHIST ) ), MXAMP, 
+     :                          MXWAVE, MXANG, STATUS )
+            END DO
 
 *  Calculate the wavelength of the periodicity at right angles to the above 
 *  chosen direction.
-         PAMP = -1.0
-         PWAVE = 0.0
-         CALL KPG1_OPGR2( NPOS, XOUT, YOUT, MXANG + AST__DPIBY2, 
-     :                    SPC, XC, YC, SPC0, .TRUE., HISTSZ, 
-     :                    %VAL( CNF_PVAL( IPHIST ) ), 
-     :                    PAMP, PWAVE, PANG, STATUS )
+            PAMP = -1.0
+            PWAVE = 0.0
+            CALL KPG1_OPGR2( NPOS, XOUT, YOUT, MXANG + AST__DPIBY2, 
+     :                       SPC, XC, YC, SPC0, .TRUE., HISTSZ, 
+     :                       %VAL( CNF_PVAL( IPHIST ) ), 
+     :                       PAMP, PWAVE, PANG, STATUS )
 
 *  Check that the chosen orientations have some periodicity.
-         IF( MXWAVE .GT. 0.0 .AND. PWAVE .GT. 0.0 ) THEN   
+            IF( MXWAVE .GT. 0.0 .AND. PWAVE .GT. 0.0 ) THEN   
+               OK = .TRUE.
 
 *  The orientation with the most prominent periodicity can be used as
 *  either the X or Y axis in the returned optimal grid, and can be either
@@ -544,222 +560,225 @@
 *  +ve X in the initial grid) of the optimal Y axis, and set a flag
 *  indicating if the periodicity is associated with the optimal X or Y
 *  grid axis.
-            IF( MXANG .LE. 0.5*AST__DPIBY2 ) THEN
-               YANG = MXANG
-               OPTY = .TRUE.
-            
-            ELSE IF( MXANG .LE. 1.5*AST__DPIBY2 ) THEN
-               YANG = MXANG - AST__DPIBY2
-               OPTY = .FALSE.
-            
-            ELSE IF( MXANG .LE. 2.5*AST__DPIBY2  ) THEN
-               YANG = MXANG - 2*AST__DPIBY2
-               OPTY = .TRUE.
-            
-            ELSE IF( MXANG .LE. 3.5*AST__DPIBY2 ) THEN
-               YANG = MXANG - 3*AST__DPIBY2
-               OPTY = .FALSE.
-            
-            ELSE
-               YANG = MXANG 
-               OPTY = .TRUE.
-            
-            END IF         
-
-*  Store the INITIAL CRPIX1/2 parameters of the optimal grid. 
-            PAR0( 1 ) = 1.0
-            PAR0( 2 ) = 1.0
-
-*  If no reference point sky coords were supplied, use the centre of the
-*  bounding box (if reference point sky coords were supplied they will
-*  already be stored in PAR0(3) and PAR0(4) ).
-            IF( PAR( 3 ) .EQ. AST__BAD .OR. 
-     :          PAR( 4 ) .EQ. AST__BAD ) THEN
-
-*  Find the celestial coordinates at the centre of the bounding box.
-               CALL AST_TRAN2( MAP, 1, XC, YC, .TRUE., XOUT, YOUT, 
-     :                         STATUS )
-
-*  Report an error if the celestial coords are bad. 
-               IF( XOUT( 1 ) .EQ. VAL__MIND ) THEN
-                  IF( STATUS .EQ. SAI__OK ) THEN
-                     STATUS = SAI__ERROR
-                     CALL ERR_REP( ' ', 'KPG1_OPGRD: Cannot '//
-     :                             'transform central position '//
-     :                             '(programming error).', STATUS )
-                  END IF
-                  GO TO 999
-               END IF 
-      	       
-               PAR0( 3 ) = XOUT( 1 )
-               PAR0( 4 ) = YOUT( 1 )
-            END IF
+               IF( MXANG .LE. 0.5*AST__DPIBY2 ) THEN
+                  YANG = MXANG
+                  OPTY = .TRUE.
+               
+               ELSE IF( MXANG .LE. 1.5*AST__DPIBY2 ) THEN
+                  YANG = MXANG - AST__DPIBY2
+                  OPTY = .FALSE.
+               
+               ELSE IF( MXANG .LE. 2.5*AST__DPIBY2  ) THEN
+                  YANG = MXANG - 2*AST__DPIBY2
+                  OPTY = .TRUE.
+               
+               ELSE IF( MXANG .LE. 3.5*AST__DPIBY2 ) THEN
+                  YANG = MXANG - 3*AST__DPIBY2
+                  OPTY = .FALSE.
+               
+               ELSE
+                  YANG = MXANG 
+                  OPTY = .TRUE.
+               
+               END IF         
 
 *  Store the CDELT1/2 parameters of the optimal grid. 
-            IF( OPTY ) THEN
-               PAR0( 5 ) = -PWAVE*PIXSCL
-               PAR0( 6 ) = MXWAVE*PIXSCL
-            ELSE
-               PAR0( 5 ) = -MXWAVE*PIXSCL
-               PAR0( 6 ) = PWAVE*PIXSCL
-            END IF
+               IF( OPTY ) THEN
+                  PAR0( 5 ) = -PWAVE*PIXSCL
+                  PAR0( 6 ) = MXWAVE*PIXSCL
+               ELSE
+                  PAR0( 5 ) = -MXWAVE*PIXSCL
+                  PAR0( 6 ) = PWAVE*PIXSCL
+               END IF
 
 *  Store the CROTA2 parameter.
-            PAR0( 7 ) = YANG
+               PAR0( 7 ) = YANG
 
-            IF( .NOT. WEST ) THEN
-               PAR0( 5 ) = -PAR0( 5 )
-               PAR0( 7 ) = -PAR0( 7 )
-            END IF
+               IF( .NOT. WEST ) THEN
+                  PAR0( 5 ) = -PAR0( 5 )
+                  PAR0( 7 ) = -PAR0( 7 )
+               END IF
 
 *  Round to the nearest 10th of a degree. 
-            PAR0( 7 ) = NINT( PAR0( 7 )*AST__DR2D*10.0 )/
-     :                         (10.0*AST__DR2D)
+               PAR0( 7 ) = NINT( PAR0( 7 )*AST__DR2D*10.0 )/
+     :                            (10.0*AST__DR2D)
 
 *  Ensure CROTA is in the range 0 -> 2*PI
-            DO WHILE( PAR0( 7 ) .LT. 0.0 ) 
-               PAR0( 7 ) = PAR0( 7 ) + 2*AST__DPI
-            END DO
+               DO WHILE( PAR0( 7 ) .LT. 0.0 ) 
+                  PAR0( 7 ) = PAR0( 7 ) + 2*AST__DPI
+               END DO
             
-            DO WHILE( PAR0( 7 ) .GE. 360.0 ) 
-               PAR0( 7 ) = PAR0( 7 ) - 2*AST__DPI
-            END DO
+               DO WHILE( PAR0( 7 ) .GE. 360.0 ) 
+                  PAR0( 7 ) = PAR0( 7 ) - 2*AST__DPI
+               END DO
 
 *  Round the pixel sizes to the closest 10th of an arc-second.
-            PAR0( 5 ) = NINT( PAR0( 5 )*AST__DR2D*36000.0 )/
-     :                         (36000.0*AST__DR2D)
-            PAR0( 6 ) = NINT( PAR0( 6 )*AST__DR2D*36000.0 )/
-     :                         (36000.0*AST__DR2D)
-
-*  Copy any supplied values into the projection parameters array.
-            DO I = 1, 7
-               IF( PAR( I ) .NE. AST__BAD ) PAR0( I ) = PAR( I )
-            END DO
-
-*  We now find a small (less than one pixel) change to PAR0(1) and
-*  PAR0(2) that causes more samples to be projected to the centre of the
-*  corresponding pixel. First create a Mapping from the above projection
-*  parameters and use it to map the supplied sky positions into grid coords.
-            FC = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
-            CALL AST_SETFITSS( FC, 'CTYPE1', 'RA---TAN', ' ', .TRUE., 
-     :                         STATUS )
-            CALL AST_SETFITSS( FC, 'CTYPE2', 'DEC--TAN', ' ', .TRUE., 
-     :                         STATUS )
-            CALL AST_SETFITSF( FC, 'CRPIX1', PAR0( 1 ), ' ', .TRUE., 
-     :                         STATUS )
-            CALL AST_SETFITSF( FC, 'CRPIX2', PAR0( 2 ), ' ', .TRUE., 
-     :                         STATUS )
-            CALL AST_SETFITSF( FC, 'CRVAL1', PAR0( 3 )*AST__DR2D, ' ', 
-     :                         .TRUE., STATUS )
-            CALL AST_SETFITSF( FC, 'CRVAL2', PAR0( 4 )*AST__DR2D, ' ',
-     :                         .TRUE., STATUS )
-            CALL AST_SETFITSF( FC, 'CDELT1', PAR0( 5 )*AST__DR2D, ' ',
-     :                         .TRUE., STATUS )
-            CALL AST_SETFITSF( FC, 'CDELT2', PAR0( 6 )*AST__DR2D, ' ',
-     :                         .TRUE., STATUS )
-            CALL AST_SETFITSF( FC, 'CROTA2', PAR0( 7 )*AST__DR2D, ' ',
-     :                         .TRUE., STATUS )
-            CALL AST_CLEAR( FC, 'Card', STATUS )
-            
-            FS = AST_READ( FC, STATUS )
-            
-            IF( FS .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( ' ', 'KPG1_OPGRD: Failed to read '//
-     :                       'FrameSet from FitsChan (programming '//
-     :                       'error).', STATUS )
-               GO TO 999
-            END IF
-            
-            MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT, STATUS )
-            CALL AST_TRAN2( MAP, NPOS, AIN, BIN, .FALSE., XOUT, YOUT, 
-     :                      STATUS )
-
-*  Find the fractional pixel offsets that result in the minimum squared
-*  deviation between sample positions and the centres of the corresponding
-*  pixels. 
-            CALL KPG1_OPGR4( NPOS, XOUT, YOUT, DX, DY, STATUS )
-
-*  If the reference point sky coords were supplied, modify the CRPIX1/2
-*  values to put the refence point at the right place, leaving CRVAL1/2 
-*  unchanged.
-            IF( PAR( 3 ) .NE. AST__BAD .OR. 
-     :          PAR( 4 ) .NE. AST__BAD ) THEN
-               PAR0( 1 ) = PAR0( 1 ) + DX
-               PAR0( 2 ) = PAR0( 2 ) + DY
-
-*  If the reference point sky coords were not supplied, modify the CRVAL1/2
-*  values so that CRPIX1/2 can retain the existing nice integer values.
-            ELSE
-
-*  Modify the CRPIX values ( PAR0(1) and PAR0(2) ) accordingly.
-               NPAR1 = PAR0( 1 ) - DX
-               NPAR2 = PAR0( 2 ) - DY
-
-*  Find the sky coords corresponding to this position, and use them as
-*  the new CRVAL1/2 values ( PAR0(3) and PAR0(4) ).
-               CALL AST_TRAN2( MAP, 1, NPAR1, NPAR2, .TRUE., PAR0( 3 ), 
-     :                         PAR0( 4 ), STATUS )
-            END IF
-
-*  Normalise CRVAL1/2 into range (0->2PI, -PI/2->PI/2)
-            IF( PAR0( 4 ) .GT. AST__DPIBY2 ) THEN
-               PAR0( 4 ) = AST__DPI - PAR0( 4 ) 
-               PAR0( 3 ) = AST__DPI + PAR0( 3 )
-            
-            ELSE IF( PAR0( 4 ) .LT. -AST__DPIBY2 ) THEN
-               PAR0( 4 ) = -AST__DPI - PAR0( 4 ) 
-               PAR0( 3 ) = AST__DPI + PAR0( 3 )
-            
-            END IF
-            
-            IF( PAR0( 3 ) .LT. 0.0 ) THEN
-               PAR0( 3 ) = PAR0( 3 ) + 2*AST__DPI 
-            
-            ELSE IF( PAR0( 3 ) .GT. 2*AST__DPI ) THEN
-               PAR0( 3 ) = PAR0( 3 ) - 2*AST__DPI 
-            
-            END IF
-
-*  Find the pixel bounds of the new bounding box.
-            XHI = VAL__MIND
-            YHI = VAL__MIND
-            XLO = VAL__MAXD
-            YLO = VAL__MAXD
-            
-            DO I = 1, NPOS
-               IF( XOUT( I ) .NE. AST__BAD .AND.
-     :             YOUT( I ) .NE. AST__BAD ) THEN
-                  XHI = MAX( XHI, XOUT( I ) )
-                  YHI = MAX( YHI, YOUT( I ) )
-                  XLO = MIN( XLO, XOUT( I ) )
-                  YLO = MIN( YLO, YOUT( I ) )
-               END IF
-            END DO
-
-*  Choose the integer part of CRPIX1/2 so that it is close to the centre
-*  of the bounding box.
-            PAR0( 1 ) = PAR0( 1 ) + NINT( ( XHI - XLO )/2 ) + 1 
-     :                  - NINT( PAR0( 1 ) )
-            PAR0( 2 ) = PAR0( 2 ) + NINT( ( YHI - YLO )/2 ) + 1 
-     :                  - NINT( PAR0( 2 ) )
-
-*  Check pixel sizes are not zero.
-            IF( PAR0( 5 ) .NE. 0.0 .AND.
-     :          PAR0( 6 ) .NE. 0.0 ) THEN
-               
-*  Copy the projection parameters to the supplIed array.
-               DO I = 1, 7
-                  IF( PAR( I ) .EQ. AST__BAD ) PAR( I ) = PAR0( I )
-               END DO
+               PAR0( 5 ) = NINT( PAR0( 5 )*AST__DR2D*36000.0 )/
+     :                            (36000.0*AST__DR2D)
+               PAR0( 6 ) = NINT( PAR0( 6 )*AST__DR2D*36000.0 )/
+     :                            (36000.0*AST__DR2D)
 
             END IF
          END IF
       END IF
 
+*  Check that PAR0 now contains usable pixel size and orientation values. 
+      IF( OK ) THEN
+
+*  Store the INITIAL CRPIX1/2 parameters of the optimal grid. 
+         PAR0( 1 ) = 1.0
+         PAR0( 2 ) = 1.0
+
+*  If no reference point sky coords were supplied, use the centre of the
+*  bounding box (if reference point sky coords were supplied they will
+*  already be stored in PAR0(3) and PAR0(4) ).
+         IF( PAR( 3 ) .EQ. AST__BAD .OR. PAR( 4 ) .EQ. AST__BAD ) THEN
+
+*  Find the celestial coordinates at the centre of the bounding box.
+            CALL AST_TRAN2( MAP, 1, XC, YC, .TRUE., XOUT, YOUT, STATUS )
+
+*  Report an error if the celestial coords are bad. 
+            IF( XOUT( 1 ) .EQ. VAL__MIND ) THEN
+               IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP( ' ', 'KPG1_OPGRD: Cannot transform '//
+     :                          'central position (programming error).', 
+     :                          STATUS )
+               END IF
+               GO TO 999
+            END IF 
+      	    
+            PAR0( 3 ) = XOUT( 1 )
+            PAR0( 4 ) = YOUT( 1 )
+         END IF
+
+*  Copy any supplied values into the projection parameters array.
+         DO I = 1, 7
+            IF( PAR( I ) .NE. AST__BAD ) PAR0( I ) = PAR( I )
+         END DO
+
+*  We now find a small (less than one pixel) change to PAR0(1) and
+*  PAR0(2) that causes more samples to be projected to the centre of the
+*  corresponding pixel. First create a Mapping from the above projection
+*  parameters and use it to map the supplied sky positions into grid coords.
+         FC = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
+         CALL AST_SETFITSS( FC, 'CTYPE1', 'RA---TAN', ' ', .TRUE., 
+     :                      STATUS )
+         CALL AST_SETFITSS( FC, 'CTYPE2', 'DEC--TAN', ' ', .TRUE., 
+     :                      STATUS )
+         CALL AST_SETFITSF( FC, 'CRPIX1', PAR0( 1 ), ' ', .TRUE., 
+     :                      STATUS )
+         CALL AST_SETFITSF( FC, 'CRPIX2', PAR0( 2 ), ' ', .TRUE., 
+     :                      STATUS )
+         CALL AST_SETFITSF( FC, 'CRVAL1', PAR0( 3 )*AST__DR2D, ' ', 
+     :                      .TRUE., STATUS )
+         CALL AST_SETFITSF( FC, 'CRVAL2', PAR0( 4 )*AST__DR2D, ' ',
+     :                      .TRUE., STATUS )
+         CALL AST_SETFITSF( FC, 'CDELT1', PAR0( 5 )*AST__DR2D, ' ',
+     :                      .TRUE., STATUS )
+         CALL AST_SETFITSF( FC, 'CDELT2', PAR0( 6 )*AST__DR2D, ' ',
+     :                      .TRUE., STATUS )
+         CALL AST_SETFITSF( FC, 'CROTA2', PAR0( 7 )*AST__DR2D, ' ',
+     :                      .TRUE., STATUS )
+         CALL AST_CLEAR( FC, 'Card', STATUS )
+         
+         FS = AST_READ( FC, STATUS )
+         
+         IF( FS .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'KPG1_OPGRD: Failed to read '//
+     :                    'FrameSet from FitsChan (programming '//
+     :                    'error).', STATUS )
+            GO TO 999
+         END IF
+         
+         MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT, STATUS )
+         CALL AST_TRAN2( MAP, NPOS, AIN, BIN, .FALSE., XOUT, YOUT, 
+     :                   STATUS )
+
+*  Find the fractional pixel offsets that result in the minimum squared
+*  deviation between sample positions and the centres of the corresponding
+*  pixels. 
+         CALL KPG1_OPGR4( NPOS, XOUT, YOUT, DX, DY, STATUS )
+
+*  If the reference point sky coords were supplied, modify the CRPIX1/2
+*  values to put the refence point at the right place, leaving CRVAL1/2 
+*  unchanged.
+         IF( PAR( 3 ) .NE. AST__BAD .OR. 
+     :       PAR( 4 ) .NE. AST__BAD ) THEN
+            PAR0( 1 ) = PAR0( 1 ) + DX
+            PAR0( 2 ) = PAR0( 2 ) + DY
+
+*  If the reference point sky coords were not supplied, modify the CRVAL1/2
+*  values so that CRPIX1/2 can retain the existing nice integer values.
+         ELSE
+
+*  Modify the CRPIX values ( PAR0(1) and PAR0(2) ) accordingly.
+            NPAR1 = PAR0( 1 ) - DX
+            NPAR2 = PAR0( 2 ) - DY
+
+*  Find the sky coords corresponding to this position, and use them as
+*  the new CRVAL1/2 values ( PAR0(3) and PAR0(4) ).
+            CALL AST_TRAN2( MAP, 1, NPAR1, NPAR2, .TRUE., PAR0( 3 ), 
+     :                      PAR0( 4 ), STATUS )
+         END IF
+
+*  Normalise CRVAL1/2 into range (0->2PI, -PI/2->PI/2)
+         IF( PAR0( 4 ) .GT. AST__DPIBY2 ) THEN
+            PAR0( 4 ) = AST__DPI - PAR0( 4 ) 
+            PAR0( 3 ) = AST__DPI + PAR0( 3 )
+         
+         ELSE IF( PAR0( 4 ) .LT. -AST__DPIBY2 ) THEN
+            PAR0( 4 ) = -AST__DPI - PAR0( 4 ) 
+            PAR0( 3 ) = AST__DPI + PAR0( 3 )
+         
+         END IF
+         
+         IF( PAR0( 3 ) .LT. 0.0 ) THEN
+            PAR0( 3 ) = PAR0( 3 ) + 2*AST__DPI 
+         
+         ELSE IF( PAR0( 3 ) .GT. 2*AST__DPI ) THEN
+            PAR0( 3 ) = PAR0( 3 ) - 2*AST__DPI 
+         
+         END IF
+
+*  Find the pixel bounds of the new bounding box.
+         XHI = VAL__MIND
+         YHI = VAL__MIND
+         XLO = VAL__MAXD
+         YLO = VAL__MAXD
+         
+         DO I = 1, NPOS
+            IF( XOUT( I ) .NE. AST__BAD .AND.
+     :          YOUT( I ) .NE. AST__BAD ) THEN
+               XHI = MAX( XHI, XOUT( I ) )
+               YHI = MAX( YHI, YOUT( I ) )
+               XLO = MIN( XLO, XOUT( I ) )
+               YLO = MIN( YLO, YOUT( I ) )
+            END IF
+         END DO
+
+*  Choose the integer part of CRPIX1/2 so that it is close to the centre
+*  of the bounding box.
+         PAR0( 1 ) = PAR0( 1 ) + NINT( ( XHI - XLO )/2 ) + 1 
+     :               - NINT( PAR0( 1 ) )
+         PAR0( 2 ) = PAR0( 2 ) + NINT( ( YHI - YLO )/2 ) + 1 
+     :               - NINT( PAR0( 2 ) )
+
+*  Check pixel sizes are not zero.
+         IF( PAR0( 5 ) .NE. 0.0 .AND. PAR0( 6 ) .NE. 0.0 ) THEN
+               
+*  Copy the projection parameters to the supplIed array.
+            DO I = 1, 7
+               IF( PAR( I ) .EQ. AST__BAD ) PAR( I ) = PAR0( I )
+            END DO
+
+         END IF
+      END IF
+
 *  Free resources
  999  CONTINUE
-      CALL PSX_FREE( IPHIST, STATUS )
+      IF( IPHIST .NE. 0 ) CALL PSX_FREE( IPHIST, STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )
