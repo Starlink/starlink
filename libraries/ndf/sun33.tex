@@ -3778,6 +3778,9 @@ it for write access, store the scaled data values in the mapped simple
 array, unmap the array, and then associate scale and zero values with the
 array, thus converting it to a scaled array.
 
+\item The NDF\_GTSZx routine can be used to determine the scale and zero
+values of an existing scaled array.
+
 \item Scaled arrays cannot have complex data types. An error will be
 reported if an attempt is made to to import an HDS structure describing a
 complex scaled array, or to assign scale and zero values to an array with
@@ -3787,7 +3790,8 @@ complex data values.
 return information about the data type of the unscaled data values. In
 practice, this means that they return the data type of the SCALE and ZERO
 constants, rather than the data type of the array holding the stored
-(scaled) data values.
+(scaled) data values. To get the data type of the stored (scaled) values,
+use NDF\_SCTYP.
 
 \end{enumerate}
 
