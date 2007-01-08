@@ -106,6 +106,9 @@
 *        co-incident.
 *     28-DEC-2006 (TIMJ):
 *        Needed sf1 and sf2 even if output system was AZEL
+*     8-JAN-2006 (DSB):
+*        Increase pixel size used if all points are co-incident, to avoid
+*        them spanning more than 1 pixel.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -201,6 +204,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    double rdiam;         /* Diameter of bounding circle, in rads */
    double sep;           /* Separation between first and last base positions */
    float *pdata;         /* Pointer to next data sample */
+   int coin;             /* Are all points effectively co-incident? */
    int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
    int ibasein;          /* Index of base Frame in input FrameSet */
@@ -575,6 +579,9 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    above loop. */
    if( data != NULL ) smf_close_file( &data, status );
 
+/* Set a flag indicating if all the points are co-incident. */
+   coin = 0;
+
 /* If required, calculate the optimal projection parameters. */
    if( autogrid && usesys ) {
       kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par, &rdiam, 
@@ -583,15 +590,19 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* If the automatic grid determination algorithm failed, see if all the
    points are effectively co-incident (i.e. within a radius of 0.4
    arcsec). If so, we use default grid parameters that result in a grid
-   of 1x1 spatial pixels. */
+   of 1x1 spatial pixels. The grid pixel sizes (par[4] and par[5]) are
+   made twice the size of the area covered by the points in order to
+   avoid points spanning two pixels. */
       if( par[ 0 ] == AST__BAD ) {
          if( rdiam < 0.4*AST__DD2R/3600.0 ) {
             if( rdiam < 0.01*AST__DD2R/3600.0 ) rdiam = 0.01*AST__DD2R/3600.0;
             par[ 0 ] = 0.0;
             par[ 1 ] = 0.0;
-            par[ 4 ] = -rdiam;
-            par[ 5 ] = rdiam;
+            par[ 4 ] = -rdiam*2;
+            par[ 5 ] = -par[ 4 ];
             par[ 6 ] = 0.0;
+
+            coin = 1;
 
 /* If the sky positions are not co-incident, we cannot use a grid, so
    warn the user. */
@@ -737,8 +748,8 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* If any parameter were given explicit values which differ from the
    default values, then we need to re-calculate the optimal CRPIX1/2 
-   values. */
-      if( !usedefs && autogrid && usesys ) {
+   values. We also do this if all the points are effectively co-incident. */
+      if( ( coin || !usedefs ) && autogrid && usesys ) {
          par[ 0 ] = AST__BAD;
          par[ 1 ] = AST__BAD;
          kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par,
