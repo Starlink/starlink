@@ -21,38 +21,38 @@
 
 *  Description:
 *     This application aligns and rebins a group of input NDFs into a
-*     single output NDF. It differs from WCSALIGN in both the algorithm
-*     used, and in the requirements placed on the input NDFs. WCSMOSAIC
+*     single output NDF.  It differs from WCSALIGN in both the algorithm
+*     used, and in the requirements placed on the input NDFs.  WCSMOSAIC
 *     requires that the transformation from pixel to WCS co-ordinates
 *     be defined in each input NDF, but (unlike WCSALIGN) the inverse 
 *     transformation from WCS to pixel co-ordinates need not be defined.
 *     For instance, this means that WCSMOSAIC can process data in which 
-*     the WCS position of each input pixel is defined via a look-up-table 
-*     rather than an analytical expression. Note however, that the WCS
-*     information in the reference NDF (see parameter REF) must have a defined 
-*     inverse transformation.
+*     the WCS position of each input pixel is defined via a look-up
+*     table rather than an analytical expression.  Note however, that 
+*     the WCS information in the reference NDF (see parameter REF) must
+*     have a defined inverse transformation.
 *
-*     The WCSMOSAIC algorithm proceeds as follows.  First, the output NDF 
-*     is filled with zeros.  An associated array of weights (one weight for
-*     each output pixel) is created and is also filled with zeros.  Each
-*     input NDF is then processed in turn.  For each pixel in the
-*     current input NDF, the corresponding transformed position in the
-*     output NDF is found (based on the WCS information in both NDFs).
-*     The input pixel value is then divided up between a small group of
-*     output pixels centred on this central output position.  The method
-*     used for choosing the fraction of the input pixel value assigned
-*     to each output pixel is determined by the METHOD and PARAMS 
-*     parameters.  Each of the affected output pixel values is then
-*     incremented by its allocated fraction of the input pixel value. 
-*     The corresponding weight values are incremented by the fractions 
-*     used (that is, if 0.25 of an input pixel is assigned to an output 
-*     pixel, the weight for the output pixel is incremented by 0.25).
-*     Once all pixels in the current input NDF have been rebinned into
-*     the output NDF in this way, the algorithm proceeds to rebin the
-*     next input NDF in the same way.  Once all input NDFs have been
-*     processed, output pixels which have a weight less than the value
-*     given by parameter WLIM are set bad.  The mean value in the
-*     weights array (excluding those values less than WLIM) is then
+*     The WCSMOSAIC algorithm proceeds as follows.  First, the output 
+*     NDF is filled with zeros.  An associated array of weights (one 
+*     weight for each output pixel) is created and is also filled with 
+*     zeros.  Each input NDF is then processed in turn.  For each pixel 
+*     in the current input NDF, the corresponding transformed position 
+*     in the output NDF is found (based on the WCS information in both 
+*     NDFs).  The input pixel value is then divided up between a small 
+*     group of output pixels centred on this central output position.  
+*     The method used for choosing the fraction of the input pixel 
+*     value assigned to each output pixel is determined by the METHOD 
+*     and PARAMS parameters.  Each of the affected output pixel values 
+*     is then incremented by its allocated fraction of the input pixel 
+*     value.  The corresponding weight values are incremented by the 
+*     fractions used (that is, if 0.25 of an input pixel is assigned to 
+*     an output pixel, the weight for the output pixel is incremented by
+*     0.25).  Once all pixels in the current input NDF have been 
+*     rebinned into the output NDF in this way, the algorithm proceeds 
+*     to rebin the next input NDF in the same way.  Once all input NDFs
+*     have been processed, output pixels which have a weight less than 
+*     the value given by parameter WLIM are set bad.  The mean value in 
+*     the weights array (excluding those values less than WLIM) is then
 *     found.  The output NDF is then normalised by dividing it by the
 *     weights array.  This normalisation of the output NDF takes account
 *     of any difference in the number of pixels contributing to each
@@ -142,8 +142,8 @@
 *        can take the following values.
 *
 *        - "Bilinear" -- The input pixel value is divided bi-linearly
-*        between  the four nearest output pixels.  This produces smoother
-*        output NDFs than the nearest-neighbour scheme, but is
+*        between  the four nearest output pixels.  This produces 
+*        smoother output NDFs than the nearest-neighbour scheme, but is
 *        marginally slower.
 *
 *        - "Nearest" -- The input pixel value is assigned completely to
@@ -207,7 +207,7 @@
 *        input pixel.  Typically, a value of 2 is appropriate and the 
 *        minimum allowed value is 1 (i.e. one pixel on each side).  A
 *        value of zero or fewer indicates that a suitable number of
-*        pixels should be calculated  automatically. [0]
+*        pixels should be calculated  automatically.  [0]
 *
 *        PARAMS( 2 ) is required only by the Gauss, SombCos, SincSinc, 
 *        SincCos, and SincGauss schemes. For the SombCos, SincSinc and
@@ -220,9 +220,9 @@
 *     REF = NDF (Read)
 *        The NDF to which all the input NDFs are to be aligned.  If a
 *        null value is supplied for this parameter, the first NDF
-*        supplied for parameter IN is used. The WCS Information in this 
+*        supplied for parameter IN is used.  The WCS information in this
 *        NDF must have a defined inverse transformation (from WCS
-*        co-ordinates to pixel co-ordinates).
+*        co-ordinates to pixel co-ordinates).  [!]
 *     UBND() = _INTEGER (Read)
 *        An array of values giving the upper pixel-index bound on each
 *        axis for the output NDF.  The suggested default values just
@@ -269,7 +269,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -279,8 +279,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
