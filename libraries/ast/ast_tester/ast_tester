@@ -16,8 +16,8 @@
 #     compared visually with the file "*.ps". The new files are displayed 
 #     automatically unless the -nd option is supplied on the command line
 #
-#     This script assumes the gnu g77 compiler is available. If this is not 
-#     the case, do a global edit of g77 to whatever fortran 77 compiler you 
+#     This script assumes the gnu g95 compiler is available. If this is not 
+#     the case, do a global edit of g95 to whatever fortran 77 compiler you 
 #     have available (you will probably also need to change the compiler 
 #     flags).
 
@@ -48,10 +48,10 @@ setenv PATH $AST/bin\:$STARLINK/bin\:$PATH
 # List the test progs
 
 # Build the progs
-#f95 -fno-second-underscore -o regression regression.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link`
-f95 -fno-second-underscore -o plotter plotter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -pgp -ems` `pgplot_link`
-f95 -fno-second-underscore -o wcsconverter wcsconverter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
-f95 -fno-second-underscore -o simplify simplify.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
+#g95 -fno-second-underscore -o regression regression.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link`
+g95 -fno-second-underscore -o plotter plotter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -pgp -ems` `pgplot_link`
+g95 -fno-second-underscore -o wcsconverter wcsconverter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
+g95 -fno-second-underscore -o simplify simplify.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
 
 
 
@@ -82,7 +82,7 @@ f95 -fno-second-underscore -o simplify simplify.f -I$AST/include -I$STARLINK/inc
 echo "" 
 foreach prog (testspecframe testfitschan testswitchmap testrebin testtrangrid testnormmap teststc testtime testrate testflux testratemap testspecflux testxmlchan testregions testkeymap )
 
-f95 -fno-second-underscore -w -g -o $prog -g $prog.f -I$AST/include \
+g95 -fno-second-underscore -w -g -o $prog -g $prog.f -I$AST/include \
      -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` \
      `prm_link` `chr_link` `err_link`
 
