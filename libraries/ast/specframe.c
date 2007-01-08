@@ -115,6 +115,17 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *        attributes.
 *     15-NOV-2006 (DSB):
 *        Only write out SpecOrigin if it is not bad.
+*     8-JAN-2006 (DSB):
+*        - SubFrame: Copy the SourceSystem and SourceStdOfRest attributes
+*        to the System and StdOfRest attributes of the "align_frm" 
+*        SpecFrame before calling MakeSpecMapping. Previously, the 
+*        values assigned to  SourceSystem and SourceStdOfRest were
+*        ignored, and alignment was always performed in the templates System 
+*        and StdOfRest.
+*        - MakeSpecMapping: Correct logic used to decide if steps 2 and 7
+*        can be cancelled.
+*        - OriginSystem: Clear the AlignSpecOffset attributes before
+*        finding the Mapping between the old and new Systems.
 *class--
 */
 
@@ -2380,7 +2391,8 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 *     transformation. A transformation is then found from the alignment
 *     frame to the required result Frame,  using the attributes of the
 *     result to define the transformation. The alignment Frame is
-*     described by the attributes of the "align_frm" SpecFrame.
+*     described by the AlignSystem and AlignStdOfRest attributes of the 
+*     "align_frm" SpecFrame.
 *
 *     Thus, different forms of alignment can be obtained by suitable
 *     choice of the attributes of "align_frm". For instance, to compare the
@@ -2567,13 +2579,13 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    the target sor equals the result sor. */
    if( !step4 && !step5 && EqualSor( target, result ) ) step3 = step6 = 0;
 
-/* Steps 2 and 7 are not necessary if steps 3, 4, 5 and 6 are not necessary, and
-   the target sor equals the result sor, and the target and results systems 
-   are equal (if the systems are relative they must also have equal rest 
-   frequencies). */
+/* Steps 2 and 7 are not necessary if steps 3, 4, 5 and 6 are not necessary, 
+   and the target sor equals the result sor, and the target and results 
+   systems are equal (if the systems are relative they must also have equal 
+   rest frequencies). */
    if( !step3 && !step4 && !step5 && !step6 && EqualSor( target, result ) &&
        target_system == result_system ) {
-      if( !ABS_SYSTEM( target_system ) || result_rf == target_rf ) step2 = step7 = 0;
+      if( !ABS_SYSTEM( target_system ) && result_rf == target_rf ) step2 = step7 = 0;
    }
 
 
@@ -3100,7 +3112,8 @@ static void OriginSystem( AstSpecFrame *this, AstSystemType oldsys,
 */
 
 /* Local Variables: */
-   AstSpecFrame *sf;
+   AstSpecFrame *sf1;
+   AstSpecFrame *sf2;
    AstFrameSet *fs;
    double origin;
    double neworigin;
@@ -3114,29 +3127,36 @@ static void OriginSystem( AstSpecFrame *this, AstSystemType oldsys,
 /* Do nothing if the System will not change. */
       if( oldsys != astGetSystem( this ) ) {
 
-/* Save the original SpecOrigin value (in the current SpecFrame units) and then 
-   clear it. */
-         origin = GetSpecOriginCur( this );
-         astClearSpecOrigin( this );
+/* Note the original SpecOrigin value, in the SpecFrame's default units. */
+         origin = astGetSpecOrigin( this );
 
-/* Take a copy of the SpecFrame and set the old system. */
-         sf = astCopy( this );
-         astSetSystem( sf, oldsys );
+/* Take a copy of the original SpecFrame and ensure the Units, SpecOrigin and
+   AlignSpecOffset attributes are cleared. */
+         sf1 = astCopy( this );
+         astClearUnit( sf1, 0 );
+         astClearSpecOrigin( sf1 );
+         astClearAlignSpecOffset( sf1 );
+
+/* Take another copy of the SpecFrame and set the old system. */
+         sf2 = astCopy( sf1 );
+         astSetSystem( sf2, oldsys );
 
 /* Create a Mapping to perform the rest frame change, then use it to convert 
    the value to the current system. */
-         fs = astConvert( sf, this, "" );
+         fs = astConvert( sf2, sf1, "" );
          neworigin = AST__BAD;
          if( fs ) {
             astTran1( fs, 1, &origin, 1, &neworigin );
             fs = astAnnul( fs );
-         }
+         } 
 
-/* If succesful, convert from the current units to the default units, and store 
-   in "this". */
+/* Free resources */
+         sf1 = astAnnul( sf1 );
+         sf2 = astAnnul( sf2 );
+
+/* If succesful, store it in "this". */
          if( neworigin != AST__BAD ) {
-            astSetSpecOrigin( this, ToUnits( this, astGetUnit( this, 0 ), neworigin,
-                              method ) );
+            astSetSpecOrigin( this, neworigin );
 
          } else if( astOK ) {
             astError( AST__ATSER, "%s(%s): Cannot convert the SpecOrigin "
@@ -4648,7 +4668,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
       if ( template ) {
          astOverlay( template, template_axes, *result );
          if( astIsASpecFrame( template ) ) {
-            align_frm = astClone( template );
+            align_frm = astCopy( template );
 
 /* Since we now know that both the template and target are SpecFrames, it 
    should usually be possible to convert betwen them. If conversion is
@@ -4659,7 +4679,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
             report = 1;
 
          } else {
-            align_frm = astClone( target );
+            align_frm = astCopy( target );
          }
 
 /* If no template was supplied, align in the System and StdOfRest of the
@@ -4667,8 +4687,16 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
       } else {
          VerifyAttrs( target, "convert between different spectral systems", 
                    "StdOfRest", "astMatch" );
-         align_frm = astClone( target );
+         align_frm = astCopy( target );
       }
+
+/* The MakeSpecMapping function uses the System and StdOfRest attributes to
+   define the alignment frame. But the AlignSystem and AlignStdOfRest 
+   attributes should be used for this purpose. Therefore, copy the values 
+   of the AlignSystem and AlignStdOfRest attributes to the System and 
+   StdOfRest attribute. */
+      astSetSystem( align_frm, astGetAlignSystem( align_frm ) );
+      astSetStdOfRest( align_frm, astGetAlignStdOfRest( align_frm ) );
 
 /* Generate a Mapping that takes account of changes in the sky coordinate
    system (equinox, epoch, etc.) between the target SpecFrame and the result
@@ -5237,7 +5265,8 @@ static double ToUnits( AstSpecFrame *this, const char *oldunit, double oldval,
 *     ToUnits
 
 *  Purpose:
-*     Convert a supplied spectral value to the default units of the supplied SpecFrame.
+*     Convert a supplied spectral value to the default units of the supplied 
+*     SpecFrame.
 
 *  Type:
 *     Private function.
@@ -5251,9 +5280,8 @@ static double ToUnits( AstSpecFrame *this, const char *oldunit, double oldval,
 *     SpecFrame member function 
 
 *  Description:
-*     This function converts the supplied value from the supplied
-*     units to the default units associated with the supplied SpecFrame's
-*     System.
+*     This function converts the supplied value from the supplied units to 
+*     the default units associated with the supplied SpecFrame's System.
 
 *  Parameters:
 *     this
